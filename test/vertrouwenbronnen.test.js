@@ -55,6 +55,41 @@ test('en er staat niets in BRONNEN dat de matrix helemaal niet leest', () => {
     'deze bronnen wegen mee voor de versheid maar worden door de matrix niet gelezen');
 });
 
+test('een OUDE faalproefronde maakt het bewijs ook echt ouder', () => {
+  /* De drie beweringen hierboven pinnen een LIJST. Deze pint dat de lijst wordt
+     GEBRUIKT -- en zonder deze zou een register in BRONNEN kunnen staan terwijl
+     ouderdom() er niets mee doet, wat exact hetzelfde gat is met een andere
+     oorzaak. ouderdom(nu, lees) neemt een injecteerbare lezer, dus dit draait
+     zonder ook maar een register aan te raken. */
+  const { ouderdom } = require('../scripts/vertrouwen.js');
+  const nu = Date.parse('2026-09-06T12:00:00Z');
+  const vers = '2026-09-06T11:00:00Z';
+  const oud = '2026-06-06T12:00:00Z';        // drie maanden terug
+
+  const lezer = (oudeFaalproef) => (naam) => JSON.stringify({
+    stempel: { op: naam === 'FAALPROEF.json' && oudeFaalproef ? oud : vers, boomVuil: false } });
+
+  const alles = ouderdom(nu, lezer(false));
+  assert.ok(alles.bronnen['FAALPROEF.json'], 'de faalproef telt mee als bron');
+  assert.ok(alles.dagen < 1, 'met alles vers is het bewijs vers, gekregen: ' + alles.dagen);
+
+  const metOude = ouderdom(nu, lezer(true));
+  assert.ok(metOude.dagen > 80,
+    'EEN oude ronde maakt het geheel oud -- het bewijs is zo vers als zijn oudste been. Gekregen: ' +
+    metOude.dagen);
+});
+
+test('een register met een vuile boom telt als onreproduceerbaar', () => {
+  /* Tweede eigenschap van dezelfde functie, en de reden dat deze tak bestaat:
+     een meting van een boom die nergens is vastgelegd, is geen bewijs. */
+  const { ouderdom } = require('../scripts/vertrouwen.js');
+  const nu = Date.parse('2026-09-06T12:00:00Z');
+  const lezer = (naam) => JSON.stringify({
+    stempel: { op: '2026-09-06T11:00:00Z', boomVuil: naam === 'FAALPROEF.json' } });
+  const r = ouderdom(nu, lezer);
+  assert.deepEqual(r.onreproduceerbaar, ['FAALPROEF.json']);
+});
+
 test('de uitzonderingen dragen allemaal een reden', () => {
   for (const [naam, reden] of GEEN_VERSHEIDSBRON) {
     assert.ok(reden && reden.length > 20, naam + ' staat als uitzondering zonder bruikbare reden');

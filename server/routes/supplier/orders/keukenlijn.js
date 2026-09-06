@@ -61,13 +61,27 @@ app.post('/api/supplier/order/spoed', supplierAuth, (req, res) => {
    zaak, zodat elk genre dezelfde techniek kan gebruiken. Na twee uur
    vervalt een melding vanzelf (voedselveiligheid). */
 const OVERSCHOT_TTL = 2 * 3600000;
+/* VERS LEZEN ZONDER TE SCHRIJVEN.
+
+   Dit schreef `s.overschot` terug bij ELKE aanroep, ook als het verzoek daarna
+   met 404 werd geweigerd -- en dan is er een leverancierrij gewijzigd voor een
+   opdracht die niet is uitgevoerd. STAATPROEF.json zag dat en zette ROLLBACK op
+   GEZAKT voor POST /api/supplier/overschot.
+
+   De opruiming is niet verloren: elke LEZER filtert zelf al op dezelfde
+   twee uur (server/kern/leverancier/state.js en kern/events/coach.js), dus een
+   vervallen regel is nergens zichtbaar. Wat hier wegvalt is alleen het
+   terugschrijven -- en dat gebeurt nu op de schrijfpaden hieronder, waar
+   sowieso wordt opgeslagen. */
 function overschotVers(s) {
-  s.overschot = (s.overschot || []).filter(x => Date.now() - new Date(x.at) < OVERSCHOT_TTL);
-  return s.overschot;
+  return (s.overschot || []).filter(x => Date.now() - new Date(x.at) < OVERSCHOT_TTL);
 }
 app.post('/api/supplier/overschot', supplierAuth, (req, res) => {
   const s = req.supplier;
-  const lijst = overschotVers(s);
+  /* `lijst` is een KOPIE (overschotVers filtert), dus hij wordt pas onderaan
+     teruggezet -- na alle 404's. Zo laat een geweigerd verzoek niets achter en
+     blijft de vervaltijd-opruiming toch gebeuren zodra er echt iets verandert. */
+  let lijst = overschotVers(s);
   const op = String(req.body.op || 'erbij');
   if (op === 'erbij') {
     const m = (s.menu || []).find(x => x.id === req.body.itemId);
@@ -82,13 +96,14 @@ app.post('/api/supplier/overschot', supplierAuth, (req, res) => {
     if (!rij) return res.status(404).json({ error: 'Niets gevonden op de pas.' });
     if (op === 'gebruikt') {
       rij.qty -= 1;
-      if (rij.qty <= 0) s.overschot = lijst.filter(x => x !== rij);
+      if (rij.qty <= 0) lijst = lijst.filter(x => x !== rij);
       logActivity(s.code, req.actor, 'gebruikte van de pas: ' + rij.name);
     } else {
-      s.overschot = lijst.filter(x => x !== rij);
+      lijst = lijst.filter(x => x !== rij);
       logActivity(s.code, req.actor, 'schreef af van de pas: ' + rij.qty + 'x ' + rij.name);
     }
   }
+  s.overschot = lijst;
   save();
   sseToSupplier(s.code, 'sync', { scope: 'orders' });
   res.json({ ok: true, overschot: s.overschot });

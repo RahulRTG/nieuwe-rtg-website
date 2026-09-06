@@ -21,6 +21,22 @@ module.exports = ({ db, save, crypto, schoon }) => {
   const nu = () => new Date().toISOString();
   const bak = () => eigen.bak('tafelWensen');
   const vanZaak = code => { const b = bak(); if (!Array.isArray(b[code])) b[code] = []; return b[code]; };
+  /* OPZOEKEN MAAKT NIETS AAN. vanZaak() materialiseert: wie hem aanroept krijgt
+     gegarandeerd een array, desnoods door hem aan te leggen. Voor schrijven is
+     dat goed; voor LEZEN is het een stille bijwerking, en die is gemeten --
+     STAATPROEF.json zag `/api/werkvloer/bedieningskaart` keurig 404 geven en
+     ondertussen een lege tafelrij voor die zaak aanleggen, en zette ROLLBACK
+     daarop op GEZAKT. Dezelfde vorm als in server/kern/zorgketen/index.js.
+     Bevroren met opzet: wie er per ongeluk in duwt krijgt een fout in plaats
+     van een wijziging die nergens terechtkomt.
+
+     Het leespad bestaat al en heet `kijk()` in kern/eigencollectie.js: dezelfde
+     eigenaars- en vormcontrole als bak(), maar afwezig blijft afwezig. Dat is de
+     eigen deur van dit domein, en db.data hier rechtstreeks lezen zou langs
+     keuringsregel 62 gaan. */
+  const LEGE_RIJ = Object.freeze([]);
+  const vanZaakLees = code => { const r = eigen.kijk('tafelWensen')[code];
+    return Array.isArray(r) ? r : LEGE_RIJ; };
 
   /* De veertien wettelijke allergenen, plus de dieetwensen die een keuken
      in de praktijk net zo hard nodig heeft. */
@@ -87,19 +103,21 @@ module.exports = ({ db, save, crypto, schoon }) => {
 
   function tafelLijst(zaak, f) {
     f = f || {};
-    let rijen = vanZaak(zaak);
+    let rijen = vanZaakLees(zaak);
     if (f.event) rijen = rijen.filter(t => (t.event || '') === f.event);
     if (f.wanneer) rijen = rijen.filter(t => (t.wanneer || '') === f.wanneer);
     return { ok: true, allergenen: ALLERGENEN, wensen: WENSEN,
       tafels: rijen.slice(0, 200).map(metTelling),
-      events: [...new Set(vanZaak(zaak).map(t => t.event).filter(Boolean))] };
+      events: [...new Set(vanZaakLees(zaak).map(t => t.event).filter(Boolean))] };
   }
 
   function tafelWeg(zaak, id) {
-    const rijen = vanZaak(zaak);
-    const i = rijen.findIndex(t => t.id === String(id || ''));
+    /* Eerst LEZEND zoeken: is hij er niet, dan volgt een 404 en hoort er niets
+       te zijn aangelegd. Is hij er wel, dan bestaat de rij en geeft vanZaak()
+       exact dezelfde array terug. */
+    const i = vanZaakLees(zaak).findIndex(t => t.id === String(id || ''));
     if (i < 0) return { status: 404, error: 'Deze tafel staat niet op de lijst.' };
-    rijen.splice(i, 1);
+    vanZaak(zaak).splice(i, 1);
     save();
     return { ok: true, weg: String(id) };
   }
@@ -109,7 +127,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
      bovenaan, want daar mag niets misgaan. */
   function keukenbord(zaak, f) {
     f = f || {};
-    let rijen = vanZaak(zaak);
+    let rijen = vanZaakLees(zaak);
     if (f.event) rijen = rijen.filter(t => (t.event || '') === f.event);
     if (f.wanneer) rijen = rijen.filter(t => (t.wanneer || '') === f.wanneer);
     const tafels = rijen.map(metTelling).sort((a, b) => b.allergenenTotaal - a.allergenenTotaal || String(a.tafel).localeCompare(String(b.tafel)));
@@ -130,7 +148,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
   /* De bedieningskaart van een tafel: per stoel één regel, kort genoeg om
      mee te lopen. */
   function bedieningskaart(zaak, id) {
-    const t = vanZaak(zaak).find(x => x.id === String(id || ''));
+    const t = vanZaakLees(zaak).find(x => x.id === String(id || ''));
     if (!t) return { status: 404, error: 'Deze tafel staat niet op de lijst.' };
     return { ok: true, tafel: t.tafel, event: t.event, wanneer: t.wanneer, gastvrouw: t.gastvrouw,
       stoelen: (t.gasten || []).map(g => ({

@@ -293,3 +293,58 @@ test('een register dat ONTBREEKT of leeg is, geeft wel gewoon null', () => {
   assert.equal(perRouteKaart(zonder), null, 'een register zonder perRoute is geen defect');
   assert.equal(objectRegister(zonder), null, 'ook niet voor de andere lezer');
 });
+
+/* ---------- de FAILURE-kolom heeft twee bronnen, in volgorde ----------
+
+   scripts/faalproef.js is gebouwd om deze kolom per route te vullen en schrijft
+   FAALPROEF.json, maar dit bestand las hem niet: FAILURE kwam alleen uit
+   KETENS.json, en dat zijn drie ketens (samen twee routes). De kolom stond
+   daardoor op 2 van 4971 bewezen, en omdat scripts/vertrouwen.js elke route met
+   een ongemeten schakel op `verzwakt` zet, stond VERTROUWEN.json op 0 bewezen.
+   Een bedradingsfout die in drie registers zichtbaar was en in geen ervan als
+   bedrading las. */
+const metFaal = (failure, reden) => bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null,
+  poort: null, rol: null, keten: null, invoer: null, idem: null,
+  faal: new Map([['POST /api/proef/schrijf', { methode: 'POST', pad: '/api/proef/schrijf', failure, reden }]]) })
+  .rijen.find(r => r.pad === '/api/proef/schrijf').cellen.FAILURE;
+
+test('de faalproef vult de FAILURE-cel als de ketenronde er niets over zegt', () => {
+  const c = metFaal('bewezen', 'schrijf-faalt: een expliciete fout, niets half achter');
+  assert.equal(c.staat, 'bewezen');
+  assert.equal(c.bron, 'faalproef');
+  assert.match(c.reden, /schrijf-faalt/);
+});
+
+test('een gezakte faalproef is een bevinding en telt niet als bewijs', () => {
+  const c = metFaal('gezakt', 'schrijf-verloren: 2xx terwijl de toestand er niet is');
+  assert.equal(c.staat, 'gezakt');
+  assert.equal(c.bron, 'faalproef');
+});
+
+test('ongemeten van de faalproef draagt de reden -- niet gegrepen is niet ongezien', () => {
+  /* Het verschil tussen "het verraad greep niet aan" en "niemand heeft gekeken"
+     hoort in de cel te staan. Zonder reden lezen ze identiek. */
+  const c = metFaal('ongemeten', 'geen ingebouwd verraad voor een leesafhankelijkheid');
+  assert.equal(c.staat, 'ongemeten');
+  assert.equal(c.bron, 'faalproef');
+  assert.match(c.reden, /leesafhankelijkheid/);
+});
+
+test('de ketenronde wint van de faalproef -- die herstart de server, de faalproef niet', () => {
+  /* De volgorde is de hele reden dat de faalproef ONDER de ketenronde staat.
+     Zou de faalproef bovenaan komen, dan verdringt een meting binnen het proces
+     een meting die de herstart heeft overleefd. */
+  const c = bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null, poort: null, rol: null,
+    invoer: null, idem: null,
+    keten: new Map([['POST /api/proef/schrijf', { stil: false }]]),
+    faal: new Map([['POST /api/proef/schrijf', { methode: 'POST', pad: '/api/proef/schrijf',
+      failure: 'gezakt', reden: 'binnen het proces gezakt' }]]) })
+    .rijen.find(r => r.pad === '/api/proef/schrijf').cellen.FAILURE;
+  assert.equal(c.bron, 'ketenronde', 'de zwaardere waarneming hoort te winnen');
+  assert.equal(c.staat, 'bewezen');
+});
+
+test('zonder faalproef-register blijft FAILURE gewoon ongemeten', () => {
+  const c = leeg().rijen.find(r => r.pad === '/api/proef/schrijf').cellen.FAILURE;
+  assert.equal(c.staat, 'ongemeten');
+});

@@ -22,16 +22,19 @@ module.exports = ({ db, save, inzagelog, hulp, serviceEnvelop }) => {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/ledenbalie-zaken', bezit: { balieKlachten: 'lijst', balieAboVoorstellen: 'lijst' } });
   const K = () => eigen.bak('balieKlachten');
   const V = () => eigen.bak('balieAboVoorstellen');
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const Klees = () => eigen.kijk('balieKlachten');
+  const Vlees = () => eigen.kijk('balieAboVoorstellen');
 
   /* Wat het dossier van een lid laat zien: de klachten die nog lopen, en de
      voorstellen die er over hem zijn gedaan. Kort gehouden -- het dossier is
      een werkscherm, geen archief. */
   function klachtenVan(lidId) {
-    return K().filter(k => k.lidId === lidId && k.status !== 'gesloten' && k.status !== 'opgelost')
+    return Klees().filter(k => k.lidId === lidId && k.status !== 'gesloten' && k.status !== 'opgelost')
       .slice(0, 20).map(k => ({ id: k.id, soort: k.soort, tekst: k.tekst, status: k.status, at: k.at }));
   }
   function voorstellenVan(lidId) {
-    return V().filter(v => v.lidId === lidId).slice(0, 10)
+    return Vlees().filter(v => v.lidId === lidId).slice(0, 10)
       .map(v => ({ id: v.id, naarPas: v.naarPas, status: v.status, at: v.at }));
   }
 
@@ -76,7 +79,7 @@ module.exports = ({ db, save, inzagelog, hulp, serviceEnvelop }) => {
     const st = String(status || '').trim().toLowerCase();
     if (!STATUSSEN.includes(st))
       return { status: 400, error: 'Kies een stand: ' + STATUSSEN.join(', ') + '.' };
-    const k = K().find(x => x.id === String(klachtId || ''));
+    const k = Klees().find(x => x.id === String(klachtId || ''));
     if (!k) return { status: 404, error: 'Deze klacht kennen we niet.' };
     k.status = st;
     k.log.push({ status: st, door: wie(door), at: nu() });

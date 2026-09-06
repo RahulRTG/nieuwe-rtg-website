@@ -12,6 +12,9 @@ module.exports = (ctx) => {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/vakwerk/pro3', bezit: { vakRitmes: 'lijst', vakWachtlijst: 'lijst' } });
   const ritmes = () => eigen.bak('vakRitmes');
   const wacht = () => eigen.bak('vakWachtlijst');
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const ritmesLees = () => eigen.kijk('vakRitmes');
+  const wachtLees = () => eigen.kijk('vakWachtlijst');
   const pubRitme = r => ({ id: r.id, supplierCode: r.supplierCode, zaak: r.supplierName, klant: r.customerCodename,
     dienst: r.dienstNaam, intervalWeken: r.intervalWeken, tijd: r.tijd, laatst: r.laatst || r.start, actief: r.actief });
 
@@ -37,7 +40,7 @@ module.exports = (ctx) => {
   function ritmeTick(code) {
     const vd = vandaagStr();
     let acties = 0;
-    for (const r of ritmes()) {
+    for (const r of ritmesLees()) {
       if (r.supplierCode !== code || !r.actief) continue;
       const open = (boekingenVanZaak(code) || []).some(b => b.note === 'Vaste afspraak ' + r.id
         && b.status !== 'geweigerd' && String(b.wanneer || '').slice(0, 10) >= vd);
@@ -83,10 +86,10 @@ module.exports = (ctx) => {
     sseToSupplier(s.code, 'sync', { scope: 'orders' });
     return { status: 200, ok: true, ritme: pubRitme(r), boeking: b };
   }
-  const ritmesVanLid = key => ({ status: 200, ritmes: ritmes().filter(r => r.customerKey === key && r.actief).slice(0, 15).map(pubRitme) });
-  const ritmesVanZaak = code => ritmes().filter(r => r.supplierCode === code && r.actief).slice(0, 25).map(pubRitme);
+  const ritmesVanLid = key => ({ status: 200, ritmes: ritmesLees().filter(r => r.customerKey === key && r.actief).slice(0, 15).map(pubRitme) });
+  const ritmesVanZaak = code => ritmesLees().filter(r => r.supplierCode === code && r.actief).slice(0, 25).map(pubRitme);
   function ritmeStop(wie, id) {
-    const r = ritmes().find(x => x.id === String(id || '') && (wie.key ? x.customerKey === wie.key : x.supplierCode === wie.code));
+    const r = ritmesLees().find(x => x.id === String(id || '') && (wie.key ? x.customerKey === wie.key : x.supplierCode === wie.code));
     if (!r || !r.actief) return { status: 404, error: 'Deze vaste afspraak is niet gevonden of al gestopt.' };
     r.actief = false;
     save();
@@ -115,7 +118,7 @@ module.exports = (ctx) => {
     notifySupplier(s.code, { icon: 'agenda', title: 'Wachtlijst', body: sessie.codename + ' wacht op een plek op ' + datum + (w.dienst ? ' (' + w.dienst + ')' : '') + '.' });
     return { status: 200, ok: true };
   }
-  const wachtVanZaak = code => wacht().filter(w => w.supplierCode === code && w.datum >= vandaagStr()).slice(0, 25)
+  const wachtVanZaak = code => wachtLees().filter(w => w.supplierCode === code && w.datum >= vandaagStr()).slice(0, 25)
     .map(w => ({ id: w.id, klant: w.codenaam, dienst: w.dienst, datum: w.datum, uitgenodigd: !!w.uitgenodigd }));
   function nodigUit(w, naam) {
     notify(w.customerTier, { icon: 'agenda', title: naam, body: 'Er is plek vrijgekomen op ' + w.datum + (w.dienst ? ' voor "' + w.dienst + '"' : '') + '. Boeken kan in de Mall, als u dat nog wilt.', scope: 'orders' });
@@ -123,7 +126,7 @@ module.exports = (ctx) => {
     w.uitgenodigd = nu();
   }
   function wachtUitnodig(code, body) {
-    const w = wacht().find(x => x.id === String((body || {}).id || '') && x.supplierCode === code);
+    const w = wachtLees().find(x => x.id === String((body || {}).id || '') && x.supplierCode === code);
     if (!w) return { status: 404, error: 'Deze wachtende is niet gevonden.' };
     if (w.uitgenodigd) return { status: 429, error: 'Al uitgenodigd; het lid beslist zelf.' };
     nodigUit(w, (findSupplier(code) || {}).name || 'RTG');
@@ -133,7 +136,7 @@ module.exports = (ctx) => {
   // auto-seintje: komt er een plek vrij (geweigerde/afgezegde boeking), dan
   // krijgt de eerste wachtende voor die dag vanzelf netjes bericht
   function wachtVrij(code, datum) {
-    const w = wacht().find(x => x.supplierCode === code && x.datum === datum && !x.uitgenodigd);
+    const w = wachtLees().find(x => x.supplierCode === code && x.datum === datum && !x.uitgenodigd);
     if (!w) return 0;
     nodigUit(w, (findSupplier(code) || {}).name || 'RTG');
     save();

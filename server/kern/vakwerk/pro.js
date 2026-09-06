@@ -11,7 +11,9 @@ module.exports = (ctx) => {
     sseToCustomer, sseToSupplier, boekingenVoegToe } = ctx;
   const eigen = require('../eigencollectie')({ db, domein: 'kern/vakwerk/pro', bezit: { vakOffertes: 'lijst' } });
   const nu = () => new Date().toISOString();
-  const lijst = () => eigen.bak('vakOffertes');
+  const lijst = () => eigen.bak('vakOffertes');   // schrijfpad: unshift + zetBak
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const lees = () => eigen.kijk('vakOffertes');
 
   /* `regels` reist mee naar de klant: een bedrag zonder onderbouwing is precies
      waar de offertebouwer voor bestaat. Null als de zaak alleen een prijs gaf --
@@ -46,8 +48,8 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, offerte: publiekLid(o) };
   }
 
-  const offertesVanLid = key => ({ status: 200, offertes: lijst().filter(o => o.customerKey === key).slice(0, 25).map(publiekLid) });
-  const offertesVanZaak = code => lijst().filter(o => o.supplierCode === code).slice(0, 40).map(publiekZaak);
+  const offertesVanLid = key => ({ status: 200, offertes: lees().filter(o => o.customerKey === key).slice(0, 25).map(publiekLid) });
+  const offertesVanZaak = code => lees().filter(o => o.supplierCode === code).slice(0, 40).map(publiekZaak);
 
   /* Antwoorden kan op twee manieren, en dit blijft de ENIGE plek die een
      offerte bijwerkt. Met `regels` bouwt kern/onderneming/offertebouw.js de
@@ -55,7 +57,7 @@ module.exports = (ctx) => {
      het zoals het altijd ging. Dat tweede is geen tijdelijke tolerantie maar
      het eerlijke geval: een klus van een uur is soms gewoon een bedrag. */
   function offerteAntwoord(code, body) {
-    const o = lijst().find(x => x.id === String((body || {}).id || '') && x.supplierCode === code);
+    const o = lees().find(x => x.id === String((body || {}).id || '') && x.supplierCode === code);
     if (!o) return { status: 404, error: 'Offerte niet gevonden.' };
     if (o.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + o.status + '.' };
 
@@ -83,7 +85,7 @@ module.exports = (ctx) => {
   }
 
   function offerteWeiger(code, body) {
-    const o = lijst().find(x => x.id === String((body || {}).id || '') && x.supplierCode === code);
+    const o = lees().find(x => x.id === String((body || {}).id || '') && x.supplierCode === code);
     if (!o) return { status: 404, error: 'Offerte niet gevonden.' };
     if (o.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + o.status + '.' };
     o.status = 'afgewezen'; o.antwoordAt = nu();
@@ -94,7 +96,7 @@ module.exports = (ctx) => {
   }
 
   function offerteAkkoord(key, body) {
-    const o = lijst().find(x => x.id === String((body || {}).id || '') && x.customerKey === key);
+    const o = lees().find(x => x.id === String((body || {}).id || '') && x.customerKey === key);
     if (!o) return { status: 404, error: 'Offerte niet gevonden.' };
     if (o.status !== 'aangeboden') return { status: 409, error: 'Deze offerte staat niet open voor akkoord (status: ' + o.status + ').' };
     const s = findSupplier(o.supplierCode);
@@ -116,7 +118,7 @@ module.exports = (ctx) => {
   }
 
   function offerteIntrek(key, body) {
-    const o = lijst().find(x => x.id === String((body || {}).id || '') && x.customerKey === key);
+    const o = lees().find(x => x.id === String((body || {}).id || '') && x.customerKey === key);
     if (!o) return { status: 404, error: 'Offerte niet gevonden.' };
     if (o.status === 'akkoord') return { status: 409, error: 'Deze offerte is al akkoord; overleg met de zaak.' };
     o.status = 'ingetrokken';

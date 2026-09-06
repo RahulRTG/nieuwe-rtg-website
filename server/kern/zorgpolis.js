@@ -17,14 +17,22 @@ function maakZorgpolis({ db, save, crypto, schoon, keyVanCodenaam, walletVoeg, w
   const cap = (l, m) => { if (l.length > m) l.length = m; };
   const eigen = require('./eigencollectie')({ db, domein: 'kern/zorgpolis', bezit: { zorgpolis: 'kaart' } });
 
-  function Z(code) {
+  const LEEGZ = () => ({ verzekerden: [], declaraties: [] });
+  function Z(code) {                       // schrijfkant: mag aanleggen
     const alle = eigen.bak('zorgpolis');
-    if (!alle[code]) alle[code] = { verzekerden: [], declaraties: [] };
+    if (!alle[code]) alle[code] = LEEGZ();
     return alle[code];
+  }
+  /* Leeskant: legt niets aan -- ook alle[code] niet. Alleen eigen.bak()
+     omzetten is hier niet genoeg: de regel eronder schrijft dan nog steeds in
+     de echte kaart zodra die al bestaat. */
+  function Zlees(code) {
+    const alle = eigen.kijk('zorgpolis');
+    return alle[code] || LEEGZ();
   }
 
   function overzicht(code) {
-    const z = Z(code);
+    const z = Zlees(code);
     return { status: 200, pakketten: PAKKETTEN,
       verzekerden: z.verzekerden.map(v => ({ id: v.id, pas: v.pas, codenaam: v.codenaam, pakket: v.pakket, sinds: v.sinds, status: v.status })).slice(0, 60),
       declaraties: z.declaraties.slice(0, 60),
@@ -37,7 +45,6 @@ function maakZorgpolis({ db, save, crypto, schoon, keyVanCodenaam, walletVoeg, w
 
   /* ---- inschrijven: een mens schrijft in, op codenaam ---- */
   async function schrijfIn(code, b, wie) {
-    const z = Z(code);
     const codenaam = schoon(b.codenaam, 60);
     const pakket = PAKKETTEN[b.pakket] != null ? b.pakket : null;
     if (!codenaam) return { status: 400, error: 'Op welke codenaam schrijft u in?' };
@@ -45,12 +52,13 @@ function maakZorgpolis({ db, save, crypto, schoon, keyVanCodenaam, walletVoeg, w
     let memberKey = null;
     try { const t = keyVanCodenaam ? await keyVanCodenaam(codenaam) : null; memberKey = t && t.key; } catch (e) {}
     if (!memberKey) return { status: 404, error: 'Geen lid gevonden met die codenaam.' };
-    if (z.verzekerden.find(v => v.memberKey === memberKey && v.status === 'actief'))
+    if (Zlees(code).verzekerden.find(v => v.memberKey === memberKey && v.status === 'actief'))
       return { status: 409, error: 'Dit lid heeft al een actieve zorgpolis.' };
     const pas = 'ZP-' + crypto.randomBytes(2).toString('hex').toUpperCase();
     const v = { id: id('v'), pas, codenaam, memberKey, pakket, sinds: nu().slice(0, 10),
       status: 'actief', door: schoon(wie, 60) || 'verzekeraar' };
-    z.verzekerden.unshift(v); cap(z.verzekerden, MAX_LIJST);
+    const zw = Z(code);
+    zw.verzekerden.unshift(v); cap(zw.verzekerden, MAX_LIJST);
     // de pas ligt direct in de wallet van het lid, geldig tot het einde van het jaar
     try { walletVoeg(memberKey, { soort: 'pas', titel: 'Zorgpas Segur (' + pakket + ')', code: pas,
       bron: 'zorgpolis', geldigTot: nu().slice(0, 4) + '-12-31' }); } catch (e) {}
@@ -58,7 +66,7 @@ function maakZorgpolis({ db, save, crypto, schoon, keyVanCodenaam, walletVoeg, w
     return { status: 200, ok: true, verzekerde: { id: v.id, pas, codenaam, pakket, sinds: v.sinds }, maandpremie: PAKKETTEN[pakket] };
   }
   function stopZet(code, vId) {
-    const z = Z(code);
+    const z = Zlees(code);
     const v = z.verzekerden.find(x => x.id === String(vId || ''));
     if (!v) return { status: 404, error: 'Verzekerde niet gevonden.' };
     if (v.status !== 'actief') return { status: 409, error: 'Deze polis is al gestopt.' };
@@ -70,7 +78,7 @@ function maakZorgpolis({ db, save, crypto, schoon, keyVanCodenaam, walletVoeg, w
 
   /* ---- declaraties: indienen op de pas, en een mens beslist ---- */
   function declaratieIn(code, b) {
-    const z = Z(code);
+    const z = Zlees(code);
     const pas = schoon(b.pas, 20).toUpperCase();
     const v = z.verzekerden.find(x => x.pas === pas);
     if (!v || v.status !== 'actief') return { status: 409, error: 'Geen actieve zorgpas met dit nummer.' };
@@ -79,11 +87,12 @@ function maakZorgpolis({ db, save, crypto, schoon, keyVanCodenaam, walletVoeg, w
     if (!omschrijving) return { status: 400, error: 'Waar gaat de declaratie over?' };
     if (!(bedrag > 0 && bedrag <= 25000)) return { status: 400, error: 'Een bedrag tussen 0 en 25.000.' };
     const d = { id: id('d'), pas, codenaam: v.codenaam, omschrijving, bedrag, status: 'ingediend', reden: '', door: '', om: nu() };
-    z.declaraties.unshift(d); cap(z.declaraties, MAX_LIJST); save();
+    const zw = Z(code);
+    zw.declaraties.unshift(d); cap(zw.declaraties, MAX_LIJST); save();
     return { status: 200, ok: true, declaratie: d };
   }
   function declaratieBeslis(code, b, wie) {
-    const z = Z(code);
+    const z = Zlees(code);
     const d = z.declaraties.find(x => x.id === String(b.id || ''));
     if (!d) return { status: 404, error: 'Declaratie niet gevonden.' };
     if (d.status !== 'ingediend') return { status: 409, error: 'Hierover is al beslist.' };
@@ -100,7 +109,7 @@ function maakZorgpolis({ db, save, crypto, schoon, keyVanCodenaam, walletVoeg, w
 
   /* ---- de pas-controle: niet meer dan actief, pakket en codenaam ---- */
   function pasCheck(code, pasnr) {
-    const z = Z(code);
+    const z = Zlees(code);
     const v = z.verzekerden.find(x => x.pas === schoon(pasnr, 20).toUpperCase());
     if (!v) return { status: 404, error: 'Onbekend pasnummer.' };
     return { status: 200, actief: v.status === 'actief', pakket: v.pakket, codenaam: v.codenaam };

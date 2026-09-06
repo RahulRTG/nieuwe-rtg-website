@@ -797,3 +797,318 @@ test('kijkplicht: een regel afvinken die er niet is, schept geen kijkplichtlijst
   k.kijkplichtMijn('user-1');
   geenMeubilair(db, 'theaterKijkplicht', 'de stand en de eigen lijst zonder regels');
 });
+
+/* -------------------------------------------------------------- vakwerk/pro */
+test('vakwerk: antwoorden op een offerte die er niet is, schept geen offertelijst', () => {
+  const db = { data: {}, capsVan: () => [] };
+  const v = require('../server/kern/vakwerk/pro')({
+    db, save: () => {}, findSupplier: () => ({ code: 'S1', name: 'Zaak', type: 'zzp', services: [] }),
+    isVak: () => true, scho: (x, n) => String(x == null ? '' : x).trim().slice(0, n || 200),
+    crypto: require('node:crypto'), notify: () => {}, notifySupplier: () => {},
+    sseToCustomer: () => {}, sseToSupplier: () => {}, boekingenVoegToe: () => {},
+  });
+
+  assert.equal(v.offerteAntwoord('S1', { id: 'x' }).status, 404);
+  assert.equal(v.offerteWeiger('S1', { id: 'x' }).status, 404);
+  assert.equal(v.offerteAkkoord('k', { id: 'x' }).status, 404);
+  assert.equal(v.offerteIntrek('k', { id: 'x' }).status, 404);
+  v.offertesVanLid('k');
+  v.offertesVanZaak('S1');
+  geenMeubilair(db, 'vakOffertes', 'zes paden zonder offertes');
+});
+
+/* ---------------------------------------------------------------- zorgpolis */
+test('zorgpolis: een onbekend pasnummer schept geen poliskaart', () => {
+  const { maakZorgpolis } = require('../server/kern/zorgpolis');
+  const { schoon } = require('../server/kern/util');
+  const db = { data: {} };
+  const { zorgpolis } = maakZorgpolis({
+    db, save: () => {}, crypto: require('node:crypto'), schoon,
+    keyVanCodenaam: async () => ({ key: 'mk1' }), walletVoeg: () => {}, walletWegBron: () => {},
+  });
+
+  assert.equal(zorgpolis.pasCheck('SEGUR', 'ZP-0000').status, 404);
+  assert.equal(zorgpolis.stopZet('SEGUR', 'v-nietbestaand').status, 404);
+  assert.equal(zorgpolis.declaratieBeslis('SEGUR', { id: 'd-nietbestaand' }, 'Wie').status, 404);
+  assert.equal(zorgpolis.declaratieIn('SEGUR', { pas: 'ZP-0000' }).status, 409);
+  zorgpolis.overzicht('SEGUR');
+  geenMeubilair(db, 'zorgpolis', 'vijf paden zonder polissen');
+
+  /* TEGENPROEF: inschrijven schrijft nog in de ECHTE kaart, en de pas is
+     daarna te controleren -- die zakt zodra Z() ook op kijk() gaat. */
+  return zorgpolis.schrijfIn('SEGUR', { codenaam: 'Lid', pakket: 'basis' }, 'Balie').then(r => {
+    assert.ok(r.ok, 'de polis is aangemaakt: ' + (r.error || ''));
+    assert.equal(db.data.zorgpolis.SEGUR.verzekerden.length, 1);
+    assert.equal(zorgpolis.pasCheck('SEGUR', r.verzekerde.pas).status, 200);
+  });
+});
+
+/* --------------------------------------------------------------- toestellen */
+test('toestellen: een toestel intrekken dat er niet is, schept geen lijst', () => {
+  const db = { data: {} };
+  const k = require('../server/kern/toestellen')({
+    db, save: () => {}, crypto: require('node:crypto'),
+    schoon: (w, n) => String(w == null ? '' : w).trim().slice(0, n),
+    metingVanToestel: () => ({ ok: true, onderwerp: 'slaap', bron: 'apparaat' }),
+  });
+
+  assert.equal(k.toestelIntrek('lid1', { id: 'x' }).status, 404);
+  assert.equal(k.toestelKoppel('lid1', {}).status, 400);
+  assert.equal(k.toestelVanSleutel('a'.repeat(48)), null);
+  k.toestellenVan('lid1');
+  geenMeubilair(db, 'toestellen', 'vier paden zonder toestellen');
+
+  /* TEGENPROEF: koppelen schrijft nog, en de sleutel vindt het toestel terug. */
+  const t = k.toestelKoppel('lid1', { naam: 'Horloge', soort: 'horloge' });
+  assert.ok(t.sleutel, 'het toestel is gekoppeld: ' + (t.error || ''));
+  assert.equal(db.data.toestellen.length, 1);
+  assert.ok(k.toestelVanSleutel(t.sleutel), 'en is via de sleutel te vinden');
+});
+
+/* ---------------------------------------------------------------------- wbw */
+test('wbw: een lijstje openen dat er niet is, schept geen groepen', async () => {
+  const db = { data: {} };
+  const { maakWbw } = require('../server/kern/wbw');
+  const w = maakWbw({
+    db, save: () => {}, crypto: require('node:crypto'),
+    schoon: (s, n) => String(s == null ? '' : s).slice(0, n),
+    codenaamVan: k => 'cn-' + k, connectieTussen: () => ({}), verbActief: () => true,
+    pay: { stuur: async () => ({ ok: true }), verzoekMaak: async () => ({ ok: true }) },
+    notify: () => {},
+  });
+
+  assert.equal(w.wbwGroep('k1', 'bestaat-niet').status, 404);
+  assert.equal((await w.wbwUitgave('k1', 'x', { centen: 100 })).status, 404);
+  assert.equal(w.wbwMaak('k1', { naam: '' }).status, 400);
+  w.wbwMijn('k1');
+  geenMeubilair(db, 'wbwGroepen', 'vier paden zonder lijstjes');
+
+  /* TEGENPROEF: een lijstje maken legt de collectie wel aan. */
+  const g = w.wbwMaak('k1', { naam: 'Test', leden: ['k2'] });
+  assert.ok(g.groep, 'het lijstje is gemaakt: ' + (g.error || ''));
+  assert.equal(db.data.wbwGroepen.length, 1);
+  assert.ok(w.wbwGroep('k1', g.groep.id).groep, 'en is terug te vinden');
+});
+
+/* ------------------------------------------------------------------- wallet */
+test('wallet: iets weghalen dat er niet in zit, schept geen wallet', async () => {
+  const { maakWallet } = require('../server/kern/wallet');
+  const db = { data: {} };
+  let saves = 0;
+  const w = maakWallet({
+    db, save: () => saves++, crypto: require('node:crypto'),
+    schoon: (s, n) => String(s == null ? '' : s).slice(0, n).trim(),
+    pay: { huisIn: async () => ({ status: 402, error: 'geen saldo' }) }, codenaamVan: k => k,
+  });
+
+  assert.equal(w.wallet.muntWissel('lid1', { id: 'x' }).status, 404);
+  assert.equal(w.wallet.weg('lid1', 'x').status, 404);
+  w.wallet.lijst('lid1');
+  assert.equal((await w.wallet.muntKoop('lid1', { zaak: 'Feest', aantal: 2 })).status, 402);
+  assert.equal(w.walletWegBron('lid1', 'zorgpolis'), 0);
+  geenMeubilair(db, 'wallet', 'vijf paden zonder wallet');
+  assert.equal(saves, 0);
+
+  /* TEGENPROEF: erin leggen schrijft nog, en weghalen landt op die rij. */
+  const it = w.walletVoeg('lid1', { soort: 'pas', titel: 'Zorgpas', code: 'ZP-1', bron: 'zorgpolis' });
+  assert.ok(it && it.id, 'de pas ligt in de wallet');
+  assert.equal(db.data.wallet.lid1.length, 1);
+  assert.equal(w.walletWegBron('lid1', 'zorgpolis'), 1, 'en gaat er via de bron weer uit');
+  assert.equal(db.data.wallet.lid1.length, 0);
+});
+
+/* ------------------------------------------------------------------ webmerk */
+test('webmerk: een merk koppelen dat er niet is, schept geen merkenkaart', () => {
+  const db = { data: {} };
+  const W = require('../server/kern/webmerk')({
+    db, save: () => {}, scho: (s, n) => String(s == null ? '' : s).slice(0, n),
+    findSupplier: code => ({ ESVEDRA: { code: 'ESVEDRA', name: 'Es Vedra' } })[code] || null,
+    webmaker: { mijn: () => [], bewaar: () => ({ ok: true, design: { id: 'd1' } }),
+      publiceer: () => ({ adres: 'a' }), slug: s => s },
+  });
+
+  W.koppel('ZEIL', 'ESVEDRA', true);
+  W.haal('ZEIL');
+  W.lijst();
+  geenMeubilair(db, 'webMerken', 'koppelen en lezen zonder merken');
+
+  /* TEGENPROEF: een merk maken legt de kaart wel aan. */
+  const m = W.maak('ZEIL', 'Zeilmerk');
+  assert.ok(m.ok, 'het merk is gemaakt: ' + (m.error || ''));
+  assert.ok(Object.prototype.hasOwnProperty.call(db.data, 'webMerken'));
+  assert.ok(W.haal('ZEIL'), 'en is terug te vinden');
+});
+
+/* ------------------------------------------------------- ledenbalie-zaken */
+test('ledenbalie-zaken: een klacht opzoeken die er niet is, schept geen zaken', () => {
+  const hulp = {
+    nu: () => 'T', rid: () => 'ID', kort: (v, n) => String(v == null ? '' : v).trim().slice(0, n),
+    inhoud: s => String(s).replace(/[^\p{L}\p{N}]/gu, '').length, wie: () => 'balie',
+    redenOf: r => (String(r || '').length >= 10 ? String(r) : null),
+    lidOf: id => (id === 1 ? { id: 1, codename: 'CN', tier: 'rtg' } : null),
+    pasVan: () => 'rtg', PASSEN: ['gratis', 'rtg', 'lifestyle', 'business'], REDEN_MIN: 10,
+    geenReden: { status: 400 }, geenLid: { status: 404 },
+  };
+  const db = { data: {} };
+  const b = require('../server/kern/ledenbalie-zaken')({
+    db, save: () => {}, inzagelog: { noteer() {} }, hulp,
+  });
+
+  assert.equal(b.balieKlachtStatus('geen-id', 'opgelost', 'een geldige reden', 1).status, 404);
+  geenMeubilair(db, 'balieKlachten', 'een 404 op balieKlachtStatus');
+  b.klachtenVan(1);
+  b.voorstellenVan(1);
+  geenMeubilair(db, 'balieKlachten', 'de klachten van een lid zonder klachten');
+  geenMeubilair(db, 'balieAboVoorstellen', 'en zonder abonnementsvoorstellen');
+});
+
+/* ---------------------------------------------------------------- leerstof */
+test('leerstof: antwoorden zonder lopende sessie schept geen sessiekaart', () => {
+  const { maakLeerstof } = require('../server/kern/leerstof');
+  const db = { data: {} };
+  const L = maakLeerstof({
+    db, save: () => {},
+    onderwijs: { mijn: () => ({ doelen: {} }), doelBehaald: () => ({}),
+      herhalingen: () => ({ open: [], later: [], uitleg: '' }), noteerOphaling: () => null },
+  });
+
+  assert.equal(L.leerstofOefenAntwoord('niemand', { antwoord: 'x' }).status, 400);
+  geenMeubilair(db, 'leerstofSessies', 'antwoorden zonder lopende sessie');
+});
+
+/* ------------------------------------------------------------ onderzoekslab */
+test('onderzoekslab: vijf weigerpaden laten de projectenlijst ongemoeid', () => {
+  const db = { data: {} };
+  const lab = require('../server/kern/onderzoekslab')({
+    db, save: () => {}, crypto: require('node:crypto'), anthropic: null,
+  }).lab;
+
+  assert.equal(lab.faseZet('bestaat-niet', 'onderzoek').status, 404);
+  assert.equal(lab.teamZet('bestaat-niet', {}).status, 404);
+  assert.equal(lab.veiligheidZet('bestaat-niet', {}).status, 404);
+  assert.equal(lab.logMaak('bestaat-niet', {}).status, 404);
+  assert.equal(lab.bevindingMaak('bestaat-niet', {}).status, 404);
+  lab.overzichtVoor('rtg');
+  geenMeubilair(db, 'labProjecten', 'vijf 404-en en het overzicht');
+
+  /* TEGENPROEF: een project maken legt de lijst wel aan. */
+  const p = lab.projectMaak({ titel: 'Zonneboer', veld: 'landbouw' });
+  assert.ok(p.project, 'het project is gemaakt: ' + (p.error || ''));
+  assert.equal(db.data.labProjecten.length, 1);
+});
+
+/* ----------------------------------------------------------------- rtfbieb */
+test('rtfbieb: een app verwijderen die er niet staat, schept geen rij', () => {
+  const { maakRtfBieb, APPS } = require('../server/kern/rtfbieb');
+  const db = { data: {} };
+  let bewaard = 0;
+  const { rtfbieb } = maakRtfBieb({ db, save: () => { bewaard++; } });
+
+  assert.equal(rtfbieb.verwijder('handle-1', 'rtf-bestaatniet').status, 404);
+  geenMeubilair(db, 'rtfAppInstallaties', 'een 404 op verwijder');
+  assert.deepEqual(rtfbieb.mijnApps('handle-1'), []);
+  geenMeubilair(db, 'rtfAppInstallaties', 'mijnApps op een leeg lid');
+  assert.equal(bewaard, 0);
+
+  /* TEGENPROEF: installeren schrijft nog, en verwijderen landt op die rij. */
+  const app = APPS[0];
+  assert.ok(rtfbieb.installeer('handle-1', app.doelgroep, app.id).ok);
+  assert.equal(rtfbieb.mijnApps('handle-1').length, 1);
+  assert.equal(rtfbieb.verwijder('handle-1', app.id).status, 200);
+});
+
+/* -------------------------------------------------------- overheid/naheffing */
+test('naheffing: een naheffing opzoeken die er niet is, schept geen register', () => {
+  const { maakBtwTelling } = require('../server/kern/fiscaal/btwtelling');
+  const db = { data: {} };
+  const ctx = {
+    db, save: () => {}, crypto: require('node:crypto'), nu: () => '2026-08-09T12:00:00.000Z',
+    seed: () => {}, telPerZaak: maakBtwTelling({ db }).telPerZaak, ref: p => 'RTG-' + p + '-X',
+    schoon: (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120),
+    notifySupplier: () => {},
+  };
+  Object.assign(ctx, require('../server/kern/overheid/btwtoezicht')(ctx));
+  const n = require('../server/kern/overheid/naheffing')(ctx);
+
+  assert.equal(n.naheffingStelVast('nh-bestaatniet', 'Inspecteur').status, 404);
+  geenMeubilair(db, 'rijkNaheffingen', 'een 404 op naheffingStelVast');
+});
+
+/* ---------------------------------------------------------------- uitgifte */
+test('uitgifte: tekenen op een uitgifte die er niet is, schept geen lijst', () => {
+  const { maakUitgifte } = require('../server/kern/uitgifte');
+  const db = { data: {} };
+  let bewaard = 0;
+  const { uitgifte } = maakUitgifte({ db, save: () => { bewaard++; }, crypto: require('node:crypto') });
+
+  assert.equal(uitgifte.teken('zaak', 'S1', 'geenid', 'Jan Jansen').status, 404);
+  geenMeubilair(db, 'uitgiften', 'een 404 op teken');
+  uitgifte.lijst('zaak', 'S1');
+  geenMeubilair(db, 'uitgiften', 'de lijst van een zaak zonder uitgiften');
+  assert.equal(bewaard, 0);
+
+  /* TEGENPROEF, en dit is de plek waar een te brede omzetting stukgaat: start()
+     roept U() twee keer aan (unshift, daarna zetBak). Met kijk() zouden dat
+     twee vluchtige rijen zijn en verdween de uitgifte terwijl het antwoord
+     nog "ok" zegt. */
+  const u = uitgifte.start('zaak', 'S1', 'Jan Jansen',
+    { bron: Object.keys(uitgifte.UITGIFTE_BRONNEN.zaak)[0], ogen: 4 });
+  assert.ok(u.uitgifte && u.uitgifte.id, 'de uitgifte staat: ' + (u.error || ''));
+  assert.equal(db.data.uitgiften.length, 1, 'en staat echt in db.data');
+  assert.equal(uitgifte.lijst('zaak', 'S1').uitgiften.length, 1);
+});
+
+/* ---------------------------------------------------------- waarde/oormerk */
+test('oormerk: een oormerk vrijgeven dat er niet is, schept geen collectie', () => {
+  const { maakOormerk } = require('../server/kern/waarde/oormerk');
+  const db = { data: {} };
+  const o = maakOormerk({ db, save: () => {}, crypto: require('node:crypto') });
+
+  assert.equal(o.oormerkVrij({ rek: 'partner:A', id: 'OMX' }).status, 404);
+  assert.deepEqual(db.data, {}, 'een 404 laat de opslag volledig leeg');
+
+  /* TEGENPROEF: de splice landt op de LEVENDE verzameling en niet op een kopie. */
+  const z = o.oormerkZet({ rek: 'partner:A', naam: 'Btw', centen: 5000, saldo: 100000 });
+  assert.ok(z.ok, 'het oormerk staat: ' + (z.error || ''));
+  const id = db.data.waardeOormerken['partner:A'][0].id;
+  const v = o.oormerkVrij({ rek: 'partner:A', id });
+  assert.equal(v.ok, true);
+  assert.equal(db.data.waardeOormerken['partner:A'].length, 0, 'de splice landde op db.data');
+});
+
+/* ------------------------------------------------------------- vakwerk/pro3 */
+test('vakwerk/pro3: ritmes en wachtlijst lezen schept geen collecties', () => {
+  const db = { data: {} };
+  const p = require('../server/kern/vakwerk/pro3')({
+    db, save: () => {}, notify: () => {}, notifySupplier: () => {},
+    sseToCustomer: () => {}, sseToSupplier: () => {}, boekingenVoegToe: () => {},
+    boekingenVanZaak: () => [], crypto: require('node:crypto'), scho: x => x,
+    vandaagStr: () => '2026-09-06', geldigeTijd: t => /^\d{2}:\d{2}$/.test(t),
+    findSupplier: c => (c === 'S1'
+      ? { code: 'S1', name: 'Kapper', services: [{ id: 'd1', name: 'Knippen', price: 30, duurMin: 30 }] }
+      : null),
+    isVak: () => true,
+  });
+
+  p.ritmesVanLid('k');
+  p.ritmesVanZaak('S1');
+  p.wachtVanZaak('S1');
+  assert.equal(p.ritmeStop({ key: 'k' }, 'geen-id').status, 404);
+  assert.equal(p.wachtUitnodig('S1', { id: 'geen-id' }).status, 404);
+  geenMeubilair(db, 'vakRitmes', 'vijf paden zonder ritmes');
+  geenMeubilair(db, 'vakWachtlijst', 'en zonder wachtlijst');
+});
+
+/* --------------------------------------------------- spellen/magnaat/leerkring */
+test('leerkring: een weigering schept geen leerkast', () => {
+  const db = { data: {} };
+  const leren = require('../server/kern/spellen/magnaat/leerkring')({
+    db, save: () => {}, crypto: require('node:crypto'),
+  });
+
+  assert.equal(leren.besluit('ML-X', 'naar-test', 'R').status, 404);
+  assert.equal(leren.registreerHospitality({ potjeId: 'p', simulatie: { status: 'live' } }).status, 409);
+  geenMeubilair(db, 'magnaatLeren', 'twee weigeringen in de leerkring');
+  assert.equal(leren.overzicht().runs, 0);
+  geenMeubilair(db, 'magnaatLeren', 'het overzicht op een lege leerkring');
+});

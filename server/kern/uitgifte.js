@@ -40,7 +40,14 @@ function maakUitgifte({ db, save, crypto }) {
   function U() {
     return eigen.bak('uitgiften');
   }
-  const vind = (domein, eigenaar, uid) => U().find(u => u.id === String(uid || '') && u.domein === domein && u.eigenaar === eigenaar);
+  /* Lezen zonder scheppen (kijk() in ./eigencollectie.js). Twee deuren en geen
+     omzetting: start() roept U() twee keer aan (unshift, daarna zetBak), en met
+     kijk() zouden dat twee verschillende vluchtige rijen zijn -- de nieuwe
+     uitgifte verdwijnt dan terwijl het antwoord nog "ok" zegt. */
+  function Ulees() {
+    return eigen.kijk('uitgiften');
+  }
+  const vind = (domein, eigenaar, uid) => Ulees().find(u => u.id === String(uid || '') && u.domein === domein && u.eigenaar === eigenaar);
   const nodig = u => u.ogen / 2;
 
   function publiek(u) {
@@ -91,7 +98,7 @@ function maakUitgifte({ db, save, crypto }) {
 
   function lijst(domein, eigenaar) {
     return { ok: true, bronnen: Object.entries(BRONNEN[domein] || {}).map(([k, v]) => ({ id: k, label: v })),
-      uitgiften: U().filter(u => u.domein === domein && u.eigenaar === eigenaar).slice(0, 30).map(publiek) };
+      uitgiften: Ulees().filter(u => u.domein === domein && u.eigenaar === eigenaar).slice(0, 30).map(publiek) };
   }
 
   /* ---- de bron-bladen: wat er daadwerkelijk naar de schijf gaat ---- */

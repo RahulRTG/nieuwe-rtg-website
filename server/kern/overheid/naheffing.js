@@ -48,7 +48,9 @@ module.exports = (ctx) => {
 
   const eigen = require('../eigencollectie')({ db, domein: 'kern/overheid/naheffing', bezit: { rijkNaheffingen: 'lijst' } });
   const bak = () => eigen.bak('rijkNaheffingen');
-  const vind = (id) => bak().find(n => n.id === String(id || '')) || null;
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const kijk = () => eigen.kijk('rijkNaheffingen');
+  const vind = (id) => kijk().find(n => n.id === String(id || '')) || null;
   /* Dezelfde ogen tellen niet dubbel -- de vergelijking staat in kern/ogen.js
      en niet meer hier. Hij stond op vier plekken in huis en liep uiteen: de
      ene trimde de naam, de andere niet, en dan tekent "A. Bakker " zijn eigen
@@ -82,7 +84,7 @@ module.exports = (ctx) => {
     if (t.error) return t;
     const zaakCode = t.zaak.code;
 
-    const lopend = bak().find(n => n.code === zaakCode && n.periode === t.periode &&
+    const lopend = kijk().find(n => n.code === zaakCode && n.periode === t.periode &&
       ['concept', 'vastgesteld', 'bezwaar', 'gehandhaafd'].includes(n.status));
     if (lopend) return { status: 409, error: 'Er loopt al een naheffing over ' + t.periode +
       ' voor deze zaak (' + lopend.kenmerk + ', ' + lopend.status + ').' };

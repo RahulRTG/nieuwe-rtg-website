@@ -38,6 +38,11 @@ function maakLeerstof({ db, save, onderwijs }) {
   function sessies() {
     return eigen.bak('leerstofSessies');
   }
+  /* Lezen zonder scheppen (kijk() in kern/eigencollectie.js). sessies() blijft
+     de SCHRIJFdeur -- oefenStart en herhaalStart zetten er een sessie in. Wie
+     alleen kijkt of er een sessie loopt, mag er geen lege kaart voor
+     aanleggen: dan is een weigering een opslagmutatie. */
+  const sessieVan = key => eigen.kijk('leerstofSessies')['lid:' + key];
   const norm = s => String(s == null ? '' : s).toLowerCase().replace(/\s+/g, ' ').trim();
 
   /* De LEES-kant (de leerlijn per groep of fase, de les, het pad naar een doel)
@@ -64,7 +69,7 @@ function maakLeerstof({ db, save, onderwijs }) {
   }
 
   function oefenAntwoord(key, d) {
-    const s = sessies()['lid:' + key];
+    const s = sessieVan(key);
     if (!s) return { status: 400, error: 'Begin eerst een oefensessie.' };
     const vraag = s.vragen[s.ix];
     if (!vraag) return { status: 400, error: 'Deze sessie is al klaar; begin een nieuwe.' };

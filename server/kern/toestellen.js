@@ -28,9 +28,11 @@ const MAX_TOESTELLEN = 8;
 
 module.exports = ({ db, save, crypto, schoon, metingVanToestel }) => {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/toestellen', bezit: { toestellen: 'lijst' } });
-  const lijst = () => eigen.bak('toestellen');
+  const lijst = () => eigen.bak('toestellen');   // schrijfpad: de push bij koppelen
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const kijkLijst = () => eigen.kijk('toestellen');
   const afdruk = t => crypto.createHash('sha256').update(String(t || ''), 'utf8').digest('hex');
-  const mijne = key => lijst().filter(t => t.key === key && t.status === 'actief');
+  const mijne = key => kijkLijst().filter(t => t.key === key && t.status === 'actief');
 
   const toon = t => ({
     id: t.id, naam: t.naam, gekoppeldOp: t.gekoppeldOp,
@@ -76,7 +78,7 @@ module.exports = ({ db, save, crypto, schoon, metingVanToestel }) => {
     const s = String(sleutel || '');
     if (s.length !== 48) return null;                 // 24 bytes hex; een andere lengte is nooit een sleutel
     const a = afdruk(s);
-    return lijst().find(t => t.status === 'actief' && t.afdruk === a) || null;
+    return kijkLijst().find(t => t.status === 'actief' && t.afdruk === a) || null;
   }
 
   /* Schrijven namens een toestel. De sleutel bepaalt VOOR WIE er geschreven

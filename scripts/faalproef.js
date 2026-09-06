@@ -92,15 +92,53 @@ async function ronde(verraad, lijstUit) {
   const server = await start({ naam: 'faalproef', env });
   const { basis, klaar } = server;
 
+  /* HET LICHAAM MOET MEE, en zonder dat heeft deze proef nooit kunnen draaien.
+
+     Hier stond `await r.text();` -- de tekst opgehaald en meteen weggegooid,
+     omdat de meting zelf alleen aan de KOPPEN genoeg heeft (x-rtg-staat,
+     x-rtg-effect). Dat klopt voor de meting en niet voor de opstart: vier
+     regels verderop vraagt haalSleutels() de sleutelbos, en de munters daarin
+     lezen `.data.token` uit precies dit antwoord. Zonder lichaam bleef elke
+     munter leeg en zakte de proef op `geen token voor: member, office,
+     supplier` -- bij de allereerste ronde, voor er iets was gemeten.
+
+     Dit is de EERSTE van twee redenen waarom FAALPROEF.json niet bestond, en
+     alleen deze is hier gerepareerd. Met het lichaam erbij loopt de schone
+     ronde: sleutels gemunt, routes gereden, profielen bepaald.
+
+     DE TWEEDE STAAT NOG OPEN en is niet met een regel te verhelpen. `schrijf-faalt`
+     laat save() GOOIEN, en de opstart schrijft ook (zaaien, migraties). De
+     wegwerpserver komt daardoor met dat verraad aan niet op -- gemeten: dood na
+     409 ms, ook met een al gezaaide datamap, terwijl diezelfde server zonder
+     verraad in 5,7 seconde staat. Deze proef heeft een LEVENDE server nodig om
+     al zijn routes te rijden, dus voor haar is dat fataal.
+
+     WAAROM scripts/ketenronde.js er wel mee draait (blindeKetens: 0): die start
+     met `magSterven: true` en een stervende server is daar een geldige uitkomst
+     -- het systeem faalt hoorbaar, en dat is precies wat die keten meet. Dit
+     instrument meet iets anders en kan niet met een dode server verder.
+
+     De uitweg vraagt een besluit dat hier niet thuishoort: het verraad zou pas
+     mogen slaan als de opstart klaar is. Een gate op de VERZOEKcontext werkt
+     aantoonbaar (de server komt dan in 5,7 s op), maar zet stilletjes de sabotage
+     uit op elke achtergrondschrijver -- en `opslagKlaar()` is voor json/sqlite al
+     bij de eerste regel waar, dus die grens helpt niet. Dat is een verbouwing aan
+     een GEDEELDE sabotagemotor die ook de ketenronde draagt, en die hoort niet
+     als bijvangst van deze reparatie.
+
+     Het lichaam wordt hier ontleed en meegegeven; de rest van dit bestand
+     gebruikt `data` nergens, dus de meting verandert er geen letter door. */
   const post = async (pad, lijf, tok) => {
     try {
       const r = await fetch(basis + pad, { method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(tok ? { Authorization: 'Bearer ' + tok } : {}) },
         body: JSON.stringify(lijf || {}) });
-      await r.text();
-      return { status: r.status, staat: r.headers.get('x-rtg-staat'),
+      const tekst = await r.text();
+      let data = null;
+      try { data = JSON.parse(tekst); } catch (e) { data = tekst; }
+      return { status: r.status, data, staat: r.headers.get('x-rtg-staat'),
         effect: r.headers.get('x-rtg-effect'), nietGemeten: r.headers.get('x-rtg-effect-niet-gemeten') };
-    } catch (e) { return { status: 0, staat: null, effect: null, nietGemeten: null }; }
+    } catch (e) { return { status: 0, data: null, staat: null, effect: null, nietGemeten: null }; }
   };
 
   const bos = await haalSleutels({ post });

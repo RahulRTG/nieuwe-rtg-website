@@ -19,6 +19,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { weegAntwoord, draaiRolproef, plausibelLijf, LEKMERKERS } = require('../scripts/lib/rolproef');
+const { LEGE_SLEUTELS } = require('../scripts/lib/proefsleutels');
 
 /* ---------- het oordeel over een enkel antwoord ---------- */
 
@@ -115,16 +116,63 @@ test('een route die NIET is geprobeerd, staat nergens als in orde', async () => 
   /* De kern van deze hele uitbreiding. Zou een niet-beproefde route als "geen
      bevinding" tellen, dan dekt een ronde van duizend routes er negenendertig-
      honderd af -- en dat is precies de valse zekerheid waar de bewijsmatrix
-     tegen is. */
+     tegen is.
+
+     DEZE TOETS STOND HIER MET `rol: 'open'`, EN DAT WOORD BESTAAT NIET. De
+     bewakerslaag noemt zo'n route `openbaar`. De toets voedde de proef dus met
+     verzonnen invoer, sloeg groen aan, en hield vier jaar lang een dode wacht
+     overeind -- terwijl in de echte ronde alle 112 openbare routes wel degelijk
+     werden bekropen. Zie de kop van scripts/lib/rolproef.js.
+
+     Een cap die een document noemt, wordt tegen de code gehouden; een ROL die
+     een toets noemt, dus ook. */
   const nep = nepServer(() => ({ status: 403, data: { error: 'Verboden' } }));
   const uit = await draaiRolproef({
     post: nep.post,
-    routes: [...ROUTES, { methode: 'POST', pad: '/api/nooit/geprobeerd', rol: 'open' }],
+    routes: [...ROUTES, { methode: 'POST', pad: '/api/nooit/geprobeerd', rol: 'openbaar' }],
     tokensVoor: TOKENS
   });
   assert.ok(uit.perRoute['POST /api/zaak/prijs'], 'de beproefde route staat er wel in');
   assert.equal(uit.perRoute['POST /api/nooit/geprobeerd'], undefined,
     'een publieke route is niet met een verkeerde rol te beproeven en hoort er dus niet in');
+});
+
+test('een rol zonder sleutel wordt niet gekruist, en zegt waarom', async () => {
+  /* NIET STIL OVERSLAAN. Een `continue` zonder spoor laat deze routes in de
+     bewijsmatrix als `ongemeten` staan, en dat is onwaar: er valt niets te
+     kruisen (de route vraagt geen kop), en dat is iets anders dan dat niemand
+     heeft gekeken. De reden reist mee zodat de matrix er `nvt` van maakt. */
+  const nep = nepServer(() => ({ status: 200, data: { ok: true } }));
+  const uit = await draaiRolproef({
+    post: nep.post,
+    routes: LEGE_SLEUTELS.map((rol, i) => ({ methode: 'POST', pad: '/api/zonder/sleutel' + i, rol })),
+    tokensVoor: TOKENS
+  });
+  assert.equal(uit.pogingen, 0, 'er is op geen van deze routes geklopt');
+  assert.deepEqual(uit.perRoute, {}, 'en geen ervan telt als beproefd');
+  assert.equal(uit.nietTeKruisen.length, LEGE_SLEUTELS.length);
+  for (const r of uit.nietTeKruisen) {
+    assert.match(r.reden, /geen sleutel/, 'elke overgeslagen route draagt de reden');
+    assert.ok(LEGE_SLEUTELS.includes(r.rol));
+  }
+});
+
+test('alleen de rollen UIT de sleutelbos worden overgeslagen -- geen verzonnen woord', async () => {
+  /* DE RATEL OP DE VORIGE FOUT. Zou hier ooit weer een woord staan dat de
+     bewakerslaag niet kent (`open`, `publiek`, `geen`), dan wordt die route
+     stilletjes niet meer gekruist en verdwijnt zijn ACL-bewijs zonder dat
+     iemand het merkt. Deze toets zakt op zo'n woord: het hoort GEWOON gekruist
+     te worden, want de proef kent het niet als sleutelloos. */
+  const nep = nepServer(() => ({ status: 403, data: { error: 'Verboden' } }));
+  const uit = await draaiRolproef({
+    post: nep.post,
+    routes: [{ methode: 'POST', pad: '/api/verzonnen/rol', rol: 'open' }],
+    tokensVoor: TOKENS
+  });
+  assert.deepEqual(uit.nietTeKruisen, [],
+    '`open` is geen rol van de bewakerslaag en mag dus niet als sleutelloos gelden');
+  assert.ok(uit.perRoute['POST /api/verzonnen/rol'],
+    'een onbekende rol wordt gewoon gekruist -- anders verdwijnt bewijs in stilte');
 });
 
 test('een leesroute wordt niet geprobeerd -- dit gaat over muteren', async () => {

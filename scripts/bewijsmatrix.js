@@ -303,6 +303,20 @@ function rolproefUitslag() {
     if (!Array.isArray(j.perRoute)) return null;
     const kaart = new Map();
     for (const r of j.perRoute) kaart.set(r.methode + ' ' + r.pad, r);
+    /* NIET TE KRUISEN IS GEEN GAT. Een route waarvan de rol geen sleutel heeft
+       (`openbaar`, `omgeving`, `eigen-poort`) kan per definitie niet met een
+       VERKEERDE rol worden bekropen: hij vraagt geen kop. Die cellen stonden
+       hier op `ongemeten` -- alsof niemand keek -- en zolang de wacht in
+       lib/rolproef.js dood was zelfs op `gezakt`, want een openbare route laat
+       een ingelogd lid gewoon binnen. Dat waren op 6 september 2026 29 van de
+       30 gezakte cellen in het hele huis.
+
+       `nvt` mag hier alleen staan met de REDEN erbij, en die komt uit het
+       register (welke lijst noemt deze route openbaar). Zonder die reden is nvt
+       een manier om een teller te verlagen. */
+    kaart.nvt = new Map();
+    for (const r of (Array.isArray(j.nietTeKruisen) ? j.nietTeKruisen : []))
+      kaart.nvt.set(r.methode + ' ' + r.pad, r);
     return kaart;
   } catch (e) { return null; }
 }
@@ -641,6 +655,7 @@ function bouw(invoer) {
 
       if (s.id === 'ACL' || s.id === 'PRIVACY') {
         const beproefd = rol && rol.get(sleutel);
+        const geenSleutel = rol && rol.nvt && rol.nvt.get(sleutel);
         if (beproefd) {
           /* Beproefd EN doorstaan is bewezen; beproefd en gezakt is een
              bevinding, en die hoort niet als bewijs te tellen. */
@@ -648,6 +663,8 @@ function bouw(invoer) {
           cellen[s.id] = stuk
             ? { staat: 'gezakt', bron: 'rolproef', rollen: beproefd.geprobeerd }
             : { staat: 'bewezen', bron: 'rolproef', rollen: beproefd.geprobeerd };
+        } else if (geenSleutel) {
+          cellen[s.id] = { staat: 'nvt', bron: 'rolproef', reden: geenSleutel.reden };
         } else {
           cellen[s.id] = { staat: 'ongemeten' };
         }

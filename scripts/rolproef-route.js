@@ -230,7 +230,22 @@ wachtOpSchoneBoom();
         .map(z => z.methode + ' ' + z.pad).sort()
     })),
     routesGevonden: kandidaten.length,
+    /* ROUTES DIE NIET TE KRUISEN ZIJN, met de reden per route.
+
+       Ze hebben WEL een rol (`openbaar`, `omgeving`, `eigen-poort`) maar die rol
+       heeft geen sleutel: er is geen verkeerde rol om mee aan te kloppen. Dat is
+       iets anders dan `nietBeproefbaar` hierboven -- daar kon de rol niet worden
+       bepaald, hier is hij bekend en luidt het antwoord "niet van toepassing".
+
+       Ze staan met opzet NIET in perRoute: die lijst betekent beproefd en telt
+       als dekking. De bewijsmatrix leest dit veld en zet ACL en PRIVACY voor deze
+       routes op `nvt` in plaats van `ongemeten` -- niets te meten is geen gat.
+       Zie de kop van scripts/lib/rolproef.js voor de 29 valse bevindingen die
+       hier vandaan kwamen. */
+    nietTeKruisen: (uit.nietTeKruisen || []).slice()
+      .sort((a, b) => (a.pad + a.methode).localeCompare(b.pad + b.methode)),
     gemeten: { routesMetRol: routes.length, beproefd: perRoute.length, pogingen: uit.pogingen,
+      nietTeKruisen: (uit.nietTeKruisen || []).length,
       aclOpen: open.length, privacyLek: lek.length,
       /* Blijvende wijziging na afloop: een handler die eerst schrijft en daarna
          pas de rechten controleert, geeft keurig 403 terug terwijl de mutatie al

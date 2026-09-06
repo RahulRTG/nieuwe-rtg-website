@@ -17,12 +17,14 @@ const MAX_KINDEREN = 40;
 
 module.exports = ({ db, save, crypto, schoon, anthropic, leeftijdInstr }) => {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/lesmaker', bezit: { lessen: 'kaart' } });
-  const L = () => eigen.bak('lessen');
+  const L = () => eigen.bak('lessen');    // schrijfpad: mag aanleggen
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const LZ = () => eigen.kijk('lessen');
   const nu = () => Date.now();
   const code = (n) => { let s = ''; const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; for (let i = 0; i < n; i++) s += A[crypto.randomInt(0, A.length)]; return s; };
 
   function opruimen() {
-    const l = L();
+    const l = LZ();
     for (const [c, les] of Object.entries(l)) if (nu() - les.at > VERVAL_MS) delete l[c];
     const codes = Object.keys(l);
     if (codes.length > MAX_LESSEN) for (const c of codes.slice(0, codes.length - MAX_LESSEN)) delete l[c];
@@ -66,7 +68,7 @@ module.exports = ({ db, save, crypto, schoon, anthropic, leeftijdInstr }) => {
     return { status: 200, code: c, leraarToken: les.leraarToken, les: leraarBeeld(les) };
   }
 
-  const vind = (c) => L()[String(c || '').trim().toUpperCase()] || null;
+  const vind = (c) => LZ()[String(c || '').trim().toUpperCase()] || null;
   const alsLeraar = (c, tok) => { const les = vind(c); return les && les.leraarToken === String(tok || '') ? les : null; };
 
   function stand(les) {

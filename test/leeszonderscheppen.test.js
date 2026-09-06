@@ -422,3 +422,192 @@ test('hulpdienst: zes weigerpaden laten de hulpkast onaangeroerd', () => {
   for (const w of weigeringen) assert.equal(w().status, 404);
   assert.equal(JSON.stringify(db.data.hulp), voor, 'zes 404-en veranderden niets aan db.data.hulp');
 });
+
+/* ------------------------------------------------------- ledenbalie-zetels */
+test('ledenbalie-zetels: de baliepoort weigert zonder een lege la aan te leggen', () => {
+  const db = { data: {} };
+  const m = require('../server/kern/ledenbalie-zetels')({
+    db, save: () => {}, accounts: { getUserById: id => (id === 1 ? { id: 1 } : null) },
+    magBoardroom: () => false,
+  });
+
+  assert.equal(m.magBalie('user-9'), false);
+  geenMeubilair(db, 'balieZetels', 'een geweigerde baliepoort');
+  assert.deepEqual(m.balieZetels(), []);
+  assert.equal(m.balieZetelWeg('user-9').ok, true);
+  geenMeubilair(db, 'balieZetels', 'een zetel weghalen die er niet is');
+
+  /* TEGENPROEF: inleggen schrijft nog en de poort ziet het. Zonder deze regel
+     ziet een omzetting van lijst() zelf er groen uit terwijl de push in het
+     niets verdwijnt. */
+  m.balieZetelZet('user-1');
+  assert.equal(db.data.balieZetels.length, 1);
+  assert.equal(m.magBalie('user-1'), true);
+});
+
+/* ----------------------------------------------------------------- lesmaker */
+test('lesmaker: een les openen die niet bestaat, schept geen lessenkaart', async () => {
+  const { schoon } = require('../server/kern/util');
+  const db = { data: {} };
+  const { lesmaker } = require('../server/kern/lesmaker')({
+    db, save: () => {}, crypto: require('node:crypto'), schoon,
+    anthropic: null, leeftijdInstr: () => '',
+  });
+
+  assert.equal(lesmaker.leraar('ZZZZZZ', 'x').status, 403);
+  geenMeubilair(db, 'lessen', 'een 403 op leraar');
+
+  /* TEGENPROEF: een echte les komt er wel, en een antwoord landt in db.data. */
+  const les = await lesmaker.maakLes({ onderwerp: 'De waterkringloop' });
+  assert.ok(les.code, 'de les is gemaakt: ' + (les.error || ''));
+  assert.equal(Object.keys(db.data.lessen).length, 1);
+});
+
+/* ------------------------------------------------------------ mall/aanvragen */
+test('mall: een aanvraag sluiten die niet bestaat, schept geen lijst', () => {
+  const db = { data: {} };
+  const { mallAanvragen } = require('../server/kern/mall/aanvragen')({
+    db, save: () => {}, crypto: require('node:crypto'),
+    plek: { plekVan: ({ stad }) => ({ stad }), bereikVan: () => ({}), bedient: () => true },
+  });
+
+  assert.equal(mallAanvragen.sluit('k', 'bestaat-niet').status, 404);
+  assert.equal(mallAanvragen.kies('k', 'x', 'Y').status, 404);
+  assert.equal(mallAanvragen.plaats('k', 'Lid', { wat: 'ab' }).status, 400);
+  geenMeubilair(db, 'mallAanvragen', 'drie weigeringen in de Mall');
+
+  /* TEGENPROEF: een geldige aanvraag legt de lijst wel aan. */
+  const ok = mallAanvragen.plaats('k', 'Lid', {
+    wat: 'Massage aan huis', verdieping: 'beauty', plek: 'Amsterdam' });
+  assert.ok(ok.ok, 'de aanvraag staat: ' + (ok.error || ''));
+  assert.equal(db.data.mallAanvragen.length, 1);
+});
+
+/* ------------------------------------------------------------- mediaos/smaak */
+test('mediaos/smaak: bijsturen zonder doel schept geen smaakprofiel', () => {
+  const { maakSmaak } = require('../server/kern/mediaos/smaak');
+  const { schoon } = require('../server/kern/util');
+  const db = { data: {} };
+  let saves = 0;
+  const m = maakSmaak({ db, save: () => saves++, schoon });
+
+  assert.equal(m.smaakStuur('lid-1', { richting: 'meer' }).status, 400);
+  geenMeubilair(db, 'mediaSmaak', 'bijsturen zonder maker of onderwerp');
+  m.smaakVan('lid-1');
+  geenMeubilair(db, 'mediaSmaak', 'een smaakprofiel lezen dat er niet is');
+  assert.equal(saves, 0);
+
+  /* TEGENPROEF: een echte zet landt in db.data en is terug te lezen. */
+  assert.equal(m.smaakStuur('lid-1', { richting: 'meer', maker: 'Iemand' }).ok, true);
+  assert.equal(db.data.mediaSmaak['lid-1'].makers.Iemand, 1);
+  assert.equal(m.smaakVan('lid-1').makers.Iemand, 1);
+});
+
+/* ---------------------------------------------------------------- ketenchat */
+test('ketenchat: een geweigerd gesprek legt geen ketenkast aan', () => {
+  const db = { data: { hulp: { eenheden: {}, bedden: {} },
+    suppliers: [{ code: 'GUARDIA', name: 'Politie', type: 'politie' }] } };
+  const { ketenchat } = require('../server/kern/ketenchat')({
+    db, save: () => {}, crypto: require('node:crypto'),
+    findSupplier: c => db.data.suppliers.find(s => s.code === c),
+  });
+  const s = db.data.suppliers[0];
+  const actor = { staffId: 1, manager: true, name: 'Chef' };
+  const geenKeten = wat => {
+    assert.equal(db.data.hulp.keten, undefined, wat + ' legt geen ketenkast aan');
+    delete db.data.hulp.keten;   // en meet niet alleen het eerste geval
+  };
+
+  assert.equal(ketenchat.gesprek(s, actor, 'keten').status, 403);
+  geenKeten('een gesprek zonder partners');
+  assert.equal(ketenchat.gesprek(s, actor, 'zzz').status, 404);
+  geenKeten('een kanaal dat niet bestaat');
+  assert.equal(ketenchat.beslis('GUARDIA', 'URGENCIA', true).status, 404);
+  geenKeten('beslissen over een verzoek dat er niet is');
+  assert.equal(ketenchat.groepMaak('GUARDIA', actor, { naam: 'x', leden: [] }).status, 400);
+  geenKeten('een groep zonder leden');
+
+  /* TEGENPROEF: verbinden schrijft nog, en het gesprek opent daarna. */
+  db.data.suppliers.push({ code: 'BOMBERS', name: 'Brandweer', type: 'brandweer' });
+  assert.ok(ketenchat.verzoek('GUARDIA', 'BOMBERS').ok);
+  assert.ok(ketenchat.beslis('BOMBERS', 'GUARDIA', true).ok);
+  assert.equal(db.data.hulp.keten.links[0].status, 'akkoord');
+  assert.equal(ketenchat.gesprek(s, actor, 'keten').ok, true);
+});
+
+/* ----------------------------------------------- navigatie/partner-events */
+test('partner-events: de gebeurtenissen lezen schept geen lijst', () => {
+  const db = { data: {} };
+  const p = require('../server/kern/navigatie/partner-events')({
+    db, save: () => {}, crypto: require('node:crypto'), haversine: () => 1e6,
+  });
+
+  p.navPartnerEvents('X');
+  p.partnerEventsRond({ lat: 38.9, lng: 1.4 });
+  geenMeubilair(db, 'navPartnerEvents', 'de gebeurtenissen lezen');
+
+  /* TEGENPROEF: melden legt hem wel aan en is daarna leesbaar. */
+  assert.equal(p.navPartnerEvent({ code: 'HOTEL-X' }, { soort: 'file', lat: 38.9, lng: 1.4 }).status, 200);
+  assert.equal(p.navPartnerEvents('HOTEL-X').gebeurtenissen.length, 1);
+  assert.ok(Object.prototype.hasOwnProperty.call(db.data, 'navPartnerEvents'));
+});
+
+/* ---------------------------------------------------------------------- oog */
+test('oog: uitgifte loggen van een stuk dat er niet is, schept geen spullen', () => {
+  const { maakOog } = require('../server/kern/oog');
+  const db = { data: {} };
+  const oog = maakOog({
+    db, save: () => {}, crypto: require('node:crypto'),
+    schoon: (v, n) => String(v == null ? '' : v).slice(0, n),
+    sseToSupplier: () => {}, logActivity: null,
+  });
+  const zaak = { code: 'Z1', fleet: [] };
+
+  assert.equal(oog.oogUitgifteLog(zaak, { name: 'PDA' }, { itemId: 'sp-bestaatniet' }).status, 404);
+  geenMeubilair(db, 'oogSpullen', 'een 404 op oogUitgifteLog');
+  oog.oogSpullen(zaak);
+  oog.oogNulmetingVan(zaak, 'v1');
+  geenMeubilair(db, 'oogSpullen', 'de spullenlijst lezen');
+  geenMeubilair(db, 'oogNulmeting', 'een nulmeting lezen die er niet is');
+
+  /* TEGENPROEF: een stuk toevoegen legt de collectie wel aan en is vindbaar. */
+  const sp = oog.oogLeer(zaak, { name: 'PDA' }, { naam: 'Zaklamp', sig: [1, 2, 3] });
+  assert.ok(sp.ok, 'het stuk is aangeleerd: ' + (sp.error || ''));
+  assert.equal(oog.oogSpullen(zaak).length, 1);
+});
+
+/* --------------------------------------------------------------- kletspraat */
+test('kletspraat: een geweigerd gesprek schept geen kletsla', async () => {
+  const maak = require('../server/kern/kletspraat');
+  const basis = (vrienden) => {
+    const db = { data: {} };
+    const k = maak({
+      db, save: () => {}, crypto: require('node:crypto'),
+      sociaal: { codenaamVan: h => h, zijnVrienden: () => vrienden },
+      ordersVanKlant: () => [], boekingenVanKlant: () => [],
+      anthropic: null, dagContext: () => ({ zin: '' }), sseToCustomer: () => {},
+    });
+    return { db, k };
+  };
+
+  let { db, k } = basis(true);
+  assert.equal(k.kletsAan('u1'), false);
+  k.kletsLijst('u1');
+  assert.equal(k.kletsHaal('u1', 'bestaat-niet').status, 404);
+  assert.equal((await k.kletsStart('u1', 'u1')).status, 400);
+  geenMeubilair(db, 'klets', 'vier weigerpaden in de kletspraat');
+
+  ({ db, k } = basis(false));
+  assert.equal((await k.kletsStart('u1', 'u2')).status, 403);
+  geenMeubilair(db, 'klets', 'kletsen met iemand die geen vriend is');
+
+  /* TEGENPROEF, en tegelijk de aliasvangst: met een omgezet schrijfpad landt
+     de push in het niets en blijft gesprekken leeg. */
+  ({ db, k } = basis(true));
+  k.kletsZet('u1', true);
+  k.kletsZet('u2', true);
+  assert.ok(db.data.klets.aan.u1, 'de schakelaar staat in db.data');
+  const g = await k.kletsStart('u1', 'u2');
+  assert.ok(g.ok, 'het gesprek is gestart: ' + (g.error || ''));
+  assert.equal(db.data.klets.gesprekken.length, 1, 'het gesprek staat in db.data');
+});

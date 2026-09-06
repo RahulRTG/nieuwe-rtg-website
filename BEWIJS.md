@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1701 bestanden en 12047 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1701 bestanden en 12055 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1701 |
-| losse beweringen (`test(...)`) | 12047 |
+| losse beweringen (`test(...)`) | 12055 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 99 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1042 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1497 bestanden, 11692 beweringen.
+1497 bestanden, 11700 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -656,7 +656,7 @@ toets omvalt.
 | `leerstof.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 2: de leerstof-motor. Elke groep heeft echte leerdoelen met een les, de oefensessie is server-authoritatief (antwoorden staan nooit in de vraag), een behaald doel komt in het leerpaspoort, en er zijn... |
 | `leerstofbreed.test.js` | 3 | gezakt op `+->-#0` | RTG School, de brede leerlijn: van twee vakken naar een echt curriculum. Basisschool: rekenen, taal, aardrijkskunde, geschiedenis, natuur, verkeer en Engels. |
 | `leerstofvo.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 3: het voortgezet en vervolgonderwijs op de leerstof-motor. Vakken per fase (vmbo t/m wo), examentraining die pas aan het eind terugkijkt (zoals een echt examen), en het niveau-advies dat adviseert en... |
-| `leeszonderscheppen.test.js` | 17 | -- | LEZEN ZONDER SCHEPPEN -- de tegenproef van een hele klasse. scripts/lib/eigencollectie.js kent twee deuren naar de eigen opslag van een domein: bak() maakt de collectie aan als hij er nog niet is, kijk() geeft een... |
+| `leeszonderscheppen.test.js` | 25 | -- | LEZEN ZONDER SCHEPPEN -- de tegenproef van een hele klasse. scripts/lib/eigencollectie.js kent twee deuren naar de eigen opslag van een domein: bak() maakt de collectie aan als hij er nog niet is, kijk() geeft een... |
 | `legacy-codeportaal-productiepoort.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `leren-leden.test.js` | 11 | gezakt op `liegpoort /api/` | DE LEERLAAG VANAF DE LEDEN-APP -- 28 endpoints, en een uitnodiging als spil. Deze achtentwintig wees de waargenomen dekkingsmeting aan als nooit aangeroepen. |
 | `leren.test.js` | 5 | gezakt op `liegpoort /api/` | Integratietests voor de leerlaag: overhoorlijsten (zelf en via de AI-demo), het overhoorduel via de vriendenlaag (zonder automatische vriendschap), samen-projecten met taken/notities/AI-plan, en schrijven met... |

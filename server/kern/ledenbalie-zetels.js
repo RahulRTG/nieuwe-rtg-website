@@ -24,12 +24,18 @@ module.exports = ({ db, save, accounts, magBoardroom }) => {
   function lijst() {
     return eigen.bak('balieZetels');
   }
+  /* Lezen zonder scheppen (kijk() in ./eigencollectie.js). magBalie is de poort
+     van de balie- en serviceroutes en weigert vaker dan hij toelaat; een 403
+     hoort geen lege la achter te laten. Alleen INLEGGEN gaat langs lijst(). */
+  function gelezen() {
+    return eigen.kijk('balieZetels');
+  }
 
   /* Alleen codenamen en momenten naar buiten -- nooit een naam. De key is het
      pseudoniem waarop de rest van het kantoor ook draait; wie er een codenaam
      bij wil tonen, vraagt die aan de gids. */
   function balieZetels() {
-    return lijst().map(z => ({ key: z.key, sinds: z.at }));
+    return gelezen().map(z => ({ key: z.key, sinds: z.at }));
   }
 
   /* Een zetel geven. De key moet een ECHTE inlog zijn: 'user-<id>' van een
@@ -56,7 +62,7 @@ module.exports = ({ db, save, accounts, magBoardroom }) => {
      de eigenaar wil ("deze persoon zit er niet meer") is dan gewoon waar. */
   function balieZetelWeg(key) {
     const k = String(key || '').trim();
-    const l = lijst();
+    const l = gelezen();
     const rest = l.filter(z => z.key !== k);
     if (rest.length !== l.length) { eigen.zetBak('balieZetels', rest); save(); }
     return { ok: true };
@@ -69,7 +75,7 @@ module.exports = ({ db, save, accounts, magBoardroom }) => {
   function magBalie(key) {
     if (!key) return false;
     if (typeof magBoardroom === 'function' && magBoardroom(key)) return true;
-    return lijst().some(z => z.key === key);
+    return gelezen().some(z => z.key === key);
   }
 
   return { balieZetels, balieZetelZet, balieZetelWeg, magBalie };

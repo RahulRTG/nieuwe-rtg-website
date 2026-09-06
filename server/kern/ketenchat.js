@@ -26,8 +26,14 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
     if (!Array.isArray(h.keten.groepen)) h.keten.groepen = [];
     return h.keten;
   }
-  const linkVan = (a, b) => bak().links.find(l => [l.a, l.b].sort().join('|') === [a, b].sort().join('|'));
-  const partnersVan = code => bak().links.filter(l => l.status === 'akkoord' && (l.a === code || l.b === code)).map(l => l.a === code ? l.b : l.a);
+  /* Opzoeken maakt niets aan: bak() materialiseert db.data.hulp EN hulp.keten,
+     en een 403 of 404 hoort geen ketenkast achter te laten. Bevroren met opzet
+     -- wie erin duwt krijgt een fout in plaats van een schrijfactie die nergens
+     terechtkomt. De schrijfpaden houden bak(). */
+  const LEEG = Object.freeze([]);
+  const kijk = vak => { const k = (db.data.hulp || {}).keten; const r = k && k[vak]; return Array.isArray(r) ? r : LEEG; };
+  const linkVan = (a, b) => kijk('links').find(l => [l.a, l.b].sort().join('|') === [a, b].sort().join('|'));
+  const partnersVan = code => kijk('links').filter(l => l.status === 'akkoord' && (l.a === code || l.b === code)).map(l => l.a === code ? l.b : l.a);
   const inKeten = code => partnersVan(code).length > 0;
 
   /* ---------- eenmalig verbinden ---------- */
@@ -89,14 +95,14 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
   /* ---------- lezen en schrijven ---------- */
   function status(s, actor) {
     if (!magKeten(s)) return { status: 403, error: 'Alleen hulpdiensten en zorg-zaken zitten in de keten.' };
-    const links = bak().links.filter(l => l.a === s.code || l.b === s.code).map(l => ({
+    const links = kijk('links').filter(l => l.a === s.code || l.b === s.code).map(l => ({
       met: l.a === s.code ? l.b : l.a,
       metNaam: (findSupplier(l.a === s.code ? l.b : l.a) || {}).name || '',
       status: l.status, inkomend: l.status === 'wacht' && l.door !== s.code
     }));
     const kanalen = [];
     if (inKeten(s.code)) kanalen.push({ id: 'keten', naam: 'De keten (alle verbonden korpsen)', soort: 'keten', magSchrijven: true, kijktMee: false });
-    for (const g of bak().groepen) {
+    for (const g of kijk('groepen')) {
       if (isLid(g, s.code, actor)) kanalen.push({ id: g.id, naam: g.naam, soort: 'groep', magSchrijven: true, kijktMee: false });
       else if (kijktMee(g, s.code, actor)) kanalen.push({ id: g.id, naam: g.naam + ' (u kijkt mee)', soort: 'groep', magSchrijven: false, kijktMee: true });
     }
@@ -105,8 +111,11 @@ module.exports = ({ db, save, crypto, findSupplier }) => {
     return { ok: true, eigen: s.code, links, kanalen, kandidaten, partners: partnersVan(s.code) };
   }
   function kanaalVan(id) { return id === 'keten' ? { keten: true, berichten: bak().berichten } : bak().groepen.find(g => g.id === id); }
+  /* Naast kanaalVan en niet in plaats daarvan: bericht() houdt kanaalVan, want
+     die duwt in de teruggegeven berichten-array. gesprek() schrijft niets. */
+  const kanaalLees = id => id === 'keten' ? { keten: true, berichten: kijk('berichten') } : kijk('groepen').find(g => g.id === id);
   function gesprek(s, actor, kanaalId) {
-    const k = kanaalVan(String(kanaalId || 'keten'));
+    const k = kanaalLees(String(kanaalId || 'keten'));
     if (!k) return { status: 404, error: 'Dit kanaal bestaat niet.' };
     if (k.keten) {
       if (!inKeten(s.code)) return { status: 403, error: 'Verbind eerst met een ander korps; daarna opent de ketenchat.' };

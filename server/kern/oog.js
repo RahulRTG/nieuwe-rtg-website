@@ -40,7 +40,7 @@ function maakOog({ db, save, crypto, schoon, sseToSupplier, logActivity }) {
 
   /* ---- de voertuigen van de zaak (vloot + vrije invoer bij de schouw) ---- */
   function voertuigen(s) {
-    return (s.fleet || []).map(v => ({ id: v.id, naam: v.name + (v.plate ? ' · ' + v.plate : ''), nulmeting: !!((eigen.bak('oogNulmeting')[s.code] || {})[v.id]) }));
+    return (s.fleet || []).map(v => ({ id: v.id, naam: v.name + (v.plate ? ' · ' + v.plate : ''), nulmeting: !!((eigen.kijk('oogNulmeting')[s.code] || {})[v.id]) }));
   }
 
   /* ---- de schouw ---- */
@@ -53,7 +53,7 @@ function maakOog({ db, save, crypto, schoon, sseToSupplier, logActivity }) {
     save();
     return { status: 200, ok: true };
   }
-  function nulmetingVan(s, vid) { return (eigen.bak('oogNulmeting')[s.code] || {})[String(vid || '')] || null; }
+  function nulmetingVan(s, vid) { return (eigen.kijk('oogNulmeting')[s.code] || {})[String(vid || '')] || null; }
   function schouwLog(s, actor, data) {
     const naam = schoon(data.voertuigNaam, 60) || 'Voertuig';
     const zones = Array.isArray(data.zones) ? data.zones.slice(0, 12).map(z => ({
@@ -72,7 +72,7 @@ function maakOog({ db, save, crypto, schoon, sseToSupplier, logActivity }) {
     return { status: 200, ok: true, regel };
   }
   function schouwen(s, vid) {
-    let rij = (eigen.bak('oogSchouwen')[s.code] || []);
+    let rij = (eigen.kijk('oogSchouwen')[s.code] || []);
     if (vid) rij = rij.filter(r => r.voertuigId === vid);
     return rij.slice(-40).reverse();
   }
@@ -90,11 +90,12 @@ function maakOog({ db, save, crypto, schoon, sseToSupplier, logActivity }) {
     return { status: 200, ok: true, item: { id: item.id, naam: item.naam } };
   }
   function spullen(s) {
-    return (eigen.bak('oogSpullen')[s.code] || []).map(x => ({ id: x.id, naam: x.naam, sig: x.sig }));
+    return (eigen.kijk('oogSpullen')[s.code] || []).map(x => ({ id: x.id, naam: x.naam, sig: x.sig }));
   }
   // zonder knop: het oog zag een aangeleerd item; de richting wisselt vanzelf
   function uitgifteLog(s, actor, data) {
-    const item = (eigen.bak('oogSpullen')[s.code] || []).find(x => x.id === String(data.itemId || ''));
+    // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+    const item = (eigen.kijk('oogSpullen')[s.code] || []).find(x => x.id === String(data.itemId || ''));
     if (!item) return { status: 404, error: 'Onbekend item; leer het eerst aan.' };
     const ug = eigen.bak('oogUitgifte');
     const rij = ug[s.code] = ug[s.code] || [];
@@ -114,12 +115,12 @@ function maakOog({ db, save, crypto, schoon, sseToSupplier, logActivity }) {
     return { status: 200, ok: true, regel };
   }
   function overzicht(s) {
-    const uit = (eigen.bak('oogUitgifte')[s.code] || []);
+    const uit = (eigen.kijk('oogUitgifte')[s.code] || []);
     const buiten = {};
     for (const r of uit) buiten[r.itemId] = r.richting === 'mee' ? r : null;
     return {
       schouwen: schouwen(s), uitgifte: uit.slice(-40).reverse(),
-      spullen: (eigen.bak('oogSpullen')[s.code] || []).map(x => ({ id: x.id, naam: x.naam })),
+      spullen: (eigen.kijk('oogSpullen')[s.code] || []).map(x => ({ id: x.id, naam: x.naam })),
       nogBuiten: Object.values(buiten).filter(Boolean).map(r => ({ itemNaam: r.itemNaam, door: r.door, sinds: r.at }))
     };
   }

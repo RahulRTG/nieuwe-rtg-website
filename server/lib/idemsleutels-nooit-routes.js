@@ -3,6 +3,9 @@
 'use strict';
 
 module.exports = Object.freeze({
+  'POST /api/webhooks/storingen':
+    'eigen duurzame SQLite-deduplicatie op de ondertekende event-id en bodyhash, over processen en herstarts; ' +
+    'de ontvanger beslist opnieuw over 200, 409 of opslagfout, een generieke antwoordcache mag dat bewijs niet vervangen',
   'POST /api/office/bank/nood':
     'een noodknop met een optionele reden: twee keer drukken is twee keer menen',
   'POST /api/office/bank/herstel':

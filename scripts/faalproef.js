@@ -342,7 +342,21 @@ function oordeel(schoon, met) {
   for (const r of lijst) {
     const sleutel = r.methode + ' ' + r.pad;
     const p = profielen.get(sleutel);
-    const rij = { route: sleutel, rol: r.rol, profiel: p.soort, effect: p.effect || null, perVerraad: {} };
+    /* `methode` en `pad` APART, en niet alleen de samengestelde `route`.
+
+       scripts/bewijsmatrix.js bouwt zijn sleutel als `r.methode + ' ' + r.pad`
+       -- zo lezen alle registers van deze familie. Dit bestand droeg alleen
+       `route`, dus elke sleutel werd 'undefined undefined' en de FAILURE-kolom
+       matchte NIETS. Dat is een bedradingsfout die ik zelf heb gemaakt toen ik
+       de kolom aansloot, en die niemand kon zien: het register vulde zich, de
+       matrix draaide, en er kwam alleen nooit een cel uit.
+
+       De les eronder is die van LAT.md regel 11, nu op bedrading in plaats van
+       op een toets: een koppeling die je niet van het ene eind tot het andere
+       hebt zien werken, is geen koppeling. test/faalproefvorm.test.js houdt de
+       twee vormen sindsdien tegen elkaar aan. */
+    const rij = { methode: r.methode, pad: r.pad, route: sleutel,
+      rol: r.rol, profiel: p.soort, effect: p.effect || null, perVerraad: {} };
     if (p.soort !== 'duurzaam') {
       rij.failure = 'ongemeten';
       rij.reden = p.reden;

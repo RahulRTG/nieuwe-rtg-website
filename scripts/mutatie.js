@@ -752,6 +752,16 @@ const EIGEN_MODULE = new Map([
   ['genretoegang.test.js', ['server/kern/aanmeldingen/bedrijf.js', 'server/seed/genres.js']],
   ['loghygiene.test.js', ['server/log.js', 'server/routelog.js']],
   ['ledengids-race.test.js', ['server/db/ledengids.js', 'server/db/gidsen.js']],
+  /* Twee servertoetsen uit de samenvoeging van 6 september 2026 die de
+     liegpoort overleefden omdat ze geen /api/-antwoord lezen: de foutmelder-
+     dekking haalt SCHERMEN op en kijkt of de injectie erin zit (de bewering
+     woont in kopinjectie.js), en paginaroutes toetst of de routes BUITEN /api/
+     aan de app hangen (bureaublad() in voordeur.js en de bundelroutes in
+     poortwachters.js). Beide met de hand zien zakken: de foutmelder-tag uit de
+     injectie halen -> beide beweringen rood; dat is de mutatie die de motor
+     hieronder herhaalt. */
+  ['foutmelder-dekking.test.js', ['server/middleware/kopinjectie.js']],
+  ['paginaroutes.test.js', ['server/middleware/voordeur.js', 'server/opzet/poortwachters.js']],
   /* SCHERMTOETSEN, en dat is nieuw. De motor haalde altijd alleen *.test.js op,
      dus de 85 *.e2e.js-bestanden waren structureel onmeetbaar -- en dat maakte
      toetsenNietGemeten een meter die het SCHRIJVEN van een schermtoets bestrafte.

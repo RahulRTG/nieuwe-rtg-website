@@ -451,6 +451,15 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  /* Beide Edge-toetsen voeren browsercode in een VM uit of lezen het kleine
+     basisfragment rechtstreeks. Daardoor ziet modulesVan() geen require,
+     terwijl dit wel hun echte bron is. Nageproefd: een verkeerde Edge-CSS-URL
+     laat edge-boot zakken en actie:null terugzetten op een gok laat edge-uitrol
+     zakken. */
+  ['rtg-edge-boot.test.js', ['public/shared/randen.js',
+    'public/shared/rtg-edge-2-loader.js']],
+  ['rtg-edge-uitrol.test.js', ['public/shared/basis/basis-01ac-edge.js',
+    'public/shared/randen.js']],
   /* De Workspace-platformtoets laadt browsermodules bewust in een VM en heeft
      daardoor geen statische require die modulesVan() kan vinden. Dit is wel
      degelijk zijn bron: de SDK-validatie omkeren laat de eerste en tweede
@@ -828,6 +837,23 @@ const EIGEN_MODULE = new Map([
    Elke reden noemt hoeveel mutaties er zijn geprobeerd, want een reden zonder
    poging is een vermoeden. */
 const GEEN_BRONMUTATIE = new Map([
+  /* De waarheidstoets leest operationele claims in HTML en letterlijke
+     antwoordteksten. De mechanische JS-operatoren raken dat soort leugen niet
+     en overleefden 52 irrelevante mutaties. Handmatig een vaste Kyoto-claim
+     terugbrengen liet de eerste toets wel direct zakken. */
+  ['heritage-truth.test.js', 'inhoudscensus; een teruggebrachte vaste Kyoto-claim liet de waarheidstoets zakken'],
+  /* De gewone mutator kent geen browser-DOM en de schermmutator kan de
+     route.pad-tabel van deze viervoudige matrix niet statisch volgen. De
+     foutklasse is wel echt nageproefd: een tijdelijke 200vw-dashboardbreedte
+     liet de 320/390/desktopmatrix zakken (13 toetsen, geen skip of time-out). */
+  ['world-dashboard.e2e.js', 'browsermatrix; handmutatie naar 200vw liet de echte wereldviewporttoets zakken'],
+  /* Deze twee toetsen bewaken CSS-contracten. De mutatiemotor kan alleen JS
+     syntactisch keuren en zou een CSS-bestand daarom ten onrechte als
+     onmeetbaar afwijzen. Met de hand nageproefd: --edge-top van 44px naar 40px
+     laat rtg-edge-accessibility zakken; --rtg-radius-content van 2px naar 8px
+     laat rtg-heritage zakken. */
+  ['rtg-edge-accessibility.test.js', 'CSS-contract; handmutatie 44px naar 40px liet de raakdoeltoets zakken'],
+  ['rtg-heritage.test.js', 'CSS-contract; handmutatie inhoudsradius 2px naar 8px liet de geometriepoort zakken'],
   /* Deze ratel staat op NUL, en dat is precies wat hem onmeetbaar maakt voor de
      motor: meet() leest de echte testmap, telt daar nul wachten, en elke
      gedragsmatige mutatie in scripts/klokwacht.js laat dat nul. Nul in, nul uit.

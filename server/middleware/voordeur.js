@@ -110,14 +110,7 @@ function cspNonce(publicDir, aan) {
       /* Met de nonce-schakelaar uit blijft de openbare landing bereikbaar. De
          canonieke bron heeft alleen externe scripts en bladen, dus de strenge
          terugval-CSP uit koppen.js blijft daarbij bruikbaar. */
-      if (!aan) {
-        res.type('html');
-        if (req.method === 'HEAD') {
-          res.setHeader('Content-Length', Buffer.byteLength(html));
-          return res.end();
-        }
-        return res.send(html);
-      }
+      if (!aan) return landing.stuurZonderNonce(req, res, html);
       const nonce = crypto.randomBytes(16).toString('base64');
       const magnaat = req.query && String(req.query.magnaat || '') === '1' && rel.startsWith('/apps/');
       /* Voor / geven we ook / aan de keten. De blokafsplitsers herkennen dat

@@ -42,4 +42,16 @@ function voorNode(bron) {
     .replace(/(\s(?:href|action)\s*=\s*["'])https:\/\/app\.rahultravelgroup\.com(?=\/)/gi, '$1');
 }
 
-module.exports = { APP_ORIGIN, bronbestand, voorNode };
+/* Alleen de openbare landing wordt ook bediend wanneer de nonce-laag bewust
+   uitstaat. De GET- en HEAD-vorm horen bij dezelfde bron en blijven daarom bij
+   de landing, in plaats van als een tweede antwoordpad in voordeur.js. */
+function stuurZonderNonce(req, res, html) {
+  res.type('html');
+  if (req.method === 'HEAD') {
+    res.setHeader('Content-Length', Buffer.byteLength(html));
+    return res.end();
+  }
+  return res.send(html);
+}
+
+module.exports = { APP_ORIGIN, bronbestand, voorNode, stuurZonderNonce };

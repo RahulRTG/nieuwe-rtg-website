@@ -1,108 +1,108 @@
 {
   "stempel": {
-    "op": "2026-09-03T12:34:50.251Z",
-    "commit": "1c5dc892",
+    "op": "2026-09-06T14:30:23.789Z",
+    "commit": "2034d181",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 0,
     "instrument": "scripts/bewijsmatrix.js",
     "node": "v22.22.2"
   },
   "herkomst": "routekaart (draaiende server)",
   "gedegradeerd": false,
   "journaalGelezen": null,
-  "routes": 4846,
+  "routes": 4971,
   "schakels": 11,
-  "cellen": 53306,
+  "cellen": 54681,
   "telling": {
-    "bewezen": 26093,
-    "verklaard": 0,
-    "nvt": 308,
-    "ongemeten": 26861,
-    "gezakt": 44
+    "bewezen": 26447,
+    "verklaard": 117,
+    "nvt": 578,
+    "ongemeten": 27512,
+    "gezakt": 27
   },
   "perSchakel": {
     "AUTH": {
       "bewezen": 4516,
-      "verklaard": 0,
+      "verklaard": 117,
       "nvt": 0,
-      "ongemeten": 330,
+      "ongemeten": 338,
       "gezakt": 0
     },
     "ACL": {
-      "bewezen": 3824,
+      "bewezen": 3902,
       "verklaard": 0,
-      "nvt": 0,
-      "ongemeten": 993,
-      "gezakt": 29
+      "nvt": 133,
+      "ongemeten": 936,
+      "gezakt": 0
     },
     "INPUT": {
       "bewezen": 3444,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 1402,
+      "ongemeten": 1527,
       "gezakt": 0
     },
     "OUTPUT": {
       "bewezen": 4151,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 695,
+      "ongemeten": 820,
       "gezakt": 0
     },
     "STATE": {
       "bewezen": 438,
       "verklaard": 0,
-      "nvt": 77,
-      "ongemeten": 4331,
+      "nvt": 78,
+      "ongemeten": 4455,
       "gezakt": 0
     },
     "SIDE_EFFECT": {
       "bewezen": 438,
       "verklaard": 0,
-      "nvt": 77,
-      "ongemeten": 4331,
+      "nvt": 78,
+      "ongemeten": 4455,
       "gezakt": 0
     },
     "AUDIT": {
       "bewezen": 1059,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3787,
+      "ongemeten": 3912,
       "gezakt": 0
     },
     "IDEMPOTENCY": {
-      "bewezen": 1642,
+      "bewezen": 1662,
       "verklaard": 0,
-      "nvt": 77,
-      "ongemeten": 3117,
-      "gezakt": 10
-    },
-    "FAILURE": {
-      "bewezen": 2,
-      "verklaard": 0,
-      "nvt": 0,
-      "ongemeten": 4844,
+      "nvt": 78,
+      "ongemeten": 3231,
       "gezakt": 0
     },
-    "ROLLBACK": {
-      "bewezen": 2726,
-      "verklaard": 0,
-      "nvt": 77,
-      "ongemeten": 2038,
-      "gezakt": 5
-    },
-    "PRIVACY": {
-      "bewezen": 3853,
+    "FAILURE": {
+      "bewezen": 113,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 993,
+      "ongemeten": 4832,
+      "gezakt": 26
+    },
+    "ROLLBACK": {
+      "bewezen": 2822,
+      "verklaard": 0,
+      "nvt": 78,
+      "ongemeten": 2070,
+      "gezakt": 1
+    },
+    "PRIVACY": {
+      "bewezen": 3902,
+      "verklaard": 0,
+      "nvt": 133,
+      "ongemeten": 936,
       "gezakt": 0
     }
   },
   "verslechteringToegestaan": {
-    "reden": "Eerste volledige meetronde op EEN boom (40ff1c66). De vorige matrix stelde registers van drie commits samen (5dc3b081, 47c119c3, 9ce86fe98); die vergelijking is dus tussen twee wereldbeelden en niet tussen twee metingen van dezelfde code. Netto: bewezen 25500 -> 26093, ongemeten 27453 -> 26861, AUTH +41, ROLLBACK +1067, AUDIT +350. ACL en PRIVACY verliezen elk 5 routes; WELKE vijf is uit de artefacten niet te herleiden -- de oude matrix draagt geen per-route-gegevens en de oude rolproef is gemeten op een commit die in deze boom niet bestaat. Vastgelegd omdat de ronde intern samenhangend is; de vijf staan hiermee open als vraag, niet als opgelost.",
+    "reden": "Eerste ronde met de FAALPROEF aangesloten en met een verse staatproef (39f57ea2). De verslechtering is een NOEMER en geen kwaliteitsverlies: 4846 -> 4971 routes, want main leverde 125 routes die geen enkele meetronde heeft gezien. INPUT, OUTPUT en AUDIT stijgen daardoor met exact 125 ongemeten; STATE en SIDE_EFFECT met 124 plus 1 nvt; AUTH splitst ze in 117 verklaard en 8 ongemeten. GEEN ENKELE KOLOM VERLIEST BEWEZEN CELLEN -- bewezen stijgt in vijf kolommen en daalt in nul: FAILURE 2 -> 113 (de faalproef stond wel geschreven en werd nooit gelezen), ROLLBACK 2726 -> 2822, ACL 3824 -> 3902, PRIVACY 3853 -> 3902, IDEMPOTENCY 1642 -> 1662. GEZAKT gaat van 44 naar 27 en dat is een ANDERE 27: de oude 44 (ACL 29, IDEMPOTENCY 10, ROLLBACK 5) zijn alle gesloten, en er staan 26 FAILURE-cellen plus 1 ROLLBACK voor terug uit een kolom die eerder blind was. Dat is bewijs dat erbij komt, geen kwaliteit die weggaat. Wat deze ronde NIET doet is de 125 nieuwe routes meten; daarvoor moeten poortwacht, invoerproef, uitvoerproef en auditproef opnieuw, en dat staat als schuld en niet als groen.",
     "cellenVoor": 53306,
-    "cellenNa": 53306
+    "cellenNa": 54681
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

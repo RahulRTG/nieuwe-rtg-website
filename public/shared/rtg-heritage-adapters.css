@@ -1,0 +1,124 @@
+/* RTG HERITAGE ADAPTERS ----------------------------------------------------
+   De bestaande applicaties hebben al echte data en echte knoppen, maar noemen
+   dezelfde rollen historisch `.kaart`, `.litem`, `.kantoor-intro`, enzovoort.
+   Deze laag verbindt die bestaande DOM met de nieuwe grammatica zonder nodes
+   te kopiëren of handlers te vervangen. */
+
+/* Inhoud rust in de wereld; focus komt pas door selectie of intentie. */
+body[data-rtg-skin="heritage"] :where(.kaart,.card,.paneel,.panel,.tegel,.tile,.vak,.rtg-groep){
+  background-color:color-mix(in srgb,var(--rtg-world-card) 95%,transparent);
+  border-color:var(--rtg-world-line);background-clip:padding-box
+}
+body[data-rtg-skin="heritage"] :where(.kaart,.card,.paneel,.panel,.tegel,.tile,.vak,.rtg-groep)
+  :where(h3,.kop,.naam,strong){color:var(--rtg-world-ink)}
+body[data-rtg-skin="heritage"] :where(.kaart,.card,.paneel,.panel,.tegel,.tile,.vak,.rtg-groep)
+  :where(p,.sub,.stil,.meta,small){color:var(--rtg-world-muted)}
+
+body[data-rtg-skin="heritage"] :where(a.kaart,a.card,a.tegel,a.tile,button.kaart,button.card,
+  button.tegel,button.tile,.kaart[tabindex],.card[tabindex]){position:relative;isolation:isolate}
+body[data-rtg-skin="heritage"] :where(a.kaart,a.card,a.tegel,a.tile,button.kaart,button.card,
+  button.tegel,button.tile,.kaart[tabindex],.card[tabindex])::after{
+  content:"";position:absolute;z-index:-1;inset:-1px;opacity:0;pointer-events:none;
+  background:linear-gradient(135deg,var(--rtg-world-signature-soft),transparent 62%);
+  transition:opacity var(--rtg-time-functional,200ms) var(--rtg-ease-standard,ease)
+}
+body[data-rtg-skin="heritage"] :where(a.kaart,a.card,a.tegel,a.tile,button.kaart,button.card,
+  button.tegel,button.tile,.kaart[tabindex],.card[tabindex]):is(:hover,:focus-visible)::after{opacity:1}
+
+/* De drie bestaande kantoor-intro's en de rtg-intro's zijn compacte
+   contextstroken. Geen tweede homehero, wel fotografie en richting. */
+body[data-rtg-skin="heritage"] :where(.kantoor-intro,.rtg-intro){
+  position:relative;isolation:isolate;overflow:hidden;border:1px solid var(--rtg-world-line);
+  background-color:var(--rtg-world-card);background-image:
+    linear-gradient(100deg,var(--rtg-world-bg) 0%,color-mix(in srgb,var(--rtg-world-bg) 88%,transparent) 54%,
+      color-mix(in srgb,var(--rtg-world-bg) 48%,transparent) 100%),var(--rtg-world-photo);
+  background-size:auto,cover;background-position:center,var(--rtg-world-photo-position);
+  box-shadow:var(--rtg-depth-focus)
+}
+body[data-rtg-skin="heritage"] :where(.kantoor-intro,.rtg-intro) :where(h1,h2){
+  color:var(--rtg-world-ink);text-wrap:balance
+}
+body[data-rtg-skin="heritage"] :where(.kantoor-intro,.rtg-intro) p{color:var(--rtg-world-muted)}
+
+/* Bestaande lijsten worden één Moment List: rijen, niet een stapel tegels. */
+body[data-rtg-skin="heritage"] :where(.litem,.rtg-rij,.lijnrij,.taakrij){
+  border-color:var(--rtg-world-line);box-shadow:none
+}
+body[data-rtg-skin="heritage"] :where(.litem,.rtg-rij,.lijnrij,.taakrij):is(:hover,:focus-within){
+  background-color:var(--rtg-world-signature-soft)
+}
+body[data-rtg-skin="heritage"] :where(time,.tijd,.datum,.bedrag,.kpi,.stat){font-variant-numeric:tabular-nums}
+
+/* Eerlijke producttoestanden zijn rustig, maar nooit onzichtbaar. */
+body[data-rtg-skin="heritage"] :where(.leeg,.empty,.rtg-leeg){
+  color:var(--rtg-world-muted);border-color:var(--rtg-world-line)
+}
+body[data-rtg-skin="heritage"] :where(.melding,.melder,[role="status"]){
+  border-color:var(--rtg-world-line);box-shadow:var(--rtg-depth-system)
+}
+body[data-rtg-skin="heritage"] :where(.fout,[data-status="error"],[aria-invalid="true"]){
+  --rtg-state-accent:var(--rtg-status-danger);border-color:var(--rtg-status-danger)
+}
+body[data-rtg-skin="heritage"] :where(.ok,.goed,[data-status="confirmed"]){
+  --rtg-state-accent:var(--rtg-status-ok)
+}
+body[data-rtg-skin="heritage"] :where(.wacht,.let,[data-status="pending"],[data-status="offline"]){
+  --rtg-state-accent:var(--rtg-status-warn)
+}
+
+/* Formulieren houden labels, focus en oorzaak in hetzelfde optische vlak. */
+body[data-rtg-skin="heritage"] :where(.veld,input:not([type="checkbox"]):not([type="radio"]),select,textarea){
+  min-height:36px;background-color:color-mix(in srgb,var(--rtg-world-card-strong) 92%,transparent);
+  border-color:var(--rtg-world-line);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)
+}
+body[data-rtg-skin="heritage"] :where(label,.lbl){color:var(--rtg-world-muted)}
+body[data-rtg-skin="heritage"] :where(button,.knop,.btn,.rtg-knop,[role="button"]){min-height:36px}
+
+/* Modalen zijn systeem; hun inhoud mag recht blijven. */
+body[data-rtg-skin="heritage"] :where(.scrim,.backdrop,[data-backdrop]){
+  background-color:color-mix(in srgb,var(--rtg-world-bg) 76%,transparent);
+  backdrop-filter:blur(10px) saturate(.9);border:0;border-radius:0;box-shadow:none;
+  overscroll-behavior:contain
+}
+body[data-rtg-skin="heritage"] :where(.scrim,.backdrop,[data-backdrop])>.paneel{
+  border-radius:var(--rtg-radius-system);box-shadow:var(--rtg-depth-system)
+}
+
+@media(max-width:700px){
+  body[data-rtg-skin="heritage"] :where(.veld,input:not([type="checkbox"]):not([type="radio"]),select,
+    textarea,button,.knop,.btn,.rtg-knop,[role="button"],summary,a.terug,.terug[href]){
+    min-height:var(--rtg-target)
+  }
+  body[data-rtg-skin="heritage"] :where(summary,a.terug,.terug[href]){align-items:center}
+  body[data-rtg-skin="heritage"] :where(.kantoor-intro,.rtg-intro){
+    background-image:linear-gradient(0deg,var(--rtg-world-bg),
+      color-mix(in srgb,var(--rtg-world-bg) 62%,transparent)),var(--rtg-world-photo)
+  }
+  body[data-rtg-skin="heritage"] :where(.scrim,.backdrop,[data-backdrop]){
+    padding-top:max(16px,env(safe-area-inset-top));
+    padding-right:max(16px,env(safe-area-inset-right));
+    padding-bottom:max(16px,env(safe-area-inset-bottom));
+    padding-left:max(16px,env(safe-area-inset-left))
+  }
+  body[data-rtg-skin="heritage"] :where(.scrim,.backdrop,[data-backdrop])>.paneel{
+    border-radius:var(--rtg-radius-system)
+  }
+}
+
+@media(pointer:coarse){
+  body[data-rtg-skin="heritage"] :where(.veld,input:not([type="checkbox"]):not([type="radio"]),select,
+    textarea,button,.knop,.btn,.rtg-knop,[role="button"],summary,a.terug,.terug[href]){
+    min-height:var(--rtg-target)
+  }
+  body[data-rtg-skin="heritage"] :where(label:has(>input[type="checkbox"]),
+    label:has(>input[type="radio"])){min-height:var(--rtg-target);display:flex;align-items:center}
+}
+
+@media(prefers-reduced-motion:reduce){
+  body[data-rtg-skin="heritage"] :where(a.kaart,a.card,a.tegel,a.tile,button.kaart,button.card,
+    button.tegel,button.tile,.kaart[tabindex],.card[tabindex])::after{transition:none}
+}
+
+@media(forced-colors:active){
+  body[data-rtg-skin="heritage"] :where(.kantoor-intro,.rtg-intro){background-image:none}
+}

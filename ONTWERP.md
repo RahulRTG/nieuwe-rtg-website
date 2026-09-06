@@ -1,5 +1,10 @@
 # RTG Interface Operating Standard — visuele taal
 
+> **Normatieve opvolger:** [HERITAGE.md](HERITAGE.md) legt het actuele RTG
+> Heritage Intelligence System vast. Bij een verschil in palet, geometrie,
+> beweging, Edge-gedrag of componentrol gaat dat document voor. Dit bestand
+> blijft de geschiedenis en de verdere operationele uitwerking bewaren.
+
 > **Van veraf classy, van dichtbij extreem krachtig.**
 >
 > Wie vijf seconden kijkt, ziet een exclusief Europees merk. Wie er acht uur per

@@ -31,6 +31,50 @@
   if (window.__rtgBasis) return; window.__rtgBasis = true;
   var rtf = location.pathname.indexOf('/apps/foundation/') === 0;
 
+  /* ---- vaste wereldidentiteit, voor alle andere gedeelde lagen -----------
+     De toetsbare routekaart vult alleen een ontbrekende wereld aan. Het
+     heritage-blad komt bewust LAAT in <head>, na de stijl van het scherm. */
+  if (document.body) document.body.setAttribute('data-rtg-skin', 'heritage');
+
+  function laadHeritageBlad() {
+    var bestaand = document.getElementById('rtgHeritageCss') ||
+      document.querySelector('link[href^="/shared/rtg-heritage.css"]');
+    if (bestaand) {
+      if (!bestaand.id) bestaand.id = 'rtgHeritageCss';
+      return;
+    }
+    var blad = document.createElement('link');
+    blad.id = 'rtgHeritageCss';
+    blad.rel = 'stylesheet';
+    blad.href = '/shared/rtg-heritage.css';
+    (document.head || document.documentElement).appendChild(blad);
+  }
+
+  function pasWereldIdentiteitToe() {
+    try {
+      if (window.RTGWorldIdentity && window.RTGWorldIdentity.apply) {
+        window.RTGWorldIdentity.apply(document, location.pathname);
+      }
+    } finally { laadHeritageBlad(); }
+  }
+
+  if (window.RTGWorldIdentity) pasWereldIdentiteitToe();
+  else {
+    var identiteitScript = document.getElementById('rtgWorldIdentityJs') ||
+      document.querySelector('script[src^="/shared/rtg-world-identity.js"]');
+    if (!identiteitScript) {
+      identiteitScript = document.createElement('script');
+      identiteitScript.id = 'rtgWorldIdentityJs';
+      identiteitScript.src = '/shared/rtg-world-identity.js';
+      identiteitScript.async = false;
+    }
+    identiteitScript.addEventListener('load', pasWereldIdentiteitToe, { once: true });
+    identiteitScript.addEventListener('error', laadHeritageBlad, { once: true });
+    if (!identiteitScript.parentNode) {
+      (document.head || document.documentElement).appendChild(identiteitScript);
+    }
+  }
+
   /* ---- taal: elk echt appscherm krijgt dezelfde 114-talige laag ---------
      Vijf grote shells namen i18n.js zelf al op; alle andere schermen hadden
      daardoor geen taalkeuze en hielden hun hardcoded tekst. De basis ligt op
@@ -123,6 +167,57 @@
     th.src = '/shared/rtg-themas.js';
     (document.head || document.documentElement).appendChild(th);
   }
+/* Heritage Motion vult alleen declaratieve status en toegankelijkheid aan. De
+   app houdt haar eigen klik, bevoegdheid en route; dubbel laden is uitgesloten. */
+  if (!window.RTGHeritageMotion && !document.getElementById('rtgHeritageMotionJs') &&
+      !document.querySelector('script[src^="/shared/rtg-heritage-motion.js"]')) {
+    var bewegingScript = document.createElement('script');
+    bewegingScript.id = 'rtgHeritageMotionJs';
+    bewegingScript.src = '/shared/rtg-heritage-motion.js';
+    bewegingScript.async = false;
+    (document.head || document.documentElement).appendChild(bewegingScript);
+  }
+/* De Continue Key verrijkt uitsluitend de al gemarkeerde Edge-hoofdactie. De
+   passieve kern staat ervoor; async=false bewaakt de toevoegvolgorde. */
+  if (!window.RTGContinueKeyCore && !document.getElementById('rtgContinueKeyCoreJs') &&
+      !document.querySelector('script[src^="/shared/rtg-continue-key-core.js"]')) {
+    var verderKern = document.createElement('script');
+    verderKern.id = 'rtgContinueKeyCoreJs';
+    verderKern.src = '/shared/rtg-continue-key-core.js';
+    verderKern.async = false;
+    (document.head || document.documentElement).appendChild(verderKern);
+  }
+  if (!window.RTGContinueKey && !document.getElementById('rtgContinueKeyJs') &&
+      !document.querySelector('script[src^="/shared/rtg-continue-key.js"]')) {
+    var verderScript = document.createElement('script');
+    verderScript.id = 'rtgContinueKeyJs';
+    verderScript.src = '/shared/rtg-continue-key.js';
+    verderScript.async = false;
+    (document.head || document.documentElement).appendChild(verderScript);
+  }
+/* Routes mogen functionele CSS bijladen, maar Heritage blijft het laatste
+   materiaalblad. De helper verplaatst alleen de bestaande link. */
+  if (!window.RTGHeritageOrder && !document.getElementById('rtgHeritageOrderJs') &&
+      !document.querySelector('script[src^="/shared/rtg-heritage-order.js"]')) {
+    var heritageOrderScript = document.createElement('script');
+    heritageOrderScript.id = 'rtgHeritageOrderJs';
+    heritageOrderScript.src = '/shared/rtg-heritage-order.js';
+    heritageOrderScript.async = false;
+    (document.head || document.documentElement).appendChild(heritageOrderScript);
+  }
+/* Iedere echte wereldkamer gebruikt dezelfde Edge. Pagina's die randen.js al
+   zelf opnemen blijven eigenaar van hun laadvolgorde; de basis vult hem alleen
+   aan wanneer hij ontbreekt. Core bestaat niet als zichtbare vijfde wereld. */
+(function () {
+  'use strict';
+  var b = document.body;
+  if (!b || ['living', 'travel', 'work', 'foundation'].indexOf(b.getAttribute('data-rtg-world')) < 0) return;
+  if (window.RTGRanden || window.__RTGRandenBoot || document.getElementById('rtgRandenJs') ||
+      document.querySelector('script[src^="/shared/randen.js"],script[src^="../shared/randen.js"]')) return;
+  var s = document.createElement('script');
+  s.id = 'rtgRandenJs'; s.src = '/shared/randen.js'; s.async = true;
+  (document.head || document.documentElement).appendChild(s);
+}());
 /* Vervolg van basis-01 (op de 10 kB-grens geknipt na de thema-toevoeging van
    de consolidatieronde; de bundelvolgorde is alfabetisch, dus 01, 01b, 02).
    Sectie 1 en verder: offline, verbinding, en de rest. */

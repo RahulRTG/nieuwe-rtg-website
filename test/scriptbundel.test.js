@@ -78,3 +78,58 @@ test('de lijst zit IN de verwijzing, niet in een tabel op de server', () => {
   const paden = Buffer.from(m[1], 'base64url').toString('utf8').split('\n');
   assert.deepEqual(paden, ['/shared/a.js', '/shared/b.js'], 'en die lijst beschrijft zichzelf');
 });
+
+/* De URL van een scriptbundel draagt bewust alleen de bronlijst. Daarom moet
+   de ETag ieder bestand uit die lijst dekken: verandert bijvoorbeeld basis.js
+   aan het einde, dan moet een browser met de oude validator 200 + nieuwe code
+   krijgen en nooit een onterechte 304. */
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { scriptbundel } = require('../server/middleware/scriptbundel');
+
+function proefBundel(scripts) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-scb-'));
+  for (const [naam, inhoud] of Object.entries(scripts)) fs.writeFileSync(path.join(dir, naam), inhoud);
+  const mw = scriptbundel(dir);
+  const f = Buffer.from(Object.keys(scripts).map((naam) => '/' + naam).join('\n')).toString('base64url');
+  const haal = (etag) => new Promise((klaar) => {
+    const koppen = {};
+    const res = {
+      statusCode: 200,
+      setHeader: (k, v) => { koppen[k] = v; },
+      type: () => res,
+      status: (code) => { res.statusCode = code; return res; },
+      send: (body) => klaar({ status: res.statusCode, koppen, body: String(body || '') }),
+      end: (body) => klaar({ status: res.statusCode, koppen, body: body ? String(body) : '' })
+    };
+    mw({ path: '/scriptbundel.js', query: { f }, headers: etag ? { 'if-none-match': etag } : {} },
+      res, () => klaar({ status: 404, koppen, body: '' }));
+  });
+  return { dir, haal, raak: (naam, inhoud) => fs.writeFileSync(path.join(dir, naam), inhoud) };
+}
+
+test('de ETag dekt elk script, ook het laatste', async () => {
+  const p = proefBundel({
+    'a.js': 'globalThis.a = "alfa";',
+    'b.js': 'globalThis.b = "bravo";',
+    'c.js': 'globalThis.c = "charlie";',
+    'd.js': 'globalThis.d = "delta";',
+    'basis.js': 'globalThis.basis = "oud";'
+  });
+  try {
+    const eerst = await p.haal();
+    assert.equal(eerst.status, 200);
+    assert.ok(eerst.koppen.ETag, 'de bundel draagt een validator');
+    assert.ok(eerst.body.includes('"oud"'), 'de oude laatste bron zit in de eerste respons');
+    assert.equal((await p.haal(eerst.koppen.ETag)).status, 304, 'ongewijzigd mag 304 geven');
+
+    p.raak('basis.js', 'globalThis.basis = "nieuw en langer";');
+    const na = await p.haal(eerst.koppen.ETag);
+    assert.equal(na.status, 200, 'de oude validator krijgt na een bronwijziging nieuwe inhoud');
+    assert.notEqual(na.koppen.ETag, eerst.koppen.ETag, 'de validator verandert mee met het laatste script');
+    assert.ok(na.body.includes('"nieuw en langer"'), 'de nieuwe broncode wordt uitgeleverd');
+  } finally {
+    fs.rmSync(p.dir, { recursive: true, force: true });
+  }
+});

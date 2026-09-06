@@ -30,7 +30,7 @@
       teken(); bind(); neemAI();
       d.body.classList.add('rtg-edge-host');
       d.body.setAttribute('data-rtg-edge-ready', 'true');
-      var v2=d.createElement('script');v2.src='/shared/rtg-edge-2-loader.js';d.head.appendChild(v2);
+      if(!d.getElementById('rtg-edge-2-loader-js')){var v2=d.createElement('script');v2.id='rtg-edge-2-loader-js';v2.src='/shared/rtg-edge-2-loader.js';v2.async=true;(d.head||d.documentElement).appendChild(v2);}
       L.refresh(A); return api;
     } catch (fout) {
       if (root.parentNode) root.parentNode.removeChild(root);
@@ -51,7 +51,9 @@
     e.root.querySelector('.rtg-edge-worldbar').innerHTML = L.balk(e, C, esc);
     e.root.querySelector('.rtg-edge-scope').textContent = c.scope;
     e.root.querySelector('.rtg-edge-tools').innerHTML = t.map(function (x, i) { return '<a class="rtg-edge-tool" data-tool="' + x[0] + '" data-shortcut="' + (i + 1) + '" href="' + x[3] + '" aria-label="' + esc(x[1]) + '" ' + ((c.tool === x[0] || (!c.tool && actief(x))) ? 'aria-current="page"' : '') + '>' + s(x[2]) + '<span class="rtg-edge-tip">' + esc(x[1]) + '<kbd>Alt+' + (i + 1) + '</kbd></span></a>'; }).join('');
-    e.root.querySelector('.rtg-edge-action button').textContent = c.actie || e.cfg.actie;
+    var hoofdactie = e.root.querySelector('.rtg-edge-action [data-rtg-edge-primary]');
+    var hoofdtekst = typeof c.actie === 'string' ? c.actie.trim() : '';
+    hoofdactie.hidden = !hoofdtekst; hoofdactie.textContent = hoofdtekst;
     e.root.querySelector('.rtg-edge-layout small').textContent = e.layout;
     e.root.querySelector('.rtg-edge-index').innerHTML = L.html(e, C, esc, s, actief);
     e.root.querySelector('.rtg-edge-status-panel').innerHTML = L.status();
@@ -86,7 +88,7 @@
     r.querySelector('[data-go="back"]').onclick = function () { history.back(); };
     r.querySelector('[data-go="next"]').onclick = function () { history.forward(); };
     r.querySelector('.rtg-edge-layout').onclick = function () { if (!e.workspace) { location.href = e.cfg.workspace; return; } setLayout(e.layout === 1 ? 2 : e.layout === 2 ? 4 : 1); };
-    r.querySelector('.rtg-edge-action button').onclick = voerActie;
+    r.querySelector('.rtg-edge-action [data-rtg-edge-primary]').onclick = voerActie;
     ai.onclick = function () { var open = ai.getAttribute('aria-expanded') !== 'true'; sluitLagen(); ai.setAttribute('aria-expanded', String(open)); panel.setAttribute('aria-hidden', String(!open)); if (open) neemAI(); };
     state.onclick = function () { var open = state.getAttribute('aria-expanded') !== 'true'; sluitLagen(); state.setAttribute('aria-expanded', String(open)); status.setAttribute('aria-hidden', String(!open)); if(open)L.refresh(e); };
     d.addEventListener('keydown', function (ev) {

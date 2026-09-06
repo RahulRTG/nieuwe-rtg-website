@@ -75,17 +75,22 @@ test('vier homes zijn native dashboards; drie subroutes houden alleen hun wereld
   assert.match(bodyVan(lees('public/apps/werk.html')), /data-rtg-vandaag-surface="projecten"/);
 });
 
-test('alle Edge2-assets komen één keer en in volgorde uit de centrale loader', () => {
+test('alle Edge2-assets komen één keer via de centrale gereedbarrière', () => {
   assert.equal((SYSTEM.match(/\/shared\/rtg-edge-2-loader\.js/g) || []).length, 1);
+  assert.match(SYSTEM, /getElementById\('rtg-edge-2-loader-js'\)/);
+  assert.match(SYSTEM, /v2\.id='rtg-edge-2-loader-js'/);
   assert.ok(SYSTEM.indexOf("data-rtg-edge-ready', 'true") < SYSTEM.indexOf('/shared/rtg-edge-2-loader.js'),
     'de loader mag pas na het commitpunt van de bestaande Edge starten');
   for (const direct of ['/shared/rtg-edge-2.css', '/shared/rtg-edge-2-context.js', '/shared/rtg-edge-2.js']) {
     assert.ok(!SYSTEM.includes(direct), 'rtg-edge-system laadt alleen de loader, niet ' + direct);
     assert.equal((LOADER.split(direct).length - 1), 1, direct + ' wordt centraal exact één keer genoemd');
   }
-  assert.match(LOADER, /getElementById\('rtg-edge-2-css'\)/);
+  assert.match(LOADER, /w\.__RTGEdge2Loader/);
+  assert.match(LOADER, /var over = 2, mislukt = false/,
+    'vorm en context delen één parallelle gereedbarrière');
   assert.ok(LOADER.indexOf('/shared/rtg-edge-2.css') < LOADER.indexOf('/shared/rtg-edge-2-context.js'));
-  assert.ok(LOADER.indexOf('/shared/rtg-edge-2-context.js') < LOADER.indexOf('/shared/rtg-edge-2.js'));
+  assert.match(LOADER, /if \(--over \|\| mislukt\) return;\s*script\('\/shared\/rtg-edge-2\.js'/,
+    'de uitvoerder wordt pas na beide geslaagde parallelle bronnen aangelegd');
 });
 
 test('de onderrand gebruikt per pilot een expliciete veilige hoofdactie', () => {

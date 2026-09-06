@@ -1,8 +1,8 @@
 'use strict';
 /* Start-rooktest: boot de ECHTE server als kindproces met een verse, tijdelijke
-   database en controleer dat hij (a) opstart zonder fatale uitzondering en
-   (b) op de site-root het RTG OS-bureaublad (de ROS-poort) serveert - niet de
-   oude hub, niet een 500.
+   database en controleer dat hij (a) opstart zonder fatale uitzondering, (b)
+   op de site-root de publieke RTG-landingspagina serveert en (c) de OS-poort
+   op zijn eigen /apps-ingang beschikbaar houdt - niet een oude hub of een 500.
 
    Waarom: een unittest raakt losse functies, maar niets startte tot nu toe de
    hele applicatie op. Zo glipte een crash-bij-opstart (een module die een niet-
@@ -77,15 +77,16 @@ function boot(port, dataDir) {
   return { kind, uitInfo };
 }
 
-test('de server boot en serveert de ROS-poort op de root', async () => {
+test('de server boot met de publieke landing op root en de OS-poort onder /apps', async () => {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-boot-'));
-  let kind, uitInfo, r;
+  let kind, uitInfo, r, actievePoort;
   try {
     for (let poging = 0; ; poging++) {
       const port = 34000 + Math.floor(Math.random() * 2000);
       ({ kind, uitInfo } = boot(port, dataDir));
       try {
         r = await wachtTotOp(port, uitInfo, kind);
+        actievePoort = port;
         break;
       } catch (e) {
         kind.kill('SIGKILL');
@@ -96,12 +97,17 @@ test('de server boot en serveert de ROS-poort op de root', async () => {
     }
     // 1) de root reageert met een echte pagina
     assert.equal(r.status, 200, 'root gaf status ' + r.status + ' i.p.v. 200');
-    // 2) het is het RTG OS-bureaublad (de ROS-poort), herkenbaar aan het slot + het gategrid
-    assert.ok(/id="gate"/.test(r.body) && /os-lock|os-grid/.test(r.body),
-      'root serveert niet de ROS-poort (klokscherm) maar iets anders');
-    // 3) niet per ongeluk de oude hub-index
-    assert.ok(!/RTG OS het bureaublad|het bureaublad/i.test(r.body) || /os-lock/.test(r.body),
-      'root serveert de oude hub in plaats van de ROS');
+    // 2) root is de canonieke publieke compositie met alle vier werelden
+    assert.ok(/data-page="rtg-landing"/.test(r.body) &&
+      /Vier werelden[\s\S]*[ÉE]én visie/.test(r.body) &&
+      /LivingOS/.test(r.body) && /TravelOS/.test(r.body) &&
+      /WorkOS/.test(r.body) && /FoundationOS/.test(r.body),
+    'root serveert niet de publieke vier-wereldenlanding');
+    // 3) de eerdere OS-ingang is niet verdwenen maar bewust naar /apps verhuisd
+    const apps = await haal(actievePoort, '/apps');
+    assert.equal(apps.status, 200, '/apps gaf status ' + apps.status + ' i.p.v. 200');
+    assert.ok(/id="gate"/.test(apps.body) && /os-lock|os-grid/.test(apps.body),
+      '/apps serveert niet de OS-poort (klokscherm)');
     // 4) geen fatale uitzondering onderweg
     assert.equal(uitInfo.fataal, false, 'server logde een fatale fout:\n' + uitInfo.log.slice(-1500));
   } finally {

@@ -31,6 +31,50 @@
   if (window.__rtgBasis) return; window.__rtgBasis = true;
   var rtf = location.pathname.indexOf('/apps/foundation/') === 0;
 
+  /* ---- vaste wereldidentiteit, voor alle andere gedeelde lagen -----------
+     De toetsbare routekaart vult alleen een ontbrekende wereld aan. Het
+     heritage-blad komt bewust LAAT in <head>, na de stijl van het scherm. */
+  if (document.body) document.body.setAttribute('data-rtg-skin', 'heritage');
+
+  function laadHeritageBlad() {
+    var bestaand = document.getElementById('rtgHeritageCss') ||
+      document.querySelector('link[href^="/shared/rtg-heritage.css"]');
+    if (bestaand) {
+      if (!bestaand.id) bestaand.id = 'rtgHeritageCss';
+      return;
+    }
+    var blad = document.createElement('link');
+    blad.id = 'rtgHeritageCss';
+    blad.rel = 'stylesheet';
+    blad.href = '/shared/rtg-heritage.css';
+    (document.head || document.documentElement).appendChild(blad);
+  }
+
+  function pasWereldIdentiteitToe() {
+    try {
+      if (window.RTGWorldIdentity && window.RTGWorldIdentity.apply) {
+        window.RTGWorldIdentity.apply(document, location.pathname);
+      }
+    } finally { laadHeritageBlad(); }
+  }
+
+  if (window.RTGWorldIdentity) pasWereldIdentiteitToe();
+  else {
+    var identiteitScript = document.getElementById('rtgWorldIdentityJs') ||
+      document.querySelector('script[src^="/shared/rtg-world-identity.js"]');
+    if (!identiteitScript) {
+      identiteitScript = document.createElement('script');
+      identiteitScript.id = 'rtgWorldIdentityJs';
+      identiteitScript.src = '/shared/rtg-world-identity.js';
+      identiteitScript.async = false;
+    }
+    identiteitScript.addEventListener('load', pasWereldIdentiteitToe, { once: true });
+    identiteitScript.addEventListener('error', laadHeritageBlad, { once: true });
+    if (!identiteitScript.parentNode) {
+      (document.head || document.documentElement).appendChild(identiteitScript);
+    }
+  }
+
   /* ---- taal: elk echt appscherm krijgt dezelfde 114-talige laag ---------
      Vijf grote shells namen i18n.js zelf al op; alle andere schermen hadden
      daardoor geen taalkeuze en hielden hun hardcoded tekst. De basis ligt op

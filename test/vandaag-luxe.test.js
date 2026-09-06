@@ -14,20 +14,21 @@ const lees = bestand => fs.readFileSync(path.join(ROOT, bestand), 'utf8');
 const CSS = lees('public/shared/rtg-vandaag-luxe.css');
 const JS = lees('public/shared/rtg-vandaag-luxe.js');
 const HOMES = [
-  ['living', 'public/apps/rtg.html', '/apps/rtg.html', '#inhoud'],
-  ['work', 'public/apps/kantoor.html', '/apps/kantoor.html', '#inhoud'],
-  ['travel', 'public/apps/reizen.html', '/apps/reizen.html', '#inhoud'],
-  ['foundation', 'public/apps/foundation/os-publiek.html', '/apps/foundation/os-publiek.html', '#main']
+  ['living', 'public/apps/rtg.html', '/apps/rtg.html', '#inhoud', 'living-heritage-v2.jpg'],
+  ['work', 'public/apps/kantoor.html', '/apps/kantoor.html', '#inhoud', 'work-heritage-v2.jpg'],
+  ['travel', 'public/apps/reizen.html', '/apps/reizen.html', '#inhoud', 'travel-heritage-v2.jpg'],
+  ['foundation', 'public/apps/foundation/os-publiek.html', '/apps/foundation/os-publiek.html', '#main', 'foundation-heritage-v2.jpg']
 ];
 
-test('exact de vier canonieke homes laden één runtime, stijl en atlas', () => {
-  for (const [wereld, bestand] of HOMES) {
+test('exact de vier canonieke homes laden één runtime, stijl en eigen wereldbeeld', () => {
+  for (const [wereld, bestand, , , beeld] of HOMES) {
     const html = lees(bestand);
     assert.match(html, new RegExp('<body[^>]+data-rtg-world="' + wereld +
       '"[^>]+data-rtg-world-dashboard="' + wereld + '"[^>]+data-rtg-vandaag-luxe(?:\\s|>)'), bestand);
     assert.equal((html.match(/\/shared\/rtg-vandaag-luxe\.css/g) || []).length, 1, bestand);
     assert.equal((html.match(/\/shared\/rtg-vandaag-luxe\.js/g) || []).length, 1, bestand);
-    assert.equal((html.match(/wereld-atlas\.jpg/g) || []).length, 1, bestand);
+    assert.equal((html.match(new RegExp('/images/worlds/heritage/' + beeld, 'g')) || []).length, 1, bestand);
+    assert.doesNotMatch(html, /wereld-atlas\.jpg/, bestand + ' mag geen quadrant uit de oude atlas laden');
   }
 });
 
@@ -132,11 +133,11 @@ test('de vier bestaande panelstructuren en hun echte hoofdacties blijven bron-DO
   }
 });
 
-test('iedere wereld houdt eigen materiaal en eigen atlas-uitsnede', () => {
+test('iedere wereld erft centraal materiaal en gebruikt een eigen brede foto', () => {
   const paletten = {
     living: ['#f4f0e8', '#fbf8f2', '#211e19', '#745718'],
     work: ['#0c1112', '#141b1c', '#f0f2ec', '#75b8b1'],
-    travel: ['#14090e', '#231016', '#f7f0e6', '#7f1634'],
+    travel: ['#14090e', '#231016', '#f7f0e6', '#a72049'],
     foundation: ['#071522', '#0b2032', '#f2f2ea', '#d0b66e']
   };
   for (const [wereld, kleuren] of Object.entries(paletten)) {
@@ -144,9 +145,43 @@ test('iedere wereld houdt eigen materiaal en eigen atlas-uitsnede', () => {
       wereld + '"\\]\\{([^}]+)'));
     assert.ok(blok, wereld);
     for (const kleur of kleuren) assert.ok(blok[1].includes(kleur), wereld + ': ' + kleur);
+    for (const token of ['bg', 'card', 'card-strong', 'ink', 'muted', 'line', 'signature', 'metal']) {
+      assert.ok(blok[1].includes('var(--rtg-world-' + token + ','),
+        wereld + ' erft --rtg-world-' + token + ' niet');
+    }
   }
-  for (const positie of ['left top', 'right top', 'left bottom', 'right bottom'])
-    assert.ok(CSS.includes(positie), 'atlas mist ' + positie);
+  for (const beeld of HOMES.map(rij => rij[4]))
+    assert.ok(JS.includes('/images/worlds/heritage/' + beeld), beeld + ' mist uit het runtimecontract');
+  assert.doesNotMatch(CSS + JS, /wereld-atlas\.jpg/);
+  assert.match(CSS, /background-size:auto,auto,cover,auto/);
+});
+
+test('de vier homes gebruiken één focuslaag en rustige inhoudsdiepte', () => {
+  assert.match(CSS, /\.dagkop,[\s\S]*\.doelgroep,[\s\S]*\.kaartraster,[\s\S]*\.onthaal\{[\s\S]*box-shadow:var\(--rtg-v-depth-focus\)/);
+  assert.match(CSS, /Heritage-diepte[\s\S]*box-shadow:var\(--rtg-v-depth-content\)/);
+  assert.match(CSS, /\.dagkaart-volgend\{[^}]*border-left:2px solid var\(--rtg-v-signature\)/s);
+  assert.match(CSS, /\.rahulsnel\{[^}]*border-left:2px solid var\(--rtg-v-signature\)/s);
+  assert.match(CSS, /\.band\{[^}]*border-top:2px solid/s);
+  assert.match(CSS, /@media\(hover:hover\) and \(pointer:fine\)/);
+});
+
+test('Agenda surface behoudt een stille Heritage-atmosfeer', () => {
+  const blok = CSS.match(/data-rtg-vandaag-luxe="surface"\]\[data-rtg-world="living"\]\[data-kantoor-tool="agenda"\]\{([^}]+)\}/);
+  assert.ok(blok, 'Agenda heeft geen gerichte surface');
+  assert.ok(blok[1].includes('--rtg-world-photo'), 'Agenda verliest wereldfotografie');
+  assert.ok(blok[1].includes('--rtg-world-ground'), 'Agenda verliest wereldgrond');
+  assert.doesNotMatch(blok[1], /background\s*:\s*none/);
+});
+
+test('Travel toont geen bestemming of zekerheid voordat de reisbron antwoordt', () => {
+  const html = lees('public/apps/reizen.html');
+  assert.doesNotMatch(html, /<h1 id="titelVandaag">IBIZA<\/h1>/);
+  assert.doesNotMatch(html, /<p class="sub" id="dagzin">Alles staat klaar\.<\/p>/);
+  assert.match(html, /<h1 id="titelVandaag">Uw reizen<\/h1>/);
+  assert.match(html, /function zetReisdek\(reizen, toestand\)/);
+  assert.match(html, /const bestemming = String\(eerste\.bestemming \|\| ''\)\.trim\(\)/);
+  assert.match(html, /zetReisdek\(reizen, 'geladen'\)/);
+  assert.match(html, /zetReisdek\(\[\], 'fout'\)/);
 });
 
 test('dashboardtop blijft onder een viewport en de rasters schalen tot 320px', () => {
@@ -161,10 +196,14 @@ test('dashboardtop blijft onder een viewport en de rasters schalen tot 320px', (
     assert.ok(['0', '50%'].includes(match[1].trim()), 'ongeldige radius: ' + match[1]);
 });
 
-test('de atlas heeft controleerbare lokale herkomst en de runtime blijft onder 10 KiB', () => {
-  const map = path.join(ROOT, 'public/images/worlds/vandaag');
-  const beeld = fs.readFileSync(path.join(map, 'wereld-atlas.jpg'));
+test('ieder wereldbeeld heeft controleerbare lokale herkomst en de runtime blijft onder 10 KiB', () => {
+  const map = path.join(ROOT, 'public/images/worlds/heritage');
   const herkomst = JSON.parse(fs.readFileSync(path.join(map, 'HERKOMST.json'), 'utf8'));
-  assert.equal(crypto.createHash('sha256').update(beeld).digest('hex'), herkomst.sha256);
+  assert.equal(herkomst.assets.length, 4);
+  for (const record of herkomst.assets) {
+    const beeld = fs.readFileSync(path.join(map, record.bestand));
+    assert.equal(crypto.createHash('sha256').update(beeld).digest('hex'), record.sha256, record.bestand);
+    assert.ok(beeld.byteLength > 200 * 1024, record.bestand + ' is geen volwaardig bronbeeld');
+  }
   assert.ok(Buffer.byteLength(JS) < 10 * 1024, Buffer.byteLength(JS) + ' bytes');
 });

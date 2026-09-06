@@ -19,7 +19,12 @@
     dashboard: 'data-rtg-world-dashboard',
     gereed: 'data-rtg-world-dashboard-ready',
     render: 'data-rtg-vandaag-render',
-    atlas: '/images/worlds/vandaag/wereld-atlas.jpg',
+    beelden: Object.freeze({
+      living: '/images/worlds/heritage/living-heritage-v2.jpg',
+      travel: '/images/worlds/heritage/travel-heritage-v2.jpg',
+      work: '/images/worlds/heritage/work-heritage-v2.jpg',
+      foundation: '/images/worlds/heritage/foundation-heritage-v2.jpg'
+    }),
     netwerk: false,
     opslag: false
   });
@@ -71,11 +76,6 @@
     return wereld;
   }
 
-  function ruimOudePresentatie(document) {
-    var oud = document.getElementById && document.getElementById('rtg-vandaag-luxe');
-    if (oud && oud.parentNode) oud.parentNode.removeChild(oud);
-  }
-
   function deactiveer(document) {
     if (!document || !document.body) return null;
     var oud = document.querySelector && document.querySelector('.' + KLAS + '[data-rtg-dashboard-world]');
@@ -83,7 +83,6 @@
       oud.classList.remove(KLAS);
       oud.removeAttribute('data-rtg-dashboard-world');
     }
-    ruimOudePresentatie(document);
     document.body.removeAttribute(CONTRACT.gereed);
     document.body.removeAttribute(CONTRACT.render);
     return null;
@@ -94,7 +93,6 @@
     if (!wereld) return deactiveer(document);
     var hoofd = document.querySelector(WERELDEN[wereld].hoofd);
     if (!hoofd) return deactiveer(document);
-    ruimOudePresentatie(document);
     hoofd.classList.add(KLAS);
     hoofd.setAttribute('data-rtg-dashboard-world', wereld);
     document.body.setAttribute(CONTRACT.render, 'dashboard');

@@ -37,8 +37,9 @@ function voorNode(bron) {
   return String(bron || '')
     .replace(/<meta\b[^>]*>/gi, metaNaarZelfdeOrigin)
     .replace(/(\s(?:href|src)\s*=\s*["'])\.\/public\//gi, '$1/')
-    .replace(new RegExp('(\\s(?:href|action)\\s*=\\s*["\'])' +
-      APP_ORIGIN.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '(?=/)', 'gi'), '$1');
+    /* Een letterlijke hostregex houdt de veiligheidsgrens ook voor statische
+       analyzers zichtbaar: de punten zijn hostpunten, geen jokertekens. */
+    .replace(/(\s(?:href|action)\s*=\s*["'])https:\/\/app\.rahultravelgroup\.com(?=\/)/gi, '$1');
 }
 
 module.exports = { APP_ORIGIN, bronbestand, voorNode };

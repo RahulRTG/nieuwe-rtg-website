@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-06T13:12:20.670Z",
-    "commit": "be1f5c8a",
+    "op": "2026-09-06T13:15:59.649Z",
+    "commit": "661dd049",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -7252,13 +7252,11 @@
     },
     "vertrouwenbronnen.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "scripts/vertrouwen.js"
-      ],
-      "geprobeerd": 29,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "staat": "gezakt",
+      "module": "scripts/vertrouwen.js",
+      "operator": "-->+#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "verzadiging.test.js": {
       "soort": "puur",

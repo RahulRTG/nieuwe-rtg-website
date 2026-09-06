@@ -18,7 +18,7 @@
 'use strict';
 
 module.exports = function bouwKernAan(kern, grens) {
-  const { db, save, bewerkCollectie, crypto, schoon, sseToCustomer, accounts, anthropic, mail,
+  const { db, save, bewerkCollectie, STORE, crypto, schoon, sseToCustomer, accounts, anthropic, mail,
     beveilig, fs, path, DATA_DIR, rtf, gidsHaal, keyVanCodenaam, leeftijdVan, leeftijdInstr } = kern;
   /* De logger RECHTSTREEKS uit ./log, niet via kern.logboek. Bij het verhuizen
      van dit blok uit server.js kwam `logboek` hier uit de kern -- en daar is
@@ -64,12 +64,12 @@ module.exports = function bouwKernAan(kern, grens) {
      automaat. Geld en klantdata blijven altijd mensenwerk (advies, geen ingreep). */
   Object.assign(kern, require('../kern/zelfzorg')({
     db, save, accounts, sessions: kern.sessions, beveilig, pay: kern.pay, bank: kern.bank,
-    log, fs, path, DATA_DIR, mail
+    log, fs, path, DATA_DIR, mail, achtergrondMutaties: STORE !== 'postgres'
   }));
   kern.zelfzorg.autoStart();
   /* De RTG AI van het RTG Kantoor (kern/rtgai.js): leest mee, traint zichzelf
      en meldt wanneer hij klaar is; het roer geven blijft een menselijke knop. */
-  Object.assign(kern, require('../kern/rtgai')({ db, save, zelfzorgVan: () => kern.zelfzorg }));
+  Object.assign(kern, require('../kern/rtgai')({ db, save, bewerkCollectie }));
   kern.rtgai.autoStart();
   /* De Onderzoeker (kern/rtgonderzoeker.js): de tweede AI van het RTG Kantoor,
      door de RTG AI gebouwd; doet agentisch onderzoek en adviseert alleen. */

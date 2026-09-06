@@ -32,7 +32,7 @@ const { datum: klokDatum } = require('../../lib/klok');
 const haak = require('./haak');
 const soorten = require('./soorten');
 
-function maakKosten({ db, save, accounts, geldPasprijzen, fonds, economie, keyVanCodenaam, bestandenOpslag, klok }) {
+function maakKosten({ db, save, bewerkCollectie, accounts, geldPasprijzen, fonds, economie, keyVanCodenaam, bestandenOpslag, klok }) {
   /* ZONDER ECONOMIELAAG BESTAAT DEZE LAAG NIET: een fout bij het OPBOUWEN en
      geen nette terugval bij het rekenen. Hier stonden drie takken die "als de
      economielaag ontbreekt, dan..." afhandelden; alle drie verdedigbaar, en
@@ -54,8 +54,11 @@ function maakKosten({ db, save, accounts, geldPasprijzen, fonds, economie, keyVa
     if (!db.data.kosten || typeof db.data.kosten !== 'object') db.data.kosten = {};
     return db.data.kosten;
   }
+  function kijkD() {
+    return db.data.kosten && typeof db.data.kosten === 'object' ? db.data.kosten : {};
+  }
 
-  const ctx = { db, save, nu, d, accounts, geldPasprijzen, fonds, economie, keyVanCodenaam, bestandenOpslag };
+  const ctx = { db, save, bewerkCollectie, nu, d, kijkD, accounts, geldPasprijzen, fonds, economie, keyVanCodenaam, bestandenOpslag };
   /* DE METER GAAT VOOROP, want hij bezit de periodesleutel (JJJJ-MM) en drie
      lagen hieronder rekenen daarmee. Hij stond eerder verderop en dan moest
      `periodeVan` er tijdelijk twee keer staan -- twee definities van dezelfde

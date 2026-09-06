@@ -862,7 +862,7 @@ omlaag.
 
 ## `shared/verbinding.js`
 
-`public/shared/verbinding/` -- 2 delen, 344 regels in de delen
+`public/shared/verbinding/` -- 2 delen, 345 regels in de delen
 
 | deel | onderwerp |
 |---|---|

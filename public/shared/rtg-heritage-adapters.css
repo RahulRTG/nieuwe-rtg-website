@@ -9,10 +9,8 @@ body[data-rtg-skin="heritage"] :where(.kaart,.card,.paneel,.panel,.tegel,.tile,.
   background-color:color-mix(in srgb,var(--rtg-world-card) 95%,transparent);
   border-color:var(--rtg-world-line);background-clip:padding-box
 }
-body[data-rtg-skin="heritage"] :where(.kaart,.card,.paneel,.panel,.tegel,.tile,.vak,.rtg-groep)
-  :where(h3,.kop,.naam,strong){color:var(--rtg-world-ink)}
-body[data-rtg-skin="heritage"] :where(.kaart,.card,.paneel,.panel,.tegel,.tile,.vak,.rtg-groep)
-  :where(p,.sub,.stil,.meta,small){color:var(--rtg-world-muted)}
+body[data-rtg-skin="heritage"] .rtg-groep :where(h3,.kop,.naam,strong){color:var(--rtg-world-ink)}
+body[data-rtg-skin="heritage"] .rtg-groep :where(p,.sub,.stil,.meta,small){color:var(--rtg-world-muted)}
 
 body[data-rtg-skin="heritage"] :where(a.kaart,a.card,a.tegel,a.tile,button.kaart,button.card,
   button.tegel,button.tile,.kaart[tabindex],.card[tabindex]){position:relative;isolation:isolate}
@@ -71,7 +69,7 @@ body[data-rtg-skin="heritage"] :where(.veld,input:not([type="checkbox"]):not([ty
   min-height:36px;background-color:color-mix(in srgb,var(--rtg-world-card-strong) 92%,transparent);
   border-color:var(--rtg-world-line);box-shadow:inset 0 1px 0 rgba(255,255,255,.035)
 }
-body[data-rtg-skin="heritage"] :where(label,.lbl){color:var(--rtg-world-muted)}
+body[data-rtg-skin="heritage"] .rtg-groep :where(label,.lbl){color:var(--rtg-world-muted)}
 body[data-rtg-skin="heritage"] :where(button,.knop,.btn,.rtg-knop,[role="button"]){min-height:36px}
 
 /* Modalen zijn systeem; hun inhoud mag recht blijven. */

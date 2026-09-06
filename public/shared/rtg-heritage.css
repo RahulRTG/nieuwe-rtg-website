@@ -60,9 +60,23 @@ body[data-rtg-skin="heritage"]{
   --rtg-soft:var(--rtg-world-muted);
   --rtg-line:var(--rtg-world-line);
   --rtg-goud:var(--rtg-world-metal);
+  --rtg-opgoud:var(--rtg-world-action-ink);
+  --rtg-goud-hoog:var(--rtg-world-action);
   --rtg-leesgoud:var(--rtg-world-metal);
   --rtg-leeszacht:var(--rtg-world-muted);
   --rtg-acc:var(--rtg-world-signature);
+  /* rtg-ui berekent deze materialen anders op :root, dus nog voordat de
+     wereldtokens op body bekend zijn. Door ze hier te verbinden blijven een
+     lichte Living-kamer en een expliciet donker eigenvlak ieder intern
+     leesbaar, zonder route-eigen panelen opnieuw vorm te geven. */
+  --rtg-oppervlak:linear-gradient(145deg,
+    color-mix(in srgb,var(--rtg-world-card) 91%,white) 0%,
+    var(--rtg-world-card) 48%,
+    color-mix(in srgb,var(--rtg-world-card) 90%,black) 100%);
+  --rtg-oppervlak-2:linear-gradient(145deg,
+    color-mix(in srgb,var(--rtg-world-card-strong) 92%,white) 0%,
+    var(--rtg-world-card-strong) 58%,
+    color-mix(in srgb,var(--rtg-world-card-strong) 88%,black) 100%);
   --bg:var(--rtg-world-bg);
   --card:var(--rtg-world-card);
   --card2:var(--rtg-world-card-strong);
@@ -108,7 +122,7 @@ body[data-rtg-skin="heritage"][data-rtg-world="living"]{
   --rtg-world-card:#fbf8f2;
   --rtg-world-card-strong:#e8e0d2;
   --rtg-world-ink:#211e19;
-  --rtg-world-muted:#675f54;
+  --rtg-world-muted:#5f574d;
   --rtg-world-line:rgba(33,30,25,.17);
   --rtg-world-signature:#7f1634;
   --rtg-world-signature-soft:rgba(127,22,52,.10);
@@ -177,4 +191,45 @@ body[data-rtg-skin="heritage"][data-rtg-world="foundation"]{
   --rtg-world-photo:url('/images/worlds/heritage/foundation-heritage-v2.jpg');
   --rtg-world-photo-position:72% center;
   --rtg-world-photo-mask:linear-gradient(112deg,rgba(7,21,34,.975),rgba(7,21,34,.84));
+}
+
+/* Een route die zelf een donker materiaalvlak verklaart, draagt ook de hele
+   bijbehorende inktset. Zonder deze koppeling bleef een Living-route op onyx
+   of bordeaux de lichte-wereldtokens gebruiken: donker op donker, terwijl de
+   route juist expliciet had gezegd dat grond en inkt samen horen. */
+body[data-rtg-skin="heritage"][data-rtg-eigenvlak="onyx"]{
+  --rtg-world-bg:#0c0c0b;
+  --rtg-world-ground:linear-gradient(155deg,#171614 0%,#0c0c0b 58%,#050505 100%);
+  --rtg-world-card:#151312;
+  --rtg-world-card-strong:#1b1817;
+  --rtg-world-ink:#f4f0e9;
+  --rtg-world-muted:#cdc9c0;
+  --rtg-world-line:rgba(244,240,233,.15);
+  --rtg-world-signature:#9e1c40;
+  --rtg-world-signature-soft:rgba(158,28,64,.16);
+  --rtg-world-metal:#c0a544;
+  --rtg-world-action:#745718;
+  --rtg-world-action-ink:#fff;
+  --rtg-world-schema:dark;
+  --rtg-world-photo:none;
+  --rtg-world-photo-position:center;
+  --rtg-world-photo-mask:none
+}
+body[data-rtg-skin="heritage"][data-rtg-eigenvlak="bordeaux"]{
+  --rtg-world-bg:#2e0713;
+  --rtg-world-ground:linear-gradient(168deg,#7f1634 0%,#4a0c1e 44%,#2e0713 100%);
+  --rtg-world-card:#2a0713;
+  --rtg-world-card-strong:#20060e;
+  --rtg-world-ink:#f4f0e9;
+  --rtg-world-muted:#e2c9cf;
+  --rtg-world-line:rgba(244,240,233,.14);
+  --rtg-world-signature:#c23a5e;
+  --rtg-world-signature-soft:rgba(194,58,94,.16);
+  --rtg-world-metal:#e7a8b8;
+  --rtg-world-action:#7f1634;
+  --rtg-world-action-ink:#fff;
+  --rtg-world-schema:dark;
+  --rtg-world-photo:none;
+  --rtg-world-photo-position:center;
+  --rtg-world-photo-mask:none
 }

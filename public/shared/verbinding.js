@@ -237,7 +237,8 @@
       uit.type = 'button';
       uit.textContent = '✕';
       uit.setAttribute('aria-label', T('net.satUit', 'Zuinige stand uitzetten'));
-      uit.style.cssText = 'background:none;border:0;color:#8fa6ba;cursor:pointer;font-size:.8rem;padding:0;';
+      uit.style.cssText = 'flex:0 0 44px;min-width:44px;min-height:44px;display:grid;place-items:center;' +
+        'background:none;border:0;color:#8fa6ba;cursor:pointer;font-size:.8rem;padding:0;';
       uit.addEventListener('click', function () { satZet('uit'); });
       satEl.appendChild(tekst); satEl.appendChild(uit);
       document.body.appendChild(satEl);

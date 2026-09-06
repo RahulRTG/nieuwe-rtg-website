@@ -13,12 +13,13 @@ body[data-rtg-skin="heritage"] :where(h1,h2,.rtg-ceremonie,.display,.serif){
   font-weight:450;
   letter-spacing:-.025em;
 }
-body[data-rtg-skin="heritage"] :where(h1,h2){color:var(--rtg-world-ink)}
 body[data-rtg-skin="heritage"] :where(.ey,.eyebrow,.kicker,.micro,.rtg-merk,.rtg-label,legend){
   color:var(--rtg-world-metal);font-family:var(--rtg-interface,Inter,system-ui,sans-serif);
   font-size:.68rem;font-weight:650;letter-spacing:.17em;text-transform:uppercase
 }
-body[data-rtg-skin="heritage"] :where(.sub,.soft,.stil,.meta,.muted,.uitleg,small){color:var(--rtg-world-muted)}
+/* Kleur volgt het echte inhoudsvlak. Een route kan binnen een lichte wereld
+   bewust een donker hero-, camera- of cockpitvlak bezitten; een globale
+   tekstkleur zou de plaatselijke, aantoonbaar leesbare inkt overschrijven. */
 
 /* Rechte wereldinhoud en afgeronde systeemlagen zijn bewust twee geometrieën. */
 body[data-rtg-skin="heritage"] :where(button,input,select,textarea,.rtg-knop,.rtg-veld,
@@ -54,11 +55,15 @@ body[data-rtg-skin="heritage"] :where(a,button,input,select,textarea,[tabindex])
 body[data-rtg-skin="heritage"] :where([aria-current="page"],[aria-selected="true"],[aria-pressed="true"]){
   border-color:var(--rtg-world-signature)
 }
-body[data-rtg-skin="heritage"] :where(.rtg-knop.vol,.knop.vol,.btn.primary,[data-primary="true"]){
-  border-color:color-mix(in srgb,var(--rtg-world-action) 72%,var(--rtg-world-metal));
-  background:linear-gradient(135deg,color-mix(in srgb,var(--rtg-world-action) 92%,#fff 8%),var(--rtg-world-action));
-  color:var(--rtg-world-action-ink);box-shadow:inset 0 1px rgba(255,255,255,.14),
+body[data-rtg-skin="heritage"] :where(.rtg-knop.vol,.knop.vol,.btn.primary,[data-primary="true"]),
+body[data-rtg-skin="heritage"].rtg-stijl :is(.knop.vol,.knop.primair,.knop.prim,.knop.hoofd){
+  border-color:color-mix(in srgb,var(--rtg-world-action) 72%,var(--rtg-world-metal))!important;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--rtg-world-action) 92%,#fff 8%),var(--rtg-world-action))!important;
+  color:var(--rtg-world-action-ink)!important;box-shadow:inset 0 1px rgba(255,255,255,.14),
     0 10px 30px color-mix(in srgb,var(--rtg-world-action) 22%,transparent)
+}
+body[data-rtg-skin="heritage"].rtg-stijl .skip{
+  background:var(--rtg-world-action);color:var(--rtg-world-action-ink)
 }
 body[data-rtg-skin="heritage"] ::selection{background:var(--rtg-world-action);color:var(--rtg-world-action-ink)}
 

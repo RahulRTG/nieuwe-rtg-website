@@ -782,7 +782,7 @@
         "retour": false
       },
       "bewijs": {
-        "toon": "fondsBeeld",
+        "toon": "beeldPeriode",
         "prijs": "directeKostenPerDrager",
         "beschikbaarheid": "heropen",
         "bevestig": "boek"

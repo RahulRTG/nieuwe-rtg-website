@@ -44,26 +44,35 @@ const BUFFER_MAX = 500;    // hoeveel gebruiker-maandrijen er in het geheugen mo
 const SPOEL_MS = 5000;     // en hoe lang, als niemand kijkt
 
 module.exports = (ctx) => {
-  const { d, save, nu } = ctx;
+  const { d, kijkD, save, bewerkCollectie, nu } = ctx;
 
   const periodeVan = (t) => String(t || nu()).slice(0, 7);
 
-  function meters() {
-    const k = d();
-    if (!k.meters || typeof k.meters !== 'object') k.meters = {};
+  function metersVan(k, maak) {
+    if (!k.meters || typeof k.meters !== 'object') {
+      if (!maak) return {};
+      k.meters = {};
+    }
     return k.meters;
   }
+  const meters = () => metersVan(d(), true);
+  const leesMeters = () => metersVan(kijkD ? kijkD() : d(), false);
 
   /* Lezen zonder aan te maken. Een overzicht dat een lege rij achterlaat voor
      elke gebruiker die er ooit naar keek, laat de opslag groeien met kijken in
      plaats van met verbruik (dezelfde fout als in kern/levensgraaf). */
   function kijk(periode, drager) {
-    spoel();
-    const p = meters()[periodeVan(periode)];
+    const p = beeldPeriode(periode);
     return (p && p[String(drager || HUIS)]) || null;
   }
-  function kijkPeriode(periode) { spoel(); return meters()[periodeVan(periode)] || {}; }
-  function perioden() { spoel(); return Object.keys(meters()).sort().reverse(); }
+  function kijkPeriode(periode) { return beeldPeriode(periode); }
+  function perioden() {
+    const uit = new Set(Object.keys(leesMeters()));
+    for (const batch of [achtergrondBatch, wacht]) if (batch) {
+      for (const sleutel of batch.keys()) uit.add(sleutel.slice(0, sleutel.indexOf('\u0000')));
+    }
+    return [...uit].sort().reverse();
+  }
 
   function pak(periode, drager) {
     const m = meters();
@@ -75,48 +84,93 @@ module.exports = (ctx) => {
 
   /* Oude maanden opruimen. Gebeurt bij het schrijven en niet in een aparte
      ronde: een opruiming die zijn eigen aanleiding nodig heeft, blijft liggen. */
-  function snoei() {
-    const m = meters();
+  function snoeiIn(k) {
+    const m = metersVan(k, true);
     const alle = Object.keys(m).sort();
     if (alle.length <= MAANDEN) return;
     for (const p of alle.slice(0, alle.length - MAANDEN)) delete m[p];
   }
+  const snoei = () => snoeiIn(d());
 
-  /* DE BUFFER, EN WAAROM HIJ ER MOET ZIJN.
+  /* Verzoeken tellen in RAM; lezers of de vijfsecondenklok schrijven de batch. */
+  let wacht = new Map();
+  let klaarZetter = null, achtergrondBatch = null, achtergrondBelofte = null;
 
-     Deze meter hangt aan de poort, dus hij ziet ELK verzoek -- ook de duizenden
-     die alleen maar lezen. Zou hij daar meteen db.data mee bijwerken en save()
-     aanroepen, dan wordt elk leesverzoek van dit huis opeens een schrijfactie.
-     Dat is precies het soort verandering dat in een demo niets doet en in
-     productie de opslag verdubbelt.
-
-     Dus: optellen in het geheugen, en in één keer wegschrijven. Elke LEZER
-     spoelt eerst (zie ./overzicht.js gaat langs kijk/dragers), en een timer
-     spoelt wat er blijft liggen. Bij een harde kill kan er hooguit een paar
-     seconden aan tellers verloren gaan; dat is een handvol centen, en de prijs
-     ervoor is een schrijfactie per leesverzoek van het hele huis. Die ruil is
-     bewust, en hij staat hier zodat hij niet stil is. */
-  const wacht = new Map();
-  let klaarZetter = null;
-
-  function spoel() {
-    if (!wacht.size) return false;
-    for (const [sleutel, tel] of wacht) {
+  function pasBatchToe(kosten, batch, alleenPeriode) {
+    const m = metersVan(kosten, true);
+    for (const [sleutel, tel] of batch) {
       const k = sleutel.indexOf('\u0000');
-      const rij = pak(sleutel.slice(0, k), sleutel.slice(k + 1));
+      const p = sleutel.slice(0, k);
+      if (alleenPeriode && p !== alleenPeriode) continue;
+      const vak = m[p] || (m[p] = {}), dr = sleutel.slice(k + 1);
+      const rij = vak[dr] || (vak[dr] = { laatst: null });
       for (const id of Object.keys(tel.per)) rij[id] = Math.round(((rij[id] || 0) + tel.per[id]) * 1000) / 1000;
-      rij.laatst = tel.laatst;
-      if (tel.pas) { rij.pas = tel.pas; rij.pasGezien = tel.laatst; }
+      if (!rij.laatst || Date.parse(tel.laatst) >= Date.parse(rij.laatst)) rij.laatst = tel.laatst;
+      if (tel.pas && (!rij.pasGezien || Date.parse(tel.laatst) >= Date.parse(rij.pasGezien))) {
+        rij.pas = tel.pas; rij.pasGezien = tel.laatst;
+      }
     }
-    wacht.clear();
-    snoei();
-    /* Een mislukte schrijfactie mag een LEESACTIE niet omgooien. De tellers
-       staan op dit punt al in db.data; alleen het wegschrijven ging mis, en de
-       eerstvolgende save() van welke laag dan ook neemt ze alsnog mee. Wie hier
-       laat gooien, laat een kostenoverzicht crashen omdat de schijf even vol
-       was -- en dat is een slechtere uitkomst dan een minuut later bewaren. */
-    try { save(); } catch (e) {}
-    return true;
+  }
+
+  function beeldPeriode(periode) {
+    const p = periodeVan(periode), bron = leesMeters()[p] || {};
+    const beeld = { meters: { [p]: JSON.parse(JSON.stringify(bron)) } };
+    if (achtergrondBatch) pasBatchToe(beeld, achtergrondBatch, p);
+    if (wacht.size) pasBatchToe(beeld, wacht, p);
+    return beeld.meters[p];
+  }
+
+  function voegTerug(batch) {
+    for (const [sleutel, tel] of batch) {
+      const nuTel = wacht.get(sleutel);
+      if (!nuTel) { wacht.set(sleutel, tel); continue; }
+      for (const id of Object.keys(tel.per)) nuTel.per[id] = (nuTel.per[id] || 0) + tel.per[id];
+      if (!nuTel.laatst || tel.laatst > nuTel.laatst) {
+        nuTel.laatst = tel.laatst;
+        if (tel.pas) nuTel.pas = tel.pas;
+      }
+    }
+  }
+
+  /* Een timer heeft geen requestcommit. Hij mag daarom nooit eerst de levende
+     db.data muteren en daarna save() roepen: in PostgreSQL sluit dat terecht de
+     verkeerspoort. De batch gaat rechtstreeks door het collectieslot en komt
+     bij een fout volledig terug in de buffer. */
+  function spoelAchtergrond() {
+    if (achtergrondBelofte || !wacht.size) return achtergrondBelofte || false;
+    const batch = wacht; wacht = new Map(); achtergrondBatch = batch;
+    let uit;
+    try {
+      if (typeof bewerkCollectie === 'function') {
+        uit = bewerkCollectie('kosten', kosten => { pasBatchToe(kosten, batch); snoeiIn(kosten); });
+      } else {
+        pasBatchToe(d(), batch); snoei(); save(); uit = true;
+      }
+    } catch (e) {
+      achtergrondBatch = null; voegTerug(batch);
+      if (!klaarZetter) planSpoel();
+      return false;
+    }
+    if (!uit || typeof uit.then !== 'function') { achtergrondBatch = null; return true; }
+    achtergrondBelofte = Promise.resolve(uit).then(() => true, () => {
+      voegTerug(batch); return false;
+    }).finally(() => {
+      achtergrondBatch = null; achtergrondBelofte = null;
+      if (wacht.size && !klaarZetter) planSpoel();
+    });
+    return achtergrondBelofte;
+  }
+
+  /* Ook een expliciete spoeling gebruikt dezelfde autoritatieve baan. Lezers
+     projecteren de RAM-batch hierboven en maken daardoor nooit van een GET een
+     verborgen schrijfactie. */
+  const spoel = () => spoelAchtergrond();
+
+  function planSpoel() {
+    klaarZetter = setTimeout(() => {
+      klaarZetter = null; try { spoelAchtergrond(); } catch (e) {}
+    }, SPOEL_MS);
+    if (klaarZetter.unref) klaarZetter.unref();
   }
 
   /* Verbruik erbij. Geeft false in plaats van te gooien: dit zit in het pad van
@@ -145,13 +199,8 @@ module.exports = (ctx) => {
     wacht.set(sleutel, tel);
     /* Vol: meteen wegschrijven. Anders zou een stille nacht met veel verkeer en
        geen enkele lezer de buffer laten groeien tot hij zelf het probleem is. */
-    if (wacht.size >= BUFFER_MAX) spoel();
-    else if (!klaarZetter) {
-      klaarZetter = setTimeout(() => { klaarZetter = null; try { spoel(); } catch (e) {} }, SPOEL_MS);
-      /* unref: deze timer mag een proces nooit in leven houden -- niet in een
-         toets, en niet bij het afsluiten van de server. */
-      if (klaarZetter.unref) klaarZetter.unref();
-    }
+    if (wacht.size >= BUFFER_MAX) spoelAchtergrond();
+    else if (!klaarZetter) planSpoel();
     return true;
   }
 

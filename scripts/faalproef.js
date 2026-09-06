@@ -89,7 +89,16 @@ if (!b.ok) { console.error('\n  ' + b.reden + '\n'); for (const f of b.bestanden
 async function ronde(verraad, lijstUit) {
   const env = { RTG_DEMO: '1', RTG_MAGNAAT_TEST: '1', OFFICE_CODE: 'RTG-OFFICE-PROEF', RTG_STAATLOG: '2' };
   if (verraad) { env.RTG_VERRAAD = verraad; env.RTG_VERRAAD_SEED = SEED; }
-  const server = await start({ naam: 'faalproef', env });
+  let server;
+  try {
+    server = await start({ naam: 'faalproef', env });
+  } catch (e) {
+    /* NIET GEDRAAID IS IETS ANDERS DAN NIETS GEVONDEN. Zonder deze tak zakte de
+       hele proef op het eerste verraad dat de opstart niet overleeft, en dan
+       bestaat er ook geen uitslag voor het verraad dat het WEL doet. */
+    return { waarnemingen: new Map(), lijst: lijstUit || [], nietGedraaid:
+      'de wegwerpserver kwam met dit verraad niet op: ' + String(e && e.message || e).slice(0, 200) };
+  }
   const { basis, klaar } = server;
 
   /* HET LICHAAM MOET MEE, en zonder dat heeft deze proef nooit kunnen draaien.
@@ -227,9 +236,19 @@ function oordeel(schoon, met) {
     [...profielen.values()].filter(p => p.soort === 'geen-werk').length);
 
   const rondes = {};
+  const nietGedraaid = {};
   for (const naam of Object.keys(TOEPASBAAR)) {
     console.log('  verraadronde: ' + naam + ' ...');
     rondes[naam] = await ronde(naam, lijst);
+    if (rondes[naam].nietGedraaid) {
+      nietGedraaid[naam] = rondes[naam].nietGedraaid;
+      console.log('      NIET GEDRAAID -- ' + rondes[naam].nietGedraaid);
+    }
+  }
+  const gedraaid = Object.keys(TOEPASBAAR).filter(n => !nietGedraaid[n]);
+  if (!gedraaid.length) {
+    console.error('\n  Geen enkel verraad kon draaien; er valt niets te oordelen.\n');
+    process.exit(2);
   }
 
   const perRoute = [];
@@ -244,7 +263,13 @@ function oordeel(schoon, met) {
       continue;
     }
     let eind = 'ongemeten', reden = null;
-    for (const naam of Object.keys(TOEPASBAAR)) {
+    /* Alleen de verraden die WERKELIJK gedraaid hebben. Een verraad dat niet kon
+       starten mag een route niet stil op `ongemeten` zetten alsof er gemeten is;
+       hij staat per route bij naam in perVerraad, met de reden. */
+    for (const naam of Object.keys(nietGedraaid)) {
+      rij.perVerraad[naam] = { staat: 'niet-gedraaid', reden: nietGedraaid[naam] };
+    }
+    for (const naam of gedraaid) {
       const o = oordeel(schoon.waarnemingen.get(sleutel), rondes[naam].waarnemingen.get(sleutel));
       rij.perVerraad[naam] = o;
       /* De STRENGSTE uitkomst telt: gezakt is een bevinding en die wint van een
@@ -266,14 +291,27 @@ function oordeel(schoon, met) {
     grond: ['server/lib/verraad.js', 'scripts/lib/ketenproef.js (clientAntwoord)', 'server/effectmeter.js', 'server/staatlog.js'],
     grens: 'De ketenronde herstart de server om te zien of een schrijfactie de herstart OVERLEEFT; dat kan niet per route. Duurzaamheid wordt hier binnen het proces gemeten via de collectiemomentopname. Een route die pas bij een herstart zijn belofte breekt, ziet deze proef niet -- dat is een grens van het instrument en geen eigenschap van die route.',
     verraden: TOEPASBAAR,
+    /* WAT ER NIET IS GEMETEN, EN WAAROM -- en niet als een lege waarde. Een
+       route die hier `bewezen` heet, is dat op de verraden in `verradenGedraaid`
+       en op geen enkel ander. Wie dat verschil wegpoetst, leest een halve meting
+       als een hele. */
+    verradenGedraaid: gedraaid,
+    verradenNietGedraaid: nietGedraaid,
     gemeten: {
       routes: perRoute.length,
       duurzaamSchrijvend: duurzaam,
-      bewezen: tel('bewezen'), gezakt: tel('gezakt'), ongemeten: tel('ongemeten')
+      bewezen: tel('bewezen'), gezakt: tel('gezakt'), ongemeten: tel('ongemeten'),
+      /* DE NOEMER VAN DE MEETWEG. `bewezen` hierboven is bewezen op zoveel van
+         de zoveel sabotages -- staat er een nul in `verradenGedraaid`, dan is
+         het geen bewijs maar een niet-uitgevoerde proef. */
+      verradenInCatalogus: Object.keys(TOEPASBAAR).length,
+      verradenGedraaid: gedraaid.length
     },
     perRoute
   };
   fs.writeFileSync(UITSLAG, JSON.stringify(uit, null, 1) + '\n');
   console.log('\nFAALPROEF.json geschreven');
   console.log('  bewezen ' + uit.gemeten.bewezen + ' | gezakt ' + uit.gemeten.gezakt + ' | ongemeten ' + uit.gemeten.ongemeten);
+  console.log('  gemeten met ' + gedraaid.length + ' van de ' + Object.keys(TOEPASBAAR).length + ' sabotages: ' + gedraaid.join(', '));
+  for (const [naam, reden] of Object.entries(nietGedraaid)) console.log('  NIET gedraaid -- ' + naam + ': ' + reden);
 })().catch(e => { console.error(e); process.exit(1); });

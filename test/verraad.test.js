@@ -23,6 +23,8 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('path');
+const fs = require('fs');
+const os = require('os');
 const { execFileSync } = require('child_process');
 const { CATALOGUS, lees, maakTeller, sla, actief, ietsAan, ingebouwd } = require('../server/lib/verraad');
 
@@ -164,7 +166,12 @@ test('in productie zonder RTG_VERRAAD gebeurt er niets bijzonders', () => {
 test('schrijf-faalt laat de database echt omvallen op save()', () => {
   /* Ingebouwd op het ene punt waar alle schrijfacties doorheen gaan. Zou dit
      alleen in de catalogus staan, dan was de motor een lijst goede voornemens. */
+  /* De poort van ../lib/verraadfase.js moet hier met de hand open: in een los
+     proces luistert er geen server, en dan verraadt save() met opzet niets.
+     Deze toets meet de MOTOR in save() en niet de opstartfase -- die heeft een
+     eigen toets in test/verraadfase.test.js. */
   const uit = inProces({ RTG_VERRAAD: 'schrijf-faalt', RTG_DATA_DIR: '/tmp/rtg-verraad-proef' },
+    "require('./server/lib/verraadfase').zetVerkeerAan();" +
     "const db=require('./server/db');let stuk=null;" +
     "db.db.writable=true;try{db.save()}catch(e){stuk=e.message};console.log(stuk)");
   assert.match(uit, /schrijf-faalt/);
@@ -174,6 +181,7 @@ test('schrijf-verloren keert normaal terug -- de aanroeper merkt niets', () => {
   /* En dat is precies de aanval: geen fout, geen melding, en de gegevens weg.
      Wie hier een uitzondering verwacht, meet het verkeerde. */
   const uit = inProces({ RTG_VERRAAD: 'schrijf-verloren', RTG_DATA_DIR: '/tmp/rtg-verraad-proef2' },
+    "require('./server/lib/verraadfase').zetVerkeerAan();" +   // zie de toets hierboven
     "const db=require('./server/db');db.db.writable=true;" +
     "let stuk=null;try{db.save()}catch(e){stuk=e.message};" +
     "console.log(stuk+' '+JSON.stringify(require('./server/lib/verraad').telling()))");
@@ -198,19 +206,38 @@ test('zonder verraad schrijft save() gewoon -- op een ECHT geladen database', ()
   assert.equal(uit, 'null {}');
 });
 
-test('MET verraad valt het OPSTARTEN al om -- load() schrijft zelf ook', () => {
-  /* Hier vond de proef meteen iets wat niemand had opgeschreven: db.load()
-     roept zelf save() aan, en niets vangt dat af. Met een falende schijf komt
-     de server dus niet eens op -- geen nette melding, een uitzondering die door
-     het opstartpad heen valt.
+test('MET verraad komt het OPSTARTEN er nu doorheen -- en daarna slaat hij wel toe', () => {
+  /* DEZE TOETS IS OMGEKEERD, EN DAT IS DE HELE WINST. Hij stond hier als:
+     "MET verraad valt het OPSTARTEN al om -- load() schrijft zelf ook". Die
+     bevinding was echt en staat nog steeds: db.load() roept zelf save() aan en
+     niets vangt dat af, dus met een falende schijf kwam de server niet eens op.
 
-     Dat is niet per se fout (bij een kapotte schijf NIET starten is te
-     verdedigen), maar het was niet bekend en het staat nergens. Precies waar
-     deze motor voor is: hij beantwoordt de vraag niet, hij maakt hem stelbaar.
-     Vandaar dat de toets de hele rit omvat en niet alleen de losse save(). */
-  const uit = inProces({ RTG_VERRAAD: 'schrijf-faalt', RTG_DATA_DIR: '/tmp/rtg-verraad-proef4' },
-    "const db=require('./server/db');(async()=>{let stuk=null;" +
-    "try{await db.load();db.save()}catch(e){stuk=e.message};console.log(stuk)})()" +
-    ".catch(e=>console.log(e.message))");
-  assert.match(uit, /schrijf-faalt/);
+     Dat maakte `schrijf-faalt` onbruikbaar voor elke ronde die ROUTES moet
+     rijden: scripts/faalproef.js kreeg zijn wegwerpserver niet op (dood na 409
+     ms) en kon de FAILURE-kolom dus maar over een van zijn twee sabotages
+     vullen. Niet omdat het systeem slecht faalde, maar omdat het instrument er
+     niet bij kon.
+
+     server/lib/verraadfase.js zet daarom een poort op de aanroepplek: tijdens de
+     opstart verraadt save() niets, na 'listening' weer alles -- ook voor
+     achtergrondschrijvers. De opstart komt er dus door, en de sabotage werkt
+     daarna gewoon. Beide helften staan hieronder, want alleen de eerste zou
+     ook slagen als de motor kapot was. */
+  /* EEN VERSE DATAMAP, en dat is hier geen netheid. Op een map die al bestaat
+     hoeft load() niets te migreren, en dan telt `overgeslagen` nul -- de toets
+     zou dan afhangen van wat een vorige ronde had laten staan. */
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-verraad-opstart-'));
+  const uit = inProces({ RTG_VERRAAD: 'schrijf-faalt', RTG_DATA_DIR: map },
+    "const f=require('./server/lib/verraadfase');" +
+    "const db=require('./server/db');(async()=>{let opstart=null,erna=null;" +
+    "try{await db.load()}catch(e){opstart=e.message};" +
+    "f.zetVerkeerAan();" +
+    "try{db.db.writable=true;db.save()}catch(e){erna=e.message};" +
+    "console.log(JSON.stringify({opstart,erna,stand:f.stand()}))})()" +
+    ".catch(e=>console.log(JSON.stringify({fataal:e.message})))");
+  const r = JSON.parse(uit);
+  assert.equal(r.opstart, null, 'de opstart komt er doorheen');
+  assert.match(String(r.erna), /schrijf-faalt/, 'en daarna verraadt hij wel degelijk');
+  assert.ok(r.stand.overgeslagen > 0, 'de overgeslagen opstartschrijfacties zijn geteld');
+  fs.rmSync(map, { recursive: true, force: true });
 });

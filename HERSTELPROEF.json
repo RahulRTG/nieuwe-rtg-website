@@ -962,14 +962,12 @@
    "heenStatus": 200,
    "terugStatus": 200,
    "geraakt": [
-    "store.db:beauty",
-    "store.db:wacht"
+    "store.db:beauty"
    ],
    "nietTerug": [
-    "store.db:beauty",
-    "store.db:wacht"
+    "store.db:beauty"
    ],
-   "reden": "de terugweg deed werk, maar 2 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
+   "reden": "de terugweg deed werk, maar 1 collectie(s) staan niet terug op de oude inhoud. Een geldige vorm van herstel, en geen exacte omkering"
   },
   {
    "heen": "/api/verzorging/boek",
@@ -1011,9 +1009,9 @@
   "de opwarmronde kan een EENMALIG gevolg opslokken: kost de eerste aanmaak iets (een kostenregel, een eerste inrichting), dan gebeurt dat in de opwarmronde en ziet de meting het niet. `exact` betekent hier dus: exact bij een tweede en volgende uitvoering. Zonder die ronde was `exact` onbereikbaar, dus dit is een gekozen ruil en geen vergissing -- /api/meet/maak stond in de eerste ronde op compensatie met `kosten` als reden, en staat er nu op exact"
  ],
  "stempel": {
-  "op": "2026-09-06T14:59:01.500Z",
-  "commit": "ba0d3b0c",
-  "boomVuil": true,
+  "op": "2026-09-06T15:13:15.905Z",
+  "commit": "f8de8c6a",
+  "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/herstelproef.js",
   "node": "v22.22.2"

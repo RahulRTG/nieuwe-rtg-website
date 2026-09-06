@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De FAILURE-cel per route: faalt hij netjes als er iets onder hem wegvalt. Het contract wordt eerst bepaald uit het gemeten effectprofiel (X-RTG-Effect / X-RTG-Staat) en pas daarna beproefd met het verraad dat daarbij hoort.",
  "stempel": {
-  "op": "2026-09-06T13:09:26.845Z",
-  "commit": "5015685a",
+  "op": "2026-09-06T15:02:52.591Z",
+  "commit": "49a98239",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/faalproef.js",
@@ -35,8 +35,8 @@
   "routes": 4893,
   "duurzaamSchrijvend": 139,
   "nietToeTeSchrijven": 284,
-  "bewezen": 111,
-  "gezakt": 26,
+  "bewezen": 113,
+  "gezakt": 24,
   "ongemeten": 4756,
   "verradenInCatalogus": 2,
   "verradenGedraaid": 2
@@ -4032,15 +4032,15 @@
    "perVerraad": {
     "schrijf-faalt": {
      "staat": "bewezen",
-     "reden": "expliciete fout (status 500) in plaats van een bevestiging"
+     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     },
     "schrijf-verloren": {
-     "staat": "gezakt",
-     "reden": "status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     }
    },
-   "failure": "gezakt",
-   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+   "failure": "bewezen",
+   "reden": "schrijf-verloren: expliciete fout (status 503) in plaats van een bevestiging"
   },
   {
    "methode": "POST",
@@ -22164,12 +22164,12 @@
      "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     },
     "schrijf-verloren": {
-     "staat": "gezakt",
-     "reden": "status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     }
    },
-   "failure": "gezakt",
-   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+   "failure": "bewezen",
+   "reden": "schrijf-verloren: expliciete fout (status 503) in plaats van een bevestiging"
   },
   {
    "methode": "POST",

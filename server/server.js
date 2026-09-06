@@ -2167,7 +2167,7 @@ const { aiSystemPrompt, cannedAnswer, generateAiReply, convOf, memberSays, notee
 
 // De backoffice-laag draagt de AI-kern (conciergeInbox) mee, dus staat hij na maakAi.
 const { officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, pendingVerifications, mensdeurStand } = maakKantoor({
-  db, save, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes,
+  db, save, bewerkCollectie, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes,
   publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal
 });
 

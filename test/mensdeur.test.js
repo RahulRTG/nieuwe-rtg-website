@@ -32,10 +32,10 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { maakMensdeur, MAX_PADEN } = require('../server/kern/kantoor/mensdeur');
 
-function opzet() {
+function opzet(opties) {
   const db = { data: {} };
   let bewaard = 0;
-  const m = maakMensdeur({ db, save: () => { bewaard += 1; } });
+  const m = maakMensdeur(Object.assign({ db, save: () => { bewaard += 1; } }, opties || {}));
   return { db, m, saves: () => bewaard };
 }
 /* Een nep-response die `finish` meteen vuurt: de teller hangt daaraan, want er
@@ -96,6 +96,7 @@ test('3. de querystring gaat eraf -- een meting bewaart geen tokens', () => {
 test('4. een teller en geen journaal: geen wie, geen wanneer, geen volgorde', () => {
   const { db, m } = opzet();
   doe(m, '/api/office/state', false);
+  m.spoel();   // tikken staan tot dan in de RAM-buffer; zie de kop van mensdeur.js
   const rij = Object.values(db.data.kantoorMensdeur)[0];
   assert.deepEqual(Object.keys(rij).sort(), ['metMens', 'pad', 'zonderMens'],
     'er staat een veld in de opslag dat er niet hoort: een tijdstempel of een sleutel per ' +
@@ -105,6 +106,7 @@ test('4. een teller en geen journaal: geen wie, geen wanneer, geen volgorde', ()
 test('5. het plafond houdt de opslag begrensd bij verzonnen paden', () => {
   const { db, m } = opzet();
   for (let i = 0; i < MAX_PADEN + 25; i++) doe(m, '/api/office/verzin-' + i, false);
+  m.spoel();
   const sleutels = Object.keys(db.data.kantoorMensdeur);
   assert.ok(sleutels.length <= MAX_PADEN + 1,
     'boven het plafond hoort alles in `overig` te landen, anders laat een vreemde de opslag groeien');
@@ -160,4 +162,54 @@ test('10. lezen schept niets -- stand() legt de collectie niet aan', () => {
     'stand() heeft de collectie aangelegd. De kop van kern/eigencollectie.js verbiedt dat: ' +
     'een leesweg achter bak() schrijft leeg meubilair weg bij een verzoek dat op 403 eindigt, ' +
     'en dan zegt de statuscode iets anders dan de opslag. Opzoeken doet kijk().');
+});
+
+/* ============================================================================
+   DE SCHRIJFWEG. Deze vier bestaan omdat de eerste versie in res.on('finish')
+   db.data muteerde en save() riep -- de PostgreSQL-opstelling werd daarvan
+   onherstelbaar niet-ready (writeHealthy: false, elk verzoek 503), en 11
+   geslaagde integratietoetsen werden er 1. De reden staat in kern/kosten/
+   meter.js: een moment zonder requestcommit mag nooit eerst de levende db.data
+   muteren en daarna save() roepen. */
+
+test('11. tellen doet geen I/O -- pas het spoelen schrijft', () => {
+  const { db, m, saves } = opzet();
+  doe(m, '/api/office/state', false);
+  assert.equal(saves(), 0, 'er is geschreven in het pad van een verzoek');
+  assert.ok(!('kantoorMensdeur' in db.data), 'de opslag is aangeraakt voor het spoelen');
+  m.spoel();
+  assert.equal(saves(), 1);
+});
+
+test('12. het spoelen gaat door het collectieslot als dat er is', () => {
+  let viaSlot = null;
+  const { m, saves } = opzet({
+    bewerkCollectie: (sleutel, werk) => { viaSlot = sleutel; werk({}); }
+  });
+  doe(m, '/api/office/state', false);
+  m.spoel();
+  assert.equal(viaSlot, 'kantoorMensdeur',
+    'het spoelen omzeilde bewerkCollectie -- dat is precies de weg die PostgreSQL sluit');
+  assert.equal(saves(), 0, 'naast het collectieslot is ook nog save() geroepen');
+});
+
+test('13. een mislukte spoeling verliest geen tikken', () => {
+  const { m } = opzet({
+    bewerkCollectie: () => { throw new Error('opslag even weg'); }
+  });
+  doe(m, '/api/office/state', false);
+  doe(m, '/api/office/state', true);
+  assert.equal(m.spoel(), false, 'een mislukte spoeling hoort false te geven');
+  /* De tikken staan nog in de buffer, dus de uitslag kent ze nog steeds. Een
+     teller die stilletjes tikken weggooit, meet iets anders dan hij zegt. */
+  assert.equal(m.stand().verzoeken, 2, 'tikken verdwenen bij een mislukte spoeling');
+});
+
+test('14. lezen projecteert de buffer, maar schrijft hem niet weg', () => {
+  const { db, m, saves } = opzet();
+  doe(m, '/api/office/state', false);
+  const s = m.stand();
+  assert.equal(s.verzoeken, 1, 'de nog niet gespoelde tik hoort al zichtbaar te zijn');
+  assert.equal(saves(), 0, 'lezen werd een verborgen schrijfactie');
+  assert.ok(!('kantoorMensdeur' in db.data), 'lezen heeft de collectie aangelegd');
 });

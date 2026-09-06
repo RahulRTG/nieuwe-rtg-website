@@ -14,7 +14,7 @@ const { txLedgerAantal } = require('../../db'); // gecachete grootboek-teller (O
 const inzagelog = require('../../inzagelog');  // spoor bij elke blik in de identiteitskluis
 const envelop = require('../../opzet/envelop');
 
-function maakKantoor({ db, save, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes, publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal }) {
+function maakKantoor({ db, save, bewerkCollectie, sessionFor, eigenaar, accounts, findSupplier, connectedSupplierCodes, publicSupplier, conciergeInbox, beveilig, archief, grootAantal, ledenAantal }) {
   const metrics = require('./metrics')({ db, accounts, conciergeInbox, beveilig });
   /* De kluispoort staat in ./kluispoort.js: hij is geen variant van officeAuth
      maar een eigen grens, en hij werd hier de druppel over keuringsregel 13. */
@@ -22,7 +22,7 @@ function maakKantoor({ db, save, sessionFor, eigenaar, accounts, findSupplier, c
   /* DE SCHADUWMETING (KANTOOR.md par. 3). Telt per route of er een bewezen mens
      achter de handeling stond; houdt niets tegen. Zie ./mensdeur.js voor waarom
      dit een teller is en geen journaal. */
-  const mensdeur = require('./mensdeur').maakMensdeur({ db, save });
+  const mensdeur = require('./mensdeur').maakMensdeur({ db, save, bewerkCollectie });
   /* DEZELFDE POORT, EEN ANDERE REDEN (TAKEN.md 4.73): de uitgifte tekent met
      vier ogen en las de naam uit `req.body.wie`. Zie ./kluispoort.js. */
   const naamAuth = require('./kluispoort')({ officeAuth, sessionFor }, {

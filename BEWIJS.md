@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1725 bestanden en 12212 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1725 bestanden en 12216 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,13 +13,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1725 |
-| losse beweringen (`test(...)`) | 12212 |
+| losse beweringen (`test(...)`) | 12216 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 104 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1065 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 55 |
-| alleen in de kop *genoemd*, nog niet gemeten | 179 |
-| niets van beide | 426 |
+| alleen in de kop *genoemd*, nog niet gemeten | 180 |
+| niets van beide | 425 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1520 bestanden, 11856 beweringen.
+1520 bestanden, 11860 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -785,7 +785,7 @@ toets omvalt.
 | `meetserver-schorspoort.test.js` | 2 | gezakt op `true->false#0` | DE LUS DIE ZICHZELF DICHTTROK -- en waarom een meetserver de schorspoort uit heeft. server/middleware/schorspoort.js weigert met 503 elke schrijvende aanroep op een route die in VERTROUWEN.json `geschorst` heet... |
 | `memo.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Memo: de memo-flow door de Bestanden-kluis (map Memo's, upload, lijst, prullenbak) en de eerlijke Rahul-samenvatting van het transcript -- zonder AI-sleutel een demo die zegt wat hij is, nooit neptekst. |
 | `mensdeur-route.test.js` | 4 | -- | DE SCHADUWMETING OVER DE ROUTE -- met een echte server en echt inloggen. WAAROM NAAST test/mensdeur.test.js. |
-| `mensdeur.test.js` | 10 | -- | DE SCHADUWMETING VAN DE KANTOORDEUR (server/kern/kantoor/mensdeur.js). Waarom deze toetsen bestaan: de anonieme tak is end-to-end bewezen tegen een draaiende server (vier kantoorverzoeken met de gedeelde code gaven... |
+| `mensdeur.test.js` | 14 | genoemd | DE SCHADUWMETING VAN DE KANTOORDEUR (server/kern/kantoor/mensdeur.js). Waarom deze toetsen bestaan: de anonieme tak is end-to-end bewezen tegen een draaiende server (vier kantoorverzoeken met de gedeelde code gaven... |
 | `menselijkebanen.test.js` | 4 | gezakt op `liegpoort /api/` | DE MENSELIJKE BANEN -- kan elk mens in dit huis bij zijn eigen werk? WAAROM DIT ER IS Dit huis kent 60 afdelingen en 157 mensen met een baan: van de kok in KIKUNOI tot de meldkamer van GUARDIA, van de... |
 | `menselijkverkeer.test.js` | 5 | gezakt op `liegpoort /api/` | HET MENSELIJKE VERKEER -- wat mensen hier met elkaar doen. WAAROM DIT ER NAAST test/menselijkebanen.test.js STAAT Die toets bewijst dat 157 mensen bij hun werk kunnen. |
 | `merge3.property.test.js` | 5 | gezakt op `===->!==#0` | Eigenschap-gedreven (property-based) tests voor merge3, de 3-weg-samenvoeging die het hart is van de multi-writer-opslag. In plaats van een handvol vaste gevallen genereren we duizenden willekeurige situaties en... |

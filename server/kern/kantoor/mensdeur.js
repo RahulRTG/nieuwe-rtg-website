@@ -20,10 +20,15 @@
    daarom lexicaal: hij ziet dat een bestand `officeKey` noemt, niet dat de
    route die je nu aanroept er iets mee doet. Zijn `anoniemUitvoerbaar` draagt
    daarom de graad `vermoed` en is een ONDERgrens. Deze meting is runtime en per
-   route: welke deuren worden werkelijk anoniem gebruikt, en welke nooit. Dat is
-   het verschil tussen een triagelijst en een werklijst.
+   route: welke deuren worden werkelijk anoniem gebruikt, en welke nooit.
 
-   WAT HET NIET IS, EN DAT IS DE HELFT VAN HET ONTWERP.
+   DE SCHRIJFWEG staat in ./mensdeur-spoel.js, met de reden erbij. Kort: tellen
+   gaat naar een RAM-buffer en alleen het SPOELEN raakt de opslag aan, via het
+   collectieslot. De vanzelfsprekende weg (db.data muteren en save() roepen in
+   een finish-handler) brak de PostgreSQL-opstelling volledig.
+
+   ============================================================================
+   WAT DIT NIET IS, EN DAT IS DE HELFT VAN HET ONTWERP.
 
    Dit is een TELLER EN GEEN JOURNAAL. Per route twee getallen, en verder niets:
    geen wie, geen wanneer, geen volgorde. Dat is geen zuinigheid maar een grens
@@ -40,23 +45,20 @@
    HET PLAFOND, EN WAAROM HET ER IS. De sleutel is het PAD, en een pad komt van
    buiten: wie /api/office/verzin-maar-wat aanroept met een geldige kantoorcode
    zou anders een sleutel in de opslag kunnen laten groeien. Boven MAX_PADEN
-   landt alles in de bak `overig`. Dat verliest precisie op onbekende paden en
-   houdt de opslag begrensd; de 585 routes die bestaan passen ruim onder het
-   plafond, dus in de praktijk verliest de meting niets.
+   landt alles in de bak `overig`.
 
    DE STAND KOMT LATER, EN HIJ KOMT VAN ../commercie/schaduw.js. Zodra de
    eigenaar besluit dat de mens-eis wordt AFGEDWONGEN, is dat een stand met een
    rijpheidseis (minimaal zoveel waarnemingen over zoveel dagen) en dat bestaat
-   al -- inclusief de regel dat een schaduwregel die nog nooit iemand zou hebben
-   tegengehouden niet "veilig" is maar "onbewezen". Er komt hier dus GEEN tweede
-   schaduwmechanisme naast; dit bestand telt, dat bestand beslist. */
+   al. Er komt hier dus GEEN tweede schaduwmechanisme naast; dit bestand telt,
+   dat bestand beslist. */
 'use strict';
 
-/* Ruim boven de 585 kantoorroutes die vandaag bestaan, en klein genoeg om de
+/* Ruim boven de 586 kantoorroutes die vandaag bestaan, en klein genoeg om de
    opslag begrensd te houden als iemand paden verzint. */
 const MAX_PADEN = 900;
 
-function maakMensdeur({ db, save }) {
+function maakMensdeur({ db, save, bewerkCollectie }) {
   const eigen = require('../eigencollectie')({
     db, domein: 'kern/kantoor/mensdeur', bezit: { kantoorMensdeur: 'kaart' }
   });
@@ -70,40 +72,38 @@ function maakMensdeur({ db, save }) {
   function bak() { return eigen.bak('kantoorMensdeur'); }
   function kijk() { return eigen.kijk('kantoorMensdeur'); }
 
+  /* De schrijfweg staat in ./mensdeur-spoel.js; zie de kop daar. */
+  const spoeler = require('./mensdeur-spoel').maakSpoeler({
+    bak, save, bewerkCollectie, collectie: 'kantoorMensdeur', maxPaden: MAX_PADEN
+  });
+
   /* Het pad zonder querystring. De query kan een token dragen (zie
      backoffice-01.js, dat /api/office/doc?token=... opvraagt) en die hoort in
      geen enkele meting terecht te komen. */
   function padVan(req) {
     const rauw = String((req && (req.originalUrl || req.url)) || '');
-    const pad = rauw.split('?')[0];
-    return pad.slice(0, 120);
+    return rauw.split('?')[0].slice(0, 120);
   }
 
-  /* DE ENIGE SCHRIJFWEG. `heeftMens` is een besluit dat de aanroeper al genomen
-     heeft (officeAuth weet of er een lidKey is); hier wordt het alleen geteld.
+  /* TELLEN. `heeftMens` is een besluit dat de aanroeper al genomen heeft
+     (officeAuth weet of er een lidKey is); hier wordt het alleen geteld.
 
      ER WORDT PAS GETELD ALS HET VERZOEK IS UITGEVOERD, en dat is een reparatie
      uit de proef. `officeAuth` draait VOOR de strengere poorten: /api/office/
      mensdeur draagt zelf boardroomAuth, dus een anonieme sessie komt langs deze
      teller en wordt daarna alsnog geweigerd. Tellen bij binnenkomst zette die
      route dus op de werklijst "wordt anoniem gebruikt" terwijl hij juist al
-     dicht zit -- een meetfout die je aan de uitslag niet ziet, want het getal
-     ziet er precies zo uit als een echte anonieme uitvoering.
+     dicht zit -- een meetfout die je aan de uitslag niet ziet.
 
-     Daarom hangt de telling aan `finish` en telt alleen wat 2xx of 3xx werd.
      Een 401, 403 of 404 is een deur die zijn werk deed en geen handeling. */
   function tel(req, res, heeftMens) {
-    let pad = padVan(req);
+    const pad = padVan(req);
     if (!pad.startsWith('/api/')) return;   // geen kantoorpad: niet onze meting
     if (!res || typeof res.on !== 'function') return;
     res.on('finish', () => {
       try {
         if (res.statusCode >= 400) return;
-        const B = bak();
-        if (!B[pad] && Object.keys(B).length >= MAX_PADEN) pad = 'overig';
-        if (!B[pad]) B[pad] = { pad, metMens: 0, zonderMens: 0 };
-        if (heeftMens) B[pad].metMens += 1; else B[pad].zonderMens += 1;
-        save();
+        spoeler.tik(pad, heeftMens);
       } catch (e) { /* een meting houdt nooit een antwoord tegen */ }
     });
   }
@@ -112,9 +112,14 @@ function maakMensdeur({ db, save }) {
      anoniem wordt gebruikt is werk, een route die alleen op naam wordt gebruikt
      kan vandaag al dicht, en een route die beide ziet vraagt een gesprek. Een
      samengesteld cijfer eroverheen zou die drie verschillen wegpoetsen, en dat
-     is precies wat BEWIJSMACHINE.md verbiedt. */
+     is precies wat BEWIJSMACHINE.md verbiedt.
+
+     De nog niet gespoelde buffer wordt hier over de opgeslagen stand
+     GEPROJECTEERD en niet weggeschreven: een leesverzoek is nooit een verborgen
+     schrijfactie. */
   function stand() {
-    const rijen = Object.values(kijk());
+    const beeld = spoeler.projecteer(JSON.parse(JSON.stringify(kijk())));
+    const rijen = Object.values(beeld);
     const alleenAnoniem = rijen.filter(r => r.zonderMens > 0 && r.metMens === 0);
     const alleenOpNaam = rijen.filter(r => r.metMens > 0 && r.zonderMens === 0);
     const beide = rijen.filter(r => r.metMens > 0 && r.zonderMens > 0);
@@ -137,7 +142,7 @@ function maakMensdeur({ db, save }) {
     };
   }
 
-  return { tel, stand, MAX_PADEN };
+  return { tel, stand, spoel: spoeler.spoel, MAX_PADEN };
 }
 
 module.exports = { maakMensdeur, MAX_PADEN };

@@ -75,7 +75,7 @@
    waarom dat drie verschillende soorten blindheid zijn, en waarom ze apart van
    de publieke lijst wonen. */
 const buiten = require('./buiten');
-const { ROUTEPOORTEN, ROUTERPOORTEN, FAMILIES, poortVanRouteHand, veldVanBewaker,
+const { ROUTEPOORTEN, ROUTERPOORTEN, FAMILIES, poortVanRouteHand, veldVanBewaker, veldVanPad,
   voorvoegselVan } = buiten;
 
 /* De poort van een route die uit een LUS komt, of null. De familie staat in
@@ -122,5 +122,5 @@ function poortVan(bestand, naam) {
   return POORTEN[n] || null;
 }
 
-module.exports = { POORTEN, poortVan, poortVanRoute, poortVanRouteHand, veldVanBewaker,
+module.exports = { POORTEN, poortVan, poortVanRoute, poortVanRouteHand, veldVanBewaker, veldVanPad,
   NIET_IN, FAMILIES, ROUTERPOORTEN, ROUTEPOORTEN };

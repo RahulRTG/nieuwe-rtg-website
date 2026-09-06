@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-06T12:31:58.452Z",
-    "commit": "2e54f1e6",
+    "op": "2026-09-06T12:44:20.264Z",
+    "commit": "4b957cc1",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -7209,6 +7209,14 @@
       "module": "server/lib/verraad.js",
       "operator": "true->false#0",
       "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "verraadfase.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/verraadfase.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "verraadtelling.test.js": {

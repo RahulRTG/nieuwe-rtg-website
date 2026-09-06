@@ -7,7 +7,7 @@
    Deze deelmodule staat los omdat kern/pulse/index.js anders over de tien
    kilobyte gaat (check-regel 13). Hij krijgt de binnenkant van de feed mee --
    P, publiek, zichtbaar en tags -- en raakt niets anders aan. */
-module.exports = ({ save, nu, keur, P, publiek, zichtbaar, tags }) => {
+module.exports = ({ save, nu, keur, P, kijkP, publiek, zichtbaar, tags }) => {
 
   /* BEWERKEN -- elders de bekendste betaalde functie van een microblog, hier
      gewoon in de pas. Maar wel op de manier van dit huis: een correctie mag,
@@ -20,7 +20,7 @@ module.exports = ({ save, nu, keur, P, publiek, zichtbaar, tags }) => {
      geschiedenis opvragen -- niet alleen jij. Dat is geen boetedoening maar de
      voorwaarde waaronder bewerken eerlijk blijft. */
   function pulseBewerk(key, id, tekst) {
-    const post = P().posts.find(x => x.id === id && zichtbaar(x));
+    const post = kijkP().posts.find(x => x.id === id && zichtbaar(x));
     if (!post) return { status: 404, error: 'Bericht niet gevonden.' };
     if (post.key !== key) return { status: 403, error: 'Dit bericht is niet van jou.' };
     const t = String(tekst || '').trim().slice(0, 280);
@@ -39,7 +39,7 @@ module.exports = ({ save, nu, keur, P, publiek, zichtbaar, tags }) => {
   }
   // De geschiedenis staat open voor iedereen die het bericht mag zien.
   function pulseVersies(key, id) {
-    const post = P().posts.find(x => x.id === id && zichtbaar(x));
+    const post = kijkP().posts.find(x => x.id === id && zichtbaar(x));
     if (!post) return { status: 404, error: 'Bericht niet gevonden.' };
     return { status: 200, nu: post.tekst, bewerkt: post.bewerkt || null,
       versies: (post.versies || []).map(v => ({ tekst: v.tekst, tot: v.tot })),

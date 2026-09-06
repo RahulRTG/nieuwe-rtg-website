@@ -611,3 +611,189 @@ test('kletspraat: een geweigerd gesprek schept geen kletsla', async () => {
   assert.ok(g.ok, 'het gesprek is gestart: ' + (g.error || ''));
   assert.equal(db.data.klets.gesprekken.length, 1, 'het gesprek staat in db.data');
 });
+
+/* -------------------------------------------------------------- ov/operatie */
+test('ov: een operatie bevestigen die er niet is, schept geen lijst', () => {
+  const db = { data: {} };
+  const api = require('../server/kern/ov/operatie')({
+    db, save: () => {}, crypto: require('node:crypto'),
+    schoon: (v, n) => String(v || '').replace(/[<>]/g, '').slice(0, n),
+  });
+
+  /* De tier hoort erbij: zonder 'business' valt er een 403 VOOR de opzoeking,
+     en dan meet dit blok niets. */
+  assert.equal(api.ovOperatieBevestig('k', 'business', { id: 'op-bestaatniet', code: 'X' }).status, 404);
+  assert.equal(api.ovOperatieAnnuleer('k', 'business', { id: 'op-bestaatniet' }).status, 404);
+  assert.equal(api.ovOperatieSegment('k', 'business', { id: 'op-bestaatniet' }).status, 404);
+  assert.equal(api.ovOperatieOverzicht('k', 'business').status, 200);
+  geenMeubilair(db, 'ovOperaties', 'vier paden zonder operaties');
+});
+
+/* -------------------------------------------------------------------- pulse */
+test('pulse: een bericht dat er niet is, schept geen pulse-kaart', () => {
+  const db = { data: {} };
+  const p = require('../server/kern/pulse')({
+    db, save: () => {}, crypto: require('node:crypto'),
+    liveCodename: () => 'Lid', notify: null, stemmingVan: null, jarigVan: null,
+  });
+
+  assert.equal(p.pulseWeg('k', 'geen-id').status, 404);
+  assert.equal(p.pulseLike('k', 'geen-id').status, 404);
+  assert.equal(p.pulseReactie('k', 'Lid', 'geen-id', 'hoi').status, 404);
+  assert.equal(p.pulseMeld('k', 'geen-id', 'reden').status, 404);
+  assert.equal(p.pulseBewerk('k', 'geen-id', 'anders').status, 404);
+  assert.equal(p.pulseVersies('k', 'geen-id').status, 404);
+  geenMeubilair(db, 'pulse', 'zes 404-en in de Pulse');
+
+  /* TEGENPROEF: posten legt de kaart wel aan en het bericht is bewerkbaar --
+     dat zakt zodra iemand P() ook op kijk() zet. */
+  const post = p.pulsePost('k', 'Lid', 'Een eerste bericht');
+  assert.ok(post.post && post.post.id, 'het bericht staat: ' + (post.error || ''));
+  assert.equal(db.data.pulse.posts.length, 1);
+  assert.equal(p.pulseLike('ander', post.post.id).ok, true);
+  assert.equal(Object.keys(db.data.pulse.posts[0].likes).length, 1, 'de like landde in db.data');
+});
+
+/* ----------------------------------------------------------------- reisbieb */
+test('reisbieb: een gids verwijderen die er niet staat, schept geen rij', () => {
+  const { maakReisBieb } = require('../server/kern/reisbieb');
+  const db = { data: {} };
+  let saves = 0;
+  const { reisbieb } = maakReisBieb({ db, save: () => saves++ });
+
+  assert.equal(reisbieb.verwijder('user-1', 'reis-londen').status, 404);
+  geenMeubilair(db, 'reisInstallaties', 'een 404 op verwijder');
+  assert.deepEqual(reisbieb.mijnApps('user-1'), []);
+  geenMeubilair(db, 'reisInstallaties', 'mijnApps zonder installaties');
+  assert.equal(saves, 0);
+
+  /* TEGENPROEF: installeren schrijft nog, en verwijderen landt op die rij. */
+  const eerste = reisbieb.catalogus().items[0];
+  assert.ok(reisbieb.installeer('user-1', eerste.id).ok);
+  assert.equal(reisbieb.mijnApps('user-1').length, 1);
+  assert.equal(reisbieb.verwijder('user-1', eerste.id).aantal, 0);
+});
+
+/* ----------------------------------------------------------------- rtfclubs */
+test('rtfclubs: een clubcode die niet bestaat, schept geen clubregister', () => {
+  const db = { data: {} };
+  let saves = 0;
+  const { rtfclubs } = require('../server/kern/rtfclubs')({
+    db, save: () => { saves++; }, crypto: require('node:crypto'),
+  });
+
+  assert.equal(rtfclubs.portaal('CLUB-BESTAATNIET').status, 404);
+  geenMeubilair(db, 'rtfClubs', 'een onbekende clubcode');
+  rtfclubs.overzicht();
+  geenMeubilair(db, 'rtfClubs', 'het clubsoverzicht op een leeg register');
+  assert.equal(saves, 0);
+
+  /* TEGENPROEF: een club maken legt het register wel aan. */
+  const m = rtfclubs.clubMaak({ naam: 'FC Proef', stad: 'Utrecht' });
+  assert.ok(m.ok, 'de club is gemaakt: ' + (m.error || ''));
+  assert.equal(db.data.rtfClubs.length, 1);
+});
+
+/* ----------------------------------------------------------- spellen/teams */
+test('spelteams: antwoorden op een team dat er niet is, schept geen teamlijst', () => {
+  const { schoon } = require('../server/kern/util');
+  const db = { data: {} };
+  const h = require('../server/kern/spellen/teams')({
+    db, save() {}, rid: () => 't1', nu: () => '2026-08-09T12:00:00.000Z',
+    codenaamVan: k => 'CN-' + k, isGeblokkeerd: () => false, zijnVrienden: () => false,
+    klasgenotenVan: () => [], schoon, sociaalRate: () => true,
+  });
+
+  assert.equal(h.teamAntwoord('anna', 't9', true).status, 404);
+  assert.equal(h.teamVerlaat('anna', 't9').status, 404);
+  h.mijnTeams('anna');
+  geenMeubilair(db, 'spelTeams', 'drie paden zonder teams');
+
+  /* TEGENPROEF: een team maken legt de lijst wel aan en is terug te vinden. */
+  const t = h.teamNieuw('anna', 'De Proef', []);
+  assert.ok(t.team, 'het team is gemaakt: ' + (t.error || ''));
+  assert.equal(db.data.spelTeams.length, 1);
+  assert.equal(h.mijnTeams('anna').teams.length, 1);
+});
+
+/* ---------------------------------------------------------- spellen/zetten */
+test('spelzetten: een replay van een potje dat er niet is, schept geen verloop', () => {
+  const db = { data: {} };
+  const z = require('../server/kern/spellen/zetten')({
+    db, save() {}, nu: () => '2026-08-09T12:00:00.000Z', codenaamVan: x => x,
+  });
+
+  assert.equal(z.spelReplay('a', 'p1').status, 404);
+  geenMeubilair(db, 'spelZetten', 'een replay zonder verloop');
+
+  /* TEGENPROEF: noteren houdt bak(), dus daarna is er wel een replay. */
+  z.noteerZet({ id: 'p1', soort: 'schaak', spelers: ['a', 'b'] }, 'a', { n: 1 });
+  assert.ok(Array.isArray(db.data.spelZetten), 'noteerZet houdt bak()');
+  assert.equal(z.spelReplay('a', 'p1').status, 200);
+});
+
+/* --------------------------------------------------------------- stadsraad */
+test('stadsraad: vier weigerpaden laten het raadsregister ongemoeid', () => {
+  const db = { data: {} };
+  const { stadsraad } = require('../server/kern/stadsraad')({
+    db, save: () => {}, crypto: require('node:crypto'),
+  });
+
+  assert.equal(stadsraad.stem('nep', 'rtg', 'x', true).status, 404);
+  assert.equal(stadsraad.besluitSluit('nep').status, 404);
+  assert.equal(stadsraad.partnerStop('nep').status, 404);
+  assert.equal(stadsraad.portaal('RAAD-BESTAATNIET').status, 404);
+  stadsraad.raad('rtg');
+  geenMeubilair(db, 'stadsraad', 'vier weigeringen en het leesbord');
+
+  /* TEGENPROEF: een partner toevoegen legt het register wel aan. */
+  const p = stadsraad.partnerMaak({ stad: 'Utrecht', naam: 'Gemeente Utrecht' });
+  assert.ok(p.ok, 'de partner staat: ' + (p.error || ''));
+  assert.equal(db.data.stadsraad.partners.length, 1);
+});
+
+/* ---------------------------------------------------------------- synergie */
+test('synergie: drie weigeringen laten de dealcollecties ongemoeid', async () => {
+  const opzet = () => {
+    const db = { data: {} };
+    const { maakSynergie } = require('../server/kern/synergie');
+    return { db, s: maakSynergie({
+      db, save: () => {}, crypto: require('node:crypto'), schoon: null,
+      findSupplier: code => ({ A: { code: 'A', name: 'Villa' }, B: { code: 'B', name: 'Sal' } })[code] || null,
+      notifySupplier: () => {}, pay: { saldoVan: () => 100000, boekAsync: async () => ({}) },
+    }).synergie };
+  };
+
+  let { db, s } = opzet();
+  s.dealReageer('A', 'x', true);
+  s.dealStop('A', 'x');
+  await s.pakketKoop('LID', 'x', 'idem1');
+  s.dealsVoorZaak('A');
+  s.pakketten();
+  assert.equal(Object.keys(db.data).length, 0, 'vijf paden lieten db.data leeg');
+
+  /* TEGENPROEF: een deal maken legt de collectie wel aan. */
+  ({ db, s } = opzet());
+  const d = s.dealMaak('A', { naam: 'Proefdeal', prijsCenten: 1000,
+    aandelen: [{ code: 'A', centen: 600 }, { code: 'B', centen: 400 }] });
+  assert.ok(d.ok || d.deal, 'de deal is gemaakt: ' + (d.error || ''));
+  assert.ok(Array.isArray(db.data.synergie) && db.data.synergie.length === 1);
+});
+
+/* -------------------------------------------------------- theater/kijkplicht */
+test('kijkplicht: een regel afvinken die er niet is, schept geen kijkplichtlijst', () => {
+  const db = { data: {} };
+  const k = require('../server/kern/theater/kijkplicht')({
+    db, save: () => {}, nu: () => '2026-09-06T00:00:00.000Z', id: () => 'r1',
+    lijsten: () => {}, kanaalMet: () => null, videoMet: () => null,
+    zakenVan: () => [{ code: 'X', naam: 'X bv', leiding: true }], personeelVan: () => [],
+  });
+
+  assert.equal(k.kijkplichtGedaan('user-1', {}).status, 404);
+  geenMeubilair(db, 'theaterKijkplicht', 'een 404 op kijkplichtGedaan');
+  assert.equal(k.kijkplichtZet('user-1', { zaakCode: 'X', weg: true, id: 'niets' }).status, 404);
+  geenMeubilair(db, 'theaterKijkplicht', 'een regel weghalen die er niet is');
+  k.kijkplichtStand('user-1', 'X');
+  k.kijkplichtMijn('user-1');
+  geenMeubilair(db, 'theaterKijkplicht', 'de stand en de eigen lijst zonder regels');
+});

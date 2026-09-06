@@ -16,7 +16,9 @@ function maakSynergie({ db, save, crypto, schoon, findSupplier, notifySupplier, 
   function store() {
     return { synergie: eigen.bak('synergie'), synergieKopen: eigen.bak('synergieKopen') };
   }
-  const vind = (dealId) => store().synergie.find(d => d.id === dealId);
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const lees = () => ({ synergie: eigen.kijk('synergie'), synergieKopen: eigen.kijk('synergieKopen') });
+  const vind = (dealId) => lees().synergie.find(d => d.id === dealId);
   const doetMee = (d, code) => d.aandelen.some(a => a.code === code);
   const zeg = (d, vanCode, tekst) => {
     for (const a of d.aandelen) if (a.code !== vanCode && notifySupplier)
@@ -83,9 +85,9 @@ function maakSynergie({ db, save, crypto, schoon, findSupplier, notifySupplier, 
   }
 
   const dealsVoorZaak = (code) => ({ ok: true,
-    deals: store().synergie.filter(d => doetMee(d, code)).slice(0, 50) });
+    deals: lees().synergie.filter(d => doetMee(d, code)).slice(0, 50) });
 
-  const pakketten = () => ({ ok: true, pakketten: store().synergie
+  const pakketten = () => ({ ok: true, pakketten: lees().synergie
     .filter(d => d.status === 'actief' && (!d.geldigTot || d.geldigTot >= vandaag()))
     .slice(0, 30).map(d => ({ id: d.id, naam: d.naam, omschrijving: d.omschrijving,
       prijsCenten: d.prijsCenten, zaken: d.aandelen.map(a => a.naam) })) });
@@ -98,7 +100,7 @@ function maakSynergie({ db, save, crypto, schoon, findSupplier, notifySupplier, 
     if (!d || d.status !== 'actief' || (d.geldigTot && d.geldigTot < vandaag()))
       return { status: 404, error: 'Dit pakket is niet (meer) beschikbaar.' };
     const sleutel = scho(idem, 60);
-    if (sleutel && store().synergieKopen.some(k => k.idem === sleutel && k.codenaam === codenaam))
+    if (sleutel && lees().synergieKopen.some(k => k.idem === sleutel && k.codenaam === codenaam))
       return { ok: true, deal: { id: d.id, naam: d.naam }, alBetaald: true };
     const rek = 'lid:' + codenaam;
     if (pay.saldoVan(rek) < d.prijsCenten) return { status: 402, error: 'Onvoldoende saldo voor dit pakket.' };

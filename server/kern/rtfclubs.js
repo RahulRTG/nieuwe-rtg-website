@@ -19,9 +19,11 @@ module.exports = ({ db, save, crypto }) => {
   const TEKENS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const codeMaak = () => 'CLUB-' + Array.from(crypto.randomBytes(6)).map(b => TEKENS[b % TEKENS.length]).join('');
 
-  const C = () => eigen.bak('rtfClubs');
-  const vind = id => C().find(c => c.id === String(id || ''));
-  const vindCode = code => C().find(c => c.code === String(code || '').trim().toUpperCase());
+  const C = () => eigen.bak('rtfClubs');    // schrijfpad: alleen clubMaak legt aan
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const L = () => eigen.kijk('rtfClubs');
+  const vind = id => L().find(c => c.id === String(id || ''));
+  const vindCode = code => L().find(c => c.code === String(code || '').trim().toUpperCase());
 
   // wat de club zelf ziet: alleen het eigen dossier, nooit een ander
   const clubBeeld = c => ({ naam: c.naam, stad: c.stad, sport: c.sport, status: c.status,
@@ -30,8 +32,8 @@ module.exports = ({ db, save, crypto }) => {
 
   function overzicht() {
     const perStad = {};
-    for (const c of C()) { (perStad[c.stad] = perStad[c.stad] || []).push(kantoorBeeld(c)); }
-    return { ok: true, totaal: C().length, statussen: STATUS, ideeen: PROGRAMMA_IDEEEN,
+    for (const c of L()) { (perStad[c.stad] = perStad[c.stad] || []).push(kantoorBeeld(c)); }
+    return { ok: true, totaal: L().length, statussen: STATUS, ideeen: PROGRAMMA_IDEEEN,
       steden: Object.keys(perStad).sort().map(stad => ({ stad, clubs: perStad[stad] })) };
   }
   function clubMaak(b) {
@@ -39,7 +41,7 @@ module.exports = ({ db, save, crypto }) => {
     const naam = schoon(b.naam, 80), stad = schoon(b.stad, 60), sport = schoon(b.sport, 40);
     if (naam.length < 2) return { status: 400, error: 'Hoe heet de club?' };
     if (stad.length < 2) return { status: 400, error: 'In welke stad speelt de club?' };
-    if (C().length >= 5000) return { status: 400, error: 'Het clubregister zit vol.' };
+    if (L().length >= 5000) return { status: 400, error: 'Het clubregister zit vol.' };
     const c = { id: rid(), code: codeMaak(), naam, stad, sport: sport || 'sport', contact: schoon(b.contact, 80),
       status: 'verkend', team: [], programmas: [], afspraken: [], log: [], at: nu() };
     C().unshift(c); save();

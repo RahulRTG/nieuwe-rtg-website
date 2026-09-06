@@ -32,6 +32,11 @@ function maakReisBieb({ db, save }) {
     if (!Array.isArray(b[key])) b[key] = [];
     return b[key];
   };
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const rijLees = (key) => {
+    const v = eigen.kijk('reisInstallaties')[key];
+    return Array.isArray(v) ? v : [];
+  };
   const publiek = (a) => ({ id: a.id, slug: a.slug, naam: a.naam, titel: a.titel, bestemming: a.bestemming,
     regio: a.regio, categorie: a.categorie, categorieLabel: a.categorieLabel, uitleg: a.uitleg,
     woorden: a.woorden, gratis: true, prijsCenten: 0, ledenprijsCenten: 0 });
@@ -75,14 +80,14 @@ function maakReisBieb({ db, save }) {
   }
 
   function verwijder(key, id) {
-    const mijn = rij(key);
+    const mijn = rijLees(key);
     const ix = mijn.indexOf(String(id || ''));
     if (ix < 0) return { status: 404, error: 'Deze gids staat niet bij uw reisgidsen.' };
     mijn.splice(ix, 1); save();
     return { status: 200, ok: true, aantal: mijn.length };
   }
 
-  const mijnApps = (key) => rij(key).map(appVan).filter(Boolean).map(publiek);
+  const mijnApps = (key) => rijLees(key).map(appVan).filter(Boolean).map(publiek);
 
   return { reisbieb: { overzicht, catalogus, lees, installeer, verwijder, mijnApps, appVan, TOTAAL } };
 }

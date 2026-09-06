@@ -102,6 +102,9 @@ const KAART = new Map([
   ['adminOnly', ['rol', 'office', 'een kantoormedewerker met beheerrechten; smaller dan officeAuth, zelfde token']],
 
   // ---- eigenrol: identiteit met een rol buiten het drietal ----
+  // Geen herbruikbare bearerrol: het bewijs zit in de HMAC-kop en is gebonden
+  // aan de onbewerkte body, event-id en tijd. De eigen HTTP-proef tekent dit.
+  ['storingenAuth', ['verzoeksignatuur', null, 'HMAC-kop over raw body, event-id en tijd; een bearer is hier geen geloofsbrief']],
   ['boardroomAuth', ['eigenrol', 'boardroom',
     'draait eerst officeAuth en eist daarna boardroomtoegang; member en supplier stranden op de eerste, office op de tweede']],
   /* DE KLUISPOORT (server/kern/kantoor/kluispoort.js). Hij draait eerst
@@ -166,6 +169,7 @@ const KAART = new Map([
      zijn antwoord zo. Het is een LEZER en geen deur: wie erdoor komt is nog
      niemand. De echte weigering zit in de handtekeningcontrole erna. */
   ['formulier', ['geenBewaker', null, 'leest het formulierlichaam van een SAML-antwoord (server/routes/sso-saml.js)']],
+  ['leesMelding', ['geenBewaker', null, 'begrensde raw-body lezer voor de storingenwebhook; storingenAuth controleert daarna de HMAC']],
 
   // ---- omgeving: de opstelling beslist, niet de bezoeker ----
   ['meetpoort', ['omgeving', null, 'RTG_METRICS_TOKEN en het interne net beslissen; zie scripts/poortwacht.js']]
@@ -277,11 +281,12 @@ function beoordeel(route) {
      Arrival Pass in het lichaam); alleen staat er een snelheidsrem voor. De
      zwakste bewering mag de sterkste niet overschrijven, want dan leest een route
      mét een slot als een route zonder. */
-  const RANG = { lichaamssleutel: 3, objectpoort: 2, omgeving: 1, geenBewaker: 0 };
+  const RANG = { verzoeksignatuur: 4, lichaamssleutel: 3, objectpoort: 2, omgeving: 1, geenBewaker: 0 };
   const zwaarste = dragend.slice().sort((a, b) =>
     (RANG[soortVan(b)] || 0) - (RANG[soortVan(a)] || 0))[0];
   const soort = soortVan(zwaarste);
   const uitleg = {
+    verzoeksignatuur: 'de HMAC is aan lichaam, event-id en tijd gebonden; een bearer kruisen meet dit niet, de eigen HTTP-proef tekent het verzoek',
     lichaamssleutel: 'de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets',
     objectpoort: 'eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord',
     geenBewaker: 'geen autorisatielaag -- alleen een rem of cache',

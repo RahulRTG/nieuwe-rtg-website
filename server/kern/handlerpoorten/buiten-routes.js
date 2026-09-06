@@ -89,6 +89,8 @@ const ROUTEPOORTEN = {
     wat: 'accounts.findByReset(token) plus de tweede stap van de telefoon; de link IS de sleutel' },
   'POST /api/betaal/webhook/adyen': { toegang: 'SERVICE_TO_SERVICE',
     wat: 'webhookPoort: Adyen bewijst bezit met een HMAC over de melding' },
+  'POST /api/webhooks/storingen': { toegang: 'SERVICE_TO_SERVICE',
+    wat: 'protocol.verifieer: tijdveilige HMAC over raw body, event-id en vijf minuten geldige tijd; zonder sleutel 503' },
   'POST /api/aanmeld/zeg': { toegang: 'OBJECT_SCOPED', veld: 'id',
     wat: 'het gespreks-id uit het lichaam; zonder bestaand gesprek is er niets, plus een rem per IP' }
 };

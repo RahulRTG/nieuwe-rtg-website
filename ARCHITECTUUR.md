@@ -19,12 +19,12 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 4982 |
-| servermodules (`server/**/*.js`) | 3284 |
-| routebestanden (`server/routes/**`) | 575 |
-| kernmodules (`server/kern/**`) | 2054 |
+| servermodules (`server/**/*.js`) | 3286 |
+| routebestanden (`server/routes/**`) | 574 |
+| kernmodules (`server/kern/**`) | 2052 |
 | schermen (`public/**/*.html`) | 293 |
 | gedeelde browsermodules (`public/shared/*.js`) | 329 |
-| toetsbestanden (`test/*.test.js`) | 1520 |
+| toetsbestanden (`test/*.test.js`) | 1519 |
 | schermtoetsen (`test/*.e2e.js`) | 205 |
 
 ## 2. De weg van een verzoek
@@ -112,7 +112,7 @@ zie §5 -- er zijn nog 231 kern-namen die meer dan één domein aanraakt.
 | `auth` | 20 | 6 | 8 | 52 |
 | `member` | 694 | 70 | 16 | 427 |
 | `supplier` | 618 | 122 | 6 | 331 |
-| `office` | 64 | 17 | 3 | 79 |
+| `office` | 63 | 16 | 3 | 78 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 71 |
 | `techniek` | 77 | 19 | 1 | 64 |
@@ -127,7 +127,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3369 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3370 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -135,9 +135,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1557 |
+| kern-namen die routes aanraken | 1556 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 231 |
-| daarvan door precies één domein | 1326 |
+| daarvan door precies één domein | 1325 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

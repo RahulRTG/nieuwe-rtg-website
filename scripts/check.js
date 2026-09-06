@@ -1928,6 +1928,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      scripts/mutatiecontract.js leest hem als SERVICE_TO_SERVICE, dus dit is de
      derde plek die dezelfde deur nu bij dezelfde naam noemt. */
   POORT_MW.add('scimAuth');
+  POORT_MW.add('storingenAuth'); // raw HMAC, event-id en vijf minuten geldigheid; HTTP-proeven in storingen-webhook.test.js
   /* `viaBeheerOfDirectie` (routes/tenant.js) is geen derde poort maar een keuze
      tussen de twee die er al zijn: het beheer-token, of een lid met het recht
      `werkruimte`. Hij belandde hier omdat deze regel 800 tekens vooruitkijkt en

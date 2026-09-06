@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-09-06T21:08:00.598Z",
-  "commit": "d60db2a1",
+  "op": "2026-09-06T20:51:03.627Z",
+  "commit": "d57a27710",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
@@ -14,18 +14,18 @@
   "geclassificeerd": 4864,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3253,
-   "NOT_APPLICABLE": 1126,
-   "PROTECTED": 369,
+   "NOT_APPLICABLE": 1125,
+   "PROTECTED": 370,
    "INTENTIONALLY_NON_IDEMPOTENT": 116
   },
   "vastgesteldDoorMens": 1655,
   "afgeleidDoorScript": 3209,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4005,
+   "AUTHENTICATED": 4004,
    "PUBLIC": 122,
    "OBJECT_SCOPED": 718,
    "(niet af te leiden -- vraagt een verklaring)": 4,
-   "SERVICE_TO_SERVICE": 14,
+   "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
   "bewijs": {
@@ -59308,27 +59308,6 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "office.mensdeur",
-   "route": "POST /api/office/mensdeur",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -126306,6 +126285,29 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "storingen.ontvang",
+   "route": "POST /api/webhooks/storingen",
+   "semantiek": {
+    "klasse": "sleutelVereist"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "SERVICE_TO_SERVICE",
+    "uitHandler": null,
+    "bedoeld": "SERVICE_TO_SERVICE",
+    "bewakers": [
+     "mw",
+     "leesMelding",
+     "storingenAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

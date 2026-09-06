@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-06T14:50:25.727Z",
-    "commit": "a799a0c5",
+    "op": "2026-09-06T16:13:37.740Z",
+    "commit": "3414a739b",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4135,6 +4135,10 @@
       "operator": "liegpoort /api/",
       "gezakt": 11,
       "scherp": "gezakt"
+    },
+    "objectveld.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
     },
     "ochtend.test.js": {
       "soort": "server",

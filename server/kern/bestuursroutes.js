@@ -7,6 +7,7 @@
 'use strict';
 
 const REDENEN = [
+  ['/api/webhooks/storingen', 'HMAC-beveiligde storingenontvangst blijft bereikbaar wanneer functies uitstaan; de ontvangst heeft een eigen rem en opslagpoort'],
   ['/api/techniek', 'het techniekbord zelf: de herstelknoppen mogen niet achter een knop'],
   ['/api/boardroom', 'de schakelkast zelf: anders sluit de eigenaar zichzelf buiten'],
   ['/api/health', 'de gezondheidscheck moet altijd antwoorden voor externe bewaking'],

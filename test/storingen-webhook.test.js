@@ -8,12 +8,14 @@ const path = require('node:path');
 const { DatabaseSync } = require('node:sqlite');
 const protocol = require('../server/storingen/protocol');
 const { startServer, stop } = require('./helper');
+const PAD = '/api/webhooks/storingen';
+assert.equal(protocol.PAD, PAD);
 const sleutel = crypto.randomBytes(32).toString('hex');
 const encryptie = crypto.randomBytes(32).toString('hex');
 const body = () => Buffer.from(JSON.stringify({ app: 'rtg', soort: 'zelfproef',
   tijd: new Date().toISOString(), fout: 'E2E ontvangst zonder klantgegevens', context: { token: 'NOOIT_OPSLAAN' } }));
 async function stuur(base, raw, id, headers = {}) {
-  const r = await fetch(base + protocol.PAD, { method: 'POST', body: raw,
+  const r = await fetch(base + PAD, { method: 'POST', body: raw,
     headers: { 'content-type': 'application/json', ...protocol.koppen(sleutel, id, raw), ...headers } });
   return { status: r.status, body: await r.json(), retry: r.headers.get('retry-after') };
 }
@@ -25,8 +27,8 @@ test('echte app: authenticatie, opslagbewijs, parallelle retries, herstart en re
     a = await startServer({ env });
     const raw = body(), id = crypto.randomUUID();
     await t.test('ongesigneerd, verval, manipulatie en invoer worden geweigerd', async () => {
-      assert.equal((await fetch(a.base + protocol.PAD)).status, 404);
-      assert.equal((await fetch(a.base + protocol.PAD, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' })).status, 401);
+      assert.equal((await fetch(a.base + PAD)).status, 404);
+      assert.equal((await fetch(a.base + PAD, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' })).status, 401);
       assert.equal((await stuur(a.base, raw, id, protocol.koppen(sleutel, id, raw, Date.now() - 360000))).status, 401);
       assert.equal((await stuur(a.base, raw, id, protocol.koppen(crypto.randomBytes(32).toString('hex'), id, raw))).status, 401);
       assert.equal((await stuur(a.base, Buffer.from(raw.toString().replace('zonder', 'andere')), id, protocol.koppen(sleutel, id, raw))).status, 401);
@@ -50,7 +52,7 @@ test('echte app: authenticatie, opslagbewijs, parallelle retries, herstart en re
       assert.equal((await stuur(a.base, Buffer.from(raw.toString().replace('E2E', 'Andere')), id)).status, 409);
     });
     await t.test('twee echte processen leggen gelijktijdige retries slechts eenmaal vast', async () => {
-      b = await startServer({ env: { ...env, ERR_WEBHOOK_URL: a.base + protocol.PAD, ERR_WEBHOOK_INTERN: '1' } });
+      b = await startServer({ env: { ...env, ERR_WEBHOOK_URL: a.base + PAD, ERR_WEBHOOK_INTERN: '1' } });
       const nieuw = crypto.randomUUID();
       const rs = await Promise.all(Array.from({ length: 12 }, (_, i) => stuur(i % 2 ? a.base : b.base, raw, nieuw)));
       assert.equal(rs.filter(r => r.status === 201).length, 1);

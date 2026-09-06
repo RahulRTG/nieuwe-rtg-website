@@ -27,6 +27,11 @@ module.exports = function hangStoringenOp({ app, express, log, env = process.env
   const raw = express.raw({ type: '*/*', limit: protocol.MAX_BYTES });
   function leesMelding(req, res, next) {
     res.set('Cache-Control', 'no-store');
+    // Een anoniem verzoek krijgt altijd een auth-weigering, ook wanneer de
+    // ontvanger nog niet is ingesteld. Het onthult geen configuratiestand.
+    if (!req.get('x-rtg-signature') || !req.get('x-rtg-event-id') || !req.get('x-rtg-timestamp')) {
+      noteer('auth-geweigerd', req); return res.status(401).json({ ok: false, error: 'Handtekening vereist.' });
+    }
     if (!protocol.sleutelGoed(sleutel)) return res.status(503).json({ ok: false, error: 'Ontvangst niet geconfigureerd.' });
     if (!/^application\/json(?:\s*;|$)/i.test(req.get('content-type') || '') || req.get('content-encoding'))
       return res.status(415).json({ ok: false, error: 'Ongecomprimeerde JSON vereist.' });

@@ -102,7 +102,9 @@ const KAART = new Map([
   ['adminOnly', ['rol', 'office', 'een kantoormedewerker met beheerrechten; smaller dan officeAuth, zelfde token']],
 
   // ---- eigenrol: identiteit met een rol buiten het drietal ----
-  ['storingenAuth', ['eigenrol', 'storingen-service', 'tijdveilige HMAC over raw bytes, event-id en tijd; alleen de ingestelde afzender']],
+  // Geen herbruikbare bearerrol: het bewijs zit in de HMAC-kop en is gebonden
+  // aan de onbewerkte body, event-id en tijd. De eigen HTTP-proef tekent dit.
+  ['storingenAuth', ['lichaamssleutel', null, 'HMAC-kop over raw body, event-id en tijd; een bearer is hier geen geloofsbrief']],
   ['boardroomAuth', ['eigenrol', 'boardroom',
     'draait eerst officeAuth en eist daarna boardroomtoegang; member en supplier stranden op de eerste, office op de tweede']],
   /* DE KLUISPOORT (server/kern/kantoor/kluispoort.js). Hij draait eerst

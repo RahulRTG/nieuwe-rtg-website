@@ -91,14 +91,19 @@ voornemen, en die staan hieronder ook als zodanig.
 | elke meter is geijkt | een nieuwe meter slaat uit op bekend-foute invoer | **machine** -- keuringsregel 35 + `metersOngeijkt` |
 | geld schrijft via de poort (par. 3) | -- | **geen handhaver.** Kan er pas komen als `TAKEN.md` 7.1 staat: vandaag schrijft `pasToe()` zelf, dus de regel zou op de eerste dag rood zijn op de bron die hij moet beschermen |
 | een ontleder van buitenbytes draagt een budget (par. 6) | -- | **geen handhaver.** Vraagt `FUZZ.json`, dat niet bestaat -- `TAKEN.md` 7.2 |
-| een scherm draagt de foutmelder (par. 4.1) | -- | **geen handhaver.** Vraagt `TAKEN.md` 7.9 |
+| een scherm draagt de foutmelder (par. 4.1) | een nieuw scherm komt met foutmelder bij de browser aan | **machine** -- `test/foutmelder-dekking.test.js`: haalt alle 292 schermen bij een draaiende server op en eist de tag in wat de server VERSTUURT, plus dat de injectie op een plek blijft |
 | een route draagt een invoercontract (par. 2) | -- | **geen handhaver.** Vraagt `TAKEN.md` 7.6 |
 | een ontleder van buitenbytes hangt niet (par. 6) | een nieuwe ontleder wordt op misvormde bytes beproefd | **half.** `test/vijandigerand.test.js` bewaakt de twee gerepareerde ontleders met een tijdsbudget in een kindproces; er is nog geen fuzzer die zelf zoekt -- `TAKEN.md` 7.2 |
 | elk /api-pad draagt een poort (par. 8) | een nieuwe route zonder poort komt er niet door | **machine** -- keuringsregel 28, sinds 2 september HARD over de volle routetabel: 565 paden buiten zijn eigen uitdrukking, alle 565 geclassificeerd, nul zonder poort |
 | autorisatie is toewijsbaar (par. 8) | -- | **geen handhaver.** Een poort HEBBEN is niet hetzelfde als een toewijsbare uitslag geven; van de 716 `OBJECT_SCOPED`-routes dragen er 638 er geen -- `TAKEN.md` 7.14 sloot de eerste helft, de tweede staat open |
 
-Zeven machines en vijf voornemens, en bij elk voornemen staat wat hem in de weg
-staat. De schaduwstand is er niet meer: hij is op 2 september 2026 hard geworden,
+Acht machines en vier voornemens, en bij elk voornemen staat wat hem in de weg
+staat. De foutmelder schoof op 4 september 2026 op: hij was in de praktijk al waar
+(de voordeur spuit hem in élk .html-bestand onder `public/`) en miste alleen een
+handhaver -- en juist die constructie is gevaarlijk, want hij is op EEN plek uit te
+zetten. De toets meet daarom wat de server VERSTUURT en niet wat er op schijf staat:
+een scan over de bestanden zou precies een treffer geven en de andere 291 ten
+onrechte rood noemen. Nagemeten met een mutatie: injectie uit, 292 schermen rood. De schaduwstand is er niet meer: hij is op 2 september 2026 hard geworden,
 en dat is precies wat een schaduw hoort te doen. Die verhouding hoort te verschuiven; zij is zelf de
 voortgangsmaat van dit document. Wat er NIET hoort te gebeuren is dat een
 voornemen stilzwijgend als eis wordt gelezen omdat hij in dezelfde tabel staat.

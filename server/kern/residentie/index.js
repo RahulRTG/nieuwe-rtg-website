@@ -69,6 +69,26 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
     }
   }
   const kamerVan = key => Object.keys(R().kamers).find(id => R().kamers[id].leden[key]) || null;
+
+  /* ---------- LEZEN ZONDER SCHEPPEN ----------
+
+     `R()` materialiseert: hij roept eigen.bak() aan en zet daarna nog `wie` neer.
+     Voor schrijven hoort dat zo; voor OPZOEKEN is het een stille bijwerking, en
+     die is gemeten. STAATPROEF.json zag `/api/residentie/spel/antwoord` keurig
+     404 geven ("er is geen uitnodiging meer") en ondertussen de collectie
+     `residentie` aanleggen -- want de opzoeking loopt via kamerVan() en potjes(),
+     en allebei gaan ze door R().
+
+     Het leespad hoeft niet bedacht te worden: `kijk()` in ../eigencollectie.js
+     is precies dit, met dezelfde eigenaars- en vormcontrole, en afwezig blijft
+     afwezig. Bevroren leegte met opzet: wie erin duwt krijgt een fout in plaats
+     van een wijziging die nergens terechtkomt. */
+  const LEEG = Object.freeze({});
+  const Rlees = () => eigen.kijk('residentie');
+  const kamerVanLees = (key) => {
+    const kamers = Rlees().kamers || LEEG;
+    return Object.keys(kamers).find(id => ((kamers[id] || LEEG).leden || LEEG)[key]) || null;
+  };
   const pub = l => ({ codenaam: l.codenaam, x: l.x, y: l.y, dx: l.dx, dy: l.dy, zit: !!l.zit });
   function staat(id, p) {
     ruimOp(id);
@@ -174,7 +194,8 @@ function maakResidentie({ db, save, schoon, sseToCustomer }) {
   Object.assign(api, require('./suite')({ R, suiteVan, kamer, sein, save, schoon, MEUBELS, ZALEN, SUITE }));
   Object.assign(kop, require('./koppel')({ R, kamer, kamerVan, sein, sseToCustomer, save, zetNeer, zitplek, plattegrond }));
   Object.assign(api, { paarVraag: kop.paarVraag, paarAntwoord: kop.paarAntwoord, paarLos: k => kop.paarLos(k) });
-  Object.assign(api, require('./spel')({ R, kamer, kamerVan, sein, sseToCustomer, save, partnerVan: kop.partnerVan }));
+  Object.assign(api, require('./spel')({ R, Rlees, LEEG, kamer, kamerVan, kamerVanLees,
+    sein, sseToCustomer, save, partnerVan: kop.partnerVan }));
   return { residentie: api };
 }
 

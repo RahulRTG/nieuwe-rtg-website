@@ -10,8 +10,11 @@ const rahul = require('./rahul');
 const vragen = require('./vragen');
 
 module.exports = (ctx) => {
-  const { R, kamer, kamerVan, sein, sseToCustomer, save, partnerVan } = ctx;
+  const { R, Rlees, LEEG, kamer, kamerVan, kamerVanLees, sein, sseToCustomer, save, partnerVan } = ctx;
   const potjes = () => (R().potjes = R().potjes || {});
+  /* De leeskant van potjes(): geen toewijzing, dus een opzoeking die op 404
+     uitloopt laat niets achter. Zie de kop van ./index.js bij kamerVanLees. */
+  const potjesLees = () => Rlees().potjes || LEEG;
   const spelerIn = (id, key) => kamer(id).leden[key];
   const keyOpNaam = (id, codenaam) =>
     Object.keys(kamer(id).leden).find(k => kamer(id).leden[k].codenaam === codenaam) || null;
@@ -44,8 +47,9 @@ module.exports = (ctx) => {
   }
 
   function antwoord(key, body) {
-    const id = kamerVan(key);
-    const p = id && potjes()[id];
+    /* LEZEND opzoeken: hieronder staat een 404, en die hoort niets aan te leggen. */
+    const id = kamerVanLees(key);
+    const p = id && potjesLees()[id];
     if (!p || p.status !== 'wacht' || p.spelers[1].key !== key) return { status: 404, error: 'Er is geen uitnodiging (meer).' };
     if (!(body || {}).ja) {
       delete potjes()[id]; save();
@@ -66,8 +70,8 @@ module.exports = (ctx) => {
   const teamNamen = p => [0, 1].map(t => p.spelers.filter(s => s.team === t).map(s => s.codenaam).join(' & '));
 
   function spelZet(key, body) {
-    const id = kamerVan(key);
-    const p = id && potjes()[id];
+    const id = kamerVanLees(key);
+    const p = id && potjesLees()[id];
     if (!p || p.status !== 'bezig') return { status: 404, error: 'Er loopt hier geen potje.' };
     const S2 = SPELLEN[p.spel];
     const wie = p.spelers[p.beurt % p.spelers.length];
@@ -97,8 +101,8 @@ module.exports = (ctx) => {
   }
 
   function spelStop(key) {
-    const id = kamerVan(key);
-    const p = id && potjes()[id];
+    const id = kamerVanLees(key);
+    const p = id && potjesLees()[id];
     if (!p || !p.spelers.some(s => s.key === key)) return { status: 404, error: 'Er loopt hier geen potje van u.' };
     delete potjes()[id]; save();
     sein(id, 'spel-gestopt', { van: spelerIn(id, key) ? spelerIn(id, key).codenaam : null });

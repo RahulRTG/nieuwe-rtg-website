@@ -187,16 +187,17 @@
     if (nieuw) h.appendChild(css);
   }
 
-  var over = 2, mislukt = false;
+  var over = 3, mislukt = false;
   function afhankelijk(ok) {
     if (!ok) mislukt = true;
     if (--over || mislukt) return;
     script('/shared/rtg-edge-2.js', 'RTGEdge2', function (klaar) {
       if (!klaar || !w.RTGEdge2) return;
-      try { w.RTGEdge2.start(d, w); bewaakVensters(); } catch (fout) {}
+      try { w.RTGEdge2.start(d, w); bewaakVensters(); w.RTGEdgeCommand.koppel(d, w); } catch (fout) {}
     });
   }
   /* Vorm en contextkern downloaden samen; de uitvoerder volgt pas na beide. */
   blad('/shared/rtg-edge-2.css', afhankelijk);
   script('/shared/rtg-edge-2-context.js', 'RTGEdge2Context', afhankelijk);
+  script('/shared/rtg-edge-command.js', 'RTGEdgeCommand', afhankelijk);
 })(window, document);

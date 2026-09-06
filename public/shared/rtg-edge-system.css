@@ -94,6 +94,10 @@ body.rtg-edge-host #osMenuBtn{display:none!important}
    elkaar zeggen twee keer waar je bent. */
 body.rtg-edge-host .os-switcher{display:none!important}
 body.rtg-edge-host .prestatiekop{display:none!important}
+/* Een eigen sticky paginakop blijft onder de enige Edge-bovenbalk. Zonder deze
+   vaste naad schuift zo'n kop bij scrollen onder Edge en komen echte knoppen
+   (zoals Verversen in horeca) precies achter de systeemstatus terecht. */
+body.rtg-edge-host>header:not(.rtg-edge-top){top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important}
 /* DE VIER REISBLADEN WORDEN DE BLADENBALK. Deze regel verborg ze samen met de
    prestatiekop, en dat kon zolang geen enkel reisscherm de schil droeg. Zodra
    reizen.html hem wel draagt, verdwijnt met .hoofdtabs de enige weg naar
@@ -126,14 +130,39 @@ body.rtg-edge-host .hoofdtabs svg{width:16px!important;height:16px!important}/* 
 body.rtg-edge-host .reisapp{padding-left:0!important;display:flex;flex-direction:column}
 body.rtg-edge-host .reisapp>.hoofdtabs{order:-1}body.rtg-edge-host .reisapp>main{padding-bottom:1rem!important}
 body.travel-os.rtg-edge-host{padding-top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important;padding-left:var(--edge-side)!important;padding-bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px) + 1rem)!important}
-body.travel-os.rtg-edge-host>.kop,body.travel-os.rtg-edge-host>header:not(.rtg-edge-top){top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important}
+body.travel-os.rtg-edge-host>.kop{top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important}
 body.travel-os-map.rtg-edge-host #kaart{top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important;left:var(--edge-side)!important;width:calc(100% - var(--edge-side))!important;height:calc(100% - var(--edge-top) - var(--edge-bottom) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))!important}
 body.travel-os-map.rtg-edge-host>main{top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important;left:var(--edge-side)!important;bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px))!important}
+/* Een lokale PDA-bladenbalk blijft een inhoudskeuze, maar mag niet op dezelfde
+   onderste pixels als Edge liggen. Zij rust daarom direct boven de systeemlaag. */
+body.rtg-edge-host .pda-nav{bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px))!important}
 body.rtg-edge-host .lo-shell{position:fixed;inset:calc(var(--edge-top) + env(safe-area-inset-top,0px)) 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) var(--edge-side);height:auto;display:block}.rtg-edge-host .lo-main{height:100%;display:block}.rtg-edge-host .lo-stage{height:100%;padding:0;grid-template-columns:repeat(var(--lo-columns,3),minmax(0,1fr))}.rtg-edge-host .lo-panel{padding-bottom:32px}.rtg-edge-host[data-rtg-layout="1"] .lo-stage{grid-template-columns:1fr}.rtg-edge-host[data-rtg-layout="1"] .lo-panel:not([data-edge-active]){display:none!important}.rtg-edge-host[data-rtg-layout="2"] .lo-stage{grid-template-columns:repeat(2,minmax(0,1fr))}.rtg-edge-host[data-rtg-layout="2"] .lo-panel:nth-of-type(n+3){display:none!important}.rtg-edge-host[data-rtg-layout="4"] .lo-stage{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr))}.rtg-edge-host[data-rtg-layout="4"] .lo-panel{display:block!important}
 /* Partner Network gebruikte 100dvh binnen een body die Edge al boven en onder
    inset. Daardoor schoof zijn echte mobiele rail exact de Edge-hoogte buiten
    het venster. De lokale inhoud vult de overblijvende werkhoogte. */
 body.rtg-edge-host .pn-shell{height:calc(100dvh - var(--edge-top) - var(--edge-bottom) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+/* Command is het lokale werkvlak; Edge is de globale systeemlaag. Op smalle
+   schermen krijgen beide daarom ieder hun eigen, niet-overlappende zone. De
+   Command-dock blijft direct boven Edge bereikbaar en de wereldinhoud begint
+   onder de veilige bovenrand. Tijdelijke modale lagen mogen de volledige
+   viewport weer gebruiken, omdat Edge dan volgens hetzelfde contract wijkt. */
+@media(max-width:999px){
+  body.rtg-edge-host #rtgCommand{
+    inset:calc(var(--edge-top) + env(safe-area-inset-top,0px)) 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) 0!important;
+    padding-top:0!important
+  }
+  body.rtg-edge-host #rtgCommand:not(.rtg-interface-second-screen) .cmd-bank{
+    bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px))!important
+  }
+  body.rtg-edge-host .rtg-laag{
+    inset:calc(var(--edge-top) + env(safe-area-inset-top,0px)) 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) 0!important
+  }
+  /* In Command ontsluit de zichtbare Edge-menuknop dezelfde functies. De
+     losse Sprong-greep zou daar een tweede globaal doel tekenen en precies op
+     de lokale Trust Rail landen. Op gewone ledenschermen blijft hij bestaan. */
+  body.rtg-edge-host.rtg-command .rtgsprong-greep{display:none!important}
+  body.rtg-edge-host[data-rtg-edge-venster-open="true"] .rtg-laag{inset:0!important}
+}
 body.rtg-edge-embed{padding:0!important}body.rtg-edge-embed .tos-topbar,body.rtg-edge-embed .tos-nav,body.rtg-edge-embed .prestatiekop,body.rtg-edge-embed .hoofdtabs{display:none!important}body.rtg-edge-embed .reisapp{padding-left:0!important}body.rtg-edge-embed .reisapp>main{padding-bottom:1rem!important}body.travel-os.rtg-edge-embed{padding:0!important}body.travel-os-map.rtg-edge-embed #kaart{inset:0!important;width:100%!important;height:100%!important}
 body.rtg-edge-embed .lo-rail,body.rtg-edge-embed .lo-top,body.rtg-edge-embed .lo-rahul{display:none!important}body.rtg-edge-embed .lo-shell{height:100dvh;display:block}body.rtg-edge-embed .lo-main{height:100%;display:block}body.rtg-edge-embed .lo-stage{height:100%;display:block;padding:0}body.rtg-edge-embed .lo-panel{display:none!important;height:100%;padding:22px 18px}body.rtg-edge-embed .lo-panel[data-edge-active]{display:block!important}
 /* Een ingebed scherm gebruikt de rand van zijn ouder. Ook eigen vaste koppen,

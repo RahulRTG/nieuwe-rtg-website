@@ -55,6 +55,7 @@ function maakZaakabonnement({ db, save, nu }) {
 
   const eigen = require('../eigencollectie')({ db, domein: 'kern/commercie/zaakabonnement', bezit: { zaakAbonnement: 'kaart' } });
   function alles() { return eigen.bak('zaakAbonnement'); }
+  function leesAlles() { return eigen.kijk('zaakAbonnement'); }
   const sleutel = code => String(code || '').toUpperCase();
 
   /* Het abonnement van een zaak. Geeft ALTIJD een antwoord, met `herkomst`
@@ -62,7 +63,7 @@ function maakZaakabonnement({ db, save, nu }) {
      een terugval die je kunt tellen en een terugval die verdwijnt. */
   function van(code) {
     const c = sleutel(code);
-    const r = alles()[c];
+    const r = leesAlles()[c];
     if (r && ladder.trede(r.pas))
       return { code: c, pas: r.pas, herkomst: 'vastgelegd', sinds: r.sinds, door: r.door || null,
         contractId: r.contractId || null };
@@ -95,13 +96,13 @@ function maakZaakabonnement({ db, save, nu }) {
      houdt. `zaakCodes` komt van de aanroeper omdat deze laag de
      leverancierstabel niet hoort te kennen. */
   function zonderAbonnement(zaakCodes) {
-    const bekend = alles();
+    const bekend = leesAlles();
     const uit = (zaakCodes || []).map(sleutel).filter(c => !bekend[c]);
     return { aantal: uit.length, codes: uit.slice(0, 200), terugval: TERUGVAL };
   }
 
   function lijst() {
-    return Object.entries(alles()).map(([code, r]) => ({ code, ...van(code), sinds: r.sinds }));
+    return Object.entries(leesAlles()).map(([code, r]) => ({ code, ...van(code), sinds: r.sinds }));
   }
 
   return { van, zet, mag, zonderAbonnement, lijst, TERUGVAL };

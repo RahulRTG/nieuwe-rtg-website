@@ -101,15 +101,27 @@ async function toon(page, base, app, achtervoegsel) {
     }, SLEUTELS);
   } catch (e) { /* al doorverwezen; de sleutels stonden er toch niet */ }
   await ga();
+  if (app === 'kantoorpda' || app === 'zorgbalie') {
+    await page.waitForURL(u => u.pathname === '/apps/personeel.html', { timeout: 10000 });
+  }
   /* Deze schermen halen hun gegevens NA het laden op en kunnen onderweg nog
      doorverwijzen; wachten tot het stil is vangt allebei. */
   await wachtOpRust(page);
-  return page.evaluate(() => ({
-    pad: location.pathname + location.search,
-    fragment: location.hash,
-    deur: !!document.querySelector('.rtgdeur'),
-    tekst: document.body.innerText.replace(/\s+/g, ' ').trim()
-  }));
+  const lees = () => page.evaluate(() => ({
+      pad: location.pathname + location.search,
+      fragment: location.hash,
+      deur: !!document.querySelector('.rtgdeur'),
+      tekst: document.body.innerText.replace(/\s+/g, ' ').trim()
+    }));
+  try { return await lees(); }
+  catch (e) {
+    /* Een meta-refresh kan exact tussen de rustmeting en het uitlezen
+       committen. Lees na die ene echte navigatie opnieuw; een tweede fout
+       blijft gewoon rood en maskeert dus geen lus of kapot doelscherm. */
+    if (!/Execution context was destroyed|navigation/i.test(String(e && e.message || e))) throw e;
+    await wachtOpRust(page);
+    return lees();
+  }
 }
 
 async function opstelling() {

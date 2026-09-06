@@ -58,7 +58,8 @@ test('Agenda: maandraster, Rahul plant, uitnodigen op codenaam, ja zeggen en ICS
     /* ---- A: het paneel, met herhaling en plek ---- */
     await page.waitForSelector('body[data-rtg-edge-2-rendered="true"]', { timeout: 8000 });
     const hoofdactie = '.rtg-edge-action > button:not(.rtg-edge-2-context-button)';
-    assert.equal(await page.textContent(hoofdactie), 'Nieuwe afspraak',
+    const zichtbareHoofdactie = hoofdactie + ' [data-rtg-action-copy-for="idle"][aria-hidden="false"]';
+    assert.equal(await page.textContent(zichtbareHoofdactie), 'Nieuwe afspraak',
       'de enige onderrand biedt de echte Agenda-hoofdactie aan');
     await page.click(hoofdactie);
     await page.waitForSelector('#afScrim.open', { timeout: 5000 });

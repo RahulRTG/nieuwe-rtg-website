@@ -12,10 +12,10 @@
 const BEV = require('../bevoegdheid');
 
 module.exports = (ctx) => {
-  const { d, save } = ctx;
+  const { d, kijk, save } = ctx;
 
-  const vergunning = () => (d().vergunning ? { ...d().vergunning } : null);
-  const partnerRails = () => ({ ...d().partnerRails });
+  const vergunning = () => (kijk().vergunning ? { ...kijk().vergunning } : null);
+  const partnerRails = () => ({ ...kijk().partnerRails });
 
   /* De vergunning vastleggen. Dit is een REGISTRATIE en geen besluit: hier komt
      te staan wat er in werkelijkheid is afgegeven, zodat kern/bevoegdheid.js
@@ -71,7 +71,7 @@ module.exports = (ctx) => {
      `open` is de standaard, want dat is wat er is besloten (24 augustus 2026)
      en de lijst hoort te beschrijven wat er is en niet wat lichter uitkomt. */
   const TERUGSTORTSTANDEN = ['gesloten', 'open'];
-  const terugstorting = () => (TERUGSTORTSTANDEN.includes(d().terugstorting) ? d().terugstorting : 'open');
+  const terugstorting = () => (TERUGSTORTSTANDEN.includes(kijk().terugstorting) ? kijk().terugstorting : 'open');
   function terugstortingZet({ stand, wie }) {
     if (!TERUGSTORTSTANDEN.includes(stand))
       return { status: 400, error: 'Kies ' + TERUGSTORTSTANDEN.join(' of ') + '.' };

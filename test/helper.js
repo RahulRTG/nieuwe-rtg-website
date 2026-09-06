@@ -200,6 +200,16 @@ async function startEens(opts) {
   // geladen is (belangrijk in Postgres-modus), en een test die meteen na
   // "gezond" een API aanroept zou daarop stranden.
   const wachtPad = opts.wachtPad || '/api/ready';
+  /* Een PostgreSQL-server luistert al terwijl de gedeelde projecties nog
+     worden geladen. In die stand is /health bewust groen en /ready bewust
+     rood. De oude vaste vijf seconden hieronder waren op een volle CI-run te
+     kort en gaven vervolgens de eerste productcall een willekeurige 503.
+     Alleen PG vraagt daarom de volledige, reeds begrensde opstartlus af; voor
+     lokale fixtures blijft het historische helpergedrag intact. */
+  const wachtOpPg = Boolean(
+    (opts.env && (opts.env.DATABASE_URL || opts.env.PG_URL)) ||
+    process.env.DATABASE_URL || process.env.PG_URL
+  );
   /* HOE LANG WACHTEN WE, EN WAT ZEGGEN WE ALS HET NIET LUKT.
 
      Deze grens is al twee keer opgehoogd (15s -> 25s) en werd allebei de keren
@@ -220,7 +230,7 @@ async function startEens(opts) {
      lang is er gewacht, en hoe zwaar stond de machine. Een levend kind plus een
      hoge belasting is drukte; een gestopt kind is een echt defect. Dat verschil
      hoort in de melding te staan en niet in het hoofd van wie hem leest. */
-  const { druk, extra } = opstartGeduld();
+  const { druk, kernen, extra } = opstartGeduld();
   const pogingen = opts.pogingen || 250 * extra;
   const gestart = Date.now();
   const port = await vrijePoort();
@@ -297,6 +307,16 @@ async function startEens(opts) {
         if (d.pid === child.pid) {
           // echt onze server; eventueel nog even wachten op het gevraagde pad
           if (wachtPad !== '/api/health') {
+            /* PostgreSQL blijft binnen de ENE opstartgrens hierboven pollen.
+               Hier geen tweede lus van vijf seconden nesten: bij een echte
+               blokkade zou 500 buitenpogingen anders ruim veertig minuten
+               kunnen duren in plaats van de bedoelde, belastingsgeschaalde
+               grens. */
+            if (wachtOpPg) {
+              const w = await fetch(base + wachtPad, { headers: { 'X-Forwarded-Proto': 'https' } }).catch(() => null);
+              if (!w || !w.ok) { await new Promise(r2 => setTimeout(r2, 100)); continue; }
+              return { child, base, port };
+            }
             for (let j = 0; j < 50; j++) {
               const w = await fetch(base + wachtPad, { headers: { 'X-Forwarded-Proto': 'https' } }).catch(() => null);
               if (w && w.ok) break;
@@ -1273,10 +1293,20 @@ function drukte() {
    raakt, en dus pas in CI. Vandaar hier, waar gedeeld gereedschap hoort. */
 async function bankDeur(page, naam, opties) {
   const ms = (opties && opties.timeout) || 15000;
-  await page.waitForSelector('#rtgCommand', { state: 'visible', timeout: 10000 });
+  /* Tijdens login wordt de gesloten Command-root door de echte werktafel
+     vervangen. Een kort zichtbare gesloten root is nog geen bedienbare deur. */
+  await page.waitForSelector('#rtgCommand[data-stand="open"]', { state: 'visible', timeout: 10000 });
   const lade = page.locator('#rtgCommand .cmd-lade');
-  if (await lade.isVisible()) {
-    await lade.click();
+  const mobielDicht = await page.evaluate(() => matchMedia('(max-width:999px)').matches &&
+    !document.getElementById('rtgCommand').classList.contains('bank-open'));
+  if (mobielDicht) {
+    /* Met Edge is zijn zichtbare menuknop de enige eigenaar van dezelfde lade.
+       Zonder Edge (of vóór de opt-in) blijft de oorspronkelijke greep de weg. */
+    await page.waitForFunction(() => !document.querySelector('.rtg-edge-menu') ||
+      document.querySelector('.rtg-edge-menu[data-rtg-command-brug="true"]'), null,
+    { timeout: 5000 }).catch(() => {});
+    const edge = page.locator('.rtg-edge-menu[data-rtg-command-brug="true"]');
+    if (await edge.isVisible()) await edge.click(); else await lade.click();
     await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
   }
   await page.waitForFunction((n) => [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')]

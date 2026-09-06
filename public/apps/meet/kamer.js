@@ -163,6 +163,7 @@
       var vak = $('#tegels'); if (vak && vak.parentNode) vak.parentNode.insertBefore(mee.el, vak.nextSibling);
     }
     $('#lobby').style.display = 'none';
+    $('#kamer').hidden = false;
     $('#kamer').style.display = 'flex';
     $('#tegels').innerHTML = '';
     /* Een trage toestemmingsvraag mag de kamer niet op een leeg scherm laten
@@ -199,6 +200,7 @@
     if (kamer) api('verlaat', { id: kamer.id }).catch(function () {});
     kamer = null; deelcode = null;
     $('#kamer').style.display = 'none';
+    $('#kamer').hidden = true;
     $('#lobby').style.display = '';
     if (opWeg) opWeg();
   }

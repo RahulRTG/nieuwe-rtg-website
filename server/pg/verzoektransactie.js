@@ -9,6 +9,7 @@
 
 const { KANAAL } = require('./schrijflanen');
 const { voegVeilig } = require('./verzoekmerge');
+const { voegBijzonderSamen } = require('./verzoekbijzonder');
 
 module.exports = (ctx) => {
   const { pool, uitStore, naarStore, toegepast, laatsteJson,
@@ -39,7 +40,11 @@ module.exports = (ctx) => {
     }
     if (!dbBestaat && w.basisBestaat)
       throw fout('PG_REQUEST_DRIFT', 'De lokale collectie ontbreekt in PostgreSQL; herstel is vereist.');
-    const waarde = dbBestaat ? voegVeilig(basis, ons, hun, w.sleutel) : ons;
+    const bijzonder = !dbBestaat ? null
+      : voegBijzonderSamen(w.sleutel, basis, ons, hun);
+    const waarde = bijzonder === null
+      ? (dbBestaat ? voegVeilig(basis, ons, hun, w.sleutel) : ons)
+      : bijzonder;
     return { bestaat: true, waarde, dbJson: JSON.stringify(waarde) };
   }
 

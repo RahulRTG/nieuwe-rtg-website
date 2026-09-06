@@ -177,9 +177,18 @@
     d.addEventListener('pointerdown', function (e) {
       if (e.pointerType === 'mouse' && e.button !== 0) return;
       gedaan = false;
-      if (e.clientY <= RAND) { bezig = 'boven'; y0 = e.clientY; }
+      if (e.clientY <= RAND) {
+        bezig = 'boven'; y0 = e.clientY;
+        /* Edge draagt echte links in de bovenrand. Pointer capture houdt de
+           haal bij ons wanneer de aanwijzer zo'n link verlaat. */
+        try { e.target.setPointerCapture(e.pointerId); } catch (fout) {}
+      }
       else bezig = null;
-    }, { passive: true });
+    }, { capture: true, passive: true });
+
+    d.addEventListener('dragstart', function (e) {
+      if (bezig === 'boven') e.preventDefault();
+    }, true);
 
     var stop = function () {
       hBoven.classList.remove('aan'); hBoven.style.width = '44px';

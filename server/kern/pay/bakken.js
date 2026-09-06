@@ -23,6 +23,12 @@
 module.exports = ({ db, crypto }) => {
   const d = () => db.data;
 
+  const kaart = naam => {
+    const v = d()[naam];
+    return v && typeof v === 'object' && !Array.isArray(v) ? v : {};
+  };
+  const lijst = naam => Array.isArray(d()[naam]) ? d()[naam] : [];
+
   function saldi() { if (!d().paySaldi || typeof d().paySaldi !== 'object') d().paySaldi = {}; return d().paySaldi; }
   function grootboek() { if (!Array.isArray(d().payBoekingen)) d().payBoekingen = []; return d().payBoekingen; }
   function klompjes() { if (!Array.isArray(d().payVerzoeken)) d().payVerzoeken = []; return d().payVerzoeken; }
@@ -31,8 +37,12 @@ module.exports = ({ db, crypto }) => {
 
   const rekLid = c => 'lid:' + c;
   const rekPartner = c => 'partner:' + c;
-  const saldoVan = rek => Math.round(saldi()[rek] || 0);
+  const saldiKijk = () => kaart('paySaldi');
+  const grootboekKijk = () => lijst('payBoekingen');
+  const klompjesKijk = () => lijst('payVerzoeken');
+  const saldoVan = rek => Math.round(saldiKijk()[rek] || 0);
   const id = p => (p || 'P') + crypto.randomBytes(5).toString('hex').toUpperCase();
 
-  return { d, saldi, grootboek, klompjes, kascodes, tikcodes, rekLid, rekPartner, saldoVan, id };
+  return { d, saldi, grootboek, klompjes, kascodes, tikcodes,
+    saldiKijk, grootboekKijk, klompjesKijk, rekLid, rekPartner, saldoVan, id };
 };

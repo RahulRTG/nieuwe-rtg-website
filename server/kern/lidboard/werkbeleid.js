@@ -65,11 +65,14 @@ function maakWerkbeleid({ db, save }) {
   function store() {
     return eigen.bak('werkbeleid');
   }
+  function leesStore() {
+    return eigen.kijk('werkbeleid');
+  }
   const norm = code => String(code || '').toUpperCase();
 
   /* Het beleid van EEN zaak: de functies die dicht staan. */
   function beleid(zaakcode) {
-    const b = store()[norm(zaakcode)];
+    const b = leesStore()[norm(zaakcode)];
     const uit = (b && Array.isArray(b.uit)) ? b.uit.filter(id => OP_ID[id] && !OP_ID[id].vast) : [];
     return { uit, at: (b && b.at) || null, door: (b && b.door) || null };
   }
@@ -101,7 +104,7 @@ function maakWerkbeleid({ db, save }) {
      beleid hem dichtzet. Zo is het een lijst om te bedienen, geen rijtje id's. */
   function overzicht(zaakcode) {
     const dicht = new Set(beleid(zaakcode).uit);
-    const b = store()[norm(zaakcode)] || {};
+    const b = leesStore()[norm(zaakcode)] || {};
     return {
       gewijzigd: b.at || null,
       door: b.door || null,

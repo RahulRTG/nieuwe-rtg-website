@@ -132,14 +132,20 @@ test('Edge 2 downloadt vorm en context parallel, dedupliceert en commit als laat
   o.draai(EDGE2);
   assert.equal(o.voor('/shared/rtg-edge-2.css').length, 1);
   assert.equal(o.voor('/shared/rtg-edge-2-context.js').length, 1);
+  assert.equal(o.voor('/shared/rtg-edge-command.js').length, 1);
   assert.equal(o.voor('/shared/rtg-edge-2.js').length, 0);
 
   o.window.RTGEdge2Context = {};
   context.emit('load');
-  assert.equal(o.voor('/shared/rtg-edge-2.js').length, 1, 'CSS was al gereed; context ontsluit de uitvoerder');
+  assert.equal(o.voor('/shared/rtg-edge-2.js').length, 0, 'de Command-brug hoort bij dezelfde complete laadgolf');
+  let gekoppeld = 0;
+  o.window.RTGEdgeCommand = { koppel() { gekoppeld++; } };
+  o.voor('/shared/rtg-edge-command.js')[0].emit('load');
+  assert.equal(o.voor('/shared/rtg-edge-2.js').length, 1, 'alle drie kernen ontsluiten samen de uitvoerder');
   o.window.RTGEdge2 = { start() { gestart++; } };
   o.voor('/shared/rtg-edge-2.js')[0].emit('load');
   assert.equal(gestart, 1);
+  assert.equal(gekoppeld, 1);
   const aantal = o.knopen.length;
   o.draai(EDGE2);
   assert.equal(o.knopen.length, aantal);
@@ -152,9 +158,12 @@ test('een Edge 2-bronfout behoudt Edge 1 en start geen halve verrijking', () => 
   assert.equal(o.voor('/shared/rtg-edge-2.css').length, 1);
   assert.equal(o.voor('/shared/rtg-edge-2-context.js').length, 1,
     'vorm en context zijn in dezelfde laadgolf aangelegd');
+  assert.equal(o.voor('/shared/rtg-edge-command.js').length, 1);
   o.voor('/shared/rtg-edge-2.css')[0].emit('error');
   o.window.RTGEdge2Context = {};
   o.voor('/shared/rtg-edge-2-context.js')[0].emit('load');
+  o.window.RTGEdgeCommand = { koppel() {} };
+  o.voor('/shared/rtg-edge-command.js')[0].emit('load');
   assert.equal(o.voor('/shared/rtg-edge-2.js').length, 0);
   assert.equal(o.body.hasAttribute('data-rtg-edge-2-rendered'), false);
 });

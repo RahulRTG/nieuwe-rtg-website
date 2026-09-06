@@ -87,7 +87,8 @@ test('Tap, Search en Rahul kunnen dezelfde gebrokerde agenda-intentie veilig geb
   const boot = await post('/api/experience/bootstrap', { world: 'work' }, token);
   const definition = boot.body.intents.find(i => i.id === 'schedule.item.create');
   assert.ok(definition, 'schedule.item.create ontbreekt in het serverregister');
-  const parameters = { title: 'Golden path overleg', date: '2026-09-05', time: '10:15',
+  const morgen = new Date(Date.now() + 864e5).toISOString().slice(0, 10);
+  const parameters = { title: 'Golden path overleg', date: morgen, time: '10:15',
     note: 'Via de gedeelde intentlaag' };
 
   const fout = await post('/api/experience/intent/preview', {

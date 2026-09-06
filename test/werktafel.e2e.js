@@ -119,6 +119,8 @@ const stand = () => {
     // de schilbalk: de bank, waar je bent, en weg hier
     balk: (() => { const b = document.querySelector('.cmd-balk');
       return b ? Math.round(b.getBoundingClientRect().height) : null; })(),
+    edgeOnder: (() => { const b = document.querySelector('.rtg-edge-bottom');
+      return b ? Math.round(b.getBoundingClientRect().height) : null; })(),
     chips: [...document.querySelectorAll('.cmd-balkblad')]
       .map(x => x.textContent + (x.classList.contains('actief') ? '*' : '')),
     sluitknop: (() => { const k = document.querySelector('.cmd-balksluit'); return !!k && !k.hidden; })(),
@@ -291,12 +293,15 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
        glasconsole, die al niet zichtbaar is -- lege ruimte in de haarlijnkleur,
        zichtbaar als een grijze balk. De greep ligt nu IN de onderbalk van de
        wereld, op dezelfde hoogte als de iconen daar. */
-    /* De schilbalk is op een telefoon het enige wat de schil laat zien: de wereld
-       begint bovenaan, en onder het blad staat precies die balk -- geen gat, geen
-       overlap, en geen tweede navigatielaag boven de kop van de wereld zelf. */
-    assert.equal(smalBlad.bladVanaf, 0, 'de wereld hoort bovenaan te beginnen; daar hoort geen schil-chroom meer');
+    /* Edge is ook op een telefoon de ene globale schil: 44px context bovenaan
+       en de globale bediening onderaan. Command voegt daar direct boven één
+       lokale bladstrook aan toe. Het werkblad eindigt dus exact boven beide
+       betekenisvolle rijen, zonder leeg inset of overlap. */
+    assert.equal(smalBlad.bladVanaf, 44, 'de wereld hoort direct onder de enige Edge-bovenbalk te beginnen');
     assert.equal(smalBlad.balk, 48, 'de schilbalk hoort 48px te zijn, kreeg ' + smalBlad.balk);
-    assert.equal(smalBlad.bladTotOnder, 48, 'en het blad hoort er precies op te eindigen');
+    assert.equal(smalBlad.edgeOnder, 48, 'de globale Edge-onderrand hoort 48px te zijn');
+    assert.equal(smalBlad.bladTotOnder, smalBlad.balk + smalBlad.edgeOnder,
+      'het blad hoort direct boven de lokale bladstrook en globale Edge-onderrand te eindigen');
     assert.deepEqual(smalBlad.chips, ['Vandaag*'], 'de balk hoort te tonen waar je bent');
     assert.equal(smalBlad.sluitknop, true, 'met een weg-hier ernaast');
 
@@ -306,7 +311,10 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
        ook een vierde wereld bij gekomen. Wat de bewering doet is onveranderd:
        de LADE en de RAIL horen hetzelfde aanbod te dragen, want anders krijgt
        een telefoon minder deuren dan een computer. */
-    await page.click('.cmd-lade');
+    const bankKnop = await page.$('.rtg-edge-menu[data-rtg-command-brug="true"]')
+      ? '.rtg-edge-menu[data-rtg-command-brug="true"]'
+      : '.cmd-lade';
+    await page.click(bankKnop);
     /* `inBeeld` is de echte vraag en niet display:none -- de bank SCHUIFT, dus
        we wachten tot hij werkelijk in beeld staat, met dezelfde meting die de
        bewering hieronder gebruikt. */

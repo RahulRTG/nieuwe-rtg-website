@@ -188,8 +188,12 @@ async function werelden(page) {
 async function openLade(page) {
   if (await page.evaluate(() => !!document.querySelector('#rtgCommand.bank-open'))) return;
   const lade = page.locator('#rtgCommand .cmd-lade');
-  if (!(await lade.isVisible())) return;      // breed scherm: de bank staat vast
-  await lade.click();
+  if (!(await page.evaluate(() => matchMedia('(max-width:999px)').matches))) return; // breed: vaste rail
+  await page.waitForFunction(() => !document.querySelector('.rtg-edge-menu') ||
+    document.querySelector('.rtg-edge-menu[data-rtg-command-brug="true"]'), null,
+  { timeout: 5000 }).catch(() => {});
+  const edge = page.locator('.rtg-edge-menu[data-rtg-command-brug="true"]');
+  if (await edge.isVisible()) await edge.click(); else await lade.click();
   await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
 }
 
@@ -1185,7 +1189,9 @@ test('RTG Second Screen groeit van Peek naar Focus zonder tweede navigatie',
     await page.click('#rtgCommand [data-ss-action="close"]');
     await page.waitForFunction(() => {
       const r = document.getElementById('rtgCommand');
-      return r.dataset.rtgSecondScreen === 'peek' && document.activeElement === r.querySelector('.cmd-lade');
+      const deur = document.querySelector('.rtg-edge-menu[data-rtg-command-owner="true"]') ||
+        r.querySelector('.cmd-lade');
+      return r.dataset.rtgSecondScreen === 'peek' && document.activeElement === deur;
     });
 
     /* Een Living Module gebruikt dezelfde Command-ingang. Hij sluit het paneel

@@ -1283,7 +1283,17 @@ meetbaar, en vermenigvuldigen met een verzonnen getal is erger dan het weglaten)
 Par. 3.5 draagt het duurste getal: **van de 115 AI-schrijfpaden hebben er 91 geen
 bekende terugweg**, dus de formule uit punt 11 (autonomie = impact x onzekerheid
 x reversibility) is voor 79% niet uit te rekenen -- en `HERSTELPROEF.json` toont
-dat het instrument bestaat en er 46 werelden ontbreken, geen motor. De maatstaf
+dat het instrument bestaat en er 46 werelden ontbreken, geen motor. Dat getal
+KAN niet schuiven: die 91 hebben geen tegenhanger om te beproeven (`HERSTEL.json`
+leidt kandidaten af uit de NAAM van een route), dus er is niets gedraaid dat
+anders had kunnen uitvallen. **Par. 3.5a is wel verplichte kost voordat je de
+herstelproef gebruikt**: het ingecheckte `HERSTELPROEF.json` reproduceert niet op
+een andere machine (twee rondes op ongewijzigde main zijn onderling identiek maar
+wijken allebei met dezelfde vijf paren af, dus de juiste nulstand is een VERSE
+ronde op de basisbranch), en alle negentig paren delen EEN wegwerpserver -- dus
+elke wijziging die ergens schrijft verschuift wat `exact` betekent voor latere
+paren. `exact` is daar een BROZE graad; `wereldOntbreekt` wordt beslist voordat
+er een server draait en kan nooit schuiven. De maatstaf
 in par. 6 is daarom niet "wanneer heeft RTG een Intelligence Layer" maar
 **wanneer kan RTG van een zelfstandige handeling vooraf zeggen wat er verandert,
 achteraf bewijzen dat het gebeurd is, en hem terugdraaien als het misging** --

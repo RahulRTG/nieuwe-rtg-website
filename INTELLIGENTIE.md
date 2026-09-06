@@ -82,7 +82,7 @@ omkeerbaar. Er is geen vierde wereld: het kantoor (`office`) is geen rol in
 | `VERTROUWEN.json` | 0 bewezen, 0 geschorst, 4716 verzwakt, 22 ongemeten | de bewijspoort sluit alleen op `geschorst` en er zijn er nul: **proof-aware routing filtert vandaag niets** |
 | gevolgvoorspelling | over de 176: 35 gemeten, 48 geen-effect-gemeten, **93 onbekend** | voor 53% van zijn handelingen kan het stuur niet zeggen wát er verandert |
 | herhaalbaarheid | over de 176: 57 beschermd, **119 ongemeten** | voor tweederde is niet bekend wat een tweede aanroep doet |
-| herstel | over de 115 AI-**schrijfpaden**: 4 exact, 18 compensatie, 2 wereld ontbreekt, **91 geen terugweg bekend** | zie par. 3.5 — dit is het duurste getal in dit document |
+| herstel | over de 115 AI-**schrijfpaden**: 4 exact, 17–18 compensatie, 2 wereld ontbreekt, 1 niet beproefd, **91 zonder enige tegenhanger** | zie par. 3.5 — dit is het duurste getal in dit document, en het enige dat niet kan schuiven |
 
 `HERSTEL.json` staat huisbreed op 1,1% dekking (47 vermoede tegenhangers over
 4643 routes), en niets daarvan komt boven de graad `vermoed` uit een naam.
@@ -269,6 +269,47 @@ formule is vandaag voor de meeste paden niet uit te rekenen:
 zijn er 22 — 4 `exact` en 18 `compensatie` — plus 2 waarvoor de proef de wereld
 niet kon opzetten.
 
+**En dit getal kan niet schuiven, wat er ook met het instrument gebeurt.** Die
+91 hebben namelijk geen tegenhanger *om* te beproeven: `HERSTEL.json` leidt
+kandidaat-paren af uit de NAAM van een route (`/bewaar` tegenover `/verwijder`),
+en voor deze 91 levert dat er geen. Er is dus niets gedraaid dat anders had
+kunnen uitvallen. Alleen de 24 paden die wél een tegenhanger hebben, worden echt
+beproefd, en daar zit de beweging: 21 of 22 bewezen, afhankelijk van de
+omgeving (zie 3.5a).
+
+| | ingecheckt register | herdraaid op een andere machine |
+|---|---|---|
+| bewezen terugweg | 22 | 21 |
+| geen bekende terugweg | 93 | 94 |
+| volledig bewijsbaar (par. 6) | **7** | **7** |
+
+### 3.5a Twee eigenschappen van de herstelproef die je moet kennen
+
+Bewijsgraad van alles wat uit `HERSTELPROEF.json` komt: **gemeten**, met een
+spreiding van één paar, en met twee voorbehouden die op 6 september 2026 zijn
+vastgesteld door de proef meerdere keren te draaien.
+
+**Het ingecheckte register reproduceert niet op een andere machine.** Twee
+rondes op ongewijzigde `main` zijn onderling identiek — nul verschillen over
+negentig paren, dus de proef is deterministisch — maar wijken allebei met
+dezelfde vijf paren van het ingecheckte bestand af (`/api/meet/kom`,
+`/api/meet/verlaat`, `/api/meet/weg`, `/api/samen/maak`, `/api/samen/weg`). Wie
+zijn eigen ronde tegen het ingecheckte bestand legt, ziet vijf spookverschillen.
+De juiste nulstand is een **verse ronde op de basisbranch, op dezelfde machine**.
+
+**Alle negentig paren delen één wegwerpserver.** Een wijziging die ergens
+schrijft verschuift daarmee de voorgeschiedenis van de opslag, en dus wat
+`exact` betekent voor latere paren — ook voor routes die niets met die
+wijziging te maken hebben. **`exact` is hier een broze graad.**
+`wereldOntbreekt` daarentegen wordt beslist voordat er een server draait en kan
+per constructie nooit schuiven; dat is de reden dat par. 3.2 en de opzoeking uit
+Fase 0 wél hard zijn.
+
+Beide staan uitgeschreven in `scripts/herstelproef.js` op de plek waar ze
+bijten, want ze hebben tijdens Fase 0 drie meetrondes gekost: een werkende
+wijziging is teruggetrokken op grond van vijf "regressies" die achteraf
+spookverschillen bleken.
+
 *Pad of paar:* het stuur kent 176 (rol, pad)-paren over 173 unieke paden; de
 schrijfkant is 118 paren over 115 paden. Waar dit document over herstel en
 gevolg spreekt telt het **paden**, want een terugweg is een eigenschap van de
@@ -433,5 +474,9 @@ drievoudige EN met drie noembare bronnen, en zodra één ervan zakt, zakt het
 paar eruit met de reden erbij.
 
 *Nagerekend op 6 september 2026 uit `EXECUTION_MAP.json`, `HERSTELPROEF.json` en
-`kern/stuur/gevolg.js`. De eerste versie van deze paragraaf beweerde 4 zonder te
+`kern/stuur/gevolg.js`. **Deze teller is stabiel**: hij komt op 7 uit met het
+ingecheckte register én met een verse ronde op een andere machine, terwijl de
+onderliggende uitslagen daartussen op vijf paren verschillen (par. 3.5a). Dat is
+geen toeval maar de drievoudige EN: een paar dat op één van de drie assen zakt,
+valt eruit, en de paren die alle drie halen zitten er ruim in. De eerste versie van deze paragraaf beweerde 4 zonder te
 rekenen; dat is precies de fout waar LAT.md regel 6 over gaat, en het getal is 7.*

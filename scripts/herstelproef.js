@@ -213,6 +213,27 @@ async function beproefPaar(srv, token, paar) {
      Let op wat dit NIET is: de voorbereiding staat VOOR de opwarmronde en voor
      de meting. Wat zij aanricht zit dus in de nulstand en niet in de uitslag. */
   let uitVoorbereiding = {};
+
+  /* EERST DE OPZOEKING, want zonder haar heeft de voorbereiding geen onderwerp.
+     Een opzoeking MAAKT niets (zie scripts/lib/herstelwereld.js par. 2c): zij
+     haalt op welke salon, welke behandeling en welk vrij uur er in DEZE
+     database staan. Dat moet voor de tegenhanger draaien, want die is hier de
+     voorbereiding -- /api/verzorging/annuleer laat eerst /api/verzorging/boek
+     lopen, en die kan zonder salon niets boeken.
+
+     Beide richtingen worden opgezocht en niet alleen de heenweg: bij het paar
+     boek <-> annuleer is de boekroute de ene keer heen en de andere keer terug,
+     en zij heeft haar velden in allebei de rollen nodig.
+
+     Levert een opzoeking niets op, dan wordt er niets toegevoegd en faalt de
+     heenweg gewoon -- `nietBeproefd`, en geen verzonnen tweede kandidaat. */
+  for (const pad of [paar.terug, paar.heen]) {
+    const zoek = wereld.opzoekingVoor(pad);
+    if (!zoek) continue;
+    const uit = await zoek({ roep: (p, lijf) => roep(srv.basis, p, token, lijf) }).catch(() => null);
+    if (uit) uitVoorbereiding = Object.assign({}, uitVoorbereiding, uit);
+  }
+
   const voorbereid = async () => {
     const voorRonde = opslagBeeld(srv.datamap);
     /* EERST DE TEGENHANGER, DAN DE VOORZIENING, en die volgorde is een
@@ -220,7 +241,10 @@ async function beproefPaar(srv, token, paar) {
        tegenhanger (/verwijder) hem meteen weer weg -- waarna de heenweg
        (/bewaar) niets te bewaren had. Wat de heenweg nodig heeft, moet als
        LAATSTE zijn ontstaan. */
-    const rTerug = await roep(srv.basis, paar.terug, token, lijfVoor(paar.terug));
+    /* De opzoeking reist mee naar de tegenhanger. Zonder dit kreeg
+       /api/verzorging/boek als VOORBEREIDING geen salon en boekte hij niets,
+       waarna de heenweg (/annuleer) niets te annuleren had. */
+    const rTerug = await roep(srv.basis, paar.terug, token, lijfVoor(paar.terug, uitVoorbereiding));
     let uit = sleutelsUit(rTerug.data);
     /* Dan het DING dat de heenweg nodig heeft en dat de tegenhanger niet maakt:
        publiceren vraagt een website, een pas sluiten vraagt een pas. Een keten
@@ -249,8 +273,25 @@ async function beproefPaar(srv, token, paar) {
      De opwarmronde laat de collectie ontstaan; pas daarna begint de meting. */
   const heenLijf = () => lijfVoor(paar.heen, uitVoorbereiding);
   const voorOpwarming = opslagBeeld(srv.datamap);
-  await roep(srv.basis, paar.heen, token, heenLijf());
+  const opwarm = await roep(srv.basis, paar.heen, token, heenLijf());
   await stilBeeld(srv.datamap, voorOpwarming);
+  /* WAT DE OPWARMRONDE MAAKTE, MOET DE VOORBEREIDING KUNNEN OPRUIMEN -- en dat
+     kon zij niet, want het antwoord van deze oproep werd nergens bewaard. De
+     `voorbereid()` hieronder draait de tegenhanger met een lijf dat het
+     onderwerp niet aanwijst (een annulering zonder ref, een verwijdering zonder
+     id): 404, en wat de opwarming maakte bleef staan.
+
+     Bij de meeste paren viel dat niet op, omdat de heenweg een tweede keer
+     gewoon iets nieuws maakt. Het valt wel op zodra het onderwerp SCHAARS is:
+     /api/care/boek bezet een behandelaar op een tijdslot, dus de meetronde
+     kreeg 409 "Dat tijdslot is al bezet" -- van zijn eigen opwarmronde. Dat las
+     als `nietBeproefd` en dus als een eigenschap van het paar, terwijl het een
+     restant van de proef was. /api/verzorging/boek ontsnapte er alleen aan
+     doordat een salon meer dan een stoel heeft.
+
+     De sleutels van de opwarming reizen daarom mee. Zij WIJZEN alleen aan; wat
+     de tegenhanger ermee doet blijft aan de tegenhanger. */
+  uitVoorbereiding = Object.assign({}, uitVoorbereiding, sleutelsUit(opwarm.data));
   /* NOG EEN KEER, want de opwarmronde heeft het onderwerp opgebruikt: bij een
      verwijder -> maak-paar staat er na de opwarming weer niets. De nulstand
      hoort de wereld te zijn waarin de heenweg IETS kan doen. */
@@ -325,6 +366,9 @@ async function main() {
     catch (e) { return null; }
   })();
   let paren = parenUit(register, rollenUit(idemproef));
+  /* Zet een deelronde haar eigen naam, zodat het REGISTER weet dat hij niet
+     over alles ging -- zie de schrijfstap onderaan. */
+  let deelronde = null;
   const i = process.argv.indexOf('--pad');
   if (i >= 0 && process.argv[i + 1]) {
     /* Een voorvoegsel mag: --pad /api/agenda beproeft alle agendaparen, en dat
@@ -332,6 +376,7 @@ async function main() {
        niet -- dan zit het verschil in wat een ander paar achterliet. */
     const wens = process.argv[i + 1];
     paren = paren.filter(p => p.heen === wens || p.heen.startsWith(wens + '/'));
+    deelronde = wens;
   }
   console.log('DE HERSTELPROEF\n');
   console.log('  ' + paren.length + ' vermoed(e) paren, uitgevoerd tegen een wegwerpserver\n');
@@ -449,11 +494,30 @@ async function main() {
     ]
   };
   Object.assign(uit, { stempel: stempel() });
-  fs.writeFileSync(path.join(WORTEL, 'HERSTELPROEF.json'), JSON.stringify(uit, null, 1) + '\n');
+  /* EEN DEELRONDE SCHRIJFT HET REGISTER NIET, en dat is een reparatie met een
+     eigen litteken: `--pad /api/verzorging` overschreef HERSTELPROEF.json met
+     TWEE paren, en het bestand zag er daarna volkomen normaal uit -- alleen
+     ging het niet meer over negentig paren maar over twee. Dat is precies de
+     stille versmalling waar dit huis elders regels tegen heeft: een register
+     dat smaller wordt zonder het te zeggen, is gevaarlijker dan een dat
+     ontbreekt, want niemand controleert een bestand dat er goed uitziet.
+
+     Samenvoegen met de vorige uitslag is met opzet OOK niet de uitweg: dan
+     staan er rijen naast elkaar die op verschillende commits zijn gemeten, en
+     CODE.md par. 0.3 zegt dat een verschil tussen twee metingen van
+     verschillende leeftijd een leeftijdsverschil is en geen bevinding. Een
+     deelronde is een DIAGNOSE en geen meting van het geheel; zij hoort op het
+     scherm en niet in het register. */
+  if (deelronde) {
+    console.log('\n  Deelronde (--pad ' + deelronde + '): HERSTELPROEF.json is NIET geschreven.');
+    console.log('  Een deelronde meet niet het geheel; draai `npm run herstelproef` zonder --pad om het register bij te werken.');
+  } else {
+    fs.writeFileSync(path.join(WORTEL, 'HERSTELPROEF.json'), JSON.stringify(uit, null, 1) + '\n');
+  }
   console.log('\n  exact ' + tel('exact') + ' | compensatie ' + tel('compensatie') +
     ' | geen-herstel ' + tel('geen-herstel') + ' | niet beproefd ' + tel('nietBeproefd') +
     ' | andere wereld nodig ' + tel('wereldOntbreekt'));
-  console.log('\nHERSTELPROEF.json geschreven.');
+  if (!deelronde) console.log('\nHERSTELPROEF.json geschreven.');
 }
 
 if (require.main === module) main().catch(e => { console.error('herstelproef: ' + e.message); process.exit(1); });

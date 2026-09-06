@@ -18,8 +18,8 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | **gezakt** op een mutatie (bewezen gevoelig) | 1042 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 50 |
-| alleen in de kop *genoemd*, nog niet gemeten | 181 |
-| niets van beide | 427 |
+| alleen in de kop *genoemd*, nog niet gemeten | 182 |
+| niets van beide | 426 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -349,7 +349,7 @@ toets omvalt.
 | `eventloop.test.js` | 4 | geen bronmutatie mogelijk | DE EVENT-LOOP-VERTRAGING, EN OF DE METER HEM ECHT ZIET. Node draait alles op een lus. |
 | `excursie.test.js` | 2 | gezakt op `liegpoort /api/` | DE EXCURSIE -- waar kinderen zijn, en wie dat mag weten. WAAROM DIT DE ZWAARSTE VAN DE SCHOOL IS Van alle 199 school- en RTF-routes zonder toets is dit de enige waar het over de LOCATIE VAN EEN KIND gaat. |
 | `executionmap.test.js` | 12 | al rood | DE CAPABILITY-COMPILER (scripts/executionmap.js, EXECUTIE.md blok 1). EXECUTION_MAP.json is een PROJECTIE en geen bron. |
-| `experience-platform.e2e.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `experience-platform.e2e.test.js` | 3 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `experience-platform.test.js` | 12 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `facturatie.test.js` | 6 | gezakt op `liegpoort /api/` | De centrale facturatielaag (kern/facturatie.js): bij elke verkoop krijgt zowel de verkoper als de koper automatisch dezelfde factuur in de app; de PDF is te downloaden; en de AI-factuurtool maakt in gewone taal een... |
 | `factuur.test.js` | 5 | gezakt op `liegpoort /api/` | Facturen downloaden. Zelfgebouwde PDF-schrijver (geen pakketten) + de leden-endpoints om een factuur en een jaaroverzicht op te halen. |

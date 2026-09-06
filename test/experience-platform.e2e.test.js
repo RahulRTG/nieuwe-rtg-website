@@ -87,7 +87,21 @@ test('Tap, Search en Rahul kunnen dezelfde gebrokerde agenda-intentie veilig geb
   const boot = await post('/api/experience/bootstrap', { world: 'work' }, token);
   const definition = boot.body.intents.find(i => i.id === 'schedule.item.create');
   assert.ok(definition, 'schedule.item.create ontbreekt in het serverregister');
-  const parameters = { title: 'Golden path overleg', date: '2026-09-05', time: '10:15',
+  /* EEN DATUM DIE MEEBEWEEGT, want een harde datum is hier een tijdbom. Hier
+     stond `'2026-09-05'`: die toets slaagde tot en met 5 september 2026 en zakte
+     vanaf de dag erna op ELKE tak, ook op main -- de werkprojectie hieronder
+     toont een verstreken agenda-item niet meer. Hij ging niet stuk, hij
+     verliep. Nagerekend met een mutatie: alleen deze datum in de toekomst
+     zetten maakte de scherf weer groen.
+
+     Het huis heeft het idioom al: 123 toetsbestanden rekenen hun datum
+     relatief (zie `dagPlus` in test/tafeldek.test.js). Harde datums elders in
+     de toetsen -- btw-aangiften, payroll, fiscale jaargangen -- horen wel vast
+     te staan: een aangifte over 2025 gaat over 2025. Het onderscheid is of de
+     toets iets aanmaakt en daarna verwacht dat het in een "huidig of
+     komend"-beeld staat. Dan moet de datum meebewegen. */
+  const dagPlus = (n) => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
+  const parameters = { title: 'Golden path overleg', date: dagPlus(7), time: '10:15',
     note: 'Via de gedeelde intentlaag' };
 
   const fout = await post('/api/experience/intent/preview', {

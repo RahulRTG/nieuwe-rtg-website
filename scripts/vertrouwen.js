@@ -62,7 +62,15 @@ const BRONNEN = ['POORTWACHT.json', 'ROLPROEF.json', 'KETENS.json', 'INVOERPROEF
   /* Deze twee stonden er niet terwijl de matrix ze wel leest. Ze droegen ook geen
      stempel, dus ze hadden hier hoe dan ook niets bijgedragen -- twee gaten die
      elkaar dekten. */
-  'HANDELINGPROEF.json', 'UITVOERPROEF.json'];
+  'HANDELINGPROEF.json', 'UITVOERPROEF.json',
+  /* DERDE KEER DEZELFDE VORM, EN DAAROM STAAT HIER NU EEN TOETS ONDER.
+     scripts/bewijsmatrix.js leest FAALPROEF.json voor de FAILURE-cel sinds die
+     kolom is aangesloten; deze lijst wist daar niets van. Dat is exact wat de
+     twee regels hierboven beschrijven -- een register dat de matrix WEL leest en
+     de versheidsmeter NIET, zodat een verouderde faalproefronde het bewijs niet
+     ouder had gemaakt. test/vertrouwenbronnen.test.js houdt de twee lijsten nu
+     tegen elkaar aan, zodat een vierde keer niet kan. */
+  'FAALPROEF.json'];
 
 /* De staat van EEN route, uit zijn elf cellen en de ouderdom van het bewijs.
    Pure functie: de toets voert hem elke overgang (LAT.md regel 10), en wie de

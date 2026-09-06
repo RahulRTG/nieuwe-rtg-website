@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-06T16:14:42.589Z",
-    "commit": "f628328d8",
+    "op": "2026-09-06T16:16:53.379Z",
+    "commit": "c8cf5916d",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1790,9 +1790,12 @@
       "scherp": "gezakt"
     },
     "foutmelder-dekking.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/kopinjectie.js",
+      "operator": "+->-#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "foutmelder.test.js": {
       "soort": "puur",
@@ -4595,9 +4598,12 @@
       "scherp": "gezakt"
     },
     "paginaroutes.test.js": {
-      "soort": "server",
-      "staat": "overleefd",
-      "operator": "liegpoort /api/"
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/middleware/voordeur.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "paginascripts.test.js": {
       "soort": "puur",

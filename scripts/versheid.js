@@ -120,6 +120,18 @@ const REGISTERS = [
      commits achter, en gemeten op een vuile boom. Precies het gat waar dit
      instrument voor bestaat, en het stond er zelf niet in. */
   ['BEWIJSSCHULD.json', 'node scripts/bewijsschuld.js --vastleggen', 'wat er nog niet gemeten is, en waarom niet'],
+  /* DE KANTOORMACHT (blok 0 van KANTOORMACHT.md). Hij telt of er een MENS achter
+     een kantoorhandeling staat, en dat is inhoudelijk een beveiligingsvraag --
+     toch staat hij hier als MELDING en niet als poort, om de reden die in de kop
+     van dit bestand staat: hij verandert bij elke nieuwe kantoorroute, en een
+     register dat vaak beweegt maakt van een poort een sirene die iedereen uitzet.
+     Wat hem vandaag tegenhoudt is zijn EIGEN tand (npm run kantoormacht:controle,
+     via test/kantoormacht.test.js): het aantal anoniem uitvoerbare routes mag
+     alleen dalen. Die tand bijt op de INHOUD en niet op de ouderdom.
+     Hij hoort BEVEILIGING te worden zodra de mens-eis werkelijk wordt afgedwongen
+     (KANTOOR.md par. 14, blok 1) -- vanaf dat moment is een verouderd getal wel
+     een uitspraak over wie er binnenkomt. Dat is een besluit en geen automatisme. */
+  ['KANTOORMACHT.json', 'npm run kantoormacht:vast', 'of er een mens achter een kantoorhandeling staat'],
   /* DE SCHADUWPROEF VAN DE ISOLATIEPOORT. Hij hoort hier omdat hij het enige is
      dat zegt wat die poort ZOU doen -- en dat getal veroudert sneller dan de
      meeste: elke nieuwe route in de member-allowlist verandert het, zonder dat

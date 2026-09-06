@@ -51,6 +51,40 @@ module.exports = ({ db, save, crypto, findSupplier, persoonseis }) => {
   const afspraakRij = code => { const h = bak(); if (!Array.isArray(h.afspraken[code])) h.afspraken[code] = []; return h.afspraken[code]; };
   const receptieRij = code => { const h = bak(); if (!h.receptie) h.receptie = {}; if (!Array.isArray(h.receptie[code])) h.receptie[code] = []; return h.receptie[code]; };
 
+  /* ---------- OPZOEKEN MAAKT NIETS AAN ----------
+
+     bak() en de drie ...Rij()-helpers hierboven MATERIALISEREN: wie ze aanroept
+     krijgt gegarandeerd een array terug, desnoods door hem aan te maken. Voor
+     schrijven is dat precies goed. Voor OPZOEKEN is het een stille bijwerking,
+     en die werd gemeten: `POST /api/supplier/zorg/afspraak/zet` gaf keurig 404
+     ("deze afspraak staat niet in de agenda") en had ondertussen db.data.hulp
+     plus een lege rij voor die zaak aangelegd. STAATPROEF.json zag daardoor
+     terecht een toestandswijziging na een weigering en zette ROLLBACK op GEZAKT
+     -- de enige echte van de dertig gezakte cellen in het huis.
+
+     Onschuldig van inhoud (er komt geen gegeven bij, alleen leeg meubilair) en
+     toch een echte bevinding: een geweigerd verzoek hoort niets te veranderen,
+     anders kan geen enkele meter het verschil zien tussen leeg meubilair en een
+     halve mutatie.
+
+     Deze lezers maken niets aan en geven een BEVROREN lege rij terug. Bevroren
+     met opzet: wie er per ongeluk in duwt, krijgt een fout in plaats van een
+     wijziging die nergens terechtkomt. Schrijfpaden houden de ...Rij()-helpers.
+
+     De idioom `if (!db.data.X) db.data.X = {}` staat 88 keer in 25 kernmappen;
+     dit repareert de plek waar hij aantoonbaar een weigering vervuilde, niet
+     alle 88 -- zie de commit voor waarom dat hier de juiste hoogte is. */
+  const LEGE_RIJ = Object.freeze([]);
+  const leesRij = (vak, sleutel) => {
+    const h = db.data.hulp;
+    const kast = h && h[vak];
+    const rij = kast && kast[sleutel];
+    return Array.isArray(rij) ? rij : LEGE_RIJ;
+  };
+  const sehRijLees = zk => leesRij('seh', zk);
+  const afspraakRijLees = code => leesRij('afspraken', code);
+  const receptieRijLees = code => leesRij('receptie', code);
+
   /* ---------- het zorg-overzicht per soort zaak ---------- */
   function zorgOverzicht(s) {
     const soort = s && s.type;
@@ -76,6 +110,7 @@ module.exports = ({ db, save, crypto, findSupplier, persoonseis }) => {
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = { db, save, crypto, findSupplier, nu, schoon, bak, soortVan, sehRij, afspraakRij, receptieRij,
+    sehRijLees, afspraakRijLees, receptieRijLees,
     VOORSCHRIJVERS, VERWIJZERS, AGENDAS, TRIAGE, SPREEKKAMERS, persoonMag };
   const api = { ZORG_TYPES, TRIAGE, zorgOverzicht };
   Object.assign(api, require('./keten')(ctx), require('./balie')(ctx));

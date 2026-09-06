@@ -125,3 +125,53 @@ test('6. het zorg-overzicht past zich aan de soort zaak aan', async () => {
   assert.ok(Array.isArray(zk.body.seh) && zk.body.apotheken.length, 'het ziekenhuis ziet de SEH en kan voorschrijven');
   assert.equal((await api('/api/supplier/zorg/overzicht', {}, tokens.GUARDIA)).status, 403, 'de politie hoort niet bij de zorgketen');
 });
+
+test('7. een weigering verandert de toestand niet -- ook geen leeg meubilair', () => {
+  /* DE ENIGE ECHTE VAN DERTIG GEZAKTE CELLEN. STAATPROEF.json zag dat
+     `/api/supplier/zorg/afspraak/zet` met een onbekend id keurig 404 gaf en
+     ondertussen db.data.hulp plus een lege afsprakenrij voor die zaak aanlegde:
+     de opzoek-helper materialiseert namelijk wat hij niet vindt. Er komt geen
+     gegeven bij -- alleen leeg meubilair -- en toch is het een echte bevinding:
+     zolang een weigering iets verandert, kan geen enkele meter leeg meubilair
+     onderscheiden van een half uitgevoerde mutatie.
+
+     DEZE TOETS STOND EERST OVER HTTP EN WAS LOOS. Hij las db.json van schijf, en
+     het 404-pad roept `save()` juist niet aan -- dus bleef de schijf gelijk, ook
+     mét de fout. Hij slaagde bij de mutatieproef en bewees niets. De fout zit in
+     het GEHEUGEN, precies waar de staatproef zijn vingerafdruk neemt, dus wordt
+     hij hier ook in het geheugen gemeten: de module krijgt een lege db en de
+     toets vergelijkt db.data voor en na.
+
+     Hij zakt zodra een opzoekpad weer een materialiserende helper gebruikt. */
+  const crypto = require('crypto');
+  const zaken = [{ code: 'ZORG1', name: 'Proefkliniek', type: 'beautymedical' },
+    { code: 'ZORG2', name: 'Proefpraktijk', type: 'huisarts' },
+    { code: 'ZORG3', name: 'Proefziekenhuis', type: 'ziekenhuis' }];
+  const db = { data: {} };
+  let bewaard = 0;
+  const { zorgketen } = require('../server/kern/zorgketen')({
+    db, save: () => { bewaard++; }, crypto,
+    findSupplier: (c) => zaken.find(z => z.code === c) || null, persoonseis: null
+  });
+
+  const voor = JSON.stringify(db.data);
+  assert.equal(voor, '{}', 'de proef begint met een lege opslag');
+
+  const weg = zorgketen.afspraakZet('ZORG1', 'bestaat-niet-0000', 'afgerond');
+  assert.equal(weg.status, 404, 'een onbekende afspraak wordt geweigerd');
+  assert.equal(JSON.stringify(db.data), voor,
+    'de weigering legde leeg meubilair aan: ' + JSON.stringify(db.data));
+
+  for (const [wat, roep] of [
+    ['receptie/roep', () => zorgketen.receptieRoep('ZORG2', 'bestaat-niet-0000', 'kamer 1')],
+    ['receptie/klaar', () => zorgketen.receptieKlaar('ZORG2', 'bestaat-niet-0000')],
+    /* ZORG3 en niet ZORG2: sehZet toetst eerst het GENRE, dus een huisarts
+       krijgt 403 en bereikt het opzoekpad nooit -- dan meet deze regel niets. */
+    ['seh/zet', () => zorgketen.sehZet('ZORG3', 'bestaat-niet-0000', 'opgenomen')]
+  ]) {
+    const uit = roep();
+    assert.equal(uit.status, 404, wat + ' weigert een onbekend id');
+    assert.equal(JSON.stringify(db.data), voor, wat + ' liet toch iets achter');
+  }
+  assert.equal(bewaard, 0, 'een weigering bewaart niets');
+});

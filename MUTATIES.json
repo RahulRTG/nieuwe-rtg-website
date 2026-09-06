@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-06T12:44:20.264Z",
-    "commit": "4b957cc1",
+    "op": "2026-09-06T13:04:37.774Z",
+    "commit": "a1c5ffa3",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1655,6 +1655,14 @@
       "soort": "puur",
       "staat": "al rood",
       "gezakteZonderMutatie": 2
+    },
+    "faalproefvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bewijsmatrix.js",
+      "operator": "===->!==#3",
+      "gezakt": 1,
+      "geprobeerd": 16
     },
     "facturatie.test.js": {
       "soort": "server",

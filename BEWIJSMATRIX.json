@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-06T14:30:23.789Z",
-    "commit": "2034d181",
+    "op": "2026-09-06T15:04:45.816Z",
+    "commit": "b53eaa5e",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bewijsmatrix.js",
@@ -14,11 +14,11 @@
   "schakels": 11,
   "cellen": 54681,
   "telling": {
-    "bewezen": 26447,
+    "bewezen": 26449,
     "verklaard": 117,
     "nvt": 578,
     "ongemeten": 27512,
-    "gezakt": 27
+    "gezakt": 25
   },
   "perSchakel": {
     "AUTH": {
@@ -78,11 +78,11 @@
       "gezakt": 0
     },
     "FAILURE": {
-      "bewezen": 113,
+      "bewezen": 115,
       "verklaard": 0,
       "nvt": 0,
       "ongemeten": 4832,
-      "gezakt": 26
+      "gezakt": 24
     },
     "ROLLBACK": {
       "bewezen": 2822,
@@ -98,11 +98,6 @@
       "ongemeten": 936,
       "gezakt": 0
     }
-  },
-  "verslechteringToegestaan": {
-    "reden": "Eerste ronde met de FAALPROEF aangesloten en met een verse staatproef (39f57ea2). De verslechtering is een NOEMER en geen kwaliteitsverlies: 4846 -> 4971 routes, want main leverde 125 routes die geen enkele meetronde heeft gezien. INPUT, OUTPUT en AUDIT stijgen daardoor met exact 125 ongemeten; STATE en SIDE_EFFECT met 124 plus 1 nvt; AUTH splitst ze in 117 verklaard en 8 ongemeten. GEEN ENKELE KOLOM VERLIEST BEWEZEN CELLEN -- bewezen stijgt in vijf kolommen en daalt in nul: FAILURE 2 -> 113 (de faalproef stond wel geschreven en werd nooit gelezen), ROLLBACK 2726 -> 2822, ACL 3824 -> 3902, PRIVACY 3853 -> 3902, IDEMPOTENCY 1642 -> 1662. GEZAKT gaat van 44 naar 27 en dat is een ANDERE 27: de oude 44 (ACL 29, IDEMPOTENCY 10, ROLLBACK 5) zijn alle gesloten, en er staan 26 FAILURE-cellen plus 1 ROLLBACK voor terug uit een kolom die eerder blind was. Dat is bewijs dat erbij komt, geen kwaliteit die weggaat. Wat deze ronde NIET doet is de 125 nieuwe routes meten; daarvoor moeten poortwacht, invoerproef, uitvoerproef en auditproef opnieuw, en dat staat als schuld en niet als groen.",
-    "cellenVoor": 53306,
-    "cellenNa": 54681
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
 }

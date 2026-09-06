@@ -1,0 +1,210 @@
+{
+  "soort": "meting",
+  "uitleg": "Blok 0 van KANTOORMACHT.md: staat er een MENS achter elke kantoorhandeling? Zes assen, zes getallen, met opzet geen samengesteld cijfer (BEWIJSMACHINE.md verbiedt het enkele READY boven een scorecard).",
+  "grens": "De as `deurEistMens` komt uit de ROUTER en is hard; `handlerKentMens` is lexicaal op BESTANDSniveau en draagt daarom `vermoed` -- een bestand dat officeKey noemt gebruikt hem misschien niet in elke route erin. `handlerKentMens` is dus een BOVENgrens en `anoniemUitvoerbaar` een ONDERgrens. Een deploy-gate hoort aan de harde as te hangen.",
+  "stempel": {
+    "op": "2026-09-06T20:14:32.764Z",
+    "commit": "fa207040",
+    "node": "v22.22.2"
+  },
+  "gemeten": {
+    "routes": 585,
+    "deurEistMens": 125,
+    "deurGedeeld": 460,
+    "zonderBewakerslaag": 3,
+    "handlerKentMens": 117,
+    "anoniemUitvoerbaar": 385,
+    "metSpoor": 130,
+    "metReden": 259,
+    "bestanden": 88
+  },
+  "graden": {
+    "routes": "gemeten",
+    "deurEistMens": "gemeten",
+    "deurGedeeld": "gemeten",
+    "zonderBewakerslaag": "gemeten",
+    "handlerKentMens": "vermoed",
+    "anoniemUitvoerbaar": "vermoed",
+    "metSpoor": "vermoed",
+    "metReden": "vermoed"
+  },
+  "ongemeten": {
+    "risicoPerRoute": "er is geen risicomodule in dit huis (KANTOORMACHT.md par. 3); een 0 zou hier \"gemeten en niet aanwezig\" beweren, en dat is onwaar",
+    "vierOgenVereist": "welke handeling vier ogen VERDIENT is een besluit en geen meting; wat wel gemeten is, staat in `machinerie.vierogen`",
+    "historischeToestand": "er is geen versiegeschiedenis van entiteiten (par. 18)"
+  },
+  "machinerie": {
+    "voornemen": {
+      "wat": "execution plan: plan, keuring, uitvoeren",
+      "aanKantoorroute": 0,
+      "aanroepersInServer": 2
+    },
+    "vierogen": {
+      "wat": "tweede handtekening, met de graad van de scheiding",
+      "aanKantoorroute": 0,
+      "aanroepersInServer": 3
+    },
+    "bevoegdheid": {
+      "wat": "vier dimensies; delegatie versmalt structureel",
+      "aanKantoorroute": 0,
+      "aanroepersInServer": 0
+    },
+    "simulatie": {
+      "wat": "impact vooraf, met de aannames in de uitslag",
+      "aanKantoorroute": 0,
+      "aanroepersInServer": 2
+    },
+    "canary": {
+      "wat": "beleid geleidelijk uitrollen, met terugrol",
+      "aanKantoorroute": 0,
+      "aanroepersInServer": 3
+    },
+    "schaduw": {
+      "wat": "een nieuwe regel loopt eerst mee zonder te blokkeren",
+      "aanKantoorroute": 1,
+      "aanroepersInServer": 5
+    },
+    "rechten": {
+      "wat": "machtskaart: nominaal naast effectief",
+      "aanKantoorroute": 0,
+      "aanroepersInServer": 1
+    }
+  },
+  "anoniemVoorbeeld": [
+    {
+      "methode": "POST",
+      "pad": "/api/boardroom/ai",
+      "bestand": "server/routes/techniek/boardroom/index.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/boardroom/betalingen/proef",
+      "bestand": "server/routes/techniek/betalingen.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/boardroom/betalingen/stap",
+      "bestand": "server/routes/techniek/betalingen.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/boardroom/betalingen/status",
+      "bestand": "server/routes/techniek/betalingen.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/boardroom/status",
+      "bestand": "server/routes/techniek/boardroom/index.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/boardroom/talen",
+      "bestand": "server/routes/techniek/boardroom/index.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/afdelingshotel",
+      "bestand": "server/routes/regering.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/afdelingshotel/annuleer",
+      "bestand": "server/routes/regering.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/afdelingshotel/boek",
+      "bestand": "server/routes/regering.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/afdelingshotel/zet",
+      "bestand": "server/routes/regering.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/ai/tegoed",
+      "bestand": "server/routes/member/aitegoed.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/aidata",
+      "bestand": "server/routes/kantoren/geld.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/anker",
+      "bestand": "server/routes/office/anker.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/anker/post",
+      "bestand": "server/routes/office/anker.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/anker/post/reken",
+      "bestand": "server/routes/office/anker.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/anker/reken",
+      "bestand": "server/routes/office/anker.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/architect",
+      "bestand": "server/routes/kantoren/bureaus.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/architect/bouwstaat",
+      "bestand": "server/routes/kantoren/bureaus.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/architect/concept",
+      "bestand": "server/routes/kantoren/bureaus.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/architect/kritiek",
+      "bestand": "server/routes/kantoren/bureaus.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/architect/maak",
+      "bestand": "server/routes/kantoren/bureaus.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/architect/portfolio",
+      "bestand": "server/routes/kantoren/bureaus.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/architect/project",
+      "bestand": "server/routes/kantoren/bureaus.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/architect/verwijder",
+      "bestand": "server/routes/kantoren/bureaus.js"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/architect/zet",
+      "bestand": "server/routes/kantoren/bureaus.js"
+    }
+  ],
+  "deuren": {
+    "officeAuth": 451,
+    "boardroomAuth": 107,
+    "balieAuth": 31,
+    "techAuth": 16,
+    "eigenaarAlleen": 10,
+    "alleenBaas": 6,
+    "kluisAuth": 5,
+    "naamAuth": 3
+  }
+}

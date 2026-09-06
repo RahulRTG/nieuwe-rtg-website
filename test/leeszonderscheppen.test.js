@@ -1112,3 +1112,80 @@ test('leerkring: een weigering schept geen leerkast', () => {
   assert.equal(leren.overzicht().runs, 0);
   geenMeubilair(db, 'magnaatLeren', 'het overzicht op een lege leerkring');
 });
+
+/* ============================================================================
+   DE VOLGORDE-VARIANT: de weigering stond ONDER de la.
+
+   De blokken hierboven gaan over een opzoeking die achter bak() stond. Deze
+   drie gaan over dezelfde klasse in een andere vorm: de collectie wordt op de
+   eerste regel van de functie aangelegd, en de weigering op de INVOER valt
+   daarna -- terwijl die weigering die eerste regel helemaal niet nodig had.
+   Gevonden door een weerlegger op labfonds, daarna over de hele boom gemeten.
+   ========================================================================== */
+
+/* --------------------------------------------------------- labfonds/locatie */
+test('labfonds: een locatie met een te korte naam legt geen fonds aan', () => {
+  const db = { data: {} };
+  let saves = 0;
+  const { labfonds } = require('../server/kern/labfonds')({
+    db, save: () => saves++, crypto: require('node:crypto'), anthropic: null,
+  });
+
+  /* Dit is geen leeg meubilair maar echte INHOUD: F() zet drie
+     voorbeeldlocaties neer en roept save() aan, op een verzoek dat 400 krijgt. */
+  assert.equal(labfonds.locatieMaak('x').status, 400);
+  geenMeubilair(db, 'labFonds', 'een 400 op locatieMaak');
+  assert.equal(saves, 0, 'en bewaart niets');
+
+  /* TEGENPROEF: met een geldige naam ontstaat het fonds wel, met de startset. */
+  const ok = labfonds.locatieMaak('Utrecht', 'NL');
+  assert.ok(ok.ok, 'de locatie is gemaakt: ' + (ok.error || ''));
+  assert.ok(db.data.labFonds.locaties.utrecht, 'en staat in db.data');
+  assert.ok(db.data.labFonds.locaties.ibiza, 'naast de startset');
+});
+
+/* ------------------------------------------------------------ rahul/stemming */
+test('stemming: een onbekende stemming vastzetten legt geen pot aan', () => {
+  const db = { data: {} };
+  const s = require('../server/kern/rahul/stemming')({
+    db, save: () => {}, crypto: require('node:crypto'),
+  });
+
+  assert.equal(s.stemmingZet('bestaat-niet', true).status, 400);
+  geenMeubilair(db, 'rahulStemming', 'een 400 op stemmingZet');
+
+  /* TEGENPROEF: een stemming die WEL bestaat landt in db.data. */
+  const echt = s.STANDEN[0].id;
+  assert.ok(s.stemmingZet(echt, true).ok !== false, 'een bestaande stand mag');
+  assert.equal(db.data.rahulStemming.id, echt, 'de stand staat in db.data');
+});
+
+/* --------------------------------------------------------- eigenaarherstel */
+test('eigenaarherstel: zonder ingerichte herstelweg blijft de la dicht', () => {
+  const db = { data: {} };
+  const h = require('../server/kern/eigenaarherstel')({
+    db, save: () => {}, log: null,
+    beveiligVan: () => ({ meld: () => {} }),
+    mailVan: () => ({ send: () => {} }),
+    eigenaarEmail: () => 'eigenaar@x.nl',
+    nu: () => Date.parse('2026-09-03T12:00:00Z'),
+  });
+
+  /* Fail-closed: op een platform zonder herstelquorum antwoordt elke route met
+     404. Die 404 hoorde geen la achter te laten -- en dit is de herstelweg van
+     het eigenaarsaccount zelf, dus dat weegt hier zwaarder dan elders. */
+  assert.equal(h.ingericht(), false);
+  assert.equal(h.start('RTGH1-1-x', 'RTGH1-2-y').status, 404);
+  assert.equal(h.voltooi('RTGH1-1-x', 'RTGH1-2-y').status, 404);
+  assert.equal(h.breekAf().status, 404);
+  assert.equal(h.herstelvensterOpen(), false);
+  assert.equal(h.stand().ingericht, false);
+  geenMeubilair(db, 'eigenaarHerstel', 'vijf paden op een platform zonder herstelweg');
+
+  /* TEGENPROEF: inrichten schrijft nog, en daarna staat de weg open. */
+  const in1 = h.richtIn();
+  assert.ok(in1.delen && in1.delen.length === 3, 'drie delen: ' + (in1.error || ''));
+  assert.ok(db.data.eigenaarHerstel.verifier, 'de verifier staat in db.data');
+  assert.equal(h.ingericht(), true);
+  assert.equal(h.stand().log.length > 0, true, 'en het logboek loopt');
+});

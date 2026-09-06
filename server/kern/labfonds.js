@@ -45,9 +45,10 @@ module.exports = ({ db, save, crypto, anthropic, livinglab }) => {
     return schoon(naam, 40).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || rid();
   }
   function locatieMaak(naam, land) {
-    const f = F();
+    // eerst de naam, dan pas de la: een 400 hoort het fonds niet aan te leggen
     const n = schoon(naam, 40);
     if (n.length < 2) return { status: 400, error: 'Geef de locatie een duidelijke naam.' };
+    const f = F();
     const id = locSlug(n);
     if (!f.locaties[id]) { f.locaties[id] = { id, naam: n, land: schoon(land, 2).toUpperCase() || '', pot: 0, opgehaald: 0, uitgekeerd: 0 }; save(); }
     return { ok: true, locatie: f.locaties[id] };

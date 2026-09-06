@@ -52,7 +52,11 @@ module.exports = ({ db, save, log, beveiligVan, mailVan, eigenaarEmail, nu }) =>
     if (!Array.isArray(s.log)) s.log = [];
     return s;
   }
-  const ingericht = () => !!herstelstand().verifier;
+  /* Lezen zonder scheppen (kijk() in ./eigencollectie.js). ingericht() is de
+     eerste vraag van start() en voltooi(), en het antwoord "nee" is een 404 --
+     die hoort op een platform zonder herstelweg geen la achter te laten. */
+  const lees = () => eigen.kijk('eigenaarHerstel');
+  const ingericht = () => !!lees().verifier;
 
   function meld(code, niveau, zin) {
     if (log && log.warn) log.warn(code, { zin });
@@ -87,8 +91,8 @@ module.exports = ({ db, save, log, beveiligVan, mailVan, eigenaarEmail, nu }) =>
      paar telt de poging en valt het slot na POGING_MAX dicht. Het antwoord is
      in beide gevallen even karig -- of een quorum bestond, is zelf informatie. */
   function start(deelA, deelB) {
-    const s = herstelstand();
     if (!ingericht()) return { status: 404, error: 'Er is geen herstelweg ingericht voor dit platform.' };
+    const s = herstelstand();
     if (s.slotTot && klok() < s.slotTot)
       return { status: 429, error: 'Te veel pogingen. Probeer het later opnieuw.' };
 
@@ -124,8 +128,8 @@ module.exports = ({ db, save, log, beveiligVan, mailVan, eigenaarEmail, nu }) =>
   /* AFBREKEN. De aanroeper heeft zich al met een passkey bewezen (de route zet
      dat af via de zware poort); hier staat alleen wat er dan gebeurt. */
   function breekAf() {
+    if (!lees().lopend) return { status: 404, error: 'Er loopt geen herstel.' };
     const s = herstelstand();
-    if (!s.lopend) return { status: 404, error: 'Er loopt geen herstel.' };
     s.lopend = null;
     meld('eigenaarherstel-afgebroken', 'kritiek',
       'Een lopend herstel van het eigenaarsaccount is afgebroken met een passkey van de eigenaar.');
@@ -138,8 +142,8 @@ module.exports = ({ db, save, log, beveiligVan, mailVan, eigenaarEmail, nu }) =>
      Geeft een eenmalig venster terug waarin een nieuwe passkey mag worden
      geregistreerd; de route doet dat registreren, niet dit bestand. */
   function voltooi(deelA, deelB) {
-    const s = herstelstand();
     if (!ingericht()) return { status: 404, error: 'Er is geen herstelweg ingericht voor dit platform.' };
+    const s = herstelstand();
     /* EERST HET QUORUM EN PAS DAARNA DE STAND, en die volgorde is geen smaak.
        Andersom antwoordt een FOUT paar met "er loopt geen herstel" en met "de
        wachttijd loopt nog" -- en dan is deze route een orakel waarmee iemand
@@ -167,19 +171,20 @@ module.exports = ({ db, save, log, beveiligVan, mailVan, eigenaarEmail, nu }) =>
   /* Staat het venster open? De route vraagt dit vlak voor het registreren. Een
      venster gaat EEN keer op: wie hem gebruikt, sluit hem. */
   function herstelvensterOpen() {
-    const s = herstelstand();
+    const s = lees();
     return !!(s.venster && klok() < s.venster.tot);
   }
   function herstelvensterGebruikt() { const s = herstelstand(); s.venster = null; save(); }
 
   function stand() {
-    const s = herstelstand();
+    const s = lees();   // lezend: herstelstand() bakt, en dit scherm hoort niets te maken
     return {
       ingericht: ingericht(),
       ingerichtOp: s.ingerichtOp || null,
       lopend: s.lopend ? { klaarOp: s.lopend.klaarOp, gestartOp: s.lopend.gestartOp } : null,
       wachttijdDagen: Math.round(WACHTTIJD_MS / 86400000),
-      log: s.log.slice(0, 10)
+      // lees() waarborgt de vorm niet zoals herstelstand() dat doet
+      log: (s.log || []).slice(0, 10)
     };
   }
 

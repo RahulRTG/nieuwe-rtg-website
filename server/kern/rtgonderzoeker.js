@@ -20,7 +20,7 @@ const BOUWPLAN = [
 ];
 const MAX_RAPPORTEN = 30, MAX_STAPPEN = 12;
 
-module.exports = ({ db, save, crypto, schoon, anthropic }) => {
+module.exports = ({ db, save, crypto, schoon, anthropic, rtgai }) => {
   const S = () => {
     if (!db.data.onderzoeker || typeof db.data.onderzoeker !== 'object') {
       db.data.onderzoeker = { fase: 'in-ontwikkeling', gestart: Date.now(), bouwstappen: 0, logboek: [], rapporten: [] };
@@ -34,17 +34,14 @@ module.exports = ({ db, save, crypto, schoon, anthropic }) => {
   };
   // de bouw staat ook in het journaal van de RTG AI: hij is de bouwer
   const rtgaiJournaal = (tekst) => {
-    const r = db.data.rtgai;
-    if (!r || !Array.isArray(r.journaal)) return;
-    r.journaal.unshift({ at: Date.now(), soort: 'bouw', tekst: String(tekst).slice(0, 200) });
-    if (r.journaal.length > 200) r.journaal.length = 200;
+    if (rtgai && typeof rtgai.noteer === 'function') rtgai.noteer(String(tekst).slice(0, 200), 'bouw');
   };
 
   /* ---- de RTG AI bouwt de Onderzoeker, stap voor stap ---- */
   function ontwikkel() {
     const s = S();
     if (s.fase === 'onderzoeksklaar') return { status: 400, error: 'De Onderzoeker is al af; stel hem een onderzoeksvraag.' };
-    const r = db.data.rtgai;
+    const r = rtgai && typeof rtgai.status === 'function' ? rtgai.status() : db.data.rtgai;
     if (!r || !(r.waarnemingen > 0)) {
       return { status: 400, error: 'De RTG AI heeft nog geen leerstof: laat hem eerst meelezen, dan kan hij de Onderzoeker bouwen.' };
     }

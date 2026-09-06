@@ -124,7 +124,14 @@ async function nieuwLid(base, tier = 'business') {
   const token = reg.body.token;
   const st = await tot(() => api(base, '/api/state', {}, token),
     r => r.body && r.body.state && r.body.state.user, { pogingen: 40, wacht: 150 });
-  assert.ok(st.body && st.body.state && st.body.state.user, 'lid-sessie lost op');
+  if (!(st.body && st.body.state && st.body.state.user)) {
+    const ready = await fetch(base + '/api/ready').then(async r => ({
+      status: r.status,
+      body: await r.json().catch(() => ({}))
+    })).catch(e => ({ error: e.message }));
+    assert.ok(false, 'lid-sessie lost op; laatste antwoord=' +
+      JSON.stringify(st).slice(0, 500) + '; readiness=' + JSON.stringify(ready));
+  }
   return { token, codename: st.body.state.user.codename, key: st.body.state.user.key || null };
 }
 
@@ -170,12 +177,30 @@ test('GRAND: twee instances op gedeelde Postgres + Redis, volledige gelijktijdig
       assert.equal(leden.length, 24, 'alle 24 registraties slaagden');
       assert.equal(new Set(leden.map(l => l.codename)).size, 24, 'elk lid heeft een unieke codenaam');
 
+      const gereedNaRegistratie = await getJson(A.base, '/api/ready');
+      assert.equal(gereedNaRegistratie.ready, true,
+        'A blijft gereed na gelijktijdige registraties: ' + JSON.stringify(gereedNaRegistratie));
+
       // Het O(1)-ledental (Postgres-telling) is met ~24 gestegen. Poll: de gids
       // wordt kort na de upsert bijgewerkt en de telling gecachet.
-      const na = await tot(
-        async () => (await api(A.base, '/api/office/state', {}, office.token)).body.state.totals.leden,
-        n => n >= totVoor.leden + 24, { pogingen: 60, wacht: 200 });
-      assert.ok(na >= totVoor.leden + 24, 'ledental steeg met >= 24 (' + totVoor.leden + ' -> ' + na + ')');
+      let laatsteOfficeFout = null;
+      const na = await tot(async () => {
+        const antwoord = await api(A.base, '/api/office/state', {}, office.token);
+        if (antwoord.body && antwoord.body.state && antwoord.body.state.totals) {
+          laatsteOfficeFout = null;
+          return antwoord.body.state.totals.leden;
+        }
+        laatsteOfficeFout = {
+          status: antwoord.status,
+          body: antwoord.body,
+          ready: await fetch(A.base + '/api/ready').then(async r => ({
+            status: r.status, body: await r.json().catch(() => ({}))
+          })).catch(e => ({ error: e.message }))
+        };
+        return -1;
+      }, n => n >= totVoor.leden + 24, { pogingen: 60, wacht: 200 });
+      assert.ok(na >= totVoor.leden + 24, 'ledental steeg met >= 24 (' +
+        totVoor.leden + ' -> ' + na + '); laatste opslagfout=' + JSON.stringify(laatsteOfficeFout));
     });
 
     await t.test('3. cross-instance data: een lid van A is op B vindbaar via de PG-gids', async () => {

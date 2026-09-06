@@ -23,6 +23,32 @@ const txDedup = (naam, items) => {
   return uit;
 };
 
+/* Maak een verliesvrij plan voor het afkappen van een RAM-staart. Een sleutel
+   die ook buiten het gekozen deel voorkomt blijft volledig in RAM: het
+   grootboek heeft maar één rij per sleutel en de nieuwste dubbel moet winnen.
+   Verwijderen gaat daarna op afdruk+aantal, vanaf de oudste kant. Daardoor
+   blijft een gelijktijdig toegevoegde dubbel staan en verdwijnt nooit bij
+   vergissing iedere rij met dezelfde ref. */
+function veegplan(naam, alle, ruw) {
+  const tel = lijst => { const m = new Map(); for (const t of lijst) {
+    const k = String(sleutelVan(naam, t)); m.set(k, (m.get(k) || 0) + 1);
+  } return m; };
+  const totaal = tel(alle), gekozen = tel(ruw);
+  const items = ruw.filter(t => totaal.get(String(sleutelVan(naam, t))) === gekozen.get(String(sleutelVan(naam, t))));
+  const afdrukken = new Map();
+  for (const t of items) { const k = JSON.stringify(t); afdrukken.set(k, (afdrukken.get(k) || 0) + 1); }
+  function verwijder(verzameling) {
+    if (!Array.isArray(verzameling)) throw new Error('tx-collectie ' + naam + ' is geen lijst');
+    let n = 0;
+    for (let i = verzameling.length - 1; i >= 0; i--) {
+      const k = JSON.stringify(verzameling[i]), over = afdrukken.get(k) || 0;
+      if (over) { verzameling.splice(i, 1); afdrukken.set(k, over - 1); n++; }
+    }
+    return n;
+  }
+  return { items, verwijder };
+}
+
 /* HET TIJDSTIP, EN WAAROM DAT EEN OMWEG NODIG HAD.
 
    Hier stond `at: t.at || new Date().toISOString()`. Dat klopte zolang elke
@@ -61,4 +87,4 @@ const rijVan = (naam, t) => ({
 });
 const lees = rijen => rijen.map(d => JSON.parse(kluis.ontsleutel(d)));
 
-module.exports = { txDedup, tijdstipVan, rijVan, lees };
+module.exports = { txDedup, veegplan, tijdstipVan, rijVan, lees };

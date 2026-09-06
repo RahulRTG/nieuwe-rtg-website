@@ -1,10 +1,9 @@
 /* De voordeur en de scriptbeveiliging van de pagina's.
 
-   De voordeur: wie naar / gaat krijgt meteen het RTG-OS-bureaublad met alle
-   apps als tegels. Bewust geen omleiding maar een interne herschrijving, zodat
-   de nonce-laag hieronder er gewoon overheen gaat en er geen 302-sprong
-   tussen zit. Web en mobiel krijgen exact dezelfde pagina; de tegels schalen
-   mee met het formaat. De oude bureau-URL blijft werken.
+   De voordeur: / is de openbare RTG-landing; het ledenbureaublad woont onder
+   /apps. De oude bureau-URL's blijven werken en komen zonder omleiding op
+   /apps/app.html uit. Zo bestaan er geen twee leden-homescreens, terwijl de
+   goedgekeurde merkvoordeur ook op de Node-server werkelijk zichtbaar is.
 
    De scriptbeveiliging: op de app-pagina's staat geen 'unsafe-inline' voor
    scripts, maar krijgt elk antwoord een eigen nonce. We lezen het bestand,
@@ -20,6 +19,7 @@ const zlib = require('zlib');
 const crypto = require('crypto');
 const { CSP, magnaatHtml } = require('./csp');
 const { kopinjecties } = require('./kopinjectie');
+const landing = require('./landing');
 /* De vijf herschrijvingen en hun volgorde staan apart; die volgorde is dragend
    en hoort als keten leesbaar te zijn. Zie ./herschrijfketen.js. */
 const { herschrijfPagina } = require('./herschrijfketen');
@@ -43,7 +43,7 @@ function herschrijf(req, naar) {
   if (eigen && eigen.writable) req.path = naar;
 }
 
-/* De site-root is de HOMESCREEN, en er is er maar een.
+/* Het ledengebied heeft één HOMESCREEN; de site-root is de openbare landing.
 
    Hier stonden twee bureaubladen naast elkaar. /apps/app.html draagt het
    springboard -- iconen, mappen, de horlogering, zoeken -- en dat is de
@@ -53,12 +53,14 @@ function herschrijf(req, naar) {
    beginscherm met de metaforen van een computer, en twee beginschermen is er
    een te veel: je wist nooit welke "thuis" was.
 
-   Alle drie de paden komen nu op dezelfde plek uit. /apps/index.html blijft
+   Alle oude app-paden komen nu op dezelfde plek uit. /apps/index.html blijft
    als pad bestaan omdat er van buiten naar gelinkt kan zijn; hij brengt je
-   gewoon thuis. */
+   gewoon thuis. De expliciete /-route blijft geregistreerd zodat de routekaart
+   en dekkingsmeting de openbare voordeur kennen; de nonce-laag eronder levert
+   daarvan de canonieke repository-index uit. */
 function bureaublad(app) {
   const naarHome = (req, res, next) => { herschrijf(req, '/apps/app.html'); next(); };
-  app.get('/', naarHome);
+  app.get('/', (req, res, next) => next());
   app.get('/apps/bureau.html', naarHome);
   app.get('/apps/index.html', naarHome);
   /* ZONDER SCHUINE STREEP GEREGISTREERD, en dat is geen smaak.
@@ -90,20 +92,33 @@ function opPagina(fn) { paginaHaak = typeof fn === 'function' ? fn : null; }
 
 function cspNonce(publicDir, aan) {
   return (req, res, next) => {
-    if (!aan || req.method !== 'GET') return next();
+    const isLanding = req.path === '/';
+    if (req.method !== 'GET' && !(isLanding && req.method === 'HEAD')) return next();
+    if (!aan && !isLanding) return next();
     let rel = req.path;
     if (rel.endsWith('/')) rel += 'index.html';
     if (!rel.endsWith('.html')) return next();
-    const bestand = path.join(publicDir, rel);
-    if (!bestand.startsWith(publicDir + path.sep)) return next(); // geen path traversal
+    const bestand = isLanding ? landing.bronbestand(publicDir) : path.join(publicDir, rel);
+    if (!isLanding && !bestand.startsWith(publicDir + path.sep)) return next(); // geen path traversal
     fs.readFile(bestand, 'utf8', (err, html) => {
       if (err) return next(); // bestaat niet: laat de statische laag/404 het doen
       // het verzoek gaat mee: alleen daaraan is te zien of dit een bezoek was
       // of een voorophaling van een service worker (zie server/routelog.js)
-      if (paginaHaak) { try { paginaHaak(rel, req); } catch (e) {} }
+      const paginaPad = isLanding ? '/' : rel;
+      if (paginaHaak) { try { paginaHaak(paginaPad, req); } catch (e) {} }
+      if (isLanding) html = landing.voorNode(html);
+      /* Met de nonce-schakelaar uit blijft de openbare landing bereikbaar. De
+         canonieke bron heeft alleen externe scripts en bladen, dus de strenge
+         terugval-CSP uit koppen.js blijft daarbij bruikbaar. */
+      if (!aan) return landing.stuurZonderNonce(req, res, html);
       const nonce = crypto.randomBytes(16).toString('base64');
       const magnaat = req.query && String(req.query.magnaat || '') === '1' && rel.startsWith('/apps/');
-      html = herschrijfPagina(html, rel, publicDir, magnaat);
+      /* Voor / geven we ook / aan de keten. De blokafsplitsers herkennen dat
+         bewust niet als public/*.html-bron en laten een eventueel toekomstig
+         inline blok dus op zijn plek; hun uitleverroute kan de canonieke
+         repository-index buiten public/ immers niet terugzoeken. Bundelen en
+         versieadressen blijven wel gewoon werken. */
+      html = herschrijfPagina(html, paginaPad, publicDir, magnaat);
       html = html.replace(/<script(?![^>]*\bnonce=)/g, '<script nonce="' + nonce + '"');
       // dezelfde behandeling voor de stijlblokken: sinds style-src een nonce
       // draagt, komt een ongestempeld blok er niet meer doorheen
@@ -113,6 +128,10 @@ function cspNonce(publicDir, aan) {
       html = kopinjecties(html, nonce, req, res, magnaat);
       res.set('Content-Security-Policy', CSP(nonce, magnaat));
       res.type('html');
+      if (req.method === 'HEAD') {
+        res.setHeader('Content-Length', Buffer.byteLength(html));
+        return res.end();
+      }
       /* Ook de pagina's zelf gecomprimeerd over de lijn (satelliet en traag
          mobiel).
 

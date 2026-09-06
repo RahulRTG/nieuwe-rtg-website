@@ -11,7 +11,7 @@
    wie, en precies welke acties. */
 
 module.exports = (deps) => {
-  const { db, save } = deps;
+  const { db, save, achtergrondMutaties = true } = deps;
 
   const z = () => {
     if (!db.data.zelfzorg || typeof db.data.zelfzorg !== 'object') db.data.zelfzorg = {};
@@ -64,13 +64,24 @@ module.exports = (deps) => {
      spreidingsmodus schrijven alle servers en zou dit drie keer draaien), uit te
      zetten met RTG_ZELFZORG_MS=0; upgrades en reparaties blijven altijd een knop. */
   const AUTO_MS = Number(process.env.RTG_ZELFZORG_MS || 6 * 3600000);
-  api.automaatAan = () => AUTO_MS > 0;
+  /* PostgreSQL kent voor deze opruimronde nog geen atomaire deelnemer over de
+     meerdere collecties die zij tegelijk raakt. Daar blijft de stille automaat
+     daarom eerlijk uit; de kantoorhandelingen lopen wel door requestcommit. */
+  api.automaatAan = () => AUTO_MS > 0 && achtergrondMutaties;
   api.automaatUren = () => Math.round(AUTO_MS / 3600000 * 10) / 10;
+  let autoBezig = null;
+  api.autoRonde = () => {
+    if (!db.leider) return Promise.resolve(null);
+    if (autoBezig) return autoBezig;
+    autoBezig = Promise.resolve().then(() => api.opruim('automaat'))
+      .then(() => api.bescherm('automaat'))
+      .finally(() => { autoBezig = null; });
+    return autoBezig;
+  };
   api.autoStart = () => {
-    if (!AUTO_MS) return null;
+    if (!api.automaatAan()) return null;
     const t = setInterval(() => {
-      if (!db.leider) return;
-      try { api.opruim('automaat'); api.bescherm('automaat'); } catch (e) { /* nooit de server omtrekken */ }
+      api.autoRonde().catch(() => { /* nooit de server omtrekken */ });
     }, AUTO_MS);
     if (t.unref) t.unref();
     return t;

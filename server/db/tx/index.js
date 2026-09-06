@@ -24,9 +24,10 @@ const ledger = require('./ledger');
 const opslag = require('../opslag');
 const db = state.db;
 
-// index injecteert save() (venster-verhuis vraagt een snapshot) door naar het
-// grootboek, en levert het RAM-venster aan de veegronde.
-function wire(saveFn) { ledger.wire({ txStaartNa, txVerwijder, save: saveFn }); }
+// Index levert het RAM-venster en de enige autoritatieve collectiepoort aan de
+// veegronde. De poort commit de kap vóór publicatie; een kale save() buiten een
+// request zou in PostgreSQL juist het noodherstel en een readiness-dip starten.
+function wire(bewerkCollectie) { ledger.wire({ txStaartNa, bewerkCollectie }); }
 
 /* De klantsleutel komt uit ./collecties, en dat is geen omweg maar de reparatie
    van een duplicaat: hier stond `const txKlantVan = t => t.customerKey ||

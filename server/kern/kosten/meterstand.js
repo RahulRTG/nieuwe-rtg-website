@@ -14,21 +14,20 @@
    opslag gebruikt. Het aantal peilingen gaat mee, zodat het overzicht kan zeggen
    hoe hard dat gemiddelde is.
 
-   Deelt de opslag van ./meter.js (pak, spoel, snoei) en schrijft rechtstreeks:
+   Deelt de opslag van ./meter.js (pak en snoei) en schrijft rechtstreeks:
    een peiling is zeldzaam -- hooguit een paar per uur -- en het gemiddelde moet
    de vorige stand kennen, dus de schrijfbuffer van de stromen helpt hier niet. */
 'use strict';
 
 const { soort } = require('./soorten');
 
-module.exports = ({ pak, spoel, snoei, save, nu, periodeVan, MAX_AANTAL }) => {
+module.exports = ({ pak, snoei, save, nu, periodeVan, MAX_AANTAL }) => {
   /* Zie de kop van dit bestand voor waarom dit peilen is en geen optellen. */
   function peil({ drager, soort: soortId, waarde, tijd }) {
     const s = soort(soortId);
     if (!s || s.aard !== 'stand') return false;
     const v = Number(waarde);
     if (!Number.isFinite(v) || v < 0 || v > MAX_AANTAL) return false;
-    spoel();
     const rij = pak(periodeVan(tijd), drager);
     const p = rij.peilingen || (rij.peilingen = {});
     const n = (p[s.id] || 0) + 1;

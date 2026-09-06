@@ -4,14 +4,10 @@
 
    1. ÉÉN BALK VAN RAHUL PER SCHERM. shared/metgezel.js hangt zijn chatbalk op
       elke app-pagina, behalve waar het scherm er zelf al een heeft -- en dat is
-      de homescreen (#osAiBalk). Die uitzondering werd getoetst met
-      `/\/apps\/app\.html$/.test(location.pathname)`, en dat is precies één
-      regel te letterlijk: server/middleware/voordeur.js serveert de homescreen
-      OOK op /, /apps/ en /apps/index.html, zonder omleiding. Op drie van de
-      vier ingangen -- waaronder de kale domeinnaam, de meest bezochte van
-      allemaal -- stonden er dus twee invoervelden voor hetzelfde gesprek, recht
-      onder elkaar. Vandaar dat deze toets alle vier de paden afgaat en niet
-      alleen het bestandspad.
+      de homescreen (#osAiBalk). De app heeft vier eigen ingangen:
+      /apps/app.html en de drie oude aliassen /apps/, /apps/index.html en
+      /apps/bureau.html. De kale domeinnaam is nu de openbare merklanding en
+      hoort niet bij deze telling.
 
       De mutatie die hem hoort te laten zakken: zet in shared/metgezel.js de
       padtoets terug als enige voorwaarde voor `eigenRahul`.
@@ -192,18 +188,22 @@ async function werelden(page) {
 async function openLade(page) {
   if (await page.evaluate(() => !!document.querySelector('#rtgCommand.bank-open'))) return;
   const lade = page.locator('#rtgCommand .cmd-lade');
-  if (!(await lade.isVisible())) return;      // breed scherm: de bank staat vast
-  await lade.click();
+  if (!(await page.evaluate(() => matchMedia('(max-width:999px)').matches))) return; // breed: vaste rail
+  await page.waitForFunction(() => !document.querySelector('.rtg-edge-menu') ||
+    document.querySelector('.rtg-edge-menu[data-rtg-command-brug="true"]'), null,
+  { timeout: 5000 }).catch(() => {});
+  const edge = page.locator('.rtg-edge-menu[data-rtg-command-brug="true"]');
+  if (await edge.isVisible()) await edge.click(); else await lade.click();
   await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
 }
 
 test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
   { skip: geenBrowser(pw) }, async (t) => {
   await metLid(async ({ base, ctx }) => {
-    /* Alle vier de ingangen van de homescreen (zie voordeur.js) plus een paar
+    /* Alle vier de app-ingangen van de homescreen (zie voordeur.js) plus een paar
        gewone app-pagina's, want daar hoort de balk van metgezel.js juist WEL te
        staan -- eentje. */
-    const thuisPaden = ['/', '/apps/', '/apps/index.html', '/apps/bureau.html', '/apps/app.html'];
+    const thuisPaden = ['/apps/', '/apps/index.html', '/apps/bureau.html', '/apps/app.html'];
     const appPagina = ['/apps/muziek.html', '/apps/wallet.html', '/apps/berichten.html'];
     const fouten = [];
 
@@ -1189,7 +1189,9 @@ test('RTG Second Screen groeit van Peek naar Focus zonder tweede navigatie',
     await page.click('#rtgCommand [data-ss-action="close"]');
     await page.waitForFunction(() => {
       const r = document.getElementById('rtgCommand');
-      return r.dataset.rtgSecondScreen === 'peek' && document.activeElement === r.querySelector('.cmd-lade');
+      const deur = document.querySelector('.rtg-edge-menu[data-rtg-command-owner="true"]') ||
+        r.querySelector('.cmd-lade');
+      return r.dataset.rtgSecondScreen === 'peek' && document.activeElement === deur;
     });
 
     /* Een Living Module gebruikt dezelfde Command-ingang. Hij sluit het paneel

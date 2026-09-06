@@ -32,7 +32,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { accounts, anthropic, bijeen, inBundel, broadcastSync, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, liveCodename, media, notify, notifySupplier, onboarding, rtmail, save, schoon } = hulp;
+  const { accounts, anthropic, bewerkCollectie, bijeen, inBundel, broadcastSync, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, liveCodename, media, notify, notifySupplier, onboarding, rtmail, save, schoon } = hulp;
   // sseToCustomer/sseToSupplier/sseToOffice worden via hulp.* gelezen (zie kern.comm)
 
 
@@ -149,7 +149,7 @@ Object.assign(kern, require('../kern/ledenregister')({ accounts, onboarding, gel
    NA de geldregie om de pasprijs; het fonds gaat laat gebonden mee. Zet ook de
    kostenhaak aan, die tot hier leeg was. */
 Object.assign(kern, require('../kern/economie')({ db, save }));
-Object.assign(kern, require('../kern/kosten')({ db, save, accounts, economie: kern.economie,
+Object.assign(kern, require('../kern/kosten')({ db, save, bewerkCollectie, accounts, economie: kern.economie,
   keyVanCodenaam, bestandenOpslag: kern.bestandenOpslag,
   geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),
   fonds: () => kern.fonds }));

@@ -5,8 +5,6 @@ const { coord, coordPaar } = require('../../kern/util');
 module.exports = (kern) => {
   const { app, auth, db, save, findSupplier, notifySupplier, notify, pushLive,
     liveStateFor, liveCodename, haversine, vraagRitVoor, betaalRitVoor, ledenInhoudVan } = kern;
-  // laatste durende opslag van de live locatie per lid (throttle tegen GPS-storm)
-  const liveSaveAt = new Map();
 
   app.post('/api/live/start', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
@@ -38,7 +36,10 @@ module.exports = (kern) => {
     const L = db.data.live[key];
     if (!L || !L.active) return res.status(409).json({ error: 'U bent niet onderweg.' });
     const lat = coord(req.body.lat, 90), lng = coord(req.body.lng, 180);
-    if (Number.isFinite(lat) && Number.isFinite(lng)) { L.lat = lat; L.lng = lng; L.updatedAt = new Date().toISOString(); }
+    let gewijzigd = false;
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+      L.lat = lat; L.lng = lng; L.updatedAt = new Date().toISOString(); gewijzigd = true;
+    }
     // automatische aankomst binnen ~150 m van de bestemming
     const dest = L.destCode ? findSupplier(L.destCode) : null;
     let aangekomen = false;
@@ -50,12 +51,12 @@ module.exports = (kern) => {
         notify(L.tier, { icon: 'gps', title: 'Aangekomen', body: 'U bent bij ' + dest.name + '.', scope: 'live' });
       }
     }
-    // De live locatie is vluchtig en komt vele keren per minuut per lid binnen; een
-    // durende opslag PER ping zou de datastore overbelasten (elke save serialiseert
-    // de hele kast). We sturen de positie altijd live via SSE door, maar bewaren
-    // hooguit eens per 3 s per lid, en meteen bij een echte statuswijziging (aankomst).
-    const nu = Date.now();
-    if (aangekomen || nu - (liveSaveAt.get(key) || 0) > 3000) { liveSaveAt.set(key, nu); save(); }
+    /* Iedere gewijzigde positie neemt deel aan de requestcommit. De JSON-motor
+       bundelt zulke save()-signalen nog steeds in zijn write-behind, terwijl
+       PostgreSQL alleen deze collectie commit. Een proceslokale tijdgrendel is
+       hier onveilig: gelijktijdige requests werken op geisoleerde kopieen en
+       zouden dan wel 200 antwoorden, maar hun positie na het antwoord verliezen. */
+    if (gewijzigd || aangekomen) save();
     pushLive(key);
     res.json({ ok: true, live: liveStateFor(key, req.body.lang) });
   });

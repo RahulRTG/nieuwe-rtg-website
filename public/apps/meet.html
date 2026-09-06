@@ -78,8 +78,9 @@
 <script src="/shared/social-intelligence-deck.js" defer></script>
 <script src="/shared/social-intelligence-runtime.js" defer></script>
 <script src="/shared/social-intelligence-data.js" defer></script>
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage">
 <header>
   <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
   <span><span class="ey">RTG</span><h1>Meet</h1></span>
@@ -109,7 +110,7 @@
     Alles op codenaam.</p>
 </main>
 
-<section id="kamer" aria-label="Vergaderkamer">
+<section id="kamer" role="dialog" aria-modal="true" aria-label="Vergaderkamer" hidden>
   <div id="kamerKop"></div>
   <div id="wieLijst"></div>
   <div id="tegels"></div>

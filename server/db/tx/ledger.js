@@ -15,8 +15,8 @@
    idempotent) naar het grootboek en haalt hem pas daarna uit het RAM. Nieuwe
    items gaan bij aanmaak direct (best-effort) mee; statuswissels van recente
    items neemt de veegronde mee via de hete kop. Zonder achterkant is dit inert.
-   Afgesplitst uit tx/index.js; het RAM-venster (txStaartNa/txVerwijder) en save()
-   komen via wire() binnen. */
+   Afgesplitst uit tx/index.js; het RAM-venster en de autoritatieve
+   collectietransactie komen via wire() binnen. */
 const state = require('../state');
 const db = state.db;
 
@@ -25,11 +25,15 @@ const { COLLECTIES, NAMEN, TX_SOORT, sleutelVan } = require('./collecties');
 /* Hoe een item een grootboekrij wordt (en terug): ./rij. Daar staat ook waarom
    het tijdstip genormaliseerd wordt -- zonder dat komt payBoekingen in
    Postgres-stand nergens, en zonder enige melding. */
-const { txDedup, tijdstipVan, rijVan, lees } = require('./rij');
+const { txDedup, veegplan, tijdstipVan, rijVan, lees } = require('./rij');
 
-// het RAM-venster + de snapshot-trigger komen uit tx/index (injectie voorkomt
-// een circulaire require: index gebruikt onze zet(), wij gebruiken hun venster)
-let venster = { txStaartNa: () => [], txVerwijder: () => {}, save: () => {} };
+// Het RAM-venster + de opslagpoort komen uit tx/index (injectie voorkomt een
+// circulaire require: index gebruikt onze zet(), wij gebruiken hun venster).
+// De veegronde mag nooit rechtstreeks db.data muteren en daarna save() roepen:
+// in PostgreSQL is dat buiten een request terecht een herstelpad dat readiness
+// sluit. De collectietransactie leest, kapt en publiceert dezelfde collectie
+// atomair zonder een tussentijdse lokale fantoomstand.
+let venster = { txStaartNa: () => [], bewerkCollectie: null };
 function wire(v) { venster = Object.assign(venster, v); }
 
 let achter = null;
@@ -37,6 +41,18 @@ const TX_VEEG_MS = Number(process.env.TX_VEEG_MS || 30000);
 const TX_KAP = Number(process.env.TX_KAP || 20000);      // max staart-items per veegronde (tegen event-loop-stalls)
 const TX_KOP = Number(process.env.TX_KOP || 500);        // hete kop die elke ronde opnieuw meegaat (statuswissels)
 const txBekend = Object.fromEntries(NAMEN.map(n => [n, new Set()])); // refs waarvan we weten dat ze in het grootboek staan
+/* `zet()` is best-effort en wordt bewust niet door de route afgewacht. Zonder
+   ordening kan zo'n oude, losse upsert NA een veegronde landen en een verse
+   status terugzetten. Reserveer daarom per soort+sleutel een baan. Verschillende
+   transacties blijven parallel; alleen twee versies van dezelfde rij wachten. */
+const txBaan = new Map();
+const baanSleutel = (naam, item) => naam + '\u0000' + String(sleutelVan(naam, item));
+function opBaan(sleutels, werk) {
+  const voor = sleutels.map(k => txBaan.get(k)).filter(Boolean);
+  const taak = Promise.all(voor.map(p => p.catch(() => {}))).then(werk);
+  for (const k of sleutels) txBaan.set(k, taak);
+  return taak.finally(() => { for (const k of sleutels) if (txBaan.get(k) === taak) txBaan.delete(k); });
+}
 let txVeegTimer = null, txVeegBezig = false;
 function txLedgerActief() { return !!achter; }
 // de WAL van het grootboek platslaan voor een backup; zonder achterkant inert
@@ -44,8 +60,9 @@ function checkpointGrootboek() { try { return !!(achter && achter.checkpoint && 
 
 async function txLedgerZet(naam, t) {
   if (!achter || !t || sleutelVan(naam, t) == null) return;
+  const rij = rijVan(naam, t), sleutel = baanSleutel(naam, t);
   try {
-    await achter.upsert([rijVan(naam, t)]);
+    await opBaan([sleutel], () => achter.upsert([rij]));
     txBekend[naam].add(sleutelVan(naam, t));
   } catch (e) { /* eventueel-consistent: de veegronde (backfill/kop) probeert het opnieuw */ }
 }
@@ -53,7 +70,8 @@ async function txLedgerBulk(naam, items) {
   if (!achter) return false;
   const schoonItems = txDedup(naam, items);
   if (!schoonItems.length) return true;
-  await achter.upsert(schoonItems.map(t => rijVan(naam, t)));
+  const rijen = schoonItems.map(t => rijVan(naam, t));
+  await opBaan(schoonItems.map(t => baanSleutel(naam, t)), () => achter.upsert(rijen));
   for (const t of schoonItems) txBekend[naam].add(sleutelVan(naam, t));
   return true;
 }
@@ -99,12 +117,14 @@ async function txVeegNu() {
       if (onbekend.length) await txLedgerBulk(naam, onbekend);
       if (arr.length) await txLedgerBulk(naam, arr.slice(0, TX_KOP));
       if (arr.length > COLLECTIES[naam].ramMax) {
-        const staart = venster.txStaartNa(naam, COLLECTIES[naam].ramMax).slice(-TX_KAP).filter(t => t && sleutelVan(naam, t) != null);
-        if (staart.length) {
-          await txLedgerBulk(naam, staart);   // eerst duurzaam in het grootboek...
-          venster.txVerwijder(naam, staart);  // ...dan pas uit het venster
-          venster.save();
-          console.log('[tx] ' + staart.length + ' ' + naam + ' voorbij het venster naar het grootboek verhuisd; ' + (db.data[naam] || []).length + ' in het RAM.');
+        const plan = veegplan(naam, arr, venster.txStaartNa(naam, COLLECTIES[naam].ramMax)
+          .slice(-TX_KAP).filter(t => t && sleutelVan(naam, t) != null));
+        if (plan.items.length) {
+          await txLedgerBulk(naam, plan.items); // eerst duurzaam in het grootboek...
+          if (typeof venster.bewerkCollectie !== 'function') throw new Error('tx-veegronde mist de collectietransactie');
+          const verwijderd = await venster.bewerkCollectie(naam, plan.verwijder);
+                                                 // ...dan autoritatief uit het venster
+          if (verwijderd) console.log('[tx] ' + verwijderd + ' ' + naam + ' voorbij het venster naar het grootboek verhuisd; ' + (db.data[naam] || []).length + ' in het RAM.');
         }
       }
     }

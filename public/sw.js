@@ -14,8 +14,26 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-4c464ae4';
+const CACHE = 'rtg-app-4318c0fe';
 const SHELL = ['/apps/app.html', '/shared/id.js',
+  /* Heritage is één systeemlaag. Een offline start mag niet alleen de HTML
+     bewaren en daarna identiteit, materiaal, beweging of lettertypen missen. */
+  '/shared/basis.js', '/shared/rtg-world-identity.js',
+  '/shared/rtg-heritage.css', '/shared/rtg-heritage-materials.css',
+  '/shared/rtg-heritage-adapters.css', '/shared/rtg-heritage-components.css',
+  '/shared/rtg-heritage-motion.css', '/shared/rtg-heritage-motion.js',
+  '/shared/rtg-continue-key.css', '/shared/rtg-continue-key-core.js',
+  '/shared/rtg-continue-key.js', '/shared/rtg-heritage-order.js',
+  '/shared/randen.js', '/shared/rtg-edge-worlds.js', '/shared/rtg-edge-icons.js',
+  '/shared/rtg-edge-library.js', '/shared/rtg-edge-system.js', '/shared/rtg-edge-system.css',
+  '/shared/rtg-edge-2-loader.js', '/shared/rtg-edge-2-context.js', '/shared/rtg-edge-command.js',
+  '/shared/rtg-edge-2.js', '/shared/rtg-edge-2.css',
+  '/images/worlds/heritage/living-heritage-v2.jpg',
+  '/images/worlds/heritage/travel-heritage-v2.jpg',
+  '/images/worlds/heritage/work-heritage-v2.jpg',
+  '/images/worlds/heritage/foundation-heritage-v2.jpg',
+  '/fonts/aFTQ7PxzY382XsXX63LUYJSKSKjWXFBP.woff2',
+  '/fonts/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2',
   /* De drie installeerbare passen starten met een betekenisvolle query. Die
      adressen staan daarom exact in de schil: ze mogen offline niet naar de
      kale Home worden omgebogen, maar moeten bij de eerste start wel openen. */

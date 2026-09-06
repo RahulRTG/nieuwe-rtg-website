@@ -42,6 +42,7 @@
 const fs = require('fs');
 const path = require('path');
 const zlib = require('zlib');
+const crypto = require('crypto');
 
 const { herschrijfHtml, decodeer, GOED_PAD, PAD } = require('./scriptbundel-rij');
 
@@ -87,7 +88,12 @@ function scriptbundel(publicDir) {
     const ae = String(req.headers['accept-encoding'] || '');
     const br = /\bbr\b/.test(ae), gz = !br && /\bgzip\b/.test(ae);
     const vorm = br ? 'b' : (gz ? 'g' : 'r');
-    const etag = 'W/"scb-' + Buffer.from(stempel).toString('base64url').slice(0, 32) + '-' + vorm + '"';
+    /* Hash de VOLLEDIGE stempel voordat hij wordt afgekapt. De oude vorm
+       encodeerde de tekst en sneed daarna op 32 tekens af; daardoor hing de
+       ETag alleen van de eerste circa 24 bytes af en konden wijzigingen in
+       latere scripts ten onrechte een 304 krijgen. */
+    const etag = 'W/"scb-' + crypto.createHash('sha1').update(stempel).digest('base64url').slice(0, 22) +
+      '-' + vorm + '"';
     res.setHeader('ETag', etag);
     res.setHeader('Cache-Control', 'no-cache');
     res.setHeader('Vary', 'Accept-Encoding');

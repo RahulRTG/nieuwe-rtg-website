@@ -18,20 +18,20 @@ vm.runInNewContext(werelden,context);
 const catalogus=context.window.RTGEdgeWorlds;
 
 test('het randenstelsel heeft een vaste dunne geometrie en maximaal 2 x 2',()=>{
-  assert.match(css,/--edge-top:40px;--edge-side:48px;--edge-bottom:48px/);
+  assert.match(css,/--edge-top:44px;--edge-side:48px;--edge-bottom:48px/);
   assert.match(kern,/\[1, 2, 4\]/);
   assert.match(lees('public/shared/rtg-schil/02-indeling.js'),/var kol = k === 1 \? 1 : 2/);
   assert.match(lees('public/shared/rtg-schil/03-surfaces.js'),/surfaces\.length >= 4/);
   const schilCss=lees('public/shared/rtg-schil.css');
   assert.match(schilCss,/\.rtg-handle button\{[\s\S]*min-width:24px;min-height:24px/);
   assert.match(schilCss,/\.rtg-console \.rijtje button\{[\s\S]*min-width:24px;min-height:24px/);
-  assert.match(css,/\.rtg-edge-crumbs button\{min-width:24px;min-height:24px/);
+  assert.match(css,/\.rtg-edge-crumbs button\{min-width:44px;min-height:44px/);
   assert.match(css,/\.rtg-edge-bottom>button,\.rtg-edge-bottom>a,\.rtg-edge-history\{height:var\(--edge-bottom\)/);
   assert.match(css,/\.rtg-edge-bottom\{[^}]*pointer-events:none/,
     'alleen de echte onderrandknoppen mogen apps onder de transparante balk afvangen');
   assert.match(css,/\.rtg-edge-ai-panel\{[^}]*pointer-events:none/,
     'een gesloten gesprek mag geen bediening in de app afvangen');
-  assert.match(css,/\.rtg-edge-action button\{min-width:24px;min-height:24px/);
+  assert.match(css,/\.rtg-edge-action button\{min-width:44px;min-height:44px/);
   assert.match(css,/@media\(max-width:767px\)[\s\S]*\.rtg-edge-layout\{display:none!important\}/);
 });
 

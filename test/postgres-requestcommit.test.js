@@ -9,6 +9,12 @@ const context = require('../server/db/verzoekcontext');
 const maakGrens = require('../server/db/postgres-verzoeken');
 const naCommitMail = require('../server/mail-na-commit');
 const { voegVeilig } = require('../server/pg/verzoekmerge');
+const { mergeHandeling, mergeApiSpoor } = require('../server/pg/verzoeksporen');
+const { voegKostenSamen } = require('../server/pg/verzoekmeters');
+const { voegRtgaiSamen } = require('../server/pg/verzoekrtgai');
+const maakPgInlezer = require('../server/pg/inlezen');
+const keten = require('../server/lib/keten');
+const { maakJournaal } = require('../server/kern/command/journaal');
 const { maakBus } = require('../server/bus');
 const { maakSessies, tokenHash } = require('../server/kern/sessies');
 
@@ -157,6 +163,201 @@ test('same-path conflict faalt gesloten; onafhankelijke velden blijven samenvoeg
     { rol: 'beheer', taal: 'nl' }, 'rechten'), { rol: 'beheer', taal: 'en' });
   assert.throws(() => voegVeilig({ rol: 'lid' }, { rol: 'beheer' }, { rol: 'ingetrokken' }, 'rechten'),
     e => e && e.code === 'PG_REQUEST_CONFLICT');
+});
+
+test('gelijktijdige kostenmeters tellen delta, tijd en opslaggemiddelde exact samen', () => {
+  const basis = { meters: { '2026-09': { huis: {
+    laatst: '2026-09-06T10:00:00.000Z', verzoek: 10, opslag: 2,
+    peilingen: { opslag: 2 }, pas: 'business', pasGezien: '2026-09-06T10:00:00.000Z'
+  } } }, tarieven: { bron: 'bestuur' } };
+  const ons = structuredClone(basis), hun = structuredClone(basis);
+  Object.assign(ons.meters['2026-09'].huis, {
+    laatst: '2026-09-06T10:01:00.000Z', verzoek: 13, opslag: 3,
+    peilingen: { opslag: 3 }, pas: 'business', pasGezien: '2026-09-06T10:01:00.000Z'
+  });
+  Object.assign(hun.meters['2026-09'].huis, {
+    laatst: '2026-09-06T10:02:00.000Z', verzoek: 14, opslag: 4,
+    peilingen: { opslag: 3 }, pas: 'premium', pasGezien: '2026-09-06T10:02:00.000Z'
+  });
+  const samen = voegKostenSamen(basis, ons, hun);
+  assert.equal(samen.meters['2026-09'].huis.verzoek, 17);
+  assert.equal(samen.meters['2026-09'].huis.laatst, '2026-09-06T10:02:00.000Z');
+  assert.equal(samen.meters['2026-09'].huis.peilingen.opslag, 4);
+  assert.equal(samen.meters['2026-09'].huis.opslag, 4.25,
+    'twee nieuwe peilingen worden als gewogen gemiddelde samengebracht');
+  assert.equal(samen.meters['2026-09'].huis.pas, 'premium');
+  assert.deepEqual(samen.tarieven, { bron: 'bestuur' });
+});
+
+test('kostenmeters bewaren een verse meting bij gelijktijdige retentie en raden onbekende velden niet', () => {
+  const basis = { meters: { '2024-01': { huis: { verzoek: 3 } } } };
+  const ons = { meters: {} };
+  const hun = { meters: { '2024-01': { huis: { verzoek: 4 } } } };
+  assert.equal(voegKostenSamen(basis, ons, hun).meters['2024-01'].huis.verzoek, 4);
+  assert.throws(() => voegKostenSamen(
+    { meters: { '2026-09': { huis: { bewijs: 'basis' } } } },
+    { meters: { '2026-09': { huis: { bewijs: 'ons' } } } },
+    { meters: { '2026-09': { huis: { bewijs: 'hun' } } } }),
+  e => e && e.code === 'PG_REQUEST_CONFLICT');
+  assert.equal(voegKostenSamen(
+    { meters: { '2026-09': { huis: { pas: 'rtg' } } } },
+    { meters: { '2026-09': { huis: { pas: 'business' } } } },
+    { meters: { '2026-09': { huis: { pas: 'rtg' } } } })
+    .meters['2026-09'].huis.pas, 'business',
+  'een legacy pas zonder meettijd gebruikt de gewone conflictvaste merge');
+  assert.throws(() => voegKostenSamen(
+    { meters: { '2026-09': { huis: { peilingen: { onbekend: 1 } } } } },
+    { meters: { '2026-09': { huis: { peilingen: { onbekend: 2 } } } } },
+    { meters: { '2026-09': { huis: { peilingen: { onbekend: 3 } } } } }),
+  e => e && e.code === 'PG_REQUEST_CONFLICT',
+  'alleen geregistreerde standmeters mogen peilingen als delta optellen');
+});
+
+test('twee instances voegen RTG-AI metingen als monotone delta samen', () => {
+  const basis = { fase: 'meelezen', gestart: 1, waarnemingen: 10,
+    domeinen: { auth: 6, office: 4 }, fouten: 1, rondes: 2,
+    roerSinds: null, roerRondes: 0,
+    journaal: [{ at: 10, soort: 'training', tekst: 'basis' }] };
+  const ons = structuredClone(basis), hun = structuredClone(basis);
+  ons.waarnemingen += 4; ons.domeinen.auth += 3; ons.domeinen.member = 1;
+  ons.fouten += 1; ons.rondes += 1;
+  ons.journaal.unshift({ at: 30, soort: 'training', tekst: 'ons' });
+  hun.waarnemingen += 5; hun.domeinen.auth += 2; hun.domeinen.supplier = 3;
+  hun.rondes += 2;
+  hun.journaal.unshift({ at: 20, soort: 'training', tekst: 'hun' });
+
+  const samen = voegRtgaiSamen(basis, ons, hun);
+  assert.equal(samen.waarnemingen, 19);
+  assert.equal(samen.domeinen.auth, 11);
+  assert.equal(samen.domeinen.member, 1);
+  assert.equal(samen.domeinen.supplier, 3);
+  assert.equal(samen.fouten, 2);
+  assert.equal(samen.rondes, 5);
+  assert.deepEqual(samen.journaal.map(x => x.tekst), ['ons', 'hun', 'basis']);
+  assert.equal(voegRtgaiSamen({ ...basis, gestart: 20 },
+    { ...ons, gestart: 20 }, { ...hun, gestart: 10 }).gestart, 10,
+  'de eerste echte waarneming blijft de start van een gedeelde meetperiode');
+  assert.throws(() => voegRtgaiSamen(basis,
+    { ...ons, fase: 'klaar-voor-roer' }, { ...hun, fase: 'aan-het-roer' }),
+  e => e && e.code === 'PG_REQUEST_CONFLICT',
+  'twee strijdige roerstanden worden nooit op basis van telemetrie geraden');
+  const identiek = structuredClone(basis); identiek.waarnemingen = 12;
+  assert.equal(voegRtgaiSamen(basis, identiek, structuredClone(identiek)).waarnemingen, 14,
+    'gelijke onafhankelijke node-delta\'s gaan niet stil verloren');
+  const terug = structuredClone(basis); terug.waarnemingen = 9;
+  assert.throws(() => voegRtgaiSamen(basis, terug, structuredClone(terug)),
+    e => e && e.code === 'PG_REQUEST_CONFLICT',
+    'ook een identieke teller-terugzet faalt gesloten');
+});
+
+test('PostgreSQL-inlezen herbaseert RTG-AI delta zodat een volgende notify niet dubbeltelt', async () => {
+  let remote = 3, ver = 1;
+  let remoteJournaal = [{ at: 10, soort: 'training', tekst: 'basis' }];
+  const vorm = (n, journaal = remoteJournaal) => ({ fase: 'meelezen', gestart: 1, waarnemingen: n,
+    domeinen: { auth: n }, fouten: 0, rondes: 0, roerSinds: null,
+    roerRondes: 0, journaal: structuredClone(journaal) });
+  const basisJournaal = [{ at: 10, soort: 'training', tekst: 'basis' }];
+  const laatsteJson = new Map([['rtgai', JSON.stringify(vorm(0, basisJournaal))]]);
+  const toegepast = new Map([['rtgai', 0]]);
+  const pool = { async query(sql) {
+    if (/SELECT key, ver/.test(sql)) return { rows: [{ key: 'rtgai', ver }] };
+    return { rows: [{ val: JSON.stringify(vorm(remote)), ver, weg: false }] };
+  } };
+  const inlezer = maakPgInlezer({ pool, merge3: voegVeilig, uitStore: x => x,
+    toegepast, laatsteJson });
+  const data = { rtgai: vorm(5, [
+    { at: 20, soort: 'training', tekst: 'lokaal' }, ...basisJournaal
+  ]) };
+  remoteJournaal = [{ at: 30, soort: 'training', tekst: 'remote' }, ...basisJournaal];
+  await inlezer.haalNieuwer(data);
+  assert.equal(data.rtgai.waarnemingen, 8);
+  assert.deepEqual(data.rtgai.journaal.map(x => x.tekst), ['lokaal', 'remote', 'basis'],
+    'lokale kop blijft herbaseerbaar voor de actuele remote keten');
+  assert.equal(JSON.parse(laatsteJson.get('rtgai')).waarnemingen, 3,
+    'de actuele remote stand wordt de nieuwe basis');
+  remote = 4; ver = 2;
+  remoteJournaal = [
+    { at: 40, soort: 'training', tekst: 'remote-twee' },
+    { at: 30, soort: 'training', tekst: 'remote' }, ...basisJournaal
+  ];
+  await inlezer.haalNieuwer(data);
+  assert.equal(data.rtgai.waarnemingen, 9,
+    'alleen de ene nieuwe remote waarneming wordt bij de lokale vijf geteld');
+  assert.deepEqual(data.rtgai.journaal.map(x => x.tekst),
+    ['lokaal', 'remote-twee', 'remote', 'basis'],
+  'ook een remote regel met een nieuwere klok blijft na de tweede notify mergeerbaar');
+});
+
+test('gelijktijdige auditregels worden op de actuele ketenkop herketend, nooit overschreven', () => {
+  const basis = [];
+  keten.noteerIn(basis, { at: 'basis', pad: '/api/basis' }, 50000);
+  const ons = basis.map(x => ({ ...x }));
+  const hun = basis.map(x => ({ ...x }));
+  keten.noteerIn(ons, { at: 'ons', pad: '/api/ons' }, 50000);
+  keten.noteerIn(hun, { at: 'hun', pad: '/api/hun' }, 50000);
+  const samen = mergeHandeling(basis, ons, hun);
+  assert.deepEqual(samen.map(x => x.pad), ['/api/ons', '/api/hun', '/api/basis']);
+  assert.equal(keten.verifieer(samen).ok, true);
+  const vervalst = ons.map(x => ({ ...x }));
+  vervalst[1].pad = '/api/herschreven';
+  assert.throws(() => mergeHandeling(basis, vervalst, hun),
+    e => e && e.code === 'PG_REQUEST_CONFLICT');
+  const kapot = ons.map(x => ({ ...x })); kapot[0].hash = 'vals';
+  assert.throws(() => mergeHandeling(basis, kapot, hun),
+    e => e && e.code === 'PG_REQUEST_CONFLICT', 'een kapotte lokale keten wordt niet stil hersteld');
+  const hashloos = ons.map(x => ({ ...x })); delete hashloos[0].hash;
+  assert.throws(() => mergeHandeling(basis, hashloos, basis),
+    e => e && e.code === 'PG_REQUEST_CONFLICT', 'een nieuwe hashloze regel geldt niet als legacybewijs');
+  const dubbelNr = [keten.schakel({ at: 'dubbel', pad: '/api/dubbel' }, basis[0].hash, basis[0].nr),
+    ...basis];
+  assert.throws(() => mergeHandeling(basis, dubbelNr, basis),
+    e => e && e.code === 'PG_REQUEST_CONFLICT', 'een toevoeging hergebruikt geen ankervolgnummer');
+  const vervangen = [];
+  keten.noteerIn(vervangen, { at: 'ander', pad: '/api/vervanger' }, 50000);
+  assert.throws(() => mergeHandeling(basis, vervangen, basis),
+    e => e && e.code === 'PG_REQUEST_CONFLICT', 'een geldige maar andere keten vervangt het bewijs niet');
+  const gesnoeid = samen.slice(0, 2);
+  assert.deepEqual(mergeHandeling(samen, gesnoeid, samen), gesnoeid,
+    'retentie van de oudste staart landt wanneer PostgreSQL niet veranderde');
+});
+
+test('gelijktijdige API-journaalregels behouden teller, volgorde en zegelketen', () => {
+  const maak = () => {
+    const db = { data: { apiSpoor: {} } };
+    const j = maakJournaal({ db, save() {}, crypto, vak: () => db.data.apiSpoor });
+    return { db, j };
+  };
+  const bron = maak(); bron.j.noteer({ actor: 'a', actie: 'basis' });
+  const basis = JSON.parse(JSON.stringify(bron.db.data.apiSpoor));
+  const een = maak(); een.db.data.apiSpoor = JSON.parse(JSON.stringify(basis));
+  een.j.noteer({ actor: 'b', actie: 'ons' });
+  const twee = maak(); twee.db.data.apiSpoor = JSON.parse(JSON.stringify(basis));
+  twee.j.noteer({ actor: 'c', actie: 'hun' });
+  const samen = mergeApiSpoor(basis, een.db.data.apiSpoor, twee.db.data.apiSpoor);
+  assert.deepEqual(samen.commandJournaal.map(x => x.actie), ['basis', 'hun', 'ons']);
+  assert.equal(samen.commandJournaalTotaal, 3);
+  for (let i = 1; i < samen.commandJournaal.length; i++)
+    assert.equal(samen.commandJournaal[i].vorig, samen.commandJournaal[i - 1].zegel);
+
+  const wis = maak(); wis.db.data.apiSpoor = JSON.parse(JSON.stringify(samen));
+  wis.j.wisActor('b', 'AVG-proef');
+  const herschreven = mergeApiSpoor(samen, wis.db.data.apiSpoor, samen);
+  assert.equal(herschreven.commandJournaal.some(x => x.actor === 'b'), false,
+    'een AVG-wissing verdwijnt niet wanneer de database niet veranderde');
+  assert.equal(wis.j.controleer().heel, true);
+  const vol = maak(); vol.j.noteer({ actor: 'oudste', actie: 'basis-0' });
+  for (let i = 1; i < 5000; i++) vol.j.noteer({ actor: 'ander', actie: 'basis-' + i });
+  const volBasis = JSON.parse(JSON.stringify(vol.db.data.apiSpoor));
+  vol.j.wisActor('oudste', 'AVG-vensterproef');
+  assert.doesNotThrow(() => mergeApiSpoor(volBasis, vol.db.data.apiSpoor, volBasis),
+    'de bewezen wissing van de afgekaptte oudste regel blijft geldig');
+  const vervanger = maak(); vervanger.j.noteer({ actor: 'x', actie: 'vervanger' });
+  assert.throws(() => mergeApiSpoor(basis, vervanger.db.data.apiSpoor, basis),
+    e => e && e.code === 'PG_REQUEST_CONFLICT', 'een aparte geldige keten vervangt het spoor niet');
+  const kapot = JSON.parse(JSON.stringify(een.db.data.apiSpoor));
+  kapot.commandJournaal[1].zegel = 'vals';
+  assert.throws(() => mergeApiSpoor(basis, kapot, twee.db.data.apiSpoor),
+    e => e && e.code === 'PG_REQUEST_CONFLICT', 'een kapot lokaal zegel wordt niet stil hersteld');
 });
 
 test('commitfout geeft 503 en laat geen dirty RAM of succes-naCommit achter', async () => {

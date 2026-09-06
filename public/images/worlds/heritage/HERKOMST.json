@@ -1,0 +1,42 @@
+{
+  "assets": [
+    {
+      "bestand": "living-heritage-v2.jpg",
+      "sha256": "cc637f98d11e932063b411954813fd345fc8e41d65d1fa018ee09dbd9314cd6e",
+      "wereld": "LivingOS",
+      "bronbestand": "exec-4614318f-820b-4925-a89e-dace0a0bcfa6.png",
+      "doel": "Brede fotografische wereldachtergrond met rustige ruimte voor de interface.",
+      "prompt": "Original cinematic editorial hospitality scene: a contemporary Mediterranean residence and intimate dining terrace at blue-gold hour, warm and tactile, with negative space on the left; pearl, ivory, warm black, restrained burgundy, dark gold and soft bronze; no UI, text, logo or watermark."
+    },
+    {
+      "bestand": "travel-heritage-v2.jpg",
+      "sha256": "87f0ce2c3f053b497fd38539545da98e2fbfd147c776af987f9a3a0c6f96ddc4",
+      "wereld": "TravelOS",
+      "bronbestand": "exec-732d5532-d727-4977-8a16-652ece12dc3b.png",
+      "doel": "Brede directionele wereldachtergrond voor reizen, routes en vertrek.",
+      "prompt": "Original cinematic travel scene: a refined private airfield and coastal destination at deep twilight, with business aircraft, discreet chauffeured car and warm terminal lounge, negative space on the left; wine, near-black, champagne and midnight blue; no UI, text, logo or watermark."
+    },
+    {
+      "bestand": "work-heritage-v2.jpg",
+      "sha256": "02a90b1b25e5b5fef9d46c0db27456421092afe9b4883a77f5257fb852ed9f29",
+      "wereld": "WorkOS",
+      "bronbestand": "exec-c8b9dc83-0a9f-46e2-b66b-a0bfedb4bcae.png",
+      "doel": "Brede architectonische wereldachtergrond voor precies en beheerst werk.",
+      "prompt": "Original executive-work scene: a precise contemporary workspace at dusk overlooking a European city, with dark architectural negative space on the left; graphite, near-black green, muted teal, brass and stone white; no UI, readable screens, text, logo or watermark."
+    },
+    {
+      "bestand": "foundation-heritage-v2.jpg",
+      "sha256": "200169cad9909bdd73d2d55860e54ac05afb4684a3c0dbfbb5300f41c08e8356",
+      "wereld": "FoundationOS",
+      "bronbestand": "exec-43768d0f-fbf7-4208-ab85-fb2b37729b59.png",
+      "doel": "Brede waardige wereldachtergrond voor publieke en maatschappelijke context.",
+      "prompt": "Original civic editorial scene: an Amsterdam neighborhood courtyard and community garden with a diverse group naturally planting a young tree, calm negative space on the left; navy, civic gold, stone blue and muted green; no charity cliches, UI, text, logo or watermark."
+    }
+  ],
+  "gemaakt_op": "2026-09-06",
+  "generator": "OpenAI ingebouwde ImageGen",
+  "origineel_formaat": "1672x941 PNG",
+  "productieformaat": "JPEG kwaliteit 86",
+  "verklaring": "Origineel voor RTG gegenereerd. Geen extern stockbeeld, zichtbare merken of interface-elementen gebruikt. De vier beelden zijn afzonderlijke assets; geen uitgesneden atlas of opgeschaald quadrant.",
+  "referentie": "De door de opdrachtgever vastgelegde RTG Heritage Intelligence-doctrine bepaalde sfeer, wereldpalet, compositieruimte en materiaalrichting; de referentie-interfaces zijn niet gekopieerd."
+}

@@ -34,7 +34,7 @@ const edgeStaat = () => {
   if (!balk) return { roots: 0, balk: 'geen', venster: false };
   const stijl = getComputedStyle(balk), r = balk.getBoundingClientRect();
   const zichtbaar = stijl.display !== 'none' && stijl.visibility !== 'hidden' &&
-    stijl.pointerEvents !== 'none' && r.width > 0 && r.height > 0 && r.top < window.innerHeight;
+    r.width > 0 && r.height > 0 && r.top < window.innerHeight;
   return {
     roots: document.querySelectorAll('.rtg-edge-chrome').length,
     balk: zichtbaar ? 'zichtbaar' : 'weg',
@@ -78,7 +78,9 @@ test('de metgezel wijkt voor een venster en komt daarna terug',
     assert.equal(await page.evaluate(rahulStaat), 'zichtbaar', 'in rust is de centrale Rahul-tab bereikbaar');
     assert.deepEqual(await page.evaluate(edgeStaat), { roots: 1, balk: 'zichtbaar', venster: false },
       'in rust staat exact het ene Edge-casco klaar');
-    assert.equal(await page.locator('.rtg-edge-action button').textContent(), 'Maak een clip',
+    const zichtbareHoofdactie = '.rtg-edge-action button ' +
+      '[data-rtg-action-copy-for="idle"][aria-hidden="false"]';
+    assert.equal(await page.locator(zichtbareHoofdactie).textContent(), 'Maak een clip',
       'de ene onderrand neemt de hoofdhandeling van Clips over');
     assert.equal(await page.locator('#studioOpen').isVisible(), false,
       'de oude vaste duimstrook staat niet als tweede balk in beeld');

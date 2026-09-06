@@ -4,11 +4,10 @@
    wallet zelf bij (autolaad in de kern) en betaalt door. Krijgt de gedeelde ctx van
    kern/pay/index.js. */
 module.exports = (ctx) => {
-  const { crypto, save, schoon, nu, d, klompjes, tikcodes, grootboek, rekLid, saldoVan, walletRuimte,
+  const { crypto, save, schoon, nu, d, klompjes, klompjesKijk, tikcodes, grootboek, grootboekKijk, rekLid, saldoVan, walletRuimte,
     id, metIdem, boekAsync, zorgSaldo, seintje, bestaatLid, waarde,
     MIN_CENTEN, MAX_CENTEN, walletMax, KASCODE_MS } = ctx;
 
-  /* ---------- geld sturen en Klompjes ---------- */
   async function stuur({ van, aanCodenaam, centen, oms, idem, soort }) {
     const aan = schoon(aanCodenaam, 40);
     if (!aan || aan === van) return { status: 400, error: 'Kies aan wie je het stuurt.' };
@@ -99,7 +98,7 @@ module.exports = (ctx) => {
       });
   }
   function verzoekenVoor(codenaam) {
-    const alle = klompjes();
+    const alle = klompjesKijk();
     return {
       aanMij: alle.filter(v => v.aan === codenaam && v.status === 'open').slice(0, 20),
       vanMij: alle.filter(v => v.van === codenaam).slice(0, 20)
@@ -107,7 +106,7 @@ module.exports = (ctx) => {
   }
   // EEN knop: het Klompje betalen (met autolaad als het saldo tekortschiet)
   async function verzoekBetaal({ codenaam, verzoekId, idem }) {
-    const v = klompjes().find(x => x.id === verzoekId && x.aan === codenaam);
+    const v = klompjesKijk().find(x => x.id === verzoekId && x.aan === codenaam);
     if (!v) return { status: 404, error: 'Dit verzoek staat niet voor jou open.' };
     if (v.status !== 'open') return { status: 409, error: 'Dit verzoek is al afgehandeld.' };
     return metIdem(idem ? 'klompje:' + codenaam + ':' + idem : null,
@@ -124,7 +123,7 @@ module.exports = (ctx) => {
     }, { geld: 'voldoet een betaalverzoek van iemand anders' });
   }
   function verzoekIntrek({ codenaam, verzoekId }) {
-    const v = klompjes().find(x => x.id === verzoekId && x.van === codenaam);
+    const v = klompjesKijk().find(x => x.id === verzoekId && x.van === codenaam);
     if (!v) return { status: 404, error: 'Dit verzoek is niet van jou.' };
     if (v.status !== 'open') return { status: 409, error: 'Dit verzoek is al afgehandeld.' };
     v.status = 'ingetrokken';
@@ -141,7 +140,7 @@ module.exports = (ctx) => {
   /* ---------- het overzicht voor het lid (alles in een scherm) ---------- */
   function overzicht(codenaam) {
     const rek = rekLid(codenaam);
-    const rijen = grootboek().filter(r => r.van === rek || r.naar === rek).slice(0, 30).map(r => ({
+    const rijen = grootboekKijk().filter(r => r.van === rek || r.naar === rek).slice(0, 30).map(r => ({
       id: r.id, at: r.at, oms: r.oms, soort: r.soort,
       centen: r.naar === rek ? r.centen : -r.centen,
       tegen: (r.naar === rek ? r.van : r.naar).replace(/^lid:/, '').replace(/^partner:/, 'zaak ').replace(/^extern:oplaad$/, 'opgeladen').replace(/^extern:uitbetaald$/, 'bank')

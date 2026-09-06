@@ -1,49 +1,8 @@
-/* RTG Vandaag luxe, contract versie 2.
-   Opt-in: data-rtg-vandaag-luxe op body. Een lege waarde of "home" maakt de
-   wereldstart schermvullend; "surface" maakt een compacte contextkop. De
-   wereld komt uitsluitend uit data-rtg-world. Alle kleuren hieronder hebben
-   een semantische rol, zodat een modus nooit zijn eigen los palet krijgt. */
-.rtg-vandaag-luxe,
-.rtg-vandaag-luxe *{box-sizing:border-box}
+/* RTG-wereldschil · contract versie 3.
+   De vier bestaande homes zijn zelf het dashboard. Deze stylesheet maakt
+   daarom geen tweede cover of chrome: zij deelt alleen tokens, materialen en
+   responsieve rasterregels met de echte, reeds gebonden app-DOM. */
 
-.rtg-vandaag-luxe{
-  --vandaag-bg:#0b0b0a;--vandaag-inkt:#f5f0e6;--vandaag-inkt-rgb:245,240,230;
-  --vandaag-zacht:#b9ad9e;--vandaag-metaal:#d4bd7c;--vandaag-metaal-rgb:212,189,124;
-  --vandaag-paneel-rgb:13,14,14;--vandaag-signatuur:#7f1634;--vandaag-was-rgb:5,6,7;
-  --vandaag-foto:saturate(.72) contrast(1.06);--vandaag-schema:dark;
-  position:relative;z-index:1;isolation:isolate;width:100%;min-height:100svh;overflow:hidden;
-  border:0;border-radius:0;background:var(--vandaag-bg);color:var(--vandaag-inkt);
-  color-scheme:var(--vandaag-schema);font-family:Inter,system-ui,sans-serif;
-  box-shadow:inset 0 2px 0 var(--vandaag-signatuur)
-}
-
-.rtg-vandaag-luxe[data-wereld="living"]{
-  --vandaag-bg:#f4f0e8;--vandaag-inkt:#211e19;--vandaag-inkt-rgb:33,30,25;
-  --vandaag-zacht:#675f54;--vandaag-metaal:#745718;--vandaag-metaal-rgb:116,87,24;
-  --vandaag-paneel-rgb:251,248,242;--vandaag-signatuur:#b89545;--vandaag-was-rgb:244,240,232;
-  --vandaag-foto:saturate(.55) contrast(.94) brightness(1.06);--vandaag-schema:light
-}
-.rtg-vandaag-luxe[data-wereld="travel"]{
-  --vandaag-bg:#14090e;--vandaag-inkt:#f7f0e6;--vandaag-inkt-rgb:247,240,230;
-  --vandaag-zacht:#c2b2aa;--vandaag-metaal:#d0b77b;--vandaag-metaal-rgb:208,183,123;
-  --vandaag-paneel-rgb:35,16,22;--vandaag-signatuur:#7f1634;--vandaag-was-rgb:20,9,14;
-  --vandaag-foto:saturate(.78) contrast(1.08);--vandaag-schema:dark
-}
-.rtg-vandaag-luxe[data-wereld="work"]{
-  --vandaag-bg:#0c1112;--vandaag-inkt:#f0f2ec;--vandaag-inkt-rgb:240,242,236;
-  --vandaag-zacht:#aab6b2;--vandaag-metaal:#c1a45f;--vandaag-metaal-rgb:193,164,95;
-  --vandaag-paneel-rgb:20,27,28;--vandaag-signatuur:#75b8b1;--vandaag-was-rgb:12,17,18;
-  --vandaag-foto:saturate(.56) contrast(1.1);--vandaag-schema:dark
-}
-.rtg-vandaag-luxe[data-wereld="foundation"]{
-  --vandaag-bg:#071522;--vandaag-inkt:#f2f2ea;--vandaag-inkt-rgb:242,242,234;
-  --vandaag-zacht:#aebccc;--vandaag-metaal:#d0b66e;--vandaag-metaal-rgb:208,182,110;
-  --vandaag-paneel-rgb:11,32,50;--vandaag-signatuur:#d0b66e;--vandaag-was-rgb:7,21,34;
-  --vandaag-foto:saturate(.62) contrast(1.08);--vandaag-schema:dark
-}
-
-/* De expliciete opt-in kleurt ook de bestaande pagina onder de presentatielaag.
-   Edge en oudere schermnamen wijzen naar dezelfde semantische wereldrollen. */
 body[data-rtg-vandaag-luxe][data-rtg-world]{
   --rtg-bg:var(--rtg-v-bg);--rtg-grond:var(--rtg-v-bg);
   --rtg-card:var(--rtg-v-card);--rtg-card2:var(--rtg-v-card2);--rtg-line:var(--rtg-v-line);
@@ -56,23 +15,36 @@ body[data-rtg-vandaag-luxe][data-rtg-world]{
   --paneel:var(--rtg-v-card);--paneel2:var(--rtg-v-card2);--txt:var(--rtg-v-ink);
   --muted:var(--rtg-v-muted);--soft:var(--rtg-v-muted);--zacht:var(--rtg-v-muted);
   --line:var(--rtg-v-line);--lijn:var(--rtg-v-line);--gold:var(--rtg-v-metal);--goud:var(--rtg-v-metal);
+  --gold-rand:color-mix(in srgb,var(--rtg-v-metal) 48%,transparent);
   --burgundy:var(--rtg-v-signature);
+  --rtg-v-ground:var(--rtg-world-ground,linear-gradient(155deg,#171310,#0c0b0a 58%,#070605));
+  --rtg-v-photo:var(--rtg-world-photo,none);
+  --rtg-v-photo-mask:var(--rtg-world-photo-mask,linear-gradient(112deg,rgba(12,11,10,.98),rgba(12,11,10,.88)));
+  --rtg-v-photo-position:var(--rtg-world-photo-position,center);
+  --rtg-v-depth-content:var(--rtg-depth-content,inset 0 1px rgba(255,255,255,.035),0 1px 0 rgba(0,0,0,.18));
+  --rtg-v-depth-focus:var(--rtg-depth-focus,inset 0 1px rgba(255,255,255,.08),0 20px 55px rgba(0,0,0,.25));
   color-scheme:var(--rtg-v-schema);background:var(--rtg-v-bg)!important;color:var(--rtg-v-ink)!important
 }
 body[data-rtg-vandaag-luxe][data-rtg-world="living"]{
-  --rtg-v-bg:#f4f0e8;--rtg-v-card:#fbf8f2;--rtg-v-card2:#e8e0d2;--rtg-v-ink:#211e19;
-  --rtg-v-muted:#675f54;--rtg-v-line:rgba(33,30,25,.16);--rtg-v-signature:#b89545;
-  --rtg-v-metal:#745718;--rtg-v-accent-soft:rgba(184,149,69,.14);--rtg-v-schema:light
+  --rtg-v-bg:var(--rtg-world-bg,#f4f0e8);--rtg-v-card:var(--rtg-world-card,#fbf8f2);
+  --rtg-v-card2:var(--rtg-world-card-strong,#e8e0d2);--rtg-v-ink:var(--rtg-world-ink,#211e19);
+  --rtg-v-muted:var(--rtg-world-muted,#675f54);--rtg-v-line:var(--rtg-world-line,rgba(33,30,25,.17));
+  --rtg-v-signature:var(--rtg-world-signature,#7f1634);--rtg-v-metal:var(--rtg-world-metal,#745718);
+  --rtg-v-accent-soft:var(--rtg-world-signature-soft,rgba(127,22,52,.1));--rtg-v-schema:var(--rtg-world-schema,light)
 }
 body[data-rtg-vandaag-luxe][data-rtg-world="travel"]{
-  --rtg-v-bg:#14090e;--rtg-v-card:#231016;--rtg-v-card2:#0e090b;--rtg-v-ink:#f7f0e6;
-  --rtg-v-muted:#c2b2aa;--rtg-v-line:rgba(247,240,230,.16);--rtg-v-signature:#7f1634;
-  --rtg-v-metal:#d0b77b;--rtg-v-accent-soft:rgba(127,22,52,.22);--rtg-v-schema:dark
+  --rtg-v-bg:var(--rtg-world-bg,#14090e);--rtg-v-card:var(--rtg-world-card,#231016);
+  --rtg-v-card2:var(--rtg-world-card-strong,#0e090b);--rtg-v-ink:var(--rtg-world-ink,#f7f0e6);
+  --rtg-v-muted:var(--rtg-world-muted,#c2b2aa);--rtg-v-line:var(--rtg-world-line,rgba(247,240,230,.17));
+  --rtg-v-signature:var(--rtg-world-signature,#a72049);--rtg-v-metal:var(--rtg-world-metal,#d0b77b);
+  --rtg-v-accent-soft:var(--rtg-world-signature-soft,rgba(158,28,64,.2));--rtg-v-schema:var(--rtg-world-schema,dark)
 }
 body[data-rtg-vandaag-luxe][data-rtg-world="work"]{
-  --rtg-v-bg:#0c1112;--rtg-v-card:#141b1c;--rtg-v-card2:#090d0e;--rtg-v-ink:#f0f2ec;
-  --rtg-v-muted:#aab6b2;--rtg-v-line:rgba(240,242,236,.15);--rtg-v-signature:#75b8b1;
-  --rtg-v-metal:#c1a45f;--rtg-v-accent-soft:rgba(117,184,177,.16);--rtg-v-schema:dark;
+  --rtg-v-bg:var(--rtg-world-bg,#0c1112);--rtg-v-card:var(--rtg-world-card,#141b1c);
+  --rtg-v-card2:var(--rtg-world-card-strong,#090d0e);--rtg-v-ink:var(--rtg-world-ink,#f0f2ec);
+  --rtg-v-muted:var(--rtg-world-muted,#aab6b2);--rtg-v-line:var(--rtg-world-line,rgba(240,242,236,.16));
+  --rtg-v-signature:var(--rtg-world-signature,#75b8b1);--rtg-v-metal:var(--rtg-world-metal,#c1a45f);
+  --rtg-v-accent-soft:var(--rtg-world-signature-soft,rgba(117,184,177,.15));--rtg-v-schema:var(--rtg-world-schema,dark);
   --wo-black:#0c1112;--wo-onyx:#0c1112;--wo-panel:#141b1c;--wo-panel-hi:#192223;
   --wo-silver:#f0f2ec;--wo-muted:#aab6b2;--wo-line:rgba(240,242,236,.15);
   --wo-line-gold:rgba(193,164,95,.34);--wo-gold:#c1a45f;--wo-bordeaux:#4f8580;--wo-bordeaux-hi:#75b8b1;
@@ -80,297 +52,707 @@ body[data-rtg-vandaag-luxe][data-rtg-world="work"]{
   --wk-soft:#aab6b2;--wk-red:#75b8b1;--wk-gold:#c1a45f
 }
 body[data-rtg-vandaag-luxe][data-rtg-world="foundation"]{
-  --rtg-v-bg:#071522;--rtg-v-card:#0b2032;--rtg-v-card2:#06101b;--rtg-v-ink:#f2f2ea;
-  --rtg-v-muted:#aebccc;--rtg-v-line:rgba(242,242,234,.16);--rtg-v-signature:#d0b66e;
-  --rtg-v-metal:#d0b66e;--rtg-v-accent-soft:rgba(208,182,110,.16);--rtg-v-schema:dark
+  --rtg-v-bg:var(--rtg-world-bg,#071522);--rtg-v-card:var(--rtg-world-card,#0b2032);
+  --rtg-v-card2:var(--rtg-world-card-strong,#06101b);--rtg-v-ink:var(--rtg-world-ink,#f2f2ea);
+  --rtg-v-muted:var(--rtg-world-muted,#aebccc);--rtg-v-line:var(--rtg-world-line,rgba(242,242,234,.17));
+  --rtg-v-signature:var(--rtg-world-signature,#d0b66e);--rtg-v-metal:var(--rtg-world-metal,#d0b66e);
+  --rtg-v-accent-soft:var(--rtg-world-signature-soft,rgba(208,182,110,.14));--rtg-v-schema:var(--rtg-world-schema,dark)
 }
 
-/* Living is het lichte huis. Het bestaande Vandaag-scherm was nog volledig
-   voor een donkere grond getekend: halfdoorzichtige zwarte kaarten mengden met
-   parelmoer en lieten zowel de donkere nieuwe inkt als de oude witte actieve
-   stand onleesbaar achter. De pagina blijft functioneel dezelfde, maar ieder
-   inhoudsvlak gebruikt nu het materiaalpaar van de gekozen wereld. */
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .schil{
-  background:radial-gradient(70% 42% at 82% 0,rgba(184,149,69,.09),transparent 70%),var(--rtg-v-bg);
-  color:var(--rtg-v-ink)
+/* Het dashboardcontract wordt pas zichtbaar onder de runtime-commitmarker.
+   Daardoor blijft een fout vóór de commit een volledig werkbare legacy-home. */
+body[data-rtg-world-dashboard-ready="true"]{
+  min-height:100svh;margin:0!important;overflow-x:hidden;
+  background:
+    radial-gradient(65% 40% at 82% 0,var(--rtg-v-accent-soft),transparent 72%),
+    var(--rtg-v-photo-mask),
+    var(--rtg-v-photo),
+    var(--rtg-v-ground)!important;
+  background-size:auto,auto,cover,auto!important;
+  background-position:center,center,var(--rtg-v-photo-position),center!important;
+  background-repeat:no-repeat!important;background-attachment:fixed!important
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .standen button.actief,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .lifelagen button.actief,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .lifelagen button:hover{
-  color:var(--rtg-v-ink)!important
+body[data-rtg-world-dashboard-ready="true"]::after{
+  content:"";position:fixed;z-index:0;inset:0;pointer-events:none;
+  background:
+    radial-gradient(38rem 28rem at 76% 9%,color-mix(in srgb,var(--rtg-v-metal) 5%,transparent),transparent 72%),
+    linear-gradient(135deg,transparent 0 62%,color-mix(in srgb,var(--rtg-v-signature) 5%,transparent)),
+    repeating-linear-gradient(115deg,rgba(255,255,255,.012) 0 1px,transparent 1px 7px)
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .laagkeuze,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .hero,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .dagkaart,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .kompasblok,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .laagfocus a,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .mag-kader,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .kaart{
-  border-color:var(--rtg-v-line)!important;background:var(--rtg-v-card)!important;color:var(--rtg-v-ink)!important
+body[data-rtg-world-dashboard-ready="true"] .rtg-world-dashboard,
+body[data-rtg-world-dashboard-ready="true"] .rtg-world-dashboard *{box-sizing:border-box}
+body[data-rtg-world-dashboard-ready="true"] .rtg-world-dashboard{
+  position:relative;z-index:1;isolation:isolate;width:min(100%,96rem)!important;max-width:96rem!important;
+  min-width:0;margin-inline:auto!important;padding:clamp(.9rem,2.6vw,2.5rem)!important;
+  padding-bottom:clamp(5.5rem,9vw,8rem)!important;color:var(--rtg-v-ink)
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .dagkaart:hover,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .laagfocus a:hover{
-  background:var(--rtg-v-card2)!important
+body[data-rtg-world-dashboard-ready="true"] .rtg-world-dashboard :where(h1,h2,h3){
+  color:var(--rtg-v-ink);text-wrap:balance
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .lifelagen button{
-  border-color:var(--rtg-v-line)!important;background:var(--rtg-v-card2)!important;color:var(--rtg-v-muted)!important
+body[data-rtg-world-dashboard-ready="true"] .rtg-world-dashboard :where(a,button,input,select,textarea):focus-visible{
+  outline:2px solid var(--rtg-v-metal)!important;outline-offset:3px
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .mag-knop{
-  border-color:var(--rtg-v-line);color:var(--rtg-v-ink)
+body[data-rtg-world-dashboard-ready="true"] .rtg-world-dashboard :where(a,button){
+  -webkit-tap-highlight-color:transparent
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .laagmelding,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .dagwacht{
-  color:var(--rtg-v-metal)!important
+body[data-rtg-world-dashboard-ready="true"] .rtg-world-dashboard :where(.ey,.micro,.buurtsec,.regkop){
+  color:var(--rtg-v-metal)!important;letter-spacing:.17em
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .kompaslijst a:hover{
-  color:var(--rtg-v-ink)!important
-}
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .mag-knop.prim{
-  color:#fbf8f2!important
-}
-/* De oorspronkelijke Living-bank en -kop worden als echte nodes naar de
-   lichte Edge-context verplaatst. Hun oude ivoor-op-zwartkleuren mogen daar
-   niet meeverhuizen: dezelfde semantische inktrollen gelden ook in de lade. */
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .bank .merk,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .topbar a,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .topbar button{
-  color:var(--rtg-v-ink)!important
-}
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .bank .merk small,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .bank a{
+body[data-rtg-world-dashboard-ready="true"] .rtg-world-dashboard :where(.sub,.stil,.leeg,.leegtekst,.uitleg){
   color:var(--rtg-v-muted)!important
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .bank a:hover,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .bank a.actief{
-  color:var(--rtg-v-ink)!important;background:var(--rtg-v-accent-soft)!important
+
+/* Eén focuslaag per wereldhome. Dit zijn de bestaande hero's; de schaduw en
+   binnenlijn geven ze afstand tot de operationele inhoud zonder een extra
+   dashboard of generieke glazen kaart toe te voegen. */
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkop,
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroep,
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kaartraster,
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .onthaal{
+  box-shadow:var(--rtg-v-depth-focus)!important;
+  outline:1px solid color-mix(in srgb,var(--rtg-v-ink) 4%,transparent);
+  outline-offset:-2px
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .bank a span,
-body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .topbar .terug{
+
+/* LivingOS · parelmoer, champagne en daglicht. */
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .schil{
+  display:block!important;min-height:0!important;background:transparent!important;color:var(--rtg-v-ink)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .schil>.werk{
+  grid-column:auto!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .standen{
+  justify-content:flex-start;margin:0 0 clamp(.8rem,2vw,1.35rem)!important;
+  padding-bottom:.2rem;border-bottom:1px solid var(--rtg-v-line)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .standen button{
+  min-height:44px;padding:.7rem 1rem!important;color:var(--rtg-v-muted)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .standen button.actief{
+  color:var(--rtg-v-ink)!important;border-color:var(--rtg-v-metal)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dag{
+  display:grid!important;grid-template-columns:minmax(0,1.72fr) minmax(17rem,.68fr)!important;
+  gap:clamp(.9rem,2vw,1.5rem)!important;align-items:start
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkolom{min-width:0}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkop{
+  position:relative;isolation:isolate;min-height:clamp(18rem,31vw,29rem);
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-end;
+  margin:0 0 1rem!important;padding:clamp(1.35rem,4vw,3.4rem)!important;
+  overflow:hidden;border:1px solid var(--rtg-v-line);background:var(--rtg-v-card)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkop::before,
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkop::after{
+  content:"";position:absolute;inset:0;pointer-events:none
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkop::before{
+  z-index:-2;background:var(--rtg-v-photo) var(--rtg-v-photo-position)/cover no-repeat;
+  filter:saturate(.62) contrast(.98) brightness(1.03);transform:scale(1.015);
+  transition:transform var(--rtg-time-atmospheric,560ms) var(--rtg-ease-atmospheric,cubic-bezier(.22,.66,.2,1))
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkop::after{
+  z-index:-1;width:auto;height:auto;margin:0;background:
+    linear-gradient(90deg,color-mix(in srgb,var(--rtg-v-bg) 97%,transparent),color-mix(in srgb,var(--rtg-v-bg) 67%,transparent) 52%,color-mix(in srgb,var(--rtg-v-bg) 14%,transparent)),
+    linear-gradient(0deg,color-mix(in srgb,var(--rtg-v-bg) 84%,transparent),transparent 68%)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkop h1{
+  max-width:10ch;margin:.7rem 0 1rem!important;
+  font:400 clamp(2.7rem,5.5vw,5.5rem)/.94 "Bodoni Moda",Georgia,serif!important;
+  letter-spacing:-.035em!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkop .status{
+  margin:0!important;border-color:var(--rtg-v-line)!important;background:rgba(251,248,242,.6)
+}
+.rtg-dashboard-hero-cta{
+  min-height:48px;display:inline-flex;align-items:center;gap:1.4rem;margin-top:1rem;
+  padding:.75rem 1rem;border:1px solid var(--rtg-v-signature);color:var(--rtg-world-action-ink,#fff);
+  background:var(--rtg-v-signature);font-size:.65rem;font-weight:700;letter-spacing:.13em;
+  text-decoration:none;text-transform:uppercase;box-shadow:0 12px 28px color-mix(in srgb,var(--rtg-v-signature) 22%,transparent);
+  transition:translate var(--rtg-time-direct,100ms),background-color var(--rtg-time-direct,100ms),box-shadow var(--rtg-time-direct,100ms)
+}
+.rtg-dashboard-hero-cta:hover{background:color-mix(in srgb,var(--rtg-v-signature) 88%,#000);translate:0 -2px}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagtitel{
+  min-height:2.4rem;margin:1.2rem 0 .5rem!important;padding:0 .1rem .55rem;
+  border-bottom:1px solid var(--rtg-v-line)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] :where(.dagkaart,.kompasblok,.laagkeuze,.hero,.kaart,.laagfocus a){
+  border-color:var(--rtg-v-line)!important;
+  background-color:var(--rtg-v-card)!important;
+  background-image:linear-gradient(145deg,color-mix(in srgb,#fff 32%,transparent),transparent 48%)!important;
+  color:var(--rtg-v-ink)!important;box-shadow:var(--rtg-v-depth-content)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .momentenrij{
+  gap:.6rem!important;margin:0 0 1rem!important;padding:.15rem 0 .65rem
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .moment{
+  min-width:6rem;padding:.55rem;border:1px solid var(--rtg-v-line);background:var(--rtg-v-card)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagfeed{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:.65rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkaart{
+  min-height:6.6rem!important;padding:1rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .kompas{
+  position:sticky!important;top:1rem!important;gap:.65rem!important;min-width:0
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .kompasblok{
+  padding:1.1rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .kompaslijst a{
+  color:var(--rtg-v-muted)!important;border-color:var(--rtg-v-line)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .kompaslijst a:hover{
+  color:var(--rtg-v-ink)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] #reisdossier{
+  margin:1rem 0 0!important;padding:clamp(1.2rem,2.5vw,2rem)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .lifelagen button{
+  border-color:var(--rtg-v-line)!important;background:var(--rtg-v-card2)!important;color:var(--rtg-v-muted)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .lifelagen button:is(.actief,:hover){
+  color:var(--rtg-v-ink)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .grid,
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .laagfocus{
+  gap:.65rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .mag-knop{
+  border-color:var(--rtg-v-line);color:var(--rtg-v-ink)
+}
+
+/* WorkOS · onyx en gedempt teal. */
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .rtg-world-dashboard{
+  background:transparent!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .merkkop{
+  min-height:0!important;display:flex!important;align-items:center!important;gap:1rem;
+  margin:0!important;padding:.6rem .15rem .8rem!important;overflow:visible!important;
+  border:0!important;border-bottom:1px solid var(--rtg-v-line)!important;background:transparent!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .merkkop::before{
+  content:"02 / WORKOS"!important;flex:0 0 auto;margin:0!important;color:var(--rtg-v-metal)!important;
+  font-size:.55rem!important;letter-spacing:.18em!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .merkkop::after{display:none!important}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .merkkop h1{
+  display:flex;align-items:baseline;gap:.85rem;max-width:none!important;margin:0!important;
+  color:var(--rtg-v-ink)!important;font:400 clamp(1.25rem,2.3vw,1.75rem)/1 "Bodoni Moda",Georgia,serif!important;
+  letter-spacing:.01em!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .merkkop .onder{
+  display:inline!important;max-width:none!important;margin:0!important;color:var(--rtg-v-muted)!important;
+  font:650 .52rem/1.25 Inter,system-ui,sans-serif!important;letter-spacing:.13em!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroep{
+  position:relative;isolation:isolate;min-height:clamp(20rem,34vw,31rem);
+  display:grid;align-content:end;margin:0 0 1rem!important;padding:clamp(1.25rem,3.2vw,2.8rem)!important;
+  overflow:hidden;border:1px solid var(--rtg-v-line)!important;
+  background:
+    linear-gradient(90deg,color-mix(in srgb,var(--rtg-v-bg) 97%,transparent),color-mix(in srgb,var(--rtg-v-bg) 76%,transparent) 56%,color-mix(in srgb,var(--rtg-v-bg) 22%,transparent)),
+    linear-gradient(0deg,color-mix(in srgb,var(--rtg-v-bg) 90%,transparent),transparent 70%),
+    var(--rtg-v-photo) var(--rtg-v-photo-position)/cover no-repeat!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroepnav{
+  width:min(34rem,100%);margin:0 0 1.35rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroepnav a{
+  border-color:var(--rtg-v-line)!important;background:color-mix(in srgb,var(--rtg-v-card2) 62%,transparent)!important;color:var(--rtg-v-muted)!important;
+  backdrop-filter:blur(12px)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroepnav a.actief{
+  color:var(--rtg-v-ink)!important;border-color:var(--rtg-v-signature)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeptekst{
+  width:min(45rem,100%);text-align:left!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeptekst h2{
+  font:400 clamp(2.5rem,5vw,5rem)/.96 "Bodoni Moda",Georgia,serif!important;
+  letter-spacing:-.03em!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeptekst p{
+  max-width:38rem;margin:.7rem 0 0!important;color:var(--rtg-v-muted)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeppoorten{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:.55rem!important;margin-top:1.25rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeppoorten a{
+  min-height:8.2rem!important;border-color:var(--rtg-v-line)!important;
+  background:color-mix(in srgb,var(--rtg-v-card) 82%,transparent)!important;color:var(--rtg-v-ink)!important;backdrop-filter:blur(14px)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeppoorten a:hover{
+  border-color:var(--rtg-v-signature)!important;background:color-mix(in srgb,var(--rtg-v-card) 90%,var(--rtg-v-signature) 10%)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeppoorten b{
+  color:var(--rtg-v-ink)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeppoorten a>span:not(.voet){
+  color:var(--rtg-v-muted)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeppoorten .voet{
+  color:var(--rtg-v-muted)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeppoorten .voet em{
+  margin:0!important;padding:0!important;color:var(--rtg-v-metal)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeppoorten .voet .pijl{
+  color:var(--rtg-v-signature)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .cv-rij{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:.7rem!important;
+  margin:0 0 1rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .cv-rij>*,
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #werkdag>*,
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #poorten>*,
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .hero{
+  border-color:var(--rtg-v-line)!important;background:var(--rtg-v-card)!important;color:var(--rtg-v-ink)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .cv-rij :where(h2,.cv-woord,.cv-cijfers b),
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .regkop h2,
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #werkdag :where(h3,.dag .nr),
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #poorten .poort b{
+  color:var(--rtg-v-ink)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .cv-rij :where(.cv-app,.cv-cijfers>span,.cv-rust p,.cv-lijn p,.cv-lijn small,.cv-lijn time),
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .regkop .tel,
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #werkdag :where(.feiten,.bron,.dag .wd,.dag .mnd,.dag .uur,.stil),
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #poorten .poort>span:not(.ic){
+  color:var(--rtg-v-muted)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #poorten .poort .ic{
   color:var(--rtg-v-metal)!important
 }
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #vandaagVak{min-width:0!important}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #werkdag{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.65rem;margin-bottom:1.4rem
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #werkdag>*{
+  min-width:0;margin:0!important;padding:1rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #poorten{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:.65rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #poorten>*{
+  min-width:0!important;min-height:8rem!important;padding:1rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .hero{
+  padding:clamp(1.2rem,2.5vw,2rem)!important;margin-top:1rem
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .wrooster{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:.55rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .wrooster-kaart{
+  min-width:0!important;border-color:var(--rtg-v-line)!important;background:var(--rtg-v-card2)!important
+}
 
-/* Travel gebruikt champagne als metaal op zijn wijnkleurige grond. De gedeelde
-   springlink erfde nog witte bordeaux-inkt; op metaal hoort juist donkere inkt. */
-body[data-rtg-vandaag-luxe][data-rtg-world="travel"] .skip{
-  color:#1c1608!important
+/* TravelOS · wijnrood, ivoor en een fotografisch reisdek. */
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .reisapp{
+  width:100%;min-width:0;background:transparent!important
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium]{
-  background:radial-gradient(85% 46% at 82% -6%,rgba(117,184,177,.14),transparent 67%),linear-gradient(135deg,#0c1112,#101718 54%,#0c1112)!important
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .rtg-world-dashboard{
+  width:min(100%,96rem)!important;padding-top:clamp(.8rem,2vw,1.8rem)!important
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium] #shell,
-body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium] .wk-shell,
-body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium] .hq-shell,
-body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium] .pn-shell{
-  background:radial-gradient(72% 46% at 82% 0,rgba(117,184,177,.16),transparent 68%),var(--wo-black)!important
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .bladbinnen{
+  width:100%!important;max-width:none!important;margin:0!important;padding:0!important
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium] .wk-bank button.actief,
-body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium] .hq-rail a.actief,
-body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium] .pn-rail button.actief{
-  background:linear-gradient(90deg,rgba(117,184,177,.36),rgba(117,184,177,.07),transparent)!important
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagdek{
+  display:grid!important;grid-template-columns:minmax(0,1.72fr) minmax(17rem,.68fr)!important;
+  gap:clamp(.9rem,2vw,1.5rem)!important;align-items:start!important
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="work"] .knop.p{
-  border-color:#75b8b1!important;background:rgba(117,184,177,.08)!important;
-  color:#f0f2ec!important;box-shadow:none!important
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .daghoofd{
+  min-width:0;display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:.8rem!important
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="foundation"] .onthaal-beeld{
-  background:linear-gradient(155deg,#0b2032,#071522 58%,#06101b)!important
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagtitel,
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kaartraster{
+  grid-column:1;grid-row:1
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="foundation"] .band{
-  background:linear-gradient(120deg,#06101b,#0b2032 62%)!important
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagtitel{
+  z-index:2;align-self:end;min-width:0;margin:0!important;padding:clamp(1.35rem,4vw,3.4rem)!important;
+  pointer-events:none
 }
-body[data-rtg-vandaag-luxe][data-rtg-world="foundation"] .buurtknop.vol{
-  border:1px solid #d0b66e!important;background:rgba(11,32,50,.72)!important;
-  color:#f2f2ea!important;box-shadow:none!important
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagtitel h1{
+  max-width:9ch;margin:.55rem 0 .4rem!important;
+  font:400 clamp(3rem,6.2vw,6rem)/.9 "Bodoni Moda",Georgia,serif!important;
+  letter-spacing:-.04em!important
 }
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagtitel .sub{
+  max-width:34rem;color:var(--rtg-v-muted)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kaartraster{
+  position:relative;isolation:isolate;min-height:clamp(20rem,35vw,32rem)!important;overflow:hidden;
+  border:1px solid var(--rtg-v-line)!important;background:var(--rtg-v-card2)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kaartraster::before,
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kaartraster::after{
+  content:"";position:absolute;z-index:-2;inset:0;pointer-events:none
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kaartraster::before{
+  background:var(--rtg-v-photo) var(--rtg-v-photo-position)/cover no-repeat;
+  filter:saturate(.82) contrast(1.1);transform:scale(1.015);
+  transition:transform var(--rtg-time-atmospheric,560ms) var(--rtg-ease-atmospheric,cubic-bezier(.22,.66,.2,1))
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kaartraster::after{
+  z-index:-1;background:
+    linear-gradient(90deg,color-mix(in srgb,var(--rtg-v-bg) 94%,transparent),color-mix(in srgb,var(--rtg-v-bg) 48%,transparent) 62%,color-mix(in srgb,var(--rtg-v-bg) 14%,transparent)),
+    linear-gradient(0deg,color-mix(in srgb,var(--rtg-v-bg) 90%,transparent),transparent 66%)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kaartraster>.dagkop{
+  position:absolute!important;inset:0!important;min-height:0!important;margin:0!important;
+  border:0!important;background:transparent!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .vandaagraster{
+  position:absolute!important;z-index:3;right:clamp(.8rem,2vw,1.4rem);bottom:clamp(.8rem,2vw,1.4rem);
+  width:min(21rem,calc(100% - 1.6rem));margin:0!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .volgendblok{
+  border:1px solid var(--rtg-v-line)!important;background:color-mix(in srgb,var(--rtg-v-card) 86%,transparent)!important;
+  backdrop-filter:blur(16px)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .strook{
+  grid-column:1;grid-row:2;margin:0!important;padding:1rem!important;
+  border:1px solid var(--rtg-v-line)!important;background:var(--rtg-v-card)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .pionnen{
+  display:flex!important;gap:.55rem!important;overflow-x:auto;padding-bottom:.2rem
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .rahulsnel{
+  grid-column:1;grid-row:3;margin:0!important;border-color:var(--rtg-v-line)!important;
+  background:var(--rtg-v-card2)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kompas{
+  position:sticky!important;top:1rem!important;display:grid!important;gap:.65rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kompaskaart{
+  margin:0!important;padding:1rem!important;border-color:var(--rtg-v-line)!important;
+  background:var(--rtg-v-card)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] :where(.reisregister,.canvasband,.reisdiensten>a,.sectiekop,.taxilinks,.taxirechts){
+  border-color:var(--rtg-v-line)!important;background-color:var(--rtg-v-card)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .reisdiensten{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:.6rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .reisdiensten>a{
+  min-width:0!important;min-height:5.5rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .actieknop{
+  min-height:46px;border-color:var(--rtg-v-signature)!important;color:var(--rtg-v-ink)!important
+}
+
+/* FoundationOS · nachtblauw en warm goud. */
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .rtg-world-dashboard{
+  display:block!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .onthaal{
+  grid-template-columns:minmax(0,1.55fr) minmax(17rem,.55fr)!important;
+  min-height:clamp(20rem,35vw,32rem);margin:0 0 1rem;border-color:var(--rtg-v-line)!important;
+  background:var(--rtg-v-card2)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .onthaal-beeld{
+  min-height:inherit!important;padding:clamp(1.4rem,4vw,3.5rem)!important;
+  background:
+    linear-gradient(90deg,color-mix(in srgb,var(--rtg-v-bg) 94%,transparent),color-mix(in srgb,var(--rtg-v-bg) 55%,transparent) 62%,color-mix(in srgb,var(--rtg-v-bg) 16%,transparent)),
+    linear-gradient(0deg,color-mix(in srgb,var(--rtg-v-bg) 86%,transparent),transparent 70%),
+    var(--rtg-v-photo) var(--rtg-v-photo-position)/cover no-repeat!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .onthaal-beeld::before{opacity:.08!important}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .onthaal-beeld h1{
+  max-width:11ch!important;margin:.65rem 0!important;
+  font:400 clamp(2.8rem,5.4vw,5.5rem)/.94 "Bodoni Moda",Georgia,serif!important;
+  letter-spacing:-.035em!important;color:var(--rtg-v-ink)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .onthaal-beeld p{
+  max-width:38rem!important;color:var(--rtg-v-muted)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .onthaal-kies{
+  min-width:0;padding:1.15rem!important;border-color:var(--rtg-v-line)!important;
+  background:color-mix(in srgb,var(--rtg-v-card) 88%,transparent)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .steden{
+  min-width:0;display:grid!important;grid-template-columns:1fr!important;gap:.55rem!important;
+  overflow:auto;scrollbar-width:thin
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .buurtstad{
+  min-height:4.5rem!important;border-color:var(--rtg-v-line)!important;background:var(--rtg-v-card2)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .buurtstad[aria-pressed="true"]{
+  border-color:var(--rtg-v-metal)!important;background:var(--rtg-v-accent-soft)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .tweeluik{
+  grid-template-columns:minmax(0,1.55fr) minmax(17rem,.55fr)!important;
+  gap:1rem!important;margin-bottom:1rem
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .doen{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:.65rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] :where(.doenkaart,.buurtkaart,.band){
+  border-color:var(--rtg-v-line)!important;background:var(--rtg-v-card)!important;color:var(--rtg-v-ink)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .doenkaart{
+  min-width:0;min-height:10rem;padding:1rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .doenkaart svg{stroke:var(--rtg-v-metal)!important}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] #uit:not(:empty){
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.7rem;margin:1rem 0
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] #uit>.buurtkaart{
+  min-width:0;margin:0!important;padding:1rem!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .band{
+  margin:1rem 0!important;padding:clamp(1.2rem,2.5vw,2rem)!important;
+  background:linear-gradient(120deg,var(--rtg-v-card2),var(--rtg-v-card) 68%)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .hero{
+  border-color:var(--rtg-v-line)!important;background:var(--rtg-v-card)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .wrooster{
+  display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:.55rem!important
+}
+
+/* Heritage-diepte ---------------------------------------------------------
+   Niet ieder vlak zweeft. De fotohero is Focus, gewone inhoud ligt één laag
+   lager en alleen echte keuzes reageren. Zo ontstaat hiërarchie zonder een
+   raster van identieke SaaS-kaarten. */
+body[data-rtg-world-dashboard-ready="true"] :where(
+  .dagkaart,.kompasblok,.laagkeuze,.laagfocus a,.grid>.kaart,
+  .doelgroeppoorten a,.cv-rij>*,#werkdag>*,#poorten>*,
+  .strook,.rahulsnel,.kompaskaart,.reisregister,.reisdiensten>a,
+  .onthaal-kies,.buurtstad,.doenkaart,.buurtkaart,.band,.wrooster-kaart){
+  box-shadow:var(--rtg-v-depth-content);
+  transition:border-color var(--rtg-time-direct,100ms),
+    background-color var(--rtg-time-direct,100ms),
+    box-shadow var(--rtg-time-functional,200ms),translate var(--rtg-time-direct,100ms)
+}
+
+/* LivingOS: papierlicht op de inhoud, bordeaux alleen waar aandacht wacht. */
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .standen button{
+  background:transparent!important;box-shadow:none!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .standen button.actief{
+  box-shadow:inset 0 -2px var(--rtg-v-signature)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkaart-volgend{
+  border-left:2px solid var(--rtg-v-signature)!important;
+  background-image:linear-gradient(105deg,var(--rtg-v-accent-soft),transparent 62%)!important;
+  box-shadow:inset 0 1px color-mix(in srgb,#fff 72%,transparent),var(--rtg-v-depth-content)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .kompasrahul{
+  border-top-color:color-mix(in srgb,var(--rtg-v-signature) 54%,var(--rtg-v-line))!important;
+  background-image:linear-gradient(145deg,var(--rtg-v-accent-soft),transparent 58%)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] #reisdossier{
+  border-top:2px solid color-mix(in srgb,var(--rtg-v-signature) 72%,var(--rtg-v-line))!important;
+  background-image:linear-gradient(120deg,var(--rtg-v-accent-soft),transparent 42%)!important;
+  box-shadow:var(--rtg-v-depth-focus)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .moment{
+  background-image:linear-gradient(155deg,color-mix(in srgb,#fff 44%,transparent),transparent 55%);
+  box-shadow:var(--rtg-v-depth-content)
+}
+
+/* WorkOS: meer informatiedichtheid, kortere diepte en een exacte teal-as. */
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] :where(.cv-rij>*,#werkdag>*,#poorten>*,.hero){
+  background-color:var(--rtg-v-card)!important;
+  background-image:linear-gradient(145deg,color-mix(in srgb,var(--rtg-v-signature) 4%,transparent),transparent 54%)!important;
+  box-shadow:var(--rtg-v-depth-content)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeppoorten a{
+  box-shadow:inset 0 1px color-mix(in srgb,var(--rtg-v-ink) 6%,transparent),0 18px 40px rgba(0,0,0,.14)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeppoorten .voet{
+  padding-top:.75rem!important;border-top:1px solid var(--rtg-v-line)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .cv-rij>*:first-child{
+  border-top-color:var(--rtg-v-signature)!important;
+  box-shadow:inset 0 2px color-mix(in srgb,var(--rtg-v-signature) 66%,transparent),var(--rtg-v-depth-content)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #werkdag>*{
+  border-left:2px solid transparent!important
+}
+
+/* TravelOS: een richtinggevende wijnlijn en één verheven volgend moment. */
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .volgendblok{
+  border-top-color:color-mix(in srgb,var(--rtg-v-metal) 62%,var(--rtg-v-line))!important;
+  box-shadow:var(--rtg-v-depth-focus)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .strook{
+  background-image:linear-gradient(90deg,var(--rtg-v-accent-soft),transparent 38%)!important;
+  box-shadow:var(--rtg-v-depth-content)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .rahulsnel{
+  border-left:2px solid var(--rtg-v-signature)!important;
+  background-image:linear-gradient(90deg,var(--rtg-v-accent-soft),transparent 56%)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kompaskaart:first-of-type{
+  border-top-color:color-mix(in srgb,var(--rtg-v-metal) 58%,var(--rtg-v-line))!important
+}
+
+/* FoundationOS: civiele panelen die zich verbinden langs één gouden bovenlijn. */
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] :where(.doenkaart,.buurtkaart,.band){
+  background-color:var(--rtg-v-card)!important;
+  background-image:linear-gradient(145deg,color-mix(in srgb,var(--rtg-v-metal) 4%,transparent),transparent 58%)!important;
+  box-shadow:var(--rtg-v-depth-content)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .doenkaart.vast{
+  border-top-color:color-mix(in srgb,var(--rtg-v-metal) 62%,var(--rtg-v-line))!important;
+  background-image:linear-gradient(120deg,var(--rtg-v-accent-soft),transparent 62%)!important
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .band{
+  border-top:2px solid color-mix(in srgb,var(--rtg-v-metal) 68%,var(--rtg-v-line))!important;
+  box-shadow:var(--rtg-v-depth-focus)
+}
+body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .buurtstad[aria-pressed="true"]{
+  box-shadow:inset 2px 0 var(--rtg-v-metal),var(--rtg-v-depth-content)
+}
+
+@media(hover:hover) and (pointer:fine){
+  body[data-rtg-world-dashboard-ready="true"] :where(
+    .rtg-dashboard-hero-cta,.dagkaart[href],.laagfocus a,.grid>.kaart,
+    .doelgroeppoorten a,#werkdag>a,#poorten>a,.reisdiensten>a,
+    .buurtstad,.doenkaart:not(.vast),.wrooster-kaart):hover{
+    translate:0 -2px;border-color:color-mix(in srgb,var(--rtg-v-metal) 62%,var(--rtg-v-line))!important;
+    box-shadow:var(--rtg-v-depth-focus)
+  }
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #werkdag>*:hover{
+    border-left-color:var(--rtg-v-signature)!important
+  }
+}
+
+/* De subroutes houden uitsluitend hun wereldmateriaal. De annotator negeert
+   surface, dus hier kan nooit een cover of tweede dashboard ontstaan. */
 body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"]{
-  background:#f4f0e8!important;color:#211e19!important
+  background-color:var(--rtg-world-bg,#f4f0e8)!important;
+  background-image:
+    radial-gradient(42rem 26rem at 82% -8rem,var(--rtg-world-signature-soft,rgba(127,22,52,.1)),transparent 72%),
+    var(--rtg-world-photo-mask,linear-gradient(112deg,rgba(244,240,232,.985),rgba(244,240,232,.94))),
+    var(--rtg-world-photo,url('/images/worlds/heritage/living-heritage-v2.jpg')),
+    var(--rtg-world-ground,linear-gradient(155deg,#fbf8f2,#f4f0e8 58%,#e8e0d2))!important;
+  background-size:auto,auto,cover,auto!important;
+  background-position:center,center,var(--rtg-world-photo-position,68% center),center!important;
+  background-repeat:no-repeat!important;background-attachment:fixed!important;
+  color:var(--rtg-world-ink,#211e19)!important
 }
 body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"]>header{
-  background:rgba(251,248,242,.96)!important;border-bottom-color:rgba(33,30,25,.16)!important;color:#211e19
+  background:color-mix(in srgb,var(--rtg-world-card,#fbf8f2) 96%,transparent)!important;
+  border-bottom-color:var(--rtg-world-line,rgba(33,30,25,.17))!important;color:var(--rtg-world-ink,#211e19)
 }
-body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .kantoor-intro,
-body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .rahulbalk{
-  border-color:rgba(33,30,25,.16)!important;background:#fbf8f2!important
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] :where(.kantoor-intro,.rahulbalk,.veld,.mkop,.paneel){
+  border-color:var(--rtg-world-line,rgba(33,30,25,.17))!important;
+  background:color-mix(in srgb,var(--rtg-world-card,#fbf8f2) 96%,transparent)!important;
+  color:var(--rtg-world-ink,#211e19)!important;box-shadow:var(--rtg-depth-content,0 1px 0 rgba(55,40,15,.08))
 }
-body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .veld,
-body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .mkop,
-body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .paneel{
-  border-color:rgba(33,30,25,.16)!important;background:#fbf8f2!important;color:#211e19!important
-}
-body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .mdag,
-body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .wdag{
-  border-color:rgba(33,30,25,.16)!important;background:#f4f0e8!important;color:#211e19!important
+body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] :where(.mdag,.wdag){
+  border-color:var(--rtg-world-line,rgba(33,30,25,.17))!important;
+  background:color-mix(in srgb,var(--rtg-world-bg,#f4f0e8) 94%,transparent)!important;
+  color:var(--rtg-world-ink,#211e19)!important
 }
 body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .mdag:hover{
-  background:#e8e0d2!important
+  background:var(--rtg-world-card-strong,#e8e0d2)!important
 }
 body[data-rtg-vandaag-luxe="surface"][data-rtg-world="living"][data-kantoor-tool="agenda"] .mdag.vandaag .dnr{
-  background:#745718!important;color:#fbf8f2!important
+  background:var(--rtg-world-metal,#745718)!important;color:var(--rtg-world-card,#fbf8f2)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot :where(.bank .merk,.topbar a,.topbar button){
+  color:var(--rtg-v-ink)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot :where(.bank .merk small,.bank a){
+  color:var(--rtg-v-muted)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"] .rtg-edge-2-context-slot .bank a:is(:hover,.actief){
+  color:var(--rtg-v-ink)!important;background:var(--rtg-v-accent-soft)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-2-context-slot .bank a span{
+  color:var(--rtg-v-muted)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-2-context-slot .bank a:is(:hover,:focus-visible,.actief) span{
+  color:var(--rtg-v-ink)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="travel"] .skip{color:#1c1608!important}
+body[data-rtg-vandaag-luxe][data-rtg-world="work"][data-workos-premium]{
+  background:radial-gradient(85% 46% at 82% -6%,var(--rtg-v-accent-soft),transparent 67%),var(--rtg-v-bg)!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="work"] .knop.p{
+  border-color:var(--rtg-v-signature)!important;background:color-mix(in srgb,var(--rtg-v-signature) 8%,transparent)!important;
+  color:var(--rtg-v-ink)!important;box-shadow:none!important
+}
+body[data-rtg-vandaag-luxe][data-rtg-world="foundation"] .buurtknop.vol{
+  border:1px solid var(--rtg-v-metal)!important;background:color-mix(in srgb,var(--rtg-v-card) 74%,transparent)!important;
+  color:var(--rtg-v-ink)!important;box-shadow:none!important
 }
 
-.rtg-vandaag-luxe::before,
-.rtg-vandaag-luxe::after{content:"";position:absolute;inset:0;pointer-events:none}
-.rtg-vandaag-luxe::before{
-  z-index:-2;background-image:url("/images/worlds/vandaag/wereld-atlas.jpg");background-repeat:no-repeat;
-  background-size:200% auto;filter:var(--vandaag-foto);transform:scale(1.015);
-  animation:rtg-vandaag-adem 18s ease-out both
+@media(max-width:980px){
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dag,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagdek{grid-template-columns:minmax(0,1fr)!important}
+  body[data-rtg-world-dashboard-ready="true"] .kompas{position:static!important}
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #poorten,
+  body[data-rtg-world-dashboard-ready="true"] .wrooster{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
-.rtg-vandaag-luxe::after{
-  z-index:-1;background:
-    linear-gradient(90deg,rgba(var(--vandaag-was-rgb),.96) 0%,rgba(var(--vandaag-was-rgb),.78) 39%,rgba(var(--vandaag-was-rgb),.3) 71%,rgba(var(--vandaag-was-rgb),.62) 100%),
-    linear-gradient(0deg,rgba(var(--vandaag-was-rgb),.9) 0%,transparent 49%,rgba(var(--vandaag-was-rgb),.34) 100%)
-}
-.rtg-vandaag-luxe[data-wereld="living"]::before{background-position:left top}
-.rtg-vandaag-luxe[data-wereld="work"]::before{background-position:right top}
-.rtg-vandaag-luxe[data-wereld="travel"]::before{background-position:left bottom}
-.rtg-vandaag-luxe[data-wereld="foundation"]::before{background-position:right bottom}
-
-.rtg-vandaag-luxe__binnen{
-  width:min(92rem,100%);min-height:inherit;margin-inline:auto;
-  padding:max(1.25rem,env(safe-area-inset-top)) clamp(1.25rem,5vw,5rem) max(2rem,env(safe-area-inset-bottom));
-  display:flex;flex-direction:column
-}
-.rtg-vandaag-luxe__boven{
-  display:flex;align-items:center;justify-content:space-between;gap:1.25rem;padding:0 0 1rem;
-  border-bottom:1px solid rgba(var(--vandaag-inkt-rgb),.14)
-}
-.rtg-vandaag-luxe__merk{
-  flex:0 0 auto;color:var(--vandaag-metaal);font:400 1.35rem/1 "Bodoni Moda",Georgia,serif;
-  letter-spacing:.04em;text-decoration:none
-}
-.rtg-vandaag-luxe__portalen{
-  display:flex;align-items:center;justify-content:flex-end;gap:clamp(.25rem,1vw,1rem);
-  min-width:0;overflow-x:auto;scrollbar-width:thin
-}
-body.rtg-edge-host .rtg-vandaag-luxe__boven{display:none}
-body.rtg-edge-host .rtg-vandaag-luxe__binnen{
-  padding-bottom:max(4.5rem,env(safe-area-inset-bottom))
-}
-.rtg-vandaag-luxe__portalen a{
-  flex:0 0 auto;min-height:44px;display:inline-flex;align-items:center;padding:.65rem .75rem;
-  border:1px solid transparent;border-radius:0;color:var(--vandaag-zacht);font-size:.67rem;
-  font-weight:650;letter-spacing:.06em;text-decoration:none
-}
-.rtg-vandaag-luxe__portalen a:hover,
-.rtg-vandaag-luxe__portalen a:focus-visible{
-  color:var(--vandaag-inkt);border-color:rgba(var(--vandaag-metaal-rgb),.38);
-  background:rgba(var(--vandaag-paneel-rgb),.5)
-}
-.rtg-vandaag-luxe__portalen a[aria-current="page"]{
-  color:var(--vandaag-inkt);border-bottom-color:var(--vandaag-metaal)
-}
-
-.rtg-vandaag-luxe__opstelling{
-  flex:1;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(18rem,.58fr);
-  align-items:end;gap:clamp(2rem,8vw,8rem);
-  padding-block:clamp(4.5rem,12vh,9rem) clamp(2.5rem,7vh,5.5rem)
-}
-.rtg-vandaag-luxe__intro{max-width:51rem}
-.rtg-vandaag-luxe__wereld,
-.rtg-vandaag-luxe__focuslabel{
-  margin:0;color:var(--vandaag-metaal);font-size:.62rem;font-weight:700;
-  letter-spacing:.24em;text-transform:uppercase
-}
-.rtg-vandaag-luxe h1{
-  max-width:12ch;margin:1rem 0 1.15rem;color:var(--vandaag-inkt);
-  font:400 clamp(3.15rem,7vw,7rem)/.94 "Bodoni Moda",Georgia,serif;
-  letter-spacing:-.035em;text-wrap:balance
-}
-.rtg-vandaag-luxe__belofte{
-  max-width:40rem;margin:0;color:var(--vandaag-zacht);font-size:clamp(.95rem,1.25vw,1.12rem);line-height:1.7
-}
-.rtg-vandaag-luxe__cta,
-.rtg-vandaag-luxe__focuslink{
-  min-height:48px;display:inline-flex;align-items:center;justify-content:center;margin-top:2rem;
-  padding:.75rem 1.15rem;border:1px solid var(--vandaag-metaal);border-radius:0;
-  background:rgba(var(--vandaag-paneel-rgb),.4);color:var(--vandaag-inkt);font-size:.68rem;
-  font-weight:700;letter-spacing:.12em;text-decoration:none;text-transform:uppercase;backdrop-filter:blur(12px)
-}
-.rtg-vandaag-luxe__cta:hover,
-.rtg-vandaag-luxe__focuslink:hover{
-  background:rgba(var(--vandaag-metaal-rgb),.14)
-}
-.rtg-vandaag-luxe a:focus-visible{
-  outline:2px solid var(--vandaag-metaal);outline-offset:4px
-}
-.rtg-vandaag-luxe__focus{
-  align-self:end;width:100%;min-height:16rem;padding:clamp(1.4rem,3vw,2rem);
-  border:1px solid rgba(var(--vandaag-metaal-rgb),.38);border-top:2px solid var(--vandaag-metaal);
-  border-radius:0;background:linear-gradient(145deg,rgba(var(--vandaag-paneel-rgb),.9),rgba(var(--vandaag-paneel-rgb),.58));
-  box-shadow:0 28px 60px rgba(0,0,0,.22);backdrop-filter:blur(18px)
-}
-.rtg-vandaag-luxe__focustitel{
-  margin:1.3rem 0 .65rem;color:var(--vandaag-inkt);
-  font:400 clamp(1.55rem,2.5vw,2.25rem)/1.08 "Bodoni Moda",Georgia,serif
-}
-.rtg-vandaag-luxe__focusmeta{
-  min-height:3.2em;margin:0;color:var(--vandaag-zacht);font-size:.79rem;line-height:1.6
-}
-.rtg-vandaag-luxe__focuslink{width:100%;margin-top:1.35rem}
-
-/* Surface is een eigen contextstrip, niet een verkleinde home-opstelling. */
-.rtg-vandaag-luxe[data-modus="surface"]{min-height:clamp(9rem,16svh,13rem)}
-body[data-rtg-vandaag-luxe="surface"][data-rtg-world="work"][data-rtg-vandaag-surface="projecten"]{
-  --rtg-vandaag-werk-kop:clamp(9rem,16svh,13rem)
-}
-body[data-rtg-vandaag-luxe="surface"][data-rtg-world="work"][data-rtg-vandaag-surface="projecten"][data-rtg-vandaag-render="surface"]>.rtg-vandaag-luxe{
-  position:fixed;z-index:40;inset:0 0 auto;height:var(--rtg-vandaag-werk-kop);min-height:var(--rtg-vandaag-werk-kop)
-}
-body[data-rtg-vandaag-luxe="surface"][data-rtg-world="work"][data-rtg-vandaag-surface="projecten"][data-rtg-vandaag-render="surface"]>.wk-shell{
-  inset:var(--rtg-vandaag-werk-kop) 0 0!important;height:auto!important
-}
-.rtg-vandaag-luxe[data-modus="surface"]::after{
-  background:linear-gradient(90deg,rgba(var(--vandaag-was-rgb),.96),rgba(var(--vandaag-was-rgb),.7) 62%,rgba(var(--vandaag-was-rgb),.42))
-}
-.rtg-vandaag-luxe[data-modus="surface"] .rtg-vandaag-luxe__binnen{
-  padding-block:max(1rem,env(safe-area-inset-top)) max(1rem,env(safe-area-inset-bottom))
-}
-.rtg-vandaag-luxe__surface{
-  min-height:inherit;display:grid;grid-template-columns:minmax(0,1fr) auto;
-  align-items:end;gap:2rem;padding-block:1rem
-}
-.rtg-vandaag-luxe__surface h1{
-  max-width:24ch;margin:.5rem 0 0;font-size:clamp(2.15rem,4vw,3.6rem);line-height:1
-}
-.rtg-vandaag-luxe__surface .rtg-vandaag-luxe__cta{align-self:end;margin:0}
-
-@keyframes rtg-vandaag-adem{from{transform:scale(1.04)}to{transform:scale(1.015)}}
 @media(max-width:780px){
-  .rtg-vandaag-luxe[data-modus="home"]{min-height:100svh}
-  .rtg-vandaag-luxe::after{
-    background:linear-gradient(0deg,rgba(var(--vandaag-was-rgb),.97) 0%,rgba(var(--vandaag-was-rgb),.82) 48%,rgba(var(--vandaag-was-rgb),.3) 100%),linear-gradient(90deg,rgba(var(--vandaag-was-rgb),.54),rgba(var(--vandaag-was-rgb),.16))
+  body[data-rtg-world-dashboard-ready="true"],
+  body[data-rtg-vandaag-luxe="surface"][data-kantoor-tool="agenda"]{background-attachment:scroll!important}
+  body[data-rtg-world-dashboard-ready="true"] .rtg-world-dashboard{
+    width:100%!important;padding:.75rem!important;padding-bottom:5.5rem!important
   }
-  .rtg-vandaag-luxe__binnen{padding-inline:1rem}
-  .rtg-vandaag-luxe__portalen{justify-content:flex-start}
-  .rtg-vandaag-luxe__opstelling{
-    grid-template-columns:1fr;align-content:end;gap:1.5rem;padding-block:clamp(5rem,15vh,8rem) 1.5rem
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkop,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroep,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kaartraster,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .onthaal{min-height:clamp(18rem,88vw,25rem)}
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkop::before,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kaartraster::before{background-size:cover}
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroep,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .onthaal-beeld{background-size:auto,auto,cover!important}
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkop{padding:1.25rem!important}
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagtitel{
+    padding:1.25rem!important;padding-bottom:7.5rem!important
   }
-  .rtg-vandaag-luxe h1{max-width:10ch;font-size:clamp(2.9rem,14vw,4.8rem)}
-  .rtg-vandaag-luxe__belofte{max-width:34rem;font-size:.91rem}
-  .rtg-vandaag-luxe__cta{margin-top:1.35rem}
-  .rtg-vandaag-luxe__focus{min-height:0;padding:1.25rem}
-  .rtg-vandaag-luxe[data-modus="surface"]{min-height:clamp(8rem,20svh,11rem)}
-  body[data-rtg-vandaag-luxe="surface"][data-rtg-world="work"][data-rtg-vandaag-surface="projecten"]{
-    --rtg-vandaag-werk-kop:clamp(8rem,20svh,11rem)
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .vandaagraster{
+    left:.75rem;right:.75rem;bottom:.75rem;width:auto
   }
-  .rtg-vandaag-luxe__surface{grid-template-columns:minmax(0,1fr) auto;gap:1rem;padding-block:.5rem}
-  .rtg-vandaag-luxe__surface h1{font-size:clamp(1.9rem,8.5vw,2.65rem)}
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroep{padding:1rem!important}
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeppoorten,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .cv-rij,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #werkdag,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #poorten,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .reisdiensten,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .onthaal,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .tweeluik,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] #uit:not(:empty){
+    grid-template-columns:minmax(0,1fr)!important
+  }
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .onthaal-beeld{min-height:18rem!important}
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .onthaal-kies{
+    border-left:0!important;border-top:1px solid var(--rtg-v-line)!important
+  }
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .doen{grid-template-columns:minmax(0,1fr)!important}
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .doenkaart{
+    min-height:0;align-items:flex-start!important;text-align:left!important
+  }
+  body[data-rtg-world-dashboard-ready="true"] .wrooster{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
-@media(max-aspect-ratio:1/1){
-  .rtg-vandaag-luxe::before{background-size:auto 200%}
-}
-@media(max-width:420px){
-  .rtg-vandaag-luxe__portalen a{padding-inline:.6rem;font-size:.61rem}
-  .rtg-vandaag-luxe__opstelling{padding-top:4rem}
-  .rtg-vandaag-luxe h1{font-size:clamp(2.65rem,13.2vw,3.75rem)}
-  .rtg-vandaag-luxe__surface .rtg-vandaag-luxe__cta{min-width:44px;padding-inline:.7rem;font-size:.58rem}
+@media(max-width:390px){
+  body[data-rtg-world-dashboard-ready="true"] .rtg-world-dashboard{padding:.55rem!important;padding-bottom:5rem!important}
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkop h1,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeptekst h2,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagtitel h1,
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .onthaal-beeld h1{
+    font-size:clamp(2.45rem,13vw,3.35rem)!important
+  }
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagfeed,
+  body[data-rtg-world-dashboard-ready="true"] .wrooster{grid-template-columns:minmax(0,1fr)!important}
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroepnav a{
+    min-width:0;padding:.45rem .25rem!important;font-size:.49rem!important
+  }
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .merkkop{
+    min-height:44px!important;padding:.55rem .1rem!important
+  }
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .merkkop .onder{display:none!important}
 }
 @media(prefers-reduced-motion:reduce){
-  .rtg-vandaag-luxe::before{animation:none;transform:none}
-  .rtg-vandaag-luxe *,
-  .rtg-vandaag-luxe *::before,
-  .rtg-vandaag-luxe *::after{
-    scroll-behavior:auto!important;transition-duration:.01ms!important;
-    animation-duration:.01ms!important;animation-iteration-count:1!important
+  body[data-rtg-world-dashboard-ready="true"] *{
+    scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important
   }
+  body[data-rtg-world-dashboard-ready="true"] :where(.dagkop,.kaartraster)::before{transform:none!important}
 }

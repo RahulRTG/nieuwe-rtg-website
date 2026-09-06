@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**59 bundels, 466 delen, 0 zonder onderwerp.**
+**59 bundels, 470 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -550,11 +550,15 @@ omlaag.
 
 ## `shared/basis.js`
 
-`public/shared/basis/` -- 5 delen, 804 regels in de delen
+`public/shared/basis/` -- 9 delen, 899 regels in de delen
 
 | deel | onderwerp |
 |---|---|
 | `basis-01.js` | De gedeelde basis-laag: het vangnet dat elke app-pagina op 9+-niveau houdt |
+| `basis-01a-motion.js` | Heritage Motion vult alleen declaratieve status en toegankelijkheid aan |
+| `basis-01aa-continue.js` | De Continue Key verrijkt uitsluitend de al gemarkeerde Edge-hoofdactie |
+| `basis-01ab-heritage-order.js` | Routes mogen functionele CSS bijladen, maar Heritage blijft het laatste materiaalblad |
+| `basis-01ac-edge.js` | Iedere echte wereldkamer gebruikt dezelfde Edge |
 | `basis-01b.js` | Vervolg van basis-01 (op de 10 kB-grens geknipt na de thema-toevoeging van de consolidatieronde; de bundelvolgorde is... |
 | `basis-01c.js` | de toegankelijkheidshelpers van de gedeelde laag |
 | `basis-02.js` | 5. het lopende werk: de gangreserve-laag van het huis |
@@ -858,7 +862,7 @@ omlaag.
 
 ## `shared/verbinding.js`
 
-`public/shared/verbinding/` -- 2 delen, 344 regels in de delen
+`public/shared/verbinding/` -- 2 delen, 345 regels in de delen
 
 | deel | onderwerp |
 |---|---|

@@ -202,12 +202,14 @@ test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
     const d = await decor(srv.base);
     s = await schermMet(srv.base, pw, '/apps/foundation/os-publiek.html?stad=almere');
     await s.page.waitForSelector('#uit .buurtkaart', { timeout: 15000 });
-    await s.page.waitForSelector('#rtg-vandaag-luxe[data-modus="surface"][data-surface="public-city"]',
+    await s.page.waitForSelector('body[data-rtg-world-dashboard-ready="true"]',
       { timeout: 15000 });
     const tekst = await s.page.evaluate(() => document.body.innerText.replace(/\s+/g, ' '));
 
-    assert.match(await s.page.textContent('#rtg-vandaag-luxe-kop'), /RTF Almere/i,
-      'de publieke slug opent de compacte kop van de gevalideerde stad');
+    assert.equal(await s.page.getAttribute('#main', 'data-rtg-dashboard-world'), 'foundation',
+      'de publieke slug blijft in het oorspronkelijke Foundation-dashboard');
+    assert.equal(await s.page.$('#rtg-vandaag-surface-cover'), null,
+      'de stadsroute krijgt geen aparte production cover');
     assert.match(tekst, /RTF Almere/i, 'de stad staat niet in beeld');
     assert.match(tekst, /Buurtmaaltijd Almere/, 'de open activiteit staat niet in beeld');
     assert.match(tekst, /plekken vrij/i, 'er staat niet of er nog plek is');
@@ -244,10 +246,12 @@ test('de buurt-app toont activiteiten en geen enkel gegeven over een mens',
     await s.page.goto(srv.base + '/apps/foundation/os-publiek.html?stad=almere&embed=1',
       { waitUntil: 'domcontentloaded' });
     await s.page.waitForSelector('#uit .buurtkaart', { timeout: 15000 });
-    assert.equal(await s.page.getAttribute('body', 'data-rtg-vandaag-luxe'), 'surface',
-      'de embed behoudt het surface-palet na publieke validatie');
+    assert.equal(await s.page.getAttribute('body', 'data-rtg-vandaag-luxe'), 'home',
+      'de embed behoudt hetzelfde Foundation-palet na publieke validatie');
     assert.equal(await s.page.$('#rtg-vandaag-luxe'), null,
       'de embedded stadsroute tekent geen tweede wereldkop');
+    assert.equal(await s.page.$('#rtg-vandaag-surface-cover'), null,
+      'de embedded stadsroute tekent evenmin een grote production cover');
     assert.deepEqual(s.fouten, [], 'paginafouten: ' + s.fouten.join(' | '));
   } finally {
     if (s && s.browser) await s.browser.close();

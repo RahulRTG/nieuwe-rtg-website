@@ -1,9 +1,8 @@
-/* Laadt Edge 2 pas nadat het bestaande Edge-casco aantoonbaar gereed is.
-   Mislukt een onderdeel, dan blijft Edge 1 volledig bruikbaar en wordt er
-   geen oude bediening verborgen. */
+/* Edge 2 verrijkt pas na een volledig bestaand casco; fouten laten Edge 1 staan. */
 (function (w, d) {
   'use strict';
-  if (!d.body || d.getElementById('rtg-edge-2-css')) return;
+  if (!d.body || w.__RTGEdge2Loader) return;
+  w.__RTGEdge2Loader = true;
 
   var b = d.body, h = d.head || d.documentElement;
   b.classList.remove('rtg-edge-fold');
@@ -12,8 +11,7 @@
   if (!b.hasAttribute('data-rtg-edge-2-state')) b.setAttribute('data-rtg-edge-2-state', 'overview');
   if (!b.hasAttribute('data-rtg-edge-2-auto')) b.setAttribute('data-rtg-edge-2-auto', 'true');
 
-  /* De onderrand krijgt alleen een expliciete, niet-destructieve hoofdactie.
-     De bestaande knop of focusplek blijft eigenaar van het gedrag. */
+  /* Alleen expliciete, niet-destructieve hoofdacties. */
   function vind(q) { return d.querySelector(q); }
   function klik(q) { var n = vind(q); if (n) n.click(); }
   function focus(q) {
@@ -22,18 +20,17 @@
     n.focus();
   }
   function hoofdactie(tekst, doe) {
-    var e = w.RTGEdge && w.RTGEdge.active, k = e && e.root.querySelector('.rtg-edge-action button');
+    var e = w.RTGEdge && w.RTGEdge.active, k = e && e.root.querySelector('.rtg-edge-action [data-rtg-edge-primary]');
     if (!e || !k) return;
-    e.onAction = doe; e.ctx.actie = tekst; k.textContent = tekst;
+    e.onAction = doe; e.ctx.actie = tekst; k.hidden = false; k.textContent = tekst;
+    if (w.RTGContinueKey && w.RTGContinueKey.sync) w.RTGContinueKey.sync(d, w);
   }
   function neemHoofdactie(tekst, q) {
     hoofdactie(tekst, function () { klik(q); });
     b.setAttribute('data-rtg-edge-2-hoofdactie', 'edge');
   }
 
-  /* Een bediening uit een opgeheven oude strook blijft alleen geldig als zij
-     in de ene Edge-onderrand terechtkomt. We verplaatsen de echte knop, met
-     zijn eigen luisteraar; er ontstaat dus geen kloon en geen tweede status. */
+  /* Verplaats de echte knop; maak geen kloon of tweede status. */
   function neemRandknop(q) {
     var e = w.RTGEdge && w.RTGEdge.active;
     var slot = e && e.root.querySelector('.rtg-edge-action');
@@ -50,10 +47,7 @@
     setTimeout(function () { wacht.disconnect(); }, 10000);
   }
 
-  /* Werk heeft al een volwaardige Rahul-werkruimte. De zichtbare Edge-mond
-     opent daarom die bestaande ruimte; het generieke lege Edge-paneel zou een
-     tweede, minder capabele waarheid zijn. Open/dicht blijft afgeleid van het
-     oorspronkelijke paneel. */
+  /* Werk gebruikt zijn bestaande Rahul-werkruimte als enige waarheid. */
   function koppelWerkRahul() {
     var e = w.RTGEdge && w.RTGEdge.active;
     var rand = e && e.root.querySelector('.rtg-edge-ai');
@@ -70,21 +64,14 @@
       if (!werk.hidden && werk.classList.contains('page') && sluit) sluit.click();
       sync();
     };
-    /* Exclusiviteit werkt in beide richtingen. Niet alleen Rahul sluit een al
-       geopende Edge-laag; elke echte Edge-laagbediening sluit eerst de echte
-       Werk-Rahul. Zo kunnen DOM, beeld en aria nooit twee open lagen melden. */
-    /* De contextknop wordt pas door Edge 2 toegevoegd nadat deze loader al
-       draait. Delegeer daarom op het blijvende casco; dit dekt ook een veilige
-       herbouw zonder een tweede luisteraar op een nieuwe knop. */
+    /* Delegatie op het casco houdt beide richtingen exclusief, ook na herbouw. */
     e.root.addEventListener('click', function (ev) {
       var doel = ev.target && ev.target.closest && ev.target.closest(
         '.rtg-edge-menu,.rtg-edge-state,.rtg-edge-2-context-button');
       if (doel && e.root.contains(doel)) sluitWerk();
     }, true);
     rand.onclick = function (ev) {
-      /* Edge 2 bezit zijn contextlade; sluit haar via haar echte bediening.
-         De oorspronkelijke Rahul-handler sluit daarna index, status en het
-         generieke AI-paneel. Pas dan wisselen we naar de rijkere Werkruimte. */
+      /* Sluit context en generieke lagen vóór de bestaande Werkruimte opent. */
       var context = e.root.querySelector('.rtg-edge-2-context-button[aria-expanded="true"]');
       if (context) context.click();
       if (sluitEdge) sluitEdge.call(rand, ev);
@@ -100,12 +87,28 @@
     sync();
   }
 
-  /* EEN MODAAL VENSTER HEEFT VOORRANG OP DE RANDEN. De oude Rahul-tab week
-     al voor een open dialoog, maar de ene Edge-onderrand bleef erboven liggen.
-     Daardoor was in Clips de knop "Sluit" zichtbaar en toch niet aan te
-     raken. We verwijderen geen rand en bouwen geen tweede: zolang een echt
-     zichtbaar venster openstaat trekt hetzelfde casco tijdelijk weg, waarna
-     de eerder gekozen Edge-stand vanzelf terugkomt. */
+  /* WorkOS geeft zijn geneste scrollstroom aan dezelfde Edge-state door. */
+  function koppelWerkScroll() {
+    var stage = vind('.wk-stage');
+    if (!stage) return;
+    var laatste = stage.scrollTop || 0, gepland = false;
+    stage.addEventListener('scroll', function () {
+      if (gepland) return;
+      gepland = true;
+      var werk = function () {
+        gepland = false;
+        var nu = stage.scrollTop || 0, verschil = nu - laatste;
+        laatste = nu;
+        if (!w.RTGEdge2 || b.getAttribute('data-rtg-edge-2-auto') !== 'true' ||
+            b.getAttribute(VENSTER_ATTR) === 'true') return;
+        if (nu <= 32 || verschil < -14) w.RTGEdge2.setState('overview', { source: 'auto' });
+        else if (verschil > 14) w.RTGEdge2.setState('compact', { source: 'auto' });
+      };
+      if (w.requestAnimationFrame) w.requestAnimationFrame(werk); else w.setTimeout(werk, 0);
+    }, { passive: true });
+  }
+
+  /* Een zichtbaar modaal venster laat hetzelfde casco tijdelijk wijken. */
   var VENSTER_ATTR = 'data-rtg-edge-venster-open';
   function zichtbaarVenster(el) {
     if (!el || el.hidden || (el.closest && el.closest('.rtg-edge-chrome'))) return false;
@@ -130,13 +133,13 @@
   }
   var pad = w.location.pathname;
   if (pad === '/apps/rtg.html') {
-    hoofdactie('Bekijk uw dag', function () { klik('.rtg-vandaag-luxe__cta'); });
+    hoofdactie('Bekijk uw dag', function () { klik('.rtg-dashboard-hero-cta'); });
     neemRandknop('.xp-trigger');
   }
   else if (pad === '/apps/kantoor.html') hoofdactie('Open werkbank', function () { klik('.wereldtab-plus'); });
   else if (pad === '/apps/reizen.html') hoofdactie('Open reizen', function () { klik('[data-tab="reizen"]'); });
   else if (pad === '/apps/foundation/os-publiek.html') hoofdactie('Bekijk uw stad', function () {
-    var a = vind('[data-heen="activiteiten"]'); if (b.getAttribute('data-rtg-vandaag-luxe') === 'surface' && a) a.click(); else focus('#steden');
+    var a = vind('[data-heen="activiteiten"]'); if (b.getAttribute('data-rtg-foundation-city') === 'true' && a) a.click(); else focus('#steden');
   });
   else if (pad === '/apps/agenda.html') hoofdactie('Nieuwe afspraak', function () { klik('#nieuwBtn'); });
   else if (pad === '/apps/reisboek.html') hoofdactie('Naar reisinhoud', function () { focus('#main'); });
@@ -146,27 +149,55 @@
       if (inlog && inlog.offsetParent !== null) inlog.click(); else focus('#a_h0_naam, #mKeuze, #main');
     });
     koppelWerkRahul();
+    koppelWerkScroll();
   }
   else if (pad === '/apps/clips.html') neemHoofdactie('Maak een clip', '#studioOpen');
 
-  function script(bron, naam, klaar) {
-    if (w[naam]) { klaar(); return; }
-    var s = d.createElement('script');
-    s.src = bron;
-    s.onload = klaar;
-    h.appendChild(s);
+  function bron(tag, attribuut, pad) {
+    var lijst = d.querySelectorAll(tag + '[' + attribuut + ']');
+    for (var i = 0; i < lijst.length; i++) {
+      try { if (new URL(lijst[i].getAttribute(attribuut), w.location.href).pathname === pad) return lijst[i]; }
+      catch (fout) {}
+    }
+    return null;
+  }
+  function wacht(el, naam, klaar) {
+    if (naam && w[naam]) { klaar(true); return; }
+    var gedaan = false;
+    function af(ok) {
+      if (gedaan) return; gedaan = true;
+      if (ok) el.setAttribute('data-rtg-geladen', 'true');
+      klaar(ok && (!naam || !!w[naam]));
+    }
+    el.addEventListener('load', function () { af(true); }, { once: true });
+    el.addEventListener('error', function () { af(false); }, { once: true });
+    if (el.getAttribute('data-rtg-geladen') === 'true' || (!naam && el.sheet)) af(true);
+  }
+  function script(pad, naam, klaar) {
+    if (w[naam]) { klaar(true); return; }
+    var s = bron('script', 'src', pad), nieuw = !s;
+    if (!s) { s = d.createElement('script'); s.src = pad; s.async = true; }
+    wacht(s, naam, klaar);
+    if (nieuw) h.appendChild(s);
+  }
+  function blad(pad, klaar) {
+    var css = bron('link[rel~="stylesheet"]', 'href', pad), nieuw = !css;
+    if (!css) { css = d.createElement('link'); css.id = 'rtg-edge-2-css'; css.rel = 'stylesheet'; css.href = pad; }
+    wacht(css, '', klaar);
+    if (nieuw) h.appendChild(css);
   }
 
-  var css = d.createElement('link');
-  css.id = 'rtg-edge-2-css';
-  css.rel = 'stylesheet';
-  css.href = '/shared/rtg-edge-2.css';
-  css.onload = function () {
-    script('/shared/rtg-edge-2-context.js', 'RTGEdge2Context', function () {
-      script('/shared/rtg-edge-2.js', 'RTGEdge2', function () {
-        if (w.RTGEdge2) { w.RTGEdge2.start(d, w); bewaakVensters(); }
-      });
+  var over = 3, mislukt = false;
+  function afhankelijk(ok) {
+    if (!ok) mislukt = true;
+    if (--over || mislukt) return;
+    script('/shared/rtg-edge-2.js', 'RTGEdge2', function (klaar) {
+      if (!klaar || !w.RTGEdge2) return;
+      try { w.RTGEdge2.start(d, w); bewaakVensters(); w.RTGEdgeCommand.koppel(d, w); } catch (fout) {}
     });
-  };
-  h.appendChild(css);
+  }
+  /* Vorm en contextkern downloaden samen; de uitvoerder volgt pas na beide. */
+  blad('/shared/rtg-edge-2.css', afhankelijk);
+  script('/shared/rtg-edge-2-context.js', 'RTGEdge2Context', afhankelijk);
+  script('/shared/rtg-edge-command.js', 'RTGEdgeCommand', afhankelijk);
 })(window, document);

@@ -1,0 +1,90 @@
+@font-face{
+  font-family:"Bodoni Moda";font-style:normal;font-weight:400 900;font-display:swap;
+  src:url('/fonts/aFTQ7PxzY382XsXX63LUYJSKSKjWXFBP.woff2') format('woff2')
+}
+@font-face{
+  font-family:Inter;font-style:normal;font-weight:400 700;font-display:swap;
+  src:url('/fonts/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2') format('woff2')
+}
+
+/* De wereld bepaalt de inhoud; het huis bepaalt de letterrollen. */
+body[data-rtg-skin="heritage"] :where(h1,h2,.rtg-ceremonie,.display,.serif){
+  font-family:var(--rtg-display,"Bodoni Moda",Georgia,serif);
+  font-weight:450;
+  letter-spacing:-.025em;
+}
+body[data-rtg-skin="heritage"] :where(.ey,.eyebrow,.kicker,.micro,.rtg-merk,.rtg-label,legend){
+  color:var(--rtg-world-metal);font-family:var(--rtg-interface,Inter,system-ui,sans-serif);
+  font-size:.68rem;font-weight:650;letter-spacing:.17em;text-transform:uppercase
+}
+/* Kleur volgt het echte inhoudsvlak. Een route kan binnen een lichte wereld
+   bewust een donker hero-, camera- of cockpitvlak bezitten; een globale
+   tekstkleur zou de plaatselijke, aantoonbaar leesbare inkt overschrijven. */
+
+/* Rechte wereldinhoud en afgeronde systeemlagen zijn bewust twee geometrieën. */
+body[data-rtg-skin="heritage"] :where(button,input,select,textarea,.rtg-knop,.rtg-veld,
+  .knop,.btn,.button,.rtg-groep,.kaart,.card,.paneel,.panel,.tegel,.box,.blok){
+  border-radius:var(--rtg-radius-content)
+}
+body[data-rtg-skin="heritage"] :where(.rtg-groep,.kaart,.card,.paneel,.panel,.tegel,.box,.blok){
+  border-color:var(--rtg-world-line);box-shadow:var(--rtg-depth-content)
+}
+body[data-rtg-skin="heritage"] :where(dialog,.modal,.sheet,[role="dialog"]){
+  border-color:var(--rtg-world-line);border-radius:var(--rtg-radius-system);box-shadow:var(--rtg-depth-system)
+}
+
+body[data-rtg-skin="heritage"] :where(a.kaart,a.card,button.kaart,button.card,
+  .kaart[role="button"],.card[role="button"],[data-rtg-interactive]){
+  transition:border-color var(--rtg-time-functional,200ms) var(--rtg-ease-standard,ease),
+    box-shadow var(--rtg-time-functional,200ms) var(--rtg-ease-standard,ease),
+    transform var(--rtg-time-direct,100ms) var(--rtg-ease-standard,ease)
+}
+body[data-rtg-skin="heritage"] :where(a.kaart,a.card,button.kaart,button.card,
+  .kaart[role="button"],.card[role="button"],[data-rtg-interactive]):is(:hover,:focus-visible){
+  border-color:color-mix(in srgb,var(--rtg-world-metal) 52%,var(--rtg-world-line));
+  box-shadow:var(--rtg-depth-focus);transform:translateY(-2px)
+}
+body[data-rtg-skin="heritage"] :where(hr,fieldset,table,th,td){border-color:var(--rtg-world-line)}
+body[data-rtg-skin="heritage"] :where(input,select,textarea){
+  border-color:var(--rtg-world-line);color:var(--rtg-world-ink);caret-color:var(--rtg-world-signature)
+}
+body[data-rtg-skin="heritage"] :where(input,textarea)::placeholder{color:var(--rtg-world-muted);opacity:1}
+body[data-rtg-skin="heritage"] :where(a,button,input,select,textarea,[tabindex]):focus-visible{
+  outline:2px solid var(--rtg-world-metal);outline-offset:3px
+}
+body[data-rtg-skin="heritage"] :where([aria-current="page"],[aria-selected="true"],[aria-pressed="true"]){
+  border-color:var(--rtg-world-signature)
+}
+body[data-rtg-skin="heritage"] :where(.rtg-knop.vol,.knop.vol,.btn.primary,[data-primary="true"]),
+body[data-rtg-skin="heritage"].rtg-stijl :is(.knop.vol,.knop.primair,.knop.prim,.knop.hoofd){
+  border-color:color-mix(in srgb,var(--rtg-world-action) 72%,var(--rtg-world-metal))!important;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--rtg-world-action) 92%,#fff 8%),var(--rtg-world-action))!important;
+  color:var(--rtg-world-action-ink)!important;box-shadow:inset 0 1px rgba(255,255,255,.14),
+    0 10px 30px color-mix(in srgb,var(--rtg-world-action) 22%,transparent)
+}
+body[data-rtg-skin="heritage"].rtg-stijl .skip{
+  background:var(--rtg-world-action);color:var(--rtg-world-action-ink)
+}
+body[data-rtg-skin="heritage"] ::selection{background:var(--rtg-world-action);color:var(--rtg-world-action-ink)}
+
+/* Eigen canvassen houden hun ruimtelijke waarheid. Zij erven alleen tokens. */
+body[data-rtg-skin="heritage"]:is([data-rtg-projectie],.travel-os-map,.rtg-edge-workspace,
+  .rtg-edge-embed,.media-werk),
+html[data-rtg-oppervlak="1"] body[data-rtg-skin="heritage"],
+html.rtg-command-blad body[data-rtg-skin="heritage"]{background-image:none}
+body[data-rtg-skin="heritage"] :where(video,canvas,#beeld,.zoeker,.speler,.media-studio){border-radius:0}
+
+@media(max-width:640px){
+  body[data-rtg-skin="heritage"]{--rtg-grid-gap:16px;--rtg-radius-system:18px;
+    background-size:auto,auto,cover,auto}
+  body[data-rtg-skin="heritage"] :where(dialog,.modal,.sheet,[role="dialog"]):fullscreen{border-radius:0}
+}
+@media(prefers-reduced-motion:reduce){
+  body[data-rtg-skin="heritage"]{background-attachment:initial}
+  body[data-rtg-skin="heritage"] :where(a.kaart,a.card,button.kaart,button.card,
+    .kaart[role="button"],.card[role="button"],[data-rtg-interactive]){transition-duration:1ms}
+  body[data-rtg-skin="heritage"] :where(a.kaart,a.card,button.kaart,button.card,
+    .kaart[role="button"],.card[role="button"],[data-rtg-interactive]):is(:hover,:focus-visible){transform:none}
+}
+@media(forced-colors:active){body[data-rtg-skin="heritage"]{background-image:none}}
+@media print{body[data-rtg-skin="heritage"]{background:#fff!important;color:#000!important}}

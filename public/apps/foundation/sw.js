@@ -2,7 +2,7 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-premium-foundation-0cc6782e';
+const CACHE = 'rtf-premium-foundation-dba7da59';
 const SHELL = [
   '/apps/foundation/', '/apps/foundation/index.html', '/apps/foundation/campus.html',
   '/apps/foundation/leren.html', '/apps/foundation/leerpaspoort.html', '/apps/foundation/bord.html', '/apps/foundation/schrift.html',
@@ -56,7 +56,23 @@ const SHELL = [
   '/apps/foundation/os-veld.html', '/apps/foundation/os-donateur.html',
   '/apps/foundation/tekenen.js', '/apps/foundation/realtime.js', '/apps/foundation/stijl.css', '/apps/foundation/premium.css', '/apps/foundation/premium.js', '/apps/foundation/palet.js',
   '/apps/rtgschool/leer.js', '/apps/rtgschool/examen.js', '/apps/rtgschool/bijles.js',
-  '/shared/id.js', '/shared/rtg-school-shell.css', '/shared/rtg-school-session.js', '/shared/seizoen.js', '/shared/dagkleur.css', '/shared/verbinding.js', '/apps/geo.js', '/apps/translate.js', '/apps/util.js',
+  '/shared/id.js', '/shared/basis.js', '/shared/rtg-world-identity.js',
+  '/shared/rtg-heritage.css', '/shared/rtg-heritage-materials.css',
+  '/shared/rtg-heritage-adapters.css', '/shared/rtg-heritage-components.css',
+  '/shared/rtg-heritage-motion.css', '/shared/rtg-heritage-motion.js',
+  '/shared/rtg-continue-key.css', '/shared/rtg-continue-key-core.js',
+  '/shared/rtg-continue-key.js', '/shared/rtg-heritage-order.js',
+  '/shared/randen.js', '/shared/rtg-edge-worlds.js', '/shared/rtg-edge-icons.js',
+  '/shared/rtg-edge-library.js', '/shared/rtg-edge-system.js', '/shared/rtg-edge-system.css',
+  '/shared/rtg-edge-2-loader.js', '/shared/rtg-edge-2-context.js', '/shared/rtg-edge-command.js',
+  '/shared/rtg-edge-2.js', '/shared/rtg-edge-2.css',
+  '/images/worlds/heritage/living-heritage-v2.jpg',
+  '/images/worlds/heritage/travel-heritage-v2.jpg',
+  '/images/worlds/heritage/work-heritage-v2.jpg',
+  '/images/worlds/heritage/foundation-heritage-v2.jpg',
+  '/fonts/aFTQ7PxzY382XsXX63LUYJSKSKjWXFBP.woff2',
+  '/fonts/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2',
+  '/shared/rtg-school-shell.css', '/shared/rtg-school-session.js', '/shared/seizoen.js', '/shared/dagkleur.css', '/shared/verbinding.js', '/apps/geo.js', '/apps/translate.js', '/apps/util.js',
   '/manifests/foundation.webmanifest', '/icons/foundation.svg'
 ];
 

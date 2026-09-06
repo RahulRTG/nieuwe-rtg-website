@@ -25,64 +25,42 @@ const MODI = ['partner', 'hybride', 'eigen'];
 const RANG = { partner: 0, hybride: 1, eigen: 2 };
 const NOOD_DREMPEL = 3;            // zoveel mislukte eigen-clearings achter elkaar -> automatisch nood
 const AUTORISATIE_MS = 10 * 60 * 1000; // de tweede persoon heeft tien minuten
+const normaliseer = require('./stand')({ MODI });
 
 function maakBankregie({ db, save }) {
   function d() {
     if (!db.data.bankregie || typeof db.data.bankregie !== 'object') db.data.bankregie = {};
-    const b = db.data.bankregie;
-    if (!MODI.includes(b.modus)) b.modus = 'partner';
-    if (typeof b.operationeel !== 'boolean') b.operationeel = false;
-    if (!Number.isFinite(b.spaarrenteBp)) b.spaarrenteBp = 150;
-    if (!Number.isFinite(b.roodLimietCenten)) b.roodLimietCenten = 0;
-    if (!b.tarieven || typeof b.tarieven !== 'object') b.tarieven = { sepaUitCenten: 0, spoedCenten: 0, passenCenten: 0 };
-    /* DE TWEE PLAFONDS ONDER HET BESLUIT. kern/bevoegdheid/lijst.js staat het
-       aanhouden van ledengeld toe op grond van een BESLUIT en niet van een
-       vergunning, en dat besluit rust op drie voorwaarden -- waarvan "harde
-       plafonds" er een is. Die twee getallen stonden als constante in de code
-       (kern/pay/stand.js en kern/ervaring/leden/punten.js), en daarmee was de
-       grond onder het besluit alleen te verzetten door een programmeur.
-
-       Ze horen hier omdat dit de kamer is waar ook de VERGUNNING wordt
-       vastgelegd (./vergunning.js): wie het plafond verzet, verzet de grond
-       onder datzelfde besluit, en die twee horen op een tafel te liggen. De
-       code leest ze via een koppeling (kern/pay/index.js koppelPlafond), zodat
-       er geen tweede waarheid ontstaat. */
-    if (!Number.isFinite(b.walletPlafondCenten)) b.walletPlafondCenten = 1000000;      // 10.000 euro per wallet
-    if (!Number.isFinite(b.puntenTegoedMaxCenten)) b.puntenTegoedMaxCenten = 50000;    // 500 euro punten-tegoed
-    if (!b.iban || typeof b.iban !== 'object') b.iban = { landcode: 'NL', bankcode: 'RTGB', bic: 'RTGBNL2A' };
-    if (!b.nood || typeof b.nood !== 'object') b.nood = { actief: false, sinds: null, reden: '', door: '' };
-    if (!Number.isFinite(b.mislukt)) b.mislukt = 0;
-    if (!('autorisatie' in b)) b.autorisatie = null;
-    if (typeof b.ledenAan !== 'boolean') b.ledenAan = false; // staat de leden-bank live (zichtbaar in de app)?
-    /* Wat er is VASTGELEGD over wat RTG zelf mag. Leeg is het eerlijke begin en
-       betekent nee: zie kern/bevoegdheid.js. De partnerrails staan standaard AAN
-       -- dat is wat er vandaag draait, met een bevoegde partij aan de andere
-       kant -- zodat de lijst beschrijft wat er is en niet wat we hopen. */
-    if (!('vergunning' in b)) b.vergunning = null;
-    if (!b.partnerRails || typeof b.partnerRails !== 'object') b.partnerRails = { sepa: true, passen: true, rekeningen: true };
-    return b;
+    return normaliseer(db.data.bankregie);
   }
 
-  const modus = () => d().modus;
-  const operationeel = () => d().operationeel === true;
-  const spaarrenteBp = () => d().spaarrenteBp;
-  const roodLimietStandaard = () => d().roodLimietCenten;
-  const ibanParams = () => ({ ...d().iban });
-  const tarief = naam => Math.max(0, Math.round(Number(d().tarieven[naam]) || 0));
+  /* Lezen gebruikt een genormaliseerde kopie. Zo wordt een zuivere status- of
+     walletvraag geen opslagmutatie wanneer een oude kast deze configuratie nog
+     niet heeft; echte wijzigingen blijven via d() lopen. */
+  function kijk() {
+    const bron = db.data.bankregie;
+    return normaliseer(bron && typeof bron === 'object' && !Array.isArray(bron) ? { ...bron } : {});
+  }
+
+  const modus = () => kijk().modus;
+  const operationeel = () => kijk().operationeel === true;
+  const spaarrenteBp = () => kijk().spaarrenteBp;
+  const roodLimietStandaard = () => kijk().roodLimietCenten;
+  const ibanParams = () => ({ ...kijk().iban });
+  const tarief = naam => Math.max(0, Math.round(Number(kijk().tarieven[naam]) || 0));
   const kenmerk = () => 'AUT' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
-  const ledenAan = () => d().ledenAan === true;
+  const ledenAan = () => kijk().ledenAan === true;
   /* De twee plafonds als EEN antwoord. Wie ze los opvraagt, vergeet er een. */
-  const plafonds = () => ({ walletCenten: d().walletPlafondCenten, puntenCenten: d().puntenTegoedMaxCenten });
+  const plafonds = () => ({ walletCenten: kijk().walletPlafondCenten, puntenCenten: kijk().puntenTegoedMaxCenten });
 
   // de INGESTELDE clearing (los van nood): wat de gekozen stand zou doen
   function clearingConfig() {
-    const b = d();
+    const b = kijk();
     const m = b.operationeel ? b.modus : 'partner';
     return { modus: m, eigen: m === 'eigen' || m === 'hybride', kaart: m === 'partner' || m === 'hybride' };
   }
   // de EFFECTIEVE clearing: in nood forceren we de kaart-rails, wat de stand ook is
   function clearing() {
-    if (d().nood.actief) return { modus: 'nood', eigen: false, kaart: true, nood: true };
+    if (kijk().nood.actief) return { modus: 'nood', eigen: false, kaart: true, nood: true };
     return { ...clearingConfig(), nood: false };
   }
 
@@ -114,7 +92,7 @@ function maakBankregie({ db, save }) {
     return { ok: true, operationeel: d().operationeel, modus: d().modus, teruggevallen, wie: wie || 'boardroom' };
   }
 
-  const ctx = { d, save, MODI, RANG, AUTORISATIE_MS, NOOD_DREMPEL, operationeel, _modusZet, _operationeelZet, clearing, kenmerk };
+  const ctx = { d, kijk, save, MODI, RANG, AUTORISATIE_MS, NOOD_DREMPEL, operationeel, _modusZet, _operationeelZet, clearing, kenmerk };
   const nood = require('./nood')(ctx);
   const aut = require('./autorisatie')(ctx);
   /* Wat er is vastgelegd over wat RTG zelf mag, en welke partnerrails
@@ -132,7 +110,7 @@ function maakBankregie({ db, save }) {
   function ledenZet({ aan, wie }) { d().ledenAan = aan === true; save(); return { ok: true, ledenAan: d().ledenAan, wie: wie || 'boardroom' }; }
 
   function overzicht() {
-    const b = d();
+    const b = kijk();
     return { status: 200, modus: b.modus, modi: MODI.slice(), operationeel: b.operationeel, ledenAan: b.ledenAan,
       clearing: clearing(), clearingConfig: clearingConfig(), nood: { ...b.nood }, mislukt: b.mislukt,
       autorisatie: aut.pub(b.autorisatie), spaarrenteBp: b.spaarrenteBp, spaarrentePct: b.spaarrenteBp / 100,

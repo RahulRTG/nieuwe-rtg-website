@@ -33,6 +33,7 @@
 'use strict';
 
 const KANAAL = 'rtg_kv';
+const { voegBijzonderSamen } = require('./verzoekbijzonder');
 
 module.exports = maakSchrijflanen;
 /* De kanaalnaam hangt aan de fabriek zelf: ./index.js heeft hem nodig voor de
@@ -81,7 +82,9 @@ function maakSchrijflanen(ctx, laatsteSchrijf) {
       let j = liveJson === jOns ? jOns : liveJson;
       if (huidig.rows.length && Number(huidig.rows[0].ver) > (toegepast.get(k) || 0)) {
         const base = laatsteJson.has(k) ? JSON.parse(laatsteJson.get(k)) : undefined;
-        const samen = merge3(base, dataNu[k], JSON.parse(uitStore(huidig.rows[0].val)));
+        const hun = JSON.parse(uitStore(huidig.rows[0].val));
+        const bijzonder = voegBijzonderSamen(k, base, dataNu[k], hun);
+        const samen = bijzonder === null ? merge3(base, dataNu[k], hun) : bijzonder;
         dataNu[k] = samen;
         j = JSON.stringify(samen);
       }

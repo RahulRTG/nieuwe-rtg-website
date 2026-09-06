@@ -1,0 +1,127 @@
+/* RTG CONTINUE KEY ---------------------------------------------------------
+   De Key is de bestaande Edge-hoofdactie, niet een tweede knop. Zijn vaste
+   flowmaat blijft 44px; de capsule wordt erbuiten getekend en kan daardoor
+   nooit navigatie laten verspringen. JS begrenst de open breedte tot de vrije
+   ruimte tussen de echte buurknoppen. */
+body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-edge-primary]{
+  flex:0 0 44px;width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px
+}
+body[data-rtg-skin="heritage"] .rtg-edge-action:has(>[data-rtg-continue-key]){
+  --rtg-key-keyboard-lift:0px;position:relative;overflow:visible
+}
+body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key]{
+  --rtg-key-open-width:44px;
+  position:relative;z-index:2;isolation:isolate;display:grid;place-items:center;
+  flex:0 0 44px;width:44px;min-width:44px;max-width:44px;height:44px;min-height:44px;
+  margin-block:0;padding:0;overflow:visible;border-radius:50%;
+  transform:translateY(calc(-1 * var(--rtg-key-keyboard-lift)));
+  transition-property:color,border-color,box-shadow,opacity,translate,scale,transform;
+  transition-duration:var(--rtg-time-direct,100ms),var(--rtg-time-direct,100ms),
+    var(--rtg-time-direct,100ms),var(--rtg-time-direct,100ms),var(--rtg-time-direct,100ms),
+    var(--rtg-time-direct,100ms),var(--rtg-time-structural,340ms)
+}
+body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key]::before{
+  content:"";position:absolute;z-index:-1;top:0;bottom:0;width:var(--rtg-key-open-width);
+  border:1px solid color-mix(in srgb,var(--edge-metal) 66%,var(--edge-line));
+  border-radius:0;background:color-mix(in srgb,var(--edge-panel) 96%,transparent);
+  box-shadow:0 10px 30px rgba(0,0,0,.2);pointer-events:auto;
+  transition:clip-path var(--rtg-time-functional,200ms) var(--rtg-ease-standard,ease),
+    border-color var(--rtg-time-direct,100ms) linear,background-color var(--rtg-time-direct,100ms) linear
+}
+body[data-rtg-skin="heritage"] [data-rtg-key-open-direction="right"]::before{
+  left:0;clip-path:inset(0 calc(100% - 44px) 0 0 round 999px)
+}
+body[data-rtg-skin="heritage"] [data-rtg-key-open-direction="left"]::before{
+  right:0;clip-path:inset(0 0 0 calc(100% - 44px) round 999px)
+}
+body[data-rtg-skin="heritage"] .rtg-continue-key-icon{
+  position:relative;z-index:1;display:grid;place-items:center;width:44px;height:44px;
+  color:var(--edge-metal);pointer-events:none
+}
+body[data-rtg-skin="heritage"] .rtg-continue-key-icon svg{width:17px;height:17px}
+body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key] [data-rtg-action-copy]{
+  position:absolute;z-index:1;top:50%;width:max(0px,calc(var(--rtg-key-open-width) - 54px));
+  min-width:0;opacity:0;overflow:hidden;translate:0 -50%;pointer-events:none;
+  transition:opacity var(--rtg-time-functional,200ms) var(--rtg-ease-standard,ease)
+}
+body[data-rtg-skin="heritage"] [data-rtg-key-open-direction="right"] [data-rtg-action-copy]{left:50px;text-align:left}
+body[data-rtg-skin="heritage"] [data-rtg-key-open-direction="left"] [data-rtg-action-copy]{right:50px;text-align:right}
+body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key] [data-rtg-action-copy-for]{
+  width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap
+}
+body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key]:is(:focus-visible,[data-rtg-key-expanded="true"])::before{
+  clip-path:inset(0 round 999px);border-color:var(--edge-metal)
+}
+body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key]:is(:focus-visible,[data-rtg-key-expanded="true"]) [data-rtg-action-copy]{opacity:1}
+@media(hover:hover) and (pointer:fine){
+  body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key]:hover::before{
+    clip-path:inset(0 round 999px);border-color:var(--edge-metal)
+  }
+  body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key]:hover [data-rtg-action-copy]{opacity:1}
+}
+
+/* De voortgang blijft aan dezelfde Key verbonden. De algemene motionlaag
+   beheert de waarde; hier krijgt de lijn de ronde maat van de rusttoestand. */
+body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key]::after{
+  content:""!important;left:4px;right:4px;bottom:3px;width:auto;height:2px;border-radius:0
+}
+
+/* Alleen op telefoon wordt de vooraf gekozen duimpositie toegepast. Marges
+   delen vrije ruimte; DOM-volgorde en dus schermlezervolgorde blijven gelijk. */
+@media(max-width:767px){
+  body[data-rtg-skin="heritage"] .rtg-edge-action:has(>[data-rtg-continue-key]){gap:4px;padding-inline:4px}
+  body[data-rtg-skin="heritage"] .rtg-edge-action:has(>[data-rtg-continue-key])::before{display:none}
+  body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key][data-rtg-key-anchor="links"]{margin-inline:0 auto}
+  body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key][data-rtg-key-anchor="midden"]{margin-inline:auto}
+  body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key][data-rtg-key-anchor="rechts"]{margin-inline:auto 0}
+}
+@media(max-width:340px){
+  body[data-rtg-skin="heritage"][data-rtg-world="living"][data-rtg-edge-2-rendered="true"]
+    .rtg-edge-action>[data-rtg-edge-primary]{
+      display:grid!important;width:44px!important;min-width:44px!important;max-width:44px!important;
+      height:44px!important;font-size:7px!important
+  }
+  body[data-rtg-skin="heritage"][data-rtg-world="living"][data-rtg-edge-2-rendered="true"]
+    .rtg-edge-action>[data-rtg-edge-primary]::after{content:""!important}
+}
+
+/* De plaatskiezer is een tijdelijke systeemlaag boven Edge. Hij bevat alleen
+   de drie veilige ankers en ligt nooit over de onderrandbediening. */
+.rtg-continue-key-picker{
+  position:fixed;z-index:8890;left:var(--rtg-key-picker-left,calc(50vw - 80px));
+  bottom:calc(var(--edge-bottom,48px) + env(safe-area-inset-bottom,0px) +
+    var(--rtg-key-keyboard-lift,0px) + 10px);
+  display:flex;gap:4px;width:160px;padding:6px;border:1px solid var(--edge-line);
+  border-radius:0;clip-path:inset(0 round 20px);background:var(--edge-panel);box-shadow:0 18px 50px rgba(0,0,0,.34);
+  color:var(--edge-copy);pointer-events:auto
+}
+.rtg-continue-key-picker[hidden]{display:none!important}
+body[data-rtg-edge-2-state="focus"] .rtg-continue-key-picker,
+body[data-rtg-edge-venster-open="true"] .rtg-continue-key-picker{display:none!important}
+.rtg-continue-key-picker button{
+  display:grid!important;place-items:center;width:44px!important;min-width:44px!important;
+  max-width:44px!important;height:44px!important;min-height:44px!important;padding:0!important;
+  border:1px solid var(--edge-line)!important;border-radius:0!important;clip-path:inset(0 round 14px);
+  color:var(--edge-copy)!important;font:600 8px/1 Inter,system-ui,sans-serif!important;
+  letter-spacing:.08em!important;text-transform:uppercase!important
+}
+.rtg-continue-key-picker button[aria-pressed="true"]{border-color:var(--edge-metal)!important;color:var(--edge-metal)!important;background:var(--edge-accent-soft)!important}
+.rtg-continue-key-picker button:focus-visible{outline:2px solid var(--edge-metal)!important;outline-offset:2px}
+.rtg-continue-key-a11y{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
+
+@media(prefers-reduced-motion:reduce){
+  body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key],
+  body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key]::before,
+  body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key] [data-rtg-action-copy]{
+    transition:none!important;translate:none!important;scale:1!important
+  }
+}
+html.rtg-stil body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key],
+html.rtg-stil body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key]::before,
+html.rtg-stil body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key] [data-rtg-action-copy]{
+  transition:none!important;translate:none!important;scale:1!important
+}
+@media(forced-colors:active){
+  .rtg-continue-key-picker,.rtg-continue-key-picker button,
+  body[data-rtg-skin="heritage"] .rtg-edge-action>[data-rtg-continue-key]::before{forced-color-adjust:auto;border-color:ButtonText}
+}

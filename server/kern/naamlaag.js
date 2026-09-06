@@ -9,8 +9,9 @@
 module.exports = ({ db, save, schoon }) => {
 
   const eigen = require('./eigencollectie')({ db, domein: 'kern/naamlaag', bezit: { eigenNamen: 'kaart' } });
-  const bak = () => eigen.bak('eigenNamen');   // eigen sleutel -> { codenaam: 'Eigen naam' }
-  const mijn = key => bak()[key] || {};
+  const bak = () => eigen.bak('eigenNamen');   // schrijfpad: eigen sleutel -> { codenaam: 'Eigen naam' }
+  const kijk = () => eigen.kijk('eigenNamen'); // lezen maakt nooit een lege collectie aan
+  const mijn = key => kijk()[key] || {};
   const laag = s => String(s == null ? '' : s).trim().toLowerCase();
 
   // Zet (of wis, bij lege naam) het eigen etiket voor een codenaam.

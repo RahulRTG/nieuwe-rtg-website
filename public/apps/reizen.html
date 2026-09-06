@@ -16,10 +16,11 @@
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link href="/shared/wereldrooster.css" rel="stylesheet">
 <link href="/shared/experience-kernel.css?v=20260829-7" rel="stylesheet">
-<link href="/images/worlds/vandaag/wereld-atlas.jpg" rel="preload" as="image" fetchpriority="high">
+<link href="/images/worlds/heritage/travel-heritage-v2.jpg" rel="preload" as="image" fetchpriority="high">
 <link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="travel" data-rtg-eigenvlak="bordeaux" data-rtg-vandaag-luxe data-rtg-edge-2-context="travel-header,hoofdtabs" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
+<body class="rtg-stijl" data-rtg-world="travel" data-rtg-world-dashboard="travel" data-rtg-eigenvlak="bordeaux" data-rtg-vandaag-luxe data-rtg-edge-2-context="travel-header,hoofdtabs" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <!-- De wereldstrook stond hier; de vier werelden staan nu in de topbalk van de
      Edge-schil. Zie de opmerking in apps/kantoor.html. -->
@@ -69,8 +70,8 @@
           <div class="daghoofd">
             <header class="dagtitel">
               <p class="micro"><span id="groet">GOEDEMIDDAG</span></p>
-              <h1 id="titelVandaag">IBIZA</h1>
-              <p class="sub" id="dagzin">Alles staat klaar.</p>
+              <h1 id="titelVandaag">Uw reizen</h1>
+              <p class="sub" id="dagzin">Uw reisoverzicht wordt opgehaald&hellip;</p>
             </header>
 
             <!-- DE MOMENTEN VAN VANDAAG. De onderdelen van deze reis als strook,
@@ -649,8 +650,30 @@
   }
 
   let REIZEN = [];
+  /* De fotokop is sfeer, geen demo-inhoud. Een bestemming verschijnt hier pas
+     wanneer zij uit hetzelfde reisdossier komt dat het register tekent. Bij
+     leegte of een mislukte bron blijft de kop expliciet neutraal. */
+  function zetReisdek(reizen, toestand) {
+    const eerste = (reizen || [])[0];
+    if (eerste) {
+      const bestemming = String(eerste.bestemming || '').trim();
+      $('#titelVandaag').textContent = bestemming
+        ? bestemming.toLocaleUpperCase('nl-NL') : 'Uw volgende reis';
+      $('#dagzin').textContent = 'Uit uw reisdossier.';
+      $('#dagbeeldzin').textContent = bestemming
+        ? 'Bestemming uit uw reisdossier.' : 'Uw volgende reis uit het dossier.';
+      return;
+    }
+    $('#titelVandaag').textContent = 'Uw reizen';
+    $('#dagzin').textContent = toestand === 'fout'
+      ? 'Reisgegevens zijn nu niet beschikbaar.' : 'Er staat nog geen reis in uw dossier.';
+    $('#dagbeeldzin').textContent = toestand === 'fout'
+      ? 'De bron kon niet worden bevestigd.' : 'Een bestemming verschijnt zodra die in uw dossier staat.';
+  }
+
   function teken(d) {
     const reizen = REIZEN = d.reizen || [];
+    zetReisdek(reizen, 'geladen');
     const losseDelen = (d.los || []).map(x => x.onderdeel);
     const alles = reizen.reduce((a, r) => a.concat(r.onderdelen), []).concat(losseDelen);
 
@@ -758,6 +781,7 @@
       if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
       teken(d);
     } catch (e) {
+      zetReisdek([], 'fout');
       // geen esc(): het Canvas zet tekst met textContent en escapet dus zelf
       RTGCanvas.rust('#rust', { kop: RTGCanvas.groet(), zin: e.message + ' Log eerst in via de leden-app.' });
       $('#komend').innerHTML = '<p class="stil">' + esc(e.message) + ' Log eerst in via de leden-app.</p>';

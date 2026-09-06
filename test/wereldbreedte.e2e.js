@@ -215,8 +215,12 @@ test('elk scherm uit de catalogus past op een telefoon van 390px', { skip: geenB
     assert.ok(vooruitzicht, 'Het Vooruitzicht is werkelijk in de schermronde gemeten');
     assert.ok(vooruitzicht.wereldHoog > 300,
       'Het Vooruitzicht toont op telefoonmaat zijn hoofdwereld, kreeg ' + vooruitzicht.wereldHoog + 'px');
-    assert.match(vooruitzicht.titel, /Alles ligt al klaar/i,
-      'de zichtbare hoofdkaart draagt zijn eigen kernboodschap');
+    /* Een anonieme of nieuwe gebruiker heeft nog geen intentie en dus ook geen
+       doorgerekende route. De oude verwachting "Alles ligt al klaar" maakte
+       een voorbeeldscenario tot operationeel feit. De hoofdkaart moet juist
+       zichtbaar blijven én de lege bronstand eerlijk benoemen. */
+    assert.match(vooruitzicht.titel, /Voeg eerst een intentie toe/i,
+      'de zichtbare hoofdkaart benoemt de lege bronstand zonder voorbeeldreis');
     assert.equal(vooruitzicht.actieZichtbaar, true, 'de hoofdactie is zichtbaar');
     assert.ok(vooruitzicht.actieHoog >= 44,
       'de hoofdactie heeft duimmaat (minimaal 44px), kreeg ' + vooruitzicht.actieHoog + 'px');

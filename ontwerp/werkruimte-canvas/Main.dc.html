@@ -1,0 +1,250 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@300;400;500;600&display=swap">
+  <style>
+  :root{
+    --grond:#120C09; --grond-diep:#0A0705;
+    --vlak:#1B1310; --vlak-hoog:#241A15; --vlak-diep:#150E0B;
+    --ivoor:#F4F0E9; --gedempt:#CBBDAF; --zacht:#9C8D7E;
+    --lijn:rgba(244,240,233,.09); --lijn-goud:rgba(212,185,120,.22);
+    --goud:#D4B978; --goud-diep:#C0A544; --goud-logo:#857007;
+    --bordeaux:#7F1634; --bordeaux-hoog:#9E1C40; --bordeaux-tekst:#C23A5E;
+    --salie:#4C9A75; --aandacht:#C9A24B; --incident:#DE6E92; --actief:#7E8FC4;
+    --display:'Bodoni Moda',Georgia,'Times New Roman',serif;
+    --interface:Inter,system-ui,-apple-system,'Segoe UI',sans-serif;
+    --gutter:14px;
+    --pil:calc(var(--ronding,14px) * 55);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:var(--interface);color:var(--ivoor);
+    -webkit-font-smoothing:antialiased;font-variant-numeric:tabular-nums;}
+  a{color:var(--goud);text-decoration:none;} a:hover{color:var(--ivoor);}
+
+  /* de tafel: warm bijna-zwart met twee gloeden, geen egale verf */
+  .tafel{position:relative;overflow:hidden;background:var(--grond);}
+  .tafel::before{content:"";position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 45% at 88% 2%, rgba(212,185,120,.13), transparent 60%),
+      radial-gradient(ellipse 55% 50% at 4% 96%, rgba(127,22,52,.16), transparent 62%);}
+  .tafel > *{position:relative;}
+
+  /* het gouden kapitalenlabel -- de signatuur van deze stijl */
+  .label{font-size:9.5px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--goud);font-weight:500;}
+  .label.stil{color:var(--zacht);}
+  .serif{font-family:var(--display);font-weight:400;letter-spacing:.01em;}
+
+  /* surface */
+  .surface{display:flex;flex-direction:column;background:var(--vlak);
+    border:1px solid var(--lijn);border-radius:var(--ronding,14px);overflow:hidden;
+    box-shadow:0 2px 10px rgba(0,0,0,.45);}
+  .surface[data-actief],.surface.is-actief{border-color:var(--lijn-goud);
+    box-shadow:0 10px 34px rgba(0,0,0,.5),0 0 0 1px rgba(212,185,120,.10);}
+  .greep{display:flex;align-items:center;gap:9px;padding:8px 11px 7px;
+    border-bottom:1px solid var(--lijn);position:relative;cursor:grab;user-select:none;}
+  .greep::before{content:"";position:absolute;left:11px;right:11px;top:0;height:2px;
+    background:transparent;border-radius:2px;}
+  .surface[data-actief] .greep::before,.surface.is-actief .greep::before{background:linear-gradient(90deg,var(--goud),rgba(212,185,120,.25));}
+  .greep .naam{font-size:10.5px;letter-spacing:.17em;text-transform:uppercase;color:var(--zacht);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .surface[data-actief] .greep .naam,.surface.is-actief .greep .naam{color:var(--ivoor);}
+  .greep .rek{margin-left:auto;}
+  .greep button{background:none;border:0;color:var(--zacht);cursor:pointer;
+    min-width:24px;min-height:24px;padding:2px 5px;border-radius:calc(var(--ronding,14px)/2);
+    font:inherit;font-size:12px;line-height:1;}
+  .greep button:hover{color:var(--goud);}
+  .vlak{flex:1;min-height:0;overflow:hidden;}
+
+  /* register: rijen met haarlijnen, geen kaartenstapel */
+  .rij{display:flex;align-items:center;gap:12px;min-height:var(--regel,40px);
+    padding:8px 14px;border-bottom:1px solid var(--lijn);font-size:13px;}
+  .rij:last-child{border-bottom:0;}
+  .rij .dag{font-family:var(--display);font-size:22px;line-height:1;
+    font-variant-numeric:proportional-nums;color:var(--ivoor);min-width:34px;}
+  .rij .maand{font-size:9px;letter-spacing:.2em;color:var(--goud);text-transform:uppercase;}
+  .rij .wat{flex:1;color:var(--gedempt);}
+  .rij .meta{color:var(--zacht);font-size:11.5px;white-space:nowrap;}
+
+  /* signal rail: dunne verticale lijn, geen gekleurde pil */
+  .rail{position:relative;padding-left:17px;}
+  .rail::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;
+    background:var(--lijn);}
+  .rail[data-sig="aandacht"]::before{background:var(--aandacht);}
+  .rail[data-sig="incident"]::before{background:var(--incident);}
+  .rail[data-sig="actief"]::before{background:var(--actief);}
+  .rail[data-sig="gezond"]::before{background:rgba(76,154,117,.55);}
+
+  /* knoppen */
+  .knop{display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:12.5px;
+    padding:9px 18px;border-radius:var(--pil);cursor:pointer;border:1px solid var(--lijn-goud);
+    background:none;color:var(--ivoor);}
+  .knop:hover{border-color:var(--goud);}
+  .knop.vol{background:var(--bordeaux);border-color:var(--bordeaux);color:#FCF6F0;font-weight:500;}
+  .knop.vol:hover{background:var(--bordeaux-hoog);border-color:var(--bordeaux-hoog);}
+  .knop.goud{background:var(--goud);border-color:var(--goud);color:#1C1608;font-weight:600;}
+
+  /* fotografisch veld, met CSS opgebouwd -- geen stockfoto */
+  .foto{position:relative;overflow:hidden;background:#1E120B;}
+  .foto i{position:absolute;inset:0;display:block;}
+  .foto .lucht{background:linear-gradient(180deg,#3A1F13 0%,#7A3A18 38%,#C4682A 62%,#2A1710 100%);}
+  .foto .zon{background:radial-gradient(circle 30% 34% at 64% 66%,rgba(255,196,110,.85),rgba(224,124,52,.35) 42%,transparent 68%);}
+  .foto .water{top:62%;background:linear-gradient(180deg,rgba(196,104,42,.55),rgba(18,12,9,.92));}
+  .foto .sluier{background:linear-gradient(180deg,rgba(10,7,5,.15) 0%,rgba(10,7,5,.55) 55%,rgba(10,7,5,.92) 100%);}
+
+  /* ---- alleen voor dit artboard ---- */
+  .edge{display:flex;align-items:center;gap:22px;height:54px;padding:0 20px;
+    border-bottom:1px solid var(--lijn);background:rgba(10,7,5,.55);}
+  .merk{font-family:var(--display);font-size:19px;letter-spacing:.14em;color:var(--goud);}
+  .edge nav{display:flex;gap:20px;font-size:12px;color:var(--zacht);}
+  .edge nav b{color:var(--ivoor);font-weight:500;position:relative;}
+  .edge nav b::after{content:"";position:absolute;left:0;right:0;bottom:-19px;height:1px;background:var(--goud);}
+  .zoek{margin-left:auto;display:flex;align-items:center;gap:9px;width:300px;
+    padding:8px 13px;border:1px solid var(--lijn);border-radius:var(--pil);
+    background:rgba(244,240,233,.03);font-size:12px;color:var(--zacht);}
+  .zoek kbd{margin-left:auto;font:inherit;font-size:10px;letter-spacing:.08em;color:var(--zacht);
+    border:1px solid var(--lijn);border-radius:4px;padding:1px 5px;}
+  .avatar{width:28px;height:28px;border-radius:50%;border:1px solid var(--lijn-goud);
+    background:linear-gradient(150deg,#3A2418,#1B1310);display:flex;align-items:center;
+    justify-content:center;font-size:10.5px;color:var(--goud);letter-spacing:.06em;}
+
+  .werkblad{display:flex;gap:var(--gutter);padding:var(--gutter);height:calc(100% - 54px);}
+
+  .console{width:452px;flex:0 0 452px;display:flex;flex-direction:column;gap:16px;
+    padding:20px;background:var(--vlak);border:1px solid var(--lijn-goud);
+    border-radius:var(--ronding,14px);box-shadow:0 2px 10px rgba(0,0,0,.45);}
+  .console .wie{font-size:12.5px;color:var(--zacht);margin-top:5px;}
+  .blok{border-top:1px solid var(--lijn);padding-top:12px;}
+  .bloknaam{display:flex;align-items:baseline;gap:10px;margin-bottom:9px;}
+  .bloknaam .telling{margin-left:auto;font-size:11px;color:var(--gedempt);}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{border:1px solid var(--lijn);border-radius:var(--pil);padding:5px 12px;
+    font-size:11.5px;color:var(--gedempt);min-height:24px;display:inline-flex;align-items:center;}
+  .chip[data-open]{border-color:var(--lijn-goud);color:var(--ivoor);background:rgba(212,185,120,.07);}
+  .aandachtrij{display:flex;gap:10px;align-items:baseline;padding:7px 0 7px 17px;font-size:12.5px;}
+  .aandachtrij .bron{color:var(--zacht);margin-left:auto;font-size:11px;}
+  .rahul{display:flex;gap:12px;align-items:flex-start;}
+  .mond{width:30px;height:30px;border-radius:50%;flex:0 0 30px;
+    background:radial-gradient(circle at 34% 30%,rgba(212,185,120,.55),rgba(127,22,52,.5) 70%);
+    border:1px solid var(--lijn-goud);}
+  .rahul p{margin:0;font-family:var(--display);font-size:16px;line-height:1.4;color:var(--gedempt);font-style:italic;}
+
+  .surface{flex:1;min-width:0;}
+  .kop{position:relative;height:184px;}
+  .kop .tekst{position:absolute;left:22px;right:22px;bottom:16px;}
+  .kop h2{margin:4px 0 0;font-family:var(--display);font-size:38px;line-height:1;color:#FFFBF4;}
+  .balk{display:flex;align-items:center;gap:14px;padding:12px 16px;border-bottom:1px solid var(--lijn);}
+  .balk .som{font-size:12px;color:var(--gedempt);}
+  .balk .som b{color:var(--ivoor);font-weight:500;}
+  </style>
+</helmet>
+
+<div class="tafel" style="width:1440px;height:900px;--ronding:{{ronding}}px">
+
+  <header class="edge">
+    <span class="merk">RTG</span>
+    <nav>
+      <b>TravelOS</b><span>LivingOS</span><span>WorkOS</span><span>FoundationOS</span>
+    </nav>
+    <div class="zoek">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <span>Vraag of open iets</span><kbd>⌘K</kbd>
+    </div>
+    <div class="avatar">R</div>
+  </header>
+
+  <div class="werkblad">
+
+    <aside class="console">
+      <div>
+        <div class="label">RTG Command</div>
+        <div class="wie">Rahul · Nederland / RTG</div>
+      </div>
+
+      <div class="blok">
+        <div class="bloknaam"><span class="label stil">Nu</span><span class="telling">3 vragen aandacht</span></div>
+        <div class="aandachtrij rail" data-sig="aandacht"><span>Gstaad — hotelbevestiging ontbreekt</span><span class="bron">Reizen</span></div>
+        <div class="aandachtrij rail" data-sig="aandacht"><span>Monaco — visum verloopt over 12 dagen</span><span class="bron">Bestanden</span></div>
+        <div class="aandachtrij rail" data-sig="actief"><span>Ibiza — chauffeur nog niet bevestigd</span><span class="bron">Dispatch</span></div>
+      </div>
+
+      <div class="blok">
+        <div class="bloknaam"><span class="label stil">Werelden</span></div>
+        <div class="chips">
+          <span class="chip" data-open>Reizen</span><span class="chip">Geld</span><span class="chip">Werk</span><span class="chip">Salon</span><span class="chip">Huis</span>
+        </div>
+      </div>
+
+      <div class="blok">
+        <div class="bloknaam"><span class="label stil">Actief</span><span class="telling">1 van 4</span></div>
+        <div class="chips"><span class="chip" data-open>Reizen</span></div>
+      </div>
+
+      <div class="blok" style="margin-top:auto">
+        <div class="bloknaam"><span class="label stil">Rahul</span></div>
+        <div class="rahul">
+          <span class="mond"></span>
+          <p>Wat wil je doen?</p>
+        </div>
+      </div>
+    </aside>
+
+    <article class="surface" data-actief>
+      <header class="greep">
+        <span class="naam">Reizen</span>
+        <span class="rek"></span>
+        <button type="button" title="Kleiner of groter">▫</button>
+        <button type="button" title="Sluiten">×</button>
+      </header>
+
+      <div class="vlak">
+        <div class="foto kop">
+          <i class="lucht"></i><i class="zon"></i><i class="water"></i><i class="sluier"></i>
+          <div class="tekst">
+            <span class="label">Volgende reis · 29 augustus</span>
+            <h2>Ibiza</h2>
+          </div>
+        </div>
+
+        <div class="balk">
+          <span class="som"><b>3</b> komende reizen</span>
+          <span class="som" style="color:var(--zacht)">RTG-R-6F612F</span>
+          <button type="button" class="knop" style="margin-left:auto;padding:7px 15px">+ Nieuwe reis</button>
+        </div>
+
+        <div class="rij rail" data-sig="actief">
+          <span class="dag">29</span><span class="maand">Aug</span>
+          <span class="wat">Ibiza — villa, chauffeur, twee gasten</span>
+          <span class="meta">chauffeur open</span>
+        </div>
+        <div class="rij rail" data-sig="aandacht">
+          <span class="dag">17</span><span class="maand">Sep</span>
+          <span class="wat">Gstaad — chalet, wintersport</span>
+          <span class="meta">hotel onbevestigd</span>
+        </div>
+        <div class="rij rail" data-sig="gezond">
+          <span class="dag">06</span><span class="maand">Okt</span>
+          <span class="wat">Monaco — Grand Prix, twee nachten</span>
+          <span class="meta">compleet</span>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</div>
+</x-dc>
+<script data-dc-script data-props='{"ronding":{"editor":"range","default":14,"min":0,"max":18,"step":1,"unit":"px","section":"Vorm"}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { ronding: this.props.ronding ?? 14 };
+  }
+}
+</script>
+</body>
+</html>

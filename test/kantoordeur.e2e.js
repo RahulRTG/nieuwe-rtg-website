@@ -105,6 +105,14 @@ async function opstelling() {
    zodat de melding zegt wat er misging in plaats van wie het gedaan zou hebben. */
 async function bezoek(page, base, app) {
   const doel = '/apps/' + app + '.html';
+  /* EERST NAAR EEN STIL DOCUMENT, dan de sleutel weghalen. Het vorige scherm kan
+     nog aan het navigeren zijn (een location.replace of een meta-refresh), en
+     een evaluate op een document dat net vertrekt zakt met "Execution context
+     was destroyed" -- gezien onder belasting, vijftien schermtoetsen tegelijk.
+     Dat is een mislukte meting en geen uitspraak over het scherm; /api/health
+     heeft geen appcode en vertrekt dus nooit uit zichzelf, precies zoals alsLid
+     hem gebruikt. */
+  await page.goto(base + '/api/health', { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => { try { localStorage.removeItem('rtg_office_token'); } catch (e) {} });
   let waarom = null, r = null;
   /* TWEE POGINGEN, en de tweede is geen wegkijken. Een navigatie die afbreekt is

@@ -67,8 +67,18 @@ function maakLagen({ db, save, crypto, journaal, register, kern, opslag }) {
      Twee treden dragen een mensrem en gaan nooit vanzelf open -- geld en het
      kanaal tussen twee leden. Waarom dat geen instelling is, staat in de kop
      van ./uitrolregie.js. */
+  /* DE DUURZAME HELPER WORDT HIER GEBOUWD EN NIET IN DE REGIE ZELF, want de
+     regie krijgt zijn `save` geinjecteerd en hoort niet zelf aan de database te
+     komen. `bijeen` en `inBundel` reizen niet mee door deze keten (aanbouw.js
+     geeft ze niet door), dus ze komen van de db-module -- acht kernmodules doen
+     dat al. Zie GELDLAT.md, uitbreiding 6 september 2026: een rem die een mens
+     overhaalt hoort vast te staan voordat hij bevestigd wordt. */
+  const dbModule = require('../../db');
+  const vastleggenUitrol = require('../../lib/duurzaam')({
+    bijeen: dbModule.bijeen, save, inBundel: dbModule.inBundel, bron: 'uitrolregie' });
   const uitrolregie = require('./uitrolregie').maakUitrolregie({
-    opslag, save, meting: require('../../meting'), functies: require('../../functies/register'),
+    opslag, save, vastleggen: vastleggenUitrol,
+    meting: require('../../meting'), functies: require('../../functies/register'),
     schakelFase: (id, door) => {
       const a = kern && kern.afdelingen;
       if (!a || typeof a.schakelFase !== 'function') {

@@ -69,7 +69,7 @@ const STANDAARD = {
   geschiedenisMax: 200
 };
 
-function maakUitrolregie({ opslag, save, meting, functies, schakelFase, nu }) {
+function maakUitrolregie({ opslag, save, meting, functies, schakelFase, nu, vastleggen }) {
   const tijd = nu || klok.nu;
   const iso = () => new Date(tijd()).toISOString();
   const TREDEN = () => (functies && functies.FASES) || [];
@@ -118,12 +118,27 @@ function maakUitrolregie({ opslag, save, meting, functies, schakelFase, nu }) {
     return stand();
   }
 
-  function pauze(door, reden) {
+  /* PAUZEREN IS EEN REM DIE EEN MENS OVERHAALT, en dus duurzaam. GELDLAT.md
+     (uitbreiding 6 september 2026): de bediener leest `stil` en loopt weg. Ging
+     de schrijfactie verloren, dan loopt de uitrol na een herstart gewoon door
+     terwijl het scherm zegt dat hij stilstaat. FAALPROEF.json mat dat als
+     `schrijf-verloren` -> 200: gezakt.
+
+     ASYNC, EN DAAROM WACHT routes/command/index.js ZIJN `veilig` NU AF. Zonder
+     dat await gaat hier een Promise naar res.json() en leest de bediener `{}`
+     met een 200 -- erger dan de fout die we repareren. */
+  async function pauze(door, reden) {
     const u = staat();
     u.stand = 'stil';
     u.reden = reden || 'met de hand gepauzeerd';
     boek(u, u.trede, u.trede, door, 'hand', u.reden);
-    save();
+    /* Zonder de duurzame helper valt hij terug op de gewone write-behind save().
+       Dat is geen stille terugval: `vastleggen` ontbreekt alleen als iemand deze
+       regie zonder db bedraadt, en dan is er ook niets om aan te bevestigen. */
+    if (vastleggen) {
+      const fout = await vastleggen();
+      if (fout) return fout;
+    } else save();
     return stand();
   }
 

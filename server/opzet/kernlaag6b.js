@@ -49,4 +49,11 @@ Object.assign(kern, require('../kern/kantoorgesprek').maakKantoorgesprek({
   loginFails, noteFailedTry
 }));
 
+/* DE INTEGRATIEKAMER (kern/integratiekamer.js): de standen van de vier externe
+   kanalen plus de noodstop. Hij hangt hier en niet in de route omdat de
+   noodstop DUURZAAM wegschrijft -- een bediener die "alles uit" leest, hoort
+   dat na een herstart terug te vinden (GELDLAT.md, uitbreiding 6 sept 2026).
+   Die primitive woont in kern- en lib-bestanden en niet in een router. */
+Object.assign(kern, require('../kern/integratiekamer')({ db, save }));
+
 };

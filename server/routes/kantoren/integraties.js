@@ -9,7 +9,7 @@ const proef = require('./integraties-proef');
 const { wie: envelopWie } = require('../../opzet/envelop');
 
 module.exports = (ctx) => {
-  const { app, boardroomAuth, db, save, kern } = ctx;
+  const { app, boardroomAuth, save, kern } = ctx;
   const mail = kern.mail, betaal = kern.betaal;
   const IDS = ['smtp', 'sms', 'connect', 'sepa'];
   const DEF = {
@@ -19,15 +19,8 @@ module.exports = (ctx) => {
     sepa: { naam: 'SEPA', doel: 'Uitbetalingen en RTFoundation-afdracht', config: 'SEPA_SANDBOX=1' }
   };
 
-  function data() {
-    if (!db.data.integratiekamer || typeof db.data.integratiekamer !== 'object')
-      db.data.integratiekamer = { schakelaars: {}, verantwoordelijk: {}, tests: {}, storingen: {}, verzoeken: [], log: [] };
-    const s = db.data.integratiekamer;
-    for (const k of ['schakelaars', 'verantwoordelijk', 'tests', 'storingen']) if (!s[k] || typeof s[k] !== 'object') s[k] = {};
-    if (!Array.isArray(s.verzoeken)) s.verzoeken = [];
-    if (!Array.isArray(s.log)) s.log = [];
-    return s;
-  }
+  /* De kamer en de noodstop wonen in kern/integratiekamer.js; zie de kop daar. */
+  const { data, noodstop } = kern.integratiekamer;
   const postStand = () => mail.sandboxStand ? mail.sandboxStand() : { smtp: {}, sms: {} };
   const geldStand = () => betaal.sandboxStand ? betaal.sandboxStand() : { connect: {}, sepa: {} };
   function actueel(id) { return id === 'smtp' || id === 'sms' ? postStand()[id] : geldStand()[id]; }
@@ -139,10 +132,13 @@ module.exports = (ctx) => {
     res.status(stappen.every(x => x.ok) ? 200 : 409).json(beeld({ proef: { id: gevraagd, stappen }, baas: !!req.boardroomBaas }));
   });
 
-  app.post('/api/office/techniek/integraties/noodstop', boardroomAuth, (req, res) => {
-    const s = data();
-    for (const id of IDS) { zetRuntime(id, false); s.schakelaars[id] = false; }
-    log('noodstop', req, { reden: String(req.body.reden || 'handmatig veilig uit').slice(0, 120) }); save();
+  /* "Alles uit" wordt pas bevestigd als de opslag het heeft vastgelegd. Zonder
+     dat leest een boardroomlid `noodstop: true` en staat na een herstart alles
+     gewoon weer aan -- gemeten in FAALPROEF.json. */
+  app.post('/api/office/techniek/integraties/noodstop', boardroomAuth, async (req, res) => {
+    const fout = await noodstop(IDS, zetRuntime, () =>
+      log('noodstop', req, { reden: String(req.body.reden || 'handmatig veilig uit').slice(0, 120) }));
+    if (fout) return res.status(fout.status).json({ error: fout.error });
     res.json(beeld({ noodstop: true, baas: !!req.boardroomBaas }));
   });
 };

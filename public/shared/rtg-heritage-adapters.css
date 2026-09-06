@@ -64,6 +64,58 @@ body[data-rtg-skin="heritage"] :where(.wacht,.let,[data-status="pending"],[data-
   --rtg-state-accent:var(--rtg-status-warn)
 }
 
+/* CONTRAST OP BESTAANDE MATERIAALEILANDEN ---------------------------------
+   De wereldtokens horen bij de paginagrond. Enkele oudere onderdelen tekenen
+   bewust een ander materiaal binnen die pagina: de zwarte commandolade, de
+   parelmoeren Social-inhoud en de zwarte onboarding. Zij krijgen hier lokaal
+   hun eigen inktset; de wereldidentiteit en de rest van het scherm veranderen
+   niet. */
+body[data-rtg-skin="heritage"] .cmd-bank{
+  --rtg-txt:#f4f0e9;--rtg-muted:#cdc9c0;--rtg-soft:#cdc9c0;color:#f4f0e9
+}
+body.rtg-social-elite[data-rtg-skin="heritage"][data-rtg-world="living"] main#inhoud{
+  --rtg-txt:#171712;--rtg-muted:#625f57;--rtg-soft:#625f57;
+  --txt:#171712;--muted:#625f57;--soft:#625f57;--zacht:#625f57;color:#171712
+}
+body[data-rtg-skin="heritage"] #onbGate[data-rtg-vlak="onyx"]{
+  --txt:#f4f0e9;--muted:#c9c0b6;--soft:#c9c0b6;--line:rgba(244,240,233,.15);
+  --card:#151310;--card2:#1d1815;--gold:#d0b77b;color:#f4f0e9
+}
+
+/* De Living-home droeg nog een legacy `bordeaux`-vlag. Voor een gewoon
+   Living-scherm is dat een lokaal eiland; op de wereldhome overschreef hij de
+   complete parelmoeren wereld en ontstonden half-transparante wijnvlakken met
+   lichte Living-tekst. De dashboardmarkering maakt de bedoelde grens exact. */
+body[data-rtg-skin="heritage"][data-rtg-world="living"][data-rtg-world-dashboard="living"]{
+  --rtg-world-bg:#f4f0e8;--rtg-world-ground:linear-gradient(155deg,#fbf8f2 0%,#f4f0e8 58%,#e8e0d2 100%);
+  --rtg-world-card:#fbf8f2;--rtg-world-card-strong:#e8e0d2;--rtg-world-ink:#211e19;
+  --rtg-world-muted:#5f574d;--rtg-world-line:rgba(33,30,25,.17);--rtg-world-signature:#7f1634;
+  --rtg-world-signature-soft:rgba(127,22,52,.10);--rtg-world-metal:#745718;
+  --rtg-world-action:#7f1634;--rtg-world-action-ink:#fff;--rtg-world-schema:light;
+  --rtg-world-photo:url('/images/worlds/heritage/living-heritage-v2.jpg');
+  --rtg-world-photo-position:68% center;
+  --rtg-world-photo-mask:linear-gradient(112deg,rgba(244,240,232,.975),rgba(244,240,232,.89))
+}
+
+/* Kleine actie- en statusvlakken gebruiken de inkt die bij hun EIGEN vulling
+   hoort. Goud en lichtroze vragen donkere inkt; het diepe erfgoedgoud en
+   bordeaux vragen juist ivoor. */
+body[data-rtg-skin="heritage"] .skip{
+  background:var(--rtg-world-action)!important;color:var(--rtg-world-action-ink)!important
+}
+body[data-rtg-skin="heritage"] :is(#btn-zet,#rkToetsen .gelijk),
+body[data-rtg-skin="heritage"][data-rtg-world="living"] .kg-rij button{color:#fff!important}
+body[data-rtg-skin="heritage"] #zegGo,
+body[data-rtg-skin="heritage"][data-rtg-world="work"] #boTabs .tab.aan,
+body[data-rtg-skin="heritage"][data-rtg-world="foundation"] .chip.aan{color:#211e19!important}
+body[data-rtg-skin="heritage"] .winst .kop{color:var(--rtg-world-action)!important}
+body[data-rtg-skin="heritage"][data-kantoor-tool="notities"] #bord>p.stil{
+  color:var(--rtg-world-ink)!important
+}
+body[data-rtg-skin="heritage"][data-workos-premium] .stat .b .v.a{
+  color:var(--rtg-world-metal)!important
+}
+
 /* Formulieren houden labels, focus en oorzaak in hetzelfde optische vlak. */
 body[data-rtg-skin="heritage"] :where(.veld,input:not([type="checkbox"]):not([type="radio"]),select,textarea){
   min-height:36px;background-color:color-mix(in srgb,var(--rtg-world-card-strong) 92%,transparent);

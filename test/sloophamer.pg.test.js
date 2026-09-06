@@ -20,8 +20,10 @@
      REDIS_URL=redis://127.0.0.1:6399 \
      node --test test/sloophamer.pg.test.js */
 /* Draait PostgreSQL lokaal in Docker, geef dan ook de expliciete wegwerpcontainer
-   mee: RTG_POSTGRES_CONTAINER=rtg-pg-proef. De CI-service gebruikt de gewone
-   procesroute hieronder; de toets kiest nooit zelf een willekeurige container. */
+   mee: RTG_POSTGRES_CONTAINER=rtg-pg-proef. Alleen onder CI mag de toets zonder
+   die variabele de ene draaiende postgres:16-alpine-servicecontainer herkennen.
+   Bij nul of meerdere kandidaten faalt de storingproef gesloten; lokaal kiest de
+   toets nooit zelf een Docker-container. */
 /* LET OP -- deze toets vraagt de database VOOR ZICHZELF. Verschillende
    PG-toetsen maken en droppen dezelfde tabellen (kv, tx_ledger, users), en
    `node --test` draait bestanden standaard PARALLEL: dan trekt de een de tabel
@@ -70,11 +72,39 @@ async function wachtGereed(base, naam) {
 }
 
 // een proces met SIGSTOP bevriezen / met SIGCONT hervatten (netwerk-partitie)
+const IS_CI = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+const IS_GITHUB_CI = process.env.GITHUB_ACTIONS === 'true';
+let bestuurdePostgresContainer = null;
+
+function vindCiPostgresContainer() {
+  if (!IS_GITHUB_CI) return null;
+  const uitvoer = execFileSync('docker', [
+    'ps',
+    '--filter', 'ancestor=postgres:16-alpine',
+    '--filter', 'status=running',
+    '--format', '{{.ID}}'
+  ], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  const kandidaten = uitvoer.split(/\r?\n/).map(s => s.trim()).filter(Boolean);
+  return kandidaten.length === 1 ? kandidaten[0] : null;
+}
+
 function seinNaar(patroon, sig) {
   try {
-    const container = patroon === 'postgres' ? process.env.RTG_POSTGRES_CONTAINER : null;
-    if (container) execFileSync('docker', [sig === 'STOP' ? 'pause' : 'unpause', container], { stdio: 'ignore' });
-    else execFileSync('pkill', ['-' + sig, '-x', patroon], { stdio: 'ignore' });
+    if (patroon === 'postgres') {
+      const expliciet = String(process.env.RTG_POSTGRES_CONTAINER || '').trim();
+      const container = expliciet
+        || (sig === 'CONT' ? bestuurdePostgresContainer : null)
+        || vindCiPostgresContainer();
+      if (container) {
+        execFileSync('docker', [sig === 'STOP' ? 'pause' : 'unpause', container], { stdio: 'ignore' });
+        bestuurdePostgresContainer = sig === 'STOP' ? container : null;
+        return true;
+      }
+      // Een CI-run zonder exact één herkenbare servicecontainer mag nooit
+      // terugvallen op een brede processelectie op de host.
+      if (IS_CI) return false;
+    }
+    execFileSync('pkill', ['-' + sig, '-x', patroon], { stdio: 'ignore' });
     return true;
   }
   catch (e) { return false; } // geen proces/container of geen recht om hem te besturen

@@ -17,6 +17,7 @@ const { db } = require('../server/db');
    her-exports muteren in plaats van de logica ('overleefd' zonder reden). */
 const { orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe } = require('../server/db/tx');
+const { veegplan } = require('../server/db/tx/rij');
 
 const ZAKEN = ['KIKUNOI', 'PONTO', 'HOSHI'];
 function maakOrder(i) {
@@ -87,6 +88,23 @@ test('boekingen: zelfde semantiek + de 50000-cap knipt zonder kopie per toevoegi
   const dubbel = { ...maakB(7), status: 'nieuwer' };
   boekingenVoegToe(dubbel);
   assert.equal(boekingMetRef('RTG-B-7'), dubbel, 'de nieuwste met die ref wint, zoals .find op nieuwste-eerst');
+});
+
+test('de veegronde archiveert nooit een oude dubbel over de nieuwste ref heen', () => {
+  const nieuw = { ref: 'dubbel', status: 'nieuw' };
+  const oud = { ref: 'dubbel', status: 'oud' };
+  const uniek = { ref: 'uniek', status: 'klaar' };
+  const plan = veegplan('orders', [nieuw, oud, uniek], [oud, uniek]);
+  assert.deepEqual(plan.items, [uniek], 'de dubbele ref blijft geheel in RAM zolang zijn nieuwste rij in de kop staat');
+  const werk = [{ ref: 'later', status: 'nieuw' }, nieuw, oud, uniek];
+  assert.equal(plan.verwijder(werk), 1, 'alleen de veilig gekozen staartregel verdwijnt');
+  assert.deepEqual(werk.map(x => x.ref), ['later', 'dubbel', 'dubbel'], 'nieuwe en dubbele regels blijven staan');
+
+  const gelijk = { ref: 'zelfde', status: 'gelijk' };
+  const alleInStaart = veegplan('orders', [gelijk, { ...gelijk }], [gelijk, { ...gelijk }]);
+  const metLatereDubbel = [{ ...gelijk }, gelijk, { ...gelijk }];
+  assert.equal(alleInStaart.verwijder(metLatereDubbel), 2, 'het plan verwijdert exact het gekozen aantal');
+  assert.equal(metLatereDubbel.length, 1, 'een later toegevoegde identieke dubbel blijft behouden');
 });
 
 /* DOET DE INDEX NOG WERK, OF GEEFT HIJ ALLEEN HET JUISTE ANTWOORD?

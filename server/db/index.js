@@ -113,8 +113,9 @@ const bewerkCollectie = require('./collectie-bewerken')({
   store: STORE, postgres, sqlite, db, save
 });
 
-// De tx-veegronde vraagt na een venster-verhuis een snapshot: injecteer save().
-tx.wire(save);
+// De tx-veegronde kapt pas na de duurzame grootboek-upsert en doet dat via de
+// autoritatieve collectiepoort; nooit als kale achtergrond-save.
+tx.wire(bewerkCollectie);
 
 // De kern zet hier een functie neer die na een externe wijziging draait.
 function onExternalChange(cb) { state.setExternCb(cb); }

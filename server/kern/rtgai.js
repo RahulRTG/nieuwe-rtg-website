@@ -150,6 +150,15 @@ module.exports = ({ db, save, bewerkCollectie }) => {
       roerSinds: s.roerSinds, roerRondes: s.roerRondes, journaal: s.journaal.slice(0, 20) };
   }
 
+  /* Andere kantoormotoren mogen hun eigen, aantoonbare stap in hetzelfde
+     RTG-AI-journaal zetten. De tellingen blijven in de aparte RAM-batch; deze
+     kleine journaalmutatie reist mee met de lopende requestcommit. */
+  function noteer(tekst, soort) {
+    schrijf(S(), tekst, soort);
+    save();
+    return true;
+  }
+
   let timer = null;
   function autoStart() {
     if (!TRAIN_MS) return null;
@@ -161,5 +170,5 @@ module.exports = ({ db, save, bewerkCollectie }) => {
     return timer;
   }
 
-  return { rtgai: { lees, train, status, roerGeef, roerTerug, autoStart } };
+  return { rtgai: { lees, train, status, noteer, roerGeef, roerTerug, autoStart } };
 };

@@ -23,6 +23,7 @@
 
 const { soort } = require('./soorten');
 const { HUIS } = require('./haak');
+const { metersVan, pasBatchToe, voegTerug } = require('./meterbatch');
 
 /* Hoeveel maanden blijven staan. Vierentwintig: genoeg voor een jaarvergelijking
    en voor een correctie op een oude factuur, en niet meer dan dat. */
@@ -48,13 +49,6 @@ module.exports = (ctx) => {
 
   const periodeVan = (t) => String(t || nu()).slice(0, 7);
 
-  function metersVan(k, maak) {
-    if (!k.meters || typeof k.meters !== 'object') {
-      if (!maak) return {};
-      k.meters = {};
-    }
-    return k.meters;
-  }
   const meters = () => metersVan(d(), true);
   const leesMeters = () => metersVan(kijkD ? kijkD() : d(), false);
 
@@ -96,40 +90,12 @@ module.exports = (ctx) => {
   let wacht = new Map();
   let klaarZetter = null, achtergrondBatch = null, achtergrondBelofte = null;
 
-  function pasBatchToe(kosten, batch, alleenPeriode) {
-    const m = metersVan(kosten, true);
-    for (const [sleutel, tel] of batch) {
-      const k = sleutel.indexOf('\u0000');
-      const p = sleutel.slice(0, k);
-      if (alleenPeriode && p !== alleenPeriode) continue;
-      const vak = m[p] || (m[p] = {}), dr = sleutel.slice(k + 1);
-      const rij = vak[dr] || (vak[dr] = { laatst: null });
-      for (const id of Object.keys(tel.per)) rij[id] = Math.round(((rij[id] || 0) + tel.per[id]) * 1000) / 1000;
-      if (!rij.laatst || Date.parse(tel.laatst) >= Date.parse(rij.laatst)) rij.laatst = tel.laatst;
-      if (tel.pas && (!rij.pasGezien || Date.parse(tel.laatst) >= Date.parse(rij.pasGezien))) {
-        rij.pas = tel.pas; rij.pasGezien = tel.laatst;
-      }
-    }
-  }
-
   function beeldPeriode(periode) {
     const p = periodeVan(periode), bron = leesMeters()[p] || {};
     const beeld = { meters: { [p]: JSON.parse(JSON.stringify(bron)) } };
     if (achtergrondBatch) pasBatchToe(beeld, achtergrondBatch, p);
     if (wacht.size) pasBatchToe(beeld, wacht, p);
     return beeld.meters[p];
-  }
-
-  function voegTerug(batch) {
-    for (const [sleutel, tel] of batch) {
-      const nuTel = wacht.get(sleutel);
-      if (!nuTel) { wacht.set(sleutel, tel); continue; }
-      for (const id of Object.keys(tel.per)) nuTel.per[id] = (nuTel.per[id] || 0) + tel.per[id];
-      if (!nuTel.laatst || tel.laatst > nuTel.laatst) {
-        nuTel.laatst = tel.laatst;
-        if (tel.pas) nuTel.pas = tel.pas;
-      }
-    }
   }
 
   /* Een timer heeft geen requestcommit. Hij mag daarom nooit eerst de levende
@@ -147,13 +113,13 @@ module.exports = (ctx) => {
         pasBatchToe(d(), batch); snoei(); save(); uit = true;
       }
     } catch (e) {
-      achtergrondBatch = null; voegTerug(batch);
+      achtergrondBatch = null; voegTerug(wacht, batch);
       if (!klaarZetter) planSpoel();
       return false;
     }
     if (!uit || typeof uit.then !== 'function') { achtergrondBatch = null; return true; }
     achtergrondBelofte = Promise.resolve(uit).then(() => true, () => {
-      voegTerug(batch); return false;
+      voegTerug(wacht, batch); return false;
     }).finally(() => {
       achtergrondBatch = null; achtergrondBelofte = null;
       if (wacht.size && !klaarZetter) planSpoel();

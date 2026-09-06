@@ -811,6 +811,17 @@ const EIGEN_MODULE = new Map([
     'public/shared/rtg-edge-system.js',
     'public/shared/rtg-edge-library.js'
   ]],
+  /* Deze regressietoets raakt drie achtergrondschrijvers via hun facades en
+     een directe meter-import. modulesVan() ziet daardoor alleen de dunne
+     gevels, terwijl de geteste retry-, pending- en serialisatielogica hier
+     woont. De gerichte mutatieronde bevestigt deze koppeling voordat zij als
+     meetbewijs geldt. */
+  ['achtergrondcollecties.test.js', [
+    'server/kern/kosten/meterbatch.js',
+    'server/kern/kosten/meter.js',
+    'server/kern/rtgai.js',
+    'server/kern/zelfzorg/index.js'
+  ]],
   /* De blinde vlek zoekt structuurfouten in de PAGINA'S en niet in een module.
      Hij staat er met een kandidaat en niet met een reden, omdat ik niet ga
      beweren dat het onmeetbaar is voordat de motor het heeft geprobeerd:

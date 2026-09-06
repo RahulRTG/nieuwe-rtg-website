@@ -73,7 +73,9 @@ module.exports = function bouwKernAan(kern, grens) {
   kern.rtgai.autoStart();
   /* De Onderzoeker (kern/rtgonderzoeker.js): de tweede AI van het RTG Kantoor,
      door de RTG AI gebouwd; doet agentisch onderzoek en adviseert alleen. */
-  Object.assign(kern, require('../kern/rtgonderzoeker')({ db, save, crypto, schoon, anthropic }));
+  Object.assign(kern, require('../kern/rtgonderzoeker')({
+    db, save, crypto, schoon, anthropic, rtgai: kern.rtgai
+  }));
   require('../routes/rtgkantoor')(grens('rtgkantoor'));
   require('../routes/kantoren')(grens('kantoren'));
   /* RTG Command (kern/command/): de bestuurslaag van het RTG- en RTF-kantoor.

@@ -41,6 +41,22 @@ test('vier vaste werelden delen één volledige token- en dieptegrammatica', () 
   }
 });
 
+test('eigen donkere routevlakken dragen hun volledige Heritage-inktset', () => {
+  assert.match(TOKENS, /\[data-rtg-world="living"\]\{[^}]*--rtg-world-muted:#5f574d/s);
+  for (const vlak of ['onyx', 'bordeaux']) {
+    const blok = TOKENS.match(new RegExp(`body\\[data-rtg-skin="heritage"\\]\\[data-rtg-eigenvlak="${vlak}"\\]\\{([^}]+)\\}`));
+    assert.ok(blok, `${vlak} heeft een eigen Heritage-contract`);
+    for (const token of ['bg', 'ground', 'card', 'card-strong', 'ink', 'muted', 'line',
+      'signature', 'signature-soft', 'metal', 'action', 'action-ink', 'schema', 'photo', 'photo-mask']) {
+      assert.match(blok[1], new RegExp(`--rtg-world-${token}:`), `${vlak} zet ${token}`);
+    }
+  }
+  assert.match(TOKENS, /--rtg-opgoud:var\(--rtg-world-action-ink\)/);
+  assert.match(TOKENS, /--rtg-goud-hoog:var\(--rtg-world-action\)/);
+  assert.match(TOKENS, /--rtg-oppervlak:linear-gradient\([^;]+var\(--rtg-world-card\)/s);
+  assert.match(TOKENS, /--rtg-oppervlak-2:linear-gradient\([^;]+var\(--rtg-world-card-strong\)/s);
+});
+
 test('Bodoni blijft redactioneel en Inter blijft operationeel', () => {
   assert.match(MATERIALEN, /h1,h2,.rtg-ceremonie,.display,.serif/);
   assert.doesNotMatch(MATERIALEN, /body\[data-rtg-skin="heritage"\]\s*\{[^}]*font-family:[^;}]*Bodoni/i,
@@ -96,6 +112,20 @@ test('bestaande echte DOM wordt geadapteerd zonder knoppen of data te kopiëren'
   assert.match(ADAPTERS, /@media\(pointer:coarse\)[\s\S]*min-height:var\(--rtg-target\)/);
   assert.match(ADAPTERS, /@media\(max-width:700px\)[\s\S]*min-height:var\(--rtg-target\)/);
   assert.match(ADAPTERS, /prefers-reduced-motion:reduce/);
+});
+
+test('Heritage overschrijft geen route-eigen tekstinkt op donkere eilanden', () => {
+  assert.doesNotMatch(MATERIALEN, /:where\(h1,h2\)\{color:var\(--rtg-world-ink\)\}/);
+  assert.doesNotMatch(MATERIALEN,
+    /:where\(\.sub,\.soft,\.stil,\.meta,\.muted,\.uitleg,small\)\{color:var\(--rtg-world-muted\)\}/);
+  assert.doesNotMatch(ADAPTERS,
+    /:where\(\.kaart,\.card,\.paneel,\.panel,\.tegel,\.tile,\.vak,\.rtg-groep\)\s*:where\([^}]+\)\{color:/);
+  assert.match(ADAPTERS, /\.rtg-groep :where\(h3,\.kop,\.naam,strong\)\{color:var\(--rtg-world-ink\)\}/);
+  assert.match(MATERIALEN,
+    /body\[data-rtg-skin="heritage"\]\.rtg-stijl :is\(\.knop\.vol,\.knop\.primair,\.knop\.prim,\.knop\.hoofd\)/);
+  assert.match(MATERIALEN, /color:var\(--rtg-world-action-ink\)!important/);
+  assert.match(MATERIALEN,
+    /body\[data-rtg-skin="heritage"\]\.rtg-stijl \.skip\{\s*background:var\(--rtg-world-action\);color:var\(--rtg-world-action-ink\)/);
 });
 
 test('de volledige Heritage-laag reist mee in beide offline schillen', () => {

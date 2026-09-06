@@ -12,6 +12,8 @@ const EDGE = lees('public/shared/rtg-edge-system.css');
 const EDGE2 = lees('public/shared/rtg-edge-2.css');
 const HERITAGE = lees('public/shared/rtg-heritage.css');
 const COMPONENTEN = lees('public/shared/rtg-heritage-components.css');
+const CHAUFFEUR = lees('public/apps/chauffeur.css');
+const VERBINDING = lees('public/shared/verbinding/verbinding-02.js');
 
 function variabele(blok, naam) {
   const raak = blok.match(new RegExp('--' + naam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ':\\s*(#[0-9a-f]{6})', 'i'));
@@ -51,6 +53,17 @@ test('zichtbare Edge-bediening gebruikt minstens 44 bij 44 pixels', () => {
     />\.wos-dock button\{[^}]*min-width:44px;min-height:44px/,
     />nav\.balk\[aria-label="Hoofdnavigatie"\] a\{[^}]*min-width:44px;min-height:44px/
   ]) assert.match(EDGE2, contract);
+});
+
+test('route-eigen mobiele bediening houdt hetzelfde volledige raakvlak', () => {
+  assert.match(CHAUFFEUR, /\.rtg-merk\{[^}]*min-width:44px;min-height:44px;[^}]*display:grid/);
+  assert.match(VERBINDING, /flex:0 0 44px;min-width:44px;min-height:44px;display:grid/);
+});
+
+test('Edge verbergt een hoofdactie zonder doel en respecteert de toesteluitsparing', () => {
+  assert.match(EDGE, /\[data-rtg-edge-primary\]\[hidden\]\{display:none!important\}/);
+  assert.match(EDGE,
+    /inset:calc\(var\(--edge-top\) \+ var\(--rtg-command-safe-top,env\(safe-area-inset-top,0px\)\)\)/);
 });
 
 test('de enkele onderrand blijft op 320px bruikbaar zonder kleinere noodknoppen', () => {

@@ -48,6 +48,12 @@ function maakBeroepenBieb({ db, save }) {
     if (!Array.isArray(b[handle])) b[handle] = [];
     return b[handle];
   };
+  /* Lezen zonder scheppen (zie kijk() in kern/eigencollectie.js): een handle
+     zonder installaties blijft afwezig. Alleen installeer() schept. */
+  const rijLees = (handle) => {
+    const r = eigen.kijk('beroepenInstallaties')[handle];
+    return Array.isArray(r) ? r : [];
+  };
 
   function overzicht() {
     return {
@@ -105,14 +111,14 @@ function maakBeroepenBieb({ db, save }) {
   }
 
   function verwijder(handle, id) {
-    const mijn = rij(handle);
+    const mijn = rijLees(handle);
     const ix = mijn.indexOf(String(id || ''));
     if (ix < 0) return { status: 404, error: 'Deze app staat niet bij jouw beroeps-apps.' };
     mijn.splice(ix, 1); save();
     return { status: 200, ok: true, aantal: mijn.length };
   }
 
-  const mijnApps = (handle) => rij(handle).map(id => { const [w, nr] = splits(id); return appVan(w, nr); }).filter(Boolean);
+  const mijnApps = (handle) => rijLees(handle).map(id => { const [w, nr] = splits(id); return appVan(w, nr); }).filter(Boolean);
 
   return { beroepenbieb: { overzicht, catalogus, installeer, verwijder, mijnApps, appVan, PER_WERELD } };
 }

@@ -114,7 +114,21 @@ module.exports = function maakEigen({ db, domein, bezit }) {
   /* LEZEN ZONDER SCHEPPEN. Een ontbrekende collectie betekent voor een
      projectie een lege verzameling, maar schrijft die lege standaard niet terug.
      Een BESTAANDE verkeerde vorm is geen lege verzameling: die blijft een harde
-     fout, zodat beschadigde securitydata nooit als afwezig wordt geïnterpreteerd. */
+     fout, zodat beschadigde securitydata nooit als afwezig wordt geïnterpreteerd.
+
+     WAAROM DIT NIET ALLEEN OVER LEESVERZOEKEN GAAT -- de regel staat hier één
+     keer, zodat veertig domeinen hem niet veertig keer hoeven over te schrijven.
+     Ook een SCHRIJFroute leest eerst: hij zoekt op wat hij gaat veranderen. Zit
+     die opzoeking achter bak(), dan legt een verzoek dat op 400, 403 of 404
+     eindigt de collectie alsnog aan. Dat is leeg meubilair van een aanvrager
+     die niets mocht -- op een openbare route door een vreemde te sturen -- en
+     geen meter kan het onderscheiden van een half uitgevoerde mutatie: de
+     statuscode zegt dan iets anders dan de opslag. Dus: opzoeken doet kijk(),
+     schrijven doet bak(), en dat zijn TWEE toegangen en niet een omgezette.
+     Wie ze samenvoegt in het voordeel van kijk(), laat een net weggeschreven
+     waarde in een vluchtig object verdwijnen terwijl het antwoord nog steeds
+     "gelukt" zegt -- erger dan het gebrek dat hij repareerde.
+     De tegenproef van die klasse staat in test/leeszonderscheppen.test.js. */
   function kijk(naam) {
     const soort = eis(naam);
     if (!Object.prototype.hasOwnProperty.call(db.data, naam)) return LEEG[soort]();

@@ -41,7 +41,9 @@ function maakBtwAangifte({ db, save, crypto, nu }) {
 
   const eigen = require('../eigencollectie')({ db, domein: 'kern/fiscaal/btwaangifte', bezit: { btwAangiftes: 'lijst' } });
   const bak = () => eigen.bak('btwAangiftes');
-  const vind = (id) => bak().find(a => a.id === id) || null;
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const lees = () => eigen.kijk('btwAangiftes');
+  const vind = (id) => lees().find(a => a.id === id) || null;
 
   /* ---------- opmaken ---------- */
   /* Een concept mag opnieuw worden opgemaakt zolang de periode loopt: er komen
@@ -58,7 +60,7 @@ function maakBtwAangifte({ db, save, crypto, nu }) {
 
     const code = String(zaak.code).toUpperCase();
     const land = (zaak.settings && zaak.settings.land) || 'NL';
-    const eerder = bak().filter(a => a.code === code && a.periode === vak.periode);
+    const eerder = lees().filter(a => a.code === code && a.periode === vak.periode);
     const laatste = eerder[0] || null;
     const ingediend = eerder.find(a => a.stand === 'ingediend') || null;
     if (ingediend && !opties.correctie) return { status: 409,
@@ -151,7 +153,7 @@ function maakBtwAangifte({ db, save, crypto, nu }) {
   }
 
   /* ---------- teruglezen ---------- */
-  const vanZaak = (code, jaar) => bak()
+  const vanZaak = (code, jaar) => lees()
     .filter(a => a.code === String(code || '').toUpperCase() && (!jaar || a.periode.slice(0, 4) === String(jaar)));
 
   /* `haalBtwAangifte` en niet `haal`: dezelfde reden als in kern/payroll/

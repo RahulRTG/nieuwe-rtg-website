@@ -110,14 +110,17 @@ module.exports = (ctx) => {
     return { ok: true, pakket: pb, behandeling: r.boeking };
   }
 
+  /* Lezen zonder scheppen: pakketten() legt de boekingenlijst EN de catalogus
+     aan (met een save()), en die hoort te ontstaan waar hij getoond wordt --
+     niet bij een betaling die vier regels verder op 404 eindigt. */
   function carePakketBetaal(sess, refIn, verdien) {
-    pakketten();
-    const pb = db.data.carePakketBoekingen.find(x => x.ref === String(refIn || '') && x.key === sess.key);
+    const boekingen = Array.isArray(db.data.carePakketBoekingen) ? db.data.carePakketBoekingen : [];
+    const pb = boekingen.find(x => x.ref === String(refIn || '') && x.key === sess.key);
     if (!pb) return { status: 404, error: 'Pakketboeking niet gevonden.' };
     if (pb.paid) return { status: 409, error: 'Al betaald.' };
     if (Date.now() - Date.parse(pb.at) > 30 * 60000) return { status: 410, error: 'Deze boeking is verlopen. Boek opnieuw.' };
     // de behandeling in de agenda meebevestigen (zonder los te betalen)
-    const bk = db.data.careBoekingen.find(x => x.ref === pb.careRef && x.key === sess.key);
+    const bk = (db.data.careBoekingen || []).find(x => x.ref === pb.careRef && x.key === sess.key);
     if (bk && !bk.paid) { bk.paid = true; bk.paidAt = nu(); bk.status = 'geboekt'; }
     pb.paid = true; pb.paidAt = nu(); pb.status = 'geboekt';
     save();

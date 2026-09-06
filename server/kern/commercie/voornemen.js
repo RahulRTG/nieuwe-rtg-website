@@ -58,7 +58,11 @@ function maakVoornemens({ db, save, nu, beslis, munt, verbruikToken, veiligheids
 
   const eigen = require('../eigencollectie')({ db, domein: 'kern/commercie/voornemen', bezit: { voornemens: 'lijst' } });
   function alles() { return eigen.bak('voornemens'); }
-  const vind = id => alles().find(v => v.id === String(id || '')) || null;
+  /* Lezen zonder scheppen (zie kijk() in kern/eigencollectie.js). vind() geeft
+     een ELEMENT terug en nooit de verzameling, dus de vluchtige lege lijst
+     ontsnapt nergens naartoe. Schrijven blijft alles(). */
+  const lees = () => eigen.kijk('voornemens');
+  const vind = id => lees().find(v => v.id === String(id || '')) || null;
 
   function zet(v, naar, velden) {
     if (!P.magOvergaan(v.stand, naar))

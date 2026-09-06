@@ -46,7 +46,9 @@ function maakGateway({ db, save, crypto, nu, mandaat, kanalen }) {
   const eigen = require('../../eigencollectie')({ db, domein: 'kern/fiscaal/gateway/index',
     bezit: { gatewayZendingen: 'lijst', gatewayLosseBewijzen: 'lijst' } });
   const bak = () => eigen.bak('gatewayZendingen');
-  const vind = (id) => bak().find(z => z.id === id) || null;
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const lees = () => eigen.kijk('gatewayZendingen');
+  const vind = (id) => lees().find(z => z.id === id) || null;
   const kanaalVan = (naam) => (kanalen || {})[naam] || null;
 
   function zet(z, naar, soort, extra) {
@@ -140,7 +142,7 @@ function maakGateway({ db, save, crypto, nu, mandaat, kanalen }) {
      signaal dat er iets is verstuurd dat je niet kent. */
   function ontvangstbewijs({ idem, kenmerk, aangenomen, reden }) {
     const k = String(kenmerk || '').trim();
-    const z = bak().find(x => x.idem === idem || x.id === idem);
+    const z = lees().find(x => x.idem === idem || x.id === idem);
     if (!z) {
       eigen.bak('gatewayLosseBewijzen').unshift({ idem: String(idem || ''), kenmerk: k, at: tijd(), aangenomen: !!aangenomen });
       save();
@@ -172,7 +174,7 @@ function maakGateway({ db, save, crypto, nu, mandaat, kanalen }) {
     return keurKeten(z);
   }
 
-  const vanZaak = (code) => bak().filter(z => z.code === String(code || '').toUpperCase());
+  const vanZaak = (code) => lees().filter(z => z.code === String(code || '').toUpperCase());
 
   return { gateway: { maakKlaar, biedAan, ontvangstbewijs, trekIn, controleer, vanZaak, haal: vind, canoniek } };
 }

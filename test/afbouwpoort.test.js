@@ -2,7 +2,7 @@
 
    Twee motoren in dit huis muteren met opzet echte bestanden en zetten ze in
    een finally terug: scripts/mutatie.js (de mutatiemotor) en
-   test/meterijk.test.js (de ijking, die public/apps/zz-ijk-tijdelijk.html, een
+   test/meterijk.test.js (de ijking, die een tijdelijk scherm onder public/apps/, een
    dependency in package.json en honderd /api/zzijkproef-routes neerzet). Ze
    nemen daarvoor het exclusieve slot uit scripts/afbouw-slot.js.
 
@@ -68,6 +68,41 @@ test('RTG_METEN_TIJDENS_AFBOUW=1 opent hem met opzet', () => {
   } finally {
     if (oud === undefined) delete process.env.RTG_METEN_TIJDENS_AFBOUW;
     else process.env.RTG_METEN_TIJDENS_AFBOUW = oud;
+  }
+});
+
+test('het slot van je EIGEN proceslijn is geen vreemde motor', () => {
+  /* HIER IS DEZE POORT DE EERSTE KEER OMGEVALLEN, en niet op een meting maar op
+     de toetsen zelf. scripts/test-runner.js pakt het slot voor de HELE suite
+     (`pak('volledige Node-tests')`) en geeft RTG_AFBOUW_SLOT_ACTIEF=1 door aan
+     elk kindproces. Zonder deze regel weigert de poort dus binnen elke toets,
+     en dan valt alles om wat een gepoort script aanroept:
+     test/functielijst.test.js eindigde op exitCode 2 (het script doet
+     process.exit(2) bij een weigering) en test/schoneboom.test.js zakte twee
+     keer, omdat eisSchoneBoom een weigering teruggaf zonder `bestanden` en met
+     een reden die zijn eigen ontsnapping RTG_METEN_OP_VUILE_BOOM niet noemt.
+
+     De vlag bestond al -- pak() gebruikt hem sinds de meterijking -- en betekent
+     "het slot is van mijn eigen ouder". Die vraag is iets anders dan "er loopt
+     een motor", en dit is de plek waar dat onderscheid hoort.
+
+     WAT DEZE OPENING NIET WEGGEEFT: binnen een suite muteert alleen een IJKING
+     de bron, en scripts/lib/ijkingen.js draait die een voor een en in CI zelfs
+     in een eigen job. Die isolatie is de bescherming daar; deze poort beschermt
+     tegen een motor in een ANDERE proceslijn (mijn eigen shell naast een
+     draaiende meterijking -- precies het geval waarvoor hij gebouwd is). Haalt
+     iemand een ijking uit die lijst zonder eigen job, dan is dat gat er wel;
+     test/delen.test.js is de toets die daarover gaat. */
+  const oud = process.env.RTG_AFBOUW_SLOT_ACTIEF;
+  process.env.RTG_AFBOUW_SLOT_ACTIEF = '1';
+  try {
+    const r = slot.eisGeenAfbouw('een proefmeting',
+      alsAfbouw({ taak: 'volledige Node-tests', pid: 4242, gestart: 'toen' }));
+    assert.equal(r.ok, true, 'het slot van je eigen ouder mag je niet buitensluiten');
+    assert.match(r.reden, /eigen proceslijn/, 'en de reden zegt waarom hij toch doorloopt');
+  } finally {
+    if (oud === undefined) delete process.env.RTG_AFBOUW_SLOT_ACTIEF;
+    else process.env.RTG_AFBOUW_SLOT_ACTIEF = oud;
   }
 });
 

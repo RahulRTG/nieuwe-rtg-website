@@ -41,7 +41,7 @@ const DOEL = path.join(WORTEL, 'FUNCTIES.md');
 /* GEEN METING TIJDENS EEN AFBOUW. Dit bestand telt de boom en schrijft het
    getal in een DOCUMENT -- zonder stempel, dus zonder `boomVuil`, dus een
    besmette ronde is hier onzichtbaar. Precies zo ontstond een rode CI: de
-   meterijking had public/apps/zz-ijk-tijdelijk.html neergezet, dit script telde
+   meterijking had een tijdelijk scherm onder public/apps/ neergezet, dit script telde
    het mee, en het document liep daarna achter op de code.
 
    `eisSchoneBoom` is hier de VERKEERDE poort: je draait dit script juist omdat

@@ -256,9 +256,30 @@ function profielVan(w) {
   const werkte = w.status >= 200 && w.status < 300;
   if (!werkte) return { soort: 'geen-werk', reden: 'de proef kreeg hem niet aan het werk (status ' + w.status + ')' };
   const effect = String(w.effect || '');
-  const slaatOp = /save=[1-9]/.test(effect) || w.veranderd === true;
+  /* DE EFFECTMETER BESLIST, NIET DE MOMENTOPNAME -- en dat is een reparatie.
+
+     Hier stond `slaatOp = /save=[1-9]/ || w.veranderd === true`. Die tweede helft
+     is een GLOBALE momentopname, vergeleken met de vorige route in de rij: alles
+     wat intussen schrijft (de onderhoudsronde, een wekker, een async staart van
+     een eerdere route) wordt toegeschreven aan de route die toevallig daarna
+     kwam. Gemeten over 400 routes: 109 heetten `duurzaam`, waarvan er 85 een
+     effectkop `geen` droegen -- save() was daar nooit aangeroepen. Van die 85
+     leverde er precies EEN een oordeel op; de andere 84 kwamen als "het verraad
+     greep hier niet aan" in het register, en dat leest als een bevinding over de
+     route terwijl het er een is over de meter.
+
+     De effectkop is de directe meting (server/effectmeter.js telt in save()
+     zelf, boven de bundelcheck, dus ook een gebundelde schrijfactie telt mee).
+     Beweegt de momentopname zonder dat die teller iets zag, dan is dat geen
+     duurzame route maar een niet toe te schrijven waarneming -- eigen soort,
+     eigen reden, en GEEN oordeel over hoe hij faalt. */
+  const slaatOp = /save=[1-9]/.test(effect);
   const bericht = /(mail|sms)=[1-9]/.test(effect);
   if (slaatOp) return { soort: 'duurzaam', effect };
+  if (w.veranderd === true) return { soort: 'onzeker', effect,
+    reden: 'de momentopname bewoog maar de effectmeter zag geen save(); die opname is ' +
+      'globaal en sequentieel, dus dit kan net zo goed een achtergrondschrijver zijn. ' +
+      'Niet aan deze route toe te schrijven, en dus niet te beoordelen.' };
   if (bericht) return { soort: 'bericht', effect,
     reden: 'deze route stuurt een bericht en slaat niets op; er is geen ingebouwd verraad dat een berichtenrail laat wegvallen' };
   if (w.effect == null) return { soort: 'onmeetbaar', reden: 'dit antwoord droeg geen effectkop (een stromend antwoord zet zijn koppen zelf)' };
@@ -290,11 +311,11 @@ function oordeel(schoon, met) {
     const sleutel = r.methode + ' ' + r.pad;
     profielen.set(sleutel, profielVan(schoon.waarnemingen.get(sleutel)));
   }
-  const duurzaam = [...profielen.values()].filter(p => p.soort === 'duurzaam').length;
-  console.log('  duurzaam schrijvend: ' + duurzaam + ' | bericht: ' +
-    [...profielen.values()].filter(p => p.soort === 'bericht').length + ' | leest: ' +
-    [...profielen.values()].filter(p => p.soort === 'leest').length + ' | geen werk: ' +
-    [...profielen.values()].filter(p => p.soort === 'geen-werk').length);
+  const telSoort = s => [...profielen.values()].filter(p => p.soort === s).length;
+  const duurzaam = telSoort('duurzaam');
+  console.log('  duurzaam schrijvend: ' + duurzaam + ' | onzeker: ' + telSoort('onzeker') +
+    ' | bericht: ' + telSoort('bericht') + ' | leest: ' + telSoort('leest') +
+    ' | geen werk: ' + telSoort('geen-werk'));
 
   const rondes = {};
   const nietGedraaid = {};
@@ -361,6 +382,10 @@ function oordeel(schoon, met) {
     gemeten: {
       routes: perRoute.length,
       duurzaamSchrijvend: duurzaam,
+      /* Apart, en met opzet niet bij `duurzaam` opgeteld: over deze routes zegt
+         deze proef niets, en een getal dat twee dingen bij elkaar telt verbergt
+         welk van de twee bewoog. */
+      nietToeTeSchrijven: telSoort('onzeker'),
       bewezen: tel('bewezen'), gezakt: tel('gezakt'), ongemeten: tel('ongemeten'),
       /* DE NOEMER VAN DE MEETWEG. `bewezen` hierboven is bewezen op zoveel van
          de zoveel sabotages -- staat er een nul in `verradenGedraaid`, dan is

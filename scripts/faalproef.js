@@ -273,7 +273,12 @@ function profielVan(w) {
      Beweegt de momentopname zonder dat die teller iets zag, dan is dat geen
      duurzame route maar een niet toe te schrijven waarneming -- eigen soort,
      eigen reden, en GEEN oordeel over hoe hij faalt. */
-  const slaatOp = /save=[1-9]/.test(effect);
+  /* DE SLEUTELS HETEN `opslag`, `mail` EN `sms` -- zie SOORTEN in
+     server/effectmeter.js. Hier stond `/save=[1-9]/`, en die matchte dus NOOIT:
+     de oude klassering leunde volledig op de momentopname zonder dat iemand dat
+     kon zien, want de regex ernaast suggereerde het tegendeel. Een dode tak in
+     een classificatie is erger dan een ontbrekende: hij ziet eruit als dekking. */
+  const slaatOp = /opslag=[1-9]/.test(effect);
   const bericht = /(mail|sms)=[1-9]/.test(effect);
   if (slaatOp) return { soort: 'duurzaam', effect };
   if (w.veranderd === true) return { soort: 'onzeker', effect,

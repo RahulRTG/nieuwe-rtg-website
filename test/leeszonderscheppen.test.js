@@ -212,3 +212,213 @@ test('fluister: een weetje vergeten dat er niet is, schept geen profiel', () => 
   assert.equal(verschil(vingerafdruk({}), vingerafdruk(db.data)).aantal, 0,
     'de vingerafdruk van de opslag is niet veranderd');
 });
+
+/* ------------------------------------------------------------------ defensie */
+test('defensie: iets opzoeken dat er niet is, schept geen zaak met zes lege vakken', () => {
+  const mk = require('../server/kern/defensie');
+  const db = { data: {} };
+  const { defensie } = mk({ db, save: () => {}, crypto: require('node:crypto'), anthropic: null });
+
+  assert.equal(defensie.paraatZet('XX', 'geen-id', 'beperkt', '').status, 404);
+  geenMeubilair(db, 'defensie', 'een 404 op paraatZet');
+  assert.equal(defensie.gewondeZet('XX', 'geen-id', 'stabiel').status, 404);
+  geenMeubilair(db, 'defensie', 'een 404 op gewondeZet');
+
+  /* DE ONVOLLEDIGE SEEDVORM. De demozaak krijgt maar vier van de zes vakken;
+     een lezer die alleen de zaak controleert, maakt van deze 404 een
+     TypeError op d.gewonden. */
+  db.data.defensie = { G: { eenheden: [], materieel: [], bevoorrading: [], oefeningen: [] } };
+  assert.equal(defensie.gewondeZet('G', 'x', 'stabiel').status, 404);
+  assert.equal('gewonden' in db.data.defensie.G, false, 'en het vak blijft weg');
+
+  /* TEGENPROEF: aanmaken schrijft nog wel, en is daarna vindbaar. */
+  const e = defensie.eenheidMaak('XX', { naam: 'Alfa' });
+  assert.ok(e.ok, 'de eenheid is gemaakt: ' + (e.error || ''));
+  assert.equal(db.data.defensie.XX.eenheden.length, 1, 'de eenheid staat in db.data');
+});
+
+/* ---------------------------------------------------------------- gedachten */
+test('gedachten: een notitie wegdoen die er niet is, schept geen lijst', () => {
+  const { schoon } = require('../server/kern/util');
+  const db = { data: {} };
+  const k = require('../server/kern/gedachten')({ db, save: () => {}, schoon, crypto: require('node:crypto') });
+
+  assert.equal(k.gedachteWeg('sleutel-a', 'bestaat-niet').status, 404);
+  geenMeubilair(db, 'gedachten', 'een 404 op gedachteWeg');
+  assert.deepEqual(k.gedachtenVan('sleutel-a').notities, []);
+  geenMeubilair(db, 'gedachten', 'gedachtenVan zonder notities');
+
+  /* TEGENPROEF: schrijven landt in db.data, een 404 van een ANDER lid laat de
+     notitie staan, en de splice landt op db.data en niet op een kopie. */
+  k.gedachteZet('sleutel-a', { tekst: 'iets' });
+  assert.equal(db.data.gedachten.length, 1);
+  const id = db.data.gedachten[0].id;
+  assert.equal(k.gedachteWeg('sleutel-b', id).status, 404);
+  assert.equal(db.data.gedachten.length, 1);
+  k.gedachteWeg('sleutel-a', id);
+  assert.equal(db.data.gedachten.length, 0, 'de splice landde op db.data');
+});
+
+/* ------------------------------------------------------------------- gemoed */
+test('gemoed: een dag wissen die er niet is, schept geen dagrij', () => {
+  const db = { data: {} };
+  const g = require('../server/kern/gemoed')({
+    db, save: () => {}, schoon: (s, n) => String(s == null ? '' : s).slice(0, n),
+  });
+
+  assert.equal(g.gemoedWeg('sleutel-a', {}).status, 404);
+  geenMeubilair(db, 'gemoed', 'een 404 op gemoedWeg');
+  g.gemoedVan('sleutel-b');
+  geenMeubilair(db, 'gemoed', 'gemoedVan op een lid zonder rijen');
+
+  /* TEGENPROEF: splice landt nog op de opgeslagen lijst. */
+  g.gemoedZet('sleutel-a', { stemming: 'goed' });
+  assert.equal(g.gemoedWeg('sleutel-a', {}).ok, true);
+  assert.equal(db.data.gemoed['sleutel-a'].length, 0, 'de splice landde op db.data');
+});
+
+/* ---------------------------------------------------------------- gewoonten */
+test('gewoonten: aftikken van een gewoonte die er niet is, schept geen lijst', () => {
+  const db = { data: {} };
+  const k = require('../server/kern/gewoonten')({
+    db, save: () => {}, crypto: require('node:crypto'),
+    schoon: (s, n) => String(s == null ? '' : s).trim().slice(0, n),
+  });
+
+  assert.equal(k.gewoonteTik('lid-a', { id: 'bestaat-niet' }).status, 404);
+  geenMeubilair(db, 'gewoonten', 'een 404 op gewoonteTik');
+  assert.equal(k.gewoonteStop('lid-a', { id: 'bestaat-niet' }).status, 404);
+  geenMeubilair(db, 'gewoonten', 'een 404 op gewoonteStop');
+
+  /* TEGENPROEF: maken schrijft nog en is daarna vindbaar. */
+  assert.ok(k.gewoonteMaak('lid-a', { naam: 'Wandelen' }).ok);
+  assert.equal(db.data.gewoonten.length, 1);
+  assert.equal(k.gewoontenVan('lid-a').gewoonten[0].naam, 'Wandelen');
+});
+
+/* ------------------------------------------------------------- handelsketen */
+test('handelsketen: een handel opzoeken die er niet is, schept geen lijst', () => {
+  const { maakHandelsketen } = require('../server/kern/handelsketen');
+  const db = { data: {} };
+  const ks = maakHandelsketen({
+    db, save: () => {}, crypto: require('node:crypto'), findSupplier: () => null,
+    notifySupplier: null, sseToSupplier: null, schoon: null, facturatie: null,
+  });
+  const zaak = { code: 'AAA', name: 'T', type: 'wasserij' };
+
+  assert.equal(ks.betalen(zaak, 'bestaat-niet').status, 404);
+  assert.equal(ks.gunnen(zaak, 'bestaat-niet', {}).status, 404);
+  assert.equal(ks.intrekken(zaak, 'bestaat-niet').status, 404);
+  assert.equal(ks.leveren(zaak, 'bestaat-niet', {}).status, 404);
+  geenMeubilair(db, 'handel', 'vier 404-paden in de handelsketen');
+  ks.mijn(zaak);
+  geenMeubilair(db, 'handel', 'het overzicht van een zaak zonder handel');
+
+  /* TEGENPROEF: een echte aanvraag legt de collectie wel aan. */
+  db.data.supplierTypes = { wasserij: { label: 'Wasserij' }, horeca: { label: 'Horeca' } };
+  db.data.suppliers = [];
+  const a = ks.nieuweAanvraag({ code: 'AAA', name: 'T', type: 'horeca' },
+    { genre: 'wasserij', titel: 'x', regels: [{ wat: 'servet', aantal: 1 }] });
+  assert.ok(a.handel && a.handel.id, 'de aanvraag is aangemaakt: ' + (a.error || ''));
+  assert.equal(db.data.handel.length, 1, 'de aanvraag staat in db.data');
+});
+
+/* ------------------------------------------------------------------ homekit */
+test('homekit: een scene starten die er niet is, schept geen woning', () => {
+  const db = { data: {} };
+  let bewaard = 0;
+  const { homekit } = require('../server/kern/homekit')({
+    db, save: () => { bewaard++; }, crypto: require('node:crypto'),
+    schoon: (s, n) => String(s == null ? '' : s).slice(0, n), anthropic: null,
+  });
+
+  assert.equal(homekit.sceneWeg('lid-1', 'sc-1').status, 404);
+  assert.equal(homekit.sceneStart('lid-1', 'sc-1').status, 404);
+  assert.equal(homekit.sceneBewaar('lid-1', {}).status, 400);
+  geenMeubilair(db, 'homekit', 'drie weigeringen op de scenes');
+  assert.equal(bewaard, 0, 'en er is niets bewaard');
+
+  /* TEGENPROEF, en tegelijk de aliascontrole: het overzicht MOET de woning
+     aanleggen, en zet() moet in diezelfde woning landen. */
+  homekit.overzicht('lid-1');
+  assert.ok(db.data.homekit['lid-1'].apparaten.length > 0, 'het overzicht legt de woning aan');
+  homekit.zet('lid-1', 'lamp-woon', { aan: true });
+  assert.equal(db.data.homekit['lid-1'].apparaten.find(a => a.id === 'lamp-woon').stand.aan, true);
+});
+
+/* ----------------------------------------------------------------- labfonds */
+test('labfonds: stemmen op een voorstel dat er niet is, schept geen fonds', () => {
+  const db = { data: {} };
+  const { labfonds } = require('../server/kern/labfonds')({
+    db, save: () => {}, crypto: require('node:crypto'), anthropic: null,
+  });
+
+  assert.equal(labfonds.stem('lid-1', 'bestaat-niet', 'voor').status, 404);
+  geenMeubilair(db, 'labFonds', 'een 404 op stem');
+
+  /* TEGENPROEF: loc() houdt bak() -- de startset locaties MOET ontstaan zodra
+     iemand het fonds echt opent, anders is er niets om op te stemmen. */
+  assert.ok(labfonds.fonds('lid-1').locaties.length >= 3, 'het fondsoverzicht legt de locaties aan');
+  assert.ok(db.data.labFonds.locaties.ibiza, 'en die staan in db.data');
+});
+
+/* ------------------------------------------------------------ journalistiek */
+test('journalistiek: een krant lezen op een leeg adres, schept geen redactie', () => {
+  const db = { data: {} };
+  const j = require('../server/kern/journalistiek')({
+    db, save: () => {}, crypto: require('node:crypto'),
+    schoon: (s, n) => String(s || '').slice(0, n),
+    findSupplier: code => ({ code, name: 'Krant ' + code }), claude: null,
+  });
+
+  /* /api/krant/* vraagt geen sessie: dit is de kant die een vreemde raakt. */
+  assert.equal(j.krant('NIET').status, 404);
+  geenMeubilair(db, 'redacties', 'een 404 op krant');
+  assert.equal(j.leesArtikel('NIET', 'x').status, 404);
+  assert.equal(j.publiceer('NIET', 'x').status, 404);
+  assert.equal(j.naarConcept('NIET', 'x').status, 404);
+  assert.equal(j.artikelVol('NIET', 'x'), null);
+  assert.equal(j.rubriekBewaar('NIET', '').status, 400);
+  assert.deepEqual(j.krantGids(), []);
+  geenMeubilair(db, 'redacties', 'zeven weigerpaden in de journalistiek');
+
+  /* TEGENPROEF: de redactie schrijft nog, en de leesteller loopt op de ECHTE
+     opslag -- die zakt zodra iemand ook het schrijfpad op kijk() zet. */
+  const a = j.bewaarArtikel('EEN', { titel: 'Kop', inhoud: 'tekst', rubriek: 'Stad' });
+  assert.ok(a.artikel && a.artikel.id, 'het artikel is bewaard: ' + (a.error || ''));
+  assert.ok(j.publiceer('EEN', a.artikel.id).ok);
+  j.leesArtikel('EEN', a.artikel.id);
+  j.leesArtikel('EEN', a.artikel.id);
+  assert.equal(j.artikelVol('EEN', a.artikel.id).gelezen, 2, 'de teller loopt op db.data');
+});
+
+/* --------------------------------------------------------------- hulpdienst */
+test('hulpdienst: zes weigerpaden laten de hulpkast onaangeroerd', () => {
+  const db = { data: { suppliers: [
+    { code: 'GUARDIA', name: 'Politie', type: 'politie' },
+    { code: 'BOMBERS', name: 'Brandweer', type: 'brandweer' },
+    { code: 'CANMISSES', name: 'Zkh', type: 'ziekenhuis' },
+    { code: 'CONSULTA', name: 'HA', type: 'huisarts' },
+  ] } };
+  /* Exact wat initdata/deel6-diensten.js neerzet: vier van de zes vakken. */
+  db.data.hulp = {
+    eenheden: { GUARDIA: [{ id: 'he0', naam: 'NH11', soort: 'land', status: 'vrij' }] },
+    bedden: { CANMISSES: { totaal: 24, bezet: 0 } },
+  };
+  const { hulpdienst } = require('../server/kern/hulpdienst')({
+    db, save: () => {}, crypto: require('node:crypto'), anthropic: null,
+    findSupplier: c => db.data.suppliers.find(s => s.code === c),
+  });
+
+  const voor = JSON.stringify(db.data.hulp);
+  const weigeringen = [
+    () => hulpdienst.eenheidZet('BOMBERS', 'x', 'vrij'),
+    () => hulpdienst.meldingWijs('GUARDIA', 'x', 'he0'),
+    () => hulpdienst.meldingStatus('GUARDIA', 'x', 'afgerond'),
+    () => hulpdienst.bijstandVraag('GUARDIA', 'x', 'BOMBERS'),
+    () => hulpdienst.opnameZet('CANMISSES', 'x', 'opgenomen'),
+    () => hulpdienst.consultZet('CONSULTA', 'x', 'afgerond'),
+  ];
+  for (const w of weigeringen) assert.equal(w().status, 404);
+  assert.equal(JSON.stringify(db.data.hulp), voor, 'zes 404-en veranderden niets aan db.data.hulp');
+});

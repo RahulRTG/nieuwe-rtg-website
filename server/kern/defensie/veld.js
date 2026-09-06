@@ -4,7 +4,7 @@
    lucht). Humanitaire zorg en logistiek, geen gevechtsfunctie. Krijgt de gedeelde ctx
    van kern/defensie/index.js. */
 module.exports = (ctx) => {
-  const { crypto, save, nu, schoon, bak, TRIAGE, VERPL_SOORT, VERPL_LADING, VERPL_KETEN } = ctx;
+  const { crypto, save, nu, schoon, bak, kijk, TRIAGE, VERPL_SOORT, VERPL_LADING, VERPL_KETEN } = ctx;
 
   /* ---------- het veldhospitaal: gewondenopvang met triage ---------- */
   function gewondeMaak(code, b) {
@@ -18,7 +18,7 @@ module.exports = (ctx) => {
     return { ok: true, gewonde: g };
   }
   function gewondeZet(code, id, status) {
-    const g = bak(code).gewonden.find(x => x.id === id);
+    const g = kijk(code).gewonden.find(x => x.id === id);
     if (!g) return { status: 404, error: 'Deze gewonde staat niet op het bord.' };
     /* Geevacueerd is het eindpunt van dit bord. gewondeEvac() weigert een
        tweede evacuatie al met 409, dus dat idee bestond -- het stond alleen
@@ -33,7 +33,7 @@ module.exports = (ctx) => {
   }
   // markeer een gewonde als geevacueerd (de routelaag maakt de ziekenhuis-SEH aan)
   function gewondeEvac(code, id, ziekenhuisNaam) {
-    const g = bak(code).gewonden.find(x => x.id === id);
+    const g = kijk(code).gewonden.find(x => x.id === id);
     if (!g) return { status: 404, error: 'Deze gewonde staat niet op het bord.' };
     if (g.status === 'geevacueerd') return { status: 409, error: 'Deze gewonde is al geevacueerd.' };
     g.status = 'geevacueerd';
@@ -56,7 +56,7 @@ module.exports = (ctx) => {
     return { ok: true, verplaatsing: v };
   }
   function verplaatsingZet(code, id, status) {
-    const v = bak(code).verplaatsingen.find(x => x.id === id);
+    const v = kijk(code).verplaatsingen.find(x => x.id === id);
     if (!v) return { status: 404, error: 'Deze verplaatsing staat niet op het bord.' };
     if (!VERPL_KETEN.includes(status)) return { status: 400, error: 'Onbekende status.' };
     v.status = status;

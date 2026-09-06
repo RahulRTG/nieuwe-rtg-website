@@ -38,7 +38,8 @@ module.exports = ({ db, save, crypto, anthropic, livinglab }) => {
     return f;
   }
   const loc = (id) => F().locaties[String(id || '')];
-  const vindV = (id) => F().voorstellen.find(v => v.id === String(id || ''));
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const vindV = (id) => (eigen.kijk('labFonds').voorstellen || []).find(v => v.id === String(id || ''));
 
   function locSlug(naam) {
     return schoon(naam, 40).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || rid();

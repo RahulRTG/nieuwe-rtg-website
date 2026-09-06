@@ -14,6 +14,8 @@ const { KAMERS, BASIS, DEMO_SCENES } = require('./homekit-data');
 module.exports = ({ db, save, crypto, schoon, anthropic }) => {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/homekit', bezit: { homekit: 'kaart' } });
   const H = () => eigen.bak('homekit');
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const woningLees = (key) => eigen.kijk('homekit')[key] || null;
   const woningVan = (key) => {
     const h = H();
     if (!h[key]) { h[key] = { apparaten: JSON.parse(JSON.stringify(BASIS)), scenes: [] }; save(); }
@@ -76,9 +78,9 @@ module.exports = ({ db, save, crypto, schoon, anthropic }) => {
   /* de AI-scenemaker: een wens wordt een VOORSTEL (naam, uitleg, standen);
      het lid bekijkt het, bewaart en start het zelf. */
   async function sceneVoorstel(key, wens) {
-    const w = woningVan(key);
     const q = schoon(String(wens || ''), 200);
     if (!q || q.length < 3) return { status: 400, error: 'Vertel eerst wat voor moment het moet worden (bijv. filmavond).' };
+    const w = woningVan(key);
     if (anthropic) {
       try {
         const lijst = w.apparaten.filter(a => a.soort !== 'slot')
@@ -100,9 +102,9 @@ module.exports = ({ db, save, crypto, schoon, anthropic }) => {
   }
 
   function sceneBewaar(key, { naam, uitleg, standen } = {}) {
-    const w = woningVan(key);
     const n = schoon(String(naam || ''), 60).trim();
     if (!n) return { status: 400, error: 'Geef de scene eerst een naam.' };
+    const w = woningVan(key);
     const s = schoonStanden(w, standen);
     if (!Object.keys(s).length) return { status: 400, error: 'Een scene heeft minstens een apparaatstand nodig.' };
     if (w.scenes.length >= 30) return { status: 400, error: 'Het maximum van dertig scenes is bereikt; ruim eerst op.' };
@@ -113,8 +115,8 @@ module.exports = ({ db, save, crypto, schoon, anthropic }) => {
   }
 
   function sceneStart(key, id) {
-    const w = woningVan(key);
-    const s = w.scenes.find(x => x.id === String(id || ''));
+    const w = woningLees(key);
+    const s = w && w.scenes.find(x => x.id === String(id || ''));
     if (!s) return { status: 404, error: 'Deze scene bestaat niet (meer).' };
     let n = 0;
     for (const [aid, stand] of Object.entries(s.standen)) { const r = zet(key, aid, stand); if (r.ok) n++; }
@@ -122,8 +124,8 @@ module.exports = ({ db, save, crypto, schoon, anthropic }) => {
   }
 
   function sceneWeg(key, id) {
-    const w = woningVan(key);
-    const ix = w.scenes.findIndex(x => x.id === String(id || ''));
+    const w = woningLees(key);
+    const ix = w ? w.scenes.findIndex(x => x.id === String(id || '')) : -1;
     if (ix < 0) return { status: 404, error: 'Deze scene bestaat niet (meer).' };
     w.scenes.splice(ix, 1); save();
     return { status: 200, ok: true };

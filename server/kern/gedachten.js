@@ -27,8 +27,10 @@ const dagVan = d => new Date(d).toISOString().slice(0, 10);
 
 module.exports = ({ db, save, schoon, crypto }) => {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/gedachten', bezit: { gedachten: 'lijst' } });
-  const lijst = () => eigen.bak('gedachten');
-  const mijne = key => lijst().filter(g => g.key === key);
+  const lijst = () => eigen.bak('gedachten');   // schrijfpad: hier ontstaat de collectie
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const gezien = () => eigen.kijk('gedachten');
+  const mijne = key => gezien().filter(g => g.key === key);
   const toon = g => ({ id: g.id, op: g.op, at: g.at, tekst: g.tekst });
 
   function gedachtenVan(key) {
@@ -70,7 +72,7 @@ module.exports = ({ db, save, schoon, crypto }) => {
   }
 
   function gedachteWeg(key, id) {
-    const rijen = lijst();
+    const rijen = gezien();
     const i = rijen.findIndex(g => g.id === String(id) && g.key === key);
     /* Ook als het id bestaat maar van iemand anders is: dan is het antwoord
        hetzelfde 404, want "bestaat wel maar niet van u" is ook een antwoord. */

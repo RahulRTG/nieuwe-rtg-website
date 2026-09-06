@@ -43,8 +43,10 @@ function reeksVan(dagen, nu = new Date()) {
 
 module.exports = ({ db, save, schoon, crypto }) => {
   const eigen = require('./eigencollectie')({ db, domein: 'kern/gewoonten', bezit: { gewoonten: 'lijst' } });
-  const lijst = () => eigen.bak('gewoonten');
-  const mijne = key => lijst().filter(g => g.key === key && g.status !== 'weg');
+  const lijst = () => eigen.bak('gewoonten');   // schrijfpad: gewoonteMaak duwt hier in
+  // lezen zonder scheppen -- zie kijk() in kern/eigencollectie.js
+  const lezen = () => eigen.kijk('gewoonten');
+  const mijne = key => lezen().filter(g => g.key === key && g.status !== 'weg');
 
   function toon(g, nu) {
     const vandaag = dagVan(nu);

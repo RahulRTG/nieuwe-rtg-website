@@ -50,6 +50,13 @@ const WERELDEN = [
     naam: 'TravelOS', wereld: 'travel', pad: '/apps/reizen.html', hoofd: '#inhoud',
     panelen: ['.dagdek', '.strook', '.kaartraster', '.kompas'],
     context: ['travel-header', 'hoofdtabs'],
+    /* TWEE BLOKKEN DIE MET OPZET IN DEZELFDE RASTERCEL LIGGEN. De grote titel
+       hoort over het fotodek, dus .dagtitel en .kaartraster delen grid-row 1 --
+       en allebei verankeren ze hun tekst aan de ONDERrand. Dat ging fout: de
+       zin van de titel liep dwars door "DE BESTEMMING" heen, 11px over 495px
+       breedte op 1440. Alleen onder 780px was er ruimte gereserveerd. Wie een
+       cel deelt, hoort zijn tekst niet te delen. */
+    gestapeld: [['.dagtitel', '.dagkop-inhoud']],
     oud: [
       '.reisapp > .prestatiekop', '.reisapp > .hoofdtabs', '.tos-topbar', '.tos-nav',
       'body > .rtgdeel-balk', 'body > header.ios-nav', 'body > .ios-thuis', '#osMenuBtn'
@@ -161,6 +168,29 @@ async function dashboardMeting(page, route) {
             el.scrollHeight > el.clientHeight + 2);
       })
       .map((el) => beschrijf(el, 'kop'));
+    /* Tekst die over tekst valt. Alleen tussen blokken die de opmaak BEWUST
+       stapelt (cfg.gestapeld): daar is de botsing een echt gebrek en geen
+       toevallige nabijheid van twee lagen. Bladeren, want een ouder omvat zijn
+       kind altijd. */
+    const tekstbladeren = (wortel) => wortel
+      ? [...wortel.querySelectorAll('*')].filter((el) =>
+        !el.children.length && (el.textContent || '').trim() && layoutZichtbaar(el))
+      : [];
+    const tekstBotsingen = [];
+    (cfg.gestapeld || []).forEach(([aSel, bSel]) => {
+      const linksom = tekstbladeren(document.querySelector(aSel));
+      const rechtsom = tekstbladeren(document.querySelector(bSel));
+      linksom.forEach((ea) => rechtsom.forEach((eb) => {
+        const ra = ea.getBoundingClientRect(), rb = eb.getBoundingClientRect();
+        const vy = Math.min(ra.bottom, rb.bottom) - Math.max(ra.top, rb.top);
+        const vx = Math.min(ra.right, rb.right) - Math.max(ra.left, rb.left);
+        if (vy > 1 && vx > 1) tekstBotsingen.push(
+          aSel + ' ' + JSON.stringify(ea.textContent.trim().slice(0, 28)) + ' over ' +
+          bSel + ' ' + JSON.stringify(eb.textContent.trim().slice(0, 28)) +
+          ' (' + Math.round(vy) + 'x' + Math.round(vx) + 'px)');
+      }));
+    });
+
     const html = document.documentElement, body = document.body;
     const canvas = rechthoek(hoofd);
 
@@ -182,7 +212,7 @@ async function dashboardMeting(page, route) {
       },
       contextTokens: contextueel.map((el) => el.getAttribute('data-rtg-edge-2-contextual')),
       contextBuiten, oudZichtbaar,
-      canvas, panelen: panelen.length, ontbrekend, paneelBuiten, kopAfgesneden,
+      canvas, panelen: panelen.length, ontbrekend, paneelBuiten, kopAfgesneden, tekstBotsingen,
       viewport: html.clientWidth,
       documentOverloop: Math.max(html.scrollWidth, body.scrollWidth) - html.clientWidth,
       canvasOverloop: hoofd.scrollWidth - hoofd.clientWidth
@@ -221,6 +251,8 @@ function keurDashboard(m, route, maat) {
     label + ': native paneel valt buiten beeld:\n' + m.paneelBuiten.join('\n'));
   assert.deepEqual(m.kopAfgesneden, [],
     label + ': koptekst is afgesneden:\n' + m.kopAfgesneden.join('\n'));
+  assert.deepEqual(m.tekstBotsingen, [],
+    label + ': tekst uit twee gestapelde blokken loopt door elkaar:\n' + m.tekstBotsingen.join('\n'));
 }
 
 async function raakdoel(page, selector, label) {

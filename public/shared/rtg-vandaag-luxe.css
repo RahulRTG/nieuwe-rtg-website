@@ -369,8 +369,30 @@ body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagtitel,
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kaartraster{
   grid-column:1;grid-row:1
 }
+/* DE ONDERRAND WORDT GEDEELD, DUS DE TITEL RESERVEERT DE BAND ERONDER.
+
+   .dagtitel en .kaartraster liggen hierboven met opzet in dezelfde rastercel;
+   de grote titel hoort over de foto. Beide blokken verankeren hun tekst
+   ONDERAAN: .dagtitel met align-self:end, en .dagkop erft uit
+   reizen-performance.css align-items:flex-end. Zonder gereserveerde ruimte
+   schuiven ze dus door elkaar -- gemeten 11px verticale overlap over 495px
+   breedte op 1440x900, waarbij de zin van de titel dwars door "DE BESTEMMING"
+   liep.
+
+   Onder 780px was dat al opgelost, en op precies deze manier: daar staat
+   padding-bottom:7,5rem op .dagtitel. Alleen de bredere vensters misten die
+   reservering. Hier staat hij dus ook, opgeteld bij de eigen binnenruimte
+   zodat het zijritme klopt: 3,4rem eigen ruimte plus 5,5rem band is ruim
+   genoeg voor het bijschrift van twee regels (kicker, marge en zin halen samen
+   ten hoogste ~6rem).
+
+   Waarom niet het bijschrift naar boven verplaatst: dat haalt de botsing ook
+   weg, maar draait de leesvolgorde om -- op de telefoon staat de titel eerst
+   en het bijschrift eronder, en twee breedtes die iets anders vertellen is
+   erger dan de botsing zelf. */
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagtitel{
   z-index:2;align-self:end;min-width:0;margin:0!important;padding:clamp(1.35rem,4vw,3.4rem)!important;
+  padding-bottom:calc(clamp(1.35rem,4vw,3.4rem) + 5.5rem)!important;
   pointer-events:none
 }
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagtitel h1{

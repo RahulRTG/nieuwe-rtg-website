@@ -41,6 +41,7 @@
 'use strict';
 
 const CONTRACTEN = Object.assign({},
+  require('./mutatiecontracten-storingen').CONTRACTEN,
   /* Opgesplitst omdat scripts/check.js een bestandsgrens kent en die terecht
      aansloeg: een lijst die naar duizenden regels groeit, hoort niet in een
      bestand dat ook nog de vorm en de regels uitlegt. Dezelfde vorm als

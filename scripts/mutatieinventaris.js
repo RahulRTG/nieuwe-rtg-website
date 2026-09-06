@@ -87,7 +87,7 @@ for (const r of schrijfBuitenSchakel) {
   /* De ZWAARSTE soort telt, net als in bewakers.js: een verfijner zegt niets
      over wie er binnenkomt, en `mw` (een rem) mag een echte deur niet
      overschrijven. */
-  const RANG = { rol: 6, eigenrol: 5, lichaamssleutel: 4, objectpoort: 3, omgeving: 2, geenBewaker: 1, verfijner: 0, onbekend: 0 };
+  const RANG = { rol: 7, eigenrol: 6, verzoeksignatuur: 5, lichaamssleutel: 4, objectpoort: 3, omgeving: 2, geenBewaker: 1, verfijner: 0, onbekend: 0 };
   const soorten = namen.map(n => bewakerskaart.soortVan(n));
   const zwaarste = soorten.slice().sort((a, b) => (RANG[b] || 0) - (RANG[a] || 0))[0] || 'onbekend';
   perBewakerssoort[zwaarste] = (perBewakerssoort[zwaarste] || 0) + 1;

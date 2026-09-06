@@ -55,7 +55,7 @@ test('elke bewaker in het huis heeft een soort -- de kaart is uitputtend', () =>
   }
   assert.deepStrictEqual([...onbekend.keys()], [],
     'Nieuwe bewakerslaag zonder soort. Deel hem in in scripts/lib/bewakers.js -- ' +
-    'rol, eigenrol, verfijner, lichaamssleutel, objectpoort, geenBewaker of omgeving. ' +
+    'rol, eigenrol, verfijner, verzoeksignatuur, lichaamssleutel, objectpoort, geenBewaker of omgeving. ' +
     'Voorbeelden: ' + JSON.stringify([...onbekend]));
 });
 

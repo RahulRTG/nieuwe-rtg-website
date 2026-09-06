@@ -118,6 +118,11 @@ function keur(env, fouten, waarschuwingen) {
       catch (e) { keur = { ok: false, reden: 'de keuring kon niet draaien: ' + (e && e.message) }; }
       if (!keur.ok) fouten.push('ERR_WEBHOOK_URL is gezet maar wordt geweigerd (' + keur.reden + '): server/foutmelder.js gooit hem bij het opstarten weg, dus er gaat NIETS naar buiten terwijl het techniekbord en de alarmstand doen alsof er een uitgang is.');
     }
+    if (require('../storingen/protocol').eigenEndpoint(env.ERR_WEBHOOK_URL)) {
+      if (!require('../storingen/protocol').sleutelGoed(env.ERR_WEBHOOK_SECRET))
+        fouten.push('ERR_WEBHOOK_SECRET moet voor de eigen storingenwebhook 64 hex-tekens bevatten.');
+      waarschuwingen.push('Eigen storingenontvangst is geen onafhankelijke bewaking bij volledige app- of hostuitval.');
+    }
     if (env.SENTRY_DSN && !env.ERR_WEBHOOK_URL) waarschuwingen.push('SENTRY_DSN is gezet maar wordt door niets gelezen: deze codebase heeft geen Sentry-koppeling (zero dependencies). De externe alarmering loopt via ERR_WEBHOOK_URL.');
     /* RTG_OWNER_BOOTSTRAP staat BEWUST niet in deze lijst. De eenmalige sleutel
        waarmee de eerste eigenaar zijn account claimt hoort weg zodra dat account

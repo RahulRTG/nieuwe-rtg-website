@@ -175,8 +175,10 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
          dan hoort daar niet stilzwijgend een kanaal in de lijst te staan dat er
          niet is -- een lege url leest anders als bezorging. */
       uitgangen: ['het journaal (elke aan- en afmelding)', 'het kantoorbord via de office-SSE']
-        .concat(buitenStand().actief ? ['de externe webhook (ERR_WEBHOOK_URL), alleen op de overgang'] : []),
-      geenUitgang: buitenStand().actief ? null : buitenStand().reden,
+        .concat(buitenStand().actief ? [buitenStand().onafhankelijk === false
+          ? 'storingenontvangst op dezelfde app, alleen op de overgang'
+          : 'de externe webhook (ERR_WEBHOOK_URL), alleen op de overgang'] : []),
+      geenUitgang: buitenStand().actief && buitenStand().onafhankelijk !== false ? null : buitenStand().reden,
       let: 'er gaat geen mail en geen telefoonmelding uit. Dat is een kanaalbesluit met een piket ' +
         'eraan vast (SLO.md, punt 4) en hoort niet stilzwijgend hier ingebouwd te worden. En het alarm ' +
         'piept op verandering en niet elke ronde: een melding die elke dertig seconden terugkomt, leert ' +

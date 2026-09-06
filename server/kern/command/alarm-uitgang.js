@@ -83,7 +83,8 @@ module.exports = ({ journaal, sein, foutmelder }) => {
     const m = melderNu();
     if (!m) return { actief: false, reden: 'er is geen foutmelder aangesloten op deze laag; alarmen blijven binnen het huis' };
     if (!m.actief) return { actief: false, reden: 'ERR_WEBHOOK_URL is niet gezet of werd geweigerd; er gaat niets naar buiten' };
-    return { actief: true, reden: null };
+    const stand = typeof m.stand === 'function' ? m.stand() : {};
+    return { actief: true, reden: stand.beperking || null, onafhankelijk: stand.onafhankelijk !== false };
   }
 
   return { meld, buitenStand, naarBuiten };

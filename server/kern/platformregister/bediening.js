@@ -17,6 +17,8 @@
    met naam en reden, en de lijst is uitputtend: wat er niet op staat, komt als
    'onbenoemd' terug en valt op. */
 module.exports = [
+  ['/api/webhooks/storingen', 'Storingenontvangst', 'Ondertekende meldingen duurzaam ontvangen op deze host.',
+    'storingen moeten ontvangen kunnen worden terwijl bedrijfsfuncties uitstaan; geen onafhankelijke hostbewaking'],
   ['/api/boardroom', 'De boardroom', 'Het hoogste bedieningspaneel: schakelen, storingen, onboarding, betalingen.',
     'de boardroom bedient de schakelkast; een schakelaar die de schakelkast uitzet is geen schakelaar'],
   ['/api/techniek', 'De technische pagina', 'Inzicht in de motor: logboeken, sleutels, herstel, uitrol.',

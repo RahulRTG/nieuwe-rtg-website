@@ -303,29 +303,32 @@ async function beproefPaar(srv, token, paar) {
      wordt hier alleen opgeruimd en wordt het antwoord weggegooid; de
      voorbereiding eronder loopt daarna onveranderd.
 
-     LET OP VOOR WIE HIER IETS VERANDERT: DEZE PROEF IS NIET REPRODUCEERBAAR.
-     Gemeten op 6 september 2026 door de proef opnieuw te draaien op
-     ONGEWIJZIGDE main (5cf21401) en de uitslag te vergelijken met zijn eigen
-     ingecheckte HERSTELPROEF.json: 5 van de 90 paren gaven een andere uitslag
-     zonder dat er een letter code was veranderd -- /api/meet/kom,
+     LET OP VOOR WIE HIER IETS VERANDERT: VERGELIJK NOOIT MET HET INGECHECKTE
+     HERSTELPROEF.json. Dat bestand reproduceert niet op een andere machine.
+
+     Gemeten op 6 september 2026. De proef is TWEE keer gedraaid op
+     ongewijzigde main (5cf21401, schone werkboom) en de twee uitslagen zijn
+     onderling identiek -- nul verschillen over negentig paren. De proef is dus
+     wel degelijk reproduceerbaar. Maar allebei die rondes wijken met DEZELFDE
+     vijf paren af van het ingecheckte register: /api/meet/kom,
      /api/meet/verlaat, /api/meet/weg, /api/samen/maak en /api/samen/weg, alle
      vijf van `compensatie` of `exact` naar `nietBeproefd`.
 
-     Een enkele ronde tegen een enkele nulstand kan hier dus GEEN oorzaak van
-     ruis onderscheiden, en dat is geen theoretisch bezwaar: de reparatie
-     hierboven is een keer teruggetrokken op grond van vier "regressies" die
-     achteraf allemaal in die ruisfamilie bleken te vallen.
+     Het ingecheckte register is dus omgevingsafhankelijk, en wie zijn eigen
+     ronde ertegen legt ziet vijf spookverschillen die niets met zijn wijziging
+     te maken hebben. Dat is geen theoretisch bezwaar: de reparatie hierboven is
+     een keer teruggetrokken omdat precies die vijf paren als "regressie"
+     werden geteld.
 
-     Wat hier WEL telt is een deterministisch argument of een nagespeeld
-     mechanisme. `wereldOntbreekt` bijvoorbeeld wordt beslist voordat er een
-     server draait, dus dat kan per definitie niet schuiven. En dat het slot
-     hier echt vrijkomt is met de hand nagespeeld: boeken, annuleren op ref, en
-     opnieuw boeken op hetzelfde slot geeft 200.
+     DE JUISTE NULSTAND IS EEN VERSE RONDE OP DE BASISBRANCH, op dezelfde
+     machine, en niet het bestand in de repository. Deze vijf zijn de bekende
+     afwijkers; komen er andere bij, dan is dat wel een bevinding.
 
-     Wie een uitspraak wil doen over een paar dat WEL kan schuiven, heeft
-     meerdere rondes nodig of een proef die per paar op een eigen verse server
-     draait. Dat laatste is de echte oplossing, kost een veelvoud aan looptijd,
-     en is een besluit van de eigenaar. */
+     Twee soorten bewijs blijven daarnaast altijd geldig, ook zonder nulronde:
+     een deterministisch argument (`wereldOntbreekt` wordt beslist voordat er
+     een server draait, dus dat kan niet schuiven) en een mechanisme dat met de
+     hand is nagespeeld -- zoals hier: boeken, annuleren op ref, en opnieuw
+     boeken op hetzelfde slot geeft 200, dus het slot komt echt vrij. */
   await roep(srv.basis, paar.terug, token,
     lijfVoor(paar.terug, Object.assign({}, uitVoorbereiding, sleutelsUit(opwarm.data))));
   await stilBeeld(srv.datamap, voorOpwarming);

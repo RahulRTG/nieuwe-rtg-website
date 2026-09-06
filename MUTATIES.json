@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-06T13:15:59.649Z",
-    "commit": "661dd049",
+    "op": "2026-09-06T13:44:38.338Z",
+    "commit": "ab5474a7",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -119,6 +119,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "afbouwpoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/afbouw-slot.js",
+      "operator": "===->!==#3",
+      "gezakt": 3,
+      "geprobeerd": 17
     },
     "afleidbaar.test.js": {
       "soort": "puur",

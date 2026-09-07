@@ -59,7 +59,11 @@
       'link:nalatenschap', 'link:logboek',
     /* De Salon is weer De Salon: mensen en wat je met ze deelt. Wat je in je
        eentje kijkt of luistert staat bij Media. */
-      'tab:salon', 'link:wereldlaag', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera',
+    /* `link:vrienden` staat nu in FoundationOS: dat scherm is de contactenlaag
+       van een GEZIN, met een eigen deur. Een lid kwam hier op een dicht scherm
+       uit, en een zichtbare ingang naar een onbereikbare functie is een
+       productdefect (BETROUWBAARHEID.md par. 6). */
+      'tab:salon', 'link:wereldlaag', 'link:pulse', 'os:snaps', 'link:camera',
     /* CONTACT MET IEMAND HOORT HIER, en het stond nergens: deze drie bestonden
        in LINKS/OSAPPS maar werden door geen enkele map genoemd, en dat bleef
        stil omdat scripts/wereldlijst.js alleen tabs op dakloosheid controleerde

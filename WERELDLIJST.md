@@ -17,15 +17,15 @@ Drie soorten onderdeel, en ze gedragen zich verschillend:
 
 | wereld | huis | onderdelen |
 |---|---|---|
-| **LivingOS** | `/apps/rtg.html` | 59 |
+| **LivingOS** | `/apps/rtg.html` | 58 |
 | **WorkOS** | `/apps/kantoor.html` | 13 |
 | **TravelOS** | `/apps/reizen.html` | 14 |
-| **FoundationOS** | `/apps/foundation/os-publiek.html` | 7 |
+| **FoundationOS** | `/apps/foundation/os-publiek.html` | 8 |
 | | **samen** | **93** |
 
 ## LivingOS
 
-Huis: `/apps/rtg.html` — 59 onderdelen.
+Huis: `/apps/rtg.html` — 58 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
@@ -50,7 +50,6 @@ Huis: `/apps/rtg.html` — 59 onderdelen.
 | Salon | `tab:salon` | `/apps/app.html (stand salon)` |
 | Alles bij elkaar | `link:wereldlaag` | `/apps/wereld.html` |
 | Vandaag | `link:pulse` | `/apps/pulse.html` |
-| Vrienden | `link:vrienden` | `/apps/foundation/vrienden.html` |
 | Snaps | `os:snaps` | kiezer in de app |
 | Camera | `link:camera` | `/apps/camera.html` |
 | Berichten | `link:berichten` | `/apps/comm.html` |
@@ -132,7 +131,7 @@ Huis: `/apps/reizen.html` — 14 onderdelen.
 
 ## FoundationOS
 
-Huis: `/apps/foundation/os-publiek.html` — 7 onderdelen.
+Huis: `/apps/foundation/os-publiek.html` — 8 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
@@ -143,6 +142,7 @@ Huis: `/apps/foundation/os-publiek.html` — 7 onderdelen.
 | Klimaatfonds | `link:klimaat` | `/apps/foundation/klimaatfonds.html` |
 | Buurtruil | `link:buurtruil` | `/apps/foundation/buurtruil.html` |
 | Geven | `link:geven` | `/apps/foundation/geven.html` |
+| Vrienden | `link:vrienden` | `/apps/foundation/vrienden.html` |
 
 ## Wat er buiten de werelden valt
 

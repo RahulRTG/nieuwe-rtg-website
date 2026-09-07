@@ -5264,8 +5264,17 @@ console.log('\n66) een pagina die een gedeelde module gebruikt, laadt hem ook');
      zoveel woorden de Web Speech API -- die stuurt het geluid van het gesprek
      naar de browserleverancier. Deze tak had de browserkant gebouwd; die is
      ingetrokken en niet naast main's laag gezet. */
+  /* RTGPlek is er op 7 september 2026 bijgekomen, en met een reden die precies
+     deze regel is. De locatieschakelaar `rtg_os_gps` werd door zeven plekken
+     RECHTSTREEKS uit localStorage gelezen; shared/plek.js maakte daar de
+     contractlaag van (aan/vraag/volg/zetAan), maar drie lezers bleven zelf
+     graven -- en op de pagina's waar zij draaien stond plek.js niet eens
+     geladen. Wie de sleutel zelf leest, mist het moment waarop de contractlaag
+     hem zet; wie de contractlaag gebruikt zonder hem te laden, valt stil terug
+     op "uit". Beide fouten zijn onzichtbaar: de functie doet gewoon niets. */
   const MODULES = [
-    ['RTGMeelezen', '/shared/meelezen.js']
+    ['RTGMeelezen', '/shared/meelezen.js'],
+    ['RTGPlek', '/shared/plek.js']
   ];
   const PUB = path.join(ROOT, 'public');
   const web = (p) => '/' + path.relative(PUB, p).split(path.sep).join('/');
@@ -5389,6 +5398,59 @@ console.log('\n67) elk `npm run X` in een document bestaat ook echt');
       }
     }
     if (!mis) ok(gezien + ' verwijzingen naar `npm run ...` in ' + docs.length + ' documenten, allemaal bestaand');
+  }
+}
+
+console.log('\n68) de locatieschakelaar heeft precies een lezer');
+{
+  /* WAAROM DEZE REGEL BESTAAT.
+
+     `rtg_os_gps` zegt of RTG je positie mag gebruiken. Zeven plekken lazen die
+     sleutel zelf uit localStorage en behandelden hem als de waarheid -- terecht,
+     alleen zette NIEMAND hem ooit op '1', want de tegel die dat moest doen
+     bestond niet. De schakelaar stond dus voor iedereen, voor altijd, op uit:
+     de sterrenhemel, het levensteken van RTG Veilig, de ontmoet-lus en drie
+     reis-apps deden stil niets. Dat is de duurste soort defect in dit huis --
+     er is geen foutmelding, geen rode toets en geen klacht; de functie is er
+     gewoon niet.
+
+     shared/plek.js is sindsdien de contractlaag (aan/vraag/volg/zetAan) en de
+     enige die de sleutel kent. Deze regel houdt dat vast, want een tweede lezer
+     is niet fout op de dag dat hij geschreven wordt -- hij wordt fout op de dag
+     dat de contractlaag iets verandert, en dan merkt niemand het.
+
+     Wat hier NIET onder valt: het woord in commentaar. Een uitleg die de
+     sleutel noemt is geen lezer, en dat verschil wordt hier gemeten en niet
+     aangenomen -- anders zou elke reparatie die zichzelf uitlegt de regel
+     laten zakken. */
+  const zonderCommentaar = (t) => t.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/^\s*\/\/.*$/gm, ' ');
+  const EIGENAAR = 'public/shared/plek.js';
+  const PUB = path.join(ROOT, 'public');
+  /* De toets is de SLEUTELNAAM zelf en niet de vorm van de aanroep. plek.js
+     leest hem via een constante (`var SLEUTEL = 'rtg_os_gps'`), dus een regex
+     op `getItem('rtg_os_gps')` had de eigenaar gemist en elke tweede lezer die
+     ook een constante gebruikt evengoed. Buiten de eigenaar hoort de naam in
+     code helemaal niet voor te komen: wie hem noemt, kent hem. */
+  const RE = /rtg_os_gps/;
+  const bestanden = [];
+  loop(PUB, /\.(js|html)$/, f => bestanden.push(f));
+
+  /* DE ZELFIJKING. Leest de eigenaar de sleutel niet meer, dan meet deze regel
+     niets meer en hoort hij te zakken in plaats van 0 te melden (LAT.md regel 9). */
+  const eigenaarBron = zonderCommentaar(fs.readFileSync(path.join(ROOT, EIGENAAR), 'utf8'));
+  if (!RE.test(eigenaarBron)) {
+    fout(EIGENAAR + ' leest rtg_os_gps niet meer; dan meet deze regel niets');
+  } else {
+    let anderen = 0;
+    for (const f of bestanden) {
+      const rel = path.relative(ROOT, f).split(path.sep).join('/');
+      if (rel === EIGENAAR || rel.startsWith('public/dist/')) continue;
+      if (!RE.test(zonderCommentaar(fs.readFileSync(f, 'utf8')))) continue;
+      anderen++;
+      fout(rel + ' leest rtg_os_gps zelf uit de opslag; die sleutel hoort bij ' +
+        EIGENAAR + ' (RTGPlek.aan/vraag/volg). Een tweede lezer loopt achter zodra de contractlaag iets verandert, en dat is stil.');
+    }
+    if (!anderen) ok('alleen ' + EIGENAAR + ' leest rtg_os_gps; ' + bestanden.length + ' bestanden nagekeken');
   }
 }
 

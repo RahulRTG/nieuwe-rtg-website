@@ -353,7 +353,13 @@
   }
 
   /* ---- de pinnen (koppelpunten), herbouwd bij laagwissel ---- */
+  /* `kaartData` bestaat pas na de eerste plek EN een geslaagde kaart-aanroep.
+     De laagknoppen rechts staan er vanaf de eerste seconde, en tikte je er
+     eerder op dan gooide dit `Cannot read properties of null` -- de knop deed
+     dus niets en zei ook niets. Leeg teruggeven is hier de waarheid: er zijn
+     geen plekken zolang er geen kaart is. */
   function zichtbarePlekken() {
+    if (!kaartData) return [];
     return (kaartData.plekken || []).filter(p => actief[p.laag]).concat(flitsPunten.filter(p => actief.flits));
   }
   let flitsPunten = [];
@@ -570,12 +576,25 @@
     if (r.status !== 200) return;
     $('#sourceNetwork').textContent = r.body.live ? r.body.live.netwerk : '0';
     $('#sourcePartners').textContent = r.body.live ? r.body.live.partners : '0';
+    /* DE BADGE ZEGT WAT DE MOTOR HIER KAN, en niet dat hij bestaat. Hier
+       stond "Motor actief" zodra de status-route antwoordde -- ook boven
+       Nederland zonder NWB-import, waar elke route 503 gaf. Wat er nu staat
+       komt uit `net` en `routeerbaarHier` van de motor zelf; het scherm leidt
+       niets meer af. Een demonstratienet heet ook zo. */
     const dekking = r.body.dekking;
     if (dekking && dekking.actief) {
       $('#sourceCore').textContent = (dekking.wegvakken / 1000000).toFixed(2).replace('.', ',') + ' mln';
       $('#sourceCoreLabel').textContent = 'NWB-wegvakken';
-      $('#liveBadge').textContent = dekking.hierActief ? 'NWB Nederland actief' : (r.body.motor || 'Motor actief');
-    } else $('#liveBadge').textContent = r.body.motor || 'Motor actief';
+    } else if (r.body.net === 'geen') {
+      $('#sourceCore').textContent = 'Geen';
+      $('#sourceCoreLabel').textContent = 'Kaartdata';
+    }
+    const badge = { nwb: 'NWB Nederland actief', demonstratie: 'Demonstratienet',
+      geen: 'Geen kaartdata voor Nederland' }[r.body.net];
+    $('#liveBadge').textContent = badge || (r.body.routeerbaarHier === false ? 'Motor kan hier niet routeren' : (r.body.motor || 'Motor actief'));
+    /* Alleen melden wat de gebruiker tegenhoudt. Dat we buiten Nederland op
+       het eigen net rekenen staat in de badge en hoeft geen melding. */
+    if (r.body.routeerbaarHier === false && r.body.netReden) zeg(r.body.netReden);
   }
 
   (() => {
@@ -619,11 +638,18 @@
 
   // lagen aan/uit
   document.querySelectorAll('.lagen button').forEach(b => b.addEventListener('click', async () => {
+    /* Een laag aanzetten zonder kaart is geen fout van de gebruiker; het is
+       een knop die te vroeg klaarstaat. Hij zegt nu waarom er niets gebeurt
+       in plaats van stil te gooien, en de stand wordt WEL onthouden -- zodra
+       de kaart er is, klopt het beeld met de knoppen. */
     const laag = b.dataset.laag; actief[laag] = !actief[laag]; b.setAttribute('aria-pressed', actief[laag]);
+    if (!kaartData) { zeg(($('#poort').classList.contains('zien') && $('#poortReden').textContent)
+      || 'De kaart is er nog niet: kies eerst een vertrekpunt.'); return; }
     if (laag === 'flits' && actief.flits) await haalFlits();
     bouwPinnen();
   }));
   async function haalFlits() {
+    if (!hier) return;
     const r = await api('poi', { lagen: ['flits'], lat: hier.lat, lng: hier.lng, land });
     if (r.status === 200) flitsPunten = (r.body.lagen.flits || []).map(f => ({ ...f, laag: 'flits' }));
   }

@@ -11,7 +11,19 @@
 <link href="/shared/seizoen.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
-  :root{
+  /* DE INKT STAAT OP DE BODY EN NIET OP :root. Dat is geen smaak maar de enige
+     plek waar hij wint. shared/seizoen.css zet bij dag- en middaglicht
+     `:root[data-dagdeel="ochtend"]{--grey:rgba(26,21,18,0.78)}` -- een selector
+     met een attribuut erbij, dus SPECIFIEKER dan het `:root{}` dat hier stond.
+     De donkere paginatokens verloren daardoor overdag, terwijl de grond wel
+     donker bleef (rtg-themas.css schildert die op `body[data-rtg-eigenvlak]`,
+     nog een trede specifieker). Gemeten stond de lopende tekst van dit document
+     tussen zonsopkomst en de avond op 1,09:1 -- onzichtbaar, een heel juridisch
+     stuk lang. Een aangepaste eigenschap die op de BODY staat erft naar alles
+     eronder en verslaat elke :root-regel, hoe specifiek ook: overerving en
+     specificiteit zijn twee verschillende vragen. Wie zijn eigen grond
+     schildert, houdt zo ook zijn eigen inkt. */
+  body[data-rtg-eigenvlak]{
     --white:#0C0C0B; --panel:#151312; --panel2:#1B1817; --black:#F4F1EC; --burgundy:#C23A5E; --gold:#A98F1C;
     --line:var(--rtg-line); --grey:rgba(244,241,236,0.72); --grey-soft:rgba(244,241,236,0.50);
   }

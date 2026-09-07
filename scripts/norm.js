@@ -446,6 +446,12 @@ const METERS = [
      gaan schrijven -- dan meet hij groei en geen kwaliteit. Dezelfde les als bij
      toetsenOngevoeligPct hierboven: een meter die stijgt van gewoon werk, leert
      iedereen hem te negeren. */
+  /* APPWERKT.json telt de onderdelen uit MAPPEN waarvan een bewijs GEBLOKKEERD
+     DOOR DEFECT is. Dat getal moet omlaag: een functie die het deed en nu niet
+     meer, hoort de bouw te laten zakken. `npm run appwerkt:controle` doet
+     hetzelfde met een VERSE meting; deze tand houdt het register zelf vast, ook
+     als niemand die browserronde draait. */
+  { sleutel: 'appwerktDefecten', richting: 'omlaag', wat: 'onderdelen uit MAPPEN met een defect bewijs (uit APPWERKT.json)' },
   { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' }
 ];
 
@@ -1124,7 +1130,8 @@ function meet(bronnen) {
     registersUitVuileBoom: vuileRegisters(WORTEL).length,
     laatSpoorVerdacht: leesRegister('LAATSPOOR.json', (j) => j.gemeten.verdacht),
     rollbackUitzonderingen: leesRegister('ROLLBACKBESLUIT.json', (j) => Object.keys(j.routes || {}).length),
-    faalproefGezakt: leesRegister('FAALPROEF.json', (j) => j.gemeten.gezakt)
+    faalproefGezakt: leesRegister('FAALPROEF.json', (j) => j.gemeten.gezakt),
+    appwerktDefecten: leesRegister('APPWERKT.json', (j) => j.gemeten.defecten)
   };
 }
 

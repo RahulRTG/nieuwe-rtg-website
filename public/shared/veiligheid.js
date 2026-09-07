@@ -125,7 +125,15 @@
          positie gewoon werd opgehaald en elke twee minuten verstuurd. Nu geldt:
          alleen een uitdrukkelijke "1" geeft de locatie vrij. De kring krijgt
          dan geen plek, en dat is precies wat het scherm belooft. */
-      try { if (localStorage.getItem('rtg_os_gps') !== '1') return klaar(false); } catch (e) {}
+      /* De stand wordt GEVRAAGD aan de contractlaag (shared/plek.js) en niet
+         meer zelf uit localStorage gehaald. Dat is dezelfde reparatie als in
+         sterren.js: de sleutelnaam en de betekenis van "uit" horen op een
+         plek te wonen, anders loopt een van de lezers achter zodra de
+         schakelaar verandert. Het levensteken VRAAGT niet om toestemming --
+         het loopt op de achtergrond, en een kaartje dat daar vanzelf opkomt
+         hoort bij een handeling van de gebruiker, niet bij een timer. */
+      if (!window.RTGPlek) { if (window.console) console.warn('[veiligheid] shared/plek.js ontbreekt; het levensteken geeft geen plek door.'); return klaar(false); }
+      if (!window.RTGPlek.aan()) return klaar(false);
       if (!navigator.geolocation) return klaar(false);
       navigator.geolocation.getCurrentPosition(function (p) {
         var body = { lat: p.coords.latitude, lon: p.coords.longitude, nauwkeurig: p.coords.accuracy };

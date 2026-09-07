@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-06T23:47:27.337Z",
-    "commit": "ff316fb6",
+    "op": "2026-09-07T20:11:08.965Z",
+    "commit": "a0eecb695",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
@@ -11,9 +11,9 @@
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 89,
-  "woorden": 1053,
-  "gevonden": 682,
-  "dekking": 0.6477,
+  "woorden": 1054,
+  "gevonden": 683,
+  "dekking": 0.648,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -963,13 +963,6 @@
       "mist": []
     },
     {
-      "naam": "Vrienden",
-      "url": "/apps/foundation/vrienden.html",
-      "woorden": 13,
-      "gevonden": 13,
-      "mist": []
-    },
-    {
       "naam": "Wallet",
       "url": "/apps/geld.html#wallet",
       "woorden": 0,
@@ -1065,6 +1058,13 @@
       "url": "/apps/foundation/os-portaal.html",
       "woorden": 6,
       "gevonden": 6,
+      "mist": []
+    },
+    {
+      "naam": "Vrienden",
+      "url": "/apps/foundation/vrienden.html",
+      "woorden": 14,
+      "gevonden": 14,
       "mist": []
     }
   ]

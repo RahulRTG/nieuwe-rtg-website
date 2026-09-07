@@ -13,16 +13,33 @@
 
   function Deel() { return w.RTGGeldDeel.labfonds; }
 
+  /* STAAT DEZE STAND ER NOG?
+
+     `laad()` wacht op de server, en in die tijd kan het lid al naar een andere
+     stand zijn getikt -- dan is de opmaak van deze stand vervangen en bestaat
+     `#lfWrap` niet meer. Alles hieronder schrijft in die opmaak, dus zonder
+     deze poort krijgt het lid een kale `Cannot set properties of null (setting
+     'innerHTML')` in zijn console voor iets wat hij niet eens meer kijkt.
+
+     Gevonden door `npm run appwerkt` op zijn eerste volle ronde: de proef tikt
+     de standen sneller achter elkaar aan dan een mens gewoonlijk doet, en juist
+     daarom vindt hij races die met de hand nooit reproduceren. Stil weggaan is
+     hier de juiste uitkomst -- er is niets meer om te tonen, en een melding
+     over een scherm dat je verlaten hebt is ruis. */
+  function nogInBeeld() { return !!$('#lfWrap'); }
+
   async function laad() {
     var Geld = w.Geld, D = Deel(), r;
     try { r = await Geld.api('/api/labfonds/overzicht'); }
     catch (e) {
+      if (!nogInBeeld()) return;
       /* de poort van de oude pagina: niet ingelogd (of gast), dan geen half
          scherm maar alleen de uitleg waarom */
       $('#lfFout').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: Geld.esc(e.message) }));
       $('#lfBody').hidden = true;
       return;
     }
+    if (!nogInBeeld()) return;
     $('#lfFout').innerHTML = '';
     $('#lfBody').hidden = false;
     D.S.locs = r.locaties || [];

@@ -13,7 +13,7 @@ omlaag.
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 99 delen, 9938 regels in de delen
+`public/apps/app-main/` -- 99 delen, 9944 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -834,7 +834,7 @@ omlaag.
 
 ## `shared/sterren.js`
 
-`public/shared/sterren/` -- 3 delen, 335 regels in de delen
+`public/shared/sterren/` -- 3 delen, 341 regels in de delen
 
 | deel | onderwerp |
 |---|---|

@@ -897,6 +897,32 @@ daar: mergen blijft mensenwerk (met als enige, gesloten uitzondering de
 Dependabot-klassen in `automerge.yml`), en de wetwacht meldt alleen — het
 juridische oordeel blijft bij een mens.
 
+**`BETROUWBAARHEID.md` zegt wanneer een functie BESTAAT** -- en dat is iets
+anders dan of het scherm laadt. De definitie: *een functie bestaat pas als een
+echte gebruiker haar volledige bedoeling kan voltooien, de uitkomst correct wordt
+opgeslagen, fouten begrijpelijk worden afgehandeld, rechten kloppen en dezelfde
+stroom na storing, refresh en herhaling betrouwbaar blijft werken.* Lees die vóór
+je zegt dat iets werkt. De meeteenheid is een **belofte en geen scherm** --
+Navigatie is niet een HTML-bestand maar *breng mij van hier naar mijn bestemming*
+-- dus wordt er geteld per onderdeel uit `MAPPEN`, met de persona aan wie de
+wereld het toont. Acht bewijzen (bereikbaar, bedienbaar, voltooibaar,
+waarheidsgetrouw, persistent, bevoegd, herstelbaar, menselijk), waarvan er
+vandaag drie gemeten worden door `npm run appwerkt` (`APPWERKT.json`); de andere
+vijf staan er per rij bij als `GEEN_FIXTURE` **met de reden**, want een bewijs dat
+je weglaat leest als een bewijs dat je haalt. De standen zijn gesloten en
+"waarschijnlijk goed" zit er niet bij: BEWEZEN, GEBLOKKEERD_DOOR_DEFECT,
+GEBLOKKEERD_DOOR_CONFIG, GEEN_FIXTURE, NIET_GETEST -- en de stand van een rij is
+de STRENGSTE van haar bewijzen. Het verschil tussen DEFECT en CONFIG wordt niet
+geraden maar gelezen uit wat de server zelf zegt (een `hoe` bij de weigering).
+Par. 4 is het grootste ontbrekende stuk: een gecontroleerde testwereld waarin
+betalen, versturen en verwijderen ECHT mogen -- en de regel daarboven staat al in
+MAGNAATLAB.md (*een simulatie-adapter vervangt de rail, nooit de poort*). Par. 6
+staat er even groot bij: vier stille defecten uit één middag handmatig kijken, die
+geen enkele bestaande toets zag -- waaronder een ingang in LivingOS naar een
+scherm met een andere deur. **Een zichtbare ingang naar een onbereikbare functie
+is een productdefect, ook als elke regel code klopt**; daarom gaat bewijs 1 over
+een persona en niet over een URL.
+
 **`TIKKEN.md` zegt hoe diep het huis is** -- hoeveel tikken elke functie van het
 beginscherm af ligt, gemeten met `scripts/tikken.js` in een echte browser op
 telefoonformaat en niet geschat. De belofte staat er in twee helften, en de

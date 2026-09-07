@@ -1441,6 +1441,16 @@ const IJKINGEN = {
     proef: (voor) => metVervangenJson('FAALPROEF.json',
       (j) => { j.gemeten.gezakt = (j.gemeten.gezakt || 0) + 5; return j; },
       () => norm.meet().faalproefGezakt - voor.faalproefGezakt)
+  },
+  /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
+     waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
+     de meter leest `gemeten.defecten` uit een register dat er al is, dus hij
+     wordt geijkt door dat veld tijdelijk op te hogen. Leest hij het verkeerde
+     veld, of een ontbrekend bestand als nul, dan beweegt hij niet mee. */
+  appwerktDefecten: {
+    proef: (voor) => metVervangenJson('APPWERKT.json',
+      (j) => { j.gemeten.defecten = (j.gemeten.defecten || 0) + 3; return j; },
+      () => norm.meet().appwerktDefecten - voor.appwerktDefecten)
   }
 };
 

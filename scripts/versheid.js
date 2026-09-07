@@ -256,6 +256,7 @@ const REGISTERS = [
      meldde de +290 alleen in de schaduw. Wie hier niet kijkt, ratelt tegen
      een verouderde basislijn. */
   ['TEKSTOPPERVLAK.json', 'npm run tekstoppervlak', 'waar gebruikerszichtbare tekst ontstaat, en de basislijn van keuringsregel 68'],
+  ['APPWERKT.json', 'npm run appwerkt', 'welke apps werkelijk werken, en de defecten die de meter vond'],
   ['AANROEPGRAAF.json', 'node scripts/aanroepgraaf.js --vastleggen', 'wie wie aanroept in server/ en scripts/'],
   ['KERNHERKOMST.json', 'node scripts/kernherkomst.js --vastleggen', 'waar een kernnaam vandaan komt en wie hem doorgeeft'],
   ['SYMBOLEN.json', 'node scripts/symbolen.js --vastleggen', 'welke functies waar wonen'],

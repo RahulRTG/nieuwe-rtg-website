@@ -294,13 +294,15 @@ function scanJs(bron, herkomst, vangst) {
 function scanHtml(bron, herkomst, vangst) {
   /* de inline scripts APART, want die zijn voor de tekstmeting onzichtbaar
      (hij strippt <script>) en voor de .js-meting ook (ze staan niet in .js) */
-  /* EEN SLUITTAG MAG WITRUIMTE DRAGEN: </script > is geldige HTML. Zonder
-     \s* voor de > sluit zo'n tag het blok niet en slokt de scanner de rest van
-     het document op als script -- CodeQL vond het als "bad HTML filtering
-     regexp". Als beveiligingsvondst is het hier loos (dit is een meter over
-     onze eigen bestanden, geen sanitizer), als meetfout is het echt. */
+  /* EEN SLUITTAG SLUIT OOK MET ROMMEL ERIN: de HTML-parser behandelt
+     </script >, </script\n> en zelfs </script bar> allemaal als eindtag. Wie
+     alleen op de kale vorm zoekt, sluit het blok daar niet en slokt de rest van
+     het document op als script. Dus `<\/script\b[^>]*>` -- en de openingstag
+     quote-bewust, want een attribuut mag een > dragen. CodeQL vond dit als
+     "bad HTML filtering regexp"; als beveiligingsvondst is het hier loos (een
+     meter over onze eigen bestanden, geen sanitizer), als meetfout is het echt. */
   const scripts = [];
-  const zonderScript = bron.replace(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi, (m, attrs, body) => {
+  const zonderScript = bron.replace(/<script\b((?:[^>"']|"[^"]*"|'[^']*')*)>([\s\S]*?)<\/script\b[^>]*>/gi, (m, attrs, body) => {
     if (!/\bsrc\s*=/i.test(attrs) && body.trim()) scripts.push(body);
     return ' ';
   });
@@ -312,7 +314,7 @@ function scanHtml(bron, herkomst, vangst) {
      UI-brokken bewaart, en <svg><text> is gewoon zichtbare tekst. De aanval
      zette een hele kaart met kop, alinea en knop in een <template>, cloneerde
      hem in het DOM, en geen enkel getal bewoog. */
-  const schoon = zonderScript.replace(/<(style|noscript|code|pre)\b[\s\S]*?<\/\1\s*>/gi, ' ')
+  const schoon = zonderScript.replace(/<(style|noscript|code|pre)\b[\s\S]*?<\/\1\b[^>]*>/gi, ' ')
     .replace(/<!--[\s\S]*?-->/g, ' ');
 
   /* ZICHTBARE TEKSTKNOPEN, MET HET VOORAFGAANDE TAG ERBIJ.

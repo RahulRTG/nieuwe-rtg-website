@@ -113,6 +113,14 @@ const REGISTER = {
   'RESOLVERBEREIK.json': { eigenRatel: 'test/resolverbereik.test.js' },
   'GEZAGSNOEMER.json': { eigenRatel: 'test/gezagsnoemer.test.js' },
 
+  /* APPWERKT.json hangt aan de NORM-ratel en niet aan een eigen toets, want een
+     verse meting vraagt een browser en een kwartier -- dat hoort niet in
+     `npm test`. Wat er wel aan hangt is het getal dat ertoe doet:
+     `appwerktDefecten` mag alleen omlaag, en dat wordt bij elke bouw
+     nagerekend. De volle ronde (`npm run appwerkt:controle`) is de tweede tand
+     en die is met een mutatie zien zakken; zie BETROUWBAARHEID.md par. 5. */
+  'APPWERKT.json': { meter: ['appwerktDefecten'] },
+
   /* DE ZEVEN REGISTERS VAN MAATSTAF.md, en waarom ze hier mogen staan. Elk van
      deze toetsen doet HETZELFDE: hij meet vers en vergelijkt met wat er in het
      register staat, zodat een achterlopend register de bouw laat zakken in

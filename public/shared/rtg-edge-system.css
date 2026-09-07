@@ -161,7 +161,11 @@ body.rtg-edge-host .pn-shell{height:calc(100dvh - var(--edge-top) - var(--edge-b
 @media(max-width:999px){
   body.rtg-edge-host #rtgCommand{
     inset:calc(var(--edge-top) + var(--rtg-command-safe-top,env(safe-area-inset-top,0px))) 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) 0!important;
-    padding-top:0!important
+    padding-top:0!important;
+    /* De regel hierboven zet Command IN tot boven de Edge-onderbalk, en die
+       balk draagt de thuisstreep al. Command reserveert hem daarom niet nog
+       een keer; zie de toelichting bij .cmd-balk in command.css. */
+    --rtg-command-safe-bottom:0px
   }
   body.rtg-edge-host #rtgCommand:not(.rtg-interface-second-screen) .cmd-bank{
     bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px))!important

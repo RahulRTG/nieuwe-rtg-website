@@ -61,7 +61,11 @@ body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus
 body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .pda-nav{bottom:0!important}
 @media(max-width:999px){
   body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] #rtgCommand{
-    inset:0!important;padding-top:var(--rtg-command-safe-top,env(safe-area-inset-top,0px))!important
+    /* In de focusstand geeft Edge het hele venster terug (`inset:0`), dus dan
+       raakt Command de onderrand WEL en draagt hij de thuisstreep zelf weer.
+       Deze selector is specifieker dan die in rtg-edge-system.css, dus hij wint. */
+    inset:0!important;padding-top:var(--rtg-command-safe-top,env(safe-area-inset-top,0px))!important;
+    --rtg-command-safe-bottom:env(safe-area-inset-bottom,0px)
   }
   body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] #rtgCommand .cmd-bank{bottom:0!important}
   body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-laag{inset:0!important}

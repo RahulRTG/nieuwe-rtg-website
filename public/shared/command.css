@@ -194,8 +194,31 @@ body.rtg-command .hv-chat{z-index:259;bottom:calc(108px + env(safe-area-inset-bo
 
    Hoogstens een derde van het scherm, en hij scrolt in zichzelf: de werkvloer
    eronder blijft staan. */
+/* DE HOOGTE VAN DE SCHILBALK STAAT OP EEN PLEK.
+   `calc(48px + env(safe-area-inset-bottom))` stond hier vier keer: in de balk
+   zelf, in de derde rasterrij van .cmd-werk, onder .cmd-praat en onder de
+   cookiemelding. Vier plekken die dezelfde waarheid dragen, lopen uit elkaar --
+   en dat gebeurde ook: toen de balk onder de Edge-schil van 82 naar 48 ging,
+   bleef de rasterrij op 82 staan en zat er 34px werkvlak onder een balk die er
+   niet meer was. Een tweede plek met dezelfde waarheid is geen veiligheidsnet
+   (LAT.md regel 9).
+
+   De inzet zit erin via --rtg-command-safe-bottom, zodat de schil hem op nul
+   kan zetten waar Edge de thuisstreep al draagt; zonder schil valt hij terug op
+   env(). Zie de toelichting bij .cmd-balk verderop. */
+:root,body.rtg-command,#rtgCommand{
+  /* DRIE KEER DEZELFDE VERKLARING, EN DAT IS GEEN DUBBELING. Een var() wordt
+     opgelost op het element waar hij WORDT VERKLAARD, niet waar hij wordt
+     gelezen. Stond deze token alleen op de body, dan bevroor hij daar op de
+     kale env() -- en de nul die Edge op #rtgCommand zet, kwam er nooit meer in.
+     Precies dat ging hier mis: de balk bleef 82px terwijl hij er 48 hoorde te
+     zijn. Op #rtgCommand lost hij op met de nul van de schil (48px), op de body
+     zonder (82px), en dat laatste is wat een lezer BUITEN de schil hoort te
+     krijgen -- de cookiemelding staat naast #rtgCommand en niet erin. */
+  --cmd-balk-hoogte:calc(48px + var(--rtg-command-safe-bottom,env(safe-area-inset-bottom,0px)));
+}
 .cmd-praat{
-  position:absolute;left:0;right:0;bottom:calc(48px + env(safe-area-inset-bottom,0px));
+  position:absolute;left:0;right:0;bottom:var(--cmd-balk-hoogte);
   z-index:22;max-height:34vh;overflow-y:auto;overscroll-behavior:contain;
   background:rgba(12,12,11,.96);border-top:1px solid var(--rtg-line);
   backdrop-filter:blur(18px) saturate(1.05);-webkit-backdrop-filter:blur(18px) saturate(1.05);
@@ -366,7 +389,7 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
      het viewport, terwijl WebKit/Blink op macOS hem toevallig onderaan hield.
      De namen hieronder maken de plaats onafhankelijk van display/overgangen. */
   body.rtg-stijl main.cmd-werk,.cmd-werk{
-    grid-template-rows:minmax(0,1fr) auto calc(48px + env(safe-area-inset-bottom,0px))
+    grid-template-rows:minmax(0,1fr) auto var(--cmd-balk-hoogte)
   }
   .cmd-panes{grid-row:1}
   .cmd-rail{grid-row:2}
@@ -376,9 +399,23 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
      Drie zones: de bank links, waar je bent in het midden, weg hier rechts.
      48px, want dat is de minimale aanraakmaat plus een haarlijn -- alles
      daarboven kost leesruimte aan een wereld die zijn eigen balk al draagt. */
+  /* DE THUISSTREEP WORDT EEN KEER GERESERVEERD, DOOR WIE DE ONDERRAND RAAKT.
+     Hier stond `env(safe-area-inset-bottom)` hard in de hoogte en in de
+     opvulling. Dat klopt zolang deze balk zelf tot de onderrand van het venster
+     loopt -- maar onder de Edge-schil doet hij dat niet: rtg-edge-system.css
+     zet #rtgCommand op telefoonmaat in tot `calc(var(--edge-bottom) +
+     env(safe-area-inset-bottom))`, en de Edge-onderbalk draagt de streep dus al.
+     Gemeten op /apps/app.html bij 390x844 met inzet 34: .cmd-balk y680..762 met
+     hoogte 82px, terwijl zijn drie kinderen alle drie op y681..728 staan -- 34px
+     lege zwarte strook, en daaronder begon de Edge-balk pas.
+
+     Dezelfde afspraak als aan de bovenkant, en om dezelfde reden: wie de
+     uitsparing werkelijk raakt, reserveert hem, en de ander leest de variabele.
+     Zonder schil valt hij gewoon terug op env(). */
   .cmd-balk{
-    display:flex;align-items:stretch;height:calc(48px + env(safe-area-inset-bottom,0px));
-    padding-bottom:env(safe-area-inset-bottom,0px);
+    display:flex;align-items:stretch;
+    height:var(--cmd-balk-hoogte);
+    padding-bottom:var(--rtg-command-safe-bottom,env(safe-area-inset-bottom,0px));
     border-top:1px solid var(--rtg-line);background:rgba(12,12,11,.94);
     backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
   }
@@ -415,7 +452,7 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
      sluitknop waren onbereikbaar zolang hij stond. Hij gaat er hier bovenuit.
      Weghalen mag niet; dat is een melding en geen versiering. */
   body.rtg-command #rtg-cookie{
-    bottom:calc(48px + env(safe-area-inset-bottom,0px));left:0;right:0;transform:none;
+    bottom:var(--cmd-balk-hoogte);left:0;right:0;transform:none;
     width:auto;max-width:none;padding:.45rem .8rem;
     /* Een eigen grond, want zonder dat leest hij als tekst dwars door de
        onderbalk van de wereld heen. Nu is het een strook van de schil, en de

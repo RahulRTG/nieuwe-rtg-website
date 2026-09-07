@@ -289,7 +289,11 @@ geen ruimte.
 Focus heeft precies één zichtbare, toetsenbordbereikbare herstelgreep. Escape en
 de greep herstellen de vorige automatische keuze als Focus vanuit Auto kwam;
 anders herstellen zij Overview. Automatisch wisselen stopt zolang iemand in een
-invoer, dialoog, contextlade of sleepbeweging werkt.
+invoer, dialoog, contextlade of sleepbeweging werkt. En het luistert alleen naar
+een scroll van de mens (wiel, vinger, scrolltoets): een scroll die de software
+zelf veroorzaakt -- scrollIntoView, een anker, een focusverplaatsing -- laat de
+stand staan. Anders klapt de bovenrand in of uit en verschuift de hele pagina een
+knophoogte, precies onder een vinger die net wil tikken.
 
 De systeemstatus bevat de vier expliciete keuzes **Overzicht, Compact,
 Automatisch en Focus**. Een vaste keuze van de gebruiker gaat voor automatische

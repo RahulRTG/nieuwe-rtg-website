@@ -343,6 +343,32 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
         assert.ok(result.overflow <= 1, 'The shell may not force horizontal page overflow.');
       });
     });
+    await t.test('Edge auto follows a human scroll, never a scroll made by the software', async () => {
+      await withPage(1280, async page => {
+        await page.goto(server.base + '/apps/mall.html', { waitUntil: 'domcontentloaded' });
+        await ready(page);
+        await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-auto') === 'true' &&
+          document.body.getAttribute('data-rtg-edge-2-state') === 'overview' &&
+          document.documentElement.scrollHeight > innerHeight * 3, null, { timeout: geduld(10000) });
+        /* The software scrolls (scrollIntoView, an anchor, a focus move): the stand
+           stays. Otherwise the top rail collapses, the body loses 44px of padding
+           and a tap that aimed at a button lands on what stood below it --
+           test/appstore.e2e.js saw exactly that on "Inkoopdossier". */
+        await page.evaluate(() => window.scrollTo(0, 900));
+        await page.waitForFunction(() => Math.round(scrollY) === 900);
+        await page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(r)))));
+        assert.equal(await page.evaluate(() => document.body.getAttribute('data-rtg-edge-2-state')), 'overview',
+          'a programmatic scroll may not collapse the rail');
+        assert.equal(await page.evaluate(() => getComputedStyle(document.body).paddingTop), '44px',
+          'and the page keeps its top inset, so nothing moves under a finger');
+        // A human scrolls down: compact. Up again: overview.
+        await page.mouse.move(640, 500);
+        await page.mouse.wheel(0, 600);
+        await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-state') === 'compact', null, { timeout: geduld(6000) });
+        await page.mouse.wheel(0, -400);
+        await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-state') === 'overview', null, { timeout: geduld(6000) });
+      });
+    });
   } finally {
     if (browser) await browser.close();
     await stop(server.child);

@@ -91,7 +91,14 @@
   function koppelWerkScroll() {
     var stage = vind('.wk-stage');
     if (!stage) return;
-    var laatste = stage.scrollTop || 0, gepland = false;
+    var laatste = stage.scrollTop || 0, gepland = false, gebaarTijd = 0;
+    /* Alleen een scroll van de mens schakelt; een scroll die de software zelf
+       veroorzaakt laat de stand staan (dezelfde regel als in rtg-edge-2.js). */
+    ['wheel', 'touchmove', 'keydown'].forEach(function (t) {
+      stage.addEventListener(t, function (e) {
+        if (w.RTGEdge2 && w.RTGEdge2.scrollGesture(e)) gebaarTijd = Date.now();
+      }, { passive: true, capture: true });
+    });
     stage.addEventListener('scroll', function () {
       if (gepland) return;
       gepland = true;
@@ -101,6 +108,9 @@
         laatste = nu;
         if (!w.RTGEdge2 || b.getAttribute('data-rtg-edge-2-auto') !== 'true' ||
             b.getAttribute(VENSTER_ATTR) === 'true') return;
+        var tijd = Date.now();
+        if (tijd - gebaarTijd > w.RTGEdge2.GESTURE_MS) return;
+        gebaarTijd = tijd;
         if (nu <= 32 || verschil < -14) w.RTGEdge2.setState('overview', { source: 'auto' });
         else if (verschil > 14) w.RTGEdge2.setState('compact', { source: 'auto' });
       };

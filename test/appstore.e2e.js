@@ -74,16 +74,48 @@ async function api(base, pad, body, token) {
    een gewone muisklik naar dat punt. Er wordt dus niets geforceerd. */
 async function klikRaakbaar(page, selector) {
   const knop = page.locator(selector);
-  await knop.evaluate(el => el.scrollIntoView({ block: 'center', inline: 'nearest' }));
+  /* EERST SCROLLEN, DAN WACHTEN TOT DE PAGINA DIE SCROLL HEEFT VERWERKT, DAN
+     PAS METEN. De scroll hieronder is voor de Edge een gewone scroll: in de
+     automatische stand klapt de bovenrand na een scroll omlaag in en komt hij
+     na een scroll omhoog terug -- en met hem de 44px bovenmarge van de body, dus
+     alles op het scherm springt een knophoogte op of neer. Dat gebeurt in de
+     scroll-gebeurtenis, en die komt pas in de VOLGENDE tekenbeurt, soms later
+     als de machine het druk heeft. Wie het middelpunt meet voor die sprong en
+     klikt erna, raakt niet de knop maar wat ernaast stond: hier de link "Op
+     eigen pagina" (de toets navigeerde weg) of het lege vlak boven de knop
+     "Mijn geschiedenis" (de muis ging omlaag op de knop en kwam omhoog op de
+     etage). Ook de click van Playwright zelf verloor die race een keer op vijftien.
+
+     Op de Mall bleef dit lang onzichtbaar: de Edge zag daar een taalkaart met
+     role=dialog die nooit in beeld is en hield zich daarom stil bij elke scroll.
+     Toen hij onzichtbare vensters leerde negeren, ging hij ook hier bewegen --
+     zonder dat er aan de Mall iets was veranderd.
+
+     Daarom drie eisen voor de klik: de scroll die wij zelf veroorzaakten is
+     verwerkt (of er was er geen), twee opeenvolgende frames geven dezelfde
+     rechthoek, en het middelpunt raakt de knop zelf -- dezelfde stilstandseis
+     die Playwright aan zijn click stelt, plus de scroll-eis die hij mist. */
+  await knop.evaluate((el) => {
+    const stand = { voor: window.scrollY, gebeurd: false };
+    window.__raakScroll = stand;
+    window.addEventListener('scroll', () => { stand.gebeurd = true; }, { once: true, passive: true });
+    el.scrollIntoView({ block: 'center', inline: 'nearest' });
+  });
   const handvat = await page.waitForFunction((sel) => {
     const el = document.querySelector(sel);
     if (!el) return false;
+    const s = window.__raakScroll;
+    if (s && window.scrollY !== s.voor && !s.gebeurd) return false;
     const r = el.getBoundingClientRect();
+    const nu = [r.left, r.top, r.width, r.height].map(Math.round).join(',');
+    const geheugen = (window.__raakVorige = window.__raakVorige || new WeakMap());
+    const vorige = geheugen.get(el); geheugen.set(el, nu);
+    if (vorige !== nu) return false;
     const x = r.left + r.width / 2;
     const y = r.top + r.height / 2;
     const raak = document.elementFromPoint(x, y);
     return (raak === el || el.contains(raak)) && { x, y };
-  }, selector);
+  }, selector, { polling: 'raf' });
   const punt = await handvat.jsonValue();
   await page.mouse.click(punt.x, punt.y);
 }
@@ -265,7 +297,7 @@ test('de winkel en het uitgeversbureau openen zonder fouten', { skip: !pw && 'Pl
     assert.match(dos, /Wat dit dossier NIET zegt/, 'en wat wij niet kunnen aantonen staat er als eigen blok');
     assert.match(dos, /beschikbaarheid van de leverancier/, 'met de reden erbij en niet als kleine letters');
 
-    await page.click('#asGesch');
+    await klikRaakbaar(page, '#asGesch');
     await page.waitForSelector('#asTijd:not([hidden])', { timeout: 15000 });
     await page.waitForFunction(() => !/Even ophalen/.test(document.getElementById('asTijd').textContent),
       null, { timeout: 15000 });

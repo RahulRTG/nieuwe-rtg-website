@@ -5401,7 +5401,126 @@ console.log('\n67) elk `npm run X` in een document bestaat ook echt');
   }
 }
 
-console.log('\n68) de locatieschakelaar heeft precies een lezer');
+/* 68) geen NIEUWE gebruikerszichtbare tekst hardcoded waar het al anders kan.
+
+   Het doel van de meertaligheidslaag is niet "de code 114-talig maken" maar iets
+   dat je kunt afdwingen: geen gebruikerszichtbare tekst meer hardcoded in een
+   taal. TEKSTOPPERVLAK.json meet er vandaag 23.823, over html, client-js en
+   server-js samen (npm run tekstoppervlak).
+
+   DEZE REGEL BLOKKEERT NIET OP DAT TOTAAL, en dat is met opzet. Er is nog geen
+   berichtencatalogus en geen t(sleutel)-runtime, dus een nieuw scherm MOET
+   vandaag hardcoden. Wie dat toch blokkeert legt alle bouw stil, en dan wordt de
+   poort uitgezet -- CONTROLPLANE.md par. 5.3: je kunt niet afdwingen wat nooit in
+   de schaduw heeft gelopen. Het totaal loopt hier dus MEE en meldt alleen.
+
+   Wat hij wel hard tegenhoudt zijn de twee plekken waar vandaag al een
+   alternatief bestaat:
+
+   ratel 1  DE VASTE nl-LOCALE. 246 aanroepen geven een vaste 'nl-NL' mee aan
+            toLocaleString of Intl. Daar valt geen sleutel op te plakken en toch
+            leest een Japanse gebruiker een Nederlandse datum -- een scherm kan
+            100% gesleuteld zijn en hier alsnog Nederlands tonen. De taal van de
+            gebruiker meegeven kan NU, zonder catalogus en zonder runtime.
+
+   ratel 2  EEN BESTAND DAT DE SLEUTELWEG AL GEBRUIKT. 37 eenheden dragen T() of
+            data-i18n. Daar staat het alternatief in datzelfde bestand, dus een
+            kale string erbij is een regressie. Zo wordt migratie
+            eenrichtingsverkeer: wat om is, kan niet terugglijden.
+
+   Beide ratels mogen alleen OMLAAG. Wie een getal met opzet verhoogt, draait
+   TEKSTOPPERVLAK.json bij met npm run tekstoppervlak EN schrijft de reden in de
+   commitboodschap. Een ratel die je losdraait omdat je er zelf tegenaan loopt,
+   is geen ratel. */
+console.log('\n68) geen nieuwe hardcoded tekst waar de sleutelweg al bestaat');
+{
+  let basis = null;
+  try { basis = JSON.parse(fs.readFileSync(path.join(ROOT, 'TEKSTOPPERVLAK.json'), 'utf8')); }
+  catch (e) { fout('TEKSTOPPERVLAK.json ontbreekt of is stuk -- draai `npm run tekstoppervlak`'); }
+
+  if (basis && basis.grendel) {
+    const g = basis.grendel;
+    let nu = null;
+    try { nu = require('./tekstoppervlak').meet(); }
+    catch (e) { fout('de tekstmeter liep vast: ' + e.message); }
+
+    if (nu) {
+      /* EEN PARSEFOUT IS NUL TEKSTEN, EN DAT LIJKT OP VOORUITGANG.
+         scanJs vangt een parsefout en geeft nul terug. Zonder deze controle zet
+         een syntaxfout stil een lagere basislijn, en zakt de keuring pas als
+         iemand hem REPAREERT. "Niet vast te stellen" mag nooit als "in orde"
+         langskomen. */
+      if (nu.grendel.parsefouten > 0) {
+        fout(nu.grendel.parsefouten + ' bestand(en) konden niet worden geparseerd; hun tekst telt als NUL ' +
+          'en dat verlaagt de basislijn stilletjes. Repareer de syntaxfout, of splits het inline blok niet ' +
+          'midden in een functie');
+      }
+
+      /* ratel 1: de vaste locale, PER BESTAND. Huisbreed telde betekende dat
+         ruimte gewonnen in het ene bestand in het andere kon worden uitgegeven. */
+      const localeOp = [];
+      const wasLoc = g.hardVasteLocalePerBestand || {};
+      const isLoc = nu.grendel.hardVasteLocalePerBestand || {};
+      for (const bestand of Object.keys(isLoc)) {
+        const w = wasLoc[bestand] || 0;
+        if (isLoc[bestand] > w) localeOp.push(bestand + ' (' + w + ' -> ' + isLoc[bestand] + ')');
+      }
+      if (localeOp.length) {
+        fout(localeOp.length + ' bestand(en) kregen een vaste nl-locale erbij: ' + localeOp.slice(0, 4).join(', ') +
+          (localeOp.length > 4 ? ' en ' + (localeOp.length - 4) + ' meer' : '') +
+          '. Geef de taal van de gebruiker mee in plaats van \'nl-NL\'; dat kan vandaag al, zonder catalogus. ' +
+          'Moet het getal echt omhoog, draai dan `npm run tekstoppervlak` en zeg in de commitboodschap waarom');
+      }
+
+      /* ratel 2: per bestand dat de sleutelweg al gebruikt. Sinds de
+         groene-padreparatie telt tekst ONDER T() of data-i18n hier niet mee, dus
+         er IS een manier om zichtbare tekst toe te voegen die groen blijft. */
+      const gestegen = [], verdwenen = [];
+      const wasG = g.hardGesleuteldeBestanden || {}, isG = nu.grendel.hardGesleuteldeBestanden || {};
+      for (const [bestand, wasN] of Object.entries(wasG)) {
+        const isN = isG[bestand];
+        /* EEN VERDWENEN INGANG IS STILTE, EN STILTE IS HIER EEN UITGANG.
+           Wie een gesleuteld bestand hernoemt, verplaatst, of er T()/data-i18n
+           uithaalt, viel hiervoor zonder melding uit de ratel -- en was daarna
+           vrij. */
+        if (typeof isN !== 'number') verdwenen.push(bestand + ' (stond op ' + wasN + ')');
+        else if (isN > wasN) gestegen.push(bestand + ' (' + wasN + ' -> ' + isN + ')');
+      }
+      /* EN EEN NIEUW GESLEUTELD BESTAND KOMT BINNEN OP NUL. Anders heeft een
+         scherm dat vanaf dag een de sleutelweg gebruikt nooit een bovengrens. */
+      for (const [bestand, isN] of Object.entries(isG)) {
+        if (!(bestand in wasG) && isN > 0) gestegen.push(bestand + ' (nieuw, 0 -> ' + isN + ')');
+      }
+
+      if (gestegen.length) {
+        fout(gestegen.length + ' bestand(en) die T() of data-i18n AL gebruiken kregen er hardcoded tekst bij: ' +
+          gestegen.slice(0, 5).join(', ') + (gestegen.length > 5 ? ' en ' + (gestegen.length - 5) + ' meer' : '') +
+          '. Het alternatief staat in datzelfde bestand: zet de tekst achter T(sleutel, tekst) of data-i18n, ' +
+          'dan telt hij hier niet mee');
+      }
+      if (verdwenen.length) {
+        fout(verdwenen.length + ' bestand(en) uit de basislijn zijn verdwenen (hernoemd, verplaatst, of de ' +
+          'sleutelweg is eruit gehaald): ' + verdwenen.slice(0, 4).join(', ') +
+          '. Een bestand mag niet stil uit de ratel vallen -- draai `npm run tekstoppervlak` als de verhuizing klopt');
+      }
+
+      if (!localeOp.length && !gestegen.length && !verdwenen.length && !nu.grendel.parsefouten) {
+        const opNul = Object.values(isG).filter(v => v === 0).length;
+        ok('vaste nl-locale ' + nu.vasteLocale.aanroepen + ' over ' + Object.keys(isLoc).length +
+          ' bestanden, en van de ' + Object.keys(isG).length + ' gesleutelde bestanden staan er ' + opNul +
+          ' op nul hardcoded tekst; geen enkele steeg');
+      }
+
+      /* schaduw: het totaal meldt en velt niet */
+      const dHuis = nu.totaal.uniekeTeksten - g.schaduwHuisbreed;
+      console.log('  · schaduw: ' + nu.totaal.uniekeTeksten + ' gebruikerszichtbare teksten huisbreed (' +
+        (dHuis === 0 ? 'gelijk' : (dHuis > 0 ? '+' + dHuis : String(dHuis))) +
+        '). Meldt en velt niet: er is nog geen catalogus om naar uit te wijken.');
+    }
+  }
+}
+
+console.log('\n69) de locatieschakelaar heeft precies een lezer');
 {
   /* WAAROM DEZE REGEL BESTAAT.
 

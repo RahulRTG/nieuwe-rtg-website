@@ -718,6 +718,136 @@ function startEchteServer() {
     console.log(`[a11y] thema ${thema}: ${struct} structureel, ${contr} contrast`);
   }
 
+  /* ===== ZESDE RONDE: DE BLINDE ASSEN ========================================
+
+     WAAROM DEZE RONDE BESTAAT. Deze keuring varieerde twee assen -- de sessie
+     (uitgelogd, ingelogd, zaak) en het thema (champagne, bordeaux, royal) -- en
+     stond op nul. Ondertussen zijn er drie andere assen waarop dit huis kleur en
+     opmaak verandert, en op alle drie is een fout gevonden die hier NOOIT langs
+     kwam:
+
+       dagdeel   shared/seizoen.js zet data-dagdeel op <html> uit de KLOK, en
+                 seizoen.css vertaalt dat naar een heel palet. De drie juridische
+                 documenten stonden daardoor van zonsopkomst tot de avond op
+                 1,09:1 -- een heel privacybeleid onleesbaar -- en 's avonds ging
+                 het goed.
+
+                 LET OP HOE DEZE AS ZICH GEDROEG, want het is niet wat het lijkt.
+                 Het woord `dagdeel` kwam in dit bestand nul keer voor, maar de
+                 as werd wel degelijk gemeten: door de klok van de machine waarop
+                 de scan toevallig draaide. Nagemeten met de fout er met opzet
+                 weer in, om 12:24 UTC (dagdeel `middag`): de bestaande rondes
+                 vonden 111 contrastfouten op dat ene scherm en de poort zakte.
+                 Dezelfde code om 02:00 vindt er nul.
+
+                 Dat is erger dan blind, want het ziet er groen uit. Wat deze as
+                 hier toevoegt is dus niet dekking maar BEPAALDHEID: hij pint
+                 beide standen expliciet met ?dagdeel=, zodat de uitslag niet
+                 meer afhangt van het uur waarop iemand op start drukt.
+       ros       shared/rosthema.css is een TWEEDE themasysteem met een eigen
+                 sleutel (rtg_ros_thema). Het bedieningspaneel belooft "Uw keuze
+                 reist mee naar al uw RTG-schermen", en op de schermen die dat
+                 stijlblad laden houdt de grond de ene helft van het palet en de
+                 inkt de andere. Ook dat woord stond hier nul keer.
+       inzet     De veilige zone van een iPhone is in een gewone browser NUL, dus
+                 alles wat met env(safe-area-inset-*) misgaat is hier per
+                 definitie onzichtbaar. Elf sociale schermen legden hun hele
+                 bovenbalk in de statusbalk, waar een tik naar het systeem gaat.
+
+     WAT DEZE RONDE WEL EN NIET DOET. Zij MELDT en zij VELT NIET. Dat is geen
+     halfheid maar de huisregel: een nieuwe handhavingsregel loopt eerst mee
+     zonder te blokkeren, want je kunt niet afdwingen wat nooit in de schaduw
+     heeft gelopen (CONTROLPLANE.md, scripts/schaduw.js). Zodra de getallen
+     hieronder een ronde lang stabiel zijn, hoort er per as een grens in
+     A11Y-INGELOGD.json te komen en hoort deze ronde mee te tellen in `fouten`.
+     Tot die tijd staat er in de slotregel hoeveel zij vond, zodat niemand de
+     nul van de andere rondes voor een schoon huis aanziet.
+
+     DE SCHERMEN WORDEN AFGELEID EN NIET OPGESOMD. Een lijst met de hand
+     bijgehouden loopt binnen een jaar uit de code (LAT.md regel 9), en juist bij
+     deze drie assen is de vraag "welk scherm kan dit raken" mechanisch te
+     beantwoorden: draagt het scherm een eigen palet EN laadt het seizoen.js,
+     laadt het rosthema.css, draagt het viewport-fit=cover. */
+  const blind = { dagdeel: 0, ros: 0, inzet: 0, gemist: [] };
+  {
+    const fsx = require('fs');
+    const px = require('path');
+    const wortel = px.join(__dirname, '..', 'public');
+    const leesbaar = (pad) => { try { return fsx.readFileSync(px.join(wortel, pad.replace(/^\//, '')), 'utf8'); } catch (e) { return ''; } };
+
+    /* de dagdeel-as: een eigen :root-palet EN seizoen.js, want zonder dat
+       tweede krijgt het scherm nooit een data-dagdeel om over te botsen */
+    const seiz = leesbaar('/shared/seizoen.css');
+    const seizToken = new Set();
+    for (const m of seiz.matchAll(/:root\[data-dagdeel[^{]*\{([^}]*)\}/g))
+      for (const t of m[1].matchAll(/(--[a-z0-9-]+)\s*:/g)) seizToken.add(t[1]);
+    const dagdeelPaginas = PAGINAS.filter((pad) => {
+      const h = leesbaar(pad);
+      if (!/seizoen\.js/.test(h) || !/seizoen\.css/.test(h)) return false;
+      const stijl = [...h.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/gi)].map((m) => m[1]).join('\n');
+      const roots = [...stijl.matchAll(/:root\s*\{([^}]*)\}/g)].map((m) => m[1]).join('\n');
+      return [...roots.matchAll(/(--[a-z0-9-]+)\s*:/g)].some((m) => seizToken.has(m[1]));
+    });
+    const rosPaginas = PAGINAS.filter((pad) => /rosthema\.css/.test(leesbaar(pad)));
+    const inzetPaginas = PAGINAS.filter((pad) => /viewport-fit=cover/.test(leesbaar(pad)));
+
+    const assen = [
+      { naam: 'dagdeel', paginas: dagdeelPaginas, standen: ['ochtend', 'avond'] },
+      { naam: 'ros', paginas: rosPaginas, standen: ['parelmoer', 'standaard'] },
+      { naam: 'inzet', paginas: inzetPaginas, standen: ['notch'] },
+    ];
+    console.log(`\n[a11y] ===== ronde BLINDE ASSEN (meldt, velt niet) =====`);
+    for (const as of assen) {
+      if (!as.paginas.length) { console.log(`[a11y] as ${as.naam}: geen scherm raakt deze as`); continue; }
+      for (const stand of as.standen) {
+        const ctx = await browser.newContext({
+          viewport: { width: 390, height: 844 }, serviceWorkers: 'block',
+        });
+        await ctx.addInitScript((o) => {
+          try {
+            localStorage.setItem('rtg_member_token', o.t);
+            localStorage.setItem('rtg_cookieinfo_v1', '1');
+            if (o.as === 'ros') localStorage.setItem('rtg_ros_thema', o.stand);
+          } catch (e) {}
+        }, { t: lid.token, as: as.naam, stand });
+        const pg = await ctx.newPage();
+        if (as.naam === 'inzet') {
+          /* de veilige zone bestaat alleen als je hem OPLEGT; zonder deze regel
+             is elke inset nul en meet deze as niets */
+          try {
+            const cdp = await ctx.newCDPSession(pg);
+            await cdp.send('Emulation.setSafeAreaInsetsOverride',
+              { insets: { top: 59, bottom: 34, left: 0, right: 0 } });
+          } catch (e) {
+            console.log('[a11y] as inzet: de inzet kon niet worden opgelegd -- ' + e.message.split('\n')[0]);
+            blind.gemist.push('inzet: ' + e.message.split('\n')[0]);
+            await ctx.close(); continue;
+          }
+        }
+        let n = 0;
+        for (const pad of as.paginas) {
+          const url = basis + pad + (as.naam === 'dagdeel' ? (pad.includes('?') ? '&' : '?') + 'dagdeel=' + stand : '');
+          const misging = await ga(pg, url);
+          if (misging) { blind.gemist.push(`${as.naam}/${stand} ${pad}: ${misging}`); continue; }
+          await pg.waitForTimeout(600);
+          let res;
+          try { res = await hermeet(pg, KEUR, (r) => r.contrast.length); }
+          catch (e) { blind.gemist.push(`${as.naam}/${stand} ${pad}: ${e.message.split('\n')[0]}`); continue; }
+          if (res.contrast.length) {
+            n += res.contrast.length;
+            console.log(`[a11y] ${pad} (${as.naam}=${stand}): ${res.contrast.length} contrastfout(en)`);
+            for (const w of res.contrast.slice(0, 3)) console.log(`  · ${w}`);
+          }
+        }
+        blind[as.naam] += n;
+        console.log(`[a11y] as ${as.naam}=${stand}: ${as.paginas.length} scherm(en), ${n} contrastfout(en)`);
+        await ctx.close();
+      }
+    }
+    console.log(`[a11y] blinde assen samen: dagdeel ${blind.dagdeel}, ros ${blind.ros}, inzet ${blind.inzet}`
+      + (blind.gemist.length ? `, ${blind.gemist.length} niet gemeten` : ''));
+  }
+
   await browser.close();
   server.stop();
 
@@ -870,6 +1000,9 @@ function startEchteServer() {
      het dat niet meer, en stond er een getal boven deze regel dat hem tegensprak.
      Een samenvatting die een ander getal noemt dan de meting eronder, is erger
      dan geen samenvatting: hij is precies wat mensen overnemen. */
+  console.log(`[a11y] SCHADUW (meldt, velt niet): dagdeel ${blind.dagdeel}, ros ${blind.ros}, inzet ${blind.inzet}`
+    + (blind.gemist.length ? `, ${blind.gemist.length} niet gemeten` : '')
+    + ` -- zolang hier geen grens in A11Y-INGELOGD.json staat, telt deze ronde niet mee in het oordeel.`);
   console.log(`\n[a11y] ${PAGINAS.length} schermen, uitgelogd EN ingelogd. Structuur nul in beide staten; ` +
     `contrast uitgelogd ${uitgelogd.contr} (grens ${grens.uitgelogd.contrast}), ` +
     `ingelogd ${ingelogd.contr} (grens ${grens.ingelogd.contrast}). ` +

@@ -9,8 +9,8 @@
     "testbestanden": 1519,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 28,
-    "e2eBestanden": 206,
-    "keuringOmvang": 320,
+    "e2eBestanden": 204,
+    "keuringOmvang": 322,
     "keuringDubbeling": 179,
     "keuringDekkingAdvies": 52,
     "endpointsNooitAangeraakt": 0,
@@ -21,7 +21,7 @@
     "keuringTeGroot": 14,
     "inlineStijlAttributen": 4684,
     "browserpoortToetsen": 325,
-    "kernBreedte": 1556,
+    "kernBreedte": 1557,
     "kernGedeeld": 231,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -1812,6 +1812,24 @@
       "vervalt": "2026-12-01",
       "meter": "bewijsAchterstand 2291 -> 2292",
       "reden": "De post rollback-gezakt staat op 2 en de norm was gezet toen hij op 1 stond. Dat is GEEN verslechtering van de code: deze tak repareerde drie routes die na een 404 leeg meubilair achterlieten (zorg/afspraak-zet, supplier/overschot, werkvloer/bedieningskaart) en de verse staatproefronde op e1ff91de zet alle drie op `bewezen`. De teller blijft op 2 doordat er twee ANDERE bovenkwamen, op andere collecties: member/spel-antwoord (spellen) en residentie/spel-antwoord (residentie). WAAROM DE TELLER NIET ZAKT ALS JE REPAREERT. De staatproef meldt per COLLECTIE de route die haar als eerste aanraakt. Repareer je die route, dan verschijnt de volgende collectie met hetzelfde gebrek. De teller zegt dus hoeveel er deze ronde bovenkwamen, niet hoeveel routes het gebrek hebben -- precies wat BEWIJSSCHULD.json bij deze post al vermoedde met 'een bevinding die verhuist is zelf een bevinding over de meting'. Vijf verschillende routes over vijf collecties in drie ronden. Aflossen doe je dus NIET route voor route -- dat is een loopband van twee per ronde -- maar aan de klasse: het idioom `if (!db.data.X) db.data.X = {}` in een LEESPAD. Voor de domeinen die kern/eigencollectie.js gebruiken bestaat het gereedschap al en heet het `kijk()` (lezen zonder scheppen); die omzetting is greppbaar en toetsbaar. Voor de domeinen die db.data rechtstreeks raken is het handwerk per module, zoals in kern/zorgketen/index.js. Dat is een besluit van de eigenaar over reikwijdte en niet iets om onder een norm door te schuiven; tot dat besluit staat de schuld hier met een einddatum."
+    },
+    {
+      "datum": "2026-09-06",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 320,
+      "vervalt": "2026-12-01",
+      "meter": "keuringOmvang 320 -> 322",
+      "reden": "De schaduwmeting van de kantoordeur brengt twee bestanden mee die vlak onder de 10 kB-grens zitten: server/kern/kantoor/mensdeur.js en test/mensdeur.test.js. Dat is groei door TOEVOEGEN en niet door iets te laten verslechteren -- precies het geval dat bij deze meter al eerder is uitgeschreven ('ontstaan door bestanden toe te voegen'). De omvang zit in de koppen, en die dragen hier de reden waarom de meting een TELLER is en geen journaal (KANTOOR.md par. 11.3); die weghalen om een getal te halen maakt de code slechter. Sluitweg: wie de kop wil verkorten, splitst de teller van de uitslag -- niet de uitleg van de code."
+    },
+    {
+      "datum": "2026-09-06",
+      "soort": "schuld",
+      "sleutel": "kernBreedte",
+      "van": 1556,
+      "vervalt": "2026-12-01",
+      "meter": "kernBreedte 1556 -> 1557",
+      "reden": "Een naam erbij in de kern-tas: `mensdeurStand`, de LEESweg van de schaduwmeting, nodig omdat server/routes/office/mensdeur.js hem opvraagt. De domeingrens hield hem terecht tegen tot hij in GRENZEN.json bij `office` stond. Een leesfunctie die een bestaand domein opvraagt is de goedkoopste vorm die er is: geen nieuwe collectie, geen tweede rechtenmodel. Sluitweg: hij verdwijnt weer zodra de schaduwfase voorbij is en de meting in de reguliere kantoorstand opgaat (KANTOOR.md par. 14, blok 1)."
     }
   ],
   "prestatie": {

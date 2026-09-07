@@ -687,8 +687,18 @@ body.rtg-stijl [role="button"].hoofd{
    rij onder de kop, rechts uitgelijnd zoals hij in de kopbalk stond. Zo verhuist
    de knop waar het uitmaakt en verandert er op een bureau niets aan de
    leesvolgorde. */
+/* DE RECHTERKANT LEEST DE RECHTERINZET. Hieronder stond zes keer een
+   drie-waardige `padding`-shorthand met de LINKER-inzet als middelste waarde --
+   en die middelste waarde geldt voor links EN rechts. In staande stand zijn
+   allebei de inzetten nul en valt er niets te zien; draai je de telefoon met de
+   inkeping naar rechts, dan is de rechterinzet 47px terwijl deze regels 16px
+   aanhielden. Gemeten op /apps/notities.html en /apps/bestanden.html bij
+   844x390 met inzet rechts 47: de laatste knop van de duimbalk eindigde 16px
+   van de rand, dus 31px onder de inkeping. `.ios-nav-rij` in ditzelfde bestand
+   deed het al goed (padding-right 47px) -- de fout zat in de shorthand en niet
+   in het idee. Vier waarden dus: boven, rechts, onder, links. */
 .rtg-duimbalk{ display:flex; gap:.5rem; justify-content:flex-end;
-  padding:0 max(1rem, env(safe-area-inset-left,0px)) .6rem; }
+  padding:0 max(1rem, env(safe-area-inset-right,0px)) .6rem max(1rem, env(safe-area-inset-left,0px)); }
 @media(max-width:760px){
   .rtg-duimbalk{
     position:fixed; left:0; right:0; bottom:0; z-index:60;
@@ -696,8 +706,9 @@ body.rtg-stijl [role="button"].hoofd{
        vrijhoudt (shared/ios.css). Zonder die marge legt deze balk zich over dat
        streepje heen -- gemeten op /apps/notities.html. Schermen zonder de schil
        kennen de variabele niet en vallen terug op de veilige zone alleen. */
-    padding:.7rem max(1rem, env(safe-area-inset-left,0px))
-            calc(var(--ios-thuis-ruimte, env(safe-area-inset-bottom,0px)) + .7rem);
+    padding:.7rem max(1rem, env(safe-area-inset-right,0px))
+            calc(var(--ios-thuis-ruimte, env(safe-area-inset-bottom,0px)) + .7rem)
+            max(1rem, env(safe-area-inset-left,0px));
     background:color-mix(in srgb, var(--rtg-bg) 92%, transparent);
     backdrop-filter:blur(10px);
     border-top:1px solid var(--rtg-line);

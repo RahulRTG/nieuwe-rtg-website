@@ -120,6 +120,18 @@ const REGISTERS = [
      commits achter, en gemeten op een vuile boom. Precies het gat waar dit
      instrument voor bestaat, en het stond er zelf niet in. */
   ['BEWIJSSCHULD.json', 'node scripts/bewijsschuld.js --vastleggen', 'wat er nog niet gemeten is, en waarom niet'],
+  /* DE KANTOORMACHT (blok 0 van KANTOORMACHT.md). Hij telt of er een MENS achter
+     een kantoorhandeling staat, en dat is inhoudelijk een beveiligingsvraag --
+     toch staat hij hier als MELDING en niet als poort, om de reden die in de kop
+     van dit bestand staat: hij verandert bij elke nieuwe kantoorroute, en een
+     register dat vaak beweegt maakt van een poort een sirene die iedereen uitzet.
+     Wat hem vandaag tegenhoudt is zijn EIGEN tand (npm run kantoormacht:controle,
+     via test/kantoormacht.test.js): het aantal anoniem uitvoerbare routes mag
+     alleen dalen. Die tand bijt op de INHOUD en niet op de ouderdom.
+     Hij hoort BEVEILIGING te worden zodra de mens-eis werkelijk wordt afgedwongen
+     (KANTOOR.md par. 14, blok 1) -- vanaf dat moment is een verouderd getal wel
+     een uitspraak over wie er binnenkomt. Dat is een besluit en geen automatisme. */
+  ['KANTOORMACHT.json', 'npm run kantoormacht:vast', 'of er een mens achter een kantoorhandeling staat'],
   /* DE SCHADUWPROEF VAN DE ISOLATIEPOORT. Hij hoort hier omdat hij het enige is
      dat zegt wat die poort ZOU doen -- en dat getal veroudert sneller dan de
      meeste: elke nieuwe route in de member-allowlist verandert het, zonder dat
@@ -238,6 +250,13 @@ const REGISTERS = [
   ['DOORWERKING.json', 'npm run doorwerking:vast', 'of een gegeven dat een keer is opgegeven doorwerkt, met doel en actualiteit'],
   ['RITMIGRATIE.json', 'npm run ritmigratie:vast', 'welke lezers van db.data.rides wanneer naar de opdrachtwereld kunnen'],
   ['CODEWERELD.json', 'node scripts/codewereld.js --vastleggen', 'wat de registers samen over deze code beweren'],
+  /* Het tekstoppervlak veroudert bij elke merge die schermen meebrengt, en
+     dat is precies wat er op 7 september gebeurde: main bracht twaalf
+     schermen mee, het register bleef op 24.110 staan en keuringsregel 68
+     meldde de +290 alleen in de schaduw. Wie hier niet kijkt, ratelt tegen
+     een verouderde basislijn. */
+  ['TEKSTOPPERVLAK.json', 'npm run tekstoppervlak', 'waar gebruikerszichtbare tekst ontstaat, en de basislijn van keuringsregel 68'],
+  ['APPWERKT.json', 'npm run appwerkt', 'welke apps werkelijk werken, en de defecten die de meter vond'],
   ['AANROEPGRAAF.json', 'node scripts/aanroepgraaf.js --vastleggen', 'wie wie aanroept in server/ en scripts/'],
   ['KERNHERKOMST.json', 'node scripts/kernherkomst.js --vastleggen', 'waar een kernnaam vandaan komt en wie hem doorgeeft'],
   ['SYMBOLEN.json', 'node scripts/symbolen.js --vastleggen', 'welke functies waar wonen'],

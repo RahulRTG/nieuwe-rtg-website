@@ -87,7 +87,7 @@ html[data-rtg-oppervlak="1"] body[data-kantoor-tool]>main{width:100%;padding-bot
   body[data-kantoor-tool]>header>.rij{width:100%;margin-left:2.7rem!important;}
   body[data-kantoor-tool]>main{padding:.72rem .62rem 3rem;}
   .kantoor-intro{margin-bottom:.75rem;padding:.82rem;}.kantoor-intro p{font-size:.75rem;}
-  body[data-kantoor-tool] .rahulbalk{display:grid;grid-template-columns:1fr auto;}
+  body[data-kantoor-tool] .rahulbalk{display:grid;grid-template-columns:minmax(0,1fr) auto;}
   body[data-kantoor-tool] .stuur{gap:.28rem;}
   body[data-kantoor-tool] .stuur h2{order:-1;width:100%;font-size:1.15rem;}
   body[data-kantoor-tool="agenda"] .mdag{min-height:4.25rem;padding:.2rem .14rem;}

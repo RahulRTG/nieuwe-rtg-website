@@ -130,7 +130,18 @@ const REGISTER = {
      van dit bestand is daar duidelijk over: een gok hoort hier niet in, want
      dan daalt het getal doordat er regels bijkomen in plaats van ratels. */
   'DOODSPOOR.json': { eigenRatel: 'test/doodspoor.test.js' },
+  /* De kantoormacht (KANTOOR.md par. 1, blok 0 van KANTOORMACHT.md). Toets 6
+     van dat bestand vergelijkt het vastgelegde register met een VERSE meting en
+     zakt zodra `anoniemUitvoerbaar` stijgt -- de normtandvorm uit PROOF.md:
+     schuld mag alleen krimpen. Die toets is zien zakken, dus deze regel is geen
+     bewering (zie de kop over de helft die mensenwerk blijft). */
+  'KANTOORMACHT.json': { eigenRatel: 'test/kantoormacht.test.js' },
   'TAFELPROEF.json': { eigenRatel: 'test/tafelproef.test.js' },
+  /* Het tekstoppervlak hangt aan keuringsregel 68 en niet aan een toets: die
+     regel IS de ratel (twee harde tanden, een schaduw) en hij moet elke PR
+     tegenhouden, dus hij woont in de keuring die CI draait. Hij noemt het
+     register bij naam en vergelijkt de verse meting ertegen. */
+  'TEKSTOPPERVLAK.json': { eigenRatel: 'scripts/check.js' },
   'RITPROEF.json': { eigenRatel: 'test/ritproef.test.js' },
   'TOELATINGSPROEF.json': { eigenRatel: 'test/toelatingsproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },

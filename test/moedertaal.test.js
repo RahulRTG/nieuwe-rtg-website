@@ -55,8 +55,20 @@ test('2. het hele UI-woordenboek in een keer naar de moedertaal (demo: werkvloer
   assert.equal(r.body.naar, 'es');
   assert.match(r.body.teksten[0], /Tareas/i, 'Tasks wordt tareas');
   assert.match(r.body.teksten[1], /Horario/i, 'Schedule wordt horario');
-  assert.match(r.body.teksten[2], /pedido/i, 'de bon-taal doet mee (order -> pedido)');
-  assert.match(r.body.teksten[3], /hoy/i, 'en de Nederlandse bron ook (vandaag -> hoy)');
+  /* EEN LABEL VAN TWEE WOORDEN IS EEN BOODSCHAP, GEEN SOM VAN WOORDEN.
+
+     Hier stond dat 'New order' /pedido/ oplevert en 'Taken vandaag' /hoy/.
+     Dat ontstond door de losse woorden achter elkaar te plakken. In het Spaans
+     valt dat toevallig goed uit; in een taal met een andere woordvolgorde niet,
+     en dan levert dezelfde code onzin die er vertaald uitziet.
+
+     Het woordenboek is op WOORD gesleuteld, dus het kent deze labels niet als
+     boodschap en laat ze staan. Dat is de eerlijke uitkomst en tegelijk de maat
+     van het werk dat nog ligt: deze labels horen in een berichtencatalogus met
+     'new order' als hele sleutel. Zodra die er is, hoort deze toets weer een
+     Spaanse uitkomst te eisen. */
+  assert.equal(r.body.teksten[2], 'New order', 'een label van twee woorden wordt niet samengesteld');
+  assert.equal(r.body.teksten[3], 'Taken vandaag', 'ook niet vanuit het Nederlands');
 });
 
 test('3. de bonnen en taken (losse regels) vertalen mee naar het Spaans', async () => {
@@ -64,7 +76,12 @@ test('3. de bonnen en taken (losse regels) vertalen mee naar het Spaans', async 
   assert.equal(r.status, 200);
   assert.match(r.body.teksten[0], /Café/i, 'koffie op de bon wordt café');
   assert.match(r.body.teksten[1], /Vino/i, 'wijn wordt vino');
-  assert.match(r.body.teksten[2], /Habitación limpiar|limpiar/i, 'de taak leest als Spaans');
+  /* De oude assertie liet /Habitación limpiar/ door en dat is precies het
+     probleem: dat is "kamer schoonmaken" in NEDERLANDSE woordvolgorde, geen
+     Spaans (dat zou "Limpiar la habitación" zijn). De toets legde de fout vast
+     in plaats van hem te vangen. Een taak van twee woorden hoort als hele
+     boodschap in de catalogus; tot die er is blijft hij staan. */
+  assert.equal(r.body.teksten[2], 'Kamer schoonmaken', 'een taak van twee woorden wordt niet samengesteld');
 });
 
 test('4. Engels blijft gewoon werken via dezelfde weg (de bestaande terugval)', async () => {

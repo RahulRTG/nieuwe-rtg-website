@@ -120,6 +120,10 @@ const SLEUTELS = {
     waarom: 'de route weigert de tweede correctie zelf met een 409 die zegt wat er al is gebeurd; ' +
       'de poort die tik laten opslikken zou die mededeling wegnemen bij precies de mens die hem nodig heeft' },
   'POST /api/office/handelingen': { leest: true },
+  /* De schaduwmeting van de kantoordeur (KANTOOR.md par. 3). Leest de stand op;
+     de TELLING gebeurt in officeAuth op res.on('finish') en niet in deze
+     handler, dus twee keer opvragen verandert niets aan wat er geteld is. */
+  'POST /api/office/mensdeur': { leest: true },
   'POST /api/ik/workspace': { leest: true },
   'POST /api/ik/workspace/audit': { leest: true }
 };

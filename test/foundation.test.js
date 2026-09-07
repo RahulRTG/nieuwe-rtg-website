@@ -750,9 +750,22 @@ test('automatisch vertalen: bericht komt in de taal van de lezer, beide kanten o
   const nl2en = await json(await (await fetch(BASE + '/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: 'Snackbar dicht, telefoon uit, ik ben even niemands baas.', to: 'en' }) })));
   assert.equal(nl2en.translated, true);
   assert.match(nl2en.text, /Snack bar closed/);
+  /* EN TERUG: EEN ZIN IS GEEN WOORDENBOEKINGANG.
+     Hier stond dat 'hello, thanks for the message' vertaald terugkomt met
+     /hallo|bedankt/. Dat werkte door woord-voor-woord te vervangen, wat een
+     Engelse zin met wat Nederlandse woorden opleverde en zich `translated:true`
+     noemde. Zonder model komt de zin nu heel terug; een los woord dat WEL een
+     ingang is, vertaalt nog steeds. Zie server/translate.js, volledigeBoodschap. */
   const en2nl = await json(await (await fetch(BASE + '/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: 'hello, thanks for the message', to: 'nl' }) })));
-  assert.equal(en2nl.translated, true);
-  assert.match(en2nl.text, /hallo|bedankt/);
+  assert.equal(en2nl.translated, false, 'een zin die het woordenboek niet heelt dekt, blijft staan');
+  assert.equal(en2nl.text, 'hello, thanks for the message', 'en blijft ongeschonden');
+  /* De brontaal staat er expliciet bij: detect() herkent EEN los woord niet
+     (hij scoort op stopwoorden mét spaties), dus zonder `from` zou 'hello' als
+     Nederlands gelden en is er niets te vertalen. Dat is bestaand gedrag van de
+     herkenning en staat los van de volledige-boodschapregel. */
+  const losWoord = await json(await (await fetch(BASE + '/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: 'hello', to: 'nl', from: 'en' }) })));
+  assert.equal(losWoord.translated, true, 'een boodschap die zelf een ingang is, vertaalt wel');
+  assert.match(losWoord.text, /hallo/i);
   // al in de doeltaal: niets te vertalen
   const zelfde = await json(await (await fetch(BASE + '/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: 'hello there', to: 'en' }) })));
   assert.equal(zelfde.translated, false);

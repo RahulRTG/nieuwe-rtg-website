@@ -109,14 +109,24 @@ test('5. de vriendenchat: B typt Nederlands, A (moedertaal Engels) leest Engels;
   await api(base, '/api/member/connect/respond', { key: keyA, action: 'accept' }, lidB);
   const stuur = await api(base, '/api/member/dm/send', { toKey: keyA, text: 'proost met wijn en koffie erbij' }, lidB);
   assert.equal(stuur.status, 200);
-  // A heeft moedertaal Engels (test 4): het bericht komt vertaald binnen
+  /* WAT A LEEST ZONDER MODELSERVER: HET ORIGINEEL, HEEL.
+
+     Hier stond dat A /wine/ en /coffee/ te zien krijgt. Dat klopte letterlijk
+     en het was geen vertaling: A kreeg "proost met wine en coffee erbij" --
+     de Nederlandse zin van zijn vriend met twee woorden omgewisseld, met een
+     etiket erop dat zei dat het uit het Nederlands vertaald was.
+
+     Een bericht van een mens aan een mens is precies waar dat het duurst is.
+     Zonder modelserver (LOCAL_AI_URL) vertaalt RTG deze zin niet, en zegt dat
+     ook: de zin blijft heel en draagt geen vertaalstempel. Met een model komt
+     hier de echte Engelse zin te staan. */
   const bijA = await api(base, '/api/member/dm', { withKey: keyB }, lidA);
   assert.equal(bijA.status, 200);
   const m = bijA.body.messages.find(x => x.from === keyB);
   assert.ok(m, 'het bericht is er');
-  assert.match(m.text, /wine/i, 'wijn is wine geworden');
-  assert.match(m.text, /coffee/i, 'koffie is coffee geworden');
-  assert.equal(m.vertaaldUit, 'nl', 'en het draagt zijn brontaal');
+  assert.equal(m.text, 'proost met wijn en koffie erbij', 'zonder model blijft de zin van de schrijver heel');
+  assert.ok(!/\bwine\b/i.test(m.text) || !/\bwijn\b/i.test(m.text),
+    'nooit half: niet de ene helft Engels en de andere Nederlands');
   // B (geen moedertaal gezet) leest zijn eigen woorden onvertaald
   const bijB = await api(base, '/api/member/dm', { withKey: keyA }, lidB);
   assert.match(bijB.body.messages.find(x => x.from === keyB).text, /wijn/, 'de schrijver ziet zijn eigen taal');

@@ -10,22 +10,21 @@
   "NIET_GETEST": "deze ronde niet aangeraakt, met de reden erbij"
  },
  "stempel": {
-  "op": "2026-09-07T11:38:52.976Z",
-  "commit": "feb6ea97",
-  "boomVuil": true,
-  "boomAnders": 11,
+  "op": "2026-09-07T11:59:06.040Z",
+  "commit": "783ebf1d",
+  "boomVuil": false,
+  "boomAnders": 0,
   "instrument": "scripts/appwerkt.js",
   "node": "v22.22.2"
  },
  "sessiesOvergeslagen": [],
  "gemeten": {
   "onderdelen": 102,
-  "defecten": 1,
+  "defecten": 0,
   "deurenZonderPersona": 2
  },
  "telling": {
-  "GEEN_FIXTURE": 101,
-  "GEBLOKKEERD_DOOR_DEFECT": 1
+  "GEEN_FIXTURE": 102
  },
  "perBewijs": {
   "bereikbaar": {
@@ -33,13 +32,11 @@
    "NIET_GETEST": 15
   },
   "bedienbaar": {
-   "BEWEZEN": 85,
-   "NIET_GETEST": 16,
-   "GEBLOKKEERD_DOOR_DEFECT": 1
+   "BEWEZEN": 87,
+   "NIET_GETEST": 15
   },
   "menselijk": {
-   "NIET_GETEST": 101,
-   "GEBLOKKEERD_DOOR_DEFECT": 1
+   "NIET_GETEST": 102
   },
   "voltooibaar": {
    "GEEN_FIXTURE": 102
@@ -57,14 +54,7 @@
    "GEEN_FIXTURE": 102
   }
  },
- "defecten": [
-  {
-   "app": "Fonds",
-   "wereld": "LivingOS",
-   "ingang": "/apps/geld.html#labfonds",
-   "reden": "JS: Cannot set properties of null (setting 'innerHTML')"
-  }
- ],
+ "defecten": [],
  "deurenZonderPersona": [
   {
    "app": "Het bord",
@@ -600,7 +590,7 @@
    "geklikt": 9,
    "overgeslagen": [],
    "waarnemingen": [
-    "als gezin: 1616 tekens zichtbaar"
+    "als gezin: 1615 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -1272,7 +1262,7 @@
    "geklikt": 3,
    "overgeslagen": [],
    "waarnemingen": [
-    "als lid: 1901 tekens zichtbaar"
+    "als lid: 2719 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -2507,13 +2497,13 @@
      "bewijs": "/apps/geld.html"
     },
     "bedienbaar": {
-     "status": "GEBLOKKEERD_DOOR_DEFECT",
-     "reden": "JS: Cannot set properties of null (setting 'innerHTML')",
-     "bewijs": "JS: Cannot set properties of null (setting 'innerHTML')"
+     "status": "BEWEZEN",
+     "reden": "12 knoppen aangetikt zonder fout",
+     "bewijs": null
     },
     "menselijk": {
-     "status": "GEBLOKKEERD_DOOR_DEFECT",
-     "reden": "een kale JS-fout of 500 bereikt de gebruiker: JS: Cannot set properties of null (setting 'innerHTML')",
+     "status": "NIET_GETEST",
+     "reden": "afgeleid: geen kale fout gezien. Of een foutMELDING bruikbaar is, beoordeelt deze proef niet -- dat vraagt de storingen uit bewijs 7",
      "bewijs": null
     },
     "voltooibaar": {
@@ -2561,7 +2551,7 @@
     "status": "NIET_GETEST",
     "reden": "welke externe dienst deze functie nodig heeft, staat nergens per functie vastgelegd"
    },
-   "status": "GEBLOKKEERD_DOOR_DEFECT"
+   "status": "GEEN_FIXTURE"
   },
   {
    "app": "Food Court",
@@ -2777,8 +2767,8 @@
      "bewijs": "/apps/geld-command.html"
     },
     "bedienbaar": {
-     "status": "NIET_GETEST",
-     "reden": "geen zichtbare knop zonder bestemming gevonden; wat dit scherm doet, loopt via links of formulieren",
+     "status": "BEWEZEN",
+     "reden": "1 knoppen aangetikt zonder fout",
      "bewijs": null
     },
     "menselijk": {
@@ -2812,8 +2802,10 @@
      "bewijs": null
     }
    },
-   "geklikt": 0,
-   "overgeslagen": [],
+   "geklikt": 1,
+   "overgeslagen": [
+    "Wie betaalt wat"
+   ],
    "waarnemingen": [
     "als lid: 127 tekens zichtbaar"
    ],
@@ -2947,7 +2939,7 @@
    "geklikt": 11,
    "overgeslagen": [],
    "waarnemingen": [
-    "als lid: 2842 tekens zichtbaar"
+    "als lid: 2910 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -3314,7 +3306,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "9 knoppen aangetikt zonder fout",
+     "reden": "12 knoppen aangetikt zonder fout",
      "bewijs": null
     },
     "menselijk": {
@@ -3348,7 +3340,7 @@
      "bewijs": null
     }
    },
-   "geklikt": 9,
+   "geklikt": 12,
    "overgeslagen": [
     "Wie betaalt wat"
    ],
@@ -3491,7 +3483,7 @@
     "□\nBestellen"
    ],
    "waarnemingen": [
-    "als lid: 1761 tekens zichtbaar"
+    "als lid: 1829 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -4027,7 +4019,7 @@
    "geklikt": 1,
    "overgeslagen": [],
    "waarnemingen": [
-    "als lid: 1865 tekens zichtbaar"
+    "als lid: 2634 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -4762,7 +4754,7 @@
    "geklikt": 7,
    "overgeslagen": [],
    "waarnemingen": [
-    "als lid: 1280 tekens zichtbaar"
+    "als lid: 1325 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -4829,7 +4821,7 @@
    "geklikt": 1,
    "overgeslagen": [],
    "waarnemingen": [
-    "als lid: 1575 tekens zichtbaar"
+    "als lid: 1620 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -5229,7 +5221,7 @@
    "geklikt": 2,
    "overgeslagen": [],
    "waarnemingen": [
-    "als lid: 1839 tekens zichtbaar"
+    "als lid: 1817 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -5763,7 +5755,7 @@
    "geklikt": 2,
    "overgeslagen": [],
    "waarnemingen": [
-    "als lid: 1545 tekens zichtbaar"
+    "als lid: 1554 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -6297,7 +6289,7 @@
    "geklikt": 7,
    "overgeslagen": [],
    "waarnemingen": [
-    "als lid: 3446 tekens zichtbaar"
+    "als lid: 4331 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -6431,7 +6423,7 @@
    "geklikt": 9,
    "overgeslagen": [],
    "waarnemingen": [
-    "als lid: 2921 tekens zichtbaar"
+    "als lid: 2966 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -6632,7 +6624,7 @@
    "geklikt": 2,
    "overgeslagen": [],
    "waarnemingen": [
-    "als lid: 1917 tekens zichtbaar"
+    "als lid: 1962 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",

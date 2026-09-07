@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-07T19:51:04.632Z",
-    "commit": "e52b38714",
+    "op": "2026-09-07T19:54:48.450Z",
+    "commit": "3bf8c1626",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6733,6 +6733,21 @@
       "operator": "&&->||#6",
       "gezakt": 1,
       "geprobeerd": 16
+    },
+    "storingen-bezorging.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/storingen/protocol.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 6
+    },
+    "storingen-webhook.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "streng-poorten.test.js": {
       "soort": "server",

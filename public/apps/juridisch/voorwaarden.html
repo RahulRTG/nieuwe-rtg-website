@@ -26,6 +26,8 @@
   body[data-rtg-eigenvlak]{
     --white:#0C0C0B; --panel:#151312; --panel2:#1B1817; --black:#F4F1EC; --burgundy:#C23A5E; --gold:#A98F1C;
     --line:var(--rtg-line); --grey:rgba(244,241,236,0.72); --grey-soft:rgba(244,241,236,0.50);
+    --legal-ground:#0C0C0B; --legal-ink:#F4F1EC;
+    --legal-muted:rgba(244,241,236,0.78); --legal-soft:rgba(244,241,236,0.64); --legal-line:rgba(244,241,236,0.18);
   }
   *{margin:0;padding:0;box-sizing:border-box;}
   /* body.rtg-stijl en niet body: de gedeelde UI-kit zet `body.rtg-stijl` en die
@@ -45,23 +47,23 @@
      lichte pagina -- de cookiemelding kwam zo op 1,03:1 terecht, onzichtbare
      tekst onder een juridisch stuk. Wie zijn eigen grond schildert, hoort ook
      zijn eigen schema te melden. */
-    body.rtg-stijl[data-rtg-eigenvlak]{color-scheme:light;background:var(--white);color:var(--black);font-family:'Inter',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
+    body.rtg-stijl[data-rtg-eigenvlak]{color-scheme:dark;background:var(--legal-ground);color:var(--legal-ink);font-family:'Inter',sans-serif;line-height:1.7;-webkit-font-smoothing:antialiased;}
   a{color:inherit;}
   .wrap{max-width:720px;margin:0 auto;padding:0 clamp(1.5rem,4vw,3rem);}
-  header{padding:2rem 0;border-bottom:1px solid var(--line);background:var(--kap,rgba(12,12,11,0.86));}
+  header{padding:2rem 0;border-bottom:1px solid var(--legal-line);background:rgba(12,12,11,0.96);}
   header .wrap{display:flex;justify-content:space-between;align-items:center;}
-  header a{font-size:0.8rem;color:var(--grey);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;}
+  header a{font-size:0.8rem;color:var(--legal-muted);text-decoration:none;border-bottom:1px solid var(--legal-line);padding-bottom:2px;}
   main{padding:clamp(3rem,7vw,5rem) 0 5rem;}
   .kicker{font-size:0.66rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--leesgoud,var(--rtg-leesgoud,var(--gold-diep,#5E4F05)));font-weight:600;}
   h1{font-family:'Bodoni Moda',serif;font-weight:500;font-size:clamp(2rem,5vw,2.8rem);line-height:1.15;margin:0.8rem 0 0.4rem;}
-  .updated{font-size:0.78rem;color:var(--grey-soft);}
+  .updated{font-size:0.78rem;color:var(--legal-soft);}
   h2{font-family:'Bodoni Moda',serif;font-weight:500;font-size:1.35rem;margin:2.6rem 0 0.7rem;}
-  p,li{font-size:0.95rem;color:var(--grey);}
+  p,li{font-size:0.95rem;color:var(--legal-muted);}
   ul{padding-left:1.2rem;margin:0.6rem 0;}
   li{margin:0.35rem 0;}
-  b{color:var(--black);}
-  footer{border-top:1px solid var(--line);padding:2rem 0;font-size:0.78rem;color:var(--grey-soft);}
-  footer a{text-decoration:none;border-bottom:1px solid var(--line);}
+  b{color:var(--legal-ink);}
+  footer{border-top:1px solid var(--legal-line);padding:2rem 0;font-size:0.78rem;color:var(--legal-soft);}
+  footer a{text-decoration:none;border-bottom:1px solid var(--legal-line);}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">

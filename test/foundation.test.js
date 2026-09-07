@@ -755,7 +755,7 @@ test('automatisch vertalen: bericht komt in de taal van de lezer, beide kanten o
      /hallo|bedankt/. Dat werkte door woord-voor-woord te vervangen, wat een
      Engelse zin met wat Nederlandse woorden opleverde en zich `translated:true`
      noemde. Zonder model komt de zin nu heel terug; een los woord dat WEL een
-     ingang is, vertaalt nog steeds. Zie server/translate.js, volledigeBoodschap. */
+     ingang is, vertaalt nog steeds. Zie server/translate/boodschap.js. */
   const en2nl = await json(await (await fetch(BASE + '/api/translate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: 'hello, thanks for the message', to: 'nl' }) })));
   assert.equal(en2nl.translated, false, 'een zin die het woordenboek niet heelt dekt, blijft staan');
   assert.equal(en2nl.text, 'hello, thanks for the message', 'en blijft ongeschonden');

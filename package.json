@@ -64,6 +64,7 @@
     "keuring": "node scripts/keuring.js",
     "nood": "node server/nood.js",
     "check": "node scripts/check.js",
+    "tekstoppervlak": "node scripts/tekstoppervlak.js",
     "delta": "node scripts/deltapoort.js",
     "verval": "node scripts/normverval.js",
     "ast-scan": "node scripts/ast-scan.js",

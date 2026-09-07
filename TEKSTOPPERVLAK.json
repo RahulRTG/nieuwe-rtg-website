@@ -1,0 +1,104 @@
+{
+  "gemetenOp": "2026-09-07",
+  "bestanden": {
+    "html": 293,
+    "clientJs": 495,
+    "serverJs": 3271,
+    "bundelsGeteldDelenOvergeslagen": 62
+  },
+  "totaal": {
+    "uniekeTeksten": 23823,
+    "woorden": 155023,
+    "opMeerDanEenOppervlak": 1015
+  },
+  "perOppervlak": {
+    "html": {
+      "unieke": 8353,
+      "voorkomens": 11717,
+      "parsefouten": 0
+    },
+    "client": {
+      "unieke": 4704,
+      "voorkomens": 6060,
+      "parsefouten": 0
+    },
+    "server": {
+      "unieke": 11926,
+      "voorkomens": 14910,
+      "parsefouten": 0
+    }
+  },
+  "perVorm": {
+    "html-tekst": 6065,
+    "eigenschap:error": 5315,
+    "T()": 3469,
+    "eigenschap:naam": 2200,
+    "eigenschap:label": 960,
+    "eigenschap:uitleg": 845,
+    "eigenschap:wat": 794,
+    "html-attribuut:aria-label": 726,
+    "eigenschap:tekst": 640,
+    "html-attribuut:placeholder": 578,
+    "melder:meld": 567,
+    "toewijzing:textContent": 516,
+    "eigenschap:reden": 397,
+    "eigenschap:titel": 362,
+    "eigenschap:waarom": 345,
+    "html-titel": 290,
+    "toewijzing:innerHTML": 267,
+    "eigenschap:les": 168,
+    "eigenschap:vraag": 167,
+    "melder:prompt": 139,
+    "eigenschap:title": 134,
+    "setAttribute:aria-label": 83,
+    "melder:confirm": 82,
+    "melder:toast": 82,
+    "melder:melding": 59,
+    "html-attribuut:title": 58,
+    "melder:logActivity": 48,
+    "eigenschap:missie": 44,
+    "eigenschap:kop": 32,
+    "eigenschap:fout": 31,
+    "eigenschap:text": 26,
+    "melder:alert": 26,
+    "eigenschap:omschrijving": 24,
+    "eigenschap:doe": 24,
+    "eigenschap:antwoord": 24,
+    "eigenschap:body": 22,
+    "eigenschap:hint": 21,
+    "toewijzing:placeholder": 18,
+    "eigenschap:beschrijving": 17,
+    "toewijzing:title": 16,
+    "html-attribuut:data-titel": 15,
+    "eigenschap:placeholder": 12,
+    "eigenschap:onderwerp": 12,
+    "eigenschap:melding": 11,
+    "html-attribuut:alt": 9,
+    "eigenschap:bericht": 6,
+    "toewijzing:value": 5,
+    "melder:notify": 4,
+    "html-meta": 2,
+    "setAttribute:title": 1,
+    "melder:notifySupplier": 1,
+    "melder:sendSms": 1
+  },
+  "vasteLocale": {
+    "aanroepen": 246,
+    "perVorm": {
+      "toLocaleString": 170,
+      "toLocaleDateString": 37,
+      "toLocaleTimeString": 32,
+      "toLocaleUpperCase": 3,
+      "toLocaleLowerCase": 4
+    },
+    "uitleg": "Gebruikerszichtbare taal ZONDER string om te vertalen: een vaste nl-locale in toLocale*/Intl. Een scherm kan 100% gesleuteld zijn en hier alsnog Nederlands tonen. Aparte defectklasse: telt NIET mee in uniekeTeksten."
+  },
+  "tDubbelzinnig": 18,
+  "nietGedekt": [
+    "Tekst die pas bij het draaien ontstaat: samengestelde zinnen, template-literals met een variabele erin, en tekst die uit de database komt. Een statische meter ziet die niet.",
+    "Bevroren tekst: labels die ooit uit een register naar de database zijn gekopieerd en daar blijven staan. Wijzigen aan de bron bereikt een bestaande installatie dan niet.",
+    "De KWALITEIT van welke vertaling dan ook. Deze meter telt plekken; hij beoordeelt geen taal.",
+    "De grens tussen INHOUD en INTERFACE. Lesmateriaal en een productnaam zijn inhoud; een statusnaam en een knop zijn interface. Deze meter telt beide en kiest niet.",
+    "Afgeleide registers (handelingindex.json, sprongindex.json) tellen niet mee: ze zijn gegenereerd uit de schermen en zouden dubbeltelling zijn."
+  ]
+}

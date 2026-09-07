@@ -41,7 +41,14 @@
   /* de chatbalk */
   /* de zaal-balk staat boven de OS-brede stuurbalk (handenvrij, bottom:0) */
   .balk{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(4.4rem + env(safe-area-inset-bottom));z-index:6;display:flex;gap:.4rem;width:min(560px,94vw);background:color-mix(in srgb,var(--rtg-card,#151312) 88%,transparent);border:1px solid var(--line);border-radius:0;padding:.4rem;backdrop-filter:blur(8px);}
-  .balk input{flex:1;background:transparent;border:none;outline:none;color:var(--txt);font:inherit;font-size:.86rem;padding:.35rem .7rem;}
+  /* min-width:0 IS HIER GEEN DETAIL. Een flexkind heeft standaard
+     min-width:auto en kan dus niet krimpen onder zijn eigen intrinsieke
+     breedte. Deze invoer hield daardoor 239px vast en duwde de rest naar
+     rechts: gemeten op 390x844 stond de verzendknop "Zeg" op x354..406, dus
+     16px BUITEN het scherm, en de balk zelf op scrollWidth 393 tegen
+     clientWidth 365. De knop was daarmee half onaanraakbaar en er was geen
+     manier om de zaalchat te versturen. */
+  .balk input{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--txt);font:inherit;font-size:.86rem;padding:.35rem .7rem;}
   .balk button{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:0;padding:.35rem .8rem;font:inherit;font-size:.8rem;cursor:pointer;}
   .balk .zeg{background:var(--gold);border-color:var(--gold);color:#fff;font-weight:600;}
   /* overlays: gids en suite-atelier */

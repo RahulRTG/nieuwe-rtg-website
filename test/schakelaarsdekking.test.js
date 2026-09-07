@@ -151,7 +151,15 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
      De scherpe controle hierboven (`onverklaard <= 10`) is de echte poort en die
      beweegt NIET mee: een route zonder functie EN zonder register blijft
      verboden. */
-  assert.ok(zonder.length <= 139,
+  /* 139 -> 140: de ondertekende storingenontvanger. Ontvangst en herstel
+     moeten bereikbaar blijven wanneer bedrijfsfuncties uitstaan. De route
+     staat met reden in beide bedieningsregisters; platformregister.test.js
+     was groen op 29f8ff1ad voordat deze telling is bijgewerkt. De eigen
+     HMAC-poort blijft verplicht en onverklaard <= 10 verandert niet. */
+  const storingen = zonder.find(r => r.methode === 'POST' && r.pad === '/api/webhooks/storingen');
+  assert.ok(storingen && storingen.bewakers.includes('storingenAuth'),
+    'de extra bedieningsroute moet de HMAC-beveiligde storingenontvanger zijn');
+  assert.ok(zonder.length <= 140,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
     'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
     'te zijn, maar bij deze aantallen is er iets anders aan de hand.');

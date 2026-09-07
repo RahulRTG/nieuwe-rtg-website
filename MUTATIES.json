@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-06T21:13:35.509Z",
-    "commit": "7af55bd",
+    "op": "2026-09-06T22:47:07.020Z",
+    "commit": "4e4495fe",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 5,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -2792,6 +2792,14 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "kantoormacht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/kantoormacht.js",
+      "operator": "getal+1#0",
+      "gezakt": 1,
+      "geprobeerd": 4
+    },
     "kantoorpakket-alle.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3820,6 +3828,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "mensdeur-route.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "mensdeur.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kantoor/mensdeur.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "menselijkebanen.test.js": {
       "soort": "server",

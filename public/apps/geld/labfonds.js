@@ -33,7 +33,7 @@
     var st = d.createElement('style');
     st.id = 'lfStijl';
     st.textContent =
-      '#paneel .lf-som{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;}' +
+      '#paneel .lf-som{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;}' +
       '#paneel .lf-som .c{border:1px solid var(--rtg-line);border-radius:0;padding:.9rem;text-align:center;}' +
       '#paneel .lf-som .n{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rtg-soft);}' +
       '#paneel .lf-som .v{font-family:"Bodoni Moda",serif;font-size:1.25rem;margin-top:.25rem;}' +

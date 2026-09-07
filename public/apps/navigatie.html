@@ -27,9 +27,17 @@
   /* een pijl is smal: hier is de BREEDTE het probleem, niet de hoogte (WCAG 2.5.8) */
   .kop a.terug{color:var(--txt);text-decoration:none;font-size:1.2rem;line-height:1;
     display:inline-flex;align-items:center;justify-content:center;min-width:24px;min-height:24px;}
-  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.2rem;}
+  /* De kop is een flexrij en beide tekstvakken weigerden te krimpen: h1 had geen
+     min-width:0 en de badge stond op nowrap. Gemeten op 390 breed liep #liveBadge
+     van x316 tot 419 -- 29px buiten beeld, en de kop zelf op scrollWidth 419 tegen
+     clientWidth 390. De live-status las daardoor als "MOTOR ACT". Nu krimpen ze
+     allebei en kapt de badge af met een beletselteken, zodat zichtbaar is DAT er
+     meer staat in plaats van dat het stilletjes wegvalt. */
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.2rem;
+    min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .kop .badge{font-size:0.58rem;letter-spacing:0.13em;text-transform:uppercase;color:var(--soft);
-    border:1px solid var(--line);border-radius:0;padding:0.22rem 0.55rem;white-space:nowrap;}
+    border:1px solid var(--line);border-radius:0;padding:0.22rem 0.55rem;white-space:nowrap;
+    min-width:0;overflow:hidden;text-overflow:ellipsis;}
   .kop .rek{flex:1;}
   /* de zoekbalk */
   .zoekwrap{position:fixed;top:calc(env(safe-area-inset-top,0px) + 3.4rem);left:1rem;right:1rem;z-index:6;max-width:640px;margin:0 auto;}

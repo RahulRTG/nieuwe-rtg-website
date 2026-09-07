@@ -6,20 +6,17 @@
       naar de taal van de bezoeker. Werkt volledig offline via een woordenboek.
    2) translate(text, to, from): losse berichten (reacties, DM's) vertalen naar
       de taal van de ontvanger. Gebruikt de echte Claude-API als die beschikbaar
-      is (lokaal of extern), anders het woordenboek en een woord-voor-woord
-      terugval, zodat de functie ook in demo-modus iets zinnigs teruggeeft.
+      is (lokaal of extern), anders een woordenboek dat alleen antwoordt op een
+      bericht dat het HELEMAAL dekt. Is dat er niet, dan komt de brontaal terug
+      met translated:false -- nooit een half vertaalde zin.
    ========================================================================== */
 
-/* De woordenboeken (seed-inhoud en woord-voor-woord terugval) staan als
+/* De woordenboeken (seed-inhoud en volledige-boodschaptabellen) staan als
    pure data in een deelmodule. */
-const { NL2EN, WORDS_NL_EN, WORDS_EN_NL, EN2NL, WORDS_ES } = require('./translate/woordenboek');
-/* De woord-voor-woord terugval per DOELtaal (demo zonder AI-sleutel). De
-   Spaanse tabel dekt Nederlands en Engels als bron; andere talen vallen
-   zonder AI-sleutel terug op de oorspronkelijke tekst (nooit kapot). */
-const WORDS = { en: WORDS_NL_EN, nl: WORDS_EN_NL, es: WORDS_ES };
-/* Het wereld-kernwoordenboek: 30 school-kernwoorden in ALLE registertalen,
-   zodat elke taal ook zonder AI-sleutel iets zinnigs teruggeeft. */
-const wereld = require('./translate/woordenboek/wereld');
+const { NL2EN, EN2NL } = require('./translate/woordenboek');
+/* De termtabellen en het wereld-kernwoordenboek wonen in ./translate/boodschap:
+   dat is de laag ZONDER model, en zij antwoordt alleen op een hele boodschap. */
+const { volledigeBoodschap } = require('./translate/boodschap');
 
 let anthropic = null;
 function setAnthropic(a) { anthropic = a; }
@@ -62,22 +59,6 @@ function localizeList(list, lang) {
   return Array.isArray(list) ? list.map(x => localize(x, lang)) : list;
 }
 
-function wordLevel(text, to) {
-  const dict = WORDS[to] || wereld.dictVan(to);
-  if (!dict) return null;
-  let hit = false;
-  const out = String(text).split(/(\s+)/).map(tok => {
-    // het koppelteken hoort bij het woord: anders valt 'e-mailadres' uiteen
-    // in 'e' + '-mailadres' en mist het woordenboek hem altijd
-    const m = tok.match(/^([\wÀ-ÿ'-]+)(.*)$/);
-    if (!m) return tok;
-    const w = m[1].toLowerCase();
-    if (dict[w]) { hit = true; const r = dict[w]; return (m[1][0] === m[1][0].toUpperCase() ? r[0].toUpperCase() + r.slice(1) : r) + m[2]; }
-    return tok;
-  }).join('');
-  return hit ? out : null;
-}
-
 const { naamEn, bestaat } = require('./talen');
 const vertaalModelBatch = require('./translate/batch-model');
 
@@ -95,9 +76,9 @@ async function claudeTranslate(text, to) {
 
 /* Vertaal een los bericht naar de taal van de ontvanger. Elke taal uit het
    wereldtalenregister (server/talen.js) mag als doel; welke talen AANstaan
-   bewaakt de aanroeper (talen.taalVan). Voor nl/en werkt het woordenboek ook
-   zonder AI; voor andere talen vertaalt de AI, en zonder AI-sleutel komt het
-   bericht onvertaald terug (translated:false), nooit kapot. */
+   bewaakt de aanroeper (talen.taalVan). Een bericht dat zelf een woordenboekterm
+   is werkt zonder AI; al het andere vertaalt de AI, en zonder AI-sleutel komt
+   het bericht onvertaald terug (translated:false), nooit kapot en nooit half. */
 async function translate(text, to, from, opties) {
   text = String(text || '');
   to = bestaat(to) ? String(to).toLowerCase() : 'nl';
@@ -118,7 +99,7 @@ async function translate(text, to, from, opties) {
      het inlogscherm doet het gewoon. */
   const magAi = !opties || opties.ai !== false;
   if (!out && anthropic && magAi) { try { out = await claudeTranslate(text, to); } catch (e) { /* val terug */ } }
-  if (!out) out = wordLevel(text, to); // woordenboek of wereld-kern: elke registertaal doet mee
+  if (!out) out = volledigeBoodschap(text, to); // alleen als het woordenboek het HELE bericht dekt
   const result = out || text;
   cacheSchrijf(key, result);
   return { text: result, translated: result !== text, from };
@@ -127,7 +108,8 @@ async function translate(text, to, from, opties) {
 /* Dezelfde vertaallogica voor een schermwoordenboek, maar met echte batching.
    Hoogstens 40 regels / 6000 tekens gaan in één modelaanroep. Alles daarbuiten
    wordt in een volgende begrensde groep verwerkt. Een mislukte groep valt per
-   regel terug op het lokale woordenboek en laat de interface nooit verdwijnen. */
+   regel terug op het woordenboek waar dat de hele regel dekt, en anders op de
+   brontaal -- de interface verdwijnt nooit en raakt nooit half vertaald. */
 async function translateBatch(teksten, to, from, opties) {
   teksten = Array.isArray(teksten) ? teksten.map(t => String(t == null ? '' : t)) : [];
   to = bestaat(to) ? String(to).toLowerCase() : 'nl';
@@ -174,7 +156,7 @@ async function translateBatch(teksten, to, from, opties) {
         catch (e) { model = null; }
       }
       groep.forEach((item, j) => {
-        const lokaal = wordLevel(item.text, to);
+        const lokaal = volledigeBoodschap(item.text, to);
         const result = (model && model[j]) || lokaal || item.text;
         /* Een tijdelijke modelstoring mag geen onvertaalde zin als blijvend
            cacheantwoord vastzetten. Alleen echte vertaling is een cache-hit. */

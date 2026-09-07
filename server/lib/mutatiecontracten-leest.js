@@ -96,6 +96,28 @@ const CONTRACTEN = Object.assign(Object.fromEntries([
   leest('POST /api/vertaal/talen', 'vertaal.talen', 'server/routes/vertaal.js'),
   leest('POST /api/wallet', 'wallet', 'server/routes/zorgwallet.js'),
 ]), {
+  /* De schaduwmeting van de kantoordeur (KANTOOR.md par. 3). Deze route heeft
+     zijn stand VERDIEND en niet gekregen: de eerste versie las via
+     eigencollectie.bak(), en die LEGT DE COLLECTIE AAN. Daarmee schreef een
+     leesverzoek leeg meubilair weg -- precies wat de kop van
+     kern/eigencollectie.js beschrijft, inclusief het gevolg dat de statuscode
+     dan iets anders zegt dan de opslag. Na de reparatie naar kijk() verandert
+     hij werkelijk niets; test/mensdeur.test.js toets 10 houdt dat vast. */
+  'POST /api/office/mensdeur': {
+    mutatieId: 'office.mensdeur',
+    herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'NOT_APPLICABLE',
+    bewijs: { gemeten: 'tegen een draaiende server (RTG_MAGNAAT_TEST=1): de route geeft 403 op een ' +
+      'gedeelde kantoorsessie en liet daarbij niets achter in kantoorMensdeur; de teller bewoog ' +
+      'alleen op de UITGEVOERDE verzoeken van andere routes', op: '2026-09-06' },
+    nagekeken: 'met de hand, 2026-09-06: server/routes/office/mensdeur.js roept alleen ' +
+      'kern.mensdeurStand() aan, en server/kern/kantoor/mensdeur.js stand() leest via ' +
+      'eigen.kijk() -- lezen zonder scheppen, geen save(), geen toewijzing. De schrijfweg ' +
+      'van die module (tel) hangt aan res.on("finish") en is een andere ingang',
+    afgetekend: { door: 'Claude (Opus 5), handler met de hand nagelezen en tegen een server gemeten', op: '2026-09-06' }
+  },
   'POST /api/metier/zoek': {
     mutatieId: 'metier.zoek',
     herkomst: 'mens',

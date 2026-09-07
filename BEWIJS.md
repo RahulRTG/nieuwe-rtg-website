@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1727 bestanden en 12218 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1732 bestanden en 12250 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1727 |
-| losse beweringen (`test(...)`) | 12218 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 108 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1067 |
+| toetsbestanden | 1732 |
+| losse beweringen (`test(...)`) | 12250 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 110 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1070 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 55 |
 | alleen in de kop *genoemd*, nog niet gemeten | 179 |
-| niets van beide | 426 |
+| niets van beide | 428 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1520 bestanden, 11860 beweringen.
+1525 bestanden, 11892 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -596,6 +596,7 @@ toets omvalt.
 | `kaart.test.js` | 8 | gezakt op `===->!==` | De kaart-uitwijk (public/shared/kaart.js): de pure parseGeo() ontleedt de geo:-URI's die het huis gebruikt tot iets toonbaars. Getoetst op beide vormen (echte coördinaten en het adres-alleen 0,0?q=...), op de... |
 | `kantoordienst.test.js` | 3 | gezakt op `liegpoort /api/` | HET RTG-KANTOOR OP EEN WERKDAG: AANMELDEN, INWERKEN, EN DE NOODKNOP. DRIE DINGEN DIE HIER SAMENKOMEN 1. |
 | `kantoorgesprek.test.js` | 2 | gezakt op `liegpoort /api/` | De backoffice binnenkomen door met Rahul te praten in plaats van een codeveld in te vullen -- zonder dat de deur daar zachter van wordt. Dat laatste is de kern van deze test. |
+| `kantoormacht.test.js` | 6 | gezakt op `getal+1#0` | DE KANTOORMACHT-METER (scripts/kantoormacht.js). KANTOORMACHT.md par. |
 | `kantoorpakket-alle.test.js` | 10 | gezakt op `liegpoort /api/` | RTG Office voor het hele ecosysteem: leden (alle passen), elke leverancier en partner (team-drive per zaak), de eigen RTG-kantoren (kantoor-drive) en RTF-leden (per gezinsprofiel, met delen binnen het gezin). Bewaakt... |
 | `kantoorroutes.test.js` | 3 | -- | De kantoorroutes: officeAuth laat door, de handeling vraagt wie er zit. |
 | `kantoorwereld.test.js` | 11 | gezakt op `===->!==#0` | RTG Kantoor, de samenhanglaag. Wat hier getoetst wordt is niet of de lijst klopt -- dat weten de vier domeinen zelf -- maar of deze laag zich aan zijn eigen belofte houdt: hij bezit niets, hij verzint niets, en hij... |
@@ -783,6 +784,8 @@ toets omvalt.
 | `meetkeuring.test.js` | 7 | gezakt op `===->!==#0` | DE MEETLAAG WORDT ZELF GEMETEN. WAAROM DIT BESTAAT. |
 | `meetserver-schorspoort.test.js` | 2 | gezakt op `true->false#0` | DE LUS DIE ZICHZELF DICHTTROK -- en waarom een meetserver de schorspoort uit heeft. server/middleware/schorspoort.js weigert met 503 elke schrijvende aanroep op een route die in VERTROUWEN.json `geschorst` heet... |
 | `memo.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Memo: de memo-flow door de Bestanden-kluis (map Memo's, upload, lijst, prullenbak) en de eerlijke Rahul-samenvatting van het transcript -- zonder AI-sleutel een demo die zegt wat hij is, nooit neptekst. |
+| `mensdeur-route.test.js` | 4 | gezakt op `liegpoort /api/` | DE SCHADUWMETING OVER DE ROUTE -- met een echte server en echt inloggen. WAAROM NAAST test/mensdeur.test.js. |
+| `mensdeur.test.js` | 14 | gezakt op `===->!==#0` | DE SCHADUWMETING VAN DE KANTOORDEUR (server/kern/kantoor/mensdeur.js). Waarom deze toetsen bestaan: de anonieme tak is end-to-end bewezen tegen een draaiende server (vier kantoorverzoeken met de gedeelde code gaven... |
 | `menselijkebanen.test.js` | 4 | gezakt op `liegpoort /api/` | DE MENSELIJKE BANEN -- kan elk mens in dit huis bij zijn eigen werk? WAAROM DIT ER IS Dit huis kent 60 afdelingen en 157 mensen met een baan: van de kok in KIKUNOI tot de meldkamer van GUARDIA, van de... |
 | `menselijkverkeer.test.js` | 5 | gezakt op `liegpoort /api/` | HET MENSELIJKE VERKEER -- wat mensen hier met elkaar doen. WAAROM DIT ER NAAST test/menselijkebanen.test.js STAAT Die toets bewijst dat 157 mensen bij hun werk kunnen. |
 | `merge3.property.test.js` | 5 | gezakt op `===->!==#0` | Eigenschap-gedreven (property-based) tests voor merge3, de 3-weg-samenvoeging die het hart is van de multi-writer-opslag. In plaats van een handvol vaste gevallen genereren we duizenden willekeurige situaties en... |
@@ -1303,12 +1306,14 @@ toets omvalt.
 | `staff-inzet-mob.test.js` | 6 | gezakt op `liegpoort /api/` | DRIE PERSONEELSINGANGEN VAN HET MOBILITY OS DIE DOOR NIETS WERDEN AANGEROEPEN. /api/staff/mob/kaart/storingen de storingslijst van de OV-vervoerder /api/staff/mob/mijn het dispatchbeeld op de PDA... |
 | `staff-pin-productie.test.js` | 2 | -- | Productiegrens voor de oude viercijferige personeelspin. Deze toets draait de server in de gewone, niet-synthetische stand. |
 | `staffinvite.test.js` | 12 | gezakt op `liegpoort /api/` | Personeel = RTG-account, met uitnodiging. Een manager nodigt uit en krijgt een eenmalige kassacode; pas daarna kan de medewerker zich aanmelden met de bedrijfsnaam + kassacode + eigen RTG-inlog. |
-| `startpagina.test.js` | 6 | -- | De losse GitHub Pages-voordeur: merk, routes en dagdeelbeelden. Deze pagina draait niet via de productieserver: index.html in de repositoryroot wordt rechtstreeks door GitHub Pages bediend. |
+| `startpagina.test.js` | 8 | -- | De losse GitHub Pages-voordeur: merk, routes en dagdeelbeelden. Deze pagina draait niet via de productieserver: index.html in de repositoryroot wordt rechtstreeks door GitHub Pages bediend. |
 | `stempel.test.js` | 4 | gezakt op `===->!==#0` | HET STEMPEL: WANNEER IS EEN METING ONREPRODUCEERBAAR? `boomVuil` beantwoordt een vraag met gevolgen: hoort deze uitslag bij de commit die eronder staat, of bij iets wat nergens is vastgelegd? |
 | `stijlafsplitsing.test.js` | 8 | -- | HET AFGESPLITSTE STIJLBLOK: WAT ER WEG MAG, EN VOORAL WAT NIET. Over alle 258 schermen is 74% van de HTML inline CSS en JS. |
 | `stijlbundel.test.js` | 11 | gezakt op `===->!==#0` | DE STIJLBUNDEL: WAT ER SAMEN MAG, EN VOORAL WAT NIET. /apps/app.html doet 72 verzoeken. |
 | `stilalarm.test.js` | 3 | gezakt op `liegpoort /api/` | EEN NOODSIGNAAL DAT NIEMAND BEREIKT, MAG NOOIT ALS GELUKT GELDEN. WAT ER MISGING. |
 | `stillepost.test.js` | 2 | gezakt op `&&->||#6` | Post die nergens heen kan, moet je kunnen zien. WAT ER MIS WAS. |
+| `storingen-bezorging.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `storingen-webhook.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `streng-poorten.test.js` | 7 | gezakt op `liegpoort /api/` | De strenge poorten-veeg over de nieuwe genredomeinen: elke werkplek-API weigert anoniemen (401) en zaken zonder het juiste vermogen (403), de leden-lagen weigeren gasten (403), en rommel-invoer (HTML-injectie,... |
 | `strenge-poort.test.js` | 2 | gezakt op `regex-alternatief-weg#0` | De strenge poort bewaakt de hele suite: een geslaagde test mag de server nooit een uncaughtException of unhandledRejection laten loggen. Deze test bewaakt de BEWAKER zelf: dat de detectie klopt (crashes wel,... |
 | `stripe-eigen.test.js` | 4 | gezakt op `===->!==#0` | De eigen Stripe-client (server/stripe.js) i.p.v. het pakket 'stripe'. |
@@ -1488,7 +1493,7 @@ toets omvalt.
 | `wereldrtf.test.js` | 7 | -- | De RTF-kant van het gezin: wie klopt er aan, per deelgebied. Derde variant van hetzelfde: een veldnaam die per deelgebied iets anders betekent. |
 | `wereldrtmail.test.js` | 6 | -- | De postbuswereld: vier dingen over twee domeinen die dezelfde postbus zijn. De kern van deze toets is dezelfde valkuil als bij het livinglab: `id` betekent per deelgebied iets anders. |
 | `wereldschool.test.js` | 6 | genoemd | DE SCHOOLWERELD -- vier objecten die aan elkaar hangen. Na de sleutelronde en de objectoogst stonden er 87 schoolroutes op 404, en de server zei zelf waarom: 36 keer "Dit gezin kennen we niet", 14 keer "Deze leerling... |
-| `wereldtaal.test.js` | 3 | geen bronmutatie mogelijk | Het wereld-kernwoordenboek: ALLE talen uit het register werken ook zonder AI-sleutel. Geen volzin-vertaler (dat doet de AI), maar de 30 school-kernwoorden zijn in elke taal aanwezig en compleet -- deze test is de... |
+| `wereldtaal.test.js` | 4 | geen bronmutatie mogelijk | Het wereld-kernwoordenboek: ALLE talen uit het register werken ook zonder AI-sleutel. Geen volzin-vertaler (dat doet de AI), maar de 30 school-kernwoorden zijn in elke taal aanwezig en compleet -- deze test is de... |
 | `wereldvermogens.test.js` | 14 | gezakt op `liegpoort /api/` | De vermogens van de Lifestyle- en Business Pass die eerst alleen een NAAM in rechten.js hadden: geavanceerd zoeken, netwerkanalyse en "wie bekeek mijn profiel". De belangrijkste bewering staat in het midden: ZOEKEN... |
 | `wereldwortels.test.js` | 8 | -- | De kleine wortels: negen dingen die elk hun eigen domein openen. Geen ketens maar een oproep per stuk -- daarom een module en geen negen werelden. |
 | `werk-bij-inloggen.test.js` | 1 | gezakt op `liegpoort /api/` | Een account voor alles: je logt in op je RTG-account en je werk-app staat er meteen. Geen tweede inlog, geen pincode, geen rol kiezen. |

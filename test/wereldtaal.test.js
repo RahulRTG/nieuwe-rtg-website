@@ -21,7 +21,7 @@ test('1. elke registertaal heeft een compleet kernwoordenboek (30 woorden, geen 
   }
 });
 
-test('2. woord-voor-woord zonder AI-sleutel: een greep uit alle windstreken', async () => {
+test('2. een VOLLEDIGE boodschap zonder AI-sleutel: een greep uit alle windstreken', async () => {
   const gevallen = [
     ['huiswerk', 'de', 'Hausaufgaben'],
     ['school', 'sw', 'shule'],
@@ -37,9 +37,30 @@ test('2. woord-voor-woord zonder AI-sleutel: een greep uit alle windstreken', as
     assert.equal(r.translated, true, nl + ' -> ' + taal + ' moet ook zonder AI vertalen');
     assert.equal(r.text.toLowerCase(), verwacht.toLowerCase(), nl + ' -> ' + taal);
   }
-  // en in een zin blijft de rest netjes staan (demo-kwaliteit, nooit kapot)
-  const zin = await translate('Morgen is er school.', 'sw', 'nl');
-  assert.match(zin.text, /Kesho/i, 'het kernwoord is herkend, de zin blijft leesbaar');
+  // leestekens aan de rand horen niet bij de term: dit blijft een hele boodschap
+  const uitroep = await translate('Welkom!', 'ja', 'nl');
+  assert.equal(uitroep.translated, true, 'Welkom! is nog steeds een boodschap van een term');
+  assert.match(uitroep.text, /ようこそ/, 'de term is vertaald, het leesteken blijft staan');
+});
+
+/* DE BEWAKER VAN DE NIEUWE GRENS.
+
+   Hier stond: `translate('Morgen is er school.','sw')` moet /Kesho/ bevatten --
+   "het kernwoord is herkend, de zin blijft leesbaar". Dat legde precies het
+   gedrag vast dat eruit moest: een Nederlandse zin met een paar woorden
+   omgewisseld, gemeld als `translated: true`. Gemeten gaf dat bijvoorbeeld
+   "اليوم is de مدرسة gesloten" voor het Arabisch.
+
+   De kleinste vertaalbare eenheid is de hele BOODSCHAP. Een zin die het
+   woordenboek niet volledig dekt komt onvertaald terug, en zegt dat ook. Deze
+   toets zakt zodra iemand het samenstellen uit losse woorden terugzet. */
+test('4. een zin wordt NOOIT half vertaald, en meldt zichzelf niet als vertaald', async () => {
+  const zin = 'Morgen is er school.';
+  for (const taal of ['sw', 'ar', 'ja', 'zh', 'am', 'es', 'en']) {
+    const r = await translate(zin, taal, 'nl');
+    assert.equal(r.translated, false, taal + ': een half gedekte zin is geen vertaling');
+    assert.equal(r.text, zin, taal + ': de brontaal blijft heel staan, nooit half omgewisseld');
+  }
 });
 
 test('3. de tweetalige klasgenoot kan hiermee elke thuistaal kiezen', () => {

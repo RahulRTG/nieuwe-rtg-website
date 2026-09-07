@@ -189,8 +189,18 @@
 .ios-nav-acties > .ios-nadruk{font-weight:600 !important;}
 
 /* de tweede rij: zoekveld, filters, segmenten -- zoals Berichten en Mail */
+/* DE RECHTERKANT LEEST DE RECHTERINZET. Hieronder stond zes keer een
+   drie-waardige `padding`-shorthand met de LINKER-inzet als middelste waarde --
+   en die middelste waarde geldt voor links EN rechts. In staande stand zijn
+   allebei de inzetten nul en valt er niets te zien; draai je de telefoon met de
+   inkeping naar rechts, dan is de rechterinzet 47px terwijl deze regels 16px
+   aanhielden. Gemeten op /apps/notities.html en /apps/bestanden.html bij
+   844x390 met inzet rechts 47: de laatste knop van de duimbalk eindigde 16px
+   van de rand, dus 31px onder de inkeping. `.ios-nav-rij` in ditzelfde bestand
+   deed het al goed (padding-right 47px) -- de fout zat in de shorthand en niet
+   in het idee. Vier waarden dus: boven, rechts, onder, links. */
 .ios-nav-extra{
-  padding:0 max(0.75rem, env(safe-area-inset-left,0px)) 0.5rem;
+  padding:0 max(0.75rem, env(safe-area-inset-right,0px)) 0.5rem max(0.75rem, env(safe-area-inset-left,0px));
   display:flex; flex-direction:column; gap:0.5rem;
 }
 .ios-nav-extra input[type=search],
@@ -219,14 +229,14 @@
    alleen de uitlijning, zodat hij precies boven de grote titel valt en niet
    tegen de rand van het scherm. */
 .ios-boven{
-  padding:0.5rem max(1rem, env(safe-area-inset-left,0px)) 0;
+  padding:0.5rem max(1rem, env(safe-area-inset-right,0px)) 0 max(1rem, env(safe-area-inset-left,0px));
   margin:0;
 }
 .ios-boven + .ios-groot{ padding-top:0.1rem; }
 /* De ondertitel onder de grote titel. Hij houdt zijn eigen kleur en maat uit de
    klasse die hij al had (.stil, .badge); hier staat alleen de uitlijning. */
 .ios-onder{
-  padding:0 max(1rem, env(safe-area-inset-left,0px)) 0.5rem;
+  padding:0 max(1rem, env(safe-area-inset-right,0px)) 0.5rem max(1rem, env(safe-area-inset-left,0px));
   margin:0;
 }
 .ios-groot:has(+ .ios-onder){ padding-bottom:0.25rem; }
@@ -242,7 +252,7 @@
      hierboven, alleen de andere kant op: de schil beslist in de balk, de pagina
      beslist op de pagina. */
   color:var(--rtg-txt, var(--ios-inkt));
-  padding:0.3rem max(1rem, env(safe-area-inset-left,0px)) 0.6rem;
+  padding:0.3rem max(1rem, env(safe-area-inset-right,0px)) 0.6rem max(1rem, env(safe-area-inset-left,0px));
   margin:0;
 }
 

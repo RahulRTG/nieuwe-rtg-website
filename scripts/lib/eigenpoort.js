@@ -53,6 +53,7 @@ const EIGEN_POORT = new Map([
   ['/api/aanmeld/zeg', 'werkt op een gespreks-id uit een eerdere stap, met een rem per adres; een onbekend id komt niet verder'],
 
   // ---- machine naar machine: het bewijs zit in het verzoek zelf ----
+  ['/api/webhooks/storingen', 'HMAC over raw body, event-id en tijd; verval, rem en duurzame unieke ontvangst'],
   ['/api/betaal/webhook/adyen', 'de derde kaartwebhook; hij telt een handtekening na en weigert zonder secret'],
 
   /* /api/foundation/reis/aanvraag stond hier tot 3 september 2026 onder

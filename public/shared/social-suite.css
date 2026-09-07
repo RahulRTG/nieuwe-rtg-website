@@ -6,9 +6,24 @@
    markeert alleen positie en bevestiging. Geen verzameling zwevende SaaS-kaarten.
    ========================================================================== */
 body.rtg-suite-page{
-  --suite-top:64px;
+  /* DE VEILIGE ZONE ZIT IN DE MAAT ZELF, EN NIET IN EEN OPVULLING ERNAAST.
+     Deze elf schermen zetten `viewport-fit=cover` en reserveerden daarna niets:
+     `.rtg-suitebar` stond op `inset:0 0 auto` met `padding-top:0`, dus op een
+     iPhone met inkeping lag de hele balk -- woordmerk en accountzegel -- binnen
+     de 59px die iOS voor de klok en de batterij opeist. Een tik daar gaat naar
+     het systeem en niet naar de pagina, dus de weg naar het profiel en de weg
+     terug naar huis bestonden daar niet. Gemeten op 390x844 met inzet 59/34:
+     .rtg-suitebar y0..58, .rtg-suitenav y776..844, allebei met opvulling nul.
+
+     De inzet staat daarom IN --suite-top en --suite-nav en niet in een losse
+     regel per balk. Die twee maten worden op tien plekken gelezen -- de hoogte
+     van de balken, de opvulling van de body, de `top` van de navigatie, de
+     inzet van .comm, de minimumhoogte van .private-world en de onderkant van de
+     aibalk -- en die volgen nu allemaal vanzelf. Een tweede plek die dezelfde
+     waarheid draagt, loopt binnen een jaar uit de eerste (LAT.md regel 9). */
+  --suite-top:calc(64px + env(safe-area-inset-top,0px));
   --suite-nav:52px;
-  --suite-stack:116px;
+  --suite-stack:calc(116px + env(safe-area-inset-top,0px));
   --suite-ink:#181917;
   --suite-ink-2:#20211e;
   /* DE SUITE STAAT OP PEARL (31 augustus 2026).
@@ -66,8 +81,16 @@ body.rtg-suite-page::after{
   background:linear-gradient(90deg,transparent 49.9%,rgba(27,28,25,.026) 50%,transparent 50.1%);
 }
 .rtg-suitebar{
+  /* box-sizing STAAT HIER EN NIET IN EEN RESET VAN DE PAGINA. Deze balk is een
+     gedeeld onderdeel dat op elf schermen hangt, en niet alle elf zetten
+     `*{box-sizing:border-box}`. Zonder deze regel telt de hoogte hierboven de
+     veilige zone een keer en de opvulling hem nog een keer: gemeten werd de balk
+     op /apps/vonk.html en /apps/sociaal-prive.html 177px hoog waar hij 117 hoort
+     te zijn, terwijl /apps/berichten.html wel klopte. Een onderdeel dat afhangt
+     van wat de gastpagina toevallig verklaart, is niet gedeeld maar gelukkig. */
+  box-sizing:border-box;
   position:fixed;z-index:80;inset:0 0 auto;height:var(--suite-top);display:flex;align-items:stretch;
-  padding:0 clamp(1.25rem,3vw,3rem);color:#f4f1e9;background:rgba(20,21,19,.97);
+  padding:env(safe-area-inset-top,0px) clamp(1.25rem,3vw,3rem) 0;color:#f4f1e9;background:rgba(20,21,19,.97);
   border-bottom:1px solid rgba(255,255,255,.10);backdrop-filter:blur(20px);
 }
 .rtg-suitebrand{display:flex;align-items:center;min-width:250px;color:inherit;text-decoration:none;}
@@ -81,7 +104,7 @@ body.rtg-suite-page::after{
 .rtg-suiteperson-copy{font:600 .66rem/1 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;}
 .rtg-suiteperson-seal{display:grid;place-items:center;width:32px;height:32px;border:1px solid rgba(255,255,255,.22);border-radius:50%;
   color:#dac891;background:#272821;font:500 .88rem/1 "Bodoni Moda",Georgia,serif;}
-.rtg-suitenav{position:fixed;z-index:79;top:var(--suite-top);right:0;left:0;height:var(--suite-nav);display:flex;
+.rtg-suitenav{box-sizing:border-box;position:fixed;z-index:79;top:var(--suite-top);right:0;left:0;height:var(--suite-nav);display:flex;
   justify-content:center;background:rgba(246,244,239,.96);border-bottom:1px solid var(--suite-line);backdrop-filter:blur(18px);}
 .rtg-suitenav-link{position:relative;display:flex;align-items:center;gap:.65rem;min-width:132px;padding:0 1.4rem;color:#625f57;
   text-decoration:none;font:600 .65rem/1 Inter,system-ui,sans-serif;letter-spacing:.12em;text-transform:uppercase;}
@@ -281,14 +304,14 @@ body.rtg-social-private-hub{background:var(--suite-ink)!important;}
 .private-support a{min-height:44px;display:flex;align-items:center;color:rgba(239,235,225,.65);font-size:.68rem;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.14);}
 
 @media(max-width:900px){
-  body.rtg-suite-page{--suite-top:58px;--suite-nav:68px;--suite-stack:58px;padding-top:var(--suite-top)!important;padding-bottom:var(--suite-nav)!important;}
-  .rtg-suitebar{height:var(--suite-top);padding:0 .9rem;}
+  body.rtg-suite-page{--suite-top:calc(58px + env(safe-area-inset-top,0px));--suite-nav:calc(68px + env(safe-area-inset-bottom,0px));--suite-stack:calc(58px + env(safe-area-inset-top,0px));padding-top:var(--suite-top)!important;padding-bottom:var(--suite-nav)!important;}
+  .rtg-suitebar{height:var(--suite-top);padding:env(safe-area-inset-top,0px) .9rem 0;}
   .rtg-suitebrand{min-width:44px;}
   .rtg-suitebrand-world{margin-left:.75rem;padding-left:.75rem;font-size:.5rem;}
   .rtg-suitestate,.rtg-suiteperson-copy{display:none;}
   .rtg-suiteperson{margin-left:auto;padding-left:.8rem;border-left:0;}
   .rtg-suiteperson-seal{width:34px;height:34px;}
-  .rtg-suitenav{top:auto;bottom:0;height:var(--suite-nav);justify-content:stretch;border-top:1px solid rgba(255,255,255,.1);border-bottom:0;background:rgba(20,21,19,.98);}
+  .rtg-suitenav{top:auto;bottom:0;height:var(--suite-nav);padding-bottom:env(safe-area-inset-bottom,0px);justify-content:stretch;border-top:1px solid rgba(255,255,255,.1);border-bottom:0;background:rgba(20,21,19,.98);}
   .rtg-suitenav-link{flex:1;min-width:0;justify-content:center;padding:0 .2rem;color:rgba(244,241,233,.44);font-size:.54rem;letter-spacing:.07em;}
   .rtg-suitenav-link::after{top:0;right:22%;bottom:auto;left:22%;}
   .rtg-suitenav-link[aria-current="page"]{color:#f3ecda;}

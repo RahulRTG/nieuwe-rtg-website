@@ -64,6 +64,7 @@
     "keuring": "node scripts/keuring.js",
     "nood": "node server/nood.js",
     "check": "node scripts/check.js",
+    "tekstoppervlak": "node scripts/tekstoppervlak.js",
     "delta": "node scripts/deltapoort.js",
     "verval": "node scripts/normverval.js",
     "ast-scan": "node scripts/ast-scan.js",
@@ -292,7 +293,10 @@
     "doorwerking": "node scripts/doorwerking.js",
     "doorwerking:vast": "node scripts/doorwerking.js --vastleggen",
     "toelatingsproef": "node scripts/toelatingsproef.js",
-    "toelatingsproef:vast": "node scripts/toelatingsproef.js --vastleggen"
+    "toelatingsproef:vast": "node scripts/toelatingsproef.js --vastleggen",
+    "kantoormacht": "node scripts/kantoormacht.js",
+    "kantoormacht:vast": "node scripts/kantoormacht.js --vastleggen",
+    "kantoormacht:controle": "node scripts/kantoormacht.js --controle"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

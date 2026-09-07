@@ -34,10 +34,16 @@
       "Nederlandse brontekst" opneemt, probeert Engels uit het Nederlands te
       vertalen.
 
-   5. DE TEKST ZONDER STRING. 249 aanroepen geven een vaste 'nl-NL' mee aan
+   5. DE TEKST ZONDER STRING. 270 aanroepen geven een vaste nl-locale mee aan
       toLocaleString of Intl. Daar valt niets te extraheren en toch leest een
       Japanse gebruiker een Nederlandse datum. Dat is een EIGEN defectklasse en
       wordt apart geteld, nooit in het dekkingsgetal weggemiddeld.
+
+   EN EEN ZESDE, GEVONDEN DOOR DE METER AAN TE VALLEN: TEKST DIE AL EEN SLEUTEL
+      DRAAGT IS GEEN DEFECT. Telt de meter T(sleutel, tekst) en de tekst onder
+      data-i18n als hardcoded, dan bestaat er geen enkele manier om zichtbare
+      tekst toe te voegen die de poort haalt -- en dan leert de poort mensen
+      ontwijken in plaats van sleutelen. Zie GESLEUTELDE_VORMEN.
 
    Wat deze meter NIET doet staat in `nietGedekt` in de uitvoer. Dat veld hoort
    te krimpen; leeg is het nooit. */
@@ -93,7 +99,16 @@ function bundelDelen() {
 
 /* ---------- 2. is dit tekst die een MENS leest? ------------------------ */
 
-const LETTERS = /[A-Za-zÀ-ÖØ-öø-ÿ]/;
+/* ELKE LETTER, NIET ALLEEN DE LATIJNSE. Dit stond op [A-Za-zÀ-ÖØ-öø-ÿ], en in
+   een laag die bestaat om het huis meertalig te maken was dat de duurste blinde
+   vlek die er is: Cyrillisch, Grieks, Hebreeuws, Arabisch, Chinees en Japans
+   waren voor deze meter geen tekst. Een scherm dat al vertaald was kon
+   hardgecodeerd Russisch terugkrijgen zonder dat een ratel bewoog. Vandaag
+   verschuift dit de basislijn met NUL (het huis is nu volledig Latijns), dus de
+   reparatie is gratis -- en zij wordt pas duur op de dag dat de laag werkt
+   waarvoor hij gebouwd is. */
+const LETTERS = /\p{L}/u;
+
 /* codevormen die er als tekst uitzien */
 const CODEVORM = [
   /^[a-z0-9]+(?:[A-Z][a-z0-9]*)+$/,          // camelCase
@@ -103,17 +118,36 @@ const CODEVORM = [
   /^(?:https?:|mailto:|tel:|data:|blob:|#|\/)/i,
   /^[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}$/,
   /^[A-Z]{2,5}(?:-[A-Z0-9]+)?$/,             // taalcodes en korte codes
-  /^\d/,                                     // begint met een cijfer
+  /* HIER STOND /^\d/ -- "begint met een cijfer". Dat verwierp 153 echte
+     meldingen, en precies de soort die meervoudsregels nodig heeft:
+     "3 nieuwe berichten", "30% naar goede doelen", "2 van 4 stappen verkend".
+     Verworpen wordt nu alleen wat GEEN woord bevat: een kaal getal met
+     eenheid of scheidingsteken. Staat er na het cijfer een woord, dan is het
+     een zin. */
+  /^[\d\s.,:%/€$+-]+$/,
   /^[a-z]+$/                                 // een enkel kaal kleinletterwoord: bijna altijd een sleutel
 ];
 
+/* Een lap lopende tekst mag lang zijn; een base64-blok of een stuk CSS niet.
+   De grens stond op 300 tekens en verborg daarmee 69 teksten van samen 4.615
+   woorden -- de juridische documenten, waar geldt: hoe langer de lap, hoe
+   onzichtbaarder. Lengte is het verkeerde criterium; VORM is het goede. */
+const MEGAGRENS = 3000;
+function opmaakBlok(s) {
+  if (/\{[^}]*:[^}]*;/.test(s)) return true;        // css-achtig
+  if (!/\s/.test(s) && s.length > 80) return true;  // een lange reeks zonder spatie: base64, minified
+  const letters = (s.match(/\p{L}/gu) || []).length;
+  return letters / s.length < 0.4;                  // te weinig letter voor lopende tekst
+}
+
 function menselijk(s) {
   s = String(s == null ? '' : s).trim();
-  if (s.length < 2 || s.length > 300) return false;
+  if (s.length < 2 || s.length > MEGAGRENS) return false;
   if (!LETTERS.test(s)) return false;
+  if (s.length > 300 && opmaakBlok(s)) return false;
   for (const r of CODEVORM) if (r.test(s)) return false;
   /* een spatie, of een hoofdletter aan het begin: "Sluiten" telt, "flexStart" niet */
-  if (!/\s/.test(s) && !/^[A-ZÀ-Þ]/.test(s)) return false;
+  if (!/\s/.test(s) && !/^\p{Lu}/u.test(s)) return false;
   return true;
 }
 
@@ -133,6 +167,9 @@ const ATTRIBUTEN = ['placeholder', 'title', 'aria-label', 'aria-description', 'a
 
 const LOCALEFUNCTIES = new Set(['toLocaleString', 'toLocaleDateString', 'toLocaleTimeString',
   'toLocaleLowerCase', 'toLocaleUpperCase']);
+const INTLVORMEN = new Set(['NumberFormat', 'DateTimeFormat', 'Collator', 'PluralRules',
+  'RelativeTimeFormat', 'ListFormat', 'Segmenter', 'DisplayNames']);
+const VASTNL = /^nl(?![a-z])/i;
 
 /* ---------- 4. de JS-scanner ------------------------------------------ */
 
@@ -194,7 +231,14 @@ function scanJs(bron, herkomst, vangst) {
       }
     }
 
-    if (node.type !== 'CallExpression') return;
+    /* OOK NewExpression. Hier stond alleen CallExpression, en daardoor was de
+       hele Intl-tak hieronder DODE CODE: `new Intl.NumberFormat('nl-NL')` is
+       een NewExpression. Er stonden er 25 in de boom die de basislijn van 246
+       niet bevatte, en het register verried het zelf -- vasteLocale.perVorm had
+       nul Intl-ingangen. Extra zuur: `new Intl.DateTimeFormat(taalVanGebruiker)`
+       is precies het alternatief dat regel 68 aanbeveelt, dus dit gat ging open
+       zodra iemand de regel gehoorzaamde. */
+    if (node.type !== 'CallExpression' && node.type !== 'NewExpression') return;
     const naam = naamVan(node.callee);
     const args = node.arguments || [];
 
@@ -227,15 +271,19 @@ function scanJs(bron, herkomst, vangst) {
 
     /* f. de tekst ZONDER string: een vaste locale. Hier valt niets te
        extraheren en toch leest een Japanse gebruiker een Nederlandse datum. */
+    /* BCP-47 IS NIET HOOFDLETTERGEVOELIG. Hier stond /^nl(-[A-Z]{2})?$/, en
+       daarmee was ratel 1 met een tikje op de shift-toets te omzeilen:
+       toLocaleDateString('nl-nl') geeft gewoon Nederlands en telde niet mee.
+       Nu op de eerste subtag, hoofdletterongevoelig -- dat vangt ook
+       'nl-NL-u-ca-gregory'. */
     if (LOCALEFUNCTIES.has(naam) && args.length && isTekstLiteraal(args[0])) {
-      const loc = tekstVan(args[0]);
-      if (/^nl(-[A-Z]{2})?$/.test(loc)) vangst.vasteLocale.push({ herkomst, lijn: node.lijn, vorm: naam, locale: loc });
+      if (VASTNL.test(tekstVan(args[0]))) {
+        vangst.vasteLocale.push({ herkomst, lijn: node.lijn, vorm: naam, locale: tekstVan(args[0]) });
+      }
     }
-    if (naam === 'NumberFormat' || naam === 'DateTimeFormat' || naam === 'Collator' ||
-        naam === 'PluralRules' || naam === 'RelativeTimeFormat' || naam === 'ListFormat') {
-      if (args.length && isTekstLiteraal(args[0])) {
-        const loc = tekstVan(args[0]);
-        if (/^nl(-[A-Z]{2})?$/.test(loc)) vangst.vasteLocale.push({ herkomst, lijn: node.lijn, vorm: 'Intl.' + naam, locale: loc });
+    if (INTLVORMEN.has(naam) && args.length && isTekstLiteraal(args[0])) {
+      if (VASTNL.test(tekstVan(args[0]))) {
+        vangst.vasteLocale.push({ herkomst, lijn: node.lijn, vorm: 'Intl.' + naam, locale: tekstVan(args[0]) });
       }
     }
   });
@@ -253,19 +301,47 @@ function scanHtml(bron, herkomst, vangst) {
   });
   for (let i = 0; i < scripts.length; i++) scanJs(scripts[i], herkomst + ' <script#' + (i + 1) + '>', vangst);
 
-  const schoon = zonderScript.replace(/<(style|noscript|template|svg|code|pre)\b[\s\S]*?<\/\1>/gi, ' ')
+  /* <template> EN <svg> WORDEN NIET MEER WEGGESTREKEN. Ze stonden in dezelfde
+     striplijst als <style> en <code>, en dat is een categoriefout: een
+     <template> is juist de standaardplek waar een scherm zijn herbruikbare
+     UI-brokken bewaart, en <svg><text> is gewoon zichtbare tekst. De aanval
+     zette een hele kaart met kop, alinea en knop in een <template>, cloneerde
+     hem in het DOM, en geen enkel getal bewoog. */
+  const schoon = zonderScript.replace(/<(style|noscript|code|pre)\b[\s\S]*?<\/\1>/gi, ' ')
     .replace(/<!--[\s\S]*?-->/g, ' ');
 
-  /* zichtbare tekstknopen */
-  for (const brok of schoon.split(/<[^>]+>/)) {
-    const s = brok.replace(/&[a-z#0-9]+;/gi, ' ').trim();
-    if (menselijk(s)) vangst.voeg(s, 'html-tekst', herkomst, 0);
+  /* ZICHTBARE TEKSTKNOPEN, MET HET VOORAFGAANDE TAG ERBIJ.
+     Zonder dat tag is niet te zien of de tekst al een sleutel draagt. Splitsen
+     MET vangst houdt de tags in de reeks, zodat een tekstbrok weet waar hij
+     onder hangt. Een element met data-i18n draagt zijn vertaling al; die tekst
+     is de Nederlandse bron bij een sleutel en geen los hardcoded label. */
+  const stukken = schoon.split(/(<[^>]+>)/);
+  let sleutelDiep = 0;
+  for (const stuk of stukken) {
+    if (stuk.startsWith('<')) {
+      if (/^<\//.test(stuk)) { if (sleutelDiep > 0) sleutelDiep--; }
+      else if (!/\/>$/.test(stuk)) {
+        if (/\bdata-i18n(-html)?\s*=/.test(stuk)) sleutelDiep++;
+        else if (sleutelDiep > 0) sleutelDiep++;
+      }
+      continue;
+    }
+    const s = stuk.replace(/&[a-z#0-9]+;/gi, ' ').trim();
+    if (menselijk(s)) vangst.voeg(s, sleutelDiep > 0 ? 'html-gesleuteld' : 'html-tekst', herkomst, 0);
   }
-  /* attributen */
+
+  /* ATTRIBUTEN IN ALLE DRIE DE SCHRIJFWIJZEN. Dit las alleen dubbele
+     aanhalingstekens, dus placeholder='Vul uw achternaam in' was onzichtbaar --
+     inclusief de aria-label die een schermlezer voorleest. En het maakte het
+     normaliseren van quotes tot een wijziging die de poort liet zakken zonder
+     dat er een letter tekst bijkwam. */
   for (const attr of ATTRIBUTEN) {
-    const re = new RegExp(attr + '\\s*=\\s*"([^"]{2,300})"', 'gi');
+    const re = new RegExp(attr + '\\s*=\\s*(?:"([^"]{2,3000})"|\'([^\']{2,3000})\'|([^\\s>]{2,120}))', 'gi');
     let m;
-    while ((m = re.exec(schoon))) if (menselijk(m[1])) vangst.voeg(m[1].trim(), 'html-attribuut:' + attr, herkomst, 0);
+    while ((m = re.exec(schoon))) {
+      const waarde = m[1] != null ? m[1] : (m[2] != null ? m[2] : m[3]);
+      if (menselijk(waarde)) vangst.voeg(waarde.trim(), 'html-attribuut:' + attr, herkomst, 0);
+    }
   }
   /* de titel van het scherm en de omschrijving */
   const t = schoon.match(/<title>([^<]{2,300})<\/title>/i);
@@ -281,12 +357,29 @@ function scanHtml(bron, herkomst, vangst) {
    zodra iemand twee blokken samenvoegt zonder een letter tekst te wijzigen. */
 function bestandVan(herkomst) { return String(herkomst).replace(/ <script#\d+>$/, ''); }
 
+/* ER MOET EEN GROEN PAD ZIJN, ANDERS LEERT DE POORT ONTWIJKEN.
+
+   Dit was de zwaarste bevinding van de aanval op regel 68, en hij was juist:
+   `T('bord.deel','Bord delen')` telde als hardcoded tekst, en
+   `<span data-i18n="k">Bord delen</span>` ook. Wie precies deed wat de
+   foutmelding voorschrijft -- "gebruik de sleutelweg" -- liet de keuring
+   opnieuw zakken. Voor de gesleutelde bestanden bestond dus GEEN enkele manier
+   om zichtbare tekst toe te voegen die de poort haalt, behalve een ontwijking.
+   Een poort waar je alleen omheen kunt, leert mensen eromheen gaan.
+
+   Tekst die AL op de sleutelweg staat telt daarom niet mee in de harde ratel.
+   Zij blijft wel in het corpus staan -- de catalogus moet haar straks vertalen
+   -- maar zij is geen defect. */
+const GESLEUTELDE_VORMEN = new Set(['T()', 'html-gesleuteld']);
+
 function nieuweVangst() {
-  const teksten = new Map();    // tekst -> { aantal, vormen:Set, plekken:[] }
-  const perBestand = new Map(); // bestand -> aantal voorkomens
+  const teksten = new Map();         // tekst -> { aantal, vormen:Set, plekken:[] }
+  const perBestand = new Map();      // bestand -> voorkomens ZONDER sleutel (de harde teller)
+  const perBestandSleutel = new Map(); // bestand -> voorkomens MET sleutel
   return {
     teksten,
     perBestand,
+    perBestandSleutel,
     parsefouten: [],
     vasteLocale: [],
     tDubbelzinnig: 0,
@@ -299,7 +392,8 @@ function nieuweVangst() {
       r.vormen.add(vorm);
       if (r.plekken.length < 3) r.plekken.push(herkomst + (lijn ? ':' + lijn : ''));
       const b = bestandVan(herkomst);
-      perBestand.set(b, (perBestand.get(b) || 0) + 1);
+      const doel = GESLEUTELDE_VORMEN.has(vorm) ? perBestandSleutel : perBestand;
+      doel.set(b, (doel.get(b) || 0) + 1);
     }
   };
 }
@@ -398,9 +492,25 @@ function meet() {
     const rel = path.relative(WORTEL, f);
     const bron = lees(f);
     if (!/\bT\(|data-i18n[=\s]/.test(bron)) continue;
+    /* perBestand telt sinds de groene-padreparatie alleen nog tekst ZONDER
+       sleutel. Een bestand dat volledig om is, staat hier dus op 0 -- en dat is
+       precies de bedoeling: dan mag er niets bij dat niet gesleuteld is. */
     const n = (oppervlakken.html.perBestand.get(rel) || 0) + (oppervlakken.client.perBestand.get(rel) || 0);
-    if (n) gesleuteld[rel] = n;
+    gesleuteld[rel] = n;
   }
+
+  /* RATEL 1 PER BESTAND EN NIET HUISBREED. Huisbreed betekent dat ruimte die je
+     in het ene bestand wint, in het andere mag worden uitgegeven aan een echt
+     defect: het totaal blijft 246 en er is toch een Nederlandse datum bijgekomen.
+     Per bestand kan dat niet. */
+  const localePerBestand = {};
+  for (const v of Object.values(oppervlakken)) {
+    for (const l of v.vasteLocale) {
+      const b = bestandVan(l.herkomst);
+      localePerBestand[b] = (localePerBestand[b] || 0) + 1;
+    }
+  }
+  const parsefouten = [].concat(...Object.values(oppervlakken).map(v => v.parsefouten));
 
   const uit = {
     gemetenOp: new Date().toISOString().slice(0, 10),
@@ -419,20 +529,58 @@ function meet() {
         'zakken zodra hij stijgt; `schaduw` wordt alleen gemeld. Wie een getal met opzet ' +
         'verhoogt, schrijft de reden erbij -- een ratel die je losdraait is geen ratel.',
       hardVasteLocale: locales.length,
+      hardVasteLocalePerBestand: localePerBestand,
       hardGesleuteldeBestanden: gesleuteld,
+      parsefouten: parsefouten.length,
       schaduwHuisbreed: alle.size,
       waaromSchaduw: 'Er is nog geen berichtencatalogus en geen t(sleutel)-runtime, dus een ' +
         'nieuw scherm MOET vandaag hardcoden. Dit getal blokkeren zou alle bouw stilleggen. ' +
         'Het gaat bijten zodra de runtime er is.'
     },
+    /* WAT DEZE METER NIET ZIET, MET DE GEMETEN OMVANG ERBIJ.
+
+       Deze lijst is na een gerichte aanval op de meter en op keuringsregel 68
+       herschreven. Alles wat hier staat is BEWEZEN ontsnapt, niet vermoed --
+       een gat dat er staat is iets anders dan een gat dat stil ontbreekt, en
+       alleen het eerste kun je inplannen. */
     nietGedekt: [
-      'Tekst die pas bij het draaien ontstaat: samengestelde zinnen, template-literals met een ' +
-        'variabele erin, en tekst die uit de database komt. Een statische meter ziet die niet.',
-      'Bevroren tekst: labels die ooit uit een register naar de database zijn gekopieerd en daar ' +
-        'blijven staan. Wijzigen aan de bron bereikt een bestaande installatie dan niet.',
+      'DE VORMZEEF, en dit is het grootste gat. De scanner ziet alleen een KALE ' +
+        'stringliteraal op een bekende plek. Ontsnapt bewezen: een template-literal met een ' +
+        'expressie erin (`Welkom terug ${naam}`), string-optelling, een array met .join(), tekst ' +
+        'via een variabele, en de sinks createTextNode, insertAdjacentHTML en replaceChildren. ' +
+        'Dat is het meest gebruikte idioom voor UI-tekst in dit huis, dus het huisbrede getal is ' +
+        'een ONDERGRENS van onbekende ruimte. De reparatie (elke literal in de deelboom van een ' +
+        'sink tellen) is middelgroot en verschuift de basislijn fors; hij hoort vooraf te gaan aan ' +
+        'het moment dat het huisbrede getal hard wordt gemaakt.',
+      'VIER BEDIENDE OPPERVLAKKEN worden niet gelezen, met hun gemeten omvang: de root ' +
+        'index.html (92 teksten, 69 nergens anders -- en die pagina WORDT bediend), de 31 ' +
+        'webmanifesten (91 teksten, 57 nergens anders -- waaronder de naam van de app op het ' +
+        'beginscherm van een lid), de content-eigenschap in CSS (20 teksten, 18 nergens anders), ' +
+        'en .json/.txt-bestanden die naar de client gaan. De bestandslijst hangt aan een MAP; zij ' +
+        'hoort aan de bediende bron te hangen.',
+      'HTML DIE DE SERVER MET + AAN ELKAAR PLAKT (ongeveer 84, graad vermoed): kantoorsjablonen ' +
+        'en de blokrenderer bouwen HTML met optelling, en dat hangt onder geen labelsleutel en ' +
+        'geen sink.',
+      'DE LOCALE UIT EEN CONSTANTE: `const NL = \'nl-NL\'; d.toLocaleString(NL)` is onzichtbaar. ' +
+        'Dat volgen vraagt dataflow-analyse en maakt van deze meter een halve interpreter; de ' +
+        'ontwijking vraagt bovendien opzet. Bewust niet gebouwd.',
+      'KORTE HOOFDLETTERCODES worden verworpen (66 uniek). Van de 141 verworpen voorkomens zijn ' +
+        'er 89 merk- en vakafkorting (RTG, PDA, HACCP, BRIN) en 52 een gewoon woord (OK, JA, ' +
+        'LEEG, KASSA). Versoepelen haalt vooral sleutelnamen binnen; de winst is 52 woorden.',
+      'RATEL 2 TELT VOORKOMENS EN GEEN TEKSTEN, dus een zin sleutelen koopt ruimte voor een ' +
+        'nieuwe zin in hetzelfde bestand. Dat vraagt opzet, en het kost precies een vertaling.',
+      'BUNDELDELEN bewegen geen getal tot `npm run build` draait; daarna slaat het toe bij wie ' +
+        'dat toevallig draait, met een verwijzing naar bouwuitvoer.',
+      'TEKSTKNOPEN WORDEN GESPLITST OP ELKE TAG, dus "Onze <b>reis</b> gaat door" wordt twee ' +
+        'brokken. Voor tellen is dat ruis; voor een latere catalogus zijn het geen vertaaleenheden.',
+      'Tekst die pas bij het draaien ontstaat, en BEVROREN tekst: labels die ooit uit een register ' +
+        'naar de database zijn gekopieerd. Wijzigen aan de bron bereikt een bestaande installatie ' +
+        'dan niet.',
       'De KWALITEIT van welke vertaling dan ook. Deze meter telt plekken; hij beoordeelt geen taal.',
       'De grens tussen INHOUD en INTERFACE. Lesmateriaal en een productnaam zijn inhoud; een ' +
-        'statusnaam en een knop zijn interface. Deze meter telt beide en kiest niet.',
+        'statusnaam en een knop zijn interface. Deze meter telt beide en kiest niet. In het ' +
+        'getelde zit daardoor ruis: poortdocumentatie uit server/kern/handlerpoorten/, ' +
+        'HTML-fragmenten inclusief class=, en zaai- en lesmateriaal.',
       'Afgeleide registers (handelingindex.json, sprongindex.json) tellen niet mee: ze zijn ' +
         'gegenereerd uit de schermen en zouden dubbeltelling zijn.'
     ]

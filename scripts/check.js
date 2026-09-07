@@ -5436,30 +5436,70 @@ console.log('\n68) geen nieuwe hardcoded tekst waar de sleutelweg al bestaat');
     catch (e) { fout('de tekstmeter liep vast: ' + e.message); }
 
     if (nu) {
-      /* ratel 1: de vaste locale */
-      const was = g.hardVasteLocale, is = nu.vasteLocale.aanroepen;
-      if (is > was) {
-        fout('er zijn ' + (is - was) + ' aanroepen met een vaste nl-locale bijgekomen (' + was + ' -> ' + is +
-          '). Geef de taal van de gebruiker mee in plaats van \'nl-NL\'; dat kan vandaag al. ' +
-          'Moet het getal echt omhoog, verhoog het dan met opzet via `npm run tekstoppervlak` en zeg waarom');
+      /* EEN PARSEFOUT IS NUL TEKSTEN, EN DAT LIJKT OP VOORUITGANG.
+         scanJs vangt een parsefout en geeft nul terug. Zonder deze controle zet
+         een syntaxfout stil een lagere basislijn, en zakt de keuring pas als
+         iemand hem REPAREERT. "Niet vast te stellen" mag nooit als "in orde"
+         langskomen. */
+      if (nu.grendel.parsefouten > 0) {
+        fout(nu.grendel.parsefouten + ' bestand(en) konden niet worden geparseerd; hun tekst telt als NUL ' +
+          'en dat verlaagt de basislijn stilletjes. Repareer de syntaxfout, of splits het inline blok niet ' +
+          'midden in een functie');
       }
 
-      /* ratel 2: per bestand dat de sleutelweg al gebruikt */
-      const gestegen = [];
-      for (const [bestand, wasN] of Object.entries(g.hardGesleuteldeBestanden || {})) {
-        const isN = (nu.grendel.hardGesleuteldeBestanden || {})[bestand];
-        if (typeof isN === 'number' && isN > wasN) gestegen.push(bestand + ' (' + wasN + ' -> ' + isN + ')');
+      /* ratel 1: de vaste locale, PER BESTAND. Huisbreed telde betekende dat
+         ruimte gewonnen in het ene bestand in het andere kon worden uitgegeven. */
+      const localeOp = [];
+      const wasLoc = g.hardVasteLocalePerBestand || {};
+      const isLoc = nu.grendel.hardVasteLocalePerBestand || {};
+      for (const bestand of Object.keys(isLoc)) {
+        const w = wasLoc[bestand] || 0;
+        if (isLoc[bestand] > w) localeOp.push(bestand + ' (' + w + ' -> ' + isLoc[bestand] + ')');
       }
+      if (localeOp.length) {
+        fout(localeOp.length + ' bestand(en) kregen een vaste nl-locale erbij: ' + localeOp.slice(0, 4).join(', ') +
+          (localeOp.length > 4 ? ' en ' + (localeOp.length - 4) + ' meer' : '') +
+          '. Geef de taal van de gebruiker mee in plaats van \'nl-NL\'; dat kan vandaag al, zonder catalogus. ' +
+          'Moet het getal echt omhoog, draai dan `npm run tekstoppervlak` en zeg in de commitboodschap waarom');
+      }
+
+      /* ratel 2: per bestand dat de sleutelweg al gebruikt. Sinds de
+         groene-padreparatie telt tekst ONDER T() of data-i18n hier niet mee, dus
+         er IS een manier om zichtbare tekst toe te voegen die groen blijft. */
+      const gestegen = [], verdwenen = [];
+      const wasG = g.hardGesleuteldeBestanden || {}, isG = nu.grendel.hardGesleuteldeBestanden || {};
+      for (const [bestand, wasN] of Object.entries(wasG)) {
+        const isN = isG[bestand];
+        /* EEN VERDWENEN INGANG IS STILTE, EN STILTE IS HIER EEN UITGANG.
+           Wie een gesleuteld bestand hernoemt, verplaatst, of er T()/data-i18n
+           uithaalt, viel hiervoor zonder melding uit de ratel -- en was daarna
+           vrij. */
+        if (typeof isN !== 'number') verdwenen.push(bestand + ' (stond op ' + wasN + ')');
+        else if (isN > wasN) gestegen.push(bestand + ' (' + wasN + ' -> ' + isN + ')');
+      }
+      /* EN EEN NIEUW GESLEUTELD BESTAND KOMT BINNEN OP NUL. Anders heeft een
+         scherm dat vanaf dag een de sleutelweg gebruikt nooit een bovengrens. */
+      for (const [bestand, isN] of Object.entries(isG)) {
+        if (!(bestand in wasG) && isN > 0) gestegen.push(bestand + ' (nieuw, 0 -> ' + isN + ')');
+      }
+
       if (gestegen.length) {
         fout(gestegen.length + ' bestand(en) die T() of data-i18n AL gebruiken kregen er hardcoded tekst bij: ' +
           gestegen.slice(0, 5).join(', ') + (gestegen.length > 5 ? ' en ' + (gestegen.length - 5) + ' meer' : '') +
-          '. Het alternatief staat in datzelfde bestand -- gebruik de sleutelweg');
+          '. Het alternatief staat in datzelfde bestand: zet de tekst achter T(sleutel, tekst) of data-i18n, ' +
+          'dan telt hij hier niet mee');
+      }
+      if (verdwenen.length) {
+        fout(verdwenen.length + ' bestand(en) uit de basislijn zijn verdwenen (hernoemd, verplaatst, of de ' +
+          'sleutelweg is eruit gehaald): ' + verdwenen.slice(0, 4).join(', ') +
+          '. Een bestand mag niet stil uit de ratel vallen -- draai `npm run tekstoppervlak` als de verhuizing klopt');
       }
 
-      if (is <= was && !gestegen.length) {
-        ok('vaste nl-locale ' + is + ' (grens ' + was + '), en geen van de ' +
-          Object.keys(g.hardGesleuteldeBestanden || {}).length +
-          ' gesleutelde bestanden kreeg hardcoded tekst erbij');
+      if (!localeOp.length && !gestegen.length && !verdwenen.length && !nu.grendel.parsefouten) {
+        const opNul = Object.values(isG).filter(v => v === 0).length;
+        ok('vaste nl-locale ' + nu.vasteLocale.aanroepen + ' over ' + Object.keys(isLoc).length +
+          ' bestanden, en van de ' + Object.keys(isG).length + ' gesleutelde bestanden staan er ' + opNul +
+          ' op nul hardcoded tekst; geen enkele steeg');
       }
 
       /* schaduw: het totaal meldt en velt niet */

@@ -294,8 +294,13 @@ function scanJs(bron, herkomst, vangst) {
 function scanHtml(bron, herkomst, vangst) {
   /* de inline scripts APART, want die zijn voor de tekstmeting onzichtbaar
      (hij strippt <script>) en voor de .js-meting ook (ze staan niet in .js) */
+  /* EEN SLUITTAG MAG WITRUIMTE DRAGEN: </script > is geldige HTML. Zonder
+     \s* voor de > sluit zo'n tag het blok niet en slokt de scanner de rest van
+     het document op als script -- CodeQL vond het als "bad HTML filtering
+     regexp". Als beveiligingsvondst is het hier loos (dit is een meter over
+     onze eigen bestanden, geen sanitizer), als meetfout is het echt. */
   const scripts = [];
-  const zonderScript = bron.replace(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi, (m, attrs, body) => {
+  const zonderScript = bron.replace(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi, (m, attrs, body) => {
     if (!/\bsrc\s*=/i.test(attrs) && body.trim()) scripts.push(body);
     return ' ';
   });
@@ -307,7 +312,7 @@ function scanHtml(bron, herkomst, vangst) {
      UI-brokken bewaart, en <svg><text> is gewoon zichtbare tekst. De aanval
      zette een hele kaart met kop, alinea en knop in een <template>, cloneerde
      hem in het DOM, en geen enkel getal bewoog. */
-  const schoon = zonderScript.replace(/<(style|noscript|code|pre)\b[\s\S]*?<\/\1>/gi, ' ')
+  const schoon = zonderScript.replace(/<(style|noscript|code|pre)\b[\s\S]*?<\/\1\s*>/gi, ' ')
     .replace(/<!--[\s\S]*?-->/g, ' ');
 
   /* ZICHTBARE TEKSTKNOPEN, MET HET VOORAFGAANDE TAG ERBIJ.

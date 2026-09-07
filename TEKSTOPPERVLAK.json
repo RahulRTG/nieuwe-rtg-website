@@ -1,20 +1,20 @@
 {
   "gemetenOp": "2026-09-07",
   "bestanden": {
-    "html": 293,
+    "html": 302,
     "clientJs": 495,
-    "serverJs": 3271,
+    "serverJs": 3275,
     "bundelsGeteldDelenOvergeslagen": 62
   },
   "totaal": {
-    "uniekeTeksten": 24110,
-    "woorden": 160293,
-    "opMeerDanEenOppervlak": 1022
+    "uniekeTeksten": 24400,
+    "woorden": 163258,
+    "opMeerDanEenOppervlak": 1024
   },
   "perOppervlak": {
     "html": {
-      "unieke": 8610,
-      "voorkomens": 11999,
+      "unieke": 8902,
+      "voorkomens": 12426,
       "parsefouten": 0
     },
     "client": {
@@ -23,20 +23,20 @@
       "parsefouten": 0
     },
     "server": {
-      "unieke": 11943,
-      "voorkomens": 14931,
+      "unieke": 11944,
+      "voorkomens": 14932,
       "parsefouten": 0
     }
   },
   "perVorm": {
-    "html-tekst": 6059,
-    "eigenschap:error": 5315,
+    "html-tekst": 6340,
+    "eigenschap:error": 5316,
     "T()": 3479,
     "eigenschap:naam": 2207,
     "eigenschap:label": 965,
     "eigenschap:uitleg": 847,
     "eigenschap:wat": 794,
-    "html-attribuut:aria-label": 733,
+    "html-attribuut:aria-label": 735,
     "eigenschap:tekst": 647,
     "html-attribuut:placeholder": 583,
     "melder:meld": 567,
@@ -45,7 +45,7 @@
     "eigenschap:titel": 362,
     "eigenschap:waarom": 347,
     "html-gesleuteld": 304,
-    "html-titel": 290,
+    "html-titel": 299,
     "toewijzing:innerHTML": 274,
     "eigenschap:les": 168,
     "eigenschap:vraag": 167,
@@ -73,12 +73,12 @@
     "html-attribuut:data-titel": 15,
     "eigenschap:placeholder": 12,
     "eigenschap:onderwerp": 12,
+    "html-meta": 11,
     "eigenschap:melding": 11,
     "html-attribuut:alt": 9,
     "eigenschap:bericht": 6,
     "toewijzing:value": 5,
     "melder:notify": 4,
-    "html-meta": 2,
     "setAttribute:title": 1,
     "melder:notifySupplier": 1,
     "melder:sendSms": 1
@@ -278,7 +278,7 @@
       "public/shared/verbinding.js": 3
     },
     "parsefouten": 0,
-    "schaduwHuisbreed": 24110,
+    "schaduwHuisbreed": 24400,
     "waaromSchaduw": "Er is nog geen berichtencatalogus en geen t(sleutel)-runtime, dus een nieuw scherm MOET vandaag hardcoden. Dit getal blokkeren zou alle bouw stilleggen. Het gaat bijten zodra de runtime er is."
   },
   "nietGedekt": [

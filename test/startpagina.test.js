@@ -50,6 +50,63 @@ test('de vier wereldkaarten en inloggen wijzen naar de echte app', () => {
   assert.match(HTML, /data-app-path="\/apps\/app\.html" href="https:\/\/app\.rahultravelgroup\.com\/apps\/app\.html">Inloggen/);
 });
 
+test('iedere wereld heeft vanaf de startpagina een eigen verhaalpagina', () => {
+  const werelden = {
+    livingos: '/apps/rtg.html',
+    travelos: '/apps/reizen.html',
+    workos: '/apps/kantoor.html',
+    foundationos: '/apps/foundation/index.html'
+  };
+
+  for (const [wereld, appPad] of Object.entries(werelden)) {
+    const relatiefPad = './public/site/werelden/' + wereld + '.html';
+    assert.match(HTML, new RegExp('href="' + relatiefPad.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '"'),
+      wereld + ' is vanaf zijn detailblok bereikbaar');
+
+    const bestand = path.join(ROOT, 'public/site/werelden', wereld + '.html');
+    assert.ok(fs.existsSync(bestand), relatiefPad + ' bestaat');
+    const wereldHtml = fs.readFileSync(bestand, 'utf8');
+    assert.match(wereldHtml, /href="\.\.\/start\/start-base\.css"/,
+      wereld + ' gebruikt de gedeelde merkbasis');
+    assert.match(wereldHtml, /href="\.\/world\.css\?v=\d+"/,
+      wereld + ' gebruikt het gedeelde wereldontwerp');
+    assert.match(wereldHtml, /href="\.\.\/\.\.\/\.\.\/#werelden"/,
+      wereld + ' wijst terug naar het wereldenoverzicht');
+    assert.ok(wereldHtml.includes('https://app.rahultravelgroup.com' + appPad),
+      wereld + ' opent zijn canonieke app-route');
+  }
+});
+
+test('iedere pas heeft vanaf de startpagina een eigen verhaalpagina', () => {
+  const passen = {
+    community: '/apps/app.html?pas=guest',
+    'rtg-pass': '/apps/app.html?pas=rtg',
+    'business-lite': '/apps/kantoor.html',
+    'business-pass': '/apps/app.html?pas=business',
+    'lifestyle-pass': '/apps/app.html?pas=lifestyle'
+  };
+
+  for (const [pas, appPad] of Object.entries(passen)) {
+    const relatiefPad = './public/site/passen/' + pas + '.html';
+    assert.ok(HTML.includes('href="' + relatiefPad + '"'),
+      pas + ' is vanaf zijn prijskaart bereikbaar');
+
+    const bestand = path.join(ROOT, 'public/site/passen', pas + '.html');
+    assert.ok(fs.existsSync(bestand), relatiefPad + ' bestaat');
+    const pasHtml = fs.readFileSync(bestand, 'utf8');
+    assert.match(pasHtml, /href="\.\.\/start\/start-base\.css"/,
+      pas + ' gebruikt de gedeelde merkbasis');
+    assert.match(pasHtml, /href="\.\.\/werelden\/world\.css\?v=\d+"/,
+      pas + ' gebruikt het gedeelde verhaalontwerp');
+    assert.match(pasHtml, /href="\.\/pass\.css\?v=\d+"/,
+      pas + ' gebruikt het gedeelde pasontwerp');
+    assert.match(pasHtml, /href="\.\.\/\.\.\/\.\.\/#passen"/,
+      pas + ' wijst terug naar het passenoverzicht');
+    assert.ok(pasHtml.includes('https://app.rahultravelgroup.com' + appPad),
+      pas + ' opent zijn passende RTG-ingang');
+  }
+});
+
 test('alle lokale HTML- en stylesheetassets zijn projectpad-relatief en bestaan', () => {
   const lokaal = [...HTML.matchAll(/(?:src|href)="(\.\/public\/[^"?#]+)["?#]/g)].map(m => m[1]);
   assert.ok(lokaal.length >= 6, 'de landing noemt zijn lokale bladen, scripts en icoon');
@@ -57,13 +114,19 @@ test('alle lokale HTML- en stylesheetassets zijn projectpad-relatief en bestaan'
     assert.ok(fs.existsSync(path.join(ROOT, url.slice(2))), url + ' bestaat');
   }
 
-  for (const cssPad of ['start-base.css', 'start-layout.css', 'start-responsive.css']) {
-    const bestand = path.join(ROOT, 'public/site/start', cssPad);
+  for (const cssRelatief of [
+    'public/site/start/start-base.css',
+    'public/site/start/start-layout.css',
+    'public/site/start/start-responsive.css',
+    'public/site/werelden/world.css',
+    'public/site/passen/pass.css'
+  ]) {
+    const bestand = path.join(ROOT, cssRelatief);
     const css = fs.readFileSync(bestand, 'utf8');
     for (const match of css.matchAll(/url\(["']?([^"')]+)["']?\)/g)) {
-      assert.ok(!match[1].startsWith('/'), cssPad + ' gebruikt geen root-absoluut assetpad');
+      assert.ok(!match[1].startsWith('/'), cssRelatief + ' gebruikt geen root-absoluut assetpad');
       assert.ok(fs.existsSync(path.resolve(path.dirname(bestand), match[1])),
-        cssPad + ': ' + match[1] + ' bestaat');
+        cssRelatief + ': ' + match[1] + ' bestaat');
     }
   }
 });

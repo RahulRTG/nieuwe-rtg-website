@@ -70,8 +70,14 @@ body[data-rtg-skin="heritage"] :where(.wacht,.let,[data-status="pending"],[data-
    parelmoeren Social-inhoud en de zwarte onboarding. Zij krijgen hier lokaal
    hun eigen inktset; de wereldidentiteit en de rest van het scherm veranderen
    niet. */
-body[data-rtg-skin="heritage"] .cmd-bank{
-  --rtg-txt:#f4f0e9;--rtg-muted:#cdc9c0;--rtg-soft:#cdc9c0;color:#f4f0e9
+/* Balk en praatlog horen bij hetzelfde eiland als de bank: zelfde donkere grond,
+   inkt uit de lichte wereld eronder (1,18:1 gemeten). --rtg-line ontbrak ook voor
+   de bank. Metingen: commit 24954750. Deze laag heeft een budget van 10 KB. */
+body[data-rtg-skin="heritage"] .cmd-bank,
+body[data-rtg-skin="heritage"] .cmd-balk,
+body[data-rtg-skin="heritage"] .cmd-praat{
+  --rtg-txt:#f4f0e9;--rtg-muted:#cdc9c0;--rtg-soft:#cdc9c0;
+  --rtg-line:var(--onyx-rand,rgba(255,255,255,.09));color:#f4f0e9
 }
 body.rtg-social-elite[data-rtg-skin="heritage"][data-rtg-world="living"] main#inhoud{
   --rtg-txt:#171712;--rtg-muted:#625f57;--rtg-soft:#625f57;

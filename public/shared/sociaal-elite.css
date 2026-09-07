@@ -71,7 +71,7 @@
   .rtg-social-elite .merkkop{position:relative;display:block;min-height:246px;padding:1.7rem 0 1.4rem;}.rtg-social-elite .merkkop>div:first-child{display:block;}.rtg-social-elite .sociaal-boven{display:block;margin:0 0 .75rem;}.rtg-social-elite .merkkop h1{max-width:9.5ch;font-size:2.65rem;line-height:1;}.rtg-social-elite .sociaal-inleiding{max-width:33ch;margin-top:.85rem;font-size:.8rem;line-height:1.55;}.rtg-social-elite .sociaal-filter{position:absolute;top:1.15rem;right:0;min-width:92px;min-height:44px;font-size:.66rem;}.sociaal-filtermenu{top:4.4rem;right:0;}
   .rtg-social-elite .sociaal-ruimtes{position:fixed;z-index:45;right:0;bottom:calc(env(safe-area-inset-bottom) + 24px);left:0;margin:0;border:0;border-top:1px solid rgba(255,255,255,.1);border-radius:0;background:rgba(20,21,19,.97);box-shadow:0 -12px 35px rgba(0,0,0,.18);}.rtg-social-elite .sociaal-ruimtes a{flex:1 1 20%;min-width:0;min-height:68px;display:grid;place-items:center;padding:.45rem .18rem!important;border-right-color:rgba(255,255,255,.08);background:transparent!important;color:rgba(255,255,255,.58);font-size:.62rem;text-align:center;}.rtg-social-elite .sociaal-ruimtes a small,.rtg-social-elite .sociaal-ruimtes a.is-levend::before{display:none;}.rtg-social-elite .sociaal-ruimtes a.actief{color:#fff;}.rtg-social-elite .sociaal-ruimtes a.actief::after{left:.45rem;right:.45rem;background:#bca66c;}
   .sociaal-stage{display:flex;min-height:0;flex-direction:column;margin-top:.8rem;gap:12px;}.sociaal-stage>#vandaagVak,.sociaal-stage>.sociaal-briefing,.sociaal-stage>.sociaal-kringpaneel{grid-column:auto!important;grid-row:auto!important;}#vandaagVak{order:1;min-height:360px;padding:1.35rem;border-radius:0;}#vandaagVak .sociaal-uitgelicht{top:1.2rem;left:1.25rem;}#vandaagVak>.regkop{position:relative;top:auto;right:auto;left:auto;margin-bottom:.75rem;}#vandaagVak>.regkop h2{font-size:2rem;}#vandaag{position:relative;top:auto;left:auto;width:100%;}.sociaal-briefing{order:2;padding:1.2rem;border-radius:0;}.sociaal-kringpaneel{order:3;padding:1.2rem;border-radius:0;}
-  .sociaal-register,.sociaal-poorten{margin-top:1.7rem;}.sociaal-register #lijn{grid-template-columns:1fr;gap:10px;}.sociaal-poorten .poorten{grid-template-columns:1fr 1fr;}.sociaal-poorten .poort{min-height:116px;}
+  .sociaal-register,.sociaal-poorten{margin-top:1.7rem;}.sociaal-register #lijn{grid-template-columns:1fr;gap:10px;}.sociaal-poorten .poorten{grid-template-columns:repeat(2,minmax(0,1fr));}.sociaal-poorten .poort{min-height:116px;}
 }
 
 /* ==========================================================================
@@ -328,7 +328,7 @@
   .sociaal-register,.sociaal-poorten{margin-top:3.5rem;padding-inline:1.25rem;}
   .sociaal-register #lijn{grid-template-columns:1fr;}
   .sociaal-register .vak{padding:1.2rem 0;border-right:0;border-bottom:1px solid rgba(23,23,18,.13);}
-  .sociaal-poorten .poorten{grid-template-columns:1fr 1fr;}
+  .sociaal-poorten .poorten{grid-template-columns:repeat(2,minmax(0,1fr));}
   .sociaal-poorten .poort{min-height:104px;padding:1.1rem .8rem;}
   .sociaal-poorten .poort:nth-child(2n){border-right:0;}
 }

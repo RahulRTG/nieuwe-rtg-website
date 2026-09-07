@@ -173,13 +173,24 @@ test('Rahul/concierge: antwoordt in de taal van het lid en de geschiedenis leest
   const rtg = (await api(base, '/api/auth/register', { name: 'Rahul Lid', email: 'b' + u + '@x.nl',
     phone: '061' + u, password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
 
-  // het lid schrijft in het Engels; zonder AI-sleutel vertaalt het demo-antwoord
-  // via het woordenboek mee en draagt het de juiste taal
+  /* HET ANTWOORD DRAAGT DE TAAL DIE HET ECHT HEEFT.
+
+     Hier stond `rahul.lang === 'en'`, met als toelichting dat het demo-antwoord
+     "via het woordenboek meevertaalt". Dat was niet waar: het woordenboek
+     wisselde een paar losse woorden om en meldde `translated: true`, waarna
+     kern/ai.js het Nederlandse antwoord als Engels stempelde. Het lid kreeg
+     Nederlands met een Engels etiket erop.
+
+     kern/ai.js was al eerlijk -- die zet de doeltaal ALLEEN bij `t.translated`
+     en anders 'nl'. De leugen zat in server/translate.js en is daar gerepareerd.
+     Zonder AI-sleutel is het vaste antwoord dus Nederlands, en dat zegt het nu
+     ook. Met een modelserver (LOCAL_AI_URL) wordt dit 'en'; dat is dan een
+     echte vertaling van de hele boodschap en geen omgewisselde woorden. */
   const r = await api(base, '/api/chat/send', { text: 'hallo', lang: 'en' }, rtg);
   assert.equal(r.status, 200);
   const rahul = r.body.messages.filter(m => m.from === 'rahul').pop();
   assert.ok(rahul && rahul.text.length > 0, 'Rahul antwoordt');
-  assert.equal(rahul.lang, 'en', 'het antwoord draagt de taal van het lid');
+  assert.equal(rahul.lang, 'nl', 'zonder model draagt het antwoord zijn echte taal en niet de gevraagde');
 
   // de geschiedenis leest per kijker: zelfde gesprek, nl-bril -> nl-mechaniek
   const hist = await api(base, '/api/chat/history', { lang: 'en' }, rtg);

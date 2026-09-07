@@ -65,19 +65,30 @@ test('1. de thuistaal: de ouder zet hem, rommel wordt geweigerd, de leraar ziet 
 test('2. tweetalig overzicht: de eigen taal ernaast, het Nederlands blijft staan', async () => {
   const { klas, g, kindToken, profielId } = await opzet('Twee');
   await api('/school/taal', { code: g.code, token: g.token, klasCode: klas.code, profielId, taal: 'en' });
-  const hw = await json(await lr(klas, '/school/huiswerk/maak', { titel: 'Morgen oefenen', vak: 'taal' }));
+  const hw = await json(await lr(klas, '/school/huiswerk/maak', { titel: 'Morgen', vak: 'taal' }));
   await lr(klas, '/school/mededeling', { tekst: 'Morgen is er geen school.' });
   const mijn = await json(await api('/school/mijn', { code: g.code, token: kindToken }));
   const entry = mijn.school[0];
   assert.equal(entry.taal, 'en');
   // het Nederlands staat er nog gewoon (dat is de taal die het kind leert)
-  assert.equal(entry.huiswerk[0].titel, 'Morgen oefenen');
+  /* 'Morgen' en niet 'Morgen oefenen': het wereldwoordenboek dekt een bericht
+     dat zelf een kernwoord is, en dat is sinds de reparatie van
+     server/translate.js de enige vertaling zonder model. 'Morgen oefenen'
+     "vertaalde" hier alleen doordat het ene woord werd omgewisseld. */
+  assert.equal(entry.huiswerk[0].titel, 'Morgen');
   // en de eigen taal staat ernaast
   assert.ok(entry.vertaling, 'de tweetalige laag reist mee');
   assert.match(entry.vertaling.huiswerk[hw.huiswerk.id].titel, /Tomorrow/i, 'vertaald naar de thuistaal');
   const medIds = Object.keys(entry.vertaling.mededelingen);
   assert.ok(medIds.length >= 1);
-  assert.match(entry.vertaling.mededelingen[medIds[0]], /Tomorrow/i);
+  /* EEN ZIN WORDT NOOIT HALF VERTAALD. 'Morgen is er geen school.' is geen
+     woordenboekingang; zonder model blijft hij heel Nederlands, ook in de
+     thuistaallaag -- en dat is eerlijker dan "Tomorrow is er geen school." met
+     een vertaalstempel erop. Dat de laag hier het Nederlands herhaalt is een
+     kaal punt dat bij de berichtencatalogus hoort (een zin zonder vertaling
+     hoort gemarkeerd of weggelaten), niet iets om hier weg te toetsen. */
+  assert.equal(entry.vertaling.mededelingen[medIds[0]], 'Morgen is er geen school.',
+    'zonder model blijft een zin heel, nooit half omgewisseld');
   // een klasgenoot zonder thuistaal krijgt geen vertaallaag (niets dubbels)
   const g2 = await json(await api('/gezin/maak', { gezinsnaam: 'Fam NL', naam: 'Ouder NL', pin: '1234' }));
   const kind2 = await json(await api('/gezin/profiel/maak', { code: g2.code, token: g2.token, naam: 'Kind NL', rol: 'kind', groep: 'kind' }));

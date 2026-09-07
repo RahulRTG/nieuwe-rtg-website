@@ -181,6 +181,17 @@
         <button class="knop grijs mini" id="pinNieuwKnop">Nieuwe pin</button>
         <button class="knop grijs mini" id="pinLiveBeheerKnop">Live code</button>
         <button class="knop grijs mini" id="pinUitKnop">Pin uitzetten</button>
+        <!-- HET NOODSLOT WAS ER WEL EN STOND ER NIET. Bij het uitdunnen
+             hierboven ("vijf gelijke knoppen betekent dat er geen belangrijk
+             is") is deze knop uit de opmaak gevallen terwijl zijn code bleef
+             staan: pinStandTonen() en de listener onderaan zochten allebei
+             #pinNoodKnop. Die eerste $() gooide, en daarmee viel de rest van
+             het scriptblok stil -- laad(), de stream, chat, foto's, snaps,
+             verhalen en bellen. Een ontbrekende knop nam dus de halve app mee.
+             Weghalen was hier de verkeerde reparatie: het noodslot is de enige
+             plek waar een lid zijn PIN kan bevriezen als hij zijn telefoon
+             kwijt is, en pin-deur.js dwingt dat af met 423. -->
+        <button class="knop grijs mini" id="pinNoodKnop">Noodslot</button>
         <button class="knop grijs mini" id="pinKoppelKnop">Mijn koppelingen</button>
       </div>
     </details>

@@ -3,11 +3,17 @@
     // op het zuidelijk halfrond naar het noorden -- daar staan de mooiste beelden.
     var obs = { lat: 50, lon: -(new Date().getTimezoneOffset() / 60) * 15 };
     function facing() { return obs.lat >= 0 ? 180 : 0; }
-    // ongevraagd bij het openen, dus de GPS-schakelaar (rtg_os_gps) wint;
-    // zonder plek valt de kaart terug op de tijdzone-schatting hierboven
-    var gpsUit = false;
-    try { gpsUit = localStorage.getItem('rtg_os_gps') !== '1'; } catch (e) {}
-    if (!gpsUit && navigator.geolocation) {
+    /* Ongevraagd bij het openen, dus de GPS-schakelaar wint; zonder plek valt
+       de kaart terug op de tijdzone-schatting hierboven. Wat hier VERANDERD is:
+       de schakelaar werd rechtstreeks uit localStorage gelezen. Dat is precies
+       de dubbeling waar shared/plek.js mee afrekende -- twee plekken die weten
+       hoe "uit" eruitziet, en een ervan mist het moment waarop de gebruiker
+       hem aanzet. De contractlaag is voortaan de enige lezer; de sterrenhemel
+       VRAAGT niets (RTGPlek.vraag zou een kaartje openen bij het opengaan van
+       een scherm dat er niet om ging) maar leest alleen de stand. */
+    var gpsAan = !!(window.RTGPlek && window.RTGPlek.aan());
+    if (!window.RTGPlek && window.console) console.warn('[sterren] shared/plek.js ontbreekt op deze pagina; de sterrenkaart gebruikt de tijdzone-schatting.');
+    if (gpsAan && navigator.geolocation) {
       try {
         navigator.geolocation.getCurrentPosition(function (p) {
           obs = { lat: p.coords.latitude, lon: p.coords.longitude };

@@ -1,7 +1,7 @@
 {
  "uitleg": "Doet de functie het? Per onderdeel uit MAPPEN, met de persona aan wie de wereld hem toont, gemeten in een echte browser met een echte sessie. Drie van de acht bewijzen uit BETROUWBAARHEID.md worden hier gemeten; de andere vijf staan er met de reden waarom ze nog niet te meten zijn.",
  "hoe": "node scripts/appwerkt.js  (--controle zakt als het aantal defecten groeit)",
- "grens": "Een BEWEZEN rij betekent: de ingang opent voor zijn persona en de bediening breekt niet. Het betekent NIET dat de functie werkt -- daarvoor zijn de vijf bewijzen nodig die hier GEEN_FIXTURE zijn. Er worden geen formulieren ingevuld en geen onomkeerbare knoppen aangetikt; die staan per rij in `overgeslagen`.",
+ "grens": "Een BEWEZEN rij betekent: de ingang opent voor zijn persona en de bediening breekt niet. Het betekent NIET dat de functie werkt -- daarvoor zijn de vijf bewijzen nodig die hier GEEN_FIXTURE zijn. Er worden geen formulieren ingevuld en geen onomkeerbare knoppen aangetikt; die staan per rij in `overgeslagen`. EN: een groot deel van wat er zichtbaar staat is niet aan te tikken -- er ligt iets overheen, of het is weg op het moment van tikken. Raakt de proef minder dan de helft van een scherm, dan is die rij NIET_GETEST en geen BEWEZEN; zie knoppenNietKlikbaar en schermenGrotendeelsOngemeten.",
  "standen": {
   "BEWEZEN": "gemeten en in orde",
   "GEBLOKKEERD_DOOR_DEFECT": "gemeten en stuk; hier moet code voor worden gerepareerd",
@@ -10,10 +10,10 @@
   "NIET_GETEST": "deze ronde niet aangeraakt, met de reden erbij"
  },
  "stempel": {
-  "op": "2026-09-07T11:59:06.040Z",
-  "commit": "783ebf1d",
-  "boomVuil": false,
-  "boomAnders": 0,
+  "op": "2026-09-07T12:56:32.461Z",
+  "commit": "19ece6d4",
+  "boomVuil": true,
+  "boomAnders": 2,
   "instrument": "scripts/appwerkt.js",
   "node": "v22.22.2"
  },
@@ -21,6 +21,10 @@
  "gemeten": {
   "onderdelen": 102,
   "defecten": 0,
+  "knoppenGevonden": 3407,
+  "knoppenAangetikt": 439,
+  "knoppenNietKlikbaar": 720,
+  "schermenGrotendeelsOngemeten": 80,
   "deurenZonderPersona": 2
  },
  "telling": {
@@ -32,8 +36,8 @@
    "NIET_GETEST": 15
   },
   "bedienbaar": {
-   "BEWEZEN": 87,
-   "NIET_GETEST": 15
+   "BEWEZEN": 6,
+   "NIET_GETEST": 96
   },
   "menselijk": {
    "NIET_GETEST": 102
@@ -84,7 +88,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "reden": "10 van 14 zichtbare knoppen aangetikt zonder fout, 4 niet aan te tikken (1x element is outside of the viewport, 3x intercepts pointer events)",
      "bewijs": null
     },
     "menselijk": {
@@ -118,8 +122,15 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 14,
+   "geklikt": 10,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als gezin: 2157 tekens zichtbaar"
    ],
@@ -151,7 +162,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "reden": "10 van 14 zichtbare knoppen aangetikt zonder fout, 4 niet aan te tikken (1x element is outside of the viewport, 3x intercepts pointer events)",
      "bewijs": null
     },
     "menselijk": {
@@ -185,8 +196,15 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 14,
+   "geklikt": 10,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als gezin: 2120 tekens zichtbaar"
    ],
@@ -252,8 +270,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [
     "als gezin: poort dicht"
    ],
@@ -319,8 +339,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [
     "als gezin: poort dicht"
    ],
@@ -352,7 +374,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "reden": "10 van 16 zichtbare knoppen aangetikt zonder fout, 4 niet aan te tikken (1x element is outside of the viewport, 3x intercepts pointer events)",
      "bewijs": null
     },
     "menselijk": {
@@ -386,8 +408,15 @@
      "bewijs": null
     }
    },
-   "geklikt": 2,
+   "gevonden": 16,
+   "geklikt": 10,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als gezin: 2083 tekens zichtbaar"
    ],
@@ -419,7 +448,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "4 knoppen aangetikt zonder fout",
+     "reden": "10 van 19 zichtbare knoppen aangetikt zonder fout, 4 niet aan te tikken (1x element is outside of the viewport, 3x intercepts pointer events)",
      "bewijs": null
     },
     "menselijk": {
@@ -453,8 +482,15 @@
      "bewijs": null
     }
    },
-   "geklikt": 4,
+   "gevonden": 19,
+   "geklikt": 10,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als gezin: 2828 tekens zichtbaar"
    ],
@@ -486,7 +522,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "3 knoppen aangetikt zonder fout",
+     "reden": "9 van 17 zichtbare knoppen aangetikt zonder fout, 5 niet aan te tikken (1x element is outside of the viewport, 4x intercepts pointer events)",
      "bewijs": null
     },
     "menselijk": {
@@ -520,8 +556,16 @@
      "bewijs": null
     }
    },
-   "geklikt": 3,
+   "gevonden": 17,
+   "geklikt": 9,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "KANT: intercepts pointer events",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als gezin: 2572 tekens zichtbaar"
    ],
@@ -552,8 +596,8 @@
      "bewijs": "/apps/foundation/vrienden.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "9 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "9 van 35 zichtbare knoppen aangetikt zonder fout, 5 niet aan te tikken (5x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -587,10 +631,18 @@
      "bewijs": null
     }
    },
+   "gevonden": 35,
    "geklikt": 9,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "(naamloos): element is not visible",
+    "(naamloos): element is not visible",
+    "(naamloos): element is not visible",
+    "(naamloos): element is not visible",
+    "(naamloos): element is not visible"
+   ],
    "waarnemingen": [
-    "als gezin: 1615 tekens zichtbaar"
+    "als gezin: 1616 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -619,8 +671,8 @@
      "bewijs": "/apps/mijn-isolatie.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "4 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "4 van 34 zichtbare knoppen aangetikt zonder fout, 10 niet aan te tikken (6x element is not visible, 4x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -654,8 +706,21 @@
      "bewijs": null
     }
    },
+   "gevonden": 34,
    "geklikt": 4,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events",
+    "Randen en alle functies: element is not visible",
+    "Terug: element is not visible",
+    "Vooruit: element is not visible",
+    "Aantal schermen: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 2131 tekens zichtbaar"
    ],
@@ -686,8 +751,8 @@
      "bewijs": "/apps/juridisch.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 29 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (1x element is outside of the viewport, 7x element is not visible, 4x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -721,8 +786,23 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 29,
+   "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events",
+    "Randen en alle functies: element is not visible",
+    "Terug: element is not visible",
+    "Vooruit: element is not visible",
+    "Aantal schermen: element is not visible",
+    "Gesprek met Rahul: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1366 tekens zichtbaar"
    ],
@@ -753,8 +833,8 @@
      "bewijs": "/apps/passkeys.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 43 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (11x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -788,8 +868,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 43,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Log in met passkey: intercepts pointer events",
+    "Passkey toevoegen: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 1441 tekens zichtbaar"
    ],
@@ -820,8 +915,8 @@
      "bewijs": "/apps/mijn-post.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "3 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "10 van 37 zichtbare knoppen aangetikt zonder fout, 4 niet aan te tikken (4x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -855,8 +950,15 @@
      "bewijs": null
     }
    },
-   "geklikt": 3,
+   "gevonden": 37,
+   "geklikt": 10,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "E-mail: intercepts pointer events",
+    "Sms: intercepts pointer events",
+    "Bericht in de app: intercepts pointer events",
+    "Zet alle post van RTG uit: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 2671 tekens zichtbaar"
    ],
@@ -887,8 +989,8 @@
      "bewijs": "/apps/veilig.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "4 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "12 van 42 zichtbare knoppen aangetikt zonder fout, 2 niet aan te tikken (2x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -922,8 +1024,13 @@
      "bewijs": null
     }
    },
-   "geklikt": 4,
+   "gevonden": 42,
+   "geklikt": 12,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Codewoord: intercepts pointer events",
+    "8 uur: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 2340 tekens zichtbaar"
    ],
@@ -954,8 +1061,8 @@
      "bewijs": "/apps/mijn-sessies.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 41 zichtbare knoppen aangetikt zonder fout, 11 niet aan te tikken (10x intercepts pointer events, 1x element is not visible), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -989,9 +1096,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 41,
    "geklikt": 2,
    "overgeslagen": [
     "Sluit deze sessie (uitloggen)"
+   ],
+   "nietKlikbaar": [
+    "Bevestig dit toestel: intercepts pointer events",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "(naamloos): element is not visible"
    ],
    "waarnemingen": [
     "als lid: 1493 tekens zichtbaar"
@@ -1023,8 +1144,8 @@
      "bewijs": "/apps/mijn-gegevens.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 40 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (10x intercepts pointer events, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -1058,8 +1179,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 40,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 16896 tekens zichtbaar"
    ],
@@ -1090,8 +1226,8 @@
      "bewijs": "/apps/ik.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 56 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (12x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -1125,8 +1261,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 56,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "WAAR STAAT U IN HET LEVEN: intercepts pointer events",
+    "HOE RAHUL TEGEN U DOET: intercepts pointer events",
+    "NAAM EN VOORNAAMWOORDEN: intercepts pointer events",
+    "HOE HET SCHERM ZICH GEDRAAGT: intercepts pointer events",
+    "WELKE HAND U GEBRUIKT: intercepts pointer events",
+    "GELOOF OF LEVENSBESCHOUWING: intercepts pointer events",
+    "HOE RAHUL ER VANDAAG BIJ ZIT: intercepts pointer events",
+    "Student of net begonnen\nStudie, rondkome: intercepts pointer events",
+    "Midden in het leven\nWerk, huishouden, ge: intercepts pointer events",
+    "Opa of oma\nAlle tijd, gewone woorden, en: intercepts pointer events",
+    "Middelbare school\nLos en beschermend; ru: intercepts pointer events",
+    "◡: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 2067 tekens zichtbaar"
    ],
@@ -1157,8 +1308,8 @@
      "bewijs": "/apps/mijn-relaties.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 39 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (10x intercepts pointer events, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -1192,8 +1343,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 39,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 3587 tekens zichtbaar"
    ],
@@ -1224,8 +1390,8 @@
      "bewijs": "/apps/wereld.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "3 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "6 van 49 zichtbare knoppen aangetikt zonder fout, 8 niet aan te tikken (1x element is outside of the viewport, 7x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -1259,10 +1425,21 @@
      "bewijs": null
     }
    },
-   "geklikt": 3,
+   "gevonden": 49,
+   "geklikt": 6,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events"
+   ],
    "waarnemingen": [
-    "als lid: 2719 tekens zichtbaar"
+    "als lid: 2720 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -1291,8 +1468,8 @@
      "bewijs": "/apps/appstore-dossier.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 38 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (10x intercepts pointer events, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -1326,8 +1503,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 38,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 3483 tekens zichtbaar"
    ],
@@ -1393,8 +1585,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -1423,8 +1617,8 @@
      "bewijs": "/apps/attenties.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "5 van 21 zichtbare knoppen aangetikt zonder fout, 2 niet aan te tikken (1x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -1458,10 +1652,16 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 21,
+   "geklikt": 5,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Spring naar een functie: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport"
+   ],
    "waarnemingen": [
-    "als lid: 1978 tekens zichtbaar"
+    "als lid: 1978 tekens zichtbaar",
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw; de proef verloor de pagina door een navigatie en opende hem opnieuw; opnieuw openen lukte niet: page.goto: Navigation to \"http://127.0.0.1:37325/apps/attenties.html\" is interru"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -1490,8 +1690,8 @@
      "bewijs": "/apps/geld.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "12 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "6 van 34 zichtbare knoppen aangetikt zonder fout, 7 niet aan te tikken (7x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -1525,9 +1725,19 @@
      "bewijs": null
     }
    },
-   "geklikt": 12,
+   "gevonden": 34,
+   "geklikt": 6,
    "overgeslagen": [
     "Wie betaalt wat"
+   ],
+   "nietKlikbaar": [
+    "Métier: intercepts pointer events",
+    "Balans: intercepts pointer events",
+    "RTG-code: intercepts pointer events",
+    "Lab-fonds: intercepts pointer events",
+    "Mecenaat: intercepts pointer events",
+    "Logboek: intercepts pointer events",
+    "Nalatenschap: intercepts pointer events"
    ],
    "waarnemingen": [
     "als lid: 1809 tekens zichtbaar"
@@ -1559,8 +1769,8 @@
      "bewijs": "/apps/geld.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "12 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "6 van 34 zichtbare knoppen aangetikt zonder fout, 7 niet aan te tikken (7x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -1594,9 +1804,19 @@
      "bewijs": null
     }
    },
-   "geklikt": 12,
+   "gevonden": 34,
+   "geklikt": 6,
    "overgeslagen": [
     "Wie betaalt wat"
+   ],
+   "nietKlikbaar": [
+    "Métier: intercepts pointer events",
+    "Balans: intercepts pointer events",
+    "RTG-code: intercepts pointer events",
+    "Lab-fonds: intercepts pointer events",
+    "Mecenaat: intercepts pointer events",
+    "Logboek: intercepts pointer events",
+    "Nalatenschap: intercepts pointer events"
    ],
    "waarnemingen": [
     "als lid: 1809 tekens zichtbaar"
@@ -1663,8 +1883,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -1693,8 +1915,8 @@
      "bewijs": "/apps/comm.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "4 van 29 zichtbare knoppen aangetikt zonder fout, 10 niet aan te tikken (9x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -1728,10 +1950,24 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 29,
+   "geklikt": 4,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "+: intercepts pointer events",
+    "ALLES: intercepts pointer events",
+    "MENSEN: intercepts pointer events",
+    "ZAKEN: intercepts pointer events",
+    "ONDERWEG: intercepts pointer events",
+    "OFFICIEEL: intercepts pointer events",
+    "RAHUL: intercepts pointer events",
+    "R\nRahul\nStel me gerust een vraag.\nRAHUL: intercepts pointer events",
+    "Spring naar een functie: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport"
+   ],
    "waarnemingen": [
-    "als lid: 1628 tekens zichtbaar"
+    "als lid: 1628 tekens zichtbaar",
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -1795,8 +2031,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -1825,8 +2063,8 @@
      "bewijs": "/apps/geld.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "12 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "6 van 34 zichtbare knoppen aangetikt zonder fout, 7 niet aan te tikken (7x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -1860,9 +2098,19 @@
      "bewijs": null
     }
    },
-   "geklikt": 12,
+   "gevonden": 34,
+   "geklikt": 6,
    "overgeslagen": [
     "Wie betaalt wat"
+   ],
+   "nietKlikbaar": [
+    "Métier: intercepts pointer events",
+    "Balans: intercepts pointer events",
+    "RTG-code: intercepts pointer events",
+    "Lab-fonds: intercepts pointer events",
+    "Mecenaat: intercepts pointer events",
+    "Logboek: intercepts pointer events",
+    "Nalatenschap: intercepts pointer events"
    ],
    "waarnemingen": [
     "als lid: 1809 tekens zichtbaar"
@@ -1929,8 +2177,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -1959,8 +2209,8 @@
      "bewijs": "/apps/pay.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "12 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "12 van 46 zichtbare knoppen aangetikt zonder fout, 2 niet aan te tikken (1x element is outside of the viewport, 1x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -1994,12 +2244,15 @@
      "bewijs": null
     }
    },
+   "gevonden": 46,
    "geklikt": 12,
-   "overgeslagen": [
-    "Tik en betaal"
+   "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "(naamloos): element is not visible"
    ],
    "waarnemingen": [
-    "als lid: 1129 tekens zichtbaar"
+    "als lid: 1130 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -2028,8 +2281,8 @@
      "bewijs": "/apps/camera.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "9 van 48 zichtbare knoppen aangetikt zonder fout, 5 niet aan te tikken (5x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -2063,10 +2316,19 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 48,
+   "geklikt": 9,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "FOOD: intercepts pointer events",
+    "Spraaksturing: zeg bijvoorbeeld foto, wi: intercepts pointer events",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events"
+   ],
    "waarnemingen": [
-    "als lid: 1288 tekens zichtbaar"
+    "als lid: 1288 tekens zichtbaar",
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -2095,8 +2357,8 @@
      "bewijs": "/apps/cellier.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 38 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (1x element is outside of the viewport, 9x intercepts pointer events, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -2130,8 +2392,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 38,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1385 tekens zichtbaar"
    ],
@@ -2162,8 +2439,8 @@
      "bewijs": "/apps/cercle.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "5 van 21 zichtbare knoppen aangetikt zonder fout, 2 niet aan te tikken (1x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -2197,10 +2474,16 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 21,
+   "geklikt": 5,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Spring naar een functie: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport"
+   ],
    "waarnemingen": [
-    "als lid: 1896 tekens zichtbaar"
+    "als lid: 1896 tekens zichtbaar",
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw; de proef verloor de pagina door een navigatie en opende hem opnieuw; opnieuw openen lukte niet: page.goto: Navigation to \"http://127.0.0.1:37325/apps/cercle.html\" is interrupte"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -2229,8 +2512,8 @@
      "bewijs": "/apps/commerce.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "3 van 45 zichtbare knoppen aangetikt zonder fout, 11 niet aan te tikken (11x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -2264,8 +2547,22 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 45,
+   "geklikt": 3,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "In de mand: intercepts pointer events",
+    "Leegmaken: intercepts pointer events",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 3345 tekens zichtbaar"
    ],
@@ -2296,8 +2593,8 @@
      "bewijs": "/apps/vonk.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "5 van 21 zichtbare knoppen aangetikt zonder fout, 2 niet aan te tikken (1x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -2331,10 +2628,16 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 21,
+   "geklikt": 5,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Spring naar een functie: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport"
+   ],
    "waarnemingen": [
-    "als lid: 1705 tekens zichtbaar"
+    "als lid: 1705 tekens zichtbaar",
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw; de proef verloor de pagina door een navigatie en opende hem opnieuw; opnieuw openen lukte niet: page.goto: Navigation to \"http://127.0.0.1:37325/apps/vonk.html\" is interrupted "
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -2363,8 +2666,8 @@
      "bewijs": "/apps/entourage.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "9 van 21 zichtbare knoppen aangetikt zonder fout, 5 niet aan te tikken (4x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -2398,10 +2701,19 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 21,
+   "geklikt": 9,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Spring naar een functie: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events"
+   ],
    "waarnemingen": [
-    "als lid: 1967 tekens zichtbaar"
+    "als lid: 1967 tekens zichtbaar",
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw; de proef verloor de pagina door een navigatie en opende hem opnieuw"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -2430,8 +2742,8 @@
      "bewijs": "/apps/theater.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 44 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (10x intercepts pointer events, 1x element is outside of the viewport, 1x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -2465,8 +2777,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 44,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Kanaal aanmelden: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "(naamloos): element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1461 tekens zichtbaar"
    ],
@@ -2497,8 +2824,8 @@
      "bewijs": "/apps/geld.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "12 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "6 van 34 zichtbare knoppen aangetikt zonder fout, 7 niet aan te tikken (7x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -2532,9 +2859,19 @@
      "bewijs": null
     }
    },
-   "geklikt": 12,
+   "gevonden": 34,
+   "geklikt": 6,
    "overgeslagen": [
     "Wie betaalt wat"
+   ],
+   "nietKlikbaar": [
+    "Métier: intercepts pointer events",
+    "Balans: intercepts pointer events",
+    "RTG-code: intercepts pointer events",
+    "Lab-fonds: intercepts pointer events",
+    "Mecenaat: intercepts pointer events",
+    "Logboek: intercepts pointer events",
+    "Nalatenschap: intercepts pointer events"
    ],
    "waarnemingen": [
     "als lid: 1809 tekens zichtbaar"
@@ -2566,8 +2903,8 @@
      "bewijs": "/apps/foodcourt.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "1 van 38 zichtbare knoppen aangetikt zonder fout, 13 niet aan te tikken (13x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -2601,8 +2938,24 @@
      "bewijs": null
     }
    },
+   "gevonden": 38,
    "geklikt": 1,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "MEENEMEN: intercepts pointer events",
+    "ALLE KEUKENS: intercepts pointer events",
+    "FRANS: intercepts pointer events",
+    "GRILL: intercepts pointer events",
+    "JAPANS: intercepts pointer events",
+    "STEAKHOUSE: intercepts pointer events",
+    "VISRESTAURANT: intercepts pointer events",
+    "STEAKHOUSE · €€€ · IBIZA\nCafe Brisa\nRese: intercepts pointer events",
+    "JAPANS · €€ · IBIZA\nClub Sombra\nReservee: intercepts pointer events",
+    "VISRESTAURANT · €€€ · IBIZA\nSal de Mar\nR: intercepts pointer events",
+    "VISRESTAURANT · €€€ · IBIZA\nSal Nocturna: intercepts pointer events",
+    "GRILL · €€€ · IBIZA\nSunset Ibiza\nReserve: intercepts pointer events",
+    "FRANS · €€€€ · IBIZA\nVora Beach Club\nRes: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 1700 tekens zichtbaar"
    ],
@@ -2633,8 +2986,8 @@
      "bewijs": "/apps/spelscherm.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "3 van 16 zichtbare knoppen aangetikt zonder fout -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -2668,8 +3021,10 @@
      "bewijs": null
     }
    },
-   "geklikt": 2,
+   "gevonden": 16,
+   "geklikt": 3,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [
     "als lid: 166 tekens zichtbaar"
    ],
@@ -2700,8 +3055,8 @@
      "bewijs": "/apps/garderobe.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 38 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (9x intercepts pointer events, 1x element is outside of the viewport, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -2735,8 +3090,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 38,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1390 tekens zichtbaar"
    ],
@@ -2767,8 +3137,8 @@
      "bewijs": "/apps/geld-command.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "geen zichtbare knop zonder bestemming gevonden; wat dit scherm doet, loopt via links of formulieren",
      "bewijs": null
     },
     "menselijk": {
@@ -2802,12 +3172,12 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
-   "overgeslagen": [
-    "Wie betaalt wat"
-   ],
+   "gevonden": 0,
+   "geklikt": 0,
+   "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [
-    "als lid: 127 tekens zichtbaar"
+    "als lid: 1042 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -2871,8 +3241,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -2901,8 +3273,8 @@
      "bewijs": "/apps/living-os.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "11 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "13 van 41 zichtbare knoppen aangetikt zonder fout, 1 niet aan te tikken (1x element is not stable) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -2936,10 +3308,14 @@
      "bewijs": null
     }
    },
-   "geklikt": 11,
+   "gevonden": 41,
+   "geklikt": 13,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Omhoog vegen brengt je naar de homescree: element is not stable"
+   ],
    "waarnemingen": [
-    "als lid: 2910 tekens zichtbaar"
+    "als lid: 2842 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -2968,8 +3344,8 @@
      "bewijs": "/apps/krant.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "3 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "3 van 39 zichtbare knoppen aangetikt zonder fout, 11 niet aan te tikken (1x element is outside of the viewport, 9x intercepts pointer events, 1x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -3003,8 +3379,22 @@
      "bewijs": null
     }
    },
+   "gevonden": 39,
    "geklikt": 3,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "(naamloos): element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1039 tekens zichtbaar"
    ],
@@ -3035,8 +3425,8 @@
      "bewijs": "/apps/podium.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "3 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "7 van 50 zichtbare knoppen aangetikt zonder fout, 7 niet aan te tikken (7x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -3070,8 +3460,18 @@
      "bewijs": null
     }
    },
-   "geklikt": 3,
+   "gevonden": 50,
+   "geklikt": 7,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "BUSINESS: intercepts pointer events",
+    "COMMERCE: intercepts pointer events",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 1693 tekens zichtbaar"
    ],
@@ -3102,8 +3502,8 @@
      "bewijs": "/apps/geld.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "12 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "6 van 34 zichtbare knoppen aangetikt zonder fout, 7 niet aan te tikken (7x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -3137,9 +3537,19 @@
      "bewijs": null
     }
    },
-   "geklikt": 12,
+   "gevonden": 34,
+   "geklikt": 6,
    "overgeslagen": [
     "Wie betaalt wat"
+   ],
+   "nietKlikbaar": [
+    "Métier: intercepts pointer events",
+    "Balans: intercepts pointer events",
+    "RTG-code: intercepts pointer events",
+    "Lab-fonds: intercepts pointer events",
+    "Mecenaat: intercepts pointer events",
+    "Logboek: intercepts pointer events",
+    "Nalatenschap: intercepts pointer events"
    ],
    "waarnemingen": [
     "als lid: 1809 tekens zichtbaar"
@@ -3171,8 +3581,8 @@
      "bewijs": "/apps/maison.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 38 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (1x element is outside of the viewport, 9x intercepts pointer events, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -3206,8 +3616,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 38,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1454 tekens zichtbaar"
    ],
@@ -3238,8 +3663,8 @@
      "bewijs": "/apps/mall.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 175 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (12x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -3273,10 +3698,25 @@
      "bewijs": null
     }
    },
+   "gevonden": 175,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Zoeken: intercepts pointer events",
+    "Nu open: intercepts pointer events",
+    "Op voorraad: intercepts pointer events",
+    "Eten\n8: intercepts pointer events",
+    "Winkelen\n21: intercepts pointer events",
+    "Reizen\n8: intercepts pointer events",
+    "Er op uit\n3: intercepts pointer events",
+    "Vervoer\n4: intercepts pointer events",
+    "Beauty & wellness\n3: intercepts pointer events",
+    "Diensten\n55: intercepts pointer events",
+    "Sport\n1: intercepts pointer events",
+    "Zorg\n4: intercepts pointer events"
+   ],
    "waarnemingen": [
-    "als lid: 24147 tekens zichtbaar"
+    "als lid: 24079 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -3305,8 +3745,8 @@
      "bewijs": "/apps/geld.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "12 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "6 van 34 zichtbare knoppen aangetikt zonder fout, 7 niet aan te tikken (7x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -3340,9 +3780,19 @@
      "bewijs": null
     }
    },
-   "geklikt": 12,
+   "gevonden": 34,
+   "geklikt": 6,
    "overgeslagen": [
     "Wie betaalt wat"
+   ],
+   "nietKlikbaar": [
+    "Métier: intercepts pointer events",
+    "Balans: intercepts pointer events",
+    "RTG-code: intercepts pointer events",
+    "Lab-fonds: intercepts pointer events",
+    "Mecenaat: intercepts pointer events",
+    "Logboek: intercepts pointer events",
+    "Nalatenschap: intercepts pointer events"
    ],
    "waarnemingen": [
     "als lid: 1809 tekens zichtbaar"
@@ -3374,8 +3824,8 @@
      "bewijs": "/apps/mijnmall.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 43 zichtbare knoppen aangetikt zonder fout, 11 niet aan te tikken (10x intercepts pointer events, 1x element is outside of the viewport), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -3409,9 +3859,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 43,
    "geklikt": 2,
    "overgeslagen": [
     "Verwijder"
+   ],
+   "nietKlikbaar": [
+    "Lijst: intercepts pointer events",
+    "Reismand: intercepts pointer events",
+    "Openen: intercepts pointer events",
+    "Plaatsen: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events"
    ],
    "waarnemingen": [
     "als lid: 2198 tekens zichtbaar"
@@ -3443,8 +3907,8 @@
      "bewijs": "/apps/leven.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "7 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "13 van 38 zichtbare knoppen aangetikt zonder fout, 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -3478,10 +3942,12 @@
      "bewijs": null
     }
    },
-   "geklikt": 7,
+   "gevonden": 38,
+   "geklikt": 13,
    "overgeslagen": [
     "□\nBestellen"
    ],
+   "nietKlikbaar": [],
    "waarnemingen": [
     "als lid: 1829 tekens zichtbaar"
    ],
@@ -3512,8 +3978,8 @@
      "bewijs": "/apps/muziek.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "1 van 38 zichtbare knoppen aangetikt zonder fout, 13 niet aan te tikken (13x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -3547,8 +4013,24 @@
      "bewijs": null
     }
    },
+   "gevonden": 38,
    "geklikt": 1,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Start een sessie: intercepts pointer events",
+    "Doe mee: intercepts pointer events",
+    "Stoppen: intercepts pointer events",
+    "Sunset Lounge\nchill · 84 bpm: intercepts pointer events",
+    "Beach Club\nhouse · 118 bpm: intercepts pointer events",
+    "Salon Jazz\ndiner · 72 bpm: intercepts pointer events",
+    "Golden Hour\nwarm · 64 bpm: intercepts pointer events",
+    "Focus\nambient · 60 bpm: intercepts pointer events",
+    "Club Nacht\ndeep · 122 bpm: intercepts pointer events",
+    "Spraaksturing: zeg wat u wilt horen: intercepts pointer events",
+    "Opnieuw beginnen: intercepts pointer events",
+    "▶: intercepts pointer events",
+    "Volgende track: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 1480 tekens zichtbaar"
    ],
@@ -3579,8 +4061,8 @@
      "bewijs": "/apps/geld.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "12 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "6 van 34 zichtbare knoppen aangetikt zonder fout, 7 niet aan te tikken (7x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -3614,9 +4096,19 @@
      "bewijs": null
     }
    },
-   "geklikt": 12,
+   "gevonden": 34,
+   "geklikt": 6,
    "overgeslagen": [
     "Wie betaalt wat"
+   ],
+   "nietKlikbaar": [
+    "Métier: intercepts pointer events",
+    "Balans: intercepts pointer events",
+    "RTG-code: intercepts pointer events",
+    "Lab-fonds: intercepts pointer events",
+    "Mecenaat: intercepts pointer events",
+    "Logboek: intercepts pointer events",
+    "Nalatenschap: intercepts pointer events"
    ],
    "waarnemingen": [
     "als lid: 1809 tekens zichtbaar"
@@ -3648,8 +4140,8 @@
      "bewijs": "/apps/nieuws.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "1 van 26 zichtbare knoppen aangetikt zonder fout, 13 niet aan te tikken (10x intercepts pointer events, 1x element is outside of the viewport, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -3683,8 +4175,24 @@
      "bewijs": null
     }
    },
+   "gevonden": 26,
    "geklikt": 1,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "ALLES: intercepts pointer events",
+    "NIEUWS: intercepts pointer events",
+    "REIZEN: intercepts pointer events",
+    "LIFESTYLE: intercepts pointer events",
+    "ZAKEN: intercepts pointer events",
+    "CULTUUR: intercepts pointer events",
+    "SPORT: intercepts pointer events",
+    "Spring naar een functie: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events",
+    "COMPACT: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 1085 tekens zichtbaar"
    ],
@@ -3715,8 +4223,8 @@
      "bewijs": "/apps/rtg.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "4 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "4 van 35 zichtbare knoppen aangetikt zonder fout, 10 niet aan te tikken (1x element is outside of the viewport, 5x element is not visible, 4x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -3750,8 +4258,21 @@
      "bewijs": null
     }
    },
+   "gevonden": 35,
    "geklikt": 4,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events",
+    "Randen en alle functies: element is not visible",
+    "Terug: element is not visible",
+    "Vooruit: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 2515 tekens zichtbaar"
    ],
@@ -3782,8 +4303,8 @@
      "bewijs": "/apps/lifestyle.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 38 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (9x intercepts pointer events, 1x element is outside of the viewport, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -3817,8 +4338,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 38,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1880 tekens zichtbaar"
    ],
@@ -3849,8 +4385,8 @@
      "bewijs": "/apps/rendezvous.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "7 van 25 zichtbare knoppen aangetikt zonder fout, 7 niet aan te tikken (6x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -3884,10 +4420,21 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 25,
+   "geklikt": 7,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "PROFIEL: intercepts pointer events",
+    "ONTDEK: intercepts pointer events",
+    "MATCHES: intercepts pointer events",
+    "DE KRING: intercepts pointer events",
+    "Spring naar een functie: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "COMPACT: intercepts pointer events"
+   ],
    "waarnemingen": [
-    "als lid: 1708 tekens zichtbaar"
+    "als lid: 1708 tekens zichtbaar",
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw; de proef verloor de pagina door een navigatie en opende hem opnieuw"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -3951,8 +4498,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -3981,8 +4530,8 @@
      "bewijs": "/apps/media.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "1 van 65 zichtbare knoppen aangetikt zonder fout, 13 niet aan te tikken (13x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -4016,8 +4565,24 @@
      "bewijs": null
     }
    },
+   "gevonden": 65,
    "geklikt": 1,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Samen: intercepts pointer events",
+    "Bibliotheek: intercepts pointer events",
+    "Mijn bord: intercepts pointer events",
+    "Nieuwe productie: intercepts pointer events",
+    "Vandaag\nvoor u gekozen: intercepts pointer events",
+    "Ontdekken\nmakers en werk: intercepts pointer events",
+    "Bibliotheek\nbewaren en verdergaan: intercepts pointer events",
+    "Studio\nnieuwe productie: intercepts pointer events",
+    "Releases\ngeen besluit nodig: intercepts pointer events",
+    "Live\nuitzenden en premières: intercepts pointer events",
+    "MUZIEK: intercepts pointer events",
+    "KIJK: intercepts pointer events",
+    "FLOW: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 2634 tekens zichtbaar"
    ],
@@ -4083,8 +4648,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -4113,8 +4680,8 @@
      "bewijs": "/apps/geld.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "12 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "6 van 34 zichtbare knoppen aangetikt zonder fout, 7 niet aan te tikken (7x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -4148,9 +4715,19 @@
      "bewijs": null
     }
    },
-   "geklikt": 12,
+   "gevonden": 34,
+   "geklikt": 6,
    "overgeslagen": [
     "Wie betaalt wat"
+   ],
+   "nietKlikbaar": [
+    "Métier: intercepts pointer events",
+    "Balans: intercepts pointer events",
+    "RTG-code: intercepts pointer events",
+    "Lab-fonds: intercepts pointer events",
+    "Mecenaat: intercepts pointer events",
+    "Logboek: intercepts pointer events",
+    "Nalatenschap: intercepts pointer events"
    ],
    "waarnemingen": [
     "als lid: 1809 tekens zichtbaar"
@@ -4217,8 +4794,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -4247,8 +4826,8 @@
      "bewijs": "/apps/sociaal.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "9 van 23 zichtbare knoppen aangetikt zonder fout, 5 niet aan te tikken (4x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -4282,10 +4861,19 @@
      "bewijs": null
     }
    },
-   "geklikt": 2,
+   "gevonden": 23,
+   "geklikt": 9,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Rahul\nKOMPAS: intercepts pointer events",
+    "Spring naar een functie: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events"
+   ],
    "waarnemingen": [
-    "als lid: 1931 tekens zichtbaar"
+    "als lid: 1999 tekens zichtbaar",
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw; de proef verloor de pagina door een navigatie en opende hem opnieuw"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -4314,8 +4902,8 @@
      "bewijs": "/apps/spelen.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "3 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "4 van 35 zichtbare knoppen aangetikt zonder fout, 10 niet aan te tikken (1x element is outside of the viewport, 5x element is not visible, 4x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -4349,8 +4937,21 @@
      "bewijs": null
     }
    },
-   "geklikt": 3,
+   "gevonden": 35,
+   "geklikt": 4,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events",
+    "Randen en alle functies: element is not visible",
+    "Terug: element is not visible",
+    "Vooruit: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1164 tekens zichtbaar"
    ],
@@ -4381,8 +4982,8 @@
      "bewijs": "/apps/sport.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "1 van 25 zichtbare knoppen aangetikt zonder fout, 13 niet aan te tikken (10x intercepts pointer events, 1x element is outside of the viewport, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -4416,8 +5017,24 @@
      "bewijs": null
     }
    },
+   "gevonden": 25,
    "geklikt": 1,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "UITSLAGEN: intercepts pointer events",
+    "DE STAND: intercepts pointer events",
+    "TICKETS: intercepts pointer events",
+    "MIJN TICKETS: intercepts pointer events",
+    "DE CLUB: intercepts pointer events",
+    "Tickets voor deze wedstrijd: intercepts pointer events",
+    "Spring naar een functie: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 1242 tekens zichtbaar"
    ],
@@ -4448,8 +5065,8 @@
      "bewijs": "/apps/table.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 38 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (9x intercepts pointer events, 1x element is outside of the viewport, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -4483,8 +5100,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 38,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1385 tekens zichtbaar"
    ],
@@ -4515,8 +5147,8 @@
      "bewijs": "/apps/thuis.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 45 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (11x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -4550,8 +5182,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 45,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "ZOEKEN: intercepts pointer events",
+    "MIJN REIZEN: intercepts pointer events",
+    "HOST: intercepts pointer events",
+    "Zoek: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 1308 tekens zichtbaar"
    ],
@@ -4582,8 +5229,8 @@
      "bewijs": "/apps/scherm.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 38 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (1x element is outside of the viewport, 9x intercepts pointer events, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -4617,8 +5264,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 38,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1076 tekens zichtbaar"
    ],
@@ -4649,8 +5311,8 @@
      "bewijs": "/apps/uitgaan.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 51 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (11x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -4684,8 +5346,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 51,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "MEENEMEN: intercepts pointer events",
+    "ALLES: intercepts pointer events",
+    "BARS: intercepts pointer events",
+    "CLUBS: intercepts pointer events",
+    "BEACHCLUBS: intercepts pointer events",
+    "BAR · IBIZA\nSunset Ibiza\n1 avond gepland: intercepts pointer events",
+    "CLUB · IBIZA\nSal Nocturna\n1 avond geplan: intercepts pointer events",
+    "BEACHCLUB · IBIZA\nVora Beach Club\n1 avon: intercepts pointer events",
+    "CLUB · IBIZA\nClub Sombra\n1 avond gepland: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 1287 tekens zichtbaar"
    ],
@@ -4716,8 +5393,8 @@
      "bewijs": "/apps/vandaag.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "7 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "13 van 35 zichtbare knoppen aangetikt zonder fout, 1 niet aan te tikken (1x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -4751,8 +5428,12 @@
      "bewijs": null
     }
    },
-   "geklikt": 7,
+   "gevonden": 35,
+   "geklikt": 13,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "COMPACT: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 1325 tekens zichtbaar"
    ],
@@ -4783,8 +5464,8 @@
      "bewijs": "/apps/pulse.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "5 van 28 zichtbare knoppen aangetikt zonder fout, 9 niet aan te tikken (8x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -4818,10 +5499,23 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 28,
+   "geklikt": 5,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "stemming: intercepts pointer events",
+    "mijn week: intercepts pointer events",
+    "Plaatsen: intercepts pointer events",
+    "VOLGEND (0): intercepts pointer events",
+    "ONTDEK: intercepts pointer events",
+    "MIJN PROFIEL: intercepts pointer events",
+    "MIJN PLANK: intercepts pointer events",
+    "Spring naar een functie: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport"
+   ],
    "waarnemingen": [
-    "als lid: 1620 tekens zichtbaar"
+    "als lid: 1620 tekens zichtbaar",
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -4850,8 +5544,8 @@
      "bewijs": "/apps/clips.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "3 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "3 van 42 zichtbare knoppen aangetikt zonder fout, 11 niet aan te tikken (10x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -4885,8 +5579,22 @@
      "bewijs": null
     }
    },
+   "gevonden": 42,
    "geklikt": 3,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "↑ Terug naar boven: intercepts pointer events",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport"
+   ],
    "waarnemingen": [
     "als lid: 1198 tekens zichtbaar"
    ],
@@ -4952,8 +5660,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -4982,8 +5692,8 @@
      "bewijs": "/apps/geld.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "12 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "6 van 34 zichtbare knoppen aangetikt zonder fout, 7 niet aan te tikken (7x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -5017,9 +5727,19 @@
      "bewijs": null
     }
    },
-   "geklikt": 12,
+   "gevonden": 34,
+   "geklikt": 6,
    "overgeslagen": [
     "Wie betaalt wat"
+   ],
+   "nietKlikbaar": [
+    "Métier: intercepts pointer events",
+    "Balans: intercepts pointer events",
+    "RTG-code: intercepts pointer events",
+    "Lab-fonds: intercepts pointer events",
+    "Mecenaat: intercepts pointer events",
+    "Logboek: intercepts pointer events",
+    "Nalatenschap: intercepts pointer events"
    ],
    "waarnemingen": [
     "als lid: 1809 tekens zichtbaar"
@@ -5086,8 +5806,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -5116,8 +5838,8 @@
      "bewijs": "/apps/arrival.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 34 zichtbare knoppen aangetikt zonder fout, 11 niet aan te tikken (7x element is not visible, 4x intercepts pointer events), 1 overgeslagen omdat ze onomkeerbaar zijn -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -5151,8 +5873,24 @@
      "bewijs": null
     }
    },
+   "gevonden": 34,
    "geklikt": 2,
-   "overgeslagen": [],
+   "overgeslagen": [
+    "Controleer en verstuur aanvraag"
+   ],
+   "nietKlikbaar": [
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events",
+    "Randen en alle functies: element is not visible",
+    "Terug: element is not visible",
+    "Vooruit: element is not visible",
+    "Aantal schermen: element is not visible",
+    "Gesprek met Rahul: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1211 tekens zichtbaar"
    ],
@@ -5183,8 +5921,8 @@
      "bewijs": "/apps/hangar.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 38 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (1x element is outside of the viewport, 9x intercepts pointer events, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -5218,8 +5956,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 38,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1817 tekens zichtbaar"
    ],
@@ -5250,8 +6003,8 @@
      "bewijs": "/apps/navigatie.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "7 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "7 van 33 zichtbare knoppen aangetikt zonder fout, 7 niet aan te tikken (7x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -5285,8 +6038,18 @@
      "bewijs": null
     }
    },
+   "gevonden": 33,
    "geklikt": 7,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "✕: element is outside of the viewport",
+    "RTG SLIM: element is outside of the viewport",
+    "SNEL: element is outside of the viewport",
+    "COMFORT: element is outside of the viewport",
+    "ZEKER: element is outside of the viewport",
+    "ELECTRIC: element is outside of the viewport",
+    "START BEGELEIDING: element is outside of the viewport"
+   ],
    "waarnemingen": [
     "als lid: 1696 tekens zichtbaar"
    ],
@@ -5317,8 +6080,8 @@
      "bewijs": "/apps/ov.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "4 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "4 van 25 zichtbare knoppen aangetikt zonder fout, 10 niet aan te tikken (7x intercepts pointer events, 1x element is outside of the viewport, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -5352,8 +6115,21 @@
      "bewijs": null
     }
    },
+   "gevonden": 25,
    "geklikt": 4,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Toon: intercepts pointer events",
+    "Spring naar een functie: intercepts pointer events",
+    "Nu niet: intercepts pointer events",
+    "Aanzetten: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 5410 tekens zichtbaar"
    ],
@@ -5384,8 +6160,8 @@
      "bewijs": "/apps/ovroutes.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 41 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (1x element is outside of the viewport, 9x intercepts pointer events, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -5419,8 +6195,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 41,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1291 tekens zichtbaar"
    ],
@@ -5451,8 +6242,8 @@
      "bewijs": "/apps/reisboek.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "1 van 31 zichtbare knoppen aangetikt zonder fout, 13 niet aan te tikken (1x element is outside of the viewport, 8x element is not visible, 4x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -5486,8 +6277,24 @@
      "bewijs": null
     }
    },
+   "gevonden": 31,
    "geklikt": 1,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events",
+    "Randen en alle functies: element is not visible",
+    "Terug: element is not visible",
+    "Vooruit: element is not visible",
+    "Aantal schermen: element is not visible",
+    "Context van dit scherm openen: element is not visible",
+    "NAAR REISINHOUD: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1882 tekens zichtbaar"
    ],
@@ -5553,8 +6360,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -5583,8 +6392,8 @@
      "bewijs": "/apps/reizen-veilig.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "7 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "10 van 37 zichtbare knoppen aangetikt zonder fout, 4 niet aan te tikken (2x element is not visible, 2x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -5618,8 +6427,15 @@
      "bewijs": null
     }
    },
-   "geklikt": 7,
+   "gevonden": 37,
+   "geklikt": 10,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events",
+    "COMPACT: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 2569 tekens zichtbaar"
    ],
@@ -5651,7 +6467,7 @@
     },
     "bedienbaar": {
      "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "reden": "9 van 18 zichtbare knoppen aangetikt zonder fout, 5 niet aan te tikken (1x element is outside of the viewport, 4x intercepts pointer events)",
      "bewijs": null
     },
     "menselijk": {
@@ -5685,8 +6501,16 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 18,
+   "geklikt": 9,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "OVERZICHT: intercepts pointer events",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 1171 tekens zichtbaar"
    ],
@@ -5717,8 +6541,8 @@
      "bewijs": "/apps/stad.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 43 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (11x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -5752,10 +6576,25 @@
      "bewijs": null
     }
    },
+   "gevonden": 43,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "HOE DE STAD ER NU BIJ STAAT: intercepts pointer events",
+    "IETS KAPOT OF VOL GEZIEN? MELD HET: intercepts pointer events",
+    "MIJN MELDINGEN: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events"
+   ],
    "waarnemingen": [
-    "als lid: 1554 tekens zichtbaar"
+    "als lid: 1551 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -5819,8 +6658,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -5849,8 +6690,8 @@
      "bewijs": "/apps/residentie.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 51 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (11x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -5884,8 +6725,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 51,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Wandel samen: intercepts pointer events",
+    "Samen spelen: intercepts pointer events",
+    "Gids: intercepts pointer events",
+    "Mijn suite: intercepts pointer events",
+    "✶: intercepts pointer events",
+    "♥: intercepts pointer events",
+    "Zeg: intercepts pointer events",
+    "DE GIDS: intercepts pointer events",
+    "HET ATELIER: intercepts pointer events",
+    "DE HUISTELEFOON: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 1163 tekens zichtbaar"
    ],
@@ -5916,8 +6772,8 @@
      "bewijs": "/apps/flits.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "1 van 33 zichtbare knoppen aangetikt zonder fout, 13 niet aan te tikken (6x intercepts pointer events, 1x element is outside of the viewport, 6x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -5951,8 +6807,24 @@
      "bewijs": null
     }
    },
+   "gevonden": 33,
    "geklikt": 1,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Nu niet: intercepts pointer events",
+    "Aanzetten: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events",
+    "Randen en alle functies: element is not visible",
+    "Terug: element is not visible",
+    "Vooruit: element is not visible",
+    "Aantal schermen: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1403 tekens zichtbaar"
    ],
@@ -5983,8 +6855,8 @@
      "bewijs": "/apps/vluchten.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "1 van 23 zichtbare knoppen aangetikt zonder fout, 13 niet aan te tikken (8x intercepts pointer events, 1x element is outside of the viewport, 4x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -6018,8 +6890,24 @@
      "bewijs": null
     }
    },
+   "gevonden": 23,
    "geklikt": 1,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "HET BORD: intercepts pointer events",
+    "MIJN REIZEN: intercepts pointer events",
+    "Boek deze vlucht: intercepts pointer events",
+    "Spring naar een functie: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible",
+    "OVERZICHT: intercepts pointer events",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events",
+    "Randen en alle functies: element is not visible",
+    "Terug: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1605 tekens zichtbaar"
    ],
@@ -6050,8 +6938,8 @@
      "bewijs": "/apps/office.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "4 van 57 zichtbare knoppen aangetikt zonder fout, 10 niet aan te tikken (10x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -6085,8 +6973,21 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 57,
+   "geklikt": 4,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "MEENEMEN: intercepts pointer events",
+    "Rekenblad\nCijfers met formules: intercepts pointer events",
+    "Presentatie\nDeck met notities: intercepts pointer events",
+    "Formulier\nVragen en antwoorden: intercepts pointer events",
+    "Schets\nDiagram met kaders en pijlen: intercepts pointer events",
+    "Bord\nLijsten met kaarten, samen plannen: intercepts pointer events",
+    "Zakelijke brief: intercepts pointer events",
+    "Projectplan: intercepts pointer events",
+    "Factuurregels: intercepts pointer events",
+    "Weekplanning: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 2094 tekens zichtbaar"
    ],
@@ -6117,8 +7018,8 @@
      "bewijs": "/apps/horeca.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "3 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "3 van 41 zichtbare knoppen aangetikt zonder fout, 11 niet aan te tikken (11x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -6152,8 +7053,22 @@
      "bewijs": null
     }
    },
+   "gevonden": 41,
    "geklikt": 3,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Horeca Command\nOPERATIONS: intercepts pointer events",
+    "Ververs: intercepts pointer events",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 1673 tekens zichtbaar"
    ],
@@ -6184,8 +7099,8 @@
      "bewijs": "/apps/loonstrook.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 40 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (9x intercepts pointer events, 1x element is outside of the viewport, 2x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -6219,8 +7134,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 40,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "(naamloos): element is not visible",
+    "Beveiliging en systeemstatus: element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1642 tekens zichtbaar"
    ],
@@ -6251,8 +7181,8 @@
      "bewijs": "/apps/magnaat.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "7 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "8 van 234 zichtbare knoppen aangetikt zonder fout, 6 niet aan te tikken (6x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -6286,10 +7216,19 @@
      "bewijs": null
     }
    },
-   "geklikt": 7,
+   "gevonden": 234,
+   "geklikt": 8,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events"
+   ],
    "waarnemingen": [
-    "als lid: 4331 tekens zichtbaar"
+    "als lid: 4399 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -6318,8 +7257,8 @@
      "bewijs": "/apps/onderneming.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 40 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (10x intercepts pointer events, 1x element is outside of the viewport, 1x element is not visible) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -6353,8 +7292,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 40,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Begin een onderneming: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events",
+    "→: intercepts pointer events",
+    "Bekijk actieve grens →: intercepts pointer events",
+    "Bekijk grenzen: intercepts pointer events",
+    "(naamloos): element is not visible"
+   ],
    "waarnemingen": [
     "als lid: 1268 tekens zichtbaar"
    ],
@@ -6385,8 +7339,8 @@
      "bewijs": "/apps/partner-network.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "9 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "9 van 43 zichtbare knoppen aangetikt zonder fout, 5 niet aan te tikken (5x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -6420,8 +7374,16 @@
      "bewijs": null
     }
    },
+   "gevonden": 43,
    "geklikt": 9,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "⌂\nHet Vooruitzicht: intercepts pointer events",
+    "Onderzoek match →: intercepts pointer events",
+    "Simuleer belofte: intercepts pointer events",
+    "Verstoring: intercepts pointer events",
+    "H\nHotel\n98: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 2966 tekens zichtbaar"
    ],
@@ -6452,8 +7414,8 @@
      "bewijs": "/apps/rtgone.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "1 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "8 van 17 zichtbare knoppen aangetikt zonder fout, 6 niet aan te tikken (1x element is outside of the viewport, 1x element is not visible, 4x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -6487,8 +7449,17 @@
      "bewijs": null
     }
    },
-   "geklikt": 1,
+   "gevonden": 17,
+   "geklikt": 8,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "Omhoog vegen brengt je naar de homescree: element is not visible",
+    "OVERZICHT: intercepts pointer events",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 1228 tekens zichtbaar"
    ],
@@ -6519,8 +7490,8 @@
      "bewijs": "/apps/werk.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "10 van 34 zichtbare knoppen aangetikt zonder fout, 4 niet aan te tikken (1x element is outside of the viewport, 3x intercepts pointer events) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -6554,10 +7525,18 @@
      "bewijs": null
     }
    },
-   "geklikt": 2,
+   "gevonden": 34,
+   "geklikt": 10,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Instellingen openen: element is outside of the viewport",
+    "COMPACT: intercepts pointer events",
+    "AUTOMATISCH: intercepts pointer events",
+    "FOCUS: intercepts pointer events"
+   ],
    "waarnemingen": [
-    "als lid: 1416 tekens zichtbaar"
+    "als lid: 1416 tekens zichtbaar",
+    "proef: de proef verloor de pagina door een navigatie en opende hem opnieuw"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -6586,8 +7565,8 @@
      "bewijs": "/apps/rtmail.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 51 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (11x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -6621,10 +7600,25 @@
      "bewijs": null
     }
    },
+   "gevonden": 51,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "MEENEMEN: intercepts pointer events",
+    "Postvak in1: intercepts pointer events",
+    "Archief: intercepts pointer events",
+    "Prullenbak: intercepts pointer events",
+    "Verzonden: intercepts pointer events",
+    "Zoek: intercepts pointer events",
+    "Rahul vat je postvak samen: intercepts pointer events",
+    "RTG\nWelkom bij Rahul Travel Group\nWelkom: intercepts pointer events",
+    "Team oprichten: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events"
+   ],
    "waarnemingen": [
-    "als lid: 1962 tekens zichtbaar"
+    "als lid: 1963 tekens zichtbaar"
    ],
    "mobiel": {
     "status": "NIET_GETEST",
@@ -6653,8 +7647,8 @@
      "bewijs": "/apps/rtgschool.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "2 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "2 van 47 zichtbare knoppen aangetikt zonder fout, 12 niet aan te tikken (11x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -6688,8 +7682,23 @@
      "bewijs": null
     }
    },
+   "gevonden": 47,
    "geklikt": 2,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "HET PASPOORT: intercepts pointer events",
+    "LEREN EN OEFENEN: intercepts pointer events",
+    "TOETSING EN ADVIES: intercepts pointer events",
+    "BIJLES: intercepts pointer events",
+    "Inschrijven: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events",
+    "↙: intercepts pointer events",
+    "Maak mijn beslispakket →: intercepts pointer events",
+    "Wat vraagt nu aandacht?: intercepts pointer events",
+    "Open het juiste onderdeel: intercepts pointer events",
+    "Bereid de volgende stap voor: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 2331 tekens zichtbaar"
    ],
@@ -6720,8 +7729,8 @@
      "bewijs": "/apps/browser.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "5 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "11 van 46 zichtbare knoppen aangetikt zonder fout, 3 niet aan te tikken (2x intercepts pointer events, 1x element is outside of the viewport) -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -6755,8 +7764,14 @@
      "bewijs": null
     }
    },
-   "geklikt": 5,
+   "gevonden": 46,
+   "geklikt": 11,
    "overgeslagen": [],
+   "nietKlikbaar": [
+    "Zoek: intercepts pointer events",
+    "Instellingen openen: element is outside of the viewport",
+    "◡: intercepts pointer events"
+   ],
    "waarnemingen": [
     "als lid: 1324 tekens zichtbaar"
    ],
@@ -6787,8 +7802,8 @@
      "bewijs": "/apps/sitemaker.html"
     },
     "bedienbaar": {
-     "status": "BEWEZEN",
-     "reden": "14 knoppen aangetikt zonder fout",
+     "status": "NIET_GETEST",
+     "reden": "14 van 44 zichtbare knoppen aangetikt zonder fout -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd",
      "bewijs": null
     },
     "menselijk": {
@@ -6822,8 +7837,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 44,
    "geklikt": 14,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [
     "als lid: 1664 tekens zichtbaar"
    ],
@@ -6889,8 +7906,10 @@
      "bewijs": null
     }
    },
+   "gevonden": 0,
    "geklikt": 0,
    "overgeslagen": [],
+   "nietKlikbaar": [],
    "waarnemingen": [],
    "mobiel": {
     "status": "NIET_GETEST",

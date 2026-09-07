@@ -44,7 +44,7 @@ blijven.
 | # | bewijs | de vraag | stand |
 |---|---|---|---|
 | 1 | **bereikbaar** | vindt de gebruiker de functie vanaf de plek waar RTG haar presenteert? | **staat** (`APPWERKT.json`) |
-| 2 | **bedienbaar** | doen de knoppen, tabs, velden, uploads en gebaren iets, zonder te breken? | **half** — knoppen wel, formulieren/uploads/toetsenbord niet |
+| 2 | **bedienbaar** | doen de knoppen, tabs, velden, uploads en gebaren iets, zonder te breken? | **een kwart** — knoppen wel, formulieren/uploads/toetsenbord niet; en een groot deel van wat er staat is niet aan te tikken omdat er iets overheen ligt (zie par. 5) |
 | 3 | **voltooibaar** | kan de hele stroom worden afgemaakt, tot en met de bevestiging? | **een stap weg** (vraagt de testwereld uit par. 4) |
 | 4 | **waarheidsgetrouw** | toont de UI nooit een sterkere toestand dan de backend heeft bewezen? | **een stap weg** (`SCHERMLEUGEN.json` doet dit voor 6 schermen) |
 | 5 | **persistent** | komt de juiste toestand terug na refresh, nieuwe sessie, andere browser? | **een stap weg** |
@@ -143,6 +143,59 @@ uitdrukkelijk niet dat de functie werkt. Vier dingen die deze proef niet ziet:
 - hooguit veertien knoppen per scherm;
 - het meet op bureaubreedte — de telefoonkant staat in `TIKKEN.json`.
 
+### De duurste beperking, en een verkeerde diagnose onderweg
+
+Bewijs 2 is dunner dan het lijkt, en het kostte drie metingen om te weten
+waarom. Dat staat hier voluit, want de tussenstappen waren allebei plausibel en
+allebei fout.
+
+**Ronde 1 — de ratel leek stuk.** Er werd een knop ingebouwd die bij een klik
+gooit; `appwerkt:controle` meldde *"OK: 0 defecten"*. Conclusie op dat moment:
+de ratel deugt niet.
+
+**Ronde 2 — een verkeerde verklaring.** De meter had op dat scherm maar één knop
+aangetikt, dus leek het antwoord: een vers account toont te weinig. Dat is
+opgeschreven, en het was **onjuist** — de meter *vond* er gewoon veertien en
+klikte er één.
+
+**Ronde 3 — het echte gebrek zat in de meter zelf.** `bedien()` markeerde in één
+keer veertien knoppen met `data-appwerkt` en tikte ze op nummer aan. Een tik
+wisselt vaak van stand, het scherm hertekent, de markeringen verdwijnen — en
+elke volgende klik liep in een time-out die stil werd overgeslagen. Gemeten over
+de hele ronde: **1206 knoppen gevonden, 331 aangetikt**, mediaan 14 gevonden
+tegen 2 aangetikt. "Bedienbaar BEWEZEN" sloeg dus vrijwel overal op één knop.
+
+Dat is de gevaarlijkste soort defect in een meetinstrument: **een meter die te
+weinig doet, meldt groen.** Hij kijkt nu elke ronde opnieuw wat er zichtbaar
+staat en houdt op een handtekening bij wat al gehad is — een positie klopt na
+een hertekening niet meer.
+
+**En wat er toen zichtbaar werd, is de grootste bevinding van deze ronde.** Over
+alle 102 onderdelen staan **3407 zichtbare knoppen**; de proef tikte er **439**
+aan en kwam bij **720** niet — de rest was al gehad of viel buiten de veertien
+rondes per scherm. De reden staat er nu bij, en één springt eruit:
+
+| waarom niet aan te tikken | aantal |
+|---|---|
+| **er ligt iets overheen** (`intercepts pointer events`) | **572** |
+| niet zichtbaar op het moment van tikken | 91 |
+| buiten beeld | 56 |
+| niet stabiel | 1 |
+
+Wat daarvan een overlay is die een mens eerst wegtikt, en wat een werkelijk
+onbereikbare knop, kan deze proef niet uitmaken — en juist daarom maakt hij er
+geen vinkje van. Raakt de proef minder dan de helft van wat er staat, dan is de
+rij `NIET_GETEST` met de uitsplitsing erbij. Uitkomst: **bedienbaar staat op 6
+BEWEZEN en 96 NIET_GETEST**, en **80 van de 102** schermen zijn grotendeels
+ongemeten.
+
+Dat is een veel slechter getal dan de 87 BEWEZEN van de vorige ronde, en het is
+het eerste getal dat waar is.
+
+De les die hier het meeste waard is: **de eerste twee verklaringen waren
+verhalen, de derde was een meting.** Een register dat op ronde 1 was blijven
+staan, had 87 rijen BEWEZEN gemeld op één klik per scherm.
+
 `npm run appwerkt:controle` is de ratel: het aantal defecten mag alleen omlaag.
 Groeit het, dan is er een functie stukgegaan die het deed, en dat hoort de bouw te
 laten zakken in plaats van in een register te verdwijnen.
@@ -170,7 +223,14 @@ foutmelding, geen rode toets, geen klacht:
    klopte tot op de regel; de belofte niet. *Een zichtbare ingang naar een
    onbereikbare functie is een productdefect, ook als elke regel code klopt.*
 
-5. **En de meter vond er zelf een, op zijn eerste volle ronde.** `LivingOS /
+5. **De meter vond een defect in zichzelf**, en dat is het bewijs dat deze laag
+   werkt zoals bedoeld. Zie par. 5: hij klikte één knop per scherm terwijl hij
+   er veertien vond, en meldde daar 87 rijen groen op. Twee verklaringen daarvoor
+   waren plausibel en fout voordat de derde meting het echte gebrek aanwees. Een
+   meter die te weinig doet, meldt groen — dat is de faalvorm waar een
+   betrouwbaarheidslaag zelf het kwetsbaarst voor is.
+
+6. **En hij vond er een in de code, op zijn eerste volle ronde.** `LivingOS /
    Fonds`: tik in RTG Geld naar de stand Lab-fonds en meteen door naar een
    andere, dan schrijft `laad()` na zijn `await` in opmaak die er niet meer is
    -- `Cannot set properties of null (setting 'innerHTML')`. Met de hand
@@ -192,17 +252,22 @@ verkeerde persoon toont, wel.
 
 ## 7. De volgorde
 
-1. **Bewijs 2 afmaken** (formulieren, uploads, toetsenbord, mobiel). Geen nieuwe
-   infrastructuur nodig — dit is de goedkoopste uitbreiding met de grootste
-   dekking. *Een stap weg.*
-2. **Bewijs 4 verbreden.** De liegpoort bestaat (`RTG_LIEG`) en draait over zes
+1. **Uitzoeken wat er over die knoppen heen ligt.** 8 van de 13 onbereikbare
+   knoppen op één scherm melden "intercepts pointer events". Dat is óf een
+   overlay die een mens eerst wegtikt (dan moet de proef dat ook doen), óf een
+   knop die werkelijk onbereikbaar is (dan is het een productdefect van de
+   ergste soort: hij staat er en doet niets). Zolang dat niet uit elkaar is
+   gehaald, is elke uitbreiding van bewijs 2 bouwen op zand. *Een stap weg.*
+2. **Bewijs 2 afmaken** (formulieren, uploads, toetsenbord, mobiel). Geen nieuwe
+   infrastructuur nodig. *Een stap weg, na 1.*
+3. **Bewijs 4 verbreden.** De liegpoort bestaat (`RTG_LIEG`) en draait over zes
    schermen. Hem over alle onderdelen halen kost rekentijd, geen ontwerp.
    *Een stap weg.*
-3. **De testwereld bouwen** (par. 4), en daarmee bewijs 3, 5 en 7 openen. Dit is
+4. **De testwereld bouwen** (par. 4), en daarmee bewijs 3, 5 en 7 openen. Dit is
    het grote stuk en het enige dat een besluit vraagt. *Vraagt een besluit.*
-4. **Bewijs 6 naar de schermkant.** De routekant is gemeten; wat een scherm doet
-   met een sessie van iemand anders niet. *Een stap weg, na 3.*
-5. **De acht bewijzen aan `BELOFTE.json` koppelen**, zodat de uitspraak niet per
+5. **Bewijs 6 naar de schermkant.** De routekant is gemeten; wat een scherm doet
+   met een sessie van iemand anders niet. *Een stap weg, na 4.*
+6. **De acht bewijzen aan `BELOFTE.json` koppelen**, zodat de uitspraak niet per
    ingang maar per belofte gedaan kan worden. *Vraagt een besluit* — welke ingangen
    samen één belofte vormen, staat nergens in de code, en dat verzinnen levert een
    lijst op die stelliger is dan wat het huis weet (zelfde reden als de
@@ -214,12 +279,12 @@ Niet *"292 schermen laden"*, maar iets in deze vorm — met per getal een regist
 dat hem draagt:
 
     N/N onderdelen bereikbaar voor hun eigen persona
-    N/N gebruikershandelingen bedienbaar zonder fout
+    N/N gebruikershandelingen bedienbaar zonder fout   (nu: 439 van 3407)
     N/N primaire stromen end-to-end voltooid
     0 schermen die meer beweren dan de backend heeft bewezen
     0 onbewezen kritieke mutaties
     0 autorisatielekken
     0 kale fouten die de gebruiker bereiken
 
-Vandaag is alleen de eerste regel te vullen, en de tweede half. Dat is geen
+Vandaag is alleen de eerste regel te vullen, en de tweede voor een achtste. Dat is geen
 tegenvaller: het is de eerste keer dat de vraag überhaupt een noemer heeft.

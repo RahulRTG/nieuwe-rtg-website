@@ -61,6 +61,29 @@
    functie werkt". Dat verschil is de hele reden dat de andere vijf bewijzen er
    met naam bij staan.
 
+   EN EEN GROOT DEEL VAN WAT ER STAAT, IS NIET AAN TE TIKKEN. Op vluchten.html
+   staan 23 zichtbare knoppen en zijn er 13 niet te bereiken: 8x ligt er iets
+   overheen ("intercepts pointer events"), 4x is de knop niet zichtbaar op het
+   moment van tikken, 1x staat hij buiten beeld. Wat daarvan een overlay is die
+   een mens eerst wegtikt en wat een werkelijk onbereikbare knop, weet deze
+   proef niet -- dus raakt hij minder dan de helft, dan heet de rij NIET_GETEST
+   met de uitsplitsing erbij. `knoppenNietKlikbaar` en
+   `schermenGrotendeelsOngemeten` staan in het register zodat dat een getal is
+   en geen voetnoot.
+
+   DRIE FOUTEN IN DIT INSTRUMENT ZELF zijn de reden dat het er zo uitziet, en ze
+   staan hier omdat ze zich anders herhalen:
+     1. Knoppen werden EEN keer gemarkeerd en daarna op nummer aangetikt. Na de
+        eerste tik hertekent een scherm en zijn de markeringen weg -- er werd
+        dus een knop per scherm getikt terwijl er veertien stonden, en dat werd
+        als BEWEZEN gemeld. Een meter die te weinig doet, meldt groen.
+     2. Een tik die navigeert sloopte de context van de volgende meting, en die
+        fout werd uitgeschreven als een DEFECT VAN DE APP. Een instrument dat
+        zijn eigen struikelen als beschuldiging meldt, is erger dan geen.
+     3. De eerste ratelproef saboteerde een KLIK op een knop die de proef nooit
+        bereikte, en concludeerde daaruit dat de ratel stuk was. Sabotage hoort
+        bij het LADEN, want dat wordt op elk scherm gehaald.
+
    DRAAIEN
 
      node scripts/appwerkt.js              meet, schrijft APPWERKT.json
@@ -212,7 +235,7 @@ async function maakContext(browser, opslag) {
 }
 
 async function meetRij(rij, base, persoonlijk, rollen) {
-  const r = { ...rij, bewijzen: {}, geklikt: 0, overgeslagen: [], waarnemingen: [] };
+  const r = { ...rij, bewijzen: {}, gevonden: 0, geklikt: 0, overgeslagen: [], nietKlikbaar: [], waarnemingen: [] };
   delete r.soort; delete r.pad;
 
   /* tab: en os: hebben geen eigen adres -- ze zijn een stand of een kiezer
@@ -296,17 +319,37 @@ async function meetRij(rij, base, persoonlijk, rollen) {
 
   // ---- bewijs 2 en 8: bedienbaar en menselijk ----
   const bediening = await bedien(eigen, base, rij.pad);
+  r.gevonden = bediening.gevonden;
   r.geklikt = bediening.geklikt;
   r.overgeslagen = bediening.overgeslagen;
+  r.nietKlikbaar = bediening.nietKlikbaar;
+  if (bediening.instrument.length) r.waarnemingen.push('proef: ' + bediening.instrument.join('; '));
   const stuk = [...bediening.crash, ...bediening.serverfout];
+  /* De uitsplitsing staat ALTIJD in de reden, ook bij een geslaagde rij: "3
+     knoppen aangetikt zonder fout" leest als een bewijs, maar zonder de noemer
+     weet niemand of dat alles was of het topje. */
+  const redenenTelling = {};
+  for (const n of bediening.nietKlikbaar) { const w = n.split(': ').pop(); redenenTelling[w] = (redenenTelling[w] || 0) + 1; }
+  const uitsplitsing = bediening.geklikt + ' van ' + bediening.gevonden + ' zichtbare knoppen aangetikt zonder fout'
+    + (bediening.nietKlikbaar.length ? ', ' + bediening.nietKlikbaar.length + ' niet aan te tikken (' + Object.entries(redenenTelling).map(([w, n]) => n + 'x ' + w).join(', ') + ')' : '')
+    + (bediening.overgeslagen.length ? ', ' + bediening.overgeslagen.length + ' overgeslagen omdat ze onomkeerbaar zijn' : '');
   if (bediening.geklikt === 0 && !bediening.gevonden) {
     r.bewijzen.bedienbaar = { status: 'NIET_GETEST', reden: 'geen zichtbare knop zonder bestemming gevonden; wat dit scherm doet, loopt via links of formulieren', bewijs: null };
   } else if (stuk.length) {
     r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_DEFECT', reden: stuk[0], bewijs: bediening.crash.concat(bediening.serverfout).slice(0, 5).join(' | ') };
   } else if (bediening.config.length) {
     r.bewijzen.bedienbaar = { status: 'GEBLOKKEERD_DOOR_CONFIG', reden: bediening.config[0], bewijs: null };
+  } else if (bediening.gevonden > 0 && bediening.geklikt * 2 < bediening.gevonden) {
+    /* EEN SCHERM WAAR HET MEESTE ONAANGERAAKT BLEEF, IS NIET BEWEZEN. Op
+       vluchten.html bleken 8 van de 23 knoppen bedekt door iets anders
+       ("intercepts pointer events"), 4 onzichtbaar op het moment van tikken en
+       1 buiten beeld. Wat daarvan een overlay is die een mens eerst wegtikt en
+       wat een werkelijk onbereikbare knop, kan deze proef niet uitmaken -- en
+       juist daarom mag hij er geen groen vinkje van maken. */
+    r.bewijzen.bedienbaar = { status: 'NIET_GETEST',
+      reden: uitsplitsing + ' -- de proef raakte minder dan de helft, dus dit scherm is niet beproefd', bewijs: null };
   } else {
-    r.bewijzen.bedienbaar = { status: 'BEWEZEN', reden: bediening.geklikt + ' knoppen aangetikt zonder fout', bewijs: null };
+    r.bewijzen.bedienbaar = { status: 'BEWEZEN', reden: uitsplitsing, bewijs: null };
   }
   /* Bewijs 8 wordt AFGELEID en niet apart gemeten, en dat staat er zo bij: een
      kale TypeError of 500 is nooit menselijk, en verder kan deze proef niet
@@ -374,37 +417,86 @@ async function bezoek(ctx, base, pad) {
 async function bedien(ctx, base, pad) {
   const page = await ctx.newPage();
   const crash = [], config = [], serverfout = [];
-  let geklikt = 0, gevonden = 0; const overgeslagen = [];
+  let geklikt = 0, gevonden = 0;
+  const overgeslagen = [], nietKlikbaar = [], instrument = [];
   try {
     await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 20000 });
     await page.waitForTimeout(2200);
     luister(page, base, { crash, config, serverfout });   // pas NA het laden: laadfouten horen bij bewijs 1
-    const knoppen = await page.evaluate((max) => {
-      const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
-        if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
-        const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
-      const alle = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
-        .filter(zie).filter((el) => !el.getAttribute('href') && !el.getAttribute('data-url'));
-      return alle.slice(0, max).map((el, n) => { el.setAttribute('data-appwerkt', String(n));
-        return { n, tekst: (el.innerText || el.getAttribute('aria-label') || el.title || '').trim().slice(0, 40) }; });
-    }, MAXKLIK);
-    gevonden = knoppen.length;
-    for (const k of knoppen) {
+    const gehad = new Set();
+    for (let ronde = 0; ronde < MAXKLIK; ronde++) {
+      let k;
+      try { k = await kijkRonde(page, gehad); }
+      catch (e) {
+        /* Een tik kan navigeren, en dan is de context van de pagina weg op het
+           moment dat de volgende ronde kijkt ("Execution context was
+           destroyed"). Dat is een eigenschap van de PROEF en niet van het
+           scherm. Zonder deze opvang werd een navigerende knop gemeld als een
+           defect van de app -- een instrument dat zijn eigen struikelen als
+           beschuldiging uitschrijft is erger dan geen instrument. */
+        if (!/Execution context was destroyed|Target closed|Navigation|frame was detached/i.test(String(e.message || e))) throw e;
+        instrument.push('de proef verloor de pagina door een navigatie en opende hem opnieuw');
+        try { await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 15000 }); await page.waitForTimeout(1200); k = await kijkRonde(page, gehad); }
+        catch (x) { instrument.push('opnieuw openen lukte niet: ' + String(x.message || x).split('\n')[0].slice(0, 80)); break; }
+      }
+      gevonden = Math.max(gevonden, k.zichtbaar || 0);
+      if (k.klaar) break;
+      gehad.add(k.merk);
       if (ONOMKEERBAAR.test(k.tekst)) { overgeslagen.push(k.tekst || '(naamloos)'); continue; }
       try {
-        await page.click('[data-appwerkt="' + k.n + '"]', { timeout: 2500, noWaitAfter: true });
+        await page.click('[data-appwerkt="1"]', { timeout: 2500, noWaitAfter: true });
         await page.waitForTimeout(600);
-      } catch (e) { continue; }
-      geklikt++;
+        geklikt++;
+      } catch (e) {
+        /* De reden van een time-out staat in de LOG van Playwright ("intercepts
+           pointer events", "element is not visible"), niet in de boodschap.
+           Zonder die reden is "niet aan te tikken" een dood getal: een knop
+           onder een balk is iets anders dan een knop die er niet is. */
+        const log = String(e.message || e);
+        const waarom = (log.match(/intercepts pointer events|element is not visible|element is not stable|element is not enabled|element is outside of the viewport/i) || ['reden niet gemeld'])[0];
+        nietKlikbaar.push((k.tekst || '(naamloos)') + ': ' + waarom);
+      }
       if (page.url().replace(base, '').split('#')[0] !== pad) {
         try { await page.goto(base + pad, { waitUntil: 'domcontentloaded', timeout: 15000 }); await page.waitForTimeout(1500); } catch (e) { break; }
       }
     }
   } catch (e) {
-    crash.push('bediening mislukt: ' + String(e.message || e).split('\n')[0].slice(0, 140));
+    instrument.push('bediening mislukt: ' + String(e.message || e).split('\n')[0].slice(0, 140));
   }
   await page.close();
-  return { geklikt, gevonden, overgeslagen, crash, config, serverfout };
+  return { geklikt, gevonden, overgeslagen, nietKlikbaar, instrument, crash, config, serverfout };
+}
+
+/* WAT STAAT ER NU, EN WAT HEBBEN WE NOG NIET GEHAD.
+
+   Hier stond eerst: markeer in EEN keer veertien knoppen met `data-appwerkt` en
+   tik ze daarna op nummer aan. Dat werkte precies een keer per scherm -- een tik
+   wisselt vaak van stand, het scherm hertekent, de markeringen verdwijnen, en
+   elke volgende klik liep in een time-out die stil werd overgeslagen. Gemeten
+   over de hele ronde: 1206 knoppen gevonden, 331 aangetikt, mediaan 14 gevonden
+   tegen 2 aangetikt. "Bedienbaar BEWEZEN" sloeg dus vrijwel overal op EEN knop,
+   en dat is de gevaarlijkste soort defect in een meter: te weinig doen en groen
+   melden.
+
+   Daarom per ronde OPNIEUW kijken, en bijhouden wat al gehad is op een
+   HANDTEKENING (tag, id, aria-label, tekst) en niet op een positie -- na een
+   hertekening klopt een positie niet meer. */
+async function kijkRonde(page, gehad) {
+  return page.evaluate((alGehad) => {
+    const zie = (el) => { if (!el || el.hidden || el.disabled) return false;
+      if (!el.offsetParent && getComputedStyle(el).position !== 'fixed') return false;
+      const b = el.getBoundingClientRect(); return b.width > 1 && b.height > 1; };
+    const merk = (el) => [el.tagName, el.id || '', (el.getAttribute('aria-label') || '').slice(0, 30),
+      (el.innerText || el.title || '').trim().slice(0, 40)].join('|');
+    const alle = Array.from(document.querySelectorAll('button,[role=button],[data-tab],[data-stand]'))
+      .filter(zie).filter((el) => !el.getAttribute('href') && !el.getAttribute('data-url'));
+    document.querySelectorAll('[data-appwerkt]').forEach((el) => el.removeAttribute('data-appwerkt'));
+    const nieuwe = alle.filter((el) => !alGehad.includes(merk(el)));
+    if (!nieuwe.length) return { klaar: true, zichtbaar: alle.length };
+    nieuwe[0].setAttribute('data-appwerkt', '1');
+    return { klaar: false, zichtbaar: alle.length, merk: merk(nieuwe[0]),
+      tekst: (nieuwe[0].innerText || nieuwe[0].getAttribute('aria-label') || nieuwe[0].title || '').trim().slice(0, 40) };
+  }, [...gehad]);
 }
 
 /* Een 503 die zichzelf uitlegt is CONFIG en geen DEFECT. Dit huis schrijft die
@@ -441,7 +533,8 @@ function bouw(meting) {
   return {
     uitleg: 'Doet de functie het? Per onderdeel uit MAPPEN, met de persona aan wie de wereld hem toont, gemeten in een echte browser met een echte sessie. Drie van de acht bewijzen uit BETROUWBAARHEID.md worden hier gemeten; de andere vijf staan er met de reden waarom ze nog niet te meten zijn.',
     hoe: 'node scripts/appwerkt.js  (--controle zakt als het aantal defecten groeit)',
-    grens: 'Een BEWEZEN rij betekent: de ingang opent voor zijn persona en de bediening breekt niet. Het betekent NIET dat de functie werkt -- daarvoor zijn de vijf bewijzen nodig die hier GEEN_FIXTURE zijn. Er worden geen formulieren ingevuld en geen onomkeerbare knoppen aangetikt; die staan per rij in `overgeslagen`.',
+    grens: 'Een BEWEZEN rij betekent: de ingang opent voor zijn persona en de bediening breekt niet. Het betekent NIET dat de functie werkt -- daarvoor zijn de vijf bewijzen nodig die hier GEEN_FIXTURE zijn. Er worden geen formulieren ingevuld en geen onomkeerbare knoppen aangetikt; die staan per rij in `overgeslagen`. ' +
+      'EN: een groot deel van wat er zichtbaar staat is niet aan te tikken -- er ligt iets overheen, of het is weg op het moment van tikken. Raakt de proef minder dan de helft van een scherm, dan is die rij NIET_GETEST en geen BEWEZEN; zie knoppenNietKlikbaar en schermenGrotendeelsOngemeten.',
     standen: {
       BEWEZEN: 'gemeten en in orde',
       GEBLOKKEERD_DOOR_DEFECT: 'gemeten en stuk; hier moet code voor worden gerepareerd',
@@ -452,6 +545,13 @@ function bouw(meting) {
     stempel: stempel(),
     sessiesOvergeslagen: meting.sessiesOvergeslagen,
     gemeten: { onderdelen: meting.regels.length, defecten: defecten.length,
+      knoppenGevonden: meting.regels.reduce((n, r) => n + (r.gevonden || 0), 0),
+      knoppenAangetikt: meting.regels.reduce((n, r) => n + (r.geklikt || 0), 0),
+      knoppenNietKlikbaar: meting.regels.reduce((n, r) => n + ((r.nietKlikbaar || []).length), 0),
+      /* De eerlijkste maat voor hoe dun bewijs 2 is: op hoeveel schermen bleef
+         meer dan de helft van wat er stond onaangeraakt? */
+      schermenGrotendeelsOngemeten: meting.regels.filter((r) => (r.gevonden || 0) > 0
+        && (r.geklikt || 0) * 2 < (r.gevonden || 0)).length,
       deurenZonderPersona: meting.regels.filter((r) => r.bewijzen.bereikbaar
         && r.bewijzen.bereikbaar.status === 'NIET_GETEST'
         && /er staat een deur/.test(r.bewijzen.bereikbaar.reden || '')).length },

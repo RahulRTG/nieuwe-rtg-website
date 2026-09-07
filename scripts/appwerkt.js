@@ -567,7 +567,12 @@ function bouw(meting) {
   };
 }
 
-(async () => {
+/* DE WACHT: dit script schrijft APPWERKT.json en start daarom niet bij het
+   requiren (scripts/meetkeuring.js, regel `wacht`). Een laadcontrole -- node -e
+   "require('./scripts/appwerkt')" -- mag geen browserronde starten en geen
+   register overschrijven; dat is precies hoe ROLPROEF.json ooit van 3377 naar
+   292 beproefde routes terugviel. */
+if (require.main === module) (async () => {
   /* Een gefilterde ronde vergelijken met het VOLLEDIGE register telt appels bij
      peren: minder rijen geeft altijd minder defecten, dus de ratel zou altijd
      groen zeggen. Dat is precies het soort stille geruststelling waar dit

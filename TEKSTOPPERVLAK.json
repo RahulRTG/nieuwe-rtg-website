@@ -3,18 +3,18 @@
   "bestanden": {
     "html": 302,
     "clientJs": 495,
-    "serverJs": 3275,
+    "serverJs": 3276,
     "bundelsGeteldDelenOvergeslagen": 62
   },
   "totaal": {
-    "uniekeTeksten": 24400,
-    "woorden": 163258,
-    "opMeerDanEenOppervlak": 1024
+    "uniekeTeksten": 24401,
+    "woorden": 163259,
+    "opMeerDanEenOppervlak": 1025
   },
   "perOppervlak": {
     "html": {
-      "unieke": 8902,
-      "voorkomens": 12426,
+      "unieke": 8904,
+      "voorkomens": 12429,
       "parsefouten": 0
     },
     "client": {
@@ -29,7 +29,7 @@
     }
   },
   "perVorm": {
-    "html-tekst": 6340,
+    "html-tekst": 6341,
     "eigenschap:error": 5316,
     "T()": 3479,
     "eigenschap:naam": 2207,
@@ -40,7 +40,7 @@
     "eigenschap:tekst": 647,
     "html-attribuut:placeholder": 583,
     "melder:meld": 567,
-    "toewijzing:textContent": 518,
+    "toewijzing:textContent": 520,
     "eigenschap:reden": 397,
     "eigenschap:titel": 362,
     "eigenschap:waarom": 347,
@@ -278,7 +278,7 @@
       "public/shared/verbinding.js": 3
     },
     "parsefouten": 0,
-    "schaduwHuisbreed": 24400,
+    "schaduwHuisbreed": 24401,
     "waaromSchaduw": "Er is nog geen berichtencatalogus en geen t(sleutel)-runtime, dus een nieuw scherm MOET vandaag hardcoden. Dit getal blokkeren zou alle bouw stilleggen. Het gaat bijten zodra de runtime er is."
   },
   "grens": "Dit register telt WAAR gebruikerszichtbare tekst in de bron staat; het bewijst niet dat een scherm vertaald is, niet dat een getelde tekst ooit op een scherm komt, en niet dat er geen tekst ontsnapt. Het huisbrede getal is een ONDERGRENS: template-literals met een expressie, string-optelling, .join() en de sinks createTextNode/insertAdjacentHTML blijven buiten beeld (de vormzeef hieronder). Alleen `grendel.hard*` is een basislijn; al het andere is een meting van vandaag en geen garantie.",
@@ -297,8 +297,8 @@
     "Afgeleide registers (handelingindex.json, sprongindex.json) tellen niet mee: ze zijn gegenereerd uit de schermen en zouden dubbeltelling zijn."
   ],
   "stempel": {
-    "op": "2026-09-07T19:25:56.929Z",
-    "commit": "b50d0cac0",
+    "op": "2026-09-07T19:45:14.342Z",
+    "commit": "a11721a16",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/tekstoppervlak.js",

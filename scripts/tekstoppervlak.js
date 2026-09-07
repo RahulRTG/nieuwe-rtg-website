@@ -276,10 +276,17 @@ function scanHtml(bron, herkomst, vangst) {
 
 /* ---------- 6. de vangst ---------------------------------------------- */
 
+/* De herkomst van een inline script is "scherm.html <script#2>". Voor de
+   grendel telt het BESTAND, niet het blok: anders verschuift de basislijn
+   zodra iemand twee blokken samenvoegt zonder een letter tekst te wijzigen. */
+function bestandVan(herkomst) { return String(herkomst).replace(/ <script#\d+>$/, ''); }
+
 function nieuweVangst() {
-  const teksten = new Map();  // tekst -> { aantal, vormen:Set, plekken:[] }
+  const teksten = new Map();    // tekst -> { aantal, vormen:Set, plekken:[] }
+  const perBestand = new Map(); // bestand -> aantal voorkomens
   return {
     teksten,
+    perBestand,
     parsefouten: [],
     vasteLocale: [],
     tDubbelzinnig: 0,
@@ -291,13 +298,20 @@ function nieuweVangst() {
       r.aantal++;
       r.vormen.add(vorm);
       if (r.plekken.length < 3) r.plekken.push(herkomst + (lijn ? ':' + lijn : ''));
+      const b = bestandVan(herkomst);
+      perBestand.set(b, (perBestand.get(b) || 0) + 1);
     }
   };
 }
 
 /* ---------- 7. hoofdprogramma ----------------------------------------- */
 
-function main() {
+/* MEET SCHRIJFT NIET. Dat is geen netheid maar de kern van de ratel: als de
+   meting haar eigen basislijn zou bijwerken, is elke stijging meteen de nieuwe
+   norm en houdt de grendel nooit iets tegen. Regel 68 van de keuring roept
+   `meet()` aan en vergelijkt met het INGECHECKTE register; alleen
+   `npm run tekstoppervlak` schrijft, en dat is een bewuste handeling. */
+function meet() {
   const { bundels, isDeel } = bundelDelen();
   const overslaan = [
     path.join(WORTEL, 'server', 'translate', 'woordenboek'), // doelkant: EN en ES
@@ -360,6 +374,34 @@ function main() {
   const gedeeld = [...alle.values()].filter(a => a.oppervlakken.size > 1).length;
   const woorden = [...alle.keys()].reduce((n, s) => n + s.split(/\s+/).length, 0);
 
+  /* ---------- de grendel: waar mag hij VANDAAG al bijten? -------------
+     Een poort die blokkeert zonder alternatief wordt uitgezet, en dan is hij
+     geen poort meer. CONTROLPLANE.md par. 5.3: je kunt niet afdwingen wat nooit
+     in de schaduw heeft gelopen. Dus twee standen naast elkaar:
+
+     HARD, want er is vandaag een alternatief:
+     - de vaste nl-locale. `new Intl.DateTimeFormat(taalVanGebruiker)` kan nu,
+       zonder catalogus en zonder runtime. Niets houdt dit tegen behalve de
+       gewoonte.
+     - nieuwe hardcoded tekst in een bestand dat de sleutelweg AL gebruikt
+       (T() of data-i18n). Daar staat het alternatief in datzelfde bestand, dus
+       terugvallen op een kale string is een regressie. Zo wordt migratie
+       eenrichtingsverkeer: wat om is, kan niet terugglijden.
+
+     SCHADUW, want het alternatief bestaat nog niet:
+     - het huisbrede totaal. Er is geen berichtencatalogus en geen t(sleutel)-
+       runtime, dus elk nieuw scherm MOET vandaag hardcoden. Dat blokkeren zou
+       alle bouw stilleggen. Het getal wordt gemeld met zijn verschil, en het
+       hoort te gaan bijten zodra de runtime er is. */
+  const gesleuteld = {};
+  for (const f of htmls.concat(clientJs)) {
+    const rel = path.relative(WORTEL, f);
+    const bron = lees(f);
+    if (!/\bT\(|data-i18n[=\s]/.test(bron)) continue;
+    const n = (oppervlakken.html.perBestand.get(rel) || 0) + (oppervlakken.client.perBestand.get(rel) || 0);
+    if (n) gesleuteld[rel] = n;
+  }
+
   const uit = {
     gemetenOp: new Date().toISOString().slice(0, 10),
     bestanden: { html: htmls.length, clientJs: clientJs.length, serverJs: serverJs.length,
@@ -372,6 +414,17 @@ function main() {
         'toLocale*/Intl. Een scherm kan 100% gesleuteld zijn en hier alsnog Nederlands tonen. ' +
         'Aparte defectklasse: telt NIET mee in uniekeTeksten.' },
     tDubbelzinnig: oppervlakken.client.tDubbelzinnig,
+    grendel: {
+      uitleg: 'Basislijn voor keuringsregel 68. `hard` mag alleen omlaag en laat de keuring ' +
+        'zakken zodra hij stijgt; `schaduw` wordt alleen gemeld. Wie een getal met opzet ' +
+        'verhoogt, schrijft de reden erbij -- een ratel die je losdraait is geen ratel.',
+      hardVasteLocale: locales.length,
+      hardGesleuteldeBestanden: gesleuteld,
+      schaduwHuisbreed: alle.size,
+      waaromSchaduw: 'Er is nog geen berichtencatalogus en geen t(sleutel)-runtime, dus een ' +
+        'nieuw scherm MOET vandaag hardcoden. Dit getal blokkeren zou alle bouw stilleggen. ' +
+        'Het gaat bijten zodra de runtime er is.'
+    },
     nietGedekt: [
       'Tekst die pas bij het draaien ontstaat: samengestelde zinnen, template-literals met een ' +
         'variabele erin, en tekst die uit de database komt. Een statische meter ziet die niet.',
@@ -385,6 +438,12 @@ function main() {
     ]
   };
 
+  return uit;
+}
+
+function main() {
+  const uit = meet();
+  const perOppervlak = uit.perOppervlak;
   fs.writeFileSync(UIT, JSON.stringify(uit, null, 2) + '\n');
 
   const n = x => String(x).padStart(7);
@@ -398,15 +457,15 @@ function main() {
       (v.parsefouten ? '   parsefouten: ' + v.parsefouten : ''));
   }
   console.log('  ' + '-'.repeat(52));
-  console.log('  ' + 'HUISBREED'.padEnd(10) + n(alle.size) + ' uniek, ' + woorden + ' woorden, ' +
-    gedeeld + ' op meer dan een oppervlak');
+  console.log('  ' + 'HUISBREED'.padEnd(10) + n(uit.totaal.uniekeTeksten) + ' uniek, ' + uit.totaal.woorden +
+    ' woorden, ' + uit.totaal.opMeerDanEenOppervlak + ' op meer dan een oppervlak');
   console.log('\n  APARTE DEFECTKLASSE -- taal zonder string:');
-  console.log('    ' + locales.length + ' aanroepen met een vaste nl-locale (' +
-    Object.entries(locVorm).map(([k, v]) => k + ' ' + v).join(', ') + ')');
+  console.log('    ' + uit.vasteLocale.aanroepen + ' aanroepen met een vaste nl-locale (' +
+    Object.entries(uit.vasteLocale.perVorm).map(([k, v]) => k + ' ' + v).join(', ') + ')');
   if (uit.tDubbelzinnig) console.log('    ' + uit.tDubbelzinnig + ' T()-aanroepen met meer dan een menselijk argument (onverenigbare handtekeningen)');
   console.log('\n  geschreven: TEKSTOPPERVLAK.json');
   console.log('  wat deze meter NIET dekt staat in `nietGedekt` -- dat veld hoort te krimpen, leeg wordt het nooit.\n');
 }
 
 if (require.main === module) main();
-module.exports = { menselijk, scanJs, scanHtml, nieuweVangst };
+module.exports = { meet, menselijk, scanJs, scanHtml, nieuweVangst };

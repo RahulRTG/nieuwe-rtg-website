@@ -5392,5 +5392,84 @@ console.log('\n67) elk `npm run X` in een document bestaat ook echt');
   }
 }
 
+/* 68) geen NIEUWE gebruikerszichtbare tekst hardcoded waar het al anders kan.
+
+   Het doel van de meertaligheidslaag is niet "de code 114-talig maken" maar iets
+   dat je kunt afdwingen: geen gebruikerszichtbare tekst meer hardcoded in een
+   taal. TEKSTOPPERVLAK.json meet er vandaag 23.823, over html, client-js en
+   server-js samen (npm run tekstoppervlak).
+
+   DEZE REGEL BLOKKEERT NIET OP DAT TOTAAL, en dat is met opzet. Er is nog geen
+   berichtencatalogus en geen t(sleutel)-runtime, dus een nieuw scherm MOET
+   vandaag hardcoden. Wie dat toch blokkeert legt alle bouw stil, en dan wordt de
+   poort uitgezet -- CONTROLPLANE.md par. 5.3: je kunt niet afdwingen wat nooit in
+   de schaduw heeft gelopen. Het totaal loopt hier dus MEE en meldt alleen.
+
+   Wat hij wel hard tegenhoudt zijn de twee plekken waar vandaag al een
+   alternatief bestaat:
+
+   ratel 1  DE VASTE nl-LOCALE. 246 aanroepen geven een vaste 'nl-NL' mee aan
+            toLocaleString of Intl. Daar valt geen sleutel op te plakken en toch
+            leest een Japanse gebruiker een Nederlandse datum -- een scherm kan
+            100% gesleuteld zijn en hier alsnog Nederlands tonen. De taal van de
+            gebruiker meegeven kan NU, zonder catalogus en zonder runtime.
+
+   ratel 2  EEN BESTAND DAT DE SLEUTELWEG AL GEBRUIKT. 37 eenheden dragen T() of
+            data-i18n. Daar staat het alternatief in datzelfde bestand, dus een
+            kale string erbij is een regressie. Zo wordt migratie
+            eenrichtingsverkeer: wat om is, kan niet terugglijden.
+
+   Beide ratels mogen alleen OMLAAG. Wie een getal met opzet verhoogt, draait
+   TEKSTOPPERVLAK.json bij met npm run tekstoppervlak EN schrijft de reden in de
+   commitboodschap. Een ratel die je losdraait omdat je er zelf tegenaan loopt,
+   is geen ratel. */
+console.log('\n68) geen nieuwe hardcoded tekst waar de sleutelweg al bestaat');
+{
+  let basis = null;
+  try { basis = JSON.parse(fs.readFileSync(path.join(ROOT, 'TEKSTOPPERVLAK.json'), 'utf8')); }
+  catch (e) { fout('TEKSTOPPERVLAK.json ontbreekt of is stuk -- draai `npm run tekstoppervlak`'); }
+
+  if (basis && basis.grendel) {
+    const g = basis.grendel;
+    let nu = null;
+    try { nu = require('./tekstoppervlak').meet(); }
+    catch (e) { fout('de tekstmeter liep vast: ' + e.message); }
+
+    if (nu) {
+      /* ratel 1: de vaste locale */
+      const was = g.hardVasteLocale, is = nu.vasteLocale.aanroepen;
+      if (is > was) {
+        fout('er zijn ' + (is - was) + ' aanroepen met een vaste nl-locale bijgekomen (' + was + ' -> ' + is +
+          '). Geef de taal van de gebruiker mee in plaats van \'nl-NL\'; dat kan vandaag al. ' +
+          'Moet het getal echt omhoog, verhoog het dan met opzet via `npm run tekstoppervlak` en zeg waarom');
+      }
+
+      /* ratel 2: per bestand dat de sleutelweg al gebruikt */
+      const gestegen = [];
+      for (const [bestand, wasN] of Object.entries(g.hardGesleuteldeBestanden || {})) {
+        const isN = (nu.grendel.hardGesleuteldeBestanden || {})[bestand];
+        if (typeof isN === 'number' && isN > wasN) gestegen.push(bestand + ' (' + wasN + ' -> ' + isN + ')');
+      }
+      if (gestegen.length) {
+        fout(gestegen.length + ' bestand(en) die T() of data-i18n AL gebruiken kregen er hardcoded tekst bij: ' +
+          gestegen.slice(0, 5).join(', ') + (gestegen.length > 5 ? ' en ' + (gestegen.length - 5) + ' meer' : '') +
+          '. Het alternatief staat in datzelfde bestand -- gebruik de sleutelweg');
+      }
+
+      if (is <= was && !gestegen.length) {
+        ok('vaste nl-locale ' + is + ' (grens ' + was + '), en geen van de ' +
+          Object.keys(g.hardGesleuteldeBestanden || {}).length +
+          ' gesleutelde bestanden kreeg hardcoded tekst erbij');
+      }
+
+      /* schaduw: het totaal meldt en velt niet */
+      const dHuis = nu.totaal.uniekeTeksten - g.schaduwHuisbreed;
+      console.log('  · schaduw: ' + nu.totaal.uniekeTeksten + ' gebruikerszichtbare teksten huisbreed (' +
+        (dHuis === 0 ? 'gelijk' : (dHuis > 0 ? '+' + dHuis : String(dHuis))) +
+        '). Meldt en velt niet: er is nog geen catalogus om naar uit te wijken.');
+    }
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

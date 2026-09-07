@@ -41,7 +41,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser } = require('./helper');
+const { startServer, letOpFouten, laadPlaywright, browserOpties, geenBrowser, wachtOpWaarde, wachtOpNetstilte } = require('./helper');
 
 const pw = laadPlaywright();
 
@@ -85,7 +85,10 @@ test('RTG Vrienden: het scriptblok loopt tot het einde -- lijst, stream, ververs
     // 1. laad() -- zonder deze aanroep blijft de contactenlijst voor altijd leeg
     await page.waitForFunction(() => !!window.__vriendenGeladen ||
       document.querySelector('#vrienden') !== null, null, { timeout: 15000 });
-    await page.waitForTimeout(3500);
+    /* Op de TOESTAND wachten en niet op de klok (scripts/klokwacht.js): de twee
+       verzoeken die het blok afvuurt zijn het bewijs, dus daar wachten we op. */
+    await wachtOpWaarde(() => paden.includes('/api/rtf/social/connections') && paden.some((p) => p.includes('/social/stream')),
+      { ms: 15000, wat: 'de contactenlijst en de stream (laad() en startStream())' });
     assert.ok(paden.includes('/api/rtf/social/connections'),
       'laad() heeft gedraaid: de contactenlijst is opgehaald. Zo niet, dan is het scriptblok eerder gestopt.');
 
@@ -107,9 +110,12 @@ test('RTG Vrienden: het scriptblok loopt tot het einde -- lijst, stream, ververs
     /* 4. de verversing per twaalf seconden -- de allerlaatste regel van het
        blok (`setInterval(... laad(), 12000)`). Hij staat er apart omdat hij
        NA startStream() komt: draait hij, dan is het blok tot de laatste regel
-       uitgevoerd. De dertien seconden wachten zijn de prijs van dat bewijs. */
+       uitgevoerd. Er wordt gewacht op de TWEEDE ophaalronde zelf en niet op
+       dertien seconden klok; de kap van twintig seconden is een tijdgrens die
+       luid faalt, geen gok. */
     const voorVerversing = paden.filter((p) => p === '/api/rtf/social/connections').length;
-    await page.waitForTimeout(13000);
+    await wachtOpWaarde(() => paden.filter((p) => p === '/api/rtf/social/connections').length > voorVerversing,
+      { ms: 20000, stap: 250, wat: 'de tweede ophaalronde van de contactenlijst (de verversing per twaalf seconden)' });
     assert.ok(paden.filter((p) => p === '/api/rtf/social/connections').length > voorVerversing,
       'de verversing per twaalf seconden loopt: het blok is tot zijn laatste regel uitgevoerd');
 
@@ -141,7 +147,8 @@ test('RTG Vrienden: het scriptblok loopt tot het einde -- lijst, stream, ververs
     page2.on('request', (r) => { const u = r.url().replace(base, '');
       if (u.startsWith('/api/rtf/social')) zonderKnop.push(u.split('?')[0]); });
     await page2.goto(base + '/apps/foundation/vrienden.html', { waitUntil: 'domcontentloaded' });
-    await page2.waitForTimeout(4000);
+    /* Op afwezigheid kun je niet wachten; wel tot de pagina is uitgepraat. */
+    await wachtOpNetstilte(page2, { stilMs: 1500, maxMs: 8000 });
     assert.ok(!zonderKnop.includes('/api/rtf/social/connections'),
       'ZELFIJKING: zonder #pinNoodKnop hoort het blok af te breken vóór laad(). ' +
       'Draait laad() daar wél, dan meet spoor 1 hierboven niet wat het beweert.');

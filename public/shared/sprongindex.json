@@ -543,16 +543,6 @@
       "sleutel": "videobellen"
     },
     {
-      "naam": "Vrienden",
-      "wereld": "LivingOS",
-      "soort": "link",
-      "sleutel": "vrienden",
-      "url": "/apps/foundation/vrienden.html",
-      "woorden": [
-        "contacten"
-      ]
-    },
-    {
       "naam": "Wallet",
       "wereld": "LivingOS",
       "soort": "link",
@@ -975,6 +965,16 @@
         "partners",
         "gemeenten",
         "ondernemers"
+      ]
+    },
+    {
+      "naam": "Vrienden",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "vrienden",
+      "url": "/apps/foundation/vrienden.html",
+      "woorden": [
+        "contacten"
       ]
     }
   ]

@@ -2842,91 +2842,97 @@
     {
       "label": "Accepteer",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {
       "label": "Bekijk",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {
       "label": "Boardroom",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {
       "label": "Kopieer",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {
       "label": "Live code",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {
       "label": "Mijn koppelingen",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {
       "label": "Nieuwe pin",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/vrienden.html"
+    },
+    {
+      "label": "Noodslot",
+      "app": "Vrienden",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {
       "label": "Opnemen",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {
       "label": "Pin uitzetten",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {
       "label": "Scan",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {
       "label": "Toon QR",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {
       "label": "Versturen",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {
       "label": "Verzoek",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {
       "label": "Vriend",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {
       "label": "Weiger",
       "app": "Vrienden",
-      "wereld": "LivingOS",
+      "wereld": "FoundationOS",
       "url": "/apps/foundation/vrienden.html"
     },
     {

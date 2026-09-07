@@ -546,7 +546,15 @@ test('19. een site lezen in je eigen taal: wel de tekst, niet de naam', async ()
   /* Dezelfde zin staat in velden die WEL en velden die NIET vertaald mogen
      worden. Zo toetsen we onze eigen regel en niet de kwaliteit van het
      woordenboek: wat overblijft moet verschillen van wat verandert. */
-  const Z = 'Neem contact op';
+  /* Z IS EEN BOODSCHAP DIE HET WOORDENBOEK HEEL DEKT. Hier stond 'Neem contact
+     op', en dat "vertaalde" alleen doordat de oude woord-voor-woordlaag losse
+     woorden omwisselde -- een halve zin die zich vertaald noemde. Sinds
+     server/translate.js alleen nog hele boodschappen vertaalt, blijft zo'n zin
+     zonder model Nederlands en zegt de sitelezer eerlijk `vertaald: null`.
+     'Zojuist betaald' staat als hele zin in NL2EN, dus de route wordt getoetst
+     op wat hij moet doen -- WELKE velden mee mogen -- met een echte vertaling
+     eronder in plaats van een omgewisseld woord. */
+  const Z = 'Zojuist betaald';
   const mk = await api('/api/site/bewaar', { design: { titel: 'Atelier Nora Vertaal',
     blokken: [
       { type: 'hero', kop: Z, sub: Z, knop: 'Contact' },

@@ -59,6 +59,21 @@ const GETALLEN = {
     wat: 'losse capability-woordenlijsten in de code' },
   'capabiliteit.leden': { bron: 'CAPABILITEIT.json', veld: 'leden',
     wat: 'leden over al die lijsten samen' },
+  /* De kantoormacht: staat er een MENS achter de handeling (KANTOOR.md par. 1,
+     KANTOORMACHT.md blok 0). De harde assen komen uit de router; `anoniem` is
+     lexicaal en dus een ONDERgrens -- die graad hoort in het proza te staan. */
+  'kantoor.routes': { bron: 'KANTOORMACHT.json', veld: 'gemeten.routes',
+    wat: 'kantoorroutes achter /api/office en /api/boardroom' },
+  'kantoor.deurEistMens': { bron: 'KANTOORMACHT.json', veld: 'gemeten.deurEistMens',
+    wat: 'kantoorroutes waar de bewaker een bewezen mens eist' },
+  'kantoor.deurGedeeld': { bron: 'KANTOORMACHT.json', veld: 'gemeten.deurGedeeld',
+    wat: 'kantoorroutes achter de gedeelde kantoorcode' },
+  'kantoor.anoniem': { bron: 'KANTOORMACHT.json', veld: 'gemeten.anoniemUitvoerbaar',
+    wat: 'kantoorroutes zonder mens-eisende deur en zonder mens in de handler' },
+  'kantoor.handlerKentMens': { bron: 'KANTOORMACHT.json', veld: 'gemeten.handlerKentMens',
+    wat: 'kantoorroutes waarvan de handler de handelende mens noemt' },
+  'kantoor.bestanden': { bron: 'KANTOORMACHT.json', veld: 'gemeten.bestanden',
+    wat: 'bestanden die een kantoorroute registreren' },
   'semantiek.namen': { bron: 'SEMANTIEK.json', veld: 'namenInMeerDomeinen',
     wat: 'namen die in meer dan een domein voorkomen' },
   'semantiek.betekenissen': { bron: 'SEMANTIEK.json', veld: 'woordenMetMeerBetekenissen',
@@ -309,7 +324,7 @@ const GETALLEN = {
    alles: een generator die elk .md-bestand mag herschrijven, herschrijft op een
    dag ook iets dat niemand had bedoeld. */
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
-  'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md'];
+  'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

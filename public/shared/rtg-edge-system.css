@@ -15,7 +15,12 @@ body[data-rtg-world="living"]{--edge-bg:#090809;--edge-panel:#12100f;--edge-acce
 body[data-rtg-world="foundation"]{--edge-bg:#07111c;--edge-panel:#0b1825;--edge-copy:#f0f5f7;--edge-dim:#8799a6;--edge-line:rgba(142,195,224,.16);--edge-accent:#78bce2;--edge-accent-soft:rgba(120,188,226,.14);--edge-metal:#dcc778;--edge-ok:#74d7ad}
 body[data-rtg-world="foundation"]{--rtg-bg:#07111c;--rtg-grond:#07111c;--rtg-card:#0b1825;--rtg-card2:#091522;--rtg-line:#1c3547;--rtg-txt:#f0f5f7;--rtg-muted:#b8c6ce;--rtg-soft:#a8bac5;--rtg-goud:#78bce2;--rtg-leesgoud:#b8dcf0;--rtg-leeszacht:#a8bac5;--bg:#07111c;--card:#0b1825;--card2:#091522;--paneel:#0b1825;--paneel2:#091522;--line:#1c3547;--lijn:#1c3547;--txt:#f0f5f7;--muted:#b8c6ce;--soft:#a8bac5;--zacht:#a8bac5;--gold:#78bce2;--goud:#78bce2;--goud2:#dcc778;background:radial-gradient(circle at 72% 12%,rgba(120,188,226,.10),transparent 34%),var(--bg)!important;color:var(--txt)!important}
 
-body.rtg-edge-host{min-width:320px;padding-top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important;padding-left:var(--edge-side)!important;padding-bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px))!important}
+/* margin:0 hoort bij min-width:320px. Zonder dat komt de standaard body-marge
+   van de browser (8px links en rechts) BOVENOP die 320 en scrolt elk scherm
+   met deze schil 8px horizontaal op een toestel van 320 breed -- gemeten op
+   /apps/geld.html. Een schil die de body-opvulling al overneemt, hoort ook
+   zijn marge te verklaren. */
+body.rtg-edge-host{margin:0;min-width:320px;padding-top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important;padding-left:var(--edge-side)!important;padding-bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px))!important}
 .rtg-edge-chrome,.rtg-edge-chrome *{box-sizing:border-box}
 .rtg-edge-chrome{position:fixed;z-index:8800;inset:0;pointer-events:none;color:var(--edge-copy);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;font-feature-settings:"tnum" 1}
 .rtg-edge-chrome button,.rtg-edge-chrome a,.rtg-edge-chrome input{font:inherit}

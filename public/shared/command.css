@@ -206,7 +206,7 @@ body.rtg-command .hv-chat{z-index:259;bottom:calc(108px + env(safe-area-inset-bo
    De inzet zit erin via --rtg-command-safe-bottom, zodat de schil hem op nul
    kan zetten waar Edge de thuisstreep al draagt; zonder schil valt hij terug op
    env(). Zie de toelichting bij .cmd-balk verderop. */
-:root,body.rtg-command,#rtgCommand{
+:root,body.rtg-command,#rtgCommand,#rtg-cookie{
   /* DRIE KEER DEZELFDE VERKLARING, EN DAT IS GEEN DUBBELING. Een var() wordt
      opgelost op het element waar hij WORDT VERKLAARD, niet waar hij wordt
      gelezen. Stond deze token alleen op de body, dan bevroor hij daar op de
@@ -214,7 +214,13 @@ body.rtg-command .hv-chat{z-index:259;bottom:calc(108px + env(safe-area-inset-bo
      Precies dat ging hier mis: de balk bleef 82px terwijl hij er 48 hoorde te
      zijn. Op #rtgCommand lost hij op met de nul van de schil (48px), op de body
      zonder (82px), en dat laatste is wat een lezer BUITEN de schil hoort te
-     krijgen -- de cookiemelding staat naast #rtgCommand en niet erin. */
+     krijgen -- de cookiemelding staat naast #rtgCommand en niet erin.
+
+     #rtg-cookie staat er als vierde anker bij, en om precies dezelfde reden:
+     die melding zet onder de Edge-schil zelf --rtg-command-safe-bottom op nul
+     (zie verderop), en zonder een eigen verklaring hier las hij de waarde die
+     al op de body was uitgerekend -- de inzet telde dan dubbel en de melding
+     kwam 34px boven de balk te zweven in plaats van er strak op. */
   --cmd-balk-hoogte:calc(48px + var(--rtg-command-safe-bottom,env(safe-area-inset-bottom,0px)));
 }
 .cmd-praat{
@@ -459,6 +465,25 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
        wereld eronder blijft leesbaar. */
     background:rgba(12,12,11,.94);border-top:1px solid var(--rtg-line);
     backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  }
+  /* EN SINDS ER TWEE BALKEN ONDER HEM STAAN, MOET HIJ ER ALLEBEI OVERHEEN.
+     De regel hierboven klopte toen de schilbalk het onderste ding op het scherm
+     was. Onder de Edge-schil is dat niet meer zo: rtg-edge-system.css zet
+     #rtgCommand in tot boven de Edge-onderbalk, dus de melding klom precies EEN
+     balkhoogte en landde weer op de schilbalk. Gemeten op 390x844, ingelogd
+     lid: #rtg-cookie y757..796 over .cmd-balk y748..796 -- 39 van de 48px
+     bedekt, met z-index 9999, en een tik op x=40, 150, 250 en 360 kwam alle
+     vier bij de melding uit in plaats van bij de balk. De bankgreep, de vier
+     wereldtegels en de mond van Rahul waren dus dood zolang hij stond, en hij
+     staat er bij elk eerste bezoek. Met de veilige zone erbij (59/34) precies
+     hetzelfde beeld, een balkhoogte lager.
+
+     --rtg-command-safe-bottom op nul, want de schilbalk draagt de thuisstreep
+     onder Edge niet zelf (zie .cmd-balk hierboven); zonder die nul telt de
+     inzet hier dubbel. */
+  body.rtg-command.rtg-edge-host #rtg-cookie{
+    --rtg-command-safe-bottom:0px;
+    bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px) + var(--cmd-balk-hoogte));
   }
   .cmd-balkbladen:empty::after{
     content:"Kies een wereld";align-self:center;padding:0 1rem;

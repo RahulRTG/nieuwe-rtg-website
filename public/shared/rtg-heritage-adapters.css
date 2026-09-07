@@ -70,8 +70,31 @@ body[data-rtg-skin="heritage"] :where(.wacht,.let,[data-status="pending"],[data-
    parelmoeren Social-inhoud en de zwarte onboarding. Zij krijgen hier lokaal
    hun eigen inktset; de wereldidentiteit en de rest van het scherm veranderen
    niet. */
-body[data-rtg-skin="heritage"] .cmd-bank{
-  --rtg-txt:#f4f0e9;--rtg-muted:#cdc9c0;--rtg-soft:#cdc9c0;color:#f4f0e9
+/* DE BALK EN HET PRAATLOG STAAN OP HETZELFDE EILAND ALS DE BANK.
+   Hier stond alleen `.cmd-bank`. De twee andere vlakken van de werktafelschil
+   schilderen precies dezelfde harde donkere grond -- `.cmd-balk`
+   rgba(12,12,11,.94) en `.cmd-praat` rgba(12,12,11,.96) -- maar haalden hun
+   inkt uit de LICHTE wereld eronder (LivingOS is in heritage de lichte kamer).
+   Gemeten op 390x844, ingelogd lid: de vier wereldtegels, het vraagveld aan
+   Rahul, de stuurpijl en de mond allemaal rgb(33,30,25) op die grond = 1,18:1,
+   en de bankgreep plus Rahuls antwoorden rgb(95,87,77) = 2,76:1. De bank stond
+   in dezelfde balk op 17,94:1: het verschil stond naast elkaar in een strook.
+
+   Dat maakte de enige zichtbare weg een wereld in onleesbaar op het scherm dat
+   letterlijk "Kies een wereld om te beginnen" zegt, en het maakte wat je Rahul
+   typt onzichtbaar terwijl je het typte.
+
+   --rtg-line hoorde er altijd al bij en ontbrak ook voor de bank: de haarlijn
+   was rgba(33,30,25,.17) op die grond, 1,02:1, waardoor de drie zones van de
+   balk als een ononderbroken zwarte strook lazen. Met de onyx-rand is dat
+   1,15:1 -- lichter dan de grond in plaats van donkerder, dus de scheiding is
+   er, maar nog steeds onder de 3:1 die een betekenisdragende rand hoort te
+   halen. Die waarde optillen is een merkbesluit en staat hier niet. */
+body[data-rtg-skin="heritage"] .cmd-bank,
+body[data-rtg-skin="heritage"] .cmd-balk,
+body[data-rtg-skin="heritage"] .cmd-praat{
+  --rtg-txt:#f4f0e9;--rtg-muted:#cdc9c0;--rtg-soft:#cdc9c0;
+  --rtg-line:var(--onyx-rand,rgba(255,255,255,.09));color:#f4f0e9
 }
 body.rtg-social-elite[data-rtg-skin="heritage"][data-rtg-world="living"] main#inhoud{
   --rtg-txt:#171712;--rtg-muted:#625f57;--rtg-soft:#625f57;

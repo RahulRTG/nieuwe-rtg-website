@@ -122,14 +122,19 @@
     pasViewport(rt); C.measure(rt); actief = rt; return rt;
   }
   function synchroniseer(doc, win) {
+    /* Focus verbergt ook de Key. Sluit zijn laag vóór de zichtbaarheidsfilter,
+       anders verschijnt een oude positiekeuze opnieuw bij het verlaten van Focus. */
+    var body = doc.body;
+    if (actief && actief.doc === doc && body &&
+        (body.getAttribute('data-rtg-edge-2-state') === 'focus' ||
+         body.getAttribute('data-rtg-edge-venster-open') === 'true') && !actief.picker.hidden) {
+      sluitPicker(actief, false);
+    }
     var gevonden = Array.prototype.filter.call(doc.querySelectorAll(C.SELECTOR), function (e) {
       return C.isUsable(e, win);
     });
     if (gevonden.length !== 1) return null;
-    var rt = verrijk(gevonden[0], doc, win), body = doc.body;
-    if (rt && body && (body.getAttribute('data-rtg-edge-2-state') === 'focus' ||
-        body.getAttribute('data-rtg-edge-venster-open') === 'true') && !rt.picker.hidden) sluitPicker(rt, false);
-    return rt;
+    return verrijk(gevonden[0], doc, win);
   }
   function start(doc, win) {
     if (!doc || !win) return null; synchroniseer(doc, win);
@@ -140,7 +145,7 @@
         (win.queueMicrotask || function (fn) { win.setTimeout(fn, 0); })(function () { gepland = false; synchroniseer(doc, win); });
       });
       observer.observe(doc.documentElement, { subtree: true, childList: true, attributes: true,
-        attributeFilter: ['data-rtg-edge-2-state', 'data-rtg-edge-venster-open'] });
+        attributeFilter: ['data-rtg-edge-2-state', 'data-rtg-edge-venster-open', 'data-rtg-world-start'] });
     }
     return actief;
   }

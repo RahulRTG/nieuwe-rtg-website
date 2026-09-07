@@ -80,7 +80,7 @@ function nepBody(begin) {
   };
 }
 
-test('classificatie normaliseert adressen en toepassen bewaart schermgezag', () => {
+test('classificatie normaliseert adressen en toepassen bewaakt het centrale manifest', () => {
   assert.equal(identiteit.classify('https://rtg.example/apps/rtg.html?pas=rtg#nu'), 'living');
   assert.equal(identiteit.classify('/apps/'), 'living');
   assert.equal(identiteit.classify('/apps/foundation/'), 'foundation');
@@ -93,8 +93,8 @@ test('classificatie normaliseert adressen en toepassen bewaart schermgezag', () 
   assert.equal(leeg.waarden['data-rtg-world'], 'travel');
 
   const eigen = nepBody({ 'data-rtg-world': 'living' });
-  assert.equal(identiteit.apply({ body: eigen }, '/apps/kantoor.html'), 'living');
-  assert.equal(eigen.waarden['data-rtg-world'], 'living', 'een bestaande body-waarde mag nooit worden overschreven');
+  assert.equal(identiteit.apply({ body: eigen }, '/apps/kantoor.html'), 'work');
+  assert.equal(eigen.waarden['data-rtg-world'], 'work', 'een route kan het centrale wereldmanifest niet overschrijven');
   assert.equal(eigen.waarden['data-rtg-skin'], 'heritage');
 });
 
@@ -108,4 +108,12 @@ test('basis laadt de routekaart vroeg en het heritage-blad laat en uniek', () =>
     'wereldidentiteit hoort voor de overige gedeelde lagen te starten');
   assert.ok(/window\.RTGWorldIdentity\.apply\([\s\S]*finally \{ laadHeritageBlad\(\); \}/.test(bron),
     'de heritage-stylesheet hoort pas na de identiteit te worden toegevoegd');
+});
+
+
+test('de gedeelde werkruimte kent uitsluitend centraal toegewezen gebieden', () => {
+  const identity = require('../public/shared/rtg-world-identity');
+  for (const [area,world] of [['reizen','travel'],['living','living'],['foundation','foundation'],['kantoor','work'],['persoonlijk','work'],['random','work'],['constructor','work'],['toString','work'],['__proto__','work']])
+    assert.equal(identity.classify('/apps/werkruimte.html?gebied='+area),world);
+  assert.equal(identity.classify('/apps/kantoor.html?gebied=living'),'work','een willekeurige route kan niet van wereld wisselen');
 });

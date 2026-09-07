@@ -391,7 +391,7 @@ try {
     position:fixed;
     top:0;right:0;
     width:86%;max-width:340px;
-    height:100dvh;
+    height:100%;max-height:100%;box-sizing:border-box;
     background:var(--bg);
     border-left:1px solid var(--line);
     z-index:45;
@@ -400,6 +400,13 @@ try {
     display:flex;flex-direction:column;
     padding-top:env(safe-area-inset-top, 0px);
   }
+  body.rtg-edge-host{--rtg-panel-top:calc(var(--edge-top,44px) + env(safe-area-inset-top,0px));--rtg-panel-bottom:calc(var(--edge-bottom,48px) + env(safe-area-inset-bottom,0px))}
+  body.rtg-edge-host[data-rtg-edge-2-state="compact"]{--rtg-panel-top:0px}
+  body.rtg-edge-host[data-rtg-edge-2-state="focus"]{--rtg-panel-top:0px;--rtg-panel-bottom:0px}
+  body.rtg-edge-host #notifPanel{height:calc(100dvh - var(--rtg-panel-top) - var(--rtg-panel-bottom));max-height:none;box-sizing:border-box;padding-top:0;overflow-y:auto}
+  body.rtg-edge-host #notifPanel .notif-list{min-height:0}
+  body.rtg-edge-host[data-rtg-edge-2-state="compact"] #notifPanel{padding-top:env(safe-area-inset-top,0px)}
+  body.rtg-edge-host[data-rtg-edge-2-state="focus"] #notifPanel{padding-block:env(safe-area-inset-top,0px) env(safe-area-inset-bottom,0px)}
   .notif-panel.open{transform:translateX(0);}
   .notif-head{
     padding:1.2rem 1.25rem 1rem;

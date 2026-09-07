@@ -161,4 +161,5 @@
     });
     if ((w.location.hash || '').indexOf('samen') === 1) laad();
   });
+  R.laadSamen = laad;
 })(window, document);

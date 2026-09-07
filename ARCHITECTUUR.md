@@ -23,9 +23,9 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | routebestanden (`server/routes/**`) | 575 |
 | kernmodules (`server/kern/**`) | 2055 |
 | schermen (`public/**/*.html`) | 302 |
-| gedeelde browsermodules (`public/shared/*.js`) | 329 |
-| toetsbestanden (`test/*.test.js`) | 1522 |
-| schermtoetsen (`test/*.e2e.js`) | 206 |
+| gedeelde browsermodules (`public/shared/*.js`) | 340 |
+| toetsbestanden (`test/*.test.js`) | 1525 |
+| schermtoetsen (`test/*.e2e.js`) | 208 |
 
 ## 2. De weg van een verzoek
 

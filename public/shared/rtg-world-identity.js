@@ -66,6 +66,13 @@
       rijksloket schoolpartner zorgbalie')
   });
 
+  /* Bestaande functionele materiaalgrenzen: routes kunnen geen vrij thema kiezen. */
+  var MATERIALS = Object.freeze({
+    onyx: routes('agenda berichten camera comm festival foundation/onveilig foundation/registreren foundation/wegwijzer geld-command horeca-beheer horeca-bezorg horeca-club horeca-events horeca-expeditie horeca-haccp horeca-hotel horeca juridisch/partnervoorwaarden juridisch/privacy juridisch/voorwaarden leven leverancier living-os media muziek office sociaal werkruimte'),
+    bordeaux: routes('appstore-dossier arrival boeken cellier chauffeur clips commerce flits foodcourt foundation/vrienden garderobe geld hangar hotels krant lifestyle luchthaven maison mall mijnmall navigatie nieuws ov ovcontrol ovdienst ovroutes pay podium reisboek reisbureau reizen-veilig residentie rit routedossier scherm spelen spelscherm sport stad table theater thuis uitgaan vandaag vluchten wereld'),
+    pearl: routes('attenties cercle entourage pulse rendezvous vonk')
+  });
+
   var REDIRECTS = routes('\
     balans bank berichten codewoord geld-command labfonds logboek mecenaat metier nalatenschap rtgcode thuisrust \
     thuiswacht vitaal wallet wbw');
@@ -81,12 +88,19 @@
     catch (e) { waarde = waarde.split(/[?#]/)[0]; }
     waarde = waarde.replace(/\/{2,}/g, '/');
     if (waarde.length > 1) waarde = waarde.replace(/\/$/, '');
+    if (waarde === '/') return '/apps/app.html';
     if (waarde === '/apps') return '/apps/app.html';
     if (waarde === '/apps/foundation') return '/apps/foundation/index.html';
     return waarde;
   }
 
   function classificeer(pad) {
+    if (normaliseer(pad) === '/apps/werkruimte.html') {
+      try { var area = new URL(pad, 'https://rtg.local').searchParams.get('gebied');
+        var areas={kantoor:'work',persoonlijk:'work',reizen:'travel',living:'living',foundation:'foundation'};
+        return Object.prototype.hasOwnProperty.call(areas,area) ? areas[area] : 'work';
+      } catch(e) { return 'work'; }
+    }
     return ROUTES[normaliseer(pad)] || null;
   }
 
@@ -94,20 +108,23 @@
     if (!doc || !doc.body) return null;
     var body = doc.body;
     body.setAttribute('data-rtg-skin', 'heritage');
-    /* Een scherm dat zijn wereld al uitspreekt is de hoogste autoriteit. Ook
-       een toekomstige waarde wordt hier niet stil teruggeschreven. */
-    if (body.hasAttribute('data-rtg-world')) return body.getAttribute('data-rtg-world');
     var venster = doc.defaultView;
-    var huidig = pad || (venster && venster.location && venster.location.pathname) ||
-      (doc.location && doc.location.pathname) || '';
+    var huidig = pad || (venster && venster.location && (venster.location.href || venster.location.pathname)) ||
+      (doc.location && (doc.location.href || doc.location.pathname)) || '';
     var wereld = classificeer(huidig);
-    if (wereld && wereld !== 'redirect') body.setAttribute('data-rtg-world', wereld);
+    if (wereld && wereld !== 'redirect') {
+      body.setAttribute('data-rtg-world', wereld);
+      var material = Object.keys(MATERIALS).find(function (key) { return MATERIALS[key].indexOf(normaliseer(huidig)) >= 0; });
+      if (material) body.setAttribute('data-rtg-eigenvlak', material);
+      else if (body.removeAttribute) body.removeAttribute('data-rtg-eigenvlak');
+    }
     return wereld;
   }
 
   return Object.freeze({
     VALUES: Object.freeze(['living', 'travel', 'work', 'foundation']),
     MANIFEST: MANIFEST,
+    MATERIALS: MATERIALS,
     REDIRECTS: REDIRECTS,
     normalizePath: normaliseer,
     classify: classificeer,

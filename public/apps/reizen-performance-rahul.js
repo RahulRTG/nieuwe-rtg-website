@@ -27,6 +27,6 @@
   $('#groet').textContent = (uur < 12 ? 'GOEDEMORGEN' : uur < 18 ? 'GOEDEMIDDAG' : 'GOEDEAVOND') + (R.token ? '' : ' · INLOG NODIG');
   initMoment();
   var eersteBlad = location.hash.replace('#', '');
-  R.wisselBlad(['vandaag', 'reizen', 'taxi', 'rahul'].includes(eersteBlad) ? eersteBlad : 'vandaag', false);
+  R.wisselBlad(['vandaag', 'reizen', 'taxi', 'samen', 'rahul'].includes(eersteBlad) ? eersteBlad : 'vandaag', false, { restore: true });
   R.laadReizen(false); R.laadLopendeRit();
 })(window.RTGReizen);

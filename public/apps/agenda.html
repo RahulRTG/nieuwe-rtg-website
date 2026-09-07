@@ -151,6 +151,7 @@
     <span class="ey">Kantoor · tijd &amp; besluit</span>
     <div><h2 id="agendaIntro">Uw dag, zonder ruis.</h2><p>Afspraken, uitnodigingen en RTG-momenten in één beheerste tijdlijn.</p></div>
   </section>
+  <div id="agendaStatus" class="rtg-operation-status" role="status" aria-live="polite"></div>
   <div class="rahulbalk">
     <input class="veld" id="rahulIn" maxlength="300" placeholder='Zeg het gewoon: "lunch met de notaris vrijdag om 12:30"'
       aria-label="Plan in gewone taal">
@@ -166,7 +167,7 @@
     <button class="knop" id="wWeek" type="button">Week</button>
     <button class="knop" id="wLijst" type="button">Lijst</button>
   </div>
-  <div id="kal" aria-live="polite"></div>
+  <div id="kal" data-rtg-scroll="agenda-calendar" aria-live="polite"></div>
   <p class="stil h-mt80">Goud is wat uit RTG zelf komt (boekingen); dat leest de agenda alleen.
     Gestippeld is een uitnodiging die nog op uw ja of nee wacht. Herinneringen komen als seintje op het toestel.</p>
 </main>
@@ -184,9 +185,9 @@
     </div>
     <div id="afVelden">
       <label for="afTitel">Titel</label>
-      <input id="afTitel" maxlength="120">
+      <input id="afTitel" required maxlength="120">
       <div class="twee">
-        <span><label for="afDatum">Datum</label><input id="afDatum" type="date"></span>
+        <span><label for="afDatum">Datum</label><input id="afDatum" type="date" required></span>
         <span><label for="afPlek">Plek</label><input id="afPlek" maxlength="120" placeholder="mag leeg"></span>
       </div>
       <div class="twee">
@@ -219,7 +220,7 @@
       </div>
     </div>
     <div class="rij h-mt90">
-      <button class="knop vol" id="afBewaar" type="button">Bewaar</button>
+      <button class="knop vol" id="afBewaar" type="button" data-rtg-morph-action data-rtg-action-state="idle"><span data-rtg-action-copy><span data-rtg-action-copy-for="idle">Bewaar</span><span data-rtg-action-copy-for="pending">Bewaren…</span><span data-rtg-action-copy-for="success">Bewaard ✓</span><span data-rtg-action-copy-for="error">Opnieuw</span></span></button>
       <button class="knop" id="afMeet" type="button" style="display:none;">Vergaderruimte</button>
       <button class="knop" id="afWeg" type="button" style="display:none;">Verwijder</button>
       <span class="rek h-flex1"></span>
@@ -229,6 +230,10 @@
 </div>
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/rtg-route-memory-core.js"></script>
+<script src="/shared/rtg-route-memory.js"></script>
+<script src="/shared/rtg-operation.js"></script>
+<script src="/shared/rtg-side-sheet.js"></script>
 <script src="/apps/agenda/kalender.js"></script>
 <script src="/apps/agenda/paneel.js"></script>
 <script src="/apps/agenda/app.js"></script>

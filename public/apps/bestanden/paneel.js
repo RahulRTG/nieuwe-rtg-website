@@ -116,7 +116,7 @@
       });
   });
   $('#bkSter').addEventListener('click', function () {
-    B().api('wijzig', { id: open.id, ster: !open.ster }).then(function () { dicht(); B().laad(); });
+    B().api('wijzig', { id: open.id, ster: !open.ster }).then(function (r) { if (r.body.error) return B().meld(r.body.error); dicht(); B().laad(); });
   });
   $('#bkHaal').addEventListener('click', function () { haal(null); });
   $('#bkNieuwVersie').addEventListener('click', function () { $('#versiekiezer').click(); });
@@ -152,7 +152,8 @@
     });
   });
   $('#bkHerstel').addEventListener('click', function () {
-    B().api('herstel', { id: open.id }).then(function () {
+    B().api('herstel', { id: open.id }).then(function (r) {
+      if (r.body.error) return B().meld(r.body.error);
       B().meld('Terug in de kluis.'); dicht(); B().laad();
     });
   });

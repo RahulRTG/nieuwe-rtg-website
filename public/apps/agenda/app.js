@@ -10,11 +10,9 @@
   try { token = localStorage.getItem('rtg_member_token'); } catch (e) {}
 
   var api = function (pad, body) {
-    return fetch('/api/agenda/' + pad, { method: 'POST',
+    return window.RTGOperation.requestJson(window.fetch.bind(window), '/api/agenda/' + pad, { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
       body: JSON.stringify(body || {})
-    }).then(function (r) {
-      return r.json().catch(function () { return {}; }).then(function (b) { return { status: r.status, body: b }; });
     });
   };
   var meldT; var meld = function (t) {
@@ -24,6 +22,15 @@
 
   var vandaag = K.iso(new Date());
   var stand = { weergave: 'maand', anker: vandaag };
+  window.RTGRouteMemory.register('agenda', {
+    capture: function () { return { weergave: stand.weergave, anker: stand.anker }; },
+    restore: function (value) {
+      if (['maand','week','lijst'].indexOf(value.weergave) >= 0) stand.weergave = value.weergave;
+      if (/^\d{4}-\d{2}-\d{2}$/.test(value.anker || '') && Number.isFinite(Date.parse(value.anker))) stand.anker = value.anker;
+      return true;
+    }
+  });
+  window.RTGRouteMemory.start();
   var paneel = window.RTGAgendaPaneel.maak(api, meld, laad);
 
   /* het datumvenster hoort bij de weergave: de maand laadt zijn hele
@@ -40,9 +47,11 @@
     return { van: start, tot: K.plusDagen(start, 41) };
   }
 
+  var laadVersie = 0;
   function laad() {
-    var v = venster();
+    var v = venster(), versie = ++laadVersie;
     api('bereik', v).then(function (r) {
+      if (versie !== laadVersie) return;
       if (r.status !== 200) return meld(r.body.error || 'Log eerst in op de leden-app.');
       var alles = (r.body.items || []).concat(r.body.ecosysteem || []);
       alles.sort(function (a, b) {
@@ -54,6 +63,7 @@
         dag: function (dag) { paneel.toon({ datum: dag }); }
       };
       $('#periode').textContent = K[stand.weergave]($('#kal'), stand.anker, alles, acties, vandaag);
+      window.RTGRouteMemory.ready('agenda');
       ['wMaand', 'wWeek', 'wLijst'].forEach(function (id) {
         $('#' + id).classList.toggle('aan', id.slice(1).toLowerCase() === stand.weergave);
       });
@@ -97,13 +107,21 @@
   $('#nieuwBtn').addEventListener('click', function () { paneel.toon({ datum: stand.anker }); });
 
   /* Rahul plant in gewone taal; de bestaande AI-route zet het om */
+  var planningBezig = false;
   function rahul() {
     var t = $('#rahulIn').value.trim();
-    if (!t) return;
-    $('#rahulIn').value = '';
+    if (!t || planningBezig) return;
+    planningBezig = true; $('#rahulBtn').disabled = true;
+    window.RTGOperation.setState($('#agendaStatus'), 'sent');
     api('ai', { opdracht: t }).then(function (r) {
-      meld(r.body.antwoord || 'Dat lukte niet.');
-      if (r.body.gedaan) laad();
+      meld(r.body.error || r.body.antwoord || 'Geen bevestiging ontvangen.');
+      if (r.status === 200 && !r.body.error && r.body.gedaan) {
+        if ($('#rahulIn').value.trim() === t) $('#rahulIn').value = '';
+        window.RTGOperation.setState($('#agendaStatus'), 'confirmed', { confirmed: true, source: '/api/agenda/ai' });
+        laad();
+      } else window.RTGOperation.setState($('#agendaStatus'), r.status === 0 ? 'waiting' : 'failed', { message: r.body.error || r.body.antwoord || 'Geen afspraak bevestigd.' });
+    }).finally(function () {
+      planningBezig = false; $('#rahulBtn').disabled = false;
     });
   }
   $('#rahulBtn').addEventListener('click', rahul);

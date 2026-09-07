@@ -15,7 +15,7 @@
   'use strict';
   if (window.RTGWauw) return;
   var rustig = function () {
-    try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
+    try { return document.documentElement.classList.contains('rtg-stil') || matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; }
   };
   var en = function () {
     try { return (localStorage.getItem('rtg_lang') || document.documentElement.lang || 'nl').indexOf('en') === 0; } catch (e) { return false; }

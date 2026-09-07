@@ -47,9 +47,13 @@ test('de reiswacht op het scherm: signalen met bron, de ontbrekende bronnen, en 
 
     /* ---- eerst de rust: een lid zonder reizen ---- */
     await page.goto(srv.base + '/apps/reizen.html', { waitUntil: 'domcontentloaded' });
+    /* Op ZICHTBARE tekst wachten, zoals de tweede wacht hieronder al doet:
+       innerText is leeg zolang de wereldstart-laag de inhoud nog verbergt, en
+       textContent staat er dan al. Wie op textContent leest, meet de leegte
+       van de laadlaag en niet de rust van het scherm. */
     await page.waitForFunction(() => {
       const el = document.querySelector('#wacht');
-      return el && !/Laden/.test(el.textContent);
+      return el && !/Laden/.test(el.textContent) && /\S/.test(el.innerText);
     }, null, { timeout: 20000 });
 
     await t.test('rust wordt gezegd, en de bronnen staan er toch', async () => {

@@ -24,12 +24,16 @@ het?**
 <<<<<<< HEAD
 | Kernmodules (`server/kern/**`) | **2055** |
 | App-pagina's (`public/apps/**.html`) | **292** |
-| Testbestanden | **1728** |
+| Testbestanden | **1733** |
 =======
 | Kernmodules (`server/kern/**`) | **2054** |
 | App-pagina's (`public/apps/**.html`) | **292** |
+<<<<<<< HEAD
+| Testbestanden | **1732** |
+=======
 | Testbestanden | **1727** |
 >>>>>>> bf9433df56e0214ea5e56f7a39f9e29927440adf
+>>>>>>> origin/main
 
 ## De vier werelden
 

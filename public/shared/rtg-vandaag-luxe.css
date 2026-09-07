@@ -369,27 +369,8 @@ body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagtitel,
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kaartraster{
   grid-column:1;grid-row:1
 }
-/* DE ONDERRAND WORDT GEDEELD, DUS DE TITEL RESERVEERT DE BAND ERONDER.
-
-   .dagtitel en .kaartraster liggen hierboven met opzet in dezelfde rastercel;
-   de grote titel hoort over de foto. Beide blokken verankeren hun tekst
-   ONDERAAN: .dagtitel met align-self:end, en .dagkop erft uit
-   reizen-performance.css align-items:flex-end. Zonder gereserveerde ruimte
-   schuiven ze dus door elkaar -- gemeten 11px verticale overlap over 495px
-   breedte op 1440x900, waarbij de zin van de titel dwars door "DE BESTEMMING"
-   liep.
-
-   Onder 780px was dat al opgelost, en op precies deze manier: daar staat
-   padding-bottom:7,5rem op .dagtitel. Alleen de bredere vensters misten die
-   reservering. Hier staat hij dus ook, opgeteld bij de eigen binnenruimte
-   zodat het zijritme klopt: 3,4rem eigen ruimte plus 5,5rem band is ruim
-   genoeg voor het bijschrift van twee regels (kicker, marge en zin halen samen
-   ten hoogste ~6rem).
-
-   Waarom niet het bijschrift naar boven verplaatst: dat haalt de botsing ook
-   weg, maar draait de leesvolgorde om -- op de telefoon staat de titel eerst
-   en het bijschrift eronder, en twee breedtes die iets anders vertellen is
-   erger dan de botsing zelf. */
+/* Titel en fotobijschrift delen de eerste cel; de bronactie heeft een eigen
+   rij. De gereserveerde band houdt ook vergrote tekst vrij van het bijschrift. */
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagtitel{
   z-index:2;align-self:end;min-width:0;margin:0!important;padding:clamp(1.35rem,4vw,3.4rem)!important;
   padding-bottom:calc(clamp(1.35rem,4vw,3.4rem) + 5.5rem)!important;
@@ -426,15 +407,15 @@ body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .kaartraste
   border:0!important;background:transparent!important
 }
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .vandaagraster{
-  position:absolute!important;z-index:3;right:clamp(.8rem,2vw,1.4rem);bottom:clamp(.8rem,2vw,1.4rem);
-  width:min(21rem,calc(100% - 1.6rem));margin:0!important
+  position:static!important;grid-column:1;grid-row:2;
+  width:100%;margin:0!important
 }
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .volgendblok{
   border:1px solid var(--rtg-v-line)!important;background:color-mix(in srgb,var(--rtg-v-card) 86%,transparent)!important;
   backdrop-filter:blur(16px)
 }
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .strook{
-  grid-column:1;grid-row:2;margin:0!important;padding:1rem!important;
+  grid-column:1;grid-row:3;margin:0!important;padding:1rem!important;
   border:1px solid var(--rtg-v-line)!important;background:var(--rtg-v-card)!important
 }
 body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .pionnen{
@@ -635,7 +616,7 @@ body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .buurts
     .rtg-dashboard-hero-cta,.dagkaart[href],.laagfocus a,.grid>.kaart,
     .doelgroeppoorten a,#werkdag>a,#poorten>a,.reisdiensten>a,
     .buurtstad,.doenkaart:not(.vast),.wrooster-kaart):hover{
-    translate:0 -2px;border-color:color-mix(in srgb,var(--rtg-v-metal) 62%,var(--rtg-v-line))!important;
+    translate:none;border-color:color-mix(in srgb,var(--rtg-v-metal) 62%,var(--rtg-v-line))!important;
     box-shadow:var(--rtg-v-depth-focus)
   }
   body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #werkdag>*:hover{
@@ -713,7 +694,7 @@ body[data-rtg-vandaag-luxe][data-rtg-world="foundation"] .buurtknop.vol{
   body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagdek{grid-template-columns:minmax(0,1fr)!important}
   body[data-rtg-world-dashboard-ready="true"] .kompas{position:static!important}
   body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] #poorten,
-  body[data-rtg-world-dashboard-ready="true"] .wrooster{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world] .wrooster{grid-template-columns:repeat(3,minmax(0,1fr))!important}
 }
 @media(max-width:780px){
   body[data-rtg-world-dashboard-ready="true"],
@@ -732,9 +713,6 @@ body[data-rtg-vandaag-luxe][data-rtg-world="foundation"] .buurtknop.vol{
   body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagkop{padding:1.25rem!important}
   body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .dagtitel{
     padding:1.25rem!important;padding-bottom:7.5rem!important
-  }
-  body[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .vandaagraster{
-    left:.75rem;right:.75rem;bottom:.75rem;width:auto
   }
   body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroep{padding:1rem!important}
   body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroeppoorten,
@@ -755,7 +733,7 @@ body[data-rtg-vandaag-luxe][data-rtg-world="foundation"] .buurtknop.vol{
   body[data-rtg-world-dashboard-ready="true"][data-rtg-world="foundation"] .doenkaart{
     min-height:0;align-items:flex-start!important;text-align:left!important
   }
-  body[data-rtg-world-dashboard-ready="true"] .wrooster{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world] .wrooster{grid-template-columns:repeat(2,minmax(0,1fr))!important}
 }
 @media(max-width:390px){
   body[data-rtg-world-dashboard-ready="true"] .rtg-world-dashboard{padding:.55rem!important;padding-bottom:5rem!important}
@@ -766,9 +744,9 @@ body[data-rtg-vandaag-luxe][data-rtg-world="foundation"] .buurtknop.vol{
     font-size:clamp(2.45rem,13vw,3.35rem)!important
   }
   body[data-rtg-world-dashboard-ready="true"][data-rtg-world="living"] .dagfeed,
-  body[data-rtg-world-dashboard-ready="true"] .wrooster{grid-template-columns:minmax(0,1fr)!important}
+  body[data-rtg-world-dashboard-ready="true"][data-rtg-world] .wrooster{grid-template-columns:minmax(0,1fr)!important}
   body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .doelgroepnav a{
-    min-width:0;padding:.45rem .25rem!important;font-size:.49rem!important
+    min-width:44px;padding:.45rem .25rem!important;font-size:.75rem!important;line-height:1.35;overflow-wrap:anywhere
   }
   body[data-rtg-world-dashboard-ready="true"][data-rtg-world="work"] .merkkop{
     min-height:44px!important;padding:.55rem .1rem!important

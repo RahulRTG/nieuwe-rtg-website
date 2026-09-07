@@ -99,8 +99,10 @@ Een route kiest deze rollen; zij ontwerpt ze niet opnieuw.
 ## 6. Edge en de Continue Key
 
 Edge kent Overzicht, Compact, Automatisch en Focus. Automatisch is de regelaar
-die tussen Overzicht en Compact kiest; Focus blijft een expliciete taakstand met
-een zichtbare uitgang. De globale ankerpunten blijven op elk scherm gelijk.
+die tussen Overzicht en Compact kiest, en hij kiest alleen op een scroll van de
+mens -- een scroll die de software zelf maakt laat de stand staan, zodat er niets
+verschuift onder een vinger die net wil tikken. Focus blijft een expliciete
+taakstand met een zichtbare uitgang. De globale ankerpunten blijven op elk scherm gelijk.
 
 De RTG Continue Key vertegenwoordigt de eerstvolgende betekenisvolle stap. De
 vorm en positie blijven herkenbaar; icoon en label mogen door context veranderen.

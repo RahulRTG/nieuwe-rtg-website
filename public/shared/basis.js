@@ -53,7 +53,7 @@
   function pasWereldIdentiteitToe() {
     try {
       if (window.RTGWorldIdentity && window.RTGWorldIdentity.apply) {
-        window.RTGWorldIdentity.apply(document, location.pathname);
+        window.RTGWorldIdentity.apply(document, location.href);
       }
     } finally { laadHeritageBlad(); }
   }
@@ -218,6 +218,16 @@
   s.id = 'rtgRandenJs'; s.src = '/shared/randen.js'; s.async = true;
   (document.head || document.documentElement).appendChild(s);
 }());
+/* De centrale controllers laden één keer, ook als een route een adapter vóór
+   basis nodig heeft. Ze behouden de bestaande nodes en bevoegdheden. */
+  [['rtg-route-memory-core', 'RTGRouteMemoryCore'], ['rtg-route-memory', 'RTGRouteMemory'], ['rtg-heritage-transition', 'RTGHeritageTransition'], ['rtg-action-dock', 'RTGActionDock'], ['rtg-edge-preferences', 'RTGEdgePreferences'],
+    ['rtg-heritage-registry', 'RTGHeritageRegistry'],
+    ['rtg-heritage-components', 'RTGHeritageComponents']].forEach(function (bron) {
+    if (window[bron[1]] || document.querySelector('script[src="/shared/' + bron[0] + '.js"]')) return;
+    var script = document.createElement('script');
+    script.src = '/shared/' + bron[0] + '.js'; script.async = false;
+    (document.head || document.documentElement).appendChild(script);
+  });
 /* Vervolg van basis-01 (op de 10 kB-grens geknipt na de thema-toevoeging van
    de consolidatieronde; de bundelvolgorde is alfabetisch, dus 01, 01b, 02).
    Sectie 1 en verder: offline, verbinding, en de rest. */

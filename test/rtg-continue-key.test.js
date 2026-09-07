@@ -254,6 +254,7 @@ test('Focus en een appvenster sluiten de tijdelijke kiezer zonder terugkeer', ()
   omg.doc.querySelectorAll = () => [button];
   const rt = key.enhance(button, omg.doc, omg.win);
   button.dispatch('keydown', { key: 'F10', shiftKey: true }); assert.equal(rt.picker.hidden, false);
+  omg.win.getComputedStyle = () => ({ visibility: omg.doc.body.getAttribute('data-rtg-edge-2-state') === 'focus' ? 'hidden' : 'visible', display: 'grid', opacity: '1' });
   omg.doc.body.setAttribute('data-rtg-edge-2-state', 'focus'); key.sync(omg.doc, omg.win);
   assert.equal(rt.picker.hidden, true); assert.equal(button.getAttribute('aria-expanded'), 'false');
   omg.doc.body.setAttribute('data-rtg-edge-2-state', 'overview'); key.sync(omg.doc, omg.win);

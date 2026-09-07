@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl">
 <head>
+<noscript><style>html body.rtg-stijl[data-rtg-world-start] *{visibility:visible!important}.rtg-world-start{display:none!important}</style></noscript>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -179,15 +180,20 @@
 <link href="/shared/experience-kernel.css?v=20260829-7" rel="stylesheet">
 <link href="/images/worlds/heritage/foundation-heritage-v2.jpg" rel="preload" as="image" fetchpriority="high">
 <link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
+<link rel="stylesheet" href="/shared/rtg-world-start.css">
+<script src="/shared/rtg-world-start.js" defer></script>
+
+<script>setTimeout(function(){var b=document.body;if(b&&b.getAttribute("data-rtg-world-start")==="loading"){b.setAttribute("data-rtg-world-start","ready");b.removeAttribute("aria-busy");var l=b.querySelector(".rtg-world-start");if(l)l.hidden=true;}},12500);</script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-world-dashboard="foundation" data-rtg-vandaag-luxe data-rtg-vandaag-surface="public-city" data-rtg-edge-2-context="world-shell" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
+<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-world-dashboard="foundation" data-rtg-vandaag-luxe data-rtg-vandaag-surface="public-city" data-rtg-edge-2-context="world-shell" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true">
+<div class="rtg-world-start" role="status" aria-live="polite"><strong aria-hidden="true">RTG</strong><span>FoundationOS wordt klaargezet…</span></div>
 <!-- De wereldstrook stond hier; de vier werelden staan nu in de topbalk van de
      Edge-schil (shared/rtg-edge-system.js), die dit scherm via randen.js al
      draagt. Zie de opmerking in apps/kantoor.html. -->
 <main id="main">
 
-  <section class="onthaal" aria-labelledby="onthaalkop">
+  <section class="onthaal" data-rtg-transition="world" aria-labelledby="onthaalkop">
     <div class="onthaal-beeld">
       <div class="buurtey" id="groet">FoundationOS · RTFoundation</div>
       <h1 id="onthaalkop">Iedere buurt<br>heeft een toekomst.</h1>
@@ -286,6 +292,8 @@
 </main>
 
 <script src="/shared/rtg-vandaag-luxe.js" defer></script>
+<script src="/shared/rtg-route-memory-core.js"></script>
+<script src="/shared/rtg-route-memory.js"></script>
 <script>
 /* De publieke RTF-app: geen inlog, en daarom de strengste grens van het hele
    systeem.
@@ -380,6 +388,26 @@ function groet() {
 let GEKOZEN = null;   // de stad die open staat
 let WACHT = null;     // waar de bezoeker heen wilde voor hij een stad koos
 
+let BEWAARDE_STAD = null;
+let STAD_VERSIE = 0;
+let HERSTEL_STAD_TOEGESTAAN = true;
+['pointerdown', 'keydown', 'wheel', 'touchstart', 'input'].forEach(type => {
+  document.addEventListener(type, () => { HERSTEL_STAD_TOEGESTAAN = false; },
+    { capture: true, passive: true, once: true });
+});
+if (window.RTGRouteMemory) {
+  RTGRouteMemory.register('foundation-home', {
+    capture: () => ({ city: GEKOZEN }),
+    restore: x => {
+      // Only a preference, never evidence that a city exists or is public.
+      if (!STADSAANVRAAG && x && typeof x.city === 'string' &&
+          /^[A-Za-z0-9_-]{1,80}$/.test(x.city)) BEWAARDE_STAD = x.city;
+      return true;
+    }
+  });
+  RTGRouteMemory.start();
+}
+
 async function start() {
   $('#groet').textContent = groet();
 
@@ -405,6 +433,8 @@ async function start() {
         meldStad('');
         zetVandaagModus('surface', 'RTF ' + gevonden.naam);
       } else zetVandaagModus('home');
+    } else if (HERSTEL_STAD_TOEGESTAAN && BEWAARDE_STAD && r.steden.some(s => String(s.id) === BEWAARDE_STAD)) {
+      await toonStad(BEWAARDE_STAD, { blijfBoven: true, restore: true });
     }
   } catch (e) {
     $('#steden').innerHTML = '<div class="melder">' + esc(e.message) + '</div>';
@@ -437,8 +467,11 @@ function tekenVrijePlekken(activiteiten) {
 }
 
 async function toonStad(id, opties) {
+  const versie = ++STAD_VERSIE;
+  const actueel = () => versie === STAD_VERSIE && (!(opties && opties.restore) || HERSTEL_STAD_TOEGESTAAN);
   try {
     const r = await api('stad', { id });
+    if (!actueel()) return false;
     GEKOZEN = id;
     $('#steden').querySelectorAll('[data-stad]').forEach(k =>
       k.setAttribute('aria-pressed', k.dataset.stad === id ? 'true' : 'false'));
@@ -464,8 +497,10 @@ async function toonStad(id, opties) {
         '<a class="buurtknop rand" href="os-deelnemer.html">Ik heb een code voor mijn hulpvraag</a></div></div>';
     if (!opties || !opties.blijfBoven) ga(WACHT || 'hulp');
     WACHT = null;
+    if (window.RTGRouteMemory) RTGRouteMemory.ready('foundation-home');
     return true;
   } catch (e) {
+    if (!actueel()) return false;
     $('#uit').innerHTML = '<div class="buurtkaart"><div class="melder">' + esc(e.message) + '</div></div>';
     return false;
   }

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-06T22:47:07.020Z",
-    "commit": "4e4495fe",
+    "op": "2026-09-07T21:02:53.959Z",
+    "commit": "302848894",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -5678,6 +5678,22 @@
       "staat": "geen bronmutatie mogelijk",
       "reden": "CSS-contract; handmutatie inhoudsradius 2px naar 8px liet de geometriepoort zakken"
     },
+    "rtg-operation.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-operation.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "rtg-route-memory.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-route-memory.js",
+      "operator": "===->!==#0",
+      "gezakt": 12,
+      "geprobeerd": 3
+    },
     "rtg-world-identity.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6718,6 +6734,21 @@
       "gezakt": 1,
       "geprobeerd": 16
     },
+    "storingen-bezorging.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/storingen/protocol.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 6
+    },
+    "storingen-webhook.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "streng-poorten.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7552,6 +7583,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "vrienden-blok.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "vrijenamen.test.js": {

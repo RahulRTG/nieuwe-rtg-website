@@ -74,6 +74,17 @@
       });
     });
     teken();
+if (w.RTGRouteMemory) {
+  var explicit = geldig(query) || geldig(hash);
+  w.RTGRouteMemory.register('work-home', {
+    capture: function () { return { audience: actief }; },
+    restore: function (x) {
+      if (!explicit && x && geldig(x.audience)) kies(x.audience, false);
+      return true;
+    }
+  });
+  w.RTGRouteMemory.start();
+}
     return { kies: kies, actief: function () { return actief; } };
   }
 

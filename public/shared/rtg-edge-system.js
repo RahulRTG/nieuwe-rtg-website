@@ -56,7 +56,7 @@
     hoofdactie.hidden = !hoofdtekst; hoofdactie.textContent = hoofdtekst;
     e.root.querySelector('.rtg-edge-layout small').textContent = e.layout;
     e.root.querySelector('.rtg-edge-index').innerHTML = L.html(e, C, esc, s, actief);
-    e.root.querySelector('.rtg-edge-status-panel').innerHTML = L.status();
+    if (!e.root.querySelector('.rtg-edge-status-inner')) e.root.querySelector('.rtg-edge-status-panel').innerHTML = L.status();
     bindTools(); L.bind(e, sluitLagen); L.crumbs(e, openIndex, voerActie);
   }
   function bindTools() {
@@ -99,7 +99,7 @@
       if (ev.key === 'Escape') sluitLagen();
     }, true);
     w.addEventListener('resize', function () { if (innerWidth < 768 && e.layout !== 1) setLayout(1); });
-    w.addEventListener('online', teken); w.addEventListener('offline', teken);
+    ['online','offline'].forEach(function(t){w.addEventListener(t,function(){L.refresh(A);});});
   }
   function voerActie() {
     if (!A) return;

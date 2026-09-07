@@ -12,7 +12,7 @@
    De rij scrolt nu in ZICHZELF, precies zoals .cmd-tabs in de werktafel dat doet
    (shared/command.css). Zo blijven de labels leesbaar in plaats van afgekapt, en
    houdt de pagina zijn eigen breedte. */
-@media(max-width:760px){
+@media(max-width:1080px){
   .pn-top{overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
   .pn-top::-webkit-scrollbar{display:none}
   .pn-top>*{flex:0 0 auto}

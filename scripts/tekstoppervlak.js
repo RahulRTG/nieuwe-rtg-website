@@ -52,6 +52,7 @@ const fs = require('fs');
 const path = require('path');
 const { parse } = require('./ast/parser');
 const { loop } = require('./ast/walk');
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = process.cwd();
 const UIT = path.join(WORTEL, 'TEKSTOPPERVLAK.json');
@@ -550,6 +551,15 @@ function meet() {
        herschreven. Alles wat hier staat is BEWEZEN ontsnapt, niet vermoed --
        een gat dat er staat is iets anders dan een gat dat stil ontbreekt, en
        alleen het eerste kun je inplannen. */
+    /* DE GRENS IN EEN ZIN, voor wie het register leest zonder de lijst eronder.
+       scripts/meetkeuring.js eist dat elk register zelf zegt wat het NIET
+       aantoont; de lijst nietGedekt is de uitwerking met de gemeten omvang. */
+    grens: 'Dit register telt WAAR gebruikerszichtbare tekst in de bron staat; het bewijst niet ' +
+      'dat een scherm vertaald is, niet dat een getelde tekst ooit op een scherm komt, en niet ' +
+      'dat er geen tekst ontsnapt. Het huisbrede getal is een ONDERGRENS: template-literals ' +
+      'met een expressie, string-optelling, .join() en de sinks createTextNode/insertAdjacentHTML ' +
+      'blijven buiten beeld (de vormzeef hieronder). Alleen `grendel.hard*` is een basislijn; ' +
+      'al het andere is een meting van vandaag en geen garantie.',
     nietGedekt: [
       'DE VORMZEEF, en dit is het grootste gat. De scanner ziet alleen een KALE ' +
         'stringliteraal op een bekende plek. Ontsnapt bewezen: een template-literal met een ' +
@@ -599,6 +609,10 @@ function meet() {
 function main() {
   const uit = meet();
   const perOppervlak = uit.perOppervlak;
+  /* Wanneer en tegen welke commit: zonder stempel ziet een verouderd register er
+     identiek uit aan een verse (scripts/lib/stempel.js). Alleen bij het SCHRIJVEN,
+     niet in meet() -- de keuring meet vers en hoeft git daarvoor niet te vragen. */
+  Object.assign(uit, { stempel: stempel() });
   fs.writeFileSync(UIT, JSON.stringify(uit, null, 2) + '\n');
 
   const n = x => String(x).padStart(7);

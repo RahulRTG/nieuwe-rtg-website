@@ -281,6 +281,7 @@
     "schaduwHuisbreed": 24400,
     "waaromSchaduw": "Er is nog geen berichtencatalogus en geen t(sleutel)-runtime, dus een nieuw scherm MOET vandaag hardcoden. Dit getal blokkeren zou alle bouw stilleggen. Het gaat bijten zodra de runtime er is."
   },
+  "grens": "Dit register telt WAAR gebruikerszichtbare tekst in de bron staat; het bewijst niet dat een scherm vertaald is, niet dat een getelde tekst ooit op een scherm komt, en niet dat er geen tekst ontsnapt. Het huisbrede getal is een ONDERGRENS: template-literals met een expressie, string-optelling, .join() en de sinks createTextNode/insertAdjacentHTML blijven buiten beeld (de vormzeef hieronder). Alleen `grendel.hard*` is een basislijn; al het andere is een meting van vandaag en geen garantie.",
   "nietGedekt": [
     "DE VORMZEEF, en dit is het grootste gat. De scanner ziet alleen een KALE stringliteraal op een bekende plek. Ontsnapt bewezen: een template-literal met een expressie erin (`Welkom terug ${naam}`), string-optelling, een array met .join(), tekst via een variabele, en de sinks createTextNode, insertAdjacentHTML en replaceChildren. Dat is het meest gebruikte idioom voor UI-tekst in dit huis, dus het huisbrede getal is een ONDERGRENS van onbekende ruimte. De reparatie (elke literal in de deelboom van een sink tellen) is middelgroot en verschuift de basislijn fors; hij hoort vooraf te gaan aan het moment dat het huisbrede getal hard wordt gemaakt.",
     "VIER BEDIENDE OPPERVLAKKEN worden niet gelezen, met hun gemeten omvang: de root index.html (92 teksten, 69 nergens anders -- en die pagina WORDT bediend), de 31 webmanifesten (91 teksten, 57 nergens anders -- waaronder de naam van de app op het beginscherm van een lid), de content-eigenschap in CSS (20 teksten, 18 nergens anders), en .json/.txt-bestanden die naar de client gaan. De bestandslijst hangt aan een MAP; zij hoort aan de bediende bron te hangen.",
@@ -294,5 +295,13 @@
     "De KWALITEIT van welke vertaling dan ook. Deze meter telt plekken; hij beoordeelt geen taal.",
     "De grens tussen INHOUD en INTERFACE. Lesmateriaal en een productnaam zijn inhoud; een statusnaam en een knop zijn interface. Deze meter telt beide en kiest niet. In het getelde zit daardoor ruis: poortdocumentatie uit server/kern/handlerpoorten/, HTML-fragmenten inclusief class=, en zaai- en lesmateriaal.",
     "Afgeleide registers (handelingindex.json, sprongindex.json) tellen niet mee: ze zijn gegenereerd uit de schermen en zouden dubbeltelling zijn."
-  ]
+  ],
+  "stempel": {
+    "op": "2026-09-07T19:25:56.929Z",
+    "commit": "b50d0cac0",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/tekstoppervlak.js",
+    "node": "v22.22.2"
+  }
 }

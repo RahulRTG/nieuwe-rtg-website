@@ -26,8 +26,6 @@ body[data-rtg-skin="heritage"] [data-rtg-type="display"]{font-family:var(--rtg-d
 @media(max-width:767px){
   .rtg-edge-chrome[data-rtg-preferences] .rtg-edge-worldbar{display:none}
   .rtg-edge-chrome[data-rtg-preferences] .rtg-edge-top{grid-template-columns:44px minmax(0,1fr) repeat(4,44px)}
-  body.rtg-edge-host:not(.rtg-edge-workspace):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])) .rtg-edge-chrome[data-rtg-preferences] .rtg-edge-bottom{grid-template-columns:44px 88px minmax(0,1fr) 44px!important}
-  .rtg-edge-chrome[data-rtg-preferences] .rtg-edge-bottom>a{display:none!important}
   .rtg-edge-chrome[data-rtg-preferences] .rtg-edge-history{grid-template-columns:44px 44px}
   body[data-rtg-skin="heritage"] .rtg-edge-chrome[data-rtg-preferences] .rtg-edge-action{padding-inline:0!important;gap:0!important}
   body[data-rtg-skin="heritage"] .rtg-edge-chrome[data-rtg-preferences] .rtg-edge-action::before{display:none!important}
@@ -65,7 +63,6 @@ body[data-rtg-density="compact"]{--rtg-row-space:8px}
 body[data-rtg-skin="heritage"] [data-rtg-operational-table] :where(td,th),body[data-rtg-skin="heritage"] [data-rtg-moment-row]{padding-block:var(--rtg-row-space,12px)}
 .rtg-edge-status-panel{max-height:calc(100dvh - var(--edge-top) - var(--edge-bottom) - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px));overflow-y:auto}
 
-body:has(.rtg-edge-chrome[data-rtg-preferences])>.rtgsprong-greep{display:none!important}
 .rtg-edge-export{padding:12px 16px;border-top:1px solid var(--edge-line)}
 html.rtg-stil::view-transition-old(root),html.rtg-stil::view-transition-new(root){animation:none!important}
 

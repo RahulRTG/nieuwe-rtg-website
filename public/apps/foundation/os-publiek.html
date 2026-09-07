@@ -360,6 +360,8 @@ function zetVandaagModus(modus, titel) {
   } else document.body.removeAttribute('data-rtg-foundation-city');
   document.body.removeAttribute('data-rtg-vandaag-surface-title');
   document.body.setAttribute(VANDAAG_ATTR, 'home');
+  document.body.setAttribute('data-rtg-edge-2-state', 'overview');
+  document.body.setAttribute('data-rtg-edge-2-auto', 'true');
 }
 
 function meldStad(tekst) {

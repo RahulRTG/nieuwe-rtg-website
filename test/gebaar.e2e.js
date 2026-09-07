@@ -94,6 +94,14 @@ test('de twee laden onder een regel: openen, uitvoeren en de weg terug',
     }, reg.token);
     await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => !!window.RTGGebaar, null, { timeout: 20000 });
+    /* Een gebaar op een onzichtbaar vlak is geen gebaar: het wereldhuis toont
+       zijn inhoud pas na zijn eigen startlaag, en een pointer die op verborgen
+       inhoud landt bereikt niets. Wachten op de TOESTAND (zichtbaar), niet op
+       een klok. */
+    await page.waitForFunction(() => {
+      const el = document.querySelector('#werkdag');
+      return !!el && getComputedStyle(el).visibility !== 'hidden';
+    }, null, { timeout: 20000 });
     await page.evaluate((h) => {
       document.querySelector('#werkdag').innerHTML = h;
       // het klembord is in een kale browser niet toegestaan; we luisteren mee
@@ -198,6 +206,14 @@ test('doorvegen kan terug, en wat niet terug kan gaat alleen op vasthouden',
     letOpFouten(page, paginaFouten);
     await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => !!window.RTGGebaar, null, { timeout: 20000 });
+    /* Een gebaar op een onzichtbaar vlak is geen gebaar: het wereldhuis toont
+       zijn inhoud pas na zijn eigen startlaag, en een pointer die op verborgen
+       inhoud landt bereikt niets. Wachten op de TOESTAND (zichtbaar), niet op
+       een klok. */
+    await page.waitForFunction(() => {
+      const el = document.querySelector('#werkdag');
+      return !!el && getComputedStyle(el).visibility !== 'hidden';
+    }, null, { timeout: 20000 });
     await page.evaluate(() => {
       document.querySelector('#werkdag').innerHTML =
         '<div class="proefrij" tabindex="0" style="height:70px"><span>Een regel om te proeven</span></div>';
@@ -307,6 +323,14 @@ test('op een aanraakscherm ligt de lade in de regel en niet over de pagina',
     }, reg.token);
     await page.goto(base + '/apps/kantoor.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => !!window.RTGGebaar, null, { timeout: 20000 });
+    /* Een gebaar op een onzichtbaar vlak is geen gebaar: het wereldhuis toont
+       zijn inhoud pas na zijn eigen startlaag, en een pointer die op verborgen
+       inhoud landt bereikt niets. Wachten op de TOESTAND (zichtbaar), niet op
+       een klok. */
+    await page.waitForFunction(() => {
+      const el = document.querySelector('#werkdag');
+      return !!el && getComputedStyle(el).visibility !== 'hidden';
+    }, null, { timeout: 20000 });
     assert.equal(await page.evaluate(() => matchMedia('(hover:hover) and (pointer:fine)').matches), false,
       'deze proef hoort in de aanraakstand te draaien; anders meet hij hetzelfde als de twee hierboven');
 

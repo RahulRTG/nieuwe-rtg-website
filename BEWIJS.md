@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1733 |
 | losse beweringen (`test(...)`) | 12253 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 110 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1072 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1073 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 55 |
 | alleen in de kop *genoemd*, nog niet gemeten | 179 |
-| niets van beide | 427 |
+| niets van beide | 426 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -1756,7 +1756,7 @@ toets omvalt.
 | `voeding-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/voeding.html. Dit scherm belooft vooral iets NIET, en dat is precies wat op het scherm zelf nagekeken hoort te worden: een motor die niets telt naast een scherm dat er alsnog een cijfer of een... |
 | `voertuigscherm.e2e.js` | 8 | geen bronmutatie mogelijk | HET VOERTUIGSCHERM: het adres dat een verwijzing nodig had. De verwijsvorm van dit huis kon nergens heen voor een voertuig -- er was geen app die er EEN opende. |
 | `vooruitscherm.e2e.js` | 1 | -- | SCHERM-TOETS voor de twee kaarten in Mijn backoffice: "Vooruit" en "Uit uw post". WAAROM DEZE ER MOET ZIJN. |
-| `vrienden-blok.e2e.js` | 1 | -- | RTG VRIENDEN: HET HELE SCRIPTBLOK DRAAIT, EN NIET ALLEEN HET BEGIN. WAT HIER FOUT GING, want dat bepaalt wat deze toets moet meten. |
+| `vrienden-blok.e2e.js` | 1 | gezakt op `liegpoort /api/` | RTG VRIENDEN: HET HELE SCRIPTBLOK DRAAIT, EN NIET ALLEEN HET BEGIN. WAT HIER FOUT GING, want dat bepaalt wat deze toets moet meten. |
 | `wegwijzerscherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | SCHERMTOETS VOOR DE TWEE VEILIGHEIDSSCHERMEN VAN DE RTFOUNDATION: /apps/foundation/onveilig.html en /apps/foundation/wegwijzer.html. WAAROM DEZE TWEE EEN BROWSER NODIG HEBBEN. |
 | `wereldbreedte.e2e.js` | 1 | genoemd | ELKE WERELD PAST OP EEN TELEFOON. Vier van de twaalf werelden liepen op 390px rechts buiten beeld: Partner Network 558, Private Office 557, Living OS 532, Instant Reality 459. |
 | `wereldlaag.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-test voor RTG Wereld. test/wereldlaag.test.js bewijst de server-kant; deze bewijst dat de APP het doet, en vooral dat de NAAD werkt. |

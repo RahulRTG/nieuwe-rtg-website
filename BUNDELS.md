@@ -789,7 +789,7 @@ omlaag.
 
 ## `shared/rahulpoort.js`
 
-`public/shared/rahulpoort/` -- 2 delen, 269 regels in de delen
+`public/shared/rahulpoort/` -- 2 delen, 280 regels in de delen
 
 | deel | onderwerp |
 |---|---|

@@ -24,7 +24,7 @@ het?**
 <<<<<<< HEAD
 | Kernmodules (`server/kern/**`) | **2055** |
 | App-pagina's (`public/apps/**.html`) | **292** |
-| Testbestanden | **1733** |
+| Testbestanden | **1734** |
 =======
 | Kernmodules (`server/kern/**`) | **2054** |
 | App-pagina's (`public/apps/**.html`) | **292** |

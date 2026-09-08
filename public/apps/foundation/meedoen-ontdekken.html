@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="nl" data-rtg-thema="foundation">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#123d3a">
+<meta name="robots" content="noindex,nofollow">
+<title>Meedoen &amp; Ontdekken · FoundationOS</title>
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-deep-flows-2026.css" rel="stylesheet">
+<link href="premium.css" rel="stylesheet">
+<link href="/shared/rtg-foundation-meedoen-ontdekken-2026.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl foundation-meedoen" data-rtg-world="foundation" data-rtg-skin="heritage" data-session-helper="Sessie">
+<a class="mo-skip" href="#moInhoud">Naar de inhoud</a>
+<div class="mo-top" role="banner">
+  <a class="mo-brand" href="index.html" aria-label="Naar FoundationOS">RTG</a>
+  <div class="mo-world"><b>FoundationOS</b><span>Meedoen · ontdekken · dichtbij</span></div>
+  <a class="mo-profiel" href="index.html#profielen" aria-label="Profiel"><i data-glyf="vrienden"></i></a>
+</div>
+
+<main id="moInhoud" class="mo-main" tabindex="-1">
+  <section class="mo-view is-actief" data-mo-view="vandaag" aria-labelledby="moVandaagTitel">
+    <div class="mo-hero">
+      <div class="mo-hero__beeld" aria-hidden="true"></div>
+      <div class="mo-hero__laag">
+        <p class="mo-kicker">Uw buurt leeft</p>
+        <h1 id="moVandaagTitel">Er is meer mogelijk wanneer u weet waar u welkom bent.</h1>
+        <p>Ontdek wat er dichtbij gebeurt en vind een plek die bij u past.</p>
+        <button type="button" class="mo-hoofdknop" data-mo-open="buurt">Ontdek wat er te doen is <i data-glyf="rechterhand"></i></button>
+      </div>
+    </div>
+    <div class="mo-inhoud">
+      <div class="mo-stadregel">
+        <div><p class="mo-kicker">Dichtbij</p><h2>Kies uw stad</h2></div>
+        <button type="button" class="mo-tekstknop" data-mo-kies-stad>Verander stad</button>
+      </div>
+      <div id="moSteden" class="mo-steden" aria-live="polite"><div class="mo-leeg">De open stadsafdelingen worden opgehaald.</div></div>
+      <section class="mo-paneel" aria-labelledby="moVoorUTitel">
+        <div class="mo-heading"><div><p class="mo-kicker">Deze week</p><h2 id="moVoorUTitel">Voor u in de buurt</h2></div><button type="button" data-mo-open="buurt">Bekijk alles</button></div>
+        <div id="moVandaagLijst" class="mo-lijst" aria-live="polite"><div class="mo-leeg">Kies eerst uw stad. Daarna laten we alleen echt open aanbod zien.</div></div>
+      </section>
+      <aside class="mo-belofte"><i data-glyf="gps"></i><div><h2>Dichtbij, zonder u te volgen.</h2><p>U kiest zelf uw stad. FoundationOS gebruikt uw precieze locatie niet.</p></div></aside>
+    </div>
+  </section>
+
+  <section class="mo-view" data-mo-view="buurt" aria-labelledby="moBuurtTitel" hidden>
+    <div class="mo-paginakop">
+      <button type="button" data-mo-open="vandaag" aria-label="Terug"><i data-glyf="rechterhand"></i></button>
+      <div><p class="mo-kicker">Vandaag dichtbij</p><h1 id="moBuurtTitel">Iets om aan mee te doen.</h1><p id="moBuurtPlaats">Kies uw stad om te zien waar u welkom bent.</p></div>
+      <button type="button" class="mo-stadwissel" data-mo-kies-stad><i data-glyf="gps"></i><span>Stad</span></button>
+    </div>
+    <div class="mo-inhoud mo-inhoud--smal">
+      <div class="mo-filters" role="group" aria-label="Kies een periode">
+        <button type="button" data-mo-filter="nu">Nu</button>
+        <button type="button" data-mo-filter="vandaag">Vandaag</button>
+        <button type="button" class="is-actief" data-mo-filter="week">Deze week</button>
+      </div>
+      <div id="moActiviteiten" class="mo-activiteiten" aria-live="polite"><div class="mo-leeg">Kies eerst uw stad.</div></div>
+      <section class="mo-kaart" aria-labelledby="moKaartTitel">
+        <div class="mo-heading"><div><p class="mo-kicker">Buurtoverzicht</p><h2 id="moKaartTitel">Waar kunt u terecht?</h2></div></div>
+        <div id="moKaartPunten" class="mo-kaartbeeld"><p>Dit is een overzicht van genoemde plekken, geen routekaart.</p></div>
+      </section>
+    </div>
+  </section>
+
+  <section class="mo-view" data-mo-view="detail" aria-labelledby="moDetailTitel" hidden>
+    <div class="mo-detailbeeld" id="moDetailBeeld">
+      <button type="button" data-mo-open="buurt" aria-label="Terug naar de activiteiten"><i data-glyf="rechterhand"></i></button>
+      <div><p class="mo-kicker">U bent welkom</p><h1 id="moDetailTitel">Activiteit</h1></div>
+    </div>
+    <div class="mo-inhoud mo-inhoud--detail">
+      <div id="moDetailMeta" class="mo-detailmeta"></div>
+      <p id="moDetailUitleg" class="mo-detailuitleg"></p>
+      <div id="moPlekStatus" class="mo-plekstatus" aria-live="polite"></div>
+      <button type="button" id="moInteresse" class="mo-hoofdknop mo-hoofdknop--breed">Ik wil meedoen <i data-glyf="rechterhand"></i></button>
+      <button type="button" class="mo-nevenknop" data-mo-vraag>Stel een vraag</button>
+      <p class="mo-eerlijk"><i data-glyf="schild"></i> Uw plek is pas definitief nadat de organisator die heeft bevestigd.</p>
+    </div>
+  </section>
+
+  <section class="mo-view" data-mo-view="maken" aria-labelledby="moMakenTitel" hidden>
+    <div class="mo-paginakop mo-paginakop--goud">
+      <button type="button" data-mo-open="vandaag" aria-label="Terug"><i data-glyf="rechterhand"></i></button>
+      <div><p class="mo-kicker">Zelf iets beginnen</p><h1 id="moMakenTitel">Een klein idee kan de buurt dichterbij brengen.</h1><p>Kies wat u wilt maken. U komt op de bestaande plek waar u verder kunt.</p></div>
+    </div>
+    <div class="mo-inhoud mo-inhoud--smal">
+      <div class="mo-maakroutes">
+        <a href="club.html"><i data-glyf="vrienden"></i><span><b>Een club of activiteit</b><small>Breng mensen rond een gedeelde interesse bij elkaar</small></span><i data-glyf="rechterhand"></i></a>
+        <a href="projecten.html"><i data-glyf="werk"></i><span><b>Een buurtproject</b><small>Maak een plan en verdeel het werk in haalbare stappen</small></span><i data-glyf="rechterhand"></i></a>
+        <a href="buurtruil.html"><i data-glyf="store"></i><span><b>Iets delen of ruilen</b><small>Laat spullen en hulp verder komen in de buurt</small></span><i data-glyf="rechterhand"></i></a>
+        <a href="/apps/livinglab.html"><i data-glyf="vonk"></i><span><b>Een idee onderzoeken</b><small>Ontwikkel het samen verder in het Living Lab</small></span><i data-glyf="rechterhand"></i></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="mo-view" data-mo-view="kansen" aria-labelledby="moKansenTitel" hidden>
+    <div class="mo-paginakop mo-paginakop--kansen">
+      <button type="button" data-mo-open="vandaag" aria-label="Terug"><i data-glyf="rechterhand"></i></button>
+      <div><p class="mo-kicker">Kansen dichtbij</p><h1 id="moKansenTitel">Zie waar iets in beweging is.</h1><p>Projecten en campagnes die openbaar lopen, zonder druk of ranglijst.</p></div>
+    </div>
+    <div class="mo-inhoud mo-inhoud--smal">
+      <section class="mo-paneel"><div class="mo-heading"><div><p class="mo-kicker">In uw stad</p><h2>Projecten</h2></div></div><div id="moProjecten" class="mo-kansenlijst"><div class="mo-leeg">Kies eerst uw stad.</div></div></section>
+      <section class="mo-paneel"><div class="mo-heading"><div><p class="mo-kicker">Landelijk</p><h2>Campagnes</h2></div></div><div id="moCampagnes" class="mo-kansenlijst"><div class="mo-leeg">De campagnes worden opgehaald.</div></div></section>
+    </div>
+  </section>
+</main>
+
+<nav class="mo-nav" aria-label="Meedoen en Ontdekken navigatie">
+  <button type="button" class="is-actief" data-mo-tab="vandaag" aria-current="page"><i data-glyf="maison"></i><span>Vandaag</span></button>
+  <button type="button" data-mo-tab="buurt"><i data-glyf="gps"></i><span>Mijn buurt</span></button>
+  <button type="button" class="mo-plus" data-mo-tab="maken" aria-label="Iets maken"><b aria-hidden="true">+</b><span>Maken</span></button>
+  <button type="button" data-mo-tab="kansen"><i data-glyf="vonk"></i><span>Kansen</span></button>
+  <a href="index.html#alle-apps"><i data-glyf="paneel"></i><span>Meer</span></a>
+</nav>
+
+<dialog id="moDialoog" class="mo-dialoog" aria-labelledby="moDialoogTitel">
+  <form method="dialog"><button class="mo-sluit" value="sluiten" aria-label="Sluiten">×</button></form>
+  <p class="mo-kicker">Goed om te weten</p><h2 id="moDialoogTitel">Zo vraagt u verder.</h2>
+  <p id="moVraagTekst">Vraag bij het buurthuis naar deze activiteit. Er wordt vanuit dit scherm niets verstuurd.</p>
+  <div id="moVraagGegevens" class="mo-vraaggegevens"></div>
+  <form method="dialog"><button class="mo-hoofdknop mo-hoofdknop--breed" value="begrepen">Begrepen</button></form>
+</dialog>
+<dialog id="moStadDialoog" class="mo-dialoog" aria-labelledby="moStadDialoogTitel">
+  <form method="dialog"><button class="mo-sluit" value="sluiten" aria-label="Sluiten">×</button></form>
+  <p class="mo-kicker">Dichtbij</p><h2 id="moStadDialoogTitel">Welke stad wilt u bekijken?</h2>
+  <p>U kiest dit zelf. We vragen uw locatie niet op.</p>
+  <div id="moStadDialoogLijst" class="mo-stad-dialooglijst"></div>
+</dialog>
+
+<script src="sessie.js"></script>
+<script src="meedoen-ontdekken-weergave.js"></script>
+<script src="meedoen-ontdekken.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="premium.js" defer></script>
+</body>
+</html>

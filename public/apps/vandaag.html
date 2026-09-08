@@ -23,9 +23,10 @@
   @media(max-width:600px){.rahul{grid-template-columns:1fr}.mond{width:58px;height:38px}.keuzes,.lijn{margin-left:0}}
 </style>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<link href="/shared/rtg-anchor-experiences-2026.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-today-experience" data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-edge-2-state="focus" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
   <div class="os-switcher__links">
@@ -36,24 +37,87 @@
   </div>
   <span class="os-switcher__state">Kern verbonden</span>
 </div>
-<main>
-  <div class="ey">Vandaag · Rahul</div>
-  <section class="rahul">
-    <button class="mond" id="praat" aria-label="Vraag Rahul"></button>
-    <div><h1 id="groet">Goedemorgen.</h1><p class="brief" id="brief">Uw dag staat rustig klaar. Ik kan iedere software voor u openen, combineren en precies naar het juiste onderdeel brengen.</p></div>
+<main class="today-shell" id="inhoud">
+  <header class="today-top">
+    <a class="today-brand" href="/apps/rtg.html"><b>RTG</b><span>LivingOS</span></a>
+    <span class="today-spacer"></span>
+    <a class="today-round" href="/apps/comm.html" aria-label="Open berichten">◇</a>
+    <button class="today-round" id="praat" type="button" aria-label="Vraag Rahul">◉</button>
+  </header>
+
+  <section class="today-hero" aria-labelledby="groet">
+    <img id="todayHero" src="/images/start/dagdelen/hero-ochtend.jpg" alt="Warm uitzicht vanuit huis">
+    <div>
+      <p class="today-ey">Mensen · plaatsen · momenten</p>
+      <h1 id="groet">Goedemorgen.</h1>
+      <p class="today-date" id="todayDatum"></p>
+      <p class="today-weather"><b aria-hidden="true">☼</b><span>Uw dag, rustig bij elkaar</span></p>
+      <p class="today-brief" id="brief">LivingOS brengt samen wat vandaag bij u hoort en laat de rest op de achtergrond doorlopen.</p>
+      <a class="today-primary" href="#vandaagOverzicht">Bekijk uw dag <span aria-hidden="true">→</span></a>
+    </div>
   </section>
-  <div class="keuzes" aria-label="Voorstellen van Rahul">
-    <button data-vraag="Open Reizen">Bereid mijn reis voor</button>
-    <button data-vraag="Zet Geld ernaast">Wat vraagt financieel aandacht?</button>
-    <button data-vraag="Open De Salon">Open mijn berichten</button>
+
+  <div class="today-grid" id="vandaagOverzicht">
+    <section class="today-section" aria-labelledby="momentenTitel">
+      <div class="today-section-head"><h2 id="momentenTitel">Vandaag</h2><span id="todayRust">Alleen wat ertoe doet</span></div>
+      <div class="today-moments">
+        <article class="today-moment"><div class="tijd">10:30</div><div><b>Reisvoorbereiding</b><span>Planning en documenten staan klaar om te controleren.</span></div><button data-vraag="Open Reizen">Open →</button></article>
+        <article class="today-moment"><div class="tijd">15:00</div><div><b>Financieel moment</b><span>Bekijk alleen wat vandaag uw aandacht nodig heeft.</span></div><button data-vraag="Zet Geld ernaast">Bekijk →</button></article>
+        <article class="today-moment"><div class="tijd">19:30</div><div><b>Uw avond</b><span>Eten, vervoer en sfeer kunnen vanuit één voorstel worden geopend.</span></div><a class="today-secondary" href="/apps/leven.html">Open →</a></article>
+      </div>
+    </section>
+
+    <section class="today-section" aria-labelledby="aandachtTitel">
+      <div class="today-section-head"><h2 id="aandachtTitel">Wat vraagt uw aandacht?</h2><span>4 ingangen</span></div>
+      <div class="today-attention">
+        <a href="/apps/agenda.html"><i class="icoon" aria-hidden="true">□</i><span><b>Afspraken</b><span>Bevestigen, verplaatsen of samen plannen.</span></span><em>Agenda</em></a>
+        <a href="/apps/attenties.html"><i class="icoon" aria-hidden="true">♡</i><span><b>Uw mensen</b><span>Belangrijke momenten en attenties bij elkaar.</span></span><em>Bekijk</em></a>
+        <a href="/apps/mijnmall.html"><i class="icoon" aria-hidden="true">◇</i><span><b>Bestellingen</b><span>Volg wat onderweg is zonder winkels af te gaan.</span></span><em>Volg</em></a>
+        <a href="/apps/table.html"><i class="icoon" aria-hidden="true">○</i><span><b>Reservering vanavond</b><span>Tafel, gezelschap en voorkeuren in één dossier.</span></span><em>Details</em></a>
+      </div>
+      <p class="today-calm">De rest loopt vanzelf.</p>
+    </section>
   </div>
-  <section class="lijn"><h2>Uw eerstvolgende momenten</h2>
-    <article class="moment"><div class="tijd">10:30</div><div><b>Reisvoorbereiding</b><span>Planning en documenten staan klaar om te controleren.</span><button data-vraag="Open Reizen">Open Reizen →</button></div></article>
-    <article class="moment"><div class="tijd">15:00</div><div><b>Financieel moment</b><span>Bekijk alleen wat vandaag uw aandacht nodig heeft.</span><button data-vraag="Zet Geld ernaast">Open Geld ernaast →</button></div></article>
+
+  <section class="today-evening" aria-labelledby="avondTitel">
+    <div>
+      <p class="today-ey">Vanavond</p>
+      <h2 id="avondTitel">Uw avond, al geregeld.</h2>
+      <div class="today-evening-list">
+        <a href="/apps/foodcourt.html"><i aria-hidden="true">◇</i><b>Diner of thuisbezorgd</b><span>Kies</span></a>
+        <a href="/apps/reizen.html"><i aria-hidden="true">◇</i><b>Vervoer op het juiste moment</b><span>Plan</span></a>
+        <a href="/apps/entourage.html"><i aria-hidden="true">◇</i><b>Wie er met u meegaat</b><span>Nodig uit</span></a>
+        <a href="/apps/muziek.html"><i aria-hidden="true">◇</i><b>Muziek die bij de sfeer past</b><span>Luister</span></a>
+      </div>
+      <a class="today-primary" href="/apps/leven.html">Open avond <span aria-hidden="true">→</span></a>
+      <a class="today-secondary" href="/apps/leven.html">Wijzig voorstel</a>
+    </div>
   </section>
+
+  <nav class="today-nav" aria-label="LivingOS">
+    <a href="/apps/vandaag.html" aria-current="page"><b>☼</b>Vandaag</a>
+    <a href="/apps/wereld.html"><b>♧</b>Mensen</a>
+    <a class="maak" href="/apps/app.html"><b>＋</b><span class="vis-verborgen">Open de RTG-app</span></a>
+    <a href="/apps/thuis.html"><b>⌂</b>Thuis</a>
+    <a href="/apps/ik.html"><b>◎</b>Profiel</a>
+  </nav>
 </main>
 <script>
-  (function(){var uur=new Date().getHours(),g=document.getElementById('groet');g.textContent=(uur<12?'Goedemorgen.':uur<18?'Goedemiddag.':'Goedenavond.');function ga(q){if(parent.RTGCommand&&parent.RTGCommand.bestemming){var r=parent.RTGCommand.bestemming(q);document.getElementById('brief').textContent=r||'Zeg in de hulpbalk welke software u wilt openen.'}}document.querySelectorAll('[data-vraag]').forEach(function(b){b.onclick=function(){ga(b.dataset.vraag)}});document.getElementById('praat').onclick=function(){try{parent.document.querySelector('[data-open=ai]').click()}catch(e){}}})();
+  (function(){
+    var nu=new Date(),uur=nu.getHours(),g=document.getElementById('groet');
+    var maanden=['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+    var dagen=['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
+    g.textContent=(uur<12?'Goedemorgen.':uur<18?'Goedemiddag.':'Goedenavond.');
+    document.getElementById('todayDatum').textContent=dagen[nu.getDay()]+' '+nu.getDate()+' '+maanden[nu.getMonth()]+' '+nu.getFullYear();
+    document.getElementById('todayHero').src=uur<12?'/images/start/dagdelen/hero-ochtend.jpg':uur<18?'/images/start/dagdelen/hero-middag.jpg':'/images/start/dagdelen/hero-avond.jpg';
+    function ga(q){
+      if(parent.RTGCommand&&parent.RTGCommand.bestemming){var r=parent.RTGCommand.bestemming(q);document.getElementById('brief').textContent=r||'Zeg in de hulpbalk welke software u wilt openen.';return}
+      var paden={'Open Reizen':'/apps/reizen.html','Zet Geld ernaast':'/apps/geld-command.html','Open De Salon':'/apps/wereld.html'};
+      if(paden[q]) location.href=paden[q];
+    }
+    document.querySelectorAll('[data-vraag]').forEach(function(b){b.onclick=function(){ga(b.dataset.vraag)}});
+    document.getElementById('praat').onclick=function(){try{parent.document.querySelector('[data-open=ai]').click()}catch(e){location.href='/apps/app.html'}};
+  })();
 </script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

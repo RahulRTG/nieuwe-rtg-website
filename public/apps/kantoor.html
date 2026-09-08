@@ -75,9 +75,10 @@
 <link href="/shared/experience-kernel.css?v=20260829-7" rel="stylesheet">
 <link href="/images/worlds/heritage/work-heritage-v2.jpg" rel="preload" as="image" fetchpriority="high">
 <link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
+<link href="/shared/rtg-anchor-experiences-2026.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-modus="pro" data-rtg-world="work" data-rtg-world-dashboard="work" data-rtg-vandaag-luxe data-rtg-edge-2-context="wereldtabs,wereldapps" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-work-experience" data-rtg-modus="pro" data-rtg-world="work" data-rtg-world-dashboard="work" data-rtg-vandaag-luxe data-rtg-edge-2-context="wereldtabs,wereldapps" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <!-- DE WERELDSTROOK IS WEG EN DAT IS GEEN GAT. De vier werelden stonden hier
      als eigen balk, boven een schil die ze al kende: rtg-edge-system.js zet ze
@@ -130,14 +131,16 @@
      hetzelfde: werk. De kopjes zijn er zodat de rij leesbaar blijft. -->
 <nav class="wereldapps" aria-label="Apps in deze wereld">
   <b>Ingangen</b>
-  <a href="/apps/personeel.html">Personeel</a>
+  <a href="/apps/personeel.html">Team Room</a>
   <a href="/apps/leverancier.html">Bedrijf beheren</a>
   <a href="/apps/partner-worden.html">Bedrijf aanmelden</a>
   <b>Werk</b>
   <a href="/apps/rtgone.html">RTG One</a>
+  <a href="/apps/decision-room.html">Decision Room</a>
+  <a href="/apps/project-room.html">Project Room</a>
   <a href="/apps/rtmail.html">RTMail</a>
   <a href="/apps/magnaat.html">Magnaat</a>
-  <a href="/apps/office.html">Documenten</a>
+  <a href="/apps/office.html">RTDocs</a>
   <a href="/apps/onderneming.html">Onderneming</a>
   <a href="/apps/loonstrook.html">Loon</a>
   <a href="/apps/browser.html">Web</a>
@@ -209,15 +212,18 @@
 
   <section class="doelgroep" aria-labelledby="workDoelgroepKop">
     <nav class="doelgroepnav" aria-label="Voor wie is WORK">
-      <a class="actief" href="#personeel" data-work-kies="personeel" aria-current="page">Personeel</a>
+      <a class="actief" href="#personeel" data-work-kies="personeel" aria-current="page">Team Room</a>
       <a href="#ondernemers" data-work-kies="ondernemers">Ondernemers en bedrijven</a>
       <a href="#aanmelden" data-work-kies="aanmelden">Bedrijf aanmelden</a>
     </nav>
-    <div class="doelgroeptekst"><h2 id="workDoelgroepKop">Uw werkdag, op uw eigen naam.</h2><p id="workDoelgroepUitleg">Open uw dienst, taken, team, loon en persoonlijke werkplek. Uw werkgever ziet alleen wat voor het werk nodig is; uw vertrouwenslijn blijft privé.</p></div>
+    <div class="doelgroeptekst"><span class="work-ey">UW WERKDAG</span><h2 id="workDoelgroepKop">Uw werkdag. Alleen wat aandacht vraagt.</h2><p id="workDoelgroepUitleg">Afspraken, taken, documenten en besluiten komen hier samen. Uw werkgever ziet alleen wat voor het werk nodig is; uw vertrouwenslijn blijft privé.</p><a class="work-open-day" href="/apps/personeel.html">Open werkdag <span aria-hidden="true">→</span></a></div>
     <div class="doelgroeppoorten" data-work-paneel="personeel">
-      <a href="/apps/personeel.html"><b>Personeels-app</b><span>Dienst, taken, team, chat en vertrouwenslijn.</span><span class="voet"><em>Open mijn werkdag</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
+      <a href="/apps/personeel.html"><b>Team Room</b><span>Uw dienst, eerstvolgende taak, team, rooster en ontwikkeling.</span><span class="voet"><em>Open mijn werkdag</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
       <a href="/apps/loonstrook.html"><b>Mijn loon</b><span>Loonstroken van alle bedrijven waar u werkt.</span><span class="voet"><em>Alleen voor u</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
       <a href="/apps/werk.html"><b>Mijn werkplek</b><span>De organisatieomgeving waarvoor u bent uitgenodigd.</span><span class="voet"><em>Rolgestuurde toegang</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
+      <a href="/apps/rtgone.html?view=decisions"><b>Besluiten</b><span>Impact, risico, alternatief en bronnen samen vóór iemand beslist.</span><span class="voet"><em>Open in RTG One</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
+      <a href="/apps/project-room.html"><b>Project Room</b><span>De volgende stap, het levende dossier en aantoonbare oplevering bij elkaar.</span><span class="voet"><em>Van besluit naar resultaat</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
+      <a href="/apps/rtgone.html?view=handover"><b>Overdracht</b><span>Context, eigenaar, bewijs en geldigheid blijven bij het werk.</span><span class="voet"><em>Niets raakt zoek</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
     </div>
     <div class="doelgroeppoorten" data-work-paneel="ondernemers" hidden>
       <a href="/apps/onderneming.html"><b>Mijn onderneming</b><span>Van een eerste idee naar plan, oprichting en klant.</span><span class="voet"><em>Voor ondernemers</em><span class="pijl" aria-hidden="true">&rarr;</span></span></a>
@@ -286,12 +292,14 @@
        bedieningselement te staan (test/kantoor.e2e.js). -->
   <section class="hero rtgdeel-vast" aria-labelledby="allesWorkOS"><div class="ey">ALLES IN DEZE WERELD</div><h2 id="allesWorkOS">Alles wat in WorkOS hangt.</h2><div class="wrooster">
   <!-- WERELDROOSTER:WorkOS -->
-    <a class="wrooster-kaart" href="/apps/office.html"><span>Documenten</span></a>
+    <a class="wrooster-kaart" href="/apps/decision-room.html"><span>Decision Room</span></a>
     <a class="wrooster-kaart" href="/apps/horeca.html"><span>Horeca</span></a>
     <a class="wrooster-kaart" href="/apps/loonstrook.html"><span>Loon</span></a>
     <a class="wrooster-kaart" href="/apps/magnaat.html"><span>Magnaat</span></a>
     <a class="wrooster-kaart" href="/apps/onderneming.html"><span>Onderneming</span></a>
     <a class="wrooster-kaart" href="/apps/partner-network.html"><span>Partner Network</span></a>
+    <a class="wrooster-kaart" href="/apps/project-room.html"><span>Project Room</span></a>
+    <a class="wrooster-kaart" href="/apps/office.html"><span>RTDocs</span></a>
     <a class="wrooster-kaart" href="/apps/rtgone.html"><span>RTG One</span></a>
     <a class="wrooster-kaart" href="/apps/werk.html"><span>RTG Werk OS</span></a>
     <a class="wrooster-kaart" href="/apps/rtmail.html"><span>RTMail</span></a>
@@ -341,7 +349,7 @@
   /* De vier specialisten. Dit is de kern van de super-app-regel: hier staan
      LINKS naar volwaardige producten, geen vervangingen ervan. */
   const WERELD = [
-    ['Office', 'Documenten, bladen, presentaties', '/apps/office.html', ICO.blad],
+    ['RTDocs', 'Documenten, versies en besluiten', '/apps/office.html', ICO.blad],
     ['Agenda', 'Afspraken, uitnodigingen, ICS', '/apps/agenda.html', ICO.klok],
     ['Notities', 'Aantekeningen en taken', '/apps/notities.html', ICO.lijst],
     ['Bestanden', 'Uw versleutelde kluis', '/apps/bestanden.html', ICO.map]

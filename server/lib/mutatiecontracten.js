@@ -75,6 +75,8 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-opvangwijzer').CONTRACTEN,
   require('./mutatiecontracten-horeca-correctie').CONTRACTEN,
   require('./mutatiecontracten-integratie').CONTRACTEN,
+  require('./mutatiecontracten-wonen').CONTRACTEN,
+  require('./mutatiecontracten-project-room').CONTRACTEN,
   /* De zware poort: drie ceremonieloketten, alle drie met opzet niet
      herhaalbaar. Eigen bestand, zie de kop daar. */
   require('./mutatiecontracten-zwaar').CONTRACTEN,
@@ -110,7 +112,8 @@ const CONTRACTEN = Object.assign({},
     require('./mutatiecontracten-tweedehandeling-b').CONTRACTEN,
     require('./mutatiecontracten-isolatie').CONTRACTEN,
     require('./mutatiecontracten-isolatie-lid').CONTRACTEN,
-    require('./mutatiecontracten-samenvoeging').CONTRACTEN);
+    require('./mutatiecontracten-samenvoeging').CONTRACTEN,
+    require('./mutatiecontracten-wonen').CONTRACTEN);
   const overschreven = Object.keys(effect).filter(k => k in eerder);
   if (overschreven.length) {
     throw new Error('mutatiecontracten: ./mutatiecontracten-effect overschrijft een specifieker ' +

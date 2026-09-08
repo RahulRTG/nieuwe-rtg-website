@@ -43,6 +43,7 @@
        publieke kant. Foundation OS zelf (os.html) staat er niet bij: dat vraagt
        een kantoortoken en is geen deur voor een lid. */
     rtfportaal:  { naam: 'RTFoundation portaal', url: '/apps/foundation/os-portaal.html' },
+    foundationzorg:{ naam: 'Zorg', url: '/apps/foundation/zorg.html' },
     /* DE TWAALF UIT DE SOFTWARE-RIJ, en dit blok is de reden dat die rij weg is.
        De bank had onder de werelden een tweede kopje, Software, met twaalf apps
        die in geen enkele wereld hingen. Dat is precies de vraag die WERELDEN.md
@@ -90,6 +91,7 @@
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },
     camera:      { naam: 'Camera',       url: '/apps/camera.html' },
     muziek:      { naam: 'Muziek',    url: '/apps/muziek.html' },
+    wonen:       { naam: 'Wonen',      url: '/apps/wonen.html' },
     podium:      { naam: 'Live',       url: '/apps/podium.html' },
     flits:       { naam: 'Verkeer',           url: '/apps/flits.html' },
     navigatie:   { naam: 'Navigatie',    url: '/apps/navigatie.html' },

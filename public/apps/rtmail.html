@@ -110,11 +110,63 @@
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/shared/rtg-mail-2026.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="work" data-rtg-skin="heritage">
-<header><div><div class="ey">Je eigen postvak</div><h1>RTMAIL</h1></div>
+<body class="rtg-stijl rtg-work-flow rtm-voorzijde-actief" data-rtg-world="work" data-rtg-skin="heritage">
+<section class="rtm-voorzijde" id="rtmVoorzijde" aria-label="RTMail rustig werkpostvak">
+  <div class="rtm-binnen">
+    <header class="rtm-kop">
+      <a class="rtm-merk" href="/apps/kantoor.html" aria-label="RTG WorkOS"><b>RTG</b><span>Mail</span></a>
+      <span class="rtm-kopruimte"></span>
+      <span class="rtm-huis">WorkOS</span>
+      <span class="rtm-profiel" aria-label="Persoonlijk postvak">RI</span>
+    </header>
+
+    <div>
+      <section class="rtm-scherm" data-rtm-paneel="aandacht">
+        <div class="rtm-ey" id="rtmDag">Uw aandacht · laden</div>
+        <h1 class="rtm-titel">Uw inbox, teruggebracht tot wat ertoe doet.</h1>
+        <p class="rtm-inleiding">RTMail zet lezen, beoordelen en doorgeven in één rustige volgorde.</p>
+        <article class="rtm-focus" id="rtmFocus" aria-live="polite"><div class="rtm-leeg">Uw post wordt rustig geordend…</div></article>
+        <div class="rtm-sectiekop"><h2>Daarna</h2><button type="button" data-rtm-diep="inbox">Open alle post</button></div>
+        <div class="rtm-lijst" id="rtmDaarna"></div>
+        <div class="rtm-rust"><b>Rust boven telling.</b><span>Geen teller die druk maakt. Alleen wat u nu moet lezen, beoordelen of doorgeven.</span></div>
+      </section>
+
+      <section class="rtm-scherm" data-rtm-paneel="gesprek" hidden>
+        <div class="rtm-terugkop">
+          <button class="rtm-rond" type="button" data-rtm-open="aandacht" aria-label="Terug naar Mijn aandacht">&larr;</button>
+          <span class="rtm-terugtitel"><b>Gesprek</b><span id="rtmGesprekMeta">Vraag, mensen en bron bij elkaar</span></span>
+          <span class="rtm-deelnemers" id="rtmGesprekMensen" aria-label="Deelnemers"></span>
+        </div>
+        <article class="rtm-onderwerp"><small>RTMail · beschermd gesprek</small><h1 id="rtmGesprekOnderwerp">Kies een bericht</h1></article>
+        <div class="rtm-draad" id="rtmDraad"><div class="rtm-leeg">Kies bij Mijn aandacht welk gesprek u wilt openen.</div></div>
+        <aside class="rtm-samenvatting" id="rtmGesprekHulp"><b>In één oogopslag</b><p>De samenvatting blijft herleidbaar tot de oorspronkelijke post.</p></aside>
+        <div class="rtm-gesprekacties">
+          <button class="rtm-secundair" type="button" data-rtm-diep="bericht">Open volledige post</button>
+          <button class="rtm-primair" type="button" data-rtm-naar-werk>Maak er werk van &rsaquo;</button>
+        </div>
+      </section>
+
+      <section class="rtm-scherm" data-rtm-paneel="werk" hidden>
+        <div class="rtm-ey">RTMail &rarr; RTG One</div>
+        <h1 class="rtm-titel">Van gesprek naar resultaat, zonder opnieuw te beginnen.</h1>
+        <p class="rtm-inleiding">De bedoeling, eigenaar en bewijslijn reizen mee. U hoeft niets over te typen.</p>
+        <div id="rtmWerkInhoud"><div class="rtm-leeg">Kies eerst een bericht bij Mijn aandacht.</div></div>
+      </section>
+    </div>
+  </div>
+
+  <nav class="rtm-nav" aria-label="RTMail hoofdnavigatie">
+    <button type="button" data-rtm-open="aandacht" aria-current="page"><i aria-hidden="true">&#8962;</i>Aandacht</button>
+    <button type="button" data-rtm-open="gesprek"><i aria-hidden="true">&#9671;</i>Gesprek</button>
+    <button type="button" data-rtm-open="werk"><i aria-hidden="true">&#8644;</i>Naar werk</button>
+    <button type="button" data-rtm-diep="inbox"><i aria-hidden="true">&#8801;</i>Alle post</button>
+  </nav>
+</section>
+<header aria-hidden="true"><div><div class="ey">Je eigen postvak</div><h1>RTMAIL</h1></div>
   <span class="tel" id="tel" hidden></span></header>
-<main id="main"><div class="leeg">Laden…</div></main>
+<main id="main" aria-hidden="true"><div class="leeg">Laden…</div></main>
 <script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
@@ -456,11 +508,14 @@ async function hulp(m, wat){
    veeg heeft alle drie nodig. Apart bestand omdat dit blad tegen de maat van
    check.js regel 13 aan loopt, en omdat een veeg iets anders is dan een postvak:
    wie hier leest wat de post DOET, hoeft niet langs de bediening. */
-window.RTGMail = { api: api, laad: laadInbox,
-  map: () => MAP, bericht: (i) => LIJST[i] };
+window.RTGMail = { api: api, laad: laadInbox, open: openBericht, draad: toonDraad,
+  map: () => MAP, bericht: (i) => LIJST[i], berichten: () => LIJST.slice() };
 laadInbox();
 document.addEventListener('visibilitychange',()=>{ if(!document.hidden && !$('#terug')) laadInbox(); });
 </script>
+<script src="/apps/rtmail-voorzijde-werk.js"></script>
+<script src="/apps/rtmail-voorzijde-gesprek.js"></script>
+<script src="/apps/rtmail-voorzijde.js"></script>
 <script src="/apps/rtmail/gebaren.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

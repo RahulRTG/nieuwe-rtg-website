@@ -25,6 +25,13 @@
      een korte video hier ter plekke, en dient dit scherm de eigen clips ook uit
      zolang het openstaat. */
   var deler = window.RTGClipDeler ? window.RTGClipDeler.start({ token: TOKEN, opStatus: zeg }) : null;
+  var huidig = null;
+
+  function acties(s) {
+    huidig = s || null;
+    var a = $('#spActions');
+    if (a) a.hidden = !s;
+  }
 
   function stopAlles() {
     if (window.RTGStudioMotor) window.RTGStudioMotor.stop();
@@ -35,9 +42,12 @@
     cf.pause(); cf.removeAttribute('src'); cf.load();
     var ond = cv.querySelector('.ondert'); if (ond) ond.remove();
     cv.hidden = true;
+    document.body.classList.remove('media-video-playing');
+    acties(null);
   }
   function speel(s) {
     stopAlles();
+    acties(s);
     if (s.spelen.soort === 'motor') {
       fetch('/api/muziek/uitgave', { method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
@@ -56,6 +66,7 @@
       var f = $('#film');
       f.src = s.spelen.bron + '?token=' + encodeURIComponent(TOKEN);
       f.classList.add('zien');
+      document.body.classList.add('media-video-playing');
       /* Dezelfde band als in het Theater en bij een clip: shared/ondertitelband.js.
          Het gaat hier om hetzelfde bestand als in het Theater, dus een kijker die
          daar ondertitels ziet hoort ze hier ook te zien. */
@@ -72,6 +83,7 @@
     if (s.spelen.soort === 'p2p' && deler) {
       var vlak = $('#clipvlak');
       vlak.hidden = false;
+      document.body.classList.add('media-video-playing');
       $('#spTitel').textContent = s.titel;
       $('#spSub').textContent = s.maker.codenaam + ' · rechtstreeks van het toestel van de maker; RTG heeft dit beeld niet';
       deler.speel(vlak, { id: s.id.slice(s.id.indexOf(':') + 1), titel: s.titel, codenaam: s.maker.codenaam,
@@ -87,6 +99,13 @@
     stopAlles();
     $('#spTitel').textContent = 'Nog stil';
     $('#spSub').textContent = 'Kies iets uit uw wereld.';
+  });
+
+  $('#spLijst').addEventListener('click', function () {
+    if (huidig && window.RTGMediaLijst) window.RTGMediaLijst.inLijst(huidig.id);
+  });
+  $('#spSamen').addEventListener('click', function () {
+    if (huidig && window.RTGMediaSamen) window.RTGMediaSamen.start(huidig.id);
   });
 
   window.RTGMediaSpeler = { speel: speel, stop: stopAlles, deler: deler };

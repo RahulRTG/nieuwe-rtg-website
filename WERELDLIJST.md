@@ -18,10 +18,10 @@ Drie soorten onderdeel, en ze gedragen zich verschillend:
 | wereld | huis | onderdelen |
 |---|---|---|
 | **LivingOS** | `/apps/rtg.html` | 59 |
-| **WorkOS** | `/apps/kantoor.html` | 13 |
+| **WorkOS** | `/apps/kantoor.html` | 15 |
 | **TravelOS** | `/apps/reizen.html` | 14 |
-| **FoundationOS** | `/apps/foundation/os-publiek.html` | 7 |
-| | **samen** | **93** |
+| **FoundationOS** | `/apps/foundation/os-publiek.html` | 9 |
+| | **samen** | **97** |
 
 ## LivingOS
 
@@ -64,9 +64,9 @@ Huis: `/apps/rtg.html` — 59 onderdelen.
 | Ontdekken | `link:ontdek` | `/apps/rtg.html` |
 | Commerce | `link:commerce` | `/apps/commerce.html` |
 | Bestellen | `tab:bestellen` | `/apps/app.html (stand bestellen)` |
-| Zorg | `tab:zorg` | `/apps/app.html (stand zorg)` |
 | Gezin | `tab:gezin` | `/apps/app.html (stand gezin)` |
 | Privekantoor | `link:rechterhand` | `/apps/lifestyle.html` |
+| Wonen | `link:wonen` | `/apps/wonen.html` |
 | Maison | `link:maison` | `/apps/maison.html` |
 | Table | `link:table` | `/apps/table.html` |
 | Cellier | `link:cellier` | `/apps/cellier.html` |
@@ -91,15 +91,17 @@ Huis: `/apps/rtg.html` — 59 onderdelen.
 
 ## WorkOS
 
-Huis: `/apps/kantoor.html` — 13 onderdelen.
+Huis: `/apps/kantoor.html` — 15 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
 | RTG Werk OS | `link:werkos` | `/apps/werk.html` |
 | RTG One | `link:rtgone` | `/apps/rtgone.html` |
+| Decision Room | `link:decisionroom` | `/apps/decision-room.html` |
+| Project Room | `link:projectroom` | `/apps/project-room.html` |
 | RTMail | `link:rtmail` | `/apps/rtmail.html` |
 | Magnaat | `link:magnaat` | `/apps/magnaat.html` |
-| Documenten | `link:office` | `/apps/office.html` |
+| RTDocs | `link:office` | `/apps/office.html` |
 | Werk | `os:werk` | kiezer in de app |
 | Onderneming | `link:onderneming` | `/apps/onderneming.html` |
 | Loon | `link:loonstrook` | `/apps/loonstrook.html` |
@@ -132,11 +134,13 @@ Huis: `/apps/reizen.html` — 14 onderdelen.
 
 ## FoundationOS
 
-Huis: `/apps/foundation/os-publiek.html` — 7 onderdelen.
+Huis: `/apps/foundation/os-publiek.html` — 9 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
 | RTFoundation in jouw buurt | `link:rtfbuurt` | `/apps/foundation/os-publiek.html` |
+| Zorg | `link:foundationzorg` | `/apps/foundation/zorg.html` |
+| Zorgaanbod | `tab:zorg` | `/apps/app.html (stand zorg)` |
 | RTFoundation portaal | `link:rtfportaal` | `/apps/foundation/os-portaal.html` |
 | Het bord | `link:rtfbord` | `/apps/foundation/bord.html` |
 | Het schrift | `link:rtfschrift` | `/apps/foundation/schrift.html` |

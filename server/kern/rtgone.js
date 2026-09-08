@@ -60,7 +60,7 @@ module.exports = ({ db, save, crypto }) => {
       fricties: fr.slice(0, 60), overdrachten: s.overdrachten.filter(inHuis).slice(0, 30),
       automatiseringen: s.automatiseringen.filter(inHuis).slice(0, 30), goedkeuringen: s.goedkeuringen.filter(inHuis).slice(0, 80), projecten: s.projecten.filter(inHuis).slice(0, 80),
       rollen: (context && context.baas) ? s.rollen.filter(inHuis).slice(0, 100) : [], audit: s.audit.filter(inHuis).slice(0, 40),
-      governance: { rollen: rollenVoor(context && context.key, huis), rechten: rechtenVoor(context || {}, huis), baas: !!(context && context.baas), catalogus: ROLLEN },
+      governance: { rollen: rollenVoor(context && context.key, huis), rechten: rechtenVoor(context || {}, huis), baas: !!(context && context.baas), identiteit: context && context.label || null, catalogus: ROLLEN },
       vandaag: liveVandaag(huis, context || {}) };
   }
   function projectVanMail(body, context) {
@@ -75,17 +75,19 @@ module.exports = ({ db, save, crypto }) => {
     const intentie = { id: id('int-'), huis, titel, waarom: bedoeling, voorWie: tekst(body.voorWie, 160), bewijs: tekst(body.bewijs, 240),
       herzieOp: deadline, status: 'actief', door: context.label, at: nu() };
     s.intenties.unshift(intentie);
-    const project = { id: id('prj-'), huis, titel, eigenaar, deadline, status: 'intake', voortgang: 12, intentieId: intentie.id,
+    const project = { id: id('prj-'), huis, titel, eigenaar, eigenaarKey: context.key, deadline, status: 'intake', voortgang: 12, intentieId: intentie.id,
       bron: { soort: 'rtmail', mailId: mail.id, van: mail.van, onderwerp: tekst(mail.onderwerp, 160), at: mail.at },
       taken: [
         { id: id('tsk-'), tekst: 'Bronbericht en context controleren', af: false },
         { id: id('tsk-'), tekst: 'Eigenaar en gewenste uitkomst bevestigen', af: false },
         { id: id('tsk-'), tekst: 'Eerste uitvoeringsplan maken', af: false }
-      ], documenten: { ruimte: '/apps/office.html?werk=werkplek&bedrijf=' + (huis === 'rtf' ? 'rtf' : 'rtg'), status: 'gereed' },
+      ], bewijs: [], documenten: { ruimte: '/apps/office.html?werk=werkplek&bedrijf=' + (huis === 'rtf' ? 'rtf' : 'rtg'), status: 'gereed' },
       route: [], tijdlijn: [{ at: nu(), soort: 'bron', tekst: 'Project ontstaan uit persoonlijk RTMAIL-bericht.' }, { at: nu(), soort: 'intentie', tekst: 'Bedoeling vastgelegd en aan het project verbonden.' }], at: nu() };
     if (body.goedkeuringType && BESLUITTYPEN.includes(body.goedkeuringType)) {
       const g = goedkeuringMaak({ huis, type: body.goedkeuringType, titel: 'Projectgoedkeuring · ' + titel, reden: bedoeling,
-        bedrag: body.bedrag, impact: body.impact || 3, risico: body.risico || 3, omkeerbaar: body.omkeerbaar }, context);
+        waaromNu: body.waaromNu, alternatief: body.alternatief, beheersing: body.beheersing, deadline,
+        projectId: project.id, bronMailId: mail.id, bedrag: body.bedrag, impact: body.impact || 3,
+        risico: body.risico || 3, omkeerbaar: body.omkeerbaar }, context);
       if (g.goedkeuring) { project.goedkeuringId = g.goedkeuring.id; project.route.push(body.goedkeuringType); project.tijdlijn.push({ at: nu(), soort: 'besluit', tekst: 'Goedkeuringsroute ' + body.goedkeuringType + ' gestart.' }); }
     }
     mail.gelezen = true; mail.vastgezet = true; if (!Array.isArray(mail.workflow)) mail.workflow = [];
@@ -94,11 +96,47 @@ module.exports = ({ db, save, crypto }) => {
   }
   function projectTaakZet(projectId, taakId, af, context) {
     const s = S(), p = vind(s.projecten, projectId); if (!p) return { status: 404, error: 'Project niet gevonden.' };
+    if (!context || !context.key) return { status: 403, error: 'Projectuitvoering vraagt een persoonlijk personeelsaccount.' };
+    if (p.eigenaarKey && p.eigenaarKey !== context.key && !context.baas) return { status: 403, error: 'Alleen de projecteigenaar kan deze uitvoering wijzigen.' };
     const t = p.taken.find(x => x.id === String(taakId || '')); if (!t) return { status: 404, error: 'Projecttaak niet gevonden.' };
-    t.af = af === true; const klaar = p.taken.filter(x => x.af).length; p.voortgang = Math.min(90, 12 + Math.round(klaar / Math.max(1, p.taken.length) * 60));
-    p.status = klaar === p.taken.length ? (p.goedkeuringId ? 'besluit' : 'uitvoering') : 'in-voorbereiding';
+    t.af = af === true; const klaar = p.taken.filter(x => x.af).length, besluit = p.goedkeuringId && vind(s.goedkeuringen, p.goedkeuringId);
+    p.voortgang = Math.min(90, 12 + Math.round(klaar / Math.max(1, p.taken.length) * 60));
+    p.status = klaar === p.taken.length ? (besluit && besluit.status !== 'goedgekeurd' ? 'besluit' : 'oplevering') : 'in-voorbereiding';
     p.tijdlijn.push({ at: nu(), soort: 'taak', tekst: (t.af ? 'Afgerond: ' : 'Heropend: ') + t.tekst });
     log(context.label, 'projecttaak-' + (t.af ? 'af' : 'open'), p.id + ':' + t.id, p.huis); save(); return { ok: true, project: p };
+  }
+  function projectBewijs(body, context) {
+    const s = S(), p = vind(s.projecten, body.projectId); if (!p) return { status: 404, error: 'Project niet gevonden.' };
+    if (!context || !context.key) return { status: 403, error: 'Bewijs vastleggen vraagt een persoonlijk personeelsaccount.' };
+    if (p.eigenaarKey && p.eigenaarKey !== context.key && !context.baas) return { status: 403, error: 'Alleen de projecteigenaar kan bewijs toevoegen.' };
+    if (p.status === 'afgerond') return { status: 400, error: 'Dit project is al menselijk opgeleverd.' };
+    const titel = tekst(body.titel, 160), uitleg = tekst(body.uitleg, 600);
+    if (!titel || !uitleg) return { status: 400, error: 'Noem het bewijs en leg uit wat het aantoont.' };
+    if (!Array.isArray(p.bewijs)) p.bewijs = [];
+    const bestaand = p.bewijs.find(x => x.key === context.key && x.titel === titel && x.uitleg === uitleg &&
+      x.bron === tekst(body.bron, 160) && x.documentId === tekst(body.documentId, 80) && x.taakId === tekst(body.taakId, 80));
+    if (bestaand) return { ok: true, project: p, bewijs: bestaand, herhaald: true };
+    const x = { id: id('prf-'), titel, uitleg, soort: tekst(body.soort, 60) || 'uitvoering', bron: tekst(body.bron, 160),
+      documentId: tekst(body.documentId, 80), taakId: tekst(body.taakId, 80), door: tekst(context.label, 100), key: context.key, status: 'vastgelegd', at: nu() };
+    if (!Array.isArray(p.tijdlijn)) p.tijdlijn = [];
+    p.bewijs.push(x); p.tijdlijn.push({ at: nu(), soort: 'bewijs', tekst: 'Bewijs vastgelegd: ' + titel });
+    log(context.label, 'projectbewijs-vastgelegd', p.id + ':' + x.id, p.huis); save(); return { ok: true, project: p, bewijs: x };
+  }
+  function projectOplever(body, context) {
+    const s = S(), p = vind(s.projecten, body.projectId); if (!p) return { status: 404, error: 'Project niet gevonden.' };
+    if (!context || !context.key) return { status: 403, error: 'Opleveren vraagt een persoonlijk personeelsaccount.' };
+    if (p.eigenaarKey && p.eigenaarKey !== context.key && !context.baas) return { status: 403, error: 'Alleen de projecteigenaar kan dit project opleveren.' };
+    if (p.status === 'afgerond') return { status: 400, error: 'Dit project is al opgeleverd.' };
+    const besluit = p.goedkeuringId && vind(s.goedkeuringen, p.goedkeuringId);
+    if (besluit && besluit.status !== 'goedgekeurd') return { status: 409, error: 'De vereiste besluitroute is nog niet goedgekeurd.' };
+    if ((p.taken || []).some(t => !t.af)) return { status: 409, error: 'Rond eerst alle uitvoeringstaken af.' };
+    if (!Array.isArray(p.bewijs) || !p.bewijs.length) return { status: 409, error: 'Leg eerst bewijs van het resultaat vast.' };
+    const uitkomst = tekst(body.uitkomst, 600), leren = tekst(body.leren, 600);
+    if (!uitkomst) return { status: 400, error: 'Beschrijf welk resultaat aantoonbaar is bereikt.' };
+    if (!Array.isArray(p.tijdlijn)) p.tijdlijn = [];
+    p.oplevering = { uitkomst, leren, door: tekst(context.label, 100), key: context.key, at: nu() };
+    p.status = 'afgerond'; p.voortgang = 100; p.tijdlijn.push({ at: nu(), soort: 'oplevering', tekst: 'Project menselijk opgeleverd: ' + uitkomst });
+    log(context.label, 'project-opgeleverd', p.id, p.huis); save(); return { ok: true, project: p };
   }
   function goedkeuringMaak(body, context) {
     const s = S(), huis = geldigHuis(body.huis), type = BESLUITTYPEN.includes(body.type) ? body.type : 'operations';
@@ -106,21 +144,35 @@ module.exports = ({ db, save, crypto }) => {
     const bedrag = Math.max(0, Math.min(100000000, Number(body.bedrag) || 0)), impact = Math.max(1, Math.min(5, Number(body.impact) || 1)),
       risico = Math.max(1, Math.min(5, Number(body.risico) || 1)), omkeerbaar = body.omkeerbaar === true || body.omkeerbaar === 'true';
     const vereist = (bedrag >= 10000 || impact >= 4 || risico >= 4 || !omkeerbaar) ? 2 : 1;
-    const x = { id: id('dec-'), huis, type, titel, reden, bedrag, impact, risico, omkeerbaar, vereist, status: 'wacht',
-      aanvrager: context.key || 'legacy:kantoor', aanvragerLabel: tekst(context.label, 100), stemmen: [], at: nu() };
+    const x = { id: id('dec-'), huis, type, titel, reden, waaromNu: tekst(body.waaromNu, 600), alternatief: tekst(body.alternatief, 600),
+      beheersing: tekst(body.beheersing, 600), deadline: tekst(body.deadline, 16), bedrag, impact, risico, omkeerbaar, vereist, status: 'wacht',
+      projectId: tekst(body.projectId, 80), documentId: tekst(body.documentId, 80), documentTitel: tekst(body.documentTitel, 160),
+      bronMailId: tekst(body.bronMailId, 80), aanvrager: context.key || 'legacy:kantoor', aanvragerLabel: tekst(context.label, 100), stemmen: [], at: nu() };
     s.goedkeuringen.unshift(x); log(context.label, 'besluit-aangevraagd', x.id, huis); save(); return { ok: true, goedkeuring: x };
   }
-  function goedkeuringBeslis(idRuw, besluit, context) {
+  function goedkeuringBeslis(idRuw, besluit, context, details) {
     const s = S(), x = vind(s.goedkeuringen, idRuw); if (!x) return { status: 404, error: 'Besluit niet gevonden.' };
     if (x.status !== 'wacht') return { status: 400, error: 'Dit besluit is al gesloten.' };
     if (!context.key) return { status: 403, error: 'Een besluit vraagt een persoonlijk personeelsaccount.' };
     if (x.aanvrager === context.key) return { status: 403, error: 'De aanvrager kan de eigen aanvraag niet goedkeuren.' };
+    if (!['goedkeuren', 'afwijzen', 'terug'].includes(besluit)) return { status: 400, error: 'Kies akkoord, terug voor aanpassing of niet uitvoeren.' };
     const rechten = rechtenVoor(context, x.huis); if (!mag(rechten, 'besluit:' + x.type)) return { status: 403, error: 'Uw rol mag dit type besluit niet beoordelen.' };
     if (x.stemmen.some(v => v.key === context.key)) return { status: 400, error: 'U hebt dit besluit al beoordeeld.' };
-    const keuze = besluit === 'afwijzen' ? 'afgewezen' : 'goedgekeurd';
-    x.stemmen.push({ key: context.key, label: tekst(context.label, 100), besluit: keuze, at: nu() });
-    if (keuze === 'afgewezen') x.status = 'afgewezen';
-    else if (x.stemmen.filter(v => v.besluit === 'goedgekeurd').length >= x.vereist) { x.status = 'goedgekeurd'; x.beslotenAt = nu(); }
+    details = details || {};
+    const keuze = besluit === 'afwijzen' ? 'afgewezen' : besluit === 'terug' ? 'aanpassen' : 'goedgekeurd';
+    const stem = { key: context.key, label: tekst(context.label, 100), besluit: keuze,
+      reden: tekst(details.reden, 600), voorwaarde: tekst(details.voorwaarde, 600), at: nu() };
+    x.stemmen.push(stem);
+    if (keuze === 'afgewezen' || keuze === 'aanpassen') { x.status = keuze; x.beslotenAt = nu(); x.besluit = stem; }
+    else if (x.stemmen.filter(v => v.besluit === 'goedgekeurd').length >= x.vereist) {
+      x.status = 'goedgekeurd'; x.beslotenAt = nu(); x.besluit = stem;
+      const project = vind(s.projecten, x.projectId);
+      if (project) {
+        project.status = 'uitvoering'; project.voortgang = Math.max(25, Number(project.voortgang) || 0);
+        if (!project.taken.some(t => t.besluitId === x.id)) project.taken.push({ id: id('tsk-'), tekst: 'Besluit uitvoeren: ' + x.titel, af: false, besluitId: x.id });
+        project.tijdlijn.push({ at: nu(), soort: 'besluit', tekst: 'Besluit goedgekeurd; uitvoering vrijgegeven.' });
+      }
+    }
     log(context.label, 'besluit-' + keuze, x.id, x.huis); save(); return { ok: true, goedkeuring: x };
   }
   function rolGeef(body, context) {
@@ -187,5 +239,5 @@ module.exports = ({ db, save, crypto }) => {
     log(actor, 'automatisering-teruggedraaid', a.id, a.huis); save(); return { ok: true, automatisering: a, belofte: doel };
   }
   return { rtgone: { state, intentieMaak, belofteMaak, frictieMaak, overdrachtMaak, automatiseringVoorbereid, automatiseringVoer, automatiseringHerstel,
-    goedkeuringMaak, goedkeuringBeslis, rolGeef, rolTrek, projectVanMail, projectTaakZet, ROLLEN } };
+    goedkeuringMaak, goedkeuringBeslis, rolGeef, rolTrek, projectVanMail, projectTaakZet, projectBewijs, projectOplever, ROLLEN } };
 };

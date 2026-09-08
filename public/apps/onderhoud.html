@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>LivingOS · Onderhoud</title><meta name="theme-color" content="#130d0a">
+<link rel="icon" href="/icons/pas-rtg.svg"><link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet"><link href="/shared/rtg-ui.css" rel="stylesheet"><link href="/shared/ios.css" rel="stylesheet">
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet"><link href="/shared/rtg-deep-flows-2026.css" rel="stylesheet"><link href="/shared/rtg-wonen-2026.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl rtg-living-flow rtg-home-flow" data-rtg-world="living" data-rtg-skin="heritage" data-wonen-view="onderhoud">
+<header><a href="/apps/wonen.html" aria-label="Terug naar mijn thuis">&#8592;</a><span class="home-brand">RTG</span><span class="home-product">LivingOS<small>Thuis · samen · gerust</small></span></header>
+<main>
+  <div class="home-ey">Uw woning · geregeld</div><section class="home-section"><h1>Onderhoud</h1><p class="home-meta">Meld wat er niet goed werkt. U ziet precies wat bekend is; zonder toegewezen vakman beloven we niet dat iemand onderweg is.</p></section>
+  <div class="home-progress" aria-label="Stappen van een onderhoudsmelding"><div class="home-step actief"><b>1</b>Gemeld</div><div class="home-step"><b>2</b>Vakman gepland</div><div class="home-step"><b>3</b>Opgelost</div></div>
+  <section class="home-section" aria-labelledby="openKop"><div class="home-section-head"><h2 id="openKop">Open meldingen</h2><button class="home-button" id="nieuwMelding" type="button">Nieuwe melding +</button></div><div id="onderhoudLijst"><div class="home-empty">Onderhoud wordt geladen.</div></div></section>
+  <div class="home-assurance"><b aria-hidden="true">RTG</b><span>Betrouwbare hulp, zonder zelf te hoeven zoeken.</span></div>
+</main>
+<nav class="rtg-deep-nav" style="--deep-nav-count:3" aria-label="Wonen en thuis"><a href="/apps/wonen.html"><b>01</b>Mijn thuis</a><a href="/apps/onderhoud.html" aria-current="page"><b>02</b>Onderhoud</a><a href="/apps/woningdossier.html"><b>03</b>Dossier</a></nav>
+<dialog class="home-form" id="meldingDialoog"><form method="dialog" id="meldingForm"><div class="home-ey">Nieuwe onderhoudsmelding</div><h2>Wat werkt niet goed?</h2><label for="meldingTitel">Wat is er aan de hand?</label><input class="home-field" id="meldingTitel" maxlength="100" required placeholder="Bijv. verwarming wordt niet warm"><label for="meldingPlek">Waar in huis?</label><input class="home-field" id="meldingPlek" maxlength="60" required placeholder="Bijv. woonkamer"><label for="meldingUrgentie">Hoe dringend?</label><select class="home-field" id="meldingUrgentie"><option value="normaal">Normaal</option><option value="hoog">Dringend</option><option value="laag">Kan wachten</option></select><label for="meldingNotitie">Wat moeten we nog weten?</label><textarea class="home-field" id="meldingNotitie" maxlength="500"></textarea><div class="home-error" id="meldingFout" role="alert"></div><div class="home-actions"><button class="home-button alt" id="meldingSluit" type="button">Annuleer</button><button class="home-button" id="meldingBewaar" type="submit">Melding versturen</button></div></form></dialog>
+<script src="/shared/uitvoer.js"></script><script src="/apps/wonen.js"></script>
+<script src="/shared/schermbeeld.js" defer></script><script src="/shared/metgezel.js" defer></script><script src="/shared/basis.js" defer></script><script src="/shared/bediening.js" defer></script><script src="/shared/randen.js" defer></script><script src="/shared/ios.js" defer></script>
+</body></html>

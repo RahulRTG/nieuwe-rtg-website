@@ -18,8 +18,8 @@
   var TEKST = {
     personeel: {
       naam: 'Personeel',
-      kop: 'Uw werkdag, op uw eigen naam.',
-      uitleg: 'Open uw dienst, taken, team, loon en persoonlijke werkplek. Uw werkgever ziet alleen wat voor het werk nodig is; uw vertrouwenslijn blijft privé.'
+      kop: 'Uw werkdag. Alleen wat aandacht vraagt.',
+      uitleg: 'Afspraken, taken, documenten en besluiten komen hier samen. Uw werkgever ziet alleen wat voor het werk nodig is; uw vertrouwenslijn blijft privé.'
     },
     ondernemers: {
       naam: 'Ondernemers en bedrijven',

@@ -65,7 +65,37 @@
     // de moedertaal van dit personeelslid: het hele scherm en de taken volgen
     if (window.MoederTaal) MoederTaal.start((p, b) => API.call(p, b), renderAll);
   }
-  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderGebouwPda(); renderMarinaPda(); renderPolisPda(); renderZorgbalie(); renderMeldkamerPda(); renderBorden(); renderTeam(); }
+  function teamRoomStand(){
+    return { state: state, week: week, me: me, code: code, zaken: zaken,
+      contracten: pdContracten, missies: horecaMissies, overdrachten: horecaOverdrachten };
+  }
+  function meldTeamRoom(){
+    if (window.RTGTeamRoomVoorzijde && state && me) window.RTGTeamRoomVoorzijde.ontvang(teamRoomStand());
+  }
+  function renderAll(){ renderToday(); renderRooster(); renderTaken(); renderKeuken(); renderKamers(); renderHulp(); renderRitten(); renderBezorgen(); renderEntree(); renderWinkel(); renderVaart(); renderVerkoop(); renderBevPda(); renderBoer(); renderGebouwPda(); renderMarinaPda(); renderPolisPda(); renderZorgbalie(); renderMeldkamerPda(); renderBorden(); renderTeam(); meldTeamRoom(); }
+  /* Team Room is de rustige voorzijde van deze volledige personeels-PDA. De
+     brug geeft haar alleen de al bevoegde stand en dezelfde handelingen; er
+     ontstaat geen tweede personeelsmodel en geen route die de tenant kiest. */
+  window.RTGTeamRoomBrug = Object.freeze({
+    snapshot: function(){ return state && me ? teamRoomStand() : null; },
+    lees: function(pad, body){ return API.call(pad, body || {}); },
+    doe: async function(pad, body){
+      const uit = await API.call(pad, body || {}); await refresh(); return uit;
+    },
+    open: function(tab){
+      const voor = document.getElementById('teamRoomVoorzijde');
+      if (voor) voor.hidden = true;
+      document.body.classList.remove('trm-voorzijde-actief');
+      const shell = document.getElementById('shell'); if (shell) shell.setAttribute('aria-hidden', 'false');
+      openTab(tab || 'vandaag', true);
+    }
+  });
+  const teamRoomTerug = document.createElement('button');
+  teamRoomTerug.type = 'button'; teamRoomTerug.className = 'trm-diep-terug';
+  teamRoomTerug.textContent = 'Rustig overzicht';
+  teamRoomTerug.addEventListener('click', () => window.RTGTeamRoomVoorzijde && window.RTGTeamRoomVoorzijde.voorzijde());
+  const teamRoomKoppen = document.querySelector('#app .topbar > div:last-child');
+  if (teamRoomKoppen) teamRoomKoppen.insertBefore(teamRoomTerug, teamRoomKoppen.firstChild);
 
   /* ---- Borden: hetzelfde werkbord als in de leverancier-app (shared/borden.js) ---- */
   let pdBordenUI = null;

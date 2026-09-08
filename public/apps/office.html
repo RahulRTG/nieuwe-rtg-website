@@ -6,7 +6,7 @@
 <script src="/shared/id.js"></script>
 <script>try{if(window.self!==window.top)document.documentElement.dataset.rtgOppervlak='1'}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTG Office</title>
+<title>RTDocs · RTG WorkOS</title>
 <meta name="theme-color" content="#0E0E0D">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -339,9 +339,48 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/adaptief.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/shared/rtg-docs-2026.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-eigenvlak="onyx">
+<body class="rtg-stijl rtg-work-flow rtd-voorzijde-actief" data-rtg-world="work" data-rtg-skin="heritage" data-rtg-eigenvlak="onyx">
 <script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
+<section class="rtd-voorzijde" id="rtdVoorzijde" aria-label="RTDocs rustige documentruimte">
+  <div class="rtd-binnen">
+    <header class="rtd-kop">
+      <a class="rtd-merk" href="/apps/kantoor.html" aria-label="RTG WorkOS"><b>RTG</b><span>Docs</span></a>
+      <span class="rtd-kopruimte"></span>
+      <span class="rtd-huis">WorkOS</span>
+      <span class="rtd-profiel" aria-label="Persoonlijke documentruimte">RT</span>
+    </header>
+
+    <section class="rtd-scherm" data-rtd-paneel="nodig">
+      <div class="rtd-ey" id="rtdDag">Uw werkmoment · laden</div>
+      <h1 class="rtd-titel">Niet zoeken. Meteen verder.</h1>
+      <p class="rtd-inleiding">RTDocs brengt de juiste versie, haar context en de mensen eromheen bij elkaar.</p>
+      <article class="rtd-focus" id="rtdFocus" aria-live="polite"><div class="rtd-leeg">Uw documenten worden geordend…</div></article>
+      <div class="rtd-sectiekop"><h2>Daarna</h2><button type="button" data-rtd-diep="lijst">Open alle documenten</button></div>
+      <div class="rtd-lijst" id="rtdDaarna"></div>
+      <div class="rtd-rust"><b>Geen mappenjacht.</b><span>U ziet welke versie geldt, waarom een stuk aandacht vraagt en wie nog aan zet is.</span></div>
+    </section>
+
+    <section class="rtd-scherm" data-rtd-paneel="dossier" hidden>
+      <div id="rtdDossier"><div class="rtd-leeg">Kies bij Nodig welk dossier u wilt openen.</div></div>
+    </section>
+
+    <section class="rtd-scherm" data-rtd-paneel="besluit" hidden>
+      <div class="rtd-ey">RTDocs &rarr; menselijke beoordeling</div>
+      <h1 class="rtd-titel">Klaar om te besluiten, met zicht op wat nog ontbreekt.</h1>
+      <p class="rtd-inleiding">Geen groen vinkje zonder bewijs. RTDocs toont wat compleet is en wie nog aan zet is.</p>
+      <div id="rtdBesluit"><div class="rtd-leeg">Open eerst een dossier om de besluitklaarheid te controleren.</div></div>
+    </section>
+  </div>
+
+  <nav class="rtd-nav" aria-label="RTDocs hoofdnavigatie">
+    <button type="button" data-rtd-open="nodig" aria-current="page"><i aria-hidden="true">&#9679;</i>Nodig</button>
+    <button type="button" data-rtd-open="dossier"><i aria-hidden="true">&#9671;</i>Dossiers</button>
+    <button type="button" data-rtd-open="besluit"><i aria-hidden="true">B</i>Besluit</button>
+    <button type="button" data-rtd-diep="lijst"><i aria-hidden="true">&#8801;</i>Alle docs</button>
+  </nav>
+</section>
 <header class="kop">
   <a href="/apps/app.html" class="terug" id="terug" aria-label="Terug">←</a>
   <h1>RTG Office</h1>
@@ -617,6 +656,9 @@
 <script src="/shared/adaptief/lagen.js" defer></script>
 <script src="/shared/adaptief/brug.js" defer></script>
 <script src="/apps/office/app.js?v=enterprise3" defer></script>
+<script src="/apps/office/voorzijde-dossier.js" defer></script>
+<script src="/apps/office/voorzijde-besluit.js" defer></script>
+<script src="/apps/office/voorzijde.js" defer></script>
 <script src="/apps/office/adaptief-pres.js" defer></script>
 <script src="/apps/office/adaptief-staat.js" defer></script>
 <script src="/apps/office/adaptief.js" defer></script>

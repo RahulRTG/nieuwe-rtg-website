@@ -1,14 +1,4 @@
-/* De ECHTE RTF App-Bibliotheek: geen twintigduizend verzonnen namen meer, maar
-   de apps die werkelijk in de RTFoundation draaien. Elke tegel opent een
-   bestaande, werkende pagina. Alles is en blijft gratis: een cadeau van de
-   RTFoundation. Geen aankopen, geen reclame, geen verslavende trucjes.
-
-   Dit is pure data; de motor (kern/rtfbieb.js) toont, doorzoekt en installeert
-   ze, met de leeftijdspoort van het profiel. Nieuwe RTF-pagina's krijgen hier
-   gewoon een regel.
-
-   [id, naam, categorie, doelgroep, url, uitleg]
-   doelgroep: mini (0-4), kind (5-11), tiener (12+) of gezin (iedereen). */
+/* Echte Foundation-apps: [id, naam, categorie, doelgroep, url, uitleg]. */
 
 const CATEGORIEEN = [
   { id: 'leren', label: 'Leren & school', icon: 'diploma' },
@@ -23,7 +13,7 @@ const CATEGORIEEN = [
 
 const R = [
   // ---- leren & school ----
-  ['leren', 'Leren', 'leren', 'kind', '/apps/foundation/leren.html', 'Oefenen en samen leren, in je eigen tempo.'],
+  ['leren', 'Leren & Groei', 'leren', 'kind', '/apps/foundation/leren.html', 'Zie wat vandaag telt, wat al groeit en krijg hulp op je eigen tempo.'],
   ['leerpaspoort', 'Mijn leerpaspoort', 'leren', 'kind', '/apps/foundation/leerpaspoort.html', 'Je leerlijn, lessen, opgaven, behaalde doelen en bijles in één persoonlijke werkplek.'],
   ['overhoren', 'Overhoren', 'leren', 'kind', '/apps/foundation/overhoren.html', 'Woordjes en sommen overhoren; alleen of als duel met een vriend.'],
   ['school', 'School', 'leren', 'kind', '/apps/foundation/school.html', 'Klas, rooster, huiswerk en cijfers voor het hele gezin.'],
@@ -51,6 +41,7 @@ const R = [
   ['magnaat', 'Magnaat', 'spelen', 'kind', '/apps/spelen.html?pas=foundation&open=magnaat', 'Bouw samen een eerlijke onderneming en leer over handel, risico, bank, mensen en verantwoordelijkheid.'],
 
   // ---- samen in het gezin ----
+  ['samen-thuis', 'Samen Thuis', 'gezin', 'gezin', '/apps/foundation/samen-thuis.html', 'Vandaag, ieder gezinslid en iets regelen vanuit één rustig overzicht.'],
   ['mail', 'RTF Mail', 'gezin', 'kind', '/apps/foundation/mail.html', 'Je eigen Foundation-postvak, publiek uitsluitend op codenaam.'],
   ['agenda', 'Gezinsagenda', 'gezin', 'gezin', '/apps/foundation/agenda.html', 'Alle afspraken van het gezin op een rij, voor iedereen zichtbaar.'],
   ['ochtend', 'Ochtendritme', 'gezin', 'mini', '/apps/foundation/ochtend.html', 'Aankleden, tanden, jas: de ochtend in stapjes die een kleuter zelf snapt.'],
@@ -61,7 +52,7 @@ const R = [
   ['vrienden', 'Contacten', 'gezin', 'kind', '/apps/foundation/vrienden.html', 'Vrienden, snaps en verhalen van 24 uur, veilig en op codenaam.'],
   ['markt', 'Koopje', 'gezin', 'gezin', '/apps/foundation/markt.html', 'Ruilen, weggeven en delen in de buurt.'],
   ['opvoeden', 'Opvoedhulp', 'gezin', 'gezin', '/apps/foundation/opvoeden.html', 'Rustige hulp bij het gedoe van elke dag, zonder oordeel.'],
-  ['club', 'Clubportaal', 'gezin', 'gezin', '/apps/foundation/club.html', 'De club om de hoek: activiteiten, leden en aanmelden.'],
+  ['meedoen-ontdekken', 'Meedoen & Ontdekken', 'gezin', 'gezin', '/apps/foundation/meedoen-ontdekken.html', 'Ontdek open activiteiten en projecten dichtbij, zonder dat uw locatie wordt gevolgd.'],
 
   // ---- gevoelens & steun ----
   ['gevoel', 'Hoe voel je je?', 'gevoel', 'mini', '/apps/foundation/gevoel.html', 'Tik het gezichtje aan dat bij je past; er wordt niets opgeslagen.'],
@@ -74,6 +65,7 @@ const R = [
   ['wegwijzer', 'Zelf iets in gang zetten', 'gevoel', 'gezin', '/apps/foundation/wegwijzer.html', 'Zonder account en zonder je naam een hulpvraag achterlaten, met een code om hem in te trekken.'],
 
   // ---- geld & later ----
+  ['geld-later', 'Geld & Later', 'geld', 'gezin', '/apps/foundation/geld-later.html', 'Begrijp uw geld van vandaag en vind een rustige route naar leren, studie en werk.'],
   ['zakgeld', 'Zakgeld', 'geld', 'kind', '/apps/foundation/zakgeld.html', 'Het zakgeldpotje: sparen voor iets, samen bijgehouden.'],
   ['geld', 'Geldmaatje', 'geld', 'kind', '/apps/foundation/geld.html', 'Snappen wat geld is en wat dingen kosten, spelenderwijs.'],
   ['cv', 'CV-maker', 'geld', 'tiener', '/apps/foundation/cv.html', 'Je eerste cv, in nette zinnen, klaar om te versturen.'],
@@ -82,8 +74,8 @@ const R = [
   ['rechten', 'Wat mag ik op welke leeftijd', 'geld', 'tiener', '/apps/foundation/rechten.html', 'Werken, geld, school en zorg per leeftijd, met de werktijden erbij.'],
 
   // ---- veilig & gezond ----
-  ['veilig', 'Veilig thuis', 'veilig', 'gezin', '/apps/foundation/veilig.html', 'Online en thuis veilig: afspraken die werken voor kind en ouder.'],
-  ['gezondheid', 'Gezondheidsmaatje', 'veilig', 'gezin', '/apps/foundation/gezondheid.html', 'Het gezondheidsboekje van het gezin, rustig bijgehouden.'],
+  ['veilig-vertrouwd', 'Veilig & Vertrouwd', 'veilig', 'gezin', '/apps/foundation/veilig-vertrouwd.html', 'Uw kring, uw keuzes en hulp wanneer dat nodig is.'],
+  ['gezondheid-welzijn', 'Gezondheid & Welzijn', 'veilig', 'gezin', '/apps/foundation/gezondheid-welzijn.html', 'Vandaag, uw eigen ritme en echte zorgcontacten rustig bij elkaar.'],
   ['privacy', 'Privacy', 'veilig', 'gezin', '/apps/foundation/privacy.html', 'Wat er met jullie gegevens gebeurt, in gewone woorden.'],
   /* De levenspas aan de gezinskant (LEVEN.md par. 2.8). Doelgroep 'gezin' en
      niet 'kind': een ouder heeft hem net zo hard nodig als een kind, want ook

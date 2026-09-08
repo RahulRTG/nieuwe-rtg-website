@@ -1,0 +1,132 @@
+/* RTG Heritage app experiences: recognizable, calm mobile shells for
+   FoundationOS Care and the LivingOS music/social families. The functional
+   pages keep owning their data; this sheet only gives them one visual language. */
+:root{
+  --xp-ivory:#f2eadc;
+  --xp-paper:#fffaf0;
+  --xp-espresso:#110d0b;
+  --xp-brown:#251813;
+  --xp-wine:#7f1634;
+  --xp-wine-bright:#aa2149;
+  --xp-gold:#d4ad64;
+  --xp-gold-soft:#eed49b;
+  --xp-navy:#071523;
+  --xp-blue:#76b7dc;
+}
+
+body.rtg-music-experience,
+body.rtg-social-experience{
+  --rtg-bg:var(--xp-espresso);
+  --rtg-card:#1b1310;
+  --rtg-card2:#211712;
+  --rtg-line:rgba(238,212,155,.19);
+  --rtg-txt:#fff9ed;
+  --rtg-muted:#c8b9aa;
+  --rtg-soft:#a89484;
+  --rtg-acc:var(--xp-wine-bright);
+  background:
+    radial-gradient(circle at 78% 8%,rgba(194,116,58,.16),transparent 27rem),
+    linear-gradient(180deg,#1a100c 0,var(--xp-espresso) 30rem)!important;
+  color:var(--rtg-txt)!important;
+}
+
+body.rtg-music-experience .os-switcher,
+body.rtg-social-experience .os-switcher{
+  background:rgba(13,9,7,.88)!important;
+  border-color:rgba(238,212,155,.16)!important;
+  backdrop-filter:blur(18px);
+}
+
+/* Music */
+body.rtg-music-experience .kop{
+  position:absolute;inset:var(--os-switcher-h,0) 0 auto;z-index:4;
+  background:transparent;padding:calc(env(safe-area-inset-top,0px) + 1rem) 1.25rem;
+}
+body.rtg-music-experience .kop h1{font-size:1rem;font-family:Inter,system-ui,sans-serif;font-weight:500}
+body.rtg-music-experience .kop .badge{border:0;padding:0;color:var(--xp-gold);font-size:.5rem}
+body.rtg-music-experience .muziek-hero{
+  min-height:min(73vh,46rem);display:flex;align-items:flex-end;position:relative;
+  padding:9.5rem 1.25rem 3rem;overflow:hidden;
+  background:
+    linear-gradient(180deg,rgba(11,7,5,.12),rgba(15,9,7,.18) 38%,#110d0b 98%),
+    linear-gradient(90deg,rgba(13,8,5,.35),transparent 70%),
+    url('/images/worlds/heritage/living-heritage-v2.jpg') center/cover;
+}
+body.rtg-music-experience .muziek-hero__beeld{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;filter:saturate(.85) sepia(.08);opacity:.86}
+body.rtg-music-experience .muziek-hero::before{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(11,7,5,.12),rgba(15,9,7,.18) 38%,#110d0b 98%),linear-gradient(90deg,rgba(13,8,5,.48),transparent 75%);pointer-events:none}
+body.rtg-music-experience .muziek-hero::after{content:'';position:absolute;inset:auto 0 0;height:8rem;background:linear-gradient(transparent,var(--xp-espresso));pointer-events:none}
+body.rtg-music-experience .muziek-hero__inhoud{position:relative;z-index:2;max-width:34rem}
+body.rtg-music-experience .muziek-hero .eyebrow{font-size:.62rem;letter-spacing:.32em;text-transform:uppercase;color:var(--xp-gold-soft);margin:0 0 .8rem}
+body.rtg-music-experience .muziek-hero h2{font-family:'Bodoni Moda',Georgia,serif;font-size:clamp(3rem,13vw,5.5rem);font-weight:400;line-height:.83;text-transform:none;letter-spacing:-.035em;color:#fff9ed;margin:0 0 1rem}
+body.rtg-music-experience .muziek-hero p{font-size:1rem;line-height:1.55;color:#eadfce;max-width:25rem;margin:0 0 1.35rem}
+body.rtg-music-experience .hero-speel{display:inline-flex;align-items:center;gap:.7rem;border:1px solid rgba(255,236,204,.42);border-radius:0;background:linear-gradient(135deg,#a7254b,#71142f);box-shadow:0 .8rem 2.4rem rgba(92,10,36,.45);color:white;padding:.8rem 1.2rem;font:600 .85rem Inter,system-ui;cursor:pointer}
+body.rtg-music-experience>.zoek{display:none}
+body.rtg-music-experience main{padding:0 1rem calc(env(safe-area-inset-bottom,0px) + 10rem);max-width:70rem;margin:auto}
+body.rtg-music-experience main>h2{font-family:'Bodoni Moda',Georgia,serif;font-size:1.75rem;letter-spacing:0;text-transform:none;color:#fff9ed;margin:1.4rem 0 .75rem}
+body.rtg-music-experience .stations{display:flex;overflow-x:auto;gap:.75rem;padding:.15rem .05rem .65rem;scroll-snap-type:x proximity;scrollbar-width:none}
+body.rtg-music-experience .stations::-webkit-scrollbar{display:none}
+body.rtg-music-experience .station{flex:0 0 9.5rem;aspect-ratio:.83;border-radius:0;border-color:rgba(238,212,155,.2)!important;scroll-snap-align:start;box-shadow:0 .9rem 2rem rgba(0,0,0,.22)}
+body.rtg-music-experience .station .hoes{font-size:3rem;background-blend-mode:screen}
+body.rtg-music-experience .station .naam{padding:2.4rem .75rem .75rem;background:linear-gradient(transparent,rgba(8,5,4,.96));font-size:.8rem}
+body.rtg-music-experience .station[aria-pressed="true"]{border-color:var(--xp-gold)!important;box-shadow:0 0 0 1px var(--xp-gold),0 1rem 2.2rem rgba(0,0,0,.35)}
+body.rtg-music-experience .wachtrij{background:rgba(255,248,233,.045);border:1px solid var(--rtg-line);border-radius:0;padding:.45rem .9rem}
+body.rtg-music-experience .wachtrij li{padding:.72rem .2rem;border-bottom:1px solid var(--rtg-line)}
+body.rtg-music-experience .wachtrij li:last-child{border:0}
+body.rtg-music-experience .samen{border-radius:0;background:linear-gradient(135deg,rgba(127,22,52,.18),rgba(238,212,155,.06));margin-top:1.2rem}
+body.rtg-music-experience .rahul{display:none}
+body.rtg-music-experience .speler{left:.7rem;right:.7rem;bottom:calc(env(safe-area-inset-bottom,0px) + .65rem);border:1px solid rgba(238,212,155,.25);border-radius:0;padding:.6rem .75rem .7rem;background:rgba(34,23,17,.94);box-shadow:0 1rem 3rem rgba(0,0,0,.48);backdrop-filter:blur(20px)}
+body.rtg-music-experience .speler .titel{font-family:'Bodoni Moda',Georgia,serif;font-size:1rem}
+body.rtg-music-experience .speler .rij{height:3rem!important;min-height:3rem!important;flex-wrap:nowrap!important;align-items:center!important}
+body.rtg-music-experience .speler .info{flex:1 1 auto!important;min-width:0!important;height:auto!important}
+body.rtg-music-experience .speler button{flex:0 0 2.5rem!important;width:2.5rem!important;min-width:2.5rem!important;padding:0!important}
+body.rtg-music-experience .speler .afspeel{flex-basis:3rem!important;width:3rem!important;height:3rem!important;border-radius:50%;background:linear-gradient(135deg,#a7254b,#651229);box-shadow:0 .4rem 1.4rem rgba(127,22,52,.5)}
+body.rtg-music-experience canvas.golf{bottom:5.9rem;opacity:.28}
+
+/* Social */
+body.rtg-social-experience .kop{background:linear-gradient(180deg,rgba(23,14,10,.97),rgba(17,13,11,.93))!important;border-color:rgba(238,212,155,.16)!important;padding:.9rem .95rem 0!important}
+body.rtg-social-experience .elite-merk{align-items:center;margin-bottom:.55rem}
+body.rtg-social-experience .elite-merk .eyebrow{color:var(--xp-gold);letter-spacing:.28em;font-size:.5rem}
+body.rtg-social-experience .kop .elite-titel{font-size:1.6rem;color:var(--xp-gold-soft)}
+body.rtg-social-experience .kop .elite-titel::after{content:'  LivingOS';font:500 .78rem Inter,system-ui;color:#fff9ed;margin-left:.45rem}
+.momenten{display:flex;gap:.7rem;overflow-x:auto;padding:.2rem 0 .8rem;scrollbar-width:none}.momenten::-webkit-scrollbar{display:none}.moment{flex:0 0 3.65rem;color:#cdbdae;text-decoration:none;text-align:center;font-size:.57rem;white-space:nowrap}.moment i{display:block;width:3.55rem;height:3.55rem;border-radius:50%;padding:2px;margin-bottom:.35rem;background:linear-gradient(145deg,#e1a453,#a71f4c 55%,#5b255c)}.moment i::after{content:'';display:block;width:100%;height:100%;border-radius:50%;background:linear-gradient(145deg,#5e3622,#1b100c);border:2px solid #170d0a;box-sizing:border-box}.moment:first-child i::after{content:'+';display:grid;place-items:center;font:300 1.6rem Inter;color:white;background:#1d1410}
+body.rtg-social-experience .passport{border-radius:0;background:linear-gradient(135deg,rgba(109,54,28,.32),rgba(127,22,52,.16));border-color:rgba(238,212,155,.2)}
+body.rtg-social-experience .lenzen{border-bottom:1px solid rgba(238,212,155,.12);padding:.25rem 0 .55rem}
+body.rtg-social-experience .lenzen a,body.rtg-social-experience .lenzen span{border:0;padding:.4rem .55rem;color:#ae9d8e}
+body.rtg-social-experience .lenzen a[aria-current="page"]{color:#fff8ea;border-bottom:2px solid var(--xp-gold)}
+body.rtg-social-experience .werelden{padding:.6rem 0 .8rem}
+body.rtg-social-experience .werelden button{border-radius:0;border-color:rgba(238,212,155,.22);background:rgba(255,255,255,.025)}
+body.rtg-social-experience .werelden button[aria-current="true"]{background:linear-gradient(135deg,#a6254b,#74152f);border-color:#bd385d}
+body.rtg-social-experience main{max-width:40rem;padding:.85rem .7rem 6.8rem}
+body.rtg-social-experience .kaart{position:relative;overflow:hidden;border-radius:0;padding:.85rem!important;background:linear-gradient(145deg,#211611,#160f0c)!important;border-color:rgba(238,212,155,.22)!important;box-shadow:0 1.1rem 2.5rem rgba(0,0,0,.24)}
+body.rtg-social-experience .kaart .r1{align-items:center;margin-bottom:.75rem}
+body.rtg-social-experience .kaart .auteur{font-size:.88rem;color:#fff8ea}
+body.rtg-social-experience .kaart .auteur::before{content:'';display:inline-block;width:2.2rem;height:2.2rem;vertical-align:middle;margin-right:.55rem;border-radius:50%;border:2px solid #bd385d;background:linear-gradient(145deg,#cf7f54,#521629)}
+body.rtg-social-experience .kaart .bron{color:var(--xp-gold);font-size:.54rem}
+body.rtg-social-experience .kaart p{font-family:'Bodoni Moda',Georgia,serif;font-size:clamp(1.25rem,5vw,2rem);line-height:1.16;color:#fff8ea;margin:.4rem .2rem 1rem}
+body.rtg-social-experience .kaart img{border-radius:0;max-height:70vh;object-fit:cover;border:1px solid rgba(238,212,155,.16)}
+body.rtg-social-experience .kaart .acties{padding:.15rem .1rem 0}
+body.rtg-social-experience .kaart .acties button{border-radius:0;padding:.42rem .8rem;border-color:rgba(238,212,155,.2);color:#dbcdbd}
+body.rtg-social-experience .kaart .acties button:first-child::before{content:'♡  '}
+body.rtg-social-experience .social-nav{position:fixed;left:.7rem;right:.7rem;bottom:calc(env(safe-area-inset-bottom,0px) + .65rem);z-index:9000;display:flex;border:1px solid rgba(238,212,155,.22);border-radius:0;background:rgba(26,17,13,.94);overflow:hidden;box-shadow:0 1rem 3rem rgba(0,0,0,.5);backdrop-filter:blur(18px)}
+body.rtg-social-experience .social-nav a{flex:1;text-align:center;padding:.7rem .2rem .65rem;color:#a89484;text-decoration:none;font-size:.6rem;font-weight:600}body.rtg-social-experience .social-nav span{display:block;font-size:1.05rem;margin-bottom:.16rem}body.rtg-social-experience .social-nav a[aria-current="page"]{color:var(--xp-gold-soft)}
+
+/* Care */
+body.rtg-care-experience{margin:0;background:#eef2f3;color:#12202b;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.care-shell{max-width:62rem;margin:auto;min-height:100dvh;padding-bottom:6.5rem;background:linear-gradient(180deg,#071523 0,#0b1d2c 25rem,#eef2f3 25rem)}
+.care-top{display:flex;align-items:center;gap:.7rem;padding:calc(env(safe-area-inset-top,0px) + 1rem) 1.1rem .9rem;color:#f6fbff}
+.care-brand{font-family:'Bodoni Moda',Georgia,serif;font-size:2rem;color:var(--xp-gold-soft);text-decoration:none}
+.care-world{font-size:.82rem}.care-world b{display:block;font-weight:600}.care-world span{display:block;color:#9bb6c8;font-size:.58rem;letter-spacing:.18em;text-transform:uppercase}
+.care-top__end{margin-left:auto;display:flex;gap:.45rem}.care-icon{width:2.55rem;height:2.55rem;border:1px solid rgba(196,221,237,.26);border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.04);color:#f6fbff;text-decoration:none;font-size:1rem}
+.care-hero{min-height:22rem;margin:0 .75rem;position:relative;overflow:hidden;border-radius:0;background:linear-gradient(90deg,rgba(3,14,24,.94),rgba(4,17,28,.4)),url('/images/worlds/heritage/foundation-heritage-v2.jpg') center/cover;color:white;display:flex;align-items:flex-end;padding:2rem 1.4rem}
+.care-hero__copy{max-width:28rem}.care-eyebrow{font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--xp-gold-soft);margin:0 0 .65rem}.care-hero h1{font:400 clamp(2.8rem,12vw,5.2rem)/.9 'Bodoni Moda',Georgia,serif;margin:0 0 1rem;letter-spacing:-.03em}.care-hero p{color:#dbe9f1;line-height:1.55;margin:0 0 1.25rem;max-width:22rem}.care-primary{border:0;border-radius:0;background:linear-gradient(135deg,#9d2548,#68162e);color:white;padding:.8rem 1.15rem;font:600 .84rem Inter,system-ui;box-shadow:0 .7rem 1.8rem rgba(65,7,25,.32);cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:.55rem}
+.care-content{padding:1.25rem .85rem}.care-shortcuts{display:grid;grid-template-columns:repeat(4,1fr);gap:.55rem;margin-top:-2.65rem;position:relative;z-index:2}.care-shortcut{background:#fffaf0;color:#24323a;text-decoration:none;border:1px solid #dfd6c6;border-radius:0;padding:.9rem .5rem;text-align:center;box-shadow:0 .7rem 1.6rem rgba(25,35,43,.09);font-size:.68rem;line-height:1.3}.care-shortcut b{display:grid;place-items:center;margin:0 auto .45rem;width:2.35rem;height:2.35rem;border-radius:50%;background:#f1e6d2;color:#7f1634;font-size:1.05rem}
+.care-section-head{display:flex;align-items:end;justify-content:space-between;gap:.7rem;margin:1.7rem .2rem .7rem}.rtg-care-experience .care-section-head h2{font:400 1.5rem 'Bodoni Moda',Georgia,serif!important;margin:0;color:#14242f!important}.care-section-head button,.care-section-head a{border:0;background:transparent;color:#7f1634;font:600 .72rem Inter;text-decoration:none;cursor:pointer;white-space:nowrap}
+.care-list{display:grid;gap:.65rem}.care-card{background:#fffaf0;border:1px solid #ded6c8;border-radius:0;padding:.85rem;box-shadow:0 .65rem 1.45rem rgba(25,35,43,.07)}.care-card__top{display:flex;align-items:center;gap:.7rem}.care-time{width:3.25rem;font-weight:700;font-size:.78rem;font-variant-numeric:tabular-nums}.care-dot{width:.55rem;height:.55rem;border-radius:50%;background:#3b9b7d;box-shadow:0 0 0 4px rgba(59,155,125,.12)}.care-card__main{flex:1;min-width:0}.care-card__main b{display:block;font-size:.9rem}.care-card__main span{display:block;color:#68767e;font-size:.7rem;margin-top:.15rem}.care-status{color:#2b7962!important}.care-card__actions{display:flex;gap:.45rem;margin:.7rem 0 0 4.55rem}.care-card__actions button{flex:1;border:1px solid #d6ccbb;background:#fffdf7;border-radius:0;padding:.55rem;color:#6a2338;font:600 .7rem Inter;cursor:pointer}.care-empty{padding:1.4rem;text-align:center;color:#68767e;background:#fffaf0;border:1px solid #ded6c8;border-radius:0;line-height:1.5}
+.care-agenda{display:none}.care-shell[data-view="agenda"] .care-home{display:none}.care-shell[data-view="agenda"] .care-agenda{display:block}.care-agenda-head{background:#fffaf0;border-radius:0;padding:1rem;margin:.2rem .75rem 0}.rtg-care-experience .care-agenda-head h1{font:400 2rem 'Bodoni Moda',Georgia,serif!important;text-align:center;margin:.2rem;color:#14242f!important}.care-days{display:grid;grid-template-columns:repeat(7,1fr);gap:.25rem;margin-top:1rem}.care-day{border:0;background:transparent;padding:.5rem .1rem;border-radius:0;color:#56636a;font:600 .66rem Inter;cursor:pointer}.care-day b{display:block;font-size:.85rem;margin-top:.35rem}.care-day[aria-pressed="true"]{background:#7f1634;color:white}.care-agenda .care-content{background:#eef2f3}
+.care-note{margin:1.5rem 0 0;background:linear-gradient(135deg,#f5ead6,#fffaf0);border:1px solid #dfd2bc;border-radius:0;padding:1.15rem}.care-note h3{font:400 1.35rem 'Bodoni Moda',Georgia,serif;margin:0 0 .35rem}.care-note p{margin:0;color:#67747c;font-size:.76rem;line-height:1.5}
+.care-nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + .6rem);width:min(calc(100% - 1.4rem),38rem);display:flex;background:rgba(255,250,240,.94);backdrop-filter:blur(18px);border:1px solid #d9cfbf;border-radius:0;overflow:hidden;box-shadow:0 1rem 2.5rem rgba(11,22,30,.18);z-index:10}.care-nav button,.care-nav a{flex:1;border:0;background:transparent;text-align:center;padding:.7rem .2rem;color:#6f777b;text-decoration:none;font:600 .62rem Inter;cursor:pointer}.care-nav span{display:block;font-size:1rem;margin-bottom:.2rem}.care-nav [aria-current="page"]{color:#7f1634}
+.care-error{margin:.7rem 0;padding:.75rem;background:#f9e5e8;color:#79283c;border-radius:0;font-size:.76rem}
+.care-dialog{width:min(calc(100% - 1.4rem),31rem);border:0;border-radius:0;padding:0;background:#fffaf0;color:#17262f;box-shadow:0 1.5rem 5rem rgba(0,0,0,.35)}.care-dialog::backdrop{background:rgba(2,10,17,.66);backdrop-filter:blur(5px)}.care-dialog__hero{min-height:10rem;padding:1.2rem;display:flex;align-items:flex-end;color:white;background:linear-gradient(180deg,rgba(5,19,31,.18),rgba(5,19,31,.92)),url('/images/worlds/heritage/foundation-heritage-v2.jpg') center/cover}.care-dialog__hero h2{font:400 2rem/1 'Bodoni Moda',Georgia,serif;margin:.2rem 0}.care-dialog__body{padding:1.1rem}.care-detail-row{padding:.75rem 0;border-bottom:1px solid #e1d8c9}.care-detail-row small{display:block;color:#788188;font-size:.6rem;text-transform:uppercase;letter-spacing:.12em;margin-bottom:.25rem}.care-detail-row b{font-size:.86rem}.care-dialog__actions{display:flex;gap:.55rem;margin-top:1rem}.care-dialog__actions button{flex:1;border:1px solid #cdbfa9;border-radius:0;background:transparent;padding:.7rem;color:#6c1d35;font:600 .73rem Inter;cursor:pointer}.care-dialog__actions .care-pay{background:#7f1634;color:white;border-color:#7f1634}.care-dialog__close{position:absolute;right:.8rem;top:.8rem;width:2.3rem;height:2.3rem;border:1px solid rgba(255,255,255,.45);border-radius:50%;background:rgba(7,21,35,.55);color:white;font-size:1.1rem;cursor:pointer}
+@media(min-width:760px){.care-shell{box-shadow:0 0 4rem rgba(0,0,0,.12)}.care-shortcuts{grid-template-columns:repeat(4,minmax(8rem,1fr))}.care-content{padding-inline:1.5rem}}
+@media(max-width:480px){body.rtg-music-experience .kop .badge{display:none}.care-shortcut{padding:.75rem .2rem}.care-hero{min-height:25rem}.care-hero h1{font-size:3.3rem}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}

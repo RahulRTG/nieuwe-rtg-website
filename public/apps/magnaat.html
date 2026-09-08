@@ -98,12 +98,90 @@
 <script src="/shared/media.js"></script>
 <script src="/shared/realtime.js"></script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/shared/rtg-magnaat-2026.css" rel="stylesheet">
 </head>
-<body data-rtg-world="work" data-rtg-skin="heritage">
-<div class="app">
+<body class="magnaat-voorzijde-actief" data-rtg-world="work" data-rtg-skin="heritage" data-mv-scherm="wereld">
+<section class="magnaat-voorzijde" id="magnaatVoorzijde" aria-label="Magnaat veilige oefenwereld">
+  <div class="mv-binnen">
+    <header class="mv-kop">
+      <a class="mv-merk" href="/apps/kantoor.html" aria-label="RTG WorkOS"><b>RTG</b><span>Magnaat</span></a>
+      <span class="mv-kopruimte"></span>
+      <button class="mv-profiel" type="button" data-mv-diep="home" aria-label="Open mijn Magnaat-profiel">RI</button>
+    </header>
+
+    <main>
+      <section class="mv-scherm" id="mvWereld" data-mv-paneel="wereld">
+        <div class="mv-hero">
+          <span class="mv-veilig">Veilige oefenwereld</span>
+          <h1>Leer ondernemen door het echt te doen.</h1>
+          <p>Echte keuzes. Synthetische gegevens. Geen risico voor klanten of geld.</p>
+        </div>
+
+        <article class="mv-fotokaart" aria-labelledby="mvMissieTitel">
+          <span class="mv-kaartlabel">Actieve missie</span>
+          <h2 id="mvMissieTitel">Uw werkvloer vraagt een keuze</h2>
+          <p id="mvMissieMeta">Magnaat Test · veilige praktijkmissie</p>
+          <div class="mv-voortgang"><span class="mv-meter" aria-hidden="true"><i id="mvVoortgang"></i></span><small id="mvVoortgangTekst">Klaar om te beginnen</small></div>
+          <button class="mv-knop mv-knop--goud" type="button" id="mvGaVerder">Ga verder <span aria-hidden="true">›</span></button>
+        </article>
+
+        <div class="mv-sectiekop"><h2>Kies uw volgende uitdaging</h2><button type="button" data-mv-diep="speelhal">Bekijk alle</button></div>
+        <div class="mv-uitdagingen" id="mvUitdagingen">
+          <button class="mv-uitdaging" type="button" data-mv-uitdaging="0"><i aria-hidden="true">◎</i><b>Personeel plannen</b><small>Operatie · 15 min</small><em>Gemiddeld</em></button>
+          <button class="mv-uitdaging" type="button" data-mv-uitdaging="1"><i aria-hidden="true">◇</i><b>Voorraad onder druk</b><small>Inkoop · 12 min</small><em>Uitdagend</em></button>
+          <button class="mv-uitdaging" type="button" data-mv-uitdaging="2"><i aria-hidden="true">△</i><b>Klantbelofte bewaken</b><small>Service · 10 min</small><em>Gericht</em></button>
+        </div>
+
+        <div class="mv-sectiekop"><h2>Uw wereld vandaag</h2><button type="button" data-mv-diep="economie">Open economie</button></div>
+        <div class="mv-cijfers" aria-label="Uw virtuele Magnaat-waarden">
+          <div class="mv-cijfer"><small>Reputatie</small><b id="mvReputatie">-</b></div>
+          <div class="mv-cijfer"><small>Niveau</small><b id="mvNiveau">-</b></div>
+          <div class="mv-cijfer"><small>Balans</small><b id="mvBalans">-</b><em>spelwaarde</em></div>
+        </div>
+        <button class="mv-knop mv-verdieping" type="button" data-mv-diep="werkplek">Open de volledige Magnaat-wereld</button>
+      </section>
+
+      <section class="mv-scherm" id="mvMissie" data-mv-paneel="missie" hidden>
+        <div class="mv-boven"><button class="mv-terug" type="button" data-mv-naar="wereld" aria-label="Terug naar wereld">‹</button><span class="mv-boventitel" id="mvBedrijf">Magnaat Test</span><button class="mv-meer" type="button" data-mv-diep="speelhal" aria-label="Meer missies">•••</button></div>
+        <span class="mv-oog" id="mvMissieStap">Korte oefening</span>
+        <h1 class="mv-titel" id="mvVraag">De werkvloer loopt vol. Wat doet u?</h1>
+        <div class="mv-bericht"><span class="mv-avatar" aria-hidden="true">NB</span><div><b id="mvAfzender">Nora Bakker</b><small id="mvRol">Operationeel manager</small><p id="mvSituatie">De vraag loopt op. Twee onderdelen van de operatie hebben tegelijk versterking nodig.</p></div></div>
+
+        <section class="mv-sectie"><h2>Uw speelruimte</h2><div class="mv-speelruimte"><div class="mv-feit"><small>Budget</small><b>€ 1.800</b></div><div class="mv-feit"><small>Team</small><b>7 mensen</b></div><div class="mv-feit"><small>Tijd</small><b>25 min</b></div></div></section>
+        <section class="mv-sectie"><h2>Kies uw aanpak</h2><div class="mv-keuzes" id="mvKeuzes"></div></section>
+        <p class="mv-grens">Dit is een korte, lokale oefening. Pas bij “Start volledige missie” wordt een echt synthetisch Magnaat-dossier geopend.</p>
+        <div class="mv-acties"><button class="mv-knop mv-knop--goud" type="button" id="mvVoerKeuzeUit" disabled>Bekijk het gevolg</button><button class="mv-knop mv-knop--wijn" type="button" data-mv-diep="wereld">Vraag uw team</button></div>
+      </section>
+
+      <section class="mv-scherm" id="mvResultaat" data-mv-paneel="resultaat" hidden>
+        <div class="mv-boven"><button class="mv-terug" type="button" data-mv-naar="missie" aria-label="Terug naar de keuze">‹</button><span class="mv-boventitel">Resultaat</span><button class="mv-meer" type="button" data-mv-diep="home" aria-label="Open Magnaat-profiel">•••</button></div>
+        <span class="mv-oog">Oefenresultaat · nog niet opgeslagen</span>
+        <h1 class="mv-resultaatkop" id="mvResultaatTitel">Uw keuze bracht rust op de vloer.</h1>
+        <div class="mv-score"><span class="mv-score-ring" id="mvScore">86</span><div><b id="mvScoreTitel">Sterke beslissing</b><small>U hield overzicht én liet ruimte voor herstel.</small></div></div>
+        <div class="mv-resultaat-layout">
+          <section class="mv-sectie"><h2>Wat veranderde</h2><div class="mv-impact"><div class="mv-impactregel"><b>Klanten</b><span id="mvImpactKlant">Wachttijd korter</span></div><div class="mv-impactregel"><b>Team</b><span id="mvImpactTeam">Werkdruk beheersbaar</span></div><div class="mv-impactregel"><b>Kosten</b><span class="is-kost" id="mvImpactKosten">Kosten iets hoger</span></div></div></section>
+          <section class="mv-sectie"><h2>Waarom dit werkte</h2><p class="mv-uitleg" id="mvWaarom">U koos eerst voor mensen en continuïteit. Daardoor bleef de dienstverlening op niveau tijdens de piek.</p></section>
+        </div>
+        <section class="mv-sectie"><h2>Meegenomen naar uw werk</h2><div class="mv-leren"><div class="mv-leerregel">Capaciteit onder druk verdelen</div><div class="mv-leerregel">Kosten afwegen tegen kwaliteit</div></div></section>
+        <p class="mv-grens">Alleen een volledige Magnaat-missie wordt als synthetisch dossier vastgelegd. Klantdata, echte betalingen en productieacties blijven buiten bereik.</p>
+        <div class="mv-acties"><button class="mv-knop mv-knop--goud" type="button" id="mvStartVolledig">Start volledige missie</button><button class="mv-knop mv-knop--wijn" type="button" id="mvVolgende">Volgende uitdaging</button></div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="mv-navigatie" aria-label="Magnaat hoofdnavigatie">
+    <button type="button" data-mv-nav="wereld" aria-current="page"><i aria-hidden="true">⌂</i>Wereld</button>
+    <button type="button" data-mv-nav="missie"><i aria-hidden="true">◇</i>Missies</button>
+    <button type="button" data-mv-diep="wereld"><i aria-hidden="true">♙</i>Team</button>
+    <button type="button" data-mv-diep="home"><i aria-hidden="true">○</i>Profiel</button>
+  </nav>
+</section>
+
+<div class="app" aria-hidden="true">
   <aside class="rail">
     <div class="brand"><div class="crest">M</div><div><b>Magnaat Wereld</b><small>RTG living economy</small></div></div>
     <nav class="nav" aria-label="Magnaat navigatie">
+      <button type="button" data-magnaat-voorzijde-open><span class="ni">00</span><span>Rustige voorzijde</span></button>
       <button data-screen="home"><span class="ni">01</span><span>Commandocentrum</span></button>
       <button class="aan" data-screen="werkplek"><span class="ni">02</span><span>Mijn werkplek</span></button>
       <button data-screen="speelhal"><span class="ni">03</span><span>Functiehal</span></button>
@@ -294,6 +372,7 @@ function render(){
   $('#worldSource').textContent=w.databron;$('#worldMissions').textContent=w.missiesVoltooid;
   const cats=[...new Set(DATA.catalogus.map(c=>c.categorie))].sort();$('#filter').innerHTML='<option value="">Alle categorieën</option>'+cats.map(c=>'<option>'+esc(c)+'</option>').join('');
   renderCapabilityGraph();renderCaps();renderDienst();renderPda();renderWorld();renderEconomy();renderFuture();
+  if(window.RTGMagnaatVoorzijde)window.RTGMagnaatVoorzijde.ontvang(DATA);
 }
 function renderCapabilityGraph(){
   const g=DATA.capabilityGraph,c=g.cijfers;
@@ -350,7 +429,7 @@ $('#applyOfficeRole').onclick=()=>{if(DATA&&DATA.speler.kantoor)kiesKantoor(DATA
 $('#controlRefresh').onclick=()=>loadControl(CONTROL_PAGE);$('#controlFind').onclick=()=>loadControl(1);$('#controlSearch').onkeydown=e=>{if(e.key==='Enter')loadControl(1)};$('#controlType').onchange=()=>loadControl(1);$('#controlStatus').onchange=()=>loadControl(1);
 async function startWerkproces(id){try{const d=await api('werkproces/start',{workflowId:id,apparaat:DEVICE});TASK=d.taak;neemSpeler(d.speler);renderCapabilityGraph();go('werkplek');toast('Volledig dossier gestart als '+TASK.rol+'. Open '+TASK.huidig.schermNaam+'.')}catch(e){toast(e.message);if(DATA.speler.actieveTaak){TASK=DATA.speler.actieveTaak;openTask()}}}
 $('#startService').onclick=()=>{const id=$('#officeWorkflowSelect').value;if(id)startWerkproces(id)};
-function neemSpeler(p){DATA.speler=p;renderStats();renderDienst();renderPda()}
+function neemSpeler(p){DATA.speler=p;renderStats();renderDienst();renderPda();if(window.RTGMagnaatVoorzijde)window.RTGMagnaatVoorzijde.ontvang(DATA)}
 function renderDienst(){
   const d=DATA&&DATA.speler&&DATA.speler.dienst;if(!d)return;
   const g=d.gebeurtenis||{};
@@ -584,6 +663,8 @@ if(window.RTGRealtime)RTGRealtime.start(TOKEN,{onSync:(scope,data)=>{if(scope!==
 setInterval(()=>{if(TEAM_ROOM&&!$('#teamOverlay').hidden&&!document.hidden)refreshTeamRoom(true)},60000);
 load();
 </script>
+<script src="/apps/magnaat-voorzijde-scenarios.js"></script>
+<script src="/apps/magnaat-voorzijde.js"></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/randen.js" defer></script>

@@ -38,9 +38,11 @@
     stop();
     actief = s;
 
+    var hoofd = ['overzicht', 'betalen', 'vooruit', 'meer'];
+    var navId = hoofd.indexOf(s.id) >= 0 ? s.id : 'meer';
     var knoppen = $('#standen').querySelectorAll('button');
     for (var i = 0; i < knoppen.length; i++) {
-      knoppen[i].setAttribute('aria-current', String(knoppen[i].dataset.id === s.id));
+      knoppen[i].setAttribute('aria-current', String(knoppen[i].dataset.id === navId));
     }
     $('#standUitleg').innerHTML = s.uitleg || '';
     $('#paneel').innerHTML = s.html || '';
@@ -62,8 +64,12 @@
 
   function bouw() {
     var nav = $('#standen');
-    nav.innerHTML = V.standen.map(function (s) {
-      return '<button type="button" data-id="' + s.id + '" aria-current="false">' + s.naam + '</button>';
+    var namen = { overzicht: ['01', 'Overzicht'], betalen: ['02', 'Betalen'], vooruit: ['03', 'Vooruit'], meer: ['04', 'Meer'] };
+    nav.innerHTML = ['overzicht', 'betalen'].map(function (id) {
+      return '<button type="button" data-id="' + id + '" data-nr="' + namen[id][0] + '" aria-current="false">' + namen[id][1] + '</button>';
+    }).join('') + '<a class="gx-plus" href="/apps/pay.html" aria-label="Nieuwe betaling">+</a>' +
+    ['vooruit', 'meer'].map(function (id) {
+      return '<button type="button" data-id="' + id + '" data-nr="' + namen[id][0] + '" aria-current="false">' + namen[id][1] + '</button>';
     }).join('');
     nav.addEventListener('click', function (e) {
       var b = e.target.closest('button[data-id]');

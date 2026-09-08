@@ -51,6 +51,8 @@ test('Office: formulier bouwen, delen, invullen en de uitslag; schets tekenen en
         localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
       }, token);
       await page.goto(base + '/apps/office.html', { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('[data-rtd-diep="lijst"]', { timeout: 15000 });
+      await page.click('[data-rtd-diep="lijst"]');
       await page.waitForSelector('#nieuwFormulier', { timeout: 15000 });
     };
 

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="nl" data-rtg-thema="foundation">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#103b39">
+<meta name="robots" content="noindex,nofollow">
+<title>Geld &amp; Later · FoundationOS</title>
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-deep-flows-2026.css" rel="stylesheet">
+<link href="premium.css" rel="stylesheet">
+<link href="/shared/rtg-foundation-geld-later-2026.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl foundation-geld-later" data-rtg-world="foundation" data-rtg-skin="heritage" data-session-helper="Sessie">
+<a class="gl-skip" href="#glInhoud">Naar de inhoud</a>
+<div class="gl-top" role="banner">
+  <a class="gl-brand" href="index.html" aria-label="Naar FoundationOS">RTG</a>
+  <div class="gl-world"><b>FoundationOS</b><span>Geld · groei · toekomst</span></div>
+  <a class="gl-profiel" href="index.html#profielen" aria-label="Profiel"><i data-glyf="vrienden"></i></a>
+</div>
+
+<main id="glInhoud" class="gl-main" tabindex="-1">
+  <section class="gl-view is-actief" data-gl-view="vandaag" aria-labelledby="glVandaagTitel">
+    <div class="gl-hero">
+      <div class="gl-hero__beeld" aria-hidden="true"></div>
+      <div class="gl-hero__copy">
+        <p class="gl-kicker">Geld zonder gedoe</p>
+        <h1 id="glVandaagTitel">Vandaag begrijpen. Voor morgen bouwen.</h1>
+        <p>Zie wat kan, kies wat telt en houd ruimte over.</p>
+        <button class="gl-hoofdknop" type="button" id="glBekijkGeld">Bekijk mijn geld <i data-glyf="rechterhand"></i></button>
+      </div>
+    </div>
+    <div class="gl-inhoud" id="glGeldBegin">
+      <div class="gl-heading"><div><p class="gl-kicker">Eén eerlijk overzicht</p><h2>Vandaag</h2></div><a href="zakgeld.html">Open Zakgeld</a></div>
+      <div id="glVandaag" class="gl-samenvatting" aria-live="polite"><div class="gl-leeg">Uw geldruimte wordt veilig opgehaald.</div></div>
+      <aside class="gl-belofte"><i data-glyf="balans"></i><div><h2>Kleine stappen geven rust.</h2><p>Dit overzicht helpt u kijken en kiezen. Het geeft geen financieel oordeel en doet geen beloftes over later.</p></div></aside>
+    </div>
+  </section>
+
+  <section class="gl-view" data-gl-view="toekomst" aria-labelledby="glToekomstTitel" hidden>
+    <div class="gl-paginakop">
+      <button type="button" data-gl-open="vandaag" aria-label="Terug"><i data-glyf="navigatie"></i></button>
+      <div><p class="gl-kicker">In uw eigen tempo</p><h1 id="glToekomstTitel">Uw route. Uw toekomst.</h1><p>Van leren naar studie en werk, stap voor stap.</p></div>
+    </div>
+    <div class="gl-inhoud gl-inhoud--smal">
+      <div class="gl-route" aria-label="Mogelijke route">
+        <a href="leren.html"><span class="gl-routemark"><i data-glyf="diploma"></i></span><div><small>Nu</small><b>Leren en groeien</b><em>Open uw eigen leerplek</em></div><strong>→</strong></a>
+        <a href="studie.html"><span class="gl-routemark"><i data-glyf="ontdek"></i></span><div><small>Volgende stap</small><b>Studie ontdekken</b><em>Vind een haalbare leerweg</em></div><strong>→</strong></a>
+        <a href="werk.html"><span class="gl-routemark"><i data-glyf="tas"></i></span><div><small>Later</small><b>Werk dat bij u past</b><em>Bekijk echte kansen</em></div><strong>→</strong></a>
+      </div>
+      <section class="gl-paneel" aria-labelledby="glPastTitel">
+        <p class="gl-kicker">Wat is er echt beschikbaar?</p>
+        <h2 id="glPastTitel">Wat past bij mij?</h2>
+        <div id="glKansen" class="gl-kansen" aria-live="polite"></div>
+        <a class="gl-nevenknop" href="werk.html">Bekijk mogelijkheden <i data-glyf="rechterhand"></i></a>
+      </section>
+      <p class="gl-priveregel"><i data-glyf="schild"></i> Dit is een routekaart, geen voorspelling. FoundationOS bepaalt niet wat u moet worden.</p>
+    </div>
+  </section>
+
+  <section class="gl-view" data-gl-view="regelen" aria-labelledby="glRegelenTitel" hidden>
+    <div class="gl-paginakop gl-paginakop--regelen">
+      <button type="button" data-gl-open="vandaag" aria-label="Terug"><i data-glyf="navigatie"></i></button>
+      <div><p class="gl-kicker">Eén kleine stap</p><h1 id="glRegelenTitel">Even regelen.</h1><p>Waar wilt u mee beginnen?</p></div>
+    </div>
+    <div class="gl-inhoud gl-inhoud--smal">
+      <div class="gl-keuzes" role="radiogroup" aria-label="Wat wilt u regelen?">
+        <button type="button" class="is-actief" data-gl-soort="budget" role="radio" aria-checked="true"><i data-glyf="balans"></i><b>Budget maken</b></button>
+        <button type="button" data-gl-soort="spaardoel" role="radio" aria-checked="false"><i data-glyf="rekening"></i><b>Spaardoel starten</b></button>
+        <button type="button" data-gl-soort="cv" role="radio" aria-checked="false"><i data-glyf="office"></i><b>CV beginnen</b></button>
+        <button type="button" data-gl-soort="rechten" role="radio" aria-checked="false"><i data-glyf="juridisch"></i><b>Mijn rechten</b></button>
+      </div>
+      <section id="glRegelPaneel" class="gl-paneel" aria-live="polite"></section>
+      <p class="gl-priveregel"><i data-glyf="schild"></i> Uw budget en cv blijven op dit toestel. Een spaardoel wordt alleen in uw eigen Foundation-profiel bewaard.</p>
+    </div>
+  </section>
+</main>
+
+<nav class="gl-nav" aria-label="Geld en Later navigatie">
+  <button type="button" class="is-actief" data-gl-tab="vandaag" aria-current="page"><i data-glyf="maison"></i><span>Vandaag</span></button>
+  <a href="zakgeld.html"><i data-glyf="wallet"></i><span>Mijn geld</span></a>
+  <button type="button" class="gl-plus" data-gl-tab="regelen" aria-label="Even regelen"><b aria-hidden="true">+</b><span>Regelen</span></button>
+  <button type="button" data-gl-tab="toekomst"><i data-glyf="diploma"></i><span>Toekomst</span></button>
+  <a href="index.html#alle-apps"><i data-glyf="paneel"></i><span>Meer</span></a>
+</nav>
+
+<script src="sessie.js"></script>
+<script src="geld-later-weergave.js"></script>
+<script src="geld-later.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="premium.js" defer></script>
+</body>
+</html>

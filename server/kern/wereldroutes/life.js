@@ -59,6 +59,7 @@ module.exports = [
   '/apps/nalatenschap.html',
   '/apps/navigatie.html',
   '/apps/nieuws.html',
+  '/apps/onderhoud.html',
   '/apps/ov.html',
   '/apps/pay.html',
   '/apps/podium.html',
@@ -98,5 +99,7 @@ module.exports = [
   '/apps/wallet.html',
   '/apps/wbw.html',
   '/apps/wereld.html',
+  '/apps/wonen.html',
+  '/apps/woningdossier.html',
   '/apps/zaal.html'
 ];

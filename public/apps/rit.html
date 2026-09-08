@@ -1,103 +1,62 @@
 <!doctype html>
 <html lang="nl">
 <head>
-<meta charset="utf-8">
 <script src="/shared/id.js"></script>
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTG Rit</title>
-<meta name="theme-color" content="#0C0C0B">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>RTG Aankomst &amp; Chauffeur</title>
+<meta name="theme-color" content="#03101a">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);
-    --soft:var(--rtg-soft);--groen:#69B891;--rood:#DE6E92;--let:#C9A24B;}
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
-  .kop{display:flex;align-items:center;gap:.7rem;padding:calc(env(safe-area-inset-top,0px) + .9rem) 1.1rem .6rem;}
-  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
-  .kop .rek{flex:1;}
-  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
-  main{padding:0 1.1rem 3rem;max-width:46rem;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1rem;margin-top:.9rem;}
-  .kaart h2{font-family:'Bodoni Moda',serif;font-size:1.1rem;font-weight:600;margin-bottom:.5rem;}
-  .stil{color:var(--soft);font-size:.85rem;line-height:1.5;}
-  .stand{display:inline-block;padding:.2rem .6rem;border-radius:0;font-size:.78rem;font-weight:600;}
-  .ja{background:rgba(105,184,145,.16);color:var(--groen);}
-  .nee{background:rgba(222,110,146,.16);color:var(--rood);}
-  .bijna{background:rgba(201,162,75,.16);color:var(--let);}
-  .rij{display:flex;justify-content:space-between;gap:1rem;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.9rem;}
-  .rij:last-child{border-bottom:0;}
-  .rij b{font-weight:600;}
-  ul{list-style:none;}
-  li{padding:.35rem 0;font-size:.9rem;}
-  .vlootrij{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);
-    color:var(--txt);padding:.6rem 0;font:inherit;cursor:pointer;}
-  .vlootrij:last-child{border-bottom:0;}
-  .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);
-    border:1px solid var(--line);border-radius:0;padding:.6rem 1rem;opacity:0;transition:opacity .2s;font-size:.9rem;}
-  .melding.zien{opacity:1;}
-</style>
 <link href="/shared/travel-os.css" rel="stylesheet">
 <link href="/shared/rtg-edge-system.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/shared/rtg-deep-flows-2026.css" rel="stylesheet">
+<link href="/shared/rtg-aankomst-2026.css" rel="stylesheet">
+<link href="/shared/rtg-aankomst-momenten-2026.css" rel="stylesheet">
+<script src="/shared/poortgesprek.js"></script>
 </head>
-<body class="travel-os" data-rtg-eigenvlak="bordeaux" data-rtg-world="travel" data-rtg-skin="heritage">
-<header class="kop">
-  <a href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
-  <h1>Rit</h1>
-  <span class="rek"></span>
-  <button class="knop h-raak24" id="ververs" type="button">Ververs</button>
+<body class="rtg-stijl travel-os rtg-travel-flow rtg-arrival-experience" data-rtg-eigenvlak="onyx" data-rtg-world="travel" data-rtg-skin="heritage" data-rit-tab="aanvragen">
+<header class="ritkop">
+  <a class="rit-brand" href="/apps/reizen.html" aria-label="RTG TravelOS"><b>RTG</b><span>TravelOS</span><small>Van aankomst tot thuiskomst</small></a>
+  <a class="rit-bericht" href="/apps/comm.html" aria-label="Open berichten"><span aria-hidden="true">◇</span></a>
+  <div class="rit-koptekst"><span class="ey" id="ritEy">Uw transfer</span><h1 id="ritTitel">Van aankomst<br>naar bestemming.</h1><p id="ritIntro">Uw rit sluit aan op uw reis. U kiest; een chauffeur bevestigt persoonlijk.</p></div>
 </header>
-<main>
-  <div class="kaart" id="geen" hidden>
-    <h2>Geen rit gekozen</h2>
-    <p class="stil" id="geenTekst"></p>
-  </div>
 
-  <div id="dit" hidden>
-    <div class="kaart">
-      <h2 id="vNaam">-</h2>
-      <p class="stil" id="vSub"></p>
-      <p id="vStand"></p>
-      <div id="vRedenen"></div>
-    </div>
-
-    <div class="kaart">
-      <h2>De reis</h2>
-      <div id="vReis"></div>
-    </div>
-
-    <div class="kaart">
-      <h2>Wie hem rijdt</h2>
-      <div id="vWie"></div>
-      <p class="stil" id="vWieLet"></p>
-    </div>
-  </div>
-
-  <div class="kaart">
-    <h2>Mijn ritten</h2>
-    <div id="vloot"></div>
-    <p class="stil" id="vlootLet"></p>
-  </div>
+<main id="main">
+  <nav class="rit-momenten" aria-label="Moment van uw aankomst">
+    <button type="button" data-t="aanvragen" aria-current="step"><b>01</b><span>Aanvragen</span></button>
+    <button type="button" data-t="chauffeur"><b>02</b><span>Chauffeur</span></button>
+    <button type="button" data-t="aankomst"><b>03</b><span>Aankomst</span></button>
+  </nav>
+  <div id="inhoud"><div class="rit-leeg">Uw aankomst wordt veilig geladen…</div></div>
 </main>
-<div class="melding" id="melding" role="status"></div>
+
+<nav class="rtg-deep-nav" aria-label="TravelOS reisflow" style="--deep-nav-count:3">
+  <a href="/apps/vluchten.html?view=mijn"><b>01</b>Vlucht</a>
+  <a href="/apps/hotels.html?view=mijn"><b>02</b>Verblijf</a>
+  <a href="/apps/rit.html" aria-current="page"><b>03</b>Aankomst</a>
+</nav>
+<nav class="rit-nav" aria-label="RTG Aankomst">
+  <button type="button" data-rit-nav="aanvragen" aria-current="page"><b>01</b>Ritten</button>
+  <button type="button" data-rit-nav="chauffeur"><b>02</b>Mijn rit</button>
+  <a href="/apps/navigatie.html"><b>03</b>Navigatie</a>
+  <button type="button" data-rit-nav="aankomst"><b>04</b>Verblijf</button>
+</nav>
+
+<div class="melding" id="melding" role="status" aria-live="polite"></div>
+<script src="/apps/rit-momenten.js"></script>
 <script src="/apps/rit.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
-<!-- shared/ios.js brengt het app-menu (de hamburger rechtsboven) en daarmee de
-     weg terug naar het beginscherm. Deze twee pagina's waren hem vergeten, en
-     dat is een fout zonder foutmelding: de app opent, doet alles wat hij moet
-     doen, en heeft geen enkele uitgang. test/appmenu.e2e.js loopt daarom ALLE
-     app-pagina's af -- hij ving deze twee. -->
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
-<script src="/shared/ios.js" defer></script>
 <script src="/shared/travel-os-config.js" defer></script>
-<script src="/shared/travel-os.js" defer></script>
 </body>
 </html>

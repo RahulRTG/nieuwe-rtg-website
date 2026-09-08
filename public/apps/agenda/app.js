@@ -23,7 +23,10 @@
   };
 
   var vandaag = K.iso(new Date());
-  var stand = { weergave: 'maand', anker: vandaag };
+  /* Op telefoon opent de agenda als rustige tijdlijn, zoals het LivingOS-
+     dagbeeld. Op een breder scherm blijft het maandraster de beste ingang. */
+  var smal = window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
+  var stand = { weergave: smal ? 'lijst' : 'maand', anker: vandaag };
   var paneel = window.RTGAgendaPaneel.maak(api, meld, laad);
 
   /* het datumvenster hoort bij de weergave: de maand laadt zijn hele

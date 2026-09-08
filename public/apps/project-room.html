@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07100e">
+<title>Project Room · WorkOS</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/shared/rtg-project-room-2026.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl rtg-work-flow" data-rtg-world="work" data-rtg-skin="heritage" data-pr-scherm="uitvoering">
+<div class="pr-app" id="projectRoom">
+  <header class="pr-kop">
+    <a class="pr-merk" href="/apps/kantoor.html" aria-label="Terug naar WorkOS"><b>RTG</b><span>Project Room</span></a>
+    <div class="pr-huizen" role="group" aria-label="Gegevenshuis kiezen">
+      <button type="button" data-pr-huis="rtg" aria-pressed="true">RTG</button>
+      <button type="button" data-pr-huis="rtf" aria-pressed="false">RTF</button>
+      <button type="button" data-pr-huis="gedeeld" aria-pressed="false">Samen</button>
+    </div>
+    <span class="pr-kopruimte"></span>
+    <a class="pr-bronknop" href="/apps/rtmail.html">Start vanuit RTMail</a>
+    <a class="pr-profiel" href="/apps/rtgone.html" aria-label="Open RTG One">RI</a>
+  </header>
+
+  <main>
+    <section class="pr-scherm" data-pr-paneel="uitvoering" aria-labelledby="prUitvoeringTitel">
+      <div class="pr-ey" id="prDag">Uitvoering · laden</div>
+      <h1 id="prUitvoeringTitel">Maak voortgang voelbaar.</h1>
+      <p class="pr-intro">Niet alle taken tegelijk. Alleen wat het gekozen project nu werkelijk verder brengt.</p>
+      <div id="prUitvoering" aria-live="polite"><div class="pr-leeg">De projectuitvoering wordt geladen.</div></div>
+      <aside class="pr-vertrouwen"><i aria-hidden="true">✓</i><span><b>Geen drukte als voortgang.</b> Werk dat nog niet kan beginnen blijft buiten beeld totdat de afhankelijkheid is opgelost.</span></aside>
+    </section>
+
+    <section class="pr-scherm" data-pr-paneel="dossier" aria-labelledby="prDossierTitel" hidden>
+      <button class="pr-terug" type="button" data-pr-open="uitvoering">← Uitvoering</button>
+      <div class="pr-ey">Projectdossier · bedoeling blijft voorop</div>
+      <h1 id="prDossierTitel">Alles wat nodig is. Niets dubbel.</h1>
+      <div id="prDossier"><div class="pr-leeg">Kies eerst een project uit de uitvoering.</div></div>
+    </section>
+
+    <section class="pr-scherm" data-pr-paneel="oplevering" aria-labelledby="prOpleverTitel" hidden>
+      <button class="pr-terug" type="button" data-pr-open="dossier">← Projectdossier</button>
+      <div class="pr-ey">Oplevering · resultaat tegenover bedoeling</div>
+      <h1 id="prOpleverTitel">Niet klaar omdat alles is afgevinkt.</h1>
+      <p class="pr-intro">Klaar wanneer het beloofde resultaat aantoonbaar is bereikt en een mens het bevestigt.</p>
+      <div id="prOplevering"><div class="pr-leeg">Kies eerst een project.</div></div>
+    </section>
+  </main>
+
+  <nav class="pr-nav" aria-label="Project Room navigatie">
+    <button type="button" data-pr-open="uitvoering" aria-current="page"><i aria-hidden="true">01</i><span>Uitvoering</span></button>
+    <button type="button" data-pr-open="dossier"><i aria-hidden="true">02</i><span>Dossier</span></button>
+    <button type="button" data-pr-open="oplevering"><i aria-hidden="true">03</i><span>Oplevering</span></button>
+  </nav>
+</div>
+
+<div class="pr-laag" id="prBewijsLaag" hidden>
+  <form class="pr-dialoog" id="prBewijsForm">
+    <button class="pr-sluit" type="button" data-pr-sluit aria-label="Sluiten">×</button>
+    <div class="pr-ey">Bewijs van uitvoering</div><h2>Wat toont het resultaat aan?</h2>
+    <p>Leg de betekenis vast en verwijs naar de echte bron. Een bestandskopie is niet nodig.</p>
+    <label><span>Bewijsstuk</span><input name="titel" maxlength="160" required></label>
+    <label><span>Wat toont dit aan?</span><textarea name="uitleg" maxlength="600" required></textarea></label>
+    <div class="pr-veldgrid"><label><span>Soort</span><select name="soort"><option value="uitvoering">Uitvoering</option><option value="finance">Finance</option><option value="kwaliteit">Kwaliteit</option><option value="document">Document</option><option value="praktijktest">Praktijktest</option></select></label><label><span>Bron of verwijzing</span><input name="bron" maxlength="160"></label></div>
+    <div class="pr-dialoogacties"><button type="button" data-pr-sluit>Annuleren</button><button class="primair" type="submit">Bewijs vastleggen →</button></div>
+  </form>
+</div>
+
+<div class="pr-melding" id="prMelding" role="status" hidden></div>
+<script src="/apps/project-room-uitvoering.js"></script>
+<script src="/apps/project-room-dossier.js"></script>
+<script src="/apps/project-room-oplevering.js"></script>
+<script src="/apps/project-room.js"></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

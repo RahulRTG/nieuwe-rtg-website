@@ -75,8 +75,9 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/shared/rtg-eten-uitgaan-2026.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-night-flow rtg-night-evening" data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-skin="heritage">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
   <div class="os-switcher__links">
@@ -88,14 +89,23 @@
   <span class="os-switcher__state">Kern verbonden</span>
 </div>
 <header>
-  <a class="terug" href="/apps/app.html">← App</a>
-  <div><div class="ey">Op de gastenlijst</div><h1>RTG Uitgaan</h1></div>
+  <a class="night-brand" href="/apps/rtg.html"><span>RTG</span><b>LivingOS</b><small>Eten · uitgaan · samen</small></a>
+  <a class="terug" href="/apps/foodcourt.html">← Ontdekken</a>
 </header>
 <main id="main">
-  <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:60ch;">Bars, clubs en beachclubs met hun avonden. Meld je aan op de gastenlijst; je codenaam is je toegang aan de deur.</p>
-  <div class="chips" id="soorten"></div>
-  <div class="lijst" id="lijst"></div>
+  <section class="night-intro" aria-labelledby="avondKop">
+    <p class="night-ey">Uw avond</p>
+    <h1 id="avondKop">Alles voor vanavond. In de juiste volgorde.</h1>
+    <p>Uw tafels, tickets en gastenlijsten bij elkaar. Iedere aanbieder houdt zijn eigen bevestiging.</p>
+  </section>
   <div id="mijnWrap"></div>
+  <section id="avondOntdek">
+    <h2 class="night-title">Nog iets toevoegen?</h2>
+    <nav class="night-switch" aria-label="Kies wat u wilt ontdekken"><a href="/apps/foodcourt.html">Restaurants</a><a href="#ontdekken" aria-current="page">Bars en avonden</a></nav>
+    <p class="meta">Bars, clubs en beachclubs met hun avonden. Uw codenaam is uw toegang aan de deur.</p>
+    <div class="chips" id="soorten"></div>
+    <div class="lijst" id="lijst"></div>
+  </section>
 </main>
 
 <section class="blad" id="blad" aria-label="Aanmelden">
@@ -157,14 +167,29 @@ async function laad(){
   laadMijn();
 }
 async function laadMijn(){
-  let d; try { d = await api('/api/uitgaan/mijn'); } catch(e){ return; }
-  const av = d.avonden||[];
-  if (!av.length){ $('#mijnWrap').innerHTML = ''; return; }
-  $('#mijnWrap').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.1rem;margin:2rem 0 0.75rem;border-top:1px solid var(--line);padding-top:1.4rem;">Mijn avonden</h2>'+
-    av.map(a => '<div class="resto" style="cursor:default;flex-direction:row;justify-content:space-between;align-items:center;">'+
-      '<div><h3 style="font-size:1rem;">'+esc(a.naam)+'</h3><span class="meta">'+esc(a.zaak)+' · '+[a.datum,a.tijd].filter(Boolean).map(esc).join(' · ')+' · '+a.qty+' pers'+(a.ingecheckt?' · ingecheckt':'')+'</span></div>'+
-      (a.ingecheckt?'':'<button class="knop" data-code="'+esc(a.supplierCode)+'" data-ev="'+esc(a.eventId)+'" style="width:auto;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);">Afmelden</button>')+
-    '</div>').join('');
+  const uitslagen = await Promise.allSettled([api('/api/uitgaan/mijn'), api('/api/mall/bestellingen')]);
+  const av = uitslagen[0].status === 'fulfilled' ? uitslagen[0].value.avonden||[] : [];
+  const lopen = uitslagen[1].status === 'fulfilled' ? uitslagen[1].value.bestellingen||[] : [];
+  const momenten = av.map(a => ({
+    soort:'Gastenlijst', titel:a.naam, aanbieder:a.zaak, datum:a.datum||'', tijd:a.tijd||'',
+    status:a.ingecheckt?'Ingecheckt':'Op de gastenlijst', qty:a.qty, code:a.supplierCode, eventId:a.eventId
+  })).concat(lopen.filter(r => r.soort === 'reservering' || r.soort === 'ticket').map(r => ({
+    soort:r.soortLabel, titel:r.titel, aanbieder:r.aanbieder, datum:r.wanneer||'', tijd:'',
+    status:r.status, pagina:r.pagina
+  }))).sort((a,b) => (a.datum+' '+a.tijd).localeCompare(b.datum+' '+b.tijd));
+  if (!momenten.length){
+    $('#mijnWrap').innerHTML = '<div class="leeg">Nog niets gepland. Kies hieronder een tafel of avond; alleen bevestigde gegevens verschijnen hier.</div>';
+    return;
+  }
+  $('#mijnWrap').innerHTML = '<h2 class="night-title">Mijn avond</h2><div class="night-timeline">'+
+    momenten.map(a => '<div class="night-moment">'+
+      '<span class="night-time">'+esc(a.tijd||a.datum||'Gepland')+'</span>'+
+      '<span class="night-copy"><b>'+esc(a.titel)+'</b><small>'+esc(a.soort)+' · '+esc(a.aanbieder)+
+        (a.qty?' · '+a.qty+' personen':'')+'</small><a class="night-route" href="/apps/navigatie.html">Open route</a></span>'+
+      '<span class="night-state">'+esc(a.status)+
+        (a.eventId&&!String(a.status||'').toLowerCase().includes('ingecheckt')?'<button class="knop" data-code="'+esc(a.code)+'" data-ev="'+esc(a.eventId)+'">Afmelden</button>':'')+
+        (a.pagina?'<a class="night-route" href="'+esc(a.pagina)+'">Bekijken</a>':'')+'</span></div>').join('')+
+    '</div><div class="night-assurance"><span>&#10003;</span><div><b>Alles bij elkaar</b><small>De aanbieder bevestigt, wijzigt of annuleert iedere reservering.</small></div></div>';
   $('#mijnWrap').querySelectorAll('button[data-ev]').forEach(b => b.addEventListener('click', async () => {
     try { await api('/api/event/rsvp/annuleer', { supplierCode: b.dataset.code, eventId: b.dataset.ev }); meld('Afgemeld.'); laad(); } catch(e){ meld(e.message); }
   }));
@@ -260,5 +285,6 @@ $('#bladTerug').addEventListener('click', () => $('#blad').classList.remove('ope
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="/apps/eten-uitgaan-voorzijde.js"></script>
 </body>
 </html>

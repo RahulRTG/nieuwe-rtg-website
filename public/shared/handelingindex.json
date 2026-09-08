@@ -2630,12 +2630,6 @@
       "url": "/apps/pulse.html"
     },
     {
-      "label": "Open mijn berichten",
-      "app": "Vandaag",
-      "wereld": "LivingOS",
-      "url": "/apps/vandaag.html"
-    },
-    {
       "label": "Plaatsen",
       "app": "Vandaag",
       "wereld": "LivingOS",
@@ -3006,6 +3000,18 @@
       "app": "Wie ben ik",
       "wereld": "Instellingen",
       "url": "/apps/ik.html"
+    },
+    {
+      "label": "Bekijk details",
+      "app": "Zorg",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/zorg.html"
+    },
+    {
+      "label": "Nu betalen",
+      "app": "Zorg",
+      "wereld": "FoundationOS",
+      "url": "/apps/foundation/zorg.html"
     }
   ]
 }

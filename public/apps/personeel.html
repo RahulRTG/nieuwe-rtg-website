@@ -7,7 +7,7 @@
 <script>try{if(window.self!==window.top)document.documentElement.dataset.rtgOppervlak='1'}catch(e){}</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#0C0C0B">
-<title>RTG Personeel, uw dienst en taken</title>
+<title>RTG Team Room, uw werkdag en team</title>
 <link rel="icon" href="/icons/personeel.svg" type="image/svg+xml">
 <link rel="manifest" href="/manifests/personeel.webmanifest">
 <link rel="apple-touch-icon" href="/icons/personeel-192.png">
@@ -211,15 +211,72 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/workos-premium.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/shared/rtg-team-room-2026.css" rel="stylesheet">
+<link href="/shared/rtg-team-room-profiel-2026.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-workos-premium data-rtg-world="work" data-rtg-skin="heritage">
 <a class="skip" href="#content">Naar de inhoud</a>
+<section class="trm-voorzijde" id="teamRoomVoorzijde" aria-label="Team Room rustig werkoverzicht" hidden>
+  <div class="trm-binnen">
+    <header class="trm-kop">
+      <a class="trm-merk" href="/apps/kantoor.html" aria-label="Terug naar WorkOS"><b>RTG</b><span>WorkOS</span></a>
+      <span class="trm-naam">Team Room</span>
+      <span class="trm-kopruimte"></span>
+      <button class="trm-profiel" type="button" data-trm-profiel aria-label="Open uw medewerkerprofiel"><span id="trmInitialen">RTG</span></button>
+    </header>
+
+    <main class="trm-hoofd" id="trmHoofd">
+      <section class="trm-scherm" data-trm-paneel="vandaag" aria-labelledby="trmVandaagTitel">
+        <p class="trm-ey">MIJN WERKDAG</p>
+        <h1 class="trm-titel" id="trmVandaagTitel">Een sterke werkdag begint met rust.</h1>
+        <p class="trm-groet" id="trmGroet">Goedemorgen.</p>
+        <p class="trm-inleiding" id="trmVandaagRegel">Dit is wat vandaag telt.</p>
+        <div id="trmDienst"></div>
+        <div id="trmVolgende"></div>
+        <div class="trm-sectiekop"><h2>Uw werkdag</h2><button type="button" data-trm-diep="taken">Alle taken</button></div>
+        <div class="trm-tijdlijn" id="trmTijdlijn"></div>
+      </section>
+
+      <section class="trm-scherm" data-trm-paneel="team" aria-labelledby="trmTeamTitel" hidden>
+        <p class="trm-ey">SAMEN AAN HET WERK</p>
+        <h1 class="trm-titel" id="trmTeamTitel">Team &amp; rooster</h1>
+        <p class="trm-inleiding">Zie wie er is, wie later komt en waar echte aandacht nodig is.</p>
+        <div class="trm-dagen" id="trmDagen" aria-label="Kies een dag"></div>
+        <div class="trm-bezetting" id="trmBezetting"></div>
+        <div class="trm-team" id="trmTeam"></div>
+        <div id="trmTeamAandacht"></div>
+      </section>
+
+      <section class="trm-scherm" data-trm-paneel="profiel" aria-labelledby="trmProfielTitel" hidden>
+        <button class="trm-terug" type="button" data-trm-open="team">&larr; Team</button>
+        <div class="trm-profielkop">
+          <span class="trm-portret" id="trmPortret">RTG</span>
+          <div><p class="trm-ey">MEDEWERKER</p><h1 id="trmProfielTitel">Uw profiel</h1><p id="trmProfielRol"></p></div>
+        </div>
+        <div class="trm-profielstatus" id="trmProfielStatus"></div>
+        <div class="trm-profielrooster" id="trmProfielRooster"></div>
+        <div class="trm-profielbreed" id="trmDienstverband"></div>
+        <div class="trm-profielacties">
+          <button class="trm-primair" type="button" data-trm-diep="hulp">Gesprek voorbereiden</button>
+          <button class="trm-secundair" type="button" data-trm-diep="hulp">Contract bekijken</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <nav class="trm-nav" aria-label="Team Room-menu">
+    <button type="button" data-trm-open="vandaag" aria-current="page"><i aria-hidden="true">&#9788;</i>Vandaag</button>
+    <button type="button" data-trm-open="team"><i aria-hidden="true">&#9675;&#9675;</i>Team</button>
+    <button type="button" data-trm-diep="rooster"><i aria-hidden="true">&#9634;</i>Rooster</button>
+    <button type="button" data-trm-diep="hulp"><i aria-hidden="true">&#9776;</i>Meer</button>
+  </nav>
+</section>
 <div id="shell">
 
   <div id="gate" role="main" aria-label="Inloggen" data-inlogkleur>
     <!-- inlogscherm: de naam van de app, de klok en de datum; daaronder inloggen -->
     <div class="gate-top">
-      <div class="badge">RTG Personeel</div>
+      <div class="badge">RTG Team Room</div>
       <div class="gate-klok" id="gateKlok" data-rtg-klok="ring">--:--</div>
     </div>
     <div id="gateStep"></div>
@@ -453,6 +510,9 @@
      model aan met RTGUitvoer.bron() en moet de laag dus al vinden. -->
 <script src="/shared/uitvoer.js"></script>
 <script src="/apps/personeel.js"></script>
+<script src="/apps/personeel-voorzijde-weergave.js"></script>
+<script src="/apps/personeel-voorzijde-team.js"></script>
+<script src="/apps/personeel-voorzijde.js"></script>
 <script>
 window.I18N = { en: {
   'pd.title':'Your shift, <em>in your pocket</em>.',

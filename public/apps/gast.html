@@ -98,6 +98,7 @@
   .menu-concierge{margin:.7rem 0 1rem;padding:.9rem;border:1px solid rgba(169,143,28,.3);border-radius:0;background:linear-gradient(145deg,rgba(127,22,52,.12),var(--card2))}.menu-concierge>span{font-size:.58rem;letter-spacing:.15em;color:var(--rtg-leesgoud,var(--gold))}.menu-concierge .rij{margin-top:.55rem}.menu-concierge input{flex:1}.menu-concierge p{font-size:.73rem;line-height:1.5;color:var(--muted);margin:.55rem 0 0}.concierge-keus{padding:.55rem 0;border-top:1px solid var(--line)}.concierge-keus b{font-size:.82rem}.concierge-keus small{display:block;color:var(--soft);margin-top:.1rem}
 </style>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+<link href="/shared/rtg-eten-uitgaan-2026.css" rel="stylesheet">
 </head>
 <!-- data-ios-uit: deze pagina wil bewust GEEN OS-chroom. Ze staat wel onder
      /apps/, maar wie hem opent is meestal geen lid: je komt hier via de QR op
@@ -106,11 +107,15 @@
      hamburger suggereert een app waar hij geen account voor heeft. De vlag
      staat hier en niet in een uitzonderingslijst in de toets: de pagina weet
      zelf het beste wat ze is (test/appmenu.e2e.js leest hem). -->
-<body data-ios-uit data-rtg-world="living" data-rtg-skin="heritage">
+<body class="rtg-night-flow rtg-night-table" data-ios-uit data-rtg-world="living" data-rtg-skin="heritage">
 <header>
-  <span class="ey">Rahul Travel Group</span>
-  <h1 id="zaakNaam">Aan tafel</h1>
-  <p class="sub" id="zaakSub">Scan de code op je tafel of op je kamer om te beginnen.</p>
+  <a class="night-brand" href="/apps/foodcourt.html"><span>RTG</span><b>LivingOS</b><small>Eten · uitgaan · samen</small></a>
+  <div class="night-table-copy">
+    <p class="night-ey">Aan tafel</p>
+    <h1>Samen genieten. Zonder het regelwerk.</h1>
+    <p>De actuele kaart, uw wensen en de rekening bij elkaar.</p>
+  </div>
+  <div class="night-venue"><b id="zaakNaam">Aan tafel</b><small id="zaakSub">Scan de code op uw tafel of kamer om te beginnen.</small></div>
 </header>
 
 <main id="main" role="main">

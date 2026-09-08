@@ -39,7 +39,8 @@
       "label": "Lifestyle",
       "woorden": [
         "lifestyle",
-        "pass"
+        "pass",
+        "aandacht"
       ]
     },
     {
@@ -200,7 +201,12 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "foodcourt",
-      "url": "/apps/foodcourt.html"
+      "url": "/apps/foodcourt.html",
+      "woorden": [
+        "hebben",
+        "iets",
+        "past"
+      ]
     },
     {
       "naam": "Game Night",
@@ -309,7 +315,14 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "mall",
-      "url": "/apps/mall.html"
+      "url": "/apps/mall.html",
+      "woorden": [
+        "vinden",
+        "past",
+        "zonder",
+        "eindeloos",
+        "zoeken"
+      ]
     },
     {
       "naam": "Mecenaat",
@@ -329,7 +342,11 @@
       "sleutel": "mijnmall",
       "url": "/apps/mijnmall.html",
       "woorden": [
-        "mall"
+        "mall",
+        "weten",
+        "waar",
+        "winkel",
+        "voordeur"
       ]
     },
     {
@@ -421,7 +438,9 @@
       "sleutel": "mediaos",
       "url": "/apps/media.html",
       "woorden": [
-        "mediawereld"
+        "minder",
+        "zoeken",
+        "beleven"
       ]
     },
     {
@@ -471,7 +490,13 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "sport",
-      "url": "/apps/sport.html"
+      "url": "/apps/sport.html",
+      "woorden": [
+        "rondom",
+        "wedstrijd",
+        "juiste",
+        "moment"
+      ]
     },
     {
       "naam": "Table",
@@ -504,7 +529,12 @@
       "wereld": "LivingOS",
       "soort": "link",
       "sleutel": "uitgaan",
-      "url": "/apps/uitgaan.html"
+      "url": "/apps/uitgaan.html",
+      "woorden": [
+        "vanavond",
+        "juiste",
+        "volgorde"
+      ]
     },
     {
       "naam": "Vandaag",
@@ -563,10 +593,19 @@
       ]
     },
     {
-      "naam": "Zorg",
+      "naam": "Wonen",
       "wereld": "LivingOS",
-      "soort": "tab",
-      "sleutel": "zorg"
+      "soort": "link",
+      "sleutel": "wonen",
+      "url": "/apps/wonen.html",
+      "woorden": [
+        "livingos",
+        "thuis",
+        "zonder",
+        "eraan",
+        "hoeven",
+        "denken"
+      ]
     },
     {
       "naam": "Accountbescherming",
@@ -601,7 +640,17 @@
       "wereld": "Instellingen",
       "soort": "link",
       "sleutel": "veilig",
-      "url": "/apps/veilig.html"
+      "url": "/apps/veilig.html",
+      "woorden": [
+        "rust",
+        "omdat",
+        "juiste",
+        "mensen",
+        "weten",
+        "wanneer",
+        "nodig",
+        "zijn"
+      ]
     },
     {
       "naam": "Waar ben ik aanwezig",
@@ -635,13 +684,20 @@
       "url": "/apps/mijn-relaties.html"
     },
     {
-      "naam": "Documenten",
+      "naam": "Decision Room",
       "wereld": "WorkOS",
       "soort": "link",
-      "sleutel": "office",
-      "url": "/apps/office.html",
+      "sleutel": "decisionroom",
+      "url": "/apps/decision-room.html",
       "woorden": [
-        "office"
+        "workos",
+        "beslis",
+        "waar",
+        "nodig",
+        "niet",
+        "luidst",
+        "wordt",
+        "gevraagd"
       ]
     },
     {
@@ -670,9 +726,11 @@
       "url": "/apps/magnaat.html",
       "woorden": [
         "wereld",
-        "bedrijf",
-        "leeft",
-        "reageert"
+        "leer",
+        "ondernemen",
+        "door",
+        "echt",
+        "doen"
       ]
     },
     {
@@ -693,15 +751,43 @@
       ]
     },
     {
+      "naam": "Project Room",
+      "wereld": "WorkOS",
+      "soort": "link",
+      "sleutel": "projectroom",
+      "url": "/apps/project-room.html",
+      "woorden": [
+        "workos",
+        "maak",
+        "voortgang",
+        "voelbaar"
+      ]
+    },
+    {
+      "naam": "RTDocs",
+      "wereld": "WorkOS",
+      "soort": "link",
+      "sleutel": "office",
+      "url": "/apps/office.html",
+      "woorden": [
+        "workos",
+        "niet",
+        "zoeken",
+        "meteen",
+        "verder"
+      ]
+    },
+    {
       "naam": "RTG One",
       "wereld": "WorkOS",
       "soort": "link",
       "sleutel": "rtgone",
       "url": "/apps/rtgone.html",
       "woorden": [
-        "enterprise",
-        "command",
-        "center"
+        "workos",
+        "werkdag",
+        "rustig",
+        "beeld"
       ]
     },
     {
@@ -719,7 +805,13 @@
       "wereld": "WorkOS",
       "soort": "link",
       "sleutel": "rtmail",
-      "url": "/apps/rtmail.html"
+      "url": "/apps/rtmail.html",
+      "woorden": [
+        "inbox",
+        "teruggebracht",
+        "ertoe",
+        "doet"
+      ]
     },
     {
       "naam": "School",
@@ -822,8 +914,8 @@
       "url": "/apps/reisboek.html",
       "label": "Lifestyle",
       "woorden": [
-        "lifestyle",
-        "pass"
+        "travelos",
+        "beweegt"
       ]
     },
     {
@@ -895,7 +987,12 @@
       "wereld": "TravelOS",
       "soort": "link",
       "sleutel": "vluchten",
-      "url": "/apps/vluchten.html"
+      "url": "/apps/vluchten.html",
+      "woorden": [
+        "waar",
+        "wilt",
+        "naartoe"
+      ]
     },
     {
       "naam": "Buurtruil",
@@ -976,6 +1073,24 @@
         "gemeenten",
         "ondernemers"
       ]
+    },
+    {
+      "naam": "Zorg",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "foundationzorg",
+      "url": "/apps/foundation/zorg.html",
+      "woorden": [
+        "foundationos",
+        "rustiger",
+        "morgen"
+      ]
+    },
+    {
+      "naam": "Zorgaanbod",
+      "wereld": "FoundationOS",
+      "soort": "tab",
+      "sleutel": "zorg"
     }
   ]
 }

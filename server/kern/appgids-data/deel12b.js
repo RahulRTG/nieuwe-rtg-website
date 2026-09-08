@@ -9,6 +9,10 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
+  '/apps/foundation/zorg.html': G('Hulp & Zorg in FoundationOS: echte zorgmomenten, een rustige hulpwijzer en uw begeleider op een plek.',
+    ['Bekijk wat er voor u of uw gezin aankomt', 'Vind zonder nieuw dossier een passende eerste stap bij uw vraag',
+     'Controleer welke medische intake u tijdelijk met een aanbieder deelt'],
+    'De app verzint geen begeleider of voortgang. Alleen gegevens uit uw Foundation-profiel en RTG Care verschijnen; delen blijft uw keuze.'),
   '/apps/mijn-gegevens.html': G('Wat weet RTG van mij: per soort gegeven waar het staat, hoe het bij ons kwam, waarvoor het mag worden gebruikt en of het weg kan.',
     ['Zie per gegeven of RTG het heeft -- en waar dat niet vast te stellen is, staat dat er als eigen uitslag',
      'Lees waarvoor elk gegeven gebruikt mag worden, en waar het fysiek staat',

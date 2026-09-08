@@ -2,10 +2,15 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-premium-foundation-c9877169';
+const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-v2';
 const SHELL = [
   '/apps/foundation/', '/apps/foundation/index.html', '/apps/foundation/campus.html',
-  '/apps/foundation/leren.html', '/apps/foundation/leerpaspoort.html', '/apps/foundation/bord.html', '/apps/foundation/schrift.html',
+  '/apps/foundation/samen-thuis.html', '/apps/foundation/samen-thuis.js', '/apps/foundation/samen-thuis-weergave.js',
+  '/apps/foundation/geld-later.html', '/apps/foundation/geld-later.js', '/apps/foundation/geld-later-weergave.js',
+  '/apps/foundation/gezondheid-welzijn.html', '/apps/foundation/gezondheid-welzijn.js', '/apps/foundation/gezondheid-welzijn-weergave.js',
+  '/apps/foundation/veilig-vertrouwd.html', '/apps/foundation/veilig-vertrouwd.js', '/apps/foundation/veilig-vertrouwd-weergave.js',
+  '/apps/foundation/meedoen-ontdekken.html', '/apps/foundation/meedoen-ontdekken.js', '/apps/foundation/meedoen-ontdekken-weergave.js',
+  '/apps/foundation/leren.html', '/apps/foundation/leren-groei.js', '/apps/foundation/leren-groei-weergave.js', '/apps/foundation/leerpaspoort.html', '/apps/foundation/bord.html', '/apps/foundation/schrift.html',
   '/apps/foundation/cv.html', '/apps/foundation/rust.html', '/apps/foundation/reis.html',
   '/apps/foundation/geld.html', '/apps/foundation/hulpwijzer.html', '/apps/foundation/dromen.html',
   '/apps/foundation/opvoeden.html', '/apps/foundation/steun.html', '/apps/foundation/studie.html',
@@ -34,6 +39,8 @@ const SHELL = [
   '/apps/foundation/club.html', '/apps/foundation/klas.html',
   '/apps/foundation/beheer.html', '/apps/foundation/privacy.html',
   '/apps/foundation/onveilig.html', '/apps/foundation/wegwijzer.html', '/apps/foundation/sessie.js',
+  '/apps/foundation/voorzijde.js', '/apps/foundation/voorzijde-weergave.js',
+  '/apps/foundation/zorg.html', '/apps/foundation/zorg-hulp.js', '/apps/foundation/zorg-hulp-weergave.js',
   /* Deze tien stonden WEL op de hub en NIET in de schil: spelen, de biebs, de
      schoolkant en het magazine. Precies de tegels waarmee een kind zich
      bezighoudt als er niets anders is -- en dus juist de tegels die je nodig
@@ -56,7 +63,8 @@ const SHELL = [
   '/apps/foundation/os-veld.html', '/apps/foundation/os-donateur.html',
   '/apps/foundation/tekenen.js', '/apps/foundation/realtime.js', '/apps/foundation/stijl.css', '/apps/foundation/premium.css', '/apps/foundation/premium.js', '/apps/foundation/palet.js',
   '/apps/rtgschool/leer.js', '/apps/rtgschool/examen.js', '/apps/rtgschool/bijles.js',
-  '/shared/id.js', '/shared/basis.js', '/shared/rtg-world-identity.js',
+  '/shared/id.js', '/shared/basis.js', '/shared/rtg-world-identity.js', '/shared/rtg-foundation-thuis-2026.css', '/shared/rtg-foundation-leren-2026.css', '/shared/rtg-foundation-samen-thuis-2026.css', '/shared/rtg-foundation-geld-later-2026.css', '/shared/rtg-foundation-gezondheid-welzijn-2026.css', '/shared/rtg-foundation-veilig-vertrouwd-2026.css',
+  '/shared/rtg-foundation-hulp-2026.css', '/shared/rtg-foundation-meedoen-ontdekken-2026.css',
   '/shared/rtg-heritage.css', '/shared/rtg-heritage-materials.css',
   '/shared/rtg-heritage-adapters.css', '/shared/rtg-heritage-components.css',
   '/shared/rtg-heritage-motion.css', '/shared/rtg-heritage-motion.js',
@@ -70,6 +78,11 @@ const SHELL = [
   '/images/worlds/heritage/travel-heritage-v2.jpg',
   '/images/worlds/heritage/work-heritage-v2.jpg',
   '/images/worlds/heritage/foundation-heritage-v2.jpg',
+  '/images/worlds/heritage/foundation-gezondheid-vandaag-v1.jpg',
+  '/images/worlds/heritage/foundation-zorg-dichtbij-v1.jpg',
+  '/images/worlds/heritage/foundation-veilig-vertrouwd-v1.jpg',
+  '/images/worlds/heritage/foundation-meedoen-buurt-v2.jpg',
+  '/images/worlds/heritage/foundation-meedoen-atelier-v1.jpg',
   '/fonts/aFTQ7PxzY382XsXX63LUYJSKSKjWXFBP.woff2',
   '/fonts/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2',
   '/shared/rtg-school-shell.css', '/shared/rtg-school-session.js', '/shared/seizoen.js', '/shared/dagkleur.css', '/shared/verbinding.js', '/apps/geo.js', '/apps/translate.js', '/apps/util.js',

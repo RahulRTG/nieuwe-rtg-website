@@ -24,7 +24,10 @@
        "Wat wij doen, bij u in de buurt". Alleen dat laatste is een voordeur voor
        een lid; de andere twee zijn deuren BINNEN de wereld. */
     { sleutel: 'map-rtf', naam: 'FoundationOS', wereld: '/apps/foundation/os-publiek.html', glyf: 'rtf', items: [
-      'link:rtfbuurt', 'link:rtfportaal',
+    /* Zorg woont hier als eigen rustige voordeur en als direct zorgaanbod. De
+       eerste maakt afspraken en privacy begrijpelijk; de tweede houdt de al
+       bestaande boekingsstroom bereikbaar zonder functies te verdubbelen. */
+      'link:rtfbuurt', 'link:foundationzorg', 'tab:zorg', 'link:rtfportaal',
     /* Twee uit de tikkenmeting (scripts/tikken.js): het bord en het schrift
        bestonden en hingen nergens aan. */
     /* Het Klimaatfonds is een VENSTER op het Living Lab en geen tweede lab:

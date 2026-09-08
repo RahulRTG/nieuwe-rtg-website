@@ -244,7 +244,9 @@
      zegt waarvoor je hem pakt, niet wat hij heet. */
   var SUITE = [
     ['Schrijven & rekenen', [
-      ['/apps/office.html', 'RTG Office', 'Documenten, bladen, presentaties, formulieren en borden -- met de kantoor-drive eronder.'],
+      ['/apps/office.html', 'RTDocs', 'Documenten, bladen, presentaties, formulieren en borden -- met de kantoor-drive eronder.'],
+      ['/apps/decision-room.html', 'Decision Room', 'Volledige afweging, bevoegde menselijke keuze en een controleerbaar besluitspoor.'],
+      ['/apps/project-room.html', 'Project Room', 'Eén volgende stap, een levend dossier en menselijke oplevering op aantoonbaar resultaat.'],
       ['/apps/notities.html', 'Notities', 'Korte aantekeningen die aan een dossier of project blijven hangen.'],
       ['/apps/bestanden.html', 'Bestanden', 'De drive: versies, rechten, bewaartermijn en het spoor wie wat opende.']
     ]],
@@ -257,7 +259,7 @@
     ['Bedrijfsvoering', [
       ['/apps/backoffice.html', 'Backoffice', 'De dagcijfers, partners, orders en de verificatiewachtrij.'],
       ['/apps/kantoren.html', 'De kamers', 'De afdelingskamers van RTG, de boardroom en de regie.'],
-      ['/apps/personeel.html', 'Personeel', 'Rooster, taken, verlof en de PDA’s van de werkvloer.'],
+      ['/apps/personeel.html', 'Team Room', 'Uw werkdag, het team, rooster, afspraken en ontwikkeling rustig bij elkaar.'],
       ['/apps/payroll.html', 'Payroll', 'De loonrun, uren, toeslagen en de salarisadministratie.'],
       ['/apps/balans.html', 'Balans', 'Grootboek, debiteuren, crediteuren en de jaarcijfers.'],
       /* RTG REKENING. Het b-woord in de eigen productnaam vraagt een

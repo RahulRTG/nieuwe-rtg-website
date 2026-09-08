@@ -1,0 +1,107 @@
+/* RTG Heritage · verdiepende appflows 2026
+   Overzicht -> handeling -> zekerheid. Deze laag verandert geen gegevensbron,
+   recht of route; hij geeft de bestaande specialisten een herkenbare familie. */
+
+:where(.rtg-living-flow,.rtg-travel-flow,.rtg-work-flow,.rtg-school-flow){
+  --deep-gold:#d1a85a;--deep-ivory:#f3ede3;--deep-soft:#aaa198;--deep-line:rgba(209,168,90,.22);
+  color:var(--deep-ivory);font-family:Inter,system-ui,sans-serif
+}
+:where(.rtg-living-flow,.rtg-travel-flow,.rtg-work-flow,.rtg-school-flow) h1,
+:where(.rtg-living-flow,.rtg-travel-flow,.rtg-work-flow,.rtg-school-flow) h2,
+:where(.rtg-living-flow,.rtg-travel-flow,.rtg-work-flow,.rtg-school-flow) h3{
+  font-family:"Bodoni Moda",Georgia,serif;font-weight:500;letter-spacing:-.025em
+}
+:where(.rtg-living-flow,.rtg-travel-flow,.rtg-work-flow,.rtg-school-flow) :focus-visible{
+  outline:2px solid var(--deep-gold);outline-offset:3px
+}
+.rtg-deep-nav{position:fixed;z-index:24;left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));display:none;grid-template-columns:repeat(var(--deep-nav-count,3),1fr);border:1px solid var(--deep-line);background:rgba(10,8,8,.94);backdrop-filter:blur(22px);box-shadow:0 18px 60px rgba(0,0,0,.48)}
+.rtg-deep-nav a{min-height:58px;display:grid;place-items:center;align-content:center;gap:3px;color:var(--deep-soft);text-decoration:none;font-size:.62rem;letter-spacing:.02em}
+.rtg-deep-nav a b{font-size:1rem;font-weight:400;color:var(--deep-gold)}
+.rtg-deep-nav a[aria-current="page"]{color:var(--deep-ivory);background:rgba(209,168,90,.08)}
+
+/* LivingOS · dag, afspraak en aandacht */
+body.rtg-living-flow{--bg:#100b09!important;--card:#18110e!important;--card2:#211714!important;--line:rgba(213,167,102,.2)!important;--txt:#f4eee5!important;--muted:#aca096!important;--soft:#82776f!important;background:radial-gradient(circle at 82% 3%,rgba(105,22,42,.18),transparent 30%),linear-gradient(180deg,#100b09,#080706 78%)!important}
+.rtg-living-flow>header{background:rgba(16,11,9,.92)!important;border-color:var(--deep-line)!important}
+.rtg-living-flow>header .ey{color:var(--deep-gold)!important}.rtg-living-flow>header h1{font-size:1.5rem!important;color:var(--deep-ivory)}
+.rtg-living-flow main{max-width:760px;padding-bottom:96px!important}
+.rtg-living-flow .kantoor-intro{display:block!important;padding:clamp(1.2rem,5vw,2.4rem) 0 1.2rem!important;border:0!important;background:none!important}
+.rtg-living-flow .kantoor-intro>.ey{display:block;margin-bottom:.65rem;color:var(--deep-gold)!important;letter-spacing:.22em}
+.rtg-living-flow .kantoor-intro h2{font-size:clamp(2.5rem,8vw,4.2rem)!important;line-height:.94;margin:0 0 .6rem!important}
+.rtg-living-flow .kantoor-intro p{max-width:34rem;color:var(--muted);line-height:1.6}
+.rtg-living-flow .rahulbalk{padding:.45rem;border:1px solid var(--deep-line);background:rgba(28,18,14,.76);box-shadow:0 18px 55px rgba(0,0,0,.2)}
+.rtg-living-flow .rahulbalk .veld{min-height:48px;background:transparent!important;border:0!important}
+.rtg-living-flow .rahulbalk .knop,.rtg-living-flow .knop.vol{background:linear-gradient(135deg,#64162d,#9a2347)!important;color:#fff!important;border-color:#a6425e!important}
+.rtg-living-flow .stuur{padding:.75rem 0;border-bottom:1px solid var(--deep-line)}
+.rtg-living-flow .ldag{position:relative;margin:0;padding:1rem 0 1.15rem 4.9rem;border-left:1px solid rgba(209,168,90,.28)}
+.rtg-living-flow .ldag h3{position:absolute;left:.75rem;top:1.25rem;max-width:3.5rem;color:var(--deep-gold)!important;line-height:1.5}
+.rtg-living-flow .litem{min-height:78px;padding:1rem!important;background:linear-gradient(145deg,rgba(34,24,20,.94),rgba(18,13,11,.97))!important;border-color:var(--deep-line)!important;box-shadow:0 15px 42px rgba(0,0,0,.16)}
+.rtg-living-flow .litem .tijd{color:var(--deep-gold)!important}.rtg-living-flow .litem .wat b{font-family:"Bodoni Moda",Georgia,serif;font-size:1.12rem!important;font-weight:500!important}
+.rtg-living-flow .paneel{background:linear-gradient(160deg,#1d1411,#0f0b09)!important;border-color:rgba(209,168,90,.36)!important;box-shadow:0 30px 100px #000}
+.rtg-living-flow .paneel h3{font-size:2rem!important}.rtg-living-flow .paneel input,.rtg-living-flow .paneel select,.rtg-living-flow .paneel textarea{min-height:46px;background:#17100d!important}
+.rtg-living-flow .os-switcher{background:#0c0807!important;border-color:var(--deep-line)!important}
+.rtg-living-flow>header .terug{border-color:var(--deep-line)!important}.rtg-living-flow .kaart{background:linear-gradient(145deg,#1d1411,#110c0a)!important;border-color:var(--deep-line)!important;padding:1.15rem!important}
+.rtg-living-flow .attn{padding:1.25rem!important;background:linear-gradient(135deg,rgba(111,24,48,.34),rgba(209,168,90,.08))!important;border-color:rgba(209,168,90,.34)!important}
+.rtg-living-flow .attn h2{font-size:1.8rem!important;color:var(--deep-ivory)!important}.rtg-living-flow .attn .r{padding:.75rem 0!important;border-top:1px solid var(--deep-line)}
+.rtg-living-flow .deel{margin:1.7rem 0 .65rem;color:var(--deep-gold);font-size:.64rem;letter-spacing:.2em;text-transform:uppercase}
+.rtg-living-flow .rel{min-height:76px}.rtg-living-flow .rel .nm{font:500 1.15rem "Bodoni Moda",Georgia,serif}
+
+/* TravelOS · reis, vlucht en aankomst */
+body.rtg-travel-flow{--bg:#04121b!important;--card:#081c28!important;--card2:#0c2532!important;--line:rgba(203,155,87,.24)!important;--txt:#f5ede2!important;--muted:#a9a09a!important;--soft:#807a76!important;--gold:#d3a45f!important;background:radial-gradient(circle at 10% 5%,rgba(13,70,86,.45),transparent 34%),linear-gradient(165deg,#061b28,#030a10 74%)!important}
+.rtg-travel-flow>header,.rtg-travel-flow .kop{background:rgba(4,18,27,.92)!important;border-color:var(--deep-line)!important}
+.rtg-travel-flow main{max-width:760px!important;padding-bottom:96px!important}.rtg-travel-flow header .ey{color:var(--deep-gold)!important}
+.rtg-travel-flow .tabs{border-color:var(--deep-line)!important}.rtg-travel-flow .tabs>.tab.aan{color:var(--deep-ivory)!important;border-color:var(--deep-gold)!important}
+.rtg-travel-flow .item,.rtg-travel-flow .pass,.rtg-travel-flow .kaart{background:linear-gradient(145deg,rgba(10,32,44,.97),rgba(4,17,25,.98))!important;border-color:var(--deep-line)!important;box-shadow:0 18px 55px rgba(0,0,0,.2)}
+.rtg-travel-flow .item{min-height:82px;padding:1.1rem!important}.rtg-travel-flow .item h4{font-size:1.24rem!important}.rtg-travel-flow .nr{color:var(--deep-gold)!important}
+.rtg-travel-flow .knop:not(.stil){background:linear-gradient(135deg,#6b1531,#9b2247)!important;color:#fff!important;border:1px solid #a64361!important;min-height:44px}
+.rtg-travel-flow .pass{border-color:rgba(209,168,90,.52)!important}.rtg-travel-flow .pass .code{color:var(--deep-gold)!important}
+.rtg-travel-flow .kop h1{font-size:1.55rem!important}.rtg-travel-flow #dit>.kaart:first-child{position:relative;overflow:hidden;padding:1.4rem!important}
+.rtg-travel-flow #dit>.kaart:first-child:before{content:"UW AANKOMST";display:block;margin-bottom:.65rem;color:var(--deep-gold);font-size:.6rem;letter-spacing:.2em}
+.rtg-travel-flow #vNaam{font-size:2rem!important}.rtg-travel-flow .stand{border:1px solid currentColor;background:transparent!important}
+.rtg-travel-flow .rij{padding:.75rem 0!important;border-color:var(--deep-line)!important}.rtg-travel-flow .vlootrij{min-height:64px;border-color:var(--deep-line)!important}
+.travel-arrival-actions{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.9rem}.travel-arrival-actions a{min-height:48px;display:grid;place-items:center;border:1px solid var(--deep-gold);color:var(--deep-gold);text-decoration:none;font-weight:650}.travel-arrival-actions a:last-child{background:linear-gradient(135deg,#6b1531,#9b2247);border-color:#a64361;color:#fff}
+.travel-assurance{margin-top:.75rem;padding:1rem;border:1px solid var(--deep-line);color:var(--deep-ivory);font:500 1.16rem "Bodoni Moda",Georgia,serif;line-height:1.35}
+
+/* WorkOS · werkdag, besluit en overdracht */
+body.rtg-work-flow{--bg:#06131d;--side:#071722;--card:#0a1d29;--card2:#0d2430;--line:rgba(204,157,88,.22);--txt:#f3ece2;--muted:#aaa39b;--soft:#777873;--gold:#d0a259;--rose:#741b35;background:radial-gradient(circle at 80% 0,rgba(43,73,86,.3),transparent 36%),#06131d!important}
+.rtg-work-flow .top{background:rgba(6,19,29,.94)!important;border-color:var(--deep-line)!important}.rtg-work-flow .brand b{color:var(--deep-gold)}
+.rtg-work-flow .layout aside{background:rgba(5,16,24,.98)!important;border-color:var(--deep-line)!important}.rtg-work-flow main{max-width:1120px}
+.rtg-work-flow .hero{padding:1rem 0 1.35rem;border-bottom:1px solid var(--deep-line)}.rtg-work-flow .hero h1{font-size:clamp(2.75rem,7vw,5.2rem);max-width:780px;line-height:.94}.rtg-work-flow .hero p{font-size:.95rem}
+.rtg-work-flow .stats,.rtg-work-flow .card,.rtg-work-flow .row,.rtg-work-flow .empty{border-color:var(--deep-line)!important;background:linear-gradient(145deg,rgba(12,32,44,.98),rgba(5,19,28,.98))!important}
+.rtg-work-flow .stat{border-color:var(--deep-line)!important}.rtg-work-flow .stat b{color:var(--deep-ivory)}.rtg-work-flow .stat span{color:var(--deep-gold)}
+.rtg-work-flow .card{min-height:150px;padding:1.2rem!important}.rtg-work-flow .card h2{font-size:1.4rem!important}.rtg-work-flow .card p{font-size:.82rem!important}
+.rtg-work-flow .btn.primary{background:linear-gradient(135deg,#c69a50,#dfb66e)!important;color:#06131d!important}.rtg-work-flow .btn{border-color:var(--deep-line)!important;background:#0a1d29!important}
+.rtg-work-flow .tag{border-color:var(--deep-line)!important}.rtg-work-flow .nav button.on{background:#0a1d29!important;border-color:#b23b5c!important}
+.rtg-work-flow .modal{background:rgba(0,0,0,.82)}.rtg-work-flow .dialog{background:#071722!important;border-color:var(--deep-line)!important}
+
+/* FoundationOS · schooldag, huiswerkhulp en bericht */
+body.rtg-school-flow{--deep-ivory:#211b18;--deep-soft:#766f68;--deep-line:rgba(118,82,47,.18);background:radial-gradient(circle at 85% 3%,rgba(131,28,57,.08),transparent 29%),linear-gradient(180deg,#faf6ef,#eee6da)!important;color:#211b18!important;padding-bottom:88px}
+.rtg-school-flow .topnav,.rtg-school-flow>#balk{background:rgba(250,246,239,.93)!important;border-color:var(--deep-line)!important}.rtg-school-flow .topnav .brand,.rtg-school-flow .topnav a{color:#211b18!important}.rtg-school-flow .topnav .brand b{color:#9d7137!important}
+.rtg-school-flow .wrap{max-width:760px!important;align-items:stretch!important;justify-content:flex-start!important;min-height:0!important;padding-top:1.4rem!important;padding-bottom:98px!important}
+.rtg-school-flow .kick{color:#9d7137!important;letter-spacing:.2em;text-transform:uppercase;font-size:.62rem}.rtg-school-flow .logo,.rtg-school-flow h1{font-size:clamp(2.5rem,8vw,4rem)!important;text-align:left!important;line-height:.96}
+.rtg-school-flow .deck,.rtg-school-flow .intro,.rtg-school-flow .stil{color:#766f68!important;text-align:left!important}.rtg-school-flow .keuze{grid-template-columns:1fr!important;max-width:none!important}
+.rtg-school-flow .kaart,.rtg-school-flow .rij,.rtg-school-flow .litem,.rtg-school-flow .mdag,.rtg-school-flow .wdag{background:rgba(255,252,247,.72)!important;border-color:var(--deep-line)!important;color:#211b18!important;box-shadow:0 18px 50px rgba(74,48,30,.07)}
+.rtg-school-flow .rol{text-align:left!important;padding:1.25rem!important;display:grid;grid-template-columns:auto 1fr auto;gap:.3rem 1rem;align-items:center}.rtg-school-flow .rol .ic{grid-row:1/4;font-size:2rem!important}.rtg-school-flow .rol h2,.rtg-school-flow .rol p{margin:0!important}.rtg-school-flow .rol button{grid-column:3;grid-row:1/4}
+.rtg-school-flow .knop{background:#811735!important;color:#fff!important;border-color:#9b3651!important}.rtg-school-flow .knop.grijs{background:transparent!important;color:#6f1830!important;border-color:#8f6b44!important}
+.rtg-school-flow .stuur{border-color:var(--deep-line)!important}.rtg-school-flow .stuur .knop[data-zicht].aan{color:#6f1830!important;border-color:#6f1830!important}.rtg-school-flow .litem{min-height:68px}.rtg-school-flow .litem .tijd{color:#8b6132!important}.rtg-school-flow .paneel,.rtg-school-flow dialog{background:#fbf7f0!important;border-color:var(--deep-line)!important;color:#211b18!important;box-shadow:0 30px 100px rgba(41,25,16,.2)}
+.rtg-school-flow .veld,.rtg-school-flow input,.rtg-school-flow textarea,.rtg-school-flow select{background:#fffaf3!important;color:#211b18!important;border-color:var(--deep-line)!important}
+.rtg-school-flow .adres{color:#7e1734!important}.rtg-school-flow .ongelezen b:before{color:#7e1734!important}.rtg-school-flow .rij small,.rtg-school-flow .rij .tijd{color:#766f68!important}
+.rtg-school-flow .rtg-deep-nav{background:rgba(20,16,14,.96)}.rtg-school-flow .rtg-deep-nav a{color:#bdb4aa}.rtg-school-flow .rtg-deep-nav a[aria-current="page"]{color:#fffaf3}
+
+@media(max-width:800px){
+  .rtg-deep-nav{display:grid;bottom:max(64px,calc(env(safe-area-inset-bottom) + 54px))}
+  body:is(.rtg-living-flow,.rtg-travel-flow,.rtg-school-flow){padding-bottom:154px!important}
+  .rtg-living-flow main,.rtg-travel-flow main,.rtg-school-flow .wrap{padding-bottom:164px!important}
+  .rtg-living-flow main,.rtg-travel-flow main{padding-left:1rem!important;padding-right:1rem!important}
+  .rtg-living-flow .kantoor-intro h2{font-size:3.25rem!important}
+  .rtg-living-flow .stuur{gap:.3rem}.rtg-living-flow .stuur h2{order:-1;width:100%;font-size:1.45rem!important;margin-bottom:.35rem}.rtg-living-flow #wMaand{display:none}
+  .rtg-travel-flow header{padding-left:1rem!important;padding-right:1rem!important}
+  .rtg-work-flow .layout aside{height:70px!important}.rtg-work-flow .nav{display:flex!important;overflow-x:auto;overscroll-behavior-x:contain}.rtg-work-flow .nav button,.rtg-work-flow .nav button:nth-child(n+6){display:grid!important;flex:0 0 74px;min-width:74px}.rtg-work-flow main{padding:28px 16px 94px!important}.rtg-work-flow .hero h1{font-size:3.15rem!important}.rtg-work-flow .stats{margin:1.1rem 0!important}.rtg-work-flow .grid{grid-template-columns:1fr!important}
+  .rtg-school-flow .rol{grid-template-columns:auto 1fr}.rtg-school-flow .rol button{grid-column:1/3;grid-row:auto;min-height:48px}.rtg-school-flow .twee{grid-template-columns:1fr!important}
+}
+@media(max-width:430px){
+  .rtg-living-flow .kantoor-intro h2,.rtg-work-flow .hero h1{font-size:2.8rem!important}
+  .rtg-living-flow .ldag{padding-left:4.2rem}.rtg-living-flow .litem{align-items:flex-start}.rtg-living-flow .litem .tijd{min-width:3.6rem!important}
+  .rtg-travel-flow .tabs{overflow-x:auto;flex-wrap:nowrap!important}.rtg-travel-flow .tabs>.tab{flex:none}
+  .travel-arrival-actions{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){.rtg-deep-nav,.rtg-deep-nav *{transition:none!important}}

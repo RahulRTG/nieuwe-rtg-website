@@ -108,10 +108,10 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 
 | wereld | huis | dat is | onderdelen |
 |---|---|---|---|
-| **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 59 |
+| **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 58 |
 | **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 13 |
 | **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 14 |
-| **FoundationOS** | `/apps/foundation/os-publiek.html` | RTFoundation en haar maatschappelijke werk | 7 |
+| **FoundationOS** | `/apps/foundation/os-publiek.html` | zorg, hulp en maatschappelijke vooruitgang | 9 |
 
 Die laatste kolom telt items in `MAPPEN` en geen schermen. De tabel wordt
 machinaal vergeleken met de code, dus als hij niet meer klopt zakt de bouw.
@@ -454,10 +454,10 @@ De acht domeinen van 11 augustus zijn niet weggegooid; ze zijn een niveau
 gezakt.
 
 ```
-LivingOS      Geld · Wonen · Sociaal · Media · Zorg · Cultuur · Winkel
+LivingOS      Geld · Wonen · Sociaal · Media · Cultuur · Winkel
 WorkOS        Kantoor · Horeca · Handel · Personeel · Onderwijs · Bestuur
 TravelOS      Vervoer · Verblijf · Onderweg · Aankomst
-FoundationOS  Programma's · Veldwerk · Onderzoek · Fondsen
+FoundationOS  Zorg · Programma's · Veldwerk · Onderzoek · Fondsen
 RTG Core      Identiteit · Toestand · Communicatie · AI · Betalen · Media
 ```
 

@@ -165,7 +165,8 @@ module.exports = ({ db, save, crypto }) => {
     log(actor, 'automatisering-teruggedraaid', a.id, a.huis); save(); return { ok: true, automatisering: a, belofte: doel };
   }
   const { projectVanMail, projectTaakZet, projectBewijs, projectOplever } = projectenMaak({
-    db, save, S, id, geldigHuis, tekst, vind, log, nu, klokDatum, besluittypen: BESLUITTYPEN, goedkeuringMaak
+    rtmailBerichten: () => (((db.data.rtmail || {}).berichten) || []),
+    save, S, id, geldigHuis, tekst, vind, log, nu, klokDatum, besluittypen: BESLUITTYPEN, goedkeuringMaak
   });
   return { rtgone: { state, intentieMaak, belofteMaak, frictieMaak, overdrachtMaak, automatiseringVoorbereid, automatiseringVoer, automatiseringHerstel,
     goedkeuringMaak, goedkeuringBeslis, rolGeef, rolTrek, projectVanMail, projectTaakZet, projectBewijs, projectOplever, ROLLEN } };

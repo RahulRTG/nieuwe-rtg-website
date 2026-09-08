@@ -2,11 +2,11 @@
    en menselijke oplevering bij elkaar, zonder de gezamenlijke kern te laten
    uitgroeien tot een tweede router. */
 module.exports = function projectenMaak(h) {
-  const { db, save, S, id, geldigHuis, tekst, vind, log, nu, klokDatum, besluittypen, goedkeuringMaak } = h;
+  const { rtmailBerichten, save, S, id, geldigHuis, tekst, vind, log, nu, klokDatum, besluittypen, goedkeuringMaak } = h;
 
   function projectVanMail(body, context) {
     if (!context || !context.key || !context.codename) return { status: 403, error: 'Een RTMAIL-project vraagt een persoonlijk personeelsaccount.' };
-    const s = S(), huis = geldigHuis(body.huis), berichten = (((db.data.rtmail || {}).berichten) || []),
+    const s = S(), huis = geldigHuis(body.huis), berichten = rtmailBerichten(),
       adres = String(context.codename).trim().toLowerCase().replace(/[^a-z0-9._-]/g, '') + '@rtmail';
     const mail = berichten.find(m => m.id === String(body.mailId || '') && m.naar === adres);
     if (!mail) return { status: 404, error: 'Dit bericht staat niet in uw persoonlijke RTMAIL.' };

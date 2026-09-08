@@ -158,14 +158,43 @@ function oordeel(werkmap, hoofd, tak) {
   if (vooruit.uit === '0') return { stand: 'leeg', waarom: 'nul commits voor op ' + hoofd };
 
   const hoofdBoom = git('rev-parse', `origin/${hoofd}^{tree}`);
+  /* DE NAAM REIST MEE. `git merge` eist een committer, ook met --no-commit, en
+     valt anders om met "Committer identity unknown". Op een werkstation staat
+     die naam in ~/.gitconfig en merk je daar niets van; in een verse CI-job
+     staat hij er NIET. Wie hem uit de omgeving haalt, bouwt een gereedschap dat
+     ergens anders iets anders doet -- dus draagt elke aanroep hem zelf. */
   const inWerkmap = (...args) => {
-    try { return { ok: true, uit: execFileSync('git', ['-C', werkmap, ...args], { encoding: 'utf8', maxBuffer: 1 << 28 }).trim() }; }
-    catch (e) { return { ok: false, uit: String((e && e.stdout) || '') }; }
+    try {
+      return { ok: true, uit: execFileSync('git', ['-C', werkmap,
+        '-c', 'user.name=rtg-takken', '-c', 'user.email=takken@rtg.local',
+        ...args], { encoding: 'utf8', maxBuffer: 1 << 28 }).trim() };
+    } catch (e) { return { ok: false, uit: String((e && e.stdout) || '') }; }
   };
 
   inWerkmap('reset', '--hard', `origin/${hoofd}`);
   inWerkmap('clean', '-qfd');
-  inWerkmap('merge', '--no-commit', '--no-ff', `origin/${tak}`);
+  /* `--allow-unrelated-histories` omdat een deel van de oude takken een EIGEN
+     wortel heeft en dus geen gemeenschappelijke voorouder. Zonder die vlag
+     weigert git te mergen, en dan bleef de index staan op de boom van de
+     hoofdtak -- wat als 'leeg' las. Dat trof hier 66 takken: de meting zei
+     "weg mag" over werk dat nooit vergeleken is. Met de vlag is de proef juist
+     STRENGER: bij een lege basis telt elk bestand van de tak als toevoeging, en
+     alleen als ze allemaal al identiek in de hoofdtak staan valt de merge samen
+     met diens boom. */
+  inWerkmap('merge', '--no-commit', '--no-ff', '--allow-unrelated-histories', `origin/${tak}`);
+
+  /* EEN MERGE DIE NIET LIEP, IS GEEN LEGE MERGE. `git merge` geeft ook een
+     foutcode bij een gewoon conflict, dus de uitkomst zegt te weinig; wat wel
+     onderscheidt is of de merge BEGONNEN is, en dat staat in MERGE_HEAD. Staat
+     die er niet, dan is er niets samengevoegd en zou de index nog exact de boom
+     van de hoofdtak zijn -- en dat las hiervoor als 'leeg', oftewel: weg ermee.
+     Voor een gereedschap dat verwijdert is dat de gevaarlijke kant op falen, en
+     precies zo is deze regel gevonden (CI had geen naam, de merge liep niet, en
+     een tak met eigen werk kwam als leeg terug). */
+  if (!inWerkmap('rev-parse', '-q', '--verify', 'MERGE_HEAD').ok) {
+    inWerkmap('merge', '--abort');
+    return { stand: 'onbeslist', waarom: 'de merge kon niet worden uitgevoerd' };
+  }
 
   const botsend = (inWerkmap('diff', '--name-only', '--diff-filter=U').uit || '')
     .split('\n').map(s => s.trim()).filter(Boolean);

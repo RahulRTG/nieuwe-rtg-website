@@ -69,6 +69,17 @@ function bouwWereld() {
   // Een tak die exact op de hoofdtak staat: nul commits vooruit.
   git(map, 'update-ref', 'refs/remotes/origin/heel-in-main', hoofdSha);
 
+  /* EEN TAK MET EEN EIGEN WORTEL. Die hebben geen gemeenschappelijke voorouder
+     met de hoofdtak, en er staan er hier tientallen van. */
+  git(map, 'checkout', '-q', '--orphan', 'losse-wortel');
+  git(map, 'rm', '-rqf', '--cached', '.');
+  fs.rmSync(path.join(map, 'server'), { recursive: true, force: true });
+  fs.rmSync(path.join(map, 'BEWIJS.md'), { force: true });
+  schrijf(map, 'server/eigen.js', 'werk uit een eigen geschiedenis\n');
+  const wortelSha = commit(map, 'losse wortel');
+  git(map, 'update-ref', 'refs/remotes/origin/losse-wortel', wortelSha);
+  git(map, 'checkout', '-q', '-f', 'main');
+
   const werkmap = fs.mkdtempSync(path.join(os.tmpdir(), 'takkenwerk-'));
   git(map, 'worktree', 'add', '--quiet', '--detach', werkmap, 'refs/remotes/origin/main');
   return { map, werkmap };
@@ -93,6 +104,63 @@ test('het oordeel per tak: weg mag alleen wat aantoonbaar niets toevoegt', () =>
     assert.equal(code.stand, 'inhoud', 'een botsing op echte code laat de tak staan');
     assert.match(code.waarom, /server\/x\.js/, 'en hij zegt waarop hij botste');
   } finally { process.chdir(oud); fs.rmSync(map, { recursive: true, force: true }); fs.rmSync(werkmap, { recursive: true, force: true }); }
+});
+
+/* EEN PROEF DIE NIET KON DRAAIEN, IS NOOIT EEN VRIJBRIEF.
+
+   Dit is de duurste regel van het hele gereedschap, en hij is gevonden doordat
+   CI hem overtrad. `git merge` eist een committer -- ook met --no-commit -- en
+   in een verse CI-job staat die naam nergens. De merge liep dus niet, de index
+   bleef staan op de boom van de hoofdtak, en dat las als "voegt niets toe":
+   weg ermee. Een gereedschap dat verwijdert, faalde naar de gevaarlijke kant.
+
+   Dezelfde vorm zat er nog een keer in: takken met een EIGEN wortel hebben geen
+   gemeenschappelijke voorouder, git weigerde die te mergen, en ook daar bleef de
+   index op de hoofdtak staan. Dat trof 66 van de 181 takken in deze repo.
+
+   Beide worden hier vastgehouden, want dit is niet het soort fout dat je een
+   tweede keer wilt maken. */
+test('een tak met een eigen wortel telt als inhoud en niet als leeg', () => {
+  const { map, werkmap } = bouwWereld();
+  const oud = process.cwd();
+  try {
+    process.chdir(map);
+    const o = takken.oordeel(werkmap, 'main', 'losse-wortel');
+    assert.notEqual(o.stand, 'leeg',
+      'zonder gemeenschappelijke voorouder mag de uitkomst nooit "weg mag" zijn');
+    assert.equal(o.stand, 'inhoud', 'en hij draagt eigen werk, dus hij blijft staan');
+  } finally { process.chdir(oud); fs.rmSync(map, { recursive: true, force: true }); fs.rmSync(werkmap, { recursive: true, force: true }); }
+});
+
+test('zonder een naam in de git-instellingen oordeelt hij nog steeds goed', () => {
+  const { map, werkmap } = bouwWereld();
+  const oud = process.cwd();
+  /* Precies de omgeving van een verse CI-job: geen globale en geen
+     systeeminstellingen, en niets in de omgevingsvariabelen. */
+  const bewaard = {};
+  const leegmaken = ['GIT_CONFIG_GLOBAL', 'GIT_CONFIG_SYSTEM', 'GIT_AUTHOR_NAME',
+    'GIT_AUTHOR_EMAIL', 'GIT_COMMITTER_NAME', 'GIT_COMMITTER_EMAIL', 'EMAIL', 'HOME'];
+  for (const k of leegmaken) bewaard[k] = process.env[k];
+  try {
+    process.chdir(map);
+    process.env.GIT_CONFIG_GLOBAL = '/dev/null';
+    process.env.GIT_CONFIG_SYSTEM = '/dev/null';
+    process.env.HOME = map;
+    for (const k of ['GIT_AUTHOR_NAME', 'GIT_AUTHOR_EMAIL', 'GIT_COMMITTER_NAME',
+      'GIT_COMMITTER_EMAIL', 'EMAIL']) delete process.env[k];
+
+    assert.equal(takken.oordeel(werkmap, 'main', 'eigen-werk').stand, 'inhoud',
+      'een tak met eigen werk blijft staan, ook zonder git-identiteit');
+    assert.equal(takken.oordeel(werkmap, 'main', 'alleen-register').stand, 'leeg',
+      'en het oordeel is niet ineens strenger geworden');
+  } finally {
+    process.chdir(oud);
+    for (const k of leegmaken) {
+      if (bewaard[k] === undefined) delete process.env[k]; else process.env[k] = bewaard[k];
+    }
+    fs.rmSync(map, { recursive: true, force: true });
+    fs.rmSync(werkmap, { recursive: true, force: true });
+  }
 });
 
 /* DE GEVAARLIJKE KANT VAN DE REGISTERLIJST. Elke naam die erbij komt, maakt het

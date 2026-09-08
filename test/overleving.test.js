@@ -133,3 +133,34 @@ test('5. er komt geen samengesteld cijfer uit', () => {
     'de telling draagt iets dat naar een samengesteld oordeel ruikt: ' + platte);
   assert.deepEqual(Object.keys(u.telling).sort(), ['deels', 'ja', 'nee', 'onbekend', 'rijen']);
 });
+
+test('6. het vastgelegde register is de ratel: ja mag niet dalen, nee en onbekend niet stijgen', () => {
+  /* WAAROM DEZE RATEL IN EEN TOETS ZIT EN NIET ALLEEN IN CI. `npm run
+     overleving:controle` doet hetzelfde, maar hij hangt aan een losse stap in
+     ci.yml -- en scripts/norm.js telt een meetbestand in de wortel dat aan geen
+     enkele ratel hangt als `metingenZonderRatel`. Terecht: een register waar
+     alleen een aparte CI-stap op let, verliest zijn bewaker zodra iemand die
+     stap verplaatst. Deze toets draait in elke scherf mee en noemt het bestand
+     bij naam, zodat scripts/lib/metingen.js hem als eigenRatel kan aanwijzen.
+
+     DE RICHTING IS HET PUNT. Niet "de getallen zijn gelijk" -- dat zou elke
+     verbetering laten zakken en dan zet iemand de toets uit. Alleen de verkeerde
+     kant op is fout. En `onbekend` staat er met opzet bij: zonder die derde is
+     een bron weghalen de goedkoopste manier om een `nee` te laten verdwijnen. */
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const pad = path.join(__dirname, '..', 'OVERLEVING.json');
+  const vastgelegd = JSON.parse(fs.readFileSync(pad, 'utf8'));
+  const nu = meet(bronnen()).telling;
+  const was = vastgelegd.telling;
+
+  assert.ok(nu.ja >= was.ja,
+    'overleefde scenario\'s ' + was.ja + ' -> ' + nu.ja + '; deze teller mag alleen stijgen');
+  assert.ok(nu.nee <= was.nee,
+    'niet-overleefde scenario\'s ' + was.nee + ' -> ' + nu.nee + '; deze teller mag alleen dalen');
+  assert.ok(nu.onbekend <= was.onbekend,
+    'ongemeten scenario\'s ' + was.onbekend + ' -> ' + nu.onbekend + '; minder meten is geen vooruitgang');
+  assert.equal(nu.rijen, was.rijen,
+    'er is een scenario bij gekomen of weggehaald zonder OVERLEVING.json bij te werken ' +
+    '(npm run overleving:vast)');
+});

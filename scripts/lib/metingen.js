@@ -136,6 +136,7 @@ const REGISTER = {
      schuld mag alleen krimpen. Die toets is zien zakken, dus deze regel is geen
      bewering (zie de kop over de helft die mensenwerk blijft). */
   'KANTOORMACHT.json': { eigenRatel: 'test/kantoormacht.test.js' },
+  'OVERLEVING.json': { eigenRatel: 'test/overleving.test.js' },
   'TAFELPROEF.json': { eigenRatel: 'test/tafelproef.test.js' },
   /* Het tekstoppervlak hangt aan keuringsregel 68 en niet aan een toets: die
      regel IS de ratel (twee harde tanden, een schaduw) en hij moet elke PR

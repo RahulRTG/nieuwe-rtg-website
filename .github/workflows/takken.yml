@@ -1,0 +1,99 @@
+### DE TAKKEN -- overbodige remote takken opruimen.
+#
+# WAAROM DIT BESTAAT. De takkenlijst liep vol met honderdveertig doodlopende
+# namen uit juli en augustus. Gevaarlijk is dat niet, maar wie zoekt waar er
+# aan gewerkt wordt, moet er eerst doorheen. Handmatig opruimen is 128 keer
+# klikken en gebeurt daarom nooit.
+#
+# WAT DIT WEL EN NIET IS. Dit is GEEN tweede uitzondering op "mergen is
+# mensenwerk" (ONDERHOUD.md). Er wordt hier niets gemerged, niets gepusht naar
+# een tak en niets teruggerold; er verdwijnt alleen een verwijzing naar werk
+# dat aantoonbaar al in de hoofdtak zit. De commit blijft op GitHub bestaan en
+# is met zijn sha terug te halen -- die sha staat in het logboek van de run.
+#
+# HIJ START ALLEEN MET DE HAND. Er staat met opzet geen `schedule` in dit
+# bestand. Een opruimer die 's nachts uit zichzelf takken verwijdert, is
+# precies wat dit huis niet wil: het oordeel is mechanisch, maar het moment
+# waarop je het loslaat hoort van een mens te komen.
+#
+# TWEE SLOTEN VOOR HET WERKELIJK WEGGAAT:
+#   1. `doen` moet letterlijk "verwijder" zijn. Een vinkje is te makkelijk
+#      aangetikt; een woord typ je met opzet.
+#   2. `maximum` kapt de ronde af. Zegt de meting ineens dat er tweehonderd
+#      takken weg mogen, dan is er iets mis met de meting en niet met de repo.
+#
+# HET OORDEEL ZELF staat in scripts/takken.js en wordt bij ELKE run opnieuw
+# bewezen -- een tak gaat alleen weg als samenvoegen met de hoofdtak exact
+# dezelfde boom oplevert. Er is geen lijst die iemand bijhoudt, want zo'n lijst
+# is bij de volgende merge alweer verouderd.
+#
+# Wat er nooit weggaat: de hoofdtak, elke tak met een open pull request, en
+# wat er in `beschermd` wordt meegegeven. Kan de lijst met open PR's niet
+# worden opgehaald, dan verdwijnt er niets.
+
+name: De takken (opruimen)
+
+on:
+  workflow_dispatch:
+    inputs:
+      doen:
+        description: 'Typ exact "verwijder" om ze werkelijk weg te halen. Leeg laten = alleen tonen.'
+        required: false
+        default: ''
+      maximum:
+        description: 'Hoogstens zoveel takken in een ronde.'
+        required: false
+        default: '150'
+      beschermd:
+        description: 'Takken die hoe dan ook blijven staan, gescheiden door een komma.'
+        required: false
+        default: ''
+
+# Verwijderen van een ref valt onder `contents`. Verder heeft dit bestand
+# nergens schrijfrecht op; pull-requests is alleen-lezen omdat de open PR's
+# moeten worden opgezocht. Wat deze workflow mag, staat hier en nergens anders.
+permissions:
+  contents: write
+  pull-requests: read
+
+concurrency:
+  group: takken-opruimen
+  cancel-in-progress: false
+
+jobs:
+  opruimen:
+    name: Wat voegt niets meer toe
+    runs-on: ubuntu-latest
+    steps:
+      - name: De repo, met alle geschiedenis
+        uses: actions/checkout@v4
+        with:
+          # Nul is hier geen luxe: het oordeel voegt takken samen, en dat kan
+          # niet in een ondiepe kloon.
+          fetch-depth: 0
+
+      - name: Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Een naam voor de merges
+        run: |
+          git config user.name 'rtg-takken'
+          git config user.email 'takken@rtg.local'
+
+      - name: Het oordeel (en het opruimen, als daarom gevraagd is)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          HOOFDTAK: ${{ github.event.repository.default_branch }}
+          BESCHERM: ${{ inputs.beschermd }}
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.doen }}" = "verwijder" ]; then
+            echo "::notice::De takken worden werkelijk verwijderd (hoogstens ${{ inputs.maximum }})."
+            node scripts/takken.js --verwijder --max='${{ inputs.maximum }}'
+          else
+            echo "::notice::Droogloop -- er verdwijnt niets. Typ \"verwijder\" bij doen om het echt te doen."
+            node scripts/takken.js
+          fi

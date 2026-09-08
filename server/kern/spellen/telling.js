@@ -62,7 +62,17 @@ module.exports = (ctx) => {
      persoon hoeft te bestaan. */
   function spelTelemetrie(dagen) {
     const n = Math.max(1, Math.min(MAX_DAGEN, Number(dagen) || 30));
-    const grens = new Date(Date.now() - n * 86400000).toISOString().slice(0, 10);
+    /* EEN MODULE MET EEN KLOK HEEFT ER EEN, EN NIET TWEE. Hier stond
+       `Date.now()`, terwijl telPotje() hierboven de dag SCHRIJFT met `nu()`.
+       Rijen kwamen dus binnen op de ene klok en werden eruit gefilterd op de
+       andere. In productie vallen die samen, dus het bleef latent -- en
+       onzichtbaar tot een toets met vaste datums 30 dagen oud werd: op
+       8 september viel het potje van 8 augustus buiten het venster van dertig
+       dagen en telde test/speltelling.test.js 2 in plaats van 3.
+
+       Dat is dezelfde soort vervaldatum als in de golden-path-toets, alleen
+       zat hij hier in de BRON en niet in de toets. */
+    const grens = new Date(Date.parse(nu()) - n * 86400000).toISOString().slice(0, 10);
     const rijen = T().filter(r => r.dag >= grens);
 
     const perSpel = new Map();

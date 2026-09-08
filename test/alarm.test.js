@@ -35,7 +35,13 @@ function maak(opties) {
   /* De derde uitgang, als nepmelder. `actief` is de schakelaar die in het echt
      uit ERR_WEBHOOK_URL komt; standaard staat hij hier AAN, zodat een toets die
      er niets over zegt toch merkt als er ineens niets meer naar buiten gaat. */
-  const melder = { actief: o.buitenUit ? false : true, melden: (e, ctx) => buiten.push({ bericht: e.message, ctx }) };
+  /* `stand()` hoort er wel degelijk bij: de echte melder heeft hem altijd, en
+     een stub zonder stand liet het bord vroeger stil aannemen dat de uitgang
+     onafhankelijk was -- precies de fail-open die server/foutmelder.js sinds
+     8 september niet meer doet. Standaard dus een BEWEZEN externe uitgang;
+     `buitenStand` in de opties zet er een andere stand voor in de plaats. */
+  const melder = { actief: o.buitenUit ? false : true, melden: (e, ctx) => buiten.push({ bericht: e.message, ctx }),
+    stand: () => ('buitenStand' in o ? o.buitenStand : { onafhankelijk: true, beperking: null }) };
   const alarm = maakAlarm({
     foutmelder: () => (o.geenMelder ? null : melder),
     db, opslag: maakCmdOpslag({ db }), save: () => {},
@@ -231,4 +237,34 @@ test('zonder uitgang zegt de stand DAT er geen uitgang is, in plaats van te zwij
   const zonder = maak(Object.assign({ geenMelder: true }, RUSTIG));
   assert.match(zonder.alarm.stand().geenUitgang, /geen foutmelder/,
     'en helemaal geen melder is een ANDERE reden dan een lege url -- dat verschil hoort te blijven');
+});
+
+/* EEN UITGANG WAARVAN JE DE ONAFHANKELIJKHEID NIET KENT, IS GEEN BEWAKING.
+
+   Het bord telde hier `onafhankelijk !== false`, en dat maakte van "niet vast
+   te stellen" stil een "ja": een melder die het niet wist, werd op het scherm
+   "de externe webhook (ERR_WEBHOOK_URL)" en `geenUitgang` bleef leeg. Dat is
+   de gevaarlijkste vorm van deze laag -- het bord belooft dan een alarm dat bij
+   een volledige app- of hostuitval niet afgaat. Drie standen, drie uitkomsten. */
+test('onbekende onafhankelijkheid is geen groen op het alarmbord', () => {
+  const bewezen = maak(RUSTIG).alarm.stand();
+  assert.equal(bewezen.geenUitgang, null, 'een BEWEZEN externe uitgang laat het veld leeg');
+  assert.ok(bewezen.uitgangen.some(u => /externe webhook/.test(u)), 'en staat als externe webhook in de lijst');
+
+  const zelfde = maak(Object.assign({ buitenStand: { onafhankelijk: false,
+    beperking: 'Ontvangst op de eigen storingenwebhook; geen bewaking bij volledige app- of hostuitval.' } }, RUSTIG)).alarm.stand();
+  assert.ok(zelfde.geenUitgang, 'ontvangst op de eigen app is geen bewaking, en dat hoort er te staan');
+  assert.match(zelfde.geenUitgang, /hostuitval/);
+  assert.ok(zelfde.uitgangen.some(u => /dezelfde app/.test(u)), 'en de lijst noemt hem niet extern');
+
+  const onbekend = maak(Object.assign({ buitenStand: { onafhankelijk: null,
+    beperking: 'APP_URL ontbreekt of is geen geldig adres, dus of deze ontvanger buiten deze app staat is niet vast te stellen.' } }, RUSTIG)).alarm.stand();
+  assert.ok(onbekend.geenUitgang, 'niet vast te stellen mag niet als een werkende uitgang lezen');
+  assert.match(onbekend.geenUitgang, /niet vast te stellen/);
+  assert.ok(!onbekend.uitgangen.some(u => /externe webhook \(ERR_WEBHOOK_URL\)/.test(u)),
+    'en het bord noemt hem niet "de externe webhook" alsof het zeker is');
+
+  /* Een melder die helemaal geen stand kan geven, weet het ook niet. */
+  const stil = maak(Object.assign({ buitenStand: {} }, RUSTIG)).alarm.stand();
+  assert.ok(stil.geenUitgang, 'een melder zonder oordeel levert geen groen op');
 });

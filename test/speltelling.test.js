@@ -182,3 +182,30 @@ test('de telling staat in het bewaarbeleid en verloopt dus vanzelf', () => {
   h.noteerUitslag(potje('p1', 'schaak', ['anna', 'boris'], 'CN-anna'));
   assert.match(h.db.data.spelTelling[0].at, /^\d{4}-\d{2}-\d{2}T/);
 });
+
+/* HET VENSTER REKENT MET DE KLOK VAN DE MODULE, NIET MET DIE VAN HET PROCES.
+
+   `spelTelemetrie()` nam zijn ondergrens uit `Date.now()`, terwijl `telPotje()`
+   de dag SCHRIJFT met `nu()`. Twee klokken in een module: rijen kwamen binnen
+   op de ene en werden eruit gefilterd op de andere. In productie vallen die
+   samen, dus het bleef latent -- en het viel pas op toen de toets hierboven
+   dertig dagen oud werd: op 8 september 2026 lag het potje van 8 augustus
+   buiten het venster van dertig dagen en telde hij 2 in plaats van 3.
+
+   Die toets zou dus over dertig dagen opnieuw kunnen rotten zonder dat er iets
+   stuk is. Deze toets niet: hij zet de klok op een datum ver van vandaag en
+   controleert de ondergrens RECHTSTREEKS. Zodra iemand `Date.now()` terugzet,
+   zakt hij -- vandaag, morgen en over een jaar. */
+test('het venster rekent met de klok van de module en niet met die van het proces', () => {
+  const t = maak('2020-03-15');
+  t.noteerUitslag(potje('p1', 'dam', ['a', 'b'], 'CN-a'));
+
+  const r = t.spelTelemetrie(30);
+  assert.equal(r.vanaf, '2020-02-14', 'de ondergrens ligt dertig dagen voor de klok van de module');
+  assert.equal(r.totaal.potjes, 1, 'een potje van "vandaag" valt nooit buiten zijn eigen venster');
+
+  /* En een ander venster schuift mee, zodat de grens echt gerekend wordt en
+     niet toevallig goed uitkomt. */
+  assert.equal(t.spelTelemetrie(1).vanaf, '2020-03-14');
+  assert.equal(t.spelTelemetrie(365).vanaf, '2019-03-16');
+});

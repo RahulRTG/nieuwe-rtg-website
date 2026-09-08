@@ -77,3 +77,52 @@ test('gedeelde ontvangstlimiet en volle opslag geven geen vals ontvangstbewijs',
     assert.equal(a.bewaar('eerste', raw, {}, nu).status, 429);
   } finally { a.close(); b.close(); fs.rmSync(map, { recursive: true, force: true }); }
 });
+
+/* EEN GEWONE WEBHOOK LEVERT GEEN BEWIJS, DUS ZIJN ANTWOORD DOET NIET MEE.
+
+   De grens van 4 KB op het antwoordlichaam stond buiten de ondertekende tak en
+   gold daardoor ook voor een gewone collector (Slack, Discord, een eigen bak).
+   Een 200 met een groter antwoord -- een pagina, een echo van de melding -- werd
+   geboekt als MISLUKT met "Ontvangstbewijs te groot.", en de zelfproef op het
+   techniekbord meldde een werkende alarmweg als kapot. Alleen de ONDERTEKENDE
+   weg leest het antwoord; daar blijft de grens staan. */
+test('een 2xx van een ongetekende webhook telt, ook met een groot antwoordlichaam', async () => {
+  const groot = 'x'.repeat(5000);
+  const gezien = [];
+  const srv = http.createServer((req, res) => {
+    const b = []; req.on('data', c => b.push(c));
+    req.on('end', () => { gezien.push(Buffer.concat(b).length); res.writeHead(200, { 'content-type': 'text/html' }); res.end(groot); });
+  });
+  await new Promise(resolve => srv.listen(0, '127.0.0.1', resolve));
+  const url = 'http://127.0.0.1:' + srv.address().port + '/collector';
+  try {
+    const m = maakFoutmelder({ url, intern: true, appUrl: 'https://ergens-anders.test', timeout: 2000,
+      log: { warn: () => {} } });
+    assert.strictEqual(m.stand().onafhankelijk, true, 'deze collector staat buiten de app; anders meet de toets iets anders');
+    const r = await m.zelfproef('grote-echo');
+    assert.strictEqual(r.ok, true, 'een 200 is een geslaagde bezorging, wat de ontvanger verder ook terugpraat');
+    assert.strictEqual(r.status, 200);
+    assert.strictEqual(m.stand().bezorgd, 1);
+    assert.strictEqual(m.stand().mislukt, 0, 'en hij telt niet als mislukt');
+    assert.strictEqual(m.stand().laatsteFout, null, 'er hoort geen "Ontvangstbewijs te groot." op het bord te staan');
+    assert.strictEqual(gezien.length, 1, 'een ongetekende bezorging wordt niet herhaald');
+  } finally { srv.closeAllConnections(); await new Promise(resolve => srv.close(resolve)); }
+});
+
+/* De ondertekende weg houdt zijn grens WEL: daar gaat het antwoord door
+   JSON.parse, en een onbegrensd lichaam is daar een echte last. */
+test('de ondertekende weg weigert nog steeds een te groot ontvangstbewijs', async () => {
+  const srv = http.createServer((req, res) => {
+    const b = []; req.on('data', c => b.push(c));
+    req.on('end', () => { res.writeHead(200, { 'content-type': 'application/json' }); res.end('{"vul":"' + 'y'.repeat(6000) + '"}'); });
+  });
+  await new Promise(resolve => srv.listen(0, '127.0.0.1', resolve));
+  const url = 'http://127.0.0.1:' + srv.address().port + protocol.PAD;
+  try {
+    const m = maakFoutmelder({ url, sleutel, intern: true, appUrl: 'https://ergens-anders.test', timeout: 2000,
+      log: { warn: () => {} } });
+    const r = await m.zelfproef('te-groot-bewijs');
+    assert.strictEqual(r.ok, false, 'een onbegrensd "bewijs" hoort niet door JSON.parse te gaan');
+    assert.match(String(r.reden), /te groot/i);
+  } finally { srv.closeAllConnections(); await new Promise(resolve => srv.close(resolve)); }
+});

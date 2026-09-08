@@ -66,16 +66,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: De repo, met alle geschiedenis
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           # Nul is hier geen luxe: het oordeel voegt takken samen, en dat kan
           # niet in een ondiepe kloon.
           fetch-depth: 0
+          # Deze job is de eerste in dit huis die werkelijk iets weghaalt, en
+          # juist daarom blijft het token niet in .git/config achter. Het
+          # verwijderen gaat langs de API met het token in de omgeving van die
+          # ene stap; zie de kop van scripts/takken.js.
+          persist-credentials: false
 
       - name: Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
         with:
-          node-version: '22'
+          node-version-file: '.nvmrc'
 
       - name: Een naam voor de merges
         run: |

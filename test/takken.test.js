@@ -132,3 +132,32 @@ test('de workflow start alleen met de hand en vraagt een getypt woord', () => {
   assert.match(wf, /permissions:\n  contents: write\n  pull-requests: read\n/,
     'precies twee rechten, en pull-requests alleen-lezen');
 });
+
+/* HET TOKEN BLIJFT NIET IN DE WERKMAP LIGGEN, en dat is hier geen formaliteit:
+   dit is de enige job in dit huis die werkelijk iets weghaalt. De checkout laat
+   dus niets achter (scripts/ci-keten.js regel 1), en daarmee ligt vast dat het
+   verwijderen NIET langs `git push` kan gaan -- die zou zonder credential stil
+   op een 403 stuklopen. Deze twee horen bij elkaar; wie de een terugdraait moet
+   de ander meenemen, en daarom zakt deze toets op allebei. */
+test('de opruimer verwijdert langs de API, en de checkout laat geen token achter', () => {
+  const wf = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'takken.yml'), 'utf8');
+  assert.match(wf, /persist-credentials: false/, 'de checkout laat geen credential in .git/config achter');
+
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'takken.js'), 'utf8');
+  /* Commentaar is geschiedenis en geen commando -- die uitleg mag `git push`
+     gewoon noemen, zoals ook test/ci-keten.test.js dat toestaat. */
+  const code = bron.split(/\r?\n/).filter(r => !/^\s*(\/\*|\*|\/\/)/.test(r)).join('\n');
+  assert.doesNotMatch(code, /'push'/, 'zonder credential is `git push` geen werkende weg meer');
+  assert.match(code, /-X', 'DELETE'/, 'de verwijzing gaat weg met een DELETE op de API');
+});
+
+/* EEN VERWIJDERING DIE NIET DOORGING, MAG NIET ALS GELUKT LEZEN. 204 is weg en
+   422 is "hij was al weg"; al het andere -- een 403 op een beschermde tak
+   voorop -- is een mislukking met zijn code erbij, zodat het logboek zegt wat
+   er gebeurde in plaats van te zwijgen. */
+test('de uitslag van een verwijdering komt uit de HTTP-status', () => {
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'takken.js'), 'utf8');
+  assert.match(bron, /code === '204' \|\| code === '422'/, '204 en 422 tellen als weg');
+  assert.match(bron, /return \{ ok: false, reden: 'HTTP ' \+ code \}/, 'en de rest draagt zijn code');
+  assert.match(bron, /if \(mislukt\) process\.exit\(1\)/, 'een mislukte ronde eindigt met een foutcode');
+});

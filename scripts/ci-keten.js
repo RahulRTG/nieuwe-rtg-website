@@ -60,14 +60,24 @@ function losseActions(tekst, bestand) {
 
    De regel kijkt naar het blok dat op de checkout volgt: `with:` en daaronder
    de inspringende sleutels. Staat `persist-credentials: false` daar niet bij,
-   dan blijft het token in .git/config staan. */
+   dan blijft het token in .git/config staan.
+
+   EEN STAP HOEFT NIET MET `uses:` TE BEGINNEN. Schrijf je hem als `- name:` met
+   de `uses:` eronder, dan staat er geen streepje voor. De eerste versie van
+   deze regel eiste dat streepje wel, en miste daardoor precies een checkout in
+   dit huis: die van takken.yml, het enige bestand dat werkelijk push-recht
+   vraagt. Een keuring die je met een opmaakkeuze omzeilt, keurt niets; het
+   niveau van de STAP komt daarom van het streepje als dat er staat, en anders
+   van de inspringing van `uses:` zelf. */
 function checkoutMetCredential(tekst, bestand) {
   const fout = [];
   const R = String(tekst).split(/\r?\n/);
   R.forEach((regel, i) => {
-    const m = /^(\s*)-\s*uses:\s*actions\/checkout@/.exec(regel);
+    const m = /^(\s*)(-\s*)?uses:\s*actions\/checkout@/.exec(regel);
     if (!m) return;
-    const diep = m[1].length;
+    /* Zonder streepje is `uses:` een sleutel BINNEN de stap en ligt de stap zelf
+       twee tekens naar links; met streepje is dit de eerste regel van de stap. */
+    const diep = m[2] ? m[1].length : Math.max(0, m[1].length - 2);
     let gevonden = false;
     for (let j = i + 1; j < R.length; j++) {
       const r = R[j];

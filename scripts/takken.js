@@ -43,8 +43,10 @@
      node scripts/takken.js --verwijder     verwijdert wat aantoonbaar weg mag
      node scripts/takken.js --max=40        hoogstens zoveel in een ronde
 
-   Verwijderen kan alleen waar de omgeving push-recht heeft (in de praktijk:
-   .github/workflows/takken.yml). Lokaal draait hij prima als meting.
+   Verwijderen vraagt een GITHUB_TOKEN met schrijfrecht op de inhoud (in de
+   praktijk: .github/workflows/takken.yml) en gaat langs de API, zodat er geen
+   push-recht in de werkmap hoeft achter te blijven. Lokaal draait hij prima
+   als meting: zonder token wordt er niets opgezocht en dus niets verwijderd.
    ========================================================================== */
 'use strict';
 const { execFileSync } = require('node:child_process');
@@ -117,6 +119,34 @@ function takkenMetOpenPr(repo) {
     if (lijst.length < 100) break;
   }
   return namen;
+}
+
+/* EEN TAK WEGHALEN, LANGS DE API EN NIET LANGS `git push`.
+
+   Dat lijkt een omweg -- push-recht heeft deze job immers -- maar het is er
+   juist om dat recht NIET in de werkmap te laten liggen. `git push --delete`
+   werkt alleen als de checkout het token in .git/config achterlaat, en dan
+   staat het daar voor alles wat verder in die job draait. De keuring in
+   scripts/ci-keten.js zegt dat met zoveel woorden ("een checkout laat geen
+   credential achter"), en deze workflow was het eerste bestand dat werkelijk
+   iets wilde pushen. De uitweg is niet een uitzondering op die regel maar de
+   weg die hem niet nodig heeft: het token blijft in de omgeving van deze ene
+   stap, en de verwijzing gaat weg met een DELETE.
+
+   De uitslag is de HTTP-status en niet de uitvoer: 204 is weg, 422 betekent
+   meestal dat hij al weg was, en al het andere is een mislukking met zijn
+   code erbij. */
+function verwijderTak(repo, token, tak) {
+  let code;
+  try {
+    code = execFileSync('curl', ['-sS', '-o', '/dev/null', '-w', '%{http_code}',
+      '-X', 'DELETE', '-H', 'Authorization: Bearer ' + token,
+      '-H', 'Accept: application/vnd.github+json',
+      `https://api.github.com/repos/${repo}/git/refs/heads/${encodeURIComponent(tak)}`],
+    { encoding: 'utf8' }).trim();
+  } catch (e) { return { ok: false, reden: 'de aanroep zelf mislukte' }; }
+  if (code === '204' || code === '422') return { ok: true };
+  return { ok: false, reden: 'HTTP ' + code };
 }
 
 /* HET BEWIJS PER TAK. Geeft 'leeg' (voegt niets toe), 'inhoud' (voegt wel iets
@@ -212,15 +242,19 @@ function main() {
     process.exit(1);
   }
 
+  const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
+  if (!token) {
+    console.error('\nGeen GITHUB_TOKEN, dus er kan niets worden verwijderd.');
+    process.exit(1);
+  }
   let mislukt = 0;
-  for (let i = 0; i < weg.length; i += 40) {
-    const groep = weg.slice(i, i + 40).map(x => x[0]);
-    const r = gitStil('push', 'origin', '--delete', ...groep);
-    if (!r.ok) for (const t of groep) { const los = gitStil('push', 'origin', '--delete', t); if (!los.ok) { mislukt++; console.error(`  niet verwijderd: ${t}`); } }
+  for (const [tak] of weg) {
+    const r = verwijderTak(repo, token, tak);
+    if (!r.ok) { mislukt++; console.error(`  niet verwijderd: ${tak} (${r.reden})`); }
   }
   console.log(`\nVerwijderd: ${weg.length - mislukt}. Mislukt: ${mislukt}.`);
   if (mislukt) process.exit(1);
 }
 
 if (require.main === module) main();
-module.exports = { REGISTERS, BESCHERMD, oordeel, hoofdtak };
+module.exports = { REGISTERS, BESCHERMD, oordeel, hoofdtak, verwijderTak };

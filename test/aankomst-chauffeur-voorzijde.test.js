@@ -35,6 +35,6 @@ test('chauffeur, voertuig en sleutel worden niet als belofte verzonnen',()=>{
 test('de nieuwe aankomstvoorzijde blijft in kleine modules en gebruikt de systeemvorm',()=>{
   const bestanden=['public/apps/rit.js','public/apps/rit-momenten.js','public/shared/rtg-aankomst-2026.css','public/shared/rtg-aankomst-momenten-2026.css'];
   for(const bestand of bestanden)assert.ok(Buffer.byteLength(lees(bestand))<10*1024,bestand+' is te groot');
-  assert.match(lees('public/shared/rtg-heritage-adapters.css'),/rtg-arrival-experience \.rit-nav/);
+  assert.match(lees('public/shared/rtg-heritage-experiences.css'),/rtg-arrival-experience \.rit-nav/);
   assert.match(lees('public/shared/travel-os-config.js'),/AANKOMST & CHAUFFEUR/);
 });

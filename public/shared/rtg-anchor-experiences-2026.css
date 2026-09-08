@@ -116,6 +116,8 @@ body.rtg-travel-experience[data-rtg-world-dashboard-ready="true"]{background:rad
 .rtg-travel-experience .travel-hero-actie{margin-top:1rem}
 .rtg-travel-experience :where(.strook,.rahulsnel,.kompaskaart,.reisregister,.reisdiensten>a,.volgendblok){border-color:rgba(213,181,116,.22)!important;background-color:#081d2e!important}
 .rtg-travel-experience .actieknop{border-color:#b18c4c!important;background:linear-gradient(100deg,#caa760,#e1c58d)!important;color:#071522!important}
+body.rtg-travel-experience[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .actieknop,
+body.rtg-travel-experience[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .actieknop :where(span,b){color:#071522!important}
 .rtg-travel-experience .micro,.rtg-travel-experience .strookkop h2{color:var(--anchor-gold)!important}
 .rtg-travel-experience .routekort,.rtg-travel-experience .status,.rtg-travel-experience .gereed{border-color:rgba(213,181,116,.32)!important}
 
@@ -203,7 +205,7 @@ body.rtg-school-experience{
 }
 @media(max-width:390px){
   .today-moment,.today-attention a{grid-template-columns:2.8rem minmax(0,1fr)}.today-moment>:last-child,.today-attention em{grid-column:2}.today-section h2{font-size:1.45rem}
-  .rtg-travel-experience .travel-belofte{font-size:3.05rem}.rtg-work-experience .doelgroeptekst h2{font-size:3rem!important}.rtg-school-experience .enterprise-hero h2{font-size:2.9rem!important}
+  .rtg-travel-experience .travel-belofte{font-size:3.05rem}.rtg-work-experience .doelgroeptekst h2{font-size:3rem!important}.rtg-work-experience .doelgroepnav{display:grid!important;grid-template-columns:1fr!important;overflow:visible!important}.rtg-work-experience .doelgroepnav a{min-width:0!important}.rtg-school-experience .enterprise-hero h2{font-size:2.9rem!important}
 }
 @media(prefers-reduced-motion:reduce){
   :where(.rtg-today-experience,.rtg-travel-experience,.rtg-work-experience,.rtg-school-experience) *{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}

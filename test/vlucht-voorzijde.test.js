@@ -45,8 +45,8 @@ test('de instapcode blijft tabgebonden, vernieuwbaar en intrekbaar', () => {
 
 test('de nieuwe vluchtlaag blijft klein en gebruikt de centrale systeemvorm', () => {
   const css = lees('public/shared/rtg-vlucht-2026.css');
-  const adapter = lees('public/shared/rtg-heritage-adapters.css');
+  const ervaringen = lees('public/shared/rtg-heritage-experiences.css');
   assert.ok(Buffer.byteLength(css) < 10 * 1024);
-  assert.match(adapter, /rtg-flight-experience \.vlucht-nav/);
+  assert.match(ervaringen, /rtg-flight-experience \.vlucht-nav/);
   assert.doesNotMatch(css, /border-radius:var\(--rtg-radius-system\)/);
 });

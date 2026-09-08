@@ -23,6 +23,12 @@ async function api(base, pad, body) {
   return (await fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}) })).json();
 }
 
+async function openVolledigePda(page, tab) {
+  await page.locator('.trm-nav button[data-trm-diep="hulp"]').click();
+  await page.waitForSelector('.wos-dock button[data-tab="' + tab + '"]', { state: 'visible', timeout: 15000 });
+  await page.click('.wos-dock button[data-tab="' + tab + '"]');
+}
+
 test('PDA in de browser: trainingskaart rendert, tips klappen uit, gelezen-voortgang werkt',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = verseDataDir();
@@ -47,10 +53,8 @@ test('PDA in de browser: trainingskaart rendert, tips klappen uit, gelezen-voort
     }, [login.token, 'KIKUNOI']);
     await page.goto(base + '/apps/personeel.html', { waitUntil: 'domcontentloaded' });
 
-    // 3) naar de Hulp-tab; de trainingskaart moet verschijnen
-    // het Werk-OS verbergt de tabbar; de Hulp-app opent via het dock
-    await page.waitForSelector('.wos-dock button[data-tab="hulp"]', { state: 'visible', timeout: 10000 });
-    await page.click('.wos-dock button[data-tab="hulp"]');
+    // 3) via Team Room naar de volledige Hulp-tab; de trainingskaart verschijnt
+    await openVolledigePda(page, 'hulp');
     await page.waitForSelector('#trainKaart .card', { timeout: 10000 });
     const kop = await page.textContent('#trainKaart .k');
     assert.match(kop, /Training/i, 'de kaart toont de kop Training & tips');
@@ -107,6 +111,7 @@ test('PDA in de browser: pauze staat naast de klok, en telt minuten en niets and
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, [login.token, 'KIKUNOI']);
     await page.goto(base + '/apps/personeel.html', { waitUntil: 'domcontentloaded' });
+    await openVolledigePda(page, 'vandaag');
 
     // uitgeklokt is er geen pauze te nemen: de knop hoort er dan niet te staan
     await page.waitForSelector('#klokBtn', { timeout: 12000 });
@@ -176,6 +181,7 @@ test('PDA in de browser: een gast vraagt aandacht, het personeel ziet het op Van
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, [login.token, 'KIKUNOI']);
     await page.goto(base + '/apps/personeel.html', { waitUntil: 'domcontentloaded' });
+    await openVolledigePda(page, 'vandaag');
 
     await page.waitForSelector('#todayWrap [data-aankl]', { timeout: 12000 });
     const tekst = await page.textContent('#todayWrap');

@@ -48,9 +48,9 @@ test('de Media-voordeur legt de aanbeveling eerlijk uit', () => {
 test('de nieuwe Media-laag blijft klein en de systeemradius blijft centraal', () => {
   const css = lees('public/shared/rtg-media-2026.css');
   const js = lees('public/apps/media/voorzijde.js');
-  const adapter = lees('public/shared/rtg-heritage-adapters.css');
+  const ervaringen = lees('public/shared/rtg-heritage-experiences.css');
   assert.ok(Buffer.byteLength(css) < 10 * 1024, 'Media CSS hoort onder 10 KiB te blijven');
   assert.ok(Buffer.byteLength(js) < 5 * 1024, 'voordeur-JS hoort onder 5 KiB te blijven');
-  assert.match(adapter, /rtg-media-experience \.media-mobile-nav/);
+  assert.match(ervaringen, /rtg-media-experience \.media-mobile-nav/);
   assert.doesNotMatch(css, /border-radius:var\(--rtg-radius-system\)/);
 });

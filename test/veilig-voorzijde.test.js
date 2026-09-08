@@ -41,10 +41,10 @@ test('de nieuwe Veilig-lagen blijven klein en gebruiken de centrale systeemradiu
   const css = lees('public/shared/rtg-veilig-2026.css');
   const vandaag = lees('public/apps/veilig/vandaag.js');
   const voorzijde = lees('public/apps/veilig/voorzijde.js');
-  const adapter = lees('public/shared/rtg-heritage-adapters.css');
+  const ervaringen = lees('public/shared/rtg-heritage-experiences.css');
   assert.ok(Buffer.byteLength(css) < 10 * 1024);
   assert.ok(Buffer.byteLength(vandaag) < 7 * 1024);
   assert.ok(Buffer.byteLength(voorzijde) < 5 * 1024);
-  assert.match(adapter, /rtg-safe-experience \.veilig-nav/);
+  assert.match(ervaringen, /rtg-safe-experience \.veilig-nav/);
   assert.doesNotMatch(css, /border-radius:var\(--rtg-radius-system\)/);
 });

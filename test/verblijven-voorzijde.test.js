@@ -47,5 +47,5 @@ test('de verblijfsvoorzijde blijft in kleine modules en gebruikt de systeemvorm'
   for (const bestand of bestanden) assert.ok(Buffer.byteLength(lees(bestand)) < 10 * 1024, bestand + ' is te groot');
   const css = lees('public/shared/rtg-verblijven-2026.css') + lees('public/shared/rtg-verblijven-momenten-2026.css');
   assert.doesNotMatch(css, /border-radius:var\(--rtg-radius-system\)/);
-  assert.match(lees('public/shared/rtg-heritage-adapters.css'), /rtg-stay-experience \.verblijf-nav/);
+  assert.match(lees('public/shared/rtg-heritage-experiences.css'), /rtg-stay-experience \.verblijf-nav/);
 });

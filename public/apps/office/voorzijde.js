@@ -138,5 +138,9 @@
     terug.addEventListener('click', voorzijde); oudeKop.appendChild(terug);
   }
   w.RTGDocs = Object.freeze({ vernieuw: laad, dossier: openDossier, voorzijde: voorzijde, diep: diep });
-  openPaneel('nodig'); laad();
+  /* In RTG Command is Office al het diepe werkblad. Daar hoort geen tweede
+     rustige voordeur vóór de editor te liggen: de schil heeft het document
+     immers bewust geopend. Zelfstandig blijft RTDocs wel op de voorzijde. */
+  if (d.body.hasAttribute('data-ios-uit')) diep();
+  else { openPaneel('nodig'); laad(); }
 }(window, document));

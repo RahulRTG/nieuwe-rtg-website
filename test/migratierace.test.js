@@ -49,11 +49,18 @@ const { DatabaseSync } = require('node:sqlite');
 const start = Number(process.argv[2]);
 const db = new DatabaseSync(process.argv[1]);
 db.exec('PRAGMA busy_timeout=5000');
-db.exec('PRAGMA journal_mode=WAL');
+const tot = Date.now() + 5000;
+for (;;) {
+  try { db.exec('PRAGMA journal_mode=WAL'); break; }
+  catch (e) {
+    if (!/lock|busy/i.test(String((e && e.message) || e)) || Date.now() >= tot) throw e;
+    Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 25);
+  }
+}
 const m = require(process.argv[3]);
 while (Date.now() < start) { /* strak wachten tot het sein */ }
 const uit = m.draai(db);
-process.stdout.write(JSON.stringify({ gedraaid: uit.gedraaid.length, overgeslagen: (uit.overgeslagen || []).length }));
+process.stdout.write(JSON.stringify({ gedraaid: uit.gedraaid.map(x => x.n), overgeslagen: uit.overgeslagen || [] }));
 `;
 
 function raceRonde(aantal) {
@@ -112,12 +119,17 @@ test('zes processen migreren tegelijk, en alle zes komen op', async () => {
     assert.deepEqual(nummers, [...new Set(nummers)].sort((a, b) => a - b),
       'een migratie staat dubbel in het grootboek');
 
-    /* EN PRECIES EEN PROCES HEEFT ZE ECHT GEDRAAID. De rest hoort niets te
-       hebben gedaan -- of het nu kwam doordat ze het van tevoren al zagen, of
-       doordat ze het slot verloren en binnen de transactie opnieuw keken. */
-    const gedraaid = uit.map(r => { try { return JSON.parse(r.uit).gedraaid; } catch (e) { return -1; } });
-    assert.equal(gedraaid.filter(n => n > 0).length, 1,
-      'meer dan een proces zegt migraties te hebben gedraaid: ' + JSON.stringify(gedraaid));
+    /* EN ELKE MIGRATIE IS DOOR PRECIES EEN PROCES GEDRAAID. Een migratie houdt
+       bewust alleen zijn EIGEN transactie vast. Na de commit mag een wachtend
+       proces dus de volgende migratie winnen; op een drukke machine kan de rij
+       legitiem over meerdere processen verdeeld raken. Wat nooit mag, is dat
+       een nummer ontbreekt of door twee processen als uitgevoerd wordt gemeld. */
+    const gemeld = uit.flatMap(r => {
+      try { return JSON.parse(r.uit).gedraaid; } catch (e) { return [-1]; }
+    }).sort((a, b) => a - b);
+    const verwacht = LIJST.map(m => m.n).sort((a, b) => a - b);
+    assert.deepEqual(gemeld, verwacht,
+      'de processen samen horen elke migratie precies eenmaal te draaien: ' + JSON.stringify(gemeld));
   } finally {
     try { fs.rmSync(map, { recursive: true, force: true }); } catch (e) {}
   }

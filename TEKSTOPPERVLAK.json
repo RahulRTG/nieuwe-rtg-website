@@ -320,8 +320,8 @@
     "Afgeleide registers (handelingindex.json, sprongindex.json) tellen niet mee: ze zijn gegenereerd uit de schermen en zouden dubbeltelling zijn."
   ],
   "stempel": {
-    "op": "2026-09-08T18:48:11.523Z",
-    "commit": "f72fc1616",
+    "op": "2026-09-08T18:51:38.166Z",
+    "commit": "431597fbb",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/tekstoppervlak.js",

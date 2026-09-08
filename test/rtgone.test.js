@@ -38,8 +38,11 @@ test('Vandaag verzamelt echte open taken uit het gekozen RTF-huis', async () => 
 });
 
 test('de twee Project Room-schrijfdeuren bestaan en blijven zonder kantooridentiteit dicht', async () => {
-  assert.equal((await api('project/bewijs', { projectId: 'onbekend', titel: 'Proef' }, null)).status, 401);
-  assert.equal((await api('project/oplever', { projectId: 'onbekend', uitkomst: 'Klaar' }, null)).status, 401);
+  const zonderIdentiteit = pad => fetch(base + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projectId: 'onbekend' })
+  });
+  assert.equal((await zonderIdentiteit('/api/rtgone/project/bewijs')).status, 401);
+  assert.equal((await zonderIdentiteit('/api/rtgone/project/oplever')).status, 401);
 });
 
 test('het frictiegrootboek rekent minuten en geld per jaar exact door', async () => {

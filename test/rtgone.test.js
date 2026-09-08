@@ -43,6 +43,10 @@ test('de twee Project Room-schrijfdeuren bestaan en blijven zonder kantooridenti
   });
   assert.equal((await zonderIdentiteit('/api/rtgone/project/bewijs')).status, 401);
   assert.equal((await zonderIdentiteit('/api/rtgone/project/oplever')).status, 401);
+  assert.equal((await api('project/bewijs', { projectId: 'onbekend' })).status, 404,
+    'na de kantoorpoort bereikt bewijs de echte Project Room-deur');
+  assert.equal((await api('project/oplever', { projectId: 'onbekend' })).status, 404,
+    'na de kantoorpoort bereikt opleveren de echte Project Room-deur');
 });
 
 test('het frictiegrootboek rekent minuten en geld per jaar exact door', async () => {

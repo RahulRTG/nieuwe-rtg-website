@@ -1,0 +1,87 @@
+{
+  "soort": "meting",
+  "uitleg": "Single Compromise Survivability (WEERBAARHEID.md par. 4): als er EEN ding wordt overgenomen, houdt RTG dan stand? Acht scenario's, elk met een bron, een bewijsgraad en wat de rij NIET dekt. Met opzet geen samengesteld cijfer.",
+  "grens": "`onbekend` is een eersteklas uitslag en betekent nooit \"waarschijnlijk goed\". Elke rij leest een echte bron; ontbreekt die, dan wordt de rij `onbekend` met de reden en niet stil een middenwaarde. De rijen `sessie` en `dienst` dragen `vermoed`: die gaan over een VORM in de code en niet over wat er in productie gebeurt.",
+  "stempel": {
+    "op": "2026-09-08T22:03:04.562Z",
+    "commit": "1a5b39e8",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/overleving.js",
+    "node": "v22.22.2"
+  },
+  "telling": {
+    "ja": 0,
+    "deels": 4,
+    "nee": 3,
+    "onbekend": 1,
+    "rijen": 8
+  },
+  "kroonjuwelen": "geld bewegen, identiteit wijzigen, de kluis lezen, bulk exporteren. Voor die vier hoort elke rij hieronder op `ja` te staan.",
+  "rijen": [
+    {
+      "id": "kantoorcode",
+      "vraag": "Iemand heeft de gedeelde kantoorcode. Houdt RTG stand?",
+      "uitkomst": "nee",
+      "graad": "gemeten",
+      "grond": "460 van 586 kantoorroutes hangen achter de gedeelde code, en 0 ervan vragen een tweede handtekening (KANTOORMACHT.json)",
+      "nietGemeten": "wat een gestolen code in de PRAKTIJK oplevert -- dat hangt af van welke 460 routes het zijn, en er is geen risicomodule die dat weegt (KANTOORMACHT.md par. 3)"
+    },
+    {
+      "id": "document",
+      "vraag": "Er staat een opdracht verstopt in een document dat de AI leest. Houdt RTG stand?",
+      "uitkomst": "nee",
+      "graad": "gemeten",
+      "grond": "de poort hangt voor de uitvoering maar telt alleen -- hij bijt pas met RTG_HERKOMST_AFDWINGEN=1 (kern/stuur/lusstap.js, ISOLATIEPROEF.json bijt=false)",
+      "nietGemeten": "de dekking van de kanaallabels: van de 13 kanalen in kern/isolatie/herkomst.js meldt er vandaag een zich aan, en die telling zit in ISOLATIEPROEF.json en niet in deze rij"
+    },
+    {
+      "id": "apparaat",
+      "vraag": "Het toestel van een lid of medewerker is overgenomen. Houdt RTG stand?",
+      "uitkomst": "onbekend",
+      "graad": "gemeten",
+      "grond": "de ceremoniestap `apparaat` draagt `uitgevoerd: false` met de reden erbij: er is geen register van vertrouwde toestellen, dus de stap wordt afgetekend en niet gecontroleerd",
+      "nietGemeten": "wat een webapp uberhaupt over een toestel KAN weten. OS-integriteit, patchstand en jailbreak-signalen zijn niet bereikbaar; een ladder die ze belooft, liegt (WEERBAARHEID.md grens 3)"
+    },
+    {
+      "id": "medewerker",
+      "vraag": "Een medewerker handelt te kwader trouw, in zijn eentje. Houdt RTG stand?",
+      "uitkomst": "nee",
+      "graad": "gemeten",
+      "grond": "0 kantoorroutes vragen een tweede handtekening en 0 hangen aan een keurbaar voornemen (KANTOORMACHT.json); de ontsluitceremonie kent wel een tweede paar ogen",
+      "nietGemeten": "welke handeling vier ogen VERDIENT is een besluit en geen meting -- KANTOORMACHT.json zegt dat met zoveel woorden onder `ongemeten.vierOgenVereist`"
+    },
+    {
+      "id": "ai",
+      "vraag": "De AI is gemanipuleerd of zijn sessie is gekaapt. Houdt RTG stand?",
+      "uitkomst": "deels",
+      "graad": "gemeten",
+      "grond": "de allowlist is standaard dicht en de goedkeuring is niet door een model te fabriceren; de bewijspoort laat vandaag 0 capabilities vallen (VERTROUWEN.json)",
+      "nietGemeten": "wat de AI met de paden die hij WEL mag kan aanrichten; dat is de vraag van kern/stuur/gevolg.js en die staat op 96 van 176 paden `onbekend`"
+    },
+    {
+      "id": "wachtwoord",
+      "vraag": "Het wachtwoord van een lid is uitgelekt. Houdt RTG stand?",
+      "uitkomst": "deels",
+      "graad": "gemeten",
+      "grond": "10 zware handelingen staan achter een verse passkey (kern/webauthn-acties.js); daarbuiten is een wachtwoord genoeg voor wat het lid zelf mag",
+      "nietGemeten": "of die zware lijst de JUISTE handelingen bevat. Deze rij telt hoeveel er staan; welke handelingen het horen te zijn, is een besluit en geen meting"
+    },
+    {
+      "id": "sessie",
+      "vraag": "Een sessietoken is gestolen. Houdt RTG stand?",
+      "uitkomst": "deels",
+      "graad": "vermoed",
+      "grond": "de stand `gebonden` bestaat (een gestolen token alleen levert dan niets op) en intrekking wint van eerder verleend vertrouwen (pgaccounts-intrekking.js); hoeveel sessies die stand werkelijk halen, is nergens geteld",
+      "nietGemeten": "het aandeel sessies dat `gebonden` haalt. De stand wordt met opzet niet opgeslagen (kern/identiteit/vertrouwen.js), dus er is niets om achteraf te tellen -- dat is een besluit en geen gat, maar het betekent wel dat deze rij over de VORM gaat en niet over de praktijk"
+    },
+    {
+      "id": "dienst",
+      "vraag": "Een interne dienst of een sleutel in de omgeving is gecompromitteerd. Houdt RTG stand?",
+      "uitkomst": "deels",
+      "graad": "gemeten",
+      "grond": "er is een eigen interne CA (server/lib/ca.js) en server/lib/tls.js doet mTLS, maar de webdeur roept maakServer(app) ZONDER ca aan (server/web/index.js), dus daar wordt geen clientcertificaat gevraagd",
+      "nietGemeten": "of de zaakdoos, de noodserver en losse instances hun mTLS wel bedraden -- die starten niet via server/web/index.js en zijn hier niet nagelopen. En kortlevende werklastidentiteit (een dienst die per keer bewijst wie hij is) bestaat hier niet: een certificaat is een langlevende identiteit"
+    }
+  ]
+}

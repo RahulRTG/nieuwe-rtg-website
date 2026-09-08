@@ -56,9 +56,11 @@ besluit dat dit huis al heeft genomen; die staan in par. 2 en 5 met de reden.
 | Security fault injection (19) | `scripts/sabotage.js` (zet de handhaver van een wet uit en eist rood) + `server/lib/verraad.js` (4 ingebouwd, 5 voornemen) + `server/opzet/liegpoort.js` | **staat, verkeerd gericht** |
 | Supply chain (22) | `scripts/imageherkomst.js` — SBOM (CycloneDX 1.5) uit het image zelf, Ed25519-handtekening die stuklijst, image-digest en bron bindt; `scripts/release-bewijs.js` hasht de bron | **staat, geen transparantielogboek** |
 
-**Wat werkelijk vanaf nul begint zijn er vier**, en dat is een korte lijst:
-workload-identiteit (par. 6), lokvermogens (par. 15), de cryptografie-inventaris
-(par. 24) en de overlevingsmeter zelf (par. 4).
+**Wat werkelijk vanaf nul begint zijn er drie**, en dat is een korte lijst:
+kortlevende workload-identiteit (par. 6 — mTLS en een interne CA staan er wél,
+zie par. 4), lokvermogens (par. 15) en de cryptografie-inventaris (par. 24). De
+overlevingsmeter stond ook in dit rijtje en is er sinds 8 september 2026 uit:
+`scripts/overleving.js` draait, ijkt zichzelf en hangt in CI.
 
 ## 2. Vier namen zijn bezet, en één begrip botst
 
@@ -126,29 +128,70 @@ kroonjuweel te beantwoorden is: *als dit één ding wordt overgenomen, houdt RTG
 dan stand?* Voor de kroonjuwelen — geld bewegen, identiteit wijzigen, de kluis
 lezen, bulk exporteren — moet elk antwoord **JA** zijn.
 
-**Eerste stand, 8 september 2026.** Elke regel citeert de bron waar hij uit volgt
-en de bewijsgraad van die bron; geen enkel vakje is geschat.
+**Dit is sinds 8 september 2026 een METER en geen tabel** (`npm run overleving`,
+`OVERLEVING.json`). Dat is geen opsmuk: de eerste versie van deze paragraaf was
+een tabel met de hand, en drie van de acht regels erin waren fout. Een tabel kan
+niet zakken, en een tabel wordt niet nagerekend.
 
-| Compromis | Overleeft RTG? | Grond | Graad |
-|---|---|---|---|
-| Gestolen ledenwachtwoord | **deels** | kluis-inzage en zes zware handelingen vragen een verse passkey (`zwaarbewijs.js`); geld is begrensd door plafonds (`pay/plafond.js`, `geldbeleid/grens.js`) en niet door bezit | vermoed |
-| Gestolen sessietoken | **deels** | de stand `gebonden` bestaat (`identiteit/vertrouwen.js`) en intrekking werkt (`pgaccounts-intrekking.js`); `VERTROUWEN.json` staat op **0 bewezen** | vermoed |
-| Gestolen `OFFICE_CODE` | **NEE** | 460 van 586 kantoorroutes achter het gedeelde geheim; vierogen op 0 routes, voornemen op 0, bevoegdheid op 0 (`KANTOORMACHT.json`, 6 sep) | **gemeten** |
-| Gemanipuleerde AI | **deels** | `beleid.js` closed by default, `goedkeuring.js` niet te vervalsen; de bewijspoort houdt niets tegen want er is 0 geschorst | gemeten |
-| Geïnjecteerd document | **NEE** | de herkomstpoort telt en blokkeert niet zolang `RTG_HERKOMST_AFDWINGEN` niet op 1 staat (`kern/stuur/lusstap.js`) | **gemeten** |
-| Gecompromitteerd apparaat | **onbekend** | de ceremoniestap `apparaat` draagt `uitgevoerd: false` mét de reden: er is geen toestelregister | **gemeten** |
-| Gecompromitteerde interne dienst | **onbekend** | geen enkele treffer op mTLS, SPIFFE of een dienst-token in `server/`; interne herkomst is niet bewezen maar aangenomen | vermoed |
-| Eén corrupte medewerker | **NEE** | 0 kantoorroutes met een tweede handtekening; de ceremonie dekt alleen het verlagen van de isolatiestand | **gemeten** |
+De meter leest per rij een echte bron, draagt per rij een bewijsgraad én wat de
+rij **niet** dekt, en kent vier uitslagen waarvan `onbekend` er een is — nooit
+stilzwijgend een middenwaarde. Er komt met opzet **geen samengesteld cijfer** uit;
+`test/overleving.test.js` toets 5 is de rem op die verleiding.
 
-**Nul van de acht staan op JA.** Dat is de eerlijke nulstand, en hij is precies
-wat een dashboard zou verbergen: vier van de acht regels leunen op registers die
-er groen uitzien (`IDOR.json`: 1623 routes, 0 doorbraken; `GLUURRONDE.json`:
-13.617 verzoeken, 0 gaten) terwijl die registers een andere vraag beantwoorden —
-namelijk of een *niet-gecompromitteerde* buitenstaander binnenkomt.
+**Stand nu: <!--getal:overleving.ja-->0<!--/getal--> ja,
+<!--getal:overleving.deels-->4<!--/getal--> deels,
+<!--getal:overleving.nee-->3<!--/getal--> nee en
+<!--getal:overleving.onbekend-->1<!--/getal--> onbekend over
+<!--getal:overleving.rijen-->8<!--/getal--> scenario's.** Die getallen komen uit
+`OVERLEVING.json` en worden door `npm run getallen` bijgehouden, dus ze kunnen
+hier niet stil verouderen. De rijen zelf staan in het register, met per rij de
+bron.
 
-Dit hoort een meter te worden (`scripts/overleving.js` → `OVERLEVING.json`), geen
-tabel in een document, want een tabel veroudert stil. Zolang die meter er niet
-is, staat deze tabel er met de datum en de commit van elke bron erbij.
+**Nul van de acht staan op JA**, en dat is precies wat een dashboard zou
+verbergen: de registers waar dit huis groen op staat (`IDOR.json`: 1623 routes,
+0 doorbraken; `GLUURRONDE.json`: 13.617 verzoeken, 0 gaten) beantwoorden een
+andere vraag — of een *niet-gecompromitteerde* buitenstaander binnenkomt. Dat is
+de makkelijke helft.
+
+**Drie ratels bewaken hem** (`npm run overleving:controle`, in CI): `ja` mag
+alleen stijgen, `nee` alleen dalen, en `onbekend` mag óók niet stijgen. Die derde
+is de belangrijkste — zonder hem is een bron weghalen de goedkoopste manier om
+een `nee` te laten verdwijnen.
+
+**En de meter ijkt zichzelf** (`npm run overleving:ijking`, in CI vóór de ratel).
+Hij voedt zichzelf een vervalste bron waarin het probleem is opgelost en eist dat
+de uitslag meebeweegt. LAT.md regel 2: een meter die je niet hebt zien uitslaan,
+meet niets — en een meter die zijn bron niet leest, geeft acht keurige uitslagen
+die niets betekenen.
+
+### Wat de eerste ronde meteen vond, en het waren fouten in de METER
+
+Drie rijen zagen er goed uit en waren fout. Ze staan hier omdat ze alle drie
+dezelfde vorm hebben, en die vorm is de gevaarlijkste van deze hele laag: **een
+valse `nee` is even schadelijk als een valse `ja`** — hij wordt geloofd, en
+daarna genegeerd.
+
+- de apparaat-probe las 600 tekens vanaf `apparaat:` en liep door in de
+  buurstap, die op `uitgevoerd: true` staat. Hij meldde dus dat het toestel
+  wordt gecontroleerd, terwijl de stap er letterlijk bij zegt van niet.
+- de AI-probe zocht het `Symbol` in `goedkeuring.js`, terwijl dat in
+  `bevestiging.js` woont — en meldde dat de goedkeuring te vervalsen was.
+- de wachtwoord-probe zocht `'naam':` in wat een array is, telde nul zware
+  handelingen en meldde `nee`. Het zijn er tien.
+
+**En een vierde correctie raakt dit document zelf.** Hierboven stond dat er
+"geen enkele treffer op mTLS, SPIFFE of een dienst-token" was. Dat was onwaar en
+het was mijn fout: `server/lib/ca.js` is een eigen interne CA en
+`server/lib/tls.js` doet wederzijdse TLS voor het verkeer tussen de RTG-servers,
+de zaakdoos, de noodserver en losse instances. Wat ontbreekt is niet het
+mechanisme maar de **bedrading**: `server/web/index.js` roept `maakServer(app)`
+aan zónder `ca`, dus aan de webdeur wordt geen clientcertificaat gevraagd. De rij
+kijkt dat sindsdien na in plaats van te greppen, en staat daarom op `deels` en
+niet op `onbekend`.
+
+Wat daarmee overeind blijft van par. 1: **kortlevende** werklastidentiteit — een
+dienst die per aanroep bewijst wie hij is — bestaat hier niet. Een certificaat is
+een langlevende identiteit, en dat is een ander ding.
 
 ## 5. De grenzen — zeven, en drie ervan corrigeren het voorstel
 

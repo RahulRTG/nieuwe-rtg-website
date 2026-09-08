@@ -1,0 +1,49 @@
+/* RTG HERITAGE EXPERIENCES -------------------------------------------------
+   De rijke mobiele ervaringen delen dezelfde voelbare systeemvorm. Deze
+   route-adapters staan apart, zodat de algemene adapterlaag klein en leesbaar
+   blijft. Routebladen blijven rechthoekig; cirkels blijven cirkels. */
+body[data-rtg-skin="heritage"] :where(
+  .hero-speel,.station,.wachtrij,.samen,.speler,.passport,.werelden button,
+  .kaart,.kaart img,.kaart .acties button,.social-nav,.care-hero,.care-primary,
+  .care-shortcut,.care-card,.care-card__actions button,.care-empty,
+  .care-agenda-head,.care-note,.care-nav,.care-error,.care-dialog,
+  .care-dialog__actions button){border-radius:var(--rtg-radius-system)}
+
+body[data-rtg-skin="heritage"] :where(
+  .today-hero,.today-primary,.today-action,.today-moments,.today-attention,
+  .today-moment button,.today-evening,.today-evening-list,.today-nav,
+  .rtg-travel-experience .kaartraster,.rtg-travel-experience .strook,
+  .rtg-travel-experience .rahulsnel,.rtg-travel-experience .kompaskaart,
+  .rtg-travel-experience .reisregister,.rtg-travel-experience .reisdiensten>a,
+  .rtg-travel-experience .volgendblok,.rtg-work-experience .doelgroep,
+  .rtg-work-experience .doelgroepnav a,.rtg-work-experience .doelgroeppoorten a,
+  .rtg-work-experience .work-open-day,
+  .rtg-work-experience .cv-rij>*,.rtg-work-experience #werkdag>*,
+  .rtg-work-experience #poorten>*,.rtg-school-experience .enterprise-hero,
+  .rtg-school-experience .enterprise-chip,.rtg-school-experience .enterprise-belofte,
+  .rtg-school-experience .kaart,.rtg-school-experience .kpi,
+  .rtg-school-experience .school-dashboard-grid>*,.school-mobile-nav,
+  .rtg-sport-flow .sport-nav,.rtg-media-experience .media-mobile-nav,
+  .rtg-media-experience .media-belofte,.rtg-media-experience .lade .vlak,
+  .rtg-media-experience .stuk,.rtg-media-experience .speler,
+  .rtg-media-experience #standen,.rtg-media-experience .media-ruimtes,
+  .rtg-safe-experience .veilig-nav,.rtg-safe-experience .veilig-actief,
+  .rtg-safe-experience .veilig-statussen button,.rtg-safe-experience .veilig-check,
+  .rtg-safe-experience #paneelVak,.rtg-safe-experience .kaart,
+  .rtg-safe-experience .grens,.rtg-safe-experience .baan,
+  .rtg-safe-experience .veilig-meer>section,
+  .rtg-flight-experience .vlucht-nav,.rtg-flight-experience .vlucht-zoek,
+  .rtg-flight-experience .vluchtkaart,.rtg-flight-experience .instapkaart,
+  .rtg-flight-experience .charter-hero,.rtg-flight-experience .charter-paneel,
+  .rtg-flight-experience .charter-keuzes label,
+  .rtg-stay-experience .verblijf-nav,.rtg-stay-experience .verblijf-zoek,
+  .rtg-stay-experience .verblijfkaart,.rtg-stay-experience .mijn-verblijf,
+  .rtg-stay-experience .service-hero,.rtg-stay-experience .service-rooster button,
+  .rtg-stay-experience .service-vraag,.rtg-stay-experience .inlog,
+  .rtg-arrival-experience .rit-nav,.rtg-arrival-experience .rit-momenten,
+  .rtg-arrival-experience .transfer-form,.rtg-arrival-experience .route-velden,
+  .rtg-arrival-experience .plek-lijst,.rtg-arrival-experience .voertuig-keuzes button,
+  .rtg-arrival-experience .chauffeur-kaart,.rtg-arrival-experience .aankomst-kaart,
+  .rtg-arrival-experience .rit-hoofdknop,.rtg-arrival-experience .rit-leeg){
+  border-radius:var(--rtg-radius-system)
+}

@@ -37,6 +37,7 @@ const DEKKING = {
   'toestellen.js': { laag: 'toestel' },
   'gastzorg.js': { laag: 'locatie' },
   'salon-claimcode.js': { reden: 'een tijdelijke aanbiedingsclaim; status bewaakt een bearer en is geen toestemming voor gegevensgebruik' },
+  'rtgone-projecten.js': { reden: 'status actief beschrijft de levensloop van een projectintentie; er wordt geen toestemming voor gegevensgebruik vastgelegd' },
   'assets/winkel.js': { reden: 'een ticket op een object; geen toestemming maar bezit' }
 };
 

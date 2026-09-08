@@ -1,4 +1,5 @@
-/* Scherm-test voor RTG Geld als ECHTE app: twaalf standen in een schil
+/* Scherm-test voor RTG Geld als ECHTE app: vier rustige hoofdingangen met de
+   twaalf vertrouwde geldstanden bereikbaar achter Meer
    (PLATFORM.md par. 0, de eerste wereld die werkelijk is samengevoegd).
 
    Wat hier bewezen wordt:
@@ -34,6 +35,7 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, {
    meer genoeg is zodra er een werkgeversbudget of gemeentetegoed naast staat. */
 const STANDEN = ['overzicht', 'wallet', 'waarde', 'bank', 'wbw', 'kosten', 'metier', 'balans',
   'rtgcode', 'labfonds', 'mecenaat', 'logboek', 'nalatenschap'];
+const HOOFDSTANDEN = ['overzicht', 'betalen', 'vooruit', 'meer'];
 const OUDE_PADEN = {
   '/apps/wallet.html': 'wallet', '/apps/bank.html': 'bank', '/apps/wbw.html': 'wbw',
   '/apps/metier.html': 'metier', '/apps/balans.html': 'balans', '/apps/rtgcode.html': 'rtgcode',
@@ -41,7 +43,7 @@ const OUDE_PADEN = {
   '/apps/logboek.html': 'logboek', '/apps/nalatenschap.html': 'nalatenschap'
 };
 
-test('RTG Geld: twaalf standen openen, wisselen schoon, en de oude paden leiden om',
+test('RTG Geld: vier hoofdingangen en twaalf vertrouwde standen openen schoon',
   { skip: geenBrowser(pw) }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-geldapp-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
@@ -71,14 +73,18 @@ test('RTG Geld: twaalf standen openen, wisselen schoon, en de oude paden leiden 
 
     const knoppen = await page.evaluate(() =>
       [...document.querySelectorAll('#standen button')].map((b) => b.dataset.id));
-    assert.deepEqual(knoppen, STANDEN,
-      'de standenbalk hoort precies de twaalf standen plus het overzicht te dragen, in deze volgorde');
+    assert.deepEqual(knoppen, HOOFDSTANDEN,
+      'de rustige standenbalk hoort overzicht, betalen, vooruit en meer te dragen');
 
     /* Elke stand openen. "Iets tekenen" is hier de lat: een premium-stand op
        een RTG-pas toont de weigering van de server, en dat is ook iets -- een
        LEEG paneel is het enige dat altijd fout is. */
-    for (const id of STANDEN) {
-      await page.click('#standen button[data-id="' + id + '"]');
+    for (const id of HOOFDSTANDEN.concat(STANDEN.filter((x) => x !== 'overzicht'))) {
+      if (HOOFDSTANDEN.includes(id)) await page.click('#standen button[data-id="' + id + '"]');
+      else {
+        await page.click('#standen button[data-id="meer"]');
+        await page.click('.gx-more a[href="#' + id + '"]');
+      }
       /* Elke stand vult zijn paneel; wachten tot het paneel iets ZEGT is precies
          de bewering eronder ("een leeg paneel is het enige dat altijd fout is"). */
       await wachtTot(page, (x) => {
@@ -92,7 +98,8 @@ test('RTG Geld: twaalf standen openen, wisselen schoon, en de oude paden leiden 
       }));
       assert.equal(beeld.hash, '#' + id, 'het adres hoort de stand te dragen');
       assert.ok(beeld.tekst > 0, 'stand "' + id + '" tekende een leeg paneel');
-      assert.equal(beeld.actief.id, id, 'de balk hoort de actieve stand te tonen');
+      assert.equal(beeld.actief.id, HOOFDSTANDEN.includes(id) ? id : 'meer',
+        'de balk hoort de actieve hoofdstand te tonen');
     }
 
     /* En terug naar het overzicht: het wisselen zelf mag niets kapotmaken. */

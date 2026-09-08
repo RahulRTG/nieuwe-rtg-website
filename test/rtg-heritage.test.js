@@ -137,6 +137,7 @@ test('de volledige Heritage-laag reist mee in beide offline schillen', () => {
     '/shared/rtg-heritage.css',
     '/shared/rtg-heritage-materials.css',
     '/shared/rtg-heritage-adapters.css',
+    '/shared/rtg-heritage-experiences.css',
     '/shared/rtg-heritage-components.css',
     '/shared/rtg-heritage-motion.css',
     '/shared/rtg-heritage-motion.js',

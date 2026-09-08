@@ -14,6 +14,11 @@
 }
 body.trm-voorzijde-actief{display:block;overflow-x:hidden;background:var(--trm-diep);padding:0!important}
 body.trm-voorzijde-actief>#shell{display:none!important}
+body.trm-voorzijde-actief>.wos-dock{display:none!important}
+body.trm-voorzijde-actief .rtg-edge-top,
+body.trm-voorzijde-actief .rtg-edge-side,
+body.trm-voorzijde-actief .rtg-edge-bottom{visibility:hidden!important;pointer-events:none!important}
+body.trm-voorzijde-actief .rtg-edge-chrome :is(button,a,input){pointer-events:none!important}
 .trm-voorzijde[hidden]{display:none!important}
 .trm-voorzijde{min-height:100dvh;padding:0 0 calc(5.4rem + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(10,6,4,.35) 0,rgba(10,6,4,.84) 27rem,var(--trm-diep) 42rem),url('/images/worlds/heritage/work-heritage-v2.jpg') center top/auto 38rem no-repeat,linear-gradient(180deg,var(--trm-nacht),var(--trm-diep));color:var(--trm-ivoor);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
 .trm-voorzijde *{box-sizing:border-box}

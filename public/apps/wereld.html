@@ -186,6 +186,7 @@
     color:var(--rtg-soft);text-decoration:none;font-size:0.66rem;
     font-weight:600;letter-spacing:0.01em;}
   .balk a[aria-current="page"]{color:var(--rtg-txt);}
+  .wereld-inlog-link{color:inherit;text-decoration:none;}
   .balk a[aria-current="page"] span{color:var(--rtg-txt);}
   .balk span{display:block;font-size:1.05rem;line-height:1.35;}
   /* shared/rtg-worlds-2026.css schuift elke vaste `body > nav` omlaag met
@@ -623,7 +624,7 @@
          foutmelding: het scherm zou dan tegelijk zeggen dat het stuk is en dat
          het nog bezig is. De melding is het antwoord; verder hoort dit vlak
          leeg te zijn. */
-      $('#feed').innerHTML = '<article class="kaart"><div class="r1"><span class="auteur">Uw LivingOS</span><span class="bron">Privé</span></div><p>De momenten van uw mensen, reizen en plekken komen hier rustig samen.</p><div class="acties"><a href="/apps/app.html" style="color:inherit;text-decoration:none">Log in om uw wereld te openen</a></div></article>';
+      $('#feed').innerHTML = '<article class="kaart"><div class="r1"><span class="auteur">Uw LivingOS</span><span class="bron">Privé</span></div><p>De momenten van uw mensen, reizen en plekken komen hier rustig samen.</p><div class="acties"><a class="wereld-inlog-link" href="/apps/app.html">Log in om uw wereld te openen</a></div></article>';
       toon(e.message + ' Log opnieuw in via de app.');
     });
 })();

@@ -5,6 +5,7 @@
   function el(id){return d.getElementById(id)}
   function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
   function initialen(naam){return String(naam||'RT').trim().split(/\s+/).slice(0,2).map(function(x){return x.charAt(0)}).join('').toUpperCase()||'RT'}
+  function kleur(v){return /^#[0-9a-f]{6}$/i.test(String(v||''))?v:'#861936'}
   function dagNaam(iso){var n=new Date(iso+'T12:00:00');var v=new Date();var m=new Date(v);m.setDate(v.getDate()+1);var zelf=function(x){return x.toISOString().slice(0,10)};if(iso===zelf(v))return'Vandaag';if(iso===zelf(m))return'Morgen';return n.toLocaleDateString('nl-NL',{weekday:'short',day:'numeric'})}
   function dag(info,items){
     var p=info.profiel||{},naam=p.naam||'u';el('rtfVoorNaam').textContent=naam;el('rtfVoorInit').textContent=initialen(naam);el('rtfGroeiInit').textContent=initialen(naam);
@@ -24,7 +25,7 @@
     vol.innerHTML=opties.map(function(x){return '<a class="rtf-thuis-regel" href="'+x[2]+'"><time>'+esc(x[0])+'</time><div><b>'+esc(x[1])+'</b><span>Open wanneer u eraan toe bent</span></div><em aria-hidden="true">&rarr;</em></a>'}).join('');
   }
   function kring(info,stand){
-    var eigen=info.profiel||{},profielen=info.profielen||[];el('rtfFamilie').innerHTML=profielen.map(function(p){var rol=p.id===eigen.id?'U':(p.rol==='kind'?'Kind':p.rol==='gast'?'Gast':'Gezin');return '<div class="rtf-kring-persoon"><i style="background:' + esc(p.kleur||'#861936')+'">'+esc(initialen(p.naam))+'</i><b>'+esc(p.naam)+'</b><span>'+esc(rol)+'</span></div>'}).join('')||'<p class="rtf-thuis-leeg">Er zijn nog geen andere gezinsprofielen.</p>';
+    var eigen=info.profiel||{},profielen=info.profielen||[],familie=el('rtfFamilie');familie.innerHTML=profielen.map(function(p){var rol=p.id===eigen.id?'U':(p.rol==='kind'?'Kind':p.rol==='gast'?'Gast':'Gezin');return '<div class="rtf-kring-persoon"><i data-rtf-kleur="'+kleur(p.kleur)+'">'+esc(initialen(p.naam))+'</i><b>'+esc(p.naam)+'</b><span>'+esc(rol)+'</span></div>'}).join('')||'<p class="rtf-thuis-leeg">Er zijn nog geen andere gezinsprofielen.</p>';familie.querySelectorAll('[data-rtf-kleur]').forEach(function(avatar){avatar.style.backgroundColor=avatar.dataset.rtfKleur});
     var banden=stand&&stand.banden||[],vak=el('rtfKringLijst');
     vak.innerHTML=banden.length?banden.slice(0,6).map(function(b){var open=b.staat==='gevraagd',status=open?(b.ikVroeg?'Wacht op antwoord':'Uw antwoord nodig'):(b.staat==='verlopen'?'Verlopen':(b.ikDeel||[]).length+' onderdeel(en) gedeeld');var detail=open?'Een band ontstaat pas na bevestiging.':((b.ikDeel||[]).length?b.ikDeel.map(function(x){return x.wat}).join(', '):'U deelt nog niets met deze persoon.');return '<a class="rtf-thuis-regel rtf-kring-regel" href="mijnbanden.html"><i class="rtf-kring-avatar">'+esc(initialen(b.ander))+'</i><div><b>'+esc(b.ander)+'</b><span>'+esc(detail)+'</span><span class="rtf-kring-status">'+esc(status)+'</span></div><em aria-hidden="true">&rarr;</em></a>'}).join(''):'<p class="rtf-thuis-leeg">U heeft nog geen persoonlijke banden. Ook zonder band wordt er niets gedeeld.</p>';
   }

@@ -56,9 +56,13 @@
       var a = afspraakVan(staat, p.id, gekozen), o = ochtendVan(staat, p.id);
       var regel = a ? ((a.tijd ? a.tijd + ' · ' : '') + a.titel) : 'Geen eigen afspraak op ' + lokaal(gekozen);
       var status = o && o.heeftRitme ? (o.klaar ? 'Ochtend klaar' : o.gedaan + ' van ' + o.totaal + ' ochtendstappen') : 'Geen ochtendstatus';
-      return '<article class="st-persoon"><span class="st-avatar" style="background:' + kleur(p.kleur) + ';color:' + opKleur(p.kleur) + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span>' +
+      return '<article class="st-persoon"><span class="st-avatar" data-st-achtergrond="' + kleur(p.kleur) + '" data-st-voorgrond="' + opKleur(p.kleur) + '">' + esc(String(p.naam || '?').slice(0, 1).toUpperCase()) + '</span>' +
         '<div><b>' + esc(p.naam) + '</b><span>' + esc(regel) + '</span><small>' + esc(status) + '</small></div></article>';
     }).join('');
+    box.querySelectorAll('.st-avatar[data-st-achtergrond]').forEach(function (avatar) {
+      avatar.style.backgroundColor = avatar.dataset.stAchtergrond;
+      avatar.style.color = avatar.dataset.stVoorgrond;
+    });
   }
   function geregeld(staat) {
     var box = document.getElementById('stGeregeld'), open = (staat.klussen || []).filter(function (x) { return x.status !== 'goedgekeurd'; }).length;

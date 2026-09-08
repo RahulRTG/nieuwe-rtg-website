@@ -30,7 +30,7 @@
     var doel=d.getElementById('fhStappen');
     if(!volgende){doel.innerHTML='<div class="fh-leeg">Uw stappen verschijnen hier zodra er een zorgafspraak is.</div>';return}
     var datumVoorbij=String(volgende.datum||'')<new Date().toISOString().slice(0,10),afgerond=volgende.status==='afgerond';
-    var items=[{t:'Afspraak aangevraagd',s:'De aanbieder en het moment zijn vastgelegd.',klaar:true},{t:volgende.paid?'Betaling bevestigd':'Betaling nog nodig',s:volgende.paid?'Uw afspraak is betaald.':'Rond de betaling af om uw afspraak te bevestigen.',klaar:!!volgende.paid},{t:'Zorgmoment',s:lang(volgende.datum)+' om '+volgende.tijd+'.',klaar:datumVoorbij||afgerond},{t:'Afgerond',s:afgerond?'De zorgverlener heeft dit moment afgerond.':'Dit verandert alleen na bevestiging door de zorgverlener.',klaar:afgerond}];
+    var items=[{t:'Afspraak aangevraagd',s:'De aanbieder en het moment zijn vastgelegd.',klaar:true},{t:volgende.paid?'Betaling bevestigd':'Betaling nog nodig',s:volgende.paid?'Uw betaalbevestiging is ontvangen.':'Rond de betaling af om uw afspraak te bevestigen.',klaar:!!volgende.paid},{t:'Zorgmoment',s:lang(volgende.datum)+' om '+volgende.tijd+'.',klaar:datumVoorbij||afgerond},{t:'Afgerond',s:afgerond?'De zorgverlener heeft dit moment afgerond.':'Dit verandert alleen na bevestiging door de zorgverlener.',klaar:afgerond}];
     doel.innerHTML=items.map(function(x,i){return '<div class="fh-stap '+(x.klaar?'is-klaar':'')+'"><i aria-hidden="true">'+(x.klaar?'&#10003;':(i+1))+'</i><div><b>'+esc(x.t)+'</b><span>'+esc(x.s)+'</span></div></div>'}).join('')
   }
   function delen(intakes,beschikbaar){

@@ -37,6 +37,11 @@ test('Vandaag verzamelt echte open taken uit het gekozen RTF-huis', async () => 
   assert.ok(s.body.vandaag.telling.taken >= 1);
 });
 
+test('de twee Project Room-schrijfdeuren bestaan en blijven zonder kantooridentiteit dicht', async () => {
+  assert.equal((await api('project/bewijs', { projectId: 'onbekend', titel: 'Proef' }, null)).status, 401);
+  assert.equal((await api('project/oplever', { projectId: 'onbekend', uitkomst: 'Klaar' }, null)).status, 401);
+});
+
 test('het frictiegrootboek rekent minuten en geld per jaar exact door', async () => {
   const r = await api('frictie', { huis: 'rtg', naam: 'Handmatig facturen zoeken', minuten: 12, frequentie: 5, uurloon: 45 });
   assert.equal(r.status, 200); assert.equal(r.body.frictie.jaarMinuten, 3120); assert.equal(r.body.frictie.jaarCenten, 234000);

@@ -163,6 +163,7 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
   function stand() {
     const r = weeg();
     const staat = vak();
+    const buiten = buitenStand();  // een keer, niet vijf keer
     const lijst = Object.keys(staat).map(id => staat[id])
       .sort((a, b) => (ERNST[b.ernst] || 0) - (ERNST[a.ernst] || 0));
     const actief = lijst.filter(a => a.actief);
@@ -175,10 +176,11 @@ function maakAlarm({ opslag, save, journaal, slo, sonde, canary, kwaliteit, norm
          dan hoort daar niet stilzwijgend een kanaal in de lijst te staan dat er
          niet is -- een lege url leest anders als bezorging. */
       uitgangen: ['het journaal (elke aan- en afmelding)', 'het kantoorbord via de office-SSE']
-        .concat(buitenStand().actief ? [buitenStand().onafhankelijk === false
-          ? 'storingenontvangst op dezelfde app, alleen op de overgang'
-          : 'de externe webhook (ERR_WEBHOOK_URL), alleen op de overgang'] : []),
-      geenUitgang: buitenStand().actief && buitenStand().onafhankelijk !== false ? null : buitenStand().reden,
+        .concat(buiten.actief ? [(buiten.onafhankelijk === true ? 'de externe webhook (ERR_WEBHOOK_URL)'
+          : buiten.onafhankelijk === false ? 'storingenontvangst op dezelfde app'
+          : 'een webhook zonder bewijs dat hij extern is') + ', alleen op de overgang'] : []),
+      // onbekend is geen groen (zie alarm-uitgang.js)
+      geenUitgang: buiten.actief && buiten.onafhankelijk === true ? null : buiten.reden,
       let: 'er gaat geen mail en geen telefoonmelding uit. Dat is een kanaalbesluit met een piket ' +
         'eraan vast (SLO.md, punt 4) en hoort niet stilzwijgend hier ingebouwd te worden. En het alarm ' +
         'piept op verandering en niet elke ronde: een melding die elke dertig seconden terugkomt, leert ' +

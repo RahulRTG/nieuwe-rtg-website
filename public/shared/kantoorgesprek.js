@@ -184,16 +184,19 @@
             zegt.textContent = 'Welkom terug. U bent binnen met uw eigen RTG-account.';
             return klaar(s.token, s.state);
           }
-          if (s.pinNodig) return vraagPin();
+          /* `pinNodig` is de vraag EN de afwijzing (eenaccount/starten.js);
+             alleen de afwijzing draagt een reden. Zie test/kantoordeur.e2e.js. */
+          if (s.pinNodig) return vraagPin(pin ? (s.error || 'Die pincode klopt niet.') : '');
           // geen sleutel (meer), of iets anders mis: de code, met de reden erbij
           codeGesprek();
           fout.textContent = s.error || '';
         }).catch(function () { codeGesprek(); });
       }
 
-      function vraagPin() {
+      function vraagPin(reden) {
         ontvanger = function (tekst) { start(tekst); };
         vraag({ tekst: 'Uw algemene pin, dan zet ik de kantoordeur open.', verborgen: true });
+        fout.textContent = reden || '';
       }
     }
 

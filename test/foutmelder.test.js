@@ -70,3 +70,48 @@ test('SSRF-poort: een privé/metadata-webhook wordt geweigerd (melder inert)', (
   // een gewone publieke https-webhook mag wel
   assert.strictEqual(maakFoutmelder({ url: 'https://hooks.slack.com/services/T/B/x', log: stil }).actief, true);
 });
+
+/* ONAFHANKELIJK IS EEN OORDEEL MET DRIE UITKOMSTEN.
+
+   Hier stond `let onafhankelijk = true` met een try/catch eromheen: elke fout in
+   de berekening -- APP_URL niet gezet, APP_URL zonder schema -- liet de waarde
+   op `true` staan, en een ontvanger die deze app ZELF is telde dan als externe
+   bewaking. Het alarmbord noemde daarna "de externe webhook (ERR_WEBHOOK_URL)"
+   als uitgang terwijl er bij een volledige app- of hostuitval niets afgaat.
+
+   Het oordeel hangt nu voorop aan protocol.eigenEndpoint() -- dezelfde bron die
+   server/config/productie.js gebruikt, en die geen APP_URL nodig heeft -- en
+   valt bij twijfel DICHT op `null` met de reden erbij. */
+test('onafhankelijkheid staat vast, is weerlegd, of is niet vast te stellen -- nooit stil "ja"', () => {
+  const stil = { warn: () => {} };
+  const sleutel = 'a'.repeat(64);
+  const stand = (o) => maakFoutmelder(Object.assign({ sleutel, log: stil }, o)).stand();
+
+  const buiten = stand({ url: 'https://hooks.voorbeeld.test/x', appUrl: 'https://app.rtg.test' });
+  assert.strictEqual(buiten.onafhankelijk, true, 'een echte externe webhook is bewezen onafhankelijk');
+  assert.strictEqual(buiten.beperking, null, 'en draagt dan geen beperking');
+
+  /* Het eigen endpoint, ook zonder APP_URL om mee te vergelijken: het PAD is
+     genoeg, en juist dit geval liep vroeger als "onafhankelijk" binnen. */
+  for (const appUrl of ['https://app.rtg.test', '', 'app.rtg.test']) {
+    const eigen = stand({ url: 'https://app.rtg.test/api/webhooks/storingen', appUrl });
+    assert.strictEqual(eigen.onafhankelijk, false,
+      'de eigen storingenwebhook is nooit onafhankelijk, ook niet met APP_URL = ' + JSON.stringify(appUrl));
+    assert.match(eigen.beperking, /hostuitval/);
+  }
+
+  /* Een loopback-ontvanger draait op een andere HERKOMST en kwam er daarom
+     vroeger als "extern" doorheen -- terwijl het dezelfde machine is. */
+  const lokaal = stand({ url: 'http://127.0.0.1:3000/api/webhooks/storingen', appUrl: 'https://app.rtg.test', intern: true });
+  assert.strictEqual(lokaal.onafhankelijk, false, 'een loopback-ontvanger van onszelf is geen externe bewaking');
+
+  const zelfde = stand({ url: 'https://app.rtg.test/intern/meld', appUrl: 'https://app.rtg.test' });
+  assert.strictEqual(zelfde.onafhankelijk, false, 'dezelfde herkomst is dezelfde app');
+  assert.match(zelfde.beperking, /dezelfde app/);
+
+  /* Niet vast te stellen is een eigen uitslag en geen "ja": zonder bruikbare
+     APP_URL weten we het niet, en dan zegt het bord dat ook. */
+  const onbekend = stand({ url: 'https://hooks.voorbeeld.test/x', appUrl: 'niet-een-adres' });
+  assert.strictEqual(onbekend.onafhankelijk, null, 'zonder bruikbare APP_URL is het oordeel onbekend');
+  assert.match(onbekend.beperking, /niet vast te stellen/);
+});

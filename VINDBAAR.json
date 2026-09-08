@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-08T18:47:56.906Z",
-    "commit": "cfb262b33",
-    "boomVuil": false,
-    "boomAnders": 0,
+    "op": "2026-09-08T20:21:59.212Z",
+    "commit": "84bfcdac9",
+    "boomVuil": true,
+    "boomAnders": 2,
     "instrument": "scripts/vindbaar.js",
     "node": "v24.18.0"
   },
@@ -12,19 +12,18 @@
   "drempel": 3,
   "bestemmingen": 93,
   "woorden": 1129,
-  "gevonden": 725,
-  "dekking": 0.6422,
+  "gevonden": 740,
+  "dekking": 0.6554,
   "perBestemming": [
     {
       "naam": "Magnaat",
       "url": "/apps/magnaat.html",
       "woorden": 88,
-      "gevonden": 36,
+      "gevonden": 35,
       "mist": [
         "werkvloer",
         "vraagt",
         "keuze",
-        "uitdaging",
         "speelruimte",
         "aanpak",
         "veranderde",
@@ -39,7 +38,6 @@
         "functies",
         "dagdienst",
         "laden",
-        "volledig",
         "soleerd",
         "functiehal",
         "wereldkaart",
@@ -64,14 +62,17 @@
         "bedrijfstraining",
         "bedrijfsteamkamer",
         "bedrijf",
-        "gevolg",
-        "missie",
+        "blokkeer",
+        "afronden",
+        "vrije",
+        "teamkamer",
         "oefen",
         "solo",
         "teamtraining",
         "hervat",
         "overdragen",
         "pauzeer",
+        "kamer",
         "trainingsronde"
       ]
     },
@@ -310,23 +311,6 @@
       ]
     },
     {
-      "naam": "RTDocs",
-      "url": "/apps/office.html",
-      "woorden": 28,
-      "gevonden": 19,
-      "mist": [
-        "daarna",
-        "gedeeld",
-        "samenwerken",
-        "versiegeschiedenis",
-        "leest",
-        "intussen",
-        "nieuwere",
-        "dossiers",
-        "besluit"
-      ]
-    },
-    {
       "naam": "Sociaal",
       "url": "/apps/sociaal.html",
       "woorden": 13,
@@ -375,38 +359,6 @@
       ]
     },
     {
-      "naam": "RTG One",
-      "url": "/apps/rtgone.html",
-      "woorden": 32,
-      "gevonden": 24,
-      "mist": [
-        "geladen",
-        "persoonlijke",
-        "beloften",
-        "length",
-        "persoonlijk",
-        "actieve",
-        "werkstromen",
-        "besluiten"
-      ]
-    },
-    {
-      "naam": "Vluchten",
-      "url": "/apps/vluchten.html",
-      "woorden": 13,
-      "gevonden": 5,
-      "mist": [
-        "beschikbare",
-        "stappen",
-        "tijd",
-        "bepaalt",
-        "vertrek",
-        "aanvragen",
-        "persoonlijk",
-        "instapcode"
-      ]
-    },
-    {
       "naam": "Commerce",
       "url": "/apps/commerce.html",
       "woorden": 13,
@@ -422,18 +374,33 @@
       ]
     },
     {
-      "naam": "RTMail",
-      "url": "/apps/rtmail.html",
-      "woorden": 25,
-      "gevonden": 18,
+      "naam": "RTDocs",
+      "url": "/apps/office.html",
+      "woorden": 28,
+      "gevonden": 21,
       "mist": [
         "daarna",
-        "externe",
-        "link",
-        "namens",
-        "onderwerp",
-        "samenvatting",
-        "volledig"
+        "gedeeld",
+        "samenwerken",
+        "versiegeschiedenis",
+        "leest",
+        "intussen",
+        "nieuwere"
+      ]
+    },
+    {
+      "naam": "RTG One",
+      "url": "/apps/rtgone.html",
+      "woorden": 32,
+      "gevonden": 25,
+      "mist": [
+        "geladen",
+        "persoonlijke",
+        "beloften",
+        "length",
+        "persoonlijk",
+        "actieve",
+        "werkstromen"
       ]
     },
     {
@@ -464,21 +431,6 @@
         "alpien",
         "weekend",
         "zien"
-      ]
-    },
-    {
-      "naam": "Zorg",
-      "url": "/apps/foundation/zorg.html",
-      "woorden": 11,
-      "gevonden": 4,
-      "mist": [
-        "houdt",
-        "regie",
-        "gevaar",
-        "stappen",
-        "meekijken",
-        "afspraak",
-        "begeleider"
       ]
     },
     {
@@ -538,20 +490,6 @@
       ]
     },
     {
-      "naam": "Sport",
-      "url": "/apps/sport.html",
-      "woorden": 15,
-      "gevonden": 9,
-      "mist": [
-        "competitie",
-        "clubmomenten",
-        "partnership",
-        "reserveren",
-        "wedstrijddag",
-        "mogelijkheden"
-      ]
-    },
-    {
       "naam": "Video",
       "url": "/apps/clips.html",
       "woorden": 18,
@@ -566,6 +504,20 @@
       ]
     },
     {
+      "naam": "RTMail",
+      "url": "/apps/rtmail.html",
+      "woorden": 25,
+      "gevonden": 19,
+      "mist": [
+        "daarna",
+        "externe",
+        "link",
+        "namens",
+        "onderwerp",
+        "samenvatting"
+      ]
+    },
+    {
       "naam": "Hangar",
       "url": "/apps/hangar.html",
       "woorden": 8,
@@ -577,6 +529,34 @@
         "toestel",
         "loggen",
         "vluchtlogboek"
+      ]
+    },
+    {
+      "naam": "Vluchten",
+      "url": "/apps/vluchten.html",
+      "woorden": 13,
+      "gevonden": 7,
+      "mist": [
+        "beschikbare",
+        "stappen",
+        "tijd",
+        "bepaalt",
+        "vertrek",
+        "aanvragen"
+      ]
+    },
+    {
+      "naam": "Zorg",
+      "url": "/apps/foundation/zorg.html",
+      "woorden": 11,
+      "gevonden": 5,
+      "mist": [
+        "houdt",
+        "regie",
+        "gevaar",
+        "stappen",
+        "meekijken",
+        "afspraak"
       ]
     },
     {
@@ -642,15 +622,15 @@
       ]
     },
     {
-      "naam": "RTG Veilig",
-      "url": "/apps/veilig.html",
-      "woorden": 9,
-      "gevonden": 5,
+      "naam": "Sport",
+      "url": "/apps/sport.html",
+      "woorden": 15,
+      "gevonden": 11,
       "mist": [
-        "kring",
-        "zekerheid",
-        "thuiswacht",
-        "check"
+        "competitie",
+        "clubmomenten",
+        "interesse",
+        "partnership"
       ]
     },
     {
@@ -698,17 +678,6 @@
       ]
     },
     {
-      "naam": "RTG Media",
-      "url": "/apps/media.html",
-      "woorden": 18,
-      "gevonden": 15,
-      "mist": [
-        "releasecontrole",
-        "kijken",
-        "maken"
-      ]
-    },
-    {
       "naam": "Table",
       "url": "/apps/table.html",
       "woorden": 5,
@@ -720,17 +689,6 @@
       ]
     },
     {
-      "naam": "Decision Room",
-      "url": "/apps/decision-room.html",
-      "woorden": 9,
-      "gevonden": 6,
-      "mist": [
-        "afweging",
-        "compleet",
-        "besluit"
-      ]
-    },
-    {
       "naam": "Loon",
       "url": "/apps/loonstrook.html",
       "woorden": 4,
@@ -739,17 +697,6 @@
         "loonstroken",
         "keek",
         "papieren"
-      ]
-    },
-    {
-      "naam": "Project Room",
-      "url": "/apps/project-room.html",
-      "woorden": 8,
-      "gevonden": 5,
-      "mist": [
-        "toont",
-        "resultaat",
-        "vanuit"
       ]
     },
     {
@@ -800,6 +747,26 @@
       "mist": [
         "eerste",
         "inloggen"
+      ]
+    },
+    {
+      "naam": "Decision Room",
+      "url": "/apps/decision-room.html",
+      "woorden": 9,
+      "gevonden": 7,
+      "mist": [
+        "afweging",
+        "compleet"
+      ]
+    },
+    {
+      "naam": "Project Room",
+      "url": "/apps/project-room.html",
+      "woorden": 8,
+      "gevonden": 6,
+      "mist": [
+        "toont",
+        "resultaat"
       ]
     },
     {
@@ -857,6 +824,24 @@
       "gevonden": 1,
       "mist": [
         "lead"
+      ]
+    },
+    {
+      "naam": "RTG Media",
+      "url": "/apps/media.html",
+      "woorden": 18,
+      "gevonden": 17,
+      "mist": [
+        "releasecontrole"
+      ]
+    },
+    {
+      "naam": "RTG Veilig",
+      "url": "/apps/veilig.html",
+      "woorden": 9,
+      "gevonden": 8,
+      "mist": [
+        "zekerheid"
       ]
     },
     {

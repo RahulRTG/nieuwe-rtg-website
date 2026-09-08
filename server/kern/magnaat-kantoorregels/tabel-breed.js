@@ -56,7 +56,7 @@ const BREED = [
      scherm zonder kantoor is een functie zonder eigenaar. Hij hoort bij dezelfde
      dienstverlening als ritten en charters. */
   [/salon|member|bericht|dm|ontmoet|vonk|care|zorg|reis|ticket|lucht|hotel|ov|rit|charter|\/chauffeur/, 'klantenservice', 'Klantenservice'],
-  [/\/thuis|\/home|\/leven|\/life\b|\/ik\b|\/gemoed|\/gedachten|\/gewoonten|\/doelen|\/notities|\/memo|\/vitaal|\/voeding|\/medicatie|\/medicijnen|\/metingen|\/arrival|\/verblijf|\/booking|\/book\b|\/residentie|\/sociaal|\/samen|\/fluister|\/live\b|\/klets|\/chat\b|\/like\b|\/comment|\/tijdlijn|\/aandacht|\/attenties|\/favoriet|\/dag\b|\/locatie|\/adres|\/annuleer|\/gids\b|\/event\b|\/punten|\/vandaag|\/ice\b|\/rahul|\/ai\b|\/navigatie|\/reizen|\/vertaler/, 'klantenservice', 'Klantenservice'],
+  [/\/thuis|\/home|\/leven|\/life\b|\/ik\b|\/gemoed|\/gedachten|\/gewoonten|\/doelen|\/notities|\/memo|\/vitaal|\/voeding|\/medicatie|\/medicijnen|\/metingen|\/arrival|\/verblijf|\/booking|\/book\b|\/residentie|\/sociaal|\/samen|\/fluister|\/live\b|\/klets|\/chat\b|\/like\b|\/comment|\/tijdlijn|\/aandacht|\/attenties|\/favoriet|\/dag\b|\/locatie|\/adres|\/annuleer|\/gids\b|\/event\b|\/punten|\/vandaag|\/ice\b|\/rahul|\/ai\b|\/navigatie|\/reizen|\/vertaler|\/(?:onderhoud|wonen|woningdossier)\.html/, 'klantenservice', 'Klantenservice'],
   [/\/cellier|\/cercle|\/concierge|\/zaal|\/entourage|\/garderobe|\/ghost|\/hangar|\/lifestyle|\/horloge|\/uitzicht|\/maison|\/mecenaat|\/pulse|\/rendezvous/, 'klantenservice', 'Klantenservice'],
   [/\/klankwerk|\/camera|\/oog\b|\/media\.html/, 'creatief', 'Creatief'],
   // de organisatiekant van het festival (poort, kassa, dienst): een zaak, net

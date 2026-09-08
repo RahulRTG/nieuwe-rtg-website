@@ -129,7 +129,7 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
         width: r.width, height: r.height, scrollWidth: nav.scrollWidth },
       onder: { left: onder.left, right: onder.right, top: onder.top, bottom: onder.bottom }, links };
     });
-    assert.deepEqual(navmaat.links.map(x => x.naam), ['Home', 'Ontdek', 'Chat', 'Activiteit', 'Profiel']);
+    assert.deepEqual(navmaat.links.map(x => x.naam), ['Home', 'Zoeken', 'Maken', 'Berichten', 'Wereld']);
     assert.ok(navmaat.nav.left >= navmaat.onder.left && navmaat.nav.right <= navmaat.onder.right + 1,
       'de vijf wereldkeuzes horen volledig in de ene Edge-onderrand: ' + JSON.stringify(navmaat));
     assert.ok(navmaat.nav.top >= navmaat.onder.top - 1 && navmaat.nav.bottom <= navmaat.onder.bottom + 1,

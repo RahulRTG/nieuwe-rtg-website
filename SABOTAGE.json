@@ -1,8 +1,10 @@
 {
   "stempel": {
-    "op": "2026-09-02T10:54:15.639Z",
-    "commit": "a59c2978",
+    "op": "2026-09-08T21:49:24.824Z",
+    "commit": "9b4e0bd2",
     "boomVuil": false,
+    "boomAnders": 2,
+    "instrument": "scripts/sabotage.js",
     "node": "v22.22.2"
   },
   "uitleg": "Gemeten uitslag van npm run sabotage: per systeemwet of het uitzetten van zijn handhaver ECHT iets rood maakte. Niet met de hand bijwerken -- npm run wetten vergelijkt de vingerafdruk van het recept en meldt het als de meting verlopen is.",
@@ -322,6 +324,34 @@
       "reden": "8. elke cap die PLATFORM.md als voorbeeld noemt, bestaat echt",
       "wachter": "test:test/genrecap.test.js",
       "duurMs": 159
+    },
+    "beveiliging-geen-verlaging-zonder-ceremonie": {
+      "stand": "raak",
+      "afdruk": "bf35d6e7db263801",
+      "reden": "SEC-LOCK-001-a: elke overgang naar een zwakkere of niet te ordenen stand telt als verlaging",
+      "wachter": "test:test/seclock.test.js",
+      "duurMs": 5309
+    },
+    "beveiliging-ai-heft-beveiliging-niet-op": {
+      "stand": "raak",
+      "afdruk": "55380814c1ba9f06",
+      "reden": "SEC-LOCK-002-b: geen enkele regex in de AI-allowlist raakt een beveiligingspad",
+      "wachter": "test:test/seclock.test.js",
+      "duurMs": 4756
+    },
+    "beveiliging-lagere-drager-neutraliseert-niet": {
+      "stand": "raak",
+      "afdruk": "7a527e18bf4467d6",
+      "reden": "SEC-LOCK-003: een lagere drager kan de beperking van een hogere niet opheffen",
+      "wachter": "test:test/seclock.test.js",
+      "duurMs": 4868
+    },
+    "beveiliging-onbekende-stand-is-niet-normaal": {
+      "stand": "raak",
+      "afdruk": "6984fe409b39e954",
+      "reden": "SEC-LOCK-004: een onleesbare stand valt terug op beschermd en niet op normaal",
+      "wachter": "test:test/seclock.test.js",
+      "duurMs": 4681
     }
   }
 }

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-07T21:02:53.959Z",
-    "commit": "302848894",
+    "op": "2026-09-08T22:12:08.799Z",
+    "commit": "d516045f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4604,6 +4604,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 18,
       "scherp": "gezakt"
+    },
+    "overleving.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/overleving.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "overname.test.js": {
       "soort": "puur",

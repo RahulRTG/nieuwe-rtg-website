@@ -199,3 +199,58 @@ test('12. de compacte Nederlandse graaf snapt, zoekt en respecteert voertuigtoeg
   assert.equal(n.zoekPlekken('Amsterdam')[0].naam, 'Amsterdam');
   fs.rmSync(map, { recursive: true, force: true });
 });
+
+/* 13. ZONDER NEDERLANDS WEGENNET LIEGT DE KAART NIET MEER.
+
+   Dit is de reparatie van een stil defect: `route()` weigerde een Nederlandse
+   rit netjes met 503, maar `kaart()`, `bestemmingen()` en `poi()` vielen zonder
+   een woord terug op het demonstratieraster rond Ibiza. Een lid in Amsterdam
+   kreeg dus een kaart van een ander eiland, zocht zijn straat en vond nul, en
+   las intussen "Motor actief". Vier antwoorden op dezelfde ontbrekende bron
+   zijn vier waarheden; het zijn er nu twee: binnen Nederland weigeren alle vier
+   met DEZELFDE zin, en buiten Nederland verandert er niets.
+
+   Deze opzet() heeft met opzet GEEN nederlandNet -- dat is de situatie op elke
+   verse installatie, want de NWB-data staat in RTG_DATA_DIR en niet in git. */
+test('13. binnen Nederland zonder NWB-import weigert de kaart met de reden, in plaats van Ibiza te tonen', () => {
+  const { nav } = opzet();
+  const amsterdam = { lat: 52.3676, lng: 4.9041 };
+  const reden = 'Het Nederlandse wegennet is nog niet ingeladen.';
+
+  for (const [naam, uitkomst] of [
+    ['navKaart', nav.navKaart(amsterdam)],
+    ['navBestemmingen', nav.navBestemmingen('Amsterdam', amsterdam)],
+    ['navPoi', nav.navPoi(['tank'], amsterdam)],
+    ['navRoute', nav.navRoute({ van: amsterdam, naar: { lat: 52.0907, lng: 5.1214 }, modus: 'auto' })]
+  ]) {
+    assert.equal(uitkomst.status, 503, naam + ' weigert');
+    assert.equal(uitkomst.error, reden, naam + ' geeft dezelfde reden');
+  }
+  // en de weigering wijst de weg naar de oplossing, in plaats van alleen nee te zeggen
+  assert.match(nav.navKaart(amsterdam).hoe, /navigatie:nederland/);
+
+  // buiten de Nederlandse dekking blijft het eigen net gewoon werken
+  const ibiza = nav.navKaart({ lat: 38.91, lng: 1.43 });
+  assert.equal(ibiza.status, 200);
+  assert.ok(ibiza.plekken.length > 0, 'buiten NL onveranderd');
+});
+
+/* 14. DE STATUS ZEGT WAT DE MOTOR HIER KAN, NIET DAT HIJ BESTAAT.
+
+   De badge in het scherm leidde zijn tekst af uit `dekking`, en kwam daardoor
+   op "Motor actief" uit terwijl elke Nederlandse route 503 gaf. De motor
+   antwoordt nu zelf op die vraag (`net` + `routeerbaarHier`) zodat er maar een
+   plek is waar dit geweten wordt. */
+test('14. status noemt het net en of hier te routeren valt', () => {
+  const { nav } = opzet();
+  const nl = nav.navStatus({ lat: 52.3676, lng: 4.9041 });
+  assert.equal(nl.net, 'geen');
+  assert.equal(nl.routeerbaarHier, false);
+  assert.equal(nl.dekking.actief, false);
+  assert.equal(nl.dekking.hierBinnenNederland, true);
+  assert.match(nl.netReden, /nog niet ingeladen/);
+
+  const buiten = nav.navStatus({ lat: 38.91, lng: 1.43 });
+  assert.equal(buiten.net, 'demonstratie');
+  assert.equal(buiten.routeerbaarHier, true, 'buiten NL rekent het eigen net gewoon');
+});

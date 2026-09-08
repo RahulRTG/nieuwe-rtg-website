@@ -47,6 +47,41 @@ test('auto gebruikt richting en hysterese maar overschrijft Focus of rust niet',
   assert.match(MAIN, /dragstart/);
 });
 
+test('auto luistert alleen naar een scroll van de mens, niet naar een scroll van de software', () => {
+  /* De scroll-gebeurtenis zegt niet wie hem veroorzaakte. Een wiel, een vinger
+     of een scrolltoets wel. Een scroll die de software zelf maakt
+     (scrollIntoView, een anker, een focusverplaatsing) laat de stand staan:
+     anders klapt de bovenrand in of uit, verschuift de body een knophoogte, en
+     landt een tik die net op een knop mikte op wat eronder stond --
+     test/appstore.e2e.js zag precies dat gebeuren. Een tik is met opzet GEEN
+     gebaar: de software scrolt vaak vlak na een tik, en dat is de gevaarlijke
+     volgorde. */
+  const ev = (type, extra) => Object.assign({ type, key: '', target: null }, extra);
+  assert.equal(edge.scrollGesture(ev('wheel')), true);
+  assert.equal(edge.scrollGesture(ev('touchmove')), true);
+  assert.equal(edge.scrollGesture(ev('keydown', { key: 'PageDown' })), true);
+  assert.equal(edge.scrollGesture(ev('keydown', { key: ' ' })), true);
+  assert.equal(edge.scrollGesture(ev('keydown', { key: 'a' })), false, 'typen is geen scrollen');
+  assert.equal(edge.scrollGesture(ev('keydown', { key: ' ', target: { tagName: 'INPUT' } })), false,
+    'een spatie in een veld scrolt niet');
+  assert.equal(edge.scrollGesture(ev('keydown', { key: 'Tab', target: { tagName: 'INPUT' } })), true,
+    'Tab verplaatst de focus, ook vanuit een veld');
+  assert.equal(edge.scrollGesture(ev('scroll')), false, 'de scroll zelf zegt niet wie hem veroorzaakte');
+  assert.equal(edge.scrollGesture(ev('pointerdown')), false, 'een tik is geen scroll');
+  assert.equal(edge.scrollGesture(null), false);
+  assert.ok(edge.GESTURE_MS >= 1000 && edge.GESTURE_MS <= 3000,
+    'het venster dekt de uitloop van een veeg, zonder een minuut later nog te gelden');
+  // en de bediening vraagt het ook echt: de scroll-luisteraar van het venster gaat langs de gebaartijd
+  assert.match(CONTEXT, /\['wheel','touchmove','keydown'\]\.forEach/);
+  assert.match(MAIN, /gebaarBind\(rt,rt\.win\);/);
+  assert.match(MAIN, /if\(!gebaarVers\(rt\)\)return;/);
+  // het venster loopt mee met een veeg die uitloopt: een geaccepteerde scroll verlengt het
+  const rt = { gebaarTijd: Date.now() };
+  assert.equal(edge.gestureFresh(rt), true);
+  assert.equal(edge.gestureFresh({ gebaarTijd: 0 }), false, 'zonder gebaar is de scroll van de software');
+  assert.equal(edge.gestureFresh({}), false);
+});
+
 test('alleen de gesloten lijst contexttokens wordt geaccepteerd', () => {
   assert.deepEqual(Object.keys(edge.CONTEXT).sort(), [
     'duimbalk', 'hoofdtabs', 'living-bank', 'living-top', 'native-header',

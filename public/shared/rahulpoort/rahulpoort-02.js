@@ -52,8 +52,18 @@
     /* Een stap is een tekstregel OF een keuze uit een lijst (type:'keuze', met
        opties() die [{waarde,label}] geeft). Meer smaken zijn er niet: een poort
        waar je doorheen praat hoort simpel te blijven. */
+    /* WELKE STAP ER STAAT, en of hij VERS is. De groet laat de eerste vraag
+       900 ms wachten, maar het veld staat er al -- en wie meteen begint te
+       typen (een snelle typist, een wachtwoordmanager, een toets) heeft dan
+       al een antwoord staan en misschien al op Enter gedrukt. Dezelfde stap
+       nog eens tonen mag dan niet het veld leegmaken: dan verdwijnt het
+       wachtwoord dat net was ingetypt, Enter vindt een leeg veld, en het
+       gesprek staat stil bij "En uw wachtwoord?" zonder dat iemand iets
+       verkeerd deed. Alleen een NIEUWE stap begint met een leeg veld. */
+    var getoond = -1;
     function toonStap() {
-      var s = stappen[i];
+      var s = stappen[i], vers = getoond !== i;
+      getoond = i;
       zeg(lees(s.vraag));
       var isKeuze = s.type === 'keuze';
       keus.hidden = !isKeuze; keus.setAttribute('aria-hidden', isKeuze ? 'false' : 'true');
@@ -77,8 +87,7 @@
       inp.setAttribute('autocomplete', s.autocomplete || 'off');
       if (s.inputmode) inp.setAttribute('inputmode', s.inputmode); else inp.removeAttribute('inputmode');
       if (s.maxlength) inp.maxLength = s.maxlength; else inp.removeAttribute('maxlength');
-      inp.value = '';
-      rij.classList.remove('vol');
+      if (vers) { inp.value = ''; rij.classList.remove('vol'); }
       try { inp.focus(); } catch (e) {}
     }
 
@@ -146,9 +155,11 @@
     setTimeout(hertaal, 0);
     w.addEventListener('rtglang', hertaal);
 
-    if (opt.groet) { zeg(lees(opt.groet)); setTimeout(toonStap, 900); } else toonStap();
+    /* De groet wacht, het gesprek niet: wie tijdens de groet al antwoordde en
+       verder is, krijgt de eerste vraag niet alsnog over zijn tweede heen. */
+    if (opt.groet) { zeg(lees(opt.groet)); setTimeout(function () { if (getoond < 0) toonStap(); }, 900); } else toonStap();
     return { zeg: zeg, misging: misging, hertaal: hertaal,
-      opnieuw: function () { i = 0; antw = {}; toonStap(); } };
+      opnieuw: function () { i = 0; antw = {}; getoond = -1; toonStap(); } };
   }
 
   w.RTGPoort = { gesprek: gesprek };

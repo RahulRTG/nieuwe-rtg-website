@@ -40,6 +40,10 @@ module.exports = (kern) => {
      het personeel na te kijken in plaats van alleen in een terminal. Zie
      ./office/dekking.js. */
   require('./office/dekking')(octx);
+  /* De schaduwmeting van de kantoordeur: welke routes worden werkelijk anoniem
+     gebruikt (KANTOOR.md par. 3). Achter boardroomAuth, want een kaart van de
+     gaten hoort niet leesbaar te zijn voor de sessie die het gat is. */
+  require('./office/mensdeur')(octx);
   /* Het routedossier: dezelfde routes, maar dan wat we er over ELF schakels van
      weten. De dekking zegt of een route is aangeraakt; dit zegt of hij dicht
      zit, rommel weigert en een spoor achterlaat. Zie ./office/dossier.js. */

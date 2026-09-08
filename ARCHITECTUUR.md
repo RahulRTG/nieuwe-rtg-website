@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4987 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4988 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4987 |
-| servermodules (`server/**/*.js`) | 3289 |
-| routebestanden (`server/routes/**`) | 574 |
-| kernmodules (`server/kern/**`) | 2053 |
+| API-endpoints | 4988 |
+| servermodules (`server/**/*.js`) | 3294 |
+| routebestanden (`server/routes/**`) | 575 |
+| kernmodules (`server/kern/**`) | 2056 |
 | schermen (`public/**/*.html`) | 313 |
-| gedeelde browsermodules (`public/shared/*.js`) | 329 |
-| toetsbestanden (`test/*.test.js`) | 1546 |
-| schermtoetsen (`test/*.e2e.js`) | 205 |
+| gedeelde browsermodules (`public/shared/*.js`) | 340 |
+| toetsbestanden (`test/*.test.js`) | 1552 |
+| schermtoetsen (`test/*.e2e.js`) | 208 |
 
 ## 2. De weg van een verzoek
 
@@ -112,7 +112,7 @@ zie §5 -- er zijn nog 231 kern-namen die meer dan één domein aanraakt.
 | `auth` | 20 | 6 | 8 | 52 |
 | `member` | 694 | 70 | 16 | 427 |
 | `supplier` | 618 | 122 | 6 | 331 |
-| `office` | 63 | 16 | 3 | 78 |
+| `office` | 64 | 17 | 3 | 79 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 71 |
 | `techniek` | 77 | 19 | 1 | 64 |
@@ -135,9 +135,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1557 |
+| kern-namen die routes aanraken | 1558 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 231 |
-| daarvan door precies één domein | 1326 |
+| daarvan door precies één domein | 1327 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

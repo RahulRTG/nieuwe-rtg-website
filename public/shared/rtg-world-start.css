@@ -1,0 +1,12 @@
+/* Eén tijdelijke laadstatus. De echte route bouwt ondertussen in haar eigen DOM. */
+body[data-rtg-world-start]{margin:0;display:flow-root}
+body[data-rtg-world-start="loading"]>:not(.rtg-world-start){visibility:hidden!important}
+body[data-rtg-world-start="loading"] :not(.rtg-world-start,.rtg-world-start *){visibility:hidden!important}
+.rtg-world-start{position:fixed;z-index:20000;inset:0;display:grid;place-content:center;grid-template-rows:64px 24px 17px;gap:16px;padding:24px;background:#10100f;color:#f4f0e9;text-align:center;font:400 1rem/1.5 Inter,system-ui,sans-serif}
+.rtg-world-start[hidden]{display:none!important}
+.rtg-world-start strong{height:64px;font:400 64px/64px Georgia,serif;color:#c6ae77}
+.rtg-world-start span{height:24px;line-height:24px;font-size:.875rem;letter-spacing:.04em}
+.rtg-world-start::after{content:"";width:48px;height:1px;background:#c6ae77;margin:8px auto;animation:rtg-wait 1s ease-in-out infinite alternate}
+@keyframes rtg-wait{to{opacity:.35}}
+@media(prefers-reduced-motion:reduce){.rtg-world-start::after{animation:none}}
+html.rtg-stil .rtg-world-start::after{animation:none}

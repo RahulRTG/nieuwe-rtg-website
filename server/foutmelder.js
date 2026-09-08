@@ -38,8 +38,43 @@ function maakFoutmelder(opts) {
   if (protocol.eigenEndpoint(url) && !protocol.sleutelGoed(sleutel)) {
     logger('[foutmelder] Ondertekeningssleutel ontbreekt; eigen webhook uit.'); url = '';
   }
-  let onafhankelijk = true;
-  try { onafhankelijk = new URL(url).origin !== new URL(opts.appUrl || process.env.APP_URL).origin; } catch (_) {}
+  /* ONAFHANKELIJK IS EEN VRAAG MET DRIE ANTWOORDEN, EN "NIET VAST TE STELLEN"
+     IS ER EEN VAN.
+
+     Hier stond `let onafhankelijk = true` met een try/catch eromheen, en dat is
+     fail-OPEN op precies het veld dat moet waarschuwen: elke fout in de
+     berekening liet de waarde op `true` staan. Een ontvanger op een ANDERE
+     herkomst die toch deze app is (loopback met ERR_WEBHOOK_INTERN=1, een
+     tweede hostnaam) telde daardoor als externe bewaking, en het alarmbord
+     noemde "de externe webhook (ERR_WEBHOOK_URL)" als uitgang terwijl er bij
+     een volledige app- of hostuitval niets afgaat. Dat is exact wat de kop van
+     kern/command/alarm-uitgang.js belooft te voorkomen.
+
+     De betrouwbare bron stond drie regels hoger al berekend en wordt in
+     server/config/productie.js voor hetzelfde oordeel gebruikt:
+     protocol.eigenEndpoint(url) kijkt naar het PAD en heeft geen APP_URL nodig.
+     Die gaat voorop. Pas daarna de herkomstvergelijking -- en die kan mislukken,
+     want APP_URL is buiten productie niet afgedwongen. Dan is het antwoord
+     `null` MET de reden, en niet stilzwijgend "ja". */
+  let onafhankelijk = null;
+  let onafhankelijkReden = 'Er is geen uitgang: ERR_WEBHOOK_URL is niet gezet of werd geweigerd.';
+  if (url) {
+    let zelfdeHerkomst = null;
+    try { zelfdeHerkomst = new URL(url).origin === new URL(String(opts.appUrl || process.env.APP_URL || '')).origin; }
+    catch (_) { zelfdeHerkomst = null; }
+    if (protocol.eigenEndpoint(url)) {
+      onafhankelijk = false;
+      onafhankelijkReden = 'Ontvangst op de eigen storingenwebhook; geen bewaking bij volledige app- of hostuitval.';
+    } else if (zelfdeHerkomst === true) {
+      onafhankelijk = false;
+      onafhankelijkReden = 'Ontvangst op dezelfde app; geen bewaking bij volledige app- of hostuitval.';
+    } else if (zelfdeHerkomst === false) {
+      onafhankelijk = true;
+      onafhankelijkReden = '';
+    } else {
+      onafhankelijkReden = 'APP_URL ontbreekt of is geen geldig adres, dus of deze ontvanger buiten deze app staat is niet vast te stellen.';
+    }
+  }
   const app = opts.app || process.env.RTG_APP_NAAM || 'rtg';
   const timeout = opts.timeout || 5000;
   const venster = opts.vensterMs || 60000;        // per vingerafdruk max 1x per minuut
@@ -119,8 +154,11 @@ function maakFoutmelder(opts) {
     return r;
   }
 
+  /* `beperking` is leeg BIJ EEN BEWEZEN ONAFHANKELIJKE UITGANG en anders de
+     reden -- ook als die reden "wij weten het niet" is. Een leeg vak leest als
+     een uitgang die er is. */
   const stand = () => Object.assign({ actief: !!url, onafhankelijk,
-    beperking: onafhankelijk ? null : 'Ontvangst op dezelfde app; geen bewaking bij volledige app- of hostuitval.' }, staat);
+    beperking: onafhankelijk === true ? null : (onafhankelijkReden || null) }, staat);
 
   return { melden, zelfproef, stand, actief: !!url };
 }

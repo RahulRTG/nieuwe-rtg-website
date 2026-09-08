@@ -170,7 +170,11 @@ $('#nMaak').addEventListener('click', async () => {
 let P = null, poll = null, uGekozen = null;
 async function openProject(id){
   P = { id };
-  toon('vProject');
+  const source = Array.from(document.querySelectorAll('#projecten [data-open]')).find(el => el.dataset.open === String(id));
+  if (source && window.RTGHeritageTransition) {
+    const transition = RTGHeritageTransition.run(source, '#vProject', () => toon('vProject'));
+    if (transition && transition.updateCallbackDone) await transition.updateCallbackDone;
+  } else toon('vProject');
   await ververs();
   laadVrienden();
   clearInterval(poll);

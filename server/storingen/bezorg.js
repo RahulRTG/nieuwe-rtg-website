@@ -18,6 +18,21 @@ function poging({ url, payload, sleutel, id, timeout, getekend }) {
         res.on('error', () => eind({ ok: false, reden: 'Antwoordverbinding onderbroken.', retry: true }));
         res.on('aborted', () => eind({ ok: false, reden: 'Antwoordverbinding afgebroken.', retry: true }));
         res.on('data', b => {
+          /* DE GRENS HOORT BIJ HET BEWIJS, NIET BIJ DE BEZORGING. Alleen een
+             ONDERTEKENDE bezorging leest het antwoord: daar zit het opslagbewijs
+             in, en dat moet begrensd blijven voordat het door JSON.parse gaat.
+             Een gewone webhook (Slack, Discord, een eigen collector) stuurt geen
+             bewijs; daar telt de status en verder niets.
+
+             Deze grens stond buiten die tak, en dus gold hij ook voor de
+             ongetekende weg: een collector die met 200 en een antwoord van meer
+             dan 4 KB terugkwam -- een pagina, een echo van de melding -- werd
+             geboekt als MISLUKT, met "Ontvangstbewijs te groot." als laatste
+             fout op het techniekbord. Een werkende alarmweg las dan als kapot.
+             De vorige versie van post() deed hier res.resume(): lichaam weg,
+             status telt. Dat gedrag staat hieronder terug. De verbinding blijft
+             begrensd door de deadline hierboven, net als toen. */
+          if (!getekend) return;
           lengte += b.length;
           if (lengte > 4096) { eind({ ok: false, reden: 'Ontvangstbewijs te groot.' }); res.destroy(); }
           else chunks.push(b);

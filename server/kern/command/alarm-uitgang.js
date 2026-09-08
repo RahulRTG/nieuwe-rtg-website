@@ -84,7 +84,18 @@ module.exports = ({ journaal, sein, foutmelder }) => {
     if (!m) return { actief: false, reden: 'er is geen foutmelder aangesloten op deze laag; alarmen blijven binnen het huis' };
     if (!m.actief) return { actief: false, reden: 'ERR_WEBHOOK_URL is niet gezet of werd geweigerd; er gaat niets naar buiten' };
     const stand = typeof m.stand === 'function' ? m.stand() : {};
-    return { actief: true, reden: stand.beperking || null, onafhankelijk: stand.onafhankelijk !== false };
+    /* `!== false` maakte van "onbekend" stil een "ja" -- dezelfde fail-open die
+       in server/foutmelder.js zat, een laag hoger. Drie standen blijven drie
+       standen: alleen een echte boolean is een oordeel.
+
+       En een uitgang die zijn onafhankelijkheid NIET bewijst draagt hier altijd
+       een reden, ook als de melder er geen meegaf. Zonder die regel bleef het
+       veld leeg en las het bord dat als "niets aan de hand" -- een lege reden
+       is precies zo misleidend als een verkeerde. */
+    const onaf = typeof stand.onafhankelijk === 'boolean' ? stand.onafhankelijk : null;
+    return { actief: true, onafhankelijk: onaf,
+      reden: stand.beperking || (onaf === true ? null
+        : 'de foutmelder zegt niet of deze uitgang buiten deze app staat; onbewezen bewaking telt niet als bewaking') };
   }
 
   return { meld, buitenStand, naarBuiten };

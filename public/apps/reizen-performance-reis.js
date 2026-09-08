@@ -56,13 +56,13 @@
 
   function updateVandaag(data) {
     var lijst = data.komend || [], vlucht = lijst.find(function (x) { return x.soort === 'vlucht'; });
-    var eerst = lijst.filter(function (x) { return x.van === R.vandaagISO(0) && x.tijd; })
-      .sort(function (a, b) { return String(a.tijd).localeCompare(String(b.tijd)); })[0];
+    var eerst = lijst.slice().sort(function(a,b){return String(a.van || '').localeCompare(String(b.van || '')) || String(a.tijd || '').localeCompare(String(b.tijd || ''));})[0];
     var bestemming = vlucht && vlucht.bestemming ? vlucht.bestemming : ((lijst[0] && lijst[0].bestemming) || 'UW REIS');
     $('#titelVandaag').textContent = String(bestemming).toUpperCase();
-    $('#gereedTeller').textContent = lijst.length + '/' + lijst.length + ' GEREED';
+    $('#gereedTeller').textContent = lijst.length + (lijst.length === 1 ? ' ONDERDEEL' : ' ONDERDELEN');
     $('#dagzin').textContent = lijst.length ? 'Alles voor uw volgende beweging staat bij elkaar.' : 'Er staat nog geen reis gepland.';
-    var raster = $('#dagRaster'); if (raster) raster.hidden = !lijst.length;
+    $('#reisBronState').hidden = !!lijst.length; $('#reisVolgende').hidden = !lijst.length;
+    $('#reisBronTekst').textContent = 'Nog geen reis gepland. Uw reisregister staat voor u klaar.';
     tekenMomenten(lijst);
     var status = $('#statusLijst'); status.textContent = '';
     lijst.slice(0, 3).forEach(function (reis) {
@@ -72,10 +72,10 @@
       span.appendChild(titel); span.appendChild(maak('small', '', [reis.status, reis.bestemming, reis.kenmerk].filter(Boolean).join(' · ')));
       a.appendChild(i); a.appendChild(span); a.appendChild(maak('em', '', '›')); status.appendChild(a);
     });
-    if (eerst) { $('#volgendTijd').textContent = eerst.tijd; $('#volgendLabel').textContent = eerst.titel || 'Volgend reismoment';
-      $('#volgendVan').textContent = 'VERTREK';
-      $('#volgendNaar').textContent = String(eerst.bestemming || 'BESTEMMING').toUpperCase(); }
-    if (vlucht && vlucht.tijd) $('#volgendExtra').textContent = 'VLUCHT ' + vlucht.tijd;
+    if (eerst) { var datum = datumDelen(eerst.van); $('#volgendTijd').textContent = eerst.tijd || (datum.dag + ' ' + datum.maand).trim(); $('#volgendLabel').textContent = eerst.titel || 'Volgend reismoment';
+      $('#volgendVan').textContent = eerst.van === R.vandaagISO(0) ? 'VANDAAG' : (eerst.van || 'DATUM ONBEKEND');
+      $('#volgendNaar').textContent = String(eerst.bestemming || 'BESTEMMING ONBEKEND').toUpperCase(); }
+    $('#volgendExtra').textContent = eerst && eerst.tijd ? 'VOLGENS UW REISGEGEVENS' : 'TIJD NOG ONBEKEND';
   }
   function renderReizen(data) {
     R.staat.reizen = data;
@@ -86,12 +86,12 @@
        demowereld met drie komende reizen en een gezonde stand; wie de app
        zonder token opende zag dus een reisoverzicht dat niet van hem was.
        RTG toont wat er echt is, of het zegt dat het niets kan tonen. */
-    if (!R.token) { if (melding) R.toast('Log in om uw reizen te zien.'); return; }
-    return R.api('/api/reis/wereld', {}).then(function (data) { renderReizen(data); if (melding) R.toast('Uw reizen zijn bijgewerkt.'); })
+    if (!R.token) { $('#reisBronTekst').textContent = 'Log in om uw eigen reizen te zien.'; if (melding) R.toast('Log in om uw reizen te zien.'); return; }
+    return R.api('/api/reis/wereld', {}).then(function (data) { renderReizen(data); if (window.RTGRouteMemory) window.RTGRouteMemory.ready('travel-home'); if (melding) R.toast('Uw reizen zijn bijgewerkt.'); })
       /* Ook bij een storing NIET in #komend schrijven: dat register is van
          reizen.html, en die zegt zelf wat er misging. Twee foutmeldingen over
          elkaar heen leest als twee storingen. */
-      .catch(function (e) { R.toast(e.message); });
+      .catch(function (e) { $('#reisBronState').hidden=false; $('#reisVolgende').hidden=true; $('#reisBronTekst').textContent='Wacht op bron. Uw reisgegevens konden niet worden opgehaald.'; $('#gereedTeller').textContent='WACHT OP BRON'; R.toast(e.message); });
   };
   $('[data-ververs-reizen]').addEventListener('click', function () { R.laadReizen(true); });
 })(window.RTGReizen);

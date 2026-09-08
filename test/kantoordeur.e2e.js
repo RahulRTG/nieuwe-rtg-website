@@ -275,6 +275,31 @@ test('staat er een algemene pin, dan vraagt de kantoordeur die (gemaskeerd)',
     assert.match(vraag.tekst, /pin/i, 'de deur hoort om de algemene pin te vragen, niet om iets anders');
     assert.equal(vraag.type, 'password', 'een pin hoort gemaskeerd te worden ingetypt');
 
+    /* EERST EEN FOUTE PIN, EN DAT IS DE HELFT DIE ONTBRAK. Deze toets liep
+       alleen de goede weg, en juist daardoor kon het scherm maandenlang stil
+       zijn bij een afwijzing: de server zei "Onjuiste pincode." en de deur gaf
+       exact dezelfde vraag terug zonder een woord. Wie zich vertypt weet dan
+       niet of hij zich vergiste of dat er iets stuk is -- en na vijf pogingen
+       zet het slot de deur op 429 zonder dat ook dat in beeld komt. */
+    await o.page.fill('.kg-in', '111111');
+    await o.page.click('.kg-rij button');
+    await wachtOpRust(o.page).catch(() => {});
+    const geweigerd = await o.page.evaluate(() => {
+      const foutvak = document.querySelector('.kg .kg-fout');
+      return {
+        fout: foutvak ? foutvak.textContent.replace(/\s+/g, ' ').trim() : null,
+        vraag: document.querySelector('.kg .kg-zegt').textContent.replace(/\s+/g, ' ').trim(),
+        type: document.querySelector('.kg-in').type,
+        tok: !!localStorage.getItem('rtg_office_token')
+      };
+    });
+    assert.equal(geweigerd.tok, false, 'een foute pin hoort geen kantoorsessie op te leveren');
+    assert.ok(geweigerd.fout, 'een geweigerde pin hoort de reden van de server te tonen; ' +
+      'een deur die zwijgt laat de medewerker tegen zichzelf typen');
+    assert.match(geweigerd.vraag, /pin/i, 'en hij hoort daarna opnieuw om de pin te vragen');
+    assert.equal(geweigerd.type, 'password', 'ook de tweede poging blijft gemaskeerd');
+    assert.ok(!vraagtCode(geweigerd.vraag), 'een foute pin stuurt je niet naar de kantoorcode');
+
     await o.page.fill('.kg-in', '482913');
     await o.page.click('.kg-rij button');
     await wachtOpRust(o.page).catch(() => {});

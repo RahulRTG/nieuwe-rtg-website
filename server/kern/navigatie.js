@@ -11,6 +11,7 @@ const MODI = { auto: 13.9, ev: 13.9, fiets: 4.4, lopen: 1.4 };  // terugval-ETA 
 const LANGS_M = 450;                                             // "langs de route" straal
 const intelligence = require('./navigatie/intelligentie');
 const { maakNederlandNet, binnenNederland } = require('./navigatie/nederland');
+const dekking = require('./navigatie/dekking');
 let nederlandNetCache;
 
 // de eigen POI-lagen: tankstations, laadpalen en civiele loketten rond Ibiza
@@ -68,6 +69,7 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
   }
 
   function bestemmingen(query, hier) {
+    if (inNLZonderNet(hier)) return dekking.geenNederlandsNet();
     const q = zonderTekens(query);
     let rij = eigenPlekken();
     const laagZoek = ['laad', 'laadpaal', 'tank', 'tankstation', 'halte', 'ov', 'gemeente', 'overheid', 'leverancier'].includes(q);
@@ -91,6 +93,7 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
   }
 
   function poiLagen(lagen, hier) {
+    if (inNLZonderNet(hier)) return dekking.geenNederlandsNet();
     const wens = Array.isArray(lagen) && lagen.length ? lagen : ['tank', 'laad', 'civic', 'ov', 'leverancier'];
     const uit = {};
     const alles = eigenPlekken();
@@ -113,10 +116,13 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
     flitsRond, partners, meters, snap: nederland.snap, zoek: nederland.zoek, stappenVan: nederland.stappenVan,
     intelligence, netwerk: { bron: 'RTG Route Intelligence op het Rijkswaterstaat Nationaal Wegenbestand (NWB, CC0); geen externe kaartdienst' } });
 
+  // wat deze motor over zijn eigen dekking weet, staat in ./navigatie/dekking.js
+  const inNLZonderNet = (hier) => dekking.inNLZonderNet(nederland, hier);
+
   function route(vraag) {
     const vanNL = binnenNederland(vraag && vraag.van), naarNL = binnenNederland(vraag && vraag.naar);
     if (vanNL || naarNL) {
-      if (!nederlandRoute) return { status: 503, error: 'Het Nederlandse wegennet is nog niet ingeladen.' };
+      if (!nederlandRoute) return dekking.geenNederlandsNet();
       if (!vanNL || !naarNL) return { status: 422, error: 'Deze route kruist de huidige landsdekking.' };
       vraag.van.land = 'NL'; vraag.naar.land = 'NL';
       return nederlandRoute(vraag);
@@ -129,8 +135,7 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
     const netwerk = flitsRond && hier ? (flitsRond(hier, hier.land).meldingen || []) : [];
     return { status: 200, motor: 'RTG Route Intelligence', versie: 3, eigenMotor: true,
       live: { netwerk: netwerk.length, partners: partnerEvents.length, bijgewerktAt: new Date().toISOString() },
-      dekking: nederland ? { land: 'Nederland', actief: true, hierActief: binnenNederland(hier), wegvakken: Number(nederland.info.wegvakken || 0),
-        bron: nederland.info.bron, licentie: nederland.info.licentie, gebouwdAt: nederland.info.gebouwd_at } : { land: 'Nederland', actief: false },
+      ...dekking.dekkingsbeeld(nederland, hier),
       profielen: Object.entries(intelligence.PROFIELEN).map(([id, p]) => ({ id, naam: p.naam })),
       mogelijkheden: ['live-verkeer', 'alternatieve-routes', 'eta-confidence', 'ev-energie', 'partner-events', 'privacy-routing', 'nederland-nwb'] };
   }
@@ -138,6 +143,7 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
   // ---- de kaart voor de 3D-app: net-definitie + koppelpunten ----
   function kaart(hier) {
     if (nederland && binnenNederland(hier)) return nederland.kaart(hier, eigenPlekken());
+    if (inNLZonderNet(hier)) return dekking.geenNederlandsNet();
     return {
       status: 200, ref: REF, bounds: BOUNDS, grid: GRID, arterie: ARTERIE,
       plekken: eigenPlekken().map(p => {

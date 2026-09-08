@@ -7,8 +7,9 @@
   src:url('/fonts/UcC73FwrK3iLTeHuS_nVMrMxCp50SjIa1ZL7W0Q5nw.woff2') format('woff2')
 }
 
-/* De wereld bepaalt de inhoud; het huis bepaalt de letterrollen. */
-body[data-rtg-skin="heritage"] :where(h1,h2,.rtg-ceremonie,.display,.serif){
+/* Bediening en gegevens blijven Inter; alleen benoemde vertelmomenten Bodoni. */
+body[data-rtg-skin="heritage"] :where(h1,h2,h3,h4){font-family:var(--rtg-interface,Inter,system-ui,sans-serif)}
+body[data-rtg-skin="heritage"] :where([data-rtg-type="display"],.rtg-ceremonie,.display,.serif){
   font-family:var(--rtg-display,"Bodoni Moda",Georgia,serif);
   font-weight:450;
   letter-spacing:-.025em;
@@ -37,12 +38,12 @@ body[data-rtg-skin="heritage"] :where(a.kaart,a.card,button.kaart,button.card,
   .kaart[role="button"],.card[role="button"],[data-rtg-interactive]){
   transition:border-color var(--rtg-time-functional,200ms) var(--rtg-ease-standard,ease),
     box-shadow var(--rtg-time-functional,200ms) var(--rtg-ease-standard,ease),
-    transform var(--rtg-time-direct,100ms) var(--rtg-ease-standard,ease)
+    color var(--rtg-time-direct,100ms) var(--rtg-ease-standard,ease)
 }
 body[data-rtg-skin="heritage"] :where(a.kaart,a.card,button.kaart,button.card,
   .kaart[role="button"],.card[role="button"],[data-rtg-interactive]):is(:hover,:focus-visible){
   border-color:color-mix(in srgb,var(--rtg-world-metal) 52%,var(--rtg-world-line));
-  box-shadow:var(--rtg-depth-focus);transform:translateY(-2px)
+  box-shadow:var(--rtg-depth-focus);transform:none
 }
 body[data-rtg-skin="heritage"] :where(hr,fieldset,table,th,td){border-color:var(--rtg-world-line)}
 body[data-rtg-skin="heritage"] :where(input,select,textarea){

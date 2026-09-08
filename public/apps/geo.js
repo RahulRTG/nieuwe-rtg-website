@@ -23,9 +23,12 @@
    `Geo.mag()` zegt vooraf welke van de twee je nodig hebt. */
 (function (w) {
   var KEY = 'rtg_geo';
-  var SCHAKELAAR = 'rtg_os_gps';
-  // de schakelaar uit het bedieningspaneel (shared/plek.js houdt hem bij)
-  function mag() { try { return localStorage.getItem(SCHAKELAAR) === '1'; } catch (e) { return false; } }
+  /* De schakelaar komt van de contractlaag en niet uit de opslag. Dit bestand
+     kende de sleutelnaam zelf -- de achtste lezer van een sleutel met een
+     eigenaar. Zolang beide '1' bedoelden viel dat niet op; het valt pas op als
+     shared/plek.js iets aan die sleutel verandert, en dan doet dit bestand stil
+     iets anders dan de rest van het huis. */
+  function mag() { return !!(w.RTGPlek && w.RTGPlek.aan()); }
   /* Staat de schakelaar uit, dan is er geen bewaarde plek meer -- niet "wel
      bewaard maar even niet gebruiken". Anders staat je laatste positie na het
      uitzetten gewoon nog in localStorage, en dat is precies wat "uit" niet

@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl" data-rtg-thema="royal">
 <head>
+<noscript><style>html body.rtg-stijl[data-rtg-world-start] *{visibility:visible!important}.rtg-world-start{display:none!important}</style></noscript>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -76,9 +77,14 @@
 <link href="/images/worlds/heritage/work-heritage-v2.jpg" rel="preload" as="image" fetchpriority="high">
 <link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
 <link href="/shared/rtg-anchor-experiences-2026.css" rel="stylesheet">
+<link rel="stylesheet" href="/shared/rtg-world-start.css">
+<script src="/shared/rtg-world-start.js" defer></script>
+
+<script>setTimeout(function(){var b=document.body;if(b&&b.getAttribute("data-rtg-world-start")==="loading"){b.setAttribute("data-rtg-world-start","ready");b.removeAttribute("aria-busy");var l=b.querySelector(".rtg-world-start");if(l)l.hidden=true;}},12500);</script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl rtg-work-experience" data-rtg-modus="pro" data-rtg-world="work" data-rtg-world-dashboard="work" data-rtg-vandaag-luxe data-rtg-edge-2-context="wereldtabs,wereldapps" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-work-experience" data-rtg-modus="pro" data-rtg-world="work" data-rtg-world-dashboard="work" data-rtg-vandaag-luxe data-rtg-edge-2-context="wereldtabs,wereldapps" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true">
+<div class="rtg-world-start" role="status" aria-live="polite"><strong aria-hidden="true">RTG</strong><span>WorkOS wordt klaargezet…</span></div>
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <!-- DE WERELDSTROOK IS WEG EN DAT IS GEEN GAT. De vier werelden stonden hier
      als eigen balk, boven een schil die ze al kende: rtg-edge-system.js zet ze
@@ -210,7 +216,7 @@
     <h1 class="rtg-ceremonie">WorkOS<span class="onder">RTG Kantoor · Personeel · Ondernemers · Organisaties</span></h1>
   </header>
 
-  <section class="doelgroep" aria-labelledby="workDoelgroepKop">
+  <section class="doelgroep" data-rtg-transition="world" aria-labelledby="workDoelgroepKop">
     <nav class="doelgroepnav" aria-label="Voor wie is WORK">
       <a class="actief" href="#personeel" data-work-kies="personeel" aria-current="page">Team Room</a>
       <a href="#ondernemers" data-work-kies="ondernemers">Ondernemers en bedrijven</a>
@@ -323,6 +329,8 @@
 <script src="/shared/rtg-vandaag-luxe.js" defer></script>
 <script src="/shared/canvas.js"></script>
 <script src="/shared/canvas-taal.js"></script>
+<script src="/shared/rtg-route-memory-core.js"></script>
+<script src="/shared/rtg-route-memory.js"></script>
 <script src="/apps/work-doelgroepen.js"></script>
 <script>
 (() => {

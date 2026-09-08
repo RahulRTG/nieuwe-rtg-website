@@ -372,21 +372,26 @@
      toont haltes die niets met jou te maken hebben. shared/plek.js vraagt het
      een keer, met de reden erbij; zeg je nee, dan blijft het demo-startpunt
      staan en vraagt hij deze sessie niet opnieuw. */
-  let gpsUit = false;
-  try { gpsUit = localStorage.getItem('rtg_os_gps') !== '1'; } catch (e) {}
-  /* De toets op window.RTGPlek stond BUITEN deze haak, en deze code draait
-     tijdens het parsen: een defer-script bestaat dan nog niet, dus de toets was
-     altijd onwaar en de haak werd nooit eens gezet. Nu binnen, waar plek.js
-     gegarandeerd geladen is. */
-  if (gpsUit) {
-    document.addEventListener('DOMContentLoaded', () => {
-      if (!window.RTGPlek) return;
-      RTGPlek.vraag({ waarom: 'Om de haltes en ritten bij jou in de buurt te tonen moet ik weten waar je bent. Je locatie blijft op je toestel.' })
-        .then(plek => { if (plek) location.reload(); });
-    });
-  }
-  if (!gpsUit && 'geolocation' in navigator)
-    navigator.geolocation.watchPosition(p => { hier = { lat: p.coords.latitude, lng: p.coords.longitude }; }, () => {}, { enableHighAccuracy: true });
+  /* DE STAND VAN DE SCHAKELAAR KOMT VAN DE CONTRACTLAAG, NIET UIT LOCALSTORAGE.
+
+     Hier stond een eigen `localStorage.getItem('rtg_os_gps')`. Dat is een
+     tweede lezer van een sleutel die een eigenaar heeft (shared/plek.js), en
+     zulke tweede lezers lopen achter zodra de eigenaar iets verandert -- exact
+     hoe deze schakelaar ooit voor iedereen op "uit" bleef staan. Het lezen
+     moest daarvoor wel VERHUIZEN: dit blok draait tijdens het parsen en
+     plek.js laadt met `defer`, dus tijdens het parsen bestaat RTGPlek nog
+     niet. Alles wat de stand nodig heeft staat daarom nu in de haak, waar
+     plek.js gegarandeerd geladen is. */
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!window.RTGPlek) { if (window.console) console.warn('[ov] shared/plek.js ontbreekt; zonder plek blijft het scherm bij de demo-stand.'); return; }
+    if (RTGPlek.aan()) {
+      if ('geolocation' in navigator)
+        navigator.geolocation.watchPosition(p => { hier = { lat: p.coords.latitude, lng: p.coords.longitude }; }, () => {}, { enableHighAccuracy: true });
+      return;
+    }
+    RTGPlek.vraag({ waarom: 'Om de haltes en ritten bij jou in de buurt te tonen moet ik weten waar je bent. Je locatie blijft op je toestel.' })
+      .then(plek => { if (plek) location.reload(); });
+  });
 
   /* ---- de tabbladen ---- */
   const TABS = [['#tabRit', '#vRit'], ['#tabOv', '#vOv'], ['#tabPendel', '#vPendel'], ['#tabPrivate', '#vPrivate']];

@@ -12,7 +12,7 @@
    De rij scrolt nu in ZICHZELF, precies zoals .cmd-tabs in de werktafel dat doet
    (shared/command.css). Zo blijven de labels leesbaar in plaats van afgekapt, en
    houdt de pagina zijn eigen breedte. */
-@media(max-width:760px){
+@media(max-width:1080px){
   .pn-top{overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
   .pn-top::-webkit-scrollbar{display:none}
   .pn-top>*{flex:0 0 auto}
@@ -71,7 +71,16 @@ header button{min-height:24px;display:inline-flex;align-items:center;}
 .pn-shell{padding-top:env(safe-area-inset-top,0px)}
 body.amn-zwevend .pn-rail{padding-top:56px}
 @media(max-width:760px){
-  body.amn-zwevend .pn-top{margin-left:3.6rem}
+  /* OPVULLING EN GEEN MARGE. Deze regel houdt de strook vrij van de zwevende knop
+     linksboven. Met `margin-left` gebeurde dat op de verkeerde manier: de ouder is
+     een grid, de strook rekte tot de volle kolom (390px) en de marge kwam daar
+     BOVENOP -- gemeten x58..448, dus 58px buiten het venster, met inhoud die je
+     ook door te scrollen niet bereikte omdat de scrollpositie al aan het eind
+     stond. Een max-width erbij hielp niet: een andere regel zet max-width:100%
+     en wint. Met opvulling blijft de doos binnen de kolom (box-sizing:border-box
+     staat op regel 1) en schuift alleen de inhoud op -- wat voor een horizontale
+     scroller ook de gewone manier is om de eerste tegel vrij te zetten. */
+  body.amn-zwevend .pn-top{padding-left:3.6rem}
   .pn-rail{padding:5px max(8px,env(safe-area-inset-right,0px)) calc(5px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
   body.amn-zwevend .pn-rail{padding-top:5px}
 }

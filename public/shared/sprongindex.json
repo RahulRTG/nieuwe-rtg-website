@@ -573,16 +573,6 @@
       "sleutel": "videobellen"
     },
     {
-      "naam": "Vrienden",
-      "wereld": "LivingOS",
-      "soort": "link",
-      "sleutel": "vrienden",
-      "url": "/apps/foundation/vrienden.html",
-      "woorden": [
-        "contacten"
-      ]
-    },
-    {
       "naam": "Wallet",
       "wereld": "LivingOS",
       "soort": "link",
@@ -1075,15 +1065,26 @@
       ]
     },
     {
+      "naam": "Vrienden",
+      "wereld": "FoundationOS",
+      "soort": "link",
+      "sleutel": "vrienden",
+      "url": "/apps/foundation/vrienden.html",
+      "woorden": [
+        "contacten"
+      ]
+    },
+    {
       "naam": "Zorg",
       "wereld": "FoundationOS",
       "soort": "link",
       "sleutel": "foundationzorg",
       "url": "/apps/foundation/zorg.html",
       "woorden": [
+        "hulp",
         "foundationos",
-        "rustiger",
-        "morgen"
+        "leven",
+        "meebeweegt"
       ]
     },
     {

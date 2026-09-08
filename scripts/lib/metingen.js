@@ -113,6 +113,14 @@ const REGISTER = {
   'RESOLVERBEREIK.json': { eigenRatel: 'test/resolverbereik.test.js' },
   'GEZAGSNOEMER.json': { eigenRatel: 'test/gezagsnoemer.test.js' },
 
+  /* APPWERKT.json hangt aan de NORM-ratel en niet aan een eigen toets, want een
+     verse meting vraagt een browser en een kwartier -- dat hoort niet in
+     `npm test`. Wat er wel aan hangt is het getal dat ertoe doet:
+     `appwerktDefecten` mag alleen omlaag, en dat wordt bij elke bouw
+     nagerekend. De volle ronde (`npm run appwerkt:controle`) is de tweede tand
+     en die is met een mutatie zien zakken; zie BETROUWBAARHEID.md par. 5. */
+  'APPWERKT.json': { meter: ['appwerktDefecten'] },
+
   /* DE ZEVEN REGISTERS VAN MAATSTAF.md, en waarom ze hier mogen staan. Elk van
      deze toetsen doet HETZELFDE: hij meet vers en vergelijkt met wat er in het
      register staat, zodat een achterlopend register de bouw laat zakken in
@@ -122,7 +130,18 @@ const REGISTER = {
      van dit bestand is daar duidelijk over: een gok hoort hier niet in, want
      dan daalt het getal doordat er regels bijkomen in plaats van ratels. */
   'DOODSPOOR.json': { eigenRatel: 'test/doodspoor.test.js' },
+  /* De kantoormacht (KANTOOR.md par. 1, blok 0 van KANTOORMACHT.md). Toets 6
+     van dat bestand vergelijkt het vastgelegde register met een VERSE meting en
+     zakt zodra `anoniemUitvoerbaar` stijgt -- de normtandvorm uit PROOF.md:
+     schuld mag alleen krimpen. Die toets is zien zakken, dus deze regel is geen
+     bewering (zie de kop over de helft die mensenwerk blijft). */
+  'KANTOORMACHT.json': { eigenRatel: 'test/kantoormacht.test.js' },
   'TAFELPROEF.json': { eigenRatel: 'test/tafelproef.test.js' },
+  /* Het tekstoppervlak hangt aan keuringsregel 68 en niet aan een toets: die
+     regel IS de ratel (twee harde tanden, een schaduw) en hij moet elke PR
+     tegenhouden, dus hij woont in de keuring die CI draait. Hij noemt het
+     register bij naam en vergelijkt de verse meting ertegen. */
+  'TEKSTOPPERVLAK.json': { eigenRatel: 'scripts/check.js' },
   'RITPROEF.json': { eigenRatel: 'test/ritproef.test.js' },
   'TOELATINGSPROEF.json': { eigenRatel: 'test/toelatingsproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },

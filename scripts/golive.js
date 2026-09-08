@@ -253,6 +253,28 @@ function leesEnvBestand(pad) {
   if (process.env.RTG_MAGNAAT_TEST !== '1' && process.env.RTG_DEMO !== '1')
     goed('Magnaat Test en snelle testinlog staan uit; leden loggen in via hun account, personeel met pincode.');
 
+  /* 8. HET NEDERLANDSE WEGENNET, want een functie die zwijgend iets anders
+        doet is erger dan een functie die uit staat.
+
+        RTG Navigatie draait op de dagelijkse NWB-import van Rijkswaterstaat
+        (CC0), en die data staat in RTG_DATA_DIR -- niet in git. Draait de
+        import niet, dan weigert de motor binnen Nederland met de reden
+        (kern/navigatie/dekking.js). Dat is sinds 7 september 2026 eerlijk;
+        daarvóór viel de kaart stil terug op een demonstratieraster rond Ibiza
+        en las een lid in Amsterdam "Motor actief".
+
+        Eerlijk weigeren is nog steeds geen werkende navigatie, en op een
+        productiemachine hoort dat niet stil te zijn. Het is een WAARSCHUWING
+        en geen blokker: RTG kan live zonder navigatie, maar niemand hoort er
+        pas achter te komen als een lid een route vraagt. */
+  {
+    const dataMap = process.env.RTG_DATA_DIR || path.join(__dirname, '..', 'server', 'data');
+    const nlDb = process.env.RTG_NAV_NL_DB || path.join(dataMap, 'navigatie', 'nederland.sqlite');
+    if (fs.existsSync(nlDb)) goed('RTG Navigatie: het Nederlandse wegennet (NWB) is ingelezen.');
+    else waarschuw('RTG Navigatie heeft geen Nederlands wegennet: elke route binnen Nederland weigert met een reden. ' +
+      'Inlezen met: npm run navigatie:nederland (zie NEDERLAND-WEGENNET.md).');
+  }
+
   /* De papieren kant, als ECHTE controle in plaats van een herinnering.
 
      Hier stond eerst alleen een regel tekst: "AVG op orde: verwerkersafspraken

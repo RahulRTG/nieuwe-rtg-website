@@ -39,7 +39,7 @@
      icoonfunctie van het systeem; die blijft daar, want zij leest de
      iconenset. */
   function casco(cfg, s) {
-    return '<header class="rtg-edge-top"><a class="rtg-edge-mark" href="' + cfg.home + '" aria-label="Naar ' + cfg.naam + '">RTG</a><nav class="rtg-edge-crumbs" aria-label="U bent hier"></nav><nav class="rtg-edge-worldbar" aria-label="De vier RTG-werelden"></nav><button class="rtg-edge-state" type="button" aria-label="Beveiliging en systeemstatus" aria-expanded="false"><i></i><span>Beveiligd</span></button></header>' +
+    return '<header class="rtg-edge-top"><a class="rtg-edge-mark" href="' + cfg.home + '" aria-label="Naar ' + cfg.naam + '">RTG</a><nav class="rtg-edge-crumbs" aria-label="U bent hier"></nav><nav class="rtg-edge-worldbar" aria-label="De vier RTG-werelden"></nav><button class="rtg-edge-state" type="button" aria-label="Beveiliging en systeemstatus" aria-expanded="false"><i></i><span>Controleren</span></button></header>' +
       '<aside class="rtg-edge-side"><div class="rtg-edge-scope"></div><nav class="rtg-edge-tools" aria-label="Snelle functies"></nav></aside>' +
       '<section class="rtg-edge-index" aria-hidden="true"></section><section class="rtg-edge-status-panel" aria-hidden="true"></section>' +
       '<section class="rtg-edge-ai-panel" aria-hidden="true"><div class="rtg-edge-ai-empty"><span><b>Rahul staat klaar.</b>Log in voor uw beveiligde gesprek.<a href="/apps/app.html">Inloggen →</a></span></div></section>' +
@@ -59,22 +59,30 @@
   }
   function status() {
     var lokaal = /^(localhost|127\.0\.0\.1)$/.test(location.hostname), veilig = w.isSecureContext || lokaal, online = navigator.onLine;
-    return '<div class="rtg-edge-status-inner"><div class="rtg-edge-index-k">LIVE SYSTEEMSTATUS</div><h2 data-edge-status-title>Status ophalen…</h2><dl><div><dt>Context</dt><dd><i class="' + (veilig ? 'ok' : 'warn') + '"></i>' + (lokaal ? 'Lokale controle' : veilig ? 'Beveiligd' : 'Niet beveiligd') + '</dd></div><div><dt>Netwerk</dt><dd><i class="' + (online ? 'ok' : 'warn') + '"></i>' + (online ? 'Online' : 'Offline') + '</dd></div><div><dt>Server</dt><dd data-edge-ready><i class="warn"></i>Controleren…</dd></div><div><dt>Datalaag</dt><dd data-edge-store><i class="warn"></i>Controleren…</dd></div><div><dt>Rahul AI</dt><dd data-edge-ai><i class="warn"></i>Controleren…</dd></div></dl><p data-edge-mode>Boeken, betalen en goedkeuren blijven menselijke handelingen.</p></div>';
+    return '<div class="rtg-edge-status-inner"><div class="rtg-edge-index-k">LIVE SYSTEEMSTATUS</div><h2 data-edge-status-title>Status ophalen…</h2><dl><div><dt>Context</dt><dd><i class="' + (veilig ? 'ok' : 'warn') + '"></i>' + (lokaal ? 'Lokale controle' : veilig ? 'Beveiligd' : 'Niet beveiligd') + '</dd></div><div><dt>Netwerk</dt><dd data-edge-network><i class="' + (online ? 'ok' : 'warn') + '"></i>' + (online ? 'Online' : 'Offline') + '</dd></div><div><dt>Server</dt><dd data-edge-ready><i class="warn"></i>Controleren…</dd></div><div><dt>Datalaag</dt><dd data-edge-store><i class="warn"></i>Controleren…</dd></div><div><dt>Rahul AI</dt><dd data-edge-ai><i class="warn"></i>Controleren…</dd></div></dl><p data-edge-mode>Boeken, betalen en goedkeuren blijven menselijke handelingen.</p></div>';
   }
   function statusRij(el, goed, tekst) { if (!el) return; el.innerHTML = '<i class="' + (goed ? 'ok' : 'warn') + '"></i>'; el.appendChild(document.createTextNode(tekst)); }
   async function refresh(e) {
     if (!e || !e.root) return;
     var title = e.root.querySelector('[data-edge-status-title]'), state = e.root.querySelector('.rtg-edge-state span');
+    var version = e.statusVersion = (e.statusVersion || 0) + 1;
+    statusRij(e.root.querySelector('[data-edge-network]'), navigator.onLine, navigator.onLine ? 'Online' : 'Offline');
     try {
       var rs = await Promise.all([fetch('/api/ready', { cache: 'no-store' }), fetch('/api/health', { cache: 'no-store' })]);
       var ready = await rs[0].json(), health = await rs[1].json(), ok = rs[0].ok && ready.ready === true && health.ok === true;
+      if (version !== e.statusVersion) return;
       var magnaat = health.omgeving === 'magnaat-test' && health.testomgeving === true;
       title.textContent = magnaat ? 'Magnaat Test gereed' : ok ? 'Systemen gereed' : 'Controle nodig'; state.textContent = magnaat ? 'TEST' : ok ? 'Beveiligd' : 'Beperkt';
       statusRij(e.root.querySelector('[data-edge-ready]'), rs[0].ok && ready.ready === true, ready.ready ? 'Gereed' : 'Niet gereed');
       statusRij(e.root.querySelector('[data-edge-store]'), ready.data === true && ready.writable === true, (ready.store || 'opslag') + (ready.writable ? ' · schrijfbaar' : ' · alleen-lezen'));
       statusRij(e.root.querySelector('[data-edge-ai]'), health.ai !== 'uit', health.ai || 'niet beschikbaar');
       e.root.querySelector('[data-edge-mode]').textContent = (magnaat ? 'Afgeschermde Magnaat-testomgeving. Geen klantdata of productieacties. ' : '') + 'Boeken, betalen en goedkeuren blijven menselijke handelingen.';
-    } catch (fout) { title.textContent = 'Server niet bereikbaar'; state.textContent = 'Offline'; statusRij(e.root.querySelector('[data-edge-ready]'), false, 'Geen antwoord'); }
+    } catch (fout) {
+      if (version !== e.statusVersion) return;
+      title.textContent = 'Server niet bereikbaar'; state.textContent = navigator.onLine ? 'Onbekend' : 'Offline';
+      ['ready','store','ai'].forEach(function (key) { statusRij(e.root.querySelector('[data-edge-' + key + ']'), false, 'Wacht op bron'); });
+    }
+    state.parentNode.dataset.edgeHealth = state.textContent === 'Beveiligd' ? 'ok' : 'waiting';
   }
   function bind(e, sluiten) {
     var input = e.root.querySelector('.rtg-edge-find input');

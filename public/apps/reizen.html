@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl" data-rtg-thema="onyx">
 <head>
+<noscript><style>html body.rtg-stijl[data-rtg-world-start] *{visibility:visible!important}.rtg-world-start{display:none!important}</style></noscript>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -19,9 +20,14 @@
 <link href="/images/worlds/heritage/travel-heritage-v2.jpg" rel="preload" as="image" fetchpriority="high">
 <link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
 <link href="/shared/rtg-anchor-experiences-2026.css" rel="stylesheet">
+<link rel="stylesheet" href="/shared/rtg-world-start.css">
+<script src="/shared/rtg-world-start.js" defer></script>
+
+<script>setTimeout(function(){var b=document.body;if(b&&b.getAttribute("data-rtg-world-start")==="loading"){b.setAttribute("data-rtg-world-start","ready");b.removeAttribute("aria-busy");var l=b.querySelector(".rtg-world-start");if(l)l.hidden=true;}},12500);</script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl rtg-travel-experience" data-rtg-world="travel" data-rtg-world-dashboard="travel" data-rtg-eigenvlak="bordeaux" data-rtg-vandaag-luxe data-rtg-edge-2-context="travel-header,hoofdtabs" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-travel-experience" data-rtg-world="travel" data-rtg-world-dashboard="travel" data-rtg-eigenvlak="bordeaux" data-rtg-vandaag-luxe data-rtg-edge-2-context="travel-header,hoofdtabs" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true">
+<div class="rtg-world-start" role="status" aria-live="polite"><strong aria-hidden="true">RTG</strong><span>TravelOS wordt klaargezet…</span></div>
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <!-- De wereldstrook stond hier; de vier werelden staan nu in de topbalk van de
      Edge-schil. Zie de opmerking in apps/kantoor.html. -->
@@ -84,12 +90,12 @@
             <section class="strook" aria-labelledby="strookTitel">
               <div class="strookkop">
                 <h2 id="strookTitel">Momenten van deze reis</h2>
-                <span class="gereed" id="gereedTeller">0/0 GEREED</span>
+                <span class="gereed" id="gereedTeller">WACHT OP BRON</span>
               </div>
-              <div class="pionnen" id="momenten"><p class="leegtekst">Uw reisgegevens worden veilig opgehaald…</p></div>
+              <div class="pionnen" id="momenten" data-rtg-scroll="travel-moments"><p class="leegtekst">Uw reisgegevens worden veilig opgehaald…</p></div>
             </section>
 
-            <div class="kaartraster">
+            <div class="kaartraster" data-rtg-transition="world">
               <div class="dagkop">
                 <div class="dagkop-inhoud">
                   <p class="micro">DE BESTEMMING</p>
@@ -97,15 +103,17 @@
                 </div>
               </div>
 
-              <div class="vandaagraster" id="dagRaster" hidden>
-                <section class="volgendblok" aria-labelledby="volgendTitel">
+            </div>
+
+            <div class="vandaagraster" id="dagRaster">
+                <section class="rtg-reis-state" id="reisBronState" aria-live="polite"><p id="reisBronTekst">Uw volgende reismoment wordt opgehaald…</p><button class="actieknop" type="button" data-naar-blad="reizen">BEKIJK UW REIZEN →</button></section>
+                <section class="volgendblok" id="reisVolgende" hidden aria-labelledby="volgendTitel">
                   <div class="micro" id="volgendTitel">VOLGENDE</div>
                   <div class="tijdregel"><strong id="volgendTijd">-</strong><span id="volgendLabel">Volgend reismoment</span></div>
                   <div class="routekort"><span id="volgendVan">VERTREK</span><b aria-hidden="true">→</b><span id="volgendNaar">BESTEMMING</span></div>
                   <div class="vluchtregel"><span id="volgendExtra"></span></div>
                   <button class="actieknop" type="button" data-naar-blad="reizen"><span>OPEN REIS</span><b aria-hidden="true">→</b></button>
                 </section>
-              </div>
             </div>
 
             <form class="rahulsnel" data-rahul-snel>
@@ -1067,6 +1075,8 @@ function tekenCanvasVandaag(lijst) {
 }
 </script>
 <script src="/shared/rtg-vandaag-luxe.js" defer></script>
+<script src="/shared/rtg-route-memory-core.js"></script>
+<script src="/shared/rtg-route-memory.js"></script>
 <script src="/apps/reizen-performance.js"></script>
 <script src="/apps/reizen-performance-reis.js"></script>
 <script src="/apps/reizen-performance-taxi.js"></script>
@@ -1075,6 +1085,7 @@ function tekenCanvasVandaag(lijst) {
 <script src="/apps/reizen-samen-delen.js"></script>
 <script src="/apps/reizen-samen-mensen.js"></script>
 <script src="/apps/reizen-samen.js"></script>
+<script src="/apps/reizen-context.js"></script>
 <!-- De vier bestaande TravelOS-tabs reizen als capabilities naar de ene
      mobiele Command-balk; de uitvoering blijft in reizen-performance.js. -->
 <script src="/shared/adaptief.js" defer></script>

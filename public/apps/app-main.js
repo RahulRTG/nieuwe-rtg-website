@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '650567d1';
+var RTG_BOUW = 'fe71ec21';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4422,8 +4422,7 @@ var RTG_BOUW = '650567d1';
 
      Een wereld hoeft niet even groot te zijn als de andere; dat is geen
      scheefheid maar het verschil tussen een reis en een dagelijks leven. Wat
-     wel voor alle vier geldt: een app staat in precies EEN wereld en
-     premiumrechten gelden pas op onderdeelniveau.
+     wel voor alle vier geldt: een app staat in precies EEN wereld.
 
      EN ER IS GEEN LIJST ERNAAST MEER. De bank had onder de werelden een tweede
      kopje (Software) met twaalf apps die nergens in hingen; die twaalf staan nu
@@ -4467,7 +4466,11 @@ var RTG_BOUW = '650567d1';
       'link:nalatenschap', 'link:logboek',
     /* De Salon is weer De Salon: mensen en wat je met ze deelt. Wat je in je
        eentje kijkt of luistert staat bij Media. */
-      'tab:salon', 'link:wereldlaag', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera',
+    /* `link:vrienden` staat nu in FoundationOS: dat scherm is de contactenlaag
+       van een GEZIN, met een eigen deur. Een lid kwam hier op een dicht scherm
+       uit, en een zichtbare ingang naar een onbereikbare functie is een
+       productdefect (BETROUWBAARHEID.md par. 6). */
+      'tab:salon', 'link:wereldlaag', 'link:pulse', 'os:snaps', 'link:camera',
     /* CONTACT MET IEMAND HOORT HIER, en het stond nergens: deze drie bestonden
        in LINKS/OSAPPS maar werden door geen enkele map genoemd, en dat bleef
        stil omdat scripts/wereldlijst.js alleen tabs op dakloosheid controleerde
@@ -4583,7 +4586,11 @@ var RTG_BOUW = '650567d1';
        bestonden en hingen nergens aan. */
     /* Het Klimaatfonds is een VENSTER op het Living Lab en geen tweede lab:
        klimaat is daar de soort 'duurzaam' (kern/livinglab/kader.js). */
-      'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil', 'link:geven'] }
+    /* `link:vrienden` is hier vandaan LivingOS gekomen: de contactenlaag van
+       een gezin hoort in de wereld waar haar deur staat (zie de reden in
+       app-main-24a2.js). */
+      'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil', 'link:geven',
+      'link:vrienden'] }
   ];
   /* Afgesplitst van app-main-24a2.js toen dat over de 10 KB ging. De snede loopt
      langs een echte grens, en het is dezelfde grens waar WERELDEN.md over gaat:
@@ -9595,13 +9602,11 @@ var RTG_BOUW = '650567d1';
   }
   function ontmoetPositie(){
     return new Promise(res => {
-      // De GPS-schakelaar in het OS-menu (rtg_os_gps, gezet in shared/osmenu)
-      // wint van deze lus. Zonder deze poort vroeg de tick elke twintig
-      // seconden om een positie -- op een toestel met toestemming op "vraag
-      // elke keer" is dat een systeemprompt per tick, ook op het beginscherm,
-      // terwijl de schakelaar in de app op "uit" stond. De server kan al
-      // zonder positie (pos || {} hieronder), dus uit is gewoon: geen plek.
-      try { if (localStorage.getItem('rtg_os_gps') !== '1') return res(null); } catch (e) {}
+      // De GPS-schakelaar wint van deze lus: zonder deze poort vroeg de tick
+      // elke twintig seconden om een positie, ook op het beginscherm. De STAND
+      // komt van shared/plek.js en niet meer uit localStorage -- die sleutel
+      // heeft een eigenaar. Vragen doet een timer niet.
+      if (!(window.RTGPlek && window.RTGPlek.aan())) return res(null);
       if (!navigator.geolocation) return res(null);
       navigator.geolocation.getCurrentPosition(p => res({ lat: p.coords.latitude, lng: p.coords.longitude }), () => res(null), { maximumAge: 15000, timeout: 8000 });
     });

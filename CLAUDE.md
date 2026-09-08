@@ -347,6 +347,33 @@ mens draagt altijd zijn opbouw** en wordt nooit een sorteersleutel — niet op
 klanten en niet op medewerkers — en **een versmalling die het gevraagde vermogen
 verbergt is een gebrek en geen veiligheid**, dus dekking gaat vóór compactheid,
 precies zoals bij `npm run resolverbereik`.
+**`KANTOOR.md` is de mens in die kamer** — niet wat een medewerker MAG (dat is
+KANTOORMACHT.md) maar wie hij IS, hoe hij binnenkomt en wanneer het systeem juist
+niets moet zeggen. Lees die vóór je aan onboarding, personeelsidentiteit,
+werktoewijzing of een kantoormelding werkt. Blok 0 van KANTOORMACHT.md staat er
+inmiddels als meter (`npm run kantoormacht`, `KANTOORMACHT.json`) en die vervangt
+de lexicale getallen van 2 september door gemeten getallen: <!--getal:kantoor.routes-->586<!--/getal-->
+kantoorroutes, waarvan er <!--getal:kantoor.deurEistMens-->126<!--/getal--> een bewezen mens eisen en
+<!--getal:kantoor.deurGedeeld-->460<!--/getal--> achter de gedeelde code hangen — en
+<!--getal:kantoor.anoniem-->385<!--/getal--> zijn er anoniem uitvoerbaar. Let op de graden: de
+deur-assen komen uit de ROUTER en zijn hard, `anoniem` is lexicaal en dus een
+ONDERgrens — daarom hangt `npm run kantoormacht:controle` (die alleen mag dalen)
+aan de harde as en niet aan de zachte. De kern in één zin: **een spoor dat eindigt
+bij een gedeelde code is geen spoor, het is een alibi** — en de poort die dat
+oplost bestaat al (`kern/kantoor/kluispoort.js`), hij hangt alleen aan 8 van de
+585 routes. Drie dingen die de uitwerking corrigeren: **`Pulse` is bezet** (21
+bestanden, een sociale feed — de gebeurtenismotor heet daarom `weerklank`), een
+**vooruitblik draagt geen `confidence`-percentage** zolang de trefzekerheid niet
+over drie afgesloten perioden is gemeten (INT-04 en de vorm van
+`kern/kosten/vooruitblik.js`), en **`AUTONOOM-BEWEZEN` wordt geen vijfde
+bewijsgraad** maar een checklist van elf uitslagen — de graden blijven vier. Wat
+er al staat en dus niet gebouwd hoeft te worden is het meeste:
+`kern/concern/employment.js` IS de Person→Employment-fundering (op codenaam),
+`server/webauthn/` staat maar hangt niet aan de kantoordeur, en de
+verantwoordelijkheidsgraaf hoort een PROJECTIE te zijn in de vorm van
+`kern/levensgraaf/graaf.js` — er komt geen `humans`-tabel, dezelfde grens als
+HDI.md par. 5.1. Par. 13 is de eerlijke stand: van de tien wetten hebben er zes
+vandaag geen handhaver.
 **`MUTATIECONTRACT.md` is de laag ernaast** — niet wie iets mag (dat is
 CONTROLPLANE.md) maar wat een TWEEDE aanroep doet, en hoe hard dit huis dat weet.
 Lees die vóór je een schrijfroute toevoegt of aan idempotentie werkt. De kern in
@@ -869,6 +896,32 @@ die van elk rood licht een fix-issue met diagnose maakt. De twee vaste grenzen
 daar: mergen blijft mensenwerk (met als enige, gesloten uitzondering de
 Dependabot-klassen in `automerge.yml`), en de wetwacht meldt alleen — het
 juridische oordeel blijft bij een mens.
+
+**`BETROUWBAARHEID.md` zegt wanneer een functie BESTAAT** -- en dat is iets
+anders dan of het scherm laadt. De definitie: *een functie bestaat pas als een
+echte gebruiker haar volledige bedoeling kan voltooien, de uitkomst correct wordt
+opgeslagen, fouten begrijpelijk worden afgehandeld, rechten kloppen en dezelfde
+stroom na storing, refresh en herhaling betrouwbaar blijft werken.* Lees die vóór
+je zegt dat iets werkt. De meeteenheid is een **belofte en geen scherm** --
+Navigatie is niet een HTML-bestand maar *breng mij van hier naar mijn bestemming*
+-- dus wordt er geteld per onderdeel uit `MAPPEN`, met de persona aan wie de
+wereld het toont. Acht bewijzen (bereikbaar, bedienbaar, voltooibaar,
+waarheidsgetrouw, persistent, bevoegd, herstelbaar, menselijk), waarvan er
+vandaag drie gemeten worden door `npm run appwerkt` (`APPWERKT.json`); de andere
+vijf staan er per rij bij als `GEEN_FIXTURE` **met de reden**, want een bewijs dat
+je weglaat leest als een bewijs dat je haalt. De standen zijn gesloten en
+"waarschijnlijk goed" zit er niet bij: BEWEZEN, GEBLOKKEERD_DOOR_DEFECT,
+GEBLOKKEERD_DOOR_CONFIG, GEEN_FIXTURE, NIET_GETEST -- en de stand van een rij is
+de STRENGSTE van haar bewijzen. Het verschil tussen DEFECT en CONFIG wordt niet
+geraden maar gelezen uit wat de server zelf zegt (een `hoe` bij de weigering).
+Par. 4 is het grootste ontbrekende stuk: een gecontroleerde testwereld waarin
+betalen, versturen en verwijderen ECHT mogen -- en de regel daarboven staat al in
+MAGNAATLAB.md (*een simulatie-adapter vervangt de rail, nooit de poort*). Par. 6
+staat er even groot bij: vier stille defecten uit één middag handmatig kijken, die
+geen enkele bestaande toets zag -- waaronder een ingang in LivingOS naar een
+scherm met een andere deur. **Een zichtbare ingang naar een onbereikbare functie
+is een productdefect, ook als elke regel code klopt**; daarom gaat bewijs 1 over
+een persona en niet over een URL.
 
 **`TIKKEN.md` zegt hoe diep het huis is** -- hoeveel tikken elke functie van het
 beginscherm af ligt, gemeten met `scripts/tikken.js` in een echte browser op

@@ -116,6 +116,16 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 Die laatste kolom telt items in `MAPPEN` en geen schermen. De tabel wordt
 machinaal vergeleken met de code, dus als hij niet meer klopt zakt de bouw.
 
+**Op 7 september 2026 verhuisde er een onderdeel** (LivingOS 59 -> 58,
+FoundationOS 7 -> 8): `link:vrienden` stond in de sociale rij van LivingOS terwijl
+het scherm erachter de contactenlaag van een GEZIN is, met een eigen sessie en een
+API op een gezinscode. Een lid dat erop tikte kwam op een dichte deur uit. De
+autorisatie klopte tot op de regel; de belofte niet -- en *een zichtbare ingang
+naar een onbereikbare functie is een productdefect, ook als elke regel code
+klopt* (`BETROUWBAARHEID.md` par. 6). Hij staat nu in de wereld waar zijn deur
+staat. Wil RTG hem terug in LivingOS, dan is dat een FUNCTIE (een lidpad in de
+gezinsgraaf) en geen regel in een lijst.
+
 De drie werelden groeiden op 30 augustus 2026 met veertien onderdelen, en dat is
 geen nieuwe software: `scripts/tikken.js` vond veertien ledenschermen die
 bestonden maar in geen enkele wereld hingen en dus vanaf het beginscherm

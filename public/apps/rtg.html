@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="nl" data-rtg-thema="bordeaux">
 <head>
+<noscript><style>html body.rtg-stijl[data-rtg-world-start] *{visibility:visible!important}.rtg-world-start{display:none!important}</style></noscript>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -96,9 +97,14 @@
 <link href="/shared/experience-kernel.css?v=20260829-7" rel="stylesheet">
 <link href="/images/worlds/heritage/living-heritage-v2.jpg" rel="preload" as="image" fetchpriority="high">
 <link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
+<link rel="stylesheet" href="/shared/rtg-world-start.css">
+<script src="/shared/rtg-world-start.js" defer></script>
+
+<script>setTimeout(function(){var b=document.body;if(b&&b.getAttribute("data-rtg-world-start")==="loading"){b.setAttribute("data-rtg-world-start","ready");b.removeAttribute("aria-busy");var l=b.querySelector(".rtg-world-start");if(l)l.hidden=true;}},12500);</script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-ios-home data-rtg-eigenvlak="bordeaux" data-rtg-world="living" data-rtg-world-dashboard="living" data-rtg-vandaag-luxe data-rtg-edge-2-context="living-bank,living-top" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
+<body class="rtg-stijl" data-ios-home data-rtg-world="living" data-rtg-world-dashboard="living" data-rtg-vandaag-luxe data-rtg-edge-2-context="living-bank,living-top" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true">
+<div class="rtg-world-start" role="status" aria-live="polite"><strong aria-hidden="true">RTG</strong><span>LivingOS wordt klaargezet…</span></div>
 <a class="skip" href="#inhoud">Naar inhoud</a>
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden · één kern</span></a>
@@ -132,7 +138,7 @@
   <section class="paneel actief" data-inhoud="vandaag">
     <div class="dag">
       <div class="dagkolom">
-        <header class="dagkop">
+        <header class="dagkop" data-rtg-transition="world">
           <div class="ey">Vandaag &middot; uw leven</div>
           <h1>Uw momenten, uw leven.</h1>
           <div class="status"><i></i><span id="lifePasStatus">RTG Pass &middot; LIFE</span></div>
@@ -140,7 +146,7 @@
         </header>
 
         <div class="dagtitel"><b>Momenten van vandaag</b><a href="/apps/pulse.html">Bekijk alles &rsaquo;</a></div>
-        <div class="momentenrij" id="momentenrij" aria-live="polite"><p class="dagleeg">Uw momenten worden opgehaald&hellip;</p></div>
+        <div class="momentenrij" id="momentenrij" data-rtg-scroll="living-moments" aria-live="polite"><p class="dagleeg">Uw momenten worden opgehaald&hellip;</p></div>
 
         <article class="dagkaart dagkaart-volgend" id="volgendMoment" hidden>
           <span class="dagbron">Volgend moment</span>
@@ -286,11 +292,11 @@
     <a class="wrooster-kaart" href="/apps/vandaag.html"><span>Vandaag</span></a>
     <a class="wrooster-kaart" href="/apps/pulse.html"><span>Vandaag</span></a>
     <a class="wrooster-kaart" href="/apps/clips.html"><span>Video</span></a>
-    <a class="wrooster-kaart" href="/apps/foundation/vrienden.html"><span>Vrienden</span></a>
     <a class="wrooster-kaart" href="/apps/geld.html#wallet"><span>Wallet</span></a>
     <a class="wrooster-kaart" href="/apps/wonen.html"><span>Wonen</span></a>
   <!-- /WERELDROOSTER --></div></section>
 </main></div>
+<script src="/shared/plek.js"></script>
 <script src="../shared/sterren.js"></script>
 <script src="../shared/uurwerk.js"></script>
 <script src="../shared/klok.js" defer></script>
@@ -299,7 +305,9 @@
 <script src="/apps/rtg-dossier.js"></script>
 <script src="/apps/life-lagen.js"></script>
 <script src="/apps/rtg-vandaag.js"></script>
-<script>RTGSterren.hang(document.body,{dichtheid:.9,helderheid:.75});document.querySelectorAll('[data-paneel]').forEach(function(knop){knop.addEventListener('click',function(){document.querySelectorAll('[data-paneel]').forEach(function(x){x.classList.toggle('actief',x===knop)});document.querySelectorAll('[data-inhoud]').forEach(function(x){x.classList.toggle('actief',x.dataset.inhoud===knop.dataset.paneel)});});});</script>
+<script src="/shared/rtg-route-memory-core.js"></script>
+<script src="/shared/rtg-route-memory.js"></script>
+<script src="/apps/rtg-context.js"></script>
 <script src="../shared/schermbeeld.js" defer></script>
 <script src="../shared/metgezel.js" defer></script>
 <script src="../shared/basis.js" defer></script>

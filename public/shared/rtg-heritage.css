@@ -3,8 +3,9 @@
 @import url('/shared/rtg-heritage-materials.css');
 @import url('/shared/rtg-heritage-adapters.css');
 @import url('/shared/rtg-heritage-components.css');
+@import url('/shared/rtg-intelligence.css');
 
-/* RTG Heritage -------------------------------------------------------------
+/* RTG Heritage
    De vaste beeldtaal van het huis, over ieder echt appscherm heen.
 
    Deze laag wordt door shared/basis.js als LAATSTE stylesheet geladen. Zij
@@ -18,8 +19,7 @@
    niet als een vijfde visuele wereld. */
 
 body[data-rtg-skin="heritage"]{
-  /* De vaste maatvoering. Routes kiezen hieruit; zij bedenken geen eigen
-     tussenmaten voor dezelfde betekenis. */
+  /* Vaste maatvoering voor alle routes. */
   --rtg-space-1:4px;--rtg-space-2:8px;--rtg-space-3:12px;
   --rtg-space-4:16px;--rtg-space-6:24px;--rtg-space-8:32px;
   --rtg-space-12:48px;--rtg-space-16:64px;--rtg-space-24:96px;
@@ -122,11 +122,12 @@ body[data-rtg-skin="heritage"][data-rtg-world="living"]{
   --rtg-world-card:#fbf8f2;
   --rtg-world-card-strong:#e8e0d2;
   --rtg-world-ink:#211e19;
-  --rtg-world-muted:#5f574d;
+  --rtg-world-muted:#51493f;
   --rtg-world-line:rgba(33,30,25,.17);
+  --rtg-world-action:#7f1634;--rtg-world-action-ink:#fff;
   --rtg-world-signature:#7f1634;
   --rtg-world-signature-soft:rgba(127,22,52,.10);
-  --rtg-world-metal:#745718;
+  --rtg-world-metal:#674b12;
   /* Status is hier tekst op ivoor. Deze drie donkere toonwaarden halen ook op
      het lichtste Living-vlak ruim WCAG AA; de heldere donkere-wereldtokens
      zouden hier alleen als decoratieve stip voldoende contrast hebben. */

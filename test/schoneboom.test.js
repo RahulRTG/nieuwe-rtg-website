@@ -150,7 +150,11 @@ test('14. een wijziging buiten het instrument veroudert het register niet', () =
 
   const instrumenten = ['scripts/poortwacht.js', 'scripts/sabotage.js',
     'scripts/bewijsschuld.js', 'scripts/staatproef-route.js'];
-  const commits = spawnSync('git', ['log', '--format=%h', '-40', 'HEAD'],
+  /* Een PR-checkout voegt een synthetische mergecommit toe. Daardoor viel het
+     vaste bewijsgeval precies als nummer 41 buiten het oude venster van 40,
+     terwijl dezelfde toets op de brontak wel groen was. Houd genoeg echte
+     historie over om niet van die checkoutvorm afhankelijk te zijn. */
+  const commits = spawnSync('git', ['log', '--format=%h', '-200', 'HEAD'],
     { cwd: WORTEL2, encoding: 'utf8' }).stdout.split('\n').filter(Boolean);
 
   /* Per commit zijn EIGEN wijziging (ouder..commit), en niet de opgetelde

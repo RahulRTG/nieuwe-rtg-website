@@ -1,46 +1,42 @@
 {
-  "gedraaid": "2026-09-09T04:42:29.081Z",
+  "gedraaid": "2026-08-18T13:48:25.300Z",
   "stempel": {
-    "op": "2026-09-09T04:42:29.115Z",
-    "commit": "e90dd7be",
-    "boomVuil": false,
-    "boomAnders": 0,
-    "instrument": "scripts/beproeving.js",
+    "op": "2026-08-18T13:48:25.324Z",
+    "commit": "4537d50",
+    "boomVuil": true,
     "node": "v22.22.2"
   },
   "uitleg": "Gemeten uitslag van npm run beproeving: storm (gelijktijdige verhalen onder belasting), geld (blijft het grootboek sluiten), misbruik (houden de deuren) en herstel (komt de gewone aanroep terug binnen zijn grens na de storm).",
   "grens": "Dit zegt niets over gedrag op andere hardware, over een langere duur dan deze ronde, of over endpoints die niet zijn bestookt (zie meters.endpointsOnbereikt). \"0% verkeerde-rol-2xx\" is een ondergrens en geen bewijs van rolscheiding -- daarvoor is scripts/rolproef-route.js er. Een groene beproeving betekent: onder DEZE last, op DEZE machine, is er niets omgevallen.",
-  "modus": "postgres",
+  "modus": "sqlite",
   "machine": {
     "kernen": 4,
     "geheugenGB": 17,
     "platform": "linux",
     "node": "v22.22.2",
-    "kalibratieBasisMs": 12.9
+    "kalibratieBasisMs": 13.3
   },
-  "oordeel": "GEZAKT",
-  "gezakteDrempels": 3,
+  "oordeel": "PASS",
+  "gezakteDrempels": 0,
   "meters": {
-    "p50Ms": 21,
-    "p95Ms": 55,
-    "p99Ms": 144,
-    "maxMs": 1086,
-    "doorvoerPerSec": 266,
-    "stormDuurSec": 69.3,
-    "serverfouten5xx": 95,
-    "serverfouten5xxPaden": [
-      "/api/supplier/backoffice (95x)"
-    ],
-    "eventLoopP99Ms": 64.4,
-    "eventLoopMaxMs": 1064.8,
-    "cpuGemiddeldPct": 119.2,
-    "cpuPiekPct": 187.3,
-    "ramPiekMB": 2624,
-    "geheugenHellingMBPerMin": 35,
-    "herstelSeconden": 7.3,
-    "verhalenSlaagPctStorm": 20.2,
-    "verhalenGefaaldStorm": 2,
+    "p50Ms": 13,
+    "p95Ms": 144,
+    "p99Ms": 233,
+    "maxMs": 343,
+    "doorvoerPerSec": 336,
+    "stormDuurSec": 186.1,
+    "serverfouten5xx": 0,
+    "serverfouten5xxPaden": [],
+    "eventLoopP99Ms": 97.9,
+    "eventLoopMaxMs": 151.9,
+    "cpuGemiddeldPct": 109.5,
+    "cpuPiekPct": 142.3,
+    "ramPiekMB": 522,
+    "geheugenHellingMBPerMin": 0,
+    "herstelSeconden": 1,
+    "verhalenSlaagPctStorm": 100,
+    "verhalenGefaaldStorm": 0,
     "endpointsOnbereikt": 0,
-    "endpointsBestookt": 4131
+    "endpointsBestookt": 3429
   }
 }

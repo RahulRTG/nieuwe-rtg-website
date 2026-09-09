@@ -40,11 +40,11 @@ const LIJKT_OP_IEMAND = /@|\bcn-|\blid:|\buser-|\d{6,}/;
 const TELLERS = new Map();      // "wereld|pad" -> { wereld, pad, gewogen, zouSluiten }
 let SINDS = new Date().toISOString();
 
-function sleutel(wereld, pad) { return String(wereld || 'onbekend') + '|' + String(pad || 'onbekend'); }
+function bakSleutel(wereld, pad) { return String(wereld || 'onbekend') + '|' + String(pad || 'onbekend'); }
 
 /* Eén gewogen aanroep. `zouSluiten` is of de poort hem in de bijtende stand had
    tegengehouden -- niet of hij dat werkelijk deed. */
-function noteer(wereld, pad, zouSluiten) {
+function telWeging(wereld, pad, zouSluiten) {
   const w = String(wereld || 'onbekend');
   const p = String(pad || 'onbekend');
   /* Een pad is een pad. Staat er iets in dat op een mens lijkt (een id in de
@@ -52,7 +52,7 @@ function noteer(wereld, pad, zouSluiten) {
      dat de teller een identiteit gaat dragen. Weglaten zou het getal stil
      verlagen, en dat is erger. */
   const veilig = LIJKT_OP_IEMAND.test(p) ? '(pad met een kenmerk erin)' : p;
-  const s = sleutel(w, veilig);
+  const s = bakSleutel(w, veilig);
   const t = TELLERS.get(s) || { wereld: w, pad: veilig, gewogen: 0, zouSluiten: 0 };
   t.gewogen++;
   if (zouSluiten) t.zouSluiten++;
@@ -65,7 +65,7 @@ function noteer(wereld, pad, zouSluiten) {
    uitslag dan 3 van de 4000, en met alleen `zouSluiten` zijn die twee niet uit
    elkaar te houden. Een percentage staat er NIET -- bij een handvol metingen is
    dat een getal met een valse precisie eromheen. */
-function stand() {
+function schaduwStand() {
   const perWereld = new Map();
   for (const t of TELLERS.values()) {
     const w = perWereld.get(t.wereld) || { wereld: t.wereld, gewogen: 0, zouSluiten: 0, paden: [] };
@@ -93,6 +93,6 @@ function stand() {
 /* Alleen voor de toets: de telling loopt per proces en moet tussen twee toetsen
    door leeg kunnen. Zie de valkuil in test/herkomstlus.test.js -- een module die
    zijn toestand vasthoudt, laat de volgende toets de vorige meten. */
-function vergeet() { TELLERS.clear(); SINDS = new Date().toISOString(); }
+function schaduwVergeet() { TELLERS.clear(); SINDS = new Date().toISOString(); }
 
-module.exports = { noteer, stand, vergeet };
+module.exports = { noteer: telWeging, stand: schaduwStand, vergeet: schaduwVergeet };

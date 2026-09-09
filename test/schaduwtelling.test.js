@@ -101,3 +101,53 @@ test('5. de lusstap voedt de telling, en niet alleen zijn eigen gesprek', () => 
   assert.match(bron, /telling\.noteer\(/,
     'lusstap.js laadt de telling maar noteert er niets in -- een dode koppeling leest als een levende');
 });
+
+/* ============================================================================
+   DE LEESWEG. Een teller die niemand kan opvragen is precies het probleem dat
+   deze module oplost, alleen een laag hoger -- dus de route hoort erbij te
+   worden beproefd en niet alleen de rekenkant.
+   ========================================================================== */
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { startServer, stop } = require('./helper');
+
+test('6. het kantoor kan de schaduwtelling opvragen, en een lid niet', async (t) => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-schaduw-'));
+  const CODE = 'KANTOOR-SCHADUW-1';
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
+  const post = (pad, body, token) => fetch(srv.base + pad, {
+    method: 'POST',
+    headers: Object.assign({ 'Content-Type': 'application/json' },
+      token ? { Authorization: 'Bearer ' + token } : {}),
+    body: JSON.stringify(body || {})
+  }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+
+  try {
+    /* Zonder inlog komt er niets uit. De telling draagt geen identiteit, maar
+       zij zegt wel welke PADEN de AI probeert -- dat is geen openbare kennis. */
+    assert.equal((await post('/api/office/stuur/herkomstschaduw', {}, null)).status, 401,
+      'de leesweg staat open zonder inlog');
+
+    const lid = (await post('/api/login', { tier: 'rtg' })).body.token;
+    assert.ok(lid, 'er is een lid om mee te vergelijken');
+    const alsLid = await post('/api/office/stuur/herkomstschaduw', {}, lid);
+    assert.ok(alsLid.status === 401 || alsLid.status === 403,
+      'een ledentoken opent de kantoordeur (kreeg ' + alsLid.status + ')');
+
+    const kantoor = (await post('/api/office/login', { code: CODE })).body.token;
+    assert.ok(kantoor, 'het kantoor logt in');
+    const r = await post('/api/office/stuur/herkomstschaduw', {}, kantoor);
+    assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 160));
+    /* DE DRIE DINGEN DIE MEE MOETEN KOMEN. Zonder `sinds` en `bewaard` is het
+       getal niet te plaatsen, en zonder `nietGemeten` vult de lezer zelf in wat
+       een hoog getal betekent. */
+    assert.equal(r.body.bewaard, false, 'het antwoord zegt niet dat het niet bewaard is');
+    assert.ok(!Number.isNaN(Date.parse(r.body.sinds)), 'het antwoord draagt geen begindatum');
+    assert.ok(String(r.body.nietGemeten || '').length > 40, 'het antwoord zegt niet wat het NIET meet');
+    assert.ok(Array.isArray(r.body.werelden), 'de werelden ontbreken');
+  } finally {
+    stop(srv && srv.child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

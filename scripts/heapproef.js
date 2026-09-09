@@ -69,8 +69,7 @@ const UIT = vlag('uit', path.join(WORTEL, 'HEAPPROEF.json'));
    een rechte drift binnen de eenheid telt voor beide condities even zwaar. */
 const EENHEID = ['verkeer', 'stilte', 'stilte', 'verkeer'];
 
-const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-heapproef-'));
-const GC_OUT = path.join(TMP, 'gc.json');
+let TMP = null, GC_OUT = null;
 const BASIS = 'http://127.0.0.1:' + PORT;
 let child = null;
 
@@ -169,6 +168,8 @@ async function poortVrij() {
 
 async function main() {
   await poortVrij();
+  TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-heapproef-'));
+  GC_OUT = path.join(TMP, 'gc.json');
   const env = { NODE_ENV: 'test', ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI',
     RTG_DEMO: '1', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT, NODE_OPTIONS: '--max-old-space-size=8192' };
   if (PG) { env.DATABASE_URL = PG; env.RTG_STORE = 'postgres'; }
@@ -218,7 +219,7 @@ async function main() {
   console.log('  verkeer: ' + telling.n + ' calls, ' + telling.s5xx + ' onverwachte 5xx' +
     (telling.s5xx ? ' \x1b[31m' + JSON.stringify(telling.paden) + '\x1b[0m' : ''));
 
-  const verslag = { stempel: stempel(__filename),
+  const verslag = { stempel: stempel(),
     uitleg: 'Verweven verkeer/stilte-blokken (A B B A) met een vast post-GC meetpunt. ' +
       'Er staan TWEE vragen naast elkaar en de strengste telt: het VERKEERSLEK (verkeer min ' +
       'stilte -- groeit hij harder door verzoeken?) en het GRONDLEK (de stilte op zichzelf -- ' +
@@ -243,7 +244,7 @@ async function main() {
   return uit.stand === 'LEK' ? 1 : 0;
 }
 
-main().then(code => { try { child && child.kill('SIGKILL'); } catch (e) {} 
+if (require.main === module) main().then(code => { try { child && child.kill('SIGKILL'); } catch (e) {}
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   process.exit(code); })
   .catch(e => { console.error('\n  \x1b[31mheapproef gestrand:\x1b[0m ' + (e && e.message || e) + '\n');

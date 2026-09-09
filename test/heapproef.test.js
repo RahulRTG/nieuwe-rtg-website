@@ -31,6 +31,18 @@ const PAD = path.join(WORTEL, 'HEAPPROEF.json');
    het, dan is dat een bevinding en geen reden om te zwijgen. */
 const reg = JSON.parse(fs.readFileSync(PAD, 'utf8'));
 
+test('importeren start geen meting en schrijft geen bestanden', () => {
+  const { spawnSync } = require('node:child_process');
+  const uit = spawnSync(process.execPath, ['-e', `
+    const onverwacht = () => { throw new Error('importeren start werk'); };
+    require('node:fs').mkdtempSync = onverwacht;
+    require('node:fs').writeFileSync = onverwacht;
+    require('node:net').createServer = onverwacht;
+    require('./scripts/heapproef');
+  `], { cwd: WORTEL, encoding: 'utf8', timeout: 5000 });
+  assert.equal(uit.status, 0, uit.stderr || String(uit.error || 'laadcontrole eindigde niet'));
+});
+
 test('1. verkeer en stilte lopen VERWEVEN, niet na elkaar', () => {
   /* De oude FASE F deed eerst alle stiltes en daarna al het verkeer. Elke
      drift in de tijd landde daarmee volledig op het verkeer. A B B A houdt de

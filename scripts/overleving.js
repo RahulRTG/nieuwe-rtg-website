@@ -168,14 +168,34 @@ const RIJEN = [
         return { uitkomst: 'onbekend', graad: 'onbekend',
           grond: 'de herkomstpoort is niet meer te vinden in kern/stuur/lusstap.js' };
       }
-      if (proef && proef.bijt === true) {
+      /* `bijt` IS EEN LIJST WERELDEN GEWORDEN en geen ja/nee (9 sep 2026): de
+         poort gaat wereld voor wereld aan, want de prijs verschilt per wereld.
+         Een ouder register draagt nog een boolean; die wordt hier gelezen als
+         "alle" of "geen" in plaats van te breken -- een meter die op een oud
+         register omvalt, is een meter die niemand meer draait. */
+      const werelden = (proef && Array.isArray(proef.werelden) && proef.werelden.length)
+        ? proef.werelden : ['member', 'supplier', 'staff'];
+      const bijt = !proef ? []
+        : Array.isArray(proef.bijt) ? proef.bijt
+        : (proef.bijt === true ? werelden.slice() : []);
+      const noemer = ' (kern/stuur/lusstap.js, ISOLATIEPROEF.json)';
+      if (bijt.length >= werelden.length) {
         return { uitkomst: 'ja', graad: 'gemeten',
-          grond: 'de herkomstpoort hangt voor de uitvoering en BIJT (ISOLATIEPROEF.json)' };
+          grond: 'de herkomstpoort hangt voor de uitvoering en BIJT in alle ' + werelden.length +
+            ' werelden' + noemer };
+      }
+      if (bijt.length) {
+        /* DEELS EN NIET JA, ook al is er een wereld beschermd: een geinjecteerd
+           document dat een niet-afgedwongen wereld raakt, komt er nog steeds
+           langs. De rij vraagt of RTG standhoudt, niet of er ergens iets staat. */
+        return { uitkomst: 'deels', graad: 'gemeten',
+          grond: 'de herkomstpoort BIJT in ' + bijt.join(' en ') + ' en telt alleen in ' +
+            werelden.filter(w => !bijt.includes(w)).join(' en ') + noemer };
       }
       return { uitkomst: 'nee', graad: 'gemeten',
         grond: 'de poort hangt voor de uitvoering maar telt alleen' +
-          (achterVlag ? ' -- hij bijt pas met RTG_HERKOMST_AFDWINGEN=1' : '') +
-          ' (kern/stuur/lusstap.js, ISOLATIEPROEF.json bijt=false)' };
+          (achterVlag ? ' -- hij bijt pas als een wereld in RTG_HERKOMST_AFDWINGEN staat' : '') +
+          noemer };
     },
     nietGemeten: 'de dekking van de kanaallabels: van de 13 kanalen in kern/isolatie/herkomst.js meldt ' +
       'er vandaag een zich aan, en die telling zit in ISOLATIEPROEF.json en niet in deze rij'

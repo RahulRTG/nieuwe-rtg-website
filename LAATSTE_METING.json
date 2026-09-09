@@ -1,0 +1,51 @@
+{
+  "gedraaid": "2026-09-09T09:28:47.925Z",
+  "stempel": {
+    "op": "2026-09-09T09:28:48.007Z",
+    "commit": "b34f264a",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/beproeving.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Gemeten uitslag van npm run beproeving: storm (gelijktijdige verhalen onder belasting), geld (blijft het grootboek sluiten), misbruik (houden de deuren) en herstel (komt de gewone aanroep terug binnen zijn grens na de storm).",
+  "grens": "Dit zegt niets over gedrag op andere hardware, over een langere duur dan deze ronde, of over endpoints die niet zijn bestookt (zie meters.endpointsOnbereikt). \"0% verkeerde-rol-2xx\" is een ondergrens en geen bewijs van rolscheiding -- daarvoor is scripts/rolproef-route.js er. Een groene beproeving betekent: onder DEZE last, op DEZE machine, is er niets omgevallen.",
+  "modus": "postgres",
+  "machine": {
+    "kernen": 4,
+    "geheugenGB": 17,
+    "platform": "linux",
+    "node": "v22.22.2",
+    "kalibratieBasisMs": 12.9
+  },
+  "oordeel": "GEZAKT",
+  "gezakteDrempels": 4,
+  "gezakteNamen": [
+    "ROL-LEK",
+    "LATENTIE",
+    "HERSTEL",
+    "VERHALEN"
+  ],
+  "meters": {
+    "p50Ms": 89,
+    "p95Ms": 1000,
+    "p99Ms": 4200,
+    "maxMs": 10023,
+    "doorvoerPerSec": 118,
+    "stormDuurSec": 1203,
+    "serverfouten5xx": 0,
+    "serverfouten5xxPaden": [],
+    "eventLoopP99Ms": 2483.5,
+    "eventLoopMaxMs": 6042.4,
+    "cpuGemiddeldPct": 159.7,
+    "cpuPiekPct": 333.2,
+    "ramPiekMB": 4107,
+    "geheugenHellingMBPerMin": -55,
+    "geheugenStilteMBPerMin": -115,
+    "herstelSeconden": null,
+    "verhalenSlaagPctStorm": 1.1,
+    "verhalenGefaaldStorm": 5,
+    "endpointsOnbereikt": 0,
+    "endpointsBestookt": 4131
+  }
+}

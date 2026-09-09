@@ -1,4 +1,167 @@
-/* Automatische UI-vertaling voor de volledige RTG-schermfamilie.
+/* De vertaalkast van de browser: vertaalde interface die een NAVIGATIE overleeft.
+
+   WAAROM DIT EEN EIGEN LAAG IS. De automatische vertaallaag hiernaast hield
+   zijn vertalingen in een kale Map in zijn eigen scope, en die is bij elke
+   paginawissel weg. Elk van de 313 schermen vroeg de server dus opnieuw de hele
+   wereld -- ook de balk, het menu en de knoppen die op ieder scherm hetzelfde
+   zeggen. Dat is de reden dat een vertaald huis traag aanvoelde: niet het
+   vertalen, maar het opnieuw vertalen van wat we al wisten.
+
+   EEN HUIS, EEN KAST. De sleutelweg (RTGi18n.laadWereldDict) bewaarde zijn
+   woordenboek in een TWEEDE opslag, per pad en per aantal sleutels. Dezelfde
+   knop op twee schermen werd daardoor twee keer vertaald en twee keer bewaard.
+   Daarom staat de kast hier los en niet in een van de twee lagen: beide praten
+   met dezelfde voorraad.
+
+   BEGRENSD, want localStorage is klein en gedeeld met de rest van de app. Per
+   taal een harde regel- en bytegrens; daarboven valt de oudst ingevoegde regel
+   eruit (Map bewaart de invoegvolgorde). Loopt de opslag ondanks alles vol, dan
+   snoeit de kast een keer en geeft daarna DIE taal op voor de rest van de
+   sessie -- het geheugen blijft werken, alleen de volgende pagina begint weer
+   koud. Een volle opslag mag nooit een leeg of half scherm opleveren.
+
+   WAT ER NIET IN GAAT. Alleen interface. De aanroepers hier zijn de twee
+   UI-lagen; wat een lid TYPT loopt langs /api/vertaal en komt hier nooit langs.
+   Dezelfde grens als server/lib/ui-bronnen.js aan de serverkant trekt. */
+(function (w) {
+  'use strict';
+  if (w.RTGVertaalKast) return;
+
+  var SLEUTEL = 'rtg_tr_';
+  var MAX_REGELS = 4000, MAX_BYTES = 300000;
+  var kast = new Map();                 // taal -> Map(bron -> vertaling)
+  var vuil = new Set(), opgegeven = new Set(), timer = null;
+
+  function opslag() {
+    try { return w.localStorage; } catch (e) { return null; }  // prive-modus gooit al bij het LEZEN
+  }
+  function van(taal) {
+    var m = kast.get(taal);
+    if (m) return m;
+    m = new Map();
+    kast.set(taal, m);
+    var s = opslag();
+    if (s && taal && taal !== 'nl') {
+      try {
+        var rauw = JSON.parse(s.getItem(SLEUTEL + taal) || 'null');
+        if (rauw) for (var k in rauw) if (typeof rauw[k] === 'string' && rauw[k]) m.set(k, rauw[k]);
+      } catch (e) { /* stukke of afgekapte JSON: een lege kast is geen fout */ }
+      while (m.size > MAX_REGELS) m.delete(m.keys().next().value);
+    }
+    return m;
+  }
+  function zet(taal, bron, vertaling) {
+    /* Een regel die gelijk is aan zijn bron is geen vertaling maar een
+       mislukking die zich als antwoord voordoet. Hem bewaren zet een storing
+       van vandaag vast als het antwoord van morgen -- dezelfde regel als in
+       server/lib/vertaalkast.js, aan de andere kant van dezelfde weg. */
+    if (!taal || taal === 'nl' || !bron || !vertaling || vertaling === bron) return false;
+    var m = van(taal);
+    m.delete(bron); m.set(bron, vertaling);
+    while (m.size > MAX_REGELS) m.delete(m.keys().next().value);
+    if (opgegeven.has(taal)) return true;
+    vuil.add(taal);
+    if (!timer) timer = setTimeout(bewaarNu, 400);
+    return true;
+  }
+  /* De kasten van alle ANDERE talen van het toestel halen. Alleen aangeroepen
+     wanneer de opslag vol zit; het geheugen blijft ongemoeid, dus de pagina die
+     nu open staat verliest niets. */
+  function andereTalenWeg(s, houd) {
+    try {
+      var weg = [];
+      for (var i = 0; i < s.length; i++) {
+        var k = s.key(i);
+        if (k && k.indexOf(SLEUTEL) === 0 && k !== SLEUTEL + houd && k !== SLEUTEL + 'opgeruimd') weg.push(k);
+      }
+      weg.forEach(function (k) { s.removeItem(k); });
+      return weg.length > 0;
+    } catch (e) { return false; }
+  }
+
+  function bewaarNu() {
+    timer = null;
+    var s = opslag();
+    if (!s) return;
+    /* Een KOPIE, want de lus verwijdert eruit. En met Array.from en niet met
+       slice.call: een Set heeft geen `length`, dus slice geeft daar een lege
+       lijst -- de kast schreef dan nooit iets weg zonder een spoor achter te
+       laten. Gevonden door test/i18n-auto.test.js, niet door lezen. */
+    Array.from(vuil).forEach(function (taal) {
+      vuil.delete(taal);
+      if (opgegeven.has(taal)) return;
+      var m = kast.get(taal);
+      if (!m) return;
+      /* Drie pogingen bij een volle opslag, in deze volgorde omdat dat de
+         goedkoopste ruimte eerst opgeeft. Een mens leest in EEN taal, dus de
+         kasten van talen waar hij doorheen klikte zijn dode ruimte -- die gaan
+         voor. Pas daarna snijden we in de taal die hij NU leest. Lukt het dan
+         nog niet, dan is de ruimte van iemand anders en niet van ons om op te
+         eisen: deze taal wordt opgegeven, het geheugen blijft werken en de
+         volgende pagina begint weer koud. */
+      for (var poging = 0; poging < 3; poging++) {
+        if (poging === 1) andereTalenWeg(s, taal);
+        if (poging === 2) {
+          var helft = Math.floor(m.size / 2);
+          while (m.size > helft && m.size) m.delete(m.keys().next().value);
+        }
+        var uit = {}, bytes = 0, sleutels = [];
+        m.forEach(function (v, k) { sleutels.push(k); });
+        // van achteren naar voren, zodat het NIEUWSTE de bytegrens overleeft
+        for (var i = sleutels.length - 1; i >= 0; i--) {
+          var k = sleutels[i], v = m.get(k);
+          bytes += k.length + v.length + 6;
+          if (bytes > MAX_BYTES) break;
+          uit[k] = v;
+        }
+        try { s.setItem(SLEUTEL + taal, JSON.stringify(uit)); return; }
+        catch (e) { if (poging === 2) opgegeven.add(taal); }
+      }
+    });
+  }
+
+  /* De vorige opzet bewaarde per PAD (`rtg_ui_<taal>_<pad>_<n>`), dus stond
+     dezelfde knop tientallen keren in de opslag van het toestel. Die ruimte is
+     nu van de kast; hem laten staan zou de quota opeten van precies de laag die
+     hem vervangt. Een keer opruimen, stil, en nooit meer. */
+  (function () {
+    var s = opslag();
+    if (!s) return;
+    try {
+      if (s.getItem('rtg_tr_opgeruimd')) return;
+      var oud = [];
+      for (var i = 0; i < s.length; i++) {
+        var k = s.key(i);
+        if (k && k.indexOf('rtg_ui_') === 0) oud.push(k);
+      }
+      oud.forEach(function (k) { s.removeItem(k); });
+      s.setItem('rtg_tr_opgeruimd', '1');
+    } catch (e) {}
+  })();
+
+  /* Een navigatie mag de laatst binnengekomen vertalingen niet opeten: de
+     wachtende schrijfronde gaat er bij het verlaten van de pagina alsnog uit.
+     `pagehide` is de enige gebeurtenis die op iOS betrouwbaar valt. */
+  try {
+    w.addEventListener('pagehide', bewaarNu);
+    w.addEventListener('visibilitychange', function () {
+      if (w.document && w.document.visibilityState === 'hidden') bewaarNu();
+    });
+  } catch (e) {}
+
+  w.RTGVertaalKast = {
+    van: van, zet: zet, bewaarNu: bewaarNu,
+    lees: function (taal, bron) { var v = van(taal).get(bron); return v == null ? null : v; },
+    stand: function () {
+      var perTaal = {};
+      kast.forEach(function (m, taal) { perTaal[taal] = m.size; });
+      return { opslag: !!opslag(), perTaal: perTaal, opgegeven: Array.from(opgegeven),
+        maxRegels: MAX_REGELS, maxBytes: MAX_BYTES };
+    }
+  };
+})(window);
+/* De LEZER van de automatische UI-vertaling voor de volledige RTG-schermfamilie.
+   (Het tonen, opvragen en wisselen staat in i18n-00c.js: een IIFE, twee helften.)
 
    De expliciete data-i18n-sleutels blijven de voorkeursroute: zij geven de
    redactie volledige controle. Deze laag vangt alles op wat nog geen sleutel
@@ -20,9 +183,15 @@
     '[data-i18n],[data-i18n-html],.chat-bericht,.message-body,.bericht-tekst,.post-body,.review-text';
   var tekstMap = new WeakMap(), attribMap = new WeakMap();
   var tekstStaten = new Set(), attribStaten = new Set();
-  var cache = new Map(), wortels = new Set();
+  var wortels = new Set();
   var taal = 'nl', beurt = 0, timer = null, waarnemer = null;
+  var eersteRonde = true;
   var keten = Promise.resolve();
+  /* De voorraad vertalingen staat in i18n-00.js, in dezelfde bundel. Ontbreekt
+     hij toch, dan werkt deze laag door zonder voorraad -- traag zoals vroeger,
+     maar geen enkel scherm valt om op een ontbrekende kast. */
+  var KAST = w.RTGVertaalKast || { van: function () { return new Map(); },
+    zet: function () { return false; }, stand: function () { return { opslag: false, perTaal: {} }; } };
   var oorspronkelijkeRichting = document.documentElement.getAttribute('dir');
   var apiMeta = document.querySelector && document.querySelector('meta[name="rtg-api-base"]');
   var apiBasis = String(apiMeta && apiMeta.getAttribute('content') || '').replace(/\/+$/, '');
@@ -75,8 +244,8 @@
 
   function voeg(groepen, st) {
     if (!kandidaat(st.bron)) return;
-    var sleutel = taal + '\u0000' + st.bron;
-    if (cache.has(sleutel)) return toon(st, cache.get(sleutel));
+    var uitKast = KAST.van(taal).get(st.bron);
+    if (uitKast != null) return toon(st, uitKast);
     if (!groepen.has(st.bron)) groepen.set(st.bron, new Set());
     groepen.get(st.bron).add(st);
   }
@@ -107,6 +276,15 @@
     });
   }
 
+  /* Hier houdt de LEZER op. Wat hij verzamelde -- welke tekstknopen en welke
+     attributen vertaald mogen worden, en met welke oorspronkelijke waarde --
+     wordt in i18n-00c.js getoond, hersteld en opgevraagd. Een IIFE, twee
+     bestanden: de bundel plakt ze terug aaneen (scripts/bundel.js). */
+/* De SCHRIJVER van de automatische vertaallaag: tonen, herstellen, groeperen,
+   opvragen en de taalwissel. Dit is de tweede helft van de IIFE die in
+   i18n-00b.js opent -- de lezer daar bepaalt WAT vertaald mag worden en waar
+   het staat, deze helft doet er iets mee. Ze delen hun toestand, en de bundel
+   plakt ze terug aaneen tot een bestand (scripts/bundel.js). */
   function toon(st, vertaling) {
     if (taal === 'nl' || !st || st.bron == null) return;
     vertaling = String(vertaling == null || vertaling === '' ? st.bron : vertaling);
@@ -159,7 +337,7 @@
         if (!d || d.naar !== gekozenTaal || !Array.isArray(d.teksten)) return;
         groep.regels.forEach(function (bron, i) {
           var vertaling = d.teksten[i] || bron;
-          if (vertaling !== bron) cache.set(gekozenTaal + '\u0000' + bron, vertaling);
+          if (vertaling !== bron) KAST.zet(gekozenTaal, bron, vertaling);
           if (taal === gekozenTaal && beurt === gekozenBeurt)
             groep.doelen[i].forEach(function (st) { if (st.bron === bron) toon(st, vertaling); });
         });
@@ -168,6 +346,7 @@
 
   function voerUit() {
     timer = null;
+    eersteRonde = false;
     if (taal === 'nl') return;
     var groepen = new Map(), lijst = Array.from(wortels); wortels.clear();
     if (!lijst.length) lijst = [document.documentElement];
@@ -179,10 +358,15 @@
         .catch(function () { /* de brontekst blijft heel; een volgende DOM-wijziging probeert opnieuw */ });
     });
   }
+  /* De 80 ms bundelt een uitbarsting van DOM-wijzigingen tot EEN aanvraag. Bij
+     een warme kast is er geen aanvraag, en is die wachttijd alleen nog zichtbaar
+     Nederlands op een scherm dat we al kunnen vertalen: de EERSTE ronde loopt
+     daarom kort zodra de kast van deze taal gevuld is. */
   function plan(root) {
     if (root) wortels.add(root.nodeType === 3 ? root.parentElement : root);
     if (timer || taal === 'nl') return;
-    timer = setTimeout(voerUit, 80);
+    var warm = eersteRonde && KAST.van(taal).size > 0;
+    timer = setTimeout(voerUit, warm ? 0 : 80);
   }
 
   function observeer() {
@@ -207,12 +391,20 @@
     else if (taal === 'nl' && oorspronkelijkeRichting == null) document.documentElement.removeAttribute('dir');
     else document.documentElement.setAttribute('dir', oorspronkelijkeRichting || 'ltr');
     document.documentElement.setAttribute('data-rtg-taal', taal);
+    if (taal !== 'nl') KAST.van(taal);   // de kast van deze taal alvast van het toestel halen
+    eersteRonde = true;
     observeer();
     if (taal === 'nl') { if (timer) { clearTimeout(timer); timer = null; } wortels.clear(); herstel(); }
     else plan(document.documentElement);
   }
 
-  w.RTGAutoVertaling = { apply: pasToe, scan: plan, kandidaat: kandidaat, rtl: RTL };
+  /* De kast staat er ook naar buiten toe bij, want de sleutelweg in i18n-03.js
+     praat met dezelfde voorraad. Twee lagen die hetzelfde woord twee keer laten
+     vertalen was precies de dubbeling die deze ronde wegneemt. */
+  w.RTGAutoVertaling = {
+    apply: pasToe, scan: plan, kandidaat: kandidaat, rtl: RTL, kast: KAST,
+    stand: function () { var s = KAST.stand(); s.taal = taal; return s; }
+  };
 })(window);
 /* ============================================================================
    RTG i18n, taalkeuze + automatische detectie voor de website en alle apps.
@@ -234,7 +426,19 @@
   const STORE = 'rtg_lang';
   const apiMeta = document.querySelector('meta[name="rtg-api-base"]');
   const assetMeta = document.querySelector('meta[name="rtg-asset-base"]');
-  const API_BASIS = String(apiMeta && apiMeta.getAttribute('content') || '').replace(/\/+$/, '');
+  /* Waar de API woont. Normaal op dezelfde oorsprong -- dat klopt op de
+     RTG-server, op localhost en bij een eigen installatie. Maar de publieke
+     verhaalpagina's (public/site/) worden OOK van een statische voordeur
+     geserveerd, en daar ligt geen API: dan wijzen we naar de app. Een vaste
+     meta in die pagina's kan niet, want dan zou een eigen installatie zijn
+     vertalingen bij ons ophalen. De lijst staat in server/lib/voordeuren.js;
+     test/i18n-auto.test.js zakt zodra deze twee uit elkaar lopen. */
+  const STATISCHE_VOORDEUREN = ['https://rahulrtg.github.io', 'https://rahultravelgroup.com', 'https://www.rahultravelgroup.com'];
+  const APP_OORSPRONG = 'https://app.rahultravelgroup.com';
+  const API_BASIS = String(
+    (apiMeta && apiMeta.getAttribute('content')) ||
+    (STATISCHE_VOORDEUREN.indexOf(location.origin) >= 0 ? APP_OORSPRONG : '') || ''
+  ).replace(/\/+$/, '');
   const ASSET_BASIS = String(assetMeta && assetMeta.getAttribute('content') || '').replace(/\/+$/, '');
   const apiPad = pad => API_BASIS + pad;
   const assetPad = pad => ASSET_BASIS + pad;
@@ -374,11 +578,21 @@
     },
 
     /* Wereldtaal-woordenboeken: voor elke taal buiten nl/en halen we het
-       UI-woordenboek van DEZE pagina live vertaald op (/api/vertaal/ui) en
-       bewaren het op het toestel. Zo draait elke pagina volledig in elke
-       actieve wereldtaal; zonder AI-sleutel valt de server terug op het
-       woordenboek en blijft de Engelse tekst staan waar hij het niet weet
-       (nooit een kapot scherm). */
+       UI-woordenboek van DEZE pagina live vertaald op (/api/vertaal/ui). Zo
+       draait elke pagina volledig in elke actieve wereldtaal; zonder AI-sleutel
+       valt de server terug op het woordenboek en blijft de Engelse tekst staan
+       waar hij het niet weet (nooit een kapot scherm).
+
+       DIT WAS EEN TWEEDE OPSLAG, EN DAT KOSTTE TWEE KEER. De cachesleutel
+       droeg het PAD van de pagina, dus "Opslaan" op scherm A en "Opslaan" op
+       scherm B waren twee vertalingen: twee keer een modelaanroep, twee keer
+       bewaard, en op de tweede pagina toch weer wachten. Het gaat nu langs
+       dezelfde kast als de automatische laag (i18n-00.js), en die kent geen
+       paden -- alleen taal en bron. Wat er al ligt kost daarmee GEEN aanvraag,
+       ook niet de eerste keer dat dit scherm wordt geopend.
+
+       EN HIJ VRAAGT ALLEEN WAT HIJ MIST. Van vierhonderd sleutels zijn er op de
+       tweede pagina meestal een handvol nieuw; de rest komt uit de kast. */
     _wereldDict: {},
     laadWereldDict(lang) {
       if (lang === 'nl' || lang === 'en' || this._wereldDict[lang]) return;
@@ -388,23 +602,31 @@
       const keys = Object.keys(en).slice(0, 400);
       if (!keys.length) return;
       this._wereldDict[lang] = true;
-      const ck = 'rtg_ui_' + lang + '_' + location.pathname.replace(/\W+/g, '') + '_' + keys.length;
+      const kast = window.RTGVertaalKast;
       const zet = (d) => {
         window.I18N = window.I18N || {};
         window.I18N[lang] = d;
         if (this.lang === lang) this.apply(lang); // opnieuw toepassen zodra hij er is
       };
-      let dict = null;
-      try { dict = JSON.parse(localStorage.getItem(ck) || 'null'); } catch (e) {}
-      if (dict) return zet(dict);
+      const uit = {};
+      const missend = [];
+      keys.forEach(k => {
+        const bron = en[k];
+        const bekend = kast ? kast.lees(lang, bron) : null;
+        if (bekend != null) uit[k] = bekend; else missend.push(k);
+      });
+      if (!missend.length) return zet(uit);          // volledig uit het toestel: geen netwerk
+      if (Object.keys(uit).length) zet(uit);          // toon vast wat we al weten
       fetch(apiPad('/api/vertaal/ui'), { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ naar: lang, teksten: keys.map(k => en[k]) }) })
+        body: JSON.stringify({ naar: lang, teksten: missend.map(k => en[k]) }) })
         .then(r => r.json())
         .then(d => {
           if (!d || d.naar !== lang || !Array.isArray(d.teksten)) return;
-          const uit = {};
-          keys.forEach((k, i) => { uit[k] = d.teksten[i] || en[k]; });
-          try { localStorage.setItem(ck, JSON.stringify(uit)); } catch (e) {}
+          missend.forEach((k, i) => {
+            const v = d.teksten[i] || en[k];
+            uit[k] = v;
+            if (kast) kast.zet(lang, en[k], v);       // de kast weigert v === bron zelf
+          });
           zet(uit);
         })
         .catch(() => { this._wereldDict[lang] = false; });

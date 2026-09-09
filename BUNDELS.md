@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**59 bundels, 471 delen, 0 zonder onderwerp.**
+**59 bundels, 473 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -693,11 +693,13 @@ omlaag.
 
 ## `shared/i18n.js`
 
-`public/shared/i18n/` -- 4 delen, 703 regels in de delen
+`public/shared/i18n/` -- 6 delen, 925 regels in de delen
 
 | deel | onderwerp |
 |---|---|
-| `i18n-00.js` | Automatische UI-vertaling voor de volledige RTG-schermfamilie |
+| `i18n-00.js` | De vertaalkast van de browser: vertaalde interface die een NAVIGATIE overleeft |
+| `i18n-00b.js` | De LEZER van de automatische UI-vertaling voor de volledige RTG-schermfamilie |
+| `i18n-00c.js` | De SCHRIJVER van de automatische vertaallaag: tonen, herstellen, groeperen, opvragen en de taalwissel |
 | `i18n-01.js` | RTG i18n, taalkeuze + automatische detectie voor de website en alle apps |
 | `i18n-02.js` | spreken: de eigen stem invullen en meteen laten herkennen |
 | `i18n-03.js` | De keuze mag nooit de pagina gijzelen: klik ernaast = huidige taal houden |

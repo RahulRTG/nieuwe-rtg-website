@@ -18,7 +18,19 @@
   const STORE = 'rtg_lang';
   const apiMeta = document.querySelector('meta[name="rtg-api-base"]');
   const assetMeta = document.querySelector('meta[name="rtg-asset-base"]');
-  const API_BASIS = String(apiMeta && apiMeta.getAttribute('content') || '').replace(/\/+$/, '');
+  /* Waar de API woont. Normaal op dezelfde oorsprong -- dat klopt op de
+     RTG-server, op localhost en bij een eigen installatie. Maar de publieke
+     verhaalpagina's (public/site/) worden OOK van een statische voordeur
+     geserveerd, en daar ligt geen API: dan wijzen we naar de app. Een vaste
+     meta in die pagina's kan niet, want dan zou een eigen installatie zijn
+     vertalingen bij ons ophalen. De lijst staat in server/lib/voordeuren.js;
+     test/i18n-auto.test.js zakt zodra deze twee uit elkaar lopen. */
+  const STATISCHE_VOORDEUREN = ['https://rahulrtg.github.io', 'https://rahultravelgroup.com', 'https://www.rahultravelgroup.com'];
+  const APP_OORSPRONG = 'https://app.rahultravelgroup.com';
+  const API_BASIS = String(
+    (apiMeta && apiMeta.getAttribute('content')) ||
+    (STATISCHE_VOORDEUREN.indexOf(location.origin) >= 0 ? APP_OORSPRONG : '') || ''
+  ).replace(/\/+$/, '');
   const ASSET_BASIS = String(assetMeta && assetMeta.getAttribute('content') || '').replace(/\/+$/, '');
   const apiPad = pad => API_BASIS + pad;
   const assetPad = pad => ASSET_BASIS + pad;
@@ -158,11 +170,21 @@
     },
 
     /* Wereldtaal-woordenboeken: voor elke taal buiten nl/en halen we het
-       UI-woordenboek van DEZE pagina live vertaald op (/api/vertaal/ui) en
-       bewaren het op het toestel. Zo draait elke pagina volledig in elke
-       actieve wereldtaal; zonder AI-sleutel valt de server terug op het
-       woordenboek en blijft de Engelse tekst staan waar hij het niet weet
-       (nooit een kapot scherm). */
+       UI-woordenboek van DEZE pagina live vertaald op (/api/vertaal/ui). Zo
+       draait elke pagina volledig in elke actieve wereldtaal; zonder AI-sleutel
+       valt de server terug op het woordenboek en blijft de Engelse tekst staan
+       waar hij het niet weet (nooit een kapot scherm).
+
+       DIT WAS EEN TWEEDE OPSLAG, EN DAT KOSTTE TWEE KEER. De cachesleutel
+       droeg het PAD van de pagina, dus "Opslaan" op scherm A en "Opslaan" op
+       scherm B waren twee vertalingen: twee keer een modelaanroep, twee keer
+       bewaard, en op de tweede pagina toch weer wachten. Het gaat nu langs
+       dezelfde kast als de automatische laag (i18n-00.js), en die kent geen
+       paden -- alleen taal en bron. Wat er al ligt kost daarmee GEEN aanvraag,
+       ook niet de eerste keer dat dit scherm wordt geopend.
+
+       EN HIJ VRAAGT ALLEEN WAT HIJ MIST. Van vierhonderd sleutels zijn er op de
+       tweede pagina meestal een handvol nieuw; de rest komt uit de kast. */
     _wereldDict: {},
     laadWereldDict(lang) {
       if (lang === 'nl' || lang === 'en' || this._wereldDict[lang]) return;
@@ -172,23 +194,31 @@
       const keys = Object.keys(en).slice(0, 400);
       if (!keys.length) return;
       this._wereldDict[lang] = true;
-      const ck = 'rtg_ui_' + lang + '_' + location.pathname.replace(/\W+/g, '') + '_' + keys.length;
+      const kast = window.RTGVertaalKast;
       const zet = (d) => {
         window.I18N = window.I18N || {};
         window.I18N[lang] = d;
         if (this.lang === lang) this.apply(lang); // opnieuw toepassen zodra hij er is
       };
-      let dict = null;
-      try { dict = JSON.parse(localStorage.getItem(ck) || 'null'); } catch (e) {}
-      if (dict) return zet(dict);
+      const uit = {};
+      const missend = [];
+      keys.forEach(k => {
+        const bron = en[k];
+        const bekend = kast ? kast.lees(lang, bron) : null;
+        if (bekend != null) uit[k] = bekend; else missend.push(k);
+      });
+      if (!missend.length) return zet(uit);          // volledig uit het toestel: geen netwerk
+      if (Object.keys(uit).length) zet(uit);          // toon vast wat we al weten
       fetch(apiPad('/api/vertaal/ui'), { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ naar: lang, teksten: keys.map(k => en[k]) }) })
+        body: JSON.stringify({ naar: lang, teksten: missend.map(k => en[k]) }) })
         .then(r => r.json())
         .then(d => {
           if (!d || d.naar !== lang || !Array.isArray(d.teksten)) return;
-          const uit = {};
-          keys.forEach((k, i) => { uit[k] = d.teksten[i] || en[k]; });
-          try { localStorage.setItem(ck, JSON.stringify(uit)); } catch (e) {}
+          missend.forEach((k, i) => {
+            const v = d.teksten[i] || en[k];
+            uit[k] = v;
+            if (kast) kast.zet(lang, en[k], v);       // de kast weigert v === bron zelf
+          });
           zet(uit);
         })
         .catch(() => { this._wereldDict[lang] = false; });

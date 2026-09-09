@@ -21,11 +21,24 @@ const { volledigeBoodschap } = require('./translate/boodschap');
 let anthropic = null;
 function setAnthropic(a) { anthropic = a; }
 
+/* De vertaalkast (server/lib/vertaalkast.js) is de laag ONDER de geheugencache:
+   vertaalde interface die een herstart overleeft. Bewust optioneel -- zonder
+   kast werkt alles zoals eerder, alleen koud. Alleen wie `bewaar: true` zegt
+   mag erin, en dat zegt uitsluitend /api/vertaal/ui: wat een lid TYPT is geen
+   interface en hoort niet op schijf naast de knoppen van het huis. */
+let kast = null;
+function setVertaalkast(k) { kast = k; }
+
 /* Vertaal-cache met een vaste bovengrens: bij een hit schuift de sleutel naar
    achteren (LRU), boven de grens valt de oudste eruit. Zonder grens groeit de
    Map met elke unieke (taal, tekst)-combinatie mee en lekt de server geheugen
    onder vuur van willekeurige teksten. */
 const cache = new Map();
+/* Deze grens blijft 5000 en dat is met opzet, ook nu de kast er is. Zij is er
+   voor de LOSSE BERICHTEN -- de weg waar willekeurige ingetypte tekst langskomt
+   -- en dat is precies het geval waarvoor de bovenstaande alinea werd
+   geschreven. De interface wordt niet hier maar in de kast bewaard, die per
+   taal een eigen tabel houdt en dus zonder deze grens toe kan. */
 const CACHE_MAX = 5000;
 
 function cacheLees(key) {
@@ -115,6 +128,9 @@ async function translateBatch(teksten, to, from, opties) {
   to = bestaat(to) ? String(to).toLowerCase() : 'nl';
   const magAiVoor = typeof (opties && opties.ai) === 'function'
     ? opties.ai : () => (!opties || opties.ai !== false);
+  /* De kast bewaart alleen wat de aanroeper AANWIJST als interface. Standaard
+     dus niet: een nieuwe aanroeper krijgt nooit stilzwijgend een schijflog. */
+  const bewaarMag = !!(opties && opties.bewaar);
   const uit = new Array(teksten.length);
   const wacht = [];
 
@@ -129,6 +145,16 @@ async function translateBatch(teksten, to, from, opties) {
     const hit = cacheLees(key);
     if (hit != null) {
       uit[i] = { text: hit, translated: hit !== text, from: bron };
+      continue;
+    }
+    /* De kast staat NAAST het geheugen en BOVEN het woordenboek: een eerder
+       gemaakte vertaling is beter dan een terugval en kost geen model. Een
+       treffer wordt hier bewust NIET naar `cache` gekopieerd: de kast houdt zijn
+       tabel per taal zelf in het geheugen, dus dat zou dezelfde regel een tweede
+       keer opslaan. Alleen de eerste lezing van een taal raakt de schijf. */
+    const uitKast = (bewaarMag && kast) ? kast.lees(to, text) : null;
+    if (uitKast != null) {
+      uit[i] = { text: uitKast, translated: uitKast !== text, from: bron };
       continue;
     }
     let vast = to === 'en' ? NL2EN[text] : (to === 'nl' ? EN2NL[text] : null);
@@ -160,7 +186,12 @@ async function translateBatch(teksten, to, from, opties) {
         const result = (model && model[j]) || lokaal || item.text;
         /* Een tijdelijke modelstoring mag geen onvertaalde zin als blijvend
            cacheantwoord vastzetten. Alleen echte vertaling is een cache-hit. */
-        if (result !== item.text) cacheSchrijf(item.key, result);
+        if (result !== item.text) {
+          cacheSchrijf(item.key, result);
+          /* Alleen een ECHTE vertaling van een regel die de aanroeper
+             interface noemt gaat de schijf op. */
+          if (bewaarMag && kast) kast.schrijf(to, item.text, result);
+        }
         uit[item.i] = { text: result, translated: result !== item.text, from: item.bron };
       });
     }
@@ -168,4 +199,4 @@ async function translateBatch(teksten, to, from, opties) {
   return uit;
 }
 
-module.exports = { setAnthropic, localize, localizeList, translate, translateBatch, detect };
+module.exports = { setAnthropic, setVertaalkast, localize, localizeList, translate, translateBatch, detect };

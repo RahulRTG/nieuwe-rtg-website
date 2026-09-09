@@ -1323,11 +1323,7 @@ const talenCache = require('./lib/cache').antwoordCache({ ttl: 3600000, max: 8, 
 /* De losse GitHub Pages-voordeur (index.html in de repositoryroot) draait op
    rahulrtg.github.io en gebruikt dezelfde taal-API. Alleen die vaste publieke
    voordeuren krijgen CORS; andere oorsprongen kunnen de response niet lezen. */
-const UI_CORS_ORIGINS = new Set([
-  'https://rahulrtg.github.io',
-  'https://rahultravelgroup.com',
-  'https://www.rahultravelgroup.com'
-]);
+const { OORSPRONGEN: UI_CORS_ORIGINS } = require('./lib/voordeuren');
 app.use(['/api/talen', '/api/vertaal/ui'], (req, res, next) => {
   const origin = String(req.get('origin') || '');
   if (UI_CORS_ORIGINS.has(origin)) {
@@ -1427,6 +1423,12 @@ app.post('/api/supplier/aanwezig/leeg', supplierAuth, (req, res) => {
 const uiVertaalPerIp = require('./rem')({ windowMs: 60000, limit: 30 });
 const uiVertaalGlobaal = require('./rem')({ windowMs: 60000, limit: 180, key: () => 'alle-ui' });
 const uiBronnen = require('./lib/ui-bronnen').maakUiBronnen(PUBLIC_DIR, [path.join(PUBLIC_DIR, '..', 'index.html')]);
+/* De vertaalkast: interface-tekst die een herstart overleeft. Dit is de ENIGE
+   plek die hem vult, want dit is de enige route waar `uiBronnen` al bewijst dat
+   een regel werkelijk uit de code van dit huis komt. Wat een lid typt gaat langs
+   /api/vertaal en komt dus nooit op schijf te staan. Zie lib/vertaalkast.js. */
+const vertaalkast = require('./lib/vertaalkast').maakVertaalkast({ dir: DATA_DIR });
+i18n.setVertaalkast(vertaalkast);
 app.post('/api/vertaal/ui', uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {
   try {
     const naar = talen.taalVan(req.body && req.body.naar);
@@ -1434,7 +1436,7 @@ app.post('/api/vertaal/ui', uiVertaalPerIp, uiVertaalGlobaal, async (req, res) =
     const teksten = (Array.isArray(req.body && req.body.teksten) ? req.body.teksten : []).slice(0, 400)
       .map(t => String(t == null ? '' : t).slice(0, 300))
       .filter(t => { totaal += t.length; return totaal <= 24000; });
-    const regels = await i18n.translateBatch(teksten, naar, undefined, { ai: uiBronnen.toegestaan });
+    const regels = await i18n.translateBatch(teksten, naar, undefined, { ai: uiBronnen.toegestaan, bewaar: true });
     const uit = regels.map(r => r.text);
     res.json({ ok: true, naar, teksten: uit });
   } catch (e) { res.status(500).json({ error: 'Vertalen lukte even niet. Probeer het opnieuw.' }); }

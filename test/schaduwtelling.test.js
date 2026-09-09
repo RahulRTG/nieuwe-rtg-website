@@ -112,7 +112,7 @@ const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
 
-test('6. het kantoor kan de schaduwtelling opvragen, en een lid niet', async (t) => {
+test('6. de boardroom kan de schaduwtelling opvragen; een lid en de gedeelde code niet', async (t) => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-schaduw-'));
   const CODE = 'KANTOOR-SCHADUW-1';
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
@@ -135,9 +135,24 @@ test('6. het kantoor kan de schaduwtelling opvragen, en een lid niet', async (t)
     assert.ok(alsLid.status === 401 || alsLid.status === 403,
       'een ledentoken opent de kantoordeur (kreeg ' + alsLid.status + ')');
 
+    /* En de GEDEELDE kantoorcode ook niet. Deze route staat achter de
+       boardroomdeur: het getal bestaat om te wegen of een platformbrede
+       beveiligingsvlag omgaat, en dat is geen dagelijks kantoorwerk. */
     const kantoor = (await post('/api/office/login', { code: CODE })).body.token;
     assert.ok(kantoor, 'het kantoor logt in');
-    const r = await post('/api/office/stuur/herkomstschaduw', {}, kantoor);
+    const alsCode = await post('/api/office/stuur/herkomstschaduw', {}, kantoor);
+    assert.equal(alsCode.status, 403,
+      'de gedeelde kantoorcode komt hier binnen (kreeg ' + alsCode.status + ')');
+    assert.match(String(alsCode.body.error || ''), /boardroom/i, 'en de weigering zegt waarom');
+
+    /* De tegenproef, want anders bewijst het bovenstaande alleen dat er iets
+       dichtzit: de eigenaar komt er op zijn eigen account wel door. */
+    const eig = (await post('/api/auth/login',
+      { login: 'roellie.i@gmail.com', password: 'Imran', pasApp: 'business' })).body.token;
+    assert.ok(eig, 'de eigenaar logt in op zijn eigen account');
+    const baas = (await post('/api/account/start', { rol: 'kantoor' }, eig)).body.token;
+    assert.ok(baas, 'en staat met dat account in de backoffice');
+    const r = await post('/api/office/stuur/herkomstschaduw', {}, baas);
     assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 160));
     /* DE DRIE DINGEN DIE MEE MOETEN KOMEN. Zonder `sinds` en `bewaard` is het
        getal niet te plaatsen, en zonder `nietGemeten` vult de lezer zelf in wat

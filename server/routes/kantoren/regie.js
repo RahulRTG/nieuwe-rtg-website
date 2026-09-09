@@ -18,12 +18,20 @@ module.exports = (ctx) => {
      je niet kunt afdwingen wat nooit in de schaduw heeft gelopen -- maar een
      schaduw die niemand kan LEZEN, is geen schaduw. Deze route is die leesweg.
 
-     Achter de gedeelde code en niet achter de kluis: het is een aggregaat van
-     tellers zonder een enkele identiteit erin, en KANTOORMACHT.md zet
-     ENFORCE_EXECUTE voor ENFORCE_READ. Zie kern/stuur/schaduwtelling.js voor
-     waarom er geen journaal onder ligt en waarom het antwoord zijn eigen
-     begindatum draagt. */
-  app.post('/api/office/stuur/herkomstschaduw', officeAuth, (req, res) => veilig(res, () =>
+     ACHTER DE BOARDROOMDEUR, en dat is een besluit dat één kant op ging en
+     terug. Hij stond eerst op de gedeelde code, met het argument dat lezen
+     later komt dan uitvoeren (KANTOORMACHT.md). Dat argument gaat over
+     DAGELIJKS WERK, en dit is dat niet: dit getal bestaat om te wegen of
+     `RTG_HERKOMST_AFDWINGEN` omgaat, en dat is een platformbreed besluit van
+     dezelfde soort als de bankstand ernaast. Elke andere route in dit bestand
+     staat achter dezelfde deur; deze was de uitzondering, en er was geen reden
+     voor. Bijkomend: `anoniemUitvoerbaar` blijft er gelijk door in plaats van
+     te stijgen -- maar dat is het gevolg en niet de reden. Wie een route achter
+     een strengere deur zet om een teller te sparen, meet het gat weg.
+
+     Zie kern/stuur/schaduwtelling.js voor waarom er geen journaal onder ligt en
+     waarom het antwoord zijn eigen begindatum draagt. */
+  app.post('/api/office/stuur/herkomstschaduw', boardroomAuth, (req, res) => veilig(res, () =>
     ({ status: 200, ok: true, ...require('../../kern/stuur/schaduwtelling').stand() })));
 
   /* Het loket om een zware bevestiging in de boardroom te starten. De poort

@@ -163,6 +163,48 @@ test('zonder een naam in de git-instellingen oordeelt hij nog steeds goed', () =
   }
 });
 
+/* EEN AFGEKAPTE GESCHIEDENIS OORDEELT NIET.
+
+   Dit is de derde keer dat dit gereedschap naar de kant van WEGGOOIEN faalde,
+   en de duurste. Op een ondiepe kloon ligt de gemeenschappelijke voorouder
+   buiten beeld: `rev-list` telt dan te veel en `merge-base --is-ancestor` zegt
+   "geen voorouder". Beide metingen zijn het eens EN allebei fout, dus de
+   kruiscontrole hierboven redt het niet -- de enige uitweg is de kloon zelf
+   weigeren.
+
+   Hoe hard dat nodig was: op een ondiepe kloon zei deze meting dat 61 takken
+   weg mochten, op een volledige 162. Dezelfde repo, dezelfde commits. Wie de
+   ondiepe uitslag had uitgevoerd, had honderd takken laten staan die weg
+   konden -- en, erger, hij had die twee getallen voor twee metingen aangezien.
+
+   De toets draait het echte script als proces, want de wacht zit in main(). */
+test('een ondiepe kloon wordt geweigerd in plaats van beoordeeld', () => {
+  const { map, werkmap } = bouwWereld();
+  const ondiep = fs.mkdtempSync(path.join(os.tmpdir(), 'takkenondiep-'));
+  try {
+    /* `file://` is hier geen franje: bij een lokaal pad negeert git --depth. */
+    execFileSync('git', ['clone', '--depth', '1', '--no-single-branch', '--quiet',
+      'file://' + map, path.join(ondiep, 'k')], { encoding: 'utf8' });
+    assert.equal(
+      execFileSync('git', ['-C', path.join(ondiep, 'k'), 'rev-parse', '--is-shallow-repository'],
+        { encoding: 'utf8' }).trim(), 'true', 'de proefkloon moet werkelijk ondiep zijn');
+
+    let code = 0, uit = '';
+    try {
+      uit = execFileSync(process.execPath, [path.join(__dirname, '..', 'scripts', 'takken.js')],
+        { cwd: path.join(ondiep, 'k'), encoding: 'utf8', env: Object.assign({}, process.env, { HOOFDTAK: 'main' }) });
+    } catch (e) { code = e.status; uit = String(e.stdout || '') + String(e.stderr || ''); }
+
+    assert.equal(code, 1, 'een ondiepe kloon hoort met een foutcode te eindigen');
+    assert.match(uit, /ondiepe kloon/, 'en te zeggen waarom hij niets beoordeelt');
+    assert.doesNotMatch(uit, /VOEGT NIETS TOE/, 'er komt geen enkel weg-oordeel uit een afgekapte geschiedenis');
+  } finally {
+    fs.rmSync(map, { recursive: true, force: true });
+    fs.rmSync(werkmap, { recursive: true, force: true });
+    fs.rmSync(ondiep, { recursive: true, force: true });
+  }
+});
+
 /* DE GEVAARLIJKE KANT VAN DE REGISTERLIJST. Elke naam die erbij komt, maakt het
    gereedschap losser: een conflict daarin telt voortaan niet meer als inhoud.
    Daarom staat hier wat er in mag -- een bestand dat dit huis uit de bron

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1737 bestanden en 12284 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1738 bestanden en 12289 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1737 |
-| losse beweringen (`test(...)`) | 12284 |
+| toetsbestanden | 1738 |
+| losse beweringen (`test(...)`) | 12289 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 110 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1077 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1078 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 55 |
 | alleen in de kop *genoemd*, nog niet gemeten | 179 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1529 bestanden, 11925 beweringen.
+1530 bestanden, 11930 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1063,6 +1063,7 @@ toets omvalt.
 | `residentie3.test.js` | 4 | gezakt op `liegpoort /api/` | De Residence, het paar en de directeur: samen "vast" wandelen (verzoek, volgen bij stap en kamerwissel, losmaken), koppel tegen koppel spelen (2 tegen 2 met teamstand) en Rahul, de directeur, die het vragenspel... |
 | `residentie4.test.js` | 3 | gezakt op `return-weg#0` | De vragenmotor van De Residence: ruim tienduizend verschillende vragen in zes genres, van superluchtig tot een traan tot zakelijk en door en door. Pure unit-test op de module zelf. |
 | `resolverbereik.test.js` | 6 | gezakt op `===->!==#0` | HET BEREIK VAN DE RESOLVER (scripts/resolverbereik.js). test/stuur-resolver-taal.test.js bewaakt de dekking op 27 met de hand geschreven zinnen. |
+| `resync-licht.test.js` | 5 | gezakt op `===->!==#0` | EEN BEDOELDE SLUITING HOEFT NIET DE HELE KAST OPNIEUW TE LEZEN. De schrijfpoort sluit fail-closed, en dat blijft. |
 | `retail-annulering.test.js` | 9 | -- | EEN VERKOOP TERUGDRAAIEN -- als tegenboeking, en nooit door de bon te wissen. DE ZWAARSTE TOETS IS 3. |
 | `retail-prijs.test.js` | 8 | -- | DE PRIJS VAN EEN RETAILVERKOOP -- en de fout die eronder zat. DE ZWAARSTE TOETS IS 4. |
 | `retail.test.js` | 12 | gezakt op `liegpoort /api/` | End-to-end tests voor het retail-/mode-genre (kern/retail.js): collecties en artikelen met varianten, voorraad, clienteling (maten/verlanglijst/historie/ notities), apart leggen, paskamerverzoeken,... |

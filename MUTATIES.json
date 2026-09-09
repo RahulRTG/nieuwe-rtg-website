@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-09T07:44:24.878Z",
-    "commit": "3ef45e4f",
+    "op": "2026-09-09T11:01:36.173Z",
+    "commit": "985aa6e5",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5393,6 +5393,14 @@
       "operator": "===->!==#0",
       "gezakt": 5,
       "geprobeerd": 1
+    },
+    "resync-licht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/postgres-verzoeken.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 4
     },
     "retail.test.js": {
       "soort": "server",

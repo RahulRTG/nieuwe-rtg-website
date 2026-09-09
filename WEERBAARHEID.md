@@ -139,8 +139,8 @@ stilzwijgend een middenwaarde. Er komt met opzet **geen samengesteld cijfer** ui
 `test/overleving.test.js` toets 5 is de rem op die verleiding.
 
 **Stand nu: <!--getal:overleving.ja-->0<!--/getal--> ja,
-<!--getal:overleving.deels-->4<!--/getal--> deels,
-<!--getal:overleving.nee-->3<!--/getal--> nee en
+<!--getal:overleving.deels-->5<!--/getal--> deels,
+<!--getal:overleving.nee-->2<!--/getal--> nee en
 <!--getal:overleving.onbekend-->1<!--/getal--> onbekend over
 <!--getal:overleving.rijen-->8<!--/getal--> scenario's.** Die getallen komen uit
 `OVERLEVING.json` en worden door `npm run getallen` bijgehouden, dus ze kunnen

@@ -3,8 +3,8 @@
   "uitleg": "Single Compromise Survivability (WEERBAARHEID.md par. 4): als er EEN ding wordt overgenomen, houdt RTG dan stand? Acht scenario's, elk met een bron, een bewijsgraad en wat de rij NIET dekt. Met opzet geen samengesteld cijfer.",
   "grens": "`onbekend` is een eersteklas uitslag en betekent nooit \"waarschijnlijk goed\". Elke rij leest een echte bron; ontbreekt die, dan wordt de rij `onbekend` met de reden en niet stil een middenwaarde. De rijen `sessie` en `dienst` dragen `vermoed`: die gaan over een VORM in de code en niet over wat er in productie gebeurt.",
   "stempel": {
-    "op": "2026-09-08T22:03:04.562Z",
-    "commit": "1a5b39e8",
+    "op": "2026-09-09T00:37:36.347Z",
+    "commit": "da3d6423",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/overleving.js",
@@ -12,8 +12,8 @@
   },
   "telling": {
     "ja": 0,
-    "deels": 4,
-    "nee": 3,
+    "deels": 5,
+    "nee": 2,
     "onbekend": 1,
     "rijen": 8
   },
@@ -22,9 +22,9 @@
     {
       "id": "kantoorcode",
       "vraag": "Iemand heeft de gedeelde kantoorcode. Houdt RTG stand?",
-      "uitkomst": "nee",
-      "graad": "gemeten",
-      "grond": "460 van 586 kantoorroutes hangen achter de gedeelde code, en 0 ervan vragen een tweede handtekening (KANTOORMACHT.json)",
+      "uitkomst": "deels",
+      "graad": "vermoed",
+      "grond": "418 van 586 kantoorroutes hangen achter de gedeelde code; van de 17 die geld bewegen, rechten verlenen of bulk uitvoeren staan er 0 zonder mens op naam, en 0 kantoorroutes vragen een tweede handtekening (KANTOORMACHT.json)",
       "nietGemeten": "wat een gestolen code in de PRAKTIJK oplevert -- dat hangt af van welke 460 routes het zijn, en er is geen risicomodule die dat weegt (KANTOORMACHT.md par. 3)"
     },
     {

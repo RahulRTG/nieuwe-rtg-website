@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-07T21:02:53.959Z",
-    "commit": "302848894",
+    "op": "2026-09-08T20:52:14.988Z",
+    "commit": "7d8195f0e",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6915,6 +6915,14 @@
       "operator": "&&->||#0",
       "gezakt": 5,
       "geprobeerd": 2
+    },
+    "takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/takken.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "talen.test.js": {
       "soort": "server",

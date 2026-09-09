@@ -222,11 +222,27 @@ const RIJEN = [
         return { uitkomst: 'onbekend', graad: 'onbekend', grond: 'KANTOORMACHT.json mist machinerie.vierogen' };
       }
       const ceremonie = b.ceremonieEisen.ok && /tweedePaarOgen/.test(b.ceremonieEisen.tekst);
-      const grond = vierogen + ' kantoorroutes vragen een tweede handtekening en ' + voornemen +
+      /* DE GROND IS HIER GECORRIGEERD, en het oude fundament was misleidend.
+         Er stond "0 kantoorroutes vragen een tweede handtekening", geteld uit
+         machinerie.vierogen -- en dat telt bestanden die EEN bepaalde module
+         requiren. De scheiding bestaat elders wel: kern/payroll/run.js heeft een
+         vijf-tredige ladder met "NOOIT dezelfde persoon" en
+         /api/office/bank/salaris/run betaalt alleen een definitieve run uit.
+         Die 0 als "nergens" lezen is dezelfde fout als de balieAuth-ondertelling.
+
+         DE UITSLAG BLIJFT `nee`, EN DAAROM IS DIT GEEN VERZACHTING. Loon en
+         krediet zijn gescheiden, maar een enkele medewerker op naam kan nog
+         altijd alleen een rekening bevriezen, rood zetten of een incasso
+         starten. Voor die handelingen bestaat geen tweede handtekening, en dat
+         is wat deze rij vraagt. */
+      const grond = 'loon en krediet kennen een scheiding (kern/payroll/run.js: concept -> gecontroleerd -> ' +
+        'manager -> administrateur -> definitief, "NOOIT dezelfde persoon"; een kredietaanvraag komt van een LID ' +
+        'en het besluit van het kantoor), maar een enkele medewerker op naam kan alleen een rekening bevriezen, ' +
+        'rood zetten of een incasso starten -- daar staat geen tweede handtekening onder. ' +
+        vierogen + ' kantoorroutes gebruiken kern/appstore/vierogen en ' + voornemen +
         ' hangen aan een keurbaar voornemen (KANTOORMACHT.json)' +
         (ceremonie ? '; de ontsluitceremonie kent wel een tweede paar ogen' : '');
-      if (vierogen > 0) return { uitkomst: 'deels', graad: 'gemeten', grond };
-      return { uitkomst: 'nee', graad: 'gemeten', grond };
+      return { uitkomst: 'nee', graad: 'vermoed', grond };
     },
     nietGemeten: 'welke handeling vier ogen VERDIENT is een besluit en geen meting -- KANTOORMACHT.json ' +
       'zegt dat met zoveel woorden onder `ongemeten.vierOgenVereist`'

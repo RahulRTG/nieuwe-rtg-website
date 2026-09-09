@@ -240,6 +240,13 @@ function meet() {
         'een 0 zou hier "gemeten en niet aanwezig" beweren, en dat is onwaar',
       vierOgenVereist: 'welke handeling vier ogen VERDIENT is een besluit en geen meting; ' +
         'wat wel gemeten is, staat in `machinerie.vierogen`',
+      vierOgenBuitenDeModule: 'machinerie.vierogen telt bestanden die kern/appstore/vierogen REQUIREN, en dat is ' +
+        'een lexicale telling van EEN implementatie. Er is er minstens nog een: kern/payroll/run.js draagt een ' +
+        'eigen ladder (concept, gecontroleerd, manager, administrateur, definitief) met "NOOIT dezelfde persoon", ' +
+        'en /api/office/bank/salaris/run betaalt alleen een DEFINITIEVE run uit. Die route bereikt payroll via de ' +
+        'kern-tas (kern.payrollOS) en niet via een require, dus deze grep kan hem per constructie niet zien. Lees de ' +
+        '0 als "nul routes gebruiken DIE module" en nooit als "nergens tekent een tweede mens" -- dezelfde faalvorm ' +
+        'als de balieAuth-ondertelling hierboven.',
       historischeToestand: 'er is geen versiegeschiedenis van entiteiten (par. 18)'
     },
     machinerie,

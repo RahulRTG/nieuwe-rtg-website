@@ -43,7 +43,8 @@ const { voorspel } = require('./gevolg');
    In de schaduw TELT hij en houdt hij niets tegen; de telling reist mee in het
    antwoord van de kaart, zodat de eigenaar de prijs op zijn scherm heeft in
    plaats van in een logregel. */
-const AFDWINGEN = () => process.env.RTG_HERKOMST_AFDWINGEN === '1';
+const AFDWINGEN = require('./herkomstschakelaar');
+const telling = require('./schaduwtelling');
 
 module.exports = function maakLusstap({ stuurRoep, filter, vuil }) {
 
@@ -59,8 +60,13 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil }) {
       schaduw.zouSluiten++;
       if (schaduw.paden.length < 20) schaduw.paden.push(pad);
     }
-    return { mag: AFDWINGEN() ? oordeel.mag : true, oordeel,
-      schaduw: !oordeel.mag && !AFDWINGEN() };
+    /* En dezelfde weging OPGETELD over alle gesprekken. De telling hierboven
+       leeft één gesprek en verdwijnt; zonder de optelling is "hoe vaak zou hij
+       bijten" niet te beantwoorden, en dan is de vlag omzetten een gok. Het is
+       een teller en geen journaal -- zie ./schaduwtelling.js. */
+    telling.noteer(wereld, pad, !oordeel.mag);
+    const dwingt = AFDWINGEN(wereld);
+    return { mag: dwingt ? oordeel.mag : true, oordeel, schaduw: !oordeel.mag && !dwingt };
   }
 
   async function voerUit(req, t, { wereld, kaartVraag, paden, acties }) {
@@ -102,9 +108,9 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil }) {
          getal te zien op het scherm waar hij kijkt. */
       if (schaduw.gewogen) {
         uit.herkomstSchaduw = { gewogen: schaduw.gewogen, zouSluiten: schaduw.zouSluiten,
-          voorbeelden: schaduw.paden.slice(0, 8), afdwingen: AFDWINGEN(),
+          voorbeelden: schaduw.paden.slice(0, 8), afdwingen: AFDWINGEN(wereld),
           wat: 'wat de herkomstpoort zou hebben gesloten; hij telt en houdt niets tegen ' +
-            'zolang RTG_HERKOMST_AFDWINGEN niet op 1 staat' };
+            'zolang deze wereld niet in RTG_HERKOMST_AFDWINGEN staat' };
       }
       return uit;
     }
@@ -143,3 +149,4 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil }) {
 
   return { voerUit, schaduw: () => Object.assign({}, schaduw, { paden: schaduw.paden.slice() }) };
 };
+

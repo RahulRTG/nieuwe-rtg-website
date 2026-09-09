@@ -352,10 +352,10 @@ KANTOORMACHT.md) maar wie hij IS, hoe hij binnenkomt en wanneer het systeem juis
 niets moet zeggen. Lees die vóór je aan onboarding, personeelsidentiteit,
 werktoewijzing of een kantoormelding werkt. Blok 0 van KANTOORMACHT.md staat er
 inmiddels als meter (`npm run kantoormacht`, `KANTOORMACHT.json`) en die vervangt
-de lexicale getallen van 2 september door gemeten getallen: <!--getal:kantoor.routes-->586<!--/getal-->
-kantoorroutes, waarvan er <!--getal:kantoor.deurEistMens-->126<!--/getal--> een bewezen mens eisen en
-<!--getal:kantoor.deurGedeeld-->460<!--/getal--> achter de gedeelde code hangen — en
-<!--getal:kantoor.anoniem-->385<!--/getal--> zijn er anoniem uitvoerbaar. Let op de graden: de
+de lexicale getallen van 2 september door gemeten getallen: <!--getal:kantoor.routes-->590<!--/getal-->
+kantoorroutes, waarvan er <!--getal:kantoor.deurEistMens-->168<!--/getal--> een bewezen mens eisen en
+<!--getal:kantoor.deurGedeeld-->422<!--/getal--> achter de gedeelde code hangen — en
+<!--getal:kantoor.anoniem-->365<!--/getal--> zijn er anoniem uitvoerbaar. Let op de graden: de
 deur-assen komen uit de ROUTER en zijn hard, `anoniem` is lexicaal en dus een
 ONDERgrens — daarom hangt `npm run kantoormacht:controle` (die alleen mag dalen)
 aan de harde as en niet aan de zachte. De kern in één zin: **een spoor dat eindigt

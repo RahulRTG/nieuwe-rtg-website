@@ -74,6 +74,17 @@
     tlTimer = setTimeout(() => { tlPage = 1; laadTimeline(); }, 350);
   });
 
+  /* De weigering komt BOVEN de lijst te staan en wist hem niet: wie de export
+     niet mag maken, mag de bestellingen wel zien. Bij de volgende verversing
+     verdwijnt de melding vanzelf. */
+  function toonExportReden(d){
+    const el = $('#orders'); if (!el) return;
+    const oud = el.querySelector('.kluisdicht'); if (oud) oud.remove();
+    const n = document.createElement('div');
+    n.className = 'empty kluisdicht';
+    n.textContent = d.error || T('bo.csv.mislukt', 'De export kon niet worden gemaakt.');
+    el.prepend(n);
+  }
   // export voor de boekhouding: de server bouwt het volledige bestand, hoe
   // groot de historie ook is. Via fetch met de Authorization-header (nooit
   // het token in een URL) en dan een blob-download.
@@ -83,7 +94,13 @@
       const r = await fetch('/api/office/export.csv', {
         method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + API.token }, body: '{}'
       });
-      if (!r.ok) return;
+      /* Hier stond `if (!r.ok) return;` -- een verhindering zonder reden, en dat
+         is precies wat GRAMMATICA.md verbiedt. Het viel niet op zolang deze
+         knop altijd slaagde; sinds de export een kantoorsessie OP NAAM vraagt
+         (kluisAuth) doet hij dat voor de gedeelde code niet meer, en dan zat er
+         een knop die zichtbaar niets deed. De server zegt wel wat eraan
+         scheelt, dus die zin hoort op het scherm. */
+      if (!r.ok) { toonExportReden(await r.json().catch(() => ({}))); return; }
       const a = document.createElement('a');
       a.href = URL.createObjectURL(await r.blob());
       a.download = 'rtg-backoffice-' + new Date().toISOString().slice(0, 10) + '.csv';

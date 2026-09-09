@@ -9,26 +9,46 @@
    passeerde.
 
    `naam(req)` komt uit ./bank.js mee via de context: wie er handelt komt uit de
-   sessie, nooit uit req.body. Zie de toelichting daar. */
+   sessie, nooit uit req.body. Zie de toelichting daar.
+
+   TWEE DEUREN IN DIT BESTAND, EN DE SCHEIDSLIJN IS UITVOEREN TEGENOVER LEZEN.
+   Zes knoppen hier verplaatsen geld of verlenen een recht -- een rekening
+   openen, rood-staan-ruimte geven, bevriezen, krediet toekennen, de salarisrun
+   uitbetalen, incasseren -- en die staan achter `kluisAuth`: die vraagt geen
+   extra recht maar een NAAM, want een spoor dat eindigt bij een gedeelde code
+   is geen spoor. De rest (het kredietbord, het salarisvoorstel, het afschrift,
+   de tarieven) blijft achter de gedeelde `officeAuth`, en dat is een besluit en
+   geen vergeetachtigheid: KANTOORMACHT.md zet ENFORCE_EXECUTE bewust vóór
+   ENFORCE_READ, omdat lezen élk scherm raakt voor de kleinste risicoreductie.
+   Verhuist er ooit een, dan zakt test/bankdeuren.test.js. */
 const { KANTOOR } = require('../../kern/bank/eigendom');
 
 module.exports = (ctx) => {
-  const { app, officeAuth, veilig, afdelingen, sseToOffice, kern, naam } = ctx;
+  const { app, officeAuth, kluisAuth, veilig, afdelingen, sseToOffice, kern, naam, tweedeHand } = ctx;
   const bank = kern.bank;
   const sync = () => sseToOffice('sync', { scope: 'bank' });
 
-  app.post('/api/office/bank/rekening/open', officeAuth, async (req, res) => {
+  app.post('/api/office/bank/rekening/open', kluisAuth, async (req, res) => {
     try { const r = await bank.rekeningOpen({ codenaam: req.body.codenaam, soort: req.body.soort, naam: req.body.naamRek, wie: 'kantoor' });
       if (r.ok) { afdelingen.audit(naam(req), 'Bankrekening geopend voor ' + r.rekening.iban); sync(); }
       r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
     } catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
-  app.post('/api/office/bank/rekening/rood', officeAuth, (req, res) => veilig(res, () => {
-    const r = bank.rekeningRoodZet(String(req.body.iban || ''), req.body.euro);
-    if (r.ok) { afdelingen.audit(naam(req), 'Rood-staan-ruimte op ' + r.iban + ' gezet op € ' + (r.roodLimiet / 100).toFixed(2)); sync(); }
-    return r;
+  app.post('/api/office/bank/rekening/rood', kluisAuth, (req, res) => veilig(res, () => {
+    /* HET LIJF WORDT HIER GEKEURD EN NIET PAS BIJ DE BEVESTIGING. Een aanvraag
+       die vastloopt op een onbekend IBAN of een bedrag buiten de grenzen, hoort
+       de aanvrager meteen te zien -- niet de collega die tien minuten later
+       bevestigt en dan een fout krijgt die niet de zijne is. */
+    const keur = bank.rekeningRoodKeur(String(req.body.iban || ''), req.body.euro);
+    if (keur.error) return keur;
+    return tweedeHand.vraag({
+      actie: 'bank.rood',
+      lijf: { iban: String(req.body.iban || ''), euro: req.body.euro },
+      onderwerp: String(req.body.iban || ''),
+      door: req.officeKey
+    });
   }));
-  app.post('/api/office/bank/rekening/bevries', officeAuth, (req, res) => veilig(res, () => {
+  app.post('/api/office/bank/rekening/bevries', kluisAuth, (req, res) => veilig(res, () => {
     /* KANTOOR en geen lege plek. Deze aanroep leunde erop dat een ONTBREKENDE
        codenaam de eigendomscontrole oversloeg; dat is nu geen vrijbrief meer
        (zie server/kern/bank/eigendom.js). Het kantoor zegt voortaan wie het is. */
@@ -50,7 +70,7 @@ module.exports = (ctx) => {
   /* Krediet: de openstaande leningaanvragen en het besluit. Een mens beslist,
      nooit de AI; goedkeuren stort de hoofdsom op de rekening van het lid. */
   app.post('/api/office/bank/krediet', officeAuth, (req, res) => veilig(res, () => bank.bankKredietOpenstaand()));
-  app.post('/api/office/bank/krediet/besluit', officeAuth, async (req, res) => {
+  app.post('/api/office/bank/krediet/besluit', kluisAuth, async (req, res) => {
     const r = await bank.bankKredietBesluit({ id: String(req.body.id || ''), akkoord: req.body.akkoord === true, wie: naam(req) });
     veilig(res, () => {
       if (r.ok) { afdelingen.audit(naam(req), 'Kredietaanvraag ' + r.krediet.id + ' ' + (r.krediet.status === 'afgewezen' ? 'afgewezen' : 'goedgekeurd (€ ' + (r.krediet.bedragCenten / 100).toFixed(2) + ')')); sync(); }
@@ -79,7 +99,7 @@ module.exports = (ctx) => {
      kent staffId's en netto's, de bank weet welk personeelslid aan welk
      RTG-lid hangt en welke rekening dat lid heeft. Elk levert wat hij echt
      weet, en niemand rekent het werk van de ander na. */
-  app.post('/api/office/bank/salaris/run', officeAuth, async (req, res) => {
+  app.post('/api/office/bank/salaris/run', kluisAuth, async (req, res) => {
     const runId = String((req.body || {}).runId || '');
     if (!runId) { veilig(res, () => ({ status: 400,
       error: 'Een salarisrun betaalt een definitieve loonrun uit; geef de runId mee. Uitbetalen op geklokte uren zou het brutoloon overmaken.' })); return; }
@@ -118,12 +138,10 @@ module.exports = (ctx) => {
     });
   });
 
-  // de incassoronde: alle vaste betalingen die aan de beurt zijn uitvoeren
-  app.post('/api/office/bank/incasso', officeAuth, async (req, res) => {
-    const r = await bank.bankIncassoRonde(req.body && req.body.tot != null ? { tot: Number(req.body.tot) } : {});
-    veilig(res, () => {
-      if (r.ok && r.uitgevoerd > 0) { afdelingen.audit(naam(req), 'Incassoronde: ' + r.uitgevoerd + ' vaste betaling(en), € ' + (r.bedragCenten / 100).toFixed(2)); sync(); }
-      return r;
-    });
-  });
+  app.post('/api/office/bank/incasso', kluisAuth, (req, res) => veilig(res, () => tweedeHand.vraag({
+    actie: 'bank.incasso',
+    lijf: req.body && req.body.tot != null ? { tot: Number(req.body.tot) } : {},
+    onderwerp: 'alle vaste betalingen die aan de beurt zijn',
+    door: req.officeKey
+  })));
 };

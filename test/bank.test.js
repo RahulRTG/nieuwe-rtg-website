@@ -21,7 +21,7 @@ let srv, base, lid, office;
    req.body.naam, dus een sessie kon beide rollen spelen. Opschalen zit nu achter
    de boardroomdeur en de identiteit komt uit de sessie. Deze twee tokens zijn
    dus geen testdecor maar de kern van wat de knop beschermt. */
-let baas, tweede;
+let baas, tweede, opNaam, opNaam2;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bank-'));
 
 const api = (pad, body, token) => fetch(base + '/api/' + pad, {
@@ -35,6 +35,24 @@ const oapi = (pad, body, nm) => api('office/' + pad, { ...(body || {}), naam: nm
    autoriseer-knoppen) zitten achter de boardroomdeur en lezen de identiteit uit
    de sessie. Vandaar een aparte helper met een persoonstoken. */
 const bapi = (pad, body, token) => api('office/' + pad, body || {}, token);
+/* En er is sinds september 2026 een DERDE deur, tussen die twee in: de zes
+   knoppen die geld verplaatsen of een recht verlenen (rekening openen, rood,
+   bevriezen, kredietbesluit, salarisrun, incasso) staan achter kluisAuth. Die
+   vraagt geen extra recht maar een NAAM -- de gedeelde code komt er niet door.
+   Vandaar deze helper met een gewone kantoormedewerker op eigen account. Welke
+   route achter welke deur staat is niet hier maar in test/bankdeuren.test.js
+   vastgelegd; hier draaien we het werk, daar staat het register. */
+const kapi = (pad, body, nm) => api('office/' + pad, { ...(body || {}), naam: nm || 'boardroom' }, opNaam);
+/* De twee knoppen die een TWEEDE mens vragen (rood staan, de incassoronde)
+   leveren een aanvraag op; een collega tekent hem af. Deze helper loopt die
+   ceremonie af, zodat een toets die de BANK meet niet halverwege over de
+   ceremonie struikelt -- die heeft zijn eigen toets in
+   test/tweedehandtekening.test.js. */
+async function metTweedeHand(pad, body) {
+  const aanvraag = await kapi(pad, body);
+  if (!aanvraag.body || !aanvraag.body.needsAuth) return aanvraag;
+  return api('office/bank/handtekening/bevestig', { id: aanvraag.body.aanvraag.id }, opNaam2);
+}
 
 function ibanGeldig(iban) {
   const her = iban.slice(4) + iban.slice(0, 4);
@@ -78,6 +96,33 @@ test.before(async () => {
   assert.equal(kop.status, 200, 'het tweede lid koppelt de kantoorrol: ' + JSON.stringify(kop.body).slice(0, 140));
   tweede = (await api('account/start', { rol: 'kantoor' }, reg.token)).body.token;
   assert.ok(tweede, 'en staat als tweede persoon in de backoffice');
+
+  /* EN EEN GEWONE KANTOORMEDEWERKER OP NAAM, voor de zes knoppen achter de
+     kluisdeur. Met opzet zonder boardroom-toegang: die zes vragen een NAAM en
+     geen extra recht, dus als deze medewerker er niet door komt is de deur te
+     streng afgesteld -- en dat is even fout als te ruim. */
+  const w = (Date.now() + 7919).toString().slice(-8);
+  const med = await (await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Bankmedewerker', email: 'med' + w + '@x.nl', phone: '06' + w,
+      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' }) })).json();
+  assert.ok(med.token, 'de kantoormedewerker heeft een eigen account');
+  const kop2 = await api('account/koppel', { soort: 'kantoor', code: 'KANTOOR-BANK-1' }, med.token);
+  assert.equal(kop2.status, 200, 'de medewerker koppelt de kantoorrol: ' + JSON.stringify(kop2.body).slice(0, 140));
+  opNaam = (await api('account/start', { rol: 'kantoor' }, med.token)).body.token;
+  assert.ok(opNaam, 'en staat op naam in de backoffice');
+
+  /* EN EEN TWEEDE, want twee van de bankknoppen vragen sinds 9 september een
+     tweede mens (kern/kantoor/tweedehandtekening.js). Een toets die er maar een
+     heeft, kan de ceremonie niet aflopen -- en zou hem dus moeten omzeilen. */
+  const w2 = (Date.now() + 15838).toString().slice(-8);
+  const med2 = await (await fetch(base + '/api/auth/register', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Bankmedewerker twee', email: 'med2' + w2 + '@x.nl', phone: '06' + w2,
+      password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' }) })).json();
+  assert.ok(med2.token, 'de tweede kantoormedewerker heeft een eigen account');
+  const kop3 = await api('account/koppel', { soort: 'kantoor', code: 'KANTOOR-BANK-1' }, med2.token);
+  assert.equal(kop3.status, 200, 'de tweede medewerker koppelt de kantoorrol: ' + JSON.stringify(kop3.body).slice(0, 140));
+  opNaam2 = (await api('account/start', { rol: 'kantoor' }, med2.token)).body.token;
+  assert.ok(opNaam2, 'en staat ook op naam in de backoffice');
 
   /* DE VERGUNNING VASTLEGGEN, en dat is sinds de bevoegdheidslaag geen decor.
      Wat RTG zelf mag hangt niet aan de drie-standen-knop maar aan wat er is
@@ -243,7 +288,7 @@ test('krediet: het lid vraagt aan, het kantoor keurt goed en stort, het lid lost
   const iban = await nieuweRekening('betaal', 0);
   const id = (await api('bank/krediet/aanvraag', { iban, euro: 5000, looptijdMnd: 24 }, lid.token)).body.krediet.id;
   assert.ok((await oapi('bank/krediet', {}, 'RTG')).body.aanvragen.some(k => k.id === id), 'de aanvraag staat op het kantoorbord');
-  assert.equal((await oapi('bank/krediet/besluit', { id, akkoord: true }, 'RTG')).body.krediet.status, 'goedgekeurd');
+  assert.equal((await kapi('bank/krediet/besluit', { id, akkoord: true }, 'RTG')).body.krediet.status, 'goedgekeurd');
   assert.equal((await api('bank/rekening', { iban }, lid.token)).body.rekening.saldoCenten, 500000, 'de hoofdsom staat op de rekening');
   assert.equal((await api('bank/krediet/aflossing', { id, centen: 100000 }, lid.token)).body.krediet.restCenten, 400000);
 });
@@ -252,7 +297,8 @@ test('terugkerende betaling + incassoronde, en een zakelijke bulkbetaling', asyn
   const van = await nieuweRekening('betaal', 60000);
   const naar = await nieuweRekening('spaar', 0);
   await api('bank/terugkerend/zet', { idem: 'proef-' + Math.random(), vanIban: van, naarIban: naar, centen: 10000, interval: 'maand', oms: 'Sparen' }, lid.token);
-  assert.ok((await oapi('bank/incasso', { tot: Date.now() + 35 * 86400000 }, 'RTG')).body.uitgevoerd >= 1, 'de incassoronde voert de vaste betaling uit');
+  const inc = await metTweedeHand('bank/incasso', { tot: Date.now() + 35 * 86400000 });
+  assert.ok(inc.body.uitgevoerd >= 1, 'de incassoronde voert de vaste betaling uit: ' + JSON.stringify(inc.body).slice(0, 160));
   const a = await nieuweRekening('betaal', 0), b = await nieuweRekening('betaal', 0);
   const bulk = await api('bank/bulk', { idem: 'proef-' + Math.random(), vanIban: van, posten: [{ naarIban: a, centen: 5000 }, { naarIban: b, centen: 8000 }] }, lid.token);
   assert.equal(bulk.body.geboekt, 2, 'beide posten in één opdracht geboekt');
@@ -353,12 +399,12 @@ test('salarisrun uit de klokuren: het voorstel matcht op de lid-koppeling en de 
   // hierboven al aan zijn rekeningen-plafond)
   const l2 = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'lifestyle' }) })).json();
   const cn = (await api('pay/overzicht', {}, l2.token)).body.codenaam;
-  const zak = await oapi('bank/rekening/open', { codenaam: cn, soort: 'zakelijk' }, 'RTG');
+  const zak = await kapi('bank/rekening/open', { codenaam: cn, soort: 'zakelijk' }, 'RTG');
   const zakIban = zak.body.rekening.iban;
   await api('bank/storten', { iban: zakIban, centen: 100000, idem: 'sal-dek' }, l2.token);
 
   // ZONDER LOONRUN GEBEURT ER NIETS. Dit was de knop die bruto uitbetaalde.
-  const zonder = await oapi('bank/salaris/run', { zaak: 'KIKUNOI', vanIban: zakIban }, 'RTG');
+  const zonder = await kapi('bank/salaris/run', { zaak: 'KIKUNOI', vanIban: zakIban }, 'RTG');
   assert.equal(zonder.status, 400, 'uitbetalen zonder loonrun wordt geweigerd');
   assert.match(zonder.body.error, /loonrun/i);
   assert.match(zonder.body.error, /bruto/i, 'en de weigering zegt waarom dat gevaarlijk was');
@@ -421,7 +467,7 @@ test('salarisrun uit de klokuren: het voorstel matcht op de lid-koppeling en de 
   const brutoRun = run.stroken.reduce((s, x) => s + (x.strook.brutoCenten || 0), 0);
   assert.ok(netto > 0 && netto < brutoRun, 'netto is minder dan bruto -- er wordt echt ingehouden: ' + netto + ' van ' + brutoRun);
 
-  const run2 = await oapi('bank/salaris/run', { runId, vanIban: zakIban }, 'RTG');
+  const run2 = await kapi('bank/salaris/run', { runId, vanIban: zakIban }, 'RTG');
   assert.equal(run2.status, 200, 'de bankbatch draait op de loonrun: ' + JSON.stringify(run2.body).slice(0, 200));
   assert.equal(run2.body.runId, runId, 'en het antwoord wijst naar de run waaruit hij komt');
 

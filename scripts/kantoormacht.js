@@ -99,13 +99,37 @@ const EIST_MENS = new Set(['boardroomAuth', 'kluisAuth', 'naamAuth', 'eigenaarAl
    die geld beweegt zonder dat zijn pad dat verraadt, valt hier buiten. Vandaar
    graad `vermoed` op de teller en niet `gemeten`. Wie hier iets bij zet,
    verbreedt de meting; wie iets weghaalt, moet uitleggen waarom die handeling
-   met een gedeelde code mag. */
+   met een gedeelde code mag.
+
+   DE LIJST IS OP 9 SEPTEMBER 2026 VERSMALD, EN DAT IS EEN CORRECTIE EN GEEN
+   VERSOEPELING. Hij matchte op ONDERWERPEN (`bank/krediet`, `bank/rekening`,
+   `bank/salaris`, `bank/bevoegdheid`, `office/rechten`) terwijl de drie klassen
+   hierboven allemaal EFFECTEN zijn. Daardoor telde hij vier LEZINGEN mee als
+   zwaar: het kredietbord opvragen, het salarisvoorstel uitrekenen, de
+   bevoegdheidsmatrix lezen en de machtskaart lezen (die laatste is volgens
+   KANTOORMACHT.md par. 3 met opzet uitsluitend lezend). Geen van die vier
+   veroorzaakt GELD_BEWEGEN, RECHT_VERLENEN of BULK_UITVOER.
+
+   Een ondergrens mag dingen MISSEN; hij mag niet iets aanwijzen dat er niet is.
+   Een valse `nee` is hier even schadelijk als een valse `ja`: hij stuurt de
+   volgende lezer naar een deur die niets oplevert, en daarna gelooft niemand de
+   meter meer. De regexen noemen daarom nu de HANDELING (`krediet/besluit`,
+   `rekening/open`, `salaris/run`) en niet het onderwerp.
+
+   WAT ER NIET GEBEURT: de vier verdwijnen niet. Ze staan onder `zwaarLezend` in
+   het register, met hun pad, zodat een lezer ziet wat er buiten valt en waarom.
+   Een correctie die de vorige telling onzichtbaar maakt, is geen correctie. */
 const ZWAAR = [
-  ['GELD_BEWEGEN', /(bank\/(incasso|krediet|rekening|salaris|bevoegdheid)|terugstort|uitbetaal)/i],
-  ['RECHT_VERLENEN', /(office\/rechten|machtig|toegang\/geef)/i],
+  ['GELD_BEWEGEN', /(bank\/(incasso|krediet\/besluit|rekening\/(open|rood|bevries)|salaris\/run)|terugstort|uitbetaal)/i],
+  ['RECHT_VERLENEN', /(machtig|toegang\/geef)/i],
   ['BULK_UITVOER', /export/i]
 ];
 const isZwaar = (pad) => ZWAAR.some(([, re]) => re.test(pad));
+
+/* De onderwerpen die de oude, te brede lijst aanwees. Ze worden apart geteld en
+   met naam genoemd: dit is wat er UIT de zware bak viel, niet wat er verdween. */
+const ZWAAR_ONDERWERP = /(bank\/(krediet|rekening|salaris|bevoegdheid)|office\/rechten)/i;
+const isZwaarLezend = (pad) => !isZwaar(pad) && ZWAAR_ONDERWERP.test(pad);
 
 /* De twee manieren waarop een handler de handelende mens kan kennen. Beide zijn
    echt in gebruik, en wie er maar een van zoekt telt een factor tien mis --
@@ -197,8 +221,15 @@ function meet() {
      zegt of een gestolen kantoorcode iets onomkeerbaars kan; het aantal gedeelde
      deuren alleen zegt dat niet, want de meeste kantoorroutes zijn dagelijks
      werk. */
+  const heeftMens = (r) => (r.bewakers || []).some(b => EIST_MENS.has(b));
   const zwareRoutes = routes.filter(r => isZwaar(r.pad));
-  const zwaarZonderMens = zwareRoutes.filter(r => !(r.bewakers || []).some(b => EIST_MENS.has(b))).length;
+  const zwaarOpen = zwareRoutes.filter(r => !heeftMens(r));
+  /* En de lezingen op een zwaar onderwerp, apart geteld. Zie de kop bij ZWAAR:
+     dit is wat er uit de zware bak viel toen die van onderwerpen naar
+     handelingen ging. Ze staan hier MET pad, want een correctie die zijn eigen
+     vorige telling onzichtbaar maakt is geen correctie maar een opruiming. */
+  const lezendRoutes = routes.filter(r => isZwaarLezend(r.pad));
+  const lezendOpen = lezendRoutes.filter(r => !heeftMens(r));
 
   return {
     soort: 'meting',
@@ -209,6 +240,23 @@ function meet() {
       'op BESTANDSniveau en draagt daarom `vermoed` -- een bestand dat officeKey noemt gebruikt ' +
       'hem misschien niet in elke route erin. `handlerKentMens` is dus een BOVENgrens en ' +
       '`anoniemUitvoerbaar` een ONDERgrens. Een deploy-gate hoort aan de harde as te hangen.',
+    /* DE RATEL HEEFT EEN UITGANG, EN DIE STAAT HARDOP. `anoniemUitvoerbaar` mag
+       alleen dalen, en de enige manier om hem te laten stijgen is een hoger
+       getal vastleggen. Dat is een echte uitgang -- wie hem stil gebruikt,
+       sloopt de ratel zelf (SERVICE.md par. 13, de OPEN_MAX-verhoging). Elke
+       stijging krijgt daarom een regel hier, met de reden EN met wat hem weer
+       omlaag brengt; test/kantoormacht.test.js weigert een stijging zonder. */
+    ratelverhogingen: [
+      { as: 'anoniemUitvoerbaar', van: 365, naar: 369, op: '2026-09-09',
+        reden: 'Vier LEZINGEN stonden een dag achter kluisAuth (kredietbord, salarisvoorstel, ' +
+          'bevoegdheidsmatrix, machtskaart) en zijn teruggezet naar de gedeelde code. ' +
+          'KANTOORMACHT.md zet ENFORCE_EXECUTE bewust voor ENFORCE_READ: lezen raakt elk scherm ' +
+          'voor de kleinste risicoreductie, en het bank-scherm rendeerde er niet meer door -- ' +
+          'bankVervers() haalt kredietbord en matrix in een Promise.all op, dus de hele kamer ' +
+          'viel om. Nog altijd 16 lager dan main (385).',
+        omlaag: 'De zes uitvoerende bankknoppen staan nu op naam; de volgende stap is niet deze ' +
+          'vier lezingen maar de 13 zware routes buiten de bank, en daarna ENFORCE_READ per kamer.' }
+    ],
     stempel: { op: new Date().toISOString(), commit: commit(), node: process.version },
     gemeten: {
       routes: routes.length,
@@ -221,7 +269,16 @@ function meet() {
       metReden,
       bestanden: kantoorBestanden.length,
       zwaar: zwareRoutes.length,
-      zwaarZonderMens
+      zwaarZonderMens: zwaarOpen.length,
+      zwaarLezend: lezendRoutes.length,
+      zwaarLezendZonderMens: lezendOpen.length
+    },
+    /* De paden erbij, en niet alleen de tellingen. Een `4` zonder namen wordt
+       door de lezer gevuld met zijn eigen indruk -- dezelfde reden dat
+       scripts/overleving.js `onbekend` nooit als `deels` wegschrijft. */
+    zwaarePaden: {
+      zonderMens: zwaarOpen.map(r => r.pad).sort(),
+      lezendZonderMens: lezendOpen.map(r => r.pad).sort()
     },
     graden: {
       routes: 'gemeten',
@@ -233,7 +290,9 @@ function meet() {
       metSpoor: 'vermoed',
       metReden: 'vermoed',
       zwaar: 'vermoed',
-      zwaarZonderMens: 'vermoed'
+      zwaarZonderMens: 'vermoed',
+      zwaarLezend: 'vermoed',
+      zwaarLezendZonderMens: 'vermoed'
     },
     ongemeten: {
       risicoPerRoute: 'er is geen risicomodule in dit huis (KANTOORMACHT.md par. 3); ' +

@@ -9,7 +9,18 @@
    passeerde.
 
    `naam(req)` komt uit ./bank.js mee via de context: wie er handelt komt uit de
-   sessie, nooit uit req.body. Zie de toelichting daar. */
+   sessie, nooit uit req.body. Zie de toelichting daar.
+
+   TWEE DEUREN IN DIT BESTAND, EN DE SCHEIDSLIJN IS UITVOEREN TEGENOVER LEZEN.
+   Zes knoppen hier verplaatsen geld of verlenen een recht -- een rekening
+   openen, rood-staan-ruimte geven, bevriezen, krediet toekennen, de salarisrun
+   uitbetalen, incasseren -- en die staan achter `kluisAuth`: die vraagt geen
+   extra recht maar een NAAM, want een spoor dat eindigt bij een gedeelde code
+   is geen spoor. De rest (het kredietbord, het salarisvoorstel, het afschrift,
+   de tarieven) blijft achter de gedeelde `officeAuth`, en dat is een besluit en
+   geen vergeetachtigheid: KANTOORMACHT.md zet ENFORCE_EXECUTE bewust vóór
+   ENFORCE_READ, omdat lezen élk scherm raakt voor de kleinste risicoreductie.
+   Verhuist er ooit een, dan zakt test/bankdeuren.test.js. */
 const { KANTOOR } = require('../../kern/bank/eigendom');
 
 module.exports = (ctx) => {
@@ -49,7 +60,7 @@ module.exports = (ctx) => {
 
   /* Krediet: de openstaande leningaanvragen en het besluit. Een mens beslist,
      nooit de AI; goedkeuren stort de hoofdsom op de rekening van het lid. */
-  app.post('/api/office/bank/krediet', kluisAuth, (req, res) => veilig(res, () => bank.bankKredietOpenstaand()));
+  app.post('/api/office/bank/krediet', officeAuth, (req, res) => veilig(res, () => bank.bankKredietOpenstaand()));
   app.post('/api/office/bank/krediet/besluit', kluisAuth, async (req, res) => {
     const r = await bank.bankKredietBesluit({ id: String(req.body.id || ''), akkoord: req.body.akkoord === true, wie: naam(req) });
     veilig(res, () => {
@@ -63,7 +74,7 @@ module.exports = (ctx) => {
      fiscale bord, gematcht op de lid-koppeling van het personeel); de run
      voert dat voorstel uit vanaf een gekozen bronrekening, door dezelfde
      batch-voorcontrole als elke bulkbetaling. */
-  app.post('/api/office/bank/salaris/voorstel', kluisAuth, (req, res) => veilig(res, () =>
+  app.post('/api/office/bank/salaris/voorstel', officeAuth, (req, res) => veilig(res, () =>
     bank.bankSalarisVoorstel({ zaak: req.body.zaak })));
   /* DE SALARISRUN LOOPT VIA DE LOONRUN, EN NERGENS OMHEEN.
 

@@ -17,7 +17,7 @@
 const tegenfeit = require('../../../kern/commercie/tegenfeit');
 
 module.exports = (ctx) => {
-  const { app, officeAuth, kluisAuth, boardroomAuth, veilig, afdelingen, kern, db } = ctx;
+  const { app, officeAuth, boardroomAuth, veilig, afdelingen, kern, db } = ctx;
 
   /* DE COMMERCIELE RONDE. Draait vanzelf (kern/opzet/kernlaag3.js), maar is ook
      met de hand te trekken -- dat is het verschil tussen "hij hoort te draaien"
@@ -93,7 +93,7 @@ module.exports = (ctx) => {
      productprofiel zegt, wat er vandaag werkelijk gebeurt, en of er iets is dat
      het bewaakt. `afwijkend` staat vooraan -- dat is het gat tussen de belofte
      en de handhaving, en daar begon dit hele traject mee. */
-  app.post('/api/office/rechten', kluisAuth, (req, res) => veilig(res, () => {
+  app.post('/api/office/rechten', officeAuth, (req, res) => veilig(res, () => {
     if (!kern || !kern.commercieRechten) return { status: 503, error: 'Het rechtenbord is niet gemount.' };
     const b = req.body || {};
     if (b.code) return { status: 200, ok: true, bord: kern.commercieRechten.voorZaak(b.code) };

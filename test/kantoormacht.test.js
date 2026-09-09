@@ -130,3 +130,28 @@ test('6. het vastgelegde register loopt niet achter op de meter', () => {
     'anoniem uitvoerbare kantoorroutes gestegen van ' + oud.gemeten.anoniemUitvoerbaar +
     ' naar ' + nu.gemeten.anoniemUitvoerbaar + ' -- deze teller mag alleen dalen (PROOF.md normtand)');
 });
+
+/* DE UITGANG VAN DE RATEL, en waarom die zelf ook een slot heeft. Toets 6
+   vergelijkt met het VASTGELEGDE register, dus wie de teller wil laten stijgen
+   legt gewoon een hoger getal vast. Dat is een echte uitgang en die moet
+   bestaan -- een ratel zonder uitgang wordt bij de eerste terechte stijging
+   omzeild in plaats van gebruikt. Maar hij hoort hardop te zijn: SERVICE.md
+   par. 13 schrijft bij de OPEN_MAX-verhoging voor dat een verhoging de reden
+   EN het adres van wat hem omlaag brengt draagt. Deze toets houdt dat vast, en
+   hij is niet met een leeg lijstje te bevredigen: staat er een verhoging in,
+   dan draagt hij beide velden en beweegt hij echt omhoog. */
+test('6b. een verhoging van de ratel draagt een reden en een weg omlaag', () => {
+  const oud = JSON.parse(fs.readFileSync(path.join(WORTEL, 'KANTOORMACHT.json'), 'utf8'));
+  const lijst = oud.ratelverhogingen;
+  assert.ok(Array.isArray(lijst), 'KANTOORMACHT.json hoort een lijst ratelverhogingen te dragen -- ' +
+    'ook een lege, want dan is zichtbaar dat er geen zijn');
+  for (const v of lijst) {
+    assert.ok(v.as && typeof v.van === 'number' && typeof v.naar === 'number',
+      'een verhoging noemt de as en de twee getallen: ' + JSON.stringify(v));
+    assert.ok(v.naar > v.van, 'dit is geen verhoging: ' + JSON.stringify(v));
+    assert.ok(String(v.reden || '').length > 60,
+      v.as + ': een verhoging zonder uitgeschreven reden is een omzeiling met een JSON-veld eromheen');
+    assert.ok(String(v.omlaag || '').length > 40,
+      v.as + ': een verhoging hoort te zeggen wat hem weer omlaag brengt, anders is hij het nieuwe normaal');
+  }
+});

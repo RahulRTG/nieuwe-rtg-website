@@ -76,6 +76,12 @@ const REGISTER = {
   'ROLLBACKBESLUIT.json': { meter: ['rollbackUitzonderingen'] },
   'FAALPROEF.json': { meter: ['faalproefGezakt'] },
   'BEPROEVING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
+  /* De ACTUELE meting naast de geaccepteerde basislijn hierboven: scripts/
+     beproeving.js schrijft hem na ELKE ronde, ook een gezakte, zodat rood
+     bewijs kan blijven staan. Hij voedt dezelfde prestatiemeters -- norm.js
+     leest hem via prestatiePad() zodra hij bestaat -- en hangt dus aan
+     dezelfde ratel, niet aan geen enkele. */
+  'LAATSTE_METING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   'MUTATIES.json': { meter: ['toetsenOngevoeligPct', 'toetsenNietGemeten'] },
   'GRENZEN.json': { meter: ['kernBreedte', 'kernGedeeld', 'kernBreedsteBestand', 'kernOngebruikt'] },
   'WETTEN.json': { meter: ['wettenOnbewezen'] },

@@ -79,6 +79,10 @@ const CONTRACTEN = Object.assign({},
      het bewijs er van een andere soort is dan in ./mutatiecontracten-leest.js --
      een lezing van de handler in plaats van een gemeten kale ronde. Zie de kop. */
   require('./mutatiecontracten-schaduwtelling').CONTRACTEN,
+  /* De tweede handtekening: twee routes die een aanvraag maken en drie die het
+     loket zijn. Eigen bestand omdat het interessante in het VERSCHIL tussen die
+     twee helften zit -- zie de kop. */
+  require('./mutatiecontracten-tweedehand').CONTRACTEN,
   /* De zware poort: drie ceremonieloketten, alle drie met opzet niet
      herhaalbaar. Eigen bestand, zie de kop daar. */
   require('./mutatiecontracten-zwaar').CONTRACTEN,

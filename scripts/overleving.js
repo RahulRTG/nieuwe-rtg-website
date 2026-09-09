@@ -242,30 +242,49 @@ const RIJEN = [
         return { uitkomst: 'onbekend', graad: 'onbekend', grond: 'KANTOORMACHT.json mist machinerie.vierogen' };
       }
       const ceremonie = b.ceremonieEisen.ok && /tweedePaarOgen/.test(b.ceremonieEisen.tekst);
-      /* DE GROND IS HIER GECORRIGEERD, en het oude fundament was misleidend.
-         Er stond "0 kantoorroutes vragen een tweede handtekening", geteld uit
-         machinerie.vierogen -- en dat telt bestanden die EEN bepaalde module
-         requiren. De scheiding bestaat elders wel: kern/payroll/run.js heeft een
-         vijf-tredige ladder met "NOOIT dezelfde persoon" en
-         /api/office/bank/salaris/run betaalt alleen een definitieve run uit.
-         Die 0 als "nergens" lezen is dezelfde fout als de balieAuth-ondertelling.
+      const g = b.kantoormacht.data.gemeten || {};
+      const tweede = g.metTweedeHandtekening;
+      const zwaarOpen = g.zwaarZonderMens;
+      if (typeof tweede !== 'number' || typeof zwaarOpen !== 'number') {
+        return { uitkomst: 'onbekend', graad: 'onbekend',
+          grond: 'KANTOORMACHT.json mist metTweedeHandtekening of zwaarZonderMens; draai npm run kantoormacht:vast' };
+      }
+      const paden = ((b.kantoormacht.data.zwaarePaden || {}).tweedeHandtekening || []);
 
-         DE UITSLAG BLIJFT `nee`, EN DAAROM IS DIT GEEN VERZACHTING. Loon en
-         krediet zijn gescheiden, maar een enkele medewerker op naam kan nog
-         altijd alleen een rekening bevriezen, rood zetten of een incasso
-         starten. Voor die handelingen bestaat geen tweede handtekening, en dat
-         is wat deze rij vraagt. */
+      /* DEZE RIJ ZEI `nee` MET DE HAND, en dat was precies wat deze meter niet
+         hoort te zijn. De uitkomst stond ingetypt met een uitgeschreven reden
+         eronder; een tabel dus, en een tabel kan niet zakken. Sinds 9 september
+         leest hij `metTweedeHandtekening` uit KANTOORMACHT.json -- per ROUTE
+         gemeten en niet per bestand, want een bestandsbrede treffer zou zeggen
+         dat alle acht bankroutes een tweede handtekening hebben terwijl het er
+         twee zijn.
+
+         DE LADDER. `ja` vraagt dat er geen zware kantoorroute meer is die een
+         mens in zijn eentje kan uitvoeren, en dat getal bestaat vandaag niet:
+         welke handeling vier ogen VERDIENT is een besluit en geen meting
+         (KANTOORMACHT.json, `ongemeten.vierOgenVereist`). Zolang dat besluit
+         niet voor alle dertien is genomen, kan deze rij niet hoger dan `deels`
+         komen -- en `deels` is hier eerlijk: er staat iets, en niet over de
+         volle breedte. */
       const grond = 'loon en krediet kennen een scheiding (kern/payroll/run.js: concept -> gecontroleerd -> ' +
         'manager -> administrateur -> definitief, "NOOIT dezelfde persoon"; een kredietaanvraag komt van een LID ' +
-        'en het besluit van het kantoor), maar een enkele medewerker op naam kan alleen een rekening bevriezen, ' +
-        'rood zetten of een incasso starten -- daar staat geen tweede handtekening onder. ' +
-        vierogen + ' kantoorroutes gebruiken kern/appstore/vierogen en ' + voornemen +
-        ' hangen aan een keurbaar voornemen (KANTOORMACHT.json)' +
-        (ceremonie ? '; de ontsluitceremonie kent wel een tweede paar ogen' : '');
-      return { uitkomst: 'nee', graad: 'vermoed', grond };
+        'en het besluit van het kantoor). Sinds 9 september vragen ' + tweede + ' kantoorroutes een tweede mens' +
+        (paden.length ? ' (' + paden.join(', ') + ')' : '') + ': de aanvrager kan zijn eigen aanvraag niet ' +
+        'bevestigen, en het lijf staat vast bij de aanvraag. Van de ' + (g.zwaar || 0) + ' zware kantoorroutes ' +
+        'staan er ' + zwaarOpen + ' zonder mens op naam, en ' + vierogen + ' gebruiken kern/appstore/vierogen ' +
+        'via een eigen require (KANTOORMACHT.json)' +
+        (ceremonie ? '; de ontsluitceremonie kent ook een tweede paar ogen' : '');
+
+      if (tweede === 0) {
+        return { uitkomst: 'nee', graad: 'vermoed',
+          grond: grond + ' -- geen enkele kantoorroute vraagt een tweede mens' };
+      }
+      return { uitkomst: 'deels', graad: 'vermoed', grond }
     },
     nietGemeten: 'welke handeling vier ogen VERDIENT is een besluit en geen meting -- KANTOORMACHT.json ' +
-      'zegt dat met zoveel woorden onder `ongemeten.vierOgenVereist`'
+      'zegt dat met zoveel woorden onder `ongemeten.vierOgenVereist`. Bevriezen staat er met opzet NIET ' +
+      'achter: dat is omkeerbaar en het is de knop waarmee je fraude stopt, dus twee mensen eisen maakt de ' +
+      'rem trager dan de diefstal (besluit van de eigenaar, 9 september 2026)'
   },
   {
     id: 'ai',

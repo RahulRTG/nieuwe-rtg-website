@@ -132,6 +132,27 @@ const isZwaar = (pad) => ZWAAR.some(([, re]) => re.test(pad));
 const ZWAAR_ONDERWERP = /(bank\/(krediet|rekening|salaris|bevoegdheid)|office\/rechten)/i;
 const isZwaarLezend = (pad) => !isZwaar(pad) && ZWAAR_ONDERWERP.test(pad);
 
+/* VRAAGT DEZE ROUTE EEN TWEEDE MENS? Per ROUTE en niet per bestand, en dat is
+   hier het hele punt. `handlerKentMens` mag een BOVENgrens zijn omdat een te
+   hoge schatting daar tot meer werk leidt; hier zou een bestandsbrede treffer
+   zeggen dat elke route in bank-rekeningen.js een tweede handtekening heeft
+   terwijl er twee van de acht een hebben. Dat is een valse `ja` op een
+   beveiligingsvraag, en die is erger dan geen antwoord.
+
+   DE SNEDE LOOPT TOT DE VOLGENDE `app.post(`, en die grens staat er met een
+   reden: scripts/overleving.js heeft precies deze fout een keer gemaakt -- de
+   apparaat-probe las zeshonderd tekens vanaf een merkteken, liep door in de
+   buurstap en meldde dat het toestel werd gecontroleerd. Een venster op tekens
+   is een gok; een venster tot het volgende blok is een grens. */
+function vraagtTweedeHand(bron, pad) {
+  const merk = "app.post('" + pad + "'";
+  const i = bron.indexOf(merk);
+  if (i < 0) return false;
+  const rest = bron.slice(i + merk.length);
+  const eind = rest.indexOf('app.post(');
+  return /tweedeHand\.vraag\(/.test(eind < 0 ? rest : rest.slice(0, eind));
+}
+
 /* De twee manieren waarop een handler de handelende mens kan kennen. Beide zijn
    echt in gebruik, en wie er maar een van zoekt telt een factor tien mis --
    dat is bij het schrijven van dit script gebeurd. */
@@ -225,6 +246,11 @@ function meet() {
   const heeftMens = (r) => (r.bewakers || []).some(b => EIST_MENS.has(b));
   const zwareRoutes = routes.filter(r => isZwaar(r.pad));
   const zwaarOpen = zwareRoutes.filter(r => !heeftMens(r));
+  /* En hoeveel er een TWEEDE mens vragen. Dit getal stond tot 9 september op nul
+     omdat het uit `machinerie.vierogen` kwam -- een telling van bestanden die
+     een module requiren, en die miste de scheiding die er wel was
+     (kern/payroll/run.js). Nu wordt de vraag rechtstreeks gesteld, per route. */
+  const tweedeHandRoutes = routes.filter(r => vraagtTweedeHand(lees(r.bestand), r.pad));
   /* En de lezingen op een zwaar onderwerp, apart geteld. Zie de kop bij ZWAAR:
      dit is wat er uit de zware bak viel toen die van onderwerpen naar
      handelingen ging. Ze staan hier MET pad, want een correctie die zijn eigen
@@ -277,14 +303,16 @@ function meet() {
       zwaar: zwareRoutes.length,
       zwaarZonderMens: zwaarOpen.length,
       zwaarLezend: lezendRoutes.length,
-      zwaarLezendZonderMens: lezendOpen.length
+      zwaarLezendZonderMens: lezendOpen.length,
+      metTweedeHandtekening: tweedeHandRoutes.length
     },
     /* De paden erbij, en niet alleen de tellingen. Een `4` zonder namen wordt
        door de lezer gevuld met zijn eigen indruk -- dezelfde reden dat
        scripts/overleving.js `onbekend` nooit als `deels` wegschrijft. */
     zwaarePaden: {
       zonderMens: zwaarOpen.map(r => r.pad).sort(),
-      lezendZonderMens: lezendOpen.map(r => r.pad).sort()
+      lezendZonderMens: lezendOpen.map(r => r.pad).sort(),
+      tweedeHandtekening: tweedeHandRoutes.map(r => r.pad).sort()
     },
     /* De effectas staat NAAST `gemeten` en niet erin: hij deelt geen teller met
        de padas, want dan zou iemand ze optellen. Zie de kop van
@@ -302,7 +330,8 @@ function meet() {
       zwaar: 'vermoed',
       zwaarZonderMens: 'vermoed',
       zwaarLezend: 'vermoed',
-      zwaarLezendZonderMens: 'vermoed'
+      zwaarLezendZonderMens: 'vermoed',
+      metTweedeHandtekening: 'vermoed'
     },
     ongemeten: {
       risicoPerRoute: 'er is geen risicomodule in dit huis (KANTOORMACHT.md par. 3); ' +

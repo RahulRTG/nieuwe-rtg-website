@@ -101,9 +101,13 @@ module.exports = (kern) => {
      komt als `undefined` aan en verdwijnt dan ZONDER EEN WOORD -- tien zware
      bankroutes stonden zo even onbewaakt (HANDLERWACHT.json ving het). Een
      bewaker erbij hoort ook in GRENZEN.json bij "kantoren". */
+  /* De tweede handtekening: EEN exemplaar, want twee zouden elkaars openstaande
+     aanvragen niet zien. Zie kern/kantoor/tweedehandtekening.js. */
+  const tweedeHand = require('../../kern/kantoor/tweedehandtekening')({ db, save });
+
   const ctx = { app, officeAuth, kluisAuth: kern.kluisAuth, boardroomAuth: kern.boardroomAuth, boardroomLijst: kern.boardroomLijst,
     keyVanCodenaam: kern.keyVanCodenaam, veilig, stuur, afdelingen, sseToOffice, db, save, kern,
-    zwaar, boardroomUser,
+    zwaar, boardroomUser, tweedeHand,
     geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet };
   require('./bureaus')(ctx);
   require('./regie')(ctx);

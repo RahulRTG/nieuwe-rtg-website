@@ -46,13 +46,22 @@ const { startServer, stop } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-officebank-'));
 const CODE = 'KANTOOR-OFFICEBANK';
-let srv, base, office, opNaam, lid, ander, zaak;
+let srv, base, office, opNaam, opNaam2, lid, ander, zaak;
 
 const api = (pad, body, token) => fetch(base + '/api/' + pad, {
   method: 'POST',
   headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: 'Bearer ' + token } : {}) },
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+
+/* Rood staan levert een AANVRAAG op; een collega tekent hem af. Deze helper
+   loopt die ceremonie af zodat de toetsen hieronder de KNOP meten en niet de
+   ceremonie -- die heeft zijn eigen toets. */
+async function roodZet(body) {
+  const aanvraag = await api('office/bank/rekening/rood', body, opNaam);
+  if (!aanvraag.body || !aanvraag.body.needsAuth) return aanvraag;
+  return api('office/bank/handtekening/bevestig', { id: aanvraag.body.aanvraag.id }, opNaam2);
+}
 
 let teller = 0;
 async function nieuwLid(naam) {
@@ -80,6 +89,18 @@ test.before(async () => {
   assert.equal(kop.status, 200, 'en koppelt de kantoorrol: ' + JSON.stringify(kop.body).slice(0, 140));
   opNaam = (await api('account/start', { rol: 'kantoor' }, med.body.token)).body.token;
   assert.ok(opNaam, 'en staat op naam in de backoffice');
+
+  /* En een TWEEDE, want rood staan vraagt sinds 9 september een tweede mens.
+     Zie kern/kantoor/tweedehandtekening.js; de ceremonie zelf heeft zijn eigen
+     toets in test/tweedehandtekening.test.js. */
+  const w2 = (Date.now() + 15838).toString().slice(-9);
+  const med2 = await api('auth/register', { name: 'Bankmedewerker twee', email: 'obm2' + w2 + '@x.nl',
+    phone: '06' + w2.slice(0, 8), password: 'geheim12345', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
+  assert.ok(med2.body.token, 'de tweede kantoormedewerker heeft een eigen account');
+  const kop2 = await api('account/koppel', { soort: 'kantoor', code: CODE }, med2.body.token);
+  assert.equal(kop2.status, 200, 'en koppelt de kantoorrol: ' + JSON.stringify(kop2.body).slice(0, 140));
+  opNaam2 = (await api('account/start', { rol: 'kantoor' }, med2.body.token)).body.token;
+  assert.ok(opNaam2, 'en staat ook op naam in de backoffice');
 
   const live = await api('office/bank/leden', { aan: true, naam: 'RTG' }, office);
   assert.equal(live.status, 200, 'de leden-bank staat live: ' + JSON.stringify(live.body));
@@ -170,13 +191,13 @@ test('3. een rekening die niet bestaat wordt niet stilletjes aangemaakt of beves
   const r = await api('office/bank/rekening/bevries', { iban: 'NL00RTGB0000000000', aan: true }, opNaam);
   assert.equal(r.status, 404, 'een onbekend IBAN geeft 404');
   assert.equal((await api('office/bank/afschrift', { iban: 'NL00RTGB0000000000' }, office)).status, 404);
-  assert.equal((await api('office/bank/rekening/rood', { iban: 'NL00RTGB0000000000', euro: 500 }, opNaam)).status, 404);
+  assert.equal((await roodZet({ iban: 'NL00RTGB0000000000', euro: 500 })).status, 404);
 });
 
 /* ================= 3. rood staan heeft een plafond ================= */
 
 test('4. de rood-staan-ruimte is begrensd, en niet met een truc te omzeilen', async () => {
-  const ok = await api('office/bank/rekening/rood', { iban: lid.iban, euro: 250 }, opNaam);
+  const ok = await roodZet({ iban: lid.iban, euro: 250 });
   assert.equal(ok.status, 200, JSON.stringify(ok.body));
   assert.equal(ok.body.roodLimiet, 25000, 'euro gaat als centen de administratie in');
 
@@ -189,20 +210,20 @@ test('4. de rood-staan-ruimte is begrensd, en niet met een truc te omzeilen', as
      rekenen in JavaScript netjes om naar 1 en 0, dus dat ZIJN geldige
      bedragen -- geen truc, gewoon een getal met een omweg. */
   for (const euro of [-1, -100000, 50001, 1e9, 'veel', '50001', {}])
-    assert.equal((await api('office/bank/rekening/rood', { iban: lid.iban, euro }, opNaam)).status, 400,
+    assert.equal((await roodZet({ iban: lid.iban, euro })).status, 400,
       'euro=' + JSON.stringify(euro) + ' hoort geweigerd te worden');
   // en null betekent "nul euro ruimte", niet "geen grens"
-  const nul = await api('office/bank/rekening/rood', { iban: lid.iban, euro: null }, opNaam);
+  const nul = await roodZet({ iban: lid.iban, euro: null });
   assert.equal(nul.status, 200);
   assert.equal(nul.body.roodLimiet, 0, 'null is nul ruimte, geen ongelimiteerde ruimte');
 
   // en de limiet van zonet staat er nog precies zo
-  assert.equal((await api('office/bank/rekening/rood', { iban: lid.iban, euro: 250 }, opNaam)).body.roodLimiet, 25000);
+  assert.equal((await roodZet({ iban: lid.iban, euro: 250 })).body.roodLimiet, 25000);
 
   // een spaarrekening kan niet rood staan
   const spaar = await api('bank/rekening/open', { soort: 'spaar', naam: 'Voor later' }, lid.token);
   if (spaar.status === 200) {
-    const fout = await api('office/bank/rekening/rood', { iban: spaar.body.rekening.iban, euro: 100 }, opNaam);
+    const fout = await roodZet({ iban: spaar.body.rekening.iban, euro: 100 });
     assert.equal(fout.status, 400, 'rood staan kan alleen op een betaalrekening');
   }
 });

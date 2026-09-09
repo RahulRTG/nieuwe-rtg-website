@@ -24,7 +24,7 @@
 const { KANTOOR } = require('../../kern/bank/eigendom');
 
 module.exports = (ctx) => {
-  const { app, officeAuth, kluisAuth, veilig, afdelingen, sseToOffice, kern, naam } = ctx;
+  const { app, officeAuth, kluisAuth, veilig, afdelingen, sseToOffice, kern, naam, tweedeHand } = ctx;
   const bank = kern.bank;
   const sync = () => sseToOffice('sync', { scope: 'bank' });
 
@@ -35,9 +35,18 @@ module.exports = (ctx) => {
     } catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
   app.post('/api/office/bank/rekening/rood', kluisAuth, (req, res) => veilig(res, () => {
-    const r = bank.rekeningRoodZet(String(req.body.iban || ''), req.body.euro);
-    if (r.ok) { afdelingen.audit(naam(req), 'Rood-staan-ruimte op ' + r.iban + ' gezet op € ' + (r.roodLimiet / 100).toFixed(2)); sync(); }
-    return r;
+    /* HET LIJF WORDT HIER GEKEURD EN NIET PAS BIJ DE BEVESTIGING. Een aanvraag
+       die vastloopt op een onbekend IBAN of een bedrag buiten de grenzen, hoort
+       de aanvrager meteen te zien -- niet de collega die tien minuten later
+       bevestigt en dan een fout krijgt die niet de zijne is. */
+    const keur = bank.rekeningRoodKeur(String(req.body.iban || ''), req.body.euro);
+    if (keur.error) return keur;
+    return tweedeHand.vraag({
+      actie: 'bank.rood',
+      lijf: { iban: String(req.body.iban || ''), euro: req.body.euro },
+      onderwerp: String(req.body.iban || ''),
+      door: req.officeKey
+    });
   }));
   app.post('/api/office/bank/rekening/bevries', kluisAuth, (req, res) => veilig(res, () => {
     /* KANTOOR en geen lege plek. Deze aanroep leunde erop dat een ONTBREKENDE
@@ -129,12 +138,10 @@ module.exports = (ctx) => {
     });
   });
 
-  // de incassoronde: alle vaste betalingen die aan de beurt zijn uitvoeren
-  app.post('/api/office/bank/incasso', kluisAuth, async (req, res) => {
-    const r = await bank.bankIncassoRonde(req.body && req.body.tot != null ? { tot: Number(req.body.tot) } : {});
-    veilig(res, () => {
-      if (r.ok && r.uitgevoerd > 0) { afdelingen.audit(naam(req), 'Incassoronde: ' + r.uitgevoerd + ' vaste betaling(en), € ' + (r.bedragCenten / 100).toFixed(2)); sync(); }
-      return r;
-    });
-  });
+  app.post('/api/office/bank/incasso', kluisAuth, (req, res) => veilig(res, () => tweedeHand.vraag({
+    actie: 'bank.incasso',
+    lijf: req.body && req.body.tot != null ? { tot: Number(req.body.tot) } : {},
+    onderwerp: 'alle vaste betalingen die aan de beurt zijn',
+    door: req.officeKey
+  })));
 };

@@ -242,7 +242,7 @@ De prijs staat erbij waar hij gemeten is; waar hij niet gemeten is, staat dat er
 | **P0** | `RTG_HERKOMST_AFDWINGEN=1`, per wereld en niet globaal | de enige security boundary die af is en niet bijt | **gemeten**: een lid houdt na de eerste `doe` 36 van 120 paden over, een zaak 9 van 53 (`ISOLATIEPROEF.json`) |
 | **P0** | `kluispoort.js` op de zware kantoorroutes | 460 routes achter één gedeelde code | onbekend; de poort bestaat, het is bedrading |
 | **P0** | De twaalf beveiligingswetten in `WETTEN.json` + `npm run sabotage` erop richten | anders meet niemand of de beveiliging bijt | klein; de machinerie staat |
-| **P0** | `kern/stuur/mandaat.js` een aanroeper geven | 0 aanroepers = nog geen grens | besluit, geen bouwwerk |
+| **P0** | `kern/stuur/mandaat.js` een aanroeper geven | 0 aanroepers = nog geen grens | **besluit**, en de blokkade is preciezer dan "een aanroeper" — zie hieronder |
 | **P1** | Intentiebewijs: `goedkeuring.js` uitbreiden met actor, apparaat, bedrag, ontvanger, doel, vervaltijd — en cryptografisch laten ondertekenen | maakt een gekaapte sessie oninteressant | `zwaarbewijs.js` levert de passkey-kant al |
 | **P1** | Toestelregister op de bestaande drager `apparaat` | de ontbrekende vertrouwensgrond, met de eerlijke bovengrens uit grens 3 | middel |
 | **P1** | De overige 12 herkomstkanalen laten labelen | 1 van 13 is geen dekking | route voor route |
@@ -253,6 +253,26 @@ De prijs staat erbij waar hij gemeten is; waar hij niet gemeten is, staat dat er
 | **P3** | `CRYPTOGRAFIE.json` (inventaris) en crypto-agility | zonder inventaris is PQC-migratie onbestuurbaar | zie hieronder |
 | **P3** | Productie accepteert alleen artefacten met een kloppende keten | SBOM en handtekening staan al; de acceptatiekant niet | klein |
 | **Extern** | Onafhankelijke pentest vóór livegang van geld en identiteit | `scripts/aanval.js` zegt het zelf: *je zoekt niet naar de aanname die je niet weet dat je hebt* | inkoop |
+
+**Over `mandaat.js`, en waarom "geef hem een aanroeper" de verkeerde opdracht
+is.** Nagekeken op 9 september 2026: het probleem is niet dat niemand hem
+aanroept, maar dat er niets bestaat om hem mee aan te roepen.
+`speelruimte()` verwacht een mandaat met **padpatronen** (`capabilities`) en een
+looptijd. Er ís een mandaatopslag in dit huis — `kern/command/toegang.js` legt
+vast dat X namens Y mag handelen, met een einddatum en een journaalregel — maar
+die draagt een vrij tekstveld `terrein` en geen paden. Die twee op elkaar
+afbeelden zou gokken zijn, en een gegokte brug tussen twee bevoegdheidsmodellen
+is precies de fout die dit document elders tegenhoudt.
+
+En let op de valkuil in de andere richting: **leeg is dicht**. Wie
+`speelruimte()` naïef in de padberekening hangt, geeft de assistent bij elk
+gesprek zónder mandaat *nul* paden — de hele assistent valt stil. De aanroeper is
+dus niet klein en niet risicoloos; hij hangt aan een besluit over wie een mandaat
+uitgeeft, waar het staat en hoe het wordt ingetrokken.
+
+*(Terzijde, want het telt mee voor par. 2: `mandaat` draagt in deze boom nu vier
+betekenissen — `kern/stuur/`, `kern/fiscaal/gateway/`, `kern/stadsweefsel/` en
+`kern/command/toegang.js`. Dat is er één meer dan par. 2 vermeldt.)*
 
 **Over de cryptografie-inventaris, eerlijk over de graad.** Een ruwe lexicale
 telling over `server/` geeft vandaag: RSA 210 treffers, SHA-256 250, scrypt 58,

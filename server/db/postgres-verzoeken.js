@@ -3,13 +3,15 @@
 'use strict';
 
 const context = require('./verzoekcontext');
+/* Fout -> antwoord + serverlog: ./opslagfout.js (raakt geen toestand hier). */
+const { foutAntwoord, namenVan } = require('./opslagfout');
 
 module.exports = function maakPostgresVerzoeken(o) {
   const { store, db, state, motor, slot, topUp, extern, basisKlaar } = o;
   let gezond = false, reden = 'PostgreSQL wordt geladen', herstel = null;
   let timer = null, poging = 0, achtergrondOpen = false;
-  /* Onderdrukte gevolgen van de al gesloten poort (zie ongezond). Een getal en
-     geen stilte: de lus was alleen van buiten te zien, en dat hoort niet. */
+  /* Onderdrukte gevolgen van de al gesloten poort (zie ongezond): een getal en
+     geen stilte -- de lus was alleen van buiten te zien. */
   let gevolgen = 0;
   const stromen = new Set();
   const actief = () => store === 'postgres';
@@ -34,12 +36,11 @@ module.exports = function maakPostgresVerzoeken(o) {
     if (timer.unref) timer.unref();
   }
 
-  /* EEN GESLOTEN POORT IS GEEN NIEUWE STORING. Staat de poort dicht, dan weigert
-     collectie-postgres.js elke transactie met PG_ONGEZOND en gooit openStroom
-     dezelfde code -- GEVOLGEN van de sluiting, die hier als verse melding
-     binnenkwamen. Gemeten 9 sep 2026 op 100M leden: van de 89 sluitingen droegen
-     er 45 die echo, 44 daarvan terwijl de poort al dicht stond. De schade is niet
-     dat dicht nog dichter gaat, maar dat `reden` de oorzaak kwijtraakt.
+  /* EEN GESLOTEN POORT IS GEEN NIEUWE STORING. Staat hij dicht, dan weigeren
+     collectie-postgres.js en openStroom met PG_ONGEZOND -- GEVOLGEN van de
+     sluiting, die hier als verse melding binnenkwamen. Gemeten 9 sep 2026 op 100M
+     leden: 45 van de 89 sluitingen droegen die echo, 44 terwijl de poort al dicht
+     stond. De schade is dat `reden` de oorzaak kwijtraakt.
      DE GRENS LOOPT LANGS `gezond` EN NIET LANGS DE CODE: komt PG_ONGEZOND binnen
      terwijl de poort OPEN staat, dan is het wel een oorzaak en sluit hij gewoon.
      Er gaat hier dus nooit een poort open. */
@@ -68,8 +69,7 @@ module.exports = function maakPostgresVerzoeken(o) {
     herstel = slot(async () => {
       const p = motor();
       if (!p) throw new Error('PostgreSQL-motor ontbreekt.');
-      /* Een achtergrondmutatie heeft geen HTTP-bevestiging, maar wordt terwijl
-         verkeer dicht staat wel als één collectiebundel gecommit. */
+      /* Geen HTTP-bevestiging, maar wel als één collectiebundel gecommit. */
       if (achtergrondOpen) {
         const w = p.openstaandeWijzigingen(state.getRuweData());
         if (w.length) await p.commitVerzoek(state.getRuweData(), w);
@@ -89,9 +89,8 @@ module.exports = function maakPostgresVerzoeken(o) {
 
   function gestart() { if (actief()) { gezond = true; reden = null; poging = 0; gevolgen = 0; if (achtergrondOpen) ongezond(null, 'opstartmutatie'); } }
   function achtergrondSave() {
-    /* Tijdens de pre-ready fase is de PG-motor al verbonden zodat de
-       verplichte startupmigraties transactioneel kunnen draaien. Een gewone
-       timer/save is dan nog steeds startdata, niet een runtime-incident. */
+    /* Pre-ready is de motor al verbonden voor de startupmigraties; een timer/save
+       is dan startdata en geen runtime-incident. */
     if (!actief() || !motor() || (basisKlaar && !basisKlaar())) return false;
     achtergrondOpen = true;
     context.beginAchtergrond();
@@ -111,39 +110,6 @@ module.exports = function maakPostgresVerzoeken(o) {
       if (!e || e.code !== 'PG_REQUEST_CONFLICT') ongezond(e, 'requestcommit');
       throw e;
     }
-  }
-
-  /* Ontdubbeld en begrensd: dit gaat in een foutmelding. */
-  function namenVan(wijzigingen) {
-    const namen = [...new Set((wijzigingen || []).map(w => w && w.sleutel).filter(Boolean))];
-    if (!namen.length) return 'onbekende collectie';
-    return namen.slice(0, 6).join(', ') + (namen.length > 6 ? ' (+' + (namen.length - 6) + ')' : '');
-  }
-
-  function foutAntwoord(req, res, echtEnd, herstel, ctx, err) {
-    /* De client krijgt een nietszeggende zin -- terecht. De SERVER kreeg er ook
-       een: een 500 uit deze poort liet geen spoor na, dus "8x 5xx" was te tellen
-       en niet te verklaren. De reden hoort in het log. */
-    if (err && (err.code === 'PG_SAVE_ONTBREEKT' || err.code === 'PG_ONGEZOND' || err.code === 'PG_GEEN_COMMIT')) {
-      console.error('[opslagpoort] ' + err.code + ' op ' + (req && req.method) + ' ' + (req && req.path)
-        + ': ' + String(err.message || '').slice(0, 300));
-    }
-    context.sluit(ctx);
-    if (res.headersSent) { try { res.destroy(err); } catch (e) {} return; }
-    herstel();
-    try {
-      for (const h of ['content-length', 'content-encoding', 'etag']) res.removeHeader(h);
-      res.statusCode = err && err.code === 'PG_REQUEST_CONFLICT' ? 409
-        : err && err.code === 'PG_SAVE_ONTBREEKT' ? 500 : 503;
-      res.setHeader('Content-Type', 'application/json; charset=utf-8');
-      if (res.statusCode === 503) res.setHeader('Retry-After', '2');
-    } catch (e) {}
-    const tekst = res.statusCode === 409
-      ? 'Deze gegevens zijn intussen gewijzigd; laad opnieuw en probeer nogmaals.'
-      : res.statusCode === 500
-        ? 'Deze handeling wijzigde gegevens zonder de verplichte opslagbevestiging.'
-        : 'De opslag kon deze handeling niet duurzaam bevestigen; probeer opnieuw.';
-    return echtEnd(JSON.stringify({ error: tekst }));
   }
 
   function middleware() {
@@ -219,8 +185,7 @@ module.exports = function maakPostgresVerzoeken(o) {
              een rollback/discard en voeren ook geen na-commithaak uit. */
           const succes = status >= 200 && status < 400;
           if (succes) {
-            /* WELKE collecties muteerden hoort in de fout: zonder die namen zegt
-               hij alleen DAT er iets schreef, en dan begint het zoeken pas. */
+            /* WELKE collecties muteerden hoort in de fout te staan. */
             const stil = context.onbevestigdeWijzigingen(ctx);
             if (stil.length && !ctx.opslaan)
               throw Object.assign(new Error('save() ontbreekt na een mutatie van: ' + namenVan(stil)),

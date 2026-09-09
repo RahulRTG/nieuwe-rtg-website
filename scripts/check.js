@@ -518,22 +518,11 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     'server/opzet/leverancierpoort.js',
     'public/apps/app-main/app-main-09a.js',
     'public/shared/teamcall/teamcall-01.js',
-    /* server/db/postgres-verzoeken.js -- 10,1 KB op main, dus hij stond al op 99%
-       van de lat toen de schrijfpoortreparatie van 9 september 2026 erbij kwam
-       (de echo-guard in ongezond, de namen van gemuteerde collecties in
-       PG_SAVE_ONTBREEKT, en de logregel die een 500 uit deze poort eindelijk
-       verklaarbaar maakt). Zelfs zonder een letter commentaar past die code er
-       niet meer onder.
-       DE NAAD, met naam: de SCHRIJFGEZONDHEID eruit (./schrijfgezond.js) --
-       gezond/reden/gevolgen, sluitStromen, planHerstel, ongezond, volledigeResync,
-       herstelNu, gestart en achtergrondSave. Wat achterblijft is de HTTP-schil:
-       middleware, commit en foutAntwoord. Die twee raken elkaar alleen via een
-       kleine toestands-API, en test/writehealth-lus.test.js beproeft nu precies
-       die helft -- dus de snede is te maken met een toets ernaast.
-       Bewust NIET tijdens deze ronde geknipt: dit is de duurzaamheidspoort die
-       het geld bewaakt, en die verbouw je niet in dezelfde commit als een
-       gedragsreparatie eraan. */
-    'server/db/postgres-verzoeken.js',
+    /* server/db/postgres-verzoeken.js STOND HIER en is er weer af: de naad die
+       er met naam bij stond is gemaakt. De vertaling van een opslagfout naar een
+       antwoord (foutAntwoord, namenVan, de logregel) woont nu in
+       server/db/opslagfout.js -- die raakt geen enkele toestand van de poort. Van
+       12,3 naar 10,1 KB. Zo hoort deze lijst te krimpen. */
     /* DRIE UIT DE IDEM- EN UITROLRONDE, en op 3 september 2026 zijn ze alle drie
        geknipt op de naad die hier stond (TAKEN.md 5.57). Twee zijn daarmee van
        deze lijst af:

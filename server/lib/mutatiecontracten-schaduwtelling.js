@@ -22,6 +22,16 @@
    (een bestand, een externe dienst, een teller daarbuiten). Die tweede lijn is
    hier de LEZING van een handler van twee regels -- en het register zegt erbij
    dat het een lezing is en geen meting.
+
+   DE TOEGANGSKLASSE IS `AUTHENTICATED` EN NIET `CAPABILITY_GATED`. Hier stond
+   die tweede, en dat las zwaarder dan het klopte: die klasse EIST de naam van
+   een bevoegdheid uit kern/bevoegdheid/lijst.js, zodat het contract en de
+   rechtenlijst over hetzelfde ding praten. `boardroomAuth` vraagt geen
+   bevoegdheid maar een deur, en dat is nageteld en niet aangenomen: van de 101
+   routes achter die bewaker hebben er 50 een afgeleid contract, en die zeggen
+   alle 50 `AUTHENTICATED`. Een zwaardere klasse opschrijven dan er staat, maakt
+   van het register een verlanglijst -- en de toets die dit ving, ving het op de
+   ontbrekende NAAM.
    ========================================================================== */
 'use strict';
 
@@ -30,7 +40,7 @@ const CONTRACTEN = {
     mutatieId: 'stuur.herkomstschaduw.lezen',
     herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'CAPABILITY_GATED' },
+    toegang: { klasse: 'AUTHENTICATED' },
     stand: 'NOT_APPLICABLE',
     bewijs: {
       gemeten: 'niet gemeten: deze route is nieuw en heeft nog geen proefronde gehad. Dat staat ' +

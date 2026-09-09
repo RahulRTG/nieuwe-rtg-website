@@ -153,9 +153,31 @@ function verwijderTak(repo, token, tak) {
    toe) of 'onbeslist' (de proef kon niet draaien) -- en die laatste is met
    opzet geen synoniem van 'leeg'. */
 function oordeel(werkmap, hoofd, tak) {
+  /* TWEE VRAGEN, EN BIJ ONENIGHEID GEEN WINNAAR.
+
+     "Deze tak loopt nul commits voor" is een SNELWEG naar 'leeg': hij slaat de
+     merge over en zegt meteen dat de tak weg mag. Zo'n snelweg hoort niet op
+     een enkele meting te rusten, dus staan er twee onafhankelijke vragen naast
+     elkaar -- TELLEN (rev-list) en AFSTAMMING (merge-base --is-ancestor) --
+     en alleen als ze het eens zijn gaat de snelweg open.
+
+     WAT DEZE KRUISCONTROLE NIET VANGT, en dat hoort er eerlijk bij. Bij een
+     ONDIEPE kloon zeggen ze allebei hetzelfde onjuiste ding: de voorouder ligt
+     buiten beeld, dus rev-list telt te veel EN afstamming zegt "geen
+     voorouder". Ze zijn het dan eens en toch samen fout. Dat geval wordt niet
+     hier tegengehouden maar in main(), door de kloon zelf te weigeren. Dit is
+     dus diepteverdediging tegen een raar wordende verwijzingsgraaf, en niet de
+     wacht tegen een afgekapte geschiedenis. */
   const vooruit = gitStil('rev-list', '--count', `origin/${hoofd}..origin/${tak}`);
   if (!vooruit.ok) return { stand: 'onbeslist', waarom: 'kon de commits niet tellen' };
-  if (vooruit.uit === '0') return { stand: 'leeg', waarom: 'nul commits voor op ' + hoofd };
+  const afstamming = gitStil('merge-base', '--is-ancestor', `origin/${tak}`, `origin/${hoofd}`);
+  const nulGeteld = vooruit.uit === '0';
+  if (nulGeteld !== afstamming.ok) {
+    return { stand: 'onbeslist', waarom: 'de twee metingen spreken elkaar tegen'
+      + ` (rev-list zegt ${vooruit.uit || '?'} voor, afstamming zegt `
+      + `${afstamming.ok ? 'wel' : 'geen'} voorouder)` };
+  }
+  if (nulGeteld) return { stand: 'leeg', waarom: 'nul commits voor op ' + hoofd };
 
   const hoofdBoom = git('rev-parse', `origin/${hoofd}^{tree}`);
   /* DE NAAM REIST MEE. `git merge` eist een committer, ook met --no-commit, en
@@ -173,14 +195,21 @@ function oordeel(werkmap, hoofd, tak) {
 
   inWerkmap('reset', '--hard', `origin/${hoofd}`);
   inWerkmap('clean', '-qfd');
-  /* `--allow-unrelated-histories` omdat een deel van de oude takken een EIGEN
-     wortel heeft en dus geen gemeenschappelijke voorouder. Zonder die vlag
-     weigert git te mergen, en dan bleef de index staan op de boom van de
-     hoofdtak -- wat als 'leeg' las. Dat trof hier 66 takken: de meting zei
-     "weg mag" over werk dat nooit vergeleken is. Met de vlag is de proef juist
-     STRENGER: bij een lege basis telt elk bestand van de tak als toevoeging, en
-     alleen als ze allemaal al identiek in de hoofdtak staan valt de merge samen
-     met diens boom. */
+  /* `--allow-unrelated-histories` voor het geval een tak werkelijk een eigen
+     wortel heeft. Zonder die vlag weigert git zo'n merge, en dan blijft de
+     index staan op de boom van de hoofdtak -- wat als 'leeg' zou lezen. Met de
+     vlag is de proef juist STRENGER: bij een lege basis telt elk bestand van de
+     tak als toevoeging, en alleen als ze allemaal al identiek in de hoofdtak
+     staan valt de merge samen met diens boom.
+
+     EERLIJKE NOOT BIJ DE HERKOMST VAN DEZE VLAG. Hij is toegevoegd omdat 66
+     takken "unrelated histories" leken te hebben, en dat was ONJUIST: het
+     werkstation waarop dat gemeten werd had een ONDIEPE kloon, zodat de
+     gemeenschappelijke voorouder buiten beeld viel. Die 66 hebben gewoon een
+     basis. De vlag blijft staan omdat een echte weeskindtak kan bestaan en hij
+     dan het veilige antwoord geeft -- maar het getal waarmee hij ooit
+     verdedigd is, was een meetfout. De wacht die dat soort meetfouten
+     tegenhoudt staat nu in main(): een ondiepe kloon oordeelt hier niet. */
   inWerkmap('merge', '--no-commit', '--no-ff', '--allow-unrelated-histories', `origin/${tak}`);
 
   /* EEN MERGE DIE NIET LIEP, IS GEEN LEGE MERGE. `git merge` geeft ook een
@@ -223,7 +252,25 @@ function main() {
   const repo = process.env.GITHUB_REPOSITORY || '';
   const hoofd = hoofdtak();
 
+  /* EEN ONVOLLEDIGE KLOON MAG HIER NIET OORDELEN. In een ondiepe kloon loopt
+     `rev-list` tegen de rand van wat er is en telt te weinig -- en te weinig
+     betekent hier "weg ermee". De vraag stellen kost niets; hem niet stellen
+     kost andermans werk. */
+  const ondiep = gitStil('rev-parse', '--is-shallow-repository');
+  if (ondiep.ok && ondiep.uit === 'true') {
+    console.error('Dit is een ondiepe kloon; de geschiedenis is onvolledig en er wordt dus niets beoordeeld.');
+    console.error('Haal de repo op met volledige geschiedenis (fetch-depth: 0) en draai opnieuw.');
+    process.exit(1);
+  }
+
   git('fetch', '--prune', '--quiet', 'origin');
+
+  /* De stand van de kloon in het logboek: wie later een uitslag wantrouwt, kan
+     hier zien waarmee er gerekend is. */
+  const takRef = gitStil('for-each-ref', '--format=%(refname)', 'refs/remotes/origin');
+  console.log('Kloon: ' + (gitStil('rev-list', '--count', `origin/${hoofd}`).uit || '?')
+    + ` commits op ${hoofd}, ` + (takRef.ok ? takRef.uit.split('\n').filter(Boolean).length : '?')
+    + ' verwijzingen, ondiep: ' + (ondiep.ok ? ondiep.uit : 'onbekend') + '.');
 
   const openPr = takkenMetOpenPr(repo);
   if (verwijderen && openPr === null) {

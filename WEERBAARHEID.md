@@ -121,6 +121,43 @@ regel van `EXECUTION_MAP.json`: waar twee bronnen elkaar tegenspreken staat
 `ONBEPAALD` en nooit stil een winnaar. Wat vaststaat is de orde van grootte: een
 handvol van de 586.
 
+### 3a. De eerste zeven deuren, en de vier die terug moesten
+
+Op 9 september staan er zeven kantoorroutes bij die een **naam** vragen in plaats
+van de gedeelde code: `bank/rekening/open`, `/rood`, `/bevries`,
+`bank/krediet/besluit`, `bank/salaris/run`, `bank/incasso` en
+`office/export.csv`. De regel eronder is één zin: **wat geld verplaatst, een
+recht verleent of bulk uitvoert, vraagt een mens; gewoon lezen niet.**
+
+Er stonden er eerst elf, en de vier die eraf gingen zijn leerzamer dan de zeven
+die bleven. Het waren allemaal **lezingen** — het kredietbord, het
+salarisvoorstel, de bevoegdheidsmatrix en de machtskaart — en `KANTOORMACHT.md`
+zet `ENFORCE_EXECUTE` bewust vóór `ENFORCE_READ` omdat lezen élk scherm raakt
+voor de kleinste risicoreductie. Dat bleef geen theorie: `bankVervers()` in
+`kantoren.html` haalt het kredietbord en de matrix in één `Promise.all` op, dus
+de hele bankkamer viel om en een schermtoets die daar niets mee te maken had
+zakte. Een zichtbare ingang naar een onbereikbare functie is een productdefect,
+ook als elke regel code klopt (`BETROUWBAARHEID.md` bewijs 1).
+
+**Twee dingen die deze ronde blootlegde en die geen van beide over de deur
+gingen.** De `ZWAAR`-lijst in `scripts/kantoormacht.js` matchte op
+**onderwerpen** (`bank/krediet`) terwijl haar drie klassen **effecten** zijn, en
+telde daardoor vier lezingen als zwaar. Een ondergrens mag dingen missen; hij mag
+niet iets aanwijzen dat er niet is — een valse `nee` stuurt de volgende lezer
+naar een deur die niets oplevert, en daarna gelooft niemand de meter meer. En de
+CSV-knop in de backoffice deed `if (!r.ok) return;`: een verhindering zonder
+reden, wat `GRAMMATICA.md` verbiedt. Dat viel jaren niet op omdat hij altijd
+slaagde. **Een deur dichtzetten is de goedkoopste manier om te ontdekken welke
+foutafhandeling er nooit is geweest.**
+
+**De prijs staat hardop.** `anoniemUitvoerbaar` ging van 365 terug naar
+<!--getal:kantoor.anoniem-->369<!--/getal-->, en die teller mag alleen dalen. De
+verhoging staat daarom uitgeschreven in `KANTOORMACHT.json` zelf — met de reden
+en met wat hem weer omlaag brengt — in de vorm van de `OPEN_MAX`-verhoging uit
+`SERVICE.md` par. 13, en `test/kantoormacht.test.js` toets 6b weigert voortaan
+een verhoging zonder allebei. Dat is nog altijd 16 lager dan `main` (385). Wie
+een ratel omzeilt zonder het te zeggen, sloopt de ratel zelf.
+
 ## 4. Single Compromise Survivability — de nieuwe lat
 
 De meeteenheid is niet een route en niet een score, maar een zin die per

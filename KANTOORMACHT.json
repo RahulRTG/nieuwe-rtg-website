@@ -2,23 +2,44 @@
   "soort": "meting",
   "uitleg": "Blok 0 van KANTOORMACHT.md: staat er een MENS achter elke kantoorhandeling? Zes assen, zes getallen, met opzet geen samengesteld cijfer (BEWIJSMACHINE.md verbiedt het enkele READY boven een scorecard).",
   "grens": "De as `deurEistMens` komt uit de ROUTER en is hard; `handlerKentMens` is lexicaal op BESTANDSniveau en draagt daarom `vermoed` -- een bestand dat officeKey noemt gebruikt hem misschien niet in elke route erin. `handlerKentMens` is dus een BOVENgrens en `anoniemUitvoerbaar` een ONDERgrens. Een deploy-gate hoort aan de harde as te hangen.",
+  "ratelverhogingen": [
+    {
+      "as": "anoniemUitvoerbaar",
+      "van": 365,
+      "naar": 369,
+      "op": "2026-09-09",
+      "reden": "Vier LEZINGEN stonden een dag achter kluisAuth (kredietbord, salarisvoorstel, bevoegdheidsmatrix, machtskaart) en zijn teruggezet naar de gedeelde code. KANTOORMACHT.md zet ENFORCE_EXECUTE bewust voor ENFORCE_READ: lezen raakt elk scherm voor de kleinste risicoreductie, en het bank-scherm rendeerde er niet meer door -- bankVervers() haalt kredietbord en matrix in een Promise.all op, dus de hele kamer viel om. Nog altijd 16 lager dan main (385).",
+      "omlaag": "De zes uitvoerende bankknoppen staan nu op naam; de volgende stap is niet deze vier lezingen maar de 13 zware routes buiten de bank, en daarna ENFORCE_READ per kamer."
+    }
+  ],
   "stempel": {
-    "op": "2026-09-09T00:34:03.929Z",
-    "commit": "28d3b57d",
+    "op": "2026-09-09T02:42:07.415Z",
+    "commit": "ff388e72",
     "node": "v22.22.2"
   },
   "gemeten": {
     "routes": 586,
-    "deurEistMens": 168,
-    "deurGedeeld": 418,
+    "deurEistMens": 164,
+    "deurGedeeld": 422,
     "zonderBewakerslaag": 3,
     "handlerKentMens": 117,
-    "anoniemUitvoerbaar": 365,
+    "anoniemUitvoerbaar": 369,
     "metSpoor": 130,
     "metReden": 260,
     "bestanden": 89,
-    "zwaar": 17,
-    "zwaarZonderMens": 0
+    "zwaar": 13,
+    "zwaarZonderMens": 0,
+    "zwaarLezend": 4,
+    "zwaarLezendZonderMens": 4
+  },
+  "zwaarePaden": {
+    "zonderMens": [],
+    "lezendZonderMens": [
+      "/api/office/bank/bevoegdheid",
+      "/api/office/bank/krediet",
+      "/api/office/bank/salaris/voorstel",
+      "/api/office/rechten"
+    ]
   },
   "graden": {
     "routes": "gemeten",
@@ -30,11 +51,14 @@
     "metSpoor": "vermoed",
     "metReden": "vermoed",
     "zwaar": "vermoed",
-    "zwaarZonderMens": "vermoed"
+    "zwaarZonderMens": "vermoed",
+    "zwaarLezend": "vermoed",
+    "zwaarLezendZonderMens": "vermoed"
   },
   "ongemeten": {
     "risicoPerRoute": "er is geen risicomodule in dit huis (KANTOORMACHT.md par. 3); een 0 zou hier \"gemeten en niet aanwezig\" beweren, en dat is onwaar",
     "vierOgenVereist": "welke handeling vier ogen VERDIENT is een besluit en geen meting; wat wel gemeten is, staat in `machinerie.vierogen`",
+    "vierOgenBuitenDeModule": "machinerie.vierogen telt bestanden die kern/appstore/vierogen REQUIREN, en dat is een lexicale telling van EEN implementatie. Er is er minstens nog een: kern/payroll/run.js draagt een eigen ladder (concept, gecontroleerd, manager, administrateur, definitief) met \"NOOIT dezelfde persoon\", en /api/office/bank/salaris/run betaalt alleen een DEFINITIEVE run uit. Die route bereikt payroll via de kern-tas (kern.payrollOS) en niet via een require, dus deze grep kan hem per constructie niet zien. Lees de 0 als \"nul routes gebruiken DIE module\" en nooit als \"nergens tekent een tweede mens\" -- dezelfde faalvorm als de balieAuth-ondertelling hierboven.",
     "historischeToestand": "er is geen versiegeschiedenis van entiteiten (par. 18)"
   },
   "machinerie": {
@@ -202,11 +226,11 @@
     }
   ],
   "deuren": {
-    "officeAuth": 440,
+    "officeAuth": 444,
     "boardroomAuth": 108,
     "balieAuth": 31,
     "techAuth": 16,
-    "kluisAuth": 16,
+    "kluisAuth": 12,
     "eigenaarAlleen": 10,
     "alleenBaas": 6,
     "naamAuth": 3

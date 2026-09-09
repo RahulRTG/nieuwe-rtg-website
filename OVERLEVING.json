@@ -3,10 +3,10 @@
   "uitleg": "Single Compromise Survivability (WEERBAARHEID.md par. 4): als er EEN ding wordt overgenomen, houdt RTG dan stand? Acht scenario's, elk met een bron, een bewijsgraad en wat de rij NIET dekt. Met opzet geen samengesteld cijfer.",
   "grens": "`onbekend` is een eersteklas uitslag en betekent nooit \"waarschijnlijk goed\". Elke rij leest een echte bron; ontbreekt die, dan wordt de rij `onbekend` met de reden en niet stil een middenwaarde. De rijen `sessie` en `dienst` dragen `vermoed`: die gaan over een VORM in de code en niet over wat er in productie gebeurt.",
   "stempel": {
-    "op": "2026-09-09T00:37:36.347Z",
-    "commit": "da3d6423",
+    "op": "2026-09-09T02:42:07.621Z",
+    "commit": "ff388e72",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/overleving.js",
     "node": "v22.22.2"
   },
@@ -24,7 +24,7 @@
       "vraag": "Iemand heeft de gedeelde kantoorcode. Houdt RTG stand?",
       "uitkomst": "deels",
       "graad": "vermoed",
-      "grond": "418 van 586 kantoorroutes hangen achter de gedeelde code; van de 17 die geld bewegen, rechten verlenen of bulk uitvoeren staan er 0 zonder mens op naam, en 0 kantoorroutes vragen een tweede handtekening (KANTOORMACHT.json)",
+      "grond": "422 van 586 kantoorroutes hangen achter de gedeelde code; van de 13 die geld bewegen, rechten verlenen of bulk uitvoeren staan er 0 zonder mens op naam, en 0 kantoorroutes vragen een tweede handtekening (KANTOORMACHT.json)",
       "nietGemeten": "wat een gestolen code in de PRAKTIJK oplevert -- dat hangt af van welke 460 routes het zijn, en er is geen risicomodule die dat weegt (KANTOORMACHT.md par. 3)"
     },
     {
@@ -32,7 +32,7 @@
       "vraag": "Er staat een opdracht verstopt in een document dat de AI leest. Houdt RTG stand?",
       "uitkomst": "nee",
       "graad": "gemeten",
-      "grond": "de poort hangt voor de uitvoering maar telt alleen -- hij bijt pas met RTG_HERKOMST_AFDWINGEN=1 (kern/stuur/lusstap.js, ISOLATIEPROEF.json bijt=false)",
+      "grond": "de poort hangt voor de uitvoering maar telt alleen -- hij bijt pas als een wereld in RTG_HERKOMST_AFDWINGEN staat (kern/stuur/lusstap.js, ISOLATIEPROEF.json)",
       "nietGemeten": "de dekking van de kanaallabels: van de 13 kanalen in kern/isolatie/herkomst.js meldt er vandaag een zich aan, en die telling zit in ISOLATIEPROEF.json en niet in deze rij"
     },
     {
@@ -47,8 +47,8 @@
       "id": "medewerker",
       "vraag": "Een medewerker handelt te kwader trouw, in zijn eentje. Houdt RTG stand?",
       "uitkomst": "nee",
-      "graad": "gemeten",
-      "grond": "0 kantoorroutes vragen een tweede handtekening en 0 hangen aan een keurbaar voornemen (KANTOORMACHT.json); de ontsluitceremonie kent wel een tweede paar ogen",
+      "graad": "vermoed",
+      "grond": "loon en krediet kennen een scheiding (kern/payroll/run.js: concept -> gecontroleerd -> manager -> administrateur -> definitief, \"NOOIT dezelfde persoon\"; een kredietaanvraag komt van een LID en het besluit van het kantoor), maar een enkele medewerker op naam kan alleen een rekening bevriezen, rood zetten of een incasso starten -- daar staat geen tweede handtekening onder. 0 kantoorroutes gebruiken kern/appstore/vierogen en 0 hangen aan een keurbaar voornemen (KANTOORMACHT.json); de ontsluitceremonie kent wel een tweede paar ogen",
       "nietGemeten": "welke handeling vier ogen VERDIENT is een besluit en geen meting -- KANTOORMACHT.json zegt dat met zoveel woorden onder `ongemeten.vierOgenVereist`"
     },
     {

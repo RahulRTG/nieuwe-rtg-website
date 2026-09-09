@@ -9,7 +9,7 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**59 bundels, 473 delen, 0 zonder onderwerp.**
+**60 bundels, 475 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
@@ -797,6 +797,15 @@ omlaag.
 |---|---|
 | `rahulpoort-01.js` | DE RAHUL-POORT -- inloggen als een gesprek, ook op de werkschermen |
 | `rahulpoort-02.js` | het gesprek in stappen |
+
+## `shared/rtg-edge-smart-menu.js`
+
+`public/shared/rtg-edge-smart-menu/` -- 2 delen, 204 regels in de delen
+
+| deel | onderwerp |
+|---|---|
+| `rtg-edge-smart-menu-00.js` | Twee gezichten, één hamburger: lokale context en heel RTG blijven in het bestaande Edge-menu |
+| `rtg-edge-smart-menu-01.js` | De menupanelen, focus en koppeling aan de bestaande Edge-schil |
 
 ## `shared/rtg-schil.js`
 

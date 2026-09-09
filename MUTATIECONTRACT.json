@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-09T08:08:44.493Z",
-  "commit": "dee1586f",
+  "op": "2026-09-09T10:05:52.312Z",
+  "commit": "c40048b2",
   "boomVuil": false,
   "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
@@ -244,12 +244,6 @@
   },
   {
    "route": "POST /api/office/service/zaak",
-   "bedoeld": "CAPABILITY_GATED",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/office/stuur/herkomstschaduw",
    "bedoeld": "CAPABILITY_GATED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -54579,7 +54573,7 @@
    "semantiek": {
     "klasse": "hooguitEens"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -54600,7 +54594,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "nietIdempotent",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -54621,7 +54615,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -64518,11 +64512,11 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "CAPABILITY_GATED",
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "boardroomAuth"
     ]

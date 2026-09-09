@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-09T18:26:20.122Z",
-    "commit": "b7af216b",
+    "op": "2026-09-09T20:45:37.262Z",
+    "commit": "463cffab2",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -726,6 +726,14 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "bewijsregister.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/norm.js",
+      "operator": "===->!==#9",
+      "gezakt": 1,
+      "geprobeerd": 62
     },
     "bewijsschuld.test.js": {
       "soort": "puur",
@@ -2316,6 +2324,22 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "heapproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/heapstat.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "heapstat.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/heapstat.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
     "helikopter.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3176,6 +3200,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "leespad-schrijft-niet.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/zaakcommand/index.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "leeszonderscheppen.test.js": {
       "soort": "puur",
@@ -5394,6 +5426,14 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "resync-licht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/postgres-verzoeken.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 4
+    },
     "retail.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5640,6 +5680,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "CSS-contract; handmutatie 44px naar 40px liet de raakdoeltoets zakken"
+    },
+    "rtg-edge-appbar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-edge-appbar.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "rtg-edge-boot.test.js": {
       "soort": "puur",
@@ -7538,6 +7586,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "verzoekcontext-wikkel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/verzoekcontext.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "verzorging-leden.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -8064,6 +8120,14 @@
       "gezakt": 6,
       "geprobeerd": 2
     },
+    "writehealth-lus.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/postgres-verzoeken.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 4
+    },
     "zaaihash.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -8271,62 +8335,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "bewijsregister.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/norm.js",
-      "operator": "===->!==#9",
-      "gezakt": 1,
-      "geprobeerd": 62
-    },
-    "heapproef.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/heapstat.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
-    "heapstat.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/heapstat.js",
-      "operator": "===->!==#0",
-      "gezakt": 7,
-      "geprobeerd": 1
-    },
-    "leespad-schrijft-niet.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/zaakcommand/index.js",
-      "operator": "true->false#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "resync-licht.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/db/postgres-verzoeken.js",
-      "operator": "===->!==#0",
-      "gezakt": 5,
-      "geprobeerd": 4
-    },
-    "verzoekcontext-wikkel.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/db/verzoekcontext.js",
-      "operator": "true->false#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
-    "writehealth-lus.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/db/postgres-verzoeken.js",
-      "operator": "===->!==#0",
-      "gezakt": 5,
-      "geprobeerd": 4
     }
   }
 }

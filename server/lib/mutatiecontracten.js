@@ -75,6 +75,10 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-opvangwijzer').CONTRACTEN,
   require('./mutatiecontracten-horeca-correctie').CONTRACTEN,
   require('./mutatiecontracten-integratie').CONTRACTEN,
+  /* De leesweg naar de schaduwtelling van de herkomstpoort. Eigen bestand omdat
+     het bewijs er van een andere soort is dan in ./mutatiecontracten-leest.js --
+     een lezing van de handler in plaats van een gemeten kale ronde. Zie de kop. */
+  require('./mutatiecontracten-schaduwtelling').CONTRACTEN,
   /* De zware poort: drie ceremonieloketten, alle drie met opzet niet
      herhaalbaar. Eigen bestand, zie de kop daar. */
   require('./mutatiecontracten-zwaar').CONTRACTEN,

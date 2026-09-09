@@ -155,3 +155,84 @@ test('6b. een verhoging van de ratel draagt een reden en een weg omlaag', () => 
       v.as + ': een verhoging hoort te zeggen wat hem weer omlaag brengt, anders is hij het nieuwe normaal');
   }
 });
+
+/* ============================================================================
+   DE TWEEDE ZWAAR-AS (scripts/lib/zwaareffect.js).
+
+   De padas herkent een zware handeling aan zijn naam en is daarmee een
+   ondergrens: een route die geld beweegt onder een onschuldige naam valt
+   erbuiten. De effectas stelt dezelfde vraag langs de andere kant -- wat heeft
+   deze route werkelijk AANGERAAKT -- en is een ondergrens om een andere reden:
+   hij ziet alleen wat de idempotentieproef aan het werk kreeg.
+
+   De gevaarlijkste faalvorm van deze as is niet dat hij te weinig vindt maar
+   dat hij zijn eigen blindheid verzwijgt. `raaktZonderMens: 0` naast een
+   dekking van 10% leest als "in orde" terwijl het "we keken bijna nergens"
+   betekent. Deze toetsen bewaken precies dat.
+   ========================================================================== */
+const { meetEffect, GELDCOLLECTIES } = require('../scripts/lib/zwaareffect.js');
+
+/* Een nagebouwde proefronde, zodat deze toetsen niet meebewegen met de echte
+   meting. Vier routes: een die geld raakt, een die de proef niet aan het werk
+   kreeg, een die werkte zonder iets te raken, en een die er niet in staat. */
+function nepProef() {
+  return [
+    { methode: 'POST', pad: '/api/office/geld/schuif', reden: 'ok',
+      opslag: { a: { bankSaldi: 3 }, b: {}, c: {} } },
+    { methode: 'POST', pad: '/api/office/bank/incasso',
+      reden: 'de eerste oproep deed geen werk (status 404)', opslag: { a: {}, b: {}, c: {} } },
+    { methode: 'POST', pad: '/api/office/kijk', reden: 'ok', opslag: { a: {}, b: {}, c: {} } }
+  ];
+}
+
+test('7. de effectas telt geen route mee die de proef niet aan het werk kreeg', () => {
+  const routes = [
+    { methode: 'POST', pad: '/api/office/geld/schuif', bewakers: [] },
+    { methode: 'POST', pad: '/api/office/bank/incasso', bewakers: [] },
+    { methode: 'POST', pad: '/api/office/kijk', bewakers: [] },
+    { methode: 'POST', pad: '/api/office/nergens', bewakers: [] }
+  ];
+  const uit = meetEffect(routes, p => /incasso|schuif/.test(p), () => false, WORTEL, nepProef());
+  assert.strictEqual(uit.dekking.gemeten, 1, 'alleen de route die echt iets raakte is gemeten');
+  assert.strictEqual(uit.dekking.geenWerk, 1, 'de 404-route telt als geenWerk');
+  assert.strictEqual(uit.dekking.geenOpslag, 1, 'de route die werkte zonder effect telt apart');
+  assert.strictEqual(uit.dekking.nietInProef, 1, 'en wat er niet in staat ook');
+  /* DE KERN: `geenWerk` mag NOOIT als `geenOpslag` worden geteld. "de proef kwam
+     er niet doorheen" is iets anders dan "er gebeurde niets", en die twee door
+     elkaar halen maakt van een gat een geruststelling. */
+  assert.notStrictEqual(uit.dekking.geenWerk, 0);
+});
+
+test('8. de effectas noemt hardop over welke zware routes hij zwijgt', () => {
+  const routes = [
+    { methode: 'POST', pad: '/api/office/bank/incasso', bewakers: [] },
+    { methode: 'POST', pad: '/api/office/nergens', bewakers: [] }
+  ];
+  const uit = meetEffect(routes, p => /incasso|nergens/.test(p), () => false, WORTEL, nepProef());
+  const blind = uit.blindVoor.map(b => b.pad).sort();
+  assert.deepStrictEqual(blind, ['/api/office/bank/incasso', '/api/office/nergens'],
+    'allebei de zware routes zijn onmeetbaar en horen dus in blindVoor');
+  for (const b of uit.blindVoor)
+    assert.ok(String(b.waarom || '').length > 10, b.pad + ' zegt niet WAAROM hij blind is');
+});
+
+test('9. een geldtreffer draagt de collectie die hem aanwees', () => {
+  const routes = [{ methode: 'POST', pad: '/api/office/geld/schuif', bewakers: [] }];
+  const uit = meetEffect(routes, () => false, () => false, WORTEL, nepProef());
+  assert.strictEqual(uit.raakt.length, 1);
+  assert.deepStrictEqual(uit.raakt[0].collecties, ['bankSaldi'],
+    'een treffer zonder de collectie erbij is niet na te rekenen');
+  assert.ok(GELDCOLLECTIES.bankSaldi, 'en die collectie draagt een reden in het register');
+  for (const [naam, reden] of Object.entries(GELDCOLLECTIES))
+    assert.ok(String(reden).length > 15, naam + ' staat in de geldlijst zonder uitgeschreven reden');
+});
+
+/* De idempotentie-administratie is met opzet GEEN geldcollectie: daar landt een
+   afdruk van een verzoek, niet een bedrag. Zou `bankIdem` erin sluipen, dan
+   telt elke herhaalbare bankroute mee als geldbeweging en is de as waardeloos. */
+test('10. de idempotentie-administratie telt niet als geld', () => {
+  for (const naam of ['bankIdem', 'bankIdemAfdruk', 'payIdem', 'payIdemAfdruk', 'betaalIdem'])
+    assert.ok(!GELDCOLLECTIES[naam],
+      naam + ' is een afdruk van een verzoek en geen bedrag; hem meetellen maakt elke ' +
+      'herhaalbare bankroute een geldbeweging');
+});

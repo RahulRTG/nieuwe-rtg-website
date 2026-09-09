@@ -11,6 +11,21 @@ module.exports = (ctx) => {
   const { app, officeAuth, boardroomAuth, boardroomLijst, keyVanCodenaam, veilig, afdelingen,
           sseToOffice, db, save, kern, zwaar, boardroomUser } = ctx;
 
+  /* DE PRIJS VAN DE HERKOMSTPOORT, opgeteld over alle gesprekken.
+
+     Hij hoort hier omdat dit de kamer is waar platformbrede knoppen worden
+     omgezet, en `RTG_HERKOMST_AFDWINGEN` is er zo een. CONTROLPLANE.md zegt dat
+     je niet kunt afdwingen wat nooit in de schaduw heeft gelopen -- maar een
+     schaduw die niemand kan LEZEN, is geen schaduw. Deze route is die leesweg.
+
+     Achter de gedeelde code en niet achter de kluis: het is een aggregaat van
+     tellers zonder een enkele identiteit erin, en KANTOORMACHT.md zet
+     ENFORCE_EXECUTE voor ENFORCE_READ. Zie kern/stuur/schaduwtelling.js voor
+     waarom er geen journaal onder ligt en waarom het antwoord zijn eigen
+     begindatum draagt. */
+  app.post('/api/office/stuur/herkomstschaduw', officeAuth, (req, res) => veilig(res, () =>
+    ({ status: 200, ok: true, ...require('../../kern/stuur/schaduwtelling').stand() })));
+
   /* Het loket om een zware bevestiging in de boardroom te starten. De poort
      zelf staat in ./index.js; hier hangt alleen de deur. */
   app.post('/api/office/boardroom/bevestig/opties', boardroomAuth, async (req, res) => {

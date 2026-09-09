@@ -44,6 +44,7 @@ const { voorspel } = require('./gevolg');
    antwoord van de kaart, zodat de eigenaar de prijs op zijn scherm heeft in
    plaats van in een logregel. */
 const AFDWINGEN = require('./herkomstschakelaar');
+const telling = require('./schaduwtelling');
 
 module.exports = function maakLusstap({ stuurRoep, filter, vuil }) {
 
@@ -59,6 +60,11 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil }) {
       schaduw.zouSluiten++;
       if (schaduw.paden.length < 20) schaduw.paden.push(pad);
     }
+    /* En dezelfde weging OPGETELD over alle gesprekken. De telling hierboven
+       leeft één gesprek en verdwijnt; zonder de optelling is "hoe vaak zou hij
+       bijten" niet te beantwoorden, en dan is de vlag omzetten een gok. Het is
+       een teller en geen journaal -- zie ./schaduwtelling.js. */
+    telling.noteer(wereld, pad, !oordeel.mag);
     const dwingt = AFDWINGEN(wereld);
     return { mag: dwingt ? oordeel.mag : true, oordeel, schaduw: !oordeel.mag && !dwingt };
   }

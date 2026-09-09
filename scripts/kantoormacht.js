@@ -59,6 +59,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { alleRoutes } = require('./lib/routes.js');
+const { meetEffect } = require('./lib/zwaareffect.js');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'KANTOORMACHT.json');
@@ -231,6 +232,11 @@ function meet() {
   const lezendRoutes = routes.filter(r => isZwaarLezend(r.pad));
   const lezendOpen = lezendRoutes.filter(r => !heeftMens(r));
 
+  /* DE TWEEDE AS, langs de andere kant: niet hoe een route HEET maar wat zij
+     heeft AANGERAAKT. Zie scripts/lib/zwaareffect.js voor waarom die twee nooit
+     worden opgeteld, en waarom zijn DEKKING het belangrijkste getal is. */
+  const effect = meetEffect(routes, isZwaar, heeftMens, WORTEL);
+
   return {
     soort: 'meting',
     uitleg: 'Blok 0 van KANTOORMACHT.md: staat er een MENS achter elke kantoorhandeling? ' +
@@ -280,6 +286,10 @@ function meet() {
       zonderMens: zwaarOpen.map(r => r.pad).sort(),
       lezendZonderMens: lezendOpen.map(r => r.pad).sort()
     },
+    /* De effectas staat NAAST `gemeten` en niet erin: hij deelt geen teller met
+       de padas, want dan zou iemand ze optellen. Zie de kop van
+       scripts/lib/zwaareffect.js. */
+    zwaarEffect: effect,
     graden: {
       routes: 'gemeten',
       deurEistMens: 'gemeten',
@@ -324,6 +334,26 @@ function toon(u) {
   console.log('  ANONIEM UITVOERBAAR      ' + g.anoniemUitvoerbaar + '   vermoed (ondergrens)');
   console.log('  schrijft een spoor       ' + g.metSpoor + '   vermoed');
   console.log('  vraagt een reden         ' + g.metReden + '   vermoed');
+  /* De twee zware assen onder elkaar, met de dekking van de tweede ERBIJ. Zonder
+     die dekking leest "0 zonder mens" als een geruststelling; met de dekking
+     erbij leest hij als wat hij is -- een uitspraak over 14% van de kamer. */
+  const e = u.zwaarEffect || {};
+  console.log('\n  zwaar: twee assen, nooit opgeteld');
+  console.log('    op PAD (hoe heet je)      ' + g.zwaar + ' zwaar, ' +
+    g.zwaarZonderMens + ' zonder mens   vermoed (ondergrens)');
+  if (!e.bruikbaar) {
+    console.log('    op EFFECT (wat raak je)   niet te meten: ' + (e.reden || 'onbekend'));
+  } else {
+    console.log('    op EFFECT (wat raak je)   ' + e.raakt.length + ' raken geld, ' +
+      e.raaktZonderMens.length + ' zonder mens   vermoed');
+    console.log('      dekking: ' + e.dekking.gemeten + ' van ' + e.dekking.totaal +
+      ' routes werkelijk gemeten (' + e.dekkingPct + '%) -- ' + e.dekking.geenWerk +
+      ' kreeg de proef niet aan het werk, ' + e.dekking.geenOpslag + ' raakte niets, ' +
+      e.dekking.nietInProef + ' staat niet in de proef');
+    if (e.blindVoor.length)
+      console.log('      BLIND voor ' + e.blindVoor.length + ' van de ' + g.zwaar +
+        ' zware routes -- juist de bankknoppen; die vragen een wereld die de proef niet opzet');
+  }
   console.log('\n  de machinerie -- bestaat, hangt hij aan de kantoordeur?');
   for (const [naam, m] of Object.entries(u.machinerie)) {
     console.log('    ' + naam.padEnd(13) + 'kantoor: ' + String(m.aanKantoorroute).padStart(3) +

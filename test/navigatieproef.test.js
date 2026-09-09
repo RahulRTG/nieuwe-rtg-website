@@ -41,6 +41,30 @@ const plek = fs.readFileSync(path.join(WORTEL, 'public', 'shared', 'plek.js'), '
 const { zonderCommentaar } = require('../scripts/lib/bron');
 const schermKaal = zonderCommentaar(scherm);
 
+/* DE RATEL OP HET REGISTER ZELF (scripts/lib/metingen.js).
+
+   Een meetbestand in de wortel dat aan geen enkele ratel hangt, is een getal dat
+   niemand bewaakt -- de norm telt ze als `metingenZonderRatel` en die mag alleen
+   omlaag. Deze toets is die ratel: een VASTGELEGDE ronde die niet sluit, laat de
+   bouw zakken. Zonder hem kon NAVIGATIEPROEF.json stilletjes op een gebroken
+   belofte blijven staan, en dan is een ingecheckt register erger dan geen. */
+test('-1. de vastgelegde ronde sluit', () => {
+  const j = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NAVIGATIEPROEF.json'), 'utf8'));
+  if (j.overgeslagen) {
+    /* Zonder browser is er niets gemeten. Dat mag, maar dan hoort het er ook zo
+       te staan en niet als een geslaagde ronde. */
+    assert.ok(j.overgeslagen.length > 20, 'een overgeslagen ronde zonder reden');
+    return;
+  }
+  assert.equal(j.telling.open, 0, 'een open schakel in de vastgelegde ronde');
+  assert.equal(j.telling.gebroken, 0, 'een gebroken belofte in de vastgelegde ronde');
+  assert.equal(j.telling.scriptfouten, 0, 'de pagina gooide een scriptfout tijdens de vastgelegde ronde');
+  assert.ok(j.telling.schakels >= 7 && j.telling.storingen >= 6,
+    'de ronde is uitgedund: minder schakels of storingen dan de proef aflegt');
+  assert.equal(j.sluit, true, 'het register meldt zelf dat de keten niet sluit');
+  assert.ok(j.browser && j.browser !== 'geen', 'er staat niet bij waarmee er gemeten is');
+});
+
 test('0. de proef zakt op een open schakel, een gebroken belofte of een scriptfout', () => {
   assert.match(bron, /uit\.sluit = t\.open === 0 && t\.gebroken === 0 && t\.scriptfouten === 0/,
     'sluit hoort alle drie de slechte uitkomsten te tellen');

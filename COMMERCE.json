@@ -2,27 +2,27 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-09",
   "gemeten": {
-    "bestanden": 2142,
+    "bestanden": 2143,
     "domeinenTotaal": 590,
-    "koopbareVormen": 527,
-    "koopbareDomeinen": 109,
+    "koopbareVormen": 528,
+    "koopbareDomeinen": 110,
     "envelopDrempel": 7,
     "envelop": 46,
-    "veldenDomeineigen": 718,
-    "veldenNietEnvelop": 933,
+    "veldenDomeineigen": 720,
+    "veldenNietEnvelop": 936,
     "gelijkendeVormparen": 8,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 43,
+    "werkwoordCombinaties": 44,
     "wagenVormen": 32,
     "wagenVormenUniek": 29,
     "wagenDomeinen": 22,
-    "optellingen": 110,
-    "optelDomeinen": 54,
+    "optellingen": 111,
+    "optelDomeinen": 55,
     "optelCenten": 61,
     "optelEuro": 5,
     "optelGemengd": 0,
-    "optelOnbekend": 44
+    "optelOnbekend": 45
   },
   "envelop": [
     "aantal",
@@ -76,8 +76,8 @@
     "toon": 85,
     "prijs": 36,
     "beschikbaarheid": 50,
-    "reserveer": 27,
-    "bevestig": 50,
+    "reserveer": 28,
+    "bevestig": 51,
     "lever": 19,
     "annuleer": 27,
     "retour": 7
@@ -1406,6 +1406,24 @@
       "bewijs": {
         "toon": "alsLijst",
         "bevestig": "logboek"
+      },
+      "telt": 2
+    },
+    {
+      "domein": "kern/stuur",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "reserveer": "inhoudswoorden",
+        "bevestig": "stuurBevestig"
       },
       "telt": 2
     },

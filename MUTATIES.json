@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-09T01:41:27.577Z",
-    "commit": "c60b4ea0",
+    "op": "2026-09-09T07:38:58.487Z",
+    "commit": "fc6fd6a8",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 6,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -5978,6 +5978,13 @@
       "operator": "<=-><#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "schaduwtelling.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "schakelkast-dekking.test.js": {
       "soort": "server",

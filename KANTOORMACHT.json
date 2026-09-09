@@ -13,19 +13,19 @@
     }
   ],
   "stempel": {
-    "op": "2026-09-09T02:42:07.415Z",
-    "commit": "ff388e72",
+    "op": "2026-09-09T07:38:39.141Z",
+    "commit": "fc6fd6a8",
     "node": "v22.22.2"
   },
   "gemeten": {
-    "routes": 586,
-    "deurEistMens": 164,
+    "routes": 587,
+    "deurEistMens": 165,
     "deurGedeeld": 422,
     "zonderBewakerslaag": 3,
     "handlerKentMens": 117,
     "anoniemUitvoerbaar": 369,
-    "metSpoor": 130,
-    "metReden": 260,
+    "metSpoor": 146,
+    "metReden": 261,
     "bestanden": 89,
     "zwaar": 13,
     "zwaarZonderMens": 0,
@@ -40,6 +40,98 @@
       "/api/office/bank/salaris/voorstel",
       "/api/office/rechten"
     ]
+  },
+  "zwaarEffect": {
+    "bruikbaar": true,
+    "bron": "IDEMPROEF.json",
+    "graad": "vermoed",
+    "dekking": {
+      "gemeten": 62,
+      "geenWerk": 273,
+      "geenOpslag": 203,
+      "nietInProef": 49,
+      "totaal": 587
+    },
+    "dekkingPct": 10.6,
+    "raakt": [
+      {
+        "pad": "/api/office/payroll/dekking/land",
+        "collecties": [
+          "payrollRegels"
+        ],
+        "opNaam": false
+      },
+      {
+        "pad": "/api/office/payroll/regels/haal",
+        "collecties": [
+          "payrollRegelJournaal"
+        ],
+        "opNaam": false
+      },
+      {
+        "pad": "/api/office/rechtsvormwacht",
+        "collecties": [
+          "aiTegoed"
+        ],
+        "opNaam": false
+      }
+    ],
+    "raaktZonderMens": [
+      "/api/office/payroll/dekking/land",
+      "/api/office/payroll/regels/haal",
+      "/api/office/rechtsvormwacht"
+    ],
+    "blindVoor": [
+      {
+        "pad": "/api/office/aidata/export",
+        "waarom": "de route deed werk maar raakte geen gemeten collectie aan"
+      },
+      {
+        "pad": "/api/office/bank/incasso",
+        "waarom": "de route deed werk maar raakte geen gemeten collectie aan"
+      },
+      {
+        "pad": "/api/office/bank/krediet/besluit",
+        "waarom": "de proef kreeg deze route niet aan het werk (de eerste oproep deed geen werk (status 404))"
+      },
+      {
+        "pad": "/api/office/bank/rekening/open",
+        "waarom": "de proef kreeg deze route niet aan het werk (de eerste oproep deed geen werk (status 400))"
+      },
+      {
+        "pad": "/api/office/bank/rekening/rood",
+        "waarom": "de proef kreeg deze route niet aan het werk (de eerste oproep deed geen werk (status 400))"
+      },
+      {
+        "pad": "/api/office/bank/salaris/run",
+        "waarom": "de proef kreeg deze route niet aan het werk (de eerste oproep deed geen werk (status 400))"
+      },
+      {
+        "pad": "/api/office/bank/terugstorting",
+        "waarom": "staat niet in de proefronde"
+      },
+      {
+        "pad": "/api/office/boardroom/toegang/geef",
+        "waarom": "staat niet in de proefronde"
+      },
+      {
+        "pad": "/api/office/export.csv",
+        "waarom": "de route deed werk maar raakte geen gemeten collectie aan"
+      },
+      {
+        "pad": "/api/office/service/machtiging/intrek",
+        "waarom": "staat niet in de proefronde"
+      },
+      {
+        "pad": "/api/office/service/machtiging/tekenbij",
+        "waarom": "staat niet in de proefronde"
+      },
+      {
+        "pad": "/api/office/service/machtigingen",
+        "waarom": "staat niet in de proefronde"
+      }
+    ],
+    "grens": "Deze as ziet alleen wat de idempotentieproef WERKELIJK heeft uitgevoerd. Zij wordt nooit opgeteld bij de padas: twee ondergrenzen die verschillende dingen missen, geven samen geen bovengrens. `blindVoor` noemt de zware routes waarover zij zwijgt."
   },
   "graden": {
     "routes": "gemeten",
@@ -227,7 +319,7 @@
   ],
   "deuren": {
     "officeAuth": 444,
-    "boardroomAuth": 108,
+    "boardroomAuth": 109,
     "balieAuth": 31,
     "techAuth": 16,
     "kluisAuth": 12,

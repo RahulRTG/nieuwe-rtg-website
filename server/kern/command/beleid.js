@@ -43,41 +43,10 @@ const START = [
 function maakBeleid({ db, save, crypto, journaal, vak, start, opslag }) {
   const V = typeof vak === 'function' ? vak : (() => opslag.vak());
   const REGELS = Array.isArray(start) ? start : START;
-  /* LEZEN MAG NIET SCHRIJVEN. reg() zette de startregels weg zodra iemand een
-     waarde OPVROEG; PostgreSQL weigert die stille mutatie met PG_SAVE_ONTBREEKT
-     (alle 5xx op /api/supplier/backoffice in de 100M-ronde), sqlite bewaakt hem
-     niet. regLees()/voorstellenLees() lezen zonder vast te leggen; reg()/
-     voorstellen() staan alleen op paden die met save() eindigen. De startwaarden
-     staan in REGELS en zijn daaruit altijd opnieuw af te leiden. */
-  const startRegel = (b) => ({ id: b.id, wat: b.wat, eenheid: b.eenheid, vierOgen: b.vierOgen, bereik: 'globaal',
-    versies: [{ v: 1, waarde: b.waarde, at: null, door: 'startwaarde', reden: 'de regel zoals hij is opgezet' }] });
-
-  /* Een KOPIE van de buitenste laag: wie hierin schrijft, schrijft in het niets,
-     en dat is op een leespad precies de bedoeling. */
-  function regLees() {
-    const opgeslagen = V().commandBeleid || {};
-    const r = Object.assign({}, opgeslagen);
-    for (const b of REGELS) if (!r[b.id]) r[b.id] = startRegel(b);
-    return r;
-  }
-  function voorstellenLees() {
-    const v = V().commandVoorstellen;
-    return Array.isArray(v) ? v : [];
-  }
-  function reg() {
-    const v = V();
-    if (!v.commandBeleid) v.commandBeleid = {};
-    const r = v.commandBeleid;
-    for (const b of REGELS) {
-      if (!r[b.id]) r[b.id] = startRegel(b);
-    }
-    return r;
-  }
-  function voorstellen() {
-    const v = V();
-    if (!Array.isArray(v.commandVoorstellen)) v.commandVoorstellen = [];
-    return v.commandVoorstellen;
-  }
+  /* De opslagvorm van het register staat in ./beleidregister.js. Kern daarvan:
+     LEZEN MAG NIET SCHRIJVEN -- regLees()/voorstellenLees() leggen niets vast,
+     reg()/voorstellen() wel, en die horen alleen op paden die met save() eindigen. */
+  const { regLees, voorstellenLees, reg, voorstellen } = require('./beleidregister')(V, REGELS);
 
   const nu = () => new Date().toISOString();
   const huidige = (b) => b.versies[b.versies.length - 1];

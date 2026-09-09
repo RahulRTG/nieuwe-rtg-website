@@ -43,32 +43,8 @@ const ZAAK_BELEID = [
 
 function maakZaakCommand({ db, save, crypto, anthropic, findSupplier, commGast }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/zaakcommand/index', bezit: { zaakCommand: 'kaart' } });
-  /* HET VAK ONTSTAAT BIJ SCHRIJVEN, NIET BIJ KIJKEN. `vakken[code] = {}` is een
-     leeg vakje en toch een MUTATIE, en hij viel op het leespad: PG_SAVE_ONTBREEKT,
-     de 5xx op /api/supplier/backoffice. Een leeg vak draagt geen informatie, dus
-     het komt er pas als er echt iets in wordt gezet. */
-  function vakVan(code) {
-    /* kijk() leest zonder te scheppen; bak() maakt de collectie aan, en dat is
-       zelf al een mutatie. */
-    const bestaand = eigen.kijk('zaakCommand')[code];
-    if (bestaand) return bestaand;
-    const echt = () => eigen.kijk('zaakCommand')[code] || null;
-    const schrijf = () => {
-      const vakken = eigen.bak('zaakCommand');
-      return vakken[code] || (vakken[code] = {});
-    };
-    return new Proxy({}, {
-      get: (_d, k) => { const v = echt(); return v ? v[k] : undefined; },
-      has: (_d, k) => { const v = echt(); return v ? k in v : false; },
-      set: (_d, k, w) => { schrijf()[k] = w; return true; },
-      deleteProperty: (_d, k) => { const v = echt(); if (v) delete v[k]; return true; },
-      ownKeys: () => Reflect.ownKeys(echt() || {}),
-      getOwnPropertyDescriptor: (_d, k) => {
-        const b = Object.getOwnPropertyDescriptor(echt() || {}, k);
-        return b ? Object.assign({}, b, { configurable: true }) : undefined;
-      }
-    });
-  }
+  /* Het vak van deze zaak (./vak.js): ontstaat bij SCHRIJVEN, niet bij kijken. */
+  const vakVan = require('./vak')(eigen);
 
   /* Eén laag per zaak, op aanvraag en niet bewaard: een gecachete laag zou een
      verouderd register vasthouden. Kosten: een handvol closures per verzoek. */

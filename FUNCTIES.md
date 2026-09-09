@@ -22,7 +22,7 @@ het?**
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
 <<<<<<< HEAD
-| Kernmodules (`server/kern/**`) | **2055** |
+| Kernmodules (`server/kern/**`) | **2057** |
 | App-pagina's (`public/apps/**.html`) | **292** |
 | Testbestanden | **1737** |
 =======

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-08T20:52:14.988Z",
-    "commit": "7d8195f0e",
+    "op": "2026-09-09T07:44:24.878Z",
+    "commit": "3ef45e4f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -726,6 +726,14 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "bewijsregister.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/norm.js",
+      "operator": "===->!==#9",
+      "gezakt": 1,
+      "geprobeerd": 62
     },
     "bewijsschuld.test.js": {
       "soort": "puur",
@@ -3168,6 +3176,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "leespad-schrijft-niet.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/zaakcommand/index.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "leeszonderscheppen.test.js": {
       "soort": "puur",
@@ -8025,6 +8041,14 @@
       "operator": "&&->||#0",
       "gezakt": 6,
       "geprobeerd": 2
+    },
+    "writehealth-lus.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/postgres-verzoeken.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 4
     },
     "zaaihash.test.js": {
       "soort": "server",

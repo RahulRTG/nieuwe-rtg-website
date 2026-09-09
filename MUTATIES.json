@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-09T21:04:15.691Z",
-    "commit": "39de64a82",
-    "boomVuil": true,
+    "op": "2026-09-09T23:04:50.251Z",
+    "commit": "ea0267f32",
+    "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
@@ -2678,9 +2678,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/shared/i18n/i18n-00.js",
-      "operator": "true->false#0",
+      "operator": "false->true#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 2
     },
     "ideeen.test.js": {
       "soort": "server",
@@ -2787,6 +2787,13 @@
       "module": "server/inzagelog.js",
       "operator": "===->!==",
       "gezakt": 8
+    },
+    "isolatie-lid.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
     },
     "journaalbestand.test.js": {
       "soort": "puur",
@@ -3213,9 +3220,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/zaakcommand/index.js",
-      "operator": "true->false#0",
+      "operator": "getal+1#5",
       "gezakt": 2,
-      "geprobeerd": 1
+      "geprobeerd": 15
     },
     "leeszonderscheppen.test.js": {
       "soort": "puur",
@@ -6981,6 +6988,13 @@
       "gezakt": 4,
       "geprobeerd": 2
     },
+    "taalkast.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "tafeldek.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7578,6 +7592,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "vertaalkast.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/vertaalkast.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "vertrouwenbronnen.test.js": {
       "soort": "puur",
@@ -8349,21 +8371,6 @@
       "staat": "gezakt",
       "module": "scripts/bundel.js",
       "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
-    "taalkast.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "vertaalkast.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/lib/vertaalkast.js",
-      "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 1
     }

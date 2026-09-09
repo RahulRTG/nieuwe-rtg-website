@@ -1214,7 +1214,25 @@
       "url": "/apps/navigatie.html"
     },
     {
+      "label": "File",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
       "label": "Kies vertrekpunt",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
+      "label": "Niet melden",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
+      "label": "Ongeval",
       "app": "Navigatie",
       "wereld": "TravelOS",
       "url": "/apps/navigatie.html"
@@ -1233,6 +1251,12 @@
     },
     {
       "label": "Start begeleiding",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
+      "label": "Wegwerkzaamheden",
       "app": "Navigatie",
       "wereld": "TravelOS",
       "url": "/apps/navigatie.html"

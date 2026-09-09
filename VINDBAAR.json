@@ -1,19 +1,19 @@
 {
   "stempel": {
-    "op": "2026-09-08T20:26:11.856Z",
-    "commit": "0b0621092",
-    "boomVuil": false,
+    "op": "2026-09-09T21:38:38.457Z",
+    "commit": "c8812fe6",
+    "boomVuil": true,
     "boomAnders": 1,
     "instrument": "scripts/vindbaar.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 93,
-  "woorden": 1129,
-  "gevonden": 740,
-  "dekking": 0.6554,
+  "woorden": 1132,
+  "gevonden": 743,
+  "dekking": 0.6564,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -856,8 +856,8 @@
     {
       "naam": "Navigatie",
       "url": "/apps/navigatie.html",
-      "woorden": 12,
-      "gevonden": 11,
+      "woorden": 15,
+      "gevonden": 14,
       "mist": [
         "denkt"
       ]

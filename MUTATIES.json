@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-09T18:26:20.122Z",
-    "commit": "b7af216b",
-    "boomVuil": false,
-    "boomAnders": 2,
+    "op": "2026-09-09T22:11:06.863Z",
+    "commit": "41f052a1",
+    "boomVuil": true,
+    "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -6917,6 +6917,13 @@
       "gezakt": 4,
       "geprobeerd": 2
     },
+    "taalkast.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "tafeldek.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7514,6 +7521,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "vertaalkast.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/vertaalkast.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "vertrouwenbronnen.test.js": {
       "soort": "puur",

@@ -21,36 +21,11 @@ const { volledigeBoodschap } = require('./translate/boodschap');
 let anthropic = null;
 function setAnthropic(a) { anthropic = a; }
 
-/* De vertaalkast (server/lib/vertaalkast.js) is de laag ONDER de geheugencache:
-   vertaalde interface die een herstart overleeft. Bewust optioneel -- zonder
-   kast werkt alles zoals eerder, alleen koud. Alleen wie `bewaar: true` zegt
-   mag erin, en dat zegt uitsluitend /api/vertaal/ui: wat een lid TYPT is geen
-   interface en hoort niet op schijf naast de knoppen van het huis. */
-let kast = null;
-function setVertaalkast(k) { kast = k; }
-
-/* Vertaal-cache met een vaste bovengrens: bij een hit schuift de sleutel naar
-   achteren (LRU), boven de grens valt de oudste eruit. Zonder grens groeit de
-   Map met elke unieke (taal, tekst)-combinatie mee en lekt de server geheugen
-   onder vuur van willekeurige teksten. */
-const cache = new Map();
-/* Deze grens blijft 5000 en dat is met opzet, ook nu de kast er is. Zij is er
-   voor de LOSSE BERICHTEN -- de weg waar willekeurige ingetypte tekst langskomt
-   -- en dat is precies het geval waarvoor de bovenstaande alinea werd
-   geschreven. De interface wordt niet hier maar in de kast bewaard, die per
-   taal een eigen tabel houdt en dus zonder deze grens toe kan. */
-const CACHE_MAX = 5000;
-
-function cacheLees(key) {
-  if (!cache.has(key)) return null;
-  const hit = cache.get(key);
-  cache.delete(key); cache.set(key, hit);
-  return hit;
-}
-function cacheSchrijf(key, waarde) {
-  cache.set(key, waarde);
-  if (cache.size > CACHE_MAX) cache.delete(cache.keys().next().value);
-}
+/* De cache staat in ./translate/cache.js: twee lagen met verschillende
+   levensduur (een begrensd geheugen voor losse berichten, en de kast op schijf
+   voor vertaalde interface). Zie de kop daar voor waarom ze niet hetzelfde zijn
+   en waarom een kasttreffer niet naar het geheugen klimt. */
+const { setVertaalkast, cacheLees, cacheSchrijf, kastLees, kastSchrijf } = require('./translate/cache');
 
 /* Ruwe taalherkenning voor het geval de bron-taal niet is meegegeven. */
 function detect(text) {
@@ -147,12 +122,7 @@ async function translateBatch(teksten, to, from, opties) {
       uit[i] = { text: hit, translated: hit !== text, from: bron };
       continue;
     }
-    /* De kast staat NAAST het geheugen en BOVEN het woordenboek: een eerder
-       gemaakte vertaling is beter dan een terugval en kost geen model. Een
-       treffer wordt hier bewust NIET naar `cache` gekopieerd: de kast houdt zijn
-       tabel per taal zelf in het geheugen, dus dat zou dezelfde regel een tweede
-       keer opslaan. Alleen de eerste lezing van een taal raakt de schijf. */
-    const uitKast = (bewaarMag && kast) ? kast.lees(to, text) : null;
+    const uitKast = kastLees(bewaarMag, to, text);
     if (uitKast != null) {
       uit[i] = { text: uitKast, translated: uitKast !== text, from: bron };
       continue;
@@ -188,9 +158,7 @@ async function translateBatch(teksten, to, from, opties) {
            cacheantwoord vastzetten. Alleen echte vertaling is een cache-hit. */
         if (result !== item.text) {
           cacheSchrijf(item.key, result);
-          /* Alleen een ECHTE vertaling van een regel die de aanroeper
-             interface noemt gaat de schijf op. */
-          if (bewaarMag && kast) kast.schrijf(to, item.text, result);
+          kastSchrijf(bewaarMag, to, item.text, result);   // alleen echte vertaling van echte interface
         }
         uit[item.i] = { text: result, translated: result !== item.text, from: item.bron };
       });

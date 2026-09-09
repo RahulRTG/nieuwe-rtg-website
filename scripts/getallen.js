@@ -62,6 +62,16 @@ const GETALLEN = {
   /* De kantoormacht: staat er een MENS achter de handeling (KANTOOR.md par. 1,
      KANTOORMACHT.md blok 0). De harde assen komen uit de router; `anoniem` is
      lexicaal en dus een ONDERgrens -- die graad hoort in het proza te staan. */
+  'overleving.ja': { bron: 'OVERLEVING.json', veld: 'telling.ja',
+    wat: 'compromis-scenario\'s die RTG aantoonbaar overleeft' },
+  'overleving.deels': { bron: 'OVERLEVING.json', veld: 'telling.deels',
+    wat: 'compromis-scenario\'s waar iets tussen staat, maar niet over de volle breedte' },
+  'overleving.nee': { bron: 'OVERLEVING.json', veld: 'telling.nee',
+    wat: 'compromis-scenario\'s die RTG gemeten NIET overleeft' },
+  'overleving.onbekend': { bron: 'OVERLEVING.json', veld: 'telling.onbekend',
+    wat: 'compromis-scenario\'s waarover niemand heeft gemeten' },
+  'overleving.rijen': { bron: 'OVERLEVING.json', veld: 'telling.rijen',
+    wat: 'compromis-scenario\'s in de overlevingsmeter' },
   'kantoor.routes': { bron: 'KANTOORMACHT.json', veld: 'gemeten.routes',
     wat: 'kantoorroutes achter /api/office en /api/boardroom' },
   'kantoor.deurEistMens': { bron: 'KANTOORMACHT.json', veld: 'gemeten.deurEistMens',
@@ -324,7 +334,7 @@ const GETALLEN = {
    alles: een generator die elk .md-bestand mag herschrijven, herschrijft op een
    dag ook iets dat niemand had bedoeld. */
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
-  'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md'];
+  'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

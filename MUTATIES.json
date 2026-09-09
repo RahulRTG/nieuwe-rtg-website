@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-09T13:00:50.746Z",
-    "commit": "e79aa9634",
+    "op": "2026-09-09T18:26:20.122Z",
+    "commit": "b7af216b",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -2336,6 +2336,14 @@
       "gezakt": 7,
       "geprobeerd": 1
     },
+    "herkomstwereld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/herkomstschakelaar.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "herstel-sandbox.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4605,6 +4613,14 @@
       "gezakt": 18,
       "scherp": "gezakt"
     },
+    "overleving.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/overleving.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "overname.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5963,6 +5979,13 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "schaduwtelling.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "schakelkast-dekking.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7200,6 +7223,13 @@
       "operator": "!==->===#0",
       "gezakt": 6,
       "geprobeerd": 6
+    },
+    "tweedehandtekening.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
     },
     "txgeld.test.js": {
       "soort": "puur",

@@ -177,6 +177,13 @@
      (de norm telt ze daarom), en een rij die op twintig plekken dezelfde vier
      declaraties herhaalt is op geen enkele plek te wijzigen. */
   .bk-lab{display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;}
+  /* De wachtrij voor een tweede handtekening. Als KLASSE en niet als
+     style="..."-attribuut: die attributen houden style-src-attr in de CSP open,
+     en hun aantal is een ratel die alleen mag dalen. */
+  .bk-th{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,.08);}
+  .bk-th-wat{flex:1;min-width:14rem;}
+  .bk-th-meta{font-size:.75rem;color:var(--soft);}
+  .bk-th-weg{border-color:var(--burgundy);}
   .bk-stil{color:var(--soft);}
   /* --burgundy is in dit bestand al #C23A5E, de variant voor op zwart. */
   .bk-let{color:var(--burgundy);}
@@ -902,6 +909,9 @@
 
     <h3 class="sec">De Regelwacht: belastingen en regels, automatisch bij</h3>
     <div class="kaart" id="bankRegels"><div class="leeg">Laden…</div></div>
+
+    <h3 class="sec">Wacht op een tweede handtekening</h3>
+    <div class="kaart lijst" id="bankTweedeHand"><div class="leeg">Niets in afwachting.</div></div>
 
     <h3 class="sec">Openstaande kredietaanvragen (een mens beslist)</h3>
     <div class="kaart lijst" id="bankKrediet"><div class="leeg">Geen aanvragen.</div></div>
@@ -2612,8 +2622,15 @@ async function openBank(){
 }
 async function bankVervers(){
   try {
+    /* DE OPENSTAANDE HANDTEKENINGEN HANGEN ER APART BIJ, en niet in deze
+       Promise.all. Dat is een les die deze kamer al een keer heeft geleerd: een
+       enkele weigering in de bundel liet de HELE kamer niet renderen, en dan
+       lijkt een deur die dichtging op een stuk scherm. Wie de lijst niet mag
+       zien, hoort de rest gewoon te krijgen. */
     const [o, k, rg, bv, op] = await Promise.all([api('bank'), api('bank/krediet'), api('bank/regels'),
       api('bank/bevoegdheid'), api('bank/opdrachten', { limit: 8 })]);
+    api('bank/handtekening/open').then(h => bankRenderTweedeHand(h.aanvragen))
+      .catch(() => bankRenderTweedeHand([]));
     bankRenderKnop(o.regie); bankRenderGezond(o.gezondheid); bankRenderInstel(o.regie); bankRenderRegels(rg);
     bankRenderRail(o.gezondheid, op); bankRenderVergunning(bv); bankRenderBevoegd(bv);
     bankRenderKrediet(k.aanvragen); bankRenderSalaris(o.rekeningen); bankRenderRekOpen(); bankRenderRek(o.rekeningen);
@@ -2622,7 +2639,15 @@ async function bankVervers(){
 async function bankRonde(soort){
   try {
     if (soort === 'rente'){ const d = await api('bank/rente', {}); meld(d.bijgeschrevenCenten > 0 ? 'Rente bijgeschreven: ' + bkEuro(d.bijgeschrevenCenten) : 'Geen nieuwe rente (0 dagen verstreken).'); }
-    else { const d = await api('bank/incasso', {}); meld(d.uitgevoerd > 0 ? d.uitgevoerd + ' vaste betaling(en): ' + bkEuro(d.bedragCenten) : 'Niets aan de beurt.'); }
+    else {
+      const d = await api('bank/incasso', {});
+      /* DE INCASSORONDE VRAAGT SINDS 9 SEPTEMBER EEN TWEEDE MENS. Zonder deze
+         tak leest `d.uitgevoerd > 0` als false op een AANVRAAG, en dan meldde
+         dit scherm "Niets aan de beurt" terwijl er een aanvraag klaarstond --
+         een knop die zichtbaar niets deed en er ook nog over loog. */
+      if (d.needsAuth) meld('Aangevraagd. Een tweede collega bevestigt dit hieronder.');
+      else meld(d.uitgevoerd > 0 ? d.uitgevoerd + ' vaste betaling(en): ' + bkEuro(d.bedragCenten) : 'Niets aan de beurt.');
+    }
     bankVervers();
   } catch (e) { meld(e.message); }
 }
@@ -2904,6 +2929,34 @@ function bankRenderRegels(s){
     try { const d = await api('bank/regels/check'); meld(d.ok ? (d.bron ? 'Bron gecontroleerd: ' + (d.bijgewerkt || 0) + ' land(en) bijgewerkt.' : 'Geen externe bron gekoppeld; het peiljaar plus doorgevoerde updates geldt.') : d.fout); bankVervers(); }
     catch (e) { meld(e.message); }
   });
+}
+/* WACHT OP EEN TWEEDE HANDTEKENING. Rood-staan-ruimte geven en een incassoronde
+   draaien vragen twee verschillende mensen (kern/kantoor/tweedehandtekening.js).
+   Zonder dit paneel is de aanvraag onzichtbaar: er staat dan iets klaar dat
+   niemand kan afmaken, en dat leest als een knop die niet werkt.
+
+   De server weigert een bevestiging door de aanvrager zelf; het scherm laat de
+   knop wel staan. Dat is met opzet -- een grijze knop zonder uitleg is precies
+   wat GRAMMATICA.md verbiedt, en de weigering van de server zegt waarom. */
+function bankRenderTweedeHand(rij){
+  const el = $('#bankTweedeHand'); if (!el) return;
+  if (!rij || !rij.length){ el.innerHTML = '<div class="leeg">Niets in afwachting.</div>'; return; }
+  el.innerHTML = rij.map(a =>
+    '<div class="bk-th"><span class="bk-th-wat"><strong>' + esc(a.wat) + '</strong>' +
+    (a.onderwerp ? ' · ' + esc(a.onderwerp) : '') +
+    '<br><span class="bk-th-meta">aangevraagd door ' + esc(a.aangevraagdDoor) +
+    ' · verloopt over ' + Math.round((a.verlooptOverMs || 0) / 60000) + ' min</span></span>' +
+    '<button class="knop stil" data-tekenen="' + esc(a.id) + '">Ik ben iemand anders: bevestig</button>' +
+    '<button class="knop stil bk-th-weg" data-intrek="' + esc(a.id) + '">Intrekken</button></div>').join('');
+  el.querySelectorAll('[data-tekenen]').forEach(b => b.addEventListener('click', async () => {
+    try { const d = await api('bank/handtekening/bevestig', { id: b.dataset.tekenen });
+      meld('Getekend en uitgevoerd: ' + (d.wat || d.handeling || 'gedaan') + '.'); bankVervers(); }
+    catch (e) { meld(e.message); }
+  }));
+  el.querySelectorAll('[data-intrek]').forEach(b => b.addEventListener('click', async () => {
+    try { await api('bank/handtekening/intrek', { id: b.dataset.intrek }); meld('Ingetrokken.'); bankVervers(); }
+    catch (e) { meld(e.message); }
+  }));
 }
 function bankRenderKrediet(rij){
   if (!rij || !rij.length){ $('#bankKrediet').innerHTML = '<div class="leeg">Geen openstaande aanvragen.</div>'; return; }

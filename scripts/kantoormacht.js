@@ -59,6 +59,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 const { alleRoutes } = require('./lib/routes.js');
+const { meetEffect } = require('./lib/zwaareffect.js');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'KANTOORMACHT.json');
@@ -75,10 +76,82 @@ const KANTOORPAD = /^\/api\/(office|boardroom)\//;
      naamAuth       mens leidt, is geen spoor"; twee redenen, een implementatie
    - eigenaarAlleen de eigenaar is een persoon, geen code
      alleenBaas
+   - balieAuth     server/routes/ledenbalie.js -- leest boardroomWie(req) en
+                   weigert de gedeelde code letterlijk: "de gedeelde kantoorcode
+                   opent wel de ruimte, maar wijst niemand aan". Hij stond hier
+                   NIET in, en dat was een ondertelling van tot eenendertig
+                   routes: de meter las hem als een rolcontrole omdat hij naast
+                   officeAuth staat, terwijl hij juist de mens erachter opzoekt.
+                   Gevonden bij het bedraden van de zware kantoorroutes -- vijf
+                   ervan bleken al beschermd, en "repareren" wat al klopt is de
+                   duurste manier om een getal te laten bewegen.
    Wie hier iets bij zet, leest eerst de bron van die bewaker. Een bewaker die
    alleen een ROL controleert, hoort er niet bij: `office` is een rol en geen
    mens, en dat verschil is het hele punt van dit script. */
-const EIST_MENS = new Set(['boardroomAuth', 'kluisAuth', 'naamAuth', 'eigenaarAlleen', 'alleenBaas']);
+const EIST_MENS = new Set(['boardroomAuth', 'kluisAuth', 'naamAuth', 'eigenaarAlleen', 'alleenBaas', 'balieAuth']);
+
+/* WELKE KANTOORROUTES ZWAAR ZIJN, en waarom die lijst niet zelfverzonnen is.
+   De klassen komen uit kern/isolatie/herkomst.js: dat bestand noemt de effecten
+   die nooit uit een naamloze bron mogen komen (GELD_BEWEGEN, RECHT_VERLENEN,
+   BULK_UITVOER). Dit is dezelfde vraag, een verdieping lager: mag een GEDEELDE
+   CODE dat wel?
+
+   HET IS EEN PADHERKENNING EN DUS EEN ONDERGRENS, geen effectmeting -- een route
+   die geld beweegt zonder dat zijn pad dat verraadt, valt hier buiten. Vandaar
+   graad `vermoed` op de teller en niet `gemeten`. Wie hier iets bij zet,
+   verbreedt de meting; wie iets weghaalt, moet uitleggen waarom die handeling
+   met een gedeelde code mag.
+
+   DE LIJST IS OP 9 SEPTEMBER 2026 VERSMALD, EN DAT IS EEN CORRECTIE EN GEEN
+   VERSOEPELING. Hij matchte op ONDERWERPEN (`bank/krediet`, `bank/rekening`,
+   `bank/salaris`, `bank/bevoegdheid`, `office/rechten`) terwijl de drie klassen
+   hierboven allemaal EFFECTEN zijn. Daardoor telde hij vier LEZINGEN mee als
+   zwaar: het kredietbord opvragen, het salarisvoorstel uitrekenen, de
+   bevoegdheidsmatrix lezen en de machtskaart lezen (die laatste is volgens
+   KANTOORMACHT.md par. 3 met opzet uitsluitend lezend). Geen van die vier
+   veroorzaakt GELD_BEWEGEN, RECHT_VERLENEN of BULK_UITVOER.
+
+   Een ondergrens mag dingen MISSEN; hij mag niet iets aanwijzen dat er niet is.
+   Een valse `nee` is hier even schadelijk als een valse `ja`: hij stuurt de
+   volgende lezer naar een deur die niets oplevert, en daarna gelooft niemand de
+   meter meer. De regexen noemen daarom nu de HANDELING (`krediet/besluit`,
+   `rekening/open`, `salaris/run`) en niet het onderwerp.
+
+   WAT ER NIET GEBEURT: de vier verdwijnen niet. Ze staan onder `zwaarLezend` in
+   het register, met hun pad, zodat een lezer ziet wat er buiten valt en waarom.
+   Een correctie die de vorige telling onzichtbaar maakt, is geen correctie. */
+const ZWAAR = [
+  ['GELD_BEWEGEN', /(bank\/(incasso|krediet\/besluit|rekening\/(open|rood|bevries)|salaris\/run)|terugstort|uitbetaal)/i],
+  ['RECHT_VERLENEN', /(machtig|toegang\/geef)/i],
+  ['BULK_UITVOER', /export/i]
+];
+const isZwaar = (pad) => ZWAAR.some(([, re]) => re.test(pad));
+
+/* De onderwerpen die de oude, te brede lijst aanwees. Ze worden apart geteld en
+   met naam genoemd: dit is wat er UIT de zware bak viel, niet wat er verdween. */
+const ZWAAR_ONDERWERP = /(bank\/(krediet|rekening|salaris|bevoegdheid)|office\/rechten)/i;
+const isZwaarLezend = (pad) => !isZwaar(pad) && ZWAAR_ONDERWERP.test(pad);
+
+/* VRAAGT DEZE ROUTE EEN TWEEDE MENS? Per ROUTE en niet per bestand, en dat is
+   hier het hele punt. `handlerKentMens` mag een BOVENgrens zijn omdat een te
+   hoge schatting daar tot meer werk leidt; hier zou een bestandsbrede treffer
+   zeggen dat elke route in bank-rekeningen.js een tweede handtekening heeft
+   terwijl er twee van de acht een hebben. Dat is een valse `ja` op een
+   beveiligingsvraag, en die is erger dan geen antwoord.
+
+   DE SNEDE LOOPT TOT DE VOLGENDE `app.post(`, en die grens staat er met een
+   reden: scripts/overleving.js heeft precies deze fout een keer gemaakt -- de
+   apparaat-probe las zeshonderd tekens vanaf een merkteken, liep door in de
+   buurstap en meldde dat het toestel werd gecontroleerd. Een venster op tekens
+   is een gok; een venster tot het volgende blok is een grens. */
+function vraagtTweedeHand(bron, pad) {
+  const merk = "app.post('" + pad + "'";
+  const i = bron.indexOf(merk);
+  if (i < 0) return false;
+  const rest = bron.slice(i + merk.length);
+  const eind = rest.indexOf('app.post(');
+  return /tweedeHand\.vraag\(/.test(eind < 0 ? rest : rest.slice(0, eind));
+}
 
 /* De twee manieren waarop een handler de handelende mens kan kennen. Beide zijn
    echt in gebruik, en wie er maar een van zoekt telt een factor tien mis --
@@ -166,6 +239,30 @@ function meet() {
     machinerie[naam] = { wat, aanKantoorroute: aan.length, aanroepersInServer: aanroepersTotaal };
   }
 
+  /* De zware routes en hoeveel er GEEN mens achter hebben. Dit is het getal dat
+     zegt of een gestolen kantoorcode iets onomkeerbaars kan; het aantal gedeelde
+     deuren alleen zegt dat niet, want de meeste kantoorroutes zijn dagelijks
+     werk. */
+  const heeftMens = (r) => (r.bewakers || []).some(b => EIST_MENS.has(b));
+  const zwareRoutes = routes.filter(r => isZwaar(r.pad));
+  const zwaarOpen = zwareRoutes.filter(r => !heeftMens(r));
+  /* En hoeveel er een TWEEDE mens vragen. Dit getal stond tot 9 september op nul
+     omdat het uit `machinerie.vierogen` kwam -- een telling van bestanden die
+     een module requiren, en die miste de scheiding die er wel was
+     (kern/payroll/run.js). Nu wordt de vraag rechtstreeks gesteld, per route. */
+  const tweedeHandRoutes = routes.filter(r => vraagtTweedeHand(lees(r.bestand), r.pad));
+  /* En de lezingen op een zwaar onderwerp, apart geteld. Zie de kop bij ZWAAR:
+     dit is wat er uit de zware bak viel toen die van onderwerpen naar
+     handelingen ging. Ze staan hier MET pad, want een correctie die zijn eigen
+     vorige telling onzichtbaar maakt is geen correctie maar een opruiming. */
+  const lezendRoutes = routes.filter(r => isZwaarLezend(r.pad));
+  const lezendOpen = lezendRoutes.filter(r => !heeftMens(r));
+
+  /* DE TWEEDE AS, langs de andere kant: niet hoe een route HEET maar wat zij
+     heeft AANGERAAKT. Zie scripts/lib/zwaareffect.js voor waarom die twee nooit
+     worden opgeteld, en waarom zijn DEKKING het belangrijkste getal is. */
+  const effect = meetEffect(routes, isZwaar, heeftMens, WORTEL);
+
   return {
     soort: 'meting',
     uitleg: 'Blok 0 van KANTOORMACHT.md: staat er een MENS achter elke kantoorhandeling? ' +
@@ -175,6 +272,23 @@ function meet() {
       'op BESTANDSniveau en draagt daarom `vermoed` -- een bestand dat officeKey noemt gebruikt ' +
       'hem misschien niet in elke route erin. `handlerKentMens` is dus een BOVENgrens en ' +
       '`anoniemUitvoerbaar` een ONDERgrens. Een deploy-gate hoort aan de harde as te hangen.',
+    /* DE RATEL HEEFT EEN UITGANG, EN DIE STAAT HARDOP. `anoniemUitvoerbaar` mag
+       alleen dalen, en de enige manier om hem te laten stijgen is een hoger
+       getal vastleggen. Dat is een echte uitgang -- wie hem stil gebruikt,
+       sloopt de ratel zelf (SERVICE.md par. 13, de OPEN_MAX-verhoging). Elke
+       stijging krijgt daarom een regel hier, met de reden EN met wat hem weer
+       omlaag brengt; test/kantoormacht.test.js weigert een stijging zonder. */
+    ratelverhogingen: [
+      { as: 'anoniemUitvoerbaar', van: 365, naar: 369, op: '2026-09-09',
+        reden: 'Vier LEZINGEN stonden een dag achter kluisAuth (kredietbord, salarisvoorstel, ' +
+          'bevoegdheidsmatrix, machtskaart) en zijn teruggezet naar de gedeelde code. ' +
+          'KANTOORMACHT.md zet ENFORCE_EXECUTE bewust voor ENFORCE_READ: lezen raakt elk scherm ' +
+          'voor de kleinste risicoreductie, en het bank-scherm rendeerde er niet meer door -- ' +
+          'bankVervers() haalt kredietbord en matrix in een Promise.all op, dus de hele kamer ' +
+          'viel om. Nog altijd 16 lager dan main (385).',
+        omlaag: 'De zes uitvoerende bankknoppen staan nu op naam; de volgende stap is niet deze ' +
+          'vier lezingen maar de 13 zware routes buiten de bank, en daarna ENFORCE_READ per kamer.' }
+    ],
     stempel: { op: new Date().toISOString(), commit: commit(), node: process.version },
     gemeten: {
       routes: routes.length,
@@ -185,8 +299,25 @@ function meet() {
       anoniemUitvoerbaar: anoniem.length,
       metSpoor,
       metReden,
-      bestanden: kantoorBestanden.length
+      bestanden: kantoorBestanden.length,
+      zwaar: zwareRoutes.length,
+      zwaarZonderMens: zwaarOpen.length,
+      zwaarLezend: lezendRoutes.length,
+      zwaarLezendZonderMens: lezendOpen.length,
+      metTweedeHandtekening: tweedeHandRoutes.length
     },
+    /* De paden erbij, en niet alleen de tellingen. Een `4` zonder namen wordt
+       door de lezer gevuld met zijn eigen indruk -- dezelfde reden dat
+       scripts/overleving.js `onbekend` nooit als `deels` wegschrijft. */
+    zwaarePaden: {
+      zonderMens: zwaarOpen.map(r => r.pad).sort(),
+      lezendZonderMens: lezendOpen.map(r => r.pad).sort(),
+      tweedeHandtekening: tweedeHandRoutes.map(r => r.pad).sort()
+    },
+    /* De effectas staat NAAST `gemeten` en niet erin: hij deelt geen teller met
+       de padas, want dan zou iemand ze optellen. Zie de kop van
+       scripts/lib/zwaareffect.js. */
+    zwaarEffect: effect,
     graden: {
       routes: 'gemeten',
       deurEistMens: 'gemeten',
@@ -195,13 +326,25 @@ function meet() {
       handlerKentMens: 'vermoed',
       anoniemUitvoerbaar: 'vermoed',
       metSpoor: 'vermoed',
-      metReden: 'vermoed'
+      metReden: 'vermoed',
+      zwaar: 'vermoed',
+      zwaarZonderMens: 'vermoed',
+      zwaarLezend: 'vermoed',
+      zwaarLezendZonderMens: 'vermoed',
+      metTweedeHandtekening: 'vermoed'
     },
     ongemeten: {
       risicoPerRoute: 'er is geen risicomodule in dit huis (KANTOORMACHT.md par. 3); ' +
         'een 0 zou hier "gemeten en niet aanwezig" beweren, en dat is onwaar',
       vierOgenVereist: 'welke handeling vier ogen VERDIENT is een besluit en geen meting; ' +
         'wat wel gemeten is, staat in `machinerie.vierogen`',
+      vierOgenBuitenDeModule: 'machinerie.vierogen telt bestanden die kern/appstore/vierogen REQUIREN, en dat is ' +
+        'een lexicale telling van EEN implementatie. Er is er minstens nog een: kern/payroll/run.js draagt een ' +
+        'eigen ladder (concept, gecontroleerd, manager, administrateur, definitief) met "NOOIT dezelfde persoon", ' +
+        'en /api/office/bank/salaris/run betaalt alleen een DEFINITIEVE run uit. Die route bereikt payroll via de ' +
+        'kern-tas (kern.payrollOS) en niet via een require, dus deze grep kan hem per constructie niet zien. Lees de ' +
+        '0 als "nul routes gebruiken DIE module" en nooit als "nergens tekent een tweede mens" -- dezelfde faalvorm ' +
+        'als de balieAuth-ondertelling hierboven.',
       historischeToestand: 'er is geen versiegeschiedenis van entiteiten (par. 18)'
     },
     machinerie,
@@ -220,6 +363,26 @@ function toon(u) {
   console.log('  ANONIEM UITVOERBAAR      ' + g.anoniemUitvoerbaar + '   vermoed (ondergrens)');
   console.log('  schrijft een spoor       ' + g.metSpoor + '   vermoed');
   console.log('  vraagt een reden         ' + g.metReden + '   vermoed');
+  /* De twee zware assen onder elkaar, met de dekking van de tweede ERBIJ. Zonder
+     die dekking leest "0 zonder mens" als een geruststelling; met de dekking
+     erbij leest hij als wat hij is -- een uitspraak over 14% van de kamer. */
+  const e = u.zwaarEffect || {};
+  console.log('\n  zwaar: twee assen, nooit opgeteld');
+  console.log('    op PAD (hoe heet je)      ' + g.zwaar + ' zwaar, ' +
+    g.zwaarZonderMens + ' zonder mens   vermoed (ondergrens)');
+  if (!e.bruikbaar) {
+    console.log('    op EFFECT (wat raak je)   niet te meten: ' + (e.reden || 'onbekend'));
+  } else {
+    console.log('    op EFFECT (wat raak je)   ' + e.raakt.length + ' raken geld, ' +
+      e.raaktZonderMens.length + ' zonder mens   vermoed');
+    console.log('      dekking: ' + e.dekking.gemeten + ' van ' + e.dekking.totaal +
+      ' routes werkelijk gemeten (' + e.dekkingPct + '%) -- ' + e.dekking.geenWerk +
+      ' kreeg de proef niet aan het werk, ' + e.dekking.geenOpslag + ' raakte niets, ' +
+      e.dekking.nietInProef + ' staat niet in de proef');
+    if (e.blindVoor.length)
+      console.log('      BLIND voor ' + e.blindVoor.length + ' van de ' + g.zwaar +
+        ' zware routes -- juist de bankknoppen; die vragen een wereld die de proef niet opzet');
+  }
   console.log('\n  de machinerie -- bestaat, hangt hij aan de kantoordeur?');
   for (const [naam, m] of Object.entries(u.machinerie)) {
     console.log('    ' + naam.padEnd(13) + 'kantoor: ' + String(m.aanKantoorroute).padStart(3) +

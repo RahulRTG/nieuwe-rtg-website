@@ -81,9 +81,20 @@ function opstelling({ afdwingen }) {
   const oud = process.env.RTG_HERKOMST_AFDWINGEN;
   if (afdwingen) process.env.RTG_HERKOMST_AFDWINGEN = '1';
   else delete process.env.RTG_HERKOMST_AFDWINGEN;
+  /* DE SCHAKELAAR LEEST DE OMGEVING EEN KEER, en dat is met opzet: hij KEURT de
+     waarde ook, en een keuring die per aanroep gooit gooit midden in een
+     gesprek. Voor een proces klopt dat -- de omgeving verandert daar niet -- maar
+     hier wisselt hij tussen twee toetsen door, en dan wint het geheugen van de
+     vorige. Toets 3 stond daardoor op de stand van toets 4 en mat de bijtende
+     poort NIET terwijl hij groen bleef. `vergeet()` bestaat precies hiervoor;
+     wie hem vergeet, toetst de vorige toets nog een keer. */
+  require('../server/kern/stuur/herkomstschakelaar').vergeet();
   return { iso, filter, vuil, stap, geroepen,
-    herstel: () => { if (oud === undefined) delete process.env.RTG_HERKOMST_AFDWINGEN;
-      else process.env.RTG_HERKOMST_AFDWINGEN = oud; } };
+    herstel: () => {
+      if (oud === undefined) delete process.env.RTG_HERKOMST_AFDWINGEN;
+      else process.env.RTG_HERKOMST_AFDWINGEN = oud;
+      require('../server/kern/stuur/herkomstschakelaar').vergeet();
+    } };
 }
 
 /* De twijfelpoort (kern/rahul/twijfel.js) staat VOOR de herkomstpoort en eist

@@ -73,7 +73,7 @@
       "naam": "het toestel geeft geen locatie af",
       "belofte": "binnen drie seconden een poort met de reden, een uitweg, en een badge die niet doet alsof de motor draait",
       "stand": "gehouden",
-      "wat": "poort na 470 ms, reden \"Uw toestel geeft geen locatie af. Kies zelf uw vertrekpunt; RTG verzin\", badge \"Locatie onbekend\", uitweg: true"
+      "wat": "poort na 670 ms, reden \"Uw toestel geeft geen locatie af. Kies zelf uw vertrekpunt; RTG verzin\", badge \"Locatie onbekend\", uitweg: true"
     },
     {
       "naam": "een lid dat zelf zijn vertrekpunt kiest",

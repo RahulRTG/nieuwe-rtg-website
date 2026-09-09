@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-09T20:45:37.262Z",
-    "commit": "463cffab2",
-    "boomVuil": false,
+    "op": "2026-09-09T21:04:15.691Z",
+    "commit": "39de64a82",
+    "boomVuil": true,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
@@ -575,6 +575,14 @@
       "operator": "!==->===#0",
       "gezakt": 3,
       "geprobeerd": 2
+    },
+    "beproeving-contract.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/verhalen.js",
+      "operator": "+->-#2",
+      "gezakt": 1,
+      "geprobeerd": 17
     },
     "bereikbaar.test.js": {
       "soort": "puur",
@@ -4159,6 +4167,14 @@
       "operator": "+->-#0",
       "gezakt": 4,
       "geprobeerd": 2
+    },
+    "navigatieproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/plek.js",
+      "operator": "===->!==#2",
+      "gezakt": 1,
+      "geprobeerd": 11
     },
     "negenplus.test.js": {
       "soort": "server",

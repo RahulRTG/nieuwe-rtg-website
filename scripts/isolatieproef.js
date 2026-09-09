@@ -637,6 +637,7 @@ const noemers = {};
     handhaaft: (() => {
       const lus = fs.readFileSync(path.join(root, 'server/kern/stuur/lus.js'), 'utf8');
       const stap = fs.readFileSync(path.join(root, 'server/kern/stuur/lusstap.js'), 'utf8');
+      const WERELDEN = Object.keys(require('../server/kern/stuur/beleid-lijsten').LEZEN);
       const geeftDoor = /stuurPaden\(app, opties\.wereld, isoContext\(\), vuil\.bronnen\(\)\)/.test(lus);
       const poortBijDoe = /herkomstpoort\(pad, wereld\)/.test(stap);
       const meldt = /vuil\.meldToolantwoord\(pad\)/.test(stap);
@@ -644,11 +645,25 @@ const noemers = {};
         kaartVersmalt: geeftDoor,
         poortBijUitvoeren: poortBijDoe,
         besmettingGeboekt: meldt,
-        bijt: process.env.RTG_HERKOMST_AFDWINGEN === '1',
+        /* BIJT HIJ, EN VOOR WIE? Sinds 9 september 2026 is de schakelaar PER
+           WERELD (kern/stuur/lusstap.js): `1` of `alle` zet alle drie aan, een
+           lijst zet er een paar aan, en een onbekende naam GOOIT in plaats van
+           stil uit te blijven. Een enkele boolean kon de middelste stap van
+           CONTROLPLANE.md -- eerst beperkt, dan wereld voor wereld -- niet
+           uitdrukken; `bijt` is daarom een LIJST en geen ja/nee. Leeg betekent
+           hier "voor niemand", en dat leest anders dan `false`. */
+        bijt: (() => {
+          const rauw = String(process.env.RTG_HERKOMST_AFDWINGEN || '').trim();
+          if (!rauw) return [];
+          if (rauw === '1' || rauw.toLowerCase() === 'alle') return WERELDEN.slice();
+          return rauw.split(/[,\s]+/).filter(Boolean).map(w => w.toLowerCase()).filter(w => WERELDEN.includes(w));
+        })(),
+        werelden: WERELDEN.slice(),
         wat: geeftDoor && poortBijDoe && meldt
           ? 'de leiding ligt er: de lus boekt zijn kanalen, de kaart versmalt erop en de poort ' +
-            'hangt VOOR de uitvoering. Hij BIJT alleen met RTG_HERKOMST_AFDWINGEN=1; daarzonder telt ' +
-            'hij en houdt hij niets tegen (CONTROLPLANE.md: eerst in de schaduw).'
+            'hangt VOOR de uitvoering. Hij BIJT per WERELD: RTG_HERKOMST_AFDWINGEN noemt de werelden ' +
+            '(of "1"/"alle"), en waar hij niet genoemd is telt hij en houdt hij niets tegen ' +
+            '(CONTROLPLANE.md: eerst in de schaduw, dan wereld voor wereld).'
           : 'de leiding is INCOMPLEET; wat hier ontbreekt maakt de regel dood'
       };
     })(),

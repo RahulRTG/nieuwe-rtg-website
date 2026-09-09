@@ -518,6 +518,11 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     'server/opzet/leverancierpoort.js',
     'public/apps/app-main/app-main-09a.js',
     'public/shared/teamcall/teamcall-01.js',
+    /* server/db/postgres-verzoeken.js STOND HIER en is er weer af: de naad die
+       er met naam bij stond is gemaakt. De vertaling van een opslagfout naar een
+       antwoord (foutAntwoord, namenVan, de logregel) woont nu in
+       server/db/opslagfout.js -- die raakt geen enkele toestand van de poort. Van
+       12,3 naar 10,1 KB. Zo hoort deze lijst te krimpen. */
     /* DRIE UIT DE IDEM- EN UITROLRONDE, en op 3 september 2026 zijn ze alle drie
        geknipt op de naad die hier stond (TAKEN.md 5.57). Twee zijn daarmee van
        deze lijst af:

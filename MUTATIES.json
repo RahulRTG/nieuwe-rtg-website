@@ -8271,6 +8271,62 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "bewijsregister.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/norm.js",
+      "operator": "===->!==#9",
+      "gezakt": 1,
+      "geprobeerd": 62
+    },
+    "heapproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/heapstat.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "heapstat.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/heapstat.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "leespad-schrijft-niet.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/zaakcommand/index.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "resync-licht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/postgres-verzoeken.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 4
+    },
+    "verzoekcontext-wikkel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/verzoekcontext.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "writehealth-lus.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/postgres-verzoeken.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 4
     }
   }
 }

@@ -3,8 +3,14 @@
 'use strict';
 
 const { AsyncLocalStorage } = require('async_hooks');
+/* De leeswikkel staat in ./verzoekwikkel.js: dit bestand gaat over de
+   LEVENSLOOP van een verzoek, dat over hoe een object er tijdens dat verzoek
+   uitziet. De twee haken gaan als functie mee zodat er geen kring ontstaat. */
+const { losWaarde, objectProxy } = require('./verzoekwikkel')({
+  vakVoor: (ctx, sleutel) => vakVoor(ctx, sleutel),
+  eisMutatieOpen: (ctx) => eisMutatieOpen(ctx)
+});
 const winkel = new AsyncLocalStorage();
-const PROXY_INFO = new WeakMap();
 const heeft = (o, k) => !!o && Object.prototype.hasOwnProperty.call(o, k);
 let achtergrondEffecten = null;
 
@@ -30,7 +36,7 @@ function kloonMetKaart(bron) {
 function nieuw(req) {
   return {
     req: req || null, open: true, opslaan: false, stroom: false,
-    bron: null, wortel: null, vakken: new Map(), proxies: new Map(),
+    bron: null, wortel: null, vakken: new Map(), proxies: new Map(), handlers: new Map(),
     voorCommit: [], naCommit: [], commitEigen: new Set()
   };
 }
@@ -58,57 +64,6 @@ function vakVoor(ctx, sleutel) {
   return vak;
 }
 
-function losWaarde(v) {
-  const info = v && typeof v === 'object' ? PROXY_INFO.get(v) : null;
-  return info ? info.actueel() : v;
-}
-
-function objectProxy(ctx, vak, origineel) {
-  let kaart = ctx.proxies.get(vak.sleutel);
-  if (!kaart) { kaart = new WeakMap(); ctx.proxies.set(vak.sleutel, kaart); }
-  if (kaart.has(origineel)) return kaart.get(origineel);
-  const actueel = () => vak.heen.get(origineel) || origineel;
-  const pak = (v) => {
-    if (!v || typeof v !== 'object') return v;
-    const echt = ctx.vakken.get(vak.sleutel);
-    /* Voor de eerste schrijfactie komt `v` rechtstreeks uit de gedeelde
-       objectgraaf en moet ieder niveau gewikkeld blijven. Na de kopie herkennen
-       heen/terug welke clone nog bij zo'n oud object hoort. Een nieuw object
-       dat de request zelf invoegde staat niet in die kaarten en is al veilig. */
-    if (!echt) return objectProxy(ctx, vak, v);
-    const oud = echt.terug.get(v) || v;
-    /* Een tijdens dit verzoek nieuw ingevoegd object is al geisoleerd. Alleen
-       objecten uit de gedeelde bron hebben nog een wikkel nodig. */
-    return echt.heen.has(oud) || oud === echt.origineel ? objectProxy(ctx, vak, oud) : v;
-  };
-  const handler = {
-    get(_t, p, r) { return pak(Reflect.get(actueel(), p, r)); },
-    set(_t, p, v) {
-      eisMutatieOpen(ctx);
-      const f = vakVoor(ctx, vak.sleutel); ctx.vakken.set(vak.sleutel, f);
-      return Reflect.set(f.heen.get(origineel) || f.waarde, p, losWaarde(v));
-    },
-    deleteProperty(_t, p) {
-      eisMutatieOpen(ctx);
-      const f = vakVoor(ctx, vak.sleutel); return Reflect.deleteProperty(f.heen.get(origineel) || f.waarde, p);
-    },
-    defineProperty(_t, p, d) {
-      eisMutatieOpen(ctx);
-      const f = vakVoor(ctx, vak.sleutel), x = Object.assign({}, d);
-      if ('value' in x) x.value = losWaarde(x.value);
-      return Reflect.defineProperty(f.heen.get(origineel) || f.waarde, p, x);
-    },
-    ownKeys() { return Reflect.ownKeys(actueel()); },
-    has(_t, p) { return Reflect.has(actueel(), p); },
-    getOwnPropertyDescriptor(_t, p) { return Reflect.getOwnPropertyDescriptor(actueel(), p); },
-    getPrototypeOf() { return Reflect.getPrototypeOf(actueel()); }
-  };
-  const proxy = new Proxy(origineel, handler);
-  kaart.set(origineel, proxy);
-  PROXY_INFO.set(proxy, { actueel });
-  return proxy;
-}
-
 function wortelVoor(ctx, bron) {
   if (ctx.wortel && ctx.bron === bron) return ctx.wortel;
   ctx.bron = bron;
@@ -120,16 +75,15 @@ function wortelVoor(ctx, bron) {
         if (!vak.bestaat) return undefined;
         if (vak.waarde && typeof vak.waarde === 'object') {
           const oud = vak.terug.get(vak.waarde);
-          return oud ? objectProxy(ctx, vak, oud) : vak.waarde;
+          return oud ? objectProxy(ctx, p, oud) : vak.waarde;
         }
         return vak.waarde;
       }
       const v = bron[p];
-      return v && typeof v === 'object'
-        ? objectProxy(ctx, { sleutel: p, origineel: v,
-          get heen() { return (ctx.vakken.get(p) || {}).heen || new WeakMap(); },
-          get terug() { return (ctx.vakken.get(p) || {}).terug || new WeakMap(); } }, v)
-        : v;
+      /* Het gelegenheidsvak met getters dat hier stond is weg: handlerVoor()
+         zoekt het vak per aanroep op zijn sleutel op, en levert vóór de eerste
+         schrijfactie dezelfde lege heen/terug op. */
+      return v && typeof v === 'object' ? objectProxy(ctx, p, v) : v;
     },
     set(_t, p, v) {
       if (typeof p !== 'string') return Reflect.set(bron, p, v);

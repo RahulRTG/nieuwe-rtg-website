@@ -128,6 +128,8 @@ Voor een datalek is er een eigen draaiboek met de 72-uursklok: `DATALEK.md`.
 | hoe breed reikt een domein in de kern? | `npm run grenzen` |
 | welke endpointgroepen kunnen liegen zonder dat een toets omvalt? | `npm run leugens` (lang: een volle suite per groep) |
 | hoe houdt hij het onder last? | `npm run beproeving` |
+| waar breekt hij? | `npm run tot-crash` (escalerende druk tot iets echt stukgaat) |
+| houdt hij geheugen vast? | `npm run heapproef` (schrijft `HEAPPROEF.json`) -- eerst `npm run heapproef:ijk`: een meter die een bekend lek niet vindt, meet niets |
 | welke endpoints raakt niemand aan? | `npm run dekking` |
 | toegankelijkheid | `npm run a11y` |
 | klopt het gebouwde releasepakket nog byte voor byte? | `npm run release:controle` |

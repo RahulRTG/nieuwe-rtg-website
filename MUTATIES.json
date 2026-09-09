@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-09T13:09:10.402Z",
-    "commit": "4db25da5",
+    "op": "2026-09-09T19:55:09.330Z",
+    "commit": "03db8ad8",
     "boomVuil": false,
     "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
@@ -2326,8 +2326,11 @@
     },
     "heapproef.test.js": {
       "soort": "puur",
-      "staat": "al rood",
-      "gezakteZonderMutatie": 1
+      "staat": "gezakt",
+      "module": "scripts/lib/heapstat.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "heapstat.test.js": {
       "soort": "puur",

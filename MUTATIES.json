@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-09T01:21:31.126Z",
-    "commit": "f2fa2d9b",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-09T01:39:08.661Z",
+    "commit": "51200632",
+    "boomVuil": true,
+    "boomAnders": 5,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -6931,6 +6931,14 @@
       "operator": "&&->||#0",
       "gezakt": 5,
       "geprobeerd": 2
+    },
+    "takken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/takken.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "talen.test.js": {
       "soort": "server",

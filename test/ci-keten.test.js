@@ -40,6 +40,44 @@ test('een checkout zonder persist-credentials: false wordt gemeld', () => {
   assert.deepEqual(checkoutMetCredential(goed, 'ci.yml'), []);
 });
 
+/* DE OPMAAK MAG DE KEURING NIET UITZETTEN. Een stap die met `- name:` opent
+   heeft geen streepje voor zijn `uses:`; de eerste versie van deze regel eiste
+   dat streepje wel en miste daardoor precies een checkout in dit huis -- die
+   van takken.yml, het enige bestand dat werkelijk push-recht vraagt. */
+test('een checkout onder een `- name:` telt net zo hard mee', () => {
+  const sha = 'a'.repeat(40);
+  const kaal = [
+    '      - name: De repo',
+    `        uses: actions/checkout@${sha} # v7`,
+    '        with:',
+    '          fetch-depth: 0'
+  ].join('\n');
+  assert.deepEqual(checkoutMetCredential(kaal, 'takken.yml'),
+    ['takken.yml:2 checkout zonder persist-credentials: false']);
+
+  const goed = [
+    '      - name: De repo',
+    `        uses: actions/checkout@${sha} # v7`,
+    '        with:',
+    '          fetch-depth: 0',
+    '          persist-credentials: false'
+  ].join('\n');
+  assert.deepEqual(checkoutMetCredential(goed, 'takken.yml'), []);
+
+  /* En het blok houdt nog steeds op bij de volgende stap: een
+     persist-credentials van de BUURSTAP redt deze checkout niet. */
+  const buurman = [
+    '      - name: De repo',
+    `        uses: actions/checkout@${sha} # v7`,
+    '      - name: Nog een checkout',
+    `        uses: actions/checkout@${sha} # v7`,
+    '        with:',
+    '          persist-credentials: false'
+  ].join('\n');
+  assert.deepEqual(checkoutMetCredential(buurman, 'takken.yml'),
+    ['takken.yml:2 checkout zonder persist-credentials: false']);
+});
+
 test('een overgetypte node-versie wordt gemeld, een matrix niet', () => {
   assert.deepEqual(overgetypteRuntime("          node-version: '26'", 'ci.yml').length, 1);
   assert.deepEqual(overgetypteRuntime("          node-version-file: '.nvmrc'", 'ci.yml'), []);

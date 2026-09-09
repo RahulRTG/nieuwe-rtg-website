@@ -131,7 +131,8 @@
     M.api('bieb', {}).then(function (d) {
       if (d.error) return M.zeg(d.error);
       open(function (vlak) {
-        vlak.appendChild(M.el('h3', null, 'Uw bibliotheek'));
+        vlak.appendChild(M.el('div', 'vorm', 'Mijn media'));
+        vlak.appendChild(M.el('h3', null, 'Uw bibliotheek. Vier vormen, één plek.'));
         vlak.appendChild(M.el('p', 'stil', d.uitleg));
         rijVan('Bewaard', d.stukken, vlak);
         if (d.verdwenen.length) {
@@ -140,6 +141,10 @@
             vlak.appendChild(M.el('p', 'stil', v.id + ' -- bewaard op ' + String(v.bewaardOp).slice(0, 10)));
           });
         }
+        var door = M.el('div', 'media-bieb-doorgangen');
+        door.appendChild(M.knop('Open samen-kijkkamers', '', function () { window.RTGMediaSamen.mijn(); }));
+        var live = M.el('a', 'knop', 'Ga naar wat nu live is');
+        live.href = '/apps/podium.html'; door.appendChild(live); vlak.appendChild(door);
       });
     });
   }

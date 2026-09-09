@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-08T20:52:14.988Z",
-    "commit": "7d8195f0e",
+    "op": "2026-09-09T13:00:50.746Z",
+    "commit": "e79aa9634",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -7402,6 +7402,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 12,
       "scherp": "gezakt"
+    },
+    "verdiepende-schermen.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/decision-room.js",
+      "operator": "!==->===#2",
+      "gezakt": 1,
+      "geprobeerd": 18
     },
     "vergeten-gezelschap.test.js": {
       "soort": "server",

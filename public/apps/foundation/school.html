@@ -69,9 +69,10 @@
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<link rel="stylesheet" href="/shared/rtg-anchor-experiences-2026.css">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl school-shell" data-rtg-world="foundation" data-rtg-skin="heritage">
+<body class="rtg-stijl school-shell rtg-school-experience" data-rtg-world="foundation" data-rtg-edge-2-state="focus" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <div class="school-kader">
 <aside class="school-zij" aria-label="RTF Campus">
@@ -93,7 +94,7 @@
 </aside>
 <div class="school-werk">
 <header class="school-boven">
-  <div class="school-boventitel"><span class="school-ey">RTFoundation</span><h1>School</h1></div>
+  <div class="school-boventitel"><span class="school-ey">RTG · FoundationOS</span><h1>School</h1></div>
   <span class="school-bovenruimte"></span>
   <a class="school-toplink verberg-smal" href="campus.html">Campus</a>
   <div id="balk" class="school-sessiebalk"></div>
@@ -102,7 +103,7 @@
   <!-- gezinsweergave -->
   <section id="vGezin" hidden>
     <section class="enterprise-hero">
-      <div><span class="ey">Gezin &amp; leerling</span><h2 id="schoolWelkom">Jouw schooldag. Op wereldniveau.</h2><p>Rooster, huiswerk, toetsen, cijfers en contact horen bij elkaar. Hoogwaardige begeleiding, met alleen zicht op jouw eigen klas en gezin.</p>
+      <div><span class="ey">Gezin &amp; leerling</span><h2 id="schoolWelkom">Een rustige schooldag.</h2><p id="schoolGroet">Rooster, huiswerk, toetsen en contact staan bij elkaar. Iedereen ziet alleen wat bij de eigen klas en het eigen gezin hoort.</p>
         <div class="enterprise-acties"><span class="enterprise-chip"><i></i>Vandaag</span><span class="enterprise-chip"><i></i>Mijn werk</span><span class="enterprise-chip"><i></i>Berichten</span></div>
       </div>
       <div class="enterprise-belofte"><b>Jij houdt de regie</b>Een kind accepteert zelf een klasuitnodiging. Schoolberichten lopen via het gezin en gevoelige gegevens blijven afgeschermd.</div>
@@ -156,6 +157,14 @@
 </main>
 </div>
 </div>
+
+<nav class="school-mobile-nav" aria-label="FoundationOS School">
+  <a href="school.html" aria-current="page"><b>⌂</b>Overzicht</a>
+  <a href="agenda.html"><b>□</b>Schooldag</a>
+  <a href="leren.html"><b>?</b>Huiswerkhulp</a>
+  <a href="mail.html"><b>◇</b>Berichten</a>
+  <a href="campus.html"><b>☰</b>Meer</a>
+</nav>
 
 <!-- berichten-overlay (leraar <-> gezin) -->
 <div class="ov" id="chatOv" aria-label="Schoolberichten">
@@ -240,7 +249,7 @@ async function laadGezin(){
   const lessenVandaag = lijst.reduce((n, x) => n + (x.vandaag || []).length, 0);
   const cijfers = lijst.reduce((n, x) => n + (x.cijfers || []).length, 0);
   const naam = s && s.profiel && s.profiel.naam;
-  if (naam) $('#schoolWelkom').textContent = 'Goed dat je er bent, ' + naam + '.';
+  if (naam) $('#schoolGroet').textContent = 'Goed dat je er bent, ' + naam + '. Rooster, huiswerk, toetsen en contact staan rustig bij elkaar.';
   $('#schoolKerncijfers').hidden = false;
   $('#schoolKerncijfers').innerHTML = [
     ['Klassen', lijst.length], ['Lessen vandaag', lessenVandaag], ['Open werk', openWerk], ['Cijfers', cijfers]

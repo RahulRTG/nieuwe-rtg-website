@@ -33,6 +33,20 @@ const STANDEN = [
   ['rust', 'Thuisrust', 'Zet aan', '/apps/thuisrust.html']
 ];
 
+/* Op telefoon is de oude standenstrook bewust vervangen door de herkenbare
+   vijfknops onderbalk. De proef bedient daarom dezelfde zichtbare route als de
+   gebruiker: Thuiswacht en Vitaal rechtstreeks, Codewoord en Thuisrust via
+   Meer. De verborgen desktopstrook aanklikken zou de router wel toetsen, maar
+   niet meer het scherm dat we daadwerkelijk hebben ontworpen. */
+async function toonStand(page, id) {
+  if (id === 'wacht' || id === 'vitaal') {
+    await page.click('[data-veilig-nav="' + id + '"]');
+    return;
+  }
+  await page.click('[data-veilig-nav="meer"]');
+  await page.click('[data-veilig-open="' + id + '"]');
+}
+
 test('RTG Veilig: de vier standen staan echt', { skip: geenBrowser(pw) }, async (t) => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-veilig-e2e-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
@@ -88,7 +102,7 @@ test('RTG Veilig: de vier standen staan echt', { skip: geenBrowser(pw) }, async 
 
     for (const [id, naam, knop] of STANDEN) {
       await t.test('stand ' + naam, async () => {
-        await page.click('#standen button[data-id="' + id + '"]');
+        await toonStand(page, id);
 
         // 1. deze stand staat aan, en precies deze
         await page.waitForFunction(
@@ -166,13 +180,13 @@ test('RTG Veilig: de vier standen staan echt', { skip: geenBrowser(pw) }, async 
         'de stand Thuisrust hoort geen seconde-teller te hebben');
 
       // naar de Thuiswacht: die loopt nu, dus daar hoort de klok te tikken
-      await p.click('#standen button[data-id="wacht"]');
+      await toonStand(p, 'wacht');
       await p.waitForFunction(() => document.querySelector('#paneel').innerText.includes('Ik ben thuis'), null, { timeout: 15000 });
       assert.equal(await p.evaluate(() => window.__tellersMet(1000)), 1,
         'een lopende wacht hoort precies een seconde-teller te hebben');
 
       // en weg ervan: de klok hoort opgeruimd te zijn
-      await p.click('#standen button[data-id="rust"]');
+      await toonStand(p, 'rust');
       await p.waitForFunction(() => document.querySelector('#paneel').innerText.includes('Zet aan'), null, { timeout: 15000 });
       assert.equal(await p.evaluate(() => window.__tellersMet(1000)), 0,
         'na het verlaten van de Thuiswacht hoort de seconde-teller gestopt te zijn');
@@ -248,9 +262,9 @@ test('RTG Veilig: de vier standen staan echt', { skip: geenBrowser(pw) }, async 
          paneel weg en bouwt het opnieuw op uit de server, die alleen het AANTAL
          woorden teruggeeft. Zou een stand zijn eigen laatste invoer vasthouden,
          dan stond de zin er na het terugwisselen weer. */
-      await p.click('#standen button[data-id="rust"]');
+      await toonStand(p, 'rust');
       await p.waitForFunction(() => document.querySelector('#paneel').innerText.includes('Zet aan'), null, { timeout: 15000 });
-      await p.click('#standen button[data-id="codewoord"]');
+      await toonStand(p, 'codewoord');
       await p.waitForFunction(() => /woorden/.test(document.querySelector('#zinKaart').innerText), null, { timeout: 15000 });
       assert.ok(!/staat de blauwe fiets nog buiten/i.test(await p.content()),
         'de zin mag ook na het wisselen van stand nergens in de pagina staan');

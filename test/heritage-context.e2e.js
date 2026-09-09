@@ -79,7 +79,9 @@ test('Heritage context returns through real navigation without writes', async t 
       await page.keyboard.press('Escape');
       await page.waitForFunction(selector=>document.activeElement.matches(selector),key);
       assert.equal(await page.getAttribute('#afScrim','aria-modal'),'false');
-      await page.click('#wMaand');
+      /* Maand is op telefoon bewust verborgen; Week is de zichtbare route
+         naar dezelfde dagsheet die deze toets nodig heeft. */
+      await page.click('#wWeek');
       await page.click('.rtg-edge-state'); await page.click('[data-edge-2-mode="focus"]');
       await page.locator('#kal [data-dag]').first().click();
       await page.waitForSelector('#afScrim.open');

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#091312">
+<title>Decision Room · WorkOS</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-decision-room-2026.css" rel="stylesheet">
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl rtg-work-flow" data-rtg-world="work" data-rtg-skin="heritage" data-dr-scherm="agenda">
+<div class="dr-app" id="decisionRoom">
+  <header class="dr-kop">
+    <a class="dr-merk" href="/apps/kantoor.html" aria-label="Terug naar WorkOS"><b>RTG</b><span>Decision Room</span></a>
+    <div class="dr-huizen" role="group" aria-label="Gegevenshuis kiezen">
+      <button type="button" data-dr-huis="rtg" aria-pressed="true">RTG</button>
+      <button type="button" data-dr-huis="rtf" aria-pressed="false">RTF</button>
+      <button type="button" data-dr-huis="gedeeld" aria-pressed="false">Samen</button>
+    </div>
+    <span class="dr-kopruimte"></span>
+    <button class="dr-nieuw" type="button" data-dr-nieuw>Nieuw besluit</button>
+    <a class="dr-profiel" href="/apps/rtgone.html?view=governance" aria-label="Open mijn werkprofiel">RI</a>
+  </header>
+
+  <main>
+    <section class="dr-scherm" data-dr-paneel="agenda" aria-labelledby="drAgendaTitel">
+      <div class="dr-ey" id="drDag">Besluitagenda · laden</div>
+      <h1 id="drAgendaTitel">Beslis waar het nodig is.<br>Niet waar het luidst wordt gevraagd.</h1>
+      <p class="dr-intro">Alleen voorstellen met een duidelijke bedoeling, eigenaar, impact en risico komen in uw afweging.</p>
+      <div id="drAgenda" aria-live="polite"><div class="dr-leeg">De besluitagenda wordt geladen.</div></div>
+      <aside class="dr-vertrouwen"><i aria-hidden="true">✓</i><span><b>Geen besluitdruk.</b> Een onvolledig dossier wordt niet als besluitrijp gepresenteerd.</span></aside>
+    </section>
+
+    <section class="dr-scherm" data-dr-paneel="afweging" aria-labelledby="drAfwegingTitel" hidden>
+      <button class="dr-terug" type="button" data-dr-open="agenda">← Besluitagenda</button>
+      <div class="dr-ey">Volledige afweging · bronnen zichtbaar</div>
+      <h1 id="drAfwegingTitel">Eerst begrijpen.<br>Dan pas beslissen.</h1>
+      <div id="drAfweging"><div class="dr-leeg">Kies een besluit uit de agenda.</div></div>
+    </section>
+
+    <section class="dr-scherm" data-dr-paneel="besluit" aria-labelledby="drBesluitTitel" hidden>
+      <button class="dr-terug" type="button" data-dr-open="afweging">← Volledige afweging</button>
+      <div class="dr-ey">Besluit &amp; borging · menselijke bevestiging</div>
+      <h1 id="drBesluitTitel">Maak de keuze.<br>Bewaar de reden.</h1>
+      <div id="drBesluit"><div class="dr-leeg">Open eerst een volledige afweging.</div></div>
+    </section>
+
+    <section class="dr-scherm" data-dr-paneel="archief" aria-labelledby="drArchiefTitel" hidden>
+      <div class="dr-ey">Besluitregister · controleerbaar verleden</div>
+      <h1 id="drArchiefTitel">Wat besloten is,<br>blijft navolgbaar.</h1>
+      <p class="dr-intro">Keuze, reden, rol, tijdstip en gekoppelde bronnen blijven samen in één spoor.</p>
+      <div id="drArchief"><div class="dr-leeg">Het besluitregister wordt geladen.</div></div>
+    </section>
+  </main>
+
+  <nav class="dr-nav" aria-label="Decision Room navigatie">
+    <button type="button" data-dr-open="agenda" aria-current="page"><i aria-hidden="true">01</i><span>Besluiten</span></button>
+    <button type="button" data-dr-open="afweging"><i aria-hidden="true">02</i><span>Afweging</span></button>
+    <button type="button" data-dr-open="besluit"><i aria-hidden="true">03</i><span>Vastleggen</span></button>
+    <button type="button" data-dr-open="archief"><i aria-hidden="true">04</i><span>Archief</span></button>
+  </nav>
+</div>
+
+<div class="dr-laag" id="drIntake" hidden>
+  <form class="dr-dialoog" id="drIntakeForm">
+    <button class="dr-sluit" type="button" data-dr-sluit aria-label="Sluiten">×</button>
+    <div class="dr-ey">Nieuw voorstel · besluitroute</div>
+    <h2>Leg de afweging compleet voor.</h2>
+    <p>Niet het formulier, maar de onderbouwing maakt een voorstel besluitrijp.</p>
+    <div class="dr-velden">
+      <label><span>Voorstel</span><input name="titel" maxlength="160" required autocomplete="off"></label>
+      <label class="dr-breed"><span>Bedoeling en onderbouwing</span><textarea name="reden" maxlength="600" required></textarea></label>
+      <label class="dr-breed"><span>Waarom nu?</span><textarea name="waaromNu" maxlength="600"></textarea></label>
+      <label><span>Besluitgebied</span><select name="type"><option value="operations">Operations</option><option value="finance">Finance</option><option value="legal">Juridisch</option><option value="privacy">Privacy</option><option value="security">Security</option><option value="safeguarding">Safeguarding</option><option value="people">People &amp; Culture</option><option value="ai">AI Governance</option></select></label>
+      <label><span>Bedrag in euro</span><input name="bedrag" type="number" min="0" max="100000000" value="0"></label>
+      <label><span>Impact · 1 tot 5</span><input name="impact" type="number" min="1" max="5" value="3"></label>
+      <label><span>Risico · 1 tot 5</span><input name="risico" type="number" min="1" max="5" value="3"></label>
+      <label class="dr-breed"><span>Alternatief</span><textarea name="alternatief" maxlength="600"></textarea></label>
+      <label class="dr-breed"><span>Beheersing van het risico</span><textarea name="beheersing" maxlength="600"></textarea></label>
+      <label><span>Gewenst besluit voor</span><input name="deadline" type="date"></label>
+      <label class="dr-keuze"><input name="omkeerbaar" type="checkbox"><span>Deze keuze is aantoonbaar omkeerbaar</span></label>
+      <input name="documentId" type="hidden"><input name="documentTitel" type="hidden"><input name="projectId" type="hidden"><input name="bronMailId" type="hidden">
+    </div>
+    <div class="dr-dialoogacties"><button type="button" data-dr-sluit>Annuleren</button><button class="primair" type="submit">Voorleggen aan Decision Room →</button></div>
+  </form>
+</div>
+
+<div class="dr-melding" id="drMelding" role="status" hidden></div>
+<script src="/apps/decision-room-agenda.js"></script>
+<script src="/apps/decision-room-afweging.js"></script>
+<script src="/apps/decision-room-besluit.js"></script>
+<script src="/apps/decision-room.js"></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

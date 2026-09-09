@@ -131,3 +131,23 @@ test('5. de open standaard: ELK partnermerk meldt zich aan en is meteen te verbi
   assert.equal((await api(base, '/api/supplier/home/merk', { naam: 'X' })).status, 401);
   assert.equal((await api(base, '/api/home/merken')).status, 401);
 });
+
+test('6. woningonderhoud bewaart alleen wat het lid echt meldt', async () => {
+  const leeg = await api(base, '/api/home/onderhoud', {}, lid);
+  assert.deepEqual(leeg.body.meldingen, [], 'geen verzonnen monteur of storing');
+  const fout = await api(base, '/api/home/onderhoud/meld', { titel: 'x', plek: '' }, lid);
+  assert.equal(fout.status, 400);
+  const nieuw = await api(base, '/api/home/onderhoud/meld', {
+    titel: 'Verwarming wordt niet warm', plek: 'Woonkamer',
+    notitie: 'Radiator blijft koud.', urgentie: 'hoog'
+  }, lid);
+  assert.equal(nieuw.status, 200);
+  assert.equal(nieuw.body.melding.status, 'gemeld');
+  assert.equal(nieuw.body.melding.urgentie, 'hoog');
+  assert.ok(!('vakman' in nieuw.body.melding), 'zonder toewijzing wordt geen vakman beloofd');
+  const lijst = await api(base, '/api/home/onderhoud', {}, lid);
+  assert.equal(lijst.body.meldingen.length, 1);
+  const weg = await api(base, '/api/home/onderhoud/annuleer', { id: nieuw.body.melding.id }, lid);
+  assert.equal(weg.body.melding.status, 'geannuleerd');
+  assert.equal((await api(base, '/api/home/onderhoud')).status, 401);
+});

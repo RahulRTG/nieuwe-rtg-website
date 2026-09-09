@@ -74,9 +74,10 @@
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<link href="/shared/rtg-eten-uitgaan-2026.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-night-flow rtg-night-discover" data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-skin="heritage">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
   <div class="os-switcher__links">
@@ -88,11 +89,21 @@
   <span class="os-switcher__state">Kern verbonden</span>
 </div>
 <header>
+  <a class="night-brand" href="/apps/rtg.html"><span>RTG</span><b>LivingOS</b><small>Eten · uitgaan · samen</small></a>
   <a class="terug" href="/apps/app.html">← App</a>
-  <div><div class="ey">Reserveer een tafel</div><h1>RTG Food Court</h1></div>
 </header>
 <main id="main">
-  <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:60ch;">Alle restaurants op een rij. Kies een keuken, een datum en je gezelschap, en zie meteen de vrije tijden. Je reservering gaat naar het restaurant, dat hem bevestigt.</p>
+  <section class="night-hero" aria-labelledby="nightKop">
+    <div class="night-hero-copy">
+      <p class="night-ey">Vanavond</p>
+      <h1 id="nightKop">Van zin hebben naar iets dat bij u past.</h1>
+      <p>Tafels, avonden en plekken dichtbij. U ziet de echte vrije tijden en de aanbieder bevestigt zelf.</p>
+      <div class="night-actions"><a class="night-primary" href="#avondZoek">Vind een tafel</a><a class="night-secondary" href="/apps/uitgaan.html#ontdekken">Bekijk uitgaan</a></div>
+    </div>
+  </section>
+  <nav class="night-switch" aria-label="Kies wat u wilt ontdekken"><a href="/apps/foodcourt.html" aria-current="page">Restaurants</a><a href="/apps/uitgaan.html#ontdekken">Bars en avonden</a></nav>
+  <input class="night-search" id="avondZoek" type="search" maxlength="80" placeholder="Zoek op restaurant, keuken of plaats" aria-label="Restaurants zoeken">
+  <h2 class="night-title">Voor u gevonden</h2>
   <div class="chips" id="keukens"></div>
   <div class="lijst" id="lijst"></div>
 </main>
@@ -136,7 +147,7 @@ if (!TOKEN) {
     '<p class="h-mt100"><a href="/apps/app.html">Naar de app →</a></p></div>';
 } else { laad(); }
 
-let ALLE = [], keuken = '';
+let ALLE = [], keuken = '', zoek = '';
 /* Meenemen (shared/uitvoer.js): de restaurantlijst met de velden die de kaart
    toont. Wie een tafel zoekt, wil die lijst ook naast zich kunnen leggen. */
 if (window.RTGUitvoer) RTGUitvoer.bron(() => ({
@@ -150,8 +161,13 @@ async function laad(){
   ALLE = d.restaurants || [];
   $('#keukens').innerHTML = '<button class="chip'+(keuken===''?' aan':'')+'" data-k="">Alle keukens</button>' +
     (d.keukens||[]).map(k => '<button class="chip'+(keuken===k?' aan':'')+'" data-k="'+esc(k)+'">'+esc(k)+'</button>').join('');
-  $('#keukens').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { keuken = b.dataset.k; laad(); }));
-  const lijst = ALLE.filter(r => !keuken || r.keuken === keuken);
+  $('#keukens').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { keuken = b.dataset.k; tekenRestaurants(); }));
+  tekenRestaurants();
+}
+function tekenRestaurants(){
+  const q = zoek.toLowerCase();
+  const lijst = ALLE.filter(r => (!keuken || r.keuken === keuken) && (!q ||
+    [r.naam,r.keuken,r.stad,r.tagline].filter(Boolean).join(' ').toLowerCase().includes(q)));
   $('#lijst').innerHTML = lijst.length ? lijst.map(r =>
     '<button class="resto" data-code="'+esc(r.code)+'" data-naam="'+esc(r.naam)+'" data-keuken="'+esc(r.keuken)+'" data-deal="'+esc(r.deal||'')+'">'+
       '<span class="meta">'+esc(r.keuken)+' · '+esc(r.prijs)+(r.stad?' · '+esc(r.stad):'')+'</span>'+
@@ -159,9 +175,11 @@ async function laad(){
       '<span class="tag">'+esc(r.tagline)+'</span>'+
       (r.deal?'<span class="deal">'+esc(r.deal)+'</span>':'')+
       (r.open?'':'<span class="dicht">Nu gesloten voor reserveringen</span>')+
-    '</button>').join('') : '<div class="leeg">Geen restaurants in deze keuken.</div>';
+    '</button>').join('') : '<div class="leeg">Geen restaurants gevonden. Kies een andere keuken of zoekterm.</div>';
   $('#lijst').querySelectorAll('.resto').forEach(b => b.addEventListener('click', () => openResto(b.dataset)));
 }
+const avondZoek = $('#avondZoek');
+if (avondZoek) avondZoek.addEventListener('input', function(){ zoek = this.value.trim(); tekenRestaurants(); });
 
 let HUIDIG = null, AANTAL = 2;
 function openResto(ds){
@@ -212,5 +230,6 @@ $('#rPlus').addEventListener('click', () => { AANTAL = Math.min(20, AANTAL+1); $
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="/apps/eten-uitgaan-voorzijde.js"></script>
 </body>
 </html>

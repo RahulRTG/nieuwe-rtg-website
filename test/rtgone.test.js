@@ -37,6 +37,18 @@ test('Vandaag verzamelt echte open taken uit het gekozen RTF-huis', async () => 
   assert.ok(s.body.vandaag.telling.taken >= 1);
 });
 
+test('de twee Project Room-schrijfdeuren bestaan en blijven zonder kantooridentiteit dicht', async () => {
+  const zonderIdentiteit = pad => fetch(base + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ projectId: 'onbekend' })
+  });
+  assert.equal((await zonderIdentiteit('/api/rtgone/project/bewijs')).status, 401);
+  assert.equal((await zonderIdentiteit('/api/rtgone/project/oplever')).status, 401);
+  assert.equal((await api('project/bewijs', { projectId: 'onbekend' })).status, 404,
+    'na de kantoorpoort bereikt bewijs de echte Project Room-deur');
+  assert.equal((await api('project/oplever', { projectId: 'onbekend' })).status, 404,
+    'na de kantoorpoort bereikt opleveren de echte Project Room-deur');
+});
+
 test('het frictiegrootboek rekent minuten en geld per jaar exact door', async () => {
   const r = await api('frictie', { huis: 'rtg', naam: 'Handmatig facturen zoeken', minuten: 12, frequentie: 5, uurloon: 45 });
   assert.equal(r.status, 200); assert.equal(r.body.frictie.jaarMinuten, 3120); assert.equal(r.body.frictie.jaarCenten, 234000);
@@ -68,12 +80,18 @@ test('Decision Room: expertise, persoonlijke identiteit en vier ogen zijn hard a
   const financeB = { key: 'user-4', label: 'Balans', baas: false };
   assert.equal(one.rolGeef({ huis: 'rtg', key: financeA.key, naam: financeA.label, rol: 'finance' }, owner).ok, true);
   assert.equal(one.rolGeef({ huis: 'rtg', key: financeB.key, naam: financeB.label, rol: 'finance' }, owner).ok, true);
-  const g = one.goedkeuringMaak({ huis: 'rtg', type: 'finance', titel: 'Nieuwe vloot', reden: 'Capaciteit veilig vergroten', bedrag: 50000, impact: 5, risico: 4, omkeerbaar: false }, aanvrager).goedkeuring;
+  const g = one.goedkeuringMaak({ huis: 'rtg', type: 'finance', titel: 'Nieuwe vloot', reden: 'Capaciteit veilig vergroten', waaromNu: 'De huidige vloot bereikt de grens', alternatief: 'Tijdelijk huren', beheersing: 'Gefaseerd bestellen', documentId: 'doc-12', documentTitel: 'Investeringsvoorstel', bedrag: 50000, impact: 5, risico: 4, omkeerbaar: false }, aanvrager).goedkeuring;
   assert.equal(g.vereist, 2, 'hoog impactbesluit vraagt twee beoordelaars');
+  assert.equal(g.documentId, 'doc-12'); assert.equal(g.alternatief, 'Tijdelijk huren');
   assert.equal(one.goedkeuringBeslis(g.id, 'goedkeuren', aanvrager).status, 403, 'aanvrager beslist nooit eigen aanvraag');
+  assert.equal(one.goedkeuringBeslis(g.id, 'overslaan', financeA).status, 400, 'een onbekende keuze kan nooit per ongeluk goedkeuren');
   assert.equal(one.goedkeuringBeslis(g.id, 'goedkeuren', { key: 'user-9', label: 'Geen Finance', baas: false }).status, 403, 'verkeerde expertise blijft buiten');
-  assert.equal(one.goedkeuringBeslis(g.id, 'goedkeuren', financeA).goedkeuring.status, 'wacht');
-  assert.equal(one.goedkeuringBeslis(g.id, 'goedkeuren', financeB).goedkeuring.status, 'goedgekeurd');
+  assert.equal(one.goedkeuringBeslis(g.id, 'goedkeuren', financeA, { reden: 'Eerste financiële toets is akkoord.' }).goedkeuring.status, 'wacht');
+  const rond = one.goedkeuringBeslis(g.id, 'goedkeuren', financeB, { reden: 'Budget en liquiditeit zijn passend.', voorwaarde: 'Na controle van de leveringsgarantie.' }).goedkeuring;
+  assert.equal(rond.status, 'goedgekeurd'); assert.equal(rond.besluit.voorwaarde, 'Na controle van de leveringsgarantie.');
+  const terug = one.goedkeuringMaak({ huis: 'rtg', type: 'finance', titel: 'Kleine inkoop', reden: 'Werkplek aanvullen', impact: 2, risico: 1, omkeerbaar: true }, aanvrager).goedkeuring;
+  const aangepast = one.goedkeuringBeslis(terug.id, 'terug', financeA, { reden: 'Voeg twee offertes toe.' }).goedkeuring;
+  assert.equal(aangepast.status, 'aanpassen'); assert.equal(aangepast.besluit.reden, 'Voeg twee offertes toe.');
   assert.ok(saves >= 5);
 });
 
@@ -84,7 +102,27 @@ test('één persoonlijk RTMAIL-bericht wordt een volledige, traceerbare werkstro
   assert.equal(one.projectVanMail({ huis: 'rtg', mailId: 'mail-1', titel: 'Meridian', bedoeling: 'Vrijdag een controleerbaar besluit opleveren', deadline: '2026-08-21', goedkeuringType: 'operations', impact: 4, risico: 3, omkeerbaar: true }, {}).status, 403, 'gedeelde toegang kan persoonlijke mail niet omzetten');
   const r = one.projectVanMail({ huis: 'rtg', mailId: 'mail-1', titel: 'Meridian', bedoeling: 'Vrijdag een controleerbaar besluit opleveren', deadline: '2026-08-21', goedkeuringType: 'operations', impact: 4, risico: 3, omkeerbaar: true }, context);
   assert.equal(r.ok, true); assert.equal(r.project.bron.mailId, 'mail-1'); assert.equal(r.project.taken.length, 3); assert.ok(r.project.documenten.ruimte.includes('bedrijf=rtg')); assert.ok(r.project.goedkeuringId); assert.equal(db.data.rtmail.berichten[0].vastgezet, true);
+  const besluit = db.data.rtgOne.goedkeuringen.find(x => x.id === r.project.goedkeuringId);
+  assert.equal(besluit.projectId, r.project.id); assert.equal(besluit.bronMailId, 'mail-1');
+  const buitenstaander = { key: 'user-20', label: 'Buitenstaander', baas: false };
+  assert.equal(one.projectTaakZet(r.project.id, r.project.taken[0].id, true, buitenstaander).status, 403, 'alleen de projecteigenaar wijzigt uitvoering');
+  assert.equal(one.projectBewijs({ projectId: r.project.id, titel: 'Proef', uitleg: 'Toont resultaat' }, buitenstaander).status, 403, 'bewijs volgt dezelfde eigenaarsgrens');
+  assert.equal(one.projectOplever({ projectId: r.project.id, uitkomst: 'Klaar' }, context).status, 409, 'een open besluit blokkeert oplevering');
   const first = r.project.taken[0]; const done = one.projectTaakZet(r.project.id, first.id, true, context);
   assert.equal(done.project.taken[0].af, true); assert.ok(done.project.voortgang > 12); assert.ok(done.project.tijdlijn.some(x => x.soort === 'taak'));
+  const baas = { key: 'user-1', label: 'Eigenaar', baas: true }, opA = { key: 'user-21', label: 'Operatie A', baas: false }, opB = { key: 'user-22', label: 'Operatie B', baas: false };
+  one.rolGeef({ huis: 'rtg', key: opA.key, rol: 'operations' }, baas); one.rolGeef({ huis: 'rtg', key: opB.key, rol: 'operations' }, baas);
+  one.goedkeuringBeslis(besluit.id, 'goedkeuren', opA, { reden: 'Route is uitvoerbaar.' });
+  assert.equal(one.goedkeuringBeslis(besluit.id, 'goedkeuren', opB, { reden: 'Tweede operationele toets akkoord.' }).goedkeuring.status, 'goedgekeurd');
+  assert.ok(r.project.taken.some(x => x.besluitId === besluit.id), 'goedkeuring maakt één echte uitvoeringstaak');
+  for (const taak of r.project.taken.filter(x => !x.af)) one.projectTaakZet(r.project.id, taak.id, true, context);
+  assert.equal(one.projectOplever({ projectId: r.project.id, uitkomst: 'Route werkt.' }, context).status, 409, 'een takenlijst zonder bewijs is geen resultaat');
+  const bewijs = one.projectBewijs({ projectId: r.project.id, titel: 'Proefritverslag', uitleg: 'Toont dat de route in de praktijk werkt.', bron: 'RTDocs versie 4' }, context);
+  assert.equal(bewijs.bewijs.status, 'vastgelegd');
+  const herhaald = one.projectBewijs({ projectId: r.project.id, titel: 'Proefritverslag', uitleg: 'Toont dat de route in de praktijk werkt.', bron: 'RTDocs versie 4' }, context);
+  assert.equal(herhaald.herhaald, true); assert.equal(r.project.bewijs.length, 1, 'een dubbele tik maakt geen dubbel bewijs');
+  const oplevering = one.projectOplever({ projectId: r.project.id, uitkomst: 'De route werkt binnen de afgesproken kwaliteit.', leren: 'Controleer voortaan voor vertrek.' }, context).project;
+  assert.equal(oplevering.status, 'afgerond'); assert.equal(oplevering.voortgang, 100); assert.equal(oplevering.oplevering.door, 'Noordster');
+  assert.equal(one.projectOplever({ projectId: r.project.id, uitkomst: 'De route werkt binnen de afgesproken kwaliteit.' }, context).status, 400, 'oplevering kan nooit dubbel schrijven');
   assert.equal(one.projectVanMail({ huis: 'rtg', mailId: 'mail-1' }, context).status, 409, 'één bronbericht wordt nooit dubbel project');
 });

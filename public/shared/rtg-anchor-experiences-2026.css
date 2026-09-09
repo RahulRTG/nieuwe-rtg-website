@@ -1,0 +1,212 @@
+/* RTG Heritage anchor experiences · 2026
+   Eén visuele familie voor de vier goedgekeurde hoofdapps. De apps houden hun
+   eigen DOM, data en acties; dit blad verandert uitsluitend materiaal,
+   hiërarchie en responsief gedrag. Niet-cirkelvormige rondingen komen uit het
+   centrale Heritage-contract in rtg-heritage-adapters.css. */
+
+:where(.rtg-today-experience,.rtg-travel-experience,.rtg-work-experience,.rtg-school-experience){
+  --anchor-serif:"Bodoni Moda",Georgia,serif;
+  --anchor-sans:Inter,system-ui,sans-serif;
+  --anchor-ivory:#f7f0e6;
+  --anchor-gold:#d5b574;
+  --anchor-burgundy:#851936;
+  --anchor-line:rgba(247,240,230,.16);
+  font-family:var(--anchor-sans);
+  -webkit-font-smoothing:antialiased;
+}
+:where(.rtg-today-experience,.rtg-travel-experience,.rtg-work-experience,.rtg-school-experience) *,
+:where(.rtg-today-experience,.rtg-travel-experience,.rtg-work-experience,.rtg-school-experience) *::before,
+:where(.rtg-today-experience,.rtg-travel-experience,.rtg-work-experience,.rtg-school-experience) *::after{box-sizing:border-box}
+:where(.rtg-today-experience,.rtg-travel-experience,.rtg-work-experience,.rtg-school-experience) :focus-visible{
+  outline:2px solid var(--anchor-gold)!important;outline-offset:3px
+}
+
+/* LivingOS · Vandaag --------------------------------------------------- */
+body.rtg-today-experience{
+  margin:0;min-height:100dvh;color:#f8f0e7!important;color-scheme:dark;
+  background:
+    radial-gradient(55rem 34rem at 90% -8rem,rgba(135,35,42,.2),transparent 68%),
+    linear-gradient(155deg,#1a100d,#0e0a08 48%,#090706)!important;
+}
+.rtg-today-experience .os-switcher{display:none!important}
+.today-shell{width:min(100%,72rem);margin:0 auto;padding:0 1rem 7.2rem}
+.today-top{height:4.75rem;display:flex;align-items:center;gap:.75rem;padding-top:env(safe-area-inset-top);border-bottom:1px solid rgba(213,181,116,.18)}
+.today-brand{display:inline-flex;align-items:baseline;gap:.75rem;color:inherit;text-decoration:none}
+.today-brand b{font:500 2rem/1 var(--anchor-serif);color:var(--anchor-gold)}
+.today-brand span{font-size:.88rem}
+.today-top .today-spacer{flex:1}
+.today-round{width:42px;height:42px;display:grid;place-items:center;border:1px solid rgba(213,181,116,.42);border-radius:50%;background:rgba(18,10,8,.5);color:var(--anchor-ivory);text-decoration:none;cursor:pointer}
+.today-hero{position:relative;isolation:isolate;min-height:32rem;display:flex;align-items:flex-end;margin:1rem 0;padding:1.25rem;overflow:hidden;border:1px solid var(--anchor-line)}
+.today-hero>img{position:absolute;z-index:-3;inset:0;width:100%;height:100%;object-fit:cover;filter:saturate(.72) contrast(1.05)}
+.today-hero::before{content:"";position:absolute;z-index:-2;inset:0;background:linear-gradient(180deg,rgba(10,6,4,.05),rgba(10,6,4,.26) 38%,rgba(10,6,4,.96))}
+.today-hero::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,rgba(81,18,29,.25),transparent 58%)}
+.today-ey{margin:0 0 .75rem;color:var(--anchor-gold);font-size:.58rem;font-weight:650;letter-spacing:.25em;text-transform:uppercase}
+.today-hero h1{max-width:12ch;margin:0;font:400 clamp(3.1rem,10vw,5.6rem)/.92 var(--anchor-serif);letter-spacing:-.035em;text-wrap:balance}
+.today-date{margin:.8rem 0 .2rem;font-size:.9rem;color:#f8f0e7}
+.today-weather{display:flex;gap:.65rem;align-items:center;margin:.45rem 0 0;color:#dfcbbb;font-size:.78rem}
+.today-weather b{color:var(--anchor-gold);font-size:1.05rem}
+.today-brief{max-width:38rem;margin:.8rem 0 0;color:#d8c8bd;font-size:.88rem;line-height:1.55}
+.today-primary,.today-action{
+  min-height:48px;display:inline-flex;align-items:center;justify-content:center;gap:.75rem;
+  border:1px solid #a42a48;border-radius:0;background:linear-gradient(100deg,#6f1028,#9d2341);color:#fff7ed;
+  padding:.8rem 1.2rem;font:650 .82rem var(--anchor-sans);text-decoration:none;cursor:pointer
+}
+.today-primary{margin-top:1rem;min-width:12rem}
+.today-section{margin-top:2rem}
+.today-section-head{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:.8rem}
+.today-section h2{margin:0;font:400 1.65rem/1.1 var(--anchor-serif)}
+.today-section-head span{color:#c9aebb;font-size:.7rem}
+.today-moments,.today-attention{border:1px solid var(--anchor-line);background:rgba(28,17,14,.72)}
+.today-moment,.today-attention a{display:grid;grid-template-columns:3.6rem minmax(0,1fr) auto;gap:.8rem;align-items:center;min-height:4.8rem;padding:.9rem;border-top:1px solid var(--anchor-line);color:inherit;text-decoration:none}
+.today-moment:first-child,.today-attention a:first-child{border-top:0}
+.today-moment .tijd{color:var(--anchor-gold);font-size:.78rem;font-variant-numeric:tabular-nums}
+.today-moment b,.today-attention b{display:block;font-size:.88rem;font-weight:620}
+.today-moment span,.today-attention span{display:block;margin-top:.18rem;color:#bfaea5;font-size:.72rem;line-height:1.35}
+.today-moment button{min-height:34px;border:1px solid rgba(213,181,116,.32);border-radius:0;background:transparent;color:var(--anchor-gold);padding:.45rem .65rem;font:600 .68rem var(--anchor-sans);cursor:pointer}
+.today-attention .icoon{width:2.7rem;height:2.7rem;display:grid;place-items:center;border:1px solid rgba(213,181,116,.38);border-radius:50%;color:var(--anchor-gold)}
+.today-attention em{color:#cfbbad;font-size:.75rem;font-style:normal}
+.today-calm{margin:1rem 0 0;text-align:center;color:var(--anchor-gold);font:400 1rem var(--anchor-serif)}
+.today-evening{position:relative;isolation:isolate;min-height:25rem;display:flex;align-items:flex-end;margin-top:2rem;padding:1.25rem;overflow:hidden;border:1px solid var(--anchor-line)}
+.today-evening::before{content:"";position:absolute;z-index:-2;inset:0;background:url('/images/start/dagdelen/hero-avond.jpg') center/cover no-repeat;filter:saturate(.75)}
+.today-evening::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(180deg,rgba(8,5,4,.08),rgba(8,5,4,.95) 68%)}
+.today-evening h2{max-width:11ch;margin:0 0 1rem;font:400 2.7rem/.94 var(--anchor-serif)}
+.today-evening-list{border:1px solid var(--anchor-line);background:rgba(12,8,7,.76)}
+.today-evening-list a{display:flex;align-items:center;gap:.7rem;padding:.72rem;border-top:1px solid var(--anchor-line);color:inherit;text-decoration:none;font-size:.78rem}
+.today-evening-list a:first-child{border-top:0}.today-evening-list i{color:var(--anchor-gold);font-style:normal}.today-evening-list span{margin-left:auto;color:#d5c0b4}
+.today-evening .today-primary{width:100%}
+.today-secondary{display:inline-flex;align-items:center;justify-content:center;min-height:24px;margin:.7rem auto 0;border:0;background:none;color:var(--anchor-gold);font:600 .72rem var(--anchor-sans);text-decoration:none;text-align:center}
+.today-nav{position:fixed;z-index:20;left:.65rem;right:.65rem;bottom:calc(.65rem + env(safe-area-inset-bottom));height:4.4rem;display:grid;grid-template-columns:repeat(5,1fr);border:1px solid rgba(213,181,116,.25);background:rgba(17,10,8,.94);backdrop-filter:blur(22px)}
+.today-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.25rem;color:#bbaaa0;font-size:.58rem;text-decoration:none}.today-nav a[aria-current="page"]{color:var(--anchor-gold)}
+.today-nav b{font-size:1rem;font-weight:400}.today-nav .maak b{width:2.8rem;height:2.8rem;display:grid;place-items:center;border-radius:50%;background:#74142d;color:#fff0e5;font-size:1.35rem}
+.rtg-today-experience .vis-verborgen{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important;border:0!important}
+
+/* TravelOS · RTG Reizen ----------------------------------------------- */
+body.rtg-travel-experience{
+  --rtg-world-bg:#051523;--rtg-world-card:#092033;--rtg-world-card-strong:#06111d;
+  --rtg-world-ink:#f7f0e6;--rtg-world-muted:#bdc5c7;--rtg-world-line:rgba(213,181,116,.24);
+  --rtg-world-signature:#8b1d3d;--rtg-world-signature-soft:rgba(139,29,61,.2);--rtg-world-metal:#d5b574;
+  --rtg-world-ground:linear-gradient(165deg,#081c2d,#04111d 58%,#030b12);
+  --rtg-world-photo:url('/images/travelos/ibiza-villa.jpg');--rtg-world-photo-position:center;
+  --rtg-world-photo-mask:linear-gradient(112deg,rgba(4,17,29,.94),rgba(4,17,29,.62));
+}
+body.rtg-travel-experience[data-rtg-skin="heritage"]{
+  --rtg-world-bg:#051523!important;--rtg-world-card:#092033!important;--rtg-world-card-strong:#06111d!important;
+  --rtg-world-ink:#f7f0e6!important;--rtg-world-muted:#bdc5c7!important;--rtg-world-line:rgba(213,181,116,.24)!important;
+  --rtg-world-signature:#8b1d3d!important;--rtg-world-signature-soft:rgba(139,29,61,.2)!important;--rtg-world-metal:#d5b574!important;
+  --edge-bg:#051523!important;--edge-panel:#092033!important;--edge-copy:#f7f0e6!important;--edge-dim:#bdc5c7!important;
+  --edge-line:rgba(213,181,116,.24)!important;--edge-accent:#8b1d3d!important;--edge-metal:#d5b574!important;
+  --edge2-bg:#051523!important;--edge2-panel:#092033!important;--edge2-copy:#f7f0e6!important;--edge2-dim:#bdc5c7!important;
+  --edge2-line:rgba(213,181,116,.24)!important;--edge2-accent:#8b1d3d!important;--edge2-metal:#d5b574!important
+}
+body.rtg-travel-experience[data-rtg-world-dashboard-ready="true"]{background:radial-gradient(42rem 24rem at 84% -6rem,rgba(139,29,61,.16),transparent 70%),linear-gradient(160deg,#071b2c,#04111d 62%,#02080e)!important}
+.rtg-travel-experience .rtg-edge-top{background:rgba(5,21,35,.94)!important}
+.rtg-travel-experience .reisapp{background:linear-gradient(180deg,#071b2c,#04111d 32rem)!important;color:var(--anchor-ivory)}
+.rtg-travel-experience .prestatiekop{border-bottom-color:rgba(213,181,116,.2)!important;background:rgba(5,21,35,.93)!important}
+.rtg-travel-experience .rtgmerk{color:var(--anchor-gold)!important}
+.rtg-travel-experience .hoofdtabs{border-color:rgba(213,181,116,.22)!important;background:rgba(5,21,35,.96)!important}
+.rtg-travel-experience .hoofdtabs button.actief{color:var(--anchor-gold)!important}
+.rtg-travel-experience .hoofdtabs button.actief::after{background:var(--anchor-gold)!important}
+.rtg-travel-experience .kaartraster{min-height:35rem!important;border-color:rgba(213,181,116,.28)!important;background:#071827!important}
+.rtg-travel-experience .kaartraster::before{background-image:url('/images/travelos/ibiza-villa.jpg')!important;background-position:center!important;filter:saturate(.72) contrast(1.08)!important}
+.rtg-travel-experience .kaartraster::after{background:linear-gradient(90deg,rgba(3,14,24,.98),rgba(3,14,24,.65) 58%,rgba(3,14,24,.12)),linear-gradient(0deg,rgba(3,14,24,.93),transparent 72%)!important}
+.rtg-travel-experience .dagtitel{padding:clamp(1.2rem,4vw,3rem)!important}
+.rtg-travel-experience .travel-belofte{max-width:12ch;margin:.4rem 0 1rem;color:var(--anchor-ivory);font:400 clamp(3rem,6vw,5.8rem)/.92 var(--anchor-serif);letter-spacing:-.04em;text-wrap:balance}
+.rtg-travel-experience #titelVandaag{margin:0!important;color:var(--anchor-gold)!important;font:500 1rem/1.2 var(--anchor-serif)!important;letter-spacing:0!important}
+.rtg-travel-experience #dagzin{max-width:32rem!important;color:#d7d7d0!important}
+.rtg-travel-experience .travel-hero-actie{margin-top:1rem}
+.rtg-travel-experience :where(.strook,.rahulsnel,.kompaskaart,.reisregister,.reisdiensten>a,.volgendblok){border-color:rgba(213,181,116,.22)!important;background-color:#081d2e!important}
+.rtg-travel-experience .actieknop{border-color:#b18c4c!important;background:linear-gradient(100deg,#caa760,#e1c58d)!important;color:#071522!important}
+body.rtg-travel-experience[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .actieknop,
+body.rtg-travel-experience[data-rtg-world-dashboard-ready="true"][data-rtg-world="travel"] .actieknop :where(span,b){color:#071522!important}
+.rtg-travel-experience .micro,.rtg-travel-experience .strookkop h2{color:var(--anchor-gold)!important}
+.rtg-travel-experience .routekort,.rtg-travel-experience .status,.rtg-travel-experience .gereed{border-color:rgba(213,181,116,.32)!important}
+
+/* WorkOS · RTG Kantoor ------------------------------------------------- */
+body.rtg-work-experience{
+  --rtg-world-bg:#071522;--rtg-world-card:#0b1c2a;--rtg-world-card-strong:#06101a;
+  --rtg-world-ink:#f3eee4;--rtg-world-muted:#aeb8bd;--rtg-world-line:rgba(213,181,116,.2);
+  --rtg-world-signature:#8b1d3d;--rtg-world-signature-soft:rgba(139,29,61,.15);--rtg-world-metal:#d5b574;
+  --rtg-world-ground:linear-gradient(160deg,#0a1b28,#05101a 62%,#03090f);
+  --rtg-world-photo:url('/images/worlds/heritage/work-heritage-v2.jpg');--rtg-world-photo-position:center;
+  --rtg-world-photo-mask:linear-gradient(90deg,rgba(5,16,26,.97),rgba(5,16,26,.68));
+}
+body.rtg-work-experience[data-rtg-skin="heritage"]{
+  --rtg-world-bg:#071522!important;--rtg-world-card:#0b1c2a!important;--rtg-world-card-strong:#06101a!important;
+  --rtg-world-ink:#f3eee4!important;--rtg-world-muted:#aeb8bd!important;--rtg-world-line:rgba(213,181,116,.2)!important;
+  --rtg-world-signature:#8b1d3d!important;--rtg-world-signature-soft:rgba(139,29,61,.15)!important;--rtg-world-metal:#d5b574!important;
+  --edge-bg:#071522!important;--edge-panel:#0b1c2a!important;--edge-copy:#f3eee4!important;--edge-dim:#aeb8bd!important;
+  --edge-line:rgba(213,181,116,.2)!important;--edge-accent:#8b1d3d!important;--edge-metal:#d5b574!important;
+  --edge2-bg:#071522!important;--edge2-panel:#0b1c2a!important;--edge2-copy:#f3eee4!important;--edge2-dim:#aeb8bd!important;
+  --edge2-line:rgba(213,181,116,.2)!important;--edge2-accent:#8b1d3d!important;--edge2-metal:#d5b574!important
+}
+.rtg-work-experience .rtg-edge-top{background:rgba(7,21,34,.95)!important}
+.rtg-work-experience .rtg-edge-2-context-slot .wereldapps{display:flex!important;align-items:center!important;gap:0!important;padding:0!important;overflow-x:auto!important;background:#071522!important;scrollbar-width:none}
+.rtg-work-experience .rtg-edge-2-context-slot .wereldapps>*{position:static!important;flex:0 0 auto!important;width:auto!important;min-width:max-content!important;min-height:44px!important;display:flex!important;align-items:center!important;margin:0!important;padding:.55rem .8rem!important;border:0!important;border-right:1px solid rgba(213,181,116,.14)!important;white-space:nowrap!important;color:#b7c0c3!important;font-size:.58rem!important;line-height:1!important;text-decoration:none!important}
+.rtg-work-experience .rtg-edge-2-context-slot .wereldapps>b{color:var(--anchor-gold)!important;font-size:.52rem!important;letter-spacing:.14em!important;text-transform:uppercase!important}
+.rtg-work-experience .wereldtabs{border-color:rgba(213,181,116,.2)!important;background:rgba(5,16,26,.94)!important}
+.rtg-work-experience .wereldtab[aria-current="page"]{color:var(--anchor-gold)!important}
+.rtg-work-experience .merkkop{border-bottom-color:rgba(213,181,116,.2)!important}
+.rtg-work-experience .merkkop::before{color:var(--anchor-gold)!important}
+.rtg-work-experience .doelgroep{min-height:37rem!important;background:linear-gradient(90deg,rgba(4,14,23,.98),rgba(4,14,23,.72) 58%,rgba(4,14,23,.16)),linear-gradient(0deg,rgba(4,14,23,.94),transparent 72%),url('/images/worlds/heritage/work-heritage-v2.jpg') center/cover no-repeat!important}
+.rtg-work-experience .doelgroeptekst h2{max-width:12ch!important;color:var(--anchor-ivory)!important;font-size:clamp(3rem,6vw,5.7rem)!important}
+.rtg-work-experience .doelgroeptekst p{font-size:.88rem!important;line-height:1.6!important}
+.rtg-work-experience .work-ey{display:block;margin-bottom:.6rem;color:var(--anchor-gold);font-size:.58rem;font-weight:700;letter-spacing:.22em}
+.rtg-work-experience .work-open-day{min-height:46px;display:inline-flex;align-items:center;gap:1rem;margin-top:1rem;padding:.7rem 1rem;border:1px solid var(--anchor-gold);border-radius:0;background:linear-gradient(100deg,#c6a15d,#dfc68d);color:#071522;font-size:.76rem;font-weight:700;text-decoration:none}
+.rtg-work-experience .doelgroepnav a{border-color:rgba(213,181,116,.24)!important;background:rgba(5,16,26,.68)!important}
+.rtg-work-experience .doelgroepnav a.actief{border-color:var(--anchor-gold)!important;color:var(--anchor-gold)!important}
+.rtg-work-experience .doelgroeppoorten a{border-color:rgba(213,181,116,.2)!important;background:rgba(7,21,34,.88)!important}
+.rtg-work-experience .doelgroeppoorten .voet em{color:var(--anchor-gold)!important}
+.rtg-work-experience :where(.cv-rij>*,#werkdag>*,#poorten>*,.hero){border-color:rgba(213,181,116,.18)!important;background-color:#091b2a!important}
+.rtg-work-experience #werkdag .reis{min-height:4.9rem!important}
+.rtg-work-experience .regkop h2{font-family:var(--anchor-serif)!important;font-size:1.35rem!important;font-weight:500!important;letter-spacing:0!important;text-transform:none!important}
+
+/* FoundationOS · School ----------------------------------------------- */
+body.rtg-school-experience{
+  --school-navy:#071827;--school-navy-2:#0b2336;--school-ivory:#f5f0e7;
+  --school-ink:#17191b;--school-muted:#646769;--school-burgundy:#851936;--school-gold:#b89555;
+  margin:0;color-scheme:light;background:#071827!important;
+}
+.rtg-school-experience .school-kader{background:#071827!important}
+.rtg-school-experience .school-zij{border-color:rgba(213,181,116,.18)!important;background:#06131f!important}
+.rtg-school-experience .school-merk{color:var(--anchor-ivory)!important}.rtg-school-experience .school-merkbeeld{border-color:var(--school-gold)!important;color:var(--school-gold)!important}
+.rtg-school-experience .school-nav{color:#b8c2c7!important}.rtg-school-experience .school-nav.aan{border-color:var(--school-gold)!important;background:rgba(184,149,85,.12)!important;color:#fff6e8!important}
+.rtg-school-experience .school-veilig{border-color:rgba(213,181,116,.18)!important;color:#aebbc2!important}
+.rtg-school-experience .school-werk{background:var(--school-ivory)!important;color:var(--school-ink)!important}
+.rtg-school-experience .school-boven{border-color:#ded5c7!important;background:rgba(245,240,231,.94)!important;color:var(--school-ink)!important;backdrop-filter:blur(18px)}
+.rtg-school-experience .school-ey{color:var(--school-burgundy)!important}
+.rtg-school-experience .school-boventitel h1{font-family:var(--anchor-serif)!important;font-weight:500!important}
+.rtg-school-experience .wrap{max-width:70rem!important;padding:1rem 1rem 7rem!important}
+.rtg-school-experience .enterprise-hero{position:relative;isolation:isolate;min-height:34rem;display:flex!important;align-items:flex-end!important;padding:clamp(1.2rem,4vw,3rem)!important;overflow:hidden;border:1px solid rgba(245,240,231,.2)!important;background:#071827!important;color:var(--anchor-ivory)!important}
+.rtg-school-experience .enterprise-hero::before{content:"";position:absolute;z-index:-2;inset:0;background:url('/images/worlds/heritage/foundation-heritage-v2.jpg') center/cover no-repeat;filter:saturate(.72) contrast(1.02)}
+.rtg-school-experience .enterprise-hero::after{content:"";position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,rgba(5,18,29,.96),rgba(5,18,29,.48) 66%,rgba(5,18,29,.12)),linear-gradient(0deg,rgba(5,18,29,.93),transparent 70%)}
+.rtg-school-experience .enterprise-hero>div:first-child{max-width:39rem}
+.rtg-school-experience .enterprise-hero .ey{color:#e3c88c!important}
+.rtg-school-experience .enterprise-hero h2{max-width:12ch!important;margin:.55rem 0!important;color:var(--anchor-ivory)!important;font:400 clamp(3rem,6vw,5.6rem)/.92 var(--anchor-serif)!important;letter-spacing:-.035em!important;text-wrap:balance}
+.rtg-school-experience .enterprise-hero p{max-width:36rem!important;color:#d4dde0!important;font-size:.9rem!important;line-height:1.6!important}
+.rtg-school-experience .enterprise-chip{border-color:rgba(227,200,140,.32)!important;background:rgba(6,19,31,.65)!important;color:#f8f0e7!important}
+.rtg-school-experience .enterprise-belofte{max-width:19rem;border:1px solid rgba(227,200,140,.28)!important;background:rgba(6,19,31,.78)!important;color:#d4dde0!important;backdrop-filter:blur(14px)}
+.rtg-school-experience .enterprise-belofte b{color:#e3c88c!important}
+.rtg-school-experience :where(.kaart,.kpi,.school-dashboard-grid>*,#vandaagLeren>*){border-color:#d9d0c2!important;background:#fbf7f0!important;color:var(--school-ink)!important;box-shadow:0 12px 30px rgba(26,31,35,.06)}
+.rtg-school-experience :where(.mini,.sub,.rij small){color:var(--school-muted)!important}
+.rtg-school-experience .sec,.rtg-school-experience .soort{color:var(--school-burgundy)!important}
+.rtg-school-experience .knop{border-color:var(--school-burgundy)!important;background:var(--school-burgundy)!important;color:#fff8ef!important}
+.rtg-school-experience .veld{border-color:#d7cdbf!important;background:#fffaf3!important;color:var(--school-ink)!important}
+.school-mobile-nav{display:none}
+
+@media(min-width:760px){
+  .today-shell{padding-inline:1.5rem}.today-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:1rem}.today-grid .today-section{margin-top:0}.today-evening{min-height:32rem}
+  .today-nav{position:static;width:min(34rem,100%);margin:1.5rem auto 0}.rtg-today-experience{padding-bottom:1rem}
+}
+@media(max-width:780px){
+  .today-shell{padding-inline:.65rem}.today-top{height:4rem}.today-brand b{font-size:1.65rem}.today-hero{min-height:32rem;margin-top:.65rem;padding:1rem}.today-hero h1{font-size:2.95rem}.today-moment,.today-attention a{grid-template-columns:3rem minmax(0,1fr) auto;padding:.75rem}.today-moment button{padding:.4rem}.today-evening{padding:.9rem}.today-evening h2{font-size:2.45rem}
+  .rtg-travel-experience .prestatiekop{background:#051523!important}.rtg-travel-experience .kaartraster{min-height:36rem!important}.rtg-travel-experience .travel-belofte{font-size:3.35rem}.rtg-travel-experience .dagtitel{padding:1.05rem!important;padding-bottom:1.05rem!important}.rtg-travel-experience .travel-hero-actie{position:static!important;margin-top:1rem}.rtg-travel-experience .hoofdtabs{background:#051523!important}
+  .rtg-work-experience .doelgroep{min-height:37rem!important;padding:1rem!important}.rtg-work-experience .doelgroeptekst h2{font-size:3.25rem!important}.rtg-work-experience .doelgroeppoorten{grid-template-columns:1fr!important}.rtg-work-experience .doelgroeppoorten a{min-height:6.8rem!important}.rtg-work-experience .doelgroepnav{display:flex!important;overflow-x:auto!important;scrollbar-width:none}.rtg-work-experience .doelgroepnav a{flex:0 0 auto;min-width:8.2rem!important}
+  .rtg-school-experience .school-zij{display:none!important}.rtg-school-experience .school-kader{display:block!important}.rtg-school-experience .school-werk{min-height:100dvh!important}.rtg-school-experience .school-boven{position:sticky!important;top:0!important;z-index:25!important;padding:.7rem 1rem!important}.rtg-school-experience .wrap{padding:.65rem .65rem 6.5rem!important}.rtg-school-experience .enterprise-hero{min-height:35rem;padding:1rem!important}.rtg-school-experience .enterprise-hero h2{font-size:3.15rem!important}.rtg-school-experience .enterprise-belofte{display:none!important}.rtg-school-experience .enterprise-acties{gap:.35rem!important}.school-mobile-nav{position:fixed;z-index:30;left:.55rem;right:.55rem;bottom:calc(.55rem + env(safe-area-inset-bottom));height:4.4rem;display:grid;grid-template-columns:repeat(5,1fr);border:1px solid #d7cdbf;background:rgba(250,246,238,.96);backdrop-filter:blur(20px)}.school-mobile-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.22rem;color:#6b6863;font-size:.55rem;text-decoration:none}.school-mobile-nav a[aria-current="page"]{color:var(--school-burgundy)}.school-mobile-nav b{font-size:1rem;font-weight:500}
+}
+@media(max-width:390px){
+  .today-moment,.today-attention a{grid-template-columns:2.8rem minmax(0,1fr)}.today-moment>:last-child,.today-attention em{grid-column:2}.today-section h2{font-size:1.45rem}
+  .rtg-travel-experience .travel-belofte{font-size:3.05rem}.rtg-work-experience .doelgroeptekst h2{font-size:3rem!important}.rtg-work-experience .doelgroepnav{display:grid!important;grid-template-columns:1fr!important;overflow:visible!important}.rtg-work-experience .doelgroepnav a{min-width:0!important}.rtg-school-experience .enterprise-hero h2{font-size:2.9rem!important}
+}
+@media(prefers-reduced-motion:reduce){
+  :where(.rtg-today-experience,.rtg-travel-experience,.rtg-work-experience,.rtg-school-experience) *{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}
+}

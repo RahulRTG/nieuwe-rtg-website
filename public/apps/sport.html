@@ -74,9 +74,10 @@
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<link href="/shared/rtg-sport-2026.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-sport-flow" data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-skin="heritage">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
   <div class="os-switcher__links">
@@ -87,10 +88,18 @@
   </div>
   <span class="os-switcher__state">Kern verbonden</span>
 </div>
-<header><div class="ey">Alle uitslagen, standen en tickets</div><h1>RTG Sport</h1></header>
+<header>
+  <a class="sport-brand" href="/apps/rtg.html"><span>RTG</span><b>LivingOS</b><small>Sport · samen · beleven</small></a>
+  <a class="sport-back" href="/apps/app.html">← App</a>
+</header>
 <main>
+  <section class="sport-intro" aria-labelledby="sportKop">
+    <p class="sport-ey" id="sportEy">Vandaag</p>
+    <h1 id="sportKop">Alles rondom de wedstrijd. Op het juiste moment.</h1>
+    <p id="sportSub">Uitslagen, de stand en uw volgende wedstrijd bij elkaar.</p>
+  </section>
   <div class="tabs" id="tabs">
-    <button class="tab aan" data-t="bord">Uitslagen</button>
+    <button class="tab aan" data-t="bord">Vandaag</button>
     <button class="tab" data-t="stand">De stand</button>
     <button class="tab" data-t="tickets">Tickets</button>
     <button class="tab" data-t="mijn">Mijn tickets</button>
@@ -98,8 +107,17 @@
   </div>
   <div id="inhoud"><div class="leeg">Laden…</div></div>
 </main>
+<nav class="sport-nav" aria-label="Sport">
+  <button class="aan" data-sport="bord" data-icon="▣">Vandaag</button>
+  <button data-sport="mijn" data-icon="□">Tickets</button>
+  <button class="sport-plus" data-sport="tickets" aria-label="Een ticket reserveren">Ticket reserveren</button>
+  <button data-sport="club" data-icon="♧">Mijn club</button>
+  <button data-sport="stand" data-icon="≡">Meer</button>
+</nav>
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/qr.js"></script>
+<script src="/shared/qrteken.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -111,7 +129,15 @@ const api=(pad,body,herkans)=>fetch('/api/member/sport'+pad,{method:'POST',heade
   if(p)return p;
   if(!r.ok){throw new Error(d.error||'Er ging iets mis.');}return d;});
 const eur=c=>'€ '+(Number(c||0)/100).toFixed(2);
-let TAB='bord', CLUB='FCRTG', VAK=null;
+const SPORT_KOPPEN={
+  bord:['Vandaag','Alles rondom de wedstrijd. Op het juiste moment.','Uitslagen, de stand en uw volgende wedstrijd bij elkaar.'],
+  stand:['De stand','Iedere uitslag telt.','De actuele stand, rechtstreeks berekend uit de wedstrijden van de club.'],
+  tickets:['Wedstrijddag','Van uw vak tot de aftrap.','Kies een wedstrijd en een echt beschikbaar vak. De club houdt de capaciteit bij.'],
+  mijn:['Mijn tickets','Uw toegang. Klaar voor de poort.','Uw wedstrijd, vak en toegangscode bij elkaar. Betalen doet u bij de club.'],
+  club:['Mijn club','Dichter bij de club. Zonder iets te missen.','Clubmomenten en zakelijke mogelijkheden, rechtstreeks van de club.']
+};
+const BEGIN_TAB=/^#(bord|stand|tickets|mijn|club)$/.test(location.hash)?location.hash.slice(1):'bord';
+let TAB=BEGIN_TAB, CLUB='FCRTG', CLUBNAAM='De club', VAK=null, GEKOZEN_WEDSTRIJD=null;
 /* Meenemen (shared/uitvoer.js): het eigen model van het tabblad waar u staat.
    Het bord en uw tickets zijn lijsten van deze app; ze gaan mee met de velden
    LOS in plaats van de regel "FC RTG - Es Vedra 2-1" die op de kaart staat.
@@ -127,7 +153,18 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
     rijen:TICKETS.map(t=>[t.datum||'',t.tijd||'',t.wedstrijd||'',t.vak||'',t.aantal||'',(Number(t.prijsCenten||0)/100).toFixed(2),t.code||'',t.status||'']) };
   return null;
 });
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ TAB=b.dataset.t; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('aan',x===b)); laad(); });
+function zetStand(tab, vervang){
+  if(!SPORT_KOPPEN[tab]) return;
+  TAB=tab;
+  document.querySelectorAll('[data-t]').forEach(x=>x.classList.toggle('aan',x.dataset.t===TAB));
+  document.querySelectorAll('[data-sport]').forEach(x=>x.classList.toggle('aan',x.dataset.sport===TAB));
+  const k=SPORT_KOPPEN[TAB]; $('#sportEy').textContent=k[0]; $('#sportKop').textContent=k[1]; $('#sportSub').textContent=k[2];
+  if(location.hash!=='#'+TAB) history[vervang?'replaceState':'pushState'](null,'','#'+TAB);
+  laad();
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>zetStand(b.dataset.t));
+document.querySelectorAll('[data-sport]').forEach(b=>b.onclick=()=>zetStand(b.dataset.sport));
+window.addEventListener('hashchange',()=>{const t=location.hash.slice(1);if(SPORT_KOPPEN[t]&&t!==TAB)zetStand(t,true);});
 
 async function laad(){
   if(!TOKEN){ $('#inhoud').innerHTML='<div class="leeg">Log eerst in via de RTG-app; daarna staan hier alle uitslagen, standen en uw tickets.</div>'; return; }
@@ -137,42 +174,49 @@ async function laad(){
 async function laadBord(){
   let d; try{ d=await api('/bord'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   CLUB = (d.clubs[0]||{}).code || CLUB;
+  CLUBNAAM = (d.clubs[0]||{}).naam || CLUBNAAM;
   BORD = d.wedstrijden||[];
-  const komend = d.wedstrijden.filter(w=>!w.uitslag).reverse();
-  const gespeeld = d.wedstrijden.filter(w=>w.uitslag);
-  const kaart = w => '<div class="item"><h4>'+(w.thuis?esc(w.club)+' - '+esc(w.tegen):esc(w.tegen)+' - '+esc(w.club))+' '+
-    (w.uitslag?'<span class="uitslag">'+esc(w.uitslag)+'</span>':'<span class="status goud">'+esc(w.datum)+' · '+esc(w.tijd)+'</span>')+'</h4>'+
-    '<div class="meta">'+esc(w.team)+' · '+esc(w.competitie)+(w.thuis?' · thuis':' · uit')+'</div>'+
-    (!w.uitslag && w.thuis?'<div class="rij"><button class="knop stil" data-koop="'+esc(w.wedstrijdId)+'">Tickets voor deze wedstrijd</button></div>':'')+'</div>';
-  $('#inhoud').innerHTML=
-    (komend.length?'<h3 style="font-size:1rem;margin:0.25rem 0 0.5rem;">Programma</h3>'+komend.map(kaart).join(''):'')+
-    (gespeeld.length?'<h3 style="font-size:1rem;margin:0.75rem 0 0.5rem;">Uitslagen</h3>'+gespeeld.map(kaart).join(''):'')+
+  const komend=d.wedstrijden.filter(w=>!w.uitslag).reverse(), gespeeld=d.wedstrijden.filter(w=>w.uitslag);
+  let stand=null; try{stand=await api('/stand',{club:CLUB});}catch(e){}
+  const wedstrijd=(w,komendNu)=>'<article class="sport-match'+(komendNu?' sport-fixture':'')+'">'+
+    '<span class="sport-team"><span class="sport-crest">'+esc((w.thuis?w.club:w.tegen).slice(0,3).toUpperCase())+'</span>'+esc(w.thuis?w.club:w.tegen)+'</span>'+
+    '<span class="sport-score"><b>'+(w.uitslag?esc(w.uitslag):'VS')+'</b><small>'+(w.uitslag?'Afgelopen':esc(w.datum)+' · '+esc(w.tijd))+'</small></span>'+
+    '<span class="sport-team"><span class="sport-crest">'+esc((w.thuis?w.tegen:w.club).slice(0,3).toUpperCase())+'</span>'+esc(w.thuis?w.tegen:w.club)+'</span></article>';
+  const laatste=gespeeld[0], volgende=komend.find(w=>w.thuis)||komend[0];
+  $('#inhoud').innerHTML=(laatste?'<div class="sport-section"><h3>Vandaag</h3></div>'+wedstrijd(laatste,false):'')+
+    (volgende?wedstrijd(volgende,true)+'<button class="sport-action" data-koop="'+esc(volgende.wedstrijdId)+'">Bekijk wedstrijddag</button>':'')+
+    (stand?'<div class="sport-section"><h3>De stand</h3><button data-open="stand">Bekijk alles</button></div>'+tekenStand(stand,4):'')+
     (!d.wedstrijden.length?'<div class="leeg">Nog geen wedstrijden op het bord.</div>':'');
-  document.querySelectorAll('[data-koop]').forEach(b=>b.onclick=()=>{ TAB='tickets';
-    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('aan',x.dataset.t==='tickets'));
-    laadTickets(b.dataset.koop); });
+  document.querySelectorAll('[data-koop]').forEach(b=>b.onclick=()=>{ GEKOZEN_WEDSTRIJD=b.dataset.koop; zetStand('tickets'); });
+  verbindOpen();
 }
 
+function tekenStand(d,max){
+  const rijen=max?d.tabel.slice(0,max):d.tabel;
+  return '<div class="sport-table"><table><tr><th>#</th><th>Club</th><th>G</th><th>W</th><th>GL</th><th>V</th><th>+/-</th><th>P</th></tr>'+rijen.map((r,i)=>
+    '<tr'+(r.team===d.team?' class="eigen"':'')+'><td>'+(i+1)+'</td><td>'+esc(r.team)+'</td><td>'+r.g+'</td><td>'+r.w+'</td><td>'+r.gl+'</td><td>'+r.v+'</td><td>'+(r.dv-r.dt)+'</td><td><b>'+r.p+'</b></td></tr>').join('')+'</table></div>';
+}
 async function laadStand(){
   let d; try{ d=await api('/stand',{club:CLUB}); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
-  $('#inhoud').innerHTML='<div class="item"><h4>'+esc(d.competitie||'De stand')+'</h4><div style="overflow-x:auto;"><table>'+
-    '<tr><th>#</th><th></th><th>G</th><th>W</th><th>GL</th><th>V</th><th>+/-</th><th>P</th></tr>'+
-    d.tabel.map((r,i)=>'<tr'+(r.team===d.team?' class="eigen"':'')+'><td>'+(i+1)+'</td><td>'+esc(r.team)+'</td><td>'+r.g+'</td><td>'+r.w+'</td><td>'+r.gl+'</td><td>'+r.v+'</td><td>'+(r.dv-r.dt)+'</td><td><b>'+r.p+'</b></td></tr>').join('')+
-    '</table></div><div class="meta h-mt50">Live berekend uit de uitslagen die de club invoert.</div></div>';
+  $('#inhoud').innerHTML='<div class="sport-section"><h3>'+esc(d.competitie||'De stand')+'</h3></div>'+tekenStand(d)+
+    '<div class="item"><div class="meta">Rechtstreeks berekend uit de uitslagen die de club invoert.</div></div>';
 }
 
 async function laadTickets(voorWedstrijd){
+  voorWedstrijd=voorWedstrijd||GEKOZEN_WEDSTRIJD; GEKOZEN_WEDSTRIJD=null;
   let b, p;
   try{ b=await api('/bord'); p=await api('/plattegrond',{club:CLUB}); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  const clubInfo=(b.clubs||[]).find(c=>c.code===CLUB); if(clubInfo) CLUBNAAM=clubInfo.naam;
   const thuis=b.wedstrijden.filter(w=>w.clubCode===CLUB&&w.thuis&&!w.uitslag).reverse();
   if(!thuis.length){ $('#inhoud').innerHTML='<div class="leeg">Geen thuiswedstrijden in de verkoop.</div>'; return; }
   const VZ_ICO={horeca:'',wc:'',entree:'',ehbo:''};
   const vzBij=id=>p.voorzieningen.filter(v=>v.bij===id).map(v=>(VZ_ICO[v.soort]||'')+' '+esc(v.naam)).join(' · ');
   if(!VAK) VAK=(p.vakken[0]||{}).id;
   $('#inhoud').innerHTML=
-    '<div class="item" style="background:var(--card2);"><h4>Kies de wedstrijd</h4>'+
+    '<div class="item"><h4>Kies de wedstrijd</h4>'+
     '<div class="rij"><select class="veld h-flex1" id="tkW">'+thuis.map(w=>'<option value="'+esc(w.wedstrijdId)+'"'+(voorWedstrijd===w.wedstrijdId?' selected':'')+'>'+esc(w.club)+' - '+esc(w.tegen)+' · '+esc(w.datum)+' '+esc(w.tijd)+'</option>').join('')+'</select></div></div>'+
-    '<h3 style="font-size:1rem;margin:0.25rem 0 0.5rem;">De plattegrond van het stadion</h3>'+
+    '<div class="sport-stadium"><div class="sport-stadium-copy"><b>'+esc(CLUBNAAM)+'</b><small>Uw vak en de voorzieningen eromheen.</small></div><div class="sport-map" aria-label="Schematische stadionplattegrond"></div></div>'+
+    '<div class="sport-section"><h3>Kies uw vak</h3></div>'+
     p.vakken.map(v=>'<button class="vak'+(v.id===VAK?' aan':'')+'" data-vak="'+esc(v.id)+'"><b>'+esc(v.naam)+'</b> · '+eur(v.prijsCenten)+' p.p.'+
       '<div class="vz">'+(vzBij(v.id)||'vrij vak')+'</div></button>').join('')+
     '<div class="item"><div class="rij h-mt0"><select class="veld" id="tkN">'+[1,2,3,4,5,6,7,8].map(n=>'<option value="'+n+'">'+n+' ticket'+(n>1?'s':'')+'</option>').join('')+'</select>'+
@@ -182,7 +226,7 @@ async function laadTickets(voorWedstrijd){
   $('#tkGo').onclick=async()=>{
     try{ const r=await api('/ticket/koop',{club:CLUB,wedstrijdId:$('#tkW').value,vak:VAK,aantal:$('#tkN').value});
       meld('Gereserveerd: '+r.ticket.code+' · '+r.ticket.vak+'. '+r.ticket.let);
-      TAB='mijn'; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('aan',x.dataset.t==='mijn')); laadMijn();
+      zetStand('mijn');
     }catch(e){ meld(e.message); }
   };
 }
@@ -195,32 +239,39 @@ async function laadMijn(){
     '<div class="regel"><span>Wanneer</span><b>'+esc(t.datum)+' · '+esc(t.tijd)+'</b></div>'+
     '<div class="regel"><span>Vak</span><b>'+esc(t.vak)+' · '+t.aantal+'x</b></div>'+
     '<div class="regel"><span>Aan de poort</span><b>'+eur(t.prijsCenten)+' ('+(t.status==='gescand'?'gescand':'contant of RTG Pay')+')</b></div>'+
-    '<div class="code">'+esc(t.code)+'</div>'+
-    '<div class="regel" style="justify-content:center;color:var(--soft);font-size:.72rem;">'+(t.status==='gescand'?'Gescand bij de entree; veel plezier.':'Laat deze code zien bij de entree van '+esc(t.club))+'</div></div>').join('')
-    :'<div class="leeg">Nog geen tickets. Reserveer ze onder Tickets, op de plattegrond van het stadion.</div>';
+    '<div class="sport-ticket"><img class="sport-ticket-qr" data-ticket-code="'+esc(t.code)+'" alt="QR-toegangscode voor '+esc(t.wedstrijd)+'"><div><small>Toegangscode</small><div class="sport-ticket-code">'+esc(t.code)+'</div><div class="meta">'+(t.status==='gescand'?'Gescand bij de entree; veel plezier.':'Laat deze code zien bij de entree van '+esc(t.club))+'</div></div></div>'+
+    '<div class="sport-ticket-actions"><a href="#mijn">Toon toegang</a><a href="/apps/navigatie.html">Open route</a></div></div>').join('')
+    :'<div class="leeg">Nog geen tickets.<div class="rij"><button class="knop" data-open="tickets">Kies een wedstrijd</button></div></div>';
+  document.querySelectorAll('[data-ticket-code]').forEach(img=>{try{if(window.RTGQRteken)img.src=RTGQRteken.dataURL(img.dataset.ticketCode,{schaal:5,quiet:3});}catch(e){img.hidden=true;}});
+  verbindOpen();
 }
 
 async function laadClub(){
-  let m, sp;
-  try{ m=await api('/momenten',{club:CLUB}); sp=await api('/sponsors',{club:CLUB}); }
+  let m, sp, st, bord;
+  try{ bord=await api('/bord'); m=await api('/momenten',{club:CLUB}); sp=await api('/sponsors',{club:CLUB}); st=await api('/stand',{club:CLUB}); }
   catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  const clubInfo=(bord.clubs||[]).find(c=>c.code===CLUB); if(clubInfo) CLUBNAAM=clubInfo.naam;
   $('#inhoud').innerHTML=
-    '<h3 style="font-size:1rem;margin:0.25rem 0 0.5rem;">Momenten van de club</h3>'+
-    (m.momenten.length?m.momenten.map(x=>'<div class="item"><h4>'+esc(x.beeld)+' '+esc(x.tekst)+'</h4><div class="meta">'+esc(x.door)+' · '+new Date(x.at).toLocaleDateString('nl-NL')+'</div></div>').join(''):'<div class="leeg">Nog geen momenten.</div>')+
-    '<h3 style="font-size:1rem;margin:0.75rem 0 0.5rem;">Sponsor worden?</h3>'+
+    '<div class="item"><h4>'+esc(CLUBNAAM)+'</h4><div class="meta">Uw club in uitslagen, stand en momenten.</div></div>'+
+    '<div class="sport-section"><h3>De stand</h3><button data-open="stand">Bekijk alles</button></div>'+tekenStand(st,4)+
+    '<div class="sport-section"><h3>Clubmomenten</h3></div>'+
+    (m.momenten.length?m.momenten.map(x=>'<article class="sport-moment"><div><b>'+esc(x.tekst)+'</b><small>'+esc(x.door)+' · '+new Date(x.at).toLocaleDateString('nl-NL')+'</small></div></article>').join(''):'<div class="leeg">Nog geen momenten.</div>')+
+    '<div class="sport-section"><h3>Interesse in partnership</h3></div>'+
     (sp.sponsors.length?sp.sponsors.map(s=>
       '<div class="item"><h4>'+esc(s.pakket)+' <span class="status goud">'+eur(s.prijsCenten)+'</span></h4>'+
       (s.tekst?'<div class="meta">'+esc(s.tekst)+'</div>':'')+
-      '<div class="rij"><button class="knop stil" data-sp="'+esc(s.id)+'">Toon interesse</button></div></div>').join('')
+      '<div class="rij"><button class="knop stil" data-sp="'+esc(s.id)+'">Bekijk mogelijkheden</button></div></div>').join('')
       :'<div class="item"><div class="meta">Geen open sponsorpakketten op dit moment.</div></div>')+
-    '<div class="item" style="background:var(--card2);"><div class="meta">Interesse tonen kan op codenaam; de club beslist zelf en neemt contact op.</div></div>';
+    '<div class="item"><div class="meta">Interesse tonen kan op codenaam; de club beslist zelf en neemt contact op.</div></div>';
   document.querySelectorAll('[data-sp]').forEach(b=>b.onclick=async()=>{
     try{ const r=await api('/sponsor',{club:CLUB,id:b.dataset.sp}); meld('U staat op de lijst voor "'+r.sponsor.pakket+'"; de club neemt contact op.'); }
     catch(e){ meld(e.message); }
   });
+  verbindOpen();
 }
 
-laad();
+function verbindOpen(){document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>zetStand(b.dataset.open));}
+zetStand(TAB,true);
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

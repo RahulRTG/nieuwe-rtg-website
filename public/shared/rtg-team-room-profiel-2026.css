@@ -1,0 +1,32 @@
+.trm-terug{margin-top:1.1rem;padding:.45rem 0;border:0;background:transparent;color:var(--trm-goud-zacht);font-size:.68rem;cursor:pointer}
+.trm-profielkop{margin-top:.7rem;display:flex;align-items:center;gap:1rem}
+.trm-portret{width:5.3rem;height:5.3rem;display:grid;place-items:center;flex:0 0 auto;border:1px solid var(--trm-goud);border-radius:50%;background:linear-gradient(135deg,#4b2c20,#1e130e);color:var(--trm-goud-zacht);font:500 1.45rem/1 Georgia,serif}
+.trm-profielkop .trm-ey{margin:0}
+.trm-profielkop h1{margin:.32rem 0 0;color:var(--trm-ivoor);font:500 clamp(2rem,8vw,3.4rem)/.96 'Bodoni Moda',Georgia,serif;letter-spacing:-.045em}
+.trm-profielkop p:last-child{margin:.35rem 0 0;color:var(--trm-stil);font-size:.74rem}
+.trm-profielstatus{margin:.8rem 0 1rem;color:#aacbb0;font-size:.67rem}
+.trm-profielstatus:before{content:'';display:inline-block;width:.52rem;height:.52rem;margin-right:.42rem;border-radius:50%;background:var(--trm-groen)}
+.trm-profielrooster{display:grid;grid-template-columns:repeat(2,1fr);gap:.65rem}
+.trm-profielkaart{min-height:7rem;padding:.82rem;border:1px solid var(--trm-lijn);background:rgba(28,18,13,.86)}
+.trm-profielkaart h2{margin:0;color:var(--trm-goud-zacht);font-size:.65rem;font-weight:750}
+.trm-profielkaart strong{display:block;margin-top:.8rem;color:var(--trm-ivoor);font:500 1.12rem/1.05 'Bodoni Moda',Georgia,serif}
+.trm-profielkaart p{margin:.32rem 0 0;color:#928378;font-size:.61rem;line-height:1.42}
+.trm-voortgang{height:.3rem;margin:.75rem 0 .35rem;background:#47392f}
+.trm-voortgang span{display:block;height:100%;background:var(--trm-goud)}
+.trm-chips{margin-top:.65rem;display:flex;flex-wrap:wrap;gap:.32rem}
+.trm-chip{padding:.28rem .38rem;border:1px solid #4e3b2d;color:#aa9a8e;font-size:.52rem}
+.trm-profielbreed{margin-top:.65rem;padding:.85rem;border:1px solid var(--trm-lijn);background:rgba(28,18,13,.86)}
+.trm-profielbreed b{display:block;color:var(--trm-ivoor);font-size:.72rem}
+.trm-profielbreed span{display:block;margin-top:.28rem;color:#95867b;font-size:.6rem}
+.trm-profielacties{margin-top:.75rem;display:grid;gap:.48rem}
+.trm-profielacties .trm-primair{margin:0}
+.trm-nav{position:fixed;left:50%;bottom:max(.65rem,env(safe-area-inset-bottom));width:min(calc(100% - 1.2rem),54rem);height:4.15rem;display:grid;grid-template-columns:repeat(4,1fr);transform:translateX(-50%);z-index:40;border:1px solid #4a372a;background:rgba(15,10,7,.96);backdrop-filter:blur(1rem);box-shadow:0 1rem 3rem rgba(0,0,0,.42)}
+.trm-nav button{min-width:0;border:0;background:transparent;color:#91847b;font-size:.59rem;cursor:pointer}
+.trm-nav button i{display:block;margin:0 auto .34rem;color:#a09084;font:normal 1rem/1 Georgia,serif}
+.trm-nav button[aria-current="page"]{color:var(--trm-goud-zacht)}
+.trm-nav button[aria-current="page"] i{color:var(--trm-goud-zacht)}
+.trm-melding{position:fixed;right:1rem;bottom:5.4rem;z-index:60;max-width:min(22rem,calc(100% - 2rem));padding:.75rem .9rem;border:1px solid var(--trm-lijn);background:var(--trm-ivoor);color:#160d09;font-size:.69rem;box-shadow:0 1rem 2.5rem rgba(0,0,0,.36)}
+.trm-diep-terug{margin-left:auto!important;padding:.45rem .7rem!important;border:1px solid var(--trm-goud)!important;background:transparent!important;color:var(--trm-goud-zacht)!important;font-size:.65rem!important;cursor:pointer}
+@media(min-width:700px){.trm-binnen{padding-left:1.4rem;padding-right:1.4rem}.trm-scherm{max-width:47rem;margin:0 auto}.trm-team{display:grid;grid-template-columns:1fr 1fr}.trm-teamrij:nth-child(odd):not(:last-child){border-right:1px solid rgba(75,56,43,.75)}.trm-profielrooster{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:520px){.trm-binnen{padding-left:.75rem;padding-right:.75rem}.trm-kop{min-height:4.7rem}.trm-merk b{font-size:1.8rem}.trm-naam{font-size:.5rem}.trm-titel{font-size:clamp(2.45rem,12vw,3.35rem)}.trm-dienstdeel{padding:.72rem}.trm-focuskop{grid-template-columns:3.25rem 1fr auto}.trm-focustijd{width:3.25rem;height:3.25rem}.trm-profielrooster{gap:.48rem}.trm-profielkaart{padding:.7rem}}
+@media(prefers-reduced-motion:reduce){.trm-scherm{animation:none}}

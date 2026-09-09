@@ -14,6 +14,10 @@
     var Geld = w.Geld, esc = Geld.esc;
     try {
       var data = await Geld.api('/api/balans');
+      /* Iedere stand deelt hetzelfde #paneel. Als dit antwoord later komt dan
+         een standwissel, bestaat de Balans-opmaak niet meer en hoort het
+         antwoord stil te eindigen. */
+      if (!$('#blWrap')) return;
       DATA = data;
       var b = data.beeld || {};
       $('#blWeek').innerHTML = B.weekHtml(b);
@@ -32,6 +36,7 @@
           '<button class="knop" id="blBeweeg" type="button">Vraag Rahul naar sport en wellness</button>' +
         '</div>';
     } catch (e) {
+      if (!$('#blWrap')) return;
       $('#blWeek').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: esc(e.message) }));
       $('#blAdvies').innerHTML = '<p class="stil">Dit deel laadde niet. Ververs de pagina; blijft het staan, dan is de bron even niet bereikbaar.</p>';
       $('#blKook').innerHTML = '<p class="stil">Dit deel laadde niet. Ververs de pagina; blijft het staan, dan is de bron even niet bereikbaar.</p>';

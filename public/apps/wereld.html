@@ -186,6 +186,7 @@
     color:var(--rtg-soft);text-decoration:none;font-size:0.66rem;
     font-weight:600;letter-spacing:0.01em;}
   .balk a[aria-current="page"]{color:var(--rtg-txt);}
+  .wereld-inlog-link{display:inline-flex;align-items:center;min-height:24px;color:inherit;text-decoration:none;}
   .balk a[aria-current="page"] span{color:var(--rtg-txt);}
   .balk span{display:block;font-size:1.05rem;line-height:1.35;}
   /* shared/rtg-worlds-2026.css schuift elke vaste `body > nav` omlaag met
@@ -208,9 +209,10 @@
   }
 </style>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<link href="/shared/rtg-experience-2026.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-skin="heritage">
+<body class="rtg-social-experience" data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
 
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
@@ -225,9 +227,16 @@
 <header class="kop">
   <div class="kopinhoud" id="eliteKop">
     <div class="elite-merk">
-      <div><p class="eyebrow">Private social &amp; dating society</p><div class="elite-titel" role="heading" aria-level="1">RTG Elite</div></div>
-      <div class="belofte">Experience the Elite Class</div>
+      <div><p class="eyebrow">People · places · moments</p><div class="elite-titel" role="heading" aria-level="1">RTG</div></div>
+      <div class="belofte">Een betekenisvoller leven</div>
     </div>
+    <nav class="momenten" aria-label="Verhalen en snelle ingangen">
+      <a class="moment" href="/apps/camera.html"><i aria-hidden="true"></i>Jouw verhaal</a>
+      <a class="moment" href="/apps/reisboek.html"><i aria-hidden="true"></i>Reizen</a>
+      <a class="moment" href="/apps/table.html"><i aria-hidden="true"></i>Aan tafel</a>
+      <a class="moment" href="/apps/foundation/vrienden.html"><i aria-hidden="true"></i>Vrienden</a>
+      <a class="moment" href="/apps/rtg.html"><i aria-hidden="true"></i>LivingOS</a>
+    </nav>
     <section class="passport" id="passport" aria-label="Member passport" hidden>
       <div class="passportkop">
         <div><p class="passportlabel">Member passport</p><p class="wie" id="wie">Bezig met laden…</p></div>
@@ -267,12 +276,12 @@
   </div>
 </main>
 
-<nav class="balk" aria-label="Hoofdnavigatie">
-  <a href="/apps/wereld.html" id="homeTab" aria-label="Home" aria-current="page"><span>◎</span>Home</a>
-  <a href="#ontdek" id="ontdekTab" aria-label="Ontdek"><span>◈</span>Ontdek</a>
-  <a href="/apps/comm.html" aria-label="Chat"><span>◇</span>Chat</a>
-  <a href="/apps/attenties.html" aria-label="Activiteit"><span>◉</span>Activiteit</a>
-  <a href="#profiel" id="profielTab" aria-label="Profiel"><span>○</span>Profiel</a>
+<nav class="social-nav balk" aria-label="Hoofdnavigatie">
+  <a href="/apps/wereld.html" id="homeTab" aria-label="Home" aria-current="page"><span>⌂</span>Home</a>
+  <a href="#ontdek" id="ontdekTab" aria-label="Zoeken"><span>⌕</span>Zoeken</a>
+  <a href="/apps/camera.html" aria-label="Maken"><span>＋</span>Maken</a>
+  <a href="/apps/comm.html" aria-label="Berichten"><span>◇</span>Berichten</a>
+  <a href="#profiel" id="profielTab" aria-label="Wereld"><span>◎</span>Wereld</a>
 </nav>
 
 <script src="/shared/glyf.js"></script>
@@ -566,7 +575,7 @@
     $('#werelden').hidden = welke !== 'feed';
     $('#lenzen').hidden = welke !== 'feed';
     var bij = { feed: 'homeTab', profiel: 'profielTab', ontdek: 'ontdekTab' };
-    document.querySelectorAll('.balk a').forEach(function (a) {
+    document.querySelectorAll('.social-nav a').forEach(function (a) {
       a.setAttribute('aria-current', a.id === bij[welke] ? 'page' : 'false');
     });
   }
@@ -601,7 +610,7 @@
          wereld hoort komt van de SERVER (kern/wereld/koppel.js), zodat dit
          scherm geen eigen kaart bijhoudt. Is er geen la voor deze wereld, dan
          blijft de link gewoon de inbox openen. */
-      var chat = document.querySelector('.balk a[href="/apps/comm.html"]');
+      var chat = document.querySelector('.social-nav a[href="/apps/comm.html"]');
       if (chat) chat.href = '/apps/comm.html' + (d.chatLade ? '?lade=' + encodeURIComponent(d.chatLade) : '');
       tekenPassport(d);
       tekenLenzen();
@@ -615,7 +624,7 @@
          foutmelding: het scherm zou dan tegelijk zeggen dat het stuk is en dat
          het nog bezig is. De melding is het antwoord; verder hoort dit vlak
          leeg te zijn. */
-      $('#feed').textContent = '';
+      $('#feed').innerHTML = '<article class="kaart"><div class="r1"><span class="auteur">Uw LivingOS</span><span class="bron">Privé</span></div><p>De momenten van uw mensen, reizen en plekken komen hier rustig samen.</p><div class="acties"><a class="wereld-inlog-link" href="/apps/app.html">Log in om uw wereld te openen</a></div></article>';
       toon(e.message + ' Log opnieuw in via de app.');
     });
 })();
@@ -626,7 +635,6 @@
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/ios.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

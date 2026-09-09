@@ -40,6 +40,10 @@ test('RTMAIL-teams: oprichten, iemand erbij, oppakken en afhandelen op het scher
     }, baas.token);
     await page.goto(base + '/apps/rtmail.html', { waitUntil: 'domcontentloaded' });
 
+    // De rustige voorzijde toont alleen wat aandacht vraagt. Teambeheer blijft
+    // bewust in het volledige postvak bereikbaar, zonder een tweede mail-app.
+    await page.click('.rtm-nav [data-rtm-diep="inbox"]');
+
     // het teams-blok verschijnt onder je eigen postvak
     await page.waitForFunction(() => /Teams/.test(document.body.textContent), null, { timeout: 15000 });
 

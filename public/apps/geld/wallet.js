@@ -92,9 +92,14 @@
      De echte naam ligt in de gescheiden kluis (privacy by design). */
   function tekenPas(user) {
     var esc = w.Geld.esc;
-    if (!user) { $('#waPas').innerHTML = RTGLeeg.html(RTGLeeg.inlogStand({
+    var vak = $('#waPas');
+    /* De API kan antwoorden nadat de gebruiker al naar een andere Geld-stand
+       ging. Dan is er niets meer te tekenen; een late reactie mag het nieuwe
+       paneel niet met een null-fout vervuilen. */
+    if (!vak) return;
+    if (!user) { vak.innerHTML = RTGLeeg.html(RTGLeeg.inlogStand({
       ey: 'Wallet', wat: 'Uw pas hoort bij uw account en wordt niet zonder aanmelding getoond.' })); return; }
-    $('#waPas').innerHTML =
+    vak.innerHTML =
       '<div class="wa-pas">' +
         '<div class="label">Uw codenaam, uw identiteit in onze systemen</div>' +
         '<div class="cn" id="waPasCn">' + esc(user.codename || '') + '</div>' +
@@ -129,8 +134,11 @@
     try {
       var r = await w.Geld.api('/api/state');
       tekenPas(r && r.state && r.state.user);
-    } catch (e) { $('#waPas').innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e, { ey: 'Wallet',
-      titel: 'Uw pas is nu niet op te halen.' })); }
+    } catch (e) {
+      var vak = $('#waPas');
+      if (vak) vak.innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e, { ey: 'Wallet',
+        titel: 'Uw pas is nu niet op te halen.' }));
+    }
   }
 
   var Deel = w.RTGGeldDeel = w.RTGGeldDeel || {};

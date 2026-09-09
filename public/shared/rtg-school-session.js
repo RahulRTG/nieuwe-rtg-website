@@ -88,7 +88,7 @@
       '<div class="rtf-school-merk">RTFoundation · tijdelijke Schoolpas</div>' +
       '<h1>Deze ' + rol + ' blijft nog dicht</h1>' +
       '<p>Open de les via Leren. De klascode en sleutel blijven alleen in deze tab staan en verlopen automatisch na dertig minuten zonder activiteit.</p>' +
-      '<div class="rtf-school-acties"><a data-school-open href="/apps/foundation/leren.html">Naar Leren</a>' +
+      '<div class="rtf-school-acties"><a data-school-open href="/apps/foundation/leren.html">Naar Leren &amp; Groei</a>' +
       '<a data-school-uitweg href="/apps/app.html">Naar RTG OS</a></div></div>';
     try { if (!el.open) el.showModal(); } catch (e) {}
     return el;

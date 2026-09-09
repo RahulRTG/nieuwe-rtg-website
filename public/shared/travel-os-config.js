@@ -3,13 +3,13 @@
   w.RTGTravelOSConfig = {
     routes: {
       '/apps/vluchten.html': {
-        naam: 'VLUCHTEN', actief: 'reizen', scene: 'aviation',
+        naam: 'VLUCHTEN', actief: 'reizen', scene: 'aviation', eigenHero: true,
         titel: 'Vertrek met overzicht.',
         intro: 'Boeking, inchecken, gate en aankomst in één rustig vluchtbeeld.',
         stappen: [['ZOEKEN', 'Lijnvlucht en private aviation'], ['VERTREK', 'Check-in, gate en documenten'], ['AANKOMST', 'Transfer staat op tijd klaar']]
       },
       '/apps/hotels.html': {
-        naam: 'VERBLIJVEN', actief: 'reizen', scene: 'villa',
+        naam: 'VERBLIJVEN', actief: 'reizen', scene: 'villa', eigenHero: true,
         titel: 'Uw verblijf, rustig voorbereid.',
         intro: 'Van de eerste selectie tot de bevestigde kamer en aankomst.',
         stappen: [['SELECTIE', 'Hotel, appartement of villa'], ['BEVESTIGD', 'Prijs en voorwaarden vooraf'], ['AANKOMST', 'Adres, sleutel en vervoer bijeen']]
@@ -23,16 +23,16 @@
       '/apps/ov.html': { naam: 'MOBILITEIT', actief: 'reizen', scene: 'mobility', eigenHero: true },
       '/apps/navigatie.html': { naam: 'NAVIGATIE', actief: 'reizen', scene: 'road', kaart: true },
       '/apps/rit.html': {
-        naam: 'RITSTATUS', actief: 'taxi', scene: 'road',
-        titel: 'Uw rit, zonder onzekerheid.',
-        intro: 'Route, chauffeur en voortgang blijven zichtbaar tot aan de deur.',
-        stappen: [['TOEGEWEZEN', 'Gescreende chauffeur'], ['ONDERWEG', 'Live voortgang op uw scherm'], ['AANGEKOMEN', 'Locatiedeling stopt vanzelf']]
+        naam: 'AANKOMST & CHAUFFEUR', actief: 'taxi', scene: 'road', eigenHero: true,
+        titel: 'Van aankomst naar bestemming.',
+        intro: 'Transfer, chauffeur en verblijf sluiten aan zonder dat u opnieuw hoeft te beginnen.',
+        stappen: [['AANVRAGEN', 'Ophaalpunt, bestemming en bagage'], ['ONTVANGEN', 'Chauffeur en ontmoetingspunt'], ['THUISKOMEN', 'Rit, gastheer en sleutel bijeen']]
       },
       '/apps/reisboek.html': {
-        naam: 'REISBOEK', actief: 'reizen', scene: 'documents',
-        titel: 'Alles wat meegaat, op zijn plaats.',
-        intro: 'Het draaiboek, de documenten en elk beslismoment bij dezelfde reis.',
-        stappen: [['DRAAIBOEK', 'Heen, verblijf en terug'], ['DOCUMENTEN', 'Geldigheid en aandacht'], ['PROGRAMMA', 'Dag voor dag geordend']]
+        naam: 'REISBOEK', actief: 'reizen', scene: 'documents', eigenHero: true,
+        titel: 'Uw reis beweegt met u mee.',
+        intro: 'Vlucht, chauffeur, verblijf, documenten en wijzigingen vormen samen één rustige reis.',
+        stappen: [['VANDAAG', 'Elk volgend moment op zijn plaats'], ['DOCUMENTEN', 'Alleen wat veilig bij uw reis hoort'], ['WIJZIGINGEN', 'Voorstellen klaar; u beslist']]
       },
       '/apps/hangar.html': {
         naam: 'PRIVATE MOBILITY', actief: 'reizen', scene: 'aviation',

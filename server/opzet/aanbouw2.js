@@ -58,6 +58,7 @@ module.exports = function bouwKernAanTwee(kern, grens) {
      plek, met AI-scenes; sloten blijven altijd handwerk van het lid zelf. */
   Object.assign(kern, require('../kern/homekit')({ db, save, crypto, schoon, anthropic }));
   Object.assign(kern, require('../kern/homemerken')({ db, save, schoon }));
+  Object.assign(kern, require('../kern/woningonderhoud')({ db, save, crypto, schoon }));
   require('../routes/home')(grens('home'));
   /* RTG Vracht (kern/vracht.js): internationale vracht voor expediteurs, over
      lucht, water en land; publiek volgen op volgcode zonder klantgegevens. */

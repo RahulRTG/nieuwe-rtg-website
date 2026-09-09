@@ -23,7 +23,9 @@ module.exports = [
      ingang naar dezelfde?" is het antwoord bij alle vier nee. Wat Kantoor
      toevoegt is wat nergens bestond: uw werkdag uit vier domeinen tegelijk. */
   ['kantoor', 'RTG Kantoor', 'media', '/apps/kantoor.html', 'Uw werkdag bij elkaar -- afspraken, open taken, documenten en gedeelde bestanden -- ongeacht in welke app ze leven. Maken en wijzigen blijft in de app die het echte werk doet.'],
-  ['office', 'RTG Office', 'media', '/apps/office.html', 'Tekst en rekenblad met autosave, delen op codenaam en export.'],
+  ['office', 'RTDocs', 'media', '/apps/office.html', 'De juiste documentversie, context en menselijke beoordeling bij het werk dat haar nodig heeft.'],
+  ['decisionroom', 'Decision Room', 'media', '/apps/decision-room.html', 'Besluitagenda, volledige afweging, menselijke bevestiging en borging in één controleerbaar spoor.'],
+  ['projectroom', 'Project Room', 'media', '/apps/project-room.html', 'Van goedgekeurd besluit naar één volgende stap, een levend projectdossier en aantoonbare menselijke oplevering.'],
   ['agenda', 'Agenda', 'media', '/apps/agenda.html', 'Maand, week en lijst; uitnodigen op codenaam, herinneringen, en je RTG-boekingen staan er vanzelf in.'],
   ['notities', 'Notities & Taken', 'media', '/apps/notities.html', 'Notities en lijstjes met vinkjes; delen op codenaam is samen werken, en een datum wordt vanzelf een agenda-afspraak.'],
   ['bestanden', 'Bestanden', 'media', '/apps/bestanden.html', 'De versleutelde kluis: mappen, versies, delen op codenaam en een prullenbak die 30 dagen bewaart. Je Office-werk staat er vanzelf bij.'],

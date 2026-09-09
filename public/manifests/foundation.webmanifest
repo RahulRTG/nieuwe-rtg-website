@@ -37,12 +37,24 @@
   ],
   "shortcuts": [
     {
-      "name": "Leren",
+      "name": "Gezondheid & Welzijn",
+      "url": "/apps/foundation/gezondheid-welzijn.html"
+    },
+    {
+      "name": "Geld & Later",
+      "url": "/apps/foundation/geld-later.html"
+    },
+    {
+      "name": "Samen Thuis",
+      "url": "/apps/foundation/samen-thuis.html"
+    },
+    {
+      "name": "Leren & Groei",
       "url": "/apps/foundation/leren.html"
     },
     {
-      "name": "Onze dromen",
-      "url": "/apps/foundation/dromen.html"
+      "name": "Meedoen & Ontdekken",
+      "url": "/apps/foundation/meedoen-ontdekken.html"
     },
     {
       "name": "Contact",
@@ -57,8 +69,8 @@
       "url": "/apps/foundation/klusjes.html"
     },
     {
-      "name": "Veilig thuis",
-      "url": "/apps/foundation/veilig.html"
+      "name": "Veilig & Vertrouwd",
+      "url": "/apps/foundation/veilig-vertrouwd.html"
     },
     {
       "name": "Belangrijke info",

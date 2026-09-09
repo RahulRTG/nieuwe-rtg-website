@@ -13,7 +13,7 @@
 'use strict';
 
 const REGELS = [
-  [/office\/boardroom|\/boardroom/, 'boardroom', 'De Boardroom'],
+  [/office\/boardroom|\/boardroom|\/decision-room\.html/, 'boardroom', 'De Boardroom'],
   [/member\/magnaat|office\/magnaat|magnaat-kantoor|\/command\b|\/lab2\b/, 'controleregister', 'RTG Controleregister'],
   [/office\/(?:paniek|rampbeeld)|paniekkamer|\/noodkaart|\/veiligheid|\/kmar/, 'paniekkamer', 'De Paniekkamer'],
   [/office\/bank/, 'bank', 'RTG Rekening'],
@@ -53,7 +53,7 @@ const REGELS = [
   [/routedekking|routedossier|platformregister/, 'ingenieurs', 'Ingenieurs'],
   [/office\/ideeen|\/ideeen/, 'ideeen', 'De Ideeënkamer'],
   [/office\/kantine/, 'kantine', 'Kantine'],
-  [/office\/(?:koppel|onboarding|conversations)|\/integratie|\/webhook/, 'integraties', 'Integratiekamer'],
+  [/office\/(?:koppel|onboarding|conversations)|\/integratie|\/webhook|\/project-room\.html/, 'integraties', 'Integratiekamer'],
   [/office\/(?:rtgai|journaal)|\/instant-reality|\/test\b|\/spelscherm|\/spelen\.html/, 'controleregister', 'RTG Controleregister'],
   [/office\/(?:kamer|kamers|dienst|stats|inzage|kachat|bureau|concierge|briefing|doc|nudge|reply)|\/kantoorpda|\/rtgkantoor|\/backoffice|\/office\.html|\/kantoor\.html|\/kantoren\.html|\/werkruimte/, 'intern', 'Intern & IT'],
   [/office\/(?:login|state|timeline|export\.csv|web)|\/login|\/logout|\/ready|\/health|\/cluster|\/fout\b/, 'intern', 'Intern & IT'],

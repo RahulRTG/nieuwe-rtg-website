@@ -82,22 +82,24 @@ async function tekenBestellingen() {
     : '';
 
   if (!d.aantal) {
-    $('#bestellingen').innerHTML = stuk + '<div class="leeg">Je hebt op dit moment niets lopen.</div>';
+    $('#bestellingen').innerHTML = stuk + '<div class="leeg">U heeft op dit moment niets lopen.</div>';
     return;
   }
-  $('#bestellingen').innerHTML = stuk + '<div class="kaart">' +
-    '<p class="oms meta">' + d.loopt + ' lopend &middot; ' + d.klaar + ' afgerond &middot; ' + d.afgezegd + ' afgezegd</p>' +
+  $('#bestellingen').innerHTML = stuk +
+    '<div class="shop-order-summary" aria-label="Stand van uw bestellingen">' +
+      '<span><b>' + d.loopt + '</b> lopend</span><span><b>' + d.klaar + '</b> afgerond</span>' +
+      '<span><b>' + d.afgezegd + '</b> afgezegd</span></div>' +
+    '<div class="shop-order-list">' +
     d.bestellingen.map((r) =>
-      '<div class="regel' + (r.stand === 'afgezegd' ? ' vervallen' : '') + '">' +
-        '<span>' + esc(r.soortLabel) + ': ' + esc(r.titel) +
-          ' <span class="meta">&middot; ' + esc(r.aanbieder) + '</span></span>' +
-        '<span class="meta">' + esc(r.status) +
-          (r.bedrag != null ? ' &middot; ' + esc(euro(r.bedrag)) : '') +
-          (r.betaald === true ? ' &middot; betaald' : '') +
-          ' &middot; <a href="' + esc(r.pagina) + '">bekijken</a></span>' +
-      '</div>').join('') +
-    '<p class="oms">' + esc(d.opmerking) + '</p>' +
-    '</div>';
+      '<a class="shop-order' + (r.stand === 'afgezegd' ? ' vervallen' : '') + '" href="' + esc(r.pagina) + '">' +
+        '<span class="shop-order-kind">' + esc(r.soortLabel) + '</span>' +
+        '<span class="shop-order-copy"><b>' + esc(r.titel) + '</b><small>' + esc(r.aanbieder) +
+          (r.wanneer ? ' &middot; ' + esc(r.wanneer) : '') + '</small></span>' +
+        '<span class="shop-order-state" data-state="' + esc(r.stand) + '"><b>' + esc(r.status) + '</b><small>' +
+          (r.bedrag != null ? esc(euro(r.bedrag)) : 'Bedrag bij aanbieder') +
+          (r.betaald === true ? ' &middot; betaald' : '') + '</small></span><span class="shop-order-open">&#8594;</span>' +
+      '</a>').join('') + '</div>' +
+    '<p class="shop-order-note">' + esc(d.opmerking) + '</p>';
 }
 
 /* ---------- samengesteld aanbod ---------- */

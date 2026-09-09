@@ -68,9 +68,9 @@ module.exports = {
     'De ledenprijsgarantie staat hier zwart op wit: een lid betaalt nooit meer dan de publieke prijs.'),
 
   /* ---- de RTFoundation-apps (kindvriendelijk: warm, je/jij) ---- */
-  '/apps/foundation/index.html': G('Dit is jullie RTFoundation-app: alle hulp en leuke dingen voor het gezin op één plek.',
-    ['Kies een tegel die bij je past', 'Vraag een grote mee als iets moeilijk is', 'Alles hier is gratis en veilig'],
-    'Alles in deze app is er om je te helpen; er zit nooit een rekening of reclame achter.'),
+  '/apps/foundation/index.html': G('Jullie persoonlijke FoundationOS: vandaag, ontwikkeling en vertrouwde mensen bij elkaar.',
+    ['Bekijk de gezinsagenda', 'Open je eigen ontwikkeling zonder ranglijst', 'Zie per band wat je deelt'],
+    'Begin bij Vandaag; alle losse apps staan onder Alle apps.'),
   '/apps/foundation/agenda.html': G('De gezinsagenda: wat er deze week gebeurt, voor iedereen te zien.',
     ['Zet er iets in dat je niet wilt vergeten', 'Kijk wat er vandaag en morgen is', 'Zet een herinnering voor jezelf'],
     'Elke avond even kijken wat er morgen is; dan begint je dag rustig.'),

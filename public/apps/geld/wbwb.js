@@ -15,6 +15,7 @@
     var Geld = w.Geld, D = Deel();
     try {
       var r = await Geld.api('/api/wbw/mijn');
+      if (!$('#wbWrap')) return;
       D.S.lijstjes = r.groepen || [];
       D.tekenLijstjes();
       D.toon('lijst');
@@ -22,6 +23,7 @@
     } catch (e) {
       /* de poort van de oude pagina: niet ingelogd of geen lid, dan geen
          half scherm maar alleen de uitleg */
+      if (!$('#wbWrap')) return;
       $('#wbFout').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: Geld.esc(e.message) }));
       $('#wbLijst').hidden = true;
       $('#wbGroep').hidden = true;
@@ -30,8 +32,13 @@
 
   async function laadVrienden() {
     var D = Deel();
-    try { D.tekenVrienden((await w.Geld.api('/api/member/connections')).connections || []); }
-    catch (e) { $('#wbVrienden').innerHTML = '<p class="stil">' + w.Geld.esc(e.message) + '</p>'; }
+    try {
+      var vrienden = (await w.Geld.api('/api/member/connections')).connections || [];
+      if ($('#wbWrap')) D.tekenVrienden(vrienden);
+    } catch (e) {
+      var vak = $('#wbVrienden');
+      if (vak) vak.innerHTML = '<p class="stil">' + w.Geld.esc(e.message) + '</p>';
+    }
   }
 
   async function openGroep(id) {

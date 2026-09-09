@@ -107,9 +107,10 @@
   .melding.zien{opacity:1;}
 </style>
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<link href="/shared/rtg-media-2026.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body data-rtg-eigenvlak="onyx" data-rtg-world="living" data-rtg-skin="heritage">
+<body class="rtg-media-experience" data-rtg-eigenvlak="onyx" data-rtg-world="living" data-rtg-skin="heritage">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
   <div class="os-switcher__links">
@@ -133,7 +134,8 @@
 </aside>
 <div class="media-werk">
 <header class="kop">
-  <div class="media-titel"><span>Media · Rahul</span><h1>Uw mediawereld.</h1><p>Kijken, luisteren en produceren in één rustige ruimte.</p></div>
+  <a class="media-brand" href="/apps/rtg.html" aria-label="RTG LivingOS"><span>RTG</span><b>LivingOS</b><small>Film · video · muziek · live</small></a>
+  <div class="media-titel"><span>Vandaag · voor u</span><h1>Minder zoeken.<br>Meer beleven.</h1><p>Alles wat u wilt zien en horen, rustig bij elkaar.</p></div>
   <span class="rek"></span>
   <button class="knop" id="lijstKnop" type="button">Lijsten</button>
   <button class="knop" id="samenKnop" type="button">Samen</button>
@@ -155,7 +157,11 @@
 
 <nav class="standen" id="standen" aria-label="Standen"></nav>
 
-<main>
+<main id="rtg-inhoud">
+  <section class="media-belofte" aria-label="Hoe uw wereld wordt samengesteld">
+    <span aria-hidden="true">✦</span>
+    <p><b>Uw keuze blijft van u.</b> Deze volgorde gebruikt alleen makers die u volgt en voorkeuren die u zelf geeft. Geen verborgen kijkprofiel.</p>
+  </section>
   <p class="stil" id="uitleg">De wereld laadt…</p>
   <div class="stukken" id="stukken"></div>
 
@@ -240,10 +246,22 @@
     </div>
     <button class="knop" id="spStop" type="button">Stop</button>
   </div>
+  <div class="media-player-actions" id="spActions" hidden>
+    <button class="knop" id="spLijst" type="button">In lijst</button>
+    <button class="knop" id="spSamen" type="button">Samen kijken</button>
+  </div>
 </footer>
 
 <div class="melding" id="melding" role="status"></div>
 </div>
+
+<nav class="media-mobile-nav" aria-label="Media">
+  <button type="button" data-media-voor="wereld" data-icon="⌂" aria-current="page">Vandaag</button>
+  <button type="button" data-media-voor="ontdek" data-icon="⌕">Ontdekken</button>
+  <button class="media-plus" type="button" data-media-voor="studio" aria-label="Nieuwe productie">Maken</button>
+  <button type="button" data-media-voor="bieb" data-icon="▥">Bibliotheek</button>
+  <a href="/apps/podium.html" data-icon="◉">Live</a>
+</nav>
 
 <!-- De muziekmotor van het Klankwerk, ongewijzigd hergebruikt: een uitgave
      reist als getallen en klinkt op uw eigen toestel, precies zoals de maker
@@ -274,5 +292,6 @@
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/ios.js" defer></script>
 <script src="/apps/media/studio.js"></script>
+<script src="/apps/media/voorzijde.js"></script>
 </body>
 </html>

@@ -1,19 +1,19 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-09-07",
+  "vastgelegd": "2026-09-08",
   "gemeten": {
-    "bestanden": 2141,
-    "domeinenTotaal": 590,
+    "bestanden": 2143,
+    "domeinenTotaal": 592,
     "koopbareVormen": 527,
     "koopbareDomeinen": 109,
     "envelopDrempel": 7,
     "envelop": 46,
-    "veldenDomeineigen": 718,
-    "veldenNietEnvelop": 933,
+    "veldenDomeineigen": 722,
+    "veldenNietEnvelop": 937,
     "gelijkendeVormparen": 8,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 43,
+    "werkwoordCombinaties": 44,
     "wagenVormen": 32,
     "wagenVormenUniek": 29,
     "wagenDomeinen": 22,
@@ -78,7 +78,7 @@
     "beschikbaarheid": 50,
     "reserveer": 27,
     "bevestig": 50,
-    "lever": 19,
+    "lever": 20,
     "annuleer": 27,
     "retour": 7
   },
@@ -1788,6 +1788,23 @@
       "telt": 1
     },
     {
+      "domein": "kern/rtgone-projecten",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": true,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "lever": "projectOplever"
+      },
+      "telt": 1
+    },
+    {
       "domein": "kern/schoolbieb",
       "heeft": {
         "toon": true,
@@ -2041,21 +2058,6 @@
     },
     {
       "domein": "kern/routedekking",
-      "heeft": {
-        "toon": false,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {},
-      "telt": 0
-    },
-    {
-      "domein": "kern/rtgone",
       "heeft": {
         "toon": false,
         "prijs": false,

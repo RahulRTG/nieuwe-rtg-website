@@ -106,17 +106,13 @@ test('Personeels-PDA: dezelfde Regie in duimstand, met drie werkplekken',
     viewport: { width: 390, height: 844 },
     sleutels: (t) => ({ rtg_pda_token: t, rtg_pda_code: 'KIKUNOI' }),
     doe: async (page) => {
-      /* DE ECHTE WEG OP EEN TELEFOON LOOPT NIET LANGS DE TABBALK. De Werk-OS-laag
-         (shared/werkos) neemt op de personeels-app de schil over: hij verbergt de
-         tabbalk (`body.wos .tabbar{display:none !important}`, werkos-01.js:17) en
-         bouwt er een springboard van tegels uit -- de tabknoppen blijven het
-         model, ze zijn alleen niet meer wat je aanraakt.
-
-         Dus toetsen we wat een medewerker echt doet: de tegel op het beginscherm
-         aantikken. Wachten op de tabknop zou hier eeuwig duren, en dat zou niets
-         zeggen over de Regie. */
+      /* De echte telefoonweg begint in Team Room: Meer opent de volledige
+         WerkOS-laag, waarna Regie in de vaste werkvlakkenrail staat. Zo bewijst
+         deze toets zowel de rustige voorzijde als de bereikbaarheid van het
+         vertrouwde operationele scherm. */
       await page.waitForSelector('#gate', { state: 'hidden', timeout: 40000 });
-      const tegel = page.locator('nav.wos-grid button.wos-app', { hasText: 'Regie' });
+      await page.locator('.trm-nav button[data-trm-diep="hulp"]').click();
+      const tegel = page.locator('nav.wos-rail button', { hasText: 'Regie' });
       await tegel.first().waitFor({ state: 'visible', timeout: 25000 });
       await tegel.first().click();
       await page.waitForSelector('#pdRegieWrap .zc-rail button', { timeout: 15000 });

@@ -1,0 +1,60 @@
+/* LivingOS Winkel 2026. De vorm is nieuw; zoeken, bewaren, bestellen en
+   doorgeven blijven eigendom van de bestaande Mall- en Commerce-kernen. */
+body.rtg-shop-flow{
+  --shop-bg:#0b0807;--shop-card:#17110d;--shop-card2:#21160f;
+  --shop-ink:#f3e8d9;--shop-soft:#b8a99a;--shop-gold:#d4a451;
+  --shop-line:rgba(212,164,81,.3);--shop-wine:#7f1735;--shop-ok:#9db65d;
+  background:radial-gradient(circle at 82% 3%,rgba(137,71,31,.16),transparent 30rem),var(--shop-bg)!important;
+  color:var(--shop-ink);padding-bottom:7.5rem!important;
+}
+.rtg-shop-flow .os-switcher{display:none}
+.rtg-shop-flow>header{position:sticky;top:0;z-index:18;display:flex;align-items:center;gap:.9rem;padding:calc(env(safe-area-inset-top) + .8rem) max(1rem,calc((100% - 900px)/2)) .7rem;border-bottom:1px solid var(--shop-line);background:rgba(11,8,7,.92);backdrop-filter:blur(20px)}
+.shop-brand{display:grid;grid-template-columns:auto auto;align-items:baseline;column-gap:.8rem;color:var(--shop-ink);text-decoration:none}.shop-brand>span{grid-row:1/3;color:var(--shop-gold);font:500 2rem/1 "Bodoni Moda",Georgia,serif}.shop-brand>b{font-size:.78rem;font-weight:500}.shop-brand>small{color:var(--shop-soft);font-size:.52rem;letter-spacing:.2em;text-transform:uppercase}
+.rtg-shop-flow>header .terug{margin-left:auto;border-color:var(--shop-line);color:var(--shop-soft)}
+.rtg-shop-flow main{max-width:900px!important;padding:1rem 1rem 3rem!important}
+.shop-hero{position:relative;min-height:420px;display:flex;align-items:flex-end;margin:.2rem 0 1.2rem;border:1px solid var(--shop-line);overflow:hidden;background:linear-gradient(180deg,rgba(9,6,5,.04) 12%,rgba(9,6,5,.97) 90%),url('/images/worlds/heritage/living-heritage-v2.jpg') center/cover}
+.shop-hero-copy{position:relative;z-index:1;width:100%;padding:clamp(1.2rem,5vw,2.2rem)}
+.shop-ey{margin:0 0 .55rem;color:var(--shop-gold);font-size:.63rem;letter-spacing:.21em;text-transform:uppercase}
+.shop-hero h1,.shop-intro h1{max-width:680px;margin:0;color:var(--shop-ink);font:400 clamp(2.6rem,8vw,4.8rem)/.94 "Bodoni Moda",Georgia,serif;letter-spacing:-.025em}
+.shop-hero p:not(.shop-ey),.shop-intro p:not(.shop-ey){max-width:35rem;margin:.75rem 0 0;color:var(--shop-soft);line-height:1.55}
+.shop-primary{display:inline-grid;place-items:center;min-height:48px;margin-top:1rem;padding:.65rem 1rem;border:1px solid #aa3152;background:linear-gradient(135deg,#651126,#931d40);color:#fff;text-decoration:none;font:inherit;font-weight:650;cursor:pointer}
+.shop-intro{padding:.75rem 0 1rem}.shop-intro h1{font-size:clamp(2.45rem,8vw,4.4rem)}
+
+/* De bestaande Mall-elementen krijgen dezelfde rustige hiërarchie. */
+.rtg-shop-flow .vind{padding:1rem;border:1px solid var(--shop-line);background:linear-gradient(145deg,rgba(34,23,16,.94),rgba(15,10,8,.97))}
+.rtg-shop-flow .vind input.zoek,.rtg-shop-flow .veld,.rtg-shop-flow .plekrij select{min-height:46px;border-color:var(--shop-line)!important;background:#0e0a08!important;color:var(--shop-ink)!important}
+.rtg-shop-flow .vind .zoekrij .knop{min-height:46px;background:linear-gradient(135deg,#651126,#931d40);color:#fff}
+.rtg-shop-flow .plekrij{margin-top:.7rem}.rtg-shop-flow .plekrij>span:first-child{color:var(--shop-gold)}
+.rtg-shop-flow .knop.stil{border-color:var(--shop-line);color:var(--shop-ink)}
+.rtg-shop-flow .knop.aan{border-color:var(--shop-gold);background:rgba(212,164,81,.14);color:var(--shop-gold)}
+.rtg-shop-flow .verdiepingen{grid-template-columns:repeat(auto-fit,minmax(135px,1fr))}
+.rtg-shop-flow .vd,.rtg-shop-flow .boutiek,.rtg-shop-flow .genre,.rtg-shop-flow .tref,.rtg-shop-flow .kaart{border-color:var(--shop-line);background:linear-gradient(145deg,var(--shop-card2),#100b08);color:var(--shop-ink)}
+.rtg-shop-flow .etage-kop{border-color:var(--shop-line)}
+.rtg-shop-flow .etage-kop h2,.rtg-shop-flow .deel{color:var(--shop-ink)}
+.rtg-shop-flow .deel{margin-top:2.2rem;font-family:"Bodoni Moda",Georgia,serif;font-size:1.55rem;letter-spacing:0;text-transform:none}
+.rtg-shop-flow .vindnoot,.rtg-shop-flow .oms,.rtg-shop-flow .meta{color:var(--shop-soft)}
+.rtg-shop-flow .tref .ga,.rtg-shop-flow .knop:not(.stil){background:linear-gradient(135deg,#651126,#931d40);color:#fff}
+.rtg-shop-flow .vrij,.rtg-shop-flow .goed{color:var(--shop-ok)!important}
+
+/* Mijn Mall wordt drie herkenbare ingangen, maar houdt dezelfde DOM-doelen
+   waar de bestaande scripts hun echte gegevens in tekenen. */
+.shop-panel[hidden]{display:none!important}.shop-panel{animation:shop-in .24s ease-out}
+.shop-panel>.deel:first-child{margin-top:.4rem}
+.shop-panel .kaart{padding:1rem;margin-bottom:.65rem}
+.shop-panel .regel{min-height:58px;align-items:center;border-color:var(--shop-line);padding:.7rem 0}
+.shop-panel .regel>a,.shop-panel .regel a{color:var(--shop-gold)}
+.shop-panel .kaart>.regel:first-of-type{border-top:0}
+.shop-callout{margin:.35rem 0 1rem;padding:.9rem 1rem;border:1px solid var(--shop-line);background:linear-gradient(135deg,rgba(127,23,53,.2),rgba(212,164,81,.06));color:var(--shop-soft);font-size:.78rem;line-height:1.55}.shop-callout b{display:block;margin-bottom:.2rem;color:var(--shop-ink);font:500 1.18rem "Bodoni Moda",Georgia,serif}
+.rtg-shop-flow .leeg{border:1px solid var(--shop-line);padding:1.2rem;background:rgba(23,17,13,.58);color:var(--shop-soft);text-align:left}
+.shop-order-summary{display:grid;grid-template-columns:repeat(3,1fr);margin:.4rem 0 .75rem;border:1px solid var(--shop-line);background:linear-gradient(145deg,var(--shop-card2),#100b08)}.shop-order-summary span{padding:.8rem;border-left:1px solid var(--shop-line);color:var(--shop-soft);font-size:.68rem;text-align:center}.shop-order-summary span:first-child{border-left:0}.shop-order-summary b{display:block;margin-bottom:.15rem;color:var(--shop-ink);font:500 1.4rem "Bodoni Moda",Georgia,serif}
+.shop-order-list{border:1px solid var(--shop-line);background:rgba(23,17,13,.7)}.shop-order{min-height:76px;display:grid;grid-template-columns:90px minmax(0,1fr) auto auto;align-items:center;gap:.8rem;padding:.75rem .85rem;border-top:1px solid var(--shop-line);color:var(--shop-ink);text-decoration:none}.shop-order:first-child{border-top:0}.shop-order-kind{color:var(--shop-gold);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase}.shop-order-copy b,.shop-order-copy small,.shop-order-state b,.shop-order-state small{display:block}.shop-order-copy b{font-size:.85rem}.shop-order-copy small,.shop-order-state small{margin-top:.16rem;color:var(--shop-soft);font-size:.67rem}.shop-order-state{text-align:right}.shop-order-state b{color:var(--shop-gold);font-size:.74rem}.shop-order-state[data-state="klaar"] b{color:var(--shop-ok)}.shop-order-open{color:var(--shop-gold);font-size:1rem}.shop-order-note{margin:.65rem 0 0;color:var(--shop-soft);font-size:.7rem;line-height:1.5}
+
+.shop-nav{position:fixed;z-index:50;left:max(10px,calc(50% - 440px));right:max(10px,calc(50% - 440px));bottom:max(10px,env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr 62px 1fr 1fr;align-items:end;gap:.1rem;padding:.5rem .45rem;border:1px solid var(--shop-line);background:rgba(14,10,8,.96);box-shadow:0 18px 60px #000;backdrop-filter:blur(22px)}
+.shop-nav a{min-height:48px;display:grid;place-items:center;align-content:center;gap:.22rem;color:var(--shop-soft);text-decoration:none;font-size:.66rem;text-align:center}.shop-nav a::before{font-size:1.05rem;color:var(--shop-gold)}
+.shop-nav a:nth-child(1)::before{content:'⌂'}.shop-nav a:nth-child(2)::before{content:'♡'}.shop-nav a:nth-child(4)::before{content:'□'}.shop-nav a:nth-child(5)::before{content:'☰'}
+.shop-nav a[aria-current="page"]{color:var(--shop-gold)}
+.shop-nav .shop-bag{align-self:center;justify-self:center;width:56px;height:56px;min-height:56px;border:1px solid #a63150;border-radius:50%;background:linear-gradient(145deg,#9a2545,#58101f);color:#fff;font-size:1.35rem}.shop-nav .shop-bag::before{content:'+';color:#fff;font-size:1.7rem;line-height:1}.shop-nav .shop-bag span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.rtg-shop-flow .rahulfab{bottom:6.3rem}
+@keyframes shop-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media(max-width:620px){.rtg-shop-flow>header{padding-left:1rem;padding-right:1rem}.shop-brand>small{letter-spacing:.12em}.shop-hero{min-height:465px}.shop-hero h1,.shop-intro h1{font-size:clamp(2.35rem,11vw,3.3rem)}.rtg-shop-flow .vind{padding:.8rem}.rtg-shop-flow .vind .zoekrij .knop{flex:1 1 100%;width:100%}.shop-nav{left:10px;right:10px}.shop-nav a{font-size:.6rem}.shop-panel .regel{display:grid;grid-template-columns:1fr}.shop-panel .regel .op{margin-left:0}.shop-order{grid-template-columns:1fr auto;gap:.35rem .75rem}.shop-order-kind{grid-column:1/-1}.shop-order-state{grid-column:1;text-align:left}.shop-order-open{grid-column:2;grid-row:2/4}}
+@media(prefers-reduced-motion:reduce){.shop-panel{animation:none}}

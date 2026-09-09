@@ -1,19 +1,7 @@
-/* Alle echte functies van de vier RTG-werelden, op één vindbare plek. */
+/* Functies van de vier RTG-werelden. */
 (function (w) {
   'use strict';
-  /* HUIS EN HOME ZIJN TWEE DINGEN, en dat was hier één woord te weinig.
-
-     `home` is waar de RTG-markering van de schil naartoe gaat: de werkplek van
-     die wereld. `huis` is het wereldSCHERM uit MAPPEN (app-main.js) -- de
-     bestemming die WERELDEN.md aanwijst en die test/wereldregister.test.js
-     tegen de code houdt. Ze zijn niet hetzelfde: LivingOS werkt op
-     /apps/living-os.html en woont op /apps/rtg.html.
-
-     Zolang dat één veld was, stonden er twee antwoorden op dezelfde vraag in
-     het huis: de wereldstrook op de wereldschermen wees naar rtg.html en
-     os-publiek.html, de wereldlijst in het menu naar living-os.html en
-     foundation/index.html. Dat is precies de dubbeling uit LAT.md regel 4, dus
-     staat het adres nu één keer hier en leest elke wereldnavigatie het hier. */
+  /* home is de werkplek; huis is het publieke wereldscherm. */
   function wereld(meta, groepen, rail) {
     var alles = [];
     groepen.forEach(function (groep) { groep[1].forEach(function (functie) { alles.push(functie); }); });
@@ -76,7 +64,7 @@
     foundation: wereld({ naam: 'RTFOUNDATION', kort: 'RTF', kaart: 'FoundationOS', huis: '/apps/foundation/os-publiek.html', home: '/apps/foundation/index.html', workspace: '/apps/werkruimte.html?gebied=foundation', actie: 'Ga verder' }, [
       ['Start & leren', [
         ['foundation-home', 'Foundation Home', 'home', '/apps/foundation/index.html'], ['campus', 'Campus', 'school', '/apps/foundation/campus.html'],
-        ['leren', 'Leren', 'book', '/apps/foundation/leren.html'], ['office', 'Presenteren & Office', 'doc', '/apps/office.html?werk=rtf'],
+        ['leren', 'Leren & Groei', 'book', '/apps/foundation/leren.html'], ['office', 'Presenteren & Office', 'doc', '/apps/office.html?werk=rtf'],
         ['bieb', 'Bibliotheek', 'book', '/apps/foundation/bieb.html'], ['geloofbieb', 'Geloofsbibliotheek', 'book', '/apps/foundation/geloofbieb.html'],
         ['schoolbieb', 'Schoolbibliotheek', 'book', '/apps/foundation/schoolbieb.html'], ['beroepen', 'Beroepen', 'brief', '/apps/foundation/beroepen.html'],
         ['school', 'School', 'school', '/apps/foundation/school.html'], ['overhoren', 'Overhoren', 'target', '/apps/foundation/overhoren.html'],
@@ -92,21 +80,21 @@
       ['Spelen & samen', [
         ['spelen', 'De Speelhal', 'play', '/apps/foundation/speelhal.html'], ['arena', 'De Arena', 'target', '/apps/foundation/arena.html'],
         ['societeit', 'De Sociëteit', 'people', '/apps/foundation/societeit.html'], ['vrienden', 'Vrienden', 'people', '/apps/foundation/vrienden.html'],
-        ['games', 'RTG Spelen', 'play', '/apps/spelen.html'], ['club', 'Club', 'people', '/apps/foundation/club.html'],
+        ['games', 'RTG Spelen', 'play', '/apps/spelen.html'], ['meedoen', 'Meedoen & Ontdekken', 'map', '/apps/foundation/meedoen-ontdekken.html'],
         ['klas', 'Klas', 'school', '/apps/foundation/klas.html']
       ]],
       ['Gezin & dag', [
-        ['babyboek', 'Babyboek', 'book', '/apps/foundation/babyboek.html'], ['agenda', 'Gezinsagenda', 'calendar', '/apps/foundation/agenda.html'],
+        ['samen-thuis', 'Samen Thuis', 'home', '/apps/foundation/samen-thuis.html'], ['babyboek', 'Babyboek', 'book', '/apps/foundation/babyboek.html'], ['agenda', 'Gezinsagenda', 'calendar', '/apps/foundation/agenda.html'],
         ['keuken', 'Keuken', 'home', '/apps/foundation/keuken.html'], ['ochtend', 'Ochtend', 'home', '/apps/foundation/ochtend.html'],
-        ['verjaardagen', 'Verjaardagen', 'calendar', '/apps/foundation/verjaardagen.html'], ['gezondheid', 'Gezondheid', 'heart', '/apps/foundation/gezondheid.html'],
+        ['verjaardagen', 'Verjaardagen', 'calendar', '/apps/foundation/verjaardagen.html'], ['gezondheid-welzijn', 'Gezondheid & Welzijn', 'heart', '/apps/foundation/gezondheid-welzijn.html'],
         ['mijnbanden', 'Mijn banden', 'people', '/apps/foundation/mijnbanden.html']
       ]],
       ['Zelfstandig leven', [
-        ['zakgeld', 'Zakgeld', 'money', '/apps/foundation/zakgeld.html'], ['budget', 'Budget', 'money', '/apps/foundation/budget.html'],
+        ['geld-later', 'Geld & Later', 'money', '/apps/foundation/geld-later.html'], ['zakgeld', 'Zakgeld', 'money', '/apps/foundation/zakgeld.html'], ['budget', 'Budget', 'money', '/apps/foundation/budget.html'],
         ['rechten', 'Rechten', 'shield', '/apps/foundation/rechten.html'], ['contact', 'Contact', 'people', '/apps/foundation/contact.html'],
         ['markt', 'Markt', 'brief', '/apps/foundation/markt.html'], ['oppasinfo', 'Oppasinformatie', 'people', '/apps/foundation/oppasinfo.html'],
         ['kompas', 'Kompas', 'map', '/apps/foundation/kompas.html'], ['rust', 'Rust', 'heart', '/apps/foundation/rust.html'],
-        ['veilig', 'Veilig thuis', 'shield', '/apps/foundation/veilig.html'], ['mediawijs', 'Mediawijs', 'shield', '/apps/foundation/mediawijs.html'],
+        ['veilig-vertrouwd', 'Veilig & Vertrouwd', 'shield', '/apps/foundation/veilig-vertrouwd.html'], ['mediawijs', 'Mediawijs', 'shield', '/apps/foundation/mediawijs.html'],
         ['dromen', 'Dromen', 'spark', '/apps/foundation/dromen.html'], ['werk', 'Werk', 'brief', '/apps/foundation/werk.html']
       ]],
       ['Vooruit & hulp', [

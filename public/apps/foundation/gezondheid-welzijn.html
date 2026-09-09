@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="nl" data-rtg-thema="foundation">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#103b39">
+<meta name="robots" content="noindex,nofollow">
+<title>Gezondheid &amp; Welzijn · FoundationOS</title>
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-deep-flows-2026.css" rel="stylesheet">
+<link href="premium.css" rel="stylesheet">
+<link href="/shared/rtg-foundation-gezondheid-welzijn-2026.css" rel="stylesheet">
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl foundation-gezondheid-welzijn" data-rtg-world="foundation" data-rtg-skin="heritage" data-session-helper="Sessie">
+<a class="gw-skip" href="#gwInhoud">Naar de inhoud</a>
+<div class="gw-top" role="banner">
+  <a class="gw-brand" href="index.html" aria-label="Naar FoundationOS">RTG</a>
+  <div class="gw-world"><b>FoundationOS</b><span>Zorg · ritme · samen</span></div>
+  <a class="gw-profiel" href="index.html#profielen" aria-label="Profiel"><i data-glyf="vrienden"></i></a>
+</div>
+
+<main id="gwInhoud" class="gw-main" tabindex="-1">
+  <section class="gw-view is-actief" data-gw-view="vandaag" aria-labelledby="gwVandaagTitel">
+    <div class="gw-hero">
+      <div class="gw-hero__beeld" aria-hidden="true"></div>
+      <div class="gw-hero__copy">
+        <p class="gw-kicker">Goed voor uzelf</p>
+        <h1 id="gwVandaagTitel">Goed voor uzelf. Stap voor stap.</h1>
+        <p>Alles wat vandaag helpt, rustig bij elkaar.</p>
+        <button class="gw-hoofdknop" type="button" id="gwBekijkDag">Mijn dag bekijken <i data-glyf="rechterhand"></i></button>
+      </div>
+    </div>
+    <div class="gw-inhoud" id="gwDagBegin">
+      <div class="gw-heading"><div><p class="gw-kicker">Vandaag</p><h2>Wat helpt vandaag?</h2></div><a href="gezondheid.html">Open gezondheidsboekje</a></div>
+      <div id="gwVandaag" class="gw-daglijst" aria-live="polite"><div class="gw-leeg">Uw dag wordt veilig opgehaald.</div></div>
+      <section class="gw-gevoel" aria-labelledby="gwGevoelTitel">
+        <div><p class="gw-kicker">Een moment voor uzelf</p><h2 id="gwGevoelTitel">Hoe gaat het vandaag?</h2></div>
+        <div class="gw-gevoelkeuzes" role="radiogroup" aria-label="Hoe gaat het vandaag?">
+          <button type="button" role="radio" aria-checked="false" data-gw-gevoel="goed"><i data-glyf="emo-blij"></i><span>Goed</span></button>
+          <button type="button" role="radio" aria-checked="false" data-gw-gevoel="zoso"><i data-glyf="balans"></i><span>Zo zo</span></button>
+          <button type="button" role="radio" aria-checked="false" data-gw-gevoel="lastig"><i data-glyf="emo-slaap"></i><span>Lastig</span></button>
+        </div>
+        <p id="gwGevoelStatus" class="gw-status" aria-live="polite">Uw keuze blijft alleen op dit toestel.</p>
+      </section>
+    </div>
+  </section>
+
+  <section class="gw-view" data-gw-view="ritme" aria-labelledby="gwRitmeTitel" hidden>
+    <div class="gw-paginakop">
+      <button type="button" data-gw-open="vandaag" aria-label="Terug"><i data-glyf="navigatie"></i></button>
+      <div><p class="gw-kicker">Kleine gewoontes</p><h1 id="gwRitmeTitel">Een ritme dat bij u past.</h1><p>Niet om te scoren, wel om vandaag bewust te kiezen.</p></div>
+    </div>
+    <div class="gw-inhoud gw-inhoud--smal">
+      <div id="gwWeek" class="gw-week" aria-label="Deze week"></div>
+      <div id="gwRitmeKaarten" class="gw-ritmekaarten" aria-live="polite"></div>
+      <section class="gw-paneel" aria-labelledby="gwRitmeVormTitel">
+        <p class="gw-kicker">Uw eigen woorden</p>
+        <h2 id="gwRitmeVormTitel">Pas mijn ritme aan</h2>
+        <form id="gwRitmeVorm" class="gw-formulier">
+          <label for="gwSlaap">Hoeveel uur heeft u geslapen?</label>
+          <input id="gwSlaap" inputmode="decimal" placeholder="Bijvoorbeeld 7,5">
+          <label for="gwBeweging">Hoeveel minuten heeft u bewogen?</label>
+          <input id="gwBeweging" inputmode="numeric" placeholder="Bijvoorbeeld 20">
+          <label for="gwEten">Hoe voelt eten en drinken vandaag?</label>
+          <select id="gwEten"><option value="">Nog niet ingevuld</option><option>Op ritme</option><option>Anders vandaag</option></select>
+          <label for="gwRust">Welk rustmoment wilt u nemen?</label>
+          <input id="gwRust" maxlength="80" placeholder="Bijvoorbeeld even naar buiten">
+          <p class="gw-fout" id="gwRitmeFout" role="alert"></p>
+          <button class="gw-hoofdknop" type="submit">Bewaar op dit toestel <i data-glyf="rechterhand"></i></button>
+        </form>
+        <p class="gw-priveregel"><i data-glyf="schild"></i> U vult zelf in wat u wilt onthouden. FoundationOS geeft hier geen medisch oordeel of gezondheidsscore.</p>
+      </section>
+    </div>
+  </section>
+
+  <section class="gw-view" data-gw-view="zorg" aria-labelledby="gwZorgTitel" hidden>
+    <div class="gw-zorghero">
+      <div class="gw-zorghero__beeld" aria-hidden="true"></div>
+      <div class="gw-zorghero__copy"><p class="gw-kicker">Zorg dichtbij</p><h1 id="gwZorgTitel">De juiste hulp. Dichtbij.</h1><p>Zie wie er echt met u verbonden is en bepaal zelf wat u deelt.</p></div>
+    </div>
+    <div class="gw-inhoud gw-inhoud--smal">
+      <div id="gwZorg" class="gw-zorglijst" aria-live="polite"><div class="gw-leeg">Uw zorgcontacten worden veilig opgehaald.</div></div>
+      <aside class="gw-hulpkaart">
+        <i data-glyf="hart"></i>
+        <div><h2>Hulp nodig?</h2><p>Kies rustig wie u nu kan helpen. Bij direct gevaar belt u 112.</p></div>
+        <a class="gw-hoofdknop" href="hulpwijzer.html">Bekijk passende hulp <i data-glyf="rechterhand"></i></a>
+      </aside>
+      <a class="gw-deellink" href="mijnbanden.html"><i data-glyf="schild"></i><span><b>Wat deel ik?</b><small>Bekijk en verander uw toestemmingen</small></span><i data-glyf="rechterhand"></i></a>
+    </div>
+  </section>
+
+  <section class="gw-view" data-gw-view="regelen" aria-labelledby="gwRegelenTitel" hidden>
+    <div class="gw-paginakop gw-paginakop--regelen">
+      <button type="button" data-gw-open="vandaag" aria-label="Terug"><i data-glyf="navigatie"></i></button>
+      <div><p class="gw-kicker">Eén kleine stap</p><h1 id="gwRegelenTitel">Wat wilt u regelen?</h1><p>Open meteen de plek waar u verder kunt.</p></div>
+    </div>
+    <div class="gw-inhoud gw-inhoud--smal">
+      <div class="gw-regelkeuzes">
+        <a href="gezondheid.html"><i data-glyf="passkeys"></i><span><b>Medicatie of afspraak</b><small>Open uw gezondheidsboekje</small></span><i data-glyf="rechterhand"></i></a>
+        <a href="zorg.html"><i data-glyf="zorg"></i><span><b>Zorg of begeleiding</b><small>Bekijk uw echte zorgmomenten</small></span><i data-glyf="rechterhand"></i></a>
+        <a href="mijnbanden.html"><i data-glyf="vrienden"></i><span><b>Wie mag meekijken?</b><small>Beheer uw eigen toestemmingen</small></span><i data-glyf="rechterhand"></i></a>
+        <a href="hulpwijzer.html"><i data-glyf="help"></i><span><b>Ik heb hulp nodig</b><small>Vind een veilige eerste stap</small></span><i data-glyf="rechterhand"></i></a>
+      </div>
+      <p class="gw-priveregel"><i data-glyf="schild"></i> Er wordt niets gedeeld doordat u hier een scherm opent.</p>
+    </div>
+  </section>
+</main>
+
+<nav class="gw-nav" aria-label="Gezondheid en Welzijn navigatie">
+  <button type="button" class="is-actief" data-gw-tab="vandaag" aria-current="page"><i data-glyf="maison"></i><span>Vandaag</span></button>
+  <button type="button" data-gw-tab="ritme"><i data-glyf="oogst"></i><span>Mijn ritme</span></button>
+  <button type="button" class="gw-plus" data-gw-tab="regelen" aria-label="Iets regelen"><b aria-hidden="true">+</b><span>Regelen</span></button>
+  <button type="button" data-gw-tab="zorg"><i data-glyf="zorg"></i><span>Zorg</span></button>
+  <a href="index.html#alle-apps"><i data-glyf="paneel"></i><span>Meer</span></a>
+</nav>
+
+<script src="sessie.js"></script>
+<script src="gezondheid-welzijn-weergave.js"></script>
+<script src="gezondheid-welzijn.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="premium.js" defer></script>
+</body>
+</html>

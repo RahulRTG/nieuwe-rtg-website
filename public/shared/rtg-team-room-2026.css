@@ -1,0 +1,96 @@
+:root{
+  --trm-nacht:#0d0907;
+  --trm-diep:#080604;
+  --trm-paneel:#18100c;
+  --trm-paneel-2:#211611;
+  --trm-lijn:#4b382b;
+  --trm-goud:#d6a96a;
+  --trm-goud-zacht:#f0cc91;
+  --trm-ivoor:#f1e8dc;
+  --trm-stil:#ad9d91;
+  --trm-wijn:#8d1738;
+  --trm-groen:#70b782;
+  --trm-amber:#daa545;
+}
+body.trm-voorzijde-actief{display:block;overflow-x:hidden;background:var(--trm-diep);padding:0!important}
+body.trm-voorzijde-actief>#shell{display:none!important}
+body.trm-voorzijde-actief>.wos-dock{display:none!important}
+body.trm-voorzijde-actief .rtg-edge-top,
+body.trm-voorzijde-actief .rtg-edge-side,
+body.trm-voorzijde-actief .rtg-edge-bottom{visibility:hidden!important;pointer-events:none!important}
+body.trm-voorzijde-actief .rtg-edge-chrome :is(button,a,input){pointer-events:none!important}
+.trm-voorzijde[hidden]{display:none!important}
+.trm-voorzijde{min-height:100dvh;padding:0 0 calc(5.4rem + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(10,6,4,.35) 0,rgba(10,6,4,.84) 27rem,var(--trm-diep) 42rem),url('/images/worlds/heritage/work-heritage-v2.jpg') center top/auto 38rem no-repeat,linear-gradient(180deg,var(--trm-nacht),var(--trm-diep));color:var(--trm-ivoor);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.trm-voorzijde *{box-sizing:border-box}
+.trm-voorzijde button,.trm-voorzijde a{font:inherit}
+.trm-binnen{width:min(100%,56rem);margin:0 auto;padding:env(safe-area-inset-top) .9rem 2rem}
+.trm-kop{min-height:5rem;display:flex;align-items:center;gap:.72rem;border-bottom:1px solid rgba(214,169,106,.22)}
+.trm-merk{display:flex;align-items:baseline;gap:.65rem;color:var(--trm-ivoor);text-decoration:none;white-space:nowrap}
+.trm-merk b{color:var(--trm-goud);font:500 2rem/1 'Bodoni Moda',Georgia,serif;letter-spacing:-.04em}
+.trm-merk span{font:500 1rem/1 'Bodoni Moda',Georgia,serif}
+.trm-naam{padding-left:.72rem;border-left:1px solid rgba(214,169,106,.32);color:var(--trm-goud-zacht);font-size:.58rem;font-weight:750;letter-spacing:.2em;text-transform:uppercase}
+.trm-kopruimte{flex:1}
+.trm-profiel{width:2.6rem;height:2.6rem;display:grid;place-items:center;border:1px solid var(--trm-goud);border-radius:50%;background:#291812;color:var(--trm-goud-zacht);font-size:.67rem;font-weight:800;cursor:pointer}
+.trm-profiel:hover,.trm-profiel:focus-visible{background:#382018;outline:0}
+.trm-scherm[hidden]{display:none}
+.trm-scherm{animation:trm-in .2s ease}
+@keyframes trm-in{from{opacity:0;transform:translateY(.25rem)}to{opacity:1;transform:none}}
+.trm-ey{margin:1.3rem 0 0;color:var(--trm-goud);font-size:.59rem;font-weight:800;letter-spacing:.2em;text-transform:uppercase}
+.trm-titel{max-width:13ch;margin:.55rem 0 .95rem;color:var(--trm-ivoor);font:500 clamp(2.55rem,10vw,4.7rem)/.94 'Bodoni Moda',Georgia,serif;letter-spacing:-.05em}
+.trm-groet{margin:0;color:var(--trm-ivoor);font:500 1.55rem/1.05 'Bodoni Moda',Georgia,serif}
+.trm-inleiding{max-width:42rem;margin:.35rem 0 1.15rem;color:var(--trm-stil);font-size:.82rem;line-height:1.56}
+.trm-dienst{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--trm-lijn);background:linear-gradient(125deg,rgba(43,27,19,.96),rgba(19,13,10,.96))}
+.trm-dienstdeel{min-height:4.7rem;padding:.85rem 1rem;display:grid;grid-template-columns:2rem 1fr;align-items:center;gap:.7rem}
+.trm-dienstdeel+ .trm-dienstdeel{border-left:1px solid var(--trm-lijn)}
+.trm-diensticoon{color:var(--trm-goud);font:500 1.35rem/1 Georgia,serif;text-align:center}
+.trm-label{display:block;color:#9e8f84;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase}
+.trm-waarde{display:block;margin-top:.2rem;color:var(--trm-ivoor);font-size:.83rem;font-weight:700}
+.trm-focus{position:relative;margin-top:.8rem;padding:1rem;border:1px solid rgba(214,169,106,.48);overflow:hidden;background:linear-gradient(135deg,rgba(65,38,26,.96),rgba(28,17,13,.98));box-shadow:0 1.3rem 3rem rgba(0,0,0,.22)}
+.trm-focus:before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 100% 0,rgba(141,23,56,.24),transparent 50%);pointer-events:none}
+.trm-focuskop{position:relative;display:grid;grid-template-columns:3.6rem 1fr auto;align-items:center;gap:.8rem}
+.trm-focustijd{width:3.6rem;height:3.6rem;display:grid;place-items:center;border:1px solid rgba(214,169,106,.48);background:rgba(141,23,56,.28);color:var(--trm-goud-zacht);font:500 .88rem/1 Georgia,serif}
+.trm-focus h2{margin:0;color:var(--trm-ivoor);font:500 1.65rem/1 'Bodoni Moda',Georgia,serif}
+.trm-focus p{margin:.35rem 0 0;color:var(--trm-stil);font-size:.7rem;line-height:1.45}
+.trm-pijl{color:var(--trm-goud-zacht);font-size:1.35rem}
+.trm-primair,.trm-secundair{min-height:2.9rem;border:1px solid var(--trm-goud);font-size:.75rem;font-weight:800;cursor:pointer}
+.trm-primair{position:relative;width:100%;margin-top:.95rem;background:linear-gradient(90deg,#75152f,var(--trm-wijn));color:#fff}
+.trm-secundair{background:transparent;color:var(--trm-goud-zacht)}
+.trm-primair:hover,.trm-primair:focus-visible{filter:brightness(1.12);outline:0}
+.trm-primair[disabled]{cursor:wait;opacity:.58}
+.trm-sectiekop{margin:1.55rem 0 .6rem;display:flex;align-items:end;justify-content:space-between;gap:.8rem}
+.trm-sectiekop h2{margin:0;color:var(--trm-ivoor);font:500 1.42rem/1 'Bodoni Moda',Georgia,serif}
+.trm-sectiekop button{border:0;background:transparent;color:var(--trm-goud-zacht);font-size:.66rem;cursor:pointer}
+.trm-tijdlijn{border-top:1px solid var(--trm-lijn)}
+.trm-moment{position:relative;min-height:4.15rem;padding:.75rem .2rem .75rem 5rem;border-bottom:1px solid rgba(75,56,43,.76)}
+.trm-moment time{position:absolute;left:.2rem;top:.85rem;color:#a79486;font:500 .8rem/1 Georgia,serif}
+.trm-moment:before{content:'';position:absolute;left:3.65rem;top:1rem;width:.68rem;height:.68rem;border:1px solid var(--trm-goud);border-radius:50%;background:var(--trm-diep)}
+.trm-moment:not(:last-child):after{content:'';position:absolute;left:4rem;top:1.7rem;bottom:-1rem;width:1px;background:var(--trm-lijn)}
+.trm-moment b{display:block;color:var(--trm-ivoor);font-size:.75rem}
+.trm-moment span{display:block;margin-top:.28rem;color:#8f8076;font-size:.62rem;line-height:1.4}
+.trm-leeg{padding:1rem;border:1px solid var(--trm-lijn);background:rgba(26,17,13,.72);color:var(--trm-stil);font-size:.72rem;line-height:1.5}
+.trm-leeg b{display:block;margin-bottom:.32rem;color:var(--trm-ivoor);font:500 1.18rem/1.1 'Bodoni Moda',Georgia,serif}
+.trm-dagen{display:grid;grid-template-columns:repeat(7,1fr);margin:.2rem 0 1rem;border-bottom:1px solid var(--trm-lijn)}
+.trm-dag{min-width:0;padding:.55rem .1rem .75rem;border:0;background:transparent;color:#98897f;text-align:center;cursor:pointer}
+.trm-dag span,.trm-dag b{display:block}
+.trm-dag span{font-size:.56rem;text-transform:capitalize}
+.trm-dag b{margin-top:.32rem;font-size:.72rem}
+.trm-dag[aria-current="date"] b{width:2.2rem;height:2.2rem;margin:.25rem auto -.25rem;display:grid;place-items:center;border-radius:50%;background:var(--trm-wijn);color:#fff}
+.trm-bezetting{margin-bottom:.65rem;display:flex;align-items:center;justify-content:space-between;gap:.8rem;color:var(--trm-ivoor);font-size:.82rem}
+.trm-bezetting small{color:var(--trm-stil);font-size:.62rem}
+.trm-team{border:1px solid var(--trm-lijn);background:rgba(20,13,10,.86)}
+.trm-teamrij{width:100%;min-height:4.2rem;padding:.65rem .72rem;display:grid;grid-template-columns:2.6rem minmax(0,1fr) auto;align-items:center;gap:.7rem;border:0;border-bottom:1px solid rgba(75,56,43,.75);background:transparent;color:inherit;text-align:left}
+.trm-teamrij:last-child{border-bottom:0}
+button.trm-teamrij{cursor:pointer}
+button.trm-teamrij:hover,button.trm-teamrij:focus-visible{background:#21150f;outline:0}
+.trm-avatar{width:2.55rem;height:2.55rem;display:grid;place-items:center;border:1px solid #71543a;border-radius:50%;background:#2c1c14;color:var(--trm-goud-zacht);font:500 .78rem/1 Georgia,serif}
+.trm-teamnaam{min-width:0}
+.trm-teamnaam b{display:block;overflow:hidden;color:var(--trm-ivoor);font-size:.72rem;text-overflow:ellipsis;white-space:nowrap}
+.trm-teamnaam span{display:block;margin-top:.25rem;color:#8e8076;font-size:.59rem}
+.trm-stand{display:flex;align-items:center;gap:.38rem;color:#a89b92;font-size:.56rem;white-space:nowrap}
+.trm-stand:before{content:'';width:.42rem;height:.42rem;border-radius:50%;background:#78716c}
+.trm-stand.werk{color:#a8c9ae}.trm-stand.werk:before{background:var(--trm-groen)}
+.trm-stand.pauze{color:#d8b875}.trm-stand.pauze:before{background:var(--trm-amber)}
+.trm-aandacht{margin-top:.75rem;padding:.78rem;display:flex;align-items:center;gap:.72rem;border:1px solid rgba(218,165,69,.48);background:rgba(74,48,17,.25)}
+.trm-aandacht b{display:block;color:var(--trm-ivoor);font-size:.69rem}
+.trm-aandacht span{display:block;margin-top:.22rem;color:#a39184;font-size:.58rem;line-height:1.4}
+.trm-aandacht button{margin-left:auto;padding:.55rem .65rem;border:1px solid var(--trm-goud);background:transparent;color:var(--trm-goud-zacht);font-size:.6rem;font-weight:750;cursor:pointer}

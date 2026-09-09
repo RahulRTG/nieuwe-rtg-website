@@ -19,13 +19,14 @@
 <link href="/shared/experience-kernel.css?v=20260829-7" rel="stylesheet">
 <link href="/images/worlds/heritage/travel-heritage-v2.jpg" rel="preload" as="image" fetchpriority="high">
 <link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
+<link href="/shared/rtg-anchor-experiences-2026.css" rel="stylesheet">
 <link rel="stylesheet" href="/shared/rtg-world-start.css">
 <script src="/shared/rtg-world-start.js" defer></script>
 
 <script>setTimeout(function(){var b=document.body;if(b&&b.getAttribute("data-rtg-world-start")==="loading"){b.setAttribute("data-rtg-world-start","ready");b.removeAttribute("aria-busy");var l=b.querySelector(".rtg-world-start");if(l)l.hidden=true;}},12500);</script>
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="travel" data-rtg-world-dashboard="travel" data-rtg-vandaag-luxe data-rtg-edge-2-context="travel-header,hoofdtabs" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true">
+<body class="rtg-stijl rtg-travel-experience" data-rtg-world="travel" data-rtg-world-dashboard="travel" data-rtg-eigenvlak="bordeaux" data-rtg-vandaag-luxe data-rtg-edge-2-context="travel-header,hoofdtabs" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage" data-rtg-world-start="loading" aria-busy="true">
 <div class="rtg-world-start" role="status" aria-live="polite"><strong aria-hidden="true">RTG</strong><span>TravelOS wordt klaargezet…</span></div>
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <!-- De wereldstrook stond hier; de vier werelden staan nu in de topbalk van de
@@ -60,7 +61,7 @@
   </nav>
 
   <main id="inhoud">
-    <section class="appblad actief" data-blad="vandaag" aria-labelledby="titelVandaag">
+    <section class="appblad actief" data-blad="vandaag" aria-labelledby="travelBelofte">
       <div class="bladbinnen vandaagblad">
         <!-- HET DEK. Twee kolommen: links de reis, rechts de klok in een EIGEN
              paneel. Dat is geen opmaakvoorkeur maar de reparatie van een fout:
@@ -76,8 +77,10 @@
           <div class="daghoofd">
             <header class="dagtitel">
               <p class="micro"><span id="groet">GOEDEMIDDAG</span></p>
+              <p class="travel-belofte" id="travelBelofte">Alles van vertrek tot thuiskomst.</p>
               <h1 id="titelVandaag">Uw reizen</h1>
               <p class="sub" id="dagzin">Uw reisoverzicht wordt opgehaald&hellip;</p>
+              <button class="actieknop travel-hero-actie" type="button" data-naar-blad="reizen"><span>BEKIJK UW REIS</span><b aria-hidden="true">→</b></button>
             </header>
 
             <!-- DE MOMENTEN VAN VANDAAG. De onderdelen van deze reis als strook,

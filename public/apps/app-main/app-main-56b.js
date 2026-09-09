@@ -80,3 +80,7 @@
       onCode: (c) => { scanRoute(c.tekst); }
     });
   });
+  /* Vanuit Eten & Uitgaan betekent "Aan tafel" niet dat we een tafelsessie
+     verzinnen. De QR op de echte tafel is de deur, dus deze diepe link opent
+     alleen dezelfde scanner die ook in het bedieningspaneel staat. */
+  if (_scanBtn && location.hash === '#scan') setTimeout(() => _scanBtn.click(), 0);

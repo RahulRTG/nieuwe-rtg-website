@@ -89,6 +89,13 @@ const SLEUTELS = {
   'POST /api/office/catalogus-wensen': { leest: true },
   'POST /api/office/catalogus-wens/besluit': { zelfdeVerzoek: true },
 
+  // -- LivingOS woningonderhoud en de RTG One-projectkamer --
+  'POST /api/home/onderhoud': { leest: true },
+  'POST /api/home/onderhoud/meld': { velden: ['titel', 'plek', 'notitie', 'urgentie'] },
+  'POST /api/home/onderhoud/annuleer': { velden: ['id'] },
+  'POST /api/rtgone/project/bewijs': { velden: ['projectId', 'titel', 'uitleg', 'bron', 'documentId', 'taakId'] },
+  'POST /api/rtgone/project/oplever': { velden: ['projectId', 'uitkomst', 'leren'] },
+
   // -- onboarding, activiteiten en de rest van de ronde --
   'POST /api/onboarding/inrichten': { leest: true },             // de stand van het inrichten
   'POST /api/onboarding/meebouwen': { leest: true },             // de stand van het meebouwen

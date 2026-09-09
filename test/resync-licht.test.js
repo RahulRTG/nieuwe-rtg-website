@@ -105,7 +105,7 @@ test('na een MISLUKTE resync is de volgende ronde weer zwaar', async () => {
     'een half toegepaste lichte resync mag niet gevolgd worden door nog een lichte');
 });
 
-test('de poort blijft dicht tot de resync klaar is', async () => {
+test('de poort blijft dicht tot de resync klaar is', { timeout: 5000 }, async () => {
   const m = maakMotor();
   const grens = grensMaken(m);
   await grens.herstelNu();

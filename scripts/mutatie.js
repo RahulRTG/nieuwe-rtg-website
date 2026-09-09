@@ -787,6 +787,12 @@ const EIGEN_MODULE = new Map([
      onbetrouwbaar maken -- elke regel hier hoort een uitspraak te zijn die de
      standaardweg niet al doet. */
   ['camerascherm.e2e.js', ['public/shared/media.js']],
+  /* De verdiepingsreis opent elf nieuwe schermen en gebruikt op elk scherm de
+     eerste betekenisvolle bediening. De intake van de Decision Room is de
+     zwaarste eerste schakel: zonder de klikafhandeling komt de dialoog niet in
+     beeld en stopt de reis meteen. Bevestigd door de gerichte mutatieronde;
+     `!==` omkeren in die afhandeling laat de browsertoets zakken. */
+  ['verdiepende-schermen.e2e.js', ['public/apps/decision-room.js']],
   /* i18n-auto laadt de automatische vertaallaag met vm.runInNewContext en heeft
      daar dus geen require voor. Zonder deze regel mat de motor alleen
      server/lib/ui-bronnen.js -- de module van EEN van de zes beweringen -- en

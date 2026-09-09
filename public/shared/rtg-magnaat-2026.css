@@ -14,7 +14,6 @@
 body.magnaat-voorzijde-actief,
 body.magnaat-voorzijde-actief.rtg-edge-host{overflow-x:hidden;background:var(--mv-diep);padding:0!important}
 body.magnaat-voorzijde-actief>.app{display:none}
-body.magnaat-voorzijde-actief>.rtg-edge-chrome,
 body.magnaat-voorzijde-actief>#rtgGanglijn,
 body.magnaat-voorzijde-actief>.rtg-spring{display:none!important}
 .magnaat-voorzijde[hidden]{display:none!important}

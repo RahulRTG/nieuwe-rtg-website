@@ -16,7 +16,9 @@
   function kandidaat(el, root) {
     if (!el || root.contains(el) || el.closest('dialog,[role="dialog"],.rtg-edge-chrome')) return false;
     if (el.matches('.wos-dock,.cmd-balk,nav.balk[aria-label="Hoofdnavigatie"]')) return false;
-    return el.hasAttribute('data-rtg-edge-bar') || zichtbaarVast(el);
+    /* Geneste bediening leunt op haar eigen ouder voor CSS en klikdelegatie.
+       Alleen een uitdrukkelijke aansluiting mag haar daaruit verplaatsen. */
+    return el.hasAttribute('data-rtg-edge-bar') || (el.parentElement === d.body && zichtbaarVast(el));
   }
 
   function herstel(rt) {

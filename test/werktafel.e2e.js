@@ -320,6 +320,7 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
       ? '.rtg-edge-menu[data-rtg-command-brug="true"]'
       : '.cmd-lade';
     await page.click(bankKnop);
+    await require('./helper').edgeWerkbladen(page);
     /* `inBeeld` is de echte vraag en niet display:none -- de bank SCHUIFT, dus
        we wachten tot hij werkelijk in beeld staat, met dezelfde meting die de
        bewering hieronder gebruikt. */

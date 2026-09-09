@@ -52,7 +52,7 @@ body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom{
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom{
   --edge-bg:#f4f0e8;--edge-panel:#fbf8f2;--edge-copy:#211e19;--edge-dim:#70695f;
   --edge-line:rgba(33,30,25,.16);--edge-accent:#861638;--edge-accent-soft:rgba(134,22,56,.1);
-  --edge-metal:#8a7317;border-top-color:var(--edge-line);
+  --edge-metal:#8a7317;--edge2-metal:#745718;--edge2-copy:#211e19;border-top-color:var(--edge-line);
   background:color-mix(in srgb,var(--edge-bg) 97%,transparent);box-shadow:0 -8px 32px rgba(28,21,15,.08)
 }
 .rtg-edge-appslot{display:none;min-width:0;height:var(--edge-bottom);overflow-x:auto;overflow-y:hidden;scrollbar-width:none;pointer-events:auto}

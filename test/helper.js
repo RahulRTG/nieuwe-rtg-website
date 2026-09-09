@@ -1291,6 +1291,18 @@ function drukte() {
    aan alsof hij van hen was. Node deelt geen scope tussen toetsbestanden, dus
    dat is een ReferenceError -- en die valt pas op de tak van de toets die hem
    raakt, en dus pas in CI. Vandaar hier, waar gedeeld gereedschap hoort. */
+async function edgeCatalogus(page) {
+  if (await page.locator('.rtg-edge-faces').count()) {
+    await page.click('[role="tab"][data-edge-face="all"]');
+    await page.click('.rtg-edge-smart-doors a');
+  }
+}
+
+async function edgeWerkbladen(page) {
+  if (await page.locator('.rtg-edge-faces').count())
+    await page.locator('[data-edge-command-bank]:visible').click();
+}
+
 async function bankDeur(page, naam, opties) {
   const ms = (opties && opties.timeout) || 15000;
   /* Tijdens login wordt de gesloten Command-root door de echte werktafel
@@ -1306,7 +1318,7 @@ async function bankDeur(page, naam, opties) {
       document.querySelector('.rtg-edge-menu[data-rtg-command-brug="true"]'), null,
     { timeout: 5000 }).catch(() => {});
     const edge = page.locator('.rtg-edge-menu[data-rtg-command-brug="true"]');
-    if (await edge.isVisible()) await edge.click(); else await lade.click();
+    if (await edge.isVisible()) { await edge.click(); await edgeWerkbladen(page); } else await lade.click();
     await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
   }
   await page.waitForFunction((n) => [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')]
@@ -1317,7 +1329,7 @@ async function bankDeur(page, naam, opties) {
   }, naam);
 }
 
-module.exports = { bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
+module.exports = { edgeCatalogus, edgeWerkbladen, bankDeur, bewaakKind, binnenEenDag, browserOpties, drukte, elevateTier, geduld, geenBrowser, wachtOpWaarde,
   installeerNepMicrofoon, kantoorAlsPersoon, keurLidGoed, laadPlaywright, laadScherm, letOpFouten,
   nepMediaArgs, opstartGeduld, startServer, stop, stopHard, stopNet, veegDoor, volgVerzoeken, vrijePoort,
   wachtOpRust, wachtTot, wachtOpTekst, wachtOpZichtbaar, wachtOpVerandering,

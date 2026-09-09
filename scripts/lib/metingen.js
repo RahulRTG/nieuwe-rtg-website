@@ -72,6 +72,7 @@ const GEEN_METING = new Set([
 ]);
 
 const REGISTER = {
+  'NAVIGATIEPROEF.json': { eigenRatel: 'scripts/navigatieproef.js' },
   'LAATSPOOR.json': { meter: ['laatSpoorVerdacht'] },
   'ROLLBACKBESLUIT.json': { meter: ['rollbackUitzonderingen'] },
   'FAALPROEF.json': { meter: ['faalproefGezakt'] },

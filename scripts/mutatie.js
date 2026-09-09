@@ -829,6 +829,8 @@ const EIGEN_MODULE = new Map([
   ]],
   /* De appbalktoets leest browsercode via fs; dezelfde bron hoort ook bij
      de mutatieproef, anders blijft deze toets ongemeten. */
+  ['beproeving-contract.test.js', ['scripts/verhalen.js']],
+  ['navigatieproef.test.js', ['public/shared/plek.js', 'public/apps/navigatie.html']],
   ['rtg-edge-appbar.test.js', ['public/shared/rtg-edge-appbar.js', 'public/shared/rtg-edge-smart-menu.js']],
   /* Deze regressietoets raakt drie achtergrondschrijvers via hun facades en
      een directe meter-import. modulesVan() ziet daardoor alleen de dunne

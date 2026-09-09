@@ -52,7 +52,7 @@
       deur.setAttribute('data-rtg-edge-owned', 'true');
       deur.setAttribute('aria-hidden', 'true'); deur.tabIndex = -1;
       if (slimMenu()) {
-        if (bankOpen()) deur.click();
+        if (indexOpen() && bankOpen()) deur.click();
         menu.setAttribute('aria-label', indexOpen() ? 'Menu sluiten' : 'Menu openen');
         menu.setAttribute('aria-controls', index.id);
         menu.setAttribute('aria-expanded', String(indexOpen()));

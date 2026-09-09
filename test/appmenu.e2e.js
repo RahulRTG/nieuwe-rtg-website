@@ -193,7 +193,7 @@ async function openLade(page) {
     document.querySelector('.rtg-edge-menu[data-rtg-command-brug="true"]'), null,
   { timeout: 5000 }).catch(() => {});
   const edge = page.locator('.rtg-edge-menu[data-rtg-command-brug="true"]');
-  if (await edge.isVisible()) await edge.click(); else await lade.click();
+  if (await edge.isVisible()) { await edge.click(); await require('./helper').edgeWerkbladen(page); } else await lade.click();
   await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
 }
 

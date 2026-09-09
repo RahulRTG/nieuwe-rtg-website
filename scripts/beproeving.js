@@ -194,7 +194,7 @@ function alleRoutes() {
       const method = m[1].toUpperCase(), pad = m[2];
       if (/\/stream|\/sse|events$/.test(pad) || pad.startsWith('/api/test/') || pad === '/api/health' || pad === '/api/ready') continue;
       const echt = pad.replace(/:([a-zA-Z0-9_]+)/g, 'x1');
-      set.set(method + ' ' + echt, { method, pad: echt, rol: rol[m[3]] || 'open', schakel: isSchakel(echt) });
+      set.set(method + ' ' + echt, { methode: method, pad: echt, rol: rol[m[3]] || 'open', schakel: isSchakel(echt) });
     }
   }
   return [...set.values()];
@@ -558,7 +558,7 @@ async function misbruikBeproeving(tok) {
    er anders uitzag. Een instrument hoort te meten als je erom vraagt, niet als
    je ernaar kijkt (scripts/meetkeuring.js, regel `wacht`).
    ============================================================================ */
-if (require.main !== module) { module.exports = {}; return; }
+if (require.main !== module) { module.exports = { alleRoutes }; return; }
 (async () => {
   kop('DE BEPROEVING - ' + MODE.toUpperCase() + '-modus - seed ' + RNGSTATE + (MODE === 'postgres' ? ' - ' + nl(LEDEN) + ' leden + activiteit' : ' - sqlite (standaard, draait overal)'));
   const routes = alleRoutes();
@@ -941,7 +941,7 @@ if (require.main !== module) { module.exports = {}; return; }
        geeft alleen de status terug. Daarmee stonden de lekscan en de
        toestandsvergelijking leeg te draaien. */
     post,
-    routes, tokensVoor: () => ({
+    routes: routes.map(r => ({ ...r, rol: r.rol === 'open' ? 'openbaar' : r.rol })), tokensVoor: () => ({
       member: rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office),
       supplier: rkeuze(tokVoor.supplier.length ? tokVoor.supplier : tokVoor.office),
       office: rkeuze(tokVoor.office.length ? tokVoor.office : tokVoor.member)

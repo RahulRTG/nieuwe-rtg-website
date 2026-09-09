@@ -56,6 +56,14 @@
       knop.addEventListener('click', function () { sluit(rt); bron.click(); });
       nav.appendChild(knop);
     });
+    var bank = d.querySelector('#rtgCommand .cmd-lade');
+    if (bank) {
+      var werk = d.createElement('button'); werk.type = 'button';
+      werk.className = 'rtg-edge-here-action'; werk.setAttribute('data-edge-command-bank', '');
+      werk.textContent = 'Werelden en werkbladen';
+      werk.addEventListener('click', function () { sluit(rt); bank.click(); });
+      nav.appendChild(werk);
+    }
     var terug = d.createElement('a');
     terug.className = 'rtg-edge-here-action'; terug.href = recent();
     terug.innerHTML = icoon('replay') + '<span>Recent bezocht</span><em aria-hidden="true">›</em>';
@@ -119,6 +127,12 @@
         ev.preventDefault(); gezicht(rt, rt.tabs[i ? 0 : 1].getAttribute('data-edge-face'), true);
       });
     });
+    if (d.querySelector('#rtgCommand .cmd-lade')) {
+      var werk = d.createElement('button'); werk.type = 'button'; werk.className = 'rtg-edge-smart-door';
+      werk.setAttribute('data-edge-command-bank', ''); werk.textContent = 'Werelden en werkbladen';
+      werk.addEventListener('click', function () { sluit(rt); d.querySelector('#rtgCommand .cmd-lade').click(); });
+      rt.alles.querySelector('.rtg-edge-smart-doors').appendChild(werk);
+    }
     schaal.querySelector('[data-edge-smart-search]').addEventListener('click', function () {
       rt.alles.setAttribute('data-catalogus-open', 'true');
       var invoer = rt.alles.querySelector('.rtg-edge-find input'); if (invoer) invoer.focus();

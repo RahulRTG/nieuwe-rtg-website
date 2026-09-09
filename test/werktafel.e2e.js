@@ -110,8 +110,8 @@ const stand = () => {
       .some(b => /^Instellingen$/i.test(b.textContent.trim())),
     // de tabstrip en of de greep op een blad ligt: zie de mobiele stap hieronder
     tabstrip: (() => { const t = document.querySelector('.cmd-tabs'); return t ? getComputedStyle(t).display : null; })(),
-    // hoeveel er onder het blad overblijft: dat hoort precies de schilbalk te
-    // zijn -- geen gat, geen overlap
+    // hoeveel er onder het blad overblijft: dat hoort precies de gezamenlijke
+    // Edge-onderrand te zijn -- geen gat, geen dubbele zwarte strook
     bladTotOnder: (() => {
       const f = document.querySelector('.cmd-pane.actief iframe');
       return f ? Math.round(window.innerHeight - f.getBoundingClientRect().bottom) : null;
@@ -119,8 +119,12 @@ const stand = () => {
     // de schilbalk: de bank, waar je bent, en weg hier
     balk: (() => { const b = document.querySelector('.cmd-balk');
       return b ? Math.round(b.getBoundingClientRect().height) : null; })(),
+    balkVanaf: (() => { const b = document.querySelector('.cmd-balk');
+      return b ? Math.round(b.getBoundingClientRect().top) : null; })(),
     edgeOnder: (() => { const b = document.querySelector('.rtg-edge-bottom');
       return b ? Math.round(b.getBoundingClientRect().height) : null; })(),
+    edgeVanaf: (() => { const b = document.querySelector('.rtg-edge-bottom');
+      return b ? Math.round(b.getBoundingClientRect().top) : null; })(),
     chips: [...document.querySelectorAll('.cmd-balkblad')]
       .map(x => x.textContent + (x.classList.contains('actief') ? '*' : '')),
     sluitknop: (() => { const k = document.querySelector('.cmd-balksluit'); return !!k && !k.hidden; })(),
@@ -294,14 +298,15 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
        zichtbaar als een grijze balk. De greep ligt nu IN de onderbalk van de
        wereld, op dezelfde hoogte als de iconen daar. */
     /* Edge is ook op een telefoon de ene globale schil: 44px context bovenaan
-       en de globale bediening onderaan. Command voegt daar direct boven één
-       lokale bladstrook aan toe. Het werkblad eindigt dus exact boven beide
-       betekenisvolle rijen, zonder leeg inset of overlap. */
+       en de globale bediening onderaan. Command draagt zijn echte functies in
+       diezelfde lichte onderrand; het voegt geen tweede zwarte rij meer toe. */
     assert.equal(smalBlad.bladVanaf, 44, 'de wereld hoort direct onder de enige Edge-bovenbalk te beginnen');
     assert.equal(smalBlad.balk, 48, 'de schilbalk hoort 48px te zijn, kreeg ' + smalBlad.balk);
     assert.equal(smalBlad.edgeOnder, 48, 'de globale Edge-onderrand hoort 48px te zijn');
-    assert.equal(smalBlad.bladTotOnder, smalBlad.balk + smalBlad.edgeOnder,
-      'het blad hoort direct boven de lokale bladstrook en globale Edge-onderrand te eindigen');
+    assert.equal(smalBlad.balkVanaf, smalBlad.edgeVanaf,
+      'Command-functies en Edge horen zichtbaar dezelfde onderrand te bewonen');
+    assert.equal(smalBlad.bladTotOnder, smalBlad.edgeOnder,
+      'het blad hoort direct boven de ene gezamenlijke onderrand te eindigen');
     assert.deepEqual(smalBlad.chips, ['Vandaag*'], 'de balk hoort te tonen waar je bent');
     assert.equal(smalBlad.sluitknop, true, 'met een weg-hier ernaast');
 

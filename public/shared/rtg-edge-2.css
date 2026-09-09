@@ -45,6 +45,21 @@ body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom{
      gedeelde Edge-contract pointer-events:auto. */
   visibility:visible;pointer-events:none;transition:transform .24s cubic-bezier(.2,.8,.2,1),visibility 0s
 }
+/* De onderrand is de vaste, lichte bediening van alle werelden. De wereld zelf
+   mag donker, groen of blauw zijn; thuiskomen, teruggaan en Rahul blijven op
+   hetzelfde ivoorkleurige instrument staan. Lokale variabelen houden de rest
+   van Edge in de eigen wereldkleur. */
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom{
+  --edge-bg:#f4f0e8;--edge-panel:#fbf8f2;--edge-copy:#211e19;--edge-dim:#70695f;
+  --edge-line:rgba(33,30,25,.16);--edge-accent:#861638;--edge-accent-soft:rgba(134,22,56,.1);
+  --edge-metal:#8a7317;border-top-color:var(--edge-line);
+  background:color-mix(in srgb,var(--edge-bg) 97%,transparent);box-shadow:0 -8px 32px rgba(28,21,15,.08)
+}
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom>button,
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom>a,
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom .rtg-edge-history{
+  border-color:rgba(33,30,25,.09)!important
+}
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-top,
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-side,
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-bottom{transform:none!important}
@@ -135,6 +150,53 @@ body[data-rtg-edge-2-rendered="true"][data-ios]{--ios-thuis-ruimte:0px!important
    zichtbaar, aanklikbaar of voorleesbaar doel. */
 @media(max-width:999px){
   #rtgCommand .cmd-lade[data-rtg-edge-owned="true"]{visibility:hidden!important;pointer-events:none!important}
+
+  /* Command had op telefoon een eigen zwarte dock direct boven Edge. De echte
+     tabknoppen blijven eigenaar van hun gedrag, maar liggen nu in de vrije
+     middenzone van de witte Edge-onderrand. Daardoor is er nog maar één balk. */
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-werk{
+    grid-template-rows:minmax(0,1fr) auto!important
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-panes{grid-row:1!important}
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-rail{grid-row:2!important}
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) .rtg-edge-bottom{
+    grid-template-columns:var(--edge-side) 44px minmax(0,1fr)!important
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) .rtg-edge-history,
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) .rtg-edge-action,
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) .rtg-edge-ai{
+    display:none!important
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balk{
+    --rtg-txt:#211e19;--rtg-muted:#70695f;--rtg-soft:#8b8276;--rtg-line:rgba(33,30,25,.13);--gold-tekst:#8a7317;
+    position:fixed!important;z-index:8801!important;grid-row:auto!important;
+    left:calc(var(--edge-side) + 44px)!important;right:0!important;
+    bottom:env(safe-area-inset-bottom,0px)!important;width:auto!important;height:var(--edge-bottom)!important;
+    padding:0!important;overflow:hidden!important;border:0!important;background:transparent!important;
+    box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;color:var(--rtg-txt)
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balk .cmd-lade{
+    display:none!important
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balkbladen{
+    order:1;border-left:1px solid var(--rtg-line);border-right:0
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balkblad{
+    min-height:44px;max-width:min(45vw,220px);color:var(--rtg-muted)
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balkblad:hover,
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balkblad.actief{color:var(--rtg-txt)}
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balkblad.actief{
+    border-bottom-color:#861638;background:linear-gradient(180deg,rgba(134,22,56,.09),rgba(134,22,56,.025))
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balksluit{
+    order:2;width:44px;color:var(--rtg-muted);border-left:1px solid var(--rtg-line)
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-vraagvorm{order:1}
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-mondknop{
+    order:3;width:44px;color:#861638;border-left:1px solid var(--rtg-line);opacity:1
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-mondknop canvas{width:36px!important}
 }
 
 /* WerkOS bouwt zijn echte tabknoppen dynamisch. In een Edge-scherm liggen die
@@ -260,6 +322,9 @@ body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data
   }
   body[data-rtg-edge-2-rendered="true"]>.wos-dock{
     left:calc(var(--edge-side) + 88px)!important;right:44px!important
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balk{
+    left:var(--edge-side)!important
   }
   body[data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-action:has(>.xp-trigger){
     gap:6px!important;padding:0!important

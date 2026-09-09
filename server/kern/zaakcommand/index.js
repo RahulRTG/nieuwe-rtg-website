@@ -45,10 +45,43 @@ function maakZaakCommand({ db, save, crypto, anthropic, findSupplier, commGast }
   const eigen = require('../eigencollectie')({ db, domein: 'kern/zaakcommand/index', bezit: { zaakCommand: 'kaart' } });
   /* Het vak van deze zaak. Alles wat de motoren opslaan komt hierin terecht;
      er is geen sleutel die buiten de zaak wijst. */
+  /* HET VAK ONTSTAAT BIJ SCHRIJVEN, NIET BIJ KIJKEN.
+
+     Hier stond `if (!vakken[code]) vakken[code] = {}`. Dat lijkt onschuldig --
+     een leeg vakje -- maar het is een MUTATIE, en hij viel op het leespad: wie
+     alleen zijn dashboard opende, veranderde `zaakCommand`. In PostgreSQL-modus
+     weigert de requestcommit dat terecht met PG_SAVE_ONTBREEKT, en dat waren de
+     8 serverfouten op /api/supplier/backoffice in de 100M-ronde (95 in de
+     200k-ronde). In sqlite bewaakt niets die grens, dus daar bleef het jaren
+     onzichtbaar.
+
+     Een leeg vak draagt geen informatie: het bestaan ervan zegt niets wat je niet
+     uit de afwezigheid kunt afleiden. Daarom komt het er pas zodra er echt iets
+     in wordt gezet. Tot die tijd gedraagt deze schil zich als een leeg vak --
+     lezen geeft undefined, schrijven maakt het vak alsnog aan, en vanaf dan is
+     het een gewoon object. */
   function vakVan(code) {
-    const vakken = eigen.bak('zaakCommand');
-    if (!vakken[code]) vakken[code] = {};
-    return vakken[code];
+    /* kijk() leest zonder te scheppen; bak() maakt de collectie aan als zij
+       ontbreekt -- en dat laatste is zelf al een mutatie, ook als er daarna
+       niets in komt. Op het leespad hoort dus kijk(). */
+    const bestaand = eigen.kijk('zaakCommand')[code];
+    if (bestaand) return bestaand;
+    const echt = () => eigen.kijk('zaakCommand')[code] || null;
+    const schrijf = () => {
+      const vakken = eigen.bak('zaakCommand');
+      return vakken[code] || (vakken[code] = {});
+    };
+    return new Proxy({}, {
+      get: (_d, k) => { const v = echt(); return v ? v[k] : undefined; },
+      has: (_d, k) => { const v = echt(); return v ? k in v : false; },
+      set: (_d, k, w) => { schrijf()[k] = w; return true; },
+      deleteProperty: (_d, k) => { const v = echt(); if (v) delete v[k]; return true; },
+      ownKeys: () => Reflect.ownKeys(echt() || {}),
+      getOwnPropertyDescriptor: (_d, k) => {
+        const b = Object.getOwnPropertyDescriptor(echt() || {}, k);
+        return b ? Object.assign({}, b, { configurable: true }) : undefined;
+      }
+    });
   }
 
   /* Eén laag per zaak, gebouwd op aanvraag en niet bewaard: de zaak-objecten

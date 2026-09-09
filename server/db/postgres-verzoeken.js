@@ -125,7 +125,24 @@ module.exports = function maakPostgresVerzoeken(o) {
     }
   }
 
+  /* De namen van de gemuteerde collecties, ontdubbeld en begrensd: dit gaat in
+     een foutmelding en die hoort leesbaar te blijven. */
+  function namenVan(wijzigingen) {
+    const namen = [...new Set((wijzigingen || []).map(w => w && w.sleutel).filter(Boolean))];
+    if (!namen.length) return 'onbekende collectie';
+    return namen.slice(0, 6).join(', ') + (namen.length > 6 ? ' (+' + (namen.length - 6) + ')' : '');
+  }
+
   function foutAntwoord(req, res, echtEnd, herstel, ctx, err) {
+    /* De CLIENT krijgt een nette, nietszeggende zin -- terecht. Maar tot 9
+       september 2026 kreeg de SERVER er ook een: een 500 uit deze poort liet
+       geen enkel spoor na van de reden, dus "8x 5xx op /api/supplier/backoffice"
+       was wel te tellen en niet te verklaren. De reden hoort in het log, één
+       regel, met het pad erbij. */
+    if (err && (err.code === 'PG_SAVE_ONTBREEKT' || err.code === 'PG_ONGEZOND' || err.code === 'PG_GEEN_COMMIT')) {
+      console.error('[opslagpoort] ' + err.code + ' op ' + (req && req.method) + ' ' + (req && req.path)
+        + ': ' + String(err.message || '').slice(0, 300));
+    }
     context.sluit(ctx);
     if (res.headersSent) { try { res.destroy(err); } catch (e) {} return; }
     herstel();
@@ -217,11 +234,19 @@ module.exports = function maakPostgresVerzoeken(o) {
              een rollback/discard en voeren ook geen na-commithaak uit. */
           const succes = status >= 200 && status < 400;
           if (succes) {
-            if (context.onbevestigdeWijzigingen(ctx).length && !ctx.opslaan)
-              throw Object.assign(new Error('save() ontbreekt na een mutatie.'), { code: 'PG_SAVE_ONTBREEKT' });
+            /* WELKE collecties er muteerden hoort in de fout te staan. Zonder die
+               namen zegt "save() ontbreekt na een mutatie" alleen DAT er iets
+               schreef, en dan begint het zoeken pas -- op 9 september 2026 kostte
+               dat een halve middag voor een enkele route. */
+            const stil = context.onbevestigdeWijzigingen(ctx);
+            if (stil.length && !ctx.opslaan)
+              throw Object.assign(new Error('save() ontbreekt na een mutatie van: ' + namenVan(stil)),
+                { code: 'PG_SAVE_ONTBREEKT' });
             await context.draaiVoorCommit(ctx);
-            if (context.onbevestigdeWijzigingen(ctx).length && !ctx.opslaan)
-              throw Object.assign(new Error('Een voor-commithaak muteerde zonder save().'), { code: 'PG_SAVE_ONTBREEKT' });
+            const stil2 = context.onbevestigdeWijzigingen(ctx);
+            if (stil2.length && !ctx.opslaan)
+              throw Object.assign(new Error('Een voor-commithaak muteerde zonder save(): ' + namenVan(stil2)),
+                { code: 'PG_SAVE_ONTBREEKT' });
             if (ctx.opslaan) await commit(ctx);
             context.draaiNaCommit(ctx);
           }

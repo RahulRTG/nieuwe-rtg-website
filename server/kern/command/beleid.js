@@ -43,31 +43,17 @@ const START = [
 function maakBeleid({ db, save, crypto, journaal, vak, start, opslag }) {
   const V = typeof vak === 'function' ? vak : (() => opslag.vak());
   const REGELS = Array.isArray(start) ? start : START;
-  /* LEZEN MAG NIET SCHRIJVEN, en dat ging hier mis.
-
-     reg() zette de startregels in het vak zodra iemand ook maar een WAARDE
-     opvroeg. Op een leespad is dat een stille mutatie, en in PostgreSQL-modus is
-     dat geen schoonheidsfout maar een 500: de requestcommit ziet een gewijzigde
-     collectie zonder save() en weigert (PG_SAVE_ONTBREEKT). Zo gaf
-     /api/supplier/backoffice -- een dashboard dat alleen kijkt -- 8x een
-     serverfout in de 100M-ronde en 95x in de 200k-ronde, telkens op
-     `zaakCommand`. In sqlite viel het nooit op, want daar bewaakt niets die
-     grens; het is dus geen postgres-bug maar een postgres-DETECTIE.
-
-     Sindsdien twee wegen met hetzelfde antwoord:
-       regLees() / voorstellenLees()  leveren de regels zonder ze vast te leggen.
-       reg()     / voorstellen()      leggen ze vast, en horen daarom alleen op
-                                      een schrijfpad te staan -- elk daarvan
-                                      eindigt met save().
-     De startwaarden zijn geen gegevens maar een OPZET: ze staan in REGELS en
-     zijn daaruit altijd opnieuw af te leiden. Ze hoeven dus niet te worden
-     opgeslagen om te bestaan. */
+  /* LEZEN MAG NIET SCHRIJVEN. reg() zette de startregels weg zodra iemand een
+     waarde OPVROEG; PostgreSQL weigert die stille mutatie met PG_SAVE_ONTBREEKT
+     (alle 5xx op /api/supplier/backoffice in de 100M-ronde), sqlite bewaakt hem
+     niet. regLees()/voorstellenLees() lezen zonder vast te leggen; reg()/
+     voorstellen() staan alleen op paden die met save() eindigen. De startwaarden
+     staan in REGELS en zijn daaruit altijd opnieuw af te leiden. */
   const startRegel = (b) => ({ id: b.id, wat: b.wat, eenheid: b.eenheid, vierOgen: b.vierOgen, bereik: 'globaal',
     versies: [{ v: 1, waarde: b.waarde, at: null, door: 'startwaarde', reden: 'de regel zoals hij is opgezet' }] });
 
-  /* Lezen: een samengestelde kijk op opgeslagen regels plus de startwaarden.
-     Het is een KOPIE van de buitenste laag -- wie hierin schrijft, schrijft in
-     het niets, en dat is precies de bedoeling op een leespad. */
+  /* Een KOPIE van de buitenste laag: wie hierin schrijft, schrijft in het niets,
+     en dat is op een leespad precies de bedoeling. */
   function regLees() {
     const opgeslagen = V().commandBeleid || {};
     const r = Object.assign({}, opgeslagen);

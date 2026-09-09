@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1734 bestanden en 12268 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1737 bestanden en 12283 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1734 |
-| losse beweringen (`test(...)`) | 12268 |
+| toetsbestanden | 1737 |
+| losse beweringen (`test(...)`) | 12283 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 110 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1074 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 55 |
-| alleen in de kop *genoemd*, nog niet gemeten | 179 |
-| niets van beide | 426 |
+| alleen in de kop *genoemd*, nog niet gemeten | 181 |
+| niets van beide | 427 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1526 bestanden, 11909 beweringen.
+1529 bestanden, 11924 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -180,6 +180,7 @@ toets omvalt.
 | `bewijsboek.test.js` | 12 | genoemd | HET REGRESSIECORPUS VAN HET BEWIJSBOEK. Dit is de laag die mag zeggen "die toets hoeft niet opnieuw". |
 | `bewijsmatrix-audit.test.js` | 4 | -- | DE AUDIT-KOLOM HEEFT TWEE BRONNEN, EN ALLEBEI MOETEN ZE AAN BOD KOMEN. DIT IS TWEE KEER MISGEGAAN, en beide keren op dezelfde manier: een tak die de cel ook claimde als hij NIETS wist, met een `continue` erachter. |
 | `bewijsmatrix.test.js` | 26 | gezakt op `!==->===#0` | DE ENDPOINT-BEWIJSMATRIX (scripts/bewijsmatrix.js): het register dat per route de elf schakels langsloopt en zegt wie er een bewijst. WAT HIER OP HET SPEL STAAT, en het is precies het gevaar dat de matrix zelf moest... |
+| `bewijsregister.test.js` | 5 | -- | ROOD BEWIJS MOET BLIJVEN STAAN. Tot 9 september 2026 was BEPROEVING.json tegelijk het VERSLAG van de laatste ronde en de INVOER van de prestatieratel. |
 | `bewijsschuld.test.js` | 8 | gezakt op `!==->===#0` | DE BEWIJSSCHULD MAG ALLEEN KRIMPEN. WAAROM DIT BESTAAT. |
 | `bewijstoken.test.js` | 13 | genoemd | HET BEWIJSTOKEN -- een bevoegdheid die je kunt meedragen. WAT ER OP HET SPEL STAAT. |
 | `bezitsbewijs.test.js` | 19 | -- | MIJN RTG blok 4 -- het bezitsbewijs. DE BEWERING DIE ERTOE DOET staat in toets 1: een sessietoken is een DRAGERSBEWIJS. |
@@ -663,6 +664,7 @@ toets omvalt.
 | `leerstof.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 2: de leerstof-motor. Elke groep heeft echte leerdoelen met een les, de oefensessie is server-authoritatief (antwoorden staan nooit in de vraag), een behaald doel komt in het leerpaspoort, en er zijn... |
 | `leerstofbreed.test.js` | 3 | gezakt op `+->-#0` | RTG School, de brede leerlijn: van twee vakken naar een echt curriculum. Basisschool: rekenen, taal, aardrijkskunde, geschiedenis, natuur, verkeer en Engels. |
 | `leerstofvo.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 3: het voortgezet en vervolgonderwijs op de leerstof-motor. Vakken per fase (vmbo t/m wo), examentraining die pas aan het eind terugkijkt (zoals een echt examen), en het niveau-advies dat adviseert en... |
+| `leespad-schrijft-niet.test.js` | 5 | genoemd | EEN LEESPAD SCHRIJFT NIET. /api/supplier/backoffice is een dashboard: het kijkt naar de dag, de week en de openstaande signalen en verandert niets. |
 | `leeszonderscheppen.test.js` | 52 | gezakt op `===->!==#0` | LEZEN ZONDER SCHEPPEN -- de tegenproef van een hele klasse. scripts/lib/eigencollectie.js kent twee deuren naar de eigen opslag van een domein: bak() maakt de collectie aan als hij er nog niet is, kijk() geeft een... |
 | `legacy-codeportaal-productiepoort.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `leren-leden.test.js` | 11 | gezakt op `liegpoort /api/` | DE LEERLAAG VANAF DE LEDEN-APP -- 28 endpoints, en een uitnodiging als spil. Deze achtentwintig wees de waargenomen dekkingsmeting aan als nooit aangeroepen. |
@@ -1532,6 +1534,7 @@ toets omvalt.
 | `workspace-platform.test.js` | 5 | -- | De platformgrenzen onder de Dynamic Layer: versiecontract, Event Fabric, Action Broker, centrale state, orchestration en declaratieve blueprints. |
 | `workspace-server-platform.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `workspace-voorkeur.test.js` | 4 | -- | De Adaptive Workspace bewaart compositie en niets anders. Dit toetst zowel de pure grens als de twee accountwegen die Continuity gebruikt. |
+| `writehealth-lus.test.js` | 5 | genoemd | DE SCHRIJFPOORT MAG ZIJN EIGEN GESLOTEN TOESTAND NIET ALS NIEUWE STORING LEZEN. Gemeten in de 100M-ronde van 9 september 2026: de poort sloot 89 keer, en 45 van die sluitingen droegen als reden "collectietransactie:... |
 | `zaaihash.test.js` | 5 | gezakt op `liegpoort /api/` | DE ZAAI-HASH, EN DE GRENS ERONDER. De demo-seed maakte bij elke serverstart 220 scrypt-hashes voor 4 verschillende wachtwoorden. |
 | `zaak-balie.test.js` | 7 | gezakt op `liegpoort /api/` | DE BALIE VAN EEN ZAAK -- 7 endpoints uit de supplier-groep. agenda/toevoegen, agenda/wijzig, agenda/verwijder, ticket/add, ticket/status, lost/add en lost/done stonden als nooit aangeroepen in de waargenomen... |
 | `zaak-en-mensen.test.js` | 6 | gezakt op `liegpoort /api/` | DE ZAAK EN HAAR MENSEN -- 6 endpoints achter de leverancier-inlog. Deze zes wees de waargenomen dekkingsmeting aan als nooit aangeroepen: werkbeleid, werkbeleid/zet, leave/decide, team/message, team/buzz en... |

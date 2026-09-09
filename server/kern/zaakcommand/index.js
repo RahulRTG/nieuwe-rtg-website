@@ -43,27 +43,13 @@ const ZAAK_BELEID = [
 
 function maakZaakCommand({ db, save, crypto, anthropic, findSupplier, commGast }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/zaakcommand/index', bezit: { zaakCommand: 'kaart' } });
-  /* Het vak van deze zaak. Alles wat de motoren opslaan komt hierin terecht;
-     er is geen sleutel die buiten de zaak wijst. */
-  /* HET VAK ONTSTAAT BIJ SCHRIJVEN, NIET BIJ KIJKEN.
-
-     Hier stond `if (!vakken[code]) vakken[code] = {}`. Dat lijkt onschuldig --
-     een leeg vakje -- maar het is een MUTATIE, en hij viel op het leespad: wie
-     alleen zijn dashboard opende, veranderde `zaakCommand`. In PostgreSQL-modus
-     weigert de requestcommit dat terecht met PG_SAVE_ONTBREEKT, en dat waren de
-     8 serverfouten op /api/supplier/backoffice in de 100M-ronde (95 in de
-     200k-ronde). In sqlite bewaakt niets die grens, dus daar bleef het jaren
-     onzichtbaar.
-
-     Een leeg vak draagt geen informatie: het bestaan ervan zegt niets wat je niet
-     uit de afwezigheid kunt afleiden. Daarom komt het er pas zodra er echt iets
-     in wordt gezet. Tot die tijd gedraagt deze schil zich als een leeg vak --
-     lezen geeft undefined, schrijven maakt het vak alsnog aan, en vanaf dan is
-     het een gewoon object. */
+  /* HET VAK ONTSTAAT BIJ SCHRIJVEN, NIET BIJ KIJKEN. `vakken[code] = {}` is een
+     leeg vakje en toch een MUTATIE, en hij viel op het leespad: PG_SAVE_ONTBREEKT,
+     de 5xx op /api/supplier/backoffice. Een leeg vak draagt geen informatie, dus
+     het komt er pas als er echt iets in wordt gezet. */
   function vakVan(code) {
-    /* kijk() leest zonder te scheppen; bak() maakt de collectie aan als zij
-       ontbreekt -- en dat laatste is zelf al een mutatie, ook als er daarna
-       niets in komt. Op het leespad hoort dus kijk(). */
+    /* kijk() leest zonder te scheppen; bak() maakt de collectie aan, en dat is
+       zelf al een mutatie. */
     const bestaand = eigen.kijk('zaakCommand')[code];
     if (bestaand) return bestaand;
     const echt = () => eigen.kijk('zaakCommand')[code] || null;
@@ -84,13 +70,11 @@ function maakZaakCommand({ db, save, crypto, anthropic, findSupplier, commGast }
     });
   }
 
-  /* Eén laag per zaak, gebouwd op aanvraag en niet bewaard: de zaak-objecten
-     veranderen onder je handen, en een gecachete laag zou een verouderd
-     register vasthouden. De kosten zijn een handvol closures per verzoek. */
+  /* Eén laag per zaak, op aanvraag en niet bewaard: een gecachete laag zou een
+     verouderd register vasthouden. Kosten: een handvol closures per verzoek. */
   /* `opties.leiding` is de tweede as van de scope: van welke ZAAK, en met welke
-     ROL. Hij staat standaard op false -- wie hem vergeet ziet te weinig, en dat
-     is de goede kant om fout te gaan. De aanroeper haalt hem uit req.actor en
-     nooit uit de aanvraag. */
+     ROL. Standaard false -- wie hem vergeet ziet te weinig, en dat is de goede
+     kant om fout te gaan. Hij komt uit req.actor, nooit uit de aanvraag. */
   function voor(zaak, opties) {
     const code = String(zaak && zaak.code ? zaak.code : zaak || '');
     if (!code) return null;

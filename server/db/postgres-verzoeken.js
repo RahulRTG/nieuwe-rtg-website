@@ -8,10 +8,8 @@ module.exports = function maakPostgresVerzoeken(o) {
   const { store, db, state, motor, slot, topUp, extern, basisKlaar } = o;
   let gezond = false, reden = 'PostgreSQL wordt geladen', herstel = null;
   let timer = null, poging = 0, achtergrondOpen = false;
-  /* Hoeveel meldingen er zijn onderdrukt omdat ze het GEVOLG waren van de al
-     gesloten poort. Zie ongezond(). Dit is met opzet een getal en geen stilte:
-     de lus was alleen te zien met een waarnemer van buiten die elke halve
-     seconde /api/ready opvroeg, en dat hoort niet nodig te zijn. */
+  /* Onderdrukte gevolgen van de al gesloten poort (zie ongezond). Een getal en
+     geen stilte: de lus was alleen van buiten te zien, en dat hoort niet. */
   let gevolgen = 0;
   const stromen = new Set();
   const actief = () => store === 'postgres';
@@ -36,25 +34,15 @@ module.exports = function maakPostgresVerzoeken(o) {
     if (timer.unref) timer.unref();
   }
 
-  /* EEN GESLOTEN POORT IS GEEN NIEUWE STORING.
-
-     Zodra de poort dicht staat, weigert collectie-postgres.js elke
-     collectietransactie met PG_ONGEZOND ("de gedeelde PostgreSQL-opslag is nog
-     niet schrijfbaar") en gooit openStroom dezelfde code. Dat zijn GEVOLGEN van
-     de sluiting, geen oorzaken -- en ze kwamen hier binnen als verse melding.
-
-     Gemeten op 9 september 2026, 100M leden: van de 89 sluitingen droegen er 45
-     die echo als reden, en 44 daarvan vielen terwijl de poort al dicht stond. De
-     schade is niet dat dicht nog dichter gaat, maar dat `reden` de oorzaak
-     kwijtraakt: wie achteraf vraagt waarom er niets meer geschreven werd, leest
-     het symptoom van de sluiting in plaats van de mutatie buiten de
-     requestcontext die hem sloot.
-
-     DE GRENS LOOPT LANGS `gezond` EN NIET LANGS DE CODE. Staat de poort nog
-     OPEN en komt PG_ONGEZOND binnen, dan is dat wél een oorzaak (de opslag is
-     dan niet schrijfbaar terwijl wij dachten van wel) en sluit hij gewoon. Zo
-     versoepelt dit niets: de poort gaat hier nooit open, alleen de echo van zijn
-     eigen dichte stand telt niet als tweede reden. */
+  /* EEN GESLOTEN POORT IS GEEN NIEUWE STORING. Staat de poort dicht, dan weigert
+     collectie-postgres.js elke transactie met PG_ONGEZOND en gooit openStroom
+     dezelfde code -- GEVOLGEN van de sluiting, die hier als verse melding
+     binnenkwamen. Gemeten 9 sep 2026 op 100M leden: van de 89 sluitingen droegen
+     er 45 die echo, 44 daarvan terwijl de poort al dicht stond. De schade is niet
+     dat dicht nog dichter gaat, maar dat `reden` de oorzaak kwijtraakt.
+     DE GRENS LOOPT LANGS `gezond` EN NIET LANGS DE CODE: komt PG_ONGEZOND binnen
+     terwijl de poort OPEN staat, dan is het wel een oorzaak en sluit hij gewoon.
+     Er gaat hier dus nooit een poort open. */
   function ongezond(err, bron) {
     if (!actief()) return;
     if (!gezond && err && err.code === 'PG_ONGEZOND') { gevolgen++; return; }
@@ -125,8 +113,7 @@ module.exports = function maakPostgresVerzoeken(o) {
     }
   }
 
-  /* De namen van de gemuteerde collecties, ontdubbeld en begrensd: dit gaat in
-     een foutmelding en die hoort leesbaar te blijven. */
+  /* Ontdubbeld en begrensd: dit gaat in een foutmelding. */
   function namenVan(wijzigingen) {
     const namen = [...new Set((wijzigingen || []).map(w => w && w.sleutel).filter(Boolean))];
     if (!namen.length) return 'onbekende collectie';
@@ -134,11 +121,9 @@ module.exports = function maakPostgresVerzoeken(o) {
   }
 
   function foutAntwoord(req, res, echtEnd, herstel, ctx, err) {
-    /* De CLIENT krijgt een nette, nietszeggende zin -- terecht. Maar tot 9
-       september 2026 kreeg de SERVER er ook een: een 500 uit deze poort liet
-       geen enkel spoor na van de reden, dus "8x 5xx op /api/supplier/backoffice"
-       was wel te tellen en niet te verklaren. De reden hoort in het log, één
-       regel, met het pad erbij. */
+    /* De client krijgt een nietszeggende zin -- terecht. De SERVER kreeg er ook
+       een: een 500 uit deze poort liet geen spoor na, dus "8x 5xx" was te tellen
+       en niet te verklaren. De reden hoort in het log. */
     if (err && (err.code === 'PG_SAVE_ONTBREEKT' || err.code === 'PG_ONGEZOND' || err.code === 'PG_GEEN_COMMIT')) {
       console.error('[opslagpoort] ' + err.code + ' op ' + (req && req.method) + ' ' + (req && req.path)
         + ': ' + String(err.message || '').slice(0, 300));
@@ -234,10 +219,8 @@ module.exports = function maakPostgresVerzoeken(o) {
              een rollback/discard en voeren ook geen na-commithaak uit. */
           const succes = status >= 200 && status < 400;
           if (succes) {
-            /* WELKE collecties er muteerden hoort in de fout te staan. Zonder die
-               namen zegt "save() ontbreekt na een mutatie" alleen DAT er iets
-               schreef, en dan begint het zoeken pas -- op 9 september 2026 kostte
-               dat een halve middag voor een enkele route. */
+            /* WELKE collecties muteerden hoort in de fout: zonder die namen zegt
+               hij alleen DAT er iets schreef, en dan begint het zoeken pas. */
             const stil = context.onbevestigdeWijzigingen(ctx);
             if (stil.length && !ctx.opslaan)
               throw Object.assign(new Error('save() ontbreekt na een mutatie van: ' + namenVan(stil)),

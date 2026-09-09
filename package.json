@@ -307,7 +307,9 @@
     "toelatingsproef:vast": "node scripts/toelatingsproef.js --vastleggen",
     "kantoormacht": "node scripts/kantoormacht.js",
     "kantoormacht:vast": "node scripts/kantoormacht.js --vastleggen",
-    "kantoormacht:controle": "node scripts/kantoormacht.js --controle"
+    "kantoormacht:controle": "node scripts/kantoormacht.js --controle",
+    "navigatieproef": "node scripts/navigatieproef.js",
+    "navigatieproef:vast": "node scripts/navigatieproef.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

@@ -152,6 +152,7 @@ const REGISTER = {
   'TOELATINGSPROEF.json': { eigenRatel: 'test/toelatingsproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },
   'RITMIGRATIE.json': { eigenRatel: 'test/ritmigratie.test.js' },
+  'HEAPPROEF.json': { eigenRatel: 'test/heapproef.test.js' },
   'DOORWERKING.json': { eigenRatel: 'test/doorwerking.test.js' },
   /* De gedeelde namespace van handelingen (TAKEN.md 4.54). Drie getallen, en
      ze lopen niet dezelfde kant op: gedeelde onderwerpen mogen alleen OMHOOG

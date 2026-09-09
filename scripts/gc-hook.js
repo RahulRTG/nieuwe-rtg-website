@@ -37,6 +37,38 @@ const meter = setInterval(() => {
 }, TIK);
 if (meter.unref) meter.unref(); // nooit een reden om het proces open te houden
 
+/* HET IJKLEK -- ALLEEN OM DE METER TE CONTROLEREN.
+
+   Een geheugenmeter die je nooit hebt zien AANSLAAN, meet niets: hij zegt
+   "stabiel" over een server die lekt en over een server die dat niet doet, en
+   die twee zien er dan identiek uit. Met RTG_LEK_MBMIN houdt dit proces bewust
+   een bekend tempo aan geheugen vast, en scripts/heapproef.js MOET dat lek dan
+   vinden -- vindt hij het niet, dan eindigt hij met een foutcode.
+
+   Dit is een test-preload en geen servercode: zonder de omgevingsvariabele
+   gebeurt er niets, en de variabele wordt alleen gezet door de ijkronde. De
+   DE BROKKEN ZIJN JS-ARRAYS EN GEEN BUFFERS, en dat is geen smaak. Deze meter
+   leest `heapUsed`, en de opslag van een Buffer ligt BUITEN de V8-heap: 50 MB
+   aan Buffers bewoog heapUsed hier met 1 MB. Een ijklek van Buffers zou dus
+   onzichtbaar zijn en de meter ten onrechte blind verklaren. Een array van
+   131072 doubles is ongeveer 1 MB en staat wel in de heap (gemeten: 50 stuks
+   gaven +50 MB). Ze blijven in `vast` staan, dus een major GC kan ze niet
+   opruimen -- precies wat een echt lek doet. */
+const lekTempo = Number(process.env.RTG_LEK_MBMIN || 0);
+if (lekTempo > 0) {
+  const vast = [];
+  global.__rtgIjkLek = vast;                     // ook een harde verwijzing buiten de closure
+  const perTik = Math.max(1, Math.round(lekTempo / 12));   // twaalf tikken per minuut
+  const lek = setInterval(() => {
+    for (let i = 0; i < perTik; i++) {
+      const a = new Array(131072).fill(1.5);     // doubles: ~1 MB, en in de heap
+      a[0] = vast.length;                        // aanraken, anders mag V8 hem uitstellen
+      vast.push(a);
+    }
+  }, 5000);
+  if (lek.unref) lek.unref();
+}
+
 process.on('SIGUSR2', () => {
   try {
     if (global.gc) { global.gc(); global.gc(); }

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-09T07:38:58.487Z",
-    "commit": "fc6fd6a8",
+    "op": "2026-09-09T08:08:59.811Z",
+    "commit": "dee1586f",
     "boomVuil": false,
     "boomAnders": 6,
     "instrument": "scripts/mutatie.js",
@@ -7223,6 +7223,13 @@
       "operator": "!==->===#0",
       "gezakt": 6,
       "geprobeerd": 6
+    },
+    "tweedehandtekening.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
     },
     "txgeld.test.js": {
       "soort": "puur",

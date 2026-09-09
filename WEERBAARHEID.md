@@ -151,7 +151,7 @@ slaagde. **Een deur dichtzetten is de goedkoopste manier om te ontdekken welke
 foutafhandeling er nooit is geweest.**
 
 **De prijs staat hardop.** `anoniemUitvoerbaar` ging van 365 terug naar
-<!--getal:kantoor.anoniem-->369<!--/getal-->, en die teller mag alleen dalen. De
+<!--getal:kantoor.anoniem-->365<!--/getal-->, en die teller mag alleen dalen. De
 verhoging staat daarom uitgeschreven in `KANTOORMACHT.json` zelf — met de reden
 en met wat hem weer omlaag brengt — in de vorm van de `OPEN_MAX`-verhoging uit
 `SERVICE.md` par. 13, en `test/kantoormacht.test.js` toets 6b weigert voortaan
@@ -176,8 +176,8 @@ stilzwijgend een middenwaarde. Er komt met opzet **geen samengesteld cijfer** ui
 `test/overleving.test.js` toets 5 is de rem op die verleiding.
 
 **Stand nu: <!--getal:overleving.ja-->0<!--/getal--> ja,
-<!--getal:overleving.deels-->5<!--/getal--> deels,
-<!--getal:overleving.nee-->2<!--/getal--> nee en
+<!--getal:overleving.deels-->6<!--/getal--> deels,
+<!--getal:overleving.nee-->1<!--/getal--> nee en
 <!--getal:overleving.onbekend-->1<!--/getal--> onbekend over
 <!--getal:overleving.rijen-->8<!--/getal--> scenario's.** Die getallen komen uit
 `OVERLEVING.json` en worden door `npm run getallen` bijgehouden, dus ze kunnen

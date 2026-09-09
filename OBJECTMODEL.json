@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-09",
   "gemeten": {
-    "bestanden": 2143,
-    "vormen": 1379,
-    "velden": 2002,
-    "modules": 752,
+    "bestanden": 2144,
+    "vormen": 1380,
+    "velden": 2004,
+    "modules": 753,
     "domeinen": 265,
     "envelopDrempel": 16,
     "envelop": 34,
-    "veldenDomeineigen": 1415,
+    "veldenDomeineigen": 1416,
     "veldenGedeeldVanafVier": 195,
     "gelijkendeVormparen": 19
   },
@@ -147,6 +147,18 @@
       ]
     },
     {
+      "veld": "onderwerp",
+      "domeinen": 12,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/kantoor",
+        "kern/mailwachtrij",
+        "kern/postdatum"
+      ]
+    },
+    {
       "veld": "besluit",
       "domeinen": 11,
       "waar": [
@@ -255,18 +267,6 @@
       ]
     },
     {
-      "veld": "onderwerp",
-      "domeinen": 11,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/commercie",
-        "kern/mailwachtrij",
-        "kern/postdatum",
-        "kern/rtfos"
-      ]
-    },
-    {
       "veld": "niveau",
       "domeinen": 11,
       "waar": [
@@ -360,6 +360,18 @@
         "kern/gemeente",
         "kern/mall",
         "kern/overheid"
+      ]
+    },
+    {
+      "veld": "actie",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/bankregie",
+        "kern/command",
+        "kern/frictie",
+        "kern/geldbeleid",
+        "kern/kantoor"
       ]
     },
     {
@@ -480,18 +492,6 @@
         "kern/kosten",
         "kern/labfonds",
         "kern/livinglab"
-      ]
-    },
-    {
-      "veld": "actie",
-      "domeinen": 9,
-      "waar": [
-        "bedrijf",
-        "kern/bankregie",
-        "kern/command",
-        "kern/frictie",
-        "kern/geldbeleid",
-        "kern/magnaat-controle"
       ]
     },
     {

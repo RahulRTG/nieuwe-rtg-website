@@ -46,11 +46,11 @@ uitslag van `npm run kantoormacht` (`KANTOORMACHT.json`, blok 0 van
 
 | As | Getal | Graad |
 |---|---|---|
-| kantoorroutes (`/api/office` + `/api/boardroom`) | **<!--getal:kantoor.routes-->587<!--/getal-->** over <!--getal:kantoor.bestanden-->89<!--/getal--> bestanden | gemeten |
-| deur eist een bewezen mens | **<!--getal:kantoor.deurEistMens-->165<!--/getal-->** | gemeten |
+| kantoorroutes (`/api/office` + `/api/boardroom`) | **<!--getal:kantoor.routes-->590<!--/getal-->** over <!--getal:kantoor.bestanden-->90<!--/getal--> bestanden | gemeten |
+| deur eist een bewezen mens | **<!--getal:kantoor.deurEistMens-->168<!--/getal-->** | gemeten |
 | deur is de gedeelde code | **<!--getal:kantoor.deurGedeeld-->422<!--/getal-->** | gemeten |
-| handler kent de handelende mens | <!--getal:kantoor.handlerKentMens-->117<!--/getal--> | vermoed (bovengrens) |
-| **anoniem uitvoerbaar** | **<!--getal:kantoor.anoniem-->369<!--/getal-->** | vermoed (ondergrens) |
+| handler kent de handelende mens | <!--getal:kantoor.handlerKentMens-->130<!--/getal--> | vermoed (bovengrens) |
+| **anoniem uitvoerbaar** | **<!--getal:kantoor.anoniem-->365<!--/getal-->** | vermoed (ondergrens) |
 | schrijft een auditspoor | 130 | vermoed |
 | vraagt een reden | 259 | vermoed |
 
@@ -366,7 +366,7 @@ Twee dingen die deze verbouwing NIET mag doen: er komt geen `/admin` erbij
 (`KANTOORMACHT.md` par. 28), en geen tweede zoekbalk naast `kern/command/zoek.js`.
 
 Stand: **een stap weg**, en het is zichtbaar werk — maar het raakt de machtsvraag
-niet. De <!--getal:kantoor.anoniem-->369<!--/getal--> anonieme routes blijven anoniem van een nieuwe schil.
+niet. De <!--getal:kantoor.anoniem-->365<!--/getal--> anonieme routes blijven anoniem van een nieuwe schil.
 
 ## 11. Waar dit voorstel botst met wat er al besloten is
 

@@ -13,24 +13,25 @@
     }
   ],
   "stempel": {
-    "op": "2026-09-09T07:38:39.141Z",
-    "commit": "fc6fd6a8",
+    "op": "2026-09-09T08:08:39.577Z",
+    "commit": "dee1586f",
     "node": "v22.22.2"
   },
   "gemeten": {
-    "routes": 587,
-    "deurEistMens": 165,
+    "routes": 590,
+    "deurEistMens": 168,
     "deurGedeeld": 422,
     "zonderBewakerslaag": 3,
-    "handlerKentMens": 117,
-    "anoniemUitvoerbaar": 369,
+    "handlerKentMens": 130,
+    "anoniemUitvoerbaar": 365,
     "metSpoor": 146,
     "metReden": 261,
-    "bestanden": 89,
+    "bestanden": 90,
     "zwaar": 13,
     "zwaarZonderMens": 0,
     "zwaarLezend": 4,
-    "zwaarLezendZonderMens": 4
+    "zwaarLezendZonderMens": 4,
+    "metTweedeHandtekening": 2
   },
   "zwaarePaden": {
     "zonderMens": [],
@@ -39,6 +40,10 @@
       "/api/office/bank/krediet",
       "/api/office/bank/salaris/voorstel",
       "/api/office/rechten"
+    ],
+    "tweedeHandtekening": [
+      "/api/office/bank/incasso",
+      "/api/office/bank/rekening/rood"
     ]
   },
   "zwaarEffect": {
@@ -49,10 +54,10 @@
       "gemeten": 62,
       "geenWerk": 273,
       "geenOpslag": 203,
-      "nietInProef": 49,
-      "totaal": 587
+      "nietInProef": 52,
+      "totaal": 590
     },
-    "dekkingPct": 10.6,
+    "dekkingPct": 10.5,
     "raakt": [
       {
         "pad": "/api/office/payroll/dekking/land",
@@ -145,7 +150,8 @@
     "zwaar": "vermoed",
     "zwaarZonderMens": "vermoed",
     "zwaarLezend": "vermoed",
-    "zwaarLezendZonderMens": "vermoed"
+    "zwaarLezendZonderMens": "vermoed",
+    "metTweedeHandtekening": "vermoed"
   },
   "ongemeten": {
     "risicoPerRoute": "er is geen risicomodule in dit huis (KANTOORMACHT.md par. 3); een 0 zou hier \"gemeten en niet aanwezig\" beweren, en dat is onwaar",
@@ -162,7 +168,7 @@
     "vierogen": {
       "wat": "tweede handtekening, met de graad van de scheiding",
       "aanKantoorroute": 0,
-      "aanroepersInServer": 3
+      "aanroepersInServer": 4
     },
     "bevoegdheid": {
       "wat": "vier dimensies; delegatie versmalt structureel",
@@ -322,7 +328,7 @@
     "boardroomAuth": 109,
     "balieAuth": 31,
     "techAuth": 16,
-    "kluisAuth": 12,
+    "kluisAuth": 15,
     "eigenaarAlleen": 10,
     "alleenBaas": 6,
     "naamAuth": 3

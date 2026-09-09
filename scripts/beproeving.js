@@ -986,12 +986,40 @@ if (require.main !== module) { module.exports = {}; return; }
   async function rustVloer() { await new Promise(r => setTimeout(r, 4000)); let l = Infinity; for (let i = 0; i < 3; i++) { const h = await heapNaGc(child.pid); if (h != null && h < l) l = h; await new Promise(r => setTimeout(r, 1200)); } return l === Infinity ? null : l; }
   async function lekRonde(ms) { stormEind = Date.now() + ms; await Promise.all(Array.from({ length: WERKERS }, leesWerker)); return rustVloer(); }
   const lekMin = LEK_MS / 60000;
+  /* De helling van een reeks vloeren, als losse functie: hij wordt nu twee keer
+     gebruikt -- een keer MET verkeer en een keer ZONDER. */
+  const helling = (reeks) => {
+    const ys = reeks, xs = ys.map((_, i) => i * lekMin);
+    if (xs.length < 2) return 0;
+    const xm = xs.reduce((a, b) => a + b, 0) / xs.length, ym = ys.reduce((a, b) => a + b, 0) / ys.length;
+    let tel = 0, noem = 0;
+    for (let i = 0; i < xs.length; i++) { tel += (xs[i] - xm) * (ys[i] - ym); noem += (xs[i] - xm) ** 2; }
+    return noem > 0 ? tel / noem : 0;
+  };
+  /* DE STILTEMETING, en zonder haar meet deze fase iets anders dan zij beweert.
+
+     De lek-vloer hamert identieke leespaden en noemt de stijging een lek. Dat
+     klopt alleen als een server die NIETS doet vlak blijft. Gemeten op 9
+     september 2026, 100M leden: dat is hij niet. Zonder één verzoek liepen de
+     vloeren 572 -> 576 -> 692 -> 685 -> 734 -> 686 MB, een helling van +131
+     MB/min -- HOGER dan elk pad mét verkeer (health +52, /api/state +55,
+     /api/notifications -219). De achtergrond van dit huis (de lokale snapshot die
+     periodiek het hele db.data serialiseert, de write-behind-flush, LISTEN/NOTIFY)
+     alloceert op deze schaal honderden MB's, en of een GC-monster daar vlak naast
+     valt bepaalt de "vloer".
+
+     Daarom staat de stiltehelling er nu NAAST, met dezelfde rondes en dezelfde
+     duur. Hij verandert het oordeel niet -- de drempel blijft waar hij stond --
+     maar hij maakt zichtbaar hoeveel van een gemeten helling de server zelf is.
+     Een lek-getal zonder die tweede meting is niet te lezen. */
+  const stilteRonde = async (ms) => { await new Promise(r => setTimeout(r, ms)); return rustVloer(); };
+  const stiltes = [await rustVloer()];
+  for (let i = 0; i < LEK_RONDES; i++) stiltes.push(await stilteRonde(LEK_MS));
+  const stilteHelling = helling(stiltes.slice(1));
+
   const vloers = [await rustVloer()];
   for (let i = 0; i < LEK_RONDES; i++) vloers.push(await lekRonde(LEK_MS));
-  const ys = vloers.slice(1), xs = ys.map((_, i) => i * lekMin);
-  const xm = xs.reduce((a, b) => a + b, 0) / xs.length, ym = ys.reduce((a, b) => a + b, 0) / ys.length;
-  let tel = 0, noem = 0; for (let i = 0; i < xs.length; i++) { tel += (xs[i] - xm) * (ys[i] - ym); noem += (xs[i] - xm) ** 2; }
-  const lekHelling = noem > 0 ? tel / noem : 0;
+  const lekHelling = helling(vloers.slice(1));
 
   // ---------- METING ----------
   kop('METING');
@@ -1080,6 +1108,10 @@ if (require.main !== module) { module.exports = {}; return; }
   rij('RAM (RSS) dal/piek onder last', dal + ' / ' + piek + ' MB');
   rij('heapUsed vers -> opgewarmd (na GC)', vloerVers + ' -> ' + vloers[0] + ' MB');
   rij('heapUsed lek-vloeren per ronde', vloers.join(' -> ') + ' MB (' + lekHelling.toFixed(1) + ' MB/min)');
+  rij('heapUsed vloeren ZONDER verkeer', stiltes.join(' -> ') + ' MB (' + stilteHelling.toFixed(1) + ' MB/min)');
+  rij('  waarvan de server zelf', stilteHelling >= lekHelling
+    ? '\x1b[33mde stilte stijgt harder dan het verkeer -- deze meting toont geen verkeerslek\x1b[0m'
+    : (lekHelling - stilteHelling).toFixed(1) + ' MB/min blijft over na aftrek van de stilte');
   const onbereikt = [...dekking.entries()].filter(([, n]) => n < SLO_DEKKING);
   rij('endpoints < ' + SLO_DEKKING + 'x geraakt', nl(onbereikt.length) + ' / ' + nl(routes.length));
 
@@ -1241,6 +1273,7 @@ if (require.main !== module) { module.exports = {}; return; }
       cpuPiekPct: cpuUit ? cpuUit.piek : null,
       ramPiekMB: piek,
       geheugenHellingMBPerMin: Number(lekHelling.toFixed(2)),
+      geheugenStilteMBPerMin: Number(stilteHelling.toFixed(2)),
       herstelSeconden: herstel.hersteld ? herstel.naSeconden : null,
       verhalenSlaagPctStorm: stormSom.gelukt + stormSom.afgewezen + stormSom.gefaald > 0
         ? Number((100 * stormSom.gelukt / (stormSom.gelukt + stormSom.afgewezen + stormSom.gefaald)).toFixed(1)) : null,

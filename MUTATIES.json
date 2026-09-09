@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-09T18:26:20.122Z",
-    "commit": "b7af216b",
-    "boomVuil": false,
-    "boomAnders": 2,
+    "op": "2026-09-09T21:08:34.823Z",
+    "commit": "16d0a765",
+    "boomVuil": true,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -4127,6 +4127,14 @@
       "operator": "+->-#0",
       "gezakt": 4,
       "geprobeerd": 2
+    },
+    "navigatieproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "negenplus.test.js": {
       "soort": "server",

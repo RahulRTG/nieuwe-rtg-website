@@ -477,6 +477,16 @@ jobs:
       # en hoort in de wekelijkse ronde, niet in elke push.
       - name: Het wettenregister klopt met de code (wetten.js --controle)
         run: node scripts/wetten.js --controle
+      # DE OVERLEVING: als er EEN ding wordt overgenomen -- een wachtwoord, de
+      # kantoorcode, een apparaat, de AI, een document -- houdt RTG dan stand?
+      # Acht scenario's, elk met een bron en een bewijsgraad, en met opzet geen
+      # samengesteld cijfer. De ijking gaat VOOROP en niet erna: een meter die
+      # zijn bron niet leest, geeft acht keurige uitslagen die niets betekenen,
+      # en dan is de ratel eronder een ratel op een verzinsel.
+      - name: De overlevingsmeter leest zijn bron werkelijk (zelfijking)
+        run: npm run overleving:ijking
+      - name: De overleving (ja mag alleen stijgen, nee en onbekend alleen dalen)
+        run: npm run overleving:controle
       # HET GEZAG: hoeveel losse schalen beantwoorden de vraag "mag de machine
       # dit zelf"? Het zijn er vijf, ze kennen elkaar niet, en dat is LAT.md
       # regel 4 op de plek waar hij het duurst is. Deze stap kost seconden en

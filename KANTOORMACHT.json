@@ -2,21 +2,141 @@
   "soort": "meting",
   "uitleg": "Blok 0 van KANTOORMACHT.md: staat er een MENS achter elke kantoorhandeling? Zes assen, zes getallen, met opzet geen samengesteld cijfer (BEWIJSMACHINE.md verbiedt het enkele READY boven een scorecard).",
   "grens": "De as `deurEistMens` komt uit de ROUTER en is hard; `handlerKentMens` is lexicaal op BESTANDSniveau en draagt daarom `vermoed` -- een bestand dat officeKey noemt gebruikt hem misschien niet in elke route erin. `handlerKentMens` is dus een BOVENgrens en `anoniemUitvoerbaar` een ONDERgrens. Een deploy-gate hoort aan de harde as te hangen.",
+  "ratelverhogingen": [
+    {
+      "as": "anoniemUitvoerbaar",
+      "van": 365,
+      "naar": 369,
+      "op": "2026-09-09",
+      "reden": "Vier LEZINGEN stonden een dag achter kluisAuth (kredietbord, salarisvoorstel, bevoegdheidsmatrix, machtskaart) en zijn teruggezet naar de gedeelde code. KANTOORMACHT.md zet ENFORCE_EXECUTE bewust voor ENFORCE_READ: lezen raakt elk scherm voor de kleinste risicoreductie, en het bank-scherm rendeerde er niet meer door -- bankVervers() haalt kredietbord en matrix in een Promise.all op, dus de hele kamer viel om. Nog altijd 16 lager dan main (385).",
+      "omlaag": "De zes uitvoerende bankknoppen staan nu op naam; de volgende stap is niet deze vier lezingen maar de 13 zware routes buiten de bank, en daarna ENFORCE_READ per kamer."
+    }
+  ],
   "stempel": {
-    "op": "2026-09-06T21:05:55.264Z",
-    "commit": "02b8f083",
+    "op": "2026-09-09T08:08:39.577Z",
+    "commit": "dee1586f",
     "node": "v22.22.2"
   },
   "gemeten": {
-    "routes": 586,
-    "deurEistMens": 126,
-    "deurGedeeld": 460,
+    "routes": 590,
+    "deurEistMens": 168,
+    "deurGedeeld": 422,
     "zonderBewakerslaag": 3,
-    "handlerKentMens": 117,
-    "anoniemUitvoerbaar": 385,
-    "metSpoor": 130,
-    "metReden": 260,
-    "bestanden": 89
+    "handlerKentMens": 130,
+    "anoniemUitvoerbaar": 365,
+    "metSpoor": 146,
+    "metReden": 261,
+    "bestanden": 90,
+    "zwaar": 13,
+    "zwaarZonderMens": 0,
+    "zwaarLezend": 4,
+    "zwaarLezendZonderMens": 4,
+    "metTweedeHandtekening": 2
+  },
+  "zwaarePaden": {
+    "zonderMens": [],
+    "lezendZonderMens": [
+      "/api/office/bank/bevoegdheid",
+      "/api/office/bank/krediet",
+      "/api/office/bank/salaris/voorstel",
+      "/api/office/rechten"
+    ],
+    "tweedeHandtekening": [
+      "/api/office/bank/incasso",
+      "/api/office/bank/rekening/rood"
+    ]
+  },
+  "zwaarEffect": {
+    "bruikbaar": true,
+    "bron": "IDEMPROEF.json",
+    "graad": "vermoed",
+    "dekking": {
+      "gemeten": 62,
+      "geenWerk": 273,
+      "geenOpslag": 203,
+      "nietInProef": 52,
+      "totaal": 590
+    },
+    "dekkingPct": 10.5,
+    "raakt": [
+      {
+        "pad": "/api/office/payroll/dekking/land",
+        "collecties": [
+          "payrollRegels"
+        ],
+        "opNaam": false
+      },
+      {
+        "pad": "/api/office/payroll/regels/haal",
+        "collecties": [
+          "payrollRegelJournaal"
+        ],
+        "opNaam": false
+      },
+      {
+        "pad": "/api/office/rechtsvormwacht",
+        "collecties": [
+          "aiTegoed"
+        ],
+        "opNaam": false
+      }
+    ],
+    "raaktZonderMens": [
+      "/api/office/payroll/dekking/land",
+      "/api/office/payroll/regels/haal",
+      "/api/office/rechtsvormwacht"
+    ],
+    "blindVoor": [
+      {
+        "pad": "/api/office/aidata/export",
+        "waarom": "de route deed werk maar raakte geen gemeten collectie aan"
+      },
+      {
+        "pad": "/api/office/bank/incasso",
+        "waarom": "de route deed werk maar raakte geen gemeten collectie aan"
+      },
+      {
+        "pad": "/api/office/bank/krediet/besluit",
+        "waarom": "de proef kreeg deze route niet aan het werk (de eerste oproep deed geen werk (status 404))"
+      },
+      {
+        "pad": "/api/office/bank/rekening/open",
+        "waarom": "de proef kreeg deze route niet aan het werk (de eerste oproep deed geen werk (status 400))"
+      },
+      {
+        "pad": "/api/office/bank/rekening/rood",
+        "waarom": "de proef kreeg deze route niet aan het werk (de eerste oproep deed geen werk (status 400))"
+      },
+      {
+        "pad": "/api/office/bank/salaris/run",
+        "waarom": "de proef kreeg deze route niet aan het werk (de eerste oproep deed geen werk (status 400))"
+      },
+      {
+        "pad": "/api/office/bank/terugstorting",
+        "waarom": "staat niet in de proefronde"
+      },
+      {
+        "pad": "/api/office/boardroom/toegang/geef",
+        "waarom": "staat niet in de proefronde"
+      },
+      {
+        "pad": "/api/office/export.csv",
+        "waarom": "de route deed werk maar raakte geen gemeten collectie aan"
+      },
+      {
+        "pad": "/api/office/service/machtiging/intrek",
+        "waarom": "staat niet in de proefronde"
+      },
+      {
+        "pad": "/api/office/service/machtiging/tekenbij",
+        "waarom": "staat niet in de proefronde"
+      },
+      {
+        "pad": "/api/office/service/machtigingen",
+        "waarom": "staat niet in de proefronde"
+      }
+    ],
+    "grens": "Deze as ziet alleen wat de idempotentieproef WERKELIJK heeft uitgevoerd. Zij wordt nooit opgeteld bij de padas: twee ondergrenzen die verschillende dingen missen, geven samen geen bovengrens. `blindVoor` noemt de zware routes waarover zij zwijgt."
   },
   "graden": {
     "routes": "gemeten",
@@ -26,11 +146,17 @@
     "handlerKentMens": "vermoed",
     "anoniemUitvoerbaar": "vermoed",
     "metSpoor": "vermoed",
-    "metReden": "vermoed"
+    "metReden": "vermoed",
+    "zwaar": "vermoed",
+    "zwaarZonderMens": "vermoed",
+    "zwaarLezend": "vermoed",
+    "zwaarLezendZonderMens": "vermoed",
+    "metTweedeHandtekening": "vermoed"
   },
   "ongemeten": {
     "risicoPerRoute": "er is geen risicomodule in dit huis (KANTOORMACHT.md par. 3); een 0 zou hier \"gemeten en niet aanwezig\" beweren, en dat is onwaar",
     "vierOgenVereist": "welke handeling vier ogen VERDIENT is een besluit en geen meting; wat wel gemeten is, staat in `machinerie.vierogen`",
+    "vierOgenBuitenDeModule": "machinerie.vierogen telt bestanden die kern/appstore/vierogen REQUIREN, en dat is een lexicale telling van EEN implementatie. Er is er minstens nog een: kern/payroll/run.js draagt een eigen ladder (concept, gecontroleerd, manager, administrateur, definitief) met \"NOOIT dezelfde persoon\", en /api/office/bank/salaris/run betaalt alleen een DEFINITIEVE run uit. Die route bereikt payroll via de kern-tas (kern.payrollOS) en niet via een require, dus deze grep kan hem per constructie niet zien. Lees de 0 als \"nul routes gebruiken DIE module\" en nooit als \"nergens tekent een tweede mens\" -- dezelfde faalvorm als de balieAuth-ondertelling hierboven.",
     "historischeToestand": "er is geen versiegeschiedenis van entiteiten (par. 18)"
   },
   "machinerie": {
@@ -42,7 +168,7 @@
     "vierogen": {
       "wat": "tweede handtekening, met de graad van de scheiding",
       "aanKantoorroute": 0,
-      "aanroepersInServer": 3
+      "aanroepersInServer": 4
     },
     "bevoegdheid": {
       "wat": "vier dimensies; delegatie versmalt structureel",
@@ -198,13 +324,13 @@
     }
   ],
   "deuren": {
-    "officeAuth": 451,
-    "boardroomAuth": 108,
+    "officeAuth": 444,
+    "boardroomAuth": 109,
     "balieAuth": 31,
     "techAuth": 16,
+    "kluisAuth": 15,
     "eigenaarAlleen": 10,
     "alleenBaas": 6,
-    "kluisAuth": 5,
     "naamAuth": 3
   }
 }

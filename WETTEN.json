@@ -985,6 +985,94 @@
           "test:test/genrecap.test.js"
         ]
       }
+    },
+    {
+      "id": "beveiliging-geen-verlaging-zonder-ceremonie",
+      "soort": "beveiliging",
+      "wet": "Software mag de beveiliging automatisch verhogen en nooit zelfstandig verlagen: elke overgang naar een zwakkere of niet te ordenen stand telt als verlaging (SEC-LOCK-001).",
+      "bron": {
+        "bestand": "ISOLATIE.md",
+        "anker": "geen verlaging zonder ceremonie"
+      },
+      "handhaver": [
+        "test/seclock.test.js",
+        "server/kern/isolatie/ordening.js"
+      ],
+      "sabotage": {
+        "wat": "laat een niet te ordenen overgang doorgaan voor \"geen verlaging\", zodat beschermd -> beperkt zonder ceremonie kan",
+        "bestand": "server/kern/isolatie/ordening.js",
+        "zoek": "if (uitslag === 'onvergelijkbaar') return { verlaagt: true",
+        "zet": "if (uitslag === 'onvergelijkbaar') return { verlaagt: false",
+        "wachters": [
+          "test:test/seclock.test.js"
+        ]
+      }
+    },
+    {
+      "id": "beveiliging-ai-heft-beveiliging-niet-op",
+      "soort": "beveiliging",
+      "wet": "Geen pad dat de beveiliging zet of opheft is via het AI-stuur bereikbaar, in geen enkele wereld (SEC-LOCK-002).",
+      "bron": {
+        "bestand": "ISOLATIE.md",
+        "anker": "de AI kan de beveiliging niet opheffen"
+      },
+      "handhaver": [
+        "test/seclock.test.js",
+        "server/kern/stuur/beleid-lijsten.js"
+      ],
+      "sabotage": {
+        "wat": "zet de isolatielaag van een lid op de AI-allowlist, zodat het stuur de bescherming van dat lid kan opheffen",
+        "bestand": "server/kern/stuur/beleid-lijsten.js",
+        "zoek": "/^\\/api\\/bookings\\/mine$/",
+        "zet": "/^\\/api\\/bookings\\/mine$/,\n    /^\\/api\\/isolatie\\//",
+        "wachters": [
+          "test:test/seclock.test.js"
+        ]
+      }
+    },
+    {
+      "id": "beveiliging-lagere-drager-neutraliseert-niet",
+      "soort": "beveiliging",
+      "wet": "Een lagere drager heft de beperking van een hogere niet op: de standen van huis, organisatie, identiteit, sessie en apparaat worden samengevoegd met een join en niet met \"de fijnste drager wint\" (SEC-LOCK-003).",
+      "bron": {
+        "bestand": "ISOLATIE.md",
+        "anker": "een kind neutraliseert zijn ouder niet"
+      },
+      "handhaver": [
+        "test/seclock.test.js",
+        "server/kern/isolatie/ordening.js"
+      ],
+      "sabotage": {
+        "wat": "vervang de join door \"de laatste drager wint\", zodat een sessie op normaal een huis in isolatie opheft",
+        "bestand": "server/kern/isolatie/ordening.js",
+        "zoek": "if (i > ix) ix = i;",
+        "zet": "ix = i;",
+        "wachters": [
+          "test:test/seclock.test.js"
+        ]
+      }
+    },
+    {
+      "id": "beveiliging-onbekende-stand-is-niet-normaal",
+      "soort": "beveiliging",
+      "wet": "Een onleesbare of onbekende beveiligingsstand valt terug op beschermd en loopt nooit door als normaal (SEC-LOCK-004).",
+      "bron": {
+        "bestand": "ISOLATIE.md",
+        "anker": "onbekend is niet normaal"
+      },
+      "handhaver": [
+        "test/seclock.test.js",
+        "server/kern/incidentcontrole-stand.js"
+      ],
+      "sabotage": {
+        "wat": "laat een beschadigd standveld terugvallen op normaal -- de fail-open die hier eerder stond",
+        "bestand": "server/kern/incidentcontrole-stand.js",
+        "zoek": "      s.modus = 'beschermd';",
+        "zet": "      s.modus = 'normaal';",
+        "wachters": [
+          "test:test/seclock.test.js"
+        ]
+      }
     }
   ]
 }

@@ -116,7 +116,9 @@ Object.assign(SLEUTELS,
      verdween in de samenvoeging van twaalf PR's (2 september 2026) en dertig
      verklaringen lagen ongelezen naast het register; het bestand exporteert
      de lijst zelf, zonder SLEUTELS-omhulsel. */
-  require('./idemsleutels-restbak'));
+  require('./idemsleutels-restbak'),
+  /* De weerbaarheidsronde: de tweede handtekening en de schaduwteller. */
+  require('./idemsleutels-weerbaarheid').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:
    geen route in twee zijbestanden, elke verklaring compleet, en vier routes die

@@ -102,15 +102,26 @@ module.exports = (ctx) => {
     return { ok: true, iban, bevroren: m.bevroren };
   }
   // de rood-staan-ruimte van een betaalrekening zetten (boardroom of kantoor)
-  function roodZet(iban, euro) {
+  /* DE KEURING APART VAN HET ZETTEN. Rood staan gaat sinds 9 september langs een
+     tweede handtekening (kern/kantoor/tweedehandtekening.js), dus de invoer
+     hoort bij de AANVRAAG te worden afgekeurd -- de collega die tien minuten
+     later tekent, mag geen fout krijgen die niet de zijne is. Hij staat hier en
+     niet bij de route: een tweede kopie loopt uiteen (LAT.md regel 4), en dan
+     keurt de aanvraag iets anders goed dan de uitvoering doet. */
+  function roodKeur(iban, euro) {
     const m = rekMeta(iban);
     if (!m) return { status: 404, error: 'De rekening bestaat niet.' };
     if (m.soort !== 'betaal') return { status: 400, error: 'Rood staan kan alleen op een betaalrekening.' };
     const centen = Math.round(Number(euro) * 100);
     if (!Number.isFinite(centen) || centen < 0 || centen > 5000000) return { status: 400, error: 'Kies tussen 0 en 50.000 euro.' };
-    m.roodLimiet = centen;
+    return { ok: true, centen, meta: m };
+  }
+  function roodZet(iban, euro) {
+    const k = roodKeur(iban, euro);
+    if (k.error) return k;
+    k.meta.roodLimiet = k.centen;
     save();
-    return { ok: true, iban, roodLimiet: centen };
+    return { ok: true, iban, roodLimiet: k.centen };
   }
   // een lege rekening sluiten; met saldo kan het niet (eerst leegmaken)
   function sluit(iban, codenaam) {
@@ -158,7 +169,7 @@ module.exports = (ctx) => {
   return {
     genIban, ibanControle,
     rekeningOpen: open, rekeningenVanLid: vanLid, rekeningDetail: detail,
-    rekeningBevries: bevries, rekeningRoodZet: roodZet, rekeningSluit: sluit,
+    rekeningBevries: bevries, rekeningRoodZet: roodZet, rekeningRoodKeur: roodKeur, rekeningSluit: sluit,
     bankLedenOverzicht: ledenOverzicht, bankLedenAkkoord: ledenAkkoord
   };
 };

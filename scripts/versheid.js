@@ -132,6 +132,17 @@ const REGISTERS = [
      (KANTOOR.md par. 14, blok 1) -- vanaf dat moment is een verouderd getal wel
      een uitspraak over wie er binnenkomt. Dat is een besluit en geen automatisme. */
   ['KANTOORMACHT.json', 'npm run kantoormacht:vast', 'of er een mens achter een kantoorhandeling staat'],
+  /* DE OVERLEVING STAAT MET OPZET OP `overig` EN NIET OP BEVEILIGING, en dat is
+     de correctie op een eerste versie die hem die vlag wel gaf -- "hij gaat over
+     beveiliging, dus hij hoort in de beveiligingsklasse". Dat is de verkeerde
+     lezing: een poortklasse betekent hier niet WAAROVER een register gaat maar
+     dat een verouderd exemplaar de RONDE TEGENHOUDT, en die eer is voorbehouden
+     aan de vier registers die `npm run meetronde` ook werkelijk ververst.
+     test/versheidspoort.test.js zegt precies waarom: een poort die iets eist wat
+     de stap ervoor niet levert, staat per constructie rood -- en wordt dan met
+     `|| true` uitgezet, met de vier die wel werken erbij. Zijn veroudering wordt
+     dus GEMELD, en zijn ratel zit waar hij hoort: in test/overleving.test.js. */
+  ['OVERLEVING.json', 'npm run overleving:vast', 'of RTG een enkel compromis overleeft'],
   /* DE SCHADUWPROEF VAN DE ISOLATIEPOORT. Hij hoort hier omdat hij het enige is
      dat zegt wat die poort ZOU doen -- en dat getal veroudert sneller dan de
      meeste: elke nieuwe route in de member-allowlist verandert het, zonder dat

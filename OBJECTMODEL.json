@@ -1,15 +1,15 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-09-08",
+  "vastgelegd": "2026-09-09",
   "gemeten": {
-    "bestanden": 2143,
-    "vormen": 1382,
-    "velden": 2008,
-    "modules": 754,
+    "bestanden": 2146,
+    "vormen": 1383,
+    "velden": 2010,
+    "modules": 755,
     "domeinen": 267,
     "envelopDrempel": 17,
     "envelop": 29,
-    "veldenDomeineigen": 1417,
+    "veldenDomeineigen": 1418,
     "veldenGedeeldVanafVier": 200,
     "gelijkendeVormparen": 20
   },
@@ -202,6 +202,18 @@
       ]
     },
     {
+      "veld": "onderwerp",
+      "domeinen": 12,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/kantoor",
+        "kern/mailwachtrij",
+        "kern/postdatum"
+      ]
+    },
+    {
       "veld": "besluit",
       "domeinen": 11,
       "waar": [
@@ -334,18 +346,6 @@
       ]
     },
     {
-      "veld": "onderwerp",
-      "domeinen": 11,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/commercie",
-        "kern/mailwachtrij",
-        "kern/postdatum",
-        "kern/rtfos"
-      ]
-    },
-    {
       "veld": "niveau",
       "domeinen": 11,
       "waar": [
@@ -415,6 +415,18 @@
         "kern/gemeente",
         "kern/mall",
         "kern/overheid"
+      ]
+    },
+    {
+      "veld": "actie",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/bankregie",
+        "kern/command",
+        "kern/frictie",
+        "kern/geldbeleid",
+        "kern/kantoor"
       ]
     },
     {
@@ -511,18 +523,6 @@
         "kern/assets",
         "kern/bureau",
         "kern/commerce"
-      ]
-    },
-    {
-      "veld": "versie",
-      "domeinen": 9,
-      "waar": [
-        "bedrijf",
-        "kern/appstore",
-        "kern/beroepenbieb",
-        "kern/command",
-        "kern/envelop",
-        "kern/livinglab"
       ]
     }
   ],

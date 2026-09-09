@@ -60,6 +60,9 @@ function maakOntsluiting({ opslag, save, klok, ordening }) {
 
   /* START. Bewaart een verzoek en verandert GEEN stand. */
   function start({ drager, sleutel, van, naar, door, reden, tweedeMens, passkeyMogelijk }) {
+    if (typeof naar !== 'string' || !ordening.ontleed(naar).bekend) {
+      fout(400, 'Kies een bekende doelstand voor de ontsluiting.');
+    }
     const eis = eisenVoor({ drager, van, naar, tweedeMens, passkeyMogelijk });
     if (!eis.verlaagt) fout(400, 'Deze overgang verlaagt niets; verstrengen gaat zonder ceremonie.');
     const schoon = String(reden || '').trim().replace(/\s+/g, ' ').slice(0, 240);

@@ -2,7 +2,7 @@
   "stempel": "2026-09-09",
   "uitleg": "De belofte van RTG Navigatie -- breng mij vanaf waar ik nu ben naar mijn bestemming -- gemeten in een echte browser, per SCHAKEL (doet het lid iets, en ziet hij het gevolg?) en per STORING (houdt de belofte als het misgaat?). Derde keten naast tafelproef en ritproef; zie BETROUWBAARHEID.md par. 1.",
   "grens": "Alleen de app op telefoonformaat, alleen de rol lid. De motor zelf staat in test/navigatie.test.js; deze proef meet het scherm erboven. Er wordt niet werkelijk gereden: dat de bocht-voor-bocht op straat klopt, is hier niet gemeten en kan dat ook niet.",
-  "browser": "/opt/pw-browsers/chromium",
+  "browser": "de gepinde Playwright-build",
   "schakels": [
     {
       "nr": 1,
@@ -73,7 +73,7 @@
       "naam": "het toestel geeft geen locatie af",
       "belofte": "binnen drie seconden een poort met de reden, een uitweg, en een badge die niet doet alsof de motor draait",
       "stand": "gehouden",
-      "wat": "poort na 470 ms, reden \"Uw toestel geeft geen locatie af. Kies zelf uw vertrekpunt; RTG verzin\", badge \"Locatie onbekend\", uitweg: true"
+      "wat": "poort na 221 ms, reden \"Uw toestel geeft geen locatie af. Kies zelf uw vertrekpunt; RTG verzin\", badge \"Locatie onbekend\", uitweg: true"
     },
     {
       "naam": "een lid dat zelf zijn vertrekpunt kiest",

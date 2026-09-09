@@ -173,17 +173,8 @@
         menu.setAttribute('aria-label', open ? 'Menu sluiten' : 'Menu openen');
       });
     });
-    rt.zoek = function (ev) {
-      if (!(ev.ctrlKey || ev.metaKey) || ev.key.toLowerCase() !== 'k') return;
-      w.setTimeout(function () {
-        if (index.getAttribute('aria-hidden') !== 'false') return;
-        gezicht(rt, 'all', false); rt.alles.setAttribute('data-catalogus-open', 'true');
-        var input = index.querySelector('.rtg-edge-find input'); if (input) input.focus();
-      }, 0);
-    };
-    doc.addEventListener('keydown', rt.zoek);
     rt.observer = new MutationObserver(function (regels) {
-      if (!doc.documentElement.contains(root)) { rt.observer.disconnect(); doc.removeEventListener('keydown', rt.zoek); actief = null; return; }
+      if (!doc.documentElement.contains(root)) { rt.observer.disconnect(); actief = null; return; }
       bouw(rt);
       regels.forEach(function (regel) {
         if (regel.type !== 'attributes' || regel.target !== index) return;
@@ -198,6 +189,11 @@
 
   w.RTGEdgeSmartMenu = {
     start: start,
+    openSearch: function () {
+      if (!actief || actief.index.getAttribute('aria-hidden') !== 'false') return;
+      gezicht(actief, 'all', false);
+      actief.alles.setAttribute('data-catalogus-open', 'true');
+    },
     setAttention: function (aan) {
       var menu = d.querySelector('.rtg-edge-menu');
       if (menu) menu.setAttribute('data-attention', aan ? 'true' : 'false');

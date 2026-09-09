@@ -56,6 +56,7 @@
         menu.setAttribute('aria-label', indexOpen() ? 'Menu sluiten' : 'Menu openen');
         menu.setAttribute('aria-controls', index.id);
         menu.setAttribute('aria-expanded', String(indexOpen()));
+        if (!bankOpen() && d.activeElement === deur) menu.focus();
         return;
       }
       menu.setAttribute('aria-label', 'Werelden en systeem');

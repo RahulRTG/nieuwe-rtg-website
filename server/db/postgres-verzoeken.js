@@ -8,12 +8,19 @@ module.exports = function maakPostgresVerzoeken(o) {
   const { store, db, state, motor, slot, topUp, extern, basisKlaar } = o;
   let gezond = false, reden = 'PostgreSQL wordt geladen', herstel = null;
   let timer = null, poging = 0, achtergrondOpen = false;
+  /* Hoeveel meldingen er zijn onderdrukt omdat ze het GEVOLG waren van de al
+     gesloten poort. Zie ongezond(). Dit is met opzet een getal en geen stilte:
+     de lus was alleen te zien met een waarnemer van buiten die elke halve
+     seconde /api/ready opvroeg, en dat hoort niet nodig te zijn. */
+  let gevolgen = 0;
   const stromen = new Set();
   const actief = () => store === 'postgres';
   const vrij = p => p === '/api/health' || p === '/api/ready' ||
     String(p || '').startsWith('/api/techniek') || String(p || '').startsWith('/api/cluster');
 
-  function stand() { return { writeHealthy: !actief() || gezond, reden: gezond ? null : reden }; }
+  function stand() {
+    return { writeHealthy: !actief() || gezond, reden: gezond ? null : reden, gevolgen };
+  }
 
   function sluitStromen() {
     for (const res of stromen) {
@@ -29,8 +36,28 @@ module.exports = function maakPostgresVerzoeken(o) {
     if (timer.unref) timer.unref();
   }
 
+  /* EEN GESLOTEN POORT IS GEEN NIEUWE STORING.
+
+     Zodra de poort dicht staat, weigert collectie-postgres.js elke
+     collectietransactie met PG_ONGEZOND ("de gedeelde PostgreSQL-opslag is nog
+     niet schrijfbaar") en gooit openStroom dezelfde code. Dat zijn GEVOLGEN van
+     de sluiting, geen oorzaken -- en ze kwamen hier binnen als verse melding.
+
+     Gemeten op 9 september 2026, 100M leden: van de 89 sluitingen droegen er 45
+     die echo als reden, en 44 daarvan vielen terwijl de poort al dicht stond. De
+     schade is niet dat dicht nog dichter gaat, maar dat `reden` de oorzaak
+     kwijtraakt: wie achteraf vraagt waarom er niets meer geschreven werd, leest
+     het symptoom van de sluiting in plaats van de mutatie buiten de
+     requestcontext die hem sloot.
+
+     DE GRENS LOOPT LANGS `gezond` EN NIET LANGS DE CODE. Staat de poort nog
+     OPEN en komt PG_ONGEZOND binnen, dan is dat wél een oorzaak (de opslag is
+     dan niet schrijfbaar terwijl wij dachten van wel) en sluit hij gewoon. Zo
+     versoepelt dit niets: de poort gaat hier nooit open, alleen de echo van zijn
+     eigen dichte stand telt niet als tweede reden. */
   function ongezond(err, bron) {
     if (!actief()) return;
+    if (!gezond && err && err.code === 'PG_ONGEZOND') { gevolgen++; return; }
     gezond = false;
     reden = String((bron ? bron + ': ' : '') + ((err && err.message) || err || 'opslagfout')).slice(0, 240);
     sluitStromen(); planHerstel();
@@ -61,7 +88,7 @@ module.exports = function maakPostgresVerzoeken(o) {
         achtergrondOpen = false;
       }
       await volledigeResync(p);
-      gezond = true; reden = null; poging = 0;
+      gezond = true; reden = null; poging = 0; gevolgen = 0;
       context.voltooiAchtergrond();
       return true;
     });
@@ -72,7 +99,7 @@ module.exports = function maakPostgresVerzoeken(o) {
     } finally { herstel = null; if (!gezond) planHerstel(); }
   }
 
-  function gestart() { if (actief()) { gezond = true; reden = null; poging = 0; if (achtergrondOpen) ongezond(null, 'opstartmutatie'); } }
+  function gestart() { if (actief()) { gezond = true; reden = null; poging = 0; gevolgen = 0; if (achtergrondOpen) ongezond(null, 'opstartmutatie'); } }
   function achtergrondSave() {
     /* Tijdens de pre-ready fase is de PG-motor al verbonden zodat de
        verplichte startupmigraties transactioneel kunnen draaien. Een gewone

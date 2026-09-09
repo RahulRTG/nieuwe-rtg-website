@@ -10,16 +10,18 @@ module.exports = function maakPostgresVerzoeken(o) {
   const { store, db, state, motor, slot, topUp, extern, basisKlaar } = o;
   let gezond = false, reden = 'PostgreSQL wordt geladen', herstel = null;
   let timer = null, poging = 0, achtergrondOpen = false;
-  /* Onderdrukte gevolgen van de al gesloten poort (zie ongezond): een getal en
-     geen stilte -- de lus was alleen van buiten te zien. */
+  /* Onderdrukte gevolgen van de al gesloten poort (zie ongezond). */
   let gevolgen = 0;
+  /* Hoeveel er heringelezen moet worden voor de poort open mag (./resync.js):
+     onze eigen achtergrondmutatie hoeft niet de hele kast opnieuw te lezen. */
+  const resync = require('./resync')({ state, topUp, extern });
   const stromen = new Set();
   const actief = () => store === 'postgres';
   const vrij = p => p === '/api/health' || p === '/api/ready' ||
     String(p || '').startsWith('/api/techniek') || String(p || '').startsWith('/api/cluster');
 
   function stand() {
-    return { writeHealthy: !actief() || gezond, reden: gezond ? null : reden, gevolgen };
+    return Object.assign({ writeHealthy: !actief() || gezond, reden: gezond ? null : reden, gevolgen }, resync.stand());
   }
 
   function sluitStromen() {
@@ -47,21 +49,13 @@ module.exports = function maakPostgresVerzoeken(o) {
   function ongezond(err, bron) {
     if (!actief()) return;
     if (!gezond && err && err.code === 'PG_ONGEZOND') { gevolgen++; return; }
+    /* Alleen onze eigen achtergrondmutatie laat het beeld intact. */
+    if (bron !== 'achtergrond') resync.eisZwaar();
     gezond = false;
     reden = String((bron ? bron + ': ' : '') + ((err && err.message) || err || 'opslagfout')).slice(0, 240);
     sluitStromen(); planHerstel();
   }
 
-  async function volledigeResync(p) {
-    await p.pool.query('SELECT 1');
-    const alles = await p.laadAlles();
-    if (!alles) throw new Error('PostgreSQL bevat geen autoritatieve collecties.');
-    state.setRuweData(alles);
-    if (typeof topUp === 'function') await topUp();
-    await p.pool.query('SELECT 1');
-    const cb = typeof extern === 'function' ? extern() : null;
-    if (cb) cb();
-  }
 
   async function herstelNu() {
     if (!actief()) return true;
@@ -75,7 +69,7 @@ module.exports = function maakPostgresVerzoeken(o) {
         if (w.length) await p.commitVerzoek(state.getRuweData(), w);
         achtergrondOpen = false;
       }
-      await volledigeResync(p);
+      await resync.voer(p);
       gezond = true; reden = null; poging = 0; gevolgen = 0;
       context.voltooiAchtergrond();
       return true;
@@ -83,6 +77,7 @@ module.exports = function maakPostgresVerzoeken(o) {
     try { return await herstel; }
     catch (e) {
       gezond = false; reden = 'resync: ' + String(e.message || e).slice(0, 220);
+      resync.eisZwaar();   // half toegepast is niet te vertrouwen
       poging++; planHerstel(); throw e;
     } finally { herstel = null; if (!gezond) planHerstel(); }
   }

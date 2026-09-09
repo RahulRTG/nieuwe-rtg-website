@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-08T22:12:08.799Z",
-    "commit": "d516045f",
+    "op": "2026-09-09T01:21:31.126Z",
+    "commit": "f2fa2d9b",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2334,6 +2334,14 @@
       "module": "server/kern/command/register.js",
       "operator": "===->!==#0",
       "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "herkomstwereld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/herkomstschakelaar.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "herstel-sandbox.test.js": {

@@ -90,6 +90,7 @@
 
   function openWerkbladen(rt) {
     sluit(rt);
+    rt.root.querySelector('.rtg-edge-menu').focus();
     d.querySelector('#rtgCommand .cmd-lade').click();
     w.requestAnimationFrame(function () {
       var bank = d.querySelector('#rtgCommand.bank-open .cmd-bank');

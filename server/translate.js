@@ -158,7 +158,7 @@ async function translateBatch(teksten, to, from, opties) {
            cacheantwoord vastzetten. Alleen echte vertaling is een cache-hit. */
         if (result !== item.text) {
           cacheSchrijf(item.key, result);
-          kastSchrijf(bewaarMag, to, item.text, result);   // alleen echte vertaling van echte interface
+          kastSchrijf(bewaarMag && item.ai, to, item.text, result);   // alleen door de broncontrole toegelaten interface
         }
         uit[item.i] = { text: result, translated: result !== item.text, from: item.bron };
       });

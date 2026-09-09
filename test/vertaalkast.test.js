@@ -73,3 +73,19 @@ test('alleen een aanroeper die bewaar zegt vult de kast', async () => {
     assert.equal(kast.stand().bewaard, 0, 'een gewone aanroeper schrijft niet in de kast');
   } finally { i18n.setVertaalkast(null); }
 });
+
+test('een UI-verzoek bewaart alleen bronregels die de broncontrole heeft toegelaten', async () => {
+  const i18n = require('../server/translate');
+  const kast = maakVertaalkast({ dir: tijdelijk(), venster: 0 });
+  i18n.setVertaalkast(kast);
+  try {
+    const uit = await i18n.translateBatch(['huiswerk!', 'school!'], 'ja', 'nl',
+      { bewaar: true, ai: tekst => tekst === 'school!' });
+    assert.notEqual(uit[0].text, 'huiswerk!', 'de geweigerde regel is wel lokaal vertaald');
+    assert.notEqual(uit[1].text, 'school!', 'de toegelaten interface is vertaald');
+    kast.leegNu();
+    const herstart = maakVertaalkast({ dir: path.dirname(kast.stand().map) });
+    assert.equal(herstart.lees('ja', 'huiswerk!'), null, 'privé-invoer mag niet op schijf komen');
+    assert.equal(herstart.lees('ja', 'school!'), uit[1].text, 'toegelaten interface overleeft de herstart');
+  } finally { i18n.setVertaalkast(null); }
+});

@@ -35,6 +35,8 @@
     "poortwacht": "node scripts/poortwacht.js",
     "rand": "node scripts/rand.js",
     "beproeving": "node scripts/beproeving.js",
+    "tot-crash": "node scripts/tot-crash.js",
+    "tot-crash:mega": "node --max-old-space-size=8192 scripts/tot-crash.js",
     "tandeloos": "node scripts/tandeloos.js",
     "onbetreden": "node scripts/onbetreden.js",
     "ladder": "node scripts/ladder.js",

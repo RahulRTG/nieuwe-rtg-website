@@ -105,12 +105,19 @@ jobs:
           {
             echo '## De Beproeving'
             echo ''
-            if [ -f BEPROEVING.json ]; then
+            # De ACTUELE meting eerst, ook als hij rood is. BEPROEVING.json is de
+            # geaccepteerde basislijn en schuift alleen na een geslaagde ronde;
+            # wie alleen die toont, laat een gezakte ronde onzichtbaar blijven.
+            if [ -f LAATSTE_METING.json ]; then
+              echo '```json'
+              cat LAATSTE_METING.json
+              echo '```'
+            elif [ -f BEPROEVING.json ]; then
               echo '```json'
               cat BEPROEVING.json
               echo '```'
             else
-              echo '_BEPROEVING.json is niet geschreven; zie het artefact voor de uitvoer._'
+              echo '_Er is geen meting geschreven; zie het artefact voor de uitvoer._'
             fi
             echo ''
             echo '> De prestatiecijfers hierboven zijn op een GitHub-runner gemeten.'
@@ -125,6 +132,45 @@ jobs:
           path: |
             beproeving.log
             BEPROEVING.json
+            LAATSTE_METING.json
+          retention-days: 30
+
+  tot-crash:
+    name: Tot crash (escalerende druk tot iets breekt)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      # DIT HARNAS STOND ER AL EN WAS NERGENS AAN GEHANGEN. Hij noemt zichzelf in
+      # zijn eigen kop de escalerende bug-jager "op weg naar 100 miljoen", maar
+      # had geen npm-script en geen CI-pad -- anders dan chaos, beproeving en
+      # spreiding. Een harnas dat je niet bij naam kunt aanroepen wordt niet
+      # gedraaid, en dat is de waarschijnlijkste reden dat de sqlite-basislijn
+      # van PASS naar GEZAKT kon lopen zonder dat iemand het zag.
+      #
+      # Hij zakt zelf (exitcode 1) bij een ECHTE breuk: het proces valt om, de
+      # server hangt, het geld klopt niet meer, een onafgevangen fout, of een
+      # heap die na GC blijft klimmen. Een 503-lastafworp is daar met opzet geen
+      # breuk maar de immuunreactie van De Wacht.
+      #
+      # Wat hij NIET afdwingt is het aantal werkers dat aankomt: dat hangt van de
+      # runner af. Het harnas meldt zelf wanneer het zijn eigen client meet in
+      # plaats van de server, en stopt dan.
+      - name: Tot crash (sqlite-schaal)
+        run: npm run tot-crash 2>&1 | tee tot-crash.log
+      - name: De uitvoer bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: tot-crash
+          path: tot-crash.log
           retention-days: 30
 
   dekking:

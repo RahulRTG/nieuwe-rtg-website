@@ -1122,7 +1122,8 @@ if (require.main !== module) { module.exports = {}; return; }
   // ---------- HET OORDEEL ----------
   kop('HET OORDEEL (drempels; faalt er een, dan exitcode 1)');
   const verdicten = [];
-  const v = (naam, ok, detail) => { verdicten.push(ok); console.log('  ' + (ok ? '\x1b[32mPASS\x1b[0m' : '\x1b[31mFAIL\x1b[0m') + '  ' + naam.padEnd(16) + ' \x1b[2m' + detail + '\x1b[0m'); };
+  const gezakteNamen = [];
+  const v = (naam, ok, detail) => { verdicten.push(ok); if (!ok) gezakteNamen.push(naam); console.log('  ' + (ok ? '\x1b[32mPASS\x1b[0m' : '\x1b[31mFAIL\x1b[0m') + '  ' + naam.padEnd(16) + ' \x1b[2m' + detail + '\x1b[0m'); };
   /* SCHAKELKAST. Deze staat bewust bovenaan: zakt hij, dan zijn alle oordelen
      eronder minder waard dan ze lijken, want dan is de helft van de functies
      nooit aangeraakt. Een meting die stilletjes minder doet dan ze zegt is
@@ -1220,6 +1221,7 @@ if (require.main !== module) { module.exports = {}; return; }
       kalibratieBasisMs: Number(kal.basis.toFixed(1)) },
     oordeel: gezakt === 0 ? 'PASS' : 'GEZAKT',
     gezakteDrempels: gezakt,
+    gezakteNamen,
     meters: {
       p50Ms: pctMs(0.50), p95Ms: pctMs(0.95), p99Ms: pctMs(0.99), maxMs: latMax,
       doorvoerPerSec: Math.round(totaal / (stormDuurMs / 1000)),
@@ -1247,11 +1249,48 @@ if (require.main !== module) { module.exports = {}; return; }
       endpointsBestookt: routes.length
     }
   };
-  try {
-    fs.writeFileSync(path.join(__dirname, '..', 'BEPROEVING.json'), JSON.stringify(cijfers, null, 2) + '\n');
-    console.log('\n  \x1b[2mcijfers weggeschreven naar BEPROEVING.json (scripts/norm.js vergelijkt ze met de vorige ronde)\x1b[0m');
-  } catch (e) {
-    console.log('\n  \x1b[31mBEPROEVING.json kon niet worden geschreven: ' + e.message + '\x1b[0m');
+  /* TWEE BESTANDEN, TWEE BANEN -- en die liepen door elkaar.
+
+     BEPROEVING.json was tegelijk het VERSLAG van de laatste ronde en de INVOER
+     van de prestatieratel in scripts/norm.js. Dat botst, want norm.js weigert
+     terecht een gezakte ronde als lat ("die cijfers zijn geen lat"). Gevolg: een
+     gezakte ronde was niet in te checken, dus bleef de laatste GESLAAGDE ronde
+     staan en kon het register alleen ooit goed nieuws bevatten. Op 9 september
+     2026 mat CI daardoor tegen een lat van 18 augustus terwijl dezelfde test op
+     de huidige commit zakte -- 22 dagen lang bewaakte de ratel een basislijn die
+     de code niet meer beschreef, en niets dwong een herronde af.
+
+     Sindsdien:
+       LAATSTE_METING.json  ALTIJD geschreven, of de ronde nu slaagt of zakt.
+                            Dit is de actuele waarheid en hij is commitbaar,
+                            juist als hij rood is. Rood bewijs hoort te blijven
+                            staan; het verdween alleen omdat er geen plek voor
+                            was.
+       BEPROEVING.json      de GEACCEPTEERDE basislijn (de lat). Die schuift
+                            alleen op na een geslaagde ronde, want een lat die
+                            meebeweegt met een mislukking is geen lat.
+
+     norm.js leest ze allebei en vergelijkt: hij mag rood worden van een gezakte
+     meting, maar hij hoort nooit meer te zeggen dat hij niets kán controleren. */
+  const schrijf = (naam, inhoud) => {
+    try {
+      fs.writeFileSync(path.join(__dirname, '..', naam), JSON.stringify(inhoud, null, 2) + '\n');
+      return true;
+    } catch (e) {
+      console.log('\n  \x1b[31m' + naam + ' kon niet worden geschreven: ' + e.message + '\x1b[0m');
+      return false;
+    }
+  };
+  if (schrijf('LAATSTE_METING.json', cijfers)) {
+    console.log('\n  \x1b[2mactuele meting weggeschreven naar LAATSTE_METING.json (' + cijfers.oordeel
+      + ') -- die blijft staan, ook rood\x1b[0m');
+  }
+  if (cijfers.oordeel === 'PASS') {
+    if (schrijf('BEPROEVING.json', cijfers)) {
+      console.log('  \x1b[2mde ronde slaagde, dus de basislijn BEPROEVING.json is meegeschoven\x1b[0m');
+    }
+  } else {
+    console.log('  \x1b[2mde basislijn BEPROEVING.json blijft ongemoeid: een gezakte ronde is geen lat\x1b[0m');
   }
 
   await stop();

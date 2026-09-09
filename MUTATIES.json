@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-09T11:01:36.173Z",
-    "commit": "985aa6e5",
+    "op": "2026-09-09T13:09:10.402Z",
+    "commit": "4db25da5",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2323,6 +2323,19 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "heapproef.test.js": {
+      "soort": "puur",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
+    "heapstat.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/heapstat.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
     },
     "helikopter.test.js": {
       "soort": "server",
@@ -7523,6 +7536,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "verzoekcontext-wikkel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/verzoekcontext.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "verzorging-leden.test.js": {
       "soort": "server",

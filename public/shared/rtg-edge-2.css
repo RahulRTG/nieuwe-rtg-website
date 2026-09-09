@@ -45,6 +45,81 @@ body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom{
      gedeelde Edge-contract pointer-events:auto. */
   visibility:visible;pointer-events:none;transition:transform .24s cubic-bezier(.2,.8,.2,1),visibility 0s
 }
+/* De onderrand is de vaste, lichte bediening van alle werelden. De wereld zelf
+   mag donker, groen of blauw zijn; thuiskomen, teruggaan en Rahul blijven op
+   hetzelfde ivoorkleurige instrument staan. Lokale variabelen houden de rest
+   van Edge in de eigen wereldkleur. */
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom{
+  --edge-bg:#f4f0e8;--edge-panel:#fbf8f2;--edge-copy:#211e19;--edge-dim:#70695f;
+  --edge-line:rgba(33,30,25,.16);--edge-accent:#861638;--edge-accent-soft:rgba(134,22,56,.1);
+  --edge-metal:#8a7317;border-top-color:var(--edge-line);
+  background:color-mix(in srgb,var(--edge-bg) 97%,transparent);box-shadow:0 -8px 32px rgba(28,21,15,.08)
+}
+.rtg-edge-appslot{display:none;min-width:0;height:var(--edge-bottom);overflow-x:auto;overflow-y:hidden;scrollbar-width:none;pointer-events:auto}
+.rtg-edge-appslot::-webkit-scrollbar{display:none}
+body[data-rtg-edge-appbar="true"] .rtg-edge-bottom{grid-template-columns:var(--edge-side) 44px minmax(0,1fr) 44px!important}
+body[data-rtg-edge-appbar="true"] .rtg-edge-history,
+body[data-rtg-edge-appbar="true"] .rtg-edge-layout,
+body[data-rtg-edge-appbar="true"] .rtg-edge-action{display:none!important}
+body[data-rtg-edge-appbar="true"] .rtg-edge-appslot{display:flex;grid-column:3;align-items:stretch}
+body[data-rtg-edge-appbar="true"] .rtg-edge-ai{grid-column:4;min-width:44px!important;width:44px!important}
+.rtg-edge-appslot>.rtg-edge-owned-bar{
+  position:relative!important;z-index:auto!important;inset:auto!important;left:auto!important;right:auto!important;top:auto!important;bottom:auto!important;
+  flex:1 0 max-content!important;width:auto!important;max-width:none!important;height:var(--edge-bottom)!important;min-height:var(--edge-bottom)!important;
+  margin:0!important;padding:0!important;transform:none!important;border:0!important;border-radius:0!important;
+  background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;color:var(--edge-copy)!important
+}
+.rtg-edge-appslot>nav.rtg-edge-owned-bar{display:flex!important;align-items:stretch!important}
+.rtg-edge-appslot>nav.rtg-edge-owned-bar>a,
+.rtg-edge-appslot>nav.rtg-edge-owned-bar>button{flex:1 0 52px!important;min-width:44px!important;min-height:44px!important;height:var(--edge-bottom)!important;padding:2px 4px!important;border:0!important;border-right:1px solid rgba(33,30,25,.09)!important;border-radius:0!important;background:transparent!important;color:var(--edge-dim)!important;box-shadow:none!important}
+.rtg-edge-appslot>nav.rtg-edge-owned-bar>:is(a,button).is-actief,
+.rtg-edge-appslot>nav.rtg-edge-owned-bar>:is(a,button)[aria-current]{color:var(--edge-accent)!important;background:var(--edge-accent-soft)!important}
+.rtg-edge-appslot>.speler.rtg-edge-owned-bar{min-width:220px!important;padding:0 4px!important}
+.rtg-edge-appslot>.speler.rtg-edge-owned-bar .balk{position:absolute;left:0;right:0;top:0;margin:0!important}
+.rtg-edge-appslot>.speler.rtg-edge-owned-bar .rij{height:var(--edge-bottom)!important;gap:2px!important}
+.rtg-edge-appslot>.speler.rtg-edge-owned-bar button{min-width:44px!important;width:44px!important;height:44px!important;color:var(--edge-copy)!important}
+body[data-rtg-edge-appbar="true"]:is(.rtg-music-experience,.rtg-media-experience)>.rahul{display:none!important}
+
+/* Het slimme menu heeft twee zichtbare gezichten in dezelfde laag. Op een
+   telefoon groeit die laag rechtstreeks uit de witte onderrand; desktop houdt
+   dezelfde inhoud in de bestaande zijlade. */
+.rtg-edge-index:has(.rtg-edge-faces){--edge-bg:#f4f0e8;--edge-panel:#fbf8f2;--edge-copy:#211e19;--edge-dim:#70695f;--edge-line:rgba(33,30,25,.16);--edge-accent:#861638;--edge-accent-soft:rgba(134,22,56,.09);--edge-metal:#8a7317;color:var(--edge-copy)}
+.rtg-edge-faces{min-height:100%;background:var(--edge-panel);color:var(--edge-copy)}
+.rtg-edge-sheet-grip{display:none;width:36px;height:4px;margin:10px auto 12px;border-radius:50%;background:rgba(33,30,25,.24)}
+.rtg-edge-face-tabs{position:sticky;z-index:3;top:0;display:grid;grid-template-columns:1fr 1fr;margin:0 0 22px;border:1px solid var(--edge-line);background:var(--edge-bg)}
+.rtg-edge-face-tabs button{min-height:44px!important;padding:0 12px!important;border:0!important;background:transparent!important;color:var(--edge-copy)!important;font:400 16px/1 "Bodoni Moda",Georgia,serif!important}
+.rtg-edge-face-tabs button[aria-selected="true"]{background:var(--edge-accent)!important;color:#fff!important}
+.rtg-edge-face-tabs button:focus-visible{outline:2px solid var(--edge-metal)!important;outline-offset:2px}
+.rtg-edge-face{padding:0 22px 28px}.rtg-edge-face[hidden]{display:none!important}
+.rtg-edge-face>h2{margin:0!important;color:var(--edge-copy)!important;font:400 29px/1.06 "Bodoni Moda",Georgia,serif!important}
+.rtg-edge-face>p{margin:8px 0 18px;color:var(--edge-metal);font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase}
+.rtg-edge-here-list,.rtg-edge-smart-doors{display:grid}
+.rtg-edge-here-action,.rtg-edge-smart-door{width:100%;min-height:54px!important;display:grid!important;grid-template-columns:34px minmax(0,1fr) 20px!important;align-items:center;padding:0 4px!important;border:0!important;border-top:1px solid var(--edge-line)!important;background:transparent!important;color:var(--edge-copy)!important;text-align:left;text-decoration:none!important}
+.rtg-edge-here-action svg,.rtg-edge-smart-door svg{width:20px!important;height:20px!important;color:var(--edge-accent)}
+.rtg-edge-here-action span,.rtg-edge-smart-door span{font:400 16px/1.2 "Bodoni Moda",Georgia,serif}
+.rtg-edge-here-action em,.rtg-edge-smart-door em{color:var(--edge-copy);font:300 23px/1 Inter,sans-serif;text-align:right}
+.rtg-edge-here-action[aria-current="page"]{background:var(--edge-accent-soft)!important;color:var(--edge-accent)!important}
+.rtg-edge-smart-worlds .rtg-edge-worlds{display:grid!important;grid-template-columns:1fr!important;gap:0!important;margin:0!important;background:transparent!important}
+.rtg-edge-smart-worlds .rtg-edge-worlds a{min-height:54px!important;display:grid!important;grid-template-columns:42px minmax(0,1fr) 20px!important;justify-content:normal!important;padding:0 4px!important;border:0!important;border-top:1px solid var(--edge-line)!important;background:transparent!important;color:var(--edge-copy)!important;font:400 16px/1.2 "Bodoni Moda",Georgia,serif!important;letter-spacing:0!important;text-transform:none!important}
+.rtg-edge-smart-worlds .rtg-edge-worlds a::before{content:attr(data-nr);color:var(--edge-metal);font:500 14px/1 Inter,sans-serif}
+.rtg-edge-smart-worlds .rtg-edge-worlds a::after{content:"›";font:300 23px/1 Inter,sans-serif;text-align:right}
+.rtg-edge-smart-worlds .rtg-edge-worlds a[aria-current="page"]{color:var(--edge-accent)!important;background:var(--edge-accent-soft)!important}
+.rtg-edge-global-original{display:none;margin-top:18px;padding-top:16px;border-top:1px solid var(--edge-line)}
+.rtg-edge-face-all[data-catalogus-open="true"] .rtg-edge-global-original{display:block}
+.rtg-edge-global-original>.rtg-edge-index-inner{width:auto!important;height:auto!important;padding:0!important;overflow:visible!important}
+.rtg-edge-global-original .rtg-edge-index-k,.rtg-edge-global-original>.rtg-edge-index-inner>h2{display:none!important}
+.rtg-edge-global-original .rtg-edge-find{top:0;margin:0 0 16px;background:var(--edge-bg)}
+.rtg-edge-menu>small,.rtg-edge-bottom>a>small{display:block;color:var(--edge-dim);font-size:10px;line-height:1;letter-spacing:.04em}
+.rtg-edge-menu,.rtg-edge-bottom>a{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.rtg-edge-menu[data-attention="true"]:not([aria-expanded="true"])::before{content:"";position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--edge-accent);box-shadow:0 0 0 2px var(--edge-bg)}
+.rtg-edge-menu[aria-expanded="true"] svg{opacity:0}
+.rtg-edge-menu[aria-expanded="true"]::before,.rtg-edge-menu[aria-expanded="true"]::after{content:"";position:absolute;left:15px;top:16px;width:17px;height:1px;background:var(--edge-copy);transform:rotate(45deg)}
+.rtg-edge-menu[aria-expanded="true"]::after{right:auto;bottom:auto;transform:rotate(-45deg)}
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom>button,
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom>a,
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom .rtg-edge-history{
+  border-color:rgba(33,30,25,.09)!important
+}
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-top,
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-side,
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-bottom{transform:none!important}
@@ -135,6 +210,53 @@ body[data-rtg-edge-2-rendered="true"][data-ios]{--ios-thuis-ruimte:0px!important
    zichtbaar, aanklikbaar of voorleesbaar doel. */
 @media(max-width:999px){
   #rtgCommand .cmd-lade[data-rtg-edge-owned="true"]{visibility:hidden!important;pointer-events:none!important}
+
+  /* Command had op telefoon een eigen zwarte dock direct boven Edge. De echte
+     tabknoppen blijven eigenaar van hun gedrag, maar liggen nu in de vrije
+     middenzone van de witte Edge-onderrand. Daardoor is er nog maar één balk. */
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-werk{
+    grid-template-rows:minmax(0,1fr) auto!important
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-panes{grid-row:1!important}
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-rail{grid-row:2!important}
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) .rtg-edge-bottom{
+    grid-template-columns:var(--edge-side) 44px minmax(0,1fr)!important
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) .rtg-edge-history,
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) .rtg-edge-action,
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) .rtg-edge-ai{
+    display:none!important
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balk{
+    --rtg-txt:#211e19;--rtg-muted:#70695f;--rtg-soft:#8b8276;--rtg-line:rgba(33,30,25,.13);--gold-tekst:#8a7317;
+    position:fixed!important;z-index:8801!important;grid-row:auto!important;
+    left:calc(var(--edge-side) + 44px)!important;right:0!important;
+    bottom:env(safe-area-inset-bottom,0px)!important;width:auto!important;height:var(--edge-bottom)!important;
+    padding:0!important;overflow:hidden!important;border:0!important;background:transparent!important;
+    box-shadow:none!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;color:var(--rtg-txt)
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balk .cmd-lade{
+    display:none!important
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balkbladen{
+    order:1;border-left:1px solid var(--rtg-line);border-right:0
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balkblad{
+    min-height:44px;max-width:min(45vw,220px);color:var(--rtg-muted)
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balkblad:hover,
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balkblad.actief{color:var(--rtg-txt)}
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balkblad.actief{
+    border-bottom-color:#861638;background:linear-gradient(180deg,rgba(134,22,56,.09),rgba(134,22,56,.025))
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balksluit{
+    order:2;width:44px;color:var(--rtg-muted);border-left:1px solid var(--rtg-line)
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-vraagvorm{order:1}
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-mondknop{
+    order:3;width:44px;color:#861638;border-left:1px solid var(--rtg-line);opacity:1
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-mondknop canvas{width:44px!important}
 }
 
 /* WerkOS bouwt zijn echte tabknoppen dynamisch. In een Edge-scherm liggen die
@@ -187,6 +309,13 @@ body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data-rtg-edge-2-state="compact"]>.wk-shell{inset:var(--rtg-vandaag-werk-kop,0px) 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) 0!important}
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data-rtg-edge-2-state="focus"]>.wk-shell{inset:var(--rtg-vandaag-werk-kop,0px) 0 0!important}
 @media(max-width:767px){
+  .rtg-edge-index:has(.rtg-edge-faces){left:0!important;right:0!important;top:auto!important;bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px))!important;width:100%!important;height:0;max-height:calc(100dvh - var(--edge-bottom) - env(safe-area-inset-bottom,0px));border:0!important;border-top:1px solid transparent!important;border-radius:var(--rtg-radius-system,22px) var(--rtg-radius-system,22px) 0 0;overflow:hidden;box-shadow:none!important;transition:height .3s cubic-bezier(.2,.8,.2,1),border-color .2s,box-shadow .25s}
+  .rtg-edge-index:has(.rtg-edge-faces)[aria-hidden="false"]{height:min(72dvh,620px);border-top-color:var(--edge-line)!important;box-shadow:0 -24px 64px rgba(33,22,15,.18)!important}
+  .rtg-edge-index:has(.rtg-edge-faces) .rtg-edge-faces{height:100%;overflow:auto;scrollbar-width:none;border-radius:var(--rtg-radius-system,22px) var(--rtg-radius-system,22px) 0 0}
+  .rtg-edge-index:has(.rtg-edge-faces) .rtg-edge-faces::-webkit-scrollbar{display:none}
+  .rtg-edge-sheet-grip{display:block}
+  .rtg-edge-face-tabs{top:0;margin:0 16px 22px}
+  .rtg-edge-face{padding-inline:22px}
   body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-side{display:none!important}
   body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"]{padding-left:0!important}
   body.rtg-edge-workspace[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-werkruimte{left:0!important}
@@ -252,6 +381,9 @@ body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data
     grid-template-columns:var(--edge-side) 88px minmax(0,1fr) 44px!important
   }
   body[data-rtg-edge-2-rendered="true"] .rtg-edge-bottom>a{display:none!important}
+  body[data-rtg-edge-appbar="true"] .rtg-edge-bottom{grid-template-columns:var(--edge-side) minmax(0,1fr) 44px!important}
+  body[data-rtg-edge-appbar="true"] .rtg-edge-appslot{grid-column:2}
+  body[data-rtg-edge-appbar="true"] .rtg-edge-ai{grid-column:3}
   body[data-rtg-edge-2-rendered="true"]:has(>nav.balk[aria-label="Hoofdnavigatie"]) .rtg-edge-bottom{
     grid-template-columns:var(--edge-side) minmax(0,1fr) 44px!important
   }
@@ -260,6 +392,9 @@ body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data
   }
   body[data-rtg-edge-2-rendered="true"]>.wos-dock{
     left:calc(var(--edge-side) + 88px)!important;right:44px!important
+  }
+  body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balk{
+    left:var(--edge-side)!important
   }
   body[data-rtg-world="living"][data-rtg-edge-2-rendered="true"] .rtg-edge-action:has(>.xp-trigger){
     gap:6px!important;padding:0!important

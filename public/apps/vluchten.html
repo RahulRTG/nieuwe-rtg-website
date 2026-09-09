@@ -67,17 +67,34 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/travel-os.css" rel="stylesheet">
 <link href="/shared/rtg-edge-system.css" rel="stylesheet">
+<link href="/shared/rtg-deep-flows-2026.css" rel="stylesheet">
+<link href="/shared/rtg-vlucht-2026.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl travel-os" data-rtg-eigenvlak="bordeaux" data-rtg-world="travel" data-rtg-skin="heritage">
-<header><div class="ey">RTG Airport</div><h1>Vluchten</h1></header>
+<body class="rtg-stijl travel-os rtg-travel-flow rtg-flight-experience" data-rtg-eigenvlak="onyx" data-rtg-world="travel" data-rtg-skin="heritage">
+<header class="vliegkop">
+  <a class="vlucht-brand" href="/apps/reizen.html" aria-label="RTG TravelOS"><b>RTG</b><span>TravelOS</span><small>Van vertrek tot thuiskomst</small></a>
+  <div class="vlucht-koptekst"><span class="ey" id="vluchtEy">Vlucht</span><h1 id="vluchtTitel">Waar wilt u naartoe?</h1><p id="vluchtIntro">Vind uw vlucht en zie meteen wat u nu moet doen.</p></div>
+</header>
 <main>
   <div class="tabs" id="tabs">
-    <button class="tab aan" data-t="bord">Het bord</button>
+    <button class="tab aan" data-t="bord">Vluchten</button>
     <button class="tab" data-t="mijn">Mijn reizen</button>
+    <button class="tab" data-t="charter">Persoonlijk</button>
   </div>
   <div id="inhoud"><div class="leeg">Laden…</div></div>
 </main>
+<nav class="rtg-deep-nav" aria-label="TravelOS reisflow" style="--deep-nav-count:3">
+  <a href="/apps/reizen.html"><b>01</b>Uw reis</a>
+  <a href="/apps/vluchten.html?view=mijn" aria-current="page"><b>02</b>Vlucht</a>
+  <a href="/apps/rit.html"><b>03</b>Aankomst</a>
+</nav>
+<nav class="vlucht-nav" aria-label="RTG Vlucht">
+  <button type="button" data-vlucht-nav="bord" aria-current="page"><b>01</b>Vluchten</button>
+  <button type="button" data-vlucht-nav="mijn"><b>02</b>Mijn reizen</button>
+  <a href="/apps/reizen.html"><b>03</b>TravelOS</a>
+  <button type="button" data-vlucht-nav="charter"><b>04</b>Persoonlijk</button>
+</nav>
 <div class="melding" id="melding"></div>
 <!-- uitvoer.js zonder defer en vlak voor het eigen script: dat meldt zijn
      model aan met RTGUitvoer.bron(). In de <head> hield hij het parsen op
@@ -93,12 +110,19 @@ function leesPass(id){ try{ return sessionStorage.getItem(passSleutel(id))||''; 
 function vergeetPass(id){ try{ sessionStorage.removeItem(passSleutel(id)); }catch(e){} }
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2800); }
 const api=(pad,body)=>fetch('/api/member/vluchten'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok){throw new Error(d.error||'Er ging iets mis.');}return d;});
-let TAB='bord';
+const START_VIEW=new URLSearchParams(location.search).get('view');
+let TAB=['mijn','charter'].includes(START_VIEW)?START_VIEW:'bord';
 let BORD=null, MIJN=null;   // wat er binnenkwam; waaruit dit scherm tekent
+document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('aan',b.dataset.t===TAB));
 /* Meenemen (shared/uitvoer.js): allebei de tabbladen zijn een echte lijst, dus
    u neemt mee wat u aankijkt -- het bord met de vluchten, of uw eigen
    boekingen. De velden los, zoals de app ze van de server krijgt. */
 if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
+  if(TAB==='charter'){
+    const r=(MIJN&&MIJN.charters||[]).map(c=>[c.code,c.soort,c.bestemming,c.datum,c.tijd,c.status]);
+    return r.length?{naam:'mijn-charteraanvragen',
+      kolommen:['code','soort','bestemming','datum','tijd','status'],rijen:r}:null;
+  }
   if(TAB==='mijn'){
     const r=(MIJN&&MIJN.boekingen||[]).map(b=>[b.vlucht.datum,b.vlucht.tijd,b.vlucht.nummer,
       b.vlucht.bestemming,b.id,b.stoel||'',b.status]);
@@ -110,17 +134,36 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
   return r.length?{naam:'vluchtenbord',
     kolommen:['datum','tijd','vluchtnummer','bestemming','soort','gate','status'],rijen:r}:null;
 });
-document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{ TAB=b.dataset.t; document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('aan',x===b)); laad(); });
+function zetTab(tab){
+  TAB=['bord','mijn','charter'].includes(tab)?tab:'bord';
+  document.body.dataset.vluchtTab=TAB;
+  const kop={
+    bord:['Vlucht','Waar wilt u naartoe?','Vind uw vlucht en zie meteen wat u nu moet doen.'],
+    mijn:['Mijn vlucht','Alles bij de hand.','Uw tijd, gate, stoel, bagage en instapcode op één rustige plek.'],
+    charter:['Persoonlijk vliegen','Uw tijd bepaalt het vertrek.','Vraag een privévlucht of helikopter aan. Operations bevestigt persoonlijk.']
+  }[TAB];
+  $('#vluchtEy').textContent=kop[0]; $('#vluchtTitel').textContent=kop[1]; $('#vluchtIntro').textContent=kop[2];
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('aan',x.dataset.t===TAB));
+  document.querySelectorAll('[data-vlucht-nav]').forEach(x=>x.setAttribute('aria-current',x.dataset.vluchtNav===TAB?'page':'false'));
+  const url=new URL(location.href); if(TAB==='bord') url.searchParams.delete('view'); else url.searchParams.set('view',TAB);
+  history.replaceState(null,'',url.pathname+url.search); laad();
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>zetTab(b.dataset.t));
+document.querySelectorAll('[data-vlucht-nav]').forEach(b=>b.onclick=()=>zetTab(b.dataset.vluchtNav));
 
 async function laad(){
   if(!TOKEN){ $('#inhoud').innerHTML='<div class="leeg">Log eerst in via de RTG-app; daarna boekt en checkt u hier in.</div>'; return; }
-  TAB==='bord' ? laadBord() : laadMijn();
+  if(TAB==='bord') laadBord(); else if(TAB==='mijn') laadMijn(); else laadCharter();
 }
 async function laadBord(){
   let d; try{ d=await api('/bord'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   BORD=d;
   const sec=d.security.filter(f=>f.open).map(f=>esc(f.naam)+': '+f.wachtMinuten+' min').join(' · ');
-  let h='<div class="sec">Security nu · '+(sec||'geen filter open')+'</div>';
+  const eerste=(d.vluchten[0]||{}).datum||new Date().toISOString().slice(0,10);
+  let h='<section class="vlucht-zoek"><span>Zoek uw vlucht</span><label>Waarheen<input id="vliegNaar" placeholder="Bestemming of vluchtnummer" autocomplete="off"></label>'+
+    '<label>Datum<input id="vliegDatum" type="date" value="'+esc(eerste)+'"></label><label>Richting<select id="vliegSoort"><option value="">Alles</option><option value="vertrek">Vertrek</option><option value="aankomst">Aankomst</option></select></label>'+
+    '<small>U ziet het actuele bord. Een boeking is pas gemaakt nadat de server haar bevestigt.</small></section>'+
+    '<div class="sec">Security nu · '+(sec||'geen filter open')+'</div><div class="vlucht-lijstkop"><h2>Beschikbare vluchten</h2><span id="vluchtAantal">'+d.vluchten.length+' op het bord</span></div>';
   h+= d.vluchten.length ? d.vluchten.map(v=>{
     const st = v.geannuleerd?'<span class="status open">geannuleerd</span>'
       : v.status==='inchecken'?'<span class="status goud">inchecken open</span>'
@@ -129,10 +172,18 @@ async function laadBord(){
       : v.status==='geland'||v.status==='bagage-op-band'?'<span class="status ok">'+esc(v.status)+(v.band?' · band '+v.band:'')+'</span>'
       : '<span class="status">'+esc(v.status)+'</span>';
     const ver=v.vertraging?' <span class="status open">+'+v.vertraging.minuten+' min</span>':'';
-    const boek=(v.soort==='vertrek'&&['gepland','inchecken'].includes(v.status))?'<div class="rij"><button class="knop stil" data-boek="'+v.id+'">Boek deze vlucht</button></div>':'';
-    return '<div class="item"><h4>'+(v.icoon||'')+' <span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+'</h4><div class="meta">'+esc(v.soort)+' · '+esc(v.tijd)+' · '+esc(v.gate)+' · '+st+ver+'</div>'+boek+'</div>';
+    const boek=(v.soort==='vertrek'&&['gepland','inchecken'].includes(v.status))?'<div class="rij"><button class="knop" data-boek="'+v.id+'">Kies deze vlucht</button></div>':'';
+    const zoek=esc([v.nummer,v.bestemming,v.datum,v.soort].join(' ').toLowerCase());
+    return '<article class="item vluchtkaart" data-vlucht-zoek="'+zoek+'" data-datum="'+esc(v.datum)+'" data-soort="'+esc(v.soort)+'"><h4><span class="nr">'+esc(v.nummer)+'</span></h4><div class="vlucht-status">'+st+ver+'</div>'+
+      '<div class="vlucht-tijd"><time>'+esc(v.tijd)+'</time><i></i><b>'+esc(v.bestemming)+'</b></div><div class="meta">'+esc(v.datum)+' · '+esc(v.soort)+' · gate '+esc(v.gate)+'</div>'+boek+'</article>';
   }).join('') : '<div class="leeg">Geen vluchten op het bord.</div>';
   $('#inhoud').innerHTML=h;
+  function filterBord(){
+    const q=$('#vliegNaar').value.trim().toLowerCase(), datum=$('#vliegDatum').value, soort=$('#vliegSoort').value;
+    let n=0; document.querySelectorAll('[data-vlucht-zoek]').forEach(r=>{ const toon=(!q||r.dataset.vluchtZoek.includes(q))&&(!datum||r.dataset.datum===datum)&&(!soort||r.dataset.soort===soort); r.hidden=!toon; if(toon)n++; });
+    $('#vluchtAantal').textContent=n+(n===1?' vlucht':' vluchten');
+  }
+  $('#vliegNaar').addEventListener('input',filterBord); $('#vliegDatum').addEventListener('change',filterBord); $('#vliegSoort').addEventListener('change',filterBord);
   document.querySelectorAll('[data-boek]').forEach(b=>b.onclick=async()=>{
     try{ const r=await api('/boek',{id:b.dataset.boek}); meld('Geboekt: '+r.boeking.id+'. Inchecken kan zodra het open staat.'); }catch(e){ meld(e.message); }
   });
@@ -140,33 +191,27 @@ async function laadBord(){
 async function laadMijn(){
   let d; try{ d=await api('/mijn'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
   MIJN=d;
-  const charterBlok='<div class="item" style="border-color:rgba(169,143,7,.4);"><h4>Charter aanvragen</h4>'+
-    '<div class="meta">Een privejet of helikopter op uw moment. Operations bevestigt persoonlijk; daarna staat de vlucht in uw reizen.</div>'+
-    '<div class="rij"><select class="veld" id="chSoort"><option value="privejet">Privejet</option><option value="helikopter">Helikopter</option></select>'+
-    '<input class="veld" id="chBest" style="flex:1;min-width:8rem;" placeholder="Bestemming" maxlength="60"></div>'+
-    '<div class="rij"><input class="veld" id="chDatum" type="date"><input class="veld" id="chTijd" type="time" value="12:00"><button class="knop" id="chVraag">Vraag aan</button></div>'+
-    ((d.charters||[]).length?'<div class="h-mt50">'+d.charters.map(c=>'<div class="meta">'+(c.icoon||'')+' '+esc(c.code)+' · '+esc(c.bestemming)+' · '+esc(c.datum)+' '+esc(c.tijd)+' · <span class="status '+(c.status==='bevestigd'?'ok':c.status==='afgewezen'?'open':'goud')+'">'+esc(c.status)+(c.vlucht?' · '+esc(c.vlucht):'')+'</span></div>').join('')+'</div>':'')+'</div>';
-  $('#inhoud').innerHTML= charterBlok + (d.boekingen.length ? d.boekingen.map(b=>{
+  $('#inhoud').innerHTML='<div class="mijn-vluchtintro"><div><span class="nr">MIJN REIZEN</span><h2>Klaar om in te stappen.</h2></div><span>'+d.boekingen.length+(d.boekingen.length===1?' vlucht':' vluchten')+'</span></div>'+(d.boekingen.length ? d.boekingen.map(b=>{
     const v=b.vlucht;
     if(b.status==='ingecheckt'){
       const code=leesPass(b.id), pass=b.pass||{}, actief=pass.stand==='actief';
-      return '<div class="pass"><div class="regel"><span>Vlucht</span><b>'+esc(v.nummer)+' · '+esc(v.bestemming)+'</b></div>'+
-        '<div class="regel"><span>Vertrek</span><b>'+esc(v.tijd)+' · gate '+esc(v.gate)+'</b></div>'+
-        '<div class="regel"><span>Stoel</span><b>'+esc(b.stoel)+'</b></div>'+
-        (code&&actief?'<div class="code">'+esc(code)+'</div><div class="regel" style="justify-content:center;color:var(--soft);font-size:.72rem;">Deze code staat alleen in dit browsertabblad. Laat haar zien bij security en de gate.</div>':
+      return '<article class="pass instapkaart"><div class="instap-route"><strong>'+esc(v.nummer)+'</strong><span>naar</span><strong>'+esc(v.bestemming)+'</strong></div>'+
+        '<div class="instap-details"><div><span>Vertrek</span><b>'+esc(v.tijd)+'</b></div><div><span>Gate</span><b>'+esc(v.gate)+'</b></div><div><span>Stoel</span><b>'+esc(b.stoel)+'</b></div><div><span>Bagage</span><b>'+b.koffers.length+(b.koffers.length===1?' koffer':' koffers')+'</b></div></div>'+
+        (code&&actief?'<div class="code">'+esc(code)+'</div><div class="regel">Deze code staat alleen in dit browsertabblad. Laat haar zien bij security en de gate.</div>':
           '<div class="meta code-ontbreekt">De geheime code wordt niet door Mijn reizen teruggegeven. Geef een nieuwe uit als u haar niet meer op dit toestel heeft.</div>')+
-        '<div class="rij code-acties">'+
-          ((!code||!actief)&&!v.geannuleerd?'<button class="knop" data-roteer="'+esc(b.id)+'" data-rotatie="'+esc(pass.rotatie||0)+'">Nieuwe code uitgeven</button>':'')+
+        '<div class="instap-acties">'+
+          ((!code||!actief)&&!v.geannuleerd?'<button class="knop" data-roteer="'+esc(b.id)+'" data-rotatie="'+esc(pass.rotatie||0)+'">Nieuwe instapcode</button>':'')+
           (actief?'<button class="knop stil" data-intrek="'+esc(b.id)+'" data-rotatie="'+esc(pass.rotatie||0)+'">Code intrekken</button>':'')+'</div>'+
         (b.koffers.length?'<div class="regel"><span>Koffers</span><b>'+b.koffers.map(k=>esc(k.tag)+' ('+esc(k.status)+(k.band?' · band '+k.band:'')+')').join('<br>')+'</b></div>':'')+
-        (v.vertraging?'<div class="regel"><span>Let op</span><b style="color:var(--burgundy);">+'+v.vertraging.minuten+' min · '+esc(v.vertraging.reden)+'</b></div>':'')+'</div>';
+        (v.vertraging?'<div class="regel"><span>Let op</span><b>+'+v.vertraging.minuten+' min · '+esc(v.vertraging.reden)+'</b></div>':'')+'</article>';
     }
     const kan=v.status==='inchecken';
-    return '<div class="item"><h4><span class="nr">'+esc(v.nummer)+'</span> · '+esc(v.bestemming)+'</h4>'+
-      '<div class="meta">'+esc(v.datum)+' · '+esc(v.tijd)+' · boeking '+esc(b.id)+' · <span class="status '+(v.geannuleerd?'open':'goud')+'">'+esc(v.geannuleerd?'geannuleerd':v.status)+'</span></div>'+
+    return '<article class="item vluchtkaart"><h4><span class="nr">'+esc(v.nummer)+'</span></h4><div class="vlucht-status"><span class="status '+(v.geannuleerd?'open':'goud')+'">'+esc(v.geannuleerd?'geannuleerd':v.status)+'</span></div>'+
+      '<div class="vlucht-tijd"><time>'+esc(v.tijd)+'</time><i></i><b>'+esc(v.bestemming)+'</b></div>'+
+      '<div class="meta">'+esc(v.datum)+' · boeking '+esc(b.id)+'</div>'+
       (kan?'<div class="rij"><select class="veld" data-kof="'+esc(b.id)+'"><option value="0">Geen koffer</option><option value="1">1 koffer</option><option value="2">2 koffers</option><option value="3">3 koffers</option></select><button class="knop" data-in="'+esc(b.id)+'">Inchecken</button></div>'
-        : v.geannuleerd?'':'<div class="meta">Inchecken kan zodra het open staat.</div>')+'</div>';
-  }).join('') : '<div class="leeg">Nog geen reizen. Boek een vlucht via Het bord, of vraag hierboven een charter aan.</div>');
+        : v.geannuleerd?'':'<div class="meta">Inchecken kan zodra het open staat.</div>')+'</article>';
+  }).join('') : '<div class="leeg">Nog geen reizen. Kies eerst een vlucht, of vraag persoonlijk vervoer aan.</div>');
   document.querySelectorAll('[data-in]').forEach(b=>b.onclick=async()=>{
     const kof=document.querySelector('[data-kof="'+b.dataset.in+'"]');
     try{ const r=await api('/incheck',{id:b.dataset.in,koffers:kof?kof.value:0});
@@ -181,13 +226,24 @@ async function laadMijn(){
     try{ await api('/pass/intrek',{id:b.dataset.intrek,rotatie:Number(b.dataset.rotatie)});
       vergeetPass(b.dataset.intrek); meld('Boarding-passcode ingetrokken.'); laadMijn(); }catch(e){ meld(e.message); }
   });
+}
+async function laadCharter(){
+  let d; try{ d=await api('/mijn'); }catch(e){ $('#inhoud').innerHTML='<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  MIJN=d;
+  const aanvragen=d.charters||[];
+  $('#inhoud').innerHTML='<section class="charter-hero"><div><span>Persoonlijk vliegen</span><h2>Uw tijd bepaalt het vertrek.</h2><p>Vraag een privévlucht of helikopter aan. Operations bevestigt persoonlijk.</p></div></section>'+
+    '<section class="charter-paneel"><span class="nr">UW AANVRAAG</span><div class="charter-keuzes"><label><input type="radio" name="chSoort" value="privejet" checked> Privéjet</label><label><input type="radio" name="chSoort" value="helikopter"> Helikopter</label></div>'+
+    '<div class="charter-velden"><label>Bestemming<input class="veld" id="chBest" placeholder="Waar wilt u heen?" maxlength="60"></label><label>Datum<input class="veld" id="chDatum" type="date"></label><label>Tijd<input class="veld" id="chTijd" type="time" value="12:00"></label></div>'+
+    '<button class="knop" id="chVraag">Vraag persoonlijk aan</button><p class="charter-grens">Geen automatische belofte. Eerst persoonlijke bevestiging door Operations.</p>'+
+    (aanvragen.length?'<div class="charter-lijst"><h3>Uw aanvragen</h3>'+aanvragen.map(c=>'<div class="charter-aanvraag"><b>'+esc(c.code)+' · '+esc(c.bestemming)+'</b>'+esc(c.soort)+' · '+esc(c.datum)+' '+esc(c.tijd)+' · <span class="status '+(c.status==='bevestigd'?'ok':c.status==='afgewezen'?'open':'goud')+'">'+esc(c.status)+(c.vlucht?' · '+esc(c.vlucht):'')+'</span></div>').join('')+'</div>':'')+'</section>';
   $('#chDatum').value=new Date().toISOString().slice(0,10);
   $('#chVraag').onclick=async()=>{
-    try{ const r=await api('/charter',{soort:$('#chSoort').value,bestemming:$('#chBest').value,datum:$('#chDatum').value,tijd:$('#chTijd').value});
-      meld('Aangevraagd ('+r.charter.code+'); operations bevestigt persoonlijk.'); laadMijn(); }catch(e){ meld(e.message); }
+    const soort=document.querySelector('[name="chSoort"]:checked').value;
+    try{ const r=await api('/charter',{soort,bestemming:$('#chBest').value,datum:$('#chDatum').value,tijd:$('#chTijd').value});
+      meld('Aangevraagd ('+r.charter.code+'); Operations bevestigt persoonlijk.'); laadCharter(); }catch(e){ meld(e.message); }
   };
 }
-laad();
+zetTab(TAB);
 </script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

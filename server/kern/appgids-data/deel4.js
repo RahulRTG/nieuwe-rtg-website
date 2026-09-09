@@ -1,8 +1,23 @@
-/* App-gids data, deel4 (18 pagina's). Zie ../appgids.js voor de uitleg;
+/* App-gids data, deel4 (19 pagina's). Zie ../appgids.js voor de uitleg;
    nieuwe pagina's krijgen hier (of in het passende deel) een eigen entry. */
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
+  '/apps/foundation/meedoen-ontdekken.html': G('Meedoen & Ontdekken: openbaar buurtaanbod en kansen uit FoundationOS in één warme ingang.',
+    ['Kies zelf uw stad en bekijk alleen activiteiten die echt openstaan', 'Bewaar belangstelling op uw toestel en neem de gegevens mee naar de organisator', 'Start vanuit Maken een club, project, buurtruil of onderzoek in het Living Lab'],
+    'FoundationOS vraagt uw precieze locatie niet. Belangstelling is nog geen reservering; de organisator bevestigt uw plek.'),
+  '/apps/foundation/veilig-vertrouwd.html': G('Veilig & Vertrouwd: uw gezinsstatus, vertrouwde kring en passende hulp op één rustige plek.',
+    ['Laat zonder precieze locatie weten dat u veilig thuis of onderweg bent', 'Bekijk echte banden en wat u per persoon deelt of mag zien', 'Bel bij direct gevaar 112 of open Veilig Thuis en andere bestaande hulproutes'],
+    'Door een scherm te openen wordt niets verstuurd. Een band geeft nooit vanzelf toegang en een korte status deelt geen GPS-positie.'),
+  '/apps/foundation/gezondheid-welzijn.html': G('Gezondheid & Welzijn: wat vandaag helpt, uw eigen ritme en echte zorgcontacten op één rustige plek.',
+    ['Bekijk vastgelegde medicatie en komende gezondheidsafspraken', 'Onthoud slaap, beweging, eten, rust en gevoel alleen op uw eigen toestel', 'Open echte RTG Care-contacten, uw vertrouwde kring of de hulpwijzer'],
+    'Deze app geeft geen diagnose of gezondheidsscore en verzint geen huisarts of begeleider. Wat niet aan een echte bron is gekoppeld, blijft leeg.'),
+  '/apps/foundation/geld-later.html': G('Geld & Later: begrijp uw ruimte van vandaag en vind de volgende haalbare stap naar leren, studie of werk.',
+    ['Bekijk het echte zakgeldpotje, spaardoel en de beweging van deze maand', 'Open leren, studie, vacatures en de lokale cv vanuit één route', 'Bereken een budget, start een echt spaardoel of bekijk uw rechten'],
+    'De toekomstlijn is een routekaart, geen voorspelling. Het budget en cv blijven op dit toestel.'),
+  '/apps/foundation/samen-thuis.html': G('Samen Thuis: de gezamenlijke dag, ieder gezinslid en kleine afspraken op één rustige plek.',
+    ['Bekijk echte afspraken, taken en het geplande eten van vandaag', 'Zie per gezinslid alleen vastgelegde afspraken en ochtendstatus', 'Verdeel een taak, vraag hulp of zet een herinnering op de dag'],
+    'Samen Thuis raadt geen locatie of aanwezigheid. Wat niet door het gezin is vastgelegd, wordt ook niet als feit getoond.'),
   '/apps/foundation/registreren.html': G('De veilige FOUNDATION-balie voor een gezin, school, vrijwilliger of partnerstichting.',
     ['Kies hoe je wilt meedoen', 'Vul alleen de gevraagde registratiegegevens in', 'Volg daarna de officiële controles'],
     'Mail nooit een kopie van je identiteitsbewijs of VOG; een medewerker legt alleen de controle-uitkomst vast.'),
@@ -27,9 +42,9 @@ module.exports = {
   '/apps/foundation/kompas.html': G('Het kompas: nadenken over wie je bent en wat je wilt, met een maatje dat meedenkt.',
     ['Doe de denkstukjes op jouw tempo', 'Schrijf op wat je ontdekt', 'Deel alleen wat jij wilt delen'],
     'Er is geen goed of fout antwoord over wie jij bent; nadenken zelf is het punt.'),
-  '/apps/foundation/leren.html': G('Leren: overhoren, duellen, samen aan projecten en beter schrijven.',
-    ['Kies wat je wilt oefenen', 'Daag een vriend uit voor een duel', 'Laat de schrijfcoach meelezen'],
-    'Fouten maken is gewoon oefenen; wie nooit een fout maakt, oefent te makkelijk.'),
+  '/apps/foundation/leren.html': G('Leren & Groei: zie wat vandaag telt, wat al groeit en wie rustig met je mee kan kijken.',
+    ['Kies een voorgestelde stap uit je echte leerroute', 'Bekijk leerdoelen met bewijs zonder ranglijst', 'Vraag om een andere uitleg of open een live les met een begeleider'],
+    'Het dagplan is een voorstel, geen opdracht. Er is geen reeks, achterstand of vergelijking met een ander.'),
   '/apps/foundation/markt.html': G('Koopje: de gezinsmarkt voor tweedehands en delen.',
     ['Zet iets erop dat weg mag', 'Zoek iets dat jullie nodig hebben', 'Ruil of geef door in de buurt'],
     'Wat jij niet meer gebruikt, maakt een ander blij; doorgeven is twee keer winst.'),

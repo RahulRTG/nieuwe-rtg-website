@@ -38,6 +38,7 @@
     if (!s) return;
     stop();
     actief = s;
+    d.body.dataset.veiligStand = s.id;
 
     var knoppen = $('#standen').querySelectorAll('button');
     for (var i = 0; i < knoppen.length; i++) {
@@ -70,6 +71,7 @@
     try { if (typeof s.start === 'function') s.start(); }
     catch (e) { $('#paneel').innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e, {
       ey: 'RTG Veilig', titel: 'Deze stand kon niet openen.' })); }
+    d.dispatchEvent(new CustomEvent('rtgveiligstand', { detail: s.id }));
   }
   V.toon = toon;
 

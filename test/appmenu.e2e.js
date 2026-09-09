@@ -283,6 +283,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
               };
               return zichtbaar(document.getElementById('osMenuBtn')) ||
                 zichtbaar(document.querySelector('.rtg-edge-menu')) ||
+                zichtbaar(document.querySelector('.rtg-edge-2-reveal')) ||
                 zichtbaar(document.querySelector('#rtf-toegang-slot [data-rtf-uitweg]'));
             }, null, { timeout: 8000 });
             const deuren = await page.evaluate(() => {
@@ -295,6 +296,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
               return {
                 legacy: zichtbaar(document.getElementById('osMenuBtn')),
                 edge: zichtbaar(document.querySelector('.rtg-edge-menu')),
+                edgeGreep: zichtbaar(document.querySelector('.rtg-edge-2-reveal')),
                 uitweg: zichtbaar(document.querySelector('#rtf-toegang-slot [data-rtf-uitweg]')),
                 roots: document.querySelectorAll('.rtg-edge-chrome').length
               };
@@ -336,6 +338,14 @@ test('het zichtbare Edge-menu opent en houdt home en instellingen bereikbaar',
     /* Wallet is geen losse app meer maar de wallet-stand van RTG Geld. Daar is
        Edge de zichtbare eigenaar; op de verborgen oude hamburger klikken
        toetst alleen of Playwright door een balk heen kan klikken. */
+    const focusGreep = page.locator('.rtg-edge-2-reveal');
+    if (await focusGreep.isVisible()) {
+      await focusGreep.click();
+      await page.waitForFunction(() => {
+        const menu = document.querySelector('.rtg-edge-menu');
+        return !!(menu && getComputedStyle(menu).visibility !== 'hidden' && menu.getBoundingClientRect().width > 0);
+      }, null, { timeout: 5000 });
+    }
     await page.click('.rtg-edge-menu');
     await page.waitForFunction(() => document.querySelector('.rtg-edge-index')
       .getAttribute('aria-hidden') === 'false', null, { timeout: 5000 });

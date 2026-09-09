@@ -1,17 +1,17 @@
 {
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
-  "vastgelegd": "2026-09-09",
+  "vastgelegd": "2026-09-08",
   "gemeten": {
-    "bestanden": 2144,
-    "vormen": 1380,
-    "velden": 2004,
-    "modules": 753,
-    "domeinen": 265,
-    "envelopDrempel": 16,
-    "envelop": 34,
-    "veldenDomeineigen": 1416,
-    "veldenGedeeldVanafVier": 195,
-    "gelijkendeVormparen": 19
+    "bestanden": 2143,
+    "vormen": 1382,
+    "velden": 2008,
+    "modules": 754,
+    "domeinen": 267,
+    "envelopDrempel": 17,
+    "envelop": 29,
+    "veldenDomeineigen": 1417,
+    "veldenGedeeldVanafVier": 200,
+    "gelijkendeVormparen": 20
   },
   "envelop": [
     "aantal",
@@ -21,21 +21,18 @@
     "code",
     "codenaam",
     "datum",
-    "doel",
     "door",
     "gemaakt",
     "id",
     "key",
     "label",
     "naam",
-    "naar",
     "notitie",
     "ok",
     "omschrijving",
     "prijs",
     "reden",
     "ref",
-    "sinds",
     "soort",
     "stand",
     "status",
@@ -45,11 +42,69 @@
     "tot",
     "uitleg",
     "van",
-    "waarom",
-    "wat",
-    "wie"
+    "wat"
   ],
   "gedeeld": [
+    {
+      "veld": "sinds",
+      "domeinen": 16,
+      "waar": [
+        "bedrijf",
+        "kern/afdelingen",
+        "kern/clubs",
+        "kern/command",
+        "kern/commercie",
+        "kern/ledenbalie"
+      ]
+    },
+    {
+      "veld": "doel",
+      "domeinen": 16,
+      "waar": [
+        "kern/appstore",
+        "kern/codelevenscyclus",
+        "kern/commercie",
+        "kern/consent-register",
+        "kern/defensie",
+        "kern/labfonds"
+      ]
+    },
+    {
+      "veld": "naar",
+      "domeinen": 16,
+      "waar": [
+        "bedrijf",
+        "kern/bank",
+        "kern/command",
+        "kern/lidboard",
+        "kern/mailwachtrij",
+        "kern/mobiliteit"
+      ]
+    },
+    {
+      "veld": "waarom",
+      "domeinen": 16,
+      "waar": [
+        "kern/bureau",
+        "kern/command",
+        "kern/commerce",
+        "kern/commercie",
+        "kern/concern",
+        "kern/gewoonten"
+      ]
+    },
+    {
+      "veld": "wie",
+      "domeinen": 16,
+      "waar": [
+        "bedrijf",
+        "kern/comm",
+        "kern/commerce",
+        "kern/consent-lezers",
+        "kern/horeca",
+        "kern/isolatie"
+      ]
+    },
     {
       "veld": "icon",
       "domeinen": 15,
@@ -147,18 +202,6 @@
       ]
     },
     {
-      "veld": "onderwerp",
-      "domeinen": 12,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/commercie",
-        "kern/kantoor",
-        "kern/mailwachtrij",
-        "kern/postdatum"
-      ]
-    },
-    {
       "veld": "besluit",
       "domeinen": 11,
       "waar": [
@@ -192,6 +235,30 @@
         "kern/klok",
         "kern/lidboard",
         "kern/pay"
+      ]
+    },
+    {
+      "veld": "plek",
+      "domeinen": 11,
+      "waar": [
+        "kern/afdelingen",
+        "kern/agenda-pro",
+        "kern/commerce",
+        "kern/festival",
+        "kern/hulpdienst",
+        "kern/mall"
+      ]
+    },
+    {
+      "veld": "af",
+      "domeinen": 11,
+      "waar": [
+        "kern/afdelingen",
+        "kern/bank",
+        "kern/klok",
+        "kern/leren",
+        "kern/livinglab",
+        "kern/rtfclubs"
       ]
     },
     {
@@ -267,6 +334,18 @@
       ]
     },
     {
+      "veld": "onderwerp",
+      "domeinen": 11,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/mailwachtrij",
+        "kern/postdatum",
+        "kern/rtfos"
+      ]
+    },
+    {
       "veld": "niveau",
       "domeinen": 11,
       "waar": [
@@ -303,18 +382,6 @@
       ]
     },
     {
-      "veld": "plek",
-      "domeinen": 10,
-      "waar": [
-        "kern/afdelingen",
-        "kern/agenda-pro",
-        "kern/commerce",
-        "kern/festival",
-        "kern/hulpdienst",
-        "kern/mall"
-      ]
-    },
-    {
       "veld": "klaar",
       "domeinen": 10,
       "waar": [
@@ -324,18 +391,6 @@
         "kern/eten",
         "kern/magnaat-partnerstudio-basis",
         "kern/muziek"
-      ]
-    },
-    {
-      "veld": "af",
-      "domeinen": 10,
-      "waar": [
-        "kern/afdelingen",
-        "kern/bank",
-        "kern/klok",
-        "kern/leren",
-        "kern/livinglab",
-        "kern/rtfclubs"
       ]
     },
     {
@@ -363,18 +418,6 @@
       ]
     },
     {
-      "veld": "actie",
-      "domeinen": 10,
-      "waar": [
-        "bedrijf",
-        "kern/bankregie",
-        "kern/command",
-        "kern/frictie",
-        "kern/geldbeleid",
-        "kern/kantoor"
-      ]
-    },
-    {
       "veld": "op",
       "domeinen": 10,
       "waar": [
@@ -384,6 +427,18 @@
         "kern/galerij",
         "kern/gedachten",
         "kern/klok"
+      ]
+    },
+    {
+      "veld": "bewijs",
+      "domeinen": 10,
+      "waar": [
+        "kern/betaalwaarheid",
+        "kern/horeca",
+        "kern/invoer",
+        "kern/livinglab",
+        "kern/magnaat-controle",
+        "kern/magnaat-trainingslobby-acties"
       ]
     },
     {
@@ -469,66 +524,6 @@
         "kern/envelop",
         "kern/livinglab"
       ]
-    },
-    {
-      "veld": "opties",
-      "domeinen": 9,
-      "waar": [
-        "kern/autoverkoop",
-        "kern/concern",
-        "kern/eten",
-        "kern/gast",
-        "kern/horeca",
-        "kern/magnaat-werkroutefabriek"
-      ]
-    },
-    {
-      "veld": "nummer",
-      "domeinen": 9,
-      "waar": [
-        "bedrijf",
-        "kern/bank",
-        "kern/facturatie",
-        "kern/kosten",
-        "kern/labfonds",
-        "kern/livinglab"
-      ]
-    },
-    {
-      "veld": "stad",
-      "domeinen": 9,
-      "waar": [
-        "kern/beschermzaak",
-        "kern/foundationregistratie-uitgifte",
-        "kern/ledenbalie",
-        "kern/livinglab",
-        "kern/mobiliteit",
-        "kern/rechterhand"
-      ]
-    },
-    {
-      "veld": "ingetrokken",
-      "domeinen": 9,
-      "waar": [
-        "bedrijf",
-        "kern/beschermzaak",
-        "kern/command",
-        "kern/festival",
-        "kern/mobiliteit",
-        "kern/rtgid-regie"
-      ]
-    },
-    {
-      "veld": "stappen",
-      "domeinen": 9,
-      "waar": [
-        "kern/beschermzaak",
-        "kern/commercie",
-        "kern/magnaat-trainingslobby",
-        "kern/magnaatwereld",
-        "kern/muziek",
-        "kern/ondernemerpoort"
-      ]
     }
   ],
   "paren": [
@@ -542,11 +537,26 @@
         "actie",
         "certificaat",
         "klantImpact",
+        "naar",
         "oorzaak",
         "past",
         "terugDraaibaar",
         "type",
         "veld"
+      ]
+    },
+    {
+      "gelijkenis": 1,
+      "a": "server/kern/command/index.js",
+      "b": "server/kern/zaakcommand/beeld.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/zaakcommand",
+      "gedeeld": [
+        "niveau",
+        "score",
+        "vierOgen",
+        "waarom",
+        "waaromNiet"
       ]
     },
     {
@@ -592,19 +602,6 @@
       ]
     },
     {
-      "gelijkenis": 1,
-      "a": "server/kern/command/index.js",
-      "b": "server/kern/zaakcommand/beeld.js",
-      "domeinA": "kern/command",
-      "domeinB": "kern/zaakcommand",
-      "gedeeld": [
-        "niveau",
-        "score",
-        "vierOgen",
-        "waaromNiet"
-      ]
-    },
-    {
       "gelijkenis": 0.93,
       "a": "server/kern/foundationregistratie-uitgifte.js",
       "b": "server/kern/rtfos/vrijwilligers.js",
@@ -628,6 +625,24 @@
     },
     {
       "gelijkenis": 0.9,
+      "a": "server/kern/command/runbookcatalogus.js",
+      "b": "server/kern/zaakcommand/runbooks.js",
+      "domeinA": "kern/command",
+      "domeinB": "kern/zaakcommand",
+      "gedeeld": [
+        "actie",
+        "certificaat",
+        "klantImpact",
+        "naar",
+        "oorzaak",
+        "past",
+        "terugDraaibaar",
+        "type",
+        "veld"
+      ]
+    },
+    {
+      "gelijkenis": 0.9,
       "a": "server/kern/spellen/projectie.js",
       "b": "server/kern/spelprojectie-toegang.js",
       "domeinA": "kern/spellen",
@@ -642,23 +657,6 @@
         "scherm_historie",
         "sluitreden",
         "uitgiftes"
-      ]
-    },
-    {
-      "gelijkenis": 0.89,
-      "a": "server/kern/command/runbookcatalogus.js",
-      "b": "server/kern/zaakcommand/runbooks.js",
-      "domeinA": "kern/command",
-      "domeinB": "kern/zaakcommand",
-      "gedeeld": [
-        "actie",
-        "certificaat",
-        "klantImpact",
-        "oorzaak",
-        "past",
-        "terugDraaibaar",
-        "type",
-        "veld"
       ]
     },
     {
@@ -823,6 +821,18 @@
         "gratis",
         "nr",
         "prijsCenten"
+      ]
+    },
+    {
+      "gelijkenis": 0.6,
+      "a": "server/kern/rtgone-projecten.js",
+      "b": "server/kern/rtgone.js",
+      "domeinA": "kern/rtgone-projecten",
+      "domeinB": "kern/rtgone",
+      "gedeeld": [
+        "bewijs",
+        "herzieOp",
+        "voorWie"
       ]
     }
   ]

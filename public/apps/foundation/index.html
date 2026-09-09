@@ -175,6 +175,7 @@
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link rel="stylesheet" href="premium.css">
+<link rel="stylesheet" href="/shared/rtg-foundation-thuis-2026.css">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage">
@@ -236,9 +237,56 @@
   <div class="mini"><a id="pAnder">Ander gezin</a></div>
 </section>
 
-<!-- 3. De hub: ingelogd (rol-bewust) -->
+<div id="hWisBanner" class="wisbanner rtf-wis" hidden></div>
+
+<!-- 3. De rustige persoonlijke voorzijde. De volledige gereedschapswand blijft
+     erachter beschikbaar; dit is de dagelijkse ingang met echte gezinsdata. -->
+<section id="vVoorzijde" class="rtf-thuis" hidden aria-label="FoundationOS persoonlijk overzicht">
+  <header class="rtf-thuis-top">
+    <a class="rtf-thuis-merk" href="index.html" aria-label="RTG FoundationOS start"><span>RTG</span><small>FoundationOS</small></a>
+    <a class="rtf-thuis-profiel" href="#profielen" aria-label="Wissel van profiel"><span id="rtfVoorNaam">Mijn profiel</span><i id="rtfVoorInit" aria-hidden="true">RT</i></a>
+  </header>
+  <div class="rtf-thuis-inhoud">
+    <section class="rtf-thuis-paneel is-actief" data-rtf-paneel="vandaag" aria-labelledby="rtfVandaagKop">
+      <div class="rtf-thuis-hero">
+        <div class="rtf-thuis-herobeeld" role="img" aria-label="Mensen van verschillende generaties werken samen in de buurt"></div>
+        <div class="rtf-thuis-herotekst"><p>Vandaag in uw wereld</p><h1 id="rtfVandaagKop">Vandaag hoeft u het niet alleen te doen.</h1><span>Uw gezin, school, zorg en de mensen om u heen komen rustig samen.</span></div>
+      </div>
+      <div class="rtf-thuis-groet"><p id="rtfGroet">Goedendag</p><span id="rtfDatum"></span></div>
+      <div class="rtf-thuis-snel" aria-label="Veelgebruikte onderdelen">
+        <a href="agenda.html"><i data-glyf="agenda"></i><span>Agenda</span></a><a href="zorg.html"><i data-glyf="zorg"></i><span>Zorg</span></a><a href="campus.html"><i data-glyf="gebouw"></i><span>Campus</span></a><a href="contact.html"><i data-glyf="berichten"></i><span>Contact</span></a>
+      </div>
+      <div class="rtf-thuis-sectiekop"><div><small>Uw dag</small><h2>Wat er voor u klaarstaat</h2></div><a href="agenda.html">Hele agenda &rarr;</a></div>
+      <div id="rtfDagLijst" class="rtf-thuis-lijst" aria-live="polite"><p class="rtf-thuis-leeg">Uw dag wordt opgehaald.</p></div>
+      <a class="rtf-thuis-hulp" href="hulpwijzer.html"><i data-glyf="help"></i><span><small>Er hoeft niet eerst iets mis te gaan</small><b>Vraag hulp wanneer het u uitkomt</b></span><em>&rarr;</em></a>
+    </section>
+
+    <section class="rtf-thuis-paneel" data-rtf-paneel="groei" aria-labelledby="rtfGroeiKop" hidden>
+      <div class="rtf-thuis-intro rtf-groei-intro"><p>Mijn ontwikkeling</p><h1 id="rtfGroeiKop">Groeien op uw eigen tempo.</h1><span>Niet vergelijken met een ander. Alleen zien waar u staat, wat al lukt en welke stap bij u past.</span></div>
+      <article class="rtf-groei-kaart"><div class="rtf-groei-ring" aria-hidden="true"><span id="rtfGroeiInit">RT</span></div><div><small>Uw eigen route</small><h2 id="rtfGroeiFase">Uw ontwikkeling</h2><p id="rtfGroeiUitleg">FoundationOS zoekt alleen wat bij dit profiel hoort.</p></div></article>
+      <div id="rtfGroeiDoelen" class="rtf-groei-doelen" aria-live="polite"></div>
+      <div class="rtf-thuis-sectiekop"><div><small>Volgende stap</small><h2>Doe wat nu bij u past</h2></div></div>
+      <div id="rtfGroeiVolgende" class="rtf-thuis-lijst"></div>
+      <div class="rtf-thuis-belofte"><i data-glyf="schild"></i><p><b>U bent geen score.</b><span>Uw ontwikkeling is van u. Geen openbare ranglijst en geen besluit zonder een mens.</span></p></div>
+    </section>
+
+    <section class="rtf-thuis-paneel" data-rtf-paneel="kring" aria-labelledby="rtfKringKop" hidden>
+      <div class="rtf-thuis-intro rtf-kring-intro"><p>Mijn kring</p><h1 id="rtfKringKop">De juiste mensen, dichtbij.</h1><span>Zie wie bij uw gezin hoort en bepaal per band wat iemand mag zien. Niets wordt vanzelf gedeeld.</span></div>
+      <div class="rtf-kring-familie" id="rtfFamilie" aria-label="Gezinsprofielen"></div>
+      <div class="rtf-thuis-sectiekop"><div><small>Vertrouwde banden</small><h2>U houdt zelf de regie</h2></div><a href="mijnbanden.html">Beheren &rarr;</a></div>
+      <div id="rtfKringLijst" class="rtf-thuis-lijst" aria-live="polite"><p class="rtf-thuis-leeg">Uw kring wordt opgehaald.</p></div>
+      <a class="rtf-thuis-hulp rtf-kring-actie" href="contact.html"><i data-glyf="berichten"></i><span><small>Samen afstemmen</small><b>Stuur iemand in uw gezin een bericht</b></span><em>&rarr;</em></a>
+      <div class="rtf-thuis-belofte"><i data-glyf="passkeys"></i><p><b>Vertrouwen is precies.</b><span>Een band geeft nooit automatisch toegang. U kiest per onderdeel en kunt dat altijd terugnemen.</span></p></div>
+    </section>
+  </div>
+  <nav class="rtf-thuis-nav" aria-label="FoundationOS hoofdonderdelen">
+    <button type="button" class="is-actief" data-rtf-tab="vandaag"><i data-glyf="rtf"></i><span>Vandaag</span></button><button type="button" data-rtf-tab="groei"><i data-glyf="balans"></i><span>Ontwikkeling</span></button><button type="button" data-rtf-tab="kring"><i data-glyf="vrienden"></i><span>Mijn kring</span></button><button type="button" data-rtf-meer><i data-glyf="paneel"></i><span>Alle apps</span></button>
+  </nav>
+</section>
+
+<!-- 4. De volledige hub: ingelogd (rol-bewust) -->
 <section id="vHub" class="wrap" hidden>
-  <div id="hWisBanner" class="wisbanner" hidden></div>
+  <button class="knop grijs rtf-rustig-terug" id="rtfRustigTerug" type="button">&larr; Rustig overzicht</button>
   <div class="hero" style="padding-top:.4rem;">
     <div class="logo" id="hWelkom">Welkom terug</div>
     <div class="deck" id="hDeck"></div>
@@ -323,8 +371,8 @@
   </div>
   <div class="tiles">
     <a class="tile" href="leren.html" data-grp="kind tiener jong volw">
-      <div class="ic" data-glyf="diploma"></div><h2>Leren</h2>
-      <span class="cta">Open jouw leeromgeving →</span>
+      <div class="ic" data-glyf="diploma"></div><h2>Leren &amp; Groei</h2>
+      <span class="cta">Vandaag, groei en hulp op jouw tempo →</span>
     </a>
     <a class="kaart tile" href="mail.html" data-grp="kind tiener jong volw">
       <div class="ic"></div><h2>RTF Mail</h2>
@@ -394,6 +442,18 @@
 
   <h3 class="sec">Elke dag</h3>
   <div class="tiles">
+    <a class="tile" href="geld-later.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="balans"></div><h2>Geld &amp; Later</h2>
+      <span class="cta">Vandaag begrijpen, voor morgen bouwen →</span>
+    </a>
+    <a class="tile" href="samen-thuis.html" data-grp="mini kind tiener jong volw">
+      <div class="ic" data-glyf="maison"></div><h2>Samen Thuis</h2>
+      <span class="cta">Vandaag, het gezin en even regelen →</span>
+    </a>
+    <a class="tile" href="meedoen-ontdekken.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="gps"></div><h2>Meedoen &amp; Ontdekken</h2>
+      <span class="cta">Zie waar u dichtbij welkom bent →</span>
+    </a>
     <a class="tile" id="tileBoekje" href="babyboek.html" data-grp="mini volw">
       <div class="ic" data-glyf="camera"></div><h2>Fotoboekje</h2>
       <span class="cta">Elke dag een momentje →</span>
@@ -414,9 +474,9 @@
       <div class="ic" data-glyf="attenties"></div><h2>Verjaardagen</h2>
       <span class="cta">Wensen &amp; cadeaupotje →</span>
     </a>
-    <a class="tile" href="gezondheid.html" data-grp="kind tiener jong volw">
-      <div class="ic" data-glyf="zorg"></div><h2>Gezondheidsmaatje</h2>
-      <span class="cta">Medicijnen, afspraken &amp; groei →</span>
+    <a class="tile" href="gezondheid-welzijn.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="zorg"></div><h2>Gezondheid &amp; Welzijn</h2>
+      <span class="cta">Vandaag, uw ritme en zorg dichtbij →</span>
     </a>
     <a class="tile" href="vrienden.html" data-grp="kind tiener jong volw">
       <div class="ic" data-glyf="vrienden"></div><h2>Contacten</h2>
@@ -462,9 +522,9 @@
       <div class="ic" data-glyf="parasol"></div><h2>Even rust</h2>
       <span class="cta">→</span>
     </a>
-    <a class="tile" href="veilig.html" data-grp="kind tiener jong volw">
-      <div class="ic" data-glyf="schild"></div><h2>Veilig thuis</h2>
-      <span class="cta">→</span>
+    <a class="tile" href="veilig-vertrouwd.html" data-grp="kind tiener jong volw">
+      <div class="ic" data-glyf="schild"></div><h2>Veilig &amp; Vertrouwd</h2>
+      <span class="cta">Uw kring, keuzes en hulp →</span>
     </a>
     <a class="tile" href="mediawijs.html" data-grp="tiener jong">
       <div class="ic" data-glyf="wifi"></div><h2>Online wijs</h2>
@@ -598,6 +658,8 @@
      tegelwand, geen register. De profielen die hier langskomen zijn het
      gezinsregister van beheer.html, en daar zit de uitvoer al. -->
 <script src="/shared/uitvoer.js"></script>
+<script src="voorzijde-weergave.js"></script>
+<script src="voorzijde.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const api = Sessie.api;
@@ -632,7 +694,7 @@ function appGroep(){ try { const g = localStorage.getItem('rtf_app_groep'); retu
   document.querySelectorAll('.kick').forEach(k => { k.textContent = GROEP_APPS[ag].emoji + ' ' + GROEP_APPS[ag].naam; });
 })();
 
-function toon(id){ ['vWelkom','vProfielen','vHub'].forEach(v => $('#'+v).hidden = (v!==id)); }
+function toon(id){ ['vWelkom','vProfielen','vVoorzijde','vHub'].forEach(v => $('#'+v).hidden = (v!==id)); }
 function toonRol(profiel){
   const rol = profiel.rol;
   const kind = rol === 'kind';
@@ -695,6 +757,7 @@ $('#gCode').addEventListener('input', e=> e.target.value = e.target.value.toUppe
 
 // ---- start: bepaal welk scherm ----
 async function start(){
+  document.documentElement.removeAttribute('data-rtf-foundation-voor');
   const hash = location.hash;
   const s = Sessie.huidig();
   if (s && s.token && hash !== '#profielen'){
@@ -730,7 +793,13 @@ async function start(){
         }
         $('#hWisBanner').hidden=false;
       }
-      toon('vHub'); return;
+      if (hash === '#alle-apps') {
+        toon('vHub');
+      } else {
+        toon('vVoorzijde');
+        if (window.RTGFoundationVoorzijde) window.RTGFoundationVoorzijde.start(d, toon);
+      }
+      return;
     }
     Sessie.wisProfiel();
   }

@@ -130,13 +130,14 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/kantoor-tools.css?v=enterprise1" rel="stylesheet">
 <link href="/shared/rtg-vandaag-luxe.css" rel="stylesheet">
+<link href="/shared/rtg-deep-flows-2026.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-kantoor-tool="agenda" data-rtg-eigenvlak="onyx" data-rtg-world="living" data-rtg-vandaag-luxe="surface" data-rtg-vandaag-surface="agenda" data-rtg-vandaag-surface-title="Uw agenda" data-rtg-edge-2-context="native-header,duimbalk" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-living-flow" data-kantoor-tool="agenda" data-rtg-eigenvlak="onyx" data-rtg-world="living" data-rtg-vandaag-luxe="surface" data-rtg-vandaag-surface="agenda" data-rtg-vandaag-surface-title="Uw agenda" data-rtg-edge-2-context="native-header,duimbalk" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
 <script>try{if(window.self!==window.top)document.body.setAttribute('data-ios-uit','')}catch(e){}</script>
 <header>
   <a class="terug" href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
-  <span><span class="ey">RTG</span><h1>Agenda</h1></span>
+  <span><span class="ey">RTG · LivingOS</span><h1>Uw dag</h1></span>
   <span class="rij" style="margin-left:auto;">
     <button class="knop" id="icsBtn" type="button" title="Exporteer als .ics; opent in elke agenda ter wereld">Exporteer</button>
   </span>
@@ -148,8 +149,8 @@
 <div class="rtg-duimbalk"><button class="knop vol" id="nieuwBtn" type="button" data-hoofdactie>+ Afspraak</button></div>
 <main>
   <section class="kantoor-intro" aria-labelledby="agendaIntro">
-    <span class="ey">Kantoor · tijd &amp; besluit</span>
-    <div><h2 id="agendaIntro">Uw dag, zonder ruis.</h2><p>Afspraken, uitnodigingen en RTG-momenten in één beheerste tijdlijn.</p></div>
+    <span class="ey">Vandaag · samen gepland</span>
+    <div><h2 id="agendaIntro">Uw dag, zonder ruis.</h2><p>Afspraken, reistijd en de mensen die erbij horen in één rustige tijdlijn.</p></div>
   </section>
   <div id="agendaStatus" class="rtg-operation-status" role="status" aria-live="polite"></div>
   <div class="rahulbalk">
@@ -171,6 +172,12 @@
   <p class="stil h-mt80">Goud is wat uit RTG zelf komt (boekingen); dat leest de agenda alleen.
     Gestippeld is een uitnodiging die nog op uw ja of nee wacht. Herinneringen komen als seintje op het toestel.</p>
 </main>
+
+<nav class="rtg-deep-nav rtg-deep-nav--3" aria-label="LivingOS dagflow">
+  <a href="/apps/agenda.html" aria-current="page"><b>01</b>Uw dag</a>
+  <a href="/apps/attenties.html"><b>02</b>Aandacht</a>
+  <a href="/apps/vandaag.html"><b>03</b>Vandaag</a>
+</nav>
 
 <!-- de afspraak -->
 <div class="scrim" id="afScrim" role="dialog" aria-label="Afspraak">

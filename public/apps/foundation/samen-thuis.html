@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="nl" data-rtg-thema="foundation">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#103b39">
+<meta name="robots" content="noindex,nofollow">
+<title>Samen Thuis · FoundationOS</title>
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-deep-flows-2026.css" rel="stylesheet">
+<link href="premium.css" rel="stylesheet">
+<link href="/shared/rtg-foundation-samen-thuis-2026.css" rel="stylesheet">
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl foundation-samen-thuis" data-rtg-world="foundation" data-rtg-skin="heritage" data-session-helper="Sessie">
+<a class="st-skip" href="#stInhoud">Naar de inhoud</a>
+<div class="st-top" role="banner">
+  <a class="st-brand" href="index.html" aria-label="Naar FoundationOS">RTG</a>
+  <div class="st-world"><b>FoundationOS</b><span>Gezin · thuis · samen</span></div>
+  <a class="st-iconlink" href="mail.html" aria-label="Berichten"><i data-glyf="berichten"></i></a>
+</div>
+
+<main id="stInhoud" class="st-main" tabindex="-1">
+  <section class="st-view is-actief" data-st-view="vandaag" aria-labelledby="stVandaagTitel">
+    <div class="st-hero">
+      <div class="st-hero__beeld" aria-hidden="true"></div>
+      <div class="st-hero__copy">
+        <p class="st-kicker">Thuis is een team</p>
+        <h1 id="stVandaagTitel">Samen begint met overzicht.</h1>
+        <p>Iedereen weet wat vandaag telt.</p>
+        <button class="st-hoofdknop" type="button" id="stBekijkDag">Bekijk onze dag <i data-glyf="rechterhand"></i></button>
+      </div>
+    </div>
+    <div class="st-inhoud" id="stDagBegin">
+      <div class="st-heading"><div><p class="st-kicker">Eén rustige tijdlijn</p><h2>Vandaag</h2></div><a href="agenda.html">Hele agenda</a></div>
+      <div id="stVandaag" class="st-tijdlijn" aria-live="polite"><div class="st-leeg">De gezamenlijke dag wordt veilig opgehaald.</div></div>
+      <div class="st-snelroutes" aria-label="Gezinsroutes">
+        <a href="ochtend.html"><i data-glyf="oogst"></i><b>Ochtend</b><span>Rustig beginnen</span></a>
+        <a href="keuken.html"><i data-glyf="table"></i><b>Keuken</b><span>Menu en boodschappen</span></a>
+        <a href="klusjes.html"><i data-glyf="logboek"></i><b>Taken</b><span>Samen aanpakken</span></a>
+      </div>
+      <aside class="st-belofte"><i data-glyf="maison"></i><div><h2>Niet perfect, wel samen.</h2><p>Samen Thuis brengt bestaande gezinsafspraken bij elkaar. Het bepaalt niet hoe uw gezin hoort te leven.</p></div></aside>
+    </div>
+  </section>
+
+  <section class="st-view" data-st-view="gezin" aria-labelledby="stGezinTitel" hidden>
+    <div class="st-paginakop">
+      <button type="button" data-st-open="vandaag" aria-label="Terug"><i data-glyf="navigatie"></i></button>
+      <div><p class="st-kicker">Dichtbij wat ertoe doet</p><h1 id="stGezinTitel">Ons gezin.</h1><p>De dag van ieder gezinslid, zonder te hoeven rondvragen.</p></div>
+    </div>
+    <div class="st-inhoud st-inhoud--smal">
+      <div id="stDagen" class="st-dagen" aria-label="Kies een dag"></div>
+      <div id="stGezin" class="st-gezin" aria-live="polite"><div class="st-leeg">De gezinsleden worden opgehaald.</div></div>
+      <section class="st-paneel" aria-labelledby="stSamenTitel">
+        <div class="st-heading"><div><p class="st-kicker">Eén blik voor iedereen</p><h2 id="stSamenTitel">Samen geregeld</h2></div></div>
+        <div id="stGeregeld" class="st-geregeld"></div>
+      </section>
+      <p class="st-priveregel"><i data-glyf="schild"></i> U ziet alleen de gezinsinformatie waarvoor dit profiel toegang heeft. Er wordt geen locatie of aanwezigheid geraden.</p>
+    </div>
+  </section>
+
+  <section class="st-view" data-st-view="regelen" aria-labelledby="stRegelenTitel" hidden>
+    <div class="st-paginakop st-paginakop--regelen">
+      <button type="button" data-st-open="vandaag" aria-label="Terug"><i data-glyf="navigatie"></i></button>
+      <div><p class="st-kicker">Een kleine afspraak, een rustiger thuis</p><h1 id="stRegelenTitel">Even regelen.</h1><p>Wat wilt u samen afspreken?</p></div>
+    </div>
+    <div class="st-inhoud st-inhoud--smal">
+      <div class="st-keuzes" role="radiogroup" aria-label="Wat wilt u regelen?">
+        <button type="button" class="is-actief" data-st-soort="taak" role="radio" aria-checked="true"><i data-glyf="logboek"></i><b>Taak verdelen</b><span>Leg vast wie wat oppakt</span></button>
+        <button type="button" data-st-soort="hulp" role="radio" aria-checked="false"><i data-glyf="vrienden"></i><b>Hulp vragen</b><span>Laat het gezin meedenken</span></button>
+        <button type="button" data-st-soort="herinnering" role="radio" aria-checked="false"><i data-glyf="agenda"></i><b>Herinnering maken</b><span>Zet iets op de gezamenlijke dag</span></button>
+      </div>
+      <form id="stVorm" class="st-vorm">
+        <p class="st-kicker" id="stVormKicker">Taak verdelen</p>
+        <h2 id="stVormTitel">Zet samen een taak op de dag.</h2>
+        <label for="stWat" id="stWatLabel">Wat moet er gebeuren?</label>
+        <input id="stWat" maxlength="80" placeholder="Bijvoorbeeld boodschappen doen" required>
+        <label for="stWie">Voor wie?</label>
+        <select id="stWie"><option value="">Het hele gezin</option></select>
+        <div id="stWanneerVelden" class="st-wanneer">
+          <label>Wanneer?<span><input id="stDatum" type="date" required><input id="stTijd" type="time" aria-label="Tijd, mag leeg"></span></label>
+        </div>
+        <p id="stFout" class="st-fout" role="alert"></p>
+        <button class="st-hoofdknop st-hoofdknop--breed" id="stBewaar" type="submit">Zet op onze dag <i data-glyf="rechterhand"></i></button>
+      </form>
+      <p id="stBevestiging" class="st-bevestiging" role="status" hidden></p>
+      <p class="st-priveregel"><i data-glyf="schild"></i> Alleen zichtbaar voor uw gezin. Hulpvragen worden als gezinsbericht bewaard; er wordt niets buiten het gezin verstuurd.</p>
+    </div>
+  </section>
+</main>
+
+<nav class="st-nav" aria-label="Samen Thuis navigatie">
+  <button type="button" class="is-actief" data-st-tab="vandaag" aria-current="page"><i data-glyf="maison"></i><span>Vandaag</span></button>
+  <button type="button" data-st-tab="gezin"><i data-glyf="vrienden"></i><span>Gezin</span></button>
+  <button type="button" class="st-plus" data-st-tab="regelen" aria-label="Even regelen"><b aria-hidden="true">+</b><span>Regelen</span></button>
+  <a href="mail.html"><i data-glyf="berichten"></i><span>Berichten</span></a>
+  <a href="index.html#alle-apps"><i data-glyf="paneel"></i><span>Meer</span></a>
+</nav>
+
+<script src="/shared/uitvoer.js"></script>
+<script src="sessie.js"></script>
+<script src="samen-thuis-weergave.js"></script>
+<script src="samen-thuis.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="samen.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="premium.js" defer></script>
+</body>
+</html>

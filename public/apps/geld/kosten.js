@@ -60,13 +60,15 @@
       var vb = null, gr = null;
       try { vb = await w.Geld.api('/api/kosten/vooruitblik'); } catch (e) { vb = null; }
       try { gr = await w.Geld.api('/api/kosten/grens'); } catch (e) { gr = null; }
+      if (!$('#ksWrap')) return;
       $('#ksHoofd').innerHTML = K.hoofd(beeld, vb, beeld.grens, 'lid');
       $('#ksRegels').innerHTML = K.regels(beeld);
       $('#ksBetaalt').innerHTML = K.betaalt(beeld);
       $('#ksGrens').innerHTML = gr ? grensHtml(gr) : '<p class="stil">De grens is niet geladen.</p>';
       $('#ksNiet').innerHTML = K.niet(beeld);
     } catch (e) {
-      $('#ksHoofd').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: K.esc(e.message) }));
+      var vak = $('#ksHoofd');
+      if (vak) vak.innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: K.esc(e.message) }));
     }
   }
 

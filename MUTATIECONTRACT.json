@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-09T10:05:52.312Z",
-  "commit": "c40048b2",
+  "op": "2026-09-08T19:18:19.760Z",
+  "commit": "a0e7689d1",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4869,
-  "geclassificeerd": 4869,
+  "totaal": 4870,
+  "geclassificeerd": 4870,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3251,
-   "NOT_APPLICABLE": 1128,
-   "PROTECTED": 370,
-   "INTENTIONALLY_NON_IDEMPOTENT": 120
+   "BLOCKED_BY_TEST_FIXTURE": 3253,
+   "NOT_APPLICABLE": 1127,
+   "PROTECTED": 373,
+   "INTENTIONALLY_NON_IDEMPOTENT": 117
   },
-  "vastgesteldDoorMens": 1662,
-  "afgeleidDoorScript": 3207,
+  "vastgesteldDoorMens": 1661,
+  "afgeleidDoorScript": 3209,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4009,
+   "AUTHENTICATED": 4010,
    "PUBLIC": 122,
    "OBJECT_SCOPED": 718,
    "(niet af te leiden -- vraagt een verklaring)": 4,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 88,
    "kale ronde: geen uitspraak": 4512,
-   "niet gemeten": 140
+   "niet gemeten": 141
   },
   "voorstellen": {},
   "metingVan": "2026-09-03T11:51:23.232Z"
@@ -29432,6 +29432,69 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "wonen.onderhoud.lijst",
+   "route": "POST /api/home/onderhoud",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "wonen.onderhoud.annuleer",
+   "route": "POST /api/home/onderhoud/annuleer",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "wonen.onderhoud.meld",
+   "route": "POST /api/home/onderhoud/meld",
+   "semantiek": {
+    "klasse": "compenseerbaar"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "home.scene.ai",
    "route": "POST /api/home/scene/ai",
    "semantiek": {
@@ -54568,69 +54631,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "bank.handtekening.bevestigen",
-   "route": "POST /api/office/bank/handtekening/bevestig",
-   "semantiek": {
-    "klasse": "hooguitEens"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "kluisAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "bank.handtekening.intrekken",
-   "route": "POST /api/office/bank/handtekening/intrek",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "nietIdempotent",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "kluisAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "bank.handtekening.lezen",
-   "route": "POST /api/office/bank/handtekening/open",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "kluisAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "office.bank.herstel",
    "route": "POST /api/office/bank/herstel",
    "semantiek": {
@@ -54658,10 +54658,10 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "bank.incasso.aanvragen",
+   "mutatieId": "office.bank.incasso",
    "route": "POST /api/office/bank/incasso",
    "semantiek": {
-    "klasse": "nietHerhaalbaar"
+    "klasse": "onbekend"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -54669,7 +54669,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "kluisAuth"
+     "officeAuth"
     ]
    },
    "bewijs": {
@@ -54679,8 +54679,8 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
-   "herkomst": "mens",
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -54750,7 +54750,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "kluisAuth"
+     "officeAuth"
     ]
    },
    "bewijs": {
@@ -55209,7 +55209,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "kluisAuth"
+     "officeAuth"
     ]
    },
    "bewijs": {
@@ -55236,7 +55236,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "kluisAuth"
+     "officeAuth"
     ]
    },
    "bewijs": {
@@ -55252,10 +55252,10 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "bank.rood.aanvragen",
+   "mutatieId": "office.bank.rekening.rood",
    "route": "POST /api/office/bank/rekening/rood",
    "semantiek": {
-    "klasse": "nietHerhaalbaar"
+    "klasse": "onbekend"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -55263,7 +55263,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "kluisAuth"
+     "officeAuth"
     ]
    },
    "bewijs": {
@@ -55273,8 +55273,8 @@
     "grond": null,
     "hindernis": "Kies tussen 0 en 50.000 euro."
    },
-   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
-   "herkomst": "mens",
+   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "herkomst": "afgeleid",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -55317,7 +55317,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "kluisAuth"
+     "officeAuth"
     ]
    },
    "bewijs": {
@@ -56391,7 +56391,7 @@
     "uitHandler": null,
     "bedoeld": "AUTHENTICATED",
     "bewakers": [
-     "kluisAuth"
+     "officeAuth"
     ]
    },
    "bewijs": {
@@ -64503,27 +64503,6 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "stuur.herkomstschaduw.lezen",
-   "route": "POST /api/office/stuur/herkomstschaduw",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "boardroomAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -88976,6 +88955,48 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtgone.project.bewijs",
+   "route": "POST /api/rtgone/project/bewijs",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rtgone.project.oplever",
+   "route": "POST /api/rtgone/project/oplever",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

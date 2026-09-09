@@ -1,0 +1,93 @@
+:root{
+  --mv-nacht:#06131d;
+  --mv-diep:#020a10;
+  --mv-paneel:#0a1b27;
+  --mv-goud:#d8ac69;
+  --mv-goud-zacht:#f0cb94;
+  --mv-ivoor:#eee1d0;
+  --mv-stil:#aeb7b7;
+  --mv-lijn:rgba(216,172,105,.34);
+  --mv-wijn:#7a1830;
+  --mv-groen:#7c9a83;
+  --mv-rood:#de6a67;
+}
+body.magnaat-voorzijde-actief,
+body.magnaat-voorzijde-actief.rtg-edge-host{overflow-x:hidden;background:var(--mv-diep);padding:0!important}
+body.magnaat-voorzijde-actief>.app{display:none}
+body.magnaat-voorzijde-actief>#rtgGanglijn,
+body.magnaat-voorzijde-actief>.rtg-spring{display:none!important}
+.magnaat-voorzijde[hidden]{display:none!important}
+.magnaat-voorzijde{
+  min-height:100dvh;
+  padding:0 0 calc(6.4rem + env(safe-area-inset-bottom));
+  background:
+    radial-gradient(circle at 50% -8rem,rgba(36,83,110,.42),transparent 32rem),
+    linear-gradient(180deg,var(--mv-nacht),var(--mv-diep));
+  color:var(--mv-ivoor);
+  font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.magnaat-voorzijde main{min-width:0;padding:0}
+.magnaat-voorzijde *{box-sizing:border-box}
+.magnaat-voorzijde button,.magnaat-voorzijde a{-webkit-tap-highlight-color:transparent}
+.mv-binnen{width:min(100%,46rem);margin:0 auto;padding:env(safe-area-inset-top) .9rem 2rem}
+.mv-kop{height:5.3rem;display:flex;align-items:center;gap:.75rem;padding:.75rem .25rem;border-bottom:1px solid rgba(216,172,105,.16)}
+.mv-merk{display:flex;align-items:baseline;gap:.8rem;color:var(--mv-ivoor);text-decoration:none;white-space:nowrap}
+.mv-merk b{font:500 2rem/1 'Bodoni Moda',Georgia,serif;color:var(--mv-goud)}
+.mv-merk span{font-size:1rem}
+.mv-kopruimte{flex:1}
+.mv-profiel{width:2.55rem;height:2.55rem;display:grid;place-items:center;border:1px solid var(--mv-goud);border-radius:50%;color:var(--mv-goud-zacht);text-decoration:none;background:rgba(216,172,105,.08);font-size:.78rem;font-weight:700}
+.mv-scherm{animation:mv-in .24s ease}
+.mv-scherm[hidden]{display:none}
+@keyframes mv-in{from{opacity:0;transform:translateY(.35rem)}to{opacity:1;transform:none}}
+.mv-veilig{width:max-content;max-width:100%;display:flex;align-items:center;gap:.45rem;margin:1.05rem 0 .9rem;padding:.42rem .65rem;border:1px solid rgba(124,154,131,.54);border-radius:0;color:#c1d6c6;background:rgba(124,154,131,.09);font-size:.62rem;font-weight:750;letter-spacing:.1em;text-transform:uppercase}
+.mv-veilig:before{content:'\2713';width:1.15rem;height:1.15rem;display:grid;place-items:center;border:1px solid currentColor;border-radius:50%;font-size:.65rem}
+.mv-hero h1,.mv-titel,.mv-resultaatkop,.mv-kaart h2,.mv-sectie h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;letter-spacing:-.035em}
+.mv-hero h1{max-width:11ch;margin:.3rem 0 .55rem;font-size:clamp(2.65rem,12vw,4.75rem);line-height:.92}
+.mv-hero>p{max-width:38rem;margin:0 0 1rem;color:var(--mv-stil);font-size:.87rem;line-height:1.5}
+.mv-fotokaart{position:relative;isolation:isolate;min-height:18rem;margin:1.2rem 0 1.1rem;padding:1rem;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;border:1px solid var(--mv-lijn);background:#09141c;box-shadow:0 1.2rem 3rem rgba(0,0,0,.3)}
+.mv-fotokaart:before{content:'';position:absolute;inset:0;z-index:-2;background:url('/images/travelos/hotel-executive.jpg') center/cover no-repeat;filter:saturate(.82) brightness(.72)}
+.mv-fotokaart:after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(2,10,16,.12),rgba(2,10,16,.42) 44%,#04101a 100%)}
+.mv-kaartlabel{position:absolute;left:.9rem;top:.9rem;display:flex;align-items:center;gap:.42rem;padding:.4rem .62rem;border:1px solid var(--mv-lijn);border-radius:0;background:rgba(3,13,20,.72);color:var(--mv-goud-zacht);font-size:.65rem;font-weight:700;backdrop-filter:blur(8px)}
+.mv-fotokaart h2{margin:0;font-size:1.75rem;line-height:1.03;text-shadow:0 2px 18px #000}
+.mv-fotokaart>p{margin:.35rem 0 .7rem;color:#d8d0c5;font-size:.75rem}
+.mv-voortgang{display:grid;grid-template-columns:1fr auto;gap:.8rem;align-items:center}
+.mv-meter{height:3px;background:rgba(255,255,255,.15);overflow:hidden}.mv-meter i{display:block;width:40%;height:100%;background:linear-gradient(90deg,var(--mv-groen),var(--mv-goud))}
+.mv-voortgang small{color:var(--mv-stil);font-size:.68rem}
+.mv-knop{min-height:3.15rem;border:1px solid var(--mv-lijn);border-radius:0;padding:.72rem 1rem;display:flex;align-items:center;justify-content:center;gap:.55rem;background:transparent;color:var(--mv-goud-zacht);font:700 .82rem/1 Inter,sans-serif;text-decoration:none;cursor:pointer}
+.mv-knop--goud{background:linear-gradient(135deg,#e3b872,#c7944f);border-color:#e4bd7e;color:#171109;box-shadow:inset 0 1px rgba(255,255,255,.34),0 .7rem 1.8rem rgba(0,0,0,.18)}
+.mv-knop--wijn{border-color:#a62a49;color:#f4d5dc;background:rgba(122,24,48,.1)}
+.mv-knop:focus-visible,.mv-keuze:focus-visible,.mv-navigatie button:focus-visible,.mv-terug:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.mv-fotokaart .mv-knop{margin-top:.75rem;align-self:flex-end;min-width:9.5rem}
+.mv-sectiekop{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin:.95rem .15rem .55rem}
+.mv-sectiekop h2{margin:0;font:500 1.15rem/1.15 'Bodoni Moda',Georgia,serif}.mv-sectiekop button{border:0;background:transparent;color:var(--mv-goud);font-size:.68rem;cursor:pointer}
+.mv-uitdagingen{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem}
+.mv-uitdaging{min-width:0;min-height:8rem;padding:.8rem;text-align:left;border:1px solid var(--mv-lijn);border-radius:0;background:linear-gradient(145deg,rgba(12,34,48,.92),rgba(4,15,24,.94));color:var(--mv-ivoor);cursor:pointer}
+.mv-uitdaging i{width:2.15rem;height:2.15rem;display:grid;place-items:center;margin-bottom:.55rem;border:1px solid var(--mv-lijn);border-radius:50%;color:var(--mv-goud);font-style:normal}.mv-uitdaging b{display:block;font-size:.8rem;line-height:1.25}.mv-uitdaging small{display:block;margin-top:.3rem;color:var(--mv-stil);font-size:.62rem;line-height:1.35}.mv-uitdaging em{display:block;width:max-content;margin-top:.6rem;padding:.2rem .42rem;border:1px solid var(--mv-lijn);border-radius:0;color:var(--mv-goud-zacht);font:normal .56rem/1.2 Inter,sans-serif}
+.mv-cijfers{display:grid;grid-template-columns:repeat(3,1fr);margin-top:.7rem;border:1px solid var(--mv-lijn);background:rgba(8,25,36,.84)}
+.mv-cijfer{min-width:0;padding:.75rem .35rem;text-align:center;border-right:1px solid var(--mv-lijn)}.mv-cijfer:last-child{border:0}.mv-cijfer small{display:block;color:var(--mv-stil);font-size:.56rem}.mv-cijfer b{display:block;margin-top:.25rem;color:var(--mv-ivoor);font:500 1.18rem/1.1 'Bodoni Moda',Georgia,serif}.mv-cijfer em{display:block;margin-top:.2rem;color:var(--mv-goud);font:normal .48rem/1 Inter,sans-serif}
+.mv-verdieping{width:100%;margin-top:.75rem}
+.mv-boven{display:flex;align-items:center;gap:.65rem;min-height:4.4rem;border-bottom:1px solid rgba(216,172,105,.18)}
+.mv-terug{width:2.5rem;height:2.5rem;border:0;background:transparent;color:var(--mv-ivoor);font-size:1.5rem;cursor:pointer}.mv-boventitel{flex:1;text-align:center;font-family:'Bodoni Moda',Georgia,serif;font-size:1.08rem}.mv-meer{width:2.5rem;height:2.5rem;border:0;background:transparent;color:var(--mv-ivoor);font-size:1.25rem;cursor:pointer}
+.mv-oog{display:block;margin:1.2rem 0 .45rem;color:var(--mv-goud);font-size:.66rem;font-weight:750;letter-spacing:.13em;text-transform:uppercase}
+.mv-titel{max-width:13ch;margin:0 0 .9rem;font-size:clamp(2.35rem,10vw,4rem);line-height:.94}
+.mv-bericht{display:grid;grid-template-columns:2.7rem 1fr;gap:.65rem;padding:.8rem;border:1px solid var(--mv-lijn);background:linear-gradient(145deg,rgba(10,31,44,.9),rgba(4,15,23,.94))}
+.mv-avatar{width:2.7rem;height:2.7rem;display:grid;place-items:center;border:1px solid var(--mv-goud);border-radius:50%;color:var(--mv-goud-zacht);background:rgba(216,172,105,.08);font-size:.72rem;font-weight:750}.mv-bericht b{display:block;font-size:.8rem}.mv-bericht small{display:block;margin:.12rem 0 .3rem;color:var(--mv-stil);font-size:.63rem}.mv-bericht p{margin:0;color:#d6d1c9;font-size:.74rem;line-height:1.42}
+.mv-sectie{margin-top:1rem}.mv-sectie h2{margin:0 0 .55rem;font-size:1.15rem}.mv-speelruimte{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem}.mv-feit{padding:.6rem .4rem;border:1px solid var(--mv-lijn);text-align:center;background:rgba(8,24,35,.75)}.mv-feit small{display:block;color:var(--mv-stil);font-size:.53rem}.mv-feit b{display:block;margin-top:.2rem;font-size:.75rem;font-weight:600}
+.mv-keuzes{display:grid;gap:.48rem}.mv-keuze{width:100%;min-height:4rem;padding:.7rem;display:grid;grid-template-columns:2rem 1fr auto;gap:.6rem;align-items:center;text-align:left;border:1px solid rgba(216,172,105,.25);border-radius:0;background:rgba(7,22,32,.86);color:var(--mv-ivoor);cursor:pointer}.mv-keuze:before{content:'';width:1.1rem;height:1.1rem;margin:auto;border:1px solid #78838a;border-radius:50%}.mv-keuze[aria-pressed="true"]{border-color:var(--mv-goud);background:linear-gradient(90deg,rgba(216,172,105,.18),rgba(7,22,32,.88))}.mv-keuze[aria-pressed="true"]:before{background:var(--mv-goud);box-shadow:inset 0 0 0 3px #1b2021;border-color:var(--mv-goud)}.mv-keuze b{display:block;font-size:.78rem}.mv-keuze small{display:block;margin-top:.18rem;color:var(--mv-stil);font-size:.62rem}.mv-keuze i{color:var(--mv-goud);font-style:normal}
+.mv-grens{display:flex;gap:.55rem;align-items:flex-start;margin:.72rem 0;padding:.7rem;border:1px solid rgba(124,154,131,.34);color:#bdc9c3;background:rgba(124,154,131,.06);font-size:.62rem;line-height:1.42}.mv-grens:before{content:'\2713';flex:0 0 auto;color:#a9cbb1}
+.mv-acties{display:grid;gap:.5rem;margin-top:.7rem}
+.mv-resultaatkop{max-width:12ch;margin:1.25rem 0 1rem;font-size:clamp(2.35rem,10vw,4rem);line-height:.94}
+.mv-score{display:flex;align-items:center;gap:1rem;padding-bottom:1rem;border-bottom:1px solid rgba(216,172,105,.2)}.mv-score-ring{width:5.4rem;height:5.4rem;flex:0 0 auto;display:grid;place-items:center;border:6px solid var(--mv-groen);border-left-color:rgba(124,154,131,.3);border-radius:50%;font:500 2rem/1 'Bodoni Moda',Georgia,serif}.mv-score b{display:block;font-family:'Bodoni Moda',Georgia,serif;font-size:1.25rem;font-weight:500}.mv-score small{display:block;margin-top:.2rem;color:var(--mv-stil);font-size:.68rem}
+.mv-impact{border:1px solid var(--mv-lijn);background:rgba(7,22,32,.82)}.mv-impactregel{display:grid;grid-template-columns:1fr auto;gap:.65rem;padding:.8rem;border-bottom:1px solid rgba(216,172,105,.2);font-size:.72rem}.mv-impactregel:last-child{border:0}.mv-impactregel b{font-weight:600}.mv-impactregel span{color:#a9cfb1;text-align:right}.mv-impactregel span.is-kost{color:#f07876}
+.mv-uitleg{margin:.65rem 0 0;color:#d0cbc3;font-size:.76rem;line-height:1.55}
+.mv-leren{display:grid;gap:.45rem}.mv-leerregel{display:flex;gap:.6rem;align-items:center;padding:.68rem;border:1px solid rgba(216,172,105,.24);font-size:.7rem;background:rgba(7,22,32,.76)}.mv-leerregel:before{content:'\2713';width:1.45rem;height:1.45rem;display:grid;place-items:center;border:1px solid var(--mv-groen);border-radius:50%;color:#b4d1b9;font-size:.7rem}
+.mv-open-diep{width:100%;margin-top:1rem}
+.mv-navigatie{position:fixed;z-index:45;left:50%;bottom:max(.55rem,env(safe-area-inset-bottom));transform:translateX(-50%);width:min(calc(100% - 1rem),42rem);display:grid;grid-template-columns:repeat(4,1fr);padding:.5rem;border:1px solid var(--mv-lijn);background:rgba(2,11,17,.96);box-shadow:0 .8rem 2.5rem #000;backdrop-filter:blur(16px)}
+.mv-navigatie button{min-width:0;min-height:3.25rem;border:0;background:transparent;color:var(--mv-stil);display:grid;place-items:center;gap:.22rem;cursor:pointer;font-size:.58rem}.mv-navigatie button i{font:normal 1.05rem/1 Inter,sans-serif;color:var(--mv-goud)}.mv-navigatie button[aria-current="page"]{color:var(--mv-goud-zacht)}
+.mv-navigatie button[aria-current="page"]:after{content:'';width:1.2rem;height:2px;background:var(--mv-goud)}
+.mv-terugknop{display:flex;align-items:center;gap:.55rem;width:max-content;margin:.6rem 0 0;border:0;background:transparent;color:var(--mv-goud-zacht);font-size:.72rem;cursor:pointer}
+@media(min-width:700px){
+  .mv-binnen{padding-left:1.5rem;padding-right:1.5rem}.mv-fotokaart{min-height:23rem}.mv-fotokaart h2{font-size:2.25rem}.mv-uitdagingen{grid-template-columns:repeat(3,1fr)}.mv-uitdaging[data-mv-uitdaging="2"]{display:block}.mv-acties{grid-template-columns:1fr 1fr}.mv-resultaat-layout{display:grid;grid-template-columns:.86fr 1.14fr;gap:1rem;align-items:start}.mv-resultaat-layout .mv-sectie:first-child{margin-top:0}
+}
+@media(max-width:699px){.mv-uitdaging[data-mv-uitdaging="2"]{display:none}}
+@media(prefers-reduced-motion:reduce){.mv-scherm{animation:none}.magnaat-voorzijde *{scroll-behavior:auto!important;transition:none!important}}

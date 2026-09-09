@@ -25,7 +25,7 @@
     "kernGedeeld": 231,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 645,
+    "toetsenNietGemeten": 672,
     "toetsenOngevoeligPct": 0,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -58,13 +58,42 @@
     "wekkersZonderTrede": 0,
     "wekkersOnverklaard": 0,
     "meetleerBlind": 8,
-    "registersUitVuileBoom": 3,
+    "registersUitVuileBoom": 4,
     "laatSpoorVerdacht": 3,
     "rollbackUitzonderingen": 1,
     "faalproefGezakt": 24,
     "appwerktDefecten": 0
   },
   "notities": [
+    {
+      "datum": "2026-09-08",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1557,
+      "meter": "kernBreedte 1557 -> 1558",
+      "reden": "LivingOS Wonen voegt woningOnderhoud als één expliciete routezichtbare kern toe. De drie routes blijven achter de bestaande ledenpoort en de eigencollectiegrens; test/homekit.test.js meet melden, teruglezen en intrekken.",
+      "waarheen": "server/kern/woningonderhoud.js en test/homekit.test.js; de kern blijft één afgebakende woningonderhoudsdeur"
+    },
+    {
+      "datum": "2026-09-08",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 645,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 645 -> 672",
+      "reden": "De vier RTG-werelden voegen 27 gerichte scherm-, route- en integratietoetsen toe die de volledige lokale schermsuite en projectcheck halen, maar waar de mutatiemotor nog niet langs is geweest. Dit is instrumentdekking en geen groenverklaring over ongemeten mutaties.",
+      "waarheen": "laat de mutatiemotor precies over de 27 nieuwe toetsbestanden lopen en leg MUTATIES.json opnieuw uit een schone commit vast"
+    },
+    {
+      "datum": "2026-09-08",
+      "soort": "schuld",
+      "sleutel": "registersUitVuileBoom",
+      "van": 3,
+      "vervalt": "2026-12-15",
+      "meter": "registersUitVuileBoom 3 -> 4",
+      "reden": "Na de samenvoeging met de nieuwste hoofdlijn blijven vier oudere registers met een vuile of ontbrekende commitstempel over: BEPROEVING, WAAROM, ISOLATIESCHADUW en SCHERMMUTATIES. De twee door deze wereldronde geraakte registers, VINDBAAR en TEKSTOPPERVLAK, zijn afzonderlijk vanuit een schone commit herstempeld.",
+      "waarheen": "draai de vier genoemde meetinstrumenten opnieuw vanuit een schone boom; deze normwijziging verbergt geen nieuw register van de wereldschermen"
+    },
     {
       "datum": "2026-09-06",
       "soort": "schuld",

@@ -25,13 +25,15 @@
   }
 
   function vul(sel, lijst) {
-    $(sel).innerHTML = (lijst || []).length ? lijst.map(rij).join('') : '<p class="stil">Nog leeg.</p>';
+    var vak = $(sel);
+    if (vak) vak.innerHTML = (lijst || []).length ? lijst.map(rij).join('') : '<p class="stil">Nog leeg.</p>';
   }
 
   async function laad() {
     var Geld = w.Geld;
     try {
       var r = await Geld.api('/api/wallet');
+      if (!$('#waWrap')) return; // de gebruiker koos intussen een andere stand
       items = r.items || [];
       var p = r.perSoort || {};
       vul('#waLijstPas', p.pas); vul('#waLijstTicket', p.ticket); vul('#waLijstSleutel', p.sleutel);
@@ -41,9 +43,11 @@
       $('#waMuntPrijs').textContent = 'Munten kosten ' + Geld.euro(Math.round(r.muntPrijs * 100)) +
         ' per stuk (demo). Kopen verhoogt het saldo, inwisselen verlaagt het.';
     } catch (e) {
-      $('#waFout').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: Geld.esc(e.message) }));
+      var foutvak = $('#waFout');
+      if (!foutvak) return;
+      foutvak.innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: Geld.esc(e.message) }));
       var leeg = ['#waLijstPas', '#waLijstTicket', '#waLijstSleutel', '#waLijstMunt', '#waLijstKaart'];
-      for (var i = 0; i < leeg.length; i++) $(leeg[i]).innerHTML = '<p class="stil">Dit deel laadde niet. Ververs de pagina; blijft het staan, dan is de bron even niet bereikbaar.</p>';
+      for (var i = 0; i < leeg.length; i++) vul(leeg[i], []);
     }
   }
 

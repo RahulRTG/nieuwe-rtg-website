@@ -50,6 +50,11 @@
   /* ---- de kaart van één stuk ---- */
   function kaart(s) {
     var k = el('div', 'stuk' + (s.mijn ? ' mijn' : ''));
+    if (s.poster) {
+      var beeld = el('img', 'media-beeld');
+      beeld.src = s.poster; beeld.alt = '';
+      k.appendChild(beeld);
+    }
     k.appendChild(el('div', 'vorm', s.vormNaam));
     k.appendChild(el('div', 't', s.titel));
     var m = el('div', 'm');
@@ -168,7 +173,9 @@
       ey: 'RTG Media', titel: d.leeg.titel, wat: d.leeg.wat,
       waarom: d.leeg.waarom, stappen: d.leeg.stappen
     }));
-    d.stukken.forEach(function (s) { doos.appendChild(kaart(s)); });
+    d.stukken.forEach(function (s, i) {
+      var k = kaart(s); if (i === 0) k.classList.add('media-feature'); doos.appendChild(k);
+    });
     $('#einde').textContent = d.einde;
 
     var b = $('#buiten'); b.textContent = '';

@@ -208,9 +208,10 @@
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<link href="/shared/rtg-winkel-2026.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-shop-flow rtg-shop-discover" data-rtg-world="living" data-rtg-eigenvlak="bordeaux" data-rtg-skin="heritage">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
   <div class="os-switcher__links">
@@ -222,10 +223,18 @@
   <span class="os-switcher__state">Kern verbonden</span>
 </div>
 <header>
+  <a class="shop-brand" href="/apps/rtg.html"><span>RTG</span><b>LivingOS</b><small>Winkel · thuis · vertrouwd</small></a>
   <a class="terug" href="/apps/app.html">← App</a>
-  <div><div class="ey">Alleen voor leden</div><h1>De RTG Mall</h1></div>
 </header>
 <main id="main">
+  <section class="shop-hero" aria-labelledby="shopKop">
+    <div class="shop-hero-copy">
+      <p class="shop-ey">Alleen voor leden</p>
+      <h1 id="shopKop">Vinden wat bij u past. Zonder eindeloos zoeken.</h1>
+      <p>Producten, diensten en plekken komen samen in één rustige zoeklaag. U ziet steeds wie het aanbiedt en waar u bevestigt.</p>
+      <a class="shop-primary" href="#zoek">Verder ontdekken</a>
+    </div>
+  </section>
   <!-- De vindlaag: eerst waar je bent en wat je zoekt, pas daarna wie het aanbiedt. -->
   <section class="vind" aria-label="Zoeken in de Mall">
     <div class="zoekrij rtg-duimeind">
@@ -1581,5 +1590,6 @@ $('#lezerTerug').addEventListener('click', () => $('#lezer').classList.remove('o
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="/apps/winkel-voorzijde.js"></script>
 </body>
 </html>

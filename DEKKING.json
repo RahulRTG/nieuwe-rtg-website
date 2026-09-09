@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-09-09T10:04:14.472Z",
-    "commit": "4d770876",
-    "routesToen": 4987
+    "op": "2026-09-08T19:57:32.004Z",
+    "commit": "da84d3639",
+    "routesToen": 4988
   },
   "aangeraakt": [
     "GET /",
@@ -1154,6 +1154,9 @@
     "POST /api/home/merk/ontkoppel",
     "POST /api/home/merk/verbind",
     "POST /api/home/merken",
+    "POST /api/home/onderhoud",
+    "POST /api/home/onderhoud/annuleer",
+    "POST /api/home/onderhoud/meld",
     "POST /api/home/scene/ai",
     "POST /api/home/scene/bewaar",
     "POST /api/home/scene/start",
@@ -2090,9 +2093,6 @@
     "POST /api/office/bank/bevoegdheid",
     "POST /api/office/bank/draai",
     "POST /api/office/bank/gezond",
-    "POST /api/office/bank/handtekening/bevestig",
-    "POST /api/office/bank/handtekening/intrek",
-    "POST /api/office/bank/handtekening/open",
     "POST /api/office/bank/herstel",
     "POST /api/office/bank/incasso",
     "POST /api/office/bank/instellingen",
@@ -2482,7 +2482,6 @@
     "POST /api/office/studio/specsheet",
     "POST /api/office/studio/verwijder",
     "POST /api/office/studio/zet",
-    "POST /api/office/stuur/herkomstschaduw",
     "POST /api/office/techniek",
     "POST /api/office/techniek/integraties",
     "POST /api/office/techniek/integraties/besluit",
@@ -3409,6 +3408,8 @@
     "POST /api/rtgone/goedkeuring/beslis",
     "POST /api/rtgone/intentie",
     "POST /api/rtgone/overdracht",
+    "POST /api/rtgone/project/bewijs",
+    "POST /api/rtgone/project/oplever",
     "POST /api/rtgone/project/taak",
     "POST /api/rtgone/project/van-mail",
     "POST /api/rtgone/rol/geef",

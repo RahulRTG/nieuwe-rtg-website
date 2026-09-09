@@ -93,9 +93,10 @@
 <script src="/shared/media.js"></script>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/rtg-worlds-2026.css" rel="stylesheet">
+<link href="/shared/rtg-experience-2026.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-eigenvlak="onyx" data-rtg-world="living" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-music-experience" data-rtg-eigenvlak="onyx" data-rtg-world="living" data-rtg-edge-2-state="focus" data-rtg-edge-2-auto="true" data-rtg-skin="heritage">
 <div class="os-switcher" role="navigation" aria-label="De vier RTG-werelden">
   <a class="os-switcher__brand" href="/apps/app.html"><b>RTG</b><span>Vier werelden &middot; één kern</span></a>
   <div class="os-switcher__links">
@@ -113,6 +114,16 @@
   <span class="rek"></span>
 </header>
 <div class="zoek"><input id="zoek" type="search" placeholder="Zoek een station of sfeer…" aria-label="Zoeken"></div>
+
+<section class="muziek-hero" aria-labelledby="muziekBelofte">
+  <img class="muziek-hero__beeld" src="/images/worlds/heritage/living-heritage-v2.jpg" alt="Avondlicht bij een huis aan zee">
+  <div class="muziek-hero__inhoud">
+    <p class="eyebrow">Muziek voor elk moment</p>
+    <h2 id="muziekBelofte">Meer dan<br>muziek.</h2>
+    <p>Thuis, onderweg of samen op afstand. LivingOS laat de juiste sfeer met u meebewegen.</p>
+    <button class="hero-speel" id="heroSpeel" type="button"><span aria-hidden="true">▶</span> Verder luisteren</button>
+  </div>
+</section>
 
 <main>
   <section class="samen" id="samen" aria-label="Samen luisteren">
@@ -214,6 +225,15 @@
   });
 
   $('#knopSpeel').addEventListener('click', () => { if (!G.stand()) { zeg('Kies eerst een station, of zeg wat u wilt horen.'); return; } G.toggle(); });
+  $('#heroSpeel').addEventListener('click', () => {
+    if (!G.stand()) {
+      const eerste = STATIONS[0];
+      speelTrack(eerste, (Date.now() / 60000 | 0) * 7);
+      zeg('Uw muziek beweegt weer met u mee.');
+      return;
+    }
+    G.hervat();
+  });
   $('#knopVolgende').addEventListener('click', volgende);
   $('#knopVorige').addEventListener('click', () => G.opnieuw());
 
@@ -396,7 +416,6 @@
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
-<script src="/shared/ios.js" defer></script>
 <script src="/shared/leeg.js"></script>
 </body>
 </html>

@@ -1,15 +1,15 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-09-09",
+  "vastgelegd": "2026-09-08",
   "gemeten": {
-    "bestanden": 2144,
-    "domeinenTotaal": 590,
-    "koopbareVormen": 528,
-    "koopbareDomeinen": 110,
+    "bestanden": 2143,
+    "domeinenTotaal": 592,
+    "koopbareVormen": 527,
+    "koopbareDomeinen": 109,
     "envelopDrempel": 7,
     "envelop": 46,
-    "veldenDomeineigen": 720,
-    "veldenNietEnvelop": 936,
+    "veldenDomeineigen": 722,
+    "veldenNietEnvelop": 937,
     "gelijkendeVormparen": 8,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
@@ -17,12 +17,12 @@
     "wagenVormen": 32,
     "wagenVormenUniek": 29,
     "wagenDomeinen": 22,
-    "optellingen": 111,
-    "optelDomeinen": 55,
+    "optellingen": 110,
+    "optelDomeinen": 54,
     "optelCenten": 61,
     "optelEuro": 5,
     "optelGemengd": 0,
-    "optelOnbekend": 45
+    "optelOnbekend": 44
   },
   "envelop": [
     "aantal",
@@ -75,11 +75,11 @@
   "perWerkwoord": {
     "toon": 85,
     "prijs": 36,
-    "beschikbaarheid": 51,
-    "reserveer": 28,
-    "bevestig": 52,
-    "lever": 19,
-    "annuleer": 28,
+    "beschikbaarheid": 50,
+    "reserveer": 27,
+    "bevestig": 50,
+    "lever": 20,
+    "annuleer": 27,
     "retour": 7
   },
   "overalAanwezig": [],
@@ -750,26 +750,6 @@
       "telt": 4
     },
     {
-      "domein": "kern/kantoor",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": true,
-        "reserveer": false,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": true,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "boardroomLijst",
-        "beschikbaarheid": "open",
-        "bevestig": "bevestig",
-        "annuleer": "annuleer"
-      },
-      "telt": 4
-    },
-    {
       "domein": "kern/keuken",
       "heeft": {
         "toon": true,
@@ -1430,24 +1410,6 @@
       "telt": 2
     },
     {
-      "domein": "kern/stuur",
-      "heeft": {
-        "toon": false,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": true,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "reserveer": "inhoudswoorden",
-        "bevestig": "stuurBevestig"
-      },
-      "telt": 2
-    },
-    {
       "domein": "kern/vonk",
       "heeft": {
         "toon": true,
@@ -1639,6 +1601,23 @@
       "telt": 1
     },
     {
+      "domein": "kern/kantoor",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "boardroomLijst"
+      },
+      "telt": 1
+    },
+    {
       "domein": "kern/leerstof-herhalen",
       "heeft": {
         "toon": true,
@@ -1805,6 +1784,23 @@
       },
       "bewijs": {
         "toon": "overzicht"
+      },
+      "telt": 1
+    },
+    {
+      "domein": "kern/rtgone-projecten",
+      "heeft": {
+        "toon": false,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": true,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "lever": "projectOplever"
       },
       "telt": 1
     },
@@ -2062,21 +2058,6 @@
     },
     {
       "domein": "kern/routedekking",
-      "heeft": {
-        "toon": false,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": false,
-        "bevestig": false,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {},
-      "telt": 0
-    },
-    {
-      "domein": "kern/rtgone",
       "heeft": {
         "toon": false,
         "prijs": false,

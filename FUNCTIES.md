@@ -17,23 +17,13 @@ het?**
 | | |
 |---|---|
 | Functieschakelaars (aan/uit per functie) | **213** in 17 categorieën |
-| Apps in de leden-catalogus | **84** in 8 categorieën |
+| Apps in de leden-catalogus | **89** in 8 categorieën |
 | Bedrijfsgenres | **74** in 27 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-<<<<<<< HEAD
-| Kernmodules (`server/kern/**`) | **2058** |
-| App-pagina's (`public/apps/**.html`) | **292** |
-| Testbestanden | **1738** |
-=======
-| Kernmodules (`server/kern/**`) | **2054** |
-| App-pagina's (`public/apps/**.html`) | **292** |
-<<<<<<< HEAD
-| Testbestanden | **1732** |
-=======
-| Testbestanden | **1727** |
->>>>>>> bf9433df56e0214ea5e56f7a39f9e29927440adf
->>>>>>> origin/main
+| Kernmodules (`server/kern/**`) | **2057** |
+| App-pagina's (`public/apps/**.html`) | **303** |
+| Testbestanden | **1762** |
 
 ## De vier werelden
 
@@ -543,7 +533,7 @@ ook blokkeert.
 - **Festival: uw pas, programma en groep** (`fs-gast`) — De kant van de bezoeker: de eigen pas en edities, het programma met wat er getekend is, en een groep waarvan u zelf de code deelt.  
   _voor: rtg, lifestyle, business, gast_
 
-# 2. De 84 apps in de leden-catalogus
+# 2. De 89 apps in de leden-catalogus
 
 Wat een lid op zijn homescreen kan zetten. De schakelaars hierboven bepalen of
 ze werken; dit is wat hij ziet.
@@ -585,7 +575,7 @@ ze werken; dit is wat hij ziet.
 - **Cellier** `/apps/cellier.html` — Uw wijnkelder: per fles domein, jaargang, aantal, waarde en drinkvenster. Het overzicht wijst aan wat nu op dronk is, met de kelderwaarde. Een fles schenken telt af.
 - **Uitgaan** `/apps/uitgaan.html` — Bars, clubs en beachclubs met hun avonden en gastenlijsten.
 
-### Media & creatie — 25
+### Media & creatie — 27
 
 - **RTG Media** `/apps/media.html` — Eén mediawereld over Klankwerk, Theater, Clips en Podium heen: muziek, kijk en flow als drie standen op dezelfde catalogus, met één makersprofiel en uw eigen regelaars in plaats van een algoritme.
 - **Camera** `/apps/camera.html` — Fotograferen, plus RTG Eye: voertuigschouw en hands-free werkvloerlog.
@@ -599,7 +589,9 @@ ze werken; dit is wat hij ziet.
 - **RTG Browser** `/apps/browser.html` — Blader door de sites die leden in het RTG-web publiceren.
 - **RTG Werk OS** `/apps/werk.html` — De werkplek van een hele organisatie: startscherm per rol, projecten, kennisbank, klanten, servicedesk, bouw, apparaten, contracten en besluiten. Wat niet gemeten wordt, staat er als niet gemeten en niet als nul.
 - **RTG Kantoor** `/apps/kantoor.html` — Uw werkdag bij elkaar -- afspraken, open taken, documenten en gedeelde bestanden -- ongeacht in welke app ze leven. Maken en wijzigen blijft in de app die het echte werk doet.
-- **RTG Office** `/apps/office.html` — Tekst en rekenblad met autosave, delen op codenaam en export.
+- **RTDocs** `/apps/office.html` — De juiste documentversie, context en menselijke beoordeling bij het werk dat haar nodig heeft.
+- **Decision Room** `/apps/decision-room.html` — Besluitagenda, volledige afweging, menselijke bevestiging en borging in één controleerbaar spoor.
+- **Project Room** `/apps/project-room.html` — Van goedgekeurd besluit naar één volgende stap, een levend projectdossier en aantoonbare menselijke oplevering.
 - **Agenda** `/apps/agenda.html` — Maand, week en lijst; uitnodigen op codenaam, herinneringen, en je RTG-boekingen staan er vanzelf in.
 - **Notities & Taken** `/apps/notities.html` — Notities en lijstjes met vinkjes; delen op codenaam is samen werken, en een datum wordt vanzelf een agenda-afspraak.
 - **Bestanden** `/apps/bestanden.html` — De versleutelde kluis: mappen, versies, delen op codenaam en een prullenbak die 30 dagen bewaart. Je Office-werk staat er vanzelf bij.
@@ -636,17 +628,20 @@ ze werken; dit is wat hij ziet.
 - **Passkeys** `/apps/passkeys.html` — Inloggen met vingerafdruk, gezicht of een fysieke sleutel.
 - **Juridisch** `/apps/juridisch.html` — Voorwaarden, contracten en je eigen akkoorden.
 
-### RTFoundation (gratis) — 17
+### RTFoundation (gratis) — 20
 
 - **RTFoundation** `/apps/foundation/index.html` — Gratis hulp voor je gezin: alles wat de RTFoundation biedt op één plek.
+- **Geld & Later** `/apps/foundation/geld-later.html` — Uw geld van vandaag en uw route naar leren, studie en werk in één rustige ingang.
+- **Samen Thuis** `/apps/foundation/samen-thuis.html` — De gezamenlijke dag, ieder gezinslid en snel iets regelen op één plek.
+- **Meedoen & Ontdekken** `/apps/foundation/meedoen-ontdekken.html` — Open activiteiten, projecten en kansen dichtbij, met een eerlijke route om mee te doen.
 - **Vrienden** `/apps/foundation/vrienden.html` — Vrienden, snaps en 24-uursverhalen, veilig en op codenaam.
-- **Leren** `/apps/foundation/leren.html` — Oefenen, overhoren en samen leren.
+- **Leren & Groei** `/apps/foundation/leren.html` — Vandaag, je groei en rustige leerhulp op je eigen tempo.
 - **School** `/apps/foundation/school.html` — Klas, rooster, huiswerk en cijfers voor het hele gezin.
 - **Toetsen** `/apps/foundation/toetsen.html` — De toetsplanner voor tieners.
 - **Zakgeld** `/apps/foundation/zakgeld.html` — Het zakgeldpotje, samen bijgehouden.
 - **Babyboek** `/apps/foundation/babyboek.html` — Het fotoboekje en de eerste momenten, met AI die de mooie zinnen schrijft.
-- **Gezondheid** `/apps/foundation/gezondheid.html` — Het gezinsgezondheidsboekje.
-- **Veilig** `/apps/foundation/veilig.html` — Hulp bij online veiligheid voor kinderen en ouders.
+- **Gezondheid & Welzijn** `/apps/foundation/gezondheid-welzijn.html` — Uw dag, persoonlijke ritme en echte zorgcontacten in één rustige ingang.
+- **Veilig & Vertrouwd** `/apps/foundation/veilig-vertrouwd.html` — Uw gezinsstatus, vertrouwde kring, toestemmingen en directe hulproutes op één rustige plek.
 - **Pesten** `/apps/foundation/pesten.html` — Steun en een luisterend oor bij pesten.
 - **Kompas** `/apps/foundation/kompas.html` — Het tienerkompas: koers houden in een druk hoofd.
 - **Schrijven** `/apps/foundation/schrijven.html` — Samen verhalen maken en schrijven.

@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '9fb73db9';
+var RTG_BOUW = 'fe71ec21';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4134,6 +4134,7 @@ var RTG_BOUW = '9fb73db9';
        publieke kant. Foundation OS zelf (os.html) staat er niet bij: dat vraagt
        een kantoortoken en is geen deur voor een lid. */
     rtfportaal:  { naam: 'RTFoundation portaal', url: '/apps/foundation/os-portaal.html' },
+    foundationzorg:{ naam: 'Zorg', url: '/apps/foundation/zorg.html' },
     /* DE TWAALF UIT DE SOFTWARE-RIJ, en dit blok is de reden dat die rij weg is.
        De bank had onder de werelden een tweede kopje, Software, met twaalf apps
        die in geen enkele wereld hingen. Dat is precies de vraag die WERELDEN.md
@@ -4181,6 +4182,7 @@ var RTG_BOUW = '9fb73db9';
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },
     camera:      { naam: 'Camera',       url: '/apps/camera.html' },
     muziek:      { naam: 'Muziek',    url: '/apps/muziek.html' },
+    wonen:       { naam: 'Wonen',      url: '/apps/wonen.html' },
     podium:      { naam: 'Live',       url: '/apps/podium.html' },
     flits:       { naam: 'Verkeer',           url: '/apps/flits.html' },
     navigatie:   { naam: 'Navigatie',    url: '/apps/navigatie.html' },
@@ -4260,8 +4262,10 @@ var RTG_BOUW = '9fb73db9';
        hernoemde de tegels naar gewone woorden ("Video" in plaats van "Clips"),
        en een tak die daarvoor aftakte kent die keuze nog niet. */
     mediaos:     { naam: 'RTG Media',    url: '/apps/media.html' },
-    office:      { naam: 'Documenten',   url: '/apps/office.html' },
+    office:      { naam: 'RTDocs',       url: '/apps/office.html' },
     rtgone:      { naam: 'RTG One',      url: '/apps/rtgone.html' },
+    decisionroom:{ naam: 'Decision Room',url: '/apps/decision-room.html' },
+    projectroom: { naam: 'Project Room', url: '/apps/project-room.html' },
     rtmail:      { naam: 'RTMail',       url: '/apps/rtmail.html' },
     magnaat:     { naam: 'Magnaat',      url: '/apps/magnaat.html' },
     /* Hier stond een losse "Werk OS"-tegel naast "Mijn werkplekken": twee
@@ -4340,6 +4344,21 @@ var RTG_BOUW = '9fb73db9';
        test/wereldregister.test.js vangt dit soort gaten nu. */
     bank:        { naam: 'Bank',          url: '/apps/geld.html#bank' }
   };
+
+  /* Afgesplitst van app-main-24.js, dat over de 10 KB ging toen er een tegel
+     bijkwam. De snede loopt langs een echte grens: hierboven staat WAT er is
+     (de registry van alle apps), hieronder WAAR het hangt (de mappen), en hier
+     ertussen staat waarom die mappen zo werken. Dat het maar een blok
+     commentaar is, maakt het niet minder de juiste plek -- de uitleg hoort bij
+     de MAPPEN in app-main-24a2.js en niet bij de registry ervoor. */
+  /* ---------- de mappen, boven de klok ----------
+     Vier mappen, en daar zit alles in waar je pas je recht op geeft. Niets
+     installeren: het staat er al. Wil je iets niet zien, dan zet je het uit
+     in de Boardroom (die zet het uit, hij hoeft het niet aan te zetten).
+
+     Een map heeft een vaste sleutel (waar je eigen naam onder bewaard wordt),
+     een standaardnaam en zijn apps. Apps die voor jouw pas niet bestaan
+     vallen er vanzelf uit (itemZichtbaar). */
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
      sociale laag van de leden-app (WebRTC-bellen, snaps op codenaam).
@@ -4388,21 +4407,6 @@ var RTG_BOUW = '9fb73db9';
      tekenlaag aan te raken -- en zodat hier staat waarom hij leeg is. */
   const FUNCTIES = [];
 
-  /* Afgesplitst van app-main-24.js, dat over de 10 KB ging toen er een tegel
-     bijkwam. De snede loopt langs een echte grens: hierboven staat WAT er is
-     (de registry van alle apps), hieronder WAAR het hangt (de mappen), en hier
-     ertussen staat waarom die mappen zo werken. Dat het maar een blok
-     commentaar is, maakt het niet minder de juiste plek -- de uitleg hoort bij
-     de MAPPEN in app-main-24a2.js en niet bij de registry ervoor. */
-  /* ---------- de mappen, boven de klok ----------
-     Vier mappen, en daar zit alles in waar je pas je recht op geeft. Niets
-     installeren: het staat er al. Wil je iets niet zien, dan zet je het uit
-     in de Boardroom (die zet het uit, hij hoeft het niet aan te zetten).
-
-     Een map heeft een vaste sleutel (waar je eigen naam onder bewaard wordt),
-     een standaardnaam en zijn apps. Apps die voor jouw pas niet bestaan
-     vallen er vanzelf uit (itemZichtbaar). */
-
   /* Afgesplitst van app-main-24.js, dat over de 10 KB ging. De snede loopt
      langs een echte grens: hierboven staat de registry van alle apps en de
      vaste functierij, hieronder de MAPPEN waarin die apps vallen en de vraag
@@ -4418,8 +4422,7 @@ var RTG_BOUW = '9fb73db9';
 
      Een wereld hoeft niet even groot te zijn als de andere; dat is geen
      scheefheid maar het verschil tussen een reis en een dagelijks leven. Wat
-     wel voor alle vier geldt: een app staat in precies EEN wereld en
-     premiumrechten gelden pas op onderdeelniveau.
+     wel voor alle vier geldt: een app staat in precies EEN wereld.
 
      EN ER IS GEEN LIJST ERNAAST MEER. De bank had onder de werelden een tweede
      kopje (Software) met twaalf apps die nergens in hingen; die twaalf staan nu
@@ -4477,15 +4480,15 @@ var RTG_BOUW = '9fb73db9';
       'link:berichten', 'os:bellen', 'os:videobellen',
       'link:vonk', 'link:cercle', 'link:entourage', 'link:rendezvous', 'link:attenties',
     /* Het Huis is het huishouden in de brede zin: waar je woont, wat er op
-       tafel komt, wat er in de kast hangt -- en hoe het met de mensen erin
-       gaat. Die laatste helft (zorg, gezin, vitaal, rust) stond even in een
-       eigen map Zorg; die is hier terug, want zonder haar was Het Huis op een
-       RTG-pas een map met drie tegels. De kantoorkant zit bij Werk. */
+       tafel komt, wat er in de kast hangt en hoe het met het gezin gaat.
+       Zorg staat vanaf september 2026 in FoundationOS: niet als bezit van de
+       stichting, maar als de publieke context waarin hulp, gezondheid en
+       zorgverleners rondom een mens samenkomen. De kantoorkant zit bij Werk. */
     /* os:rtf stond hier, en staat nu in zijn eigen wereld hieronder. Regel 44
        in scripts/check.js ving dat meteen: een app in twee werelden is precies
        waarom je hem nergens meer vindt. */
-      'link:ontdek', 'link:commerce', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
-      'link:rechterhand',
+      'link:ontdek', 'link:commerce', 'tab:bestellen', 'tab:gezin',
+      'link:rechterhand', 'link:wonen',
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe',
 
       'link:muziek', 'link:podium', 'link:theater', 'link:clips', 'link:spelen',
@@ -4516,7 +4519,7 @@ var RTG_BOUW = '9fb73db9';
        dat verschil niet -- de commerciele verpakking zit BINNEN de wereld.
        Het huis houdt zijn eigen naam: RTG Kantoor is een merk in WorkOS. */
     { sleutel: 'map-werk', naam: 'WorkOS', wereld: '/apps/kantoor.html', glyf: 'office', items: [
-      'link:werkos', 'link:rtgone', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
+      'link:werkos', 'link:rtgone', 'link:decisionroom', 'link:projectroom', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
       'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk'] },
     /* TRAVELOS IS DE KLEINSTE WERELD EN DAT IS GEEN ARGUMENT TEGEN HEM: een
        wereld is geen categorie in een spreadsheet maar een bestemming in het
@@ -4575,7 +4578,10 @@ var RTG_BOUW = '9fb73db9';
        "Wat wij doen, bij u in de buurt". Alleen dat laatste is een voordeur voor
        een lid; de andere twee zijn deuren BINNEN de wereld. */
     { sleutel: 'map-rtf', naam: 'FoundationOS', wereld: '/apps/foundation/os-publiek.html', glyf: 'rtf', items: [
-      'link:rtfbuurt', 'link:rtfportaal',
+    /* Zorg woont hier als eigen rustige voordeur en als direct zorgaanbod. De
+       eerste maakt afspraken en privacy begrijpelijk; de tweede houdt de al
+       bestaande boekingsstroom bereikbaar zonder functies te verdubbelen. */
+      'link:rtfbuurt', 'link:foundationzorg', 'tab:zorg', 'link:rtfportaal',
     /* Twee uit de tikkenmeting (scripts/tikken.js): het bord en het schrift
        bestonden en hingen nergens aan. */
     /* Het Klimaatfonds is een VENSTER op het Living Lab en geen tweede lab:
@@ -4645,7 +4651,7 @@ var RTG_BOUW = '9fb73db9';
       () => af(null), { enableHighAccuracy: true, timeout: 8000 });
   });
   const WERKDOEL = {
-    personeel: { glyf: 'navigatie', app: 'Personeel (PDA)', url: '/apps/personeel.html', bewaar: (t, r) => { localStorage.setItem('rtg_pda_token', t); localStorage.setItem('rtg_pda_code', r.code || ''); } },
+    personeel: { glyf: 'navigatie', app: 'Team Room', url: '/apps/personeel.html', bewaar: (t, r) => { localStorage.setItem('rtg_pda_token', t); localStorage.setItem('rtg_pda_code', r.code || ''); } },
     zaak:      { glyf: 'maison', app: 'Leverancier',    url: '/apps/leverancier.html', bewaar: (t) => { localStorage.setItem('rtg_sup_token', t); } },
     kantoor:   { glyf: 'office', app: 'Backoffice',     url: '/apps/backoffice.html', bewaar: (t) => { localStorage.setItem('rtg_office_token', t); } },
     /* De werkruimte van het RTG Werk OS. Die had zijn eigen tweede inlog
@@ -9263,6 +9269,10 @@ var RTG_BOUW = '9fb73db9';
       onCode: (c) => { scanRoute(c.tekst); }
     });
   });
+  /* Vanuit Eten & Uitgaan betekent "Aan tafel" niet dat we een tafelsessie
+     verzinnen. De QR op de echte tafel is de deur, dus deze diepe link opent
+     alleen dezelfde scanner die ook in het bedieningspaneel staat. */
+  if (_scanBtn && location.hash === '#scan') setTimeout(() => _scanBtn.click(), 0);
 /* De Salon: de etalage van een partner en de tijdlijn. Stond in ./app-main-56.js,
    samen met het zegel en de scanknop -- drie onderwerpen in een bestand, wat de
    omvangregel van de keuring aanwees zodra RTG Scan er inhoud bij kreeg. */

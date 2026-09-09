@@ -1,0 +1,105 @@
+:root{
+  --one-nacht:#061116;
+  --one-diep:#030a0e;
+  --one-paneel:#0a171d;
+  --one-paneel-2:#102229;
+  --one-lijn:#2c4046;
+  --one-goud:#c99b55;
+  --one-goud-zacht:#e2bd7e;
+  --one-ivoor:#eee6da;
+  --one-stil:#98a5a5;
+  --one-teal:#7d9f98;
+  --one-wijn:#7a1830;
+  --one-rood:#d06b68;
+}
+body.one-voorzijde-actief,
+body.one-voorzijde-actief.rtg-edge-host{overflow-x:hidden;background:var(--one-diep);padding:0!important}
+body.one-voorzijde-actief>.top,
+body.one-voorzijde-actief>.layout{display:none!important}
+body.one-voorzijde-actief>.rtg-edge-chrome,
+body.one-voorzijde-actief>#rtgGanglijn,
+body.one-voorzijde-actief>.rtg-spring{display:none!important}
+.one-voorzijde[hidden]{display:none!important}
+.one-voorzijde{min-height:100dvh;padding:0 0 calc(5.2rem + env(safe-area-inset-bottom));background:radial-gradient(circle at 70% -8rem,rgba(61,108,111,.3),transparent 32rem),linear-gradient(180deg,var(--one-nacht),var(--one-diep));color:var(--one-ivoor);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.one-voorzijde *{box-sizing:border-box}
+.one-binnen{width:min(100%,52rem);margin:0 auto;padding:env(safe-area-inset-top) .9rem 2rem}
+.one-kop{min-height:5.2rem;display:flex;align-items:center;gap:.72rem;border-bottom:1px solid rgba(201,155,85,.2)}
+.one-merk{display:flex;align-items:baseline;gap:.65rem;color:var(--one-ivoor);text-decoration:none;white-space:nowrap}
+.one-merk b{color:var(--one-goud);font:500 2rem/1 'Bodoni Moda',Georgia,serif;letter-spacing:-.04em}
+.one-merk span{font-size:1rem;font-weight:650}
+.one-kopruimte{flex:1}
+.one-huizen{display:flex;border:1px solid var(--one-lijn);background:#061014}
+.one-huizen button{min-width:2.55rem;min-height:2.2rem;padding:.35rem .6rem;border:0;border-right:1px solid var(--one-lijn);background:transparent;color:#879596;font-size:.64rem;font-weight:800;letter-spacing:.06em;cursor:pointer}
+.one-huizen button:last-child{border-right:0}
+.one-huizen button[aria-pressed="true"]{background:var(--one-goud);color:#091217}
+.one-profiel{width:2.55rem;height:2.55rem;display:grid;place-items:center;border:1px solid var(--one-goud);border-radius:50%;background:var(--one-paneel-2);color:var(--one-goud-zacht);font-size:.68rem;font-weight:800;cursor:pointer}
+.one-scherm[hidden]{display:none}
+.one-ey{margin-top:1.25rem;color:var(--one-goud);font-size:.63rem;font-weight:800;letter-spacing:.17em;text-transform:uppercase}
+.one-titel{max-width:12ch;margin:.55rem 0 .6rem;color:var(--one-ivoor);font:500 clamp(2.7rem,10vw,4.8rem)/.94 'Bodoni Moda',Georgia,serif;letter-spacing:-.05em}
+.one-inleiding{max-width:39rem;margin:0 0 1.25rem;color:var(--one-stil);font-size:.87rem;line-height:1.58}
+.one-focus{position:relative;min-height:13.7rem;padding:1.15rem;border:1px solid rgba(201,155,85,.44);overflow:hidden;background:linear-gradient(118deg,rgba(6,18,23,.98),rgba(18,42,45,.82)),repeating-linear-gradient(90deg,transparent 0 22px,rgba(201,155,85,.04) 23px 24px);box-shadow:0 1.4rem 3.2rem rgba(0,0,0,.24)}
+.one-focus:after{content:'01';position:absolute;right:.8rem;top:.45rem;color:rgba(226,189,126,.13);font:500 4.3rem/1 Georgia,serif}
+.one-label{position:relative;z-index:1;display:inline-block;padding:.38rem .48rem;border:1px solid rgba(125,159,152,.55);color:#aac1bc;font-size:.58rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase}
+.one-focus h2{position:relative;z-index:1;max-width:16ch;margin:1rem 0 .45rem;color:var(--one-ivoor);font:500 clamp(1.75rem,7vw,2.6rem)/1 'Bodoni Moda',Georgia,serif;letter-spacing:-.035em}
+.one-focus p{position:relative;z-index:1;max-width:34rem;margin:0;color:#a6b2b1;font-size:.78rem;line-height:1.48}
+.one-focusvoet{position:relative;z-index:1;margin-top:1.05rem;display:flex;align-items:center;gap:.8rem}
+.one-focusvoet span{color:#cdb17d;font-size:.67rem}
+.one-primair,.one-secundair{min-height:2.75rem;padding:.6rem .9rem;border:1px solid var(--one-goud);font:800 .72rem/1 Inter,sans-serif;cursor:pointer}
+.one-primair{margin-left:auto;background:var(--one-goud);color:#071116}
+.one-secundair{background:transparent;color:var(--one-goud-zacht)}
+.one-sectiekop{margin:1.65rem 0 .65rem;display:flex;align-items:end;justify-content:space-between;gap:.75rem}
+.one-sectiekop h2{margin:0;color:var(--one-ivoor);font:500 1.5rem/1 'Bodoni Moda',Georgia,serif}
+.one-sectiekop button{border:0;background:transparent;color:var(--one-goud-zacht);font-size:.68rem;cursor:pointer}
+.one-telling{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--one-lijn);background:#081419}
+.one-getal{min-width:0;padding:.8rem;border-right:1px solid var(--one-lijn)}
+.one-getal:last-child{border-right:0}
+.one-getal b{display:block;color:var(--one-goud-zacht);font:500 1.65rem/1 Georgia,serif}
+.one-getal span{display:block;margin-top:.35rem;color:#7f8d8e;font-size:.6rem;line-height:1.3}
+.one-lijst{margin-top:.65rem;border:1px solid var(--one-lijn);background:#071318}
+.one-rij{min-height:4.25rem;padding:.72rem;display:grid;grid-template-columns:3.25rem minmax(0,1fr) auto;align-items:center;gap:.7rem;border-bottom:1px solid #22363c}
+.one-rij:last-child{border-bottom:0}
+.one-tijd{color:var(--one-goud);font:500 1rem/1 Georgia,serif}
+.one-rij b{display:block;overflow:hidden;color:var(--one-ivoor);font-size:.75rem;text-overflow:ellipsis;white-space:nowrap}
+.one-rij small{display:block;margin-top:.27rem;color:#7f8e8f;font-size:.62rem}
+.one-punt{width:.55rem;height:.55rem;border:1px solid var(--one-teal);border-radius:50%}
+.one-punt.nu{background:var(--one-teal);box-shadow:0 0 .7rem rgba(125,159,152,.55)}
+.one-leeg{padding:1.4rem;border:1px solid var(--one-lijn);background:#071318;color:var(--one-stil);font-size:.76rem;line-height:1.5}
+.one-paneelkaart{padding:1rem;border:1px solid rgba(201,155,85,.42);background:#08161b}
+.one-besluitkop{display:flex;align-items:center;gap:.8rem}
+.one-zegel{width:3.15rem;height:3.15rem;display:grid;place-items:center;flex:0 0 auto;border:1px solid var(--one-goud);border-radius:50%;color:var(--one-goud-zacht);font:500 1.25rem/1 Georgia,serif}
+.one-besluitkop h2{margin:0;color:var(--one-ivoor);font:500 1.55rem/1.05 'Bodoni Moda',Georgia,serif}
+.one-besluitkop p{margin:.3rem 0 0;color:#829192;font-size:.65rem}
+.one-meters{display:grid;grid-template-columns:repeat(3,1fr);margin:1rem 0;border-top:1px solid var(--one-lijn);border-bottom:1px solid var(--one-lijn)}
+.one-meter{padding:.75rem .5rem;border-right:1px solid var(--one-lijn)}
+.one-meter:last-child{border-right:0}
+.one-meter small{display:block;color:#788788;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase}
+.one-meter b{display:block;margin-top:.3rem;color:#dcd5c9;font-size:.72rem}
+.one-meter b.zacht{color:#91b5ad}
+.one-afweging{display:grid;gap:.65rem}
+.one-afweging div{display:grid;grid-template-columns:5.6rem 1fr;gap:.65rem;color:#9aa7a6;font-size:.69rem;line-height:1.45}
+.one-afweging strong{color:#d4b277;font-size:.58rem;letter-spacing:.08em;text-transform:uppercase}
+.one-rahul{margin-top:.8rem;padding:.8rem;border-left:2px solid var(--one-teal);background:#102126;color:#a9b5b3;font-size:.68rem;line-height:1.5}
+.one-rahul b{display:block;margin-bottom:.2rem;color:#cad5d1;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase}
+.one-acties{display:grid;grid-template-columns:1fr 1.45fr;gap:.55rem;margin-top:.85rem}
+.one-acties .one-primair{margin:0}
+.one-mens{display:flex;align-items:center;gap:.75rem;padding:.85rem;border:1px solid var(--one-lijn);background:#09171c}
+.one-avatar{width:3.15rem;height:3.15rem;display:grid;place-items:center;flex:0 0 auto;border:1px solid var(--one-teal);border-radius:50%;background:#16292d;color:var(--one-goud-zacht);font:500 1.1rem/1 Georgia,serif}
+.one-mens b{display:block;color:var(--one-ivoor);font-size:.77rem}
+.one-mens small{display:block;margin-top:.28rem;color:#899798;font-size:.62rem}
+.one-tot{margin-left:auto;text-align:right;color:#c9aa75;font-size:.58rem;line-height:1.5}
+.one-overdracht{margin-top:.7rem;border:1px solid var(--one-lijn);background:#071419}
+.one-blok{padding:.8rem;border-bottom:1px solid #273b40}
+.one-blok:last-child{border-bottom:0}
+.one-blokkop{display:flex;align-items:center;gap:.55rem;margin-bottom:.45rem;color:#ddd6ca;font-size:.72rem;font-weight:750}
+.one-icoon{width:1.55rem;height:1.55rem;display:grid;place-items:center;border:1px solid var(--one-teal);border-radius:50%;color:#a6bdb7;font-size:.62rem}
+.one-check{display:flex;gap:.5rem;margin:.42rem 0;color:#99a7a6;font-size:.67rem;line-height:1.4}
+.one-check:before{content:'\2713';color:#86a9a0}
+.one-waarschuwing{margin-top:.75rem;padding:.75rem;border:1px solid rgba(201,155,85,.34);background:rgba(201,155,85,.05);color:#aab4b1;font-size:.64rem;line-height:1.48}
+.one-waarschuwing b{color:#d7b679}
+.one-nav{position:fixed;left:50%;bottom:max(.7rem,env(safe-area-inset-bottom));width:min(calc(100% - 1.2rem),50rem);height:4rem;display:grid;grid-template-columns:repeat(4,1fr);transform:translateX(-50%);z-index:32;border:1px solid #34474c;background:rgba(4,12,16,.97);backdrop-filter:blur(1rem);box-shadow:0 1rem 3rem rgba(0,0,0,.38)}
+.one-nav button{border:0;background:transparent;color:#7c8a8b;font-size:.62rem;cursor:pointer}
+.one-nav button i{display:block;margin:0 auto .3rem;color:#8f9c9c;font:normal 1rem/1 Georgia,serif}
+.one-nav button[aria-current="page"]{color:var(--one-goud-zacht)}
+.one-nav button[aria-current="page"] i{color:var(--one-goud-zacht)}
+.one-terug{margin-left:auto;padding:.45rem .7rem;border:1px solid var(--one-goud)!important;background:transparent!important;color:var(--one-goud-zacht)!important;font-size:.65rem!important;cursor:pointer}
+@media(max-width:520px){.one-binnen{padding-left:.75rem;padding-right:.75rem}.one-kop{gap:.5rem}.one-huizen button{min-width:2.1rem;padding:.3rem .42rem}.one-profiel{width:2.3rem;height:2.3rem}.one-telling{grid-template-columns:repeat(2,1fr)}.one-getal:nth-child(2){border-right:0}.one-getal:nth-child(-n+2){border-bottom:1px solid var(--one-lijn)}.one-titel{font-size:2.7rem}.one-focusvoet{align-items:flex-end}.one-focusvoet span{max-width:9rem}.one-rij{grid-template-columns:2.8rem minmax(0,1fr) auto}.one-acties{grid-template-columns:1fr}.one-afweging div{grid-template-columns:4.8rem 1fr}}

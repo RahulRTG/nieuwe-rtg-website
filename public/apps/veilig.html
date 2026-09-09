@@ -45,14 +45,14 @@
 <script src="/shared/plek.js" defer></script>
 <script src="/shared/veiligheid.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/rtg-veilig-2026.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-safe-experience" data-rtg-eigenvlak="onyx" data-rtg-world="living" data-rtg-skin="heritage">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <header class="kop">
-  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
-  <h1>RTG Veilig</h1>
-  <div class="rek"></div>
+  <a class="veilig-brand" href="/apps/rtg.html" aria-label="RTG LivingOS"><span>RTG</span><b>LivingOS</b><small>Veilig · thuis · samen</small></a>
+  <div class="veilig-koptekst"><span>Vandaag veilig</span><h1>Rust omdat de juiste mensen weten wanneer ze nodig zijn.</h1></div>
   <span class="stil" id="standRegel">wie er over u waakt</span>
 </header>
 
@@ -99,13 +99,34 @@
   <div id="grens" class="rtgdeel-vast"></div>
 </main>
 
+<nav class="veilig-nav" aria-label="RTG Veilig">
+  <button type="button" data-veilig-nav="vandaag" data-icon="home" aria-current="page">Vandaag</button>
+  <button type="button" data-veilig-nav="wacht" data-icon="walk">Thuiswacht</button>
+  <button class="veilig-plus" type="button" data-veilig-nav="kring" aria-label="Iemand aan mijn kring toevoegen">Kring</button>
+  <button type="button" data-veilig-nav="vitaal" data-icon="check">Check-in</button>
+  <button type="button" data-veilig-nav="meer" data-icon="menu" aria-expanded="false">Meer</button>
+</nav>
+
+<div class="veilig-meer" id="veiligMeer" hidden>
+  <section role="dialog" aria-modal="true" aria-labelledby="veiligMeerTitel">
+    <button class="veilig-meer-sluit" type="button" aria-label="Sluiten">Sluiten</button>
+    <span>RTG Veilig</span><h2 id="veiligMeerTitel">Meer rust en zekerheid</h2>
+    <button type="button" data-veilig-open="codewoord"><b>Codewoord</b><small>Stil om hulp vragen</small></button>
+    <button type="button" data-veilig-open="rust"><b>Thuisrust</b><small>Stil, maar bereikbaar</small></button>
+    <a href="/apps/rtgid.html"><b>RTG iD</b><small>Uw identiteit in eigen hand</small></a>
+    <a href="/apps/labpas.html"><b>Labpas</b><small>Uw deelname en toestemming</small></a>
+  </section>
+</div>
+
 <script src="/shared/uitvoer.js"></script>
 <script src="/shared/leeg.js"></script>
+<script src="/apps/veilig/vandaag.js"></script>
 <script src="/apps/veilig/wacht.js"></script>
 <script src="/apps/veilig/codewoord.js"></script>
 <script src="/apps/veilig/vitaal.js"></script>
 <script src="/apps/veilig/rust.js"></script>
 <script src="/apps/veilig/schil.js"></script>
+<script src="/apps/veilig/voorzijde.js"></script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

@@ -14,8 +14,7 @@
 
      Een wereld hoeft niet even groot te zijn als de andere; dat is geen
      scheefheid maar het verschil tussen een reis en een dagelijks leven. Wat
-     wel voor alle vier geldt: een app staat in precies EEN wereld en
-     premiumrechten gelden pas op onderdeelniveau.
+     wel voor alle vier geldt: een app staat in precies EEN wereld.
 
      EN ER IS GEEN LIJST ERNAAST MEER. De bank had onder de werelden een tweede
      kopje (Software) met twaalf apps die nergens in hingen; die twaalf staan nu
@@ -73,15 +72,15 @@
       'link:berichten', 'os:bellen', 'os:videobellen',
       'link:vonk', 'link:cercle', 'link:entourage', 'link:rendezvous', 'link:attenties',
     /* Het Huis is het huishouden in de brede zin: waar je woont, wat er op
-       tafel komt, wat er in de kast hangt -- en hoe het met de mensen erin
-       gaat. Die laatste helft (zorg, gezin, vitaal, rust) stond even in een
-       eigen map Zorg; die is hier terug, want zonder haar was Het Huis op een
-       RTG-pas een map met drie tegels. De kantoorkant zit bij Werk. */
+       tafel komt, wat er in de kast hangt en hoe het met het gezin gaat.
+       Zorg staat vanaf september 2026 in FoundationOS: niet als bezit van de
+       stichting, maar als de publieke context waarin hulp, gezondheid en
+       zorgverleners rondom een mens samenkomen. De kantoorkant zit bij Werk. */
     /* os:rtf stond hier, en staat nu in zijn eigen wereld hieronder. Regel 44
        in scripts/check.js ving dat meteen: een app in twee werelden is precies
        waarom je hem nergens meer vindt. */
-      'link:ontdek', 'link:commerce', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
-      'link:rechterhand',
+      'link:ontdek', 'link:commerce', 'tab:bestellen', 'tab:gezin',
+      'link:rechterhand', 'link:wonen',
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe',
 
       'link:muziek', 'link:podium', 'link:theater', 'link:clips', 'link:spelen',
@@ -112,7 +111,7 @@
        dat verschil niet -- de commerciele verpakking zit BINNEN de wereld.
        Het huis houdt zijn eigen naam: RTG Kantoor is een merk in WorkOS. */
     { sleutel: 'map-werk', naam: 'WorkOS', wereld: '/apps/kantoor.html', glyf: 'office', items: [
-      'link:werkos', 'link:rtgone', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
+      'link:werkos', 'link:rtgone', 'link:decisionroom', 'link:projectroom', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
       'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk'] },
     /* TRAVELOS IS DE KLEINSTE WERELD EN DAT IS GEEN ARGUMENT TEGEN HEM: een
        wereld is geen categorie in een spreadsheet maar een bestemming in het

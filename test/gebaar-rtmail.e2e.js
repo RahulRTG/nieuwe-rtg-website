@@ -79,6 +79,13 @@ test('een veeg bergt post op, de weg terug haalt hem terug, en een weigering ook
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
     }, reg.token);
     await page.goto(base + '/apps/rtmail.html', { waitUntil: 'domcontentloaded' });
+    /* De rustige voorzijde is nu de echte ingang. De veeg hoort in Alle post:
+       ga erheen via dezelfde zichtbare knop als het lid, zodat deze proef niet
+       door aria-hidden heen in het oude postvak probeert te grijpen. */
+    await page.locator('[data-rtm-diep="inbox"]').first().click();
+    await page.waitForFunction(() => !document.body.classList.contains('rtm-voorzijde-actief') &&
+      document.getElementById('main') && document.getElementById('main').getAttribute('aria-hidden') === 'false',
+    null, { timeout: 5000 });
     await page.waitForSelector('#main .rij[data-i].gb-rij', { timeout: 20000 });
 
     // 1. doorvegen bergt het bericht ECHT op, en opent het NIET

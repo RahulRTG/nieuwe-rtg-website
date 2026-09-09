@@ -3,9 +3,9 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
-  '/apps/personeel.html': G('De personeels-app (PDA): uw dienst, taken en team op zak.',
-    ['Klok in en zie uw dienst', 'Pak taken op en meld ze af', 'Praat met collega\'s via chat of walkie-talkie'],
-    'Meld afwijkingen meteen; een klein bericht nu voorkomt groot gedoe later.'),
+  '/apps/personeel.html': G('Team Room brengt uw werkdag, collega\'s en ontwikkeling terug tot wat nu betekenis heeft.',
+    ['Zie uw dienst en pak de eerstvolgende echte taak op', 'Bekijk wie werkt, wie vrij is en welke aanvraag aandacht vraagt', 'Open uw eigen afspraken, certificaten, ontwikkeling en contract'],
+    'Team Room toont mensen vóór administratie; de volledige personeels-PDA blijft vanuit ieder onderdeel bereikbaar.'),
   '/apps/backoffice.html': G('De RTG Backoffice: het kantoor dat leden en partners helpt.',
     ['Behandel verificaties en aanvragen', 'Zoek dwars door het systeem', 'Bekijk prestaties en weekcijfers'],
     'Het actiecentrum sorteert op urgentie: van boven naar beneden werken is genoeg.'),

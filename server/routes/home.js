@@ -2,7 +2,7 @@
    plus scenes met AI-hulp. Alles op de eigen sessiesleutel; de AI stelt
    voor, het lid beslist, en sloten gaan nooit via een scene of de AI. */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, homekit, homeMerken } = kern;
+  const { app, auth, supplierAuth, homekit, homeMerken, woningOnderhoud } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; res.status(status || 200).json(rest); };
 
   app.post('/api/home', auth, (req, res) => res.json(homekit.overzicht(req.session.key)));
@@ -15,6 +15,12 @@ module.exports = (kern) => {
   app.post('/api/home/scene/bewaar', auth, (req, res) => stuur(res, homekit.sceneBewaar(req.session.key, req.body || {})));
   app.post('/api/home/scene/start', auth, (req, res) => stuur(res, homekit.sceneStart(req.session.key, req.body.id)));
   app.post('/api/home/scene/weg', auth, (req, res) => stuur(res, homekit.sceneWeg(req.session.key, req.body.id)));
+
+  /* Onderhoud blijft aan hetzelfde huis en dezelfde ledenpoort gekoppeld.
+     Een lid kan melden en intrekken; een vakman wordt hier nooit verzonnen. */
+  app.post('/api/home/onderhoud', auth, (req, res) => res.json(woningOnderhoud.lijst(req.session.key)));
+  app.post('/api/home/onderhoud/meld', auth, (req, res) => stuur(res, woningOnderhoud.meld(req.session.key, req.body || {})));
+  app.post('/api/home/onderhoud/annuleer', auth, (req, res) => stuur(res, woningOnderhoud.annuleer(req.session.key, req.body.id)));
 
   /* ---- "Werkt met RTG Home Kit": de open merkenlaag ---- */
   // de merken bekijken en verbinden (de woning staat altijd eerst klaar)

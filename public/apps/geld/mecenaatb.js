@@ -22,13 +22,15 @@
     var Geld = w.Geld;
     try {
       M.stand = await Geld.api('/api/member/rechterhand/mecenaat');
+      if (!$('#mcWrap')) return;
       M.teken(M.stand);
     } catch (e) {
       M.stand = null;
       /* Bij een 403 is de serverzin (onderdeel van de Lifestyle Pass) het
          hele verhaal; daar hoort geen inloghint achteraan. Al het andere is
          vrijwel altijd niet ingelogd, zoals in de andere standen. */
-      $('#mcVak').innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e));
+      var vak = $('#mcVak');
+      if (vak) vak.innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e));
     }
   }
 

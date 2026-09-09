@@ -1,119 +1,113 @@
 <!doctype html>
-<html lang="nl">
+<html lang="nl" data-rtg-thema="foundation">
 <head>
 <script src="/shared/id.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTFoundation · Leren</title>
-<meta name="theme-color" content="#08090C">
+<meta name="theme-color" content="#123c3a">
+<meta name="robots" content="noindex,nofollow">
+<title>Leren &amp; Groei · FoundationOS</title>
 <link rel="manifest" href="/manifests/foundation.webmanifest">
-<link rel="apple-touch-icon" href="/icons/foundation.svg">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
-<link rel="stylesheet" href="stijl.css">
-<script src="palet.js"></script>
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  .topnav{display:flex;align-items:center;gap:.7rem;padding:.7rem 1rem;border-bottom:1px solid var(--lijn);}
-  .topnav .brand{font-family:var(--serif);font-weight:500;}.topnav .brand b{color:var(--rtg-leesgoud,var(--goud));}
-  .topnav a{margin-left:auto;color:var(--zacht);text-decoration:none;font-size:.85rem;}
-  .wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;gap:1.4rem;min-height:calc(100vh - 3.4rem);}
-  .kick{margin-top:.4rem;}
-  .logo{font-family:var(--serif);font-size:2.3rem;font-weight:500;letter-spacing:-.01em;text-align:center;}
-  .logo b{color:var(--rtg-leesgoud,var(--goud));font-weight:600;}
-  .deck{color:var(--zacht);text-align:center;max-width:34rem;line-height:1.55;}
-  .keuze{display:grid;grid-template-columns:1fr 1fr;gap:1rem;width:100%;max-width:44rem;}
-  @media(max-width:560px){.keuze{grid-template-columns:1fr;}}
-  .rol{padding:1.6rem;text-align:center;transition:transform .12s,border-color .12s;}
-  .rol:hover{transform:translateY(-3px);border-color:var(--goud);}
-  .rol .ic{font-size:2.6rem;}
-  .rol h2{margin:.6rem 0 .3rem;font-size:1.25rem;font-family:var(--serif);font-weight:500;}
-  .rol p{color:var(--zacht);font-size:.9rem;line-height:1.45;margin-bottom:1rem;}
-  dialog{border:none;background:transparent;color:var(--txt);}
-  dialog::backdrop{background:rgba(4,4,3,.75);}
-  .modal{width:min(92vw,26rem);padding:1.6rem;}
-  .modal h3{font-size:1.2rem;margin-bottom:1rem;font-family:var(--serif);font-weight:500;}
-  .modal .veld{margin-bottom:.8rem;}
-  .fout{color:var(--rood-tekst);font-size:.85rem;min-height:1.1rem;}
-  .rij{display:flex;gap:.6rem;justify-content:flex-end;margin-top:.4rem;}
-  .codebig{text-transform:uppercase;letter-spacing:.35em;text-align:center;font-size:1.3rem;font-weight:700;}
-</style>
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/ios.css" rel="stylesheet">
-<link rel="stylesheet" href="premium.css">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-deep-flows-2026.css" rel="stylesheet">
+<link href="premium.css" rel="stylesheet">
+<link href="/shared/rtg-foundation-leren-2026.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage">
-<div class="topnav"><span class="brand">Rahul Travel <b>Foundation</b></span><a href="index.html">← Foundation</a></div>
-<div class="wrap" role="main">
-  <div class="kick">Leren</div>
-  <div class="logo">Gratis <b>leren</b> voor ieder kind</div>
-  <div class="keuze">
-    <div class="kaart rol" id="rolDocent">
-      <div class="ic"></div><h2>Ik geef les</h2>
-      <p>Docent, ouder of vrijwilliger: start een les en krijg een lescode. Wat je op het bord schrijft, zien alle leerlingen live.</p>
-      <button class="knop">Nieuwe les starten</button>
-    </div>
-    <div class="kaart rol" id="rolLeerling">
-      <div class="ic"></div><h2>Ik ga leren</h2>
-      <p>Doe mee met de lescode en open je eigen schrift met je AI-buddy ernaast.</p>
-      <button class="knop groen">Meedoen met een les</button>
-    </div>
-  </div>
+<body class="rtg-stijl rtg-school-flow foundation-leren" data-rtg-world="foundation" data-rtg-skin="heritage" data-session-helper="RTGSchoolSession">
+<a class="lg-skip" href="#lgInhoud">Naar de inhoud</a>
+<div class="lg-top" role="banner">
+  <a class="lg-brand" href="index.html" aria-label="Naar FoundationOS">RTG</a>
+  <div class="lg-world"><b>FoundationOS</b><span>Leren · groeien · samen</span></div>
+  <a class="lg-iconlink" href="mail.html" aria-label="Berichten"><i data-glyf="berichten"></i></a>
 </div>
 
-<dialog id="dlgDocent"><div class="kaart modal">
-  <h3>Nieuwe les</h3>
-  <input class="veld" id="dVak" placeholder="Vak of onderwerp (bijv. Rekenen)" maxlength="40">
-  <input class="veld" id="dNaam" placeholder="Jouw naam (begeleider)" maxlength="40">
-  <div class="fout" id="dFout"></div>
-  <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop" id="dStart">Start les</button></div>
-</div></dialog>
+<main id="lgInhoud" class="lg-main" tabindex="-1">
+  <section class="lg-view is-actief" data-lg-view="vandaag" aria-labelledby="lgVandaagTitel">
+    <div class="lg-hero">
+      <div class="lg-hero__beeld" aria-hidden="true"></div>
+      <div class="lg-hero__copy">
+        <p class="lg-kicker">Leren op uw eigen tempo</p>
+        <h1 id="lgVandaagTitel">Vandaag één stap verder.</h1>
+        <p>Een rustige dag. Duidelijk wat nu telt.</p>
+        <button class="lg-hoofdknop" type="button" id="lgGaVerder">Ga verder <i data-glyf="rechterhand"></i></button>
+      </div>
+    </div>
+    <div class="lg-inhoud">
+      <div class="lg-heading"><div><p class="lg-kicker">Een voorstel, geen opdracht</p><h2>Vandaag</h2></div><a href="leerpaspoort.html">Bekijk alles</a></div>
+      <div id="lgDag" class="lg-taken" aria-live="polite"><div class="lg-leeg">Uw leerroute wordt veilig opgehaald.</div></div>
+      <aside class="lg-tempo"><i data-glyf="rtf"></i><div><h2>Uw tempo</h2><p>Pauze als het nodig is. Verder als het kan. Er wordt geen reeks, achterstand of ranglijst bijgehouden.</p></div></aside>
+      <nav class="lg-schoollinks" aria-label="Schoolroutes"><a href="agenda.html">Schooldag</a><a href="leren.html" aria-current="page">Leren &amp; Groei</a><a href="mail.html">Berichten</a></nav>
+      <div class="lg-live">
+        <div><p class="lg-kicker">Samen leren</p><h2>Iemand naast u nodig?</h2><p>Start een live les als begeleider of doe veilig mee met de lescode die u heeft gekregen.</p></div>
+        <button type="button" data-lg-les="kies">Open live les</button>
+      </div>
+    </div>
+  </section>
 
-<dialog id="dlgLeerling"><div class="kaart modal">
-  <h3>Meedoen met een les</h3>
-  <input class="veld codebig" id="lCode" placeholder="LESCODE" maxlength="6" autocapitalize="characters">
-  <input class="veld" id="lNaam" placeholder="Jouw naam of bijnaam" maxlength="40">
-  <div class="fout" id="lFout"></div>
-  <div class="rij"><button class="knop grijs klein" data-sluit>Annuleren</button><button class="knop groen" id="lJoin">Doe mee</button></div>
-</div></dialog>
+  <section class="lg-view" data-lg-view="groei" aria-labelledby="lgGroeiTitel" hidden>
+    <div class="lg-paginakop">
+      <button type="button" data-lg-open="vandaag" aria-label="Terug"><i data-glyf="navigatie"></i></button>
+      <div><p class="lg-kicker">Iedere stap telt</p><h1 id="lgGroeiTitel">Zie wat er al groeit.</h1><p>Op uw manier, zonder vergelijking met iemand anders.</p></div>
+    </div>
+    <div class="lg-inhoud lg-inhoud--smal">
+      <div id="lgGroeipad" class="lg-pad" aria-live="polite"></div>
+      <section class="lg-paneel" aria-labelledby="lgVakkenTitel">
+        <div class="lg-heading"><div><p class="lg-kicker">Uw leerroute</p><h2 id="lgVakkenTitel">Wat al groeit</h2></div><a href="leerpaspoort.html">Leerpaspoort</a></div>
+        <div id="lgVakken" class="lg-vakken"><div class="lg-leeg">Uw leerdoelen worden opgehaald.</div></div>
+      </section>
+      <aside id="lgTrots" class="lg-trots"></aside>
+      <p class="lg-eerlijk"><i data-glyf="schild"></i> Dit is uw eigen leerpaspoort. Een mens en een officiële school nemen echte onderwijsbesluiten.</p>
+    </div>
+  </section>
+
+  <section class="lg-view" data-lg-view="hulp" aria-labelledby="lgHulpTitel" hidden>
+    <div class="lg-paginakop lg-paginakop--hulp">
+      <button type="button" data-lg-open="vandaag" aria-label="Terug"><i data-glyf="navigatie"></i></button>
+      <div><p class="lg-kicker">Samen naar de volgende stap</p><h1 id="lgHulpTitel">Vastgelopen? We kijken samen.</h1><p>Kies waar u hulp bij wilt.</p></div>
+    </div>
+    <div class="lg-inhoud lg-inhoud--smal">
+      <div id="lgOnderwerpen" class="lg-onderwerpen" role="radiogroup" aria-label="Onderwerp"></div>
+      <form id="lgHulpVorm" class="lg-hulpvorm">
+        <label for="lgVraag">Waar loopt u vast?</label>
+        <textarea id="lgVraag" rows="5" maxlength="600" placeholder="Vertel wat u al begrijpt en waar het lastig wordt." required></textarea>
+        <div class="lg-routes" aria-label="Manier van helpen">
+          <button type="button" class="is-actief" data-lg-route="uitleg"><i data-glyf="berichten"></i><b>Leg het anders uit</b><span>Een andere manier die bij u past</span></button>
+          <a href="leerpaspoort.html"><i data-glyf="diploma"></i><b>Oefen samen</b><span>Stap voor stap in uw leerroute</span></a>
+          <button type="button" data-lg-les="kies"><i data-glyf="vrienden"></i><b>Vraag een begeleider</b><span>Start of open een live les</span></button>
+        </div>
+        <button class="lg-hoofdknop lg-hoofdknop--breed" type="submit">Help mij verder <i data-glyf="rechterhand"></i></button>
+      </form>
+      <div id="lgGesprek" class="lg-gesprek" aria-live="polite"></div>
+      <p class="lg-eerlijk"><i data-glyf="schild"></i> Uw bijlesgesprek blijft bij uw profiel en wordt niet automatisch met een begeleider gedeeld.</p>
+    </div>
+  </section>
+</main>
+
+<nav class="lg-nav" aria-label="Leren &amp; Groei navigatie">
+  <button type="button" class="is-actief" data-lg-tab="vandaag" aria-current="page"><i data-glyf="rtf"></i><span>Vandaag</span></button>
+  <button type="button" data-lg-tab="groei"><i data-glyf="grafiek"></i><span>Groei</span></button>
+  <button type="button" data-lg-tab="hulp"><i data-glyf="help"></i><span>Hulp</span></button>
+  <a href="index.html#alle-apps"><i data-glyf="paneel"></i><span>Meer</span></a>
+</nav>
+
+<dialog id="lgLesKies" class="lg-dialog" aria-labelledby="lgLesKiesTitel"><div class="lg-dialog__kop"><div><p class="lg-kicker">Samen leren</p><h2 id="lgLesKiesTitel">Hoe wilt u beginnen?</h2></div><button type="button" data-lg-sluit aria-label="Sluiten">&times;</button></div><div class="lg-dialog__inhoud lg-leskeuze"><button type="button" data-lg-les="docent"><i data-glyf="diploma"></i><b>Ik begeleid</b><span>Start een les en ontvang een tijdelijke lescode.</span></button><button type="button" data-lg-les="leerling"><i data-glyf="rtf"></i><b>Ik ga leren</b><span>Doe mee met de lescode en open uw schrift.</span></button></div></dialog>
+
+<dialog id="dlgDocent" class="lg-dialog" aria-labelledby="lgDocentTitel"><div class="lg-dialog__kop"><div><p class="lg-kicker">Live les</p><h2 id="lgDocentTitel">Nieuwe les</h2></div><button type="button" data-lg-sluit aria-label="Sluiten">&times;</button></div><div class="lg-dialog__inhoud"><label>Vak of onderwerp<input id="dVak" maxlength="40" placeholder="Bijvoorbeeld rekenen"></label><label>Naam van de begeleider<input id="dNaam" maxlength="40" placeholder="Uw naam"></label><p class="lg-fout" id="dFout" role="alert"></p><button class="lg-hoofdknop lg-hoofdknop--breed" type="button" id="dStart">Start les</button></div></dialog>
+
+<dialog id="dlgLeerling" class="lg-dialog" aria-labelledby="lgLeerlingTitel"><div class="lg-dialog__kop"><div><p class="lg-kicker">Live les</p><h2 id="lgLeerlingTitel">Meedoen</h2></div><button type="button" data-lg-sluit aria-label="Sluiten">&times;</button></div><div class="lg-dialog__inhoud"><label>Lescode<input class="lg-code" id="lCode" maxlength="6" autocapitalize="characters" placeholder="LESCODE"></label><label>Uw naam of bijnaam<input id="lNaam" maxlength="40" placeholder="Uw naam"></label><p class="lg-fout" id="lFout" role="alert"></p><button class="lg-hoofdknop lg-hoofdknop--breed" type="button" id="lJoin">Doe mee</button></div></dialog>
 
 <script src="/shared/uitvoer.js"></script>
 <script src="sessie.js"></script>
 <script src="/shared/rtg-school-session.js"></script>
-<script>
-const $ = s => document.querySelector(s);
-async function api(p, b){ const r = await fetch('/api/foundation'+p,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b||{})}); const d = await r.json().catch(()=>({})); if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d; }
-// het profiel kennen we al: vul de naam vast in
-const _naam = (window.Sessie && Sessie.naam && Sessie.naam()) || '';
-if (_naam){ $('#dNaam').value = _naam; $('#lNaam').value = _naam; }
-$('#rolDocent').addEventListener('click', ()=> $('#dlgDocent').showModal());
-$('#rolLeerling').addEventListener('click', ()=> $('#dlgLeerling').showModal());
-document.querySelectorAll('[data-sluit]').forEach(b=> b.addEventListener('click', e=> e.target.closest('dialog').close()));
-$('#dStart').addEventListener('click', async ()=>{
-  $('#dFout').textContent='';
-  try{ const d = await api('/les/maak', { vak: $('#dVak').value, naam: $('#dNaam').value }); RTGSchoolSession.zet('rtf_docent', { code:d.code, token:d.token }); location.href = 'bord.html?code='+d.code; }
-  catch(e){ $('#dFout').textContent = e.message; }
-});
-$('#lJoin').addEventListener('click', async ()=>{
-  $('#lFout').textContent='';
-  const code = $('#lCode').value.trim().toUpperCase();
-  try{ const d = await api('/les/join', { code, naam: $('#lNaam').value }); RTGSchoolSession.zet('rtf_leerling', { code, token:d.token, naam:d.naam }); location.href = 'schrift.html?code='+code; }
-  catch(e){ $('#lFout').textContent = e.message; }
-});
-$('#lCode').addEventListener('input', e=> e.target.value = e.target.value.toUpperCase());
-if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
-</script>
+<script src="leren-groei-weergave.js"></script>
+<script src="leren-groei.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
-<script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
-<script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/ios.js" defer></script>
 <script src="premium.js" defer></script>
 </body>
 </html>

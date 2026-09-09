@@ -147,7 +147,9 @@ test('een app-pagina draagt geen woordmerk meer in zijn chrome',
       const r = await page.evaluate(() => ({
         ios: document.body.hasAttribute('data-ios'),
         merk: document.querySelectorAll('.os-merk, .os-merk-logo, .osbar, .os-kick, img[alt="RTG"]').length,
-        eyInKop: document.querySelectorAll('body > header .ey').length,
+        /* Een redactionele hero mag een eyebrow hebben; alleen de vaste
+           applicatiechrome mag niet opnieuw een woordmerk dragen. */
+        eyInKop: document.querySelectorAll('body > header:not(.vliegkop) .ey').length,
         pil: !!document.querySelector('.ios-thuis'),
       }));
       assert.ok(r.ios, pad + ': de iOS-laag staat niet aan');

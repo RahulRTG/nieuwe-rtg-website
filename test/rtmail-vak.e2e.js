@@ -44,6 +44,10 @@ test('postvak op het scherm: mappen, opbergen, ster, zoeken en het gesprek',
     letOpFouten(page, fouten);
     await page.addInitScript((tok) => { localStorage.setItem('rtg_member_token', tok); }, reg.token);
     await page.goto(base + '/apps/rtmail.html', { waitUntil: 'domcontentloaded' });
+    /* RTMail opent nu op de rustige betekenisvolle voorzijde. De volledige
+       mappenwerkplek blijft via ‘Alle post’ bereikbaar; deze toets volgt die
+       echte gebruikersroute voordat hij het postvak controleert. */
+    await page.locator('.rtm-nav [data-rtm-diep="inbox"]').click();
     await page.waitForSelector('.mapbalk', { timeout: 15000 });
 
     // de vier mappen staan er, en "Postvak in" is de open map

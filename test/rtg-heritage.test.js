@@ -17,12 +17,14 @@ const CHECK = lees('scripts/check.js');
 
 test('de centrale laag blijft klein, gesplitst en laat alle delen één keer binnen', () => {
   for (const naam of ['rtg-heritage.css', 'rtg-heritage-materials.css', 'rtg-heritage-adapters.css',
+    'rtg-heritage-experiences.css',
     'rtg-heritage-components.css']) {
     const bytes = fs.statSync(path.join(ROOT, 'public/shared', naam)).size;
     assert.ok(bytes < 10 * 1024, naam + ' hoort onder de 10 KB te blijven, is ' + bytes);
   }
   assert.equal((TOKENS.match(/rtg-heritage-materials\.css/g) || []).length, 1);
   assert.equal((TOKENS.match(/rtg-heritage-adapters\.css/g) || []).length, 1);
+  assert.equal((TOKENS.match(/rtg-heritage-experiences\.css/g) || []).length, 1);
   assert.equal((TOKENS.match(/rtg-heritage-components\.css/g) || []).length, 1);
 });
 
@@ -137,6 +139,7 @@ test('de volledige Heritage-laag reist mee in beide offline schillen', () => {
     '/shared/rtg-heritage.css',
     '/shared/rtg-heritage-materials.css',
     '/shared/rtg-heritage-adapters.css',
+    '/shared/rtg-heritage-experiences.css',
     '/shared/rtg-heritage-components.css',
     '/shared/rtg-heritage-motion.css',
     '/shared/rtg-heritage-motion.js',

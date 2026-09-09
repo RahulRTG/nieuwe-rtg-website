@@ -1,0 +1,54 @@
+/* Warme voordeur voor de bestaande MediaOS-kern. */
+body.rtg-media-experience{
+  --media-bg:#0b0807;--media-card:#17100c;--media-card2:#21150f;
+  --media-ink:#f4eadc;--media-soft:#bcae9d;--media-gold:#d1aa60;
+  --media-line:rgba(209,170,96,.28);--media-wine:#801b39;
+  background:radial-gradient(circle at 80% 4%,rgba(135,67,27,.17),transparent 30rem),linear-gradient(150deg,#130d09,var(--media-bg) 58%,#070504)!important;
+  color:var(--media-ink);padding-bottom:9.5rem
+}
+.rtg-media-experience .os-switcher{display:none}
+.rtg-media-experience .media-werk{min-height:100dvh}
+.rtg-media-experience .kop{position:relative;display:grid!important;grid-template-columns:minmax(180px,.6fr) minmax(320px,1.4fr) repeat(4,auto);align-items:end!important;gap:.75rem;min-height:250px!important;padding:2.6rem clamp(1.25rem,4vw,4.5rem) 1.5rem!important;border-top:0;border-bottom:1px solid var(--media-line);overflow:hidden;background:linear-gradient(90deg,rgba(8,5,4,.98) 0 40%,rgba(8,5,4,.62)),url('/images/start/dagdelen/hero-avond.jpg') 80% 62%/cover}
+.rtg-media-experience .kop:after{content:"";position:absolute;inset:auto 0 0;height:42%;background:linear-gradient(transparent,var(--media-bg));pointer-events:none}
+.rtg-media-experience .kop>*{position:relative;z-index:1}
+.media-brand{align-self:start;display:grid;grid-template-columns:auto auto;align-items:baseline;gap:.15rem .85rem;color:inherit;text-decoration:none}
+.media-brand>span{grid-row:1/3;color:var(--media-gold);font:400 2.35rem/1 "Bodoni Moda",Georgia,serif}
+.media-brand>b{font-size:.9rem;font-weight:450}.media-brand>small{color:#c8ab75;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase}
+.rtg-media-experience .media-titel>span{color:var(--media-gold);font-size:.6rem;letter-spacing:.22em}
+.rtg-media-experience .media-titel h1{max-width:650px;margin:.45rem 0;color:var(--media-ink);font:400 clamp(2.75rem,5.5vw,5rem)/.9 "Bodoni Moda",Georgia,serif!important;letter-spacing:-.035em}
+.rtg-media-experience .media-titel p{color:var(--media-soft);line-height:1.5}
+.rtg-media-experience .kop>.rek{display:none}
+.rtg-media-experience .kop>.knop{align-self:end;min-height:42px;border-color:var(--media-line);background:rgba(11,8,7,.66);color:var(--media-ink);backdrop-filter:blur(14px)}
+.rtg-media-experience .rtg-duimbalk{display:none}
+.rtg-media-experience #standen{gap:0;margin:1rem clamp(1.25rem,4vw,4.5rem) 0;padding:0;border:1px solid var(--media-line);background:rgba(17,12,9,.86)}
+.rtg-media-experience #standen button{flex:1;min-height:44px;margin:0;padding:.55rem .8rem;border-left:1px solid var(--media-line);border-bottom:0;color:var(--media-soft);letter-spacing:.1em}
+.rtg-media-experience #standen button:first-child{border-left:0}.rtg-media-experience #standen button[aria-current=true]{background:rgba(209,170,96,.11);color:var(--media-gold);box-shadow:inset 0 -2px var(--media-gold)}
+.rtg-media-experience .media-werk>main{max-width:1180px!important;margin:auto;padding:1rem clamp(1rem,4vw,3.5rem) 10.5rem!important}
+.media-belofte{display:grid;grid-template-columns:auto 1fr;gap:.75rem;align-items:center;margin:0 0 1rem;padding:.8rem .95rem;border:1px solid var(--media-line);background:linear-gradient(135deg,rgba(128,27,57,.2),rgba(209,170,96,.06))}
+.media-belofte>span{display:grid;place-items:center;width:38px;height:38px;border:1px solid var(--media-gold);border-radius:50%;color:var(--media-gold)}
+.media-belofte p{margin:0;color:var(--media-soft);font-size:.72rem;line-height:1.45}.media-belofte b{display:block;color:var(--media-ink);font:400 1rem "Bodoni Moda",Georgia,serif}
+.rtg-media-experience #uitleg{max-width:730px;margin:0 0 1rem;color:var(--media-soft)}
+.rtg-media-experience .stukken{grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem}
+.rtg-media-experience .stuk{position:relative;min-height:220px;padding:1rem;border-color:var(--media-line);overflow:hidden;background:radial-gradient(circle at 75% 17%,rgba(209,170,96,.13),transparent 27%),linear-gradient(145deg,var(--media-card2),var(--media-card));box-shadow:0 18px 46px rgba(0,0,0,.18)}
+.rtg-media-experience .stuk>*{position:relative;z-index:1}
+.rtg-media-experience .stuk.media-feature{grid-column:span 2;min-height:410px;justify-content:flex-end;background:linear-gradient(180deg,rgba(9,6,5,.08) 15%,rgba(9,6,5,.95) 91%),url('/images/start/dagdelen/hero-avond.jpg') 62% center/cover}
+.rtg-media-experience .media-beeld{position:absolute;z-index:0;inset:0;width:100%;height:100%;object-fit:cover;opacity:.58}
+.rtg-media-experience .stuk .vorm{color:var(--media-gold);letter-spacing:.2em}.rtg-media-experience .stuk .t{max-width:570px;color:var(--media-ink);font-size:clamp(1.35rem,2.4vw,2.4rem)}
+.rtg-media-experience .stuk .m,.rtg-media-experience .stuk .waarom{color:var(--media-soft)}
+.rtg-media-experience .stuk .waarom{max-width:34rem;border-left-color:var(--media-gold)}
+.rtg-media-experience .stuk .rij{margin-top:.65rem}.rtg-media-experience .knop{min-height:40px;border-color:var(--media-line);background:rgba(11,8,7,.72);color:var(--media-ink)}
+.rtg-media-experience .knop.vol{border-color:#a62c4d;background:linear-gradient(135deg,#651126,#931d40);color:#fff}.rtg-media-experience .knop.aan{border-color:var(--media-gold);color:var(--media-gold)}
+.rtg-media-experience .maker{color:var(--media-ink)}
+.rtg-media-experience .kader{border-color:var(--media-line);background:var(--media-card)}
+.rtg-media-experience #specialisten{border-color:var(--media-line)}.rtg-media-experience #specialisten a{border-color:var(--media-line);color:var(--media-soft)}
+.rtg-media-experience .lade{background:rgba(5,3,2,.78);backdrop-filter:blur(18px)}.rtg-media-experience .lade .vlak{min-height:70vh;margin:5vh auto;padding:1.2rem;border-color:var(--media-line);background:radial-gradient(circle at 80% 0,rgba(128,27,57,.18),transparent 28rem),var(--media-bg)}
+.rtg-media-experience .lade h3{max-width:700px;color:var(--media-ink);font-size:clamp(2rem,5vw,3.6rem);line-height:.98}.rtg-media-experience .lade h2{color:var(--media-gold)}
+.media-bieb-doorgangen{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin-top:1rem}.media-bieb-doorgangen .knop{display:grid;place-items:center;text-decoration:none}
+.rtg-media-experience .speler{left:156px!important;bottom:0;padding:.65rem max(1rem,calc((100% - 1120px)/2));border-color:var(--media-line);background:rgba(15,10,8,.96);box-shadow:0 -18px 55px rgba(0,0,0,.3);backdrop-filter:blur(18px)}
+.rtg-media-experience .speler .titel{color:var(--media-ink);font:400 1rem "Bodoni Moda",Georgia,serif}.rtg-media-experience .speler .sub{color:var(--media-soft)}
+.media-player-actions{display:flex;gap:.45rem;margin-top:.55rem}.media-player-actions[hidden]{display:none}
+.media-mobile-nav{position:fixed;z-index:55;left:max(10px,calc(50% - 380px));right:max(10px,calc(50% - 380px));bottom:max(10px,env(safe-area-inset-bottom));display:none;grid-template-columns:1fr 1fr 62px 1fr 1fr;align-items:end;padding:.45rem;border:1px solid var(--media-line);background:rgba(14,9,7,.96);box-shadow:0 18px 60px #000;backdrop-filter:blur(22px)}
+.media-mobile-nav button,.media-mobile-nav a{min-height:48px;display:grid;place-items:center;align-content:center;gap:.2rem;border:0;background:none;color:var(--media-soft);font:inherit;font-size:.61rem;text-align:center;text-decoration:none}.media-mobile-nav [data-icon]:before{content:attr(data-icon);color:currentColor;font-size:1.05rem}.media-mobile-nav [aria-current=page]{color:var(--media-gold)}
+.media-mobile-nav .media-plus{align-self:center;justify-self:center;width:56px;height:56px;min-height:56px;border:1px solid #a63150;border-radius:50%;background:linear-gradient(145deg,#9a2545,#58101f);color:#fff;font-size:0}.media-mobile-nav .media-plus:before{content:'+';font:300 1.8rem/1 Inter,sans-serif}
+@media(max-width:999px){.rtg-media-experience .media-bank{display:none}.rtg-media-experience .media-werk{margin-left:0}.rtg-media-experience .speler{left:0!important;bottom:130px}.media-mobile-nav{display:grid;bottom:calc(max(10px,env(safe-area-inset-bottom)) + 48px)}.rtg-media-experience .kop{grid-template-columns:1fr repeat(4,auto)}.media-brand{grid-column:1/-1}.rtg-media-experience .media-titel{grid-column:1/-1}.rtg-media-experience .stukken{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:650px){body.rtg-media-experience{padding-bottom:13rem}.rtg-media-experience .kop{display:grid!important;grid-template-columns:repeat(4,1fr);min-height:430px!important;padding:calc(env(safe-area-inset-top) + .85rem) 1rem 1.1rem!important;background:linear-gradient(180deg,rgba(8,5,4,.22),rgba(8,5,4,.94) 84%),url('/images/start/dagdelen/hero-avond.jpg') 61% center/cover}.media-brand{grid-column:1/-1;align-self:start}.rtg-media-experience .media-titel{grid-column:1/-1;align-self:end}.rtg-media-experience .media-titel h1{font-size:clamp(2.8rem,14vw,4.2rem)!important}.rtg-media-experience .kop>.knop:not(.media-nieuw){display:grid;place-items:center;min-width:0;padding:.5rem .2rem;font-size:.64rem}.rtg-media-experience .media-ruimtes{display:none}.rtg-media-experience #standen{margin:.75rem .8rem 0}.rtg-media-experience #standen button{padding:.5rem .55rem;font-size:.58rem}.rtg-media-experience .media-werk>main{padding:1rem .8rem 15rem!important}.media-belofte{margin-bottom:.75rem}.rtg-media-experience .stukken{grid-template-columns:1fr}.rtg-media-experience .stuk.media-feature{grid-column:auto;min-height:390px}.rtg-media-experience .stuk{min-height:190px}.rtg-media-experience .stuk .t{font-size:1.55rem}.rtg-media-experience .lade .vlak{min-height:100%;margin:0;padding:calc(env(safe-area-inset-top) + 1rem) .85rem 11rem}.media-bieb-doorgangen{grid-template-columns:1fr}.rtg-media-experience.media-video-playing .speler{top:max(54px,env(safe-area-inset-top));bottom:130px;display:flex;flex-direction:column;justify-content:center;padding:1rem;background:linear-gradient(155deg,#1b100b,#090605)}.rtg-media-experience.media-video-playing .speler video{max-height:55vh}.rtg-media-experience.media-video-playing .speler .titel{font-size:1.7rem}.rtg-media-experience .melding{bottom:13.5rem}}

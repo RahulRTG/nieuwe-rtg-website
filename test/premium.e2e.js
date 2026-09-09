@@ -43,7 +43,7 @@ const PREMIUM_ZELFSTANDIG = [
   ['mijnmall', /Mijn Mall/i, /Mijn Mall|toegang|pas/i],
   ['ovcontrol', /Mobility Control Tower/i, /Mobility Control Tower|operatie/i],
   ['partner-worden', /Partner worden/i, /Partneraanvraag|Partner worden/i],
-  ['rit', /RTG Rit/i, /Geen rit gekozen|Rit/i],
+  ['rit', /RTG Aankomst & Chauffeur/i, /Van aankomst|Rit/i],
   ['voertuig', /RTG Voertuig/i, /Geen voertuig gekozen|Voertuig/i],
   ['zaakweb', /Mijn RTG-website/i, /Mijn RTG-website|Nog geen website/i]
 ];

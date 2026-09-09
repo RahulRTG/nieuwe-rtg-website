@@ -17,7 +17,9 @@
    Gebruik:
      RTGPlek.aan()                      staat de schakelaar aan?
      RTGPlek.vraag({ waarom: '...' })   -> Promise van {lat,lng} of null
-     RTGPlek.volg(cb, { waarom })       -> stopfunctie; cb krijgt elke nieuwe plek
+     RTGPlek.volg(cb, { waarom, geenPlek })  -> stopfunctie; cb krijgt elke nieuwe
+                                        plek, geenPlek(reden) gaat een keer af
+                                        zodra vaststaat dat er geen komt
      RTGPlek.zetAan(true|false)         de schakelaar zelf (bedieningspaneel)
 
    De browser vraagt daarna zelf nog een keer toestemming, en dat is juist: onze
@@ -120,17 +122,44 @@
   /* Meelopen met je positie (navigatie, een rit volgen). Geeft een stopfunctie
      terug; die hoort bij het verlaten van het scherm aangeroepen te worden,
      anders blijft het toestel peilen als niemand kijkt. */
+  /* NIETS KRIJGEN IS OOK EEN ANTWOORD, EN DAT WERD NIET DOORGEGEVEN.
+
+     `volg` riep `cb` aan bij elke nieuwe plek en zweeg als er nooit een kwam.
+     De aanroeper wist dus niet het verschil tussen "de fix duurt even" en "je
+     hebt zojuist nee gezegd", en kon niets anders dan een tijd afwachten. RTG
+     Navigatie deed dat met twaalf seconden: gemeten op een browser die de
+     locatie weigert, staat een lid twaalf seconden naar een zwart scherm te
+     kijken terwijl het antwoord er na een halve seconde al was.
+
+     `geenPlek(reden)` gaat daarom hoogstens EEN keer af, en alleen zolang er
+     nog geen enkele plek is binnengekomen -- een haperende fix NADAT je positie
+     bekend was, is geen "geen plek" maar ruis, en wie daarop een poort opent,
+     gooit een werkende kaart weg. De reden is het woord dat we werkelijk kunnen
+     onderscheiden en geen gok:
+
+       geen-gps          dit toestel kent geen locatiebepaling
+       niet-toegestaan   de vraag is met "nu niet" beantwoord, of het toestel
+                         gaf bij de eerste peiling niets vrij
+       toestel-weigert   de schakelaar stond aan, maar het toestel weigert
+  */
   function volg(cb, opties) {
     opties = opties || {};
-    var id = null, gestopt = false;
+    var id = null, gestopt = false, gehad = false, gemeld = false;
+    function gezien(plek) { gehad = true; cb(plek); }
+    function niets(reden) {
+      if (gehad || gemeld || gestopt) return;
+      gemeld = true;
+      if (typeof opties.geenPlek === 'function') opties.geenPlek(reden);
+    }
     function start() {
-      if (gestopt || !navigator.geolocation) return;
+      if (gestopt) return;
+      if (!navigator.geolocation) return niets('geen-gps');
       id = navigator.geolocation.watchPosition(function (p) {
-        cb({ lat: p.coords.latitude, lng: p.coords.longitude, nauwkeurig: p.coords.accuracy });
-      }, function () { zet(false); }, Object.assign({ enableHighAccuracy: true, maximumAge: 10000 }, opties.gps));
+        gezien({ lat: p.coords.latitude, lng: p.coords.longitude, nauwkeurig: p.coords.accuracy });
+      }, function () { zet(false); niets('toestel-weigert'); }, Object.assign({ enableHighAccuracy: true, maximumAge: 10000 }, opties.gps));
     }
     if (aan()) start();
-    else vraag(opties).then(function (plek) { if (plek) { cb(plek); start(); } });
+    else vraag(opties).then(function (plek) { if (plek) { gezien(plek); start(); } else niets('niet-toegestaan'); });
     return function stop() {
       gestopt = true;
       if (id != null && navigator.geolocation) { navigator.geolocation.clearWatch(id); id = null; }

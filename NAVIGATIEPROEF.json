@@ -1,0 +1,120 @@
+{
+  "stempel": "2026-09-09",
+  "uitleg": "De belofte van RTG Navigatie -- breng mij vanaf waar ik nu ben naar mijn bestemming -- gemeten in een echte browser, per SCHAKEL (doet het lid iets, en ziet hij het gevolg?) en per STORING (houdt de belofte als het misgaat?). Derde keten naast tafelproef en ritproef; zie BETROUWBAARHEID.md par. 1.",
+  "grens": "Alleen de app op telefoonformaat, alleen de rol lid. De motor zelf staat in test/navigatie.test.js; deze proef meet het scherm erboven. Er wordt niet werkelijk gereden: dat de bocht-voor-bocht op straat klopt, is hier niet gemeten en kan dat ook niet.",
+  "browser": "/opt/pw-browsers/chromium",
+  "schakels": [
+    {
+      "nr": 1,
+      "van": "lid",
+      "naar": "kaart",
+      "wat": "opent RTG Navigatie met een vrijgegeven locatie",
+      "ziet": "de kaart bouwt en de poort blijft dicht; de badge noemt het net dat hier ligt",
+      "stand": "gesloten",
+      "antwoord": "badge: \"Demonstratienet\", poort dicht: true"
+    },
+    {
+      "nr": 2,
+      "van": "lid",
+      "naar": "motor",
+      "wat": "typt een woord in het zoekveld",
+      "ziet": "de eigen bronnen komen terug, met de afstand vanaf waar hij staat",
+      "stand": "gesloten",
+      "antwoord": "4 treffers, eerste afstand: \"684 m\""
+    },
+    {
+      "nr": 3,
+      "van": "lid",
+      "naar": "route",
+      "wat": "kiest een bestemming uit de lijst",
+      "ziet": "het routepaneel opent met een ETA, een afstand en bocht-voor-bocht",
+      "stand": "gesloten",
+      "antwoord": "ETA \"2 min\", 4 stappen"
+    },
+    {
+      "nr": 4,
+      "van": "toetsenbord",
+      "naar": "route",
+      "wat": "kiest dezelfde bestemming met pijltjes en Enter",
+      "ziet": "de lijst draagt opties, de keuze is te zien, en Enter berekent de route",
+      "stand": "gesloten",
+      "antwoord": "rol \"option\", gemarkeerd: 1, ETA \"10 min\""
+    },
+    {
+      "nr": 5,
+      "van": "lid",
+      "naar": "route",
+      "wat": "wisselt van auto naar lopen",
+      "ziet": "dezelfde route wordt opnieuw gerekend en de ETA verandert mee",
+      "stand": "gesloten",
+      "antwoord": "auto \"10 min\" -> lopen \"82 min\""
+    },
+    {
+      "nr": 6,
+      "van": "lid",
+      "naar": "netwerk",
+      "wat": "meldt een file op deze plek",
+      "ziet": "de keuze staat in het scherm zelf en de melding wordt bevestigd",
+      "stand": "gesloten",
+      "antwoord": "5 keuzeknoppen, antwoord: \"File gemeld voor het netwerk.\""
+    },
+    {
+      "nr": 7,
+      "van": "vinger",
+      "naar": "kaart",
+      "wat": "knijpt met twee vingers uit elkaar",
+      "ziet": "het beeld verandert; zonder deze weg is de kaart op een telefoon niet te zoomen",
+      "stand": "gesloten",
+      "antwoord": "beeld stond stil en veranderde door het knijpen: true"
+    }
+  ],
+  "storingen": [
+    {
+      "naam": "het toestel geeft geen locatie af",
+      "belofte": "binnen drie seconden een poort met de reden, een uitweg, en een badge die niet doet alsof de motor draait",
+      "stand": "gehouden",
+      "wat": "poort na 470 ms, reden \"Uw toestel geeft geen locatie af. Kies zelf uw vertrekpunt; RTG verzin\", badge \"Locatie onbekend\", uitweg: true"
+    },
+    {
+      "naam": "een lid dat zelf zijn vertrekpunt kiest",
+      "belofte": "de kaart bouwt alsnog en er komt een echte route uit -- de uitweg is geen doodlopende knop",
+      "stand": "gehouden",
+      "wat": "8 vertrekpunten, kaart open: true, ETA \"17 min\""
+    },
+    {
+      "naam": "een lid in Nederland zonder ingeladen wegennet",
+      "belofte": "poort, badge en zoeklijst zeggen alle drie hetzelfde: hier ligt geen kaartdata -- nergens \"Motor actief\"",
+      "stand": "gehouden",
+      "wat": "poort \"Het Nederlandse wegennet is nog niet ingeladen.\", badge \"Geen kaartdata voor Nederland\", kern \"Geen\", zoeken: \"Het Nederlandse wegennet is nog niet ingeladen.\""
+    },
+    {
+      "naam": "zoeken terwijl de locatievraag nog openstaat",
+      "belofte": "zoeken werkt zonder plek (alleen zonder afstanden) en gooit geen scriptfout",
+      "stand": "gehouden",
+      "wat": "vraag open: 1, 4 treffers, scriptfouten: geen"
+    },
+    {
+      "naam": "een toestel dat zijn plek pas na de poort vrijgeeft",
+      "belofte": "de poort gaat alsnog open en de kaart bouwt; een late fix is geen verloren fix",
+      "stand": "gehouden",
+      "wat": "poort ging dicht: true, badge daarna \"Demonstratienet\""
+    },
+    {
+      "naam": "een zoekterm die niets oplevert",
+      "belofte": "de lijst zegt dat er niets is gevonden in plaats van stil dicht te gaan",
+      "stand": "gehouden",
+      "wat": "lijst zegt: \"Niets gevonden voor “qqzzxx-bestaat-niet”.\""
+    }
+  ],
+  "scriptfouten": [],
+  "telling": {
+    "schakels": 7,
+    "gesloten": 7,
+    "open": 0,
+    "storingen": 6,
+    "gehouden": 6,
+    "gebroken": 0,
+    "scriptfouten": 0
+  },
+  "sluit": true
+}

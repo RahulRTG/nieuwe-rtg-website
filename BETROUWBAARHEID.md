@@ -246,6 +246,39 @@ foutmelding, geen rode toets, geen klacht:
    twaalf modules is precies hoe je een stille fout toevoegt in plaats van
    weghaalt.
 
+7. **En Navigatie zelf, de functie waarmee dit document opent, was niet af.**
+   Een tweede ronde -- deze keer met een browser in plaats van met de hand --
+   leverde vijf stille defecten op in het SCHERM, terwijl de motor eronder
+   (`test/navigatie.test.js`, veertien toetsen) volledig groen stond:
+
+   - de badge zei **"Motor actief"** boven Nederland zonder ingeladen wegennet.
+     Dat is defect 1 hierboven, en `kern/navigatie/dekking.js` heeft het
+     opgelost -- maar het scherm haalde de status alleen op NA een geslaagde
+     kaart, en juist in het faalgeval is die er niet. De reparatie zat in de
+     motor, de leugen stond op het scherm. *Een badge die niet is bijgewerkt is
+     geen lege badge; hij liegt.*
+   - wie zocht voordat de eerste GPS-fix binnen was, kreeg per toetsaanslag een
+     `Cannot read properties of null (reading 'lat')`. Geen resultaten, geen
+     melding, en het zoeken bleef stuk tot er een plek kwam -- terwijl de server
+     een zoekvraag zonder plek gewoon beantwoordt en dan alleen de afstanden
+     weglaat.
+   - nul treffers sloot de lijst zonder een woord, en een 503 van de motor werd
+     helemaal weggegooid: een lid in Amsterdam typte zijn straat en er gebeurde
+     letterlijk niets.
+   - wie zijn locatie weigerde, keek **12,2 seconden** naar een zwart scherm.
+     Het antwoord was er na een halve seconde, maar `shared/plek.js` kon "er
+     komt geen plek" niet doorgeven, dus wachtte de app zijn volle time-out uit.
+   - knijpen deed niets. `pinchD` stond er als losse variabele die nergens werd
+     gelezen, en het doek draagt `touch-action:none` -- dus op precies het
+     toestel waarvoor een navigatie-app bedoeld is, was de kaart niet te zoomen.
+
+   Geen van de vijf zit in een route, dus geen routetoets kon ze vinden. Ze
+   staan nu onder `scripts/navigatieproef.js` (`npm run navigatieproef`): zeven
+   schakels en vijf storingen in een echte browser, met de scriptfouten van de
+   pagina als eigen teller. Elke reparatie is een keer teruggedraaid om te zien
+   dat de proef hem werkelijk mist -- een toets die je niet hebt zien zakken is
+   geen toets (LAT.md regel 11).
+
 Nummer 4 is de reden dat bewijs 1 over een **persona** gaat en niet over een URL.
 Een dichte deur is geen defect; een dichte deur achter een ingang die je aan de
 verkeerde persoon toont, wel.

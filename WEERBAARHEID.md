@@ -158,6 +158,54 @@ en met wat hem weer omlaag brengt — in de vorm van de `OPEN_MAX`-verhoging uit
 een verhoging zonder allebei. Dat is nog altijd 16 lager dan `main` (385). Wie
 een ratel omzeilt zonder het te zeggen, sloopt de ratel zelf.
 
+### 3b. Drie besluiten, uitgevoerd — en wat elk ervan opleverde
+
+De eigenaar heeft op 9 september vier keuzes gemaakt. Drie leidden tot code, de
+vierde was met opzet *niet nu*.
+
+**Vier ogen op rood-staan en de incassoronde, en met opzet niet op bevriezen.**
+`kern/kantoor/tweedehandtekening.js`: de aanvrager vraagt, een collega met een
+eigen kantooraccount bevestigt, en pas dan gebeurt er iets. Bevriezen blijft één
+handtekening omdat het omkeerbaar is én de knop is waarmee je fraude *stopt* —
+twee mensen eisen maakt de rem trager dan de diefstal. Een strengere deur is niet
+vanzelf een veiligere, en dat is de enige plek in deze ronde waar dat expliciet
+tegen elkaar is afgewogen.
+
+**De herkomstpoort gaat nog niet bijten; eerst tellen.** De poort liep al in de
+schaduw, maar telde *per gesprek* en verdween daarna — dus de vraag "hoe vaak zou
+hij bijten" was onbeantwoordbaar en de vlag omzetten een gok.
+`kern/stuur/schaduwtelling.js` telt over gesprekken heen, per wereld en per pad,
+met een leesweg in de boardroom. Het is een **teller en geen journaal**: geen
+identiteit, en een pad met een id erin wordt geschuild in plaats van weggelaten —
+weglaten zou het getal stil verlagen. En de uitslag zegt zelf dat hij niet
+bewaard is, met zijn begindatum erin, zodat "achttien" niet als een totaal over
+de levensduur wordt gelezen.
+
+**Het mandaat wordt niet gebouwd.** `kern/stuur/mandaat.js` blijft grammatica met
+nul aanroepers, en dat is de juiste stand: *leeg is dicht*, dus naïef aansluiten
+geeft de assistent nul paden in plaats van minder. Een mandaat is pas zinvol
+naast een lopende autonome handeling, en die is er niet.
+
+**`zwaar` wordt gemeten en niet geraden — en de meting zegt vooral hoe blind zij
+is.** `scripts/lib/zwaareffect.js` leest uit `IDEMPROEF.json` welke collecties een
+route werkelijk aanraakte. Over de kantoorroutes haalt hij **10,6%**, en binnen
+dat deel vond hij géén verborgen geldbeweging: de drie treffers zijn alle drie
+lezingen of onderhoudsrondes. Maar **12 van de 13 zware routes zijn onmeetbaar** —
+de bankknoppen vragen een levende bank, een geldig IBAN en een lid met een
+rekening, en die wereld zet de proef niet op. `zwaarZonderMens: 0` blijft dus een
+geruststelling met een ondergrens eronder; het verschil is dat die ondergrens nu
+een getal heeft. De twee assen worden **nooit opgeteld**: de padas mist een route
+die geld beweegt onder een onschuldige naam, de effectas mist elke route die de
+proef niet aan het werk kreeg, en een som van twee ondergrenzen is niets.
+
+**Wat het dichtzetten opleverde buiten de deuren zelf.** Drie stille gebreken
+kwamen alleen aan het licht doordat er iets veranderde: de CSV-knop in de
+backoffice deed `if (!r.ok) return;` (jarenlang onopgemerkt omdat hij altijd
+slaagde), de incassoknop meldde "Niets aan de beurt" op een aanvraag, en
+`test/herkomstlus.test.js` toets 3 mat de bijtende poort niet meer omdat de
+schakelaar zijn omgeving één keer leest. **Een deur dichtzetten is de goedkoopste
+manier om te ontdekken welke foutafhandeling er nooit is geweest.**
+
 ## 4. Single Compromise Survivability — de nieuwe lat
 
 De meeteenheid is niet een route en niet een score, maar een zin die per

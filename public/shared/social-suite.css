@@ -312,7 +312,7 @@ body.rtg-social-private-hub{background:var(--suite-ink)!important;}
   .rtg-suiteperson{margin-left:auto;padding-left:.8rem;border-left:0;}
   .rtg-suiteperson-seal{width:34px;height:34px;}
   .rtg-suitenav{top:auto;bottom:0;height:var(--suite-nav);padding-bottom:env(safe-area-inset-bottom,0px);justify-content:stretch;border-top:1px solid rgba(255,255,255,.1);border-bottom:0;background:rgba(20,21,19,.98);}
-  .rtg-suitenav-link{flex:1;min-width:0;justify-content:center;padding:0 .2rem;color:rgba(244,241,233,.44);font-size:.54rem;letter-spacing:.07em;}
+  .rtg-suitenav-link{flex:1;min-width:0;justify-content:center;padding:0 .2rem;color:rgba(244,241,233,.54);font-size:.54rem;letter-spacing:.07em;}
   .rtg-suitenav-link::after{top:0;right:22%;bottom:auto;left:22%;}
   .rtg-suitenav-link[aria-current="page"]{color:#f3ecda;}
   .rtg-suitenav-note{display:none;}

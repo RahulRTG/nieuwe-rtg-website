@@ -10,6 +10,7 @@
 
   function render() {
     var Geld = w.Geld, el = $('#bkApp');
+    if (!el) return; // een laat antwoord na het wisselen van stand
     if (!B.ov.online) { el.innerHTML = B.offline(); return; }
     if (!B.ov.akkoord) {
       el.innerHTML = B.akkoordVraag();
@@ -33,7 +34,8 @@
   async function laad() {
     try { B.ov = await w.Geld.api('/api/bank/overzicht'); render(); }
     catch (e) {
-      $('#bkApp').innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: w.Geld.esc(e.message) }));
+      var vak = $('#bkApp');
+      if (vak) vak.innerHTML = RTGLeeg.html(RTGLeeg.vanFout({ status: 401, message: w.Geld.esc(e.message) }));
     }
   }
 
@@ -48,17 +50,25 @@
     var Geld = w.Geld;
     try {
       var h = await Geld.api('/api/bank/hart', { limit: 25 });
+      if (!$('#bkApp')) return;
       B.hart = h.regels || [];
       $('#bkHart').innerHTML = B.hart.length ? B.hart.map(B.hrow).join('') : '<p class="leeg">Nog geen boekingen.</p>';
     } catch (e) { vang('#bkHart', e); }
-    try { $('#bkInz').innerHTML = B.inzicht(await Geld.api('/api/bank/inzichten')); }
+    try {
+      var inzicht = await Geld.api('/api/bank/inzichten');
+      if (!$('#bkApp')) return;
+      $('#bkInz').innerHTML = B.inzicht(inzicht);
+    }
     catch (e) { vang('#bkInz', e); }
     try {
       var v = await Geld.api('/api/bank/vastelasten');
+      if (!$('#bkApp')) return;
       $('#bkVast').innerHTML = (v.vasteLasten && v.vasteLasten.length)
         ? v.vasteLasten.map(B.vrow).join('') : '<p class="leeg">Nog geen vaste lasten herkend.</p>';
     } catch (e) { vang('#bkVast', e); }
-    $('#bkVeeg').addEventListener('click', async function () {
+    var veeg = $('#bkVeeg');
+    if (!veeg) return;
+    veeg.addEventListener('click', async function () {
       try {
         var r = await Geld.api('/api/bank/veeg');
         $('#bkVeegUit').textContent = r.geveegdCenten

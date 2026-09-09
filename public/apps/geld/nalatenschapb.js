@@ -23,6 +23,7 @@
     var Geld = w.Geld;
     try {
       D.stand = await Geld.api('/api/member/rechterhand/nalatenschap');
+      if (!$('#nlWrap')) return;
       D.teken(D.stand);
     } catch (e) {
       D.stand = null;
@@ -30,7 +31,8 @@
          over de Lifestyle Pass het hele verhaal, en een 500 tegen een
          ingelogd lid "log eerst in" noemen is een leugen. De pagina toonde
          de inlogkaart ook alleen zonder token. */
-      $('#nlVak').innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e));
+      var vak = $('#nlVak');
+      if (vak) vak.innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e));
     }
   }
 

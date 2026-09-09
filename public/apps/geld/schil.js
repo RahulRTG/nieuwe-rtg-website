@@ -46,6 +46,11 @@
     }
     $('#standUitleg').innerHTML = s.uitleg || '';
     $('#paneel').innerHTML = s.html || '';
+    /* De hash verandert bij een gewone ankerklik een fractie VOOR de
+       hashchange-handler dit paneel tekent. Deze markering zegt welke stand
+       werkelijk in beeld staat en geeft toetsen en hulptechnologie een vaste
+       toestand in plaats van een timingaanname. */
+    $('#paneel').dataset.stand = s.id;
 
     /* replaceState en niet pushState: met pushState sleept de terugknop u
        eerst door al uw standwissels voordat u de app uit bent. En ook

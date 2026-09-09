@@ -8,3 +8,11 @@
 .foundation-hulp .fh-hero__beeld{z-index:0}.foundation-hulp .fh-hero__copy{position:relative;z-index:1}.foundation-hulp .fh-hero h1,.foundation-hulp .fh-paginakop h1{font-family:var(--fh-serif)!important;font-weight:500!important;text-transform:none!important;letter-spacing:-.045em!important;line-height:.94!important}.foundation-hulp .fh-nav{z-index:8901}
 .foundation-hulp .fh-hero__beeld{background-image:linear-gradient(180deg,rgba(8,32,32,.08),rgba(7,31,31,.28) 42%,rgba(7,31,31,.96) 100%),url('/images/worlds/heritage/foundation-zorg-dichtbij-v1.jpg');background-position:center 42%}
 .foundation-hulp .fh-paginakop--beeld{background-image:linear-gradient(90deg,rgba(8,43,44,.98),rgba(8,43,44,.7)),url('/images/worlds/heritage/foundation-zorg-dichtbij-v1.jpg');background-position:center 45%}
+/* Deze zorgwereld kiest bewust een warme, lichte kamer. De algemene
+   Foundation Heritage-laag wordt later geladen en zette daardoor de lichte
+   nachtblauwe inkt op deze lichte kaarten. Houd grond en inkt hier als één
+   lokaal materiaalcontract; donkere hero's en balken hebben al hun eigen
+   expliciete lichte tekstkleur. */
+body.foundation-hulp[data-rtg-world="foundation"]{background-color:var(--fh-papier)!important;background-image:none!important;color:var(--fh-inkt)!important}
+body.foundation-hulp .fh-skip{color:var(--fh-inkt)}
+body.foundation-hulp .fh-snel small{color:#5f5a52}

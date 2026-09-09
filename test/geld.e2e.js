@@ -89,14 +89,17 @@ test('RTG Geld: vier hoofdingangen en twaalf vertrouwde standen openen schoon',
          de bewering eronder ("een leeg paneel is het enige dat altijd fout is"). */
       await wachtTot(page, (x) => {
         const p = document.getElementById('paneel');
-        return location.hash === '#' + x && !!p && (p.innerText || '').trim().length > 0;
+        return location.hash === '#' + x && !!p && p.dataset.stand === x &&
+          (p.innerText || '').trim().length > 0;
       }, id, { wat: 'het gevulde paneel van ' + id });
       const beeld = await page.evaluate(() => ({
         hash: location.hash,
+        stand: document.getElementById('paneel').dataset.stand,
         tekst: (document.getElementById('paneel').innerText || '').trim().length,
         actief: (document.querySelector('#standen button[aria-current="true"]') || {}).dataset
       }));
       assert.equal(beeld.hash, '#' + id, 'het adres hoort de stand te dragen');
+      assert.equal(beeld.stand, id, 'het getekende paneel hoort de gevraagde stand te dragen');
       assert.ok(beeld.tekst > 0, 'stand "' + id + '" tekende een leeg paneel');
       assert.equal(beeld.actief.id, HOOFDSTANDEN.includes(id) ? id : 'meer',
         'de balk hoort de actieve hoofdstand te tonen');

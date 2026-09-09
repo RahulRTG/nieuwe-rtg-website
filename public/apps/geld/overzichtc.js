@@ -31,11 +31,13 @@
     var O = D();
     try {
       C = await api('/api/geld/cockpit');
+      if (!$('#ovAlles')) return;
       O.teken(C); O.deelVooruit(C); O.tijdlijn(C);
     } catch (e) {
       C = null;
       /* hint alleen bij 401: een 500 zo noemen is een leugen */
-      $('#ovVak').innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e));
+      var vak = $('#ovVak');
+      if (vak) vak.innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e));
     }
   }
 

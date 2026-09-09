@@ -22,9 +22,11 @@
          serverzin over de Lifestyle Pass het hele verhaal, en een 500 of
          netwerkfout tegen een ingelogd lid "log eerst in" noemen is een
          leugen. De pagina toonde de inlogkaart ook alleen zonder token. */
-      $('#lbVak').innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e));
+      var vak = $('#lbVak');
+      if (vak) vak.innerHTML = RTGLeeg.html(RTGLeeg.vanFout(e));
       return;
     }
+    if (!$('#lbWrap')) return;
     D.S.data = dd;
     if (D.S.open) {
       var o = null;

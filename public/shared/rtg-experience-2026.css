@@ -108,7 +108,7 @@ body.rtg-social-experience .kaart .acties{padding:.15rem .1rem 0}
 body.rtg-social-experience .kaart .acties button{border-radius:0;padding:.42rem .8rem;border-color:rgba(238,212,155,.2);color:#dbcdbd}
 body.rtg-social-experience .kaart .acties button:first-child::before{content:'♡  '}
 body.rtg-social-experience .social-nav{position:fixed;left:.7rem;right:.7rem;bottom:calc(env(safe-area-inset-bottom,0px) + .65rem);z-index:9000;display:flex;border:1px solid rgba(238,212,155,.22);border-radius:0;background:rgba(26,17,13,.94);overflow:hidden;box-shadow:0 1rem 3rem rgba(0,0,0,.5);backdrop-filter:blur(18px)}
-body.rtg-social-experience .social-nav a{flex:1;text-align:center;padding:.7rem .2rem .65rem;color:#a89484;text-decoration:none;font-size:.6rem;font-weight:600}body.rtg-social-experience .social-nav span{display:block;font-size:1.05rem;margin-bottom:.16rem}body.rtg-social-experience .social-nav a[aria-current="page"]{color:var(--xp-gold-soft)}
+body.rtg-social-experience .social-nav a{flex:1;text-align:center;padding:.7rem .2rem .65rem;color:#d7c8ba;text-decoration:none;font-size:.6rem;font-weight:600}body.rtg-social-experience .social-nav span{display:block;font-size:1.05rem;margin-bottom:.16rem}body.rtg-social-experience .social-nav a[aria-current="page"]{color:var(--xp-gold-soft)}
 
 /* Care */
 body.rtg-care-experience{margin:0;background:#eef2f3;color:#12202b;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}

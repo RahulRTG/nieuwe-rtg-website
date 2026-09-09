@@ -366,7 +366,7 @@ dialog::backdrop{background:rgba(2,4,8,.86)!important;backdrop-filter:blur(6px)}
 .rtf-ios-brand{color:var(--rtf-gold-soft);font-family:var(--serif);font-size:.8rem;font-weight:700;letter-spacing:.08em}
 #rtf-toegang-slot{background:radial-gradient(circle at 50% 38%,#101d31,#08090c 62%)!important}
 #rtf-toegang-slot>div{border-color:var(--rtf-line-gold)!important;background:linear-gradient(145deg,#121923,#0b0e14)!important}
-#rtf-toegang-slot h1{font-family:var(--sans)!important;font-weight:900!important;letter-spacing:-.035em!important;text-transform:uppercase}
+#rtf-toegang-slot h1{color:var(--rtf-paper)!important;font-family:var(--sans)!important;font-weight:900!important;letter-spacing:-.035em!important;text-transform:uppercase}
 #rtf-toegang-slot [data-rtf-wissel]{background:linear-gradient(135deg,var(--rtf-crimson),var(--rtf-crimson-bright))!important;color:#fff!important;box-shadow:0 9px 24px rgba(166,0,47,.2)}
 #rtf-toegang-slot [data-rtf-uitweg]{background:#11151d!important;border-color:var(--rtf-line)!important;color:var(--rtf-paper)!important}
 body[data-rtf-page="klas"] #vCode{padding-top:clamp(2rem,10vh,6rem)}

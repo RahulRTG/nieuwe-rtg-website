@@ -3,20 +3,22 @@
   "uitleg": "Blok 0 van KANTOORMACHT.md: staat er een MENS achter elke kantoorhandeling? Zes assen, zes getallen, met opzet geen samengesteld cijfer (BEWIJSMACHINE.md verbiedt het enkele READY boven een scorecard).",
   "grens": "De as `deurEistMens` komt uit de ROUTER en is hard; `handlerKentMens` is lexicaal op BESTANDSniveau en draagt daarom `vermoed` -- een bestand dat officeKey noemt gebruikt hem misschien niet in elke route erin. `handlerKentMens` is dus een BOVENgrens en `anoniemUitvoerbaar` een ONDERgrens. Een deploy-gate hoort aan de harde as te hangen.",
   "stempel": {
-    "op": "2026-09-06T21:05:55.264Z",
-    "commit": "02b8f083",
+    "op": "2026-09-09T00:34:03.929Z",
+    "commit": "28d3b57d",
     "node": "v22.22.2"
   },
   "gemeten": {
     "routes": 586,
-    "deurEistMens": 126,
-    "deurGedeeld": 460,
+    "deurEistMens": 168,
+    "deurGedeeld": 418,
     "zonderBewakerslaag": 3,
     "handlerKentMens": 117,
-    "anoniemUitvoerbaar": 385,
+    "anoniemUitvoerbaar": 365,
     "metSpoor": 130,
     "metReden": 260,
-    "bestanden": 89
+    "bestanden": 89,
+    "zwaar": 17,
+    "zwaarZonderMens": 0
   },
   "graden": {
     "routes": "gemeten",
@@ -26,7 +28,9 @@
     "handlerKentMens": "vermoed",
     "anoniemUitvoerbaar": "vermoed",
     "metSpoor": "vermoed",
-    "metReden": "vermoed"
+    "metReden": "vermoed",
+    "zwaar": "vermoed",
+    "zwaarZonderMens": "vermoed"
   },
   "ongemeten": {
     "risicoPerRoute": "er is geen risicomodule in dit huis (KANTOORMACHT.md par. 3); een 0 zou hier \"gemeten en niet aanwezig\" beweren, en dat is onwaar",
@@ -198,13 +202,13 @@
     }
   ],
   "deuren": {
-    "officeAuth": 451,
+    "officeAuth": 440,
     "boardroomAuth": 108,
     "balieAuth": 31,
     "techAuth": 16,
+    "kluisAuth": 16,
     "eigenaarAlleen": 10,
     "alleenBaas": 6,
-    "kluisAuth": 5,
     "naamAuth": 3
   }
 }

@@ -89,7 +89,7 @@ test('3b. de zelfijking zegt ook NEE als er niets beweegt', () => {
      vervalsing verandert dan niets, en `bewoog` HOORT false te zijn. */
   const alOpgelost = Object.assign(bronnen(), {
     kantoormacht: { ok: true, data: {
-      gemeten: { routes: 586, deurGedeeld: 0, deurEistMens: 586 },
+      gemeten: { routes: 586, deurGedeeld: 0, deurEistMens: 586, zwaar: 17, zwaarZonderMens: 0 },
       machinerie: { vierogen: { aanKantoorroute: 12 }, voornemen: { aanKantoorroute: 12 } }
     } }
   });

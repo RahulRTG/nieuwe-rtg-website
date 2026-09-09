@@ -128,10 +128,24 @@ const RIJEN = [
         return { uitkomst: 'onbekend', graad: 'onbekend',
           grond: 'KANTOORMACHT.json mist deurGedeeld of machinerie.vierogen' };
       }
-      const grond = gedeeld + ' van ' + g.routes + ' kantoorroutes hangen achter de gedeelde code, ' +
-        'en ' + vierogen + ' ervan vragen een tweede handtekening (KANTOORMACHT.json)';
+      const zwaarOpen = g.zwaarZonderMens;
+      if (typeof zwaarOpen !== 'number') {
+        return { uitkomst: 'onbekend', graad: 'onbekend',
+          grond: 'KANTOORMACHT.json mist zwaarZonderMens; draai npm run kantoormacht:vast' };
+      }
+      const grond = gedeeld + ' van ' + g.routes + ' kantoorroutes hangen achter de gedeelde code; ' +
+        'van de ' + g.zwaar + ' die geld bewegen, rechten verlenen of bulk uitvoeren staan er ' +
+        zwaarOpen + ' zonder mens op naam, en ' + vierogen + ' kantoorroutes vragen een tweede ' +
+        'handtekening (KANTOORMACHT.json)';
+      /* DE LADDER, EN WAAROM `deels` NIET AAN VIEROGEN HANGT. De eerste versie
+         zei `deels` zodra er ergens een tweede handtekening stond -- dan zou een
+         enkele route de hele rij optillen, en dat is precies het soort
+         getalbeweging waar dit huis niet in gelooft. De vraag van deze rij is of
+         een gestolen code iets ONOMKEERBAARS kan; het antwoord daarop is het
+         aantal zware routes zonder mens, en niet het aantal gedeelde deuren
+         (het meeste kantoorwerk is dagelijks werk en hoort met de code te kunnen). */
       if (gedeeld === 0) return { uitkomst: 'ja', graad: 'gemeten', grond };
-      if (vierogen > 0) return { uitkomst: 'deels', graad: 'gemeten', grond };
+      if (zwaarOpen === 0) return { uitkomst: 'deels', graad: 'vermoed', grond };
       return { uitkomst: 'nee', graad: 'gemeten', grond };
     },
     nietGemeten: 'wat een gestolen code in de PRAKTIJK oplevert -- dat hangt af van welke 460 routes ' +
@@ -384,7 +398,7 @@ function zelfijking(basis) {
   const kantoorNu = nu.rijen.find(r => r.id === 'kantoorcode');
 
   const vervalst = JSON.parse(JSON.stringify({
-    gemeten: { routes: 586, deurGedeeld: 0, deurEistMens: 586 },
+    gemeten: { routes: 586, deurGedeeld: 0, deurEistMens: 586, zwaar: 17, zwaarZonderMens: 0 },
     machinerie: { vierogen: { aanKantoorroute: 12 }, voornemen: { aanKantoorroute: 12 } }
   }));
   const nep = Object.assign({}, echt, { kantoormacht: { ok: true, data: vervalst, naam: 'verzonnen' } });

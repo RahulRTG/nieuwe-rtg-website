@@ -97,7 +97,15 @@ module.exports = (kern) => {
   const zwaar = kern.zwaarbewijs;
   const boardroomUser = zwaar.boardroomUser;
 
-  const ctx = { app, officeAuth, boardroomAuth: kern.boardroomAuth, boardroomLijst: kern.boardroomLijst,
+  /* `kluisAuth` staat hier bij naam, en dat is geen vormpje. Deze ctx wordt met
+     de HAND samengesteld: wat er niet in staat, komt in de submodules aan als
+     `undefined` -- en een bewaker die undefined is, verdwijnt zonder een woord.
+     Dat is hier echt gebeurd: tien zware bankroutes werden bij het bedraden van
+     de kluispoort in een klap ONBEWAAKT, terwijl de server gewoon opkwam en de
+     bron er goed uitzag. HANDLERWACHT.json ving het (`onbewaakt: 0 -> 10`); de
+     grens en de router deden precies wat ze moesten doen. Wie hier een bewaker
+     bij zet, zet hem ook in GRENZEN.json bij "kantoren". */
+  const ctx = { app, officeAuth, kluisAuth: kern.kluisAuth, boardroomAuth: kern.boardroomAuth, boardroomLijst: kern.boardroomLijst,
     keyVanCodenaam: kern.keyVanCodenaam, veilig, stuur, afdelingen, sseToOffice, db, save, kern,
     zwaar, boardroomUser,
     geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet };

@@ -2,7 +2,7 @@
    Draait op de gedeelde kern; gemount vanuit routes/office.js. */
 module.exports = (octx) => {
   const { kern, officeQueryMag } = octx;
-  const { OFFICE_CODE, app, archief, crypto, db, loginFails, noteFailedTry, officeAuth, officeState,
+  const { OFFICE_CODE, app, archief, crypto, db, loginFails, noteFailedTry, officeAuth, kluisAuth, officeState,
           rememberSession, sseClients, tooManyTries, totpOk, veiligGelijk, logInlog, securityLogKeten,
           handelingsspoor } = kern;
 app.post('/api/office/login', (req, res) => {
@@ -79,7 +79,7 @@ app.post('/api/office/timeline', officeAuth, (req, res) => {
 /* Bewust POST met het token in de Authorization-header (zelfde les als de
    bank-export): een token in een GET-querystring lekt via logs, proxies en de
    browsergeschiedenis. De backoffice downloadt via fetch + blob. */
-app.post('/api/office/export.csv', officeAuth, (req, res) => {
+app.post('/api/office/export.csv', kluisAuth, (req, res) => {
   const esc = require('../../kern/factuur').csvCel; // csv-veilig + geen formule-injectie
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="rtg-backoffice-' + new Date().toISOString().slice(0, 10) + '.csv"');

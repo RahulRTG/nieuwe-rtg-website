@@ -47,10 +47,10 @@ uitslag van `npm run kantoormacht` (`KANTOORMACHT.json`, blok 0 van
 | As | Getal | Graad |
 |---|---|---|
 | kantoorroutes (`/api/office` + `/api/boardroom`) | **<!--getal:kantoor.routes-->586<!--/getal-->** over <!--getal:kantoor.bestanden-->89<!--/getal--> bestanden | gemeten |
-| deur eist een bewezen mens | **<!--getal:kantoor.deurEistMens-->126<!--/getal-->** | gemeten |
-| deur is de gedeelde code | **<!--getal:kantoor.deurGedeeld-->460<!--/getal-->** | gemeten |
+| deur eist een bewezen mens | **<!--getal:kantoor.deurEistMens-->168<!--/getal-->** | gemeten |
+| deur is de gedeelde code | **<!--getal:kantoor.deurGedeeld-->418<!--/getal-->** | gemeten |
 | handler kent de handelende mens | <!--getal:kantoor.handlerKentMens-->117<!--/getal--> | vermoed (bovengrens) |
-| **anoniem uitvoerbaar** | **<!--getal:kantoor.anoniem-->385<!--/getal-->** | vermoed (ondergrens) |
+| **anoniem uitvoerbaar** | **<!--getal:kantoor.anoniem-->365<!--/getal-->** | vermoed (ondergrens) |
 | schrijft een auditspoor | 130 | vermoed |
 | vraagt een reden | 259 | vermoed |
 
@@ -366,7 +366,7 @@ Twee dingen die deze verbouwing NIET mag doen: er komt geen `/admin` erbij
 (`KANTOORMACHT.md` par. 28), en geen tweede zoekbalk naast `kern/command/zoek.js`.
 
 Stand: **een stap weg**, en het is zichtbaar werk — maar het raakt de machtsvraag
-niet. De <!--getal:kantoor.anoniem-->385<!--/getal--> anonieme routes blijven anoniem van een nieuwe schil.
+niet. De <!--getal:kantoor.anoniem-->365<!--/getal--> anonieme routes blijven anoniem van een nieuwe schil.
 
 ## 11. Waar dit voorstel botst met wat er al besloten is
 
@@ -422,7 +422,7 @@ mensen is "een tweede paar ogen" soms "dezelfde mens morgen"**. Daar helpt geen
 hoeveelheid code tegen. `vierogen.js` is er eerlijk over: hij levert de graad van
 de scheiding mee in plaats van een groen vinkje.
 
-**`ENFORCE_EXECUTE` heeft een prijs.** <!--getal:kantoor.deurGedeeld-->460<!--/getal--> routes hangen aan de gedeelde deur, en
+**`ENFORCE_EXECUTE` heeft een prijs.** <!--getal:kantoor.deurGedeeld-->418<!--/getal--> routes hangen aan de gedeelde deur, en
 het kantoor doet daar het dagelijkse werk mee. Wie de deur dichtzet zonder eerst
 de schaduwronde, legt werk stil dat gisteren gewoon mocht. Dat is precies waarom
 `kluispoort.js` destijds de gedeelde code níét heeft afgesloten: *deze poort

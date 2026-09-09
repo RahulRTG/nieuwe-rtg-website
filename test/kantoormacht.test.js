@@ -54,8 +54,37 @@ test('2. de harde as blijft hard: een gedeelde rol telt nooit als een mens', () 
   assert.ok(!EIST_MENS.has('officeAuth'),
     'officeAuth staat in EIST_MENS -- maar de gedeelde kantoorcode maakt een sessie ' +
     'zonder lidKey (kern/kantoor/kluispoort.js). Wie hem meetelt, meet het gat weg.');
-  assert.ok(!EIST_MENS.has('balieAuth') && !EIST_MENS.has('techAuth'),
+  assert.ok(!EIST_MENS.has('techAuth'),
     'een bewaker die alleen een ROL controleert hoort niet in EIST_MENS: een rol is geen mens');
+
+  /* BALIEAUTH STOND HIER BIJ TECHAUTH, EN DAT WAS FEITELIJK ONJUIST -- 9 sep 2026.
+     De regel groepeerde hem als "controleert alleen een rol", maar zijn bron zegt
+     iets anders: server/routes/ledenbalie.js haalt de sleutel op met
+     boardroomWie(req) -- null bij de gedeelde code -- en laat hem langs
+     magBalie(). En kern/ledenbalie-zetels.js opent met `if (!key) return false`
+     en eist daarna een zetel OP NAAM. De gedeelde kantoorcode krijgt daar een 403
+     met zoveel woorden: "de gedeelde kantoorcode opent wel de ruimte, maar wijst
+     niemand aan".
+
+     Die fout kostte een ondertelling van eenendertig routes: het register meldde
+     126 kantoorroutes met een mens erachter terwijl het er 157 waren. Een meter
+     die te STRENG staat is niet veilig -- hij stuurt werk naar routes die al
+     beschermd zijn, en dat is precies wat hier gebeurde.
+
+     De toets eist daarom niet langer dat balieAuth eruit blijft, maar dat hij
+     blijft DOEN waarop hij hier is toegelaten. Wordt de mens-vraag ooit uit die
+     poort gehaald, dan zakt deze regel. */
+  assert.ok(EIST_MENS.has('balieAuth'), 'balieAuth eist aantoonbaar een mens en hoort in EIST_MENS');
+  const balie = fs.readFileSync(path.join(WORTEL, 'server/routes/ledenbalie.js'), 'utf8');
+  const tak = balie.slice(balie.indexOf('function balieAuth'), balie.indexOf('function balieAuth') + 400);
+  assert.match(tak, /boardroomWie\(req\)/,
+    'balieAuth vraagt niet meer welke MENS er achter de sessie zit; dan is het een rolcontrole ' +
+    'en hoort hij uit EIST_MENS');
+  assert.match(tak, /magBalie\(/,
+    'balieAuth toetst de zetel niet meer; zonder die tweede helft laat hij elke naam door');
+  const zetels = fs.readFileSync(path.join(WORTEL, 'server/kern/ledenbalie-zetels.js'), 'utf8');
+  assert.match(zetels, /function magBalie\(key\)\s*\{\s*\n?\s*if \(!key\) return false;/,
+    'magBalie laat een lege sleutel door; dan komt de gedeelde code er alsnog langs');
   assert.ok(EIST_MENS.has('kluisAuth') && EIST_MENS.has('boardroomAuth'),
     'de twee poorten die aantoonbaar een identiteit eisen horen er wel in');
 });

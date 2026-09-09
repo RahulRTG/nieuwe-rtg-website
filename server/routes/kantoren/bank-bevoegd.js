@@ -17,7 +17,7 @@
    `naam(req)` komt uit ./bank.js mee via de context: wie er handelt komt uit de
    sessie, nooit uit req.body. Zie de toelichting daar. */
 module.exports = (ctx) => {
-  const { app, officeAuth, boardroomAuth, veilig, afdelingen, sseToOffice, kern, naam,
+  const { app, officeAuth, kluisAuth, boardroomAuth, veilig, afdelingen, sseToOffice, kern, naam,
           zwaar, boardroomUser } = ctx;
   const bank = kern.bank;
   const sync = () => sseToOffice('sync', { scope: 'bank' });
@@ -43,7 +43,7 @@ module.exports = (ctx) => {
     res.json(r);
   });
 
-  app.post('/api/office/bank/bevoegdheid', officeAuth, (req, res) => veilig(res, () => kern.bevoegd.matrix({ land: req.body.land })));
+  app.post('/api/office/bank/bevoegdheid', kluisAuth, (req, res) => veilig(res, () => kern.bevoegd.matrix({ land: req.body.land })));
   app.post('/api/office/bank/vergunning', boardroomAuth, (req, res) => veilig(res, () => {
     const r = kern.bankVergunningZet({ soort: req.body.soort, nummer: req.body.nummer, entiteit: req.body.entiteit,
       landen: req.body.landen, tot: req.body.tot, wie: naam(req) });

@@ -75,10 +75,37 @@ const KANTOORPAD = /^\/api\/(office|boardroom)\//;
      naamAuth       mens leidt, is geen spoor"; twee redenen, een implementatie
    - eigenaarAlleen de eigenaar is een persoon, geen code
      alleenBaas
+   - balieAuth     server/routes/ledenbalie.js -- leest boardroomWie(req) en
+                   weigert de gedeelde code letterlijk: "de gedeelde kantoorcode
+                   opent wel de ruimte, maar wijst niemand aan". Hij stond hier
+                   NIET in, en dat was een ondertelling van tot eenendertig
+                   routes: de meter las hem als een rolcontrole omdat hij naast
+                   officeAuth staat, terwijl hij juist de mens erachter opzoekt.
+                   Gevonden bij het bedraden van de zware kantoorroutes -- vijf
+                   ervan bleken al beschermd, en "repareren" wat al klopt is de
+                   duurste manier om een getal te laten bewegen.
    Wie hier iets bij zet, leest eerst de bron van die bewaker. Een bewaker die
    alleen een ROL controleert, hoort er niet bij: `office` is een rol en geen
    mens, en dat verschil is het hele punt van dit script. */
-const EIST_MENS = new Set(['boardroomAuth', 'kluisAuth', 'naamAuth', 'eigenaarAlleen', 'alleenBaas']);
+const EIST_MENS = new Set(['boardroomAuth', 'kluisAuth', 'naamAuth', 'eigenaarAlleen', 'alleenBaas', 'balieAuth']);
+
+/* WELKE KANTOORROUTES ZWAAR ZIJN, en waarom die lijst niet zelfverzonnen is.
+   De klassen komen uit kern/isolatie/herkomst.js: dat bestand noemt de effecten
+   die nooit uit een naamloze bron mogen komen (GELD_BEWEGEN, RECHT_VERLENEN,
+   BULK_UITVOER). Dit is dezelfde vraag, een verdieping lager: mag een GEDEELDE
+   CODE dat wel?
+
+   HET IS EEN PADHERKENNING EN DUS EEN ONDERGRENS, geen effectmeting -- een route
+   die geld beweegt zonder dat zijn pad dat verraadt, valt hier buiten. Vandaar
+   graad `vermoed` op de teller en niet `gemeten`. Wie hier iets bij zet,
+   verbreedt de meting; wie iets weghaalt, moet uitleggen waarom die handeling
+   met een gedeelde code mag. */
+const ZWAAR = [
+  ['GELD_BEWEGEN', /(bank\/(incasso|krediet|rekening|salaris|bevoegdheid)|terugstort|uitbetaal)/i],
+  ['RECHT_VERLENEN', /(office\/rechten|machtig|toegang\/geef)/i],
+  ['BULK_UITVOER', /export/i]
+];
+const isZwaar = (pad) => ZWAAR.some(([, re]) => re.test(pad));
 
 /* De twee manieren waarop een handler de handelende mens kan kennen. Beide zijn
    echt in gebruik, en wie er maar een van zoekt telt een factor tien mis --
@@ -166,6 +193,13 @@ function meet() {
     machinerie[naam] = { wat, aanKantoorroute: aan.length, aanroepersInServer: aanroepersTotaal };
   }
 
+  /* De zware routes en hoeveel er GEEN mens achter hebben. Dit is het getal dat
+     zegt of een gestolen kantoorcode iets onomkeerbaars kan; het aantal gedeelde
+     deuren alleen zegt dat niet, want de meeste kantoorroutes zijn dagelijks
+     werk. */
+  const zwareRoutes = routes.filter(r => isZwaar(r.pad));
+  const zwaarZonderMens = zwareRoutes.filter(r => !(r.bewakers || []).some(b => EIST_MENS.has(b))).length;
+
   return {
     soort: 'meting',
     uitleg: 'Blok 0 van KANTOORMACHT.md: staat er een MENS achter elke kantoorhandeling? ' +
@@ -185,7 +219,9 @@ function meet() {
       anoniemUitvoerbaar: anoniem.length,
       metSpoor,
       metReden,
-      bestanden: kantoorBestanden.length
+      bestanden: kantoorBestanden.length,
+      zwaar: zwareRoutes.length,
+      zwaarZonderMens
     },
     graden: {
       routes: 'gemeten',
@@ -195,7 +231,9 @@ function meet() {
       handlerKentMens: 'vermoed',
       anoniemUitvoerbaar: 'vermoed',
       metSpoor: 'vermoed',
-      metReden: 'vermoed'
+      metReden: 'vermoed',
+      zwaar: 'vermoed',
+      zwaarZonderMens: 'vermoed'
     },
     ongemeten: {
       risicoPerRoute: 'er is geen risicomodule in dit huis (KANTOORMACHT.md par. 3); ' +

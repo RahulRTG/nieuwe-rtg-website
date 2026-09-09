@@ -61,7 +61,7 @@
       var werk = d.createElement('button'); werk.type = 'button';
       werk.className = 'rtg-edge-here-action'; werk.setAttribute('data-edge-command-bank', '');
       werk.textContent = 'Werelden en werkbladen';
-      werk.addEventListener('click', function () { sluit(rt); bank.click(); });
+      werk.addEventListener('click', function () { openWerkbladen(rt); });
       nav.appendChild(werk);
     }
     var terug = d.createElement('a');
@@ -86,6 +86,15 @@
   function sluit(rt) {
     var menu = rt.root.querySelector('.rtg-edge-menu');
     if (menu && menu.getAttribute('aria-expanded') === 'true') menu.click();
+  }
+
+  function openWerkbladen(rt) {
+    sluit(rt);
+    d.querySelector('#rtgCommand .cmd-lade').click();
+    w.requestAnimationFrame(function () {
+      var bank = d.querySelector('#rtgCommand.bank-open .cmd-bank');
+      if (bank) { bank.tabIndex = -1; bank.focus({ preventScroll: true }); }
+    });
   }
 
   function deur(href, naam, icon, attribuut) {
@@ -130,7 +139,7 @@
     if (d.querySelector('#rtgCommand .cmd-lade')) {
       var werk = d.createElement('button'); werk.type = 'button'; werk.className = 'rtg-edge-smart-door';
       werk.setAttribute('data-edge-command-bank', ''); werk.textContent = 'Werelden en werkbladen';
-      werk.addEventListener('click', function () { sluit(rt); d.querySelector('#rtgCommand .cmd-lade').click(); });
+      werk.addEventListener('click', function () { openWerkbladen(rt); });
       rt.alles.querySelector('.rtg-edge-smart-doors').appendChild(werk);
     }
     schaal.querySelector('[data-edge-smart-search]').addEventListener('click', function () {
@@ -142,7 +151,7 @@
       if (!groepen) return; ev.preventDefault(); rt.alles.setAttribute('data-catalogus-open', 'true'); groepen.scrollIntoView({ block: 'start' });
     });
     index.addEventListener('focusin', function (ev) {
-      if (ev.target.matches('.rtg-edge-find input')) gezicht(rt, 'all', false);
+      if (ev.target.matches('.rtg-edge-find input')) { gezicht(rt, 'all', false); rt.alles.setAttribute('data-catalogus-open', 'true'); }
     });
     gezicht(rt, wereldHome() ? 'all' : 'here', false);
     return true;
@@ -164,8 +173,17 @@
         menu.setAttribute('aria-label', open ? 'Menu sluiten' : 'Menu openen');
       });
     });
+    rt.zoek = function (ev) {
+      if (!(ev.ctrlKey || ev.metaKey) || ev.key.toLowerCase() !== 'k') return;
+      w.setTimeout(function () {
+        if (index.getAttribute('aria-hidden') !== 'false') return;
+        gezicht(rt, 'all', false); rt.alles.setAttribute('data-catalogus-open', 'true');
+        var input = index.querySelector('.rtg-edge-find input'); if (input) input.focus();
+      }, 0);
+    };
+    doc.addEventListener('keydown', rt.zoek);
     rt.observer = new MutationObserver(function (regels) {
-      if (!doc.documentElement.contains(root)) { rt.observer.disconnect(); actief = null; return; }
+      if (!doc.documentElement.contains(root)) { rt.observer.disconnect(); doc.removeEventListener('keydown', rt.zoek); actief = null; return; }
       bouw(rt);
       regels.forEach(function (regel) {
         if (regel.type !== 'attributes' || regel.target !== index) return;

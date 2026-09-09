@@ -86,6 +86,10 @@ test('3. de ondernemer blokkeert vandaag, en de Mall zegt het', async () => {
      en bewees het blokkeren daarna niets (LAT-regel 9). De oorspronkelijke
      dagen worden aan het eind teruggezet. */
   const begin = (await api('/api/supplier/vak/uren', {}, tok.SERENA)).body.uren;
+  const tz = require('../server/kern/tijdzone');
+  const zone = ['Europe/Madrid', 'Pacific/Auckland'].find(z => tz.lokaal(z).minuten < 1380);
+  const oudeZone = (await api('/api/supplier/mall', {}, tok.SERENA)).body.tijdzone.zone;
+  await api('/api/supplier/tijdzone', { tijdzone: zone }, tok.SERENA);
   /* "Vandaag" is de kalenderdag bij de zaak, niet de UTC-dag van de
      testrunner. Rond middernacht kunnen die verschillen. Lees daarom dezelfde
      zaakzone als de Mall en laat de gedeelde tijdzonehulp de datum bepalen. */
@@ -179,6 +183,7 @@ test('5. "Nu open" laat nooit een zaak door waarvan we het niet weten', async ()
   }
 
   await api('/api/supplier/vak/uren-zet', { dagen: begin.dagen, van: begin.van, tot: begin.tot }, tok.SERENA);
+  await api('/api/supplier/tijdzone', { tijdzone: oudeZone }, tok.SERENA);
 });
 
 test('6. voorraad nul is een antwoord, geen leegte', () => {

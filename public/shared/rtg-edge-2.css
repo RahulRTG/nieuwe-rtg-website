@@ -57,6 +57,7 @@ body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom{
 }
 .rtg-edge-appslot{display:none;min-width:0;height:var(--edge-bottom);overflow-x:auto;overflow-y:hidden;scrollbar-width:none;pointer-events:auto}
 .rtg-edge-appslot::-webkit-scrollbar{display:none}
+.rtg-edge-appslot>.rtg-edge-2-context-button{flex:0 0 44px;background:transparent}
 body[data-rtg-edge-appbar="true"] .rtg-edge-bottom{grid-template-columns:var(--edge-side) 44px minmax(0,1fr) 44px!important}
 body[data-rtg-edge-appbar="true"] .rtg-edge-history,
 body[data-rtg-edge-appbar="true"] .rtg-edge-layout,

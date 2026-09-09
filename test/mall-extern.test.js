@@ -125,7 +125,10 @@ test('4. "Nu open" volgt de klok van de zaak, niet die van de server', async () 
   /* De zaak krijgt een venster dat op haar EIGEN klok nu open is, en daarna een
      tijdzone waarin datzelfde venster juist gesloten is. Verandert het antwoord
      niet mee, dan rekent de Mall nog met de server. */
-  const zone = 'Europe/Amsterdam';
+  /* Kies de zaakklok ruim buiten middernacht; 23:59 is exclusief gesloten. */
+  const zone = ['Europe/Amsterdam', 'Pacific/Auckland'].find(z => {
+    const m = tz.lokaal(z).minuten; return m > 90 && m < 1350;
+  });
   await api('/api/supplier/tijdzone', { tijdzone: zone }, tok.SERENA);
   const hier = tz.lokaal(zone);
   const pad = (n) => String(Math.floor(n / 60)).padStart(2, '0') + ':' + String(n % 60).padStart(2, '0');
@@ -136,8 +139,9 @@ test('4. "Nu open" volgt de klok van de zaak, niet die van de server', async () 
   assert.equal(open.open.open, true, 'op haar eigen klok staat de zaak open (' + open.open.tekst + ')');
 
   // dezelfde uren, maar de zaak staat nu twaalf uur verderop
-  await api('/api/supplier/tijdzone', { tijdzone: 'Pacific/Auckland' }, tok.SERENA);
-  const ginds = tz.lokaal('Pacific/Auckland');
+  const andereZone = zone === 'Europe/Amsterdam' ? 'Pacific/Auckland' : 'Europe/Amsterdam';
+  await api('/api/supplier/tijdzone', { tijdzone: andereZone }, tok.SERENA);
+  const ginds = tz.lokaal(andereZone);
   const binnenVenster = ginds.minuten >= van && ginds.minuten < tot;
   const na = (await mallVan('SERENA'))[0];
   assert.equal(na.open.open, binnenVenster,

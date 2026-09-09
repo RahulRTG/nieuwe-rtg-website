@@ -28,6 +28,7 @@
       else r.ouder.appendChild(r.el);
       r.el.classList.remove('rtg-edge-owned-bar');
     });
+    if (rt.context) rt.context.ouder.appendChild(rt.context.el);
     rt.body.removeAttribute('data-rtg-edge-appbar');
     rt.balken = [];
     if (rt.observer) rt.observer.disconnect();
@@ -49,6 +50,11 @@
     Array.from(d.querySelectorAll('[data-rtg-edge-bar],nav,footer')).forEach(function (el) {
       if (kandidaat(el, rt.root)) neem(rt, el);
     });
+    var context = rt.root.querySelector('.rtg-edge-2-context-button');
+    if (rt.balken.length && context && !rt.slot.contains(context)) {
+      rt.context = { el: context, ouder: context.parentNode };
+      rt.slot.appendChild(context);
+    }
     rt.bezig = false;
   }
 

@@ -110,11 +110,12 @@ test('de poort blijft dicht tot de resync klaar is', async () => {
   const grens = grensMaken(m);
   await grens.herstelNu();
 
-  let laatLos;
-  m.motor.haalNieuwer = () => new Promise(r => { laatLos = () => { m.geteld.haalNieuwer++; r(0); }; });
+  let laatLos, begonnen;
+  const gestart = new Promise(r => { begonnen = r; });
+  m.motor.haalNieuwer = () => new Promise(r => { laatLos = () => { m.geteld.haalNieuwer++; r(0); }; begonnen(); });
   grens.achtergrondSave();
   const bezig = grens.herstelNu();
-  await new Promise(r => setTimeout(r, 20));
+  await gestart;
   assert.equal(grens.stand().writeHealthy, false, 'de poort ging open terwijl de resync nog liep');
   laatLos();
   await bezig;

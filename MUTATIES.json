@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-10T04:15:42.981Z",
-    "commit": "119b1e037",
+    "op": "2026-09-10T16:28:04.183Z",
+    "commit": "3444aee7",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -5313,6 +5313,21 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "reisbureau-genre.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/seed/genres.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "reisbureau-nazorg.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
       "scherp": "gezakt"
     },
     "reisbureau.test.js": {

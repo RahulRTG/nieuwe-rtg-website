@@ -163,7 +163,21 @@ const VERKLAARD = {
   'POST /api/office/handelingen': { veld: 'hash',
     reden: 'het handelingsspoor met zijn ketenhashes; zonder die hash valt de keten niet na te rekenen' },
   'POST /api/office/securitylog': { veld: 'hash',
-    reden: 'het inlogauditlog met zijn ketenhashes; zelfde reden als het anker' }
+    reden: 'het inlogauditlog met zijn ketenhashes; zelfde reden als het anker' },
+  /* DRIE ERBIJ UIT DE AUDITRONDE, en alle drie op een grond die in de bron zelf
+     staat -- niet omdat ze lastig waren.
+
+     De vier hierboven stonden al verklaard, en toch las een verouderd
+     UITVOERPROEF.json ze als vier lekken. Dat was mijn leesfout: het register
+     droeg het stempel van 3 september en geen bevindingen, dus wie het citeert
+     zonder te hermeten, citeert 3 september. Vers gedraaid stonden ze alle vier
+     op `verklaard` -- en kwamen deze drie ANDERE routes eruit. */
+  'POST /api/office/anker/post': { veld: 'hash',
+    reden: 'de broer van /api/office/anker: dezelfde ankerpunten, dezelfde grond -- de hash IS het bewijsmiddel' },
+  'POST /api/privacy/export': { veld: 'hash',
+    reden: 'de AVG-uitvoer van het lid over zichzelf. De hashes zijn KETENhashes: het handelingsspoor bewaart de body niet en alleen een hash, en de ketenstand gaat mee zodat de betrokkene kan NAREKENEN of er aan zijn spoor is gesleuteld in plaats van ons te moeten geloven' },
+  'POST /api/toestellen/koppel': { veld: 'sleutel',
+    reden: 'mint een toestelsleutel (24 bytes CSPRNG) en toont hem EEN keer; de opslag houdt alleen de afdruk, dus dit is de enige plek waar hij bestaat -- zelfde patroon als de IMAP-sleutel hierboven' }
 };
 
 /* Is dit een verklaarde combinatie van route en veld? Geeft de reden terug, of

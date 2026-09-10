@@ -42,6 +42,30 @@ systeem weet) draagt. Lees vóór je hieraan werkt vooral paragraaf 2.1 en de
 grenzen: de Reis bezit geen boeking maar een verwijzing, een voornemen en een
 bewijs; een wachter zonder bron zegt dat hij niet kijkt; een ingelezen waarde
 wordt nooit stilletjes verbeterd, en de barcode blijft van de uitgever.
+**`TRAVELCOMMERCE.md` is de handelskant daarvan** — RTG Travel Commerce &
+Agency OS: niet de wereld die de REIZIGER ziet (dat blijft REIZEN.md) maar wie
+een reis bedenkt, verkoopt, inkoopt, uitvoert, ondersteunt en betaalt. Een
+richtingsdocument zoals PLATFORM.md en ECONOMIE.md: per onderdeel **staat**,
+**een stap weg**, **vraagt een besluit** of **jaren weg**. De kern in één zin:
+zes partijen kijken naar dezelfde reis en geen van hen ziet hetzelfde — er is
+één werkelijkheid en er zijn zes projecties. Lees die vóór je een reisbureau,
+een marge of een leverancierscijfer bouwt. Het belangrijkste dat het document
+tegenhoudt is een `journeys`-tabel: een reis die mensen, geld, documenten én
+reserveringen BEZIT is de `Asset`-fout opnieuw, en de meting staat er
+(`KETENVORM.json`: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
+<!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> gedeelde actoren over drie
+ketens). De vorm die wél werkt is die van `kern/levensgraaf/graaf.js` — een
+PROJECTIE met vijf etiketten, hier plus de **herkomst** als zesde. Zeven grenzen
+bovenop die van REIZEN.md, waarvan de drie scherpste: geld wordt klaargezet en
+een mens voert uit, een gevolg dat niemand gemeten heeft heet `onbekend` (en de
+onbekende helft staat even groot op het scherm), en een reisbureau is een KLANT
+en geen afdeling van RTG — RTG's eigen balie is kantoormacht, een extern bureau
+is een zaak met een genre, en dat **genre bestaat vandaag niet** (74 genres, wel
+`hotel` en `vervoer`). Par. 9 is de meting die het document eerlijk houdt: de
+hele eigen reisketen is een keer echt gelopen, en vond vier dingen die geen
+enkele toets zag — er is geen weg om een verkochte reis te betalen, "bevestigd"
+is een eindstation voor lid én kantoor, het lid krijgt geen bericht, en wat we
+verkopen is één regel in plaats van een samengestelde reis.
 **`FOUNDATION.md` is het diepte-document van de RTFoundation als platform** —
 Personal & Civic Operating System, op drie niveaus tegelijk: individu,
 professional, organisatie. Het doet LEVEN.md niet over (dat blijft gelden en gaat

@@ -195,3 +195,17 @@ evaluate-klik, maakt de toets blind voor precies het defect waarvoor hij bestaat
 ook als elke regel code klopt en elke servertoets groen staat. De belofte is niet
 "de route antwoordt 200" maar *ik zie welke kaarten RTG kan leveren en kies zelf
 welke ik wil hebben*.
+
+## 10. Een nieuwe route raakt ook MUTATIESEMANTIEK.json
+
+Toetsscherf 2 zakte op `test/mutatiesemantiek.test.js`: de bron had 4394 routes
+en het register 4391 -- precies de drie kaartenroutes van deze laag. De
+afrondronde draaide wel `scripts/semantiek.js` (botsende NAMEN, `SEMANTIEK.json`)
+en niet `scripts/mutatiesemantiek.js` (wat doet een TWEEDE aanroep,
+`MUTATIESEMANTIEK.json`). Twee namen die op elkaar lijken en twee verschillende
+dingen meten -- de vorm die `SEMANTIEK.json` zélf meet, nu op de gereedschapskist
+in plaats van op de code.
+
+Wie een route toevoegt draait dus ook `node scripts/mutatiesemantiek.js
+--vastleggen`. De verklaring bij de drie routes blijft daarbij leeg tot iemand
+hem geeft: `onverklaard` is een uitslag en geen nul.

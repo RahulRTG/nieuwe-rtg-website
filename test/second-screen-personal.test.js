@@ -49,14 +49,15 @@ test('lege informatie is één familie en opent meteen de juiste invullaag', () 
   assert.match(LEEG, /rtg-leeg-vlak--actie/);
   assert.match(LEEG, /data-rtg-leeg-doel/);
   assert.match(UI, /\.rtg-leeg-vlak--actie::after/);
+  assert.match(UI, /\.rtg-leeg-vlak--actie \.rtg-leeg-actie\{[\s\S]*?color:inherit/,
+    'de invulhandeling moet de leesbare inkt van haar vlak erven');
   assert.match(EMPTY, /RTGLeeg\.vlak/);
   assert.match(MODULES, /\/apps\/comm\.html#nieuw/);
   assert.match(TRAVEL, /\/apps\/reizen\.html#rahul/);
   assert.match(COMM, /actie: \{ tekst: 'Begin een gesprek', doel: '#nieuwBtn' \}/);
   assert.match(COMM, /\.then\(openLegeActie\)/);
   assert.match(REISRAHUL, /eersteBlad === 'rahul'[\s\S]*#rahulVraag/);
-  assert.match(JS, /profiel\.getAttribute\('href'\) !== '\/apps\/ik\.html#persoonlijk'/);
-  assert.match(JS, /profiel\.textContent !== 'Aanvullen'/,
+  assert.match(JS, /profiel\.getAttribute\('href'\) !== '\/apps\/ik\.html#persoonlijk'[\s\S]*profiel\.textContent !== 'Aanvullen'/,
     'de mutatiekijker mag zijn eigen profieltekst niet eindeloos opnieuw schrijven');
 });
 

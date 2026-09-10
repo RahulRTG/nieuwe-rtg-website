@@ -1,0 +1,959 @@
+{
+  "stempel": {
+    "op": "2026-09-10T15:53:10.567Z",
+    "commit": "eebbd906",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/bewijsladder.js",
+    "node": "v22.22.2"
+  },
+  "sporten": [
+    {
+      "id": "snel",
+      "naam": "Snelle bewijzen",
+      "wat": "huisregels, statische analyse, geheimen, het contract van de keten zelf",
+      "stand": "stap",
+      "waarom": "draait aan beide kanten, maar laat geen gestempeld register achter",
+      "mechanismen": [
+        {
+          "doel": "git diff",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null
+        },
+        {
+          "doel": "scripts/ast-scan.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/check.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/ci-keten.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/ci-lokaal.js",
+          "lokaal": true,
+          "keten": [],
+          "aanleiding": [],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/deltapoort.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/geheimen.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/keuring.js",
+          "lokaal": true,
+          "keten": [],
+          "aanleiding": [],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/normverval.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml",
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/samenhang.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": "NORM.json",
+          "stempel": false,
+          "grond": "schrijft"
+        },
+        {
+          "doel": "scripts/wetten.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": "NORM.json",
+          "stempel": false,
+          "grond": "schrijft"
+        }
+      ]
+    },
+    {
+      "id": "geraakt",
+      "naam": "Wat kan deze wijziging raken",
+      "wat": "de affected-graaf: welk bewijs moet opnieuw",
+      "stand": "staat",
+      "waarom": "2 mechanisme(n) draaien aan beide kanten en laten een gestempeld register achter",
+      "mechanismen": [
+        {
+          "doel": "scripts/activering.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": "ACTIVERING.json",
+          "stempel": true,
+          "grond": "naam"
+        },
+        {
+          "doel": "scripts/attributie.js",
+          "lokaal": false,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": "ATTRIBUTIE.json",
+          "stempel": null,
+          "grond": "schrijft"
+        },
+        {
+          "doel": "scripts/verstrengeling.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": "VERSTRENGELING.json",
+          "stempel": true,
+          "grond": "naam"
+        }
+      ]
+    },
+    {
+      "id": "eenheid",
+      "naam": "Eenheid, contract en bevoegdheid",
+      "wat": "de toetssuite zelf, plus de as-proeven per route",
+      "stand": "staat",
+      "waarom": "1 mechanisme(n) draaien aan beide kanten en laten een gestempeld register achter",
+      "mechanismen": [
+        {
+          "doel": "scripts/pgtoetsen.js",
+          "lokaal": false,
+          "keten": [
+            "ci.yml",
+            "release-image.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/test-runner.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml",
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/wekkers.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": "WEKKERS.json",
+          "stempel": true,
+          "grond": "naam"
+        },
+        {
+          "doel": "test/isolatiepoort.test.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        }
+      ]
+    },
+    {
+      "id": "reis",
+      "naam": "Echte reizen per rol",
+      "wat": "een keten van begin tot eind, met de actor die hem loopt",
+      "stand": "staat",
+      "waarom": "3 mechanisme(n) draaien aan beide kanten en laten een gestempeld register achter",
+      "mechanismen": [
+        {
+          "doel": "scripts/ladder.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": "LADDER.json",
+          "stempel": false,
+          "grond": "schrijft"
+        },
+        {
+          "doel": "scripts/rolronde.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": "ROLRONDE.json",
+          "stempel": true,
+          "grond": "schrijft"
+        },
+        {
+          "doel": "scripts/tredeproef.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": "TREDEPROEF.json",
+          "stempel": true,
+          "grond": "naam"
+        },
+        {
+          "doel": "scripts/zaakwig.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": "ZAAKWIG.json",
+          "stempel": true,
+          "grond": "naam"
+        }
+      ]
+    },
+    {
+      "id": "grens",
+      "naam": "Tenant, veiligheid en tegenspel",
+      "wat": "isolatie, aanval, gluren, verraad, sabotage, overleving",
+      "stand": "staat",
+      "waarom": "2 mechanisme(n) draaien aan beide kanten en laten een gestempeld register achter",
+      "mechanismen": [
+        {
+          "doel": "npm audit",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null
+        },
+        {
+          "doel": "scripts/gluurronde.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": "GLUURRONDE.json",
+          "stempel": true,
+          "grond": "schrijft"
+        },
+        {
+          "doel": "scripts/overleving.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": "OVERLEVING.json",
+          "stempel": true,
+          "grond": "schrijft"
+        },
+        {
+          "doel": "scripts/sabotage.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": "sabotage-journaal.json",
+          "stempel": null,
+          "grond": "schrijft"
+        }
+      ]
+    },
+    {
+      "id": "storing",
+      "naam": "Storing en herstel",
+      "wat": "chaos, crash, faalpad, terugweg, geheugen",
+      "stand": "staat",
+      "waarom": "1 mechanisme(n) draaien aan beide kanten en laten een gestempeld register achter",
+      "mechanismen": [
+        {
+          "doel": "scripts/grondwacht.js",
+          "lokaal": true,
+          "keten": [
+            "wacht.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/heapproef.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": "HEAPPROEF.json",
+          "stempel": true,
+          "grond": "naam"
+        },
+        {
+          "doel": "scripts/tot-crash.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        }
+      ]
+    },
+    {
+      "id": "prestatie",
+      "naam": "Prestatiebudgetten",
+      "wat": "de storm, de duurmeting en de gewichten",
+      "stand": "staat",
+      "waarom": "1 mechanisme(n) draaien aan beide kanten en laten een gestempeld register achter",
+      "mechanismen": [
+        {
+          "doel": "scripts/beproeving.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": "BEPROEVING.json",
+          "stempel": true,
+          "grond": "naam"
+        },
+        {
+          "doel": "scripts/dekking.js",
+          "lokaal": false,
+          "keten": [
+            "ci.yml",
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": "DEKKING.json",
+          "stempel": true,
+          "grond": "schrijft"
+        },
+        {
+          "doel": "scripts/dekkingsvloer.js",
+          "lokaal": false,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/gewichtdrift.js",
+          "lokaal": false,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/gewichtvoorstel.js",
+          "lokaal": false,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/toetsduur.js",
+          "lokaal": false,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": "TOETSDUUR.json",
+          "stempel": false,
+          "grond": "schrijft"
+        }
+      ]
+    },
+    {
+      "id": "scherm",
+      "naam": "Scherm, toegankelijkheid en browser",
+      "wat": "de schermsuite, de a11y-scan en het oordeel erover",
+      "stand": "stap",
+      "waarom": "draait aan beide kanten, maar laat geen gestempeld register achter",
+      "mechanismen": [
+        {
+          "doel": "scripts/a11y-oordeel.js",
+          "lokaal": false,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/a11y.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml",
+            "wacht.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/e2e.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml",
+            "wacht.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/schermen.js",
+          "lokaal": false,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": "NORM.json",
+          "stempel": false,
+          "grond": "schrijft"
+        }
+      ]
+    },
+    {
+      "id": "gegevens",
+      "naam": "Migratie en gegevensintegriteit",
+      "wat": "schemamigraties, bewaartermijnen, de container die opkomt",
+      "stand": "stap",
+      "waarom": "draait aan beide kanten, maar laat geen gestempeld register achter",
+      "mechanismen": [
+        {
+          "doel": "scripts/containerproef.js",
+          "lokaal": false,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/norm.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml",
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": "NORM.json",
+          "stempel": false,
+          "grond": "schrijft"
+        },
+        {
+          "doel": "scripts/normbasis.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        }
+      ]
+    },
+    {
+      "id": "releasebewijs",
+      "naam": "Releasebewijs",
+      "wat": "de bronboom gehasht, de stuklijst, de herkomst, de poort ervoor",
+      "stand": "stap",
+      "waarom": "draait aan beide kanten, maar laat geen gestempeld register achter",
+      "mechanismen": [
+        {
+          "doel": "npm run afbouw:software",
+          "lokaal": false,
+          "keten": [
+            "release-image.yml"
+          ],
+          "aanleiding": [
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null
+        },
+        {
+          "doel": "scripts/bron-release-bewijs.js",
+          "lokaal": true,
+          "keten": [
+            "release-image.yml"
+          ],
+          "aanleiding": [
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/build.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/envelop.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": "ENVELOP.json",
+          "stempel": false,
+          "grond": "naam"
+        },
+        {
+          "doel": "scripts/gezag.js",
+          "lokaal": true,
+          "keten": [
+            "ci.yml"
+          ],
+          "aanleiding": [
+            "pull_request",
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": "GEZAG.json",
+          "stempel": false,
+          "grond": "schrijft"
+        },
+        {
+          "doel": "scripts/imageherkomst.js",
+          "lokaal": false,
+          "keten": [
+            "release-image.yml"
+          ],
+          "aanleiding": [
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/meetronde.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/versheid.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/zekerheid.js",
+          "lokaal": true,
+          "keten": [
+            "ronde.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        }
+      ]
+    },
+    {
+      "id": "kandidaat",
+      "naam": "Onveranderlijke kandidaat",
+      "wat": "het image gebonden aan een digest en een handtekening",
+      "stand": "stap",
+      "waarom": "draait maar aan een kant: alleen in de keten",
+      "mechanismen": [
+        {
+          "doel": "scripts/imageherkomst.js",
+          "lokaal": false,
+          "keten": [
+            "release-image.yml"
+          ],
+          "aanleiding": [
+            "push",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        }
+      ]
+    },
+    {
+      "id": "uitrol",
+      "naam": "Staging, canary en productieverificatie",
+      "wat": "de repetitie, de uitrol en de sonde erna",
+      "stand": "stap",
+      "waarom": "draait aan beide kanten, maar laat geen gestempeld register achter",
+      "mechanismen": [
+        {
+          "doel": "scripts/publieke-tls-proef.js",
+          "lokaal": false,
+          "keten": [
+            "live-monitor.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/sonde.js",
+          "lokaal": false,
+          "keten": [
+            "live-monitor.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/takken.js",
+          "lokaal": false,
+          "keten": [
+            "takken.yml"
+          ],
+          "aanleiding": [
+            "workflow_dispatch"
+          ],
+          "register": null,
+          "stempel": null,
+          "grond": null
+        },
+        {
+          "doel": "scripts/triage.js",
+          "lokaal": true,
+          "keten": [
+            "live-monitor.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": "TRIAGE.json",
+          "stempel": null,
+          "grond": "schrijft"
+        },
+        {
+          "doel": "scripts/wetwacht.js",
+          "lokaal": true,
+          "keten": [
+            "wacht.yml"
+          ],
+          "aanleiding": [
+            "schedule",
+            "workflow_dispatch"
+          ],
+          "register": "WETBRONNEN.json",
+          "stempel": false,
+          "grond": "schrijft"
+        }
+      ]
+    }
+  ],
+  "zonderTrede": [],
+  "telling": {
+    "mechanismen": 56,
+    "sporten": 12,
+    "staat": 6,
+    "stap": 6,
+    "jaren": 0,
+    "alleenKeten": 16,
+    "zonderTrede": 0
+  }
+}

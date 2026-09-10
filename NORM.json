@@ -29,7 +29,7 @@
     "toetsenOngevoeligPct": 0,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "ratelTanden": 68,
+    "ratelTanden": 69,
     "metingenZonderRatel": 49,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
@@ -62,7 +62,8 @@
     "laatSpoorVerdacht": 3,
     "rollbackUitzonderingen": 1,
     "faalproefGezakt": 24,
-    "appwerktDefecten": 0
+    "appwerktDefecten": 0,
+    "bewijsAlleenKeten": 16
   },
   "notities": [
     {

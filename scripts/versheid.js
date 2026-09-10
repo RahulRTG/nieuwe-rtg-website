@@ -217,6 +217,14 @@ const REGISTERS = [
   ['DROOGLOOP.json', 'npm run droogloop', 'een plan werkelijk laten lopen, maar nergens waar het telt'],
   ['ONDERZOEKSKETEN.json', 'npm run onderzoeksketen', 'welke stations van het onderzoek van elkaar weten'],
 
+  /* DE BEWIJSLADDER (KEURING.md par. 7): welke soorten bewijs dit huis levert,
+     waar ze draaien en wat ze achterlaten. Hij hoort hier omdat hij veroudert
+     zonder dat iemand hem aanraakt: zijn invoer zijn .github/workflows en de
+     lagen van scripts/slotsuite.js, dus een poort die er in de keten bij komt
+     maakt dit register stil onvolledig. Melding en geen poort -- de tand die op
+     zijn INHOUD bijt is `bewijsAlleenKeten` in NORM.json. */
+  ['BEWIJSLADDER.json', 'npm run bewijsladder:vast', 'welke soorten bewijs er draaien, lokaal en in de keten'],
+
   /* DE VIJF VAN DE BESTURINGSLAAG (MODULAIR.md).
 
      Ze horen hier om precies de reden die hierboven al twee keer is opgeschreven,

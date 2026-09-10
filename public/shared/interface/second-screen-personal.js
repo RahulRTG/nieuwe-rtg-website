@@ -69,7 +69,10 @@
     var shell = d.querySelector('#rtgCommand .rtg-ss-shell'); bouw(shell);
     var root = shell && shell.closest('#rtgCommand');
     var profiel = shell && shell.querySelector('.rtg-ss-profile-edit');
-    if (profiel) { profiel.href = '/apps/ik.html#persoonlijk'; profiel.textContent = 'Aanvullen'; }
+    if (profiel) {
+      if (profiel.getAttribute('href') !== '/apps/ik.html#persoonlijk') profiel.href = '/apps/ik.html#persoonlijk';
+      if (profiel.textContent !== 'Aanvullen') profiel.textContent = 'Aanvullen';
+    }
     d.body.toggleAttribute('data-rtg-personal-surface', !!(root && root.dataset.rtgSecondScreen !== 'peek'));
   }
   var kijker = new MutationObserver(scan);

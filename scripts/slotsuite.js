@@ -22,11 +22,14 @@
      2  POORTEN      goedkoop en hard: syntaxis, huisregels, AST, geheimen.
                      Zakt hier iets, dan is de rest tijdverspilling.
      3  TESTS        de volledige testsuite: elk onderdeel doet wat het belooft.
-     4  TOEGANKELIJK de a11y-scan over alle schermen.
-     5  BEPROEVING   de storm: mega volume, geld op de cent, morele grenzen,
+     4  KETEN        de poorten die GitHub straks draait, hier gedraaid. De lijst
+                     komt uit .github/workflows zelf (scripts/ci-lokaal.js), dus
+                     een poort die er in de keten bij komt, staat hier vanzelf.
+     5  TOEGANKELIJK de a11y-scan over alle schermen.
+     6  BEPROEVING   de storm: mega volume, geld op de cent, morele grenzen,
                      herstart, elke route in elke rol, geheugenlek-vloer.
-     6  KEURING      het logica-oordeel over het geheel.
-     7  RAPPORT      RAPPORT-SLOTSUITE.md: uitslag, wat is opgelost sinds de
+     7  KEURING      het logica-oordeel over het geheel.
+     8  RAPPORT      RAPPORT-SLOTSUITE.md: uitslag, wat is opgelost sinds de
                      vorige ronde, wat is nieuw, en de backlog op volgorde.
 
    DRAAIEN:
@@ -70,6 +73,18 @@ const LAGEN = [
        bronmuterende ijkingen apart. Anders kan de Slotsuite precies door haar
        eigen meetproeven nondeterministisch rood worden. */
     ['test/*.test.js', [NODE, ['scripts/test-runner.js', '--reporter=dot']]]
+  ] },
+  /* DE KETEN. Wat GitHub straks over deze wijziging zegt, hoort hier al gezegd
+     te zijn -- en dat waren vierentwintig poorten die in geen enkele lokale
+     ronde stonden (de deltapoort, het verval, het wettenregister, de overleving,
+     het gezag, de envelop, de norm, de ladder, de rolronde, de gluurronde). Deze
+     stap heeft met opzet GEEN lijst: scripts/ci-lokaal.js leest .github/workflows
+     en draait wat daar staat, dus een poort die er morgen bij komt staat morgen
+     in deze suite. Wat hier niet kan draaien (een artefact uit een andere job,
+     een geheim, een ontbrekende postgres) meldt hij als NIET GEDRAAID met de
+     reden -- en nooit als groen. Hij slaat over wat de lagen hierboven al doen. */
+  { id: 'keten', naam: 'DE KETEN (wat de CI straks draait)', hard: true, overslaanBijSnel: true, stappen: [
+    ['de poorten van de keten', [NODE, ['scripts/ci-lokaal.js']]]
   ] },
   /* A11Y_STRICT=1, en dat is hier geen detail. scripts/a11y.js slaat zichzelf
      over met exitcode 0 als er geen browser staat -- terecht, want op een kale
@@ -334,4 +349,4 @@ function suite() {
 }
 
 if (require.main === module) suite();
-module.exports = { suite };
+module.exports = { suite, LAGEN };

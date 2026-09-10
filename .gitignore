@@ -91,3 +91,9 @@ server/routes/zz-ijk-tijdelijk*.js
 # door de toets zelf ("de ijking ruimt zichzelf op").
 zz-ijk-tijdelijk*
 dump.rdb
+
+# de duurmeting van de lokale ketenronde (scripts/ci-lokaal.js): op welke poort
+# hoeveel tijd ging, zodat --snel weet wat hij mag overslaan. Een meting van
+# DEZE machine en dus geen bron -- op een andere machine staan er andere
+# getallen in, en een gedeelde versie zou daar liegen.
+.cilokaal

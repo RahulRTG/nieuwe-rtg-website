@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 4996 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 4992 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,12 +18,12 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 4996 |
-| servermodules (`server/**/*.js`) | 3313 |
+| API-endpoints | 4992 |
+| servermodules (`server/**/*.js`) | 3310 |
 | routebestanden (`server/routes/**`) | 576 |
-| kernmodules (`server/kern/**`) | 2064 |
+| kernmodules (`server/kern/**`) | 2062 |
 | schermen (`public/**/*.html`) | 313 |
-| gedeelde browsermodules (`public/shared/*.js`) | 347 |
+| gedeelde browsermodules (`public/shared/*.js`) | 348 |
 | toetsbestanden (`test/*.test.js`) | 1571 |
 | schermtoetsen (`test/*.e2e.js`) | 210 |
 
@@ -110,7 +110,7 @@ zie §5 -- er zijn nog 231 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 20 | 6 | 8 | 52 |
-| `member` | 696 | 70 | 16 | 427 |
+| `member` | 694 | 70 | 16 | 427 |
 | `supplier` | 618 | 122 | 6 | 331 |
 | `office` | 64 | 17 | 3 | 79 |
 | `staff` | 26 | 8 | 1 | 42 |
@@ -127,7 +127,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3381 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3379 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 

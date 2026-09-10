@@ -20,6 +20,8 @@
 - [ ] `npm run ast-scan`
 - [ ] `npm test`
 - [ ] `npm run build`
+- [ ] `npm run ci:lokaal` (de poorten van de keten, hier gedraaid; wat er NIET
+      gedraaid is staat in de uitslag met de reden)
 - [ ] Schermen op relevante formaten gecontroleerd
 
 ## Go-live

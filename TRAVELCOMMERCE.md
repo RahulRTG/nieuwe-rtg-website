@@ -201,7 +201,7 @@ dat dit huis niet heeft).
 ### Het reisbureau als klant
 | Onderdeel | Stand | Toelichting |
 |---|---|---|
-| Genre `reisbureau` | **een stap weg** | bestaat NIET; 74 genres, wel `hotel`, `vervoer`, `ov`, `activiteiten` |
+| Genre `reisbureau` | **staat** (10 sep 2026) | eigen sector `travel`, caps `services/location/pricing`; de papieren hangen aan de handeling |
 | Werkblad per klant | **een stap weg** | de kamer Reisbalie is de vorm; hij telt en toont al |
 | CRM | **staat elders** | `kern/klantenboek.js`, op codenaam -- geen tweede CRM in TravelOS |
 | Offerte -> contract -> factuur | **staat elders** | `kern/commercie/`, `supplier/facturen` |
@@ -259,8 +259,8 @@ achter dat de volgende moet afmaken.
    **Gedaan op 10 september 2026** (zie par. 9a). Wat er nog aan ontbreekt is
    geen stap 1 meer maar hangt aan stap 3: annuleringskosten en een terugbetaling
    kunnen pas bestaan als er een geldweg is.
-2. **Genre `reisbureau`** plus de scheiding kamer/zaak uit TC-6. Eén regel in het
-   genre-register en zijn caps; daarna kan een extern bureau überhaupt bestaan.
+2. ~~**Genre `reisbureau`** plus de scheiding kamer/zaak uit TC-6.~~ **Gedaan op
+   10 september 2026** (par. 9b). Een extern reisbureau kan zich nu aanmelden.
 3. **De geldweg** -- aanbetaling en restbetaling langs `kern/pay/poort.js`, met
    de besluiten uit par. 7 genomen.
 4. **De Reis als samenstelling** -- een verkochte reis krijgt echte onderdelen
@@ -358,6 +358,42 @@ gewoon), en het eindpunt leest beide bakken.
 
 **Wat er nog steeds niet is** (par. 9, punten 1 en 4): de geldweg, en een
 verkochte reis die uit echte onderdelen bestaat in plaats van uit een regel.
+
+---
+
+## 9b. Het genre `reisbureau` (10 september 2026)
+
+Stap 2 uit par. 8. Van de vierenzeventig genres was er geen enkele waarin een
+reisbedrijf paste: wel `hotel`, `vervoer`, `ov` en `activiteiten`, maar niets
+voor wie die drie SAMENSTELT. Een extern reisbureau kon zich dus niet aanmelden.
+Nu wel, en drie dingen liggen daarbij vast.
+
+**Een eigen sector, en niet een hoekje van `professional`.** Een reisbureau
+verkoopt geen uren zoals een adviesbureau en geen kamers zoals een hotel; het
+stelt samen wat anderen leveren. In `professional` zou het onvindbaar zijn voor
+wie een reisbedrijf zoekt, en dat is precies wat een sector hoort op te lossen.
+De sector `travel` draagt vandaag één genre; een touroperator en een reisgids
+zijn een besluit en geen bouwwerk.
+
+**De papieren hangen aan de HANDELING en niet aan het genre.** Dit is de
+scherpste keuze van deze stap. De acht genres op de bewijslijst
+(`kern/bedrijfscontrole.js`) zijn beroepen waar iemand zonder papier direct
+schade aanricht. Bij reizen werkt dat anders: wie **pakketreizen verkoopt**
+heeft insolventiebescherming nodig, en wie alleen adviseert niet -- terwijl een
+HOTEL dat een arrangement verkoopt hem juist wél nodig heeft. Die vlag bestond
+al (`pakketreis`, met de garantieregeling als bron) en geldt voor elke
+aanvrager. Het genre aan de bewijslijst toevoegen zou dezelfde eis twee keer
+stellen en hem tegelijk missen bij wie hem wel nodig heeft.
+`test/reisbureau-genre.test.js` toets 3 houdt dat besluit vast, zodat wie het
+omdraait er langs moet.
+
+**En het blijft de gewone leverancier-app.** Geen van de drie caps hangt aan een
+PDA-module, en dat klopt: een reisbureau werkt met agenda, klantenboek,
+facturen en berichten. Wie er `bookings` of `tickets` bij zet, geeft een
+reisbureau kamers of een deurverkoop die het niet heeft.
+
+**TC-6 blijft staan:** de kamer Reisbureau van het RTG-kantoor is kantoormacht,
+dit is een zaak met een eigen code. Ze delen de kern en nooit de deur.
 
 ---
 

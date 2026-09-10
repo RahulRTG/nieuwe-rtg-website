@@ -50,7 +50,7 @@ const CONTRACTEN = {
     semantiek: { klasse: 'idempotent' },
     /* De ref moet van DEZE aanvrager zijn; een ref van een ander lid geeft 404
        en niet 403 -- wie hem niet bezit, hoort niet te weten dat hij bestaat. */
-    toegang: { klasse: 'OBJECT_SCOPED', veld: 'ref' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'ref' },
     stand: 'PROTECTED',
     bewijs: {
       gemeten: '1e: 200 -> wijziging-gevraagd | 2 pers | 4400 | spoor 2. ' +
@@ -67,7 +67,7 @@ const CONTRACTEN = {
     mutatieId: 'reisbureau.afzegging.lid',
     herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'OBJECT_SCOPED', veld: 'ref' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'ref' },
     stand: 'PROTECTED',
     bewijs: {
       gemeten: '1e: 200 -> afgezegd | 2 pers | 4400 | spoor 2. ' +

@@ -55,6 +55,35 @@ module.exports = {
   events: { label: 'Events & festivals', icon: '\u{1F3AA}', industry: 'events', caps: ['tickets', 'rides', 'location', 'pricing'], status: 'open' },
   activiteit: { label: 'Activiteiten & musea', icon: 'ticket', industry: 'events', caps: ['tickets', 'rides', 'location', 'pricing'], status: 'open' },
   activiteiten: { label: 'Activiteiten & excursies', icon: 'tickets', industry: 'events', caps: ['tickets', 'location', 'pricing'], status: 'open' },
+
+  /* ---- Reizen ----
+     HET REISBUREAU ALS KLANT, en dat is iets anders dan de kamer Reisbureau van
+     het RTG-kantoor. Die kamer is kantoormacht (KANTOORMACHT.md rekent haar tot
+     de productkamers, geen afdeling); dit is een ZAAK met een eigen code, eigen
+     personeel en een eigen klantenboek. Ze delen de kern en nooit de deur --
+     TRAVELCOMMERCE.md TC-6.
+
+     WAAROM DIT GENRE MOEST BESTAAN. Van de 74 genres was er geen enkele waarin
+     een reisbedrijf paste: wel `hotel`, `vervoer`, `ov` en `activiteiten`, maar
+     niets voor wie die drie SAMENSTELT. Een extern reisbureau kon zich dus niet
+     aanmelden -- geen zaakcode, geen leverancier-app, geen klantenboek, geen
+     facturatie. Gemeten en opgeschreven in TRAVELCOMMERCE.md par. 3.
+
+     GEEN EIGEN BEWIJSEIS, EN DAT IS EEN BESLUIT. De acht genres in
+     kern/bedrijfscontrole.js BEWIJS_EISEN zijn beroepen waar iemand zonder
+     papier direct schade aanricht. Bij reizen hangt het papier niet aan het
+     genre maar aan de HANDELING: wie pakketreizen verkoopt heeft
+     insolventiebescherming nodig, en wie alleen adviseert niet. Die vlag bestaat
+     al (`pakketreis` in kern/bedrijfscontrole.js, met de garantieregeling als
+     bron) en geldt voor elke aanvrager, ook voor een hotel dat een arrangement
+     verkoopt. Het genre hier aan de bewijslijst toevoegen zou dezelfde eis twee
+     keer stellen en hem tegelijk missen bij wie hem wel nodig heeft.
+
+     CAPS: geen van de drie hangt aan een PDA-module, en dat klopt -- een
+     reisbureau werkt met de gewone leverancier-app (agenda, klantenboek,
+     facturen, berichten). Wie hier `bookings` of `tickets` bij zet, geeft een
+     reisbureau kamers of een deurverkoop die het niet heeft. */
+  reisbureau: { label: 'Reisbureau', icon: 'reisboek', industry: 'travel', caps: ['services', 'location', 'pricing'], status: 'open' },
   galerie: { label: 'Kunst & galerie', icon: '\u{1F5BC}', industry: 'events', caps: ['tickets', 'retail', 'location', 'pricing'], status: 'open' },
   weddingplanner: { label: 'Weddings & prive-events', icon: '\u{1F492}', industry: 'events', caps: ['weddings', 'location', 'pricing'], status: 'open' },
 

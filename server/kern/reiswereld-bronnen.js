@@ -18,10 +18,30 @@ module.exports = function bronnen({ kern, regel, bron }, key, uit, stil) {
       .filter(v => v.status !== 'geannuleerd')
       .map(v => regel('verblijf', {
         titel: v.roomName, bestemming: v.plaats || '', van: v.aankomst, tot: v.vertrek,
+        /* Het hotel IS een RTG-zaak, en die code stond al op het verblijf --
+           mijnVerblijven() zocht de zaak zelfs op om `plaats` te vullen en gooide
+           de code daarna weg. Zelfde reparatie als bij de activiteiten hieronder.
+
+           LET OP WAT DIT WEL EN NIET OPLOST: de PLEK is hiermee bekend, de TIJD
+           niet. Een verblijf draagt een aankomstDATUM en geen uur, dus RTG Move
+           houdt de naad ernaartoe `NIET_TE_BEPALEN` -- alleen met een kortere
+           `mist`-lijst. Een standaard check-in van 15:00 erbij verzinnen zou de
+           marge een gok maken. */
+        plek: v.supplierCode ? { zaak: v.supplierCode } : null,
         status: v.status, kenmerk: v.id, herkomst: 'partner',
         app: 'Verblijven', link: '/apps/hotels.html'
       })), uit, stil);
 
+    /* HET REISBUREAU DRAAGT GEEN PLEK, en dat blijft zo. Een reispakket heeft
+       een bestemming als vrije tekst ("Barcelona") en geen zaak, geen halte en
+       geen punt. RTG Move meldt de naad daarom als NIET_TE_BEPALEN met
+       `plek-naar` in de mist-lijst.
+
+       Waarom hier geen benadering op de stadsnaam komt: op zo'n marge wordt
+       straks een reservering verzet. Gaat het reisbureau ooit een verwijzing
+       meesturen -- het hotel dat het boekt is een zaak -- dan stijgt de dekking
+       zonder dat er in Move iets verandert. Dat is de goedkoopste volgende stap
+       en hij hoort daar en niet hier. */
     bron('reisbureau', () => (kern.reisbureau.mijn(key) || [])
       .filter(a => a.status !== 'geannuleerd')
       .map(a => regel('reis', {
@@ -30,16 +50,34 @@ module.exports = function bronnen({ kern, regel, bron }, key, uit, stil) {
         app: 'Reisbureau', link: '/apps/reisbureau.html'
       })), uit, stil);
 
+    /* DE VLUCHTEN, EN DE PLEK DIE HIER NIET DE BESTEMMING IS.
+
+       Bij elk ander onderdeel zijn "waar ga ik heen" en "waar moet ik zijn"
+       dezelfde plek: het hotel, het restaurant, de excursie. Bij een vlucht
+       lopen ze uiteen -- u moet op de LUCHTHAVEN zijn, en de bestemming is waar
+       het vliegtuig u brengt. Wie hier `bestemming` als plek zou meesturen,
+       laat RTG Move de reistijd naar Parijs Le Bourget uitrekenen voor iemand
+       die naar de gate moet: een oordeel dat compleet oogt en onzin is.
+
+       De bestemming BLIJFT dus vrije tekst en wordt nooit een coordinaat --
+       `schoon(data.bestemming, 60)` levert dingen als 'Ibiza (uit Geneve)', en
+       daar hoort geen benadering op. Wat er wel bij komt is de luchthaven zelf,
+       als verwijzing, uit het domein dat hem uitgeeft (kern/luchthaven).
+
+       Dit is de bron die de DEKKING van Move werkelijk verhoogt, want een
+       vlucht draagt als enige van de vijf een datum EN een uur. Een verblijf
+       levert alleen een plek. */
     bron('vluchten', () => {
       const d = kern.lucht.mijn(key) || {};
+      const luchthaven = kern.lucht.plek ? kern.lucht.plek() : null;
       const b = (d.boekingen || []).filter(x => x.status !== 'geannuleerd').map(x => regel('vlucht', {
         titel: (x.vlucht || {}).nummer, bestemming: (x.vlucht || {}).bestemming,
-        van: (x.vlucht || {}).datum, tijd: (x.vlucht || {}).tijd,
+        van: (x.vlucht || {}).datum, tijd: (x.vlucht || {}).tijd, plek: luchthaven,
         status: x.status, kenmerk: x.id, herkomst: 'rtg',
         app: 'Vluchten', link: '/apps/vluchten.html'
       }));
       const c = (d.charters || []).filter(x => x.status !== 'geannuleerd').map(x => regel('charter', {
-        titel: x.soort, bestemming: x.bestemming, van: x.datum, tijd: x.tijd,
+        titel: x.soort, bestemming: x.bestemming, van: x.datum, tijd: x.tijd, plek: luchthaven,
         status: x.status, kenmerk: x.code, herkomst: 'rtg', app: 'Hangar', link: '/apps/hangar.html'
       }));
       return b.concat(c);
@@ -113,6 +151,9 @@ module.exports = function bronnen({ kern, regel, bron }, key, uit, stil) {
      Ontbreekt de module, dan gaat deze bron stuk en meldt hij zich in `stil` --
      precies zoals bedoeld. Een reis die stilletjes zonder uw eigen ingevoerde
      onderdelen wordt getoond, ziet er compleet uit en is het niet. */
+  /* EN DE INVOERBALIE DRAAGT ER OOK GEEN. Wat uit een document, een foto of de
+     hand komt, is per definitie vrije tekst -- de balie kent geen zaakcode.
+     Blijft dus zonder plek, met de reden hierboven bij het reisbureau. */
   bron('ingevoerd', () => (kern.invoer.mijnRegels(key) || []).map(x => regel(x.soort, {
     titel: x.titel, bestemming: x.bestemming, van: x.van, tot: x.tot,
     status: x.status, kenmerk: x.kenmerk, herkomst: x.herkomst,

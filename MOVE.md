@@ -136,15 +136,32 @@ niet betrouwbaar* -- gerekend uit echte gegevens door de echte motor.
 
 ## 6. Wat er niet is, met de reden
 
-- **Eén van de zes bronnen levert een plek.** Activiteiten en afspraken bij een
-  zaak wel; verblijven, reisbureau-reizen, vluchten, charters en eigen invoer
-  dragen alleen een vrije tekst ("Barcelona"). Move meldt die als onbekend in
-  plaats van een stadsnaam naar coördinaten te benaderen -- op zo'n marge wordt
-  straks een reservering verzet. Elke bron die een verwijzing gaat meesturen,
-  verhoogt de dekking zonder dat hier iets verandert.
-- **Geen aankomsttijd van een vlucht.** Een vlucht draagt zijn vertrektijd; het
-  moment waarop je het vliegveld verlaat is nergens bekend. Zolang dat zo is,
-  is de naad ná een vlucht `NIET_TE_BEPALEN` -- en niet een geraden drie kwartier.
+- **Twee van de zes bronnen leveren geen plek**, en dat blijft zo tot het
+  domein er een meestuurt. Het reisbureau draagt een bestemming als vrije tekst
+  ("Barcelona") en geen zaak; de Invoerbalie leest uit een document of een foto
+  en kent per definitie geen zaakcode. Move meldt die naad als
+  `NIET_TE_BEPALEN` met `plek-naar` in de mist-lijst, in plaats van een
+  stadsnaam naar coördinaten te benaderen -- op zo'n marge wordt straks een
+  reservering verzet. Het hotel dat het reisbureau boekt *is* een zaak, dus die
+  bron kan de dekking verhogen zonder dat er in Move iets verandert; dat is werk
+  in het reisbureau en niet hier.
+- **Een verblijf levert een plek maar geen tijd.** Het hotel is een zaak en die
+  code stond al op het verblijf, dus de plek is bekend. Een verblijf draagt
+  alleen een aankomst*datum* en geen uur, dus de naad ernaartoe blijft
+  `NIET_TE_BEPALEN` -- met een kortere `mist`-lijst. Een standaard check-in van
+  15:00 erbij verzinnen zou de marge een gok maken.
+- **Voor een vlucht is de plek de luchthaven en niet de bestemming.** Dat is
+  geen benadering maar een ander gegeven: u moet op de luchthaven zijn, en het
+  vliegtuig brengt u naar Parijs. Bij elk ander onderdeel vallen "waar ga ik
+  heen" en "waar moet ik zijn" samen; hier niet. De code komt uit
+  `kern/luchthaven` (`lucht.plek()`) en niet uit een letterlijke `'LUCHT'` in de
+  reiswereld. Geen luchthaven in de database, of een zaak zonder punt op de
+  kaart: dan is er geen plek, en zegt Move dat.
+- **Geen moment waarop je het vliegveld UIT bent.** Een aankomende vlucht draagt
+  wel zijn aankomsttijd op RTG Airport, dus de naad *naartoe* is te rekenen. Wat
+  nergens bekend is, is wanneer je er weg kunt: bagage, douane en de weg naar de
+  uitgang. Daarom krijgt een vlucht geen `klaarAt` en blijft de naad *ná* een
+  vlucht `NIET_TE_BEPALEN` -- en niet een geraden drie kwartier.
 - **Geen achtergrondwachter.** Move rekent op het moment van opvragen, net als
   de Reiswacht. Een wachter die doorwerkt terwijl de app dicht is, is een eigen
   besluit met een eigen prijs en groeit hier niet stilletjes bij.

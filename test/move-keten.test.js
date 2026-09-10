@@ -100,3 +100,83 @@ test('RTG Move: een gast heeft geen reis om te wegen', async (t) => {
   const zonder = await post(base, '/api/move/reis', {});
   assert.equal(zonder.status, 401, 'zonder sessie komt er niets uit');
 });
+
+/* ============================================================================
+   DE DEKKING: WELKE BRONNEN LEVEREN EEN PLEK?
+
+   Move stond op 1 van de 6 bronnen met een oplosbare plek, en dat is de reden
+   dat hij over de meeste echte reizen `NIET_TE_BEPALEN` zei. Deze toetsen
+   houden de drie vast die er sinds 10 september 2026 bij zijn, en vooral de
+   GRENS eronder: een plek wordt opgelost of hij bestaat niet -- er komt nooit
+   een benadering op een stadsnaam.
+   ========================================================================== */
+
+test('een vlucht wijst naar de LUCHTHAVEN en niet naar zijn bestemming', async (t) => {
+  /* DE FOUT DIE DEZE TOETS TEGENHOUDT. Bij een hotel of een restaurant zijn
+     "waar ga ik heen" en "waar moet ik zijn" dezelfde plek. Bij een vlucht niet:
+     u moet op de luchthaven zijn en het vliegtuig brengt u naar Parijs. Wie
+     `bestemming` als plek zou meesturen, laat Move de reistijd naar Parijs Le
+     Bourget uitrekenen voor iemand die naar de gate moet -- een oordeel dat
+     compleet oogt en onzin is. Vandaar dat deze toets het LABEL naleest en niet
+     alleen of er een plek is. */
+  const { child, base } = await startServer({ env: { SMTP_URL: '', NODE_ENV: 'test', RTG_DEMO: '1' } });
+  t.after(() => stop(child));
+
+  const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
+  const reg = await post(base, '/api/auth/register', { name: 'Proeflid', email: 'mvl' + u + '@voorbeeld.nl',
+    phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
+  const tok = reg.data && reg.data.token;
+  assert.ok(tok, 'proeflid aangemaakt');
+
+  /* Een CHARTER en geen lijnvlucht: boeken vraagt een paspoort (een echte
+     poort, geen tekort van de toets) en een charter loopt langs exact dezelfde
+     luchthaven-plek. De bestemming is met opzet een plaats die NIET de
+     luchthaven is. */
+  const ch = await post(base, '/api/member/vluchten/charter',
+    { soort: 'privejet', bestemming: 'Parijs Le Bourget', datum: morgen(), tijd: '09:30' }, tok);
+  assert.equal(ch.status, 200, 'charter aangevraagd');
+
+  const volg = await post(base, '/api/move/volgende', {}, tok);
+  assert.equal(volg.status, 200);
+  assert.ok(volg.data.volgende, 'de charter staat op de tijdlijn met plek en tijd');
+  const plek = volg.data.volgende.plek;
+  assert.equal(plek.bron, 'zaak', 'de luchthaven is opgelost uit een verwijzing en niet geraden');
+  assert.match(plek.label, /airport|luchthaven/i, 'de plek IS de luchthaven');
+  assert.doesNotMatch(plek.label, /parijs|bourget/i, 'en niet de bestemming van de vlucht');
+  assert.ok(Number.isFinite(plek.lat) && Number.isFinite(plek.lng), 'met een echt punt');
+});
+
+test('een afspraak vóór een vlucht wordt een weegbare naad', async (t) => {
+  /* DIT IS DE DEKKINGSWINST, en hij is met een mutatie nagemeten: haal de plek
+     van de charter weg en deze naad wordt NIET_TE_BEPALEN met mist ['plek-naar']
+     en dekking 0. Een vlucht draagt als enige van de vijf toegevoegde bronnen
+     een datum EN een uur, en is daarmee de enige die een naad echt weegbaar
+     maakt -- een verblijf levert alleen een plek. */
+  const { child, base } = await startServer({ env: { SMTP_URL: '', NODE_ENV: 'test', RTG_DEMO: '1' } });
+  t.after(() => stop(child));
+
+  const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
+  const reg = await post(base, '/api/auth/register', { name: 'Proeflid', email: 'mvn' + u + '@voorbeeld.nl',
+    phone: '06' + u.slice(0, 8), password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' });
+  const tok = reg.data && reg.data.token;
+  assert.ok(tok, 'proeflid aangemaakt');
+
+  const d = morgen();
+  const bk = await post(base, '/api/booking/request',
+    { supplierCode: 'KAITO', serviceId: 's1', date: d, time: '08:00' }, tok);
+  assert.equal(bk.status, 200, 'afspraak van 08:00 geboekt');
+  assert.equal((await post(base, '/api/booking/pay', { ref: bk.data.boeking.ref }, tok)).status, 200);
+  assert.equal((await post(base, '/api/member/vluchten/charter',
+    { soort: 'privejet', bestemming: 'Parijs Le Bourget', datum: d, tijd: '09:30' }, tok)).status, 200);
+
+  const reis = await post(base, '/api/move/reis', {}, tok);
+  assert.equal(reis.status, 200);
+  assert.equal(reis.data.metPlek, 2, 'beide onderdelen hebben een opgeloste plek');
+  assert.equal(reis.data.dekking, 100, 'en de overgang ertussen is te bepalen');
+  const n = reis.data.naden[0];
+  assert.notEqual(n.uitkomst, 'NIET_TE_BEPALEN', 'de naad afspraak -> luchthaven is weegbaar');
+  assert.ok(Number.isFinite(n.nodigMin) && n.nodigMin > 0, 'met een echte reistijd');
+  /* De marge zelf staat er NIET in als vast getal: hij hangt aan de zaakdata in
+     de seed, en een toets die 13 minuten eist zakt zodra iemand een zaak
+     verplaatst -- dan meet hij de seed en niet de laag. */
+});

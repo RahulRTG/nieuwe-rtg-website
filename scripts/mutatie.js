@@ -451,6 +451,16 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  /* DE VERSHEIDSPOORT wordt als SUBPROCES gestart en niet gerequired: de toets
+     meet juist wat er door een PIJP naar buiten komt, en daar hoort geen
+     require bij. Zonder deze regel meldt de motor "geen module gevonden" en
+     blijft de toets buiten de mutatiemeting -- en dan is toetsenNietGemeten een
+     meter die het SCHRIJVEN van deze toets bestraft, precies de fout die de
+     schermtoetsen hieronder al een keer opleverde.
+
+     Bevestigd door de motor, en dat is hier de voorwaarde: een geraden module
+     geeft de toets de schuld van wat deze lijst fout heeft. */
+  ['versheid-uitvoer.test.js', ['scripts/versheid.js']],
   /* Beide Edge-toetsen voeren browsercode in een VM uit of lezen het kleine
      basisfragment rechtstreeks. Daardoor ziet modulesVan() geen require,
      terwijl dit wel hun echte bron is. Nageproefd: een verkeerde Edge-CSS-URL

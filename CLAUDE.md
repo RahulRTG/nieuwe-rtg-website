@@ -975,7 +975,7 @@ voor je iets bouwt dat bepaalt of een handeling mag, hoeveel bevestiging hij
 vraagt, of hij te herhalen is of hoe hij terugdraait. De kern in een zin: **een
 scherm, een automatisering, de commandbalk, een AI-agent, een externe aanroep en
 een geplande taak leveren allemaal intentie -- alleen de execution plane
-veroorzaakt effecten.** Het opent met de gezagsvraag: `kern/command/risico.js`
+veroorzaakt effecten.** Het opent met de gezagsvraag: `kern/frictie/motor.js`
 rekent per geval uit of iets `hand`, `assist` of `auto` mag (met de score-opbouw
 erbij, want een cijfer zonder opbouw is een orakel), terwijl `kern/stuur/beleid.js`
 er naast staat met 21 patronen `direct` en 27 `voorstel`, vast per route en

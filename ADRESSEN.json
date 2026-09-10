@@ -1,0 +1,267 @@
+{
+  "stempel": {
+    "op": "2026-09-10T14:22:06.451Z",
+    "commit": "2ec16a85",
+    "boomVuil": true,
+    "boomAnders": 5,
+    "instrument": "scripts/adressen.js",
+    "node": "v22.22.2"
+  },
+  "hoe": "npm run adressen:vast",
+  "uitleg": "Elk gewortelde bestandsadres dat een .md in de wortel noemt, tegen de bronboom gehouden. KLOPT: het bestand staat er. OPGEKNIPT: het is een map geworden, dus de module bestaat en het adres niet. KAPOT: er staat niets, ook geen map.",
+  "grens": "Deze meter zegt NIET of een adres naar het juiste bestand wijst -- een pad dat bestaat maar de verkeerde module aanwijst, komt langs als klopt. En hij beoordeelt geen kale bestandsnamen zonder map ervoor: dat is een verkorte verwijzing en geen adres.",
+  "graad": "gemeten",
+  "beoordeeld": 3801,
+  "klopt": 3760,
+  "onbeoordeeld": 3413,
+  "opgeknipt": [
+    {
+      "doc": "BESTUUR.md",
+      "regel": 467,
+      "pad": "server/accounts.js",
+      "nu": "server/accounts/"
+    },
+    {
+      "doc": "FUNCTIES.md",
+      "regel": 700,
+      "pad": "server/accounts.js",
+      "nu": "server/accounts/"
+    },
+    {
+      "doc": "HORECA.md",
+      "regel": 781,
+      "pad": "server/accounts.js",
+      "nu": "server/accounts/"
+    },
+    {
+      "doc": "LINK.md",
+      "regel": 30,
+      "pad": "server/accounts.js",
+      "nu": "server/accounts/"
+    },
+    {
+      "doc": "MIJNRTG.md",
+      "regel": 402,
+      "pad": "server/accounts.js",
+      "nu": "server/accounts/"
+    },
+    {
+      "doc": "PLAATS.md",
+      "regel": 273,
+      "pad": "server/accounts.js",
+      "nu": "server/accounts/"
+    },
+    {
+      "doc": "PLATFORM.md",
+      "regel": 54,
+      "pad": "kern/luchthaven.js",
+      "nu": "server/kern/luchthaven/"
+    },
+    {
+      "doc": "README.md",
+      "regel": 48,
+      "pad": "server/db.js",
+      "nu": "server/db/"
+    },
+    {
+      "doc": "README.md",
+      "regel": 48,
+      "pad": "server/pg.js",
+      "nu": "server/pg/"
+    },
+    {
+      "doc": "README.md",
+      "regel": 48,
+      "pad": "server/accounts.js",
+      "nu": "server/accounts/"
+    },
+    {
+      "doc": "README.md",
+      "regel": 48,
+      "pad": "kern/pay.js",
+      "nu": "server/kern/pay/"
+    },
+    {
+      "doc": "README.md",
+      "regel": 48,
+      "pad": "kern/directpay.js",
+      "nu": "server/kern/directpay/"
+    },
+    {
+      "doc": "README.md",
+      "regel": 48,
+      "pad": "kern/kantoor.js",
+      "nu": "server/kern/kantoor/"
+    },
+    {
+      "doc": "README.md",
+      "regel": 48,
+      "pad": "kern/hoteldorp/tools.js",
+      "nu": "server/kern/hoteldorp/tools/"
+    },
+    {
+      "doc": "README.md",
+      "regel": 4588,
+      "pad": "server/kern/bevoegdheid.js",
+      "nu": "server/kern/bevoegdheid/"
+    },
+    {
+      "doc": "REIZEN.md",
+      "regel": 71,
+      "pad": "kern/bevoegdheid.js",
+      "nu": "server/kern/bevoegdheid/"
+    },
+    {
+      "doc": "TAKEN.md",
+      "regel": 220,
+      "pad": "kern/bevoegdheid.js",
+      "nu": "server/kern/bevoegdheid/"
+    },
+    {
+      "doc": "TAKEN.md",
+      "regel": 404,
+      "pad": "server/kern/levensdossier.js",
+      "nu": "server/kern/levensdossier/"
+    }
+  ],
+  "kapot": [
+    {
+      "doc": "CONTROLPLANE.md",
+      "regel": 174,
+      "pad": "kern/commercie/verzonnen.js",
+      "nu": null
+    },
+    {
+      "doc": "CREATE.md",
+      "regel": 308,
+      "pad": "kern/gebeurtenis.js",
+      "nu": null
+    },
+    {
+      "doc": "EXECUTIE.md",
+      "regel": 443,
+      "pad": "kern/command/risico.js",
+      "nu": null
+    },
+    {
+      "doc": "INTELLIGENTIE.md",
+      "regel": 194,
+      "pad": "scripts/wereldmodel.js",
+      "nu": null
+    },
+    {
+      "doc": "ISOLATIE.md",
+      "regel": 32,
+      "pad": "kern/stuur/schaduw.js",
+      "nu": null
+    },
+    {
+      "doc": "KANTOOR.md",
+      "regel": 110,
+      "pad": "kern/kantoor/weerklank.js",
+      "nu": null
+    },
+    {
+      "doc": "KANTOOR.md",
+      "regel": 255,
+      "pad": "kern/kantoor/verantwoordelijkheid.js",
+      "nu": null
+    },
+    {
+      "doc": "KEURING.md",
+      "regel": 57,
+      "pad": "scripts/scherf.js",
+      "nu": null
+    },
+    {
+      "doc": "MAATSTAF.md",
+      "regel": 206,
+      "pad": "scripts/overdracht.js",
+      "nu": null
+    },
+    {
+      "doc": "MAATSTAF.md",
+      "regel": 728,
+      "pad": "scripts/lib/keten.js",
+      "nu": null
+    },
+    {
+      "doc": "PROOF-INCREMENTAL.md",
+      "regel": 279,
+      "pad": "test/wereld.e2e.js",
+      "nu": null
+    },
+    {
+      "doc": "PROOF-INCREMENTAL.md",
+      "regel": 362,
+      "pad": "scripts/scherf.js",
+      "nu": null
+    },
+    {
+      "doc": "STANDAARD.md",
+      "regel": 417,
+      "pad": "kern/stuur/schaduw.js",
+      "nu": null
+    },
+    {
+      "doc": "TAKEN.md",
+      "regel": 249,
+      "pad": "public/shared/spraaktekst.js",
+      "nu": null
+    },
+    {
+      "doc": "TAKEN.md",
+      "regel": 249,
+      "pad": "shared/spraaktekst.js",
+      "nu": null
+    },
+    {
+      "doc": "TAKEN.md",
+      "regel": 391,
+      "pad": "test/wings.e2e.js",
+      "nu": null
+    },
+    {
+      "doc": "TAKEN.md",
+      "regel": 402,
+      "pad": "opzet/kernlaagN.js",
+      "nu": null
+    },
+    {
+      "doc": "TAKEN.md",
+      "regel": 423,
+      "pad": "scripts/fuzz.js",
+      "nu": null
+    },
+    {
+      "doc": "TENANT.md",
+      "regel": 350,
+      "pad": "public/shared/enterprise-shell.js",
+      "nu": null
+    },
+    {
+      "doc": "TIKKEN.md",
+      "regel": 103,
+      "pad": "shared/wereldrooster.js",
+      "nu": null
+    },
+    {
+      "doc": "TOEGANKELIJK.md",
+      "regel": 341,
+      "pad": "shared/wereld/wereld-03.js",
+      "nu": null
+    },
+    {
+      "doc": "WERELD.md",
+      "regel": 86,
+      "pad": "shared/wereld.js",
+      "nu": null
+    },
+    {
+      "doc": "WERELD.md",
+      "regel": 86,
+      "pad": "test/wereld.e2e.js",
+      "nu": null
+    }
+  ]
+}

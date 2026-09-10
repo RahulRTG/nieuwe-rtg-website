@@ -10,7 +10,7 @@ de plek waar die handeling landt, en die hoort niet van de AI te zijn: een
 scherm, een automatisering, de commandbalk, een externe aanroep en een geplande
 taak stellen dezelfde vraag ("mag dit nu, en met hoeveel frictie?") en horen
 daar EEN antwoord op te krijgen. Daar staat ook de dubbele waarheid die deze
-laag vandaag heeft -- `kern/command/risico.js` en `kern/stuur/beleid.js`
+laag vandaag heeft -- `kern/frictie/motor.js` en `kern/stuur/beleid.js`
 beantwoorden allebei de frictievraag, en verschillend -- en de vijf mechanismen
 uit par. 3 die al gebouwd blijken, alleen voor de ops-cockpit in plaats van voor
 het stuur.

@@ -185,6 +185,8 @@
     "faalproef": "node scripts/faalproef.js",
     "getallen": "node scripts/getallen.js",
     "getallen:controle": "node scripts/getallen.js --controle",
+    "adressen": "node scripts/adressen.js",
+    "adressen:vast": "node scripts/adressen.js --vast",
     "gezagshandelingen": "node scripts/gezagshandelingen.js",
     "gezagshandelingen:lijst": "node scripts/gezagshandelingen.js --lijst",
     "gezagsnoemer": "node scripts/gezagsnoemer.js",

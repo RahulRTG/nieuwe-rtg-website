@@ -25,8 +25,16 @@
    ========================================================================== */
 'use strict';
 
-const AFGETEKEND = 'Claude, 2026-09-10: opgesteld bij het bouwen van de laag zelf. ' +
-  'De grond is de BOUW en niet een meting -- zie de kop.';
+/* De aftekening is een OBJECT met `door` en `op`, en niet een zin: de keuring
+   leest die twee velden apart (server/kern/mutatiecontract/keuring.js). Dat de
+   drie hier eerst een string droegen, is precies wat de toets vond.
+
+   `door` zegt de METHODE en niet een mens die ze niet heeft gelezen -- dat
+   onderscheid staat met zoveel woorden in de keuring. De grond is hier de BOUW:
+   deze drie zijn opgesteld terwijl de laag zelf werd geschreven, en de grendel
+   die het staande houdt is een toets en geen waarneming. */
+const AFGETEKEND = { door: 'Claude, opgesteld bij het bouwen van de laag zelf; de grond is de ' +
+  'BOUW en niet een meting -- test/move.test.js toets 12 is de grendel', op: '2026-09-10' };
 
 const leestMove = (route, mutatieId) => [route, {
   mutatieId, herkomst: 'mens',

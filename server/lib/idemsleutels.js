@@ -118,7 +118,11 @@ Object.assign(SLEUTELS,
      de lijst zelf, zonder SLEUTELS-omhulsel. */
   require('./idemsleutels-restbak'),
   /* De weerbaarheidsronde: de tweede handtekening en de schaduwteller. */
-  require('./idemsleutels-weerbaarheid').SLEUTELS);
+  require('./idemsleutels-weerbaarheid').SLEUTELS,
+  /* RTG Move: drie lezende POST-routes. Waarom `leest` en niet
+     `zelfdeVerzoek` staat in de kop van dat bestand -- een tweede weging
+     hoort het antwoord van NU te krijgen. */
+  require('./idemsleutels-move').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:
    geen route in twee zijbestanden, elke verklaring compleet, en vier routes die

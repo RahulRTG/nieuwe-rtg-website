@@ -84,6 +84,7 @@ const REGISTER = {
   'LAATSTE_METING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   'MUTATIES.json': { meter: ['toetsenOngevoeligPct', 'toetsenNietGemeten'] },
   'TAALKWALITEIT.json': { meter: ['taalPoortHoudtTegen', 'taalCellenVerkeerdSchrift', 'taalBetekenisOngemeten'] },
+  'TAALSCHIL.json': { meter: ['taalSchilOffline'] },
   /* Het sprekersregister is de INVOER van taalBetekenisOngemeten: die meter
      daalt alleen doordat hier een oordeel bij komt. Het hangt dus aan dezelfde
      ratel, en niet aan geen enkele. */

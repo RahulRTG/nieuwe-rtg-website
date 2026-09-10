@@ -98,6 +98,7 @@ const REGISTERS = [
      welke faalvormen zij aantoonbaar tegenhoudt, en die telling is niets waard
      zodra de keuring is veranderd zonder hem opnieuw te draaien. */
   ['TAALKWALITEIT.json', 'npm run taalkwaliteit', 'wat er per taal over de VORM van een vertaling is vastgesteld, en wat de keuring tegenhoudt'],
+  ['TAALSCHIL.json', 'npm run taalschil', 'wat er per taal offline klaarstaat: de tekst van de app-schil die sw.js voorcachet'],
   ['POORTWACHT.json', 'npm run meetronde -- --alleen=poortwacht', 'welke routes zonder token opengaan', BEVEILIGING],
   ['ROLPROEF.json', 'npm run meetronde -- --alleen=rolproef', 'of een verkeerde rol binnenkomt', BEVEILIGING],
   ['INVOERPROEF.json', 'npm run meetronde -- --alleen=invoerproef', 'of rommel netjes wordt geweigerd'],

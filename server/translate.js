@@ -110,6 +110,8 @@ async function translateBatch(teksten, to, from, opties) {
   /* De kast bewaart alleen wat de aanroeper AANWIJST als interface. Standaard
      dus niet: een nieuwe aanroeper krijgt nooit stilzwijgend een schijflog. */
   const bewaarMag = !!(opties && opties.bewaar);
+  /* Lezen is niet schrijven: de schilbouwer leest de kast en vult hem niet. */
+  const leesKastMag = (opties && opties.leesKast !== undefined) ? !!opties.leesKast : bewaarMag;
   const uit = new Array(teksten.length);
   const wacht = [];
   /* Wat de keuring deze ronde tegenhield. De aanroeper krijgt dit mee, zodat
@@ -129,7 +131,7 @@ async function translateBatch(teksten, to, from, opties) {
       uit[i] = { text: hit, translated: hit !== text, from: bron };
       continue;
     }
-    const uitKast = kastLees(bewaarMag, to, text);
+    const uitKast = kastLees(leesKastMag, to, text);
     if (uitKast != null) {
       uit[i] = { text: uitKast, translated: uitKast !== text, from: bron };
       continue;

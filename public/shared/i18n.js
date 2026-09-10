@@ -160,6 +160,102 @@
     }
   };
 })(window);
+/* DE MEEGELEVERDE TAALSCHIL -- vertaling zonder netwerk.
+
+   WAT DIT OPLOST. De automatische laag hieronder schraapt tekst van het scherm
+   en vraagt hem op bij /api/vertaal/ui. Dat werkt goed zolang er verbinding is;
+   wie voor het EERST offline binnenkomt, kreeg Nederlands, ook als hij zijn
+   taal allang had gekozen. De kast (i18n-00.js) hielp daar niet: die vult zich
+   pas door eerder bezoek. Deze laag levert de tekst van de app-schil mee als
+   bestand, gebouwd door scripts/taalschil.js en voorgecachet door sw.js.
+
+   DE VOLGORDE IS KAST, DAN SCHIL, DAN NET, en die is niet willekeurig. De kast
+   is VERSER (hij bevat wat deze bezoeker werkelijk zag, inclusief schermen
+   buiten de schil) en staat daarom voorop. De schil is BREDER bij een koude
+   start. Het net is de laatste, want dat is de enige stap die iets kost.
+
+   WAT DEZE LAAG NIET DOET. Hij keurt niets. De keuring staat in
+   server/kern/taalkeuring.js en heeft bij het BOUWEN al beslist wat er in het
+   bestand mag; alleen `goed` haalt het. Hier nog eens keuren zou een tweede,
+   zwakkere kopie van dat oordeel in de browser zetten -- precies de dubbeling
+   waar LAT.md regel 4 tegen is.
+
+   EEN ONTBREKENDE SCHIL IS GEEN STORING. Talen buiten de elf hebben geen
+   bestand, en dat hoort: zij werken zoals altijd, via het net. Een mislukte
+   ophaalpoging wordt daarom ONTHOUDEN en niet herhaald -- anders doet elke
+   DOM-wijziging een nieuw verzoek dat toch niets oplevert. */
+(function (w, d) {
+  if (w.RTGTaalSchil) return;
+  var MAP = '/shared/taalschil';
+  var LEEG = new Map();
+  var geladen = {};   // taal -> Map met de regels
+  var bezig = {};     // taal -> lopende belofte
+  var mislukt = {};   // taal -> we hebben het geprobeerd, het kwam er niet
+
+  /* De schil staat op dezelfde plek als de andere gedeelde bestanden. Op de
+     publieke verhaalpagina's ligt de webroot een paar mappen hoger; die dragen
+     daarvoor `rtg-asset-base`, net als i18n-01.js. */
+  function basis() {
+    var m = d.querySelector && d.querySelector('meta[name="rtg-asset-base"]');
+    return String((m && m.getAttribute('content')) || '').replace(/\/+$/, '');
+  }
+
+  /* Een taalcode komt uit een keuzelijst, maar hij komt ook uit localStorage en
+     uit een URL. Alles wat geen kale code is, wordt hier een pad -- dus eerst
+     de vorm afdwingen en pas dan een adres bouwen. */
+  function veilig(taal) {
+    return /^[a-z]{2,3}$/.test(String(taal || '')) ? String(taal) : null;
+  }
+
+  function alsMap(regels) {
+    var m = new Map();
+    if (!regels || typeof regels !== 'object') return m;
+    /* Via Object.keys en een Map, zodat een sleutel als `__proto__` in het
+       bestand nooit iets aan een object kan veranderen. */
+    Object.keys(regels).forEach(function (k) {
+      var v = regels[k];
+      if (typeof v === 'string' && v) m.set(k, v);
+    });
+    return m;
+  }
+
+  function van(taal) {
+    taal = veilig(taal);
+    return (taal && geladen[taal]) || LEEG;
+  }
+
+  function laad(taal) {
+    taal = veilig(taal);
+    if (!taal) return Promise.resolve(LEEG);
+    if (geladen[taal]) return Promise.resolve(geladen[taal]);
+    if (mislukt[taal]) return Promise.resolve(LEEG);
+    if (bezig[taal]) return bezig[taal];
+    if (typeof fetch !== 'function') { mislukt[taal] = true; return Promise.resolve(LEEG); }
+    bezig[taal] = fetch(basis() + MAP + '/' + taal + '.json', { credentials: 'omit' })
+      .then(function (r) { if (!r.ok) throw new Error('schil ' + r.status); return r.json(); })
+      .then(function (j) {
+        var m = alsMap(j && j.regels);
+        geladen[taal] = m;
+        delete bezig[taal];
+        return m;
+      })
+      .catch(function () {
+        mislukt[taal] = true;
+        delete bezig[taal];
+        return LEEG;
+      });
+    return bezig[taal];
+  }
+
+  /* Voor de meter en voor een mens die wil weten waar zijn tekst vandaan komt. */
+  function stand() {
+    var uit = {};
+    Object.keys(geladen).forEach(function (t) { uit[t] = geladen[t].size; });
+    return { geladen: uit, mislukt: Object.keys(mislukt) };
+  }
+
+  w.RTGTaalSchil = { van: van, laad: laad, stand: stand, MAP: MAP };
+})(window, document);
 /* De LEZER van de automatische UI-vertaling voor de volledige RTG-schermfamilie.
    (Het tonen, opvragen en wisselen staat in i18n-00c.js: een IIFE, twee helften.)
 
@@ -192,6 +288,10 @@
      maar geen enkel scherm valt om op een ontbrekende kast. */
   var KAST = w.RTGVertaalKast || { van: function () { return new Map(); },
     zet: function () { return false; }, stand: function () { return { opslag: false, perTaal: {} }; } };
+  /* De meegeleverde schil (i18n-00a.js): wat er offline al klaarstaat. Zelfde
+     terugval als de kast -- ontbreekt hij, dan werkt deze laag door via het net. */
+  var SCHIL = w.RTGTaalSchil || { van: function () { return new Map(); },
+    laad: function () { return Promise.resolve(new Map()); } };
   var oorspronkelijkeRichting = document.documentElement.getAttribute('dir');
   var apiMeta = document.querySelector && document.querySelector('meta[name="rtg-api-base"]');
   var apiBasis = String(apiMeta && apiMeta.getAttribute('content') || '').replace(/\/+$/, '');
@@ -246,6 +346,10 @@
     if (!kandidaat(st.bron)) return;
     var uitKast = KAST.van(taal).get(st.bron);
     if (uitKast != null) return toon(st, uitKast);
+    /* Kast, dan schil, dan net. De kast is verser (hij kent ook schermen buiten
+       de schil), de schil is breder bij een koude start, het net kost geld. */
+    var uitSchil = SCHIL.van(taal).get(st.bron);
+    if (uitSchil != null) return toon(st, uitSchil);
     if (!groepen.has(st.bron)) groepen.set(st.bron, new Set());
     groepen.get(st.bron).add(st);
   }
@@ -391,7 +495,19 @@
     else if (taal === 'nl' && oorspronkelijkeRichting == null) document.documentElement.removeAttribute('dir');
     else document.documentElement.setAttribute('dir', oorspronkelijkeRichting || 'ltr');
     document.documentElement.setAttribute('data-rtg-taal', taal);
-    if (taal !== 'nl') KAST.van(taal);   // de kast van deze taal alvast van het toestel halen
+    if (taal !== 'nl') {
+      KAST.van(taal);   // de kast van deze taal alvast van het toestel halen
+      /* En de meegeleverde schil erbij. Die komt van schijf of uit de
+         service-worker-cache, dus ook zonder verbinding. Hij landt ASYNCHROON,
+         dus na aankomst nog een ronde: anders staat de eerste render er nog in
+         het Nederlands terwijl de vertaling al binnen is. `beurt` bewaakt dat
+         een late schil van een vorige taal niets meer aanraakt. */
+      (function (gekozenTaal, gekozenBeurt) {
+        SCHIL.laad(gekozenTaal).then(function (m) {
+          if (m && m.size && taal === gekozenTaal && beurt === gekozenBeurt) plan(document.documentElement);
+        });
+      })(taal, beurt);
+    }
     eersteRonde = true;
     observeer();
     if (taal === 'nl') { if (timer) { clearTimeout(timer); timer = null; } wortels.clear(); herstel(); }

@@ -470,6 +470,21 @@ const IJKINGEN = {
      `meet(bron)`, dezelfde vorm als kern/taaldekking.js). De echte tabel heeft
      geen gaten, dus een proef op de echte tabel kan nooit uitslaan -- en dan
      bewijst hij niets over de meter. */
+  taalSchilOffline: {
+    /* Bekend-foute invoer: een boom waarin geen enkel schilbestand ligt. Zakt
+       dit, dan telt de meter niet de bestanden maar iets anders -- en dan kan
+       een taal stil uit de offline schil vallen zonder dat de ratel valt. Dat
+       gebeurt geruisloos: zonder bestand werkt die taal nog steeds, alleen niet
+       meer zonder netwerk. */
+    proef: () => {
+      const { offlineTalen } = require('../scripts/taalschil');
+      const echt = offlineTalen();
+      const leeg = offlineTalen(() => false);
+      assert.equal(leeg, 0, 'zonder enig schilbestand hoort er geen taal offline te werken');
+      return echt - leeg;
+    }
+  },
+
   taalPoortHoudtTegen: {
     /* Bekend-foute invoer: een keuring die alles goedkeurt. Zakt dit, dan telt
        de meter niet meer wat de poort werkelijk vangt, en kan iemand een

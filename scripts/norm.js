@@ -423,6 +423,13 @@ const METERS = [
   { sleutel: 'taalPoortHoudtTegen', richting: 'omhoog', wat: 'faalvormen die de taalkeuring aantoonbaar tegenhoudt' },
   { sleutel: 'taalCellenVerkeerdSchrift', richting: 'omlaag', wat: 'kernwoorden in een schrift dat de taal niet kent' },
   { sleutel: 'taalBetekenisOngemeten', richting: 'omlaag', wat: 'talen waarvan geen spreker de BETEKENIS heeft beoordeeld' },
+  /* DE OFFLINE TALEN. Deze telt de talen die een schilbestand HEBBEN, niet
+     hoeveel regels erin staan: dat tweede getal beweegt mee met elk scherm dat
+     erbij komt of verdwijnt, en dan zakt de ratel op werk dat niets met taal te
+     maken had. Wat hier bewaakt wordt is dat een taal nooit stil uit de offline
+     schil valt -- en dat gebeurt geruisloos, want zonder bestand werkt hij nog
+     steeds, alleen niet meer zonder netwerk. */
+  { sleutel: 'taalSchilOffline', richting: 'omhoog', wat: 'talen waarvan de app-schil zonder netwerk werkt' },
   /* DE METER DIE OVER HET BEWIJS ZELF GAAT (STANDAARD.md par. 5).
 
      Alles hierboven meet de code of de ratel. Deze meet of de UITSLAGEN
@@ -1161,8 +1168,13 @@ function meet(bronnen) {
     ...(() => {
       try {
         const t = require('./taalkwaliteit').meet();
+        /* Geteld op de BESTANDEN en niet op het register: een schil die uit
+           TAALSCHIL.json is verdwenen maar nog op schijf staat, is nog steeds
+           offline beschikbaar -- en andersom is een register dat een taal
+           belooft die er niet ligt, precies de stilte die dit huis niet wil. */
+        const aanwezig = require('./taalschil').offlineTalen();
         return { taalPoortHoudtTegen: t.poortHoudtTegen, taalCellenVerkeerdSchrift: t.cellenVerkeerdSchrift,
-          taalBetekenisOngemeten: t.betekenisOngemeten };
+          taalBetekenisOngemeten: t.betekenisOngemeten, taalSchilOffline: aanwezig };
       } catch (e) { return {}; }
     })()
   };

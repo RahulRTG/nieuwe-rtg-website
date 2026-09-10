@@ -1,4 +1,13 @@
 {
+  "stempel": {
+    "op": "2026-09-10T15:05:27.785Z",
+    "commit": "0a39efcd",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/taalkwaliteit.js",
+    "node": "v22.22.2"
+  },
+  "hoe": "npm run taalkwaliteit",
   "uitleg": "Per taal wat er over de VORM van een vertaling is vastgesteld. Over de BETEKENIS doet deze meter geen uitspraak; daarvoor is een spreker nodig.",
   "grens": "Schriftcontrole sluit alleen iets uit bij een taal die het Latijnse schrift niet aanvaardt. Voor de overige talen zegt een groene rij niet dat er geen Engels doorheen kan.",
   "talen": 114,

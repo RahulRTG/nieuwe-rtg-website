@@ -35,6 +35,7 @@
     }
     function indexOpen() { return !!(index && index.getAttribute('aria-hidden') === 'false'); }
     function slimMenu() { return !!(index && index.querySelector('.rtg-edge-faces')); }
+    function secondOpen() { return !!(root && root.dataset.rtgSecondScreen && root.dataset.rtgSecondScreen !== 'peek'); }
     function sync() {
       vindDeur();
       if (!media.matches || !deur) {
@@ -52,7 +53,7 @@
       deur.setAttribute('data-rtg-edge-owned', 'true');
       deur.setAttribute('aria-hidden', 'true'); deur.tabIndex = -1;
       if (slimMenu()) {
-        if (indexOpen() && bankOpen()) deur.click();
+        if (indexOpen() && bankOpen() && !secondOpen()) deur.click();
         menu.setAttribute('aria-label', indexOpen() ? 'Menu sluiten' : 'Menu openen');
         menu.setAttribute('aria-controls', index.id);
         menu.setAttribute('aria-expanded', String(indexOpen()));

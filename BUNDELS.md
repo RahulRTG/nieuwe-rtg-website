@@ -800,7 +800,7 @@ omlaag.
 
 ## `shared/rtg-edge-smart-menu.js`
 
-`public/shared/rtg-edge-smart-menu/` -- 2 delen, 204 regels in de delen
+`public/shared/rtg-edge-smart-menu/` -- 2 delen, 214 regels in de delen
 
 | deel | onderwerp |
 |---|---|

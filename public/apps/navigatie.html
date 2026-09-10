@@ -142,9 +142,26 @@
     background:#0C0C0B;border:1px solid var(--line);border-radius:0;color:#fff;font-size:0.82rem;
     padding:0.55rem 0.9rem;box-shadow:0 10px 28px rgba(0,0,0,0.6);opacity:0;transition:opacity 0.25s;max-width:90vw;}
   .toast.zien{opacity:1;}
-  .poort{position:fixed;inset:0;z-index:20;background:rgba(8,8,8,0.9);display:none;align-items:center;justify-content:center;padding:1.4rem;}
+  /* DE LOCATIEVRAAG LIGT BOVEN DEZE POORT, en dat is met opzet: shared/plek.js
+     zet zijn kaart op z-index 9985, omdat een vraag die onder een poort
+     verdwijnt door niemand te beantwoorden is. Het gevolg was wel dat de
+     ONDERSTE knop van dit kaartje eronder lag. Gemeten op 390x844: de
+     vraagkaart staat op 516-694 en "Kaarten kiezen" op 514-558, dus 42 van de
+     44 px zat eronder en de knop was met de vinger niet te raken -- zichtbaar
+     en onbereikbaar, precies het productdefect uit BETROUWBAARHEID.md.
+     Gevonden door test/navigatiekaarten.e2e.js toets 4, die met de MUIS klikt
+     en niet met .click() uit de DOM; een DOM-klik gaat dwars door een
+     dekkende laag heen en had dit nooit gezien.
+
+     De poort houdt die band daarom vrij. Is de vraag al beantwoord, dan staat
+     het kaartje iets boven het midden en dat is het hele gevolg. `margin:auto`
+     met `align-items:flex-start` centreert zolang er ruimte is en laat het
+     kaartje scrollen zodra er te weinig is -- met het handmatige
+     vertrekpaneel open is het namelijk hoger dan de rest, en bij centreren
+     met overflow verdwijnt dan de KOP buiten beeld. */
+  .poort{position:fixed;inset:0;z-index:20;background:rgba(8,8,8,0.9);display:none;align-items:flex-start;justify-content:center;padding:1.4rem 1.4rem 17rem;overflow:auto;}
   .poort.zien{display:flex;}
-  .poort .kaartje{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.6rem;max-width:340px;text-align:center;}
+  .poort .kaartje{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.6rem;max-width:340px;text-align:center;margin:auto;}
   .poort h2{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.3rem;margin-bottom:0.5rem;}
   .poort p{color:var(--soft);font-size:0.9rem;line-height:1.55;margin-bottom:1.1rem;}
   .poort a{display:inline-block;background:var(--gold);color:#0C0C0B;text-decoration:none;font-weight:600;

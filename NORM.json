@@ -21,7 +21,7 @@
     "keuringTeGroot": 14,
     "inlineStijlAttributen": 4684,
     "browserpoortToetsen": 325,
-    "kernBreedte": 1560,
+    "kernBreedte": 1563,
     "kernGedeeld": 231,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -1895,6 +1895,15 @@
       "meter": "kernBreedte 1559 -> 1560",
       "reden": "RTG Move (MOVE.md) voegt EEN naam aan de kern toe: `move`, een namespace met drie lezende functies erin (reis, gevolg, volgende). Dat is met opzet niet drie losse kernnamen -- de smalste vorm die deze laag kan hebben. De laag bezit geen collectie, kent geen schrijfweg (test/move.test.js toets 12 zakt op db.data of save()) en hangt aan een eigen schakelaar dom-move, zodat de boardroom hem kan sluiten zonder de navigatie mee te nemen.",
       "waarheen": "server/kern/move/ (naad, haalbaar, gevolg, index) met test/move.test.js en test/move-keten.test.js; de kern blijft een enkele naadlaag zonder eigen opslag"
+    },
+    {
+      "datum": "2026-09-10",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1560,
+      "meter": "kernBreedte 1560 -> 1563",
+      "reden": "DE KAARTENLAAG VAN RTG NAVIGATIE (KAARTEN.md) VOEGT DRIE NAMEN TOE: `navKaartenBeeld`, `navKaartKies` en `navKaartWeg` -- de drie routes waarmee een lid ziet welke kaarten RTG kan leveren en zelf kiest welke hij wil hebben (/api/nav/gebieden, /api/nav/gebied/kies, /api/nav/gebied/weg). Er is een vierde functie (`navKaartVraag`, de telling voor het kantoor) en die telt hier niet mee: geen route raakt hem aan, en dat is precies wat deze meter meet.\n\nDRIE EN NIET EEN, EN DAT IS EEN KEUZE DIE HIER HOORT TE STAAN. De laag had ook als EEN naam kunnen binnenkomen -- `navKaarten` met beeld/kies/weg erin, de vorm die `move` op 10 september kreeg -- en dan was deze stap +1 geweest in plaats van +3. Dat is niet gedaan, om twee redenen. Ten eerste is het domein navigatie overal plat (navKaart, navRoute, navBestemmingen, navPoi, navMeld, navStatus, navPartnerEvent): een enkele namespace tussen zeven vlakke namen in hetzelfde routebestand is een tweede manier waarop dit domein zich aanbiedt, en dat is de vorm van fout die LAT.md regel 4 bedoelt. Ten tweede zou het de KOPPELING niet kleiner maken maar alleen de meting: dezelfde drie functies, dezelfde drie aanroepen, een naam eromheen. Een ratel die je met een verpakking omlaag praat, meet vanaf dan de verpakking.\n\nWat de breedte wel beperkt houdt: de drie hangen achter de bestaande ledenpoort (`auth` plus de gastweigering), ze staan op de SESSIESLEUTEL en niet op een naam, en de laag bezit een eigen collectie via kern/eigencollectie.js. De catalogus zelf leest alleen van schijf.",
+      "waarheen": "server/kern/navigatie/mijnkaarten.js (de keuze per lid) met server/routes/navigatie.js voor de drie routes; de catalogus en de licentiepoort blijven in server/kern/navigatie/gebieden.js zonder eigen kernnaam"
     }
   ],
   "prestatie": {

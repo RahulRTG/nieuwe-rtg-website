@@ -162,3 +162,36 @@ privacy by design), en de kantoorkant telt alleen AANTALLEN per gebied -- nooit
 wie. Er komt ook geen plafond op het aantal kaarten: de pakketten zijn gedeeld,
 dus een maximum zou een verzonnen grens zijn. Op het toestel is de grens de
 opslag van dat toestel, en die kent RTG niet.
+
+## 9. Wat de eerste browserronde vond, en wat dat over toetsen zegt
+
+De vier servertoetsen van deze laag stonden groen voordat het paneel ooit in een
+browser had gestaan. `test/navigatiekaarten.e2e.js` liep daarna voor het eerst,
+en toets 4 zakte: **de knop "Kaarten kiezen" was zichtbaar en niet aan te
+tikken.** De poort (`#poort`, `inset:0`, z-index 20) dekt het hele scherm, en
+`shared/plek.js` zet zijn locatievraag daarboven op z-index 9985 -- want een
+vraag die onder een poort verdwijnt, kan niemand beantwoorden. Gemeten op
+390x844: de vraagkaart staat op 516-694 en de knop op 514-558, dus 42 van de 44
+px zat eronder.
+
+Drie dingen die je hier niet moet wegpoetsen.
+
+**Het defect is ouder dan deze laag.** `#manualStart` ("Kies vertrekpunt") staat
+in hetzelfde kaartje en stond op 460-504 -- twee pixels boven de vraagkaart. De
+knop erbij duwde de onderste van de twee eronder. Wat de kaartenlaag toevoegde
+is dus geen nieuw defect maar de druppel; de poort houdt de band waar de
+locatievraag woont nu vrij (`padding-bottom`), en `margin:auto` op het kaartje
+laat hem scrollen in plaats van zijn kop kwijtraken zodra het handmatige
+vertrekpaneel opengaat.
+
+**Alleen een ECHTE klik ziet dit.** De andere drie toetsen openen het paneel met
+`page.evaluate(() => el.click())`, en dat moet ook: de schil verbouwt de kop met
+`defer` en dan klik je zestig keer op een cookiebalk (SERVICE.md par. 13). Maar
+een DOM-klik gaat dwars door een dekkende laag heen. Toets 4 klikt daarom met de
+MUIS, en dat staat er als reden bij -- wie die regel "opruimt" naar een
+evaluate-klik, maakt de toets blind voor precies het defect waarvoor hij bestaat.
+
+**Zichtbaar en onbereikbaar is een productdefect** (BETROUWBAARHEID.md par. 6),
+ook als elke regel code klopt en elke servertoets groen staat. De belofte is niet
+"de route antwoordt 200" maar *ik zie welke kaarten RTG kan leveren en kies zelf
+welke ik wil hebben*.

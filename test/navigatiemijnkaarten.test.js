@@ -310,7 +310,15 @@ test('12. over HTTP: kiezen, terugzien en weghalen -- en de sleutel komt uit de 
   const kies = await post('/api/nav/gebied/kies', { code: 'frankrijk' }, a);
   assert.equal(kies.status, 200);
   assert.equal(kies.body.gekozen, true);
-  assert.deepEqual((await post('/api/nav/gebieden', {}, a)).body.mijn, ['frankrijk']);
+  /* EERST DE LENGTE EN DAARNA DE INHOUD, en die eerste regel is geen dubbelop:
+     de lege lijsten in deze toets (hierboven, en bij lid B) bewijzen alleen iets
+     als `mijn` AANTOONBAAR gevuld kan raken. Zonder deze regel is elke
+     `deepEqual(..., [])` hier vanzelf waar voor een route die altijd niets
+     teruggeeft -- de vorm die scripts/tandeloos.js meldt, en hij meldde precies
+     deze. */
+  const na = await post('/api/nav/gebieden', {}, a);
+  assert.equal(na.body.mijn.length, 1, 'de lijst raakt werkelijk gevuld');
+  assert.deepEqual(na.body.mijn, ['frankrijk']);
 
   /* HET ANDERE LID ZIET ZIJN EIGEN LIJST. Zou de laag de sleutel uit het
      LICHAAM lezen, dan kon een lid de lijst van een ander zetten of zien --

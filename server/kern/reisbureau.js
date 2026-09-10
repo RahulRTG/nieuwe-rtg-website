@@ -135,7 +135,11 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan }
      bevestigd is. Dat was een doodlopende weg -- zie de kop daar. Hij deelt de
      aanvraag, het dossier en de visumtaak met het besluit hierboven, zodat er
      EEN plek blijft waar een aanvraag van stand verandert. */
-  const nazorg = require('./reisbureau-nazorg')({ db, save, nu, dossier, visum, meldLid });
+  const nazorg = require('./reisbureau-nazorg')({
+    /* De aanvragenrij gaat MEE naar beneden in plaats van dat de nazorg zelf
+       db.data opzoekt: waar deze collectie woont, hoort op een plek te staan. */
+    rij: () => (Array.isArray(db.data.reisAanvragen) ? db.data.reisAanvragen : []),
+    save, nu, dossier, visum, meldLid });
 
   return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen,
     bevestig, wijsAf, besluit,

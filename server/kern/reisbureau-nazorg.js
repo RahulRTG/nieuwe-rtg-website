@@ -47,10 +47,15 @@ const OPEN_STANDEN = ['aangevraagd', 'wijziging-gevraagd'];
 // de standen waarin een reis rond is en dus afgezegd KAN worden
 const ROND_STANDEN = ['bevestigd', 'wijziging-gevraagd'];
 
-module.exports = ({ db, save, nu, dossier, visum, meldLid }) => {
+/* DE AANVRAGEN KOMEN BINNEN ALS `rij`, en dit bestand raakt db.data niet aan.
+   Waar de aanvragen wonen, weet ../reisbureau.js -- die deur is er al en er hoort
+   er geen tweede naast te komen. Dat is dezelfde regel die scripts/deuren.js
+   telt en die NORM.json op een ratel heeft staan: elk bestand buiten server/db/
+   dat db.data rechtstreeks aanraakt, is een plek waar de opslag kan verschuiven
+   zonder dat iemand het merkt. */
+module.exports = ({ rij, save, nu, dossier, visum, meldLid }) => {
 
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
-  const rij = () => (Array.isArray(db.data.reisAanvragen) ? db.data.reisAanvragen : []);
 
   /* Een regel bij de geschiedenis. `door` is een INTERNE naam (een sleutel van
      het kantoor, of 'lid'); wat het lid ervan ziet wordt in ./lidbeeld gefilterd

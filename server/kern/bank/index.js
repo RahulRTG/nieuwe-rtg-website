@@ -91,7 +91,20 @@ module.exports = (deps) => {
      boekte gewoon nog een keer (TAKEN.md 4.57). Nu hangt hij in de gedeelde
      ctx, met EEN sleutelruimte (`bankIdem`) voor de hele bank, zoals RTG Pay
      dat ook doet. */
-  const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem', bijeen });
+  /* EN DUURZAAM, net als RTG Pay (kern/pay/index.js regel 66).
+
+     De vlag stond hier NIET, en lib/idem.js waarschuwt zelf precies daarvoor:
+     zonder hem is de bundel wel ATOMAIR maar niet DUURZAAM -- "bevestigd aan de
+     klant, na een herstart weg". Gemeten in de verse faalproefronde:
+     /api/bank/akkoord kwam eruit als `gezakt`, en nagelopen in de bron gaf de
+     route `{ok:true, akkoord:true, rekening}` met een IBAN terug terwijl noch
+     het akkoord noch de rekening bevestigd was vastgelegd. Een lid houdt dan
+     een rekeningnummer dat er na een herstart niet is.
+
+     Dit is de reikwijdte van GELDLAT.md ("geld en alles wat een lid zelf
+     maakt") en de inconsistentie was dat betalen al duurzaam was en een
+     rekening OPENEN niet -- terwijl beide door dezelfde sleutelruimte lopen. */
+  const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem', bijeen, duurzaam: true });
 
   // de gedeelde context voor de deelbestanden
   const ctx = { db, save, bijeen, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, anthropic,

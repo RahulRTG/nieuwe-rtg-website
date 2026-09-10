@@ -3337,7 +3337,13 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
        `schrijf-verloren` 287 bytes met 200, terwijl er na de herstart geen
        sleutel kantoorAudit meer was -- nul regels. Een logboek dat zegt wie
        welke knop omzette, is geen afgeleide toestand. */
-    ['server/kern/afdelingen/bewaking/index.js', 'het auditspoor: een handeling die is bevestigd, moet achteraf te herleiden zijn -- ook na een opslagstoring']
+    ['server/kern/afdelingen/bewaking/index.js', 'het auditspoor: een handeling die is bevestigd, moet achteraf te herleiden zijn -- ook na een opslagstoring'],
+    /* HET VIJFDE, en dezelfde laag als pay: de bankbundel was atomair en niet
+       duurzaam, precies waar lib/idem.js voor waarschuwt. /api/bank/akkoord gaf
+       een IBAN terug die na een herstart weg kon zijn (gemeten in FAALPROEF.json
+       als `gezakt`). Betalen was al duurzaam; een rekening openen hoort dat ook
+       te zijn -- ze lopen door dezelfde sleutelruimte. */
+    ['server/kern/bank/index.js', 'de bank: een geopende rekening en een gegeven akkoord mogen niet verdwijnen na een herstart']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze

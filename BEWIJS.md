@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1782 bestanden en 12540 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1783 bestanden en 12558 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1782 |
-| losse beweringen (`test(...)`) | 12540 |
+| toetsbestanden | 1783 |
+| losse beweringen (`test(...)`) | 12558 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1095 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 55 |
-| alleen in de kop *genoemd*, nog niet gemeten | 178 |
+| alleen in de kop *genoemd*, nog niet gemeten | 179 |
 | niets van beide | 454 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1572 bestanden, 12178 beweringen.
+1573 bestanden, 12196 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -856,6 +856,7 @@ toets omvalt.
 | `naarkassa.test.js` | 2 | gezakt op `liegpoort /api/` | Order naar de kassa (server): het lid kiest "stuur naar de kassa" -- de bestelling gaat direct als open bon naar de zaak (de keuken maakt hem), en wordt aan de balie afgerekend met de ophaalcode. Getoetst: de vlag... |
 | `naslag.test.js` | 9 | genoemd | HET NASLAGWERK -- één bron voor de CLI en het uitgeversbureau. `rtg sdk` schreef de typings en de documentatie al uit de code. |
 | `navigatie.test.js` | 14 | gezakt op `+->-#0` | RTG Navigatie (server/kern/navigatie.js): het huiseigen navigatiesysteem. Getoetst als pure motor met de echte haversine en fakes voor de Flits-koppeling: het eigen wegennet + A*-route, de bocht-voor-bocht en ETA per... |
+| `navigatiegebieden.test.js` | 18 | genoemd | DE GEBIEDEN VAN DE NAVIGATIE -- de catalogus, de gebiedsbepaling en de licentiepoort. Deze laag bestaat omdat de motor precies EEN gebied kende (Nederland, met een bbox en een bestandsnaam in de code). |
 | `navigatieproef.test.js` | 10 | gezakt op `===->!==#2` | DE NAVIGATIEPROEF -- het instrument, niet de keten. scripts/navigatieproef.js opent RTG Navigatie in een echte browser en meet de belofte uit BETROUWBAARHEID.md par. |
 | `negenplus.test.js` | 4 | gezakt op `liegpoort /api/` | De 9+-ronde: de app-gids dekt elke app-pagina met echte uitleg, en Rahul is er kindveilig voor het hele gezin in de RTFoundation. |
 | `nieuwe-endpoints.test.js` | 1 | -- | DE NIEUWE ENDPOINTS VAN DE SAMENVOEGRONDE, EEN KEER ECHT AANGEROEPEN. WAT DIT IS. |

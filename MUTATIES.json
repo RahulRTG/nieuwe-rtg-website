@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T15:54:09.295Z",
-    "commit": "16599476",
+    "op": "2026-09-10T16:00:47.249Z",
+    "commit": "ac2816c5",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -455,13 +455,6 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
-      "scherp": "gezakt"
-    },
-    "bankduurzaam.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 2,
       "scherp": "gezakt"
     },
     "bankhart.test.js": {
@@ -1702,14 +1695,6 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
-    "faalproefklasse.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/faalproef.js",
-      "operator": "!==->===#0",
-      "gezakt": 1,
-      "geprobeerd": 2
-    },
     "faalproefvorm.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2839,13 +2824,6 @@
       "module": "public/shared/kaart.js",
       "operator": "===->!==",
       "gezakt": 2
-    },
-    "kantoorawait.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 3,
-      "scherp": "gezakt"
     },
     "kantoordienst.test.js": {
       "soort": "server",
@@ -7017,6 +6995,38 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "taalkeuring.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/taalkeuring.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
+    "taaloordeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/taalkwaliteit.js",
+      "operator": "===->!==#3",
+      "gezakt": 1,
+      "geprobeerd": 15
+    },
+    "taalschil.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/taalschil.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "taalschrift.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/taalschrift.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "tafeldek.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7599,14 +7609,6 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
-    },
-    "versheid-uitvoer.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/versheid.js",
-      "operator": "!==->===#2",
-      "gezakt": 2,
-      "geprobeerd": 12
     },
     "verstrengeling.test.js": {
       "soort": "puur",

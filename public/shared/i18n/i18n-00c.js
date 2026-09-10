@@ -109,7 +109,19 @@
     else if (taal === 'nl' && oorspronkelijkeRichting == null) document.documentElement.removeAttribute('dir');
     else document.documentElement.setAttribute('dir', oorspronkelijkeRichting || 'ltr');
     document.documentElement.setAttribute('data-rtg-taal', taal);
-    if (taal !== 'nl') KAST.van(taal);   // de kast van deze taal alvast van het toestel halen
+    if (taal !== 'nl') {
+      KAST.van(taal);   // de kast van deze taal alvast van het toestel halen
+      /* En de meegeleverde schil erbij. Die komt van schijf of uit de
+         service-worker-cache, dus ook zonder verbinding. Hij landt ASYNCHROON,
+         dus na aankomst nog een ronde: anders staat de eerste render er nog in
+         het Nederlands terwijl de vertaling al binnen is. `beurt` bewaakt dat
+         een late schil van een vorige taal niets meer aanraakt. */
+      (function (gekozenTaal, gekozenBeurt) {
+        SCHIL.laad(gekozenTaal).then(function (m) {
+          if (m && m.size && taal === gekozenTaal && beurt === gekozenBeurt) plan(document.documentElement);
+        });
+      })(taal, beurt);
+    }
     eersteRonde = true;
     observeer();
     if (taal === 'nl') { if (timer) { clearTimeout(timer); timer = null; } wortels.clear(); herstel(); }

@@ -30,6 +30,10 @@
      maar geen enkel scherm valt om op een ontbrekende kast. */
   var KAST = w.RTGVertaalKast || { van: function () { return new Map(); },
     zet: function () { return false; }, stand: function () { return { opslag: false, perTaal: {} }; } };
+  /* De meegeleverde schil (i18n-00a.js): wat er offline al klaarstaat. Zelfde
+     terugval als de kast -- ontbreekt hij, dan werkt deze laag door via het net. */
+  var SCHIL = w.RTGTaalSchil || { van: function () { return new Map(); },
+    laad: function () { return Promise.resolve(new Map()); } };
   var oorspronkelijkeRichting = document.documentElement.getAttribute('dir');
   var apiMeta = document.querySelector && document.querySelector('meta[name="rtg-api-base"]');
   var apiBasis = String(apiMeta && apiMeta.getAttribute('content') || '').replace(/\/+$/, '');
@@ -84,6 +88,10 @@
     if (!kandidaat(st.bron)) return;
     var uitKast = KAST.van(taal).get(st.bron);
     if (uitKast != null) return toon(st, uitKast);
+    /* Kast, dan schil, dan net. De kast is verser (hij kent ook schermen buiten
+       de schil), de schil is breder bij een koude start, het net kost geld. */
+    var uitSchil = SCHIL.van(taal).get(st.bron);
+    if (uitSchil != null) return toon(st, uitSchil);
     if (!groepen.has(st.bron)) groepen.set(st.bron, new Set());
     groepen.get(st.bron).add(st);
   }

@@ -15,7 +15,13 @@ const ROOT = path.join(__dirname, '..');
    de lezer en de schrijver. Ze vormen samen een IIFE plus een losse kast, en de
    bundel plakt ze aaneen -- dus laadt de toets ze ook alle drie. Zonder opslag,
    want een toets hoort de vorige toets niet te kunnen ruiken. */
-const AUTODELEN = ['i18n-00.js', 'i18n-00b.js', 'i18n-00c.js'];
+/* AFGELEID EN NIET OVERGETYPT. Dit stond als handlijst en liep meteen achter
+   toen i18n-00a.js (de meegeleverde taalschil) erbij kwam: de toets draaide dan
+   een andere laag dan de browser krijgt, en dekte de nieuwe leesweg niet. De
+   autolaag is precies de reeks `i18n-00*`; scripts/bundel.js plakt ze in
+   dezelfde volgorde aaneen. */
+const AUTODELEN = fs.readdirSync(path.join(ROOT, 'public/shared/i18n'))
+  .filter(f => /^i18n-00.*\.js$/.test(f)).sort();
 
 function autoLaag(opslag) {
   const attrs = {};

@@ -1,0 +1,25 @@
+{
+ "taal": "pt",
+ "bron": "nl",
+ "uitleg": "De tekst van de voorgecachete app-schil in deze taal, zodat een offline start niet in het Nederlands hoeft te blijven staan.",
+ "grens": "Alleen de VORM is gekeurd (schrift, plaatshouders, bedragen, merknamen). Over de BETEKENIS doet dit bestand geen uitspraak; daarvoor is een spreker nodig (TAALOORDEEL.json). Wat hier niet in staat, valt in de app terug op het netwerk en anders op het Nederlands.",
+ "vorm": "gemeten",
+ "betekenis": "ongemeten",
+ "schilTeksten": 1413,
+ "gevuld": 9,
+ "dekking": 0.6,
+ "afgewezenDoorKeuring": 0,
+ "zonderVertaling": 1404,
+ "bestandenNietGevonden": [],
+ "regels": {
+  "Betalen.": "Pagar.",
+  "Betalen": "Pagar",
+  "Taal": "Língua",
+  "Samen": "Juntos",
+  "Bellen": "Ligar",
+  "Boek": "Livro",
+  "Vandaag": "Hoje",
+  "School": "Escola",
+  "Vraag": "Pergunta"
+ }
+}

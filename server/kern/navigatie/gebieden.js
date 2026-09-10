@@ -27,8 +27,8 @@
    niemand heeft gebouwd.
 
    EEN BBOX IS GEEN GRENS, en dat staat in elk antwoord: elk gebied draagt
-   `vakIsGeenGrens` en een `grond` die zegt HOE het gekozen is. Zie
-   `gebiedVoor()` hieronder voor wat er gebeurt als twee vakken overlappen.
+   `vakIsGeenGrens` en een `grond` die zegt HOE het gekozen is. De regel zelf
+   staat in ./gebiedkeuze.js -- daar is ook opgeschreven welke fout hij herstelt.
 
    DE LICENTIE IS EEN GRENDEL EN GEEN VELD. Het NWB is CC0 en vraagt niets, OSM
    is ODbL en vraagt naamsvermelding; een pakket dat die plicht draagt en geen
@@ -37,6 +37,10 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+/* De gebiedsbepaling woont in een eigen module -- zie de kop daar voor waarom
+   een rechthoek geen grens is. Hier alleen doorgegeven, zodat een aanroeper
+   niet hoeft te weten dat het twee bestanden zijn. */
+const keuze = require('./gebiedkeuze');
 
 /* Licenties die naamsvermelding EISEN. Niet "welke licenties bestaan er" maar
    "welke leggen ons een plicht op" -- de enige vraag die deze laag hoeft te
@@ -91,22 +95,6 @@ function index() {
   }
 }
 
-/* Een vak is geldig als het vier eindige getallen heeft die de aarde niet
-   verlaten EN niet omgekeerd staan. Een omgedraaid vak omvat NIETS en zou als
-   "past nergens" langskomen in plaats van als fout. */
-function vakGeldig(v) {
-  if (!v) return false;
-  const n = [v.lat0, v.lat1, v.lng0, v.lng1].map(Number);
-  if (!n.every(Number.isFinite)) return false;
-  if (Math.abs(n[0]) > 90 || Math.abs(n[1]) > 90) return false;
-  if (Math.abs(n[2]) > 180 || Math.abs(n[3]) > 180) return false;
-  return n[0] < n[1] && n[2] < n[3];
-}
-const inVak = (v, p) => vakGeldig(v) && p && Number.isFinite(Number(p.lat)) && Number.isFinite(Number(p.lng))
-  && Number(p.lat) >= v.lat0 && Number(p.lat) <= v.lat1
-  && Number(p.lng) >= v.lng0 && Number(p.lng) <= v.lng1;
-const vakOppervlak = (v) => (v.lat1 - v.lat0) * (v.lng1 - v.lng0);
-
 /* DE CATALOGUS: per gebied de drie standen, afgeleid en niet verklaard. */
 function catalogus() {
   const idx = index();
@@ -116,6 +104,12 @@ function catalogus() {
       code: String(g.code).toLowerCase(),
       naam: String(g.naam),
       soort: g.soort === 'stad' ? 'stad' : 'land',
+      /* DE OUDER KOMT UIT DE BRON en is geen gok. De bronindex hangt
+         `netherlands/noord-holland` onder `netherlands`; dat is verklaarde
+         omvatting, en ./gebiedkeuze.js laat een kind daarom van zijn ouder
+         winnen. Zonder dit veld zou de keuze terugvallen op oppervlak, en juist
+         daarop kwam Maastricht een keer op Belgie uit. */
+      ouder: g.ouder ? String(g.ouder).toLowerCase() : null,
       vak: g.vak || null,
       bron: g.bron || idx.bron || null,
       licentie: g.licentie || idx.licentie || null,
@@ -137,55 +131,6 @@ function catalogus() {
   };
 }
 
-/* WELK GEBIED LIGT HIER.
-
-   HIER STOND "HET KLEINSTE VAK WINT", EN DAT WAS FOUT -- gemeten en niet
-   bedacht: het Belgische vak is kleiner dan het Nederlandse, dus Maastricht
-   kwam op `belgie` uit, met een compleet ogende onderbouwing. Oppervlak zegt
-   tussen twee LANDEN niets.
-
-   Wat er nu staat zijn twee verschillende dingen. Een STAD in een LAND is echte
-   omvatting, dus daar mag de fijnere winnen. Twee gebieden van DEZELFDE soort
-   kan een rechthoek niet scheiden: dan wordt er niet gekozen -- is er precies
-   een gebouwd pakket, dan is de keuze GEDWONGEN (en dat staat er zo bij), zijn
-   er meer, dan komt er `null` met de kandidaten.
-
-   Dat is met opzet onbevredigend: het juiste gereedschap is een grens en geen
-   vak. Zolang die er niet is, is "met een rechthoek niet te zeggen" eerlijker
-   dan een lid over het net van het buurland laten rijden. */
-function gebiedVoor(punt, lijst) {
-  const rij = Array.isArray(lijst) ? lijst : catalogus().gebieden;
-  const passen = rij.filter(g => inVak(g.vak, punt));
-  if (!passen.length) {
-    return { gebied: null, grond: 'geen-vak', kandidaten: [],
-      waarom: 'Geen aangeboden gebied omvat dit punt; RTG biedt hier (nog) geen kaart aan.' };
-  }
-  if (passen.length === 1) {
-    return { gebied: passen[0], grond: 'enig-vak', vakIsGeenGrens: true, kandidaten: [] };
-  }
-
-  /* Een stad binnen een land is echte omvatting: is er precies een stad, dan
-     wint die. Meer steden op hetzelfde punt is weer een overlap van gelijken. */
-  const steden = passen.filter(g => g.soort === 'stad');
-  if (steden.length === 1) {
-    return { gebied: steden[0], grond: 'stad-in-land', vakIsGeenGrens: true,
-      kandidaten: passen.filter(g => g !== steden[0]).map(g => g.code) };
-  }
-
-  const gebouwd = passen.filter(g => g.gebouwd);
-  if (gebouwd.length === 1) {
-    return { gebied: gebouwd[0], grond: 'enige-gebouwde', vakIsGeenGrens: true,
-      kandidaten: passen.filter(g => g !== gebouwd[0]).map(g => g.code),
-      waarom: 'Meerdere vakken omvatten dit punt; alleen van ' + gebouwd[0].code +
-        ' ligt er een pakket, dus die keuze is gedwongen en niet gemeten.' };
-  }
-  return { gebied: null, grond: 'meerdere-vakken',
-    kandidaten: passen.map(g => g.code).sort(),
-    waarom: 'Dit punt ligt in ' + passen.length + ' vakken van dezelfde soort (' +
-      passen.map(g => g.code).sort().join(', ') + '). Een rechthoek is geen grens en ' +
-      'RTG kiest hier niet: een route over het net van het buurland is erger dan geen route.' };
-}
-
 /* DE POORT. Een pakket mag alleen worden aangeboden als zijn licentie is
    nagekomen. Weigeren geeft een REDEN terug en geen false: "mag niet" zonder
    waarom leidt tot een tweede onderzoek. */
@@ -203,5 +148,12 @@ function mag(gebied) {
     licentie: gebied.licentie };
 }
 
+/* Zonder lijst wordt de catalogus gebruikt: een aanroeper die alleen een punt
+   heeft, hoeft niet te weten waar de gebieden vandaan komen. */
+const gebiedVoor = (punt, lijst) => keuze.gebiedVoor(punt, Array.isArray(lijst) ? lijst : catalogus().gebieden);
+
 module.exports = { catalogus, index, gebiedVoor, pakketVan, pakketLigt, mag,
-  eistNaamsvermelding, vakGeldig, inVak, vakOppervlak, indexPad, navMap };
+  eistNaamsvermelding, indexPad, navMap,
+  /* Doorgegeven zodat er EEN adres is voor deze laag; de code staat in
+     ./gebiedkeuze.js en niet twee keer. */
+  vakGeldig: keuze.vakGeldig, inVak: keuze.inVak, vakOppervlak: keuze.vakOppervlak };

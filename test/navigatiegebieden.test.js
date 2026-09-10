@@ -40,7 +40,12 @@ const NL = { code: 'nederland', naam: 'Nederland', soort: 'land',
   vak: { lat0: 50.70, lat1: 53.72, lng0: 3.20, lng1: 7.30 } };
 const BE = { code: 'belgie', naam: 'Belgie', soort: 'land',
   vak: { lat0: 49.49, lat1: 51.51, lng0: 2.54, lng1: 6.41 } };
-const AMS = { code: 'amsterdam', naam: 'Amsterdam', soort: 'stad',
+/* AMSTERDAM HANGT ONDER NEDERLAND, en dat veld is de hele reden dat de keuze
+   werkt: omvatting komt uit de BRON (`ouder`) en niet uit het label `stad`.
+   Deze fixture droeg eerst alleen `soort: 'stad'`, en toen de regel van
+   oppervlak naar verklaarde omvatting ging, zakte hij terecht -- een stad
+   zonder ouder is voor de keuze een buurland. */
+const AMS = { code: 'amsterdam', naam: 'Amsterdam', soort: 'stad', ouder: 'nederland',
   vak: { lat0: 52.28, lat1: 52.43, lng0: 4.73, lng1: 5.07 } };
 
 test('1. zonder index is de catalogus LEEG met een reden, niet stil nul', () => {
@@ -102,13 +107,43 @@ test('4. een rechthoek beslist niet tussen twee landen', () => {
   });
 });
 
-test('5. een stad in een land is echte omvatting en wint wel', () => {
+test('5. een kind wint van zijn ouder, want de bron verklaart die omvatting', () => {
   metDataMap((map, g) => {
     const r = g.gebiedVoor({ lat: 52.37, lng: 4.89 }, [NL, AMS].map(x => ({ ...x, gebouwd: false })));
     assert.equal(r.gebied.code, 'amsterdam');
-    assert.equal(r.grond, 'stad-in-land');
-    assert.deepEqual(r.kandidaten, ['nederland'], 'het land blijft als kandidaat staan');
+    assert.equal(r.grond, 'kind-in-ouder');
+    assert.deepEqual(r.kandidaten, ['nederland'], 'de ouder blijft als kandidaat staan');
   });
+});
+
+test('5b. een gebied ZONDER ouder is geen kind, ook niet als het kleiner is', () => {
+  /* De tegenproef op toets 5, en de kern van de reparatie: kleiner zijn is geen
+     omvatting. Amsterdam zonder `ouder` is voor deze laag een buurland van
+     Nederland -- precies de vorm waarin het Belgische vak Maastricht opeiste. */
+  metDataMap((map, g) => {
+    const los = { ...AMS, ouder: null, gebouwd: false };
+    const r = g.gebiedVoor({ lat: 52.37, lng: 4.89 }, [{ ...NL, gebouwd: false }, los]);
+    assert.equal(r.gebied, null, 'zonder verklaarde ouder wordt er niet gekozen');
+    assert.equal(r.grond, 'meerdere-vakken');
+  });
+});
+
+test('5c. een ouderketen loopt door, en een lus loopt niet oneindig', () => {
+  /* De bron levert kettingen (`europe` > `netherlands` > `noord-holland`), dus
+     de winnaar kan een KLEINKIND zijn. En de index komt van buiten: een
+     verwijzing die naar zichzelf of rond wijst, mag geen oneindige lus worden. */
+  const keuze = require('../server/kern/navigatie/gebiedkeuze');
+  const EU = { code: 'europa', naam: 'Europa', ouder: null, vak: { lat0: 35, lat1: 71, lng0: -10, lng1: 40 } };
+  const NH = { code: 'noord-holland', naam: 'Noord-Holland', ouder: 'nederland',
+    vak: { lat0: 52.16, lat1: 53.18, lng0: 4.51, lng1: 5.36 } };
+  const r = keuze.gebiedVoor({ lat: 52.37, lng: 4.89 }, [EU, { ...NL, ouder: 'europa' }, NH]);
+  assert.equal(r.gebied.code, 'noord-holland', 'het kleinkind wint van beide ouders');
+  assert.deepEqual(r.kandidaten, ['europa', 'nederland']);
+
+  const lus = [{ code: 'a', ouder: 'b', vak: NL.vak }, { code: 'b', ouder: 'a', vak: NL.vak }];
+  const l = keuze.gebiedVoor({ lat: 52.09, lng: 5.12 }, lus);
+  assert.ok(l, 'een lus in de index levert een antwoord in plaats van vast te lopen');
+  assert.equal(l.gebied, null, 'en hij kiest niet tussen twee gebieden die elkaars ouder zijn');
 });
 
 test('6. een gedwongen keuze heet gedwongen en niet gemeten', () => {
@@ -120,6 +155,7 @@ test('6. een gedwongen keuze heet gedwongen en niet gemeten', () => {
     const r = g.gebiedVoor({ lat: 50.85, lng: 5.69 }, lijst);
     assert.equal(r.gebied.code, 'nederland');
     assert.equal(r.grond, 'enige-gebouwde');
+    assert.match(r.waarom, /geen familie/i, 'en hij zegt dat het buren zijn');
     assert.match(r.waarom, /gedwongen en niet gemeten/i);
   });
 });
@@ -128,6 +164,7 @@ test('7. elk gevonden gebied zegt dat een vak geen grens is', () => {
   metDataMap((map, g) => {
     for (const punt of [{ lat: 52.09, lng: 5.12 }, { lat: 52.37, lng: 4.89 }]) {
       const r = g.gebiedVoor(punt, [NL, AMS].map(x => ({ ...x, gebouwd: false })));
+      assert.ok(r.gebied, 'er is een gebied gevonden op ' + JSON.stringify(punt));
       assert.equal(r.vakIsGeenGrens, true, 'op ' + JSON.stringify(punt));
     }
   });
@@ -174,6 +211,28 @@ test('10. de licentiepoort laat geen onvervulde plicht door', () => {
     assert.equal(g.eistNaamsvermelding(''), true, 'leeg telt als eisend');
     assert.equal(g.eistNaamsvermelding('ODbL 1.0'), true);
     assert.equal(g.eistNaamsvermelding('CC0 1.0'), false);
+  });
+});
+
+test('10b. de catalogus geeft de ouder DOOR, en de keuze werkt zonder lijst', () => {
+  /* HET GAT DAT DEZE TOETS DICHT. Alle keuzetoetsen hierboven geven een eigen
+     lijst mee, dus het `ouder`-veld van de CATALOGUS werd nergens geraakt: met
+     een mutatie die `ouder: null` zette, bleven ze alle dertien groen. Een
+     catalogus die de ouder laat vallen, verliest de omvatting stilzwijgend --
+     en dan kiest de laag opeens niet meer tussen Amsterdam en Nederland.
+
+     Daarom loopt deze toets langs `gebiedVoor(punt)` ZONDER lijst, zoals een
+     echte aanroeper die alleen een punt heeft. */
+  metDataMap((map, g) => {
+    schrijfIndex(map, { bron: 'proef', licentie: 'ODbL 1.0', gebieden: [NL, AMS] });
+    const uitCatalogus = g.catalogus().gebieden;
+    assert.equal(uitCatalogus.find(x => x.code === 'amsterdam').ouder, 'nederland',
+      'de catalogus draagt de ouder uit de index');
+    assert.equal(uitCatalogus.find(x => x.code === 'nederland').ouder, null);
+
+    const r = g.gebiedVoor({ lat: 52.37, lng: 4.89 });
+    assert.equal(r.gebied.code, 'amsterdam', 'en de keuze gebruikt hem');
+    assert.equal(r.grond, 'kind-in-ouder');
   });
 });
 

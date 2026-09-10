@@ -19,7 +19,7 @@ const MAX_BODY = 30000;   // een actie-body hoeft nooit groter dan dit
 const TIMEOUT_MS = 15000; // een interne aanroep die langer duurt is stuk
 const INTERNE_GOEDKEURING = Symbol('stuur-goedgekeurd');
 const { beleidVoor, toegestanePaden, NIVEAUS } = require('./stuur/beleid');
-const frictieschaduw = require('./stuur/frictieschaduw');
+
 
 // infrastructuur waar het stuur nooit aan zit, wie er ook vraagt
 const VERBODEN = [
@@ -89,12 +89,14 @@ function maakStuur({ log, anthropic, app, crypto, isolatie }) {
   // De gewone handmatige schermen blijven dan beschikbaar.
   function stuurUit() { return process.env.RTG_AI_STUUR_UIT === '1'; }
 
-  /* De weger wordt een keer gemaakt en pas bij het eerste verzoek: maakFrictie()
-     leest de bodemregels en dat hoeft niet bij het bedraden. Het stuur heeft het
-     beleidsregister van de boardroom niet in zijn tas, dus hij rekent met de
-     standaardgrenzen -- de schaduwstand zegt dat er zelf bij. */
+  /* DE SCHADUW LAADT LUI, en dat is een gemeten keuze: zie de kop van
+     ./stuur/frictieschaduw.js. Kort: hij wordt alleen binnen stuurToets
+     gebruikt, en een require bovenaan dit bestand trok kern/frictie/ het
+     bedraden in. */
   let WEGER = null;
-  function weger() { return (WEGER = WEGER || frictieschaduw.maakSchaduw({})); }
+  let SCHADUW = null;
+  function schaduw() { return (SCHADUW = SCHADUW || require('./stuur/frictieschaduw')); }
+  function weger() { return (WEGER = WEGER || schaduw().maakSchaduw({})); }
 
   /* ---- de poortwachter: mag dit pad überhaupt via het stuur? ---- */
   function stuurToets(pad, body, opties) {
@@ -120,7 +122,7 @@ function maakStuur({ log, anthropic, app, crypto, isolatie }) {
 
        Alles achter een vangnet: een schaduw die de aanroeper kan laten klappen
        is erger dan geen schaduw, en de levering gaat voor (kern/envelop.js). */
-    try { frictieschaduw.noteer(o.wereld, pad, weger().weeg(beleid.niveau, body)); }
+    try { schaduw().noteer(o.wereld, pad, weger().weeg(beleid.niveau, body)); }
     catch (e) { /* een gemiste tel is geen geweigerde actie */ }
 
     if (beleid.niveau === NIVEAUS.voorstel && o.goedgekeurd !== INTERNE_GOEDKEURING)

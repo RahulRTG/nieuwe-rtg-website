@@ -14,7 +14,7 @@
       '<p>Alles van Rahul Travel Group</p><div class="rtg-edge-smart-worlds"></div><nav class="rtg-edge-smart-doors" aria-label="Heel RTG">' +
       deur('/apps/app.html', 'Alle apps', 'grid') +
       '<button type="button" class="rtg-edge-smart-door" data-edge-smart-search>' + icoon('search') + '<span>Zoeken</span><em aria-hidden="true">›</em></button>' +
-      deur('/apps/ik.html#persoonlijk', 'Profiel aanvullen', 'people') + '</nav><div class="rtg-edge-global-original"></div></section>';
+      deur('/apps/mijn-gegevens.html', 'Profiel &amp; veiligheid', 'people') + '</nav><div class="rtg-edge-global-original"></div></section>';
     index.textContent = ''; index.appendChild(schaal);
     rt.hier = schaal.querySelector('.rtg-edge-face-here');
     rt.alles = schaal.querySelector('.rtg-edge-face-all');

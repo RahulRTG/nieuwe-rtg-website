@@ -55,7 +55,7 @@ test('lege informatie is één familie en opent meteen de juiste invullaag', () 
   assert.match(COMM, /actie: \{ tekst: 'Begin een gesprek', doel: '#nieuwBtn' \}/);
   assert.match(COMM, /\.then\(openLegeActie\)/);
   assert.match(REISRAHUL, /eersteBlad === 'rahul'[\s\S]*#rahulVraag/);
-  assert.match(SMART, /\/apps\/ik\.html#persoonlijk/);
+  assert.match(JS, /profiel\.href = '\/apps\/ik\.html#persoonlijk'/);
 });
 
 test('het nieuwe vlak en de ene Edge-balk laden ook offline', () => {

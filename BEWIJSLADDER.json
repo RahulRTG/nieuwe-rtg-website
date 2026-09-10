@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-10T15:53:10.567Z",
-    "commit": "eebbd906",
+    "op": "2026-09-10T16:43:11.604Z",
+    "commit": "85a29ffc",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/bewijsladder.js",
     "node": "v22.22.2"
   },
@@ -947,6 +947,7 @@
     }
   ],
   "zonderTrede": [],
+  "grens": "De SPORTEN zijn verklaard en niet gemeten: dat een soort bewijs hier ontbreekt, zegt deze meter niet. Van de mechanismen erop meet hij dat ze DRAAIEN en waar -- niet of het bewijs dat ze leveren goed is, en niet of het genoeg is. `alleenKeten` telt en oordeelt niet: zeven van die mechanismen lezen een artefact uit een andere job en kunnen lokaal per definitie niet draaien. En er staat met opzet geen samengesteld eindoordeel onder deze tabel (KEURING.md par. 5).",
   "telling": {
     "mechanismen": 56,
     "sporten": 12,

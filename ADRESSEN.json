@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T14:37:01.583Z",
-    "commit": "c0cc8569",
+    "op": "2026-09-10T15:22:10.688Z",
+    "commit": "e9d19ee0",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/adressen.js",
@@ -13,7 +13,7 @@
   "graad": "gemeten",
   "beoordeeld": 3815,
   "klopt": 3774,
-  "onbeoordeeld": 3426,
+  "onbeoordeeld": 3427,
   "opgeknipt": [
     {
       "doc": "BESTUUR.md",

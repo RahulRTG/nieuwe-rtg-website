@@ -174,7 +174,7 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
     await t.test('Pinned actions keep their three explicit slots after navigation', async () => {
       await withPage(1440, async page => {
         await page.goto(server.base + '/apps/agenda.html', {waitUntil:'domcontentloaded'}); await ready(page);
-        await page.click('.rtg-edge-menu'); await page.click('.rtg-action-dock summary');
+        await page.click('.rtg-edge-menu'); await require('./helper').edgeCatalogus(page); await page.click('.rtg-action-dock summary');
         const ids = await page.locator('.rtg-action-dock select').first().evaluate(el => [...el.options].map(o=>o.value).filter(Boolean).slice(0,2));
         assert.equal(ids.length,2);
         await page.selectOption('.rtg-action-dock [data-slot="0"]', ids[0]);
@@ -182,7 +182,7 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
         const links = await page.locator('.rtg-action-dock-slots > div').evaluateAll(els=>els.map(e=>e.querySelector('a')?.getAttribute('href') || null));
         assert.equal(links[1],null);
         await page.goto(server.base + '/apps/rtg.html', {waitUntil:'domcontentloaded'}); await ready(page);
-        await page.click('.rtg-edge-menu');
+        await page.click('.rtg-edge-menu'); await require('./helper').edgeCatalogus(page);
         assert.deepEqual(await page.locator('.rtg-action-dock-slots > div').evaluateAll(els=>els.map(e=>e.querySelector('a')?.getAttribute('href') || null)),links);
         await page.keyboard.press('Escape'); await page.click('.rtg-edge-state');
         await page.click('.rtg-edge-density [data-density="compact"]');
@@ -198,7 +198,7 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
         await page.waitForSelector('#kaart[data-rtg-native-canvas]');
         await page.locator('.rtgplek .nee').click();
         await page.evaluate(()=>{window.__canvasResizes=0;window.addEventListener('resize',()=>window.__canvasResizes++);});
-        await page.click('.rtg-edge-menu');
+        await page.click('.rtg-edge-menu'); await require('./helper').edgeCatalogus(page);
         await page.click('.rtg-edge-preferences-open');
         await page.click('[data-edge-2-mode="focus"]');
         await page.waitForFunction(()=>window.__canvasResizes>0);
@@ -217,7 +217,7 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
           await page.goto(server.base + '/apps/werkruimte.html?gebied=' + area, {waitUntil:'domcontentloaded'}); await ready(page);
           assert.deepEqual(await page.evaluate(()=>[document.body.dataset.rtgWorld,window.RTGEdge.active.key]),[world,world]);
         }
-        await page.click('.rtg-edge-menu'); await page.click('.rtg-action-dock summary');
+        await page.click('.rtg-edge-menu'); await require('./helper').edgeCatalogus(page); await page.click('.rtg-action-dock summary');
         const id=await page.locator('.rtg-action-dock select').first().evaluate(el=>[...el.options].find(o=>/agenda/i.test(o.textContent)).value);
         await page.selectOption('.rtg-action-dock [data-slot="0"]',id);
         const address=page.url();
@@ -233,7 +233,7 @@ test('Heritage Intelligence: input, route context and stable reachable controls'
         await page.goto(server.base + '/apps/foundation/speeltuin.html', {waitUntil:'domcontentloaded'}); await ready(page);
         await page.waitForSelector('.rtg-edge-2-context-slot .ws-balk', {state:'attached'});
         assert.equal(await page.locator('body > .ws-balk').count(),0);
-        await page.click('.rtg-edge-menu'); await page.click('.rtg-edge-preferences-open');
+        await page.click('.rtg-edge-menu'); await require('./helper').edgeCatalogus(page); await page.click('.rtg-edge-preferences-open');
         await page.click('[data-edge-2-mode="overview"]');
         await page.waitForFunction(()=>document.body.getAttribute('data-rtg-edge-2-state')==='overview');
       });

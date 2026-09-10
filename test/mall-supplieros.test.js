@@ -155,6 +155,10 @@ test('5. "Nu open" laat nooit een zaak door waarvan we het niet weten', async ()
      draaide -- viel hij buiten lunch en diner, dan was "Nu open" leeg en
      slaagde alles hieronder over een lege lijst (LAT-regel 9). */
   const begin = (await api('/api/supplier/vak/uren', {}, tok.SERENA)).body.uren;
+  const tz = require('../server/kern/tijdzone');
+  const zone = ['Europe/Madrid', 'Pacific/Auckland'].find(z => tz.lokaal(z).minuten < 1380);
+  const oudeZone = (await api('/api/supplier/mall', {}, tok.SERENA)).body.tijdzone.zone;
+  await api('/api/supplier/tijdzone', { tijdzone: zone }, tok.SERENA);
   await api('/api/supplier/vak/uren-zet', { dagen: [true, true, true, true, true, true, true], van: '00:00', tot: '23:59' }, tok.SERENA);
 
   const alles = await api('/api/mall/zoek', { per: 60 }, lid);
@@ -179,6 +183,7 @@ test('5. "Nu open" laat nooit een zaak door waarvan we het niet weten', async ()
   }
 
   await api('/api/supplier/vak/uren-zet', { dagen: begin.dagen, van: begin.van, tot: begin.tot }, tok.SERENA);
+  await api('/api/supplier/tijdzone', { tijdzone: oudeZone }, tok.SERENA);
 });
 
 test('6. voorraad nul is een antwoord, geen leegte', () => {

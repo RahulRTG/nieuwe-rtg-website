@@ -74,7 +74,7 @@
     d.body.classList.remove('rtg-edge-fold'); sluitLagen();
     var idx = A.root.querySelector('.rtg-edge-index'), menu = A.root.querySelector('.rtg-edge-menu');
     idx.setAttribute('aria-hidden', 'false'); menu.setAttribute('aria-expanded', 'true');
-    if (zoek) setTimeout(function () { var v = idx.querySelector('input'); if (v) v.focus(); }, 20);
+    if (zoek) setTimeout(function () { if (w.RTGEdgeSmartMenu) w.RTGEdgeSmartMenu.openSearch(); var v = idx.querySelector('input'); if (v) v.focus(); }, 20);
   }
   function bind() {
     var e = A, r = e.root, menu = r.querySelector('.rtg-edge-menu'), idx = r.querySelector('.rtg-edge-index'), ai = r.querySelector('.rtg-edge-ai'), panel = r.querySelector('.rtg-edge-ai-panel'), status = r.querySelector('.rtg-edge-status-panel'), state = r.querySelector('.rtg-edge-state');

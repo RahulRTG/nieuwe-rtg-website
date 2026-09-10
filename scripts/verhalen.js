@@ -376,7 +376,9 @@ const VERHALEN = [
       wb.eis('de portemonnee', typeof bOverzicht.saldo === 'number' && bOverzicht.codenaam,
         'de portemonnee van B is onbereikbaar');
 
-      const idem = 'verhaal-oplaad-' + uniek();
+      /* Eén startbedrag per podium. Elke ronde brengt de overboeking terug,
+         zodat herhaling de walletlimiet niet zelf volstort. */
+      const idem = a.oplaadIdem || (a.oplaadIdem = 'verhaal-oplaad-' + uniek());
       await wb.stap('opladen', 'POST', '/api/pay/oplaad', a.token, { centen: 200000, idem });
       const naEen = (await saldo(a.token)).saldo;
       await wb.stap('nog een keer opladen met dezelfde sleutel', 'POST', '/api/pay/oplaad', a.token, { centen: 200000, idem });
@@ -393,6 +395,11 @@ const VERHALEN = [
         'er lekten centen weg: ' + (voorA + voorB) + ' -> ' + (naA + naB));
       wb.eis('B ontving exact', naB - voorB === 5000, 'B ontving ' + (naB - voorB) + ' in plaats van 5000 centen');
       wb.eis('A betaalde exact', voorA - naA === 5000, 'A betaalde ' + (voorA - naA) + ' in plaats van 5000 centen');
+      const aOverzicht = await saldo(a.token);
+      await wb.stap('terugsturen voor de volgende ronde', 'POST', '/api/pay/stuur', b.token,
+        { aan: aOverzicht.codenaam, centen: 5000, oms: 'verhaal retour', idem: 'verhaal-retour-' + uniek() });
+      wb.eis('terug op de beginsaldi', (await saldo(a.token)).saldo === voorA &&
+        (await saldo(b.token)).saldo === voorB, 'de retourboeking herstelde de beginsaldi niet');
     }
   }
 ];

@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-09T18:26:20.122Z",
-    "commit": "b7af216b",
+    "op": "2026-09-10T04:15:42.981Z",
+    "commit": "119b1e037",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -576,6 +576,14 @@
       "gezakt": 3,
       "geprobeerd": 2
     },
+    "beproeving-contract.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/verhalen.js",
+      "operator": "+->-#2",
+      "gezakt": 1,
+      "geprobeerd": 17
+    },
     "bereikbaar.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
@@ -726,6 +734,14 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "bewijsregister.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/norm.js",
+      "operator": "===->!==#9",
+      "gezakt": 1,
+      "geprobeerd": 62
     },
     "bewijsschuld.test.js": {
       "soort": "puur",
@@ -2316,6 +2332,22 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "heapproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/heapstat.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "heapstat.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/heapstat.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
     "helikopter.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2646,9 +2678,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "public/shared/i18n/i18n-00.js",
-      "operator": "true->false#0",
+      "operator": "false->true#0",
       "gezakt": 1,
-      "geprobeerd": 1
+      "geprobeerd": 2
     },
     "ideeen.test.js": {
       "soort": "server",
@@ -2755,6 +2787,13 @@
       "module": "server/inzagelog.js",
       "operator": "===->!==",
       "gezakt": 8
+    },
+    "isolatie-lid.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
     },
     "journaalbestand.test.js": {
       "soort": "puur",
@@ -3176,6 +3215,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "leespad-schrijft-niet.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/zaakcommand/index.js",
+      "operator": "getal+1#5",
+      "gezakt": 2,
+      "geprobeerd": 15
     },
     "leeszonderscheppen.test.js": {
       "soort": "puur",
@@ -4127,6 +4174,14 @@
       "operator": "+->-#0",
       "gezakt": 4,
       "geprobeerd": 2
+    },
+    "navigatieproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/plek.js",
+      "operator": "===->!==#2",
+      "gezakt": 1,
+      "geprobeerd": 11
     },
     "negenplus.test.js": {
       "soort": "server",
@@ -5394,6 +5449,14 @@
       "gezakt": 5,
       "geprobeerd": 1
     },
+    "resync-licht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/postgres-verzoeken.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 4
+    },
     "retail.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5640,6 +5703,14 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "CSS-contract; handmutatie 44px naar 40px liet de raakdoeltoets zakken"
+    },
+    "rtg-edge-appbar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtg-edge-appbar.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "rtg-edge-boot.test.js": {
       "soort": "puur",
@@ -6917,6 +6988,13 @@
       "gezakt": 4,
       "geprobeerd": 2
     },
+    "taalkast.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "tafeldek.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7515,6 +7593,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "vertaalkast.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/vertaalkast.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "vertrouwenbronnen.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -7537,6 +7623,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "verzoekcontext-wikkel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/verzoekcontext.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "verzorging-leden.test.js": {
       "soort": "server",
@@ -8063,6 +8157,14 @@
       "operator": "&&->||#0",
       "gezakt": 6,
       "geprobeerd": 2
+    },
+    "writehealth-lus.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/postgres-verzoeken.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 4
     },
     "zaaihash.test.js": {
       "soort": "server",

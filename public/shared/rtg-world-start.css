@@ -1,12 +1,33 @@
-/* Eén tijdelijke laadstatus. De echte route bouwt ondertussen in haar eigen DOM. */
+/* Eén tijdelijke laadstatus. De echte route bouwt ondertussen in haar eigen DOM.
+   De entree is opzettelijk in de lichte huisstijl: ieder OS begint bij dezelfde
+   afzender, niet bij een los zwart RTG-monogram. */
 body[data-rtg-world-start]{margin:0;display:flow-root}
 body[data-rtg-world-start="loading"]>:not(.rtg-world-start){visibility:hidden!important}
 body[data-rtg-world-start="loading"] :not(.rtg-world-start,.rtg-world-start *){visibility:hidden!important}
-.rtg-world-start{position:fixed;z-index:20000;inset:0;display:grid;place-content:center;grid-template-rows:64px 24px 17px;gap:16px;padding:24px;background:#10100f;color:#f4f0e9;text-align:center;font:400 1rem/1.5 Inter,system-ui,sans-serif}
+.rtg-world-start{
+  position:fixed;z-index:20000;inset:0;display:grid;place-content:center;justify-items:center;
+  gap:clamp(28px,6vh,52px);padding:clamp(24px,7vw,72px);overflow:hidden;
+  background:#f4f0e8;color:#211e19;text-align:center;font:400 1rem/1.5 Inter,system-ui,sans-serif
+}
 .rtg-world-start[hidden]{display:none!important}
-.rtg-world-start strong{height:64px;font:400 64px/64px Georgia,serif;color:#c6ae77}
-.rtg-world-start span{height:24px;line-height:24px;font-size:.875rem;letter-spacing:.04em}
-.rtg-world-start::after{content:"";width:48px;height:1px;background:#c6ae77;margin:8px auto;animation:rtg-wait 1s ease-in-out infinite alternate}
+.rtg-world-start-brand{display:grid;width:min(820px,86vw);gap:clamp(22px,4vw,38px)}
+.rtg-world-start-brand strong{
+  display:grid;place-items:center;min-height:clamp(96px,19vw,176px);padding:clamp(20px,4vw,38px);
+  background:#861638;color:#fff;font:400 clamp(34px,7.2vw,78px)/.95 "Bodoni Moda",Didot,Georgia,serif;
+  letter-spacing:-.045em;white-space:nowrap
+}
+.rtg-world-start-brand span{
+  color:#8a7317;font:400 clamp(16px,3.65vw,39px)/1 "Bodoni Moda",Didot,Georgia,serif;
+  letter-spacing:.025em;text-transform:uppercase;white-space:nowrap
+}
+.rtg-world-start-status{display:grid;justify-items:center;gap:18px;color:#625b51;font-size:.875rem;letter-spacing:.04em}
+.rtg-world-start-status::after{content:"";width:48px;height:1px;background:#861638;animation:rtg-wait 1s ease-in-out infinite alternate}
 @keyframes rtg-wait{to{opacity:.35}}
-@media(prefers-reduced-motion:reduce){.rtg-world-start::after{animation:none}}
-html.rtg-stil .rtg-world-start::after{animation:none}
+@media(max-width:520px){
+  .rtg-world-start{gap:34px;padding-inline:18px}
+  .rtg-world-start-brand{width:min(100%,430px);gap:20px}
+  .rtg-world-start-brand strong{min-height:92px;padding:20px 14px;font-size:clamp(29px,9.2vw,44px)}
+  .rtg-world-start-brand span{font-size:clamp(13px,4vw,19px);letter-spacing:.015em}
+}
+@media(prefers-reduced-motion:reduce){.rtg-world-start-status::after{animation:none}}
+html.rtg-stil .rtg-world-start-status::after{animation:none}

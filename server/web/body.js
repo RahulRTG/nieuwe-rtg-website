@@ -70,6 +70,19 @@ function json(opts) {
       const s = buf.toString('utf8').trim();
       if (!s) { req.body = {}; return next(); }
       try { req.body = rtgjson.parse(s); } catch (e) { e.status = 400; e.type = 'entity.parse.failed'; return next(e); }
+      /* HET LICHAAM `null` IS GEEN LICHAAM.
+
+         JSON.parse('null') geeft null, en dan laat `req.body.iets` elke route
+         omvallen met een 500 -- op afroep, door een client die letterlijk vier
+         letters stuurt. De gauntlet van De Beproeving doet dat, en zo viel
+         /api/supplier/backoffice om ("Cannot read properties of null (reading
+         'lang')").
+
+         Een leeg lichaam wordt hierboven al {} ; `null` draagt precies evenveel
+         informatie, dus het is dezelfde beslissing en niet een nieuwe. Alleen
+         null wordt rechtgezet: een array of een getal blijft staan, want er zijn
+         routes die die vorm met opzet aannemen. */
+      if (req.body === null) req.body = {};
       next();
     });
   };

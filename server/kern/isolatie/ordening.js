@@ -79,7 +79,7 @@ function tredeIndex(t) { return t === null || t === undefined ? -1 : LADDER.inde
    zet geen enkele schakelaar om, dus een corrupte waarde legt niets plat, maar
    hij loopt ook niet door alsof er niets aan de hand is. */
 function ontleed(modus) {
-  const paar = MODUS_ALS_PAAR[String(modus)];
+  const paar = Object.hasOwn(MODUS_ALS_PAAR, String(modus)) ? MODUS_ALS_PAAR[String(modus)] : null;
   if (paar) return Object.assign({ bekend: true }, paar);
   return { bekend: false, trede: null, beschermd: true, waarom:
     'onbekende stand "' + String(modus).slice(0, 40) + '": hij is niet als normaal gelezen' };

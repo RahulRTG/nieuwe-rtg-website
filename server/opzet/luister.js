@@ -135,10 +135,11 @@ module.exports = function luister(deps) {
   for (const sig of ['SIGTERM', 'SIGINT']) process.on(sig, () => {
     console.log(`[stop] ${sig} ontvangen, data wordt bewaard...`);
     try { save(); } catch (e) {}
-    /* Het doorgeefjournaal spoelt per venster; wat nu nog in die stapel staat,
-       staat nog nergens. Synchroon, want een asynchrone spoeling haalt
+    /* Journaal en vertaalkast spoelen per venster; wat nu nog in die stapels
+       staat, staat nog nergens. Synchroon, want een asynchrone spoeling haalt
        process.exit() niet meer. */
     try { require('../kern/journaalbestand').spoelAlle(); } catch (e) {}
+    try { require('../lib/vertaalkast').spoelAlle(); } catch (e) {}
     // Bij Postgres: nog een laatste flush zodat niets in de write-behind hangt.
     Promise.allSettled([Promise.resolve(flushBijAfsluiten()), Promise.resolve(accounts.flushBijAfsluiten())]).finally(() => {
       server.close(() => process.exit(0));

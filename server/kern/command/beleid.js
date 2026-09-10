@@ -43,27 +43,16 @@ const START = [
 function maakBeleid({ db, save, crypto, journaal, vak, start, opslag }) {
   const V = typeof vak === 'function' ? vak : (() => opslag.vak());
   const REGELS = Array.isArray(start) ? start : START;
-  function reg() {
-    const v = V();
-    if (!v.commandBeleid) v.commandBeleid = {};
-    const r = v.commandBeleid;
-    for (const b of REGELS) {
-      if (!r[b.id]) r[b.id] = { id: b.id, wat: b.wat, eenheid: b.eenheid, vierOgen: b.vierOgen, bereik: 'globaal',
-        versies: [{ v: 1, waarde: b.waarde, at: null, door: 'startwaarde', reden: 'de regel zoals hij is opgezet' }] };
-    }
-    return r;
-  }
-  function voorstellen() {
-    const v = V();
-    if (!Array.isArray(v.commandVoorstellen)) v.commandVoorstellen = [];
-    return v.commandVoorstellen;
-  }
+  /* De opslagvorm van het register staat in ./beleidregister.js. Kern daarvan:
+     LEZEN MAG NIET SCHRIJVEN -- regLees()/voorstellenLees() leggen niets vast,
+     reg()/voorstellen() wel, en die horen alleen op paden die met save() eindigen. */
+  const { regLees, voorstellenLees, reg, voorstellen } = require('./beleidregister')(V, REGELS);
 
   const nu = () => new Date().toISOString();
   const huidige = (b) => b.versies[b.versies.length - 1];
 
   function waarde(id, standaard) {
-    const b = reg()[String(id)];
+    const b = regLees()[String(id)];
     return b ? huidige(b).waarde : standaard;
   }
   function getal(id, standaard) {
@@ -72,7 +61,7 @@ function maakBeleid({ db, save, crypto, journaal, vak, start, opslag }) {
   }
 
   function alles() {
-    return Object.values(reg()).map(b => ({
+    return Object.values(regLees()).map(b => ({
       id: b.id, wat: b.wat, eenheid: b.eenheid, vierOgen: b.vierOgen, bereik: b.bereik || 'globaal',
       waarde: huidige(b).waarde, versie: huidige(b).v, sinds: huidige(b).at, door: huidige(b).door,
       versies: b.versies.length
@@ -149,13 +138,13 @@ function maakBeleid({ db, save, crypto, journaal, vak, start, opslag }) {
   }
 
   function geschiedenis(id) {
-    const b = reg()[String(id)];
+    const b = regLees()[String(id)];
     return b ? { id: b.id, wat: b.wat, versies: b.versies.slice().reverse() } : { error: 'Die regel bestaat niet.', status: 404 };
   }
-  const openVoorstellen = () => voorstellen().filter(v => v.status === 'wacht');
+  const openVoorstellen = () => voorstellenLees().filter(v => v.status === 'wacht');
 
   return { alles, waarde, getal, zet, keur, terug, geschiedenis, openVoorstellen,
-    voorstellen: () => voorstellen().slice().reverse().slice(0, 50), START: REGELS };
+    voorstellen: () => voorstellenLees().slice().reverse().slice(0, 50), START: REGELS };
 }
 
 module.exports = { maakBeleid, START };

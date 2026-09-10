@@ -1,0 +1,226 @@
+{
+  "stempel": {
+    "0": "/",
+    "1": "h",
+    "2": "o",
+    "3": "m",
+    "4": "e",
+    "5": "/",
+    "6": "u",
+    "7": "s",
+    "8": "e",
+    "9": "r",
+    "10": "/",
+    "11": "n",
+    "12": "i",
+    "13": "e",
+    "14": "u",
+    "15": "w",
+    "16": "e",
+    "17": "-",
+    "18": "r",
+    "19": "t",
+    "20": "g",
+    "21": "-",
+    "22": "w",
+    "23": "e",
+    "24": "b",
+    "25": "s",
+    "26": "i",
+    "27": "t",
+    "28": "e",
+    "29": "/",
+    "30": "s",
+    "31": "c",
+    "32": "r",
+    "33": "i",
+    "34": "p",
+    "35": "t",
+    "36": "s",
+    "37": "/",
+    "38": "h",
+    "39": "e",
+    "40": "a",
+    "41": "p",
+    "42": "p",
+    "43": "r",
+    "44": "o",
+    "45": "e",
+    "46": "f",
+    "47": ".",
+    "48": "j",
+    "49": "s",
+    "op": "2026-09-09T13:48:20.291Z",
+    "commit": "03db8ad8",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/heapproef.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Verweven verkeer/stilte-blokken (A B B A) met een vast post-GC meetpunt. Er staan TWEE vragen naast elkaar en de strengste telt: het VERKEERSLEK (verkeer min stilte -- groeit hij harder door verzoeken?) en het GRONDLEK (de stilte op zichzelf -- groeit hij al als hij niets doet?). Alleen het verschil beoordelen laat een lek in de achtergrond door; dat is bij de ijking van 9 september 2026 werkelijk gebeurd. NIET_VAST_TE_STELLEN betekent dat de ruis van deze ronde groter is dan de drempel.",
+  "opstelling": {
+    "store": "postgres",
+    "blokSeconden": 90,
+    "aanloopSeconden": 20,
+    "eenheden": 4,
+    "werkers": 24,
+    "drempelMBPerMin": 40,
+    "ijkLekMBPerMin": null,
+    "machine": {
+      "kernen": 4,
+      "geheugenGB": 17,
+      "node": "v22.22.2"
+    }
+  },
+  "blokken": [
+    {
+      "soort": "verkeer",
+      "beginMB": 414.5,
+      "eindMB": 560.7
+    },
+    {
+      "soort": "stilte",
+      "beginMB": 516,
+      "eindMB": 516.1
+    },
+    {
+      "soort": "stilte",
+      "beginMB": 516.1,
+      "eindMB": 516.1
+    },
+    {
+      "soort": "verkeer",
+      "beginMB": 534.4,
+      "eindMB": 539.8
+    },
+    {
+      "soort": "verkeer",
+      "beginMB": 566.7,
+      "eindMB": 550.5
+    },
+    {
+      "soort": "stilte",
+      "beginMB": 510.9,
+      "eindMB": 510.9
+    },
+    {
+      "soort": "stilte",
+      "beginMB": 510.9,
+      "eindMB": 510.9
+    },
+    {
+      "soort": "verkeer",
+      "beginMB": 540.2,
+      "eindMB": 596.8
+    },
+    {
+      "soort": "verkeer",
+      "beginMB": 578.9,
+      "eindMB": 591.9
+    },
+    {
+      "soort": "stilte",
+      "beginMB": 545.3,
+      "eindMB": 513.6
+    },
+    {
+      "soort": "stilte",
+      "beginMB": 513.6,
+      "eindMB": 513.6
+    },
+    {
+      "soort": "verkeer",
+      "beginMB": 548.9,
+      "eindMB": 557.4
+    },
+    {
+      "soort": "verkeer",
+      "beginMB": 607.8,
+      "eindMB": 548.2
+    },
+    {
+      "soort": "stilte",
+      "beginMB": 535.5,
+      "eindMB": 535.5
+    },
+    {
+      "soort": "stilte",
+      "beginMB": 535.5,
+      "eindMB": 535.5
+    },
+    {
+      "soort": "verkeer",
+      "beginMB": 574.1,
+      "eindMB": 636.2
+    }
+  ],
+  "tempos": {
+    "verkeer": [
+      97.5,
+      3.6,
+      -10.8,
+      37.7,
+      8.7,
+      5.7,
+      -39.7,
+      41.4
+    ],
+    "stilte": [
+      0.1,
+      0,
+      0,
+      0,
+      -21.1,
+      0,
+      0,
+      0
+    ]
+  },
+  "verkeer": {
+    "calls": 78687,
+    "onverwachte5xx": 0,
+    "paden": {}
+  },
+  "overgeslagenRollen": [],
+  "oordeel": {
+    "stand": "NIET_VAST_TE_STELLEN",
+    "drempel": 40,
+    "verkeerslek": {
+      "stand": "NIET_VAST_TE_STELLEN",
+      "tempo": 20.6,
+      "laag": -7.2,
+      "hoog": 48.4,
+      "oplossing": 27.8,
+      "perMethode": {
+        "bootstrap": [
+          -1.1,
+          44.6
+        ],
+        "welch": [
+          -7.2,
+          48.4
+        ]
+      }
+    },
+    "grondlek": {
+      "stand": "STABIEL",
+      "tempo": -2.6,
+      "laag": -7.6,
+      "hoog": 2.4,
+      "oplossing": 5
+    },
+    "netto": 20.6,
+    "laag": -7.2,
+    "hoog": 48.4,
+    "oplossing": 27.8,
+    "verkeerMediaan": 7.2,
+    "verkeerSpreiding": 24.3,
+    "stilteMediaan": 0,
+    "stilteSpreiding": 0,
+    "metingen": {
+      "verkeer": 8,
+      "stilte": 8
+    },
+    "reden": "verkeerslek niet vast te stellen (20.6 MB/min, [-7.2, 48.4]); grondlek stabiel (-2.6 MB/min, [-7.6, 2.4]) -- de strengste telt"
+  }
+}

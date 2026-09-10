@@ -76,6 +76,12 @@ const REGISTER = {
   'ROLLBACKBESLUIT.json': { meter: ['rollbackUitzonderingen'] },
   'FAALPROEF.json': { meter: ['faalproefGezakt'] },
   'BEPROEVING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
+  /* De ACTUELE meting naast de geaccepteerde basislijn hierboven: scripts/
+     beproeving.js schrijft hem na ELKE ronde, ook een gezakte, zodat rood
+     bewijs kan blijven staan. Hij voedt dezelfde prestatiemeters -- norm.js
+     leest hem via prestatiePad() zodra hij bestaat -- en hangt dus aan
+     dezelfde ratel, niet aan geen enkele. */
+  'LAATSTE_METING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   'MUTATIES.json': { meter: ['toetsenOngevoeligPct', 'toetsenNietGemeten'] },
   'GRENZEN.json': { meter: ['kernBreedte', 'kernGedeeld', 'kernBreedsteBestand', 'kernOngebruikt'] },
   'WETTEN.json': { meter: ['wettenOnbewezen'] },
@@ -145,8 +151,10 @@ const REGISTER = {
   'TEKSTOPPERVLAK.json': { eigenRatel: 'scripts/check.js' },
   'RITPROEF.json': { eigenRatel: 'test/ritproef.test.js' },
   'TOELATINGSPROEF.json': { eigenRatel: 'test/toelatingsproef.test.js' },
+  'NAVIGATIEPROEF.json': { eigenRatel: 'test/navigatieproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },
   'RITMIGRATIE.json': { eigenRatel: 'test/ritmigratie.test.js' },
+  'HEAPPROEF.json': { eigenRatel: 'test/heapproef.test.js' },
   'DOORWERKING.json': { eigenRatel: 'test/doorwerking.test.js' },
   /* De gedeelde namespace van handelingen (TAKEN.md 4.54). Drie getallen, en
      ze lopen niet dezelfde kant op: gedeelde onderwerpen mogen alleen OMHOOG

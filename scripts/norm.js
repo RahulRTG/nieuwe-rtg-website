@@ -517,6 +517,14 @@ function telInlineStijl(lees, bestanden) {
       Zelfde behandeling.
    ========================================================================== */
 const PRESTATIEBESTAND = path.join(WORTEL, 'BEPROEVING.json');
+/* De ACTUELE meting, los van de geaccepteerde lat hierboven. scripts/beproeving.js
+   schrijft dit bestand na ELKE ronde, ook een gezakte -- zie de uitleg daar. Punt
+   1 hierboven ("het bestand ontbreekt") kende maar twee standen, en daardoor
+   viel de belangrijkste stand ertussenuit: een ronde die WEL gedraaid heeft en
+   WEL gezakt is. Die kon nergens landen, dus bleef de laatste geslaagde ronde
+   staan en las CI 22 dagen lang een lat die de code niet meer beschreef. Een
+   rode meting is geen ontbrekende meting. */
+const METINGBESTAND = path.join(WORTEL, 'LAATSTE_METING.json');
 const PRESTATIEMETERS = [
   { sleutel: 'p99Ms', richting: 'omlaag', wat: 'latentie p99 onder de storm (ms)' },
   { sleutel: 'doorvoerPerSec', richting: 'omhoog', wat: 'afgehandelde verzoeken per seconde onder de storm' },
@@ -1166,10 +1174,30 @@ function bron(c) {
   return c.machine.kernen + 'k/' + c.machine.geheugenGB + 'g/' + c.machine.platform + '/' + (c.modus || '?');
 }
 
+/* WELK BESTAND DE ACTUELE CIJFERS DRAAGT. Apart en met een injecteerbare
+   bestaat-controle, zodat een toets deze voorrang echt kan beproeven zonder
+   bestanden in de repowortel te verzetten. De regel zelf is de kern van de
+   splitsing: bestaat er een verse meting, dan wint die ALTIJD van de basislijn --
+   anders laat een gezakte ronde de vorige geslaagde staan en meldt de ratel
+   groen terwijl de laatste echte ronde zakte. */
+function prestatiePad(bestaat) {
+  const f = typeof bestaat === 'function' ? bestaat : fs.existsSync;
+  return f(METINGBESTAND) ? METINGBESTAND : PRESTATIEBESTAND;
+}
+
 /* Geeft altijd hetzelfde soort antwoord: { cijfers, bron, reden }. `reden`
    ingevuld = niet bruikbaar, en dan zegt de aanroeper WAAROM. Nooit stil null. */
 function leesPrestatie(bestand) {
-  const pad = bestand || PRESTATIEBESTAND;   // parameter zodat een toets hem echt kan beproeven
+  /* DE ACTUELE METING WINT VAN DE BASISLIJN, en die volgorde is het hele punt.
+
+     Sinds beproeving.js de basislijn alleen na een GESLAAGDE ronde bijwerkt,
+     zou lezen-uit-BEPROEVING.json betekenen dat een gezakte ronde de vorige
+     geslaagde laat staan -- en dan meldt deze ratel vrolijk groen terwijl de
+     laatste echte ronde zakte. Dat is erger dan de fout die we repareren.
+     Daarom leest hij LAATSTE_METING.json zodra die bestaat: die is altijd van de
+     laatste ronde, geslaagd of niet. De GEZAKT-regel hieronder maakt hem dan
+     rood, zoals het hoort. */
+  const pad = bestand || prestatiePad();
   if (!fs.existsSync(pad)) return { reden: 'BEPROEVING.json ontbreekt (draai: npm run beproeving)' };
   let c;
   try { c = JSON.parse(fs.readFileSync(pad, 'utf8')); }
@@ -1180,6 +1208,34 @@ function leesPrestatie(bestand) {
   if (c.oordeel !== 'PASS') return { reden: 'de laatste beproeving is GEZAKT (' + c.gezakteDrempels + ' drempel(s)); die cijfers zijn geen lat' };
   return { cijfers: c.meters, bron: bron(c), gedraaid: c.gedraaid,
     kalibratie: c.machine && c.machine.kalibratieBasisMs || null };
+}
+
+/* DE ACTUELE METING, die iets anders is dan de lat.
+
+   leesPrestatie() hierboven beantwoordt precies een vraag: mogen deze getallen
+   als lat dienen? Daar hoort een GEZAKTE ronde niet bij, en dat blijft zo -- een
+   slechte ronde die de lat verlaagt en zichzelf daarna goedkeurt is een ratel die
+   achteruit klikt.
+
+   Maar "geen lat" werd tot 9 september 2026 verward met "geen meting". Een
+   gezakte ronde kon nergens landen: BEPROEVING.json was tegelijk verslag en lat,
+   en CI weigerde het bestand zodra het rood was. Dus bleef de laatste GESLAAGDE
+   ronde staan, en mat de ratel 22 dagen tegen een basislijn die de code niet
+   meer beschreef.
+
+   Deze lezer is er voor de andere helft van die vraag: WAT stond er in de laatste
+   ronde, geslaagd of niet. Hij oordeelt niet en hij levert nooit een lat; hij
+   zorgt alleen dat rood bewijs zichtbaar blijft in plaats van te verdwijnen
+   omdat er geen plek voor was. */
+function leesMeting(bestand) {
+  const pad = bestand || METINGBESTAND;
+  if (!fs.existsSync(pad)) return null;
+  let c;
+  try { c = JSON.parse(fs.readFileSync(pad, 'utf8')); } catch (e) { return null; }
+  if (!c || !c.meters) return null;
+  return { meters: c.meters, oordeel: c.oordeel || null, gedraaid: c.gedraaid || null,
+    gezakteDrempels: c.gezakteDrempels || 0, gezakteNamen: c.gezakteNamen || null,
+    bron: bron(c), gezakt: c.oordeel !== 'PASS' };
 }
 
 /* Beweegt de meter de goede kant op, de verkeerde kant op, of staat hij stil? */
@@ -1306,10 +1362,30 @@ function main() {
   let presFout = null;
 
   console.log('\n  \x1b[1mprestatie\x1b[0m \x1b[2m(uit BEPROEVING.json)\x1b[0m');
+  /* De actuele meting eerst, ook (juist) als hij rood is. Zonder deze regels
+     eindigde een gezakte ronde als "GEEN CIJFERS" -- alsof er niet gemeten was,
+     terwijl er wel degelijk gemeten was en het antwoord slecht was. Die twee
+     horen niet op elkaar te lijken. */
+  const meting = leesMeting();
+  if (meting) {
+    const wanneer = meting.gedraaid ? String(meting.gedraaid).slice(0, 16).replace('T', ' ') : 'onbekend';
+    if (meting.gezakt) {
+      console.log('  \x1b[31mLAATSTE METING GEZAKT\x1b[0m ' + meting.gezakteDrempels
+        + ' drempel(s) -- gemeten ' + wanneer + ' op ' + (meting.bron || '?'));
+      if (meting.gezakteNamen && meting.gezakteNamen.length) {
+        console.log('  \x1b[31m  ' + meting.gezakteNamen.join(', ') + '\x1b[0m');
+      }
+      console.log('  \x1b[2m  (LAATSTE_METING.json; de lat in NORM.json blijft ongemoeid)\x1b[0m');
+    } else {
+      console.log('  \x1b[2mlaatste meting: PASS, gemeten ' + wanneer + ' op ' + (meting.bron || '?') + '\x1b[0m');
+    }
+  }
   if (pres.reden) {
     /* Ontbrekende invoer terwijl er een lat staat: dat is een fout en geen
-       stilte. Staat er nog geen lat, dan is het een mededeling. */
-    if (heeftGrond) { presFout = pres.reden; console.log('  \x1b[31mGEEN CIJFERS\x1b[0m ' + pres.reden); }
+       stilte. Staat er nog geen lat, dan is het een mededeling. Een GEZAKTE
+       meting is hierboven al uitgeschreven; die telt hier als fout omdat de lat
+       niet te controleren valt, maar hij verdwijnt niet meer uit beeld. */
+    if (heeftGrond) { presFout = pres.reden; console.log('  \x1b[31mGEEN LAT\x1b[0m ' + pres.reden); }
     else console.log('  \x1b[2m' + pres.reden + ' -- nog geen prestatielat gezet\x1b[0m');
   } else if (heeftGrond && norm.prestatieBron && norm.prestatieBron !== pres.bron) {
     console.log('  \x1b[33mNIET VERGELEKEN\x1b[0m: deze ronde draaide op ' + pres.bron
@@ -1449,5 +1525,5 @@ function main() {
 
 if (require.main === module) process.exit(main());
 module.exports = { meet, leesNorm, METERS, schoon, traagsteTanden, heeftEinde, dagenTussen, oordeel, leesActivering, leesTredeproef, leesWekkers, leesRondgang, leesZaakwig, leesMeetleer,
-  PRESTATIEMETERS, leesPrestatie, bron, PRESTATIEBESTAND, telOngeijkt, telInlineStijl, telSkips,
+  PRESTATIEMETERS, leesPrestatie, leesMeting, prestatiePad, bron, PRESTATIEBESTAND, METINGBESTAND, telOngeijkt, telInlineStijl, telSkips,
   telBewijslaag };

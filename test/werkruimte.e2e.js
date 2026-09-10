@@ -100,7 +100,7 @@ test('Werkruimte: een kamer bewaren, leeghalen en met een klik terughalen',
 
     /* EN NU TERUG. Dit is waar het om gaat: een klik en de hele kamer staat er,
        met dezelfde apps op dezelfde adressen. */
-    await page.click('.rtg-edge-menu');
+    await page.click('.rtg-edge-menu'); await require('./helper').edgeCatalogus(page);
     await page.click('[data-edge-ruimte="Mijn Directie"]');
     await page.waitForFunction(() => RTGSchil.surfaces.length === 3, { timeout: 8000 });
     const terug = await page.evaluate(() => RTGSchil.surfaces.map(s => ({ id: s.id, url: s.url })));

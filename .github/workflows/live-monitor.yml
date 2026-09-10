@@ -21,6 +21,17 @@ on:
 permissions:
   contents: read
 
+# PIPEFAIL. Elke stap hieronder die op `| tee <log>` eindigt geeft de
+# uitgangscode van `tee` door en niet die van de wachter -- en die van tee is
+# altijd 0. Een wachter die rood meldde kwam zo groen door. De standaardschil
+# is `bash -e {0}`: wel -e, geen pipefail. `shell: bash` maakt er
+# `bash --noprofile --norc -eo pipefail {0}` van. (ci.yml zet hetzelfde per
+# stap met `set -o pipefail`; hier staat het op workflowniveau, zodat een
+# nieuwe stap hem niet kan vergeten.)
+defaults:
+  run:
+    shell: bash
+
 jobs:
   sonde:
     if: ${{ vars.RTG_LIVE_URL != '' }}

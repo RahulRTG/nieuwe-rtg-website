@@ -35,6 +35,11 @@
     "poortwacht": "node scripts/poortwacht.js",
     "rand": "node scripts/rand.js",
     "beproeving": "node scripts/beproeving.js",
+    "tot-crash": "node scripts/tot-crash.js",
+    "heapproef": "node scripts/heapproef.js",
+    "heapproef:ijk": "node scripts/heapproef.js --ijk=120 --blok=45 --aanloop=10 --eenheden=2",
+    "heapproef:mega": "node --max-old-space-size=8192 scripts/heapproef.js",
+    "tot-crash:mega": "node --max-old-space-size=8192 scripts/tot-crash.js",
     "tandeloos": "node scripts/tandeloos.js",
     "onbetreden": "node scripts/onbetreden.js",
     "ladder": "node scripts/ladder.js",
@@ -302,7 +307,9 @@
     "toelatingsproef:vast": "node scripts/toelatingsproef.js --vastleggen",
     "kantoormacht": "node scripts/kantoormacht.js",
     "kantoormacht:vast": "node scripts/kantoormacht.js --vastleggen",
-    "kantoormacht:controle": "node scripts/kantoormacht.js --controle"
+    "kantoormacht:controle": "node scripts/kantoormacht.js --controle",
+    "navigatieproef": "node scripts/navigatieproef.js",
+    "navigatieproef:vast": "node scripts/navigatieproef.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

@@ -236,6 +236,47 @@ test('10b. de catalogus geeft de ouder DOOR, en de keuze werkt zonder lijst', ()
   });
 });
 
+test('10c. een gebiedscode uit een vreemde index verlaat de datamap niet', () => {
+  /* EEN ECHT GAT, EN GEEN VOORZORG. De index wordt van BUITEN opgehaald en zijn
+     code wordt een bestandsnaam: `pakketVan('../../../etc/passwd')` gaf
+     `./etc/passwd.sqlite` terug -- de datamap uit. Het gewone geval was al fout,
+     want de bronindex draagt ids MET schuine strepen (`europe/netherlands`), en
+     die maakten stilletjes submappen aan waar pakketLigt() nooit keek.
+
+     Fail closed: een onveilige code levert `null` en geen pad. Een pad
+     teruggeven dat "toch wel klopt" is precies hoe zo'n gat blijft bestaan. */
+  metDataMap((map, g) => {
+    for (const kwaad of ['../../../etc/passwd', 'europe/netherlands', 'a\\b', '..', '.',
+      'nl/../../x', '-nl', 'nl-', 'nl_1', 'n l', '']) {
+      assert.equal(g.pakketVan(kwaad), null, JSON.stringify(kwaad) + ' levert geen pad');
+      assert.equal(g.pakketLigt(kwaad), false, JSON.stringify(kwaad) + ' ligt nergens');
+    }
+    /* En de tegenproef: een gewone code werkt WEL, en blijft in de datamap.
+       Zonder deze helft haalt een pakketVan die altijd null geeft de toets. */
+    const ok = g.pakketVan('nederland');
+    assert.ok(ok, 'een gewone code levert een pakket');
+    assert.equal(path.dirname(ok.db), path.join(map, 'navigatie'), 'en het staat in de datamap');
+    assert.equal(path.relative(path.join(map, 'navigatie'), ok.db), 'nederland.sqlite');
+  });
+});
+
+test('10d. een onveilige code valt niet STIL uit de catalogus', () => {
+  /* Weigeren is goed, stil weigeren niet: een gebied dat zonder een woord
+     verdwijnt, kost iemand een middag zoeken. */
+  metDataMap((map, g) => {
+    schrijfIndex(map, { bron: 'proef', gebieden: [
+      NL,
+      { code: 'europe/netherlands', naam: 'Nederland via Europa', vak: NL.vak },
+      { code: '../../etc/passwd', naam: 'Kwaad', vak: NL.vak }
+    ] });
+    const c = g.catalogus();
+    assert.equal(c.telling.aangeboden, 1, 'alleen de veilige code komt door');
+    assert.equal(c.telling.geweigerd, 2, 'en de andere twee zijn GETELD');
+    assert.deepEqual(c.geweigerd.sort(), ['../../etc/passwd', 'europe/netherlands']);
+    assert.equal(c.gebieden[0].code, 'nederland');
+  });
+});
+
 test('11. het pakket van een gebied komt uit zijn CODE en niet uit een vaste naam', () => {
   /* Hier zat een echte val: de graafmap heette letterlijk `nederland-graaf`,
      afgeleid van de MAP van het bestand en niet van zijn naam. Een tweede
@@ -243,6 +284,7 @@ test('11. het pakket van een gebied komt uit zijn CODE en niet uit een vaste naa
      route op rekenen. */
   metDataMap((map, g) => {
     const nl = g.pakketVan('nederland'), fr = g.pakketVan('frankrijk');
+    assert.ok(nl && fr, 'beide codes zijn veilig en leveren een pakket');
     assert.notEqual(nl.graafMap, fr.graafMap, 'twee gebieden delen geen graafmap');
     assert.match(nl.graafMap, /nederland-graaf$/);
     assert.match(fr.graafMap, /frankrijk-graaf$/);

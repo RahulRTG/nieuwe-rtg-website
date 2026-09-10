@@ -59,20 +59,41 @@ const navMap = () => path.join(dataMap(), 'navigatie');
    is invoer voor een meting en geen bron (zelfde regel als het routejournaal). */
 const indexPad = () => path.join(navMap(), 'gebieden.json');
 
+/* EEN GEBIEDSCODE WORDT EEN BESTANDSNAAM, DUS HIJ IS STRENG. Dit is geen
+   voorzorg maar een reparatie: de code kwam uit een index die van BUITEN wordt
+   opgehaald, en `pakketVan('../../../etc/passwd')` gaf gewoon
+   `./etc/passwd.sqlite` terug -- de datamap uit. En het is niet eens een
+   kwaadwillend geval: de bronindex draagt ids MET schuine strepen
+   (`europe/netherlands`), dus het gewone geval maakte al stilletjes submappen
+   aan waar `pakketLigt()` nooit meer keek.
+
+   Alleen kleine letters, cijfers en koppeltekens, niet beginnend of eindigend
+   op een koppelteken. Geen punt (dus geen `..`), geen streep, geen scheidingsteken.
+   Wie een pad wil samenstellen uit iets van buiten, hoort het eerst te laten
+   afkeuren; het VERTALEN van een bron-id naar een veilige code doet de
+   indexschrijver, want alleen die kan een botsing zien. */
+const VEILIG = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+const codeVeilig = (code) => VEILIG.test(String(code || ''));
+
 /* HET PAKKET VAN EEN GEBIED. Twee bestanden per gebied: de SQLite met de
    r-tree-indexen en een map met de binaire graaf ernaast.
 
-   DE GRAAFMAP KOMT UIT DE BESTANDSNAAM en niet uit een vaste tekst. Hier stond
+   DE GRAAFMAP KOMT UIT DE CODE en niet uit een vaste tekst. Hier stond
    `path.join(dirname(bestand), 'nederland-graaf')`, en dat werkt zolang er een
    gebied is: een tweede pakket in dezelfde map zou de graaf van Nederland
-   inlezen en er een Franse route op rekenen. */
+   inlezen en er een Franse route op rekenen.
+
+   Een onveilige code levert `null` en geen pad. Fail closed: een pad
+   teruggeven dat "toch wel klopt" is precies hoe zo'n gat blijft bestaan. */
 function pakketVan(code) {
   const c = String(code || '').toLowerCase();
-  const db = path.join(navMap(), c + '.sqlite');
-  return { code: c, db, graafMap: path.join(navMap(), c + '-graaf') };
+  if (!codeVeilig(c)) return null;
+  return { code: c, db: path.join(navMap(), c + '.sqlite'),
+    graafMap: path.join(navMap(), c + '-graaf') };
 }
 const pakketLigt = (code) => {
   const p = pakketVan(code);
+  if (!p) return false;
   try { return fs.existsSync(p.db) && fs.existsSync(path.join(p.graafMap, 'graaf.json')); }
   catch (e) { return false; }
 };
@@ -98,8 +119,13 @@ function index() {
 /* DE CATALOGUS: per gebied de drie standen, afgeleid en niet verklaard. */
 function catalogus() {
   const idx = index();
+  /* EEN ONVEILIGE CODE VALT NIET STIL WEG. Hij komt uit een index van buiten,
+     dus hij hoort geweigerd te worden EN geteld -- een gebied dat zonder een
+     woord verdwijnt, zoekt iemand een middag. */
+  const geweigerd = idx.gebieden.filter(g => g && g.code && g.naam && !codeVeilig(String(g.code).toLowerCase()))
+    .map(g => String(g.code));
   const rij = idx.gebieden
-    .filter(g => g && g.code && g.naam)
+    .filter(g => g && g.code && g.naam && codeVeilig(String(g.code).toLowerCase()))
     .map(g => ({
       code: String(g.code).toLowerCase(),
       naam: String(g.naam),
@@ -124,7 +150,9 @@ function catalogus() {
     }));
   return {
     gebieden: rij,
-    telling: { aangeboden: rij.length, gebouwd: rij.filter(g => g.gebouwd).length },
+    telling: { aangeboden: rij.length, gebouwd: rij.filter(g => g.gebouwd).length,
+      geweigerd: geweigerd.length },
+    geweigerd,
     bron: idx.bron || null,
     gelezenAt: idx.gelezenAt || null,
     reden: idx.reden || null
@@ -153,7 +181,7 @@ function mag(gebied) {
 const gebiedVoor = (punt, lijst) => keuze.gebiedVoor(punt, Array.isArray(lijst) ? lijst : catalogus().gebieden);
 
 module.exports = { catalogus, index, gebiedVoor, pakketVan, pakketLigt, mag,
-  eistNaamsvermelding, indexPad, navMap,
+  eistNaamsvermelding, codeVeilig, indexPad, navMap,
   /* Doorgegeven zodat er EEN adres is voor deze laag; de code staat in
      ./gebiedkeuze.js en niet twee keer. */
   vakGeldig: keuze.vakGeldig, inVak: keuze.inVak, vakOppervlak: keuze.vakOppervlak };

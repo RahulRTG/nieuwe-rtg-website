@@ -162,8 +162,38 @@ niet betrouwbaar* -- gerekend uit echte gegevens door de echte motor.
   nergens bekend is, is wanneer je er weg kunt: bagage, douane en de weg naar de
   uitgang. Daarom krijgt een vlucht geen `klaarAt` en blijft de naad *ná* een
   vlucht `NIET_TE_BEPALEN` -- en niet een geraden drie kwartier.
+
+  **Dat stond hier eerder ook al, en de code deed het niet.** `Number(null)` is
+  `0` en `0 >= 0` is waar, dus kreeg élk onderdeel zonder bekende duur
+  `klaarAt === nodigAt`: *"u kunt weg op het moment dat u er moet zijn"*. Voor
+  een vlucht, een charter, een verblijf en eigen invoer -- de meerderheid van de
+  reis -- gold dat dus. Het gevolg was geen ontbrekend getal maar een **verkeerd
+  getal met een compleet ogende onderbouwing**: een charter van 18:10 met een
+  diner om 19:00 gaf *"50 min beschikbaar, 17 nodig, marge 33 -- RUIM"*. De fout
+  was onzichtbaar zolang vluchten geen plek hadden: de naad sneuvelde toch al op
+  `plek-van`. Hij kwam pas boven toen de dekking omhoog ging, en dat is het
+  patroon om te onthouden -- een gebrek dat door een ánder gebrek wordt gedekt,
+  komt pas los als je dat andere repareert.
+
+- **Een onderbalk die later verschijnt, wordt door de cookiemelding bedekt.** In
+  `/apps/move.html` opgelost (de balk houdt zijn hoogte én is aanraakbaar), maar
+  de oorzaak zit in de gedeelde component en geldt dus breder:
+  `shared/cookie/cookie-02.js` zoekt met `elementsFromPoint` wat er achter haar
+  ligt, en dat slaat `pointer-events:none` en `visibility:hidden` over. Zij
+  meet één keer bij het laden en één frame later; haar `MutationObserver`
+  hermeet alleen de inkt. Elk ander scherm met een primaire actie die
+  asynchroon verschijnt, heeft daarmee een knop die niemand kan indrukken --
+  gemeten in een browser: 60 klikpogingen, *"#rtg-cookie intercepts pointer
+  events"*. Dat is niet in deze tak opgelost: het raakt 313 schermen en hoort
+  een eigen ronde met een eigen proef.
 - **Geen achtergrondwachter.** Move rekent op het moment van opvragen, net als
   de Reiswacht. Een wachter die doorwerkt terwijl de app dicht is, is een eigen
   besluit met een eigen prijs en groeit hier niet stilletjes bij.
-- **Geen Continue Key op het scherm.** `/api/move/volgende` levert de waarheid
-  die zo'n toets nodig heeft; hem in de schil hangen is schermwerk en volgt.
+- **De Continue Key hangt niet in de schilbalk.** `/apps/move.html` doet zijn
+  WERK -- de volgende plek als label, en erheen brengen -- maar niet met de
+  component. `shared/rtg-continue-key.*` hoort bij het Edge 2-systeem van de
+  schil: een 44px-cirkel die opengaat tot een capsule, met eigen
+  materiaalvariabelen. Geen enkel routescherm draagt hem, en keuring 58 zegt
+  waarom dat klopt: route-inhoud blijft `0` en een afgeronde systeemlaag komt
+  alleen uit de centrale Heritage-CSS. Hem in de schilbalk hangen is schilwerk
+  en volgt.

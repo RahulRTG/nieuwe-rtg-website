@@ -86,5 +86,22 @@ module.exports = Object.freeze({
   'POST /api/rtf/samen/sluit':
     'de gezinskern sluit en trekt toegang onder haar eigen collectieslot in; een generieke cache mag een gewijzigde profiel- of sluitstand niet verhullen',
   'POST /api/supplier/horeca/folio/nacht':
-    'de nachtrun weet zelf welke nachten al geboekt zijn en zegt dat ook; een cache maakt van dat antwoord een leugen'
+    'de nachtrun weet zelf welke nachten al geboekt zijn en zegt dat ook; een cache maakt van dat antwoord een leugen',
+  /* De nazorg van een reisaanvraag (kern/reisbureau-nazorg.js). Alle vier weten
+     zelf dat ze het al gedaan hebben: de standcontrole pakt de reis alleen in de
+     stand waar de handeling bij hoort, en een tweede oproep krijgt 409 met de
+     reden. Dat is precies de grens uit de kop hierboven -- deze laag is er voor
+     routes die dat NIET weten. En het antwoord op een herhaling is hier een
+     besluit ("deze reis is al afgezegd"), net als bij de kantoorpakket-routes:
+     een cache die de 200 van de eerste keer afspeelt, zou een lid vertellen dat
+     zijn afzegging is aangekomen terwijl er iets anders is gebeurd. De gemeten
+     dubbeltik staat in server/lib/mutatiecontracten-reisnazorg.js. */
+  'POST /api/reisbureau/wijzig':
+    'de reis staat na de eerste oproep op wijziging-gevraagd en is dus niet meer bevestigd; de tweede krijgt een besluit terug en geen herhaling',
+  'POST /api/reisbureau/afzeggen':
+    'een afgezegde reis kan niet nog een keer worden afgezegd; die weigering is het antwoord en mag niet door een cache worden overschreven',
+  'POST /api/office/reisbureau/wijziging':
+    'na het besluit ligt er geen wijzigingsverzoek meer; een afgespeeld succes zou een tweede keer personen en bedrag lijken te verzetten',
+  'POST /api/office/reisbureau/afzeggen':
+    'zelfde reden als de ledenkant, plus: een herhaling zou het lid een tweede melding sturen over dezelfde afzegging'
 });

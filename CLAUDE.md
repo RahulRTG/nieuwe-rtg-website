@@ -640,9 +640,10 @@ code gehouden.
 hij werkt vóór productie. Lees die vóór je Magnaat aan RTG koppelt of een
 simulatiewereld toevoegt. Ook hier is de dragende bewering eerst **gemeten**
 (`scripts/magnaatlab.js`, `MAGNAATLAB.json`): de simulatielaag telt 66 modules en
-116 requires, en raakt daarmee **2 van 415 kerndomeinen** aan — 0%. Als testhal
-bewijst Magnaat vandaag niets over RTG, en niet omdat hij RTG heeft nagebouwd:
-van de 34 paren met hetzelfde onderwerp deelt er **geen enkele** een vorm. Het
+121 requires, en raakt daarmee **4 van 576 kerndomeinen** aan — 1%. Als testhal
+bewijst Magnaat vandaag vrijwel niets over RTG, en niet omdat hij RTG heeft
+nagebouwd: van de 20 paren met hetzelfde onderwerp deelt er **geen enkele** een
+vorm. Het
 probleem is afwezigheid, niet dubbeling — er hoeft dus niets te worden
 afgebroken. Veertien van de vijftig punten staan al (chaos, aanvalsbatterij,
 tenant-isolatie, doelschending, canary met automatische terugrol, shadow
@@ -667,9 +668,10 @@ die niet geslaagd is. **En Magnaat rijdt er inmiddels op**:
 `kern/spellen/magnaat/rtg-keten.js` stelt de geldpompvraag aan RTG Pay
 (`npm run magnaat:pomp:rtg`) — vijf perverse volgordes, exact nul verschil, en de
 idempotentie gemeten (twintig aangeboden tikken, veertig grootboekregels). Het
-bereik van de simulatielaag ging daarmee van 1 naar 2 kernmodules; het
-percentage bleef 0% en dat is geen tegenvaller maar te grof gemeten — één
-capability is geen percentage. Het is een **proefstuk en geen koppeling**: geen
+bereik van de simulatielaag ging daarmee van 1 naar 2 kernmodules (vers gemeten
+op 10 september 2026: 5 kernmodules in 4 van 576 domeinen); het percentage blijft
+1% en dat is geen tegenvaller maar te grof gemeten — één capability is geen
+percentage. Het is een **proefstuk en geen koppeling**: geen
 speelbeurt komt langs RTG Pay, en `test/magnaat-rtgketen.test.js` zakt zodra een
 spelmodule `kern/pay` laadt. Twee dingen om niet
 te laten sneuvelen: een Magnaat-PASS is bewijs en geen vergunning (wat het huis

@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-10T15:35:31.519Z",
-  "commit": "b36e42c5",
-  "boomVuil": true,
-  "boomAnders": 1,
+  "op": "2026-09-10T15:44:02.136Z",
+  "commit": "3dd0b3f5",
+  "boomVuil": false,
+  "boomAnders": 0,
   "instrument": "scripts/taalschil.js",
   "node": "v22.22.2"
  },

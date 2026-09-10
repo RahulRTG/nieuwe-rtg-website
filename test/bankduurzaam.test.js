@@ -25,7 +25,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, verwachtServerfout } = require('./helper');
 
 const mappen = [];
 const verseMap = () => { const m = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bnkd-')); mappen.push(m); return m; };
@@ -55,6 +55,19 @@ async function bankLive(basis, code) {
 
 let eerlijk, leugen;
 test.before(async () => {
+  /* DE WORP IS HIER DE BEDOELING, en dus wordt hij VERWACHT en niet weggepoetst.
+
+     bijeen() gooit als de opslag een duurzame commit niet bevestigt
+     (db/bijeen.js regel 83) en metIdem geeft die worp door -- net als in
+     kern/pay, waar geen enkele route hem afvangt. De foutisolatie maakt er een
+     500 van en het proces leeft door; dat is een expliciete fout en geen vals
+     succes, en dat is precies wat deze toets wil zien.
+
+     De strenge poort in helper.js laat een ronde zakken op een onafgevangen
+     serveruitzondering, en dat hoort ook. Hem hier VERWACHTEN is zelf een
+     bewering: komt de worp niet, dan zakt de ronde op de gemiste verwachting. */
+  verwachtServerfout(/\[duurzaam\] de commit is niet vastgelegd/,
+    'de liegende opslag hoort de duurzame commit te laten mislukken -- dat is de kern van deze toets');
   eerlijk = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: verseMap(), OFFICE_CODE: 'KANTOOR-BNKD-1' } });
   leugen = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: verseMap(), OFFICE_CODE: 'KANTOOR-BNKD-2',
     RTG_VERRAAD: 'schrijf-verloren' } });
@@ -91,4 +104,12 @@ test('2. onder een liegende opslag komt er GEEN akkoord en GEEN IBAN', async () 
     'een akkoord dat de opslag niet bevestigt mag niet met een 2xx worden bevestigd (kreeg ' + akk.status + ')');
   assert.ok(!(akk.body && akk.body.rekening && akk.body.rekening.iban),
     'en er mag geen IBAN in het antwoord staan: ' + JSON.stringify(akk.body).slice(0, 160));
+
+  /* EN WAT HIER NIET WORDT BEWEERD. Ik heb hier eerst bij gezet dat het
+     overzicht daarna geen rekening mag tonen, en dat is fout: `schrijf-verloren`
+     gooit de schrijfactie naar de SCHIJF weg, niet de mutatie in het geheugen.
+     Binnen hetzelfde proces leest bank/overzicht dus gewoon wat er in het
+     geheugen staat, en dat hoort ook -- de belofte gaat over wat een HERSTART
+     overleeft. Dat meet de ketenronde met een echte herstart; deze toets meet
+     wat de CLIENT te horen krijgt, en dat is de helft die eerder loog. */
 });

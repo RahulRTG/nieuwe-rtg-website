@@ -62,29 +62,21 @@ module.exports = (ctx) => {
       if (!rec) return { status: 404, error: 'Die codenaam kennen we niet.' };
       c = rec.codename || ruw;
     }
-    /* EEN NIET-VASTGELEGDE COMMIT IS EEN ANTWOORD, GEEN UITZONDERING. De bundel
-       is duurzaam (kern/bank/index.js), dus bijeen() gooit als de opslag niet
-       bevestigt: juist signaal, verkeerde vorm. Hier wordt het een 503 met een
-       reden, zoals lib/duurzaam.js. Andere fouten gaan ONGEMOEID omhoog. */
-    try {
-      return await metIdem(idem ? 'rekopen:' + c + ':' + idem : null,
-        'rekopen|' + c + '|' + soort + '|' + String(naam || ''), () => {
-        const eigen = Object.values(rekeningen()).filter(m => m.codenaam === c);
-        if (eigen.length >= 12) return { status: 429, error: 'Het maximaal aantal rekeningen is bereikt.' };
-        const iban = genIban();
-        if (!iban) return { status: 500, error: 'Kon geen IBAN uitgeven; probeer het opnieuw.' };
-        const meta = { iban, codenaam: c, soort, naam: String(naam || SOORTEN[soort]).replace(/[<>]/g, '').slice(0, 40),
-          geopend: nu(), roodLimiet: soort === 'betaal' ? bankregie.bankRoodStandaard() : 0, bevroren: false, doelCenten: 0, door: wie || 'lid' };
-        rekeningen()[iban] = meta;
-        save();
-        seintje(c);
-        return { ok: true, rekening: publiek(meta) };
-      });
-    } catch (e) {
-      if (!/\[duurzaam\]/.test(String(e && e.message))) throw e;
-      return { status: 503, error: 'De rekening is niet vastgelegd; probeer het zo nog een keer.' };
-    }
+    return metIdem(idem ? 'rekopen:' + c + ':' + idem : null,
+      'rekopen|' + c + '|' + soort + '|' + String(naam || ''), () => {
+      const eigen = Object.values(rekeningen()).filter(m => m.codenaam === c);
+      if (eigen.length >= 12) return { status: 429, error: 'Het maximaal aantal rekeningen is bereikt.' };
+      const iban = genIban();
+      if (!iban) return { status: 500, error: 'Kon geen IBAN uitgeven; probeer het opnieuw.' };
+      const meta = { iban, codenaam: c, soort, naam: String(naam || SOORTEN[soort]).replace(/[<>]/g, '').slice(0, 40),
+        geopend: nu(), roodLimiet: soort === 'betaal' ? bankregie.bankRoodStandaard() : 0, bevroren: false, doelCenten: 0, door: wie || 'lid' };
+      rekeningen()[iban] = meta;
+      save();
+      seintje(c);
+      return { ok: true, rekening: publiek(meta) };
+    });
   }
+
 
   const publiek = m => ({ iban: m.iban, soort: m.soort, soortLabel: SOORTEN[m.soort], naam: m.naam,
     saldoCenten: saldoVan(m.iban), roodLimiet: m.roodLimiet || 0, bevroren: !!m.bevroren, doelCenten: m.doelCenten || 0, geopend: m.geopend });
@@ -164,11 +156,7 @@ module.exports = (ctx) => {
     const alHad = Object.values(rekeningen()).some(m => m.codenaam === c);
     store[c] = store[c] || nu();
     save();
-    /* MET EEN IDEM-SLEUTEL: lib/idem.js regel 94 is `if (!sleutel) return
-       werk();`, dus zonder sleutel loopt het werk buiten bijeen() om en dus
-       buiten de duurzame commit -- 200 met een IBAN die de opslag nooit
-       bevestigde (FAALPROEF.json: `gezakt`). Stabiel per lid en per soort;
-       `alHad` voorkwam al een tweede rekening. */
+    /* MET SLEUTEL: zonder loopt het werk buiten de duurzame commit (idem.js 94). */
     let rekening = null;
     if (!alHad) { const r = await open({ codenaam: c, soort: 'betaal', naam: 'RTG Betaalrekening', wie: 'lid', idem: 'akkoord-betaal' }); if (r.error) return r; rekening = r.rekening; }
     // de Business Pass krijgt er AUTOMATISCH een zakelijke rekening bij (gratis)

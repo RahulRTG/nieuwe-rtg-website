@@ -700,7 +700,7 @@ mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanl
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
 `SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->118<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->100<!--/getal--> meer dan één betekenis** — samen 284
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->100<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->379<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -1017,7 +1017,7 @@ voor je iets bouwt dat bepaalt of een handeling mag, hoeveel bevestiging hij
 vraagt, of hij te herhalen is of hoe hij terugdraait. De kern in een zin: **een
 scherm, een automatisering, de commandbalk, een AI-agent, een externe aanroep en
 een geplande taak leveren allemaal intentie -- alleen de execution plane
-veroorzaakt effecten.** Het opent met de gezagsvraag: `kern/command/risico.js`
+veroorzaakt effecten.** Het opent met de gezagsvraag: `kern/frictie/motor.js`
 rekent per geval uit of iets `hand`, `assist` of `auto` mag (met de score-opbouw
 erbij, want een cijfer zonder opbouw is een orakel), terwijl `kern/stuur/beleid.js`
 er naast staat met 21 patronen `direct` en 27 `voorstel`, vast per route en

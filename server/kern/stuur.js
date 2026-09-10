@@ -19,6 +19,7 @@ const MAX_BODY = 30000;   // een actie-body hoeft nooit groter dan dit
 const TIMEOUT_MS = 15000; // een interne aanroep die langer duurt is stuk
 const INTERNE_GOEDKEURING = Symbol('stuur-goedgekeurd');
 const { beleidVoor, toegestanePaden, NIVEAUS } = require('./stuur/beleid');
+const frictieschaduw = require('./stuur/frictieschaduw');
 
 // infrastructuur waar het stuur nooit aan zit, wie er ook vraagt
 const VERBODEN = [
@@ -88,6 +89,13 @@ function maakStuur({ log, anthropic, app, crypto, isolatie }) {
   // De gewone handmatige schermen blijven dan beschikbaar.
   function stuurUit() { return process.env.RTG_AI_STUUR_UIT === '1'; }
 
+  /* De weger wordt een keer gemaakt en pas bij het eerste verzoek: maakFrictie()
+     leest de bodemregels en dat hoeft niet bij het bedraden. Het stuur heeft het
+     beleidsregister van de boardroom niet in zijn tas, dus hij rekent met de
+     standaardgrenzen -- de schaduwstand zegt dat er zelf bij. */
+  let WEGER = null;
+  function weger() { return (WEGER = WEGER || frictieschaduw.maakSchaduw({})); }
+
   /* ---- de poortwachter: mag dit pad überhaupt via het stuur? ---- */
   function stuurToets(pad, body, opties) {
     const o = opties || {};
@@ -103,6 +111,18 @@ function maakStuur({ log, anthropic, app, crypto, isolatie }) {
     const beleid = beleidVoor(pad, o.wereld);
     if (beleid.niveau === NIVEAUS.verboden)
       return { status: 403, error: beleid.reden || 'Deze actie is niet beschikbaar voor het AI-stuur.' };
+    /* DE FRICTIESCHADUW -- wat zou de motor van dit GEVAL zeggen?
+
+       ./beleid.js antwoordt uit een statische lijst plus de bodem; de
+       frictiemotor rekent met bedrag en aantal, en die staan hier in de body.
+       CONTROLPLANE.md: eerst meelopen, dan pas afdwingen. Deze regel BESLIST
+       DUS NIETS -- `beleid.niveau` hieronder is onaangeraakt.
+
+       Alles achter een vangnet: een schaduw die de aanroeper kan laten klappen
+       is erger dan geen schaduw, en de levering gaat voor (kern/envelop.js). */
+    try { frictieschaduw.noteer(o.wereld, pad, weger().weeg(beleid.niveau, body)); }
+    catch (e) { /* een gemiste tel is geen geweigerde actie */ }
+
     if (beleid.niveau === NIVEAUS.voorstel && o.goedgekeurd !== INTERNE_GOEDKEURING)
       return { status: 428, bevestigNodig: true, menselijkAkkoord: true, pad,
         vraag: 'Deze actie verandert gegevens of heeft externe gevolgen. Controleer het voorstel en bevestig het zelf.' };

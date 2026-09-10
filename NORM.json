@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-09-10",
+  "vastgelegd": "2026-09-09",
   "meters": {
     "endpointsZonderTest": 906,
     "dekkingPct": 82,
@@ -21,15 +21,15 @@
     "keuringTeGroot": 14,
     "inlineStijlAttributen": 4684,
     "browserpoortToetsen": 325,
-    "kernBreedte": 1560,
+    "kernBreedte": 1559,
     "kernGedeeld": 231,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 672,
+    "toetsenNietGemeten": 674,
     "toetsenOngevoeligPct": 0,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "ratelTanden": 69,
+    "ratelTanden": 68,
     "metingenZonderRatel": 49,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
@@ -62,8 +62,7 @@
     "laatSpoorVerdacht": 3,
     "rollbackUitzonderingen": 1,
     "faalproefGezakt": 24,
-    "appwerktDefecten": 0,
-    "bewijsAlleenKeten": 16
+    "appwerktDefecten": 0
   },
   "notities": [
     {
@@ -1890,12 +1889,13 @@
     },
     {
       "datum": "2026-09-10",
-      "soort": "structureel",
-      "sleutel": "kernBreedte",
-      "van": 1559,
-      "meter": "kernBreedte 1559 -> 1560",
-      "reden": "RTG Move (MOVE.md) voegt EEN naam aan de kern toe: `move`, een namespace met drie lezende functies erin (reis, gevolg, volgende). Dat is met opzet niet drie losse kernnamen -- de smalste vorm die deze laag kan hebben. De laag bezit geen collectie, kent geen schrijfweg (test/move.test.js toets 12 zakt op db.data of save()) en hangt aan een eigen schakelaar dom-move, zodat de boardroom hem kan sluiten zonder de navigatie mee te nemen.",
-      "waarheen": "server/kern/move/ (naad, haalbaar, gevolg, index) met test/move.test.js en test/move-keten.test.js; de kern blijft een enkele naadlaag zonder eigen opslag"
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 672,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 672 -> 674",
+      "reden": "Twee toetsen komen erbij waar de mutatiemotor nog niet langs is. test/adressen.test.js handhaaft de adresratel (vijf documenten wezen naar een risicomotor onder kern/command/ die daar nooit heeft bestaan). test/frictieschaduw.test.js handhaaft dat de frictieschaduw NIETS beslist -- getoetst op de bron van kern/stuur.js -- en het gemeten anker dat bedrag alleen niet verzwaart en bedrag plus aantal wel. Dat een bronmutatie over deze twee niets zou zeggen is aannemelijk maar NIET gemeten, en GEEN_BRONMUTATIE eist pogingen: een reden zonder poging is een vermoeden. Dit is instrumentdekking en geen groenverklaring.",
+      "waarheen": "laat de mutatiemotor over test/adressen.test.js en test/frictieschaduw.test.js lopen in dezelfde ronde als de 27 toetsen van 2026-09-08 (zelfde sleutel, zelfde vervaldatum); levert dat pogingen zonder uitslag op, dan horen ze in GEEN_BRONMUTATIE met het aantal pogingen erbij, en anders gewoon gemeten"
     }
   ],
   "prestatie": {

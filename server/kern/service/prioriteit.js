@@ -7,7 +7,7 @@
    in plaats van ernst.
 
    DE OPBOUW STAAT ERBIJ, ALTIJD. Een cijfer zonder opbouw is een orakel --
-   dezelfde regel die kern/command/risico.js al voert. Elke uitkomst van deze
+   dezelfde regel die kern/frictie/motor.js al voert. Elke uitkomst van deze
    module draagt daarom de termen die eraan bijdroegen, in gewone taal, zodat
    een medewerker kan zien waarom SUP-x boven SUP-y staat en dat kan aanvechten.
 

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1781 bestanden en 12524 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1781 bestanden en 12516 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,13 +13,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1781 |
-| losse beweringen (`test(...)`) | 12524 |
+| losse beweringen (`test(...)`) | 12516 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1094 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1092 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 55 |
-| alleen in de kop *genoemd*, nog niet gemeten | 179 |
-| niets van beide | 453 |
+| alleen in de kop *genoemd*, nog niet gemeten | 178 |
+| niets van beide | 456 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1571 bestanden, 12162 beweringen.
+1571 bestanden, 12154 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -55,6 +55,7 @@ toets omvalt.
 | `adaptief.test.js` | 13 | genoemd | DE ADAPTIEVE LAAG, machinaal gehandhaafd. De regels staan in ADAPTIEF.md. |
 | `administratie.test.js` | 3 | gezakt op `liegpoort /api/` | DE ADMINISTRATIE -- boekhouding, belasting, en de AI in de keuken. WAAROM DIT ER IS Dit zijn de schermen waar niemand naar kijkt tot het misgaat, en dan gaat het meteen over geld of over iemands gezondheid. |
 | `adresopzoek.test.js` | 19 | gezakt op `liegpoort /api/` | DE ADRESOPZOEKER -- postcode en huisnummer erin, de rest eruit. WAT HIER BEWEZEN WORDT, EN WAAROM JUIST DAT 1. |
+| `adressen.test.js` | 4 | -- | DE ADRESRATEL (scripts/adressen.js). Vijf documenten wezen naar een risicomotor onder kern/command/ die per geval hand/assist/auto uitrekent. |
 | `advocaat-lezer.test.js` | 4 | genoemd | DE ADVOCATE ALS LEZER: EEN AFLOPENDE TOESTEMMING IS EEN TERMIJN HDI.md par. 7 regel 7. |
 | `adyen-config.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `adyen-eigen.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -180,7 +181,6 @@ toets omvalt.
 | `bewakersketen.test.js` | 2 | genoemd | DE BEWAKERSKETEN: elke deur van een domein draagt het slot van dat domein. WAT DIT BEWAAKT, EN WAAROM HET PAS SINDS VANDAAG KAN Een route is in deze router een LAAG PER MIDDLEWARE (server/web/routing.js); de laatste... |
 | `bewijs.test.js` | 3 | -- | Proof of Learning: bewijs onder elke beheersing. De belofte die hier hard wordt gemaakt: "behaald" is geen bewering meer maar een conclusie uit bewijs, en een leerling kan altijd navragen waarop die conclusie berust. |
 | `bewijsboek.test.js` | 12 | genoemd | HET REGRESSIECORPUS VAN HET BEWIJSBOEK. Dit is de laag die mag zeggen "die toets hoeft niet opnieuw". |
-| `bewijsladder.test.js` | 5 | gezakt op `!==->===#0` | DE BEWIJSLADDER -- levert dit huis nog elk soort bewijs, en waar? Twee beweringen worden hier hard gemaakt, en ze zijn allebei een ANDERE dan die van test/ci-lokaal.test.js (dat gaat over pariteit per poort): 1. |
 | `bewijsmatrix-audit.test.js` | 4 | -- | DE AUDIT-KOLOM HEEFT TWEE BRONNEN, EN ALLEBEI MOETEN ZE AAN BOD KOMEN. DIT IS TWEE KEER MISGEGAAN, en beide keren op dezelfde manier: een tak die de cel ook claimde als hij NIETS wist, met een `continue` erachter. |
 | `bewijsmatrix.test.js` | 26 | gezakt op `!==->===#0` | DE ENDPOINT-BEWIJSMATRIX (scripts/bewijsmatrix.js): het register dat per route de elf schakels langsloopt en zegt wie er een bewijst. WAT HIER OP HET SPEL STAAT, en het is precies het gevaar dat de matrix zelf moest... |
 | `bewijsregister.test.js` | 5 | gezakt op `===->!==#9` | ROOD BEWIJS MOET BLIJVEN STAAN. Tot 9 september 2026 was BEPROEVING.json tegelijk het VERSLAG van de laatste ronde en de INVOER van de prestatieratel. |
@@ -240,7 +240,6 @@ toets omvalt.
 | `chaos.test.js` | 7 | gezakt op `>=->>#0` | De meetkant van de chaosproef (scripts/lib/chaosmeet.js). HET OMLEGGEN ZELF IS EEN SCRIPT (scripts/chaos.js): dat start een eigen trio, schiet de ACTIEVE server met SIGKILL om en meet door. |
 | `charter.test.js` | 8 | gezakt op `liegpoort /api/` | Charter (boten en jachten), eerlijk verhuren: vaste dagprijs vooraf betaald, met of zonder schipper, bareboat alleen met vaarbewijs, dubbele boekingen onmogelijk, staat met foto's VOOR het uitvaren en NA de... |
 | `ci-keten.test.js` | 6 | gezakt op `+->-#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `ci-lokaal.test.js` | 13 | gezakt op `<=-><#0` | DE LOKALE KETEN -- draait hier wat de CI straks draait? Deze toetsen bewaken twee dingen die uit elkaar kunnen lopen zonder dat iemand het merkt: de AFLEIDING (leest scripts/lib/werkstroom.js de werkstromen goed... |
 | `claims-btw.test.js` | 11 | -- | BTW EN CLAIMS: het tarief op EEN plek, en geen bewering zonder dekking. TWEE GATEN uit de doorlichting van 20 augustus 2026: 4.10 `* 1.21` stond hard in kern/fonds.js en kern/lid/facturen.js, terwijl het platform... |
 | `clipdeler.test.js` | 4 | geen module gevonden | DE CLIPDELER STAAT ÉÉN KEER. Korte video's staan alleen op het toestel van de maker en reizen rechtstreeks (WebRTC-datakanaal). |
 | `clips.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Clips: korte verticale video's die alleen op het toestel van de maker staan (OPFS). De server bewaart enkel de kaart (titel, duur, affiche) en relayeert signalen; de feed is een eindige dagselectie zonder... |
@@ -420,6 +419,7 @@ toets omvalt.
 | `foutmelder-dekking.test.js` | 2 | gezakt op `+->-#0` | DRAAGT ELK SCHERM DE FOUTMELDER? -- van voornemen naar machine. |
 | `foutmelder.test.js` | 5 | gezakt op `===->!==` | Eigen externe fout-melder (server/foutmelder.js), die @sentry/node verving. We draaien tegen een lokale nep-webhook en controleren: er gaat een nette JSON-POST uit met de fout + context, dezelfde fout wordt binnen... |
 | `frictiebodem.test.js` | 14 | genoemd | DE BODEM ONDER DE FRICTIE. WAT HIER BEPROEFD WORDT, EN WAAROM HET ZWAAR WEEGT. |
+| `frictieschaduw.test.js` | 6 | -- | DE FRICTIESCHADUW -- meelopen zonder te bijten. kern/stuur/beleid.js beantwoordt "mag de AI dit pad" uit een statische lijst plus de bodem. |
 | `functielijst.test.js` | 6 | genoemd | DE AFDRUK VAN FUNCTIES.md LAAT NIETS VALLEN. WAAROM DIT ER IS, EN WAT HET KOSTTE. |
 | `functieplaats.test.js` | 4 | gezakt op `liegpoort /api/` | De plaats-as van de schakelkast: een functie per STAD of DORP dicht. Fijner dan het land, grover dan de persoon. |
 | `functies.test.js` | 16 | geen bruikbare mutatie | Tests voor de functieschakelaars (server/functies.js): de pad-matching (langste prefix wint), de standaard en de catalogus. Zuiver, geen server nodig. |
@@ -1243,7 +1243,7 @@ toets omvalt.
 | `scriptafsplitsing.test.js` | 8 | -- | HET AFGESPLITSTE SCRIPTBLOK: WAT ER WEG MAG, EN VOORAL WAT NIET. 146 inline <script>-blokken in 143 schermen, samen 2,33 MB, die bij elk bezoek opnieuw over de lijn gaan -- een pagina draagt een eigen nonce, dus er... |
 | `scriptbundel.test.js` | 7 | geen bronmutatie mogelijk | De uitgestelde scripts in een verzoek -- en waarom dat lang NIET mocht. In de kop van server/middleware/stijlbundel.js staat het argument dat scripts met rust liet: "gooit de eerste een fout, dan draait de tweede in... |
 | `seclock.test.js` | 6 | genoemd | DE SEC-LOCK-INVARIANTEN -- software mag beveiliging automatisch verhogen, maar nooit zelfstandig verlagen. WAAROM DEZE VIER VOOR ELKE FEATURE UIT GAAN. |
-| `second-screen-personal.test.js` | 4 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `second-screen-personal.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `securitylog-keten.test.js` | 7 | -- | HET INLOG-AUDITLOG AAN DE HASHKETEN. Waarom juist dit log. |
 | `selfhost.test.js` | 5 | gezakt op `===->!==#0` | De self-hosted voordeur: geheimen mogen niet in Compose lekken, een private beta mag nooit publiek worden, en het installatiecommando mag bestaande sleutels niet stil vervangen. |
 | `semantiek.test.js` | 11 | gezakt op `getal+1#0` | HET SEMANTISCH REGISTER -- en of hij werkelijk iets onderscheidt. scripts/semantiek.js beantwoordt de vraag uit BEWIJSMACHINE.md par. |

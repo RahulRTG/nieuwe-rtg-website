@@ -31,7 +31,7 @@
    hard maakt ("geen tarief is een REDEN, geen nul") en die bon.js toepast.
 
    WAT ER BEWUST ONBEPAALD BLIJFT, met de reden in de kaart zelf: risico (dat
-   rekent kern/command/risico.js per GEVAL uit, met bedrag en aantal -- statisch
+   rekent kern/frictie/motor.js per GEVAL uit, met bedrag en aantal -- statisch
    bestaat het niet), herstel (geen register kent de tegenhanger van een route;
    EXECUTIE.md blok 5) en kosten (KOSTEN.md meet verbruik, niet routes). Een
    kaart die die drie invult, verzint ze.
@@ -72,7 +72,7 @@ const VELDEN = {
     wat: 'de vervalstaat: bewezen, verschaald, verzwakt, geschorst of ongemeten' },
   herhaling: { bron: 'IDEMPROEF.json', afgeleid: true,
     wat: 'wat een tweede identieke aanroep doet: beschermd, onbeschermd of ongemeten' },
-  risico: { bron: 'server/kern/command/risico.js', afgeleid: false, waarde: 'ONBEPAALD',
+  risico: { bron: 'server/kern/frictie/motor.js', afgeleid: false, waarde: 'ONBEPAALD',
     reden: 'risico wordt per GEVAL berekend uit bedrag, aantal en omkeerbaarheid; statisch bestaat het niet' },
   herhalingBesluit: { bron: 'IDEMBESLUIT.json', afgeleid: true,
     wat: 'waarom een herhaalde oproep hier wel of niet iets nieuws mag doen -- het OORDEEL van een mens, ' +

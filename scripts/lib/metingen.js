@@ -126,6 +126,15 @@ const REGISTER = {
   'RESOLVERBEREIK.json': { eigenRatel: 'test/resolverbereik.test.js' },
   'GEZAGSNOEMER.json': { eigenRatel: 'test/gezagsnoemer.test.js' },
 
+  /* De adressen die de documenten noemen. De toets bevriest het register NIET --
+     ADRESSEN.json beweegt bij elke documentregel die een pad noemt, en een tand
+     op gelijkheid zou zakken om een reden die niets met adressen te maken heeft.
+     Geratelde wordt het getal dat ertoe doet: `kapot` mag niet boven de
+     grondwaarde in scripts/adressen.js komen. Toets 1 is zien zakken (een
+     verzonnen adres in TIKKEN.md bracht hem op 24), dus deze regel is geen
+     bewering -- zie de kop over de helft die mensenwerk blijft. */
+  'ADRESSEN.json': { eigenRatel: 'test/adressen.test.js' },
+
   /* APPWERKT.json hangt aan de NORM-ratel en niet aan een eigen toets, want een
      verse meting vraagt een browser en een kwartier -- dat hoort niet in
      `npm test`. Wat er wel aan hangt is het getal dat ertoe doet:

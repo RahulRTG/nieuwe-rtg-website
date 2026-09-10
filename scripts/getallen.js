@@ -88,6 +88,8 @@ const GETALLEN = {
     wat: 'namen die in meer dan een domein voorkomen' },
   'semantiek.betekenissen': { bron: 'SEMANTIEK.json', veld: 'woordenMetMeerBetekenissen',
     wat: 'namen die meer dan een betekenis dragen' },
+  'semantiek.betekenissenTotaal': { bron: 'SEMANTIEK.json', veld: 'betekenissenTotaal',
+    wat: 'betekenissen die die namen samen dragen' },
   /* De meetleer: mag de lezer dit geloven, en hoeveel (MODULAIR.md par. 7). */
   'meetleer.registers': { bron: 'MEETLEER.json', veld: 'registers',
     wat: 'registers in de wortel die de meetleer keurt' },

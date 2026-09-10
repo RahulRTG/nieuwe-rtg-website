@@ -120,7 +120,14 @@ test('het kaartenpaneel toont de gebieden uit de index, met aangeboden en gebouw
        eerlijke mededeling. */
     const uitleg = await page.textContent('#kaartenUitleg');
     assert.match(uitleg, /gebouwd/);
-    assert.match(uitleg, /volgende stap/, 'en dat het pakket nog niet op het toestel staat: ' + uitleg);
+    /* De kop telt ook wat er OP DIT TOESTEL staat -- gemeten uit de opslag en
+       niet uit het antwoord van de server, die dat niet kan weten. Nul dus, in
+       een verse browser. */
+    assert.match(uitleg, /0 op dit toestel/, uitleg);
+    /* En de zin die niemand verwacht staat erbij: opslag in een browser is
+       niet van ons. Zonder die mededeling belooft dit paneel een offline kaart
+       die de browser mag opruimen. */
+    assert.match(uitleg, /opruimen|bewaart deze kaarten|zegt hij niet/, uitleg);
   });
 });
 
@@ -210,4 +217,132 @@ test('zonder locatie is het kaartenpaneel nog steeds te bereiken',
     assert.ok(zichtbaar.hoog >= 24, 'de knop is te raken (>=24px): ' + zichtbaar.hoog);
     assert.equal(zichtbaar.bovenop, true, 'en er ligt niets over de knop heen');
   }, { gps: false });
+});
+
+/* ---------------------------------------------------------------------------
+   HET PAKKET OP HET TOESTEL (stap 2, shared/kaartpakket.js).
+
+   Dit is de enige plek waar die laag ECHT gemeten kan worden: `caches` en
+   `crypto.subtle` bestaan alleen in een beveiligde context, en de wegwerpserver
+   staat op 127.0.0.1 -- localhost telt daarvoor. Buiten een browser is er dus
+   niets van te bewijzen, en dat is precies waarom deze drie toetsen hier staan
+   en niet in test/navigatietoestelpakket.test.js.
+   --------------------------------------------------------------------------- */
+
+const NL = 'europe-netherlands';
+
+async function toestelKnop(page) {
+  await page.waitForSelector('#kaartenPaneel.zien .kaartrij button[data-toestel="' + NL + '"]', { timeout: 60000 });
+  return page.locator('.kaartrij button[data-toestel="' + NL + '"]');
+}
+const bakInhoud = (page) => page.evaluate(async () => {
+  if (!window.caches) return null;
+  const b = await caches.open('rtg-kaart-v1');
+  return (await b.keys()).map(r => new URL(r.url).pathname).sort();
+});
+
+test('het pakket gaat op dit toestel, en het scherm MEET dat in plaats van het te onthouden',
+  { skip: geenBrowser(pw) }, async () => {
+  await metLid(async ({ base, ctx }) => {
+    const page = await ctx.newPage();
+    await page.goto(base + '/apps/navigatie.html', { waitUntil: 'domcontentloaded' });
+    await paneelOpen(page);
+
+    /* Vooraf: de browser kan het (anders zegt de knop de reden), en er staat
+       nog niets. Zonder deze eerste meting bewijst "er staat iets" hierna
+       niets -- het had er al kunnen staan. */
+    assert.deepEqual(await bakInhoud(page), [], 'de opslag begint leeg');
+    const knop = await toestelKnop(page);
+    assert.equal(await knop.textContent(), 'Naar toestel');
+    assert.equal(await knop.isDisabled(), false, 'op localhost kan het, dus de knop kan aan');
+
+    await knop.click();
+    await page.waitForFunction((c) => {
+      const b = document.querySelector('.kaartrij button[data-toestel="' + c + '"]');
+      return b && b.getAttribute('aria-pressed') === 'true';
+    }, NL, { timeout: 60000 });
+    assert.equal(await knop.textContent(), 'Op dit toestel');
+
+    /* NEGEN SLEUTELS: acht delen plus het plaatselijke manifest. Dat laatste
+       is geen extra deel maar het bewijs dat de download IS afgerond -- zonder
+       hem zegt stand() `volledig: false`. */
+    const na = await bakInhoud(page);
+    assert.equal(na.length, 9, JSON.stringify(na));
+    for (const naam of ['graaf.json', 'coords.f64', 'offsets.u32', 'doelen.u32',
+      'kosten.f32', 'lengtes.f32', 'wegen.u32', 'vlaggen.u8', '__manifest']) {
+      assert.ok(na.includes('/api/nav/gebied/pakket/' + NL + '/' + naam), naam + ' staat in de opslag');
+    }
+
+    /* De laag zelf, opnieuw gevraagd: hij LEEST de opslag en zegt volledig. */
+    const stand = await page.evaluate((c) => window.RTGKaartPakket.stand(c), NL);
+    assert.equal(stand.op, true);
+    assert.equal(stand.volledig, true);
+    assert.deepEqual(stand.mist, []);
+    assert.equal(stand.bytes, stand.bytesVerwacht, 'evenveel bytes als het manifest belooft');
+    /* ODbL: de vermelding staat OOK plaatselijk, zodat het scherm hem offline
+       kan noemen -- niet alleen op het moment van downloaden. */
+    assert.match(String(stand.naamsvermelding), /OpenStreetMap/);
+
+    /* En de kop van het paneel telt het, want dat is de plek waar een lid het
+       leest zonder elke rij af te gaan. */
+    assert.match(await page.textContent('#kaartenUitleg'), /1 op dit toestel/);
+
+    /* Een verse pagina meet het opnieuw uit de opslag: niets wordt in het
+       geheugen van deze sessie bewaard. */
+    const twee = await ctx.newPage();
+    await twee.goto(base + '/apps/navigatie.html', { waitUntil: 'domcontentloaded' });
+    await paneelOpen(twee);
+    const knop2 = await toestelKnop(twee);
+    assert.equal(await knop2.textContent(), 'Op dit toestel', 'ook na een herlaad');
+  });
+});
+
+test('van het toestel af halen laat niets achter', { skip: geenBrowser(pw) }, async () => {
+  await metLid(async ({ base, ctx }) => {
+    const page = await ctx.newPage();
+    await page.goto(base + '/apps/navigatie.html', { waitUntil: 'domcontentloaded' });
+    await paneelOpen(page);
+    const knop = await toestelKnop(page);
+    await knop.click();
+    await page.waitForFunction((c) => {
+      const b = document.querySelector('.kaartrij button[data-toestel="' + c + '"]');
+      return b && b.getAttribute('aria-pressed') === 'true';
+    }, NL, { timeout: 60000 });
+    assert.equal((await bakInhoud(page)).length, 9);
+
+    await knop.click();
+    await page.waitForFunction((c) => {
+      const b = document.querySelector('.kaartrij button[data-toestel="' + c + '"]');
+      return b && b.getAttribute('aria-pressed') === 'false';
+    }, NL, { timeout: 60000 });
+    assert.deepEqual(await bakInhoud(page), [], 'ook het plaatselijke manifest is weg');
+    assert.equal(await knop.textContent(), 'Naar toestel');
+  });
+});
+
+test('een deel dat ANDERS binnenkomt wordt geweigerd, en dan staat er niets',
+  { skip: geenBrowser(pw) }, async () => {
+  await metLid(async ({ base, ctx }) => {
+    const page = await ctx.newPage();
+    /* Precies even lang als het echte deel (zes coordinaten, 48 bytes) en met
+       andere inhoud. Zou de laag alleen de LENGTE controleren, dan kwam dit
+       erdoor -- en een omgekiepte graaf levert geen foutmelding maar een route
+       die er goed uitziet. Dit is dus de toets op het controlegetal zelf. */
+    await page.route('**/api/nav/gebied/pakket/' + NL + '/coords.f64', (route) => route.fulfill({
+      status: 200, contentType: 'application/octet-stream', body: Buffer.alloc(48) }));
+    await page.goto(base + '/apps/navigatie.html', { waitUntil: 'domcontentloaded' });
+    await paneelOpen(page);
+    const knop = await toestelKnop(page);
+    await knop.click();
+
+    await page.waitForFunction(() => {
+      const t = document.querySelector('#toast');
+      return t && /anders binnen/i.test(t.textContent || '');
+    }, null, { timeout: 60000 });
+    assert.match(await page.textContent('#toast'), /bewaart deze kaart niet/i);
+    /* En de bak is leeg: de delen die al goed binnen waren gaan er ook uit.
+       Zeven achtste van een graaf is geen kaart. */
+    assert.deepEqual(await bakInhoud(page), []);
+    assert.equal(await knop.getAttribute('aria-pressed'), 'false');
+  });
 });

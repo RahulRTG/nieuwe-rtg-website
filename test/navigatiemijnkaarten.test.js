@@ -178,8 +178,14 @@ test('8. het antwoord zegt dat de kaart NIET op het toestel staat', () => {
     /* Een leeg veld wordt door de lezer met zijn eigen aanname gevuld. Dus
        niet alleen `false`, maar ook waarom -- en dat het de lijst is die het
        toestel straks ophaalt. */
-    assert.equal(b.opToestel, false);
-    assert.match(b.opToestelWaarom, /volgende stap/);
+    /* NULL EN NIET FALSE, en dat is de hele bewering: sinds
+       kern/navigatie/toestelpakket.js is de kaart wel op te halen, maar deze
+       laag kan niet WETEN of hij op het toestel staat -- dat meet het scherm
+       (shared/kaartpakket.js). `false` zou een bewering zijn die deze kant
+       niet kan doen. */
+    assert.equal(b.opToestel, null);
+    assert.match(b.opToestelWaarom, /alleen het toestel/i);
+    assert.match(b.opToestelWaarom, /opruimen/, 'en dat de browser hem mag weggooien');
   }, { bouw: ['nederland'] });
 });
 

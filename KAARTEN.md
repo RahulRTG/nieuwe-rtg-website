@@ -145,11 +145,12 @@ ontbrekende bron zijn vier waarheden; die les stond al in toets 13 van
   `index-v1.json` (`test/navigatie-index-fixture.js`). Dat de echte bron er zo
   uitziet is daarmee graad `vermoed` en niet `gemeten`; klopt een veld niet, dan
   hoort de fixture bijgewerkt te worden en niet de bewering.
-- **Het pakket op het TOESTEL** (stap 2). Vandaag leest RTG de kaart zelf; echt
-  offline navigeren vraagt de graaf in de browser. Elk antwoord van de
-  keuzelaag draagt daarom `opToestel: false` MET de reden -- geen leeg veld,
-  want een leeg veld wordt door de lezer met zijn eigen aanname gevuld. De
-  keuze die een lid nu maakt, is de lijst die het toestel dan ophaalt.
+- **Offline ROUTEREN** (de tweede helft van stap 2). De graaf gaat sinds
+  `kern/navigatie/toestelpakket.js` wel naar het toestel (par. 11), maar de
+  route wordt nog op de server gerekend. Elk antwoord van de keuzelaag draagt
+  daarom `opToestel: null` MET de reden -- `null` en niet `false`, want de
+  server kan niet weten wat er in de opslag van een browser staat; het scherm
+  meet dat.
 - **Het formaat van een pakket** staat niet in de index; dat vergt een HEAD per
   gebied. `bronBytes` is daarom `null` en niet `0` -- een nul zou op het scherm
   van een lid "gratis" betekenen.
@@ -209,3 +210,64 @@ in plaats van op de code.
 Wie een route toevoegt draait dus ook `node scripts/mutatiesemantiek.js
 --vastleggen`. De verklaring bij de drie routes blijft daarbij leeg tot iemand
 hem geeft: `onverklaard` is een uitslag en geen nul.
+
+## 11. Stap 2, de helft die er echt is: het pakket op het toestel
+
+De graaf van een gebouwd pakket is nu op te halen en op het toestel te bewaren
+(`server/kern/navigatie/toestelpakket.js` plus `public/shared/kaartpakket.js`).
+Wat dat wel en niet betekent, staat hieronder -- want een download die "offline
+navigatie" heet terwijl de helft mist, is de gevaarlijkste vorm van marketing.
+
+**Wat er meegaat**: de acht bestanden van de graaf (`graaf.json`, `coords.f64`,
+`offsets.u32`, `doelen.u32`, `kosten.f32`, `lengtes.f32`, `wegen.u32`,
+`vlaggen.u8`) -- precies de vorm die `gebiednet.js` leest.
+
+**Wat er niet meegaat, met de reden in het manifest zelf**: de `<code>.sqlite`
+ernaast. Daar zitten de plaatsnamen (FTS), de wegnamen en de geometrie in, en
+dat is een zoekindex voor een query-engine die een browser niet heeft. Zoeken
+blijft dus online, en een route die het toestel zelf zou rekenen kent de vorm
+van de weg wel en zijn naam niet. Dat staat als `nietMeegeleverd` in het
+antwoord en niet als stilte.
+
+**Vier grenzen die deze laag zichzelf oplegt.**
+
+1. **De lijst is gesloten.** Een lid vraagt om één van acht delen en nooit om
+   een bestandsnaam. Wie hier een vrij pad toelaat, opent `RTG_DATA_DIR` -- daar
+   liggen ook de sleutels en de database. `pakket.js` weert al een onveilige
+   gebiedscode; de lijst weert de tweede helft van dezelfde aanval, en
+   `test/navigatietoestelpakket.test.js` toets 5 probeert acht vormen.
+2. **De licentie gaat vóór de bytes.** Een pakket op een toestel zetten is
+   verspreiden, en dan eist ODbL naamsvermelding. Geen vermelding, geen
+   manifest -- en ook geen bytes, want de tweede route vraagt dezelfde poort.
+   De vermelding gaat MEE de opslag in, zodat het scherm hem ook offline kan
+   noemen: ODbL vraagt hem zolang de gegevens er zijn.
+3. **Een half pakket is geen pakket.** Ontbreekt of leeg is één deel, dan
+   weigert het hele manifest met de naam erin. En valt er tijdens het ophalen
+   een deel af, dan gaat het hele gebied er weer uit -- zeven achtste van een
+   graaf is geen kaart.
+4. **Een stuk bestand is erger dan geen bestand.** Een afgekapte of omgekiepte
+   graaf levert geen foutmelding maar een ROUTE: de motor leest onzin uit de
+   typed arrays en rekent er een net uitziende weg mee. Elk deel wordt daarom
+   tegen een sha256 uit het manifest gehouden. De browsertoets stuurt met opzet
+   48 bytes nul terug voor een deel dat óók 48 bytes is -- zou de laag alleen de
+   lengte controleren, dan kwam dat erdoor.
+
+**Drie dingen die een browser anders doet dan een telefoon-app**, en ze staan
+alle drie op het scherm in plaats van in een voetnoot:
+
+- **Zonder https is er geen opslag.** `caches` en `crypto.subtle` bestaan alleen
+  in een beveiligde context. Op http (behalve localhost) kan het dus niet, en
+  dan draagt de knop de reden in plaats van stil niets te doen.
+- **De browser mag het weggooien.** We vragen `navigator.storage.persist()`, en
+  het antwoord staat in de kop van het paneel: bewaart hij het, mag hij het
+  opruimen, of zegt hij het niet? Alle drie zijn echte uitkomsten, en `null` is
+  er één van.
+- **De server weet niet wat er op uw toestel staat.** Daarom `opToestel: null`
+  en niet `false`, en daarom MEET het scherm de opslag bij elke keer openen in
+  plaats van een lijst te onthouden. Een onthouden lijst en een lege cache lopen
+  binnen een week uit elkaar, en dan belooft het scherm een kaart die er niet is.
+
+Het plaatselijke manifest (`__manifest`, een adres dat de server niet kent en
+zou weigeren) is het bewijs dat een download IS afgerond. Het gaat er als
+LAATSTE in: zolang het er niet staat, is het een halve download en zegt de laag
+dat ook.

@@ -6,10 +6,17 @@
    MUTATIECONTRACT.md verbiedt `onbekend` voor wat nieuw publiek aanroepbaar
    wordt, dus staan deze drie er vooraf -- eerst het contract, dan de route.
 
-   DRIE ROUTES, TWEE SOORTEN. `gebieden` leest en heeft niets te herhalen.
-   `kies` en `weg` schrijven in EEN collectie (`navKaarten`, van deze laag zelf
-   via kern/eigencollectie.js) en zijn idempotent omdat de keuze een
+   VIER ROUTES, TWEE SOORTEN. `gebieden` en `pakket` LEZEN en hebben niets te
+   herhalen. `kies` en `weg` schrijven in EEN collectie (`navKaarten`, van deze
+   laag zelf via kern/eigencollectie.js) en zijn idempotent omdat de keuze een
    VERZAMELING is: hetzelfde gebied twee keer kiezen geeft een keuze.
+
+   `pakket` staat er met POST en niet met GET, en dat is geen slordigheid: het
+   is een LEESroute die een lichaam met een gebiedscode aanneemt, zoals alle
+   nav-routes in dit huis. Hij verandert niets -- hij leest de catalogus, kijkt
+   in RTG_DATA_DIR en rekent controlegetallen. De BYTES gaan met GET (dat is een
+   bestand achter een adres, en de browser bewaart het op dat adres); een GET
+   telt niet als schrijfroute en heeft hier dus geen eigen regel.
 
    DE GROND IS DE BOUW EN NIET EEN KALE MEETRONDE, en dat verschil hoort hier te
    staan: de idempotentie volgt uit de vorm van de handeling (een set) en is
@@ -45,6 +52,27 @@ const CONTRACTEN = {
     },
     nagekeken: 'test/navigatiemijnkaarten.test.js toets 1 en 9, 2026-09-10: het beeld bij een lege ' +
       'datamap levert een lijst met een REDEN en legt geen collectie aan',
+    afgetekend: AFGETEKEND
+  },
+  /* Het manifest van een gebouwd pakket: wat er te halen is, hoe groot en met
+     welk controlegetal. Leest; verandert niets. Twee keer vragen geeft
+     hetzelfde antwoord zolang het pakket niet opnieuw is gebouwd -- en juist
+     DAN hoort het te verschillen, want dan is de kaart anders. */
+  'POST /api/nav/gebied/pakket': {
+    mutatieId: 'nav.gebied.pakket', herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'NOT_APPLICABLE',
+    bewijs: {
+      gemeten: 'de route roept navKaartPakket() aan; die leest de catalogus, doet statSync op de acht ' +
+        'delen en hasht ze stromend. Er is geen db, geen save en geen collectie in ' +
+        'kern/navigatie/toestelpakket.js -- de laag krijgt ze ook niet mee',
+      op: '2026-09-10'
+    },
+    nagekeken: 'test/navigatietoestelpakket.test.js toets 1 en 9, 2026-09-10: hetzelfde manifest bij ' +
+      'een tweede aanroep, en een ANDER controlegetal zodra het bestand verandert -- die tweede is de ' +
+      'scherpe, want een som die op een cache blijft staan laat het toestel denken dat het de nieuwe ' +
+      'kaart heeft',
     afgetekend: AFGETEKEND
   },
   /* Een gebied kiezen. Schrijft in navKaarten; idempotent omdat de keuze een

@@ -14,12 +14,15 @@
                     gebied dat alleen AANGEBODEN is, is een verzoek: RTG weet
                     daarmee wat er gebouwd moet worden, en dat is precies de
                     weg "via ons".
-     WAT ER NIET IS Het pakket staat op de server van RTG en niet op het
-                    toestel. Werkelijk offline navigeren vraagt de graaf in de
-                    browser, en dat is een volgende stap. Elk antwoord van deze
-                    laag draagt daarom `opToestel: false` met de reden -- geen
-                    lege waarde, want een leeg veld wordt door de lezer met zijn
-                    eigen aanname gevuld.
+     WAT ER NIET IS Deze laag weet niet of een pakket op het toestel STAAT.
+                    Sinds ./toestelpakket.js is de graaf op te halen (het scherm
+                    doet dat met shared/kaartpakket.js), maar opslag in een
+                    browser is van de browser: hij mag hem opruimen, en alleen
+                    het toestel kan hem tellen. Elk antwoord draagt daarom
+                    `opToestel: null` MET de reden -- niet `false`, want dat zou
+                    een bewering zijn die deze kant niet kan doen. Wat er
+                    werkelijk niet is, is offline ROUTEREN: de motor rekent nog
+                    op de server.
 
    DE SLEUTEL IS DE SESSIESLEUTEL EN GEEN NAAM. Welke landen iemand op zijn
    telefoon zet, zegt iets over waar hij komt; dat hoort bij de codenaam en
@@ -91,9 +94,9 @@ module.exports = function maakMijnKaarten({ db, save }) {
     return { status: 200, gebieden: rij, mijn: [...mijn], gekozenNietAangeboden: nietMeer,
       telling: { aangeboden: rij.length, gebouwd: rij.filter(g => g.gebouwd).length, gekozen: mijn.size },
       bron: cat.bron, licentie: cat.licentie || null, reden: cat.reden || null,
-      opToestel: false,
-      opToestelWaarom: 'De kaart wordt vandaag door RTG zelf gelezen; op uw toestel opslaan is een ' +
-        'volgende stap. Uw keuze blijft staan en is dan de lijst die het toestel ophaalt.' };
+      opToestel: null,
+      opToestelWaarom: 'Een gebouwde kaart is naar dit toestel te halen; of hij daar staat, weet alleen ' +
+        'het toestel zelf -- en de browser mag hem opruimen. Routeren doet RTG vandaag op de server.' };
   }
 
   /* KIEZEN. Alleen een gebied dat de catalogus kent en dat de licentiepoort

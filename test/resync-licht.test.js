@@ -110,12 +110,21 @@ test('de poort blijft dicht tot de resync klaar is', { timeout: 5000 }, async ()
   const grens = grensMaken(m);
   await grens.herstelNu();
 
-  let laatLos, begonnen;
-  const gestart = new Promise(r => { begonnen = r; });
-  m.motor.haalNieuwer = () => new Promise(r => { laatLos = () => { m.geteld.haalNieuwer++; r(0); }; begonnen(); });
+  /* WACHTEN OP EEN TOESTAND EN NIET OP DE KLOK. Hier stond `setTimeout(20)`,
+     en dat is precies wat scripts/klokwacht.js telt: op een rustige machine te
+     lang, onder belasting te kort, en dan zakt de toets zonder dat er iets stuk
+     is. De toestand waar het hier om gaat is "de resync is BEGONNEN maar nog
+     niet klaar" -- en dat weet de nep-haalNieuwer zelf, want hij ís dat moment.
+     Hij meldt het, de toets wacht daarop, en er komt geen tijd aan te pas. */
+  let laatLos, meldBinnen;
+  const binnen = new Promise(r => { meldBinnen = r; });
+  m.motor.haalNieuwer = () => new Promise(r => {
+    laatLos = () => { m.geteld.haalNieuwer++; r(0); };
+    meldBinnen();
+  });
   grens.achtergrondSave();
   const bezig = grens.herstelNu();
-  await gestart;
+  await binnen;
   assert.equal(grens.stand().writeHealthy, false, 'de poort ging open terwijl de resync nog liep');
   laatLos();
   await bezig;

@@ -4,9 +4,9 @@
  "gemeten": {
   "scherm": 0,
   "schermBestanden": 0,
-  "server": 34,
+  "server": 32,
   "serverBestanden": 17,
-  "totaal": 34,
+  "totaal": 32,
   "bestanden": 17
  },
  "schuld": {
@@ -24,7 +24,7 @@
   "pg-snapshot.test.js": 1,
   "pg-wachten.test.js": 1,
   "schoolkoppel.test.js": 1,
-  "sloophamer.pg.test.js": 5,
+  "sloophamer.pg.test.js": 3,
   "speldag.test.js": 1,
   "spelsudoku.test.js": 1
  },

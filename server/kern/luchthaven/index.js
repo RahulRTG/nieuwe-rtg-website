@@ -141,18 +141,10 @@ function maakLuchthaven({ db, save, bewerkCollectie, crypto, anthropic, visumtaa
   const royaal = require('./royaal')(ctx);
   // mijn reizen (in ./vluchten) toont ook de eigen charteraanvragen
   ctx.mijnCharters = royaal.mijnCharters;
-  /* WAAR DE LUCHTHAVEN IS -- als VERWIJZING en niet als coordinaat.
-
-     Een reiziger moet voor zijn vlucht op de LUCHTHAVEN zijn en niet op de
-     bestemming. Die twee lopen bij een vlucht uiteen (bij een hotel niet), en
-     wie ze verwart laat RTG Move de reistijd naar Parijs uitrekenen voor iemand
-     die naar de gate moet. De code woont hier omdat dit domein hem uitgeeft --
-     de reiswereld die zelf 'LUCHT' intikt, maakt een tweede waarheid (LAT.md
-     regel 4). Op het TYPE gezocht, dus een tweede luchthaven breekt niets.
-
-     Geen luchthaven (het is een demo-instelling) of geen punt op de kaart:
-     null. Move meldt de plek dan als onbekend, en dat hoort -- een geraden
-     luchthaven is een geraden marge. */
+  /* Waar de luchthaven is, als VERWIJZING (voor RTG Move). De code hoort hier
+     omdat dit domein hem uitgeeft (LAT.md regel 4); op TYPE gezocht, dus een
+     tweede luchthaven breekt niets. Waarom dit de plek is en niet de vluchtbe-
+     stemming: zie de kop van kern/reiswereld-bronnen.js. */
   function plek() {
     const s = (db.data.suppliers || []).find(isLucht);
     return (s && s.loc && Number.isFinite(s.loc.lat)) ? { zaak: s.code } : null;

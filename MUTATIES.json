@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T15:30:00.667Z",
-    "commit": "ecfe14a1",
+    "op": "2026-09-10T15:30:42.953Z",
+    "commit": "8abd530c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4109,7 +4109,11 @@
     },
     "moveproef.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "scripts/moveproef.js",
+      "operator": "regex-alternatief-weg#1",
+      "gezakt": 1,
+      "geprobeerd": 10
     },
     "mrz.test.js": {
       "soort": "puur",

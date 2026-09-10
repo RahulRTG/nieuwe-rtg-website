@@ -18,30 +18,22 @@ module.exports = function bronnen({ kern, regel, bron }, key, uit, stil) {
       .filter(v => v.status !== 'geannuleerd')
       .map(v => regel('verblijf', {
         titel: v.roomName, bestemming: v.plaats || '', van: v.aankomst, tot: v.vertrek,
-        /* Het hotel IS een RTG-zaak, en die code stond al op het verblijf --
-           mijnVerblijven() zocht de zaak zelfs op om `plaats` te vullen en gooide
-           de code daarna weg. Zelfde reparatie als bij de activiteiten hieronder.
-
-           LET OP WAT DIT WEL EN NIET OPLOST: de PLEK is hiermee bekend, de TIJD
-           niet. Een verblijf draagt een aankomstDATUM en geen uur, dus RTG Move
-           houdt de naad ernaartoe `NIET_TE_BEPALEN` -- alleen met een kortere
-           `mist`-lijst. Een standaard check-in van 15:00 erbij verzinnen zou de
-           marge een gok maken. */
+        /* Het hotel IS een zaak en die code stond al op het verblijf;
+           mijnVerblijven() zocht hem zelfs op voor `plaats` en gooide hem weg.
+           Dit lost de PLEK op en niet de TIJD: een verblijf draagt een
+           aankomstdatum zonder uur, dus de naad blijft NIET_TE_BEPALEN met een
+           kortere mist-lijst. Een check-in van 15:00 verzinnen zou de marge een
+           gok maken. */
         plek: v.supplierCode ? { zaak: v.supplierCode } : null,
         status: v.status, kenmerk: v.id, herkomst: 'partner',
         app: 'Verblijven', link: '/apps/hotels.html'
       })), uit, stil);
 
-    /* HET REISBUREAU DRAAGT GEEN PLEK, en dat blijft zo. Een reispakket heeft
-       een bestemming als vrije tekst ("Barcelona") en geen zaak, geen halte en
-       geen punt. RTG Move meldt de naad daarom als NIET_TE_BEPALEN met
-       `plek-naar` in de mist-lijst.
-
-       Waarom hier geen benadering op de stadsnaam komt: op zo'n marge wordt
-       straks een reservering verzet. Gaat het reisbureau ooit een verwijzing
-       meesturen -- het hotel dat het boekt is een zaak -- dan stijgt de dekking
-       zonder dat er in Move iets verandert. Dat is de goedkoopste volgende stap
-       en hij hoort daar en niet hier. */
+    /* HET REISBUREAU DRAAGT GEEN PLEK, en dat blijft zo: een reispakket heeft
+       een bestemming als vrije tekst ("Barcelona") en geen zaak. Geen benadering
+       op de stadsnaam -- op zo'n marge wordt straks een reservering verzet. Het
+       hotel dat het reisbureau boekt IS een zaak, dus daar zit de volgende
+       dekkingswinst: in dat domein en niet hier. */
     bron('reisbureau', () => (kern.reisbureau.mijn(key) || [])
       .filter(a => a.status !== 'geannuleerd')
       .map(a => regel('reis', {
@@ -50,23 +42,14 @@ module.exports = function bronnen({ kern, regel, bron }, key, uit, stil) {
         app: 'Reisbureau', link: '/apps/reisbureau.html'
       })), uit, stil);
 
-    /* DE VLUCHTEN, EN DE PLEK DIE HIER NIET DE BESTEMMING IS.
-
-       Bij elk ander onderdeel zijn "waar ga ik heen" en "waar moet ik zijn"
-       dezelfde plek: het hotel, het restaurant, de excursie. Bij een vlucht
-       lopen ze uiteen -- u moet op de LUCHTHAVEN zijn, en de bestemming is waar
-       het vliegtuig u brengt. Wie hier `bestemming` als plek zou meesturen,
-       laat RTG Move de reistijd naar Parijs Le Bourget uitrekenen voor iemand
-       die naar de gate moet: een oordeel dat compleet oogt en onzin is.
-
-       De bestemming BLIJFT dus vrije tekst en wordt nooit een coordinaat --
-       `schoon(data.bestemming, 60)` levert dingen als 'Ibiza (uit Geneve)', en
-       daar hoort geen benadering op. Wat er wel bij komt is de luchthaven zelf,
-       als verwijzing, uit het domein dat hem uitgeeft (kern/luchthaven).
-
-       Dit is de bron die de DEKKING van Move werkelijk verhoogt, want een
-       vlucht draagt als enige van de vijf een datum EN een uur. Een verblijf
-       levert alleen een plek. */
+    /* DE PLEK IS HIER NIET DE BESTEMMING. Bij elk ander onderdeel vallen "waar
+       ga ik heen" en "waar moet ik zijn" samen; bij een vlucht niet -- u moet op
+       de LUCHTHAVEN zijn. Wie `bestemming` als plek meestuurt, laat Move de
+       reistijd naar Parijs Le Bourget rekenen voor iemand die naar de gate moet.
+       De bestemming blijft dus vrije tekst ('Ibiza (uit Geneve)') en wordt nooit
+       een coordinaat; de luchthaven komt als verwijzing uit kern/luchthaven.
+       Dit is de bron die de dekking echt verhoogt: een vlucht draagt als enige
+       van de vijf een datum EN een uur. Zie MOVE.md par. 6. */
     bron('vluchten', () => {
       const d = kern.lucht.mijn(key) || {};
       const luchthaven = kern.lucht.plek ? kern.lucht.plek() : null;

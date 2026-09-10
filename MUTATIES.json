@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-10T14:11:53.270Z",
-    "commit": "2ec16a85",
+    "op": "2026-09-10T14:41:48.599Z",
+    "commit": "d698520d",
     "boomVuil": true,
-    "boomAnders": 7,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -719,6 +719,14 @@
       "module": "server/bewaarwacht.js",
       "operator": "===->!==",
       "gezakt": 2
+    },
+    "bewijsladder.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bewijsladder.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "bewijsmapscherm.e2e.js": {
       "soort": "server",

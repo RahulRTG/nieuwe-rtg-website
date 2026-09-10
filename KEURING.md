@@ -465,3 +465,126 @@ onzekerheid verhoogt en dus de suite verbreedt. Dat is geen extra laag maar de
 directe voortzetting van par. 1 en 3, en het is de enige constructie die de
 blinde vlek van 57% structureel onschadelijk maakt in plaats van hem te
 omzeilen.
+
+## 7. De bewijsladder — van eenheidstoets tot productieverificatie
+
+Par. 1 tot en met 6 gaan over de MACHINE: hoe snel de keten is, of versmallen
+mag, en wat de attributie daarvoor moet dragen. Deze paragraaf stelt de andere
+vraag, en die was hier nog niet gesteld: **welke SOORTEN bewijs levert dit huis,
+waar draaien ze, en laten ze iets achter dat bij deze commit hoort?** Honderd
+poorten die alle honderd hetzelfde soort bewijs leveren, zijn een ladder met één
+sport.
+
+`npm run bewijsladder` meet dat (`BEWIJSLADDER.json`). Wat er verklaard is en
+wat gemeten, staat in de kop van het script en het hoort hier ook te staan: **de
+sporten zijn verklaard** — een taxonomie komt uit een hoofd — maar **welke
+mechanismen erop staan is gemeten**, uit de keten (`.github/workflows`, via
+`scripts/lib/werkstroom.js`) en uit de Slotsuite. Wat daar niet draait, bestaat
+voor deze meter niet.
+
+### De uitslag (10 september 2026)
+
+**56 mechanismen op 12 sporten: 6 staan, 6 zijn een stap weg, 0 ontbreken.**
+
+| sport | stand | waar het op vastloopt |
+|---|---|---|
+| snelle bewijzen | een stap | draait overal, laat niets gestempelds achter |
+| wat kan dit raken | **staat** | maar de bodem eronder niet — zie hieronder |
+| eenheid, contract, bevoegdheid | **staat** | `pgtoetsen` alleen in de keten |
+| echte reizen per rol | **staat** | |
+| tenant, veiligheid, tegenspel | **staat** | |
+| storing en herstel | **staat** | |
+| prestatiebudgetten | **staat** | 5 van de 6 alleen in de keten |
+| scherm, a11y, browser | een stap | het OORDEEL draait alleen in de keten |
+| migratie en gegevensintegriteit | een stap | de containerproef alleen in de keten |
+| releasebewijs | een stap | 9 mechanismen, geen enkel gestempeld register |
+| onveranderlijke kandidaat | een stap | alleen in de keten, en dat is terecht |
+| staging, canary, productie | een stap | 3 van de 5 alleen in de keten |
+
+Geen enkele sport staat op **jaren weg**, en dat is de eerlijke kop van dit
+verhaal: dit huis levert elk soort bewijs al. Wat eraan mankeert is niet
+afwezigheid maar **pariteit en bewijsvoering**.
+
+### Twee getallen die het probleem zijn
+
+**Zestien mechanismen draaien alleen in de keten.** Niet één ervan is
+onmisbaar-remote: `attributie`, `dekking`, `dekkingsvloer`, `gewichtdrift`,
+`gewichtvoorstel`, `toetsduur`, `a11y-oordeel`, `schermen`, `pgtoetsen`,
+`containerproef`, `imageherkomst`, `sonde`, `publieke-tls-proef`, `takken` en de
+samengestelde `afbouw:software`. Zeven daarvan lezen een artefact uit een andere
+job — die kunnen hier per definitie niet draaien en zeggen dat ook
+(`npm run ci:lokaal` meldt ze als NIET GEDRAAID met de reden). De rest kan wél,
+en draait hier alleen niet omdat niemand het vroeg.
+
+**Zes registers dragen geen stempel, en drie staan hier niet eens.** Een bewijs
+zonder stempel hoort bij geen enkele commit; `scripts/lib/stempel.js` bestaat al
+en legt vast waartegen er gemeten is (commit, vuile boom). `NORM.json`,
+`LADDER.json`, `TOETSDUUR.json`, `ENVELOP.json`, `GEZAG.json` en
+`WETBRONNEN.json` missen het. `ATTRIBUTIE.json`, `TRIAGE.json` en het
+sabotage-journaal staan alleen als CI-artefact met een bewaartermijn van dagen.
+
+Dat laatste is de scherpste vondst van deze meting, want het raakt par. 3:
+**`ATTRIBUTIE.json` is de bodem onder versmalling en hij is geen register maar
+een artefact.** `TOETSDUUR.json` staat wél in de repo, met de reden erbij: *het
+stuurt de bouw, dus het hoort in een commit te veranderen en niet onderweg.*
+Voor attributie geldt dat woord voor woord — sterker, daar hangt niet de
+verdeling aan maar de vraag welk bewijs mag worden overgeslagen. Zolang dat
+register alleen in een CI-run bestaat, kan geen enkele lokale planner hem lezen
+en kan niemand nalopen of de selectie van gisteren klopte.
+
+### Wat dit betekent voor de volgende stap
+
+De volgorde van par. 4 blijft staan; deze meting zet er twee dingen vóór die
+allebei een dag kosten in plaats van een kwartaal:
+
+1. **Attributie wordt een register.** Met een stempel, in de repo, bijgewerkt
+   door de volle ronde — precies zoals `TOETSDUUR.json`. Zonder die stap is stap
+   2 van par. 4 (de dubbele planner) niet lokaal te bouwen en niet na te lopen.
+2. **Een bewijsronde laat een gestempeld spoor achter.** Vandaag levert een
+   groene lokale ronde niets op wat bij een commit hoort: `.cilokaal` is een
+   duurmeting van één machine en draagt met opzet geen gezag. Het mechanisme
+   bestaat (`lib/stempel.js`), de plek bestaat (`BEWIJSLADDER.json`,
+   `ATTRIBUTIE.json`), en de keten kan dan onafhankelijk nagaan of het lokale
+   bewijs bij exact dezelfde bronboom hoort — `scripts/release-bewijs.js` doet
+   dat al voor een release, met een hashmanifest over de hele bronboom en een
+   `--controle` die alles opnieuw uitrekent.
+
+### Drie namen die al bezet zijn
+
+Wie deze laag een naam geeft, botst op drie woorden die hier al iets anders
+betekenen — dezelfde meting als in `HDI.md` par. 2 en `COMMERCE.md` par. 3:
+
+- **verificatie** is identiteits- en betaalverificatie (83 bestanden in
+  `server/`, plus `routes/office/verificaties.js`: een mens die een paspoort
+  aftekent). Een "Verification Runtime" zou in dit huis over ID-controle gaan.
+- **runtime** is de Node-runtime, en het CI-contract heeft er een eigen regel
+  over (`ci-keten.js` regel 2: de runtime wordt gedeclareerd, niet overgetypt).
+- **bewijsketen** is de fiscale herkomstketen (`kern/fiscaal/herkomst.js`).
+
+Wat wél vrij was en al gereserveerd stond in `scripts/attributie.js` en
+`scripts/impactbereik.js`, is **impactgraaf**. Die naam blijft; de laag eromheen
+heet gewoon de keuring, en de meting heet de bewijsladder.
+
+### Wat er niet uit deze meting volgt
+
+**Geen combinatorische matrix over het hele huis.** Het voorstel om elke
+capability automatisch te bewijzen over `consument × partner × medewerker ×
+manager × support × admin × onbevoegde × andere tenant`, maal
+`normaal × timeout × dubbel verzoek × provider weg × DB weg × race × herstart`,
+leest als schaal maar botst op een meting die er al ligt: `KETENVORM.json` zegt
+**0 van de 13 actoren gedeeld** over drie doorgemeten ketens. Gast/zaal/keuken,
+lid/vervoerder/dispatch en aanvrager/kantoor/keurder zijn geen invullingen van
+één rollenas — ze zijn drie assen. Eén raster daaroverheen is de `Asset`-fout in
+een nieuwe jas. De storingsas is wél gedeeld (dat zijn eigenschappen van de
+machine, niet van het domein) en die kan dus wel generiek: `scripts/chaos.js`,
+`scripts/aanval.js` en `HERSTELPROEF.json` zijn er de bouwstenen van.
+
+**Geen release-simulatie op elke commit.** Het koppelen van de Simulation Lab
+aan een kandidaat vraagt eerst wat `MAGNAATLAB.md` al meet: de simulatielaag
+raakt **2 van de 415 kerndomeinen**. De weg erheen is bekend en staat daar — een
+simulatie-adapter vervangt de rail, nooit de poort — maar het is geen volgende
+stap, het is een richting.
+
+**En geen samengesteld eindoordeel.** Par. 5 geldt onverkort: er komt geen
+`PROVEN` boven deze tabel. `npm run bewijsladder` toont daarom twaalf standen en
+telt ze op tot een zin met drie getallen, niet tot een cijfer.

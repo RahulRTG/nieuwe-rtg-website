@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T13:49:48.551Z",
-    "commit": "364610cb",
+    "op": "2026-09-10T16:00:47.249Z",
+    "commit": "ac2816c5",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -7010,6 +7010,14 @@
       "operator": "===->!==#3",
       "gezakt": 1,
       "geprobeerd": 15
+    },
+    "taalschil.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/taalschil.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "taalschrift.test.js": {
       "soort": "puur",

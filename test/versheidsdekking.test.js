@@ -40,6 +40,13 @@ const { REGISTERS } = require('../scripts/versheid.js');
    laat deze toets zakken. */
 const BUITEN = {
   'BEWIJSSCHULD.json': 'een schuldenlijst die met de hand wordt bijgehouden en per post een sluitweg draagt; geen meetronde',
+  /* Het oordeel van een mens die de taal spreekt. Een machine kan het niet
+     opnieuw draaien en het veroudert ook niet: wat een spreker in september zag,
+     zag hij. Wat wel kan verlopen is de DEKKING ervan -- verandert de tabel na
+     zijn oordeel, dan zegt het niets meer over de nieuwe cel -- en daar staat
+     test/taaloordeel.test.js voor, die eist dat elke genoteerde correctie ook
+     werkelijk in de tabel staat. */
+  'TAALOORDEEL.json': 'het oordeel van een mens die de taal spreekt; met de hand bijgehouden, geen meetronde -- de dekking ervan bewaakt test/taaloordeel.test.js',
   'NORM.json': 'de normtanden zelf -- hij IS de ratel en wordt door de ratels geschreven, niet door een meetronde',
   'SUITEDUUR.json': 'een tijdmeting die bij elke testronde meeschrijft; SUITE.json draagt de stand die telt',
   'KRIMP.json': 'een historielijst die aangroeit; er is geen "huidige meting" om te verouderen',

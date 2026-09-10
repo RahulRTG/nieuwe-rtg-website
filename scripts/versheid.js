@@ -94,6 +94,10 @@ const REGISTERS = [
      suite eronder meet een huis waarvan niemand weet of het nog werkt. */
   ['SUITE.json', 'npm test', 'de laatste VOLLE testronde: wanneer, waartegen, en of hij groen was'],
   ['DEKKING.json', 'npm run dekking:vast', 'welke routes een toets echt heeft aangeroepen'],
+  /* De taalkwaliteit veroudert met de CODE en niet met de klok: de poort telt
+     welke faalvormen zij aantoonbaar tegenhoudt, en die telling is niets waard
+     zodra de keuring is veranderd zonder hem opnieuw te draaien. */
+  ['TAALKWALITEIT.json', 'npm run taalkwaliteit', 'wat er per taal over de VORM van een vertaling is vastgesteld, en wat de keuring tegenhoudt'],
   ['POORTWACHT.json', 'npm run meetronde -- --alleen=poortwacht', 'welke routes zonder token opengaan', BEVEILIGING],
   ['ROLPROEF.json', 'npm run meetronde -- --alleen=rolproef', 'of een verkeerde rol binnenkomt', BEVEILIGING],
   ['INVOERPROEF.json', 'npm run meetronde -- --alleen=invoerproef', 'of rommel netjes wordt geweigerd'],

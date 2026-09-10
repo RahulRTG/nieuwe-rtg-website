@@ -42,6 +42,30 @@ systeem weet) draagt. Lees vóór je hieraan werkt vooral paragraaf 2.1 en de
 grenzen: de Reis bezit geen boeking maar een verwijzing, een voornemen en een
 bewijs; een wachter zonder bron zegt dat hij niet kijkt; een ingelezen waarde
 wordt nooit stilletjes verbeterd, en de barcode blijft van de uitgever.
+**`KAARTEN.md` is de kaartlaag onder de navigatie** — hoe RTG elk land en elke
+stad kan aanbieden terwijl een lid zelf kiest welke kaarten hij wil hebben. Lees
+die vóór je aan navigatie, kaartdekking of een gebied werkt. Drie standen die
+nooit een vinkje mogen worden (**aangeboden**, **gebouwd**, **gekozen**):
+*aangeboden is geen dekking*, en een gekozen gebied dat nog niet gebouwd is is
+een VERZOEK — dat is de weg "via ons". Vier grenzen die niet mogen sneuvelen: de
+**licentie is een grendel en geen veld** (ODbL eist naamsvermelding, en zonder
+vermelding laadt de motor het pakket niet), een **bron-id is geen bestandsnaam**
+(vertalen doet de indexschrijver, en bij een botsing vallen beide gebieden af —
+een winnaar op sorteervolgorde laat een lid een pakket downloaden dat over een
+ander gebied gaat), een **rechthoek is geen grens** (`gebiedkeuze.js` beslist op
+verklaarde omvatting, want "het kleinste vak wint" liet Maastricht op België
+uitkomen), en de laag mag **alleen toevoegen** — zonder gebiedsindex gedraagt de
+navigatie zich exact als hiervoor. De scherpste vondst staat in par. 6: *"hier is
+geen gebied" is niet "hier is geen motor"*. Een gebied dat aangeboden was maar
+niet gebouwd, viel door naar het demonstratieraster, en een lid in Parijs kreeg
+een route van 1583 km met een echte reistijd eronder. Par. 5a hoort daarbij: de
+**naamsvermelding staat op het scherm en niet alleen in een poort** -- een
+vermelding die niemand ziet, is geen vermelding -- en de badge kreeg twee
+standen extra, want met een gebouwd OSM-pakket onder de voeten stond er
+"Demonstratienet" boven een echte kaart. Wat er niet is, staat er
+met de reden: de OSM-bouwer en het pakket op het TOESTEL (stap 2), plus waarom
+het OPHALEN van de index hier niet te bewijzen is (de proxy weigert de bron met
+een 403, dus het ontleden is beproefd en het ophalen niet — graad `vermoed`).
 **`FOUNDATION.md` is het diepte-document van de RTFoundation als platform** —
 Personal & Civic Operating System, op drie niveaus tegelijk: individu,
 professional, organisatie. Het doet LEVEN.md niet over (dat blijft gelden en gaat

@@ -1309,6 +1309,9 @@
     "navigatie": [
       "navBestemmingen",
       "navKaart",
+      "navKaartKies",
+      "navKaartWeg",
+      "navKaartenBeeld",
       "navMeld",
       "navPartnerEvent",
       "navPartnerEvents",

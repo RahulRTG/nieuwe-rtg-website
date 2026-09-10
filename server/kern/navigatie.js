@@ -2,37 +2,14 @@
    Nederlandse NWB-wegvakken. Eigen A*, bestemmingen uit RTG/NWB, Flits als
    live laag en positie alleen voor de berekening, nooit als reisgeschiedenis. */
 
-const REF = { lat: 38.91, lng: 1.43 };                          // Ibiza-stad, het midden
-const BOUNDS = { lat0: 38.855, lat1: 38.995, lng0: 1.28, lng1: 1.56 };
-const GRID = 22;                                                 // rasterknopen per as
-const ARTERIE = 3;                                               // elke 3e lijn is hoofdweg
-const V_HOOFD = 22, V_STAD = 11;                                 // m/s (~80 / ~40 km/h)
-const MODI = { auto: 13.9, ev: 13.9, fiets: 4.4, lopen: 1.4 };  // terugval-ETA per m/s
-const LANGS_M = 450;                                             // "langs de route" straal
+/* Middelpunt, grenzen, rasterinstellingen en de POI-lagen staan in
+   ./navigatie/geografie.js -- gegevens die kern/plaats en het stadsweefsel
+   meelezen, en die dit bestand alleen doorgeeft. */
+const { REF, BOUNDS, GRID, ARTERIE, V_HOOFD, V_STAD, MODI, LANGS_M, POI } = require('./navigatie/geografie');
 const intelligence = require('./navigatie/intelligentie');
 const { maakNederlandNet, binnenNederland } = require('./navigatie/nederland');
 const dekking = require('./navigatie/dekking');
 let nederlandNetCache;
-
-// de eigen POI-lagen: tankstations, laadpalen en civiele loketten rond Ibiza
-const POI = {
-  tank: [
-    { naam: 'Repostar Vila', lat: 38.909, lng: 1.421 },
-    { naam: 'Estacio Platja', lat: 38.884, lng: 1.406 },
-    { naam: 'Benzina Nord', lat: 38.972, lng: 1.318 }
-  ],
-  laad: [
-    { naam: 'RTG Laadplein Marina', lat: 38.918, lng: 1.449, kw: 150 },
-    { naam: 'Laadpunt Aeroport', lat: 38.874, lng: 1.377, kw: 50 },
-    { naam: 'Snellaad Sant Antoni', lat: 38.980, lng: 1.304, kw: 300 },
-    { naam: 'Laadpunt Dalt Vila', lat: 38.906, lng: 1.436, kw: 22 }
-  ],
-  civic: [
-    { naam: 'Gemeenteloket Ibiza', lat: 38.909, lng: 1.434, soort: 'gemeente' },
-    { naam: 'Overheidsloket (Rijk)', lat: 38.911, lng: 1.428, soort: 'overheid' },
-    { naam: 'Gemeenteloket Sant Antoni', lat: 38.981, lng: 1.301, soort: 'gemeente' }
-  ]
-};
 
 function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
   /* De pure meetkunde en de A*-grafenzoeker (projectie, net, snap, route,
@@ -43,33 +20,12 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
   if (nederlandNetCache === undefined) nederlandNetCache = maakNederlandNet({ haversine });
   const nederland = nederlandNetCache;
 
-  // ---- de koppeling: alle bronnen als bestemming ----
-  function eigenPlekken() {
-    const uit = [];
-    for (const s of (db.data.suppliers || [])) {
-      // een OV-zaak heeft geen eigen loc: haar plek zijn de haltes
-      if (s.type === 'ov') {
-        for (const lijn of (s.lijnen || [])) for (const h of (lijn.haltes || []))
-          if (h && h.lat != null) uit.push({ naam: h.naam, soort: 'halte', laag: 'ov', lat: h.lat, lng: h.lng, extra: lijn.naam });
-        continue;
-      }
-      const loc = s.loc || (s.geo && { lat: s.geo.lat, lng: s.geo.lng });
-      if (!loc || loc.lat == null) continue;
-      /* De CODE gaat mee, niet alleen de naam. Een naam is wat een zaak zichzelf
-         vandaag noemt; de code is waar de rest van het huis haar aan kent. De
-         plaatslaag maakt hier hek-id's van (kern/plaats/hekken.js), en een hek
-         dat van id verandert omdat iemand zijn zaak hernoemt, laat elke lopende
-         waarneming in het niets wijzen. */
-      uit.push({ naam: s.name, code: s.code, soort: 'leverancier', laag: 'leverancier', lat: loc.lat, lng: loc.lng, extra: ((db.data.supplierTypes || {})[s.type] || {}).label || s.type });
-    }
-    for (const p of POI.tank) uit.push({ naam: p.naam, soort: 'tankstation', laag: 'tank', lat: p.lat, lng: p.lng });
-    for (const p of POI.laad) uit.push({ naam: p.naam, soort: 'laadpaal', laag: 'laad', lat: p.lat, lng: p.lng, extra: p.kw + ' kW' });
-    for (const p of POI.civic) uit.push({ naam: p.naam, soort: p.soort, laag: 'civic', lat: p.lat, lng: p.lng });
-    return uit;
-  }
+  /* De koppeling van de eigen bronnen staat in ./navigatie/plekken.js: plekken
+     ophalen is een andere taak dan routes rekenen. */
+  const eigenPlekken = require('./navigatie/plekken')({ db, POI });
 
   function bestemmingen(query, hier) {
-    if (inNLZonderNet(hier)) return dekking.geenNederlandsNet();
+    const stuk = gebiedStuk(hier); if (stuk) return stuk;
     const q = zonderTekens(query);
     let rij = eigenPlekken();
     const laagZoek = ['laad', 'laadpaal', 'tank', 'tankstation', 'halte', 'ov', 'gemeente', 'overheid', 'leverancier'].includes(q);
@@ -93,7 +49,7 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
   }
 
   function poiLagen(lagen, hier) {
-    if (inNLZonderNet(hier)) return dekking.geenNederlandsNet();
+    const stuk = gebiedStuk(hier); if (stuk) return stuk;
     const wens = Array.isArray(lagen) && lagen.length ? lagen : ['tank', 'laad', 'civic', 'ov', 'leverancier'];
     const uit = {};
     const alles = eigenPlekken();
@@ -112,21 +68,60 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
 
   const lokaleRoute = require('./navigatie/route-engine')({ MODI, LANGS_M, GRID, POI, crypto, haversine,
     flitsRond, partners, meters, snap, zoek, stappenVan, intelligence });
-  const nederlandRoute = nederland && require('./navigatie/route-engine')({ MODI, LANGS_M, GRID: null, POI, crypto, haversine,
-    flitsRond, partners, meters, snap: nederland.snap, zoek: nederland.zoek, stappenVan: nederland.stappenVan,
-    intelligence, netwerk: { bron: 'RTG Route Intelligence op het Rijkswaterstaat Nationaal Wegenbestand (NWB, CC0); geen externe kaartdienst' } });
+  /* Een pakketmotor komt uit EEN fabriek: Nederland stond hier uitgeschreven
+     en de gebiedslaag heeft dezelfde regels nodig (LAT.md regel 4). */
+  const maakRouteMotor = (net, netwerk) => require('./navigatie/route-engine')({ MODI, LANGS_M, GRID: null,
+    POI, crypto, haversine, flitsRond, partners, meters, intelligence,
+    snap: net.snap, zoek: net.zoek, stappenVan: net.stappenVan, netwerk });
+  const nederlandRoute = nederland && maakRouteMotor(nederland,
+    { bron: 'RTG Route Intelligence op het Rijkswaterstaat Nationaal Wegenbestand (NWB, CC0); geen externe kaartdienst' });
+  /* De motoren per gebied; zonder gebiedsindex geeft hij niets en blijft
+     alles zoals het was. De drie regels staan in gebiednetten.js. */
+  const netten = require('./navigatie/gebiednetten').maakGebiedNetten({ haversine,
+    eersteKeus: nederland, eersteKeusBinnen: binnenNederland,
+    maakRouteMotor: (net) => maakRouteMotor(net, { bron: (net.info && net.info.bron) || 'OpenStreetMap (ODbL 1.0)' }) });
 
   // wat deze motor over zijn eigen dekking weet, staat in ./navigatie/dekking.js
   const inNLZonderNet = (hier) => dekking.inNLZonderNet(nederland, hier);
+  /* DE ORDE VAN DE VIER GEVALLEN, en die is gemeten en niet bedacht:
+
+       1. het eigen NWB-pakket voor Nederland;
+       2. een GELADEN gebiedspakket -- ook binnen Nederland, want een echte
+          kaart is beter dan een weigering. Hier stond de Nederlandse weigering
+          eerst, en dan kreeg iemand die het OSM-pakket van Nederland wel had
+          gebouwd en het NWB niet, "Geen kaartdata voor Nederland" terwijl er
+          een bruikbare kaart klaarlag;
+       3. binnen Nederland zonder enige import: de bestaande weigering;
+       4. een AANGEBODEN gebied zonder geladen pakket: weigeren met de reden.
+
+     Geen gebied blijft null en laat het demonstratieraster staan. */
+  const gebiedStuk = (hier, post) => {
+    const g = post === undefined ? netten.voorPunt(hier) : post;
+    if (g && g.net) return null;
+    if (inNLZonderNet(hier)) return dekking.geenNederlandsNet();
+    return g ? dekking.geenGebiedsnet(g) : null;
+  };
 
   function route(vraag) {
     const vanNL = binnenNederland(vraag && vraag.van), naarNL = binnenNederland(vraag && vraag.naar);
     if (vanNL || naarNL) {
-      if (!nederlandRoute) return dekking.geenNederlandsNet();
+      /* Geen NWB, maar wel een gebouwd gebiedspakket over dit punt? Dan rekent
+         dat pakket. Zelfde orde als hierboven: een echte kaart gaat voor een
+         weigering. */
+      if (!nederlandRoute) {
+        const g = netten.routeVoor(vraag && vraag.van, vraag && vraag.naar);
+        if (g && g.motor) return g.motor(vraag);
+        return dekking.geenNederlandsNet();
+      }
       if (!vanNL || !naarNL) return { status: 422, error: 'Deze route kruist de huidige landsdekking.' };
       vraag.van.land = 'NL'; vraag.naar.land = 'NL';
       return nederlandRoute(vraag);
     }
+    /* Buiten Nederland: rekent de motor van het gebouwde gebied, en anders
+       blijft het demonstratieraster over -- zoals hiervoor. */
+    const g = netten.routeVoor(vraag && vraag.van, vraag && vraag.naar);
+    if (g && g.error) return g;
+    if (g && g.motor) return g.motor(vraag);
     return lokaleRoute(vraag);
   }
 
@@ -135,7 +130,8 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
     const netwerk = flitsRond && hier ? (flitsRond(hier, hier.land).meldingen || []) : [];
     return { status: 200, motor: 'RTG Route Intelligence', versie: 3, eigenMotor: true,
       live: { netwerk: netwerk.length, partners: partnerEvents.length, bijgewerktAt: new Date().toISOString() },
-      ...dekking.dekkingsbeeld(nederland, hier),
+      ...dekking.dekkingsbeeld(nederland, hier, netten.voorPunt(hier)),
+      pakketten: netten.stand(),
       profielen: Object.entries(intelligence.PROFIELEN).map(([id, p]) => ({ id, naam: p.naam })),
       mogelijkheden: ['live-verkeer', 'alternatieve-routes', 'eta-confidence', 'ev-energie', 'partner-events', 'privacy-routing', 'nederland-nwb'] };
   }
@@ -143,7 +139,11 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
   // ---- de kaart voor de 3D-app: net-definitie + koppelpunten ----
   function kaart(hier) {
     if (nederland && binnenNederland(hier)) return nederland.kaart(hier, eigenPlekken());
-    if (inNLZonderNet(hier)) return dekking.geenNederlandsNet();
+    /* Een aanroep en niet twee: `voorPunt` onthoudt zijn uitslag wel, maar wie
+       hem twee keer vraagt suggereert dat het antwoord ertussen kan wijzigen. */
+    const g = netten.voorPunt(hier);
+    const stuk = gebiedStuk(hier, g); if (stuk) return stuk;
+    if (g) return g.net.kaart(hier, eigenPlekken());
     return {
       status: 200, ref: REF, bounds: BOUNDS, grid: GRID, arterie: ARTERIE,
       plekken: eigenPlekken().map(p => {
@@ -165,9 +165,6 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
     navStatus: status, navPartnerEvent: partners.navPartnerEvent, navPartnerEvents: partners.navPartnerEvents };
 }
 
-/* REF, BOUNDS en POI gaan mee naar buiten omdat het STADSWEEFSEL ze leest: de
-   geografie van de stad hangt op hetzelfde middelpunt en dezelfde grenzen als
-   het wegennet, en de laadpunten in het objectregister zijn dezelfde laadpunten
-   als die de navigatie aanwijst. Een tweede middelpunt zou betekenen dat de
-   stad en haar wegen naast elkaar bestaan zonder elkaar te raken. */
+/* REF, BOUNDS en POI gaan mee naar buiten omdat het STADSWEEFSEL ze leest;
+   de reden staat in ./navigatie/geografie.js. */
 module.exports = { maakNavigatie, REF, BOUNDS, POI };

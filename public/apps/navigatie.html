@@ -72,6 +72,34 @@
     border-radius:0;padding:0.9rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 1rem);
     box-shadow:0 -14px 40px rgba(0,0,0,0.55);transform:translateY(102%);transition:transform 0.32s cubic-bezier(0.2,0.8,0.2,1);}
   .paneel.zien{transform:translateY(0);}
+  /* HET KAARTENPANEEL. Zelfde laag als .paneel: rechte hoeken (de hoekgrammatica
+     laat alleen systeemlagen afronden), eigen tokens, en raakvlakken van minstens
+     24px zodat hij op een telefoon te bedienen is. */
+  .kaarten{position:fixed;left:0;right:0;bottom:0;z-index:24;max-width:640px;margin:0 auto;
+    background:rgba(18,16,15,0.97);backdrop-filter:blur(12px);border:1px solid var(--line);border-bottom:0;
+    border-radius:0;padding:0.9rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 1rem);
+    box-shadow:0 -14px 40px rgba(0,0,0,0.6);transform:translateY(102%);
+    transition:transform 0.32s cubic-bezier(0.2,0.8,0.2,1);max-height:78vh;overflow-y:auto;}
+  .kaarten.zien{transform:translateY(0);}
+  .kaarten h2{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.1rem;display:flex;align-items:center;gap:0.5rem;}
+  .kaarten h2 .x{margin-left:auto;background:transparent;border:1px solid var(--line);border-radius:0;
+    color:var(--txt);font:inherit;min-width:32px;min-height:32px;cursor:pointer;}
+  .kaarten .uitleg{color:var(--soft);font-size:0.78rem;line-height:1.45;margin:0.4rem 0 0.7rem;}
+  .kaarten .filter{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:0;
+    color:var(--txt);font:inherit;padding:0.5rem 0.6rem;min-height:40px;margin-bottom:0.6rem;}
+  .kaartrij{display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0;border-top:1px solid var(--line);}
+  .kaartrij:first-of-type{border-top:0;}
+  .kaartrij .naam{flex:1;min-width:0;}
+  .kaartrij .naam b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .kaartrij .naam small{display:block;color:var(--soft);font-size:0.72rem;}
+  .kaartrij .stand{flex:none;font-size:0.68rem;letter-spacing:0.06em;text-transform:uppercase;
+    border:1px solid var(--line);border-radius:0;padding:0.1rem 0.35rem;color:var(--soft);}
+  .kaartrij .stand.gebouwd{color:var(--txt);border-color:var(--gold);}
+  .kaartrij button{flex:none;background:var(--card2);border:1px solid var(--line);border-radius:0;
+    color:var(--txt);font:inherit;font-size:0.8rem;min-height:32px;min-width:44px;padding:0.25rem 0.6rem;cursor:pointer;}
+  .kaartrij button[aria-pressed="true"]{border-color:var(--gold);}
+  .kaartrij button[disabled]{opacity:0.55;cursor:not-allowed;}
+  .kaarten .leeg{color:var(--soft);font-size:0.82rem;line-height:1.5;}
   .paneel .grip{width:40px;height:4px;border-radius:0;background:var(--line);margin:0 auto 0.7rem;}
   .paneel h2{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.1rem;display:flex;align-items:center;gap:0.5rem;}
   .paneel h2 .x{margin-left:auto;background:transparent;border:1px solid var(--line);border-radius:0;
@@ -143,6 +171,7 @@
     <span class="badge" id="badge3d">3D</span>
     <span class="rek"></span>
     <span class="badge live-badge" id="liveBadge">Motor actief</span>
+    <button class="badge" type="button" id="kaartenKnop" aria-expanded="false" aria-controls="kaartenPaneel">Kaarten</button>
   </header>
 
   <div class="zoekwrap">
@@ -222,12 +251,27 @@
     <p class="hintbron" id="bron"></p>
   </section>
 
+  <section class="kaarten" id="kaartenPaneel" aria-label="Kaarten van RTG" hidden>
+    <h2>Kaarten<button class="x" type="button" id="kaartenSluit" aria-label="Sluiten">&#10005;</button></h2>
+    <p class="uitleg" id="kaartenUitleg">De kaarten die RTG kan leveren. Kies wat u wilt hebben.</p>
+    <input class="filter" id="kaartenFilter" type="search" placeholder="Zoek een land of gebied"
+           autocomplete="off" aria-label="Zoek een land of gebied">
+    <div id="kaartenLijst"></div>
+  </section>
+
   <div class="poort" id="poort">
     <div class="kaartje">
       <h2>RTG Navigatie</h2>
       <p id="poortReden">Log eerst in met je RTG-account om te navigeren.</p>
       <a href="/apps/app.html">Naar de app</a>
       <button class="manual-start" type="button" id="manualStart" hidden>Kies vertrekpunt</button>
+      <!-- WELKE KAARTEN U WILT HEBBEN, HANGT NIET AF VAN WAAR U NU STAAT. De
+           poort dekt het hele scherm (inset 0, z-index 20), dus de knop in de
+           kop was onbereikbaar zolang er geen locatie is -- terwijl dat juist
+           het moment is waarop iemand een kaart van zijn bestemming wil
+           binnenhalen. Deze knop verschijnt alleen als de poort over de LOCATIE
+           gaat; zonder inlog valt er niets te kiezen. -->
+      <button class="manual-start" type="button" id="poortKaarten" hidden>Kaarten kiezen</button>
       <div class="manual-panel" id="manualPanel" hidden>
         <label for="startZoek">Vertrek vanaf</label>
         <input id="startZoek" type="search" placeholder="Zoek een halte, zaak of loket" autocomplete="off">
@@ -736,7 +780,17 @@
        komt uit `net` en `routeerbaarHier` van de motor zelf; het scherm leidt
        niets meer af. Een demonstratienet heet ook zo. */
     const dekking = r.body.dekking;
-    if (dekking && dekking.actief) {
+    if (r.body.net === 'gebied' && dekking) {
+      /* EEN GELADEN GEBIEDSPAKKET IS GEEN NWB EN GEEN RASTER. Hier stond
+         alleen de NWB-tak, dus met een gebouwd OSM-pakket onder de voeten
+         bleef er "Demonstratienet" staan terwijl er op een echte kaart werd
+         gerekend -- en de NAAMSVERMELDING die ODbL eist, stond nergens. Die
+         staat nu waar de bron van een route ook staat; een vermelding die
+         niemand ziet, is geen vermelding. */
+      $('#sourceCore').textContent = dekking.land || 'Kaart';
+      $('#sourceCoreLabel').textContent = dekking.licentie || 'Kaartdata';
+      if (dekking.naamsvermelding) $('#bron').textContent = dekking.naamsvermelding;
+    } else if (dekking && dekking.actief) {
       $('#sourceCore').textContent = (dekking.wegvakken / 1000000).toFixed(2).replace('.', ',') + ' mln';
       $('#sourceCoreLabel').textContent = 'NWB-wegvakken';
     } else if (r.body.net === 'geen') {
@@ -744,7 +798,9 @@
       $('#sourceCoreLabel').textContent = 'Kaartdata';
     }
     const badge = { nwb: 'NWB Nederland actief', demonstratie: 'Demonstratienet',
-      geen: 'Geen kaartdata voor Nederland' }[r.body.net];
+      geen: 'Geen kaartdata voor Nederland',
+      gebied: (r.body.dekking && r.body.dekking.land ? r.body.dekking.land : 'Kaart') + ' actief',
+      'gebied-geen': 'Kaart nog niet gebouwd' }[r.body.net];
     $('#liveBadge').textContent = badge || (r.body.routeerbaarHier === false ? 'Motor kan hier niet routeren' : (r.body.motor || 'Motor actief'));
     /* Alleen melden wat de gebruiker tegenhoudt. Dat we buiten Nederland op
        het eigen net rekenen staat in de badge en hoeft geen melding. */
@@ -774,6 +830,7 @@
   function vraagVertrekpunt() {
     if (!$('#poortReden').textContent.trim()) $('#poortReden').textContent = 'RTG weet nog niet waar u bent. Kies zelf uw vertrekpunt; RTG verzint nooit waar u staat.';
     $('#poort').classList.add('zien');
+    if (token) $('#poortKaarten').hidden = false;
     if ($('#manualPanel').hidden) $('#manualStart').hidden = false;
   }
   let startT, startVraag = 0;
@@ -944,6 +1001,7 @@
            ligt, dus hij zegt dat in plaats van "Motor actief" te blijven tonen. */
         $('#liveBadge').textContent = 'Locatie onbekend';
         $('#manualStart').hidden = false;
+        $('#poortKaarten').hidden = false;
         $('#poort').classList.add('zien');
         wachtNogOpPlek = true;                  // komt hij alsnog, dan bouwen we alsnog
         return;
@@ -951,6 +1009,122 @@
     }
     await initialiseerKaart();
   })();
+
+  /* ------------------------------------------------------------------------
+     KAARTEN: welke gebieden RTG kan leveren, en welke dit lid wil hebben.
+
+     DRIE STANDEN DIE NOOIT DOOR ELKAAR MOGEN LOPEN (kern/navigatie/gebieden.js):
+     aangeboden, gebouwd en gekozen. Het scherm zet ze naast elkaar in plaats
+     van er een groen vinkje van te maken -- "we bieden 200 landen aan" naast
+     "er zijn er 2 gebouwd" is de eerlijke mededeling, en een lid dat op een
+     niet-gebouwde kaart tikt hoort te lezen dat zijn keuze het VERZOEK is.
+     ------------------------------------------------------------------------ */
+  let kaartenStand = null;
+  const kaartenAan = () => $('#kaartenPaneel').classList.contains('zien');
+
+  function kaartenTeken() {
+    const lijst = $('#kaartenLijst');
+    const filter = String($('#kaartenFilter').value || '').trim().toLowerCase();
+    lijst.textContent = '';
+    if (!kaartenStand) return;
+    if (kaartenStand.reden) {
+      const p = document.createElement('p');
+      p.className = 'leeg';
+      p.textContent = kaartenStand.reden;
+      lijst.append(p);
+      return;
+    }
+    const rij = kaartenStand.gebieden.filter(g => !filter || g.naam.toLowerCase().includes(filter)
+      || g.code.includes(filter));
+    if (!rij.length) {
+      const p = document.createElement('p');
+      p.className = 'leeg';
+      p.textContent = filter ? 'Geen gebied met die naam.' : 'De catalogus is leeg.';
+      lijst.append(p);
+      return;
+    }
+    /* Honderden landen horen niet allemaal tegelijk in de DOM: dat maakt het
+       paneel op een telefoon traag. Wie zoekt, ziet alles wat matcht. */
+    for (const g of rij.slice(0, filter ? 200 : 60)) {
+      const el = document.createElement('div');
+      el.className = 'kaartrij';
+      const naam = document.createElement('span');
+      naam.className = 'naam';
+      const b = document.createElement('b');
+      b.textContent = g.naam;
+      const kl = document.createElement('small');
+      kl.textContent = g.waarom ? g.waarom : (g.licentie ? g.licentie + (g.naamsvermelding ? ' - ' + g.naamsvermelding : '') : g.code);
+      naam.append(b, kl);
+      const stand = document.createElement('span');
+      stand.className = 'stand' + (g.gebouwd ? ' gebouwd' : '');
+      stand.textContent = g.gebouwd ? 'Gebouwd' : 'Aangeboden';
+      const knop = document.createElement('button');
+      knop.type = 'button';
+      knop.dataset.code = g.code;
+      knop.setAttribute('aria-pressed', g.gekozen ? 'true' : 'false');
+      knop.textContent = g.gekozen ? 'Gekozen' : 'Kies';
+      /* Een verhindering draagt altijd een reden (GRAMMATICA.md). De reden
+         staat hierboven al in de regel, dus de knop verwijst ernaar. */
+      if (!g.teKiezen && !g.gekozen) { knop.disabled = true; knop.title = g.waarom || ''; }
+      el.append(naam, stand, knop);
+      lijst.append(el);
+    }
+    if (!filter && rij.length > 60) {
+      const p = document.createElement('p');
+      p.className = 'leeg';
+      p.textContent = 'Nog ' + (rij.length - 60) + ' gebieden. Zoek op naam om ze te vinden.';
+      lijst.append(p);
+    }
+  }
+
+  async function kaartenLaad() {
+    const r = await api('gebieden');
+    if (r.status !== 200) { zeg(r.body.error || 'De kaarten zijn niet op te halen.'); return; }
+    kaartenStand = r.body;
+    const t = r.body.telling || {};
+    $('#kaartenUitleg').textContent = t.aangeboden
+      ? t.aangeboden + ' gebieden aangeboden, ' + t.gebouwd + ' gebouwd, ' + t.gekozen + ' door u gekozen. '
+        + (r.body.opToestelWaarom || '')
+      : 'De kaarten die RTG kan leveren. Kies wat u wilt hebben.';
+    kaartenTeken();
+  }
+
+  async function kaartenOpen() {
+    const paneel = $('#kaartenPaneel');
+    if (kaartenAan()) {
+      paneel.classList.remove('zien');
+      paneel.hidden = true;
+      $('#kaartenKnop').setAttribute('aria-expanded', 'false');
+      return;
+    }
+    paneel.hidden = false;
+    paneel.classList.add('zien');
+    $('#kaartenKnop').setAttribute('aria-expanded', 'true');
+    await kaartenLaad();
+  }
+  $('#kaartenKnop').addEventListener('click', kaartenOpen);
+  $('#poortKaarten').addEventListener('click', kaartenOpen);
+  $('#kaartenSluit').addEventListener('click', () => {
+    $('#kaartenPaneel').classList.remove('zien');
+    $('#kaartenPaneel').hidden = true;
+    $('#kaartenKnop').setAttribute('aria-expanded', 'false');
+  });
+  $('#kaartenFilter').addEventListener('input', kaartenTeken);
+  $('#kaartenLijst').addEventListener('click', async (e) => {
+    const knop = e.target.closest('button[data-code]');
+    if (!knop || knop.disabled) return;
+    const code = knop.dataset.code;
+    const gekozen = knop.getAttribute('aria-pressed') === 'true';
+    knop.disabled = true;
+    const r = await api(gekozen ? 'gebied/weg' : 'gebied/kies', { code });
+    knop.disabled = false;
+    if (r.status !== 200) { zeg(r.body.error || 'Dat lukte niet.'); return; }
+    /* De hele stand opnieuw ophalen in plaats van de knop zelf omzetten: de
+       server weet of het pakket er ligt, en twee plekken die dezelfde stand
+       bijhouden gaan uit elkaar lopen. */
+    await kaartenLaad();
+    if (!gekozen && r.body.wat) zeg(r.body.wat);
+  });
 })();
 </script>
 <script src="/shared/metgezel.js" defer></script>

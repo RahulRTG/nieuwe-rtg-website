@@ -55,7 +55,15 @@ test('lege informatie is één familie en opent meteen de juiste invullaag', () 
   assert.match(COMM, /actie: \{ tekst: 'Begin een gesprek', doel: '#nieuwBtn' \}/);
   assert.match(COMM, /\.then\(openLegeActie\)/);
   assert.match(REISRAHUL, /eersteBlad === 'rahul'[\s\S]*#rahulVraag/);
-  assert.match(JS, /profiel\.href = '\/apps\/ik\.html#persoonlijk'/);
+  /* DE MUTATIELUS: `scan()` IS de callback van de MutationObserver, dus een
+     onvoorwaardelijke `textContent =` vervangt het tekstknooppunt, dat is een
+     mutatie, en de kijker voedt zichzelf. De pagina bereikt `load` dan nooit --
+     dat kostte de schermtoetsen een page.goto-timeout. Let op de `getAttribute`:
+     `profiel.href` geeft een ABSOLUTE url terug, dus vergelijken met het
+     property zou altijd verschillen en de lus laten staan.
+     Overgenomen uit 5e70c75c op origin/feature/rtg-family-empty-actions. */
+  assert.match(JS, /profiel\.getAttribute\('href'\) !== '\/apps\/ik\.html#persoonlijk'[\s\S]*profiel\.textContent !== 'Aanvullen'/,
+    'de mutatiekijker mag zijn eigen profieltekst niet eindeloos opnieuw schrijven');
 });
 
 test('het nieuwe vlak en de ene Edge-balk laden ook offline', () => {

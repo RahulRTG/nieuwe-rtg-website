@@ -353,3 +353,43 @@ test('13. de index wordt opnieuw gelezen zodra hij verandert', () => {
     assert.equal(g.catalogus().telling.aangeboden, 2, 'de nieuwe index wordt gezien');
   });
 });
+
+test('14. de catalogus wordt gecachet, en ziet een NIEUW GEBOUWD pakket toch', () => {
+  /* De catalogus vraagt per gebied twee keer aan de schijf of het pakket er
+     ligt, en hij hangt via kern/navigatie.js aan navKaart, navBestemmingen,
+     navPoi en navStatus. Bij tweehonderd landen zijn dat vierhonderd
+     schijfvragen per verzoek van een lid; die kosten staan op geen enkele nota,
+     dus niemand vindt ze terug. Vandaar de cache.
+
+     EN DUS OOK DEZE TOETS. Een cache op alleen de index zou een pakket dat
+     erna gebouwd wordt pas na een herstart tonen -- precies de stille
+     voorwaarde waar de index-cache hierboven al voor waarschuwt. De tweede
+     stempel is de MAP waarin de pakketten liggen. */
+  metDataMap((map, g) => {
+    schrijfIndex(map, { bron: 'proef', licentie: 'CC0 1.0', gebieden: [NL] });
+    const nav = path.join(map, 'navigatie');
+    assert.equal(g.catalogus().telling.gebouwd, 0, 'nog niets gebouwd');
+
+    let vragen = 0;
+    const echt = fs.existsSync;
+    fs.existsSync = (p) => { vragen++; return echt(p); };
+    try {
+      for (let i = 0; i < 20; i++) g.catalogus();
+      /* Twintig aanroepen mogen niet twintig keer per gebied de schijf op.
+         Eentje per ronde blijft over: de stempel van de index zelf. */
+      assert.ok(vragen <= 25, 'de catalogus komt niet elke keer van schijf (' + vragen + ' vragen)');
+    } finally { fs.existsSync = echt; }
+
+    /* Nu WEL een pakket neerzetten, zonder de index aan te raken. */
+    const p = g.pakketVan(NL.code);
+    fs.mkdirSync(p.graafMap, { recursive: true });
+    fs.writeFileSync(p.db, 'x');
+    fs.writeFileSync(path.join(p.graafMap, 'graaf.json'), '{}');
+    /* De mtime van de MAP moet echt verschillen; op een snelle schijf is
+       schrijven binnen dezelfde milliseconde geen theoretisch geval. Zelfde
+       reden en zelfde truc als toets 13. */
+    const t = Date.now() + 5000;
+    fs.utimesSync(nav, t / 1000, t / 1000);
+    assert.equal(g.catalogus().telling.gebouwd, 1, 'een nieuw pakket verschijnt zonder herstart');
+  });
+});

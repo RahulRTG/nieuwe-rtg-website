@@ -57,41 +57,37 @@ const eistNaamsvermelding = (licentie) => {
    zodat een aanroeper EEN adres heeft voor deze laag. */
 const { pakketVan, pakketLigt, codeVeilig, indexPad, navMap } = require('./pakket');
 
-/* Wat de bron ons kan leveren. Ontbreekt de index, dan is het antwoord LEEG met
-   een reden -- nooit stilzwijgend nul, want dat leest als "er is niets aan te
-   bieden" in plaats van "wij hebben niet gekeken". */
-/* DE INDEX WORDT GECACHET OP ZIJN WIJZIGINGSTIJD, en dat is geen optimalisatie
-   om de optimalisatie. `dekkingsbeeld()` hangt aan navStatus, dus dit bestand
-   zou bij ELK statusverzoek van schijf komen. Op de mtime en niet blind: een
-   cache die nooit vervalt, vraagt een herstart na een import -- en dat is
-   precies het soort stille voorwaarde waar iemand een uur aan kwijt is. */
-let cache = null;
-function index() {
-  const p = indexPad();
-  let stempel = null;
-  try { stempel = fs.existsSync(p) ? String(fs.statSync(p).mtimeMs) + ':' + p : 'weg:' + p; }
-  catch (e) { stempel = 'onleesbaar:' + p; }
-  if (cache && cache.stempel === stempel) return cache.uit;
-  const uit = leesIndex(p);
-  cache = { stempel, uit };
+/* De index van schijf staat in ./gebiedsindex.js -- lezen en onthouden is een
+   eigen taak, en dit bestand gaat over wat je met die index BEWEERT. */
+const { index, indexStempel } = require('./gebiedsindex');
+
+/* DE CATALOGUS WORDT OOK GECACHET, en dat is geen optimalisatie om de
+   optimalisatie: `pakketLigt()` doet twee bestandscontroles per gebied, en de
+   catalogus hangt via kern/navigatie.js aan navKaart, navBestemmingen, navPoi
+   en navStatus. Bij tweehonderd aangeboden landen zijn dat vierhonderd
+   schijfvragen per verzoek van een lid -- en die kosten staan nergens op een
+   nota, dus niemand vindt ze terug.
+
+   TWEE STEMPELS, want er zijn twee dingen die kunnen veranderen: de index
+   (nieuwe gebieden) en de MAP waarin de pakketten liggen (een gebouwd pakket).
+   Een map-mtime beweegt wanneer er een bestand bij komt of weggaat, dus een
+   nieuw pakket verschijnt gewoon -- een cache die daarvoor een herstart vraagt,
+   is het soort stille voorwaarde waar iemand een uur aan kwijt is. Eentje
+   blijft er: de MOTOR van een nieuw pakket wordt pas na een herstart geladen,
+   en dat zegt navigatie/gebiednetten.js zelf in zijn antwoord. */
+let catCache = null;
+function mapStempel() {
+  try { return String(fs.statSync(navMap()).mtimeMs); }
+  catch (e) { return 'geen-map'; }
+}
+function catalogus() {
+  const stempel = indexStempel() + '|' + mapStempel();
+  if (catCache && catCache.stempel === stempel) return catCache.uit;
+  const uit = catalogusVers();
+  catCache = { stempel, uit };
   return uit;
 }
-function leesIndex(p) {
-  if (!fs.existsSync(p)) {
-    return { gebieden: [], reden: 'Er is nog geen gebiedsindex ingelezen; draai `npm run navigatie:index`. ' +
-      'Zonder index weet RTG niet wat de bron kan leveren, en dat is iets anders dan dat er niets is.' };
-  }
-  try {
-    const j = JSON.parse(fs.readFileSync(p, 'utf8'));
-    const rij = Array.isArray(j.gebieden) ? j.gebieden : [];
-    return { gebieden: rij, bron: j.bron || null, licentie: j.licentie || null, gelezenAt: j.gelezenAt || null };
-  } catch (e) {
-    return { gebieden: [], reden: 'De gebiedsindex is niet te lezen (' + e.message + '); hij wordt niet geraden.' };
-  }
-}
-
-/* DE CATALOGUS: per gebied de drie standen, afgeleid en niet verklaard. */
-function catalogus() {
+function catalogusVers() {
   const idx = index();
   /* EEN ONVEILIGE CODE VALT NIET STIL WEG. Hij komt uit een index van buiten,
      dus hij hoort geweigerd te worden EN geteld -- een gebied dat zonder een
@@ -111,9 +107,19 @@ function catalogus() {
          daarop kwam Maastricht een keer op Belgie uit. */
       ouder: g.ouder ? String(g.ouder).toLowerCase() : null,
       vak: g.vak || null,
+      /* `bron` mag erven (waar de index vandaan komt), `downloadAdres` NOOIT:
+         dat is het adres van DIT pakket, en erven maakte van een gebied zonder
+         adres een gebied dat te bouwen leek. */
       bron: g.bron || idx.bron || null,
+      downloadAdres: g.downloadAdres || null,
       licentie: g.licentie || idx.licentie || null,
-      naamsvermelding: g.naamsvermelding || null,
+      /* DE NAAMSVERMELDING ERFT NET ALS DE LICENTIE, en dat is een reparatie:
+         hij deed dat niet, en `mag()` weigerde daardoor ELK gebied van een
+         bron die zijn plicht op de index verklaart in plaats van per rij. Zo
+         staat het in de ODbL-index van OpenStreetMap, dus de hele catalogus
+         viel stil om -- gevonden door test/navigatie-index.test.js, niet door
+         te lezen. Een plicht per rij overtypen raakt bovendien een rij kwijt. */
+      naamsvermelding: g.naamsvermelding || idx.naamsvermelding || null,
       /* Bytes van de bron, niet van ons pakket: wat een lid straks downloadt is
          de GEBOUWDE graaf en die is kleiner. Daarom heet dit veld naar zijn
          herkomst en niet `omvang` -- een getal dat het verkeerde ding meet is
@@ -128,6 +134,9 @@ function catalogus() {
       geweigerd: geweigerd.length },
     geweigerd,
     bron: idx.bron || null,
+    /* De licentie van de BRON hoort in de catalogus: het scherm van een lid
+       moet hem kunnen noemen, en hij stond wel in de index en niet hier. */
+    licentie: idx.licentie || null,
     gelezenAt: idx.gelezenAt || null,
     reden: idx.reden || null
   };
@@ -155,6 +164,10 @@ function mag(gebied) {
 const gebiedVoor = (punt, lijst) => keuze.gebiedVoor(punt, Array.isArray(lijst) ? lijst : catalogus().gebieden);
 
 module.exports = { catalogus, index, gebiedVoor, pakketVan, pakketLigt, mag,
+  /* De stempel van de PAKKETMAP gaat mee naar buiten: ./gebiednetten.js hangt
+     zijn hertest aan dezelfde verandering als deze cache, zodat catalogus en
+     motor niet uit elkaar kunnen lopen. */
+  pakketStempel: mapStempel,
   eistNaamsvermelding, codeVeilig, indexPad, navMap,
   /* Doorgegeven zodat er EEN adres is voor deze laag; de code staat in
      ./gebiedkeuze.js en niet twee keer. */

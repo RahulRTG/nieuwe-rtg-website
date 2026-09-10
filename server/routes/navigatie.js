@@ -5,7 +5,8 @@
    PDA-inlog. Op codenaam, geen externe kaartdienst. */
 module.exports = (kern) => {
   const { app, auth, supplierAuth, liveCodename, navBestemmingen, navRoute, navPoi, navKaart, navMeld,
-    navStatus, navPartnerEvent, navPartnerEvents } = kern;
+    navStatus, navPartnerEvent, navPartnerEvents,
+    navKaartenBeeld, navKaartKies, navKaartWeg } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Navigatie is voor leden.' }); return true; }
@@ -45,6 +46,28 @@ module.exports = (kern) => {
   app.post('/api/nav/meld', auth, (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, navMeld(req.session.key, liveCodename(req.session), req.body || {}));
+  });
+
+  /* DE KAARTEN VAN DIT LID: de hele catalogus met per gebied of hij hem heeft
+     gekozen, en of er werkelijk een pakket ligt. "Aangeboden" is geen dekking,
+     dus die drie standen staan apart in het antwoord (kern/navigatie/gebieden.js).
+     Op de SESSIESLEUTEL en niet op een naam: welke landen iemand wil hebben,
+     zegt iets over waar hij komt. */
+  app.post('/api/nav/gebieden', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, navKaartenBeeld(req.session.key));
+  });
+  /* Kiezen mag ook als het pakket nog niet gebouwd is -- dat IS het verzoek,
+     en het antwoord zegt met zoveel woorden dat er dan nog niet gerekend
+     wordt. Een knop die stil iets anders doet dan hij belooft, is erger dan
+     geen knop. */
+  app.post('/api/nav/gebied/kies', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, navKaartKies(req.session.key, req.body && req.body.code));
+  });
+  app.post('/api/nav/gebied/weg', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, navKaartWeg(req.session.key, req.body && req.body.code));
   });
 
   /* Partners leveren een genormaliseerd mobiliteitssignaal, nooit een te

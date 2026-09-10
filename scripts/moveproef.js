@@ -69,7 +69,13 @@ const S = (nr, van, naar, wat, ziet, stand, antwoord) =>
   schakels.push({ nr, van, naar, wat, ziet, stand, antwoord });
 const T = (naam, belofte, stand, wat) => storingen.push({ naam, belofte, stand, wat });
 
-(async () => {
+/* DE WACHT: dit instrument SCHRIJFT een register, dus hij mag niet gaan lopen
+   omdat iemand hem requiret. Dat is geen theorie -- een laadcontrole
+   (`node -e "require(...)"`) startte de rolproef een keer met de
+   STANDAARDbegrenzing en schreef ROLPROEF.json van 3377 beproefde routes terug
+   naar 292. Het register zag er daarna volkomen normaal uit. Zelfde vorm als
+   scripts/navigatieproef.js; scripts/meetkeuring.js handhaaft hem. */
+if (require.main === module) (async () => {
   /* startChromium geeft { pw, browser, waarmee } terug en `null` als er geen
      browser te vinden is. Dat laatste hoort te ZAKKEN en niet stil over te
      slaan: een proef die zichzelf overslaat als een dienst ontbreekt, is

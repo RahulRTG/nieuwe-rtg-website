@@ -38,7 +38,8 @@
         tekst.appendChild(el('strong', '', u.full || u.name || u.codename || 'RTG-lid'));
         var sub = [u.codename, u.tier].filter(Boolean).join(' · '); if (sub) tekst.appendChild(el('span', '', sub));
         if (u.emailVerified === true) tekst.appendChild(el('span', 'rtg-ss-ok', 'Profiel geverifieerd'));
-        root.appendChild(tekst); geladen = true; ctx.setStatus('live', 'ok');
+        root.appendChild(tekst); var wijzig = el('a', 'rtg-ss-profile-edit', 'Wijzig');
+        wijzig.href = '/apps/mijn-gegevens.html'; root.appendChild(wijzig); geladen = true; ctx.setStatus('live', 'ok');
         ctx.events.publish('profile.loaded', { verified: u.emailVerified === true, tier: u.tier || null });
       }).catch(function (e) {
         if (!root || e.name === 'AbortError') return; root.textContent = '';
@@ -66,8 +67,8 @@
         if (!x || !(x.label || x.naam)) return;
         var b = button(x.label || x.naam, 'rtg-ss-context-action'); b.dataset.ssContextId = x.id; root.appendChild(b);
       });
-      if (!root.childNodes.length) root.appendChild(el('p', 'rtg-ss-quiet', 'Geen actuele context.'));
-      ctx.setStatus(items.length ? 'actueel' : 'rustig', items.length ? 'ok' : 'quiet');
+      if (!root.childNodes.length) root.appendChild(el('p', 'rtg-ss-quiet', 'Geen actie nodig. Rahul houdt de rest in de gaten.'));
+      ctx.setStatus(items.length ? 'actueel' : 'Alles rustig', items.length ? 'ok' : 'quiet');
       ctx.events.publish('context.updated', { title: laatste.titel || null, source: laatste.bron || null,
         actions: (laatste.acties || []).slice(0, 12) });
     }
@@ -115,7 +116,7 @@
       if (geladen || bezig) return; bezig = true; teken(); ctx.setStatus('laden', 'busy');
       ctx.request('/api/comm/inbox', {}, { signal: stop && stop.signal }).then(function (j) {
         gesprekken = Array.isArray(j.gesprekken) ? j.gesprekken : []; geladen = true;
-        ctx.setStatus(gesprekken.length ? 'live' : 'leeg', gesprekken.length ? 'ok' : 'quiet');
+        ctx.setStatus(Number(j.ongelezen) ? Number(j.ongelezen) + ' nieuw' : gesprekken.length ? 'bij' : 'leeg', gesprekken.length ? 'ok' : 'quiet');
         ctx.events.publish('messages.loaded', { count: gesprekken.length, unread: Number(j.ongelezen) || 0 });
         var rit = gesprekken.find(function (x) { return /chauffeur|driver|kenteken|ophalen/i.test(String(x.laatste || '')); });
         if (rit) ctx.events.publish('messages.driver-details.detected', {

@@ -46,6 +46,17 @@
   function maakHier(rt) {
     var nav = rt.hier.querySelector('.rtg-edge-here-list');
     nav.textContent = '';
+    var command = d.getElementById('rtgCommand');
+    if (command && command.__rtgSecondScreen) {
+      var ruimte = d.createElement('button'); ruimte.type = 'button'; ruimte.className = 'rtg-edge-here-action';
+      ruimte.innerHTML = icoon('people') + '<span>Uw ruimte</span><em aria-hidden="true">›</em>';
+      ruimte.addEventListener('click', function () {
+        sluit(rt); var deur = rt.root.querySelector('.rtg-edge-menu'); if (deur) deur.focus();
+        command.__rtgSecondScreen.setState('panel');
+        setTimeout(function () { var x = command.querySelector('.rtg-ss-close'); if (x) x.focus(); }, 0);
+      });
+      nav.appendChild(ruimte);
+    }
     bronknoppen(rt.root).forEach(function (bron, i) {
       var knop = d.createElement('button');
       knop.type = 'button'; knop.className = 'rtg-edge-here-action';
@@ -102,4 +113,3 @@
     return '<a class="rtg-edge-smart-door" href="' + href + '"' + (attribuut || '') + '>' +
       icoon(icon) + '<span>' + naam + '</span><em aria-hidden="true">›</em></a>';
   }
-

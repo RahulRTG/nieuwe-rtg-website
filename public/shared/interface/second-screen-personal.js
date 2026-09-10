@@ -26,7 +26,7 @@
     shell.dataset.personalSurface = 'true';
 
     var intro = el('header', 'rtg-ss-personal-intro');
-    intro.appendChild(el('p', '', 'LIVINGOS · PERSOONLIJK'));
+    intro.appendChild(el('p', '', 'VIER WERELDEN · ÉÉN RUIMTE'));
     intro.appendChild(el('h2', '', 'Uw ruimte'));
     scroll.insertBefore(intro, modules);
 
@@ -37,7 +37,7 @@
     scroll.appendChild(acties);
 
     var quick = el('nav', 'rtg-ss-quick'); quick.setAttribute('aria-label', 'Snelle instellingen');
-    quick.appendChild(deur('a', 'Profiel', 'rtf-volw', '/apps/mijn-gegevens.html'));
+    quick.appendChild(deur('a', 'Profiel', 'rtf-volw', '/apps/ik.html#persoonlijk'));
     quick.appendChild(deur('a', 'Privacy', 'slot', '/apps/juridisch/privacy.html'));
     quick.appendChild(deur('a', 'Meldingen', 'meldingen', '/apps/comm.html'));
     var weergave = deur('button', 'Weergave', 'thema'); weergave.dataset.personalAction = 'appearance'; quick.appendChild(weergave);
@@ -68,6 +68,8 @@
   function scan() {
     var shell = d.querySelector('#rtgCommand .rtg-ss-shell'); bouw(shell);
     var root = shell && shell.closest('#rtgCommand');
+    var profiel = shell && shell.querySelector('.rtg-ss-profile-edit');
+    if (profiel) { profiel.href = '/apps/ik.html#persoonlijk'; profiel.textContent = 'Aanvullen'; }
     d.body.toggleAttribute('data-rtg-personal-surface', !!(root && root.dataset.rtgSecondScreen !== 'peek'));
   }
   var kijker = new MutationObserver(scan);

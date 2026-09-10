@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-10T15:24:38.525Z",
-  "commit": "c862a82d",
+  "op": "2026-09-10T15:53:22.361Z",
+  "commit": "fb5352f3",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/uitvoerproef-route.js",
@@ -9,7 +9,7 @@
   "begrenzing": "geen"
  },
  "uitleg": "Per route: met de JUISTE rol en plausibele invoer, en of het 2xx-antwoord gegevens van een ANDER account bevatte (kanaries) of een geheim veld. Een route die hier NIET in staat is niet beproefd. Een route met uitvoer:\"poort\" gaf nooit een 2xx en is ONGEMETEN, geen groen. Zie scripts/lib/uitvoerproef.js voor de grens en waarom de lekmerkers niet blind over een 2xx mogen.",
- "kanariekenmerk": "852424",
+ "kanariekenmerk": "575415",
  "gemeten": {
   "routesMetRol": 3821,
   "gemeten": 1112,
@@ -17,19 +17,22 @@
   "schoon": 1104,
   "gezakt": 0,
   "verklaard": 8,
+  "verklaardAfgetekend": 0,
+  "verklaardVoorgedragen": 8,
+  "voorgedragenRatel": 8,
   "achterEenPoort": 2709,
   "tokensHernieuwd": 7,
   "begrenzing": 0
  },
  "verklaringen": [
-  "POST /api/member/rtmail/imap/sleutel geheim veld (sleutel): mint een IMAP-wachtwoord voor de eigen mailbox en toont het EEN keer; het antwoord zegt dat er zelf bij",
-  "POST /api/office/anker geheim veld (hash): de ankerpunten van de auditketens: de hash IS het bewijsmiddel, niet het geheim",
-  "POST /api/office/anker/post geheim veld (hash): de broer van /api/office/anker: dezelfde ankerpunten, dezelfde grond -- de hash IS het bewijsmiddel",
-  "POST /api/office/handelingen geheim veld (hash): het handelingsspoor met zijn ketenhashes; zonder die hash valt de keten niet na te rekenen",
-  "POST /api/office/securitylog geheim veld (hash): het inlogauditlog met zijn ketenhashes; zelfde reden als het anker",
-  "POST /api/privacy/export geheim veld (hash): de AVG-uitvoer van het lid over zichzelf. De hashes zijn KETENhashes: het handelingsspoor bewaart de body niet en alleen een hash, en de ketenstand gaat mee zodat de betrokkene kan NAREKENEN of er aan zijn spoor is gesleuteld in plaats van ons te moeten geloven",
-  "POST /api/supplier/rtmail/imap/sleutel geheim veld (sleutel): idem, voor de mailbox van de zaak",
-  "POST /api/toestellen/koppel geheim veld (sleutel): mint een toestelsleutel (24 bytes CSPRNG) en toont hem EEN keer; de opslag houdt alleen de afdruk, dus dit is de enige plek waar hij bestaat -- zelfde patroon als de IMAP-sleutel hierboven"
+  "[voorgedragen] POST /api/member/rtmail/imap/sleutel geheim veld (sleutel): mint een IMAP-wachtwoord voor de eigen mailbox en toont het EEN keer; het antwoord zegt dat er zelf bij",
+  "[voorgedragen] POST /api/office/anker geheim veld (hash): de ankerpunten van de auditketens: de hash IS het bewijsmiddel, niet het geheim",
+  "[voorgedragen] POST /api/office/anker/post geheim veld (hash): de broer van /api/office/anker: dezelfde ankerpunten, dezelfde grond -- de hash IS het bewijsmiddel",
+  "[voorgedragen] POST /api/office/handelingen geheim veld (hash): het handelingsspoor met zijn ketenhashes; zonder die hash valt de keten niet na te rekenen",
+  "[voorgedragen] POST /api/office/securitylog geheim veld (hash): het inlogauditlog met zijn ketenhashes; zelfde reden als het anker",
+  "[voorgedragen] POST /api/privacy/export geheim veld (hash): de AVG-uitvoer van het lid over zichzelf. De hashes zijn KETENhashes: het handelingsspoor bewaart de body niet en alleen een hash, en de ketenstand gaat mee zodat de betrokkene kan NAREKENEN of er aan zijn spoor is gesleuteld in plaats van ons te moeten geloven",
+  "[voorgedragen] POST /api/supplier/rtmail/imap/sleutel geheim veld (sleutel): idem, voor de mailbox van de zaak -- dezelfde routefabriek, dus dezelfde grond",
+  "[voorgedragen] POST /api/toestellen/koppel geheim veld (sleutel): mint een toestelsleutel (24 bytes CSPRNG) en toont hem EEN keer; de opslag houdt alleen de afdruk, dus dit is de enige plek waar hij bestaat -- zelfde patroon als de IMAP-sleutel hierboven"
  ],
  "perRoute": [
   {
@@ -7500,7 +7503,8 @@
    "methode": "POST",
    "pad": "/api/member/rtmail/imap/sleutel",
    "rol": "member",
-   "uitvoer": "verklaard"
+   "uitvoer": "verklaard",
+   "grond": "voorgedragen"
   },
   {
    "methode": "POST",
@@ -8820,13 +8824,15 @@
    "methode": "POST",
    "pad": "/api/office/anker",
    "rol": "office",
-   "uitvoer": "verklaard"
+   "uitvoer": "verklaard",
+   "grond": "voorgedragen"
   },
   {
    "methode": "POST",
    "pad": "/api/office/anker/post",
    "rol": "office",
-   "uitvoer": "verklaard"
+   "uitvoer": "verklaard",
+   "grond": "voorgedragen"
   },
   {
    "methode": "POST",
@@ -9360,7 +9366,8 @@
    "methode": "POST",
    "pad": "/api/office/handelingen",
    "rol": "office",
-   "uitvoer": "verklaard"
+   "uitvoer": "verklaard",
+   "grond": "voorgedragen"
   },
   {
    "methode": "POST",
@@ -10494,7 +10501,8 @@
    "methode": "POST",
    "pad": "/api/office/securitylog",
    "rol": "office",
-   "uitvoer": "verklaard"
+   "uitvoer": "verklaard",
+   "grond": "voorgedragen"
   },
   {
    "methode": "POST",
@@ -12894,7 +12902,8 @@
    "methode": "POST",
    "pad": "/api/privacy/export",
    "rol": "member",
-   "uitvoer": "verklaard"
+   "uitvoer": "verklaard",
+   "grond": "voorgedragen"
   },
   {
    "methode": "POST",
@@ -20454,7 +20463,8 @@
    "methode": "POST",
    "pad": "/api/supplier/rtmail/imap/sleutel",
    "rol": "supplier",
-   "uitvoer": "verklaard"
+   "uitvoer": "verklaard",
+   "grond": "voorgedragen"
   },
   {
    "methode": "POST",
@@ -22014,7 +22024,8 @@
    "methode": "POST",
    "pad": "/api/toestellen/koppel",
    "rol": "member",
-   "uitvoer": "verklaard"
+   "uitvoer": "verklaard",
+   "grond": "voorgedragen"
   },
   {
    "methode": "POST",

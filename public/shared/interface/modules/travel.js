@@ -5,6 +5,7 @@
   var SDK = w.RTGModuleSDK; if (!SDK) return;
   function el(tag, cls, tekst) { var n = d.createElement(tag); if (cls) n.className = cls; if (tekst != null) n.textContent = tekst; return n; }
   function button(tekst, actie) { var b = el('button', 'rtg-module-primary', tekst); b.type = 'button'; b.dataset.rtgTravelAction = actie; return b; }
+  function leeg(o) { return w.RTGWorkspaceEmpty ? w.RTGWorkspaceEmpty(o) : el('p', 'rtg-ss-quiet', o.titel); }
   SDK.add(SDK.define({
     id: 'travel', name: 'Travel', version: '3.2.0', maturity: 'L4', runtime: { minVersion: '0.1.0' }, priority: 50,
     states: SDK.states, surfaces: { peek: true, panel: true, workspace: true, focus: true },
@@ -31,7 +32,9 @@
         card.appendChild(button('Toevoegen aan rit', 'attach-driver')); root.appendChild(card);
       }
       if (!dossier) root.appendChild(el('p', 'rtg-ss-quiet', bezig ? 'Reisdossier laden…' : 'Open de werklaag om uw reisdossier te laden.'));
-      else if (!dossier.reis) root.appendChild(el('p', 'rtg-ss-quiet', 'Er staat nog geen reis in uw dossier.'));
+      else if (!dossier.reis) root.appendChild(leeg({ ey: 'TravelOS', titel: 'Uw reisboek is nog leeg.',
+        wat: 'Vertel Rahul wat u voor ogen heeft; hij brengt de eerste keuzes bij elkaar.',
+        tekst: 'Plan een reis met Rahul', pad: '/apps/reizen.html#rahul' }));
       else {
         var r = dossier.reis, kaart = el('div', 'rtg-module-summary'); kaart.appendChild(el('strong', '', r.bestemming || 'Komende reis'));
         if (r.datums) kaart.appendChild(el('span', '', r.datums));

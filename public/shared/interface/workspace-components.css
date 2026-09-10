@@ -48,7 +48,9 @@
 .rtg-interface-second-screen .rtg-module-travel,
 .rtg-interface-second-screen .rtg-module-safety { display: grid; gap: 12px; }
 .rtg-interface-second-screen .rtg-module-summary { display: grid; gap: 3px; }
-.rtg-interface-second-screen .rtg-module-summary strong { color: var(--rtg-ss-text); font-size: .92rem; }
+.rtg-interface-second-screen .rtg-module-summary strong {
+  color: var(--rtg-ss-text); font: 500 1.08rem/1.16 "Bodoni Moda", Georgia, serif;
+}
 .rtg-interface-second-screen .rtg-module-summary span,
 .rtg-interface-second-screen .rtg-module-summary small { color: var(--rtg-ss-muted); line-height: 1.45; }
 .rtg-interface-second-screen .rtg-module-suggestion {
@@ -67,6 +69,22 @@
 }
 .rtg-interface-second-screen .rtg-module-primary:hover,
 .rtg-interface-second-screen .rtg-ss-compose:hover { filter: brightness(1.12); }
+.rtg-interface-second-screen .rtg-workspace-empty.rtg-leeg-vlak {
+  min-height: 108px; margin: 0; padding: 15px 56px 15px 0; border-top-color: var(--rtg-ss-line);
+  color: var(--rtg-ss-text); justify-content: center;
+}
+.rtg-interface-second-screen .rtg-workspace-empty .rtg-leeg-ey {
+  color: var(--rtg-ss-wine, var(--rtg-ss-gold)); font-size: 9px; font-weight: 750;
+}
+.rtg-interface-second-screen .rtg-workspace-empty b { font-size: 1.22rem; }
+.rtg-interface-second-screen .rtg-workspace-empty p { color: var(--rtg-ss-muted); font-size: .78rem; line-height: 1.5; }
+.rtg-interface-second-screen .rtg-workspace-empty .rtg-leeg-actie {
+  color: var(--rtg-ss-wine, var(--rtg-ss-gold)); font-size: .74rem;
+}
+.rtg-interface-second-screen .rtg-workspace-empty::after {
+  right: 4px; border-color: color-mix(in srgb, var(--rtg-ss-wine, var(--rtg-ss-gold)) 32%, transparent);
+  color: var(--rtg-ss-wine, var(--rtg-ss-gold));
+}
 .rtg-interface-second-screen .rtg-ss-editor-list { display: grid; gap: 6px; }
 .rtg-interface-second-screen .rtg-ss-density { display: grid; gap: 6px; grid-template-columns: 1fr 1fr; }
 .rtg-interface-second-screen .rtg-ss-density button[aria-pressed="true"] { border-color: var(--rtg-ss-gold); color: var(--rtg-ss-gold); }

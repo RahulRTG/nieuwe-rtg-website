@@ -1258,3 +1258,26 @@ test('RTG Second Screen groeit van Peek naar Focus zonder tweede navigatie',
     await page.close();
   });
 });
+
+test('Lege familiekaarten openen direct hun bestaande invullaag',
+  { skip: geenBrowser(pw) }, async () => {
+  await metLid(async ({ base, ctx }) => {
+    await ctx.route('**/api/comm/inbox', (r) => r.fulfill({ status: 200,
+      contentType: 'application/json', body: JSON.stringify({ gesprekken: [], laden: [], ongelezen: 0 }) }));
+
+    const berichten = await ctx.newPage();
+    await berichten.goto(base + '/apps/comm.html', { waitUntil: 'domcontentloaded' });
+    const leeg = berichten.locator('#gesprekken .rtg-leeg-vlak--actie');
+    await leeg.waitFor({ state: 'visible' });
+    assert.equal(await leeg.getAttribute('role'), 'button');
+    await leeg.click();
+    await berichten.locator('#bladWaas.open #blad').getByRole('heading', { name: 'Nieuw gesprek' }).waitFor();
+
+    const reizen = await ctx.newPage();
+    await reizen.goto(base + '/apps/reizen.html#rahul', { waitUntil: 'domcontentloaded' });
+    const rahulVraag = reizen.locator('[data-blad="rahul"]:not([hidden]) #rahulVraag');
+    await rahulVraag.waitFor({ state: 'visible' });
+    assert.equal(await rahulVraag.isEnabled(), true);
+    assert.equal(await reizen.locator('[data-tab="rahul"]').getAttribute('aria-current'), 'page');
+  });
+});

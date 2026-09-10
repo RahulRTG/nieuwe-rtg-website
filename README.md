@@ -751,6 +751,67 @@ pas-poort niet meer via registratie; `test/helper.js` heeft daarvoor
 `elevateTier()`, dat de geldige weg loopt (registreren als RTG → aanvraag →
 kantoor accepteert).
 
+### De keten op deze machine (`npm run ci:lokaal`)
+
+`npm test` en `npm run check` zijn wat een mens hier draait. De keten draait
+daarnaast nog vierentwintig poorten die in geen enkele lokale ronde stonden --
+de deltapoort, het verval, het wettenregister, de overleving, het gezag, de
+envelop, de norm, de normbasis, de ladder, de rolronde, de gluurronde, de
+container. Wie die niet draait, hoort er twintig minuten later van, op een
+machine waar hij niet bij kan.
+
+```bash
+npm run ci:lokaal          # de poorten die de keten bij een pull request draait
+npm run ci:lokaal:lijst    # alleen tonen: wat draait hier, wat niet, en waarom
+npm run ci:lokaal:snel     # zonder wat vorige ronde langer dan twee minuten deed
+npm run ci:lokaal -- --alle    # ook de wekelijkse ronde en de wachten
+npm run ci:lokaal -- --alleen=gezag,envelop
+```
+
+**Er staat geen lijst poorten in dit huis, en dat is het hele punt.**
+`scripts/ci-lokaal.js` LEEST `.github/workflows` (via `scripts/lib/werkstroom.js`)
+en draait wat daar staat. Een stap die morgen aan `ci.yml` wordt toegevoegd,
+staat morgen in de lokale ronde, zonder dat iemand iets bijwerkt. Een
+handgeschreven lijst zou dat ook doen -- tot de eerste keer dat iemand hem
+vergeet, en daarna bewaakt hij niets meer terwijl iedereen van wel denkt.
+`test/ci-lokaal.test.js` zet daarom een werkstroom neer die nergens genoemd
+wordt en eist dat hij vanzelf in het plan verschijnt.
+
+**Wat hier niet kan, heet NIET GEDRAAID en nooit groen.** De ronde speelt de
+keten niet na: geen vier scherven, geen postgres uit een service, geen artefact
+uit een andere job. Elke poort die overblijft draagt de reden waarom:
+
+| Reden | Wat het betekent |
+|---|---|
+| leest een artefact uit een andere job | de dekkingsvloer, het a11y-oordeel, de schermcensus: hun invoer bestaat pas na een hele keten-run |
+| de keten geeft een waarde mee | een matrix of een context (`${{ … }}`); lokaal is het HELE doel de vorm, dus `npm test` in plaats van scherf 3 van 4 |
+| krijgt een geheim mee | een stap op `secrets.*` -- die waarde staat hier niet en hoort hier niet te staan |
+| voorziening ontbreekt | geen postgres, geen redis, geen docker, geen Chromium, of een werkboom met werk in uitvoering -- met erbij hoe je hem aanzet |
+| geen lokale vorm | CodeQL en dependency-review zijn GitHub-producten; daar is hier niets van na te spelen, en dat staat er hardop bij |
+
+Dat laatste is met opzet zo streng. `scripts/pgtoetsen.js` slaat zichzelf zonder
+`DATABASE_URL` netjes over en meldt exitcode 0 -- draai je hem toch, dan staat er
+groen op het scherm voor acht toetsen die niet gedraaid hebben. Een poort die je
+overslaat en groen noemt, is erger dan een poort die je niet hebt.
+
+**Een deel van de poorten SCHRIJFT.** De ladder, de rolronde en de gluurronde
+leggen hun uitslag vast in een register in de wortel. In de keten is dat prima --
+die draait op een wegwerpcheckout -- maar hier blijft het staan, met de stempel
+van een werkboom waar nog werk in ligt. De eerste ronde hier zette daarmee
+`registersUitVuileBoom` van 2 op 5 en liet `npm run norm` zakken op zijn eigen
+bijwerking. De ronde ruimt niets op (soms wil je die uitslag juist bewaren) maar
+zegt aan het eind welke bestanden zij veranderd heeft; bewaren of terugzetten is
+een keuze van een mens.
+
+**Twee wachters houden de twee kanten bij elkaar.** `npm run ci-keten` (regel 5)
+zakt op een opdracht in de werkstromen die de afleiding niet kan lezen of die
+naar een script wijst dat niet bestaat -- want zo'n poort verdwijnt stil uit de
+lokale ronde terwijl hij in de keten gewoon meetelt. En `npm run ci:lokaal:controle`
+zakt zodra de Slotsuite deze ronde niet meer aanroept: zonder die stap is dit een
+script dat je met de hand moet starten, en dan is het net zo vergeetbaar als de
+lijst die het vervangt. De Slotsuite draait de keten als eigen laag
+(`DE KETEN`), en slaat over wat haar andere lagen al doen.
+
 ### De Postgres-toetsen (`npm run test:pg`)
 
 Zeven toetsen bewijzen de meerdere-instances-kant: de gedeelde store, de

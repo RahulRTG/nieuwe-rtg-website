@@ -25,7 +25,7 @@
     "kernGedeeld": 231,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 672,
+    "toetsenNietGemeten": 673,
     "toetsenOngevoeligPct": 0,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -1886,6 +1886,16 @@
       "vervalt": "2026-12-01",
       "meter": "kernBreedte 1558 -> 1559",
       "reden": "Een naam erbij in de ctx van het kantoor: `tweedeHand`. Er is EEN exemplaar voor het hele kantoor, want twee zouden elkaars openstaande aanvragen niet zien -- en dan tekent de tweede persoon iets af dat de eerste niet ziet staan.\n\nDE STAP IS VERZET VAN 1557->1558 NAAR 1558->1559 BIJ DE SAMENVOEGING MET MAIN (9 september 2026), en dat is geen extra naam maar een andere basis: main bracht in dezelfde week zijn eigen +1 mee (`woningOnderhoud`, de notitie van 8 september hierboven) en die twee stapelen. Elke tak bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier benoemd in plaats van stil verrekend. Nageteld en niet geschat: er staat precies EEN naam van deze tak in, en de meting leest 1559.\n\nDe schuld vervalt op 2026-12-01: dan hoort er een repository-laag onder te liggen (server/db/) waar deze en de andere 524 doorheen gaan, of hoort deze regel te zijn ingetrokken omdat de laag is verplaatst."
+    },
+    {
+      "datum": "2026-09-10",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 672,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 672 -> 673",
+      "reden": "test/adressen.test.js komt erbij als handhaver van de adresratel: vijf documenten wezen naar kern/command/risico.js en dat bestand heeft nooit bestaan. De mutatiemotor muteert bron in server/, en deze toets meet of documentadressen naar een bestaand bestand wijzen -- de motor is er nog niet langs geweest. Dat een bronmutatie hier niets over zou zeggen is aannemelijk maar NIET gemeten, en GEEN_BRONMUTATIE eist pogingen: een reden zonder poging is een vermoeden. Dit is dus instrumentdekking en geen groenverklaring.",
+      "waarheen": "laat de mutatiemotor over test/adressen.test.js lopen in dezelfde ronde als de 27 toetsen van 2026-09-08 (zelfde sleutel, zelfde vervaldatum); levert dat pogingen zonder uitslag op, dan hoort de toets in GEEN_BRONMUTATIE met het aantal pogingen erbij, en anders gewoon gemeten"
     }
   ],
   "prestatie": {

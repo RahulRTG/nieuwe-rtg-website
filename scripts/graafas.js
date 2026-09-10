@@ -71,7 +71,7 @@ const REGISTER = [
   { id: 'commandgraaf', bestand: 'server/kern/command/graaf.js', maker: null, eenheid: 'knoop',
     as: null,
     waaromGeenEenheid: 'De kennisgraaf bouwt zijn knopen inline uit het soortenregister; er is geen functie die EEN knoop maakt.',
-    waarom: 'De kennisgraaf beantwoordt "wat hangt waaraan vast" en niet "wat heeft haast"; dringendheid komt daar uit kern/command/risico.js.' },
+    waarom: 'De kennisgraaf beantwoordt "wat hangt waaraan vast" en niet "wat heeft haast"; dringendheid komt daar uit kern/frictie/motor.js.' },
   { id: 'commercegraaf', bestand: 'server/kern/commerce/graaf.js', maker: null, eenheid: 'koopbaar',
     as: null,
     waaromGeenEenheid: 'De commerce-graaf levert een lijst koopbaren uit andermans vormen; hij maakt zelf geen eenheid.',

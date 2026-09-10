@@ -3331,7 +3331,13 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
        Allebei gemeten in FAALPROEF.json als `schrijf-verloren` -> 200. */
     ['server/kern/afdelingen/integratiekamer.js', 'de noodstop: wie elke koppeling uitzet en `noodstop: true` leest, hoort dat na een herstart terug te vinden'],
     ['server/kern/command/lagen.js', 'bedraadt de duurzame helper voor de uitrolpauze; kiest zelf niets'],
-    ['server/kern/command/uitrolregie.js', 'de uitrolpauze: een uitrol die als `stil` is bevestigd, mag niet doorlopen na een herstart']
+    ['server/kern/command/uitrolregie.js', 'de uitrolpauze: een uitrol die als `stil` is bevestigd, mag niet doorlopen na een herstart'],
+    /* HET VIERDE, en op dezelfde grond gemeten: /api/office/aidata/export droeg
+       in zijn kop "Elke export komt in het auditlog" en leverde onder
+       `schrijf-verloren` 287 bytes met 200, terwijl er na de herstart geen
+       sleutel kantoorAudit meer was -- nul regels. Een logboek dat zegt wie
+       welke knop omzette, is geen afgeleide toestand. */
+    ['server/kern/afdelingen/bewaking/index.js', 'het auditspoor: een handeling die is bevestigd, moet achteraf te herleiden zijn -- ook na een opslagstoring']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze

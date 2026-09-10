@@ -49,6 +49,8 @@ test('lege informatie is één familie en opent meteen de juiste invullaag', () 
   assert.match(LEEG, /rtg-leeg-vlak--actie/);
   assert.match(LEEG, /data-rtg-leeg-doel/);
   assert.match(UI, /\.rtg-leeg-vlak--actie::after/);
+  assert.match(UI, /\.rtg-leeg-vlak--actie \.rtg-leeg-actie\{[\s\S]*?color:inherit/,
+    'de invulhandeling moet de leesbare inkt van haar vlak erven');
   assert.match(EMPTY, /RTGLeeg\.vlak/);
   assert.match(MODULES, /\/apps\/comm\.html#nieuw/);
   assert.match(TRAVEL, /\/apps\/reizen\.html#rahul/);
@@ -60,8 +62,7 @@ test('lege informatie is één familie en opent meteen de juiste invullaag', () 
      mutatie, en de kijker voedt zichzelf. De pagina bereikt `load` dan nooit --
      dat kostte de schermtoetsen een page.goto-timeout. Let op de `getAttribute`:
      `profiel.href` geeft een ABSOLUTE url terug, dus vergelijken met het
-     property zou altijd verschillen en de lus laten staan.
-     Overgenomen uit 5e70c75c op origin/feature/rtg-family-empty-actions. */
+     property zou altijd verschillen en de lus laten staan. */
   assert.match(JS, /profiel\.getAttribute\('href'\) !== '\/apps\/ik\.html#persoonlijk'[\s\S]*profiel\.textContent !== 'Aanvullen'/,
     'de mutatiekijker mag zijn eigen profieltekst niet eindeloos opnieuw schrijven');
 });

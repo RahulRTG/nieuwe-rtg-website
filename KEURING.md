@@ -543,7 +543,7 @@ allebei een dag kosten in plaats van een kwartaal:
 2. **Een bewijsronde laat een gestempeld spoor achter.** Vandaag levert een
    groene lokale ronde niets op wat bij een commit hoort: `.cilokaal` is een
    duurmeting van één machine en draagt met opzet geen gezag. Het mechanisme
-   bestaat (`lib/stempel.js`), de plek bestaat (`BEWIJSLADDER.json`,
+   bestaat (`scripts/lib/stempel.js`), de plek bestaat (`BEWIJSLADDER.json`,
    `ATTRIBUTIE.json`), en de keten kan dan onafhankelijk nagaan of het lokale
    bewijs bij exact dezelfde bronboom hoort — `scripts/release-bewijs.js` doet
    dat al voor een release, met een hashmanifest over de hele bronboom en een

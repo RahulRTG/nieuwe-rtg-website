@@ -1,9 +1,4 @@
-/* DE EERSTE RTG LIVING MODULES.
-
-   Alle definities lopen door Module SDK. De Workspace Runtime tekent de kaart,
-   titel, state en aanpasbediening; hier staat alleen domeininhoud. Travel,
-   Veiligheid, Contacten en Dashboard beginnen eerlijk via de legacy-adapter en
-   kunnen later onder hetzelfde id native worden zonder iemands ruimte te breken. */
+/* De eerste RTG Living Modules; vorm en bediening komen uit de Workspace-laag. */
 (function (w, d) {
   'use strict';
   var SDK = w.RTGModuleSDK, legacy = w.RTGWorkspaceLegacy;
@@ -14,6 +9,9 @@
     if (tekst != null) n.textContent = tekst; return n;
   }
   function button(tekst, cls) { var b = el('button', cls, tekst); b.type = 'button'; return b; }
+  function leeg(o) {
+    return w.RTGWorkspaceEmpty ? w.RTGWorkspaceEmpty(o) : el('p', 'rtg-ss-quiet', o.titel);
+  }
   function initialen(u) {
     var t = u.full || u.name || u.codename || u.email || '';
     return t.split(/\s+/).filter(Boolean).slice(0, 2).map(function (x) { return x.charAt(0); }).join('').toUpperCase() || 'RTG';
@@ -38,7 +36,8 @@
         tekst.appendChild(el('strong', '', u.full || u.name || u.codename || 'RTG-lid'));
         var sub = [u.codename, u.tier].filter(Boolean).join(' · '); if (sub) tekst.appendChild(el('span', '', sub));
         if (u.emailVerified === true) tekst.appendChild(el('span', 'rtg-ss-ok', 'Profiel geverifieerd'));
-        root.appendChild(tekst); geladen = true; ctx.setStatus('live', 'ok');
+        root.appendChild(tekst); var wijzig = el('a', 'rtg-ss-profile-edit', 'Wijzig');
+        wijzig.href = '/apps/mijn-gegevens.html'; root.appendChild(wijzig); geladen = true; ctx.setStatus('live', 'ok');
         ctx.events.publish('profile.loaded', { verified: u.emailVerified === true, tier: u.tier || null });
       }).catch(function (e) {
         if (!root || e.name === 'AbortError') return; root.textContent = '';
@@ -66,8 +65,8 @@
         if (!x || !(x.label || x.naam)) return;
         var b = button(x.label || x.naam, 'rtg-ss-context-action'); b.dataset.ssContextId = x.id; root.appendChild(b);
       });
-      if (!root.childNodes.length) root.appendChild(el('p', 'rtg-ss-quiet', 'Geen actuele context.'));
-      ctx.setStatus(items.length ? 'actueel' : 'rustig', items.length ? 'ok' : 'quiet');
+      if (!root.childNodes.length) root.appendChild(el('p', 'rtg-ss-quiet', 'Geen actie nodig. Rahul houdt de rest in de gaten.'));
+      ctx.setStatus(items.length ? 'actueel' : 'Alles rustig', items.length ? 'ok' : 'quiet');
       ctx.events.publish('context.updated', { title: laatste.titel || null, source: laatste.bron || null,
         actions: (laatste.acties || []).slice(0, 12) });
     }
@@ -100,7 +99,8 @@
       if (!root) return; root.textContent = '';
       if (!geladen) { root.appendChild(el('p', 'rtg-ss-quiet', bezig ? 'Berichten laden…' : 'Open de werklaag om berichten te laden.')); return; }
       var max = state === 'panel' ? 3 : 6, lijst = gesprekken.slice(0, max);
-      if (!lijst.length) root.appendChild(el('p', 'rtg-ss-quiet', 'Nog geen gesprekken.'));
+      if (!lijst.length) root.appendChild(leeg({ ey: 'Berichten', titel: 'Nog geen gesprekken.',
+        wat: 'Begin een gesprek; daarna blijft het hier dichtbij.', tekst: 'Begin een gesprek', pad: '/apps/comm.html#nieuw' }));
       lijst.forEach(function (x) {
         var b = button('', 'rtg-ss-message'); b.dataset.ssUrl = x.link || '/apps/comm.html';
         b.appendChild(el('strong', '', x.titel || 'Gesprek'));
@@ -115,7 +115,7 @@
       if (geladen || bezig) return; bezig = true; teken(); ctx.setStatus('laden', 'busy');
       ctx.request('/api/comm/inbox', {}, { signal: stop && stop.signal }).then(function (j) {
         gesprekken = Array.isArray(j.gesprekken) ? j.gesprekken : []; geladen = true;
-        ctx.setStatus(gesprekken.length ? 'live' : 'leeg', gesprekken.length ? 'ok' : 'quiet');
+        ctx.setStatus(Number(j.ongelezen) ? Number(j.ongelezen) + ' nieuw' : gesprekken.length ? 'bij' : 'leeg', gesprekken.length ? 'ok' : 'quiet');
         ctx.events.publish('messages.loaded', { count: gesprekken.length, unread: Number(j.ongelezen) || 0 });
         var rit = gesprekken.find(function (x) { return /chauffeur|driver|kenteken|ophalen/i.test(String(x.laatste || '')); });
         if (rit) ctx.events.publish('messages.driver-details.detected', {

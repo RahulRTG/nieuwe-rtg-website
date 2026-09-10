@@ -483,3 +483,16 @@ async function poortstand() {
   assert.ok(r.poort, 'het overzicht draagt geen poort-stand');
   return r.poort;
 }
+
+
+test('ontsluiting weigert ontbrekende en ongeldige doelstanden zonder de beveiliging te veranderen', async () => {
+  const lid = await nieuwLid();
+  for (const naar of [undefined, null, {}, [], false, 42, 'onbekend', 'constructor', '__proto__']) {
+    const r = await api('/api/isolatie/mijn/ontsluiting',
+      { drager: 'identiteit', naar, reden: 'Een ongeldige doelstand testen' }, lid);
+    assert.equal(r.status, 400, JSON.stringify({ naar, antwoord: r.body }));
+    assert.match(r.body.error, /doelstand/);
+  }
+  const na = await api('/api/isolatie/mijn', {}, lid);
+  assert.equal(na.body.mijn.identiteit, 'normaal');
+});

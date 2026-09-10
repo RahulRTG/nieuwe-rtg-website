@@ -30,7 +30,11 @@
    erbij zit, telt alleen een ronde mee waarin er ECHT druk stond, en stopt hij
    met de mededeling zodra hij zijn eigen client meet in plaats van de server.
 
-   Deterministisch (seeded), zonder externe database (sqlite), draait overal.
+   Deterministisch (seeded). Zonder DATABASE_URL draait hij op sqlite en dus
+   overal; met DATABASE_URL draait hij tegen die Postgres. De kop noemt de
+   ondergrond die hij ECHT gebruikt -- hij stond er jarenlang hard als
+   "(sqlite, seeded)", ook tijdens een 100M-Postgres-ronde, en een harnas dat
+   zijn eigen opslag verkeerd benoemt maakt zijn eigen log onbruikbaar.
    Draai: node scripts/tot-crash.js   (env: TOTCRASH_RONDES, TOTCRASH_RONDE_MS,
    TOTCRASH_WERKERS, TOTCRASH_MAX_WERKERS, TOTCRASH_SEED, TOTCRASH_PORT). */
 'use strict';
@@ -47,6 +51,12 @@ const RONDE_MS = Number(process.env.TOTCRASH_RONDE_MS || 9000);
 const BASIS = Number(process.env.TOTCRASH_WERKERS || 8);
 const MAX_WERKERS = Number(process.env.TOTCRASH_MAX_WERKERS || 1500);
 const SRVLOG = path.join(TMP, 'server.log');
+/* De ondergrond wordt NIET geraden maar afgeleid uit dezelfde schakelaar die
+   de server gebruikt, precies zoals scripts/beproeving.js dat doet. */
+const DB = process.env.DATABASE_URL || process.env.PG_URL || '';
+const MODUS = DB ? 'postgres' : 'sqlite';
+/* Zonder wachtwoord: dit gaat naar een log dat mensen delen. */
+const DBNAAM = DB ? (String(DB).split('/').pop() || '').split('?')[0] : null;
 const GC_OUT = path.join(TMP, 'gc.json');
 
 let RNG = (Number(process.env.TOTCRASH_SEED) || 987654321) >>> 0;
@@ -236,8 +246,9 @@ async function leeft() { for (let i = 0; i < 6; i++) { const r = await verzoek('
 if (require.main !== module) { module.exports = {}; return; }
 
 (async () => {
-  kop('TOT CRASH -- escalerende bug-jager (sqlite, seeded)');
+  kop('TOT CRASH -- escalerende bug-jager (' + MODUS + ', seeded)');
   rij('rondes', RONDES + ' x ' + (RONDE_MS / 1000) + ' s'); rij('start-werkers', BASIS + ' (verdubbelt per ronde, cap ' + nl(MAX_WERKERS) + ')');
+  rij('ondergrond', MODUS + (DBNAAM ? ' (' + DBNAAM + ')' : ' (geen DATABASE_URL)'));
   await boot();
   const routes = alleRoutes();
   const T = await tokens();

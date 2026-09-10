@@ -52,7 +52,11 @@
   .res button{width:100%;display:flex;align-items:center;gap:0.7rem;background:transparent;border:0;
     border-bottom:1px solid var(--line);color:var(--txt);font:inherit;text-align:left;padding:0.7rem 0.9rem;cursor:pointer;}
   .res button:last-child{border-bottom:0;}
-  .res button:hover{background:rgba(255,255,255,0.04);}
+  .res button:hover,.res button[aria-selected="true"]{background:rgba(255,255,255,0.04);}
+  .res button[aria-selected="true"]{outline:1px solid var(--gold);outline-offset:-1px;}
+  /* Een leeg antwoord is een antwoord: het staat in de lijst zelf, want een
+     toast is weg voordat iemand hem heeft gelezen. */
+  .res .leeg{padding:0.75rem 0.9rem;color:var(--soft);font-size:0.82rem;line-height:1.5;}
   .res .pun{width:0.6rem;height:0.6rem;border-radius:50%;flex:none;}
   .res .nm{flex:1;}
   .res .nm small{display:block;color:var(--soft);font-size:0.72rem;margin-top:0.1rem;}
@@ -95,6 +99,15 @@
   .meldknop{width:100%;margin-top:0.7rem;background:var(--card2);border:1px solid var(--line);border-radius:0;
     color:var(--txt);font:inherit;padding:0.7rem;cursor:pointer;}
   .meldknop:hover{border-color:var(--rood);}
+  /* De keuze stond in window.prompt("Typ 1-4"). Dat is geen scherm van dit huis,
+     het blokkeert de hele pagina en in een geinstalleerde PWA komt het er soms
+     helemaal niet -- terwijl dit juist de knop is die iemand onderweg indrukt. */
+  .meldkeuze{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem;}
+  .meldkeuze[hidden]{display:none;}
+  .meldkeuze button{flex:1 1 8rem;min-height:44px;background:var(--card2);border:1px solid var(--line);
+    border-radius:0;color:var(--txt);font:inherit;font-size:0.82rem;padding:0.5rem 0.7rem;cursor:pointer;}
+  .meldkeuze button:hover{border-color:var(--rood);}
+  .meldkeuze button.af{color:var(--soft);}
   .hintbron{color:var(--soft);font-size:0.72rem;margin-top:0.55rem;line-height:1.5;}
   /* de melding-toast en de inlogpoort */
   .toast{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 6.4rem);transform:translateX(-50%);z-index:8;
@@ -135,7 +148,8 @@
   <div class="zoekwrap">
     <div class="zoek">
       <span class="i" aria-hidden="true">Naar</span>
-      <input id="zoek" type="search" placeholder="Waar wilt u heen?" autocomplete="off" aria-label="Zoek een bestemming">
+      <input id="zoek" type="search" placeholder="Waar wilt u heen?" autocomplete="off" aria-label="Zoek een bestemming"
+             role="combobox" aria-expanded="false" aria-controls="res" aria-autocomplete="list" aria-haspopup="listbox">
       <button class="voice" id="voice" type="button" aria-label="Bestemming inspreken" aria-pressed="false">◉</button>
     </div>
     <div class="res" id="res" role="listbox" aria-label="Zoekresultaten"></div>
@@ -197,7 +211,14 @@
       <ol class="stappen" id="stappen"></ol>
     </details>
     <div class="langsrij" id="langs"></div>
-    <button class="meldknop" type="button" id="meldknop">&#128680; Meld een wegprobleem op deze plek</button>
+    <button class="meldknop" type="button" id="meldknop" aria-expanded="false" aria-controls="meldkeuze">&#128680; Meld een wegprobleem op deze plek</button>
+    <div class="meldkeuze" id="meldkeuze" role="group" aria-label="Wat is er op deze plek?" hidden>
+      <button type="button" data-soort="file">File</button>
+      <button type="button" data-soort="ongeval">Ongeval</button>
+      <button type="button" data-soort="object">Object op de weg</button>
+      <button type="button" data-soort="wegwerk">Wegwerkzaamheden</button>
+      <button type="button" class="af" data-soort="">Niet melden</button>
+    </div>
     <p class="hintbron" id="bron"></p>
   </section>
 
@@ -447,43 +468,131 @@
   }
 
   /* ---- camerabediening (sleep + zoom + knijp) ---- */
+  /* ZOOMEN OP EEN TELEFOON BESTOND NIET. `pinchD` stond hier als losse variabele
+     en werd nergens gebruikt: de enige zoomweg was het muiswiel. Het doek draagt
+     `touch-action:none`, dus de browser zoomt ook niet zelf -- op precies het
+     toestel waarvoor een navigatie-app bedoeld is, kon je de kaart niet dichterbij
+     halen. Twee vingers worden nu geteld en gemeten; met twee vingers erop wordt
+     er niet gedraaid, want dan schiet de camera weg tijdens het knijpen. */
   let slepen = false, lastX = 0, lastY = 0, pinchD = 0;
-  canvas.addEventListener('pointerdown', e => { slepen = true; lastX = e.clientX; lastY = e.clientY; draaien = 0; canvas.setPointerCapture(e.pointerId); });
+  const vingers = new Map();
+  const zoomNaar = v => { cam.afstand = Math.max(60, Math.min(6000, v)); };
+  function knijpAfstand() {
+    const [a, b] = [...vingers.values()];
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  }
+  canvas.addEventListener('pointerdown', e => {
+    vingers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    draaien = 0; canvas.setPointerCapture(e.pointerId);
+    if (vingers.size === 2) { slepen = false; pinchD = knijpAfstand(); return; }
+    slepen = true; lastX = e.clientX; lastY = e.clientY;
+  });
   canvas.addEventListener('pointermove', e => {
+    if (!vingers.has(e.pointerId)) return;
+    vingers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (vingers.size === 2) {
+      const nu = knijpAfstand();
+      if (pinchD > 0 && nu > 0) zoomNaar(cam.afstand * (pinchD / nu));
+      pinchD = nu;
+      return;
+    }
     if (!slepen) return;
     cam.azimut -= (e.clientX - lastX) * 0.006;
     cam.hoek = Math.max(0.25, Math.min(1.45, cam.hoek + (e.clientY - lastY) * 0.005));
     lastX = e.clientX; lastY = e.clientY;
   });
-  const stop = () => { slepen = false; };
+  const stop = e => {
+    vingers.delete(e.pointerId);
+    if (vingers.size < 2) pinchD = 0;
+    /* Een vinger die overblijft na een knijp is een nieuw sleeppunt, geen
+       sprong: zonder dit klapt de camera weg zodra je een vinger optilt. */
+    if (vingers.size === 1) { const [v] = [...vingers.values()]; slepen = true; lastX = v.x; lastY = v.y; }
+    else if (!vingers.size) slepen = false;
+  };
   canvas.addEventListener('pointerup', stop); canvas.addEventListener('pointercancel', stop);
-  canvas.addEventListener('wheel', e => { e.preventDefault(); cam.afstand = Math.max(60, Math.min(6000, cam.afstand * (1 + Math.sign(e.deltaY) * 0.08))); }, { passive: false });
+  canvas.addEventListener('wheel', e => { e.preventDefault(); zoomNaar(cam.afstand * (1 + Math.sign(e.deltaY) * 0.08)); }, { passive: false });
 
   /* ================= UI: zoeken, route, lagen ================= */
-  let zoekT, zoekVraag = 0;
+  let zoekT, zoekVraag = 0, keuzes = [], keuze = -1;
   $('#zoek').addEventListener('input', e => {
     clearTimeout(zoekT);
     const q = e.target.value.trim();
     zoekT = setTimeout(() => zoekBestemmingen(q), 220);
   });
+  /* De lijst hoort ook bij het TOETSENBORD. Hij stond als `role="listbox"` in
+     het scherm met gewone knoppen erin -- een rol die een schermlezer opties
+     belooft die er niet zijn -- en Enter in het zoekveld deed niets. Wie geen
+     muis of vinger gebruikt, kwam er dus nooit bij zijn bestemming. */
+  $('#zoek').addEventListener('keydown', e => {
+    if (e.key === 'Escape') { sluitLijst(); return; }
+    if (!keuzes.length) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      keuze = e.key === 'ArrowDown' ? (keuze + 1) % keuzes.length : (keuze <= 0 ? keuzes.length : keuze) - 1;
+      merkKeuze();
+    } else if (e.key === 'Enter') {
+      e.preventDefault(); pak(keuzes[keuze < 0 ? 0 : keuze]);
+    }
+  });
+  function merkKeuze() {
+    const knoppen = $('#res').querySelectorAll('button');
+    knoppen.forEach((b, i) => b.setAttribute('aria-selected', i === keuze));
+    const aan = knoppen[keuze];
+    $('#zoek').setAttribute('aria-activedescendant', aan ? aan.id : '');
+    if (aan) aan.scrollIntoView({ block: 'nearest' });
+  }
+  function sluitLijst() {
+    $('#res').classList.remove('zien'); $('#zoek').setAttribute('aria-expanded', 'false');
+    $('#zoek').setAttribute('aria-activedescendant', ''); keuzes = []; keuze = -1;
+  }
+  /* Een leeg of geweigerd antwoord kwam hier nooit aan bij de gebruiker: bij nul
+     treffers ging de lijst stil dicht, en een 503 van de motor (Nederland zonder
+     ingeladen wegennet) werd helemaal weggegooid -- een lid typte zijn straat en
+     er gebeurde letterlijk niets. Wat de motor zegt, zegt het scherm nu door;
+     dekking.js is daarvan de enige bron. */
+  function meldInLijst(tekst) {
+    const res = $('#res'); res.innerHTML = '';
+    const p = document.createElement('p'); p.className = 'leeg'; p.textContent = tekst;
+    res.appendChild(p); res.classList.add('zien');
+    /* Een mededeling is geen keuze. Een lijst met opties die er geen heeft, en
+       daarin een stuk lopende tekst, is voor een schermlezer een lege listbox --
+       de melding zelf wordt dan niet voorgelezen. Zolang er iets te MELDEN valt
+       is dit vak dus een status en geen lijst, en staat de combobox dicht. */
+    res.setAttribute('role', 'status');
+    $('#zoek').setAttribute('aria-expanded', 'false'); $('#zoek').setAttribute('aria-activedescendant', '');
+    keuzes = []; keuze = -1;
+  }
+  /* ZOEKEN KAN ZONDER PLEK, EN MOET DAT OOK. Hier stond `lat: hier.lat`, en
+     `hier` is null tot de eerste fix binnen is. Wie in de eerste seconden tikte
+     -- of terwijl de locatievraag nog openstond -- kreeg per toetsaanslag een
+     `Cannot read properties of null`: geen resultaten, geen melding, en het
+     zoeken bleef stuk. De server accepteert een zoekvraag zonder plek prima en
+     laat dan alleen de afstanden weg. Dus sturen we wat we weten, en niets meer. */
   async function zoekBestemmingen(q) {
     const vraag = ++zoekVraag;
-    const r = await api('bestemmingen', { q, lat: hier.lat, lng: hier.lng });
-    if (r.status !== 200 || vraag !== zoekVraag) return;
-    const res = $('#res'); res.innerHTML = '';
+    const r = await api('bestemmingen', hier ? { q, lat: hier.lat, lng: hier.lng } : { q });
+    if (vraag !== zoekVraag) return;
+    if (r.status !== 200) return meldInLijst(r.body.error || 'Zoeken lukt hier nu niet.');
     const rij = (r.body.bestemmingen || []).slice(0, 18);
-    if (!rij.length) { res.classList.remove('zien'); return; }
-    for (const p of rij) {
+    if (!rij.length) return meldInLijst(q ? 'Niets gevonden voor \u201c' + q + '\u201d.' : 'Nog geen bestemmingen in beeld.');
+    const res = $('#res'); res.innerHTML = ''; res.setAttribute('role', 'listbox');
+    keuzes = rij.slice(); keuze = -1;
+    rij.forEach((p, i) => {
       const b = document.createElement('button'); b.type = 'button';
+      b.id = 'res-' + i; b.setAttribute('role', 'option'); b.setAttribute('aria-selected', 'false');
       const kl = (LAAG[p.laag] || LAAG.leverancier);
       const af = p.afstandM != null ? (p.afstandM < 1000 ? p.afstandM + ' m' : (p.afstandM / 1000).toFixed(1).replace('.', ',') + ' km') : '';
       b.innerHTML = '<span class="pun" style="background:' + kl.css + '"></span><span class="nm"></span><span class="af">' + af + '</span>';
       const nm = b.querySelector('.nm'); nm.appendChild(document.createTextNode(p.naam));
       const sm = document.createElement('small'); sm.textContent = kl.naam + (p.extra ? ' · ' + p.extra : ''); nm.appendChild(sm);
-      b.addEventListener('click', () => { res.classList.remove('zien'); $('#zoek').value = p.naam; kiesBestemming(p); });
+      b.addEventListener('click', () => pak(p));
       res.appendChild(b);
-    }
-    res.classList.add('zien');
+    });
+    res.classList.add('zien'); $('#zoek').setAttribute('aria-expanded', 'true');
+  }
+  function pak(p) {
+    if (!p) return;
+    sluitLijst(); $('#zoek').value = p.naam; kiesBestemming(p);
   }
   async function kiesBestemming(p) {
     naar = { lat: p.lat, lng: p.lng, naam: p.naam };
@@ -491,6 +600,11 @@
   }
   async function berekenRoute() {
     if (!naar) return;
+    /* ZONDER VERTREKPUNT GEEN ROUTE, EN DAT ZEGT HET SCHERM ZELF. Anders ging
+       hier `van: null` naar de server en kreeg een lid "Geef een geldig vertrek-
+       en aankomstpunt" terug op een veld dat hij nooit heeft gezien. De uitweg
+       staat al in de poort: kies zelf waar u vertrekt. */
+    if (!hier) { zeg('Ik weet nog niet waar u bent. Kies eerst uw vertrekpunt.'); vraagVertrekpunt(); return; }
     const r = await api('route', { van: hier, naar, modus, profiel });
     if (r.status !== 200) { zeg(r.body.error || 'Geen route gevonden.'); return; }
     route = r.body;
@@ -579,8 +693,17 @@
     zeg(navigerend ? 'RTG volgt de route en herberekent bij nieuwe signalen.' : 'Begeleiding gepauzeerd.');
   });
 
+  /* DE STATUS WORDT OOK OPGEHAALD ALS DE KAART FAALT -- juist dan.
+
+     Dit stond alleen in de geslaagde tak van initialiseerKaart(). Gevolg: in
+     Nederland zonder ingeladen wegennet gaf `kaart` 503, ging het scherm regel-
+     recht naar de poort, en bleef de badge staan op wat er in de HTML stond:
+     "Motor actief". Gemeten in een browser op 52.37/4.89 -- precies het defect
+     dat kern/navigatie/dekking.js heeft opgelost, nog steeds zichtbaar omdat
+     niemand het antwoord ophaalde. Een badge die niet is bijgewerkt is geen
+     lege badge; hij liegt. */
   async function haalStatus() {
-    const r = await api('status', { lat: hier.lat, lng: hier.lng, land });
+    const r = await api('status', hier ? { lat: hier.lat, lng: hier.lng, land } : {});
     if (r.status !== 200) return;
     $('#sourceNetwork').textContent = r.body.live ? r.body.live.netwerk : '0';
     $('#sourcePartners').textContent = r.body.live ? r.body.live.partners : '0';
@@ -622,6 +745,14 @@
     $('#manualStart').hidden = true; $('#manualPanel').hidden = false; $('#startZoek').focus();
     zoekVertrek('');
   });
+  /* Dezelfde uitweg, maar dan aangeroepen vanuit het scherm zelf: kiest iemand
+     een bestemming terwijl zijn plek onbekend is, dan hoort hij hier te landen
+     en niet bij een serverfout over een veld dat hij nooit heeft gezien. */
+  function vraagVertrekpunt() {
+    if (!$('#poortReden').textContent.trim()) $('#poortReden').textContent = 'RTG weet nog niet waar u bent. Kies zelf uw vertrekpunt; RTG verzint nooit waar u staat.';
+    $('#poort').classList.add('zien');
+    if ($('#manualPanel').hidden) $('#manualStart').hidden = false;
+  }
   let startT, startVraag = 0;
   $('#startZoek').addEventListener('input', e => {
     clearTimeout(startT); startT = setTimeout(() => zoekVertrek(e.target.value.trim()), 180);
@@ -637,7 +768,8 @@
       const soort = document.createElement('span'); soort.textContent = (LAAG[p.laag] || LAAG.leverancier).naam + (p.extra ? ' · ' + p.extra : '');
       b.append(nm, soort);
       b.addEventListener('click', async () => {
-        hier = { lat: p.lat, lng: p.lng }; land = landVan(hier); $('#poort').classList.remove('zien');
+        hier = { lat: p.lat, lng: p.lng }; land = landVan(hier); wachtNogOpPlek = false;
+        $('#poort').classList.remove('zien');
         await initialiseerKaart(); zeg('Vertrekpunt ingesteld op ' + p.naam + '.');
       });
       lijst.appendChild(b);
@@ -662,14 +794,29 @@
     if (r.status === 200) flitsPunten = (r.body.lagen.flits || []).map(f => ({ ...f, laag: 'flits' }));
   }
 
-  // een wegprobleem melden (terug het Flits-netwerk in)
-  $('#meldknop').addEventListener('click', async () => {
-    const soorten = [['file', 'File'], ['ongeval', 'Ongeval'], ['object', 'Object op de weg'], ['wegwerk', 'Wegwerkzaamheden']];
-    const keuze = window.prompt('Wat is er op deze plek?\n1. File\n2. Ongeval\n3. Object op de weg\n4. Wegwerkzaamheden\n\nTyp 1-4:', '1');
-    const i = parseInt(keuze, 10) - 1; if (isNaN(i) || !soorten[i]) return;
-    const r = await api('meld', { soort: soorten[i][0], lat: hier.lat, lng: hier.lng, land });
+  /* Een wegprobleem melden (terug het Flits-netwerk in). Hier stond
+     `window.prompt('... Typ 1-4:')`: een venster van de browser en niet van dit
+     huis, dat de hele pagina blokkeert en in een geinstalleerde PWA soms
+     helemaal niet verschijnt -- op de knop die iemand juist onderweg indrukt.
+     Vier knoppen doen hetzelfde in een tik, en zijn met het toetsenbord en een
+     schermlezer gewoon te bedienen. */
+  function toonMeldkeuze(open) {
+    $('#meldkeuze').hidden = !open;
+    $('#meldknop').setAttribute('aria-expanded', String(open));
+    if (open) $('#meldkeuze').querySelector('button').focus();
+  }
+  $('#meldknop').addEventListener('click', () => toonMeldkeuze($('#meldkeuze').hidden));
+  $('#meldkeuze').addEventListener('keydown', e => { if (e.key === 'Escape') { toonMeldkeuze(false); $('#meldknop').focus(); } });
+  const MELDNAAM = { file: 'File', ongeval: 'Ongeval', object: 'Object op de weg', wegwerk: 'Wegwerkzaamheden' };
+  $('#meldkeuze').addEventListener('click', async e => {
+    const knop = e.target.closest('button[data-soort]'); if (!knop) return;
+    const soort = knop.dataset.soort;
+    toonMeldkeuze(false); $('#meldknop').focus();
+    if (!soort) return;
+    if (!hier) return zeg('Ik weet nog niet waar u bent; een melding zonder plek zegt niets.');
+    const r = await api('meld', { soort, lat: hier.lat, lng: hier.lng, land });
     if (r.body.error) return zeg(r.body.error);
-    zeg(r.body.bevestigd ? 'Dank je: de bestaande melding is bevestigd.' : soorten[i][1] + ' gemeld voor het netwerk.');
+    zeg(r.body.bevestigd ? 'Dank u: de bestaande melding is bevestigd.' : MELDNAAM[soort] + ' gemeld voor het netwerk.');
     await haalFlits(); bouwPinnen();
   });
 
@@ -689,9 +836,15 @@
      if stil weg en gebeurde er precies niets -- dezelfde stilte als het defect
      dat we repareren, alleen een laag hoger. Uitgeprobeerd in een echte
      browser: zonder dit verschijnt de vraag niet, ermee wel. */
-  let stopVolgen = null, opPlek = null;
+  /* `wachtNogOpPlek` staat aan zodra de poort openging OMDAT er geen plek was.
+     Zonder dat vlaggetje kost het sneller opgeven een functie: het toestel dat
+     eerst niets gaf en een seconde later alsnog een fix levert, zette wel `hier`
+     maar bouwde nooit een kaart -- de poort bleef staan boven een app die
+     precies wist waar je was. Twaalf seconden wachten verborg dat, sneller
+     opgeven legt het bloot. */
+  let stopVolgen = null, opPlek = null, opGeenPlek = null, wachtNogOpPlek = false;
   document.addEventListener('DOMContentLoaded', () => {
-    if (!window.RTGPlek || !window.isSecureContext) return;
+    if (!window.RTGPlek || !window.isSecureContext) { if (opGeenPlek) opGeenPlek('geen-veilige-verbinding'); return; }
     stopVolgen = RTGPlek.volg(plek => {
       const eerste = !hier;
       hier = { lat: plek.lat, lng: plek.lng }; land = landVan(hier);
@@ -700,8 +853,20 @@
         laatsteHerberekening = Date.now(); berekenRoute();
       }
       // de eerste fix is het startsein: hiervoor viel er niets te bouwen
-      if (eerste && opPlek) { const f = opPlek; opPlek = null; f(); }
-    }, { waarom: 'Om je de weg te wijzen moet ik weten waar je bent. Je locatie blijft op je toestel; RTG bewaart hem niet.' });
+      if (eerste && opPlek) { const f = opPlek; opPlek = null; opGeenPlek = null; f(); }
+      else if (eerste && wachtNogOpPlek) {
+        wachtNogOpPlek = false;
+        $('#poort').classList.remove('zien'); $('#poortReden').textContent = '';
+        initialiseerKaart();
+      }
+    }, {
+      waarom: 'Om je de weg te wijzen moet ik weten waar je bent. Je locatie blijft op je toestel; RTG bewaart hem niet.',
+      /* WACHTEN OP EEN ANTWOORD DAT ER AL IS. Zonder deze terugroep liep hier
+         altijd de volle time-out van twaalf seconden af, ook als de gebruiker
+         een halve seconde eerder "nu niet" had getikt. Gemeten in een browser
+         die de locatie weigert: 12,2 seconden zwart scherm, zonder een woord. */
+      geenPlek: reden => { const f = opGeenPlek; opGeenPlek = null; opPlek = null; if (f) f(reden); }
+    });
     // het toestel blijft niet peilen als niemand kijkt
     window.addEventListener('pagehide', () => { if (stopVolgen) stopVolgen(); });
   });
@@ -710,7 +875,12 @@
   async function initialiseerKaart() {
     if (kaartBegonnen || !hier) return;
     const r = await api('kaart', { lat: hier.lat, lng: hier.lng });
-    if (r.status !== 200) { $('#poortReden').textContent = r.body.error || 'Log eerst in via de app.'; $('#poort').classList.add('zien'); return; }
+    if (r.status !== 200) {
+      await haalStatus();                       // de badge hoort hetzelfde te zeggen als de poort
+      $('#poortReden').textContent = r.body.error || 'Log eerst in via de app.';
+      $('#poort').classList.add('zien');
+      return;
+    }
     kaartBegonnen = true; kaartData = r.body; ref = kaartData.ref; land = landVan(ref); cosRef = Math.cos(ref.lat * Math.PI / 180);
     await haalStatus(); grootte();
     R = Drie.maakRenderer ? Drie.maakRenderer(canvas, {}) : null;
@@ -725,14 +895,26 @@
        niet -- geen toestemming, geen gps -- dan zegt de poort waarom er niets
        staat, en dat is eerlijker dan een kaart van ergens anders. */
     if (!hier) {
-      const gekregen = await new Promise(klaar => {
-        opPlek = () => klaar(true);
-        setTimeout(() => { if (opPlek) { opPlek = null; klaar(false); } }, 12000);
+      const uitslag = await new Promise(klaar => {
+        opPlek = () => klaar({ plek: true });
+        opGeenPlek = reden => klaar({ plek: false, reden });
+        setTimeout(() => { if (opPlek || opGeenPlek) { opPlek = null; opGeenPlek = null; klaar({ plek: false, reden: 'geen-antwoord' }); } }, 12000);
       });
-      if (!gekregen) {
-        $('#poortReden').textContent = 'Locatie is niet beschikbaar. Kies veilig zelf uw vertrekpunt; RTG verzint nooit waar u bent.';
+      if (!uitslag.plek) {
+        /* De reden staat erbij, want "niet beschikbaar" is drie verschillende
+           dingen en alleen bij de laatste heeft wachten zin. */
+        $('#poortReden').textContent = {
+          'niet-toegestaan': 'Uw locatie is niet vrijgegeven. Kies zelf uw vertrekpunt; RTG verzint nooit waar u bent.',
+          'toestel-weigert': 'Uw toestel geeft geen locatie af. Kies zelf uw vertrekpunt; RTG verzint nooit waar u bent.',
+          'geen-gps': 'Dit toestel kent geen locatiebepaling. Kies zelf uw vertrekpunt; RTG verzint nooit waar u bent.',
+          'geen-veilige-verbinding': 'Zonder beveiligde verbinding geeft de browser geen locatie af. Kies zelf uw vertrekpunt.'
+        }[uitslag.reden] || 'Locatie is niet beschikbaar. Kies veilig zelf uw vertrekpunt; RTG verzint nooit waar u bent.';
+        /* En de badge zwijgt niet: zonder plek weet de motor niet welk net hier
+           ligt, dus hij zegt dat in plaats van "Motor actief" te blijven tonen. */
+        $('#liveBadge').textContent = 'Locatie onbekend';
         $('#manualStart').hidden = false;
         $('#poort').classList.add('zien');
+        wachtNogOpPlek = true;                  // komt hij alsnog, dan bouwen we alsnog
         return;
       }
     }

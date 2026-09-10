@@ -28,5 +28,6 @@
   initMoment();
   var eersteBlad = location.hash.replace('#', '');
   R.wisselBlad(['vandaag', 'reizen', 'taxi', 'samen', 'rahul'].includes(eersteBlad) ? eersteBlad : 'vandaag', false, { restore: true });
+  if (eersteBlad === 'rahul') setTimeout(function () { $('#rahulVraag').focus(); }, 0);
   R.laadReizen(false); R.laadLopendeRit();
 })(window.RTGReizen);

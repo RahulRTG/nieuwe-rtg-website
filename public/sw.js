@@ -14,7 +14,7 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-d0eb57ea';
+const CACHE = 'rtg-app-44b91540';
 const SHELL = ['/apps/app.html', '/shared/id.js',
   /* Heritage is één systeemlaag. Een offline start mag niet alleen de HTML
      bewaren en daarna identiteit, materiaal, beweging of lettertypen missen. */
@@ -44,8 +44,8 @@ const SHELL = ['/apps/app.html', '/shared/id.js',
      kale Home worden omgebogen, maar moeten bij de eerste start wel openen. */
   '/apps/app.html?pas=rtg', '/apps/app.html?pas=lifestyle', '/apps/app.html?pas=business',
   '/apps/app-main.js', '/apps/spelen.html', '/shared/verbinding.js',
-  '/shared/interface/second-screen.css', '/shared/interface/second-screen-modules.js',
-  '/shared/interface/second-screen.js', '/manifest.webmanifest', '/icon.svg'];
+  '/shared/interface/second-screen.css', '/shared/interface/second-screen-personal.css', '/shared/interface/workspace-empty.js', '/shared/interface/second-screen-modules.js',
+  '/shared/interface/second-screen.js', '/shared/interface/second-screen-personal.js', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)));

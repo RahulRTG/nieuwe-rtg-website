@@ -193,7 +193,13 @@ async function openLade(page) {
     document.querySelector('.rtg-edge-menu[data-rtg-command-brug="true"]'), null,
   { timeout: 5000 }).catch(() => {});
   const edge = page.locator('.rtg-edge-menu[data-rtg-command-brug="true"]');
-  if (await edge.isVisible()) await edge.click(); else await lade.click();
+  if (await edge.isVisible()) {
+    await edge.click();
+    if (await page.evaluate(() => !!document.querySelector('#rtgCommand').__rtgSecondScreen)) {
+      const ruimte = page.locator('.rtg-edge-index[aria-hidden="false"] .rtg-edge-here-action').filter({ hasText: 'Uw ruimte' });
+      await ruimte.waitFor({ state: 'visible', timeout: 5000 }); await ruimte.click();
+    } else await require('./helper').edgeWerkbladen(page);
+  } else await lade.click();
   await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
 }
 
@@ -1149,15 +1155,20 @@ test('RTG Second Screen groeit van Peek naar Focus zonder tweede navigatie',
         width: Math.round(rect.width), modules: r.querySelectorAll('[data-ss-module]').length,
         balken: [r.querySelector('.cmd-balk')].filter(zichtbaar).length,
         overloop: b.scrollWidth > b.clientWidth,
+        personal: document.body.hasAttribute('data-rtg-personal-surface'),
+        quick: [...r.querySelectorAll('.rtg-ss-quick > .rtg-ss-quick-door')].map(x => x.textContent.replace('›', '').trim()),
         tekst: b.textContent };
     });
     assert.equal(panel.state, 'panel', 'de greep hoort Peek naar Panel te laten groeien');
     assert.ok(panel.top >= 59, 'het Second Screen staat onder de nagebootste iPhone-uitsparing: ' + panel.top);
-    assert.ok(panel.bottom >= 94, 'het Second Screen houdt de ene onderdock en thuiszone vrij: ' + panel.bottom);
-    assert.ok(panel.width <= 369, 'het paneel loopt buiten de telefoon: ' + panel.width);
+    assert.ok(panel.bottom >= 82, 'Uw ruimte sluit direct aan op de ene Edge en thuiszone: ' + panel.bottom);
+    assert.ok(panel.width <= 393, 'Uw ruimte loopt buiten de telefoon: ' + panel.width);
     assert.ok(panel.modules >= 5, 'profiel, context, berichten, werelden en deuren horen levende modules te zijn');
     assert.equal(panel.balken, 1, 'het Second Screen mag geen tweede globale navigatie tekenen');
     assert.equal(panel.overloop, false, 'het Second Screen mag horizontaal niet overlopen');
+    assert.equal(panel.personal, true, 'de Edge herkent het geopende persoonlijke vlak niet');
+    assert.deepEqual(panel.quick, ['Profiel', 'Privacy', 'Meldingen', 'Weergave']);
+    assert.match(panel.tekst, /Uw ruimte[\s\S]*Open Rahul[\s\S]*Pas mijn ruimte aan/);
     assert.doesNotMatch(panel.tekst, /Sophie|Yassin|Laura/, 'de referentienamen mogen geen demodata worden');
 
     /* Een echte Rahul-inboxbron verwijst naar app.html. De centrale hostregel
@@ -1170,6 +1181,7 @@ test('RTG Second Screen groeit van Peek naar Focus zonder tweede navigatie',
         !r.querySelector('.cmd-pane iframe[src*="/apps/app.html"]');
     }), true, 'een inboxlink naar Home bouwt de app-shell in een werkblad');
 
+    await page.click('#rtgCommand [data-personal-action="appearance"]');
     await page.click('#rtgCommand [data-ss-action="workspace"]');
     await page.waitForFunction(() => document.getElementById('rtgCommand').dataset.rtgSecondScreen === 'workspace');
     const focusKnop = page.locator('#rtgCommand [data-ss-action="focus"]');
@@ -1179,7 +1191,7 @@ test('RTG Second Screen groeit van Peek naar Focus zonder tweede navigatie',
       return r.dataset.rtgSecondScreen === 'focus' && b.getAttribute('role') === 'dialog' &&
         b.contains(document.activeElement) && werk.hasAttribute('inert') && werk.getAttribute('aria-hidden') === 'true';
     });
-    await page.click('#rtgCommand .rtg-ss-header .rtguitvoer-knop');
+    await page.click('#rtgCommand [data-personal-action="export"]');
     await page.waitForFunction(() => {
       const r = document.getElementById('rtgCommand'), laag = r.querySelector('.rtguitvoer-laag');
       return !!(laag && !laag.hidden && r.querySelector('.cmd-bank').contains(laag));
@@ -1244,5 +1256,28 @@ test('RTG Second Screen groeit van Peek naar Focus zonder tweede navigatie',
         !!(out && out.isConnected);
     }), true, 'Second Screen laat na afbreken DOM, focus of uitvoerbediening achter');
     await page.close();
+  });
+});
+
+test('Lege familiekaarten openen direct hun bestaande invullaag',
+  { skip: geenBrowser(pw) }, async () => {
+  await metLid(async ({ base, ctx }) => {
+    await ctx.route('**/api/comm/inbox', (r) => r.fulfill({ status: 200,
+      contentType: 'application/json', body: JSON.stringify({ gesprekken: [], laden: [], ongelezen: 0 }) }));
+
+    const berichten = await ctx.newPage();
+    await berichten.goto(base + '/apps/comm.html', { waitUntil: 'domcontentloaded' });
+    const leeg = berichten.locator('#gesprekken .rtg-leeg-vlak--actie');
+    await leeg.waitFor({ state: 'visible' });
+    assert.equal(await leeg.getAttribute('role'), 'button');
+    await leeg.click();
+    await berichten.locator('#bladWaas.open #blad').getByRole('heading', { name: 'Nieuw gesprek' }).waitFor();
+
+    const reizen = await ctx.newPage();
+    await reizen.goto(base + '/apps/reizen.html#rahul', { waitUntil: 'domcontentloaded' });
+    const rahulVraag = reizen.locator('[data-blad="rahul"]:not([hidden]) #rahulVraag');
+    await rahulVraag.waitFor({ state: 'visible' });
+    assert.equal(await rahulVraag.isEnabled(), true);
+    assert.equal(await reizen.locator('[data-tab="rahul"]').getAttribute('aria-current'), 'page');
   });
 });

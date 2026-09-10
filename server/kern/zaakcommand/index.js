@@ -43,21 +43,14 @@ const ZAAK_BELEID = [
 
 function maakZaakCommand({ db, save, crypto, anthropic, findSupplier, commGast }) {
   const eigen = require('../eigencollectie')({ db, domein: 'kern/zaakcommand/index', bezit: { zaakCommand: 'kaart' } });
-  /* Het vak van deze zaak. Alles wat de motoren opslaan komt hierin terecht;
-     er is geen sleutel die buiten de zaak wijst. */
-  function vakVan(code) {
-    const vakken = eigen.bak('zaakCommand');
-    if (!vakken[code]) vakken[code] = {};
-    return vakken[code];
-  }
+  /* Het vak van deze zaak (./vak.js): ontstaat bij SCHRIJVEN, niet bij kijken. */
+  const vakVan = require('./vak')(eigen);
 
-  /* Eén laag per zaak, gebouwd op aanvraag en niet bewaard: de zaak-objecten
-     veranderen onder je handen, en een gecachete laag zou een verouderd
-     register vasthouden. De kosten zijn een handvol closures per verzoek. */
+  /* Eén laag per zaak, op aanvraag en niet bewaard: een gecachete laag zou een
+     verouderd register vasthouden. Kosten: een handvol closures per verzoek. */
   /* `opties.leiding` is de tweede as van de scope: van welke ZAAK, en met welke
-     ROL. Hij staat standaard op false -- wie hem vergeet ziet te weinig, en dat
-     is de goede kant om fout te gaan. De aanroeper haalt hem uit req.actor en
-     nooit uit de aanvraag. */
+     ROL. Standaard false -- wie hem vergeet ziet te weinig, en dat is de goede
+     kant om fout te gaan. Hij komt uit req.actor, nooit uit de aanvraag. */
   function voor(zaak, opties) {
     const code = String(zaak && zaak.code ? zaak.code : zaak || '');
     if (!code) return null;

@@ -316,7 +316,8 @@
     n.textContent = '';
     if (!staat.gesprekken.length) {
       n.innerHTML = RTGLeeg.html({ ey: 'Berichten', titel: 'Nog geen gesprekken in deze la.',
-        wat: 'Wat u hier begint blijft in deze la staan, gescheiden van uw andere gesprekken.' });
+        wat: 'Wat u hier begint blijft in deze la staan, gescheiden van uw andere gesprekken.',
+        actie: { tekst: 'Begin een gesprek', doel: '#nieuwBtn' } });
       return;
     }
     staat.gesprekken.forEach(function (g) {
@@ -744,6 +745,12 @@
     return uitDeWereldMet(met, over);
   }
 
+  function openLegeActie() {
+    if (location.hash !== '#nieuw') return;
+    history.replaceState(null, '', location.pathname + location.search);
+    $('#nieuwBtn').click();
+  }
+
   function uitDeWereldMet(met, over) {
     if (!met) return Promise.resolve();
     return fetch('/api/member/connections', { method: 'POST',
@@ -775,7 +782,7 @@
        aanwezig; we zetten onze lijst zodra hij er is. Zonder deze wacht zou de
        eerste RTGAppMenu.zet() in het niets vallen en stond er in het menu
        alleen wat de vondstlaag zelf op het scherm vindt. */
-    laadInbox().then(uitDeWereld).then(function () {
+    laadInbox().then(uitDeWereld).then(openLegeActie).then(function () {
       var pogingen = 0;
       var wacht = setInterval(function () {
         if (window.RTGAppMenu) { clearInterval(wacht); vulAppMenu(); }

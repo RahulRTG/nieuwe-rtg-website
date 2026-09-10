@@ -21,23 +21,11 @@ const { volledigeBoodschap } = require('./translate/boodschap');
 let anthropic = null;
 function setAnthropic(a) { anthropic = a; }
 
-/* Vertaal-cache met een vaste bovengrens: bij een hit schuift de sleutel naar
-   achteren (LRU), boven de grens valt de oudste eruit. Zonder grens groeit de
-   Map met elke unieke (taal, tekst)-combinatie mee en lekt de server geheugen
-   onder vuur van willekeurige teksten. */
-const cache = new Map();
-const CACHE_MAX = 5000;
-
-function cacheLees(key) {
-  if (!cache.has(key)) return null;
-  const hit = cache.get(key);
-  cache.delete(key); cache.set(key, hit);
-  return hit;
-}
-function cacheSchrijf(key, waarde) {
-  cache.set(key, waarde);
-  if (cache.size > CACHE_MAX) cache.delete(cache.keys().next().value);
-}
+/* De cache staat in ./translate/cache.js: twee lagen met verschillende
+   levensduur (een begrensd geheugen voor losse berichten, en de kast op schijf
+   voor vertaalde interface). Zie de kop daar voor waarom ze niet hetzelfde zijn
+   en waarom een kasttreffer niet naar het geheugen klimt. */
+const { setVertaalkast, cacheLees, cacheSchrijf, kastLees, kastSchrijf } = require('./translate/cache');
 
 /* Ruwe taalherkenning voor het geval de bron-taal niet is meegegeven. */
 function detect(text) {
@@ -115,6 +103,9 @@ async function translateBatch(teksten, to, from, opties) {
   to = bestaat(to) ? String(to).toLowerCase() : 'nl';
   const magAiVoor = typeof (opties && opties.ai) === 'function'
     ? opties.ai : () => (!opties || opties.ai !== false);
+  /* De kast bewaart alleen wat de aanroeper AANWIJST als interface. Standaard
+     dus niet: een nieuwe aanroeper krijgt nooit stilzwijgend een schijflog. */
+  const bewaarMag = !!(opties && opties.bewaar);
   const uit = new Array(teksten.length);
   const wacht = [];
 
@@ -129,6 +120,11 @@ async function translateBatch(teksten, to, from, opties) {
     const hit = cacheLees(key);
     if (hit != null) {
       uit[i] = { text: hit, translated: hit !== text, from: bron };
+      continue;
+    }
+    const uitKast = kastLees(bewaarMag, to, text);
+    if (uitKast != null) {
+      uit[i] = { text: uitKast, translated: uitKast !== text, from: bron };
       continue;
     }
     let vast = to === 'en' ? NL2EN[text] : (to === 'nl' ? EN2NL[text] : null);
@@ -160,7 +156,10 @@ async function translateBatch(teksten, to, from, opties) {
         const result = (model && model[j]) || lokaal || item.text;
         /* Een tijdelijke modelstoring mag geen onvertaalde zin als blijvend
            cacheantwoord vastzetten. Alleen echte vertaling is een cache-hit. */
-        if (result !== item.text) cacheSchrijf(item.key, result);
+        if (result !== item.text) {
+          cacheSchrijf(item.key, result);
+          kastSchrijf(bewaarMag && item.ai, to, item.text, result);   // alleen door de broncontrole toegelaten interface
+        }
         uit[item.i] = { text: result, translated: result !== item.text, from: item.bron };
       });
     }
@@ -168,4 +167,4 @@ async function translateBatch(teksten, to, from, opties) {
   return uit;
 }
 
-module.exports = { setAnthropic, localize, localizeList, translate, translateBatch, detect };
+module.exports = { setAnthropic, setVertaalkast, localize, localizeList, translate, translateBatch, detect };

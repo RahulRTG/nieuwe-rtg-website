@@ -36,6 +36,22 @@ on:
 permissions:
   contents: read
 
+# PIPEFAIL, EN DAT IS GEEN NETHEID MAAR EEN GEVONDEN FOUT. Elke zware stap
+# hieronder eindigt op `| tee <log>`, en de uitgangscode van een pijp is die van
+# het LAATSTE onderdeel -- dus die van `tee`, en die is altijd 0. Een harnas dat
+# met code 1 zakte, kwam hier dus groen door. Gemeten op 9 september 2026: de
+# ijking van de heapproef gaf terecht code 1 (hij vond het ingebouwde lek niet)
+# en de aanroep meldde 0.
+#
+# De standaardschil van een `run:`-stap is `bash -e {0}` -- WEL -e, GEEN
+# pipefail. Door hier `shell: bash` te zetten wordt dat `bash --noprofile
+# --norc -eo pipefail {0}`, en dan telt de code van het harnas weer. Dit staat
+# op workflowniveau en niet per stap: een vergeten stap is precies de fout die
+# hierboven al een keer is gemaakt.
+defaults:
+  run:
+    shell: bash
+
 # Twee rondes tegelijk hebben geen zin: de tweede meet dezelfde bron op een
 # machine die al bezet is. Een lopende ronde afbreken doen we NIET -- een halve
 # beproeving is geen meting.
@@ -105,12 +121,19 @@ jobs:
           {
             echo '## De Beproeving'
             echo ''
-            if [ -f BEPROEVING.json ]; then
+            # De ACTUELE meting eerst, ook als hij rood is. BEPROEVING.json is de
+            # geaccepteerde basislijn en schuift alleen na een geslaagde ronde;
+            # wie alleen die toont, laat een gezakte ronde onzichtbaar blijven.
+            if [ -f LAATSTE_METING.json ]; then
+              echo '```json'
+              cat LAATSTE_METING.json
+              echo '```'
+            elif [ -f BEPROEVING.json ]; then
               echo '```json'
               cat BEPROEVING.json
               echo '```'
             else
-              echo '_BEPROEVING.json is niet geschreven; zie het artefact voor de uitvoer._'
+              echo '_Er is geen meting geschreven; zie het artefact voor de uitvoer._'
             fi
             echo ''
             echo '> De prestatiecijfers hierboven zijn op een GitHub-runner gemeten.'
@@ -125,6 +148,84 @@ jobs:
           path: |
             beproeving.log
             BEPROEVING.json
+            LAATSTE_METING.json
+          retention-days: 30
+
+  tot-crash:
+    name: Tot crash (escalerende druk tot iets breekt)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      # DIT HARNAS STOND ER AL EN WAS NERGENS AAN GEHANGEN. Hij noemt zichzelf in
+      # zijn eigen kop de escalerende bug-jager "op weg naar 100 miljoen", maar
+      # had geen npm-script en geen CI-pad -- anders dan chaos, beproeving en
+      # spreiding. Een harnas dat je niet bij naam kunt aanroepen wordt niet
+      # gedraaid, en dat is de waarschijnlijkste reden dat de sqlite-basislijn
+      # van PASS naar GEZAKT kon lopen zonder dat iemand het zag.
+      #
+      # Hij zakt zelf (exitcode 1) bij een ECHTE breuk: het proces valt om, de
+      # server hangt, het geld klopt niet meer, een onafgevangen fout, of een
+      # heap die na GC blijft klimmen. Een 503-lastafworp is daar met opzet geen
+      # breuk maar de immuunreactie van De Wacht.
+      #
+      # Wat hij NIET afdwingt is het aantal werkers dat aankomt: dat hangt van de
+      # runner af. Het harnas meldt zelf wanneer het zijn eigen client meet in
+      # plaats van de server, en stopt dan.
+      - name: Tot crash (sqlite-schaal)
+        run: npm run tot-crash 2>&1 | tee tot-crash.log
+      - name: De uitvoer bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: tot-crash
+          path: tot-crash.log
+          retention-days: 30
+
+  heapproef:
+    name: Heapproef (houdt de server geheugen vast?)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: npm ci
+      # DE IJKING EERST, EN DAT IS DE VOLGORDE EN GEEN VOLGORDE-VOORKEUR. Een
+      # geheugenmeter die je nooit hebt zien AANSLAAN, meet niets: hij zegt
+      # "stabiel" over een server die lekt en over een server die dat niet doet,
+      # en die twee zien er dan identiek uit. Deze stap bouwt een lek van 120
+      # MB/min in (via de test-preload, nooit via servercode) en eist dat de
+      # proef LEK zegt. Zegt hij iets anders, dan is de meter blind en heeft de
+      # meting erna geen betekenis -- dus faalt de job hier al.
+      - name: IJking (een bekend lek MOET gevonden worden)
+        run: npm run heapproef:ijk 2>&1 | tee heapproef-ijk.log
+      # Pas hierna de echte meting. Zij eindigt alleen met een foutcode bij LEK;
+      # NIET_VAST_TE_STELLEN is een geldige uitslag en geen storing -- hij zegt
+      # dat deze ronde te ruisig was om een lek van deze grootte aan te tonen,
+      # en dat staat met het oplossend vermogen erbij in HEAPPROEF.json.
+      - name: De meting
+        run: npm run heapproef 2>&1 | tee heapproef.log
+      - name: De uitvoer bewaren
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: heapproef
+          path: |
+            heapproef.log
+            heapproef-ijk.log
+            HEAPPROEF.json
           retention-days: 30
 
   dekking:

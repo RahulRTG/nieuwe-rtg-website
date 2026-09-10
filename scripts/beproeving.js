@@ -194,7 +194,7 @@ function alleRoutes() {
       const method = m[1].toUpperCase(), pad = m[2];
       if (/\/stream|\/sse|events$/.test(pad) || pad.startsWith('/api/test/') || pad === '/api/health' || pad === '/api/ready') continue;
       const echt = pad.replace(/:([a-zA-Z0-9_]+)/g, 'x1');
-      set.set(method + ' ' + echt, { method, pad: echt, rol: rol[m[3]] || 'open', schakel: isSchakel(echt) });
+      set.set(method + ' ' + echt, { methode: method, pad: echt, rol: rol[m[3]] || 'open', schakel: isSchakel(echt) });
     }
   }
   return [...set.values()];
@@ -558,7 +558,7 @@ async function misbruikBeproeving(tok) {
    er anders uitzag. Een instrument hoort te meten als je erom vraagt, niet als
    je ernaar kijkt (scripts/meetkeuring.js, regel `wacht`).
    ============================================================================ */
-if (require.main !== module) { module.exports = {}; return; }
+if (require.main !== module) { module.exports = { alleRoutes }; return; }
 (async () => {
   kop('DE BEPROEVING - ' + MODE.toUpperCase() + '-modus - seed ' + RNGSTATE + (MODE === 'postgres' ? ' - ' + nl(LEDEN) + ' leden + activiteit' : ' - sqlite (standaard, draait overal)'));
   const routes = alleRoutes();
@@ -941,7 +941,7 @@ if (require.main !== module) { module.exports = {}; return; }
        geeft alleen de status terug. Daarmee stonden de lekscan en de
        toestandsvergelijking leeg te draaien. */
     post,
-    routes, tokensVoor: () => ({
+    routes: routes.map(r => ({ ...r, rol: r.rol === 'open' ? 'openbaar' : r.rol })), tokensVoor: () => ({
       member: rkeuze(tokVoor.member.length ? tokVoor.member : tokVoor.office),
       supplier: rkeuze(tokVoor.supplier.length ? tokVoor.supplier : tokVoor.office),
       office: rkeuze(tokVoor.office.length ? tokVoor.office : tokVoor.member)
@@ -986,12 +986,40 @@ if (require.main !== module) { module.exports = {}; return; }
   async function rustVloer() { await new Promise(r => setTimeout(r, 4000)); let l = Infinity; for (let i = 0; i < 3; i++) { const h = await heapNaGc(child.pid); if (h != null && h < l) l = h; await new Promise(r => setTimeout(r, 1200)); } return l === Infinity ? null : l; }
   async function lekRonde(ms) { stormEind = Date.now() + ms; await Promise.all(Array.from({ length: WERKERS }, leesWerker)); return rustVloer(); }
   const lekMin = LEK_MS / 60000;
+  /* De helling van een reeks vloeren, als losse functie: hij wordt nu twee keer
+     gebruikt -- een keer MET verkeer en een keer ZONDER. */
+  const helling = (reeks) => {
+    const ys = reeks, xs = ys.map((_, i) => i * lekMin);
+    if (xs.length < 2) return 0;
+    const xm = xs.reduce((a, b) => a + b, 0) / xs.length, ym = ys.reduce((a, b) => a + b, 0) / ys.length;
+    let tel = 0, noem = 0;
+    for (let i = 0; i < xs.length; i++) { tel += (xs[i] - xm) * (ys[i] - ym); noem += (xs[i] - xm) ** 2; }
+    return noem > 0 ? tel / noem : 0;
+  };
+  /* DE STILTEMETING, en zonder haar meet deze fase iets anders dan zij beweert.
+
+     De lek-vloer hamert identieke leespaden en noemt de stijging een lek. Dat
+     klopt alleen als een server die NIETS doet vlak blijft. Gemeten op 9
+     september 2026, 100M leden: dat is hij niet. Zonder één verzoek liepen de
+     vloeren 572 -> 576 -> 692 -> 685 -> 734 -> 686 MB, een helling van +131
+     MB/min -- HOGER dan elk pad mét verkeer (health +52, /api/state +55,
+     /api/notifications -219). De achtergrond van dit huis (de lokale snapshot die
+     periodiek het hele db.data serialiseert, de write-behind-flush, LISTEN/NOTIFY)
+     alloceert op deze schaal honderden MB's, en of een GC-monster daar vlak naast
+     valt bepaalt de "vloer".
+
+     Daarom staat de stiltehelling er nu NAAST, met dezelfde rondes en dezelfde
+     duur. Hij verandert het oordeel niet -- de drempel blijft waar hij stond --
+     maar hij maakt zichtbaar hoeveel van een gemeten helling de server zelf is.
+     Een lek-getal zonder die tweede meting is niet te lezen. */
+  const stilteRonde = async (ms) => { await new Promise(r => setTimeout(r, ms)); return rustVloer(); };
+  const stiltes = [await rustVloer()];
+  for (let i = 0; i < LEK_RONDES; i++) stiltes.push(await stilteRonde(LEK_MS));
+  const stilteHelling = helling(stiltes.slice(1));
+
   const vloers = [await rustVloer()];
   for (let i = 0; i < LEK_RONDES; i++) vloers.push(await lekRonde(LEK_MS));
-  const ys = vloers.slice(1), xs = ys.map((_, i) => i * lekMin);
-  const xm = xs.reduce((a, b) => a + b, 0) / xs.length, ym = ys.reduce((a, b) => a + b, 0) / ys.length;
-  let tel = 0, noem = 0; for (let i = 0; i < xs.length; i++) { tel += (xs[i] - xm) * (ys[i] - ym); noem += (xs[i] - xm) ** 2; }
-  const lekHelling = noem > 0 ? tel / noem : 0;
+  const lekHelling = helling(vloers.slice(1));
 
   // ---------- METING ----------
   kop('METING');
@@ -1080,6 +1108,10 @@ if (require.main !== module) { module.exports = {}; return; }
   rij('RAM (RSS) dal/piek onder last', dal + ' / ' + piek + ' MB');
   rij('heapUsed vers -> opgewarmd (na GC)', vloerVers + ' -> ' + vloers[0] + ' MB');
   rij('heapUsed lek-vloeren per ronde', vloers.join(' -> ') + ' MB (' + lekHelling.toFixed(1) + ' MB/min)');
+  rij('heapUsed vloeren ZONDER verkeer', stiltes.join(' -> ') + ' MB (' + stilteHelling.toFixed(1) + ' MB/min)');
+  rij('  waarvan de server zelf', stilteHelling >= lekHelling
+    ? '\x1b[33mde stilte stijgt harder dan het verkeer -- deze meting toont geen verkeerslek\x1b[0m'
+    : (lekHelling - stilteHelling).toFixed(1) + ' MB/min blijft over na aftrek van de stilte');
   const onbereikt = [...dekking.entries()].filter(([, n]) => n < SLO_DEKKING);
   rij('endpoints < ' + SLO_DEKKING + 'x geraakt', nl(onbereikt.length) + ' / ' + nl(routes.length));
 
@@ -1122,7 +1154,8 @@ if (require.main !== module) { module.exports = {}; return; }
   // ---------- HET OORDEEL ----------
   kop('HET OORDEEL (drempels; faalt er een, dan exitcode 1)');
   const verdicten = [];
-  const v = (naam, ok, detail) => { verdicten.push(ok); console.log('  ' + (ok ? '\x1b[32mPASS\x1b[0m' : '\x1b[31mFAIL\x1b[0m') + '  ' + naam.padEnd(16) + ' \x1b[2m' + detail + '\x1b[0m'); };
+  const gezakteNamen = [];
+  const v = (naam, ok, detail) => { verdicten.push(ok); if (!ok) gezakteNamen.push(naam); console.log('  ' + (ok ? '\x1b[32mPASS\x1b[0m' : '\x1b[31mFAIL\x1b[0m') + '  ' + naam.padEnd(16) + ' \x1b[2m' + detail + '\x1b[0m'); };
   /* SCHAKELKAST. Deze staat bewust bovenaan: zakt hij, dan zijn alle oordelen
      eronder minder waard dan ze lijken, want dan is de helft van de functies
      nooit aangeraakt. Een meting die stilletjes minder doet dan ze zegt is
@@ -1220,6 +1253,7 @@ if (require.main !== module) { module.exports = {}; return; }
       kalibratieBasisMs: Number(kal.basis.toFixed(1)) },
     oordeel: gezakt === 0 ? 'PASS' : 'GEZAKT',
     gezakteDrempels: gezakt,
+    gezakteNamen,
     meters: {
       p50Ms: pctMs(0.50), p95Ms: pctMs(0.95), p99Ms: pctMs(0.99), maxMs: latMax,
       doorvoerPerSec: Math.round(totaal / (stormDuurMs / 1000)),
@@ -1239,6 +1273,7 @@ if (require.main !== module) { module.exports = {}; return; }
       cpuPiekPct: cpuUit ? cpuUit.piek : null,
       ramPiekMB: piek,
       geheugenHellingMBPerMin: Number(lekHelling.toFixed(2)),
+      geheugenStilteMBPerMin: Number(stilteHelling.toFixed(2)),
       herstelSeconden: herstel.hersteld ? herstel.naSeconden : null,
       verhalenSlaagPctStorm: stormSom.gelukt + stormSom.afgewezen + stormSom.gefaald > 0
         ? Number((100 * stormSom.gelukt / (stormSom.gelukt + stormSom.afgewezen + stormSom.gefaald)).toFixed(1)) : null,
@@ -1247,11 +1282,48 @@ if (require.main !== module) { module.exports = {}; return; }
       endpointsBestookt: routes.length
     }
   };
-  try {
-    fs.writeFileSync(path.join(__dirname, '..', 'BEPROEVING.json'), JSON.stringify(cijfers, null, 2) + '\n');
-    console.log('\n  \x1b[2mcijfers weggeschreven naar BEPROEVING.json (scripts/norm.js vergelijkt ze met de vorige ronde)\x1b[0m');
-  } catch (e) {
-    console.log('\n  \x1b[31mBEPROEVING.json kon niet worden geschreven: ' + e.message + '\x1b[0m');
+  /* TWEE BESTANDEN, TWEE BANEN -- en die liepen door elkaar.
+
+     BEPROEVING.json was tegelijk het VERSLAG van de laatste ronde en de INVOER
+     van de prestatieratel in scripts/norm.js. Dat botst, want norm.js weigert
+     terecht een gezakte ronde als lat ("die cijfers zijn geen lat"). Gevolg: een
+     gezakte ronde was niet in te checken, dus bleef de laatste GESLAAGDE ronde
+     staan en kon het register alleen ooit goed nieuws bevatten. Op 9 september
+     2026 mat CI daardoor tegen een lat van 18 augustus terwijl dezelfde test op
+     de huidige commit zakte -- 22 dagen lang bewaakte de ratel een basislijn die
+     de code niet meer beschreef, en niets dwong een herronde af.
+
+     Sindsdien:
+       LAATSTE_METING.json  ALTIJD geschreven, of de ronde nu slaagt of zakt.
+                            Dit is de actuele waarheid en hij is commitbaar,
+                            juist als hij rood is. Rood bewijs hoort te blijven
+                            staan; het verdween alleen omdat er geen plek voor
+                            was.
+       BEPROEVING.json      de GEACCEPTEERDE basislijn (de lat). Die schuift
+                            alleen op na een geslaagde ronde, want een lat die
+                            meebeweegt met een mislukking is geen lat.
+
+     norm.js leest ze allebei en vergelijkt: hij mag rood worden van een gezakte
+     meting, maar hij hoort nooit meer te zeggen dat hij niets kán controleren. */
+  const schrijf = (naam, inhoud) => {
+    try {
+      fs.writeFileSync(path.join(__dirname, '..', naam), JSON.stringify(inhoud, null, 2) + '\n');
+      return true;
+    } catch (e) {
+      console.log('\n  \x1b[31m' + naam + ' kon niet worden geschreven: ' + e.message + '\x1b[0m');
+      return false;
+    }
+  };
+  if (schrijf('LAATSTE_METING.json', cijfers)) {
+    console.log('\n  \x1b[2mactuele meting weggeschreven naar LAATSTE_METING.json (' + cijfers.oordeel
+      + ') -- die blijft staan, ook rood\x1b[0m');
+  }
+  if (cijfers.oordeel === 'PASS') {
+    if (schrijf('BEPROEVING.json', cijfers)) {
+      console.log('  \x1b[2mde ronde slaagde, dus de basislijn BEPROEVING.json is meegeschoven\x1b[0m');
+    }
+  } else {
+    console.log('  \x1b[2mde basislijn BEPROEVING.json blijft ongemoeid: een gezakte ronde is geen lat\x1b[0m');
   }
 
   await stop();

@@ -34,13 +34,16 @@
       return !!deur;
     }
     function indexOpen() { return !!(index && index.getAttribute('aria-hidden') === 'false'); }
+    function slimMenu() { return !!(index && index.querySelector('.rtg-edge-faces')); }
+    function secondOpen() { return !!(root && root.dataset.rtgSecondScreen && root.dataset.rtgSecondScreen !== 'peek'); }
     function sync() {
       vindDeur();
       if (!media.matches || !deur) {
         herstelDeur();
         menu.removeAttribute('data-rtg-command-owner');
-        menu.setAttribute('aria-label', label || 'Randen en alle functies');
-        if (controls == null) menu.removeAttribute('aria-controls'); else menu.setAttribute('aria-controls', controls);
+        menu.setAttribute('aria-label', slimMenu() ? (indexOpen() ? 'Menu sluiten' : 'Menu openen') : label || 'Randen en alle functies');
+        if (slimMenu()) menu.setAttribute('aria-controls', index.id);
+        else if (controls == null) menu.removeAttribute('aria-controls'); else menu.setAttribute('aria-controls', controls);
         menu.setAttribute('aria-expanded', String(indexOpen()));
         return;
       }
@@ -49,6 +52,14 @@
       if (bank && !bank.id) bank.id = 'rtgCommandBank';
       deur.setAttribute('data-rtg-edge-owned', 'true');
       deur.setAttribute('aria-hidden', 'true'); deur.tabIndex = -1;
+      if (slimMenu()) {
+        if (indexOpen() && bankOpen() && !secondOpen()) deur.click();
+        menu.setAttribute('aria-label', indexOpen() ? 'Menu sluiten' : 'Menu openen');
+        menu.setAttribute('aria-controls', index.id);
+        menu.setAttribute('aria-expanded', String(indexOpen()));
+        if (!bankOpen() && d.activeElement === deur) menu.focus();
+        return;
+      }
       menu.setAttribute('aria-label', 'Werelden en systeem');
       if (bank) menu.setAttribute('aria-controls', bank.id + (index ? ' ' + index.id : ''));
       if (indexOpen() && bankOpen()) deur.click();
@@ -61,7 +72,7 @@
       });
     }
     menu.onclick = function (ev) {
-      if (!media.matches || !vindDeur()) { if (oud) oud.call(menu, ev); return; }
+      if (slimMenu() || !media.matches || !vindDeur()) { if (oud) oud.call(menu, ev); sync(); return; }
       ev.preventDefault();
       if (indexOpen()) { if (oud) oud.call(menu, ev); sync(); return; }
       sluitAndereLagen(); deur.click(); sync();

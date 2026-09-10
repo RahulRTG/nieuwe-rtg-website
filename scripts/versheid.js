@@ -346,7 +346,7 @@ module.exports = { meet, poortRijen, REGISTERS, stempelVan };
 if (require.main !== module) return;
 
 const uit = meet();
-if (process.argv.includes('--json')) { console.log(JSON.stringify(uit, null, 1)); process.exit(0); }
+if (process.argv.includes('--json')) { console.log(JSON.stringify(uit, null, 1)); process.exitCode = 0; return; }
 
 console.log('\n=== DE VERSHEID VAN DE REGISTERS ===\n');
 console.log('  de code staat op commit ' + (uit.nu || 'onbekend') + '\n');
@@ -383,6 +383,5 @@ if (uit.poort.length) {
   console.log('\n  Deze vier melden niet alleen, ze houden tegen. Wat ze zeggen -- wie er');
   console.log('  binnenkomt en wat er met geld gebeurt -- is niet iets om op een oude meting te');
   console.log('  geloven. De andere registers hierboven melden alleen.\n');
-  process.exit(1);
+  process.exitCode = 1;
 }
-process.exit(0);

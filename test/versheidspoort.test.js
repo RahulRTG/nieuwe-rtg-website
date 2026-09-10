@@ -21,7 +21,7 @@
         het is een slechtere, en dat is precies de vorm waarin een poort stil
         opengaat.
 
-   De poort zelf (process.exit(1)) zit in het uitvoerbare deel van dat script en
+   De poort zelf (exitcode 1) zit in het uitvoerbare deel van dat script en
    wordt hier als PROCES gedraaid -- een exitcode die je niet hebt zien vallen,
    bewijst niets.
 

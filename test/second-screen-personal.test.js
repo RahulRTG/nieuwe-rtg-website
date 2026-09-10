@@ -45,6 +45,8 @@ test('het nieuwe vlak en de ene Edge-balk laden ook offline', () => {
     assert.ok(SW.includes('/shared/interface/' + bestand), bestand + ' staat in de offline schil');
   }
   assert.match(CSS, /body\[data-rtg-personal-surface\] \.rtg-edge-bottom/);
+  assert.match(CSS, /rtg-edge-appslot\{[^}]*pointer-events:none/,
+    'het decoratieve UW RUIMTE-vlak mag bediening van het scherm niet onderscheppen');
   assert.match(CSS, /\.rtg-edge-appslot::before\{content:"UW RUIMTE"/);
   assert.match(CSS, /\.rtg-edge-ai\{display:flex!important/);
 });

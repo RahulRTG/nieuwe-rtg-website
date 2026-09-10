@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-10T14:15:58.726Z",
-    "commit": "1624ff0f",
+    "op": "2026-09-10T15:30:00.667Z",
+    "commit": "ecfe14a1",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -4106,6 +4106,10 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "moveproef.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
     },
     "mrz.test.js": {
       "soort": "puur",

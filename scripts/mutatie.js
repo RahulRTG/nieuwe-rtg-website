@@ -831,6 +831,11 @@ const EIGEN_MODULE = new Map([
      de mutatieproef, anders blijft deze toets ongemeten. */
   ['beproeving-contract.test.js', ['scripts/verhalen.js']],
   ['navigatieproef.test.js', ['public/shared/plek.js', 'public/apps/navigatie.html']],
+  /* De moveproef toetst twee dingen die geen require() zijn: het INSTRUMENT
+     (scripts/moveproef.js) en het SCHERM. modulesVan() ziet daardoor niets en
+     noteerde 'geen module gevonden' -- niet te meten, terwijl de beweringen
+     wel degelijk kunnen zakken (vier zijn er met de hand op nagemeten). */
+  ['moveproef.test.js', ['public/apps/move.html', 'scripts/moveproef.js']],
   ['rtg-edge-appbar.test.js', ['public/shared/rtg-edge-appbar.js', 'public/shared/rtg-edge-smart-menu.js']],
   /* Deze regressietoets raakt drie achtergrondschrijvers via hun facades en
      een directe meter-import. modulesVan() ziet daardoor alleen de dunne

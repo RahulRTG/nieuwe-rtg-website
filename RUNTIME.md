@@ -58,16 +58,19 @@ nu met bewijs uit drie onafhankelijke metingen.
 ### 1.1 Hoe ver de graaf vandaag reikt
 
 `kern/levensgraaf/` bestaat, met 47 bronnen, en leest **zes** collecties:
-`agendas`, `boekingen`, `cvs`, `leren`, `lifestyle`, `rtgid`. De opslag van dit
-huis telt er **325** (geteld op `db.data.*` in `server/`, graad: gemeten).
+`agendas`, `boekingen`, `cvs`, `leren`, `lifestyle`, `rtgid`. Dit huis heeft er
+**197** met een eigenaar (`scripts/check.js` regel 63, graad: gemeten).
 
-> **De graaf heeft de goede vorm en 1,8% van de reikwijdte.**
+> **De graaf heeft de goede vorm en 3% van de reikwijdte.**
 
-Let op de noemer: `CLAUDE.md` en `EXECUTIE.md` noemen 196 collecties uit
-`IDEMPROEF.json`, maar in de huidige stand van dat register is het veld `opslag`
-leeg — dat getal komt uit een eerdere ronde en is vandaag niet na te rekenen.
-Vandaar de directe telling. Wie een register citeert zonder zijn stempel te
-lezen, citeert een andere dag.
+Let op waar die noemer vandaan komt, want dat is bij het schrijven van dit
+document een keer misgegaan. Een eigen telling op `db.data.*` in `server/` gaf
+325 — en dat is een overtelling, want niet elke verwijzing is een collectie. Het
+huis heeft er een betere meter voor die er al stond: `check.js` regel 63 telt
+alleen collecties met een eigenaar. Wie een noemer zelf verzint terwijl er een
+gemeten noemer ligt, maakt zijn eigen percentage. (De 196 die `CLAUDE.md` uit
+`IDEMPROEF.json` citeert, klopt daarmee ook — al is het veld `opslag` in de
+huidige stand van dat register leeg, dus dáár is hij vandaag niet na te rekenen.)
 
 Dat is de eerlijkste samenvatting van dit hele document. Er hoeft niets
 afgebroken en niets uitgevonden; er moet worden **aangesloten**. En elke bron

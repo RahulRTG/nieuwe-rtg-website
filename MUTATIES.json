@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T13:56:06.683Z",
-    "commit": "6e6f4b1c",
+    "op": "2026-09-10T15:15:48.891Z",
+    "commit": "dfc8f386",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2800,6 +2800,13 @@
       "module": "public/shared/kaart.js",
       "operator": "===->!==",
       "gezakt": 2
+    },
+    "kantoorawait.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "kantoordienst.test.js": {
       "soort": "server",

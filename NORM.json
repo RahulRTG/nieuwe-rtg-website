@@ -1,7 +1,7 @@
 {
   "vastgelegd": "2026-09-10",
   "meters": {
-    "endpointsZonderTest": 906,
+    "endpointsZonderTest": 907,
     "dekkingPct": 82,
     "keuringStuk": 0,
     "keuringScheef": 16,
@@ -21,7 +21,7 @@
     "keuringTeGroot": 14,
     "inlineStijlAttributen": 4648,
     "browserpoortToetsen": 332,
-    "kernBreedte": 1563,
+    "kernBreedte": 1565,
     "kernGedeeld": 231,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -1904,6 +1904,24 @@
       "meter": "kernBreedte 1560 -> 1563",
       "reden": "DE KAARTENLAAG VAN RTG NAVIGATIE (KAARTEN.md) VOEGT DRIE NAMEN TOE: `navKaartenBeeld`, `navKaartKies` en `navKaartWeg` -- de drie routes waarmee een lid ziet welke kaarten RTG kan leveren en zelf kiest welke hij wil hebben (/api/nav/gebieden, /api/nav/gebied/kies, /api/nav/gebied/weg). Er is een vierde functie (`navKaartVraag`, de telling voor het kantoor) en die telt hier niet mee: geen route raakt hem aan, en dat is precies wat deze meter meet.\n\nDRIE EN NIET EEN, EN DAT IS EEN KEUZE DIE HIER HOORT TE STAAN. De laag had ook als EEN naam kunnen binnenkomen -- `navKaarten` met beeld/kies/weg erin, de vorm die `move` op 10 september kreeg -- en dan was deze stap +1 geweest in plaats van +3. Dat is niet gedaan, om twee redenen. Ten eerste is het domein navigatie overal plat (navKaart, navRoute, navBestemmingen, navPoi, navMeld, navStatus, navPartnerEvent): een enkele namespace tussen zeven vlakke namen in hetzelfde routebestand is een tweede manier waarop dit domein zich aanbiedt, en dat is de vorm van fout die LAT.md regel 4 bedoelt. Ten tweede zou het de KOPPELING niet kleiner maken maar alleen de meting: dezelfde drie functies, dezelfde drie aanroepen, een naam eromheen. Een ratel die je met een verpakking omlaag praat, meet vanaf dan de verpakking.\n\nWat de breedte wel beperkt houdt: de drie hangen achter de bestaande ledenpoort (`auth` plus de gastweigering), ze staan op de SESSIESLEUTEL en niet op een naam, en de laag bezit een eigen collectie via kern/eigencollectie.js. De catalogus zelf leest alleen van schijf.",
       "waarheen": "server/kern/navigatie/mijnkaarten.js (de keuze per lid) met server/routes/navigatie.js voor de drie routes; de catalogus en de licentiepoort blijven in server/kern/navigatie/gebieden.js zonder eigen kernnaam"
+    },
+    {
+      "datum": "2026-09-10",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1563,
+      "meter": "kernBreedte 1563 -> 1565",
+      "reden": "STAP 2 VAN DE KAARTENLAAG (KAARTEN.md par. 11) voegt twee namen toe: `navKaartPakket` (het manifest: wat er van een gebouwd pakket te halen is, hoe groot, met welk controlegetal) en `navKaartDeel` (het pad dat de route mag streamen). Twee en niet een, en dat is hier de keuze die verantwoording vraagt: ze hadden in EEN functie gekund met een modusvlag (`navKaartPakket(code, deel)`), maar dan geeft een naam twee verschillende soorten antwoord terug -- een manifest of een bestandsbeschrijving -- en dat is precies de vorm waar een aanroeper op een dag het verkeerde veld van leest.\n\nDe koppeling die erbij komt is smal en dat is na te rekenen: de laag krijgt GEEN db en GEEN save mee (server/opzet/kernlaag6.js), bezit geen collectie, en leest alleen wat er in RTG_DATA_DIR ligt. Wat een lid mag ophalen is een GESLOTEN lijst van acht delen en nooit een bestandsnaam, met de licentiepoort van kern/navigatie/gebieden.js ervoor -- geen naamsvermelding, geen manifest en ook geen bytes. test/navigatietoestelpakket.test.js toets 3, 5 en 6 zijn de grendels.\n\nDezelfde afweging als bij 1560 -> 1563 hierboven: het domein navigatie is overal plat, dus er komt geen namespace tussen tien vlakke namen. Een naam om functies heen maakt de koppeling niet kleiner maar alleen de meting.",
+      "waarheen": "server/kern/navigatie/toestelpakket.js (manifest en deel, zonder opslag) met public/shared/kaartpakket.js aan de toestelkant; de gesloten lijst en de licentiepoort blijven in de kern"
+    },
+    {
+      "datum": "2026-09-10",
+      "soort": "structureel",
+      "sleutel": "endpointsZonderTest",
+      "van": 906,
+      "meter": "endpointsZonderTest 906 -> 907",
+      "reden": "De nieuwe route is `GET /api/nav/gebied/pakket/:code/:deel`, en hij WORDT getest -- test/navigatietoestelpakket.test.js toets 12 haalt alle acht delen op en vergelijkt ze byte voor byte met het bestand op schijf, toets 13 probeert vier traversals op hetzelfde adres, en drie browsertoetsen in test/navigatiekaarten.e2e.js halen hem via het scherm binnen.\n\nDeze meter ziet dat niet, en dat is geen toeval maar een GRENS die in zijn eigen kop staat (scripts/keuring.js, de kop van dekking()): 'routes met een :param die een test opbouwt met string-plakwerk blijven als ongedekt tellen. Dat is een onderschatting en geen overschatting -- de goede kant om te missen.' Een test kan hem alleen zien door de padvorm LETTERLIJK in de tekst te zetten, en omdat de teller ook commentaar meeleest is dat precies het oppoetsen met zoek-en-vervang waar diezelfde kop tegen waarschuwt. Dus niet gedaan.\n\nHet ECHTE dekkingscijfer komt uit scripts/dekking.js, dat het routejournaal van een echte ronde leest; daar staat deze route als aangeraakt, en die eis kent geen norm om hem mee te verlagen. Deze ratel gaat dus met een omhoog terwijl de dekking niet is gedaald.",
+      "waarheen": "server/routes/navigatie.js (de GET met :code/:deel) met test/navigatietoestelpakket.test.js toets 12 en 13; het bewijs van dekking komt uit DEKKING.json en niet uit deze lexicale teller"
     }
   ],
   "prestatie": {

@@ -204,8 +204,31 @@ Drie dingen. Niet meer, en dat is het goede nieuws.
 
 Op opbrengst per dag werk, en de eerste drie kosten samen ongeveer een week.
 
-1. **`stuur/beleid.js` de frictiemotor laten lezen.** Heft de laatste dubbele
-   waarheid in de gezagsvraag op. De motor heeft al 26 lezers; dit is de 27e.
+1. **De frictiemotor aansluiten op het stuur — en dat is anders dan het leek.**
+   Deze aanbeveling stond hier eerst als "`stuur/beleid.js` de motor laten lezen,
+   ongeveer een dag". Dat is nagemeten en het klopte niet, op twee punten.
+
+   Ten eerste zit de naad niet in `beleid.js`. Die leest `frictie/bodem.js` al
+   volledig, mét de afbeeldingsbeslissing en de regel dat hij alleen kan
+   verzwaren. Wat ontbreekt is de MOTOR, en die vraagt bedrag, aantal,
+   omkeerbaarheid en zekerheid — terwijl `beleidVoor(pad, wereld)` alleen een pad
+   en een rol krijgt, bij alle 8 aanroepers. De context zit één laag hoger:
+   `stuurToets` in `kern/stuur.js` heeft de body al in handen.
+
+   Ten tweede is de opbrengst smaller dan gehoopt, en dat is **gemeten**
+   (`npm run frictiestuur`): met de grondslag op `lezen` scoort 250.000 euro
+   **17** punten en de autogrens ligt op 30 — de bedragfactor loopt vast op 25 en
+   `hoge zekerheid` trekt er 8 af. **Bedrag alleen verzwaart nooit.** Wat wél
+   verzwaart is bedrag ÉN aantal samen (25.000 euro + 500 objecten = 42 →
+   `assist`). Dat is één vorm, en het is een echte: een bulkhandeling met een
+   groot bedrag hoort een mens te passeren.
+
+   De schaduw staat er inmiddels (`kern/stuur/frictieschaduw.js`), meelopend en
+   zonder te bijten, zoals `CONTROLPLANE.md` eist. Wat hem breder zou maken is
+   geen bedrading maar een **besluit**: een grondslag per AI-route. De tabel in
+   `kern/frictie/motor.js` is met zoveel woorden "de acties die Command kent",
+   zestien namen, en er is geen afbeelding van een AI-route op een daarvan — er
+   een verzinnen zou de fout van de cap `rooms` zijn.
 2. **`mandaat.js` een aanroeper geven.** De duurste regel van `INTELLIGENTIE.md`
    is gratis — de grammatica staat, niemand roept hem.
 3. **De routervolgorde omdraaien**, zodra de schaduwtelling een getal draagt.

@@ -25,7 +25,7 @@
     "kernGedeeld": 231,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 673,
+    "toetsenNietGemeten": 674,
     "toetsenOngevoeligPct": 0,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
@@ -1893,9 +1893,9 @@
       "sleutel": "toetsenNietGemeten",
       "van": 672,
       "vervalt": "2026-12-15",
-      "meter": "toetsenNietGemeten 672 -> 673",
-      "reden": "test/adressen.test.js komt erbij als handhaver van de adresratel: vijf documenten wezen naar kern/command/risico.js en dat bestand heeft nooit bestaan. De mutatiemotor muteert bron in server/, en deze toets meet of documentadressen naar een bestaand bestand wijzen -- de motor is er nog niet langs geweest. Dat een bronmutatie hier niets over zou zeggen is aannemelijk maar NIET gemeten, en GEEN_BRONMUTATIE eist pogingen: een reden zonder poging is een vermoeden. Dit is dus instrumentdekking en geen groenverklaring.",
-      "waarheen": "laat de mutatiemotor over test/adressen.test.js lopen in dezelfde ronde als de 27 toetsen van 2026-09-08 (zelfde sleutel, zelfde vervaldatum); levert dat pogingen zonder uitslag op, dan hoort de toets in GEEN_BRONMUTATIE met het aantal pogingen erbij, en anders gewoon gemeten"
+      "meter": "toetsenNietGemeten 672 -> 674",
+      "reden": "Twee toetsen komen erbij waar de mutatiemotor nog niet langs is. test/adressen.test.js handhaaft de adresratel (vijf documenten wezen naar een risicomotor onder kern/command/ die daar nooit heeft bestaan). test/frictieschaduw.test.js handhaaft dat de frictieschaduw NIETS beslist -- getoetst op de bron van kern/stuur.js -- en het gemeten anker dat bedrag alleen niet verzwaart en bedrag plus aantal wel. Dat een bronmutatie over deze twee niets zou zeggen is aannemelijk maar NIET gemeten, en GEEN_BRONMUTATIE eist pogingen: een reden zonder poging is een vermoeden. Dit is instrumentdekking en geen groenverklaring.",
+      "waarheen": "laat de mutatiemotor over test/adressen.test.js en test/frictieschaduw.test.js lopen in dezelfde ronde als de 27 toetsen van 2026-09-08 (zelfde sleutel, zelfde vervaldatum); levert dat pogingen zonder uitslag op, dan horen ze in GEEN_BRONMUTATIE met het aantal pogingen erbij, en anders gewoon gemeten"
     }
   ],
   "prestatie": {

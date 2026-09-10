@@ -553,6 +553,19 @@ de tweede helft: `kern/stuur/beleid.js` leest wél `frictie/bodem.js` (de
 ondergrens) maar niet de motor, en houdt dus zijn eigen armere model voor de
 vraag per geval. Dát is de resterende dubbele waarheid, niet het adres.
 
+**En die is nu in de SCHADUW gezet** (`kern/stuur/frictieschaduw.js`,
+`npm run frictiestuur`). `stuurToets` heeft de body al in handen en geeft hem aan
+de motor; die mag alleen verzwaren en beslist voorlopig niets — CONTROLPLANE.md:
+je kunt niet afdwingen wat nooit in de schaduw heeft gelopen. De meting die
+daarbij hoort corrigeert de verwachting: met de grondslag op `lezen` scoort
+250.000 euro **17** punten tegen een autogrens van 30, dus **bedrag alleen
+verzwaart nooit**; bedrag ÉN aantal samen wel (25.000 euro + 500 objecten = 42).
+Twee factoren die elk onder de grens blijven, kunnen er samen overheen — dat is
+gemeten en het is precies wat de eerste opzet fout had. Wat de koppeling breder
+zou maken is geen bedrading maar een besluit: een grondslag per AI-route, want de
+zestien namen in `kern/frictie/motor.js` zijn die van Command en er is geen
+afbeelding.
+
 ### Blok 3 — PLAN als protocol · **GEBOUWD**
 
 De architectuursprong. En het ontwerp ervan is streng:

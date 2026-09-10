@@ -1451,6 +1451,16 @@ const IJKINGEN = {
     proef: (voor) => metVervangenJson('APPWERKT.json',
       (j) => { j.gemeten.defecten = (j.gemeten.defecten || 0) + 3; return j; },
       () => norm.meet().appwerktDefecten - voor.appwerktDefecten)
+  },
+  /* DE TAND VAN 10 SEPTEMBER 2026: bewijsAlleenKeten telt de bewijsmechanismen
+     die alleen in de keten draaien en niet lokaal (BEWIJSLADDER.json). Zelfde
+     vorm als de vier hierboven -- hij telt een POST in een register, dus hij
+     wordt geijkt door dat getal tijdelijk op te hogen. Leest hij het verkeerde
+     veld, of een ontbrekend bestand als nul, dan beweegt hij niet mee. */
+  bewijsAlleenKeten: {
+    proef: (voor) => metVervangenJson('BEWIJSLADDER.json',
+      (j) => { j.telling.alleenKeten = (j.telling.alleenKeten || 0) + 4; return j; },
+      () => norm.meet().bewijsAlleenKeten - voor.bewijsAlleenKeten)
   }
 };
 

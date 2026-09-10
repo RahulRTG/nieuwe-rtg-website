@@ -89,6 +89,7 @@ const REGISTER = {
   'ROLRONDE.json': { meter: ['rolscheidingGaten', 'rolscheidingGemeten'] },
   'GLUURRONDE.json': { meter: ['gluurGaten', 'gluurGecontroleerd'] },
   'VERSTRENGELING.json': { meter: ['verstrengelingOnverklaard'] },
+  'BEWIJSLADDER.json': { meter: ['bewijsAlleenKeten'] },
   'ACTIVERING.json': { meter: ['activeringOndergrens'] },
   'TREDEPROEF.json': { meter: ['tredeLekken', 'tredeRondgangGezakt', 'tredeIngangLekken'] },
   'WEKKERS.json': { meter: ['wekkersOnverklaard', 'wekkersFunctieUitToch', 'wekkersZonderTrede'] },

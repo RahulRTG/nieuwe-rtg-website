@@ -164,6 +164,21 @@ const METERS = [
      Leest, net als activeringOndergrens, het vastgelegde bestand: de proef start
      een server en klopt zestig routes aan, en dat hoort niet in een ratel die
      bij elke push draait. `npm run tredeproef:vast` ververst hem. */
+  /* DE PARITEIT TUSSEN LOKAAL EN DE KETEN (BEWIJSLADDER.json).
+
+     `npm run bewijsladder` telt per soort bewijs welke mechanismen er draaien en
+     WAAR. Dit getal is het aantal dat alleen in de keten draait -- de sonde, de
+     containerproef, het a11y-oordeel, de attributie. Zolang het boven nul staat,
+     zijn lokaal en de keten twee kwaliteitswerelden, en dan is een groene lokale
+     ronde iets anders dan een groen vinkje.
+
+     ALLEEN OMLAAG, en niet omdat elk mechanisme lokaal MOET kunnen draaien: zeven
+     van de zestien lezen een artefact uit een andere job en kunnen hier per
+     definitie niet. Die staan in de teller omdat ze eerlijk geteld horen te
+     worden, niet omdat ze weg moeten. Wat de tand tegenhoudt is de andere kant:
+     er mag geen bewijs BIJKOMEN dat alleen GitHub kan leveren zonder dat iemand
+     dat opschrijft. */
+  { sleutel: 'bewijsAlleenKeten', richting: 'omlaag', wat: 'bewijsmechanismen die alleen in de keten draaien en niet lokaal (uit BEWIJSLADDER.json)' },
   { sleutel: 'tredeLekken', richting: 'omlaag', wat: 'routes buiten trede 0 die tóch antwoorden (uit TREDEPROEF.json)' },
   /* WEKKERS DIE GEEN ENKELE FUNCTIE RAAKT (WEKKERS.json).
 
@@ -1139,7 +1154,8 @@ function meet(bronnen) {
     laatSpoorVerdacht: leesRegister('LAATSPOOR.json', (j) => j.gemeten.verdacht),
     rollbackUitzonderingen: leesRegister('ROLLBACKBESLUIT.json', (j) => Object.keys(j.routes || {}).length),
     faalproefGezakt: leesRegister('FAALPROEF.json', (j) => j.gemeten.gezakt),
-    appwerktDefecten: leesRegister('APPWERKT.json', (j) => j.gemeten.defecten)
+    appwerktDefecten: leesRegister('APPWERKT.json', (j) => j.gemeten.defecten),
+    bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten)
   };
 }
 

@@ -55,8 +55,7 @@ test('lege informatie is één familie en opent meteen de juiste invullaag', () 
   assert.match(COMM, /actie: \{ tekst: 'Begin een gesprek', doel: '#nieuwBtn' \}/);
   assert.match(COMM, /\.then\(openLegeActie\)/);
   assert.match(REISRAHUL, /eersteBlad === 'rahul'[\s\S]*#rahulVraag/);
-  assert.match(JS, /profiel\.getAttribute\('href'\) !== '\/apps\/ik\.html#persoonlijk'/);
-  assert.match(JS, /profiel\.textContent !== 'Aanvullen'/,
+  assert.match(JS, /profiel\.getAttribute\('href'\) !== '\/apps\/ik\.html#persoonlijk'[\s\S]*profiel\.textContent !== 'Aanvullen'/,
     'de mutatiekijker mag zijn eigen profieltekst niet eindeloos opnieuw schrijven');
 });
 

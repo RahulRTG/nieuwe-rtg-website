@@ -19,6 +19,7 @@
 'use strict';
 
 const { binnenNederland } = require('./nederland');
+const gebieden = require('./gebieden');
 
 /* Een weigering zegt wat er ontbreekt EN hoe het goedkomt. Zonder dat tweede
    deel leest 503 als een storing, terwijl het een niet-gedraaide importstap is.
@@ -47,11 +48,46 @@ function netVoor(nederland, hier) {
 /* De dekkingsregel voor navStatus. Geeft `net`, `routeerbaarHier`, `netReden`
    en `dekking` -- vier velden die samen een scherm alles vertellen wat het over
    de motor mag zeggen, zodat het niets meer hoeft af te leiden. */
+/* WELKE KAART BIEDT RTG HIER AAN, los van of hij geladen is.
+
+   Dit is de tweede helft van het eerlijke antwoord, en hij ontbrak. Buiten
+   Nederland zei deze laag `demonstratie` en daarmee was het gesprek klaar --
+   terecht zolang er EEN land was. Nu RTG wereldwijd gebieden aanbiedt, wil een
+   lid buiten de dekking iets anders weten: bestaat er een kaart voor waar ik
+   ben, en ligt hij er al?
+
+   Drie standen die niet door elkaar mogen lopen (zie ./gebieden.js):
+   aangeboden is geen dekking, en gebouwd is nog niet actief. En wat hier staat
+   is met een RECHTHOEK bepaald: `vakIsGeenGrens` reist mee, want anders leest
+   "u bent in Nederland" als een landsbepaling. */
+function gebiedsbeeld(hier) {
+  const k = gebieden.gebiedVoor(hier);
+  if (!k.gebied) {
+    return { code: null, naam: null, aangeboden: false, gebouwd: false,
+      grond: k.grond, kandidaten: k.kandidaten || [], reden: k.waarom || null };
+  }
+  const g = k.gebied;
+  /* De licentiepoort reist mee: mag dit pakket worden aangeboden, en met welke
+     naamsvermelding? Een scherm dat de kaart toont, moet die vermelding kunnen
+     zetten -- zonder komt hij er niet door (ODbL). */
+  const poort = gebieden.mag(g);
+  return { code: g.code, naam: g.naam, soort: g.soort, aangeboden: true, gebouwd: !!g.gebouwd,
+    bron: g.bron || null, licentie: g.licentie || null,
+    naamsvermelding: poort.ok ? poort.naamsvermelding : null,
+    mag: poort.ok, magNietOmdat: poort.ok ? null : poort.reden,
+    grond: k.grond, vakIsGeenGrens: !!k.vakIsGeenGrens,
+    kandidaten: k.kandidaten || [], reden: k.waarom || null };
+}
+
 function dekkingsbeeld(nederland, hier) {
   const inNL = binnenNederland(hier);
   const net = netVoor(nederland, hier);
   return {
     net,
+    /* Naast `net` (waarop kan ik NU routeren) staat `gebied` (wat biedt RTG
+       hier aan). Twee verschillende vragen, en ze werden er een toen er nog
+       maar een land was. */
+    gebied: gebiedsbeeld(hier),
     routeerbaarHier: net !== 'geen',
     netReden: net === 'geen' ? geenNederlandsNet().error
       : (net === 'demonstratie' ? 'Buiten de NWB-dekking rekent RTG op het eigen demonstratienet.' : null),
@@ -62,4 +98,4 @@ function dekkingsbeeld(nederland, hier) {
   };
 }
 
-module.exports = { geenNederlandsNet, inNLZonderNet, netVoor, dekkingsbeeld };
+module.exports = { geenNederlandsNet, inNLZonderNet, netVoor, dekkingsbeeld, gebiedsbeeld };

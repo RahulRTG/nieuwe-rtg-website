@@ -101,8 +101,23 @@ const pakketLigt = (code) => {
 /* Wat de bron ons kan leveren. Ontbreekt de index, dan is het antwoord LEEG met
    een reden -- nooit stilzwijgend nul, want dat leest als "er is niets aan te
    bieden" in plaats van "wij hebben niet gekeken". */
+/* DE INDEX WORDT GECACHET OP ZIJN WIJZIGINGSTIJD, en dat is geen optimalisatie
+   om de optimalisatie. `dekkingsbeeld()` hangt aan navStatus, dus dit bestand
+   zou bij ELK statusverzoek van schijf komen. Op de mtime en niet blind: een
+   cache die nooit vervalt, vraagt een herstart na een import -- en dat is
+   precies het soort stille voorwaarde waar iemand een uur aan kwijt is. */
+let cache = null;
 function index() {
   const p = indexPad();
+  let stempel = null;
+  try { stempel = fs.existsSync(p) ? String(fs.statSync(p).mtimeMs) + ':' + p : 'weg:' + p; }
+  catch (e) { stempel = 'onleesbaar:' + p; }
+  if (cache && cache.stempel === stempel) return cache.uit;
+  const uit = leesIndex(p);
+  cache = { stempel, uit };
+  return uit;
+}
+function leesIndex(p) {
   if (!fs.existsSync(p)) {
     return { gebieden: [], reden: 'Er is nog geen gebiedsindex ingelezen; draai `npm run navigatie:index`. ' +
       'Zonder index weet RTG niet wat de bron kan leveren, en dat is iets anders dan dat er niets is.' };

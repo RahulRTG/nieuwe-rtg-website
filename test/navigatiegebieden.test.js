@@ -294,3 +294,62 @@ test('11. het pakket van een gebied komt uit zijn CODE en niet uit een vaste naa
     assert.equal(g.pakketLigt('frankrijk'), false, 'en dat zegt niets over een ander gebied');
   });
 });
+
+test('12. de dekkingslaag ROEPT deze laag aan, en verzint er niets bij', () => {
+  /* DE REDEN DAT DEZE TOETS ER IS. De keuring merkte `gebieden.js` aan als
+     "nergens aangeroepen" -- dode code. Dat is dezelfde fout die RTG Move drie
+     commits lang was: een laag die klopt en die niemand gebruikt. De aanroeper
+     is kern/navigatie/dekking.js, en die hangt aan navStatus.
+
+     Wat hier wordt vastgelegd is dat `net` (waarop kan ik NU routeren) en
+     `gebied` (wat biedt RTG hier aan) twee VERSCHILLENDE vragen blijven. Ze
+     werden er een toen er nog maar een land was. */
+  metDataMap((map, g) => {
+    const dekking = require('../server/kern/navigatie/dekking');
+    schrijfIndex(map, { bron: 'proef', licentie: 'ODbL 1.0', gebieden: [
+      { ...NL, naamsvermelding: '(c) OpenStreetMap-bijdragers' },
+      { code: 'spanje', naam: 'Spanje', vak: { lat0: 35.9, lat1: 43.8, lng0: -9.4, lng1: 4.4 } }
+    ] });
+
+    const nl = dekking.dekkingsbeeld(null, { lat: 52.09, lng: 5.12 });
+    assert.equal(nl.net, 'geen', 'zonder NWB-pakket valt er in NL niets te rekenen');
+    assert.equal(nl.gebied.code, 'nederland', 'maar RTG biedt hier wel een kaart aan');
+    assert.equal(nl.gebied.aangeboden, true);
+    assert.equal(nl.gebied.gebouwd, false, 'aangeboden is geen dekking');
+    assert.equal(nl.gebied.mag, true, 'en de naamsvermelding is er, dus hij mag');
+    assert.equal(nl.gebied.naamsvermelding, '(c) OpenStreetMap-bijdragers');
+
+    /* DE LICENTIEPOORT REIKT TOT navStatus. Spanje staat in de index zonder
+       naamsvermelding, dus dit pakket mag niet worden aangeboden -- en het
+       scherm krijgt de reden in plaats van een stille kaart. */
+    const es = dekking.dekkingsbeeld(null, { lat: 38.91, lng: 1.43 });
+    assert.equal(es.gebied.code, 'spanje');
+    assert.equal(es.gebied.mag, false);
+    assert.match(es.gebied.magNietOmdat, /eist naamsvermelding/i);
+    assert.equal(es.gebied.naamsvermelding, null, 'en er wordt geen vermelding verzonnen');
+
+    /* Buiten elk vak blijft het eerlijke lege antwoord staan. */
+    const niets = dekking.dekkingsbeeld(null, { lat: -33.9, lng: 151.2 });
+    assert.equal(niets.gebied.code, null);
+    assert.equal(niets.gebied.aangeboden, false);
+    assert.match(niets.gebied.reden, /biedt hier \(nog\) geen kaart aan/i);
+  });
+});
+
+test('13. de index wordt opnieuw gelezen zodra hij verandert', () => {
+  /* `dekkingsbeeld()` hangt aan navStatus, dus de index wordt gecachet -- anders
+     komt hij bij elk statusverzoek van schijf. Op de MTIME en niet blind: een
+     cache die nooit vervalt, vraagt een herstart na een import, en dat is
+     precies het soort stille voorwaarde waar iemand een uur aan kwijt is. */
+  metDataMap((map, g) => {
+    schrijfIndex(map, { bron: 'proef', gebieden: [NL] });
+    assert.equal(g.catalogus().telling.aangeboden, 1);
+    /* De mtime moet echt verschillen; op een snelle schijf is twee keer
+       schrijven binnen dezelfde milliseconde geen theoretisch geval. */
+    const pad = path.join(map, 'navigatie', 'gebieden.json');
+    schrijfIndex(map, { bron: 'proef', gebieden: [NL, { code: 'spanje', naam: 'Spanje', vak: NL.vak }] });
+    const t = Date.now() + 5000;
+    fs.utimesSync(pad, t / 1000, t / 1000);
+    assert.equal(g.catalogus().telling.aangeboden, 2, 'de nieuwe index wordt gezien');
+  });
+});

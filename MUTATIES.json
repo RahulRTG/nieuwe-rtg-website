@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T15:30:42.953Z",
-    "commit": "8abd530c",
+    "op": "2026-09-10T16:04:41.093Z",
+    "commit": "72aa2f06",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4096,7 +4096,7 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 2,
+      "gezakt": 6,
       "scherp": "gezakt"
     },
     "move.test.js": {

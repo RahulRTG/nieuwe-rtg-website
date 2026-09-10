@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-09T18:26:20.122Z",
-    "commit": "b7af216b",
+    "op": "2026-09-10T13:34:55.475Z",
+    "commit": "738cf019",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -1678,6 +1678,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "faalproefklasse.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/faalproef.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "faalproefvorm.test.js": {
       "soort": "puur",
@@ -7499,6 +7507,14 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "versheid-uitvoer.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/versheid.js",
+      "operator": "!==->===#2",
+      "gezakt": 2,
+      "geprobeerd": 12
     },
     "verstrengeling.test.js": {
       "soort": "puur",

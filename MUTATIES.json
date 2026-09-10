@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T17:08:54.683Z",
-    "commit": "394e5db2",
+    "op": "2026-09-10T18:01:18.294Z",
+    "commit": "fc617ca5",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6261,6 +6261,10 @@
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
       "reden": "de foutisolatie is een stringliteraal (try/catch per bestand) die de toets echt uitvoert; geen bronoperator raakt dat. Met de hand raak: de omwikkeling weghalen laat toets 1 zakken, en dat is de enige reden dat samenvoegen daar mag"
+    },
+    "second-screen-personal.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
     },
     "selfhost.test.js": {
       "soort": "puur",

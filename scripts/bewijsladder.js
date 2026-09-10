@@ -157,7 +157,16 @@ function bewijsVan(doel) {
   let bron = '';
   try { bron = fs.readFileSync(path.join(WORTEL, doel), 'utf8'); } catch (e) { return { register: null, stempel: null }; }
 
-  /* variabele -> registernaam, voor `const REGISTER = path.join(WORTEL, 'X.json')` */
+  /* Welke variabele draagt welke registernaam? (een `const` met een
+     samengesteld pad naar een json in de wortel).
+
+     DE NAAM VAN DAT VOORBEELD STOND HIER EERST UITGESCHREVEN, en dat kostte een
+     rode keten: test/versheidsdekking.test.js leest scripts/ op de tekst
+     `WORTEL, '<NAAM>.json'` om te zien welke registers er geschreven worden, en
+     die scan kijkt niet of hij in code of in een UITLEG staat. Mijn voorbeeld
+     declareerde dus een register dat niet bestaat, en de toets eiste terecht
+     een versheidsmelding voor een bestand dat niemand ooit schrijft. Een
+     voorbeeldpad in commentaar is hier geen illustratie maar een bewering. */
   const vanVariabele = new Map();
   for (const m of bron.matchAll(/(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*path\.join\([^)]*?['"]([A-Za-z0-9_.-]+\.json)['"]\s*\)/g))
     vanVariabele.set(m[1], m[2]);

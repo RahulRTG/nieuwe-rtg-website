@@ -31,8 +31,8 @@ module.exports = ({ app, db, huisAuth, doe, kies, BUREAUS }) => {
   app.post('/api/werkplek/bureau/architect/project', huisAuth, doe('architect', 'collectieMaak', 'body'));
   app.post('/api/werkplek/bureau/architect/portfolio', huisAuth, doe('architect', 'portfolio', 'naam'));
   app.post('/api/werkplek/bureau/architect/bouwstaat', huisAuth, doe('architect', 'aiBouwstaat', 'id'));
-  app.post('/api/werkplek/bureau/architect/concept', huisAuth, doe('architect', 'aiConcept', 'id', true));
-  app.post('/api/werkplek/bureau/architect/kritiek', huisAuth, doe('architect', 'aiKritiek', 'idVraag', true));
+  app.post('/api/werkplek/bureau/architect/concept', huisAuth, doe('architect', 'aiConcept', 'id'));
+  app.post('/api/werkplek/bureau/architect/kritiek', huisAuth, doe('architect', 'aiKritiek', 'idVraag'));
   // redactie
   app.post('/api/werkplek/bureau/redactie', huisAuth, doe('redactie', 'overzicht', 'geen'));
   app.post('/api/werkplek/bureau/redactie/artikel/maak', huisAuth, doe('redactie', 'artikelMaak', 'body'));
@@ -43,8 +43,8 @@ module.exports = ({ app, db, huisAuth, doe, kies, BUREAUS }) => {
   app.post('/api/werkplek/bureau/redactie/editie/status', huisAuth, doe('redactie', 'editieStatus', 'idStatus'));
   app.post('/api/werkplek/bureau/redactie/drukproef', huisAuth, doe('redactie', 'drukproef', 'id'));
   app.post('/api/werkplek/bureau/redactie/nieuwstips', huisAuth, doe('redactie', 'nieuwstips', 'geen'));
-  app.post('/api/werkplek/bureau/redactie/ai/schrijf', huisAuth, doe('redactie', 'aiSchrijf', 'schrijf', true));
-  app.post('/api/werkplek/bureau/redactie/ai/redactie', huisAuth, doe('redactie', 'aiRedactie', 'id', true));
+  app.post('/api/werkplek/bureau/redactie/ai/schrijf', huisAuth, doe('redactie', 'aiSchrijf', 'schrijf'));
+  app.post('/api/werkplek/bureau/redactie/ai/redactie', huisAuth, doe('redactie', 'aiRedactie', 'id'));
   // ideeen
   app.post('/api/werkplek/bureau/ideeen', huisAuth, doe('ideeen', 'overzicht', 'geen'));
   app.post('/api/werkplek/bureau/ideeen/maak', huisAuth, doe('ideeen', 'ideeMaak', 'body'));
@@ -52,7 +52,7 @@ module.exports = ({ app, db, huisAuth, doe, kies, BUREAUS }) => {
   app.post('/api/werkplek/bureau/ideeen/verwijder', huisAuth, doe('ideeen', 'ideeVerwijder', 'id'));
   app.post('/api/werkplek/bureau/ideeen/reactie', huisAuth, doe('ideeen', 'reactie', 'idBody'));
   app.post('/api/werkplek/bureau/ideeen/spinoff', huisAuth, doe('ideeen', 'spinOff', 'idBureau'));
-  app.post('/api/werkplek/bureau/ideeen/uitwerken', huisAuth, doe('ideeen', 'aiUitwerken', 'id', true));
+  app.post('/api/werkplek/bureau/ideeen/uitwerken', huisAuth, doe('ideeen', 'aiUitwerken', 'id'));
 
   /* De plank van dit huis: wat er uit het Hardwarelab in de verkoop staat.
      RTG leest de echte winkel, de stichting haar eigen plank. Prijzen zijn in

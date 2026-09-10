@@ -31,7 +31,11 @@ module.exports = (kern) => {
     if (!url) return res.status(400).json({ error: 'De foto kon niet worden opgeslagen.' });
     stuur(res, atelierweb.fotoBewaar(url));
   });
-  app.post('/api/office/atelierweb/foto-weg', officeAuth, (req, res) => stuur(res, atelierweb.fotoWeg(String((req.body || {}).url || ''))));
+  /* AWAIT, want fotoWeg legt de verwijdering duurzaam vast (kern/kantoorwissen.js)
+     en is daarmee async. Zonder await serialiseert de Promise naar `{}` en
+     verdwijnt `fotos` uit het antwoord -- 200 met een leeg lijf, precies de
+     vals-succesvorm die test/salonbron-fotobank.test.js 5 ving. */
+  app.post('/api/office/atelierweb/foto-weg', officeAuth, async (req, res) => stuur(res, await atelierweb.fotoWeg(String((req.body || {}).url || ''))));
 
   // beeld "Uit De Salon" als bron in de studio
   app.post('/api/office/atelierweb/salon', officeAuth, (req, res) => {

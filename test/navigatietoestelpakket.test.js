@@ -40,6 +40,17 @@ const GEBIEDEN = [
 const DELEN = ['graaf.json', 'coords.f64', 'offsets.u32', 'doelen.u32',
   'kosten.f32', 'lengtes.f32', 'wegen.u32', 'vlaggen.u8'];
 
+/* DE VORM VAN DE BYTES-ROUTE, letterlijk zoals server/routes/navigatie.js hem
+   registreert. Dit is geen sierlijke constante: het manifest noemt per deel een
+   ADRES, en dat adres hoort exact deze route te zijn met de code en de deelnaam
+   ingevuld. Lopen die twee uiteen -- iemand hernoemt de route, of het manifest
+   plakt zijn adres anders in elkaar -- dan wijst een manifest naar een 404
+   terwijl beide kanten los prima kloppen. Zo'n fout is met geen enkele losse
+   toets te vinden, want er is niets mis met de route en niets mis met het
+   manifest. */
+const PAD_DEEL = '/api/nav/gebied/pakket/:code/:deel';
+const adresVoor = (code, naam) => PAD_DEEL.replace(':code', code).replace(':deel', naam);
+
 /* Dezelfde wereld als test/navigatiemijnkaarten.js: een verse datamap met een
    index en desgevraagd een gebouwd pakket. De modules gaan er opnieuw in omdat
    de gebiedenlaag zijn index en catalogus op een mtime onthoudt. */
@@ -89,7 +100,8 @@ test('1. het manifest noemt acht delen, met de echte grootte en de echte som', a
          toetst dit dat crypto met zichzelf overeenkomt. */
       assert.equal(d.som, crypto.createHash('sha256').update(rauw).digest('hex').slice(0, 32),
         d.naam + ': de som is van dit bestand');
-      assert.equal(d.adres, '/api/nav/gebied/pakket/nederland/' + d.naam);
+      assert.equal(d.adres, adresVoor('nederland', d.naam),
+        'het adres in het manifest is de route die de server registreert, ingevuld');
       som += rauw.length;
     }
     assert.equal(m.bytesTotaal, som, 'het totaal is de som van de delen');
@@ -280,6 +292,9 @@ test('12. over HTTP komt het manifest door, en de bytes zijn werkelijk het besta
   assert.equal(m.body.delen.length, 8);
   const graaf = path.join(TMP, 'navigatie', 'nederland-graaf');
   for (const d of m.body.delen) {
+    /* Halen langs het adres UIT het manifest (dat is wat een toestel doet), en
+       ernaast de controle dat dat adres de geregistreerde route is. */
+    assert.equal(d.adres, adresVoor('nederland', d.naam));
     const r = await fetch(base + d.adres, { headers: { Authorization: 'Bearer ' + lid } });
     assert.equal(r.status, 200, d.naam + ' -> ' + r.status);
     const buf = Buffer.from(await r.arrayBuffer());

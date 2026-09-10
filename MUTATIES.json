@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T20:57:06.928Z",
-    "commit": "9d59af32",
+    "op": "2026-09-10T22:38:34.028Z",
+    "commit": "7586b017",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4243,6 +4243,13 @@
       "operator": "===->!==#2",
       "gezakt": 1,
       "geprobeerd": 11
+    },
+    "navigatietoestelpakket.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "negenplus.test.js": {
       "soort": "server",

@@ -44,6 +44,7 @@ const { TALEN, BASIS } = require('../server/talen');
 const schrift = require('../server/taalschrift');
 const { KERN, dictVan, TALEN_MET_KERN } = require('../server/translate/woordenboek/wereld');
 const { keur } = require('../server/kern/taalkeuring');
+const { stempel } = require('./lib/stempel');
 
 /* Het oordeel van een mens die de taal spreekt. Vandaag leeg, en dat staat er
    zo in -- een leeg register is een eerlijke nul en geen ontbrekend bestand. */
@@ -161,7 +162,15 @@ function toon(m) {
 
 if (require.main === module) {
   const m = meet();
-  fs.writeFileSync(path.join(WORTEL, 'TAALKWALITEIT.json'), JSON.stringify(m, null, 2) + '\n');
+  /* HET STEMPEL STAAT HIER EN NIET IN meet(). Een register zonder tijdstempel is
+     niet na te lopen: verouderd ziet er identiek uit aan vers, en dan worden de
+     getallen geloofd (scripts/lib/stempel.js legt uit welke vier fouten daaruit
+     zijn voortgekomen). Maar meet() krijgt bij het ijken een verzonnen bron mee
+     en draait dan zonder een meetronde te zijn -- zo'n uitslag mag geen stempel
+     dragen, want dat is precies de stilte die dit veld moet doorbreken. Een
+     stempel hoort dus bij het WEGSCHRIJVEN en niet bij het rekenen. */
+  const uit = Object.assign({ stempel: stempel(), hoe: 'npm run taalkwaliteit' }, m);
+  fs.writeFileSync(path.join(WORTEL, 'TAALKWALITEIT.json'), JSON.stringify(uit, null, 2) + '\n');
   if (process.argv.includes('--toon')) toon(m);
   else console.log('TAALKWALITEIT.json geschreven: ' + m.talen + ' talen, betekenis ongemeten voor ' + m.betekenisOngemeten + '.');
 }

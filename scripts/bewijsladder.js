@@ -260,6 +260,16 @@ function meet() {
     .sort((a, b) => a.doel.localeCompare(b.doel));
 
   return { sporten, zonderTrede,
+    /* WAT DEZE UITSLAG NIET AANTOONT, en dat hoort in het REGISTER en niet
+       alleen in de kop van dit bestand: zonder die zin leest "6 sporten staan"
+       als een dekkende garantie. test/meetkeuring.test.js dwingt het af, en
+       betrapte deze meter er meteen op. */
+    grens: 'De SPORTEN zijn verklaard en niet gemeten: dat een soort bewijs hier ontbreekt, ' +
+      'zegt deze meter niet. Van de mechanismen erop meet hij dat ze DRAAIEN en waar -- niet ' +
+      'of het bewijs dat ze leveren goed is, en niet of het genoeg is. `alleenKeten` telt en ' +
+      'oordeelt niet: zeven van die mechanismen lezen een artefact uit een andere job en kunnen ' +
+      'lokaal per definitie niet draaien. En er staat met opzet geen samengesteld eindoordeel ' +
+      'onder deze tabel (KEURING.md par. 5).',
     telling: {
       mechanismen: gebruikt.size,
       sporten: sporten.length,
@@ -279,22 +289,28 @@ module.exports = { LADDER, meet, bewijsVan, standVan, REGISTER };
 if (require.main === module) {
   const argv = process.argv.slice(2);
   const uitslag = meet();
-  if (argv.includes('--json')) { console.log(JSON.stringify(uitslag, null, 2)); process.exit(0); }
+  /* GEEN process.exit NA EEN GROTE UITVOER. Naar een BESTAND gaat dat goed
+     (node schrijft dan synchroon), naar een PIPE niet: de poortwacht verloor zo
+     twee derde van 484 KB -- geldige tekst, kapotte JSON, exitcode 0. Met
+     exitCode loopt de pijp eerst leeg. Zie test/meetkeuring.test.js, regel
+     `pipe`, die deze meter er prompt op betrapte. */
+  if (argv.includes('--json')) { console.log(JSON.stringify(uitslag, null, 2)); return; }
 
   if (argv.includes('--controle')) {
     let oud = null;
     try { oud = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) {}
-    if (!oud) { console.error('Geen BEWIJSLADDER.json om tegen te vergelijken -- draai `npm run bewijsladder:vast`.'); process.exit(1); }
+    if (!oud) { console.error('Geen BEWIJSLADDER.json om tegen te vergelijken -- draai `npm run bewijsladder:vast`.'); process.exitCode = 1; return; }
     const gegroeid = uitslag.zonderTrede.filter(z => !(oud.zonderTrede || []).some(o => o.doel === z.doel));
     if (gegroeid.length) {
       console.error('De keten draait bewijs dat op geen enkele sport staat (' + gegroeid.length + '):');
       for (const z of gegroeid) console.error('  - ' + z.doel + '  [' + z.keten.join(', ') + ']');
       console.error('\nGeef het een sport in scripts/bewijsladder.js, of leg uit waarom het er geen heeft.');
-      process.exit(1);
+      process.exitCode = 1;
+      return;
     }
     console.log('De bewijsladder klopt met de keten: ' + uitslag.telling.mechanismen + ' mechanismen op ' +
       uitslag.telling.sporten + ' sporten, ' + uitslag.zonderTrede.length + ' zonder sport (ongewijzigd).');
-    process.exit(0);
+    return;
   }
 
   console.log('\n' + K.vet + 'DE BEWIJSLADDER' + K.uit + K.dim +

@@ -83,6 +83,11 @@ const REGISTER = {
      dezelfde ratel, niet aan geen enkele. */
   'LAATSTE_METING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   'MUTATIES.json': { meter: ['toetsenOngevoeligPct', 'toetsenNietGemeten'] },
+  'TAALKWALITEIT.json': { meter: ['taalPoortHoudtTegen', 'taalCellenVerkeerdSchrift', 'taalBetekenisOngemeten'] },
+  /* Het sprekersregister is de INVOER van taalBetekenisOngemeten: die meter
+     daalt alleen doordat hier een oordeel bij komt. Het hangt dus aan dezelfde
+     ratel, en niet aan geen enkele. */
+  'TAALOORDEEL.json': { meter: ['taalBetekenisOngemeten'] },
   'GRENZEN.json': { meter: ['kernBreedte', 'kernGedeeld', 'kernBreedsteBestand', 'kernOngebruikt'] },
   'WETTEN.json': { meter: ['wettenOnbewezen'] },
   'LADDER.json': { meter: ['ladderRaak', 'ladderNietGeprobeerd'] },

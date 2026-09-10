@@ -309,7 +309,9 @@
     "kantoormacht:vast": "node scripts/kantoormacht.js --vastleggen",
     "kantoormacht:controle": "node scripts/kantoormacht.js --controle",
     "navigatieproef": "node scripts/navigatieproef.js",
-    "navigatieproef:vast": "node scripts/navigatieproef.js --vastleggen"
+    "navigatieproef:vast": "node scripts/navigatieproef.js --vastleggen",
+    "taalkwaliteit": "node scripts/taalkwaliteit.js",
+    "taalkwaliteit:toon": "node scripts/taalkwaliteit.js --toon"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

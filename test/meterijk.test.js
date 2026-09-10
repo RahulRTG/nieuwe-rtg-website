@@ -465,6 +465,51 @@ const IJKINGEN = {
     }
   },
 
+  /* ---- de drie taalkwaliteitsmeters -------------------------------------
+     Alle drie geijkt met een INJECTEERBARE bron (scripts/taalkwaliteit.js kent
+     `meet(bron)`, dezelfde vorm als kern/taaldekking.js). De echte tabel heeft
+     geen gaten, dus een proef op de echte tabel kan nooit uitslaan -- en dan
+     bewijst hij niets over de meter. */
+  taalPoortHoudtTegen: {
+    /* Bekend-foute invoer: een keuring die alles goedkeurt. Zakt dit, dan telt
+       de meter niet meer wat de poort werkelijk vangt, en kan iemand een
+       controle uitzetten zonder dat de ratel valt. */
+    proef: () => {
+      const { meet } = require('../scripts/taalkwaliteit');
+      const echt = meet().poortHoudtTegen;
+      const slap = meet({ keur: () => ({ oordeel: 'goed', redenen: [], schriftBeslissend: true }) }).poortHoudtTegen;
+      assert.equal(slap, 0, 'een keuring die alles goedkeurt houdt niets tegen');
+      return echt - slap;
+    }
+  },
+
+  taalCellenVerkeerdSchrift: {
+    /* Bekend-foute invoer: een kernrij met Nederlandse woorden onder een taal
+       die het Latijnse schrift niet kent. */
+    proef: () => {
+      const { meet } = require('../scripts/taalkwaliteit');
+      const { dictVan } = require('../server/translate/woordenboek/wereld');
+      const echt = meet().cellenVerkeerdSchrift;
+      assert.equal(echt, 0, 'de echte tabel draagt er vandaag geen');
+      const kapot = meet({ dictVan: (c) => (c === 'ti' ? { huiswerk: 'huiswerk', school: 'school' } : dictVan(c)) });
+      return kapot.cellenVerkeerdSchrift - echt;
+    }
+  },
+
+  taalBetekenisOngemeten: {
+    /* Deze meter daalt ALLEEN door een oordeel van een mens. De foute invoer is
+       dus een register met sprekers erin: ziet de meter ze niet, dan blijft het
+       getal staan terwijl de schuld kleiner werd -- en meet hij het
+       tegenovergestelde van wat hij moet meten. */
+    proef: () => {
+      const { meet } = require('../scripts/taalkwaliteit');
+      const echt = meet().betekenisOngemeten;
+      const metSprekers = meet({ sprekers: { oordelen: [{ taal: 'ti' }, { taal: 'am' }, { taal: 'so' }] } });
+      assert.equal(metSprekers.graden.bewezen, 3, 'alleen een spreker zet een taal op bewezen');
+      return echt - metSprekers.betekenisOngemeten;
+    }
+  },
+
   delenZonderOnderwerp: {
     /* GEIJKT OP DE ZEEF EN NIET OP DE BOOM, en dat is hier een keuze met een
        reden. De proef van bronBlindeBestanden hierboven zet zijn foute invoer in

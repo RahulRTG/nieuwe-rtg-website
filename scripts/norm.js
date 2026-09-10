@@ -408,6 +408,21 @@ const METERS = [
   { sleutel: 'bronBlindeBestanden', richting: 'omlaag', wat: '.js-bestanden waar de commentaar-verwijderaar code kwijtraakt of niet gelezen kan worden' },
   { sleutel: 'delenZonderOnderwerp', richting: 'omlaag', wat: 'bundeldelen zonder onderwerpregel bovenin (zie BUNDELS.md)' },
   { sleutel: 'metingenZonderRatel', richting: 'omlaag', wat: 'meetbestanden in de wortel die aan geen enkele ratel hangen' },
+  /* DE TAALKWALITEIT (TAALKWALITEIT.json, npm run taalkwaliteit).
+
+     Drie getallen, en ze meten met opzet drie verschillende dingen. `taalPoort
+     HoudtTegen` telt hoeveel beproefde faalvormen de keuring werkelijk stopt --
+     zet iemand een controle uit, dan daalt dit en valt de ratel. `taalCellen
+     VerkeerdSchrift` moet op nul blijven: een kernwoord in een ander schrift dan
+     de taal kent, is een aantoonbare fout. En `taalBetekenisOngemeten` is de
+     eerlijke restschuld: over de BETEKENIS van een vertaling doet geen enkele
+     machine hier een uitspraak, en dat getal daalt alleen doordat een mens die
+     de taal spreekt een oordeel geeft in TAALOORDEEL.json. Het staat vandaag op
+     alle 114 talen, en dat hoort zichtbaar te blijven in plaats van weg te
+     vallen tegen de vorm-metingen die wel groen zijn. */
+  { sleutel: 'taalPoortHoudtTegen', richting: 'omhoog', wat: 'faalvormen die de taalkeuring aantoonbaar tegenhoudt' },
+  { sleutel: 'taalCellenVerkeerdSchrift', richting: 'omlaag', wat: 'kernwoorden in een schrift dat de taal niet kent' },
+  { sleutel: 'taalBetekenisOngemeten', richting: 'omlaag', wat: 'talen waarvan geen spreker de BETEKENIS heeft beoordeeld' },
   /* DE METER DIE OVER HET BEWIJS ZELF GAAT (STANDAARD.md par. 5).
 
      Alles hierboven meet de code of de ratel. Deze meet of de UITSLAGEN
@@ -1139,7 +1154,17 @@ function meet(bronnen) {
     laatSpoorVerdacht: leesRegister('LAATSPOOR.json', (j) => j.gemeten.verdacht),
     rollbackUitzonderingen: leesRegister('ROLLBACKBESLUIT.json', (j) => Object.keys(j.routes || {}).length),
     faalproefGezakt: leesRegister('FAALPROEF.json', (j) => j.gemeten.gezakt),
-    appwerktDefecten: leesRegister('APPWERKT.json', (j) => j.gemeten.defecten)
+    appwerktDefecten: leesRegister('APPWERKT.json', (j) => j.gemeten.defecten),
+    /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
+       milliseconden en een afdruk die achterloopt zou hier een groen getal
+       geven voor een poort die inmiddels openstaat. */
+    ...(() => {
+      try {
+        const t = require('./taalkwaliteit').meet();
+        return { taalPoortHoudtTegen: t.poortHoudtTegen, taalCellenVerkeerdSchrift: t.cellenVerkeerdSchrift,
+          taalBetekenisOngemeten: t.betekenisOngemeten };
+      } catch (e) { return {}; }
+    })()
   };
 }
 

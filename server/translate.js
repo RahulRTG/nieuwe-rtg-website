@@ -49,6 +49,10 @@ function localizeList(list, lang) {
 
 const { naamEn, bestaat } = require('./talen');
 const vertaalModelBatch = require('./translate/batch-model');
+/* De keuring staat TUSSEN het model en alles wat blijft; ./translate/uitslag.js
+   kiest daarmee welke bron wint. Zie kern/taalkeuring.js voor waarom er drie
+   uitkomsten zijn en niet twee. */
+const { beslis } = require('./translate/uitslag');
 
 async function claudeTranslate(text, to) {
   const target = to === 'nl' ? 'Dutch' : naamEn(to);
@@ -108,6 +112,9 @@ async function translateBatch(teksten, to, from, opties) {
   const bewaarMag = !!(opties && opties.bewaar);
   const uit = new Array(teksten.length);
   const wacht = [];
+  /* Wat de keuring deze ronde tegenhield. De aanroeper krijgt dit mee, zodat
+     een stille afwijzing niet stil blijft. */
+  const gekeurd = { goed: 0, verdacht: 0, afgewezen: 0 };
 
   for (let i = 0; i < teksten.length; i++) {
     const text = teksten[i];
@@ -152,18 +159,22 @@ async function translateBatch(teksten, to, from, opties) {
         catch (e) { model = null; }
       }
       groep.forEach((item, j) => {
-        const lokaal = volledigeBoodschap(item.text, to);
-        const result = (model && model[j]) || lokaal || item.text;
+        /* Welke bron wint, en mag zij blijven: ./translate/uitslag.js. */
+        const { tekst, magBewaren } = beslis({
+          bron: item.text, modelRegel: model ? model[j] : null,
+          lokaal: volledigeBoodschap(item.text, to), naar: to, tel: gekeurd
+        });
         /* Een tijdelijke modelstoring mag geen onvertaalde zin als blijvend
            cacheantwoord vastzetten. Alleen echte vertaling is een cache-hit. */
-        if (result !== item.text) {
-          cacheSchrijf(item.key, result);
-          kastSchrijf(bewaarMag && item.ai, to, item.text, result);   // alleen door de broncontrole toegelaten interface
+        if (tekst !== item.text) {
+          cacheSchrijf(item.key, tekst);
+          if (magBewaren) kastSchrijf(bewaarMag && item.ai, to, item.text, tekst);
         }
-        uit[item.i] = { text: result, translated: result !== item.text, from: item.bron };
+        uit[item.i] = { text: tekst, translated: tekst !== item.text, from: item.bron };
       });
     }
   }
+  uit.keuring = gekeurd;
   return uit;
 }
 

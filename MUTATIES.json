@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T19:02:12.039Z",
-    "commit": "a576d2ad",
+    "op": "2026-09-10T19:03:55.941Z",
+    "commit": "9f53ecb7",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1325,13 +1325,11 @@
     },
     "budgetterugname.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/waarde/index.js"
-      ],
-      "geprobeerd": 22,
-      "posities": 1000,
-      "dekking": "beproefd"
+      "staat": "gezakt",
+      "module": "server/kern/waarde/terugname.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "bugjacht.test.js": {
       "soort": "server",

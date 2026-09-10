@@ -18,12 +18,12 @@ het?**
 |---|---|
 | Functieschakelaars (aan/uit per functie) | **213** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
-| Bedrijfsgenres | **74** in 27 sectoren |
+| Bedrijfsgenres | **75** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
 | Kernmodules (`server/kern/**`) | **2064** |
 | App-pagina's (`public/apps/**.html`) | **303** |
-| Testbestanden | **1780** |
+| Testbestanden | **1781** |
 
 ## De vier werelden
 
@@ -651,7 +651,7 @@ ze werken; dit is wat hij ziet.
 - **RTF-Bibliotheek** `/apps/foundation/bieb.html` — Gratis kind- en gezinsapps van de RTFoundation.
 - **Geloof & Wijsheid** `/apps/foundation/geloofbieb.html` — De Geloof & Wijsheid-Bibliotheek: alle tradities als gelijken, met echte leesbare teksten.
 
-# 3. De 74 genres in 27 sectoren
+# 3. De 75 genres in 28 sectoren
 
 Er is **één** partner-app en **één** personeels-PDA. Welke schermen een zaak
 krijgt volgt niet uit zijn genre maar uit zijn *genre-caps*: een hotel en een
@@ -683,6 +683,7 @@ is de reden dat er geen 130 losse apps zijn.
 - **safety** (7) — Politie (`politie`), Brandweer (`brandweer`), Ambulance (`ambulance`), Marechaussee (`marechaussee`), Defensie (`defensie`), Special Forces (`specials`), Beveiliging & security (`beveiliging`)
 - **sports** (3) — Sportclub (`sportclub`), Golf & countryclub (`golfclub`), Sport & fitnessclub (`fitnessclub`)
 - **technology** (1) — IT-hulp aan huis (`ithulp`)
+- **travel** (1) — Reisbureau (`reisbureau`)
 - **veterinary** (2) — Dierenartspraktijk (`dierenarts`), Petcare & pension (`petcare`)
 - **wholesale** (1) — Groothandel & markt (`groothandel`)
 

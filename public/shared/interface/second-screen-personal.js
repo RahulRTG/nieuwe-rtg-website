@@ -69,7 +69,21 @@
     var shell = d.querySelector('#rtgCommand .rtg-ss-shell'); bouw(shell);
     var root = shell && shell.closest('#rtgCommand');
     var profiel = shell && shell.querySelector('.rtg-ss-profile-edit');
-    if (profiel) { profiel.href = '/apps/ik.html#persoonlijk'; profiel.textContent = 'Aanvullen'; }
+    /* ALLEEN SCHRIJVEN ALS ER IETS VERANDERT. Deze functie is de callback van de
+       MutationObserver hieronder, en zij schreef `href` en `textContent`
+       onvoorwaardelijk. Elke schrijfactie is zelf een mutatie, dus de kijker
+       riep zichzelf meteen weer aan: een lus die de hoofddraad bezet houdt.
+       Het `load`-event van /apps/app.html kwam daardoor nooit, en de scripts en
+       verzoeken die er nog in de wachtrij stonden ook niet.
+
+       Overgenomen uit PR #230 ("Voorkom vastlopen van de leden-app in Uw
+       ruimte") en niet zelf verzonnen: de fout kwam met #224 in main, deze tak
+       heeft hem alleen meegekregen bij het samenvoegen. Zodra #230 in main
+       staat is deze wijziging een no-op. */
+    if (profiel) {
+      if (profiel.getAttribute('href') !== '/apps/ik.html#persoonlijk') profiel.href = '/apps/ik.html#persoonlijk';
+      if (profiel.textContent !== 'Aanvullen') profiel.textContent = 'Aanvullen';
+    }
     d.body.toggleAttribute('data-rtg-personal-surface', !!(root && root.dataset.rtgSecondScreen !== 'peek'));
   }
   var kijker = new MutationObserver(scan);

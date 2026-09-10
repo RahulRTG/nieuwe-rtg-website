@@ -461,6 +461,16 @@ const EIGEN_MODULE = new Map([
      Bevestigd door de motor, en dat is hier de voorwaarde: een geraden module
      geeft de toets de schuld van wat deze lijst fout heeft. */
   ['versheid-uitvoer.test.js', ['scripts/versheid.js']],
+  /* DE BUDGETTERUGNAME toetst de GRENS van registratieTerug (alleen terugnemen
+     wat aantoonbaar leeg is) en de poort van MAX_PER_LID -- maar requiret
+     kern/waarde als geheel, dus de motor mikte op index.js: de compositiewortel,
+     22 muteerbare posities die allemaal bedrading zijn. Alle 22 overleefd in de
+     diepe ronde van 10 september 2026, en geen ervan ligt op het onderwerp. Het
+     onderwerp woont in ./terugname.js (`!== 0` op de saldo-aantoning is letterlijk
+     de belofte uit de kop van de toets) en ./uitgifte.js (MAX_PER_LID), en index.js
+     componeert die twee. Daarom hier de twee modules die de toets ECHT op de proef
+     stelt -- bevestigd door de motor, dezelfde voorwaarde als bij de regels hierboven. */
+  ['budgetterugname.test.js', ['server/kern/waarde/terugname.js', 'server/kern/waarde/uitgifte.js']],
   /* Beide Edge-toetsen voeren browsercode in een VM uit of lezen het kleine
      basisfragment rechtstreeks. Daardoor ziet modulesVan() geen require,
      terwijl dit wel hun echte bron is. Nageproefd: een verkeerde Edge-CSS-URL

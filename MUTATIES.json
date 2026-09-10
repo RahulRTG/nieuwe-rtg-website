@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-10T16:56:36.438Z",
-    "commit": "c8979a45",
+    "op": "2026-09-10T19:02:12.039Z",
+    "commit": "a576d2ad",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -999,13 +999,11 @@
     },
     "bewijsmatrix-audit.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "scripts/bewijsmatrix.js"
-      ],
-      "geprobeerd": 5,
-      "posities": 1,
-      "dekking": "dun"
+      "staat": "gezakt",
+      "module": "scripts/bewijsmatrix.js",
+      "operator": "!==->===#6",
+      "gezakt": 3,
+      "geprobeerd": 32
     },
     "bewijsmatrix.test.js": {
       "soort": "puur",
@@ -1331,9 +1329,9 @@
       "modules": [
         "server/kern/waarde/index.js"
       ],
-      "geprobeerd": 5,
-      "posities": 1,
-      "dekking": "dun"
+      "geprobeerd": 22,
+      "posities": 1000,
+      "dekking": "beproefd"
     },
     "bugjacht.test.js": {
       "soort": "server",
@@ -2254,13 +2252,11 @@
     },
     "eindpoort.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "scripts/onbewezen.js"
-      ],
-      "geprobeerd": 8,
-      "posities": 1,
-      "dekking": "beproefd"
+      "staat": "gezakt",
+      "module": "scripts/onbewezen.js",
+      "operator": "&&->||#5",
+      "gezakt": 1,
+      "geprobeerd": 24
     },
     "envelop.test.js": {
       "soort": "puur",
@@ -2427,13 +2423,11 @@
     },
     "festival-groep-routes-failclosed.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/routes/festival/groep.js"
-      ],
-      "geprobeerd": 4,
-      "posities": 1,
-      "dekking": "dun"
+      "staat": "gezakt",
+      "module": "server/routes/festival/groep.js",
+      "operator": "&&->||#3",
+      "gezakt": 1,
+      "geprobeerd": 9
     },
     "festival-groep.test.js": {
       "soort": "puur",

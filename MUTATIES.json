@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-10T16:04:41.093Z",
-    "commit": "72aa2f06",
-    "boomVuil": false,
+    "op": "2026-09-10T17:32:11.304Z",
+    "commit": "0018b6a7",
+    "boomVuil": true,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
@@ -4197,6 +4197,14 @@
       "operator": "+->-#0",
       "gezakt": 4,
       "geprobeerd": 2
+    },
+    "navigatiegebieden.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/navigatie/gebieden.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "navigatieproef.test.js": {
       "soort": "puur",

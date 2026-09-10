@@ -23,7 +23,12 @@
 
    DEZE TOETS ROEPT DE SEED AAN IN PRODUCTIESTAND, en dat kan alleen door de
    vlaggen uit de omgeving te halen -- server/testomgeving.js leest ze bij elke
-   aanroep, niet bij het laden.
+   aanroep, niet bij het laden. De positieve controle zet de vlag net zo
+   EXPLICIET aan: `node --test` zet zelf geen NODE_ENV en geen RTG_MAGNAAT_TEST
+   (alleen test/helper.js doet dat, en dan alleen voor de servers die hij
+   start), dus een toets die op de omgevingsstand vertrouwt meet de shell van
+   wie hem draait en niet de seed. Precies zo zakte de eerste versie van deze
+   controle in de volle ronde.
 
    MUTATIES die zijn gedraaid en welke toets erop zakte (LAT.md regel 2):
    - een tweede `trip: null` eronder gezet (de oude dubbele sleutel, andersom)
@@ -43,7 +48,15 @@ const assert = require('node:assert/strict');
    'production' zet elders in het huis dingen aan die deze toets niet nodig
    heeft. Wat hier bewezen wordt is de GEWONE echte start -- een server zonder
    vlaggen, en dat is nu juist het geval dat een keer misging. */
-function inProductiestand(werk) {
+function inProductiestand(werk) { return inStand({ NODE_ENV: 'development' }, werk); }
+
+/* De demostand, even expliciet: RTG_MAGNAAT_TEST=1 is de primaire vlag van
+   server/testomgeving.js. Hier staat hij met opzet ZONDER NODE_ENV=test, want
+   die combinatie is de oude compatibiliteitsweg (RTG_DEMO) en niet de weg die
+   de vier werelden vandaag kennen. */
+function inMagnaatTest(werk) { return inStand({ RTG_MAGNAAT_TEST: '1' }, werk); }
+
+function inStand(vlaggen, werk) {
   const oud = {
     magnaat: process.env.RTG_MAGNAAT_TEST,
     demo: process.env.RTG_DEMO,
@@ -51,7 +64,8 @@ function inProductiestand(werk) {
   };
   delete process.env.RTG_MAGNAAT_TEST;
   delete process.env.RTG_DEMO;
-  process.env.NODE_ENV = 'development';
+  delete process.env.NODE_ENV;
+  Object.assign(process.env, vlaggen);
   try {
     delete require.cache[require.resolve('../server/seed')];
     return werk(require('../server/seed')());
@@ -97,10 +111,11 @@ test('de productieseed laat geen verzonnen inhoud staan', () => {
 test('de demoseed houdt zijn eigen inhoud', () => {
   /* De positieve controle. Zonder deze zou "alles leeg" ook slagen als de seed
      kapot was en overal niets meer teruggaf -- en dan bewaakt de toets hierboven
-     niets. De toetsronde draait zelf in Magnaat Test, dus dit is de gewone weg. */
-  delete require.cache[require.resolve('../server/seed')];
-  const v = require('../server/seed')();
-  assert.ok(v.suppliers.length > 0, 'de demostand heeft voorbeeldzaken');
-  assert.ok(v.posts.length > 0, 'de demostand heeft voorbeeldposts in De Salon');
-  assert.ok(v.trip && v.trip.dest, 'de demostand heeft wel een voorbeeldreis met bestemming');
+     niets. De vlag staat hier expliciet aan (zie de kop): de eerste versie
+     leunde op de omgeving en zakte zodra de suite hem zonder vlag draaide. */
+  inMagnaatTest((v) => {
+    assert.ok(v.suppliers.length > 0, 'de demostand heeft voorbeeldzaken');
+    assert.ok(v.posts.length > 0, 'de demostand heeft voorbeeldposts in De Salon');
+    assert.ok(v.trip && v.trip.dest, 'de demostand heeft wel een voorbeeldreis met bestemming');
+  });
 });

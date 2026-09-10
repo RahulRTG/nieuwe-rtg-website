@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T14:44:26.538Z",
-    "commit": "36f43313",
+    "op": "2026-09-10T15:53:10.567Z",
+    "commit": "eebbd906",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bewijsladder.js",

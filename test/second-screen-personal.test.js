@@ -49,6 +49,8 @@ test('lege informatie is één familie en opent meteen de juiste invullaag', () 
   assert.match(LEEG, /rtg-leeg-vlak--actie/);
   assert.match(LEEG, /data-rtg-leeg-doel/);
   assert.match(UI, /\.rtg-leeg-vlak--actie::after/);
+  assert.match(UI, /\.rtg-leeg-vlak--actie \.rtg-leeg-actie\{[\s\S]*?color:inherit/,
+    'de invulhandeling moet de leesbare inkt van haar vlak erven');
   assert.match(EMPTY, /RTGLeeg\.vlak/);
   assert.match(MODULES, /\/apps\/comm\.html#nieuw/);
   assert.match(TRAVEL, /\/apps\/reizen\.html#rahul/);

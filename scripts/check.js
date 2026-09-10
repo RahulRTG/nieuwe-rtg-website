@@ -3343,7 +3343,14 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
        een IBAN terug die na een herstart weg kon zijn (gemeten in FAALPROEF.json
        als `gezakt`). Betalen was al duurzaam; een rekening openen hoort dat ook
        te zijn -- ze lopen door dezelfde sleutelruimte. */
-    ['server/kern/bank/index.js', 'de bank: een geopende rekening en een gegeven akkoord mogen niet verdwijnen na een herstart']
+    ['server/kern/bank/index.js', 'de bank: een geopende rekening en een gegeven akkoord mogen niet verdwijnen na een herstart'],
+    /* HET ZESDE, en het enige dat voor ZEVEN modules tekent: de kantoor-
+       verwijdering. Zeven routes uit de faalproefronde deden `filter(); save();
+       return { ok: true }` -- een bevestiging die de opslag nog niet had gedaan,
+       en na een herstart stond het weggegooide ontwerp er weer. De zeven modules
+       staan hier NIET op: die kennen de duurzame commit niet, ze kennen deze
+       helper, en dat is het punt van een gedeelde plek. */
+    ['server/kern/kantoorwissen.js', 'de kantoorverwijdering: wie te horen krijgt dat iets weg is, hoort het na een herstart niet terug te zien']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze

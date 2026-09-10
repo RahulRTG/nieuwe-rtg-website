@@ -15,6 +15,8 @@
 const { DISCIPLINES, STATUS, PALET, maakConcept } = require('./bank');
 
 function maakAtelier({ db, save, crypto, anthropic, schoon }) {
+  // een verwijdering is pas bevestigd als de opslag hem heeft: kern/kantoorwissen.js
+  const wis = require('../kantoorwissen')({ save });
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const id = () => 'atl' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
@@ -95,9 +97,8 @@ function maakAtelier({ db, save, crypto, anthropic, schoon }) {
     o.updatedAt = nu(); save();
     return { ok: true, ontwerp: publiek(o) };
   }
-  function ontwerpVerwijder(oid) {
-    const a = store(); a.ontwerpen = a.ontwerpen.filter(o => o.id !== oid); save();
-    return { ok: true };
+  async function ontwerpVerwijder(oid) {
+    return wis(() => { const a = store(); a.ontwerpen = a.ontwerpen.filter(o => o.id !== oid); });
   }
 
   function collectieMaak(data) {

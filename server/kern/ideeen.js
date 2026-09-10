@@ -18,6 +18,8 @@ const BUREAU_IDS = Object.keys(BUREAUS);
 const STATUS = ['nieuw', 'in-uitwerking', 'uitgewerkt', 'geparkeerd'];
 
 function maakIdeeen({ db, save, crypto, anthropic, schoon, bureaus }) {
+  // een verwijdering is pas bevestigd als de opslag hem heeft: kern/kantoorwissen.js
+  const wis = require('./kantoorwissen')({ save });
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const id = () => 'idee' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
@@ -90,9 +92,8 @@ function maakIdeeen({ db, save, crypto, anthropic, schoon, bureaus }) {
     o.updatedAt = nu(); save();
     return { ok: true, idee: publiek(o) };
   }
-  function ideeVerwijder(iid) {
-    const s = store(); s.lijst = s.lijst.filter(o => o.id !== iid); save();
-    return { ok: true };
+  async function ideeVerwijder(iid) {
+    return wis(() => { const s = store(); s.lijst = s.lijst.filter(o => o.id !== iid); });
   }
   function reactie(iid, data) {
     const o = vind(iid); if (!o) return { status: 404, error: 'Idee niet gevonden.' };

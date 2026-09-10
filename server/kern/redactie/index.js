@@ -17,6 +17,8 @@ const ARTIKEL_STATUS = ['concept', 'eindredactie', 'gepubliceerd'];
 const EDITIE_STATUS = ['samenstellen', 'ter-perse', 'gedrukt'];
 
 function maakRedactie({ db, save, crypto, anthropic, schoon }) {
+  // een verwijdering is pas bevestigd als de opslag hem heeft: kern/kantoorwissen.js
+  const wis = require('../kantoorwissen')({ save });
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const id = p => p + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
@@ -75,11 +77,8 @@ function maakRedactie({ db, save, crypto, anthropic, schoon }) {
     save();
     return { ok: true, artikel: a };
   }
-  function artikelVerwijder(aid) {
-    const r = R();
-    r.artikelen = r.artikelen.filter(a => a.id !== aid);
-    save();
-    return { ok: true };
+  async function artikelVerwijder(aid) {
+    return wis(() => { const r = R(); r.artikelen = r.artikelen.filter(a => a.id !== aid); });
   }
 
   // de gedeelde ctx voor de deelbestanden

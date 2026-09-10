@@ -97,3 +97,5 @@ dump.rdb
 # DEZE machine en dus geen bron -- op een andere machine staan er andere
 # getallen in, en een gedeelde versie zou daar liegen.
 .cilokaal
+# werkbomen van Claude Code-agenten: een volledige kopie van de bron die nooit mee hoort
+.claude/worktrees/

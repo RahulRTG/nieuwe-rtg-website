@@ -1,17 +1,17 @@
 {
-  "vastgelegd": "2026-09-09",
+  "vastgelegd": "2026-09-10",
   "meters": {
     "endpointsZonderTest": 906,
     "dekkingPct": 82,
     "keuringStuk": 0,
-    "keuringScheef": 16,
+    "keuringScheef": 17,
     "dependencies": 0,
-    "testbestanden": 1526,
+    "testbestanden": 1573,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 28,
     "e2eBestanden": 208,
-    "keuringOmvang": 322,
-    "keuringDubbeling": 179,
+    "keuringOmvang": 324,
+    "keuringDubbeling": 178,
     "keuringDekkingAdvies": 52,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
@@ -19,9 +19,9 @@
     "metersOngeijkt": 0,
     "schermenZonderToets": 0,
     "keuringTeGroot": 14,
-    "inlineStijlAttributen": 4684,
-    "browserpoortToetsen": 325,
-    "kernBreedte": 1559,
+    "inlineStijlAttributen": 4668,
+    "browserpoortToetsen": 328,
+    "kernBreedte": 1560,
     "kernGedeeld": 231,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -29,7 +29,7 @@
     "toetsenOngevoeligPct": 0,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "ratelTanden": 68,
+    "ratelTanden": 72,
     "metingenZonderRatel": 49,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
@@ -58,11 +58,16 @@
     "wekkersZonderTrede": 0,
     "wekkersOnverklaard": 0,
     "meetleerBlind": 8,
-    "registersUitVuileBoom": 4,
+    "registersUitVuileBoom": 2,
     "laatSpoorVerdacht": 3,
     "rollbackUitzonderingen": 1,
     "faalproefGezakt": 24,
-    "appwerktDefecten": 0
+    "appwerktDefecten": 0,
+    "taalPoortHoudtTegen": 7,
+    "taalCellenVerkeerdSchrift": 0,
+    "taalBetekenisOngemeten": 114,
+    "taalSchilOffline": 10,
+    "bewijsAlleenKeten": 16
   },
   "notities": [
     {
@@ -1896,6 +1901,42 @@
       "meter": "toetsenNietGemeten 672 -> 674",
       "reden": "Twee toetsen komen erbij waar de mutatiemotor nog niet langs is. test/adressen.test.js handhaaft de adresratel (vijf documenten wezen naar een risicomotor onder kern/command/ die daar nooit heeft bestaan). test/frictieschaduw.test.js handhaaft dat de frictieschaduw NIETS beslist -- getoetst op de bron van kern/stuur.js -- en het gemeten anker dat bedrag alleen niet verzwaart en bedrag plus aantal wel. Dat een bronmutatie over deze twee niets zou zeggen is aannemelijk maar NIET gemeten, en GEEN_BRONMUTATIE eist pogingen: een reden zonder poging is een vermoeden. Dit is instrumentdekking en geen groenverklaring.",
       "waarheen": "laat de mutatiemotor over test/adressen.test.js en test/frictieschaduw.test.js lopen in dezelfde ronde als de 27 toetsen van 2026-09-08 (zelfde sleutel, zelfde vervaldatum); levert dat pogingen zonder uitslag op, dan horen ze in GEEN_BRONMUTATIE met het aantal pogingen erbij, en anders gewoon gemeten"
+    },
+    {
+      "datum": "2026-09-10",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1559,
+      "meter": "kernBreedte 1559 -> 1560",
+      "reden": "RTG Move (MOVE.md) voegt EEN naam aan de kern toe: `move`, een namespace met drie lezende functies erin (reis, gevolg, volgende). Dat is met opzet niet drie losse kernnamen -- de smalste vorm die deze laag kan hebben. De laag bezit geen collectie, kent geen schrijfweg (test/move.test.js toets 12 zakt op db.data of save()) en hangt aan een eigen schakelaar dom-move, zodat de boardroom hem kan sluiten zonder de navigatie mee te nemen.",
+      "waarheen": "server/kern/move/ (naad, haalbaar, gevolg, index) met test/move.test.js en test/move-keten.test.js; de kern blijft een enkele naadlaag zonder eigen opslag"
+    },
+    {
+      "datum": "2026-09-10",
+      "soort": "schuld",
+      "sleutel": "keuringScheef",
+      "van": 16,
+      "vervalt": "2026-12-15",
+      "meter": "keuringScheef 16 -> 17",
+      "reden": "server/kern/navigatie/gebieden.js wordt nergens aangeroepen. Het bestand komt uit de Move-tak (#226) en droeg daar dezelfde bevinding: de keuring op die tak zelf meet 17 en niet 16, dus dit is geen artefact van de samenvoeging van zeven takken maar een schuld die de tak al had. De module is geen restant: hij houdt de catalogus en de licentiepoort van de navigatiegebieden (aangeboden / gebouwd / actief), ./gebiedkeuze.js is er van afgesplitst en test/navigatiegebieden.test.js bewaakt hem. Wat ontbreekt is de plek waar die catalogus wordt opgevraagd -- een route, of een aanroep uit de routemotor. Dat is een ontwerpbesluit van de tak en niet iets wat een samenvoeging hoort te verzinnen.\n\nVervalt op 2026-12-15: dan hangt hij ergens in, of hij is weg. Beide is beter dan blijven staan -- de eigen woorden van de keuring."
+    },
+    {
+      "datum": "2026-09-10",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 321,
+      "vervalt": "2026-12-15",
+      "meter": "keuringOmvang 321 -> 324",
+      "reden": "Drie bestanden kwamen door de samenvoeging van zeven takken in de band vlak onder de 10 kB-grens: server/kern/reiswereld.js (10033 bytes, uit #226), server/kern/stuur.js (9859, uit #229) en server/kern/reiswereld-bronnen.js (10066 -- #226 en #227 schreven allebei een commentaarblok boven hetzelfde bronblok, en de samenvoeging draagt ze allebei omdat ze iets anders verklaren over dezelfde regel code). Elke tak bleef binnen zijn eigen norm; #225 had hem in dezelfde week zelfs van 322 naar 321 gezet. Samen brengen ze er drie mee, en dat wordt hier benoemd in plaats van stil verrekend -- dezelfde vorm als de kernBreedte-notitie van 9 september.\n\nVervalt op 2026-12-15: reiswereld-bronnen.js heeft een natuurlijke naad per bron en hoort daar geknipt, en de andere twee horen niet over de grens te gaan."
+    },
+    {
+      "datum": "2026-09-10",
+      "soort": "schuld",
+      "sleutel": "inlineStijlAttributen",
+      "van": 4648,
+      "vervalt": "2026-12-15",
+      "meter": "inlineStijlAttributen 4648 -> 4668",
+      "reden": "De reisbureau-tak (#227) bracht style=\"...\"-attributen mee in public/apps/reisbureau.html en public/apps/kantoren.html: 28 toegevoegde regels met zo'n attribuut, netto 20 meer dan main -- opmaak van de nieuwe nazorg- en wijzigingsschermen (display, margin, flex, width). #225 had in dezelfde week 36 van deze attributen weggewerkt en de norm op 4648 gezet; samengevoegd meet de keuring 4668. Elke tak bleef binnen zijn eigen norm. Waarom dit een schuld is en geen bijzaak: elk inline-stijlattribuut houdt style-src-attr open in de CSP, en dat is precies wat deze meter bewaakt.\n\nVervalt op 2026-12-15: dan staan die attributen als klassen in het stijlblok van de pagina, zoals #225 dat elders deed."
     }
   ],
   "prestatie": {

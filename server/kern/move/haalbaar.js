@@ -32,7 +32,12 @@ const { naad, UITKOMST, RANG } = require('./naad');
 /* De reis erft de strengste naad. GEEN_BEWEGING telt daarbij als het gunstigste
    geval en niet als "onbekend": dat er niets af te leggen valt, is een
    volwaardig antwoord. */
-function strengste(uitkomsten) {
+/* strengsteNAAD en niet `strengste`: die naam staat al als functie in
+   kern/frictie/bodem.js en kern/isolatie/ordening.js, en drie keer dezelfde
+   naam in drie kernmodules is voor de keuring (dubbeling) een patroon en geen
+   toeval -- terecht, want alle drie kiezen ze iets anders (een niveau, een
+   drager, een naad). Zelfde reden als strengsteNiveau in kern/frictie/index.js. */
+function strengsteNaad(uitkomsten) {
   for (const u of RANG) if (uitkomsten.includes(u)) return u;
   return null;
 }
@@ -88,7 +93,7 @@ function haalbaar({ onderdelen, reisTijd, afstandM }) {
   }
 
   const bepaald = naden.filter(n => n.uitkomst !== UITKOMST.NIET_TE_BEPALEN);
-  const oordeel = strengste(bepaald.map(n => n.uitkomst));
+  const oordeel = strengsteNaad(bepaald.map(n => n.uitkomst));
 
   /* De naad die het oordeel veroorzaakt, met naam en toenaam. Een oordeel
      zonder aanwijsbare oorzaak is een orakel (EXECUTIE.md over de score-opbouw:
@@ -120,4 +125,4 @@ function haalbaar({ onderdelen, reisTijd, afstandM }) {
   };
 }
 
-module.exports = { haalbaar, strengste };
+module.exports = { haalbaar, strengsteNaad };

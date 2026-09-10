@@ -47,10 +47,24 @@ function loop(dir, uit, bronWortel) {
     if (it.name === 'node_modules' || it.name === '.git' || it.name === 'data' ||
         (dir === bronWortel && it.name === 'work')) continue;
     const p = path.join(dir, it.name);
-    if (it.isDirectory()) loop(p, uit, bronWortel);
-    else uit.push(p);
+    /* EEN GENESTE WERKBOOM IS OOK EEN TWEEDE BRONBOOM, en die staat niet op een
+       vaste plek. `git worktree add` legt een volledige kopie van de bron neer
+       met een `.git`-BESTAND erin (een echte wortel heeft een `.git`-map); een
+       agent van Claude Code zet zulke bomen in .claude/worktrees/. Gemeten op
+       10 september 2026, met twee van zulke bomen in het huis: keuringDubbeling
+       ging van 178 naar 4966, keuringOmvang van 324 naar 966, keuringScheef van
+       17 naar 57 -- zonder dat er een regel code was veranderd. Dezelfde fout als
+       `work/` hierboven, alleen zonder vaste naam, dus de kenmerkende vorm wordt
+       herkend en niet de map. */
+    if (it.isDirectory()) {
+      if (geNesteWerkboom(p)) continue;
+      loop(p, uit, bronWortel);
+    } else uit.push(p);
   }
   return uit;
+}
+function geNesteWerkboom(map) {
+  try { return fs.statSync(path.join(map, '.git')).isFile(); } catch (e) { return false; }
 }
 const alle = loop(WORTEL);
 const serverJs = alle.filter(p => p.includes('/server/') && p.endsWith('.js'));
@@ -549,4 +563,4 @@ if (require.main === module) {
   process.exit(r.stuk ? 1 : 0);
 }
 
-module.exports = { keur, loop, maakDekkingsIndex, DEKKING_KAP };
+module.exports = { keur, loop, geNesteWerkboom, maakDekkingsIndex, DEKKING_KAP };

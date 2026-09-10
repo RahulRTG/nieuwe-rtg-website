@@ -110,7 +110,7 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 |---|---|---|---|
 | **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 58 |
 | **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 15 |
-| **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 14 |
+| **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 15 |
 | **FoundationOS** | `/apps/foundation/os-publiek.html` | zorg, hulp en maatschappelijke vooruitgang | 10 |
 
 Die laatste kolom telt items in `MAPPEN` en geen schermen. De tabel wordt
@@ -208,8 +208,10 @@ Workforce OS*, met als kern dat **één bedrijf niet één KvK is**.
 
 ### TravelOS — mijn reizen en onderweg zijn
 
-De kleinste wereld: elf onderdelen in `MAPPEN`, veertien van de 190
-functieschakelaars. Dat is bewust geen argument tegen hem. Een wereld is geen
+De kleinste wereld: vijftien onderdelen in `MAPPEN`, veertien van de 190
+functieschakelaars. RTG Move is de vijftiende (10 september 2026): Navigatie
+brengt u van hier naar daar, Move zegt of u het HAALT -- twee vragen, dus twee
+ingangen. Dat is bewust geen argument tegen hem. Een wereld is geen
 categorie in een spreadsheet maar een bestemming in het mentale model, en deze
 bezit een hele keten:
 

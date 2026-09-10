@@ -271,6 +271,7 @@ const REGISTERS = [
      draaiende server EN een browser, dus zijn uitslag hoort bij de code van die
      dag en bij geen andere. */
   ['NAVIGATIEPROEF.json', 'npm run navigatieproef:vast', 'of RTG Navigatie zijn belofte houdt: van waar ik sta naar mijn bestemming'],
+  ['MOVEPROEF.json', 'npm run moveproef:vast', 'of een lid RTG Move werkelijk kan gebruiken: van een boeking naar een oordeel op het scherm'],
   ['KETENVORM.json', 'npm run ketenvorm:vast', 'wat de drie gouden ketens werkelijk delen (actoren, beloften)'],
   ['DOODSPOOR.json', 'npm run doodspoor:vast', 'of een handeling ergens AANKOMT, of een verklaring draagt waarom niet'],
   ['DOORWERKING.json', 'npm run doorwerking:vast', 'of een gegeven dat een keer is opgegeven doorwerkt, met doel en actualiteit'],

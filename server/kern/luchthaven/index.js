@@ -141,7 +141,16 @@ function maakLuchthaven({ db, save, bewerkCollectie, crypto, anthropic, visumtaa
   const royaal = require('./royaal')(ctx);
   // mijn reizen (in ./vluchten) toont ook de eigen charteraanvragen
   ctx.mijnCharters = royaal.mijnCharters;
-  const api = { seed, isLucht,
+  /* Waar de luchthaven is, als VERWIJZING (voor RTG Move). De code hoort hier
+     omdat dit domein hem uitgeeft (LAT.md regel 4); op TYPE gezocht, dus een
+     tweede luchthaven breekt niets. Waarom dit de plek is en niet de vluchtbe-
+     stemming: zie de kop van kern/reiswereld-bronnen.js. */
+  function plek() {
+    const s = (db.data.suppliers || []).find(isLucht);
+    return (s && s.loc && Number.isFinite(s.loc.lat)) ? { zaak: s.code } : null;
+  }
+
+  const api = { seed, isLucht, plek,
     passCheck: (code, context) => boardingPass.controleerEnClaim(Object.assign({ code }, context || {})),
     migreerBoardingPasses: boardingPass.migreerAlles,
     GATES, STANDS, HELIPADS, BANEN, DRAAI_TAKEN, KOFFER_KETEN, VIP_PROTOCOL };

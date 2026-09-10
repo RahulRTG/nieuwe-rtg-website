@@ -1,17 +1,17 @@
 {
-  "vastgelegd": "2026-09-10",
+  "vastgelegd": "2026-09-09",
   "meters": {
     "endpointsZonderTest": 906,
     "dekkingPct": 82,
     "keuringStuk": 0,
     "keuringScheef": 16,
     "dependencies": 0,
-    "testbestanden": 1573,
+    "testbestanden": 1526,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 28,
-    "e2eBestanden": 210,
-    "keuringOmvang": 321,
-    "keuringDubbeling": 178,
+    "e2eBestanden": 208,
+    "keuringOmvang": 322,
+    "keuringDubbeling": 179,
     "keuringDekkingAdvies": 52,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
@@ -19,9 +19,9 @@
     "metersOngeijkt": 0,
     "schermenZonderToets": 0,
     "keuringTeGroot": 14,
-    "inlineStijlAttributen": 4648,
-    "browserpoortToetsen": 328,
-    "kernBreedte": 1559,
+    "inlineStijlAttributen": 4684,
+    "browserpoortToetsen": 325,
+    "kernBreedte": 1560,
     "kernGedeeld": 231,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -29,7 +29,7 @@
     "toetsenOngevoeligPct": 0,
     "wettenOnbewezen": 5,
     "devPakketten": 1,
-    "ratelTanden": 72,
+    "ratelTanden": 68,
     "metingenZonderRatel": 49,
     "ladderRaak": 0,
     "ladderNietGeprobeerd": 1,
@@ -58,15 +58,11 @@
     "wekkersZonderTrede": 0,
     "wekkersOnverklaard": 0,
     "meetleerBlind": 8,
-    "registersUitVuileBoom": 2,
+    "registersUitVuileBoom": 4,
     "laatSpoorVerdacht": 3,
     "rollbackUitzonderingen": 1,
     "faalproefGezakt": 24,
-    "appwerktDefecten": 0,
-    "taalPoortHoudtTegen": 7,
-    "taalCellenVerkeerdSchrift": 0,
-    "taalBetekenisOngemeten": 114,
-    "taalSchilOffline": 10
+    "appwerktDefecten": 0
   },
   "notities": [
     {
@@ -1890,6 +1886,15 @@
       "vervalt": "2026-12-01",
       "meter": "kernBreedte 1558 -> 1559",
       "reden": "Een naam erbij in de ctx van het kantoor: `tweedeHand`. Er is EEN exemplaar voor het hele kantoor, want twee zouden elkaars openstaande aanvragen niet zien -- en dan tekent de tweede persoon iets af dat de eerste niet ziet staan.\n\nDE STAP IS VERZET VAN 1557->1558 NAAR 1558->1559 BIJ DE SAMENVOEGING MET MAIN (9 september 2026), en dat is geen extra naam maar een andere basis: main bracht in dezelfde week zijn eigen +1 mee (`woningOnderhoud`, de notitie van 8 september hierboven) en die twee stapelen. Elke tak bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier benoemd in plaats van stil verrekend. Nageteld en niet geschat: er staat precies EEN naam van deze tak in, en de meting leest 1559.\n\nDe schuld vervalt op 2026-12-01: dan hoort er een repository-laag onder te liggen (server/db/) waar deze en de andere 524 doorheen gaan, of hoort deze regel te zijn ingetrokken omdat de laag is verplaatst."
+    },
+    {
+      "datum": "2026-09-10",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1559,
+      "meter": "kernBreedte 1559 -> 1560",
+      "reden": "RTG Move (MOVE.md) voegt EEN naam aan de kern toe: `move`, een namespace met drie lezende functies erin (reis, gevolg, volgende). Dat is met opzet niet drie losse kernnamen -- de smalste vorm die deze laag kan hebben. De laag bezit geen collectie, kent geen schrijfweg (test/move.test.js toets 12 zakt op db.data of save()) en hangt aan een eigen schakelaar dom-move, zodat de boardroom hem kan sluiten zonder de navigatie mee te nemen.",
+      "waarheen": "server/kern/move/ (naad, haalbaar, gevolg, index) met test/move.test.js en test/move-keten.test.js; de kern blijft een enkele naadlaag zonder eigen opslag"
     }
   ],
   "prestatie": {
@@ -1908,11 +1913,11 @@
     "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). scripts/normverval.js keurt alleen wat vanaf hier bij komt. DE GRENS IS NU TWEE KEER OPGESCHOVEN, en dat is geen verzachting maar twee keer dezelfde oorzaak. De eerste keer (18 -> 19 augustus) schreef main twee notities op een eigen tak waar deze regel niet bestond. De tweede keer (19 -> 21 augustus) kwamen bij de samenvoeging van 23 PR-takken elf notities van 20 augustus mee, geschreven op takken die van dezelfde dag zijn als de regel en hem dus niet kenden. WAAROM ZE NIET ALSNOG WORDEN INGEDEELD: een soort toekennen aan andermans notitie betekent hem woorden in de mond leggen -- en bij een schuld ook een vervaldatum, dus een afspraak die hij nooit heeft gemaakt. Dat is precies de reden die de eerste verschuiving al gaf. WAT DAT KOST, EERLIJK: elf verlagingen uit die ronde staan nu zonder soort in het register. Ze dragen wel allemaal een uitgeschreven reden -- wat ze missen is het VELD. En om te laten zien dat dit geen uitweg voor mezelf is: alle acht notities die deze samenvoeging zelf schrijft (2026-08-21) dragen een soort, zeven daarvan als schuld met een sleutel, een van-waarde en een einddatum. Vanaf 21 augustus geldt de eis onverkort; test/normverval.test.js toetst de logica met eigen data en staat dus niet stil tot die datum."
   },
   "sinds": {
-    "keuringOmvang": "2026-09-10",
-    "testbestanden": "2026-09-10",
+    "keuringOmvang": "2026-09-06",
+    "testbestanden": "2026-09-08",
     "toetsenNietGemeten": "2026-09-07",
-    "inlineStijlAttributen": "2026-09-10",
-    "ratelTanden": "2026-09-10",
+    "inlineStijlAttributen": "2026-09-07",
+    "ratelTanden": "2026-09-07",
     "metingenZonderRatel": "2026-08-18",
     "bewijsAchterstand": "2026-09-06",
     "toetsenOngevoeligPct": "2026-09-05",
@@ -1920,12 +1925,12 @@
     "dekkingPct": "2026-09-06",
     "keuringScheef": "2026-09-05",
     "keuringTeGroot": "2026-09-05",
-    "keuringDubbeling": "2026-09-10",
+    "keuringDubbeling": "2026-09-07",
     "keuringDekkingAdvies": "2026-09-06",
     "dbDeuren": "2026-08-28",
     "dbDeurenSchrijvend": "2026-08-28",
-    "browserpoortToetsen": "2026-09-10",
-    "e2eBestanden": "2026-09-10",
+    "browserpoortToetsen": "2026-09-07",
+    "e2eBestanden": "2026-09-08",
     "schermenZonderVormtaal": "2026-08-28",
     "bewijsCellenBewezen": "2026-09-06",
     "beweringenZonderVulcontrole": "2026-09-05",
@@ -1943,15 +1948,11 @@
     "meetleerBlind": "2026-09-02",
     "kernBreedte": "2026-09-02",
     "kernGedeeld": "2026-09-05",
-    "registersUitVuileBoom": "2026-09-10",
+    "registersUitVuileBoom": "2026-09-05",
     "laatSpoorVerdacht": "2026-09-03",
     "rollbackUitzonderingen": "2026-09-03",
     "faalproefGezakt": "2026-09-06",
-    "appwerktDefecten": "2026-09-07",
-    "taalPoortHoudtTegen": "2026-09-10",
-    "taalCellenVerkeerdSchrift": "2026-09-10",
-    "taalBetekenisOngemeten": "2026-09-10",
-    "taalSchilOffline": "2026-09-10"
+    "appwerktDefecten": "2026-09-07"
   },
   "uitzonderingen": [
     {

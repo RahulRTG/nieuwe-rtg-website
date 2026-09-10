@@ -176,6 +176,11 @@ kern.foundationregistratie = require('../kern/foundationregistratie-register')({
    routers van kernlaag7b, want de kern wordt hier nog gevuld. */
 require('./kernlaag7-ruimtes')(kern, hulp);
 
+/* RTG MOVE (kern/move/): de naad tussen twee reisonderdelen -- haalt de
+   reiswereld (3w), de plekken en de navigatie (6) en voegt als enige het
+   verband ertussen toe. Leest laat en bezit niets. */
+Object.assign(kern, require('../kern/move').maakMove({ kern }));
+
 /* De zware poort en het herstelquorum: ./kernlaag7-eigenaar.js. */
 require('./kernlaag7-eigenaar')(kern, hulp);
 

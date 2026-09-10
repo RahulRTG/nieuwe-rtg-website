@@ -440,7 +440,11 @@ body.rtg-stijl progress{accent-color:var(--rtg-goud);}
   margin-top:.85rem;
   padding:0;
   border:0;
-  color:var(--rtg-leesgoud,var(--rtg-goud));
+  /* De hele lege kaart kan op elk wereldmateriaal landen. Goud is daar een
+     randaccent, geen veilige tekstkleur: op Sociaal en Vitaal werd dit 2,2:1
+     en 1,87:1. De handeling erft daarom dezelfde, per vlak berekende inkt als
+     kop en uitleg. Vorm en ruimte houden haar herkenbaar als handeling. */
+  color:inherit;
 }
 /* De handeling staat los van de tekst en niet eronder geplakt: dat verschil
    in ruimte is wat hem tot handeling maakt. */

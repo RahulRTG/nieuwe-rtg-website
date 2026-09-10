@@ -336,7 +336,10 @@ module.exports = { meet, poortRijen, REGISTERS, stempelVan };
 if (require.main !== module) return;
 
 const uit = meet();
-if (process.argv.includes('--json')) { console.log(JSON.stringify(uit, null, 1)); process.exit(0); }
+/* GEEN process.exit() NA EEN console.log -- ZIE DE UITLEG ONDERAAN. Met --json
+   is het gevaar het grootst: een afgekapte JSON is geen foutmelding maar
+   ongeldige invoer voor wie hem uitleest. */
+if (process.argv.includes('--json')) { console.log(JSON.stringify(uit, null, 1)); return; }
 
 console.log('\n=== DE VERSHEID VAN DE REGISTERS ===\n');
 console.log('  de code staat op commit ' + (uit.nu || 'onbekend') + '\n');
@@ -373,6 +376,24 @@ if (uit.poort.length) {
   console.log('\n  Deze vier melden niet alleen, ze houden tegen. Wat ze zeggen -- wie er');
   console.log('  binnenkomt en wat er met geld gebeurt -- is niet iets om op een oude meting te');
   console.log('  geloven. De andere registers hierboven melden alleen.\n');
-  process.exit(1);
+  process.exitCode = 1;
 }
-process.exit(0);
+
+/* WAAROM HIER GEEN process.exit() STAAT, en dat is geen stijlkwestie.
+
+   Hier stond `process.exit(1)` direct na de regels hierboven. Zodra stdout een
+   PIJP is -- en dat is hij onder execFileSync, in de CI en achter elke `| tee`
+   -- schrijft Node asynchroon. process.exit() wacht daar niet op: wat nog in de
+   buffer staat, gaat verloren.
+
+   GEMETEN, en niet bedacht: in een volle suite (12.377 toetsen, de machine vol)
+   zakte test/versheidspoort.test.js op regel 123. De exitcode was keurig 1, maar
+   de opgevangen uitvoer HIELD OP na het laatste register -- de samenvattingsregel
+   en het hele blok "DE VERSHEIDSPOORT ZAKT" waren weg. Los gedraaid haalde
+   dezelfde toets het wel. Dat is precies het gedrag waar "flaky" op geplakt
+   wordt, en het was een echte fout: een poort die met 1 afsluit zonder te zeggen
+   WAAROM, laat een mens in de CI achter met een afgekapt rapport.
+
+   Dit script is volledig synchroon (fs, path, en lib/stempel), dus met een lege
+   gebeurtenislus stopt Node vanzelf zodra stdout leeg is. `process.exitCode`
+   levert dezelfde afsluitcode en wacht wel. */

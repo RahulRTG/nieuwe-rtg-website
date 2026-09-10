@@ -1,4 +1,4 @@
-/* DE KAARTKEUZE VAN EEN LID: drie routes, en ze zijn met opzet niet gelijk.
+/* DE KAARTKEUZE VAN EEN LID: vier routes, en ze zijn met opzet niet gelijk.
 
    `/api/nav/gebieden` LEEST. Hij zet de catalogus naast de keuze van dit lid en
    verandert niets. `leest: true` en niet `zelfdeVerzoek`, om dezelfde reden als
@@ -21,11 +21,23 @@
    voordat er iets bij komt) en test/navigatiemijnkaarten.test.js toets 6 is de
    grendel; de poort hier is de tweede laag en niet de enige.
 
+   `/api/nav/gebied/pakket` LEEST ook, en om dezelfde reden als `gebieden`:
+   het manifest hoort de stand van NU te geven. Sterker nog, hier is het de hele
+   bedoeling dat een tweede vraag kan verschillen -- is het pakket opnieuw
+   gebouwd, dan draagt het andere controlegetallen, en juist dat verschil laat
+   een toestel merken dat zijn kaart oud is. Een venster dat het eerste antwoord
+   nog eens teruggeeft, zou die vernieuwing verbergen.
+
+   De BYTES gaan met GET (`/api/nav/gebied/pakket/:code/:deel`) en staan hier
+   niet: deze lijst gaat over schrijfroutes en over POST-routes die lezen. Een
+   GET is een bestand achter een adres.
+
    Volgorde: eerst de verklaring, dan de route -- zie de kop van
    ./idemsleutels.js. */
 'use strict';
 const SLEUTELS = {
   'POST /api/nav/gebieden': { leest: true },
+  'POST /api/nav/gebied/pakket': { leest: true },
   'POST /api/nav/gebied/kies': { zelfdeVerzoek: true },
   'POST /api/nav/gebied/weg': { zelfdeVerzoek: true }
 };

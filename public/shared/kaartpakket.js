@@ -6,52 +6,30 @@
    maar een blik in de opslag zelf. Een onthouden lijst en een lege cache lopen
    binnen een week uit elkaar, en dan belooft het scherm een kaart die er niet is.
 
-   DRIE DINGEN DIE EEN BROWSER ANDERS DOET DAN EEN TELEFOON-APP, en ze staan
-   hier alle drie hardop:
+   WAT DEZE BROWSER KAN EN BELOOFT staat in ./kaartopslag.js -- daar is dit
+   bestand langs geknipt toen het over de 10 kB-grens ging. Hier staat het
+   PAKKET: wat er ligt, hoe het binnenkomt en hoe het weer weggaat. Elk deel
+   wordt tegen het controlegetal uit het manifest gehouden, want een afgekapte
+   of omgekiepte graaf levert geen foutmelding maar een ROUTE.
 
-     1. ZONDER HTTPS IS ER GEEN OPSLAG. `caches` en `crypto.subtle` bestaan
-        alleen in een beveiligde context. Op http (behalve localhost) kan dit
-        dus niet, en dan zegt `kan()` dat met de reden -- geen knop die stil
-        niets doet.
-     2. DE BROWSER MAG HET WEGGOOIEN. Opslag is niet van ons. We VRAGEN
-        `navigator.storage.persist()`, en het antwoord staat op het scherm:
-        blijft hij staan, of mag de browser hem opruimen als de schijf vol
-        loopt? Beloven dat een kaart offline blijft, kan deze laag niet.
-     3. EEN STUK BESTAND IS ERGER DAN GEEN BESTAND. Een afgekapte of omgekiepte
-        graaf levert geen foutmelding maar een ROUTE: de motor leest onzin uit
-        de typed arrays en rekent er een net uitziende weg mee. Elk deel wordt
-        daarom tegen het controlegetal uit het manifest gehouden, en wat niet
-        klopt gaat er meteen weer uit.
-
-   DE OPSLAG IS DE CACHE STORAGE en niet IndexedDB: de delen zijn hele
-   bestanden achter een adres, en dat is precies waar de Cache API voor is. De
-   sleutel is het adres uit het manifest, zodat er geen tweede naamgeving
-   ontstaat naast de server. */
+   De sleutel in de opslag is het ADRES uit het manifest, zodat er geen tweede
+   naamgeving ontstaat naast de server. */
 (function (w) {
   'use strict';
   if (w.RTGKaartPakket) return;
 
-  var BAK = 'rtg-kaart-v1';
-
-  function kan() {
-    if (!w.caches || !w.isSecureContext) {
-      return { ok: false, reden: 'Deze browser geeft alleen op https opslag vrij voor kaarten. Op een ' +
-        'onbeveiligde verbinding kan RTG een kaart dus niet op uw toestel zetten.' };
-    }
-    if (!(w.crypto && w.crypto.subtle)) {
-      return { ok: false, reden: 'Deze browser kan een gedownloade kaart niet controleren, en een halve ' +
-        'kaart levert routes op die er goed uitzien. RTG bewaart hem daarom niet.' };
-    }
-    return { ok: true };
-  }
-
-  function som(buffer) {
-    return w.crypto.subtle.digest('SHA-256', buffer).then(function (d) {
-      var u = new Uint8Array(d), s = '';
-      for (var i = 0; i < 16; i++) s += u[i].toString(16).padStart(2, '0');
-      return s;
-    });
-  }
+  /* De opslagkant van dit toestel staat in ./kaartopslag.js: wat deze
+     browser kan, hoeveel ruimte er is, of hij het bewaart, en hoe een
+     controlegetal wordt gerekend. Ontbreekt dat bestand, dan kan deze laag
+     niets -- en dan zegt `kan()` dat in plaats van te doen alsof. */
+  var O = w.RTGKaartOpslag || null;
+  var BAK = O ? O.BAK : 'rtg-kaart-v1';
+  var kan = O ? O.kan : function () {
+    return { ok: false, reden: 'De opslaglaag van RTG (shared/kaartopslag.js) is niet geladen, dus '
+      + 'kan deze pagina geen kaart op uw toestel zetten.' };
+  };
+  var som = O ? O.som : function () { return Promise.resolve(null); };
+  var blijftStaan = O ? O.blijftStaan : function () { return Promise.resolve(null); };
 
   /* HET PLAATSELIJKE MANIFEST. Na een geslaagde download gaat het manifest dat
      de server stuurde MEE de bak in, onder een adres dat de server niet kent
@@ -188,30 +166,9 @@
     return { ok: true, weg: n };
   }
 
-  /* Mag de browser dit opruimen? `persisted()` zegt hoe het NU staat,
-     `persist()` vraagt het. Beide kunnen ontbreken, en dan is het antwoord
-     `null` -- onbekend, en dat is iets anders dan nee. */
-  async function blijftStaan() {
-    try {
-      if (!navigator.storage) return null;
-      if (navigator.storage.persisted && await navigator.storage.persisted()) return true;
-      if (navigator.storage.persist) return await navigator.storage.persist();
-      return null;
-    } catch (e) { return null; }
-  }
-
-  async function ruimte() {
-    try {
-      if (!navigator.storage || !navigator.storage.estimate) {
-        return { gebruikt: null, quotum: null, blijft: null,
-          reden: 'Deze browser zegt niet hoeveel opslag er vrij is.' };
-      }
-      var s = await navigator.storage.estimate();
-      return { gebruikt: s.usage ?? null, quotum: s.quota ?? null, blijft: await blijftStaan() };
-    } catch (e) {
-      return { gebruikt: null, quotum: null, blijft: null, reden: 'De opslag is niet te bevragen.' };
-    }
-  }
-
-  w.RTGKaartPakket = { kan: kan, stand: stand, haal: haal, weg: weg, ruimte: ruimte, BAK: BAK };
+  /* `kan` en `ruimte` worden DOORGEGEVEN en niet nagebouwd: het scherm heeft
+     EEN adres voor deze laag, en de regels wonen op een plek (LAT.md regel 4). */
+  w.RTGKaartPakket = { kan: kan, stand: stand, haal: haal, weg: weg, BAK: BAK,
+    ruimte: function () { return O ? O.ruimte() : Promise.resolve({ gebruikt: null, quotum: null,
+      blijft: null, reden: 'De opslaglaag is niet geladen.' }); } };
 }(window));

@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1787 |
 | losse beweringen (`test(...)`) | 12603 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1096 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1100 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 55 |
-| alleen in de kop *genoemd*, nog niet gemeten | 182 |
-| niets van beide | 454 |
+| alleen in de kop *genoemd*, nog niet gemeten | 179 |
+| niets van beide | 453 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -855,11 +855,11 @@ toets omvalt.
 | `naamlaag.test.js` | 2 | gezakt op `liegpoort /api/` | De persoonlijke naamlaag + het bedrijfsdorp per genre. Getoetst: (1) een lid geeft een verbonden vriend een eigen naam en ziet die naam in de eigen lijsten, vindt de vriend onder die naam, en Rahul-resolutie... |
 | `naarkassa.test.js` | 2 | gezakt op `liegpoort /api/` | Order naar de kassa (server): het lid kiest "stuur naar de kassa" -- de bestelling gaat direct als open bon naar de zaak (de keuken maakt hem), en wordt aan de balie afgerekend met de ophaalcode. Getoetst: de vlag... |
 | `naslag.test.js` | 9 | genoemd | HET NASLAGWERK -- één bron voor de CLI en het uitgeversbureau. `rtg sdk` schreef de typings en de documentatie al uit de code. |
-| `navigatie-index.test.js` | 13 | genoemd | DE GEBIEDSINDEX: wat er van de bron overblijft, en wat er wordt geweigerd. scripts/navigatie-index.js is met opzet in twee helften geschreven. |
+| `navigatie-index.test.js` | 13 | gezakt op `===->!==#0` | DE GEBIEDSINDEX: wat er van de bron overblijft, en wat er wordt geweigerd. scripts/navigatie-index.js is met opzet in twee helften geschreven. |
 | `navigatie.test.js` | 14 | gezakt op `+->-#0` | RTG Navigatie (server/kern/navigatie.js): het huiseigen navigatiesysteem. Getoetst als pure motor met de echte haversine en fakes voor de Flits-koppeling: het eigen wegennet + A*-route, de bocht-voor-bocht en ETA per... |
 | `navigatiegebieden.test.js` | 19 | gezakt op `true->false#0` | DE GEBIEDEN VAN DE NAVIGATIE -- de catalogus, de gebiedsbepaling en de licentiepoort. Deze laag bestaat omdat de motor precies EEN gebied kende (Nederland, met een bbox en een bestandsnaam in de code). |
-| `navigatiegebiednet.test.js` | 13 | genoemd | KAN RTG WERKELIJK IN EEN ANDER GEBIED ROUTEREN? Dat is een andere vraag dan die van test/navigatiegebieden.test.js. |
-| `navigatiemijnkaarten.test.js` | 14 | genoemd | WELKE KAARTEN WIL DIT LID -- de keuzelaag (kern/navigatie/mijnkaarten.js). RTG biedt elk gebied aan dat de bron kan leveren; een lid kiest zelf welke kaarten hij wil hebben. |
+| `navigatiegebiednet.test.js` | 13 | gezakt op `+->-#0` | KAN RTG WERKELIJK IN EEN ANDER GEBIED ROUTEREN? Dat is een andere vraag dan die van test/navigatiegebieden.test.js. |
+| `navigatiemijnkaarten.test.js` | 14 | gezakt op `liegpoort /api/` | WELKE KAARTEN WIL DIT LID -- de keuzelaag (kern/navigatie/mijnkaarten.js). RTG biedt elk gebied aan dat de bron kan leveren; een lid kiest zelf welke kaarten hij wil hebben. |
 | `navigatieproef.test.js` | 10 | gezakt op `===->!==#2` | DE NAVIGATIEPROEF -- het instrument, niet de keten. scripts/navigatieproef.js opent RTG Navigatie in een echte browser en meet de belofte uit BETROUWBAARHEID.md par. |
 | `negenplus.test.js` | 4 | gezakt op `liegpoort /api/` | De 9+-ronde: de app-gids dekt elke app-pagina met echte uitleg, en Rahul is er kindveilig voor het hele gezin in de RTFoundation. |
 | `nieuwe-endpoints.test.js` | 1 | -- | DE NIEUWE ENDPOINTS VAN DE SAMENVOEGRONDE, EEN KEER ECHT AANGEROEPEN. WAT DIT IS. |
@@ -1734,7 +1734,7 @@ toets omvalt.
 | `mijn-relaties-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET RELATIESCHERM (/apps/mijn-relaties.html) IN EEN ECHTE BROWSER. test/appstore-lab-toestemming-routes.test.js bewijst de drie routes over HTTP: de relaties zijn die van de lezer, /gevolgen voert niets uit, /sluit... |
 | `mijn-sessies-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET SESSIESCHERM (/apps/mijn-sessies.html) IN EEN ECHTE BROWSER. test/mijnrtg-routes.test.js en test/mijnsessies.test.js bewijzen de routes over HTTP: intrekken werkt op de sid, en "sluit alle andere" doet de eigen... |
 | `mobiliteitscherm.e2e.js` | 5 | -- | Scherm-toets op het Mobility OS: leggen de twee schermen de weg werkelijk af? WAAROM DEZE TOETS BESTAAT test/mobiliteit.test.js bewijst dat de API klopt. |
-| `navigatiekaarten.e2e.js` | 4 | -- | DE KAARTEN OP HET SCHERM (apps/navigatie.html, paneel "Kaarten"). test/navigatie-index.test.js en test/navigatiegebiednet.test.js bewijzen dat de catalogus, de licentiepoort en de motor per gebied kloppen. |
+| `navigatiekaarten.e2e.js` | 4 | gezakt op `liegpoort /api/` | DE KAARTEN OP HET SCHERM (apps/navigatie.html, paneel "Kaarten"). test/navigatie-index.test.js en test/navigatiegebiednet.test.js bewijzen dat de catalogus, de licentiepoort en de motor per gebied kloppen. |
 | `nieuwe-schermen.e2e.js` | 3 | -- | DRIE SCHERMEN DIE MET DE VERZAMELING MEEKWAMEN, EN DIE NOG NOOIT EEN BROWSER HADDEN GEZIEN. RTG Festival bracht twee schermen mee (het organisatiescherm en de gastenkant) en RTG Reizen een derde (de klaargezette reis). |
 | `notities.e2e.js` | 1 | -- | Scherm-test voor Notities & Taken: een lijst bouwen met Enter, bewaren, afvinken op de kaart zelf (zonder de editor te openen), delen op codenaam en de andere kant die meteen mee kan doen. |
 | `objectpaneel.e2e.js` | 1 | genoemd | Schermtoets voor het objectpaneel op RTG Sociaal (LIFE.md fase 2). Deze toets bewaakt EEN ding, en het is de reden dat de objectlaag bestaat: het scherm kent geen enkele cap bij naam. |

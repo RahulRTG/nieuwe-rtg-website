@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T20:22:50.532Z",
-    "commit": "e7cfb1c5",
+    "op": "2026-09-10T20:57:06.928Z",
+    "commit": "9d59af32",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4190,6 +4190,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "navigatie-index.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/navigatie-index.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "navigatie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4205,6 +4213,28 @@
       "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "navigatiegebiednet.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/geo.js",
+      "operator": "+->-#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "navigatiekaarten.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "navigatiemijnkaarten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "navigatieproef.test.js": {
       "soort": "puur",

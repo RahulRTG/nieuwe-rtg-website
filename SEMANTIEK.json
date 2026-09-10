@@ -2506,7 +2506,7 @@
         },
         {
           "bestanden": [
-            "server/kern/navigatie.js"
+            "server/kern/navigatie/geografie.js"
           ],
           "leden": 3,
           "voorbeeld": [
@@ -3548,5 +3548,5 @@
       ]
     }
   ],
-  "bestanden": 3295
+  "bestanden": 3307
 }

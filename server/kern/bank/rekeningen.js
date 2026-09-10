@@ -62,18 +62,10 @@ module.exports = (ctx) => {
       if (!rec) return { status: 404, error: 'Die codenaam kennen we niet.' };
       c = rec.codename || ruw;
     }
-    /* EEN NIET-VASTGELEGDE COMMIT IS EEN ANTWOORD, GEEN UITZONDERING.
-
-       Sinds kern/bank/index.js zijn bundel duurzaam maakt, GOOIT bijeen() als de
-       opslag de commit niet bevestigt (db/bijeen.js regel 83), en metIdem geeft
-       die worp door. Dat is het juiste signaal en de verkeerde vorm: hij kwam er
-       als onafgevangen serveruitzondering uit, en de strenge poort in
-       test/helper.js laat een ronde daarop terecht zakken -- een 500 met een
-       stacktrace is geen nette weigering.
-
-       Hier wordt hij daarom een 503 met een reden, exact de vorm die
-       server/lib/duurzaam.js voor dezelfde situatie teruggeeft. Andere fouten
-       gaan ONGEMOEID omhoog: wie alles afvangt, verbergt de volgende bug. */
+    /* EEN NIET-VASTGELEGDE COMMIT IS EEN ANTWOORD, GEEN UITZONDERING. De bundel
+       is duurzaam (kern/bank/index.js), dus bijeen() gooit als de opslag niet
+       bevestigt: juist signaal, verkeerde vorm. Hier wordt het een 503 met een
+       reden, zoals lib/duurzaam.js. Andere fouten gaan ONGEMOEID omhoog. */
     try {
       return await metIdem(idem ? 'rekopen:' + c + ':' + idem : null,
         'rekopen|' + c + '|' + soort + '|' + String(naam || ''), () => {
@@ -172,20 +164,11 @@ module.exports = (ctx) => {
     const alHad = Object.values(rekeningen()).some(m => m.codenaam === c);
     store[c] = store[c] || nu();
     save();
-    /* MET EEN IDEM-SLEUTEL, en dat is hier geen luxe maar de enige weg naar een
-       DUURZAME commit.
-
-       lib/idem.js regel 94 is `if (!sleutel) return werk();` -- zonder sleutel
-       loopt het werk buiten bijeen() om, en dus ook buiten de duurzame commit
-       die kern/bank/index.js sinds deze tak aanzet. Een akkoord zonder sleutel
-       kreeg daardoor nog steeds 200 met een geldige IBAN terwijl de opslag niets
-       had bevestigd (gemeten in FAALPROEF.json als `gezakt`).
-
-       De sleutel is STABIEL per lid en per soort. Dat verandert de belofte niet:
-       `alHad` hierboven voorkwam al een tweede betaalrekening en de zakelijke
-       tak toetst hetzelfde. Wat er wel bij komt is dat een dubbeltik op een
-       trage verbinding hetzelfde antwoord teruggeeft in plaats van een tweede
-       poging te doen. */
+    /* MET EEN IDEM-SLEUTEL: lib/idem.js regel 94 is `if (!sleutel) return
+       werk();`, dus zonder sleutel loopt het werk buiten bijeen() om en dus
+       buiten de duurzame commit -- 200 met een IBAN die de opslag nooit
+       bevestigde (FAALPROEF.json: `gezakt`). Stabiel per lid en per soort;
+       `alHad` voorkwam al een tweede rekening. */
     let rekening = null;
     if (!alHad) { const r = await open({ codenaam: c, soort: 'betaal', naam: 'RTG Betaalrekening', wie: 'lid', idem: 'akkoord-betaal' }); if (r.error) return r; rekening = r.rekening; }
     // de Business Pass krijgt er AUTOMATISCH een zakelijke rekening bij (gratis)

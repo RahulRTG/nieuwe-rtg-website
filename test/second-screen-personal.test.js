@@ -8,6 +8,12 @@ const lees = p => fs.readFileSync(path.join(root, p), 'utf8');
 const JS = lees('public/shared/interface/second-screen-personal.js');
 const CSS = lees('public/shared/interface/second-screen-personal.css');
 const MODULES = lees('public/shared/interface/second-screen-modules.js');
+const TRAVEL = lees('public/shared/interface/modules/travel.js');
+const EMPTY = lees('public/shared/interface/workspace-empty.js');
+const LEEG = lees('public/shared/leeg.js');
+const UI = lees('public/shared/rtg-ui.css');
+const COMM = lees('public/apps/comm.html');
+const REISRAHUL = lees('public/apps/reizen-performance-rahul.js');
 const HTML = lees('public/apps/app.html');
 const SW = lees('public/sw.js');
 const SMART = lees('public/shared/rtg-edge-smart-menu.js');
@@ -33,14 +39,27 @@ test('de persoonlijke voorzijde heeft vier echte snelle deuren', () => {
   for (const tekst of ['Uw ruimte', 'Open Rahul', 'Pas mijn ruimte aan', 'Profiel', 'Privacy', 'Meldingen', 'Weergave']) {
     assert.ok(JS.includes(tekst), tekst);
   }
-  assert.match(JS, /\/apps\/mijn-gegevens\.html/);
+  assert.match(JS, /\/apps\/ik\.html#persoonlijk/);
   assert.match(JS, /\/apps\/juridisch\/privacy\.html/);
   assert.match(JS, /\/apps\/comm\.html/);
   assert.match(MODULES, /Geen actie nodig\. Rahul houdt de rest in de gaten\./);
 });
 
+test('lege informatie is één familie en opent meteen de juiste invullaag', () => {
+  assert.match(LEEG, /rtg-leeg-vlak--actie/);
+  assert.match(LEEG, /data-rtg-leeg-doel/);
+  assert.match(UI, /\.rtg-leeg-vlak--actie::after/);
+  assert.match(EMPTY, /RTGLeeg\.vlak/);
+  assert.match(MODULES, /\/apps\/comm\.html#nieuw/);
+  assert.match(TRAVEL, /\/apps\/reizen\.html#rahul/);
+  assert.match(COMM, /actie: \{ tekst: 'Begin een gesprek', doel: '#nieuwBtn' \}/);
+  assert.match(COMM, /\.then\(openLegeActie\)/);
+  assert.match(REISRAHUL, /eersteBlad === 'rahul'[\s\S]*#rahulVraag/);
+  assert.match(SMART, /\/apps\/ik\.html#persoonlijk/);
+});
+
 test('het nieuwe vlak en de ene Edge-balk laden ook offline', () => {
-  for (const bestand of ['second-screen-personal.css', 'second-screen-personal.js']) {
+  for (const bestand of ['second-screen-personal.css', 'second-screen-personal.js', 'workspace-empty.js']) {
     assert.ok(HTML.includes('/shared/interface/' + bestand), bestand + ' staat op het scherm');
     assert.ok(SW.includes('/shared/interface/' + bestand), bestand + ' staat in de offline schil');
   }

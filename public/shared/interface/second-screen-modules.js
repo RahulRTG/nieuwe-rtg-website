@@ -1,9 +1,4 @@
-/* DE EERSTE RTG LIVING MODULES.
-
-   Alle definities lopen door Module SDK. De Workspace Runtime tekent de kaart,
-   titel, state en aanpasbediening; hier staat alleen domeininhoud. Travel,
-   Veiligheid, Contacten en Dashboard beginnen eerlijk via de legacy-adapter en
-   kunnen later onder hetzelfde id native worden zonder iemands ruimte te breken. */
+/* De eerste RTG Living Modules; vorm en bediening komen uit de Workspace-laag. */
 (function (w, d) {
   'use strict';
   var SDK = w.RTGModuleSDK, legacy = w.RTGWorkspaceLegacy;
@@ -14,6 +9,9 @@
     if (tekst != null) n.textContent = tekst; return n;
   }
   function button(tekst, cls) { var b = el('button', cls, tekst); b.type = 'button'; return b; }
+  function leeg(o) {
+    return w.RTGWorkspaceEmpty ? w.RTGWorkspaceEmpty(o) : el('p', 'rtg-ss-quiet', o.titel);
+  }
   function initialen(u) {
     var t = u.full || u.name || u.codename || u.email || '';
     return t.split(/\s+/).filter(Boolean).slice(0, 2).map(function (x) { return x.charAt(0); }).join('').toUpperCase() || 'RTG';
@@ -101,7 +99,8 @@
       if (!root) return; root.textContent = '';
       if (!geladen) { root.appendChild(el('p', 'rtg-ss-quiet', bezig ? 'Berichten laden…' : 'Open de werklaag om berichten te laden.')); return; }
       var max = state === 'panel' ? 3 : 6, lijst = gesprekken.slice(0, max);
-      if (!lijst.length) root.appendChild(el('p', 'rtg-ss-quiet', 'Nog geen gesprekken.'));
+      if (!lijst.length) root.appendChild(leeg({ ey: 'Berichten', titel: 'Nog geen gesprekken.',
+        wat: 'Begin een gesprek; daarna blijft het hier dichtbij.', tekst: 'Begin een gesprek', pad: '/apps/comm.html#nieuw' }));
       lijst.forEach(function (x) {
         var b = button('', 'rtg-ss-message'); b.dataset.ssUrl = x.link || '/apps/comm.html';
         b.appendChild(el('strong', '', x.titel || 'Gesprek'));

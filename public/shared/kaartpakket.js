@@ -82,13 +82,23 @@
     var mfAntwoord = await bak.match(voor + MERK);
     if (mfAntwoord) { try { mf = await mfAntwoord.json(); } catch (e) { mf = null; } }
     var delen = sleutels.filter(function (r) { return r.url.indexOf(voor + MERK) === -1; });
-    var bytes = 0;
+    /* DE LENGTE UIT DE KOP EN NIET UIT HET LICHAAM. Hier stond
+       `(await a.arrayBuffer()).byteLength`, en dat leest bij elke keer dat het
+       paneel opengaat de HELE graaf uit de opslag om hem op te tellen -- bij een
+       landkaart honderden megabytes voor een getal dat al in de kop staat. Wij
+       zetten die kop zelf bij het bewaren (`Content-Length`), dus hij is er; is
+       hij er toch niet, dan blijft het bij `null` en niet bij een verzonnen nul
+       (dat verschil ziet de toets: hij vergelijkt met bytesVerwacht). */
+    var bytes = 0, lengteOnbekend = false;
     for (var i = 0; i < delen.length; i++) {
       var a = await bak.match(delen[i]);
-      if (a) bytes += (await a.arrayBuffer()).byteLength;
+      if (!a) continue;
+      var lang = Number(a.headers.get('content-length'));
+      if (Number.isFinite(lang) && lang > 0) bytes += lang; else lengteOnbekend = true;
     }
     if (!mf || !Array.isArray(mf.delen)) {
-      return { kan: true, op: false, volledig: false, delen: delen.length, bytes: bytes,
+      return { kan: true, op: false, volledig: false, delen: delen.length,
+        bytes: lengteOnbekend ? null : bytes,
         bijGebrek: delen.length ? 'Er liggen ' + delen.length + ' losse delen van deze kaart, maar geen ' +
           'afgeronde download. RTG gebruikt hem niet.' : null };
     }
@@ -97,11 +107,15 @@
       var d = mf.delen[j];
       var got = await bak.match(d.adres);
       if (!got) { mist.push(d.naam); continue; }
-      var lang = (await got.arrayBuffer()).byteLength;
-      if (lang !== d.bytes) mist.push(d.naam);
+      /* Ook hier de kop en niet het lichaam. Ontbreekt de kop, dan is dit deel
+         NIET nagekeken en telt het als ontbrekend -- niet als aanwezig. Bij een
+         kaart is "ik weet het niet" hetzelfde waard als "hij is er niet". */
+      var deelLang = Number(got.headers.get('content-length'));
+      if (!Number.isFinite(deelLang) || deelLang !== d.bytes) mist.push(d.naam);
     }
     return { kan: true, op: mist.length === 0, volledig: mist.length === 0, mist: mist,
-      delen: delen.length, bytes: bytes, versie: mf.versie ?? null, gehaaldOp: mf.gehaaldOp || null,
+      delen: delen.length, bytes: lengteOnbekend ? null : bytes,
+      versie: mf.versie ?? null, gehaaldOp: mf.gehaaldOp || null,
       naamsvermelding: mf.naamsvermelding || null, licentie: mf.licentie || null,
       bytesVerwacht: mf.bytesTotaal ?? null };
   }

@@ -64,8 +64,24 @@ is een zaak met een genre, en dat **genre bestaat vandaag niet** (74 genres, wel
 `hotel` en `vervoer`). Par. 9 is de meting die het document eerlijk houdt: de
 hele eigen reisketen is een keer echt gelopen, en vond vier dingen die geen
 enkele toets zag — er is geen weg om een verkochte reis te betalen, "bevestigd"
-is een eindstation voor lid én kantoor, het lid krijgt geen bericht, en wat we
-verkopen is één regel in plaats van een samengestelde reis.
+was een eindstation voor lid én kantoor, het lid kreeg geen bericht, en wat we
+verkopen is één regel in plaats van een samengestelde reis. **De middelste twee
+zijn gerepareerd** (par. 9a, 10 september 2026): `kern/reisbureau-nazorg.js` +
+`-wijziging.js` maken de uitvoerlus rond, met drie regels die niet mogen
+sneuvelen — een wijziging is een VERZOEK dat een mens van het kantoor toepast
+(het lid schrijft zijn eigen bevestiging niet om), **afzeggen is een andere stand
+dan intrekken** (`afgezegd` was rond en gaat alsnog niet door, `geannuleerd` was
+nooit iets — wie die twee samenvoegt kan bij een geschil niet meer zien of er
+iets is beloofd), en een afzegging **verplaatst geen geld** maar schrijft
+`geld.stand = nietGeregeld` mét de reden. Daaronder zat een reparatie die groter
+was dan reizen: `notify()` schrijft op TIER en een persoonlijk bericht hoort op
+de SLEUTEL van het lid, terwijl `/api/notifications` alleen die eerste bak las —
+een persoonlijk bericht verdween dus bij de eerste herlaadbeurt (ook dat van een
+aangenomen sollicitant). `opzet/meldaan.js` heeft nu twee wegen uit één
+schrijver. En let op de vondst die een bestaande toets afdwong: een **afgewezen**
+reisaanvraag hoort juist op de tijdlijn te blijven staan, want `reisoplosser.js`
+hangt aan dat signaal om alternatieven te zoeken — alleen `geannuleerd` en
+`afgezegd` vallen weg.
 **`FOUNDATION.md` is het diepte-document van de RTFoundation als platform** —
 Personal & Civic Operating System, op drie niveaus tegelijk: individu,
 professional, organisatie. Het doet LEVEN.md niet over (dat blijft gelden en gaat

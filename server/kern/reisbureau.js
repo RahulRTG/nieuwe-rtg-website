@@ -25,10 +25,19 @@ function reisAanbod(db) {
   }));
 }
 
-function maakReisbureau({ db, save, crypto, visumtaakVan, accounts }) {
+function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan }) {
   const nu = () => new Date().toISOString();
   // de visumtaak-laag is optioneel en laat gebonden; zonder haar loopt alles door
   const visum = () => (visumtaakVan && visumtaakVan()) || null;
+  /* De weg waarlangs een besluit BIJ HET LID komt. Laat gebonden, want de
+     meldingslaag wordt in opzet/kernlaag1.js opgebouwd en deze kern in
+     kernlaag2; zonder haar (losse module-test) verandert er niets aan het
+     reisbureau zelf, en dan is het besluit alleen zichtbaar als het lid zelf
+     kijkt -- precies de stand van voor 10 september 2026. */
+  const meldLid = (key, note) => {
+    const m = meldLidVan && meldLidVan();
+    return typeof m === 'function' ? m(key, note) : null;
+  };
   /* HET DOSSIER VAN HET LID (kern/lid/reisdossier.js). Een aanvraag hoort niet
      alleen bij het reisbureau te liggen maar ook bij het lid te staan -- als
      AANVRAAG, want dat is wat het is. Zonder accounts (losse module-test) blijft
@@ -93,7 +102,10 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts }) {
     return (db.data.reisAanvragen || []).filter(a => a.customerKey === key).slice(0, 50)
       .map(a => a.besluit
         ? Object.assign({}, a, { besluit: { at: a.besluit.at, bericht: a.besluit.bericht } })
-        : a);
+        : a)
+      // en de geschiedenis van de nazorg langs dezelfde zeef: wat en wanneer wel,
+      // wie er in het kantoor op de knop drukte niet (zie ./reisbureau-nazorg.js)
+      .map(a => nazorg.lidBeeld(a));
   }
 
   // een lid trekt zijn eigen aanvraag in zolang die nog openstaat
@@ -118,9 +130,17 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts }) {
   }
   /* Het BESLUIT van de reisadviseur (bevestigen, afwijzen, en de kantooringang
      besluit()) staat in ./reisbureau-besluit.js -- zie de kop daar voor de naad. */
-  const { bevestig, wijsAf, besluit } = require('./reisbureau-besluit')({ db, save, nu, dossier, visum });
+  const { bevestig, wijsAf, besluit } = require('./reisbureau-besluit')({ db, save, nu, dossier, visum, meldLid });
+  /* DE NAZORG (./reisbureau-nazorg.js): wijzigen en afzeggen van een reis die al
+     bevestigd is. Dat was een doodlopende weg -- zie de kop daar. Hij deelt de
+     aanvraag, het dossier en de visumtaak met het besluit hierboven, zodat er
+     EEN plek blijft waar een aanvraag van stand verandert. */
+  const nazorg = require('./reisbureau-nazorg')({ db, save, nu, dossier, visum, meldLid });
 
-  return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen, bevestig, wijsAf, besluit } };
+  return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen,
+    bevestig, wijsAf, besluit,
+    vraagWijziging: nazorg.vraagWijziging, besluitWijziging: nazorg.besluitWijziging,
+    zegAf: nazorg.zegAf } };
 }
 
 module.exports = { maakReisbureau, reisAanbod };

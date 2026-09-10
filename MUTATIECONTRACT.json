@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-09T18:24:35.886Z",
-  "commit": "e66ba7f5",
-  "boomVuil": false,
-  "boomAnders": 9,
+  "op": "2026-09-10T13:57:02.616Z",
+  "commit": "2462857b",
+  "boomVuil": true,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4874,
-  "geclassificeerd": 4874,
+  "totaal": 4878,
+  "geclassificeerd": 4878,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3251,
    "NOT_APPLICABLE": 1129,
-   "PROTECTED": 373,
+   "PROTECTED": 377,
    "INTENTIONALLY_NON_IDEMPOTENT": 121
   },
-  "vastgesteldDoorMens": 1667,
+  "vastgesteldDoorMens": 1671,
   "afgeleidDoorScript": 3207,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4014,
+   "AUTHENTICATED": 4018,
    "PUBLIC": 122,
    "OBJECT_SCOPED": 718,
    "(niet af te leiden -- vraagt een verklaring)": 4,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 88,
    "kale ronde: geen uitspraak": 4512,
-   "niet gemeten": 145
+   "niet gemeten": 149
   },
   "voorstellen": {},
   "metingVan": "2026-09-03T11:51:23.232Z"
@@ -245,6 +245,18 @@
   {
    "route": "POST /api/office/service/zaak",
    "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/reisbureau/afzeggen",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/reisbureau/wijzig",
+   "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
@@ -62568,6 +62580,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "reisbureau.afzegging.kantoor",
+   "route": "POST /api/office/reisbureau/afzeggen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "office.reisbureau.besluit",
    "route": "POST /api/office/reisbureau/besluit",
    "semantiek": {
@@ -62746,6 +62779,27 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "reisbureau.wijziging.besluit",
+   "route": "POST /api/office/reisbureau/wijziging",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -75736,6 +75790,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "reisbureau.afzegging.lid",
+   "route": "POST /api/reisbureau/afzeggen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "reisbureau.annuleer",
    "route": "POST /api/reisbureau/annuleer",
    "semantiek": {
@@ -75812,6 +75887,27 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "reisbureau.wijziging.vraag",
+   "route": "POST /api/reisbureau/wijzig",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

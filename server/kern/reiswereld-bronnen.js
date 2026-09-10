@@ -20,8 +20,27 @@ module.exports = function bronnen({ kern, regel, bron }, key, uit, stil) {
         app: 'Verblijven', link: '/apps/hotels.html'
       })), uit, stil);
 
+    /* WAT ER NIET MEER KOMT, EN WAT NOG WEL AANDACHT VRAAGT -- en dat zijn hier
+       twee verschillende dingen.
+
+       Weggelaten worden een INGETROKKEN aanvraag en een AFGEZEGDE reis: die
+       eerste is nooit iets geworden, die tweede was rond en gaat alsnog niet
+       door (kern/reisbureau-nazorg.js). Allebei staan ze nog gewoon bij "mijn
+       aanvragen" en in het bestellingenoverzicht, met hun reden erbij -- ze zijn
+       alleen niet KOMEND, en dat is wat deze lijst is.
+
+       Een AFGEWEZEN aanvraag blijft hier wel staan, en dat is met opzet: de
+       reiswereld zet er het signaal `aandacht` op, en kern/reisoplosser.js
+       hangt daaraan om alternatieven uit de eigen catalogus te zoeken ("los het
+       op"). Wie hem hier wegfiltert omdat hij "toch niet doorgaat", haalt stil
+       die hele functie weg -- test/reiswereld.test.js zakt er terecht op.
+
+       De afgezegde reis krijgt die alternatieven vandaag NIET. Dat is een gat
+       en geen besluit: juist een reis die het reisbureau zelf afzegt is de plek
+       waar een lid een alternatief wil. Het staat in TRAVELCOMMERCE.md par. 8
+       en niet hier stil weggelaten. */
     bron('reisbureau', () => (kern.reisbureau.mijn(key) || [])
-      .filter(a => a.status !== 'geannuleerd')
+      .filter(a => a.status !== 'geannuleerd' && a.status !== 'afgezegd')
       .map(a => regel('reis', {
         titel: a.titel, bestemming: a.bestemming, van: a.vertrek, personen: a.personen,
         status: a.status, kenmerk: a.ref, herkomst: 'rtg',

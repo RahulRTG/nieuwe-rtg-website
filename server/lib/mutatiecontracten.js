@@ -74,6 +74,9 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-knelpunt').CONTRACTEN,
   require('./mutatiecontracten-opvangwijzer').CONTRACTEN,
   require('./mutatiecontracten-horeca-correctie').CONTRACTEN,
+  /* De nazorg van een reisaanvraag: vier routes die samen de weg terug uit een
+     toezegging zijn. Eigen bestand omdat ze een afweging delen -- zie de kop. */
+  require('./mutatiecontracten-reisnazorg').CONTRACTEN,
   require('./mutatiecontracten-integratie').CONTRACTEN,
   /* De leesweg naar de schaduwtelling van de herkomstpoort. Eigen bestand omdat
      het bewijs er van een andere soort is dan in ./mutatiecontracten-leest.js --

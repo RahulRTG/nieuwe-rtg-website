@@ -190,6 +190,7 @@ dat dit huis niet heeft).
 |---|---|---|
 | Reis over domeinen heen | **staat** | `kern/reizen.js`, vijf bronnen |
 | Reiswacht met bronnenregel | **staat** | 4 bronnen gemeten, 2 `ontbreekt` en dat staat er |
+| Bericht bij een besluit over uw reis | **staat** (10 sep 2026) | `opzet/meldaan.js` `meldLid`, scope `orders` |
 | Invoer van elders gekochte reizen | **staat, half** | tekst en boardingpass; pdf en foto niet (`kern/invoer.js`) |
 | "Los het op" | **staat** | alternatieven lezen mag altijd, uitvoeren is één agendataak |
 | Gezelschap met witte lijst | **staat** | twee rollen, drie dingen die er bewust niet zijn |
@@ -206,7 +207,7 @@ dat dit huis niet heeft).
 | Offerte -> contract -> factuur | **staat elders** | `kern/commercie/`, `supplier/facturen` |
 | Marge, inkoopprijs, betalingsplan | **vraagt een besluit** | bestaat vandaag als veld niet; zie par. 7 |
 | Personeel, rol, toegang | **staat elders** | `kern/concern/employment.js` |
-| Wijzigen en annuleren van een verkochte reis | **een stap weg** | bestaat vandaag niet, in geen enkele richting (par. 9) |
+| Wijzigen en annuleren van een verkochte reis | **staat** (10 sep 2026) | `kern/reisbureau-nazorg.js` + `-wijziging.js`; het lid vraagt, het kantoor beslist |
 
 ### De handel eronder
 | Onderdeel | Stand | Toelichting |
@@ -254,9 +255,10 @@ dat dit huis niet heeft).
 Elke stap levert iets dat op zichzelf werkt. Geen stap laat een half object
 achter dat de volgende moet afmaken.
 
-1. **De uitvoerlus dicht** -- wijzigen, annuleren, bericht bij een besluit.
-   Zonder dit is elke laag erboven een demonstratie. Het kleinste werk met de
-   grootste winst.
+1. ~~**De uitvoerlus dicht** -- wijzigen, annuleren, bericht bij een besluit.~~
+   **Gedaan op 10 september 2026** (zie par. 9a). Wat er nog aan ontbreekt is
+   geen stap 1 meer maar hangt aan stap 3: annuleringskosten en een terugbetaling
+   kunnen pas bestaan als er een geldweg is.
 2. **Genre `reisbureau`** plus de scheiding kamer/zaak uit TC-6. Eén regel in het
    genre-register en zijn caps; daarna kan een extern bureau überhaupt bestaan.
 3. **De geldweg** -- aanbetaling en restbetaling langs `kern/pay/poort.js`, met
@@ -279,17 +281,19 @@ mét de Reiswijzer erbij, een besluit door een mens op codenaam (afwijzen zonder
 reden wordt geweigerd, wie besliste komt uit de sessie), en de reis daarna in De
 Reis en De Reiswacht.
 
-Vier dingen die niet werkten, en die geen enkele bestaande toets liet zakken:
+Vier dingen die niet werkten, en die geen enkele bestaande toets liet zakken
+(twee ervan zijn op dezelfde dag gerepareerd -- zie par. 9a):
 
 1. **Er is geen geldweg.** De bevestigde reis staat in de bestellingen met
    `betaald: false` en een bedrag, en er is geen route om hem te betalen of te
    factureren. De enige bron van ledenfacturen is de verbruiksdoorbelasting
    (`kern/kosten/factuurregel.js`).
-2. **Bevestigd is een eindstation.** Het lid krijgt *"Deze aanvraag is al
-   bevestigd"*, en het kantoor krijgt exact dezelfde weigering. Wijzigen,
-   annuleren en annuleringskosten bestaan geen van drieën.
-3. **Het lid hoort niets.** Bij registratie gaat er mail uit, bij een
-   bevestiging niet -- geen mail, geen melding.
+2. ~~**Bevestigd is een eindstation.**~~ **Gerepareerd** (par. 9a). Het lid
+   kreeg *"Deze aanvraag is al bevestigd"*, en het kantoor kreeg exact dezelfde
+   weigering. Wijzigen en afzeggen bestaan nu; annuleringskosten nog niet, en die
+   kunnen ook niet vóór de geldweg (par. 7, besluit 2 en 3).
+3. ~~**Het lid hoort niets.**~~ **Gerepareerd** (par. 9a). Bij registratie ging
+   er mail uit, bij een bevestiging niet -- geen mail, geen melding.
 4. **Wat verkocht wordt is één regel.** `inbegrepen` is tekst; er ontstaat geen
    verblijf, geen transfer en geen activiteit als onderdeel. De Reis en de
    Reiswacht hebben dus het minst te doen bij precies de reizen die RTG zelf
@@ -299,6 +303,63 @@ En één kleinere vondst uit dezelfde ronde: de gegevensvraag vóór een
 reisaanvraag zegt *"als er iets verandert aan je tafel of je bestelling"* --
 restauranttekst op een reisaanvraag, omdat de aanroep in
 `routes/member/winkel.js` de soort `reservering` meegeeft.
+
+---
+
+## 9a. Wat er op 10 september 2026 is gebouwd
+
+De uitvoerlus uit par. 8, stap 1. Vier routes, twee schermen, acht toetsen.
+
+**Wijzigen is een VERZOEK en geen knop.** Het lid vraagt een andere datum, een
+ander aantal personen of stelt een vraag; de reis gaat naar
+`wijziging-gevraagd` met de wens ERNAAST, en een mens van het kantoor past hem
+toe of wijst hem af met een reden. Een lid dat zijn eigen bevestiging kan
+omschrijven, staat straks voor niets op een vliegveld -- dus staat de wens naast
+de reis en niet erin. Toets 1 zakt zodra dat verandert.
+
+**Afzeggen is iets anders dan intrekken, en draagt daarom een eigen stand.**
+`geannuleerd` is een lid dat een OPEN aanvraag terugtrekt: er was niets
+toegezegd. `afgezegd` is een reis die rond was en alsnog niet doorgaat. Wie die
+twee op een hoop gooit, kan achteraf niet meer zien of er ooit iets is beloofd --
+precies wat je bij een geschil wilt weten. Beide kanten kunnen afzeggen, allebei
+alleen met een reden.
+
+**Het geld blijft handwerk, en dat staat er.** Een afzegging schrijft een
+`geld`-blok met de stand `nietGeregeld` en de reden erbij (TC-2). Er is geen
+betaalweg, dus er valt niets terug te boeken; een leeg veld zou als
+"afgehandeld" gelezen worden. Zodra er wel een geldweg is, is dit het veld dat
+hem aanroept.
+
+**Het besluit bereikt het lid nu ook echt.** Dat vroeg een reparatie een laag
+dieper, en die was groter dan de reis: `notify()` schrijft meldingen op TIER
+(alle Business-leden), terwijl een persoonlijk bericht op de SLEUTEL van het lid
+hoort. `/api/notifications` las alleen de eerste bak. Een persoonlijk bericht
+kwam dus wel in de opslag, was over de live-verbinding even zichtbaar, en
+verdween bij de eerste herlaadbeurt. Dat raakte niet alleen reizen: ook een
+aangenomen sollicitant kreeg zo een melding die nergens aankwam.
+`opzet/meldaan.js` heeft er nu twee wegen uit EEN schrijver (veiligheid en
+gewoon), en het eindpunt leest beide bakken.
+
+**Twee dingen die het bouwen blootlegde en die hier niet weggepoetst worden:**
+
+1. **Een bestaande toets had gelijk en ik niet.** Een afgewezen reisaanvraag
+   werd door de eerste versie van de tijdlijn gefilterd ("die gaat toch niet
+   door"). `test/reiswereld.test.js` zakte daarop, en terecht: de reiswereld zet
+   op zo'n aanvraag het signaal `aandacht`, en `kern/reisoplosser.js` hangt
+   daaraan om alternatieven te zoeken. Wegfilteren had die hele functie stil
+   verwijderd. Alleen `geannuleerd` en `afgezegd` vallen nu weg.
+2. **De reisbalie in `backoffice.html` is een dood spoor.** De code die daar de
+   reisaanvragen en het reisaanbod tekent, zoekt `#rbList` en `#raList` -- en die
+   containers bestaan in geen enkele HTML van dit huis. `renderReisaanvragen()`
+   keert dus meteen terug. De werkende balie is de kamer Reisbureau in
+   `kantoren.html`, en daar is de nazorg aan gebouwd. Het dode spoor is blijven
+   staan: het weghalen of aansluiten is een besluit over dat scherm en niet over
+   deze functie.
+
+**Wat er nog steeds niet is** (par. 9, punten 1 en 4): de geldweg, en een
+verkochte reis die uit echte onderdelen bestaat in plaats van uit een regel.
+
+---
 
 **Wat deze meting NIET zegt:** er is geen browser aan te pas gekomen, de
 kantoorkant is met een persoonlijke kantoorsessie gelopen en niet met de

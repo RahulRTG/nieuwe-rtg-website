@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-10T15:58:09.363Z",
-  "commit": "b02dfc01",
+  "op": "2026-09-10T16:29:29.666Z",
+  "commit": "59a7931e",
   "boomVuil": false,
   "boomAnders": 1,
   "instrument": "scripts/mutatieinventaris.js",
@@ -17,7 +17,7 @@
   "werkelijkAangeroepen": 4729,
   "bewijsMetSleutel": 1572,
   "bewijsZonderSleutel": 217,
-  "verklaard": 426
+  "verklaard": 422
  },
  "autorisatie": {
   "rol": 3829,

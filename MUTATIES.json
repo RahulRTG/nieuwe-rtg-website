@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T16:04:41.093Z",
-    "commit": "72aa2f06",
+    "op": "2026-09-10T16:28:04.183Z",
+    "commit": "3444aee7",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4092,29 +4092,6 @@
       "gezakt": 4,
       "geprobeerd": 1
     },
-    "move-keten.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 6,
-      "scherp": "gezakt"
-    },
-    "move.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/move/naad.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "moveproef.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/moveproef.js",
-      "operator": "regex-alternatief-weg#1",
-      "gezakt": 1,
-      "geprobeerd": 10
-    },
     "mrz.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5336,6 +5313,21 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "reisbureau-genre.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/seed/genres.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "reisbureau-nazorg.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
       "scherp": "gezakt"
     },
     "reisbureau.test.js": {

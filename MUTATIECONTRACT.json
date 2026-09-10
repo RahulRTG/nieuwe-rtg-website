@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-10T15:58:04.488Z",
-  "commit": "b02dfc01",
+  "op": "2026-09-10T16:29:22.493Z",
+  "commit": "59a7931e",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
@@ -14,8 +14,8 @@
   "geclassificeerd": 4878,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3251,
-   "NOT_APPLICABLE": 1133,
-   "PROTECTED": 373,
+   "NOT_APPLICABLE": 1129,
+   "PROTECTED": 377,
    "INTENTIONALLY_NON_IDEMPOTENT": 121
   },
   "vastgesteldDoorMens": 1671,
@@ -245,6 +245,18 @@
   {
    "route": "POST /api/office/service/zaak",
    "bedoeld": "CAPABILITY_GATED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/reisbureau/afzeggen",
+   "bedoeld": "OBJECT_SCOPED",
+   "waargenomen": "AUTHENTICATED",
+   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
+  },
+  {
+   "route": "POST /api/reisbureau/wijzig",
+   "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
   },
@@ -52047,90 +52059,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "move.gevolg",
-   "route": "POST /api/move/gevolg",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "move.reis",
-   "route": "POST /api/move/reis",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "move.volgende",
-   "route": "POST /api/move/volgende",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "move.vooraf",
-   "route": "POST /api/move/vooraf",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": "leest",
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "munt.direct",
    "route": "POST /api/munt/direct",
    "semantiek": {
@@ -62652,6 +62580,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "reisbureau.afzegging.kantoor",
+   "route": "POST /api/office/reisbureau/afzeggen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "office.reisbureau.besluit",
    "route": "POST /api/office/reisbureau/besluit",
    "semantiek": {
@@ -62830,6 +62779,27 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "reisbureau.wijziging.besluit",
+   "route": "POST /api/office/reisbureau/wijziging",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -75820,6 +75790,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "reisbureau.afzegging.lid",
+   "route": "POST /api/reisbureau/afzeggen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "reisbureau.annuleer",
    "route": "POST /api/reisbureau/annuleer",
    "semantiek": {
@@ -75896,6 +75887,27 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "reisbureau.wijziging.vraag",
+   "route": "POST /api/reisbureau/wijzig",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

@@ -19,12 +19,12 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 4996 |
-| servermodules (`server/**/*.js`) | 3318 |
-| routebestanden (`server/routes/**`) | 577 |
-| kernmodules (`server/kern/**`) | 2067 |
-| schermen (`public/**/*.html`) | 314 |
-| gedeelde browsermodules (`public/shared/*.js`) | 348 |
-| toetsbestanden (`test/*.test.js`) | 1572 |
+| servermodules (`server/**/*.js`) | 3313 |
+| routebestanden (`server/routes/**`) | 576 |
+| kernmodules (`server/kern/**`) | 2064 |
+| schermen (`public/**/*.html`) | 313 |
+| gedeelde browsermodules (`public/shared/*.js`) | 347 |
+| toetsbestanden (`test/*.test.js`) | 1571 |
 | schermtoetsen (`test/*.e2e.js`) | 210 |
 
 ## 2. De weg van een verzoek
@@ -110,7 +110,7 @@ zie §5 -- er zijn nog 231 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 20 | 6 | 8 | 52 |
-| `member` | 694 | 70 | 16 | 427 |
+| `member` | 696 | 70 | 16 | 427 |
 | `supplier` | 618 | 122 | 6 | 331 |
 | `office` | 64 | 17 | 3 | 79 |
 | `staff` | 26 | 8 | 1 | 42 |
@@ -127,7 +127,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3383 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3381 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -135,9 +135,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1560 |
+| kern-namen die routes aanraken | 1559 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 231 |
-| daarvan door precies één domein | 1329 |
+| daarvan door precies één domein | 1328 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -149,7 +149,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(200) auth(121) supplierAuth(64) officeAuth(45) db(38) liveCodename(35) status(31)
+app(199) auth(120) supplierAuth(64) officeAuth(45) db(38) liveCodename(35) status(31)
 accounts(26) schoon(23) managerOnly(18) codenaamVan(17) save(17) boardroomWie(16)
 rtf(15) tooManyTries(14) geenGast(14) crypto(12) express(12) findSupplier(12) appUrl(11)
 pay(11) anthropic(11) noteFailedTry(10) boardroomAuth(10) keyVanCodenaam(10) rtmail(10)

@@ -42,6 +42,46 @@ systeem weet) draagt. Lees vóór je hieraan werkt vooral paragraaf 2.1 en de
 grenzen: de Reis bezit geen boeking maar een verwijzing, een voornemen en een
 bewijs; een wachter zonder bron zegt dat hij niet kijkt; een ingelezen waarde
 wordt nooit stilletjes verbeterd, en de barcode blijft van de uitgever.
+**`TRAVELCOMMERCE.md` is de handelskant daarvan** — RTG Travel Commerce &
+Agency OS: niet de wereld die de REIZIGER ziet (dat blijft REIZEN.md) maar wie
+een reis bedenkt, verkoopt, inkoopt, uitvoert, ondersteunt en betaalt. Een
+richtingsdocument zoals PLATFORM.md en ECONOMIE.md: per onderdeel **staat**,
+**een stap weg**, **vraagt een besluit** of **jaren weg**. De kern in één zin:
+zes partijen kijken naar dezelfde reis en geen van hen ziet hetzelfde — er is
+één werkelijkheid en er zijn zes projecties. Lees die vóór je een reisbureau,
+een marge of een leverancierscijfer bouwt. Het belangrijkste dat het document
+tegenhoudt is een `journeys`-tabel: een reis die mensen, geld, documenten én
+reserveringen BEZIT is de `Asset`-fout opnieuw, en de meting staat er
+(`KETENVORM.json`: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
+<!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> gedeelde actoren over drie
+ketens). De vorm die wél werkt is die van `kern/levensgraaf/graaf.js` — een
+PROJECTIE met vijf etiketten, hier plus de **herkomst** als zesde. Zeven grenzen
+bovenop die van REIZEN.md, waarvan de drie scherpste: geld wordt klaargezet en
+een mens voert uit, een gevolg dat niemand gemeten heeft heet `onbekend` (en de
+onbekende helft staat even groot op het scherm), en een reisbureau is een KLANT
+en geen afdeling van RTG — RTG's eigen balie is kantoormacht, een extern bureau
+is een zaak met een genre, en dat **genre bestaat vandaag niet** (74 genres, wel
+`hotel` en `vervoer`). Par. 9 is de meting die het document eerlijk houdt: de
+hele eigen reisketen is een keer echt gelopen, en vond vier dingen die geen
+enkele toets zag — er is geen weg om een verkochte reis te betalen, "bevestigd"
+was een eindstation voor lid én kantoor, het lid kreeg geen bericht, en wat we
+verkopen is één regel in plaats van een samengestelde reis. **De middelste twee
+zijn gerepareerd** (par. 9a, 10 september 2026): `kern/reisbureau-nazorg.js` +
+`-wijziging.js` maken de uitvoerlus rond, met drie regels die niet mogen
+sneuvelen — een wijziging is een VERZOEK dat een mens van het kantoor toepast
+(het lid schrijft zijn eigen bevestiging niet om), **afzeggen is een andere stand
+dan intrekken** (`afgezegd` was rond en gaat alsnog niet door, `geannuleerd` was
+nooit iets — wie die twee samenvoegt kan bij een geschil niet meer zien of er
+iets is beloofd), en een afzegging **verplaatst geen geld** maar schrijft
+`geld.stand = nietGeregeld` mét de reden. Daaronder zat een reparatie die groter
+was dan reizen: `notify()` schrijft op TIER en een persoonlijk bericht hoort op
+de SLEUTEL van het lid, terwijl `/api/notifications` alleen die eerste bak las —
+een persoonlijk bericht verdween dus bij de eerste herlaadbeurt (ook dat van een
+aangenomen sollicitant). `opzet/meldaan.js` heeft nu twee wegen uit één
+schrijver. En let op de vondst die een bestaande toets afdwong: een **afgewezen**
+reisaanvraag hoort juist op de tijdlijn te blijven staan, want `reisoplosser.js`
+hangt aan dat signaal om alternatieven te zoeken — alleen `geannuleerd` en
+`afgezegd` vallen weg.
 **`FOUNDATION.md` is het diepte-document van de RTFoundation als platform** —
 Personal & Civic Operating System, op drie niveaus tegelijk: individu,
 professional, organisatie. Het doet LEVEN.md niet over (dat blijft gelden en gaat
@@ -600,9 +640,10 @@ code gehouden.
 hij werkt vóór productie. Lees die vóór je Magnaat aan RTG koppelt of een
 simulatiewereld toevoegt. Ook hier is de dragende bewering eerst **gemeten**
 (`scripts/magnaatlab.js`, `MAGNAATLAB.json`): de simulatielaag telt 66 modules en
-116 requires, en raakt daarmee **2 van 415 kerndomeinen** aan — 0%. Als testhal
-bewijst Magnaat vandaag niets over RTG, en niet omdat hij RTG heeft nagebouwd:
-van de 34 paren met hetzelfde onderwerp deelt er **geen enkele** een vorm. Het
+121 requires, en raakt daarmee **4 van 576 kerndomeinen** aan — 1%. Als testhal
+bewijst Magnaat vandaag vrijwel niets over RTG, en niet omdat hij RTG heeft
+nagebouwd: van de 20 paren met hetzelfde onderwerp deelt er **geen enkele** een
+vorm. Het
 probleem is afwezigheid, niet dubbeling — er hoeft dus niets te worden
 afgebroken. Veertien van de vijftig punten staan al (chaos, aanvalsbatterij,
 tenant-isolatie, doelschending, canary met automatische terugrol, shadow
@@ -627,9 +668,10 @@ die niet geslaagd is. **En Magnaat rijdt er inmiddels op**:
 `kern/spellen/magnaat/rtg-keten.js` stelt de geldpompvraag aan RTG Pay
 (`npm run magnaat:pomp:rtg`) — vijf perverse volgordes, exact nul verschil, en de
 idempotentie gemeten (twintig aangeboden tikken, veertig grootboekregels). Het
-bereik van de simulatielaag ging daarmee van 1 naar 2 kernmodules; het
-percentage bleef 0% en dat is geen tegenvaller maar te grof gemeten — één
-capability is geen percentage. Het is een **proefstuk en geen koppeling**: geen
+bereik van de simulatielaag ging daarmee van 1 naar 2 kernmodules (vers gemeten
+op 10 september 2026: 5 kernmodules in 4 van 576 domeinen); het percentage blijft
+1% en dat is geen tegenvaller maar te grof gemeten — één capability is geen
+percentage. Het is een **proefstuk en geen koppeling**: geen
 speelbeurt komt langs RTG Pay, en `test/magnaat-rtgketen.test.js` zakt zodra een
 spelmodule `kern/pay` laadt. Twee dingen om niet
 te laten sneuvelen: een Magnaat-PASS is bewijs en geen vergunning (wat het huis

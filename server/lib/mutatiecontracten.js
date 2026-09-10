@@ -74,6 +74,9 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-knelpunt').CONTRACTEN,
   require('./mutatiecontracten-opvangwijzer').CONTRACTEN,
   require('./mutatiecontracten-horeca-correctie').CONTRACTEN,
+  /* De nazorg van een reisaanvraag: vier routes die samen de weg terug uit een
+     toezegging zijn. Eigen bestand omdat ze een afweging delen -- zie de kop. */
+  require('./mutatiecontracten-reisnazorg').CONTRACTEN,
   require('./mutatiecontracten-integratie').CONTRACTEN,
   /* RTG Move: drie routes die alle drie lezen, met de BOUW als grond in plaats
      van een meting. Eigen bestand om dat verschil te bewaren -- zie de kop. */

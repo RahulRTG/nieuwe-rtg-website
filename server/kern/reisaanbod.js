@@ -36,6 +36,12 @@ const klok = require('../lib/klok');
 
 const MAX_REIZEN = 500;
 
+/* WANNEER LIGT ER NOG WERK BIJ DE BALIE. Een wijzigingsverzoek op een bevestigde
+   reis (kern/reisbureau-nazorg.js) is net zo goed een open vraag als een nieuwe
+   aanvraag: staat hij open, dan verdwijnt de reis niet uit de etalage onder de
+   medewerker vandaan die hem nog moet beantwoorden. */
+const OPEN = ['aangevraagd', 'wijziging-gevraagd'];
+
 // dezelfde grenzen als het formulier: hier gehandhaafd, want een scherm is
 // geen slot
 const SNIJ = { title: 80, dest: 60, dates: 60, desc: 600, regel: 120, visual: 40 };
@@ -65,7 +71,7 @@ function maakReisaanbod({ db, save, crypto }) {
   function reisAanbodKantoor() {
     const open = new Map();
     for (const a of aanvragen()) {
-      if (!a || a.status !== 'aangevraagd') continue;
+      if (!a || !OPEN.includes(a.status)) continue;
       open.set(a.tripId, (open.get(a.tripId) || 0) + 1);
     }
     const lijst = rij().map(t => ({
@@ -142,7 +148,7 @@ function maakReisaanbod({ db, save, crypto }) {
     const sleutel = String(id || '');
     const i = rij().findIndex(t => t.id === sleutel);
     if (i < 0) return { status: 404, error: 'Deze reis staat niet in het aanbod.' };
-    const open = aanvragen().filter(a => a && a.status === 'aangevraagd' && a.tripId === sleutel).length;
+    const open = aanvragen().filter(a => a && OPEN.includes(a.status) && a.tripId === sleutel).length;
     if (open) return { status: 409,
       error: open === 1
         ? 'Er staat nog een open aanvraag voor deze reis. Handel die eerst af; daarna kan hij weg.'

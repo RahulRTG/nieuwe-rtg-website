@@ -459,7 +459,7 @@ body.rtg-stijl.rtg-salon-elite .knop{background:#691f32;background-image:none;}
   .rtg-salon-elite .tabs>button:first-child{padding-left:0!important;}
   .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop{
     right:0;width:92px;min-width:92px;padding:0 .45rem!important;
-    background:rgba(20,19,16,.42)!important;color:#fff!important;
+    background:rgba(20,19,16,.82)!important;color:#fff!important;
     font-size:.63rem!important;letter-spacing:.06em;text-shadow:0 1px 8px rgba(0,0,0,.85);
   }
   .rtg-salon-elite .salon-werkveld>header>.rtguitvoer-knop::before{display:none;}

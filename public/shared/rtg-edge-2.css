@@ -52,7 +52,7 @@ body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom{
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom{
   --edge-bg:#f4f0e8;--edge-panel:#fbf8f2;--edge-copy:#211e19;--edge-dim:#70695f;
   --edge-line:rgba(33,30,25,.16);--edge-accent:#861638;--edge-accent-soft:rgba(134,22,56,.1);
-  --edge-metal:#8a7317;--edge2-metal:#745718;--edge2-copy:#211e19;border-top-color:var(--edge-line);
+  --edge-metal:#745718;--edge2-metal:#745718;--edge2-copy:#211e19;border-top-color:var(--edge-line);
   background:color-mix(in srgb,var(--edge-bg) 97%,transparent);box-shadow:0 -8px 32px rgba(28,21,15,.08)
 }
 .rtg-edge-appslot{display:none;min-width:0;height:var(--edge-bottom);overflow-x:auto;overflow-y:hidden;scrollbar-width:none;pointer-events:auto}
@@ -75,16 +75,19 @@ body[data-rtg-edge-appbar="true"] .rtg-edge-ai{grid-column:4;min-width:44px!impo
 .rtg-edge-appslot>nav.rtg-edge-owned-bar>button{flex:1 0 52px!important;min-width:44px!important;min-height:44px!important;height:var(--edge-bottom)!important;padding:2px 4px!important;border:0!important;border-right:1px solid rgba(33,30,25,.09)!important;border-radius:0!important;background:transparent!important;color:var(--edge-dim)!important;box-shadow:none!important}
 .rtg-edge-appslot>nav.rtg-edge-owned-bar>:is(a,button).is-actief,
 .rtg-edge-appslot>nav.rtg-edge-owned-bar>:is(a,button)[aria-current]{color:var(--edge-accent)!important;background:var(--edge-accent-soft)!important}
+.rtg-edge-appslot>nav.rtg-edge-owned-bar>:is(a,button) b{color:inherit!important}
 .rtg-edge-appslot>.speler.rtg-edge-owned-bar{min-width:220px!important;padding:0 4px!important}
 .rtg-edge-appslot>.speler.rtg-edge-owned-bar .balk{position:absolute;left:0;right:0;top:0;margin:0!important}
 .rtg-edge-appslot>.speler.rtg-edge-owned-bar .rij{height:var(--edge-bottom)!important;gap:2px!important}
 .rtg-edge-appslot>.speler.rtg-edge-owned-bar button{min-width:44px!important;width:44px!important;height:44px!important;color:var(--edge-copy)!important}
+.rtg-edge-appslot>.speler.rtg-edge-owned-bar :is(.titel,.sub){color:var(--edge-copy)!important}
+.rtg-edge-appslot>.speler.rtg-edge-owned-bar button.afspeel{background:var(--edge-accent)!important;color:#fff!important}
 body[data-rtg-edge-appbar="true"]:is(.rtg-music-experience,.rtg-media-experience)>.rahul{display:none!important}
 
 /* Het slimme menu heeft twee zichtbare gezichten in dezelfde laag. Op een
    telefoon groeit die laag rechtstreeks uit de witte onderrand; desktop houdt
    dezelfde inhoud in de bestaande zijlade. */
-.rtg-edge-index:has(.rtg-edge-faces){--edge-bg:#f4f0e8;--edge-panel:#fbf8f2;--edge-copy:#211e19;--edge-dim:#70695f;--edge-line:rgba(33,30,25,.16);--edge-accent:#861638;--edge-accent-soft:rgba(134,22,56,.09);--edge-metal:#8a7317;color:var(--edge-copy)}
+.rtg-edge-index:has(.rtg-edge-faces){--edge-bg:#f4f0e8;--edge-panel:#fbf8f2;--edge-copy:#211e19;--edge-dim:#70695f;--edge-line:rgba(33,30,25,.16);--edge-accent:#861638;--edge-accent-soft:rgba(134,22,56,.09);--edge-metal:#745718;color:var(--edge-copy)}
 .rtg-edge-faces{min-height:100%;background:var(--edge-panel);color:var(--edge-copy)}
 .rtg-edge-sheet-grip{display:none;width:36px;height:4px;margin:10px auto 12px;border-radius:50%;background:rgba(33,30,25,.24)}
 .rtg-edge-face-tabs{position:sticky;z-index:3;top:0;display:grid;grid-template-columns:1fr 1fr;margin:0 0 22px;border:1px solid var(--edge-line);background:var(--edge-bg)}

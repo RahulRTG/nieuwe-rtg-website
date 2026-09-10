@@ -122,3 +122,85 @@ test('8. een onbekende taalcode laat het register vallen', () => {
   assert.equal(register.DOELTALEN.includes(register.BRON), false,
     'de brontaal hoort geen eigen schilbestand te krijgen');
 });
+
+/* ---- 9. HET GEDRAGSBEWIJS ------------------------------------------------
+   Toets 7 hierboven leest de BRON en stelt de volgorde lexicaal vast. Dat is
+   zwakker dan het kan: het bewijst dat de regels in de goede volgorde STAAN,
+   niet dat er offline werkelijk iets op het scherm verschijnt. Deze toets laat
+   de laag echt draaien in een nagebouwde DOM, met een `fetch` die het meldt
+   zodra hij wordt aangeroepen. Slaagt hij, dan is de belofte "deze taal werkt
+   zonder netwerk" gemeten en niet beweerd.                                   */
+const vm = require('node:vm');
+
+function domDubbel() {
+  const maakEl = (tag) => ({
+    nodeType: 1, tagName: tag, isConnected: true, attrs: {}, childNodes: [],
+    closest: () => null, querySelectorAll: () => [],
+    hasAttribute(n) { return Object.prototype.hasOwnProperty.call(this.attrs, n); },
+    getAttribute(n) { return this.hasAttribute(n) ? this.attrs[n] : null; },
+    setAttribute(n, v) { this.attrs[n] = String(v); },
+    removeAttribute(n) { delete this.attrs[n]; }
+  });
+  const wortel = maakEl('HTML');
+  const maakTekst = (waarde, ouder) => {
+    const n = { nodeType: 3, nodeValue: waarde, isConnected: true, parentElement: ouder };
+    ouder.childNodes.push(n);
+    return n;
+  };
+  const alleTekst = (root, uit) => {
+    (root.childNodes || []).forEach(k => {
+      if (k.nodeType === 3) uit.push(k); else alleTekst(k, uit);
+    });
+    return uit;
+  };
+  return { wortel, maakEl, maakTekst, alleTekst };
+}
+
+test('9. met een gevulde schil verschijnt de vertaling ZONDER dat het net wordt geraakt', () => {
+  const { wortel, maakTekst, alleTekst } = domDubbel();
+  const knop = maakTekst('Bestellen', wortel);
+  const zin = maakTekst('Betaal de rekening', wortel);
+
+  const schil = new Map([['Bestellen', '注文'], ['Betaal de rekening', '請求書を支払う']]);
+  let netGeraakt = 0;
+
+  const window = { addEventListener: () => {},
+    /* VOORAF gezet: i18n-00a.js begint met `if (w.RTGTaalSchil) return;`, dus
+       dit is precies het punt waar een gevulde schil ingebracht kan worden. */
+    RTGTaalSchil: { van: () => schil, laad: () => Promise.resolve(schil), stand: () => ({}) } };
+  const document = {
+    documentElement: wortel,
+    visibilityState: 'visible',
+    querySelector: () => null,
+    createTreeWalker: (root) => {
+      const rij = alleTekst(root, []);
+      let i = 0;
+      return { nextNode: () => (i < rij.length ? rij[i++] : null) };
+    }
+  };
+  window.document = document;
+
+  const context = {
+    window, document,
+    MutationObserver: function () { this.observe = () => {}; },
+    /* Meteen uitvoeren: de laag plant zijn ronde met setTimeout, en zonder
+       klok zou er niets renderen en zou deze toets altijd slagen. */
+    setTimeout: (fn) => { fn(); return 1; },
+    clearTimeout: () => {},
+    fetch: () => { netGeraakt++; return Promise.reject(new Error('niet aanroepen')); },
+    location: { pathname: '/apps/proef.html' },
+    NodeFilter: { SHOW_TEXT: 4 }
+  };
+
+  const delen = fs.readdirSync(path.join(ROOT, 'public/shared/i18n'))
+    .filter(f => /^i18n-00.*\.js$/.test(f)).sort();
+  const bron = delen.map(d => fs.readFileSync(path.join(ROOT, 'public/shared/i18n', d), 'utf8')).join('');
+  vm.runInNewContext(bron, context);
+
+  window.RTGAutoVertaling.apply('ja');
+
+  assert.equal(knop.nodeValue, '注文', 'de schil stond klaar maar het scherm bleef Nederlands');
+  assert.equal(zin.nodeValue, '請求書を支払う', 'de tweede regel kwam niet uit de schil');
+  assert.equal(netGeraakt, 0,
+    'er is ' + netGeraakt + 'x om het net gevraagd terwijl de schil het antwoord al had');
+});

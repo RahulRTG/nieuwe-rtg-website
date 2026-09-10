@@ -37,7 +37,15 @@ public/dist/
 
 # het routejournaal van de laatste suite-run: invoer voor scripts/dekking.js,
 # geen bron. Wordt bij elke `npm test` opnieuw geschreven.
-.routejournaal
+#
+# MET STERRETJE, en dat is geen slordigheid. RTG_ROUTELOG neemt een WILLEKEURIG
+# pad, en scripts/dekking.js leest met `--lees` net zo goed een journaal onder
+# een andere naam. Wie een tweede ronde naast de staande wil zetten (een verse
+# meting terwijl de oude nog nodig is) verzint dus een variant, en die stond
+# vervolgens als ongevolgd bestand in de boom -- precies gebeurd met
+# `.routejournaal-vers`. Een journaal is invoer voor een meting en nooit bron,
+# welke naam hij ook draagt.
+.routejournaal*
 # idem voor de schermen: invoer voor scripts/schermen.js, geen bronbestand
 .schermjournaal
 # de ruwe duurmeting van de laatste ronde: invoer voor scripts/toetsduur.js.

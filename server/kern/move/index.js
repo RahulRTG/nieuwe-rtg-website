@@ -21,6 +21,7 @@
 
 const { haalbaar } = require('./haalbaar');
 const { gevolg } = require('./gevolg');
+const { vooraf } = require('./vooraf');
 const { UITKOMST, tijdstip } = require('./naad');
 
 module.exports.maakMove = ({ kern }) => {
@@ -62,10 +63,17 @@ module.exports.maakMove = ({ kern }) => {
      dat je een restaurant op hetzelfde moment binnenkomt en verlaat. */
   function tijdenVan(rij) {
     const start = tijdstip(rij.van, rij.tijd);
+    /* EEN ONBEKENDE DUUR IS GEEN DUUR VAN NUL. `Number(null)` is 0 en `0 >= 0`
+       is waar, dus kreeg elk onderdeel zonder duur `klaarAt === nodigAt` -- "u
+       kunt weg op het moment dat u er moet zijn". Dat gold voor de meerderheid
+       (reiswereld zet `duurMin: null` voor vlucht, charter, verblijf en eigen
+       invoer) en leverde een VERKEERD getal met een compleet ogende
+       onderbouwing. Nu `> 0`, gelijk aan de regel in kern/reiswereld.js. Het
+       hele verhaal staat in MOVE.md par. 6. */
     const duur = Number(rij.duurMin);
     return {
       nodigAt: start,
-      klaarAt: (start != null && Number.isFinite(duur) && duur >= 0) ? start + duur * 60000 : null
+      klaarAt: (start != null && Number.isFinite(duur) && duur > 0) ? start + duur * 60000 : null
     };
   }
 
@@ -126,5 +134,24 @@ module.exports.maakMove = ({ kern }) => {
       waarom: 'Geen komend onderdeel met een bekende plek en tijd; Move verzint geen bestemming.' };
   }
 
-  return { move: { reis: moveReis, gevolg: moveGevolg, volgende: moveVolgende, UITKOMST } };
+  /* Haalbaarheid VOOR de verkoop; de weging zelf staat in ./vooraf.js. Hier
+     alleen het vertalen van een voornemen uit het lijf naar een onderdeel: de
+     plek langs de plekkenlaag en de tijden langs tijdenVan(), precies zoals bij
+     een echt onderdeel. Zo kan het voornemen niet toevallig anders worden
+     gerekend dan de reis waartegen het wordt gewogen. */
+  function moveVooraf(key, body) {
+    const b = body || {};
+    return vooraf({
+      onderdelen: onderdelenVan(key),
+      voornemen: Object.assign({
+        titel: String(b.titel || 'Dit voornemen').slice(0, 80),
+        soort: String(b.soort || 'voornemen').slice(0, 40),
+        plek: plekVan({ plek: b.plek })
+      }, tijdenVan({ van: b.dag, tijd: b.uur, duurMin: b.duurMin })),
+      reisTijd, afstandM
+    });
+  }
+
+  return { move: { reis: moveReis, gevolg: moveGevolg, volgende: moveVolgende,
+    vooraf: moveVooraf, UITKOMST } };
 };

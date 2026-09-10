@@ -59,7 +59,11 @@ const CONTRACTEN = Object.fromEntries([
      met `uitgevoerd: false`; verandert zelf niets. */
   leestMove('POST /api/move/gevolg', 'move.gevolg'),
   /* De volgende beweging, voor de Continue Key. Leidt af en verzint niets. */
-  leestMove('POST /api/move/volgende', 'move.volgende')
+  leestMove('POST /api/move/volgende', 'move.volgende'),
+  /* Haalbaarheid VOOR de verkoop: weegt een voornemen tegen de reis die er al
+     staat. Weigert niets -- dat zou Move over de reis van een mens laten
+     beslissen -- en legt niets vast. */
+  leestMove('POST /api/move/vooraf', 'move.vooraf')
 ]);
 
 module.exports = { CONTRACTEN };

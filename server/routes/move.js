@@ -42,4 +42,15 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     stuur(res, move.volgende(req.session.key));
   });
+
+  /* Past dit nog in mijn reis? Te stellen VOORDAT er iets vaststaat, met een
+     voornemen in het lijf (plek, dag, uur, duur) dat van de aanroeper komt.
+
+     Hij WEIGERT NIETS. Een boeking tegenhouden zou Move over de reis van een
+     mens laten beslissen; wat hij doet is het oordeel met en zonder het
+     voornemen naast elkaar zetten. Drukken doet de reiziger. */
+  app.post('/api/move/vooraf', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, move.vooraf(req.session.key, req.body || {}));
+  });
 };

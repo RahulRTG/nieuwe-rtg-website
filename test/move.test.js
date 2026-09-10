@@ -267,14 +267,73 @@ test('11. een verschuiving vraagt een onderdeel en een aantal minuten', () => {
   assert.equal(gevolg({ onderdelen: rij, kenmerk: 'BESTAAT-NIET', minuten: 65, reisTijd: vast(15) }).status, 404);
 });
 
-test('12. Move bezit niets: geen van de drie modules schrijft of leest opslag', () => {
+test('12. Move bezit niets: geen van de vier modules schrijft of leest opslag', () => {
   /* De grens die deze laag klein houdt, en die in de code moet staan en niet in
      een document: net als kern/reiswereld.js heeft Move geen eigen collectie.
      Zou hij die krijgen, dan is er een tweede reisadministratie. */
   const fs = require('fs'), path = require('path');
-  for (const f of ['naad.js', 'haalbaar.js', 'gevolg.js']) {
+  for (const f of ['naad.js', 'haalbaar.js', 'gevolg.js', 'vooraf.js']) {
     const bron = fs.readFileSync(path.join(__dirname, '..', 'server', 'kern', 'move', f), 'utf8');
     assert.doesNotMatch(bron, /db\.data|require\('fs'\)|save\(/,
       f + ' raakt opslag aan; dan is Move een administratie in plaats van een projectie');
   }
+});
+
+test('13. een onbekende duur is GEEN duur van nul', () => {
+  /* DE FOUT DIE DEZE TOETS TEGENHOUDT, en hij is hier echt gemaakt.
+
+     `Number(null)` is 0 en `0 >= 0` is waar, dus kreeg elk onderdeel zonder
+     bekende duur `klaarAt === nodigAt`: "u kunt weg op het moment dat u er moet
+     zijn". kern/reiswereld.js zet `duurMin: null` voor een vlucht, een charter,
+     een verblijf en eigen invoer -- dus gold dat voor de meerderheid van de
+     reis. Gemeten uitkomst vóór de reparatie: een charter van 18:10 en een
+     diner van 19:00 gaven "50 min beschikbaar, 17 nodig, marge 33 -- RUIM",
+     terwijl niemand weet wanneer je het vliegveld uit bent. MOVE.md par. 6
+     belooft daar juist NIET_TE_BEPALEN.
+
+     Deze toets werkt op de NAAD en niet op tijdenVan(), want die woont in
+     kern/move/index.js achter een fabriek met de hele kern erin. Wat hij
+     vastlegt is het gedrag dat eruit moet komen: zonder `klaarAt` valt er niets
+     te rekenen, hoe compleet de rest ook is. */
+  const uit = naad({
+    van: { plek: P(38.87, 1.37), klaarAt: null },
+    naar: { plek: P(38.97, 1.41), nodigAt: T('2026-09-11', '19:00') },
+    reisTijd: vast(17), afstandM: verM(9000)
+  });
+  assert.equal(uit.uitkomst, UITKOMST.NIET_TE_BEPALEN);
+  assert.ok(uit.mist.includes('tijd-van'), 'en hij zegt WAT er ontbreekt');
+  assert.equal(uit.beschikbaarMin, undefined, 'er staat geen getal waar er geen is');
+
+  /* En de tegenproef: MET een klaarAt komt er wel een oordeel. Zonder deze helft
+     zou een naad die altijd NIET_TE_BEPALEN geeft deze toets ook halen. */
+  const met = naad({
+    van: { plek: P(38.87, 1.37), klaarAt: T('2026-09-11', '18:10') },
+    naar: { plek: P(38.97, 1.41), nodigAt: T('2026-09-11', '19:00') },
+    reisTijd: vast(17), afstandM: verM(9000)
+  });
+  assert.notEqual(met.uitkomst, UITKOMST.NIET_TE_BEPALEN);
+  assert.equal(met.beschikbaarMin, 50);
+});
+
+test('14. een naad is terug te voeren op zijn onderdelen', () => {
+  /* `vooraf` moet weten welke naden een VOORNEMEN raakt. Op de titel matchen is
+     een gok -- twee onderdelen mogen dezelfde titel dragen -- dus draagt elke
+     naad het kenmerk van beide kanten. */
+  const uit = haalbaar({ onderdelen: reisje(), reisTijd: vast(15), afstandM: verM(9000) });
+  for (const n of uit.naden) {
+    assert.equal(typeof n.van.kenmerk, 'string', 'van draagt een kenmerk');
+    assert.equal(typeof n.naar.kenmerk, 'string', 'naar draagt een kenmerk');
+  }
+  /* NIET "is een string" MAAR "is HET kenmerk". Een lege string is ook een
+     string: met `kenmerk: ''` hardgecodeerd bleef de eerste versie van deze
+     toets groen, en dat is precies het gat dat LAT.md regel 11 bedoelt. */
+  const rij = reisje();
+  const bron = new Map(rij.map(o => [o.titel, o.kenmerk]));
+  for (const n of uit.naden) {
+    assert.equal(n.van.kenmerk, bron.get(n.van.titel), 'het kenmerk van ' + n.van.titel);
+    assert.equal(n.naar.kenmerk, bron.get(n.naar.titel), 'het kenmerk van ' + n.naar.titel);
+    assert.ok(n.van.kenmerk, 'en het is niet leeg');
+  }
+  const kenmerken = uit.naden.map(n => n.van.kenmerk + '>' + n.naar.kenmerk);
+  assert.equal(new Set(kenmerken).size, kenmerken.length, 'en die paren zijn onderscheidend');
 });

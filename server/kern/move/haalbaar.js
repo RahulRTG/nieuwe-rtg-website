@@ -76,10 +76,14 @@ function haalbaar({ onderdelen, reisTijd, afstandM }) {
       naar: { plek: b.plek, nodigAt: b.nodigAt },
       reisTijd, afstandM
     });
+    /* HET KENMERK GAAT MEE, want een naad die niet terug te voeren is op een
+       onderdeel is niet te gebruiken. `vooraf` moet weten welke naden een
+       VOORNEMEN raakt, en op de titel matchen is een gok -- twee onderdelen
+       mogen dezelfde titel dragen. */
     naden.push(Object.assign({
       nr: i + 1,
-      van: { titel: a.titel || '', soort: a.soort || '' },
-      naar: { titel: b.titel || '', soort: b.soort || '' }
+      van: { titel: a.titel || '', soort: a.soort || '', kenmerk: a.kenmerk || '' },
+      naar: { titel: b.titel || '', soort: b.soort || '', kenmerk: b.kenmerk || '' }
     }, n));
   }
 

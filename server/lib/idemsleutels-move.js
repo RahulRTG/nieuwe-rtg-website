@@ -22,6 +22,11 @@
 const SLEUTELS = {
   'POST /api/move/reis': { leest: true },
   'POST /api/move/gevolg': { leest: true },
-  'POST /api/move/volgende': { leest: true }
+  'POST /api/move/volgende': { leest: true },
+  /* Ook lezend: hij weegt een VOORNEMEN en legt niets vast. Zelfde reden
+     voor `leest` en niet `zelfdeVerzoek` -- wie een half uur later
+     dezelfde tijd nog eens weegt tegen een reis die inmiddels is
+     veranderd, hoort het antwoord van nu. */
+  'POST /api/move/vooraf': { leest: true }
 };
 module.exports = { SLEUTELS };

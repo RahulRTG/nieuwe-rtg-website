@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1797 bestanden en 12646 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1798 bestanden en 12649 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1797 |
-| losse beweringen (`test(...)`) | 12646 |
+| toetsbestanden | 1798 |
+| losse beweringen (`test(...)`) | 12649 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1179 |
 | **overleefd**: geen mutatie kreeg hem rood | 4 (waarvan 3 met minder dan 8 pogingen) |
 | niet te meten (al rood, geen module gevonden, ...) | 66 |
-| alleen in de kop *genoemd*, nog niet gemeten | 149 |
+| alleen in de kop *genoemd*, nog niet gemeten | 150 |
 | niets van beide | 399 |
 
 Van die overlevers kregen er **3** minder dan 8 mutaties aangeboden. Dat is geen
@@ -37,7 +37,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1587 bestanden, 12284 beweringen.
+1588 bestanden, 12287 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1039,6 +1039,7 @@ toets omvalt.
 | `productie-status.test.js` | 20 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `productie-vrijgave.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `productie.test.js` | 23 | gezakt op `===->!==#0` | Tests voor de productie-hardening: config-validatie, duurzame opslag, betaal-naad (idempotentie + webhook-verificatie) en de logger. NB: STRIPE_WEBHOOK_SECRET wordt hier gezet vóór het laden van betaal.js, omdat die... |
+| `productieseed.test.js` | 3 | genoemd | DE PRODUCTIESEED HOUDT ZIJN EIGEN BELOFTE. server/seed/index.js droeg de sleutel `trip` TWEE KEER in hetzelfde objectliteraal: `trip: null` met een uitleg erboven, en drie regels lager `trip: { dest: '', dates: '',... |
 | `proefsleutels.test.js` | 9 | gezakt op `!==->===#0` | DE SLEUTELBOS VAN DE PROEVEN -- scripts/lib/proefsleutels.js Deze toets bestaat om een fout te vangen die hier echt is gemaakt en die NIEMAND zag, omdat hij groen kleurde: de bewakerskaart kreeg vier eigenrollen... |
 | `project-room.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `provider-sandbox.test.js` | 11 | gezakt op `===->!==#0` | Contracttests voor de volledig lokale provider-sandboxes. Geen enkele toets maakt netwerkverkeer of beweegt geld; subprocessen isoleren de env-standen. |

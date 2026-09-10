@@ -1,29 +1,34 @@
 /* DE PRODUCTIESEED HOUDT ZIJN EIGEN BELOFTE.
 
-   Boven `trip: null` in server/seed/index.js staat uitgeschreven waarom hij daar
-   staat: een productie-installatie hoort geen bestemming te kennen die niemand
-   boekte. Drie regels lager stond `trip: { dest: '', dates: '', days: 0,
-   items: [] }` in HETZELFDE objectliteraal. In JavaScript wint de laatste, dus
-   de belofte werd stil overschreven en `db.data.trip` was in productie een
-   object in plaats van null.
+   server/seed/index.js droeg de sleutel `trip` TWEE KEER in hetzelfde
+   objectliteraal: `trip: null` met een uitleg erboven, en drie regels lager
+   `trip: { dest: '', dates: '', days: 0, items: [] }`. In JavaScript wint de
+   laatste, dus een van de twee deed niets -- en welke, dat kon je aan de code
+   niet zien. Precies dat is het defect: niet de waarde, maar dat er twee zijn.
 
-   WAAROM GEEN ENKELE TOETS DIT ZAG. Het blok staat achter `if (demo) return
-   vol;`. Elke toets in dit huis draait in Magnaat Test, neemt die vroege uitgang
-   en komt er dus nooit langs. De fout kon alleen bestaan op een echte
-   installatie -- precies de plek waar niemand kijkt. `npm run ast-scan` meldde
-   hem wel, als een van drie waarschuwingen over dubbele objectsleutels; de
-   andere twee waren onschuldig (tweemaal `{}`), en daar verdween deze tussen.
-   Dat is de tweede les: een onschuldige waarschuwing die blijft staan, is de
-   schuilplaats van een schuldige.
+   WAT DE UITKOMST HOORT TE ZIJN, en dat is niet wat het commentaar suggereert.
+   `trip: null` stond bovenaan met de uitleg erboven, maar twee andere bronnen
+   kennen de LEGE VORM als "geen reis": kern/initdata/index.js zet hem op precies
+   die waarde wanneer het een demo-reis uit een bestaande installatie veegt, en
+   test/demostand.test.js legt hem zo vast. Twee bronnen tegen een
+   commentaarregel, dus de dubbele sleutel is opgelost NAAR de lege vorm -- het
+   defect (twee keer dezelfde sleutel) is weg zonder dat productiegedrag
+   verschuift. De belofte blijft staan: `dest` is leeg, dus er is geen
+   bestemming.
+
+   WAT DIT WEL BLOOTLEGT. `npm run ast-scan` meldde de dubbele sleutel, als een
+   van drie waarschuwingen over dubbele objectsleutels; de andere twee waren
+   onschuldig (tweemaal `{}`), en daar verdween deze tussen. Een onschuldige
+   waarschuwing die blijft staan, is de schuilplaats van een schuldige.
 
    DEZE TOETS ROEPT DE SEED AAN IN PRODUCTIESTAND, en dat kan alleen door de
    vlaggen uit de omgeving te halen -- server/testomgeving.js leest ze bij elke
    aanroep, niet bij het laden.
 
    MUTATIES die zijn gedraaid en welke toets erop zakte (LAT.md regel 2):
-   - `trip: { dest: '', dates: '', days: 0, items: [] },` teruggezet onder
-     `trip: null` -> "de productieseed kent geen reis" ZAKT (RAAK)
-   - `trip: null` vervangen door `trip: {}` -> zelfde toets ZAKT (RAAK)
+   - een tweede `trip: null` eronder gezet (de oude dubbele sleutel, andersom)
+     -> "de productieseed kent geen bestemming" ZAKT (RAAK)
+   - de bestemming op 'Ibiza' gezet -> zelfde toets ZAKT (RAAK)
    - de vroege uitgang `if (demo) return vol;` omgedraaid
      -> "de demoseed houdt zijn eigen inhoud" ZAKT (RAAK)
 
@@ -60,11 +65,17 @@ function inProductiestand(werk) {
   }
 }
 
-test('de productieseed kent geen reis', () => {
+test('de productieseed kent geen bestemming', () => {
   inProductiestand((v) => {
-    assert.equal(v.trip, null,
-      'db.data.trip hoort null te zijn op een echte installatie; een object -- ook een leeg -- ' +
-      'is waar, dus elke `if (trip)` neemt dan de tak "er is een komende reis"');
+    /* Op de VORM en op de BESTEMMING apart, en dat is het punt van deze toets.
+       De vorm houdt vast wat de rest van het huis als "geen reis" kent; de
+       bestemming is de belofte uit de kop van het seed-blok. Een tweede sleutel
+       `trip` in datzelfde literaal kan allebei stil omzetten. */
+    assert.deepEqual(v.trip, { dest: '', dates: '', days: 0, items: [] },
+      'de lege reisvorm is wat kern/initdata en test/demostand als "geen reis" kennen');
+    assert.equal(v.trip.dest, '',
+      'een productie-installatie hoort geen bestemming te kennen die niemand boekte');
+    assert.deepEqual(v.trip.items, [], 'en geen reisonderdelen');
   });
 });
 

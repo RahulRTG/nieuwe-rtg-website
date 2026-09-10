@@ -46,8 +46,24 @@ module.exports = function seed() {
     /* En de voorbeeldREIS ook niet. Die bleef hier staan terwijl de facturen al
        weg waren, en werd via db.data.trip alsnog getoond als "de komende reis"
        -- in de system prompt van Rahul en in de partnerlijst per stad. Een
-       productie-installatie hoort geen bestemming te kennen die niemand boekte. */
-    trip: null,
+       productie-installatie hoort geen bestemming te kennen die niemand boekte.
+
+       WAAROM DE LEGE VORM EN NIET `null`. Hier stond de sleutel `trip` TWEE
+       KEER in hetzelfde objectliteraal: eerst `null` met deze uitleg erboven,
+       en drie regels lager de lege vorm. In JavaScript wint de laatste, dus wat
+       een productieserver kreeg was de lege vorm -- en dat is ook wat de rest
+       van het huis als "geen reis" kent: kern/initdata/index.js zet hem op
+       precies deze waarde wanneer het een demo-reis uit een bestaande
+       installatie schoonveegt, en test/demostand.test.js legt hem zo vast.
+
+       De belofte hierboven staat er niet minder om: `dest` is leeg, dus er is
+       geen bestemming. Wat wel verschilt is dat een lezer die `if (trip)`
+       schrijft hier de tak "er is een reis" neemt; wie dat niet wil, hoort op
+       `trip.dest` te kijken. Een nieuw LID krijgt trouwens wel `null`
+       (memberTemplate in kern/lid.js) -- dat is een andere sleutel met een
+       andere lezer, en die twee zijn met opzet niet gelijkgetrokken zonder dat
+       iemand die keuze maakt. */
+    trip: { dest: '', dates: '', days: 0, items: [] },
     contacts: [],
     /* Het Living Lab start in productie leeg: een echt lab hoort door de RTF
        zelf te worden neergezet, met echte tekenbevoegden. De demostand krijgt

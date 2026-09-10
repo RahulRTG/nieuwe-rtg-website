@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **213** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **214** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
 | Bedrijfsgenres | **74** in 27 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2062** |
+| Kernmodules (`server/kern/**`) | **2066** |
 | App-pagina's (`public/apps/**.html`) | **303** |
-| Testbestanden | **1779** |
+| Testbestanden | **1781** |
 
 ## De vier werelden
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 213 functieschakelaars
+# 1. De 214 functieschakelaars
 
 ### Leden (RTG-app) — 24
 
@@ -317,7 +317,7 @@ ook blokkeert.
 - **Rahul doet het (AI-stuur)** (`stuur`) — De AI voert acties uit op elk toegestaan API-pad, met de eigen inlog van wie het vraagt (nooit meer rechten dan de persoon zelf). Geld-acties vragen altijd eerst een bevestiging.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel_
 
-### Diensten (leden) — 23
+### Diensten (leden) — 24
 
 - **Overheidsloket** (`dom-overheid`) — Belasting, toeslagen, rijbewijs, voertuigen, KVK, uitkeringen, bezwaar, subsidies en waterschap in een loket.  
   _voor: rtg, lifestyle, business_
@@ -338,6 +338,8 @@ ook blokkeert.
 - **RTG Meet (vergaderkamers)** (`dom-meet`) — Vergaderkamers op codenaam; beeld en geluid lopen peer-to-peer.  
   _voor: rtg, lifestyle, business_
 - **Navigatie** (`dom-nav`) — Routes en navigatie onderweg.  
+  _voor: rtg, lifestyle, business_
+- **RTG Move (haal ik het?)** (`dom-move`) — Of uw reis in de tijd klopt, en wat er breekt als iets verschuift.  
   _voor: rtg, lifestyle, business_
 - **Plaats (aanwezigheid en nadering)** (`dom-plaats`) — Hekken, toestemmingsvensters en waarnemingen; de motor draait op het toestel.  
   _voor: rtg, lifestyle, business_

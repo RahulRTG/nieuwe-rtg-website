@@ -11,6 +11,8 @@
    de lagen erboven niet (REIZEN.md par. 2.2). */
 'use strict';
 
+const { datumVan, tijdVan } = require('./agendatijd');
+
 module.exports = function bronnen({ kern, regel, bron }, key, uit, stil) {
     bron('verblijven', () => (kern.mijnVerblijven(key) || [])
       .filter(v => v.status !== 'geannuleerd')
@@ -68,13 +70,33 @@ module.exports = function bronnen({ kern, regel, bron }, key, uit, stil) {
     const rij = kern.db.boekingenVanKlant ? kern.db.boekingenVanKlant(key)
       : (kern.db.data.boekingen || []).filter(b => (b.customerKey || b.customerTier) === key);
     return rij
-      .filter(b => b.datum && b.paid && !['geannuleerd', 'geweigerd', 'terugbetaald'].includes(b.status))
+      /* WANNEER EEN BOEKING IS, KOMT UIT KERN/AGENDATIJD.JS -- en hier stond een
+         derde waarheid. Deze bron filterde op `b.datum` en las `b.tijd`, en die
+         velden bestaan niet op een boeking: routes/member/boeken.js zet
+         `wanneer` ('JJJJ-MM-DD HH:MM'). Gevolg: het filter was ALTIJD onwaar en
+         geen enkele betaalde activiteit of afspraak kwam ooit op de reistijdlijn
+         terecht. Stil, want een bron die niets oplevert leest als "u hebt geen
+         afspraken" -- precies de faalvorm waar de kop van agendatijd.js voor
+         waarschuwt, en die module bestaat om deze twee plekken niet te laten
+         uiteenlopen (LAT.md regel 4). */
+      .filter(b => datumVan(b) && b.paid && !['geannuleerd', 'geweigerd', 'terugbetaald'].includes(b.status))
       .map(b => {
         const zaak = kern.findSupplier(b.supplierCode);
         return regel(b.kind === 'ticket' ? 'activiteit' : 'afspraak', {
           titel: (b.service && b.service.name) || b.supplierName,
           bestemming: (zaak && zaak.city) || '',
-          van: b.datum, tijd: b.tijd || null, personen: b.personen,
+          /* De leverancierscode ging hier al door de handen (`findSupplier`
+             hierboven) en werd daarna weggegooid: alleen de stadsnaam bleef
+             over. Daarmee wist de tijdlijn WAAR het ongeveer was en niet waar
+             het IS, en kon RTG Move geen enkele overgang rekenen. De code gaat
+             nu mee als verwijzing; oplossen doet de plekkenlaag. */
+          plek: b.supplierCode ? { zaak: b.supplierCode } : null,
+          /* En de DUUR, die de boeking al bewaarde (routes/member/boeken.js
+             regel 40 zet `service.duurMin`) en die hier net zo hard werd
+             weggegooid. Zonder duur is er geen moment waarop u er weg kunt, en
+             dus geen overgang naar het volgende onderdeel te rekenen. */
+          duurMin: (b.service && b.service.duurMin) || null,
+          van: datumVan(b), tijd: tijdVan(b), personen: b.personen,
           status: b.status, wacht: b.status === 'aangevraagd' ? 'de zaak' : null,
           kenmerk: b.ref, herkomst: 'partner',
           app: b.kind === 'ticket' ? 'Tickets' : 'Diensten', link: '/apps/portaal.html'

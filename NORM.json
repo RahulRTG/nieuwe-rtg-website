@@ -21,7 +21,7 @@
     "keuringTeGroot": 14,
     "inlineStijlAttributen": 4684,
     "browserpoortToetsen": 325,
-    "kernBreedte": 1559,
+    "kernBreedte": 1560,
     "kernGedeeld": 231,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -1886,6 +1886,15 @@
       "vervalt": "2026-12-01",
       "meter": "kernBreedte 1558 -> 1559",
       "reden": "Een naam erbij in de ctx van het kantoor: `tweedeHand`. Er is EEN exemplaar voor het hele kantoor, want twee zouden elkaars openstaande aanvragen niet zien -- en dan tekent de tweede persoon iets af dat de eerste niet ziet staan.\n\nDE STAP IS VERZET VAN 1557->1558 NAAR 1558->1559 BIJ DE SAMENVOEGING MET MAIN (9 september 2026), en dat is geen extra naam maar een andere basis: main bracht in dezelfde week zijn eigen +1 mee (`woningOnderhoud`, de notitie van 8 september hierboven) en die twee stapelen. Elke tak bleef binnen zijn eigen norm; samen brengen ze meer mee dan de hoofdlijn had, en dat wordt hier benoemd in plaats van stil verrekend. Nageteld en niet geschat: er staat precies EEN naam van deze tak in, en de meting leest 1559.\n\nDe schuld vervalt op 2026-12-01: dan hoort er een repository-laag onder te liggen (server/db/) waar deze en de andere 524 doorheen gaan, of hoort deze regel te zijn ingetrokken omdat de laag is verplaatst."
+    },
+    {
+      "datum": "2026-09-10",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1559,
+      "meter": "kernBreedte 1559 -> 1560",
+      "reden": "RTG Move (MOVE.md) voegt EEN naam aan de kern toe: `move`, een namespace met drie lezende functies erin (reis, gevolg, volgende). Dat is met opzet niet drie losse kernnamen -- de smalste vorm die deze laag kan hebben. De laag bezit geen collectie, kent geen schrijfweg (test/move.test.js toets 12 zakt op db.data of save()) en hangt aan een eigen schakelaar dom-move, zodat de boardroom hem kan sluiten zonder de navigatie mee te nemen.",
+      "waarheen": "server/kern/move/ (naad, haalbaar, gevolg, index) met test/move.test.js en test/move-keten.test.js; de kern blijft een enkele naadlaag zonder eigen opslag"
     }
   ],
   "prestatie": {

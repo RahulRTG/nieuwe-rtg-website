@@ -19,9 +19,9 @@ Drie soorten onderdeel, en ze gedragen zich verschillend:
 |---|---|---|
 | **LivingOS** | `/apps/rtg.html` | 58 |
 | **WorkOS** | `/apps/kantoor.html` | 15 |
-| **TravelOS** | `/apps/reizen.html` | 14 |
+| **TravelOS** | `/apps/reizen.html` | 15 |
 | **FoundationOS** | `/apps/foundation/os-publiek.html` | 10 |
-| | **samen** | **97** |
+| | **samen** | **98** |
 
 ## LivingOS
 
@@ -112,7 +112,7 @@ Huis: `/apps/kantoor.html` — 15 onderdelen.
 
 ## TravelOS
 
-Huis: `/apps/reizen.html` — 14 onderdelen.
+Huis: `/apps/reizen.html` — 15 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
@@ -122,6 +122,7 @@ Huis: `/apps/reizen.html` — 14 onderdelen.
 | Vluchten | `link:vluchten` | `/apps/vluchten.html` |
 | Openbaar vervoer | `link:ov` | `/apps/ov.html` |
 | Navigatie | `link:navigatie` | `/apps/navigatie.html` |
+| Haal ik het? | `link:move` | `/apps/move.html` |
 | Verkeer | `link:flits` | `/apps/flits.html` |
 | Stad | `link:stad` | `/apps/stad.html` |
 | Reisboek | `link:reisboek` | `/apps/reisboek.html` |

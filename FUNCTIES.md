@@ -22,8 +22,8 @@ het?**
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
 | Kernmodules (`server/kern/**`) | **2066** |
-| App-pagina's (`public/apps/**.html`) | **303** |
-| Testbestanden | **1781** |
+| App-pagina's (`public/apps/**.html`) | **304** |
+| Testbestanden | **1782** |
 
 ## De vier werelden
 

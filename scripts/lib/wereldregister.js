@@ -88,6 +88,24 @@ function waarde(n) {
     const l = waarde(n.left), r = waarde(n.right);
     return String(l === undefined || l === null ? '' : l) + String(r === undefined || r === null ? '' : r);
   }
+  /* T(sleutel, nederlands) IS EEN VASTE WAARDE, en dat moet deze lezer weten.
+
+     app-main draagt `const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl)`:
+     de tweede parameter is de Nederlandse tekst en die staat letterlijk in de
+     bron. Zonder deze regel las elke gesleutelde naam als een lege uitdrukking,
+     viel `los()` terug op de SLEUTEL, en heette RTG Move in de
+     werkruimtecatalogus "move" in plaats van "Haal ik het?". Dat is precies
+     gebeurd, en het viel alleen op omdat de catalogus een bouwartefact is dat
+     mee in de diff komt.
+
+     Alleen de tweede parameter, en alleen als hij een vaste tekst is: een T()
+     met een berekende terugval heeft hier geen waarde en hoort dan ook leeg te
+     blijven in plaats van te raden. */
+  if (n.type === 'CallExpression' && n.callee && n.callee.name === 'T') {
+    const arg = (n.arguments || [])[1];
+    const nl = arg && arg.type === 'Literal' && arg.kind === 'string' ? waarde(arg) : undefined;
+    if (typeof nl === 'string' && nl) return nl;
+  }
   return '';
 }
 

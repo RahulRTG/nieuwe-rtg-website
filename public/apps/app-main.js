@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'bc384178';
+var RTG_BOUW = '4a745cdb';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4186,6 +4186,7 @@ var RTG_BOUW = 'bc384178';
     podium:      { naam: 'Live',       url: '/apps/podium.html' },
     flits:       { naam: 'Verkeer',           url: '/apps/flits.html' },
     navigatie:   { naam: 'Navigatie',    url: '/apps/navigatie.html' },
+    move:        { naam: T('app.move', 'Haal ik het?'), url: '/apps/move.html' },
     theater:     { naam: 'Films en series',      url: '/apps/theater.html' },
     residentie:  { naam: 'Verblijven', url: '/apps/residentie.html' },
     wbw:         { naam: 'Samen betalen', url: '/apps/geld.html#wbw' },
@@ -4528,7 +4529,7 @@ var RTG_BOUW = 'bc384178';
        letterlijk uit geknipt; geen item is nieuw, geen item is verdwenen.
        Het huis bestond al en hing nergens aan: /apps/reizen.html. */
     { sleutel: 'map-reizen', naam: 'TravelOS', wereld: '/apps/reizen.html', glyf: 'reizen', items: [
-      'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
+      'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie', 'link:move',
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie',
     /* Drie uit de tikkenmeting: aankomst, routedossier en OV-routes hingen
        nergens aan. Ze horen hier, want wie ze opent is onderweg. */

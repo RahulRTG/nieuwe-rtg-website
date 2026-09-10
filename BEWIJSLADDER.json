@@ -1,12 +1,14 @@
 {
   "stempel": {
-    "op": "2026-09-10T15:53:10.567Z",
-    "commit": "eebbd906",
-    "boomVuil": false,
+    "op": "2026-09-10T17:36:00.244Z",
+    "commit": "1bbe9f14",
+    "boomVuil": true,
     "boomAnders": 0,
     "instrument": "scripts/bewijsladder.js",
     "node": "v22.22.2"
   },
+  "uitleg": "Welk bewijsmechanisme op welke sport van de bewijsladder staat, afgeleid uit de keten in .github/workflows en uit de scripts zelf. Per sport de stand (staat, een stap weg, bestaat niet) en per mechanisme of het lokaal draait, alleen in de keten, of beide.",
+  "grens": "Deze ladder zegt NIET dat het bewijs deugt. Een sport heet `staat` zodra er een mechanisme op hangt dat draait; of dat mechanisme streng genoeg is, meet hij niet -- daarvoor zijn de eigen ratels van die instrumenten. Hij zegt ook niets over sporten die niemand heeft bedacht: alleen wat de keten draait wordt tegen de ladder gehouden, dus een ontbrekende sport valt hier stil buiten beeld en niet als gat.",
   "sporten": [
     {
       "id": "snel",
@@ -17,7 +19,7 @@
       "mechanismen": [
         {
           "doel": "git diff",
-          "lokaal": true,
+          "lokaal": false,
           "keten": [
             "ci.yml"
           ],
@@ -953,7 +955,7 @@
     "staat": 6,
     "stap": 6,
     "jaren": 0,
-    "alleenKeten": 16,
+    "alleenKeten": 17,
     "zonderTrede": 0
   }
 }

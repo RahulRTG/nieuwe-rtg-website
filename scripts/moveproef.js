@@ -69,7 +69,15 @@ const S = (nr, van, naar, wat, ziet, stand, antwoord) =>
   schakels.push({ nr, van, naar, wat, ziet, stand, antwoord });
 const T = (naam, belofte, stand, wat) => storingen.push({ naam, belofte, stand, wat });
 
-(async () => {
+/* DE WACHT: DIT INSTRUMENT START NIET BIJ HET REQUIREN.
+
+   Deze proef overschrijft MOVEPROEF.json. Zonder deze wacht doet een kale
+   laadcontrole (`node -e "require(...)"`) dat ook -- dat is hier echt gebeurd
+   bij de rolproef, die ROLPROEF.json van 3377 beproefde routes terugschreef
+   naar 292 en er daarna volkomen normaal uitzag. scripts/meetkeuring.js
+   bewaakt de regel; de vorm hieronder is dezelfde die mutatie.js en
+   sabotage.js dragen. */
+if (require.main === module) (async () => {
   /* startChromium geeft { pw, browser, waarmee } terug en `null` als er geen
      browser te vinden is. Dat laatste hoort te ZAKKEN en niet stil over te
      slaan: een proef die zichzelf overslaat als een dienst ontbreekt, is

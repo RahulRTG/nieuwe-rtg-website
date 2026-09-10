@@ -259,7 +259,21 @@ function meet() {
     .map(r => ({ doel: r.doel, keten: [...r.keten].sort(), lokaal: !!r.lokaal }))
     .sort((a, b) => a.doel.localeCompare(b.doel));
 
-  return { sporten, zonderTrede,
+  return {
+    /* WAT DIT REGISTER AANTOONT, EN WAT NIET. scripts/meetkeuring.js eist die
+       tweede zin, en om een reden die hier woordelijk geldt: zonder grens leest
+       een ladder met veel groen als "het bewijs is rond", terwijl een sport
+       `staat` zodra er een mechanisme op hangt -- niet zodra dat mechanisme
+       ergens goed in is. */
+    uitleg: 'Welk bewijsmechanisme op welke sport van de bewijsladder staat, afgeleid uit de '
+      + 'keten in .github/workflows en uit de scripts zelf. Per sport de stand (staat, een stap '
+      + 'weg, bestaat niet) en per mechanisme of het lokaal draait, alleen in de keten, of beide.',
+    grens: 'Deze ladder zegt NIET dat het bewijs deugt. Een sport heet `staat` zodra er een '
+      + 'mechanisme op hangt dat draait; of dat mechanisme streng genoeg is, meet hij niet -- '
+      + 'daarvoor zijn de eigen ratels van die instrumenten. Hij zegt ook niets over sporten die '
+      + 'niemand heeft bedacht: alleen wat de keten draait wordt tegen de ladder gehouden, dus '
+      + 'een ontbrekende sport valt hier stil buiten beeld en niet als gat.',
+    sporten, zonderTrede,
     telling: {
       mechanismen: gebruikt.size,
       sporten: sporten.length,
@@ -276,25 +290,34 @@ module.exports = { LADDER, meet, bewijsVan, standVan, REGISTER };
 /* ==========================================================================
    DE UITVOER
    ========================================================================== */
-if (require.main === module) {
+/* EEN FUNCTIE EN GEEN BLOK, ZODAT `return` MAG -- en dat is de hele reden.
+
+   Hier stond `console.log(JSON.stringify(...)); process.exit(0);`. Naar een
+   BESTAND gaat dat goed (node schrijft dan synchroon), naar een PIPE niet: de
+   poortwacht printte 484 KB en er kwam 146176 bytes uit -- geldige tekst,
+   kapotte JSON, exitcode 0. Twee derde van de uitslag weg zonder signaal.
+   process.exitCode zet de code en laat het proces zelf aflopen, dus de buffer
+   loopt leeg. scripts/meetkeuring.js bewaakt deze regel. */
+function hoofd() {
   const argv = process.argv.slice(2);
   const uitslag = meet();
-  if (argv.includes('--json')) { console.log(JSON.stringify(uitslag, null, 2)); process.exit(0); }
+  if (argv.includes('--json')) { console.log(JSON.stringify(uitslag, null, 2)); process.exitCode = 0; return; }
 
   if (argv.includes('--controle')) {
     let oud = null;
     try { oud = JSON.parse(fs.readFileSync(REGISTER, 'utf8')); } catch (e) {}
-    if (!oud) { console.error('Geen BEWIJSLADDER.json om tegen te vergelijken -- draai `npm run bewijsladder:vast`.'); process.exit(1); }
+    if (!oud) { console.error('Geen BEWIJSLADDER.json om tegen te vergelijken -- draai `npm run bewijsladder:vast`.'); process.exitCode = 1; return; }
     const gegroeid = uitslag.zonderTrede.filter(z => !(oud.zonderTrede || []).some(o => o.doel === z.doel));
     if (gegroeid.length) {
       console.error('De keten draait bewijs dat op geen enkele sport staat (' + gegroeid.length + '):');
       for (const z of gegroeid) console.error('  - ' + z.doel + '  [' + z.keten.join(', ') + ']');
       console.error('\nGeef het een sport in scripts/bewijsladder.js, of leg uit waarom het er geen heeft.');
-      process.exit(1);
+      process.exitCode = 1;
+      return;
     }
     console.log('De bewijsladder klopt met de keten: ' + uitslag.telling.mechanismen + ' mechanismen op ' +
       uitslag.telling.sporten + ' sporten, ' + uitslag.zonderTrede.length + ' zonder sport (ongewijzigd).');
-    process.exit(0);
+    return;
   }
 
   console.log('\n' + K.vet + 'DE BEWIJSLADDER' + K.uit + K.dim +
@@ -326,3 +349,5 @@ if (require.main === module) {
     console.log('  BEWIJSLADDER.json geschreven.\n');
   }
 }
+
+if (require.main === module) hoofd();

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-04T08:51:14.132Z",
-  "commit": "3359f0851",
+  "op": "2026-09-10T18:31:40.470Z",
+  "commit": "b17e5d3774575fb69a124303918d7946da55d17b",
   "boomVuil": false,
   "boomAnders": 1,
   "instrument": "scripts/test-runner.js",
@@ -11,8 +11,17 @@
  "grens": "zegt niets over WELKE toets zakte -- dat staat in de uitvoer van de ronde zelf. Hij zegt alleen dat er een volle ronde is geweest, wanneer, en met welke uitkomst.",
  "hoe": "npm test",
  "gemeten": {
-  "bestanden": 1420,
+  "volledig": true,
+  "bestanden": 1573,
+  "bestandenSha256": "d79f0462dc9d822feb6c1c9859ea33f2e129b876d5063754a3c5e235e1341d35",
   "afsluitcode": 1,
-  "groen": false
+  "groen": false,
+  "tapVolledig": true,
+  "tests": 12659,
+  "geslaagdeTests": 12627,
+  "mislukt": 10,
+  "geannuleerd": 0,
+  "overgeslagen": 22,
+  "todo": 0
  }
 }

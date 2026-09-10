@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1782 bestanden en 12538 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1782 bestanden en 12540 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1782 |
-| losse beweringen (`test(...)`) | 12538 |
+| losse beweringen (`test(...)`) | 12540 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1095 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1572 bestanden, 12177 beweringen.
+1572 bestanden, 12178 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1244,7 +1244,7 @@ toets omvalt.
 | `scriptafsplitsing.test.js` | 8 | -- | HET AFGESPLITSTE SCRIPTBLOK: WAT ER WEG MAG, EN VOORAL WAT NIET. 146 inline <script>-blokken in 143 schermen, samen 2,33 MB, die bij elk bezoek opnieuw over de lijn gaan -- een pagina draagt een eigen nonce, dus er... |
 | `scriptbundel.test.js` | 7 | geen bronmutatie mogelijk | De uitgestelde scripts in een verzoek -- en waarom dat lang NIET mocht. In de kop van server/middleware/stijlbundel.js staat het argument dat scripts met rust liet: "gooit de eerste een fout, dan draait de tweede in... |
 | `seclock.test.js` | 6 | genoemd | DE SEC-LOCK-INVARIANTEN -- software mag beveiliging automatisch verhogen, maar nooit zelfstandig verlagen. WAAROM DEZE VIER VOOR ELKE FEATURE UIT GAAN. |
-| `second-screen-personal.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `second-screen-personal.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `securitylog-keten.test.js` | 7 | -- | HET INLOG-AUDITLOG AAN DE HASHKETEN. Waarom juist dit log. |
 | `selfhost.test.js` | 5 | gezakt op `===->!==#0` | De self-hosted voordeur: geheimen mogen niet in Compose lekken, een private beta mag nooit publiek worden, en het installatiecommando mag bestaande sleutels niet stil vervangen. |
 | `semantiek.test.js` | 11 | gezakt op `getal+1#0` | HET SEMANTISCH REGISTER -- en of hij werkelijk iets onderscheidt. scripts/semantiek.js beantwoordt de vraag uit BEWIJSMACHINE.md par. |
@@ -1612,14 +1612,14 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-210 bestanden, 361 beweringen.
+210 bestanden, 362 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
 | `a11y-hermeet.e2e.js` | 1 | -- | DE TWEEDE METING VAN DE A11Y-POORT (scripts/a11y-hermeet.js). Een poort die af en toe zomaar rood wordt, leert mensen om hem te negeren -- en dan is hij erger dan geen poort. |
 | `adaptief.e2e.js` | 1 | genoemd | DE ADAPTIEVE LAAG IN EEN ECHTE BROWSER. De regels staan in ADAPTIEF.md, de statische kant in test/adaptief.test.js. |
 | `agenda.e2e.js` | 1 | -- | Scherm-test voor RTG Agenda: het maandraster, Rahul die in gewone taal plant, een afspraak met het paneel, uitnodigen op codenaam en het ja-zeggen door de ander, en de ICS-export. Echte namen horen nergens in beeld... |
-| `appmenu.e2e.js` | 9 | genoemd | Het app-menu (public/shared/appmenu.js) en de belofte dat Rahul ÉÉN balk heeft. TWEE BELOFTES, EN ALLEBEI ZIJN ZE HIER AL EEN KEER GEBROKEN. |
+| `appmenu.e2e.js` | 10 | genoemd | Het app-menu (public/shared/appmenu.js) en de belofte dat Rahul ÉÉN balk heeft. TWEE BELOFTES, EN ALLEBEI ZIJN ZE HIER AL EEN KEER GEBROKEN. |
 | `apps-ui.e2e.js` | 12 | genoemd | Scherm-tests voor de overige vlaggenschip-apps: leverancier, lid en backoffice. Elk logt in via een API-token in localStorage (net als de PDA- test), opent de app in een echte browser en controleert dat de beveiligde... |
 | `appstore.e2e.js` | 3 | -- | DE CEL IN EEN ECHTE BROWSER -- het enige bewijs dat telt voor deze laag. test/appstore.test.js bewijst wat de SERVER doet. |
 | `avond-scherm.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET AVONDSCHERM (/apps/avond.html) IN EEN ECHTE BROWSER. test/avond.test.js bewijst dat de avondroutes de klok en het budget als GRENS behandelen en dat een tafel nooit verder komt dan `aangevraagd`. |

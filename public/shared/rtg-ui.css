@@ -400,6 +400,48 @@ body.rtg-stijl progress{accent-color:var(--rtg-goud);}
   font-size:.86rem;
   line-height:1.65;
 }
+.rtg-leeg-vlak--actie{
+  position:relative;
+  padding-right:clamp(3.4rem,12%,5rem);
+  padding-bottom:clamp(1.35rem,4vh,2rem);
+  color:inherit;
+  cursor:pointer;
+  text-decoration:none;
+  transition:background-color .18s ease,border-color .18s ease,transform .18s ease;
+}
+.rtg-leeg-vlak--actie::after{
+  content:'\203A';
+  position:absolute;
+  right:clamp(.9rem,4%,1.4rem);
+  top:50%;
+  width:2.35rem;
+  height:2.35rem;
+  display:grid;
+  place-items:center;
+  border:1px solid color-mix(in srgb,currentColor 28%,transparent);
+  border-radius:50%;
+  color:var(--rtg-leesgoud,var(--rtg-goud));
+  font:400 1.65rem/1 var(--rtg-display,"Bodoni Moda",Georgia,serif);
+  transform:translateY(-50%);
+}
+.rtg-leeg-vlak--actie:hover,
+.rtg-leeg-vlak--actie:focus-visible{
+  outline:none;
+  border-top-color:var(--rtg-leesgoud,var(--rtg-goud));
+  background:color-mix(in srgb,var(--rtg-leesgoud,var(--rtg-goud)) 7%,transparent);
+  transform:translateY(-1px);
+}
+.rtg-leeg-vlak--actie:focus-visible::after{
+  outline:2px solid var(--rtg-leesgoud,var(--rtg-goud));
+  outline-offset:2px;
+}
+.rtg-leeg-vlak--actie .rtg-leeg-actie{
+  min-height:0;
+  margin-top:.85rem;
+  padding:0;
+  border:0;
+  color:var(--rtg-leesgoud,var(--rtg-goud));
+}
 /* De handeling staat los van de tekst en niet eronder geplakt: dat verschil
    in ruimte is wat hem tot handeling maakt. */
 .rtg-leeg-actie{

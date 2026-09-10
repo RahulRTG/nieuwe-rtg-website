@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T19:54:17.075Z",
-    "commit": "8011ebf2",
+    "op": "2026-09-10T20:38:04.943Z",
+    "commit": "8252e72d",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/adressen.js",

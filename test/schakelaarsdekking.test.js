@@ -159,7 +159,30 @@ test('4. elke route hoort bij een functie of bij de bediening', () => {
   const storingen = zonder.find(r => r.methode === 'POST' && r.pad === '/api/webhooks/storingen');
   assert.ok(storingen && storingen.bewakers.includes('storingenAuth'),
     'de extra bedieningsroute moet de HMAC-beveiligde storingenontvanger zijn');
-  assert.ok(zonder.length <= 140,
+  /* 140 -> 143: HET EIGEN LIDMAATSCHAP VAN EEN LID. Zien wat er loopt, lezen wat
+     opzeggen gaat doen, en opzeggen (/api/mijn/abonnement en twee onderpaden).
+
+     Geen ervan hoort aan een functieschakelaar, en om dezelfde grond als de
+     zelfbedieningslaag twee blokken hierboven: wie zich mag verbinden, mag zich
+     losmaken. Een schakelaar hierop is een knop waarmee het huis iemand in een
+     contract vasthoudt -- en dat is het dark pattern dat CLAUDE.md verbiedt, niet
+     per ongeluk maar als voorziening.
+
+     Bewust niet onder `tg-aanmeld`, de functie die /api/aanmelding schakelt: die
+     gaat over de INSTROOM, en het sluiten van de inschrijving mag de bestaande
+     leden niet opsluiten. Dat zijn twee besluiten. De afweging staat uitgeschreven
+     in AFSPRAAK.md par. 14.2.
+
+     Alle drie staan met hun reden in kern/bestuursroutes.js EN in
+     kern/platformregister/bediening-recht.js -- twee registers met twee lezers,
+     die hetzelfde horen te zeggen. En de volgorde is dezelfde als de vorige vier
+     keer: test/platformregister.test.js (die eist dat elke route hier BENOEMD is)
+     was groen -- 7 van 7 -- voordat dit getal werd verzet.
+
+     De scherpe controle hierboven (`onverklaard <= 10`) beweegt NIET mee en staat
+     nog steeds op 10: deze drie zijn verklaard, dus ze raken hem niet. Dat is het
+     hele punt van twee grenzen naast elkaar. */
+  assert.ok(zonder.length <= 143,
     zonder.length + ' routes hangen aan geen enkele functie. Dat is de bediening van ' +
     'het platform (boardroom, techniek, gezondheid, isolatie) en die hoort niet schakelbaar ' +
     'te zijn, maar bij deze aantallen is er iets anders aan de hand.');

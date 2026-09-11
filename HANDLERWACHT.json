@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-10T16:29:37.573Z",
-  "commit": "59a7931e",
+  "op": "2026-09-11T20:42:39.738Z",
+  "commit": "7f0359591",
   "boomVuil": false,
   "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
@@ -9,9 +9,9 @@
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 622,
+  "zonderBewakerslaag": 623,
   "bewaakt": 533,
-  "openbaarMetReden": 50,
+  "openbaarMetReden": 51,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
@@ -328,7 +328,7 @@
   },
   {
    "sleutel": "POST /api/aanmelding/bewijs",
-   "bestand": "server/routes/aanmeldingen.js:83",
+   "bestand": "server/routes/aanmeldingen.js:131",
    "staat": "openbaar",
    "reden": "hoort bij de aanvraag zelf; de aanvrager heeft nog geen sessie, en aftekenen zit wel achter het kantoor"
   },
@@ -988,6 +988,12 @@
    "staat": "sleutelDoorgegeven"
   },
   {
+   "sleutel": "POST /api/carriere/regel/toon",
+   "bestand": "server/routes/carriereledger.js:83",
+   "staat": "openbaar",
+   "reden": "een deelbewijs wordt getoond aan iemand zonder RTG-account; de deelcode is de sleutel, verloopt en is te stoppen"
+  },
+  {
    "sleutel": "POST /api/claims",
    "bestand": "server/routes/kantoren/geld.js:59",
    "staat": "openbaar",
@@ -995,7 +1001,7 @@
   },
   {
    "sleutel": "POST /api/cluster/:actie",
-   "bestand": "server/server.js:924",
+   "bestand": "server/server.js:929",
    "staat": "openbaar",
    "reden": "de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet"
   },
@@ -4006,7 +4012,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1401",
+   "bestand": "server/server.js:1446",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

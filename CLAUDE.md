@@ -283,6 +283,87 @@ vorm die eruit volgt is die van de terugstortstand hieronder: een schakelaar in
 de boardroom die zelf de juridische positie IS, standaard dicht, en een route
 die dan weigert mét de reden.
 
+**`CARRIERE.md` is de laag BOVEN de rugdekking** -- de mens die waarde opbouwt
+rond zijn talent, naam, prestaties, publiek en loopbaan. Lees die vóór je iets
+bouwt voor een sporter, artiest, maker, model of acteur wiens talent zijn inkomen
+is. De kern in één zin: **de carrièrelus is echt, maar zij is geen object -- zij
+is een verklaring van werkwoorden over domeinen die aantoonbaar niets delen.**
+Dat is geen formulering maar een meetuitslag: `npm run carrierevorm`
+(`CARRIEREVORM.json`) draait op de lezer van `scripts/objectmodel.js` -- een
+tweede parser zou de vergelijking met de Asset-meting waardeloos maken -- en
+vindt over 162 vormen in 15 talentdomeinen **0 velden in alle domeinen**, **0 in
+zelfs maar de helft**, en **88,2% in precies één domein** (platformbreed is dat
+71%, dus de talentdomeinen zijn mínder verwant dan een willekeurige doorsnede).
+De meter is een mutatie aangedaan en bewoog: tot `atelier`+`studio` versmald
+slaat hij om naar 8 van de 10 velden gedeeld. Een `Career`-objecttype is daarmee
+niet gerechtvaardigd; de uitweg is die van `COMMERCE.md` (`Koopbaar` werd een
+verklaring van werkwoorden) met de scheidslijn van `OS.md` eronder -- een
+wedstrijd, een set en een casting zijn domeinvermogen, maar *namens iemand
+onderhandelen* en *een bewijs tonen zonder het dossier te openen* zijn
+platformvermogen. Vijf dingen die het ontwerp corrigeren en die je nergens anders
+moet herhalen. **Een Career Score botst met de scherpste grens die dit huis
+heeft** -- KANTOORMACHT.md, HDI.md, ONTMOETEN.md en INT-04 zeggen alle vier dat
+de meeteenheid nooit de mens is, ook niet intern als sorteersleutel; de vorm die
+overleeft is het **Career Ledger** (chronologisch, per regel bewijsbaar), en die
+grens heeft vandaag vier documenten en **nul** handhavers. **Een fanladder
+(bekijkt → volgt → ... → ambassadeur) is een trechter** en botst met LIFE.md par.
+4: wat iemand heeft gedaan is een feit, waar hij "staat" is een oordeel. **Een
+merk zoekt geen mensen maar schrijft een programma** -- een zoekopdracht op
+leeftijd, geslacht en afgeleide geldzorgen over minderjarigen is het product dat
+niet mag bestaan (FOUNDATION.md par. 5: een eligibility-motor mag alleen
+tóevoegen). **Twee namen zijn bezet**: "RTG Human" botst met HDI.md (juist het
+document waar de `humans`-tabelgrens vandaan komt) en `HUMAN_DEVELOPMENT` met
+hetzelfde -- `CAREER_GRANT` botst met niets en past op de bestaande conventie.
+En de **zes vragen per handeling** vallen naast `kern/envelop.js` in tweeën:
+wie/waardoor/hoe-gevoelig staan er, geld en doel horen er nooit in (de envelop
+zegt met opzet nooit WAT), maar hoedanigheid, namens-wie en mandaat horen bij de
+familie van `actor` -- en dat is een versiesprong op een envelop die gesloten is
+op acht velden, geen toevoeging. **Nummer 5 en 6 van par. 6 staan inmiddels** (`server/kern/vertegenwoordiging/`, scherm `/apps/vertegenwoordiging.html`, acht routes): de machtiging mens-namens-mens, met de grammatica letterlijk uit `kern/stuur/mandaat.js` en zeven regels in code -- versmallen is een doorsnede, leeg is dicht, de lijst is gesloten (negen bevoegdheden met een grond, zeven dingen in NOOIT waaronder delegatie), verval is berekend, aanvaarden doet de client, de eigen grens van de client raakt ook wat AL loopt, en een GEWEIGERDE poging laat een spoor na. Alle zeven met een mutatie nagetrokken. Twee dingen daar niet wegpoetsen: de poort is `volwassen()` en dus **A3**, zodat er vandaag geen machtiging kan worden afgegeven voordat RTG het identiteitsbewijs heeft gezien (met opzet -- maar wie deze laag uitrolt, rolt de verificatie mee uit), en de achttien unittoetsen stonden GROEN terwijl `voorstel()` kapot was omdat `keyVanCodenaam` **async is en een object geeft** -- de fixture hield zich aan de vorm die de code aannam in plaats van aan die van `kern/gids.js`, en alleen de e2e-toets tegen een echte server vond het. Par. 3 is de eerlijke inventaris: het meeste van
+het voorstel bestaat al (selectieve deling met herkomst in `rtgid-claims.js`,
+bijstand, de projectievorm, de ketting in de envelop), en par. 5 verheft zes
+regels tot doctrine met per regel wie hem handhaaft -- bij drie van de zes is dat
+vandaag niemand. De uitstaptoets van par. 5 is machinaal te maken en hoort dat te
+worden: **lock-in door kwaliteit mag, lock-in door gijzeling zakt.**
+
+**`RUGDEKKING.md` is het besluit vóór de sponsorknop** -- wat RTG een
+individuele sporter, artiest of maker biedt, en waarom dat geen sponsoring
+heet. Lees die vóór je iets bouwt waarmee RTG geld, middelen of zichtbaarheid
+naar een MENS beweegt die van zijn talent leeft (clubs zijn `kern/sportclub/`,
+festivals `kern/festival/`, en de filantropie van een lid is
+`kern/rechterhand/mecenaat.js` -- dit gaat over de persoon zelf). De kern in één
+zin: een sponsor koopt zichtbaarheid en is weg zodra de zichtbaarheid weg is,
+terwijl RTG het huis draagt waarin een talent zijn leven, zijn onderneming en
+zijn geld beheert -- dus de toetsvraag is niet "kunnen wij deze sporter
+betalen?" maar **"wat houdt deze mens over als wij morgen stoppen met
+betalen?"** De meting is streng en verklaart de hele richting: van de 74 genres
+zitten er **3** in de sector `sports` (allemaal een CLUB) en **0** bij een
+individuele sporter of artiest, en van de zes waardeklassen is er **geen enkele**
+waarin RTG geld dat van RTG is uitkeert aan een mens -- `LOYALTY` zegt met
+zoveel woorden niet uitbetaalbaar, en `PARTNER_SETTLEMENT` gaat naar een zaak.
+Drie dingen die de opzet corrigeren en die je nergens anders moet herhalen. Het
+woord **sponsor is al bezet en juridisch geladen**: `kern/rtfos/herkomst.js`
+grendel 2 maakt van een gift met tegenprestatie automatisch sponsoring (ander
+regime, een factuur), dus de constructie "de stichting betaalt de sporters, het
+merk plukt de zichtbaarheid" is exact wat `kern/economie/firewall.js` weigert --
+en vóór allebei staat de blokkade uit GIFT.md, want de RTFoundation heeft geen
+positie om aan te betalen. **De grootste ontbrekende steen is niet geld maar de
+ZAAKWAARNEMER**: er zijn drie vormen van namens-iemand-handelen (bijstand,
+servicemachtiging, AI-mandaat) en nul waarin een mens commercieel namens een
+mens handelt -- terwijl de grammatica ervoor al ligt (een mandaat VERSMALT
+bestaand vermogen en verleent er nooit, leeg is dicht, verval is een berekende
+toestand), en dat is het enige in dit document dat geen concurrent heeft. En
+**topsportbegeleiding botst met `kern/zorgniveau.js`**: dat is per definitie het
+professionele niveau, waar RTG de weg mag wijzen en niet de inhoud mag geven --
+de uitweg is de professional IN het systeem zetten (`persoonseis.js`,
+`vakbewijs.js`) en niet een uitzondering op de grens. Acht grenzen in par. 5,
+waarvan de drie scherpste: een sporter onder de achttien is geen merk (geen
+zichtbaarheidsverplichting, geen ranglijst van jeugdtalenten), **rugdekking
+koopt geen stem** (wie geld ontvangt is niet verplicht iets te zeggen -- staat
+er wél iets tegenover, dan is het sponsoring en gaat er een factuur uit), en de
+betaler leest de gezondheid nooit. Er komt géén vijfde wereld: een toptalent
+staat in LivingOS, WorkOS, TravelOS en FoundationOS tegelijk, en par. 7 zet de
+vier besluiten van de eigenaar op een rij.
+
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
 schakelaar *ís* de juridische positie — geen twee dingen die toevallig
@@ -370,6 +451,75 @@ afdwingen wat nooit in de schaduw heeft gelopen (`schaduw.js`).
 per capability of er ergens een caller is, en hij vond er vijf die er geen
 hadden. Draai hem vóór je een capability toevoegt. Paragraaf 6.1 is de eerlijke
 lijst van wat er nog openstaat.
+**`AFSPRAAK.md` is de laag die die vier aan elkaar knoopt** — RTG Agreement
+Fabric, als richtingsdocument met per onderdeel of het **staat**, **een stap weg**
+is, **een besluit vraagt** of **jaren weg** is. Lees die vóór je iets bouwt
+waarmee iemand met of via RTG een afspraak maakt: een abonnement, een akkoord op
+voorwaarden, een betaalmandaat, een ondertekening. De kernregel: *domeinen houden
+hun eigen betekenis; RTG deelt alleen bewijs, identiteit, levenscyclus, rechten en
+opvolging.* De eerste opdracht is daarom **bedraden en niet bouwen**, en dat volgt
+uit één gemeten getal: `kern/commercie/contract.js` ÍS een volwaardige
+overeenkomstmotor (acht standen, een expliciete overgangstabel, een bevroren
+prijs, dertien toetsen) en er zijn **0** lezers van die stand buiten de module
+zelf — de pas van een lid hangt aan `sess.tier`, die één aanroeper heeft
+(`accounts.setTier`, het menselijke besluit) en daarna nooit meer beweegt. Een
+opgezegd contract laat de pas dus staan. Drie dingen die het voorstel corrigeren
+en die je nergens anders moet herhalen: **het woord `envelop` is bezet**
+(`kern/envelop.js` is de GEBEURTENISenvelop en zegt met opzet nooit WAT — een
+tweede die juist wél over prijs en voorwaarden gaat, is de `VERMOGENS`-botsing op
+de centrale naam van de laag), er komt **geen zesde uitkomst- of zekerheidsladder**
+(`GEZAGSNOEMER.json` heeft 5 schalen en 21 treden op 4 noemertreden,
+`CONTROLPLANE.md` acht uitkomsten, en `kern/identiteit/vertrouwen.js` vijf
+assurance-standen met de regel *een conclusie is nooit harder dan haar zachtste
+premisse* — dus geen L1–L4), en er hoeft **geen transparency log gebouwd** te
+worden: `lib/keten.js` plus `lib/keten-anker.js` staan en zijn beproefd, en wat
+ontbreekt is een BESLUIT — een anker in dezelfde database is geen anker. Par. 3 is
+de scherpste meting: **31 tekenwegen** (lexicaal, dus een ONDERgrens) waarvan
+**1** een cryptografisch bewijs vastlegt, en het risico is niet het aantal maar
+dat de andere dertig hun eigen definitie van "getekend" mogen hebben. Par. 7.1 is
+het gat dat niemand zag: het **akkoord met de voorwaarden staat in geen van beide
+lijsten** van `consent-register.js` — niet als gedekte laag en niet als
+verklaarde uitzondering — want `test/consent-dekking.test.js` kent één vorm
+(`{ key, status: 'actief' }`) en de onderteken-rij heeft een andere. Acht grenzen,
+waarvan de twee scherpste: **de prijs van het product en de prijs van de
+verplichting zijn twee dingen** en alleen het eerste beweegt (die fout is op 11
+september uit `kern/lid/facturen.js` gehaald: het lid las 99 op een factuur van
+65 die hij zelf had getekend), en **rechten hangen per capability en nooit per
+account** — na opzegging blijven facturen en bewijsstukken, want account-breed
+afsluiten maakt van een opzegging een straf. Let op twee namen die al bezet zijn
+vóór je een scherm bouwt: *Mijn afspraken* betekent in de leden-app al BOEKINGEN,
+en `mandaat` en `machtiging` dragen allebei al een andere betekenis.
+**Stap 3 staat** (11 september 2026): `kern/commercie/lidpoort.js` leest de
+contractstand in `auth()` en houdt NIEMAND tegen. Het getal dat dat opende: 46
+bestanden met een ledenroute toetsen de pas van een lid, 45 vragen `tier ===
+'guest'` (*is dit überhaupt een lid*), één vraagt naar een specifieke betalende
+pas, en **nul** vragen of de overeenkomst nog loopt. Twee dingen daar niet
+samenvoegen: **`GEEN_CONTRACT` is geen `GEEINDIGD`** — de meeste betalende leden
+kregen hun pas van vóór de contractmotor, dus "ik vind geen afspraak" betekent *ik
+weet het niet* en niet *er is niets afgesproken* (`ONBEKEND` is geen `WEIGEREN`),
+en opgeteld meldt de schaduw dat vrijwel élk lid tegengehouden zou worden, wat als
+ruis leest — daarom twee schaduwregels, want *een afgelopen afspraak afdwingen* en
+*elk lid zonder vastgelegde afspraak buitensluiten* zijn twee besluiten. En de
+weging gaat **per lid en niet per verzoek**: de vraag is hoeveel LEDEN een pas
+zonder lopende afspraak hebben, en per verzoek tellen laat wie het hardst klikt het
+getal bepalen — met als keerzijde dat die teller niet vergelijkbaar is met die van
+de abonnementspoort, die wél per verzoek telt. **En er gaat geen IDENTITEIT in die
+teller**: de eerste versie gaf de sessiesleutel mee als voorbeeld, en wat daar dan
+ontstaat is een lijst leden van wie de pas mogelijk vervalt — zonder bewaartermijn,
+en het lid kon hem niet kwijt (`schaduwregels` hield tot dan alleen zaakcodes, dus de
+vergetelheidsbezem kwam er nooit langs). Niet de tak vrijgesteld en niet de bezem
+verbreed, maar de identiteit niet opgeslagen: het product is een getal, en de STAND
+is wat een mens nodig heeft om te besluiten.
+**En let op een vondst die veel breder geldt dan afspraken:
+`server/web/verrijk.js` is een EIGEN Express-achtige schil en geen Express.**
+`res.set` zit erin, `res.append` zat er niet — en een methode die die schil niet
+heeft, faalt STIL: binnen een `try/catch` (en `auth()` heeft er een, want een
+storing in de bewijslaag mag geen overtreding worden) verdwijnt de TypeError
+volledig en blijft de kop gewoon leeg. De regel liep, de meting liep, en het
+antwoord zei er niets over. Controleer dus of een `res.`-methode daar bestaat
+voordat je hem gebruikt; `append` staat er nu wel, één keer naast `set`, omdat
+`RTG-Niet-Afgedwongen` sinds deze stap door twee lagen wordt gezet en `set` de
+eerste weggooit.
 **`KANTOORMACHT.md` is de kantoorkant daarvan** — niet wat een LID mag (dat is
 CONTROLPLANE.md) maar wat een MEDEWERKER van RTG mag, en tot waar zijn macht
 reikt. Lees die vóór je een kantoorscherm, een backofficeroute of een
@@ -621,7 +771,7 @@ gestandaardiseerde capabilities". Lees die vóór je een capability, een woorden
 met rechten of een nieuwe laag toevoegt. De eerste wet van de opzet — *Everything
 is a Capability* — is er eerst **gemeten** in plaats van aangenomen
 (`scripts/capabilityroepers.js`, `CAPABILITEIT.json`), en de uitkomst is streng: er is
-geen capabilitylaag in deze code, er zijn er **<!--getal:capabiliteit.lijsten-->21<!--/getal-->** met <!--getal:capabiliteit.leden-->250<!--/getal--> leden,
+geen capabilitylaag in deze code, er zijn er **<!--getal:capabiliteit.lijsten-->21<!--/getal-->** met <!--getal:capabiliteit.leden-->248<!--/getal--> leden,
 91% van de leden woont in precies één lijst en geen twee lijsten lijken op elkaar. Twee bestanden dragen
 allebei een `VERMOGENS` met nul gedeelde leden — de les van het gedeelde
 routevoorvoegsel, nu op een woord. Daaruit volgt de grens die het document
@@ -723,8 +873,8 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->121<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->103<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->385<!--/getal-->
+`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->123<!--/getal--> namen die in meer dan
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->105<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->389<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste

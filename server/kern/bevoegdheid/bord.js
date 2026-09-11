@@ -12,11 +12,16 @@
    ontbreekt, en andersom.
 
    HET BORD TOONT HET GELDENDE GEZICHT en niet de kale lijstregel. Bij een
-   afhankelijk vermogen (WALLET_SALDO, LID_UITBETALING) staat er dus 'besluit'
-   of 'rail' naar gelang de terugstortstand, met `hangtAf` erbij zodat een
-   bestuurder ziet WAAROM het dat nu is. Zou hier de rauwe regel staan, dan las
-   het bord 'afhankelijk' -- een woord dat niets zegt over wat er op dit moment
-   geldt.
+   afhankelijk vermogen staat er dus 'besluit', 'rail' of 'stand' naar gelang
+   zijn eigen schakelaar, met `hangtAf` erbij zodat een bestuurder ziet WAAROM
+   het dat nu is. Zou hier de rauwe regel staan, dan las het bord 'afhankelijk'
+   -- een woord dat niets zegt over wat er op dit moment geldt.
+
+   EN DE SCHAKELAARS STAAN ER VOLUIT BIJ, allemaal. Er stond er eerst een
+   (`terugstorting`), en toen de tweede erbij kwam zou een bestuurder een
+   vermogen dicht zien staan zonder ergens op het bord te kunnen zien welke knop
+   dat doet. Een bord dat een gevolg toont zonder zijn oorzaak, stuurt iemand op
+   zoek in de code.
 
    Alles komt binnen als functie; dit bestand houdt zelf geen stand vast en
    beslist niets. */
@@ -32,7 +37,11 @@ module.exports = ({ vergunningStand, railVan, partnerRails, stand, vermogen, mag
       rail: railVan(),
       vergunning: v.er ? { soort: v.soort, nummer: v.nummer, entiteit: v.entiteit, landen: v.landen, tot: v.tot, verlopen: v.verlopen } : null,
       partnerRails: partnerRails() || {},
-      terugstorting: stand(),
+      /* `terugstorting` blijft als eigen veld staan omdat de boardroom-schermen
+         hem bij naam lezen; `standen` is de volledige kaart. */
+      terugstorting: stand('terugstorting'),
+      standen: Object.fromEntries([...new Set(Object.values(VERMOGENS)
+        .map(f => f && f.hangtAf).filter(Boolean))].map(naam => [naam, stand(naam)])),
       regels: Object.keys(VERMOGENS).map(id => {
         const f = vermogen(id);
         const r = mag(id, { land });

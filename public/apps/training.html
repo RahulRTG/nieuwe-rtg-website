@@ -62,6 +62,16 @@
     <div id="schema"></div>
   </section>
 
+  <!-- Voorstellen van een bevoegde vakman (kern/vakschema.js, RUGDEKKING.md par.
+       4.4). De sectie is er alleen als er iets staat: een leeg blok "voorstellen"
+       op elk scherm nodigt uit tot de vraag hoe je er een krijgt, en dat is een
+       aansporing die hier niet hoort. -->
+  <section aria-label="Voorgesteld door uw behandelaar" id="voorstelVak" hidden>
+    <h2>Voorgesteld door uw behandelaar</h2>
+    <p class="stil" id="voorstelUit"></p>
+    <div id="voorstellen"></div>
+  </section>
+
   <section aria-label="Een training erbij">
     <h2>Een training erbij</h2>
     <div class="kaart">
@@ -196,9 +206,37 @@
     if (d.meting && d.meting.ok === false) Veilig.melding(d.meting.uitleg);
   }
 
+  /* Een voorstel is GEEN schema: het staat hier tot u drukt. De knoppen zeggen
+     dat ook -- "in mijn schema zetten" en niet "akkoord" -- want wat er gebeurt
+     is precies dat en niets meer. */
+  function tekenVoorstellen(d) {
+    const el = $('#voorstellen');
+    const sec = $('#voorstelVak');
+    const lijst = (d && d.voorstellen) || [];
+    sec.hidden = lijst.length === 0;
+    if (!lijst.length) { el.innerHTML = ''; return; }
+    $('#voorstelUit').textContent = d.let || '';
+    el.innerHTML = lijst.map(v =>
+      '<article class="rij">' +
+        '<h3>' + esc(v.naam) + '</h3>' +
+        '<p>' + esc(v.wat) + '</p>' +
+        '<p class="stil">Van ' + esc(v.van) + (v.door ? ' &middot; ' + esc(v.door) : '') +
+          (v.dagen ? ' &middot; ' + esc(v.dagen) : '') +
+          (v.duurMin ? ' &middot; ' + esc(String(v.duurMin)) + ' min' : '') + '</p>' +
+        '<p><button class="knop mini" data-ja="' + esc(v.id) + '" type="button">In mijn schema zetten</button> ' +
+        '<button class="knop mini" data-nee="' + esc(v.id) + '" type="button">Niet doen</button></p>' +
+      '</article>').join('');
+  }
+
+  async function laadVoorstellen() {
+    try { tekenVoorstellen(await Veilig.api('/api/training/voorstellen')); }
+    catch (e) { $('#voorstelVak').hidden = true; }
+  }
+
   async function laad() {
     try { teken(await Veilig.api('/api/training')); }
     catch (e) { $('#vandaag').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; }
+    await laadVoorstellen();
   }
 
   function start() {
@@ -219,6 +257,23 @@
         $('#lWat').value = ''; $('#lDuur').value = '';
         teken(d);
         Veilig.melding(d.meting && d.meting.uitleg ? d.meting.uitleg : 'Genoteerd.');
+      } catch (e) { Veilig.melding(e.message); }
+    });
+    /* Weigeren vraagt geen reden: die is voor uzelf en gaat niet terug naar de
+       afzender, dus hem verplicht stellen zou alleen een drempel zijn. */
+    document.addEventListener('click', async ev => {
+      const ja = ev.target.closest('[data-ja]'), nee = ev.target.closest('[data-nee]');
+      if (!ja && !nee) return;
+      try {
+        if (ja) {
+          const r = await Veilig.api('/api/training/voorstel/aanvaard', { id: ja.dataset.ja });
+          Veilig.melding(r.let || 'In uw schema gezet.');
+          await laad();
+        } else {
+          const r = await Veilig.api('/api/training/voorstel/weiger', { id: nee.dataset.nee });
+          Veilig.melding(r.let || 'Weg.');
+          await laadVoorstellen();
+        }
       } catch (e) { Veilig.melding(e.message); }
     });
     laad();

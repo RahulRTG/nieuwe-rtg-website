@@ -32,6 +32,14 @@ const REDENEN = [
   ['/api/mijn/sessies', 'een gekaapte sessie zelf kunnen sluiten is een noodrem en geen product'],
   ['/api/mijn/herstelkanaal', 'idem: het kanaal waarmee u zichzelf terugkrijgt hoort niet uitschakelbaar te zijn'],
   ['/api/mijn/toestel', 'de toestelbinding is dezelfde eigen beveiliging als /api/toestel/meting hierboven'],
+  /* Het eigen lidmaatschap: wie zich mag verbinden, mag zich losmaken. Bewust
+     NIET onder de functie die de aanmelding schakelt (`tg-aanmeld`) -- die gaat
+     over de INSTROOM, en de inschrijving sluiten mag de bestaande leden niet
+     opsluiten. De afweging staat in AFSPRAAK.md par. 14.2; dezelfde verklaring
+     staat in kern/platformregister/bediening-recht.js, en die twee horen
+     hetzelfde te zeggen. */
+  ['/api/mijn/abonnement', 'een schakelaar op zien en opzeggen houdt een lid in een contract dat hij niet meer wil; ' +
+    'dat is geen dienst die je uitzet maar de andere kant van een afspraak'],
   ['/api/metrics', 'de meetlijn mag bij een incident niet blind worden gemaakt'],
   ['/api/cluster', 'de clusterlaag bestuurt instances en blijft buiten een instance-schakelaar'],
   ['/api/sat', 'de satellietping voorkomt dat een zaakdoos gezond verkeer als offline leest'],

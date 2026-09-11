@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-11",
   "gemeten": {
-    "bestanden": 2174,
-    "vormen": 1383,
-    "velden": 2010,
-    "modules": 755,
-    "domeinen": 267,
+    "bestanden": 2201,
+    "vormen": 1391,
+    "velden": 2018,
+    "modules": 761,
+    "domeinen": 272,
     "envelopDrempel": 17,
     "envelop": 29,
-    "veldenDomeineigen": 1418,
-    "veldenGedeeldVanafVier": 200,
+    "veldenDomeineigen": 1422,
+    "veldenGedeeldVanafVier": 201,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -202,6 +202,18 @@
       ]
     },
     {
+      "veld": "zaak",
+      "domeinen": 12,
+      "waar": [
+        "kern/appstore",
+        "kern/avond",
+        "kern/bureau",
+        "kern/commerce",
+        "kern/fiscaal",
+        "kern/mobiliteit"
+      ]
+    },
+    {
       "veld": "onderwerp",
       "domeinen": 12,
       "waar": [
@@ -286,18 +298,6 @@
       ]
     },
     {
-      "veld": "zaak",
-      "domeinen": 11,
-      "waar": [
-        "kern/appstore",
-        "kern/avond",
-        "kern/bureau",
-        "kern/commerce",
-        "kern/fiscaal",
-        "kern/mobiliteit"
-      ]
-    },
-    {
       "veld": "waarde",
       "domeinen": 11,
       "waar": [
@@ -331,6 +331,18 @@
         "kern/meet",
         "kern/metier",
         "kern/muziek"
+      ]
+    },
+    {
+      "veld": "voor",
+      "domeinen": 11,
+      "waar": [
+        "kern/carriereledger",
+        "kern/command",
+        "kern/creator",
+        "kern/koppel",
+        "kern/livinglab",
+        "kern/office"
       ]
     },
     {
@@ -406,6 +418,18 @@
       ]
     },
     {
+      "veld": "duurMin",
+      "domeinen": 10,
+      "waar": [
+        "kern/avond",
+        "kern/care",
+        "kern/gemeente",
+        "kern/leverancier",
+        "kern/mall",
+        "kern/trainingsschema"
+      ]
+    },
+    {
       "veld": "soortLabel",
       "domeinen": 10,
       "waar": [
@@ -427,6 +451,18 @@
         "kern/frictie",
         "kern/geldbeleid",
         "kern/kantoor"
+      ]
+    },
+    {
+      "veld": "ingetrokken",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/beschermzaak",
+        "kern/carriereledger",
+        "kern/command",
+        "kern/festival",
+        "kern/mobiliteit"
       ]
     },
     {
@@ -466,18 +502,6 @@
       ]
     },
     {
-      "veld": "voor",
-      "domeinen": 10,
-      "waar": [
-        "kern/command",
-        "kern/creator",
-        "kern/koppel",
-        "kern/livinglab",
-        "kern/office",
-        "kern/overheid"
-      ]
-    },
-    {
       "veld": "rol",
       "domeinen": 10,
       "waar": [
@@ -499,30 +523,6 @@
         "kern/festival",
         "kern/mobiliteit",
         "kern/navigatie"
-      ]
-    },
-    {
-      "veld": "kamer",
-      "domeinen": 9,
-      "waar": [
-        "kern/afdelingen",
-        "kern/bureau",
-        "kern/gast",
-        "kern/homemerken",
-        "kern/levensgraaf",
-        "kern/magnaat-trainingslobby-regie"
-      ]
-    },
-    {
-      "veld": "waar",
-      "domeinen": 9,
-      "waar": [
-        "bedrijf",
-        "kern/afdelingen",
-        "kern/antivirus",
-        "kern/assets",
-        "kern/bureau",
-        "kern/commerce"
       ]
     }
   ],

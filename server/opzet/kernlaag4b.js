@@ -41,7 +41,13 @@ const bevoegd = require('../kern/bevoegdheid').maakBevoegdheid({
      de juridische positie verandert, hoort die verandering ook meteen in de
      bevoegdheidsvraag te laten doorwerken -- anders is hij een manier om
      eromheen te komen. */
-  terugstorting: bankregie.bankTerugstorting
+  terugstorting: bankregie.bankTerugstorting,
+  /* EN DE TWEEDE SCHAKELAAR, op naam. RUGDEKKING_BEURS hangt aan
+     `rugdekkingBeurs` en niet aan de terugstortstand -- die twee heten allebei
+     `gesloten` en `open`, dus zonder deze kaart zou de beurs stilletjes de
+     bankknop lezen. Ontbreekt hij, dan valt het vermogen terug op `gesloten`:
+     bij twijfel gaat er geen geld naar een mens. */
+  standen: { rugdekkingBeurs: () => kern.rugdekking.beursStand() }
 });
 kern.bevoegd = bevoegd;
 /* DE TERUGSTORTING AANSLUITEN OP DE BEVOEGDHEID. Sinds leden hun saldo kunnen
@@ -51,6 +57,11 @@ kern.bevoegd = bevoegd;
    kern/pay/terug.js elke terugstorting -- dat is de veilige kant, maar het is
    niet de bedoeling. Late binding, want bevoegdheid wordt na pay gemount. */
 if (kern.pay && kern.pay.koppelBevoegdTerug) kern.pay.koppelBevoegdTerug(id => bevoegd.mag(id));
+/* EN DE RUGDEKKING AANSLUITEN. Zonder deze regel valt kern/rugdekking/beurs.js
+   terug op zijn eigen schakelaar en weegt niemand de RAIL mee: dan legt het
+   kantoor een beurs vast die RTG niet kan uitbetalen. Dezelfde late binding en
+   dezelfde reden als de terugstorting hierboven. */
+if (kern.rugdekking && kern.rugdekking.koppelBevoegd) kern.rugdekking.koppelBevoegd(id => bevoegd.mag(id));
 /* RTG Bank (kern/bank): de eigen bank, gebouwd OP het RTG Pay-grootboek en met
    dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter

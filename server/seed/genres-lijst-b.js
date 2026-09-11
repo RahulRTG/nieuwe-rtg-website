@@ -42,6 +42,22 @@ module.exports = {
   // Zakelijke dienstverlening
   professioneel: { label: 'Professionele diensten', icon: '\u{2696}', industry: 'professional', caps: ['advies', 'location', 'pricing'], status: 'open' },
   zzp: { label: 'Zelfstandig professional', icon: 'werk', industry: 'professional', caps: ['services', 'location', 'pricing'], status: 'open' },
+  /* EEN GEDEELD GENRE VOOR DE MENS WIENS TALENT ZIJN INKOMEN IS: sporter,
+     artiest, muzikant, maker, model, acteur. Van de 74 genres hiervoor zaten er
+     drie in de sector sports en dat waren alle drie CLUBS -- voor het individu
+     was er niets, dus noemde een sporter zich zzp'er en was er geen enkel
+     verschil met elk ander platform (RUGDEKKING.md).
+
+     `talentmens` en niet `talent`: dat woord is bezet door de Talent Exchange
+     (kern/leverancier/talent.js, vacaturematching). In sector `professional` en
+     niet in `sports` of `media`, want een van die twee kiezen bevoordeelt de
+     halve groep -- een marathonloper en een dj horen hier even goed thuis.
+
+     Dezelfde caps als zzp, en dat is met opzet geen tekort. Een nieuwe cap
+     verzinnen is precies de `rooms`-fout: een genre dat een vermogen noemt dat
+     geen enkele werkvorm aanmaakt. Wat dit genre toevoegt is de IDENTITEIT en
+     een plek om talentwerk aan te hangen, niet nieuw domeinvermogen. */
+  talentmens: { label: 'Zelfstandig talent', icon: 'werk', industry: 'professional', caps: ['services', 'location', 'pricing'], status: 'open' },
 
   // Technologie
   ithulp: { label: 'IT-hulp aan huis', icon: 'werk', industry: 'technology', caps: ['services', 'location', 'pricing'], status: 'open' },

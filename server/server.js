@@ -752,7 +752,12 @@ const {
   ordersVanKlant, rtf, save, schild, schoon, sessionFor, sessions, herbouwSessions, sseToOffice, sseToSupplier,
   tokenHash,
   // pas verderop in dit bestand gebouwd; zie de uitleg in diensten.js
-  lidBoardUitVan: () => lidBoardUit, lidPadFunctieVan: () => lidPadFunctie
+  lidBoardUitVan: () => lidBoardUit, lidPadFunctieVan: () => lidPadFunctie,
+  /* Ook een getter, en om dezelfde reden: `kern` staat onderaan dit bestand. auth()
+     leest er de contractstand van een lid uit (opzet/diensten2.js), en dat gebeurt
+     per VERZOEK -- dus ver nadat deze regel is uitgevoerd. Zelfde idioom als
+     opzet/leverancierpoort.js, dat hem al zo binnenkrijgt. */
+  kernGeef: () => kern
 });
 koppelSessiesBus(bus);
 /* De twee draden terug, hier gezet en niet daar (zie de kop van diensten.js):
@@ -1216,6 +1221,46 @@ const notities = require('./kern/notities').maakNotities({
 /* De opslagpeiling van de kostprijslaag (KOSTEN.md) staat naast de kluis en niet
    erin; zie de kop van kern/bestanden-opslag.js voor waarom, en welke toets die
    naad bewaakt. */
+/* RTG Vertegenwoordiging (kern/vertegenwoordiging/): een mens die handelt
+   namens een mens -- de vierde vorm, naast bijstand (RTG namens een klant), de
+   servicemachtiging en het AI-mandaat. De grammatica komt uit dat laatste en is
+   met opzet letterlijk: een machtiging VERSMALT bestaand vermogen en verleent
+   er nooit.
+
+   `volwassen` gaat als FUNCTIE mee en niet als waarde: de 18+-poort komt pas op
+   de kern in opzet/kernlaag1.js, en dit staat daarboven. Dezelfde vorm als
+   `comm: () => kern.comm` daar. */
+const vertegenwoordiging = require('./kern/vertegenwoordiging').maakVertegenwoordiging({
+  db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan,
+  volwassen: (handle) => kern.volwassen(handle),
+  /* En de STAND erbij, niet alleen de poort. Het jeugdbestuur moet onderscheid
+     maken tussen "niet volwassen" en "bewezen minderjarig", en dat verschil zit
+     in de leeftijdBron: `volwassen()` geeft een boolean, maar een voogd mag
+     alleen meetekenen als de geboortedatum van het DOCUMENT komt. */
+  lidstandVan: require('./kern/betrouwbaarheid').maakLidstand({ accounts }) });
+/* RTG Rugdekking (kern/rugdekking/): het programma waarmee RTG achter een mens
+   gaat staan die van zijn talent leeft. Twee soorten die elkaar uitsluiten, en
+   de schakelaar van de beurs staat standaard DICHT -- zie de kop van dat
+   bestand: die schakelaar IS de juridische positie.
+
+   `jeugdstandVan` komt uit het jeugdbestuur en niet uit een eigen lezing: er is
+   maar EEN plek die weet of iemand BEWEZEN minderjarig is (kern/vertegenwoordiging/
+   jeugd.js), en een tweede zou binnen een maand iets anders zeggen. */
+const { rugdekking } = require('./kern/rugdekking').maakRugdekking({
+  db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan,
+  jeugdstandVan: (key) => vertegenwoordiging.jeugdstand(key) });
+/* HET CARRIERE LEDGER (kern/carriereledger/): de loopbaan van een mens als
+   chronologische reeks, per regel bewijsbaar, met herkomst. CARRIERE.md par.
+   4.1 wijst deze vorm aan in plaats van een Career Score -- "Nederlands
+   kampioen junior 2027, geverifieerd door bond X" zegt meer dan 87 %, en het
+   veroudert niet stilletjes.
+
+   Geen `keyVanCodenaam` hier: het lid schrijft in zijn eigen ledger op zijn
+   eigen sessiesleutel. Wie een ANDER bevestigt (het kantoor, een zaak) zoekt de
+   codenaam op in zijn eigen route, want daar hoort de vertaling thuis. */
+const { maakCarriereLedger } = require('./kern/carriereledger');
+const carriereledger = maakCarriereLedger({
+  db, save, bijeen, inBundel, crypto, schoon, codenaamVan });
 const bestandenOpslag = require('./kern/bestanden-opslag')({ db });
 const bestanden = require('./kern/bestanden').maakBestanden({
   // antivirus: de gestukte upload komt nooit als data-URL in een verzoek-body
@@ -2233,7 +2278,7 @@ const kern = {
   findSupplier, forgetSession, forgetSessionDuurzaam, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, rugdekking, carriereledger, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, mensdeurStand, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, ritBezetting, ritVerder, rtf,

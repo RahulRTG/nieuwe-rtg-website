@@ -174,7 +174,7 @@ test('6. een wijziging aan een afgetekend stuk wist de aftekening', () => {
   assert.equal(nee.missend[0].reden, 'niet-gezien');
 });
 
-test('7. elke handeling uit het register wordt ergens ECHT geweigerd', () => {
+test('7. elke handeling uit het register wordt ergens ECHT geweigerd', async () => {
   /* Dit is de toets die voorkomt dat het register rust geeft die niemand heeft
      verdiend: een handeling erbij zetten zonder hem aan te sluiten, laat deze
      zakken. De weigering wordt gemeten aan de ECHTE kernfunctie, niet aan een
@@ -183,7 +183,13 @@ test('7. elke handeling uit het register wordt ergens ECHT geweigerd', () => {
   const gedekt = {
     voorschrijven: (Z, actor) => Z.receptMaak('HUIS', { apotheek: 'APO', middel: 'iets' }, actor),
     verwijzen: (Z, actor) => Z.verwijsMaak('HUIS', { naar: 'SPEC', reden: 'controle' }, actor),
-    uitreiken: (Z, actor) => Z.receptZet('APO', 'onbekend-id', 'klaar', actor)
+    uitreiken: (Z, actor) => Z.receptZet('APO', 'onbekend-id', 'klaar', actor),
+    /* `schemaGeven` woont niet in de zorgketen maar in kern/vakschema.js
+       (RUGDEKKING.md par. 4.4). De proef hieronder draait hem dus op zijn eigen
+       module, met dezelfde persoonseislaag -- want het gaat om de vraag of de
+       EIS wordt afgedwongen en niet om waar de handeling toevallig woont. */
+    schemaGeven: (Z, actor, V) => V.voorstel('FYSIO',
+      { mens: 'Iemand', naam: 'Opbouw knie', wat: 'rustig opbouwen in zes weken' }, actor)
   };
   const alle = Object.keys(persoonseisMod.HANDELINGEN);
   assert.deepEqual(alle.sort(), Object.keys(gedekt).sort(),
@@ -192,16 +198,32 @@ test('7. elke handeling uit het register wordt ergens ECHT geweigerd', () => {
   const K = bouw();
   const zaken = { HUIS: { code: 'HUIS', type: 'huisarts' }, APO: { code: 'APO', type: 'apotheek' },
     SPEC: { code: 'SPEC', type: 'specialist' } };
+  zaken.FYSIO = { code: 'FYSIO', type: 'fysiotherapie', name: 'Praktijk Noord' };
+  const vind = (c) => zaken[String(c || '').toUpperCase()] || null;
   const Z = require('../server/kern/zorgketen')({
     db: { data: {} }, save() {}, crypto: require('crypto'),
-    findSupplier: (c) => zaken[String(c || '').toUpperCase()] || null,
+    findSupplier: vind,
     persoonseis: K.eis
   }).zorgketen;
+  /* Dezelfde persoonseislaag, een andere module. `keyVanCodenaam` geeft hier een
+     bestaand lid terug, zodat een weigering ALLEEN over de bevoegdheid kan gaan
+     en niet stilletjes over een onbekende codenaam. */
+  const V = require('../server/kern/vakschema')({
+    db: { data: {} }, save() {}, crypto: require('crypto'),
+    schoon: (v, n) => String(v == null ? '' : v).trim().slice(0, n || 200),
+    findSupplier: vind, persoonseis: K.eis,
+    keyVanCodenaam: async () => ({ key: 'k-lid' }),
+    trainingZet: () => ({ id: 't1' })
+  }).vakschema;
 
   K.identiteiten[11] = { geverifieerd: true, stand: 'verified' };   // werkt er, geen vakbewijs
   const actor = { lid: 11, manager: true };
+  /* `await` op alles, ook op wat synchroon is: een van de handelingen woont in
+     een module die de codenaam moet opzoeken en dus async is. Zonder await leest
+     de bewering een Promise, die geen `status` heeft -- dan zakt de toets om de
+     verkeerde reden, of erger, hij slaagt. */
   for (const h of alle) {
-    const r = gedekt[h](Z, actor);
+    const r = await gedekt[h](Z, actor, V);
     assert.equal(r.status, 403, 'handeling "' + h + '" hoort geweigerd te worden zonder stuk');
     assert.ok(r.persoonseis, 'handeling "' + h + '" hoort te zeggen WELK stuk ontbreekt');
   }
@@ -211,6 +233,17 @@ test('7. elke handeling uit het register wordt ergens ECHT geweigerd', () => {
   inOrde(K, 11, ['big', 'farmacie']);
   assert.equal(Z.receptMaak('HUIS', { apotheek: 'APO', middel: 'iets' }, actor).ok, true);
   assert.equal(Z.verwijsMaak('HUIS', { naar: 'SPEC', reden: 'controle' }, actor).ok, true);
+  /* En dezelfde tegenproef voor `schemaGeven`, want zonder deze regel bewijst de
+     lus hierboven alleen dat hij NEE kan zeggen -- en dat zegt een kapotte
+     module ook. Let op wat hier NIET wordt aangetoond: dat het voorstel bij een
+     lid is beland. Deze weg geeft met opzet hetzelfde antwoord of de codenaam
+     bestaat of niet (kern/vakschema.js), dus `klaargezet` is de enige uitspraak
+     die hij mag doen. Wat er met een BESTAAND lid gebeurt, staat in
+     test/vakschema.test.js. */
+  const metStuk = await V.voorstel('FYSIO',
+    { mens: 'Iemand', naam: 'Opbouw knie', wat: 'rustig opbouwen in zes weken' }, actor);
+  assert.equal(metStuk.status, 200, 'met een afgetekende BIG hoort dezelfde aanroep er wel door');
+  assert.equal(metStuk.persoonseis, undefined);
   /* uitreiken komt nu voorbij de persoonspoort en valt op het onbekende recept:
      404 en niet 403 is precies het bewijs dat de poort open is. */
   assert.equal(Z.receptZet('APO', 'onbekend-id', 'klaar', actor).status, 404);

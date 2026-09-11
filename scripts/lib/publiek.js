@@ -29,6 +29,14 @@ const PUBLIEK = new Map([
      werkende passkey hem afbreekt, een rem per bron plus vijf pogingen in de
      kern, en een kritieke melding met mail bij elke start. Zonder ingericht
      quorum bestaat de weg niet. Zie EIGENAAR.md par. 5. */
+  /* HET DEELBEWIJS VAN EEN CARRIEREREGEL. Open om dezelfde reden als de twee
+     hierboven, maar met een andere grond: hier IS een sleutel -- de deelcode
+     zelf, 128 bits, alleen als hash op schijf. Wat er niet is, is een ACCOUNT,
+     en dat is de hele functie: een sponsor, een club of een visumloket hoort een
+     titel te kunnen nakijken zonder eerst lid van RTG te worden. Wat hem
+     begrenst: de code verloopt, het lid kan hem stoppen, hij toont EEN feit en
+     nooit het ledger, en de deurrem van 300/minuut hangt ervoor. */
+  ['/api/carriere/regel/toon', 'een deelbewijs wordt getoond aan iemand zonder RTG-account; de deelcode is de sleutel, verloopt en is te stoppen'],
   ['/api/herstel/eigenaar/start', 'herstel zonder toestel: er kan per definitie geen sessie zijn; het quorum, de wachttijd en de afbreekbaarheid doen het werk'],
   ['/api/herstel/eigenaar/voltooien', 'zelfde ceremonie, tweede helft: opnieuw twee delen en de wachttijd moet om zijn'],
   /* De twee passkey-loketten van dezelfde ceremonie staan hier NIET: de

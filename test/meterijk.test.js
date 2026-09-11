@@ -1502,6 +1502,18 @@ const IJKINGEN = {
       (j) => { j.gemeten.gezakt = (j.gemeten.gezakt || 0) + 5; return j; },
       () => norm.meet().faalproefGezakt - voor.faalproefGezakt)
   },
+  /* DE TAND VAN 11 SEPTEMBER 2026: carriereDomeinenGemeten telt de
+     talentdomeinen die scripts/carrierevorm.js werkelijk heeft gezien
+     (CARRIERE.md par. 0). De ijking is dezelfde vorm als hierboven -- verander
+     het register en de meter hoort exact mee te bewegen. Hij gaat OMLAAG in de
+     proef en niet omhoog, want dat is de richting die ertoe doet: een meter die
+     stil minder domeinen ziet, rapporteert dezelfde conclusie over minder
+     bewijs, en juist daarvoor hangt de ratel eraan. */
+  carriereDomeinenGemeten: {
+    proef: (voor) => metVervangenJson('CARRIEREVORM.json',
+      (j) => { j.gemeten.domeinen = Math.max(0, (j.gemeten.domeinen || 0) - 3); return j; },
+      () => voor.carriereDomeinenGemeten - norm.meet().carriereDomeinenGemeten)
+  },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
      de meter leest `gemeten.defecten` uit een register dat er al is, dus hij
@@ -1521,6 +1533,32 @@ const IJKINGEN = {
     proef: (voor) => metVervangenJson('BEWIJSLADDER.json',
       (j) => { j.telling.alleenKeten = (j.telling.alleenKeten || 0) + 4; return j; },
       () => norm.meet().bewijsAlleenKeten - voor.bewijsAlleenKeten)
+  },
+  /* DE DRIE TANDEN VAN 11 SEPTEMBER 2026 (LUSSEN.json, npm run lussen).
+
+     Alle drie lezen ze een SCHULD uit `ratel` en niet uit `gemeten`, en dat is
+     geen detail: `gemeten` draagt de hele verdeling en groeit mee met de
+     codebase, `ratel` draagt alleen wat omlaag moet. Leest de meter per ongeluk
+     de verdeling, dan stijgt hij van gewoon werk -- dezelfde val die bij
+     toetsenOngevoeligPct met zoveel woorden staat beschreven.
+
+     De ijking hoogt het getal in het register tijdelijk op. Leest de meter het
+     verkeerde veld, of een ontbrekend bestand als nul, dan beweegt hij niet mee
+     en zakt deze proef. */
+  lussenGeenUitweg: {
+    proef: (voor) => metVervangenJson('LUSSEN.json',
+      (j) => { j.ratel.geenUitwegGevonden = (j.ratel.geenUitwegGevonden || 0) + 7; return j; },
+      () => norm.meet().lussenGeenUitweg - voor.lussenGeenUitweg)
+  },
+  lussenKritiek: {
+    proef: (voor) => metVervangenJson('LUSSEN.json',
+      (j) => { j.ratel.kritiek = (j.ratel.kritiek || 0) + 6; return j; },
+      () => norm.meet().lussenKritiek - voor.lussenKritiek)
+  },
+  lussenZonderOverlapRem: {
+    proef: (voor) => metVervangenJson('LUSSEN.json',
+      (j) => { j.ratel.wekkersAsyncZonderRem = (j.ratel.wekkersAsyncZonderRem || 0) + 5; return j; },
+      () => norm.meet().lussenZonderOverlapRem - voor.lussenZonderOverlapRem)
   }
 };
 

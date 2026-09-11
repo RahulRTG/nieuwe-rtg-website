@@ -53,17 +53,33 @@ function maakFacturen({ i18n, deps }) {
     return (md.invoices || []).map(inv => {
       const contrib = /lidmaatschap|jaarbijdrage|maandbijdrage/i.test(inv.desc);
       if (contrib && PASNAAM[tier]) {
+        /* ALLEEN DE OMSCHRIJVING, NOOIT HET BEDRAG.
+
+           Hier werd het bedrag er ook bij gezet, uit de prijslijst. Daarmee werd
+           bij ELKE uitlezing het bedrag van een BESTAANDE factuur overschreven met
+           de prijs die op dat moment in de boardroom stond: zet de eigenaar de RTG
+           Pass van 65 op 99, dan las een lid met een lopend contract van 65 de
+           volgende seconde 99 op zijn eigen factuurscherm -- terwijl de OPGESLAGEN
+           factuur, die de betaalwegen lezen, nog 65 droeg.
+
+           De prijs van het PRODUCT mag bewegen, de prijs van de VERPLICHTING niet
+           (COMMERCIE.md 3b; `afgesprokenCenten` in ../commercie/contract.js is een
+           momentopname). test/pasprijs.test.js toets 6 blijft gelden:
+           `eersteBijdrageFactuur` hieronder rekent nog steeds met de prijs van
+           vandaag, dus een nieuw lid betaalt 99 en wie 65 tekende betaalt 65.
+
+           En een factuur ZONDER bedrag krijgt er geen uit de prijslijst: dat zou
+           een bedrag verzinnen voor een verplichting die niemand heeft vastgelegd
+           (KOSTEN.md: er staat nooit een getal waar er geen is).
+
+           `bijdrageCenten` blijft nodig voor EEN ding: of deze trede uberhaupt een
+           lijstprijs heeft. Is hij null, dan is de pas op maat en zegt de
+           omschrijving dat -- een mededeling en geen bedrag. */
         inv = {
           ...inv,
           desc: (lang === 'en' ? 'Monthly contribution ' : 'Maandbijdrage ') + PASNAAM[tier] +
                 (bijdrageCenten == null ? (lang === 'en' ? ' (bespoke)' : ' (prijs op maat)') : '') +
-                (maandNaam(inv.maand, lang) ? ' · ' + maandNaam(inv.maand, lang) : ''),
-          // alleen invullen als er echt een prijs IS; anders het bedrag laten staan
-          /* Het btw-tarief kwam hier als `* 1.21` binnen. Nu uit het
-             btw-profiel (../commercie/btw.js); zonder profiel is dat NL 21%,
-             hetzelfde antwoord als vroeger maar niet langer het enige mogelijke. */
-          ...(bijdrageCenten == null ? {} : { netto: 0,
-            bijdrage: btw.overNetto(bijdrageCenten, md.btwProfiel).brutoCenten / 100 })
+                (maandNaam(inv.maand, lang) ? ' · ' + maandNaam(inv.maand, lang) : '')
         };
       }
       return {

@@ -98,6 +98,11 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-commerce').SLEUTELS,
   /* De kale ronde van 30 augustus 2026, met per regel het identiteitsveld. */
   require('./idemsleutels-kaleronde').SLEUTELS,
+  /* De carrierelaag (vertegenwoordiging, jeugdbestuur, rugdekking): achttien
+     routes, per stuk gemeten met een dubbeltik-ronde. Zie de kop daar voor
+     waarom `zelfdeVerzoek` hier meestal een TOESTANDSCONTROLE is en geen
+     duplicaatlaag -- dat verschil wordt niet weggepoetst. */
+  require('./idemsleutels-carriere').SLEUTELS,
   /* En de andere kant van diezelfde ronde: wat je met opzet NIET dedupliceert,
      elk met een reden. Zie de kop van dat bestand. */
   require('./idemsleutels-kaleronde-b').SLEUTELS,
@@ -126,7 +131,8 @@ Object.assign(SLEUTELS,
   /* De kaartkeuze van een lid: een lezende route en twee die in EEN eigen
      collectie schrijven. Zie de kop van dat bestand voor waarom de dubbeling
      bij de KANTOORTELLING telt en niet in het beeld. */
-  require('./idemsleutels-kaarten').SLEUTELS);
+  require('./idemsleutels-kaarten').SLEUTELS,
+  require('./idemsleutels-lidabonnement').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:
    geen route in twee zijbestanden, elke verklaring compleet, en vier routes die

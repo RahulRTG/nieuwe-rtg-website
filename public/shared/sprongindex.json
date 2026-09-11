@@ -605,6 +605,18 @@
       "url": "/apps/mijn-isolatie.html"
     },
     {
+      "naam": "Identiteit aantonen",
+      "wereld": "Instellingen",
+      "soort": "link",
+      "sleutel": "verificatie",
+      "url": "/apps/verificatie.html",
+      "woorden": [
+        "laten",
+        "zien",
+        "bent"
+      ]
+    },
+    {
       "naam": "Juridisch",
       "wereld": "Instellingen",
       "soort": "link",
@@ -721,6 +733,23 @@
         "door",
         "echt",
         "doen"
+      ]
+    },
+    {
+      "naam": "Mijn loopbaan",
+      "wereld": "WorkOS",
+      "soort": "link",
+      "sleutel": "loopbaan",
+      "url": "/apps/loopbaan.html"
+    },
+    {
+      "naam": "Mijn team",
+      "wereld": "WorkOS",
+      "soort": "link",
+      "sleutel": "vertegenwoordiging",
+      "url": "/apps/vertegenwoordiging.html",
+      "woorden": [
+        "heen"
       ]
     },
     {

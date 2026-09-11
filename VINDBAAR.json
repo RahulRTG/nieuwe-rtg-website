@@ -1,25 +1,25 @@
 {
   "stempel": {
-    "op": "2026-09-10T17:45:53.159Z",
-    "commit": "cbbc8559",
+    "op": "2026-09-11T22:05:42.051Z",
+    "commit": "4a2fe65a9",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 3,
     "instrument": "scripts/vindbaar.js",
     "node": "v22.22.2"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
-  "bestemmingen": 94,
-  "woorden": 1135,
-  "gevonden": 745,
-  "dekking": 0.6564,
+  "bestemmingen": 97,
+  "woorden": 1153,
+  "gevonden": 754,
+  "dekking": 0.6539,
   "perBestemming": [
     {
       "naam": "Magnaat",
       "url": "/apps/magnaat.html",
-      "woorden": 88,
-      "gevonden": 35,
+      "woorden": 87,
+      "gevonden": 34,
       "mist": [
         "werkvloer",
         "vraagt",
@@ -158,8 +158,8 @@
     {
       "naam": "Spelen",
       "url": "/apps/spelen.html?pas=",
-      "woorden": 44,
-      "gevonden": 30,
+      "woorden": 43,
+      "gevonden": 29,
       "mist": [
         "mens",
         "erger",
@@ -199,31 +199,10 @@
       ]
     },
     {
-      "naam": "Openbaar vervoer",
-      "url": "/apps/ov.html",
-      "woorden": 27,
-      "gevonden": 14,
-      "mist": [
-        "gaat",
-        "heen",
-        "aanvraag",
-        "ritten",
-        "inchecken",
-        "snelle",
-        "opties",
-        "kaartje",
-        "vervoerbewijzen",
-        "werkgever",
-        "journey",
-        "studio",
-        "operaties"
-      ]
-    },
-    {
       "naam": "Daten",
       "url": "/apps/vonk.html",
-      "woorden": 27,
-      "gevonden": 15,
+      "woorden": 26,
+      "gevonden": 14,
       "mist": [
         "bevestig",
         "genoeg",
@@ -240,22 +219,23 @@
       ]
     },
     {
-      "naam": "RTG Werk OS",
-      "url": "/apps/werk.html",
-      "woorden": 25,
-      "gevonden": 14,
+      "naam": "Openbaar vervoer",
+      "url": "/apps/ov.html",
+      "woorden": 27,
+      "gevonden": 15,
       "mist": [
-        "vraagt",
-        "besluiten",
-        "menselijke",
-        "autoriteit",
-        "welkom",
-        "meesterschap",
-        "organisatie",
-        "bron",
-        "hier",
-        "waarmee",
-        "helpen"
+        "gaat",
+        "aanvraag",
+        "ritten",
+        "inchecken",
+        "snelle",
+        "opties",
+        "kaartje",
+        "vervoerbewijzen",
+        "werkgever",
+        "journey",
+        "studio",
+        "operaties"
       ]
     },
     {
@@ -277,13 +257,30 @@
       ]
     },
     {
+      "naam": "RTG Werk OS",
+      "url": "/apps/werk.html",
+      "woorden": 24,
+      "gevonden": 14,
+      "mist": [
+        "vraagt",
+        "besluiten",
+        "menselijke",
+        "autoriteit",
+        "welkom",
+        "meesterschap",
+        "organisatie",
+        "bron",
+        "waarmee",
+        "helpen"
+      ]
+    },
+    {
       "naam": "Rendez-vous",
       "url": "/apps/rendezvous.html",
       "woorden": 27,
-      "gevonden": 18,
+      "gevonden": 19,
       "mist": [
         "intentie",
-        "bent",
         "kunt",
         "inhoud",
         "matches",
@@ -294,27 +291,10 @@
       ]
     },
     {
-      "naam": "Wie ben ik",
-      "url": "/apps/ik.html",
-      "woorden": 16,
-      "gevonden": 7,
-      "mist": [
-        "tegen",
-        "voornaamwoorden",
-        "gedraagt",
-        "welke",
-        "geloof",
-        "levensbeschouwing",
-        "gebedstijden",
-        "richting",
-        "mekka"
-      ]
-    },
-    {
       "naam": "Sociaal",
       "url": "/apps/sociaal.html",
-      "woorden": 13,
-      "gevonden": 5,
+      "woorden": 12,
+      "gevonden": 4,
       "mist": [
         "kring",
         "tijdlijn",
@@ -340,6 +320,38 @@
         "rating",
         "sterren",
         "aantal"
+      ]
+    },
+    {
+      "naam": "Wie ben ik",
+      "url": "/apps/ik.html",
+      "woorden": 15,
+      "gevonden": 7,
+      "mist": [
+        "voornaamwoorden",
+        "gedraagt",
+        "welke",
+        "geloof",
+        "levensbeschouwing",
+        "gebedstijden",
+        "richting",
+        "mekka"
+      ]
+    },
+    {
+      "naam": "Mijn team",
+      "url": "/apps/vertegenwoordiging.html",
+      "woorden": 11,
+      "gevonden": 3,
+      "mist": [
+        "namens",
+        "gebeurd",
+        "verandert",
+        "aanvaardt",
+        "stand",
+        "persoon",
+        "zekerheid",
+        "gewogen"
       ]
     },
     {
@@ -391,8 +403,8 @@
     {
       "naam": "RTG One",
       "url": "/apps/rtgone.html",
-      "woorden": 32,
-      "gevonden": 25,
+      "woorden": 31,
+      "gevonden": 24,
       "mist": [
         "geladen",
         "persoonlijke",
@@ -416,35 +428,6 @@
         "begin",
         "sjabloon",
         "leden"
-      ]
-    },
-    {
-      "naam": "Reizen & Veilig",
-      "url": "/apps/reizen-veilig.html",
-      "woorden": 12,
-      "gevonden": 5,
-      "mist": [
-        "ibiza",
-        "jetset",
-        "week",
-        "gstaad",
-        "alpien",
-        "weekend",
-        "zien"
-      ]
-    },
-    {
-      "naam": "App-dossier",
-      "url": "/apps/appstore-dossier.html",
-      "woorden": 10,
-      "gevonden": 4,
-      "mist": [
-        "geen",
-        "enkele",
-        "vragen",
-        "elke",
-        "hier",
-        "geldt"
       ]
     },
     {
@@ -490,24 +473,10 @@
       ]
     },
     {
-      "naam": "Video",
-      "url": "/apps/clips.html",
-      "woorden": 18,
-      "gevonden": 12,
-      "mist": [
-        "maken",
-        "bewerken",
-        "knippen",
-        "reacties",
-        "feeddata",
-        "einde"
-      ]
-    },
-    {
       "naam": "RTMail",
       "url": "/apps/rtmail.html",
-      "woorden": 25,
-      "gevonden": 19,
+      "woorden": 23,
+      "gevonden": 17,
       "mist": [
         "daarna",
         "externe",
@@ -529,6 +498,20 @@
         "toestel",
         "loggen",
         "vluchtlogboek"
+      ]
+    },
+    {
+      "naam": "Reizen & Veilig",
+      "url": "/apps/reizen-veilig.html",
+      "woorden": 12,
+      "gevonden": 6,
+      "mist": [
+        "ibiza",
+        "jetset",
+        "week",
+        "gstaad",
+        "alpien",
+        "weekend"
       ]
     },
     {
@@ -560,16 +543,55 @@
       ]
     },
     {
+      "naam": "App-dossier",
+      "url": "/apps/appstore-dossier.html",
+      "woorden": 9,
+      "gevonden": 4,
+      "mist": [
+        "geen",
+        "enkele",
+        "vragen",
+        "elke",
+        "geldt"
+      ]
+    },
+    {
       "naam": "Mijn leven",
       "url": "/apps/leven.html",
-      "woorden": 18,
-      "gevonden": 13,
+      "woorden": 17,
+      "gevonden": 12,
       "mist": [
         "noire",
         "salon",
         "chef",
         "residence",
         "selectie"
+      ]
+    },
+    {
+      "naam": "Video",
+      "url": "/apps/clips.html",
+      "woorden": 17,
+      "gevonden": 12,
+      "mist": [
+        "bewerken",
+        "knippen",
+        "reacties",
+        "feeddata",
+        "einde"
+      ]
+    },
+    {
+      "naam": "Mijn loopbaan",
+      "url": "/apps/loopbaan.html",
+      "woorden": 11,
+      "gevonden": 6,
+      "mist": [
+        "reeks",
+        "zeven",
+        "voorraden",
+        "gedeeld",
+        "ingetrokken"
       ]
     },
     {
@@ -647,8 +669,8 @@
     {
       "naam": "Films en series",
       "url": "/apps/theater.html",
-      "woorden": 11,
-      "gevonden": 8,
+      "woorden": 10,
+      "gevonden": 7,
       "mist": [
         "abonnementen",
         "zaal",
@@ -686,6 +708,17 @@
         "gelegenheid",
         "gasten",
         "menu"
+      ]
+    },
+    {
+      "naam": "Identiteit aantonen",
+      "url": "/apps/verificatie.html",
+      "woorden": 9,
+      "gevonden": 6,
+      "mist": [
+        "stappen",
+        "identiteitsbewijs",
+        "hiermee"
       ]
     },
     {
@@ -829,8 +862,8 @@
     {
       "naam": "RTG Media",
       "url": "/apps/media.html",
-      "woorden": 18,
-      "gevonden": 17,
+      "woorden": 17,
+      "gevonden": 16,
       "mist": [
         "releasecontrole"
       ]
@@ -865,8 +898,8 @@
     {
       "naam": "Navigatie",
       "url": "/apps/navigatie.html",
-      "woorden": 15,
-      "gevonden": 14,
+      "woorden": 16,
+      "gevonden": 15,
       "mist": [
         "denkt"
       ]

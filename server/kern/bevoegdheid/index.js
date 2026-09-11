@@ -53,17 +53,25 @@ const { RANG, SOORTEN, VERMOGENS, zinnen, gezichtVan } = require('./lijst');
      clearing()    -> { eigen: bool, kaart: bool }  (kern/bankregie)
    De klok komt binnen zodat een toets een verlopen vergunning kan tonen zonder
    te wachten. */
-function maakBevoegdheid({ vergunning, partnerRails, clearing, terugstorting, nu = () => Date.now() }) {
+function maakBevoegdheid({ vergunning, partnerRails, clearing, terugstorting, standen, nu = () => Date.now() }) {
 
-  /* Het GELDENDE gezicht van een vermogen (./lijst.js kiest het; zie daar waarom
-     WALLET_SALDO en LID_UITBETALING er twee hebben). Ontbreekt de stand, dan
-     valt hij terug op het strengste gezicht: niet meegeven is veilig, alleen
-     niet volledig. */
-  function stand() {
-    if (typeof terugstorting !== 'function') return null;
-    try { return terugstorting(); } catch (e) { return null; }
+  /* DE SCHAKELAARS, OP NAAM: elk afhankelijk vermogen noemt in `hangtAf` welke
+     schakelaar over hem gaat, en alleen die wordt opgehaald. Waarom dat op naam
+     moet en niet een gedeelde stand mag zijn, staat in de kop van
+     ./lijst-afhankelijk.js. Ontbreekt de schakelaar, dan valt het vermogen
+     terug op zijn eigen strengste gezicht: niet meegeven is veilig, alleen niet
+     volledig. */
+  const SCHAKELAARS = Object.assign({}, standen || {},
+    typeof terugstorting === 'function' ? { terugstorting } : {});
+  function stand(welke) {
+    const f = SCHAKELAARS[welke];
+    if (typeof f !== 'function') return null;
+    try { return f(); } catch (e) { return null; }
   }
-  const vermogen = id => gezichtVan(VERMOGENS[id], stand());
+  const vermogen = id => {
+    const f = VERMOGENS[id];
+    return gezichtVan(f, f && f.soort === 'afhankelijk' ? stand(f.hangtAf) : null);
+  };
 
   /* Welke rail voert deze handeling uit? Niet de aanroeper bepaalt dat maar de
      stand van de knop: draait de eigen bank, dan doen we het zelf en zijn we
@@ -78,13 +86,9 @@ function maakBevoegdheid({ vergunning, partnerRails, clearing, terugstorting, nu
     return 'geen';
   }
 
-  function vergunningStand() {
-    const v = vergunning();
-    if (!v || !v.soort || !RANG[v.soort]) return { er: false };
-    const verlopen = Number.isFinite(v.tot) && v.tot < nu();
-    return { er: true, soort: v.soort, rang: RANG[v.soort], verlopen,
-      landen: Array.isArray(v.landen) ? v.landen : [], entiteit: v.entiteit || '', nummer: v.nummer || '', tot: v.tot || null };
-  }
+  /* De papieren kant -- wat ligt er, en is dat genoeg -- staat in
+     ./vergunning.js. Zie de kop daar voor waarom dat een eigen onderwerp is. */
+  const { vergunningStand, toetsVergunning } = require('./vergunning')({ vergunning, nu });
 
   /* Het oordeel. `land` is de landcode van het lid (of van de handeling); laat
      hem weg en de landtoets slaat over -- dat is geen versoepeling maar een
@@ -124,17 +128,6 @@ function maakBevoegdheid({ vergunning, partnerRails, clearing, terugstorting, nu
 
     // eigen rails: nu moet RTG het zelf mogen
     return toetsVergunning(f.eigenNodig, id, land, 'eigen');
-  }
-
-  // de vergunningstoets zelf, gedeeld door de eigen rail en het eigen boek
-  function toetsVergunning(nodig, id, land, via) {
-    const v = vergunningStand();
-    if (!v.er) return { mag: false, reden: 'geen', uitleg: zinnen.geen, vermogen: id, nodig };
-    if (v.verlopen) return { mag: false, reden: 'verlopen', uitleg: zinnen.verlopen, vermogen: id, tot: v.tot };
-    if (v.rang < RANG[nodig]) return { mag: false, reden: 'rang', uitleg: zinnen.rang, vermogen: id, nodig, heeft: v.soort };
-    if (land && v.landen.length && !v.landen.includes('*') && !v.landen.includes(land))
-      return { mag: false, reden: 'land', uitleg: zinnen.land, vermogen: id, land };
-    return { mag: true, vermogen: id, via, vergunning: v.soort };
   }
 
   /* Het bord voor de boardroom staat in ./bord.js: dat tekent een BEELD van de

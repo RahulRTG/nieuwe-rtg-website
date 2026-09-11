@@ -48,6 +48,10 @@ const CONTRACTEN = Object.assign({},
      ./idemsleutels.js, die om precies dezelfde reden vier zijbestanden heeft. */
   require('./mutatiecontracten-beschermd').CONTRACTEN,
   require('./mutatiecontracten-leest').CONTRACTEN,
+  require('./mutatiecontracten-vertegenwoordiging').CONTRACTEN,
+  require('./mutatiecontracten-rugdekking').CONTRACTEN,
+  require('./mutatiecontracten-carriereledger').CONTRACTEN,
+  require('./mutatiecontracten-vakschema').CONTRACTEN,
   require('./mutatiecontracten-tweedehandeling').CONTRACTEN,
   require('./mutatiecontracten-padparameter').CONTRACTEN,
   require('./mutatiecontracten-kaleronde').CONTRACTEN,
@@ -77,6 +81,9 @@ const CONTRACTEN = Object.assign({},
   /* De nazorg van een reisaanvraag: vier routes die samen de weg terug uit een
      toezegging zijn. Eigen bestand omdat ze een afweging delen -- zie de kop. */
   require('./mutatiecontracten-reisnazorg').CONTRACTEN,
+  /* Een lid en zijn eigen lidmaatschap: twee lezers en een opzegging. Eigen
+     bestand omdat het indelen er een defect uit haalde -- zie de kop. */
+  require('./mutatiecontracten-lidabonnement').CONTRACTEN,
   require('./mutatiecontracten-integratie').CONTRACTEN,
   /* RTG Move: drie routes die alle drie lezen, met de BOUW als grond in plaats
      van een meting. Eigen bestand om dat verschil te bewaren -- zie de kop. */
@@ -130,7 +137,8 @@ const CONTRACTEN = Object.assign({},
     require('./mutatiecontracten-isolatie').CONTRACTEN,
     require('./mutatiecontracten-isolatie-lid').CONTRACTEN,
     require('./mutatiecontracten-samenvoeging').CONTRACTEN,
-    require('./mutatiecontracten-wonen').CONTRACTEN);
+    require('./mutatiecontracten-wonen').CONTRACTEN,
+    require('./mutatiecontracten-lidabonnement').CONTRACTEN);   // ook hier: de guard moet hem kennen
   const overschreven = Object.keys(effect).filter(k => k in eerder);
   if (overschreven.length) {
     throw new Error('mutatiecontracten: ./mutatiecontracten-effect overschrijft een specifieker ' +

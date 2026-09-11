@@ -28,5 +28,6 @@ module.exports = [
   '/apps/mijn-sessies.html',
   '/apps/passkeys.html',
   '/apps/rtgid.html',
-  '/apps/toestemming.html'
+  '/apps/toestemming.html',
+  '/apps/verificatie.html'
 ];

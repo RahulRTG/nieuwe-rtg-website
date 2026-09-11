@@ -40,5 +40,55 @@ module.exports = [
      regels lopen na een hernoeming uit elkaar, en dan hangt het scherm ergens
      anders dan de deur die het bedient. */
   [/(?:^|\/)mijn[-/](?:tweefactor|sessies|herstelkanaal)/, 'intern', 'Intern & IT'],
-  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch']
+  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch'],
+  /* EEN DERDE FAMILIE: HET EIGEN LIDMAATSCHAP (/api/mijn/abonnement).
+
+     Hij viel op de restpost toen de ledenkant van het lidmaatschap erbij kwam --
+     zien wat er loopt, lezen wat opzeggen gaat doen, en opzeggen. Precies het
+     soort werk waarvoor die terugval rood is: onbekend werk hoort niet stil bij
+     Onderzoek te belanden.
+
+     DE BALIE, EN NIET JURIDISCH OF FINANCIEN. Dat is geen smaak maar een
+     afleiding: de KANTOORkant van exact dit werk ligt al bij de Ledenbalie
+     (/api/aanmelding/opzeggen en /beslis, regel 26 van ../tabel.js). Deze drie
+     routes zijn de ledenkant ervan -- dezelfde contracten, hetzelfde
+     betaalschema, dezelfde `zegOpLidmaatschap`. Twee kanten van een handeling in
+     twee kamers leggen is precies het uiteenlopen waar de schermregel hierboven
+     over klaagt.
+
+     Waarom dus niet Juridisch: een lidmaatschap is geen AVG-recht maar een
+     overeenkomst, en de Juridisch-familie hierboven is uitdrukkelijk
+     `zeggenschap` over gegevens. En niet Financien: daar hangt het GELD
+     (/api/factuur, /api/bank/akkoord), en deze routes verplaatsen niets -- ze
+     beeindigen een verplichting. Het bedrag komt van het contract. */
+  [/(?:^|\/)mijn[-/]abonnement/, 'balie', 'De Ledenbalie'],
+
+  /* RTG Vertegenwoordiging (CARRIERE.md par. 6a en 6b) hoort in deze familie en
+     niet bij de Ledenbalie: die doet inzage in het dossier van een lid met een
+     reden, terwijl RTG hier juist GEEN partij is -- de client machtigt zijn
+     eigen vertegenwoordiger en aanvaardt zelf. Een machtiging waarmee een mens
+     commercieel namens een mens handelt is een rechtsfiguur, net als `mijn-
+     relaties` hierboven, en ligt dus bij Juridisch.
+
+     Een regel voor de routes, het scherm EN de functie, zodat ze niet bij drie
+     kamers belanden. Hij sluit af op `(?:[\s/]|$)` en niet op een schuine
+     streep, want de functiecatalogus draagt het KALE prefix als codepunt
+     (../../functies/register/cat-life.js) -- dezelfde halve dekking waar de
+     tenant-regels in ./tabel.js voor waarschuwen. */
+  [/\/api\/vertegenwoordiging(?:[\s/]|$)|\/vertegenwoordiging\.html/, 'juridisch', 'Juridisch'],
+
+
+  /* HET SCHERM WAAROP EEN LID ZIJN IDENTITEIT AANTOONT hoort bij dezelfde kamer
+     als de kant waar een medewerker het aftekent: `office/verifications` ligt in
+     ./tabel.js bij Juridisch, met de reden dat een mens van RTG een stuk ZIET en
+     tekent dat hij het heeft gezien -- zonder de inhoud te beoordelen, want RTG
+     is geen inspectie. Dit is de andere helft van precies die handeling, en de
+     twee helften over twee kamers verdelen betekent dat niemand de keten ziet.
+
+     Hij staat hier en niet in ./tabel-breed.js omdat die het brede patroon
+     `verify` naar Intern & IT stuurt. Dat is juist voor de technische
+     verify-routes (een token, een passkey) en verkeerd voor deze: hier draait
+     het niet om een sleutel maar om een identiteitsbewijs. Smal gaat voor
+     breed, en deze lijst wordt voor die brede geplakt. */
+  [/\/apps\/verificatie\.html/, 'juridisch', 'Juridisch']
 ];

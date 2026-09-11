@@ -392,8 +392,30 @@ eronder — precies de vorm van `HDI.md` par. 7.
 
 ## 7. De besluiten die de eigenaar moet nemen
 
-Vier, met per optie wat het betekent en wat het kost. Ze zijn niet
-uitwisselbaar en ze staan in volgorde: besluit 1 bepaalt de rest.
+**GENOMEN (11 september 2026).** De eigenaar heeft besluit 1, 2 en 3 genomen, en
+daarbij twee besluiten die pas boven kwamen toen deze laag werkelijk gebouwd
+werd. Ze staan hieronder met de opties zoals ze voorlagen, want de prijs van de
+niet-gekozen weg hoort leesbaar te blijven.
+
+| # | Besluit | Gekozen |
+|---|---|---|
+| 1 | Hoe heet het geld dat naar een talent gaat | **C -- allebei, gescheiden**: commerciele rugdekking en een beurs, met de firewall ertussen |
+| 2 | Komt er een genre voor het individu | **A -- een gedeeld genre**, en het heet `talentmens` (`talent` is bezet door de Talent Exchange) |
+| 3 | Bouwen we de zaakwaarneming | **A -- ja, en als eerste**. Staat: `server/kern/vertegenwoordiging/` |
+| 4 | Gezondheid van een topsporter | nog niet voorgelegd; par. 4.4 staat ongewijzigd |
+| + | De A3-poort die de laag dichthield | **verificatie uitrollen** -- af: `/apps/verificatie.html` |
+| + | Minderjarig talent | **jeugdbestuur bouwen** (CARRIERE.md par. 6 nummer 7) |
+| + | De derde uitbetaalweg (par. 4.3) | **ja, met een schakelaar die standaard DICHT staat** -- de schakelaar is de juridische positie |
+
+Twee dingen die uit die keuzes volgen en die niet mogen verwateren. **Besluit 1-C
+is het duurste pad en dat is bewust**: twee programma's, twee werelden, twee
+registers, en `kern/economie/firewall.js` dwingt de scheiding af -- dus het moet
+echt gescheiden zijn en niet alleen in naam. En de beurs-helft hangt op de derde
+uitbetaalweg hierboven; zolang die schakelaar dicht staat, is wat er draait de
+commerciele helft, en dat hoort ook zo te heten.
+
+De opties zoals ze voorlagen, met per optie wat het betekent en wat het kost. Ze
+zijn niet uitwisselbaar en ze staan in volgorde: besluit 1 bepaalt de rest.
 
 ### Besluit 1 — Hoe heet het geld dat naar een talent gaat?
 

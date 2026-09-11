@@ -18,7 +18,7 @@ het?**
 |---|---|
 | Functieschakelaars (aan/uit per functie) | **215** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
-| Bedrijfsgenres | **75** in 28 sectoren |
+| Bedrijfsgenres | **76** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
 | Kernmodules (`server/kern/**`) | **2081** |
@@ -655,7 +655,7 @@ ze werken; dit is wat hij ziet.
 - **RTF-Bibliotheek** `/apps/foundation/bieb.html` — Gratis kind- en gezinsapps van de RTFoundation.
 - **Geloof & Wijsheid** `/apps/foundation/geloofbieb.html` — De Geloof & Wijsheid-Bibliotheek: alle tradities als gelijken, met echte leesbare teksten.
 
-# 3. De 75 genres in 28 sectoren
+# 3. De 76 genres in 28 sectoren
 
 Er is **één** partner-app en **één** personeels-PDA. Welke schermen een zaak
 krijgt volgt niet uit zijn genre maar uit zijn *genre-caps*: een hotel en een
@@ -681,7 +681,7 @@ is de reden dat er geen 130 losse apps zijn.
 - **mobility** (6) — Taxi (`taxi`), Autoverhuur (`verhuur`), Tweewielers & quads (`tweewielers`), Vervoer & transfers (`vervoer`), Openbaar vervoer (`ov`), Vracht & expeditie (`vracht`)
 - **nonprofit** (1) — RTFoundation (`rtfoundation`)
 - **pharmacy** (1) — Apotheek (`apotheek`)
-- **professional** (2) — Professionele diensten (`professioneel`), Zelfstandig professional (`zzp`)
+- **professional** (3) — Professionele diensten (`professioneel`), Zelfstandig professional (`zzp`), Zelfstandig talent (`talentmens`)
 - **realestate** (1) — Vastgoed & makelaar (`vastgoed`)
 - **retail** (3) — Mode & retail (`retail`), Modehuis & atelier (`modehuis`), Juwelier & horloges (`juwelier`)
 - **safety** (7) — Politie (`politie`), Brandweer (`brandweer`), Ambulance (`ambulance`), Marechaussee (`marechaussee`), Defensie (`defensie`), Special Forces (`specials`), Beveiliging & security (`beveiliging`)

@@ -2,22 +2,17 @@
     // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
     function zeg(wie, tekst){
       if (wie !== 'rahul') return;
-      /* De zin staat er METEEN, niet letter voor letter. Dat typen was mooi
-         bedoeld, maar aan de poort staat iemand die naar binnen wil: die leest
-         sneller dan de machine tikt, en zit dan te wachten op tekst die er al
-         is. De mond beweegt wel gewoon mee -- dat is Rahuls gezicht, geen
-         leesvertraging. */
+      /* De hele zin verschijnt meteen; alleen Rahuls mond blijft bewegen. */
       zin.style.animation = 'none';
       void zin.offsetWidth;              // de fade opnieuw laten lopen
       zin.style.animation = '';
       zin.textContent = tekst;
       praat(Math.min(2600, 500 + tekst.length * 28));
     }
-    /* De ballotage-regalia volgen de metadata van de server: `voortgang`
-       {nr, van} toont de kop en de Romeinse plaatsbepaling, `vertrouwelijk`
-       de kluisregel. Geen metadata (het open gesprek, de inlog, het einde) =
-       alles weer stil. De teksten lopen via T() mee met de taalkiezer. */
+    /* Servermetadata bestuurt stap, teller en kluisregel; zonder metadata
+       keert de poort terug naar haar gewone entree. */
     const kopEl = doos.querySelector('#agKop');
+    const kopLabel = doos.querySelector('#agKopLabel');
     const stappenEl = doos.querySelector('#agStappen');
     const kluisEl = doos.querySelector('#agKluis');
     const ROMEINS = ['I', 'II', 'III', 'IV', 'V', 'VI'];
@@ -25,9 +20,14 @@
       const v = d && d.voortgang;
       const entree = d && (d.entree || d.login) && !d.ingelogd;
       if (v && v.nr && !d.klaar){
-        if (kopEl) kopEl.textContent = T('ag.ballotage','De ballotage');
+        if (kopLabel) kopLabel.textContent = T('ag.ballotage','De ballotage');
+        else if (kopEl) kopEl.textContent = T('ag.ballotage','De ballotage');
+        doos.dataset.stap = String(v.nr).padStart(2, '0');
+        doos.dataset.van = String(v.van || 4).padStart(2, '0');
         if (stappenEl){
           stappenEl.textContent = '';
+          stappenEl.setAttribute('aria-label', T('ag.stap','Stap') + ' ' + v.nr + ' ' +
+            T('ag.van','van') + ' ' + (v.van || 4));
           for (let i = 1; i <= (v.van || 4); i++){
             const s = document.createElement('span');
             s.textContent = ROMEINS[i - 1] || String(i);
@@ -40,11 +40,15 @@
       } else if (entree){
         // het spiegelbeeld voor wie al lid is: dezelfde kopregel-taal,
         // zonder stappen (thuiskomen is geen procedure)
-        if (kopEl) kopEl.textContent = T('ag.entree','De entree');
-        if (stappenEl) stappenEl.textContent = '';
+        if (kopLabel) kopLabel.textContent = T('ag.entree','De entree');
+        else if (kopEl) kopEl.textContent = T('ag.entree','De entree');
+        delete doos.dataset.stap; delete doos.dataset.van;
+        if (stappenEl){ stappenEl.textContent = ''; stappenEl.removeAttribute('aria-label'); }
         doos.classList.add('ag-ballotage');
       } else {
         doos.classList.remove('ag-ballotage');
+        delete doos.dataset.stap; delete doos.dataset.van;
+        if (stappenEl) stappenEl.removeAttribute('aria-label');
       }
       const kluisTekst = d && d.login ? T('ag.kluisdirect','Rechtstreeks naar de kluis, niet door dit gesprek')
         : (d && d.vertrouwelijk ? T('ag.kluis','Versleuteld · rechtstreeks de kluis in') : null);

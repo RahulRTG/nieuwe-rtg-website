@@ -80,6 +80,24 @@
     e.root.addEventListener('click', function (ev) {
       if (media.matches && !menu.contains(ev.target) && vindDeur() && bankOpen()) deur.click();
     }, true);
+    /* In Command is een wereld geen paginawissel maar een werkblad. De witte
+       Edge-laag toont dezelfde vier werelddeuren als op ieder ander scherm;
+       alleen hier dragen we de klik over aan de bestaande Command-deur. Zo
+       blijft de zichtbare route leidend en hoeft de verborgen bank niet als
+       tweede navigatie terug in beeld. */
+    e.root.addEventListener('click', function (ev) {
+      var wereld = ev.target.closest && ev.target.closest('.rtg-edge-smart-worlds a[href]');
+      if (!wereld || !vindDeur()) return;
+      var pad;
+      try { pad = new URL(wereld.getAttribute('href'), venster.location.href).pathname; } catch (fout) { return; }
+      var knop = Array.from(root.querySelectorAll('.cmd-nav button[data-url]')).find(function (b) {
+        try { return new URL(b.dataset.url, venster.location.href).pathname === pad; } catch (fout) { return false; }
+      });
+      if (!knop) return;
+      ev.preventDefault(); ev.stopPropagation();
+      if (indexOpen()) menu.click();
+      knop.click();
+    }, true);
     if (venster.MutationObserver) {
       var boom = new venster.MutationObserver(sync);
       boom.observe(d.body, { childList: true, subtree: true });

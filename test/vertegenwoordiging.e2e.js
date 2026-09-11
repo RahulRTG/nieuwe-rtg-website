@@ -34,6 +34,15 @@
    en hier worden beide partijen juist wél gekeurd zodat er iets te zien is), en
    het intrekken vanaf de kant van de vertegenwoordiger.
 
+   DE MUTATIES (LAT.md regel 2), allebei gedraaid en allebei zag ik ze zakken:
+     - het merk `legt alleen voor` uit het scherm halen        -> punt 2 zakt
+     - `if (M.stand(m) !== 'actief') continue` in de kern naar
+       een kale `continue` (de grens raakt niets dat al loopt) -> punt 5 zakt
+   Die tweede zakte de eerste keer op punt 1 in plaats van op punt 5, terwijl de
+   machine onder een volle toetsronde lag (load 5). Een browsertoets die onder
+   last op de verkeerde stap zakt, bewijst niets over de mutatie; op een rustige
+   machine zakt hij op de wachtlus van punt 5, en pas dat telt.
+
    Draai los: node --test test/vertegenwoordiging.e2e.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');

@@ -295,6 +295,32 @@ de sporter of artiest is een **zaak**, levert iets, en wordt betaald als
 leverancier. Dat is commerciële rugdekking en geen beurs, en het moet ook zo
 heten.
 
+#### 4.3a Wat er sinds 11 september 2026 van staat — en wat met opzet niet
+
+De bevoegdheid is er: **`RUGDEKKING_BEURS`** in
+`kern/bevoegdheid/lijst-afhankelijk.js`, met twee uitgeschreven gezichten en
+`zonderStand: 'gesloten'`. De schakelaar staat in `kern/rugdekking/beurs.js` en
+gaat om op `/api/office/rugdekking/beurs`, op naam — de gedeelde kantoorcode is
+geen naam.
+
+**Het bouwen legde een fout bloot die er al stond.** `kern/bevoegdheid` haalde
+één stand op voor álle afhankelijke vermogens. Dat werkte zolang er maar één
+schakelaar was; met de tweede zou `RUGDEKKING_BEURS` stilletjes de
+terugstortstand lezen — en die twee heten allebei `gesloten` en `open`, dus
+niemand had het gemerkt: de beurs had opengestaan omdat de bank openstond. De
+stand wordt nu per vermogen opgehaald op naam van zijn eigen `hangtAf`.
+
+**En er is nog géén zevende waardeklasse, met de reden.** Een waardeklasse is
+een positie die een mens HOUDT; deze laag verplaatst geen geld en legt alleen de
+afspraak vast. Een klasse waarin nooit iets kan worden bijgeschreven is een lege
+functie, en dit huis zet die niet neer — wat er niet is, staat er met de reden.
+Vóór die klasse er komt, moet de blokkade uit par. 2.3 weg: de RTFoundation
+heeft geen positie om vanaf te betalen (`GIFT.md`). Dat is een besluit van de
+eigenaar en geen tabelregel, precies zoals de kop van deze paragraaf zegt.
+
+Wat er dus vandaag echt kan: **commerciële rugdekking**, volledig, over de
+bestaande leveranciersweg. De beurs staat klaar en dicht.
+
 ### 4.4 De gezondheidsgrens — het lastigste punt, en het antwoord is nee
 
 Red Bull heeft een Athlete Performance Center. De verleiding om dat na te bouwen

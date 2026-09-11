@@ -71,5 +71,20 @@ module.exports = [
     uitleg: 'Machtigingen van mens tot mens: wie mag wat namens een lid, sinds wanneer, tot wanneer, en wat is er ' +
       'namens hem gedaan. Een machtiging versmalt alleen wat het lid zelf al mocht en voegt er nooit iets aan toe; ' +
       'aanvaarden doet het lid zelf en intrekken kan altijd, per direct.',
-    paden: ['/api/vertegenwoordiging'] }
+    paden: ['/api/vertegenwoordiging'] },
+
+  /* RUGDEKKING, en let op WELKE kant hier schakelbaar is: alleen de LEZENDE.
+     Rugdekking toekennen en de beursstand omzetten doen kantoorroutes, en die
+     horen niet aan een functieschakelaar -- dat is de bestuurslaag zelf.
+
+     Wat deze knop uitzet is dus wat een SPORTER over zijn eigen programma ziet.
+     Hij staat aan, en om dezelfde reden als vertegenwoordiging hierboven: een
+     knop die het inzagescherm dichtzet terwijl de programma's gewoon doorlopen,
+     maakt het stiller en niet veiliger. Uitzetten hoort te betekenen dat de
+     functie er niet is, niet dat de mens er niets meer over hoort. */
+  { id: 'rugdekking', categorie: 'Eigen apps', naam: 'Rugdekking (wie staat er achter mij)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Wat een lid ziet van het programma waarmee RTG achter hem staat: welke soort, welk bedrag, tot ' +
+      'wanneer, en wat RTG ervoor terugvraagt. Daaronder staat even groot wat een tegenprestatie NOOIT kan zijn -- ' +
+      'een mening, zwijgen, gezondheid, of exclusiviteit die hem afhankelijk maakt.',
+    paden: ['/api/rugdekking'] }
 ];

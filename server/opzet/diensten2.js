@@ -200,7 +200,11 @@ function contractStandVoor(sess) {
        WEIGEREN). */
     if (!lees || typeof lees.stand !== 'function') return null;
     oordeel = lidpoort.beoordeel(sess.tier, lees.stand(sess.account.id));
-    lidpoort.weeg(kernVoorAuth.handhavingSchaduw, oordeel, sleutel);
+    /* GEEN SLEUTEL MEE. Zie de kop van kern/commercie/lidpoort.js bij `weeg`: een
+       identiteit in die teller is een lijst leden van wie de pas mogelijk vervalt,
+       zonder bewaartermijn, en het lid kan hem niet kwijt. De sleutel hierboven is
+       alleen de geheugenkaart van dit proces en staat nergens op schijf. */
+    lidpoort.weeg(kernVoorAuth.handhavingSchaduw, oordeel);
   } catch (e) { return null; }
 
   if (contractGezien.size >= CONTRACT_DAK) contractGezien.clear();

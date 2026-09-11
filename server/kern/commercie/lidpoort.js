@@ -112,11 +112,35 @@ function beoordeel(tier, contract) {
    regel nooit gaat, en dan zakt `zouTegenhouden / waarnemingen` terwijl er niets
    verbetert.
 
+   ER GAAT GEEN IDENTITEIT IN, EN DAT IS EEN GRENS EN GEEN VERGETELHEID. Deze
+   functie nam eerst een `wie` aan en gaf die door als voorbeeld. Dat leek
+   onschuldig -- ./schaduw.js bewaart voorbeelden juist omdat "120 keer" zonder
+   "van wie, waarop" niet te beoordelen is -- en het was het niet:
+
+   1. wat er dan ontstaat is een LIJST LEDEN VAN WIE DE PAS MOGELIJK VERVALT, in
+      een teller, zonder bewaartermijn. Precies het soort spoor dat
+      scripts/afleidbaar.js meldt.
+   2. en het lid kan hem niet meer kwijt. `test/vergeten-gezelschap.test.js` vond
+      dat ook meteen: na het uitoefenen van het recht op vergetelheid stond de
+      sleutel nog in `schaduwregels`. Die tak hield tot nu toe alleen zaakcodes
+      (../commercie/routepoort.js), dus de bezem kwam er nooit langs.
+
+   De reparatie is NIET de tak vrijstellen en niet de bezem uitbreiden, maar de
+   identiteit niet opslaan: het PRODUCT van deze laag is een getal, en wat een mens
+   nodig heeft om te besluiten of hij de regel aanzet is de STAND -- loopt er geen
+   afspraak, of is er geen gevonden. Die gaat nog steeds mee als `wat`. Er is dus
+   geen `wie`-parameter meer, en dat is met opzet: een ongebruikt argument vult de
+   volgende aanroeper alsnog.
+
+   Wat dat kost, en dat hoort erbij: een mens kan op het bord niet zien of het
+   dezelfde drie leden zijn of driehonderd verschillende. Dat is een bekende prijs
+   voor een getal dat niemand hoeft te vergeten.
+
    ALTIJD `door: true` ZOLANG DE REGEL IN DE SCHADUW STAAT -- dat komt niet uit
    deze functie maar uit ./schaduw.js zelf, waar het structureel is. Hier staat
    alleen dat we het antwoord NIET omzeilen: wat de schaduw teruggeeft is wat de
    aanroeper krijgt. */
-function weeg(schaduw, oordeel, wie) {
+function weeg(schaduw, oordeel) {
   if (!schaduw || !oordeel || oordeel.stand === STAND.NIET_BETALEND)
     return { door: true, gewogen: false, oordeel };
   /* Een lid met een lopende afspraak is een WAARNEMING zonder bezwaar op de regel
@@ -124,7 +148,7 @@ function weeg(schaduw, oordeel, wie) {
      veel of weinig is. Hij telt op de geeindigd-regel, want dat is de regel
      waarvan hij het tegenvoorbeeld is. */
   const id = oordeel.regel || REGEL_VAN[STAND.GEEINDIGD];
-  const w = schaduw.weeg(id, oordeel.bezwaar, { wie: wie || null, wat: oordeel.stand });
+  const w = schaduw.weeg(id, oordeel.bezwaar, { wie: null, wat: oordeel.stand });
   return { door: w.door !== false, gewogen: true, modus: w.modus, regel: id, oordeel };
 }
 

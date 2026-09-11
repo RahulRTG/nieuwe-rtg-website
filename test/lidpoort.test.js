@@ -71,7 +71,7 @@ test('3. in de schaduw gaat IEDEREEN door -- ook wie een bezwaar oplevert', () =
   for (const geval of [C('GEEINDIGD'), null]) {
     const o = poort.beoordeel('rtg', geval);
     assert.ok(o.bezwaar, 'er is wel degelijk een bezwaar');
-    const w = poort.weeg(s, o, 'user-1');
+    const w = poort.weeg(s, o);
     assert.equal(w.door, true, 'en toch gaat hij door -- anders is het geen schaduw');
     assert.equal(w.gewogen, true);
   }
@@ -81,7 +81,7 @@ test('4. een gratis lid wordt NIET geteld', () => {
   const { s, saves } = schaduwOpzet();
   const voor = poort.REGELS.map(r => s.stand(r.id).waarnemingen);
   const saveVoor = saves();
-  const w = poort.weeg(s, poort.beoordeel('guest', null), 'user-gast');
+  const w = poort.weeg(s, poort.beoordeel('guest', null));
   assert.equal(w.gewogen, false, 'een gratis lid wordt niet gewogen');
   assert.deepEqual(poort.REGELS.map(r => s.stand(r.id).waarnemingen), voor,
     'en geen enkele teller bewoog -- anders verdunt hij het deel');
@@ -91,7 +91,7 @@ test('4. een gratis lid wordt NIET geteld', () => {
 test('5. een LOPENDE afspraak telt mee als waarneming zonder bezwaar', () => {
   const { s } = schaduwOpzet();
   const id = poort.REGELS.find(r => r.stand === poort.STAND.GEEINDIGD).id;
-  poort.weeg(s, poort.beoordeel('rtg', C('ACTIEF')), 'user-2');
+  poort.weeg(s, poort.beoordeel('rtg', C('ACTIEF')));
   const na = s.stand(id);
   assert.equal(na.waarnemingen, 1, 'hij is geteld');
   assert.equal(na.zouTegenhouden, 0, 'maar zonder bezwaar -- hij is de noemer');
@@ -102,7 +102,7 @@ test('6. een afgelopen afspraak landt op de geeindigd-regel en nergens anders', 
   const { s } = schaduwOpzet();
   const geeindigd = poort.REGELS.find(r => r.stand === poort.STAND.GEEINDIGD).id;
   const ontbreekt = poort.REGELS.find(r => r.stand === poort.STAND.GEEN_CONTRACT).id;
-  poort.weeg(s, poort.beoordeel('rtg', C('GEEINDIGD', { eindigtOp: '2026-08-01' })), 'user-3');
+  poort.weeg(s, poort.beoordeel('rtg', C('GEEINDIGD', { eindigtOp: '2026-08-01' })));
   assert.equal(s.stand(geeindigd).zouTegenhouden, 1);
   assert.equal(s.stand(ontbreekt).waarnemingen, 0,
     'de ontbreekt-regel heeft hier niets gezien -- de standen sluiten elkaar uit');
@@ -110,7 +110,32 @@ test('6. een afgelopen afspraak landt op de geeindigd-regel en nergens anders', 
     'en het voorbeeld zegt waarom, niet alleen dat');
 });
 
-test('7. geen van de twee regels is vrijgesteld, en geen van de twee is rijp', () => {
+test('7. er komt GEEN identiteit in de schaduwteller', () => {
+  /* DE FOUT DIE DIT VASTZET, en hij is echt gemaakt. `weeg` nam een `wie` aan en
+     gaf die door als voorbeeld aan ./schaduw.js. Wat daar dan ontstaat is een lijst
+     leden van wie de pas mogelijk vervalt -- in een teller, zonder bewaartermijn --
+     en het lid kan hem niet meer kwijt: test/vergeten-gezelschap.test.js zag na het
+     uitoefenen van het recht op vergetelheid de sleutel nog in `schaduwregels`
+     staan. Die tak hield tot dan alleen zaakcodes, dus de bezem kwam er nooit langs.
+
+     Getoetst op de OPSLAG en niet op de aanroep: dat `weeg` geen `wie`-parameter
+     meer heeft is geen bewijs dat er niets in de bak staat. */
+  const { s } = schaduwOpzet();
+  poort.weeg(s, poort.beoordeel('rtg', null));
+  poort.weeg(s, poort.beoordeel('rtg', C('GEEINDIGD', { eindigtOp: '2026-08-01' })));
+  for (const r of poort.REGELS) {
+    for (const v of s.stand(r.id).voorbeelden) {
+      assert.equal(v.wie, null, r.id + ': het voorbeeld draagt geen identiteit');
+      assert.ok(v.wat, 'maar wel de stand -- dat is wat een mens nodig heeft');
+    }
+  }
+  /* En de hele bak mag nergens iets dragen dat op een ledensleutel lijkt. Dit is de
+     bewering die zakt zodra iemand `wie` opnieuw doorgeeft. */
+  const bak = JSON.stringify(poort.REGELS.map(r => s.stand(r.id)));
+  assert.ok(!/user-/.test(bak), 'nergens een ledensleutel in de schaduwbak: ' + bak.slice(0, 200));
+});
+
+test('8. geen van de twee regels is vrijgesteld, en geen van de twee is rijp', () => {
   const { s } = schaduwOpzet();
   for (const r of poort.REGELS) {
     const st = s.stand(r.id);
@@ -124,7 +149,7 @@ test('7. geen van de twee regels is vrijgesteld, en geen van de twee is rijp', (
   }
 });
 
-test('8. twee lagen op dezelfde kop gooien elkaar niet weg', () => {
+test('9. twee lagen op dezelfde kop gooien elkaar niet weg', () => {
   /* DE FOUT DIE HIER ECHT IS GEMAAKT, op 11 september 2026. `RTG-Niet-Afgedwongen`
      wordt nu door twee lagen gezet (het bezitsbewijs en de contractstand), en de
      eerste poging gebruikte `res.append` -- die in server/web/verrijk.js NIET
@@ -177,7 +202,7 @@ async function api(pad, body, token) {
 test.before(async () => { srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } }); base = srv.base; });
 test.after(() => stop(srv));
 
-test('9. een betalend lid ZONDER contract komt gewoon binnen, en wordt geteld', async () => {
+test('10. een betalend lid ZONDER contract komt gewoon binnen, en wordt geteld', async () => {
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   const reg = (await api('/api/auth/register', { name: 'Poort ' + u, email: u + '@x.nl',
     phone: '06' + u.replace(/\D/g, '').padEnd(8, '1').slice(0, 8),
@@ -215,7 +240,7 @@ test('9. een betalend lid ZONDER contract komt gewoon binnen, en wordt geteld', 
   assert.equal(o.rijp.ok, false, 'en hij is niet rijp om af te dwingen');
 });
 
-test('10. een lid MET een lopende afspraak levert geen bezwaar op', async () => {
+test('11. een lid MET een lopende afspraak levert geen bezwaar op', async () => {
   const office = await kantoorAlsPersoon(base, api);
   const u = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
   const reg = (await api('/api/auth/register', { name: 'Loopt ' + u, email: u + '@x.nl',

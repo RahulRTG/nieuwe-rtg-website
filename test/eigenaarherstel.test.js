@@ -54,12 +54,12 @@ test('2. inrichten geeft drie delen en bewaart alleen de verifier', () => {
 });
 
 test('3. een geldig paar levert WACHTTIJD op, geen toegang', () => {
-  const { h, mails, meldingen } = opzet();
+  const { h, mails, meldingen, nu } = opzet();
   const { delen } = h.richtIn();
   const r = h.start(delen[0], delen[1]);
   assert.equal(r.status, 200);
   assert.ok(r.klaarOp, 'er staat een moment waarop het bruikbaar wordt');
-  assert.ok(Date.parse(r.klaarOp) > Date.now() - DAG, 'en dat ligt in de toekomst');
+  assert.ok(Date.parse(r.klaarOp) > nu(), 'en dat ligt volgens dezelfde klok in de toekomst');
   assert.equal(h.herstelvensterOpen(), false, 'starten opent NIETS');
   assert.equal(mails.length, 1, 'en het is luid: er gaat een mail naar de eigenaar');
   assert.equal(mails[0].naar, 'eigenaar@x.nl');

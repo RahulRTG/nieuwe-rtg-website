@@ -82,13 +82,13 @@ test('alle Edge2-assets komen één keer via de centrale gereedbarrière', () =>
   assert.ok(SYSTEM.indexOf("data-rtg-edge-ready', 'true") < SYSTEM.indexOf('/shared/rtg-edge-2-loader.js'),
     'de loader mag pas na het commitpunt van de bestaande Edge starten');
   for (const direct of ['/shared/rtg-edge-2.css', '/shared/rtg-edge-2-context.js',
-    '/shared/rtg-edge-command.js', '/shared/rtg-edge-2.js']) {
+    '/shared/rtg-edge-command.js', '/shared/rtg-edge-2-reveal.js', '/shared/rtg-edge-2.js']) {
     assert.ok(!SYSTEM.includes(direct), 'rtg-edge-system laadt alleen de loader, niet ' + direct);
     assert.equal((LOADER.split(direct).length - 1), 1, direct + ' wordt centraal exact één keer genoemd');
   }
   assert.match(LOADER, /w\.__RTGEdge2Loader/);
-  assert.match(LOADER, /var over = 3, mislukt = false/,
-    'vorm, context en de ene Command-brug delen één parallelle gereedbarrière');
+  assert.match(LOADER, /var over = 4, mislukt = false/,
+    'vorm, context, de Command-brug en reveal delen één parallelle gereedbarrière');
   assert.ok(LOADER.indexOf('/shared/rtg-edge-2.css') < LOADER.indexOf('/shared/rtg-edge-2-context.js'));
   assert.match(LOADER, /if \(--over \|\| mislukt\) return;\s*script\('\/shared\/rtg-edge-2\.js'/,
     'de uitvoerder wordt pas na beide geslaagde parallelle bronnen aangelegd');

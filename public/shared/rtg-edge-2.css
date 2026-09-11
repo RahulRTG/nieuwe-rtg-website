@@ -3,31 +3,46 @@ body[data-rtg-edge-2]{
   --edge2-bg:var(--edge-bg,#080807);--edge2-panel:var(--edge-panel,#0c0c0b);
   --edge2-copy:var(--edge-copy,#f2eee8);--edge2-dim:var(--edge-dim,#898582);
   --edge2-line:var(--edge-line,rgba(255,255,255,.1));--edge2-accent:var(--edge-accent,#7f1634);
-  --edge2-accent-soft:var(--edge-accent-soft,rgba(127,22,52,.15));--edge2-metal:var(--edge-metal,#c0a544)
+  --edge2-accent-soft:var(--edge-accent-soft,rgba(127,22,52,.15));--edge2-metal:var(--edge-metal,#c0a544);
+  --edge-bar-bg:#080807;--edge-bar-copy:#f2eee8;--edge-bar-dim:#aaa5a0;
+  --edge-bar-line:rgba(255,255,255,.14);--edge-bar-accent:#c0a544;
+  --edge-bar-accent-soft:rgba(192,165,68,.16);--edge-bar-metal:#c0a544
 }
 body[data-rtg-edge-2][data-rtg-world="living"]{
   --edge2-bg:var(--rtg-world-bg,#f4f0e8);--edge2-panel:var(--rtg-world-card,#fbf8f2);
   --edge2-copy:var(--rtg-world-ink,#211e19);--edge2-dim:var(--rtg-world-muted,#675f54);
   --edge2-line:var(--rtg-world-line,rgba(33,30,25,.17));--edge2-accent:var(--rtg-world-signature,#7f1634);
-  --edge2-accent-soft:var(--rtg-world-signature-soft,rgba(127,22,52,.1));--edge2-metal:var(--rtg-world-metal,#745718)
+  --edge2-accent-soft:var(--rtg-world-signature-soft,rgba(127,22,52,.1));--edge2-metal:var(--rtg-world-metal,#745718);
+  --edge-bar-bg:#4a0c1e;--edge-bar-copy:#f7f0e6;--edge-bar-dim:#d4c3c5;
+  --edge-bar-line:rgba(247,240,230,.18);--edge-bar-accent:#d0b77b;
+  --edge-bar-accent-soft:rgba(208,183,123,.16);--edge-bar-metal:#d0b77b
 }
 body[data-rtg-edge-2][data-rtg-world="travel"]{
   --edge2-bg:var(--rtg-world-bg,#14090e);--edge2-panel:var(--rtg-world-card,#231016);
   --edge2-copy:var(--rtg-world-ink,#f7f0e6);--edge2-dim:var(--rtg-world-muted,#c2b2aa);
   --edge2-line:var(--rtg-world-line,rgba(247,240,230,.17));--edge2-accent:var(--rtg-world-signature,#a72049);
-  --edge2-accent-soft:var(--rtg-world-signature-soft,rgba(158,28,64,.2));--edge2-metal:var(--rtg-world-metal,#d0b77b)
+  --edge2-accent-soft:var(--rtg-world-signature-soft,rgba(158,28,64,.2));--edge2-metal:var(--rtg-world-metal,#d0b77b);
+  --edge-bar-bg:#1b050b;--edge-bar-copy:#f7f0e6;--edge-bar-dim:#cdbdc0;
+  --edge-bar-line:rgba(247,240,230,.17);--edge-bar-accent:#d0b77b;
+  --edge-bar-accent-soft:rgba(208,183,123,.16);--edge-bar-metal:#d0b77b
 }
 body[data-rtg-edge-2][data-rtg-world="work"]{
   --edge2-bg:var(--rtg-world-bg,#0c1112);--edge2-panel:var(--rtg-world-card,#141b1c);
   --edge2-copy:var(--rtg-world-ink,#f0f2ec);--edge2-dim:var(--rtg-world-muted,#aab6b2);
   --edge2-line:var(--rtg-world-line,rgba(240,242,236,.16));--edge2-accent:var(--rtg-world-signature,#75b8b1);
-  --edge2-accent-soft:var(--rtg-world-signature-soft,rgba(117,184,177,.15));--edge2-metal:var(--rtg-world-metal,#c1a45f)
+  --edge2-accent-soft:var(--rtg-world-signature-soft,rgba(117,184,177,.15));--edge2-metal:var(--rtg-world-metal,#c1a45f);
+  --edge-bar-bg:#101e3f;--edge-bar-copy:#f0f2ec;--edge-bar-dim:#b6c0d2;
+  --edge-bar-line:rgba(240,242,236,.17);--edge-bar-accent:#75b8b1;
+  --edge-bar-accent-soft:rgba(117,184,177,.16);--edge-bar-metal:#c1a45f
 }
 body[data-rtg-edge-2][data-rtg-world="foundation"]{
   --edge2-bg:var(--rtg-world-bg,#071522);--edge2-panel:var(--rtg-world-card,#0b2032);
   --edge2-copy:var(--rtg-world-ink,#f2f2ea);--edge2-dim:var(--rtg-world-muted,#aebccc);
   --edge2-line:var(--rtg-world-line,rgba(242,242,234,.17));--edge2-accent:var(--rtg-world-signature,#d0b66e);
-  --edge2-accent-soft:var(--rtg-world-signature-soft,rgba(208,182,110,.14));--edge2-metal:var(--rtg-world-metal,#d0b66e)
+  --edge2-accent-soft:var(--rtg-world-signature-soft,rgba(208,182,110,.14));--edge2-metal:var(--rtg-world-metal,#d0b66e);
+  --edge-bar-bg:#071522;--edge-bar-copy:#f2f2ea;--edge-bar-dim:#b5c0ca;
+  --edge-bar-line:rgba(242,242,234,.17);--edge-bar-accent:#d0b66e;
+  --edge-bar-accent-soft:rgba(208,182,110,.14);--edge-bar-metal:#d0b66e
 }
 
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-chrome{
@@ -43,17 +58,18 @@ body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom{
   /* De systeemvlakken schilderen Edge, maar mogen geen rechthoekige klikmuur
      boven de app vormen. Alleen de echte knoppen en links krijgen in het
      gedeelde Edge-contract pointer-events:auto. */
-  visibility:visible;pointer-events:none;transition:transform .24s cubic-bezier(.2,.8,.2,1),visibility 0s
+  --edge-bg:var(--edge-bar-bg);--edge-copy:var(--edge-bar-copy);--edge-dim:var(--edge-bar-dim);
+  --edge-line:var(--edge-bar-line);--edge-accent:var(--edge-bar-accent);
+  --edge-accent-soft:var(--edge-bar-accent-soft);--edge-metal:var(--edge-bar-metal);
+  --edge2-copy:var(--edge-bar-copy);--edge2-metal:var(--edge-bar-metal);
+  visibility:visible;pointer-events:none;background:var(--edge-bar-bg)!important;color:var(--edge-bar-copy);
+  border-color:var(--edge-bar-line)!important;
+  transition:transform .24s cubic-bezier(.2,.8,.2,1),visibility 0s
 }
-/* De onderrand is de vaste, lichte bediening van alle werelden. De wereld zelf
-   mag donker, groen of blauw zijn; thuiskomen, teruggaan en Rahul blijven op
-   hetzelfde ivoorkleurige instrument staan. Lokale variabelen houden de rest
-   van Edge in de eigen wereldkleur. */
+/* Boven- en onderrand zijn twee kanten van hetzelfde instrument. Hun materiaal
+   komt uit de actieve wereld; functies en geometrie blijven overal identiek. */
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom{
-  --edge-bg:#f4f0e8;--edge-panel:#fbf8f2;--edge-copy:#211e19;--edge-dim:#70695f;
-  --edge-line:rgba(33,30,25,.16);--edge-accent:#861638;--edge-accent-soft:rgba(134,22,56,.1);
-  --edge-metal:#745718;--edge2-metal:#745718;--edge2-copy:#211e19;border-top-color:var(--edge-line);
-  background:color-mix(in srgb,var(--edge-bg) 97%,transparent);box-shadow:0 -8px 32px rgba(28,21,15,.08)
+  box-shadow:0 -8px 32px rgba(0,0,0,.16)
 }
 .rtg-edge-appslot{display:none;min-width:0;height:var(--edge-bottom);overflow-x:auto;overflow-y:hidden;scrollbar-width:none;pointer-events:auto}
 .rtg-edge-appslot::-webkit-scrollbar{display:none}
@@ -72,7 +88,7 @@ body[data-rtg-edge-appbar="true"] .rtg-edge-ai{grid-column:4;min-width:44px!impo
 }
 .rtg-edge-appslot>nav.rtg-edge-owned-bar{display:flex!important;align-items:stretch!important}
 .rtg-edge-appslot>nav.rtg-edge-owned-bar>a,
-.rtg-edge-appslot>nav.rtg-edge-owned-bar>button{flex:1 0 52px!important;min-width:44px!important;min-height:44px!important;height:var(--edge-bottom)!important;padding:2px 4px!important;border:0!important;border-right:1px solid rgba(33,30,25,.09)!important;border-radius:0!important;background:transparent!important;color:var(--edge-dim)!important;box-shadow:none!important}
+.rtg-edge-appslot>nav.rtg-edge-owned-bar>button{flex:1 0 52px!important;min-width:44px!important;min-height:44px!important;height:var(--edge-bottom)!important;padding:2px 4px!important;border:0!important;border-right:1px solid var(--edge-line)!important;border-radius:0!important;background:transparent!important;color:var(--edge-dim)!important;box-shadow:none!important}
 .rtg-edge-appslot>nav.rtg-edge-owned-bar>:is(a,button).is-actief,
 .rtg-edge-appslot>nav.rtg-edge-owned-bar>:is(a,button)[aria-current]{color:var(--edge-accent)!important;background:var(--edge-accent-soft)!important}
 .rtg-edge-appslot>nav.rtg-edge-owned-bar>:is(a,button) b{color:inherit!important}
@@ -81,7 +97,7 @@ body[data-rtg-edge-appbar="true"] .rtg-edge-ai{grid-column:4;min-width:44px!impo
 .rtg-edge-appslot>.speler.rtg-edge-owned-bar .rij{height:var(--edge-bottom)!important;gap:2px!important}
 .rtg-edge-appslot>.speler.rtg-edge-owned-bar button{min-width:44px!important;width:44px!important;height:44px!important;color:var(--edge-copy)!important}
 .rtg-edge-appslot>.speler.rtg-edge-owned-bar :is(.titel,.sub){color:var(--edge-copy)!important}
-.rtg-edge-appslot>.speler.rtg-edge-owned-bar button.afspeel{background:var(--edge-accent)!important;color:#fff!important}
+.rtg-edge-appslot>.speler.rtg-edge-owned-bar button.afspeel{background:var(--edge-accent)!important;color:#17120d!important}
 body[data-rtg-edge-appbar="true"]:is(.rtg-music-experience,.rtg-media-experience)>.rahul{display:none!important}
 
 /* Het slimme menu heeft twee zichtbare gezichten in dezelfde laag. Op een
@@ -122,38 +138,38 @@ body[data-rtg-edge-appbar="true"]:is(.rtg-music-experience,.rtg-media-experience
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom>button,
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom>a,
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"] .rtg-edge-bottom .rtg-edge-history{
-  border-color:rgba(33,30,25,.09)!important
+  border-color:var(--edge-line)!important
 }
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-top,
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-side,
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="overview"] .rtg-edge-bottom{transform:none!important}
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-edge-top{transform:translateY(-101%)!important;visibility:hidden;pointer-events:none}
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-edge-side{transform:translateX(-101%)!important;visibility:hidden;pointer-events:none}
-body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-edge-bottom{transform:none!important}
+body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-edge-bottom{transform:translateY(101%)!important;visibility:hidden;pointer-events:none}
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-top{transform:translateY(-101%)!important;visibility:hidden;pointer-events:none}
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-side{transform:translateX(-101%)!important;visibility:hidden;pointer-events:none}
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-bottom{transform:translateY(101%)!important;visibility:hidden;pointer-events:none}
-body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"]{padding-top:0!important;padding-left:0!important;padding-bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px))!important}
+body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"]{padding:0!important}
 body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]{padding:0!important}
 body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"]>header:not(.rtg-edge-top),
 body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]>header:not(.rtg-edge-top){top:0!important}
-body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .pda-nav{bottom:0!important}
+body.rtg-edge-host[data-rtg-edge-2-rendered="true"]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"]) .pda-nav{bottom:0!important}
 @media(max-width:999px){
-  body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] #rtgCommand{
+  body.rtg-edge-host[data-rtg-edge-2-rendered="true"]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"]) #rtgCommand{
     /* In de focusstand geeft Edge het hele venster terug (`inset:0`), dus dan
        raakt Command de onderrand WEL en draagt hij de thuisstreep zelf weer.
        Deze selector is specifieker dan die in rtg-edge-system.css, dus hij wint. */
     inset:0!important;padding-top:var(--rtg-command-safe-top,env(safe-area-inset-top,0px))!important;
     --rtg-command-safe-bottom:env(safe-area-inset-bottom,0px)
   }
-  body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] #rtgCommand .cmd-bank{bottom:0!important}
-  body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-laag{inset:0!important}
+  body.rtg-edge-host[data-rtg-edge-2-rendered="true"]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-bank{bottom:0!important}
+  body.rtg-edge-host[data-rtg-edge-2-rendered="true"]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"]) .rtg-laag{inset:0!important}
 }
-body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .pn-shell{height:calc(100dvh - var(--edge-bottom) - env(safe-area-inset-bottom,0px))}
+body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .pn-shell{height:100dvh}
 body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .pn-shell{height:100dvh}
 /* De ruimtelijke werktafel ligt zelf fixed en volgt daarom niet de body-inset.
    Laat haar exact dezelfde zichtbare randen volgen wanneer Edge inklapt. */
-body.rtg-edge-workspace[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-werkruimte{inset:0 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) 0!important}
+body.rtg-edge-workspace[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-werkruimte{inset:0!important}
 body.rtg-edge-workspace[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-werkruimte{inset:0!important}
 
 /* Een zichtbaar modaal venster is tijdelijk het hele werkvlak. Het bestaande
@@ -175,6 +191,16 @@ body[data-rtg-edge-2-rendered="true"][data-rtg-edge-venster-open="true"] .rtg-ed
 .rtg-edge-2-reveal::before{transform:rotate(45deg) translateY(-4px)}
 .rtg-edge-2-reveal::after{transform:rotate(-45deg) translateY(4px)}
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-2-reveal{display:grid}
+
+/* Compact is de automatische leesstand. Twee stille, volledig raakbare
+   schermranden maken zichtbaar dat dezelfde bediening met één tik terugkomt. */
+.rtg-edge-2-edge-reveal{position:fixed;z-index:8811;left:0;display:none;width:100%;height:44px;padding:0;border:0!important;background:transparent!important;color:var(--edge-bar-accent)!important;pointer-events:auto}
+.rtg-edge-2-edge-reveal::after{content:"";position:absolute;left:50%;width:64px;height:2px;background:currentColor;opacity:.72;transform:translateX(-50%)}
+.rtg-edge-2-edge-reveal--top{top:0}.rtg-edge-2-edge-reveal--top::after{top:0}
+.rtg-edge-2-edge-reveal--bottom{bottom:0}.rtg-edge-2-edge-reveal--bottom::after{bottom:0}
+.rtg-edge-2-edge-reveal:focus-visible{outline:2px solid var(--edge-bar-accent)!important;outline-offset:-4px}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] .rtg-edge-2-edge-reveal{display:block}
+body[data-rtg-edge-venster-open="true"] .rtg-edge-2-edge-reveal{display:none!important}
 
 .rtg-edge-2-context-button{min-width:44px!important;min-height:44px!important;flex:0 0 auto;padding:0 10px!important;border:1px solid var(--edge2-line)!important;color:var(--edge2-metal)!important;font-size:10px!important;letter-spacing:.08em;text-transform:uppercase}
 .rtg-edge-2-context-button[aria-expanded="true"]{background:color-mix(in srgb,var(--edge2-accent) 18%,transparent)!important}
@@ -297,8 +323,9 @@ body[data-rtg-edge-2-rendered="true"]>nav.balk[aria-label="Hoofdnavigatie"] a{
 
 /* Focus en een modaal werkvlak trekken ook app-eigen bediening mee. Anders
    zou de Edge-rand verdwijnen terwijl precies dezelfde balk erbuiten bleef. */
-body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]>.wos-dock,
-body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]>nav.balk[aria-label="Hoofdnavigatie"],
+body[data-rtg-edge-2-rendered="true"]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"])>.wos-dock,
+body[data-rtg-edge-2-rendered="true"]:is([data-rtg-edge-2-state="compact"],[data-rtg-edge-2-state="focus"])>nav.balk[aria-label="Hoofdnavigatie"],
+body.rtg-command[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"] #rtgCommand .cmd-balk,
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-venster-open="true"]>.wos-dock,
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-venster-open="true"]>nav.balk[aria-label="Hoofdnavigatie"]{
   transform:translateY(101%)!important;visibility:hidden!important;pointer-events:none!important
@@ -310,7 +337,7 @@ body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="world-shell"][da
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"]>.wk-shell{grid-template-columns:1fr!important;grid-template-rows:1fr!important;height:auto!important}
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"]>.wk-shell>.wk-main{grid-row:1!important;grid-template-rows:1fr!important}
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data-rtg-edge-2-state="overview"]>.wk-shell{inset:calc(var(--rtg-vandaag-werk-kop,0px) + var(--edge-top) + env(safe-area-inset-top,0px)) 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) var(--edge-side)!important}
-body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data-rtg-edge-2-state="compact"]>.wk-shell{inset:var(--rtg-vandaag-werk-kop,0px) 0 calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px)) 0!important}
+body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data-rtg-edge-2-state="compact"]>.wk-shell{inset:var(--rtg-vandaag-werk-kop,0px) 0 0!important}
 body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data-rtg-edge-2-state="focus"]>.wk-shell{inset:var(--rtg-vandaag-werk-kop,0px) 0 0!important}
 @media(max-width:767px){
   .rtg-edge-index:has(.rtg-edge-faces){left:0!important;right:0!important;top:auto!important;bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px))!important;width:100%!important;height:0;max-height:calc(100dvh - var(--edge-bottom) - env(safe-area-inset-bottom,0px));border:0!important;border-top:1px solid transparent!important;border-radius:var(--rtg-radius-system,22px) var(--rtg-radius-system,22px) 0 0;overflow:hidden;box-shadow:none!important;transition:height .3s cubic-bezier(.2,.8,.2,1),border-color .2s,box-shadow .25s}
@@ -423,5 +450,5 @@ body[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-context*="work-bank"][data
   body[data-rtg-edge-2] .rtg-edge-top,body[data-rtg-edge-2] .rtg-edge-side,body[data-rtg-edge-2] .rtg-edge-bottom{transition:none!important}
 }
 @media print{
-  .rtg-edge-2-reveal,.rtg-edge-2-context{display:none!important}
+  .rtg-edge-2-reveal,.rtg-edge-2-edge-reveal,.rtg-edge-2-context{display:none!important}
 }

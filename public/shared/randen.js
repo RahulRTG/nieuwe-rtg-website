@@ -48,10 +48,11 @@
     (d.head || d.documentElement).appendChild(script);
   }
 
-  /* Alle Foundation-schermen laden deze module al. Dat maakt dit de ene,
-     bestaande ingang voor de nieuwe Foundation-rand, zonder tientallen
-     pagina's ieder hun eigen kopie van de navigatie te geven. */
-  function startFoundationEdge() {
+  /* Elk zelfstandig scherm uit de vier werelden bereikt deze ene ingang via
+     basis.js. Zo krijgen alle schermen hetzelfde Edge-casco zonder honderden
+     HTML-kopieen van de boven- en onderbalk. Een embed of projectiescherm houdt
+     uitsluitend de chrome van zijn bovenliggende zelfstandige scherm. */
+  function startPlatformEdge() {
     var pad = w.location.pathname, wereld = null;
     if (pad.indexOf('/apps/foundation/') === 0 || (pad === '/apps/office.html' && new URLSearchParams(w.location.search).get('werk') === 'rtf')) wereld = 'foundation';
     else if (['/apps/leven.html','/apps/geld.html','/apps/maison.html','/apps/table.html','/apps/garderobe.html','/apps/veilig.html'].includes(pad)) wereld = 'living';
@@ -90,7 +91,7 @@
     laad('/shared/rtg-edge-library.js', 'RTGEdgeLibrary', afhankelijk);
     return true;
   }
-  if (startFoundationEdge() && isEmbed) return;
+  if (startPlatformEdge() && isEmbed) return;
 
   var RAND = 24;   // hoe dicht bij de rand een haal mag beginnen
   var HAAL = 40;   // hoeveel pixels de goede kant op voordat hij opengaat

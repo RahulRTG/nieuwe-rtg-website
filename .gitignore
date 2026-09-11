@@ -46,8 +46,12 @@ public/dist/
 # `.routejournaal-vers`. Een journaal is invoer voor een meting en nooit bron,
 # welke naam hij ook draagt.
 .routejournaal*
-# idem voor de schermen: invoer voor scripts/schermen.js, geen bronbestand
-.schermjournaal
+# idem voor de schermen: invoer voor scripts/schermen.js, geen bronbestand.
+# MET DEZELFDE WILDCARD als het routejournaal hierboven, en om precies dezelfde
+# reden: wie een tweede ronde naast de oude wil bewaren verzint een variant
+# (`.schermjournaal-nu`), en die stond hier als ongevolgd bestand in de boom.
+# Bij het routejournaal is die les al een keer geleerd; deze regel liep achter.
+.schermjournaal*
 # de ruwe duurmeting van de laatste ronde: invoer voor scripts/toetsduur.js.
 # Het REGISTER (TOETSDUUR.json) staat wel in de repo -- dat is de weging waar
 # de scherfverdeling op draait; dit is de meting waaruit hij wordt geschreven.

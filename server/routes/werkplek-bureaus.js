@@ -37,9 +37,10 @@ module.exports = (kern, huisAuth) => {
     schrijf: b => [String(b.onderwerp || ''), String(b.rubriek || '')]
   };
 
-  /* De bureaus en wat je er kunt doen: [pad, functie, argvorm, wacht-op-AI].
-     Dit is dezelfde lijst als in routes/kantoren/bureaus.js en ./redactie.js,
-     alleen dan als tabel. */
+  /* De bureaus en wat je er kunt doen: [pad, functie, argvorm]. Dit is dezelfde
+     lijst als in routes/kantoren/bureaus.js en ./redactie.js, alleen dan als
+     tabel. Een vierde veld `wacht-op-AI` stond hier; dat is weg omdat de wikkel
+     hieronder nu altijd wacht. */
   /* De ZES BUREAUS als lijst. Hier stond een tabel BUREAUS met per bureau zijn
      acties, en die tabel voedde twee dingen tegelijk: de route-registratie en
      dit overzicht. De registratie staat nu uitgeschreven (zie hieronder);
@@ -57,14 +58,26 @@ module.exports = (kern, huisAuth) => {
      argumentvorm staan nu bij de route waar ze bij horen. Het werk zelf -- de
      module kiezen, bestaan controleren, argumenten vormen, fouten vangen --
      staat nog steeds op EEN plek. */
-  const doe = (bureau, functie, argvorm, wacht) => async (req, res) => {
+  /* DEZE WIKKEL WACHT ALTIJD, en dat is een reparatie en geen stijlkeuze.
+
+     Hier stond een vierde parameter `wacht`: alleen met `doe(..., true)` werd
+     het antwoord afgewacht. Dat is een opt-in op iets dat je juist niet kunt
+     zien vergeten -- en het ging fout zodra zeven bureaufuncties async werden
+     voor de duurzame verwijdering (kern/kantoorwissen.js). Een Promise gaat dan
+     naar res.json() en serialiseert naar `{}`, met een keurige 200. De lijst na
+     de verwijdering was daarmee verdwenen en de route zei dat het gelukt was.
+
+     `await` op iets dat geen Promise is kost een tick en niets meer. Een vlag
+     die per aanroepplek moet meebewegen met de aard van de functie erachter, is
+     een val die afgaat bij de eerste die er niet aan denkt -- en dat was ik. */
+  const doe = (bureau, functie, argvorm) => async (req, res) => {
     try {
       const mod = kies(req.werkplekCode, bureau);
       if (!mod || typeof mod[functie] !== 'function') {
         return res.status(404).json({ error: 'Dit bureau heeft dit huis niet.' });
       }
       const args = ARG[argvorm](req.body || {});
-      stuur(res, wacht ? await mod[functie](...args) : mod[functie](...args));
+      stuur(res, await mod[functie](...args));
     } catch (e) {
       console.error('[werkplek-bureaus]', bureau, functie, e);
       res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' });
@@ -78,8 +91,8 @@ module.exports = (kern, huisAuth) => {
   app.post('/api/werkplek/bureau/atelier/verwijder', huisAuth, doe('atelier', 'ontwerpVerwijder', 'id'));
   app.post('/api/werkplek/bureau/atelier/collectie', huisAuth, doe('atelier', 'collectieMaak', 'body'));
   app.post('/api/werkplek/bureau/atelier/techpack', huisAuth, doe('atelier', 'aiTechpack', 'id'));
-  app.post('/api/werkplek/bureau/atelier/concept', huisAuth, doe('atelier', 'aiConcept', 'id', true));
-  app.post('/api/werkplek/bureau/atelier/kritiek', huisAuth, doe('atelier', 'aiKritiek', 'idVraag', true));
+  app.post('/api/werkplek/bureau/atelier/concept', huisAuth, doe('atelier', 'aiConcept', 'id'));
+  app.post('/api/werkplek/bureau/atelier/kritiek', huisAuth, doe('atelier', 'aiKritiek', 'idVraag'));
   // studio
   app.post('/api/werkplek/bureau/studio', huisAuth, doe('studio', 'overzicht', 'geen'));
   app.post('/api/werkplek/bureau/studio/maak', huisAuth, doe('studio', 'ontwerpMaak', 'body'));
@@ -88,8 +101,8 @@ module.exports = (kern, huisAuth) => {
   app.post('/api/werkplek/bureau/studio/collectie', huisAuth, doe('studio', 'collectieMaak', 'body'));
   app.post('/api/werkplek/bureau/studio/lookbook', huisAuth, doe('studio', 'lookbook', 'naam'));
   app.post('/api/werkplek/bureau/studio/specsheet', huisAuth, doe('studio', 'aiSpecsheet', 'id'));
-  app.post('/api/werkplek/bureau/studio/concept', huisAuth, doe('studio', 'aiConcept', 'id', true));
-  app.post('/api/werkplek/bureau/studio/kritiek', huisAuth, doe('studio', 'aiKritiek', 'idVraag', true));
+  app.post('/api/werkplek/bureau/studio/concept', huisAuth, doe('studio', 'aiConcept', 'id'));
+  app.post('/api/werkplek/bureau/studio/kritiek', huisAuth, doe('studio', 'aiKritiek', 'idVraag'));
   // hardware
   app.post('/api/werkplek/bureau/hardware', huisAuth, doe('hardware', 'overzicht', 'geen'));
   app.post('/api/werkplek/bureau/hardware/maak', huisAuth, doe('hardware', 'ontwerpMaak', 'body'));
@@ -100,8 +113,8 @@ module.exports = (kern, huisAuth) => {
   app.post('/api/werkplek/bureau/hardware/stuklijst', huisAuth, doe('hardware', 'aiStuklijst', 'id'));
   app.post('/api/werkplek/bureau/hardware/plank', huisAuth, doe('hardware', 'naarWinkel', 'prijs'));
   app.post('/api/werkplek/bureau/hardware/plank-af', huisAuth, doe('hardware', 'uitWinkel', 'id'));
-  app.post('/api/werkplek/bureau/hardware/concept', huisAuth, doe('hardware', 'aiConcept', 'id', true));
-  app.post('/api/werkplek/bureau/hardware/kritiek', huisAuth, doe('hardware', 'aiKritiek', 'idVraag', true));  /* De tweede helft van de bureaus staat in ./werkplek-bureaus-b.js: dit
+  app.post('/api/werkplek/bureau/hardware/concept', huisAuth, doe('hardware', 'aiConcept', 'id'));
+  app.post('/api/werkplek/bureau/hardware/kritiek', huisAuth, doe('hardware', 'aiKritiek', 'idVraag'));  /* De tweede helft van de bureaus staat in ./werkplek-bureaus-b.js: dit
      bestand liep over de 10 kB-grens. De helpers hierboven gaan mee, want ze
      dragen de foutafhandeling van alle bureaus. */
   require('./werkplek-bureaus-b')({ app, db, huisAuth, doe, kies, BUREAUS });

@@ -225,6 +225,15 @@
   .tstSpoor{margin-top:0.6rem;font-size:.78rem;color:var(--soft);}
   .tstVoet{font-size:.74rem;color:var(--soft);line-height:1.6;margin:0.7rem 0 0;border-top:1px solid var(--line);padding-top:0.6rem;}
   .tstMeta{color:var(--soft);font-size:.74rem;}
+  /* De nazorg van het reisbureau (rond, wijziging gevraagd, afzeggen): eigen
+     klassen in plaats van style="..." -- dezelfde reden als hierboven. */
+  .rzKop{margin:1.2rem 0 .4rem;}
+  .rzUitleg{font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .6rem;}
+  .rzTitel{font-size:.9rem;}
+  .rzMeta{font-size:.78rem;color:var(--soft);margin:.15rem 0 .5rem;}
+  .lijst.rzRij{border-top:1px solid var(--line);padding:.7rem 0;}
+  .rzWens{font-size:.78rem;color:var(--soft);margin:-.3rem 0 .5rem;}
+  .veld.rzVeld{flex:1;}
 </style>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
@@ -320,8 +329,8 @@
       <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .6rem;">Een aanvraag heet "aangevraagd" tot u hem bevestigt, en dat is precies wat het lid op zijn scherm leest. Bevestig dus pas als het verblijf, het vervoer en de datum echt rond zijn. Afwijzen kan alleen met een reden, want die reden leest het lid. Onder uw besluit staat uw eigen inlog; die komt uit uw sessie en is niet mee te sturen.</p>
       <div id="kReisOpen"><div class="leeg">Laden...</div></div>
 
-      <h4 style="margin:1.2rem 0 .4rem;">Reizen die rond zijn</h4>
-      <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .6rem;">Een bevestigde reis kan alsnog niet doorgaan. Afzeggen kan alleen met een reden, en die reden leest het lid. Let op: een afzegging <b>verplaatst geen geld</b> -- er loopt geen betaling voor een reis van het reisbureau, dus een aanbetaling, een terugbetaling of annuleringskosten handelt u zelf af.</p>
+      <h4 class="rzKop">Reizen die rond zijn</h4>
+      <p class="stil rzUitleg">Een bevestigde reis kan alsnog niet doorgaan. Afzeggen kan alleen met een reden, en die reden leest het lid. Let op: een afzegging <b>verplaatst geen geld</b> -- er loopt geen betaling voor een reis van het reisbureau, dus een aanbetaling, een terugbetaling of annuleringskosten handelt u zelf af.</p>
       <div id="kReisRond"><div class="leeg">Laden...</div></div>
 
       <h4 style="margin:1.2rem 0 .4rem;">Een reis klaarzetten voor een klant</h4>
@@ -1287,8 +1296,8 @@ async function openKamer(id){
    een archief waar u soms iets in moet. Wie ze door elkaar zet, ziet nooit meer
    in een oogopslag hoeveel werk er ligt. */
 
-const REIS_RIJ_KOP = (a) => '<div style="font-size:.9rem;"><b>'+esc(a.titel||'reis')+'</b> · '+esc(a.bestemming||'')+'</div>'+
-  '<div class="stil" style="font-size:.78rem;color:var(--soft);margin:.15rem 0 .5rem;">'+
+const REIS_RIJ_KOP = (a) => '<div class="rzTitel"><b>'+esc(a.titel||'reis')+'</b> · '+esc(a.bestemming||'')+'</div>'+
+  '<div class="stil rzMeta">'+
     esc(a.ref)+' · '+esc(String(a.personen||1))+' pers · '+(a.vertrek ? 'vertrek '+esc(a.vertrek) : 'datum nog open')+
     ' · '+esc(a.codename||'lid')+(a.prijs ? ' · € '+esc(String(a.prijs.totaal)) : '')+
     (a.notitie ? ' · "'+esc(a.notitie)+'"' : '')+'</div>';
@@ -1314,7 +1323,7 @@ async function laadReisbalie(){
   const bevestigd = alle.filter(a => a.status === 'bevestigd');
 
   const wachtrij = open.map(a =>
-    '<div class="lijst" style="border-top:1px solid var(--line);padding:.7rem 0;">'+
+    '<div class="lijst rzRij">'+
       REIS_RIJ_KOP(a)+
       '<div class="taakrij">'+
         '<input class="veld" style="flex:1;" maxlength="300" data-bericht="'+esc(a.ref)+'" placeholder="Bericht aan het lid (verplicht bij afwijzen)">'+
@@ -1323,11 +1332,11 @@ async function laadReisbalie(){
       '</div>'+
     '</div>').join('')
   + wijzig.map(a =>
-    '<div class="lijst" style="border-top:1px solid var(--line);padding:.7rem 0;">'+
+    '<div class="lijst rzRij">'+
       REIS_RIJ_KOP(a)+
-      '<div class="stil" style="font-size:.78rem;color:var(--soft);margin:-.3rem 0 .5rem;">Wil anders: '+reisWensZin(a)+'</div>'+
+      '<div class="stil rzWens">Wil anders: '+reisWensZin(a)+'</div>'+
       '<div class="taakrij">'+
-        '<input class="veld" style="flex:1;" maxlength="300" data-wbericht="'+esc(a.ref)+'" placeholder="Bericht aan het lid (verplicht bij afwijzen)">'+
+        '<input class="veld rzVeld" maxlength="300" data-wbericht="'+esc(a.ref)+'" placeholder="Bericht aan het lid (verplicht bij afwijzen)">'+
         '<button class="knop" type="button" data-wijziging="toegepast" data-ref="'+esc(a.ref)+'">Voer door</button>'+
         '<button class="knop stil" type="button" data-wijziging="afgewezen" data-ref="'+esc(a.ref)+'">Kan niet</button>'+
       '</div>'+
@@ -1335,10 +1344,10 @@ async function laadReisbalie(){
   el.innerHTML = wachtrij || '<div class="leeg">Geen enkele aanvraag wacht op een besluit.</div>';
 
   if (rond) rond.innerHTML = bevestigd.length ? bevestigd.map(a =>
-    '<div class="lijst" style="border-top:1px solid var(--line);padding:.7rem 0;">'+
+    '<div class="lijst rzRij">'+
       REIS_RIJ_KOP(a)+
       '<div class="taakrij">'+
-        '<input class="veld" style="flex:1;" maxlength="300" data-abericht="'+esc(a.ref)+'" placeholder="Waarom gaat deze reis niet door? (verplicht)">'+
+        '<input class="veld rzVeld" maxlength="300" data-abericht="'+esc(a.ref)+'" placeholder="Waarom gaat deze reis niet door? (verplicht)">'+
         '<button class="knop stil" type="button" data-afzeg="'+esc(a.ref)+'">Zeg af</button>'+
       '</div>'+
     '</div>').join('') : '<div class="leeg">Geen bevestigde reizen.</div>';

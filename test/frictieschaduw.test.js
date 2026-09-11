@@ -34,8 +34,15 @@ const weger = schaduw.maakSchaduw({});
 
 test('1. DE SCHADUW BESLIST NIETS -- getoetst op de bron van kern/stuur.js', () => {
   const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/stuur.js'), 'utf8');
-  const regel = bron.split('\n').find(r => r.includes('frictieschaduw.noteer('));
+  /* De aanroep staat als `schaduw().noteer(` en niet als `frictieschaduw.noteer(`:
+     de module wordt LUI geladen, want een require bovenaan stuur.js verschoof de
+     opstarttiming genoeg om test/ledenschermen.e2e.js te laten zakken. Deze toets
+     zoekt daarom op `.noteer(` en niet op de modulenaam. */
+  const regel = bron.split('\n').find(r => /\.noteer\(/.test(r));
   assert.ok(regel, 'de schaduw wordt niet meer aangeroepen vanuit stuurToets');
+  assert.ok(!/^const frictieschaduw = require/m.test(bron),
+    'de schaduw wordt weer bij het bedraden geladen -- dat verschuift de opstarttiming ' +
+    'en laat ledenschermen.e2e.js zakken; hij hoort lui geladen te blijven');
   assert.ok(/^\s*try\s*\{/.test(regel),
     'de schaduwaanroep staat niet achter een vangnet: een gemiste tel mag nooit een actie weigeren');
   assert.ok(!/beleid\.niveau\s*=[^=]/.test(bron),

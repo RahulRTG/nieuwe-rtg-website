@@ -45,6 +45,22 @@
    waarheid. Komt er een derde schaduw, dan hoort het tellen eruit getrokken te
    worden -- bij twee is dat nog geen laag.
 
+   HIJ WORDT LUI GELADEN, EN DAT IS GEMETEN EN GEEN VOORKEUR. De aanroep in
+   kern/stuur.js staat als `schaduw().noteer(...)` met een require BINNEN de
+   functie. Stond die require bovenaan stuur.js, dan laadde kern/frictie/ bij het
+   BEDRADEN van de server, en dat verschoof de opstarttiming genoeg om
+   test/ledenschermen.e2e.js te laten zakken -- groen op main, rood op deze tak,
+   in CI en lokaal allebei, en met de require eruit weer groen.
+
+   Die toets is daar zelf broos: `toon()` WACHT tot de terugvaltekst
+   "Magnaat Test" verschijnt en legt de paginatekst pas daarna vast, terwijl de
+   pagina die terugval intussen vervangt door de naam van de actieve missie.
+   Elke timingverandering kan hem kantelen, en hij is ook zonder deze module
+   niet altijd groen. Dat is niet hier op te lossen; wat hier wel geldt is dat
+   deze schaduw geen millimeter aan het opstarten hoort te verschuiven -- hij
+   wordt alleen bij een AI-verzoek gebruikt, en een schermtoets komt daar nooit
+   langs. test/frictieschaduw.test.js houdt vast dat de require niet terugkruipt.
+
    TELLERS EN GEEN JOURNAAL, zoals kern/kosten/: voor deze vraag is niet nodig
    wie wat vroeg, alleen hoe vaak. */
 'use strict';

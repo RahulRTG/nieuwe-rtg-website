@@ -8,11 +8,11 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { DatabaseSync } = require('node:sqlite');
 const { haversine } = require('../server/lib/geo');
 const { maakNavigatie } = require('../server/kern/navigatie');
 const { rdNaarWgs } = require('../server/kern/navigatie/nwb-geo');
 const { maakNederlandNet } = require('../server/kern/navigatie/nederland');
+const { bouwPakket } = require('./navigatie-pakket-fixture');
 
 function opzet() {
   const db = { data: {
@@ -164,33 +164,11 @@ test('11. NWB-meetkunde zet het RD-nulpunt aantoonbaar om naar WGS84', () => {
 });
 
 test('12. de compacte Nederlandse graaf snapt, zoekt en respecteert voertuigtoegang', () => {
+  /* Het pakket komt uit test/navigatie-pakket-fixture.js: dezelfde bouwer die
+     de gebiedstoets gebruikt, zodat er niet twee handgeschreven pakketten
+     rondlopen die iets anders bouwen (LAT.md regel 4). */
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-nwb-test-'));
-  const bestand = path.join(map, 'nederland.sqlite'), grafiek = path.join(map, 'nederland-graaf');
-  fs.mkdirSync(grafiek);
-  const db = new DatabaseSync(bestand);
-  db.exec(`CREATE TABLE meta(sleutel TEXT PRIMARY KEY,waarde TEXT);
-    INSERT INTO meta VALUES('wegvakken','2'),('bron','NWB test'),('licentie','CC0 1.0');
-    CREATE TABLE node_seq(idx INTEGER PRIMARY KEY,id INTEGER UNIQUE,lat REAL,lng REAL);
-    INSERT INTO node_seq VALUES(0,100,52.3600,4.8900),(1,101,52.3610,4.9000),(2,102,52.3620,4.9100);
-    CREATE VIRTUAL TABLE node_seq_rtree USING rtree(id,minLng,maxLng,minLat,maxLat);
-    INSERT INTO node_seq_rtree SELECT idx,lng,lng,lat,lat FROM node_seq;
-    CREATE TABLE roads(id INTEGER PRIMARY KEY,lengte REAL,hoofd INTEGER,naam TEXT,ref TEXT,geom BLOB,minLat REAL,maxLat REAL,minLng REAL,maxLng REAL);
-    INSERT INTO roads(id,lengte,hoofd,naam,ref,geom) VALUES(10,700,1,'Testweg','A1',x'00'),(11,700,1,'Testweg','A1',x'00');
-    CREATE VIRTUAL TABLE road_rtree USING rtree(id,minLng,maxLng,minLat,maxLat);
-    CREATE TABLE plaatsen(id INTEGER PRIMARY KEY,naam TEXT,extra TEXT,soort TEXT,lat REAL,lng REAL,gewicht INTEGER);
-    INSERT INTO plaatsen VALUES(1,'Amsterdam','Nederland','woonplaats',52.36,4.89,100);
-    CREATE VIRTUAL TABLE plaatsen_fts USING fts5(naam,extra,content='plaatsen',content_rowid='id');
-    INSERT INTO plaatsen_fts(plaatsen_fts) VALUES('rebuild');`);
-  db.close();
-  const schrijf = (naam, rij) => fs.writeFileSync(path.join(grafiek, naam), Buffer.from(rij.buffer));
-  schrijf('coords.f64', new Float64Array([52.36, 4.89, 52.361, 4.90, 52.362, 4.91]));
-  schrijf('offsets.u32', new Uint32Array([0, 1, 3, 4]));
-  schrijf('doelen.u32', new Uint32Array([1, 0, 2, 1]));
-  schrijf('kosten.f32', new Float32Array([20, 20, 20, 20]));
-  schrijf('lengtes.f32', new Float32Array([700, 700, 700, 700]));
-  schrijf('wegen.u32', new Uint32Array([10, 10, 11, 11]));
-  schrijf('vlaggen.u8', new Uint8Array([15, 15, 15, 15]));
-  fs.writeFileSync(path.join(grafiek, 'graaf.json'), JSON.stringify({ versie: 1, knopen: 3, kanten: 4 }));
+  const { bestand } = bouwPakket({ map });
   const n = maakNederlandNet({ bestand, haversine });
   const van = n.snap({ lat: 52.36, lng: 4.89 }), naar = n.snap({ lat: 52.362, lng: 4.91 });
   const route = n.zoek(van, naar, { modus: 'auto' });

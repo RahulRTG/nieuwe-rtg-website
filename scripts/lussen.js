@@ -108,6 +108,7 @@ const timers = [];
 const parsefouten = [];
 const directRecursief = [];
 const eigenRequires = new Map();
+const rollenPerBestand = new Map();
 /* Mappen waarvan een bestand zijn buren met een schijfscan laadt. De AANNAME is
    dat de gescande map de EIGEN map van de scanner is; dat klopt voor
    spellen/register.js en staat hier als aanname en niet als feit. */
@@ -137,6 +138,8 @@ for (const boom of BOMEN) {
        herstelproef met `geen-herstel` een keer bijna maakte. Vandaar hier de
        boom, waar een commentaar niet in staat. */
     const mijnRequires = [];
+    const rollen = new Map();
+    let heeftComputed = false;
 
     wandel(ast, (n, pad) => {
       /* --- as 1: sleutelwoordlussen --- */
@@ -305,6 +308,31 @@ for (const boom of BOMEN) {
         }
       }
 
+      /* --- de ROLLEN van een naam in DIT bestand, voor de oorzaakvraag verderop.
+         Per bestand en niet over de boom: een naam als `zoek` staat in tientallen
+         bestanden, en een rol die je globaal toeschrijft is geen meting maar een
+         naamgelijkenis -- exact wat AANROEPGRAAF.json met zoveel woorden weigert.
+         Globaal toeschrijven blies FACTORY_RETURN op van 198 naar 426. --- */
+      if (n.type === 'Property' && n.value && n.value.type === 'Identifier' && !pad.some(p => p.type === 'ObjectPattern')) {
+        /* DE DIRECTE OUDER en niet een voorouder: `module.exports = function maak() { ... return { a } }`
+           zet de hele fabriek binnen die toewijzing, en dan noemt een
+           voorouderzoektocht elk object daarbinnen een module.exports-literaal.
+           Dat ging hier drie keer mis op dezelfde manier. */
+        const ouder = pad[pad.length - 1], grootouder = pad[pad.length - 2];
+        const objectOuder = ouder && ouder.type === 'ObjectExpression';
+        const rol = objectOuder && grootouder && grootouder.type === 'AssignmentExpression' && grootouder.right === ouder
+            && grootouder.left && grootouder.left.type === 'MemberExpression' && grootouder.left.object
+            && grootouder.left.object.name === 'module' ? 'MODULE_EXPORTS_OBJECT'
+          : (objectOuder && grootouder && grootouder.type === 'ReturnStatement' ? 'FACTORY_RETURN' : 'STATIC_TABLE');
+        if (!rollen.has(n.value.name)) rollen.set(n.value.name, new Set());
+        rollen.get(n.value.name).add(rol);
+      }
+      if (n.type === 'MemberExpression' && n.computed) heeftComputed = true;
+      if (n.type === 'CallExpression') for (const a of n.arguments || []) if (a && a.type === 'Identifier') {
+        if (!rollen.has(a.name)) rollen.set(a.name, new Set());
+        rollen.get(a.name).add('CALLBACK_ARGUMENT');
+      }
+
       /* --- as 3: directe recursie --- */
       if ((n.type === 'FunctionDeclaration' || n.type === 'FunctionExpression') && n.id && n.id.name) {
         let zelf = false;
@@ -337,6 +365,7 @@ for (const boom of BOMEN) {
       }
     });
     eigenRequires.set(rel, [...new Set(mijnRequires)]);
+    rollenPerBestand.set(rel, { rollen, heeftComputed });
   }
 }
 
@@ -569,6 +598,7 @@ for (const [bestand, lijst] of buitenLaders) for (const doel of lijst) {
   if (!omgekeerdeRequires.has(doel)) omgekeerdeRequires.set(doel, []);
   omgekeerdeRequires.get(doel).push(bestand);
 }
+const kernNamen = new Set((JSON.parse(fs.readFileSync(path.join(WORTEL, 'KERNHERKOMST.json'), 'utf8')).perNaam || []).map(x => x.naam));
 const isProductie = (p) => p.startsWith('server/') || p.startsWith('public/');
 for (const l of perLus) {
   /* DE LEVENDIGHEID, alleen voor wie geen bereikweg heeft. De vraag is hier niet
@@ -607,7 +637,24 @@ for (const l of perLus) {
     const inMapscan = mapscanners.has(path.dirname(l.bestand));
     const laders = omgekeerdeRequires.get(l.bestand) || [];
     const uitProductie = laders.filter(isProductie);
-    if (uitProductie.length) { l.levendigheid = 'bestandLaadtKantOntbreekt'; l.levendigheidGrond = 'het bestand wordt door ' + uitProductie.length + ' productiebestand(en) geladen; er is alleen geen kant naar deze functie'; }
+    if (uitProductie.length) {
+      l.levendigheid = 'bestandLaadtKantOntbreekt';
+      l.levendigheidGrond = 'het bestand wordt door ' + uitProductie.length + ' productiebestand(en) geladen; er is alleen geen kant naar deze functie';
+      /* WELKE CONSTRUCTIE VEROORZAAKT DE ONTBREKENDE KANT. Dit is de vraag die
+         bepaalt welke resolver het meeste koopt, en hij hoort gemeten te worden
+         in plaats van geraden: de verwachting was KERN_TAS, en dat blijkt 4 van
+         de 402. `nietToeTeSchrijven` is met opzet geen mechanisme maar een
+         terugval -- het bestand gebruikt ergens een berekende sleutel, en dan is
+         de naam niet aan een rol te binden. */
+      const rb = rollenPerBestand.get(l.bestand) || { rollen: new Map(), heeftComputed: false };
+      const r = rb.rollen.get(l.symbool) || new Set();
+      l.kantOorzaak = r.has('FACTORY_RETURN') ? 'FACTORY_RETURN'
+        : r.has('MODULE_EXPORTS_OBJECT') ? 'MODULE_EXPORTS_OBJECT'
+        : kernNamen.has(l.symbool) ? 'KERN_TAS'
+        : r.has('CALLBACK_ARGUMENT') ? 'CALLBACK_REGISTRATION'
+        : r.has('STATIC_TABLE') ? 'STATIC_TABLE'
+        : rb.heeftComputed ? 'NIET_TOE_TE_SCHRIJVEN_computed' : 'ONBEKEND';
+    }
     /* ALLEEN DOOR EEN TOETS OF METER GELADEN is een eigen stand en geen halve
        dood. Zo'n bestand LEEFT -- er draait code -- maar niet in het product.
        Dat verschil hoort zichtbaar te zijn: het is de enige bak waaruit ooit
@@ -655,6 +702,7 @@ const uit = {
     lussoortVerdeling: verdeling(perLus, 'lussoort'),
     bereikVerdeling: verdeling(perLus, 'bereikbaarheid'),
     levendigheidVerdeling: verdeling(perLus.filter(l => l.bereikbaarheid === 'onbekend'), 'levendigheid'),
+    kantOorzaakVerdeling: verdeling(perLus.filter(l => l.kantOorzaak), 'kantOorzaak'),
     mapscanners: [...mapscanners].sort(),
     /* DE WERKLIJST ACHTER `onbekend`. Dit getal stuurt welke analysetechniek
        als volgende iets oplevert -- zonder deze uitsplitsing is elke volgende
@@ -758,6 +806,10 @@ for (const [k, v] of Object.entries(g.bereikVerdeling).sort((x, y) => y[1] - x[1
 if (Object.keys(g.levendigheidVerdeling).length) {
   console.log('\n  LEVENDIGHEID (alleen voor wie geen bereikweg heeft)');
   for (const [k, v] of Object.entries(g.levendigheidVerdeling).sort((x, y) => y[1] - x[1])) console.log('    ' + k.padEnd(28), v);
+}
+if (Object.keys(g.kantOorzaakVerdeling).length) {
+  console.log('\n  OORZAAK van de ontbrekende kant (welke resolver koopt het meeste)');
+  for (const [k, v] of Object.entries(g.kantOorzaakVerdeling).sort((x, y) => y[1] - x[1])) console.log('    ' + k.padEnd(32), v);
 }
 console.log('\n  DEKKING (zes, nooit samengevat)');
 for (const k of ['ontdekking', 'identiteit', 'bereikbaarheid', 'indeling', 'bewijsstand', 'bewijskracht'])

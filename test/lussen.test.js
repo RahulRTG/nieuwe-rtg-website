@@ -380,3 +380,24 @@ test('een continue naast een onvoorwaardelijke mutatie wordt gemeld als KAN, nie
   /* En zonder continue hoort hij vals te zijn -- anders meldt de meter hem overal. */
   assert.equal(V.voortgangsanalyse(eersteLus('while (x < 9) { x++; }')).continueKanOverslaan, false);
 });
+
+test('elke ontbrekende kant draagt een OORZAAK uit een gesloten lijst', () => {
+  /* De vraag die bepaalt welke resolver het meeste koopt. Hij hoort gemeten te
+     worden en niet geraden: de verwachting was KERN_TAS, en dat bleek 4 van de
+     402 -- terwijl FACTORY_RETURN er 198 heeft. */
+  const j = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
+  const toegestaan = new Set(['FACTORY_RETURN', 'MODULE_EXPORTS_OBJECT', 'KERN_TAS',
+    'CALLBACK_REGISTRATION', 'STATIC_TABLE', 'NIET_TOE_TE_SCHRIJVEN_computed', 'ONBEKEND']);
+  const fout = new Set();
+  for (const l of j.lussen) {
+    if (l.kantOorzaak && !toegestaan.has(l.kantOorzaak)) fout.add(l.kantOorzaak);
+    /* Een oorzaak hoort ALLEEN te staan waar er een kant ontbreekt. Staat hij
+       ergens anders, dan is het veld een etiket geworden in plaats van een
+       bevinding. */
+    if (l.kantOorzaak && l.levendigheid !== 'bestandLaadtKantOntbreekt')
+      fout.add('oorzaak op een lus met levendigheid ' + l.levendigheid);
+  }
+  assert.deepEqual([...fout], []);
+  assert.ok(Object.keys(j.gemeten.kantOorzaakVerdeling).length > 0,
+    'zonder oorzaakverdeling is "bouw een resolver" een gok in plaats van een keuze');
+});

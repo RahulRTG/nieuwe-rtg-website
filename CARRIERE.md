@@ -203,9 +203,18 @@ voorraden met hun opbouw** — nooit als één getal en nooit als sorteersleutel
 over mensen. `+13 % afgelopen 90 dagen` is precies het getal dat niemand kan
 navertellen; laat het weg en toon wat er in die 90 dagen gebeurd is.
 
-*Let op: deze grens heeft vandaag **geen enkele handhaver** — hij staat in vier
-documenten en in nul toetsen. Wie hem serieus neemt, bouwt hem als toets vóór de
-eerste carrièremeter, niet erna.*
+*Die grens had bij het schrijven van dit document **geen enkele handhaver** — hij
+stond in vier documenten en in nul toetsen. Hij is gebouwd vóór het ledger, zoals
+het hier stond: de woordenlijst woont in `scripts/lib/cijferopmens.js` met per
+woord een reden, en `test/cijferopmens.test.js` legt hem over de hele
+carrièrekant (vertegenwoordiging, rugdekking, carriereledger).*
+
+*Twee dingen daar niet wegpoetsen. De lexicale helft is een **ondergrens**: een
+veld `gewicht: 0.87` op een mens heet geen `score` en komt er ongezien langs,
+dus de graad is `vermoed` en niet `gemeten` — `mensVrij()` is de gedragshelft en
+beide horen te draaien. En toets 1 is een **zelfijking**: een scan die niets KAN
+vinden staat groen om precies dezelfde reden als een scan die niets vindt, en die
+twee zijn van buiten niet te onderscheiden.*
 
 ### 4.2 De fanladder is een trechter, en dat is precies wat LIFE.md verbiedt
 
@@ -315,14 +324,14 @@ kwaliteit mag; lock-in door gijzeling zakt.**
 |---|---|---|
 | 1 | De carrièrelus als werkwoordenlaag (geen objecttype) | **besloten door de meting** — par. 0 |
 | 2 | De uitstaptoets als keuringsregel | **een stap weg** — de vorm staat in `check.js`, het is een regel erbij |
-| 3 | CAR-05 als handhaver vóór de eerste carrièremeter | **staat voor deze laag** — `test/vertegenwoordiging.test.js` 17 en 18; huisbreed nog niet |
+| 3 | CAR-05 als handhaver vóór de eerste carrièremeter | **staat voor de hele carrièrekant** — `scripts/lib/cijferopmens.js` + `test/cijferopmens.test.js`; huisbreed nog niet |
 | 4 | Hoedanigheid + namens-wie + mandaat in de envelop | **een besluit** — de envelop is gesloten op acht; dit is een versiesprong |
 | 5 | Mens-namens-mens mandaat (Representation Kernel) | **staat** — `server/kern/vertegenwoordiging/`, zie par. 6a |
 | 6 | Mandaatsimulator (permissions-diff vóór accepteren) | **staat** — `simulatie.js` plus `/apps/vertegenwoordiging.html` |
 | 7 | Guardian / jeugdbestuur, met eigen inzicht voor de jongere | **staat** — `server/kern/vertegenwoordiging/jeugd.js`, zie par. 6c |
 | 8 | `CAREER_GRANT` met drie soorten rugdekking (direct / beperkt / vrij) | **een besluit** — en `GIFT.md` staat ervóór |
 | 9 | Rights Vault met gebied, kanaal, looptijd en exclusiviteit | **een besluit** — bestaat niet, en de conflictcontrole is de hele waarde |
-| 10 | Career Ledger (chronologisch, bewijsbaar) | **volgt op 4** — de envelop draagt de keten al |
+| 10 | Career Ledger (chronologisch, bewijsbaar) | **staat** — `server/kern/carriereledger/`, zie par. 6d |
 | 11 | Opportunity als één grammatica over vijftien soorten | **meet eerst** — dit is exact dezelfde claim als par. 0, en hij is nog niet gemeten |
 | 12 | Contentherkomst (C2PA) en VC/OpenID4VCI | **sla eerst de standaarden na** — par. 3 |
 | 13 | Agentic Opportunity Exchange | **jaren weg** — par. 4.5, ná de bewijsschuld |
@@ -505,6 +514,85 @@ kind is daar een profiel binnen een gezin zonder eigen account. Een talent met
 een eigen RTG-account is een andere vorm; die twee door elkaar halen zou
 betekenen dat een sporter zijn loopbaan in het gezinsdossier van zijn ouders
 voert.
+
+---
+
+## 6d. Het Career Ledger: de vorm die par. 4.1 overhield
+
+Nummer 10 staat (`server/kern/carriereledger/`, vier bestanden, tien routes,
+achttien unittoetsen en twaalf e2e-toetsen). Hij is de vorm die par. 4.1
+overhield toen de Career Independence Score afviel, en hij is bewust gebouwd
+**ná** de handhaver van CAR-05 en niet ervoor.
+
+**De reeks kent drie soorten regels en geen standen.** Een `feit` (iemand stelt
+dat er iets gebeurd is), een `bevestiging` (iemand anders zegt dat hij het heeft
+gezien of het bevestigt) en een `intrekking`. Er komt uitsluitend bij; niets
+wordt herschreven. `ingetrokken` staat daarom **niet op de regel** maar wordt bij
+het lezen afgeleid — zou een intrekking een vlag zetten, dan was die regel
+herschreven, en een ledger die zijn eigen verleden bijwerkt is een verslag.
+
+**Drie herkomsten, elk met wat zij níét zegt.** `zelf` (dit lid heeft dit
+opgeschreven), `gezien` (een met naam genoemde medewerker van RTG heeft een STUK
+ingezien — niet: het stuk is echt) en `bevestigd` (deze partij heeft het
+bevestigd — niet: die partij is daartoe bevoegd). Dat tweede blok is even groot
+als het eerste en reist mee tot in het antwoord, want een leverancierspak dat
+overal ja zegt is niets waard (`APPSTORE.md`). RTG belt de bond niet en doet niet
+alsof — dezelfde regel als `kern/vakbewijs.js`.
+
+**En ze worden niet samengevat tot een sterkste herkomst.** "gezien door RTG" en
+"bevestigd door bond X" zijn twee verschillende dingen; wie ze tot één waarde
+platslaat, gooit juist weg wat een carrièrefeit bewijsbaar maakt.
+
+**Drie deuren, en dat ÍS de functie.** Het lid schrijft zijn eigen regel
+(`auth`), het kantoor noteert wat het heeft ingezien (`kluisAuth`), een club of
+bond bevestigt vanaf haar eigen zaakaccount (`supplierAuth`). Laat het lid zijn
+eigen regel bevestigen en `gezien` betekent niets. Er is met opzet **geen** route
+waarmee het kantoor of een zaak een heel ledger opent: bevestigen gaat over één
+regel waarvan het lid het nummer aanlevert — "alles over deze mens" stelt
+`HDI.md` par. 5.1 buiten de orde, en dat is hier meteen de reden dat de koppeling
+niet groeit.
+
+**Vier grenzen die niet mogen sneuvelen.**
+
+- **Een bedrag is geen carrièrefeit.** *Dat* er een contract was, is een feit; het
+  bedrag hoort in `WAARDE.md` en `kern/rugdekking`. Een som geld hier zou de
+  tweede boekhouding maken die dit huis nergens wil, en meteen de gevoeligste
+  sorteersleutel op mensen opleveren die er bestaat.
+- **Gezondheid hoort er niet in**, punt — `RUGDEKKING.md` grens 8, en het ledger
+  is juist de plek die een mens DEELT.
+- **De enige orde is de tijd.** Niet op gewicht, niet op aantal bevestigingen,
+  niet op kapitaal; dat zou een ranglijst zijn met een andere naam.
+- **Een voornemen is geen prestatie.** Een datum in de toekomst wordt geweigerd.
+
+**De zeven kapitalen uit punt 30 staan er als zeven aparte voorraden met hun
+opbouw**, en met opzet zonder totaal en zonder percentage. Dat ene getal is
+precies wat niemand kan navertellen, en het is ook het enige wat een lezer zou
+verleiden twee mensen naast elkaar te leggen.
+
+**Eén regel bewijzen zonder het dossier te openen** is waarom dit
+platformvermogen is en geen domeinfunctie. Een deelcode (`kern/bearercode.js`,
+128 bits, alleen als hash op schijf) opent één feit met zijn bevestigingen — niet
+het kapitaal waar het bij hoort, niet hoeveel regels er nog meer zijn, en niet
+welke voorraden leeg zijn, want ook een lege voorraad is een mededeling over een
+mens. De code verloopt (standaard dertig dagen, maximaal een jaar), het lid kan
+hem stoppen, en een **ingetrokken feit wordt getoond als ingetrokken** in plaats
+van stil op 404 te gaan: een sponsor die gisteren een titel zag en vandaag niets
+vindt, denkt aan een storing.
+
+**Wat de dubbeltikronde vond, en het was twee keer dezelfde fout.** `zet` liet na
+twee identieke aanroepen twee feiten achter (0 → 2), `bevestig` twee identieke
+bevestigingen. In een ledger weegt dat zwaarder dan elders, want een regel kan
+alleen worden ingetrokken en nooit verdwijnen — een dubbeltik vervuilt voorgoed,
+en juist de lijst die een mens naar buiten toont. Het is gerepareerd als
+**toestandscontrole** en niet als duplicaatlaag; wijk ergens van af (ander woord,
+andere dag) en het is een ander feit dat gewoon doorgaat, en een *ingetrokken*
+regel opnieuw zetten is een correctie die moet kunnen.
+
+**Wat er nog niet is, met de reden.** Een zaak kan een regel bevestigen en haar
+eigen bevestiging terugnemen, maar er is geen weg waarlangs zij er zelf één
+*voorstelt* — dan zou een club ongevraagd in het ledger van een oud-speler kunnen
+schrijven, en dat is de trechter uit par. 4.2 in een andere vorm. Het lid schrijft,
+een ander bevestigt; die volgorde is de grens.
 
 ---
 

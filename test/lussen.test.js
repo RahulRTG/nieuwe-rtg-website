@@ -281,3 +281,56 @@ test('de zes dekkingen staan apart, en vijf ervan zijn beloften over volledighei
   assert.ok(j.dekking.bewijskracht < 100, 'bewijskracht op 100 betekent dat een stand als bewijs is geteld');
   assert.ok(!('totaal' in j.dekking) && !('samengesteld' in j.dekking), 'de zes dekkingen worden nooit samengevat tot een getal');
 });
+
+/* --------------------------------------------------------------------------
+   DE LEVENDIGHEID. De vraag onder de bereikbaarheid: bestaat er uberhaupt een
+   aanroeper? Negatief bewijs is hier veel sterker dan een ontbrekende kant --
+   "de graaf kent hem niet" zegt iets over de graaf, "niemand laadt dit bestand"
+   zegt iets over de code.
+
+   Deze toetsen bewaken vooral dat de bak `aantoonbaarDood` niet te makkelijk
+   gevuld wordt. Een verdict is een BESCHULDIGING: een bak die levende bestanden
+   dood noemt, is erger dan geen bak. Dat is hier twee keer bijna misgegaan --
+   een keer doordat de requiregraaf scripts/ niet las, en een keer doordat een
+   fabriek die `return { installeer, ... }` doet niet als export telde. */
+
+test('elke onbereikbare lus draagt een levendigheidsoordeel met grond', () => {
+  const j = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
+  const zonder = [];
+  for (const l of j.lussen) {
+    if (l.bereikbaarheid !== 'onbekend') continue;
+    if (!l.levendigheid) zonder.push(l.id + ' mist levendigheid');
+    else if (!l.levendigheidGrond) zonder.push(l.id + ' mist levendigheidGrond');
+    if (zonder.length > 5) break;
+  }
+  assert.deepEqual(zonder, [], 'onbereikbaar zonder levendigheidsoordeel is een gat met een nette naam');
+});
+
+test('levendigheid komt uit een gesloten lijst, en een bereikbare lus draagt nietVanToepassing', () => {
+  const j = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
+  const toegestaan = ['bestandLaadtKantOntbreekt', 'alleenDoorToetsOfMeter', 'nietVastTeStellen', 'aantoonbaarDood', 'nietVanToepassing'];
+  const fout = new Set();
+  for (const l of j.lussen) {
+    if (l.levendigheid && !toegestaan.includes(l.levendigheid)) fout.add('waarde: ' + l.levendigheid);
+    if (l.bereikbaarheid !== 'onbekend' && l.levendigheid !== 'nietVanToepassing')
+      fout.add('een lus met bereikweg ' + l.bereikbaarheid + ' draagt levendigheid ' + l.levendigheid);
+  }
+  assert.deepEqual([...fout], []);
+});
+
+test('een bestand dat alleen een meter of toets laadt, heet niet dood', () => {
+  /* server/kern/handlerpoorten/index.js wordt door scripts/mutatiecontract.js
+     gerequired en door niets in server/. De eerste versie noemde hem
+     AANTOONBAAR DOOD, omdat de requiregraaf alleen over server/ en public/ liep.
+     Een lader is een lader, ook als hij in scripts/ woont. */
+  const j = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
+  const dood = j.lussen.filter(l => l.levendigheid === 'aantoonbaarDood');
+  for (const l of dood)
+    assert.ok(/geen enkel bestand laadt dit bestand/.test(l.levendigheidGrond || ''),
+      'dood verklaren mag alleen op die grond, en hier staat: ' + l.levendigheidGrond);
+  /* En de bak eronder moet bestaan zolang er iets in zit -- anders is het
+     onderscheid weggevallen en telt "alleen door een toets geladen" weer als
+     productiecode. */
+  const verdeling = j.gemeten.levendigheidVerdeling;
+  assert.ok(Object.keys(verdeling).length > 0, 'zonder levendigheidsverdeling is de bak niet na te lopen');
+});

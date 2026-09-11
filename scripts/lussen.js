@@ -108,6 +108,10 @@ const timers = [];
 const parsefouten = [];
 const directRecursief = [];
 const eigenRequires = new Map();
+/* Mappen waarvan een bestand zijn buren met een schijfscan laadt. De AANNAME is
+   dat de gescande map de EIGEN map van de scanner is; dat klopt voor
+   spellen/register.js en staat hier als aanname en niet als feit. */
+const mapscanners = new Set();
 let bestandenGelezen = 0, bundeldelen = 0;
 
 for (const boom of BOMEN) {
@@ -237,6 +241,41 @@ for (const boom of BOMEN) {
         });
       }
 
+      /* TWEE LAADPATRONEN DIE EEN LETTERLIJKE require NIET ZIET, en allebei
+         gevonden doordat zeven bestanden ten onrechte als "door niemand
+         gerequired" uit de meting kwamen:
+
+           for (const naam of ['kassa', 'budget', ...])       kern/pay/index.js:148
+             Object.assign(api, require('./' + naam)(ctx));
+
+           fs.readdirSync(map) ... require(path.join(map, naam))   spellen/register.js
+
+         De eerste is WEL statisch op te lossen -- de namen staan in een
+         letterlijke rij, drie regels hoger. De tweede niet: welke bestanden
+         die lus laadt, staat op schijf en niet in de bron. Daarom wordt de
+         eerste een echte kant en de tweede alleen een MARKERING op de map.
+         Wie die twee samenvoegt, doet alsof hij weet wat hij niet weet. */
+      if (n.type === 'CallExpression' && n.callee && n.callee.name === 'require'
+          && (n.arguments || [])[0] && n.arguments[0].type === 'BinaryExpression' && n.arguments[0].operator === '+'
+          && n.arguments[0].left && n.arguments[0].left.type === 'Literal' && n.arguments[0].left.kind === 'string'
+          && n.arguments[0].right && n.arguments[0].right.type === 'Identifier') {
+        const voorvoegsel = n.arguments[0].left.raw.slice(1, -1);
+        const lusnaam = n.arguments[0].right.name;
+        for (const p of pad) {
+          if (p.type !== 'ForOfStatement' || !p.right || p.right.type !== 'ArrayExpression') continue;
+          const d = p.left && p.left.declarations && p.left.declarations[0];
+          if (!d || !d.id || d.id.name !== lusnaam) continue;
+          for (const el of p.right.elements || []) {
+            if (!el || el.type !== 'Literal' || el.kind !== 'string') continue;
+            let q = path.normalize(path.join(path.dirname(rel), voorvoegsel + el.raw.slice(1, -1)));
+            if (!q.endsWith('.js')) q += '.js';
+            if (fs.existsSync(path.join(WORTEL, q))) mijnRequires.push(q);
+          }
+        }
+      }
+      if (n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression'
+          && n.callee.property && n.callee.property.name === 'readdirSync') mapscanners.add(path.dirname(rel));
+
       if (n.type === 'CallExpression' && n.callee && n.callee.name === 'require'
           && (n.arguments || [])[0] && n.arguments[0].type === 'Literal' && n.arguments[0].kind === 'string') {
         const doel = n.arguments[0].raw.slice(1, -1);
@@ -334,6 +373,14 @@ for (const r of aanroepgraaf.routeNaarSymbool) {
     symbNaarRoutes.get(s).push(r.route);
   }
 }
+/* Wie laadt wie -- de omgekeerde kant van eigenRequires, nodig voor de
+   levendigheidsvraag hieronder. */
+const omgekeerdeRequires = new Map();
+for (const [bestand, lijst] of eigenRequires) for (const doel of lijst) {
+  if (!omgekeerdeRequires.has(doel)) omgekeerdeRequires.set(doel, []);
+  omgekeerdeRequires.get(doel).push(bestand);
+}
+
 const RANG = { bewezen: 4, verschaald: 3, verzwakt: 2, geschorst: 1, ongemeten: 0 };
 
 /* BEREIKBAARHEID, want een directe treffer is bijna nooit de plek waar de lus
@@ -464,15 +511,94 @@ for (const l of perLus) {
    wordt nooit bij het andere opgeteld: een hangende lus in een meter is een
    hangende CI, geen hangende gebruiker. */
 const buitenIndex = {};
+const buitenLaders = new Map();   // bestand in scripts/ of test/ -> wat het laadt
 for (const boom of BUITEN_INDEX) {
   let n = 0, bestandenN = 0;
   for (const rel of bestanden(boom)) {
     let ast;
     try { ast = parse(fs.readFileSync(path.join(WORTEL, rel), 'utf8')); } catch (e) { continue; }
     bestandenN++;
-    wandel(ast, k => { if (LUSKNOPEN.has(k.type)) n++; });
+    /* OOK HIER DE REQUIRES, en dat is geen bijvangst maar een reparatie. De
+       eerste versie bouwde de requiregraaf alleen over server/ en public/, en
+       noemde daardoor server/kern/handlerpoorten/index.js AANTOONBAAR DOOD --
+       terwijl scripts/mutatiecontract.js hem gewoon requiret. Een lader is een
+       lader, ook als hij in scripts/ of test/ woont. */
+    const buitenRequires = [];
+    wandel(ast, (k) => {
+      if (LUSKNOPEN.has(k.type)) n++;
+      if (k.type !== 'CallExpression' || !k.callee || k.callee.name !== 'require') return;
+      const a = (k.arguments || [])[0];
+      if (!a || a.type !== 'Literal' || a.kind !== 'string') return;
+      const doel = a.raw.slice(1, -1);
+      if (!doel.startsWith('.')) return;
+      let q = path.normalize(path.join(path.dirname(rel), doel));
+      if (!q.endsWith('.js')) q += '.js';
+      if (fs.existsSync(path.join(WORTEL, q))) buitenRequires.push(q);
+      else { const idx = q.replace(/\.js$/, '/index.js'); if (fs.existsSync(path.join(WORTEL, idx))) buitenRequires.push(idx); }
+    });
+    buitenLaders.set(rel, [...new Set(buitenRequires)]);
   }
   buitenIndex[boom] = { bestanden: bestandenN, sleutelwoordlussen: n };
+}
+
+/* ---------------------------------------------------------------------------
+   DE LEVENDIGHEIDSPAS. Staat hier en niet in de lus hierboven, want hij heeft
+   de laders uit scripts/ en test/ nodig en die worden pas bij de buitenindex
+   gelezen. Een pas die draait voordat zijn invoer bestaat, geeft een antwoord
+   dat er normaal uitziet -- dat is precies hoe hier vier levende bestanden
+   doodverklaard werden. */
+for (const [bestand, lijst] of buitenLaders) for (const doel of lijst) {
+  if (!omgekeerdeRequires.has(doel)) omgekeerdeRequires.set(doel, []);
+  omgekeerdeRequires.get(doel).push(bestand);
+}
+const isProductie = (p) => p.startsWith('server/') || p.startsWith('public/');
+for (const l of perLus) {
+  /* DE LEVENDIGHEID, alleen voor wie geen bereikweg heeft. De vraag is hier niet
+     "wie roept dit aan" maar de goedkopere ervoor: BESTAAT er uberhaupt een
+     aanroeper. Een negatief bewijs is namelijk veel sterker dan een ontbrekende
+     kant -- "de graaf kent hem niet" zegt iets over de graaf, "niemand laadt dit
+     bestand" zegt iets over de code.
+
+     DRIE BAKKEN, en de middelste is met opzet bijna leeg:
+
+       bestandLaadtKantOntbreekt  het bestand wordt geladen; er is alleen geen
+                                  kant naar DEZE functie. Niet dood, en ook niet
+                                  bewezen bereikbaar.
+       aantoonbaarDood            niets laadt dit bestand, langs geen enkele weg.
+       nietVastTeStellen          een dynamische lader KAN erbij, maar welke
+                                  bestanden hij pakt staat op schijf.
+
+     WAAROM `aantoonbaarDood` VANDAAG OP NUL STAAT EN DAT GEEN TEKORT IS. De
+     goedkope falsificatie is gedraaid en zij is MISLUKT, en dat is een
+     uitkomst: van de 271 bestanden achter de onbereikbare lussen worden er 264
+     gewoon gerequired en de laatste zeven langs de twee laadpatronen hierboven.
+     Er valt hier dus niets weg te strepen -- de hoop dat een deel van deze
+     populatie dode code zou zijn, is weerlegd in plaats van bevestigd.
+
+     EN DE SCHERPERE VRAAG (is deze FUNCTIE dood) kan dit huis vandaag niet
+     stellen. Een eerste poging vond 43 functies die niet geexporteerd leken en
+     nergens werden aangeroepen; met de hand nagekeken bleek de eerste,
+     kern/appstore/winkel.js#installeer, gewoon op regel 130 te staan in
+     `return { catalogus, installeer, ... }` -- geexporteerd via een FABRIEK,
+     en SYMBOLEN.json volgt alleen `module.exports`. Dat is exact de val die
+     CODE.md par. 0.3 beschrijft. Een bak die 43 levende functies dood noemt, is
+     erger dan geen bak; wat eerst gerepareerd moet worden is het uitvoermodel,
+     niet de aanroepgraaf. */
+  if (l.bereikbaarheid === 'onbekend') {
+    const geladen = (omgekeerdeRequires.get(l.bestand) || []).length > 0;
+    const inMapscan = mapscanners.has(path.dirname(l.bestand));
+    const laders = omgekeerdeRequires.get(l.bestand) || [];
+    const uitProductie = laders.filter(isProductie);
+    if (uitProductie.length) { l.levendigheid = 'bestandLaadtKantOntbreekt'; l.levendigheidGrond = 'het bestand wordt door ' + uitProductie.length + ' productiebestand(en) geladen; er is alleen geen kant naar deze functie'; }
+    /* ALLEEN DOOR EEN TOETS OF METER GELADEN is een eigen stand en geen halve
+       dood. Zo'n bestand LEEFT -- er draait code -- maar niet in het product.
+       Dat verschil hoort zichtbaar te zijn: het is de enige bak waaruit ooit
+       een opruimbesluit kan volgen. */
+    else if (laders.length) { l.levendigheid = 'alleenDoorToetsOfMeter'; l.levendigheidGrond = 'alleen ' + laders.slice(0, 3).join(', ') + ' laadt dit bestand -- geen enkel bestand in server/ of public/'; }
+    else if (inMapscan) { l.levendigheid = 'nietVastTeStellen'; l.levendigheidGrond = 'een bestand in deze map laadt zijn buren met een schijfscan; welke dat zijn staat niet in de bron'; }
+    else { l.levendigheid = 'aantoonbaarDood'; l.levendigheidGrond = 'geen enkel bestand laadt dit bestand, en er is geen dynamische lader die erbij kan'; }
+  } else { l.levendigheid = 'nietVanToepassing'; l.levendigheidGrond = null; }
+
 }
 
 const verdeling = (rijen, veld) => rijen.reduce((m, x) => { m[x[veld]] = (m[x[veld]] || 0) + 1; return m; }, {});
@@ -510,6 +636,8 @@ const uit = {
     domeinVerdeling: verdeling(perLus, 'domein'),
     lussoortVerdeling: verdeling(perLus, 'lussoort'),
     bereikVerdeling: verdeling(perLus, 'bereikbaarheid'),
+    levendigheidVerdeling: verdeling(perLus.filter(l => l.bereikbaarheid === 'onbekend'), 'levendigheid'),
+    mapscanners: [...mapscanners].sort(),
     /* DE WERKLIJST ACHTER `onbekend`. Dit getal stuurt welke analysetechniek
        als volgende iets oplevert -- zonder deze uitsplitsing is elke volgende
        investering een gok. */
@@ -609,6 +737,10 @@ console.log('\n  TERMINATIE');
 for (const [k, v] of Object.entries(g.terminatieVerdeling).sort((x, y) => y[1] - x[1])) console.log('    ' + k.padEnd(24), v);
 console.log('\n  BEREIKBAARHEID -- langs welke weg');
 for (const [k, v] of Object.entries(g.bereikVerdeling).sort((x, y) => y[1] - x[1])) console.log('    ' + k.padEnd(24), v);
+if (Object.keys(g.levendigheidVerdeling).length) {
+  console.log('\n  LEVENDIGHEID (alleen voor wie geen bereikweg heeft)');
+  for (const [k, v] of Object.entries(g.levendigheidVerdeling).sort((x, y) => y[1] - x[1])) console.log('    ' + k.padEnd(28), v);
+}
 console.log('\n  DEKKING (zes, nooit samengevat)');
 for (const k of ['ontdekking', 'identiteit', 'bereikbaarheid', 'indeling', 'bewijsstand', 'bewijskracht'])
   /* 100% bereikbaarheid betekent dat elke lus een STAND draagt, niet dat van elke

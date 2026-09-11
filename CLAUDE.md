@@ -702,7 +702,7 @@ gestandaardiseerde capabilities". Lees die vóór je een capability, een woorden
 met rechten of een nieuwe laag toevoegt. De eerste wet van de opzet — *Everything
 is a Capability* — is er eerst **gemeten** in plaats van aangenomen
 (`scripts/capabilityroepers.js`, `CAPABILITEIT.json`), en de uitkomst is streng: er is
-geen capabilitylaag in deze code, er zijn er **<!--getal:capabiliteit.lijsten-->21<!--/getal-->** met <!--getal:capabiliteit.leden-->250<!--/getal--> leden,
+geen capabilitylaag in deze code, er zijn er **<!--getal:capabiliteit.lijsten-->21<!--/getal-->** met <!--getal:capabiliteit.leden-->248<!--/getal--> leden,
 91% van de leden woont in precies één lijst en geen twee lijsten lijken op elkaar. Twee bestanden dragen
 allebei een `VERMOGENS` met nul gedeelde leden — de les van het gedeelde
 routevoorvoegsel, nu op een woord. Daaruit volgt de grens die het document

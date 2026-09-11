@@ -2373,6 +2373,14 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "factuurbevroren.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/lid/facturen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "factuursaldo.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4099,6 +4107,21 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "lidabonnement-deur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "lidabonnement.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/commercie/contract.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 1
+    },
     "lidboard.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4120,6 +4143,13 @@
       "operator": "===->!==#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "lidpoort.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "liegpoort.test.js": {
       "soort": "puur",

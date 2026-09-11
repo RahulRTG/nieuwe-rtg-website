@@ -1498,7 +1498,7 @@ niets"; en de <!--getal:schermgedrag.zonderGrond-->137<!--/getal--> schermen waa
 in maar tellen niet als dekking (`zonderUitspraak`) -- anders stijgt een
 dekkingsgetal doordat er een meter bij komt die zwijgt. Die meter begon
 op 118 "dode paden" en eindigde op <!--getal:schermroutes.dood-->0<!--/getal-->; de aanroepgraaf begon op 587 onbekende
-doelen en eindigde op <!--getal:graaf.doelOnbekend-->1<!--/getal-->, en in beide gevallen zat de fout in de METER en niet
+doelen en eindigde op <!--getal:graaf.doelOnbekend-->0<!--/getal-->, en in beide gevallen zat de fout in de METER en niet
 in de code. Wat ertussen zat zijn regels die overal gelden -- een pad kan VERDERGAAN (`'/api/agenda/' + id`),
 een pad kan een GEGEVEN zijn in plaats van een doel (in een `.replace()`), en
 vindbaar zijn is niet hetzelfde als BESTAAN (een route zonder vindbaar bestand

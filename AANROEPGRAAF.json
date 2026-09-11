@@ -3,7 +3,7 @@
  "uitleg": "De symbool-naar-symboolgraaf van server/: welke functie roept welke functie aan. Elke kant draagt HOE hij is afgeleid (lokaal, ingevoerd, lid). Wat niet af te leiden viel staat als onopgelost in de uitslag, met aantallen -- niet weggelaten.",
  "stempel": {
   "op": "2026-09-11",
-  "commit": "0dbfdb83"
+  "commit": "79cb13ba"
  },
  "grens": "Liever geen kant dan een verzonnen kant. Er wordt geen kant gelegd op naamgelijkenis alleen: een aanroep telt pas als de naam lokaal bestaat of aantoonbaar uit een require komt, EN het doelbestand dat symbool ook echt kent.",
  "gemeten": {
@@ -33,7 +33,8 @@
    "overig": 398
   },
   "opgelostPct": 25.9,
-  "doelOnbekend": 1,
+  "doelOnbekend": 0,
+  "optioneelGeguard": 1,
   "doelNietVastTeStellen": 60,
   "symbolenMetAanroeper": 9347,
   "routesMetSymbool": 3087,
@@ -26633,11 +26634,11 @@
    ]
   }
  ],
- "doelOnbekend": [
+ "doelOnbekend": [],
+ "optioneelGeguard": [
   {
    "van": "server/accounts/transactie.js#begin",
    "naar": "server/db/verzoekcontext.js#registreerDeelnemer",
-   "hoe": "lid",
    "lijn": 128
   }
  ],

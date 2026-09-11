@@ -251,7 +251,7 @@ Wat er nu nog staat is wat ook dan niet te volgen is.
 
 #### Vier fouten die deze meter in zichzelf vond
 
-`doelOnbekend` staat op <!--getal:graaf.doelOnbekend-->1<!--/getal-->, maar begon op 587. Geen van die 587 was een
+`doelOnbekend` staat op <!--getal:graaf.doelOnbekend-->0<!--/getal-->, maar begon op 587. Geen van die 587 was een
 fout in de code; alle vier de oorzaken zaten in de meter, en alle vier zijn het
 lessen die elders net zo gelden:
 
@@ -272,7 +272,7 @@ lessen die elders net zo gelden:
    of lokale verklaring zijn, vallen daarom uit de bindingen. Grof, en met
    opzet.
 
-Wat na die vier overblijft is <!--getal:graaf.doelOnbekend-->1<!--/getal-->. Dat is hier geen lege controle: <!--getal:graaf.kanten-->25868<!--/getal-->
+Wat na die vier overblijft is <!--getal:graaf.doelOnbekend-->0<!--/getal-->. Dat is hier geen lege controle: <!--getal:graaf.kanten-->25868<!--/getal-->
 kanten zijn tegen de symbooltabel van hun doelbestand gehouden.
 
 #### Een derde teller, omdat twee er niet genoeg waren
@@ -532,7 +532,7 @@ En één fout van de verbetering zelf: de nieuwe kanten wijzen bewust alleen een
 **bestand** aan (bij `log.warn` is de methode daar geen symbool). Die liepen
 eerst door de bestaanscontrole en produceerden **303 "bevindingen"** — de meter
 beschuldigde de code van een ontbrekend symbool dat hij zelf niet had ingevuld.
-`doelOnbekend` staat weer op <!--getal:graaf.doelOnbekend-->1<!--/getal-->.
+`doelOnbekend` staat weer op <!--getal:graaf.doelOnbekend-->0<!--/getal-->.
 
 Eindstand van de graaf na §0.7 en §0.8: <!--getal:graaf.kanten-->25868<!--/getal--> kanten,
 <!--getal:graaf.opgelostPct-->25.9<!--/getal-->% herleid, <!--getal:graaf.routesMetSymbool-->3087<!--/getal--> routes met een symbool.
@@ -840,7 +840,7 @@ En twee dingen die hier horen te blijven staan, allebei omdat ze iets zeggen ove
 wat een register waard is:
 
 - De meetronde van §0.3 vond <!--getal:schermroutes.dood-->0<!--/getal--> dode paden, maar begon op 118. Die van §0.4
-  vond <!--getal:graaf.doelOnbekend-->1<!--/getal--> onbekende doelen, maar begon op 587. Beide keren zat de fout in
+  vond <!--getal:graaf.doelOnbekend-->0<!--/getal--> onbekende doelen, maar begon op 587. Beide keren zat de fout in
   de meter en niet in de code. Wie een Architect bouwt op een register dat zijn
   eigen zekerheid niet kent, bouwt een machine die 705 fouten met overtuiging
   voorleest.

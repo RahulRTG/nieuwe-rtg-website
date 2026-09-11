@@ -33,7 +33,9 @@
    EN EEN KANT WORDT ALLEEN GELEGD ALS HET DOEL BESTAAT. Wijst een ingevoerde
    naam naar een bestand dat dat symbool niet kent, dan is dat geen kant maar een
    BEVINDING (`doelOnbekend`) -- ofwel de invoer klopt niet meer, ofwel het
-   symbool is hernoemd.
+   symbool is hernoemd. TENZIJ de aanroeper de naam zelf met een typeof-toets
+   afvangt: dan weet de code dat hij optioneel is, en staat hij in
+   `optioneelGeguard` in plaats van in de bevindingen.
 
    Draaien: npm run aanroepgraaf -> AANROEPGRAAF.json */
 'use strict';
@@ -408,9 +410,29 @@ function routehandlers(ast) {
 
 /* Ronde 2: de aanroepen. */
 const kanten = [], onopgelost = new Map(), doelOnbekend = [];
+/* Aanroepen naar een naam die het doelbestand niet kent, maar die de aanroeper
+   zelf met een typeof-toets afvangt. Geen kant (het doel bestaat niet) en geen
+   bevinding (de code trekt de grens al) -- dus een eigen lijst, zichtbaar. */
+const optioneelGeguard = [];
 const routeKanten = [], perSoort = new Map(), overigWaar = new Map();
 let calls = 0, doelNietVastTeStellen = 0;
 for (const [rel, ast] of bomen) {
+  /* NAMEN DIE DIT BESTAND ZELF OPTIONEEL NOEMT. Schrijft de code
+     `if (typeof ctx.registreerDeelnemer !== 'function')`, dan WEET de auteur dat
+     die naam er niet hoeft te zijn en vangt hij het af. Zo'n aanroep als
+     BEVINDING melden is de meter laten klagen over een grens die de code al
+     trekt -- en die bevinding heeft een ratel op nul, dus hij houdt de bouw
+     tegen op correcte code.
+
+     Gevonden toen de graaf voor het eerst in acht dagen werd ververst:
+     accounts/transactie.js:128 roept verzoekcontext.registreerDeelnemer aan,
+     en regel 102 van datzelfde bestand toetst eerst of hij bestaat. */
+  const optioneleNamen = new Set();
+  loop(ast, (n) => {
+    if (n.type !== 'UnaryExpression' || n.operator !== 'typeof') return;
+    const a = n.argument;
+    if (a && a.type === 'MemberExpression' && !a.computed && a.property && a.property.name) optioneleNamen.add(a.property.name);
+  });
   const eigen = symbolenVan.get(rel), bind = invoer.get(rel);
   const handlers = routehandlers(ast);
   const gezien = new Set();
@@ -516,6 +538,7 @@ for (const [rel, ast] of bomen) {
          staan -- geen gok naar een symbool dat er niet is. */
       if (hoe === 'viaKern') doelNaam = null;
       else if (uitDaar === null || uitDaar === undefined) { doelNietVastTeStellen++; return; }
+      else if (optioneleNamen.has(doelNaam)) { optioneelGeguard.push({ van: rel + '#' + van, naar: doelBestand + '#' + doelNaam, lijn: n.lijn }); return; }
       else { doelOnbekend.push({ van: rel + '#' + van, naar: doelBestand + '#' + doelNaam, hoe, lijn: n.lijn }); return; }
     }
     const sleutel = rel + '#' + van + ' -> ' + doelBestand + '#' + doelNaam;
@@ -572,6 +595,7 @@ const uit = {
     onopgelostNaarSoort: soorten,
     opgelostPct: calls ? Math.round((calls - onopgelostTotaal) / calls * 1000) / 10 : 0,
     doelOnbekend: doelOnbekend.length,
+    optioneelGeguard: optioneelGeguard.length,
     doelNietVastTeStellen: doelNietVastTeStellen,
     symbolenMetAanroeper: aanroepersVan.size,
     routesMetSymbool: new Set(routeKanten.map(r => r.route)).size,
@@ -590,6 +614,7 @@ const uit = {
       .map(([naam, aantal]) => ({ naam, aantal, waar: soort === 'overig' ? [...(overigWaar.get(naam) || [])] : undefined }))
   })),
   doelOnbekend: doelOnbekend.slice(0, 40),
+  optioneelGeguard: optioneelGeguard.slice(0, 40),
   nietGelezen,
   kanten
 };
@@ -602,6 +627,7 @@ console.log('  kanten      ', g.kanten, '(lokaal', g.kantenLokaal + ', ingevoerd
 console.log('    viaKern   ', g.kantenViaKern, 'kanten uit de zak, waarvan', g.kantenViaKernZonderSymbool, 'alleen naar het BESTAND (zaknaam != symboolnaam)');
 console.log('  onopgelost  ', g.onopgelosteAanroepen, 'aanroepen over', g.onopgelosteNamen, 'namen -> opgelost:', g.opgelostPct + '%');
 console.log('    waarvan   ', Object.entries(soorten).map(([k, v]) => k + ': ' + v).join(', '));
+console.log('  optioneelGeguard', g.optioneelGeguard, '(doel bestaat niet, maar de aanroeper toetst dat zelf met typeof)');
 console.log('  doelOnbekend', g.doelOnbekend, '(ingevoerde naam die het doelbestand niet kent -- een BEVINDING) |',
   g.doelNietVastTeStellen, 'niet vast te stellen (module.exports is geen object)');
 console.log('  symbolen met een aanroeper:', g.symbolenMetAanroeper);

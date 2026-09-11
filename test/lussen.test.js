@@ -146,3 +146,60 @@ test('de ratel bestaat en staat op getallen, niet op percentages', () => {
   for (const [k, v] of Object.entries(j.ratel))
     assert.ok(Number.isInteger(v), 'ratelwaarde ' + k + ' hoort een geheel getal te zijn, geen percentage');
 });
+
+/* --------------------------------------------------------------------------
+   DE TWEEDE RONDE. Alle vier de regels hieronder komen uit de kalibratie: de
+   vijf lussen die de eerste versie KRITIEK noemde, bleken alle vijf veilig. Een
+   meter die veilige idiomen bovenaan zet, leert een mens de lijst negeren --
+   dat is een duurdere fout dan een gemiste lus. */
+
+test('een verzameling die elke ronde krimpt en nergens groeit, is begrensd', () => {
+  assert.equal(graadVan('while (open.size > MAX) { open.delete(k); }'), 'bewezenBegrensd');
+  assert.equal(graadVan('while (rij.length >= MAX) { rij.shift(); }'), 'bewezenBegrensd');
+});
+
+test('VAL: een verzameling die ook groeit bewijst niets (kern/pay/schaduw.js)', () => {
+  /* `rij.unshift(...stuk)` bij een fout. Dit is geen tekort van de krimpregel,
+     het is de reden dat hij te vertrouwen is. */
+  const l = eersteLus('while (rij.length) { rij.splice(0, 5); rij.unshift(x); }');
+  const vorm = V.vormVan(l);
+  assert.equal(vorm.code, 'BRON_GROEIT_EN_KRIMPT');
+  assert.equal(V.terminatieVan(l, vorm).graad, 'nietVastTeStellen');
+});
+
+test('een samengestelde EN-test wordt uitgepakt (kern/stuur/lus.js)', () => {
+  assert.equal(graadVan('for (let i = 0; i < subs.length && tel < totaal; i++) { f(); }'), 'bewezenBegrensd');
+});
+
+test('VAL: een OF-test wordt NIET uitgepakt', () => {
+  /* Bij `A || B` moeten beide onwaar worden; een begrensde disjunct bewijst
+     niets. Wie hier plat door de test wandelt, verklaart deze lus begrensd. */
+  assert.equal(graadVan('for (let i = 0; i < 10 || wachten; i++) { f(); }'), 'nietVastTeStellen');
+});
+
+test('een altijd-ware lus die elke ronde loslaat is een DIENST en geen defect', () => {
+  const dienst = eersteLus('while (true) { const r = await lezer.read(); if (r.done) break; }');
+  const vd = V.vormVan(dienst);
+  const sd = V.soortVan(dienst, vd, V.terminatieVan(dienst, vd));
+  assert.equal(sd.lussoort, 'dienst');
+  assert.equal(sd.voortgang, 'blokkerendeWacht');
+  /* en dan mag hij niet op `hoog` staan louter omdat er await in staat */
+  const r = V.risicoVan(dienst, 'server/lib/browser.js', vd, V.terminatieVan(dienst, vd), [], 0, true, sd);
+  assert.ok(r.klasse === 'laag' || r.klasse === 'midden', 'een dienstlus met blokkerende wacht is geen hoog risico, maar kreeg: ' + r.klasse);
+});
+
+test('een altijd-ware lus zonder await bezet de gebeurtenislus, en dat staat er', () => {
+  const reken = eersteLus('for (;;) { if (s[i] === 125) break; i++; }');
+  const vr = V.vormVan(reken);
+  const sr = V.soortVan(reken, vr, V.terminatieVan(reken, vr));
+  assert.equal(sr.lussoort, 'rekenlus');
+  assert.equal(sr.voortgang, 'bezetDeLus');
+});
+
+test('elke onbekende lus draagt een REDEN uit een gesloten lijst', () => {
+  const j = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
+  const toegestaan = new Set(['GEEN_TELLER', 'EXTERNE_BRON', 'TELLER_VERZET', 'GROEIENDE_GRENS', 'BRON_GROEIT_EN_KRIMPT', 'ANALYSEGRENS']);
+  const redenen = Object.keys(j.gemeten.onbekendRedenVerdeling);
+  assert.ok(redenen.length > 0, 'zonder uitsplitsing is `onbekend` een eindbak in plaats van een werklijst');
+  for (const r of redenen) assert.ok(toegestaan.has(r), 'onbekende reden-code in het register: ' + r);
+});

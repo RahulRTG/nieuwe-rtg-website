@@ -133,6 +133,49 @@ function eindigeRij(n) {
   return false;
 }
 
+/* MONOTONE KRIMP -- de tweede goedkope vorm van inductie, en in dit huis de
+   meest voorkomende die de eerste versie miste. Vier van de vijf lussen die
+   die versie KRITIEK noemde, hadden deze vorm:
+
+       while (gesprekken.size >= MAX) gesprekken.delete(...)   (kantoorgesprek)
+       while (open.size > MAX_OPEN)   open.delete(...)         (stuur/goedkeuring)
+       while (bestaand.length >= MAX) bestaand.shift()         (stuur/goedkeuring)
+
+   De voorwaarde leest de omvang van een verzameling, en het lijf maakt die
+   verzameling elke ronde kleiner. Dan is het aantal rondes hoogstens de huidige
+   omvang. Alle vier waren veilig en alle vier stonden ze bovenaan als kritiek --
+   een meter die veilige idiomen bovenaan zet, leert een mens de lijst negeren.
+
+   DE VAL, en die is echt: groeit de bron ergens in hetzelfde lijf ook, dan
+   bewijst de krimp niets. `kern/pay/schaduw.js` doet precies dat
+   (`rij.unshift(...stuk)` bij een fout), en die blijft dus ONBEKEND. Dat is
+   geen tekort van deze regel maar de reden dat hij te vertrouwen is. */
+const KRIMPERS = new Set(['pop', 'shift', 'delete', 'splice', 'clear', 'dequeue']);
+const GROEIERS = new Set(['push', 'unshift', 'add', 'set', 'concat']);
+const OMVANG = new Set(['size', 'length']);
+
+function krimpendeBronVan(lus) {
+  const bronnen = new Set();
+  wandel(lus.test, (n) => {
+    if (n.type !== 'MemberExpression' || !n.property || !OMVANG.has(n.property.name)) return;
+    const basis = naamVanBasis(n.object);
+    if (basis) bronnen.add(basis);
+  });
+  for (const bron of bronnen) {
+    let krimpt = false, groeit = false;
+    inEigenLijf(lus, (n) => {
+      if (n.type !== 'CallExpression' || !n.callee || n.callee.type !== 'MemberExpression') return;
+      const m = n.callee.property && n.callee.property.name;
+      if (naamVanBasis(n.callee.object) !== bron) return;
+      if (KRIMPERS.has(m)) krimpt = true;
+      if (GROEIERS.has(m)) groeit = true;
+    });
+    if (krimpt && !groeit) return { bron, groeitOok: false };
+    if (krimpt && groeit) return { bron, groeitOok: true };
+  }
+  return null;
+}
+
 function vormVan(lus) {
   // ALTIJD-WAAR: while(true), do..while(true), for(;;)
   const altijdWaar = (lus.type === 'WhileStatement' || lus.type === 'DoWhileStatement')
@@ -142,7 +185,7 @@ function vormVan(lus) {
 
   if (lus.type === 'ForOfStatement' || lus.type === 'ForInStatement') {
     if (eindigeRij(lus.right)) return { begrenzing: 'EINDIGE_RIJ', reden: null };
-    return { begrenzing: 'COLLECTIE', reden: 'itereert over een uitdrukking waarvan de eindigheid hier niet vaststaat' };
+    return { begrenzing: 'COLLECTIE', code: 'EXTERNE_BRON', reden: 'itereert over een uitdrukking waarvan de eindigheid hier niet vaststaat' };
   }
 
   if (lus.type === 'ForStatement') {
@@ -153,18 +196,39 @@ function vormVan(lus) {
     const monotoon = upd && ((upd.type === 'UpdateExpression' && OPHOOG.has(upd.operator) && upd.argument && upd.argument.name === naam)
       || (upd.type === 'AssignmentExpression' && (upd.operator === '+=' || upd.operator === '-=')
           && upd.left && upd.left.name === naam && upd.right && upd.right.type === 'Literal'));
-    const test = lus.test;
+    /* ALLEEN `&&` MAG WORDEN UITGEPAKT, en dat is geen detail. Bij `A && B`
+       stopt de lus zodra een van beide onwaar wordt, dus een enkele begrensde
+       conjunct begrenst het geheel. Bij `A || B` geldt dat NIET: daar moeten
+       ze allebei onwaar worden, en een begrensde disjunct bewijst niets. Wie
+       hier plat door de test wandelt, verklaart `while (i < 10 || wachten)`
+       voor begrensd. */
+    const conjuncten = (function plat(n) {
+      if (!n) return [];
+      if (n.type === 'LogicalExpression' && n.operator === '&&') return [...plat(n.left), ...plat(n.right)];
+      return [n];
+    })(lus.test);
+    const test = conjuncten.find(c => c.type === 'BinaryExpression' && ['<', '<=', '>', '>='].includes(c.operator)
+      && c.left && c.left.name === naam) || lus.test;
     const vergelijkt = test && test.type === 'BinaryExpression' && ['<', '<=', '>', '>='].includes(test.operator)
       && test.left && test.left.name === naam;
     if (naam && startLiteraal && monotoon && vergelijkt) {
       const basis = naamVanBasis(test.right);
       if (grensGroeitInLijf(lus, basis))
-        return { begrenzing: 'TELLER_GROEIENDE_GRENS', reden: 'de bovengrens (' + basis + ') groeit in het lijf van de lus zelf' };
+        return { begrenzing: 'TELLER_GROEIENDE_GRENS', code: 'GROEIENDE_GRENS', reden: 'de bovengrens (' + basis + ') groeit in het lijf van de lus zelf' };
       if (tellerVerzetInLijf(lus, naam))
-        return { begrenzing: 'TELLER_VERZET', reden: 'de teller ' + naam + ' wordt in het lijf ook zelf toegewezen' };
+        return { begrenzing: 'TELLER_VERZET', code: 'TELLER_VERZET', reden: 'de teller ' + naam + ' wordt in het lijf ook zelf toegewezen' };
       return { begrenzing: 'TELLER_MONOTOON', reden: null };
     }
-    return { begrenzing: 'ONBEPAALD', reden: 'geen herkenbare teller: ' + (naam ? 'start/ophoging/test passen niet op elkaar' : 'de init-clausule verklaart geen lusvariabele') };
+    /* EEN SAMENGESTELDE TEST VIEL HIER DOOR. `for (let i = 0; i < subs.length && tel < totaal; i++)`
+       (kern/stuur/lus.js) is gewoon begrensd, maar `test.left` is dan een
+       LogicalExpression en geen vergelijking met i. De teller-in-voorwaarde
+       hieronder kijkt in de HELE test en vangt dat; hem alleen aan while hangen
+       was een willekeurige beperking. */
+    const viaTest = tellerBegrensdVan(lus);
+    if (viaTest) return { begrenzing: 'TELLER_IN_VOORWAARDE', reden: null, teller: viaTest };
+    const krimpF = krimpendeBronVan(lus);
+    if (krimpF && !krimpF.groeitOok) return { begrenzing: 'KRIMPENDE_BRON', reden: null, bron: krimpF.bron };
+    return { begrenzing: 'ONBEPAALD', code: 'GEEN_TELLER', reden: 'geen herkenbare teller: ' + (naam ? 'start, ophoging en test passen niet op elkaar' : 'de init-clausule verklaart geen lusvariabele') };
   }
 
   /* WHILE MET EEN VEILIGHEIDSTELLER -- de goedkoopste vorm van abstracte
@@ -184,7 +248,12 @@ function vormVan(lus) {
      de lus doorlopen terwijl hij er begrensd uitziet. */
   const tel = tellerBegrensdVan(lus);
   if (tel) return { begrenzing: 'TELLER_IN_VOORWAARDE', reden: null, teller: tel };
-  return { begrenzing: 'ONBEPAALD', reden: 'de voorwaarde is een uitdrukking waarvan de afloop hier niet af te leiden is' };
+  const krimp = krimpendeBronVan(lus);
+  if (krimp && !krimp.groeitOok) return { begrenzing: 'KRIMPENDE_BRON', reden: null, bron: krimp.bron };
+  if (krimp && krimp.groeitOok)
+    return { begrenzing: 'ONBEPAALD', code: 'BRON_GROEIT_EN_KRIMPT',
+      reden: 'de voorwaarde leest de omvang van ' + krimp.bron + ', en het lijf maakt die verzameling zowel kleiner als groter' };
+  return { begrenzing: 'ONBEPAALD', code: 'GEEN_TELLER', reden: 'de voorwaarde is een uitdrukking waarvan de afloop hier niet af te leiden is' };
 }
 
 /* Zoekt in de voorwaarde een teller die tegen een literaal wordt afgezet, en
@@ -232,6 +301,8 @@ function terminatieVan(lus, vorm) {
     return { graad: 'bewezenBegrensd', grond: 'teller begint op een literaal, hoogt monotoon op, en de bovengrens groeit niet in het lijf' };
   if (vorm.begrenzing === 'TELLER_IN_VOORWAARDE')
     return { graad: 'bewezenBegrensd', grond: 'de voorwaarde zet teller ' + vorm.teller + ' af tegen een literaal, hij beweegt elke ronde die kant op en wordt in het lijf niet teruggezet' };
+  if (vorm.begrenzing === 'KRIMPENDE_BRON')
+    return { graad: 'bewezenBegrensd', grond: 'de voorwaarde leest de omvang van ' + vorm.bron + ', het lijf maakt die elke ronde kleiner en nergens groter' };
   if (vorm.begrenzing === 'EINDIGE_RIJ')
     return { graad: 'bewezenBegrensd', grond: 'itereert over een uitdrukking die per definitie een eindige rij oplevert' };
   if (vorm.begrenzing === 'COLLECTIE')
@@ -245,10 +316,46 @@ function terminatieVan(lus, vorm) {
       if (n.type === 'BreakStatement' && !n.label && viaBinnenlus) return;
       if (n.type === 'BreakStatement' || n.type === 'ReturnStatement' || n.type === 'ThrowStatement') uitweg = n.type;
     });
-    if (!uitweg) return { graad: 'geenUitwegGevonden', grond: 'altijd-ware lus zonder break, return of throw in zijn eigen lijf' };
+    if (!uitweg) return { graad: 'geenUitwegGevonden', code: 'GEEN_UITWEG', grond: 'altijd-ware lus zonder break, return of throw in zijn eigen lijf' };
     return { graad: 'uitwegAanwezig', grond: 'altijd-ware lus met een ' + uitweg + ' in zijn eigen lijf; of dat pad BEREIKBAAR is, vraagt een control-flowgraaf en staat hier niet vast' };
   }
-  return { graad: 'nietVastTeStellen', grond: vorm.reden || 'de vorm is niet herleid' };
+  /* WAAROM ONBEKEND -- gesloten codes. Zonder dit is `nietVastTeStellen` een
+     eindbak, en een eindbak vertelt je nooit welke volgende analysetechniek de
+     meeste dekking oplevert. Met de codes is het een werklijst: staat de
+     meerderheid op EXTERNE_BRON, dan koop je niets met een control-flowgraaf;
+     staat hij op GEEN_TELLER, dan wel. */
+  return { graad: 'nietVastTeStellen', code: vorm.code || 'ANALYSEGRENS', grond: vorm.reden || 'de vorm is niet herleid' };
+}
+
+/* ---------------------------------------------------------------------------
+   LUSSOORT EN VOORTGANG -- terminatie is niet de enige vraag, en voor een
+   serverlus is het de verkeerde.
+
+       while (true) { const klus = await rij.volgende(); }
+
+   Die lus HOORT niet te stoppen. Hem afmeten langs terminatie levert een
+   onveilig ogende uitslag op voor precies de gezondste vorm die er is. De
+   kalibratie liet dat meteen zien: van de vijftien altijd-ware lussen in deze
+   boom is er geen enkele stuk -- het zijn stroomlezers, een JSON-parser en een
+   heap-sift -- en vier ervan stonden op `hoog` omdat ze `await` in het lijf
+   hadden. Await IS daar juist het goede nieuws: elke ronde geeft de lus de
+   gebeurtenislus terug.
+
+   Dus twee vragen in plaats van een. Termineert hij (dat blijft terminatieVan),
+   en MAAKT HIJ VOORTGANG zonder het huis te bezetten. De gevaarlijke vorm is
+   niet de lus die niet stopt, het is de lus die niet loslaat. */
+function soortVan(lus, vorm, terminatie) {
+  if (vorm.begrenzing !== 'ALTIJD_WAAR')
+    return { lussoort: terminatie.graad === 'nietVastTeStellen' ? 'onbekend' : 'eindig', voortgang: 'nietVanToepassing' };
+  let geeftTerug = false;
+  inEigenLijf(lus, (n) => { if (n.type === 'AwaitExpression' || n.type === 'YieldExpression') geeftTerug = true; });
+  /* Een dienstlus geeft elke ronde de gebeurtenislus terug; een rekenlus niet.
+     Die tweede is niet per se fout -- een parser die over een eindige string
+     loopt hoort geen await te hebben -- maar hij bezet wel de lus, en dat is
+     wat je van hem wilt weten. */
+  return geeftTerug
+    ? { lussoort: 'dienst', voortgang: 'blokkerendeWacht' }
+    : { lussoort: 'rekenlus', voortgang: 'bezetDeLus' };
 }
 
 /* ---------------------------------------------------------------------------
@@ -304,30 +411,36 @@ const domeinVan = rel => (DOMEINEN.find(([re]) => re.test(rel)) || [null, 'overi
    welke lussen erdoor bewegen. */
 const KRITIEKE_DOMEINEN = new Set(['geld', 'identiteit', 'toegang']);
 
-function risicoVan(lus, rel, vorm, terminatie, effecten, nesting, metAwait) {
+function risicoVan(lus, rel, vorm, terminatie, effecten, nesting, metAwait, soort) {
   const opbouw = [];
-  if (terminatie.graad === 'geenUitwegGevonden') opbouw.push('terminatie: geen uitweg gevonden');
-  if (terminatie.graad === 'nietVastTeStellen') opbouw.push('terminatie: niet vast te stellen');
-  if (terminatie.graad === 'uitwegAanwezig') opbouw.push('terminatie: uitweg niet op bereikbaarheid getoetst');
   const domein = domeinVan(rel);
+  soort = soort || { lussoort: 'onbekend', voortgang: 'nietVanToepassing' };
+
+  /* DE AFLOOP. `uitwegAanwezig` telde hier eerst als onzeker, en dat leverde
+     vier valse hoge meldingen op stroomlezers op. Voor een DIENSTlus is "stopt
+     niet vanzelf" geen bevinding maar de bedoeling; wat daar telt is of hij
+     loslaat. */
+  const afloopOnzeker = terminatie.graad === 'geenUitwegGevonden'
+    || terminatie.graad === 'nietVastTeStellen'
+    || (terminatie.graad === 'uitwegAanwezig' && soort.lussoort !== 'dienst');
+  if (terminatie.graad === 'geenUitwegGevonden') opbouw.push('terminatie: geen uitweg gevonden');
+  if (terminatie.graad === 'nietVastTeStellen') opbouw.push('terminatie: niet vast te stellen (' + (terminatie.code || 'ANALYSEGRENS') + ')');
+  if (terminatie.graad === 'uitwegAanwezig' && soort.lussoort !== 'dienst') opbouw.push('terminatie: uitweg niet op bereikbaarheid getoetst');
+  if (soort.lussoort === 'rekenlus') opbouw.push('bezet de gebeurtenislus (geen await of yield in het lijf)');
+
   if (KRITIEKE_DOMEINEN.has(domein)) opbouw.push('domein: ' + domein);
-  if (metAwait) opbouw.push('I/O in het lijf (await)');
+  /* await in een EINDIGE lus is een prestatievraag (N+1, latentie-optelling);
+     in een dienstlus is het juist de gezonde vorm. Daarom niet meer plat. */
+  if (metAwait && soort.lussoort !== 'dienst') opbouw.push('I/O in het lijf (await)');
   if (effecten.includes('geld')) opbouw.push('neveneffect: geld');
   if (effecten.includes('opslag') || effecten.includes('verwijdering')) opbouw.push('neveneffect: schrijft');
   if (nesting >= 2) opbouw.push('nesting: ' + nesting + ' diep');
 
-  let klasse = 'laag';
-  if (opbouw.length) klasse = 'midden';
-  /* HOOG: onzekere afloop EN een gevolg buiten het geheugen. Een lus waarvan de
-     afloop onzeker is maar die niets doet, is een prestatievraag; doet hij wel
-     iets, dan is het een gegevensvraag. */
-  const afloopOnzeker = terminatie.graad === 'geenUitwegGevonden' || terminatie.graad === 'nietVastTeStellen' || terminatie.graad === 'uitwegAanwezig';
+  let klasse = opbouw.length ? 'midden' : 'laag';
   if (afloopOnzeker && (metAwait || effecten.length)) klasse = 'hoog';
-  /* KRITIEK: hetzelfde, maar in een domein waar een herhaling of een hangende
-     lus een mens raakt in plaats van een scherm. */
   if (klasse === 'hoog' && (KRITIEKE_DOMEINEN.has(domein) || effecten.includes('geld'))) klasse = 'kritiek';
   if (terminatie.graad === 'geenUitwegGevonden' && (metAwait || effecten.length)) klasse = 'kritiek';
-  return { klasse, opbouw, domein };
+  return { klasse, opbouw, domein, lussoort: soort.lussoort, voortgang: soort.voortgang };
 }
 
 /* ---------------------------------------------------------------------------
@@ -407,5 +520,6 @@ function overlapRemVan(callback, asyncCallback) {
 module.exports = {
   LUSKNOPEN, ITERATORS, FUNCTIEKNOPEN, GRADEN, DOMEINEN, KRITIEKE_DOMEINEN,
   structuurhash, symbooolVan, inEigenLijf, vormVan, tellerBegrensdVan,
-  terminatieVan, effectenVan, domeinVan, risicoVan, overlapRemVan, sterkeComponenten, eindigeRij
+  terminatieVan, effectenVan, domeinVan, risicoVan, overlapRemVan, sterkeComponenten, eindigeRij,
+  soortVan, krimpendeBronVan
 };

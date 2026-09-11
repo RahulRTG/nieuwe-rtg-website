@@ -64,7 +64,7 @@ const { loop: wandel } = require('./ast/walk');
    daardoor toetsbaar zonder dit register te overschrijven. */
 const {
   LUSKNOPEN, ITERATORS, FUNCTIEKNOPEN, structuurhash, symbooolVan, inEigenLijf,
-  vormVan, terminatieVan, effectenVan, domeinVan, risicoVan, overlapRemVan,
+  vormVan, terminatieVan, effectenVan, domeinVan, risicoVan, overlapRemVan, soortVan,
   sterkeComponenten, eindigeRij, KRITIEKE_DOMEINEN
 } = require('./lib/lusvorm');
 
@@ -145,14 +145,16 @@ for (const boom of BOMEN) {
         let metAwait = false;
         inEigenLijf(n, k => { if (k.type === 'AwaitExpression') metAwait = true; });
         const nesting = pad.filter(p => LUSKNOPEN.has(p.type)).length;
-        const risico = risicoVan(n, rel, vorm, terminatie, effecten, nesting, metAwait);
+        const soort = soortVan(n, vorm, terminatie);
+        const risico = risicoVan(n, rel, vorm, terminatie, effecten, nesting, metAwait, soort);
 
         perLus.push({
           id: 'LUS:' + sleutel + (volg > 1 ? '#' + volg : ''),
           as: 'syntactisch',
           bestand: rel, symbool, lijn: n.lijn || null, soort: n.type,
           begrenzing: vorm.begrenzing, begrenzingReden: vorm.reden,
-          terminatie: terminatie.graad, terminatieGrond: terminatie.grond,
+          terminatie: terminatie.graad, terminatieGrond: terminatie.grond, onbekendReden: terminatie.code || null,
+          lussoort: soort.lussoort, voortgang: soort.voortgang,
           await: metAwait, nesting, effecten,
           domein: risico.domein, risico: risico.klasse, risicoOpbouw: risico.opbouw
         });
@@ -207,6 +209,7 @@ for (const boom of BOMEN) {
           begrenzingReden: null,
           terminatie: eindigeRij(n.callee.object) ? 'bewezenBegrensd' : 'aannemelijkBegrensd',
           terminatieGrond: 'een callback-iteratie loopt over de lengte van de bron; oneindig kan alleen bij een oneindige bron',
+          onbekendReden: null, lussoort: 'eindig', voortgang: 'nietVanToepassing',
           await: heeftAwait || !!cb.async, nesting: pad.filter(p => LUSKNOPEN.has(p.type)).length,
           effecten: effect, gelijktijdigheid: gelijktijdig,
           domein: domeinVan(rel),
@@ -443,6 +446,12 @@ const uit = {
     risicoVerdeling: verdeling(perLus, 'risico'),
     begrenzingVerdeling: verdeling(syntactisch, 'begrenzing'),
     domeinVerdeling: verdeling(perLus, 'domein'),
+    lussoortVerdeling: verdeling(perLus, 'lussoort'),
+    /* DE WERKLIJST ACHTER `onbekend`. Dit getal stuurt welke analysetechniek
+       als volgende iets oplevert -- zonder deze uitsplitsing is elke volgende
+       investering een gok. */
+    onbekendRedenVerdeling: perLus.filter(l => l.terminatie === 'nietVastTeStellen')
+      .reduce((m, x) => { m[x.onbekendReden || 'ANALYSEGRENS'] = (m[x.onbekendReden || 'ANALYSEGRENS'] || 0) + 1; return m; }, {}),
     metAwait: perLus.filter(l => l.await).length,
     genest: perLus.filter(l => l.nesting >= 1).length,
     onbegrensdGelijktijdig: callbacks.filter(l => l.gelijktijdigheid === 'ONBEGRENSD_GELIJKTIJDIG').length,
@@ -510,6 +519,10 @@ console.log('    module-kringen            ', a.moduleKringen);
 console.log('    wekkers                   ', a.wekkers);
 console.log('\n  TERMINATIE');
 for (const [k, v] of Object.entries(g.terminatieVerdeling).sort((x, y) => y[1] - x[1])) console.log('    ' + k.padEnd(24), v);
+console.log('\n  LUSSOORT');
+for (const [k, v] of Object.entries(g.lussoortVerdeling).sort((x, y) => y[1] - x[1])) console.log('    ' + k.padEnd(24), v);
+console.log('\n  WAAROM ONBEKEND (de werklijst van de analyzer)');
+for (const [k, v] of Object.entries(g.onbekendRedenVerdeling).sort((x, y) => y[1] - x[1])) console.log('    ' + k.padEnd(24), v);
 console.log('\n  RISICO');
 for (const k of ['kritiek', 'hoog', 'midden', 'laag']) if (g.risicoVerdeling[k]) console.log('    ' + k.padEnd(24), g.risicoVerdeling[k]);
 console.log('\n  BEWIJS (geleend van de route, niet van de lus) -- direct:', g.brugDirect, '| via de aanroepgraaf:', g.brugViaGraaf, '| geen route:', g.brugZonderRoute);

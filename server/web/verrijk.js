@@ -91,6 +91,35 @@ function verrijk(req, res, instellingen) {
     else res.setHeader(veld, waarde);
     return res;
   };
+  /* APPEND EN NIET OVERSCHRIJVEN, voor een kop waar MEERDERE lagen iets op kwijt
+     willen. `res.set` hierboven is de juiste standaard -- een Content-Type hoort
+     geen tweede waarde te krijgen -- maar er zijn koppen waar dat juist fout is.
+
+     DE AANLEIDING, 11 september 2026. `RTG-Niet-Afgedwongen` zegt welke regel dit
+     antwoord heeft doorgelaten zonder af te dwingen, en sinds AFSPRAAK.md stap 3
+     zijn er twee lagen die hem zetten: het bezitsbewijs en de ledencontractstand
+     (opzet/diensten2.js). Met `set` gooit de tweede de eerste weg, en dan staat er
+     een kop die bewéért volledig te zijn en dat niet is -- dezelfde fout als twee
+     uitkomsten op een hoop gooien.
+
+     EN DE REDEN DAT DIT HIER MOET EN NIET BIJ DE AANROEPER. Deze laag is een eigen
+     Express-achtige schil en geen Express: `res.set` bestaat, `res.append` bestond
+     niet. Een aanroeper die hem toch gebruikt krijgt geen foutmelding die iemand
+     ziet -- binnen een `try/catch` (en auth() heeft er een, want een storing in de
+     bewijslaag mag geen overtreding worden) verdwijnt de TypeError volledig, en de
+     kop blijft gewoon leeg. Dat is precies zo gebeurd. Twee aanroepers die het
+     met de hand samenvoegen zouden daarnaast de samenvoegregel twee keer dragen
+     (LAT regel 4); dus staat hij hier, een keer, naast `set`.
+
+     Dezelfde betekenis als in Express: bestaat de kop al, dan wordt het een lijst,
+     en node stuurt daar meerdere regels met dezelfde naam voor. */
+  res.append = function (veld, waarde) {
+    const vorige = res.getHeader(veld);
+    if (vorige === undefined) return res.set(veld, waarde);
+    const samen = (Array.isArray(vorige) ? vorige : [vorige])
+      .concat(Array.isArray(waarde) ? waarde : [waarde]);
+    return res.set(veld, samen);
+  };
   res.get = (veld) => res.getHeader(veld);
   res.type = (t) => { res.setHeader('Content-Type', t.indexOf('/') === -1 ? (MIME['.' + t.replace(/^\./, '')] || t) : t); return res; };
   res.json = function (obj) {

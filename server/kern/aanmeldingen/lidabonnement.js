@@ -153,5 +153,23 @@ module.exports = ({ A, B, contracten, PASSEN, eur, zegOpLidmaatschap }) => {
     return u ? 'Actief.' : 'Actief.';
   }
 
-  return { aanmeldingVan, contractVan, komende, beeld, datum, mijn };
+  /* DE KALE STAND, voor de poortwachter en niet voor een scherm.
+
+     `mijn()` hierboven geeft een BEELD: namen, bedragen in euro's, zinnen in de
+     stem van de pas. Dat is precies wat `auth()` niet moet doen -- die draait op
+     elk ledenverzoek, en een tekst opmaken om hem weg te gooien is werk voor
+     niets. Hier staat dus alleen wat de poort nodig heeft, uit dezelfde twee
+     functies: geen tweede weg naar het contract van een lid (LAT regel 4).
+
+     GEEFT HET CONTRACT ZELF TERUG EN GEEN SAMENVATTING. Wie hier `loopt: true`
+     zou afleiden, zet de vraag "wat is lopend" op een tweede plek naast
+     ../commercie/contract/vorm.js. Het oordeel hoort in ../commercie/lidpoort.js
+     en de stand daar; dit bestand ZOEKT alleen op. */
+  function stand(accountId) {
+    const a = aanmeldingVan(accountId);
+    if (!a) return null;
+    return contractVan(a.id);
+  }
+
+  return { aanmeldingVan, contractVan, komende, beeld, datum, mijn, stand };
 };

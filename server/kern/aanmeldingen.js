@@ -134,7 +134,11 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
   const lidAbonnement = {
     mijn: lidAbonnementLezer.mijn,
     opzegVoorbeeld: lidAbonnementOpzeg.opzegVoorbeeld,
-    zegOpZelf: lidAbonnementOpzeg.zegOpZelf
+    zegOpZelf: lidAbonnementOpzeg.zegOpZelf,
+    /* De kale contractstand, voor de poortwachter. Zie de kop van
+       ./aanmeldingen/lidabonnement.js bij `stand`: hij geeft het contract zelf
+       en leidt niets af, want wat "lopend" betekent hoort op een plek te staan. */
+    stand: lidAbonnementLezer.stand
   };
 
   return { aanmeldingen: Object.assign({ aanvraag, lijst, een, beslis, betalingen, verlengLidmaatschap, zegOpLidmaatschap, contracten,

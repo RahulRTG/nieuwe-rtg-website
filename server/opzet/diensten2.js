@@ -8,9 +8,15 @@
    poortwachters waar bijna elke route van dit huis achter staat.
 
    Gescheiden omdat samen ze over de 10 kB-grens gaan. De naad is niet op maat
-   gekozen maar met scripts/blokscan.js nagemeten: op dit punt gaan er zeventien
+   gekozen maar met scripts/blokscan.js nagemeten: op dit punt gaan er achttien
    namen door de deur en komen er vijftien terug, en er loopt geen enkele draad
    terug. Een naad met nul draden is een echte naad.
+
+   ACHTTIEN SINDS 11 SEPTEMBER 2026, en nageteld en niet geschat: `kernGeef` is
+   erbij gekomen zodat auth() de contractstand van een lid kan lezen (AFSPRAAK.md
+   stap 3). Het is een GETTER en daarmee geen draad terug -- hij wordt per verzoek
+   aangeroepen en nooit tijdens het bedraden. Zelfde idioom als
+   ./leverancierpoort.js, dat `kern` al zo binnenkrijgt.
    ========================================================================== */
 'use strict';
 
@@ -20,7 +26,7 @@ const kostenhaak = require('../kern/kosten/haak');
 module.exports = function maakDiensten2(deps) {
   const {
     DATA_DIR, PERSONAS, accounts, crypto, db, dirTouch, eigenaarAccount, findSupplier, 
-    lidBoardUit, lidPadFunctie, mail, rtf, save, schild, schoon, sendPushToUser, sessionFor
+    kernGeef, lidBoardUit, lidPadFunctie, mail, rtf, save, schild, schoon, sendPushToUser, sessionFor
   } = deps;
 /* De archiefkast: houdt de levende kast klein door afgeronde tickets ouder
    dan een afgesloten kwartaal naar append-only maandbestanden te verhuizen. */
@@ -141,6 +147,67 @@ const commercieel = require('../kern/identiteit/commercieel').maakCommercieel({ 
    de standaardstand nog niets -- zie de kop van kern/identiteit/doelpoort.js. */
 const doelpoort = require('../kern/identiteit/doelpoort').maakDoelpoort({ commercieel });
 
+/* DE CONTRACTSTAND VAN EEN LID, in de schaduw (AFSPRAAK.md stap 3).
+
+   WAT HIER WORDT GESLOTEN. `kern/commercie/contract.js` is een volwaardige
+   overeenkomstmotor, en geteld op 11 september 2026 vroegen 46 ledenroute-bestanden
+   naar de pas van een lid -- 45 of hij geen gast is, 1 naar een specifieke
+   betalende pas, en NUL of de overeenkomst nog loopt. De pas hangt aan `sess.tier`,
+   die een mens een keer omhoog zet en die daarna nooit meer beweegt. Een opgezegd
+   contract laat de pas dus staan, en niemand weet hoe vaak dat voorkomt.
+
+   DIT HOUDT NIEMAND TEGEN. Beide regels staan in SCHADUW (zie
+   kern/commercie/schaduw.js): ze oordelen, ze tellen, en ze laten iedereen door.
+   Pas als er bewijs is -- 200 waarnemingen over 7 dagen -- mag een mens er een
+   aanzetten, en dat is stap 7 en geen schakelaar hier.
+
+   EEN WEGING PER LID EN NIET PER VERZOEK, en dat is geen zuinigheid maar de juiste
+   EENHEID. De vraag is "hoeveel leden hebben een pas zonder lopende afspraak", niet
+   "hoeveel verzoeken". Per verzoek tellen zou het getal laten bepalen door wie het
+   hardst klikt, en dat is precies het soort maat dat LEVEN.md verbiedt (nooit
+   vergelijkend) en KOSTEN.md over opslag opmerkt (wie een stand als stroom telt,
+   ziet de rekening van wie niets doet het hardst groeien). De keerzijde staat
+   hieronder: de teller van deze twee regels is dus NIET vergelijkbaar met die van
+   de abonnementspoort, die per verzoek telt.
+
+   En het scheelt echt iets: auth() draait op elk ledenverzoek, en `schaduw.weeg`
+   schrijft. Per verzoek wegen zou een opslagactie aan elk verzoek hangen. */
+const kernVoorAuth = new Proxy({}, { get: (_, naam) => {
+  try { const k = kernGeef && kernGeef(); return k ? k[naam] : undefined; } catch (e) { return undefined; }
+} });
+const lidpoort = require('../kern/commercie/lidpoort');
+/* Het venster waarin een eerder oordeel blijft staan, en een dak op de kaart. Een
+   kaart die per sleutel groeit en nooit krimpt, is een lek met een nette naam. */
+const CONTRACT_VENSTER = 10 * 60 * 1000;
+const CONTRACT_DAK = 5000;
+const contractGezien = new Map();
+
+function contractStandVoor(sess) {
+  if (!sess || !sess.account) return null;   // een demo-persona heeft geen afspraak om te vinden
+  const sleutel = sess.key || ('user-' + sess.account.id);
+  const nu = Date.now();
+  const eerder = contractGezien.get(sleutel);
+  if (eerder && nu - eerder.at < CONTRACT_VENSTER) return eerder.oordeel;
+
+  let oordeel = null;
+  try {
+    const aanm = kernVoorAuth.aanmeldingen;
+    const lees = aanm && aanm.lidAbonnement;
+    /* GEEN LAAG = GEEN UITSPRAAK, en met opzet geen oordeel. Is de
+       aanmeldingenlaag niet gemount, dan is het antwoord `null` en niet
+       "GEEN_CONTRACT" -- dat laatste zou een storing in de bewijslaag als een
+       bevinding over het lid laten lezen (CONTROLPLANE.md: ONBEKEND is geen
+       WEIGEREN). */
+    if (!lees || typeof lees.stand !== 'function') return null;
+    oordeel = lidpoort.beoordeel(sess.tier, lees.stand(sess.account.id));
+    lidpoort.weeg(kernVoorAuth.handhavingSchaduw, oordeel, sleutel);
+  } catch (e) { return null; }
+
+  if (contractGezien.size >= CONTRACT_DAK) contractGezien.clear();
+  contractGezien.set(sleutel, { at: nu, oordeel });
+  return oordeel;
+}
+
 /* Een token kan een demo-sessie zijn (in-memory) of een echt account-token
    (ondertekend, staatloos). Beide leveren een sessie met tier + unieke key.
 
@@ -211,6 +278,26 @@ function auth(req, res, next) {
   if (_fid && sess.key && lidBoardUit(sess.key, _fid)) {
     return res.status(403).json({ error: 'Deze functie staat uit in je boardroom.', functieUit: _fid });
   }
+  /* DE CONTRACTSTAND ERBIJ -- leest, telt, en houdt niemand tegen. Additief: hij
+     staat VOOR de bezitsbewijstak omdat die asynchroon vertakt, en een regel die
+     alleen op de lichte helft van de paden meeloopt meet de helft van het huis.
+
+     `sess.contractStand` is een GELEZEN stand en geen besluit. Stap 7 van
+     AFSPRAAK.md mag hem gebruiken om een recht af te leiden; tot dan leest hem
+     niemand, en dat is de bedoeling van een schaduwperiode. */
+  try {
+    const cs = contractStandVoor(sess);
+    if (cs) {
+      sess.contractStand = cs;
+      /* NIET-AFGEDWONGEN STAAT OP HET ANTWOORD, want een regel die niets doet en
+         dat niet zegt, is over een half jaar een regel waarvan niemand weet of hij
+         aanstaat. `append` en niet `set`: de bezitsbewijstak hieronder zet dezelfde
+         kop, en twee regels die beide niet afdwingen horen beide zichtbaar te
+         blijven -- een kop die er stil een van weggooit is dezelfde fout als twee
+         uitkomsten op een hoop. */
+      if (cs.bezwaar) res.append('RTG-Niet-Afgedwongen', cs.regel);
+    }
+  } catch (e) {}   // een storing in de bewijslaag is geen overtreding
   /* HET BEZITSBEWIJS (MIJN RTG blok 4), op hetzelfde keelgat als de boardroom
      hierboven en om dezelfde reden: een regel die op een van de 213
      routebestanden moet worden herhaald, staat er over een half jaar op 212.
@@ -223,7 +310,7 @@ function auth(req, res, next) {
       kop: req.get('rtg-bezitsbewijs') || null })
       .then(uit => {
         if (uit.stand === 'geweigerd') return res.status(uit.code || 401).json({ error: uit.reden, bezitsbewijs: 'vereist' });
-        if (uit.nietAfgedwongen) res.set('RTG-Niet-Afgedwongen', 'bezitsbewijs');
+        if (uit.nietAfgedwongen) res.append('RTG-Niet-Afgedwongen', 'bezitsbewijs');
         verder();
       })
       .catch(() => verder());   // een storing in de bewijslaag is geen overtreding

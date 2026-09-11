@@ -136,8 +136,8 @@ module.exports = function maakDiensten(deps) {
     ensureSupplierDefaults, save, sessions, tokenHash, webpush
   }));
   /* De diensten en de twee poortwachters staan in ./diensten2.js. De naad is
-     nagemeten met scripts/blokscan.js: zeventien namen erdoor, vijftien terug,
-     nul draden. */
+     nagemeten: achttien namen erdoor, vijftien terug, nul draden -- zie de kop
+     daar, ook voor waarom `kernGeef` de achttiende is. */
   const {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
     resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail

@@ -110,7 +110,8 @@ function schermToestand(route) {
   const balk = (selector) => {
     const el = document.querySelector(selector), stijl = el && getComputedStyle(el);
     return { aanwezig: !!el, zichtbaar: zichtbaar(el), pointer: stijl ? stijl.pointerEvents : null,
-      display: stijl ? stijl.display : null, visibility: stijl ? stijl.visibility : null };
+      display: stijl ? stijl.display : null, visibility: stijl ? stijl.visibility : null,
+      achtergrond: stijl ? stijl.backgroundColor : null };
   };
   const slot = document.querySelector('.rtg-edge-2-context-slot');
   const contextueel = [...document.querySelectorAll('[data-rtg-edge-2-contextual]')];
@@ -140,6 +141,8 @@ function schermToestand(route) {
     bodems: document.querySelectorAll('.rtg-edge-bottom').length,
     merken: document.querySelectorAll('.rtg-edge-mark').length,
     top: balk('.rtg-edge-top'), side: balk('.rtg-edge-side'), bottom: balk('.rtg-edge-bottom'),
+    randHerstel: document.querySelectorAll('.rtg-edge-2-edge-reveal').length,
+    randHerstelZichtbaar: [...document.querySelectorAll('.rtg-edge-2-edge-reveal')].filter(zichtbaar).length,
     revealAantal: reveals.length, revealZichtbaar: revealZichtbaar.length,
     revealFocusbaar: revealFocusbaar.length,
     contextPanelen: document.querySelectorAll('.rtg-edge-2-context').length,
@@ -232,9 +235,10 @@ function assertInsets(overzicht, compact, focus, mobiel, label) {
   assert.ok(overzicht.padding.top - compact.padding.top >= 30,
     label + ': compact geeft de ruimte van de bovenrand niet terug');
   assert.ok(overzicht.padding.bottom >= 40, label + ': overzicht reserveert de onderrand niet');
-  assert.ok(compact.padding.bottom >= 40, label + ': compact reserveert zijn enige zichtbare rand niet');
-  assert.ok(compact.padding.bottom - focus.padding.bottom >= 38,
-    label + ': focus geeft de ruimte van de onderrand niet terug');
+  assert.ok(compact.padding.bottom <= 4, label + ': compact geeft de ruimte van de onderrand niet terug');
+  assert.ok(overzicht.padding.bottom - compact.padding.bottom >= 38,
+    label + ': compact maakt het werkvlak onderaan niet vrij');
+  assert.ok(focus.padding.bottom <= 4, label + ': focus houdt onderaan nog Edge-ruimte vast');
   if (mobiel) {
     assert.ok(overzicht.padding.left <= 4 && compact.padding.left <= 4 && focus.padding.left <= 4,
       label + ': mobiel reserveert nog ruimte voor de verborgen zijrand');
@@ -303,14 +307,23 @@ async function controleerRoute(page, route, scherm) {
   assertEenRand(overzicht, label + ' · overzicht');
   assertStand(overzicht, { ...scherm.overzicht, reveal: false }, label + ' · overzicht');
   assert.equal(overzicht.wereld, route.wereld, label + ': verkeerde wereldkleur/context');
+  assert.equal(overzicht.top.achtergrond, overzicht.bottom.achtergrond,
+    label + ': boven- en onderbalk hebben niet hetzelfde wereldmateriaal');
+  assert.equal(overzicht.randHerstel, 2, label + ': boven- en onderrand missen hun herstelzone');
+  assert.equal(overzicht.randHerstelZichtbaar, 0, label + ': herstelzones zijn buiten compact zichtbaar');
   assertContext(overzicht, route, label);
   if (scherm.naam === 'desktop') await controleerContextlade(page, label, route);
 
-  await zetStand(page, 'compact', { top: false, side: false, bottom: true, reveal: false });
+  await zetStand(page, 'compact', { top: false, side: false, bottom: false, reveal: false });
   const compact = await page.evaluate(schermToestand, route);
   assertEenRand(compact, label + ' · compact');
-  assertStand(compact, { top: false, side: false, bottom: true, reveal: false }, label + ' · compact');
+  assertStand(compact, { top: false, side: false, bottom: false, reveal: false }, label + ' · compact');
+  assert.equal(compact.randHerstelZichtbaar, 2, label + ': compacte randseinen zijn niet allebei raakbaar');
   assert.deepEqual(compact.oudZichtbaar, [], label + ' · compact: oude chrome keert terug');
+
+  await page.click('.rtg-edge-2-edge-reveal--bottom');
+  await wachtOpStand(page, 'overview', { ...scherm.overzicht, reveal: false });
+  await zetStand(page, 'compact', { top: false, side: false, bottom: false, reveal: false });
 
   await zetStand(page, 'focus', { top: false, side: false, bottom: false, reveal: true });
   const focus = await page.evaluate(schermToestand, route);

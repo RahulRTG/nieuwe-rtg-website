@@ -31,15 +31,9 @@
         '><span aria-hidden="true">0' + (i + 1) + '</span>' + esc(wereld.kaart) + '</a>';
     }).join('');
   }
-  /* HET CASCO VAN DE SCHIL: de lege balken, rand en panelen die het systeem
-     daarna vult en bindt. Zelfde naad als hierboven -- de bibliotheek bouwt de
-     HTML, rtg-edge-system.js hangt er gedrag aan. Hij verhuisde hierheen toen
-     dat bestand op 16 bytes van de 10 KB uit keuringsregel 13 bleek te staan:
-     elke toevoeging viel erdoor, ook een van twee regels. `s` is de
-     icoonfunctie van het systeem; die blijft daar, want zij leest de
-     iconenset. */
+  /* Het gedeelde casco. De bibliotheek bouwt; het systeem bindt. */
   function casco(cfg, s) {
-    return '<header class="rtg-edge-top"><a class="rtg-edge-mark" href="' + cfg.home + '" aria-label="Naar ' + cfg.naam + '">RTG</a><nav class="rtg-edge-crumbs" aria-label="U bent hier"></nav><nav class="rtg-edge-worldbar" aria-label="De vier RTG-werelden"></nav><button class="rtg-edge-state" type="button" aria-label="Beveiliging en systeemstatus" aria-expanded="false"><i></i><span>Controleren</span></button></header>' +
+    return '<header class="rtg-edge-top"><a class="rtg-edge-mark" href="' + cfg.home + '" aria-label="Rahul Travel Group, naar ' + cfg.naam + '"><span class="rtg-edge-mark-short" aria-hidden="true">RTG</span><span class="rtg-edge-mark-lockup" aria-hidden="true"><strong>Rahul Travel Group</strong><small>Experience the elite class</small></span></a><nav class="rtg-edge-crumbs" aria-label="U bent hier"></nav><nav class="rtg-edge-worldbar" aria-label="De vier RTG-werelden"></nav><button class="rtg-edge-state" type="button" aria-label="Beveiliging en systeemstatus" aria-expanded="false"><i></i><span>Controleren</span></button></header>' +
       '<aside class="rtg-edge-side"><div class="rtg-edge-scope"></div><nav class="rtg-edge-tools" aria-label="Snelle functies"></nav></aside>' +
       '<section class="rtg-edge-index" aria-hidden="true"></section><section class="rtg-edge-status-panel" aria-hidden="true"></section>' +
       '<section class="rtg-edge-ai-panel" aria-hidden="true"><div class="rtg-edge-ai-empty"><span><b>Rahul staat klaar.</b>Log in voor uw beveiligde gesprek.<a href="/apps/app.html">Inloggen →</a></span></div></section>' +

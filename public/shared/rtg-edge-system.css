@@ -26,10 +26,11 @@ body.rtg-edge-host{margin:0;min-width:320px;padding-top:calc(var(--edge-top) + e
 .rtg-edge-chrome button,.rtg-edge-chrome a,.rtg-edge-chrome input{font:inherit}
 .rtg-edge-chrome button,.rtg-edge-chrome a{pointer-events:auto;border:0;background:none;color:inherit;cursor:pointer;text-decoration:none}
 .rtg-edge-chrome svg{width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:1.45;stroke-linecap:round;stroke-linejoin:round}
-.rtg-edge-top{position:absolute;left:0;right:0;top:0;height:calc(var(--edge-top) + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);display:grid;grid-template-columns:var(--edge-side) minmax(0,1fr) auto auto;align-items:center;border-bottom:1px solid var(--edge-line);background:color-mix(in srgb,var(--edge-bg) 94%,transparent);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);pointer-events:auto}
+.rtg-edge-top{position:absolute;left:0;right:0;top:0;height:calc(var(--edge-top) + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);display:grid;grid-template-columns:var(--edge-side) minmax(0,1fr) auto auto 44px 44px 44px;align-items:center;border-bottom:1px solid var(--edge-line);background:color-mix(in srgb,var(--edge-bg) 94%,transparent);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);pointer-events:auto}
 .rtg-edge-top{transition:transform .28s cubic-bezier(.2,.8,.2,1)}
 .rtg-edge-top::after{content:"";position:absolute;left:var(--edge-side);bottom:-1px;width:96px;height:1px;background:linear-gradient(90deg,var(--edge-accent),transparent)}
 .rtg-edge-mark{height:var(--edge-top);display:grid;place-items:center;border-right:1px solid var(--edge-line);color:var(--edge-metal);font:600 14px/1 "Bodoni Moda",Didot,Georgia,serif;letter-spacing:-.04em}
+.rtg-edge-mark-short{display:block}.rtg-edge-mark-lockup{display:none}
 .rtg-edge-crumbs{min-width:0;height:var(--edge-top);display:flex;align-items:center;gap:7px;padding:0 13px;overflow:hidden;white-space:nowrap;color:var(--edge-dim);font-size:10px;letter-spacing:.105em;text-transform:uppercase}
 .rtg-edge-crumbs button{min-width:44px;min-height:44px;max-width:29%;padding:6px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:inherit;letter-spacing:inherit;font-size:inherit}
 .rtg-edge-crumbs button:last-of-type{max-width:42%;color:var(--edge-copy)}

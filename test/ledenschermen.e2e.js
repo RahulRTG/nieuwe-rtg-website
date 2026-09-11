@@ -125,7 +125,10 @@ test('het bureaublad zegt eerlijk dat dit een demo is, en wat er precies uit sta
     /* Magnaat Test is de enige testversie. De melding noemt daarom niet meer
        de brede en verwarrende term "demo", maar wel de harde grens met de
        echte omgeving. */
-    assert.match(r.tekst, /Magnaat Test/i, 'het benoemt de testomgeving expliciet');
+    assert.match(r.tekst, /Veilige oefenwereld/i, 'het benoemt de testomgeving expliciet');
+    assert.match(r.tekst, /Synthetische gegevens/i, 'het benoemt de veilige oefengegevens expliciet');
+    assert.match(r.tekst, /Geen risico voor klanten of geld/i,
+      'het benoemt expliciet wat de oefenwereld beschermt');
     assert.match(r.tekst, /afgeschermd van klantdata|klantdata .*buiten bereik/i,
       'en sluit echte klantdata uit');
     assert.match(r.tekst, /afgeschermd van .*productieacties|productieacties .*buiten bereik/i,

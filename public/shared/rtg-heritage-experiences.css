@@ -7,7 +7,7 @@ body[data-rtg-skin="heritage"] :where(
   .kaart,.kaart img,.kaart .acties button,.social-nav,.care-hero,.care-primary,
   .care-shortcut,.care-card,.care-card__actions button,.care-empty,
   .care-agenda-head,.care-note,.care-nav,.care-error,.care-dialog,
-  .care-dialog__actions button){border-radius:var(--rtg-radius-system)}
+  .care-dialog__actions button,.ag-doos.ag-ballotage){border-radius:var(--rtg-radius-system)}
 
 body[data-rtg-skin="heritage"] :where(
   .today-hero,.today-primary,.today-action,.today-moments,.today-attention,
@@ -47,3 +47,7 @@ body[data-rtg-skin="heritage"] :where(
   .rtg-arrival-experience .rit-hoofdknop,.rtg-arrival-experience .rit-leeg){
   border-radius:var(--rtg-radius-system)
 }
+
+/* De RTG ID-ballotage staat al vóór het wereldskinbesluit in beeld. Zij is
+   een systeemlaag en krijgt daarom ook daar de centrale systeemvorm. */
+#gate#gate:has(.ag-doos.ag-ballotage)>.ag-doos.ag-ballotage{border-radius:var(--rtg-radius-system)}

@@ -34,6 +34,8 @@ function contrast(a, b) {
 
 test('zichtbare Edge-bediening gebruikt minstens 44 bij 44 pixels', () => {
   assert.match(EDGE, /--edge-top:44px/);
+  assert.match(EDGE, /grid-template-columns:var\(--edge-side\) minmax\(0,1fr\) auto auto 44px 44px 44px/,
+    'zoeken, taal en profiel staan in dezelfde bovenrand, niet in een tweede rij');
   for (const contract of [
     /\.rtg-edge-crumbs button\{[^}]*min-width:44px;min-height:44px/,
     /\.rtg-edge-worldbar a\{[^}]*min-width:44px;min-height:44px/,
@@ -90,7 +92,7 @@ test('mobiele LivingOS-panelen volgen de bestaande data-view en worden niet leeg
 
 test('een 100dvh-werkschil blijft binnen de zichtbare Edge-werkhoogte', () => {
   assert.match(EDGE, /body\.rtg-edge-host \.pn-shell\{height:calc\(100dvh - var\(--edge-top\) - var\(--edge-bottom\) - env\(safe-area-inset-top,0px\) - env\(safe-area-inset-bottom,0px\)\)\}/);
-  assert.match(EDGE2, /data-rtg-edge-2-state="compact"\] \.pn-shell\{height:calc\(100dvh - var\(--edge-bottom\)/);
+  assert.match(EDGE2, /data-rtg-edge-2-state="compact"\] \.pn-shell\{height:100dvh\}/);
   assert.match(EDGE2, /data-rtg-edge-2-state="focus"\] \.pn-shell\{height:100dvh\}/);
 });
 

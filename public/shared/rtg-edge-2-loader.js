@@ -1,4 +1,3 @@
-/* Edge 2 verrijkt pas na een volledig bestaand casco; fouten laten Edge 1 staan. */
 (function (w, d) {
   'use strict';
   if (!d.body || w.__RTGEdge2Loader) return;
@@ -197,14 +196,14 @@
     if (nieuw) h.appendChild(css);
   }
 
-  var over = 3, mislukt = false;
+  var over = 4, mislukt = false;
   function afhankelijk(ok) {
     if (!ok) mislukt = true;
     if (--over || mislukt) return;
     script('/shared/rtg-edge-2.js', 'RTGEdge2', function (klaar) {
       if (!klaar || !w.RTGEdge2) return;
       try {
-        w.RTGEdge2.start(d, w); bewaakVensters(); w.RTGEdgeCommand.koppel(d, w);
+        w.RTGEdge2.start(d, w); w.RTGEdge2Reveal.start(d, w); bewaakVensters(); w.RTGEdgeCommand.koppel(d, w);
         script('/shared/rtg-edge-appbar.js', 'RTGEdgeAppBar', function (appbar) {
           if (appbar) w.RTGEdgeAppBar.start(d);
           script('/shared/rtg-edge-smart-menu.js', 'RTGEdgeSmartMenu', function (slim) {
@@ -218,4 +217,5 @@
   blad('/shared/rtg-edge-2.css', afhankelijk);
   script('/shared/rtg-edge-2-context.js', 'RTGEdge2Context', afhankelijk);
   script('/shared/rtg-edge-command.js', 'RTGEdgeCommand', afhankelijk);
+  script('/shared/rtg-edge-2-reveal.js', 'RTGEdge2Reveal', afhankelijk);
 })(window, document);

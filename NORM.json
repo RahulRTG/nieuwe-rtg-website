@@ -21,8 +21,8 @@
     "keuringTeGroot": 14,
     "inlineStijlAttributen": 4638,
     "browserpoortToetsen": 337,
-    "kernBreedte": 1565,
-    "kernGedeeld": 231,
+    "kernBreedte": 1567,
+    "kernGedeeld": 233,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
     "toetsenNietGemeten": 607,
@@ -1955,6 +1955,24 @@
       "meter": "kernBreedte 1563 -> 1565",
       "reden": "STAP 2 VAN DE KAARTENLAAG (KAARTEN.md par. 11) voegt twee namen toe: `navKaartPakket` (het manifest: wat er van een gebouwd pakket te halen is, hoe groot, met welk controlegetal) en `navKaartDeel` (het pad dat de route mag streamen). Twee en niet een, en dat is hier de keuze die verantwoording vraagt: ze hadden in EEN functie gekund met een modusvlag (`navKaartPakket(code, deel)`), maar dan geeft een naam twee verschillende soorten antwoord terug -- een manifest of een bestandsbeschrijving -- en dat is precies de vorm waar een aanroeper op een dag het verkeerde veld van leest.\n\nDe koppeling die erbij komt is smal en dat is na te rekenen: de laag krijgt GEEN db en GEEN save mee (server/opzet/kernlaag6.js), bezit geen collectie, en leest alleen wat er in RTG_DATA_DIR ligt. Wat een lid mag ophalen is een GESLOTEN lijst van acht delen en nooit een bestandsnaam, met de licentiepoort van kern/navigatie/gebieden.js ervoor -- geen naamsvermelding, geen manifest en ook geen bytes. test/navigatietoestelpakket.test.js toets 3, 5 en 6 zijn de grendels.\n\nDezelfde afweging als bij 1560 -> 1563 hierboven: het domein navigatie is overal plat, dus er komt geen namespace tussen tien vlakke namen. Een naam om functies heen maakt de koppeling niet kleiner maar alleen de meting.",
       "waarheen": "server/kern/navigatie/toestelpakket.js (manifest en deel, zonder opslag) met public/shared/kaartpakket.js aan de toestelkant; de gesloten lijst en de licentiepoort blijven in de kern"
+    },
+    {
+      "datum": "2026-09-11",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1565,
+      "meter": "kernBreedte 1565 -> 1567",
+      "reden": "RTG VERTEGENWOORDIGING EN RTG RUGDEKKING VOEGEN SAMEN TWEE NAMEN TOE: `vertegenwoordiging` en `rugdekking`. Ze gaan hier samen omdat ze om exact dezelfde reden duur zijn -- en die reden is een GRENS en geen slordigheid.\n\nBEIDE NAMEN ZIJN GEDEELD, en allebei met precies EEN ander domein: `office`. Dat is de hele +2 op kernGedeeld. De oorzaak staat uitgeschreven in de kop van server/routes/office/voogdij.js: een routebestand achter de domeingrens `vertegenwoordiging` kan per definitie niet bij `kluisAuth`, en juist de twee zwaarste besluiten van deze lagen HOREN achter de kantoordeur -- \"deze volwassene mag meetekenen voor dit kind\" en \"dit lid krijgt rugdekking\". Een spoor dat eindigt bij de gedeelde kantoorcode is geen spoor maar een alibi (KANTOORMACHT.md), dus die routes moeten daar wonen waar die deur woont.\n\nWAT ER NIET IS GEDAAN, EN WAAROM NIET. Beide namen hadden in tweeen gekund -- `rugdekkingLid` voor het domein en `rugdekkingKantoor` voor office -- en dan was kernGedeeld op 231 blijven staan. Dat is niet gedaan, want het maakt de KOPPELING niet kleiner maar alleen de meting: dezelfde functies, dezelfde aanroepen, twee namen in plaats van een, en kernBreedte zou er juist van stijgen. Dat is dezelfde afweging als bij de kaartenlaag op 10 september (\"een naam om functies heen maakt de koppeling niet kleiner maar alleen de meting\"), nu in de andere richting. Een ratel die je met een naamkeuze omlaag praat, meet vanaf dan de naamkeuze.\n\nWAT DE KOPPELING WEL SMAL HOUDT, en dat is na te rekenen. Beide lagen staan in GRENZEN.json met hun eigen domein plus `office` en nergens anders. Beide bezitten een eigen collectie via kern/eigencollectie.js (`vertegenwoordigingen`, `rugdekkingen`), dus keuringsregel 63 bewaakt dat niemand anders erin schrijft. De ledenroutes hangen achter `auth` en staan op de SESSIESLEUTEL en niet op een naam. En de kantoorroutes weigeren zonder bewezen mens: de kern zelf geeft 403 als `wieKijkt(req)` geen naam oplevert, dus de gedeelde code komt er niet door.\n\nEN EEN VAN DE TWEE IS NIET WEG TE HALEN ZONDER DE FUNCTIE WEG TE HALEN. Zonder de kantoornaam kan RTG een voogd niet bevestigen, en dan kan er nooit iemand namens een minderjarig talent handelen -- de groep waar deze hele laag voor bestaat.",
+      "waarheen": "server/kern/vertegenwoordiging/ (de machtiging mens-namens-mens, met het jeugdbestuur) en server/kern/rugdekking/ (de twee soorten en de beursstand); de kantoorkant in server/routes/office/voogdij.js en server/routes/office/rugdekking.js, allebei achter kluisAuth"
+    },
+    {
+      "datum": "2026-09-11",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 231,
+      "meter": "kernGedeeld 231 -> 233",
+      "reden": "Dezelfde twee namen als de notitie hierboven (kernBreedte 1565 -> 1567), en om dezelfde reden: allebei gedeeld met precies EEN ander domein, `office`, omdat een routebestand achter de domeingrens niet bij `kluisAuth` kan en het zwaarste besluit van beide lagen daar hoort. De verantwoording staat daar voluit; hij wordt hier niet herhaald, want twee notities die hetzelfde zeggen worden allebei niet gelezen.",
+      "waarheen": "server/routes/office/voogdij.js en server/routes/office/rugdekking.js -- de twee kantoorroutes die de deling veroorzaken"
     }
   ],
   "prestatie": {

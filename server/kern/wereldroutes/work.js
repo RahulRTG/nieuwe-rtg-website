@@ -52,6 +52,15 @@ module.exports = [
   '/apps/leverancier-service.html',
   '/apps/leverancier.html',
   '/apps/loonstrook.html',
+  /* HET CARRIERE LEDGER en zijn deelbewijs horen bij elkaar en dus bij EEN
+     wereld. `loopbaan` staat in MAPPEN al onder WorkOS, naast
+     vertegenwoordiging.html -- dezelfde laag uit CARRIERE.md. En het
+     bewijsscherm is diezelfde functie van BUITEN gezien: een bond of een
+     sponsor die een titel nakijkt zonder account. Dat het geen ledenscherm
+     is, maakt het geen eigen functie; twee eigenaren voor een capability is
+     precies wat deze catalogus tegenhoudt. */
+  '/apps/loopbaan.html',
+  '/apps/loopbaanbewijs.html',
   '/apps/luchthaven.html',
   '/apps/magnaat-kantoor.html',
   '/apps/magnaat-partnerstudio.html',
@@ -96,6 +105,7 @@ module.exports = [
   '/apps/stadsdoos.html',
   '/apps/studio-pda.html',
   '/apps/techniek.html',
+  '/apps/vertegenwoordiging.html',
   '/apps/voertuig.html',
   '/apps/websitestudio.html',
   '/apps/werk.html',

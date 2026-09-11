@@ -78,6 +78,7 @@
       <div id="kAttr" style="margin:0.5rem 0;"></div>
       <select id="kNamens" style="display:none;" aria-label="Inloggen als"></select>
       <p class="i-9ex6ps stil" id="kNiveau"></p>
+      <p class="i-9ex6ps stil" id="kNiveauWeg" hidden><a href="/apps/verificatie.html">Uw identiteit laten zien &rsaquo;</a></p>
       <p class="i-9ex6ps stil" id="kSleutel"></p>
       <div class="rij" style="margin-top:0.4rem;">
         <button class="knop vol" id="kBevestig" type="button">Bevestig met passkey</button>
@@ -192,6 +193,10 @@
         ? 'Deze dienst vraagt niveau ' + eis + '; u staat op ' + koppel.betrouwbaarheid.id + ' (' + koppel.betrouwbaarheid.naam + ').'
         : 'Deze dienst vraagt niveau ' + eis + ' en u staat op ' + koppel.betrouwbaarheid.id + ' (' + koppel.betrouwbaarheid.naam +
           '). Laat eerst uw identiteitsbewijs door RTG controleren; dit lost u hier niet op.';
+    /* De weg erheen stond er niet, en daarmee was dit een doodlopende zin: het
+       scherm noemde een eis en liet de lezer zoeken. /apps/verificatie.html is
+       sinds deze ronde de plek waar je dat niveau haalt. */
+    $('#kNiveauWeg').hidden = haalt;
     $('#kMaak').style.display = (!heeft && eigen && haalt) ? '' : 'none';
     $('#kBevestig').disabled = !heeft || !haalt;
     $('#kSleutel').textContent = !haalt ? ''

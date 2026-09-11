@@ -75,6 +75,7 @@ const MAG_LOS = new Map([
   ['/apps/metier.html', 'omleiding: Metier is een stand van RTG Geld geworden'],
   ['/apps/gast.html', 'landingspagina: je komt hier door een QR-code op een tafel of kamer te scannen, niet via een link'],
   ["/apps/festival-gast.html", "landingspagina: uw eigen kant van het festival. U komt hier met de pas die u al heeft (de code staat groot in beeld aan de poort) of via de link van uw groep -- niet via de bank. Het ORGANISATIEscherm /apps/festival.html hangt wel gewoon, bij de zaakschermen in de leverancier-app."],
+  ["/apps/loopbaanbewijs.html", "landingspagina: u komt hier met een code die een mens u zelf heeft gestuurd, en meestal zonder RTG-account. Hem aan de bank hangen zou onzin zijn -- zonder code valt er niets te openen, en de mensen voor wie de pagina bestaat (een club, een bond, een sponsor, een visumloket) hebben geen bank."],
   ["/apps/reisuitnodiging.html", "landingspagina: je komt hier via de link die het reisbureau of een reisgenoot je stuurt. Hem aan de bank hangen zou hem juist verkeerd maken -- de pagina bestaat om een reis over te nemen die IEMAND ANDERS voor je klaarzette (REIZEN.md, kern/reisuitnodiging.js), en zonder die link valt er niets te openen"]
 ]);
 

@@ -63,6 +63,17 @@ module.exports = {
   specialist: { label: 'Medisch specialist', icon: '\u{1FAC0}', industry: 'healthcare', caps: ['location'], status: 'bewijs' },
   tandarts: { label: 'Tandartspraktijk', icon: 'zorg', industry: 'healthcare', caps: ['services', 'location', 'pricing'], status: 'open' },
 
+  /* De twee vakken die een SPORTER begeleiden, en de reden dat ze er nu pas
+     zijn staat in RUGDEKKING.md par. 4.4: een belastingsmodel of een
+     terugkeer-na-blessure is per definitie het niveau `professioneel` uit
+     kern/zorgniveau.js, waar RTG de weg mag wijzen en de inhoud niet mag geven.
+     De uitweg is niet een uitzondering op die grens maar de professional IN het
+     systeem zetten -- met een eigen genre, `status: 'bewijs'` zodat een mens van
+     RTG de vergunning ziet, en een persoonseis op de HANDELING
+     (kern/persoonseis-lijst.js). */
+  fysiotherapie: { label: 'Fysiotherapiepraktijk', icon: 'zorg', industry: 'healthcare', caps: ['services', 'location', 'pricing'], status: 'bewijs' },
+  sportarts: { label: 'Sportgeneeskunde', icon: 'zorg', industry: 'healthcare', caps: ['services', 'location'], status: 'bewijs' },
+
   // Farmacie
   apotheek: { label: 'Apotheek', icon: '\u{1F48A}', industry: 'pharmacy', caps: ['location'], status: 'bewijs' },
 

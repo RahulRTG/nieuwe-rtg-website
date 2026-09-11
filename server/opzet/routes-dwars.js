@@ -36,6 +36,19 @@ module.exports = function hangDwarseRoutersOp(grens) {
   require('../routes/sleutelwoorden')(grens('sleutelwoorden'));
   require('../routes/agenda')(grens('agenda'));
   require('../routes/notities')(grens('notities'));
+  /* RTG Vertegenwoordiging (kern/vertegenwoordiging/): een mens die handelt
+     namens een mens. Dwars omdat hij aan geen enkel domein hangt -- hij gaat
+     over de betrekking tussen twee leden en niet over wat zij doen. */
+  require('../routes/vertegenwoordiging')(grens('vertegenwoordiging'));
+  /* RTG Rugdekking (kern/rugdekking/): wat RTG een mens biedt die van zijn
+     talent leeft. Ook dwars: het gaat over de betrekking tussen RTG en die
+     mens, en niet over wat hij doet. */
+  require('../routes/rugdekking')(grens('rugdekking'));
+  /* Het carriere ledger (kern/carriereledger/): chronologisch, per regel
+     bewijsbaar. Ook dwars -- een loopbaan hangt aan een MENS en niet aan een
+     domein; dat is precies wat CARRIEREVORM.json meet (0 velden gedeeld over
+     de vijftien talentdomeinen). */
+  require('../routes/carriereledger')(grens('carriereledger'));
   require('../routes/bestanden')(grens('bestanden'));
   require('../routes/meet')(grens('meet'));
   require('../routes/galerij')(grens('galerij'));

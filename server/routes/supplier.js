@@ -177,24 +177,9 @@ app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   require('./supplier/zorgketen')(kern);
   require('./supplier/ketenchat')(kern);
   require('./supplier/defensie')(kern);
-  require('./supplier/retail')(kern);
-  require('./supplier/paspoort')(kern);
-  require('./supplier/salon')(kern);
-  require('./supplier/events')(kern);
-  require('./supplier/financien')(kern);
-  require('./supplier/btw')(kern);
-  require('./supplier/vervoer')(kern);
-  require('./supplier/kassa')(kern);
-  require('./supplier/horeca')(kern); // RTG Horeca OS: rekeningen, keuken, bezorging, club, hotel-folio
-  /* De retourstroom, verkoperkant (kern/commerce/retour.js, COMMERCE.md par. 6).
-     De ledenkant staat in routes/commerce.js; de standen die de VERKOPER zet,
-     komen alleen langs deze deur. */
-  require('./supplier/retour')(kern);
-  /* De verkoopwegen van de zaak (kern/commerce/verkoopweg.js): waarlangs zij
-     verkoopt. Publiek verkopen weigert de motor met de reden; zie de kop daar. */
-  require('./supplier/verkoopweg')(kern);
-  require('./supplier/werving')(kern);
-  /* "Vooruit": dezelfde Control Tower als de ledenkant, op de code van de zaak.
-     Zie de kop van ./supplier/vooruit.js. */
-  require('./supplier/vooruit')(kern);
+  /* De rest van de montage staat in ./supplier-deel2.js -- dit bestand liep over
+     de 10 KB van keuringsregel 13. Een montagelijst heeft geen tweede onderwerp,
+     dus de knip loopt hier niet langs een naad maar langs de bladzijde; de
+     volgorde is woordelijk onaangetast. */
+  require('./supplier-deel2')(kern);
 };

@@ -99,7 +99,7 @@
        in de voet. Vandaar `paneel`: geen vijfde wereldtegel, geen tweede
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
-      'link:ik', 'link:veilig', 'link:passkeys', 'link:bescherming',
+      'link:ik', 'link:verificatie', 'link:veilig', 'link:passkeys', 'link:bescherming',
       'link:sessies', 'link:relaties', 'link:gegevens', 'link:post', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
@@ -112,19 +112,8 @@
        Het huis houdt zijn eigen naam: RTG Kantoor is een merk in WorkOS. */
     { sleutel: 'map-werk', naam: 'WorkOS', wereld: '/apps/kantoor.html', glyf: 'office', items: [
       'link:werkos', 'link:rtgone', 'link:decisionroom', 'link:projectroom', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
-      'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk'] },
-    /* TRAVELOS IS DE KLEINSTE WERELD EN DAT IS GEEN ARGUMENT TEGEN HEM: een
-       wereld is geen categorie in een spreadsheet maar een bestemming in het
-       hoofd van een mens, en deze bezit de hele keten van vertrekken tot
-       thuiskomen (WERELDEN.md). Deze elf stonden in LivingOS en zijn er
-       letterlijk uit geknipt; geen item is nieuw, geen item is verdwenen.
-       Het huis bestond al en hing nergens aan: /apps/reizen.html. */
-    { sleutel: 'map-reizen', naam: 'TravelOS', wereld: '/apps/reizen.html', glyf: 'reizen', items: [
-      'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie', 'link:move',
-      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie',
-    /* Drie uit de tikkenmeting: aankomst, routedossier en OV-routes hingen
-       nergens aan. Ze horen hier, want wie ze opent is onderweg. */
-      'link:aankomst', 'link:routedossier', 'link:ovroutes'] },
+      'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk',
+      'link:vertegenwoordiging', 'link:loopbaan'] },
     /* Veilig: wie je bent en wie er over je waakt. De vier apps op dezelfde
        kern zijn een app met vier standen geworden (zie de opmerking bij LINKS),
        plus de sleutels waarmee je binnenkomt. Drie is hier geen tekort maar de

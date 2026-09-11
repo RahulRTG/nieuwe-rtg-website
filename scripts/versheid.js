@@ -305,7 +305,8 @@ const REGISTERS = [
      identiek uit aan een verse en zegt dan dat er nul altijd-ware lussen zonder
      uitweg zijn, terwijl er sindsdien drie bij kunnen zijn gekomen -- en aan dat
      getal hangt sinds 11 september 2026 een normtand. */
-  ['LUSSEN.json', 'npm run lussen', 'elke cyclische gedraging met zijn terminatiegraad, en de drie schulden waar NORM.json op ratelt']
+  ['LUSSEN.json', 'npm run lussen', 'elke cyclische gedraging met zijn terminatiegraad, en de drie schulden waar NORM.json op ratelt'],
+  ['CARRIEREVORM.json', 'node scripts/carrierevorm.js --vastleggen', 'of de talentdomeinen een datavorm delen -- CARRIERE.md par. 0 rust erop, dus een verouderde uitslag draagt daar een conclusie die niemand nog heeft nagerekend']
 ];
 
 /* De lezer van beide stempelvormen woont in ./lib/stempel.js -- hij stond hier

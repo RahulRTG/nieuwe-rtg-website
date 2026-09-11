@@ -2,7 +2,7 @@
    keurder klein blijft; dit bestand bevat alleen beleid, geen uitvoerlogica. */
 'use strict';
 
-module.exports = Object.freeze({
+module.exports = ({
   'POST /api/webhooks/storingen':
     'eigen duurzame SQLite-deduplicatie op de ondertekende event-id en bodyhash, over processen en herstarts; ' +
     'de ontvanger beslist opnieuw over 200, 409 of opslagfout, een generieke antwoordcache mag dat bewijs niet vervangen',
@@ -122,3 +122,10 @@ module.exports = Object.freeze({
     'de route weet zelf dat er al is opgezegd en zegt dat ook (alOpgezegd: true, met dezelfde einddatum); ' +
     'een afgespeeld eerste antwoord zou een lid vertellen dat hij nu opzegt terwijl dat al was gebeurd'
 });
+
+/* De carrierelaag staat in ./idemsleutels-nooit-carriere.js -- zelfde lijst,
+   eigen bestand, omdat deze anders over de 10 kB gaat. Zie de kop daar. */
+Object.assign(module.exports, require('./idemsleutels-nooit-carriere'));
+Object.assign(module.exports, require('./idemsleutels-nooit-ledger'));
+Object.assign(module.exports, require('./idemsleutels-nooit-vakschema'));
+Object.freeze(module.exports);

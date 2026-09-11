@@ -1,19 +1,19 @@
 {
   "stempel": {
-    "op": "2026-09-11T14:54:17.057Z",
-    "commit": "974680cf",
+    "op": "2026-09-11T17:54:21.240Z",
+    "commit": "eb5a38da",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
     "node": "v22.22.2"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
-  "bestemmingen": 96,
-  "woorden": 1145,
-  "gevonden": 750,
-  "dekking": 0.655,
+  "bestemmingen": 97,
+  "woorden": 1153,
+  "gevonden": 754,
+  "dekking": 0.6539,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -403,8 +403,8 @@
     {
       "naam": "RTG One",
       "url": "/apps/rtgone.html",
-      "woorden": 32,
-      "gevonden": 25,
+      "woorden": 31,
+      "gevonden": 24,
       "mist": [
         "geladen",
         "persoonlijke",
@@ -470,20 +470,6 @@
         "gezelschap",
         "aantal",
         "samenstellen"
-      ]
-    },
-    {
-      "naam": "Video",
-      "url": "/apps/clips.html",
-      "woorden": 18,
-      "gevonden": 12,
-      "mist": [
-        "maken",
-        "bewerken",
-        "knippen",
-        "reacties",
-        "feeddata",
-        "einde"
       ]
     },
     {
@@ -580,6 +566,32 @@
         "chef",
         "residence",
         "selectie"
+      ]
+    },
+    {
+      "naam": "Video",
+      "url": "/apps/clips.html",
+      "woorden": 17,
+      "gevonden": 12,
+      "mist": [
+        "bewerken",
+        "knippen",
+        "reacties",
+        "feeddata",
+        "einde"
+      ]
+    },
+    {
+      "naam": "Mijn loopbaan",
+      "url": "/apps/loopbaan.html",
+      "woorden": 11,
+      "gevonden": 6,
+      "mist": [
+        "reeks",
+        "zeven",
+        "voorraden",
+        "gedeeld",
+        "ingetrokken"
       ]
     },
     {
@@ -850,8 +862,8 @@
     {
       "naam": "RTG Media",
       "url": "/apps/media.html",
-      "woorden": 18,
-      "gevonden": 17,
+      "woorden": 17,
+      "gevonden": 16,
       "mist": [
         "releasecontrole"
       ]

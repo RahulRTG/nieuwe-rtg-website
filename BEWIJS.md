@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1806 bestanden en 12726 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1808 bestanden en 12741 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1806 |
-| losse beweringen (`test(...)`) | 12726 |
+| toetsbestanden | 1808 |
+| losse beweringen (`test(...)`) | 12741 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1183 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 66 |
-| alleen in de kop *genoemd*, nog niet gemeten | 154 |
-| niets van beide | 403 |
+| alleen in de kop *genoemd*, nog niet gemeten | 155 |
+| niets van beide | 404 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1594 bestanden, 12355 beweringen.
+1596 bestanden, 12370 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -704,6 +704,8 @@ toets omvalt.
 | `levensloop.test.js` | 1 | gezakt op `liegpoort /api/` | DE LEVENSLOOP -- een mens van aanmelding tot tweede baan. WAAROM DIT ER IS De andere twee toetsen kijken in de breedte: 157 mensen kunnen bij hun werk (menselijkebanen) en mensen doen dingen met elkaar... |
 | `leverancierpoort.test.js` | 16 | gezakt op `===->!==#0` | DE LEVERANCIERSPOORT: de acht functies waar elke supplier-route langs komt. WAAROM DEZE TOETS ER NU PAS IS. |
 | `lib.test.js` | 7 | gezakt op `===->!==#0` | Unit-tests voor de zuivere hulplibs (server/lib). Geen server nodig. |
+| `lidabonnement-deur.test.js` | 5 | -- | DE DEUR VAN /api/mijn/abonnement -- over de ECHTE server. WAAROM DIT NAAST test/lidabonnement.test.js STAAT. |
+| `lidabonnement.test.js` | 10 | genoemd | EEN LID EN ZIJN EIGEN LIDMAATSCHAP. HET GAT. |
 | `lidboard.test.js` | 21 | gezakt op `liegpoort /api/` | De eigen boardroom van elk lid (kern/lidboard/ + routes): 1. een lid ziet zijn bord met vijf groepen en zet er functies aan/uit; de stand blijft server-side bewaard. |
 | `lidfactuur.test.js` | 12 | gezakt op `liegpoort /api/` | ELKE BETAALDE LIDTRANSACTIE LEVERT EEN FACTUUR OP -- en dus btw. Dit is de toets bij de reparatie in kern/lidacties/factuur.js. |
 | `lidmaatschap.test.js` | 4 | gezakt op `===->!==#0` | De merkstatus van een lid is geen afgeleide marketingtekst in een scherm. Deze toets bewaakt de indeling zelf én houdt de memberclass los van de echte identiteitscontrole. |

@@ -123,6 +123,20 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
   // De zaak klaarzetten: ./aanmeldingen/klaarzetten.js (stond op de NOG-lijst).
   const klaarzetten = require('./aanmeldingen/klaarzetten')({ A, bedrijfMod });
 
+  /* WAT EEN LID ZELF MAG: zijn eigen lidmaatschap zien en opzeggen. Twee
+     bestanden, omdat lezen en een verbintenis veranderen twee soorten werk zijn
+     (./aanmeldingen/lidabonnement.js en -opzeg.js). Ze draaien op dezelfde
+     contracten en hetzelfde betaalschema als het kantoor -- er komt geen tweede
+     motor naast, alleen een tweede deur ervoor. */
+  const lidAbonnementLezer = require('./aanmeldingen/lidabonnement')({ A, B, contracten, PASSEN, eur });
+  const lidAbonnementOpzeg = require('./aanmeldingen/lidabonnement-opzeg')({
+    contracten, zegOpLidmaatschap, lezer: lidAbonnementLezer });
+  const lidAbonnement = {
+    mijn: lidAbonnementLezer.mijn,
+    opzegVoorbeeld: lidAbonnementOpzeg.opzegVoorbeeld,
+    zegOpZelf: lidAbonnementOpzeg.zegOpZelf
+  };
+
   return { aanmeldingen: Object.assign({ aanvraag, lijst, een, beslis, betalingen, verlengLidmaatschap, zegOpLidmaatschap, contracten,
-    termijnVoldaan, magAutomatischToekennen, PASSEN }, klaarzetten) };
+    termijnVoldaan, magAutomatischToekennen, PASSEN, lidAbonnement }, klaarzetten) };
 };

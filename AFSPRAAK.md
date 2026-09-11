@@ -440,7 +440,7 @@ Niet één herschrijving. Elke stap is los waardevol en los terug te draaien.
 | # | stap | stand |
 |---|---|---|
 | 1 | een factuur leest nooit de prijs van vandaag | **gedaan**, 11 sep 2026 |
-| 2 | een lid ziet, verlengt en zegt zelf op | open |
+| 2 | een lid ziet zijn abonnement en zegt zelf op | **gedaan**, 11 sep 2026 |
 | 3 | de contractstand in `auth()`, in de schaduw | open |
 | 4 | de bewijsprimitive, met onboarding als eerste gebruiker | open |
 | 5 | alle 31 tekenwegen een zekerheids- en bewijsverklaring | open |
@@ -455,6 +455,55 @@ Niet één herschrijving. Elke stap is los waardevol en los terug te draaien.
 | 14 | clausules en een semantische diff | open |
 | 15 | de gebeurtenissen naar finance, CRM, kantoor en AI | open |
 | 16 | het anker naar buiten | vraagt een besluit (par. 9) |
+
+### 14.1 Wat stap 2 opleverde, en wat hij NIET deed
+
+`/api/mijn/abonnement`, `/opzegvoorbeeld` en `/opzeggen`, achter de ledendeur, met
+het accountId uit de sessie en nooit uit het lijf. De motor is ongewijzigd: het
+werk gebeurt in dezelfde `zegOpLidmaatschap` die het kantoor aanroept, er is geen
+tweede opzeglus.
+
+Drie dingen die er met opzet NIET bij zitten, en alle drie zijn ze een grens:
+
+- **Geen ledenroute om te verlengen.** `contracten.verleng(c, nieuwCenten)` is het
+  enige moment waarop de afgesproken prijs mag veranderen; een lid dat zijn eigen
+  verlenging aanroept, zet zijn eigen prijs. Hij hoeft het ook niet — een
+  consumentenabonnement verlengt stilzwijgend via de ronde. Niet verlengen is
+  hetzelfde als niets doen, en dat mag hij al.
+- **Geen terugdraaiing van een opzegging.** De standentabel laat vanuit
+  `OPZEGGEND` alleen `GEEINDIGD` toe, en het opzeggen VERWIJDERT de termijnen na de
+  einddatum in plaats van ze op 'vervallen' te zetten. Terugdraaien is dus twee
+  besluiten (een overgang toevoegen, en de termijnen opnieuw opwekken) en geen
+  schakelaar. Dat hoort een eigen stap te zijn.
+- **Geen scherm.** De routes staan; de plek waar het lid ze ziet wacht op de
+  naamkwestie van par. 11.
+
+**En het indelen van die routes vond een defect dat geen toets zag.** Het
+opzegVOORBEELD rekende zijn einddatum eerst uit met een `zegOp` op een
+wegwerpkopie van het contract. Geen rij veranderde — maar `zet()` in
+`commercie/contract.js` roept `save()` aan, dus een route die alleen VERTELT wat
+opzeggen gaat doen, schreef de hele database naar schijf, met elke andere mutatie
+die op dat moment nog in het geheugen stond.
+
+Dat is precies het gat waarvoor `MUTATIECONTRACT.md` bij `NOT_APPLICABLE` een
+TWEEDE, onafhankelijke afdekking eist naast de opslagmeter. Het is niet gevonden
+door te lezen en niet door een toets, maar door die eis serieus te nemen. De
+reparatie zit aan de oorzaak: `contracten.opzegEinde()` is nu een eigen functie
+die de datum uitrekent zonder hem te zetten, en `zegOp` gebruikt dezelfde — want
+de som overtypen bij de vrager zou betekenen dat het lid vooraf een andere datum
+leest dan hij krijgt zodra iemand een van de twee aanpast.
+
+Er staat nu een meter op: `test/lidabonnement.test.js` toets 10 telt de
+`save()`-aanroepen en eist nul voor het voorbeeld **en minstens een voor het echte
+opzeggen** — anders bewijst die toets niets.
+
+Een uitkomst uit de gemeten ronde die hier hoort te staan omdat hij verbaast: na
+opzeggen op dag 1 vallen er **nul** termijnen weg en blijven er elf staan. Dat is
+geen fout maar de minimumtermijn. Het lid leest dat ook zo (`nogTeBetalen: 11`),
+en dat moet: een opzegknop die de resterende verplichting verzwijgt is zelf een
+dark pattern.
+
+---
 
 Twee dingen in die lijst zijn **geen bouwwerk maar een besluit**, en ze zijn
 allebei goedkoop en blokkerend: de naam van het blad (par. 2.2) en het anker

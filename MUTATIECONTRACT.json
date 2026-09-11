@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-11T07:39:21.780Z",
-  "commit": "f0673651",
-  "boomVuil": false,
-  "boomAnders": 10,
+  "op": "2026-09-11T10:44:29.628Z",
+  "commit": "7545f5ee",
+  "boomVuil": true,
+  "boomAnders": 8,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4886,
-  "geclassificeerd": 4886,
+  "totaal": 4889,
+  "geclassificeerd": 4889,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3251,
-   "NOT_APPLICABLE": 1135,
-   "PROTECTED": 379,
+   "NOT_APPLICABLE": 1137,
+   "PROTECTED": 380,
    "INTENTIONALLY_NON_IDEMPOTENT": 121
   },
-  "vastgesteldDoorMens": 1679,
+  "vastgesteldDoorMens": 1682,
   "afgeleidDoorScript": 3207,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4026,
+   "AUTHENTICATED": 4029,
    "PUBLIC": 122,
    "OBJECT_SCOPED": 718,
    "(niet af te leiden -- vraagt een verklaring)": 4,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 88,
    "kale ronde: geen uitspraak": 4512,
-   "niet gemeten": 157
+   "niet gemeten": 160
   },
   "voorstellen": {},
   "metingVan": "2026-09-03T11:51:23.232Z"
@@ -50923,6 +50923,69 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "lidabonnement.lezen",
+   "route": "POST /api/mijn/abonnement",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "lidabonnement.opzeggen",
+   "route": "POST /api/mijn/abonnement/opzeggen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "lidabonnement.opzegvoorbeeld",
+   "route": "POST /api/mijn/abonnement/opzegvoorbeeld",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

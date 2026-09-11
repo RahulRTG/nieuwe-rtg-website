@@ -3,7 +3,7 @@
    de hele reis. De wachtrij en de ENE menselijke handeling -- accepteren of
    afwijzen -- zitten achter de office-inlog (RTG-personeel). */
 module.exports = (kern) => {
-  const { app, officeAuth, aanmeldingen, accounts, tooManyTries, boardroomWie } = kern;
+  const { app, auth, officeAuth, aanmeldingen, accounts, tooManyTries, boardroomWie } = kern;
   const veilig = (res, werk) => { try { const r = werk(); res.status(r && r.status ? r.status : 200).json(r); } catch (e) { console.error('[aanmeldingen]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); } };
   /* WIE HEEFT DIT BESLOTEN?
 
@@ -57,6 +57,54 @@ module.exports = (kern) => {
     aanmeldingen.zegOpLidmaatschap(String((req.body || {}).id || ''))));
   app.post('/api/aanmelding/contracten', officeAuth, (req, res) => veilig(res, () =>
     ({ ok: true, contracten: aanmeldingen.contracten.lijst(req.body || {}) })));
+
+  /* ============ HET LID EN ZIJN EIGEN LIDMAATSCHAP ============
+
+     De drie routes hierboven staan achter officeAuth en dat blijft zo: het
+     kantoor mag elk lidmaatschap zien en op ID opzeggen. De drie hieronder
+     staan achter de LEDENdeur, en het verschil is niet de deur maar de SLEUTEL:
+
+       kantoor   zegOpLidmaatschap(req.body.id)      -- een id uit het lichaam
+       lid       lidAbonnement.zegOpZelf(account.id) -- de sessie, nooit het lichaam
+
+     De kantoorroute achter een ledendeur hangen zou betekenen dat elk lid elk
+     willekeurig lidmaatschap kan opzeggen. Daarom neemt geen van deze drie iets
+     uit `req.body`; `aanvragerVan` geeft het accountId uit het geverifieerde
+     token, dezelfde weg als bij de aanvraag hierboven.
+
+     `auth` en niet `officeAuth`: auth weigert een leverancier- en kantoorsessie,
+     want die hebben geen lidmaatschap. Zie de kop van opzet/diensten2.js.
+
+     WAAROM ER GEEN LEDENROUTE VOOR VERLENGEN IS: verlengen is het enige moment
+     waarop de afgesproken prijs mag veranderen, en een lid dat zijn eigen
+     verlenging aanroept zou zijn eigen prijs zetten. Hij hoeft het ook niet --
+     een consumentenabonnement verlengt stilzwijgend via de commerciele ronde.
+     Zie de kop van kern/aanmeldingen/lidabonnement.js. */
+  const ikBen = req => {
+    const id = aanvragerVan(req);
+    return Number.isFinite(Number(id)) ? Number(id) : null;
+  };
+  /* Een demo- of gastsessie heeft geen echt account en dus geen lidmaatschap om
+     te tonen. Dat is geen 401 -- die sessie is gewoon ingelogd -- maar een leeg
+     antwoord met de reden erbij. Zelfde keuze als bij een lid zonder contract. */
+  const GEEN_ACCOUNT = { ok: true, abonnement: null,
+    reden: 'Deze sessie hangt niet aan een RTG-account, dus er is geen lidmaatschap om te tonen.' };
+
+  app.post('/api/mijn/abonnement', auth, (req, res) => veilig(res, () => {
+    const id = ikBen(req);
+    return id == null ? GEEN_ACCOUNT : aanmeldingen.lidAbonnement.mijn(id);
+  }));
+  /* Wat opzeggen gaat doen, zonder dat het gebeurt. Dit is GEEN schrijfroute en
+     de naam zegt dat: een lid hoort de gevolgen te kunnen lezen voordat hij
+     drukt, anders is de bevestiging zelf een dark pattern. */
+  app.post('/api/mijn/abonnement/opzegvoorbeeld', auth, (req, res) => veilig(res, () => {
+    const id = ikBen(req);
+    return id == null ? { status: 404, error: GEEN_ACCOUNT.reden } : aanmeldingen.lidAbonnement.opzegVoorbeeld(id);
+  }));
+  app.post('/api/mijn/abonnement/opzeggen', auth, (req, res) => veilig(res, () => {
+    const id = ikBen(req);
+    return id == null ? { status: 404, error: GEEN_ACCOUNT.reden } : aanmeldingen.lidAbonnement.zegOpZelf(id);
+  }));
 
   app.post('/api/aanmelding/beslis', officeAuth, (req, res) => veilig(res, () =>
     aanmeldingen.beslis(String((req.body || {}).id || ''), String((req.body || {}).besluit || ''), wie(req), (req.body || {}).notitie,

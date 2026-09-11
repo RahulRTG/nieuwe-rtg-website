@@ -114,18 +114,6 @@
       'link:werkos', 'link:rtgone', 'link:decisionroom', 'link:projectroom', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
       'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk',
       'link:vertegenwoordiging'] },
-    /* TRAVELOS IS DE KLEINSTE WERELD EN DAT IS GEEN ARGUMENT TEGEN HEM: een
-       wereld is geen categorie in een spreadsheet maar een bestemming in het
-       hoofd van een mens, en deze bezit de hele keten van vertrekken tot
-       thuiskomen (WERELDEN.md). Deze elf stonden in LivingOS en zijn er
-       letterlijk uit geknipt; geen item is nieuw, geen item is verdwenen.
-       Het huis bestond al en hing nergens aan: /apps/reizen.html. */
-    { sleutel: 'map-reizen', naam: 'TravelOS', wereld: '/apps/reizen.html', glyf: 'reizen', items: [
-      'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie', 'link:move',
-      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie',
-    /* Drie uit de tikkenmeting: aankomst, routedossier en OV-routes hingen
-       nergens aan. Ze horen hier, want wie ze opent is onderweg. */
-      'link:aankomst', 'link:routedossier', 'link:ovroutes'] },
     /* Veilig: wie je bent en wie er over je waakt. De vier apps op dezelfde
        kern zijn een app met vier standen geworden (zie de opmerking bij LINKS),
        plus de sleutels waarmee je binnenkomt. Drie is hier geen tekort maar de

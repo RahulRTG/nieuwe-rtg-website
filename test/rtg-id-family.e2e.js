@@ -14,6 +14,146 @@ const {
 } = require('./helper');
 
 const pw = laadPlaywright();
+const ROOT = path.join(__dirname, '..');
+const APPS = path.join(ROOT, 'public', 'apps');
+const WERELDEN = new Set(['living', 'travel', 'work', 'foundation']);
+const leesPad = (bestand) => fs.readFileSync(bestand, 'utf8');
+const lees = (bestand) => leesPad(path.join(ROOT, bestand));
+
+function paginas(map) {
+  return fs.readdirSync(map, { withFileTypes: true }).flatMap((item) =>
+    item.isDirectory()
+      ? paginas(path.join(map, item.name))
+      : item.name.endsWith('.html') ? [path.join(map, item.name)] : []);
+}
+
+function bodyVan(bron) {
+  return (bron.match(/<body\b[^>]*>/i) || [''])[0];
+}
+
+function wereldVan(bron) {
+  const match = bodyVan(bron).match(/\bdata-rtg-world=["']([^"']+)/i);
+  return match && match[1];
+}
+
+function omleidingVan(bron) {
+  const meta = bron.match(/<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^"']*url=([^"';>]+)/i);
+  return meta && meta[1].trim();
+}
+
+function basisTag(bron) {
+  return (bron.match(/<script\b[^>]*src=["'][^"']*\/shared\/basis(?:\.min)?\.js[^"']*["'][^>]*>/i) || [])[0];
+}
+
+test('alle zelfstandige appschermen erven de ene wereldkleurige Edge', () => {
+  const alle = paginas(APPS);
+  const zelfstandig = [];
+  const omleidingen = [];
+  const projecties = [];
+
+  for (const bestand of alle) {
+    const bron = leesPad(bestand);
+    const omleiding = omleidingVan(bron);
+    if (omleiding) { omleidingen.push([bestand, omleiding]); continue; }
+    if (/\bdata-rtg-projectie\b/i.test(bodyVan(bron))) { projecties.push(bestand); continue; }
+
+    zelfstandig.push(bestand);
+    const relatief = path.relative(ROOT, bestand);
+    assert.ok(WERELDEN.has(wereldVan(bron)), relatief + ' mist een geldige wereldkleur');
+    const tag = basisTag(bron);
+    assert.ok(tag, relatief + ' mist de centrale basislaag voor Edge');
+    assert.ok(/\bdefer\b/i.test(tag) || bron.indexOf(tag) > bron.search(/<body\b/i),
+      relatief + ' start basis.js voordat body en wereldidentiteit bestaan');
+    assert.doesNotMatch(bron,
+      /\/shared\/rtg-edge-2-(?:loader|context|reveal)\.js|\/shared\/rtg-edge-2\.js|\/shared\/rtg-edge-2\.css/,
+      relatief + ' mag geen tweede, plaatselijke Edge-laadketen maken');
+  }
+
+  assert.ok(zelfstandig.length > 250,
+    'de platformregel moet aantoonbaar de volledige verzameling van 250+ schermen dekken');
+  assert.equal(projecties.length, 1, 'alleen het gedeelde televisiescherm is bewust chromeloos');
+  assert.equal(path.relative(ROOT, projecties[0]), 'public/apps/spelscherm.html');
+
+  for (const [bestand, doel] of omleidingen) {
+    const doelpad = doel.split(/[?#]/)[0];
+    assert.ok(doelpad.startsWith('/apps/'), path.relative(ROOT, bestand) + ' leidt niet naar een eigen app');
+    const doelbestand = path.join(ROOT, 'public', doelpad.replace(/^\//, ''));
+    assert.ok(fs.existsSync(doelbestand), path.relative(ROOT, bestand) + ' leidt naar een ontbrekend scherm');
+    const doelbron = leesPad(doelbestand);
+    assert.ok(WERELDEN.has(wereldVan(doelbron)), doelpad + ' mist een geldige wereldkleur');
+    assert.ok(basisTag(doelbron), doelpad + ' erft de centrale Edge niet');
+  }
+
+  assert.equal(zelfstandig.length + omleidingen.length + projecties.length, alle.length);
+});
+
+test('de universele laadketen bouwt exact een Edge-casco', () => {
+  const basis = lees('public/shared/basis.js');
+  const randen = lees('public/shared/randen.js');
+  const systeem = lees('public/shared/rtg-edge-system.js');
+  const bibliotheek = lees('public/shared/rtg-edge-library.js');
+
+  assert.match(basis, /\['living', 'travel', 'work', 'foundation'\]/);
+  assert.match(basis, /s\.src = '\/shared\/randen\.js'/);
+  assert.match(randen, /function startPlatformEdge\(\)/);
+  assert.match(randen, /d\.body\.dataset\.rtgWorld/);
+  assert.match(randen, /w\.RTGEdge\.start\(\{ world: wereld/);
+  assert.equal((systeem.match(/className = 'rtg-edge-chrome'/g) || []).length, 1);
+  assert.equal((systeem.match(/\/shared\/rtg-edge-2-loader\.js/g) || []).length, 1);
+  for (const deel of ['rtg-edge-top', 'rtg-edge-side', 'rtg-edge-bottom']) {
+    assert.equal((bibliotheek.match(new RegExp('class="' + deel + '"', 'g')) || []).length, 1, deel);
+  }
+});
+
+const VORM = lees('public/apps/app-main/app-main-04aaaa.js') +
+  lees('public/apps/app-main/app-main-04aaaaa.js');
+const INHOUD = lees('public/apps/app-main/app-main-04b.js');
+const GEDRAG = lees('public/apps/app-main/app-main-05.js');
+const EDGE = lees('public/shared/rtg-edge-library.js');
+
+test('RTG ID gebruikt op breed en klein scherm dezelfde Edge-insets', () => {
+  assert.match(VORM, /#gate:has\(\.ag-doos\.ag-ballotage\)/);
+  assert.match(VORM, /var\(--edge-top,44px\)/);
+  assert.match(VORM, /var\(--edge-bottom,48px\)/);
+  assert.match(VORM, /grid-template-columns:minmax\(20rem,1fr\) minmax\(27rem,\.88fr\)/);
+  assert.match(VORM, /@media \(max-width:899px\)/);
+  assert.match(VORM, /--klokschaal:\.42/);
+});
+
+test('het officiële RTG-woordmerk ligt zonder eigen kleurvlak in de Edge-balk', () => {
+  assert.match(EDGE, /rtg-edge-mark-lockup/);
+  assert.match(EDGE, /Rahul Travel Group/);
+  assert.match(EDGE, /Experience the elite class/);
+  assert.match(VORM, /\.rtg-edge-mark-lockup strong/);
+  assert.match(VORM, /\.rtg-edge-top\{[^}]*background:var\(--edge-bar-bg\)!important/);
+  assert.match(VORM, /\.rtg-edge-mark\{[^}]*background:transparent!important/);
+  assert.match(VORM, /\.rtg-edge-mark-lockup strong\{[^}]*background:transparent!important/);
+  assert.match(VORM, /color:#d8bd6b/);
+});
+
+test('de ballotage gebruikt geen tweede functierail of Command-laag', () => {
+  assert.match(VORM, /\.rtg-edge-side\{[^}]*transform:translateX\(-101%\)!important;visibility:hidden/);
+  assert.match(VORM, /#rtgCommand \.cmd-bank/);
+  assert.match(VORM, /#rtgCommand \.cmd-balk\{display:none!important/);
+});
+
+test('de ballotage geeft de vraag prioriteit en behoudt Rahuls signatuur', () => {
+  assert.match(VORM, /\.ag-doos\.ag-ballotage \.ag-zin/);
+  assert.match(VORM, /text-align:left/);
+  assert.match(VORM, /\.ag-doos\.ag-ballotage \.ag-mond/);
+  assert.doesNotMatch(VORM, /\.ag-doos\.ag-ballotage \.ag-mond\{[^}]*display:none/);
+  assert.match(VORM, /#f4ede1/);
+  assert.match(VORM, /\.rtg-id-story h1/);
+  assert.match(INHOUD, /Uw toegang begint met een gesprek/);
+  assert.match(INHOUD, /ag-id-privacy/);
+});
+
+test('de vier stappen zijn ook voor hulptechnologie betekenisvol', () => {
+  assert.match(INHOUD, /id="agStappen" role="status" aria-live="polite"/);
+  assert.match(GEDRAG, /T\('ag\.stap','Stap'\)/);
+  assert.match(GEDRAG, /T\('ag\.van','van'\)/);
+  assert.match(GEDRAG, /removeAttribute\('aria-label'\)/);
+});
 
 test('RTG ID vormt op telefoon en bureau een familie met de ene Edge',
   { skip: geenBrowser(pw) }, async () => {

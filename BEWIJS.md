@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1808 bestanden en 12731 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1806 bestanden en 12731 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1808 |
+| toetsbestanden | 1806 |
 | losse beweringen (`test(...)`) | 12731 |
-| bestanden zonder kop (dus zonder opgeschreven bewering) | 140 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1183 |
+| bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1184 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 66 |
 | alleen in de kop *genoemd*, nog niet gemeten | 154 |
-| niets van beide | 405 |
+| niets van beide | 402 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1595 bestanden, 12359 beweringen.
+1593 bestanden, 12352 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1162,7 +1162,6 @@ toets omvalt.
 | `rtg-edge-accessibility.test.js` | 8 | geen bronmutatie mogelijk | De luxe Edge-rand blijft alleen premium wanneer haar echte bediening ook leesbaar en raakbaar is. Deze toets borgt de 44px-doelen, inclusief 320px, en meet de Living-statuskleuren als tekst in plaats van als moodboard. |
 | `rtg-edge-appbar.test.js` | 6 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-edge-boot.test.js` | 4 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `rtg-edge-platformdekking.test.js` | 2 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-edge-uitrol.test.js` | 2 | gezakt op `getal+1#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-heritage-first-paint.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-heritage-motion.test.js` | 9 | gezakt op `true->false#0` | De motionlaag mag intentie bevestigen, maar nooit zelf een handeling, route of onmeetbare voortgang verzinnen. De tests bewaken zowel het CSS-contract als de toegankelijke statuskoppeling. |
@@ -1170,7 +1169,6 @@ toets omvalt.
 | `rtg-heritage-order.test.js` | 3 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-heritage-transition.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-heritage.test.js` | 12 | geen bronmutatie mogelijk | DE HERITAGE-DOCTRINE IS CODE, GEEN MOODBOARD. Deze toets borgt de vaste wereldpaletten, twee geometrieën, vier dieptelagen en de componentrollen waarmee routes gefaseerd worden opgebouwd. |
-| `rtg-id-family.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-operation.test.js` | 5 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-route-memory.test.js` | 15 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-world-identity.test.js` | 5 | gezakt op `===->!==#0` | DE HERITAGE-ROUTEKAART IS FAIL-CLOSED. Een nieuw echt scherm mag niet ongemerkt een vijfde kleur erven en een oude redirect mag geen tweede productoppervlak worden. |
@@ -1635,7 +1633,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-213 bestanden, 372 beweringen.
+213 bestanden, 379 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1801,7 +1799,7 @@ toets omvalt.
 | `rtg-a11y.e2e.js` | 2 | -- | DE TOEGANKELIJKHEIDSADAPTER IN EEN ECHTE BROWSER. test/rtg-a11y.test.js toetst het VERTAALSTUK met de echte uitvoervorm van de keuring. |
 | `rtg-dev.e2e.js` | 1 | -- | RTG DEV IN EEN ECHTE BROWSER -- want dit is de bewering die alleen daar valt na te rekenen. Alles wat `rtg dev` belooft, hangt aan drie dingen die je met curl niet ziet: 1. |
 | `rtg-edge-2.e2e.js` | 1 | -- | DE ENE RAND ROND DE ACHT EERSTE VANDAAG-SCHERMEN. Deze proef telt niet alleen dat Edge bestaat. |
-| `rtg-id-family.e2e.js` | 1 | -- | De RTG ID-ballotage in haar echte browserstand: op een telefoon blijft de vraag boven de Edge-onderrand; op een breed scherm gebruikt identiteit links en gesprek rechts de ruimte. De proef vult uitsluitend twee... |
+| `rtg-id-family.e2e.js` | 8 | gezakt op `liegpoort /api/` | De RTG ID-ballotage in haar echte browserstand: op een telefoon blijft de vraag boven de Edge-onderrand; op een breed scherm gebruikt identiteit links en gesprek rechts de ruimte. De proef vult uitsluitend twee... |
 | `rtmail-team.e2e.js` | 1 | -- | Scherm-test voor de RTMAIL-teams. De unit-toetsen (test/rtmail-team.test.js) bewijzen de server-kant; deze bewijst dat het scherm het doet: een team oprichten, iemand erbij zetten, een bericht oppakken en afhandelen,... |
 | `rtmail-vak.e2e.js` | 1 | -- | Schermtoets voor het POSTVAK in RTG Mail: de mappenbalk, zoeken, opbergen, de ster en het gesprek. De servertoetsen (test/rtmail-vak.test.js) bewijzen dat de laag klopt; deze bewijst dat een mens er ook echt bij kan. |
 | `salon-app.e2e.js` | 1 | -- | Scherm-test voor De Salon-app. De unit-toetsen (test/salon-app.test.js) bewijzen de server-kant; deze bewijst dat het SCHERM het doet: plaatsen vanaf het tabblad zelf, de post die daarna in je eigen profiel staat,... |

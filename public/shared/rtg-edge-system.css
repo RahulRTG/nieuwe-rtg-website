@@ -26,10 +26,11 @@ body.rtg-edge-host{margin:0;min-width:320px;padding-top:calc(var(--edge-top) + e
 .rtg-edge-chrome button,.rtg-edge-chrome a,.rtg-edge-chrome input{font:inherit}
 .rtg-edge-chrome button,.rtg-edge-chrome a{pointer-events:auto;border:0;background:none;color:inherit;cursor:pointer;text-decoration:none}
 .rtg-edge-chrome svg{width:16px;height:16px;display:block;fill:none;stroke:currentColor;stroke-width:1.45;stroke-linecap:round;stroke-linejoin:round}
-.rtg-edge-top{position:absolute;left:0;right:0;top:0;height:calc(var(--edge-top) + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);display:grid;grid-template-columns:var(--edge-side) minmax(0,1fr) auto auto;align-items:center;border-bottom:1px solid var(--edge-line);background:color-mix(in srgb,var(--edge-bg) 94%,transparent);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);pointer-events:auto}
+.rtg-edge-top{position:absolute;left:0;right:0;top:0;height:calc(var(--edge-top) + env(safe-area-inset-top,0px));padding-top:env(safe-area-inset-top,0px);display:grid;grid-template-columns:var(--edge-side) minmax(0,1fr) auto auto 44px 44px 44px;align-items:center;border-bottom:1px solid var(--edge-line);background:color-mix(in srgb,var(--edge-bg) 94%,transparent);backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px);pointer-events:auto}
 .rtg-edge-top{transition:transform .28s cubic-bezier(.2,.8,.2,1)}
 .rtg-edge-top::after{content:"";position:absolute;left:var(--edge-side);bottom:-1px;width:96px;height:1px;background:linear-gradient(90deg,var(--edge-accent),transparent)}
 .rtg-edge-mark{height:var(--edge-top);display:grid;place-items:center;border-right:1px solid var(--edge-line);color:var(--edge-metal);font:600 14px/1 "Bodoni Moda",Didot,Georgia,serif;letter-spacing:-.04em}
+.rtg-edge-mark-short{display:block}.rtg-edge-mark-lockup{display:none}
 .rtg-edge-crumbs{min-width:0;height:var(--edge-top);display:flex;align-items:center;gap:7px;padding:0 13px;overflow:hidden;white-space:nowrap;color:var(--edge-dim);font-size:10px;letter-spacing:.105em;text-transform:uppercase}
 .rtg-edge-crumbs button{min-width:44px;min-height:44px;max-width:29%;padding:6px 0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-transform:inherit;letter-spacing:inherit;font-size:inherit}
 .rtg-edge-crumbs button:last-of-type{max-width:42%;color:var(--edge-copy)}
@@ -57,9 +58,9 @@ body.rtg-edge-host{margin:0;min-width:320px;padding-top:calc(var(--edge-top) + e
 .rtg-edge-tool:hover,.rtg-edge-tool:focus-visible{color:var(--edge-copy);background:rgba(255,255,255,.025);outline:0}
 .rtg-edge-tool[aria-current="page"]{color:var(--edge-copy);background:linear-gradient(90deg,var(--edge-accent-soft),transparent)}
 .rtg-edge-tool[aria-current="page"]::before{height:18px}
-.rtg-edge-tip{position:absolute;left:55px;top:50%;width:max-content;max-width:220px;padding:9px 11px;opacity:0;pointer-events:none;transform:translate(-5px,-50%);border:1px solid var(--edge-line);background:var(--edge-panel);box-shadow:0 14px 38px #0008;color:var(--edge-copy);font-size:11px;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;transition:opacity .15s,transform .15s}
+.rtg-edge-tip{position:absolute;left:55px;top:50%;width:max-content;max-width:220px;padding:9px 11px;opacity:0;visibility:hidden;pointer-events:none;transform:translate(-5px,-50%);border:1px solid var(--edge-line);background:var(--edge-panel);box-shadow:0 14px 38px #0008;color:var(--edge-copy);font-size:11px;letter-spacing:.09em;text-transform:uppercase;white-space:nowrap;transition:opacity .15s,transform .15s,visibility 0s linear .15s}
 .rtg-edge-tip kbd{margin-left:10px;color:var(--edge-metal);font:500 10px/1 Inter,system-ui,sans-serif}
-.rtg-edge-tool:hover .rtg-edge-tip,.rtg-edge-tool:focus-visible .rtg-edge-tip{opacity:1;transform:translate(0,-50%)}
+.rtg-edge-tool:hover .rtg-edge-tip,.rtg-edge-tool:focus-visible .rtg-edge-tip{opacity:1;visibility:visible;transform:translate(0,-50%);transition-delay:0s}
 
 .rtg-edge-bottom{position:absolute;left:0;right:0;bottom:0;height:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);display:grid;grid-template-columns:var(--edge-side) 44px 88px 44px minmax(0,1fr) 68px;align-items:center;border-top:1px solid var(--edge-line);background:color-mix(in srgb,var(--edge-bg) 96%,transparent);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);pointer-events:none}
 .rtg-edge-bottom>button,.rtg-edge-bottom>a,.rtg-edge-history{height:var(--edge-bottom);border-right:1px solid rgba(255,255,255,.055)!important}

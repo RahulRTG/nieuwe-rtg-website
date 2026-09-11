@@ -18,6 +18,8 @@ test('Edge heeft één centraal slot voor functies van het huidige scherm', () =
   assert.equal((LIBRARY.match(/class="rtg-edge-appslot"/g) || []).length, 1);
   assert.match(LIBRARY, /aria-label="Functies van dit scherm"/);
   assert.equal((LOADER.match(/\/shared\/rtg-edge-appbar\.js/g) || []).length, 1);
+  assert.equal((LOADER.match(/\/shared\/rtg-edge-2-reveal\.js/g) || []).length, 1);
+  assert.match(LOADER, /RTGEdge2Reveal\.start\(d, w\)/);
   assert.match(LOADER, /RTGEdgeAppBar\.start\(d\)/);
   assert.equal((LOADER.match(/\/shared\/rtg-edge-smart-menu\.js/g) || []).length, 1);
   assert.match(LOADER, /RTGEdgeSmartMenu\.start\(d\)/);
@@ -58,7 +60,7 @@ test('vaste appbediening verhuist intact en wordt niet gekloond', () => {
     'bestaande gespecialiseerde Edge-bruggen blijven één eigenaar houden');
 });
 
-test('de witte onderrand houdt vaste rollen en geeft het midden aan de app', () => {
+test('de wereldkleurige onderrand houdt vaste rollen en geeft het midden aan de app', () => {
   assert.match(CSS, /data-rtg-edge-appbar="true"\] \.rtg-edge-bottom\{grid-template-columns:var\(--edge-side\) 44px minmax\(0,1fr\) 44px/);
   assert.match(CSS, /data-rtg-edge-appbar="true"\] \.rtg-edge-history[\s\S]*\.rtg-edge-layout[\s\S]*\.rtg-edge-action\{display:none!important\}/);
   assert.match(CSS, /\.rtg-edge-appslot>\.rtg-edge-owned-bar/);

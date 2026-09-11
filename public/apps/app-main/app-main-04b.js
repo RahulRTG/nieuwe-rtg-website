@@ -15,17 +15,33 @@
       s.onload = hang; document.head.appendChild(s);
     })();
 
+    /* Het RTG ID-verhaal hoort bij de ballotage, maar niet bij de gewone
+       terugkeerroute. CSS toont deze inhoud pas zodra de server de ballotage
+       activeert; de bestaande, echte klok blijft het identiteitsanker. */
+    const idIntro = document.createElement('section');
+    idIntro.className = 'rtg-id-intro';
+    idIntro.setAttribute('aria-label', T('ag.id.naam','RTG ID'));
+    idIntro.innerHTML =
+      '<div class="rtg-id-kicker"><span></span>' + T('ag.id.naam','RTG ID') + '</div>' +
+      '<div class="rtg-id-story"><p>' + T('ag.id.waarden','Persoonlijk · zorgvuldig · vertrouwd') + '</p>' +
+      '<h1>' + T('ag.id.kop','Uw toegang begint met een gesprek.') + '</h1>' +
+      '<div>' + T('ag.id.uitleg','Vier korte vragen. Geen formuliergevoel, wel de aandacht waarmee RTG u leert kennen.') + '</div></div>';
+    gate.insertBefore(idIntro, gate.querySelector('.os-lock'));
+
     const doos = document.createElement('div');
     doos.className = 'ag-doos';
     doos.innerHTML =
-      '<div class="ag-kop" id="agKop" aria-hidden="true"></div>' +
+      '<div class="ag-kop" id="agKop"><span id="agKopLabel"></span><strong>' + T('ag.kennismaking','Kennismaking') + '</strong></div>' +
       '<canvas class="ag-mond" id="agMond" width="440" height="200" aria-hidden="true"></canvas>' +
       '<div class="ag-rahul-label" aria-hidden="true">' + T('ag.log','Rahul') + '</div>' +
       '<div class="ag-intro"><h1 class="ag-welkom">' + T('ag.welkom.kop','Welkom terug') + '</h1>' +
-      '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div></div>' +
-      '<div class="ag-rij" hidden><input id="agIn" autocomplete="off" data-i18n-ph="ag.plho" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
+      '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div>' +
+      '<p class="ag-vraag-hint">' + T('ag.id.hint','U bepaalt zelf wat u deelt. Uw antwoord blijft binnen uw beveiligde RTG ID.') + '</p></div>' +
+      '<div class="ag-rij" hidden><span class="ag-veld-label">' + T('ag.antwoord','Uw antwoord') + '</span>' +
+      '<input id="agIn" autocomplete="off" data-i18n-ph="ag.plho" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
       '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>' +
-      '<div class="ag-stappen" id="agStappen" aria-hidden="true"></div>' +
+      '<div class="ag-stappen" id="agStappen" role="status" aria-live="polite"></div>' +
+      '<p class="ag-id-privacy"><i></i>' + T('ag.id.privacy','Alleen gebruikt voor uw persoonlijke RTG ID.') + '</p>' +
       '<div class="ag-kluis" id="agKluis"></div>' +
       '<div class="ag-passkey-kaart"><div class="ag-passkey-embleem" aria-hidden="true">' +
         '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.35"><circle cx="13" cy="10" r="4"/><path d="M5 23c.8-5 3.4-7 8-7 3.4 0 5.8 1.3 7 4"/><circle cx="23" cy="19" r="3"/><path d="M26 19h5m-2 0v3m-2-3v2"/></svg></div>' +

@@ -9,11 +9,11 @@ uiteenlopen; deze index zegt waar je moet zijn. Een deel zonder onderwerp staat
 er als een liggend streepje; de meter `delenZonderOnderwerp` in `NORM.json` telt ze en mag alleen
 omlaag.
 
-**60 bundels, 476 delen, 0 zonder onderwerp.**
+**60 bundels, 478 delen, 0 zonder onderwerp.**
 
 ## `apps/app-main.js`
 
-`public/apps/app-main/` -- 99 delen, 9955 regels in de delen
+`public/apps/app-main/` -- 101 delen, 10158 regels in de delen
 
 | deel | onderwerp |
 |---|---|
@@ -27,6 +27,8 @@ omlaag.
 | `app-main-04a.js` | Vervolg van app-main-04: de compositieregels van de poort (een kolom: klok, lippen, aanspreking, veld) |
 | `app-main-04aa.js` | De koekjesmelding hoort niet midden in de kennismaking |
 | `app-main-04aaa.js` | RTG ACCESS COMPOSITIE |
+| `app-main-04aaaa.js` | RTG ID BALLOTAGE |
+| `app-main-04aaaaa.js` | De ballotagekaart en haar mobiele herschikking |
 | `app-main-04ab.js` | Slotstuk van de poortstijl: de brede-schermregels, en daarna pas het insluiten van het blad |
 | `app-main-04b.js` | Vervolg van app-main-04: de poort-inhoud (mond, zin, invoerveld, passkey) en het gesprek erachter |
 | `app-main-05.js` | een zin, geen logboek: Rahuls woorden vervangen elkaar rustig |

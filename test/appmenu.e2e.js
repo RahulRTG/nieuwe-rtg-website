@@ -182,6 +182,28 @@ async function werelden(page) {
   });
 }
 
+/* Open de zichtbare witte Edge-laag zoals een lid dat doet. De oude Command-
+   bank blijft als bron voor werkbladen in de DOM, maar is op de persoonlijke
+   startpagina bewust geen tweede navigatie meer. */
+async function openEdge(page, gezicht) {
+  await page.waitForFunction(() => document.body.getAttribute('data-rtg-edge-2-rendered') === 'true' &&
+    document.querySelectorAll('.rtg-edge-chrome').length === 1, null, { timeout: 10000 });
+  const greep = page.locator('.rtg-edge-2-reveal');
+  if (await greep.isVisible()) await greep.click();
+  const menu = page.locator('.rtg-edge-menu');
+  await menu.waitFor({ state: 'visible', timeout: 5000 });
+  if (await menu.getAttribute('aria-expanded') !== 'true') await menu.click();
+  await page.waitForSelector('.rtg-edge-index[aria-hidden="false"]', { timeout: 5000 });
+  if (gezicht) await page.locator('[role="tab"][data-edge-face="' + gezicht + '"]').click();
+}
+
+async function openWereldWerkblad(page, url) {
+  await openEdge(page, 'all');
+  const deur = page.locator('.rtg-edge-smart-worlds a[href="' + url + '"]');
+  await deur.waitFor({ state: 'visible', timeout: 5000 });
+  await deur.click();
+}
+
 /* De lade openen ALS hij dicht is. Nog een keer klikken sluit hem, en zolang hij
    openstaat ligt hij over de greep heen -- dan wacht een klik zich dood op een
    knop die eronder zit. Dat is precies wat er in de lus hieronder gebeurde. */
@@ -287,9 +309,11 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
                 return s.display !== 'none' && s.visibility !== 'hidden' &&
                   Number(s.opacity || 1) > 0 && r.width > 0 && r.height > 0;
               };
+              const edgeGreep = [...document.querySelectorAll(
+                '.rtg-edge-2-reveal,.rtg-edge-2-edge-reveal')].some(zichtbaar);
               return zichtbaar(document.getElementById('osMenuBtn')) ||
                 zichtbaar(document.querySelector('.rtg-edge-menu')) ||
-                zichtbaar(document.querySelector('.rtg-edge-2-reveal')) ||
+                edgeGreep ||
                 zichtbaar(document.querySelector('#rtf-toegang-slot [data-rtf-uitweg]'));
             }, null, { timeout: 8000 });
             const deuren = await page.evaluate(() => {
@@ -302,7 +326,8 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
               return {
                 legacy: zichtbaar(document.getElementById('osMenuBtn')),
                 edge: zichtbaar(document.querySelector('.rtg-edge-menu')),
-                edgeGreep: zichtbaar(document.querySelector('.rtg-edge-2-reveal')),
+                edgeGreep: [...document.querySelectorAll(
+                  '.rtg-edge-2-reveal,.rtg-edge-2-edge-reveal')].some(zichtbaar),
                 uitweg: zichtbaar(document.querySelector('#rtf-toegang-slot [data-rtf-uitweg]')),
                 roots: document.querySelectorAll('.rtg-edge-chrome').length
               };
@@ -394,7 +419,7 @@ test('het zichtbare Edge-menu opent en houdt home en instellingen bereikbaar',
   });
 });
 
-test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank en van de bovenrand',
+test('het beginscherm draagt geen gereedschapskist: het systeem komt van de witte Edge en de bovenrand',
   { skip: geenBrowser(pw) }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
@@ -452,17 +477,27 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
     assert.equal(beeld.paneelBestaat, true,
       'de knop van het bedieningspaneel is uit de DOM verdwenen; dan klikt de deur in de bank niets meer aan');
 
-    /* DEUR EEN: de voet van de bank. Dit is de vervanger van de knop in de
-       statusbalk, en de enige zichtbare weg naar uitloggen. */
-    await openLade(page);
-    const deuren = await page.evaluate(() =>
-      [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')].map((b) => b.textContent.trim()));
-    assert.ok(deuren.some((t) => /^Instellingen$/i.test(t)),
-      'de voet van de bank heeft geen deur naar het bedieningspaneel, gevonden: ' + deuren.join(', '));
-    /* Op NAAM en niet op positie: er staan twee systeemdeuren in de voet
-       (Rahul boven het bedieningspaneel), dus `[data-systeem]` pakte de
-       eerste en opende het vraagveld van Rahul. */
-    await page.locator('#rtgCommand .cmd-bankvoet button', { hasText: 'Instellingen' }).first().click();
+    /* DEUR EEN: de witte Edge opent de persoonlijke zijde. De zwarte bank is
+       geen zichtbare omweg meer; profiel, meldingen en weergave wonen in één
+       warme laag die vanaf dezelfde hamburger bereikbaar is. */
+    await openEdge(page, 'here');
+    const ruimte = page.locator('.rtg-edge-here-action', { hasText: 'Uw ruimte' });
+    await ruimte.waitFor({ state: 'visible', timeout: 5000 });
+    await ruimte.click();
+    await page.waitForFunction(() => document.querySelector('#rtgCommand')
+      ?.getAttribute('data-rtg-second-screen') === 'panel', null, { timeout: 5000 });
+    assert.equal(await page.locator('.rtg-ss-personal-intro h2').textContent(), 'Uw ruimte',
+      'de witte Edge opent niet de persoonlijke zijde');
+    assert.equal(await page.locator('.rtg-ss-quick-door', { hasText: 'Weergave' }).isVisible(), true,
+      'weergave is niet vanuit Uw ruimte bereikbaar');
+    await page.locator('.rtg-ss-close').click();
+
+    /* Instellingen blijven daarnaast rechtstreeks via de bovenrand bereikbaar.
+       Focus maakt de toetsenborddeur zichtbaar; dit is dezelfde systeemactie
+       als een neerwaartse veeg op een toestel. */
+    const instellingen = page.locator('.rnd-toets', { hasText: 'Instellingen openen' });
+    await instellingen.focus();
+    await instellingen.click();
     await page.waitForSelector('#osCcScrim.open', { timeout: 8000 });
     assert.equal(await page.evaluate(() => {
       const s = document.getElementById('osCcScrim').getBoundingClientRect();
@@ -512,7 +547,7 @@ test('het beginscherm draagt geen gereedschapskist: het systeem komt van de bank
   });
 });
 
-test('de bank zet de vier werelden bovenaan, en het springboard is weg',
+test('het witte Edge-menu zet de vier werelden bovenaan, en het springboard is weg',
   { skip: geenBrowser(pw) }, async () => {
   /* DEZE TOETS IS MEEVERHUISD MET WAT HIJ MEET.
 
@@ -538,22 +573,27 @@ test('de bank zet de vier werelden bovenaan, en het springboard is weg',
     await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await wachtWerelden(page);
-    // op een telefoon is de bank een lade; open hem zoals een lid dat doet
-    await openLade(page);
-
-    const b = await werelden(page);
+    await openEdge(page, 'all');
+    const b = await page.evaluate(() => ({
+      koppen: [...document.querySelectorAll('.rtg-edge-face-all > h2')].map((k) => k.textContent.trim()),
+      werelden: [...document.querySelectorAll('.rtg-edge-smart-worlds a')].map((el) => {
+        const r = el.getBoundingClientRect();
+        return { url: new URL(el.href).pathname, naam: el.textContent.trim(),
+          breed: Math.round(r.width), hoog: Math.round(r.height), top: Math.round(r.top) };
+      })
+    }));
     /* EEN KOPJE EN NIET TWEE. Er stond ook "Software" met twaalf apps eronder
        die in geen wereld hingen; dat is weg (WERELDEN.md) en die twaalf staan
        nu in hun eigen wereld. De bank draagt navigatie en geen tweede
        voorraadkast. */
-    assert.deepEqual(b.koppen, ['Werelden'],
-      'de bank hoort alleen werelden te dragen, gevonden: ' + b.koppen.join(', '));
+    assert.deepEqual(b.koppen, ['Uw vier werelden'],
+      'het witte menu benoemt de vier werelden niet, gevonden: ' + b.koppen.join(', '));
     assert.deepEqual(b.werelden.map((w) => w.url),
       ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html'],
-      'de bank hoort exact LivingOS, WorkOS, TravelOS en FoundationOS bovenaan te dragen');
+      'het witte menu hoort exact LivingOS, WorkOS, TravelOS en FoundationOS bovenaan te dragen');
     const onzichtbaar = b.werelden.filter((w) => w.breed < 8 || w.hoog < 8);
     assert.deepEqual(onzichtbaar.map((w) => w.naam), [],
-      'deze werelden staan wel in de bank maar zijn nul groot');
+      'deze werelden staan wel in het witte menu maar zijn nul groot');
     const volgorde = b.werelden.map((w) => w.top);
     assert.deepEqual(volgorde.slice().sort((x, y) => x - y), volgorde,
       'de werelden staan niet op volgorde onder elkaar');
@@ -626,7 +666,7 @@ test('elke hoofdwereld houdt een volwaardig beeldmerk op de instappas',
   });
 });
 
-test('elke wereld in de bank opent ook echt zijn huis, als werkblad',
+test('elke wereld in het witte Edge-menu opent ook echt zijn huis, als werkblad',
   { skip: geenBrowser(pw) }, async () => {
   /* DIT IS NIET AAN DE BRON TE ZIEN EN OOK NIET AAN EEN GROENE TELTOETS.
 
@@ -649,8 +689,7 @@ test('elke wereld in de bank opent ook echt zijn huis, als werkblad',
 
     const b = await werelden(page);
     for (const w of b.werelden) {
-      await openLade(page);
-      await page.click('#rtgCommand .cmd-nav button[data-url="' + w.url + '"]');
+      await openWereldWerkblad(page, w.url);
       await page.waitForFunction((url) => {
         const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe') ||
                   document.querySelector('#rtgCommand .cmd-pane iframe');
@@ -678,8 +717,7 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
     await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await wachtWerelden(page);
-    await openLade(page);
-    await page.click('#rtgCommand .cmd-nav button[data-url="/apps/reizen.html"]');
+    await openWereldWerkblad(page, '/apps/reizen.html');
     await page.waitForFunction(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
       const h = f && f.contentDocument && f.contentDocument.documentElement;
@@ -778,14 +816,12 @@ test('TravelOS gebruikt mobiel één veilige onderbalk met alle vier reisbladen'
     /* Een inactief frame mag de balk niet overnemen, maar moet zijn context
        opnieuw aanbieden zodra het weer actief wordt. Zonder deze heen-en-
        terugweg verdween de enige mobiele bediening na een werkbladwissel. */
-    await openLade(page);
-    await page.click('#rtgCommand .cmd-nav button[data-url="/apps/kantoor.html"]');
+    await openWereldWerkblad(page, '/apps/kantoor.html');
     await page.waitForFunction(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
       return !!(f && f.getAttribute('src') === '/apps/kantoor.html');
     }, null, { timeout: 10000 });
-    await openLade(page);
-    await page.click('#rtgCommand .cmd-nav button[data-url="/apps/reizen.html"]');
+    await openWereldWerkblad(page, '/apps/reizen.html');
     await page.waitForFunction(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
       if (!f || f.getAttribute('src') !== '/apps/reizen.html') return false;
@@ -826,8 +862,7 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
     await page.setViewportSize({ width: 393, height: 852 });
     await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
     await wachtWerelden(page);
-    await openLade(page);
-    await page.click('#rtgCommand .cmd-nav button[data-url="/apps/rtg.html"]');
+    await openWereldWerkblad(page, '/apps/rtg.html');
     await page.waitForFunction(() => {
       const f = document.querySelector('#rtgCommand .cmd-pane.actief iframe');
       return !!(f && f.contentDocument && /\/apps\/rtg\.html$/.test(f.contentWindow.location.pathname));

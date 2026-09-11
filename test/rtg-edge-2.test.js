@@ -11,9 +11,11 @@ const edge = require('../public/shared/rtg-edge-2.js');
 const ROOT = path.join(__dirname, '..');
 const MAIN_PATH = path.join(ROOT, 'public/shared/rtg-edge-2.js');
 const CONTEXT_PATH = path.join(ROOT, 'public/shared/rtg-edge-2-context.js');
+const REVEAL_PATH = path.join(ROOT, 'public/shared/rtg-edge-2-reveal.js');
 const CSS_PATH = path.join(ROOT, 'public/shared/rtg-edge-2.css');
 const MAIN = fs.readFileSync(MAIN_PATH, 'utf8');
 const CONTEXT = fs.readFileSync(CONTEXT_PATH, 'utf8');
+const REVEAL = fs.readFileSync(REVEAL_PATH, 'utf8');
 const CSS = fs.readFileSync(CSS_PATH, 'utf8');
 
 test('het declaratieve contract en de drie renderstates zijn vast', () => {
@@ -45,6 +47,8 @@ test('auto gebruikt richting en hysterese maar overschrijft Focus of rust niet',
   assert.match(CONTEXT, /dialog\[open\]/);
   assert.match(CONTEXT, /data-rtg-edge-2-context-open/);
   assert.match(MAIN, /dragstart/);
+  assert.match(MAIN, /source==='edge'.*toonStand\(actief,stand,'start'\)/,
+    'een randtik herstelt zonder de automatische scrollstand vast te zetten');
 });
 
 test('auto luistert alleen naar een scroll van de mens, niet naar een scroll van de software', () => {
@@ -193,12 +197,25 @@ test('de marker volgt pas na volledige bereikbaarheid en verwijdering herstelt b
 test('CSS toont per state alleen de bedoelde bestaande randen', () => {
   assert.match(CSS, /data-rtg-edge-2-state="overview"\] \.rtg-edge-top[^}]*transform:none!important/);
   assert.match(CSS, /data-rtg-edge-2-state="compact"\] \.rtg-edge-top[^}]*visibility:hidden/);
-  assert.match(CSS, /data-rtg-edge-2-state="compact"\] \.rtg-edge-bottom[^}]*transform:none!important/);
+  assert.match(CSS, /data-rtg-edge-2-state="compact"\] \.rtg-edge-bottom[^}]*visibility:hidden/);
   assert.match(CSS, /data-rtg-edge-2-state="focus"\] \.rtg-edge-bottom[^}]*visibility:hidden/);
   assert.doesNotMatch(CSS, /data-rtg-edge-2-state="compact"\] \.rtg-edge-2-reveal/);
+  assert.match(CSS, /data-rtg-edge-2-state="compact"\] \.rtg-edge-2-edge-reveal\{display:block\}/);
   assert.match(CSS, /@media\(max-width:767px\)[\s\S]*\.rtg-edge-side\{display:none!important\}/);
   assert.match(CSS, /data-rtg-edge-2-rendered="true"[\s\S]*wereldtabs:not\(\[data-rtg-edge-2-contextual\]\)/);
   assert.doesNotMatch(CSS, /\.rtg-edge-chrome\s*\{[^}]*display:none/);
+});
+
+test('boven- en onderbalk delen één wereldmateriaal en compact kan via beide randen terug', () => {
+  for (const wereld of ['living', 'travel', 'work', 'foundation']) {
+    const blok = CSS.match(new RegExp('data-rtg-world="' + wereld + '"\\]\\{([^}]+)\\}'));
+    assert.ok(blok && blok[1].includes('--edge-bar-bg:#'), wereld + ' mist een eigen balkkleur');
+  }
+  assert.match(CSS, /\.rtg-edge-top,[\s\S]*\.rtg-edge-bottom\{[\s\S]*background:var\(--edge-bar-bg\)!important/);
+  assert.equal((REVEAL
+    .match(/rtg-edge-2-edge-reveal--/g) || []).length, 1,
+  'de herstelmodule bouwt de twee kanten uit één begrensde lus');
+  assert.match(REVEAL, /RTGEdge2\.setState\('overview', \{ source: 'edge' \}\)/);
 });
 
 test('iedere wereld laat Edge dezelfde centrale Heritage-tokens consumeren', () => {

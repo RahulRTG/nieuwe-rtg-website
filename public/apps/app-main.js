@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'cb545aa7';
+var RTG_BOUW = '6b4b92bc';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -849,6 +849,189 @@ var RTG_BOUW = 'cb545aa7';
         '#gate .ag-anders{margin-top:.45rem;}' +
         '#gate .ag-werelden{margin-top:.65rem;}' +
       '}' +
+      /* RTG ID BALLOTAGE.
+
+         Geen losse klok, vraag en invoerbalk meer, maar één toegangsmoment:
+         identiteit en verhaal links, het beveiligde gesprek op ivoor rechts.
+         Op telefoon worden dezelfde onderdelen verticaal gezet. De echte
+         klok, Rahul-mond, servervragen en Edge-bediening blijven intact. */
+
+      /* Het woordmerk is typografie IN de Edge. Beide delen zijn transparant,
+         zodat achter het logo exact hetzelfde bordeaux staat als achter de
+         wereldknoppen, status en profiel -- geen afwijkend logovlak. */
+      'body:has(#gate .ag-doos.ag-ballotage){--rtg-id-edge-brand:clamp(13rem,19vw,15.5rem);}' +
+      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-top{' +
+        'grid-template-columns:var(--rtg-id-edge-brand) minmax(7rem,1fr) auto auto 44px 44px 44px;' +
+        'background:var(--edge-bar-bg)!important;}' +
+      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-bottom{background:var(--edge-bar-bg)!important;}' +
+      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark{' +
+        'place-items:center;padding:.2rem .8rem;background:transparent!important;border-right-color:var(--edge-bar-line);}' +
+      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark-short{display:none;}' +
+      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark-lockup{' +
+        'display:grid;grid-template-rows:auto auto;align-content:center;width:100%;height:100%;gap:.08rem;background:transparent!important;}' +
+      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark-lockup strong{' +
+        'display:block;min-width:0;padding:0;background:transparent!important;color:#fff8ed;text-align:center;' +
+        "font:400 clamp(.86rem,1.35vw,1.12rem)/1 'Bodoni Moda',Didot,Georgia,serif;" +
+        'letter-spacing:-.035em;white-space:nowrap;}' +
+      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark-lockup small{' +
+        'padding-bottom:.1rem;background:transparent!important;color:#d8bd6b;text-align:center;text-transform:uppercase;' +
+        "font:400 .4rem/1 'Bodoni Moda',Didot,Georgia,serif;letter-spacing:.1em;white-space:nowrap;}" +
+      'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-side{' +
+        'transform:translateX(-101%)!important;visibility:hidden;}' +
+      'body:has(#gate .ag-doos.ag-ballotage) #rtgCommand .cmd-bank,' +
+      'body:has(#gate .ag-doos.ag-ballotage) #rtgCommand .cmd-tabs,' +
+      'body:has(#gate .ag-doos.ag-ballotage) #rtgCommand .cmd-toevoeg,' +
+      'body:has(#gate .ag-doos.ag-ballotage) #rtgCommand .cmd-kiezer,' +
+      'body:has(#gate .ag-doos.ag-ballotage) #rtgCommand .cmd-praat,' +
+      'body:has(#gate .ag-doos.ag-ballotage) #rtgCommand .cmd-balk{display:none!important;}' +
+
+      /* `display:contents` laat verhaal en klok samen de linkerhelft vormen
+         zonder een tweede klok of een los decoratief instrument te maken. */
+      '#gate .rtg-id-intro{display:none;}' +
+      '#gate:has(.ag-doos.ag-ballotage){' +
+        '--klokschaal:.56;display:grid;grid-template-columns:minmax(20rem,1fr) minmax(27rem,.88fr);' +
+        'grid-template-rows:auto auto auto;align-content:center;column-gap:clamp(3rem,7vw,7rem);' +
+        'overflow-y:auto;padding:calc(var(--edge-top,44px) + 2rem) clamp(3rem,7vw,7rem) ' +
+        'calc(var(--edge-bottom,48px) + 2rem);background:' +
+        'radial-gradient(circle at 12% 40%,rgba(126,18,54,.15),transparent 27%),' +
+        'radial-gradient(circle at 82% 74%,rgba(197,158,69,.09),transparent 25%),var(--bg);}' +
+      '#gate:has(.ag-doos.ag-ballotage)>.rtg-toegang-signatuur{display:none;}' +
+      '#gate:has(.ag-doos.ag-ballotage)>.rtg-id-intro{display:contents;}' +
+      '#gate:has(.ag-doos.ag-ballotage) .rtg-id-kicker{' +
+        'position:relative;z-index:2;grid-column:1;grid-row:1;align-self:end;margin-bottom:.9rem;color:#dfca8c;' +
+        "font:700 .62rem/1 'Inter',sans-serif;letter-spacing:.28em;text-transform:uppercase;}" +
+      '#gate:has(.ag-doos.ag-ballotage) .rtg-id-kicker span{' +
+        'display:inline-block;width:1.7rem;height:1px;margin:0 .7rem .2rem 0;background:#c8a959;}' +
+      '#gate:has(.ag-doos.ag-ballotage)>.os-lock{' +
+        'grid-column:1;grid-row:2;align-self:center;justify-self:start;width:11rem;height:11rem;' +
+        'margin:0 0 1.1rem clamp(4.5rem,8.5vw,8rem);padding:0;}' +
+      '#gate:has(.ag-doos.ag-ballotage)>.os-lock>.rtg-ring{' +
+        'flex:0 0 var(--rtg-klok-maat,16rem);}' +
+      '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story{' +
+        'position:relative;z-index:2;grid-column:1;grid-row:3;align-self:start;max-width:35rem;}' +
+      '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story p{' +
+        'margin:0 0 .8rem;color:#dfca8c;font-size:.61rem;font-weight:650;letter-spacing:.28em;text-transform:uppercase;}' +
+      '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story h1{' +
+        'max-width:12ch;margin:0;color:#f7f0e5;' +
+        "font:400 clamp(2.8rem,4.5vw,4.6rem)/.98 'Bodoni Moda',Didot,Georgia,serif;letter-spacing:-.045em;}" +
+      '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story div{' +
+        'max-width:38rem;margin-top:1rem;color:#b8aaa0;font-size:.84rem;line-height:1.65;}' +
+      /* De ballotagekaart en haar mobiele herschikking. */
+      '#gate:has(.ag-doos.ag-ballotage)>.ag-doos{' +
+        'position:relative;grid-column:2;grid-row:1/4;align-self:center;align-items:stretch;' +
+        'width:100%;max-width:38rem;min-height:31rem;margin:0;padding:2.5rem 2.65rem 2.1rem;' +
+        'overflow:hidden;color:#241711;background:#f4ede1;' +
+        'border:1px solid rgba(200,169,89,.85);border-radius:0;' +
+        'box-shadow:0 2rem 5rem rgba(0,0,0,.42);}' +
+      '#gate .ag-doos.ag-ballotage::after{' +
+        'content:attr(data-stap) " / " attr(data-van);position:absolute;top:2.3rem;right:2.45rem;color:#9a7f39;' +
+        "font:400 1.45rem/1 'Bodoni Moda',serif;letter-spacing:.02em;}" +
+      '#gate .ag-doos.ag-ballotage .ag-kop{' +
+        'display:block;width:calc(100% - 5.5rem);margin:0 0 1.35rem;color:#8d1238;text-align:left;opacity:1;}' +
+      '#gate .ag-doos.ag-ballotage .ag-kop::before,' +
+      '#gate .ag-doos.ag-ballotage .ag-kop::after{display:none;}' +
+      '#gate .ag-doos.ag-ballotage .ag-kop span{' +
+        'display:block;margin-bottom:.42rem;font-size:.56rem;font-weight:750;letter-spacing:.28em;text-transform:uppercase;}' +
+      '#gate .ag-doos.ag-ballotage .ag-kop strong{' +
+        'display:block;color:#241711;text-transform:none;' +
+        "font:400 1.75rem/1 'Bodoni Moda',serif;letter-spacing:-.025em;}" +
+      '#gate .ag-doos.ag-ballotage .ag-mond{' +
+        '--mondbreed:5.6rem;--doekhoog:2.55rem;--doekleeg:.72rem;--lipgat:.72rem;' +
+        'width:var(--mondbreed);height:auto;margin:calc(var(--lipgat) - var(--doekleeg)) auto .2rem;opacity:.8;}' +
+      '#gate .ag-doos.ag-ballotage .ag-rahul-label{' +
+        'margin:0 0 .55rem;color:#8d1238;text-align:left;' +
+        "font:italic 500 .88rem/1 'Bodoni Moda',serif;letter-spacing:.01em;}" +
+      '#gate .ag-doos.ag-ballotage .ag-intro{' +
+        'align-items:flex-start;background:#f4ede1!important;background-image:none!important;box-shadow:none!important;}' +
+      '#gate .ag-doos.ag-ballotage .ag-zin{' +
+        'display:block;width:100%;max-width:17ch;min-height:0;margin:0;padding:0;color:#241711!important;' +
+        'background:#f4ede1!important;background-image:none!important;border:0!important;box-shadow:none!important;' +
+        'filter:none!important;backdrop-filter:none!important;text-align:left;text-wrap:balance;' +
+        "font:400 clamp(2.15rem,3vw,3.25rem)/1.02 'Bodoni Moda',serif!important;letter-spacing:-.04em;}" +
+      '#gate .ag-doos.ag-ballotage .ag-vraag-hint{' +
+        'display:block;max-width:34rem;margin:.6rem 0 0;color:#776a60;font-size:.72rem;line-height:1.45;}' +
+      '#gate .ag-doos:not(.ag-ballotage) .ag-vraag-hint,#gate .ag-doos:not(.ag-ballotage) .ag-veld-label,' +
+      '#gate .ag-doos:not(.ag-ballotage) .ag-id-privacy{display:none;}' +
+      '#gate .ag-doos.ag-ballotage .ag-rij{' +
+        'position:relative;width:100%;min-height:4.35rem;margin:1.55rem 0 0;padding:1.3rem 4rem .25rem .95rem;' +
+        'background:transparent;border:1px solid #b79540;border-radius:0;box-shadow:none;}' +
+      '#gate .ag-doos.ag-ballotage .ag-rij:focus-within{border-color:#8d1238;box-shadow:0 0 0 3px rgba(141,18,56,.09);}' +
+      '#gate .ag-doos.ag-ballotage .ag-veld-label{' +
+        'position:absolute;top:.62rem;left:.95rem;color:#8d1238;font-size:.48rem;font-weight:750;' +
+        'letter-spacing:.2em;text-transform:uppercase;pointer-events:none;}' +
+      '#gate .ag-doos.ag-ballotage .ag-rij input{' +
+        'width:100%;padding:.25rem 0;background:transparent;color:#241711;text-align:left;font-size:.92rem;}' +
+      '#gate .ag-doos.ag-ballotage .ag-rij input::placeholder{color:#978b81;}' +
+      '#gate .ag-doos.ag-ballotage .ag-rij #agGo{' +
+        'position:absolute;top:50%;right:.55rem;display:grid;place-items:center;width:2.85rem;height:2.85rem;' +
+        'transform:translateY(-50%);padding:0;border:0;border-radius:50%;background:#b39033;color:#160f0c;opacity:1;}' +
+      '#gate .ag-doos.ag-ballotage .ag-stappen{' +
+        'display:grid;width:100%;grid-template-columns:repeat(4,1fr);gap:.35rem;margin:.8rem 0 0;' +
+        'background:none!important;border:0;box-shadow:none!important;opacity:1;}' +
+      '#gate .ag-doos.ag-ballotage .ag-stappen span{' +
+        'height:2px;padding:0;overflow:hidden;background:#d7ccbd;color:transparent;font-size:0;}' +
+      '#gate .ag-doos.ag-ballotage .ag-stappen span.nu{background:#8d1238;color:transparent;}' +
+      '#gate .ag-doos.ag-ballotage .ag-stappen span.gehad{background:rgba(141,18,56,.48);color:transparent;}' +
+      '#gate .ag-doos.ag-ballotage .ag-id-privacy{' +
+        'display:flex;align-items:center;gap:.35rem;margin:.75rem 0 0;color:#75685e;font-size:.59rem;line-height:1.3;}' +
+      '#gate .ag-doos.ag-ballotage .ag-id-privacy i{' +
+        'width:.35rem;height:.35rem;flex:0 0 auto;border-radius:50%;background:#2e9b68;box-shadow:0 0 0 3px rgba(46,155,104,.08);}' +
+      '#gate .ag-doos.ag-ballotage .ag-kluis{' +
+        'justify-content:flex-start;margin:.55rem 0 0;color:#75685e;font-size:.59rem;letter-spacing:.02em;}' +
+      '#gate .ag-doos.ag-ballotage .ag-passkey-kaart,' +
+      '#gate .ag-doos.ag-ballotage .ag-anders,#gate .ag-doos.ag-ballotage .ag-werelden{display:none!important;}' +
+
+      '@media (max-width:899px){' +
+        'body:has(#gate .ag-doos.ag-ballotage){--rtg-id-edge-brand:min(11.2rem,48vw);}' +
+        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-top{' +
+          'grid-template-columns:var(--rtg-id-edge-brand) minmax(0,1fr) 44px 44px;}' +
+        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-crumbs,' +
+        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-worldbar,' +
+        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-state,' +
+        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-search{display:none!important;}' +
+        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark{padding:.2rem .55rem;}' +
+        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark-lockup strong{font-size:.82rem;}' +
+        'body:has(#gate .ag-doos.ag-ballotage) .rtg-edge-mark-lockup small{font-size:.35rem;}' +
+        '#gate:has(.ag-doos.ag-ballotage){' +
+          '--klokschaal:.42;display:grid;grid-template-columns:1fr;grid-template-rows:auto auto auto auto;' +
+          'align-content:start;gap:0;overflow-x:hidden;overflow-y:auto;padding:' +
+          'calc(var(--edge-top,44px) + .9rem) 1rem calc(var(--edge-bottom,48px) + .8rem);}' +
+        '#gate:has(.ag-doos.ag-ballotage) .rtg-id-kicker{' +
+          'grid-column:1;grid-row:1;margin:0 0 .35rem;padding-left:.5rem;}' +
+        '#gate:has(.ag-doos.ag-ballotage)>.os-lock{' +
+          'grid-column:1;grid-row:2;justify-self:center;width:7.4rem;height:7.4rem;margin:0 0 .55rem;}' +
+        '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story{' +
+          'grid-column:1;grid-row:3;justify-self:center;width:100%;max-width:23rem;min-height:6.4rem;text-align:center;}' +
+        '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story p{margin-bottom:.5rem;font-size:.52rem;letter-spacing:.22em;}' +
+        '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story h1{' +
+          'max-width:13ch;margin:auto;font-size:clamp(2rem,9vw,2.55rem);line-height:1;}' +
+        '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story div{display:none;}' +
+        '#gate:has(.ag-doos.ag-ballotage)>.ag-doos{' +
+          'grid-column:1;grid-row:4;width:100%;max-width:31rem;min-height:25rem;margin:1.05rem 0 0;' +
+          'padding:1.45rem 1.3rem 1.15rem;border-radius:0;}' +
+        '#gate .ag-doos.ag-ballotage::after{top:1.45rem;right:1.3rem;font-size:1.35rem;}' +
+        '#gate .ag-doos.ag-ballotage .ag-kop{width:calc(100% - 4.7rem);margin-bottom:.7rem;}' +
+        '#gate .ag-doos.ag-ballotage .ag-kop span{font-size:.5rem;}' +
+        '#gate .ag-doos.ag-ballotage .ag-kop strong{font-size:1.35rem;}' +
+        '#gate .ag-doos.ag-ballotage .ag-mond{' +
+          '--mondbreed:4.6rem;--doekhoog:2.1rem;--doekleeg:.58rem;--lipgat:.58rem;margin-bottom:0;}' +
+        '#gate .ag-doos.ag-ballotage .ag-rahul-label{margin-bottom:.45rem;font-size:.78rem;}' +
+        '#gate .ag-doos.ag-ballotage .ag-zin{max-width:16ch;font-size:clamp(1.65rem,7.1vw,2rem)!important;}' +
+        '#gate .ag-doos.ag-ballotage .ag-vraag-hint{margin-top:.4rem;font-size:.65rem;}' +
+        '#gate .ag-doos.ag-ballotage .ag-rij{min-height:3.9rem;margin-top:1.05rem;padding-right:3.6rem;}' +
+        '#gate .ag-doos.ag-ballotage .ag-rij #agGo{width:2.55rem;height:2.55rem;}' +
+        '#gate .ag-doos.ag-ballotage .ag-id-privacy{margin-top:.6rem;font-size:.54rem;}' +
+      '}' +
+      '@media (max-width:899px) and (max-height:720px){' +
+        '#gate:has(.ag-doos.ag-ballotage){--klokschaal:.31;padding-top:calc(var(--edge-top,44px) + .45rem);}' +
+        '#gate:has(.ag-doos.ag-ballotage)>.os-lock{width:5.3rem;height:5.3rem;margin-bottom:.25rem;}' +
+        '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story p{display:none;}' +
+        '#gate:has(.ag-doos.ag-ballotage) .rtg-id-story h1{font-size:1.7rem;}' +
+        '#gate:has(.ag-doos.ag-ballotage)>.ag-doos{margin-top:.65rem;padding-top:1.15rem;}' +
+        '#gate .ag-doos.ag-ballotage::after{top:1.15rem;}' +
+        '#gate .ag-doos.ag-ballotage .ag-mond,#gate .ag-doos.ag-ballotage .ag-rahul-label{display:none;}' +
+        '#gate .ag-doos.ag-ballotage .ag-zin{font-size:1.65rem;}' +
+      '}' +
     /* Slotstuk van de poortstijl: de brede-schermregels, en daarna pas het
        insluiten van het blad. Dit deel MOET het laatste van de reeks 04.. zijn
        dat aan de stijlstring bijdraagt, want het sluit hem af met een `;` en
@@ -892,17 +1075,33 @@ var RTG_BOUW = 'cb545aa7';
       s.onload = hang; document.head.appendChild(s);
     })();
 
+    /* Het RTG ID-verhaal hoort bij de ballotage, maar niet bij de gewone
+       terugkeerroute. CSS toont deze inhoud pas zodra de server de ballotage
+       activeert; de bestaande, echte klok blijft het identiteitsanker. */
+    const idIntro = document.createElement('section');
+    idIntro.className = 'rtg-id-intro';
+    idIntro.setAttribute('aria-label', T('ag.id.naam','RTG ID'));
+    idIntro.innerHTML =
+      '<div class="rtg-id-kicker"><span></span>' + T('ag.id.naam','RTG ID') + '</div>' +
+      '<div class="rtg-id-story"><p>' + T('ag.id.waarden','Persoonlijk · zorgvuldig · vertrouwd') + '</p>' +
+      '<h1>' + T('ag.id.kop','Uw toegang begint met een gesprek.') + '</h1>' +
+      '<div>' + T('ag.id.uitleg','Vier korte vragen. Geen formuliergevoel, wel de aandacht waarmee RTG u leert kennen.') + '</div></div>';
+    gate.insertBefore(idIntro, gate.querySelector('.os-lock'));
+
     const doos = document.createElement('div');
     doos.className = 'ag-doos';
     doos.innerHTML =
-      '<div class="ag-kop" id="agKop" aria-hidden="true"></div>' +
+      '<div class="ag-kop" id="agKop"><span id="agKopLabel"></span><strong>' + T('ag.kennismaking','Kennismaking') + '</strong></div>' +
       '<canvas class="ag-mond" id="agMond" width="440" height="200" aria-hidden="true"></canvas>' +
       '<div class="ag-rahul-label" aria-hidden="true">' + T('ag.log','Rahul') + '</div>' +
       '<div class="ag-intro"><h1 class="ag-welkom">' + T('ag.welkom.kop','Welkom terug') + '</h1>' +
-      '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div></div>' +
-      '<div class="ag-rij" hidden><input id="agIn" autocomplete="off" data-i18n-ph="ag.plho" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
+      '<div class="ag-zin" id="agZin" role="status" aria-live="polite" aria-label="' + T('ag.log','Rahul') + '"></div>' +
+      '<p class="ag-vraag-hint">' + T('ag.id.hint','U bepaalt zelf wat u deelt. Uw antwoord blijft binnen uw beveiligde RTG ID.') + '</p></div>' +
+      '<div class="ag-rij" hidden><span class="ag-veld-label">' + T('ag.antwoord','Uw antwoord') + '</span>' +
+      '<input id="agIn" autocomplete="off" data-i18n-ph="ag.plho" aria-label="' + T('ag.in','Je antwoord aan Rahul') + '" placeholder="' + T('ag.plho','Ik wil zeggen dat..') + '">' +
       '<button type="button" id="agGo" aria-label="' + T('ag.stuur','Stuur') + '">&#8594;</button></div>' +
-      '<div class="ag-stappen" id="agStappen" aria-hidden="true"></div>' +
+      '<div class="ag-stappen" id="agStappen" role="status" aria-live="polite"></div>' +
+      '<p class="ag-id-privacy"><i></i>' + T('ag.id.privacy','Alleen gebruikt voor uw persoonlijke RTG ID.') + '</p>' +
       '<div class="ag-kluis" id="agKluis"></div>' +
       '<div class="ag-passkey-kaart"><div class="ag-passkey-embleem" aria-hidden="true">' +
         '<svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.35"><circle cx="13" cy="10" r="4"/><path d="M5 23c.8-5 3.4-7 8-7 3.4 0 5.8 1.3 7 4"/><circle cx="23" cy="19" r="3"/><path d="M26 19h5m-2 0v3m-2-3v2"/></svg></div>' +
@@ -970,22 +1169,17 @@ var RTG_BOUW = 'cb545aa7';
     // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
     function zeg(wie, tekst){
       if (wie !== 'rahul') return;
-      /* De zin staat er METEEN, niet letter voor letter. Dat typen was mooi
-         bedoeld, maar aan de poort staat iemand die naar binnen wil: die leest
-         sneller dan de machine tikt, en zit dan te wachten op tekst die er al
-         is. De mond beweegt wel gewoon mee -- dat is Rahuls gezicht, geen
-         leesvertraging. */
+      /* De hele zin verschijnt meteen; alleen Rahuls mond blijft bewegen. */
       zin.style.animation = 'none';
       void zin.offsetWidth;              // de fade opnieuw laten lopen
       zin.style.animation = '';
       zin.textContent = tekst;
       praat(Math.min(2600, 500 + tekst.length * 28));
     }
-    /* De ballotage-regalia volgen de metadata van de server: `voortgang`
-       {nr, van} toont de kop en de Romeinse plaatsbepaling, `vertrouwelijk`
-       de kluisregel. Geen metadata (het open gesprek, de inlog, het einde) =
-       alles weer stil. De teksten lopen via T() mee met de taalkiezer. */
+    /* Servermetadata bestuurt stap, teller en kluisregel; zonder metadata
+       keert de poort terug naar haar gewone entree. */
     const kopEl = doos.querySelector('#agKop');
+    const kopLabel = doos.querySelector('#agKopLabel');
     const stappenEl = doos.querySelector('#agStappen');
     const kluisEl = doos.querySelector('#agKluis');
     const ROMEINS = ['I', 'II', 'III', 'IV', 'V', 'VI'];
@@ -993,9 +1187,14 @@ var RTG_BOUW = 'cb545aa7';
       const v = d && d.voortgang;
       const entree = d && (d.entree || d.login) && !d.ingelogd;
       if (v && v.nr && !d.klaar){
-        if (kopEl) kopEl.textContent = T('ag.ballotage','De ballotage');
+        if (kopLabel) kopLabel.textContent = T('ag.ballotage','De ballotage');
+        else if (kopEl) kopEl.textContent = T('ag.ballotage','De ballotage');
+        doos.dataset.stap = String(v.nr).padStart(2, '0');
+        doos.dataset.van = String(v.van || 4).padStart(2, '0');
         if (stappenEl){
           stappenEl.textContent = '';
+          stappenEl.setAttribute('aria-label', T('ag.stap','Stap') + ' ' + v.nr + ' ' +
+            T('ag.van','van') + ' ' + (v.van || 4));
           for (let i = 1; i <= (v.van || 4); i++){
             const s = document.createElement('span');
             s.textContent = ROMEINS[i - 1] || String(i);
@@ -1008,11 +1207,15 @@ var RTG_BOUW = 'cb545aa7';
       } else if (entree){
         // het spiegelbeeld voor wie al lid is: dezelfde kopregel-taal,
         // zonder stappen (thuiskomen is geen procedure)
-        if (kopEl) kopEl.textContent = T('ag.entree','De entree');
-        if (stappenEl) stappenEl.textContent = '';
+        if (kopLabel) kopLabel.textContent = T('ag.entree','De entree');
+        else if (kopEl) kopEl.textContent = T('ag.entree','De entree');
+        delete doos.dataset.stap; delete doos.dataset.van;
+        if (stappenEl){ stappenEl.textContent = ''; stappenEl.removeAttribute('aria-label'); }
         doos.classList.add('ag-ballotage');
       } else {
         doos.classList.remove('ag-ballotage');
+        delete doos.dataset.stap; delete doos.dataset.van;
+        if (stappenEl) stappenEl.removeAttribute('aria-label');
       }
       const kluisTekst = d && d.login ? T('ag.kluisdirect','Rechtstreeks naar de kluis, niet door dit gesprek')
         : (d && d.vertrouwelijk ? T('ag.kluis','Versleuteld · rechtstreeks de kluis in') : null);

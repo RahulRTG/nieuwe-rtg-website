@@ -111,3 +111,18 @@ test('8. handelen op een machtiging die niet van u is, kan niet', async () => {
     { id: 'vm0000000000', bevoegdheid: 'aanbod.ontvangen' }, agentToken);
   assert.equal(r.status, 404);
 });
+
+test('9. aanvaarden en intrekken bestaan als route, en weigeren een vreemd id', async () => {
+  /* Ook deze twee horen over HTTP beproefd te zijn en niet alleen op de kern.
+     Een route die in geen enkele toets voorkomt telt in NORM.json als
+     `endpointsZonderTest`, en dat getal is een ratel die alleen omlaag mag --
+     terecht, want een ongetoetste schrijfroute is precies waar een deur
+     ongemerkt openstaat. */
+  const aanvaard = await api('/api/vertegenwoordiging/aanvaard', { id: 'vm0000000000' }, lidToken);
+  assert.equal(aanvaard.status, 404, 'aanvaarden van een onbekende machtiging hoort 404 te geven');
+  const intrek = await api('/api/vertegenwoordiging/intrek', { id: 'vm0000000000' }, lidToken);
+  assert.equal(intrek.status, 404, 'intrekken van een onbekende machtiging hoort 404 te geven');
+  /* En geen van beide is bereikbaar zonder sessie. */
+  assert.ok([401, 403].includes((await api('/api/vertegenwoordiging/aanvaard', { id: 'x' })).status));
+  assert.ok([401, 403].includes((await api('/api/vertegenwoordiging/intrek', { id: 'x' })).status));
+});

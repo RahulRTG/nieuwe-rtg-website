@@ -452,6 +452,10 @@ const METERS = [
      hetzelfde met een VERSE meting; deze tand houdt het register zelf vast, ook
      als niemand die browserronde draait. */
   { sleutel: 'appwerktDefecten', richting: 'omlaag', wat: 'onderdelen uit MAPPEN met een defect bewijs (uit APPWERKT.json)' },
+  /* Het BEREIK van de carrierevormmeter (CARRIERE.md par. 0): hoeveel
+     talentdomeinen hij werkelijk heeft gezien. Omhoog, want dit mag niet stil
+     dalen -- zie de kop bij CARRIEREVORM.json in ./lib/metingen.js. */
+  { sleutel: 'carriereDomeinenGemeten', richting: 'omhoog', wat: 'talentdomeinen die de carrierevormmeter werkelijk heeft gezien' },
   { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' }
 ];
 
@@ -1139,6 +1143,7 @@ function meet(bronnen) {
     laatSpoorVerdacht: leesRegister('LAATSPOOR.json', (j) => j.gemeten.verdacht),
     rollbackUitzonderingen: leesRegister('ROLLBACKBESLUIT.json', (j) => Object.keys(j.routes || {}).length),
     faalproefGezakt: leesRegister('FAALPROEF.json', (j) => j.gemeten.gezakt),
+    carriereDomeinenGemeten: leesRegister('CARRIEREVORM.json', (j) => j.gemeten.domeinen),
     appwerktDefecten: leesRegister('APPWERKT.json', (j) => j.gemeten.defecten)
   };
 }

@@ -75,6 +75,14 @@ const REGISTER = {
   'LAATSPOOR.json': { meter: ['laatSpoorVerdacht'] },
   'ROLLBACKBESLUIT.json': { meter: ['rollbackUitzonderingen'] },
   'FAALPROEF.json': { meter: ['faalproefGezakt'] },
+  /* CARRIEREVORM.json meet of de talentdomeinen een datavorm delen (CARRIERE.md
+     par. 0). De geratelde waarde is met opzet NIET de uitkomst maar het BEREIK:
+     hoeveel domeinen de meter werkelijk heeft gezien. Een uitkomst die beweegt
+     is nieuws en geen achteruitgang -- maar een meter die stil minder domeinen
+     ziet (iemand hernoemt een map, de regex matcht niet meer) rapporteert
+     dezelfde conclusie over minder bewijs, en dat is precies de faalvorm waar
+     een ratel voor is. */
+  'CARRIEREVORM.json': { meter: ['carriereDomeinenGemeten'] },
   'BEPROEVING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   /* De ACTUELE meting naast de geaccepteerde basislijn hierboven: scripts/
      beproeving.js schrijft hem na ELKE ronde, ook een gezakte, zodat rood

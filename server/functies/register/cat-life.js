@@ -54,5 +54,22 @@ module.exports = [
   { id: 'knelpunt', categorie: 'Eigen apps', naam: 'Knelpunten (welke weg ligt open)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan. Bewaart niets: ' +
       'alles komt binnen in het verzoek en gaat eruit als antwoord. Er wordt niets gerangschikt en geen beste weg aangewezen.',
-    paden: ['/api/knelpunt'] }
+    paden: ['/api/knelpunt'] },
+  /* RTG Vertegenwoordiging (CARRIERE.md par. 6a): een mens die handelt namens
+     een mens -- zaakwaarnemer, boekhouder, coach, ouder.
+
+     STANDAARD AAN, en dat is hier geen vanzelfsprekendheid maar een keuze. De
+     laag GEEFT namelijk niets: zonder machtiging gebeurt er niets namens een
+     lid, en een machtiging ontstaat alleen doordat het lid hem ZELF aanvaardt.
+     Wat de schakelaar uitzet is dus niet een bevoegdheid maar de MOGELIJKHEID
+     om er een te verlenen -- inclusief het scherm waarop een lid ziet wie er
+     vandaag al iets namens hem mag. Dat laatste is precies waarom hij aan staat:
+     een knop die het inzagescherm dichtzet terwijl lopende machtigingen blijven
+     bestaan, maakt het stiller en niet veiliger. Zelfde redenering als bij
+     /api/toestemming in de kop hierboven. */
+  { id: 'vertegenwoordiging', categorie: 'Eigen apps', naam: 'Vertegenwoordiging (wie mag iets namens mij)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Machtigingen van mens tot mens: wie mag wat namens een lid, sinds wanneer, tot wanneer, en wat is er ' +
+      'namens hem gedaan. Een machtiging versmalt alleen wat het lid zelf al mocht en voegt er nooit iets aan toe; ' +
+      'aanvaarden doet het lid zelf en intrekken kan altijd, per direct.',
+    paden: ['/api/vertegenwoordiging'] }
 ];

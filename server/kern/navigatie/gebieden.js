@@ -36,7 +36,6 @@
 'use strict';
 
 const fs = require('node:fs');
-const path = require('node:path');
 /* De gebiedsbepaling woont in een eigen module -- zie de kop daar voor waarom
    een rechthoek geen grens is. Hier alleen doorgegeven, zodat een aanroeper
    niet hoeft te weten dat het twee bestanden zijn. */
@@ -53,53 +52,50 @@ const eistNaamsvermelding = (licentie) => {
   return !VRIJ.some(v => l.startsWith(v));
 };
 
-const dataMap = () => process.env.RTG_DATA_DIR || path.join(__dirname, '..', '..', 'data');
-const navMap = () => path.join(dataMap(), 'navigatie');
-/* De index die het importscript wegschrijft uit de bronindex. Buiten Git: het
-   is invoer voor een meting en geen bron (zelfde regel als het routejournaal). */
-const indexPad = () => path.join(navMap(), 'gebieden.json');
+/* De paden en de strenge codecontrole wonen in ./pakket.js -- zie de kop daar
+   voor waarom dat een grens is en geen hulpfunctie. Hier alleen doorgegeven,
+   zodat een aanroeper EEN adres heeft voor deze laag. */
+const { pakketVan, pakketLigt, codeVeilig, indexPad, navMap } = require('./pakket');
 
-/* HET PAKKET VAN EEN GEBIED. Twee bestanden per gebied: de SQLite met de
-   r-tree-indexen en een map met de binaire graaf ernaast.
+/* De index van schijf staat in ./gebiedsindex.js -- lezen en onthouden is een
+   eigen taak, en dit bestand gaat over wat je met die index BEWEERT. */
+const { index, indexStempel } = require('./gebiedsindex');
 
-   DE GRAAFMAP KOMT UIT DE BESTANDSNAAM en niet uit een vaste tekst. Hier stond
-   `path.join(dirname(bestand), 'nederland-graaf')`, en dat werkt zolang er een
-   gebied is: een tweede pakket in dezelfde map zou de graaf van Nederland
-   inlezen en er een Franse route op rekenen. */
-function pakketVan(code) {
-  const c = String(code || '').toLowerCase();
-  const db = path.join(navMap(), c + '.sqlite');
-  return { code: c, db, graafMap: path.join(navMap(), c + '-graaf') };
+/* DE CATALOGUS WORDT OOK GECACHET, en dat is geen optimalisatie om de
+   optimalisatie: `pakketLigt()` doet twee bestandscontroles per gebied, en de
+   catalogus hangt via kern/navigatie.js aan navKaart, navBestemmingen, navPoi
+   en navStatus. Bij tweehonderd aangeboden landen zijn dat vierhonderd
+   schijfvragen per verzoek van een lid -- en die kosten staan nergens op een
+   nota, dus niemand vindt ze terug.
+
+   TWEE STEMPELS, want er zijn twee dingen die kunnen veranderen: de index
+   (nieuwe gebieden) en de MAP waarin de pakketten liggen (een gebouwd pakket).
+   Een map-mtime beweegt wanneer er een bestand bij komt of weggaat, dus een
+   nieuw pakket verschijnt gewoon -- een cache die daarvoor een herstart vraagt,
+   is het soort stille voorwaarde waar iemand een uur aan kwijt is. Eentje
+   blijft er: de MOTOR van een nieuw pakket wordt pas na een herstart geladen,
+   en dat zegt navigatie/gebiednetten.js zelf in zijn antwoord. */
+let catCache = null;
+function mapStempel() {
+  try { return String(fs.statSync(navMap()).mtimeMs); }
+  catch (e) { return 'geen-map'; }
 }
-const pakketLigt = (code) => {
-  const p = pakketVan(code);
-  try { return fs.existsSync(p.db) && fs.existsSync(path.join(p.graafMap, 'graaf.json')); }
-  catch (e) { return false; }
-};
-
-/* Wat de bron ons kan leveren. Ontbreekt de index, dan is het antwoord LEEG met
-   een reden -- nooit stilzwijgend nul, want dat leest als "er is niets aan te
-   bieden" in plaats van "wij hebben niet gekeken". */
-function index() {
-  const p = indexPad();
-  if (!fs.existsSync(p)) {
-    return { gebieden: [], reden: 'Er is nog geen gebiedsindex ingelezen; draai `npm run navigatie:index`. ' +
-      'Zonder index weet RTG niet wat de bron kan leveren, en dat is iets anders dan dat er niets is.' };
-  }
-  try {
-    const j = JSON.parse(fs.readFileSync(p, 'utf8'));
-    const rij = Array.isArray(j.gebieden) ? j.gebieden : [];
-    return { gebieden: rij, bron: j.bron || null, licentie: j.licentie || null, gelezenAt: j.gelezenAt || null };
-  } catch (e) {
-    return { gebieden: [], reden: 'De gebiedsindex is niet te lezen (' + e.message + '); hij wordt niet geraden.' };
-  }
-}
-
-/* DE CATALOGUS: per gebied de drie standen, afgeleid en niet verklaard. */
 function catalogus() {
+  const stempel = indexStempel() + '|' + mapStempel();
+  if (catCache && catCache.stempel === stempel) return catCache.uit;
+  const uit = catalogusVers();
+  catCache = { stempel, uit };
+  return uit;
+}
+function catalogusVers() {
   const idx = index();
+  /* EEN ONVEILIGE CODE VALT NIET STIL WEG. Hij komt uit een index van buiten,
+     dus hij hoort geweigerd te worden EN geteld -- een gebied dat zonder een
+     woord verdwijnt, zoekt iemand een middag. */
+  const geweigerd = idx.gebieden.filter(g => g && g.code && g.naam && !codeVeilig(String(g.code).toLowerCase()))
+    .map(g => String(g.code));
   const rij = idx.gebieden
-    .filter(g => g && g.code && g.naam)
+    .filter(g => g && g.code && g.naam && codeVeilig(String(g.code).toLowerCase()))
     .map(g => ({
       code: String(g.code).toLowerCase(),
       naam: String(g.naam),
@@ -111,9 +107,19 @@ function catalogus() {
          daarop kwam Maastricht een keer op Belgie uit. */
       ouder: g.ouder ? String(g.ouder).toLowerCase() : null,
       vak: g.vak || null,
+      /* `bron` mag erven (waar de index vandaan komt), `downloadAdres` NOOIT:
+         dat is het adres van DIT pakket, en erven maakte van een gebied zonder
+         adres een gebied dat te bouwen leek. */
       bron: g.bron || idx.bron || null,
+      downloadAdres: g.downloadAdres || null,
       licentie: g.licentie || idx.licentie || null,
-      naamsvermelding: g.naamsvermelding || null,
+      /* DE NAAMSVERMELDING ERFT NET ALS DE LICENTIE, en dat is een reparatie:
+         hij deed dat niet, en `mag()` weigerde daardoor ELK gebied van een
+         bron die zijn plicht op de index verklaart in plaats van per rij. Zo
+         staat het in de ODbL-index van OpenStreetMap, dus de hele catalogus
+         viel stil om -- gevonden door test/navigatie-index.test.js, niet door
+         te lezen. Een plicht per rij overtypen raakt bovendien een rij kwijt. */
+      naamsvermelding: g.naamsvermelding || idx.naamsvermelding || null,
       /* Bytes van de bron, niet van ons pakket: wat een lid straks downloadt is
          de GEBOUWDE graaf en die is kleiner. Daarom heet dit veld naar zijn
          herkomst en niet `omvang` -- een getal dat het verkeerde ding meet is
@@ -124,8 +130,13 @@ function catalogus() {
     }));
   return {
     gebieden: rij,
-    telling: { aangeboden: rij.length, gebouwd: rij.filter(g => g.gebouwd).length },
+    telling: { aangeboden: rij.length, gebouwd: rij.filter(g => g.gebouwd).length,
+      geweigerd: geweigerd.length },
+    geweigerd,
     bron: idx.bron || null,
+    /* De licentie van de BRON hoort in de catalogus: het scherm van een lid
+       moet hem kunnen noemen, en hij stond wel in de index en niet hier. */
+    licentie: idx.licentie || null,
     gelezenAt: idx.gelezenAt || null,
     reden: idx.reden || null
   };
@@ -153,7 +164,11 @@ function mag(gebied) {
 const gebiedVoor = (punt, lijst) => keuze.gebiedVoor(punt, Array.isArray(lijst) ? lijst : catalogus().gebieden);
 
 module.exports = { catalogus, index, gebiedVoor, pakketVan, pakketLigt, mag,
-  eistNaamsvermelding, indexPad, navMap,
+  /* De stempel van de PAKKETMAP gaat mee naar buiten: ./gebiednetten.js hangt
+     zijn hertest aan dezelfde verandering als deze cache, zodat catalogus en
+     motor niet uit elkaar kunnen lopen. */
+  pakketStempel: mapStempel,
+  eistNaamsvermelding, codeVeilig, indexPad, navMap,
   /* Doorgegeven zodat er EEN adres is voor deze laag; de code staat in
      ./gebiedkeuze.js en niet twee keer. */
   vakGeldig: keuze.vakGeldig, inVak: keuze.inVak, vakOppervlak: keuze.vakOppervlak };

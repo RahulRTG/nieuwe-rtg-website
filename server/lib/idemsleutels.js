@@ -122,7 +122,11 @@ Object.assign(SLEUTELS,
   /* RTG Move: drie lezende POST-routes. Waarom `leest` en niet
      `zelfdeVerzoek` staat in de kop van dat bestand -- een tweede weging
      hoort het antwoord van NU te krijgen. */
-  require('./idemsleutels-move').SLEUTELS);
+  require('./idemsleutels-move').SLEUTELS,
+  /* De kaartkeuze van een lid: een lezende route en twee die in EEN eigen
+     collectie schrijven. Zie de kop van dat bestand voor waarom de dubbeling
+     bij de KANTOORTELLING telt en niet in het beeld. */
+  require('./idemsleutels-kaarten').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:
    geen route in twee zijbestanden, elke verklaring compleet, en vier routes die

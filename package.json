@@ -184,6 +184,8 @@
     "resolverbereik": "node scripts/resolverbereik.js",
     "codewereld": "node scripts/codewereld.js",
     "symbolen": "node scripts/symbolen.js",
+    "lussen": "node scripts/lussen.js",
+    "lussen:controle": "node scripts/lussen.js --controle",
     "routebron": "node scripts/routebron.js",
     "schermroutes": "node scripts/schermroutes.js",
     "aanroepgraaf": "node scripts/aanroepgraaf.js",

@@ -136,17 +136,12 @@ function maakContracten({ db, save, nu }) {
   /* WANNEER EEN OPZEGGING INGAAT -- de som, zonder hem uit te voeren.
 
      Apart van `zegOp` omdat er een tweede vrager is: een lid hoort te kunnen
-     LEZEN wat opzeggen gaat doen voordat hij drukt (kern/aanmeldingen/
-     lidabonnement-opzeg.js). Dat ging eerst met een proef op een wegwerpkopie
-     van het contract, en dat was fout om een reden die pas bij het classificeren
-     van de route opviel: `zet()` hieronder roept `save()` aan. Een voorbeeld dat
-     niets verandert, schreef dus wel de hele database naar schijf -- en daarmee
-     ook elke andere mutatie die op dat moment nog in het geheugen stond, op een
-     willekeurig moment.
-
-     De som overtypen bij de vrager zou de andere fout zijn (LAT regel 4): dan
-     leest het lid vooraf een andere datum dan hij straks krijgt zodra iemand een
-     van de twee aanpast. Dus: EEN functie, twee aanroepers. */
+     LEZEN wat opzeggen gaat doen voordat hij drukt. Dat mag niet met een proef op
+     een wegwerpkopie, want `zet()` hieronder roept `save()` aan -- dan schrijft
+     een voorbeeld dat niets verandert alsnog de hele database. En overtypen bij
+     de vrager mag ook niet (LAT regel 4): dan leest het lid vooraf een andere
+     datum dan hij krijgt. Dus EEN functie, twee aanroepers; AFSPRAAK.md
+     par. 14.1 heeft de hele toedracht. */
   function opzegEinde(c, opDatum) {
     if (!c) return null;
     const vanaf = opDatum || new Date(tijd()).toISOString();

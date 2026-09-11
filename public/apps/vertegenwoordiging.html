@@ -29,18 +29,25 @@
   .stand{display:inline-block;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.12rem .5rem;border:1px solid var(--line);color:var(--muted);margin-left:.4rem;}
   .stand.actief{border-color:var(--rtg-leesgroen,var(--green));color:var(--rtg-leesgroen,var(--green));}
   .stand.voorgesteld{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
-  .stand.verlopen,.stand.ingetrokken{border-color:var(--burgundy);color:var(--burgundy);}
+  .stand.verlopen,.stand.ingetrokken{border-color:var(--burgundy);color:var(--txt);}
   ul.lijst{list-style:none;margin:.6rem 0 0;}
   ul.lijst li{padding:.42rem 0;border-top:1px solid var(--line);font-size:.87rem;line-height:1.5;}
   ul.lijst li b{font-weight:600;}
   ul.lijst li .sub{display:block;font-size:.76rem;color:var(--soft);margin-top:.1rem;}
   .merk{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));border:1px solid var(--gold);padding:.05rem .38rem;margin-left:.35rem;white-space:nowrap;}
   .nee li{border-top-color:color-mix(in srgb,var(--burgundy) 35%,transparent);}
-  .nee li b{color:var(--burgundy);}
+  /* BORDEAUX IS EEN ACCENT EN NOOIT EEN TEKSTKLEUR (CLAUDE.md, de merkregels).
+     Hij stond hier op vier plekken wel als tekst. De a11y-poort zag ze niet --
+     een verlopen machtiging, een ingetrokken spoorregel en de intrekknop staan
+     er alleen in een stand die de scanner niet rendert -- maar #C23A5E haalt op
+     deze kaartgrond 2,69:1, en dat is gemeten op het zusterscherm. Een fout die
+     alleen ongezien blijft omdat niemand in die stand keek, is geen fout minder.
+     De RAND blijft bordeaux, want daar is het wel een accent. */
+  .nee li b{color:var(--txt);}
   .rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;align-items:center;}
   .knop{background:var(--gold);color:#000;border:none;font:inherit;font-weight:600;font-size:.84rem;padding:.55rem 1.1rem;cursor:pointer;min-height:2.5rem;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
-  .knop.weg{background:transparent;color:var(--burgundy);border:1px solid var(--burgundy);font-weight:500;}
+  .knop.weg{background:transparent;color:var(--txt);border:1px solid var(--burgundy);font-weight:500;}
   .veld{background:var(--bg);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.87rem;padding:.5rem .6rem;min-height:2.5rem;}
   label.vink{display:flex;gap:.55rem;align-items:flex-start;padding:.45rem 0;font-size:.87rem;line-height:1.5;cursor:pointer;}
   label.vink input{margin-top:.22rem;width:1.1rem;height:1.1rem;flex:0 0 auto;}
@@ -48,7 +55,7 @@
   .let{border-left:2px solid var(--gold);padding:.5rem 0 .5rem .8rem;margin-top:.8rem;font-size:.82rem;color:var(--muted);line-height:1.6;}
   .spoor{font-size:.8rem;padding:.45rem 0;border-top:1px solid var(--line);line-height:1.5;display:flex;gap:.6rem;}
   .spoor .t{color:var(--soft);font-variant-numeric:tabular-nums;white-space:nowrap;}
-  .spoor.nee .w{color:var(--burgundy);}
+  .spoor.nee .w{color:var(--txt);}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
   dialog{background:var(--card);color:var(--txt);border:1px solid var(--line);max-width:34rem;width:92vw;padding:1.2rem;}
   .simkop{margin-top:1rem;font-size:.95rem;}

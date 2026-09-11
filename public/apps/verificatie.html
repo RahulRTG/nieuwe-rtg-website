@@ -28,7 +28,7 @@
   .stand{display:inline-block;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.12rem .5rem;border:1px solid var(--line);color:var(--muted);}
   .stand.verified{border-color:var(--rtg-leesgroen,var(--green));color:var(--rtg-leesgroen,var(--green));}
   .stand.pending{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
-  .stand.rejected{border-color:var(--burgundy);color:var(--burgundy);}
+  .stand.rejected{border-color:var(--burgundy);color:var(--txt);}
   .standtekst{margin:.55rem 0 0;}
   .stap{border:1px solid var(--line);padding:.95rem 1.05rem;margin-bottom:.7rem;background:var(--card);}
   .stap h3{font-size:1rem;}
@@ -42,7 +42,14 @@
   ul.lijst{list-style:none;margin:.6rem 0 0;}
   ul.lijst li{padding:.42rem 0;border-top:1px solid var(--line);font-size:.85rem;line-height:1.55;}
   ul.lijst li b{font-weight:600;}
-  .nee li b{color:var(--burgundy);}
+  /* BORDEAUX IS EEN ACCENT EN NOOIT EEN TEKSTKLEUR OP EEN DONKERE GROND
+     (CLAUDE.md, de merkregels). Hier stond hij twee keer wel als tekst -- op de
+     stand `rejected` en op de vetgedrukte woorden in de NIET-lijst -- en de
+     a11y-poort mat er 2,69:1, ver onder de 4,5 die lopende tekst vraagt. Beide
+     staan op .85rem of kleiner, dus ook `--burgundy-on-dark` (3,78:1) is hier
+     te weinig: die haalt alleen grote tekst. De rand blijft bordeaux, want daar
+     IS het een accent, en het woord zelf leest in de gewone tekstkleur. */
+  .nee li b{color:var(--txt);}
   .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.2rem;background:var(--card);border:1px solid var(--line);
     padding:.6rem 1rem;font-size:.84rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90vw;text-align:center;}
 </style>

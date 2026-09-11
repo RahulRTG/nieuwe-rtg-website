@@ -77,22 +77,6 @@ module.exports = [
      tenant-regels in ./tabel.js voor waarschuwen. */
   [/\/api\/vertegenwoordiging(?:[\s/]|$)|\/vertegenwoordiging\.html/, 'juridisch', 'Juridisch'],
 
-  /* RTG RUGDEKKING hoort NIET bij Juridisch maar bij Financien, en dat is geen
-     smaakkwestie. Een machtiging hierboven is een rechtsfiguur en verplaatst
-     niets; rugdekking legt vast dat RTG een MENS geld gaat geven -- commercieel
-     met een factuur, of als beurs. Het besluit dat een kamer hier neemt gaat
-     over een bedrag en een tegenprestatie, en de schakelaar van de beurs is de
-     uitbetaalpositie van dit huis (kern/bevoegdheid/lijst-afhankelijk.js).
-
-     De VOOGDIJ valt er wel onder Juridisch, samen met de machtiging waar zij
-     bij hoort: wie meetekent voor een minderjarige is dezelfde vraag als wie
-     namens hem mag handelen, en die twee over twee kamers verdelen betekent dat
-     niemand de hele keten ziet.
-
-     Dezelfde afsluiting op `(?:[\s/]|$)` als hierboven, en om dezelfde reden:
-     de functiecatalogus draagt het kale prefix als codepunt. */
-  [/\/api\/office\/voogdij(?:[\s/]|$)/, 'juridisch', 'Juridisch'],
-  [/\/api\/(?:office\/)?rugdekking(?:[\s/]|$)/, 'financien', 'Financien'],
 
   /* HET SCHERM WAAROP EEN LID ZIJN IDENTITEIT AANTOONT hoort bij dezelfde kamer
      als de kant waar een medewerker het aftekent: `office/verifications` ligt in

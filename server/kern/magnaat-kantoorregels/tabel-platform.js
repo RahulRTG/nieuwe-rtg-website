@@ -49,6 +49,29 @@ module.exports = [
   [/\/api\/scim(?:\/|$)/, 'intern', 'Intern & IT'],
   [/office\/(?:aidata)|\/belastingkantoor|\/loonstrook/, 'financien', 'Financiën'],
   [/office\/wereld|\/wereld\b/, 'controleregister', 'RTG Controleregister'],
+  /* VOOGDIJ EN RUGDEKKING STAAN HIER EN NIET IN ./tabel-lid.js, en dat is de
+     regel "smal gaat voor breed" -- alleen op deze plek werkt hij ook.
+
+     Ze zijn met hun reden in de ledentabel geschreven (RTG Carriere: de voogdij
+     bij Juridisch, want wie meetekent voor een minderjarige is dezelfde vraag
+     als wie namens hem mag handelen; de rugdekking bij Financien, want daar
+     wordt vastgelegd dat dit huis een MENS geld gaat geven). Maar die tabel
+     wordt ACHTER deze geplakt, en de regel hieronder pakt elk pad dat met
+     /api/office begint. Gemeten bij het samenvoegen van de takken:
+     /api/office/voogdij/besluit en de vier /api/office/rugdekking-routes kwamen
+     alle vijf uit op Intern & IT, en de twee regels die hun kamer benoemen
+     vuurden nooit. Een beursbesluit -- geld dat het huis verlaat -- stond
+     daarmee in de kamer voor toegangsbeheer.
+
+     Dat viel niet op omdat een verkeerde kamer er hetzelfde uitziet als een
+     goede: de terugval "Onderzoek & data" is rood en wordt bewaakt, maar een
+     regel die door een BREDERE regel wordt overschaduwd geeft gewoon een kamer
+     terug. test/kantoorkamer.test.js sluit dat gat voor deze vijf routes.
+
+     De ledentabel houdt wat daar wel werkt: /api/vertegenwoordiging,
+     /apps/verificatie.html en /api/mijn/abonnement raken /api/office niet. */
+  [/\/api\/office\/voogdij(?:[\s/]|$)/, 'juridisch', 'Juridisch'],
+  [/\/api\/(?:office\/)?rugdekking(?:[\s/]|$)/, 'financien', 'Financien'],
   [/\/api\/office\b|\/kantoor\/gesprek|\/living-os|\/scherm\.html|\/app\.html/, 'intern', 'Intern & IT'],
   /* ISOLATIE HOORT BIJ DEZELFDE HAND ALS DE INCIDENTCONTROLE, en dat is geen
      naamsgelijkenis maar de opzet: kern/isolatie/ leest zijn huisstand uit de

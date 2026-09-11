@@ -26,7 +26,7 @@ function waarde(tag, naam) {
   return m && m[1];
 }
 
-test('alle 290 echte schermen hebben Heritage vóór de eerste paint', () => {
+test('alle 292 echte schermen hebben Heritage vóór de eerste paint', () => {
   let echte = 0;
   let redirects = 0;
   for (const bestand of htmlBestanden(APPS)) {
@@ -50,6 +50,6 @@ test('alle 290 echte schermen hebben Heritage vóór de eerste paint', () => {
       route + ' moet Heritage na zijn eigen schermstijl laden');
     assert.equal(uitrol.gewenst(bestand, bron), bron, route + ' is niet idempotent uitgerold');
   }
-  assert.equal(echte, 290);
+  assert.equal(echte, 292);
   assert.equal(redirects, 16);
 });

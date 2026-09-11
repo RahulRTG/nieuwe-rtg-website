@@ -40,7 +40,7 @@
       concern doos handel hardware-pda horeca-bar horeca-beheer horeca-bezorg horeca-club horeca-events \
       horeca-expeditie horeca-haccp horeca-hotel horeca-pda horeca-vloer horeca kantoorpda kassa \
       klankwerk-kantoor kosten leverancier-aanvragen leverancier-commerce leverancier-rtmail \
-      leverancier-service leverancier loonstrook magnaat-kantoor magnaat-partnerstudio meldkamer merken \
+      leverancier-service leverancier loonstrook loopbaan loopbaanbewijs magnaat-kantoor magnaat-partnerstudio meldkamer merken \
       pakketten partner-network partner-worden payroll platformregister redactie-pda redactie \
       redactiekantoor rtgkantoor sportclub stadsdoos studio-pda techniek websitestudio werkplek \
       werkruimte zaakkosten zaakpay zaakweb'),
@@ -70,7 +70,7 @@
 
   /* Bestaande functionele materiaalgrenzen: routes kunnen geen vrij thema kiezen. */
   var MATERIALS = Object.freeze({
-    onyx: routes('agenda berichten camera comm festival foundation/onveilig foundation/registreren foundation/wegwijzer geld-command horeca-beheer horeca-bezorg horeca-club horeca-events horeca-expeditie horeca-haccp horeca-hotel horeca hotels juridisch/partnervoorwaarden juridisch/privacy juridisch/voorwaarden leven leverancier living-os media move muziek office reisboek rit sociaal veilig verificatie vertegenwoordiging vluchten werkruimte'),
+    onyx: routes('agenda berichten camera comm festival foundation/onveilig foundation/registreren foundation/wegwijzer geld-command horeca-beheer horeca-bezorg horeca-club horeca-events horeca-expeditie horeca-haccp horeca-hotel horeca hotels juridisch/partnervoorwaarden juridisch/privacy juridisch/voorwaarden leven leverancier living-os loopbaan loopbaanbewijs media move muziek office reisboek rit sociaal veilig verificatie vertegenwoordiging vluchten werkruimte'),
     bordeaux: routes('appstore-dossier arrival boeken cellier chauffeur clips commerce flits foodcourt foundation/vrienden garderobe geld hangar krant lifestyle luchthaven maison mall mijnmall navigatie nieuws ov ovcontrol ovdienst ovroutes pay podium reisbureau reizen reizen-veilig residentie routedossier scherm spelen spelscherm sport stad table theater thuis uitgaan vandaag wereld'),
     pearl: routes('attenties cercle entourage pulse rendezvous vonk')
   });

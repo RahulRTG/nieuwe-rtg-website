@@ -1190,6 +1190,30 @@
       "url": "/apps/leven.html"
     },
     {
+      "label": "Code maken",
+      "app": "Mijn loopbaan",
+      "wereld": "WorkOS",
+      "url": "/apps/loopbaan.html"
+    },
+    {
+      "label": "Deze regel delen",
+      "app": "Mijn loopbaan",
+      "wereld": "WorkOS",
+      "url": "/apps/loopbaan.html"
+    },
+    {
+      "label": "Laat maar",
+      "app": "Mijn loopbaan",
+      "wereld": "WorkOS",
+      "url": "/apps/loopbaan.html"
+    },
+    {
+      "label": "Stoppen",
+      "app": "Mijn loopbaan",
+      "wereld": "WorkOS",
+      "url": "/apps/loopbaan.html"
+    },
+    {
       "label": "Aanvaarden",
       "app": "Mijn team",
       "wereld": "WorkOS",

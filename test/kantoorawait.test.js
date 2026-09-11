@@ -104,3 +104,52 @@ test('3. de wikkel geeft een async antwoord ECHT door en niet als {}', async () 
   assert.notDeepEqual(weg.body, {}, 'een leeg lijf met 200 betekent dat de wikkel de Promise heeft doorgestuurd');
   assert.equal(typeof weg.body.ok, 'boolean', 'het echte antwoord draagt ok');
 });
+
+test('4. de tweede wikkel: /atelierweb/foto-weg geeft de lijst NA de verwijdering terug', async () => {
+  /* DEZE ROUTE HANGT NIET AAN `veilig`. Hij woont in routes/atelierweb.js met
+     zijn eigen `stuur`, en die deed `stuur(res, atelierweb.fotoWeg(...))` zonder
+     await. Gevolg: 200 met lijf `{}`, dus `fotos` verdween en de studio zag zijn
+     eigen foto nog staan terwijl hij hem net had weggegooid.
+
+     Dat is exact dezelfde val als in toets 3, op een ANDERE wikkel -- en daarom
+     hoort hij hier en niet bij de kantoorroutes. Gevonden door
+     test/salonbron-fotobank.test.js in CI en niet door mij; ik had de wikkel van
+     routes/kantoren gerepareerd en niet gekeken of de zeven async geworden
+     functies elders ook een niet-wachtende aanroeper hadden. */
+  const png = 'data:image/png;base64,' + Buffer.from('kaw-' + Date.now()).toString('base64');
+  const up = await post(eerlijk.base, 'office/atelierweb/foto', { dataUrl: png }, tokEerlijk);
+  assert.equal(up.status, 200, JSON.stringify(up.body).slice(0, 140));
+  const url = up.body.url;
+  assert.ok(url, 'de foto krijgt een /media-verwijzing');
+
+  const weg = await post(eerlijk.base, 'office/atelierweb/foto-weg', { url }, tokEerlijk);
+  assert.equal(weg.status, 200);
+  assert.ok(Array.isArray(weg.body.fotos),
+    'een 200 zonder `fotos` is een niet-afgewachte belofte: ' + JSON.stringify(weg.body).slice(0, 140));
+  assert.ok(!weg.body.fotos.includes(url), 'en de foto staat er niet meer in');
+});
+
+test('5. de DERDE wikkel: een bureau van de werkplek wacht ook op zijn eigen werk', async () => {
+  /* `doe` in routes/werkplek-bureaus.js draagt ZEVEN verwijderroutes (atelier,
+     studio, hardware, architect, redactie, ideeen) en had een vierde parameter
+     `wacht`: alleen met `doe(..., true)` werd er afgewacht. Een opt-in op iets
+     dat je niet kunt zien vergeten. Geen enkele toets raakte die routes, dus de
+     val was daar volledig onbewaakt -- vandaar deze.
+
+     De eigenaar is `baas` in beide huizen (routes/werkplek.js: magIn), en
+     `bedrijf` is de tenant die huisAuth uit het lijf leest. */
+  const inlog = await post(eerlijk.base, 'auth/login', { login: 'roellie.i@gmail.com', password: 'Imran' });
+  assert.equal(inlog.status, 200, 'het eigenaarsaccount uit de demostand logt in');
+  const baas = inlog.body.token;
+
+  const maak = await post(eerlijk.base, 'werkplek/bureau/atelier/maak',
+    { bedrijf: 'rtg', naam: 'Proefontwerp await', soort: 'jas' }, baas);
+  assert.equal(maak.status, 200, JSON.stringify(maak.body).slice(0, 160));
+  const id = (maak.body.ontwerp && maak.body.ontwerp.id) || maak.body.id;
+  assert.ok(id, 'het ontwerp krijgt een id: ' + JSON.stringify(maak.body).slice(0, 160));
+
+  const weg = await post(eerlijk.base, 'werkplek/bureau/atelier/verwijder', { bedrijf: 'rtg', id }, baas);
+  assert.equal(weg.status, 200);
+  assert.notDeepEqual(weg.body, {}, 'een leeg lijf met 200 betekent dat `doe` de Promise doorstuurde');
+  assert.equal(weg.body.ok, true, 'het echte antwoord draagt ok');
+});

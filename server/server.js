@@ -1227,7 +1227,12 @@ const notities = require('./kern/notities').maakNotities({
    `comm: () => kern.comm` daar. */
 const vertegenwoordiging = require('./kern/vertegenwoordiging').maakVertegenwoordiging({
   db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan,
-  volwassen: (handle) => kern.volwassen(handle) });
+  volwassen: (handle) => kern.volwassen(handle),
+  /* En de STAND erbij, niet alleen de poort. Het jeugdbestuur moet onderscheid
+     maken tussen "niet volwassen" en "bewezen minderjarig", en dat verschil zit
+     in de leeftijdBron: `volwassen()` geeft een boolean, maar een voogd mag
+     alleen meetekenen als de geboortedatum van het DOCUMENT komt. */
+  lidstandVan: require('./kern/betrouwbaarheid').maakLidstand({ accounts }) });
 const bestandenOpslag = require('./kern/bestanden-opslag')({ db });
 const bestanden = require('./kern/bestanden').maakBestanden({
   // antivirus: de gestukte upload komt nooit als data-URL in een verzoek-body

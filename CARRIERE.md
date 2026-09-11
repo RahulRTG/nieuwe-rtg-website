@@ -319,7 +319,7 @@ kwaliteit mag; lock-in door gijzeling zakt.**
 | 4 | Hoedanigheid + namens-wie + mandaat in de envelop | **een besluit** — de envelop is gesloten op acht; dit is een versiesprong |
 | 5 | Mens-namens-mens mandaat (Representation Kernel) | **staat** — `server/kern/vertegenwoordiging/`, zie par. 6a |
 | 6 | Mandaatsimulator (permissions-diff vóór accepteren) | **staat** — `simulatie.js` plus `/apps/vertegenwoordiging.html` |
-| 7 | Guardian / jeugdbestuur, met eigen inzicht voor de jongere | **volgt op 5**, en `LEVEN.md` par. 2 staat erboven |
+| 7 | Guardian / jeugdbestuur, met eigen inzicht voor de jongere | **staat** — `server/kern/vertegenwoordiging/jeugd.js`, zie par. 6c |
 | 8 | `CAREER_GRANT` met drie soorten rugdekking (direct / beperkt / vrij) | **een besluit** — en `GIFT.md` staat ervóór |
 | 9 | Rights Vault met gebied, kanaal, looptijd en exclusiviteit | **een besluit** — bestaat niet, en de conflictcontrole is de hele waarde |
 | 10 | Career Ledger (chronologisch, bewijsbaar) | **volgt op 4** — de envelop draagt de keten al |
@@ -436,6 +436,75 @@ Ledenbalie doet inzage in het dossier van een lid met een reden; hier is RTG jui
 géén partij — de cliënt machtigt zijn eigen vertegenwoordiger en aanvaardt zelf.
 Dezelfde redenering als bij `vakbewijs` en `persoonseis`, die om die reden ook
 niet bij HR liggen.
+
+---
+
+## 6c. Het jeugdbestuur: twee handtekeningen, en de jongere tekent eerst
+
+Nummer 7 staat (`server/kern/vertegenwoordiging/jeugd.js` + `jeugd-acties.js`,
+vier routes, elf e2e-toetsen). Hij bestaat omdat de weigering die hij vervangt
+eerlijk was maar doodliep — *"dat jeugdbestuur is nog niet gebouwd"* — terwijl
+juist daar de mens staat waar dit hele spoor over gaat: een talent van zeventien
+dat tekent wat hij niet leest.
+
+**Vijf regels die in code staan en niet in een afspraak.**
+
+**Een voogd compenseert leeftijd, nooit onbekende identiteit.** De weg gaat
+alleen open als RTG het document heeft gezien (A3) én de geboortedatum daarvan
+komt (`leeftijdBron === 'paspoort'`). Staat de datum nog zoals het lid hem zelf
+intypte, dan weten we niet eens dát hij minderjarig is, en een voogd aanwijzen is
+een gok met een handtekening eraan. `volwassen()` geeft één boolean en zakt op
+twee dingen tegelijk; deze laag moet die twee uit elkaar houden, en leest daarom
+de hele lidstand uit `kern/betrouwbaarheid.js`.
+
+**Drie partijen, drie handelingen.** De jongere wijst aan (het is zijn account,
+niet dat van zijn ouders), de volwassene aanvaardt de rol (niemand wordt
+ongevraagd voogd), en een mens van RTG bevestigt na bewijs. Zonder die derde stap
+wijst een zestienjarige zijn negentienjarige vriend aan en tekenen er twee
+kinderen. RTG raadpleegt daarbij géén gezagsregister en doet ook niet alsof —
+wat wordt vastgesteld is dat een medewerker een stuk heeft gezien, dezelfde
+eerlijkheid als bij de identiteitsverificatie.
+
+**De jongere tekent eerst, en zijn handtekening alleen is niet genoeg.** Na zijn
+eigen aanvaarding staat de machtiging nog op `voorgesteld`; pas de tweede
+handtekening laat hem lopen. En de voogd kán niet vooruit tekenen: dat zou de
+jongere voor een voldongen feit zetten, en dat is `LEVEN.md` par. 2 — nooit
+sturen maar openen. Dat de stand van beide handtekeningen afhangt, staat in
+`machtiging.js` en niet in een handeling: `stand()` wordt bij elke vraag opnieuw
+gerekend, dus er bestaat geen moment waarop een half getekende machtiging per
+ongeluk actief heet.
+
+**De voogd kan niet ook de vertegenwoordiger zijn.** Dan houdt één hand beide
+handtekeningen vast en is de tweede een formaliteit — precies de constructie waar
+dit document over gaat. En hij kan wél stoppen: een bestuur dat niet kan stoppen
+is geen bestuur, en hij staat niet in het dossier van de jongere en is niet de
+vertegenwoordiger, dus zonder eigen weg bestaat de machtiging voor hem niet.
+
+**Het kantoorbesluit staat op naam.** `wieKijkt()` geeft een object en geen naam:
+`{id}` voor de eigenaar, `{sleutel}` voor een kantoorrol op een eigen account, en
+alleen `{naam}` voor de gedeelde code. Die laatste mag hier niet tekenen — een
+spoor dat eindigt bij een gedeelde code is geen spoor maar een alibi
+(`KANTOORMACHT.md`). Daarom staat de route in `routes/office/` en niet bij de
+andere vertegenwoordigingsroutes: dat domein kan per definitie niet bij
+`kluisAuth`, en de domeingrens hield dat ook tegen tot `office` de naam
+`vertegenwoordiging` opschreef.
+
+**Twee dingen die de dubbeltik-ronde veranderde, vóór het contract werd
+geschreven.** Een tweede `voogd/vraag` liet twee spoorregels na voor één verzoek;
+dezelfde voogd nog eens vragen schrijft nu niets. En een tweede kantoorbesluit
+kreeg te horen dat de volwassene de rol nog moest aanvaarden, terwijl die dat
+allang had gedaan — een weigering die twee verschillende gevallen dezelfde zin
+geeft, stuurt de medewerker de verkeerde kant op. Dat is de volgorde die
+`MUTATIECONTRACT.md` bedoelt: het bewijs stuurt de code, niet andersom.
+
+**Wat het jeugdbestuur niet doet.** Het maakt van een minderjarige geen merk:
+`RUGDEKKING.md` grens 1 blijft staan, er komt geen zichtbaarheidsverplichting en
+geen ranglijst van jeugdtalenten. En het leunt niet op de bestaande
+voogdmachinerie van `kern/sociaal` — die hangt aan RTF-gezinsprofielen, en een
+kind is daar een profiel binnen een gezin zonder eigen account. Een talent met
+een eigen RTG-account is een andere vorm; die twee door elkaar halen zou
+betekenen dat een sporter zijn loopbaan in het gezinsdossier van zijn ouders
+voert.
 
 ---
 

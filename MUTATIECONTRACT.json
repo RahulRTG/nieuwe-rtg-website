@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-09-11T07:04:48.190Z",
-  "commit": "e6074224",
-  "boomVuil": false,
+  "op": "2026-09-11T11:09:13.497Z",
+  "commit": "d2846d06",
+  "boomVuil": true,
   "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
@@ -10,18 +10,19 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4890,
-  "geclassificeerd": 4890,
+  "totaal": 4894,
+  "geclassificeerd": 4893,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3251,
    "NOT_APPLICABLE": 1136,
-   "PROTECTED": 381,
-   "INTENTIONALLY_NON_IDEMPOTENT": 122
+   "PROTECTED": 384,
+   "INTENTIONALLY_NON_IDEMPOTENT": 122,
+   "LEGACY_PENDING_CLASSIFICATION": 1
   },
-  "vastgesteldDoorMens": 1683,
+  "vastgesteldDoorMens": 1686,
   "afgeleidDoorScript": 3207,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4030,
+   "AUTHENTICATED": 4034,
    "PUBLIC": 122,
    "OBJECT_SCOPED": 718,
    "(niet af te leiden -- vraagt een verklaring)": 4,
@@ -32,7 +33,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 88,
    "kale ronde: geen uitspraak": 4512,
-   "niet gemeten": 161
+   "niet gemeten": 165
   },
   "voorstellen": {},
   "metingVan": "2026-09-03T11:51:23.232Z"
@@ -65431,6 +65432,25 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "office.voogdij.besluit",
+   "route": "POST /api/office/voogdij/besluit",
+   "semantiek": null,
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": null,
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": null,
+   "voorstelGrond": "niet gemeten"
+  },
+  {
    "mutatieId": "office.voornemen.staak",
    "route": "POST /api/office/voornemen/staak",
    "semantiek": {
@@ -125802,6 +125822,69 @@
    },
    "bewijs": null,
    "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "vertegenwoordiging.voogdRolAanvaard",
+   "route": "POST /api/vertegenwoordiging/voogd/rol",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "vertegenwoordiging.voogdTekent",
+   "route": "POST /api/vertegenwoordiging/voogd/tekent",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "vertegenwoordiging.voogdVraag",
+   "route": "POST /api/vertegenwoordiging/voogd/vraag",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

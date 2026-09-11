@@ -43,7 +43,7 @@ const { simuleer } = require('./simulatie');
 const MAX_PER_LID = 40, MAX_LOG = 500;
 
 function maakVertegenwoordiging(state) {
-  const { db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, volwassen } = state;
+  const { db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, volwassen, lidstandVan } = state;
 
   const vastleggen = require('../../lib/duurzaam')({ bijeen, save, inBundel, bron: 'vertegenwoordiging' });
   const eigen = require('../eigencollectie')({ db, domein: 'kern/vertegenwoordiging',
@@ -119,6 +119,10 @@ function maakVertegenwoordiging(state) {
     const orde = (a, b) => String(b.van).localeCompare(String(a.van));
     return { status: 200, team: vanMij.sort(orde), ikSta: voorAnderen.sort(orde),
       grens: d.grens || [], volwassen: volw(key),
+      /* De jongere ziet zijn eigen bestuur, en niet alleen de voogd. LEVEN.md
+         par. 2: nooit sturen maar openen -- wie meetekent voor jou, hoor je te
+         kunnen zien zonder het te moeten vragen. */
+      jeugd: jeugdApi ? jeugdApi.jeugdbeeld(key) : null,
       log: d.log.slice(0, 100) };
   }
 
@@ -132,9 +136,25 @@ function maakVertegenwoordiging(state) {
     return Object.assign({ status: 200, id: m.id, wie: naam(m.vertegenwoordiger) }, r);
   }
 
-  return Object.assign({ lijst, mijn, simulatie, bevoegdhedenVan },
-    require('./acties')({ dossier, dossierKijk, dossiersRuw, vind, publiek, bevoegdhedenVan,
-      vastleggen, nu, scho, crypto, keyVanCodenaam, naam, volw, MAX_PER_LID, MAX_LOG }));
+  /* DE VOLGORDE IS EEN CIRKEL DIE MET OPZET GEEN CIRKEL IS. ./acties.js heeft
+     het jeugdbestuur nodig (mag deze minderjarige client een machtiging krijgen)
+     en ./jeugd.js heeft `spoor` uit acties nodig. In plaats van spoor te
+     verhuizen krijgt acties een LUIE verwijzing: `jeugdHaal()` wordt pas
+     aangeroepen als er werkelijk iets gevraagd wordt, en dan bestaan ze allebei.
+     Een require-cirkel tussen twee deelbestanden van dezelfde laag zou hier
+     alleen maar stil de helft leeg laten. */
+  let jeugdApi = null;
+  const acties = require('./acties')({ dossier, dossierKijk, dossiersRuw, vind, publiek, bevoegdhedenVan,
+    vastleggen, nu, scho, crypto, keyVanCodenaam, naam, volw, MAX_PER_LID, MAX_LOG,
+    jeugdHaal: () => jeugdApi });
+  jeugdApi = require('./jeugd')({ dossier, dossierKijk, dossiersRuw, vastleggen, nu, naam, scho,
+    keyVanCodenaam, volw, spoor: acties.spoor,
+    lidstand: (k) => (typeof lidstandVan === 'function' ? lidstandVan(k) : null) });
+  /* `spoor` is intern: ./jeugd.js krijgt hem hierboven, maar hij hoort niet op
+     het kern-object waar de routes bij kunnen. Een route die zelf het spoor kan
+     schrijven, kan een handeling vastleggen die nooit heeft plaatsgevonden. */
+  const { spoor: _intern, ...actiesPubliek } = acties;
+  return Object.assign({ lijst, mijn, simulatie, bevoegdhedenVan }, actiesPubliek, jeugdApi);
 }
 
 module.exports = { maakVertegenwoordiging };

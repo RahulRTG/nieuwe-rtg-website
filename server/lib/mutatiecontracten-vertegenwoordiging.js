@@ -77,6 +77,25 @@ const CONTRACTEN = Object.fromEntries([
     'De tweede oproep kwam terug met 409 ("Deze machtiging is actief") en liet geen tweede ' +
     'spoorregel na. Ook hier een toestandscontrole, geen duplicaatlaag (par. 5o).'),
 
+  /* HET JEUGDBESTUUR. Alle vier gemeten in dezelfde dubbeltik-ronde, en twee
+     ervan zijn erdoor VERANDERD voordat dit contract werd geschreven -- dat is
+     de volgorde die MUTATIECONTRACT.md bedoelt met "eerst het contract, dan de
+     route": het bewijs stuurt de code, niet andersom. */
+  zelfdeStand('POST /api/vertegenwoordiging/voogd/vraag', 'vertegenwoordiging.voogdVraag',
+    'De tweede oproep kwam terug met 200 en liet het spoor op EEN regel staan (0 -> 1). Dat is hier ' +
+    'geen toestandscontrole maar een vroege terugkeer zonder schrijven: dezelfde voogd nog eens ' +
+    'vragen verandert niets. In de eerste ronde stond die regel er niet en liet een dubbeltik twee ' +
+    'spoorregels na voor een verzoek dat er maar een is. Iemand ANDERS aanwijzen is wel een tweede ' +
+    'handeling, en een al BEVESTIGDE voogdij wordt sowieso niet overschreven.'),
+
+  zelfdeStand('POST /api/vertegenwoordiging/voogd/rol', 'vertegenwoordiging.voogdRolAanvaard',
+    'De tweede oproep kwam terug met 409 ("Dit verzoek is al aanvaard") en liet geen tweede ' +
+    'spoorregel na (1 -> 2 over de hele stap). Een toestandscontrole, geen duplicaatlaag (par. 5o).'),
+
+  zelfdeStand('POST /api/vertegenwoordiging/voogd/tekent', 'vertegenwoordiging.voogdTekent',
+    'De tweede oproep kwam terug met 409 ("U heeft hier al voor getekend") en de machtiging bleef ' +
+    'op EEN tweede handtekening staan. Een toestandscontrole, geen duplicaatlaag (par. 5o).'),
+
   zelfdeStand('POST /api/vertegenwoordiging/intrek', 'vertegenwoordiging.intrek',
     'De tweede oproep kwam terug met 409 ("Deze machtiging is al ingetrokken") en de intrekking van ' +
     'de eerste bleef staan. Een toestandscontrole, geen duplicaatlaag (par. 5o).'),

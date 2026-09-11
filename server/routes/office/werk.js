@@ -17,6 +17,12 @@ const wieKijkt = require('./wiekijkt')(accounts);
    kijkt er in de kluis" is precies de dubbeling van LAT.md regel 4. */
 require('./verificaties')(octx, { wieKijkt });
 
+/* En het voogdijbesluit (./voogdij.js), om dezelfde reden hier en niet bij de
+   vertegenwoordigingsroutes: dat domein kan niet bij kluisAuth, en dit besluit
+   hoort achter de kantoordeur. wieKijkt gaat mee omdat een voogdijbesluit op
+   NAAM staat en niet op de gedeelde kantoorcode. */
+require('./voogdij')(octx, { wieKijkt });
+
 app.post('/api/office/nudge', officeAuth, (req, res) => {
   const kind = req.body.kind === 'ride' ? 'ride' : 'order';
   const lijst = kind === 'ride' ? db.data.rides : db.data.orders;

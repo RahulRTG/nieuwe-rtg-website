@@ -61,6 +61,16 @@ function stand(m, nu) {
   const eind = tijd(m.tot);
   if (eind == null || eind <= t) return 'verlopen';
   if (!m.aanvaard) return 'voorgesteld';
+  /* DE TWEEDE HANDTEKENING VAN HET JEUGDBESTUUR. Draagt de machtiging
+     `voogdNodig`, dan is de handtekening van de jongere ALLEEN niet genoeg --
+     en die van de voogd alleen ook niet. Beide, of hij blijft voorgesteld.
+
+     Dit staat hier en niet in acties.js omdat het een REGEL is en geen
+     handeling: `stand()` wordt bij elke vraag opnieuw gerekend, dus er is geen
+     moment waarop een half getekende machtiging per ongeluk actief heet. En
+     `voogdNodig` is een veld OP de machtiging en geen lezing van het dossier,
+     zodat dit bestand db-vrij blijft (zie de kop). */
+  if (m.voogdNodig && !m.voogdAanvaard) return 'voorgesteld';
   const start = tijd(m.van);
   if (start != null && start > t) return 'voorgesteld';
   return 'actief';
@@ -116,7 +126,13 @@ function vorm(data, opties) {
       hoedanigheid, bevoegdheden, plafondCenten,
       van: d.van && tijd(d.van) ? new Date(tijd(d.van)).toISOString() : new Date(nu).toISOString(),
       tot: new Date(eind).toISOString(),
-      aanvaard: null, ingetrokken: null
+      aanvaard: null, ingetrokken: null,
+      /* Vastgelegd bij het VORMEN en niet bij het aanvaarden: of er een voogd
+         bij hoort, is een eigenschap van het moment waarop deze machtiging
+         ontstond. Wordt de jongere later achttien, dan blijft deze machtiging
+         er een waar twee mensen voor tekenden -- dat is geschiedenis en geen
+         toestand die stilletjes mag wegvallen. */
+      voogdNodig: !!o.voogdNodig, voogdAanvaard: null
     }
   };
 }

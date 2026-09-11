@@ -58,6 +58,26 @@ module.exports = (kern) => {
     stuur(res, await vertegenwoordiging.intrek(req.session.key, String(b.id || ''), b.reden));
   });
 
+  /* HET JEUGDBESTUUR: drie handelingen, drie verschillende mensen. De jongere
+     wijst aan, de volwassene aanvaardt de rol, en de voogd tekent mee onder een
+     machtiging die de jongere AL heeft aanvaard. Het kantoorbesluit dat de
+     voogdij bevestigt staat bewust niet hier maar in routes/office/voogdij.js:
+     dit domein kan niet bij kluisAuth, en dat is de bedoeling. */
+  app.post('/api/vertegenwoordiging/voogd/vraag', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await vertegenwoordiging.voogdVraag(req.session.key, String((req.body || {}).voogd || '')));
+  });
+
+  app.post('/api/vertegenwoordiging/voogd/rol', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await vertegenwoordiging.voogdRolAanvaard(req.session.key, String((req.body || {}).client || '')));
+  });
+
+  app.post('/api/vertegenwoordiging/voogd/tekent', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await vertegenwoordiging.voogdTekent(req.session.key, String((req.body || {}).id || '')));
+  });
+
   app.post('/api/vertegenwoordiging/grens', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, await vertegenwoordiging.grensZet(req.session.key, (req.body || {}).bevoegdheden));

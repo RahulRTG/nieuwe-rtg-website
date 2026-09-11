@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1804 bestanden en 12683 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1805 bestanden en 12694 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1804 |
-| losse beweringen (`test(...)`) | 12683 |
+| toetsbestanden | 1805 |
+| losse beweringen (`test(...)`) | 12694 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1185 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 66 |
 | alleen in de kop *genoemd*, nog niet gemeten | 152 |
-| niets van beide | 401 |
+| niets van beide | 402 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1591 bestanden, 12317 beweringen.
+1592 bestanden, 12328 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -613,6 +613,7 @@ toets omvalt.
 | `isolatiedragers.test.js` | 7 | genoemd | DE DRAGERS BIJ EEN LOPEND VERZOEK -- welke laag heeft echt een sleutel. HET GAT DAT DIT SLUIT, en het was er een van het soort dat groen kijkt. |
 | `isolatiepoort.test.js` | 13 | genoemd | DE BEVEILIGINGS-AS IN DE HTTP-KETEN -- telt hij, en houdt hij niets tegen? HET GAT DAT DIT SLUIT. |
 | `isolatieregisters.test.js` | 4 | genoemd | DE TWEE ISOLATIEREGISTERS DRAGEN EEN TAND -- en dat was de reden dat `metingenZonderRatel` van 33 naar 35 ging. scripts/lib/metingen.js zegt het scherp: een meetbestand dat aan geen enkele ratel hangt, groeit... |
+| `jeugdbestuur.e2e.test.js` | 11 | -- | HET JEUGDBESTUUR OVER HTTP -- kan een talent van zestien iemand naast zich zetten zonder dat hij iets tekent wat hij niet leest? Dit is CARRIERE.md par. |
 | `journaalbestand.test.js` | 11 | gezakt op `getal+1#7` | HET JOURNAAL OP SCHIJF (server/kern/journaalbestand.js). Het doorgeefjournaal woonde in db.data.doorgeefjournaal: één array van 20.000 regels, dus één blob in één rij van de opslag. |
 | `journaalschrijf.test.js` | 6 | gezakt op `true->false#0` | EEN LOGBOEK MAG DE SERVER NIET TRAAG MAKEN. WAT ER MIS WAS, en het was mijn eigen code van dezelfde dag. |
 | `journalistiek-redactie.test.js` | 11 | gezakt op `liegpoort /api/` | DE REDACTIE VAN EEN NIEUWSBEDRIJF -- 13 endpoints achter de leverancier-inlog. Deze dertien wees de waargenomen dekkingsmeting aan als nooit aangeroepen: niet een enkele test raakte /api/supplier/redactie/*. |

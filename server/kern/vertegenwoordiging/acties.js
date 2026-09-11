@@ -22,7 +22,8 @@ const M = require('./machtiging');
 
 module.exports = (h) => {
   const { dossier, dossierKijk, dossiersRuw, vind, publiek, bevoegdhedenVan,
-    vastleggen, nu, scho, crypto, keyVanCodenaam, naam, volw, MAX_PER_LID, MAX_LOG } = h;
+    vastleggen, nu, scho, crypto, keyVanCodenaam, naam, volw, MAX_PER_LID, MAX_LOG,
+    jeugdHaal } = h;
 
   const id = () => 'vm' + crypto.randomBytes(5).toString('hex');
 
@@ -53,14 +54,20 @@ module.exports = (h) => {
     }
     /* DE JEUGDGRENS. Zie de kop van ./index.js: half bouwen is hier de slechtste
        optie, dus weigert hij met de reden en met wat eraan te doen is. */
+    /* HET JEUGDBESTUUR OORDEELT, NIET DIT BESTAND. De regels (wat is bewezen
+       minderjarig, is er een bevestigde voogd, mag de voogd ook de
+       vertegenwoordiger zijn) staan in ./jeugd.js, want daar horen ze en daar
+       zijn ze zonder server te beproeven. */
+    let voogdNodig = false;
     if (!volw(clientKey)) {
-      return { status: 403, error: 'RTG kan van dit lid niet vaststellen dat het 18 of ouder is, en dan ' +
-        'gaat een machtiging niet door. Is het lid minderjarig, dan is er een ouder of verzorger bij ' +
-        'nodig -- dat jeugdbestuur is nog niet gebouwd, en half bouwen zou betekenen dat een ' +
-        'minderjarige alsnog tekent met een scherm ertussen. Is het lid wel volwassen: laat de ' +
-        'identiteit verifieren op /apps/verificatie.html.' };
+      const J = jeugdHaal && jeugdHaal();
+      const oordeel = J ? J.magNamens(clientKey, vertegenwoordigerKey) : null;
+      if (!oordeel || oordeel.error) {
+        return oordeel || { status: 403, error: 'RTG kan van dit lid niet vaststellen dat het 18 of ouder is.' };
+      }
+      voogdNodig = true;
     }
-    const v = M.vorm(d);
+    const v = M.vorm(d, { voogdNodig });
     if (v.error) return { status: 400, error: v.error };
 
     const doss = dossierKijk(clientKey);
@@ -79,7 +86,10 @@ module.exports = (h) => {
     });
     if (mis) return mis;
     return { status: 200, ok: true, machtiging: publiek(m, false),
-      let: 'Dit is een VOORSTEL. Er gaat niets open tot het lid het zelf aanvaardt.' };
+      let: voogdNodig
+        ? 'Dit is een VOORSTEL, en dit lid is minderjarig: er gaat pas iets open als de jongere ' +
+          'EN zijn bevestigde voogd allebei tekenen.'
+        : 'Dit is een VOORSTEL. Er gaat niets open tot het lid het zelf aanvaardt.' };
   }
 
   /* ---------- aanvaarden: alleen de client ---------- */
@@ -115,7 +125,12 @@ module.exports = (h) => {
        eruit wil. */
     let m = vind(key, mid), clientKey = key;
     if (!m) {
-      const gevonden = zoekAlsVertegenwoordiger(key, mid);
+      const J = jeugdHaal && jeugdHaal();
+      /* En de VOOGD, want een bestuur dat niet kan stoppen is geen bestuur. Hij
+         staat niet in het dossier van de jongere en is ook niet de
+         vertegenwoordiger, dus zonder deze weg kan juist de mens die meetekende
+         er niets meer aan doen. */
+      const gevonden = zoekAlsVertegenwoordiger(key, mid) || (J && J.zoekAlsVoogd ? J.zoekAlsVoogd(key, mid) : null);
       if (!gevonden) return { status: 404, error: 'Deze machtiging bestaat niet.' };
       m = gevonden.m; clientKey = gevonden.clientKey;
     }
@@ -146,6 +161,9 @@ module.exports = (h) => {
      mee plus `spoor` en `zoekAlsVertegenwoordiger`, want die twee horen bij de
      opslag en niet bij een van de twee helften. */
   const gedeeld = Object.assign({}, h, { spoor, id, zoekAlsVertegenwoordiger });
-  return Object.assign({ voorstel, aanvaard, intrek, HOEDANIGHEDEN },
+  /* `spoor` gaat mee naar buiten omdat ./jeugd.js hem ook nodig heeft, en
+     index.js haalt hem er daarna weer AF voordat de kern naar de routes gaat:
+     het spoor schrijven is intern werk, geen route-API. */
+  return Object.assign({ voorstel, aanvaard, intrek, spoor, HOEDANIGHEDEN },
     require('./handelen')(gedeeld));
 };

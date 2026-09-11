@@ -134,7 +134,8 @@ ontbrekende bron zijn vier waarheden; die les stond al in toets 13 van
 
 **Staat niet, met de reden**
 
-- **De bouwer voor een OSM-gebied** (`scripts/navigatie-osm.js`). Een `.osm.pbf`
+- **De bouwer voor een OSM-gebied** (nog niet geschreven: de indexschrijver
+  bestaat, de bouwer die er een pakket van maakt niet). Een `.osm.pbf`
   lezen vraagt protobuf en zlib zonder externe module -- dat kan, maar het is
   hier niet te BEWIJZEN: de uitgaande proxy van de bouwomgeving weigert
   `download.geofabrik.de` en `planet.openstreetmap.org` met een 403 op de

@@ -503,6 +503,57 @@ geen fout maar de minimumtermijn. Het lid leest dat ook zo (`nogTeBetalen: 11`),
 en dat moet: een opzegknop die de resterende verplichting verzwijgt is zelf een
 dark pattern.
 
+### 14.2 Opzeggen is niet schakelbaar, en dat is een besluit
+
+De drie ledenroutes uit stap 2 hangen aan **geen** functieschakelaar, en dat is
+geen vergeten stap maar de uitkomst van een afweging. `scripts/schakelbaar.js`
+ratelt erop (`routesNietSchakelbaar`, richting omlaag), dus een route zonder
+schakelaar moet met reden op een lijst staan — en er zijn er twee.
+
+**De grond: wie zich mag verbinden, mag zich losmaken.** Een schakelaar op "kan
+een lid zijn eigen abonnement zien en opzeggen" is een knop waarmee het huis
+iemand in een contract vasthoudt. Dat is niet een dienst die je aan- of uitzet
+maar de ANDERE KANT van een afspraak. `CLAUDE.md` verbiedt dark patterns, en een
+opzegknop die RTG centraal kan wegnemen is dat patroon niet per ongeluk maar als
+voorziening.
+
+Daarmee horen ze in dezelfde ruimte als `/api/mijn/tweefactor`,
+`/api/mijn/herstelkanaal` en `/api/mijn/post`, waar de reden al woord voor woord
+dezelfde is: *dit is geen dienst die je aanbiedt maar het beheer van je eigen
+account, en een schakelaar erop zet iets uit wat een lid altijd hoort te kunnen.*
+
+**Bewust niet onder `tg-aanmeld`.** Die functie
+(`server/functies/register/cat-domeinen3.js`) schakelt `/api/aanmelding` — de
+INSTROOM. Zou lidmaatschapsbeheer daaronder vallen, dan zou het sluiten van de
+inschrijving de bestaande leden opsluiten: geen nieuwe leden erbij, en de huidige
+kunnen er niet meer uit. Dat zijn twee verschillende besluiten en ze horen niet
+aan één knop.
+
+**Lezen en opzeggen staan onder één prefix.** Ze splitsen zou een stand opleveren
+waarin een lid zijn verplichting kan lezen en niet beëindigen, en dat is de
+slechtste van de vier mogelijke standen.
+
+**Twee registers, en ze moeten hetzelfde zeggen.** "Niet schakelbaar" staat op
+twee plekken met twee lezers:
+
+| register | lezer | vraag die zijn lezer stelt |
+|---|---|---|
+| `kern/platformregister/bediening.js` | `scripts/activering.js` | kan dit uit zonder dat de server stuk gaat |
+| `kern/bestuursroutes.js` | `scripts/schakelbaar.js` | mag RTG dit een mens afnemen |
+
+Dat ze hetzelfde moeten zeggen stond al in een commentaar in het eerste
+(*"dezelfde verklaring staat al in kern/bestuursroutes.js regel 26; deze twee
+horen hetzelfde te zeggen"*), en het wordt met de hand bijgehouden. Een prefix
+hoort dus in **beide**, elk met de verwijzing naar de ander. Dat er geen meter op
+die gelijkheid staat, is een echt gat — het kostte hier een ronde CI om te
+ontdekken dat de ene lijst vullen de andere niet vult.
+
+`kern/platformregister/bediening.js` is bij deze gelegenheid op zijn naad
+geknipt. Hij droeg twee soorten onschakelbaarheid met twee verschillende gronden
+— de besturing van het platform tegenover de rechten van een mens — en één regel
+erbij duwde hem over de 10 kB. `bediening-recht.js` draagt nu de tweede helft, en
+de twee worden weer samengevoegd zodat er één lijst naar buiten gaat.
+
 ---
 
 Twee dingen in die lijst zijn **geen bouwwerk maar een besluit**, en ze zijn

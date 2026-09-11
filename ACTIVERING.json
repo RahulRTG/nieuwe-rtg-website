@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-11T11:02:03.134Z",
-    "commit": "8b8852b9",
-    "boomVuil": true,
+    "op": "2026-09-11T11:07:08.974Z",
+    "commit": "57d9ba63",
+    "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/activering.js",
     "node": "v22.22.2"

@@ -1,74 +1,41 @@
 /* DE CARRIERELAAG: RTG Vertegenwoordiging, het jeugdbestuur en RTG Rugdekking.
 
-   Achttien routes, en de indeling hieronder is GEMETEN en niet beredeneerd. Er
-   is per laag een dubbeltik-ronde gedraaid (elke weg twee keer met hetzelfde
-   lijf, en tellen wat er in de collectie bij kwam); de uitslagen staan per route
-   in ./mutatiecontracten-vertegenwoordiging.js en ./mutatiecontracten-
-   rugdekking.js, en daar hoort dit register bij te kloppen.
+   ZES REGELS, EN ELF DIE HIER JUIST NIET STAAN. De elf schrijfwegen van deze
+   laag weten het ZELF al -- ze weigeren een herhaling op grond van de toestand
+   -- en staan daarom in ./idemsleutels-nooit-routes.js, elk met zijn eigen
+   reden.
 
-   DRIE SOORTEN, EN HET VERSCHIL DOET ERTOE:
+   DAT IS EEN CORRECTIE, en de fout hoort hier te blijven staan. Ze stonden
+   eerst met `zelfdeVerzoek: true` in dit bestand, en dat deed twee dingen die
+   allebei fout waren. Het INSTALLEERDE een duplicaatlaag op routes die er geen
+   nodig hadden: een tweede identiek verzoek kreeg het AFGESPEELDE antwoord van
+   de eerste in plaats van de weigering, dus de eigen dubbelklikcontrole van
+   `rugdekking/stel` vuurde nooit -- juist de controle die voorkomt dat RTG stil
+   het dubbele aan een mens belooft. En het sprak de mutatiecontracten tegen,
+   die bij elk van deze routes met zoveel woorden zeggen: een TOESTANDSCONTROLE
+   en geen duplicaatlaag (MUTATIECONTRACT.md par. 5o).
 
-   `leest`      raakt de opslag niet. Alle vijf gebruiken `kijk()` en niet
-                `bak()`, zodat een blik geen lege rij achterlaat
-                (kern/eigencollectie.js). Een tweede vraag hoort het antwoord
-                van NU te krijgen -- zelfde reden als bij ./idemsleutels-
-                kaarten.js -- dus `leest` en geen `zelfdeVerzoek`.
+   De toetsen vonden het: test/rugdekking.e2e.test.js 12, 13 en 14 zakten zodra
+   deze regels erbij kwamen, met een 200 waar een 409 hoorde. Een verklaring die
+   het gedrag VERANDERT is geen verklaring.
 
-   `zelfdeVerzoek`  een tweede identieke aanroep laat dezelfde stand achter.
-                LET OP WAT DAT HIER BETEKENT: bij het merendeel komt dat doordat
-                de route de tweede keer WEIGERT (409) op grond van de toestand.
-                Dat is een toestandscontrole en geen duplicaatlaag
-                (MUTATIECONTRACT.md par. 5o), en dat verschil wordt hier niet
-                weggepoetst -- wat vaststaat is dat er geen tweede effect kan
-                ontstaan, niet dat een dubbeltik wordt herkend. Waar het WEL
-                echte idempotentie is (een toewijzing in plaats van een
-                toevoeging) staat dat erbij.
-
-   `nietIdempotent`  de tweede aanroep DOET met opzet iets. Er is er precies
-                een, en de reden staat erbij.
-
-   TWEE DINGEN DIE DE RONDE VOND EN DIE HIER NIET MOGEN VERDWIJNEN. `voogd/vraag`
-   liet bij een dubbeltik twee spoorregels na voor een verzoek dat er maar een
-   is; dat is gerepareerd met een vroege terugkeer zonder schrijven. En
-   `rugdekking/stel` liet twee LOPENDE programma's achter (0 -> 1 -> 2): bij een
-   agenda is dat rommel, bij geld het dubbele bedrag dat RTG een mens beloofde.
-   Allebei gerepareerd VOORDAT deze regels werden geschreven. */
+   Wat hier overblijft zijn de vijf leeswegen en de ene route die met opzet WEL
+   een tweede handeling uitvoert. */
 'use strict';
 
 const SLEUTELS = {
-  /* ---- lezen: geen van de vijf raakt de opslag ---- */
+  /* Vijf leeswegen: geen van de vijf raakt de opslag. Alle vijf gebruiken
+     `kijk()` en niet `bak()`, zodat een blik geen lege rij achterlaat
+     (kern/eigencollectie.js). `leest` en niet `zelfdeVerzoek`, om dezelfde
+     reden als bij ./idemsleutels-kaarten.js: een tweede vraag hoort het
+     antwoord van NU te krijgen. Bij `rugdekking/lijst` is dat concreet -- de
+     beursstand kan tussen twee vragen zijn omgezet. */
   'POST /api/vertegenwoordiging/bevoegdheden': { leest: true },
   'POST /api/vertegenwoordiging/mijn': { leest: true },
   'POST /api/vertegenwoordiging/simulatie': { leest: true },
   'POST /api/rugdekking/lijst': { leest: true },
   'POST /api/rugdekking/mijn': { leest: true },
-
-  /* ---- de machtiging zelf ---- */
-  'POST /api/vertegenwoordiging/voorstel': { zelfdeVerzoek: true },
-  'POST /api/vertegenwoordiging/aanvaard': { zelfdeVerzoek: true },
-  'POST /api/vertegenwoordiging/intrek': { zelfdeVerzoek: true },
-  /* Een TOEWIJZING en geen toevoeging: de eigen grens van het lid wordt gezet.
-     De tweede oproep gaf 200 met dezelfde grens en liet geen tweede spoorregel
-     na, want er versmalde niets meer. Dit is dus echte idempotentie en geen
-     toestandscontrole -- de route weigert niet, hij antwoordt hetzelfde. */
-  'POST /api/vertegenwoordiging/grens': { zelfdeVerzoek: true },
-
-  /* ---- het jeugdbestuur ---- */
-  'POST /api/vertegenwoordiging/voogd/vraag': { zelfdeVerzoek: true },
-  'POST /api/vertegenwoordiging/voogd/rol': { zelfdeVerzoek: true },
-  'POST /api/vertegenwoordiging/voogd/tekent': { zelfdeVerzoek: true },
-  'POST /api/office/voogdij/besluit': { zelfdeVerzoek: true },
-
-  /* ---- de rugdekking ---- */
   'POST /api/office/rugdekking/alle': { leest: true },
-  'POST /api/office/rugdekking/stel': { zelfdeVerzoek: true },
-  'POST /api/office/rugdekking/stop': { zelfdeVerzoek: true },
-  /* Ook een toewijzing: de stand wordt GEZET. Twee keer `open` gaf twee keer
-     200 met dezelfde stand, en twee keer `gesloten` ook. Wat elke keer WEL
-     meebeweegt zijn `standDoor` en `standAt`, en dat is de bedoeling: wie de
-     juridische positie van dit huis als laatste heeft bevestigd, is precies wat
-     je bij een geschil wilt weten. */
-  'POST /api/office/rugdekking/beurs': { zelfdeVerzoek: true },
 
   /* DE ENIGE DIE MET OPZET EEN TWEEDE KEER IETS DOET. Elke aanroep zet een regel
      in het spoor van de client, en dat IS de bedoeling: twee keer namens iemand

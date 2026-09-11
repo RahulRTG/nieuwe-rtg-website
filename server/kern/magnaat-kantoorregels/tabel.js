@@ -21,6 +21,13 @@ const REGELS = [
   [/office\/regering|\/rijksloket|\/defensie/, 'regering', 'Het Regeringskantoor'],
   [/office\/opvang/, 'opvang', 'Opvang & migratie'],
   [/office\/balie|\/ledenregister/, 'balie', 'De Ledenbalie'],
+  /* HET CARRIERE LEDGER, en deze regel staat VOOR de brede office-, supplier-
+     en ledenregels -- dezelfde reden als bij RTG Service hieronder. Het ledger
+     heeft DRIE deuren (lid, kantoor, zaak) en dat is een capability; zonder
+     deze regel kwamen ze in drie kamers, en geen van de drie gekozen.
+     De Ledenbalie en niet HR: HR is het personeel van RTG, dit is het eigen
+     dossier van een LID -- zoals `/ledenregister` hierboven. */
+  [/\/carriere\b|\/loopbaan/, 'balie', 'De Ledenbalie'],
   /* RTG SERVICE HOORT BIJ DE KLANTENSERVICE, en dat moest hier staan: zonder
      deze regel viel de hele hulplijn terug op "Onderzoek & data", en die
      terugval bestaat juist om te voorkomen dat onbekend werk stilletjes ergens

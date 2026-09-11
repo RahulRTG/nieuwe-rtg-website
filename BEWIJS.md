@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1809 |
 | losse beweringen (`test(...)`) | 12751 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1186 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1187 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 66 |
 | alleen in de kop *genoemd*, nog niet gemeten | 154 |
-| niets van beide | 403 |
+| niets van beide | 402 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -709,7 +709,7 @@ toets omvalt.
 | `lidboard.test.js` | 21 | gezakt op `liegpoort /api/` | De eigen boardroom van elk lid (kern/lidboard/ + routes): 1. een lid ziet zijn bord met vijf groepen en zet er functies aan/uit; de stand blijft server-side bewaard. |
 | `lidfactuur.test.js` | 12 | gezakt op `liegpoort /api/` | ELKE BETAALDE LIDTRANSACTIE LEVERT EEN FACTUUR OP -- en dus btw. Dit is de toets bij de reparatie in kern/lidacties/factuur.js. |
 | `lidmaatschap.test.js` | 4 | gezakt op `===->!==#0` | De merkstatus van een lid is geen afgeleide marketingtekst in een scherm. Deze toets bewaakt de indeling zelf én houdt de memberclass los van de echte identiteitscontrole. |
-| `lidpoort.test.js` | 10 | -- | DE LEDENPOORT: LOOPT DE AFSPRAAK NOG? -- en hij houdt met opzet niemand tegen. |
+| `lidpoort.test.js` | 10 | gezakt op `liegpoort /api/` | DE LEDENPOORT: LOOPT DE AFSPRAAK NOG? -- en hij houdt met opzet niemand tegen. |
 | `lidsleutel.test.js` | 5 | -- | De ledensleutel (server/lib/lidsleutel.js): van `user-<id>` naar het account-id. Zeventien kopieen van dezelfde reguliere expressie zijn hier een functie geworden, en deze toets legt vast wat die functie belooft --... |
 | `liegpoort.test.js` | 7 | gezakt op `false->true#0` | DE LIEGPOORT: liegt hij precies waar hij moet, en zwijgt hij waar het telt? WAAROM DIT ER IS. |
 | `life-lagen.test.js` | 4 | -- | De LIFE-schil presenteert de bestaande passen als drie lagen. Deze toets bewaakt zowel de gevraagde schermvolgorde als de echte servertrap, zodat een mooi tabblad nooit meer belooft dan de routes erachter toestaan. |

@@ -97,7 +97,7 @@ body[data-rtg-edge-appbar="true"] .rtg-edge-ai{grid-column:4;min-width:44px!impo
 .rtg-edge-appslot>.speler.rtg-edge-owned-bar .rij{height:var(--edge-bottom)!important;gap:2px!important}
 .rtg-edge-appslot>.speler.rtg-edge-owned-bar button{min-width:44px!important;width:44px!important;height:44px!important;color:var(--edge-copy)!important}
 .rtg-edge-appslot>.speler.rtg-edge-owned-bar :is(.titel,.sub){color:var(--edge-copy)!important}
-.rtg-edge-appslot>.speler.rtg-edge-owned-bar button.afspeel{background:var(--edge-accent)!important;color:#fff!important}
+.rtg-edge-appslot>.speler.rtg-edge-owned-bar button.afspeel{background:var(--edge-accent)!important;color:#17120d!important}
 body[data-rtg-edge-appbar="true"]:is(.rtg-music-experience,.rtg-media-experience)>.rahul{display:none!important}
 
 /* Het slimme menu heeft twee zichtbare gezichten in dezelfde laag. Op een

@@ -103,5 +103,22 @@ module.exports = Object.freeze({
   'POST /api/office/reisbureau/wijziging':
     'na het besluit ligt er geen wijzigingsverzoek meer; een afgespeeld succes zou een tweede keer personen en bedrag lijken te verzetten',
   'POST /api/office/reisbureau/afzeggen':
-    'zelfde reden als de ledenkant, plus: een herhaling zou het lid een tweede melding sturen over dezelfde afzegging'
+    'zelfde reden als de ledenkant, plus: een herhaling zou het lid een tweede melding sturen over dezelfde afzegging',
+  /* Het lid zegt zijn eigen lidmaatschap op (kern/aanmeldingen/
+     lidabonnement-opzeg.js). Zelfde grond als de reisnazorg hierboven: de route
+     WEET zelf dat ze het al gedaan heeft -- het contract staat dan op OPZEGGEND
+     en de tweede oproep krijgt `alOpgezegd: true` met dezelfde einddatum terug.
+     Dat is precies de grens uit de kop van ./idemsleutels-nooit.js: deze laag is
+     er voor routes die dat NIET weten.
+
+     En het verschil met de reisnazorg is leerzaam: daar krijgt de tweede oproep
+     een 409, hier met opzet een 200. Twee tikken op een telefoon zijn geen twee
+     opzeggingen, en een foutmelding op de tweede laat een lid denken dat de
+     eerste niet is aangekomen. Maar dat antwoord is wel een BESLUIT ("dit liep
+     al af per die datum"), en een cache die de 200 van de eerste keer afspeelt,
+     vertelt een lid dat hij nu heeft opgezegd terwijl hij dat al had. De gemeten
+     dubbeltik staat in server/lib/mutatiecontracten-lidabonnement.js. */
+  'POST /api/mijn/abonnement/opzeggen':
+    'de route weet zelf dat er al is opgezegd en zegt dat ook (alOpgezegd: true, met dezelfde einddatum); ' +
+    'een afgespeeld eerste antwoord zou een lid vertellen dat hij nu opzegt terwijl dat al was gebeurd'
 });

@@ -2,7 +2,7 @@
    keurder klein blijft; dit bestand bevat alleen beleid, geen uitvoerlogica. */
 'use strict';
 
-module.exports = Object.freeze({
+module.exports = ({
   'POST /api/webhooks/storingen':
     'eigen duurzame SQLite-deduplicatie op de ondertekende event-id en bodyhash, over processen en herstarts; ' +
     'de ontvanger beslist opnieuw over 200, 409 of opslagfout, een generieke antwoordcache mag dat bewijs niet vervangen',
@@ -103,52 +103,10 @@ module.exports = Object.freeze({
   'POST /api/office/reisbureau/wijziging':
     'na het besluit ligt er geen wijzigingsverzoek meer; een afgespeeld succes zou een tweede keer personen en bedrag lijken te verzetten',
   'POST /api/office/reisbureau/afzeggen':
-    'zelfde reden als de ledenkant, plus: een herhaling zou het lid een tweede melding sturen over dezelfde afzegging',
-
-  /* DE CARRIERELAAG -- elf routes die het ZELF al weten, en dat is precies de
-     grond uit de kop van ./idemsleutels-nooit.js: deze laag is er voor routes
-     die niet weten dat ze het al gedaan hebben.
-
-     Ze stonden eerst met `zelfdeVerzoek: true` in ./idemsleutels-carriere.js, en
-     dat was fout op twee manieren tegelijk. Het brak de toetsen (een tweede
-     oproep kreeg het AFGESPEELDE antwoord van de eerste in plaats van de
-     weigering), en het sprak de mutatiecontracten tegen, die bij elk van deze
-     routes met zoveel woorden zeggen: een toestandscontrole en GEEN
-     duplicaatlaag (MUTATIECONTRACT.md par. 5o). De stand PROTECTED staat dit
-     ook uitdrukkelijk toe -- "een duplicaatregel in lib/idemsleutels.js OF een
-     eigen afhandeling in de route". */
-  'POST /api/vertegenwoordiging/voorstel':
-    'weigert een tweede voorstel van dezelfde vertegenwoordiger met 409 en de reden; een afgespeeld ' +
-    'succes zou de client laten denken dat er een tweede machtiging klaarstaat',
-  'POST /api/vertegenwoordiging/aanvaard':
-    'weigert met 409 zodra de machtiging actief is; aanvaarden is de handeling van de client zelf en ' +
-    'een afgespeeld antwoord verbergt dat hij al getekend had',
-  'POST /api/vertegenwoordiging/intrek':
-    'weigert met 409 als hij al is ingetrokken; wie intrekt hoort te weten of hij de eerste was',
-  'POST /api/vertegenwoordiging/grens':
-    'ZET de eigen grens van het lid (een toewijzing) en antwoordt altijd met de grens die er nu staat; ' +
-    'een afgespeeld antwoord zou een oudere grens tonen dan wat er werkelijk geldt',
-  'POST /api/vertegenwoordiging/voogd/vraag':
-    'keert bij dezelfde voogd vroeg terug zonder te schrijven; iemand ANDERS aanwijzen is wel een tweede ' +
-    'handeling, en die mag een duplicaatlaag niet opslikken',
-  'POST /api/vertegenwoordiging/voogd/rol':
-    'weigert met 409 als het verzoek al is aanvaard',
-  'POST /api/vertegenwoordiging/voogd/tekent':
-    'weigert met 409 als de voogd al heeft getekend, en kent standafhankelijke redenen (de jongere moet ' +
-    'eerst); een afgespeeld antwoord maakt van die twee gevallen een',
-  'POST /api/office/voogdij/besluit':
-    'weigert met 409 en zegt per stand WAAROM -- "al besloten" en "de volwassene moet nog aanvaarden" ' +
-    'vragen van een medewerker iets heel anders, en een afgespeeld succes zegt geen van beide',
-
-  'POST /api/office/rugdekking/stel':
-    'heeft een EIGEN dubbelklikcontrole die moet vuren: een tweede identiek programma verdubbelt stil wat ' +
-    'RTG een mens heeft beloofd, en de route zegt dat met zoveel woorden. Een afgespeeld succes van de ' +
-    'eerste oproep verbergt precies de melding waarvoor die controle bestaat',
-  'POST /api/office/rugdekking/stop':
-    'weigert met 409 als het programma al gestopt is; een afgespeeld succes laat een medewerker denken ' +
-    'dat HIJ het heeft gestopt',
-  'POST /api/office/rugdekking/beurs':
-    'ZET de stand, en `standDoor` en `standAt` horen bij elke bevestiging mee te bewegen: wie de ' +
-    'juridische positie van dit huis als laatste heeft bevestigd, is precies wat je bij een geschil wilt ' +
-    'weten. Een afgespeeld antwoord bevriest die naam op de eerste'
+    'zelfde reden als de ledenkant, plus: een herhaling zou het lid een tweede melding sturen over dezelfde afzegging'
 });
+
+/* De carrierelaag staat in ./idemsleutels-nooit-carriere.js -- zelfde lijst,
+   eigen bestand, omdat deze anders over de 10 kB gaat. Zie de kop daar. */
+Object.assign(module.exports, require('./idemsleutels-nooit-carriere'));
+Object.freeze(module.exports);

@@ -441,7 +441,7 @@ Niet één herschrijving. Elke stap is los waardevol en los terug te draaien.
 |---|---|---|
 | 1 | een factuur leest nooit de prijs van vandaag | **gedaan**, 11 sep 2026 |
 | 2 | een lid ziet zijn abonnement en zegt zelf op | **gedaan**, 11 sep 2026 |
-| 3 | de contractstand in `auth()`, in de schaduw | open |
+| 3 | de contractstand in `auth()`, in de schaduw | **gedaan**, 11 sep 2026 |
 | 4 | de bewijsprimitive, met onboarding als eerste gebruiker | open |
 | 5 | alle 31 tekenwegen een zekerheids- en bewijsverklaring | open |
 | 6 | de consentscanner wordt een releasepoort | open |
@@ -553,6 +553,69 @@ geknipt. Hij droeg twee soorten onschakelbaarheid met twee verschillende gronden
 — de besturing van het platform tegenover de rechten van een mens — en één regel
 erbij duwde hem over de 10 kB. `bediening-recht.js` draagt nu de tweede helft, en
 de twee worden weer samengevoegd zodat er één lijst naar buiten gaat.
+
+### 14.3 Wat stap 3 opleverde, en wat hij NIET deed
+
+`kern/commercie/lidpoort.js` plus tien regels in `auth()`
+(`server/opzet/diensten2.js`). Hij telt, en hij houdt **niemand** tegen.
+
+**Het getal dat dit opent.** 46 bestanden met een ledenroute toetsen de pas van
+een lid. 45 daarvan vragen `tier === 'guest'` — *is dit überhaupt een lid* — en
+precies één (`borden.js`) vraagt naar een specifieke betalende pas. Het aantal dat
+vraagt of de **overeenkomst** nog loopt is **nul**, en buiten `kern/commercie/`
+bestaat er geen lezer van de contractstand. Beide nageteld in plaats van geschat.
+
+**Vier standen, en de scheiding tussen twee ervan is het hele ontwerp.**
+`NIET_BETALEND` / `LOOPT` / `GEEINDIGD` / `GEEN_CONTRACT` — en die laatste twee
+worden nooit opgeteld. De meeste betalende leden van vandaag hebben hun pas langs
+een andere weg gekregen (een demo-persona, een geseed account, een aanmelding van
+vóór de contractmotor), dus *ik vind geen afspraak* betekent **ik weet het niet**
+en niet *er is niets afgesproken*. `CONTROLPLANE.md` zegt dat in één regel:
+`ONBEKEND` is geen `WEIGEREN`. Wie ze optelt, laat de schaduw melden dat vrijwel
+elk lid tegengehouden zou worden, leest iedereen dat als ruis, en dan is het echte
+getal — hoeveel passen hun eigen afspraak overleven — niet meer te vinden.
+
+**Daarom twee schaduwregels en niet één**, want ze vragen een ander besluit:
+
+| regel | afdwingen betekent |
+|---|---|
+| `lidcontract.geeindigd` | de afspraak is voorbij — verdedigbaar |
+| `lidcontract.ontbreekt` | elk lid zonder vastgelegde afspraak buitensluiten — stap 7, en een productbesluit |
+
+Met één regel krijgt een mens die de eerste aanzet de tweede er stilzwijgend bij.
+Geen van de twee is vrijgesteld: die som mág `routepoort.js` maken (daar kan een
+capability op elke trede zitten en dan pakt hij niemand iets af), hier pakt elke
+regel een lid zijn pas af. `zetModus('AFDWINGEN')` geeft 409 tot er 200
+waarnemingen over 7 dagen liggen.
+
+**Een weging per LID en niet per verzoek**, en dat is de juiste eenheid en geen
+zuinigheid: de vraag is hoeveel *leden* een pas zonder lopende afspraak hebben.
+Per verzoek tellen laat het getal bepalen door wie het hardst klikt. De keerzijde
+hoort erbij en staat in de code: de teller van deze twee regels is daarmee **niet
+vergelijkbaar** met die van de abonnementspoort, die per verzoek telt.
+
+**Wat er met opzet niet is: een pad-tabel.** Bij `routepoort.js` hoort die er wel
+— kassa is niet personeel. Hier is de vraag voor elke ledenroute dezelfde, en een
+tabel zou een lijst **gokken** zijn over welke van die 46 bestanden "echt" een
+betalende pas nodig heeft. Die 46 dragen die kennis vandaag niet; ze vragen iets
+anders. Een tabel verzinnen vervangt de meting door een mening.
+
+**En een fout die de toets vond en het lezen niet.** De kop
+`RTG-Niet-Afgedwongen` wordt nu door twee lagen gezet, dus de eerste versie
+gebruikte `res.append`. **Die bestond niet:** `server/web/verrijk.js` is een eigen
+Express-achtige schil en geen Express — `set` zit erin, `append` zat er niet.
+Binnen de `try/catch` van `auth()` (die er staat omdat een storing in de bewijslaag
+geen overtreding mag worden) verdween die TypeError volledig en bleef de kop
+gewoon leeg: de regel liep, de meting liep, en het antwoord zei er niets over.
+Een ontbrekende methode op die schil faalt dus **stil**, en dat geldt voor elke
+aanroeper. `append` staat nu in de schil zelf, één keer, naast `set`.
+
+Twee toetsen waren bovendien **leeg** en zijn dat niet meer, en beide in de vorm
+die `LAT.md` regel 9 beschrijft. De ene had een `if (status === 200)` om een
+kantoorblok met het verkeerde pad erin (`/api/office/commercie/schaduw`; het is
+`/api/office/handhaving`), dus dat blok sloeg stilzwijgend over. De andere bewees
+alleen dat de kop **ontbrak** — en dat is waar zodra de hele laag stuk is; hij telt
+nu dat het lid wel degelijk gewogen is, als noemer zonder bezwaar.
 
 ---
 

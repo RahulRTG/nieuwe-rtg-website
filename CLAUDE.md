@@ -408,6 +408,31 @@ account** — na opzegging blijven facturen en bewijsstukken, want account-breed
 afsluiten maakt van een opzegging een straf. Let op twee namen die al bezet zijn
 vóór je een scherm bouwt: *Mijn afspraken* betekent in de leden-app al BOEKINGEN,
 en `mandaat` en `machtiging` dragen allebei al een andere betekenis.
+**Stap 3 staat** (11 september 2026): `kern/commercie/lidpoort.js` leest de
+contractstand in `auth()` en houdt NIEMAND tegen. Het getal dat dat opende: 46
+bestanden met een ledenroute toetsen de pas van een lid, 45 vragen `tier ===
+'guest'` (*is dit überhaupt een lid*), één vraagt naar een specifieke betalende
+pas, en **nul** vragen of de overeenkomst nog loopt. Twee dingen daar niet
+samenvoegen: **`GEEN_CONTRACT` is geen `GEEINDIGD`** — de meeste betalende leden
+kregen hun pas van vóór de contractmotor, dus "ik vind geen afspraak" betekent *ik
+weet het niet* en niet *er is niets afgesproken* (`ONBEKEND` is geen `WEIGEREN`),
+en opgeteld meldt de schaduw dat vrijwel élk lid tegengehouden zou worden, wat als
+ruis leest — daarom twee schaduwregels, want *een afgelopen afspraak afdwingen* en
+*elk lid zonder vastgelegde afspraak buitensluiten* zijn twee besluiten. En de
+weging gaat **per lid en niet per verzoek**: de vraag is hoeveel LEDEN een pas
+zonder lopende afspraak hebben, en per verzoek tellen laat wie het hardst klikt het
+getal bepalen — met als keerzijde dat die teller niet vergelijkbaar is met die van
+de abonnementspoort, die wél per verzoek telt.
+**En let op een vondst die veel breder geldt dan afspraken:
+`server/web/verrijk.js` is een EIGEN Express-achtige schil en geen Express.**
+`res.set` zit erin, `res.append` zat er niet — en een methode die die schil niet
+heeft, faalt STIL: binnen een `try/catch` (en `auth()` heeft er een, want een
+storing in de bewijslaag mag geen overtreding worden) verdwijnt de TypeError
+volledig en blijft de kop gewoon leeg. De regel liep, de meting liep, en het
+antwoord zei er niets over. Controleer dus of een `res.`-methode daar bestaat
+voordat je hem gebruikt; `append` staat er nu wel, één keer naast `set`, omdat
+`RTG-Niet-Afgedwongen` sinds deze stap door twee lagen wordt gezet en `set` de
+eerste weggooit.
 **`KANTOORMACHT.md` is de kantoorkant daarvan** — niet wat een LID mag (dat is
 CONTROLPLANE.md) maar wat een MEDEWERKER van RTG mag, en tot waar zijn macht
 reikt. Lees die vóór je een kantoorscherm, een backofficeroute of een

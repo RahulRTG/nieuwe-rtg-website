@@ -309,9 +309,11 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
                 return s.display !== 'none' && s.visibility !== 'hidden' &&
                   Number(s.opacity || 1) > 0 && r.width > 0 && r.height > 0;
               };
+              const edgeGreep = [...document.querySelectorAll(
+                '.rtg-edge-2-reveal,.rtg-edge-2-edge-reveal')].some(zichtbaar);
               return zichtbaar(document.getElementById('osMenuBtn')) ||
                 zichtbaar(document.querySelector('.rtg-edge-menu')) ||
-                zichtbaar(document.querySelector('.rtg-edge-2-reveal')) ||
+                edgeGreep ||
                 zichtbaar(document.querySelector('#rtf-toegang-slot [data-rtf-uitweg]'));
             }, null, { timeout: 8000 });
             const deuren = await page.evaluate(() => {
@@ -324,7 +326,8 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
               return {
                 legacy: zichtbaar(document.getElementById('osMenuBtn')),
                 edge: zichtbaar(document.querySelector('.rtg-edge-menu')),
-                edgeGreep: zichtbaar(document.querySelector('.rtg-edge-2-reveal')),
+                edgeGreep: [...document.querySelectorAll(
+                  '.rtg-edge-2-reveal,.rtg-edge-2-edge-reveal')].some(zichtbaar),
                 uitweg: zichtbaar(document.querySelector('#rtf-toegang-slot [data-rtf-uitweg]')),
                 roots: document.querySelectorAll('.rtg-edge-chrome').length
               };

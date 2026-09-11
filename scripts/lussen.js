@@ -57,8 +57,12 @@ if (require.main !== module) return;
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { execSync } = require('child_process');
 const { parse } = require('./ast/parser');
+/* Het huiseigen stempel, en niet een eigen {op, commit}. Die eigen versie droeg
+   geen `boomVuil`, en daarmee kon `registersUitVuileBoom` in scripts/norm.js
+   nooit iets over dit register zeggen -- een meting uit een boom die niet
+   bestond, zou hier stilzwijgend voor bewijs zijn doorgegaan. */
+const { stempel } = require('./lib/stempel');
 const { loop: wandel } = require('./ast/walk');
 /* De indeling zelf woont in scripts/lib/lusvorm.js: die raakt geen schijf en is
    daardoor toetsbaar zonder dit register te overschrijven. */
@@ -415,13 +419,11 @@ const verdeling = (rijen, veld) => rijen.reduce((m, x) => { m[x[veld]] = (m[x[ve
 const syntactisch = perLus.filter(l => l.as === 'syntactisch');
 const callbacks = perLus.filter(l => l.as === 'callback');
 
-let commit = null;
-try { commit = execSync('git rev-parse --short HEAD', { cwd: WORTEL }).toString().trim(); } catch (e) {}
 
 const uit = {
   soort: 'index',
   uitleg: 'De canonieke lusindex: elke cyclische gedraging van server/ en public/ met EEN identiteit, EEN vorm, EEN terminatiegraad en het bewijs dat er al over ligt. De assen staan naast elkaar en worden nooit opgeteld.',
-  stempel: { op: new Date().toISOString().slice(0, 10), commit },
+  stempel: stempel(),
   grens: 'Terminatie is onbeslisbaar: geen enkele graad hier betekent "bewezen veilig". `bewezenBegrensd` zegt dat de STRUCTUUR de afloop vastlegt, `uitwegAanwezig` dat er een uitweg STAAT zonder dat iemand zijn bereikbaarheid heeft getoetst. Neveneffect en domein zijn lexicaal afgeleid en dus een ONDERGRENS (graad vermoed). Het bewijsveld is geleend van de route waar het symbool bij uitkomt en zegt niets over de lus zelf.',
   nogNietTeZetten: [
     { graad: 'runtimeBegrensd', reden: 'vraagt een looptijdproef die per LoopID iteraties telt; er is vandaag geen instrumentatie die dat per lus kan.' },

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-11T06:09:19.290Z",
-    "commit": "d18ca72a",
+    "op": "2026-09-11T12:17:32.763Z",
+    "commit": "159b6ea0",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -3579,6 +3579,13 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "jeugdbestuur.e2e.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
+    },
     "journaalbestand.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6681,6 +6688,13 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "rugdekking.e2e.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 15,
+      "scherp": "gezakt"
+    },
     "rust-migraties.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -8324,6 +8338,13 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "verificatie.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "verjaardagen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -8384,6 +8405,28 @@
       "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "vertegenwoordiging.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "vertegenwoordiging.e2e.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "vertegenwoordiging.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "vertrouwenbronnen.test.js": {
       "soort": "puur",
@@ -9157,21 +9200,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "vertegenwoordiging.e2e.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 9,
-      "scherp": "gezakt"
-    },
-    "vertegenwoordiging.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bron.js",
-      "operator": "&&->||#0",
-      "gezakt": 1,
-      "geprobeerd": 3
     }
   }
 }

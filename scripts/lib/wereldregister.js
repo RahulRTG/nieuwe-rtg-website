@@ -84,6 +84,17 @@ function waarde(n) {
     }
     return uit;
   }
+  /* T(sleutel, tekst) IS DE TEKST. De sleutelweg van dit huis zet zichtbare
+     tekst achter `T('app.iets', 'Iets')`, en die vorm kwam hier als een
+     CallExpression binnen en viel door naar de lege string -- waarna
+     `def.naam || sleutel` de SLEUTEL toonde. Gevolg: een nieuwe app heette in
+     de werkruimte-catalogus "vertegenwoordiging" in plaats van "Mijn team",
+     en dat is precies het soort stille verschil dat niemand meldt. De tweede
+     parameter is de Nederlandse val-terug-tekst en dus wat een mens ziet. */
+  if (n.type === 'CallExpression' && n.callee && n.callee.name === 'T') {
+    const val = waarde((n.arguments || [])[1]);
+    return val === undefined ? '' : val;
+  }
   if (n.type === 'BinaryExpression' && n.operator === '+') {
     const l = waarde(n.left), r = waarde(n.right);
     return String(l === undefined || l === null ? '' : l) + String(r === undefined || r === null ? '' : r);

@@ -315,10 +315,10 @@ kwaliteit mag; lock-in door gijzeling zakt.**
 |---|---|---|
 | 1 | De carrièrelus als werkwoordenlaag (geen objecttype) | **besloten door de meting** — par. 0 |
 | 2 | De uitstaptoets als keuringsregel | **een stap weg** — de vorm staat in `check.js`, het is een regel erbij |
-| 3 | CAR-05 als handhaver vóór de eerste carrièremeter | **een stap weg**, en hij hoort vóór 4 t/m 9 |
+| 3 | CAR-05 als handhaver vóór de eerste carrièremeter | **staat voor deze laag** — `test/vertegenwoordiging.test.js` 17 en 18; huisbreed nog niet |
 | 4 | Hoedanigheid + namens-wie + mandaat in de envelop | **een besluit** — de envelop is gesloten op acht; dit is een versiesprong |
-| 5 | Mens-namens-mens mandaat (Representation Kernel) | **een besluit** — grammatica staat, drager ontbreekt |
-| 6 | Mandaatsimulator (permissions-diff vóór accepteren) | **volgt op 5** — en dit is het meest onderscheidende scherm in het hele voorstel |
+| 5 | Mens-namens-mens mandaat (Representation Kernel) | **staat** — `server/kern/vertegenwoordiging/`, zie par. 6a |
+| 6 | Mandaatsimulator (permissions-diff vóór accepteren) | **staat** — `simulatie.js` plus `/apps/vertegenwoordiging.html` |
 | 7 | Guardian / jeugdbestuur, met eigen inzicht voor de jongere | **volgt op 5**, en `LEVEN.md` par. 2 staat erboven |
 | 8 | `CAREER_GRANT` met drie soorten rugdekking (direct / beperkt / vrij) | **een besluit** — en `GIFT.md` staat ervóór |
 | 9 | Rights Vault met gebied, kanaal, looptijd en exclusiviteit | **een besluit** — bestaat niet, en de conflictcontrole is de hele waarde |
@@ -332,6 +332,59 @@ De goedkoopste drie zijn 2, 3 en 6. Twee daarvan zijn grenzen en niet
 functies — en dat is geen toeval: in deze laag is de grens het product.
 
 ---
+
+## 6a. Wat er inmiddels staat: RTG Vertegenwoordiging
+
+Nummer 5 en 6 zijn gebouwd (`server/kern/vertegenwoordiging/`, scherm
+`/apps/vertegenwoordiging.html`, acht routes). De grammatica komt letterlijk uit
+`kern/stuur/mandaat.js` — een tweede grammatica naast de eerste is precies de
+fout die `SEMANTIEK.json` meet — en zeven regels staan in code in plaats van in
+een afspraak:
+
+1. **Versmallen is een doorsnede.** Een vertegenwoordiger kan structureel nooit
+   meer dan de mens voor wie hij staat.
+2. **Leeg is dicht.** Een machtiging zonder bevoegdheden bestaat niet.
+3. **De lijst is gesloten.** Negen bevoegdheden, elk met een grond en met de
+   vlag `klaarzetten` erbij; zeven dingen staan in NOOIT en zijn dus niet te
+   vragen — geld, tekenen, de bankrekening, gezondheid, privéberichten,
+   **delegatie**, en het pasbesluit.
+4. **Verval is berekend en geen opruimactie.** Een stilstaande server verruimt
+   niemands bevoegdheid.
+5. **Aanvaarden doet de cliënt.** Er is geen pad waarlangs een vertegenwoordiger
+   zijn eigen machtiging aanzet.
+6. **De cliënt heeft een eigen plafond**, en dat raakt ook machtigingen die al
+   lopen — een grens die alleen nieuwe machtigingen tegenhoudt, beschermt precies
+   de mens niet die er al een heeft.
+7. **Een geweigerde poging laat een spoor na.** Niet alleen wat er gelukt is: een
+   vertegenwoordiger die drie keer iets probeerde wat hij niet mocht, is een
+   gesprek waard.
+
+Alle zeven zijn met een **mutatie** nagetrokken (LAT.md regel 2): elke regel is in
+de bron omgedraaid, de suite zakte, en daarna weer groen. De CAR-05-grens uit par.
+5 heeft daarmee zijn eerste handhaver — hij stond in vier documenten en in nul
+toetsen.
+
+**Wat deze functie vandaag GESLOTEN houdt, en dat is geen bijwerking.** De poort
+is `volwassen()` uit `kern/volwassen.js`: een eigen account, 18 jaar of ouder,
+**en RTG heeft het identiteitsbewijs gezien (A3)**. Een vers lid haalt die niet,
+dus er kan vandaag geen machtiging worden afgegeven voordat iemand geverifieerd
+is. Dat is met opzet — een machtiging waarmee iemand commercieel namens je
+handelt, hoort niet te kunnen op een geboortedatum die je zelf hebt ingetypt —
+maar wie deze laag uitrolt, rolt daarmee ook de verificatie uit. Het jeugdbestuur
+(nummer 7) is bewust niet half gebouwd: dan tekent een vijftienjarige alsnog, met
+een scherm ertussen dat zegt dat het goed zit.
+
+**En er zit een les in die nergens anders herhaald moet worden.** De achttien
+unittoetsen stonden groen terwijl `voorstel()` kapot was: `keyVanCodenaam` uit
+`kern/gids.js` is **async en geeft een object**, en de code behandelde hem als een
+synchrone functie die een sleutel teruggaf. Een Promise is waar, dus de 404 voor
+een onbekend lid vuurde nooit en het verzoek liep door naar de 18+-poort met een
+Promise als sleutel. De toets miste het omdat haar eigen fixture zich hield aan de
+vorm die de code AANNAM in plaats van aan de vorm die de gids heeft — exact de
+valkuil uit `CLAUDE.md` waar een cap groen bleef omdat een toets hem met verzonnen
+invoer voedde. Gevonden door `test/vertegenwoordiging.e2e.test.js` tegen een
+draaiende server, en dat is de reden dat die suite naast de unittoetsen bestaat en
+niet in plaats daarvan.
 
 ## 7. Wat dit document NIET zegt
 

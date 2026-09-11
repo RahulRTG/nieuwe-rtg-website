@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '1a3ee117';
+var RTG_BOUW = 'c108b9eb';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4323,6 +4323,13 @@ var RTG_BOUW = '1a3ee117';
     reizen:      { naam: 'Reizen & Veilig', url: '/apps/reizen-veilig.html' },
     vluchten:    { naam: 'Vluchten',      url: '/apps/vluchten.html' },
     sport:       { naam: 'Sport',         url: '/apps/sport.html' },
+    /* RTG Vertegenwoordiging: wie mag wat namens mij. Hij heet "Mijn team" en
+       niet "Machtigingen", omdat een mens zijn zaakwaarnemer, boekhouder en
+       coach als MENSEN ziet en niet als rechten; het scherm toont de rechten
+       wel, per persoon. In WorkOS en niet in LivingOS: de vraag "wie handelt
+       namens mij" komt op wanneer iemand over zijn werk denkt (WERELDEN.md:
+       in welke context denkt de mens dat hij zich bevindt). */
+    vertegenwoordiging: { naam: T('app.vertegenwoordiging', 'Mijn team'), url: '/apps/vertegenwoordiging.html' },
     school:      { naam: 'School',    url: '/apps/rtgschool.html' },
     berichten:   { naam: 'Berichten',     url: '/apps/comm.html' },
     /* EEN app voor alle communicatie (kern/comm + apps/comm.html). Hier
@@ -4520,7 +4527,8 @@ var RTG_BOUW = '1a3ee117';
        Het huis houdt zijn eigen naam: RTG Kantoor is een merk in WorkOS. */
     { sleutel: 'map-werk', naam: 'WorkOS', wereld: '/apps/kantoor.html', glyf: 'office', items: [
       'link:werkos', 'link:rtgone', 'link:decisionroom', 'link:projectroom', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
-      'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk'] },
+      'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk',
+      'link:vertegenwoordiging'] },
     /* TRAVELOS IS DE KLEINSTE WERELD EN DAT IS GEEN ARGUMENT TEGEN HEM: een
        wereld is geen categorie in een spreadsheet maar een bestemming in het
        hoofd van een mens, en deze bezit de hele keten van vertrekken tot

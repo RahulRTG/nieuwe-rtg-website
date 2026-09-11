@@ -36,6 +36,10 @@ module.exports = function hangDwarseRoutersOp(grens) {
   require('../routes/sleutelwoorden')(grens('sleutelwoorden'));
   require('../routes/agenda')(grens('agenda'));
   require('../routes/notities')(grens('notities'));
+  /* RTG Vertegenwoordiging (kern/vertegenwoordiging/): een mens die handelt
+     namens een mens. Dwars omdat hij aan geen enkel domein hangt -- hij gaat
+     over de betrekking tussen twee leden en niet over wat zij doen. */
+  require('../routes/vertegenwoordiging')(grens('vertegenwoordiging'));
   require('../routes/bestanden')(grens('bestanden'));
   require('../routes/meet')(grens('meet'));
   require('../routes/galerij')(grens('galerij'));

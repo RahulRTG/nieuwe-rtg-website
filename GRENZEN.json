@@ -2545,6 +2545,9 @@
       "status",
       "wallet",
       "zorgpolis"
+    ],
+    "vertegenwoordiging": [
+      "vertegenwoordiging"
     ]
   }
 }

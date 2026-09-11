@@ -28,4 +28,12 @@ module.exports = {
      'Zie wanneer je ja zei en via welk scherm dat gebeurde',
      'Zet alles in een handeling uit'],
     'Alles staat standaard UIT; afwezigheid is hier geen toestemming. Wat je hoe dan ook blijft krijgen -- beveiliging, facturen, wettelijke berichten -- staat er even groot bij en is geen schakelaar.'),
+  /* De derde vraag van dezelfde laag. Deel12b vroeg "wie mag iets VAN mij" en
+     "wie mag mij bereiken"; dit is "wie mag iets NAMENS mij" -- dezelfde mens,
+     dezelfde controlevraag, en daarom hier en niet bij de werk-schermen. */
+  '/apps/vertegenwoordiging.html': G('Mijn team: wie mag wat namens u, sinds wanneer, tot wanneer, en wat er namens u is gedaan.',
+    ['Bekijk voor elke machtiging wat er opengaat - en even groot wat er met zekerheid niet opengaat',
+     'Zet uw eigen grens: deze bevoegdheden geeft u aan niemand, ook niet aan wie u al gemachtigd heeft',
+     'Trek een machtiging op elk moment in, per direct en zonder reden'],
+    'Een machtiging versmalt wat u zelf al mocht; zij voegt er nooit iets aan toe. Aanvaarden doet u altijd zelf, en wat er namens u gebeurde blijft in uw spoor staan ook nadat u intrekt - intrekken stopt de toekomst en niet het verleden.'),
 };

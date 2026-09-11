@@ -112,7 +112,8 @@
        Het huis houdt zijn eigen naam: RTG Kantoor is een merk in WorkOS. */
     { sleutel: 'map-werk', naam: 'WorkOS', wereld: '/apps/kantoor.html', glyf: 'office', items: [
       'link:werkos', 'link:rtgone', 'link:decisionroom', 'link:projectroom', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
-      'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk'] },
+      'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk',
+      'link:vertegenwoordiging'] },
     /* TRAVELOS IS DE KLEINSTE WERELD EN DAT IS GEEN ARGUMENT TEGEN HEM: een
        wereld is geen categorie in een spreadsheet maar een bestemming in het
        hoofd van een mens, en deze bezit de hele keten van vertrekken tot

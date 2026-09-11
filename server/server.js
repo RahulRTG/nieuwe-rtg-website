@@ -1191,6 +1191,18 @@ const notities = require('./kern/notities').maakNotities({
 /* De opslagpeiling van de kostprijslaag (KOSTEN.md) staat naast de kluis en niet
    erin; zie de kop van kern/bestanden-opslag.js voor waarom, en welke toets die
    naad bewaakt. */
+/* RTG Vertegenwoordiging (kern/vertegenwoordiging/): een mens die handelt
+   namens een mens -- de vierde vorm, naast bijstand (RTG namens een klant), de
+   servicemachtiging en het AI-mandaat. De grammatica komt uit dat laatste en is
+   met opzet letterlijk: een machtiging VERSMALT bestaand vermogen en verleent
+   er nooit.
+
+   `volwassen` gaat als FUNCTIE mee en niet als waarde: de 18+-poort komt pas op
+   de kern in opzet/kernlaag1.js, en dit staat daarboven. Dezelfde vorm als
+   `comm: () => kern.comm` daar. */
+const vertegenwoordiging = require('./kern/vertegenwoordiging').maakVertegenwoordiging({
+  db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan,
+  volwassen: (handle) => kern.volwassen(handle) });
 const bestandenOpslag = require('./kern/bestanden-opslag')({ db });
 const bestanden = require('./kern/bestanden').maakBestanden({
   // antivirus: de gestukte upload komt nooit als data-URL in een verzoek-body
@@ -2208,7 +2220,7 @@ const kern = {
   findSupplier, forgetSession, forgetSessionDuurzaam, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, mensdeurStand, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, ritBezetting, ritVerder, rtf,

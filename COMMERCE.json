@@ -1,19 +1,19 @@
 {
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
-  "vastgelegd": "2026-09-09",
+  "vastgelegd": "2026-09-11",
   "gemeten": {
-    "bestanden": 2148,
-    "domeinenTotaal": 592,
-    "koopbareVormen": 528,
-    "koopbareDomeinen": 110,
+    "bestanden": 2153,
+    "domeinenTotaal": 593,
+    "koopbareVormen": 529,
+    "koopbareDomeinen": 111,
     "envelopDrempel": 7,
     "envelop": 46,
-    "veldenDomeineigen": 724,
-    "veldenNietEnvelop": 940,
+    "veldenDomeineigen": 726,
+    "veldenNietEnvelop": 942,
     "gelijkendeVormparen": 8,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
-    "werkwoordCombinaties": 45,
+    "werkwoordCombinaties": 46,
     "wagenVormen": 32,
     "wagenVormenUniek": 29,
     "wagenDomeinen": 22,
@@ -73,13 +73,13 @@
     "zaak"
   ],
   "perWerkwoord": {
-    "toon": 85,
+    "toon": 86,
     "prijs": 36,
     "beschikbaarheid": 51,
     "reserveer": 28,
     "bevestig": 52,
     "lever": 20,
-    "annuleer": 28,
+    "annuleer": 29,
     "retour": 7
   },
   "overalAanwezig": [],
@@ -1444,6 +1444,24 @@
       "bewijs": {
         "reserveer": "inhoudswoorden",
         "bevestig": "stuurBevestig"
+      },
+      "telt": 2
+    },
+    {
+      "domein": "kern/vertegenwoordiging",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "lijst",
+        "annuleer": "intrek"
       },
       "telt": 2
     },

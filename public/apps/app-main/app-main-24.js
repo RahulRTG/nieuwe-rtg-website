@@ -84,6 +84,13 @@
     reizen:      { naam: 'Reizen & Veilig', url: '/apps/reizen-veilig.html' },
     vluchten:    { naam: 'Vluchten',      url: '/apps/vluchten.html' },
     sport:       { naam: 'Sport',         url: '/apps/sport.html' },
+    /* RTG Vertegenwoordiging: wie mag wat namens mij. Hij heet "Mijn team" en
+       niet "Machtigingen", omdat een mens zijn zaakwaarnemer, boekhouder en
+       coach als MENSEN ziet en niet als rechten; het scherm toont de rechten
+       wel, per persoon. In WorkOS en niet in LivingOS: de vraag "wie handelt
+       namens mij" komt op wanneer iemand over zijn werk denkt (WERELDEN.md:
+       in welke context denkt de mens dat hij zich bevindt). */
+    vertegenwoordiging: { naam: T('app.vertegenwoordiging', 'Mijn team'), url: '/apps/vertegenwoordiging.html' },
     school:      { naam: 'School',    url: '/apps/rtgschool.html' },
     berichten:   { naam: 'Berichten',     url: '/apps/comm.html' },
     /* EEN app voor alle communicatie (kern/comm + apps/comm.html). Hier

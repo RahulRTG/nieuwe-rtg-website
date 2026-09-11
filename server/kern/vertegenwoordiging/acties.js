@@ -1,0 +1,189 @@
+/* ============================================================================
+   RTG Vertegenwoordiging, de HANDELINGEN: voorstellen, aanvaarden, intrekken,
+   de eigen grens zetten, en handelen onder een machtiging.
+
+   Afgesplitst van ./index.js op de 10 kB-grens (keuringsregel 13), langs een
+   echte naad: daar staat de opslag en wat je mag ZIEN, hier staat wat er
+   VERANDERT. Krijgt de gedeelde hulp van index.js mee.
+
+   DE VOLGORDE IS DE BESCHERMING. Voorstellen doet de vertegenwoordiger,
+   aanvaarden doet de client, en daartussen zit de simulatie. Wie die volgorde
+   omdraait -- de client stelt voor, de vertegenwoordiger aanvaardt -- heeft een
+   machtiging gebouwd die je kunt krijgen zonder hem te lezen.
+
+   EN EEN GEWEIGERDE HANDELING LAAT EEN SPOOR NA. Dat is niet vanzelfsprekend:
+   de makkelijke vorm geeft een 403 terug en vergeet het. Maar juist een POGING
+   buiten het mandaat is wat een client wil zien -- een vertegenwoordiger die
+   drie keer iets probeerde wat hij niet mocht, is een gesprek waard. */
+'use strict';
+
+const { bestaat, HOEDANIGHEDEN } = require('./bevoegdheden');
+const M = require('./machtiging');
+
+module.exports = (h) => {
+  const { dossier, dossierKijk, dossiersRuw, vind, publiek, bevoegdhedenVan,
+    vastleggen, nu, scho, crypto, keyVanCodenaam, naam, volw, MAX_PER_LID, MAX_LOG } = h;
+
+  const id = () => 'vm' + crypto.randomBytes(5).toString('hex');
+
+  /* HET SPOOR. Groeit aan, wordt nooit herschreven, en draagt altijd of het
+     GELUKT is -- een log met alleen successen is een reclamefolder. */
+  function spoor(clientKey, regel) {
+    const d = dossier(clientKey);
+    d.log.unshift(Object.assign({ id: id(), at: nu() }, regel));
+    if (d.log.length > MAX_LOG) d.log.length = MAX_LOG;
+  }
+
+  /* ---------- voorstellen: de vertegenwoordiger vraagt ---------- */
+  async function voorstel(vertegenwoordigerKey, data) {
+    const d = data || {};
+    /* `keyVanCodenaam` IS ASYNC EN GEEFT EEN OBJECT. Hier stond hij als een
+       synchrone functie die een sleutel teruggaf, en dat was van buiten niet te
+       zien: een Promise is waar, dus de 404 voor een onbekend lid vuurde nooit
+       en het verzoek liep door naar de 18+-poort met een Promise als sleutel.
+       De unittoetsen misten het omdat hun eigen fixture zich hield aan de vorm
+       die de code AANNAM in plaats van aan de vorm die de gids heeft -- precies
+       de valkuil uit CLAUDE.md over de cap die met verzonnen invoer groen bleef.
+       Gevonden door test/vertegenwoordiging.e2e.test.js tegen een echte server. */
+    const gevonden = keyVanCodenaam ? await keyVanCodenaam(scho(d.client, 80)) : null;
+    const clientKey = gevonden && gevonden.key;
+    if (!clientKey) return { status: 404, error: 'Dit lid bestaat niet. Vraag om de codenaam zoals die in RTG staat.' };
+    if (clientKey === vertegenwoordigerKey) {
+      return { status: 400, error: 'U kunt uzelf niet machtigen; u mag dit alles al zelf.' };
+    }
+    /* DE JEUGDGRENS. Zie de kop van ./index.js: half bouwen is hier de slechtste
+       optie, dus weigert hij met de reden en met wat eraan te doen is. */
+    if (!volw(clientKey)) {
+      return { status: 403, error: 'RTG kan van dit lid niet vaststellen dat het 18 of ouder is, en dan ' +
+        'gaat een machtiging niet door. Is het lid minderjarig, dan is er een ouder of verzorger bij ' +
+        'nodig -- dat jeugdbestuur is nog niet gebouwd, en half bouwen zou betekenen dat een ' +
+        'minderjarige alsnog tekent met een scherm ertussen. Is het lid wel volwassen: laat de ' +
+        'identiteit verifieren in de app.' };
+    }
+    const v = M.vorm(d);
+    if (v.error) return { status: 400, error: v.error };
+
+    const doss = dossierKijk(clientKey);
+    if (doss.machtigingen.filter(m => M.stand(m) !== 'ingetrokken').length >= MAX_PER_LID) {
+      return { status: 409, error: 'Dit lid heeft het maximum aantal machtigingen.' };
+    }
+    if (doss.machtigingen.some(m => m.vertegenwoordiger === vertegenwoordigerKey && M.stand(m) === 'voorgesteld')) {
+      return { status: 409, error: 'Er staat al een voorstel van u open bij dit lid.' };
+    }
+
+    const m = Object.assign({ id: id(), client: clientKey, vertegenwoordiger: vertegenwoordigerKey,
+      voorgesteldDoor: vertegenwoordigerKey, gemaakt: nu() }, v.machtiging);
+    const mis = await vastleggen(() => {
+      dossier(clientKey).machtigingen.unshift(m);
+      spoor(clientKey, { soort: 'voorgesteld', door: naam(vertegenwoordigerKey), machtigingId: m.id, gelukt: true });
+    });
+    if (mis) return mis;
+    return { status: 200, ok: true, machtiging: publiek(m, false),
+      let: 'Dit is een VOORSTEL. Er gaat niets open tot het lid het zelf aanvaardt.' };
+  }
+
+  /* ---------- aanvaarden: alleen de client ---------- */
+  async function aanvaard(clientKey, mid) {
+    const m = vind(clientKey, mid);
+    if (!m) return { status: 404, error: 'Deze machtiging staat niet in uw dossier.' };
+    if (m.client !== clientKey) return { status: 403, error: 'Aanvaarden doet de cliënt zelf.' };
+    const st = M.stand(m);
+    if (st !== 'voorgesteld') return { status: 409, error: 'Deze machtiging is ' + st + '.' };
+
+    /* VERSMALLEN GEBEURT BIJ HET AANVAARDEN EN NIET BIJ HET VRAGEN. Zo staat er
+       in de opslag wat er WERKELIJK geldt, en niet wat iemand ooit vroeg. */
+    const smal = M.versmal(bevoegdhedenVan(clientKey), m);
+    if (!smal.bevoegdheden.length) {
+      return { status: 409, error: 'Na uw eigen grens blijft er niets van deze machtiging over. ' +
+        'Er valt dus niets te aanvaarden.' };
+    }
+    const mis = await vastleggen(() => {
+      m.bevoegdheden = smal.bevoegdheden;
+      m.aanvaard = { door: naam(clientKey), at: nu() };
+      spoor(clientKey, { soort: 'aanvaard', door: naam(clientKey), machtigingId: m.id, gelukt: true,
+        afgevallen: smal.buiten });
+    });
+    if (mis) return mis;
+    return { status: 200, ok: true, machtiging: publiek(m, true), versmalling: smal.buiten.length ? smal.reden : null };
+  }
+
+  /* ---------- intrekken: altijd, per direct, door beide kanten ---------- */
+  async function intrek(key, mid, reden) {
+    /* BEIDE KANTEN MOGEN INTREKKEN. De cliënt vindt hem in zijn eigen dossier;
+       de vertegenwoordiger neemt ontslag en zoekt hem via de andere weg. Een
+       machtiging die alleen de cliënt kan beëindigen, houdt iemand vast die
+       eruit wil. */
+    let m = vind(key, mid), clientKey = key;
+    if (!m) {
+      const gevonden = zoekAlsVertegenwoordiger(key, mid);
+      if (!gevonden) return { status: 404, error: 'Deze machtiging bestaat niet.' };
+      m = gevonden.m; clientKey = gevonden.clientKey;
+    }
+    if (m.ingetrokken) return { status: 409, error: 'Deze machtiging is al ingetrokken.' };
+    const mis = await vastleggen(() => {
+      m.ingetrokken = { door: naam(key), at: nu(), reden: scho(reden, 200) || null };
+      spoor(clientKey, { soort: 'ingetrokken', door: naam(key), machtigingId: m.id, gelukt: true });
+    });
+    if (mis) return mis;
+    return { status: 200, ok: true, machtiging: publiek(m, clientKey === key),
+      let: 'Ingetrokken per direct. Wat er eerder namens u is gedaan, blijft in uw spoor staan -- ' +
+        'intrekken stopt de toekomst en niet het verleden.' };
+  }
+
+  function zoekAlsVertegenwoordiger(key, mid) {
+    for (const [sleutel, doss] of Object.entries(dossiersRuw())) {
+      for (const m of (doss && doss.machtigingen) || []) {
+        if (m.id === String(mid || '') && m.vertegenwoordiger === key) {
+          return { m, clientKey: sleutel.slice(4) };
+        }
+      }
+    }
+    return null;
+  }
+
+  /* ---------- de eigen grens van de client ---------- */
+  async function grensZet(clientKey, sleutels) {
+    const lijst = Array.isArray(sleutels) ? [...new Set(sleutels.map(x => String(x || '')))] : [];
+    const onbekend = lijst.filter(k => !bestaat(k));
+    if (onbekend.length) return { status: 400, error: 'Onbekende bevoegdheid: ' + onbekend.join(', ') + '.' };
+    const mis = await vastleggen(() => {
+      const d = dossier(clientKey);
+      d.grens = lijst.sort();
+      /* DE GRENS GELDT OOK VOOR WAT AL LOOPT. Een grens die alleen nieuwe
+         machtigingen raakt, beschermt precies de mens niet die er al een heeft. */
+      for (const m of d.machtigingen) {
+        if (M.stand(m) !== 'actief') continue;
+        const over = m.bevoegdheden.filter(k => !lijst.includes(k));
+        if (over.length !== m.bevoegdheden.length) {
+          m.bevoegdheden = over;
+          spoor(clientKey, { soort: 'versmald', door: naam(clientKey), machtigingId: m.id, gelukt: true });
+        }
+      }
+    });
+    if (mis) return mis;
+    return { status: 200, ok: true, grens: lijst,
+      let: 'Deze bevoegdheden geeft u aan niemand, ook niet aan wie u al gemachtigd heeft.' };
+  }
+
+  /* ---------- handelen onder een machtiging ---------- */
+  async function handel(vertegenwoordigerKey, mid, bevoegdheid, ctx) {
+    const gevonden = zoekAlsVertegenwoordiger(vertegenwoordigerKey, mid);
+    if (!gevonden) return { status: 404, error: 'U heeft deze machtiging niet.' };
+    const { m, clientKey } = gevonden;
+    const c = ctx || {};
+    const oordeel = M.magHandelen(m, bevoegdheid, { bedragCenten: c.bedragCenten });
+    const regel = { soort: 'handeling', door: naam(vertegenwoordigerKey), machtigingId: m.id,
+      bevoegdheid: String(bevoegdheid || ''), wat: scho(c.wat, 200) || null,
+      bedragCenten: c.bedragCenten == null ? null : Math.round(Number(c.bedragCenten) || 0),
+      gelukt: !!oordeel.mag, reden: oordeel.reden };
+    const mis = await vastleggen(() => spoor(clientKey, regel));
+    if (mis) return mis;
+    if (!oordeel.mag) return { status: 403, error: oordeel.reden, gelogd: true };
+    return { status: 200, ok: true, klaarzetten: oordeel.klaarzetten, reden: oordeel.reden,
+      let: oordeel.klaarzetten
+        ? 'Klaargezet. De cliënt bevestigt; er is niets verstuurd of vastgelegd.'
+        : 'Uitgevoerd binnen de machtiging, en het staat in het spoor van de cliënt.' };
+  }
+
+  return { voorstel, aanvaard, intrek, grensZet, handel, HOEDANIGHEDEN };
+};

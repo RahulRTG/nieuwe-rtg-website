@@ -3325,6 +3325,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/fonds.js', 'fondsallocatie: een bevestigde verdeling mag niet na een herstart verdwijnen'],
     ['server/kern/experience/index.js', 'menselijke bevestiging: acknowledgement en action evidence worden vóór succes duurzaam vastgelegd'],
     ['server/kern/notities.js', 'werk van een lid: een bevestigde notitie mag niet verdwijnen bij een opslagfout'],
+    ['server/kern/vertegenwoordiging/index.js', 'een machtiging is de bevoegdheid van een mens over het leven van een ander: aanvaarden, intrekken en de eigen grens mogen nooit bevestigd zijn zonder dat de opslag het heeft'],
     ['server/kern/agenda.js', 'werk van een lid: een afspraak die je hebt gezet, hoort er na een herstart te staan'],
     ['server/kern/agenda-pro.js', 'schrijft in dezelfde agenda en doet dus dezelfde belofte'],
     ['server/kern/bestanden.js', 'werk van een lid: de bytes staan al duurzaam, de verwijzing ernaartoe nu ook'],

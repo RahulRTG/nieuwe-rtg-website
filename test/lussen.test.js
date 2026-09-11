@@ -198,7 +198,13 @@ test('een altijd-ware lus zonder await bezet de gebeurtenislus, en dat staat er'
 
 test('elke onbekende lus draagt een REDEN uit een gesloten lijst', () => {
   const j = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
-  const toegestaan = new Set(['GEEN_TELLER', 'EXTERNE_BRON', 'TELLER_VERZET', 'GROEIENDE_GRENS', 'BRON_GROEIT_EN_KRIMPT', 'ANALYSEGRENS']);
+  /* De drie voortgangscodes kwamen erbij toen de vraaggestuurde analyse GEEN_TELLER
+     verving: die bak zei alleen dat de teller-analyse niets vond, deze zeggen wat
+     er dan wel aan de hand is. GEEN_TELLER staat er nog in omdat een lus zonder
+     guards hem nog kan krijgen. */
+  const toegestaan = new Set(['GEEN_TELLER', 'EXTERNE_BRON', 'TELLER_VERZET', 'GROEIENDE_GRENS',
+    'BRON_GROEIT_EN_KRIMPT', 'ANALYSEGRENS', 'GEEN_UITWEG',
+    'GUARD_ONAANGERAAKT', 'VOORTGANG_NIET_OP_ELK_PAD', 'VOORTGANG_MAAR_GEEN_GRENS']);
   const redenen = Object.keys(j.gemeten.onbekendRedenVerdeling);
   assert.ok(redenen.length > 0, 'zonder uitsplitsing is `onbekend` een eindbak in plaats van een werklijst');
   for (const r of redenen) assert.ok(toegestaan.has(r), 'onbekende reden-code in het register: ' + r);
@@ -333,4 +339,44 @@ test('een bestand dat alleen een meter of toets laadt, heet niet dood', () => {
      productiecode. */
   const verdeling = j.gemeten.levendigheidVerdeling;
   assert.ok(Object.keys(verdeling).length > 0, 'zonder levendigheidsverdeling is de bak niet na te lopen');
+});
+
+/* --------------------------------------------------------------------------
+   DE VOORTGANGSANALYSE (baan 2). Vraaggestuurd en met opzet geen volledige
+   control-flowgraaf: alleen de vragen die dit register nodig heeft. */
+
+test('VAL: een teller die alleen in een TAK muteert bewijst niets', () => {
+  /* `while (x < 100) { if (v) x++; }` -- er bestaat een pad waarop x nooit
+     verandert. Deze lus kreeg tijdens het bouwen van baan 2 even de HOOGSTE
+     graad, en dat is de gevaarlijkste faalvorm van deze meter: een groen vinkje
+     op precies de plek waar een mens anders zelf had gekeken. */
+  assert.equal(graadVan('while (x < 100) { if (v) x++; }'), 'nietVastTeStellen');
+  const l = eersteLus('while (x < 100) { if (v) x++; }');
+  assert.equal(V.voortgangsanalyse(l).muteertGuard, 'alleenVoorwaardelijk');
+});
+
+test('de update-clausule van een for telt als onvoorwaardelijke mutatie', () => {
+  /* `for (var i = a.length - 1; i >= 0; i--)` muteert i NERGENS in het lijf.
+     Zonder deze regel viel elke achteruit lopende for-lus door naar onbekend, en
+     noemde de voortgangsanalyse er 143 `guard onaangeraakt` -- een beschuldiging
+     die onwaar was. */
+  assert.equal(graadVan('for (var i = a.length - 1; i >= 0; i--) { doe(i); }'), 'bewezenBegrensd');
+  const l = eersteLus('for (var i = a.length - 1; i >= 0; i--) { doe(i); }');
+  assert.equal(V.voortgangsanalyse(l).muteertGuard, 'onvoorwaardelijk');
+});
+
+test('een lijf dat geen enkele guard aanraakt heet GUARD_ONAANGERAAKT', () => {
+  const l = eersteLus('while (klaar) { doe(); }');
+  const v = V.voortgangsanalyse(l);
+  assert.equal(v.muteertGuard, 'nergens');
+  assert.deepEqual(v.guards, ['klaar']);
+  assert.equal(V.terminatieVan(l, V.vormVan(l)).graad, 'nietVastTeStellen');
+});
+
+test('een continue naast een onvoorwaardelijke mutatie wordt gemeld als KAN, niet als DOET', () => {
+  const l = eersteLus('while (x < 9) { if (a) continue; x++; }');
+  const v = V.voortgangsanalyse(l);
+  assert.equal(v.continueKanOverslaan, true, 'een continue kan een mutatie die erna staat overslaan');
+  /* En zonder continue hoort hij vals te zijn -- anders meldt de meter hem overal. */
+  assert.equal(V.voortgangsanalyse(eersteLus('while (x < 9) { x++; }')).continueKanOverslaan, false);
 });

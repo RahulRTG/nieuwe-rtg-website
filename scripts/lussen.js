@@ -68,7 +68,7 @@ const { loop: wandel } = require('./ast/walk');
    daardoor toetsbaar zonder dit register te overschrijven. */
 const {
   LUSKNOPEN, ITERATORS, FUNCTIEKNOPEN, structuurhash, symbooolVan, inEigenLijf,
-  vormVan, terminatieVan, effectenVan, domeinVan, risicoVan, overlapRemVan, soortVan,
+  vormVan, terminatieVan, effectenVan, domeinVan, risicoVan, overlapRemVan, soortVan, voortgangsanalyse,
   sterkeComponenten, eindigeRij, KRITIEKE_DOMEINEN
 } = require('./lib/lusvorm');
 
@@ -162,6 +162,21 @@ for (const boom of BOMEN) {
         const inWekker = pad.some(p => p.type === 'CallExpression' && p.callee
           && (p.callee.name === 'setInterval' || p.callee.name === 'setTimeout'));
         const opTopniveau = !pad.some(p => FUNCTIEKNOPEN.has(p.type));
+        /* DE VOORTGANGSVRAAG, alleen waar de terminatievraag niet te beantwoorden
+           was. Dat is de norm die deze laag zichzelf oplegt: een analysetechniek
+           hoort aantoonbaar een BESTAANDE onbekende te verkleinen, niet een
+           nieuw veld toe te voegen aan wat al beantwoord is. */
+        /* ALLEEN WAAR DE REDEN NOG GEEN_TELLER IS. De specifieke codes
+           (TELLER_VERZET, GROEIENDE_GRENS, BRON_GROEIT_EN_KRIMPT) zeggen al
+           precies wat er aan de hand is; die overschrijven met een grovere
+           voortgangscode is informatie weggooien. Dat gebeurde in de eerste
+           versie van deze wiring, en het zag eruit als een verbetering. */
+        const vg = terminatie.graad === 'nietVastTeStellen' ? voortgangsanalyse(n) : null;
+        if (vg && (!terminatie.code || terminatie.code === 'GEEN_TELLER' || terminatie.code === 'ANALYSEGRENS')) {
+          if (vg.muteertGuard === 'nergens') terminatie.code = 'GUARD_ONAANGERAAKT';
+          else if (vg.muteertGuard === 'alleenVoorwaardelijk') terminatie.code = 'VOORTGANG_NIET_OP_ELK_PAD';
+          else if (vg.muteertGuard === 'onvoorwaardelijk') terminatie.code = 'VOORTGANG_MAAR_GEEN_GRENS';
+        }
         const soort = soortVan(n, vorm, terminatie);
         const risico = risicoVan(n, rel, vorm, terminatie, effecten, nesting, metAwait, soort);
 
@@ -172,6 +187,8 @@ for (const boom of BOMEN) {
           begrenzing: vorm.begrenzing, begrenzingReden: vorm.reden,
           terminatie: terminatie.graad, terminatieGrond: terminatie.grond, onbekendReden: terminatie.code || null,
           lussoort: soort.lussoort, voortgang: soort.voortgang,
+          guards: vg ? vg.guards : null, muteertGuard: vg ? vg.muteertGuard : null,
+          continueKanOverslaan: vg ? vg.continueKanOverslaan : null,
           inWekker, opTopniveau,
           await: metAwait, nesting, effecten,
           domein: risico.domein, risico: risico.klasse, risicoOpbouw: risico.opbouw
@@ -228,6 +245,7 @@ for (const boom of BOMEN) {
           terminatie: eindigeRij(n.callee.object) ? 'bewezenBegrensd' : 'aannemelijkBegrensd',
           terminatieGrond: 'een callback-iteratie loopt over de lengte van de bron; oneindig kan alleen bij een oneindige bron',
           onbekendReden: null, lussoort: 'eindig', voortgang: 'nietVanToepassing',
+          guards: null, muteertGuard: null, continueKanOverslaan: null,
           inWekker: pad.some(p => p.type === 'CallExpression' && p.callee
             && (p.callee.name === 'setInterval' || p.callee.name === 'setTimeout')),
           opTopniveau: !pad.some(p => FUNCTIEKNOPEN.has(p.type)),

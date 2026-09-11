@@ -261,7 +261,19 @@ function vormVan(lus) {
    teruggezet. Levert de naam op, of null. */
 function tellerBegrensdVan(lus) {
   const kandidaten = [];
-  wandel(lus.test, (n) => {
+  /* ALLEEN DE CONJUNCTEN, en niet elke vergelijking die ergens in de test staat.
+     Bij `A && B` stopt de lus zodra een van beide onwaar wordt, dus een
+     begrensde conjunct begrenst het geheel. Bij `i < 10 || wachten` geldt dat
+     NIET, en toch stond die vergelijking er. Zolang de update-clausule niet
+     werd meegelezen bleef dat verborgen; zodra zij dat wel werd, verklaarde
+     deze regel een OF-lus begrensd. Een toets ving dat -- dat is precies
+     waarvoor die VAL er staat. */
+  const conjuncten = (function plat(n) {
+    if (!n) return [];
+    if (n.type === 'LogicalExpression' && n.operator === '&&') return [...plat(n.left), ...plat(n.right)];
+    return [n];
+  })(lus.test);
+  for (const c of conjuncten) ((n) => {
     if (n.type !== 'BinaryExpression' || !['<', '<=', '>', '>='].includes(n.operator)) return;
     const omhoog = n.operator === '<' || n.operator === '<=';
     const naamKant = omhoog ? n.left : n.left;
@@ -271,7 +283,7 @@ function tellerBegrensdVan(lus) {
     const naam = naamKant && (naamKant.name || (naamKant.type === 'UpdateExpression' && naamKant.argument && naamKant.argument.name));
     if (!naam) return;
     kandidaten.push({ naam, omhoog });
-  });
+  })(c);
   for (const k of kandidaten) {
     let beweegt = false, teruggezet = false;
     const kijk = (n) => {
@@ -284,11 +296,123 @@ function tellerBegrensdVan(lus) {
         else teruggezet = true;
       }
     };
+    /* DE MUTATIE MOET ONVOORWAARDELIJK ZIJN, en die eis stond er niet.
+       Zonder haar bewees deze regel dit begrensd:
+
+           while (x < 100) { if (voorwaarde) x++; }
+
+       Er bestaat een pad waarop x nooit verandert, dus die lus kan eeuwig
+       draaien -- en hij kreeg de HOOGSTE graad. Dat is de gevaarlijkste
+       faalvorm van deze meter: een groen vinkje op precies de plek waar een
+       mens anders zelf had gekeken. Meetellen doen daarom alleen de
+       voorwaarde, de update-clausule van een for, en het hoogste niveau van
+       het lusLIJF. Een mutatie in een tak maakt de lus hoogstens
+       VOORTGANG_NIET_OP_ELK_PAD, en dat is een eigen uitslag. */
     wandel(lus.test, kijk);
-    inEigenLijf(lus, kijk);
+    wandel(lus.update, kijk);
+    const romp = lus.body && lus.body.type === 'BlockStatement' ? (lus.body.body || []) : [lus.body].filter(Boolean);
+    const TAKKEN = new Set(['IfStatement', 'SwitchStatement', 'TryStatement', 'ForStatement',
+      'ForOfStatement', 'ForInStatement', 'WhileStatement', 'DoWhileStatement', 'LabeledStatement']);
+    for (const stat of romp) {
+      if (TAKKEN.has(stat.type)) {
+        /* In een tak telt alleen het TERUGZETTEN mee -- dat is een bezwaar en
+           geen bewijs, en bezwaren horen altijd te tellen. */
+        wandel(stat, (n) => {
+          if (n.type === 'AssignmentExpression' && n.left && n.left.name === k.naam && n.operator === '=') teruggezet = true;
+        });
+        continue;
+      }
+      wandel(stat, kijk);
+    }
     if (beweegt && !teruggezet) return k.naam;
   }
   return null;
+}
+
+/* ---------------------------------------------------------------------------
+   DE VOORTGANGSANALYSE -- vraaggestuurd, en met opzet geen control-flowgraaf.
+
+   De 326 lussen met code GEEN_TELLER zijn geen teller-probleem meer: de goedkope
+   patronen zijn op. Wat ze delen is dat niemand weet of er VOORTGANG is. Dat is
+   een andere vraag dan terminatie, en hij is grotendeels te beantwoorden zonder
+   een volledige CFG -- je hoeft alleen de vragen te stellen die dit register
+   nodig heeft:
+
+     welke variabelen sturen de voorwaarde?
+     raakt het lijf er ook maar een van aan?
+     gebeurt dat op elk pad, of alleen in een tak?
+     kan een continue die mutatie overslaan?
+
+   DE SCHERPSTE UITKOMST IS DE EERSTE. Raakt het lijf geen enkele guard aan, dan
+   kan deze lus niet stoppen op zijn eigen voorwaarde -- hij hangt aan iets
+   buiten zichzelf (een await die een veld bijwerkt, een andere functie, een
+   timer). Dat is geen fout, maar het is wel precies wat een mens wil weten.
+
+   DE TWEEDE IS DE VAL DIE IEDEREEN KENT:
+
+       while (x < 100) { if (voorwaarde) x++; }
+
+   Er bestaat een pad waarop x nooit verandert. Een teller-analyse ziet hier een
+   nette monotone ophoging; alleen de VRAAG of die op elk pad ligt, vindt hem.
+   Vandaar het onderscheid tussen onvoorwaardelijk en alleenVoorwaardelijk, en
+   vandaar dat de eerste geen bewijs van terminatie is maar van VOORTGANG.
+
+   WAT HIJ NIET DOET, en dat hoort erbij te staan: hij bewijst niet dat de
+   mutatie de goede KANT op gaat (dat doet tellerBegrensdVan), en hij kijkt niet
+   of een tak bereikbaar is. `if (false) x++` telt hier als een voorwaardelijke
+   mutatie en niet als geen. Dat vraagt dominatoren, en die staan er niet. */
+function voortgangsanalyse(lus) {
+  /* De guards: elke naam die in de voorwaarde staat. Een lidnaam telt op zijn
+     BASIS (`t.volgendeAt` -> `t`), want het lijf muteert het object en niet de
+     uitdrukking. */
+  const guards = new Set();
+  wandel(lus.test, (n) => {
+    if (n.type === 'Identifier') guards.add(n.name);
+    if (n.type === 'MemberExpression') { const b = naamVanBasis(n); if (b) guards.add(b); }
+  });
+  if (!guards.size) return { guards: [], muteertGuard: 'geenGuard', continueKanOverslaan: false };
+
+  /* Muteren = toewijzen, ophogen, of een methode aanroepen OP die naam. Dat
+     laatste is ruim, en met opzet: `rij.shift()` verandert rij wel degelijk. */
+  let onvoorwaardelijk = false, voorwaardelijk = false, continueGezien = false;
+  const raaktGuard = (n) => {
+    if (n.type === 'AssignmentExpression' && n.left) { const b = naamVanBasis(n.left) || n.left.name; return guards.has(b); }
+    if (n.type === 'UpdateExpression' && n.argument) { const b = naamVanBasis(n.argument) || n.argument.name; return guards.has(b); }
+    if (n.type === 'CallExpression' && n.callee && n.callee.type === 'MemberExpression') { const b = naamVanBasis(n.callee.object); return guards.has(b); }
+    if (n.type === 'AwaitExpression') return true;   // een await kan alles bijwerken; dat is geen bewijs maar wel een uitweg
+    return false;
+  };
+  /* ONVOORWAARDELIJK betekent: op het hoogste niveau van het lusLIJF, dus niet
+     binnen een if, switch, try of binnenlus. Die grens is het hele punt. */
+  /* De update-clausule van een for draait per definitie elke ronde, dus zij is
+     de onvoorwaardelijke mutatieplek bij uitstek. */
+  if (lus.update) { let raakt = false; wandel(lus.update, (n) => { if (raaktGuard(n)) raakt = true; }); if (raakt) onvoorwaardelijk = true; }
+  const lijf = lus.body && lus.body.type === 'BlockStatement' ? (lus.body.body || []) : [lus.body].filter(Boolean);
+  for (const stat of lijf) {
+    let raakt = false;
+    (function kijk(n) {
+      if (!n || typeof n !== 'object' || typeof n.type !== 'string') return;
+      if (FUNCTIEKNOPEN.has(n.type)) return;
+      if (raaktGuard(n)) raakt = true;
+      for (const k in n) { if (k === 'lijn' || k === 'start' || k === 'end') continue; const v = n[k];
+        if (Array.isArray(v)) v.forEach(kijk); else if (v && typeof v === 'object') kijk(v); }
+    })(stat);
+    const isTak = ['IfStatement', 'SwitchStatement', 'TryStatement', 'ForStatement', 'ForOfStatement',
+      'ForInStatement', 'WhileStatement', 'DoWhileStatement'].includes(stat.type);
+    if (raakt && !isTak) onvoorwaardelijk = true;
+    else if (raakt) voorwaardelijk = true;
+  }
+  inEigenLijf(lus, (n) => { if (n.type === 'ContinueStatement') continueGezien = true; });
+
+  return {
+    guards: [...guards].sort(),
+    muteertGuard: onvoorwaardelijk ? 'onvoorwaardelijk' : (voorwaardelijk ? 'alleenVoorwaardelijk' : 'nergens'),
+    /* Een continue kan een mutatie die ERNA staat overslaan. Of dat werkelijk
+       kan, hangt af van de volgorde en van bereikbaarheid -- daarom heet dit
+       KAN en niet DOET, en daarom is het alleen interessant als de mutatie
+       onvoorwaardelijk leek. */
+    continueKanOverslaan: continueGezien && onvoorwaardelijk
+  };
 }
 
 /* ---------------------------------------------------------------------------
@@ -521,5 +645,5 @@ module.exports = {
   LUSKNOPEN, ITERATORS, FUNCTIEKNOPEN, GRADEN, DOMEINEN, KRITIEKE_DOMEINEN,
   structuurhash, symbooolVan, inEigenLijf, vormVan, tellerBegrensdVan,
   terminatieVan, effectenVan, domeinVan, risicoVan, overlapRemVan, sterkeComponenten, eindigeRij,
-  soortVan, krimpendeBronVan
+  soortVan, krimpendeBronVan, voortgangsanalyse
 };

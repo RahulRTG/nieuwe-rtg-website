@@ -123,4 +123,7 @@ function maakStuur({ log, anthropic, app, crypto, isolatie }) {
   return { stuurToets, stuurRoep, stuurBevestig, stuurPaden, stuurLus, classificeer, parseSubs };
 }
 
-module.exports = { maakStuur, classificeer, parseSubs };
+/* VERBODEN hoort bij het contract van het stuur (test/rahul-eerlijk.test.js
+   leest hem hier: het pas-besluit blijft mensenwerk), ook nu de lijst zelf in
+   ./stuur/classificatie.js woont. */
+module.exports = { maakStuur, classificeer, parseSubs, VERBODEN };

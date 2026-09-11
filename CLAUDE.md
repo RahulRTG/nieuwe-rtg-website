@@ -219,6 +219,45 @@ vorm die eruit volgt is die van de terugstortstand hieronder: een schakelaar in
 de boardroom die zelf de juridische positie IS, standaard dicht, en een route
 die dan weigert mét de reden.
 
+**`RUGDEKKING.md` is het besluit vóór de sponsorknop** -- wat RTG een
+individuele sporter, artiest of maker biedt, en waarom dat geen sponsoring
+heet. Lees die vóór je iets bouwt waarmee RTG geld, middelen of zichtbaarheid
+naar een MENS beweegt die van zijn talent leeft (clubs zijn `kern/sportclub/`,
+festivals `kern/festival/`, en de filantropie van een lid is
+`kern/rechterhand/mecenaat.js` -- dit gaat over de persoon zelf). De kern in één
+zin: een sponsor koopt zichtbaarheid en is weg zodra de zichtbaarheid weg is,
+terwijl RTG het huis draagt waarin een talent zijn leven, zijn onderneming en
+zijn geld beheert -- dus de toetsvraag is niet "kunnen wij deze sporter
+betalen?" maar **"wat houdt deze mens over als wij morgen stoppen met
+betalen?"** De meting is streng en verklaart de hele richting: van de 74 genres
+zitten er **3** in de sector `sports` (allemaal een CLUB) en **0** bij een
+individuele sporter of artiest, en van de zes waardeklassen is er **geen enkele**
+waarin RTG geld dat van RTG is uitkeert aan een mens -- `LOYALTY` zegt met
+zoveel woorden niet uitbetaalbaar, en `PARTNER_SETTLEMENT` gaat naar een zaak.
+Drie dingen die de opzet corrigeren en die je nergens anders moet herhalen. Het
+woord **sponsor is al bezet en juridisch geladen**: `kern/rtfos/herkomst.js`
+grendel 2 maakt van een gift met tegenprestatie automatisch sponsoring (ander
+regime, een factuur), dus de constructie "de stichting betaalt de sporters, het
+merk plukt de zichtbaarheid" is exact wat `kern/economie/firewall.js` weigert --
+en vóór allebei staat de blokkade uit GIFT.md, want de RTFoundation heeft geen
+positie om aan te betalen. **De grootste ontbrekende steen is niet geld maar de
+ZAAKWAARNEMER**: er zijn drie vormen van namens-iemand-handelen (bijstand,
+servicemachtiging, AI-mandaat) en nul waarin een mens commercieel namens een
+mens handelt -- terwijl de grammatica ervoor al ligt (een mandaat VERSMALT
+bestaand vermogen en verleent er nooit, leeg is dicht, verval is een berekende
+toestand), en dat is het enige in dit document dat geen concurrent heeft. En
+**topsportbegeleiding botst met `kern/zorgniveau.js`**: dat is per definitie het
+professionele niveau, waar RTG de weg mag wijzen en niet de inhoud mag geven --
+de uitweg is de professional IN het systeem zetten (`persoonseis.js`,
+`vakbewijs.js`) en niet een uitzondering op de grens. Acht grenzen in par. 5,
+waarvan de drie scherpste: een sporter onder de achttien is geen merk (geen
+zichtbaarheidsverplichting, geen ranglijst van jeugdtalenten), **rugdekking
+koopt geen stem** (wie geld ontvangt is niet verplicht iets te zeggen -- staat
+er wél iets tegenover, dan is het sponsoring en gaat er een factuur uit), en de
+betaler leest de gezondheid nooit. Er komt géén vijfde wereld: een toptalent
+staat in LivingOS, WorkOS, TravelOS en FoundationOS tegelijk, en par. 7 zet de
+vier besluiten van de eigenaar op een rij.
+
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
 schakelaar *ís* de juridische positie — geen twee dingen die toevallig

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T17:45:53.159Z",
-    "commit": "cbbc8559",
+    "op": "2026-09-11T11:23:47.769Z",
+    "commit": "5356b300",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
@@ -11,9 +11,9 @@
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 94,
-  "woorden": 1135,
-  "gevonden": 745,
-  "dekking": 0.6564,
+  "woorden": 1137,
+  "gevonden": 747,
+  "dekking": 0.657,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -865,8 +865,8 @@
     {
       "naam": "Navigatie",
       "url": "/apps/navigatie.html",
-      "woorden": 15,
-      "gevonden": 14,
+      "woorden": 17,
+      "gevonden": 16,
       "mist": [
         "denkt"
       ]

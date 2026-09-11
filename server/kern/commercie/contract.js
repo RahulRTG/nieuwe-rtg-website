@@ -133,16 +133,29 @@ function maakContracten({ db, save, nu }) {
     return zet(c, STATUS.ACTIEF);
   }
 
+  /* WANNEER EEN OPZEGGING INGAAT -- de som, zonder hem uit te voeren.
+
+     Apart van `zegOp` omdat er een tweede vrager is: een lid hoort te kunnen
+     LEZEN wat opzeggen gaat doen voordat hij drukt. Dat mag niet met een proef op
+     een wegwerpkopie, want `zet()` hieronder roept `save()` aan -- dan schrijft
+     een voorbeeld dat niets verandert alsnog de hele database. En overtypen bij
+     de vrager mag ook niet (LAT regel 4): dan leest het lid vooraf een andere
+     datum dan hij krijgt. Dus EEN functie, twee aanroepers; AFSPRAAK.md
+     par. 14.1 heeft de hele toedracht. */
+  function opzegEinde(c, opDatum) {
+    if (!c) return null;
+    const vanaf = opDatum || new Date(tijd()).toISOString();
+    const naOpzeg = plusMaanden(vanaf, c.opzegMaanden);
+    const minEind = plusMaanden(c.startAt, c.minimumMaanden);
+    return new Date(naOpzeg) > new Date(minEind) ? naOpzeg : minEind;
+  }
+
   /* Opzeggen. De einddatum wordt UITGEREKEND en niet ingevoerd: opzegtermijn
      vanaf nu, maar nooit voor het einde van de minimumtermijn -- anders zou
      opzeggen in maand twee de verbintenis van twaalf maanden opheffen. */
   function zegOp(c, opDatum) {
     if (!c) return { error: 'geen contract' };
-    const vanaf = opDatum || new Date(tijd()).toISOString();
-    const naOpzeg = plusMaanden(vanaf, c.opzegMaanden);
-    const minEind = plusMaanden(c.startAt, c.minimumMaanden);
-    const eind = new Date(naOpzeg) > new Date(minEind) ? naOpzeg : minEind;
-    return zet(c, STATUS.OPZEGGEND, { eindigtOp: eind });
+    return zet(c, STATUS.OPZEGGEND, { eindigtOp: opzegEinde(c, opDatum) });
   }
 
   function beeindig(c) { return c ? zet(c, STATUS.GEEINDIGD, { eindigtOp: c.eindigtOp || new Date(tijd()).toISOString() }) : { error: 'geen contract' }; }
@@ -167,7 +180,7 @@ function maakContracten({ db, save, nu }) {
   }
 
   return { STATUS, VERLENGING, LOPEND, open, vind, bied, accepteer, activeer, verlengbaar,
-    verleng, zegOp, beeindig, verplichtingOp, termijnenTussen, eindeVerbintenis,
+    verleng, zegOp, opzegEinde, beeindig, verplichtingOp, termijnenTussen, eindeVerbintenis,
     verlooptBinnen, publiek, lijst, rij };
 }
 

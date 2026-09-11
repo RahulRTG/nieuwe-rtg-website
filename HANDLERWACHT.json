@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-10T16:29:37.573Z",
-  "commit": "59a7931e",
+  "op": "2026-09-11T12:46:50.018Z",
+  "commit": "8c589bf1",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 0,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -328,7 +328,7 @@
   },
   {
    "sleutel": "POST /api/aanmelding/bewijs",
-   "bestand": "server/routes/aanmeldingen.js:83",
+   "bestand": "server/routes/aanmeldingen.js:131",
    "staat": "openbaar",
    "reden": "hoort bij de aanvraag zelf; de aanvrager heeft nog geen sessie, en aftekenen zit wel achter het kantoor"
   },
@@ -995,7 +995,7 @@
   },
   {
    "sleutel": "POST /api/cluster/:actie",
-   "bestand": "server/server.js:924",
+   "bestand": "server/server.js:929",
    "staat": "openbaar",
    "reden": "de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet"
   },
@@ -4006,7 +4006,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1401",
+   "bestand": "server/server.js:1406",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

@@ -752,7 +752,12 @@ const {
   ordersVanKlant, rtf, save, schild, schoon, sessionFor, sessions, herbouwSessions, sseToOffice, sseToSupplier,
   tokenHash,
   // pas verderop in dit bestand gebouwd; zie de uitleg in diensten.js
-  lidBoardUitVan: () => lidBoardUit, lidPadFunctieVan: () => lidPadFunctie
+  lidBoardUitVan: () => lidBoardUit, lidPadFunctieVan: () => lidPadFunctie,
+  /* Ook een getter, en om dezelfde reden: `kern` staat onderaan dit bestand. auth()
+     leest er de contractstand van een lid uit (opzet/diensten2.js), en dat gebeurt
+     per VERZOEK -- dus ver nadat deze regel is uitgevoerd. Zelfde idioom als
+     opzet/leverancierpoort.js, dat hem al zo binnenkrijgt. */
+  kernGeef: () => kern
 });
 koppelSessiesBus(bus);
 /* De twee draden terug, hier gezet en niet daar (zie de kop van diensten.js):

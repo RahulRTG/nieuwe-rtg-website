@@ -97,6 +97,19 @@ Object.assign(kern, (() => {
       schaduw.meld(r.id, 'SCHADUW');
     }
   }
+  /* DE LEDENKANT VAN DEZELFDE VRAAG, en hier is er geen vrijstelling te rekenen.
+     ../kern/commercie/lidpoort.js meldt twee regels aan -- een afgelopen
+     overeenkomst en een ontbrekende -- en ze beginnen BEIDE in de schaduw. Geen
+     van de twee kan de som maken die routepoort hierboven wel mag maken: daar kan
+     een capability op elke trede zitten en dan pakt hij niemand iets af, hier
+     pakt elk van beide regels een lid zijn pas af.
+
+     Waarom het twee regels zijn en niet een staat in de kop van lidpoort.js: een
+     afgelopen afspraak afdwingen is verdedigbaar, een ONTBREKENDE afspraak
+     afdwingen sluit elk lid buiten dat zijn pas van voor de contractmotor heeft.
+     Met een regel krijgt een mens die de eerste aanzet de tweede er stilzwijgend
+     bij. */
+  for (const r of require('../kern/commercie/lidpoort').REGELS) schaduw.meld(r.id, 'SCHADUW');
 
   /* DE VOORNEMENS: van een plan naar een gecontroleerde uitvoering, met de
      blokkade VOOR de eerste stap. Zie kern/commercie/voornemen.js -- met name

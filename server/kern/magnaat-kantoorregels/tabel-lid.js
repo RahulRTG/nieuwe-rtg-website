@@ -40,5 +40,26 @@ module.exports = [
      regels lopen na een hernoeming uit elkaar, en dan hangt het scherm ergens
      anders dan de deur die het bedient. */
   [/(?:^|\/)mijn[-/](?:tweefactor|sessies|herstelkanaal)/, 'intern', 'Intern & IT'],
-  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch']
+  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch'],
+  /* EEN DERDE FAMILIE: HET EIGEN LIDMAATSCHAP (/api/mijn/abonnement).
+
+     Hij viel op de restpost toen de ledenkant van het lidmaatschap erbij kwam --
+     zien wat er loopt, lezen wat opzeggen gaat doen, en opzeggen. Precies het
+     soort werk waarvoor die terugval rood is: onbekend werk hoort niet stil bij
+     Onderzoek te belanden.
+
+     DE BALIE, EN NIET JURIDISCH OF FINANCIEN. Dat is geen smaak maar een
+     afleiding: de KANTOORkant van exact dit werk ligt al bij de Ledenbalie
+     (/api/aanmelding/opzeggen en /beslis, regel 26 van ../tabel.js). Deze drie
+     routes zijn de ledenkant ervan -- dezelfde contracten, hetzelfde
+     betaalschema, dezelfde `zegOpLidmaatschap`. Twee kanten van een handeling in
+     twee kamers leggen is precies het uiteenlopen waar de schermregel hierboven
+     over klaagt.
+
+     Waarom dus niet Juridisch: een lidmaatschap is geen AVG-recht maar een
+     overeenkomst, en de Juridisch-familie hierboven is uitdrukkelijk
+     `zeggenschap` over gegevens. En niet Financien: daar hangt het GELD
+     (/api/factuur, /api/bank/akkoord), en deze routes verplaatsen niets -- ze
+     beeindigen een verplichting. Het bedrag komt van het contract. */
+  [/(?:^|\/)mijn[-/]abonnement/, 'balie', 'De Ledenbalie']
 ];

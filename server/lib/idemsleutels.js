@@ -126,7 +126,8 @@ Object.assign(SLEUTELS,
   /* De kaartkeuze van een lid: een lezende route en twee die in EEN eigen
      collectie schrijven. Zie de kop van dat bestand voor waarom de dubbeling
      bij de KANTOORTELLING telt en niet in het beeld. */
-  require('./idemsleutels-kaarten').SLEUTELS);
+  require('./idemsleutels-kaarten').SLEUTELS,
+  require('./idemsleutels-lidabonnement').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:
    geen route in twee zijbestanden, elke verklaring compleet, en vier routes die

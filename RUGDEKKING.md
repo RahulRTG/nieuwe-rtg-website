@@ -3,6 +3,12 @@
 *Wat RTG een sporter, een artiest of een maker biedt — en waarom dat geen
 sponsoring heet.*
 
+**`CARRIERE.md` staat hierboven en niet ernaast.** Dat document beantwoordt de
+vraag waaronder deze valt — wat de mens die van zijn talent leeft in dit huis
+IS — en het draagt de meting die zegt waarom daar geen objecttype voor komt. Dit
+document beantwoordt één vraag uit die laag: hoe het geld heet dat naar zo'n mens
+gaat.
+
 Lees dit document vóór je iets bouwt waarmee RTG geld, middelen of zichtbaarheid
 naar een INDIVIDUELE mens beweegt die van zijn talent leeft. Het gaat niet over
 clubs (dat is `kern/sportclub/`), niet over festivals (`kern/festival/`) en niet

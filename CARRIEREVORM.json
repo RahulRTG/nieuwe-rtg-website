@@ -1,0 +1,244 @@
+{
+  "uitleg": "Gemeten met scripts/carrierevorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in CARRIERE.md par. 0. Dit meet of de talentdomeinen een DATAVORM delen; of zij een PROCES delen is een andere vraag, waarvoor de ketenproef de vorm is.",
+  "vastgelegd": "2026-09-11",
+  "gemeten": {
+    "vormen": 162,
+    "domeinen": 15,
+    "velden": 372,
+    "inAlleDomeinen": 0,
+    "inMinstensDeHelft": 0,
+    "helftDrempel": 8,
+    "veldenDomeineigen": 328,
+    "domeineigenPct": 88.2
+  },
+  "perDomein": [
+    {
+      "domein": "kern/atelier",
+      "velden": 9
+    },
+    {
+      "domein": "kern/clips",
+      "velden": 9
+    },
+    {
+      "domein": "kern/concern",
+      "velden": 41
+    },
+    {
+      "domein": "kern/creator",
+      "velden": 6
+    },
+    {
+      "domein": "kern/festival",
+      "velden": 36
+    },
+    {
+      "domein": "kern/galerij",
+      "velden": 4
+    },
+    {
+      "domein": "kern/leverancier",
+      "velden": 24
+    },
+    {
+      "domein": "kern/mediaos",
+      "velden": 13
+    },
+    {
+      "domein": "kern/muziek",
+      "velden": 13
+    },
+    {
+      "domein": "kern/muziek-uitgave",
+      "velden": 2
+    },
+    {
+      "domein": "kern/podium",
+      "velden": 11
+    },
+    {
+      "domein": "kern/rtfos",
+      "velden": 198
+    },
+    {
+      "domein": "kern/sportclub",
+      "velden": 22
+    },
+    {
+      "domein": "kern/studio",
+      "velden": 9
+    },
+    {
+      "domein": "kern/theater",
+      "velden": 25
+    }
+  ],
+  "gedeeld": [
+    {
+      "veld": "kanaal",
+      "domeinen": 4,
+      "waar": [
+        "kern/concern",
+        "kern/podium",
+        "kern/rtfos",
+        "kern/theater"
+      ]
+    },
+    {
+      "veld": "capaciteit",
+      "domeinen": 3,
+      "waar": [
+        "kern/festival",
+        "kern/rtfos",
+        "kern/sportclub"
+      ]
+    },
+    {
+      "veld": "geldigTot",
+      "domeinen": 3,
+      "waar": [
+        "kern/concern",
+        "kern/festival",
+        "kern/rtfos"
+      ]
+    },
+    {
+      "veld": "kritiek",
+      "domeinen": 3,
+      "waar": [
+        "kern/atelier",
+        "kern/festival",
+        "kern/studio"
+      ]
+    },
+    {
+      "veld": "open",
+      "domeinen": 3,
+      "waar": [
+        "kern/concern",
+        "kern/festival",
+        "kern/rtfos"
+      ]
+    },
+    {
+      "veld": "aanwezig",
+      "domeinen": 2,
+      "waar": [
+        "kern/festival",
+        "kern/rtfos"
+      ]
+    },
+    {
+      "veld": "actief",
+      "domeinen": 2,
+      "waar": [
+        "kern/concern",
+        "kern/rtfos"
+      ]
+    },
+    {
+      "veld": "betaald",
+      "domeinen": 2,
+      "waar": [
+        "kern/festival",
+        "kern/rtfos"
+      ]
+    },
+    {
+      "veld": "bio",
+      "domeinen": 2,
+      "waar": [
+        "kern/podium",
+        "kern/theater"
+      ]
+    },
+    {
+      "veld": "brief",
+      "domeinen": 2,
+      "waar": [
+        "kern/atelier",
+        "kern/studio"
+      ]
+    },
+    {
+      "veld": "categorie",
+      "domeinen": 2,
+      "waar": [
+        "kern/rtfos",
+        "kern/sportclub"
+      ]
+    },
+    {
+      "veld": "collectie",
+      "domeinen": 2,
+      "waar": [
+        "kern/atelier",
+        "kern/studio"
+      ]
+    },
+    {
+      "veld": "concept",
+      "domeinen": 2,
+      "waar": [
+        "kern/atelier",
+        "kern/studio"
+      ]
+    },
+    {
+      "veld": "contact",
+      "domeinen": 2,
+      "waar": [
+        "kern/concern",
+        "kern/rtfos"
+      ]
+    },
+    {
+      "veld": "duurS",
+      "domeinen": 2,
+      "waar": [
+        "kern/clips",
+        "kern/theater"
+      ]
+    },
+    {
+      "veld": "extra",
+      "domeinen": 2,
+      "waar": [
+        "kern/concern",
+        "kern/rtfos"
+      ]
+    },
+    {
+      "veld": "genre",
+      "domeinen": 2,
+      "waar": [
+        "kern/podium",
+        "kern/theater"
+      ]
+    },
+    {
+      "veld": "gesloten",
+      "domeinen": 2,
+      "waar": [
+        "kern/concern",
+        "kern/rtfos"
+      ]
+    },
+    {
+      "veld": "huis",
+      "domeinen": 2,
+      "waar": [
+        "kern/atelier",
+        "kern/studio"
+      ]
+    },
+    {
+      "veld": "icon",
+      "domeinen": 2,
+      "waar": [
+        "kern/atelier",
+        "kern/studio"
+      ]
+    }
+  ]
+}

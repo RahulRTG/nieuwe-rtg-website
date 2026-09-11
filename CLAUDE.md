@@ -219,6 +219,48 @@ vorm die eruit volgt is die van de terugstortstand hieronder: een schakelaar in
 de boardroom die zelf de juridische positie IS, standaard dicht, en een route
 die dan weigert mét de reden.
 
+**`CARRIERE.md` is de laag BOVEN de rugdekking** -- de mens die waarde opbouwt
+rond zijn talent, naam, prestaties, publiek en loopbaan. Lees die vóór je iets
+bouwt voor een sporter, artiest, maker, model of acteur wiens talent zijn inkomen
+is. De kern in één zin: **de carrièrelus is echt, maar zij is geen object -- zij
+is een verklaring van werkwoorden over domeinen die aantoonbaar niets delen.**
+Dat is geen formulering maar een meetuitslag: `npm run carrierevorm`
+(`CARRIEREVORM.json`) draait op de lezer van `scripts/objectmodel.js` -- een
+tweede parser zou de vergelijking met de Asset-meting waardeloos maken -- en
+vindt over 162 vormen in 15 talentdomeinen **0 velden in alle domeinen**, **0 in
+zelfs maar de helft**, en **88,2% in precies één domein** (platformbreed is dat
+71%, dus de talentdomeinen zijn mínder verwant dan een willekeurige doorsnede).
+De meter is een mutatie aangedaan en bewoog: tot `atelier`+`studio` versmald
+slaat hij om naar 8 van de 10 velden gedeeld. Een `Career`-objecttype is daarmee
+niet gerechtvaardigd; de uitweg is die van `COMMERCE.md` (`Koopbaar` werd een
+verklaring van werkwoorden) met de scheidslijn van `OS.md` eronder -- een
+wedstrijd, een set en een casting zijn domeinvermogen, maar *namens iemand
+onderhandelen* en *een bewijs tonen zonder het dossier te openen* zijn
+platformvermogen. Vijf dingen die het ontwerp corrigeren en die je nergens anders
+moet herhalen. **Een Career Score botst met de scherpste grens die dit huis
+heeft** -- KANTOORMACHT.md, HDI.md, ONTMOETEN.md en INT-04 zeggen alle vier dat
+de meeteenheid nooit de mens is, ook niet intern als sorteersleutel; de vorm die
+overleeft is het **Career Ledger** (chronologisch, per regel bewijsbaar), en die
+grens heeft vandaag vier documenten en **nul** handhavers. **Een fanladder
+(bekijkt → volgt → ... → ambassadeur) is een trechter** en botst met LIFE.md par.
+4: wat iemand heeft gedaan is een feit, waar hij "staat" is een oordeel. **Een
+merk zoekt geen mensen maar schrijft een programma** -- een zoekopdracht op
+leeftijd, geslacht en afgeleide geldzorgen over minderjarigen is het product dat
+niet mag bestaan (FOUNDATION.md par. 5: een eligibility-motor mag alleen
+tóevoegen). **Twee namen zijn bezet**: "RTG Human" botst met HDI.md (juist het
+document waar de `humans`-tabelgrens vandaan komt) en `HUMAN_DEVELOPMENT` met
+hetzelfde -- `CAREER_GRANT` botst met niets en past op de bestaande conventie.
+En de **zes vragen per handeling** vallen naast `kern/envelop.js` in tweeën:
+wie/waardoor/hoe-gevoelig staan er, geld en doel horen er nooit in (de envelop
+zegt met opzet nooit WAT), maar hoedanigheid, namens-wie en mandaat horen bij de
+familie van `actor` -- en dat is een versiesprong op een envelop die gesloten is
+op acht velden, geen toevoeging. Par. 3 is de eerlijke inventaris: het meeste van
+het voorstel bestaat al (selectieve deling met herkomst in `rtgid-claims.js`,
+bijstand, de projectievorm, de ketting in de envelop), en par. 5 verheft zes
+regels tot doctrine met per regel wie hem handhaaft -- bij drie van de zes is dat
+vandaag niemand. De uitstaptoets van par. 5 is machinaal te maken en hoort dat te
+worden: **lock-in door kwaliteit mag, lock-in door gijzeling zakt.**
+
 **`RUGDEKKING.md` is het besluit vóór de sponsorknop** -- wat RTG een
 individuele sporter, artiest of maker biedt, en waarom dat geen sponsoring
 heet. Lees die vóór je iets bouwt waarmee RTG geld, middelen of zichtbaarheid

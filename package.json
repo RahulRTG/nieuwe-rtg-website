@@ -137,6 +137,7 @@
     "deelindex": "node scripts/deelindex.js",
     "bewijs": "node scripts/bewijs.js",
     "objectmodel": "node scripts/objectmodel.js",
+    "carrierevorm": "node scripts/carrierevorm.js",
     "objectmodel:vast": "node scripts/objectmodel.js --vastleggen",
     "capabilities": "node scripts/capabilities.js",
     "resolver": "node scripts/resolver.js",

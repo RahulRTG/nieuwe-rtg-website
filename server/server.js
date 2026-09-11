@@ -1244,6 +1244,18 @@ const vertegenwoordiging = require('./kern/vertegenwoordiging').maakVertegenwoor
 const { rugdekking } = require('./kern/rugdekking').maakRugdekking({
   db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan,
   jeugdstandVan: (key) => vertegenwoordiging.jeugdstand(key) });
+/* HET CARRIERE LEDGER (kern/carriereledger/): de loopbaan van een mens als
+   chronologische reeks, per regel bewijsbaar, met herkomst. CARRIERE.md par.
+   4.1 wijst deze vorm aan in plaats van een Career Score -- "Nederlands
+   kampioen junior 2027, geverifieerd door bond X" zegt meer dan 87 %, en het
+   veroudert niet stilletjes.
+
+   Geen `keyVanCodenaam` hier: het lid schrijft in zijn eigen ledger op zijn
+   eigen sessiesleutel. Wie een ANDER bevestigt (het kantoor, een zaak) zoekt de
+   codenaam op in zijn eigen route, want daar hoort de vertaling thuis. */
+const { maakCarriereLedger } = require('./kern/carriereledger');
+const carriereledger = maakCarriereLedger({
+  db, save, bijeen, inBundel, crypto, schoon, codenaamVan });
 const bestandenOpslag = require('./kern/bestanden-opslag')({ db });
 const bestanden = require('./kern/bestanden').maakBestanden({
   // antivirus: de gestukte upload komt nooit als data-URL in een verzoek-body
@@ -2261,7 +2273,7 @@ const kern = {
   findSupplier, forgetSession, forgetSessionDuurzaam, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, rugdekking, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, rugdekking, carriereledger, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, mensdeurStand, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, ritBezetting, ritVerder, rtf,

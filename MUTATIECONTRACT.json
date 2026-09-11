@@ -1,28 +1,28 @@
 {
  "stempel": {
-  "op": "2026-09-11T14:31:32.798Z",
-  "commit": "153cd9c5",
-  "boomVuil": false,
-  "boomAnders": 0,
+  "op": "2026-09-11T15:31:18.987Z",
+  "commit": "d58df82f",
+  "boomVuil": true,
+  "boomAnders": 5,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4904,
-  "geclassificeerd": 4904,
+  "totaal": 4914,
+  "geclassificeerd": 4914,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3251,
-   "NOT_APPLICABLE": 1141,
-   "PROTECTED": 390,
-   "INTENTIONALLY_NON_IDEMPOTENT": 122
+   "NOT_APPLICABLE": 1143,
+   "PROTECTED": 396,
+   "INTENTIONALLY_NON_IDEMPOTENT": 124
   },
-  "vastgesteldDoorMens": 1697,
+  "vastgesteldDoorMens": 1707,
   "afgeleidDoorScript": 3207,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4044,
-   "PUBLIC": 122,
+   "AUTHENTICATED": 4053,
+   "PUBLIC": 123,
    "OBJECT_SCOPED": 718,
    "(niet af te leiden -- vraagt een verklaring)": 4,
    "SERVICE_TO_SERVICE": 15,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 88,
    "kale ronde: geen uitspraak": 4512,
-   "niet gemeten": 175
+   "niet gemeten": 185
   },
   "voorstellen": {},
   "metingVan": "2026-09-03T11:51:23.232Z"
@@ -9327,6 +9327,153 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "carriereledger.deel",
+   "route": "POST /api/carriere/ledger/deel",
+   "semantiek": {
+    "klasse": "nietIdempotent",
+    "waarom": "deze weg SLAAT een geheim van 128 bits en geeft het precies eenmaal terug. Twee oproepen horen twee codes te geven: dezelfde code teruggeven zou betekenen dat het geheim opnieuw over de lijn gaat, en een code per ontvanger is juist de bedoeling -- elk stopt apart. Gemeten 2026-09-11: twee keer 200, twee verschillende codes, twee rijen."
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "carriereledger.mijnDelen",
+   "route": "POST /api/carriere/ledger/delen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "carriereledger.intrek",
+   "route": "POST /api/carriere/ledger/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "carriereledger.mijn",
+   "route": "POST /api/carriere/ledger/mijn",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "carriereledger.stopDelen",
+   "route": "POST /api/carriere/ledger/stopdelen",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "carriereledger.zet",
+   "route": "POST /api/carriere/ledger/zet",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "carriereledger.toon",
+   "route": "POST /api/carriere/regel/toon",
+   "semantiek": {
+    "klasse": "nietIdempotent",
+    "waarom": "deze weg TELT een gebruik, en een teller die niet telt, telt niet. Het lid hoort te kunnen zien hoe vaak zijn bewijs is geopend; dat is de enige terugkoppeling die hij over een uitgegeven code heeft. Gemeten 2026-09-11: twee keer 200 met hetzelfde antwoord, gebruik 0 -> 2."
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "PUBLIC",
+    "uitHandler": null,
+    "bedoeld": "PUBLIC",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -56002,6 +56149,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "carriereledger.bevestig.gezien",
+   "route": "POST /api/office/carriere/ledger/bevestig",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "office.catalogus-wens.besluit",
    "route": "POST /api/office/catalogus-wens/besluit",
    "semantiek": {
@@ -97648,6 +97816,48 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "carriereledger.bevestig.bevestigd",
+   "route": "POST /api/supplier/carriere/bevestig",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "manager",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "carriereledger.intrek.zaak",
+   "route": "POST /api/supplier/carriere/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "manager",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

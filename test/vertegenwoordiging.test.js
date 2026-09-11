@@ -26,7 +26,7 @@ const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { zonderCommentaar } = require('../scripts/lib/bron');
+const { grensScan } = require('../scripts/lib/cijferopmens');
 
 const { maakVertegenwoordiging } = require('../server/kern/vertegenwoordiging');
 const M = require('../server/kern/vertegenwoordiging/machtiging');
@@ -212,16 +212,18 @@ test('16. een geweigerde poging laat een spoor na, en intrekken wist het verlede
 /* ---------- 5. de handhaver van CAR-05 ---------- */
 
 test('17. CAR-05: er komt geen cijfer op een mens in deze laag', () => {
-  /* Commentaar telt niet mee -- dit bestand en de laag zelf MOGEN de woorden
-     noemen om uit te leggen waarom ze er niet zijn. Wat verboden is, is code.
-     Dezelfde vorm als keuringsregel 53: tokens, geen tekst. */
-  const verboden = /\b(score|rating|ranking|ranglijst|puntenaantal|beoordelingscijfer)\b/i;
-  const gevonden = [];
-  for (const naam of fs.readdirSync(MAP).filter(n => n.endsWith('.js'))) {
-    const code = zonderCommentaar(fs.readFileSync(path.join(MAP, naam), 'utf8'));
-    const treffer = code.match(verboden);
-    if (treffer) gevonden.push(naam + ': ' + treffer[0]);
-  }
+  /* DE WOORDENLIJST STAAT NIET MEER HIER. Hij stond inline in dit bestand en
+     dekte daarmee precies EEN map; toen kern/rugdekking en het carriere ledger
+     erbij kwamen, gold de grens daar even hard en hield hem niets tegen. Hij
+     woont nu in scripts/lib/cijferopmens.js, met per woord een reden, en
+     test/cijferopmens.test.js legt hem over de hele carrierekant.
+
+     Deze toets blijft staan en is geen dubbeling: hij houdt vast dat DEZE laag
+     onder die grens valt, ook als iemand hem ooit uit de gedeelde lijst haalt.
+     Commentaar telt nog steeds niet mee -- dit bestand en de laag zelf MOGEN de
+     woorden noemen om uit te leggen waarom ze er niet zijn. */
+  const { gevonden, ontbreekt } = grensScan([MAP]);
+  assert.deepStrictEqual(ontbreekt, [], 'de map van deze laag is weg of hernoemd');
   assert.deepStrictEqual(gevonden, [],
     'CAR-05 (CARRIERE.md): een score op een mens wordt nooit een veld en nooit een sorteersleutel');
 });

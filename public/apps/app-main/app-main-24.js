@@ -96,6 +96,13 @@
        namens mij" komt op wanneer iemand over zijn werk denkt (WERELDEN.md:
        in welke context denkt de mens dat hij zich bevindt). */
     vertegenwoordiging: { naam: T('app.vertegenwoordiging', 'Mijn team'), url: '/apps/vertegenwoordiging.html' },
+    /* Het carriere ledger: wat deze mens heeft gedaan, chronologisch en per
+       regel bewijsbaar. Naast "Mijn team" en om dezelfde reden in WorkOS: het is
+       de vraag die opkomt wanneer iemand over zijn loopbaan denkt. Hij heet
+       "Mijn loopbaan" en niet "Mijn prestaties" -- een loopbaan is een reeks in
+       de tijd, prestaties suggereren een lijst van hoogtepunten, en juist dat
+       verschil is wat een ledger van een etalage scheidt. */
+    loopbaan: { naam: T('app.loopbaan', 'Mijn loopbaan'), url: '/apps/loopbaan.html' },
     school:      { naam: 'School',    url: '/apps/rtgschool.html' },
     berichten:   { naam: 'Berichten',     url: '/apps/comm.html' },
     /* EEN app voor alle communicatie (kern/comm + apps/comm.html). Hier

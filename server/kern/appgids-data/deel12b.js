@@ -36,4 +36,17 @@ module.exports = {
      'Zet uw eigen grens: deze bevoegdheden geeft u aan niemand, ook niet aan wie u al gemachtigd heeft',
      'Trek een machtiging op elk moment in, per direct en zonder reden'],
     'Een machtiging versmalt wat u zelf al mocht; zij voegt er nooit iets aan toe. Aanvaarden doet u altijd zelf, en wat er namens u gebeurde blijft in uw spoor staan ook nadat u intrekt - intrekken stopt de toekomst en niet het verleden.'),
+  /* En de vierde van dezelfde laag: niet wie iets mag, maar wat er GEBEURD is.
+     Hij hoort hier omdat hij dezelfde controlevraag stelt als de drie hierboven
+     -- wat staat er over mij, en wie heeft dat gezegd. */
+  '/apps/loopbaan.html': G('Mijn loopbaan: wat er gebeurde, wanneer, en wie dat heeft bevestigd - chronologisch en per regel.',
+    ['Schrijf op wat er gebeurd is; het staat er als door u opgegeven tot iemand anders het bevestigt',
+     'Zie per bevestiging wat zij WEL vaststelt en wat zij niet zegt - RTG valideert de prestatie zelf nooit',
+     'Deel EEN regel met een code die verloopt, zodat een club of sponsor iets kan nakijken zonder uw loopbaan te zien'],
+    'Er staat hier geen cijfer, geen niveau en geen vergelijking met iemand anders; de zeven voorraden hebben met opzet geen totaal. Intrekken haalt niets weg - de regel blijft staan met uw reden erbij, want een loopbaan die je kunt poetsen is geen bewijs.'),
+  '/apps/loopbaanbewijs.html': G('Een regel uit een loopbaan, geopend met de code die iemand u stuurde. Geen account nodig.',
+    ['Bekijk het ene feit dat met u gedeeld is, met de dag waarop het gebeurde',
+     'Lees per bevestiging wie ervoor instaat, en wat die bevestiging niet zegt',
+     'Zie het even groot als er niemand heeft bevestigd, of als de regel is teruggenomen'],
+    'U ziet een regel en nooit de loopbaan eromheen - ook niet welke categorieen leeg zijn, want ook dat is een mededeling over een mens. De code verloopt en de mens kan hem stoppen.'),
 };

@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="nl" data-rtg-thema="bordeaux">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn loopbaan</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
+  header h1{font-size:1.5rem;margin-top:.15rem;}
+  main{padding:1.1rem;max-width:680px;margin:0 auto;}
+  section{margin-bottom:2.2rem;}
+  section > h2{font-size:1.12rem;margin-bottom:.2rem;}
+  .uitleg{font-size:.85rem;color:var(--muted);line-height:1.6;margin-bottom:.9rem;}
+  .kaart{border:1px solid var(--line);padding:.95rem 1.05rem;margin-bottom:.7rem;background:var(--card);}
+  .kaart h3{font-size:1.05rem;}
+  .kaart.weg{border-style:dashed;}
+  .meta{font-size:.78rem;color:var(--muted);margin-top:.2rem;line-height:1.55;}
+  .dag{font-variant-numeric:tabular-nums;}
+  .stand{display:inline-block;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.12rem .5rem;border:1px solid var(--line);color:var(--muted);margin-left:.4rem;}
+  /* BORDEAUX IS EEN ACCENT EN NOOIT EEN TEKSTKLEUR (CLAUDE.md). Op dit scherm is
+     `--burgundy` #C23A5E, en die haalt op deze kaartgrond 2,69:1 -- ver onder de
+     4,5 die lopende tekst vraagt. De RAND blijft bordeaux: daar IS het een
+     accent, en zo houdt een ingetrokken regel zijn signaal zonder onleesbaar te
+     worden. Zelfde reparatie als op /apps/vertegenwoordiging.html. */
+  .stand.weg{border-color:var(--burgundy);color:var(--txt);}
+  .stand.bev{border-color:var(--rtg-leesgroen,var(--green));color:var(--rtg-leesgroen,var(--green));}
+  ul.lijst{list-style:none;margin:.6rem 0 0;}
+  ul.lijst li{padding:.42rem 0;border-top:1px solid var(--line);font-size:.87rem;line-height:1.5;}
+  ul.lijst li b{font-weight:600;}
+  ul.lijst li .sub{display:block;font-size:.76rem;color:var(--soft);margin-top:.1rem;}
+  .nee li{border-top-color:color-mix(in srgb,var(--burgundy) 35%,transparent);}
+  .nee li b{color:var(--txt);}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;align-items:center;}
+  .knop{background:var(--gold);color:#000;border:none;font:inherit;font-weight:600;font-size:.84rem;padding:.55rem 1.1rem;cursor:pointer;min-height:2.5rem;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
+  .knop.weg{background:transparent;color:var(--txt);border:1px solid var(--burgundy);font-weight:500;}
+  .veld{background:var(--bg);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.87rem;padding:.5rem .6rem;min-height:2.5rem;width:100%;}
+  .veld+.veld{margin-top:.5rem;}
+  .leeg{color:var(--soft);font-size:.9rem;padding:1.4rem .2rem;line-height:1.6;}
+  .let{border-left:2px solid var(--gold);padding:.5rem 0 .5rem .8rem;margin-top:.8rem;font-size:.82rem;color:var(--muted);line-height:1.6;}
+  .bev{font-size:.8rem;padding:.5rem 0;border-top:1px solid var(--line);line-height:1.55;}
+  .bev .wie{font-weight:600;}
+  .bev .zegt{display:block;color:var(--soft);font-size:.75rem;margin-top:.15rem;}
+  .voorraad{display:flex;justify-content:space-between;gap:1rem;padding:.5rem 0;border-top:1px solid var(--line);font-size:.85rem;}
+  .voorraad .op{color:var(--soft);font-size:.76rem;display:block;margin-top:.1rem;}
+  .voorraad .n{color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
+  dialog{background:var(--card);color:var(--txt);border:1px solid var(--line);max-width:34rem;width:92vw;padding:1.2rem;}
+  dialog::backdrop{background:rgba(0,0,0,.6);}
+  code.code{display:block;background:var(--card2);border:1px solid var(--line);padding:.6rem;margin-top:.6rem;font-size:.82rem;word-break:break-all;}
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/ios.css" rel="stylesheet">
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl" data-rtg-world="work" data-rtg-eigenvlak="onyx" data-rtg-skin="heritage">
+<header>
+  <p class="ey">RTG Carrière</p>
+  <h1>Mijn loopbaan</h1>
+</header>
+<main>
+  <p class="uitleg">Wat er gebeurde, wanneer, en wie dat heeft bevestigd. Er staat hier geen cijfer,
+    geen niveau en geen vergelijking met iemand anders - wel per regel wie ervoor instaat, en wat die
+    bevestiging <b>wel</b> en <b>niet</b> zegt. Een regel kunt u apart delen met een code die verloopt,
+    zodat een club of een sponsor één ding kan nakijken zonder uw hele loopbaan te zien.</p>
+
+  <section>
+    <h2>De reeks</h2>
+    <p class="uitleg">Op volgorde van wanneer het gebeurde. Intrekken haalt niets weg: de regel blijft
+      staan met de reden erbij, want een loopbaan die je kunt poetsen is geen bewijs.</p>
+    <div id="reeks"><p class="leeg">Bezig met laden.</p></div>
+  </section>
+
+  <section>
+    <h2>Iets toevoegen</h2>
+    <p class="uitleg">U schrijft het zelf op, en dat is precies wat er dan staat: <b>door u opgegeven</b>.
+      Meer wordt het pas als een ander het bevestigt.</p>
+    <div class="kaart">
+      <input class="veld" id="wat" maxlength="300" placeholder="Wat gebeurde er? Bijvoorbeeld: Nederlands kampioen junior">
+      <select class="veld" id="kapitaal" aria-label="Waar hoort dit bij"></select>
+      <input class="veld" id="op" type="date" aria-label="Wanneer gebeurde het">
+      <input class="veld" id="toelichting" maxlength="600" placeholder="Toelichting (mag leeg blijven)">
+      <div class="rij"><button class="knop" id="zet" type="button">Aan mijn loopbaan toevoegen</button></div>
+      <div class="let" id="nooit"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>De zeven voorraden</h2>
+    <p class="uitleg">Wat u hebt opgebouwd, uit elkaar gehouden. Met opzet zeven aparte lijsten en
+      nergens een totaal: één getal over een mens kan niemand navertellen.</p>
+    <div id="voorraden"></div>
+  </section>
+
+  <section>
+    <h2>Wat ik heb gedeeld</h2>
+    <p class="uitleg">Elke code opent één regel en niets anders. U ziet hoe vaak hij is geopend en u
+      kunt hem stoppen - wat iemand al gelezen heeft, halen wij niet terug.</p>
+    <div id="delen"></div>
+  </section>
+</main>
+
+<dialog id="deeldlg">
+  <h3>Deze regel delen</h3>
+  <p class="uitleg" id="deelwat"></p>
+  <input class="veld" id="deelvoor" maxlength="120" placeholder="Voor wie is deze code? (voor uzelf, om hem terug te vinden)">
+  <input class="veld" id="deeldagen" type="number" min="1" max="365" value="30" aria-label="Hoeveel dagen geldig">
+  <div class="rij">
+    <button class="knop" id="deelja" type="button">Code maken</button>
+    <button class="knop stil" id="deelnee" type="button">Laat maar</button>
+  </div>
+  <div id="deelklaar"></div>
+</dialog>
+
+<div class="melding" id="melding" role="status" aria-live="polite"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',4200); }
+const api=(pad,body)=>fetch('/api/carriere/ledger'+pad,{method:'POST',
+  headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},
+  body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d;});
+let MIJN=null, DEEL_ID=null;
+
+function bevestiging(b){
+  return '<div class="bev"><span class="wie">'+esc(b.door)+'</span>'+
+    '<span class="stand bev">'+esc(b.herkomst)+'</span>'+
+    (b.ingetrokken?'<span class="stand weg">ingetrokken</span>':'')+
+    (b.wat?'<span class="zegt">"'+esc(b.wat)+'"</span>':'')+
+    '<span class="zegt">Stelt vast: '+esc(b.stelt)+'</span>'+
+    '<span class="zegt">Zegt niet: '+esc(b.nietZegt)+'</span></div>';
+}
+
+function feitKaart(f){
+  return '<div class="kaart'+(f.ingetrokken?' weg':'')+'">'+
+    '<h3>'+esc(f.wat)+(f.ingetrokken?'<span class="stand weg">ingetrokken</span>':'')+'</h3>'+
+    '<p class="meta"><span class="dag">'+esc(f.op)+'</span> &middot; '+esc(f.kapitaal)+
+    (f.toelichting?' &middot; '+esc(f.toelichting):'')+'</p>'+
+    (f.bevestigingen.length
+      ? f.bevestigingen.map(bevestiging).join('')
+      : '<p class="meta">Nog niemand heeft dit bevestigd. Dat is geen gebrek - het staat er als ' +
+        'door u opgegeven, en zo staat het er ook voor een lezer.</p>')+
+    (f.ingetrokken?'':'<div class="rij">'+
+      '<button class="knop stil" data-deel="'+esc(f.id)+'" type="button">Deze regel delen</button>'+
+      '<button class="knop weg" data-weg="'+esc(f.id)+'" type="button">Intrekken</button></div>')+
+    '</div>';
+}
+
+function teken(){
+  $('#reeks').innerHTML = MIJN.feiten.length ? MIJN.feiten.map(feitKaart).join('')
+    : '<p class="leeg">Uw loopbaan begint hier. Schrijf op wat er gebeurd is - ook iets van jaren ' +
+      'geleden; de reeks loopt op de dag waarop het gebeurde en niet op vandaag.</p>';
+
+  $('#voorraden').innerHTML = '<div class="kaart">'+MIJN.voorraden.map(v=>
+    '<div class="voorraad"><span><b>'+esc(v.kapitaal)+'</b><span class="op">'+esc(v.wat)+'</span></span>'+
+    '<span class="n">'+(v.regels.length===0?'nog niets':v.regels.length+(v.regels.length===1?' regel':' regels'))+'</span></div>'
+  ).join('')+'</div>';
+
+  if(!$('#kapitaal').options.length){
+    $('#kapitaal').innerHTML = Object.entries(MIJN.kapitalen).map(([k,w])=>
+      '<option value="'+esc(k)+'">'+esc(k)+' - '+esc(w)+'</option>').join('');
+    $('#nooit').innerHTML = 'Wat hier nooit in komt: '+
+      Object.values(MIJN.nooit).map(esc).join(' &middot; ')+'.';
+  }
+}
+
+async function tekenDelen(){
+  const d=(await api('/delen')).delen;
+  $('#delen').innerHTML = d.length ? d.map(x=>'<div class="kaart'+(x.gestopt?' weg':'')+'">'+
+    '<p class="meta">'+esc(x.voor||'zonder naam')+(x.gestopt?'<span class="stand weg">gestopt</span>':'')+'</p>'+
+    '<p class="meta">Geldig tot <span class="dag">'+esc(String(x.tot).slice(0,10))+'</span> &middot; '+
+    (x.gebruik===0?'nog niet geopend':x.gebruik+(x.gebruik===1?' keer':' keer')+' geopend')+'</p>'+
+    (x.gestopt?'':'<div class="rij"><button class="knop weg" data-stop="'+esc(x.id)+'" type="button">Stoppen</button></div>')+
+    '</div>').join('')
+    : '<p class="leeg">U hebt nog niets gedeeld.</p>';
+}
+
+async function laad(){
+  try{ MIJN = await api('/mijn'); teken(); await tekenDelen(); }
+  catch(e){ $('#reeks').innerHTML='<p class="leeg">'+esc(e.message)+'</p>'; }
+}
+
+document.addEventListener('click', async ev=>{
+  const deel=ev.target.closest('[data-deel]'), weg=ev.target.closest('[data-weg]'), stop=ev.target.closest('[data-stop]');
+  if(deel){ DEEL_ID=deel.dataset.deel;
+    const f=MIJN.feiten.find(x=>x.id===DEEL_ID)||{};
+    $('#deelwat').textContent='"'+(f.wat||'')+'". De ontvanger ziet deze ene regel met wie hem heeft bevestigd - niets anders uit uw loopbaan.';
+    $('#deelklaar').innerHTML=''; $('#deeldlg').showModal(); return; }
+  if(weg){ const reden=prompt('Waarom trekt u deze regel terug? De regel blijft staan, met uw reden erbij.');
+    if(!reden) return;
+    try{ await api('/intrek',{id:weg.dataset.weg,reden}); meld('Ingetrokken. De regel blijft leesbaar.'); await laad(); }
+    catch(e){ meld(e.message); } return; }
+  if(stop){ try{ const r=await api('/stopdelen',{id:stop.dataset.stop}); meld(r.let||'Gestopt.'); await tekenDelen(); }
+    catch(e){ meld(e.message); } return; }
+});
+
+$('#zet').addEventListener('click', async ()=>{
+  try{
+    await api('/zet',{ kapitaal:$('#kapitaal').value, wat:$('#wat').value,
+      op:$('#op').value, toelichting:$('#toelichting').value });
+    $('#wat').value=''; $('#toelichting').value='';
+    meld('Toegevoegd, als door u opgegeven.'); await laad();
+  }catch(e){ meld(e.message); }
+});
+$('#deelnee').addEventListener('click',()=>$('#deeldlg').close());
+$('#deelja').addEventListener('click', async ()=>{
+  try{
+    const r=await api('/deel',{id:DEEL_ID,dagen:$('#deeldagen').value,voor:$('#deelvoor').value});
+    $('#deelklaar').innerHTML='<div class="let">Deze code krijgt u nu <b>één keer</b> te zien. ' +
+      'Bewaar hem, want hij staat nergens meer: wij bewaren alleen een versleutelde afdruk.</div>' +
+      '<code class="code">'+esc(r.code)+'</code>' +
+      '<p class="meta">Geldig tot '+esc(String(r.tot).slice(0,10))+'.</p>';
+    $('#deelvoor').value=''; await tekenDelen();
+  }catch(e){ meld(e.message); }
+});
+laad();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

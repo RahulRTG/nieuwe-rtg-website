@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="nl" data-rtg-thema="bordeaux">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Een regel uit een loopbaan</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{padding:calc(env(safe-area-inset-top) + 1.4rem) 1.1rem .9rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
+  header h1{font-size:1.5rem;margin-top:.15rem;}
+  main{padding:1.4rem 1.1rem;max-width:600px;margin:0 auto;}
+  .uitleg{font-size:.85rem;color:var(--muted);line-height:1.6;margin-bottom:1rem;}
+  .kaart{border:1px solid var(--line);padding:1.1rem 1.15rem;margin-bottom:1rem;background:var(--card);}
+  .feit{font-family:'Bodoni Moda',serif;font-size:1.45rem;line-height:1.3;}
+  .dag{font-variant-numeric:tabular-nums;}
+  .meta{font-size:.8rem;color:var(--muted);margin-top:.35rem;line-height:1.55;}
+  .stand{display:inline-block;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.12rem .5rem;border:1px solid var(--line);color:var(--muted);margin-left:.4rem;vertical-align:middle;}
+  /* De rand mag bordeaux zijn, de tekst niet: #C23A5E haalt op deze kaartgrond
+     2,69:1 (CLAUDE.md -- bordeaux is een accent en nooit een tekstkleur). */
+  .stand.weg{border-color:var(--burgundy);color:var(--txt);}
+  .stand.bev{border-color:var(--rtg-leesgroen,var(--green));color:var(--rtg-leesgroen,var(--green));}
+  .bev{font-size:.85rem;padding:.65rem 0;border-top:1px solid var(--line);line-height:1.55;}
+  .bev .wie{font-weight:600;}
+  .bev .zegt{display:block;color:var(--soft);font-size:.76rem;margin-top:.2rem;}
+  ul.nooit{list-style:none;margin:.4rem 0 0;}
+  ul.nooit li{padding:.45rem 0;border-top:1px solid color-mix(in srgb,var(--burgundy) 35%,transparent);font-size:.82rem;line-height:1.55;color:var(--muted);}
+  .veld{background:var(--bg);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.87rem;padding:.5rem .6rem;min-height:2.5rem;width:100%;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;align-items:center;}
+  .knop{background:var(--gold);color:#000;border:none;font:inherit;font-weight:600;font-size:.84rem;padding:.55rem 1.1rem;cursor:pointer;min-height:2.5rem;}
+  .let{border-left:2px solid var(--gold);padding:.5rem 0 .5rem .8rem;margin-top:.9rem;font-size:.82rem;color:var(--muted);line-height:1.6;}
+  .leeg{color:var(--soft);font-size:.9rem;padding:1.2rem .2rem;line-height:1.6;}
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/ios.css" rel="stylesheet">
+<link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl" data-rtg-world="work" data-rtg-eigenvlak="onyx" data-rtg-skin="heritage">
+<header>
+  <p class="ey">RTG Carrière</p>
+  <h1>Een regel uit een loopbaan</h1>
+</header>
+<main>
+  <p class="uitleg">Iemand heeft u één regel uit zijn loopbaan laten zien. U hoeft daarvoor geen
+    account te hebben, en u ziet alleen deze ene regel.</p>
+
+  <div class="kaart" id="invoer">
+    <label class="uitleg" for="code">Plak hier de code die u hebt gekregen.</label>
+    <input class="veld" id="code" autocomplete="off" spellcheck="false" placeholder="RTGCL.…">
+    <div class="rij"><button class="knop" id="open" type="button">Bekijken</button></div>
+  </div>
+
+  <div id="uit"></div>
+</main>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function bevestiging(b){
+  return '<div class="bev"><span class="wie">'+esc(b.door)+'</span>'+
+    '<span class="stand bev">'+esc(b.herkomst)+'</span>'+
+    (b.wat?'<span class="zegt">"'+esc(b.wat)+'"</span>':'')+
+    '<span class="zegt"><b>Stelt vast:</b> '+esc(b.stelt)+'</span>'+
+    '<span class="zegt"><b>Zegt niet:</b> '+esc(b.nietZegt)+'</span></div>';
+}
+
+function toon(d){
+  $('#invoer').hidden = true;
+  $('#uit').innerHTML = '<div class="kaart">'+
+    '<p class="feit">'+esc(d.feit.wat)+
+      (d.feit.ingetrokken?'<span class="stand weg">ingetrokken</span>':'')+'</p>'+
+    '<p class="meta">Gebeurd op <span class="dag">'+esc(d.feit.op)+'</span> &middot; opgeschreven door '+esc(d.mens)+
+      ' (de naam waaronder deze mens in RTG staat)</p>'+
+    (d.feit.ingetrokken
+      ? '<div class="let">Deze regel is door de mens zelf teruggenomen. Wij tonen hem toch, met deze ' +
+        'mededeling erbij: een regel die stilletjes verdwijnt, ziet er hetzelfde uit als een storing.</div>'
+      : '')+
+    (d.feit.bevestigingen.length
+      ? d.feit.bevestigingen.map(bevestiging).join('')
+      : '<div class="let">Niemand anders heeft dit bevestigd. Het staat er als <b>door de mens zelf ' +
+        'opgegeven</b>, en dat is precies wat het dan is.</div>')+
+    '</div>'+
+    '<div class="kaart"><h3>Wat dit niet zegt</h3><ul class="nooit">'+
+    d.voorbehoud.map(v=>'<li>'+esc(v)+'</li>').join('')+'</ul></div>';
+}
+
+async function open_(code){
+  if(!code){ return; }
+  try{
+    const r = await fetch('/api/carriere/regel/toon',{method:'POST',
+      headers:{'Content-Type':'application/json'},body:JSON.stringify({code})});
+    const d = await r.json().catch(()=>({}));
+    if(!r.ok){
+      $('#uit').innerHTML='<p class="leeg">'+esc(d.error||'Deze code doet niets meer.')+
+        (d.waarom?' <b>Reden:</b> '+esc(d.waarom)+'.':'')+
+        ' Vraag degene die hem stuurde om een nieuwe.</p>';
+      return;
+    }
+    toon(d);
+  }catch(e){ $('#uit').innerHTML='<p class="leeg">Er ging iets mis bij het ophalen.</p>'; }
+}
+
+$('#open').addEventListener('click',()=>open_($('#code').value.trim()));
+$('#code').addEventListener('keydown',ev=>{ if(ev.key==='Enter') open_($('#code').value.trim()); });
+
+/* DE CODE MAG IN DE HASH STAAN EN NIET IN DE ZOEKREEKS. Een hash gaat niet mee
+   naar de server: hij komt in geen enkel serverlogboek en in geen referrer. Wat
+   hij WEL doet is in de geschiedenis van deze browser blijven staan, en dat
+   poetsen we niet weg -- daarom staat het er hieronder ook voor de lezer. */
+(function(){
+  const m = /(?:^|[#&])code=([^&]+)/.exec(location.hash || '');
+  if(m){
+    const code = decodeURIComponent(m[1]);
+    $('#code').value = code;
+    open_(code);
+  }
+})();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

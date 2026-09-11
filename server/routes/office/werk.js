@@ -23,6 +23,7 @@ require('./verificaties')(octx, { wieKijkt });
    NAAM staat en niet op de gedeelde kantoorcode. */
 require('./voogdij')(octx, { wieKijkt });
 require('./rugdekking')(octx, { wieKijkt });
+require('./carriereledger')(octx, { wieKijkt });
 
 app.post('/api/office/nudge', officeAuth, (req, res) => {
   const kind = req.body.kind === 'ride' ? 'ride' : 'order';

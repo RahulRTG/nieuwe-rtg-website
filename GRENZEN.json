@@ -157,6 +157,9 @@
       "boeken"
     ],
     "borden": [],
+    "carriereledger": [
+      "carriereledger"
+    ],
     "clips": [
       "clipsAanwezig",
       "clipsFeed",
@@ -607,6 +610,7 @@
       "stad",
       "studio",
       "stuur",
+      "tweedeHand",
       "veilig",
       "voornemens",
       "wacht",
@@ -764,8 +768,8 @@
     ],
     "meet": [
       "loginFails",
-      "noteFailedTry",
-      "meet"
+      "meet",
+      "noteFailedTry"
     ],
     "member": [
       "AUTHOR_TIER",
@@ -777,6 +781,7 @@
       "PERSONAS",
       "STEMMINGEN",
       "ZZP",
+      "aantal",
       "accounts",
       "agendaVoor",
       "aiSystemPrompt",
@@ -937,6 +942,7 @@
       "idGeverifieerd",
       "isFavoriet",
       "jarigVan",
+      "keylessToegang",
       "kijk",
       "koopTicketVoor",
       "lbObject",
@@ -1073,6 +1079,7 @@
       "ordersVanKlant",
       "ordersVoegToe",
       "overheid",
+      "partnerCode",
       "paspoortBeslis",
       "paspoortMijn",
       "paspoortStatus",
@@ -1153,6 +1160,7 @@
       "sparStatus",
       "spelVergeet",
       "stateFor",
+      "status",
       "stemmingVan",
       "stuurLus",
       "tableGast",
@@ -1163,6 +1171,7 @@
       "tableWeg",
       "tableZet",
       "tables",
+      "titel",
       "toestellen",
       "toggleFavoriet",
       "trChat",
@@ -1343,6 +1352,7 @@
       "boardroomAuth",
       "broadcastSync",
       "bureauBalie",
+      "carriereledger",
       "catalogusWensBesluit",
       "catalogusWensen",
       "conciergeDesk",
@@ -1614,6 +1624,9 @@
       "rtmailDraad",
       "rtmailVak"
     ],
+    "rugdekking": [
+      "rugdekking"
+    ],
     "samen": [
       "loginFails",
       "noteFailedTry",
@@ -1621,6 +1634,7 @@
     ],
     "scim": [
       "accounts",
+      "scimUserSync",
       "tenant"
     ],
     "scim-groepen": [
@@ -1941,6 +1955,7 @@
       "avVerwijderAuto",
       "avZetAan",
       "avZetAuto",
+      "bearer",
       "beauty",
       "beslisReservering",
       "bevAanvraag",
@@ -1966,6 +1981,7 @@
       "bevZetDienst",
       "bevZetFunctie",
       "bevZetPost",
+      "bewerkCollectie",
       "boekhoudkennis",
       "boekingMetRef",
       "boekingenVanZaak",
@@ -1981,6 +1997,7 @@
       "careGemist",
       "careNietVerschenen",
       "careVastleg",
+      "carriereledger",
       "cateringDishes",
       "centen",
       "charterVan",
@@ -1994,8 +2011,10 @@
       "commerce",
       "controleerSom",
       "creator",
+      "dagen",
       "dagrapport",
       "defensie",
+      "doel",
       "dorpBuurt",
       "dorpDrukte",
       "dorpKan",
@@ -2007,6 +2026,7 @@
       "dpOntvangsten",
       "dpVerzoekIntrek",
       "dpVerzoekMaak",
+      "dubbeltikMs",
       "ensureApplyChat",
       "etaMinutes",
       "eventCovers",
@@ -2023,6 +2043,7 @@
       "fotosVan",
       "gcCode",
       "geborenVan",
+      "geldig",
       "gemeente",
       "getal",
       "ghAnnuleer",
@@ -2047,6 +2068,7 @@
       "haversine",
       "heleCenten",
       "herkomst",
+      "herstelGeldig",
       "horeca",
       "horecaBord",
       "horecaCorrectie",
@@ -2059,6 +2081,7 @@
       "huurVan",
       "i18n",
       "id",
+      "idemHash",
       "invitesVan",
       "isCharter",
       "isFavoriet",
@@ -2070,6 +2093,7 @@
       "ketenchat",
       "keuken",
       "keylessCode",
+      "keylessToegang",
       "klantProfiel",
       "klantSalon",
       "kortingCenten",
@@ -2077,6 +2101,8 @@
       "leeftijdVan",
       "legApart",
       "levensgraaf",
+      "lijstInvites",
+      "lijstVan",
       "linkCapAanvaard",
       "locStopZaak",
       "locVoorZaak",
@@ -2114,6 +2140,7 @@
       "overheid",
       "pandVan",
       "parseRunsheetText",
+      "partnerCode",
       "pasVoorraad",
       "paskamerBreng",
       "paspoortBekijk",
@@ -2134,6 +2161,7 @@
       "postdatum",
       "preflight",
       "publicSupplier",
+      "publiek",
       "pushLive",
       "rampbeeld",
       "receptie",
@@ -2153,6 +2181,7 @@
       "rondleidingZet",
       "roosterBeslis",
       "roosterVoorstel",
+      "roteerInvite",
       "runItem",
       "salon",
       "salonClaimcode",
@@ -2161,6 +2190,7 @@
       "salonProfielCompleet",
       "samenwerking",
       "scheduleFor",
+      "scope",
       "sectiesForOrder",
       "seizoen",
       "sessionFor",
@@ -2171,10 +2201,12 @@
       "sortRunsheet",
       "standVan",
       "stationsForOrder",
+      "status",
       "stuurLus",
       "stuurRoep",
       "stuurStyling",
       "supplierState",
+      "supplierVanCode",
       "tafelplanning",
       "tafelticket",
       "temperatuurC",
@@ -2182,6 +2214,8 @@
       "ticketsVoorSlot",
       "totaal",
       "trChat",
+      "transactie",
+      "trekInviteIn",
       "uitEuro",
       "unlockDoor",
       "vakbewijsHeeft",
@@ -2191,12 +2225,14 @@
       "vakbewijzenVan",
       "vakbewijzenVerlopend",
       "vakwerk",
+      "verbindCode",
       "verbindLid",
       "verblijfBeslis",
       "verblijfCheckin",
       "verblijfCheckout",
       "verblijfNoShow",
       "verzoeklaag",
+      "vindIn",
       "voegKlantnotitie",
       "voorraadZoek",
       "waarde",
@@ -2206,6 +2242,7 @@
       "werkAdvies",
       "werkmail",
       "werkvensterVan",
+      "wervingsBasis",
       "wervingsLink",
       "zaakAbonnement",
       "zaakBoard",
@@ -2405,6 +2442,9 @@
     "vertaal": [
       "i18n"
     ],
+    "vertegenwoordiging": [
+      "vertegenwoordiging"
+    ],
     "verzorging": [
       "beauty",
       "opvang",
@@ -2520,6 +2560,7 @@
       "loginFails",
       "noteFailedTry",
       "notifySupplier",
+      "verbindCode",
       "verbindLid",
       "zoekInvite"
     ],
@@ -2555,12 +2596,6 @@
       "status",
       "wallet",
       "zorgpolis"
-    ],
-    "vertegenwoordiging": [
-      "vertegenwoordiging"
-    ],
-    "rugdekking": [
-      "rugdekking"
     ]
   }
 }

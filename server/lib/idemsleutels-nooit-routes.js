@@ -109,4 +109,5 @@ module.exports = ({
 /* De carrierelaag staat in ./idemsleutels-nooit-carriere.js -- zelfde lijst,
    eigen bestand, omdat deze anders over de 10 kB gaat. Zie de kop daar. */
 Object.assign(module.exports, require('./idemsleutels-nooit-carriere'));
+Object.assign(module.exports, require('./idemsleutels-nooit-ledger'));
 Object.freeze(module.exports);

@@ -736,6 +736,13 @@
       ]
     },
     {
+      "naam": "Mijn loopbaan",
+      "wereld": "WorkOS",
+      "soort": "link",
+      "sleutel": "loopbaan",
+      "url": "/apps/loopbaan.html"
+    },
+    {
       "naam": "Mijn team",
       "wereld": "WorkOS",
       "soort": "link",

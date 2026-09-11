@@ -18,10 +18,10 @@ Drie soorten onderdeel, en ze gedragen zich verschillend:
 | wereld | huis | onderdelen |
 |---|---|---|
 | **LivingOS** | `/apps/rtg.html` | 58 |
-| **WorkOS** | `/apps/kantoor.html` | 16 |
+| **WorkOS** | `/apps/kantoor.html` | 17 |
 | **TravelOS** | `/apps/reizen.html` | 15 |
 | **FoundationOS** | `/apps/foundation/os-publiek.html` | 10 |
-| | **samen** | **99** |
+| | **samen** | **100** |
 
 ## LivingOS
 
@@ -90,7 +90,7 @@ Huis: `/apps/rtg.html` — 58 onderdelen.
 
 ## WorkOS
 
-Huis: `/apps/kantoor.html` — 16 onderdelen.
+Huis: `/apps/kantoor.html` — 17 onderdelen.
 
 | onderdeel | soort | komt uit op |
 |---|---|---|
@@ -110,6 +110,7 @@ Huis: `/apps/kantoor.html` — 16 onderdelen.
 | Horeca | `link:horeca` | `/apps/horeca.html` |
 | Partner Network | `link:partnernetwerk` | `/apps/partner-network.html` |
 | Mijn team | `link:vertegenwoordiging` | `/apps/vertegenwoordiging.html` |
+| Mijn loopbaan | `link:loopbaan` | `/apps/loopbaan.html` |
 
 ## TravelOS
 

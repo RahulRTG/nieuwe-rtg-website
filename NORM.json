@@ -21,8 +21,8 @@
     "keuringTeGroot": 14,
     "inlineStijlAttributen": 4638,
     "browserpoortToetsen": 337,
-    "kernBreedte": 1567,
-    "kernGedeeld": 233,
+    "kernBreedte": 1568,
+    "kernGedeeld": 234,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
     "toetsenNietGemeten": 607,
@@ -1973,6 +1973,24 @@
       "meter": "kernGedeeld 231 -> 233",
       "reden": "Dezelfde twee namen als de notitie hierboven (kernBreedte 1565 -> 1567), en om dezelfde reden: allebei gedeeld met precies EEN ander domein, `office`, omdat een routebestand achter de domeingrens niet bij `kluisAuth` kan en het zwaarste besluit van beide lagen daar hoort. De verantwoording staat daar voluit; hij wordt hier niet herhaald, want twee notities die hetzelfde zeggen worden allebei niet gelezen.",
       "waarheen": "server/routes/office/voogdij.js en server/routes/office/rugdekking.js -- de twee kantoorroutes die de deling veroorzaken"
+    },
+    {
+      "datum": "2026-09-11",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1567,
+      "meter": "kernBreedte 1567 -> 1568",
+      "reden": "HET CARRIERE LEDGER (kern/carriereledger/) voegt EEN naam toe: `carriereledger`. Dezelfde vorm als de notitie hierboven over `vertegenwoordiging` en `rugdekking`, en om dezelfde reden -- maar met een verschil dat het vermelden waard is, want het maakt deze deling BREDER dan die twee.\n\nDE NAAM IS GEDEELD MET TWEE ANDERE DOMEINEN en niet met een: `office` en `supplier`. Dat is de +1 op kernGedeeld, en het is geen slordigheid maar de kern van wat dit ledger is. Een carrierefeit krijgt zijn waarde van WIE het bevestigt, en dat kan de eigenaar per definitie niet zelf zijn. Er zijn dus precies drie schrijvers nodig, elk achter een eigen deur: het lid (`auth`) schrijft zijn eigen regel, een medewerker van RTG (`kluisAuth`) noteert dat hij een stuk heeft INGEZIEN, en een club of bond (`supplierAuth`) bevestigt vanaf haar eigen account. Haal er een weg en de herkomst `gezien` of `bevestigd` kan niet ontstaan; laat het lid ze zelf zetten en ze betekenen niets. De drie deuren ZIJN de functie.\n\nWAT DE KOPPELING SMAL HOUDT, en dat is na te rekenen: de twee routebestanden buiten het eigen domein doen allebei precies EEN ding en roepen precies EEN kernfunctie aan. Er is met opzet geen kantoor- of zaakroute die een LEDGER opent -- alleen bevestigen en terugnemen van EEN regel, waarvan het lid het nummer aanlevert. \"Alles over deze mens\" stelt HDI.md par. 5.1 buiten de orde, en dat is hier tegelijk de reden dat de koppeling niet groeit.\n\nDe collecties blijven binnen het domein (`carriereLedger` en `carriereDelen`, een declaratie in kern/eigencollectie.js) en niemand anders schrijft erin -- keuringsregel 63 bewaakt dat.",
+      "waarheen": "server/routes/office/carriereledger.js en server/routes/supplier/carriereledger.js -- de twee routes buiten het eigen domein die de deling veroorzaken; beide bevestigen EEN regel en openen nooit een ledger"
+    },
+    {
+      "datum": "2026-09-11",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 233,
+      "meter": "kernGedeeld 233 -> 234",
+      "reden": "Dezelfde naam als de notitie hierboven (kernBreedte 1567 -> 1568): `carriereledger`, gedeeld met `office` en `supplier` omdat een carrierefeit zijn waarde krijgt van wie het bevestigt, en dat de eigenaar per definitie niet zelf kan zijn. De verantwoording staat daar voluit en wordt hier niet herhaald -- twee notities die hetzelfde zeggen worden allebei niet gelezen.",
+      "waarheen": "server/routes/office/carriereledger.js en server/routes/supplier/carriereledger.js"
     }
   ],
   "prestatie": {

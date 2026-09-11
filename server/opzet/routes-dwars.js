@@ -44,6 +44,11 @@ module.exports = function hangDwarseRoutersOp(grens) {
      talent leeft. Ook dwars: het gaat over de betrekking tussen RTG en die
      mens, en niet over wat hij doet. */
   require('../routes/rugdekking')(grens('rugdekking'));
+  /* Het carriere ledger (kern/carriereledger/): chronologisch, per regel
+     bewijsbaar. Ook dwars -- een loopbaan hangt aan een MENS en niet aan een
+     domein; dat is precies wat CARRIEREVORM.json meet (0 velden gedeeld over
+     de vijftien talentdomeinen). */
+  require('../routes/carriereledger')(grens('carriereledger'));
   require('../routes/bestanden')(grens('bestanden'));
   require('../routes/meet')(grens('meet'));
   require('../routes/galerij')(grens('galerij'));

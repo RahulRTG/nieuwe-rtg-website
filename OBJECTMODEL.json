@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-11",
   "gemeten": {
-    "bestanden": 2189,
-    "vormen": 1386,
-    "velden": 2015,
-    "modules": 757,
-    "domeinen": 269,
+    "bestanden": 2193,
+    "vormen": 1388,
+    "velden": 2018,
+    "modules": 759,
+    "domeinen": 270,
     "envelopDrempel": 17,
     "envelop": 29,
-    "veldenDomeineigen": 1422,
+    "veldenDomeineigen": 1423,
     "veldenGedeeldVanafVier": 200,
     "gelijkendeVormparen": 20
   },
@@ -334,6 +334,18 @@
       ]
     },
     {
+      "veld": "voor",
+      "domeinen": 11,
+      "waar": [
+        "kern/carriereledger",
+        "kern/command",
+        "kern/creator",
+        "kern/koppel",
+        "kern/livinglab",
+        "kern/office"
+      ]
+    },
+    {
       "veld": "wanneer",
       "domeinen": 11,
       "waar": [
@@ -430,6 +442,18 @@
       ]
     },
     {
+      "veld": "ingetrokken",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/beschermzaak",
+        "kern/carriereledger",
+        "kern/command",
+        "kern/festival",
+        "kern/mobiliteit"
+      ]
+    },
+    {
       "veld": "op",
       "domeinen": 10,
       "waar": [
@@ -466,18 +490,6 @@
       ]
     },
     {
-      "veld": "voor",
-      "domeinen": 10,
-      "waar": [
-        "kern/command",
-        "kern/creator",
-        "kern/koppel",
-        "kern/livinglab",
-        "kern/office",
-        "kern/overheid"
-      ]
-    },
-    {
       "veld": "rol",
       "domeinen": 10,
       "waar": [
@@ -511,18 +523,6 @@
         "kern/homemerken",
         "kern/levensgraaf",
         "kern/magnaat-trainingslobby-regie"
-      ]
-    },
-    {
-      "veld": "waar",
-      "domeinen": 9,
-      "waar": [
-        "bedrijf",
-        "kern/afdelingen",
-        "kern/antivirus",
-        "kern/assets",
-        "kern/bureau",
-        "kern/commerce"
       ]
     }
   ],

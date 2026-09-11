@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'cd2e6bca';
+var RTG_BOUW = 'fcd9bccc';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4336,6 +4336,13 @@ var RTG_BOUW = 'cd2e6bca';
        namens mij" komt op wanneer iemand over zijn werk denkt (WERELDEN.md:
        in welke context denkt de mens dat hij zich bevindt). */
     vertegenwoordiging: { naam: T('app.vertegenwoordiging', 'Mijn team'), url: '/apps/vertegenwoordiging.html' },
+    /* Het carriere ledger: wat deze mens heeft gedaan, chronologisch en per
+       regel bewijsbaar. Naast "Mijn team" en om dezelfde reden in WorkOS: het is
+       de vraag die opkomt wanneer iemand over zijn loopbaan denkt. Hij heet
+       "Mijn loopbaan" en niet "Mijn prestaties" -- een loopbaan is een reeks in
+       de tijd, prestaties suggereren een lijst van hoogtepunten, en juist dat
+       verschil is wat een ledger van een etalage scheidt. */
+    loopbaan: { naam: T('app.loopbaan', 'Mijn loopbaan'), url: '/apps/loopbaan.html' },
     school:      { naam: 'School',    url: '/apps/rtgschool.html' },
     berichten:   { naam: 'Berichten',     url: '/apps/comm.html' },
     /* EEN app voor alle communicatie (kern/comm + apps/comm.html). Hier
@@ -4534,7 +4541,7 @@ var RTG_BOUW = 'cd2e6bca';
     { sleutel: 'map-werk', naam: 'WorkOS', wereld: '/apps/kantoor.html', glyf: 'office', items: [
       'link:werkos', 'link:rtgone', 'link:decisionroom', 'link:projectroom', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
       'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk',
-      'link:vertegenwoordiging'] },
+      'link:vertegenwoordiging', 'link:loopbaan'] },
     /* Veilig: wie je bent en wie er over je waakt. De vier apps op dezelfde
        kern zijn een app met vier standen geworden (zie de opmerking bij LINKS),
        plus de sleutels waarmee je binnenkomt. Drie is hier geen tekort maar de

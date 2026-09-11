@@ -1,9 +1,10 @@
-/* DE CARRIERELAAG: RTG Vertegenwoordiging, het jeugdbestuur en RTG Rugdekking.
+/* DE CARRIERELAAG: RTG Vertegenwoordiging, het jeugdbestuur, RTG Rugdekking en
+   het carriere ledger.
 
-   ZES REGELS, EN ELF DIE HIER JUIST NIET STAAN. De elf schrijfwegen van deze
-   laag weten het ZELF al -- ze weigeren een herhaling op grond van de toestand
+   TIEN REGELS, EN ZEVENTIEN DIE HIER JUIST NIET STAAN. Die zeventien schrijfwegen
+   weten het ZELF al -- ze weigeren een herhaling op grond van de toestand
    -- en staan daarom in ./idemsleutels-nooit-routes.js, elk met zijn eigen
-   reden.
+   reden (elf in ./idemsleutels-nooit-carriere.js, zes in ./idemsleutels-nooit-ledger.js).
 
    DAT IS EEN CORRECTIE, en de fout hoort hier te blijven staan. Ze stonden
    eerst met `zelfdeVerzoek: true` in dit bestand, en dat deed twee dingen die
@@ -19,12 +20,12 @@
    deze regels erbij kwamen, met een 200 waar een 409 hoorde. Een verklaring die
    het gedrag VERANDERT is geen verklaring.
 
-   Wat hier overblijft zijn de vijf leeswegen en de ene route die met opzet WEL
-   een tweede handeling uitvoert. */
+   Wat hier overblijft zijn de acht leeswegen en de drie routes die met opzet WEL
+   een tweede handeling uitvoeren. */
 'use strict';
 
 const SLEUTELS = {
-  /* Vijf leeswegen: geen van de vijf raakt de opslag. Alle vijf gebruiken
+  /* Acht leeswegen: geen van de acht raakt de opslag. Alle vijf gebruiken
      `kijk()` en niet `bak()`, zodat een blik geen lege rij achterlaat
      (kern/eigencollectie.js). `leest` en niet `zelfdeVerzoek`, om dezelfde
      reden als bij ./idemsleutels-kaarten.js: een tweede vraag hoort het
@@ -36,6 +37,8 @@ const SLEUTELS = {
   'POST /api/rugdekking/lijst': { leest: true },
   'POST /api/rugdekking/mijn': { leest: true },
   'POST /api/office/rugdekking/alle': { leest: true },
+  'POST /api/carriere/ledger/mijn': { leest: true },
+  'POST /api/carriere/ledger/delen': { leest: true },
 
   /* DE ENIGE DIE MET OPZET EEN TWEEDE KEER IETS DOET. Elke aanroep zet een regel
      in het spoor van de client, en dat IS de bedoeling: twee keer namens iemand
@@ -47,7 +50,21 @@ const SLEUTELS = {
      die drie keer iets probeerde wat hij niet mocht, is een gesprek waard. */
   'POST /api/vertegenwoordiging/handel': { nietIdempotent: true,
     waarom: 'elke aanroep is een eigen handeling in het spoor van de client; samenvouwen zou een ' +
-      'tweede handeling laten verdwijnen in de eerste, en ook een geweigerde poging hoort zichtbaar te blijven' }
+      'tweede handeling laten verdwijnen in de eerste, en ook een geweigerde poging hoort zichtbaar te blijven' },
+
+  /* EN TWEE IN HET LEDGER, allebei om een reden die niets met nalatigheid te
+     maken heeft. `deel` SLAAT een geheim: twee oproepen horen twee codes te
+     geven, want een code per ontvanger is de bedoeling -- elk stopt apart -- en
+     hetzelfde geheim nog eens over de lijn sturen is erger dan een tweede rij.
+     `toon` TELT een gebruik, en een teller die niet telt, telt niet: hoe vaak
+     zijn bewijs is geopend, is de enige terugkoppeling die een lid over een
+     uitgegeven code heeft. */
+  'POST /api/carriere/ledger/deel': { nietIdempotent: true,
+    waarom: 'elke aanroep slaat een nieuw geheim van 128 bits dat precies eenmaal wordt teruggegeven; ' +
+      'een code per ontvanger is de bedoeling, want elk stopt apart' },
+  'POST /api/carriere/regel/toon': { nietIdempotent: true,
+    waarom: 'elke aanroep telt een gebruik op de deelcode; het lid hoort te kunnen zien hoe vaak zijn ' +
+      'bewijs is geopend, en dat is de enige terugkoppeling die hij erover heeft' }
 };
 
 module.exports = { SLEUTELS };

@@ -86,5 +86,22 @@ module.exports = [
     uitleg: 'Wat een lid ziet van het programma waarmee RTG achter hem staat: welke soort, welk bedrag, tot ' +
       'wanneer, en wat RTG ervoor terugvraagt. Daaronder staat even groot wat een tegenprestatie NOOIT kan zijn -- ' +
       'een mening, zwijgen, gezondheid, of exclusiviteit die hem afhankelijk maakt.',
-    paden: ['/api/rugdekking'] }
+    paden: ['/api/rugdekking'] },
+
+  /* HET CARRIERE LEDGER (kern/carriereledger/). Ook aan, en hier is de reden
+     scherper dan bij de twee hierboven: dit is de enige plek waar een mens zijn
+     eigen loopbaan BIJHOUDT. Een schakelaar die hem uitzet, sluit iemand af van
+     wat hij zelf heeft opgeschreven -- en van de deelcodes die hij aan derden
+     heeft gegeven, want die blijven werken zolang ze niet verlopen zijn. Wie
+     deze functie ooit wil kunnen sluiten, sluit eerst de codes.
+
+     WAT ER MET OPZET NIET IN STAAT is een cijfer, een niveau of een percentage.
+     CARRIERE.md par. 4.1 wijst de Career Score af en dit ledger in de plaats;
+     scripts/lib/cijferopmens.js handhaaft dat. */
+  { id: 'carriereledger', categorie: 'Eigen apps', naam: 'Mijn loopbaan (het carriere ledger)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De loopbaan van een mens als chronologische reeks: wat er gebeurde, wanneer, en wie dat heeft ' +
+      'bevestigd. Per regel staat erbij wat die bevestiging WEL en NIET zegt -- RTG stelt niets vast over de ' +
+      'prestatie zelf. Een regel is apart te delen met een code die verloopt, zodat een sponsor of een bond ' +
+      'een titel kan nakijken zonder het hele dossier te zien. Er staat nergens een cijfer op de mens.',
+    paden: ['/api/carriere'] }
 ];

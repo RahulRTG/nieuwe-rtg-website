@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-11T16:33:10.462Z",
-    "commit": "ec189cbf",
-    "boomVuil": true,
-    "boomAnders": 8,
+    "op": "2026-09-11T17:25:15.437Z",
+    "commit": "a9d17346",
+    "boomVuil": false,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -4258,6 +4258,13 @@
       "geprobeerd": 1
     },
     "loonstrook-portaal.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "loopbaan.e2e.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",

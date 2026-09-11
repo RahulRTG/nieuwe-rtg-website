@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **214** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **217** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
-| Bedrijfsgenres | **75** in 28 sectoren |
+| Bedrijfsgenres | **78** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2088** |
-| App-pagina's (`public/apps/**.html`) | **304** |
-| Testbestanden | **1807** |
+| Kernmodules (`server/kern/**`) | **2115** |
+| App-pagina's (`public/apps/**.html`) | **308** |
+| Testbestanden | **1823** |
 
 ## De vier werelden
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 214 functieschakelaars
+# 1. De 217 functieschakelaars
 
 ### Leden (RTG-app) — 24
 
@@ -141,7 +141,7 @@ ook blokkeert.
 - **RTG Commerce (mand & retour)** (`commerce`) — De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug. RTG bevestigt hier zelf niets.  
   _voor: rtg, lifestyle, business_
 
-### Eigen apps — 37
+### Eigen apps — 40
 
 - **Spelen (spellen met vrienden)** (`spellen`) — Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.  
   _voor: rtg, lifestyle, business, foundation_
@@ -216,6 +216,12 @@ ook blokkeert.
 - **Kinderopvang (ouderkant)** (`opvangwijzer`) — Welke kinderopvang er is en hoeveel plek daar vrij is, plus een aanvraag klaarzetten en zelf weer intrekken. Een vrije plek is geen plek: inschrijven doet de opvang zelf. De aanwezigheidslijst van een groep komt hier nooit uit; een ouder ziet een getal en niet de namen van andere kinderen.  
   _voor: rtg, lifestyle, business_
 - **Knelpunten (welke weg ligt open)** (`knelpunt`) — Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan. Bewaart niets: alles komt binnen in het verzoek en gaat eruit als antwoord. Er wordt niets gerangschikt en geen beste weg aangewezen.  
+  _voor: rtg, lifestyle, business_
+- **Vertegenwoordiging (wie mag iets namens mij)** (`vertegenwoordiging`) — Machtigingen van mens tot mens: wie mag wat namens een lid, sinds wanneer, tot wanneer, en wat is er namens hem gedaan. Een machtiging versmalt alleen wat het lid zelf al mocht en voegt er nooit iets aan toe; aanvaarden doet het lid zelf en intrekken kan altijd, per direct.  
+  _voor: rtg, lifestyle, business_
+- **Rugdekking (wie staat er achter mij)** (`rugdekking`) — Wat een lid ziet van het programma waarmee RTG achter hem staat: welke soort, welk bedrag, tot wanneer, en wat RTG ervoor terugvraagt. Daaronder staat even groot wat een tegenprestatie NOOIT kan zijn -- een mening, zwijgen, gezondheid, of exclusiviteit die hem afhankelijk maakt.  
+  _voor: rtg, lifestyle, business_
+- **Mijn loopbaan (het carriere ledger)** (`carriereledger`) — De loopbaan van een mens als chronologische reeks: wat er gebeurde, wanneer, en wie dat heeft bevestigd. Per regel staat erbij wat die bevestiging WEL en NIET zegt -- RTG stelt niets vast over de prestatie zelf. Een regel is apart te delen met een code die verloopt, zodat een sponsor of een bond een titel kan nakijken zonder het hele dossier te zien. Er staat nergens een cijfer op de mens.  
   _voor: rtg, lifestyle, business_
 
 ### Partners (leveranciers) — 11
@@ -653,7 +659,7 @@ ze werken; dit is wat hij ziet.
 - **RTF-Bibliotheek** `/apps/foundation/bieb.html` — Gratis kind- en gezinsapps van de RTFoundation.
 - **Geloof & Wijsheid** `/apps/foundation/geloofbieb.html` — De Geloof & Wijsheid-Bibliotheek: alle tradities als gelijken, met echte leesbare teksten.
 
-# 3. De 75 genres in 28 sectoren
+# 3. De 78 genres in 28 sectoren
 
 Er is **één** partner-app en **één** personeels-PDA. Welke schermen een zaak
 krijgt volgt niet uit zijn genre maar uit zijn *genre-caps*: een hotel en een
@@ -670,7 +676,7 @@ is de reden dat er geen 130 losse apps zijn.
 - **events** (5) — Events & festivals (`events`), Activiteiten & musea (`activiteit`), Activiteiten & excursies (`activiteiten`), Kunst & galerie (`galerie`), Weddings & prive-events (`weddingplanner`)
 - **facility** (1) — Kantoorgebouw (RTG Enterprise) (`kantoorgebouw`)
 - **government** (2) — Gemeente & overheid (`gemeente`), Rijksoverheid (`rijk`)
-- **healthcare** (6) — Zorg & welzijn (`zorg`), Zorg aan huis (`care`), Ziekenhuis (`ziekenhuis`), Huisarts (`huisarts`), Medisch specialist (`specialist`), Tandartspraktijk (`tandarts`)
+- **healthcare** (8) — Zorg & welzijn (`zorg`), Zorg aan huis (`care`), Ziekenhuis (`ziekenhuis`), Huisarts (`huisarts`), Medisch specialist (`specialist`), Tandartspraktijk (`tandarts`), Fysiotherapiepraktijk (`fysiotherapie`), Sportgeneeskunde (`sportarts`)
 - **horeca** (6) — Restaurant (`restaurant`), Bar (`bar`), Club (`club`), Beachclub (`beachclub`), Koffie & patisserie (`koffie`), Privéchef & catering (`chef`)
 - **hospitality** (4) — Hotel (`hotel`), Appartement (`apartment`), Villa's & fincas (`villa`), Wintersport & seizoensresort (`wintersport`)
 - **insurance** (1) — Verzekeringen (advies) (`verzekeringen`)
@@ -679,7 +685,7 @@ is de reden dat er geen 130 losse apps zijn.
 - **mobility** (6) — Taxi (`taxi`), Autoverhuur (`verhuur`), Tweewielers & quads (`tweewielers`), Vervoer & transfers (`vervoer`), Openbaar vervoer (`ov`), Vracht & expeditie (`vracht`)
 - **nonprofit** (1) — RTFoundation (`rtfoundation`)
 - **pharmacy** (1) — Apotheek (`apotheek`)
-- **professional** (2) — Professionele diensten (`professioneel`), Zelfstandig professional (`zzp`)
+- **professional** (3) — Professionele diensten (`professioneel`), Zelfstandig professional (`zzp`), Zelfstandig talent (`talentmens`)
 - **realestate** (1) — Vastgoed & makelaar (`vastgoed`)
 - **retail** (3) — Mode & retail (`retail`), Modehuis & atelier (`modehuis`), Juwelier & horloges (`juwelier`)
 - **safety** (7) — Politie (`politie`), Brandweer (`brandweer`), Ambulance (`ambulance`), Marechaussee (`marechaussee`), Defensie (`defensie`), Special Forces (`specials`), Beveiliging & security (`beveiliging`)

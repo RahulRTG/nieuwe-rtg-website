@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-11T08:08:12.188Z",
-    "commit": "d81c4009",
-    "boomVuil": false,
-    "boomAnders": 0,
+    "op": "2026-09-11T20:36:09.937Z",
+    "commit": "dd1ba1c39",
+    "boomVuil": true,
+    "boomAnders": 14,
     "instrument": "scripts/adressen.js",
     "node": "v22.22.2"
   },
@@ -11,9 +11,9 @@
   "uitleg": "Elk gewortelde bestandsadres dat een .md in de wortel noemt, tegen de bronboom gehouden. KLOPT: het bestand staat er. OPGEKNIPT: het is een map geworden, dus de module bestaat en het adres niet. KAPOT: er staat niets, ook geen map.",
   "grens": "Deze meter zegt NIET of een adres naar het juiste bestand wijst -- een pad dat bestaat maar de verkeerde module aanwijst, komt langs als klopt. En hij beoordeelt geen kale bestandsnamen zonder map ervoor: dat is een verkorte verwijzing en geen adres.",
   "graad": "gemeten",
-  "beoordeeld": 3912,
-  "klopt": 3871,
-  "onbeoordeeld": 3476,
+  "beoordeeld": 4039,
+  "klopt": 3998,
+  "onbeoordeeld": 3548,
   "opgeknipt": [
     {
       "doc": "BESTUUR.md",
@@ -23,7 +23,7 @@
     },
     {
       "doc": "FUNCTIES.md",
-      "regel": 703,
+      "regel": 709,
       "pad": "server/accounts.js",
       "nu": "server/accounts/"
     },

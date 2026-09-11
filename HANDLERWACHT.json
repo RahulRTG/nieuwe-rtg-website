@@ -1,17 +1,17 @@
 {
  "stempel": {
-  "op": "2026-09-11T12:46:50.018Z",
-  "commit": "8c589bf1",
-  "boomVuil": false,
-  "boomAnders": 0,
+  "op": "2026-09-11T20:35:34.102Z",
+  "commit": "dd1ba1c39",
+  "boomVuil": true,
+  "boomAnders": 8,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 622,
+  "zonderBewakerslaag": 623,
   "bewaakt": 533,
-  "openbaarMetReden": 50,
+  "openbaarMetReden": 51,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
   "zonderWachtMetReden": 8,
@@ -986,6 +986,12 @@
    "sleutel": "POST /api/book",
    "bestand": "server/routes/member/partnerkanaal.js:20",
    "staat": "sleutelDoorgegeven"
+  },
+  {
+   "sleutel": "POST /api/carriere/regel/toon",
+   "bestand": "server/routes/carriereledger.js:83",
+   "staat": "openbaar",
+   "reden": "een deelbewijs wordt getoond aan iemand zonder RTG-account; de deelcode is de sleutel, verloopt en is te stoppen"
   },
   {
    "sleutel": "POST /api/claims",
@@ -4006,7 +4012,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1406",
+   "bestand": "server/server.js:1446",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

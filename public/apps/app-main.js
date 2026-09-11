@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '6b4b92bc';
+var RTG_BOUW = '5ba360c4';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4450,6 +4450,11 @@ var RTG_BOUW = '6b4b92bc';
        geinstalleerde PWA komt nog steeds uit waar hij hoort. */
     ik:          { naam: 'Wie ben ik',   url: '/apps/ik.html' },
     veilig:      { naam: 'RTG Veilig',   url: '/apps/veilig.html' },
+    /* Naast "Wie ben ik" en niet erin: dat scherm TOONT wie je bent, dit is de
+       weg om het aan te tonen. RTG iD zei tot nu toe "deze dienst vraagt niveau
+       A3 en u staat op A1" zonder ergens heen te wijzen; zonder deze tegel kan
+       een lid zijn niveau nergens verhogen en blijft elke A3-functie dicht. */
+    verificatie: { naam: T('app.verificatie', 'Identiteit aantonen'), url: '/apps/verificatie.html' },
     /* ACCOUNTbescherming en niet "Bescherming": `veilig` hierboven is de
        veiligheid van een MENS (stil alarm, codewoord), dit die van een ACCOUNT.
        Twee tegels die allebei "bescherming" heten, laten een lid op het
@@ -4527,6 +4532,20 @@ var RTG_BOUW = '6b4b92bc';
     reizen:      { naam: 'Reizen & Veilig', url: '/apps/reizen-veilig.html' },
     vluchten:    { naam: 'Vluchten',      url: '/apps/vluchten.html' },
     sport:       { naam: 'Sport',         url: '/apps/sport.html' },
+    /* RTG Vertegenwoordiging: wie mag wat namens mij. Hij heet "Mijn team" en
+       niet "Machtigingen", omdat een mens zijn zaakwaarnemer, boekhouder en
+       coach als MENSEN ziet en niet als rechten; het scherm toont de rechten
+       wel, per persoon. In WorkOS en niet in LivingOS: de vraag "wie handelt
+       namens mij" komt op wanneer iemand over zijn werk denkt (WERELDEN.md:
+       in welke context denkt de mens dat hij zich bevindt). */
+    vertegenwoordiging: { naam: T('app.vertegenwoordiging', 'Mijn team'), url: '/apps/vertegenwoordiging.html' },
+    /* Het carriere ledger: wat deze mens heeft gedaan, chronologisch en per
+       regel bewijsbaar. Naast "Mijn team" en om dezelfde reden in WorkOS: het is
+       de vraag die opkomt wanneer iemand over zijn loopbaan denkt. Hij heet
+       "Mijn loopbaan" en niet "Mijn prestaties" -- een loopbaan is een reeks in
+       de tijd, prestaties suggereren een lijst van hoogtepunten, en juist dat
+       verschil is wat een ledger van een etalage scheidt. */
+    loopbaan: { naam: T('app.loopbaan', 'Mijn loopbaan'), url: '/apps/loopbaan.html' },
     school:      { naam: 'School',    url: '/apps/rtgschool.html' },
     berichten:   { naam: 'Berichten',     url: '/apps/comm.html' },
     /* EEN app voor alle communicatie (kern/comm + apps/comm.html). Hier
@@ -4711,7 +4730,7 @@ var RTG_BOUW = '6b4b92bc';
        in de voet. Vandaar `paneel`: geen vijfde wereldtegel, geen tweede
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
-      'link:ik', 'link:veilig', 'link:passkeys', 'link:bescherming',
+      'link:ik', 'link:verificatie', 'link:veilig', 'link:passkeys', 'link:bescherming',
       'link:sessies', 'link:relaties', 'link:gegevens', 'link:post', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in
@@ -4724,19 +4743,8 @@ var RTG_BOUW = '6b4b92bc';
        Het huis houdt zijn eigen naam: RTG Kantoor is een merk in WorkOS. */
     { sleutel: 'map-werk', naam: 'WorkOS', wereld: '/apps/kantoor.html', glyf: 'office', items: [
       'link:werkos', 'link:rtgone', 'link:decisionroom', 'link:projectroom', 'link:rtmail', 'link:magnaat', 'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
-      'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk'] },
-    /* TRAVELOS IS DE KLEINSTE WERELD EN DAT IS GEEN ARGUMENT TEGEN HEM: een
-       wereld is geen categorie in een spreadsheet maar een bestemming in het
-       hoofd van een mens, en deze bezit de hele keten van vertrekken tot
-       thuiskomen (WERELDEN.md). Deze elf stonden in LivingOS en zijn er
-       letterlijk uit geknipt; geen item is nieuw, geen item is verdwenen.
-       Het huis bestond al en hing nergens aan: /apps/reizen.html. */
-    { sleutel: 'map-reizen', naam: 'TravelOS', wereld: '/apps/reizen.html', glyf: 'reizen', items: [
-      'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie', 'link:move',
-      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie',
-    /* Drie uit de tikkenmeting: aankomst, routedossier en OV-routes hingen
-       nergens aan. Ze horen hier, want wie ze opent is onderweg. */
-      'link:aankomst', 'link:routedossier', 'link:ovroutes'] },
+      'link:browser', 'link:sitemaker', 'link:horeca', 'link:partnernetwerk',
+      'link:vertegenwoordiging', 'link:loopbaan'] },
     /* Veilig: wie je bent en wie er over je waakt. De vier apps op dezelfde
        kern zijn een app met vier standen geworden (zie de opmerking bij LINKS),
        plus de sleutels waarmee je binnenkomt. Drie is hier geen tekort maar de
@@ -4757,11 +4765,34 @@ var RTG_BOUW = '6b4b92bc';
        naast Wie ben ik en Passkeys, en het gaat over jouw voorwaarden en jouw
        akkoorden -- wie je bent, niet waar je werkt. Werk houdt zes tegels. */
   /* Afgesplitst van app-main-24a2.js, dat over de 10 KB ging (keuringsregel 13).
-     De snede loopt langs een echte grens: hierboven de drie werelden waarin een
-     lid leeft, werkt en reist, hier FoundationOS -- de wereld die als laatste
-     bijkwam. De MAPPEN-array loopt door over de snede heen; dat is geen
-     uitzondering maar hoe deze bundel werkt (scripts/bundel.js plakt de delen
-     eerst aaneen, en scripts/lib/wereldregister.js leest ze zo ook). */
+     De MAPPEN-array loopt door over de snede heen; dat is geen uitzondering maar
+     hoe deze bundel werkt (scripts/bundel.js plakt de delen eerst aaneen, en
+     scripts/lib/wereldregister.js leest ze zo ook).
+
+     DE SNEDE IS OP 11 SEPTEMBER 2026 EEN WERELD OPGESCHOVEN, en de oude
+     beschrijving stond hier nog: 'hierboven de drie werelden waarin een lid
+     leeft, werkt en reist'. Dat klopte niet meer toen 24a2 opnieuw over de
+     grens ging. Nu staat hierboven waar een lid LEEFT en WERKT (plus zijn
+     instellingen, die geen wereld is) en hier waar hij HEEN GAAT en wat hij
+     BIJDRAAGT.
+
+     De volgorde van de array is met opzet niet aangeraakt: dit deel wordt
+     direct achter 24a2 geplakt, dus TravelOS staat nog steeds tussen WorkOS en
+     FoundationOS. Een snede mag de bundel niet herschikken -- dat zou de
+     volgorde van de werelden in de bank veranderen zonder dat iemand daarom
+     vroeg. */
+    /* TRAVELOS IS DE KLEINSTE WERELD EN DAT IS GEEN ARGUMENT TEGEN HEM: een
+       wereld is geen categorie in een spreadsheet maar een bestemming in het
+       hoofd van een mens, en deze bezit de hele keten van vertrekken tot
+       thuiskomen (WERELDEN.md). Deze elf stonden in LivingOS en zijn er
+       letterlijk uit geknipt; geen item is nieuw, geen item is verdwenen.
+       Het huis bestond al en hing nergens aan: /apps/reizen.html. */
+    { sleutel: 'map-reizen', naam: 'TravelOS', wereld: '/apps/reizen.html', glyf: 'reizen', items: [
+      'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie', 'link:move',
+      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie',
+    /* Drie uit de tikkenmeting: aankomst, routedossier en OV-routes hingen
+       nergens aan. Ze horen hier, want wie ze opent is onderweg. */
+      'link:aankomst', 'link:routedossier', 'link:ovroutes'] },
     /* De zelfstandige Foundation-wereld. De stichting stond als EEN tegel binnen Het Huis
        ('os:rtf'), terwijl ze zeventien onderdelen, een eigen service worker en
        een eigen huis heeft. Een wereld die als tegel in een andere wereld

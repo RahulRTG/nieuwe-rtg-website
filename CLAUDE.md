@@ -370,6 +370,44 @@ afdwingen wat nooit in de schaduw heeft gelopen (`schaduw.js`).
 per capability of er ergens een caller is, en hij vond er vijf die er geen
 hadden. Draai hem vóór je een capability toevoegt. Paragraaf 6.1 is de eerlijke
 lijst van wat er nog openstaat.
+**`AFSPRAAK.md` is de laag die die vier aan elkaar knoopt** — RTG Agreement
+Fabric, als richtingsdocument met per onderdeel of het **staat**, **een stap weg**
+is, **een besluit vraagt** of **jaren weg** is. Lees die vóór je iets bouwt
+waarmee iemand met of via RTG een afspraak maakt: een abonnement, een akkoord op
+voorwaarden, een betaalmandaat, een ondertekening. De kernregel: *domeinen houden
+hun eigen betekenis; RTG deelt alleen bewijs, identiteit, levenscyclus, rechten en
+opvolging.* De eerste opdracht is daarom **bedraden en niet bouwen**, en dat volgt
+uit één gemeten getal: `kern/commercie/contract.js` ÍS een volwaardige
+overeenkomstmotor (acht standen, een expliciete overgangstabel, een bevroren
+prijs, dertien toetsen) en er zijn **0** lezers van die stand buiten de module
+zelf — de pas van een lid hangt aan `sess.tier`, die één aanroeper heeft
+(`accounts.setTier`, het menselijke besluit) en daarna nooit meer beweegt. Een
+opgezegd contract laat de pas dus staan. Drie dingen die het voorstel corrigeren
+en die je nergens anders moet herhalen: **het woord `envelop` is bezet**
+(`kern/envelop.js` is de GEBEURTENISenvelop en zegt met opzet nooit WAT — een
+tweede die juist wél over prijs en voorwaarden gaat, is de `VERMOGENS`-botsing op
+de centrale naam van de laag), er komt **geen zesde uitkomst- of zekerheidsladder**
+(`GEZAGSNOEMER.json` heeft 5 schalen en 21 treden op 4 noemertreden,
+`CONTROLPLANE.md` acht uitkomsten, en `kern/identiteit/vertrouwen.js` vijf
+assurance-standen met de regel *een conclusie is nooit harder dan haar zachtste
+premisse* — dus geen L1–L4), en er hoeft **geen transparency log gebouwd** te
+worden: `lib/keten.js` plus `lib/keten-anker.js` staan en zijn beproefd, en wat
+ontbreekt is een BESLUIT — een anker in dezelfde database is geen anker. Par. 3 is
+de scherpste meting: **31 tekenwegen** (lexicaal, dus een ONDERgrens) waarvan
+**1** een cryptografisch bewijs vastlegt, en het risico is niet het aantal maar
+dat de andere dertig hun eigen definitie van "getekend" mogen hebben. Par. 7.1 is
+het gat dat niemand zag: het **akkoord met de voorwaarden staat in geen van beide
+lijsten** van `consent-register.js` — niet als gedekte laag en niet als
+verklaarde uitzondering — want `test/consent-dekking.test.js` kent één vorm
+(`{ key, status: 'actief' }`) en de onderteken-rij heeft een andere. Acht grenzen,
+waarvan de twee scherpste: **de prijs van het product en de prijs van de
+verplichting zijn twee dingen** en alleen het eerste beweegt (die fout is op 11
+september uit `kern/lid/facturen.js` gehaald: het lid las 99 op een factuur van
+65 die hij zelf had getekend), en **rechten hangen per capability en nooit per
+account** — na opzegging blijven facturen en bewijsstukken, want account-breed
+afsluiten maakt van een opzegging een straf. Let op twee namen die al bezet zijn
+vóór je een scherm bouwt: *Mijn afspraken* betekent in de leden-app al BOEKINGEN,
+en `mandaat` en `machtiging` dragen allebei al een andere betekenis.
 **`KANTOORMACHT.md` is de kantoorkant daarvan** — niet wat een LID mag (dat is
 CONTROLPLANE.md) maar wat een MEDEWERKER van RTG mag, en tot waar zijn macht
 reikt. Lees die vóór je een kantoorscherm, een backofficeroute of een

@@ -55,6 +55,25 @@
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--rtg-leesgoud,#E7A8B8);border-bottom:1px solid var(--gold);}
+  /* De nazorg (wijzigen, afzeggen) en "mijn aanvragen": eigen klassen in plaats
+     van style="..." -- elk van die attributen houdt style-src-attr in de CSP
+     open, en NORM.json telt ze (inlineStijlAttributen). */
+  .nazorg{display:block;margin-top:.6rem;padding:.7rem;border:1px solid var(--line);}
+  .nazorg .lbl-blok{display:block;margin-bottom:.3rem;}
+  .nazorg .lbl-afzeg{display:block;margin:.6rem 0 .3rem;}
+  .nazorg .veld-blok{width:100%;padding:.4rem;margin-bottom:.5rem;}
+  .nazorg .veld-blok.ruim{margin-bottom:.6rem;}
+  .nazorg .toelichting{display:block;margin-top:.6rem;}
+  .knop.klein{width:auto;margin:0;padding:.45rem .8rem;}
+  .knop.stil{width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);flex:none;}
+  .knop.stil.zacht{color:var(--soft);}
+  .mijn-kop{font-size:1.1rem;margin:2rem 0 .8rem;border-top:1px solid var(--line);padding-top:1.4rem;}
+  .reis.aanvraag{cursor:default;flex-direction:column;align-items:stretch;gap:.4rem;}
+  .aanvraag-rij{display:flex;justify-content:space-between;align-items:center;gap:1rem;}
+  .aanvraag-rij h3{font-size:1rem;}
+  .stand-bevestigd{color:var(--green);}
+  .stand-afgewezen,.stand-afgezegd{color:var(--burgundy);}
+  .stand-wijziging-gevraagd{color:var(--gold,#857007);}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 <link href="/shared/travel-os.css" rel="stylesheet">
@@ -169,8 +188,10 @@ async function laad(){
    AFZEGGEN VRAAGT EEN REDEN EN GEEN "WEET U HET ZEKER". Het veld IS de rem: wie
    een reden typt, heeft nagedacht. Twintig bevestigingsvragen leren mensen op ja
    drukken (GRAMMATICA.md). */
-const STAND_KLEUR = { bevestigd: 'var(--green)', afgewezen: 'var(--burgundy)',
-  afgezegd: 'var(--burgundy)', 'wijziging-gevraagd': 'var(--gold,#857007)' };
+/* De kleur van een stand is een KLASSE (zie de stylesheet): een style-attribuut
+   met de kleur erin zou style-src-attr in de CSP openhouden. */
+const STAND_KLAS = { bevestigd: 'stand-bevestigd', afgewezen: 'stand-afgewezen',
+  afgezegd: 'stand-afgezegd', 'wijziging-gevraagd': 'stand-wijziging-gevraagd' };
 const STAND_WOORD = { 'wijziging-gevraagd': 'wijziging gevraagd' };
 let openPaneel = null;   // ref waarvan het paneel openstaat, zodat het na een herlading openblijft
 
@@ -185,21 +206,21 @@ function wijzigingRegel(a){
 
 function paneelHtml(a){
   if (openPaneel !== a.ref) return '';
-  return '<div class="tag" style="display:block;margin-top:.6rem;padding:.7rem;border:1px solid var(--line);">'+
+  return '<div class="tag nazorg">'+
     (a.status === 'bevestigd'
-      ? '<label class="meta" style="display:block;margin-bottom:.3rem;">Andere vertrekdatum</label>'+
-        '<input type="date" id="wDatum" value="'+esc(a.vertrek||'')+'" style="width:100%;padding:.4rem;margin-bottom:.5rem;">'+
-        '<label class="meta" style="display:block;margin-bottom:.3rem;">Aantal personen</label>'+
-        '<input type="number" id="wPers" min="1" max="20" value="'+esc(a.personen)+'" style="width:100%;padding:.4rem;margin-bottom:.5rem;">'+
-        '<label class="meta" style="display:block;margin-bottom:.3rem;">Of vertel wat u anders wilt</label>'+
-        '<input type="text" id="wTekst" maxlength="300" placeholder="Bijvoorbeeld: een kamer met uitzicht" style="width:100%;padding:.4rem;margin-bottom:.6rem;">'+
-        '<button class="knop" data-doe="wijzig" data-ref="'+esc(a.ref)+'" style="width:auto;margin:0;padding:.45rem .8rem;">Vraag deze wijziging</button> '
+      ? '<label class="meta lbl-blok">Andere vertrekdatum</label>'+
+        '<input type="date" id="wDatum" value="'+esc(a.vertrek||'')+'" class="veld-blok">'+
+        '<label class="meta lbl-blok">Aantal personen</label>'+
+        '<input type="number" id="wPers" min="1" max="20" value="'+esc(a.personen)+'" class="veld-blok">'+
+        '<label class="meta lbl-blok">Of vertel wat u anders wilt</label>'+
+        '<input type="text" id="wTekst" maxlength="300" placeholder="Bijvoorbeeld: een kamer met uitzicht" class="veld-blok ruim">'+
+        '<button class="knop klein" data-doe="wijzig" data-ref="'+esc(a.ref)+'">Vraag deze wijziging</button> '
       : '')+
-    '<label class="meta" style="display:block;margin:.6rem 0 .3rem;">Afzeggen? Vertel kort waarom; de reisadviseur leest het.</label>'+
-    '<input type="text" id="aReden" maxlength="300" placeholder="Reden" style="width:100%;padding:.4rem;margin-bottom:.6rem;">'+
-    '<button class="knop" data-doe="afzeg" data-ref="'+esc(a.ref)+'" style="width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);">Zeg deze reis af</button> '+
-    '<button class="knop" data-doe="dicht" style="width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--soft);">Laat maar</button>'+
-    '<span class="meta" style="display:block;margin-top:.6rem;">Een afzegging verplaatst geen geld. Loopt er een betaling, dan handelt een medewerker die met u af.</span>'+
+    '<label class="meta lbl-afzeg">Afzeggen? Vertel kort waarom; de reisadviseur leest het.</label>'+
+    '<input type="text" id="aReden" maxlength="300" placeholder="Reden" class="veld-blok ruim">'+
+    '<button class="knop stil" data-doe="afzeg" data-ref="'+esc(a.ref)+'">Zeg deze reis af</button> '+
+    '<button class="knop stil zacht" data-doe="dicht">Laat maar</button>'+
+    '<span class="meta toelichting">Een afzegging verplaatst geen geld. Loopt er een betaling, dan handelt een medewerker die met u af.</span>'+
   '</div>';
 }
 
@@ -207,15 +228,15 @@ async function laadMijn(){
   let d; try { d = await api('/api/reisbureau/mijn'); } catch(e){ return; }
   const rijen = (d.aanvragen||[]).slice(0, 8);
   if (!rijen.length){ $('#mijnWrap').innerHTML = ''; return; }
-  $('#mijnWrap').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.1rem;margin:2rem 0 .8rem;border-top:1px solid var(--line);padding-top:1.4rem;">Mijn aanvragen</h2>'+
-    rijen.map(a => '<div class="reis" style="cursor:default;flex-direction:column;align-items:stretch;gap:.4rem;">'+
-      '<div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;">'+
-        '<div><h3 style="font-size:1rem;">'+esc(a.titel)+'</h3><span class="meta">'+esc(a.bestemming)+' · '+esc(a.personen)+' pers'+
-        (a.vertrek ? ' · '+esc(a.vertrek) : '')+' · <span style="color:'+(STAND_KLEUR[a.status]||'var(--soft)')+';">'+esc(STAND_WOORD[a.status]||a.status)+'</span></span></div>'+
+  $('#mijnWrap').innerHTML = '<h2 class="mijn-kop">Mijn aanvragen</h2>'+
+    rijen.map(a => '<div class="reis aanvraag">'+
+      '<div class="aanvraag-rij">'+
+        '<div><h3>'+esc(a.titel)+'</h3><span class="meta">'+esc(a.bestemming)+' · '+esc(a.personen)+' pers'+
+        (a.vertrek ? ' · '+esc(a.vertrek) : '')+' · <span class="'+(STAND_KLAS[a.status]||'')+'">'+esc(STAND_WOORD[a.status]||a.status)+'</span></span></div>'+
         (a.status === 'aangevraagd'
-          ? '<button class="knop" data-doe="intrek" data-ref="'+esc(a.ref)+'" style="width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);flex:none;">Intrekken</button>'
+          ? '<button class="knop stil" data-doe="intrek" data-ref="'+esc(a.ref)+'">Intrekken</button>'
           : (a.status === 'bevestigd' || a.status === 'wijziging-gevraagd')
-            ? '<button class="knop" data-doe="open" data-ref="'+esc(a.ref)+'" style="width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);flex:none;">Wijzigen of afzeggen</button>'
+            ? '<button class="knop stil" data-doe="open" data-ref="'+esc(a.ref)+'">Wijzigen of afzeggen</button>'
             : '')+
       '</div>'+
       (a.besluit && a.besluit.bericht ? '<span class="tag">'+esc(a.besluit.bericht)+'</span>' : '')+

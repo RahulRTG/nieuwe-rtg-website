@@ -1,5 +1,14 @@
 {
+  "stempel": {
+    "op": "2026-09-11T14:25:09.470Z",
+    "commit": "e4d0d449",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/carrierevorm.js",
+    "node": "v22.22.2"
+  },
   "uitleg": "Gemeten met scripts/carrierevorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in CARRIERE.md par. 0. Dit meet of de talentdomeinen een DATAVORM delen; of zij een PROCES delen is een andere vraag, waarvoor de ketenproef de vorm is.",
+  "grens": "Wat deze meter NIET aantoont: dat de talentdomeinen geen gedeelde LUS hebben -- hij kijkt naar bewaarde VORMEN (velden van objectliteralen) en niet naar werkwoorden, volgorde of uitkomst. Een nul hier zegt dus dat er geen gedeeld OBJECT is, niet dat er geen gedeeld PROCES is; die tweede vraag beantwoordt een ketenproef (scripts/ketenvorm.js). Hij zegt ook niets over de vraag of een domein TERECHT in de lijst staat: DOMEINEN is met opzet ruim, en een domein dat er ten onrechte bij staat verlaagt hooguit de gedeeldheid. En hij leest alleen wat er in de bron STAAT -- een veld dat pas bij runtime ontstaat, ziet hij niet.",
   "vastgelegd": "2026-09-11",
   "gemeten": {
     "vormen": 162,

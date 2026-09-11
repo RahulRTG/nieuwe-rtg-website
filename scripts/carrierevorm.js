@@ -40,6 +40,10 @@
 const fs = require('fs');
 const path = require('path');
 const om = require('./objectmodel.js');
+/* Een register zonder tijdstempel is niet na te lopen: verouderd ziet er dan
+   identiek uit aan vers. scripts/meetkeuring.js telt precies dat, en dit
+   bestand stond er zelf op. */
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 
@@ -101,10 +105,15 @@ module.exports = { meet, DOMEINEN };
 if (require.main === module) {
   const r = meet();
   const g = r.gemeten;
-  if (process.argv.includes('--json')) { console.log(JSON.stringify(r)); process.exit(0); }
+  /* GEEN process.exit() NA GROTE UITVOER. Node sluit dan af terwijl de pipe nog
+     leegloopt: geldige tekst, kapotte JSON, exitcode 0. Dat is een van de vier
+     fouten waar scripts/meetkeuring.js voor bestaat, en dit bestand maakte hem. */
+  if (process.argv.includes('--json')) { console.log(JSON.stringify(r)); process.exitCode = 0; return; }
   if (process.argv.includes('--vastleggen')) {
     fs.writeFileSync(path.join(WORTEL, 'CARRIEREVORM.json'), JSON.stringify(Object.assign({
+      stempel: stempel({ instrument: 'scripts/carrierevorm.js' }),
       uitleg: 'Gemeten met scripts/carrierevorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in CARRIERE.md par. 0. Dit meet of de talentdomeinen een DATAVORM delen; of zij een PROCES delen is een andere vraag, waarvoor de ketenproef de vorm is.',
+      grens: 'Wat deze meter NIET aantoont: dat de talentdomeinen geen gedeelde LUS hebben -- hij kijkt naar bewaarde VORMEN (velden van objectliteralen) en niet naar werkwoorden, volgorde of uitkomst. Een nul hier zegt dus dat er geen gedeeld OBJECT is, niet dat er geen gedeeld PROCES is; die tweede vraag beantwoordt een ketenproef (scripts/ketenvorm.js). Hij zegt ook niets over de vraag of een domein TERECHT in de lijst staat: DOMEINEN is met opzet ruim, en een domein dat er ten onrechte bij staat verlaagt hooguit de gedeeldheid. En hij leest alleen wat er in de bron STAAT -- een veld dat pas bij runtime ontstaat, ziet hij niet.',
       vastgelegd: new Date().toISOString().slice(0, 10)
     }, r), null, 2) + '\n');
     console.log('CARRIEREVORM.json geschreven.');

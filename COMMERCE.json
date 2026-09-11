@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-11",
   "gemeten": {
-    "bestanden": 2169,
-    "domeinenTotaal": 598,
-    "koopbareVormen": 530,
-    "koopbareDomeinen": 112,
+    "bestanden": 2174,
+    "domeinenTotaal": 599,
+    "koopbareVormen": 532,
+    "koopbareDomeinen": 113,
     "envelopDrempel": 7,
     "envelop": 46,
-    "veldenDomeineigen": 729,
-    "veldenNietEnvelop": 945,
+    "veldenDomeineigen": 732,
+    "veldenNietEnvelop": 949,
     "gelijkendeVormparen": 8,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
@@ -73,11 +73,11 @@
     "zaak"
   ],
   "perWerkwoord": {
-    "toon": 86,
+    "toon": 87,
     "prijs": 36,
     "beschikbaarheid": 51,
     "reserveer": 28,
-    "bevestig": 52,
+    "bevestig": 53,
     "lever": 20,
     "annuleer": 29,
     "retour": 7
@@ -1426,6 +1426,24 @@
       "bewijs": {
         "toon": "alsLijst",
         "bevestig": "logboek"
+      },
+      "telt": 2
+    },
+    {
+      "domein": "kern/rugdekking",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": false,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "lijst",
+        "bevestig": "boek"
       },
       "telt": 2
     },

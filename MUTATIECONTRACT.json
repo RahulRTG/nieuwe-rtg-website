@@ -1,28 +1,28 @@
 {
  "stempel": {
-  "op": "2026-09-11T11:09:13.497Z",
-  "commit": "d2846d06",
-  "boomVuil": true,
-  "boomAnders": 1,
+  "op": "2026-09-11T11:57:49.450Z",
+  "commit": "adc297b3",
+  "boomVuil": false,
+  "boomAnders": 6,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4894,
-  "geclassificeerd": 4893,
+  "totaal": 4900,
+  "geclassificeerd": 4899,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3251,
-   "NOT_APPLICABLE": 1136,
-   "PROTECTED": 384,
+   "NOT_APPLICABLE": 1139,
+   "PROTECTED": 387,
    "INTENTIONALLY_NON_IDEMPOTENT": 122,
    "LEGACY_PENDING_CLASSIFICATION": 1
   },
-  "vastgesteldDoorMens": 1686,
+  "vastgesteldDoorMens": 1692,
   "afgeleidDoorScript": 3207,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4034,
+   "AUTHENTICATED": 4040,
    "PUBLIC": 122,
    "OBJECT_SCOPED": 718,
    "(niet af te leiden -- vraagt een verklaring)": 4,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 88,
    "kale ronde: geen uitspraak": 4512,
-   "niet gemeten": 165
+   "niet gemeten": 171
   },
   "voorstellen": {},
   "metingVan": "2026-09-03T11:51:23.232Z"
@@ -63241,6 +63241,90 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "rugdekking.alle",
+   "route": "POST /api/office/rugdekking/alle",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rugdekking.beursStandZet",
+   "route": "POST /api/office/rugdekking/beurs",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rugdekking.stel",
+   "route": "POST /api/office/rugdekking/stel",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rugdekking.stop",
+   "route": "POST /api/office/rugdekking/stop",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "office.salon-naleving",
    "route": "POST /api/office/salon-naleving",
    "semantiek": {
@@ -89414,6 +89498,48 @@
     "grond": null,
     "hindernis": null
    },
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rugdekking.lijst",
+   "route": "POST /api/rugdekking/lijst",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "rugdekking.mijn",
+   "route": "POST /api/rugdekking/mijn",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
    "stand": "NOT_APPLICABLE",
    "herkomst": "mens",
    "voorstel": null,

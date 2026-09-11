@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1805 bestanden en 12694 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1806 bestanden en 12709 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1805 |
-| losse beweringen (`test(...)`) | 12694 |
+| toetsbestanden | 1806 |
+| losse beweringen (`test(...)`) | 12709 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1185 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 66 |
 | alleen in de kop *genoemd*, nog niet gemeten | 152 |
-| niets van beide | 402 |
+| niets van beide | 403 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1592 bestanden, 12328 beweringen.
+1593 bestanden, 12343 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1190,6 +1190,7 @@ toets omvalt.
 | `rtmail-werk.test.js` | 11 | gezakt op `liegpoort /api/` | RTG Mail x RTG Werk OS: het gedeelde postvak met een dossier, en de brug van een BERICHT naar een taak, ticket of kans. Dit is de bewering die het hele idee draagt -- "e-mail is geen los eiland" -- en dus wordt hij... |
 | `rtmail-zaak.test.js` | 5 | gezakt op `liegpoort /api/` | RTMAIL AAN DE ZAAKKANT -- de tweede deur, die nooit was opengedaan. WAAROM DIT BESTAND ER IS. |
 | `rtmail.test.js` | 13 | gezakt op `===->!==#0` | RTMAIL: het interne postsysteem (de rail voor de automatiseringen). Unit-test op de motor met een nep-db, zodat we send/postvak/ongelezen/lees los kunnen bewijzen zonder de server te starten. |
+| `rugdekking.e2e.test.js` | 15 | -- | RUGDEKKING OVER HTTP -- staat RTG achter een mens, of koopt het iets van hem? Dit is de vork uit RUGDEKKING.md par. |
 | `runtime-release-stempel.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rust-migraties.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rust-noodstop.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

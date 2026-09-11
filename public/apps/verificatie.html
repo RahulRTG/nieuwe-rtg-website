@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="nl" data-rtg-thema="onyx">
+<head>
+<script src="/shared/id.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Laten zien wie u bent</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:5;background:var(--bg);padding:calc(env(safe-area-inset-top) + 1rem) 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--rtg-leesgoud,var(--gold));}
+  header h1{font-size:1.5rem;margin-top:.15rem;}
+  main{padding:1.1rem;max-width:680px;margin:0 auto;}
+  section{margin-bottom:2.2rem;}
+  section > h2{font-size:1.12rem;margin-bottom:.2rem;}
+  .uitleg{font-size:.85rem;color:var(--muted);line-height:1.6;margin-bottom:.9rem;}
+  .kaart{border:1px solid var(--line);padding:.95rem 1.05rem;margin-bottom:.7rem;background:var(--card);}
+  .stand{display:inline-block;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;padding:.12rem .5rem;border:1px solid var(--line);color:var(--muted);}
+  .stand.verified{border-color:var(--rtg-leesgroen,var(--green));color:var(--rtg-leesgroen,var(--green));}
+  .stand.pending{border-color:var(--gold);color:var(--rtg-leesgoud,var(--gold));}
+  .stand.rejected{border-color:var(--burgundy);color:var(--burgundy);}
+  .standtekst{margin:.55rem 0 0;}
+  .stap{border:1px solid var(--line);padding:.95rem 1.05rem;margin-bottom:.7rem;background:var(--card);}
+  .stap h3{font-size:1rem;}
+  .stap .nr{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--soft);}
+  .stap .klaar{color:var(--rtg-leesgroen,var(--green));font-size:.78rem;margin-top:.35rem;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.8rem;align-items:center;}
+  .knop{background:var(--gold);color:#000;border:none;font:inherit;font-weight:600;font-size:.84rem;padding:.55rem 1.1rem;cursor:pointer;min-height:2.5rem;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:400;}
+  .knop[disabled]{opacity:.55;cursor:default;}
+  input[type=file]{display:none;}
+  ul.lijst{list-style:none;margin:.6rem 0 0;}
+  ul.lijst li{padding:.42rem 0;border-top:1px solid var(--line);font-size:.85rem;line-height:1.55;}
+  ul.lijst li b{font-weight:600;}
+  .nee li b{color:var(--burgundy);}
+  .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.2rem;background:var(--card);border:1px solid var(--line);
+    padding:.6rem 1rem;font-size:.84rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90vw;text-align:center;}
+</style>
+</head>
+<body class="rtg-stijl" data-rtg-world="living" data-rtg-eigenvlak="onyx" data-rtg-skin="heritage">
+
+<header>
+  <div class="ey">Identiteit</div>
+  <h1>Laten zien wie u bent</h1>
+</header>
+
+<main>
+  <section aria-labelledby="kopStand">
+    <h2 id="kopStand">Waar u nu staat</h2>
+    <div class="kaart" id="stand">Bezig met ophalen…</div>
+  </section>
+
+  <section aria-labelledby="kopStappen">
+    <h2 id="kopStappen">Twee stappen</h2>
+    <p class="uitleg">Een foto van uw identiteitsbewijs en een selfie. Een medewerker
+      van RTG legt die twee naast elkaar en tekent af dat hij ze heeft gezien.</p>
+
+    <div class="stap">
+      <div class="nr">Stap 1</div>
+      <h3>Uw identiteitsbewijs</h3>
+      <p class="uitleg">De voorkant van uw paspoort, identiteitskaart of rijbewijs.
+        JPG, PNG of WebP, tot 5 MB.</p>
+      <div class="rij">
+        <button class="knop" id="kiesDoc" type="button">Foto kiezen</button>
+        <span id="docKlaar" class="klaar" hidden>Verstuurd.</span>
+      </div>
+      <input type="file" id="doc" accept="image/png,image/jpeg,image/webp" capture="environment">
+    </div>
+
+    <div class="stap">
+      <div class="nr">Stap 2</div>
+      <h3>Een selfie</h3>
+      <p class="uitleg">Zodat RTG kan zien dat het document bij u hoort.</p>
+      <div class="rij">
+        <button class="knop" id="kiesSelfie" type="button">Selfie kiezen</button>
+        <span id="selfieKlaar" class="klaar" hidden>Verstuurd.</span>
+      </div>
+      <input type="file" id="selfie" accept="image/png,image/jpeg,image/webp" capture="user">
+    </div>
+  </section>
+
+  <section aria-labelledby="kopWat">
+    <h2 id="kopWat">Wat RTG hiermee doet</h2>
+    <ul class="lijst">
+      <li><b>Een mens kijkt ernaar.</b> Geen model en geen automatische goedkeuring.</li>
+      <li><b>De foto's blijven hier.</b> Versleuteld op schijf, en ze verlaten RTG niet.</li>
+      <li><b>Ze worden gewist.</b> Een jaar na de goedkeuring haalt de bewaarveger
+        de scan en de selfie weg. Bij een afwijzing gaan ze meteen weg.</li>
+      <li><b>Uw geboortedatum komt van het document.</b> De keurder neemt hem over.
+        Gebeurt dat niet, dan blijft staan wat u zelf opgaf -- en dat verschil is
+        zichtbaar in RTG iD.</li>
+    </ul>
+  </section>
+
+  <section aria-labelledby="kopNiet">
+    <h2 id="kopNiet">Wat RTG hiermee <em>niet</em> doet</h2>
+    <ul class="lijst nee">
+      <li><b>Wij controleren uw document niet bij een register.</b> RTG bevraagt geen
+        overheidsdatabank en doet ook niet alsof. Wat hier wordt vastgesteld is dat
+        een medewerker het document heeft gezien.</li>
+      <li><b>Wij stellen niet vast dat u de eigenaar bent.</b> De gezichtscontrole is
+        een oordeel van een mens, geen bewijs.</li>
+    </ul>
+  </section>
+</main>
+
+<div class="melding" id="melding" role="status" aria-live="polite"></div>
+<script>
+const $=s=>document.querySelector(s);
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1';
+  clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',3600); }
+const api=(pad,body)=>fetch('/api/verify'+pad,{method:'POST',
+  headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},
+  body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(d.error||'Er ging iets mis.'); return d;});
+
+/* De vier standen in gewone taal. `n/a` is met opzet geen vijfde geval dat op
+   een fout lijkt: het betekent dat er nog geen echt account achter deze sessie
+   zit, en dan is verificatie niet aan de orde in plaats van mislukt. */
+const STANDEN={
+  verified:{ kop:'Geverifieerd', tekst:'RTG heeft uw identiteitsbewijs gezien. U staat op niveau A3.' },
+  pending:{  kop:'In behandeling', tekst:'Uw stukken liggen bij een medewerker. U krijgt bericht zodra er een besluit is.' },
+  rejected:{ kop:'Afgewezen', tekst:'Het document kon niet worden goedgekeurd. Probeer het opnieuw met een scherpere foto; de vorige is al gewist.' },
+  'n/a':{    kop:'Nog geen eigen account', tekst:'Verificatie hoort bij een eigen RTG-account. Zonder account valt er niets te verifiëren.' }
+};
+function toonStand(s){
+  const v=STANDEN[s]||{ kop:'Nog niet begonnen',
+    tekst:'U heeft nog geen identiteitsbewijs ingestuurd. Dat kan hieronder.' };
+  const klasse=STANDEN[s]?s:'';
+  $('#stand').innerHTML='<span class="stand '+klasse+'">'+v.kop+'</span>'+
+    '<p class="uitleg standtekst">'+v.tekst+'</p>';
+}
+
+async function laadStand(){
+  try{ toonStand((await api('/status')).status); }
+  catch(e){ $('#stand').textContent=e.message; }
+}
+
+/* Een bestand wordt pas een data-URL als het klein genoeg is. De server weigert
+   boven 5 MB, maar dan is het al over de lijn geweest -- en op een telefoon is
+   dat een halve minuut wachten op een nee. */
+function alsDataUrl(bestand){
+  return new Promise((klaar,fout)=>{
+    if(bestand.size>5*1024*1024) return fout(new Error('Die foto is groter dan 5 MB. Kies een kleinere.'));
+    const l=new FileReader();
+    l.onerror=()=>fout(new Error('Deze foto kon niet worden gelezen.'));
+    l.onload=()=>klaar(String(l.result||''));
+    l.readAsDataURL(bestand);
+  });
+}
+
+function koppel(knopId, veldId, pad, klaarId, gelukt){
+  $('#'+knopId).addEventListener('click',()=>$('#'+veldId).click());
+  $('#'+veldId).addEventListener('change', async ev=>{
+    const bestand=(ev.target.files||[])[0];
+    if(!bestand) return;
+    const knop=$('#'+knopId);
+    knop.disabled=true;
+    try{
+      const d=await api(pad,{ image: await alsDataUrl(bestand) });
+      $('#'+klaarId).hidden=false;
+      meld(gelukt);
+      if(d.status) toonStand(d.status); else await laadStand();
+    }catch(e){ meld(e.message); }
+    finally{ knop.disabled=false; ev.target.value=''; }
+  });
+}
+
+koppel('kiesDoc','doc','/upload','docKlaar','Uw identiteitsbewijs is verstuurd.');
+koppel('kiesSelfie','selfie','/selfie','selfieKlaar','Uw selfie is verstuurd.');
+laadStand();
+</script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

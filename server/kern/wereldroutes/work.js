@@ -96,6 +96,7 @@ module.exports = [
   '/apps/stadsdoos.html',
   '/apps/studio-pda.html',
   '/apps/techniek.html',
+  '/apps/vertegenwoordiging.html',
   '/apps/voertuig.html',
   '/apps/websitestudio.html',
   '/apps/werk.html',

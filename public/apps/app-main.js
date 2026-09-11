@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '99d03bb2';
+var RTG_BOUW = 'cd2e6bca';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4247,6 +4247,11 @@ var RTG_BOUW = '99d03bb2';
        geinstalleerde PWA komt nog steeds uit waar hij hoort. */
     ik:          { naam: 'Wie ben ik',   url: '/apps/ik.html' },
     veilig:      { naam: 'RTG Veilig',   url: '/apps/veilig.html' },
+    /* Naast "Wie ben ik" en niet erin: dat scherm TOONT wie je bent, dit is de
+       weg om het aan te tonen. RTG iD zei tot nu toe "deze dienst vraagt niveau
+       A3 en u staat op A1" zonder ergens heen te wijzen; zonder deze tegel kan
+       een lid zijn niveau nergens verhogen en blijft elke A3-functie dicht. */
+    verificatie: { naam: T('app.verificatie', 'Identiteit aantonen'), url: '/apps/verificatie.html' },
     /* ACCOUNTbescherming en niet "Bescherming": `veilig` hierboven is de
        veiligheid van een MENS (stil alarm, codewoord), dit die van een ACCOUNT.
        Twee tegels die allebei "bescherming" heten, laten een lid op het
@@ -4515,7 +4520,7 @@ var RTG_BOUW = '99d03bb2';
        in de voet. Vandaar `paneel`: geen vijfde wereldtegel, geen tweede
        instellingenscherm. wereldBij() in 29c filtert deze map er vanzelf uit. */
     { sleutel: 'map-instellingen', naam: 'Instellingen', paneel: '#osCcBtn', items: [
-      'link:ik', 'link:veilig', 'link:passkeys', 'link:bescherming',
+      'link:ik', 'link:verificatie', 'link:veilig', 'link:passkeys', 'link:bescherming',
       'link:sessies', 'link:relaties', 'link:gegevens', 'link:post', 'link:juridisch'] },
     /* WORKOS IS EEN CONTEXT EN GEEN PRODUCT MET EEN PRIJS. De naam ging van
        "RTG Kantoor" naar WorkOS omdat er twee verschillende toegangsmodellen in

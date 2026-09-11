@@ -7,6 +7,11 @@
        geinstalleerde PWA komt nog steeds uit waar hij hoort. */
     ik:          { naam: 'Wie ben ik',   url: '/apps/ik.html' },
     veilig:      { naam: 'RTG Veilig',   url: '/apps/veilig.html' },
+    /* Naast "Wie ben ik" en niet erin: dat scherm TOONT wie je bent, dit is de
+       weg om het aan te tonen. RTG iD zei tot nu toe "deze dienst vraagt niveau
+       A3 en u staat op A1" zonder ergens heen te wijzen; zonder deze tegel kan
+       een lid zijn niveau nergens verhogen en blijft elke A3-functie dicht. */
+    verificatie: { naam: T('app.verificatie', 'Identiteit aantonen'), url: '/apps/verificatie.html' },
     /* ACCOUNTbescherming en niet "Bescherming": `veilig` hierboven is de
        veiligheid van een MENS (stil alarm, codewoord), dit die van een ACCOUNT.
        Twee tegels die allebei "bescherming" heten, laten een lid op het

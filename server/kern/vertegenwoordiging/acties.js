@@ -58,7 +58,7 @@ module.exports = (h) => {
         'gaat een machtiging niet door. Is het lid minderjarig, dan is er een ouder of verzorger bij ' +
         'nodig -- dat jeugdbestuur is nog niet gebouwd, en half bouwen zou betekenen dat een ' +
         'minderjarige alsnog tekent met een scherm ertussen. Is het lid wel volwassen: laat de ' +
-        'identiteit verifieren in de app.' };
+        'identiteit verifieren op /apps/verificatie.html.' };
     }
     const v = M.vorm(d);
     if (v.error) return { status: 400, error: v.error };

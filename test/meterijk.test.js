@@ -1521,6 +1521,32 @@ const IJKINGEN = {
     proef: (voor) => metVervangenJson('BEWIJSLADDER.json',
       (j) => { j.telling.alleenKeten = (j.telling.alleenKeten || 0) + 4; return j; },
       () => norm.meet().bewijsAlleenKeten - voor.bewijsAlleenKeten)
+  },
+  /* DE DRIE TANDEN VAN 11 SEPTEMBER 2026 (LUSSEN.json, npm run lussen).
+
+     Alle drie lezen ze een SCHULD uit `ratel` en niet uit `gemeten`, en dat is
+     geen detail: `gemeten` draagt de hele verdeling en groeit mee met de
+     codebase, `ratel` draagt alleen wat omlaag moet. Leest de meter per ongeluk
+     de verdeling, dan stijgt hij van gewoon werk -- dezelfde val die bij
+     toetsenOngevoeligPct met zoveel woorden staat beschreven.
+
+     De ijking hoogt het getal in het register tijdelijk op. Leest de meter het
+     verkeerde veld, of een ontbrekend bestand als nul, dan beweegt hij niet mee
+     en zakt deze proef. */
+  lussenGeenUitweg: {
+    proef: (voor) => metVervangenJson('LUSSEN.json',
+      (j) => { j.ratel.geenUitwegGevonden = (j.ratel.geenUitwegGevonden || 0) + 7; return j; },
+      () => norm.meet().lussenGeenUitweg - voor.lussenGeenUitweg)
+  },
+  lussenKritiek: {
+    proef: (voor) => metVervangenJson('LUSSEN.json',
+      (j) => { j.ratel.kritiek = (j.ratel.kritiek || 0) + 6; return j; },
+      () => norm.meet().lussenKritiek - voor.lussenKritiek)
+  },
+  lussenZonderOverlapRem: {
+    proef: (voor) => metVervangenJson('LUSSEN.json',
+      (j) => { j.ratel.wekkersAsyncZonderRem = (j.ratel.wekkersAsyncZonderRem || 0) + 5; return j; },
+      () => norm.meet().lussenZonderOverlapRem - voor.lussenZonderOverlapRem)
   }
 };
 

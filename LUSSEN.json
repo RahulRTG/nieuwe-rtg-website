@@ -2,8 +2,12 @@
  "soort": "index",
  "uitleg": "De canonieke lusindex: elke cyclische gedraging van server/ en public/ met EEN identiteit, EEN vorm, EEN terminatiegraad en het bewijs dat er al over ligt. De assen staan naast elkaar en worden nooit opgeteld.",
  "stempel": {
-  "op": "2026-09-11",
-  "commit": "802c524a"
+  "op": "2026-09-11T19:32:24.348Z",
+  "commit": "2d67c32d",
+  "boomVuil": false,
+  "boomAnders": 2,
+  "instrument": "scripts/lussen.js",
+  "node": "v22.22.2"
  },
  "grens": "Terminatie is onbeslisbaar: geen enkele graad hier betekent \"bewezen veilig\". `bewezenBegrensd` zegt dat de STRUCTUUR de afloop vastlegt, `uitwegAanwezig` dat er een uitweg STAAT zonder dat iemand zijn bereikbaarheid heeft getoetst. Neveneffect en domein zijn lexicaal afgeleid en dus een ONDERGRENS (graad vermoed). Het bewijsveld is geleend van de route waar het symbool bij uitkomt en zegt niets over de lus zelf.",
  "nogNietTeZetten": [

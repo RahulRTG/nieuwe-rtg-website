@@ -16,12 +16,12 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **215** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **216** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
 | Bedrijfsgenres | **76** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2101** |
+| Kernmodules (`server/kern/**`) | **2103** |
 | App-pagina's (`public/apps/**.html`) | **306** |
 | Testbestanden | **1811** |
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 215 functieschakelaars
+# 1. De 216 functieschakelaars
 
 ### Leden (RTG-app) — 24
 
@@ -141,7 +141,7 @@ ook blokkeert.
 - **RTG Commerce (mand & retour)** (`commerce`) — De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug. RTG bevestigt hier zelf niets.  
   _voor: rtg, lifestyle, business_
 
-### Eigen apps — 38
+### Eigen apps — 39
 
 - **Spelen (spellen met vrienden)** (`spellen`) — Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.  
   _voor: rtg, lifestyle, business, foundation_
@@ -218,6 +218,8 @@ ook blokkeert.
 - **Knelpunten (welke weg ligt open)** (`knelpunt`) — Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan. Bewaart niets: alles komt binnen in het verzoek en gaat eruit als antwoord. Er wordt niets gerangschikt en geen beste weg aangewezen.  
   _voor: rtg, lifestyle, business_
 - **Vertegenwoordiging (wie mag iets namens mij)** (`vertegenwoordiging`) — Machtigingen van mens tot mens: wie mag wat namens een lid, sinds wanneer, tot wanneer, en wat is er namens hem gedaan. Een machtiging versmalt alleen wat het lid zelf al mocht en voegt er nooit iets aan toe; aanvaarden doet het lid zelf en intrekken kan altijd, per direct.  
+  _voor: rtg, lifestyle, business_
+- **Rugdekking (wie staat er achter mij)** (`rugdekking`) — Wat een lid ziet van het programma waarmee RTG achter hem staat: welke soort, welk bedrag, tot wanneer, en wat RTG ervoor terugvraagt. Daaronder staat even groot wat een tegenprestatie NOOIT kan zijn -- een mening, zwijgen, gezondheid, of exclusiviteit die hem afhankelijk maakt.  
   _voor: rtg, lifestyle, business_
 
 ### Partners (leveranciers) — 11

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1805 bestanden en 12722 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1811 bestanden en 12777 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1805 |
-| losse beweringen (`test(...)`) | 12722 |
+| toetsbestanden | 1811 |
+| losse beweringen (`test(...)`) | 12777 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1183 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1189 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 66 |
 | alleen in de kop *genoemd*, nog niet gemeten | 154 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1593 bestanden, 12351 beweringen.
+1597 bestanden, 12404 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -613,6 +613,7 @@ toets omvalt.
 | `isolatiedragers.test.js` | 7 | genoemd | DE DRAGERS BIJ EEN LOPEND VERZOEK -- welke laag heeft echt een sleutel. HET GAT DAT DIT SLUIT, en het was er een van het soort dat groen kijkt. |
 | `isolatiepoort.test.js` | 13 | genoemd | DE BEVEILIGINGS-AS IN DE HTTP-KETEN -- telt hij, en houdt hij niets tegen? HET GAT DAT DIT SLUIT. |
 | `isolatieregisters.test.js` | 4 | genoemd | DE TWEE ISOLATIEREGISTERS DRAGEN EEN TAND -- en dat was de reden dat `metingenZonderRatel` van 33 naar 35 ging. scripts/lib/metingen.js zegt het scherp: een meetbestand dat aan geen enkele ratel hangt, groeit... |
+| `jeugdbestuur.e2e.test.js` | 11 | gezakt op `liegpoort /api/` | HET JEUGDBESTUUR OVER HTTP -- kan een talent van zestien iemand naast zich zetten zonder dat hij iets tekent wat hij niet leest? Dit is CARRIERE.md par. |
 | `journaalbestand.test.js` | 11 | gezakt op `getal+1#7` | HET JOURNAAL OP SCHIJF (server/kern/journaalbestand.js). Het doorgeefjournaal woonde in db.data.doorgeefjournaal: één array van 20.000 regels, dus één blob in één rij van de opslag. |
 | `journaalschrijf.test.js` | 6 | gezakt op `true->false#0` | EEN LOGBOEK MAG DE SERVER NIET TRAAG MAKEN. WAT ER MIS WAS, en het was mijn eigen code van dezelfde dag. |
 | `journalistiek-redactie.test.js` | 11 | gezakt op `liegpoort /api/` | DE REDACTIE VAN EEN NIEUWSBEDRIJF -- 13 endpoints achter de leverancier-inlog. Deze dertien wees de waargenomen dekkingsmeting aan als nooit aangeroepen: niet een enkele test raakte /api/supplier/redactie/*. |
@@ -1193,6 +1194,7 @@ toets omvalt.
 | `rtmail-werk.test.js` | 11 | gezakt op `liegpoort /api/` | RTG Mail x RTG Werk OS: het gedeelde postvak met een dossier, en de brug van een BERICHT naar een taak, ticket of kans. Dit is de bewering die het hele idee draagt -- "e-mail is geen los eiland" -- en dus wordt hij... |
 | `rtmail-zaak.test.js` | 5 | gezakt op `liegpoort /api/` | RTMAIL AAN DE ZAAKKANT -- de tweede deur, die nooit was opengedaan. WAAROM DIT BESTAND ER IS. |
 | `rtmail.test.js` | 13 | gezakt op `===->!==#0` | RTMAIL: het interne postsysteem (de rail voor de automatiseringen). Unit-test op de motor met een nep-db, zodat we send/postvak/ongelezen/lees los kunnen bewijzen zonder de server te starten. |
+| `rugdekking.e2e.test.js` | 15 | gezakt op `liegpoort /api/` | RUGDEKKING OVER HTTP -- staat RTG achter een mens, of koopt het iets van hem? Dit is de vork uit RUGDEKKING.md par. |
 | `runtime-release-stempel.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rust-migraties.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rust-noodstop.test.js` | 1 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
@@ -1500,6 +1502,8 @@ toets omvalt.
 | `verstrengeling.test.js` | 13 | gezakt op `===->!==#0` | DE VERSTRENGELINGSMETER -- en of hij werkelijk iets onderscheidt. scripts/verstrengeling.js beantwoordt de vraag die vóór een binnenpoort komt: welke delen van RTG kunnen elkaar wakker maken, en hoeveel daarvan is... |
 | `vertaal.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Vertaler: een dunne route op de bestaande vertaalmotor. Zonder AI-sleutel vertaalt het huiswoordenboek (nl<->en) en is de app eerlijk over wat niet lukt (vertaald:false), nooit kapot. |
 | `vertaalkast.test.js` | 7 | gezakt op `true->false#0` | De vertaalkast: vertaalde interface die een herstart overleeft. Wat hier hard wordt gemaakt: - een vertaling die een keer is gemaakt, komt na een HERSTART terug zonder model (dat is de hele reden dat de kast... |
+| `vertegenwoordiging.e2e.test.js` | 9 | gezakt op `liegpoort /api/` | RTG VERTEGENWOORDIGING OVER HTTP -- bestaat de functie ook voor een echte gebruiker? (BETROUWBAARHEID.md: een functie bestaat pas als een echte gebruiker haar bedoeling kan voltooien, niet als het scherm laadt.) De... |
+| `vertegenwoordiging.test.js` | 18 | gezakt op `&&->||#0` | RTG VERTEGENWOORDIGING (server/kern/vertegenwoordiging/, CARRIERE.md par. 6 nummer 5 en 6). |
 | `vertrouwen.test.js` | 16 | -- | DE VERTROUWENSSTAND -- afgeleid uit harde feiten, en nergens bewaard. DE BEWERING DIE ERTOE DOET staat in toets 3: een conclusie is nooit harder dan haar zachtste premisse. |
 | `vertrouwenbronnen.test.js` | 5 | gezakt op `-->+#0` | LEEST DE VERSHEIDSMETER ALLE REGISTERS DIE DE MATRIX LEEST? scripts/bewijsmatrix.js bepaalt per route zijn elf cellen uit een stapel registers. |
 | `vervalstaten.test.js` | 6 | -- | DE VERVALSTATEN VAN scripts/vertrouwen.js -- de staatmachine achter de bewijspoort. Dit bestand heette test/vertrouwen.test.js. |
@@ -1633,7 +1637,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-212 bestanden, 371 beweringen.
+214 bestanden, 373 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1823,7 +1827,9 @@ toets omvalt.
 | `vakbewijs-scherm.e2e.js` | 2 | genoemd | HET VAKBEWIJS OP HET SCHERM. WAAROM DIT BESTAAT. |
 | `veiligheid.e2e.js` | 1 | genoemd | RTG Veilig in een echte browser: vier standen op een scherm. De server-toetsen (test/veiligheid.test.js) bewijzen dat de keten werkt. |
 | `verdiepende-schermen.e2e.js` | 1 | gezakt op `!==->===#2` | DE ELF VERDIEPINGSSCHERMEN IN EEN ECHTE BROWSER. De bronproeven bewaken tekst, bedrading en veiligheidsgrenzen, maar een scherm is pas af als iemand de weg werkelijk kan afleggen. |
+| `verificatie.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET VERIFICATIESCHERM (/apps/verificatie.html) IN EEN ECHTE BROWSER. WAAROM DIT SCHERM BESTAAT. |
 | `vertaler.e2e.js` | 1 | -- | Scherm-test voor RTG Vertaler: inloggen, typen, de live-vertaling (met de halve-seconde-rustpauze), een reiszin aantikken en bewaren op het toestel. |
+| `vertegenwoordiging.e2e.js` | 1 | gezakt op `liegpoort /api/` | HET MACHTIGINGSSCHERM (/apps/vertegenwoordiging.html) IN EEN ECHTE BROWSER. test/vertegenwoordiging.test.js bewijst de zeven regels van de laag met een mutatie, en test/vertegenwoordiging.e2e.test.js bewijst dat een... |
 | `verzorging-scherm.e2e.js` | 1 | -- | Schermtoets voor de verzorgingskant van de Zorg-tab: de kapper, de barbier en de nagelstudio staan nu in de leden-app. Wat hier bewezen wordt is precies wat een servertoets NIET kan zien: dat het blok echt op het... |
 | `voeding-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/voeding.html. Dit scherm belooft vooral iets NIET, en dat is precies wat op het scherm zelf nagekeken hoort te worden: een motor die niets telt naast een scherm dat er alsnog een cijfer of een... |
 | `voertuigscherm.e2e.js` | 8 | geen bronmutatie mogelijk | HET VOERTUIGSCHERM: het adres dat een verwijzing nodig had. De verwijsvorm van dit huis kon nergens heen voor een voertuig -- er was geen app die er EEN opende. |

@@ -38,9 +38,46 @@ module.exports.maakReiswereld = ({ kern }) => {
   const meetStand = standVan({ verstoord: 'Verstoord', aandacht: 'Op vertrek', gezond: 'Rustig' });
 
   const vandaag = () => new Date().toISOString().slice(0, 10);
-  /* Het woordenboek en de regelvorm staan in ./reiswereld-regel.js: hoe een rij
-     eruitziet is iets anders dan wat deze wereld ermee doet. */
-  const { regel } = require('./reiswereld-regel')({ betekenisVan });
+  /* Elke bron levert zijn eigen vorm; dit maakt er één regel van. `app` en
+     `link` wijzen naar de specialist, want daar hoort het echte werk te
+     gebeuren. */
+  /* Wat een status BETEKENT hoort op één plek te wonen. Zou elk scherm zelf
+     beslissen dat "aangevraagd" geel is en "bevestigd" groen, dan lopen Reizen,
+     Office en Command binnen een maand uit elkaar op precies de vraag waar een
+     gebruiker op stuurt (LAT.md regel 4, en ONTWERP.md par. 3 en 5).
+
+     Drie dingen per regel, en met opzet niet alleen een kleur:
+       sig    -- de toestand voor de Signal Rail (gezond/aandacht/incident/actief)
+       teken  -- het teken naast het woord, want kleur alleen is niet genoeg
+       wacht  -- waarop gewacht wordt, als er op iets gewacht wordt
+
+     Een status die we NIET kennen krijgt geen kleur en geen teken. Raden zou
+     hier het ergst mogelijke zijn: een onbekende toestand groen kleuren is
+     precies hoe je iemand een vlucht laat missen. */
+  const BETEKENIS = {
+    bevestigd:   { sig: 'gezond', teken: '✓' },
+    geboekt:     { sig: 'gezond', teken: '✓' },
+    ingecheckt:  { sig: 'gezond', teken: '✓' },
+    aangevraagd: { sig: 'actief', teken: '◷', wacht: 'reisadviseur' },
+    afgewezen:   { sig: 'incident', teken: '!' },
+    vertraagd:   { sig: 'aandacht', teken: '!' },
+    /* De twee standen van de Invoerbalie. `ingelezen` krijgt met opzet GEEN
+       vinkje: een vinkje leest als "RTG bevestigt dit", en dat doet RTG hier
+       niet -- het document zegt het, en van wie dat document is staat in de
+       herkomst (REIZEN.md par. 4.3). En een lezing waarvan een veld onder de
+       drempel bleef, is niet "waarschijnlijk goed" maar na te kijken; die vraagt
+       dus aandacht in plaats van groen te staan (par. 4.4). */
+    ingelezen:     { sig: 'gezond', teken: '\u25c7' },
+    tecontroleren: { sig: 'aandacht', teken: '!', wacht: 'uw controle' }
+  };
+  /* Door de poort: betekenisVan weigert een status die een signaal noemt
+     dat niet bestaat. Zonder die controle gaf een onbekend signaal stil NaN
+     in de vergelijking en sorteerde de hele rij gewoon niet. */
+  const betekenis = betekenisVan(BETEKENIS);
+
+  /* De regelvorm staat in ./reiswereld-regel.js: hoe een rij eruitziet is iets
+     anders dan wat deze wereld ermee doet. Het woordenboek hierboven blijft hier. */
+  const { regel } = require('./reiswereld-regel')({ betekenis });
 
   /* Een bron die stukgaat mag de andere niet meenemen, en mag ook niet stil
      verdwijnen. Een reiswereld die na een storing drie in plaats van vier

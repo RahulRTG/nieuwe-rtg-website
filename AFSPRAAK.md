@@ -600,6 +600,24 @@ tabel zou een lijst **gokken** zijn over welke van die 46 bestanden "echt" een
 betalende pas nodig heeft. Die 46 dragen die kennis vandaag niet; ze vragen iets
 anders. Een tabel verzinnen vervangt de meting door een mening.
 
+**En een gat in het recht op vergetelheid, dat deze stap zelf maakte.** De weging
+gaf de sessiesleutel van het lid mee als VOORBEELD aan `commercie/schaduw.js` — en
+dat bewaart voorbeelden met een goede reden, want "120 keer" zonder "van wie,
+waarop" is niet te beoordelen. Alleen: wat daar dan ontstaat is een **lijst leden
+van wie de pas mogelijk vervalt**, in een teller, zonder bewaartermijn. En het lid
+kon hem niet meer kwijt — `test/vergeten-gezelschap.test.js` zag de sleutel na het
+uitoefenen van dat recht nog in `schaduwregels` staan. Die tak hield tot dan alleen
+zaakcodes (`routepoort.js`), dus de bezem kwam er nooit langs.
+
+De reparatie is **niet** de tak vrijstellen en **niet** de bezem verbreden: beide
+erkennen het gat en laten het staan. De identiteit wordt niet meer opgeslagen. Het
+product van deze laag is een getal, en wat een mens nodig heeft om te besluiten of
+hij de regel aanzet is de **stand** — loopt er geen afspraak, of is er geen
+gevonden. De `wie`-parameter is daarom helemaal weg en niet op `null` gezet: een
+ongebruikt argument vult de volgende aanroeper alsnog. De prijs staat erbij in
+plaats van eronder: een mens kan op het bord niet zien of het dezelfde drie leden
+zijn of driehonderd verschillende.
+
 **En een fout die de toets vond en het lezen niet.** De kop
 `RTG-Niet-Afgedwongen` wordt nu door twee lagen gezet, dus de eerste versie
 gebruikte `res.append`. **Die bestond niet:** `server/web/verrijk.js` is een eigen

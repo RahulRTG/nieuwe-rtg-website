@@ -422,7 +422,13 @@ ruis leest — daarom twee schaduwregels, want *een afgelopen afspraak afdwingen
 weging gaat **per lid en niet per verzoek**: de vraag is hoeveel LEDEN een pas
 zonder lopende afspraak hebben, en per verzoek tellen laat wie het hardst klikt het
 getal bepalen — met als keerzijde dat die teller niet vergelijkbaar is met die van
-de abonnementspoort, die wél per verzoek telt.
+de abonnementspoort, die wél per verzoek telt. **En er gaat geen IDENTITEIT in die
+teller**: de eerste versie gaf de sessiesleutel mee als voorbeeld, en wat daar dan
+ontstaat is een lijst leden van wie de pas mogelijk vervalt — zonder bewaartermijn,
+en het lid kon hem niet kwijt (`schaduwregels` hield tot dan alleen zaakcodes, dus de
+vergetelheidsbezem kwam er nooit langs). Niet de tak vrijgesteld en niet de bezem
+verbreed, maar de identiteit niet opgeslagen: het product is een getal, en de STAND
+is wat een mens nodig heeft om te besluiten.
 **En let op een vondst die veel breder geldt dan afspraken:
 `server/web/verrijk.js` is een EIGEN Express-achtige schil en geen Express.**
 `res.set` zit erin, `res.append` zat er niet — en een methode die die schil niet

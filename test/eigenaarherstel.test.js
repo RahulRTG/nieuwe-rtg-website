@@ -5,6 +5,12 @@
    toets. De klok gaat er daarom als functie in (`nu`), precies zodat dit
    meetbaar is -- dat is geen testhulpje maar de reden dat die parameter bestaat.
 
+   EN DAN GEBRUIKT DE TOETS OOK DIE KLOK, nergens `Date.now()`. Dat ging hier een
+   keer mis: toets 3 vergeleek `klaarOp` (gerekend op de neppe klok, 3 september)
+   met de ECHTE klok, en die vergelijking was waar tot 11 september 12:00 UTC en
+   daarna niet meer. De toets zakte dus op een dag waarop er niets veranderd was.
+   Een toets die van de kalender afhangt meet de kalender en niet de code.
+
    De vier beweringen die moeten zakken als iemand ze sloopt:
    1. zonder ingericht quorum bestaat deze weg niet (fail-closed);
    2. een geldig quorum levert WACHTTIJD op en geen toegang;
@@ -54,12 +60,12 @@ test('2. inrichten geeft drie delen en bewaart alleen de verifier', () => {
 });
 
 test('3. een geldig paar levert WACHTTIJD op, geen toegang', () => {
-  const { h, mails, meldingen } = opzet();
+  const { h, mails, meldingen, nu } = opzet();
   const { delen } = h.richtIn();
   const r = h.start(delen[0], delen[1]);
   assert.equal(r.status, 200);
   assert.ok(r.klaarOp, 'er staat een moment waarop het bruikbaar wordt');
-  assert.ok(Date.parse(r.klaarOp) > Date.now() - DAG, 'en dat ligt in de toekomst');
+  assert.ok(Date.parse(r.klaarOp) > nu(), 'en dat ligt in de toekomst');
   assert.equal(h.herstelvensterOpen(), false, 'starten opent NIETS');
   assert.equal(mails.length, 1, 'en het is luid: er gaat een mail naar de eigenaar');
   assert.equal(mails[0].naar, 'eigenaar@x.nl');

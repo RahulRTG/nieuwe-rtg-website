@@ -146,12 +146,6 @@
       "url": "/apps/foundation/buurtruil.html"
     },
     {
-      "label": "Intrekken",
-      "app": "Buurtruil",
-      "wereld": "FoundationOS",
-      "url": "/apps/foundation/buurtruil.html"
-    },
-    {
       "label": "Melden",
       "app": "Buurtruil",
       "wereld": "FoundationOS",
@@ -728,6 +722,18 @@
       "url": "/apps/horeca.html"
     },
     {
+      "label": "Foto kiezen",
+      "app": "Identiteit aantonen",
+      "wereld": "Instellingen",
+      "url": "/apps/verificatie.html"
+    },
+    {
+      "label": "Selfie kiezen",
+      "app": "Identiteit aantonen",
+      "wereld": "Instellingen",
+      "url": "/apps/verificatie.html"
+    },
+    {
       "label": "Bekijk het labfonds",
       "app": "Klimaatfonds",
       "wereld": "FoundationOS",
@@ -1016,12 +1022,6 @@
       "url": "/apps/mall.html"
     },
     {
-      "label": "Intrekken",
-      "app": "Mall",
-      "wereld": "LivingOS",
-      "url": "/apps/mall.html"
-    },
-    {
       "label": "Lezen",
       "app": "Mall",
       "wereld": "LivingOS",
@@ -1112,6 +1112,12 @@
       "url": "/apps/mall.html"
     },
     {
+      "label": "Vraag offerte aan",
+      "app": "Mall",
+      "wereld": "LivingOS",
+      "url": "/apps/mall.html"
+    },
+    {
       "label": "Nieuwe lijst",
       "app": "Mijn bestellingen",
       "wereld": "LivingOS",
@@ -1182,6 +1188,24 @@
       "app": "Mijn leven",
       "wereld": "LivingOS",
       "url": "/apps/leven.html"
+    },
+    {
+      "label": "Aanvaarden",
+      "app": "Mijn team",
+      "wereld": "WorkOS",
+      "url": "/apps/vertegenwoordiging.html"
+    },
+    {
+      "label": "Mijn grens bewaren",
+      "app": "Mijn team",
+      "wereld": "WorkOS",
+      "url": "/apps/vertegenwoordiging.html"
+    },
+    {
+      "label": "Nog niet",
+      "app": "Mijn team",
+      "wereld": "WorkOS",
+      "url": "/apps/vertegenwoordiging.html"
     },
     {
       "label": "Doe mee",
@@ -2139,12 +2163,6 @@
     },
     {
       "label": "Goedkeuren",
-      "app": "RTG One",
-      "wereld": "WorkOS",
-      "url": "/apps/rtgone.html"
-    },
-    {
-      "label": "Intrekken",
       "app": "RTG One",
       "wereld": "WorkOS",
       "url": "/apps/rtgone.html"

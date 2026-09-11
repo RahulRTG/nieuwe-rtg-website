@@ -31,7 +31,8 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, laadPlaywright, browserOpties, geenBrowser, wachtOpRust } = require('./helper');
+const { startServer, laadPlaywright, browserOpties, geenBrowser, wachtOpRust,
+  volgVerzoeken } = require('./helper');
 
 const pw = laadPlaywright();
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kantoordeur-'));
@@ -77,6 +78,30 @@ async function opstelling() {
      toets een pagina uit de cache in plaats van een verse. */
   const ctx = await browser.newContext({ serviceWorkers: 'block' });
   const page = await ctx.newPage();
+  /* DE VERZOEKENTELLER, EN DIE ONTBRAK HIER -- dat is de hele oorzaak van een
+     valse aanklacht die op een drukke CI-runner echt is gevallen.
+
+     `wachtOpRust` wacht op twee dingen tegelijk: er loopt geen verzoek meer, EN
+     de tekst staat stil. Die eerste helft hangt aan `window.__rtgBezig`, en die
+     teller bestaat alleen als `volgVerzoeken` VOOR de eerste goto om
+     window.fetch is gehangen. Zonder hem is de helft van de wacht er domweg
+     niet: dan telt alleen "de tekst veranderde honderd milliseconden niet".
+
+     En precies dat is hier fataal, want de deur heeft een tussenstand die
+     doodstil staat. Met een lid-token vraagt hij eerst aan /api/account/rollen
+     of dit account al binnen mag; zolang dat loopt staat er "Een moment, ik
+     kijk of uw eigen RTG-account hier al toegang heeft...". Perfect stabiele
+     tekst, dus de wacht was meteen tevreden, en de lus eronder schreef op:
+     "appstore-kantoor: vraagt geen code". Dat is een aanklacht -- dit
+     kantoorscherm laat iemand zonder sleutel door -- op grond van een meting
+     die niet af was, en het is dezelfde fout die de kop hierboven voor de
+     NAVIGATIE al beschrijft.
+
+     Nagerekend en niet vermoed: met /api/account/rollen achttien seconden
+     vertraagd meldde deze toets alle negen kantoorschermen als lek, met
+     letterlijk de tekst die de CI-runner liet zien. Met deze regel wacht hij
+     het verzoek af en meldt hij niets. */
+  await volgVerzoeken(page);
   return { browser, page };
 }
 
@@ -114,7 +139,7 @@ async function bezoek(page, base, app) {
      hem gebruikt. */
   await page.goto(base + '/api/health', { waitUntil: 'domcontentloaded' });
   await page.evaluate(() => { try { localStorage.removeItem('rtg_office_token'); } catch (e) {} });
-  let waarom = null, r = null;
+  let waarom = null, r = null, rustFout = null;
   /* TWEE POGINGEN, en de tweede is geen wegkijken. Een navigatie die afbreekt is
      hier geen uitspraak over het scherm maar over de sprong ernaartoe -- op een
      runner met vier scherven tegelijk is dat een koude start of een afgebroken
@@ -123,10 +148,29 @@ async function bezoek(page, base, app) {
      hieronder apart gemeld. Niet in een lus: als de tweede sprong ook strandt,
      is er iets anders aan de hand dan drukte, en dan hoort een mens te kijken. */
   for (let poging = 1; poging <= 2; poging += 1) {
-    waarom = null;
+    waarom = null; rustFout = null;
     try { await page.goto(base + doel, { waitUntil: 'domcontentloaded' }); }
     catch (e) { waarom = String((e && e.message) || e).split('\n')[0].slice(0, 120); }
-    await wachtOpRust(page).catch(() => {});
+    /* EN DE TIME-OUT VAN DE WACHT GAAT MEE TERUG, want hij werd hier ingeslikt.
+
+       De deur doet er soms twee verzoeken over: met een lid-token vraagt hij
+       eerst aan /api/account/rollen of dit account hier al binnen mag, en pas
+       daarna begint het codegesprek. Duurt dat langer dan de wacht, dan las de
+       meting de deur halverwege -- op "Een moment, ik kijk of uw eigen
+       RTG-account hier al toegang heeft..." -- en schreef dat op als
+       "vraagt geen code". Dat is een AANKLACHT (dit kantoorscherm laat iemand
+       zonder sleutel door) op grond van een meting die niet af was, en het is
+       exact de fout die de kop hierboven voor de NAVIGATIE al beschrijft: voor
+       het WACHTEN stond hij nog open.
+
+       Nagerekend in plaats van vermoed: met /api/account/rollen twintig
+       seconden vertraagd meldde deze toets alle negen kantoorschermen als lek,
+       met letterlijk de tekst die de CI-runner ook liet zien. Met deze regel
+       staan ze in de lijst "niet gemeten" -- de toets zakt even hard, maar met
+       de juiste diagnose. */
+    await wachtOpRust(page).catch((e) => {
+      rustFout = String((e && e.message) || e).split('\n')[0].slice(0, 160);
+    });
     r = await page.evaluate(() => {
       const zegt = document.querySelector('.kg .kg-zegt');
       return {
@@ -140,12 +184,22 @@ async function bezoek(page, base, app) {
   /* Een meta-refresh MAG het pad verzetten -- dat is de pagina die iets doet, en
      geen mislukte meting. Daarom telt alleen of we op het gevraagde scherm zijn
      beland; waar we anders zijn, staat in de melding. */
-  return Object.assign(r, { geland: r.pad === doel, doel, waarom });
+  /* `geland` zegt dat we op het scherm zijn; `gemeten` zegt dat er ook iets
+     over te zeggen valt. Een scherm dat niet tot rust kwam hoort bij de
+     mislukte metingen en niet bij de bevindingen -- die worden apart gemeld en
+     laten de toets net zo hard zakken, alleen met de juiste diagnose. */
+  const geland = r.pad === doel;
+  return Object.assign(r, { geland, doel, waarom, rustFout, gemeten: geland && !rustFout });
 }
 
 /* De drie lussen stellen dezelfde vraag over een andere sleutelbos. Wat ze
    moeten SPLITSEN is ook drie keer hetzelfde, dus staat het hier één keer. */
 function nietGemeten(r) {
+  if (r.geland && r.rustFout) {
+    return r.doel + ': niet gemeten -- het scherm kwam niet tot rust (' + r.rustFout +
+      '). Dit zegt niets over dat scherm; het zegt dat deze meting niet is gelukt.' +
+      ' Wat de deur op dat moment zei: ' + (r.deur || '(geen deur in beeld)');
+  }
   return r.doel + ': niet gemeten -- de browser kwam uit op ' + r.pad +
     (r.waarom ? ' (' + r.waarom + ')' : '') +
     '. Dit zegt niets over dat scherm; het zegt dat deze meting niet is gelukt.';
@@ -213,7 +267,7 @@ test('de eigenaar komt op elk kantoorscherm binnen met zijn eigen RTG-account ('
     const dicht = [], mis1 = [];
     for (const s of SCHERMEN) {
       const r = await bezoek(o.page, base, s.app);
-      if (!r.geland) { mis1.push(nietGemeten(r)); continue; }
+      if (!r.gemeten) { mis1.push(nietGemeten(r)); continue; }
       if (vraagtCode(r.deur)) { dicht.push(s.app + ': vraagt de kantoorcode aan de eigenaar'); continue; }
       if (!s.open.test(r.tekst)) dicht.push(s.app + ': niet open -- ' + r.tekst.slice(0, 140));
     }
@@ -226,7 +280,7 @@ test('de eigenaar komt op elk kantoorscherm binnen met zijn eigen RTG-account ('
     const lek = [], mis = [];
     for (const s of SCHERMEN) {
       const r = await bezoek(o.page, base, s.app);
-      if (!r.geland) { mis.push(nietGemeten(r)); continue; }
+      if (!r.gemeten) { mis.push(nietGemeten(r)); continue; }
       if (!vraagtCode(r.deur)) lek.push(s.app + ': vraagt geen code -- ' + (r.deur || r.tekst.slice(0, 140)));
     }
     assert.deepEqual(mis, [], 'deze schermen zijn niet bezocht, dus er is niets over te zeggen:\n  ' + mis.join('\n  '));
@@ -237,7 +291,7 @@ test('de eigenaar komt op elk kantoorscherm binnen met zijn eigen RTG-account ('
     const lek2 = [], mis2 = [];
     for (const s of SCHERMEN) {
       const r = await bezoek(o.page, base, s.app);
-      if (!r.geland) { mis2.push(nietGemeten(r)); continue; }
+      if (!r.gemeten) { mis2.push(nietGemeten(r)); continue; }
       if (!vraagtCode(r.deur)) lek2.push(s.app + ': vraagt geen code -- ' + (r.deur || r.tekst.slice(0, 140)));
     }
     assert.deepEqual(mis2, [], 'deze schermen zijn niet bezocht, dus er is niets over te zeggen:\n  ' + mis2.join('\n  '));

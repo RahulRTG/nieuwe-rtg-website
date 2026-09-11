@@ -16,14 +16,35 @@
       layout.active = runtime.active(); layout = continuity.save(layout);
       o.root.dataset.rtgDensity = layout.density; return layout;
     }
+    /* VASTE MODULES STAAN VOORAAN EN BLIJVEN STAAN. Het manifest zegt `pinned`
+       (module-sdk.js); de werelden zijn er een, want op een telefoon is deze
+       ruimte de bank en de bank draagt de werelden bovenaan (WERELD.md). Een
+       opgeslagen indeling van voor deze regel kan ze ergens anders of verborgen
+       hebben; dat wordt hier stil rechtgezet, want een lid dat de werelden kwijt
+       is heeft geen knop om ze terug te halen. */
+    function vast(id) {
+      var m = runtime.manifests().find(function (x) { return x.id === id; }); return !!(m && m.pinned);
+    }
+    function vastVooraan(order) {
+      var voor = order.filter(vast), rest = order.filter(function (id) { return !vast(id); });
+      return voor.concat(rest);
+    }
     function draw(nextState, isEditing) {
       state = nextState || state; editing = isEditing === true;
       o.list.textContent = ''; o.editorList.textContent = '';
-      layout.order = runtime.mount(o.list, layout.order);
+      layout.hidden = layout.hidden.filter(function (id) { return !vast(id); });
+      layout.order = runtime.mount(o.list, vastVooraan(layout.order));
       var manifests = runtime.manifests();
       layout.order.forEach(function (id) {
         var hidden = layout.hidden.indexOf(id) >= 0; runtime.setHidden(id, hidden);
         var m = manifests.find(function (x) { return x.id === id; }); if (!m) return;
+        if (m.pinned) {
+          /* Geen grijze knop zonder uitleg (GRAMMATICA.md): de rij zegt waarom
+             hier niets te kiezen valt. */
+          var vastRij = document.createElement('p'); vastRij.className = 'rtg-ss-vast';
+          vastRij.textContent = m.title + ' staat vast: de werelden horen bovenaan de bank.';
+          o.editorList.appendChild(vastRij); return;
+        }
         var b = document.createElement('button'); b.type = 'button';
         b.textContent = m.title + (hidden ? ' toevoegen' : ' verbergen');
         b.dataset.ssAction = hidden ? 'show' : 'hide'; b.dataset.ssModuleId = id;
@@ -37,9 +58,11 @@
     }
     function move(id, richting) {
       var i = layout.order.indexOf(id), j = i + richting; if (i < 0 || j < 0 || j >= layout.order.length) return;
+      if (vast(id) || vast(layout.order[j])) return;   // een vaste module verschuift niet, en niets schuift eroverheen
       var t = layout.order[j]; layout.order[j] = id; layout.order[i] = t; save(); draw(state, editing);
     }
     function hide(id, aan) {
+      if (aan && vast(id)) return;                      // de werelden zijn niet weg te zetten (WERELD.md)
       var i = layout.hidden.indexOf(id); if (aan && i < 0) layout.hidden.push(id); if (!aan && i >= 0) layout.hidden.splice(i, 1);
       if (aan && layout.active === id) layout.active = null; save(); draw(state, editing);
     }

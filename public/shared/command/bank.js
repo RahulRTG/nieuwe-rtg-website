@@ -69,6 +69,7 @@
       lijst.filter(function(x){return x&&x.naam&&typeof x.doe==='function'}).reverse()
         .forEach(function(x){
           var b=d.createElement('button');b.dataset.systeem='1';
+          if(x.sleutel)b.dataset.deur=String(x.sleutel);   // wie de deur is, zonder op de tekst te hoeven zoeken
           b.innerHTML=svg(x.teken||'instel');
           var t=d.createElement('span');t.textContent=x.naam;b.appendChild(t);
           b.onclick=function(){sluit();x.doe()};

@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-11T06:08:09.707Z",
-  "commit": "d18ca72a",
-  "boomVuil": false,
-  "boomAnders": 0,
+  "op": "2026-09-11T06:58:01.625Z",
+  "commit": "d4958739",
+  "boomVuil": true,
+  "boomAnders": 46,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -4006,7 +4006,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1388",
+   "bestand": "server/server.js:1413",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

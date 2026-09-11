@@ -89,10 +89,17 @@ test('2. de ijkstanden komen uit de metingen, bevroren op het meetmoment', async
 
 test('3. geen ruwe waarnemingen en geen aliassen', async () => {
   const r = await api('/api/lab2/capsule', { id: studieId }, office);
-  const tekst = JSON.stringify(r.body);
+  /* De capsule draagt tijdstempels (gestart, gemaaktOp, de versies van een
+     conclusie), en een tijdstempel als 05:33:28.412Z bevat toevallig "28.4".
+     Deze toets zocht daar eerst in mee en zakte daardoor een op de zeshonderd
+     keer op de KLOK in plaats van op een lek (keten 34565618263). De
+     tijdstempels gaan er dus af voordat er wordt gezocht, en de structuur wordt
+     apart nagekeken: wat een deelnemer invulde heeft in de capsule geen sleutel. */
+  const tekst = JSON.stringify(r.body).replace(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z/g, '<tijd>');
   assert.ok(!tekst.includes('HET BLEEF WARM'), 'de tekst van een observatie zit in de capsule');
   assert.ok(!tekst.includes(alias), 'een alias zit in de capsule');
   assert.ok(!tekst.includes('28.4'), 'een ingevulde meetwaarde zit in de capsule');
+  assert.ok(!/"antwoorden"/.test(tekst), 'de ingevulde antwoorden van een deelnemer hebben een sleutel in de capsule');
   assert.ok(r.body.capsule.bevatNiet.ruweWaarnemingen);
   assert.ok(r.body.capsule.bevatNiet.analyse);
 });

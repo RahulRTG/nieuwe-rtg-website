@@ -214,8 +214,36 @@ module.exports = ({
     functies, volledigeWerkprocessen: KANTOORWERKPROCESSEN,
     werkrouteFabriek: werkrouteFabriek.bouw
   });
-  let capabilityGraph = capabilityScanner.scan();
-  let alleWerkprocessen = KANTOORWERKPROCESSEN.concat(capabilityGraph.automatischeWerkprocessen || []);
+  /* DE SCAN IS LUI, EN DAT IS EEN MEETRESULTAAT EN GEEN VOORKEUR.
+
+     Hier stond `capabilityScanner.scan()` kaal in de fabriek, dus hij draaide
+     bij ELKE serverstart -- ook op een productieserver waar niemand Magnaat
+     opent. Die scan leest de hele bronboom EN alle toetsbestanden van schijf
+     (magnaat-dekkingsmatrix.js: testSleutels loopt test/ helemaal langs) om er
+     een spelwereld van te maken.
+
+     GEMETEN op een koude start met een verse datamap, drie rondes elk:
+       met de scan in de fabriek   5,85 s
+       met de scan overgeslagen    4,97 s
+     Dat is 0,88 s per start. De toetsen starten er per ronde bijna
+     negenhonderd, dus het is ruim een kwartier rekentijd per keten -- besteed
+     aan een graaf die in verreweg de meeste van die processen nooit wordt
+     opgevraagd.
+
+     Wat hieronder staat verandert de UITKOMST niet: dezelfde scan, dezelfde
+     waarde, alleen bij de eerste vraag in plaats van bij het opstarten. Wie
+     Magnaat wel opent, betaalt hem eenmalig -- daar hoort hij ook thuis.
+     verversCapabilityGraph() blijft gewoon opnieuw scannen. */
+  let capabilityGraph = null;
+  let alleWerkprocessen = null;
+  function graaf() {
+    if (!capabilityGraph) {
+      capabilityGraph = capabilityScanner.scan();
+      alleWerkprocessen = KANTOORWERKPROCESSEN.concat(capabilityGraph.automatischeWerkprocessen || []);
+    }
+    return capabilityGraph;
+  }
+  function werkprocessen() { graaf(); return alleWerkprocessen; }
 
   const eigen = require('./eigencollectie')({ db, domein: 'kern/magnaatwereld', bezit: { magnaatWereld: 'kaart' } });
   function state() {
@@ -320,7 +348,7 @@ module.exports = ({
   }
 
   const controle = require('./magnaat-controle')({
-    wereldState: state, getGraph: () => capabilityGraph, save, crypto, nu
+    wereldState: state, getGraph: () => graaf(), save, crypto, nu
   });
 
   function lidControleContext(key) {
@@ -338,22 +366,22 @@ module.exports = ({
 
   function publiekeCapabilityGraph() {
     return {
-      versie: capabilityGraph.versie,
-      gescand: capabilityGraph.gescand,
-      vingerafdruk: capabilityGraph.vingerafdruk.slice(0, 12),
-      motor: Object.assign({}, capabilityGraph.motor),
-      cijfers: Object.assign({}, capabilityGraph.cijfers),
+      versie: graaf().versie,
+      gescand: graaf().gescand,
+      vingerafdruk: graaf().vingerafdruk.slice(0, 12),
+      motor: Object.assign({}, graaf().motor),
+      cijfers: Object.assign({}, graaf().cijfers),
       dekkingsmatrix: {
-        percentage: capabilityGraph.dekkingsmatrix.percentage,
-        volledig: capabilityGraph.dekkingsmatrix.volledig,
-        metGaten: capabilityGraph.dekkingsmatrix.metGaten,
-        dimensies: capabilityGraph.dekkingsmatrix.dimensies.map(d => Object.assign({}, d))
+        percentage: graaf().dekkingsmatrix.percentage,
+        volledig: graaf().dekkingsmatrix.volledig,
+        metGaten: graaf().dekkingsmatrix.metGaten,
+        dimensies: graaf().dekkingsmatrix.dimensies.map(d => Object.assign({}, d))
       },
-      kantoren: capabilityGraph.kantoren.map(k => Object.assign({}, k, {
+      kantoren: graaf().kantoren.map(k => Object.assign({}, k, {
         rollen: [k.naam + '-medewerker', k.naam + '-coördinator', 'Trainee']
       })),
-      domeinen: capabilityGraph.domeinen.slice(),
-      werkprocessen: capabilityGraph.workflows.map(w => ({
+      domeinen: graaf().domeinen.slice(),
+      werkprocessen: graaf().workflows.map(w => ({
         id: w.id, naam: w.naam, familie: w.familie, domein: w.domein,
         kantoor: w.kantoor, rol: w.rol, risico: w.risico,
         geregistreerd: w.geregistreerd, actieAantal: w.actieAantal,
@@ -368,7 +396,7 @@ module.exports = ({
         rol: w.rol, stappen: w.stappen.length, veiligheidsniveau: w.veiligheidsniveau,
         codeFamilies: (w.codeFamilies || []).slice(), automatisch: !!w.automatisch
       })),
-      automatischeWerkprocessen: capabilityGraph.cijfers.automatischeWerkprocessen || 0
+      automatischeWerkprocessen: graaf().cijfers.automatischeWerkprocessen || 0
     };
   }
 
@@ -406,22 +434,22 @@ module.exports = ({
     capabilityGraph = capabilityScanner.scan();
     alleWerkprocessen = KANTOORWERKPROCESSEN.concat(capabilityGraph.automatischeWerkprocessen || []);
     const vorigeIds = new Set(vorig && Array.isArray(vorig.workflowIds) ? vorig.workflowIds : []);
-    const toegevoegd = vorig ? capabilityGraph.workflows.filter(w => !vorigeIds.has(w.id)) : [];
-    const kandidaten = (vorig ? toegevoegd : capabilityGraph.workflows.filter(w => !w.geregistreerd && w.actieAantal >= 2))
+    const toegevoegd = vorig ? graaf().workflows.filter(w => !vorigeIds.has(w.id)) : [];
+    const kandidaten = (vorig ? toegevoegd : graaf().workflows.filter(w => !w.geregistreerd && w.actieAantal >= 2))
       .filter(w => !w.geregistreerd).slice(0, 12);
     let voorstellen = 0;
     for (const workflow of kandidaten) if (integratieVoorstel(workflow, actor, !!vorig)) voorstellen += 1;
-    const gewijzigd = !vorig || vorig.vingerafdruk !== capabilityGraph.vingerafdruk;
+    const gewijzigd = !vorig || vorig.vingerafdruk !== graaf().vingerafdruk;
     s.capabilitySnapshot = {
-      vingerafdruk: capabilityGraph.vingerafdruk,
-      workflowIds: capabilityGraph.workflows.map(w => w.id),
-      appPaden: capabilityGraph.apps.map(a => a.pad),
-      apiActies: capabilityGraph.cijfers.apiActies,
-      gescand: capabilityGraph.gescand
+      vingerafdruk: graaf().vingerafdruk,
+      workflowIds: graaf().workflows.map(w => w.id),
+      appPaden: graaf().apps.map(a => a.pad),
+      apiActies: graaf().cijfers.apiActies,
+      gescand: graaf().gescand
     };
     const gatenplan = controle.planGaten(boardroomControleContext(actor), { limiet: 25 });
-    if (gewijzigd) log('code-scan', actor, capabilityGraph.cijfers.apps + ' apps · ' + capabilityGraph.cijfers.apiActies + ' API-acties · ' + capabilityGraph.cijfers.werkprocessen + ' werkprocessen');
-    return { gewijzigd, toegevoegd: toegevoegd.length, voorstellen, cijfers: capabilityGraph.cijfers, gatenplan };
+    if (gewijzigd) log('code-scan', actor, graaf().cijfers.apps + ' apps · ' + graaf().cijfers.apiActies + ' API-acties · ' + graaf().cijfers.werkprocessen + ' werkprocessen');
+    return { gewijzigd, toegevoegd: toegevoegd.length, voorstellen, cijfers: graaf().cijfers, gatenplan };
   }
 
   const datumSleutel = tijd => new Intl.DateTimeFormat('en-CA', {
@@ -615,7 +643,7 @@ module.exports = ({
   }
 
   function kiesKantoor(key, kantoorId, rol) {
-    const kantoor = capabilityGraph.kantoren.find(k => k.id === tekst(kantoorId, 80));
+    const kantoor = graaf().kantoren.find(k => k.id === tekst(kantoorId, 80));
     if (!kantoor) return { status: 404, error: 'Deze RTG-werkruimte staat niet in de actuele codescan.' };
     const rollen = [kantoor.naam + '-medewerker', kantoor.naam + '-coördinator', 'Trainee'];
     rol = tekst(rol, 80) || rollen[0];
@@ -628,7 +656,7 @@ module.exports = ({
   }
 
   function werkprocesStart(key, workflowId, apparaat) {
-    const workflow = alleWerkprocessen.find(w => w.id === tekst(workflowId, 100));
+    const workflow = werkprocessen().find(w => w.id === tekst(workflowId, 100));
     if (!workflow) return { status: 404, error: 'Dit volledige werkproces bestaat nog niet.' };
     if (!controle.beschikbaar('api', 'POST /api/member/magnaat/werkproces/start')) {
       return { status: 423, error: 'Volledige werkprocessen staan in de Magnaat-trainingsomgeving tijdelijk uit.' };
@@ -829,7 +857,7 @@ module.exports = ({
     if (!geforceerd && s.laatsteScan && nu() - s.laatsteScan < DAG) {
       const codeScan = {
         gewijzigd: false, toegevoegd: 0, voorstellen: 0,
-        cijfers: capabilityGraph.cijfers, gatenplan: null
+        cijfers: graaf().cijfers, gatenplan: null
       };
       return { ok: true, nieuw: codeScan.voorstellen, overgeslagen: true, codeScan, capabilityGraph: publiekeCapabilityGraph(), voorstellen: s.voorstellen.map(voorstelPubliek) };
     }
@@ -958,11 +986,11 @@ module.exports = ({
       cijfers: {
         rtgFuncties: alleFuncties.length,
         speelbaar: catalogus.length,
-        appsGevonden: capabilityGraph.cijfers.apps,
-        apiActies: capabilityGraph.cijfers.apiActies,
-        werkprocessen: capabilityGraph.cijfers.werkprocessen,
-        kantoren: capabilityGraph.cijfers.kantoren,
-        ongedekt: capabilityGraph.cijfers.ongedekteApiActies,
+        appsGevonden: graaf().cijfers.apps,
+        apiActies: graaf().cijfers.apiActies,
+        werkprocessen: graaf().cijfers.werkprocessen,
+        kantoren: graaf().cijfers.kantoren,
+        ongedekt: graaf().cijfers.ongedekteApiActies,
         spelers: spelers.length,
         opdrachtenVoltooid: afgerond,
         voorstellenOpen: s.voorstellen.filter(v => v.status === 'voorstel').length,

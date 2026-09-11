@@ -54,6 +54,14 @@ module.exports = [
     uitleg: 'Vergaderkamers op codenaam; beeld en geluid lopen peer-to-peer.', paden: ['/api/meet'] },
   { id: 'dom-nav', categorie: 'Diensten (leden)', naam: 'Navigatie', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Routes en navigatie onderweg.', paden: ['/api/nav'] },
+  /* RTG MOVE (MOVE.md): de naad tussen twee reisonderdelen -- haal ik het, wat
+     breekt er als iets verschuift, waar moet ik nu naartoe. Een eigen
+     schakelaar en niet die van Navigatie, want het zijn twee beloften: gaat
+     Move uit, dan blijft navigeren gewoon werken en verdwijnt alleen het
+     oordeel over de samenhang. Zou hij aan `dom-nav` hangen, dan zet de
+     boardroom bij een storing in de naadlaag de hele kaart uit. */
+  { id: 'dom-move', categorie: 'Diensten (leden)', naam: 'RTG Move (haal ik het?)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Of uw reis in de tijd klopt, en wat er breekt als iets verschuift.', paden: ['/api/move'] },
   /* De plaatslaag (PLAATS.md). Hoort hier net zo goed als elk ander domein: de
      boardroom moet hem per pas, per land of bij storing kunnen sluiten. Gaat
      hij uit, dan valt het huis terug op wat er voor deze laag was -- hekken en

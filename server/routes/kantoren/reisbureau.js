@@ -29,6 +29,31 @@ module.exports = ({ app, officeAuth, veilig, stuur, afdelingen, kern }) => {
       stuur(res, r);
     } catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
+  /* DE NAZORG: wijzigen en afzeggen van een reis die al bevestigd is
+     (kern/reisbureau-nazorg.js). Ook hier beslist een mens, en om dezelfde reden
+     als bij /besluit: dit zijn toezeggingen aan een lid. WIE beslist komt uit de
+     sessie en niet uit de body, en beide besluiten gaan het auditlog in. */
+  app.post('/api/office/reisbureau/wijziging', officeAuth, (req, res) => {
+    const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
+    veilig(res, () => {
+      const r = kern.reisbureau.besluitWijziging(String((req.body || {}).ref || ''),
+        String((req.body || {}).besluit || ''), wie, (req.body || {}).bericht);
+      if (r.ok) afdelingen.audit(wie, 'Reisbureau: wijziging ' + r.aanvraag.ref + ' '
+        + ((r.aanvraag.wijziging || {}).stand || '') + ' (' + r.aanvraag.titel + ')');
+      return r;
+    });
+  });
+  app.post('/api/office/reisbureau/afzeggen', officeAuth, async (req, res) => {
+    const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
+    try {
+      const r = await kern.reisbureau.zegAf({ ref: String((req.body || {}).ref || ''),
+        door: wie, reden: (req.body || {}).reden });
+      if (r.ok) afdelingen.audit(wie, 'Reisbureau: reis ' + r.aanvraag.ref + ' afgezegd ('
+        + r.aanvraag.titel + '): ' + r.aanvraag.afzegging.reden);
+      stuur(res, r);
+    } catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+
   /* De losse ingangen naast /besluit. Ze bestaan omdat het dossier van het lid
      eraan hangt: bevestigen zet de reis daar op bevestigd, afwijzen haalt hem
      eruit (kern/lid/reisdossier.js). De regel eronder is dezelfde als bij

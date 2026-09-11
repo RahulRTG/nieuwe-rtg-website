@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **213** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **215** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
-| Bedrijfsgenres | **74** in 27 sectoren |
+| Bedrijfsgenres | **75** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2067** |
-| App-pagina's (`public/apps/**.html`) | **304** |
-| Testbestanden | **1781** |
+| Kernmodules (`server/kern/**`) | **2080** |
+| App-pagina's (`public/apps/**.html`) | **305** |
+| Testbestanden | **1801** |
 
 ## De vier werelden
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 213 functieschakelaars
+# 1. De 215 functieschakelaars
 
 ### Leden (RTG-app) — 24
 
@@ -141,7 +141,7 @@ ook blokkeert.
 - **RTG Commerce (mand & retour)** (`commerce`) — De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug. RTG bevestigt hier zelf niets.  
   _voor: rtg, lifestyle, business_
 
-### Eigen apps — 37
+### Eigen apps — 38
 
 - **Spelen (spellen met vrienden)** (`spellen`) — Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.  
   _voor: rtg, lifestyle, business, foundation_
@@ -216,6 +216,8 @@ ook blokkeert.
 - **Kinderopvang (ouderkant)** (`opvangwijzer`) — Welke kinderopvang er is en hoeveel plek daar vrij is, plus een aanvraag klaarzetten en zelf weer intrekken. Een vrije plek is geen plek: inschrijven doet de opvang zelf. De aanwezigheidslijst van een groep komt hier nooit uit; een ouder ziet een getal en niet de namen van andere kinderen.  
   _voor: rtg, lifestyle, business_
 - **Knelpunten (welke weg ligt open)** (`knelpunt`) — Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan. Bewaart niets: alles komt binnen in het verzoek en gaat eruit als antwoord. Er wordt niets gerangschikt en geen beste weg aangewezen.  
+  _voor: rtg, lifestyle, business_
+- **Vertegenwoordiging (wie mag iets namens mij)** (`vertegenwoordiging`) — Machtigingen van mens tot mens: wie mag wat namens een lid, sinds wanneer, tot wanneer, en wat is er namens hem gedaan. Een machtiging versmalt alleen wat het lid zelf al mocht en voegt er nooit iets aan toe; aanvaarden doet het lid zelf en intrekken kan altijd, per direct.  
   _voor: rtg, lifestyle, business_
 
 ### Partners (leveranciers) — 11
@@ -317,7 +319,7 @@ ook blokkeert.
 - **Rahul doet het (AI-stuur)** (`stuur`) — De AI voert acties uit op elk toegestaan API-pad, met de eigen inlog van wie het vraagt (nooit meer rechten dan de persoon zelf). Geld-acties vragen altijd eerst een bevestiging.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel_
 
-### Diensten (leden) — 23
+### Diensten (leden) — 24
 
 - **Overheidsloket** (`dom-overheid`) — Belasting, toeslagen, rijbewijs, voertuigen, KVK, uitkeringen, bezwaar, subsidies en waterschap in een loket.  
   _voor: rtg, lifestyle, business_
@@ -338,6 +340,8 @@ ook blokkeert.
 - **RTG Meet (vergaderkamers)** (`dom-meet`) — Vergaderkamers op codenaam; beeld en geluid lopen peer-to-peer.  
   _voor: rtg, lifestyle, business_
 - **Navigatie** (`dom-nav`) — Routes en navigatie onderweg.  
+  _voor: rtg, lifestyle, business_
+- **RTG Move (haal ik het?)** (`dom-move`) — Of uw reis in de tijd klopt, en wat er breekt als iets verschuift.  
   _voor: rtg, lifestyle, business_
 - **Plaats (aanwezigheid en nadering)** (`dom-plaats`) — Hekken, toestemmingsvensters en waarnemingen; de motor draait op het toestel.  
   _voor: rtg, lifestyle, business_
@@ -651,7 +655,7 @@ ze werken; dit is wat hij ziet.
 - **RTF-Bibliotheek** `/apps/foundation/bieb.html` — Gratis kind- en gezinsapps van de RTFoundation.
 - **Geloof & Wijsheid** `/apps/foundation/geloofbieb.html` — De Geloof & Wijsheid-Bibliotheek: alle tradities als gelijken, met echte leesbare teksten.
 
-# 3. De 74 genres in 27 sectoren
+# 3. De 75 genres in 28 sectoren
 
 Er is **één** partner-app en **één** personeels-PDA. Welke schermen een zaak
 krijgt volgt niet uit zijn genre maar uit zijn *genre-caps*: een hotel en een
@@ -683,6 +687,7 @@ is de reden dat er geen 130 losse apps zijn.
 - **safety** (7) — Politie (`politie`), Brandweer (`brandweer`), Ambulance (`ambulance`), Marechaussee (`marechaussee`), Defensie (`defensie`), Special Forces (`specials`), Beveiliging & security (`beveiliging`)
 - **sports** (3) — Sportclub (`sportclub`), Golf & countryclub (`golfclub`), Sport & fitnessclub (`fitnessclub`)
 - **technology** (1) — IT-hulp aan huis (`ithulp`)
+- **travel** (1) — Reisbureau (`reisbureau`)
 - **veterinary** (2) — Dierenartspraktijk (`dierenarts`), Petcare & pension (`petcare`)
 - **wholesale** (1) — Groothandel & markt (`groothandel`)
 

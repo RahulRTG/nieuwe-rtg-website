@@ -11,7 +11,7 @@
    van stand verandert, ook al zijn er drie ingangen. */
 'use strict';
 
-module.exports = ({ db, save, nu, dossier, visum }) => {
+module.exports = ({ db, save, nu, dossier, visum, meldLid }) => {
 
   /* DE REISADVISEUR BESLIST, EN DAT IS EEN MENS.
 
@@ -48,10 +48,29 @@ module.exports = ({ db, save, nu, dossier, visum }) => {
     a.status = stand;
     a.besluit = { door: String(door || 'reisadviseur').replace(/[<>]/g, '').trim().slice(0, 60), at: nu() };
     if (veld) a.besluit[veld] = String(tekst || '').replace(/[<>]/g, '').trim().slice(0, 300) || null;
+    /* Het besluit komt ook in de geschiedenis te staan. Die lijst is van de
+       nazorg (./reisbureau-nazorg.js) en begint dus HIER, want het eerste dat
+       een reis overkomt is zijn besluit; zonder deze regel begint het spoor pas
+       bij de eerste wijziging en lijkt de bevestiging uit de lucht te komen. */
+    if (!Array.isArray(a.geschiedenis)) a.geschiedenis = [];
+    a.geschiedenis.push({ wat: stand, at: a.besluit.at, door: a.besluit.door,
+      ...(tekst ? { [veld === 'reden' ? 'reden' : 'bericht']: a.besluit[veld] } : {}) });
     save();
     if (dossier) {
       if (stand === 'bevestigd') dossier.bevestig(a.customerKey, a.ref);
       else dossier.weghalen(a.customerKey, a.ref);
+    }
+    /* EN HET LID HOORT HET. Dit ontbrak: een reis werd bevestigd of afgewezen en
+       er ging geen enkel bericht uit -- wie het wilde weten moest zelf de app
+       openen (TRAVELCOMMERCE.md par. 9, punt 3). De melding valt onder de scope
+       `orders`, want daar staat deze reis ook in het overzicht. */
+    if (typeof meldLid === 'function' && a.customerKey) {
+      const naam = a.titel + ' (' + a.bestemming + ')';
+      try {
+        meldLid(a.customerKey, { icon: 'reisboek', scope: 'orders',
+          title: stand === 'bevestigd' ? 'Uw reis is bevestigd' : 'Uw reisaanvraag is afgewezen',
+          body: naam + (a.besluit[veld] ? ': ' + a.besluit[veld] : '.') });
+      } catch (e) { console.error('[reisbureau-besluit] melding niet bezorgd'); }
     }
     return { ok: true, aanvraag: a };
   }

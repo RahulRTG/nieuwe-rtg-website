@@ -76,6 +76,13 @@
     "verval": "node scripts/normverval.js",
     "ast-scan": "node scripts/ast-scan.js",
     "ci-keten": "node scripts/ci-keten.js",
+    "ci:lokaal": "node scripts/ci-lokaal.js",
+    "ci:lokaal:lijst": "node scripts/ci-lokaal.js --lijst",
+    "ci:lokaal:snel": "node scripts/ci-lokaal.js --snel",
+    "ci:lokaal:controle": "node scripts/ci-lokaal.js --controle",
+    "bewijsladder": "node scripts/bewijsladder.js",
+    "bewijsladder:vast": "node scripts/bewijsladder.js --vastleggen",
+    "bewijsladder:controle": "node scripts/bewijsladder.js --controle",
     "attributie": "node scripts/attributie.js",
     "toetsduur": "node scripts/toetsduur.js",
     "impactbereik": "node scripts/impactbereik.js",
@@ -186,6 +193,9 @@
     "faalproef": "node scripts/faalproef.js",
     "getallen": "node scripts/getallen.js",
     "getallen:controle": "node scripts/getallen.js --controle",
+    "adressen": "node scripts/adressen.js",
+    "adressen:vast": "node scripts/adressen.js --vast",
+    "frictiestuur": "node scripts/frictiestuur.js",
     "gezagshandelingen": "node scripts/gezagshandelingen.js",
     "gezagshandelingen:lijst": "node scripts/gezagshandelingen.js --lijst",
     "gezagsnoemer": "node scripts/gezagsnoemer.js",
@@ -310,7 +320,12 @@
     "kantoormacht:vast": "node scripts/kantoormacht.js --vastleggen",
     "kantoormacht:controle": "node scripts/kantoormacht.js --controle",
     "navigatieproef": "node scripts/navigatieproef.js",
-    "navigatieproef:vast": "node scripts/navigatieproef.js --vastleggen"
+    "navigatieproef:vast": "node scripts/navigatieproef.js --vastleggen",
+    "taalkwaliteit": "node scripts/taalkwaliteit.js",
+    "taalschil": "node scripts/taalschil.js",
+    "taalkwaliteit:toon": "node scripts/taalkwaliteit.js --toon",
+    "moveproef": "node scripts/moveproef.js",
+    "moveproef:vast": "node scripts/moveproef.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

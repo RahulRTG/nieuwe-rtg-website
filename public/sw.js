@@ -14,7 +14,7 @@
    installeerde in de periode dat de `cache: 'no-cache'` hieronder was
    gesneuveld (zie de toelichting daar). Een naam die uit de INHOUD komt kan
    niet vergeten worden. */
-const CACHE = 'rtg-app-8acedbfb';
+const CACHE = 'rtg-app-f3dcc0a5';
 const SHELL = ['/apps/app.html', '/shared/id.js',
   /* Heritage is één systeemlaag. Een offline start mag niet alleen de HTML
      bewaren en daarna identiteit, materiaal, beweging of lettertypen missen. */
@@ -45,7 +45,22 @@ const SHELL = ['/apps/app.html', '/shared/id.js',
   '/apps/app.html?pas=rtg', '/apps/app.html?pas=lifestyle', '/apps/app.html?pas=business',
   '/apps/app-main.js', '/apps/spelen.html', '/shared/verbinding.js',
   '/shared/interface/second-screen.css', '/shared/interface/second-screen-personal.css', '/shared/interface/workspace-empty.js', '/shared/interface/second-screen-modules.js',
-  '/shared/interface/second-screen.js', '/shared/interface/second-screen-personal.js', '/manifest.webmanifest', '/icon.svg'];
+  '/shared/interface/second-screen.js', '/shared/interface/second-screen-personal.js', '/manifest.webmanifest', '/icon.svg',
+  /* DE TAAL HOORT BIJ DE SCHIL. Zonder i18n.js opent een offline start altijd
+     in het Nederlands, ook voor wie zijn taal allang gekozen had -- de laag die
+     de tekst omzet was er domweg niet. En zonder de schilbestanden heeft die
+     laag offline niets om uit te putten: het net is dan onbereikbaar en de kast
+     vult zich pas door eerder bezoek.
+
+     De lijst hieronder is de tien doeltalen uit server/taalschil.js. Hij staat
+     hier letterlijk omdat een service worker niets kan requiren; dat een tweede
+     lijst uit elkaar loopt met de eerste, wordt bewaakt door
+     test/taalschil.test.js -- die vergelijkt deze regels met schilPaden(). */
+  '/shared/i18n.js',
+  '/shared/taalschil/zh.json', '/shared/taalschil/hi.json', '/shared/taalschil/es.json',
+  '/shared/taalschil/ar.json', '/shared/taalschil/bn.json', '/shared/taalschil/pt.json',
+  '/shared/taalschil/ru.json', '/shared/taalschil/ja.json', '/shared/taalschil/fr.json',
+  '/shared/taalschil/en.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)));

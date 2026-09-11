@@ -70,6 +70,14 @@
   .knop{background:var(--txt);color:#000;border:none;border-radius:0;padding:.45rem .8rem;font:inherit;font-weight:600;font-size:.8rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .knop.aan{background:var(--gold);color:#000;border-color:var(--gold);}
+  /* HET MOVE-OORDEEL BIJ HET BOEKEN. Kleur als betekenis en niet als
+     versiering; NIET_TE_BEPALEN krijgt met opzet geen kleur -- "ik weet het
+     niet" is geen waarschuwing. */
+  .movenoot{font-size:.8rem;line-height:1.45;margin:0 0 .5rem;border-left:2px solid var(--line);padding-left:.6rem;color:var(--soft);}
+  .movenoot[data-u="KRAP"]{border-left-color:#C9A24B;}
+  .movenoot[data-u="ONHAALBAAR"]{border-left-color:#DE6E92;}
+  .movenoot[data-u="RUIM"]{border-left-color:#69B891;}
+  .movenoot b{color:var(--txt);}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:0;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--rtg-leesgoud,var(--gold));border-bottom:1px solid var(--gold);}
@@ -1379,6 +1387,7 @@ function boekDienst(code, dienstId){
       '<label class="opties" for="dbHerhaal">Herhalen</label><select class="veld h-mb50" id="dbHerhaal">'+
         '<option value="">Eenmalig</option><option value="1">Elke week</option><option value="2">Elke 2 weken</option><option value="4">Elke 4 weken</option></select>'+
       '<textarea class="veld" id="dbNote" rows="2" maxlength="140" placeholder="Opmerking voor de zaak (optioneel)" style="margin-bottom:0.5rem;resize:vertical;"></textarea>'+
+      '<p class="movenoot" id="dbMove" hidden></p>'+
       '<button class="knop" id="dbGa" style="width:100%;">Vraag aan · '+(d.prijs?euro(d.prijs):'op aanvraag')+'</button>'+
       '<button class="knop stil" id="dbWacht" style="width:100%;margin-top:0.5rem;" hidden>Vol? Zet mij op de wachtlijst voor deze dag</button>'+
       '<p class="opties h-mt50">Je boekt op je codenaam; de zaak bevestigt je aanvraag in de app. Een vaste afspraak stop je wanneer je wilt.</p>'+
@@ -1399,6 +1408,42 @@ function boekDienst(code, dienstId){
       wachtKnop.hidden = !vol;
     } catch(e){ tijd.innerHTML = '<option value="">'+esc(e.message)+'</option>'; }
   });
+  /* PAST DIT NOG IN MIJN REIS? Gevraagd zodra er een tijd op tafel ligt, dus
+     VOORDAT er iets vaststaat -- dat is het hele punt van deze vraag.
+
+     HIJ BLOKKEERT NIETS. De knop blijft doen wat hij deed; dit is een
+     mededeling. Move mag geen boeking tegenhouden, want dan beslist de software
+     over de reis van een mens (MOVE.md grens 5). Faalt de vraag, dan blijft het
+     vak leeg: een boeking mag niet stranden op een weging.
+
+     De DEKKING staat erbij. Zonder dat getal leest "ruim" als een garantie over
+     de hele reis, terwijl Move soms over de helft niets kan zeggen -- de
+     faalvorm die MOVE.md als grootste risico noemt. */
+  const moveNoot = wrap.querySelector('#dbMove');
+  const TEKST = { RUIM: 'Dit past ruim in je reis.', KRAP: 'Deze planning is niet betrouwbaar.',
+    ONHAALBAAR: 'Dit ga je op deze tijden niet halen.' };
+  async function weegVoornemen(){
+    moveNoot.hidden = true;
+    if (!datum.value || !tijd.value) return;
+    let r;
+    try {
+      r = await api('/api/move/vooraf', { titel: d.naam || 'Deze afspraak', soort: 'afspraak',
+        plek: { zaak: code }, dag: datum.value, uur: tijd.value, duurMin: d.duurMin || null });
+    } catch(e){ return; }                      // stil: een weging mag niets breken
+    if (!r || !r.oordeelMet) return;           // geen oordeel is geen mededeling
+    const n = (r.naden || [])[0];
+    const marge = n && Number.isFinite(n.margeMin)
+      ? ' Je hebt ' + n.beschikbaarMin + ' min en er is ' + n.nodigMin + ' min reistijd nodig.'
+      : '';
+    const dekking = Number.isFinite(r.dekking) && r.dekking < 100
+      ? ' Move kon ' + r.dekking + '% van je reis wegen.' : '';
+    moveNoot.setAttribute('data-u', r.oordeelMet);
+    moveNoot.innerHTML = '<b>' + esc(TEKST[r.oordeelMet] || '') + '</b>' + esc(marge + dekking) +
+      (r.vergelijking === 'slechter' ? ' <b>Je reis wordt hier krapper van.</b>' : '');
+    moveNoot.hidden = false;
+  }
+  tijd.addEventListener('change', () => { weegVoornemen().catch(() => {}); });
+
   wachtKnop.addEventListener('click', async () => {
     try {
       await api('/api/vak/wachtlijst/zet', { supplierCode: code, serviceId: d.id, datum: datum.value });

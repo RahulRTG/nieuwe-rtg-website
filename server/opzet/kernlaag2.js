@@ -142,7 +142,7 @@ Object.assign(kern, require('../kern/foodcourt').maakFoodcourt({ db, save, crypt
    bevestigt). De visumtaak-haak is laat gebonden (kern/visumtaak.js komt in
    kernlaag7) en optioneel. */
 Object.assign(kern, require('../kern/reisbureau').maakReisbureau({ db, save, crypto, anthropic, accounts,
-  visumtaakVan: () => kern.visumtaak }));
+  visumtaakVan: () => kern.visumtaak, meldLidVan: () => kern.meldLid }));
 /* Het REISAANBOD (kern/reisaanbod.js): de enige schrijver van partnerTrips, de
    bak die het reisbureau hierboven leest. Waarom die schrijver moest bestaan
    staat in de kop daar; de balie zit in routes/kantoren/reizen.js. */

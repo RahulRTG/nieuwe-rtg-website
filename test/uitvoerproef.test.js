@@ -192,3 +192,113 @@ test('draaiUitvoerproef: een verlopen token wordt eenmaal opnieuw gehaald', asyn
   assert.equal(uit.perRoute['POST /api/x'].uitvoer, 'schoon',
     'zonder de tweede poging zou een verlopen token als ongemeten wegvallen');
 });
+
+/* ============================================================================
+   DE TWEE HELFTEN VAN EEN AANVAARDE UITZONDERING: EEN NATREKBARE GROND, EN EEN
+   HANDTEKENING.
+
+   WAAROM DEZE TOETSEN ER ZIJN. De lijst VERKLAARD bestond al en deed zijn werk,
+   maar de kop erboven beweerde iets dat de lijst niet kon waarmaken: "een mens
+   heeft opgeschreven waarom dat hier hoort". Van de acht regels was dat voor
+   drie onwaar -- die heeft een auditronde erbij gezet -- en er stond nergens in
+   de data dat ze van niemand kwamen. Een uitzonderingenlijst waarvan je niet
+   kunt zien wie hem aanvaardde, is precies de plek waar een bevinding alsnog
+   verdwijnt. Dat is dezelfde klasse als de bevinding waar deze lijst uit
+   voortkwam: een verdict zonder mogelijkheid om te kloppen.
+
+   1. `bron` + `citaat` maken de grond FALSIFIEERBAAR. Een reden is anders een
+      zin die iemand typte; nu loopt er een draad naar de code die kan BREKEN.
+   2. `afgetekend` is de handtekening. Alle acht staan op null, dus op
+      `voorgedragen`, en dat is geen omissie maar de waarheid: wie deze code
+      schrijft mag geen uitzondering op een privacyregel aanvaarden.
+
+   DE MUTATIES, alle vier gedraaid en alle vier zien zakken:
+     - een citaat dat niet (meer) in zijn bron staat        -> 1 zakt
+     - een verklaring voor een route die niet bestaat       -> 2 en 4 zakken
+     - verklaringStand() geeft altijd 'afgetekend'          -> 4 zakt
+     - voorgedragen en afgetekend in EEN bak                -> 4 zakt, plus de
+       bestaande toets "verklaard telt apart van schoon"
+
+   EN EEN EERLIJKHEID OVER DE RATEL (toets 3): op die derde mutatie zakt hij
+   NIET. Een plafond vangt alleen groei, en een leugen die minder schuld meldt
+   dan er is glijdt eronderdoor. Wat die leugen wel vangt is toets 4, die de
+   twee bakken naast elkaar legt. Een ratel zonder zo'n toets ernaast is dus
+   geen bewaker van de handtekening -- alleen van het aantal.
+   ========================================================================== */
+test('elke verklaring wijst een bron aan waarin haar grond letterlijk staat', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const { VERKLAARD } = require('../scripts/lib/uitvoerproef');
+  const wortel = path.join(__dirname, '..');
+  let gekeurd = 0;
+  for (const [route, v] of Object.entries(VERKLAARD)) {
+    assert.ok(v.bron, route + ' mist de bron waarin zijn grond na te trekken is');
+    assert.ok(v.citaat && v.citaat.length > 15, route + ' mist een citaat uit die bron');
+    const pad = path.join(wortel, v.bron);
+    assert.ok(fs.existsSync(pad), route + ' wijst naar ' + v.bron + ', en dat bestand bestaat niet');
+    /* LETTERLIJK, en dat is het hele punt: verdwijnt de zin uit de bron -- de
+       sleutel wordt toch bewaard, de ketenstand gaat er niet meer mee -- dan
+       zakt deze toets in plaats van dat de uitzondering stil blijft gelden. */
+    assert.ok(fs.readFileSync(pad, 'utf8').includes(v.citaat),
+      route + ': het citaat staat niet (meer) in ' + v.bron + ', dus de grond is niet na te trekken');
+    gekeurd++;
+  }
+  assert.ok(gekeurd >= 8, 'er horen minstens acht verklaringen gekeurd te zijn, niet ' + gekeurd);
+});
+
+test('elke verklaring noemt een route die werkelijk bestaat', () => {
+  const { alleRoutes } = require('../scripts/lib/routes');
+  const { VERKLAARD } = require('../scripts/lib/uitvoerproef');
+  /* Uit de ROUTER en niet uit de bron: zie de kop van scripts/lib/routes.js.
+     Een uitzondering voor een route die niet bestaat onderdrukt niets en valt
+     ook nooit meer op -- hij houdt alleen een verklaring in de lucht voor een
+     pad dat iemand hernoemd heeft. */
+  const bestaat = new Set(alleRoutes().map(r => r.methode + ' ' + r.pad));
+  for (const route of Object.keys(VERKLAARD)) {
+    assert.ok(bestaat.has(route), route + ' staat verklaard maar bestaat niet in de router');
+  }
+});
+
+test('een uitzondering zonder handtekening is schuld, en die schuld is begrensd', () => {
+  const { VERKLAARD, verklaringStand, VOORGEDRAGEN_MAX } = require('../scripts/lib/uitvoerproef');
+  const standen = Object.keys(VERKLAARD).map(verklaringStand);
+  for (const st of standen) assert.ok(st === 'afgetekend' || st === 'voorgedragen', 'onbekende stand: ' + st);
+  /* GEEN VERKLARING IS EEN DERDE UITKOMST en geen synoniem van voorgedragen:
+     een route die niet in de lijst staat, is een lek. */
+  assert.equal(verklaringStand('POST /api/nergens/heen'), null);
+
+  const voorgedragen = standen.filter(s => s === 'voorgedragen').length;
+  /* DE RATEL. Gaat alleen omlaag, en de weg omlaag is een mens die aftekent --
+     niet een regel die verdwijnt. Wie dit getal omhoog zet zonder het in
+     scripts/lib/uitvoerproef.js uit te schrijven, sloopt de ratel zelf. */
+  assert.ok(voorgedragen <= VOORGEDRAGEN_MAX,
+    voorgedragen + ' voorgedragen uitzonderingen, ratel staat op ' + VOORGEDRAGEN_MAX);
+});
+
+test('de ronde meldt afgetekend en voorgedragen apart, nooit als een getal', async () => {
+  const mod = require('../scripts/lib/uitvoerproef');
+  const { draaiUitvoerproef, maakKanaries, VERKLAARD } = mod;
+  const kan = maakKanaries('98');
+  /* Er is vandaag geen enkele AFGETEKENDE uitzondering, dus die tak zou
+     ongetoetst blijven. Hier komt er tijdelijk een bij, zodat bewezen is dat de
+     twee bakken werkelijk uit elkaar lopen en niet allebei hetzelfde vullen. */
+  VERKLAARD['POST /api/proef/afgetekend'] = { veld: 'sleutel', reden: 'alleen voor deze toets',
+    bron: 'test/uitvoerproef.test.js', citaat: 'alleen voor deze toets', afgetekend: 'toets' };
+  try {
+    const uit = await draaiUitvoerproef({
+      /* HEX en geen 'zzz...': de lekmerker vraagt een sleutelvorm, en met een
+         reeks z'en zag hij niets -- dan staan beide routes op `schoon` en meet
+         deze toets niets. Zo gebeurde het ook echt, en de toets viel er terecht
+         over. */
+      post: async () => ({ status: 200, data: { ok: true, sleutel: 'a'.repeat(40) } }),
+      routes: [{ method: 'POST', pad: '/api/proef/afgetekend', rol: 'member' },
+        { method: 'POST', pad: '/api/toestellen/koppel', rol: 'member' }],
+      tokenVoor: () => 't', lijfVoor: () => ({}), kanaries: kan
+    });
+    assert.deepEqual(uit.bevindingen.afgetekend.map(x => x.split(' ')[1]), ['/api/proef/afgetekend']);
+    assert.deepEqual(uit.bevindingen.voorgedragen.map(x => x.split(' ')[1]), ['/api/toestellen/koppel']);
+    assert.equal(uit.perRoute['POST /api/proef/afgetekend'].grond, 'afgetekend');
+    assert.equal(uit.perRoute['POST /api/toestellen/koppel'].grond, 'voorgedragen');
+    assert.equal(uit.bevindingen.lekken.length, 0, 'beide zijn verklaard, dus geen lek');
+  } finally { delete VERKLAARD['POST /api/proef/afgetekend']; }
+});

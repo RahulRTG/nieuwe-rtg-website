@@ -67,6 +67,11 @@ test('5. een geüploade foto laat zich weer weghalen', async () => {
   const url = up.body.url;
   const weg = await api(base, '/api/office/atelierweb/foto-weg', { url }, office);
   assert.equal(weg.status, 200);
+  /* De lijst NA de verwijdering hoort terug te komen. Een route die de async
+     kern niet afwacht stuurt een Promise naar res.json(), en die wordt `{}`
+     met een 200 -- dan is `fotos` er niet, en dat is een vals succes en geen
+     vormfout. Deze regel zegt dat hardop in plaats van een TypeError. */
+  assert.ok(Array.isArray(weg.body.fotos), 'de lijst na de verwijdering komt terug, niet een leeg antwoord: ' + JSON.stringify(weg.body));
   assert.ok(!weg.body.fotos.includes(url), 'weg uit de beeldbank');
 });
 

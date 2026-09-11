@@ -6,7 +6,7 @@
 
      EEN MACHTIGING VERLEENT NOOIT VERMOGEN. Zij versmalt bestaand vermogen.
 
-   Daaruit volgen de toetsen. De uitkomst van `versmal` is een DOORSNEDE, dus
+   Daaruit volgen de toetsen. De uitkomst van `versmalMachtiging` is een DOORSNEDE, dus
    wat eruit komt zat er al in. De lijst is GESLOTEN, dus wat er niet in staat
    valt niet te vragen. En de eigen grens van de cliënt raakt ook wat AL loopt --
    een grens die alleen nieuwe machtigingen tegenhoudt, beschermt precies de
@@ -82,7 +82,7 @@ test('3. een machtiging zonder einddatum bestaat niet, en niet langer dan het ma
 test('4. versmallen is een DOORSNEDE: wat eruit komt zat er al in', () => {
   const m = M.vorm(lijf()).machtiging;
   for (const eigen of [[], ['aanbod.ontvangen'], SLEUTELS]) {
-    const r = M.versmal(eigen, m);
+    const r = M.versmalMachtiging(eigen, m);
     for (const k of r.bevoegdheden) {
       assert.ok(eigen.includes(k), k + ' kwam uit de versmalling maar zat niet in wat de cliënt zelf heeft');
       assert.ok(m.bevoegdheden.includes(k), k + ' kwam uit de versmalling maar stond niet in de machtiging');
@@ -92,7 +92,7 @@ test('4. versmallen is een DOORSNEDE: wat eruit komt zat er al in', () => {
 
 test('5. versmallen kan NIETS toevoegen, ook niet als de cliënt meer heeft', () => {
   const m = M.vorm(lijf({ bevoegdheden: ['aanbod.ontvangen'] })).machtiging;
-  const r = M.versmal(SLEUTELS, m);
+  const r = M.versmalMachtiging(SLEUTELS, m);
   assert.deepStrictEqual(r.bevoegdheden, ['aanbod.ontvangen']);
 });
 

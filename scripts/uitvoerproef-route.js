@@ -32,7 +32,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
-const { draaiUitvoerproef, maakKanaries, kanarieLijst } = require('./lib/uitvoerproef');
+const { draaiUitvoerproef, maakKanaries, kanarieLijst, VOORGEDRAGEN_MAX } = require('./lib/uitvoerproef');
 const { plausibelLijf } = require('./lib/rolproef');
 const { alleRoutes, isSchakel } = require('./lib/routes');
 /* Wanneer is dit gemeten, en waartegen. Zonder stempel is een register niet na
@@ -211,10 +211,18 @@ if (require.main !== module) return;
   const gezakt = rijen.filter(r => r.uitvoer === 'GEZAKT');
   const poortRijen = rijen.filter(r => r.uitvoer === 'poort');
   /* Verklaard staat APART van schoon: hier zag de proef werkelijk een geheim en
-     heeft een mens opgeschreven waarom dat daar hoort (VERKLAARD in
+     staat er opgeschreven waarom dat daar hoort (VERKLAARD in
      lib/uitvoerproef.js). Onder schoon wegstrepen zou de lijst een plek maken
-     waar bevindingen verdwijnen. */
+     waar bevindingen verdwijnen.
+
+     EN DE VERKLARINGEN VALLEN ZELF IN TWEE. `afgetekend` betekent dat een mens
+     deze uitzondering heeft aanvaard; `voorgedragen` dat er een grond staat
+     waar nog niemand achter is gaan staan. Die twee worden hieronder NOOIT
+     opgeteld: een uitzondering zonder handtekening is schuld, en een getal
+     waarin hij meetelt met een aanvaarde uitzondering verbergt precies dat. */
   const verklaardRijen = rijen.filter(r => r.uitvoer === 'verklaard');
+  const afgetekend = verklaardRijen.filter(r => r.grond === 'afgetekend');
+  const voorgedragen = verklaardRijen.filter(r => r.grond === 'voorgedragen');
 
   console.log('  verzoeken                            : ' + uit.pogingen);
   console.log('  gaf een 2xx (echt gemeten)           : ' + uit.gemeten + ' / ' + routes.length);
@@ -223,6 +231,9 @@ if (require.main !== module) return;
   console.log('  antwoord met gegevens van een ander  : ' + gezakt.length);
   for (const b of uit.bevindingen.lekken.slice(0, 20)) console.log('      ' + b);
   console.log('  geheim dat er hoort (verklaard)      : ' + verklaardRijen.length);
+  console.log('      door een mens afgetekend         : ' + afgetekend.length);
+  console.log('      voorgedragen, nog niet afgetekend: ' + voorgedragen.length +
+    ' (ratel: ' + VOORGEDRAGEN_MAX + ')');
   for (const b of (uit.bevindingen.verklaard || []).slice(0, 10)) console.log('      ' + b);
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
@@ -236,6 +247,9 @@ if (require.main !== module) return;
     kanariekenmerk: kenmerk,
     gemeten: { routesMetRol: routes.length, gemeten: uit.gemeten, pogingen: uit.pogingen,
       schoon: schoon.length, gezakt: gezakt.length, verklaard: verklaardRijen.length,
+      /* twee tellers en geen som: zie de opmerking bij verklaardRijen */
+      verklaardAfgetekend: afgetekend.length, verklaardVoorgedragen: voorgedragen.length,
+      voorgedragenRatel: VOORGEDRAGEN_MAX,
       achterEenPoort: poortRijen.length,
       tokensHernieuwd: uit.hernieuwd, begrenzing: MAX },
     verklaringen: uit.bevindingen.verklaard || [],

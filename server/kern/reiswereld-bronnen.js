@@ -11,33 +11,76 @@
    de lagen erboven niet (REIZEN.md par. 2.2). */
 'use strict';
 
+const { datumVan, tijdVan } = require('./agendatijd');
+
 module.exports = function bronnen({ kern, regel, bron }, key, uit, stil) {
     bron('verblijven', () => (kern.mijnVerblijven(key) || [])
       .filter(v => v.status !== 'geannuleerd')
       .map(v => regel('verblijf', {
         titel: v.roomName, bestemming: v.plaats || '', van: v.aankomst, tot: v.vertrek,
+        /* Het hotel IS een zaak en die code stond al op het verblijf;
+           mijnVerblijven() zocht hem zelfs op voor `plaats` en gooide hem weg.
+           Dit lost de PLEK op en niet de TIJD: een verblijf draagt een
+           aankomstdatum zonder uur, dus de naad blijft NIET_TE_BEPALEN met een
+           kortere mist-lijst. Een check-in van 15:00 verzinnen zou de marge een
+           gok maken. */
+        plek: v.supplierCode ? { zaak: v.supplierCode } : null,
         status: v.status, kenmerk: v.id, herkomst: 'partner',
         app: 'Verblijven', link: '/apps/hotels.html'
       })), uit, stil);
 
+    /* HET REISBUREAU DRAAGT GEEN PLEK, en dat blijft zo: een reispakket heeft
+       een bestemming als vrije tekst ("Barcelona") en geen zaak. Geen benadering
+       op de stadsnaam -- op zo'n marge wordt straks een reservering verzet. Het
+       hotel dat het reisbureau boekt IS een zaak, dus daar zit de volgende
+       dekkingswinst: in dat domein en niet hier. */
+
+    /* WAT ER NIET MEER KOMT, EN WAT NOG WEL AANDACHT VRAAGT -- en dat zijn hier
+       twee verschillende dingen.
+
+       Weggelaten worden een INGETROKKEN aanvraag en een AFGEZEGDE reis: die
+       eerste is nooit iets geworden, die tweede was rond en gaat alsnog niet
+       door (kern/reisbureau-nazorg.js). Allebei staan ze nog gewoon bij "mijn
+       aanvragen" en in het bestellingenoverzicht, met hun reden erbij -- ze zijn
+       alleen niet KOMEND, en dat is wat deze lijst is.
+
+       Een AFGEWEZEN aanvraag blijft hier wel staan, en dat is met opzet: de
+       reiswereld zet er het signaal `aandacht` op, en kern/reisoplosser.js
+       hangt daaraan om alternatieven uit de eigen catalogus te zoeken ("los het
+       op"). Wie hem hier wegfiltert omdat hij "toch niet doorgaat", haalt stil
+       die hele functie weg -- test/reiswereld.test.js zakt er terecht op.
+
+       De afgezegde reis krijgt die alternatieven vandaag NIET. Dat is een gat
+       en geen besluit: juist een reis die het reisbureau zelf afzegt is de plek
+       waar een lid een alternatief wil. Het staat in TRAVELCOMMERCE.md par. 8
+       en niet hier stil weggelaten. */
     bron('reisbureau', () => (kern.reisbureau.mijn(key) || [])
-      .filter(a => a.status !== 'geannuleerd')
+      .filter(a => a.status !== 'geannuleerd' && a.status !== 'afgezegd')
       .map(a => regel('reis', {
         titel: a.titel, bestemming: a.bestemming, van: a.vertrek, personen: a.personen,
         status: a.status, kenmerk: a.ref, herkomst: 'rtg',
         app: 'Reisbureau', link: '/apps/reisbureau.html'
       })), uit, stil);
 
+    /* DE PLEK IS HIER NIET DE BESTEMMING. Bij elk ander onderdeel vallen "waar
+       ga ik heen" en "waar moet ik zijn" samen; bij een vlucht niet -- u moet op
+       de LUCHTHAVEN zijn. Wie `bestemming` als plek meestuurt, laat Move de
+       reistijd naar Parijs Le Bourget rekenen voor iemand die naar de gate moet.
+       De bestemming blijft dus vrije tekst ('Ibiza (uit Geneve)') en wordt nooit
+       een coordinaat; de luchthaven komt als verwijzing uit kern/luchthaven.
+       Dit is de bron die de dekking echt verhoogt: een vlucht draagt als enige
+       van de vijf een datum EN een uur. Zie MOVE.md par. 6. */
     bron('vluchten', () => {
       const d = kern.lucht.mijn(key) || {};
+      const luchthaven = kern.lucht.plek ? kern.lucht.plek() : null;
       const b = (d.boekingen || []).filter(x => x.status !== 'geannuleerd').map(x => regel('vlucht', {
         titel: (x.vlucht || {}).nummer, bestemming: (x.vlucht || {}).bestemming,
-        van: (x.vlucht || {}).datum, tijd: (x.vlucht || {}).tijd,
+        van: (x.vlucht || {}).datum, tijd: (x.vlucht || {}).tijd, plek: luchthaven,
         status: x.status, kenmerk: x.id, herkomst: 'rtg',
         app: 'Vluchten', link: '/apps/vluchten.html'
       }));
       const c = (d.charters || []).filter(x => x.status !== 'geannuleerd').map(x => regel('charter', {
-        titel: x.soort, bestemming: x.bestemming, van: x.datum, tijd: x.tijd,
+        titel: x.soort, bestemming: x.bestemming, van: x.datum, tijd: x.tijd, plek: luchthaven,
         status: x.status, kenmerk: x.code, herkomst: 'rtg', app: 'Hangar', link: '/apps/hangar.html'
       }));
       return b.concat(c);
@@ -68,13 +111,33 @@ module.exports = function bronnen({ kern, regel, bron }, key, uit, stil) {
     const rij = kern.db.boekingenVanKlant ? kern.db.boekingenVanKlant(key)
       : (kern.db.data.boekingen || []).filter(b => (b.customerKey || b.customerTier) === key);
     return rij
-      .filter(b => b.datum && b.paid && !['geannuleerd', 'geweigerd', 'terugbetaald'].includes(b.status))
+      /* WANNEER EEN BOEKING IS, KOMT UIT KERN/AGENDATIJD.JS -- en hier stond een
+         derde waarheid. Deze bron filterde op `b.datum` en las `b.tijd`, en die
+         velden bestaan niet op een boeking: routes/member/boeken.js zet
+         `wanneer` ('JJJJ-MM-DD HH:MM'). Gevolg: het filter was ALTIJD onwaar en
+         geen enkele betaalde activiteit of afspraak kwam ooit op de reistijdlijn
+         terecht. Stil, want een bron die niets oplevert leest als "u hebt geen
+         afspraken" -- precies de faalvorm waar de kop van agendatijd.js voor
+         waarschuwt, en die module bestaat om deze twee plekken niet te laten
+         uiteenlopen (LAT.md regel 4). */
+      .filter(b => datumVan(b) && b.paid && !['geannuleerd', 'geweigerd', 'terugbetaald'].includes(b.status))
       .map(b => {
         const zaak = kern.findSupplier(b.supplierCode);
         return regel(b.kind === 'ticket' ? 'activiteit' : 'afspraak', {
           titel: (b.service && b.service.name) || b.supplierName,
           bestemming: (zaak && zaak.city) || '',
-          van: b.datum, tijd: b.tijd || null, personen: b.personen,
+          /* De leverancierscode ging hier al door de handen (`findSupplier`
+             hierboven) en werd daarna weggegooid: alleen de stadsnaam bleef
+             over. Daarmee wist de tijdlijn WAAR het ongeveer was en niet waar
+             het IS, en kon RTG Move geen enkele overgang rekenen. De code gaat
+             nu mee als verwijzing; oplossen doet de plekkenlaag. */
+          plek: b.supplierCode ? { zaak: b.supplierCode } : null,
+          /* En de DUUR, die de boeking al bewaarde (routes/member/boeken.js
+             regel 40 zet `service.duurMin`) en die hier net zo hard werd
+             weggegooid. Zonder duur is er geen moment waarop u er weg kunt, en
+             dus geen overgang naar het volgende onderdeel te rekenen. */
+          duurMin: (b.service && b.service.duurMin) || null,
+          van: datumVan(b), tijd: tijdVan(b), personen: b.personen,
           status: b.status, wacht: b.status === 'aangevraagd' ? 'de zaak' : null,
           kenmerk: b.ref, herkomst: 'partner',
           app: b.kind === 'ticket' ? 'Tickets' : 'Diensten', link: '/apps/portaal.html'
@@ -91,6 +154,9 @@ module.exports = function bronnen({ kern, regel, bron }, key, uit, stil) {
      Ontbreekt de module, dan gaat deze bron stuk en meldt hij zich in `stil` --
      precies zoals bedoeld. Een reis die stilletjes zonder uw eigen ingevoerde
      onderdelen wordt getoond, ziet er compleet uit en is het niet. */
+  /* EN DE INVOERBALIE DRAAGT ER OOK GEEN. Wat uit een document, een foto of de
+     hand komt, is per definitie vrije tekst -- de balie kent geen zaakcode.
+     Blijft dus zonder plek, met de reden hierboven bij het reisbureau. */
   bron('ingevoerd', () => (kern.invoer.mijnRegels(key) || []).map(x => regel(x.soort, {
     titel: x.titel, bestemming: x.bestemming, van: x.van, tot: x.tot,
     status: x.status, kenmerk: x.kenmerk, herkomst: x.herkomst,

@@ -21,8 +21,19 @@ const AFGEROND = {
   reis: ['geboekt', 'afgerond']
 };
 
-// afgezegd is iets anders dan afgerond: het is wel klaar, maar er kwam niets van
-const AFGEZEGD = ['geannuleerd', 'geweigerd', 'terugbetaald', 'ingetrokken', 'afgezegd', 'vervallen'];
+/* Afgezegd is iets anders dan afgerond: het is wel klaar, maar er kwam niets
+   van. `afgewezen` stond hier niet, en daarom bleef een afgewezen aanvraag in
+   "alles wat u lopen heeft" onder LOOPT staan -- terwijl er niets meer komt om
+   op te wachten.
+
+   LET OP DAT DIT IETS ANDERS IS DAN "ER VALT NIETS MEER TE DOEN". In de
+   reiswereld (kern/reiswereld-bronnen.js) blijft een afgewezen reisaanvraag
+   juist staan, met het signaal `aandacht`, omdat de reisoplosser er
+   alternatieven bij zoekt. Deze tabel beantwoordt de vraag "wacht ik hier nog
+   op" en niet "moet ik hier nog iets mee". Twee schermen, twee vragen, en het
+   zou fout zijn ze met een lijst te beantwoorden. */
+const AFGEZEGD = ['geannuleerd', 'geweigerd', 'terugbetaald', 'ingetrokken', 'afgezegd',
+  'vervallen', 'afgewezen'];
 
 function isAfgerond(soort, status) {
   return (AFGEROND[soort] || []).includes(String(status || ''));

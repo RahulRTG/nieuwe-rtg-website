@@ -75,9 +75,12 @@ Object.assign(kern, require('../kern/spellen')({
    De dodemansknop telt op de klok van DEZE server, niet in de app. Dat is de
    hele reden dat het werkt als de telefoon uitvalt: geen levensteken is zelf
    het signaal. Zie kern/veilig/wacht.js. */
-/* De melding zelf staat in ./meldaan.js: hoe een alarm bij een lid landt, en
-   waarom een rust-stand hem niet mag tegenhouden. Hier hangt alleen de draad. */
-const meldAan = require('./meldaan')({ kern, db, save, crypto, sseToCustomer, sendPush, sendPushToUser });
+/* De melding zelf staat in ./meldaan.js: hoe een bericht bij een lid landt, en
+   waarom een rust-stand een ALARM niet mag tegenhouden. Hier hangt alleen de
+   draad. Twee wegen uit een schrijver: `meldAan` voor veiligheid (ook op de
+   'veilig'-baan), `meldLid` voor het gewone bericht (volgt de meldingsvoorkeur
+   van het lid). */
+const { meldAan, meldLid } = require('./meldaan')({ kern, db, save, crypto, sseToCustomer, sendPush, sendPushToUser });
 
 Object.assign(kern, require('../kern/veiligheid')({
   db, save, crypto, schoon, mail,
@@ -88,6 +91,7 @@ Object.assign(kern, require('../kern/veiligheid')({
 }));
 Object.assign(kern, require('../kern/instant-reality')({ db, save, crypto, schoon }));
 kern.meldAan = meldAan;
+kern.meldLid = meldLid;
 
 /* Rahul kijkt mee (kern/kijken.js): een foto van iets, en hij zegt wat het is.
    De foto wordt nergens bewaard; zie de kop van die module. */

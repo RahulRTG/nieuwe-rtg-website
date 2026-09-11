@@ -14,18 +14,35 @@ const klok = require('../../../lib/klok');
 module.exports = (ctx) => {
   const { d, lijst, tel, recent } = ctx;
 
+  /* Wat een lid precies anders wil, in een regel. Leeg gevraagd bestaat niet
+     (de kern weigert dat), dus er staat hier altijd iets. */
+  function wijzigingZin(a) {
+    const w = (a.wijziging || {}).gevraagd || {};
+    const delen = [];
+    if (w.vertrek) delen.push('vertrek ' + a.vertrek + ' -> ' + w.vertrek);
+    if (w.personen) delen.push(a.personen + ' -> ' + w.personen + ' pers');
+    if ((a.wijziging || {}).toelichting) delen.push('"' + a.wijziging.toelichting.slice(0, 60) + '"');
+    return delen.join(', ');
+  }
+
   return {
     reisbureau: { naam: 'Reisbureau', icoon: 'reisboek', naamInzage: true,
       missie: 'Elke reisaanvraag door een mens bevestigd, en nooit iets beloven wat nog niet rond is.',
       kpis: () => {
         const alle = lijst(d().reisAanvragen);
         const open = alle.filter(a => a.status === 'aangevraagd');
+        /* Een wijzigingsverzoek op een bevestigde reis is OOK werk voor deze
+           balie, en het telt apart: een nieuwe aanvraag en een lid dat zijn
+           datum wil verzetten vragen niet hetzelfde. */
+        const wijzig = alle.filter(a => a.status === 'wijziging-gevraagd');
         const grens = klok.nu() - 2 * 86400000;
         return [
           ['Aanvragen open', open.length],
-          ['Wacht langer dan twee dagen', open.filter(a => a.at && new Date(a.at).getTime() < grens).length],
+          ['Wijzigingen open', wijzig.length],
+          ['Wacht langer dan twee dagen', open.concat(wijzig).filter(a => a.at && new Date(a.at).getTime() < grens).length],
           ['Bevestigd', alle.filter(a => a.status === 'bevestigd').length],
           ['Afgewezen', alle.filter(a => a.status === 'afgewezen').length],
+          ['Afgezegd na bevestiging', alle.filter(a => a.status === 'afgezegd').length],
           ['Aanvragen deze week', recent(d().reisAanvragen, 'at', 7)],
           ['Reizen in de etalage', tel(d().partnerTrips)]
         ];
@@ -36,12 +53,18 @@ module.exports = (ctx) => {
           { titel: 'Aanvragen die op een besluit wachten', items: alle.filter(a => a.status === 'aangevraagd').slice(0, 10)
             .map(a => a.ref + ' · ' + a.titel + ' (' + a.bestemming + ') · ' + a.personen + ' pers'
               + (a.vertrek ? ' · vertrek ' + a.vertrek : ' · datum nog open') + ' · ' + (a.codename || 'lid')) },
+          { titel: 'Wijzigingen die op een besluit wachten', items: alle.filter(a => a.status === 'wijziging-gevraagd').slice(0, 10)
+            .map(a => a.ref + ' · ' + a.titel + ' · ' + wijzigingZin(a) + ' · ' + (a.codename || 'lid')) },
+          { titel: 'Afgezegd na bevestiging', items: alle.filter(a => a.status === 'afgezegd').slice(0, 6)
+            .map(a => a.ref + ' · ' + a.titel + ' · afgezegd door ' + ((a.afzegging || {}).door || '?')
+              + ': ' + ((a.afzegging || {}).reden || '') + ' · geld: niet geregeld door het systeem') },
           { titel: 'Laatst genomen besluiten', items: alle.filter(a => a.besluit).slice(0, 8)
             .map(a => a.ref + ' · ' + a.status + ' door ' + a.besluit.door + (a.besluit.bericht ? ': ' + a.besluit.bericht.slice(0, 60) : '')) },
           { titel: 'Harde grens', items: [
             'Een aanvraag heet "aangevraagd" tot u hem bevestigt. Bevestig pas als het verblijf, het vervoer en de datum echt rond zijn -- een bevestiging is een toezegging aan een lid, geen statusveld.',
             'Afwijzen kan alleen met een reden; die reden leest het lid.',
-            'Geen luchtvaart- of hotelmerk als bevestigde partner noemen zolang dat niet zwart op wit staat.'
+            'Geen luchtvaart- of hotelmerk als bevestigde partner noemen zolang dat niet zwart op wit staat.',
+            'Een afzegging verplaatst GEEN geld. Er loopt geen betaling voor een reis van het reisbureau; een aanbetaling, terugbetaling of annuleringskosten handelt u zelf af.'
           ] }
         ];
       } },

@@ -1,0 +1,15 @@
+{
+  "uitleg": "Het oordeel van een MENS die de taal spreekt. Dit is het enige register in dit huis dat de bewijsgraad van een taal op 'bewezen' kan zetten; alle andere metingen gaan over de VORM van een vertaling (schrift, plaatshouders, bedragen) en nooit over de betekenis.",
+  "waarom": "kern/taaldekking.js zegt sinds zijn eerste regel dat de kwaliteit van deze 113 talen ongemeten is, en dat er nog nooit een spreker langs de tabel is gelopen. Dat blijft waar tot hier iets in staat. Een leeg register is daarom geen ontbrekend bestand maar een eerlijke nul.",
+  "grens": "Een oordeel telt alleen voor het BEREIK dat het noemt. Wie de dertig kernwoorden goedkeurt, heeft niets gezegd over de duizenden schermteksten die langs het model lopen -- die dragen hun eigen bewijs, en dat is de keuring in kern/taalkeuring.js.",
+  "vorm": {
+    "taal": "de tweeletterige code uit server/talen.js",
+    "bereik": "waarover dit oordeel gaat, bijvoorbeeld 'kernwoordenboek'",
+    "beoordeeld": "de datum, als JJJJ-MM-DD",
+    "door": "wie het oordeel gaf -- een naam of een rol, geen anonieme bron",
+    "herkomst": "moedertaalspreker | docent | beeedigd vertaler | vertaalbureau",
+    "uitslag": "goed | fouten-gevonden",
+    "correcties": "wat er mis was EN wat het moest zijn; test/taaloordeel.test.js eist dat elke correctie ook echt in de tabel staat"
+  },
+  "oordelen": []
+}

@@ -12,7 +12,11 @@
     var head = el('div', 'rtg-ss-module-head'), titel = el('h3', '', m.name); titel.id = o.runtimeId + '-titel-' + m.id; head.appendChild(titel);
     var tools = el('div', 'rtg-module-head-tools'), status = el('span', 'rtg-module-state', ''); tools.appendChild(status);
     var focus = knop(m.name + ' vergroten', 'focus-module', 'rtg-module-focus'); focus.dataset.ssModuleId = m.id; tools.appendChild(focus);
-    var controls = el('div', 'rtg-ss-module-controls'); [['Omhoog', 'up'], ['Omlaag', 'down'], ['Verberg', 'hide']].forEach(function (x) {
+    var controls = el('div', 'rtg-ss-module-controls');
+    /* Een vaste module (manifest.pinned) krijgt geen omhoog, omlaag of verberg:
+       de composer weigert ze toch, en een knop die niets doet is erger dan geen
+       knop. De reden staat in de samenstel-lijst (workspace-composer.js). */
+    if (!m.pinned) [['Omhoog', 'up'], ['Omlaag', 'down'], ['Verberg', 'hide']].forEach(function (x) {
       var b = knop(m.name + ' ' + x[0].toLowerCase(), x[1]); b.dataset.ssModuleId = m.id; controls.appendChild(b);
     });
     tools.appendChild(controls); head.appendChild(tools); root.appendChild(head);

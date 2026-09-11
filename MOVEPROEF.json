@@ -1,0 +1,80 @@
+{
+ "stempel": "2026-09-10",
+ "uitleg": "Kan een lid RTG Move werkelijk gebruiken? Schakels: handelt de een en ziet de ander het. Storingen: houdt het scherm zijn belofte als het misgaat.",
+ "grens": "Dit is de tafel-keten van Move op een telefoonformaat in een echte browser. Het meet niet of de reistijd juist is (dat doet de routemotor) en niet of een voorstel wordt uitgevoerd -- dat gebeurt met opzet nergens.",
+ "browser": "playwright (/opt/node22/lib/node_modules) -> /opt/pw-browsers/chromium-1194/chrome-linux/chrome",
+ "schakels": [
+  {
+   "nr": 1,
+   "van": "lid zonder reis",
+   "naar": "scherm",
+   "wat": "opent RTG Move met een lege tijdlijn",
+   "ziet": "een uitgeschreven reden en GEEN verderknop naar nergens",
+   "stand": "gesloten",
+   "antwoord": "kop: \"Nog geen reis om te wegen\", verderknop zichtbaar: false"
+  },
+  {
+   "nr": 2,
+   "van": "lid",
+   "naar": "domein",
+   "wat": "boekt een afspraak van 08:00 en vraagt een charter van 09:30 aan",
+   "ziet": "beide staan vast in hun eigen domein",
+   "stand": "gesloten",
+   "antwoord": "boeking 200, charter 200"
+  },
+  {
+   "nr": 3,
+   "van": "domein",
+   "naar": "scherm",
+   "wat": "het lid opent Move",
+   "ziet": "een oordeel over de overgang, met de dekking en de minuten erbij",
+   "stand": "gesloten",
+   "antwoord": "oordeel \"Deze planning is niet betrouwbaar\", dekking 100%, naad \"krap\": 30 min beschikbaar, 17 min nodig - marge 13 min"
+  },
+  {
+   "nr": 4,
+   "van": "scherm",
+   "naar": "reiziger",
+   "wat": "de verderknop wordt samengesteld uit /api/move/volgende",
+   "ziet": "hij noemt de luchthaven waar je moet zijn, niet de stad waar het vliegtuig heen gaat",
+   "stand": "gesloten",
+   "antwoord": "knop: \"Naar RTG Airport\""
+  },
+  {
+   "nr": 5,
+   "van": "reiziger",
+   "naar": "Navigatie",
+   "wat": "tikt op verder",
+   "ziet": "Navigatie krijgt de OPGELOSTE plek mee, dus er wordt niets opnieuw geraden",
+   "stand": "gesloten",
+   "antwoord": "url: /apps/navigatie.html?naar=38.873%2C1.373&label=RTG+Airport"
+  }
+ ],
+ "storingen": [
+  {
+   "naam": "een scherm zonder reis",
+   "belofte": "geen scriptfout en geen verzonnen oordeel",
+   "stand": "gehouden",
+   "wat": "nul paginafouten"
+  },
+  {
+   "naam": "het scherm en de overdracht samen",
+   "belofte": "geen enkele paginafout",
+   "stand": "gehouden",
+   "wat": "nul paginafouten"
+  },
+  {
+   "naam": "zonder sessie",
+   "belofte": "zegt dat je moet inloggen, en toont GEEN oordeel",
+   "stand": "gehouden",
+   "wat": "oordeel \"Uw reis is niet te wegen\", toelichting \"Meld u aan om uw reis te laten wegen.\""
+  },
+  {
+   "naam": "een reis die niet te wegen is",
+   "belofte": "geen groen oordeel, en de dekking zegt het",
+   "stand": "gehouden",
+   "wat": "reizen in catalogus 3, aanvraag 200, oordeel \"Hier valt nog niets over te zeggen\", dekking —"
+  }
+ ],
+ "sluit": true
+}

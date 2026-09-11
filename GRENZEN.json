@@ -1277,6 +1277,9 @@
       "zakelijkOverzicht",
       "zakelijkWacht"
     ],
+    "move": [
+      "move"
+    ],
     "muziek": [
       "muziekBewaar",
       "muziekMaak",

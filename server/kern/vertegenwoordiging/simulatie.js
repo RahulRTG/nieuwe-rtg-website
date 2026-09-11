@@ -31,7 +31,7 @@
 'use strict';
 
 const { BEVOEGDHEDEN, NOOIT } = require('./bevoegdheden');
-const { stand, versmal, MAX_MAANDEN } = require('./machtiging');
+const { stand, versmalMachtiging, MAX_MAANDEN } = require('./machtiging');
 
 const toon = (k) => Object.assign({ sleutel: k }, BEVOEGDHEDEN[k]);
 
@@ -52,7 +52,7 @@ function simuleer({ voorstel, huidig, magClient, nu }) {
     return { error: 'Er is geen voorstel om te bekijken.' };
   }
   const t = nu == null ? Date.now() : nu;
-  const smal = versmal(magClient, voorstel);
+  const smal = versmalMachtiging(magClient, voorstel);
   const straks = smal.bevoegdheden;
 
   const nuActief = huidig && stand(huidig, t) === 'actief'

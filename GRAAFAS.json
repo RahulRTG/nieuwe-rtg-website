@@ -1,6 +1,6 @@
 {
  "uitleg": "Per graaf: de velden van zijn eenheid, en het veld waarop dringendheid wordt afgelezen. Zie de kop van scripts/graafas.js voor wat deze meter wel en niet zegt. Een gedeelde veldnaam is geen gedeelde betekenis.",
- "vastgelegd": "2026-09-01",
+ "vastgelegd": "2026-09-10",
  "gemeten": {
   "grafen": 7,
   "metEenEigenEenheid": 3,
@@ -97,7 +97,7 @@
    "eenheidVastgesteld": false,
    "waaromGeenEenheid": "De kennisgraaf bouwt zijn knopen inline uit het soortenregister; er is geen functie die EEN knoop maakt.",
    "as": null,
-   "waarom": "De kennisgraaf beantwoordt \"wat hangt waaraan vast\" en niet \"wat heeft haast\"; dringendheid komt daar uit kern/command/risico.js."
+   "waarom": "De kennisgraaf beantwoordt \"wat hangt waaraan vast\" en niet \"wat heeft haast\"; dringendheid komt daar uit kern/frictie/motor.js."
   },
   {
    "id": "commercegraaf",

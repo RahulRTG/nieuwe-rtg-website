@@ -62,7 +62,10 @@
      nu wijzen ze allebei naar dezelfde. De deur blijft nodig naast de mond in
      die balk, want de balk bestaat alleen op een telefoon. */
   function deuren(){
-    return [{naam:'Rahul',teken:'mens',doe:rahul}].concat(systeem);
+    /* `sleutel` reist mee naar de knop (data-deur), zodat een laag die zelf al een
+       Rahul-deur heeft -- Uw ruimte -- deze ene kan wegdrukken zonder op tekst te
+       zoeken. */
+    return [{naam:'Rahul',teken:'mens',sleutel:'rahul',doe:rahul}].concat(systeem);
   }
   function rahul(){if(!mag())return;bouwTafel().praat()}
   /* Home en het laatste blad sluiten eindigen leeg; inloggen hervat. */

@@ -8,8 +8,9 @@
 module.exports = (kern) => {
   const { app, officeAuth, afdelingen, sseToOffice, db, save,
     geldOverzicht, geldPasprijzen, geldPasprijsZet, geldCommissieZet, geldKortingZet } = kern;
+  const MIS = 'Er ging iets mis. Probeer het opnieuw.';
   const stuur = (res, r) => r.error ? res.status(r.status).json({ error: r.error }) : res.json(r);
-  const veilig = (res, werk) => { try { stuur(res, werk()); } catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); } };
+  const veilig = async (res, werk) => { try { stuur(res, await werk()); } catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: MIS }); } };
 
   app.post('/api/office/kamers', officeAuth, (req, res) => veilig(res, () => afdelingen.kamers()));
   app.post('/api/office/kamer', officeAuth, (req, res) => veilig(res, () => afdelingen.kamer(String(req.body.id || ''))));
@@ -37,7 +38,7 @@ module.exports = (kern) => {
   app.post('/api/office/inzage', officeAuth, async (req, res) => {
     const wie = kern.boardroomWie(req) || 'backoffice (gedeelde code)';
     try { stuur(res, await afdelingen.naamInzage(String(req.body.kamer || ''), req.body.codenaam, wie)); }
-    catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+    catch (e) { console.error('[kantoren]', e); res.status(500).json({ error: MIS }); }
   });
   // de kantine: de kaart van vandaag lezen en zetten
   app.post('/api/office/kantine/menu', officeAuth, (req, res) => veilig(res, () => afdelingen.kantineMenu()));
@@ -49,7 +50,7 @@ module.exports = (kern) => {
   app.post('/api/office/rampbeeld/evaluatie', officeAuth, (req, res) => veilig(res, () => kern.rampbeeld.evaluatie(null)));
   app.post('/api/office/rampbeeld/ai', officeAuth, async (req, res) => {
     try { const r = await kern.rampbeeld.coordinatorAi(null, req.body.q); r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r); }
-    catch (e) { console.error('[rampbeeld]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+    catch (e) { console.error('[rampbeeld]', e); res.status(500).json({ error: MIS }); }
   });
 
   // het reisbureau (aanvragen, het besluit, en de klaargezette reizen): ./reisbureau.js

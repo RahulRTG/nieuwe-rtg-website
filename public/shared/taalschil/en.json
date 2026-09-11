@@ -1,0 +1,29 @@
+{
+ "taal": "en",
+ "bron": "nl",
+ "uitleg": "De tekst van de voorgecachete app-schil in deze taal, zodat een offline start niet in het Nederlands hoeft te blijven staan.",
+ "grens": "Alleen de VORM is gekeurd (schrift, plaatshouders, bedragen, merknamen). Over de BETEKENIS doet dit bestand geen uitspraak; daarvoor is een spreker nodig (TAALOORDEEL.json). Wat hier niet in staat, valt in de app terug op het netwerk en anders op het Nederlands.",
+ "vorm": "gemeten",
+ "betekenis": "ongemeten",
+ "schilTeksten": 1413,
+ "gevuld": 13,
+ "dekking": 0.9,
+ "afgewezenDoorKeuring": 0,
+ "zonderVertaling": 1400,
+ "bestandenNietGevonden": [],
+ "regels": {
+  "Betalen.": "To pay.",
+  "Reizen": "Travel",
+  "Betalen": "To pay",
+  "Wanneer": "When",
+  "Daar ben je weer: welkom terug in het huis.": "There you are: welcome back to the house.",
+  "Betaald": "Paid",
+  "Vandaag": "Today",
+  "Stad": "City",
+  "Vraag": "Question",
+  "Betaald.": "Paid.",
+  "Voor": "For",
+  "Tafel": "Table",
+  "Bericht": "Message"
+ }
+}

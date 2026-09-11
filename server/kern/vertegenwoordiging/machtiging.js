@@ -12,7 +12,7 @@
    grammatica naast de eerste is precies de fout die SEMANTIEK.json meet:
 
      1 EEN MACHTIGING VERLEENT NOOIT VERMOGEN. Zij kan bestaand vermogen van de
-       cliënt alleen VERSMALLEN. Daarom is `versmal()` een DOORSNEDE en geen
+       cliënt alleen VERSMALLEN. Daarom is `versmalMachtiging()` een DOORSNEDE en geen
        optelsom: een vertegenwoordiger kan structureel nooit meer dan de mens
        voor wie hij staat. Zou een machtiging iets kunnen toevoegen, dan was zij
        een tweede rechtenlijst -- en dan is de eerste geen waarheid meer.
@@ -122,8 +122,13 @@ function vorm(data, opties) {
 }
 
 /* DE DOORSNEDE. `magClient` is wat de cliënt ZELF heeft; wat daar niet in zit,
-   kan een machtiging niet geven. Structureel, niet als vuistregel. */
-function versmal(magClient, machtiging) {
+   kan een machtiging niet geven. Structureel, niet als vuistregel.
+
+   HIJ HEET `versmalMachtiging` EN NIET `versmal`. Een naam van twee
+   lettergrepen die in drie kernmodules staat, zegt niets meer over WAT hij
+   versmalt -- en de keuring telt precies dat (`keuringDubbeling`). Zelfde
+   remedie als `mandaatGeldig` in kern/stuur/mandaat.js. */
+function versmalMachtiging(magClient, machtiging) {
   const van = Array.isArray(magClient) ? magClient.filter(bestaat) : [];
   const gevraagd = (machtiging && Array.isArray(machtiging.bevoegdheden) ? machtiging.bevoegdheden : []).filter(bestaat);
   const binnen = gevraagd.filter(k => van.includes(k));
@@ -169,4 +174,4 @@ function magHandelen(machtiging, bevoegdheid, ctx) {
       : 'Binnen de machtiging.' };
 }
 
-module.exports = { vorm, stand, versmal, magHandelen, STANDEN, MAX_MAANDEN };
+module.exports = { vorm, stand, versmalMachtiging, magHandelen, STANDEN, MAX_MAANDEN };

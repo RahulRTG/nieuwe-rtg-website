@@ -451,6 +451,26 @@ function draaiToets(bestand, env, wacht, forceer) {
    De tien andere staan nog open; dat is een geteld gat in TAKEN.md en geen
    vergeten hoekje. */
 const EIGEN_MODULE = new Map([
+  /* DE VERSHEIDSPOORT wordt als SUBPROCES gestart en niet gerequired: de toets
+     meet juist wat er door een PIJP naar buiten komt, en daar hoort geen
+     require bij. Zonder deze regel meldt de motor "geen module gevonden" en
+     blijft de toets buiten de mutatiemeting -- en dan is toetsenNietGemeten een
+     meter die het SCHRIJVEN van deze toets bestraft, precies de fout die de
+     schermtoetsen hieronder al een keer opleverde.
+
+     Bevestigd door de motor, en dat is hier de voorwaarde: een geraden module
+     geeft de toets de schuld van wat deze lijst fout heeft. */
+  ['versheid-uitvoer.test.js', ['scripts/versheid.js']],
+  /* DE BUDGETTERUGNAME toetst de GRENS van registratieTerug (alleen terugnemen
+     wat aantoonbaar leeg is) en de poort van MAX_PER_LID -- maar requiret
+     kern/waarde als geheel, dus de motor mikte op index.js: de compositiewortel,
+     22 muteerbare posities die allemaal bedrading zijn. Alle 22 overleefd in de
+     diepe ronde van 10 september 2026, en geen ervan ligt op het onderwerp. Het
+     onderwerp woont in ./terugname.js (`!== 0` op de saldo-aantoning is letterlijk
+     de belofte uit de kop van de toets) en ./uitgifte.js (MAX_PER_LID), en index.js
+     componeert die twee. Daarom hier de twee modules die de toets ECHT op de proef
+     stelt -- bevestigd door de motor, dezelfde voorwaarde als bij de regels hierboven. */
+  ['budgetterugname.test.js', ['server/kern/waarde/terugname.js', 'server/kern/waarde/uitgifte.js']],
   /* Beide Edge-toetsen voeren browsercode in een VM uit of lezen het kleine
      basisfragment rechtstreeks. Daardoor ziet modulesVan() geen require,
      terwijl dit wel hun echte bron is. Nageproefd: een verkeerde Edge-CSS-URL
@@ -831,6 +851,11 @@ const EIGEN_MODULE = new Map([
      de mutatieproef, anders blijft deze toets ongemeten. */
   ['beproeving-contract.test.js', ['scripts/verhalen.js']],
   ['navigatieproef.test.js', ['public/shared/plek.js', 'public/apps/navigatie.html']],
+  /* De moveproef toetst twee dingen die geen require() zijn: het INSTRUMENT
+     (scripts/moveproef.js) en het SCHERM. modulesVan() ziet daardoor niets en
+     noteerde 'geen module gevonden' -- niet te meten, terwijl de beweringen
+     wel degelijk kunnen zakken (vier zijn er met de hand op nagemeten). */
+  ['moveproef.test.js', ['public/apps/move.html', 'scripts/moveproef.js']],
   ['rtg-edge-appbar.test.js', ['public/shared/rtg-edge-appbar.js', 'public/shared/rtg-edge-smart-menu.js']],
   /* Deze regressietoets raakt drie achtergrondschrijvers via hun facades en
      een directe meter-import. modulesVan() ziet daardoor alleen de dunne

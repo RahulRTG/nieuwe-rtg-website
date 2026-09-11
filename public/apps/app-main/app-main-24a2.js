@@ -121,7 +121,7 @@
        letterlijk uit geknipt; geen item is nieuw, geen item is verdwenen.
        Het huis bestond al en hing nergens aan: /apps/reizen.html. */
     { sleutel: 'map-reizen', naam: 'TravelOS', wereld: '/apps/reizen.html', glyf: 'reizen', items: [
-      'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
+      'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie', 'link:move',
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie',
     /* Drie uit de tikkenmeting: aankomst, routedossier en OV-routes hingen
        nergens aan. Ze horen hier, want wie ze opent is onderweg. */

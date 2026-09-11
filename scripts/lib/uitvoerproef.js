@@ -152,19 +152,71 @@ function kanarieLijst(kanaries) {
    als `verklaard`, met hun aantal, zodat een groeiende lijst opvalt.
 
    De veldnaam staat erbij: `/api/x` mag zijn `sleutel` tonen en daarmee nog geen
-   `wachtwoord`. */
+   `wachtwoord`.
+
+   ----------------------------------------------------------------------------
+   EN NU DE TWEE HELFTEN DIE ER NIET WAREN, want de kop hierboven beweerde iets
+   dat de lijst niet kon waarmaken: "een mens heeft opgeschreven waarom dat hier
+   hoort". Voor vijf regels was dat waar. Voor drie was het onwaar -- die heeft
+   een auditronde erbij gezet, en er stond nergens dat ze van niemand kwamen.
+   Een uitzonderingenlijst waarvan je niet kunt zien wie hem heeft aanvaard, is
+   precies de plek waar bevindingen alsnog verdwijnen.
+
+   1. `bron` + `citaat` MAKEN DE GROND FALSIFIEERBAAR. Een reden is anders een
+      zin die iemand heeft getypt: er loopt geen draad van die zin naar de code.
+      Nu wijst elke regel een bestand aan en een stuk tekst dat DAAR letterlijk
+      in moet staan. Verdwijnt die tekst -- iemand herschrijft de route, de
+      sleutel wordt toch bewaard -- dan zakt de toets. De grond rot dan hardop
+      in plaats van stil. Dezelfde vorm als de treden van scripts/gezagsnoemer.js,
+      die evident heten omdat hun citaat in de bron staat.
+
+   2. `afgetekend` IS DE HANDTEKENING, EN HIJ STAAT OP null. Ik kan hem niet
+      zetten: wie deze code schrijft weet niet in wiens huis hij staat, en een
+      uitzondering op een privacyregel aanvaarden is geen bouwbesluit. Alle acht
+      staan daarom op `voorgedragen` en niet op `afgetekend`, en de proef meldt
+      die twee APART -- nooit als een getal. Een voorgedragen uitzondering
+      onderdrukt het lek wel (anders staan acht correcte routes weer op GEZAKT,
+      en dat was de bevinding), maar hij draagt zichtbaar dat er nog geen mens
+      achter staat.
+
+   DE REM. Afgetekende uitzonderingen zijn niet begrensd: daar staat een mens
+   voor. VOORGEDRAGEN uitzonderingen zijn schuld, en die mag niet groeien --
+   VOORGEDRAGEN_MAX is een ratel en gaat alleen omlaag. Wie hem omhoog zet zonder
+   het uit te schrijven, sloopt de ratel zelf (dezelfde regel als OPEN_MAX in
+   scripts/check.js). Hij gaat omlaag doordat een mens er een aftekent, niet
+   doordat er een verdwijnt. */
+const V = (veld, reden, bron, citaat, afgetekend) =>
+  ({ veld, reden, bron, citaat, afgetekend: afgetekend || null });
+
 const VERKLAARD = {
-  'POST /api/member/rtmail/imap/sleutel': { veld: 'sleutel',
-    reden: 'mint een IMAP-wachtwoord voor de eigen mailbox en toont het EEN keer; het antwoord zegt dat er zelf bij' },
-  'POST /api/supplier/rtmail/imap/sleutel': { veld: 'sleutel',
-    reden: 'idem, voor de mailbox van de zaak' },
-  'POST /api/office/anker': { veld: 'hash',
-    reden: 'de ankerpunten van de auditketens: de hash IS het bewijsmiddel, niet het geheim' },
-  'POST /api/office/handelingen': { veld: 'hash',
-    reden: 'het handelingsspoor met zijn ketenhashes; zonder die hash valt de keten niet na te rekenen' },
-  'POST /api/office/securitylog': { veld: 'hash',
-    reden: 'het inlogauditlog met zijn ketenhashes; zelfde reden als het anker' }
+  'POST /api/member/rtmail/imap/sleutel': V('sleutel',
+    'mint een IMAP-wachtwoord voor de eigen mailbox en toont het EEN keer; het antwoord zegt dat er zelf bij',
+    'server/routes/rtmail-schrijf.js', 'De sleutel zelf is maar EEN keer te zien'),
+  'POST /api/supplier/rtmail/imap/sleutel': V('sleutel',
+    'idem, voor de mailbox van de zaak -- dezelfde routefabriek, dus dezelfde grond',
+    'server/routes/rtmail-schrijf.js', 'De sleutel zelf is maar EEN keer te zien'),
+  'POST /api/office/anker': V('hash',
+    'de ankerpunten van de auditketens: de hash IS het bewijsmiddel, niet het geheim',
+    'server/lib/ankerdienst.js', 'de hash over alle koppen samen'),
+  'POST /api/office/handelingen': V('hash',
+    'het handelingsspoor met zijn ketenhashes; zonder die hash valt de keten niet na te rekenen',
+    'server/routes/office/toegang.js', 'een filter mag nooit bepalen of het bewijs klopt'),
+  'POST /api/office/securitylog': V('hash',
+    'het inlogauditlog met zijn ketenhashes; zelfde reden als het anker',
+    'server/routes/office/toegang.js', 'een auditlog zonder zichtbare ketenstand vraagt van de'),
+  'POST /api/office/anker/post': V('hash',
+    'de broer van /api/office/anker: dezelfde ankerpunten, dezelfde grond -- de hash IS het bewijsmiddel',
+    'server/lib/ankerdienst.js', 'de hash over alle koppen samen'),
+  'POST /api/privacy/export': V('hash',
+    'de AVG-uitvoer van het lid over zichzelf. De hashes zijn KETENhashes: het handelingsspoor bewaart de body niet en alleen een hash, en de ketenstand gaat mee zodat de betrokkene kan NAREKENEN of er aan zijn spoor is gesleuteld in plaats van ons te moeten geloven',
+    'server/routes/member/privacy.js', 'vraagt van de betrokkene dat hij ons gelooft'),
+  'POST /api/toestellen/koppel': V('sleutel',
+    'mint een toestelsleutel (24 bytes CSPRNG) en toont hem EEN keer; de opslag houdt alleen de afdruk, dus dit is de enige plek waar hij bestaat -- zelfde patroon als de IMAP-sleutel hierboven',
+    'server/kern/toestellen.js', 'Wat bewaard wordt is een sha256-afdruk')
 };
+
+/* De ratel. Gaat alleen omlaag, en de weg omlaag is een mens die aftekent. */
+const VOORGEDRAGEN_MAX = 8;
 
 /* Is dit een verklaarde combinatie van route en veld? Geeft de reden terug, of
    null. De veldnaam komt uit de melding ("geheim veld (sleutel)"). */
@@ -174,6 +226,15 @@ function verklaringVoor(sleutel, lek) {
   const m = /^geheim veld \(([^)]+)\)$/.exec(String(lek));
   if (!m || m[1] !== v.veld) return null;
   return v.reden;
+}
+
+/* WIE STAAT ER ACHTER DEZE UITZONDERING? Drie uitkomsten en met opzet geen
+   twee: `null` betekent dat er geen verklaring is (en dus een lek), en dat is
+   iets anders dan een verklaring waar nog geen mens achter staat. */
+function verklaringStand(sleutel) {
+  const v = VERKLAARD[sleutel];
+  if (!v) return null;
+  return v.afgetekend ? 'afgetekend' : 'voorgedragen';
 }
 
 function weegUitvoer(status, lijf, kanaries) {
@@ -195,7 +256,7 @@ function weegUitvoer(status, lijf, kanaries) {
    waarde is in plaats van stilzwijgend onder 'schoon' te vallen. */
 async function draaiUitvoerproef({ post, routes, tokenVoor, lijfVoor, kanaries, hernieuw, maxPogingen }) {
   const perRoute = {};
-  const bevindingen = { lekken: [], nooit2xx: [], verklaard: [] };
+  const bevindingen = { lekken: [], nooit2xx: [], verklaard: [], afgetekend: [], voorgedragen: [] };
   let pogingen = 0, hernieuwd = 0, gemeten = 0;
 
   for (const r of routes) {
@@ -220,11 +281,22 @@ async function draaiUitvoerproef({ post, routes, tokenVoor, lijfVoor, kanaries, 
       const reden = verklaringVoor(sleutel, oordeel.lek);
       if (reden) {
         /* Verklaard is een EIGEN stand en geen synoniem van schoon: de proef zag
-           hier werkelijk een geheim, en een mens heeft opgeschreven waarom dat
-           hier hoort. Wie de twee samenvoegt, maakt van VERKLAARD een plek waar
-           bevindingen verdwijnen. */
+           hier werkelijk een geheim, en er staat opgeschreven waarom dat hier
+           hoort. Wie de twee samenvoegt, maakt van VERKLAARD een plek waar
+           bevindingen verdwijnen.
+
+           "ER STAAT OPGESCHREVEN" EN NIET "EEN MENS HEEFT OPGESCHREVEN", want
+           dat laatste stond hier en was voor drie van de acht regels onwaar.
+           Wie er achter staat leest je in `afgetekend`, en `bij.grond`
+           hieronder draagt dat per route. */
+        const stand = verklaringStand(sleutel);
         bij.uitvoer = 'verklaard';
-        bevindingen.verklaard.push(sleutel + ' ' + oordeel.lek + ': ' + reden);
+        /* De STAND staat op de rij zelf, niet alleen in een tekstregel: een
+           lezer die per route wil weten of er een mens achter staat, hoort daar
+           geen melding voor te hoeven ontleden. */
+        bij.grond = stand;
+        bevindingen.verklaard.push('[' + stand + '] ' + sleutel + ' ' + oordeel.lek + ': ' + reden);
+        bevindingen[stand].push(sleutel + ' ' + oordeel.lek);
       } else {
         bij.uitvoer = 'GEZAKT';
         const lijf = typeof uit.data === 'string' ? uit.data : JSON.stringify(uit.data || {});
@@ -240,4 +312,5 @@ async function draaiUitvoerproef({ post, routes, tokenVoor, lijfVoor, kanaries, 
 }
 
 module.exports = { weegUitvoer, draaiUitvoerproef, maakKanaries, kanarieLijst,
-  lijktGeheim, geheimVeld, GEHEIMWOORDEN, GEHEIMMERKER, VERKLAARD, verklaringVoor };
+  lijktGeheim, geheimVeld, GEHEIMWOORDEN, GEHEIMMERKER, VERKLAARD, verklaringVoor,
+  verklaringStand, VOORGEDRAGEN_MAX };

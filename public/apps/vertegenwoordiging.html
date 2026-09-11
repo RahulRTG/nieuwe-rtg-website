@@ -51,6 +51,7 @@
   .spoor.nee .w{color:var(--burgundy);}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
   dialog{background:var(--card);color:var(--txt);border:1px solid var(--line);max-width:34rem;width:92vw;padding:1.2rem;}
+  .simkop{margin-top:1rem;font-size:.95rem;}
   dialog::backdrop{background:rgba(0,0,0,.6);}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
@@ -169,18 +170,18 @@ function teken(){
 function toonSimulatie(s){
   SIM_ID=s.id;
   const deel=(kop,items,klasse)=>items.length
-    ? '<h3 style="margin-top:1rem;font-size:.95rem">'+kop+'</h3><ul class="lijst '+(klasse||'')+'">'+
+    ? '<h3 class="simkop">'+kop+'</h3><ul class="lijst '+(klasse||'')+'">'+
       items.map(bevRegel).join('')+'</ul>' : '';
   $('#simInhoud').innerHTML =
     '<p class="uitleg">'+esc(s.wie)+' zou naast u staan als <b>'+esc(s.hoedanigheid)+'</b>, '+
     'tot '+esc(dat(s.looptijd.tot))+' - nog '+esc(s.looptijd.nogDagen)+' dagen.</p>'+
     deel('Dit kan deze persoon straks', s.kan)+
     (s.afgevallen.length?deel('Dit valt af door uw eigen grens', s.afgevallen):'')+
-    '<h3 style="margin-top:1rem;font-size:.95rem">Dit kan deze persoon met zekerheid niet</h3>'+
+    '<h3 class="simkop">Dit kan deze persoon met zekerheid niet</h3>'+
     '<ul class="lijst nee">'+s.kanNiet.map(n=>'<li><b>'+esc(n.wat)+'</b><span class="sub">'+esc(n.waar)+'</span></li>').join('')+'</ul>'+
     '<div class="let">'+esc(s.plafondUitleg)+'</div>'+
     '<div class="let">'+esc(s.intrekken)+'</div>'+
-    '<h3 style="margin-top:1rem;font-size:.95rem">Wat hier niet is gewogen</h3>'+
+    '<h3 class="simkop">Wat hier niet is gewogen</h3>'+
     '<ul class="lijst">'+s.nietGewogen.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
   $('#sim').showModal();
 }

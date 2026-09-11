@@ -64,18 +64,19 @@ module.exports = (ctx) => {
     }
     return metIdem(idem ? 'rekopen:' + c + ':' + idem : null,
       'rekopen|' + c + '|' + soort + '|' + String(naam || ''), () => {
-        const eigen = Object.values(rekeningen()).filter(m => m.codenaam === c);
-        if (eigen.length >= 12) return { status: 429, error: 'Het maximaal aantal rekeningen is bereikt.' };
-        const iban = genIban();
-        if (!iban) return { status: 500, error: 'Kon geen IBAN uitgeven; probeer het opnieuw.' };
-        const meta = { iban, codenaam: c, soort, naam: String(naam || SOORTEN[soort]).replace(/[<>]/g, '').slice(0, 40),
-          geopend: nu(), roodLimiet: soort === 'betaal' ? bankregie.bankRoodStandaard() : 0, bevroren: false, doelCenten: 0, door: wie || 'lid' };
-        rekeningen()[iban] = meta;
-        save();
-        seintje(c);
-        return { ok: true, rekening: publiek(meta) };
-      });
+      const eigen = Object.values(rekeningen()).filter(m => m.codenaam === c);
+      if (eigen.length >= 12) return { status: 429, error: 'Het maximaal aantal rekeningen is bereikt.' };
+      const iban = genIban();
+      if (!iban) return { status: 500, error: 'Kon geen IBAN uitgeven; probeer het opnieuw.' };
+      const meta = { iban, codenaam: c, soort, naam: String(naam || SOORTEN[soort]).replace(/[<>]/g, '').slice(0, 40),
+        geopend: nu(), roodLimiet: soort === 'betaal' ? bankregie.bankRoodStandaard() : 0, bevroren: false, doelCenten: 0, door: wie || 'lid' };
+      rekeningen()[iban] = meta;
+      save();
+      seintje(c);
+      return { ok: true, rekening: publiek(meta) };
+    });
   }
+
 
   const publiek = m => ({ iban: m.iban, soort: m.soort, soortLabel: SOORTEN[m.soort], naam: m.naam,
     saldoCenten: saldoVan(m.iban), roodLimiet: m.roodLimiet || 0, bevroren: !!m.bevroren, doelCenten: m.doelCenten || 0, geopend: m.geopend });
@@ -155,12 +156,13 @@ module.exports = (ctx) => {
     const alHad = Object.values(rekeningen()).some(m => m.codenaam === c);
     store[c] = store[c] || nu();
     save();
+    /* MET SLEUTEL: zonder loopt het werk buiten de duurzame commit (idem.js 94). */
     let rekening = null;
-    if (!alHad) { const r = await open({ codenaam: c, soort: 'betaal', naam: 'RTG Betaalrekening', wie: 'lid' }); if (r.error) return r; rekening = r.rekening; }
+    if (!alHad) { const r = await open({ codenaam: c, soort: 'betaal', naam: 'RTG Betaalrekening', wie: 'lid', idem: 'akkoord-betaal' }); if (r.error) return r; rekening = r.rekening; }
     // de Business Pass krijgt er AUTOMATISCH een zakelijke rekening bij (gratis)
     let zakelijk = null;
     if (tier === 'business' && !Object.values(rekeningen()).some(m => m.codenaam === c && m.soort === 'zakelijk')) {
-      const z = await open({ codenaam: c, soort: 'zakelijk', naam: 'RTG Zakelijke rekening', wie: 'lid' });
+      const z = await open({ codenaam: c, soort: 'zakelijk', naam: 'RTG Zakelijke rekening', wie: 'lid', idem: 'akkoord-zakelijk' });
       if (!z.error) zakelijk = z.rekening;
     }
     return { ok: true, akkoord: true, rekening, zakelijk };

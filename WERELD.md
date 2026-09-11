@@ -79,6 +79,17 @@ is de klok geworden. Wat er van hem over is:
   Rahuls routeertabel en de bron van werkbladtitels — maar hij tekent geen bank
   meer. `test/wereldregister.test.js` zakt als er ooit weer een app in staat die
   nergens hangt.
+- **Op een telefoon is Uw ruimte de bank, en dan gelden dezelfde regels.** De
+  persoonlijke laag (`shared/interface/second-screen-personal.*`) neemt op een
+  telefoon de lade over: profiel, wat nu speelt, berichten en de snelle deuren.
+  Sinds 11 september 2026 draagt zij de werelden weer **bovenaan** en de
+  systeemdeur weer **in de voet**; daarvoor stonden die twee op `display:none`
+  en waren de vier huizen op een telefoon nergens meer te bereiken. De module
+  Werelden staat **vast** (`pinned` in het manifest, `workspace-composer.js`):
+  niet te verbergen en niet te verplaatsen, en de samenstel-lijst zegt waarom
+  in plaats van een grijze knop te tonen. De Rahul-deur staat er één keer --
+  Uw ruimte heeft "Open Rahul", dus de tweede in de voet wordt daar weggedrukt
+  (`data-deur="rahul"`). `test/appmenu.e2e.js` meet dit op telefoonformaat.
 - **De onderdelen staan op het huis zelf.** `/apps/rtg.html`,
   `/apps/kantoor.html`, `/apps/reizen.html` en `/apps/foundation/os-publiek.html`
   dragen ze. Ze een tweede keer in de bank hangen zou een rail van veertig regels

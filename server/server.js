@@ -1083,8 +1083,10 @@ app.get('/api/stream', (req, res) => {
   // gemiste persoonlijke events opnieuw afspelen (na een korte verbroken verbinding)
   const sinds = Number(req.headers['last-event-id'] || req.query.since || 0);
   if (sinds) speelOpnieuw(res, sess.key, sinds);
-  // onopgehaalde notificaties meteen meesturen
-  const unread = (db.data.notifications[sess.tier] || []).filter(n => !n.read);
+  // onopgehaalde notificaties meteen meesturen -- uit dezelfde twee bakken als
+  // /api/notifications hieronder, anders mist de handshake juist de
+  // persoonlijke berichten
+  const unread = meldingenVan(sess).filter(n => !n.read);
   sseSend(res, 'hello', { unread });
   const ping = setInterval(() => {
     if (!isolatieRealtime.magSchrijven(res)) return clearInterval(ping);
@@ -1098,12 +1100,35 @@ app.get('/api/stream', (req, res) => {
   });
 });
 
-// notificaties ophalen / als gelezen markeren
+/* NOTIFICATIES OPHALEN -- UIT TWEE BAKKEN, EN DAT IS GEEN VERDUBBELING.
+
+   Er zijn twee wegen naar een lid en ze schrijven op een andere sleutel:
+   notify() in opzet/meldingen.js schrijft op TIER (alle Business-leden krijgen
+   bericht), meldLid() in opzet/meldaan.js op de SLEUTEL van het lid (deze reis
+   is bevestigd). Dit eindpunt las alleen de eerste. Een persoonlijk bericht
+   kwam dus wel in db.data.notifications[user-4] te staan, was over de
+   live-verbinding even zichtbaar, en verdween bij de eerste herlaadbeurt -- de
+   stilste fout van allemaal, want er stond nergens een foutmelding.
+
+   Bij een demo-sessie IS de sleutel de tier; dan wordt er een bak gelezen en
+   niet twee, anders staat elk bericht er dubbel. */
+const meldingenVan = (sess) => {
+  const opTier = db.data.notifications[sess.tier] || [];
+  if (!sess.key || sess.key === sess.tier) return opTier;
+  const opSleutel = db.data.notifications[sess.key] || [];
+  if (!opSleutel.length) return opTier;
+  return opTier.concat(opSleutel)
+    .sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')))
+    .slice(0, 40);
+};
+
 app.post('/api/notifications', auth, (req, res) => {
-  res.json({ notifications: db.data.notifications[req.session.tier] || [] });
+  res.json({ notifications: meldingenVan(req.session) });
 });
 app.post('/api/notifications/read', auth, (req, res) => {
-  (db.data.notifications[req.session.tier] || []).forEach(n => n.read = true);
+  for (const bak of [req.session.tier, req.session.key]) {
+    if (bak) (db.data.notifications[bak] || []).forEach(n => n.read = true);
+  }
   save();
   res.json({ ok: true });
 });

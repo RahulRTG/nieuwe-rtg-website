@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-09T21:39:33.898Z",
-    "commit": "14d0ea9c",
+    "op": "2026-09-10T17:45:53.159Z",
+    "commit": "cbbc8559",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
@@ -10,9 +10,9 @@
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
-  "bestemmingen": 93,
-  "woorden": 1132,
-  "gevonden": 743,
+  "bestemmingen": 94,
+  "woorden": 1135,
+  "gevonden": 745,
   "dekking": 0.6564,
   "perBestemming": [
     {
@@ -851,6 +851,15 @@
       "gevonden": 2,
       "mist": [
         "behalve"
+      ]
+    },
+    {
+      "naam": "Haal ik het?",
+      "url": "/apps/move.html",
+      "woorden": 3,
+      "gevonden": 2,
+      "mist": [
+        "overgangen"
       ]
     },
     {

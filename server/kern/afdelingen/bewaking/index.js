@@ -9,6 +9,12 @@
 module.exports = (ctx) => {
   const { save, crypto, nu, d, functies } = ctx;
   const { schakel, functiesStand } = ctx;
+  /* Zelfde bedrading als ../integratiekamer.js: `bijeen` en `inBundel` reizen
+     niet door de contextketen, `save` wel -- zodat een aanroeper die zijn eigen
+     save meegeeft niet stilletjes wordt omzeild. */
+  const dbModule = require('../../../db');
+  const vastleggenAudit = require('../../../lib/duurzaam')({
+    bijeen: dbModule.bijeen, save, inBundel: dbModule.inBundel, bron: 'auditspoor' });
 
   function paniekRij() {
     if (!Array.isArray(d().paniekVoorstellen)) d().paniekVoorstellen = [];
@@ -68,11 +74,42 @@ module.exports = (ctx) => {
     if (!Array.isArray(d().kantoorAudit)) d().kantoorAudit = [];
     return d().kantoorAudit;
   }
-  function audit(wie, wat) {
-    const rij = auditRij();
-    rij.unshift({ wie: String(wie || 'kantoor').replace(/[<>]/g, '').slice(0, 30), wat: String(wat || '').replace(/[<>]/g, '').slice(0, 200), at: nu() });
-    if (rij.length > 2000) rij.pop();
-    save();
+  /* HET SPOOR WORDT VASTGELEGD, NIET GEPLAND -- en dat is een reparatie.
+
+     Hier stond de gewone `save()`. Die is write-behind: hij plant een
+     schrijfactie en keert meteen terug. Voor afgeleide toestand is dat precies
+     goed; voor het logboek dat zegt WIE WELKE KNOP OMZETTE niet, en de belofte
+     twee regels hierboven ("achteraf is altijd te herleiden") was daarmee niet
+     waar te maken.
+
+     GEMETEN, en niet bedacht. /api/office/aidata/export draagt in zijn eigen kop
+     "Elke export komt in het auditlog". A/B met een herstart ertussen:
+
+       schoon            -> 200, 287 bytes geleverd, na de herstart 1 auditregel
+       schrijf-verloren  -> 200, 287 bytes geleverd, na de herstart GEEN sleutel
+                            kantoorAudit -- nul regels
+
+     De complete AI-dataset ging de deur uit en er bleef niets van over. Dat is
+     dezelfde grond waarop integratiekamer.js en command/uitrolregie.js al op de
+     lijst van `npm run check` regel 47 staan: gemeten als `schrijf-verloren`
+     -> 200.
+
+     WAAROM HIER EN NIET PER ROUTE. De 89 aanroepen in 21 bestanden doen allemaal
+     dezelfde belofte; 89 kopieën van deze zes regels is 89 plekken die uit de pas
+     kunnen lopen (LAT.md regel 4). Dus een plek.
+
+     ASYNC, EN DAT BREEKT NIEMAND: geen enkele aanroeper gebruikt vandaag de
+     teruggave van audit(). Wie hem NIET afwacht krijgt wat hij altijd al kreeg,
+     alleen nu met een commit die bevestigd wordt in plaats van gepland. Wie het
+     spoor als VOORWAARDE wil -- eerst vastleggen, dan pas leveren -- kan hem
+     afwachten en leest dan `null` of een foutantwoord. */
+  async function audit(wie, wat) {
+    const regel = { wie: String(wie || 'kantoor').replace(/[<>]/g, '').slice(0, 30), wat: String(wat || '').replace(/[<>]/g, '').slice(0, 200), at: nu() };
+    return vastleggenAudit(() => {
+      const rij = auditRij();
+      rij.unshift(regel);
+      if (rij.length > 2000) rij.pop();
+    });
   }
 
   /* de wereldkaart en de doos-regie draaien op dezelfde context, met het

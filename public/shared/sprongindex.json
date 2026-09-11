@@ -860,6 +860,16 @@
       ]
     },
     {
+      "naam": "Haal ik het?",
+      "wereld": "TravelOS",
+      "soort": "link",
+      "sleutel": "move",
+      "url": "/apps/move.html",
+      "woorden": [
+        "move"
+      ]
+    },
+    {
       "naam": "Hangar",
       "wereld": "TravelOS",
       "soort": "link",

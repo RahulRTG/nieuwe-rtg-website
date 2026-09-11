@@ -14,6 +14,8 @@
 const { DISCIPLINES, STATUS, PALET, maakConcept } = require('./bank');
 
 function maakHardwarelab({ db, save, crypto, anthropic, schoon }) {
+  // een verwijdering is pas bevestigd als de opslag hem heeft: kern/kantoorwissen.js
+  const wis = require('../kantoorwissen')({ save });
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const id = () => 'hw' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
@@ -93,9 +95,8 @@ function maakHardwarelab({ db, save, crypto, anthropic, schoon }) {
     o.updatedAt = nu(); save();
     return { ok: true, ontwerp: publiek(o) };
   }
-  function ontwerpVerwijder(oid) {
-    const s = store(); s.ontwerpen = s.ontwerpen.filter(o => o.id !== oid); save();
-    return { ok: true };
+  async function ontwerpVerwijder(oid) {
+    return wis(() => { const s = store(); s.ontwerpen = s.ontwerpen.filter(o => o.id !== oid); });
   }
   function collectieMaak(data) {
     const naam = scho(data && data.naam, 80); if (!naam) return { status: 400, error: 'Geef de serie een naam.' };

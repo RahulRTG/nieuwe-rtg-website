@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-09-09T18:23:39.503Z",
-    "commit": "e66ba7f5",
-    "routesToen": 4992
+    "op": "2026-09-10T20:43:05.797Z",
+    "commit": "51a502de",
+    "routesToen": 5000
   },
   "aangeraakt": [
     "GET /",
@@ -1997,6 +1997,10 @@
     "POST /api/mob/vraag",
     "POST /api/mode/bezorg/aanvraag",
     "POST /api/mode/bezorg/mijn",
+    "POST /api/move/gevolg",
+    "POST /api/move/reis",
+    "POST /api/move/volgende",
+    "POST /api/move/vooraf",
     "POST /api/munt/direct",
     "POST /api/munt/opties",
     "POST /api/munt/verzoek",
@@ -2405,6 +2409,7 @@
     "POST /api/office/reisaanbod/zet",
     "POST /api/office/reisbureau",
     "POST /api/office/reisbureau/afwijzen",
+    "POST /api/office/reisbureau/afzeggen",
     "POST /api/office/reisbureau/besluit",
     "POST /api/office/reisbureau/bevestig",
     "POST /api/office/reisbureau/klaarzetten",
@@ -2412,6 +2417,7 @@
     "POST /api/office/reisbureau/uitnodiging-roteer",
     "POST /api/office/reisbureau/uitnodiging-weg",
     "POST /api/office/reisbureau/uitnodigingen",
+    "POST /api/office/reisbureau/wijziging",
     "POST /api/office/rendezvous/meldingen",
     "POST /api/office/rendezvous/tafel/maak",
     "POST /api/office/rendezvous/tafel/nodig",
@@ -2907,9 +2913,11 @@
     "POST /api/reis/wijzer",
     "POST /api/reisbureau",
     "POST /api/reisbureau/advies",
+    "POST /api/reisbureau/afzeggen",
     "POST /api/reisbureau/annuleer",
     "POST /api/reisbureau/boek",
     "POST /api/reisbureau/mijn",
+    "POST /api/reisbureau/wijzig",
     "POST /api/rekening",
     "POST /api/rekening/betaal",
     "POST /api/reserveer",

@@ -489,7 +489,28 @@ const METERS = [
      hetzelfde met een VERSE meting; deze tand houdt het register zelf vast, ook
      als niemand die browserronde draait. */
   { sleutel: 'appwerktDefecten', richting: 'omlaag', wat: 'onderdelen uit MAPPEN met een defect bewijs (uit APPWERKT.json)' },
-  { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' }
+  { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' },
+  /* DE LUSINDEX (LUSSEN.json, npm run lussen). Drie tanden, en alle drie tellen
+     ze een SCHULD en geen prestatie -- anders maakt lussen toevoegen de meter
+     beter.
+
+     `lussenGeenUitweg` telt altijd-ware lussen zonder break, return of throw in
+     hun eigen lijf. Die staat vandaag op nul en hoort daar te blijven. Let op
+     de grens: de break van een BINNENlus telt niet mee, en een return in een
+     geneste functie evenmin -- juist die twee maakten de eerste meting vals.
+
+     `lussenKritiek` telt lussen met een onzekere afloop EN een gevolg buiten
+     het geheugen in een kritiek domein. Dit getal is met opzet gevoelig voor
+     de indeling zelf: wordt een regel scherper, dan daalt hij; komt er een
+     risicovolle lus bij, dan stijgt hij. Allebei horen ze zichtbaar te zijn.
+
+     `lussenZonderOverlapRem` telt wekkers met een async callback waar geen
+     vroege uitstap in staat: duurt de callback langer dan de periode, dan lopen
+     uitvoeringen over elkaar heen. De meter ziet of er iets is dat dat
+     TEGENHOUDT, niet of het gebeurt -- vandaar een schuld en geen storing. */
+  { sleutel: 'lussenGeenUitweg', richting: 'omlaag', wat: 'altijd-ware lussen zonder uitweg in hun eigen lijf (LUSSEN.json)' },
+  { sleutel: 'lussenKritiek', richting: 'omlaag', wat: 'lussen met onzekere afloop en een gevolg in een kritiek domein (LUSSEN.json)' },
+  { sleutel: 'lussenZonderOverlapRem', richting: 'omlaag', wat: 'wekkers met een async callback en geen rem tegen overlappende uitvoering (LUSSEN.json)' }
 ];
 
 /* De telling zelf, als losse functie met de bestandslijst als invoer -- zodat
@@ -1176,6 +1197,9 @@ function meet(bronnen) {
     laatSpoorVerdacht: leesRegister('LAATSPOOR.json', (j) => j.gemeten.verdacht),
     rollbackUitzonderingen: leesRegister('ROLLBACKBESLUIT.json', (j) => Object.keys(j.routes || {}).length),
     faalproefGezakt: leesRegister('FAALPROEF.json', (j) => j.gemeten.gezakt),
+    lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),
+    lussenKritiek: leesRegister('LUSSEN.json', (j) => j.ratel.kritiek),
+    lussenZonderOverlapRem: leesRegister('LUSSEN.json', (j) => j.ratel.wekkersAsyncZonderRem),
     appwerktDefecten: leesRegister('APPWERKT.json', (j) => j.gemeten.defecten),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar

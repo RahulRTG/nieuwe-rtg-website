@@ -75,6 +75,7 @@ const REGISTER = {
   'LAATSPOOR.json': { meter: ['laatSpoorVerdacht'] },
   'ROLLBACKBESLUIT.json': { meter: ['rollbackUitzonderingen'] },
   'FAALPROEF.json': { meter: ['faalproefGezakt'] },
+  'LUSSEN.json': { meter: ['lussenGeenUitweg', 'lussenKritiek', 'lussenZonderOverlapRem'] },
   'BEPROEVING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   /* De ACTUELE meting naast de geaccepteerde basislijn hierboven: scripts/
      beproeving.js schrijft hem na ELKE ronde, ook een gezakte, zodat rood

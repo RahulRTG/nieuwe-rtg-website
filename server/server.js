@@ -1233,6 +1233,17 @@ const vertegenwoordiging = require('./kern/vertegenwoordiging').maakVertegenwoor
      in de leeftijdBron: `volwassen()` geeft een boolean, maar een voogd mag
      alleen meetekenen als de geboortedatum van het DOCUMENT komt. */
   lidstandVan: require('./kern/betrouwbaarheid').maakLidstand({ accounts }) });
+/* RTG Rugdekking (kern/rugdekking/): het programma waarmee RTG achter een mens
+   gaat staan die van zijn talent leeft. Twee soorten die elkaar uitsluiten, en
+   de schakelaar van de beurs staat standaard DICHT -- zie de kop van dat
+   bestand: die schakelaar IS de juridische positie.
+
+   `jeugdstandVan` komt uit het jeugdbestuur en niet uit een eigen lezing: er is
+   maar EEN plek die weet of iemand BEWEZEN minderjarig is (kern/vertegenwoordiging/
+   jeugd.js), en een tweede zou binnen een maand iets anders zeggen. */
+const { rugdekking } = require('./kern/rugdekking').maakRugdekking({
+  db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan,
+  jeugdstandVan: (key) => vertegenwoordiging.jeugdstand(key) });
 const bestandenOpslag = require('./kern/bestanden-opslag')({ db });
 const bestanden = require('./kern/bestanden').maakBestanden({
   // antivirus: de gestukte upload komt nooit als data-URL in een verzoek-body
@@ -2250,7 +2261,7 @@ const kern = {
   findSupplier, forgetSession, forgetSessionDuurzaam, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, rugdekking, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, mensdeurStand, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, ritBezetting, ritVerder, rtf,

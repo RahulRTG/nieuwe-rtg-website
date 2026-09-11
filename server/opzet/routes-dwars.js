@@ -40,6 +40,10 @@ module.exports = function hangDwarseRoutersOp(grens) {
      namens een mens. Dwars omdat hij aan geen enkel domein hangt -- hij gaat
      over de betrekking tussen twee leden en niet over wat zij doen. */
   require('../routes/vertegenwoordiging')(grens('vertegenwoordiging'));
+  /* RTG Rugdekking (kern/rugdekking/): wat RTG een mens biedt die van zijn
+     talent leeft. Ook dwars: het gaat over de betrekking tussen RTG en die
+     mens, en niet over wat hij doet. */
+  require('../routes/rugdekking')(grens('rugdekking'));
   require('../routes/bestanden')(grens('bestanden'));
   require('../routes/meet')(grens('meet'));
   require('../routes/galerij')(grens('galerij'));

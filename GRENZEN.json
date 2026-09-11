@@ -1376,6 +1376,7 @@
       "rechtsvormwacht",
       "rememberSession",
       "rtfWallet",
+      "rugdekking",
       "rvTafelKantoor",
       "rvTafelMaak",
       "rvTafelNodig",
@@ -2552,6 +2553,9 @@
     ],
     "vertegenwoordiging": [
       "vertegenwoordiging"
+    ],
+    "rugdekking": [
+      "rugdekking"
     ]
   }
 }

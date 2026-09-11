@@ -22,6 +22,7 @@ require('./verificaties')(octx, { wieKijkt });
    hoort achter de kantoordeur. wieKijkt gaat mee omdat een voogdijbesluit op
    NAAM staat en niet op de gedeelde kantoorcode. */
 require('./voogdij')(octx, { wieKijkt });
+require('./rugdekking')(octx, { wieKijkt });
 
 app.post('/api/office/nudge', officeAuth, (req, res) => {
   const kind = req.body.kind === 'ride' ? 'ride' : 'order';

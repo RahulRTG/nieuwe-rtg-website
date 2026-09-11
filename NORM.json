@@ -2,7 +2,7 @@
  "vastgelegd": "2026-09-11",
  "meters": {
   "activeringOnbepaald": 3,
-  "activeringOndergrens": 48,
+  "activeringOndergrens": 49,
   "activeringZonderReden": 0,
   "appwerktDefecten": 0,
   "beweringenZonderVulcontrole": 100,
@@ -11,6 +11,7 @@
   "bewijsCellenBewezen": 26449,
   "bronBlindeBestanden": 3,
   "browserpoortToetsen": 338,
+  "carriereDomeinenGemeten": 15,
   "dbDeuren": 525,
   "dbDeurenSchrijvend": 273,
   "dekkingPct": 82,
@@ -27,8 +28,8 @@
   "gluurOnbewaakt": 0,
   "inlineStijlAttributen": 4638,
   "kernBreedsteBestand": 71,
-  "kernBreedte": 1565,
-  "kernGedeeld": 231,
+  "kernBreedte": 1569,
+  "kernGedeeld": 235,
   "kernOngebruikt": 0,
   "keuringDekkingAdvies": 52,
   "keuringDubbeling": 178,
@@ -47,7 +48,7 @@
   "metingenZonderRatel": 49,
   "onbewaakt": 0,
   "ratelTanden": 76,
-  "registersUitVuileBoom": 2,
+  "registersUitVuileBoom": 1,
   "rollbackUitzonderingen": 1,
   "rolscheidingGaten": 0,
   "rolscheidingGemeten": 1444,
@@ -2021,6 +2022,15 @@
    "vervalt": "2026-12-01",
    "meter": "activeringOndergrens 48 -> 49",
    "reden": "DIT IS GEEN REGRESSIE VAN DEZE TAK MAAR EEN AFDRIFT DIE HET REGISTER NIET ZAG, en dat is nagerekend in plaats van aangenomen. ACTIVERING.json stond op main gestempeld op commit 44f4c264 van 3 september 2026 -- 539 commits achter origin/main. Een VERSE meting van origin/main zelf, in een eigen worktree zonder enige wijziging van deze tak, geeft 49: `node scripts/activering.js` zegt daar `7 deels-niet-toe-te-rekenen, 49 ondergrens, 3 onbepaald, 155 gemeten`. De norm van 48 mat dus een register van 3 september en niet de code van vandaag.\n\nWAT ER IS AFGEDREVEN. Precies een functie: `eigenaarherstel` ging van `gemeten` naar `ondergrens`, met de sleutel `kern` als onvindbaar en de reden die de meter zelf meegeeft -- \"staat niet in de kern-tas en is langs geen van de zeven constructies te herleiden\". `ondergrens` betekent dat er MEER aan die functie hangt dan het register kan zien, niet dat er iets stuk is; de graad bestaat juist om dat verschil niet te laten wegvallen (zie de kop van scripts/activering.js).\n\nWAAROM HET HIER WORDT VASTGELEGD EN NIET GEREPAREERD. Deze tak gaat over het eigen lidmaatschap van een lid (AFSPRAAK.md); `eigenaarherstel` is de herstelweg van de eigenaar (EIGENAAR.md par. 5) en deze tak raakt er niets aan. De afdrift komt uit 539 commits van ander werk. Hem hier meenemen zou de tak verbreden met een onderwerp dat niemand heeft gevraagd, en de reparatie is niet klein: de sleutel `kern` wordt daar langs een constructie opgehaald die KERNHERKOMST.json niet kan volgen.\n\nAFLOSSEN is `eigenaarherstel` zijn kern-namen expliciet laten noemen, zodat de envelop weer `gemeten` wordt -- of, als die constructie bewust niet te volgen is, hem met die reden bij de onvindbare sleutels laten staan. Dat hoort in een wijziging die over die laag gaat. Wat deze notitie WEL oplevert: het register is weer van vandaag, dus de volgende afdrift valt binnen een commit op in plaats van binnen 539."
+  },
+  {
+   "datum": "2026-09-11",
+   "soort": "structureel",
+   "sleutel": "kernBreedte",
+   "van": 1565,
+   "meter": "kernBreedte 1565 -> 1569, kernGedeeld 231 -> 235, activeringOndergrens 48 -> 49",
+   "reden": "DE SAMENVOEGING DRAAGT DE GROEI VAN BEIDE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Deze tak voegt PR #232, #235 en #237 samen. De strengste waarde per meter was het uitgangspunt, maar voor deze drie kan de samengevoegde boom die niet halen: de kern bevat nu zowel `carriereledger` en `vakschema` (#232) als de afsprakenlaag (#235), en de gemeten waarde is exact het eindpunt van de notities die #232 en #235 hier zelf al bij hebben geschreven -- 1569, 235 en 49. Er komt hier dus geen nieuwe verruiming bij; de lat gaat naar de som van twee verruimingen die elk al zijn afgewogen. Tegelijk gaat registersUitVuileBoom van 2 naar 1, want de registers van deze ronde zijn na de commit opnieuw gemeten.",
+   "waarheen": "de notities van 2026-09-11 op kernBreedte (1567->1568, 1568->1569), kernGedeeld (233->234, 234->235) en activeringOndergrens (48->49) dragen elk hun eigen grond; deze regel telt ze alleen bij elkaar op"
   }
  ],
  "prestatie": {
@@ -2081,7 +2091,8 @@
   "appwerktDefecten": "2026-09-07",
   "lussenGeenUitweg": "2026-09-11",
   "lussenKritiek": "2026-09-11",
-  "lussenZonderOverlapRem": "2026-09-11"
+  "lussenZonderOverlapRem": "2026-09-11",
+  "carriereDomeinenGemeten": "2026-09-11"
  },
  "uitzonderingen": [
   {

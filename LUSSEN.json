@@ -2,10 +2,10 @@
  "soort": "index",
  "uitleg": "De canonieke lusindex: elke cyclische gedraging van server/ en public/ met EEN identiteit, EEN vorm, EEN terminatiegraad en het bewijs dat er al over ligt. De assen staan naast elkaar en worden nooit opgeteld.",
  "stempel": {
-  "op": "2026-09-11T20:36:09.308Z",
-  "commit": "dd1ba1c39",
-  "boomVuil": true,
-  "boomAnders": 13,
+  "op": "2026-09-11T20:42:56.034Z",
+  "commit": "7f0359591",
+  "boomVuil": false,
+  "boomAnders": 3,
   "instrument": "scripts/lussen.js",
   "node": "v22.22.2"
  },

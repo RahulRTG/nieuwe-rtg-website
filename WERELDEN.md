@@ -109,7 +109,7 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 | wereld | huis | dat is | onderdelen |
 |---|---|---|---|
 | **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 58 |
-| **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 16 |
+| **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 17 |
 | **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 15 |
 | **FoundationOS** | `/apps/foundation/os-publiek.html` | zorg, hulp en maatschappelijke vooruitgang | 10 |
 

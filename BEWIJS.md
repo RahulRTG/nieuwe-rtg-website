@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1808 |
 | losse beweringen (`test(...)`) | 12741 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1183 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1186 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 66 |
-| alleen in de kop *genoemd*, nog niet gemeten | 155 |
-| niets van beide | 404 |
+| alleen in de kop *genoemd*, nog niet gemeten | 154 |
+| niets van beide | 402 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -366,7 +366,7 @@ toets omvalt.
 | `faalproefvorm.test.js` | 2 | gezakt op `===->!==#3` | PAST DE SLEUTEL VAN DE FAALPROEF IN HET SLOT VAN DE BEWIJSMATRIX? scripts/bewijsmatrix.js leest FAALPROEF.json met perRouteKaart(), en die bouwt zijn sleutel als `r.methode + ' ' + r.pad` -- zo lezen alle registers... |
 | `facturatie.test.js` | 6 | gezakt op `liegpoort /api/` | De centrale facturatielaag (kern/facturatie.js): bij elke verkoop krijgt zowel de verkoper als de koper automatisch dezelfde factuur in de app; de PDF is te downloaden; en de AI-factuurtool maakt in gewone taal een... |
 | `factuur.test.js` | 5 | gezakt op `liegpoort /api/` | Facturen downloaden. Zelfgebouwde PDF-schrijver (geen pakketten) + de leden-endpoints om een factuur en een jaaroverzicht op te halen. |
-| `factuurbevroren.test.js` | 4 | -- | EEN FACTUUR LEEST NOOIT DE PRIJS VAN VANDAAG. DE FOUT DIE DIT VASTLEGT. |
+| `factuurbevroren.test.js` | 4 | gezakt op `===->!==#0` | EEN FACTUUR LEEST NOOIT DE PRIJS VAN VANDAAG. DE FOUT DIE DIT VASTLEGT. |
 | `factuursaldo.test.js` | 6 | gezakt op `liegpoort /api/` | De maandfactuur betalen uit het eigen RTG Pay-saldo (/api/pay/saldo, kern/factuursaldo.js): de derde betaalweg naast kaart en munten. De afschrijving loopt via pay.huisIn (autolaad inbegrepen, idempotent) en de... |
 | `fases.test.js` | 4 | gezakt op `liegpoort /api/` | Uitrolfases: de gefaseerde uitrol als voorinstelling. Alles is gebouwd; lanceren is een fase kiezen in plaats van tientallen schakelaars omzetten. |
 | `festival-dienst.test.js` | 11 | gezakt op `!==->===#0` | DE DIENST: ZERO-SEARCH, EN WAT ER NIET BIJ KOMT. WAAROM DIT BESTAAT Een medewerker die zijn dienst opent, hoort niet te hoeven zoeken naar iets wat het systeem al weet: welke dienst is van mij, waar is dat, wie staat... |
@@ -704,8 +704,8 @@ toets omvalt.
 | `levensloop.test.js` | 1 | gezakt op `liegpoort /api/` | DE LEVENSLOOP -- een mens van aanmelding tot tweede baan. WAAROM DIT ER IS De andere twee toetsen kijken in de breedte: 157 mensen kunnen bij hun werk (menselijkebanen) en mensen doen dingen met elkaar... |
 | `leverancierpoort.test.js` | 16 | gezakt op `===->!==#0` | DE LEVERANCIERSPOORT: de acht functies waar elke supplier-route langs komt. WAAROM DEZE TOETS ER NU PAS IS. |
 | `lib.test.js` | 7 | gezakt op `===->!==#0` | Unit-tests voor de zuivere hulplibs (server/lib). Geen server nodig. |
-| `lidabonnement-deur.test.js` | 5 | -- | DE DEUR VAN /api/mijn/abonnement -- over de ECHTE server. WAAROM DIT NAAST test/lidabonnement.test.js STAAT. |
-| `lidabonnement.test.js` | 10 | genoemd | EEN LID EN ZIJN EIGEN LIDMAATSCHAP. HET GAT. |
+| `lidabonnement-deur.test.js` | 5 | gezakt op `liegpoort /api/` | DE DEUR VAN /api/mijn/abonnement -- over de ECHTE server. WAAROM DIT NAAST test/lidabonnement.test.js STAAT. |
+| `lidabonnement.test.js` | 10 | gezakt op `===->!==#0` | EEN LID EN ZIJN EIGEN LIDMAATSCHAP. HET GAT. |
 | `lidboard.test.js` | 21 | gezakt op `liegpoort /api/` | De eigen boardroom van elk lid (kern/lidboard/ + routes): 1. een lid ziet zijn bord met vijf groepen en zet er functies aan/uit; de stand blijft server-side bewaard. |
 | `lidfactuur.test.js` | 12 | gezakt op `liegpoort /api/` | ELKE BETAALDE LIDTRANSACTIE LEVERT EEN FACTUUR OP -- en dus btw. Dit is de toets bij de reparatie in kern/lidacties/factuur.js. |
 | `lidmaatschap.test.js` | 4 | gezakt op `===->!==#0` | De merkstatus van een lid is geen afgeleide marketingtekst in een scherm. Deze toets bewaakt de indeling zelf én houdt de memberclass los van de echte identiteitscontrole. |

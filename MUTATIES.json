@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T19:03:55.941Z",
-    "commit": "9f53ecb7",
+    "op": "2026-09-11T11:57:35.691Z",
+    "commit": "4a89932f",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2373,6 +2373,14 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "factuurbevroren.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/lid/facturen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "factuursaldo.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4097,6 +4105,21 @@
       "module": "server/lib/geo.js",
       "operator": "===->!==#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "lidabonnement-deur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "lidabonnement.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/commercie/contract.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
       "geprobeerd": 1
     },
     "lidboard.test.js": {

@@ -117,8 +117,8 @@ scherm van iemands schoonmoeder.
 
 ## 4. Vier namen die al bezet zijn
 
-`SEMANTIEK.json` telt <!--getal:semantiek.namen-->121<!--/getal--> namen in meer
-dan één domein, waarvan er <!--getal:semantiek.betekenissen-->103<!--/getal-->
+`SEMANTIEK.json` telt <!--getal:semantiek.namen-->123<!--/getal--> namen in meer
+dan één domein, waarvan er <!--getal:semantiek.betekenissen-->105<!--/getal-->
 meer dan één betekenis dragen. Deze vier raakt deze laag rechtstreeks:
 
 - **`SOORTEN`** -- 47 betekenissen over 49 domeinen, het ergste woord van het

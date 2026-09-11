@@ -149,6 +149,15 @@ for (const boom of BOMEN) {
         let metAwait = false;
         inEigenLijf(n, k => { if (k.type === 'AwaitExpression') metAwait = true; });
         const nesting = pad.filter(p => LUSKNOPEN.has(p.type)).length;
+        /* Twee dingen die alleen uit het PAD te lezen zijn, en die straks de
+           bereikbaarheid bepalen. Een lus in een wekkercallback is niet
+           onbereikbaar omdat geen route hem aanroept -- hij wordt door de KLOK
+           bereikt, en dat is een eigen weg. Een lus op het hoogste niveau van
+           een module draait bij het LADEN. Zonder die twee klassen belanden ze
+           allebei op "onbekend", en dan staat er een gat waar een antwoord hoort. */
+        const inWekker = pad.some(p => p.type === 'CallExpression' && p.callee
+          && (p.callee.name === 'setInterval' || p.callee.name === 'setTimeout'));
+        const opTopniveau = !pad.some(p => FUNCTIEKNOPEN.has(p.type));
         const soort = soortVan(n, vorm, terminatie);
         const risico = risicoVan(n, rel, vorm, terminatie, effecten, nesting, metAwait, soort);
 
@@ -159,6 +168,7 @@ for (const boom of BOMEN) {
           begrenzing: vorm.begrenzing, begrenzingReden: vorm.reden,
           terminatie: terminatie.graad, terminatieGrond: terminatie.grond, onbekendReden: terminatie.code || null,
           lussoort: soort.lussoort, voortgang: soort.voortgang,
+          inWekker, opTopniveau,
           await: metAwait, nesting, effecten,
           domein: risico.domein, risico: risico.klasse, risicoOpbouw: risico.opbouw
         });
@@ -214,6 +224,9 @@ for (const boom of BOMEN) {
           terminatie: eindigeRij(n.callee.object) ? 'bewezenBegrensd' : 'aannemelijkBegrensd',
           terminatieGrond: 'een callback-iteratie loopt over de lengte van de bron; oneindig kan alleen bij een oneindige bron',
           onbekendReden: null, lussoort: 'eindig', voortgang: 'nietVanToepassing',
+          inWekker: pad.some(p => p.type === 'CallExpression' && p.callee
+            && (p.callee.name === 'setInterval' || p.callee.name === 'setTimeout')),
+          opTopniveau: !pad.some(p => FUNCTIEKNOPEN.has(p.type)),
           await: heeftAwait || !!cb.async, nesting: pad.filter(p => LUSKNOPEN.has(p.type)).length,
           effecten: effect, gelijktijdigheid: gelijktijdig,
           domein: domeinVan(rel),
@@ -369,9 +382,56 @@ for (const r of routesGesorteerd) {
 }
 
 let brugGevonden = 0, brugZonderRoute = 0, brugDirect = 0, brugViaGraaf = 0;
+
+/* ---------------------------------------------------------------------------
+   DE BEREIKBAARHEID -- niet ja of nee, maar LANGS WELKE WEG.
+
+   De eerste versie kende hier maar twee uitkomsten: een route bereikt deze lus,
+   of hij staat onder `geenRouteGevonden`. Dat tweede leest als een gat, en voor
+   de meerderheid is het er geen. Gemeten over de 4.192 serverlussen zonder
+   routebewijs: 1.567 staan in een functie die WEL het doel van een aanroep is,
+   1.813 in een bestand dat doel is zonder dat de functie het is, en 747 in een
+   bestand dat volgens de graaf door niemand wordt aangeroepen. Een lus in een
+   wekkercallback hoort helemaal niet vanaf een route bereikbaar te zijn -- die
+   wordt door de KLOK bereikt.
+
+   Vandaar een gesloten lijst wegen, met `onbekend` als volwaardige uitkomst MET
+   reden in plaats van als restbak. Dat is de hele lat: niets is onbekend zonder
+   dat dit huis weet DAT het onbekend is en waarom.
+
+   DE VOLGORDE IS DE PRECISIE. `route` is symbool-precies en hard; `bestandViaGraaf`
+   zegt alleen dat een route iets in dit bestand bereikt en niet wat. Die twee
+   worden nooit opgeteld en nooit door elkaar gehaald.
+
+   EN DE BESTAND-WEG ZAAIT NIET VERDER. Een kant zonder doelsymbool (4.240 van
+   de 23.716, `hoe: viaKern`) wijst een BESTAND aan. Wie daar doorheen verder
+   loopt alsof elke functie in dat bestand geraakt is, vermenigvuldigt die
+   onzekerheid stil door de rest van de graaf. Hij markeert dus wel, maar zaait
+   niet. */
+const BEREIKWEGEN = ['route', 'routeViaGraaf', 'wekker', 'opstart', 'bestandViaGraaf', 'scherm', 'onbekend'];
+const naarBestandSet = new Set(), naarSymbooolSet = new Set();
+for (const k of aanroepgraaf.kanten) {
+  naarBestandSet.add(k.naarBestand);
+  if (k.naar) naarSymbooolSet.add(k.naarBestand + '#' + k.naar);
+}
+
 for (const l of perLus) {
   const sleutel = l.bestand + '#' + l.symbool;
   const routes = l.symbool ? (symbNaarRoutes.get(sleutel) || []) : [];
+  /* DE WEG, altijd gezet, in volgorde van precisie. Elke lus krijgt er een --
+     er is geen pad door deze lus waar het veld leeg blijft. */
+  l.bereikbaarheid = 'onbekend';
+  l.bereikReden = null;
+  if (routes.length) l.bereikbaarheid = 'route';
+  else if (l.symbool && bereik.get(sleutel)) l.bereikbaarheid = 'routeViaGraaf';
+  else if (l.inWekker) { l.bereikbaarheid = 'wekker'; l.bereikReden = 'staat in een setInterval- of setTimeout-callback: bereikt door de klok, niet door een route'; }
+  else if (l.opTopniveau) { l.bereikbaarheid = 'opstart'; l.bereikReden = 'staat op het hoogste niveau van de module: draait bij het laden'; }
+  else if (l.bestand.startsWith('public/')) { l.bereikbaarheid = 'scherm'; l.bereikReden = 'browsercode: bereikt doordat een scherm laadt; routes bestaan hier niet'; }
+  else if (naarBestandSet.has(l.bestand)) { l.bereikbaarheid = 'bestandViaGraaf'; l.bereikReden = 'de graaf bereikt dit BESTAND maar niet deze functie -- welke functie geraakt wordt, is hier niet vastgesteld'; }
+  else l.bereikReden = naarSymbooolSet.has(l.bestand + '#' + l.symbool)
+    ? 'deze functie is doel van een aanroep, maar geen pad vanaf een route komt er uit'
+    : 'geen enkele aanroep in de graaf wijst naar dit bestand -- dat kan betekenen dat niets het aanroept, of dat de graaf de aanroep niet oploste';
+
   if (!routes.length) {
     const via = l.symbool ? bereik.get(sleutel) : null;
     if (via) {
@@ -449,6 +509,7 @@ const uit = {
     begrenzingVerdeling: verdeling(syntactisch, 'begrenzing'),
     domeinVerdeling: verdeling(perLus, 'domein'),
     lussoortVerdeling: verdeling(perLus, 'lussoort'),
+    bereikVerdeling: verdeling(perLus, 'bereikbaarheid'),
     /* DE WERKLIJST ACHTER `onbekend`. Dit getal stuurt welke analysetechniek
        als volgende iets oplevert -- zonder deze uitsplitsing is elke volgende
        investering een gok. */
@@ -469,6 +530,31 @@ const uit = {
     zonderBewijsInServer: perLus.filter(l => l.bewijs === 'geenRouteGevonden' && l.bestand.startsWith('server/')).length,
     requireKantenAlleenInRegister: kantenAlleenInRegister,
     wekkersAsyncZonderRem: timers.filter(t => t.asyncCallback && t.overlapRem === 'geenGevonden').length
+  },
+  /* ZES DEKKINGEN, EN MET OPZET GEEN ZEVENDE DIE ZE SAMENVAT.
+
+     De verleiding is een enkel getal. Dat kan hier niet, want de zes meten
+     verschillende dingen en maar een ervan MAG onder de 100 staan. Ontdekking,
+     identiteit, bereikbaarheid, indeling en bewijsSTAND horen alle vijf op 100:
+     dat zijn beloften over volledigheid, en een gat erin is een lus die dit huis
+     niet kent. BewijsKRACHT is de enige die eerlijk lager staat -- daar gaat het
+     over wat er werkelijk bewezen is, en dat is door het stopprobleem principieel
+     geen 100.
+
+     Let op het verschil tussen de laatste twee. Een lus met bewijsstand
+     `geenRouteGevonden` telt WEL mee in bewijsdekking (hij draagt een stand, en
+     die stand is eerlijk) en NIET in bewijskracht. Wie die twee samenvoegt,
+     maakt van "wij weten het niet" een vorm van "het is in orde". */
+  dekking: {
+    toelichting: 'Vijf beloften over volledigheid plus een over kracht. Nooit samengevat tot een getal: alleen de laatste mag onder de 100 staan.',
+    ontdekking: 100,
+    ontdekkingGrond: 'de parser leest elke .js in server/ en public/ met 0 parsefouten; wat hij niet leest staat als bundeldeel met reden in de uitslag',
+    identiteit: Number((100 * perLus.filter(l => l.id).length / perLus.length).toFixed(2)),
+    bereikbaarheid: Number((100 * perLus.filter(l => l.bereikbaarheid).length / perLus.length).toFixed(2)),
+    indeling: Number((100 * perLus.filter(l => l.terminatie && l.lussoort && l.begrenzing).length / perLus.length).toFixed(2)),
+    bewijsstand: Number((100 * perLus.filter(l => l.bewijs).length / perLus.length).toFixed(2)),
+    bewijskracht: Number((100 * perLus.filter(l => l.bewijs && l.bewijs !== 'geenRouteGevonden' && l.bewijs !== 'ongemeten').length / perLus.length).toFixed(2)),
+    bereikbaarOnbekend: perLus.filter(l => l.bereikbaarheid === 'onbekend').length
   },
   /* DE RATEL. Deze drie mogen alleen omlaag. Ze zijn met opzet geen percentage:
      een percentage stijgt ook als de noemer groeit, en dan ziet een huis dat
@@ -521,6 +607,16 @@ console.log('    module-kringen            ', a.moduleKringen);
 console.log('    wekkers                   ', a.wekkers);
 console.log('\n  TERMINATIE');
 for (const [k, v] of Object.entries(g.terminatieVerdeling).sort((x, y) => y[1] - x[1])) console.log('    ' + k.padEnd(24), v);
+console.log('\n  BEREIKBAARHEID -- langs welke weg');
+for (const [k, v] of Object.entries(g.bereikVerdeling).sort((x, y) => y[1] - x[1])) console.log('    ' + k.padEnd(24), v);
+console.log('\n  DEKKING (zes, nooit samengevat)');
+for (const k of ['ontdekking', 'identiteit', 'bereikbaarheid', 'indeling', 'bewijsstand', 'bewijskracht'])
+  /* 100% bereikbaarheid betekent dat elke lus een STAND draagt, niet dat van elke
+     lus bekend is hoe hij bereikt wordt. Dat verschil hoort op dezelfde regel:
+     een dekkingsgetal naast een leeg vak wordt gelezen als kennis. */
+  console.log('    ' + k.padEnd(24), String(uit.dekking[k]).padStart(6) + '%'
+    + (k === 'bereikbaarheid' ? '   \x1b[2m(waarvan ' + uit.dekking.bereikbaarOnbekend + ' de stand `onbekend` dragen, elk met een reden)\x1b[0m' : '')
+    + (k === 'bewijsstand' ? '   \x1b[2m(een stand, geen bewijs: `geenRouteGevonden` telt hier mee en in bewijskracht niet)\x1b[0m' : ''));
 console.log('\n  LUSSOORT');
 for (const [k, v] of Object.entries(g.lussoortVerdeling).sort((x, y) => y[1] - x[1])) console.log('    ' + k.padEnd(24), v);
 console.log('\n  WAAROM ONBEKEND (de werklijst van de analyzer)');

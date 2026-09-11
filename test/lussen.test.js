@@ -203,3 +203,81 @@ test('elke onbekende lus draagt een REDEN uit een gesloten lijst', () => {
   assert.ok(redenen.length > 0, 'zonder uitsplitsing is `onbekend` een eindbak in plaats van een werklijst');
   for (const r of redenen) assert.ok(toegestaan.has(r), 'onbekende reden-code in het register: ' + r);
 });
+
+/* --------------------------------------------------------------------------
+   DE INVARIANT. Dit is de eigenlijke lat van dit register, en hij zegt met
+   opzet NIET "alle lussen zijn veilig" -- dat kan niet, want terminatie is
+   onbeslisbaar. Hij zegt:
+
+     niets is onbekend zonder dat dit huis weet DAT het onbekend is en waarom.
+
+   Elke ontdekte lus draagt een identiteit, een soort, een bereikbaarheid, een
+   terminatiegraad, een risicovector en een bewijsstand -- en waar iets onbekend
+   is, staat de reden erbij. Ontbreekt er een veld, dan is het register ongeldig
+   en zakt de bouw. Dat is een sterkere norm dan een percentage, want een
+   percentage kan stijgen doordat er lussen uit beeld vallen.
+
+   De woordenlijsten staan HIER en niet in het meetscript. Dat is het punt: de
+   toets is de autoriteit over wat een geldige waarde is. Verzint de meter
+   morgen een zevende bereikweg, dan hoort dat een besluit te zijn en geen
+   bijwerking. */
+const VOCAB = {
+  as: ['syntactisch', 'callback'],
+  terminatie: ['bewezenBegrensd', 'aannemelijkBegrensd', 'uitwegAanwezig', 'geenUitwegGevonden', 'nietVastTeStellen'],
+  lussoort: ['eindig', 'dienst', 'rekenlus', 'onbekend'],
+  voortgang: ['blokkerendeWacht', 'bezetDeLus', 'nietVanToepassing'],
+  bereikbaarheid: ['route', 'routeViaGraaf', 'wekker', 'opstart', 'bestandViaGraaf', 'scherm', 'onbekend'],
+  risico: ['kritiek', 'hoog', 'midden', 'laag'],
+  bewijs: ['bewezen', 'verschaald', 'verzwakt', 'geschorst', 'ongemeten', 'geenRouteGevonden']
+};
+
+test('INVARIANT: geen enkele lus mist een veld', () => {
+  const j = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
+  assert.ok(j.lussen.length > 1000, 'een lege index maakt elke invariant waar; dat is geen bewijs');
+  const gemist = [];
+  for (const l of j.lussen) {
+    for (const veld of ['id', 'as', 'bestand', 'soort', 'begrenzing', 'terminatie', 'lussoort',
+      'voortgang', 'bereikbaarheid', 'bewijs', 'domein', 'risico']) {
+      if (l[veld] == null) gemist.push(l.id + ' mist ' + veld);
+    }
+    if (!Array.isArray(l.effecten)) gemist.push(l.id + ' mist effecten');
+    if (!Array.isArray(l.risicoOpbouw)) gemist.push(l.id + ' mist risicoOpbouw');
+    if (typeof l.await !== 'boolean') gemist.push(l.id + ' mist await');
+    if (typeof l.nesting !== 'number') gemist.push(l.id + ' mist nesting');
+    if (gemist.length > 5) break;
+  }
+  assert.deepEqual(gemist, [], 'LUSINDEX ONGELDIG -- deze velden ontbreken');
+});
+
+test('INVARIANT: onbekend draagt altijd een reden', () => {
+  const j = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
+  const zonder = [];
+  for (const l of j.lussen) {
+    if (l.terminatie === 'nietVastTeStellen' && !l.onbekendReden) zonder.push(l.id + ': terminatie onbekend zonder reden');
+    if (l.bereikbaarheid === 'onbekend' && !l.bereikReden) zonder.push(l.id + ': bereikbaarheid onbekend zonder reden');
+    if (zonder.length > 5) break;
+  }
+  assert.deepEqual(zonder, [], 'een onbekende zonder reden is een restbak, en dan is `onbekend` geen uitslag maar een gat');
+});
+
+test('INVARIANT: elke waarde komt uit een gesloten lijst', () => {
+  const j = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
+  const vreemd = new Set();
+  for (const l of j.lussen) {
+    for (const [veld, toegestaan] of Object.entries(VOCAB)) {
+      if (l[veld] != null && !toegestaan.includes(l[veld])) vreemd.add(veld + ' = ' + l[veld]);
+    }
+  }
+  assert.deepEqual([...vreemd], [], 'onbekende waarde(n) in het register -- een nieuwe stand hoort een besluit te zijn, geen bijwerking');
+});
+
+test('de zes dekkingen staan apart, en vijf ervan zijn beloften over volledigheid', () => {
+  const j = JSON.parse(fs.readFileSync(REGISTER, 'utf8'));
+  for (const k of ['ontdekking', 'identiteit', 'bereikbaarheid', 'indeling', 'bewijsstand'])
+    assert.equal(j.dekking[k], 100, 'dekking.' + k + ' hoort 100 te zijn: hij zegt dat elke lus een STAND draagt, niet dat die stand gunstig is');
+  /* En bewijskracht mag juist NIET vastgezet worden op 100. Zou die eis er staan,
+     dan zou iemand hem halen door `geenRouteGevonden` als bewijs te tellen -- en
+     dat is precies het verschil dat deze twee getallen uit elkaar houdt. */
+  assert.ok(j.dekking.bewijskracht < 100, 'bewijskracht op 100 betekent dat een stand als bewijs is geteld');
+  assert.ok(!('totaal' in j.dekking) && !('samengesteld' in j.dekking), 'de zes dekkingen worden nooit samengevat tot een getal');
+});

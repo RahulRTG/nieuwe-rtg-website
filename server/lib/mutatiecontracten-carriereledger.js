@@ -47,8 +47,11 @@ const ZAAK = { klasse: 'AUTHENTICATED', deur: 'supplierAuth' };
    dan wat de deur afdwingt, maakt dit register een verlanglijst; twee registers
    die iets anders zeggen over dezelfde route is nog erger. */
 const CODE = { klasse: 'PUBLIC', deur: 'geen bewakerslaag; het veld `code` in het lijf is het geheim, 128 bits en alleen als hash bewaard',
-  waaromOpen: 'een deelbewijs wordt getoond aan iemand zonder RTG-account; dat is de hele functie',
-  rem: '300 verzoeken per IP per minuut (middleware/remmen.js)' };
+  /* Het veld heet `waarom` en niet `waaromOpen`: kern/mutatiecontract/keuring.js
+     leest precies deze naam, en een eigen variant ernaast is een reden die de
+     poort niet ziet -- dus geen reden. */
+  waarom: 'een deelbewijs wordt getoond aan iemand zonder RTG-account; dat is de hele functie. ' +
+    'De rem die deze klasse eist hangt ervoor: 300 verzoeken per IP per minuut (middleware/remmen.js).' };
 
 const leest = (route, mutatieId, toegang, hoe) => [route, {
   mutatieId, herkomst: 'mens',
@@ -108,11 +111,15 @@ const CONTRACTEN = Object.fromEntries([
 
   ['POST /api/carriere/ledger/deel', {
     mutatieId: 'carriereledger.deel', herkomst: 'mens',
-    semantiek: { klasse: 'nietIdempotent',
-      waarom: 'deze weg SLAAT een geheim van 128 bits en geeft het precies eenmaal terug. Twee ' +
-        'oproepen horen twee codes te geven: dezelfde code teruggeven zou betekenen dat het geheim ' +
-        'opnieuw over de lijn gaat, en een code per ontvanger is juist de bedoeling -- elk stopt ' +
-        'apart. Gemeten ' + OP + ': twee keer 200, twee verschillende codes, twee rijen.' },
+    /* `nietHerhaalbaar` uit kern/mutatie.js, en die woordenlijst is de enige --
+       er stond eerst `nietIdempotent`, en dat woord bestaat daar niet. Zijn
+       uitleg past hier woordelijk: *herhalen IS een tweede gebeurtenis, en dat
+       is de bedoeling; er is niets recht te zetten omdat er niets fout ging.* */
+    semantiek: { klasse: 'nietHerhaalbaar' },
+    waarom: 'deze weg SLAAT een geheim van 128 bits en geeft het precies eenmaal terug. Twee ' +
+      'oproepen horen twee codes te geven: dezelfde code teruggeven zou betekenen dat het geheim ' +
+      'opnieuw over de lijn gaat, en een code per ontvanger is juist de bedoeling -- elk stopt ' +
+      'apart. Gemeten ' + OP + ': twee keer 200, twee verschillende codes, twee rijen.',
     toegang: LID,
     stand: 'INTENTIONALLY_NON_IDEMPOTENT',
     bewijs: { gemeten: 'dubbeltik-ronde ' + OP + ': codes gelijk? nee. Aantal deelcodes 0 -> 2.',
@@ -122,11 +129,11 @@ const CONTRACTEN = Object.fromEntries([
 
   ['POST /api/carriere/regel/toon', {
     mutatieId: 'carriereledger.toon', herkomst: 'mens',
-    semantiek: { klasse: 'nietIdempotent',
-      waarom: 'deze weg TELT een gebruik, en een teller die niet telt, telt niet. Het lid hoort te ' +
-        'kunnen zien hoe vaak zijn bewijs is geopend; dat is de enige terugkoppeling die hij over ' +
-        'een uitgegeven code heeft. Gemeten ' + OP + ': twee keer 200 met hetzelfde antwoord, ' +
-        'gebruik 0 -> 2.' },
+    semantiek: { klasse: 'nietHerhaalbaar' },
+    waarom: 'deze weg TELT een gebruik, en een teller die niet telt, telt niet. Het lid hoort te ' +
+      'kunnen zien hoe vaak zijn bewijs is geopend; dat is de enige terugkoppeling die hij over ' +
+      'een uitgegeven code heeft. Gemeten ' + OP + ': twee keer 200 met hetzelfde antwoord, ' +
+      'gebruik 0 -> 2.',
     toegang: CODE,
     stand: 'INTENTIONALLY_NON_IDEMPOTENT',
     bewijs: { gemeten: 'dubbeltik-ronde ' + OP + ': tweemaal 200; de INHOUD van het antwoord is ' +

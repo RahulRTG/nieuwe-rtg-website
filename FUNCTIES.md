@@ -18,12 +18,12 @@ het?**
 |---|---|
 | Functieschakelaars (aan/uit per functie) | **217** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
-| Bedrijfsgenres | **76** in 28 sectoren |
+| Bedrijfsgenres | **78** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2107** |
+| Kernmodules (`server/kern/**`) | **2109** |
 | App-pagina's (`public/apps/**.html`) | **308** |
-| Testbestanden | **1814** |
+| Testbestanden | **1815** |
 
 ## De vier werelden
 
@@ -659,7 +659,7 @@ ze werken; dit is wat hij ziet.
 - **RTF-Bibliotheek** `/apps/foundation/bieb.html` — Gratis kind- en gezinsapps van de RTFoundation.
 - **Geloof & Wijsheid** `/apps/foundation/geloofbieb.html` — De Geloof & Wijsheid-Bibliotheek: alle tradities als gelijken, met echte leesbare teksten.
 
-# 3. De 76 genres in 28 sectoren
+# 3. De 78 genres in 28 sectoren
 
 Er is **één** partner-app en **één** personeels-PDA. Welke schermen een zaak
 krijgt volgt niet uit zijn genre maar uit zijn *genre-caps*: een hotel en een
@@ -676,7 +676,7 @@ is de reden dat er geen 130 losse apps zijn.
 - **events** (5) — Events & festivals (`events`), Activiteiten & musea (`activiteit`), Activiteiten & excursies (`activiteiten`), Kunst & galerie (`galerie`), Weddings & prive-events (`weddingplanner`)
 - **facility** (1) — Kantoorgebouw (RTG Enterprise) (`kantoorgebouw`)
 - **government** (2) — Gemeente & overheid (`gemeente`), Rijksoverheid (`rijk`)
-- **healthcare** (6) — Zorg & welzijn (`zorg`), Zorg aan huis (`care`), Ziekenhuis (`ziekenhuis`), Huisarts (`huisarts`), Medisch specialist (`specialist`), Tandartspraktijk (`tandarts`)
+- **healthcare** (8) — Zorg & welzijn (`zorg`), Zorg aan huis (`care`), Ziekenhuis (`ziekenhuis`), Huisarts (`huisarts`), Medisch specialist (`specialist`), Tandartspraktijk (`tandarts`), Fysiotherapiepraktijk (`fysiotherapie`), Sportgeneeskunde (`sportarts`)
 - **horeca** (6) — Restaurant (`restaurant`), Bar (`bar`), Club (`club`), Beachclub (`beachclub`), Koffie & patisserie (`koffie`), Privéchef & catering (`chef`)
 - **hospitality** (4) — Hotel (`hotel`), Appartement (`apartment`), Villa's & fincas (`villa`), Wintersport & seizoensresort (`wintersport`)
 - **insurance** (1) — Verzekeringen (advies) (`verzekeringen`)

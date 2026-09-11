@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-11",
   "gemeten": {
-    "bestanden": 2193,
-    "vormen": 1388,
+    "bestanden": 2195,
+    "vormen": 1391,
     "velden": 2018,
-    "modules": 759,
-    "domeinen": 270,
+    "modules": 761,
+    "domeinen": 272,
     "envelopDrempel": 17,
     "envelop": 29,
-    "veldenDomeineigen": 1423,
-    "veldenGedeeldVanafVier": 200,
+    "veldenDomeineigen": 1422,
+    "veldenGedeeldVanafVier": 201,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -202,6 +202,18 @@
       ]
     },
     {
+      "veld": "zaak",
+      "domeinen": 12,
+      "waar": [
+        "kern/appstore",
+        "kern/avond",
+        "kern/bureau",
+        "kern/commerce",
+        "kern/fiscaal",
+        "kern/mobiliteit"
+      ]
+    },
+    {
       "veld": "onderwerp",
       "domeinen": 12,
       "waar": [
@@ -283,18 +295,6 @@
         "kern/magnaat-capabilities",
         "kern/magnaatwereld",
         "kern/mailsleutel"
-      ]
-    },
-    {
-      "veld": "zaak",
-      "domeinen": 11,
-      "waar": [
-        "kern/appstore",
-        "kern/avond",
-        "kern/bureau",
-        "kern/commerce",
-        "kern/fiscaal",
-        "kern/mobiliteit"
       ]
     },
     {
@@ -418,6 +418,18 @@
       ]
     },
     {
+      "veld": "duurMin",
+      "domeinen": 10,
+      "waar": [
+        "kern/avond",
+        "kern/care",
+        "kern/gemeente",
+        "kern/leverancier",
+        "kern/mall",
+        "kern/trainingsschema"
+      ]
+    },
+    {
       "veld": "soortLabel",
       "domeinen": 10,
       "waar": [
@@ -511,18 +523,6 @@
         "kern/festival",
         "kern/mobiliteit",
         "kern/navigatie"
-      ]
-    },
-    {
-      "veld": "kamer",
-      "domeinen": 9,
-      "waar": [
-        "kern/afdelingen",
-        "kern/bureau",
-        "kern/gast",
-        "kern/homemerken",
-        "kern/levensgraaf",
-        "kern/magnaat-trainingslobby-regie"
       ]
     }
   ],

@@ -2224,6 +2224,7 @@
       "vakbewijsZet",
       "vakbewijzenVan",
       "vakbewijzenVerlopend",
+      "vakschema",
       "vakwerk",
       "verbindCode",
       "verbindLid",
@@ -2257,6 +2258,7 @@
       "zoekZone",
       "zorgketen"
     ],
+    "supplier-deel2": [],
     "synergie": [
       "synergie"
     ],
@@ -2406,6 +2408,9 @@
       "vakbewijsNummer",
       "vakbewijsTeken",
       "vakbewijzenVerlopend"
+    ],
+    "vakschema": [
+      "vakschema"
     ],
     "veiligheid": [
       "alarmAfsluiten",

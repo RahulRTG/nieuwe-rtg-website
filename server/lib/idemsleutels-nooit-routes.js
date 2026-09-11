@@ -110,4 +110,5 @@ module.exports = ({
    eigen bestand, omdat deze anders over de 10 kB gaat. Zie de kop daar. */
 Object.assign(module.exports, require('./idemsleutels-nooit-carriere'));
 Object.assign(module.exports, require('./idemsleutels-nooit-ledger'));
+Object.assign(module.exports, require('./idemsleutels-nooit-vakschema'));
 Object.freeze(module.exports);

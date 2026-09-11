@@ -52,7 +52,8 @@ const SOORTEN = {
 const HANDELINGEN = {
   voorschrijven: 'een recept uitschrijven',
   verwijzen: 'een patient doorverwijzen naar een specialist',
-  uitreiken: 'een recept afhandelen en uitreiken'
+  uitreiken: 'een recept afhandelen en uitreiken',
+  schemaGeven: 'een trainings- of herstelschema voor iemand anders opstellen'
 };
 
 /* HET REGISTER. Per genre: wat het werk vraagt, en wat een handeling vraagt.
@@ -79,6 +80,21 @@ const EISEN = {
   ziekenhuis: { werk: ['identiteit'], handelingen: { voorschrijven: ['big'], verwijzen: ['big'] } },
   apotheek: { werk: ['identiteit'], handelingen: { uitreiken: ['farmacie'] } },
   beautymedical: { werk: ['identiteit'], handelingen: { verwijzen: ['cosmetisch'] } },
+
+  /* -- Sportzorg: RUGDEKKING.md par. 4.4. Het WERK vraagt alleen een
+     vastgestelde identiteit -- een balie of een assistent hoort gewoon te
+     kunnen werken -- en de HANDELING vraagt de registratie. Dat is dezelfde
+     knip als bij de huisarts hierboven.
+
+     WAAROM `big` EN GEEN NIEUWE SOORT: fysiotherapeut is een artikel 3-beroep
+     in de Wet BIG en een sportarts is een geregistreerd specialisme van arts.
+     Een eigen soort ernaast zou hetzelfde stuk onder een tweede naam vastleggen,
+     en dan lopen de twee binnen een jaar uiteen (LAT.md regel 4).
+
+     En zoals overal in dit register: RTG belt het BIG-register niet en doet niet
+     alsof. Vastgelegd wordt dat een mens van RTG het stuk heeft GEZIEN. -- */
+  fysiotherapie: { werk: ['identiteit'], handelingen: { schemaGeven: ['big'] } },
+  sportarts: { werk: ['identiteit'], handelingen: { schemaGeven: ['big'] } },
 
   /* -- Verzekeringsadvies: alleen de identiteit, en dat is met opzet minder dan
      hierboven. Het advieswerk zelf hangt aan een Wft-diploma, maar er is in dit

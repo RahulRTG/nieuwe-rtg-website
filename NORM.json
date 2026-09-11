@@ -21,8 +21,8 @@
     "keuringTeGroot": 14,
     "inlineStijlAttributen": 4638,
     "browserpoortToetsen": 337,
-    "kernBreedte": 1568,
-    "kernGedeeld": 234,
+    "kernBreedte": 1569,
+    "kernGedeeld": 235,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
     "toetsenNietGemeten": 607,
@@ -1991,6 +1991,24 @@
       "meter": "kernGedeeld 233 -> 234",
       "reden": "Dezelfde naam als de notitie hierboven (kernBreedte 1567 -> 1568): `carriereledger`, gedeeld met `office` en `supplier` omdat een carrierefeit zijn waarde krijgt van wie het bevestigt, en dat de eigenaar per definitie niet zelf kan zijn. De verantwoording staat daar voluit en wordt hier niet herhaald -- twee notities die hetzelfde zeggen worden allebei niet gelezen.",
       "waarheen": "server/routes/office/carriereledger.js en server/routes/supplier/carriereledger.js"
+    },
+    {
+      "datum": "2026-09-11",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1568,
+      "meter": "kernBreedte 1568 -> 1569",
+      "reden": "HET VAKSCHEMA (kern/vakschema.js, RUGDEKKING.md par. 4.4, besluit 4) voegt EEN naam toe: `vakschema`, gedeeld met `supplier`.\n\nWAAROM DIE DELING DE FUNCTIE ZELF IS. Deze laag bestaat omdat kern/zorgniveau.js RTG verbiedt inhoud te geven op het niveau `professioneel` -- en dat is juist. Het gevolg was dat NIEMAND het kon: `vanWie` op een trainingsschema is vrije tekst die het lid zelf intypt, dus \"mijn fysio\" was een bewering en geen bevoegdheid. De uitweg die par. 4.4 aanwijst is niet een uitzondering op die grens maar de professional IN het systeem zetten. Dat vraagt per definitie twee deuren: een zaak (`supplierAuth`) die voorstelt, en een lid (`auth`) dat bevestigt. Haal er een weg en er is geen laag meer -- laat het lid zijn eigen schema als \"van de fysio\" aanmerken en je bent terug bij de vrije tekst.\n\nWAT DE KOPPELING SMAL HOUDT, en dat is na te rekenen: het routebestand buiten het eigen domein kent twee wegen, en geen van beide leest iets van het lid. De zaak ziet WAT zij verstuurde en nooit wat ermee gebeurde -- niet of het is aanvaard, niet de reden van een weigering, niet de codenaam. Er is met opzet geen leesweg naar het dossier, en dat is meteen de reden dat deze koppeling niet groeit.\n\nDe collectie blijft binnen het domein (`vakschema`, een declaratie in kern/eigencollectie.js) en niemand anders schrijft erin -- keuringsregel 63 bewaakt dat.",
+      "waarheen": "server/routes/supplier/vakschema.js -- de enige route buiten het eigen domein; twee wegen, allebei zonder leesweg naar het lid"
+    },
+    {
+      "datum": "2026-09-11",
+      "soort": "structureel",
+      "sleutel": "kernGedeeld",
+      "van": 234,
+      "meter": "kernGedeeld 234 -> 235",
+      "reden": "Dezelfde naam als de notitie hierboven (kernBreedte 1568 -> 1569): `vakschema`, gedeeld met `supplier` omdat een voorstel per definitie van een ANDER komt dan wie het aanneemt. De verantwoording staat daar voluit en wordt hier niet herhaald.",
+      "waarheen": "server/routes/supplier/vakschema.js"
     }
   ],
   "prestatie": {

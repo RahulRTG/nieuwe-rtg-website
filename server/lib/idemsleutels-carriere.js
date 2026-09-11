@@ -1,10 +1,11 @@
-/* DE CARRIERELAAG: RTG Vertegenwoordiging, het jeugdbestuur, RTG Rugdekking en
-   het carriere ledger.
+/* DE CARRIERELAAG: RTG Vertegenwoordiging, het jeugdbestuur, RTG Rugdekking, het
+   carriere ledger en het vakschema.
 
-   TIEN REGELS, EN ZEVENTIEN DIE HIER JUIST NIET STAAN. Die zeventien schrijfwegen
+   TWAALF REGELS, EN TWINTIG DIE HIER JUIST NIET STAAN. Die zeventien schrijfwegen
    weten het ZELF al -- ze weigeren een herhaling op grond van de toestand
    -- en staan daarom in ./idemsleutels-nooit-routes.js, elk met zijn eigen
-   reden (elf in ./idemsleutels-nooit-carriere.js, zes in ./idemsleutels-nooit-ledger.js).
+   reden (elf in ./idemsleutels-nooit-carriere.js, zes in ./idemsleutels-nooit-ledger.js, drie in
+   ./idemsleutels-nooit-vakschema.js).
 
    DAT IS EEN CORRECTIE, en de fout hoort hier te blijven staan. Ze stonden
    eerst met `zelfdeVerzoek: true` in dit bestand, en dat deed twee dingen die
@@ -20,12 +21,12 @@
    deze regels erbij kwamen, met een 200 waar een 409 hoorde. Een verklaring die
    het gedrag VERANDERT is geen verklaring.
 
-   Wat hier overblijft zijn de acht leeswegen en de drie routes die met opzet WEL
+   Wat hier overblijft zijn de tien leeswegen en de drie routes die met opzet WEL
    een tweede handeling uitvoeren. */
 'use strict';
 
 const SLEUTELS = {
-  /* Acht leeswegen: geen van de acht raakt de opslag. Alle vijf gebruiken
+  /* Tien leeswegen: geen van de tien raakt de opslag. Alle vijf gebruiken
      `kijk()` en niet `bak()`, zodat een blik geen lege rij achterlaat
      (kern/eigencollectie.js). `leest` en niet `zelfdeVerzoek`, om dezelfde
      reden als bij ./idemsleutels-kaarten.js: een tweede vraag hoort het
@@ -39,6 +40,8 @@ const SLEUTELS = {
   'POST /api/office/rugdekking/alle': { leest: true },
   'POST /api/carriere/ledger/mijn': { leest: true },
   'POST /api/carriere/ledger/delen': { leest: true },
+  'POST /api/training/voorstellen': { leest: true },
+  'POST /api/supplier/vakschema/mijn': { leest: true },
 
   /* DE ENIGE DIE MET OPZET EEN TWEEDE KEER IETS DOET. Elke aanroep zet een regel
      in het spoor van de client, en dat IS de bedoeling: twee keer namens iemand

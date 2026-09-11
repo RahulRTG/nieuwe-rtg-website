@@ -60,7 +60,7 @@ veertig jaar mee moet.
 | **RTG die een mens geld geeft voor zijn talent** | **Nee — nul.** Zie par. 1 |
 | **Een zaakwaarnemer die namens iemand handelt** | **Nee.** Zie par. 4.2 |
 | **Een beurs / stipendium aan een individu** | **Nee, en er staat een blokkade vóór.** Zie par. 2.3 |
-| Gezondheidsbegeleiding van een topsporter | **Nee, en dat is een grens.** Zie par. 4.4 |
+| Gezondheidsbegeleiding van een topsporter | **Niet door RTG, wel door een bevoegde mens IN het systeem.** Zie par. 4.4 en 4.4a |
 
 ---
 
@@ -347,6 +347,55 @@ gezondheid nooit.** Dat is niet een gevoelig veld maar een andere dataklasse
 
 ---
 
+### 4.4a Wat er van dat besluit gebouwd is
+
+De eigenaar heeft besluit 4 genomen zoals par. 4.4 hem voorlegt: geen
+uitzondering op `kern/zorgniveau.js`, maar de professional erin. Dat staat er nu
+(`server/kern/vakschema*.js`, vijf routes, twaalf unittoetsen en vijf
+e2e-toetsen), en `zorgniveau.js` is er geen letter voor veranderd.
+
+**Het gat was scherper dan het document het stelde.** `vanWie` op een
+trainingsschema is *vrije tekst die het lid zelf intypt*. "Mijn fysio" was dus
+een bewering, en er was geen enkele weg waarlangs een aantoonbaar bevoegde mens
+iets in het dossier van een lid kon zetten. RTG mocht geen inhoud geven — juist —
+en degene die dat wél mag, kon er niet bij.
+
+**Twee poorten, want één was niet genoeg.** `persoonseis.magHandeling` weegt het
+vakbewijs van de MENS, en een genre dat niet in het register staat vraagt met
+opzet niets extra's (een restaurant hoort geen papieren te vragen aan zijn
+afwasser). Het gevolg is dat die functie in haar eentje geen *genre*poort is: een
+restaurant met een BIG-houder in dienst kwam er zo doorheen, en de toets vond
+dat. `kern/vakschema-poort.js` zet de genrelijst ernaast, in dezelfde vorm als
+`SPREEKKAMERS` in `kern/zorgketen/index.js` — de persoonseis zegt of deze *mens*
+het mag, de lijst of het bij dit *werk* hoort.
+
+Twee genres erbij (`fysiotherapie`, `sportarts`), allebei `status: 'bewijs'` zodat
+een mens van RTG de vergunning ziet, en de handeling `schemaGeven` met `big` als
+eis. Géén nieuwe bewijssoort: fysiotherapeut is een artikel 3-beroep in de Wet
+BIG en sportarts een geregistreerd specialisme, dus een eigen soort ernaast zou
+hetzelfde stuk onder een tweede naam vastleggen.
+
+**Vier dingen die niet mogen sneuvelen.**
+
+- **De vakman stelt voor, het lid bevestigt.** Een voorstel komt niet in het
+  schema tot het lid drukt (`LIFE.md`). Wie dat omdraait, geeft een derde
+  schrijfrecht in andermans dossier.
+- **Een voorstel verklapt niet of een codenaam bestaat.** Deze weg staat open
+  voor elke zaak met een bevoegde medewerker; een antwoord dat verschilt tussen
+  "bestaat" en "bestaat niet" maakt er een zoekmachine naar leden van. Dat dwong
+  ook de vorm van de dubbelklikgrens af: de tweede identieke oproep doet *niets*
+  en antwoordt *hetzelfde* — een 409 zou het lek zijn dat de rest dichthoudt.
+- **De vakman leest niets terug**, ook niet of het is aanvaard, en de reden van
+  een weigering al helemaal niet.
+- **En grens 8 staat overeind**: er loopt geen draad van `kern/rugdekking`
+  hierheen, en `test/vakschema.test.js` 9 zakt zodra die er komt.
+
+*Wat dit met opzet niet is: een raamwerk waarin "een bevoegde professional inhoud
+geeft". Het is één handeling, voor één schema, omdat dat de plek is waar het gat
+gemeten kon worden. Een tweede handeling verdient haar eigen meting.*
+
+---
+
 ## 5. De grenzen die niet mogen sneuvelen
 
 Acht, en ze komen alle acht uit iets dat dit huis al heeft besloten. Waar een
@@ -428,7 +477,7 @@ niet-gekozen weg hoort leesbaar te blijven.
 | 1 | Hoe heet het geld dat naar een talent gaat | **C -- allebei, gescheiden**: commerciele rugdekking en een beurs, met de firewall ertussen |
 | 2 | Komt er een genre voor het individu | **A -- een gedeeld genre**, en het heet `talentmens` (`talent` is bezet door de Talent Exchange) |
 | 3 | Bouwen we de zaakwaarneming | **A -- ja, en als eerste**. Staat: `server/kern/vertegenwoordiging/` |
-| 4 | Gezondheid van een topsporter | nog niet voorgelegd; par. 4.4 staat ongewijzigd |
+| 4 | Gezondheid van een topsporter | **genomen: de professional in het systeem** -- `kern/vakschema.js`, zie par. 4.4a |
 | + | De A3-poort die de laag dichthield | **verificatie uitrollen** -- af: `/apps/verificatie.html` |
 | + | Minderjarig talent | **jeugdbestuur bouwen** (CARRIERE.md par. 6 nummer 7) |
 | + | De derde uitbetaalweg (par. 4.3) | **ja, met een schakelaar die standaard DICHT staat** -- de schakelaar is de juridische positie |

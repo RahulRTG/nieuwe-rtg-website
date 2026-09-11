@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-11T16:05:55.925Z",
-    "commit": "8b46e78a",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-11T16:33:10.462Z",
+    "commit": "ec189cbf",
+    "boomVuil": true,
+    "boomAnders": 8,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -8254,6 +8254,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "vakschema.e2e.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "vakschema.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "vakwerk-pro.test.js": {
       "soort": "server",

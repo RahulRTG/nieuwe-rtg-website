@@ -48,6 +48,24 @@ module.exports = function bouwKernAanDrie(kern, grens) {
   Object.assign(kern, require('../kern/trainingsschema')({ db, save, schoon, crypto,
     metingZet: kern.metingZet }));
   require('../routes/trainingsschema')(grens('trainingsschema'));
+  /* Een schema van een BEVOEGDE vakman (kern/vakschema.js, RUGDEKKING.md par.
+     4.4). Staat direct na het trainingsschema en krijgt `trainingZet` mee: een
+     aanvaard voorstel landt in het EIGEN schema van het lid langs de gewone weg,
+     zodat er geen tweede plek ontstaat waar schema's wonen. De vakman stelt
+     alleen voor; bevestigen doet de mens. */
+  Object.assign(kern, require('../kern/vakschema')({ db, save, crypto, schoon,
+    findSupplier: kern.findSupplier, persoonseis: kern.persoonseis,
+    keyVanCodenaam: kern.keyVanCodenaam, trainingZet: kern.trainingZet }));
+  require('../routes/vakschema')(grens('vakschema'));
+  /* En de ZAAKkant hier, en niet bij de andere supplier-routes. Dat is geen
+     voorkeur maar noodzaak, en het heeft een uur gekost: routes/supplier.js
+     wordt gemonteerd in opzet/routes.js, en die draait VOOR deze laag. De
+     route stond daar dus te kijken naar een kern waar `vakschema` nog niet in
+     zat, sloeg zichzelf over met `if (!vakschema) return;` en gaf daarna
+     eeuwig 404. Een wachter die een bedradingsfout in stilte omzet in "die
+     route bestaat niet", is precies het soort groen waar niemand iets aan
+     heeft -- de e2e-toets vond hem, geen enkele unittoets kon dat. */
+  require('../routes/supplier/vakschema')(grens('vakschema'));
   /* De voedingslaag (kern/voeding.js): wat u van plan bent te eten. Een PLAN en
      geen meting -- er wordt niets geteld en er komt geen oordeel over wat u eet.
      Leest de allergenen uit het zorgprofiel als geheugensteun, niet als filter:

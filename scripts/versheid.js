@@ -285,7 +285,8 @@ const REGISTERS = [
   ['SCHERMROUTES.json', 'node scripts/schermroutes.js --vastleggen', 'welk bestand in public/ welk API-pad noemt, en welke daarvan dood zijn'],
   ['ROUTEBRON.json', 'node scripts/routebron.js --vastleggen', 'de routelijst waar SCHERMROUTES tegen meet -- veroudert hij, dan verzint de dode-padenteller er'],
   ['CONTEXTPROEF.json', 'node scripts/contextproef.js --vastleggen', 'of de async-context blijft staan waar hij moet blijven staan'],
-  ['FAALPROEF.json', 'node scripts/faalproef.js --vastleggen', 'wat er gebeurt als een afhankelijkheid wegvalt']
+  ['FAALPROEF.json', 'node scripts/faalproef.js --vastleggen', 'wat er gebeurt als een afhankelijkheid wegvalt'],
+  ['CARRIEREVORM.json', 'node scripts/carrierevorm.js --vastleggen', 'of de talentdomeinen een datavorm delen -- CARRIERE.md par. 0 rust erop, dus een verouderde uitslag draagt daar een conclusie die niemand nog heeft nagerekend']
 ];
 
 /* De lezer van beide stempelvormen woont in ./lib/stempel.js -- hij stond hier

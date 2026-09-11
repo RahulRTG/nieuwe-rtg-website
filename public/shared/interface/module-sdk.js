@@ -77,7 +77,12 @@
       isolation: { scopedStyles: true, controlledNetwork: true, errorBoundary: true,
         eventAllowlist: true, actionAllowlist: true, globalMutation: false },
       priority: Number.isFinite(Number(m.priority)) ? Number(m.priority) : 100,
-      defaultHidden: m.defaultHidden === true
+      defaultHidden: m.defaultHidden === true,
+      /* VAST: een module die niet te verbergen en niet te verplaatsen is. De
+         werelden (WERELD.md: "de werelden staan bovenaan de bank") zijn er een.
+         Een lid mag zijn ruimte samenstellen, maar niet de enige weg naar de
+         vier huizen wegzetten -- dat is een gebrek en geen voorkeur. */
+      pinned: m.pinned === true
     };
     return Object.freeze ? Object.freeze(schoon) : schoon;
   }

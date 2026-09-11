@@ -65,7 +65,13 @@
 .rtg-interface-second-screen .rtg-ss-message{padding:9px 0;border:0;border-top:1px solid var(--rtg-ss-line)}
 .rtg-interface-second-screen .rtg-ss-message strong{font-size:14px}
 .rtg-interface-second-screen .rtg-ss-more{width:100%;padding:10px 0;border:0;color:var(--rtg-ss-wine);text-align:left}
-.rtg-interface-second-screen .rtg-ss-module[data-rtg-module="navigation"]{display:none}
+/* De module Werelden blijft in beeld en staat vast bovenaan (workspace-composer.js):
+   op een telefoon is Uw ruimte de bank, en de bank draagt de werelden bovenaan
+   (WERELD.md). Hij stond hier op display:none en daarmee waren de vier huizen op
+   een telefoon nergens meer te bereiken; test/appmenu.e2e.js meet dat. */
+.rtg-interface-second-screen .rtg-ss-module[data-rtg-module="navigation"]{padding-top:14px}
+.rtg-interface-second-screen .rtg-ss-module[data-rtg-module="navigation"] .rtg-ss-module-head{display:none}
+.rtg-interface-second-screen .rtg-ss-vast{margin:6px 0 0;color:var(--rtg-ss-muted);font-size:12px;line-height:1.4}
 .rtg-interface-second-screen .rtg-ss-actions{display:grid;grid-template-columns:1fr;gap:9px;padding:22px 0 10px;border:0}
 .rtg-interface-second-screen .rtg-ss-actions button{min-height:54px;padding:0 18px;text-align:center}
 .rtg-interface-second-screen .rtg-ss-open-rahul{
@@ -87,7 +93,10 @@
 .rtg-interface-second-screen .rtg-ss-view-menu button{min-height:48px;padding:8px;border-color:var(--rtg-ss-line);color:var(--rtg-ss-text);font-size:12px}
 .rtg-interface-second-screen .rtg-ss-view-menu button[aria-pressed="true"]{border-color:var(--rtg-ss-wine);color:var(--rtg-ss-wine)}
 .rtg-interface-second-screen .rtg-ss-editor{margin:18px 0 0;border-color:var(--rtg-ss-line);background:var(--rtg-ss-card)}
-.rtg-interface-second-screen .cmd-bankvoet{display:none}
+/* De voet van de bank blijft staan: daar woont de deur naar het bedieningspaneel
+   (Instellingen, met uitloggen), en die hoort in de bank (WERELD.md). Wat er wel
+   uit de voet gaat is de tweede Rahul-deur: Uw ruimte heeft "Open Rahul" al. */
+.rtg-interface-second-screen .cmd-bankvoet [data-systeem][data-deur="rahul"]{display:none}
 body[data-rtg-personal-surface] .rtg-edge-bottom{grid-template-columns:60px 60px minmax(0,1fr) 60px!important}
 body[data-rtg-personal-surface] .rtg-edge-history,body[data-rtg-personal-surface] .rtg-edge-layout,body[data-rtg-personal-surface] .rtg-edge-action{display:none!important}
 body[data-rtg-personal-surface] .rtg-edge-appslot{display:grid!important;grid-column:3;place-items:center;overflow:hidden;pointer-events:none}

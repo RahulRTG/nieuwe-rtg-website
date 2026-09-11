@@ -152,24 +152,101 @@ async function laad(){
    "aangevraagd" hier stond, verdween een reis uit beeld op het moment dat de
    reisadviseur hem bevestigde: precies het bericht waar je op wacht, en juist
    dat viel weg. Nu blijft elke aanvraag staan met zijn stand erbij, en het
-   bericht van de adviseur eronder. Annuleren kan alleen zolang er nog geen
-   besluit ligt; daarna gaat het via de adviseur, want er is dan iets geregeld. */
+   bericht van de adviseur eronder.
+
+   WAT ER PER STAND KAN, en dat is sinds de nazorg (kern/reisbureau-nazorg.js)
+   iets anders dan hiervoor:
+
+     aangevraagd         intrekken -- er is nog niets toegezegd
+     bevestigd           een wijziging VRAGEN, of afzeggen met een reden
+     wijziging-gevraagd  de wens staat er; afzeggen kan nog steeds
+     afgewezen/afgezegd  klaar, met de reden erbij
+
+   Een wijziging is een verzoek en geen knop die iets verzet: de reisadviseur
+   beslist erover. Dat staat er ook zo bij, want een lid dat denkt dat zijn
+   datum verzet is en dat niet is, staat straks voor niets op Schiphol.
+
+   AFZEGGEN VRAAGT EEN REDEN EN GEEN "WEET U HET ZEKER". Het veld IS de rem: wie
+   een reden typt, heeft nagedacht. Twintig bevestigingsvragen leren mensen op ja
+   drukken (GRAMMATICA.md). */
+const STAND_KLEUR = { bevestigd: 'var(--green)', afgewezen: 'var(--burgundy)',
+  afgezegd: 'var(--burgundy)', 'wijziging-gevraagd': 'var(--gold,#857007)' };
+const STAND_WOORD = { 'wijziging-gevraagd': 'wijziging gevraagd' };
+let openPaneel = null;   // ref waarvan het paneel openstaat, zodat het na een herlading openblijft
+
+function wijzigingRegel(a){
+  const w = (a.wijziging||{}).gevraagd || {};
+  const d = [];
+  if (w.vertrek) d.push('vertrek naar '+esc(w.vertrek));
+  if (w.personen) d.push(esc(w.personen)+' personen');
+  if ((a.wijziging||{}).toelichting) d.push('"'+esc(a.wijziging.toelichting)+'"');
+  return d.length ? 'Gevraagd: '+d.join(', ')+'. De reisadviseur bekijkt het.' : '';
+}
+
+function paneelHtml(a){
+  if (openPaneel !== a.ref) return '';
+  return '<div class="tag" style="display:block;margin-top:.6rem;padding:.7rem;border:1px solid var(--line);">'+
+    (a.status === 'bevestigd'
+      ? '<label class="meta" style="display:block;margin-bottom:.3rem;">Andere vertrekdatum</label>'+
+        '<input type="date" id="wDatum" value="'+esc(a.vertrek||'')+'" style="width:100%;padding:.4rem;margin-bottom:.5rem;">'+
+        '<label class="meta" style="display:block;margin-bottom:.3rem;">Aantal personen</label>'+
+        '<input type="number" id="wPers" min="1" max="20" value="'+esc(a.personen)+'" style="width:100%;padding:.4rem;margin-bottom:.5rem;">'+
+        '<label class="meta" style="display:block;margin-bottom:.3rem;">Of vertel wat u anders wilt</label>'+
+        '<input type="text" id="wTekst" maxlength="300" placeholder="Bijvoorbeeld: een kamer met uitzicht" style="width:100%;padding:.4rem;margin-bottom:.6rem;">'+
+        '<button class="knop" data-doe="wijzig" data-ref="'+esc(a.ref)+'" style="width:auto;margin:0;padding:.45rem .8rem;">Vraag deze wijziging</button> '
+      : '')+
+    '<label class="meta" style="display:block;margin:.6rem 0 .3rem;">Afzeggen? Vertel kort waarom; de reisadviseur leest het.</label>'+
+    '<input type="text" id="aReden" maxlength="300" placeholder="Reden" style="width:100%;padding:.4rem;margin-bottom:.6rem;">'+
+    '<button class="knop" data-doe="afzeg" data-ref="'+esc(a.ref)+'" style="width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);">Zeg deze reis af</button> '+
+    '<button class="knop" data-doe="dicht" style="width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--soft);">Laat maar</button>'+
+    '<span class="meta" style="display:block;margin-top:.6rem;">Een afzegging verplaatst geen geld. Loopt er een betaling, dan handelt een medewerker die met u af.</span>'+
+  '</div>';
+}
+
 async function laadMijn(){
   let d; try { d = await api('/api/reisbureau/mijn'); } catch(e){ return; }
   const rijen = (d.aanvragen||[]).slice(0, 8);
   if (!rijen.length){ $('#mijnWrap').innerHTML = ''; return; }
-  const kleur = { bevestigd: 'var(--green)', afgewezen: 'var(--burgundy)' };
   $('#mijnWrap').innerHTML = '<h2 style="font-family:\'Bodoni Moda\',serif;font-size:1.1rem;margin:2rem 0 .8rem;border-top:1px solid var(--line);padding-top:1.4rem;">Mijn aanvragen</h2>'+
-    rijen.map(a => '<div class="reis" style="cursor:default;flex-direction:row;justify-content:space-between;align-items:center;gap:1rem;">'+
-      '<div><h3 style="font-size:1rem;">'+esc(a.titel)+'</h3><span class="meta">'+esc(a.bestemming)+' · '+a.personen+' pers · <span style="color:'+(kleur[a.status]||'var(--soft)')+';">'+esc(a.status)+'</span></span>'+
-      (a.besluit && a.besluit.bericht ? '<span class="tag" style="display:block;margin-top:.3rem;">'+esc(a.besluit.bericht)+'</span>' : '')+
-      (a.status === 'aangevraagd' ? '<span class="tag" style="display:block;margin-top:.3rem;">Een RTG-reisadviseur bevestigt de datum en stelt de reis samen.</span>' : '')+'</div>'+
-      (a.status === 'aangevraagd'
-        ? '<button class="knop" data-ref="'+esc(a.ref)+'" style="width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);flex:none;">Annuleer</button>'
-        : '')+
+    rijen.map(a => '<div class="reis" style="cursor:default;flex-direction:column;align-items:stretch;gap:.4rem;">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;gap:1rem;">'+
+        '<div><h3 style="font-size:1rem;">'+esc(a.titel)+'</h3><span class="meta">'+esc(a.bestemming)+' · '+esc(a.personen)+' pers'+
+        (a.vertrek ? ' · '+esc(a.vertrek) : '')+' · <span style="color:'+(STAND_KLEUR[a.status]||'var(--soft)')+';">'+esc(STAND_WOORD[a.status]||a.status)+'</span></span></div>'+
+        (a.status === 'aangevraagd'
+          ? '<button class="knop" data-doe="intrek" data-ref="'+esc(a.ref)+'" style="width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);flex:none;">Intrekken</button>'
+          : (a.status === 'bevestigd' || a.status === 'wijziging-gevraagd')
+            ? '<button class="knop" data-doe="open" data-ref="'+esc(a.ref)+'" style="width:auto;margin:0;padding:.45rem .8rem;background:transparent;border:1px solid var(--line);color:var(--txt);flex:none;">Wijzigen of afzeggen</button>'
+            : '')+
+      '</div>'+
+      (a.besluit && a.besluit.bericht ? '<span class="tag">'+esc(a.besluit.bericht)+'</span>' : '')+
+      (a.status === 'aangevraagd' ? '<span class="tag">Een RTG-reisadviseur bevestigt de datum en stelt de reis samen.</span>' : '')+
+      (a.status === 'wijziging-gevraagd' ? '<span class="tag">'+wijzigingRegel(a)+'</span>' : '')+
+      (a.afzegging ? '<span class="tag">Afgezegd door '+esc(a.afzegging.door === 'lid' ? 'u' : 'het reisbureau')+': '+esc(a.afzegging.reden)+'</span>' : '')+
+      paneelHtml(a)+
     '</div>').join('');
-  $('#mijnWrap').querySelectorAll('button[data-ref]').forEach(b => b.addEventListener('click', async () => {
-    try { await api('/api/reisbureau/annuleer', { ref: b.dataset.ref }); meld('Aanvraag ingetrokken.'); laadMijn(); } catch(e){ meld(e.message); }
+
+  $('#mijnWrap').querySelectorAll('button[data-doe]').forEach(b => b.addEventListener('click', async () => {
+    const ref = b.dataset.ref, doe = b.dataset.doe;
+    if (doe === 'open'){ openPaneel = ref; laadMijn(); return; }
+    if (doe === 'dicht'){ openPaneel = null; laadMijn(); return; }
+    try {
+      if (doe === 'intrek'){ await api('/api/reisbureau/annuleer', { ref }); meld('Aanvraag ingetrokken.'); }
+      if (doe === 'wijzig'){
+        const lijf = { ref, toelichting: ($('#wTekst')||{}).value || '' };
+        if ($('#wDatum') && $('#wDatum').value) lijf.vertrek = $('#wDatum').value;
+        if ($('#wPers') && $('#wPers').value) lijf.personen = $('#wPers').value;
+        await api('/api/reisbureau/wijzig', lijf);
+        meld('Uw verzoek ligt bij de reisadviseur. Er is nog niets veranderd aan de reis.');
+      }
+      if (doe === 'afzeg'){
+        const reden = (($('#aReden')||{}).value || '').trim();
+        if (!reden){ meld('Vertel kort waarom, dan weet de reisadviseur wat er speelt.'); return; }
+        await api('/api/reisbureau/afzeggen', { ref, reden });
+        meld('De reis is afgezegd. Loopt er een betaling, dan neemt een medewerker contact met u op.');
+      }
+      openPaneel = null;
+      laadMijn();
+    } catch(e){ meld(e.message); }
   }));
 }
 /* Vanaf hier hoort er een ingelogd lid te zijn. Zonder token heeft de tak

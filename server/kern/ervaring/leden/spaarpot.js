@@ -45,7 +45,7 @@ module.exports = (ctx) => {
       items.push({ soort: 'verblijf', datum: v.aankomst, tijd: '', titel: 'Verblijf: ' + v.roomName + ' bij ' + v.supplierName + ' (' + v.nachten + (v.nachten === 1 ? ' nacht)' : ' nachten)'), status: v.status, ref: v.ref });
     }
     for (const a of db.data.reisAanvragen || []) {
-      if (a.customerKey !== key || !['aangevraagd', 'bevestigd'].includes(a.status) || !a.vertrek || a.vertrek < van) continue;
+      if (a.customerKey !== key || !['aangevraagd', 'bevestigd', 'wijziging-gevraagd'].includes(a.status) || !a.vertrek || a.vertrek < van) continue;
       items.push({ soort: 'reis', datum: a.vertrek, tijd: '', titel: 'Reis: ' + a.titel + ' (' + a.bestemming + ')', status: a.status, ref: a.ref });
     }
     items.sort((a, b) => (a.datum + (a.tijd || '99')).localeCompare(b.datum + (b.tijd || '99')));

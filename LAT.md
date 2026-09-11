@@ -105,7 +105,7 @@ in drie kernmodules, en geen van de kopieen had de opruimronde van het origineel
 
 *En het duurste geval, want het zit in de veiligheid zelf:* de vraag "mag de
 machine dit zelf doen" wordt op VIJF plekken beantwoord, met vijf verschillende
-schalen -- `stuur/beleid.js` (verboden/voorstel/direct), `command/risico.js`
+schalen -- `stuur/beleid.js` (verboden/voorstel/direct), `frictie/motor.js`
 (hand/assist/auto), `geldbeleid/regels.js` (kijken/voorstellen/klaarzetten/
 automatisch), `stadsweefsel/ainiveau.js` (waarnemen tot verboden) en
 `bureau/delegatie.js` (informeren tot autonoom). Elk van de vijf is op zichzelf

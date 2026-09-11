@@ -106,6 +106,17 @@ module.exports.maakReiswereld = ({ kern }) => {
          een 1 neerzetten zou een getal verzinnen dat er nooit stond. Het scherm
          laat de regel dan gewoon weg. */
       personen: Number(o.personen) > 0 ? Number(o.personen) : null,
+      /* DE PLEK ALS VERWIJZING, en alleen waar de bron er een KENT. `bestemming`
+         hierboven is vrije tekst ("Barcelona") en daarop valt geen beweging te
+         rekenen; `{ zaak: 'KIKUNOI' }` wordt door kern/mobiliteit/plekken.js
+         opgelost tot een punt. Een stadsnaam naar coordinaten benaderen zou een
+         marge op een gok bouwen, en daarop wordt straks een reservering verzet.
+         Vandaag levert EEN van de zes bronnen hem; de rest geeft null en RTG
+         Move meldt dat als onbekend (kern/move/naad.js). En `duurMin`: zonder
+         duur is er geen moment waarop u weg kunt, en nul aannemen zou een
+         restaurant op hetzelfde moment laten beginnen en eindigen. */
+      plek: o.plek || null,
+      duurMin: Number(o.duurMin) > 0 ? Number(o.duurMin) : null,
       kenmerk: o.kenmerk || '', app: o.app, link: o.link
     };
   };

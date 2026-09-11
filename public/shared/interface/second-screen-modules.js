@@ -140,7 +140,7 @@
   }));
 
   SDK.add(SDK.define({
-    id: 'navigation', title: 'Werelden', version: 1, source: 'native', priority: 40,
+    id: 'navigation', title: 'Werelden', version: 1, source: 'native', priority: 40, pinned: true,
     states: SDK.states, capabilities: ['navigation.read'], permissions: [], actions: [],
     events: { publishes: [], subscribes: [] }
   }, function (ctx) {

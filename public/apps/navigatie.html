@@ -261,6 +261,29 @@
      hadden. Zonder plek bouwen we niets en zegt de poort waarom. */
   let hier = null;
   let kaartData = null, modus = 'auto', profiel = 'slim', route = null, naar = null, kaartBegonnen = false;
+
+  /* EEN BESTEMMING DIE VAN BUITEN MEEKOMT (?naar=lat,lng&label=...).
+
+     RTG Move weet welke beweging de volgende is en lost de plek al op via
+     kern/mobiliteit/plekken.js; zonder deze ingang kwam een lid die op de
+     Continue Key drukte uit op een kaart die niet wist waar hij heen ging --
+     een zichtbare ingang naar iets dat niet gebeurt.
+
+     ALLEEN EEN PUNT, en met opzet geen zoekterm: een label uit de URL dat wij
+     zelf gaan opzoeken, is een tweede zoekweg met een tweede uitkomst. Het
+     label is hier dus puur wat er in het veld komt te staan; wat de route
+     rekent, zijn de coordinaten. Onzin in de URL levert `null` en dan doet dit
+     scherm precies wat het zonder parameter doet. */
+  const meegegeven = (() => {
+    try {
+      const q = new URLSearchParams(location.search);
+      const d = String(q.get('naar') || '').split(',');
+      const lat = Number(d[0]), lng = Number(d[1]);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+      if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
+      return { lat, lng, naam: String(q.get('label') || '').slice(0, 80) || 'Meegegeven bestemming' };
+    } catch (e) { return null; }
+  })();
   let navigerend = false, laatsteHerberekening = 0;
   const actief = { leverancier: true, ov: true, laad: true, tank: false, civic: false, flits: true, wegennet: true };
   /* Meenemen (shared/uitvoer.js): staat er een route, dan is dat wat je mee
@@ -887,6 +910,14 @@
     legenda();
     if (R) { bouwStad(); await haalFlits(); bouwPinnen(); bouwRoute(); teken(); $('#badge3d').textContent = '3D'; }
     else { $('#badge3d').textContent = '2D'; await haalFlits(); teken2D(); }
+    /* PAS HIER, en niet bij het laden: berekenRoute() heeft een vertrekpunt
+       nodig, en dat is er op dat moment nog niet. Wie hem eerder aanroept,
+       krijgt "Ik weet nog niet waar u bent" te zien terwijl er niets aan de
+       hand is. */
+    if (meegegeven) {
+      $('#zoek').value = meegegeven.naam;
+      await kiesBestemming(meegegeven);
+    }
   }
   window.addEventListener('resize', grootte);
   (async () => {

@@ -35,6 +35,36 @@ test('Uw ruimte gebruikt de bestaande profiel-, inbox- en Rahul-bronnen', () => 
   assert.doesNotMatch(JS, /fetch\(|XMLHttpRequest|localStorage/);
 });
 
+test('Uw ruimte laat de werelden en de systeemdeur in de bank staan', () => {
+  /* Op een telefoon is Uw ruimte de bank. De eerste versie van de persoonlijke
+     laag zette de module Werelden en de voet op display:none, en daarmee waren
+     de vier huizen en de deur naar het bedieningspaneel op een telefoon nergens
+     meer te bereiken (WERELD.md; test/appmenu.e2e.js zakte er vijf keer op).
+     Wat hier vaststaat: die twee regels komen niet terug, de werelden staan
+     vast (pinned) en de composer weigert ze te verbergen of te verschuiven --
+     met de reden in de samenstel-lijst, want een grijze knop zonder uitleg
+     bestaat hier niet (GRAMMATICA.md). */
+  assert.doesNotMatch(CSS, /\[data-rtg-module="navigation"\]\{display:none\}/,
+    'de module Werelden mag in Uw ruimte niet verborgen worden');
+  assert.doesNotMatch(CSS, /\.cmd-bankvoet\{display:none\}/,
+    'de voet van de bank (met de deur naar het bedieningspaneel) mag niet verborgen worden');
+  assert.match(CSS, /\[data-deur="rahul"\]\{display:none\}/,
+    'de tweede Rahul-deur in de voet wordt weggedrukt, want Uw ruimte heeft "Open Rahul" al');
+  assert.match(MODULES, /id: 'navigation'[^\n]*pinned: true/, 'de module Werelden staat vast');
+  const SDK = lees('public/shared/interface/module-sdk.js');
+  assert.match(SDK, /pinned: m\.pinned === true/, 'het manifest kent het veld pinned');
+  const COMPOSER = lees('public/shared/interface/workspace-composer.js');
+  assert.match(COMPOSER, /if \(aan && vast\(id\)\) return;/, 'een vaste module is niet te verbergen');
+  assert.match(COMPOSER, /if \(vast\(id\) \|\| vast\(layout\.order\[j\]\)\) return;/, 'en niet te verplaatsen');
+  assert.match(COMPOSER, /staat vast: de werelden horen bovenaan de bank/, 'de samenstel-lijst draagt de reden');
+  const HOST = lees('public/shared/interface/workspace-module-host.js');
+  assert.match(HOST, /if \(!m\.pinned\) \[\['Omhoog', 'up'\]/, 'een vaste module krijgt geen omhoog/omlaag/verberg-knoppen');
+  const COMMAND = lees('public/shared/command.js');
+  assert.match(COMMAND, /sleutel:'rahul'/, 'de Rahul-deur draagt zijn sleutel');
+  const BANK = lees('public/shared/command/bank.js');
+  assert.match(BANK, /b\.dataset\.deur=String\(x\.sleutel\)/, 'en de bank zet die op de knop');
+});
+
 test('de persoonlijke voorzijde heeft vier echte snelle deuren', () => {
   for (const tekst of ['Uw ruimte', 'Open Rahul', 'Pas mijn ruimte aan', 'Profiel', 'Privacy', 'Meldingen', 'Weergave']) {
     assert.ok(JS.includes(tekst), tekst);
@@ -57,7 +87,9 @@ test('lege informatie is één familie en opent meteen de juiste invullaag', () 
   assert.match(COMM, /actie: \{ tekst: 'Begin een gesprek', doel: '#nieuwBtn' \}/);
   assert.match(COMM, /\.then\(openLegeActie\)/);
   assert.match(REISRAHUL, /eersteBlad === 'rahul'[\s\S]*#rahulVraag/);
-  assert.match(JS, /profiel\.getAttribute\('href'\) !== '\/apps\/ik\.html#persoonlijk'[\s\S]*profiel\.textContent !== 'Aanvullen'/,
+  assert.match(JS, /profiel\.getAttribute\('href'\) !== '\/apps\/ik\.html#persoonlijk'/,
+    'de mutatiekijker mag zijn eigen profiel-href niet eindeloos opnieuw schrijven');
+  assert.match(JS, /profiel\.textContent !== 'Aanvullen'/,
     'de mutatiekijker mag zijn eigen profieltekst niet eindeloos opnieuw schrijven');
 });
 

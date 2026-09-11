@@ -320,6 +320,10 @@
       <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .6rem;">Een aanvraag heet "aangevraagd" tot u hem bevestigt, en dat is precies wat het lid op zijn scherm leest. Bevestig dus pas als het verblijf, het vervoer en de datum echt rond zijn. Afwijzen kan alleen met een reden, want die reden leest het lid. Onder uw besluit staat uw eigen inlog; die komt uit uw sessie en is niet mee te sturen.</p>
       <div id="kReisOpen"><div class="leeg">Laden...</div></div>
 
+      <h4 style="margin:1.2rem 0 .4rem;">Reizen die rond zijn</h4>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .6rem;">Een bevestigde reis kan alsnog niet doorgaan. Afzeggen kan alleen met een reden, en die reden leest het lid. Let op: een afzegging <b>verplaatst geen geld</b> -- er loopt geen betaling voor een reis van het reisbureau, dus een aanbetaling, een terugbetaling of annuleringskosten handelt u zelf af.</p>
+      <div id="kReisRond"><div class="leeg">Laden...</div></div>
+
       <h4 style="margin:1.2rem 0 .4rem;">Een reis klaarzetten voor een klant</h4>
       <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .6rem;">
         Plak de bevestigingen van de klant, zet de onderdelen erbij en u krijgt een link. Wie die link opent
@@ -1273,35 +1277,97 @@ async function openKamer(id){
    uit de identiteitskluis hierboven, en die opvraging komt in het auditlog.
    Bevestigen en afwijzen lopen allebei over /api/office/reisbureau/besluit --
    een knop die alleen maar 'bevestigd' meestuurt zou een typefout in een
-   toezegging veranderen, dus de stand staat op de knop en de server keurt hem. */
+   toezegging veranderen, dus de stand staat op de knop en de server keurt hem.
+
+   TWEE BLOKKEN, EN DAT IS MET OPZET. Boven staat wat op een BESLUIT wacht: een
+   nieuwe aanvraag, en sinds de nazorg (kern/reisbureau-nazorg.js) ook een
+   wijzigingsverzoek van een lid op een reis die al rond is. Daaronder staan de
+   reizen die rond ZIJN, met een afzegknop. Ze delen de balie maar niet de lijst:
+   het bovenste blok is de wachtrij (leeg is daar goed nieuws), het onderste is
+   een archief waar u soms iets in moet. Wie ze door elkaar zet, ziet nooit meer
+   in een oogopslag hoeveel werk er ligt. */
+
+const REIS_RIJ_KOP = (a) => '<div style="font-size:.9rem;"><b>'+esc(a.titel||'reis')+'</b> · '+esc(a.bestemming||'')+'</div>'+
+  '<div class="stil" style="font-size:.78rem;color:var(--soft);margin:.15rem 0 .5rem;">'+
+    esc(a.ref)+' · '+esc(String(a.personen||1))+' pers · '+(a.vertrek ? 'vertrek '+esc(a.vertrek) : 'datum nog open')+
+    ' · '+esc(a.codename||'lid')+(a.prijs ? ' · € '+esc(String(a.prijs.totaal)) : '')+
+    (a.notitie ? ' · "'+esc(a.notitie)+'"' : '')+'</div>';
+
+// wat een lid precies anders wil, in een regel -- leeg gevraagd bestaat niet
+function reisWensZin(a){
+  const w = (a.wijziging||{}).gevraagd || {};
+  const d = [];
+  if (w.vertrek) d.push('vertrek '+esc(a.vertrek||'?')+' → '+esc(w.vertrek));
+  if (w.personen) d.push(esc(String(a.personen))+' → '+esc(String(w.personen))+' pers');
+  if ((a.wijziging||{}).toelichting) d.push('"'+esc(a.wijziging.toelichting)+'"');
+  return d.join(', ');
+}
+
 async function laadReisbalie(){
-  const el = $('#kReisOpen');
+  const el = $('#kReisOpen'), rond = $('#kReisRond');
   el.innerHTML = '<div class="leeg">Laden...</div>';
+  if (rond) rond.innerHTML = '<div class="leeg">Laden...</div>';
   let d; try { d = await api('reisbureau'); } catch(e){ el.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
-  const open = (d.aanvragen||[]).filter(a => a.status === 'aangevraagd');
-  if (!open.length){ el.innerHTML = '<div class="leeg">Geen enkele aanvraag wacht op een besluit.</div>'; return; }
-  el.innerHTML = open.map(a =>
+  const alle = d.aanvragen || [];
+  const open = alle.filter(a => a.status === 'aangevraagd');
+  const wijzig = alle.filter(a => a.status === 'wijziging-gevraagd');
+  const bevestigd = alle.filter(a => a.status === 'bevestigd');
+
+  const wachtrij = open.map(a =>
     '<div class="lijst" style="border-top:1px solid var(--line);padding:.7rem 0;">'+
-      '<div style="font-size:.9rem;"><b>'+esc(a.titel||'reis')+'</b> · '+esc(a.bestemming||'')+'</div>'+
-      '<div class="stil" style="font-size:.78rem;color:var(--soft);margin:.15rem 0 .5rem;">'+
-        esc(a.ref)+' · '+esc(String(a.personen||1))+' pers · '+(a.vertrek ? 'vertrek '+esc(a.vertrek) : 'datum nog open')+
-        ' · '+esc(a.codename||'lid')+(a.prijs ? ' · \u20ac '+esc(String(a.prijs.totaal)) : '')+
-        (a.notitie ? ' · "'+esc(a.notitie)+'"' : '')+'</div>'+
+      REIS_RIJ_KOP(a)+
       '<div class="taakrij">'+
         '<input class="veld" style="flex:1;" maxlength="300" data-bericht="'+esc(a.ref)+'" placeholder="Bericht aan het lid (verplicht bij afwijzen)">'+
         '<button class="knop" type="button" data-besluit="bevestigd" data-ref="'+esc(a.ref)+'">Bevestig</button>'+
         '<button class="knop stil" type="button" data-besluit="afgewezen" data-ref="'+esc(a.ref)+'">Wijs af</button>'+
       '</div>'+
+    '</div>').join('')
+  + wijzig.map(a =>
+    '<div class="lijst" style="border-top:1px solid var(--line);padding:.7rem 0;">'+
+      REIS_RIJ_KOP(a)+
+      '<div class="stil" style="font-size:.78rem;color:var(--soft);margin:-.3rem 0 .5rem;">Wil anders: '+reisWensZin(a)+'</div>'+
+      '<div class="taakrij">'+
+        '<input class="veld" style="flex:1;" maxlength="300" data-wbericht="'+esc(a.ref)+'" placeholder="Bericht aan het lid (verplicht bij afwijzen)">'+
+        '<button class="knop" type="button" data-wijziging="toegepast" data-ref="'+esc(a.ref)+'">Voer door</button>'+
+        '<button class="knop stil" type="button" data-wijziging="afgewezen" data-ref="'+esc(a.ref)+'">Kan niet</button>'+
+      '</div>'+
     '</div>').join('');
-  el.querySelectorAll('button[data-besluit]').forEach(b => b.addEventListener('click', async () => {
+  el.innerHTML = wachtrij || '<div class="leeg">Geen enkele aanvraag wacht op een besluit.</div>';
+
+  if (rond) rond.innerHTML = bevestigd.length ? bevestigd.map(a =>
+    '<div class="lijst" style="border-top:1px solid var(--line);padding:.7rem 0;">'+
+      REIS_RIJ_KOP(a)+
+      '<div class="taakrij">'+
+        '<input class="veld" style="flex:1;" maxlength="300" data-abericht="'+esc(a.ref)+'" placeholder="Waarom gaat deze reis niet door? (verplicht)">'+
+        '<button class="knop stil" type="button" data-afzeg="'+esc(a.ref)+'">Zeg af</button>'+
+      '</div>'+
+    '</div>').join('') : '<div class="leeg">Geen bevestigde reizen.</div>';
+
+  /* Elke knop dezelfde vorm: uitzetten, doen, en de kamer opnieuw laden. Wat er
+     daarna staat komt van de server en niet uit wat dit scherm dacht. */
+  function haak(wortel, kies, doe){
+    if (!wortel) return;
+    wortel.querySelectorAll(kies).forEach(b => b.addEventListener('click', async () => {
+      b.disabled = true;
+      try { await doe(b); openKamer('reisbureau'); }
+      catch(e){ b.disabled = false; meld(e.message); }
+    }));
+  }
+  haak(el, 'button[data-besluit]', async (b) => {
     const veld = el.querySelector('input[data-bericht="'+b.dataset.ref+'"]');
-    b.disabled = true;
-    try {
-      await api('reisbureau/besluit', { ref: b.dataset.ref, besluit: b.dataset.besluit, bericht: veld ? veld.value : '' });
-      meld(b.dataset.besluit === 'bevestigd' ? 'Bevestigd. Het lid ziet het meteen staan.' : 'Afgewezen, met uw reden erbij.');
-      openKamer('reisbureau');
-    } catch(e){ b.disabled = false; meld(e.message); }
-  }));
+    await api('reisbureau/besluit', { ref: b.dataset.ref, besluit: b.dataset.besluit, bericht: veld ? veld.value : '' });
+    meld(b.dataset.besluit === 'bevestigd' ? 'Bevestigd. Het lid ziet het meteen staan.' : 'Afgewezen, met uw reden erbij.');
+  });
+  haak(el, 'button[data-wijziging]', async (b) => {
+    const veld = el.querySelector('input[data-wbericht="'+b.dataset.ref+'"]');
+    await api('reisbureau/wijziging', { ref: b.dataset.ref, besluit: b.dataset.wijziging, bericht: veld ? veld.value : '' });
+    meld(b.dataset.wijziging === 'toegepast' ? 'Doorgevoerd. Het lid krijgt bericht.' : 'Afgewezen, met uw reden erbij.');
+  });
+  haak(rond, 'button[data-afzeg]', async (b) => {
+    const veld = rond.querySelector('input[data-abericht="'+b.dataset.afzeg+'"]');
+    await api('reisbureau/afzeggen', { ref: b.dataset.afzeg, reden: veld ? veld.value : '' });
+    meld('Afgezegd. Het lid krijgt bericht -- het geld handelt u zelf af.');
+  });
 }
 
 /* EEN REIS KLAARZETTEN VOOR EEN KLANT DIE NOG GEEN LID IS.

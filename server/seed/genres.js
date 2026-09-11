@@ -54,6 +54,10 @@ const SECTOREN = {
   technology: 'Technologie',
   media: 'Media',
   events: 'Events & cultuur',
+  /* Reizen: samenstellen wat anderen leveren -- geen uren zoals `professional`
+     en geen kamers zoals `hospitality`. Vandaag een genre; de reden staat bij
+     dat genre in ./genres-lijst-b.js. */
+  travel: 'Reizen',
   sports: 'Sport',
   /* De stichting zelf. Een goed doel is geen overheid en geen zorginstelling,
      en het in een bestaande sector duwen zou een onwaarheid zijn die op een

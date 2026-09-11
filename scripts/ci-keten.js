@@ -31,6 +31,18 @@
       regel van dit bestand; een tag als @v4 is verplaatsbaar, en een gekaapt
       Action-account verplaatst hem.
 
+   EN EEN VIJFDE, VAN 10 SEPTEMBER 2026:
+
+   5. ELKE POORT IS HIER TE LEZEN EN HAAR DOEL BESTAAT. De keten draait
+      vierentwintig poorten die in geen enkele lokale ronde stonden. Sinds
+      scripts/ci-lokaal.js draaien ze hier ook -- maar die afleiding kan alleen
+      wat ze herkent. Een opdracht die scripts/lib/werkstroom.js niet thuis kan
+      brengen, verdwijnt dus stil uit de lokale ronde terwijl hij in de keten
+      gewoon meetelt, en dat is precies de drift die dit bestand hoort te
+      stoppen. Vandaar fail-closed: onbekend is een fout, geen stilte. Dezelfde
+      regel vangt het gevaarlijkere geval: een stap die naar een script wijst
+      dat niet meer bestaat -- dan draait die poort in de keten ook niet.
+
    WAAROM HIER EN NIET IN EEN NIEUW BESTAND. Er bestond al een keuring over de
    werkstromen. Een tweede ernaast is LAT.md regel 4 op de plek waar hij het
    goedkoopst te vermijden is.
@@ -42,6 +54,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const werkstroom = require('./lib/werkstroom');
 
 function losseActions(tekst, bestand) {
   const fout = [];
@@ -129,7 +142,32 @@ function installatieBuitenLockfile(tekst, bestand) {
   return fout;
 }
 
-const REGELS = [losseActions, checkoutMetCredential, overgetypteRuntime, installatieBuitenLockfile];
+/* 5) ELKE POORT IS HIER TE LEZEN EN HAAR DOEL BESTAAT.
+
+   De afleiding zelf staat in scripts/lib/werkstroom.js -- daar wordt uit de
+   werkstromen gelezen wat er draait, zodat scripts/ci-lokaal.js het hier kan
+   naspelen. Deze regel bewaakt de invoer van die afleiding: wat zij niet
+   herkent, hoort een mens te verontrusten in plaats van stil weg te vallen.
+
+   HET IS GEEN LIJST DIE JE MOET BIJWERKEN. Een gewone toets erbij (`npm run
+   iets`, `node scripts/iets.js`) wordt vanzelf herkend. Wat hier meldt, is
+   shell die niemand kan naspelen of een doel dat er niet meer is. */
+function onleesbarePoort(tekst, bestand) {
+  const fout = [];
+  const naam = path.basename(bestand);
+  for (const gat of werkstroom.poortenVan(naam, tekst)) {
+    if (gat.soort === 'onbekend') {
+      fout.push(`${bestand}:${gat.regel} onherkende opdracht (niet lokaal na te spelen): ${gat.opdracht.slice(0, 90)}`);
+      continue;
+    }
+    if (gat.soort !== 'toets') continue;
+    const o = werkstroom.oordeel(gat);
+    if (o.soortReden === 'doel-weg') fout.push(`${bestand}:${gat.regel} ${o.reden}`);
+  }
+  return fout;
+}
+
+const REGELS = [losseActions, checkoutMetCredential, overgetypteRuntime, installatieBuitenLockfile, onleesbarePoort];
 
 function controleer(map) {
   const fout = [];
@@ -150,9 +188,10 @@ if (require.main === module) {
     process.exitCode = 1;
   } else {
     console.log('Het CI-contract: elke Action op een SHA, elke checkout zonder credential,\n' +
-      '  elke runtime gedeclareerd, geen installatie buiten de lockfile om.');
+      '  elke runtime gedeclareerd, geen installatie buiten de lockfile om,\n' +
+      '  en elke poort leesbaar genoeg om hier na te spelen (npm run ci:lokaal).');
   }
 }
 
 module.exports = { losseActions, checkoutMetCredential, overgetypteRuntime,
-  installatieBuitenLockfile, REGELS, controleer };
+  installatieBuitenLockfile, onleesbarePoort, REGELS, controleer };

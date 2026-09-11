@@ -131,7 +131,7 @@ tweede besturingsvlak op.**
 | één zoekbalk over alle domeinen | **staat** | `kern/command/zoek.js` op `register.js` |
 | ieder object opent met dezelfde knoppen | **staat** | `kern/command/object.js` (stand, acties, herkomst, journaal) |
 | opdracht in gewone taal → gemeten plan | **staat** | `kern/command/operator.js` + `oorzaak.js` |
-| handmatig / assisted / autonoom per handeling | **staat** | `kern/command/risico.js`, uit beleid en niet uit de knop |
+| handmatig / assisted / autonoom per handeling | **staat** | `kern/frictie/motor.js`, uit beleid en niet uit de knop |
 | herstelrecepten met terugdraaien | **staat** | `kern/command/runbooks.js` (rondes, oude waarde mee, `BEVROREN` velden) |
 | beleid als gegeven, met versies en vier ogen | **staat** | `kern/command/beleid.js` |
 | onveranderlijk journaal met hashketen | **staat** | `kern/command/journaal.js`, `controleer()` wijst de eerste breuk aan |

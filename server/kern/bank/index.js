@@ -91,7 +91,10 @@ module.exports = (deps) => {
      boekte gewoon nog een keer (TAKEN.md 4.57). Nu hangt hij in de gedeelde
      ctx, met EEN sleutelruimte (`bankIdem`) voor de hele bank, zoals RTG Pay
      dat ook doet. */
-  const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem', bijeen });
+  /* EN DUURZAAM, als RTG Pay: zonder die vlag is de bundel atomair en niet
+     duurzaam, en gaf /api/bank/akkoord een IBAN die de opslag nooit
+     bevestigde (FAALPROEF: `gezakt`). Reikwijdte: GELDLAT.md. */
+  const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem', bijeen, duurzaam: true });
 
   // de gedeelde context voor de deelbestanden
   const ctx = { db, save, bijeen, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, anthropic,

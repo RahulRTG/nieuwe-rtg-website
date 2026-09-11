@@ -506,6 +506,12 @@
       "url": "/apps/foundation/geven.html"
     },
     {
+      "label": "Ga verder",
+      "app": "Haal ik het?",
+      "wereld": "TravelOS",
+      "url": "/apps/move.html"
+    },
+    {
       "label": "Kopieer",
       "app": "Het bord",
       "wereld": "FoundationOS",

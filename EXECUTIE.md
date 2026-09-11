@@ -48,7 +48,7 @@ tweede antwoord op een vraag die al beantwoord wordt.
 Vandaag beantwoorden twee bestanden dezelfde vraag — hoeveel autonomie of
 frictie verdient deze handeling — en ze doen het verschillend.
 
-**`server/kern/command/risico.js`** rekent het per geval uit, op drie niveaus:
+**`server/kern/frictie/motor.js`** rekent het per geval uit, op drie niveaus:
 
 | niveau | betekenis |
 |---|---|
@@ -125,7 +125,7 @@ zijn hier gebouwd — alleen voor de ops-cockpit, niet gedeeld met het stuur.
 | Bewijspoort | `beleid.js` + `lib/vervalstaat.js` | Een `geschorste` capability valt uit `toegestanePaden`. | AI |
 | Vangnet eronder | `middleware/schorspoort.js` | Schrijvende aanroep op een geschorste route: 503 met reden. Lezen blijft open. | iedereen |
 | Actiebewijs | `kern/stuur/bon.js` | Wat, waarom het mocht, de gemeten bewijsstand, de uitkomst — en wat er **niet** gemeten is. | AI |
-| **Risicomotor** | `kern/command/risico.js` | `hand`/`assist`/`auto`, per geval berekend, met de opbouw van de score. | cockpit |
+| **Risicomotor** | `kern/frictie/motor.js` | `hand`/`assist`/`auto`, per geval berekend, met de opbouw van de score. | cockpit |
 | **Voor- en nacontrole** | `kern/command/transactie-poorten.js` | *Een controle die niet kon draaien is niet geslaagd*, en de verificatie kijkt **positief** na: *"geen fout gezien" is geen uitslag.* | herstel |
 | **Transactie met terugweg** | `kern/command/transactie.js` | VOORCONTROLE → MOMENTOPNAME → UITVOEREN → VERIFICATIE → VASTLEGGEN, bij mislukte verificatie automatisch TERUG. | herstel |
 | **Zandbak** | `kern/command/zandbak.js` | Doorwerken zonder één productierij: gegevens uit de zaaiset, en er schrijft niets terug door de bouw en niet door een filter. | procesproef |
@@ -406,7 +406,7 @@ mogelijk afgeleid, en wat niet afgeleid kan worden staat als `ONBEPAALD`.
 veldsoorten worden afgeleid — bereikbaarheid uit `beleid.js`, de gezagstrede uit
 de noemer, het bewijs uit `VERTROUWEN.json`, de herhaalbaarheid uit
 `IDEMPROEF.json`. Drie staan er als **`ONBEPAALD` met de reden**: risico (dat
-rekent `command/risico.js` per gevál uit bedrag en aantal — statisch bestaat het
+rekent `frictie/motor.js` per gevál uit bedrag en aantal — statisch bestaat het
 niet), herstel (geen register kent de tegenhanger van een route) en kosten
 (`KOSTEN.md` meet verbruik per aanroep, niet per route). Een kaart die die drie
 invult omdat de kolom bestaat, verzint ze.
@@ -441,7 +441,7 @@ bron**, en hij hoort in blok 5 te worden opgelost, niet hier weggepoetst.
 ### Blok 2 — Eén risicosemantiek · **de noemer STAAT, het besluit erover niet**
 
 De eerste opzet van dit blok was "`kern/command/risico.js` naar de kern, cockpit
-en stuur lezen eruit". Die opzet is bij het bouwen gesneuveld, en om een goede
+en stuur lezen eruit" (die motor woont inmiddels op `kern/frictie/motor.js`). Die opzet is bij het bouwen gesneuveld, en om een goede
 reden: er zijn vijf schalen en geen twee, ze raken vandaag geen gemeenschappelijke
 handeling, en een 3-tredige schaal op een andere 3-tredige schaal afbeelden is
 precies het "afbeelden zonder besluit" waar `scripts/gezag.js` voor waarschuwt.
@@ -547,8 +547,24 @@ zodat de code niet met zichzelf wordt vergeleken. Vier mutaties bijten, waaronde
 de gevaarlijkste: een `voorstel`-route naar `klein` verplaatsen, waardoor een
 menselijke bevestiging stilletjes verdwijnt.
 
-**Wat er hierna nog moet:** één motor. De verhuizing van `risico.js` blijft de
-juiste eindtoestand; hij was alleen niet de eerste stap.
+**Wat er hierna nog moet:** één motor. De verhuizing zelf is gebeurd — de motor
+staat op `kern/frictie/motor.js` en heeft 26 lezers. Wat nog niet gebeurd is, is
+de tweede helft: `kern/stuur/beleid.js` leest wél `frictie/bodem.js` (de
+ondergrens) maar niet de motor, en houdt dus zijn eigen armere model voor de
+vraag per geval. Dát is de resterende dubbele waarheid, niet het adres.
+
+**En die is nu in de SCHADUW gezet** (`kern/stuur/frictieschaduw.js`,
+`npm run frictiestuur`). `stuurToets` heeft de body al in handen en geeft hem aan
+de motor; die mag alleen verzwaren en beslist voorlopig niets — CONTROLPLANE.md:
+je kunt niet afdwingen wat nooit in de schaduw heeft gelopen. De meting die
+daarbij hoort corrigeert de verwachting: met de grondslag op `lezen` scoort
+250.000 euro **17** punten tegen een autogrens van 30, dus **bedrag alleen
+verzwaart nooit**; bedrag ÉN aantal samen wel (25.000 euro + 500 objecten = 42).
+Twee factoren die elk onder de grens blijven, kunnen er samen overheen — dat is
+gemeten en het is precies wat de eerste opzet fout had. Wat de koppeling breder
+zou maken is geen bedrading maar een besluit: een grondslag per AI-route, want de
+zestien namen in `kern/frictie/motor.js` zijn die van Command en er is geen
+afbeelding.
 
 ### Blok 3 — PLAN als protocol · **GEBOUWD**
 

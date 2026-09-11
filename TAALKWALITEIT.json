@@ -1,0 +1,2291 @@
+{
+  "stempel": {
+    "op": "2026-09-10T15:05:27.785Z",
+    "commit": "0a39efcd",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/taalkwaliteit.js",
+    "node": "v22.22.2"
+  },
+  "hoe": "npm run taalkwaliteit",
+  "uitleg": "Per taal wat er over de VORM van een vertaling is vastgesteld. Over de BETEKENIS doet deze meter geen uitspraak; daarvoor is een spreker nodig.",
+  "grens": "Schriftcontrole sluit alleen iets uit bij een taal die het Latijnse schrift niet aanvaardt. Voor de overige talen zegt een groene rij niet dat er geen Engels doorheen kan.",
+  "talen": 114,
+  "metKernrij": 113,
+  "graden": {
+    "bewezen": 0,
+    "gemeten": 42,
+    "vermoed": 71,
+    "onbekend": 1
+  },
+  "betekenisOngemeten": 114,
+  "schriftBeslissend": 42,
+  "cellenVerkeerdSchrift": 0,
+  "cellenGelijkAanBron": 32,
+  "cellenLeeg": 0,
+  "poort": [
+    {
+      "faalvorm": "verkeerd-schrift",
+      "tegengehouden": true,
+      "oordeel": "afgewezen"
+    },
+    {
+      "faalvorm": "plaatshouder-weg",
+      "tegengehouden": true,
+      "oordeel": "afgewezen"
+    },
+    {
+      "faalvorm": "getal-weg",
+      "tegengehouden": true,
+      "oordeel": "afgewezen"
+    },
+    {
+      "faalvorm": "merk-vertaald",
+      "tegengehouden": true,
+      "oordeel": "afgewezen"
+    },
+    {
+      "faalvorm": "weigering",
+      "tegengehouden": true,
+      "oordeel": "afgewezen"
+    },
+    {
+      "faalvorm": "onvertaald",
+      "tegengehouden": true,
+      "oordeel": "afgewezen"
+    },
+    {
+      "faalvorm": "leeg",
+      "tegengehouden": true,
+      "oordeel": "afgewezen"
+    }
+  ],
+  "poortHoudtTegen": 7,
+  "rijen": [
+    {
+      "code": "nl",
+      "naam": "Nederlands",
+      "en": "Dutch",
+      "basistaal": true,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": false,
+      "kernGevuld": 0,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "onbekend",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "en",
+      "naam": "English",
+      "en": "English",
+      "basistaal": true,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [
+        "school",
+        "week"
+      ],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "de",
+      "naam": "Deutsch",
+      "en": "German",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [
+        "morgen",
+        "kind",
+        "ja"
+      ],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "fr",
+      "naam": "Français",
+      "en": "French",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "es",
+      "naam": "Español",
+      "en": "Spanish",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "pt",
+      "naam": "Português",
+      "en": "Portuguese",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "it",
+      "naam": "Italiano",
+      "en": "Italian",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ca",
+      "naam": "Català",
+      "en": "Catalan",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "gl",
+      "naam": "Galego",
+      "en": "Galician",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "eu",
+      "naam": "Euskara",
+      "en": "Basque",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ro",
+      "naam": "Română",
+      "en": "Romanian",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "el",
+      "naam": "Ελληνικά",
+      "en": "Greek",
+      "basistaal": false,
+      "schriften": [
+        "Greek"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "tr",
+      "naam": "Türkçe",
+      "en": "Turkish",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ru",
+      "naam": "Русский",
+      "en": "Russian",
+      "basistaal": false,
+      "schriften": [
+        "Cyrillic"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "uk",
+      "naam": "Українська",
+      "en": "Ukrainian",
+      "basistaal": false,
+      "schriften": [
+        "Cyrillic"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "be",
+      "naam": "Беларуская",
+      "en": "Belarusian",
+      "basistaal": false,
+      "schriften": [
+        "Cyrillic"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "pl",
+      "naam": "Polski",
+      "en": "Polish",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "cs",
+      "naam": "Čeština",
+      "en": "Czech",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "sk",
+      "naam": "Slovenčina",
+      "en": "Slovak",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "hu",
+      "naam": "Magyar",
+      "en": "Hungarian",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "bg",
+      "naam": "Български",
+      "en": "Bulgarian",
+      "basistaal": false,
+      "schriften": [
+        "Cyrillic"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "sr",
+      "naam": "Српски",
+      "en": "Serbian",
+      "basistaal": false,
+      "schriften": [
+        "Cyrillic",
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "hr",
+      "naam": "Hrvatski",
+      "en": "Croatian",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "bs",
+      "naam": "Bosanski",
+      "en": "Bosnian",
+      "basistaal": false,
+      "schriften": [
+        "Latin",
+        "Cyrillic"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "sl",
+      "naam": "Slovenščina",
+      "en": "Slovenian",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "mk",
+      "naam": "Македонски",
+      "en": "Macedonian",
+      "basistaal": false,
+      "schriften": [
+        "Cyrillic"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "sq",
+      "naam": "Shqip",
+      "en": "Albanian",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "lt",
+      "naam": "Lietuvių",
+      "en": "Lithuanian",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "lv",
+      "naam": "Latviešu",
+      "en": "Latvian",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "et",
+      "naam": "Eesti",
+      "en": "Estonian",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "fi",
+      "naam": "Suomi",
+      "en": "Finnish",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "sv",
+      "naam": "Svenska",
+      "en": "Swedish",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [
+        "ja"
+      ],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "no",
+      "naam": "Norsk",
+      "en": "Norwegian",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [
+        "ja"
+      ],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "da",
+      "naam": "Dansk",
+      "en": "Danish",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [
+        "ja"
+      ],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "is",
+      "naam": "Íslenska",
+      "en": "Icelandic",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ga",
+      "naam": "Gaeilge",
+      "en": "Irish",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "cy",
+      "naam": "Cymraeg",
+      "en": "Welsh",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "mt",
+      "naam": "Malti",
+      "en": "Maltese",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "lb",
+      "naam": "Lëtzebuergesch",
+      "en": "Luxembourgish",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "fy",
+      "naam": "Frysk",
+      "en": "West Frisian",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [
+        "les",
+        "toets",
+        "boek",
+        "goed",
+        "taal",
+        "ja",
+        "nee"
+      ],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "yi",
+      "naam": "ייִדיש",
+      "en": "Yiddish",
+      "basistaal": false,
+      "schriften": [
+        "Hebrew"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ar",
+      "naam": "العربية",
+      "en": "Arabic",
+      "basistaal": false,
+      "schriften": [
+        "Arabic"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "he",
+      "naam": "עברית",
+      "en": "Hebrew",
+      "basistaal": false,
+      "schriften": [
+        "Hebrew"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "fa",
+      "naam": "فارسی",
+      "en": "Persian",
+      "basistaal": false,
+      "schriften": [
+        "Arabic"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ku",
+      "naam": "Kurdî",
+      "en": "Kurdish",
+      "basistaal": false,
+      "schriften": [
+        "Latin",
+        "Arabic"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "az",
+      "naam": "Azərbaycanca",
+      "en": "Azerbaijani",
+      "basistaal": false,
+      "schriften": [
+        "Latin",
+        "Arabic",
+        "Cyrillic"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "hy",
+      "naam": "Հայերեն",
+      "en": "Armenian",
+      "basistaal": false,
+      "schriften": [
+        "Armenian"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ka",
+      "naam": "ქართული",
+      "en": "Georgian",
+      "basistaal": false,
+      "schriften": [
+        "Georgian"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "kk",
+      "naam": "Қазақша",
+      "en": "Kazakh",
+      "basistaal": false,
+      "schriften": [
+        "Cyrillic",
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "uz",
+      "naam": "Oʻzbekcha",
+      "en": "Uzbek",
+      "basistaal": false,
+      "schriften": [
+        "Latin",
+        "Cyrillic"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ky",
+      "naam": "Кыргызча",
+      "en": "Kyrgyz",
+      "basistaal": false,
+      "schriften": [
+        "Cyrillic"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "tg",
+      "naam": "Тоҷикӣ",
+      "en": "Tajik",
+      "basistaal": false,
+      "schriften": [
+        "Cyrillic"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "tk",
+      "naam": "Türkmençe",
+      "en": "Turkmen",
+      "basistaal": false,
+      "schriften": [
+        "Latin",
+        "Cyrillic"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "mn",
+      "naam": "Монгол",
+      "en": "Mongolian",
+      "basistaal": false,
+      "schriften": [
+        "Cyrillic",
+        "Mongolian"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "tt",
+      "naam": "Татарча",
+      "en": "Tatar",
+      "basistaal": false,
+      "schriften": [
+        "Cyrillic",
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "hi",
+      "naam": "हिन्दी",
+      "en": "Hindi",
+      "basistaal": false,
+      "schriften": [
+        "Devanagari"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ur",
+      "naam": "اردو",
+      "en": "Urdu",
+      "basistaal": false,
+      "schriften": [
+        "Arabic"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "bn",
+      "naam": "বাংলা",
+      "en": "Bengali",
+      "basistaal": false,
+      "schriften": [
+        "Bengali"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "pa",
+      "naam": "ਪੰਜਾਬੀ",
+      "en": "Punjabi",
+      "basistaal": false,
+      "schriften": [
+        "Gurmukhi",
+        "Arabic"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "gu",
+      "naam": "ગુજરાતી",
+      "en": "Gujarati",
+      "basistaal": false,
+      "schriften": [
+        "Gujarati"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "mr",
+      "naam": "मराठी",
+      "en": "Marathi",
+      "basistaal": false,
+      "schriften": [
+        "Devanagari"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ta",
+      "naam": "தமிழ்",
+      "en": "Tamil",
+      "basistaal": false,
+      "schriften": [
+        "Tamil"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "te",
+      "naam": "తెలుగు",
+      "en": "Telugu",
+      "basistaal": false,
+      "schriften": [
+        "Telugu"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "kn",
+      "naam": "ಕನ್ನಡ",
+      "en": "Kannada",
+      "basistaal": false,
+      "schriften": [
+        "Kannada"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ml",
+      "naam": "മലയാളം",
+      "en": "Malayalam",
+      "basistaal": false,
+      "schriften": [
+        "Malayalam"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "si",
+      "naam": "සිංහල",
+      "en": "Sinhala",
+      "basistaal": false,
+      "schriften": [
+        "Sinhala"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ne",
+      "naam": "नेपाली",
+      "en": "Nepali",
+      "basistaal": false,
+      "schriften": [
+        "Devanagari"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ps",
+      "naam": "پښتو",
+      "en": "Pashto",
+      "basistaal": false,
+      "schriften": [
+        "Arabic"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "sd",
+      "naam": "سنڌي",
+      "en": "Sindhi",
+      "basistaal": false,
+      "schriften": [
+        "Arabic",
+        "Devanagari"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "or",
+      "naam": "ଓଡ଼ିଆ",
+      "en": "Odia",
+      "basistaal": false,
+      "schriften": [
+        "Oriya"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "as",
+      "naam": "অসমীয়া",
+      "en": "Assamese",
+      "basistaal": false,
+      "schriften": [
+        "Bengali"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "dv",
+      "naam": "ދިވެހި",
+      "en": "Dhivehi",
+      "basistaal": false,
+      "schriften": [
+        "Thaana"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "bo",
+      "naam": "བོད་སྐད་",
+      "en": "Tibetan",
+      "basistaal": false,
+      "schriften": [
+        "Tibetan"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "zh",
+      "naam": "中文",
+      "en": "Chinese",
+      "basistaal": false,
+      "schriften": [
+        "Han"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ja",
+      "naam": "日本語",
+      "en": "Japanese",
+      "basistaal": false,
+      "schriften": [
+        "Hiragana",
+        "Katakana",
+        "Han"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ko",
+      "naam": "한국어",
+      "en": "Korean",
+      "basistaal": false,
+      "schriften": [
+        "Hangul",
+        "Han"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "th",
+      "naam": "ไทย",
+      "en": "Thai",
+      "basistaal": false,
+      "schriften": [
+        "Thai"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "vi",
+      "naam": "Tiếng Việt",
+      "en": "Vietnamese",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "id",
+      "naam": "Bahasa Indonesia",
+      "en": "Indonesian",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "jv",
+      "naam": "Basa Jawa",
+      "en": "Javanese",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "su",
+      "naam": "Basa Sunda",
+      "en": "Sundanese",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ms",
+      "naam": "Bahasa Melayu",
+      "en": "Malay",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "tl",
+      "naam": "Filipino",
+      "en": "Filipino",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "km",
+      "naam": "ខ្មែរ",
+      "en": "Khmer",
+      "basistaal": false,
+      "schriften": [
+        "Khmer"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "lo",
+      "naam": "ລາວ",
+      "en": "Lao",
+      "basistaal": false,
+      "schriften": [
+        "Lao"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "my",
+      "naam": "မြန်မာ",
+      "en": "Burmese",
+      "basistaal": false,
+      "schriften": [
+        "Myanmar"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ug",
+      "naam": "ئۇيغۇرچە",
+      "en": "Uyghur",
+      "basistaal": false,
+      "schriften": [
+        "Arabic",
+        "Latin",
+        "Cyrillic"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "sw",
+      "naam": "Kiswahili",
+      "en": "Swahili",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "am",
+      "naam": "አማርኛ",
+      "en": "Amharic",
+      "basistaal": false,
+      "schriften": [
+        "Ethiopic"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ti",
+      "naam": "ትግርኛ",
+      "en": "Tigrinya",
+      "basistaal": false,
+      "schriften": [
+        "Ethiopic"
+      ],
+      "schriftBeslissend": true,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "gemeten",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "om",
+      "naam": "Afaan Oromoo",
+      "en": "Oromo",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "so",
+      "naam": "Soomaali",
+      "en": "Somali",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ha",
+      "naam": "Hausa",
+      "en": "Hausa",
+      "basistaal": false,
+      "schriften": [
+        "Latin",
+        "Arabic"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "yo",
+      "naam": "Yorùbá",
+      "en": "Yoruba",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ig",
+      "naam": "Igbo",
+      "en": "Igbo",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [
+        "klas"
+      ],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "zu",
+      "naam": "isiZulu",
+      "en": "Zulu",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "xh",
+      "naam": "isiXhosa",
+      "en": "Xhosa",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "af",
+      "naam": "Afrikaans",
+      "en": "Afrikaans",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [
+        "huiswerk",
+        "les",
+        "toets",
+        "klas",
+        "kind",
+        "boek",
+        "vraag",
+        "antwoord",
+        "goed",
+        "hulp",
+        "taal",
+        "week",
+        "welkom",
+        "ja",
+        "nee"
+      ],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "st",
+      "naam": "Sesotho",
+      "en": "Sotho",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "sn",
+      "naam": "chiShona",
+      "en": "Shona",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "rw",
+      "naam": "Kinyarwanda",
+      "en": "Kinyarwanda",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "mg",
+      "naam": "Malagasy",
+      "en": "Malagasy",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "wo",
+      "naam": "Wolof",
+      "en": "Wolof",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ln",
+      "naam": "Lingála",
+      "en": "Lingala",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ny",
+      "naam": "Chichewa",
+      "en": "Chichewa",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "lg",
+      "naam": "Luganda",
+      "en": "Ganda",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ht",
+      "naam": "Kreyòl ayisyen",
+      "en": "Haitian Creole",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [
+        "klas"
+      ],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "qu",
+      "naam": "Runasimi",
+      "en": "Quechua",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "gn",
+      "naam": "Avañeʼẽ",
+      "en": "Guarani",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "ay",
+      "naam": "Aymar aru",
+      "en": "Aymara",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "mi",
+      "naam": "Te reo Māori",
+      "en": "Maori",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "sm",
+      "naam": "Gagana Sāmoa",
+      "en": "Samoan",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "to",
+      "naam": "Lea faka-Tonga",
+      "en": "Tongan",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    },
+    {
+      "code": "fj",
+      "naam": "Vosa Vakaviti",
+      "en": "Fijian",
+      "basistaal": false,
+      "schriften": [
+        "Latin"
+      ],
+      "schriftBeslissend": false,
+      "kernrij": true,
+      "kernGevuld": 30,
+      "kernTotaal": 30,
+      "leeg": [],
+      "gelijkAanBron": [],
+      "verkeerdSchrift": [],
+      "menselijkOordeel": 0,
+      "vorm": "vermoed",
+      "betekenis": "ongemeten"
+    }
+  ]
+}

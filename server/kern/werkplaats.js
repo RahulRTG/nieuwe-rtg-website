@@ -13,6 +13,8 @@
 const { maakWerkplaatsAI } = require('./werkplaats-ai');
 
 function maakWerkplaats({ db, save, crypto, anthropic, schoon }) {
+  // een verwijdering is pas bevestigd als de opslag hem heeft: kern/kantoorwissen.js
+  const wis = require('./kantoorwissen')({ save });
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const id = () => 'wp' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
@@ -80,7 +82,9 @@ function maakWerkplaats({ db, save, crypto, anthropic, schoon }) {
     if (patch.status != null && STATUS.includes(patch.status)) o.status = patch.status;
     o.updatedAt = nu(); save(); return { ok: true, item: publiek(o) };
   }
-  function verwijder(i) { const s = store(); s.items = s.items.filter(x => x.id !== i); save(); return { ok: true }; }
+  async function verwijder(i) {
+    return wis(() => { const s = store(); s.items = s.items.filter(x => x.id !== i); });
+  }
 
   /* ---- rechtstreeks uitgeven: de opdracht wordt een echt onderdeel ----
      De Werkplaats blijft adviseren, maar kan het resultaat nu ook DIRECT in de

@@ -1,0 +1,87 @@
+{
+ "stempel": {
+  "op": "2026-09-10T15:44:02.136Z",
+  "commit": "3dd0b3f5",
+  "boomVuil": false,
+  "boomAnders": 0,
+  "instrument": "scripts/taalschil.js",
+  "node": "v22.22.2"
+ },
+ "hoe": "npm run taalschil",
+ "uitleg": "Wat er per taal offline klaarstaat: de tekst van de app-schil die sw.js voorcachet.",
+ "grens": "Zegt alleen iets over de VORM (de keuring uit server/kern/taalkeuring.js) en niets over de betekenis. En alleen over de SCHIL: de overige schermen vullen zich nog altijd via het net.",
+ "schilTeksten": 1413,
+ "bestandenNietGevonden": [],
+ "talen": [
+  {
+   "taal": "zh",
+   "gevuld": 9,
+   "dekking": 0.6,
+   "afgewezen": 0,
+   "bytes": 846
+  },
+  {
+   "taal": "hi",
+   "gevuld": 9,
+   "dekking": 0.6,
+   "afgewezen": 0,
+   "bytes": 935
+  },
+  {
+   "taal": "es",
+   "gevuld": 20,
+   "dekking": 1.4,
+   "afgewezen": 0,
+   "bytes": 1118
+  },
+  {
+   "taal": "ar",
+   "gevuld": 9,
+   "dekking": 0.6,
+   "afgewezen": 0,
+   "bytes": 862
+  },
+  {
+   "taal": "bn",
+   "gevuld": 9,
+   "dekking": 0.6,
+   "afgewezen": 0,
+   "bytes": 922
+  },
+  {
+   "taal": "pt",
+   "gevuld": 9,
+   "dekking": 0.6,
+   "afgewezen": 0,
+   "bytes": 843
+  },
+  {
+   "taal": "ru",
+   "gevuld": 9,
+   "dekking": 0.6,
+   "afgewezen": 0,
+   "bytes": 900
+  },
+  {
+   "taal": "ja",
+   "gevuld": 9,
+   "dekking": 0.6,
+   "afgewezen": 0,
+   "bytes": 858
+  },
+  {
+   "taal": "fr",
+   "gevuld": 9,
+   "dekking": 0.6,
+   "afgewezen": 0,
+   "bytes": 853
+  },
+  {
+   "taal": "en",
+   "gevuld": 13,
+   "dekking": 0.9,
+   "afgewezen": 0,
+   "bytes": 1003
+  }
+ ]
+}

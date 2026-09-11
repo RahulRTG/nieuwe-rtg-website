@@ -66,7 +66,16 @@ const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;
 const SEED = 'faalproef-1';
 
-if (require.main !== module) { module.exports = {}; return; }
+/* ALS GEREEDSCHAP GEEFT HIJ ZIJN KLASSEERDER MEE, en verder niets.
+
+   `profielVan` beslist of een route werk vastlegt of alleen zijn standaard
+   klaarzet, en dat oordeel bepaalt of er uberhaupt een verdict volgt. Dat is
+   precies het soort beslissing dat een toets moet kunnen naspelen zonder een
+   half uur te draaien -- dezelfde grond als test/faalproefvorm.test.js.
+
+   Beide zijn functiedeclaraties en dus gehesen: ze bestaan hier al, ook al
+   staan ze verderop in het bestand. */
+if (require.main !== module) { module.exports = { profielVan, oordeel }; return; }
 
 const { start } = require('./lib/wegwerpserver');
 const { haalSleutels, meldSleutels, BASISROLLEN } = require('./lib/proefsleutels');
@@ -239,7 +248,41 @@ async function ronde(verraad, lijstUit) {
        voorwaarde waaronder dit signaal iets betekent. */
     const veranderd = a.staat != null && vorigeStaat != null ? a.staat !== vorigeStaat : null;
     if (a.staat != null) vorigeStaat = a.staat;
-    uit.set(r.methode + ' ' + r.pad, { ...a, veranderd, rol: r.rol });
+    /* DE TWEEDE OPROEP SCHEIDT SCHRIJVEN VAN KLAARZETTEN -- en dat is de tweede
+       laag van dezelfde fout die hierboven al een keer is gerepareerd.
+
+       De effectkop is een directe meting en die klopt: `opslag=1` betekent dat
+       save() werkelijk is aangeroepen. Maar dit is de EERSTE oproep die deze
+       route ooit kreeg, en heel veel leesroutes zetten bij die eerste oproep
+       hun standaard klaar (`homekit.overzicht()` legt de woning aan,
+       `careOverzicht()` het dossier). Dan schrijft een LEESroute een keer, en
+       uit een steekproef van een is dat niet te onderscheiden van een route die
+       werk van een lid vastlegt.
+
+       Gemeten over de 24 routes die als `gezakt` in dit register stonden: 22
+       schreven bij de eerste oproep en daarna nooit meer -- `/api/dag` staat in
+       zijn eigen kop als "die leest alleen", en `/api/office/rechten` is in
+       COMMERCIE.md "met opzet uitsluitend lezend". Twee schreven bij ELKE
+       oproep (`/api/office/aidata/export`, `/api/office/magnaat/scan`) en die
+       twee zijn dus de enige van de vierentwintig over wie dit register een
+       oordeel mocht vellen.
+
+       Daarom: wie bij de eerste oproep schrijft, krijgt er een tweede. Blijft
+       de teller dan stil, dan was het klaarzetten en geen schrijven. Alleen
+       schrijvers krijgen die extra oproep, dus dit kost de ronde ~139 verzoeken
+       en geen tweede pass.
+
+       DE GRENS: een route die om en om schrijft (elke tweede oproep) leest hier
+       als voorziening. Dat is een bekende blinde vlek van twee steekproeven en
+       geen eigenschap van die route; hij staat in de uitslag als `voorziening`
+       met de effectkop van beide oproepen erbij, zodat het na te kijken is. */
+    let effect2 = null;
+    if (!verraad && /opslag=[1-9]/.test(String(a.effect || ''))) {
+      const her = await post(r.pad, lijf, tok);
+      effect2 = String(her.effect || '');
+      if (her.staat != null) vorigeStaat = her.staat;
+    }
+    uit.set(r.methode + ' ' + r.pad, { ...a, veranderd, effect2, rol: r.rol });
     if (++n % 500 === 0) console.log('      ' + n + '/' + lijst.length);
   }
   klaar();
@@ -280,6 +323,16 @@ function profielVan(w) {
      een classificatie is erger dan een ontbrekende: hij ziet eruit als dekking. */
   const slaatOp = /opslag=[1-9]/.test(effect);
   const bericht = /(mail|sms)=[1-9]/.test(effect);
+  /* KLAARZETTEN IS GEEN SCHRIJVEN, en een oordeel over hoe een route faalt
+     hoort alleen over een route te gaan die werkelijk werk vastlegt. Zie de
+     tweede oproep in ronde() voor de meting waar dit op rust. */
+  if (slaatOp && w.effect2 != null && !/opslag=[1-9]/.test(String(w.effect2))) {
+    return { soort: 'voorziening', effect, effect2: w.effect2,
+      reden: 'de eerste oproep schreef (' + effect + ') en de tweede niet (' +
+        (w.effect2 || 'geen') + '): dit is een route die bij het eerste bezoek ' +
+        'zijn standaard klaarzet, geen route die werk vastlegt. Een verraad op de ' +
+        'schrijfweg meet hier niets, dus er wordt geen oordeel geveld.' };
+  }
   if (slaatOp) return { soort: 'duurzaam', effect };
   if (w.veranderd === true) return { soort: 'onzeker', effect,
     reden: 'de momentopname bewoog maar de effectmeter zag geen save(); die opname is ' +
@@ -356,7 +409,10 @@ function oordeel(schoon, met) {
        hebt zien werken, is geen koppeling. test/faalproefvorm.test.js houdt de
        twee vormen sindsdien tegen elkaar aan. */
     const rij = { methode: r.methode, pad: r.pad, route: sleutel,
-      rol: r.rol, profiel: p.soort, effect: p.effect || null, perVerraad: {} };
+      rol: r.rol, profiel: p.soort, effect: p.effect || null,
+      /* De tweede effectkop hoort in de uitslag en niet alleen in de reden:
+         `voorziening` is een oordeel over TWEE metingen, dus beide staan er. */
+      effect2: p.effect2 || null, perVerraad: {} };
     if (p.soort !== 'duurzaam') {
       rij.failure = 'ongemeten';
       rij.reden = p.reden;
@@ -405,6 +461,12 @@ function oordeel(schoon, met) {
          deze proef niets, en een getal dat twee dingen bij elkaar telt verbergt
          welk van de twee bewoog. */
       nietToeTeSchrijven: telSoort('onzeker'),
+      /* APART GETELD, en met opzet niet bij `duurzaam`: dit zijn routes die bij
+         hun eerste bezoek hun standaard klaarzetten. Tot deze teller bestond,
+         stonden ze als `duurzaam` in de proef en kregen ze een `gezakt` -- 22
+         van de 24 gezakte routes waren dit. Een oordeel over een route die
+         niets hoort op te slaan, is een beschuldiging zonder grond. */
+      voorziening: telSoort('voorziening'),
       bewezen: tel('bewezen'), gezakt: tel('gezakt'), ongemeten: tel('ongemeten'),
       /* DE NOEMER VAN DE MEETWEG. `bewezen` hierboven is bewezen op zoveel van
          de zoveel sabotages -- staat er een nul in `verradenGedraaid`, dan is
@@ -417,6 +479,7 @@ function oordeel(schoon, met) {
   fs.writeFileSync(UITSLAG, JSON.stringify(uit, null, 1) + '\n');
   console.log('\nFAALPROEF.json geschreven');
   console.log('  bewezen ' + uit.gemeten.bewezen + ' | gezakt ' + uit.gemeten.gezakt + ' | ongemeten ' + uit.gemeten.ongemeten);
+  console.log('  duurzaam schrijvend ' + uit.gemeten.duurzaamSchrijvend + ' | klaarzetters (voorziening) ' + uit.gemeten.voorziening);
   console.log('  gemeten met ' + gedraaid.length + ' van de ' + Object.keys(TOEPASBAAR).length + ' sabotages: ' + gedraaid.join(', '));
   for (const [naam, reden] of Object.entries(nietGedraaid)) console.log('  NIET gedraaid -- ' + naam + ': ' + reden);
 })().catch(e => { console.error(e); process.exit(1); });

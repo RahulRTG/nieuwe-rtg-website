@@ -88,7 +88,7 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
       { naam: 'Gin-tonic', aantal: 2, stoel: true, allergie: 'kinine' },
       { naam: 'Gazpacho', station: 'koud' }
     ]);
-    await tafel('BAR-B', [{ naam: 'Gin-tonic', aantal: 1 }]);
+    const t2 = await tafel('BAR-B', [{ naam: 'Gin-tonic', aantal: 1 }]);
 
     await page.evaluate(t => { localStorage.setItem('rtg_sup_token', t); }, tok);
     await page.goto(base + '/apps/horeca-bar.html', { waitUntil: 'domcontentloaded' });
@@ -130,7 +130,16 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
     const klaar = page.locator('[data-naar="klaar"]');   // locator en geen vaste handle: het bord hertekent
     await klaar.first().waitFor({ state: 'visible' });
     assert.ok(await klaar.count() > 0, 'daarna kan hij klaar gemeld worden');
-    const welke = await klaar.evaluate(el => el.getAttribute('data-zet'));
+    /* WELK GLAS, EN VAN WELKE REKENING. Het bord sorteert de ronden op
+       wachttijd, en BAR-A en BAR-B zijn hierboven binnen dezelfde seconde
+       geopend -- welke van de twee vooraan staat is dus geen afspraak. De eerste
+       versie van deze toets nam het eerste glas en zocht het daarna op de
+       rekening van BAR-A; op de keten (ronde 34528505451, schermdeel 4) was het
+       eerste glas dat van BAR-B, en `find()` gaf undefined. De knop draagt zijn
+       rekening zelf (data-rek), dus die nemen we mee in plaats van te raden. */
+    const welke = await klaar.first().evaluate(el => el.getAttribute('data-zet'));
+    const vanRekening = await klaar.first().evaluate(el => el.getAttribute('data-rek'));
+    assert.ok([t1.id, t2.id].includes(vanRekening), 'het glas hoort bij een van de twee tafels op het bord');
     await klaar.first().click();
     /* Een glas dat klaar staat heeft geen vervolgstap meer, dus verdwijnt zijn
        knop uit het bord. Die knop verdwijnt pas bij de hertekening NA het
@@ -145,7 +154,7 @@ test('het barscherm toont de stapel en de ronden, en zet een glas door',
     const bord = (await H('/api/supplier/horeca/bar', {})).body;
     const gt = bord.stapel.find(x => x.naam === 'Gin-tonic');
     assert.ok(!gt || !gt.regelIds.includes(welke), 'een glas dat klaar staat, hoeft niet nog eens gemaakt');
-    const rek = (await H('/api/supplier/horeca/rekening', { rekeningId: t1.id })).body.rekening;
+    const rek = (await H('/api/supplier/horeca/rekening', { rekeningId: vanRekening })).body.rekening;
     assert.equal(rek.regels.find(x => x.id === welke).stand, 'klaar',
       'en de stand staat op de rekening zelf, via dezelfde deur als de keuken');
 

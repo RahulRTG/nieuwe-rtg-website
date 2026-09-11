@@ -613,6 +613,46 @@ staat hier zodat niemand hem voor gebouwd aanziet.
 
 ---
 
+## 7c. De weg terug uit een toezegging (10 september 2026)
+
+Fase 1 t/m 5 gaan over hoe een reis ONTSTAAT. Wat eronder ontbrak was de weg
+terug: een bevestigde reis kon door niemand meer worden gewijzigd of afgezegd --
+niet door het lid, en ook niet door het kantoor. Beide kanten kregen dezelfde
+zin: *"Deze aanvraag is al bevestigd."* Wijzigen en afzeggen zijn het dagelijks
+werk van een reisbureau, en ze bestonden geen van beide.
+
+`kern/reisbureau-nazorg.js` (afzeggen) en `kern/reisbureau-wijziging.js` (de
+wijziging) sluiten die lus. Vier regels liggen daarbij vast, en ze volgen alle
+vier uit dit document:
+
+1. **Het lid vraagt, het kantoor beslist.** Een bevestiging is een toezegging;
+   die schrijft het lid niet zelf om. Een verzoek zet de reis op
+   `wijziging-gevraagd` met de wens ERNAAST, en een mens past hem toe of wijst
+   hem af met een reden. Dat is par. 2.1 in het klein: RTG stelt samen en zet
+   klaar, een mens maakt het af.
+2. **Afzeggen is een andere stand dan intrekken.** `geannuleerd` is een OPEN
+   aanvraag die het lid terugtrekt -- er was niets toegezegd. `afgezegd` is een
+   reis die rond WAS. Wie die twee samenvoegt, kan achteraf niet meer zien of er
+   ooit iets is beloofd.
+3. **Het geld beweegt niet.** Er is geen betaalweg voor een reis van het
+   reisbureau, dus een afzegging schrijft `geld.stand = nietGeregeld` met de
+   reden erbij en verplaatst niets -- de vorm van `kern/horeca/correctie.js`,
+   waar een teruggave een RECHT is dat een mens uitvoert.
+4. **Elke stap laat een spoor na** dat aangroeit en nooit wordt herschreven, en
+   het lid ziet daarin WAT er gebeurde en niet WIE er in het kantoor op de knop
+   drukte -- dezelfde zeef als bij het besluit zelf.
+
+En de reiswereld leerde er een grens bij die de andere kant op wijst: een
+**afgewezen** aanvraag blijft juist op de tijdlijn staan. Hij draagt daar het
+signaal `aandacht`, en `kern/reisoplosser.js` hangt aan precies dat signaal om
+alternatieven uit de eigen catalogus te zoeken. Alleen wat niet meer komt --
+`geannuleerd` en `afgezegd` -- valt van de tijdlijn. Wat de afgezegde reis
+vandaag NIET krijgt zijn die alternatieven, terwijl juist een reis die het
+reisbureau zelf afzegt de plek is waar een lid er een wil. Dat is een gat en
+geen besluit; het staat in `TRAVELCOMMERCE.md` par. 8.
+
+---
+
 ## 8. Wat V1 minimaal moet zijn om "RTG" te mogen heten
 
 Niet de hele tabel uit de opdracht. Wel deze vijf, want zonder één ervan is het

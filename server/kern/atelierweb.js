@@ -10,6 +10,8 @@
    te grote inhoud in de opslag belandt. Beeld verwacht een eigen RTG-bron
    (campagne of Salon); we bewaren alleen de verwijzing, geen bestanden. */
 module.exports = ({ db, save, crypto, schoon }) => {
+  // een verwijdering is pas bevestigd als de opslag hem heeft: kern/kantoorwissen.js
+  const wis = require('./kantoorwissen')({ save });
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   /* De bloktaal wordt NIET hier geschoond maar in ./webmaker-schoon.js.
 
@@ -43,7 +45,10 @@ module.exports = ({ db, save, crypto, schoon }) => {
     save();
     return { ok: true, url, fotos: s.fotos.slice() };
   }
-  function fotoWeg(url) { const s = store(); s.fotos = s.fotos.filter(u => u !== url); save(); return { ok: true, fotos: s.fotos.slice() }; }
+  async function fotoWeg(url) {
+    const s = store();
+    return wis(() => { s.fotos = s.fotos.filter(u => u !== url); }, () => ({ ok: true, fotos: s.fotos.slice() }));
+  }
 
   function bewaar(d) {
     d = d || {};

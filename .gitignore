@@ -37,7 +37,15 @@ public/dist/
 
 # het routejournaal van de laatste suite-run: invoer voor scripts/dekking.js,
 # geen bron. Wordt bij elke `npm test` opnieuw geschreven.
-.routejournaal
+#
+# MET STERRETJE, en dat is geen slordigheid. RTG_ROUTELOG neemt een WILLEKEURIG
+# pad, en scripts/dekking.js leest met `--lees` net zo goed een journaal onder
+# een andere naam. Wie een tweede ronde naast de staande wil zetten (een verse
+# meting terwijl de oude nog nodig is) verzint dus een variant, en die stond
+# vervolgens als ongevolgd bestand in de boom -- precies gebeurd met
+# `.routejournaal-vers`. Een journaal is invoer voor een meting en nooit bron,
+# welke naam hij ook draagt.
+.routejournaal*
 # idem voor de schermen: invoer voor scripts/schermen.js, geen bronbestand
 .schermjournaal
 # de ruwe duurmeting van de laatste ronde: invoer voor scripts/toetsduur.js.
@@ -83,3 +91,11 @@ server/routes/zz-ijk-tijdelijk*.js
 # door de toets zelf ("de ijking ruimt zichzelf op").
 zz-ijk-tijdelijk*
 dump.rdb
+
+# de duurmeting van de lokale ketenronde (scripts/ci-lokaal.js): op welke poort
+# hoeveel tijd ging, zodat --snel weet wat hij mag overslaan. Een meting van
+# DEZE machine en dus geen bron -- op een andere machine staan er andere
+# getallen in, en een gedeelde versie zou daar liegen.
+.cilokaal
+# werkbomen van Claude Code-agenten: een volledige kopie van de bron die nooit mee hoort
+.claude/worktrees/

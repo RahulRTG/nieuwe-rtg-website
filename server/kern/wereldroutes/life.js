@@ -55,6 +55,7 @@ module.exports = [
   '/apps/memo.html',
   '/apps/metier.html',
   '/apps/mijnmall.html',
+  '/apps/move.html',
   '/apps/muziek.html',
   '/apps/nalatenschap.html',
   '/apps/navigatie.html',

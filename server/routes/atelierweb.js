@@ -31,7 +31,16 @@ module.exports = (kern) => {
     if (!url) return res.status(400).json({ error: 'De foto kon niet worden opgeslagen.' });
     stuur(res, atelierweb.fotoBewaar(url));
   });
-  app.post('/api/office/atelierweb/foto-weg', officeAuth, (req, res) => stuur(res, atelierweb.fotoWeg(String((req.body || {}).url || ''))));
+  /* fotoWeg is sinds kern/kantoorwissen.js ASYNC: de verwijdering is pas
+     bevestigd als de opslag hem heeft. Zonder await ging hier een Promise naar
+     res.json() en die serialiseert naar `{}` met een keurige 200 -- de val die
+     test/kantoorawait.test.js voor routes/kantoren beschrijft, en die deze route
+     in dezelfde commit was ontgaan. test/salonbron-fotobank.test.js (toets 5)
+     zakte erop in de volle ronde. */
+  app.post('/api/office/atelierweb/foto-weg', officeAuth, async (req, res) => {
+    try { stuur(res, await atelierweb.fotoWeg(String((req.body || {}).url || ''))); }
+    catch (e) { console.error('[atelierweb]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
 
   // beeld "Uit De Salon" als bron in de studio
   app.post('/api/office/atelierweb/salon', officeAuth, (req, res) => {

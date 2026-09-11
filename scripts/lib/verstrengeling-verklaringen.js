@@ -16,6 +16,17 @@
    Een rand daarheen verplaatsen is een besluit dat je kunt terugvinden; hem
    DOMEINRELATIE noemen om van het getal af te zijn, is de meter kapotmaken. */
 module.exports = [
+  /* DE KEURING ONDER DE VERTAALMOTOR. server/translate/ levert vertalingen en
+     kern/taalkeuring.js beoordeelt of een modelantwoord er een mag heten. Dat
+     is een rand tussen twee delen, en hij is er met opzet: de motor mag zijn
+     eigen werk niet goedkeuren. Een gemeten proef met een nagebootst model liet
+     zes faalvormen ongehinderd door de oude weg komen -- een antwoord in het
+     Engels op een vraag om Japans, een weggevallen plaatshouder, een veranderd
+     bedrag -- en sinds de vertaalkast landden die op schijf. De keuring staat
+     daarom BUITEN de motor, zodat zij los te beproeven is en niet meebeweegt
+     met wie haar aanroept. */
+  { van: 'motor:translate', naar: 'domein:taalkeuring', soort: 'DOMEINRELATIE',
+    reden: 'de motor keurt zijn eigen werk niet: translate/uitslag.js vraagt kern/taalkeuring.js of een modelantwoord een vertaling mag heten, en alleen een GOED gekeurde regel wordt permanent' },
   /* DE RAILS ONDER EEN MOTOR. server/ai.js kiest tussen vier modelaanbieders en
      server/betaal.js tussen betaalproviders. Dat is geen verstrengeling maar de
      enige plek waar zo'n keuze hoort: een adapter per rail, en een motor die

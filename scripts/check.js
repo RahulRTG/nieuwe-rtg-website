@@ -3336,7 +3336,26 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
        Allebei gemeten in FAALPROEF.json als `schrijf-verloren` -> 200. */
     ['server/kern/afdelingen/integratiekamer.js', 'de noodstop: wie elke koppeling uitzet en `noodstop: true` leest, hoort dat na een herstart terug te vinden'],
     ['server/kern/command/lagen.js', 'bedraadt de duurzame helper voor de uitrolpauze; kiest zelf niets'],
-    ['server/kern/command/uitrolregie.js', 'de uitrolpauze: een uitrol die als `stil` is bevestigd, mag niet doorlopen na een herstart']
+    ['server/kern/command/uitrolregie.js', 'de uitrolpauze: een uitrol die als `stil` is bevestigd, mag niet doorlopen na een herstart'],
+    /* HET VIERDE, en op dezelfde grond gemeten: /api/office/aidata/export droeg
+       in zijn kop "Elke export komt in het auditlog" en leverde onder
+       `schrijf-verloren` 287 bytes met 200, terwijl er na de herstart geen
+       sleutel kantoorAudit meer was -- nul regels. Een logboek dat zegt wie
+       welke knop omzette, is geen afgeleide toestand. */
+    ['server/kern/afdelingen/bewaking/index.js', 'het auditspoor: een handeling die is bevestigd, moet achteraf te herleiden zijn -- ook na een opslagstoring'],
+    /* HET VIJFDE, en dezelfde laag als pay: de bankbundel was atomair en niet
+       duurzaam, precies waar lib/idem.js voor waarschuwt. /api/bank/akkoord gaf
+       een IBAN terug die na een herstart weg kon zijn (gemeten in FAALPROEF.json
+       als `gezakt`). Betalen was al duurzaam; een rekening openen hoort dat ook
+       te zijn -- ze lopen door dezelfde sleutelruimte. */
+    ['server/kern/bank/index.js', 'de bank: een geopende rekening en een gegeven akkoord mogen niet verdwijnen na een herstart'],
+    /* HET ZESDE, en het enige dat voor ZEVEN modules tekent: de kantoor-
+       verwijdering. Zeven routes uit de faalproefronde deden `filter(); save();
+       return { ok: true }` -- een bevestiging die de opslag nog niet had gedaan,
+       en na een herstart stond het weggegooide ontwerp er weer. De zeven modules
+       staan hier NIET op: die kennen de duurzame commit niet, ze kennen deze
+       helper, en dat is het punt van een gedeelde plek. */
+    ['server/kern/kantoorwissen.js', 'de kantoorverwijdering: wie te horen krijgt dat iets weg is, hoort het na een herstart niet terug te zien']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze

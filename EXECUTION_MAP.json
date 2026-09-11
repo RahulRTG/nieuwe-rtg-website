@@ -7,7 +7,7 @@
   "VERTROUWEN.json": "6fb6bc1a3e8ce705",
   "server/kern/stuur/beleid.js": "8dc821a9959c82e0",
   "scripts/gezagsnoemer.js": "6f03917150dcd838",
-  "scripts/executionmap.js": "4577d4076ff5a79e"
+  "scripts/executionmap.js": "fb5015bea4c8102e"
  },
  "velden": {
   "bereikbaar": {
@@ -31,7 +31,7 @@
    "wat": "wat een tweede identieke aanroep doet: beschermd, onbeschermd of ongemeten"
   },
   "risico": {
-   "bron": "server/kern/command/risico.js",
+   "bron": "server/kern/frictie/motor.js",
    "afgeleid": false,
    "waarde": "ONBEPAALD",
    "reden": "risico wordt per GEVAL berekend uit bedrag, aantal en omkeerbaarheid; statisch bestaat het niet"

@@ -103,10 +103,21 @@ module.exports = (ctx) => {
      alles als JSONL-bestand bewaart. Op codenamen; de kluis blijft dicht.
      Elke export komt in het auditlog. */
   app.post('/api/office/aidata', officeAuth, (req, res) => veilig(res, () => kern.aidataOverzicht()));
-  app.post('/api/office/aidata/export', boardroomAuth, (req, res) => {
+  app.post('/api/office/aidata/export', boardroomAuth, async (req, res) => {
     try {
       const r = kern.aidataExport();
-      afdelingen.audit(req.body.naam || 'boardroom', 'AI-dataset geexporteerd: ' + r.aantal + ' records (JSONL)');
+      /* EERST HET SPOOR, DAN PAS DE BYTES.
+
+         De kop hierboven belooft "Elke export komt in het auditlog", en dat is
+         hier geen bijzaak: dit is de knop die de COMPLETE dataset het huis uit
+         stuurt. Gemeten onder `schrijf-verloren`: 200 met 287 bytes geleverd
+         terwijl er na een herstart geen enkele auditregel over was. Sinds
+         kern/afdelingen/bewaking/index.js het spoor duurzaam vastlegt, kan deze
+         route erop wachten -- en weigeren als het niet is vastgelegd. Liever
+         geen export dan een export die niemand later kan terugvinden. */
+      const nietVastgelegd = await afdelingen.audit(req.body.naam || 'boardroom',
+        'AI-dataset geexporteerd: ' + r.aantal + ' records (JSONL)');
+      if (nietVastgelegd) return res.status(nietVastgelegd.status).json({ error: nietVastgelegd.error });
       res.setHeader('Content-Type', 'application/jsonl; charset=utf-8');
       res.setHeader('Content-Disposition', 'attachment; filename="rtg-ai-dataset-' + new Date().toISOString().slice(0, 10) + '.jsonl"');
       res.send(r.jsonl);

@@ -1,7 +1,7 @@
 /* DE HERITAGE-ROUTEKAART IS FAIL-CLOSED.
    Een nieuw echt scherm mag niet ongemerkt een vijfde kleur erven en een oude
    redirect mag geen tweede productoppervlak worden. Daarom wordt het manifest
-   hier tegen de werkelijke HTML-boom gehouden: 287 schermen, 16 doorwijzers,
+   hier tegen de werkelijke HTML-boom gehouden: 288 schermen, 16 doorwijzers,
    ieder exact eenmaal. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -31,16 +31,16 @@ const ECHTE_ROUTES = BESTANDEN.filter((bestand) =>
 const DOORWIJZERS = BESTANDEN.filter((bestand) =>
   !/\/shared\/basis\.js/.test(fs.readFileSync(bestand, 'utf8'))).map(route).sort();
 
-test('het manifest dekt 287 echte schermen en 16 redirects precies eenmaal', () => {
+test('het manifest dekt 288 echte schermen en 16 redirects precies eenmaal', () => {
   /* DE MUTATIE: voeg een HTML-scherm toe zonder manifestregel, of zet één pad
      in twee werelden. De setvergelijking of de lengtetoets moet dan zakken. */
   const echtManifest = identiteit.VALUES.flatMap((wereld) => identiteit.MANIFEST[wereld]);
   const allesManifest = echtManifest.concat(identiteit.REDIRECTS);
 
-  assert.equal(BESTANDEN.length, 303, 'de appboom hoort 303 HTML-bestanden te bevatten');
-  assert.equal(ECHTE_ROUTES.length, 287, 'exact 287 blijvende schermen horen basis.js te laden');
+  assert.equal(BESTANDEN.length, 304, 'de appboom hoort 304 HTML-bestanden te bevatten');
+  assert.equal(ECHTE_ROUTES.length, 288, 'exact 288 blijvende schermen horen basis.js te laden');
   assert.equal(DOORWIJZERS.length, 16, 'exact 16 oude adressen horen doorwijzers te blijven');
-  assert.equal(echtManifest.length, 287, 'het vierwereldenmanifest hoort 287 schermen te bevatten');
+  assert.equal(echtManifest.length, 288, 'het vierwereldenmanifest hoort 288 schermen te bevatten');
   assert.deepEqual(identiteit.VALUES, ['living', 'travel', 'work', 'foundation'],
     'Core ondersteunt de werelden maar mag geen vijfde zichtbare wereld zijn');
   assert.equal(identiteit.REDIRECTS.length, 16, 'het redirectmanifest hoort 16 adressen te bevatten');

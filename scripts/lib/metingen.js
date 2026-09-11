@@ -83,12 +83,19 @@ const REGISTER = {
      dezelfde ratel, niet aan geen enkele. */
   'LAATSTE_METING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   'MUTATIES.json': { meter: ['toetsenOngevoeligPct', 'toetsenNietGemeten'] },
+  'TAALKWALITEIT.json': { meter: ['taalPoortHoudtTegen', 'taalCellenVerkeerdSchrift', 'taalBetekenisOngemeten'] },
+  'TAALSCHIL.json': { meter: ['taalSchilOffline'] },
+  /* Het sprekersregister is de INVOER van taalBetekenisOngemeten: die meter
+     daalt alleen doordat hier een oordeel bij komt. Het hangt dus aan dezelfde
+     ratel, en niet aan geen enkele. */
+  'TAALOORDEEL.json': { meter: ['taalBetekenisOngemeten'] },
   'GRENZEN.json': { meter: ['kernBreedte', 'kernGedeeld', 'kernBreedsteBestand', 'kernOngebruikt'] },
   'WETTEN.json': { meter: ['wettenOnbewezen'] },
   'LADDER.json': { meter: ['ladderRaak', 'ladderNietGeprobeerd'] },
   'ROLRONDE.json': { meter: ['rolscheidingGaten', 'rolscheidingGemeten'] },
   'GLUURRONDE.json': { meter: ['gluurGaten', 'gluurGecontroleerd'] },
   'VERSTRENGELING.json': { meter: ['verstrengelingOnverklaard'] },
+  'BEWIJSLADDER.json': { meter: ['bewijsAlleenKeten'] },
   'ACTIVERING.json': { meter: ['activeringOndergrens'] },
   'TREDEPROEF.json': { meter: ['tredeLekken', 'tredeRondgangGezakt', 'tredeIngangLekken'] },
   'WEKKERS.json': { meter: ['wekkersOnverklaard', 'wekkersFunctieUitToch', 'wekkersZonderTrede'] },
@@ -118,6 +125,15 @@ const REGISTER = {
   'ISOLATIEPROEF.json': { eigenRatel: 'test/isolatieregisters.test.js' },
   'RESOLVERBEREIK.json': { eigenRatel: 'test/resolverbereik.test.js' },
   'GEZAGSNOEMER.json': { eigenRatel: 'test/gezagsnoemer.test.js' },
+
+  /* De adressen die de documenten noemen. De toets bevriest het register NIET --
+     ADRESSEN.json beweegt bij elke documentregel die een pad noemt, en een tand
+     op gelijkheid zou zakken om een reden die niets met adressen te maken heeft.
+     Geratelde wordt het getal dat ertoe doet: `kapot` mag niet boven de
+     grondwaarde in scripts/adressen.js komen. Toets 1 is zien zakken (een
+     verzonnen adres in TIKKEN.md bracht hem op 24), dus deze regel is geen
+     bewering -- zie de kop over de helft die mensenwerk blijft. */
+  'ADRESSEN.json': { eigenRatel: 'test/adressen.test.js' },
 
   /* APPWERKT.json hangt aan de NORM-ratel en niet aan een eigen toets, want een
      verse meting vraagt een browser en een kwartier -- dat hoort niet in
@@ -152,6 +168,7 @@ const REGISTER = {
   'RITPROEF.json': { eigenRatel: 'test/ritproef.test.js' },
   'TOELATINGSPROEF.json': { eigenRatel: 'test/toelatingsproef.test.js' },
   'NAVIGATIEPROEF.json': { eigenRatel: 'test/navigatieproef.test.js' },
+  'MOVEPROEF.json': { eigenRatel: 'test/moveproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },
   'RITMIGRATIE.json': { eigenRatel: 'test/ritmigratie.test.js' },
   'HEAPPROEF.json': { eigenRatel: 'test/heapproef.test.js' },

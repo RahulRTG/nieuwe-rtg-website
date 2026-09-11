@@ -45,6 +45,26 @@ app.post('/api/reisbureau/annuleer', auth, async (req, res) => {
   if (r.error) return res.status(r.status || 400).json({ error: r.error });
   res.json(r);
 });
+/* WIJZIGEN EN AFZEGGEN VAN EEN BEVESTIGDE REIS (kern/reisbureau-nazorg.js).
+   Tot 10 september 2026 hield het hier op: /annuleer hierboven werkt alleen
+   zolang de aanvraag OPEN staat, en daarna kwam zowel het lid als het kantoor
+   niet verder dan "Deze aanvraag is al bevestigd". Wijzigen is een VERZOEK en
+   geen mutatie: het lid mag een toezegging niet zelf omschrijven, dus een mens
+   van het kantoor beslist erover (routes/kantoren/reisbureau.js). */
+// een wijziging vragen op een bevestigde reis (datum, personen of een toelichting)
+app.post('/api/reisbureau/wijzig', auth, (req, res) => {
+  const r = reisbureau.vraagWijziging(req.session.key, String((req.body || {}).ref || ''), req.body || {});
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+// een bevestigde reis afzeggen, met een reden -- het geld blijft mensenwerk
+app.post('/api/reisbureau/afzeggen', auth, async (req, res) => {
+  const b = req.body || {};
+  const r = await reisbureau.zegAf({ ref: String(b.ref || ''), doorLid: true,
+    key: req.session.key, reden: b.reden });
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
 // AI-reisadvies: vertel je wens, de reisadviseur wijst de best passende reis aan
 app.post('/api/reisbureau/advies', auth, async (req, res) => {
   const r = await reisbureau.advies(String(req.body.wens || ''));

@@ -164,6 +164,21 @@ const METERS = [
      Leest, net als activeringOndergrens, het vastgelegde bestand: de proef start
      een server en klopt zestig routes aan, en dat hoort niet in een ratel die
      bij elke push draait. `npm run tredeproef:vast` ververst hem. */
+  /* DE PARITEIT TUSSEN LOKAAL EN DE KETEN (BEWIJSLADDER.json).
+
+     `npm run bewijsladder` telt per soort bewijs welke mechanismen er draaien en
+     WAAR. Dit getal is het aantal dat alleen in de keten draait -- de sonde, de
+     containerproef, het a11y-oordeel, de attributie. Zolang het boven nul staat,
+     zijn lokaal en de keten twee kwaliteitswerelden, en dan is een groene lokale
+     ronde iets anders dan een groen vinkje.
+
+     ALLEEN OMLAAG, en niet omdat elk mechanisme lokaal MOET kunnen draaien: zeven
+     van de zestien lezen een artefact uit een andere job en kunnen hier per
+     definitie niet. Die staan in de teller omdat ze eerlijk geteld horen te
+     worden, niet omdat ze weg moeten. Wat de tand tegenhoudt is de andere kant:
+     er mag geen bewijs BIJKOMEN dat alleen GitHub kan leveren zonder dat iemand
+     dat opschrijft. */
+  { sleutel: 'bewijsAlleenKeten', richting: 'omlaag', wat: 'bewijsmechanismen die alleen in de keten draaien en niet lokaal (uit BEWIJSLADDER.json)' },
   { sleutel: 'tredeLekken', richting: 'omlaag', wat: 'routes buiten trede 0 die tóch antwoorden (uit TREDEPROEF.json)' },
   /* WEKKERS DIE GEEN ENKELE FUNCTIE RAAKT (WEKKERS.json).
 
@@ -408,6 +423,28 @@ const METERS = [
   { sleutel: 'bronBlindeBestanden', richting: 'omlaag', wat: '.js-bestanden waar de commentaar-verwijderaar code kwijtraakt of niet gelezen kan worden' },
   { sleutel: 'delenZonderOnderwerp', richting: 'omlaag', wat: 'bundeldelen zonder onderwerpregel bovenin (zie BUNDELS.md)' },
   { sleutel: 'metingenZonderRatel', richting: 'omlaag', wat: 'meetbestanden in de wortel die aan geen enkele ratel hangen' },
+  /* DE TAALKWALITEIT (TAALKWALITEIT.json, npm run taalkwaliteit).
+
+     Drie getallen, en ze meten met opzet drie verschillende dingen. `taalPoort
+     HoudtTegen` telt hoeveel beproefde faalvormen de keuring werkelijk stopt --
+     zet iemand een controle uit, dan daalt dit en valt de ratel. `taalCellen
+     VerkeerdSchrift` moet op nul blijven: een kernwoord in een ander schrift dan
+     de taal kent, is een aantoonbare fout. En `taalBetekenisOngemeten` is de
+     eerlijke restschuld: over de BETEKENIS van een vertaling doet geen enkele
+     machine hier een uitspraak, en dat getal daalt alleen doordat een mens die
+     de taal spreekt een oordeel geeft in TAALOORDEEL.json. Het staat vandaag op
+     alle 114 talen, en dat hoort zichtbaar te blijven in plaats van weg te
+     vallen tegen de vorm-metingen die wel groen zijn. */
+  { sleutel: 'taalPoortHoudtTegen', richting: 'omhoog', wat: 'faalvormen die de taalkeuring aantoonbaar tegenhoudt' },
+  { sleutel: 'taalCellenVerkeerdSchrift', richting: 'omlaag', wat: 'kernwoorden in een schrift dat de taal niet kent' },
+  { sleutel: 'taalBetekenisOngemeten', richting: 'omlaag', wat: 'talen waarvan geen spreker de BETEKENIS heeft beoordeeld' },
+  /* DE OFFLINE TALEN. Deze telt de talen die een schilbestand HEBBEN, niet
+     hoeveel regels erin staan: dat tweede getal beweegt mee met elk scherm dat
+     erbij komt of verdwijnt, en dan zakt de ratel op werk dat niets met taal te
+     maken had. Wat hier bewaakt wordt is dat een taal nooit stil uit de offline
+     schil valt -- en dat gebeurt geruisloos, want zonder bestand werkt hij nog
+     steeds, alleen niet meer zonder netwerk. */
+  { sleutel: 'taalSchilOffline', richting: 'omhoog', wat: 'talen waarvan de app-schil zonder netwerk werkt' },
   /* DE METER DIE OVER HET BEWIJS ZELF GAAT (STANDAARD.md par. 5).
 
      Alles hierboven meet de code of de ratel. Deze meet of de UITSLAGEN
@@ -1139,7 +1176,23 @@ function meet(bronnen) {
     laatSpoorVerdacht: leesRegister('LAATSPOOR.json', (j) => j.gemeten.verdacht),
     rollbackUitzonderingen: leesRegister('ROLLBACKBESLUIT.json', (j) => Object.keys(j.routes || {}).length),
     faalproefGezakt: leesRegister('FAALPROEF.json', (j) => j.gemeten.gezakt),
-    appwerktDefecten: leesRegister('APPWERKT.json', (j) => j.gemeten.defecten)
+    appwerktDefecten: leesRegister('APPWERKT.json', (j) => j.gemeten.defecten),
+    bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
+    /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
+       milliseconden en een afdruk die achterloopt zou hier een groen getal
+       geven voor een poort die inmiddels openstaat. */
+    ...(() => {
+      try {
+        const t = require('./taalkwaliteit').meet();
+        /* Geteld op de BESTANDEN en niet op het register: een schil die uit
+           TAALSCHIL.json is verdwenen maar nog op schijf staat, is nog steeds
+           offline beschikbaar -- en andersom is een register dat een taal
+           belooft die er niet ligt, precies de stilte die dit huis niet wil. */
+        const aanwezig = require('./taalschil').offlineTalen();
+        return { taalPoortHoudtTegen: t.poortHoudtTegen, taalCellenVerkeerdSchrift: t.cellenVerkeerdSchrift,
+          taalBetekenisOngemeten: t.betekenisOngemeten, taalSchilOffline: aanwezig };
+      } catch (e) { return {}; }
+    })()
   };
 }
 

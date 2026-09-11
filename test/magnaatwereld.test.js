@@ -177,7 +177,14 @@ test('computer en PDA tonen de echte RTG-app in een afgeschermde spelstand', () 
   const magnaat = fs.readFileSync(path.join(basis, 'magnaat.html'), 'utf8');
   const app = fs.readFileSync(path.join(basis, 'app.html'), 'utf8');
   const kern = fs.readFileSync(path.join(basis, 'app-main', 'app-main-02.js'), 'utf8');
-  const os = fs.readFileSync(path.join(basis, 'app-main', 'app-main-24a2.js'), 'utf8');
+  /* DE MAPPEN STAAN OVER TWEE DELEN, en dat is geen ordening maar de 10 kB-grens:
+     24a2 liep erover, dus TravelOS is doorgeschoven naar 24a2b. De bundel plakt
+     ze weer aan elkaar, dus dat is ook wat hier gelezen hoort te worden --
+     anders zakt deze toets op de VOLGENDE knip in plaats van op een echte
+     verandering. `link:passkeys` staat nog in het eerste deel, `tab:reizen` in
+     het tweede; samen zijn ze wat de app werkelijk laadt. */
+  const os = ['app-main-24a2.js', 'app-main-24a2b.js']
+    .map(n => fs.readFileSync(path.join(basis, 'app-main', n), 'utf8')).join('\n');
   const sandbox = fs.readFileSync(path.join(basis, 'magnaat-sandbox.js'), 'utf8');
   const testdata = fs.readFileSync(path.join(basis, 'magnaat-data.js'), 'utf8');
   const chauffeurHtml = fs.readFileSync(path.join(basis, 'chauffeur.html'), 'utf8');

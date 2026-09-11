@@ -1226,6 +1226,18 @@
       "url": "/apps/navigatie.html"
     },
     {
+      "label": "Kaarten",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
+      "label": "Kaarten kiezen",
+      "app": "Navigatie",
+      "wereld": "TravelOS",
+      "url": "/apps/navigatie.html"
+    },
+    {
       "label": "Kies vertrekpunt",
       "app": "Navigatie",
       "wereld": "TravelOS",

@@ -236,6 +236,47 @@ test('10b. de catalogus geeft de ouder DOOR, en de keuze werkt zonder lijst', ()
   });
 });
 
+test('10c. een gebiedscode uit een vreemde index verlaat de datamap niet', () => {
+  /* EEN ECHT GAT, EN GEEN VOORZORG. De index wordt van BUITEN opgehaald en zijn
+     code wordt een bestandsnaam: `pakketVan('../../../etc/passwd')` gaf
+     `./etc/passwd.sqlite` terug -- de datamap uit. Het gewone geval was al fout,
+     want de bronindex draagt ids MET schuine strepen (`europe/netherlands`), en
+     die maakten stilletjes submappen aan waar pakketLigt() nooit keek.
+
+     Fail closed: een onveilige code levert `null` en geen pad. Een pad
+     teruggeven dat "toch wel klopt" is precies hoe zo'n gat blijft bestaan. */
+  metDataMap((map, g) => {
+    for (const kwaad of ['../../../etc/passwd', 'europe/netherlands', 'a\\b', '..', '.',
+      'nl/../../x', '-nl', 'nl-', 'nl_1', 'n l', '']) {
+      assert.equal(g.pakketVan(kwaad), null, JSON.stringify(kwaad) + ' levert geen pad');
+      assert.equal(g.pakketLigt(kwaad), false, JSON.stringify(kwaad) + ' ligt nergens');
+    }
+    /* En de tegenproef: een gewone code werkt WEL, en blijft in de datamap.
+       Zonder deze helft haalt een pakketVan die altijd null geeft de toets. */
+    const ok = g.pakketVan('nederland');
+    assert.ok(ok, 'een gewone code levert een pakket');
+    assert.equal(path.dirname(ok.db), path.join(map, 'navigatie'), 'en het staat in de datamap');
+    assert.equal(path.relative(path.join(map, 'navigatie'), ok.db), 'nederland.sqlite');
+  });
+});
+
+test('10d. een onveilige code valt niet STIL uit de catalogus', () => {
+  /* Weigeren is goed, stil weigeren niet: een gebied dat zonder een woord
+     verdwijnt, kost iemand een middag zoeken. */
+  metDataMap((map, g) => {
+    schrijfIndex(map, { bron: 'proef', gebieden: [
+      NL,
+      { code: 'europe/netherlands', naam: 'Nederland via Europa', vak: NL.vak },
+      { code: '../../etc/passwd', naam: 'Kwaad', vak: NL.vak }
+    ] });
+    const c = g.catalogus();
+    assert.equal(c.telling.aangeboden, 1, 'alleen de veilige code komt door');
+    assert.equal(c.telling.geweigerd, 2, 'en de andere twee zijn GETELD');
+    assert.deepEqual(c.geweigerd.sort(), ['../../etc/passwd', 'europe/netherlands']);
+    assert.equal(c.gebieden[0].code, 'nederland');
+  });
+});
+
 test('11. het pakket van een gebied komt uit zijn CODE en niet uit een vaste naam', () => {
   /* Hier zat een echte val: de graafmap heette letterlijk `nederland-graaf`,
      afgeleid van de MAP van het bestand en niet van zijn naam. Een tweede
@@ -243,6 +284,7 @@ test('11. het pakket van een gebied komt uit zijn CODE en niet uit een vaste naa
      route op rekenen. */
   metDataMap((map, g) => {
     const nl = g.pakketVan('nederland'), fr = g.pakketVan('frankrijk');
+    assert.ok(nl && fr, 'beide codes zijn veilig en leveren een pakket');
     assert.notEqual(nl.graafMap, fr.graafMap, 'twee gebieden delen geen graafmap');
     assert.match(nl.graafMap, /nederland-graaf$/);
     assert.match(fr.graafMap, /frankrijk-graaf$/);
@@ -250,5 +292,104 @@ test('11. het pakket van een gebied komt uit zijn CODE en niet uit een vaste naa
     legPakket(map, 'nederland');
     assert.equal(g.pakketLigt('nederland'), true);
     assert.equal(g.pakketLigt('frankrijk'), false, 'en dat zegt niets over een ander gebied');
+  });
+});
+
+test('12. de dekkingslaag ROEPT deze laag aan, en verzint er niets bij', () => {
+  /* DE REDEN DAT DEZE TOETS ER IS. De keuring merkte `gebieden.js` aan als
+     "nergens aangeroepen" -- dode code. Dat is dezelfde fout die RTG Move drie
+     commits lang was: een laag die klopt en die niemand gebruikt. De aanroeper
+     is kern/navigatie/dekking.js, en die hangt aan navStatus.
+
+     Wat hier wordt vastgelegd is dat `net` (waarop kan ik NU routeren) en
+     `gebied` (wat biedt RTG hier aan) twee VERSCHILLENDE vragen blijven. Ze
+     werden er een toen er nog maar een land was. */
+  metDataMap((map, g) => {
+    const dekking = require('../server/kern/navigatie/dekking');
+    schrijfIndex(map, { bron: 'proef', licentie: 'ODbL 1.0', gebieden: [
+      { ...NL, naamsvermelding: '(c) OpenStreetMap-bijdragers' },
+      { code: 'spanje', naam: 'Spanje', vak: { lat0: 35.9, lat1: 43.8, lng0: -9.4, lng1: 4.4 } }
+    ] });
+
+    const nl = dekking.dekkingsbeeld(null, { lat: 52.09, lng: 5.12 });
+    assert.equal(nl.net, 'geen', 'zonder NWB-pakket valt er in NL niets te rekenen');
+    assert.equal(nl.gebied.code, 'nederland', 'maar RTG biedt hier wel een kaart aan');
+    assert.equal(nl.gebied.aangeboden, true);
+    assert.equal(nl.gebied.gebouwd, false, 'aangeboden is geen dekking');
+    assert.equal(nl.gebied.mag, true, 'en de naamsvermelding is er, dus hij mag');
+    assert.equal(nl.gebied.naamsvermelding, '(c) OpenStreetMap-bijdragers');
+
+    /* DE LICENTIEPOORT REIKT TOT navStatus. Spanje staat in de index zonder
+       naamsvermelding, dus dit pakket mag niet worden aangeboden -- en het
+       scherm krijgt de reden in plaats van een stille kaart. */
+    const es = dekking.dekkingsbeeld(null, { lat: 38.91, lng: 1.43 });
+    assert.equal(es.gebied.code, 'spanje');
+    assert.equal(es.gebied.mag, false);
+    assert.match(es.gebied.magNietOmdat, /eist naamsvermelding/i);
+    assert.equal(es.gebied.naamsvermelding, null, 'en er wordt geen vermelding verzonnen');
+
+    /* Buiten elk vak blijft het eerlijke lege antwoord staan. */
+    const niets = dekking.dekkingsbeeld(null, { lat: -33.9, lng: 151.2 });
+    assert.equal(niets.gebied.code, null);
+    assert.equal(niets.gebied.aangeboden, false);
+    assert.match(niets.gebied.reden, /biedt hier \(nog\) geen kaart aan/i);
+  });
+});
+
+test('13. de index wordt opnieuw gelezen zodra hij verandert', () => {
+  /* `dekkingsbeeld()` hangt aan navStatus, dus de index wordt gecachet -- anders
+     komt hij bij elk statusverzoek van schijf. Op de MTIME en niet blind: een
+     cache die nooit vervalt, vraagt een herstart na een import, en dat is
+     precies het soort stille voorwaarde waar iemand een uur aan kwijt is. */
+  metDataMap((map, g) => {
+    schrijfIndex(map, { bron: 'proef', gebieden: [NL] });
+    assert.equal(g.catalogus().telling.aangeboden, 1);
+    /* De mtime moet echt verschillen; op een snelle schijf is twee keer
+       schrijven binnen dezelfde milliseconde geen theoretisch geval. */
+    const pad = path.join(map, 'navigatie', 'gebieden.json');
+    schrijfIndex(map, { bron: 'proef', gebieden: [NL, { code: 'spanje', naam: 'Spanje', vak: NL.vak }] });
+    const t = Date.now() + 5000;
+    fs.utimesSync(pad, t / 1000, t / 1000);
+    assert.equal(g.catalogus().telling.aangeboden, 2, 'de nieuwe index wordt gezien');
+  });
+});
+
+test('14. de catalogus wordt gecachet, en ziet een NIEUW GEBOUWD pakket toch', () => {
+  /* De catalogus vraagt per gebied twee keer aan de schijf of het pakket er
+     ligt, en hij hangt via kern/navigatie.js aan navKaart, navBestemmingen,
+     navPoi en navStatus. Bij tweehonderd landen zijn dat vierhonderd
+     schijfvragen per verzoek van een lid; die kosten staan op geen enkele nota,
+     dus niemand vindt ze terug. Vandaar de cache.
+
+     EN DUS OOK DEZE TOETS. Een cache op alleen de index zou een pakket dat
+     erna gebouwd wordt pas na een herstart tonen -- precies de stille
+     voorwaarde waar de index-cache hierboven al voor waarschuwt. De tweede
+     stempel is de MAP waarin de pakketten liggen. */
+  metDataMap((map, g) => {
+    schrijfIndex(map, { bron: 'proef', licentie: 'CC0 1.0', gebieden: [NL] });
+    const nav = path.join(map, 'navigatie');
+    assert.equal(g.catalogus().telling.gebouwd, 0, 'nog niets gebouwd');
+
+    let vragen = 0;
+    const echt = fs.existsSync;
+    fs.existsSync = (p) => { vragen++; return echt(p); };
+    try {
+      for (let i = 0; i < 20; i++) g.catalogus();
+      /* Twintig aanroepen mogen niet twintig keer per gebied de schijf op.
+         Eentje per ronde blijft over: de stempel van de index zelf. */
+      assert.ok(vragen <= 25, 'de catalogus komt niet elke keer van schijf (' + vragen + ' vragen)');
+    } finally { fs.existsSync = echt; }
+
+    /* Nu WEL een pakket neerzetten, zonder de index aan te raken. */
+    const p = g.pakketVan(NL.code);
+    fs.mkdirSync(p.graafMap, { recursive: true });
+    fs.writeFileSync(p.db, 'x');
+    fs.writeFileSync(path.join(p.graafMap, 'graaf.json'), '{}');
+    /* De mtime van de MAP moet echt verschillen; op een snelle schijf is
+       schrijven binnen dezelfde milliseconde geen theoretisch geval. Zelfde
+       reden en zelfde truc als toets 13. */
+    const t = Date.now() + 5000;
+    fs.utimesSync(nav, t / 1000, t / 1000);
+    assert.equal(g.catalogus().telling.gebouwd, 1, 'een nieuw pakket verschijnt zonder herstart');
   });
 });

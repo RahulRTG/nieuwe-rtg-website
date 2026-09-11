@@ -259,21 +259,23 @@ function meet() {
     .map(r => ({ doel: r.doel, keten: [...r.keten].sort(), lokaal: !!r.lokaal }))
     .sort((a, b) => a.doel.localeCompare(b.doel));
 
-  return {
-    /* WAT DIT REGISTER AANTOONT, EN WAT NIET. scripts/meetkeuring.js eist die
-       tweede zin, en om een reden die hier woordelijk geldt: zonder grens leest
-       een ladder met veel groen als "het bewijs is rond", terwijl een sport
-       `staat` zodra er een mechanisme op hangt -- niet zodra dat mechanisme
-       ergens goed in is. */
+  return { sporten, zonderTrede,
+    /* WAT DIT REGISTER AANTOONT staat er als `uitleg` naast de `grens`, want
+       scripts/meetkeuring.js leest ze samen: een uitleg zonder grens leest als
+       een dekkende garantie, een grens zonder uitleg zegt niet waarover. */
     uitleg: 'Welk bewijsmechanisme op welke sport van de bewijsladder staat, afgeleid uit de '
       + 'keten in .github/workflows en uit de scripts zelf. Per sport de stand (staat, een stap '
       + 'weg, bestaat niet) en per mechanisme of het lokaal draait, alleen in de keten, of beide.',
-    grens: 'Deze ladder zegt NIET dat het bewijs deugt. Een sport heet `staat` zodra er een '
-      + 'mechanisme op hangt dat draait; of dat mechanisme streng genoeg is, meet hij niet -- '
-      + 'daarvoor zijn de eigen ratels van die instrumenten. Hij zegt ook niets over sporten die '
-      + 'niemand heeft bedacht: alleen wat de keten draait wordt tegen de ladder gehouden, dus '
-      + 'een ontbrekende sport valt hier stil buiten beeld en niet als gat.',
-    sporten, zonderTrede,
+    /* WAT DEZE UITSLAG NIET AANTOONT, en dat hoort in het REGISTER en niet
+       alleen in de kop van dit bestand: zonder die zin leest "6 sporten staan"
+       als een dekkende garantie. test/meetkeuring.test.js dwingt het af, en
+       betrapte deze meter er meteen op. */
+    grens: 'De SPORTEN zijn verklaard en niet gemeten: dat een soort bewijs hier ontbreekt, ' +
+      'zegt deze meter niet. Van de mechanismen erop meet hij dat ze DRAAIEN en waar -- niet ' +
+      'of het bewijs dat ze leveren goed is, en niet of het genoeg is. `alleenKeten` telt en ' +
+      'oordeelt niet: zeven van die mechanismen lezen een artefact uit een andere job en kunnen ' +
+      'lokaal per definitie niet draaien. En er staat met opzet geen samengesteld eindoordeel ' +
+      'onder deze tabel (KEURING.md par. 5).',
     telling: {
       mechanismen: gebruikt.size,
       sporten: sporten.length,
@@ -290,18 +292,15 @@ module.exports = { LADDER, meet, bewijsVan, standVan, REGISTER };
 /* ==========================================================================
    DE UITVOER
    ========================================================================== */
-/* EEN FUNCTIE EN GEEN BLOK, ZODAT `return` MAG -- en dat is de hele reden.
-
-   Hier stond `console.log(JSON.stringify(...)); process.exit(0);`. Naar een
-   BESTAND gaat dat goed (node schrijft dan synchroon), naar een PIPE niet: de
-   poortwacht printte 484 KB en er kwam 146176 bytes uit -- geldige tekst,
-   kapotte JSON, exitcode 0. Twee derde van de uitslag weg zonder signaal.
-   process.exitCode zet de code en laat het proces zelf aflopen, dus de buffer
-   loopt leeg. scripts/meetkeuring.js bewaakt deze regel. */
-function hoofd() {
+if (require.main === module) {
   const argv = process.argv.slice(2);
   const uitslag = meet();
-  if (argv.includes('--json')) { console.log(JSON.stringify(uitslag, null, 2)); process.exitCode = 0; return; }
+  /* GEEN process.exit NA EEN GROTE UITVOER. Naar een BESTAND gaat dat goed
+     (node schrijft dan synchroon), naar een PIPE niet: de poortwacht verloor zo
+     twee derde van 484 KB -- geldige tekst, kapotte JSON, exitcode 0. Met
+     exitCode loopt de pijp eerst leeg. Zie test/meetkeuring.test.js, regel
+     `pipe`, die deze meter er prompt op betrapte. */
+  if (argv.includes('--json')) { console.log(JSON.stringify(uitslag, null, 2)); return; }
 
   if (argv.includes('--controle')) {
     let oud = null;
@@ -349,5 +348,3 @@ function hoofd() {
     console.log('  BEWIJSLADDER.json geschreven.\n');
   }
 }
-
-if (require.main === module) hoofd();

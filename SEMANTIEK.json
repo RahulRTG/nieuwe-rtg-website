@@ -1,9 +1,9 @@
 {
-  "catalogi": 1068,
+  "catalogi": 1069,
   "verschillendeNamen": 630,
-  "namenInMeerDomeinen": 120,
-  "woordenMetMeerBetekenissen": 102,
-  "betekenissenTotaal": 383,
+  "namenInMeerDomeinen": 121,
+  "woordenMetMeerBetekenissen": 103,
+  "betekenissenTotaal": 385,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 47,
   "dubbelingen": 33,
@@ -2506,7 +2506,7 @@
         },
         {
           "bestanden": [
-            "server/kern/navigatie.js"
+            "server/kern/navigatie/geografie.js"
           ],
           "leden": 3,
           "voorbeeld": [
@@ -3548,5 +3548,5 @@
       ]
     }
   ],
-  "bestanden": 3295
+  "bestanden": 3308
 }

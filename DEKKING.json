@@ -1,9 +1,9 @@
 {
   "uitleg": "Elke route (METHODE + patroon) die tijdens de volledige testsuite ECHT is aangeraakt, uit het routejournaal van server/routelog.js en niet uit de tekst van de toetsen. De eis is 100%: scripts/dekking.js zakt op elk gat en kent geen norm om die eis te verlagen. Het RTG Kantoor leest dit bestand (routes/office/dekking.js) en houdt het naast wat de server op dit moment registreert, zodat een route die er na de meting bij komt meteen als ongemeten opvalt. Bijwerken met: npm run dekking:vast",
   "gemeten": {
-    "op": "2026-09-11T09:53:03.685Z",
-    "commit": "8401fe87",
-    "routesToen": 5008
+    "op": "2026-09-11T07:43:07.849Z",
+    "commit": "05bc383f",
+    "routesToen": 5005
   },
   "aangeraakt": [
     "GET /",
@@ -2026,6 +2026,11 @@
     "POST /api/muziek/weg",
     "POST /api/muziek/zaal",
     "POST /api/nav/bestemmingen",
+    "POST /api/nav/gebied/kies",
+    "POST /api/nav/gebied/pakket",
+    "GET /api/nav/gebied/pakket/:code/:deel",
+    "POST /api/nav/gebied/weg",
+    "POST /api/nav/gebieden",
     "POST /api/nav/kaart",
     "POST /api/nav/meld",
     "POST /api/nav/poi",
@@ -4823,14 +4828,6 @@
     "POST /api/vertaal",
     "POST /api/vertaal/talen",
     "POST /api/vertaal/ui",
-    "POST /api/vertegenwoordiging/aanvaard",
-    "POST /api/vertegenwoordiging/bevoegdheden",
-    "POST /api/vertegenwoordiging/grens",
-    "POST /api/vertegenwoordiging/handel",
-    "POST /api/vertegenwoordiging/intrek",
-    "POST /api/vertegenwoordiging/mijn",
-    "POST /api/vertegenwoordiging/simulatie",
-    "POST /api/vertegenwoordiging/voorstel",
     "POST /api/verzorging",
     "POST /api/verzorging/annuleer",
     "POST /api/verzorging/boek",

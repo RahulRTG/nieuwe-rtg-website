@@ -60,6 +60,15 @@ Object.assign(kern, {
 Object.assign(kern, require('../kern/navigatie').maakNavigatie({
   db, save, crypto, haversine, flitsRond: kern.flitsRond, flitsMeld: kern.flitsMeld
 }));
+/* Welke kaarten een lid wil hebben (kern/navigatie/mijnkaarten.js). Eigen
+   collectie op de sessiesleutel, en met opzet apart van de motor: de motor
+   rekent, deze laag bewaart een keuze. */
+Object.assign(kern, require('../kern/navigatie/mijnkaarten')({ db, save }));
+/* Het pakket voor het TOESTEL (kern/navigatie/toestelpakket.js): wat er van een
+   gebouwde kaart op te halen is, met de licentiepoort ervoor. Geen db en geen
+   save: deze laag bewaart niets, ze leest wat er in RTG_DATA_DIR ligt en zegt
+   wat een toestel mag ophalen. */
+Object.assign(kern, require('../kern/navigatie/toestelpakket')());
 /* De PLAATSLAAG (kern/plaats/, zie PLAATS.md): hekken, vensters, waarnemingen
    en het actielog. Hij LEEST de geometrie die er al ligt -- de gebiedenboom van
    het stadsweefsel (kernlaag1) en de zaken -- en bezit zelf geen positie. Hier

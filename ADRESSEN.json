@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-10T16:33:38.538Z",
-    "commit": "326e2b9e",
+    "op": "2026-09-11T08:08:12.188Z",
+    "commit": "d81c4009",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/adressen.js",
@@ -11,9 +11,9 @@
   "uitleg": "Elk gewortelde bestandsadres dat een .md in de wortel noemt, tegen de bronboom gehouden. KLOPT: het bestand staat er. OPGEKNIPT: het is een map geworden, dus de module bestaat en het adres niet. KAPOT: er staat niets, ook geen map.",
   "grens": "Deze meter zegt NIET of een adres naar het juiste bestand wijst -- een pad dat bestaat maar de verkeerde module aanwijst, komt langs als klopt. En hij beoordeelt geen kale bestandsnamen zonder map ervoor: dat is een verkorte verwijzing en geen adres.",
   "graad": "gemeten",
-  "beoordeeld": 3820,
-  "klopt": 3779,
-  "onbeoordeeld": 3430,
+  "beoordeeld": 3912,
+  "klopt": 3871,
+  "onbeoordeeld": 3476,
   "opgeknipt": [
     {
       "doc": "BESTUUR.md",
@@ -23,7 +23,7 @@
     },
     {
       "doc": "FUNCTIES.md",
-      "regel": 700,
+      "regel": 703,
       "pad": "server/accounts.js",
       "nu": "server/accounts/"
     },
@@ -101,7 +101,7 @@
     },
     {
       "doc": "README.md",
-      "regel": 4588,
+      "regel": 4649,
       "pad": "server/kern/bevoegdheid.js",
       "nu": "server/kern/bevoegdheid/"
     },
@@ -253,13 +253,13 @@
     },
     {
       "doc": "WERELD.md",
-      "regel": 86,
+      "regel": 97,
       "pad": "shared/wereld.js",
       "nu": null
     },
     {
       "doc": "WERELD.md",
-      "regel": 86,
+      "regel": 97,
       "pad": "test/wereld.e2e.js",
       "nu": null
     }

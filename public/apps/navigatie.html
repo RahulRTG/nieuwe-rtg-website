@@ -72,6 +72,34 @@
     border-radius:0;padding:0.9rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 1rem);
     box-shadow:0 -14px 40px rgba(0,0,0,0.55);transform:translateY(102%);transition:transform 0.32s cubic-bezier(0.2,0.8,0.2,1);}
   .paneel.zien{transform:translateY(0);}
+  /* HET KAARTENPANEEL. Zelfde laag als .paneel: rechte hoeken (de hoekgrammatica
+     laat alleen systeemlagen afronden), eigen tokens, en raakvlakken van minstens
+     24px zodat hij op een telefoon te bedienen is. */
+  .kaarten{position:fixed;left:0;right:0;bottom:0;z-index:24;max-width:640px;margin:0 auto;
+    background:rgba(18,16,15,0.97);backdrop-filter:blur(12px);border:1px solid var(--line);border-bottom:0;
+    border-radius:0;padding:0.9rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 1rem);
+    box-shadow:0 -14px 40px rgba(0,0,0,0.6);transform:translateY(102%);
+    transition:transform 0.32s cubic-bezier(0.2,0.8,0.2,1);max-height:78vh;overflow-y:auto;}
+  .kaarten.zien{transform:translateY(0);}
+  .kaarten h2{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.1rem;display:flex;align-items:center;gap:0.5rem;}
+  .kaarten h2 .x{margin-left:auto;background:transparent;border:1px solid var(--line);border-radius:0;
+    color:var(--txt);font:inherit;min-width:32px;min-height:32px;cursor:pointer;}
+  .kaarten .uitleg{color:var(--soft);font-size:0.78rem;line-height:1.45;margin:0.4rem 0 0.7rem;}
+  .kaarten .filter{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:0;
+    color:var(--txt);font:inherit;padding:0.5rem 0.6rem;min-height:40px;margin-bottom:0.6rem;}
+  .kaartrij{display:flex;align-items:center;gap:0.6rem;padding:0.5rem 0;border-top:1px solid var(--line);}
+  .kaartrij:first-of-type{border-top:0;}
+  .kaartrij .naam{flex:1;min-width:0;}
+  .kaartrij .naam b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .kaartrij .naam small{display:block;color:var(--soft);font-size:0.72rem;}
+  .kaartrij .stand{flex:none;font-size:0.68rem;letter-spacing:0.06em;text-transform:uppercase;
+    border:1px solid var(--line);border-radius:0;padding:0.1rem 0.35rem;color:var(--soft);}
+  .kaartrij .stand.gebouwd{color:var(--txt);border-color:var(--gold);}
+  .kaartrij button{flex:none;background:var(--card2);border:1px solid var(--line);border-radius:0;
+    color:var(--txt);font:inherit;font-size:0.8rem;min-height:32px;min-width:44px;padding:0.25rem 0.6rem;cursor:pointer;}
+  .kaartrij button[aria-pressed="true"]{border-color:var(--gold);}
+  .kaartrij button[disabled]{opacity:0.55;cursor:not-allowed;}
+  .kaarten .leeg{color:var(--soft);font-size:0.82rem;line-height:1.5;}
   .paneel .grip{width:40px;height:4px;border-radius:0;background:var(--line);margin:0 auto 0.7rem;}
   .paneel h2{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.1rem;display:flex;align-items:center;gap:0.5rem;}
   .paneel h2 .x{margin-left:auto;background:transparent;border:1px solid var(--line);border-radius:0;
@@ -114,9 +142,26 @@
     background:#0C0C0B;border:1px solid var(--line);border-radius:0;color:#fff;font-size:0.82rem;
     padding:0.55rem 0.9rem;box-shadow:0 10px 28px rgba(0,0,0,0.6);opacity:0;transition:opacity 0.25s;max-width:90vw;}
   .toast.zien{opacity:1;}
-  .poort{position:fixed;inset:0;z-index:20;background:rgba(8,8,8,0.9);display:none;align-items:center;justify-content:center;padding:1.4rem;}
+  /* DE LOCATIEVRAAG LIGT BOVEN DEZE POORT, en dat is met opzet: shared/plek.js
+     zet zijn kaart op z-index 9985, omdat een vraag die onder een poort
+     verdwijnt door niemand te beantwoorden is. Het gevolg was wel dat de
+     ONDERSTE knop van dit kaartje eronder lag. Gemeten op 390x844: de
+     vraagkaart staat op 516-694 en "Kaarten kiezen" op 514-558, dus 42 van de
+     44 px zat eronder en de knop was met de vinger niet te raken -- zichtbaar
+     en onbereikbaar, precies het productdefect uit BETROUWBAARHEID.md.
+     Gevonden door test/navigatiekaarten.e2e.js toets 4, die met de MUIS klikt
+     en niet met .click() uit de DOM; een DOM-klik gaat dwars door een
+     dekkende laag heen en had dit nooit gezien.
+
+     De poort houdt die band daarom vrij. Is de vraag al beantwoord, dan staat
+     het kaartje iets boven het midden en dat is het hele gevolg. `margin:auto`
+     met `align-items:flex-start` centreert zolang er ruimte is en laat het
+     kaartje scrollen zodra er te weinig is -- met het handmatige
+     vertrekpaneel open is het namelijk hoger dan de rest, en bij centreren
+     met overflow verdwijnt dan de KOP buiten beeld. */
+  .poort{position:fixed;inset:0;z-index:20;background:rgba(8,8,8,0.9);display:none;align-items:flex-start;justify-content:center;padding:1.4rem 1.4rem 17rem;overflow:auto;}
   .poort.zien{display:flex;}
-  .poort .kaartje{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.6rem;max-width:340px;text-align:center;}
+  .poort .kaartje{background:var(--card);border:1px solid var(--line);border-radius:0;padding:1.6rem;max-width:340px;text-align:center;margin:auto;}
   .poort h2{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.3rem;margin-bottom:0.5rem;}
   .poort p{color:var(--soft);font-size:0.9rem;line-height:1.55;margin-bottom:1.1rem;}
   .poort a{display:inline-block;background:var(--gold);color:#0C0C0B;text-decoration:none;font-weight:600;
@@ -143,6 +188,7 @@
     <span class="badge" id="badge3d">3D</span>
     <span class="rek"></span>
     <span class="badge live-badge" id="liveBadge">Motor actief</span>
+    <button class="badge" type="button" id="kaartenKnop" aria-expanded="false" aria-controls="kaartenPaneel">Kaarten</button>
   </header>
 
   <div class="zoekwrap">
@@ -222,12 +268,27 @@
     <p class="hintbron" id="bron"></p>
   </section>
 
+  <section class="kaarten" id="kaartenPaneel" aria-label="Kaarten van RTG" hidden>
+    <h2>Kaarten<button class="x" type="button" id="kaartenSluit" aria-label="Sluiten">&#10005;</button></h2>
+    <p class="uitleg" id="kaartenUitleg">De kaarten die RTG kan leveren. Kies wat u wilt hebben.</p>
+    <input class="filter" id="kaartenFilter" type="search" placeholder="Zoek een land of gebied"
+           autocomplete="off" aria-label="Zoek een land of gebied">
+    <div id="kaartenLijst"></div>
+  </section>
+
   <div class="poort" id="poort">
     <div class="kaartje">
       <h2>RTG Navigatie</h2>
       <p id="poortReden">Log eerst in met je RTG-account om te navigeren.</p>
       <a href="/apps/app.html">Naar de app</a>
       <button class="manual-start" type="button" id="manualStart" hidden>Kies vertrekpunt</button>
+      <!-- WELKE KAARTEN U WILT HEBBEN, HANGT NIET AF VAN WAAR U NU STAAT. De
+           poort dekt het hele scherm (inset 0, z-index 20), dus de knop in de
+           kop was onbereikbaar zolang er geen locatie is -- terwijl dat juist
+           het moment is waarop iemand een kaart van zijn bestemming wil
+           binnenhalen. Deze knop verschijnt alleen als de poort over de LOCATIE
+           gaat; zonder inlog valt er niets te kiezen. -->
+      <button class="manual-start" type="button" id="poortKaarten" hidden>Kaarten kiezen</button>
       <div class="manual-panel" id="manualPanel" hidden>
         <label for="startZoek">Vertrek vanaf</label>
         <input id="startZoek" type="search" placeholder="Zoek een halte, zaak of loket" autocomplete="off">
@@ -736,7 +797,17 @@
        komt uit `net` en `routeerbaarHier` van de motor zelf; het scherm leidt
        niets meer af. Een demonstratienet heet ook zo. */
     const dekking = r.body.dekking;
-    if (dekking && dekking.actief) {
+    if (r.body.net === 'gebied' && dekking) {
+      /* EEN GELADEN GEBIEDSPAKKET IS GEEN NWB EN GEEN RASTER. Hier stond
+         alleen de NWB-tak, dus met een gebouwd OSM-pakket onder de voeten
+         bleef er "Demonstratienet" staan terwijl er op een echte kaart werd
+         gerekend -- en de NAAMSVERMELDING die ODbL eist, stond nergens. Die
+         staat nu waar de bron van een route ook staat; een vermelding die
+         niemand ziet, is geen vermelding. */
+      $('#sourceCore').textContent = dekking.land || 'Kaart';
+      $('#sourceCoreLabel').textContent = dekking.licentie || 'Kaartdata';
+      if (dekking.naamsvermelding) $('#bron').textContent = dekking.naamsvermelding;
+    } else if (dekking && dekking.actief) {
       $('#sourceCore').textContent = (dekking.wegvakken / 1000000).toFixed(2).replace('.', ',') + ' mln';
       $('#sourceCoreLabel').textContent = 'NWB-wegvakken';
     } else if (r.body.net === 'geen') {
@@ -744,7 +815,9 @@
       $('#sourceCoreLabel').textContent = 'Kaartdata';
     }
     const badge = { nwb: 'NWB Nederland actief', demonstratie: 'Demonstratienet',
-      geen: 'Geen kaartdata voor Nederland' }[r.body.net];
+      geen: 'Geen kaartdata voor Nederland',
+      gebied: (r.body.dekking && r.body.dekking.land ? r.body.dekking.land : 'Kaart') + ' actief',
+      'gebied-geen': 'Kaart nog niet gebouwd' }[r.body.net];
     $('#liveBadge').textContent = badge || (r.body.routeerbaarHier === false ? 'Motor kan hier niet routeren' : (r.body.motor || 'Motor actief'));
     /* Alleen melden wat de gebruiker tegenhoudt. Dat we buiten Nederland op
        het eigen net rekenen staat in de badge en hoeft geen melding. */
@@ -774,6 +847,7 @@
   function vraagVertrekpunt() {
     if (!$('#poortReden').textContent.trim()) $('#poortReden').textContent = 'RTG weet nog niet waar u bent. Kies zelf uw vertrekpunt; RTG verzint nooit waar u staat.';
     $('#poort').classList.add('zien');
+    if (token) $('#poortKaarten').hidden = false;
     if ($('#manualPanel').hidden) $('#manualStart').hidden = false;
   }
   let startT, startVraag = 0;
@@ -944,6 +1018,7 @@
            ligt, dus hij zegt dat in plaats van "Motor actief" te blijven tonen. */
         $('#liveBadge').textContent = 'Locatie onbekend';
         $('#manualStart').hidden = false;
+        $('#poortKaarten').hidden = false;
         $('#poort').classList.add('zien');
         wachtNogOpPlek = true;                  // komt hij alsnog, dan bouwen we alsnog
         return;
@@ -951,8 +1026,241 @@
     }
     await initialiseerKaart();
   })();
+
+  /* ------------------------------------------------------------------------
+     KAARTEN: welke gebieden RTG kan leveren, en welke dit lid wil hebben.
+
+     DRIE STANDEN DIE NOOIT DOOR ELKAAR MOGEN LOPEN (kern/navigatie/gebieden.js):
+     aangeboden, gebouwd en gekozen. Het scherm zet ze naast elkaar in plaats
+     van er een groen vinkje van te maken -- "we bieden 200 landen aan" naast
+     "er zijn er 2 gebouwd" is de eerlijke mededeling, en een lid dat op een
+     niet-gebouwde kaart tikt hoort te lezen dat zijn keuze het VERZOEK is.
+     ------------------------------------------------------------------------ */
+  let kaartenStand = null;
+  const kaartenAan = () => $('#kaartenPaneel').classList.contains('zien');
+
+  function kaartenTeken() {
+    const lijst = $('#kaartenLijst');
+    const filter = String($('#kaartenFilter').value || '').trim().toLowerCase();
+    lijst.textContent = '';
+    if (!kaartenStand) return;
+    if (kaartenStand.reden) {
+      const p = document.createElement('p');
+      p.className = 'leeg';
+      p.textContent = kaartenStand.reden;
+      lijst.append(p);
+      return;
+    }
+    const rij = kaartenStand.gebieden.filter(g => !filter || g.naam.toLowerCase().includes(filter)
+      || g.code.includes(filter));
+    if (!rij.length) {
+      const p = document.createElement('p');
+      p.className = 'leeg';
+      p.textContent = filter ? 'Geen gebied met die naam.' : 'De catalogus is leeg.';
+      lijst.append(p);
+      return;
+    }
+    /* Honderden landen horen niet allemaal tegelijk in de DOM: dat maakt het
+       paneel op een telefoon traag. Wie zoekt, ziet alles wat matcht. */
+    for (const g of rij.slice(0, filter ? 200 : 60)) {
+      const el = document.createElement('div');
+      el.className = 'kaartrij';
+      const naam = document.createElement('span');
+      naam.className = 'naam';
+      const b = document.createElement('b');
+      b.textContent = g.naam;
+      const kl = document.createElement('small');
+      kl.textContent = g.waarom ? g.waarom : (g.licentie ? g.licentie + (g.naamsvermelding ? ' - ' + g.naamsvermelding : '') : g.code);
+      naam.append(b, kl);
+      const stand = document.createElement('span');
+      stand.className = 'stand' + (g.gebouwd ? ' gebouwd' : '');
+      stand.textContent = g.gebouwd ? 'Gebouwd' : 'Aangeboden';
+      const knop = document.createElement('button');
+      knop.type = 'button';
+      knop.dataset.code = g.code;
+      knop.setAttribute('aria-pressed', g.gekozen ? 'true' : 'false');
+      knop.textContent = g.gekozen ? 'Gekozen' : 'Kies';
+      /* Een verhindering draagt altijd een reden (GRAMMATICA.md). De reden
+         staat hierboven al in de regel, dus de knop verwijst ernaar. */
+      if (!g.teKiezen && !g.gekozen) { knop.disabled = true; knop.title = g.waarom || ''; }
+      el.append(naam, stand, knop);
+      /* DE TWEEDE KNOP BESTAAT ALLEEN BIJ EEN GEBOUWD PAKKET, want alleen daar
+         valt iets te halen. Een grijze knop bij tweehonderd aangeboden landen
+         zou tweehonderd keer dezelfde uitleg vragen; de stand ernaast zegt al
+         "Aangeboden". */
+      if (g.gebouwd) {
+        const tk = document.createElement('button');
+        tk.type = 'button';
+        tk.dataset.toestel = g.code;
+        const t = kaartenToestel.get(g.code) || null;
+        const opHet = !!(t && t.op);
+        tk.setAttribute('aria-pressed', opHet ? 'true' : 'false');
+        tk.textContent = opHet ? 'Op dit toestel' : 'Naar toestel';
+        /* Kan deze browser het niet, dan draagt de knop de REDEN en niet
+            alleen een grijze tint (GRAMMATICA.md). */
+        if (t && t.kan === false) { tk.disabled = true; tk.title = t.reden || ''; }
+        else if (t && t.bijGebrek) tk.title = t.bijGebrek;
+        else if (opHet && t.gehaaldOp) tk.title = 'Opgehaald op ' + t.gehaaldOp.slice(0, 10)
+          + (t.bytes ? ' - ' + Math.round(t.bytes / 1024) + ' kB' : '')
+          + (t.naamsvermelding ? ' - kaartgegevens: ' + t.naamsvermelding : '');
+        el.append(tk);
+      }
+      lijst.append(el);
+    }
+    if (!filter && rij.length > 60) {
+      const p = document.createElement('p');
+      p.className = 'leeg';
+      p.textContent = 'Nog ' + (rij.length - 60) + ' gebieden. Zoek op naam om ze te vinden.';
+      lijst.append(p);
+    }
+  }
+
+  /* WAT ER OP DIT TOESTEL STAAT, GEMETEN EN NIET ONTHOUDEN. De server kan dit
+     niet weten (zijn antwoord zegt `opToestel: null` met die reden), dus het
+     scherm meet het bij elke keer openen. Alleen voor GEBOUWDE gebieden: bij
+     de rest valt er niets te halen, en tweehonderd keer in de opslag kijken
+     maakt het paneel op een telefoon traag. */
+  const kaartenToestel = new Map();
+  async function toestelMeten() {
+    kaartenToestel.clear();
+    const P = window.RTGKaartPakket;
+    if (!kaartenStand || !Array.isArray(kaartenStand.gebieden)) return;
+    const gebouwd = kaartenStand.gebieden.filter(g => g.gebouwd);
+    if (!P) {
+      for (const g of gebouwd) kaartenToestel.set(g.code, { kan: false, op: false,
+        reden: 'Deze pagina kan de opslag van dit toestel niet bereiken.' });
+      return;
+    }
+    const m = P.kan();
+    if (!m.ok) {
+      for (const g of gebouwd) kaartenToestel.set(g.code, { kan: false, op: false, reden: m.reden });
+      return;
+    }
+    for (const g of gebouwd) {
+      try { kaartenToestel.set(g.code, await P.stand(g.code)); }
+      catch (e) { kaartenToestel.set(g.code, { kan: false, op: false, reden: 'De opslag is niet te lezen.' }); }
+    }
+  }
+
+  async function kaartenLaad() {
+    const r = await api('gebieden');
+    if (r.status !== 200) { zeg(r.body.error || 'De kaarten zijn niet op te halen.'); return; }
+    kaartenStand = r.body;
+    await toestelMeten();
+    const t = r.body.telling || {};
+    const opDit = [...kaartenToestel.values()].filter(x => x && x.op).length;
+    /* De tekst zegt eerst wat er IS en dan wat het toestel ervan heeft, en
+       daarna wat de browser ervan belooft -- in die volgorde, want het laatste
+       is de zin die niemand verwacht: opslag in een browser is niet van ons. */
+    $('#kaartenUitleg').textContent = t.aangeboden
+      ? t.aangeboden + ' gebieden aangeboden, ' + t.gebouwd + ' gebouwd, ' + t.gekozen + ' door u gekozen, '
+        + opDit + ' op dit toestel. ' + (kaartenRuimte || r.body.opToestelWaarom || '')
+      : 'De kaarten die RTG kan leveren. Kies wat u wilt hebben.';
+    kaartenTeken();
+  }
+
+  /* De ruimte staat apart en wordt EEN keer per opening gevraagd: het is een
+     mededeling over het toestel en niet over een gebied. `null` betekent hier
+     onbekend en wordt dus niet als nul getoond. */
+  let kaartenRuimte = '';
+  async function ruimteMeten() {
+    const P = window.RTGKaartPakket;
+    kaartenRuimte = '';
+    if (!P || !P.kan().ok) return;
+    try {
+      const r = await P.ruimte();
+      const mb = (n) => Math.round(n / 1048576) + ' MB';
+      const deel = r.quotum ? 'Van de opslag op dit toestel is ' + mb(r.gebruikt || 0) + ' van ' + mb(r.quotum)
+        + ' in gebruik. ' : '';
+      kaartenRuimte = deel + (r.blijft === true
+        ? 'Uw browser bewaart deze kaarten totdat u ze weghaalt.'
+        : r.blijft === false
+          ? 'Uw browser mag deze kaarten opruimen als de opslag vol loopt; RTG kan dat niet beloven.'
+          : 'Of uw browser deze kaarten bewaart, zegt hij niet.');
+    } catch (e) { kaartenRuimte = ''; }
+  }
+
+  async function kaartenOpen() {
+    const paneel = $('#kaartenPaneel');
+    if (kaartenAan()) {
+      paneel.classList.remove('zien');
+      paneel.hidden = true;
+      $('#kaartenKnop').setAttribute('aria-expanded', 'false');
+      return;
+    }
+    paneel.hidden = false;
+    paneel.classList.add('zien');
+    $('#kaartenKnop').setAttribute('aria-expanded', 'true');
+    await ruimteMeten();
+    await kaartenLaad();
+  }
+  $('#kaartenKnop').addEventListener('click', kaartenOpen);
+  $('#poortKaarten').addEventListener('click', kaartenOpen);
+  $('#kaartenSluit').addEventListener('click', () => {
+    $('#kaartenPaneel').classList.remove('zien');
+    $('#kaartenPaneel').hidden = true;
+    $('#kaartenKnop').setAttribute('aria-expanded', 'false');
+  });
+  $('#kaartenFilter').addEventListener('input', kaartenTeken);
+  /* DE TOESTELKNOP. Ophalen betekent: manifest vragen, delen halen, elk deel
+     tegen zijn controlegetal houden, en pas dan bewaren -- dat alles zit in
+     shared/kaartpakket.js. Hier staat alleen de knop: hij zegt wat hij doet,
+     hij blijft uit bij een lopende download, en een mislukking komt op het
+     scherm met de reden van de laag zelf. */
+  $('#kaartenLijst').addEventListener('click', async (e) => {
+    const tk = e.target.closest('button[data-toestel]');
+    if (!tk || tk.disabled) return;
+    const P = window.RTGKaartPakket;
+    if (!P) { zeg('Deze pagina kan de opslag van dit toestel niet bereiken.'); return; }
+    const code = tk.dataset.toestel;
+    const erop = tk.getAttribute('aria-pressed') === 'true';
+    tk.disabled = true;
+    if (erop) {
+      const uit = await P.weg(code);
+      tk.disabled = false;
+      zeg(uit && uit.weg ? 'De kaart staat niet meer op dit toestel.' : 'Er stond niets om weg te halen.');
+      await kaartenLaad();
+      return;
+    }
+    tk.textContent = 'Manifest...';
+    const mf = await api('gebied/pakket', { code });
+    if (mf.status !== 200) {
+      tk.disabled = false; tk.textContent = 'Naar toestel';
+      zeg(mf.body.error || 'Deze kaart is niet op te halen.');
+      return;
+    }
+    const uit = await P.haal(code, { manifest: mf.body, token,
+      opVoortgang: (v) => { tk.textContent = v.klaar + '/' + v.totaal; } });
+    tk.disabled = false;
+    if (uit.error) { tk.textContent = 'Naar toestel'; zeg(uit.error); await kaartenLaad(); return; }
+    /* De naamsvermelding komt MEE op het scherm zodra de kaart er staat: ODbL
+       vraagt hem zolang de gegevens er zijn, niet alleen bij het downloaden.
+       Hij staat ook in de regel zelf; deze melding is de bevestiging. */
+    zeg('De kaart van ' + code + ' staat op dit toestel (' + Math.round(uit.bytes / 1024) + ' kB). '
+      + (mf.body.naamsvermelding ? 'Kaartgegevens: ' + mf.body.naamsvermelding + '. ' : '')
+      + (uit.blijft === false ? 'Uw browser mag hem opruimen.' : ''));
+    await ruimteMeten();
+    await kaartenLaad();
+  });
+  $('#kaartenLijst').addEventListener('click', async (e) => {
+    const knop = e.target.closest('button[data-code]');
+    if (!knop || knop.disabled) return;
+    const code = knop.dataset.code;
+    const gekozen = knop.getAttribute('aria-pressed') === 'true';
+    knop.disabled = true;
+    const r = await api(gekozen ? 'gebied/weg' : 'gebied/kies', { code });
+    knop.disabled = false;
+    if (r.status !== 200) { zeg(r.body.error || 'Dat lukte niet.'); return; }
+    /* De hele stand opnieuw ophalen in plaats van de knop zelf omzetten: de
+       server weet of het pakket er ligt, en twee plekken die dezelfde stand
+       bijhouden gaan uit elkaar lopen. */
+    await kaartenLaad();
+    if (!gekozen && r.body.wat) zeg(r.body.wat);
+  });
 })();
 </script>
+<script src="/shared/kaartopslag.js" defer></script>
+<script src="/shared/kaartpakket.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

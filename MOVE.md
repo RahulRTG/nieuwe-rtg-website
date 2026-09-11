@@ -186,6 +186,19 @@ niet betrouwbaar* -- gerekend uit echte gegevens door de echte motor.
   gemeten in een browser: 60 klikpogingen, *"#rtg-cookie intercepts pointer
   events"*. Dat is niet in deze tak opgelost: het raakt 313 schermen en hoort
   een eigen ronde met een eigen proef.
+- **EEN NIEUW SCHERM MOET OP VIER PLEKKEN WORDEN INGESCHREVEN, en de keuring
+  zegt er niets over.** `/apps/move.html` stond in `MAPPEN` (de bank) en werkte,
+  maar niet in `server/kern/wereldroutes/life.js` (wie bezit deze functie),
+  niet in `public/shared/rtg-world-identity.js` (welke vaste kamer en welk
+  materiaal) en het laadde het Heritage-blad niet. `npm run check` bleef
+  "Alles in orde" zeggen; negen TOETSEN zakten, verspreid over vier bestanden,
+  met meldingen die er alle negen anders uitzagen ("mist zijn vaste wereld",
+  "kiest een ongeoorloofde materiaalvariant", "de appboom hoort 303
+  HTML-bestanden te bevatten"). Dat is nu gerepareerd, en de les is de
+  vindplaats: `npm run heritage:controle` noemt het achterlopende scherm bij
+  naam, en de twee registers zijn met de hand bij te werken. Wie een scherm
+  toevoegt, draait die controle -- de statische keuring vangt dit niet.
+
 - **Geen achtergrondwachter.** Move rekent op het moment van opvragen, net als
   de Reiswacht. Een wachter die doorwerkt terwijl de app dicht is, is een eigen
   besluit met een eigen prijs en groeit hier niet stilletjes bij.

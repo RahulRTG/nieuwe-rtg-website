@@ -1,5 +1,10 @@
 # Nederlands wegennet in RTG Navigatie
 
+> Nederland is sinds de gebiedslaag EEN geval en niet de hele kaart: welke
+> gebieden RTG aanbiedt, hoe een lid ze kiest en waarom "aangeboden" geen
+> dekking is, staat in `KAARTEN.md`. Alles hieronder blijft gelden voor de
+> Nederlandse bron.
+
 RTG Navigatie gebruikt voor Nederland het **Nationaal Wegenbestand (NWB)** van
 Rijkswaterstaat. De dataset is landsdekkend, publiek domein onder CC0 1.0 en
 bevat de topologische begin- en eindjunctie van ieder wegvak. Een routeverzoek

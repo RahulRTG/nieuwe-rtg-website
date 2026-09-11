@@ -98,6 +98,11 @@ Object.assign(SLEUTELS,
   require('./idemsleutels-commerce').SLEUTELS,
   /* De kale ronde van 30 augustus 2026, met per regel het identiteitsveld. */
   require('./idemsleutels-kaleronde').SLEUTELS,
+  /* De carrierelaag (vertegenwoordiging, jeugdbestuur, rugdekking): achttien
+     routes, per stuk gemeten met een dubbeltik-ronde. Zie de kop daar voor
+     waarom `zelfdeVerzoek` hier meestal een TOESTANDSCONTROLE is en geen
+     duplicaatlaag -- dat verschil wordt niet weggepoetst. */
+  require('./idemsleutels-carriere').SLEUTELS,
   /* En de andere kant van diezelfde ronde: wat je met opzet NIET dedupliceert,
      elk met een reden. Zie de kop van dat bestand. */
   require('./idemsleutels-kaleronde-b').SLEUTELS,

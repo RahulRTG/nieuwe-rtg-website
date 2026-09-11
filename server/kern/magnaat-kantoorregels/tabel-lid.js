@@ -53,5 +53,36 @@ module.exports = [
      streep, want de functiecatalogus draagt het KALE prefix als codepunt
      (../../functies/register/cat-life.js) -- dezelfde halve dekking waar de
      tenant-regels in ./tabel.js voor waarschuwen. */
-  [/\/api\/vertegenwoordiging(?:[\s/]|$)|\/vertegenwoordiging\.html/, 'juridisch', 'Juridisch']
+  [/\/api\/vertegenwoordiging(?:[\s/]|$)|\/vertegenwoordiging\.html/, 'juridisch', 'Juridisch'],
+
+  /* RTG RUGDEKKING hoort NIET bij Juridisch maar bij Financien, en dat is geen
+     smaakkwestie. Een machtiging hierboven is een rechtsfiguur en verplaatst
+     niets; rugdekking legt vast dat RTG een MENS geld gaat geven -- commercieel
+     met een factuur, of als beurs. Het besluit dat een kamer hier neemt gaat
+     over een bedrag en een tegenprestatie, en de schakelaar van de beurs is de
+     uitbetaalpositie van dit huis (kern/bevoegdheid/lijst-afhankelijk.js).
+
+     De VOOGDIJ valt er wel onder Juridisch, samen met de machtiging waar zij
+     bij hoort: wie meetekent voor een minderjarige is dezelfde vraag als wie
+     namens hem mag handelen, en die twee over twee kamers verdelen betekent dat
+     niemand de hele keten ziet.
+
+     Dezelfde afsluiting op `(?:[\s/]|$)` als hierboven, en om dezelfde reden:
+     de functiecatalogus draagt het kale prefix als codepunt. */
+  [/\/api\/office\/voogdij(?:[\s/]|$)/, 'juridisch', 'Juridisch'],
+  [/\/api\/(?:office\/)?rugdekking(?:[\s/]|$)/, 'financien', 'Financien'],
+
+  /* HET SCHERM WAAROP EEN LID ZIJN IDENTITEIT AANTOONT hoort bij dezelfde kamer
+     als de kant waar een medewerker het aftekent: `office/verifications` ligt in
+     ./tabel.js bij Juridisch, met de reden dat een mens van RTG een stuk ZIET en
+     tekent dat hij het heeft gezien -- zonder de inhoud te beoordelen, want RTG
+     is geen inspectie. Dit is de andere helft van precies die handeling, en de
+     twee helften over twee kamers verdelen betekent dat niemand de keten ziet.
+
+     Hij staat hier en niet in ./tabel-breed.js omdat die het brede patroon
+     `verify` naar Intern & IT stuurt. Dat is juist voor de technische
+     verify-routes (een token, een passkey) en verkeerd voor deze: hier draait
+     het niet om een sleutel maar om een identiteitsbewijs. Smal gaat voor
+     breed, en deze lijst wordt voor die brede geplakt. */
+  [/\/apps\/verificatie\.html/, 'juridisch', 'Juridisch']
 ];

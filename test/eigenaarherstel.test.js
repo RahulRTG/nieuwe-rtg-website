@@ -54,12 +54,24 @@ test('2. inrichten geeft drie delen en bewaart alleen de verifier', () => {
 });
 
 test('3. een geldig paar levert WACHTTIJD op, geen toegang', () => {
-  const { h, mails, meldingen } = opzet();
+  const { h, mails, meldingen, nu } = opzet();
   const { delen } = h.richtIn();
   const r = h.start(delen[0], delen[1]);
   assert.equal(r.status, 200);
   assert.ok(r.klaarOp, 'er staat een moment waarop het bruikbaar wordt');
-  assert.ok(Date.parse(r.klaarOp) > Date.now() - DAG, 'en dat ligt in de toekomst');
+  /* OP DE EIGEN KLOK VAN DEZE TOETS, en dat is de hele reden dat `nu` een
+     parameter is. Hier stond `Date.now() - DAG`: een gepinde klok op
+     2026-09-03 vergeleken met de ECHTE tijd. Zeven dagen wachttijd zetten
+     `klaarOp` dan op 2026-09-10, dus de bewering hield het precies tot 11
+     september en zakte daarna elke dag -- zonder dat er een regel code was
+     veranderd. Een toets die op de kalender zakt in plaats van op gedrag, meldt
+     een storing die er niet is en verbergt er een die er wel komt.
+
+     Meteen scherper gemaakt ook: "ligt in de toekomst" was zwakker dan wat deze
+     weg belooft. De belofte is ZEVEN DAGEN (toets 2 legt dat getal vast), en
+     dat is precies wat hier nu staat. */
+  assert.equal(Date.parse(r.klaarOp), nu() + 7 * DAG,
+    'exact zeven dagen na nu, gemeten op de klok die deze toets zelf zet');
   assert.equal(h.herstelvensterOpen(), false, 'starten opent NIETS');
   assert.equal(mails.length, 1, 'en het is luid: er gaat een mail naar de eigenaar');
   assert.equal(mails[0].naar, 'eigenaar@x.nl');

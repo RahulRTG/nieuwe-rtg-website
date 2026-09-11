@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-11T12:17:32.763Z",
-    "commit": "159b6ea0",
+    "op": "2026-09-11T16:05:55.925Z",
+    "commit": "8b46e78a",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1440,6 +1440,21 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "carriereledger.e2e.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 12,
+      "scherp": "gezakt"
+    },
+    "carriereledger.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/carriereledger/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
     "cdt.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1489,6 +1504,14 @@
       "operator": "<=-><#0",
       "gezakt": 2,
       "geprobeerd": 4
+    },
+    "cijferopmens.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/cijferopmens.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "claims-btw.test.js": {
       "soort": "puur",

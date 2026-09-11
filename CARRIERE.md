@@ -386,6 +386,59 @@ invoer voedde. Gevonden door `test/vertegenwoordiging.e2e.test.js` tegen een
 draaiende server, en dat is de reden dat die suite naast de unittoetsen bestaat en
 niet in plaats daarvan.
 
+## 6b. Een nieuwe laag krijgt niet vanzelf een eigenaar
+
+Een vondst uit het afmaken van nummer 5, die voor elke volgende laag geldt en
+niet alleen voor deze.
+
+Het RTG Controleregister legt elk codepunt bij een bestaande RTG-kamer, en de
+laatste terugval (`Onderzoek & data`) is **met opzet rood**: onbekend werk hoort
+niet stilletjes een eigenaar te krijgen. Acht routes, een scherm en een functie
+kwamen daar terecht, want niemand had een regel geschreven die ze bij een kamer
+legt.
+
+Drie dingen daar niet wegpoetsen.
+
+**Het dekkingsPERCENTAGE bleef op 100 staan terwijl er zestien gaten waren.**
+Zestien onvolledige cellen op een noemer van duizenden ronden weg
+(`Math.round(goed / totaal * 1000) / 10`), en 99,96 leest als 100,0. Dat is geen
+fout in de meter: het is precies waarom `test/kantoren.test.js` `metGaten` apart
+toetst en niet op het percentage vertrouwt. Een samengesteld cijfer verbergt
+welke cel bewoog — dezelfde regel als in `BEWIJSMACHINE.md` over het
+entropiecijfer.
+
+**De regel dekt de routes, het scherm én de functie, in één regel.** Losse regels
+lopen na een hernoeming uit elkaar, en dan ligt dezelfde capability bij twee
+kamers. En hij sluit af op `(?:[\s/]|$)` in plaats van op een schuine streep,
+want de functiecatalogus draagt het **kale** prefix `/api/vertegenwoordiging` als
+codepunt (`server/functies/register/cat-life.js`): een regel die de routes wel
+pakt en de functie niet, dekt de helft en meldt zich niet. Die valkuil stond al
+uitgeschreven bij de tenant-regels — en werd hier prompt herhaald.
+
+**De regel hoort in de ledenlaag, en dat is geen plaatsingsdetail.** De
+regeltabel is al vier keer geknipt (`tabel.js` + `tabel-lid` + `tabel-hdi` +
+`tabel-breed`, in die volgorde achter elkaar geplakt, want volgorde is gedrag).
+De eerste poging zette de regel in `tabel.js` — die kwam daarmee op 9802 bytes,
+en de ratel `keuringOmvang` sloeg aan: boven 9400 meldt de keuring *"knip er een
+deelbestand af zolang het rustig kan"*. De verleiding is dan om het commentaar
+in te korten tot het net past; dat is precies het wegpoetsen dat die ratel moet
+voorkomen. De regel staat nu in `tabel-lid.js`, direct achter
+`mijn-gegevens | mijn-post | mijn-relaties`, en dat is ook inhoudelijk zijn
+familie: de zelfbedieningslaag van het lid over zijn eigen zeggenschap. Dat het
+niets anders verschoof is nagerekend en niet aangenomen — over een corpus van
+5476 paden (alle routes, alle schermen, alle functiebronstrings) veranderen er
+precies twee, en dat zijn deze.
+
+**De kamer is Juridisch en niet de Ledenbalie.** Een machtiging waarmee een mens
+commercieel namens een mens handelt is een rechtsfiguur: een bevoegdheid met een
+grond, een berekend verval, intrekken, en een spoor van geweigerde pogingen. De
+Ledenbalie doet inzage in het dossier van een lid met een reden; hier is RTG juist
+géén partij — de cliënt machtigt zijn eigen vertegenwoordiger en aanvaardt zelf.
+Dezelfde redenering als bij `vakbewijs` en `persoonseis`, die om die reden ook
+niet bij HR liggen.
+
+---
+
 ## 7. Wat dit document NIET zegt
 
 - Het zegt niet dat de carrièrelus niet bestaat. Het zegt dat zij gemeten geen

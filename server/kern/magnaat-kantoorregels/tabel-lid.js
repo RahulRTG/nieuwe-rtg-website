@@ -40,5 +40,18 @@ module.exports = [
      regels lopen na een hernoeming uit elkaar, en dan hangt het scherm ergens
      anders dan de deur die het bedient. */
   [/(?:^|\/)mijn[-/](?:tweefactor|sessies|herstelkanaal)/, 'intern', 'Intern & IT'],
-  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch']
+  [/(?:^|\/)mijn[-/](?:gegevens|post|relaties)/, 'juridisch', 'Juridisch'],
+  /* RTG Vertegenwoordiging (CARRIERE.md par. 6a en 6b) hoort in deze familie en
+     niet bij de Ledenbalie: die doet inzage in het dossier van een lid met een
+     reden, terwijl RTG hier juist GEEN partij is -- de client machtigt zijn
+     eigen vertegenwoordiger en aanvaardt zelf. Een machtiging waarmee een mens
+     commercieel namens een mens handelt is een rechtsfiguur, net als `mijn-
+     relaties` hierboven, en ligt dus bij Juridisch.
+
+     Een regel voor de routes, het scherm EN de functie, zodat ze niet bij drie
+     kamers belanden. Hij sluit af op `(?:[\s/]|$)` en niet op een schuine
+     streep, want de functiecatalogus draagt het KALE prefix als codepunt
+     (../../functies/register/cat-life.js) -- dezelfde halve dekking waar de
+     tenant-regels in ./tabel.js voor waarschuwen. */
+  [/\/api\/vertegenwoordiging(?:[\s/]|$)|\/vertegenwoordiging\.html/, 'juridisch', 'Juridisch']
 ];

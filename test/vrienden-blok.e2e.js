@@ -47,9 +47,27 @@ const pw = laadPlaywright();
 
 /* De elementen die pas NA de kapotte regel worden opgezocht of gebonden. Wie
    deze lijst inkort, moet zich afvragen of hij het einde van het blok nog meet.
-   `pinNoodKnop` staat er als eerste: dat is de knop die ontbrak. */
+   `pinNoodKnop` staat er als eerste: dat is de knop die ontbrak.
+
+   `#storyPlus` STOND HIER EN HOORT ER NIET, en dat is nagemeten en niet gevonden
+   door te lezen: van de vijftien is hij de enige die niet op het hoogste niveau
+   van het blok wordt gebonden. Veertien staan op inspringing 0 (regel 792 t/m
+   1051 van vrienden.html), `#storyPlus` staat op inspringing 2 -- binnen
+   `laadStories()`. Hij bestaat dus pas als een DERDE verzoek
+   (/api/rtf/social/stories) klaar is en de rij opnieuw is getekend, en daar wacht
+   deze toets hieronder niet op. Dat is een wedloop: de toets keek op een willekeurig
+   moment of een element bestond dat van een verzoek afhangt dat hij nooit afwacht.
+   Hij zakte daardoor op 11 september 2026 in CI terwijl er aan Vrienden niets was
+   veranderd.
+
+   Hij is hier dus niet WEGGEHAALD maar VERPLAATST, naar stap 3b hieronder, met een
+   wacht erbij. Dat meet strikt meer dan wat hier stond: dat `laadStories()` echt is
+   afgelopen. Die functie keert namelijk vroeg terug als /stories faalt
+   (`catch(e){ return; }`), en dan komt de plus-bel er nooit -- maar dat is iets
+   anders dan "het scriptblok is gebroken", en die twee dingen hoorden niet in een
+   lijst met een gedeelde reden te staan. */
 const NA_DE_BREUK = ['#pinNoodKnop', '#chatSend', '#chatX', '#chatBel', '#chatVideo',
-  '#snapBtn', '#stWis', '#studioX', '#snapX', '#storyX', '#storyPlus', '#belWeg',
+  '#snapBtn', '#stWis', '#studioX', '#snapX', '#storyX', '#belWeg',
   '#inkJa', '#inkNee', '#fotoIn'];
 
 test('RTG Vrienden: het scriptblok loopt tot het einde -- lijst, stream, verversing en de late knoppen',
@@ -100,6 +118,19 @@ test('RTG Vrienden: het scriptblok loopt tot het einde -- lijst, stream, ververs
     const ontbreekt = await page.evaluate((lijst) => lijst.filter((s) => !document.querySelector(s)), NA_DE_BREUK);
     assert.deepEqual(ontbreekt, [],
       'elk element dat na de breuk wordt gebonden bestaat; ontbreekt er een, dan gooit die regel en valt de rest weg');
+
+    /* 3b. laadStories() is AFGELOPEN -- en dat is een eigen bewering, geen onderdeel
+       van de lijst hierboven. Zie de kop bij NA_DE_BREUK voor waarom `#storyPlus`
+       daar niet in hoort. Op de TOESTAND wachten en niet op de klok
+       (scripts/klokwacht.js): het verzoek alleen is niet genoeg, de rij moet ook
+       opnieuw getekend zijn. */
+    await wachtOpWaarde(() => paden.some((p) => p.includes('/social/stories')),
+      { ms: 15000, wat: 'de verhalenrij (laadStories())' });
+    await page.waitForSelector('#storyPlus', { timeout: 15000 });
+    assert.ok(await page.evaluate(() => !!document.querySelector('#storyPlus')),
+      'laadStories() is tot het einde gekomen: de plus-bel staat er. Zo niet, dan is ' +
+      '/stories gezakt en keerde die functie vroeg terug -- en dan is de verhalenrij leeg ' +
+      'zonder dat iemand het ziet.');
 
     // en ze doen ook iets: het chatvenster gaat open en weer dicht
     await page.evaluate(() => { const o = document.querySelector('#chatOv'); if (o) o.classList.add('open'); });

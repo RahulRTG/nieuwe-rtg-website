@@ -92,6 +92,24 @@ const CONTRACTEN = Object.fromEntries([
     'De tweede oproep kwam terug met 409 ("Dit verzoek is al aanvaard") en liet geen tweede ' +
     'spoorregel na (1 -> 2 over de hele stap). Een toestandscontrole, geen duplicaatlaag (par. 5o).'),
 
+  /* HET KANTOORBESLUIT, en hij stond er niet. Dertien routes van deze laag
+     kregen een contract en deze ene niet -- gevonden doordat
+     MUTATIECONTRACT.json op EEN LEGACY_PENDING_CLASSIFICATION bleef staan
+     terwijl de grens nul is. De keuring liet hem door (die telt), de toets niet
+     (die eist). Precies waarvoor die nulgrens bestaat.
+
+     Hij hangt aan `kluisAuth` en niet aan de gedeelde code, en dat is hier geen
+     formaliteit: de kern weigert met 403 als `wieKijkt(req)` geen herleidbare
+     naam geeft. Een spoor dat eindigt bij een gedeelde code is geen spoor maar
+     een alibi, en dit besluit zegt dat een volwassene voor een kind mag tekenen. */
+  zelfdeStand('POST /api/office/voogdij/besluit', 'office.voogdij.besluit',
+    'De tweede oproep kwam terug met 409 ("Deze voogdij staat op bevestigd. Er is al een besluit ' +
+    'genomen; een tweede besluit hoort een nieuwe aanvraag te zijn") en de voogdij bleef op EEN ' +
+    'besluit staan. Een toestandscontrole, geen duplicaatlaag (par. 5o). Diezelfde ronde legde bloot ' +
+    'dat de weigering eerst voor ELKE stand dezelfde zin gaf -- een tweede bevestiging hoorde dat de ' +
+    'volwassene nog moest aanvaarden terwijl die dat allang had gedaan. De reden is daarna ' +
+    'standafhankelijk gemaakt; zie de kop bij voogdBesluit in kern/vertegenwoordiging/jeugd-acties.js.'),
+
   zelfdeStand('POST /api/vertegenwoordiging/voogd/tekent', 'vertegenwoordiging.voogdTekent',
     'De tweede oproep kwam terug met 409 ("U heeft hier al voor getekend") en de machtiging bleef ' +
     'op EEN tweede handtekening staan. Een toestandscontrole, geen duplicaatlaag (par. 5o).'),

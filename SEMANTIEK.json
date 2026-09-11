@@ -1,9 +1,9 @@
 {
-  "catalogi": 1070,
-  "verschillendeNamen": 631,
-  "namenInMeerDomeinen": 121,
-  "woordenMetMeerBetekenissen": 103,
-  "betekenissenTotaal": 385,
+  "catalogi": 1074,
+  "verschillendeNamen": 633,
+  "namenInMeerDomeinen": 123,
+  "woordenMetMeerBetekenissen": 105,
+  "betekenissenTotaal": 389,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 47,
   "dubbelingen": 33,
@@ -3548,5 +3548,5 @@
       ]
     }
   ],
-  "bestanden": 3345
+  "bestanden": 3362
 }

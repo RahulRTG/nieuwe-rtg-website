@@ -259,8 +259,25 @@ function main() {
     fs.writeFileSync(eigen, '');
     if (!jsonUit) console.log('De suite draait met het routejournaal aan; dit duurt zolang de suite duurt.\n');
     suite = draaiSuite(eigen);
-    journalen = [eigen];
+    /* EN HET SCHERMJOURNAAL TELT HIER NET ZO GOED MEE. Hier stond
+       `journalen = [eigen]`, en dat sprak de tak hierboven tegen: die neemt het
+       schermjournaal er wel bij, met in zijn eigen commentaar de reden --
+       zonder die ronde blijven de browser-only routes ongeraakt. Draaide de
+       suite hier zelf, dan verdween dat journaal stilzwijgend.
+       Dat is geen theorie: het kostte vijf routes die alleen een schermtoets
+       aanroept (/api/office/commercie/ronde en /openstaand,
+       /api/supplier/prijsgarantie, /api/projectie/kijk en /koppel). Ze stonden
+       alle vijf in .schermjournaal en werden alle vijf als gat gemeld -- en de
+       kop van dit script zegt zelf dat een cijfer dat een hele suite overslaat,
+       leest als een uitspraak over alles. */
+    journalen = [eigen, path.join(WORTEL, '.schermjournaal')].filter(p => fs.existsSync(p));
     herkomst.push({ pad: eigen, geteld: true, reden: 'hier gedraaid' });
+    for (const j of JOURNALEN) {
+      if (j.pad === '.routejournaal') continue;
+      const vol = path.join(WORTEL, j.pad);
+      herkomst.push({ pad: j.pad, geteld: journalen.includes(vol),
+        reden: journalen.includes(vol) ? 'lag er al' : 'bestaat niet -- draai ' + j.suite });
+    }
   }
 
   const routelog = require(path.join(WORTEL, 'server', 'routelog'));

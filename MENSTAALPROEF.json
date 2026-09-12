@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-12T18:24:55.925Z",
-    "commit": "1202d6e3",
+    "op": "2026-09-12T19:41:37.471Z",
+    "commit": "86cc6979",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/menstaalproef.js",
     "node": "v22.22.2"
   },
@@ -12,12 +12,12 @@
   "meet": "server/kern/stuur/menstaal.json tegen server/kern/stuur/spoor.js",
   "corpus": {
     "bestand": "server/kern/stuur/menstaal.json",
-    "gevallenNU": 31,
-    "vingerafdruk": "c231e0cb8cabf46a"
+    "gevallenNU": 34,
+    "vingerafdruk": "99fa3d3290893920"
   },
   "telling": {
-    "gemeten": 30,
-    "binnen": 30,
+    "gemeten": 33,
+    "binnen": 33,
     "teVer": 0,
     "nietGemeten": 1,
     "uitlegvragen": 8,
@@ -25,7 +25,8 @@
     "teVeelVragen": 0,
     "goudenPlakHeel": true,
     "samenhangHeel": true,
-    "referentHeel": true
+    "referentHeel": true,
+    "geldHeel": true
   },
   "goudenPlak": {
     "positief": {
@@ -177,9 +178,63 @@
     "heel": true,
     "wat": "\"die andere\" in vier vormen. B en D zijn structureel hetzelfde geval -- precies EEN alternatief -- en verschillen alleen in bevoegdheid; komen ze even ver, dan is de dubbelzinnigheid opgelost door bevoegdheid te veronderstellen."
   },
+  "geldveiligheid": {
+    "A": {
+      "kwam": "geen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      },
+      "vragen": 1
+    },
+    "B": {
+      "kwam": "klaarzetten",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "PASS",
+        "PROJECTED": "PASS",
+        "EXECUTED": "NOT_RUN"
+      },
+      "vragen": 0
+    },
+    "C": {
+      "kwam": "geen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      },
+      "vragen": 1
+    },
+    "aanname": {
+      "pad": "/api/bank/pas/betaal",
+      "niveau": "voorstel"
+    },
+    "gebreken": [],
+    "heel": true,
+    "wat": "\"betaal die\" in drie toestanden. Het verschil met de referentveiligheid is het PLAFOND en niet de taal: ook met een eenduidige referent komt de keten tot een VOORSTEL en geen stap verder, want geld gaat nooit vanzelf."
+  },
   "perBereikteTrede": {
-    "geen": 27,
-    "klaarzetten": 2,
+    "geen": 29,
+    "klaarzetten": 3,
     "tonen": 1
   },
   "ijking": {
@@ -1260,6 +1315,131 @@
       "context": {
         "aangeboden": "PASS",
         "woorden": 6,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "amb-betaal-die-geen",
+      "input": "betaal die",
+      "klasse": "AMBIGUOUS",
+      "verwachteRoute": "CLARIFY",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "vragen": 1,
+      "magVragen": 1,
+      "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 3,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "amb-betaal-die-1",
+      "input": "betaal die",
+      "klasse": "AMBIGUOUS",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "klaarzetten",
+      "kwam": "klaarzetten",
+      "uit": [
+        "pad /api/bank/pas/betaal (voorstel) -> klaarzetten",
+        "een voorstel gezet (bevestigNodig)"
+      ],
+      "vragen": 0,
+      "magVragen": 1,
+      "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 6,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": true,
+        "geraakt": [
+          "pay"
+        ]
+      },
+      "interpretatie": {
+        "versmald": true,
+        "paden": 12,
+        "gekozen": [
+          "/api/bank/pas/betaal"
+        ]
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "PASS",
+        "PROJECTED": "PASS",
+        "EXECUTED": "NOT_RUN"
+      }
+    },
+    {
+      "id": "amb-betaal-die-3",
+      "input": "betaal die",
+      "klasse": "AMBIGUOUS",
+      "verwachteRoute": "CLARIFY",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "vragen": 1,
+      "magVragen": 1,
+      "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 8,
         "gewist": 0,
         "verwijzingen": 0,
         "canoniek": 0,

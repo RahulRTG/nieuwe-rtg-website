@@ -111,6 +111,29 @@ function bouw({ kaart, contract, herstelproef, herstelbesluit }) {
     });
   }
 
+  /* ================= DE VIJFDELING PER AS =================
+     Een kale teller ("32/42 bewezen") vertelt niet WAAROM de rest ontbreekt, en
+     dat verschil is hier groot: van de tien ongemeten idempotentiepaden is er
+     GEEN ENKELE onbewezen omdat hij faalde -- alle tien staan geblokkeerd op een
+     ontbrekende testwereld. "10 ontbreken" en "10 geblokkeerd, 0 gefaald" zijn
+     twee totaal verschillende verhalen over hetzelfde getal.
+
+     Elke as verklaart daarom hieronder haar eigen standen. En ze verklaart ook
+     welke standen zij UBERHAUPT KAN produceren: een as die `FAILED` altijd op
+     nul houdt omdat er geen weg is om te falen, meldt een nul die niets betekent
+     -- en dat is precies de geruststelling zonder grond die deze hele meter moet
+     uitsluiten. `kan` staat daarom in de uitslag naast de telling. */
+  function vijfdeling(kan, classificeer) {
+    const uit = {};
+    for (const stand of kan) uit[stand] = 0;
+    for (const r of rijen) {
+      const stand = classificeer(r);
+      if (!(stand in uit)) throw new Error('as gaf stand "' + stand + '" die niet in `kan` staat');
+      uit[stand]++;
+    }
+    return { kan, telling: uit };
+  }
+
   const tel = (veld) => {
     const uit = {};
     for (const r of rijen) { const k = String(r[veld]); uit[k] = (uit[k] || 0) + 1; }
@@ -136,11 +159,68 @@ function bouw({ kaart, contract, herstelproef, herstelbesluit }) {
         r.collecties.filter(c => KERNBAKKEN.includes(c)).join(', ') + ')' });
   }
 
+  /* DE VIER ASSEN, elk met haar eigen standen en haar eigen precedentie.
+
+     BEVOEGDHEID. Een waargenomen niet-publieke route is BEWEZEN afgeschermd --
+     de router zag het. PUBLIC is een echte FAILED en geen ontbrekend bewijs.
+     Geen rij in het mutatiecontract is ONBEKEND.
+
+     IDEMPOTENTIE. De METING gaat voor de verklaring: `beschermd` betekent dat de
+     proef het zag houden (dezelfde sleutel gaf hetzelfde antwoord, een VERSE
+     sleutel iets anders). Pas als er niet gemeten is, telt wat het
+     mutatiecontract zegt over WAAROM niet.
+
+     SEMANTIEK. Hier bestaat geen FAILED: een verklaring kan ontbreken of er zijn,
+     maar niet "mislukken". Die stand staat dus niet in `kan`.
+
+     CORRECTIEMODEL. Idem -- FINAL en NOT_APPLICABLE zijn geldige uitkomsten en
+     geen tekort, en er is niets dat kan falen. */
+  const assen = {
+    bevoegdheid: vijfdeling(['PROVEN', 'FAILED', 'UNKNOWN'], (r) =>
+      r.toegang === null ? 'UNKNOWN' : r.toegang === 'PUBLIC' ? 'FAILED' : 'PROVEN'),
+    idempotentie: vijfdeling(['PROVEN', 'FAILED', 'BLOCKED', 'NOT_APPLICABLE', 'UNKNOWN'], (r) => {
+      if (r.idempotentie === 'beschermd') return 'PROVEN';
+      if (r.idempotentie === 'onbeschermd') return 'FAILED';
+      if (r.stand === 'BLOCKED_BY_TEST_FIXTURE') return 'BLOCKED';
+      if (r.stand === 'NOT_APPLICABLE') return 'NOT_APPLICABLE';
+      return 'UNKNOWN';
+    }),
+    semantiek: vijfdeling(['PROVEN', 'UNKNOWN'], (r) =>
+      (r.semantiek && r.semantiek !== 'onbekend') ? 'PROVEN' : 'UNKNOWN'),
+    terugweg: vijfdeling(['PROVEN', 'BLOCKED', 'UNKNOWN'], (r) =>
+      (r.terugweg === 'exact' || r.terugweg === 'compensatie') ? 'PROVEN'
+        : r.terugweg === 'wereldOntbreekt' ? 'BLOCKED' : 'UNKNOWN'),
+    correctiemodel: vijfdeling(['PROVEN', 'NOT_APPLICABLE', 'UNKNOWN'], (r) =>
+      r.herstelKlasse === 'UNKNOWN' ? 'UNKNOWN'
+        : r.herstelKlasse === 'NOT_APPLICABLE' ? 'NOT_APPLICABLE' : 'PROVEN')
+  };
+
   const ratel = {
     geldRoutesPubliek: rijen.filter(r => r.toegang === 'PUBLIC').length,
     geldRoutesZonderSemantiek: rijen.filter(r => r.semantiek === 'onbekend' || r.semantiek === null).length,
     geldRoutesZonderIdemBewijs: rijen.filter(r => r.idempotentie !== 'beschermd').length,
     geldRoutesZonderTerugweg: rijen.filter(r => r.terugweg !== 'exact' && r.terugweg !== 'compensatie').length,
+    /* HIER STOND EEN TEGENSPRAAKTELLER VOOR IDEMPOTENTIE, EN HIJ WAS FOUT.
+       Hij meldde de vijf routes die het mutatiecontract INTENTIONALLY_NON_IDEMPOTENT
+       noemt terwijl de proef `beschermd` mat, met de redenering: als een tweede
+       aanroep een tweede ding hoort te doen, hoe kan hij dan beschermd zijn?
+
+       Die redenering klopt niet, en CLAUDE.md waarschuwt er bij naam voor:
+       "`code-maker` naast een gemeten `beschermd` is GEEN bug, want de proef kent
+       `beschermd` pas toe als de VERSE sleutel iets anders gaf." Nagetrokken in
+       IDEMBESLUIT.json: /api/pay/kascode en /tikcode zijn `code-maker`,
+       /api/bank/rekening/open en /api/wallet/voeg zijn `creatie`.
+
+       De twee uitspraken gaan over verschillende dingen en zijn allebei waar.
+       INTENTIONALLY_NON_IDEMPOTENT zegt: een tweede AANROEP hoort een tweede ding
+       te doen. `beschermd` zegt: met DEZELFDE SLEUTEL gebeurt dat niet, met een
+       verse sleutel wel. Dat is geen botsing maar precies de gewenste stand --
+       een inherent niet-idempotente route met een idem-slot ervoor, zodat een
+       dubbeltik geen tweede rekening opent.
+
+       Een meter die dit als bevinding meldt, roept wolf op de vijf routes die het
+       goed doen. Hij staat hier als commentaar en niet als code, zodat de
+       volgende die deze kruistabel ziet niet dezelfde conclusie trekt. */
     /* Niet "zonder terugweg" maar "zonder VERKLAARD correctiemodel". Een route
        mag FINAL zijn; wat niet mag is dat niemand het heeft opgeschreven. */
     geldRoutesHerstelOnbesloten: rijen.filter(r => r.herstelKlasse === 'UNKNOWN').length,
@@ -165,6 +245,7 @@ function bouw({ kaart, contract, herstelproef, herstelbesluit }) {
       idempotentie: tel('idempotentie'), terugweg: tel('terugweg')
     },
     ratel,
+    assen,
     tegenspraken,
     herstelKlassen: (() => { const u = {}; for (const r of rijen) u[r.herstelKlasse] = (u[r.herstelKlasse] || 0) + 1; return u; })(),
     nietGemeten: {
@@ -203,28 +284,29 @@ if (klachten.length) { for (const k of klachten) console.log('  KLACHT: ' + k); 
 console.log('  wegen die waarde bewegen        ' + g(N) + '   (ONDERgrens: uit de geldkaart)');
 console.log('  gevonden in het mutatiecontract ' + g(register.gemeten.inMutatiecontract));
 console.log('');
-const as = (naam, goed, toelichting) => {
-  console.log('  ' + naam.padEnd(30) + staaf(goed).padStart(7) + '   ' + toelichting);
-};
-as('bevoegdheid: niet publiek', N - ratel.geldRoutesPubliek,
-  ratel.geldRoutesPubliek ? 'LET OP: ' + ratel.geldRoutesPubliek + ' publiek aanroepbaar' : 'geen enkele route is publiek');
-as('semantiek geclassificeerd', N - ratel.geldRoutesZonderSemantiek,
-  ratel.geldRoutesZonderSemantiek + ' zonder verklaarde tweede-aanroep');
-as('idempotentie bewezen', N - ratel.geldRoutesZonderIdemBewijs,
-  ratel.geldRoutesZonderIdemBewijs + ' ongemeten');
-as('terugweg beproefd', N - ratel.geldRoutesZonderTerugweg,
-  ratel.geldRoutesZonderTerugweg + ' zonder beproefde tegenhanger');
-as('correctiemodel verklaard', N - ratel.geldRoutesHerstelOnbesloten,
-  ratel.geldRoutesHerstelOnbesloten + ' op UNKNOWN (HERSTELBESLUIT.json)');
-console.log('  \x1b[2m    ' + Object.entries(register.herstelKlassen)
-  .map(([k, v]) => k + ':' + v).join('  ') + '\x1b[0m');
-if (ratel.geldRoutesHerstelTegenspraak) {
-  console.log('\n  TEGENSPRAAK tussen meting en verklaring:');
-  for (const t of register.tegenspraken) console.log('    ' + t.pad + ' -- ' + t.wat);
+/* HET SCHERM TOONT DE VIJFDELING EN NOOIT EEN KALE TELLER. Wie hier weer
+   "26/42" van maakt, geeft de lezer een noemer zonder verhaal terug. */
+const KLEUR = { PROVEN: '\x1b[32m', FAILED: '\x1b[31m', BLOCKED: '\x1b[33m',
+  NOT_APPLICABLE: '\x1b[2m', UNKNOWN: '\x1b[33m' };
+for (const [naam, a] of Object.entries(register.assen)) {
+  const som = a.kan.map(st => a.telling[st] + ' ' + st).join(', ');
+  console.log('  ' + naam.toUpperCase());
+  for (const st of a.kan) {
+    const n = a.telling[st];
+    console.log('    ' + (n ? KLEUR[st] : '\x1b[2m') + st.padEnd(16) +
+      String(n).padStart(4) + '\x1b[0m' + (st === 'UNKNOWN' && n ? '   \x1b[2m<- hier zit het werk\x1b[0m' : ''));
+  }
+  void som;
 }
-console.log('  crash-herstel                   ' + 'ONBEKEND'.padStart(7) + '   geen meting in dit huis');
-console.log('  externe settlement              ' + 'ONBEKEND'.padStart(7) + '   geen providersleutel gezet');
 console.log('');
+console.log('  crash-herstel                   ' + 'ONBEKEND'.padStart(8) + '   geen meting in dit huis');
+console.log('  externe settlement              ' + 'ONBEKEND'.padStart(8) + '   geen providersleutel gezet');
+console.log('');
+if (ratel.geldRoutesHerstelTegenspraak) {
+  console.log('  TEGENSPRAAK correctiemodel:');
+  for (const t of register.tegenspraken) console.log('    ' + t.pad + ' -- ' + t.wat);
+  console.log('');
+}
 console.log('  \x1b[2mgeen samengesteld cijfer: 42/42 bevoegd en 3/42 terugweg zijn geen 53%\x1b[0m');
 console.log('\ngeschreven: GELDDEKKING.json\n');
 

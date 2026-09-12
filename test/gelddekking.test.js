@@ -229,3 +229,79 @@ test('een verklaring die de meting tegenspreekt, wordt gemeld', () => {
   assert.equal(schoon.ratel.geldRoutesHerstelTegenspraak, 0);
   assert.equal(schoon.ratel.geldRoutesHerstelOnbesloten, 2);
 });
+
+/* ============ DE VIJFDELING PER AS ============
+   Een kale teller ("32/42 bewezen") vertelt niet WAAROM de rest ontbreekt, en
+   dat verschil is hier groot: van de tien onbewezen idempotentiepaden faalde er
+   geen enkele -- ze zijn allemaal geblokkeerd op een ontbrekende testwereld.
+   "10 ontbreken" en "10 geblokkeerd, 0 gefaald" zijn twee andere verhalen. */
+
+test('elke as telt op tot het aantal routes, en meldt alleen standen die zij KAN geven', () => {
+  const r = lees('GELDDEKKING.json');
+  const N = r.gemeten.geldroutes;
+  for (const [naam, a] of Object.entries(r.assen)) {
+    assert.ok(Array.isArray(a.kan) && a.kan.length, naam + ' verklaart geen standen');
+    const som = Object.values(a.telling).reduce((s, v) => s + v, 0);
+    assert.equal(som, N, naam + ' telt op tot ' + som + ' en niet tot ' + N +
+      ' -- een route die in geen enkele stand valt, verdwijnt uit de meting');
+    for (const stand of Object.keys(a.telling))
+      assert.ok(a.kan.includes(stand), naam + ' meldt stand ' + stand + ' die niet in `kan` staat');
+  }
+});
+
+test('een as die een stand nooit kan bereiken, meldt hem ook niet als nul', () => {
+  /* Dit is de reden dat `kan` bestaat. Een as die FAILED altijd op nul houdt
+     omdat er geen weg is om te falen, geeft een nul die niets betekent -- en dat
+     is precies de geruststelling zonder grond die deze meter moet uitsluiten.
+     SEMANTIEK en CORRECTIEMODEL kunnen niet falen: een verklaring ontbreekt of
+     is er, maar mislukt niet. */
+  const r = lees('GELDDEKKING.json');
+  assert.ok(!r.assen.semantiek.kan.includes('FAILED'),
+    'semantiek kan niet falen; een FAILED-nul daar is betekenisloos');
+  assert.ok(!r.assen.correctiemodel.kan.includes('FAILED'),
+    'een correctiemodel kan ontbreken of FINAL zijn, maar niet falen');
+  assert.ok(r.assen.bevoegdheid.kan.includes('FAILED'),
+    'bevoegdheid KAN falen -- een publieke geldroute is een echte FAILED');
+  assert.ok(r.assen.idempotentie.kan.includes('BLOCKED'),
+    'idempotentie moet BLOCKED van UNKNOWN kunnen onderscheiden');
+});
+
+test('idempotentie onderscheidt geblokkeerd van onbewezen', () => {
+  const r = lees('GELDDEKKING.json');
+  const a = r.assen.idempotentie;
+  /* De harde uitspraak van vandaag: geen enkele geldroute FAALT op idempotentie.
+     Zakt dit, dan is er een route die bij een tweede aanroep met dezelfde sleutel
+     een tweede economisch effect veroorzaakt -- en dat is de ernstigste bevinding
+     die deze meter kan doen. */
+  assert.equal(a.telling.FAILED, 0,
+    'een geldroute veroorzaakt een DUBBEL economisch effect bij herhaling. Dit is ' +
+    'geen ontbrekend bewijs maar een gemeten fout.');
+  assert.equal(a.telling.UNKNOWN, 0,
+    'een geldroute is onbewezen zonder dat iemand weet waarom. Elke onbewezen route ' +
+    'hoort een REDEN te dragen (BLOCKED of NOT_APPLICABLE), anders is de meting stil.');
+});
+
+test('bouw(): de vijfdeling verschuift mee met de invoer', () => {
+  /* Zonder deze proef zou de vijfdeling een vaste tabel kunnen zijn die toevallig
+     bij de huidige data past. */
+  const { bouw } = require('../scripts/gelddekking.js');
+  const w = {
+    kaart: { as1Kaart: { geldroutes: [
+      { methode: 'POST', pad: '/api/a', collecties: ['paySaldi'], idempotentie: 'beschermd' },
+      { methode: 'POST', pad: '/api/b', collecties: ['paySaldi'], idempotentie: 'ongemeten' },
+      { methode: 'POST', pad: '/api/c', collecties: ['paySaldi'], idempotentie: 'onbeschermd' }
+    ] } },
+    contract: { rijen: [
+      { route: 'POST /api/a', semantiek: { klasse: 'idempotent' }, toegang: { waargenomen: 'AUTHENTICATED' }, stand: 'PROTECTED' },
+      { route: 'POST /api/b', semantiek: { klasse: 'onbekend' }, toegang: { waargenomen: 'PUBLIC' }, stand: 'BLOCKED_BY_TEST_FIXTURE' },
+      { route: 'POST /api/c', semantiek: { klasse: 'idempotent' }, toegang: { waargenomen: 'AUTHENTICATED' }, stand: 'PROTECTED' }
+    ] },
+    herstelproef: { per: [] }, herstelbesluit: { routes: {} }
+  };
+  const r = bouw(w);
+  assert.equal(r.assen.idempotentie.telling.PROVEN, 1);
+  assert.equal(r.assen.idempotentie.telling.BLOCKED, 1, '/api/b is geblokkeerd, niet onbekend');
+  assert.equal(r.assen.idempotentie.telling.FAILED, 1, '/api/c is gemeten onbeschermd: een echte FAILED');
+  assert.equal(r.assen.bevoegdheid.telling.FAILED, 1, '/api/b is publiek');
+  assert.equal(r.assen.semantiek.telling.UNKNOWN, 1);
+});

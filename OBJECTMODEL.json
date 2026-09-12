@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-12",
   "gemeten": {
-    "bestanden": 2218,
-    "vormen": 1391,
-    "velden": 2018,
-    "modules": 761,
-    "domeinen": 272,
+    "bestanden": 2220,
+    "vormen": 1393,
+    "velden": 2020,
+    "modules": 763,
+    "domeinen": 274,
     "envelopDrempel": 17,
-    "envelop": 29,
-    "veldenDomeineigen": 1422,
+    "envelop": 30,
+    "veldenDomeineigen": 1424,
     "veldenGedeeldVanafVier": 201,
     "gelijkendeVormparen": 20
   },
@@ -42,7 +42,8 @@
     "tot",
     "uitleg",
     "van",
-    "wat"
+    "wat",
+    "wie"
   ],
   "gedeeld": [
     {
@@ -91,18 +92,6 @@
         "kern/commercie",
         "kern/concern",
         "kern/gewoonten"
-      ]
-    },
-    {
-      "veld": "wie",
-      "domeinen": 16,
-      "waar": [
-        "bedrijf",
-        "kern/comm",
-        "kern/commerce",
-        "kern/consent-lezers",
-        "kern/horeca",
-        "kern/isolatie"
       ]
     },
     {
@@ -523,6 +512,18 @@
         "kern/festival",
         "kern/mobiliteit",
         "kern/navigatie"
+      ]
+    },
+    {
+      "veld": "kamer",
+      "domeinen": 9,
+      "waar": [
+        "kern/afdelingen",
+        "kern/bureau",
+        "kern/gast",
+        "kern/homemerken",
+        "kern/levensgraaf",
+        "kern/magnaat-trainingslobby-regie"
       ]
     }
   ],

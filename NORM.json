@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 49,
     "onbewaakt": 0,
-    "ratelTanden": 81,
+    "ratelTanden": 83,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -75,7 +75,9 @@
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 16,
     "geldRoutesZonderIdemBewijs": 10,
-    "geldRoutesZonderTerugweg": 39
+    "geldRoutesZonderTerugweg": 39,
+    "geldRoutesHerstelOnbesloten": 42,
+    "geldRoutesHerstelTegenspraak": 0
   },
   "notities": [
     {
@@ -2100,7 +2102,9 @@
     "geldRoutesPubliek": "2026-09-12",
     "geldRoutesZonderSemantiek": "2026-09-12",
     "geldRoutesZonderIdemBewijs": "2026-09-12",
-    "geldRoutesZonderTerugweg": "2026-09-12"
+    "geldRoutesZonderTerugweg": "2026-09-12",
+    "geldRoutesHerstelOnbesloten": "2026-09-12",
+    "geldRoutesHerstelTegenspraak": "2026-09-12"
   },
   "uitzonderingen": [
     {

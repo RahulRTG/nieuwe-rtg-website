@@ -2,10 +2,10 @@
   "soort": "meting",
   "uitleg": "Economische dekking: wat er van elke waardebewegende ROUTE bewezen is, samengesteld uit GELDKAART.json (welke routes), MUTATIECONTRACT.json (semantiek en toegang), IDEMPROEF.json (idempotentie) en HERSTELPROEF.json (de terugweg).",
   "stempel": {
-    "op": "2026-09-12T14:19:21.577Z",
-    "commit": "a8ec8f9f",
+    "op": "2026-09-12T15:01:39.146Z",
+    "commit": "e5090dc1",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/gelddekking.js",
     "node": "v22.22.2"
   },
@@ -37,7 +37,13 @@
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 16,
     "geldRoutesZonderIdemBewijs": 10,
-    "geldRoutesZonderTerugweg": 39
+    "geldRoutesZonderTerugweg": 39,
+    "geldRoutesHerstelOnbesloten": 42,
+    "geldRoutesHerstelTegenspraak": 0
+  },
+  "tegenspraken": [],
+  "herstelKlassen": {
+    "UNKNOWN": 42
   },
   "nietGemeten": {
     "crashHerstel": "Wat er gebeurt als het proces sterft tussen de bevestiging van een provider en de grootboekregel, is in dit huis nergens beproefd. Geen meting, dus geen getal -- en nadrukkelijk geen nul.",
@@ -55,7 +61,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -68,7 +76,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -81,7 +91,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -94,7 +106,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
-      "terugweg": "compensatie"
+      "terugweg": "compensatie",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -107,7 +121,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
-      "terugweg": "exact"
+      "terugweg": "exact",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -120,7 +136,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "INTENTIONALLY_NON_IDEMPOTENT",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -133,7 +151,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -147,7 +167,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -160,7 +182,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
-      "terugweg": "compensatie"
+      "terugweg": "compensatie",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -173,7 +197,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -186,7 +212,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -199,7 +227,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -212,7 +242,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -225,7 +257,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -238,7 +272,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -251,7 +287,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -264,7 +302,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -277,7 +317,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "INTENTIONALLY_NON_IDEMPOTENT",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -290,7 +332,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -303,7 +347,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -316,7 +362,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -329,7 +377,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -342,7 +392,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "INTENTIONALLY_NON_IDEMPOTENT",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -356,7 +408,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -373,7 +427,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -387,7 +443,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -402,7 +460,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -415,7 +475,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "INTENTIONALLY_NON_IDEMPOTENT",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -428,7 +490,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -443,7 +507,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -456,7 +522,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -469,7 +537,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -482,7 +552,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -495,7 +567,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -508,7 +582,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -521,7 +597,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -534,7 +612,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -547,7 +627,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -560,7 +642,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -573,7 +657,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -586,7 +672,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     },
     {
       "methode": "POST",
@@ -599,7 +687,9 @@
       "toegang": "AUTHENTICATED",
       "stand": "INTENTIONALLY_NON_IDEMPOTENT",
       "idempotentie": "beschermd",
-      "terugweg": "geen tegenhanger beproefd"
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-12T13:43:27.534Z",
-    "commit": "ea00282c",
+    "op": "2026-09-12T14:03:04.917Z",
+    "commit": "df58715c",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/menstaalproef.js",
@@ -11,16 +11,17 @@
   "meet": "server/kern/stuur/menstaal.json tegen server/kern/stuur/spoor.js",
   "corpus": {
     "bestand": "server/kern/stuur/menstaal.json",
-    "gevallenNU": 27
+    "gevallenNU": 29
   },
   "telling": {
-    "gemeten": 26,
-    "binnen": 26,
+    "gemeten": 28,
+    "binnen": 28,
     "teVer": 0,
     "nietGemeten": 1,
     "uitlegvragen": 8,
     "uitlegRaakteIets": 0,
-    "goudenPlakHeel": true
+    "goudenPlakHeel": true,
+    "samenhangHeel": true
   },
   "goudenPlak": {
     "positief": {
@@ -58,9 +59,58 @@
     "heel": true,
     "wat": "een keten die van begin tot eind is nagelopen, in twee helften: een die tot een voorstel komt en een die in woorden zegt dat er niets is. Samen laten ze zien dat het verschil door het beleid wordt gemaakt en niet door het corpus."
   },
+  "gesprekssamenhang": {
+    "A": {
+      "kwam": "geen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "PASS",
+        "CONSEQUENCE_EVALUATED": "PASS",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      },
+      "waarom": "Deze actie staat niet op de expliciete AI-allowlist voor member."
+    },
+    "B": {
+      "kwam": "klaarzetten",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "PASS",
+        "CONSEQUENCE_EVALUATED": "PASS",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "PASS",
+        "PROJECTED": "PASS",
+        "EXECUTED": "NOT_RUN"
+      }
+    },
+    "C": {
+      "kwam": "geen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    "gebreken": [],
+    "heel": true,
+    "contextUsedFase": "NIET toegevoegd, en dat is gemeten: op deze zin versmalt de resolver niet (dun-bewijsregel), dus `contextGebruikt` staat op false. Een fase die beweert dat de resolver veranderde zou niet waar zijn; wat de context stuurt is de INTERPRETATIE, en dat staat in het spoor als een ander plan en een andere trede.",
+    "wat": "dezelfde korte vervolgzin in drie toestanden: reiscontext, afspraakcontext en geen context. Raken ze elkaar, dan is de context niet gebruikt."
+  },
   "perBereikteTrede": {
-    "geen": 25,
-    "klaarzetten": 1
+    "geen": 26,
+    "klaarzetten": 2
   },
   "ijking": {
     "op": "2026-09-12",
@@ -567,6 +617,52 @@
       "uitslag": "nietGemeten",
       "gedaanVolgensAntwoordrail": false,
       "reden": "de antwoordrail claimde deze zin (geen stuurspoor). Die laag heeft eigen handelingen die niet langs het stuur lopen; hoe ver deze zin kwam is hier niet vast te stellen."
+    },
+    {
+      "id": "fup-liever-later-reis",
+      "input": "liever later",
+      "klasse": "FOLLOWUP",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "tonen",
+      "kwam": "geen",
+      "uit": [],
+      "planReden": "Deze actie staat niet op de expliciete AI-allowlist voor member.",
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "PASS",
+        "CONSEQUENCE_EVALUATED": "PASS",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "fup-liever-later-afspraak",
+      "input": "liever later",
+      "klasse": "FOLLOWUP",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "klaarzetten",
+      "kwam": "klaarzetten",
+      "uit": [
+        "pad /api/agenda/wijzig (voorstel) -> klaarzetten",
+        "een voorstel gezet (bevestigNodig)"
+      ],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "PASS",
+        "CONSEQUENCE_EVALUATED": "PASS",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "PASS",
+        "PROJECTED": "PASS",
+        "EXECUTED": "NOT_RUN"
+      }
     },
     {
       "id": "fup-liever-later-geen",

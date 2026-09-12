@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 49,
     "onbewaakt": 0,
-    "ratelTanden": 81,
+    "ratelTanden": 82,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -75,7 +75,8 @@
     "eersteMinuutGezakt": 0,
     "pakteMisgelopen": 0,
     "menstaalTeVer": 0,
-    "goudenPlakGebreken": 0
+    "goudenPlakGebreken": 0,
+    "samenhangGebreken": 0
   },
   "notities": [
     {
@@ -2149,7 +2150,8 @@
     "carriereDomeinenGemeten": "2026-09-11",
     "eersteMinuutGezakt": "2026-09-12",
     "menstaalTeVer": "2026-09-12",
-    "goudenPlakGebreken": "2026-09-12"
+    "goudenPlakGebreken": "2026-09-12",
+    "samenhangGebreken": "2026-09-12"
   },
   "uitzonderingen": [
     {

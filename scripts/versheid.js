@@ -230,6 +230,16 @@ const REGISTERS = [
      die nul moet blijven en die zakt gewoon, ook als dit register oud is. */
   ['GELDKAART.json', 'npm run geldkaart', 'of elke waardemutatie door haar eigen poort ging (RTG Pay en RTG Bank)'],
   ['GELDDEKKING.json', 'npm run gelddekking', 'wat er van elke waardebewegende route bewezen is'],
+  /* OOK EEN MELDER EN GEEN POORT, om exact dezelfde mechanische grond als de
+     geldkaart hierboven: hij komt niet uit `npm run meetronde`. En er is hier
+     een tweede reden die zwaarder weegt dan de eerste -- deze proef start drie
+     servers, doodt er een met een crashverraad en kost een paar minuten. Een
+     poort die dat bij elke commit afdwingt, staat binnen twee weken uit.
+
+     Wat deze meting HARD maakt, hangt net als bij de geldkaart niet hier maar
+     in een toets: test/factuurproef.test.js bewaakt de regel die bepaalt wat
+     als een economische mutatie telt, en die zakt gewoon. */
+  ['FACTUURPROEF.json', 'npm run factuurproef:vast', 'of een geldpad van begin tot eind heel blijft: tweede aanroep, crash, herhaling'],
   /* HERSTELBESLUIT.json STAAT HIER BEWUST NIET, en dat is geen vergetelheid.
      Deze lijst is de INSTRUMENTENlijst: scripts/meetkeuring.js leest hem om te
      bepalen welk script welk register vult, en eist van elk instrument een

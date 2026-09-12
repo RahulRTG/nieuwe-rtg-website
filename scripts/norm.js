@@ -517,6 +517,20 @@ const METERS = [
      terug te draaien is terwijl een mens hem definitief noemde. */
   { sleutel: 'geldRoutesHerstelOnbesloten', richting: 'omlaag', wat: 'geldroutes zonder verklaard correctiemodel (HERSTELBESLUIT.json)' },
   { sleutel: 'geldRoutesHerstelTegenspraak', richting: 'omlaag', wat: 'geldroutes waar de herstelverklaring de meting tegenspreekt' },
+  /* DE VERTICALE GELDPROEF, EN MET OPZET TWEE TANDEN (FACTUURPROEF.json).
+
+     Eén tand zou de zeven stappen tot een cijfer maken, en dan verdwijnt precies
+     het onderscheid waarvoor de vijfdeling bestaat: een stap die GEZAKT is (er
+     bewoog geld waar dat niet mocht) en een stap die ONBEWEZEN is (er is niets
+     gemeten) vragen het tegenovergestelde. De eerste is een defect dat naar nul
+     moet, de tweede is werk dat nog niet gedaan is.
+
+     `geldpadGezakt` staat vandaag op 1 en dat is geen achterstand maar een
+     VONDST: een crash tussen de duurzame geldcommit en de afwikkeling laat het
+     lid afgeschreven achter met een open factuur. Zie GELDLAT.md par.
+     "Scenario 3". Hij hoort naar nul en de weg erheen staat er beschreven. */
+  { sleutel: 'geldpadGezakt', richting: 'omlaag', wat: 'stappen in de verticale geldproef waar geld bewoog dat niet mocht (FACTUURPROEF.json)' },
+  { sleutel: 'geldpadOnbewezen', richting: 'omlaag', wat: 'stappen in de verticale geldproef zonder bewijs (BLOCKED of UNKNOWN)' },
   /* Het BEREIK van de carrierevormmeter (CARRIERE.md par. 0): hoeveel
      talentdomeinen hij werkelijk heeft gezien. Omhoog, want dit mag niet stil
      dalen -- zie de kop bij CARRIEREVORM.json in ./lib/metingen.js. */
@@ -1240,6 +1254,11 @@ function meet(bronnen) {
     geldRoutesZonderTerugweg: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderTerugweg),
     geldRoutesHerstelOnbesloten: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesHerstelOnbesloten),
     geldRoutesHerstelTegenspraak: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesHerstelTegenspraak),
+    geldpadGezakt: leesRegister('FACTUURPROEF.json', (j) => j.telling.FAILED),
+    /* BLOCKED en UNKNOWN worden hier WEL opgeteld, en alleen hier: allebei
+       betekenen ze "geen bewijs", en de tand die ertoe doet is de andere. Het
+       verschil tussen die twee staat per stap in het register zelf. */
+    geldpadOnbewezen: leesRegister('FACTUURPROEF.json', (j) => (j.telling.BLOCKED || 0) + (j.telling.UNKNOWN || 0)),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
        milliseconden en een afdruk die achterloopt zou hier een groen getal

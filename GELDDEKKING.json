@@ -2,10 +2,10 @@
   "soort": "meting",
   "uitleg": "Economische dekking: wat er van elke waardebewegende ROUTE bewezen is, samengesteld uit GELDKAART.json (welke routes), MUTATIECONTRACT.json (semantiek en toegang), IDEMPROEF.json (idempotentie) en HERSTELPROEF.json (de terugweg).",
   "stempel": {
-    "op": "2026-09-12T16:38:01.160Z",
-    "commit": "08865f12",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-12T17:10:54.557Z",
+    "commit": "83d53bfe",
+    "boomVuil": true,
+    "boomAnders": 7,
     "instrument": "scripts/gelddekking.js",
     "node": "v22.22.2"
   },
@@ -37,7 +37,7 @@
   "ratel": {
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
-    "geldRoutesZonderIdemBewijs": 10,
+    "geldRoutesZonderIdemBewijs": 9,
     "geldRoutesZonderTerugweg": 39,
     "geldRoutesHerstelOnbesloten": 42,
     "geldRoutesHerstelTegenspraak": 0
@@ -64,9 +64,9 @@
         "UNKNOWN"
       ],
       "telling": {
-        "PROVEN": 32,
+        "PROVEN": 33,
         "FAILED": 0,
-        "BLOCKED": 7,
+        "BLOCKED": 6,
         "NOT_APPLICABLE": 3,
         "UNKNOWN": 0
       }
@@ -126,6 +126,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -141,6 +143,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -156,6 +160,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -171,6 +177,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "compensatie",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -186,6 +194,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "exact",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -201,6 +211,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "INTENTIONALLY_NON_IDEMPOTENT",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -216,6 +228,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -232,6 +246,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -247,6 +263,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "compensatie",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -262,6 +280,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "INTENTIONALLY_NON_IDEMPOTENT",
       "idempotentie": "ongemeten",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -277,6 +297,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -292,6 +314,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -307,6 +331,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -322,6 +348,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -337,6 +365,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -352,6 +382,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -367,6 +399,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -382,6 +416,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "INTENTIONALLY_NON_IDEMPOTENT",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -397,6 +433,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -412,6 +450,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -427,6 +467,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -442,6 +484,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -457,6 +501,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "INTENTIONALLY_NON_IDEMPOTENT",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -473,6 +519,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -490,8 +538,10 @@
       ],
       "semantiek": "idempotent",
       "toegang": "AUTHENTICATED",
-      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "stand": "PROTECTED",
       "idempotentie": "ongemeten",
+      "padproef": "PROVEN",
+      "padproefInstrument": "factuurproef",
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -508,6 +558,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -525,6 +577,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -540,6 +594,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "INTENTIONALLY_NON_IDEMPOTENT",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -555,6 +611,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -572,6 +630,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -587,6 +647,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -602,6 +664,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -617,6 +681,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -632,6 +698,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -647,6 +715,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "ongemeten",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -662,6 +732,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -677,6 +749,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "ongemeten",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -692,6 +766,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -707,6 +783,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "PROTECTED",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -722,6 +800,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "BLOCKED_BY_TEST_FIXTURE",
       "idempotentie": "ongemeten",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -737,6 +817,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "NOT_APPLICABLE",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null
@@ -752,6 +834,8 @@
       "toegang": "AUTHENTICATED",
       "stand": "INTENTIONALLY_NON_IDEMPOTENT",
       "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
       "herstelGrond": null

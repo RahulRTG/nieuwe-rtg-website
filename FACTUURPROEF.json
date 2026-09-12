@@ -1,0 +1,168 @@
+{
+  "soort": "proef",
+  "uitleg": "Een geldpad van begin tot eind, ECONOMISCH gemeten: niet de status van de route maar de toestand van de vijf geldcollecties eromheen. Zeven stappen, waaronder een crashpunt uit de verraadsmotor (sterf-na-commit) en de herhaling erna. Zie GELDLAT.md, \"Scenario 3, gemeten op een echt geldpad\".",
+  "grens": "DIT IS EEN PAD EN GEEN DEKKING. Wat hier bewezen is, geldt voor POST /api/pay/saldo en voor niets anders. De hashes van de vingerafdruk zijn per proces gezouten, dus over de crash heen zijn alleen aantallen en bedragen vergelijkbaar -- dat staat per stap in de meting. En `PROVEN` op stap 3 gaat over de tweede aanroep, nooit over de crashwindow.",
+  "stempel": {
+    "op": "2026-09-12T17:06:18.780Z",
+    "commit": "83d53bfe",
+    "boomVuil": true,
+    "boomAnders": 6,
+    "instrument": "scripts/factuurproef.js",
+    "node": "v22.22.2"
+  },
+  "instrument": "factuurproef",
+  "pad": "pay.factuur.saldo",
+  "route": "POST /api/pay/saldo",
+  "factuur": "RTG-2026-0207",
+  "geldbakken": [
+    "paySaldi",
+    "payBoekingen",
+    "invoices",
+    "fondsAfdrachten",
+    "socialeAfdrachten"
+  ],
+  "gemetenOp": "2026-09-12T17:05:58.768Z",
+  "stappen": [
+    {
+      "nr": 1,
+      "wat": "de factuur RTG-2026-0207 bestaat en staat open, en het saldo dekt hem",
+      "stand": "PROVEN",
+      "reden": null,
+      "gemeten": {
+        "factuurStand": "open",
+        "saldoCenten": 20000
+      }
+    },
+    {
+      "nr": 2,
+      "wat": "het geldpad voert uit: saldo af, factuur dicht, afdracht geboekt",
+      "stand": "PROVEN",
+      "reden": null,
+      "gemeten": {
+        "status": 200,
+        "saldoVoor": 20000,
+        "saldoNa": 12135,
+        "factuurStand": "paid",
+        "geldbakken": [
+          {
+            "collectie": "fondsAfdrachten",
+            "nVoor": 0,
+            "nNa": 1,
+            "hashGewijzigd": true
+          },
+          {
+            "collectie": "invoices",
+            "nVoor": 4,
+            "nNa": 4,
+            "hashGewijzigd": true
+          },
+          {
+            "collectie": "payBoekingen",
+            "nVoor": 1,
+            "nNa": 2,
+            "hashGewijzigd": true
+          },
+          {
+            "collectie": "paySaldi",
+            "nVoor": 2,
+            "nNa": 3,
+            "hashGewijzigd": true
+          },
+          {
+            "collectie": "socialeAfdrachten",
+            "nVoor": 0,
+            "nNa": 1,
+            "hashGewijzigd": null
+          }
+        ]
+      }
+    },
+    {
+      "nr": 3,
+      "wat": "een identieke tweede aanroep verplaatst nul waarde",
+      "stand": "PROVEN",
+      "reden": null,
+      "gemeten": {
+        "status": 409,
+        "geldbakkenBewogen": [],
+        "spoorBakken": [
+          "apiSpoor",
+          "handelingLog"
+        ],
+        "overigeBakken": [],
+        "saldoCenten": 12135,
+        "factuurStand": "paid"
+      }
+    },
+    {
+      "nr": 4,
+      "wat": "het proces sterft na de duurzame boeking en voor het antwoord",
+      "stand": "PROVEN",
+      "reden": null,
+      "gemeten": {
+        "statusBijKlant": 0,
+        "fout": "fetch failed",
+        "signaal": "SIGKILL"
+      }
+    },
+    {
+      "nr": 5,
+      "wat": "na de herstart is de uitkomst HEEL: helemaal gebeurd of helemaal niet",
+      "stand": "FAILED",
+      "reden": "de crash liet een halve uitkomst achter",
+      "gemeten": {
+        "uitkomst": "HALF",
+        "saldoVoor": 20000,
+        "saldoNa": 12135,
+        "factuurStand": "open",
+        "factuurBoekingen": 1,
+        "afdrachten": 0
+      }
+    },
+    {
+      "nr": 6,
+      "wat": "de herhaling na de crash levert over alles heen exact EEN mutatie",
+      "stand": "PROVEN",
+      "reden": null,
+      "gemeten": {
+        "status": 200,
+        "saldoCenten": 12135,
+        "factuurStand": "paid",
+        "factuurBoekingen": 1,
+        "factuurCenten": -7865,
+        "betaalBewijzen": 1,
+        "afdrachten": 1
+      }
+    },
+    {
+      "nr": 7,
+      "wat": "de terugweg: is deze betaling terug te draaien of te compenseren",
+      "stand": "UNKNOWN",
+      "reden": "er is geen tegenhanger gevonden, dus er is er ook geen uitgevoerd. De compenserende bouwsteen pay.huisUit bestaat wel en heeft geen aanroeper op een factuur. FINAL zou hier een BESLUIT van de eigenaar zijn en geen meting; daarom blijft dit UNKNOWN.",
+      "gemeten": {
+        "kandidatenInHerstelRegister": 0,
+        "compenserendePrimitiveAanwezig": true,
+        "correctiemodel": "UNKNOWN"
+      }
+    }
+  ],
+  "idempotent": true,
+  "crashUitkomst": "half",
+  "correctiemodel": "UNKNOWN",
+  "economischeUitkomst": {
+    "saldoCenten": 12135,
+    "factuurStand": "paid",
+    "factuurCenten": -7865,
+    "afdrachten": 1
+  },
+  "telling": {
+    "stappen": 7,
+    "PROVEN": 5,
+    "FAILED": 1,
+    "BLOCKED": 0,
+    "NOT_APPLICABLE": 0,
+    "UNKNOWN": 1
+  },
+  "gezakt": true,
+  "volledigBewezen": false
+}

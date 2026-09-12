@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-12T16:38:00.882Z",
-  "commit": "08865f12",
-  "boomVuil": false,
-  "boomAnders": 0,
+  "op": "2026-09-12T17:14:01.232Z",
+  "commit": "83d53bfe",
+  "boomVuil": true,
+  "boomAnders": 7,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
@@ -13,9 +13,9 @@
   "totaal": 4922,
   "geclassificeerd": 4922,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3243,
+   "BLOCKED_BY_TEST_FIXTURE": 3242,
    "NOT_APPLICABLE": 1150,
-   "PROTECTED": 404,
+   "PROTECTED": 405,
    "INTENTIONALLY_NON_IDEMPOTENT": 125
   },
   "vastgesteldDoorMens": 1730,
@@ -74094,7 +74094,7 @@
     "grond": null,
     "hindernis": "Deze factuur is al betaald."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
+   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

@@ -319,6 +319,8 @@
     "ritmigratie:vast": "node scripts/ritmigratie.js --vastleggen",
     "doorwerking": "node scripts/doorwerking.js",
     "doorwerking:vast": "node scripts/doorwerking.js --vastleggen",
+    "factuurproef": "node scripts/factuurproef.js",
+    "factuurproef:vast": "node scripts/factuurproef.js --vastleggen",
     "toelatingsproef": "node scripts/toelatingsproef.js",
     "toelatingsproef:vast": "node scripts/toelatingsproef.js --vastleggen",
     "kantoormacht": "node scripts/kantoormacht.js",

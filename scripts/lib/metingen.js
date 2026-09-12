@@ -204,6 +204,12 @@ const REGISTER = {
   'GELDDEKKING.json': { meter: ['geldRoutesPubliek', 'geldRoutesZonderSemantiek',
     'geldRoutesZonderIdemBewijs', 'geldRoutesZonderTerugweg',
     'geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak'] },
+  /* FACTUURPROEF.json hangt aan TWEE tanden en niet aan een, en dat is een
+     besluit en geen slordigheid: `geldpadGezakt` is een defect dat naar nul
+     moet, `geldpadOnbewezen` is werk dat nog niet gedaan is. Een tand die die
+     twee optelt, laat een crashbevinding wegvallen tegen een stap die iemand
+     nog moet meten. Zie de kop van NORM's METERS. */
+  'FACTUURPROEF.json': { meter: ['geldpadGezakt', 'geldpadOnbewezen'] },
   /* HERSTELBESLUIT.json is een VERKLARING en geen meting -- dezelfde vorm als
      ROLLBACKBESLUIT.json hierboven, dat ook aan een geteld gevolg hangt. Wie
      hier een regel bijzet of weghaalt, beweegt een van deze twee tellers: een

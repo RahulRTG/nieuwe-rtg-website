@@ -97,7 +97,7 @@ const CONTRACTEN = {
     bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen open verzoek)', op: '2026-09-12' }
   },
   'POST /api/pay/saldo': {
-    mutatieId: 'pay.factuur.saldo', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
+    mutatieId: 'pay.factuur.saldo', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'PROTECTED', afgetekend: AFGETEKEND,
     waarom: 'DRIE SLOTEN, EN DE DERDE IS EEN SLEUTEL DIE DE AANROEPER NIET KAN WEGLATEN. ' +
       'Deze route beweegt geld over vijf collecties, dus hij is nagekeken. kern/factuursaldo.js ' +
       'draagt (1) de factuurstand -- `status === "paid"` geeft 409 en niets meer open geeft 409; ' +
@@ -110,8 +110,17 @@ const CONTRACTEN = {
       'Dat was fout, gevonden door de kop en de body van kern/factuursaldo.js verder te lezen ' +
       'dan de eerste grendels -- en het is precies de reden dat een verklaring uit de CODE komt ' +
       'en niet uit een meting: de meting had hier hetzelfde gezegd en de fout niet gevonden.',
-    watErMoetKomen: "een OPENSTAANDE factuur op naam van het lid, plus genoeg saldo om hem te voldoen. Dit is de belangrijkste van de zeven: de route beweegt geld over vijf collecties en haar bescherming hangt aan de factuurSTAND en niet aan een sleutel. Pas met deze wereld is te meten of dat slot werkelijk sluit.",
-    bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen openstaande factuur)', op: '2026-09-12' }
+    /* DEZE STOND OP BLOCKED_BY_TEST_FIXTURE, EN DAT WAS EEN AANNAME: de wereld
+       die hij vroeg lag er al (RTG-2026-0207 in server/seed/leden.js). Wie de
+       andere zes leest: kijk eerst in de zaaiset.
+
+       PROTECTED gaat over de TWEEDE AANROEP en niet over de crashwindow, en die
+       twee worden niet samengevoegd -- de proef vond daar een halve toestand.
+       Het hele verhaal staat in GELDLAT.md, "Scenario 3, gemeten op een echt
+       geldpad"; hier alleen de stand en waar hij vandaan komt. */
+    watErMoetKomen: null,
+    bewijs: { gemeten: 'PROTECTED: een identieke tweede aanroep verplaatst nul waarde over alle vijf de geldcollecties (npm run factuurproef, stap 3)',
+      instrument: 'scripts/factuurproef.js', op: '2026-09-12' }
   }
 };
 

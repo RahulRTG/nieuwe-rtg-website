@@ -1564,6 +1564,23 @@ const IJKINGEN = {
       (j) => { j.ratel.geldRoutesHerstelTegenspraak = (j.ratel.geldRoutesHerstelTegenspraak || 0) + 7; return j; },
       () => norm.meet().geldRoutesHerstelTegenspraak - voor.geldRoutesHerstelTegenspraak)
   },
+  /* DE TWEE TANDEN VAN DE VERTICALE GELDPROEF (FACTUURPROEF.json). Ze lezen
+     verschillende velden uit dezelfde `telling`, en juist dat is hier de
+     faalvorm: `geldpadOnbewezen` telt BLOCKED plus UNKNOWN, en een versie die
+     er maar een van leest beweegt bij deze ijking niet genoeg mee. Daarom
+     krijgen die twee velden EEN ONGELIJKE ophoging (2 en 3), zodat een meter
+     die er een vergeet een ander getal geeft dan 5 en de ijking zakt. */
+  geldpadGezakt: {
+    proef: (voor) => metVervangenJson('FACTUURPROEF.json',
+      (j) => { j.telling.FAILED = (j.telling.FAILED || 0) + 4; return j; },
+      () => norm.meet().geldpadGezakt - voor.geldpadGezakt)
+  },
+  geldpadOnbewezen: {
+    proef: (voor) => metVervangenJson('FACTUURPROEF.json',
+      (j) => { j.telling.BLOCKED = (j.telling.BLOCKED || 0) + 2;
+        j.telling.UNKNOWN = (j.telling.UNKNOWN || 0) + 3; return j; },
+      () => norm.meet().geldpadOnbewezen - voor.geldpadOnbewezen)
+  },
   /* DE TAND VAN 10 SEPTEMBER 2026: bewijsAlleenKeten telt de bewijsmechanismen
      die alleen in de keten draaien en niet lokaal (BEWIJSLADDER.json). Zelfde
      vorm als de vier hierboven -- hij telt een POST in een register, dus hij

@@ -65,7 +65,7 @@ const { stempel } = require('./lib/stempel');
 
    `bouw` krijgt de drie registers als gewone argumenten. Geen fs, geen paden,
    geen process.exit -- dat staat allemaal onder require.main hieronder. */
-function bouw({ kaart, contract, herstelproef, herstelbesluit }) {
+function bouw({ kaart, contract, herstelproef, herstelbesluit, padproef }) {
   const klachten = [];
   if (!kaart) klachten.push('GELDKAART.json ontbreekt -- draai npm run geldkaart');
   if (!contract) klachten.push('MUTATIECONTRACT.json ontbreekt');
@@ -87,6 +87,24 @@ function bouw({ kaart, contract, herstelproef, herstelbesluit }) {
      enige die vanzelf ontstaat. */
   const besloten = (herstelbesluit && herstelbesluit.routes) || {};
 
+  /* DE VERTICALE PADPROEVEN ALS VIERDE MEETBRON.
+
+     IDEMPROEF.json meet van BUITEN: geeft een tweede aanroep een ander antwoord.
+     Er zijn geldpaden waar dat niets zegt -- een route mag keurig 409 weigeren
+     terwijl er onderweg al twee collecties zijn aangeraakt. scripts/factuurproef.js
+     meet daar de TOESTAND, en die meting hoort hier mee te tellen.
+
+     WAAROM DIT GEEN VERKLARING MAG WORDEN. Het mutatiecontract zet voor dat pad
+     nu `PROTECTED`, maar die stand is een DECLARATIE van een mens. Zou de
+     classificatie daarop groen worden, dan is de as te halen door een woord te
+     typen. Hij leest daarom de PROEF en niet de stand -- alleen een uitslag die
+     een instrument heeft opgeschreven telt als bewijs. */
+  const perPadproef = new Map();
+  for (const bron of (Array.isArray(padproef) ? padproef : [padproef]).filter(Boolean)) {
+    const s3 = (bron.stappen || []).find(x => x.nr === 3);
+    if (bron.route && s3) perPadproef.set(bron.route, { stand: s3.stand, instrument: bron.instrument || null });
+  }
+
   const rijen = [];
   for (const g of geldroutes) {
     const m = perRoute.get(g.methode + ' ' + g.pad) || null;
@@ -100,6 +118,10 @@ function bouw({ kaart, contract, herstelproef, herstelbesluit }) {
       toegang: m ? ((m.toegang && m.toegang.waargenomen) || 'onbekend') : null,
       stand: m ? m.stand : null,
       idempotentie: g.idempotentie || 'ongemeten',
+      /* Wat een verticale padproef over de TWEEDE AANROEP van deze route zag.
+         `null` betekent: geen proef gedraaid -- nooit "niets gevonden". */
+      padproef: (perPadproef.get(g.methode + ' ' + g.pad) || {}).stand || null,
+      padproefInstrument: (perPadproef.get(g.methode + ' ' + g.pad) || {}).instrument || null,
       terugweg: h ? h.uitslag : 'geen tegenhanger beproefd',
       /* TWEE KOLOMMEN DIE NOOIT SAMENVALLEN. `terugweg` is wat de proef ZAG toen
          zij de tegenhanger uitvoerde; `herstelKlasse` is wat een mens heeft
@@ -181,6 +203,14 @@ function bouw({ kaart, contract, herstelproef, herstelbesluit }) {
     idempotentie: vijfdeling(['PROVEN', 'FAILED', 'BLOCKED', 'NOT_APPLICABLE', 'UNKNOWN'], (r) => {
       if (r.idempotentie === 'beschermd') return 'PROVEN';
       if (r.idempotentie === 'onbeschermd') return 'FAILED';
+      /* De verticale padproef staat NA de idemproef en VOOR elke stand: het is
+         een meting en geen verklaring, en ze meet strenger (de toestand van de
+         geldcollecties in plaats van het antwoord). Een FAILED van de proef is
+         daarom ook echt FAILED -- een strengere meter die iets vindt, wordt niet
+         overstemd door een zachtere die niets zag. */
+      if (r.padproef === 'PROVEN') return 'PROVEN';
+      if (r.padproef === 'FAILED') return 'FAILED';
+      if (r.padproef === 'BLOCKED') return 'BLOCKED';
       if (r.stand === 'BLOCKED_BY_TEST_FIXTURE') return 'BLOCKED';
       /* Structureel niet van buiten te beproeven is iets anders dan een
          ontbrekende fixture, maar voor DEZE as komen ze op hetzelfde neer: er
@@ -208,7 +238,14 @@ function bouw({ kaart, contract, herstelproef, herstelbesluit }) {
   const ratel = {
     geldRoutesPubliek: rijen.filter(r => r.toegang === 'PUBLIC').length,
     geldRoutesZonderSemantiek: rijen.filter(r => r.semantiek === 'onbekend' || r.semantiek === null).length,
-    geldRoutesZonderIdemBewijs: rijen.filter(r => r.idempotentie !== 'beschermd').length,
+    /* DEZE TAND LEEST DEZELFDE TWEE BRONNEN ALS DE AS, en dat is een correctie.
+       Hij telde alleen IDEMPROEF.json, terwijl de as sinds de verticale
+       padproeven een tweede meting kent. Daardoor konden een as en zijn ratel
+       iets anders zeggen over dezelfde route -- twee plekken die een waarheid
+       vasthouden, en de eerste die uit de pas loopt doet dat stil (LAT.md
+       regel 4). De ratel gaat er niet door omhoog: hij telt er precies een
+       minder, en dat is een gemeten verbetering en geen versoepeling. */
+    geldRoutesZonderIdemBewijs: rijen.filter(r => r.idempotentie !== 'beschermd' && r.padproef !== 'PROVEN').length,
     geldRoutesZonderTerugweg: rijen.filter(r => r.terugweg !== 'exact' && r.terugweg !== 'compensatie').length,
     /* HIER STOND EEN TEGENSPRAAKTELLER VOOR IDEMPOTENTIE, EN HIJ WAS FOUT.
        Hij meldde de vijf routes die het mutatiecontract INTENTIONALLY_NON_IDEMPOTENT
@@ -278,7 +315,10 @@ const register = bouw({
   kaart: lees('GELDKAART.json'),
   contract: lees('MUTATIECONTRACT.json'),
   herstelproef: lees('HERSTELPROEF.json'),
-  herstelbesluit: lees('HERSTELBESLUIT.json')
+  herstelbesluit: lees('HERSTELBESLUIT.json'),
+  /* Ontbreekt hij, dan is `padproef` overal null en verandert er niets aan de
+     uitslag: een ontbrekende meting maakt een as nooit slechter dan hij was. */
+  padproef: [lees('FACTUURPROEF.json')].filter(Boolean)
 });
 const { klachten, ratel, rijen } = register;
 const N = register.gemeten.geldroutes;

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1826 bestanden en 12921 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1827 bestanden en 12932 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1826 |
-| losse beweringen (`test(...)`) | 12921 |
+| toetsbestanden | 1827 |
+| losse beweringen (`test(...)`) | 12932 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1204 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1205 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 66 |
 | alleen in de kop *genoemd*, nog niet gemeten | 154 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1610 bestanden, 12539 beweringen.
+1611 bestanden, 12550 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -370,6 +370,7 @@ toets omvalt.
 | `facturatie.test.js` | 6 | gezakt op `liegpoort /api/` | De centrale facturatielaag (kern/facturatie.js): bij elke verkoop krijgt zowel de verkoper als de koper automatisch dezelfde factuur in de app; de PDF is te downloaden; en de AI-factuurtool maakt in gewone taal een... |
 | `factuur.test.js` | 5 | gezakt op `liegpoort /api/` | Facturen downloaden. Zelfgebouwde PDF-schrijver (geen pakketten) + de leden-endpoints om een factuur en een jaaroverzicht op te halen. |
 | `factuurbevroren.test.js` | 4 | gezakt op `===->!==#0` | EEN FACTUUR LEEST NOOIT DE PRIJS VAN VANDAAG. DE FOUT DIE DIT VASTLEGT. |
+| `factuurproef.test.js` | 7 | gezakt op `!==->===#0` | De verticale geldproef -- de PURE helft ervan. De ronde zelf start drie servers en injecteert een crash; dat is een instrument en geen unittoets (`npm run factuurproef`). |
 | `factuursaldo.test.js` | 6 | gezakt op `liegpoort /api/` | De maandfactuur betalen uit het eigen RTG Pay-saldo (/api/pay/saldo, kern/factuursaldo.js): de derde betaalweg naast kaart en munten. De afschrijving loopt via pay.huisIn (autolaad inbegrepen, idempotent) en de... |
 | `fases.test.js` | 4 | gezakt op `liegpoort /api/` | Uitrolfases: de gefaseerde uitrol als voorinstelling. Alles is gebouwd; lanceren is een fase kiezen in plaats van tientallen schakelaars omzetten. |
 | `festival-dienst.test.js` | 11 | gezakt op `!==->===#0` | DE DIENST: ZERO-SEARCH, EN WAT ER NIET BIJ KOMT. WAAROM DIT BESTAAT Een medewerker die zijn dienst opent, hoort niet te hoeven zoeken naar iets wat het systeem al weet: welke dienst is van mij, waar is dat, wie staat... |
@@ -458,7 +459,7 @@ toets omvalt.
 | `geld-rollen.test.js` | 5 | genoemd | KOMT LID B BIJ HET GELD VAN LID A? De perimetertoets (test/perimeter-risico.test.js) bewijst dat niemand ZONDER identiteit door deze deuren komt. |
 | `geld-voorzijde.test.js` | 3 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `geldbeleid.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Geldbeleid, fase 1 van GELD.md: regels met vier niveaus, potten (oormerken binnen het eigen tegoed) en het append-only actielog, getoetst over het routecontract heen -- de UI bouwt blind op deze routes, dus de... |
-| `gelddekking.test.js` | 16 | gezakt op `===->!==#0` | DE TOETS OP DE ECONOMISCHE DEKKING. GELDDEKKING.json hangt aan vier tanden in NORM.json, en die bewaken de VOORRADEN: ze mogen niet stil groeien. |
+| `gelddekking.test.js` | 20 | gezakt op `===->!==#0` | DE TOETS OP DE ECONOMISCHE DEKKING. GELDDEKKING.json hangt aan vier tanden in NORM.json, en die bewaken de VOORRADEN: ze mogen niet stil groeien. |
 | `geldeenheid.test.js` | 10 | -- | DE EENHEID VAN GELD -- en de naam die drie dingen betekende. DEZE TOETS KOMT UIT EEN METING. |
 | `geldgraaf.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Geldgraaf, fase 1 van GELD.md: de cockpit staat voor een vers lid, de patroonherkenning vindt terugkerende posten en meldt een prijsstijging als 'post-duurder', een minimumbuffer-regel geeft een uitzondering met... |
 | `geldgrens.test.js` | 8 | gezakt op `liegpoort /api/` | DE EIGEN GELDGRENS -- een regel die het lid over zichzelf stelt en die echt weigert. WAAROM DEZE TOETS ER IS kern/geldbeleid/regels.js kent vier regelsoorten en ze WAARSCHUWEN allemaal. |

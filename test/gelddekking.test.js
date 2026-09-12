@@ -47,8 +47,13 @@ test('de vier ratelgetallen kloppen met de rijen eronder', () => {
     rij.filter(x => x.toegang === 'PUBLIC').length, 'geldRoutesPubliek');
   assert.equal(r.ratel.geldRoutesZonderSemantiek,
     rij.filter(x => x.semantiek === 'onbekend' || x.semantiek === null).length, 'geldRoutesZonderSemantiek');
+  /* TWEE MEETBRONNEN EN NIET EEN, net als de as zelf. Deze hertelling stond op
+     alleen IDEMPROEF en zakte terecht toen de ratel de verticale padproef ging
+     meetellen -- precies waarvoor hij bestaat. Wie hem hier weer op een bron
+     zet, laat de ratel en zijn hertelling uiteenlopen. */
   assert.equal(r.ratel.geldRoutesZonderIdemBewijs,
-    rij.filter(x => x.idempotentie !== 'beschermd').length, 'geldRoutesZonderIdemBewijs');
+    rij.filter(x => x.idempotentie !== 'beschermd' && x.padproef !== 'PROVEN').length,
+    'geldRoutesZonderIdemBewijs');
   assert.equal(r.ratel.geldRoutesZonderTerugweg,
     rij.filter(x => x.terugweg !== 'exact' && x.terugweg !== 'compensatie').length, 'geldRoutesZonderTerugweg');
 });
@@ -304,4 +309,70 @@ test('bouw(): de vijfdeling verschuift mee met de invoer', () => {
   assert.equal(r.assen.idempotentie.telling.FAILED, 1, '/api/c is gemeten onbeschermd: een echte FAILED');
   assert.equal(r.assen.bevoegdheid.telling.FAILED, 1, '/api/b is publiek');
   assert.equal(r.assen.semantiek.telling.UNKNOWN, 1);
+});
+
+/* ---------- de verticale padproef als VIERDE meetbron ----------
+
+   IDEMPROEF.json leest het ANTWOORD van een tweede aanroep; scripts/factuurproef.js
+   leest de TOESTAND van de geldcollecties eromheen. Die tweede is strenger, en
+   deze vier toetsen houden vast dat hij op de juiste plek in de rangorde staat. */
+
+const wereld = (extra) => Object.assign({
+  kaart: { as1Kaart: { geldroutes: [
+    { methode: 'POST', pad: '/api/x', collecties: ['paySaldi'], idempotentie: 'ongemeten' }
+  ] } },
+  contract: { rijen: [
+    { route: 'POST /api/x', semantiek: { klasse: 'idempotent' },
+      toegang: { waargenomen: 'AUTHENTICATED' }, stand: 'BLOCKED_BY_TEST_FIXTURE' }
+  ] },
+  herstelproef: { per: [] }, herstelbesluit: { routes: {} }
+}, extra || {});
+const proef = (stand) => ({ route: 'POST /api/x', instrument: 'scripts/factuurproef.js',
+  stappen: [{ nr: 3, stand }] });
+
+test('een padproef die de tweede aanroep bewees, haalt een route uit BLOCKED', () => {
+  const { bouw } = require('../scripts/gelddekking.js');
+  const zonder = bouw(wereld());
+  assert.equal(zonder.assen.idempotentie.telling.BLOCKED, 1, 'zonder proef blijft hij geblokkeerd');
+  const met = bouw(wereld({ padproef: [proef('PROVEN')] }));
+  assert.equal(met.assen.idempotentie.telling.PROVEN, 1);
+  assert.equal(met.assen.idempotentie.telling.BLOCKED, 0);
+});
+
+/* DE BELANGRIJKSTE VAN DE VIER. Een strengere meter die iets VINDT mag niet
+   worden overstemd doordat een zachtere niets zag of doordat het contract
+   `BLOCKED` zegt. Zou FAILED wegvallen tegen een stand, dan kan een echte
+   dubbele mutatie worden weggeschreven door een woord in een contract. */
+test('een padproef die FAALT wint van de stand in het contract', () => {
+  const { bouw } = require('../scripts/gelddekking.js');
+  const r = bouw(wereld({ padproef: [proef('FAILED')] }));
+  assert.equal(r.assen.idempotentie.telling.FAILED, 1,
+    'een gemeten dubbele mutatie hoort niet als BLOCKED te lezen');
+  assert.equal(r.assen.idempotentie.telling.BLOCKED, 0);
+});
+
+/* EEN VERKLARING IS GEEN METING. Het mutatiecontract mag `PROTECTED` zetten;
+   dat is een declaratie van een mens. Telde die als bewijs, dan is deze as te
+   halen door een woord te typen -- en dan meet hij het register in plaats van
+   de code. */
+test('een stand PROTECTED zonder meting telt niet als bewijs', () => {
+  const { bouw } = require('../scripts/gelddekking.js');
+  const r = bouw(wereld({ contract: { rijen: [
+    { route: 'POST /api/x', semantiek: { klasse: 'idempotent' },
+      toegang: { waargenomen: 'AUTHENTICATED' }, stand: 'PROTECTED' }
+  ] } }));
+  assert.equal(r.assen.idempotentie.telling.PROVEN, 0, 'een declaratie is geen bewijs');
+  assert.equal(r.assen.idempotentie.telling.UNKNOWN, 1);
+});
+
+/* EEN ONTBREKENDE MEETBRON MAAKT NIETS SLECHTER. Draait de proef niet, dan
+   staat de as precies waar hij stond -- anders wordt een ontbrekend instrument
+   een gemeten verslechtering. */
+test('zonder padproef verandert er niets aan de uitslag', () => {
+  const { bouw } = require('../scripts/gelddekking.js');
+  const a = bouw(wereld());
+  const b = bouw(wereld({ padproef: [] }));
+  const c = bouw(wereld({ padproef: null }));
+  assert.deepEqual(a.assen.idempotentie.telling, b.assen.idempotentie.telling);
+  assert.deepEqual(a.assen.idempotentie.telling, c.assen.idempotentie.telling);
 });

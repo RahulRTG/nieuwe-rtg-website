@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-12T14:19:33.246Z",
-    "commit": "a8ec8f9f",
-    "boomVuil": false,
-    "boomAnders": 3,
+    "op": "2026-09-12T17:16:25.351Z",
+    "commit": "83d53bfe",
+    "boomVuil": true,
+    "boomAnders": 8,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2403,6 +2403,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "factuurproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/factuurproef.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "factuursaldo.test.js": {
       "soort": "server",

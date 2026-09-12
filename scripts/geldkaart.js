@@ -161,7 +161,7 @@ function poortproef() {
   if (!AANDRIJVING.length) { uit.reden = 'geen van de aandrijvende toetsbestanden bestaat'; return uit; }
 
   try { fs.unlinkSync(WACHTBESTAND); } catch (e) { /* stond er niet */ }
-  const r = spawnSync(process.execPath, ['--test', ...AANDRIJVING], {
+  const r = spawnSync(process.execPath, ['--test', '--test-reporter=tap', ...AANDRIJVING], {
     cwd: WORTEL, encoding: 'utf8', timeout: 15 * 60 * 1000,
     env: { ...process.env,
       RTG_GELDWACHT_UIT: WACHTBESTAND,
@@ -171,6 +171,8 @@ function poortproef() {
   const tekst = (r.stdout || '') + (r.stderr || '');
   const pak = n => { const m = tekst.match(new RegExp('^# ' + n + ' (\\d+)$', 'm')); return m ? Number(m[1]) : null; };
   uit.toetsen = { totaal: pak('tests'), geslaagd: pak('pass'), gezakt: pak('fail') };
+  uit.toetsprocesGeslaagd = r.status === 0 && !r.error && !r.signal &&
+    uit.toetsen.totaal > 0 && uit.toetsen.geslaagd !== null && uit.toetsen.gezakt === 0;
 
   let regels = [];
   try {
@@ -341,8 +343,8 @@ if (as2.kernBuitenPoort && as2.kernBuitenPoort.length) {
   console.error('ZAKT: ' + as2.kernBuitenPoort.length + ' schrijver(s) raken een kernbak buiten de waardepoort.');
   fout = 1;
 }
-if (as2.gedraaid && as2.toetsen && as2.toetsen.gezakt) {
-  console.error('ZAKT: ' + as2.toetsen.gezakt + ' aandrijvende toets(en) gezakt; de poortproef draaide op een kapot huis.');
+if (as2.gedraaid && !as2.toetsprocesGeslaagd) {
+  console.error('ZAKT: de aandrijvende toetsen zijn niet volledig geslaagd of hun uitslag kon niet worden gelezen.');
   fout = 1;
 }
 process.exit(fout);

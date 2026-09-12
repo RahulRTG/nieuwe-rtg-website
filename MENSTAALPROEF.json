@@ -1,0 +1,572 @@
+{
+  "stempel": {
+    "op": "2026-09-12T12:52:09.260Z",
+    "commit": "5726f4d8",
+    "boomVuil": false,
+    "boomAnders": 1,
+    "instrument": "scripts/menstaalproef.js",
+    "node": "v22.22.2"
+  },
+  "wat": "hoe ver elke menselijke zin werkelijk komt, gemeten uit het stuurspoor, afgezet tegen de `sideEffectMax` die het contract voor die zin noemt",
+  "meet": "server/kern/stuur/menstaal.json tegen server/kern/stuur/spoor.js",
+  "corpus": {
+    "bestand": "server/kern/stuur/menstaal.json",
+    "gevallenNU": 26
+  },
+  "telling": {
+    "gemeten": 25,
+    "binnen": 25,
+    "teVer": 0,
+    "nietGemeten": 1,
+    "uitlegvragen": 8,
+    "uitlegRaakteIets": 0
+  },
+  "perBereikteTrede": {
+    "geen": 25
+  },
+  "ijking": {
+    "op": "2026-09-12",
+    "wat": "een corpusregel voor \"toon mijn documenten\" die /api/agenda/toevoegen aanroept",
+    "uitslag": "de proef meldde TE_VER: kwam tot klaarzetten terwijl tonen mag, met de reden \"pad /api/agenda/toevoegen (voorstel) -> klaarzetten; een voorstel gezet (bevestigNodig)\"",
+    "envondstOnderweg": "de eerste poging sloeg NIET uit, en dat was geen fout van de meter maar van de mutatie: `begrepen: true` haalt de twijfelpoort niet (kern/rahul/twijfel.js eist een zin van minstens acht tekens). De poort weigerde dus voordat er iets geselecteerd was. Een mutatie die door een andere poort wordt tegengehouden dan de bedoelde, bewijst niets.",
+    "watRTGDAARBIJDEED": "het schrijfpad werd NIET uitgevoerd maar gaf 428 terug -- een voorstel dat een mens moet bevestigen. De keten deed dus precies wat hij belooft; het is de ZIN die verder kwam dan zijn contract toestond."
+  },
+  "teVer": [],
+  "uitlegRaakteIets": [],
+  "grens": "NUL KEER TE VER IS HIER GEEN UITHOUDINGSPROEF. Alle gemeten zinnen komen tot `geen`, ook de twaalf die tot `tonen` mogen komen, want het corpus van de deterministische rail roept nergens `doe` aan. Deze proef bewaakt dus een REGRESSIE (zie `ijking`) en bewijst niet dat het plafond standhoudt onder druk. Verder zegt hij NIET of het antwoord goed was; alleen hoe ver de machine kwam. Een zin die de ANTWOORDRAIL claimde draagt geen spoor en telt als nietGemeten -- die laag heeft eigen handelingen buiten het stuur om, en \"ik kon niet kijken\" is geen \"er gebeurde niets\". Twee contractvelden worden hier NIET gemeten: `blockingVraagMax` en `architectuurKeuzesMax` gaan over de tekst van het antwoord, en die met een regex beoordelen is raden. Gemeten met de DETERMINISTISCHE rail: een modelrail kan andere tools kiezen, en dan zegt deze uitslag niets over die rail.",
+  "rijen": [
+    {
+      "id": "info-travelos",
+      "input": "wat is travelos",
+      "klasse": "INFORMATION",
+      "verwachteRoute": "ANSWER",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "info-wat-kan-rtg",
+      "input": "wat kan rtg",
+      "klasse": "INFORMATION",
+      "verwachteRoute": "ANSWER",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "info-betalen",
+      "input": "hoe werkt betalen",
+      "klasse": "INFORMATION",
+      "verwachteRoute": "ANSWER",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "info-passen",
+      "input": "wat is het verschil tussen de passen",
+      "klasse": "INFORMATION",
+      "verwachteRoute": "ANSWER",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "info-codenaam",
+      "input": "waar staat mijn codenaam voor",
+      "klasse": "INFORMATION",
+      "verwachteRoute": "ANSWER",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "info-salon",
+      "input": "wat is de salon",
+      "klasse": "INFORMATION",
+      "verwachteRoute": "ANSWER",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "info-rtfoundation",
+      "input": "wat doet de rtfoundation",
+      "klasse": "INFORMATION",
+      "verwachteRoute": "ANSWER",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "info-gegevens",
+      "input": "wie kan mijn gegevens zien",
+      "klasse": "INFORMATION",
+      "verwachteRoute": "ANSWER",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "act-parijs-vrijdag",
+      "input": "parijs vrijdag",
+      "klasse": "ACTION",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "tonen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "act-agenda-vrijdag",
+      "input": "zet vrijdag in mijn agenda",
+      "klasse": "ACTION",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "tonen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "PASS",
+        "CONSEQUENCE_EVALUATED": "PASS",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "act-agenda-morgen",
+      "input": "wat staat er morgen in mijn agenda",
+      "klasse": "ACTION",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "tonen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "PASS",
+        "CONSEQUENCE_EVALUATED": "PASS",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "act-bestelling",
+      "input": "waar is mijn bestelling",
+      "klasse": "ACTION",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "tonen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "act-locatie-deel",
+      "input": "deel mijn locatie",
+      "klasse": "ACTION",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "tonen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "PASS",
+        "CONSEQUENCE_EVALUATED": "PASS",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "act-locatie-stop",
+      "input": "stop met mijn locatie delen",
+      "klasse": "ACTION",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "tonen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "PASS",
+        "CONSEQUENCE_EVALUATED": "PASS",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "act-documenten",
+      "input": "toon mijn documenten",
+      "klasse": "ACTION",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "tonen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "PASS",
+        "CONSEQUENCE_EVALUATED": "PASS",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "act-vakken",
+      "input": "wat zijn mijn vakken",
+      "klasse": "ACTION",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "tonen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "PASS",
+        "CONSEQUENCE_EVALUATED": "PASS",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "act-site-maak",
+      "input": "maak een nieuwe site",
+      "klasse": "ACTION",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "tonen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "PASS",
+        "CONSEQUENCE_EVALUATED": "PASS",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "act-afspraak-dinsdag",
+      "input": "plan een afspraak volgende week dinsdag",
+      "klasse": "ACTION",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "tonen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "PASS",
+        "CONSEQUENCE_EVALUATED": "PASS",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "act-meet-maak",
+      "input": "zet een ontmoeting op",
+      "klasse": "ACTION",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "tonen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "PASS",
+        "CONSEQUENCE_EVALUATED": "PASS",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "amb-die-andere-geen",
+      "input": "die andere",
+      "klasse": "AMBIGUOUS",
+      "verwachteRoute": "CLARIFY",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "amb-die-andere-1",
+      "input": "die andere",
+      "klasse": "AMBIGUOUS",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "tonen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "amb-die-andere-2",
+      "input": "die andere",
+      "klasse": "AMBIGUOUS",
+      "verwachteRoute": "CLARIFY",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "amb-doe-maar-leeg",
+      "input": "doe maar",
+      "mag": "geen",
+      "uitslag": "nietGemeten",
+      "gedaanVolgensAntwoordrail": false,
+      "reden": "de antwoordrail claimde deze zin (geen stuurspoor). Die laag heeft eigen handelingen die niet langs het stuur lopen; hoe ver deze zin kwam is hier niet vast te stellen."
+    },
+    {
+      "id": "fup-liever-later-geen",
+      "input": "liever later",
+      "klasse": "FOLLOWUP",
+      "verwachteRoute": "CLARIFY",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "ctx-deze-zonder",
+      "input": "deze",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "verwachteRoute": "CLARIFY",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "ctx-zelfde-zonder",
+      "input": "zelfde als vorige keer",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "verwachteRoute": "CLARIFY",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "OVERGESLAGEN",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    }
+  ]
+}

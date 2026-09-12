@@ -120,6 +120,20 @@ const REGISTERS = [
   ['BEPROEVING.json', 'npm run beproeving', 'storm, geld, misbruik en herstel'],
   ['SCHERMLEUGEN.json', 'node --test test/liegend-scherm.e2e.js', 'of een scherm iets toont dat er niet is'],
   ['SABOTAGE.json', 'node scripts/sabotage.js', 'of elke handhaver echt aan staat'],
+  /* DE EERSTE MINUUT. Hij hoort hier en niet in BUITEN, want hij is geen afdruk
+     uit de code maar een METING VAN GEDRAG: een vers lid, de echte registratie,
+     een echte browser op 390x844. Verandert de onboarding, het menu of het
+     beginscherm zonder dat deze ronde opnieuw draait, dan beweert het register
+     iets over een app die niet meer bestaat -- en juist bij dit register is dat
+     gevaarlijk, omdat hij gaat over wat een mens ZIET.
+
+     Melding en geen poort, om de reden uit de kop van dit bestand: hij vraagt
+     een Chromium en een paar minuten, en een poort die per constructie rood
+     staat op een machine zonder browser wordt met `|| true` uitgezet. Wat hem
+     vandaag tegenhoudt is zijn eigen tand in NORM.json (eersteMinuutGezakt,
+     richting omlaag, nu 0) -- die staat los van zijn ouderdom, en dit is
+     precies het gat ertussen. */
+  ['EERSTEMINUUT.json', 'npm run eersteminuut', 'wat een mens die RTG niet kent in de eerste minuut krijgt'],
   ['WAAROM.json', 'node scripts/waarom.js --vastleggen', 'waarom een route niet te bewijzen valt, in zijn eigen woorden'],
   /* EN DE SCHULDENLIJST. Hij leest de registers hierboven en is dus per
      definitie zo oud als de oudste daarvan -- maar hij droeg zijn eigen

@@ -632,6 +632,22 @@ tekstselectie, en die blijft `ONOPGELOST`: er is geen opzoeker bedraad. Dat staa
 zo in het register, want een verwijzing die stil bruikbaar wordt is precies wat
 `menscontext-ref.js` moet voorkomen.
 
+**En de duurste vorm van dezelfde dubbelzinnigheid staat er nu naast.** "Annuleer
+hem" met twee kandidaten is taalkundig gelijk aan "die andere" met twee
+alternatieven; wat verschilt is wat een gok kóst — een verkeerd scherm tegenover
+een afspraak die niet had moeten verdwijnen. De uitkomst is **exact gelijk**, en
+dat is de bewering: de keten wordt niet voorzichtiger *omdat* het werkwoord
+gevaarlijk is, hij was het al. Zou hij bij "die andere" wel kiezen en hier niet,
+dan zat de voorzichtigheid in het woord en niet in de laag.
+
+Wat er van het contract nog geparkeerd staat, draagt nu **per geval een eigen
+reden** in plaats van de oude blanket-uitleg. Twee ervan zijn geen bouwwerk maar
+een besluit: "daar" vraagt om een locatiecontext, en die is geen van de drie
+contractdelen — hem in `selectie` proppen zou een vierde contextsoort
+binnensmokkelen via een tekstveld. En "zelfde als vorige keer" vraagt om
+geschiedenis, en die bestaat met opzet niet: de menselijke context is **vluchtig**.
+Dat is een ander productprobleem dan deze laag oplost.
+
 ### 3g. "Ja doe maar" — de gevaarlijkste twee woorden
 
 Een klaargezette handeling is een 428 met een goedkeuring: eenmalig,

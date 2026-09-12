@@ -395,6 +395,8 @@ function referentveiligheid(rijen) {
   const B = rij('amb-die-andere-1');
   const C = rij('amb-die-andere-2');
   const D = rij('amb-die-andere-onbevoegd');
+  /* E is dezelfde dubbelzinnigheid met een VERNIETIGEND werkwoord; zie onder. */
+  const E = rij('amb-annuleer-hem');
   const gebreken = [];
   const eis = (v, wat) => { if (!v) gebreken.push(wat); };
 
@@ -425,6 +427,28 @@ function referentveiligheid(rijen) {
       'komt D even ver als B, dan is de dubbelzinnigheid opgelost door bevoegdheid te ' +
       'veronderstellen');
 
+    /* E: DEZELFDE DUBBELZINNIGHEID, MET EEN PRIJS. "annuleer hem" met twee
+       kandidaten is taalkundig gelijk aan C; wat verschilt is wat een gok kost.
+       Bij C een verkeerd scherm, bij E een afspraak die niet had moeten
+       verdwijnen. De uitkomst hoort daarom EXACT gelijk te zijn -- en dat is de
+       bewering: de keten wordt niet voorzichtiger OMDAT het werkwoord gevaarlijk
+       is, hij was het al. Zou hij bij "die andere" wel kiezen en hier niet, dan
+       zit de voorzichtigheid in het woord en niet in de laag. */
+    if (E && E.fasen) {
+      eis(E.kwam === C.kwam,
+        'E komt tot ' + E.kwam + ' en C tot ' + C.kwam + '. Dezelfde dubbelzinnigheid hoort ' +
+        'dezelfde uitkomst te geven; verschilt hij, dan zit de voorzichtigheid in het WERKWOORD ' +
+        'en niet in de laag');
+      eis(E.fasen.CAPABILITY_SELECTED === 'OVERGESLAGEN',
+        'E: er is een capability gekozen op een dubbelzinnige ANNULERING -- de duurste gok die ' +
+        'deze laag kan maken');
+      eis(E.fasen.EXECUTED === 'OVERGESLAGEN', 'E: er is iets uitgevoerd op een annulering');
+      eis(E.vragen === 1, 'E: stelt ' + E.vragen + ' vraag/vragen bij twee kandidaten');
+    } else {
+      gebreken.push('E (amb-annuleer-hem) is niet gemeten; dan staat de duurste vorm van deze ' +
+        'dubbelzinnigheid nergens vast');
+    }
+
     /* En D mag er ook niet OP GEPLAND hebben: plannen is het alsnog aannemen
        als referent, alleen om daarna netjes geweigerd te worden. */
     eis(D.fasen.PLAN_COMPILED === 'OVERGESLAGEN',
@@ -436,12 +460,15 @@ function referentveiligheid(rijen) {
     B: B ? { kwam: B.kwam, fasen: B.fasen } : null,
     C: C ? { kwam: C.kwam, fasen: C.fasen } : null,
     D: D ? { kwam: D.kwam, fasen: D.fasen } : null,
+    E: E ? { kwam: E.kwam, fasen: E.fasen, vragen: E.vragen } : null,
     aanname: { pad: '/api/office/ledenregister', niveau: onbevoegd },
     gebreken,
     heel: gebreken.length === 0,
-    wat: '"die andere" in vier vormen. B en D zijn structureel hetzelfde geval -- precies EEN ' +
-      'alternatief -- en verschillen alleen in bevoegdheid; komen ze even ver, dan is de ' +
-      'dubbelzinnigheid opgelost door bevoegdheid te veronderstellen.'
+    wat: '"die andere" in vier vormen, plus "annuleer hem" als vijfde. B en D zijn structureel ' +
+      'hetzelfde geval -- precies EEN alternatief -- en verschillen alleen in bevoegdheid; komen ' +
+      'ze even ver, dan is de dubbelzinnigheid opgelost door bevoegdheid te veronderstellen. E is ' +
+      'C met een vernietigend werkwoord en hoort er exact gelijk aan te zijn: voorzichtigheid ' +
+      'hoort in de laag te zitten en niet in het woord.'
   };
 }
 

@@ -289,6 +289,65 @@ hierboven moet oplossen — niet een compromis in de opmaak. De reden staat ook 
 
 ---
 
+## 3b. De begrijplaag: gemeten voordat er iets van gebouwd is
+
+Het voorstel erboven — een laag die rommelige menselijke taal omzet in veilige
+stappen — begint met een bewering die te meten is: *hoe goed doet de bestaande
+resolver het op taal zoals mensen die echt gebruiken?* `npm run rommeltaal`
+(`scripts/rommeltaal.js`) stelt die vraag met achttien zinnen die niemand voor
+een computer zou typen.
+
+Uitslag, rol `member`, 120 toegestane paden:
+
+| | |
+|---|---|
+| versmalt | **5** van 18 |
+| valt terug op de volle lijst van 120 | **13** van 18 |
+| versmalt naar het **verkeerde** domein | **3** van die 5 |
+
+De drie verkeerde zijn alle drie een woordbotsing: *"Kan ik vrijdag weg?"* komt
+uit op `/api/site/foto-weg` (*weg* als verwijderd in plaats van afwezig), *"zet
+die later"* op `/api/bank/terugkerend/zet`, *"waar blijft ie"* op
+`/api/locatie/*`. En zelfs de expliciete ijkzin *"Ik wil een vlucht boeken naar
+Parijs"* versmalt niet, omdat maar één woord een pad raakt en de eigen grendel
+*dun bewijs is geen bewijs* hem dan tegenhoudt.
+
+**De resolver is dus veilig en niet begrijpend, en dat zijn twee dingen.**
+Terugvallen op de volle lijst is precies wat hij hoort te doen — een versmalling
+die het gevraagde vermogen verbergt is de gevaarlijkste faalvorm van die laag.
+Er is hier niets kapot; er ontbreekt een laag.
+
+Drie dingen die die laag corrigeren, en die je nergens anders moet herhalen:
+
+1. **De dertien missers gaan niet over taal maar over VERWIJZING.** "die", "dat
+   ding", "daar", "hetzelfde als vorige keer" dragen nul lexicaal signaal — geen
+   enkel taalmodel lost dat op zonder context. Punt 3 (context als officiële
+   invoer) en punt 4 (deixis) zijn daarmee niet twee van de zevenenveertig maar
+   de eerste twee: ze verklaren 13 van de 18 gevallen, en ze vragen geen model.
+2. **Het woord `envelop` is bezet.** `kern/envelop.js` is de
+   GEBEURTENISenvelop en zegt met opzet nooit WAT er gebeurt; een tweede envelop
+   die juist over bedoeling, entiteiten en zekerheid gaat, is de
+   `VERMOGENS`-botsing op de centrale naam van de laag (AFSPRAAK.md maakt exact
+   dit punt al een keer). Kies een andere naam vóór de eerste regel code.
+3. **Assumption budgets naar risico (punt 28) hebben vandaag geen invoer.**
+   KANTOORMACHT.md stelt vast dat er **geen enkele risicomodule** is, en
+   `gevolg.js` staat op 93 `onbekend` van 176 paden. "Veiligheid uit gevolg"
+   (punt 29) is dus voor ongeveer de helft van de handelingen niet te berekenen,
+   en een budget dat op een onbekende leunt is een gok met een getal erbij.
+
+Wat er al staat en dus niet bedacht hoeft te worden: de cascade van punt 22
+(regels vóór AI) bestaat als **meting** in `kern/ai/router.js`, en die vond dat
+de volgorde vandaag omgekeerd is — `demoantwoorden.js` levert al regelantwoorden
+maar draait ná het model. De vier autonomietreden van punt 13 zijn de vier van
+`GEZAGSNOEMER.json`. En punt 25 (het model kiest een capability, geen code) is
+precies wat `beleid.js` met `toegestanePaden` al afdwingt.
+
+Eén grens bij punt 47: **Human Effort mag, als hij de TAAK meet.** Zodra hij per
+persoon wordt bijgehouden is het een cijfer op een mens, en dat botst met
+INT-04, KANTOORMACHT.md en HDI.md tegelijk — ook intern als sorteersleutel.
+
+---
+
 ## 4. De grenzen
 
 Zeven, bovenop die van GRAMMATICA.md en ADAPTIEF.md.

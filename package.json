@@ -65,6 +65,7 @@
     "handelingindex": "node scripts/handelingindex.js",
     "handelingindex:controle": "node scripts/handelingindex.js --controle",
     "vindbaar": "node scripts/vindbaar.js",
+    "rommeltaal": "node scripts/rommeltaal.js",
     "eersteminuut": "node scripts/eersteminuut.js",
     "eersteminuut:controle": "node scripts/eersteminuut.js --controle",
     "vindbaar:controle": "node scripts/vindbaar.js --controle",

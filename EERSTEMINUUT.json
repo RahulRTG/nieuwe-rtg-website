@@ -1,0 +1,199 @@
+{
+  "stempel": {
+    "op": "2026-09-12T05:47:24.456Z",
+    "commit": "bfa6853b",
+    "boomVuil": true,
+    "boomAnders": 1,
+    "instrument": "scripts/eersteminuut.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Wat een mens die RTG niet kent in zijn eerste minuut krijgt. Een verse registratie langs de echte route, een echte browser op 390x844, Nederlands. Gemeten wordt de weg van registratie tot het eerste scherm waar iets te doen is, en wat daar staat.",
+  "hoe": "node scripts/eersteminuut.js  (--controle zakt zodra een toets ZAKT)",
+  "grens": "Een toets die ZAKT blokkeert. `nietMeetbaar` blokkeert niet, maar telt ook nooit als gehaald -- een bewijs dat je weglaat leest als een bewijs dat je haalt (BETROUWBAARHEID.md). Wat hier niet gemeten kan worden, draagt zijn reden.",
+  "standen": {
+    "gehaald": "gemeten en in orde",
+    "gezakt": "gemeten en niet in orde",
+    "nietMeetbaar": "kan hier niet worden vastgesteld, met de reden erbij"
+  },
+  "poorten": {
+    "totaal": 4,
+    "nodig": 1,
+    "onnodig": 3,
+    "rijen": [
+      {
+        "soort": "overeenkomst",
+        "nodig": true,
+        "grond": "zonder handtekening bestaat het lidmaatschap niet -- NU NODIG (punt 7)",
+        "kop": "Laatste stap: de RTG-lidmaatschaps- en reisovereenkomst. Typ je volledige naam om te teken"
+      },
+      {
+        "soort": "vraag",
+        "nodig": false,
+        "grond": "gesteld voordat de mens iets heeft gedaan waarvoor het antwoord nodig is",
+        "kop": "Getekend, welkom. Zodra je iets bestelt of laat bezorgen heb ik een paar gegevens nodig. Z",
+        "uitweg": "Liever later"
+      },
+      {
+        "soort": "vraag",
+        "nodig": false,
+        "grond": "gesteld voordat de mens iets heeft gedaan waarvoor het antwoord nodig is",
+        "kop": "De Salon is van de leden, en hij begint leeg. Wil je er meteen iets neerzetten?",
+        "uitweg": "Sla dit over"
+      },
+      {
+        "soort": "vraag",
+        "nodig": false,
+        "grond": "gesteld voordat de mens iets heeft gedaan waarvoor het antwoord nodig is",
+        "kop": "Heb je een bedrijf? Dan kan het hier zijn eigen plek krijgen.",
+        "uitweg": "Sla dit over"
+      }
+    ]
+  },
+  "zichtbaarheid": "checkVisibility: voorouders meegewogen (display, visibility, opacity)",
+  "stations": {
+    "beginscherm": "zoals het landt, zonder enige tik",
+    "menu": "beginscherm met het menu open (een tik)",
+    "nietGemeten": null
+  },
+  "eersteScherm": {
+    "bedienbaarTotaal": 13,
+    "waarvanSchil": 8,
+    "waarvanInhoud": 0,
+    "waarvanAlleenIcoon": 5,
+    "alleenIcoon": [
+      {
+        "naam": "LivingOS",
+        "waar": "button.cmd-actie < div.cmd-actierij < div.cmd-acties < div.cmd-balk"
+      },
+      {
+        "naam": "WorkOS",
+        "waar": "button.cmd-actie < div.cmd-actierij < div.cmd-acties < div.cmd-balk"
+      },
+      {
+        "naam": "TravelOS",
+        "waar": "button.cmd-actie < div.cmd-actierij < div.cmd-acties < div.cmd-balk"
+      },
+      {
+        "naam": "FoundationOS",
+        "waar": "button.cmd-actie < div.cmd-actierij < div.cmd-acties < div.cmd-balk"
+      },
+      {
+        "naam": "Vraag Rahul",
+        "waar": "button.cmd-mondknop < div.cmd-balk < main.cmd-werk < div#rtgCommand.rtg-interface-second-screen.rtg-ss-peek"
+      }
+    ],
+    "waarvanNaamloos": 0,
+    "invoervelden": 0,
+    "tekstregels": 8,
+    "tekst": [
+      "RTG",
+      "LIVING OS",
+      "⌕",
+      "NL",
+      "◎",
+      "MENU",
+      "HOME",
+      "Kies een wereld om te beginnen."
+    ]
+  },
+  "telling": {
+    "gehaald": 4,
+    "gezakt": 3,
+    "nietMeetbaar": 2
+  },
+  "toetsen": [
+    {
+      "naam": "inhoud-zonder-menu",
+      "station": "beginscherm",
+      "vraag": "Staat er iets te doen zonder dat de mens eerst MENU opent?",
+      "uitslag": "gezakt",
+      "gemeten": "0 dingen met een LEESBAAR opschrift; 5 alleen als pictogram met aria-label (LivingOS, WorkOS, TravelOS, FoundationOS, Vraag Rahul) -- een schermlezer noemt die, een ziend mens ziet ze niet",
+      "bewijs": []
+    },
+    {
+      "naam": "geen-interne-termen",
+      "station": "beginscherm + menu",
+      "vraag": "Staat er een woord dat alleen binnen dit huis iets betekent?",
+      "uitslag": "gezakt",
+      "gemeten": "3 interne termen zichtbaar",
+      "bewijs": [
+        {
+          "woord": "Universe",
+          "waarom": "view-naam uit shared/rtg-edge-worlds.js; stond als `01Universe` bovenaan het ledenmenu",
+          "voorbeeld": "01Universe→",
+          "keer": 1
+        },
+        {
+          "woord": "Intent",
+          "waarom": "interne naam van de intentielaag (kern/stuur/); voor een lid een leeg woord",
+          "voorbeeld": "02Intent→",
+          "keer": 1
+        },
+        {
+          "woord": "Worlds",
+          "waarom": "Engelse dubbel van \"werelden\", naast de Nederlandse variant in hetzelfde menu",
+          "voorbeeld": "03Worlds→",
+          "keer": 1
+        }
+      ]
+    },
+    {
+      "naam": "geen-vrije-plekken",
+      "station": "beginscherm + menu",
+      "vraag": "Staat er bouwsteiger op het scherm?",
+      "uitslag": "gehaald",
+      "gemeten": "0 placeholders zichtbaar",
+      "bewijs": []
+    },
+    {
+      "naam": "geen-technische-status",
+      "station": "beginscherm + menu",
+      "vraag": "Staat er een technische statuscode in consumententaal?",
+      "uitslag": "gehaald",
+      "gemeten": "0 codes van de vorm IETS_IN_HOOFDLETTERS",
+      "bewijs": []
+    },
+    {
+      "naam": "geen-onnodige-vragen",
+      "station": "weg naar het beginscherm",
+      "vraag": "Hoeveel vragen komen er vóór de eerste waarde die niet NU NODIG zijn?",
+      "uitslag": "gezakt",
+      "gemeten": "3 onnodige poorten, 1 terecht",
+      "bewijs": [
+        "Getekend, welkom. Zodra je iets bestelt of laat bezorgen heb ik een paar gegevens nodig. Z",
+        "De Salon is van de leden, en hij begint leeg. Wil je er meteen iets neerzetten?",
+        "Heb je een bedrijf? Dan kan het hier zijn eigen plek krijgen."
+      ]
+    },
+    {
+      "naam": "zoeken-of-intentie",
+      "station": "beginscherm",
+      "vraag": "Kan de mens zeggen wat hij wil, in plaats van zoeken waar het zit?",
+      "uitslag": "gehaald",
+      "gemeten": "geen invoerveld; alleen een zoekKNOP -- de mens moet eerst tikken voordat hij iets kan zeggen",
+      "bewijs": []
+    },
+    {
+      "naam": "terugweg",
+      "station": "beginscherm",
+      "vraag": "Is er een zichtbare weg terug of naar huis?",
+      "uitslag": "gehaald",
+      "gemeten": "gezocht op home/terug/sluiten",
+      "bewijs": []
+    },
+    {
+      "naam": "taal-consistent",
+      "vraag": "Is alles wat er staat Nederlands, bij een Nederlandse sessie?",
+      "uitslag": "nietMeetbaar",
+      "reden": "een woordenlijst die Engels van Nederlands scheidt bestaat hier nog niet, en raden zou merknamen (RTG, Salon, Pass) als fout aanmerken. De interne termen hierboven vangen vandaag het deel dat aantoonbaar fout is; de rest wacht op punt 57 (CONSUMENTENTAAL.json).",
+      "bewijs": []
+    },
+    {
+      "naam": "begrijpt-de-mens-het",
+      "vraag": "Snapt een mens die RTG niet kent wat hij hier kan?",
+      "uitslag": "nietMeetbaar",
+      "reden": "geen enkele browsermeting kan dit vaststellen. Dit blijft punt 56: echte mensen, zonder instructie, met een opdracht. Het staat hier zodat de afwezigheid ervan zichtbaar blijft in plaats van stil.",
+      "bewijs": []
+    }
+  ]
+}

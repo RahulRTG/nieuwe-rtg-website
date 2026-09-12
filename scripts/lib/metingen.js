@@ -157,6 +157,7 @@ const REGISTER = {
      in `npm test`. Wat eraan hangt is het getal dat ertoe doet --
      `eersteMinuutGezakt` mag alleen omlaag. */
   'EERSTEMINUUT.json': { meter: ['eersteMinuutGezakt'] },
+  'PAKTE.json': { meter: ['pakteMisgelopen'] },
 
   /* DE ZEVEN REGISTERS VAN MAATSTAF.md, en waarom ze hier mogen staan. Elk van
      deze toetsen doet HETZELFDE: hij meet vers en vergelijkt met wat er in het

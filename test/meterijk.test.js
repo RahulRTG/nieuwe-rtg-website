@@ -1539,6 +1539,21 @@ const IJKINGEN = {
       (j) => { j.telling.gezakt = (j.telling.gezakt || 0) + 3; return j; },
       () => norm.meet().eersteMinuutGezakt - voor.eersteMinuutGezakt)
   },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (tweede): pakteMisgelopen telt de
+     OPERATIONELE vragen die de antwoordrail claimt (PAKTE.json,
+     telling.misgelopen). Zelfde vorm -- een getal uit een bestaand register,
+     dus geijkt door dat veld tijdelijk op te hogen.
+
+     WAAROM `misgelopen` EN NIET `antwoordrail`: dat tweede telt ook de claims
+     die volkomen terecht zijn. "doe maar" wordt geclaimd en keurig beantwoord
+     met "er staat niets open"; dat als verlies tellen maakt van correct gedrag
+     een defect. Leest deze meter het verkeerde veld, dan beweegt hij hier niet
+     mee. */
+  pakteMisgelopen: {
+    proef: (voor) => metVervangenJson('PAKTE.json',
+      (j) => { j.telling.misgelopen = (j.telling.misgelopen || 0) + 3; return j; },
+      () => norm.meet().pakteMisgelopen - voor.pakteMisgelopen)
+  },
   /* DE TAND VAN 10 SEPTEMBER 2026: bewijsAlleenKeten telt de bewijsmechanismen
      die alleen in de keten draaien en niet lokaal (BEWIJSLADDER.json). Zelfde
      vorm als de vier hierboven -- hij telt een POST in een register, dus hij

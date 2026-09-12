@@ -155,7 +155,15 @@ if (require.main !== module) { module.exports = { GEVALLEN }; return; }
     perKlasse,
     misgelopen: misgelopen.map((r) => ({ id: r.id, input: r.input, verwachteRoute: r.verwachteRoute })),
     uitlegNaarStuur: uitlegNaarStuur.map((r) => ({ id: r.id, input: r.input })),
-    watDitNietMeet: 'of de antwoordrail een GOED antwoord gaf. Alleen wie hem claimde.',
+    /* DE GRENS. Het huis eist van elk register dat het zegt wat het NIET
+       aantoont (scripts/meetkeuring.js regel `grens`), en de sleutel heet
+       overal `grens` -- een eigen naam leest niemand mee. */
+    grens: 'Dit zegt NIET of de antwoordrail een goed antwoord gaf; alleen wie de vraag claimde. ' +
+      'Het is gemeten met de DETERMINISTISCHE rail -- een modelrail kan anders claimen, want dan ' +
+      'bestaat stuurLus om een andere reden. Alleen de gevallen die vandaag beproefbaar zijn ' +
+      'tellen mee; de contextgevallen (FASE4) zijn niet gemeten. En elk geval kreeg een VERS lid, ' +
+      'dus er is geen gespreksgeschiedenis: in een lopend gesprek kan de antwoordrail vaker ' +
+      'claimen dan hier, omdat p.wacht en het geheugen dan gevuld zijn.',
     rijen
   };
   fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');

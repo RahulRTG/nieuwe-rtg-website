@@ -1,0 +1,287 @@
+{
+  "stempel": {
+    "op": "2026-09-12T10:36:45.462Z",
+    "commit": "26db7469",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/pakte.js",
+    "node": "v22.22.2"
+  },
+  "wat": "wie claimt de vraag voordat de stuurketen hem ziet: de antwoordrail (pakte=true) of het stuur",
+  "meet": "server/routes/member/persoonlijk.js `if (stuurLus && !r.pakte)`",
+  "verandertNiets": true,
+  "corpus": {
+    "bestand": "server/kern/stuur/menstaal.json",
+    "gevallenNU": 24
+  },
+  "telling": {
+    "gemeten": 24,
+    "antwoordrail": 1,
+    "stuur": 23,
+    "nietGemeten": 0,
+    "misgelopen": 0,
+    "uitlegNaarStuur": 8
+  },
+  "perKlasse": {
+    "INFORMATION": {
+      "gevallen": 8,
+      "antwoordrail": 0,
+      "stuur": 8,
+      "nietGemeten": 0
+    },
+    "ACTION": {
+      "gevallen": 11,
+      "antwoordrail": 0,
+      "stuur": 11,
+      "nietGemeten": 0
+    },
+    "AMBIGUOUS": {
+      "gevallen": 2,
+      "antwoordrail": 1,
+      "stuur": 1,
+      "nietGemeten": 0
+    },
+    "FOLLOWUP": {
+      "gevallen": 1,
+      "antwoordrail": 0,
+      "stuur": 1,
+      "nietGemeten": 0
+    },
+    "CONTEXTUAL_REFERENCE": {
+      "gevallen": 2,
+      "antwoordrail": 0,
+      "stuur": 2,
+      "nietGemeten": 0
+    }
+  },
+  "misgelopen": [],
+  "uitlegNaarStuur": [
+    {
+      "id": "info-travelos",
+      "input": "wat is travelos"
+    },
+    {
+      "id": "info-wat-kan-rtg",
+      "input": "wat kan rtg"
+    },
+    {
+      "id": "info-betalen",
+      "input": "hoe werkt betalen"
+    },
+    {
+      "id": "info-passen",
+      "input": "wat is het verschil tussen de passen"
+    },
+    {
+      "id": "info-codenaam",
+      "input": "waar staat mijn codenaam voor"
+    },
+    {
+      "id": "info-salon",
+      "input": "wat is de salon"
+    },
+    {
+      "id": "info-rtfoundation",
+      "input": "wat doet de rtfoundation"
+    },
+    {
+      "id": "info-gegevens",
+      "input": "wie kan mijn gegevens zien"
+    }
+  ],
+  "watDitNietMeet": "of de antwoordrail een GOED antwoord gaf. Alleen wie hem claimde.",
+  "rijen": [
+    {
+      "id": "info-travelos",
+      "klasse": "INFORMATION",
+      "input": "wat is travelos",
+      "verwachteRoute": "ANSWER",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "info-wat-kan-rtg",
+      "klasse": "INFORMATION",
+      "input": "wat kan rtg",
+      "verwachteRoute": "ANSWER",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "info-betalen",
+      "klasse": "INFORMATION",
+      "input": "hoe werkt betalen",
+      "verwachteRoute": "ANSWER",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "info-passen",
+      "klasse": "INFORMATION",
+      "input": "wat is het verschil tussen de passen",
+      "verwachteRoute": "ANSWER",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "info-codenaam",
+      "klasse": "INFORMATION",
+      "input": "waar staat mijn codenaam voor",
+      "verwachteRoute": "ANSWER",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "info-salon",
+      "klasse": "INFORMATION",
+      "input": "wat is de salon",
+      "verwachteRoute": "ANSWER",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "info-rtfoundation",
+      "klasse": "INFORMATION",
+      "input": "wat doet de rtfoundation",
+      "verwachteRoute": "ANSWER",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "info-gegevens",
+      "klasse": "INFORMATION",
+      "input": "wie kan mijn gegevens zien",
+      "verwachteRoute": "ANSWER",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "act-parijs-vrijdag",
+      "klasse": "ACTION",
+      "input": "parijs vrijdag",
+      "verwachteRoute": "OPERATIONAL",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "act-agenda-vrijdag",
+      "klasse": "ACTION",
+      "input": "zet vrijdag in mijn agenda",
+      "verwachteRoute": "OPERATIONAL",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "act-agenda-morgen",
+      "klasse": "ACTION",
+      "input": "wat staat er morgen in mijn agenda",
+      "verwachteRoute": "OPERATIONAL",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "act-bestelling",
+      "klasse": "ACTION",
+      "input": "waar is mijn bestelling",
+      "verwachteRoute": "OPERATIONAL",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "act-locatie-deel",
+      "klasse": "ACTION",
+      "input": "deel mijn locatie",
+      "verwachteRoute": "OPERATIONAL",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "act-locatie-stop",
+      "klasse": "ACTION",
+      "input": "stop met mijn locatie delen",
+      "verwachteRoute": "OPERATIONAL",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "act-documenten",
+      "klasse": "ACTION",
+      "input": "toon mijn documenten",
+      "verwachteRoute": "OPERATIONAL",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "act-vakken",
+      "klasse": "ACTION",
+      "input": "wat zijn mijn vakken",
+      "verwachteRoute": "OPERATIONAL",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "act-site-maak",
+      "klasse": "ACTION",
+      "input": "maak een nieuwe site",
+      "verwachteRoute": "OPERATIONAL",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "act-afspraak-dinsdag",
+      "klasse": "ACTION",
+      "input": "plan een afspraak volgende week dinsdag",
+      "verwachteRoute": "OPERATIONAL",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "act-meet-maak",
+      "klasse": "ACTION",
+      "input": "zet een ontmoeting op",
+      "verwachteRoute": "OPERATIONAL",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "amb-die-andere-geen",
+      "klasse": "AMBIGUOUS",
+      "input": "die andere",
+      "verwachteRoute": "CLARIFY",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "amb-doe-maar-leeg",
+      "klasse": "AMBIGUOUS",
+      "input": "doe maar",
+      "verwachteRoute": "CLARIFY",
+      "pakte": true,
+      "uitslag": "antwoordrail"
+    },
+    {
+      "id": "fup-liever-later-geen",
+      "klasse": "FOLLOWUP",
+      "input": "liever later",
+      "verwachteRoute": "CLARIFY",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "ctx-deze-zonder",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "input": "deze",
+      "verwachteRoute": "CLARIFY",
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "ctx-zelfde-zonder",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "input": "zelfde als vorige keer",
+      "verwachteRoute": "CLARIFY",
+      "pakte": false,
+      "uitslag": "stuur"
+    }
+  ]
+}

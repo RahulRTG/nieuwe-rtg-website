@@ -134,6 +134,14 @@ const REGISTERS = [
      richting omlaag, nu 0) -- die staat los van zijn ouderdom, en dit is
      precies het gat ertussen. */
   ['EERSTEMINUUT.json', 'npm run eersteminuut', 'wat een mens die RTG niet kent in de eerste minuut krijgt'],
+  /* DE NULMETING OP DE ROUTER. Ook dit is een METING VAN GEDRAG en geen afdruk
+     uit de code: hij start een server, registreert per geval een vers lid en
+     kijkt wie de vraag claimt. Verandert de antwoordrail of het corpus zonder
+     dat deze ronde opnieuw draait, dan beweert het register iets over een
+     routing die niet meer bestaat -- en juist dit getal is de grond onder de
+     vraag of `r.pakte` aangeraakt mag worden. Melding en geen poort, om
+     dezelfde reden als hierboven: hij vraagt een server en een paar minuten. */
+  ['PAKTE.json', 'node scripts/pakte.js', 'wie claimt een menselijke vraag: de antwoordrail of het stuur'],
   ['WAAROM.json', 'node scripts/waarom.js --vastleggen', 'waarom een route niet te bewijzen valt, in zijn eigen woorden'],
   /* EN DE SCHULDENLIJST. Hij leest de registers hierboven en is dus per
      definitie zo oud als de oudste daarvan -- maar hij droeg zijn eigen

@@ -503,6 +503,17 @@ const METERS = [
      `nietMeetbaar`, want dat is geen uitslag over de app maar over de meter --
      die twee optellen is precies de fout die MENS.md par. 0 beschrijft. */
   { sleutel: 'eersteMinuutGezakt', richting: 'omlaag', wat: 'toetsen van de eerste minuut die ZAKKEN (uit EERSTEMINUUT.json)' },
+  /* DE NULMETING OP DE ROUTER (PAKTE.json). `misgelopen` telt de OPERATIONELE
+     vragen die de antwoordrail claimt voordat de stuurketen ze ziet -- dan
+     krijgt de motor die vraag nooit, hoe goed hij ook werkt. Hij staat op nul
+     en hoort daar te blijven; een routingwijziging die hem omhoog duwt, neemt
+     vermogen weg zonder dat iemand het merkt.
+
+     Met OPZET niet `uitlegNaarStuur` als tand, hoewel dat getal vandaag 8 is:
+     dat is een RISICO en nog geen verlies (het plafond staat op tonen), en een
+     tand op een getal dat we nog niet besloten hebben te verlagen, is een
+     sirene die wordt uitgezet. Het staat in het register, niet op de lat. */
+  { sleutel: 'pakteMisgelopen', richting: 'omlaag', wat: 'operationele vragen die de antwoordrail claimt (uit PAKTE.json)' },
   /* Het BEREIK van de carrierevormmeter (CARRIERE.md par. 0): hoeveel
      talentdomeinen hij werkelijk heeft gezien. Omhoog, want dit mag niet stil
      dalen -- zie de kop bij CARRIEREVORM.json in ./lib/metingen.js. */
@@ -1221,6 +1232,7 @@ function meet(bronnen) {
     lussenZonderOverlapRem: leesRegister('LUSSEN.json', (j) => j.ratel.wekkersAsyncZonderRem),
     appwerktDefecten: leesRegister('APPWERKT.json', (j) => j.gemeten.defecten),
     eersteMinuutGezakt: leesRegister('EERSTEMINUUT.json', (j) => j.telling.gezakt),
+    pakteMisgelopen: leesRegister('PAKTE.json', (j) => j.telling.misgelopen),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
        milliseconden en een afdruk die achterloopt zou hier een groen getal

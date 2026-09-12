@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-12T12:25:28.045Z",
-    "commit": "7befcbdb",
+    "op": "2026-09-12T13:11:20.387Z",
+    "commit": "2b834167",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 5,
     "instrument": "scripts/eersteminuut.js",
     "node": "v22.22.2"
   },
@@ -36,27 +36,27 @@
   },
   "wachten": {
     "alleGehaald": true,
-    "langste": 271,
+    "langste": 278,
     "afgelopen": [],
     "rijen": [
       {
         "naam": "app-staat-er",
-        "ms": 214,
+        "ms": 262,
         "gehaald": true
       },
       {
         "naam": "overeenkomst-weg",
-        "ms": 271,
+        "ms": 278,
         "gehaald": true
       },
       {
         "naam": "schil-of-poort",
-        "ms": 53,
+        "ms": 80,
         "gehaald": true
       },
       {
         "naam": "menu-open",
-        "ms": 55,
+        "ms": 54,
         "gehaald": true
       }
     ]

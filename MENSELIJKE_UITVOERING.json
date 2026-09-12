@@ -1,16 +1,34 @@
 {
  "wat": "per menselijke zin: welke schakels van de uitvoeringsketen werkelijk liepen, hoe ver hij kwam, en welke wacht er aantoonbaar afgaat als een schakel wordt weggehaald",
  "vorm": "PROJECTIE -- afgeleid uit de registers hieronder, nooit met de hand bijgewerkt. test/menselijkeuitvoering.test.js hercompileert hem en vergelijkt byte voor byte.",
+ "velden": {
+  "scenario": "menstaal.json (id)",
+  "input": "menstaal.json (input)",
+  "contextklasse": "menstaal.json (context)",
+  "interpretatie": "stuurspoor INTENT_RESOLVED-detail via MENSTAALPROEF.json",
+  "ambiguiteit": "menstaal.json (ambigu)",
+  "contextAangebodenGebruikt": "stuurspoor CONTEXT_SANITIZED-stand + INTENT_RESOLVED-detail (twee beweringen, en `gebruikt: null` betekent dat niemand keek)",
+  "planstatus": "stuurspoor PLAN_COMPILED + het eerste bezwaar van de compiler",
+  "gevolgstatus": "stuurspoor CONSEQUENCE_EVALUATED-detail (stappen, collecties, onbekend)",
+  "mandaatstatus": "stuurspoor MANDATE_EVALUATED-detail (de lijst voor en na de grendel)",
+  "capability": "stuurspoor CAPABILITY_SELECTED -- alleen of er EEN gekozen is",
+  "bereikteTrede": "MENSTAALPROEF.json (kwam), afgeleid uit het spoor en niet uit de tekst",
+  "uitvoeringsstatus": "stuurspoor EXECUTED (NOT_RUN bij een 428: een voorstel, geen uitvoering)",
+  "blockingVragen": "geteld in het ANTWOORD -- exact op de deterministische rail, een schatting op een modelrail",
+  "architectuurkeuzes": "GEEN PROBE. Of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden; mutatie 10b van MENSMUTATIE.json laat zien dat er vandaag dus geen wacht op staat.",
+  "mutationEvidence": "MENSMUTATIE.json, gejoind op het veld `bewaakt` van elke mutatie",
+  "unknowns": "per rij samengesteld uit wat de probes NIET leverden"
+ },
  "bronnen": {
   "server/kern/stuur/menstaal.json": "c231e0cb8cabf46a",
-  "MENSTAALPROEF.json": "8ae5884a22790094",
-  "MENSMUTATIE.json": "a762b6c12dbbf183",
+  "MENSTAALPROEF.json": "673199dc88a0ec4b",
+  "MENSMUTATIE.json": "7ced774578e31aca",
   "PAKTE.json": "b6b6c84ac29f7ad7",
-  "scripts/menselijkeuitvoering.js": "7b86980aa00aecfd"
+  "scripts/menselijkeuitvoering.js": "b211632b87591468"
  },
  "gemetenOp": {
-  "MENSTAALPROEF.json": "a83a2b5b",
-  "MENSMUTATIE.json": "8354e97e",
+  "MENSTAALPROEF.json": "5a2b0e0b",
+  "MENSMUTATIE.json": "5a2b0e0b",
   "PAKTE.json": "c933e406"
  },
  "eenLeeftijd": false,
@@ -19,6 +37,9 @@
   "binnenContract": 30,
   "buitenContract": 0,
   "nietGemeten": 1,
+  "contextAangeboden": 6,
+  "contextGebruikt": 0,
+  "contextNiemandKeek": 16,
   "totUitvoering": 3,
   "tegenspraken": 0,
   "leeftijdsverschillen": 0
@@ -36,7 +57,14 @@
    "scenario": "info-travelos",
    "input": "wat is travelos",
    "klasse": "INFORMATION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": "uitleg",
    "ambigu": false,
    "keten": {
@@ -49,6 +77,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -60,6 +94,11 @@
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [],
    "onbekend": [
@@ -85,7 +124,14 @@
    "scenario": "info-wat-kan-rtg",
    "input": "wat kan rtg",
    "klasse": "INFORMATION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": "uitleg",
    "ambigu": false,
    "keten": {
@@ -98,6 +144,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -109,6 +161,11 @@
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [],
    "onbekend": [
@@ -134,7 +191,14 @@
    "scenario": "info-betalen",
    "input": "hoe werkt betalen",
    "klasse": "INFORMATION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": "uitleg",
    "ambigu": false,
    "keten": {
@@ -147,6 +211,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -158,6 +228,11 @@
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [],
    "onbekend": [
@@ -183,7 +258,14 @@
    "scenario": "info-passen",
    "input": "wat is het verschil tussen de passen",
    "klasse": "INFORMATION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": "uitleg",
    "ambigu": false,
    "keten": {
@@ -196,6 +278,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -207,6 +295,11 @@
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [],
    "onbekend": [
@@ -232,7 +325,14 @@
    "scenario": "info-codenaam",
    "input": "waar staat mijn codenaam voor",
    "klasse": "INFORMATION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": "uitleg",
    "ambigu": false,
    "keten": {
@@ -245,6 +345,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -256,6 +362,11 @@
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [],
    "onbekend": [
@@ -281,7 +392,14 @@
    "scenario": "info-salon",
    "input": "wat is de salon",
    "klasse": "INFORMATION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": "uitleg",
    "ambigu": false,
    "keten": {
@@ -294,6 +412,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -305,6 +429,11 @@
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [],
    "onbekend": [
@@ -330,7 +459,14 @@
    "scenario": "info-rtfoundation",
    "input": "wat doet de rtfoundation",
    "klasse": "INFORMATION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": "uitleg",
    "ambigu": false,
    "keten": {
@@ -343,6 +479,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -354,6 +496,11 @@
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [],
    "onbekend": [
@@ -379,7 +526,14 @@
    "scenario": "info-gegevens",
    "input": "wie kan mijn gegevens zien",
    "klasse": "INFORMATION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": "uitleg",
    "ambigu": false,
    "keten": {
@@ -392,6 +546,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -403,6 +563,11 @@
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [],
    "onbekend": [
@@ -428,7 +593,15 @@
    "scenario": "act-parijs-vrijdag",
    "input": "parijs vrijdag",
    "klasse": "ACTION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
    "verwachtDoel": "reis",
    "ambigu": false,
    "keten": {
@@ -441,18 +614,39 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": false,
+    "paden": 120,
+    "gekozen": []
+   },
    "capability": "nietGekozen",
    "waarom": "Deze actie staat niet op de expliciete AI-allowlist voor member.",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 0,
+    "onbekend": 1
+   },
    "mandaat": {
     "mag": "tonen",
     "kwam": "geen",
     "binnen": true,
-    "uit": []
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
    },
    "vragen": {
     "mag": 1,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
@@ -479,7 +673,15 @@
    "scenario": "act-agenda-vrijdag",
    "input": "zet vrijdag in mijn agenda",
    "klasse": "ACTION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
    "verwachtDoel": "agenda",
    "ambigu": false,
    "keten": {
@@ -492,17 +694,38 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 11,
+    "gekozen": []
+   },
    "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 2,
+    "collecties": 1,
+    "gemeten": 1,
+    "geenEffect": 1,
+    "onbekend": 0
+   },
    "mandaat": {
     "mag": "tonen",
     "kwam": "geen",
     "binnen": true,
-    "uit": []
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
    },
    "vragen": {
     "mag": 1,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
@@ -533,7 +756,15 @@
    "scenario": "act-agenda-tandarts",
    "input": "zet de tandarts vrijdag om 14:00 in mijn agenda",
    "klasse": "ACTION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
    "verwachtDoel": "agenda",
    "ambigu": false,
    "keten": {
@@ -546,7 +777,21 @@
     "PROJECTED": "PASS",
     "EXECUTED": "NOT_RUN"
    },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 11,
+    "gekozen": [
+     "/api/agenda/toevoegen"
+    ]
+   },
    "capability": "gekozen",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 1,
+    "gemeten": 1,
+    "geenEffect": 0,
+    "onbekend": 0
+   },
    "mandaat": {
     "mag": "klaarzetten",
     "kwam": "klaarzetten",
@@ -554,12 +799,21 @@
     "uit": [
      "pad /api/agenda/toevoegen (voorstel) -> klaarzetten",
      "een voorstel gezet (bevestigNodig)"
-    ]
+    ],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
    },
    "vragen": {
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
@@ -582,7 +836,15 @@
    "scenario": "act-agenda-morgen",
    "input": "wat staat er morgen in mijn agenda",
    "klasse": "ACTION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
    "verwachtDoel": "agenda",
    "ambigu": false,
    "keten": {
@@ -595,17 +857,38 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": false,
+    "paden": 120,
+    "gekozen": []
+   },
    "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 1,
+    "onbekend": 0
+   },
    "mandaat": {
     "mag": "tonen",
     "kwam": "geen",
     "binnen": true,
-    "uit": []
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
    },
    "vragen": {
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
@@ -636,7 +919,14 @@
    "scenario": "act-bestelling",
    "input": "waar is mijn bestelling",
    "klasse": "ACTION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": "bestelling",
    "ambigu": false,
    "keten": {
@@ -649,6 +939,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "tonen",
@@ -660,6 +956,11 @@
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [],
    "onbekend": [
@@ -685,7 +986,15 @@
    "scenario": "act-locatie-deel",
    "input": "deel mijn locatie",
    "klasse": "ACTION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
    "verwachtDoel": "locatie",
    "ambigu": false,
    "keten": {
@@ -698,17 +1007,38 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 4,
+    "gekozen": []
+   },
    "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 2,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 1,
+    "onbekend": 1
+   },
    "mandaat": {
     "mag": "tonen",
     "kwam": "geen",
     "binnen": true,
-    "uit": []
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
    },
    "vragen": {
     "mag": 1,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
@@ -739,7 +1069,15 @@
    "scenario": "act-locatie-stop",
    "input": "stop met mijn locatie delen",
    "klasse": "ACTION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
    "verwachtDoel": "locatie",
    "ambigu": false,
    "keten": {
@@ -752,17 +1090,38 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 4,
+    "gekozen": []
+   },
    "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 0,
+    "onbekend": 1
+   },
    "mandaat": {
     "mag": "tonen",
     "kwam": "geen",
     "binnen": true,
-    "uit": []
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
    },
    "vragen": {
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
@@ -793,7 +1152,15 @@
    "scenario": "act-documenten",
    "input": "toon mijn documenten",
    "klasse": "ACTION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
    "verwachtDoel": "documenten",
    "ambigu": false,
    "keten": {
@@ -806,17 +1173,38 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 1,
+    "gekozen": []
+   },
    "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 1,
+    "onbekend": 0
+   },
    "mandaat": {
     "mag": "tonen",
     "kwam": "geen",
     "binnen": true,
-    "uit": []
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
    },
    "vragen": {
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
@@ -847,7 +1235,15 @@
    "scenario": "act-vakken",
    "input": "wat zijn mijn vakken",
    "klasse": "ACTION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
    "verwachtDoel": "onderwijs",
    "ambigu": false,
    "keten": {
@@ -860,17 +1256,38 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 1,
+    "gekozen": []
+   },
    "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 0,
+    "onbekend": 1
+   },
    "mandaat": {
     "mag": "tonen",
     "kwam": "geen",
     "binnen": true,
-    "uit": []
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
    },
    "vragen": {
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
@@ -901,7 +1318,15 @@
    "scenario": "act-site-maak",
    "input": "maak een nieuwe site",
    "klasse": "ACTION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
    "verwachtDoel": "site",
    "ambigu": false,
    "keten": {
@@ -914,17 +1339,38 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 20,
+    "gekozen": []
+   },
    "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 2,
+    "collecties": 1,
+    "gemeten": 1,
+    "geenEffect": 1,
+    "onbekend": 0
+   },
    "mandaat": {
     "mag": "tonen",
     "kwam": "geen",
     "binnen": true,
-    "uit": []
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
    },
    "vragen": {
     "mag": 1,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
@@ -955,7 +1401,15 @@
    "scenario": "act-afspraak-dinsdag",
    "input": "plan een afspraak volgende week dinsdag",
    "klasse": "ACTION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
    "verwachtDoel": "agenda",
    "ambigu": false,
    "keten": {
@@ -968,17 +1422,38 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 12,
+    "gekozen": []
+   },
    "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 2,
+    "collecties": 1,
+    "gemeten": 1,
+    "geenEffect": 1,
+    "onbekend": 0
+   },
    "mandaat": {
     "mag": "tonen",
     "kwam": "geen",
     "binnen": true,
-    "uit": []
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
    },
    "vragen": {
     "mag": 1,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
@@ -1009,7 +1484,15 @@
    "scenario": "act-meet-maak",
    "input": "zet een ontmoeting op",
    "klasse": "ACTION",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
    "verwachtDoel": "ontmoeting",
    "ambigu": false,
    "keten": {
@@ -1022,17 +1505,38 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 1,
+    "gekozen": []
+   },
    "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 1,
+    "gemeten": 1,
+    "geenEffect": 0,
+    "onbekend": 0
+   },
    "mandaat": {
     "mag": "tonen",
     "kwam": "geen",
     "binnen": true,
-    "uit": []
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
    },
    "vragen": {
     "mag": 1,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
@@ -1063,7 +1567,14 @@
    "scenario": "amb-die-andere-geen",
    "input": "die andere",
    "klasse": "AMBIGUOUS",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": null,
    "ambigu": true,
    "keten": {
@@ -1076,6 +1587,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -1087,6 +1604,11 @@
     "mag": 1,
     "gesteld": 1,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [],
    "onbekend": [
@@ -1112,7 +1634,15 @@
    "scenario": "amb-die-andere-1",
    "input": "die andere",
    "klasse": "AMBIGUOUS",
-   "context": "vergelijking met 1 alternatief",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 4,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
    "verwachtDoel": "het enige alternatief",
    "ambigu": false,
    "keten": {
@@ -1125,6 +1655,13 @@
     "PROJECTED": "PASS",
     "EXECUTED": "PASS"
    },
+   "interpretatie": {
+    "versmald": false,
+    "paden": 120,
+    "gekozen": [
+     "/api/agenda/mijn"
+    ]
+   },
    "capability": "gekozen",
    "mandaat": {
     "mag": "tonen",
@@ -1133,12 +1670,21 @@
     "uit": [
      "pad /api/agenda/mijn (lezen) -> tonen",
      "EXECUTED status 200"
-    ]
+    ],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
    },
    "vragen": {
     "mag": 0,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef",
@@ -1160,7 +1706,14 @@
    "scenario": "amb-die-andere-2",
    "input": "die andere",
    "klasse": "AMBIGUOUS",
-   "context": "vergelijking met 2 alternatieven",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 4,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": null,
    "ambigu": true,
    "keten": {
@@ -1173,6 +1726,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -1184,6 +1743,11 @@
     "mag": 1,
     "gesteld": 1,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef"
@@ -1211,7 +1775,14 @@
    "scenario": "amb-die-andere-geen-kandidaten",
    "input": "die andere",
    "klasse": "AMBIGUOUS",
-   "context": "scherm zonder vergelijking",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 3,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": null,
    "ambigu": true,
    "keten": {
@@ -1224,6 +1795,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -1235,6 +1812,11 @@
     "mag": 1,
     "gesteld": 1,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef"
@@ -1262,7 +1844,14 @@
    "scenario": "amb-die-andere-onbevoegd",
    "input": "die andere",
    "klasse": "AMBIGUOUS",
-   "context": "1 alternatief, maar onbevoegd",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 6,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": null,
    "ambigu": true,
    "keten": {
@@ -1275,6 +1864,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -1286,6 +1881,11 @@
     "mag": 1,
     "gesteld": 1,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef"
@@ -1327,7 +1927,15 @@
    "scenario": "fup-liever-later-reis",
    "input": "liever later",
    "klasse": "FOLLOWUP",
-   "context": "actieve reiscontext",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 5,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
    "verwachtDoel": "reis",
    "ambigu": false,
    "keten": {
@@ -1340,18 +1948,39 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": false,
+    "paden": 120,
+    "gekozen": []
+   },
    "capability": "nietGekozen",
    "waarom": "Deze actie staat niet op de expliciete AI-allowlist voor member.",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 0,
+    "onbekend": 1
+   },
    "mandaat": {
     "mag": "tonen",
     "kwam": "geen",
     "binnen": true,
-    "uit": []
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
    },
    "vragen": {
     "mag": 1,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef",
@@ -1379,7 +2008,15 @@
    "scenario": "fup-liever-later-afspraak",
    "input": "liever later",
    "klasse": "FOLLOWUP",
-   "context": "actieve afspraakcontext",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 4,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
    "verwachtDoel": "agenda",
    "ambigu": false,
    "keten": {
@@ -1392,7 +2029,21 @@
     "PROJECTED": "PASS",
     "EXECUTED": "NOT_RUN"
    },
+   "interpretatie": {
+    "versmald": false,
+    "paden": 120,
+    "gekozen": [
+     "/api/agenda/wijzig"
+    ]
+   },
    "capability": "gekozen",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 0,
+    "onbekend": 1
+   },
    "mandaat": {
     "mag": "klaarzetten",
     "kwam": "klaarzetten",
@@ -1400,12 +2051,21 @@
     "uit": [
      "pad /api/agenda/wijzig (voorstel) -> klaarzetten",
      "een voorstel gezet (bevestigNodig)"
-    ]
+    ],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
    },
    "vragen": {
     "mag": 1,
     "gesteld": 0,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [
     "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef",
@@ -1429,7 +2089,14 @@
    "scenario": "fup-liever-later-geen",
    "input": "liever later",
    "klasse": "FOLLOWUP",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": null,
    "ambigu": true,
    "keten": {
@@ -1442,6 +2109,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -1453,6 +2126,11 @@
     "mag": 1,
     "gesteld": 1,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [],
    "onbekend": [
@@ -1478,7 +2156,14 @@
    "scenario": "ctx-deze-zonder",
    "input": "deze",
    "klasse": "CONTEXTUAL_REFERENCE",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": null,
    "ambigu": true,
    "keten": {
@@ -1491,6 +2176,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -1502,6 +2193,11 @@
     "mag": 1,
     "gesteld": 1,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [],
    "onbekend": [
@@ -1527,7 +2223,14 @@
    "scenario": "ctx-zelfde-zonder",
    "input": "zelfde als vorige keer",
    "klasse": "CONTEXTUAL_REFERENCE",
-   "context": "geen",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
    "verwachtDoel": null,
    "ambigu": true,
    "keten": {
@@ -1540,6 +2243,12 @@
     "PROJECTED": "PASS",
     "EXECUTED": "OVERGESLAGEN"
    },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
    "capability": "nietGekozen",
    "mandaat": {
     "mag": "geen",
@@ -1551,6 +2260,11 @@
     "mag": 1,
     "gesteld": 1,
     "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
    },
    "bewijs": [],
    "onbekend": [

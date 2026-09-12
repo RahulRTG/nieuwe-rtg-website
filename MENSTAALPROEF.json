@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-12T15:37:55.232Z",
-    "commit": "a83a2b5b",
+    "op": "2026-09-12T17:02:59.872Z",
+    "commit": "5a2b0e0b",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/menstaalproef.js",
@@ -207,6 +207,20 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -231,6 +245,20 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -255,6 +283,20 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -279,6 +321,20 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -303,6 +359,20 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -327,6 +397,20 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -351,6 +435,20 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -375,6 +473,20 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -399,6 +511,31 @@
       "vragen": 0,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": false,
+        "geraakt": []
+      },
+      "interpretatie": {
+        "versmald": false,
+        "paden": 120,
+        "gekozen": []
+      },
+      "gevolg": {
+        "stappen": 1,
+        "collecties": 0,
+        "gemeten": 0,
+        "geenEffect": 0,
+        "onbekend": 1
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
       "planReden": "Deze actie staat niet op de expliciete AI-allowlist voor member.",
       "uitslag": "binnen",
       "fasen": {
@@ -424,6 +561,31 @@
       "vragen": 0,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": false,
+        "geraakt": []
+      },
+      "interpretatie": {
+        "versmald": true,
+        "paden": 11,
+        "gekozen": []
+      },
+      "gevolg": {
+        "stappen": 2,
+        "collecties": 1,
+        "gemeten": 1,
+        "geenEffect": 1,
+        "onbekend": 0
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -451,6 +613,33 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": false,
+        "geraakt": []
+      },
+      "interpretatie": {
+        "versmald": true,
+        "paden": 11,
+        "gekozen": [
+          "/api/agenda/toevoegen"
+        ]
+      },
+      "gevolg": {
+        "stappen": 1,
+        "collecties": 1,
+        "gemeten": 1,
+        "geenEffect": 0,
+        "onbekend": 0
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -475,6 +664,31 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": false,
+        "geraakt": []
+      },
+      "interpretatie": {
+        "versmald": false,
+        "paden": 120,
+        "gekozen": []
+      },
+      "gevolg": {
+        "stappen": 1,
+        "collecties": 0,
+        "gemeten": 0,
+        "geenEffect": 1,
+        "onbekend": 0
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -499,6 +713,20 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -523,6 +751,31 @@
       "vragen": 0,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": false,
+        "geraakt": []
+      },
+      "interpretatie": {
+        "versmald": true,
+        "paden": 4,
+        "gekozen": []
+      },
+      "gevolg": {
+        "stappen": 2,
+        "collecties": 0,
+        "gemeten": 0,
+        "geenEffect": 1,
+        "onbekend": 1
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -547,6 +800,31 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": false,
+        "geraakt": []
+      },
+      "interpretatie": {
+        "versmald": true,
+        "paden": 4,
+        "gekozen": []
+      },
+      "gevolg": {
+        "stappen": 1,
+        "collecties": 0,
+        "gemeten": 0,
+        "geenEffect": 0,
+        "onbekend": 1
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -571,6 +849,31 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": false,
+        "geraakt": []
+      },
+      "interpretatie": {
+        "versmald": true,
+        "paden": 1,
+        "gekozen": []
+      },
+      "gevolg": {
+        "stappen": 1,
+        "collecties": 0,
+        "gemeten": 0,
+        "geenEffect": 1,
+        "onbekend": 0
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -595,6 +898,31 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": false,
+        "geraakt": []
+      },
+      "interpretatie": {
+        "versmald": true,
+        "paden": 1,
+        "gekozen": []
+      },
+      "gevolg": {
+        "stappen": 1,
+        "collecties": 0,
+        "gemeten": 0,
+        "geenEffect": 0,
+        "onbekend": 1
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -619,6 +947,31 @@
       "vragen": 0,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": false,
+        "geraakt": []
+      },
+      "interpretatie": {
+        "versmald": true,
+        "paden": 20,
+        "gekozen": []
+      },
+      "gevolg": {
+        "stappen": 2,
+        "collecties": 1,
+        "gemeten": 1,
+        "geenEffect": 1,
+        "onbekend": 0
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -643,6 +996,31 @@
       "vragen": 0,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": false,
+        "geraakt": []
+      },
+      "interpretatie": {
+        "versmald": true,
+        "paden": 12,
+        "gekozen": []
+      },
+      "gevolg": {
+        "stappen": 2,
+        "collecties": 1,
+        "gemeten": 1,
+        "geenEffect": 1,
+        "onbekend": 0
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -667,6 +1045,31 @@
       "vragen": 0,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": false,
+        "geraakt": []
+      },
+      "interpretatie": {
+        "versmald": true,
+        "paden": 1,
+        "gekozen": []
+      },
+      "gevolg": {
+        "stappen": 1,
+        "collecties": 1,
+        "gemeten": 1,
+        "geenEffect": 0,
+        "onbekend": 0
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -691,6 +1094,20 @@
       "vragen": 1,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -718,6 +1135,26 @@
       "vragen": 0,
       "magVragen": 0,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 4,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": false,
+        "geraakt": []
+      },
+      "interpretatie": {
+        "versmald": false,
+        "paden": 120,
+        "gekozen": [
+          "/api/agenda/mijn"
+        ]
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -742,6 +1179,20 @@
       "vragen": 1,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 4,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -766,6 +1217,20 @@
       "vragen": 1,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 3,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -790,6 +1255,20 @@
       "vragen": 1,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 6,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -822,6 +1301,31 @@
       "vragen": 0,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 5,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": false,
+        "geraakt": []
+      },
+      "interpretatie": {
+        "versmald": false,
+        "paden": 120,
+        "gekozen": []
+      },
+      "gevolg": {
+        "stappen": 1,
+        "collecties": 0,
+        "gemeten": 0,
+        "geenEffect": 0,
+        "onbekend": 1
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
       "planReden": "Deze actie staat niet op de expliciete AI-allowlist voor member.",
       "uitslag": "binnen",
       "fasen": {
@@ -850,6 +1354,33 @@
       "vragen": 0,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 4,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": false,
+        "geraakt": []
+      },
+      "interpretatie": {
+        "versmald": false,
+        "paden": 120,
+        "gekozen": [
+          "/api/agenda/wijzig"
+        ]
+      },
+      "gevolg": {
+        "stappen": 1,
+        "collecties": 0,
+        "gemeten": 0,
+        "geenEffect": 0,
+        "onbekend": 1
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -874,6 +1405,20 @@
       "vragen": 1,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -898,6 +1443,20 @@
       "vragen": 1,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",
@@ -922,6 +1481,20 @@
       "vragen": 1,
       "magVragen": 1,
       "teVeelVragen": false,
+      "context": {
+        "aangeboden": "OVERGESLAGEN",
+        "woorden": 0,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
       "uitslag": "binnen",
       "fasen": {
         "INPUT_RECEIVED": "PASS",

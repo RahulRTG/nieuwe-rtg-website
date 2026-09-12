@@ -358,13 +358,15 @@ if (require.main !== module) {
       localStorage.setItem('rtg_lang', 'nl');
     }, token);
     await p.goto(BASIS + '/apps/app.html');
-    /* De app is er als de schil staat, of de onboarding-poort, of een veld om
-       in te vullen. Alle drie zijn geldige eerste schermen. */
-    await wacht(p, 'app-staat-er', () => !!(document.querySelector('#rtgCommand') ||
-      document.querySelector('#onbGate') || document.querySelector('input[placeholder]')));
+    /* De verborgen inlog- en onboardingvelden staan al in de DOM voordat de
+       sessie geladen is. Wacht op zichtbare bediening in de app zelf, anders
+       kan de meter een verborgen naamveld voor de overeenkomst aanzien. */
+    await wacht(p, 'app-staat-er', () => [...document.querySelectorAll(
+      '#rtgCommand .cmd-leeg button, #onbGate input[placeholder*="naam" i], #onbGate input[placeholder*="name" i]')].some((e) =>
+      e.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })));
 
     /* STAP 1 -- de overeenkomst. NU NODIG: zonder handtekening geen lidmaatschap. */
-    const naamveld = await p.$('input[placeholder*="naam" i], input[placeholder*="name" i]');
+    const naamveld = await p.$('#onbGate input[placeholder*="naam" i]:visible, #onbGate input[placeholder*="name" i]:visible');
     if (naamveld) {
       const b = await p.evaluate(ZICHTBAAR);
       poorten.push({ soort: 'overeenkomst', nodig: true,
@@ -412,8 +414,9 @@ if (require.main !== module) {
        van het menu de enige handeling die er is, dus dat hoort bij de eerste
        minuut. Wie alleen station 1 meet, verklaart een leeg scherm schoon
        omdat het jargon net buiten beeld ligt. */
-    await wacht(p, 'schil-of-poort', () => !!(document.querySelector('#rtgCommand') ||
-      document.querySelector('#onbGate')));
+    await wacht(p, 'schil-of-poort', () => [...document.querySelectorAll(
+      '#rtgCommand .cmd-leeg button, #onbGate input')].some((e) =>
+      e.checkVisibility({ checkOpacity: true, checkVisibilityCSS: true })));
 
     /* EERST BEWIJZEN DAT WE BINNEN ZIJN, DAN PAS METEN.
 

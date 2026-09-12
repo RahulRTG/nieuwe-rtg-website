@@ -46,7 +46,7 @@ const { voorspel } = require('./gevolg');
 const AFDWINGEN = require('./herkomstschakelaar');
 const telling = require('./schaduwtelling');
 
-module.exports = function maakLusstap({ stuurRoep, filter, vuil }) {
+module.exports = function maakLusstap({ stuurRoep, filter, vuil, spoor }) {
 
   /* De schaduwtelling van deze lus. Geen module-toestand: twee gesprekken
      tegelijk zouden elkaars getal opschrijven. */
@@ -80,7 +80,11 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil }) {
          meting wat de stappen aanraakten. Het plan bezit de voorspelling niet
          (EXECUTIE.md blok 3: PLAN bezit niets). */
       const gewogen = compileer(t.input || {}, wereld);
-      const uit = Object.assign({}, gewogen, { gevolg: voorspel(gewogen) });
+      spoor && spoor.mark('PLAN_COMPILED', gewogen.uitvoerbaar ? 'PASS' : 'NOT_RUN',
+        { bezwaren: (gewogen.bezwaren || []).length });
+      const gevolg = voorspel(gewogen);
+      spoor && spoor.mark('CONSEQUENCE_EVALUATED', 'PASS', { graad: gevolg && gevolg.graad });
+      const uit = Object.assign({}, gewogen, { gevolg });
       acties.push({ pad: 'plan', status: uit.uitvoerbaar ? 200 : 409, gevraagd: true });
       return uit;
     }
@@ -90,6 +94,8 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil }) {
       const uit = (t.input && t.input.alles)
         ? { paden: toegestaan, versmald: false, reden: 'De volledige lijst voor deze rol, op verzoek.' }
         : resolveer(kaartVraag, toegestaan);
+      spoor && spoor.mark('INTENT_RESOLVED', 'PASS',
+        { versmald: !!uit.versmald, paden: (uit.paden || []).length });
       /* WAT ER DOOR EEN BEVEILIGINGSSTAND WEGVIEL, ZEGT DE KAART ERBIJ. Zonder
          deze regel denkt het model dat die vermogens niet BESTAAN, en zegt het
          "dat kan ik niet" in plaats van "dat kan nu niet, omdat". EXECUTIE.md
@@ -138,7 +144,12 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil }) {
           'en niet dat de mogelijkheid niet bestaat.' };
     }
 
+    spoor && spoor.mark('CAPABILITY_SELECTED', 'PASS', { pad });
     const uit = await stuurRoep(req, pad, (t.input || {}).body, { wereld });
+    /* EXECUTED of niet. Een 428 betekent dat de server een VOORSTEL teruggaf en
+       er dus niets is uitgevoerd -- dat is NOT_RUN en geen mislukking. */
+    spoor && spoor.mark('EXECUTED', uit && uit.bevestigNodig ? 'NOT_RUN' : 'PASS',
+      { status: uit && uit.status });
     acties.push({ pad, status: uit.status,
       goedkeuring: uit && uit.goedkeuring ? uit.goedkeuring : undefined });
     /* MELDEN VOOR HET ANTWOORD HET GESPREK IN GAAT. Zie de kop: erna is de

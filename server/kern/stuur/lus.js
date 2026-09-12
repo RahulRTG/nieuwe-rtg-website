@@ -9,6 +9,7 @@ const { TWIJFELREGELS } = require('../rahul/twijfel');
 const { TOOLS } = require('./gereedschap');
 const besmetting = require('./besmetting');
 const maakLusstap = require('./lusstap');
+const { maakSpoor } = require('./spoor');
 const beleid = require('./beleid');
 const { maakIsolatiefilter } = require('./isolatiefilter');
 
@@ -35,13 +36,21 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
        Twee lussen tegelijk zouden elkaars boekhouding overschrijven, en dan
        versmalt het gesprek van de een op de invoer van de ander. */
     const vuil = besmetting.nieuw();
-    const paden = () => stuurPaden(app, opties.wereld, isoContext(), vuil.bronnen())
-      .filter(opties.filter || (() => true));
+    /* Het spoor: observeert, beslist niets. Zie ./spoor.js. */
+    const spoor = (opties && opties.spoor) || maakSpoor({ vraag });
+    /* MANDATE_EVALUATED valt hier: zie de kop van ./spoor.js. */
+    const paden = () => {
+      const alle = stuurPaden(app, opties.wereld, isoContext(), vuil.bronnen());
+      const over = alle.filter(opties.filter || (() => true));
+      spoor && spoor.mark('MANDATE_EVALUATED', opties.filter ? 'PASS' : 'NOT_RUN',
+        { voor: alle.length, na: over.length });
+      return over;
+    };
     /* De poort bij `doe` velt HETZELFDE oordeel als de kaart, en dat kan alleen
        door dezelfde functie te gebruiken. Nabouwen zou twee waarheden geven die
        allebei 'werken' en na een jaar iets anders zeggen. */
     const laag = typeof isolatie === 'function' ? isolatie() : isolatie;
-    const stap = maakLusstap({ stuurRoep, vuil,
+    const stap = maakLusstap({ stuurRoep, vuil, spoor,
       filter: laag ? maakIsolatiefilter({ isolatie: laag, beleid }) : null });
     // een streamende voortgangsmelding (optioneel): de route koppelt dit aan de
     // SSE-bus, zodat de UI live "Stap 4/24: taxi zoeken..." kan tonen
@@ -83,7 +92,8 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
       // ---- lichte taak: één korte lus van 4 stappen ----
       if (!cls.zwaar) {
         const r = await loop([{ role: 'user', content: vraag }], 4, 0, 4, 'Bezig...');
-        return { tekst: r.tekst || 'Gedaan.', acties, zwaar: false, stappen: r.tel };
+        spoor && spoor.mark('PROJECTED', r.tekst ? 'PASS' : 'NOT_RUN', { tekens: (r.tekst || '').length });
+        return { tekst: r.tekst || 'Gedaan.', acties, zwaar: false, stappen: r.tel, spoor: spoor ? spoor.uitslag() : undefined };
       }
 
       // ---- zware taak: de hoofd-agent splitst in max 3 deeltaken, elk een

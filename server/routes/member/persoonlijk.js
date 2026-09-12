@@ -1,7 +1,6 @@
 /* Persoonlijke ledenroutes: zorg, locatie, Rahul en Shared Assets.
    De logica woont in de kernmodules. */
 const { maakLiveTwin } = require('../../ai-live-twin');
-
 const plafond = require('../../kern/stuur/plafond');
 
 module.exports = (kern) => {

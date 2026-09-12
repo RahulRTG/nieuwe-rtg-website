@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1608,
-    "toetsenNietGemeten": 609,
+    "toetsenNietGemeten": 610,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -75,6 +75,16 @@
     "eersteMinuutGezakt": 0
   },
   "notities": [
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 609,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 609 -> 610",
+      "reden": "test/menstaal.test.js komt erbij -- twaalf toetsen op het mensentaal-contract (server/kern/stuur/menstaal.json, 41 gevallen) -- en staat nog niet in MUTATIES.json. Dat is de definitie van deze teller en geen zwakkere toets: VIER mutaties zijn met de hand gedraaid en raakten elk precies hun eigen bewering -- een ambigu geval iets laten klaarzetten laat 6 zakken, een vijfde gezagstrede toevoegen laat 1 zakken, de rail een zin laten verstaan die niet in het contract staat laat 10 zakken, en drie zinnen uit het script halen laat 11 zakken. Herstellen gaf telkens 12/12.",
+      "waarheen": "test/menstaal.test.js draagt de belofte met de hand: twaalf beweringen, elk met zijn mutatie in het bestand zelf, vier ervan gedraaid en zien zakken. Laat scripts/mutatie.js over dat bestand lopen -- samen met test/stuurrail.test.js en test/stuurplafond.test.js uit de twee notities hieronder, want het is dezelfde ronde -- en leg MUTATIES.json opnieuw vast uit een schone commit."
+    },
     {
       "datum": "2026-09-12",
       "soort": "schuld",

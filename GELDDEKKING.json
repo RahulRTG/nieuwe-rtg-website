@@ -2,10 +2,10 @@
   "soort": "meting",
   "uitleg": "Economische dekking: wat er van elke waardebewegende ROUTE bewezen is, samengesteld uit GELDKAART.json (welke routes), MUTATIECONTRACT.json (semantiek en toegang), IDEMPROEF.json (idempotentie) en HERSTELPROEF.json (de terugweg).",
   "stempel": {
-    "op": "2026-09-12T16:02:32.824Z",
-    "commit": "24671033",
+    "op": "2026-09-12T16:24:50.929Z",
+    "commit": "c889cc90",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/gelddekking.js",
     "node": "v22.22.2"
   },

@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-12T16:02:32.582Z",
-  "commit": "24671033",
+  "op": "2026-09-12T16:24:50.667Z",
+  "commit": "c889cc90",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
@@ -18,7 +18,7 @@
    "PROTECTED": 404,
    "INTENTIONALLY_NON_IDEMPOTENT": 125
   },
-  "vastgesteldDoorMens": 1715,
+  "vastgesteldDoorMens": 1730,
   "afgeleidDoorScript": 3192,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4061,
@@ -3918,7 +3918,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3931,7 +3931,7 @@
     "hindernis": "Onvoldoende saldo of rood-staan-ruimte."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -3945,7 +3945,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3958,7 +3958,7 @@
     "hindernis": null
    },
    "stand": "PROTECTED",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -3972,7 +3972,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -3985,7 +3985,7 @@
     "hindernis": null
    },
    "stand": "PROTECTED",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -3999,7 +3999,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -4012,7 +4012,7 @@
     "hindernis": "De pas bestaat niet."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -4215,7 +4215,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -4228,7 +4228,7 @@
     "hindernis": null
    },
    "stand": "PROTECTED",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -8173,7 +8173,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "techAuth"
     ]
@@ -8186,7 +8186,7 @@
     "hindernis": "Onbekende betaalprovider."
    },
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -27329,7 +27329,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -27342,7 +27342,7 @@
     "hindernis": "Deze regel bestaat niet."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -31578,7 +31578,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -31591,7 +31591,7 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -74082,7 +74082,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -74095,7 +74095,7 @@
     "hindernis": "Deze factuur is al betaald."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -74433,7 +74433,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "auth"
     ]
@@ -74446,7 +74446,7 @@
     "hindernis": "Dit verzoek is al afgehandeld."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -100470,7 +100470,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -100483,7 +100483,7 @@
     "hindernis": null
    },
    "stand": "PROTECTED",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -100524,7 +100524,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -100537,7 +100537,7 @@
     "hindernis": "Factuur niet gevonden."
    },
    "stand": "NOT_APPLICABLE",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -111148,7 +111148,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -111161,7 +111161,7 @@
     "hindernis": "Deze functie is voor dit genre zaken uitgeschakeld door RTG."
    },
    "stand": "NOT_APPLICABLE",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -112147,7 +112147,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -112160,7 +112160,7 @@
     "hindernis": "Er is niet genoeg saldo om dit apart te zetten."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -113092,7 +113092,7 @@
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": null,
+    "bedoeld": "AUTHENTICATED",
     "bewakers": [
      "supplierAuth"
     ]
@@ -113105,7 +113105,7 @@
     "hindernis": "Geen open rekening voor deze kamer of tafel."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": null,
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

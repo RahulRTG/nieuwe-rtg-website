@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-12T10:40:18.574Z",
-    "commit": "a4891c3d",
+    "op": "2026-09-12T11:57:22.333Z",
+    "commit": "c933e406",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 7,
     "instrument": "scripts/pakte.js",
     "node": "v22.22.2"
   },
@@ -12,12 +12,13 @@
   "verandertNiets": true,
   "corpus": {
     "bestand": "server/kern/stuur/menstaal.json",
-    "gevallenNU": 24
+    "gevallenNU": 26,
+    "metContext": 2
   },
   "telling": {
-    "gemeten": 24,
+    "gemeten": 26,
     "antwoordrail": 1,
-    "stuur": 23,
+    "stuur": 25,
     "nietGemeten": 0,
     "misgelopen": 0,
     "uitlegNaarStuur": 8
@@ -36,9 +37,9 @@
       "nietGemeten": 0
     },
     "AMBIGUOUS": {
-      "gevallen": 2,
+      "gevallen": 4,
       "antwoordrail": 1,
-      "stuur": 1,
+      "stuur": 3,
       "nietGemeten": 0
     },
     "FOLLOWUP": {
@@ -89,13 +90,14 @@
       "input": "wie kan mijn gegevens zien"
     }
   ],
-  "grens": "Dit zegt NIET of de antwoordrail een goed antwoord gaf; alleen wie de vraag claimde. Het is gemeten met de DETERMINISTISCHE rail -- een modelrail kan anders claimen, want dan bestaat stuurLus om een andere reden. Alleen de gevallen die vandaag beproefbaar zijn tellen mee; de contextgevallen (FASE4) zijn niet gemeten. En elk geval kreeg een VERS lid, dus er is geen gespreksgeschiedenis: in een lopend gesprek kan de antwoordrail vaker claimen dan hier, omdat p.wacht en het geheugen dan gevuld zijn.",
+  "grens": "Dit zegt NIET of de antwoordrail een goed antwoord gaf; alleen wie de vraag claimde. Het is gemeten met de DETERMINISTISCHE rail -- een modelrail kan anders claimen, want dan bestaat stuurLus om een andere reden. Alleen de gevallen die vandaag beproefbaar zijn tellen mee; de contextgevallen (FASE4) zijn niet gemeten. En elk geval kreeg een VERS lid, dus er is geen gespreksgeschiedenis: in een lopend gesprek kan de antwoordrail vaker claimen dan hier, omdat p.wacht en het geheugen dan gevuld zijn. De gevallen met een `contextGeval` zijn MET die context gepost; dat is de context uit het CONTRACT en niet die van een echt scherm.",
   "rijen": [
     {
       "id": "info-travelos",
       "klasse": "INFORMATION",
       "input": "wat is travelos",
       "verwachteRoute": "ANSWER",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -104,6 +106,7 @@
       "klasse": "INFORMATION",
       "input": "wat kan rtg",
       "verwachteRoute": "ANSWER",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -112,6 +115,7 @@
       "klasse": "INFORMATION",
       "input": "hoe werkt betalen",
       "verwachteRoute": "ANSWER",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -120,6 +124,7 @@
       "klasse": "INFORMATION",
       "input": "wat is het verschil tussen de passen",
       "verwachteRoute": "ANSWER",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -128,6 +133,7 @@
       "klasse": "INFORMATION",
       "input": "waar staat mijn codenaam voor",
       "verwachteRoute": "ANSWER",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -136,6 +142,7 @@
       "klasse": "INFORMATION",
       "input": "wat is de salon",
       "verwachteRoute": "ANSWER",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -144,6 +151,7 @@
       "klasse": "INFORMATION",
       "input": "wat doet de rtfoundation",
       "verwachteRoute": "ANSWER",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -152,6 +160,7 @@
       "klasse": "INFORMATION",
       "input": "wie kan mijn gegevens zien",
       "verwachteRoute": "ANSWER",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -160,6 +169,7 @@
       "klasse": "ACTION",
       "input": "parijs vrijdag",
       "verwachteRoute": "OPERATIONAL",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -168,6 +178,7 @@
       "klasse": "ACTION",
       "input": "zet vrijdag in mijn agenda",
       "verwachteRoute": "OPERATIONAL",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -176,6 +187,7 @@
       "klasse": "ACTION",
       "input": "wat staat er morgen in mijn agenda",
       "verwachteRoute": "OPERATIONAL",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -184,6 +196,7 @@
       "klasse": "ACTION",
       "input": "waar is mijn bestelling",
       "verwachteRoute": "OPERATIONAL",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -192,6 +205,7 @@
       "klasse": "ACTION",
       "input": "deel mijn locatie",
       "verwachteRoute": "OPERATIONAL",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -200,6 +214,7 @@
       "klasse": "ACTION",
       "input": "stop met mijn locatie delen",
       "verwachteRoute": "OPERATIONAL",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -208,6 +223,7 @@
       "klasse": "ACTION",
       "input": "toon mijn documenten",
       "verwachteRoute": "OPERATIONAL",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -216,6 +232,7 @@
       "klasse": "ACTION",
       "input": "wat zijn mijn vakken",
       "verwachteRoute": "OPERATIONAL",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -224,6 +241,7 @@
       "klasse": "ACTION",
       "input": "maak een nieuwe site",
       "verwachteRoute": "OPERATIONAL",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -232,6 +250,7 @@
       "klasse": "ACTION",
       "input": "plan een afspraak volgende week dinsdag",
       "verwachteRoute": "OPERATIONAL",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -240,6 +259,7 @@
       "klasse": "ACTION",
       "input": "zet een ontmoeting op",
       "verwachteRoute": "OPERATIONAL",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -248,6 +268,25 @@
       "klasse": "AMBIGUOUS",
       "input": "die andere",
       "verwachteRoute": "CLARIFY",
+      "metContext": false,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "amb-die-andere-1",
+      "klasse": "AMBIGUOUS",
+      "input": "die andere",
+      "verwachteRoute": "OPERATIONAL",
+      "metContext": true,
+      "pakte": false,
+      "uitslag": "stuur"
+    },
+    {
+      "id": "amb-die-andere-2",
+      "klasse": "AMBIGUOUS",
+      "input": "die andere",
+      "verwachteRoute": "CLARIFY",
+      "metContext": true,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -256,6 +295,7 @@
       "klasse": "AMBIGUOUS",
       "input": "doe maar",
       "verwachteRoute": "CLARIFY",
+      "metContext": false,
       "pakte": true,
       "uitslag": "antwoordrail"
     },
@@ -264,6 +304,7 @@
       "klasse": "FOLLOWUP",
       "input": "liever later",
       "verwachteRoute": "CLARIFY",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -272,6 +313,7 @@
       "klasse": "CONTEXTUAL_REFERENCE",
       "input": "deze",
       "verwachteRoute": "CLARIFY",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     },
@@ -280,6 +322,7 @@
       "klasse": "CONTEXTUAL_REFERENCE",
       "input": "zelfde als vorige keer",
       "verwachteRoute": "CLARIFY",
+      "metContext": false,
       "pakte": false,
       "uitslag": "stuur"
     }

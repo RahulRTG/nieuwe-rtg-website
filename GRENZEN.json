@@ -1448,9 +1448,13 @@
     ],
     "papieren-deur": [],
     "pay": [
+      "corrigeerFactuur",
       "factuurSaldo",
       "onboarding",
       "pay"
+    ],
+    "pay-correctie": [
+      "corrigeerFactuur"
     ],
     "pay-tegoed": [
       "pay"

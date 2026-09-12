@@ -3323,6 +3323,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/pay/index.js', 'geld: bevestigen vóór duurzaamheid is een belofte die de opslag nog niet deed'],
     ['server/kern/economie/runtime/index.js', 'economische waarheid: intent, ledger en evidence worden vóór bevestiging als één bundel vastgelegd'],
     ['server/kern/fonds.js', 'fondsallocatie: een bevestigde verdeling mag niet na een herstart verdwijnen'],
+    ['server/kern/factuurcorrectie.js', 'geld terug naar een lid: de terugboeking en de correctieregel horen als een duurzame commit op schijf, net als de heenweg in kern/factuursaldo.js -- een lid dat "terugbetaald" leest terwijl de opslag het nog niet heeft, is precies de halve uitkomst waar de factuurproef voor is gebouwd'],
     ['server/kern/experience/index.js', 'menselijke bevestiging: acknowledgement en action evidence worden vóór succes duurzaam vastgelegd'],
     ['server/kern/notities.js', 'werk van een lid: een bevestigde notitie mag niet verdwijnen bij een opslagfout'],
     ['server/kern/vertegenwoordiging/index.js', 'een machtiging is de bevoegdheid van een mens over het leven van een ander: aanvaarden, intrekken en de eigen grens mogen nooit bevestigd zijn zonder dat de opslag het heeft'],

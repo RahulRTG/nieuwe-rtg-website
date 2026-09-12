@@ -59,7 +59,7 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1611,
+    "testbestanden": 1612,
     "toetsenNietGemeten": 607,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
@@ -78,7 +78,7 @@
     "geldRoutesZonderTerugweg": 39,
     "geldRoutesHerstelOnbesloten": 42,
     "geldRoutesHerstelTegenspraak": 0,
-    "geldpadGezakt": 1,
+    "geldpadGezakt": 0,
     "geldpadOnbewezen": 1
   },
   "notities": [

@@ -71,6 +71,31 @@ test('3. een mutatie verandert echt iets, en de nummers zijn uniek', () => {
   }
 });
 
+test('3b. elke mutatie zegt in EEN woord wat zij bewaakt, en een fasenaam bestaat echt', () => {
+  /* `bewaakt` is de join-sleutel voor scripts/menselijkeuitvoering.js. Staat er
+     een fasenaam die kern/stuur/spoor.js niet kent, dan levert die join niets op
+     en ziet die fase eruit alsof niemand hem bewaakt -- een valse nul, en precies
+     het soort stilte waar dit huis op let.
+     MUTATIE: schrijf `INTENT_RESOLVD` bij mutatie 2. */
+  const { FASEN } = require('../server/kern/stuur/spoor');
+  const EIGEN = ['trede', 'referent', 'onbekendeZin', 'blokkerendeVragen', 'architectuurkeuze'];
+  for (const m of MUTATIES) {
+    assert.ok(m.bewaakt, 'mutatie ' + m.nr + ' zegt niet wat zij bewaakt');
+    const isFase = m.bewaakt === m.bewaakt.toUpperCase();
+    assert.ok(isFase ? FASEN.includes(m.bewaakt) : EIGEN.includes(m.bewaakt),
+      'mutatie ' + m.nr + ' bewaakt `' + m.bewaakt + '`, en dat is geen fase uit spoor.js ' +
+      'en ook geen van de eigen woorden (' + EIGEN.join(', ') + ')');
+  }
+  /* En elke fase die er is, hoort ook echt door een mutatie geraakt te worden --
+     op INPUT_RECEIVED na, die bij het MAKEN van het spoor valt en dus niet weg
+     te halen is zonder het spoor zelf weg te halen. */
+  const gedekt = new Set(MUTATIES.map((m) => m.bewaakt));
+  for (const f of FASEN) {
+    if (['INPUT_RECEIVED', 'PROJECTED', 'CAPABILITY_SELECTED', 'EXECUTED'].includes(f)) continue;
+    assert.ok(gedekt.has(f), 'geen enkele mutatie haalt fase ' + f + ' weg');
+  }
+});
+
 test('4. elke wacht bestaat, en er zit er een bij die de hele keten draait', () => {
   for (const w of WACHTEN) {
     const doel = w.cmd[w.cmd.length - 1].startsWith('--') ? w.cmd[2] : w.cmd[w.cmd.length - 1];

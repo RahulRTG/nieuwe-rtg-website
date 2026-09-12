@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1613,
-    "toetsenNietGemeten": 613,
+    "toetsenNietGemeten": 614,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -81,6 +81,16 @@
     "mensmutatieZonderWacht": 1
   },
   "notities": [
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 613,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 613 -> 614",
+      "reden": "test/menselijkeuitvoering.test.js komt erbij -- zeven toetsen op MENSELIJKE_UITVOERING.json als PROJECTIE (byte voor byte hercompileerbaar, vingerafdrukken die kloppen, zelf niets meten, leeftijdsverschil nooit bij tegenspraak optellen, onbekenden met een reden, bewijs dat naar een gezakte mutatie wijst en niet naar een spoor-id) -- en staat nog niet in MUTATIES.json. Alle zeven zijn met de hand gemuteerd en zien zakken: minder scenarios laat 0 zakken, een getal met de hand veranderen laat 1 zakken, een liegende vingerafdruk laat 2 zakken, de generator laten meten laat 3 zakken, elk verschil een tegenspraak noemen laat 4 zakken, de vaste onbekende weghalen laat 5 zakken, en een lege join met MENSMUTATIE.json laat 6 zakken. Let op wat daar onderweg misging: de eerste versie van toets 4 toetste alleen de LIJSTEN, en omdat er vandaag nul leeftijdsverschillen zijn was elke mutatie erop een no-op -- een toets die niet kon zakken. Het onderscheid staat nu als functie (soortVerschil) en wordt op afgedwongen invoer beproefd.",
+      "waarheen": "test/menselijkeuitvoering.test.js draagt de belofte met de hand: zeven beweringen, alle zeven gedraaid en zien zakken. Laat scripts/mutatie.js over dat bestand lopen -- samen met mensmutatie, stuurspoor, stuurrail, menstaal en stuurplafond uit de notities hieronder, want het is dezelfde ronde."
+    },
     {
       "datum": "2026-09-12",
       "soort": "schuld",

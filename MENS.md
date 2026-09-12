@@ -512,6 +512,23 @@ anders ging, en het gat was onzichtbaar. Dezelfde fout zit in de ijking van
 `scripts/menstaalproef.js` uitgeschreven: een mutatie die door een ándere poort
 wordt tegengehouden dan de bedoelde, bewijst niets.
 
+### Het register erboven is een projectie en geen verslag
+
+`MENSELIJKE_UITVOERING.json` legt per zin naast elkaar welke schakels liepen, hoe
+ver hij kwam, en welke wacht er aantoonbaar afgaat als een schakel wordt
+weggehaald. Hij MEET niets zelf -- er komt geen server en geen browser aan te pas
+-- en hij is byte voor byte te hercompileren uit zijn bronnen; met de hand
+bijgewerkt is rood, en een generator die iets anders doet zonder dat een bron
+veranderde ook. Dezelfde drie handhavingen als `EXECUTION_MAP.json`.
+
+Twee dingen daar niet wegpoetsen. Het veld `bewijs` verwijst met opzet **niet**
+naar een spoor-id: dat is verzoekgebonden en verdwijnt aan het eind van de
+aanroep, dus ernaar wijzen levert een bewijsstuk op dat niemand kan openen. Wat
+er staat is de mutatie die iemand heeft zien zakken. En een verschil tussen twee
+registers van **verschillende leeftijd is een leeftijdsverschil en geen
+tegenspraak** (CODE.md par. 0.9) -- die twee staan apart en worden nooit
+opgeteld, want ze samenvoegen maakt van een oude meting een fout.
+
 ### Wat hiermee NIET bewezen is
 
 Dat een MODEL de zinnen zo zou uitleggen. De interpretatie is vandaag gescript;

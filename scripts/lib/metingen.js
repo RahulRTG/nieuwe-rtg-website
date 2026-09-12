@@ -204,6 +204,12 @@ const REGISTER = {
   'WACHTWIJZE.json': { eigenRatel: 'test/wachtwijze.test.js' },
   'HANDELINGSKLASSE.json': { eigenRatel: 'test/handelingsklasse.test.js' },
   'EXECUTION_MAP.json': { eigenRatel: 'test/executionmap.test.js' },
+  /* MENSELIJKE_UITVOERING.json is net als EXECUTION_MAP.json een PROJECTIE
+     zonder tijdstempel: hij draagt vingerafdrukken van zijn bronnen in plaats
+     van een klok, en test/menselijkeuitvoering.test.js hercompileert hem byte
+     voor byte. Dat is strenger dan een ouderdomscontrole -- een projectie die
+     achterloopt op zijn bron zakt meteen. */
+  'MENSELIJKE_UITVOERING.json': { eigenRatel: 'test/menselijkeuitvoering.test.js' },
   'HERSTEL.json': { eigenRatel: 'test/herstel.test.js' },
   'HERSTELPROEF.json': { eigenRatel: 'test/herstelproef.test.js' },
   'DROOGLOOP.json': { eigenRatel: 'test/droogloop.test.js' },

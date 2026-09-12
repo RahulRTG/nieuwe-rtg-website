@@ -77,6 +77,14 @@ const WACHTEN = [
     cmd: ['node', 'scripts/menstaalproef.js', '--controle', '--stil', '--niet-schrijven'] }
 ];
 
+/* WAT ELKE MUTATIE BEWAAKT, in EEN woord, zodat een andere laag erop kan
+   joinen zonder een tweede tabel aan te leggen. Is het een FASE uit
+   kern/stuur/spoor.js, dan staat die naam er letterlijk -- dan kan
+   scripts/menselijkeuitvoering.js per fase zeggen welke wacht hem bewijst. Is
+   het geen fase (de trede, een referent, een onbekende zin, het aantal vragen,
+   een architectuurkeuze), dan staat er een eigen woord. test/mensmutatie.test.js
+   houdt vast dat een fasenaam ook echt in FASEN staat: een typefout zou de join
+   stil leeg maken, en dan zou een fase eruitzien alsof niemand hem bewaakt. */
 const L = 'server/kern/stuur/lus.js';
 const LS = 'server/kern/stuur/lusstap.js';
 const PL = 'server/kern/stuur/plafond.js';
@@ -95,6 +103,7 @@ const B_PROJECTIE = "projectie: 'Je bedoelt de afspraak van 14:00. Dit is wat da
 
 const MUTATIES = [
   { nr: '1', naam: 'context verwijderd',
+    bewaakt: 'CONTEXT_SANITIZED',
     weg: 'de gesaneerde schermcontext bereikt de lus niet meer',
     hoortTeZakken: 'de gesprekssamenhang: dezelfde zin met een ander scherm geeft dan dezelfde uitkomst',
     tekst: [{ bestand: L,
@@ -102,6 +111,7 @@ const MUTATIES = [
       naar: 'menscontext.saneer(null)' }] },
 
   { nr: '2', naam: 'resolver bypass',
+    bewaakt: 'INTENT_RESOLVED',
     weg: 'de echte resolver draait niet en INTENT_RESOLVED wordt niet gemerkt',
     hoortTeZakken: 'het spoor is incompleet',
     tekst: [
@@ -111,6 +121,7 @@ const MUTATIES = [
         naar: "false && spoor.mark('INTENT_RESOLVED', 'PASS'," }] },
 
   { nr: '3', naam: 'plan bypass',
+    bewaakt: 'PLAN_COMPILED',
     weg: 'de echte compileer() draait niet en PLAN_COMPILED wordt niet gemerkt',
     hoortTeZakken: 'het spoor is incompleet',
     tekst: [
@@ -120,6 +131,7 @@ const MUTATIES = [
         naar: "false && spoor.mark('PLAN_COMPILED', 'PASS'," }] },
 
   { nr: '4', naam: 'gevolg bypass',
+    bewaakt: 'CONSEQUENCE_EVALUATED',
     weg: 'de echte voorspel() draait niet en CONSEQUENCE_EVALUATED wordt niet gemerkt',
     hoortTeZakken: 'het spoor is incompleet',
     tekst: [
@@ -129,17 +141,20 @@ const MUTATIES = [
         naar: "false && spoor.mark('CONSEQUENCE_EVALUATED', 'PASS', { graad: gevolg && gevolg.graad });" }] },
 
   { nr: '5', naam: 'mandaat bypass',
+    bewaakt: 'MANDATE_EVALUATED',
     weg: 'de padenlijst wordt niet meer gefilterd: de wereldgrens en de plafondgrendel vallen weg',
     hoortTeZakken: 'de veiligheidspoort',
     tekst: [{ bestand: L, van: 'const over = alle.filter(opties.filter || (() => true));',
       naar: 'const over = alle;' }] },
 
   { nr: '6', naam: 'mandaat omhoog geforceerd',
+    bewaakt: 'trede',
     weg: 'zonder mandaat staat het plafond op `uitvoeren` in plaats van `tonen`',
     hoortTeZakken: 'de plafondtoets',
     tekst: [{ bestand: PL, van: "const STANDAARD = 'tonen';", naar: "const STANDAARD = 'uitvoeren';" }] },
 
   { nr: '7', naam: 'ambigue referent gekozen',
+    bewaakt: 'referent',
     weg: 'met TWEE gelijkwaardige alternatieven kiest de keten er toch een',
     hoortTeZakken: 'de referentveiligheid',
     tekst: [{ bestand: RCC,
@@ -152,17 +167,20 @@ const MUTATIES = [
         "      projectie: 'Je bedoelt de afspraak van 14:00.' }" }] },
 
   { nr: '8', naam: 'UNKNOWN behandeld als READ_ONLY',
+    bewaakt: 'onbekendeZin',
     weg: 'een zin die de rail NIET kent levert toch een leesactie op in plaats van niets',
     hoortTeZakken: 'de zijeffecttoets van de rail',
     tekst: [{ bestand: RC, van: 'if (!regel) return tekstbeurt(NIET_HERKEND);',
       naar: "if (!regel) return toolbeurt([{ name: 'kaart', input: {} }], aantalBeurten(messages));" }] },
 
   { nr: '9a', naam: '2 vragen tegelijk -- in het CONTRACT',
+    bewaakt: 'blokkerendeVragen',
     weg: 'het contract staat een geval toe dat twee blokkerende vragen tegelijk stelt',
     hoortTeZakken: 'de menselijke-inspanningstoets',
     contract: [{ bestand: CON, geval: 'amb-die-andere-2', veld: 'blockingVraagMax', naar: 2 }] },
 
   { nr: '9b', naam: '2 vragen tegelijk -- in het ANTWOORD',
+    bewaakt: 'blokkerendeVragen',
     weg: 'het antwoord dat een mens leest stelt er werkelijk twee, terwijl het contract er 1 toestaat',
     hoortTeZakken: 'dezelfde toets, maar dan op het gedrag in plaats van op het contract',
     tekst: [{ bestand: RCC, van: B_PROJECTIE,
@@ -170,6 +188,7 @@ const MUTATIES = [
         "        'En moet ik er meteen iets aan veranderen?' }" }] },
 
   { nr: '10a', naam: 'wereldkeuze verplicht -- in het CONTRACT',
+    bewaakt: 'architectuurkeuze',
     weg: 'het contract staat een geval toe waarin de mens zelf een wereld of app kiest',
     hoortTeZakken: 'de architectuurkeuzetoets',
     contract: [{ bestand: CON, geval: 'amb-die-andere-2', veld: 'architectuurKeuzesMax', naar: 1 }] },
@@ -185,6 +204,7 @@ const MUTATIES = [
      scripts/menstaalproef.js). De zin dwingt nu dezelfde keuze af zonder iets
      te vragen, zodat alleen een echte architectuurwacht hem kan zien. */
   { nr: '10b', naam: 'wereldkeuze verplicht -- in het ANTWOORD',
+    bewaakt: 'architectuurkeuze',
     weg: 'het antwoord laat de mens werkelijk kiezen tussen twee RTG-werelden',
     hoortTeZakken: 'dezelfde toets, maar dan op het gedrag in plaats van op het contract',
     tekst: [{ bestand: RCC, van: B_PROJECTIE,
@@ -311,7 +331,7 @@ if (require.main !== module) { module.exports = { MUTATIES, WACHTEN }; return; }
       }
     }
     const staat = beet.length ? 'GEZAKT' : 'GEEN_WACHT';
-    rijen.push({ nr: m.nr, naam: m.naam, weg: m.weg, hoortTeZakken: m.hoortTeZakken,
+    rijen.push({ nr: m.nr, naam: m.naam, bewaakt: m.bewaakt, weg: m.weg, hoortTeZakken: m.hoortTeZakken,
       bestanden: toe.bestanden, staat, beet, bleefGroen, alRood: alRood.length ? alRood : undefined });
     console.log('  ' + m.nr.padEnd(4) + (staat === 'GEZAKT' ? 'gezakt     ' : 'GEEN WACHT ') +
       m.naam + (beet.length ? '  <- ' + beet.map((b) => b.wacht).join(', ') : ''));

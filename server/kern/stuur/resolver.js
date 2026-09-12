@@ -163,4 +163,19 @@ function resolveer(vraag, paden, opties) {
   };
 }
 
-module.exports = { resolveer, segmentenVan, nietszeggendeSegmenten, STANDAARD_MAX };
+/* TWEE FUNCTIES IN DIT HUIS HETEN `resolveer` EN ZE DOEN IETS TOTAAL ANDERS.
+
+   Deze lost een menselijke vraag op naar een werkveld van PADEN.
+   `kern/naamlaag.js` lost een stuk tekst op naar een CODENAAM. Wie op de naam
+   zoekt vindt er twee, en wie de verkeerde importeert merkt dat pas als er een
+   codenaam in een padenlijst belandt of andersom.
+
+   Daarom draagt deze vanaf nu ook een naam die zegt WAT hij oplost.
+   `resolveer` blijft bestaan omdat de bestaande aanroepers en drie meters hem
+   zo noemen; nieuwe code hoort `resolveerIntent` te gebruiken. Het is dezelfde
+   functie en geen tweede implementatie -- een alias, geen afsplitsing, want
+   twee implementaties van dezelfde vraag zijn precies de fout die dit
+   commentaar probeert te voorkomen. */
+const resolveerIntent = resolveer;
+
+module.exports = { resolveer, resolveerIntent, segmentenVan, nietszeggendeSegmenten, STANDAARD_MAX };

@@ -34,19 +34,21 @@
    -- overgenomen uit ./gereedschap.js en ./plan.js, niet verzonnen. */
 'use strict';
 
-/* Vijf bronnen, EEN corpus. ./rail-corpus-zinnen.js draagt wat een ZIN
+/* Zes bronnen, EEN corpus. ./rail-corpus-zinnen.js draagt wat een ZIN
    oplevert, ./rail-corpus-context.js wat dezelfde zin MET een scherm eronder
    oplevert (de VERWIJZING: "die andere"), ./rail-corpus-samenhang.js wat een
    korte vervolgzin krijgt van wat er openstaat ("liever later"), en
    ./rail-corpus-goudenplak.js de twee zinnen die de keten tot het EIND
    uitvoeren, en ./rail-corpus-geld.js wat er gebeurt als diezelfde
-   dubbelzinnigheid over GELD gaat -- die tweede kan pas bestaan sinds de gesaneerde context onder de
+   dubbelzinnigheid over GELD gaat, en ./rail-corpus-bevestig.js of een
+   instemming in het gesprek een klaargezette handeling kan afmaken (nee) -- die tweede kan pas bestaan sinds de gesaneerde context onder de
    vraag meereist (./menscontext.js). Ze worden hier samengevoegd en niet in
    elkaar geschoven: een sleutel die in allebei staat, is een botsing en geen
    voorrangsregel, en test/menscontext.test.js laat de bouw daarop zakken. */
 const ZINNEN = Object.assign({}, require('./rail-corpus-zinnen'),
   require('./rail-corpus-context'), require('./rail-corpus-samenhang'),
-  require('./rail-corpus-goudenplak'), require('./rail-corpus-geld'));
+  require('./rail-corpus-goudenplak'), require('./rail-corpus-geld'),
+  require('./rail-corpus-bevestig'));
 
 /* Normaliseren is met opzet het domste wat werkt. Elke regel die hier bij komt
    is begrip, en begrip hoort in de echte rail. */
@@ -137,7 +139,13 @@ function maakCorpusRail(opties) {
        geen journaal -- er gaat geen vraagtekst naar een register. */
     gezien: () => gezien.slice(),
     kentZin: (zin) => Object.prototype.hasOwnProperty.call(corpus, normaliseer(zin)),
-    zinnen: () => Object.keys(corpus)
+    zinnen: () => Object.keys(corpus),
+    /* DE REGELS ZELF, voor een toets die eroverheen wil lopen. Zonder dit hield
+       test/stuurrail.test.js zijn eigen lijst corpusbestanden bij -- en die
+       dreef af zodra er een bestand bij kwam, precies zoals in
+       test/menscontext.test.js. Een kopie, want een toets hoort het
+       productiecorpus niet te kunnen wijzigen. */
+    regels: () => Object.assign({}, corpus)
   };
 }
 

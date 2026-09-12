@@ -631,8 +631,18 @@
       "maxMandaat": "geen",
       "blockingVraagMax": 0,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4",
-      "let op": "een voorstel wordt NOOIT in het gesprek bevestigd; de knop buiten het gesprek doet dat. Dit geval hoort dus naar die knop te wijzen en niets uit te voeren"
+      "beproefbaar": "NU",
+      "let op": "een voorstel wordt NOOIT in het gesprek bevestigd; de knop buiten het gesprek doet dat. Dit geval hoort dus naar die knop te wijzen en niets uit te voeren",
+      "contextGeval": {
+        "app": "RTG Agenda",
+        "deel": "Vrijdag",
+        "interactie": {
+          "soort": "selectie",
+          "opties": [
+            "Voorstel tandarts vrijdag 14:00"
+          ]
+        }
+      }
     },
     {
       "id": "fup-toch-niet",
@@ -646,7 +656,8 @@
       "maxMandaat": "tonen",
       "blockingVraagMax": 0,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "FASE4",
+      "let op": "NIET TE DRAAIEN, EN NIET OM DE CONTEXT. Het contract wil hier `intrekken`, en er is voor deze rail geen pad om een klaargezet voorstel in te trekken: /api/goedkeuring/intrek, /api/stuur/bevestig en /api/stuur/voorstellen staan alle drie op `verboden`. Dat is geen gat in de bedrading maar een PRODUCTVRAAG -- mag een lid een staand voorstel via Rahul intrekken, of alleen op de knop waar hij het ook bevestigt? Zolang dat niet is besloten, blijft dit geval een vooruitlopend contract; een corpusregel schrijven die iets anders doet dan intrekken, zou de belofte stil veranderen."
     },
     {
       "id": "ctx-deze-met",

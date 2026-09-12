@@ -101,5 +101,30 @@ module.exports = {
     ['/api/site/mijn', '/api/site/bewaar'],
     'Ik heb een nieuwe site klaargezet. Bevestigen doe je zelf.'),
   'zet een ontmoeting op': werk('een ontmoeting klaarzetten',
-    ['/api/meet/maak'], 'Ik heb de ontmoeting klaargezet. Bevestigen doe je zelf.')
+    ['/api/meet/maak'], 'Ik heb de ontmoeting klaargezet. Bevestigen doe je zelf.'),
+
+  /* DE TWEEDE PRODUCTGAP, en tot 12 september 2026 een STILLE. Dit geval stond
+     op NU zonder corpusregel: de rail gaf NIET_HERKEND, de zin kwam tot `geen`,
+     en de proef telde hem doodleuk als "binnen het contract" -- een groene rij
+     die niets had gemeten. Gevonden door toets 12 van test/menstaal.test.js,
+     die daarvoor een ONDERGRENS op het aantal geparkeerde gevallen toetste in
+     plaats van of een geval werkelijk te draaien is.
+
+     Wat eronder zit is hetzelfde als bij "parijs vrijdag": elk bestelpad is voor
+     een lid `verboden` (/api/mall/bestellingen, /api/bestelling/mijn, en de
+     rest). Het contract belooft hier `tonen`; het beleid geeft niets. Met deze
+     planstap zegt de echte compileer() dat in woorden in plaats van dat het
+     spoor een overgeslagen fase toont -- en dan staat de gap in het register in
+     plaats van in iemands hoofd. */
+  'waar is mijn bestelling': {
+    bewustVerboden: 'er is voor een lid geen bestel-capability op de AI-allowlist; deze regel ' +
+      'BEWIJST dat in plaats van eromheen te lopen -- zelfde vorm als "parijs vrijdag"',
+    stappen: [
+      { tools: [{ name: 'kaart', input: {} }] },
+      { tools: [{ name: 'plan', input: { doel: 'zien waar de bestelling van dit lid blijft',
+        stappen: [{ id: 's1', capability: '/api/mall/bestellingen', invoer: {}, afhankelijkVan: [] }] } }] }
+    ],
+    projectie: 'Ik kan je bestelling vanuit dit gesprek niet opzoeken -- dat staat niet op de ' +
+      'lijst van wat ik voor je mag doen. In de Mall zie je hem wel staan.'
+  }
 };

@@ -233,6 +233,57 @@ betekent niet één presentatie. `TravelOS > Mobility > Rail > Booking` is de br
 `WERELDLIJST.md` vandaag al uit `MAPPEN` wordt geschreven en `scripts/check.js`
 regel 50 zakt als hij achterloopt.
 
+### 3a. Twee onderbalken delen dezelfde rand, en de ene schildert over de andere
+
+Dit is de concrete oorzaak achter *"Kies een wereld om te beginnen"* op een leeg
+scherm, en hij is met een mutatie bewezen.
+
+Op 390×844 staan er **twee** balken op dezelfde 48 pixels onderaan:
+
+| balk | wat erin staat | positie |
+|---|---|---|
+| `.cmd-balk` (RTG Command) | LivingOS, WorkOS, TravelOS, de overloop `⋯`, de mond van Rahul | `fixed`, `z-index:8801`, y 796–844 |
+| `.rtg-edge-bottom` (Edge) | MENU, HOME | `absolute`, y 796–844 |
+
+De edge-balk schildert eroverheen. Zet je `.rtg-edge-bottom{visibility:hidden}`,
+dan komt de Command-balk compleet tevoorschijn — glyf én opschrift, op zijn eigen
+crèmekleurige vlak. Dat is de mutatieproef, en hij is eenduidig.
+
+Twee dingen volgen hieruit, en ze zijn allebei gemakkelijk verkeerd te lezen:
+
+- **Het is geen kleurprobleem.** Hier heeft in deze tak even een "contrastfix"
+  gestaan, op grond van een meting van 1,08:1 tegen de bordeaux rail. Die meting
+  klopte en de gevolgtrekking niet: bordeaux is niet de ONDERGROND van deze balk
+  maar zijn BEDEKKER. De donkere tekstkleur was al goed; licht-op-licht maakte het
+  erger. De wijziging is teruggedraaid en de reden staat in `adaptief.css`.
+- **De knoppen zijn wél aan te tikken.** De edge-balk is op dat stuk geen
+  muisdoel, dus wie blind op x≈89–265 tikt, opent gewoon LivingOS. Onzichtbaar en
+  bedienbaar tegelijk — en precies daarom ziet `npm run eersteminuut` ze als
+  aanwezig. Die blinde vlek staat in `EERSTEMINUUT.json` onder `blindeVlek`: de
+  meter toetst aantikbaarheid, geen verf.
+
+Welke van de twee balken die rand bezit, is een **ontwerpbesluit** en geen
+CSS-ingreep. ADAPTIEF.md beschrijft één balk met drie zones (links de bank,
+midden de werelden of de bladacties, rechts Rahul); de edge-balk met MENU en HOME
+is een tweede invulling van diezelfde rand. Zolang dat niet is besloten, is elke
+ingreep hier een pleister op een dubbeling — dezelfde vorm als de twee
+navigatieregisters hierboven, nu in opmaak in plaats van in data.
+
+Er is in deze tak geprobeerd het tweede gebrek alvast weg te halen — een
+**opschrift** onder elke glyf, in het ritme van de edge-balk ernaast, want een
+`aria-label` is geen opschrift (par. 4, grens 7). Dat is teruggedraaid, en de
+reden hoort hier te staan omdat hij de ontwerpvraag scherper maakt: met opschrift
+worden de knoppen 62–70px in plaats van 44, en dan past **FoundationOS** niet meer
+naast de bank, Rahul en de overloop. Hij viel in de lade en
+`test/adaptief.e2e.js` zakte terecht met *"op het beginscherm staan de werelden
+IN de balk, niet twee tikken diep"*.
+
+Op 390px is er geen ruimte voor vier opschriften zolang MENU en HOME 88 van
+diezelfde 390 pixels innemen. De grens uit par. 4 en de belofte uit die toets
+kunnen hier vandaag niet allebei waar zijn, en dat is precies wat het besluit
+hierboven moet oplossen — niet een compromis in de opmaak. De reden staat ook in
+`adaptief.css`, zodat de volgende die het probeert niet dezelfde ronde loopt.
+
 ---
 
 ## 4. De grenzen

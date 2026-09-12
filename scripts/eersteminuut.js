@@ -435,6 +435,15 @@ function vind(lijst, tekst) {
     grens: 'Een toets die ZAKT blokkeert. `nietMeetbaar` blokkeert niet, maar telt ook nooit als ' +
            'gehaald -- een bewijs dat je weglaat leest als een bewijs dat je haalt ' +
            '(BETROUWBAARHEID.md). Wat hier niet gemeten kan worden, draagt zijn reden.',
+    blindeVlek: 'DEZE METER TOETST AANTIKBAARHEID, NIET VERF. Zichtbaarheid wordt bepaald met ' +
+           'checkVisibility() en elementFromPoint. Een element dat door een andere laag wordt ' +
+           'OVERSCHILDERD terwijl die laag op dat punt geen muisdoel is (pointer-events), komt er ' +
+           'dus doorheen: elementFromPoint geeft het element terug, en de meter noemt het zichtbaar ' +
+           'terwijl een mens het niet ziet. Dat is hier echt het geval -- de vier werelden in ' +
+           '.cmd-balk worden overschilderd door .rtg-edge-bottom op dezelfde 48px rand ' +
+           '(MENS.md par. 3a). Ze zijn wel aan te tikken. Wie deze meter groen ziet op ' +
+           'inhoud-zonder-menu, heeft daarmee nog geen bewijs dat het scherm ook gevuld OOGT; ' +
+           'daarvoor is een schermafdruk nodig en die beoordeelt geen script.',
     standen: { gehaald: 'gemeten en in orde', gezakt: 'gemeten en niet in orde',
                nietMeetbaar: 'kan hier niet worden vastgesteld, met de reden erbij' },
     poorten: { totaal: poorten.length, nodig: poorten.filter((p) => p.nodig).length,

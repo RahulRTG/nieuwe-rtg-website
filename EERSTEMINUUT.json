@@ -1,15 +1,16 @@
 {
   "stempel": {
-    "op": "2026-09-12T05:47:24.456Z",
-    "commit": "bfa6853b",
+    "op": "2026-09-12T06:12:50.465Z",
+    "commit": "16676d86",
     "boomVuil": true,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/eersteminuut.js",
     "node": "v22.22.2"
   },
   "uitleg": "Wat een mens die RTG niet kent in zijn eerste minuut krijgt. Een verse registratie langs de echte route, een echte browser op 390x844, Nederlands. Gemeten wordt de weg van registratie tot het eerste scherm waar iets te doen is, en wat daar staat.",
   "hoe": "node scripts/eersteminuut.js  (--controle zakt zodra een toets ZAKT)",
   "grens": "Een toets die ZAKT blokkeert. `nietMeetbaar` blokkeert niet, maar telt ook nooit als gehaald -- een bewijs dat je weglaat leest als een bewijs dat je haalt (BETROUWBAARHEID.md). Wat hier niet gemeten kan worden, draagt zijn reden.",
+  "blindeVlek": "DEZE METER TOETST AANTIKBAARHEID, NIET VERF. Zichtbaarheid wordt bepaald met checkVisibility() en elementFromPoint. Een element dat door een andere laag wordt OVERSCHILDERD terwijl die laag op dat punt geen muisdoel is (pointer-events), komt er dus doorheen: elementFromPoint geeft het element terug, en de meter noemt het zichtbaar terwijl een mens het niet ziet. Dat is hier echt het geval -- de vier werelden in .cmd-balk worden overschilderd door .rtg-edge-bottom op dezelfde 48px rand (MENS.md par. 3a). Ze zijn wel aan te tikken. Wie deze meter groen ziet op inhoud-zonder-menu, heeft daarmee nog geen bewijs dat het scherm ook gevuld OOGT; daarvoor is een schermafdruk nodig en die beoordeelt geen script.",
   "standen": {
     "gehaald": "gemeten en in orde",
     "gezakt": "gemeten en niet in orde",

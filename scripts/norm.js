@@ -552,6 +552,14 @@ const METERS = [
      De ernstigste uitslag die deze tand kan vangen is een 2xx op /api/bank/pas/
      betaal na een zin van twee woorden. */
   { sleutel: 'geldGebreken', richting: 'omlaag', wat: 'gebreken in de geldveiligheid (uit MENSTAALPROEF.json)' },
+  /* DE BEVESTIGVEILIGHEID (MENSTAALPROEF.json). `gebreken` telt wat er mankeert
+     aan de vraag of een instemming in het GESPREK een klaargezette handeling kan
+     afmaken. Hij meet twee kanten en dat is het punt: de POORT houdt elk pad
+     rond een staand voorstel op `verboden`, en de TAAL probeert het niet eens.
+     Gaat die poort ooit open, dan zakt deze tand ook als de zin zich keurig
+     blijft gedragen -- want dan is de goedkeuring buiten het gesprek een
+     formaliteit geworden. */
+  { sleutel: 'bevestigGebreken', richting: 'omlaag', wat: 'gebreken in de bevestigveiligheid (uit MENSTAALPROEF.json)' },
   /* DE TIEN MUTATIES (MENSMUTATIE.json). `geenWacht` telt de garanties die je
      uit de bron kunt HALEN zonder dat er een wacht afgaat. Dat is een uitspraak
      over de TOETSEN en niet over de code: de keten doet nog steeds het goede,
@@ -1286,6 +1294,7 @@ function meet(bronnen) {
     samenhangGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.gesprekssamenhang.gebreken || []).length),
     referentGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.referentveiligheid.gebreken || []).length),
     geldGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.geldveiligheid.gebreken || []).length),
+    bevestigGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.bevestigveiligheid.gebreken || []).length),
     mensmutatieZonderWacht: leesRegister('MENSMUTATIE.json', (j) => j.telling.geenWacht),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar

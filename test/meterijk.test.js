@@ -1611,6 +1611,21 @@ const IJKINGEN = {
       (j) => { j.referentveiligheid.gebreken = (j.referentveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
       () => norm.meet().referentGebreken - voor.referentGebreken)
   },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (negende): bevestigGebreken telt wat er
+     mankeert aan de vraag of een instemming in het gesprek een klaargezette
+     handeling kan afmaken (MENSTAALPROEF.json, bevestigveiligheid.gebreken).
+
+     De meter zelf is met TWEE mutaties zien uitslaan, een per kant:
+     /api/stuur/bevestig opendoen voor de rail (de poort), en de corpusregel het
+     tóch laten proberen (de taal). Let op dat de eerste poging een NO-OP was --
+     een tweede `member`-sleutel in hetzelfde object wordt door de eerste
+     overschreven, dus het niveau bewoog niet en de tand dus ook niet. Een
+     mutatie die niets verandert bewijst niets. */
+  bevestigGebreken: {
+    proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
+      (j) => { j.bevestigveiligheid.gebreken = (j.bevestigveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
+      () => norm.meet().bevestigGebreken - voor.bevestigGebreken)
+  },
   /* DE TAND VAN 12 SEPTEMBER 2026 (achtste): geldGebreken telt wat er mankeert
      aan de drie toestanden van "betaal die" (MENSTAALPROEF.json,
      geldveiligheid.gebreken). Zelfde vorm als de vier ervoor.

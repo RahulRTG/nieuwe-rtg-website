@@ -608,6 +608,33 @@ corpusbestanden** bij die meteen afdreef toen er één bij kwam; die vraagt het 
 aan de rail zelf, want een tweede lijst naast de samenvoeging is precies de
 dubbeling die dit huis elders telt.
 
+### 3g. "Ja doe maar" — de gevaarlijkste twee woorden
+
+Een klaargezette handeling is een 428 met een goedkeuring: eenmalig,
+sessiegebonden, en te bevestigen op een knop **buiten** het gesprek. Zou een zin
+dat kunnen afmaken, dan is die hele 428 een formaliteit — en dan kan onvertrouwde
+inhoud die in het gesprek belandt (een toolantwoord, een mail, een bericht van
+iemand anders) de bevestiging schrijven in plaats van de mens.
+
+Dat is nu gemeten, **aan twee kanten**, en die twee samen zijn het punt. De
+*poort*: elk pad rond een staand voorstel is voor deze rail `verboden` —
+`/api/stuur/goedkeuring`, `/api/stuur/bevestig`, `/api/goedkeuring/intrek` en
+`/api/stuur/voorstellen`. De *taal*: de zin probeert het niet eens — geen enkele
+tool, dus geen enkele poort die nee hoefde te zeggen. Zou de rail het wél proberen
+en de poort het weigeren, dan was de uitkomst even veilig maar de bewering een
+andere, en dat verschil hoort zichtbaar te zijn.
+
+Beide kanten zijn met een mutatie zien bijten: het bevestigingspad opendoen laat
+de poortkant zakken, en de corpusregel het toch laten proberen de taalkant.
+
+**En het zusje van dit geval blijft met opzet ongemeten.** Het contract wil bij
+"toch niet" een `intrekken`, en er is voor deze rail geen pad om een klaargezet
+voorstel in te trekken — die staan alle drie op `verboden`. Dat is geen gat in de
+bedrading maar een **productvraag**: mag een lid een staand voorstel via Rahul
+intrekken, of alleen op de knop waar hij het ook bevestigt? Zolang dat niet
+besloten is, blijft het geval een vooruitlopend contract. Er een corpusregel voor
+schrijven die iets ánders doet dan intrekken, zou de belofte stil veranderen.
+
 ### 3e. De tweede rail: het apparaat staat, het oordeel niet
 
 De laatste stap is dezelfde 41 gevallen tegen een lokaal model en tegen de

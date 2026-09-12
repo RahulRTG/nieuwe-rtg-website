@@ -79,6 +79,7 @@
     "samenhangGebreken": 0,
     "referentGebreken": 0,
     "geldGebreken": 0,
+    "bevestigGebreken": 0,
     "mensmutatieZonderWacht": 1
   },
   "notities": [
@@ -2207,6 +2208,7 @@
     "samenhangGebreken": "2026-09-12",
     "referentGebreken": "2026-09-12",
     "geldGebreken": "2026-09-12",
+    "bevestigGebreken": "2026-09-12",
     "mensmutatieZonderWacht": "2026-09-12"
   },
   "uitzonderingen": [

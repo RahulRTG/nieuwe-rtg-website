@@ -1,95 +1,106 @@
-/* HET CORPUS VAN DE DETERMINISTISCHE RAIL -- vastgelegde zinnen, niets meer.
+/* WAT DE DETERMINISTISCHE RAIL BIJ EEN ZIN DOET -- het script, niet het contract.
 
-   Elke regel zegt wat de rail bij die zin DOET (`stappen`, `projectie`) en wat
-   de proef eraan mag VERWACHTEN (`klasse`, `maxMandaat`, `sideEffect`, ...).
-   Die twee staan met opzet naast elkaar in één bestand maar worden door twee
-   verschillende partijen gelezen: de rail leest alleen `stappen` en
-   `projectie` en kijkt nooit naar de verwachtingen -- anders zou het corpus
-   zichzelf gelijk geven.
+   De VERWACHTINGEN staan in ./menstaal.json: per menselijke zin wat er mag
+   gebeuren, rail-onafhankelijk. Dit bestand zegt alleen wat DEZE rail doet, en
+   kent die verwachtingen niet -- anders zou het corpus zichzelf gelijk geven.
+   `test/menstaal.test.js` houdt de twee tegen elkaar: een zin die hier staat en
+   niet in het contract, laat de bouw zakken.
 
-   DE SLEUTEL IS DE GENORMALISEERDE ZIN: kleine letters, leestekens weg,
-   spaties samengetrokken. Zie ./rail-corpus.js. Staat een zin er niet in, dan
-   is het antwoord NIET_HERKEND en gebeurt er niets. Dat is de bedoeling.
+   DE SLEUTEL IS DE GENORMALISEERDE ZIN (./rail-corpus.js). Staat een zin er
+   niet in, dan is het antwoord NIET_HERKEND en gebeurt er niets. De rail raadt
+   niet: dat is geen tekortkoming maar het punt.
 
-   DE PADEN HIERONDER ZIJN ECHT en komen uit de allowlist van ./beleid.js --
-   niet verzonnen. Een corpus dat naar een verzonnen pad wijst, bewijst dat het
-   plan terecht wordt afgewezen en verder niets.
+   WAAROM DE CONTEXTGEVALLEN HIER ONTBREKEN. Het contract draagt "die andere"
+   drie keer -- zonder vergelijking, met een alternatief, met twee. Die
+   normaliseren alle drie naar dezelfde sleutel, dus deze rail kan er maar EEN
+   van scripten. Ze staan in menstaal.json op `FASE4` en wachten op de dag dat
+   context de resolver bereikt. Dat is geen omissie die je met een vierde veld
+   oplost; het is de reden dat contextdoorvoer een eigen fase is.
 
-   WAT HET BOUWEN VAN DIT CORPUS AAN HET LICHT BRACHT, en het hoort hier omdat
-   het de gouden slice raakt: op de member-allowlist staat GEEN ENKEL REISPAD.
-   Wel kantoorpakket, onderwijs, leerstof, bijles, mediaos, agenda, locatie,
-   asset, site en meet -- maar /api/reisbureau/*, /api/reis/* en /api/trip/*
-   zijn alle drie `verboden` voor de wereld `member`. "parijs vrijdag" kan de
-   RTG-machine dus wel doorlopen (de kaart versmalt, de projectie ontstaat),
-   maar er is vandaag geen reis-capability om naar toe te leiden. Dat is een
-   besluit van de eigenaar en geen gat dat dit corpus mag dichtschrijven: wie
-   hier een reispad neerzet dat niet op de allowlist staat, krijgt een plan dat
-   terecht zakt en een proef die daar niets van laat zien. */
+   DE PADEN ZIJN ECHT en staan op de member-allowlist van ./beleid.js. Een
+   corpus dat naar een verzonnen of verboden pad wijst, bewijst dat het plan
+   terecht zakt en verder niets -- `test/stuurrail.test.js` toets 10 houdt dat
+   tegen.
+
+   WAT ER MET OPZET NIET GESCRIPT IS: "waar is mijn bestelling". Er staat geen
+   bestel- of orderpad op de member-allowlist, net zomin als een reispad. Een
+   pad verzinnen om de dekking op te poetsen is precies de fout die deze hele
+   laag moet uitsluiten. */
 'use strict';
 
+/* Een zin die alleen antwoord geeft: geen enkele tool, dus geen enkel effect.
+   Zo hoort een uitlegvraag door de operationele motor heen te gaan -- namelijk
+   niet. */
+const uitleg = (projectie) => ({ stappen: [], projectie });
+
+/* Een zin die niet genoeg zegt. Hij stelt EEN vraag en doet niets; taal schept
+   geen bevoegdheid, en bij twee plausibele objecten wordt er niet gegokt. */
+const verhelder = (projectie) => ({ stappen: [], projectie });
+
+/* Een operationele zin: eerst de kaart (de echte resolver versmalt de
+   allowlist), dan het plan (de echte compileer() weegt, de echte voorspel()
+   kijkt naar gevolgen). Er staat nooit een `doe` in: dit corpus zet nooit iets
+   in gang, het laat de machine wegen. */
+const werk = (doel, paden, projectie) => ({
+  stappen: [
+    { tools: [{ name: 'kaart', input: {} }] },
+    { tools: [{ name: 'plan', input: { doel,
+      stappen: paden.map((p, i) => ({ id: 's' + (i + 1), capability: p, invoer: {},
+        afhankelijkVan: i ? ['s' + i] : [] })) } }] }
+  ],
+  projectie
+});
+
 module.exports = {
-  /* ACTION, en de dragende zin van de opdracht. Met opzet ALLEEN `kaart`:
-     dat roept de echte resolver aan op de echte allowlist, en de projectie
-     zegt wat er kan zonder iets te beloven wat er niet is. Zodra er een
-     reispad op de allowlist staat, hoort hier een `plan`-stap bij -- en dan
-     pas, want een planstap naar een verboden pad bewijst niets. */
-  'parijs vrijdag': {
-    klasse: 'ACTION',
-    context: 'geen',
-    verwachtDoel: 'reis',
-    ambigu: false,
-    maxMandaat: 'tonen',
-    sideEffect: false,
-    blockingVraagMax: 1,
-    architectuurKeuzes: 0,
-    stappen: [
-      { tools: [{ name: 'kaart', input: {} }] }
-    ],
-    projectie: 'Parijs · vrijdag\nIk kan je laten zien wat er kan. Waar wil je vertrekken?'
-  },
+  /* ---- INFORMATION: acht vragen die niets mogen aanraken ---- */
+  'wat is travelos': uitleg('TravelOS is de wereld waarin je reizen worden geregeld: ' +
+    'boeken, onderweg zijn, en wat er daarna nog moet gebeuren.'),
+  'wat kan rtg': uitleg('RTG regelt je dagelijks leven, je werk, je reizen en je ' +
+    'maatschappelijke zaken op een plek. Zeg gewoon wat je nodig hebt.'),
+  'hoe werkt betalen': uitleg('Betalen loopt via RTG Pay. Wat geld beweegt wordt altijd ' +
+    'eerst klaargezet; bevestigen doe je zelf.'),
+  'wat is het verschil tussen de passen': uitleg('De RTG Pass geeft je het hele platform. ' +
+    'Lifestyle betekent dat iemand het vóór je doet. Business voegt een eigen werkwereld toe.'),
+  'waar staat mijn codenaam voor': uitleg('Je gegevens staan bij ons op een codenaam. Je echte ' +
+    'naam ligt apart en wordt alleen gekoppeld wanneer dat echt nodig is.'),
+  'wat is de salon': uitleg('De Salon is het besloten sociale netwerk van RTG: wie er lid is, ' +
+    'deelt daar wat hij kwijt wil aan mensen die hij kent.'),
+  'wat doet de rtfoundation': uitleg('De RTFoundation is de stichting naast RTG. Zij besteedt ' +
+    'een deel van de bijdragen aan maatschappelijk werk.'),
+  'wie kan mijn gegevens zien': uitleg('Alleen jij, en wie jij daarvoor toestemming geeft. ' +
+    'Een medewerker die iets opent, laat daarvan een spoor na.'),
 
-  /* ACTION met een ECHTE planstap, zodat compileer() en voorspel() werkelijk
-     draaien. /api/agenda/toevoegen staat op de VOORSTEL-lijst van member: een
-     wijziging die eerst een servervoorstel oplevert en die een mens bevestigt.
-     Precies het gedrag dat de plafondlaag op `tonen` moet tegenhouden. */
-  'zet vrijdag in mijn agenda': {
-    klasse: 'ACTION',
-    context: 'geen',
-    verwachtDoel: 'agenda',
-    ambigu: false,
-    maxMandaat: 'tonen',
-    sideEffect: false,
-    blockingVraagMax: 1,
-    architectuurKeuzes: 0,
-    stappen: [
-      { tools: [{ name: 'kaart', input: {} }] },
-      { tools: [{ name: 'plan', input: {
-        doel: 'een afspraak op vrijdag in de agenda zetten',
-        stappen: [
-          { id: 's1', capability: '/api/agenda/mijn', invoer: {},
-            uitkomst: 'wat er al op vrijdag staat' },
-          { id: 's2', capability: '/api/agenda/toevoegen', invoer: {}, afhankelijkVan: ['s1'],
-            uitkomst: 'de nieuwe afspraak staat klaar ter bevestiging' }
-        ] } }] }
-    ],
-    projectie: 'Vrijdag · agenda\nIk heb klaargezet wat er zou veranderen. Bevestigen doe je zelf.'
-  },
+  /* ---- Zinnen die te weinig zeggen: EEN vraag, geen enkel effect ---- */
+  'die andere': verhelder('Ik weet niet welke je bedoelt. Waar gaat het over?'),
+  'doe maar': verhelder('Er staat op dit moment niets klaar om te doen. Wat wil je?'),
+  'liever later': verhelder('Later dan wat? Er loopt nu niets waar ik dat op kan betrekken.'),
+  'deze': verhelder('Welke bedoel je, en wat moet ermee gebeuren?'),
+  'zelfde als vorige keer': verhelder('Ik zie niet waar je naar terugkijkt. Wat wil je herhalen?'),
 
-  /* INFORMATION. Geen enkele tool: een vraag om uitleg hoort de operationele
-     motor niet te raken, en dat moet aantoonbaar zo blijven na de routewissel.
-     Dit is de regel uit de opdracht die het scherpst is: GEEN ENKELE BESTAANDE
-     VRAAG MAG DOOR DE ROUTEWISSEL AUTOMATISCH EEN SIDE EFFECT KRIJGEN. */
-  'wat is travelos': {
-    klasse: 'INFORMATION',
-    context: 'geen',
-    verwachtDoel: 'uitleg',
-    ambigu: false,
-    maxMandaat: 'geen',
-    sideEffect: false,
-    blockingVraagMax: 0,
-    architectuurKeuzes: 0,
-    stappen: [],
-    projectie: 'TravelOS is de wereld waarin je reizen worden geregeld: boeken, ' +
-      'onderweg zijn, en wat er daarna nog moet gebeuren.'
-  }
+  /* ---- ACTION ---- */
+  'parijs vrijdag': Object.assign(
+    { stappen: [{ tools: [{ name: 'kaart', input: {} }] }] },
+    { projectie: 'Parijs · vrijdag\nIk kan je laten zien wat er kan. Waar wil je vertrekken?' }),
+  'zet vrijdag in mijn agenda': werk('een afspraak op vrijdag in de agenda zetten',
+    ['/api/agenda/mijn', '/api/agenda/toevoegen'],
+    'Vrijdag · agenda\nIk heb klaargezet wat er zou veranderen. Bevestigen doe je zelf.'),
+  'wat staat er morgen in mijn agenda': werk('zien wat er morgen in de agenda staat',
+    ['/api/agenda/mijn'], 'Dit staat er morgen in je agenda.'),
+  'plan een afspraak volgende week dinsdag': werk('een afspraak op dinsdag klaarzetten',
+    ['/api/agenda/mijn', '/api/agenda/toevoegen'],
+    'Dinsdag · agenda\nIk heb de afspraak klaargezet. Bevestigen doe je zelf.'),
+  'deel mijn locatie': werk('de eigen locatie delen',
+    ['/api/locatie/mijn', '/api/locatie/deel'],
+    'Ik heb klaargezet met wie je je locatie zou delen. Bevestigen doe je zelf.'),
+  'stop met mijn locatie delen': werk('het delen van de locatie stoppen',
+    ['/api/locatie/stop'], 'Ik heb klaargezet om het delen te stoppen. Bevestigen doe je zelf.'),
+  'toon mijn documenten': werk('de eigen documenten tonen',
+    ['/api/asset/mijn'], 'Dit zijn je documenten.'),
+  'wat zijn mijn vakken': werk('de eigen vakken tonen',
+    ['/api/leerstof/vakken'], 'Dit zijn je vakken.'),
+  'maak een nieuwe site': werk('een nieuwe site klaarzetten',
+    ['/api/site/mijn', '/api/site/bewaar'],
+    'Ik heb een nieuwe site klaargezet. Bevestigen doe je zelf.'),
+  'zet een ontmoeting op': werk('een ontmoeting klaarzetten',
+    ['/api/meet/maak'], 'Ik heb de ontmoeting klaargezet. Bevestigen doe je zelf.')
 };

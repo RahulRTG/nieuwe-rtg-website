@@ -139,7 +139,13 @@ function maakCorpusRail(opties) {
        geen journaal -- er gaat geen vraagtekst naar een register. */
     gezien: () => gezien.slice(),
     kentZin: (zin) => Object.prototype.hasOwnProperty.call(corpus, normaliseer(zin)),
-    zinnen: () => Object.keys(corpus)
+    zinnen: () => Object.keys(corpus),
+    /* DE REGELS ZELF, voor een toets die eroverheen wil lopen. Zonder dit hield
+       test/stuurrail.test.js zijn eigen lijst corpusbestanden bij -- en die
+       dreef af zodra er een bestand bij kwam, precies zoals in
+       test/menscontext.test.js. Een kopie, want een toets hoort het
+       productiecorpus niet te kunnen wijzigen. */
+    regels: () => Object.assign({}, corpus)
   };
 }
 

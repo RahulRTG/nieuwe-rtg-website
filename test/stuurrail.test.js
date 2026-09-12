@@ -148,15 +148,13 @@ test('10. elk pad in het corpus bestaat echt in het beleid', () => {
      MUTATIE: zet /api/verzonnen/pad in een planstap, of haal `bewustVerboden`
      weg bij "parijs vrijdag". */
   const { beleidVoor } = require('../server/kern/stuur/beleid');
-  /* HET HELE CORPUS EN NIET EEN BESTAND. De gouden plak verhuisde naar
-     ./rail-corpus-goudenplak.js toen rail-corpus-zinnen.js door de omvangband
-     ging; keek deze toets naar een enkel bestand, dan bewaakte hij de
-     bewust-verboden regel niet meer. Hij leest nu wat de rail werkelijk laadt.
-     Dat is binnen een dag de zesde wacht die door een splitsing blind werd. */
-  const zinnen = Object.assign({}, require('../server/kern/stuur/rail-corpus-zinnen'),
-    require('../server/kern/stuur/rail-corpus-context'),
-    require('../server/kern/stuur/rail-corpus-samenhang'),
-    require('../server/kern/stuur/rail-corpus-goudenplak'));
+  /* HET HELE CORPUS EN NIET EEN BESTAND, en nu ECHT uit de rail. Hier stond de
+     belofte "hij leest wat de rail werkelijk laadt" boven een met de hand
+     bijgehouden lijst van vier bestanden -- en die dreef prompt af toen er twee
+     bij kwamen (geld, bevestig). Dat het deze keer niets verborg, is geluk: in
+     die twee staat geen planstap. `regels()` geeft de samengevoegde corpus van
+     de rail zelf, dus een zevende bestand wordt vanzelf meegenomen. */
+  const zinnen = require('../server/kern/stuur/rail-corpus').maakCorpusRail({}).regels();
   let gezien = 0; const bewust = [];
   for (const [zin, regel] of Object.entries(zinnen)) {
     for (const stap of regel.stappen || []) {
@@ -181,11 +179,19 @@ test('10. elk pad in het corpus bestaat echt in het beleid', () => {
      iemand deze lijst aanraakt. Een teller had dat verborgen: die gaat net zo
      goed van 1 naar 2 als iemand per ongeluk op een verboden pad plant en er
      een reden bij verzint.
-       parijs vrijdag  de gouden plak, negatieve helft
-       liever later    fase 7, toestand A: reiscontext */
+       parijs vrijdag           de gouden plak, negatieve helft
+       liever later             fase 7, toestand A: reiscontext
+       waar is mijn bestelling  de tweede productgap, en tot 12 september 2026
+                                een STILLE: dit geval stond op NU zonder
+                                corpusregel, dus de rail gaf NIET_HERKEND en de
+                                proef telde het als "binnen het contract" zonder
+                                iets te meten. Elk bestelpad is voor een lid
+                                `verboden`; met deze planstap zegt de echte
+                                compileer() dat in woorden. */
   const VERKLAARD = ['parijs vrijdag',
     'liever later actieve context scherm rtg reizen deel parijs vrijdag keuze vertrek 09 12 ' +
-    'vertrek 17 40 gekozen vertrek 09 12'];
+    'vertrek 17 40 gekozen vertrek 09 12',
+    'waar is mijn bestelling'];
   assert.deepEqual(bewust.sort(), VERKLAARD.slice().sort(),
     'de bewust-verboden planstappen wijken af van de verklaarde lijst; gevonden: ' +
     JSON.stringify(bewust));

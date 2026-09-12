@@ -154,19 +154,39 @@ test('11. wat het corpus NU noemt, verstaat de rail ook echt', () => {
     ondergrens + '. Verlaag hem niet stilletijd -- script het geval, of zet het op FASE4 met de reden.');
 });
 
-test('12. een FASE4-geval wordt NIET als gedekt geteld', () => {
-  /* Zonder deze regel zou het contract kunnen groeien met gevallen die niemand
-     kan draaien, en zou de dekking er beter uitzien door iets toe te voegen dat
-     niets doet. FASE4 betekent: de verwachting hangt aan context, en context
-     bereikt de resolver nog niet.
-     MUTATIE: zet een FASE4-geval op NU zonder het te scripten -- dan zakt
-     toets 11 mee. */
-  const fase4 = G.filter(g => g.beproefbaar === 'FASE4');
-  assert.ok(fase4.length >= 10,
-    'er staan maar ' + fase4.length + ' gevallen op FASE4; de contextcondities horen daar te wachten');
-  for (const g of fase4)
-    assert.notEqual(g.context, 'geen',
-      g.id + ' wacht op FASE4 maar heeft geen contextconditie; dan is er niets om op te wachten');
+test('12. elk geval dat op NU staat, is ook echt te draaien', () => {
+  /* HIER STOND EEN ONDERGRENS, en die was verkeerd om. De regel luidde "er
+     moeten minstens tien gevallen op FASE4 blijven staan", en daarmee strafte
+     hij precies wat vooruitgang is: een vooruitlopende belofte alsnog scripten
+     en meten. Toen er drie geldgevallen en een bevestigingsgeval bijkwamen,
+     zakte hij -- terwijl er niets slechter was geworden.
+
+     Wat hij PROBEERDE te beschermen is echt: het contract mag niet groeien met
+     gevallen die niemand kan draaien, want dan ziet de dekking er beter uit
+     door iets toe te voegen dat niets doet. Dat is nu rechtstreeks getoetst in
+     plaats van via een telling: een geval op NU moet door de rail HERKEND
+     worden. Wordt het dat niet, dan geeft hij NIET_HERKEND, komt de zin tot
+     `geen`, en meldt de proef doodleuk "binnen het contract" -- een groene rij
+     die niets heeft gemeten.
+     MUTATIE: zet een FASE4-geval op NU zonder er een corpusregel bij te
+     schrijven. */
+  const RAIL = require('../server/kern/stuur/rail-corpus').maakCorpusRail({});
+  const menscontext = require('../server/kern/stuur/menscontext');
+  const { handtekening } = require('../server/kern/stuur/menscontext-uit');
+  for (const g of G.filter(x => x.beproefbaar === 'NU')) {
+    const r = g.contextGeval ? menscontext.saneer(g.contextGeval) : null;
+    const h = r ? handtekening(r) : '';
+    const zin = h ? g.input + '\n\nActieve context: ' + h : g.input;
+    assert.ok(RAIL.kentZin(zin),
+      g.id + ' staat op NU maar de rail kent hem niet; hij geeft NIET_HERKEND en de proef telt ' +
+      'hem als "binnen het contract" zonder iets te hebben gemeten:\n    ' + zin.replace(/\n+/g, ' | '));
+  }
+
+  /* En een geval dat WEL op FASE4 staat, hoort een reden te hebben om te
+     wachten: een contextconditie, of een `let op` dat zegt waar het op wacht. */
+  for (const g of G.filter(x => x.beproefbaar === 'FASE4'))
+    assert.ok(g.context !== 'geen' || g['let op'],
+      g.id + ' wacht op FASE4 zonder contextconditie en zonder uitgeschreven reden');
 });
 
 /* ---------------------------------------------------------------------------

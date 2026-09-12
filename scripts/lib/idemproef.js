@@ -215,7 +215,7 @@ function weegZonderSleutel(d, e, staat) {
     reden: 'een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik' };
 }
 
-async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hernieuw, maxRoutes, staatVan, vastlegging, metenZonderSleutel, pasladder, wacht }) {
+async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hernieuw, maxRoutes, staatVan, vastlegging, metenZonderSleutel, pasladder, wacht, voorzieningVoor, wereld }) {
   const perRoute = {};
   let gedaan = 0, hernieuwd = 0, uitOpslag = 0, verworpen = 0, pasGewisseld = 0;
   const tel = { beschermd: 0, onbeschermd: 0, ongemeten: 0 };
@@ -227,7 +227,7 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
     const methode = r.methode || r.method;
     const k1 = 'idemproef-' + r.pad.replace(/\W+/g, '') + '-1';
     const k2 = 'idemproef-' + r.pad.replace(/\W+/g, '') + '-2';
-    const lijf = lijfVoor(r);
+    let lijf = lijfVoor(r);
 
     /* WELKE SLEUTEL PAST OP DEZE DEUR.
 
@@ -272,6 +272,40 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
           if (proef.status !== 403) { pas = kandidaat; pasGewisseld++; break; }
         }
       }
+    }
+
+    /* DE VOORZIENING -- een VERS onderwerp, na de ijkoproep en voor de meting.
+
+       Deze plek is niet vrij te kiezen. De pasladder-ijkoproep hierboven doet
+       ECHT werk, en op een route die zijn onderwerp opmaakt (een pas sluiten,
+       een verzoek intrekken) is dat onderwerp daarna weg -- dan meet A een 404
+       en heet de route voor altijd `ongemeten`. Nagemeten: dat was precies wat
+       er met /api/bank/pas/sluit en /api/pay/verzoek/intrek gebeurde.
+
+       Dus hier: NA de ijkoproep, VOOR de eerste gemeten oproep. De voorziening
+       levert de identificerende velden en die gaan in het lijf.
+
+       EN ZIJ MAG FALEN ZONDER TE LIEGEN. Geeft zij een `fout`, dan blijft het
+       lijf ongewijzigd en loopt de meting gewoon door -- de route strandt dan
+       op zijn eigen hindernis, en waarom de voorziening het niet redde staat
+       ernaast in het register. Een voorziening die stil een half onderwerp
+       achterlaat is erger dan geen. */
+    let voorziening = null;
+    const maakVoorziening = voorzieningVoor ? voorzieningVoor(r.pad) : null;
+    if (maakVoorziening) {
+      try {
+        /* `tokenVoor` en niet een zelfgebouwd tokenpaar. De eerste versie gaf
+           `member: tokenVoor(pas)` mee, en op een LEVERANCIERSroute is `pas`
+           de leverancier -- dus deed de voorziening haar ledenoproep met het
+           verkeerde token en kreeg 401. Een voorziening mag meerdere rollen
+           nodig hebben (de zaak ontvangt geld VAN een lid); wie haar een vaste
+           rol oplegt, bepaalt ongemerkt wat zij kan. */
+        const v = await maakVoorziening({ post, tokenVoor, rol: pas, w: wereld || {} });
+        if (v && v.fout) voorziening = { stand: 'mislukt', reden: String(v.fout) };
+        else if (v && typeof v === 'object') { lijf = { ...lijf, ...v }; voorziening = { stand: 'gelukt', velden: Object.keys(v) }; }
+        else voorziening = { stand: 'mislukt', reden: 'de voorziening gaf niets terug' };
+      } catch (e) { voorziening = { stand: 'mislukt', reden: 'de voorziening viel om: ' + e.message }; }
+      gedaan++;
     }
 
     const doe = async (sleutel) => {
@@ -418,6 +452,11 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
         verworpen++;
       }
     }
+    /* DE VOORZIENING KOMT MEE IN HET REGISTER, ook als hij lukte. Een route die
+       alleen meetbaar is doordat de proef er een vers onderwerp voor maakte, is
+       een ander feit dan een die het uit zichzelf was -- en wie dat verschil niet
+       kan zien, leest een hogere dekking dan er is. */
+    if (voorziening) rij.voorziening = voorziening;
     perRoute[methode + ' ' + r.pad] = rij;
 
     /* DE WERELDWACHT PEILT ONDERWEG -- zie scripts/lib/wereldcontrole.js.

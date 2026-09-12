@@ -128,8 +128,17 @@ function bouw({ kaart, contract, herstelproef, herstelbesluit, padproef }) {
          VERKLAARD dat het correctiemodel is. De vraag is niet "heeft dit een
          undo?" maar "is er een expliciet en bewezen fout-/correctiemodel?" --
          en die twee kunnen elkaar tegenspreken. */
-      herstelKlasse: (besloten[g.pad] && besloten[g.pad].klasse) || 'UNKNOWN',
-      herstelGrond: (besloten[g.pad] && besloten[g.pad].grond) || null
+      /* `klasse` was de oude veldnaam en `stand` is die van het besluit van
+         12 september; allebei lezen, want een register mag niet stil van vorm
+         veranderen onder een meter die er maar een kent. */
+      herstelKlasse: (besloten[g.methode + ' ' + g.pad] && (besloten[g.methode + ' ' + g.pad].stand || besloten[g.methode + ' ' + g.pad].klasse))
+        || (besloten[g.pad] && (besloten[g.pad].stand || besloten[g.pad].klasse)) || 'UNKNOWN',
+      herstelGrond: (besloten[g.methode + ' ' + g.pad] && (besloten[g.methode + ' ' + g.pad].reden || besloten[g.methode + ' ' + g.pad].grond))
+        || (besloten[g.pad] && (besloten[g.pad].reden || besloten[g.pad].grond)) || null,
+      /* EEN VERKLAARDE STAND IS GEEN BEWEZEN TERUGWEG, en dat is de scherpste
+         kant van het besluit van 12 september. Zonder dit veld zou een route
+         PROVEN worden op de dag dat iemand `COMPENSATABLE` tikt. */
+      herstelBewijs: ((besloten[g.methode + ' ' + g.pad] || besloten[g.pad] || {}).bewijs || {}).stand || null
     });
   }
 
@@ -230,9 +239,22 @@ function bouw({ kaart, contract, herstelproef, herstelbesluit, padproef }) {
     terugweg: vijfdeling(['PROVEN', 'BLOCKED', 'UNKNOWN'], (r) =>
       (r.terugweg === 'exact' || r.terugweg === 'compensatie') ? 'PROVEN'
         : r.terugweg === 'wereldOntbreekt' ? 'BLOCKED' : 'UNKNOWN'),
-    correctiemodel: vijfdeling(['PROVEN', 'NOT_APPLICABLE', 'UNKNOWN'], (r) =>
-      r.herstelKlasse === 'UNKNOWN' ? 'UNKNOWN'
-        : r.herstelKlasse === 'NOT_APPLICABLE' ? 'NOT_APPLICABLE' : 'PROVEN')
+    /* CORRECTIEMODEL. Vier standen, en `BLOCKED` is er sinds het besluit van
+       12 september 2026 bij gekomen. De reden staat in HERSTELBESLUIT.json:
+       een VERKLAARDE COMPENSATABLE zegt wat de bedoeling is, niet dat die
+       bedoeling ergens is uitgevoerd. Zonder dat onderscheid wordt deze as
+       groen door te typen -- precies de faalvorm die de idempotentie-as al
+       kent (een `stand` in een contract telt daar ook niet als meting).
+
+       FINAL en NOT_APPLICABLE blijven geldige uitkomsten en geen tekort; er
+       valt daar niets uit te voeren en dus ook niets te bewijzen. */
+    correctiemodel: vijfdeling(['PROVEN', 'BLOCKED', 'NOT_APPLICABLE', 'UNKNOWN'], (r) => {
+      if (r.herstelKlasse === 'UNKNOWN') return 'UNKNOWN';
+      if (r.herstelKlasse === 'NOT_APPLICABLE') return 'NOT_APPLICABLE';
+      if (r.herstelKlasse === 'FINAL') return 'NOT_APPLICABLE';
+      if (r.herstelBewijs === 'BLOCKED') return 'BLOCKED';
+      return 'PROVEN';
+    })
   };
 
   const ratel = {

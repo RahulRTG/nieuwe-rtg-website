@@ -200,8 +200,8 @@ function wachtOpSchoneBoom() {
      eerst een echte wereld (rekening, saldo, pas, vaste betaling, twee klompjes)
      en levert per geldroute het lijf met de veldnamen van DIE route. Waarom per
      route, en waarom de kredietroutes NIET worden opengebroken, staat daar. */
-  const { zetWereldKlaar } = require('./lib/idemwereld');
-  const { extra, perRoute: geldLijven, perVoorvoegsel, gemist } = await zetWereldKlaar({ post, tokens, datamap: server.datamap });
+  const { zetWereldKlaar, voorzieningVoor } = require('./lib/idemwereld');
+  const { wereld, extra, perRoute: geldLijven, perVoorvoegsel, gemist } = await zetWereldKlaar({ post, tokens, datamap: server.datamap });
 
   /* De voorvoegselregels: binnen /api/foundation/ betekent `code` de gezinscode
      en nergens anders. Zie de kop van ./lib/idemwereld.js voor waarom dit geen
@@ -416,6 +416,11 @@ function wachtOpSchoneBoom() {
       return vv.rol;
     },
     maxRoutes: MAX, staatVan,
+    /* De voorziening maakt een VERS onderwerp vlak voor de meting. Nodig omdat
+       de pasladder-ijkoproep echt werk doet en een opmaakbare route zijn eigen
+       onderwerp kwijt is voordat A draait -- zie de kop bij VOORZIENINGEN in
+       ./lib/idemwereld.js. */
+    voorzieningVoor, wereld,
     vastlegging: register.vastlegging, metenZonderSleutel: true, pasladder: PASLADDER });
 
   if (uit.meterStuk) {

@@ -2,10 +2,10 @@
   "soort": "meting",
   "uitleg": "Economische dekking: wat er van elke waardebewegende ROUTE bewezen is, samengesteld uit GELDKAART.json (welke routes), MUTATIECONTRACT.json (semantiek en toegang), IDEMPROEF.json (idempotentie) en HERSTELPROEF.json (de terugweg).",
   "stempel": {
-    "op": "2026-09-12T17:51:26.282Z",
-    "commit": "64d170b8",
-    "boomVuil": false,
-    "boomAnders": 2,
+    "op": "2026-09-12T18:23:23.271Z",
+    "commit": "2a91650b",
+    "boomVuil": true,
+    "boomAnders": 1,
     "instrument": "scripts/gelddekking.js",
     "node": "v22.22.2"
   },
@@ -39,7 +39,7 @@
     "geldRoutesZonderSemantiek": 1,
     "geldRoutesZonderIdemBewijs": 9,
     "geldRoutesZonderTerugweg": 39,
-    "geldRoutesHerstelOnbesloten": 42,
+    "geldRoutesHerstelOnbesloten": 41,
     "geldRoutesHerstelTegenspraak": 0
   },
   "assen": {
@@ -96,19 +96,22 @@
     "correctiemodel": {
       "kan": [
         "PROVEN",
+        "BLOCKED",
         "NOT_APPLICABLE",
         "UNKNOWN"
       ],
       "telling": {
         "PROVEN": 0,
+        "BLOCKED": 1,
         "NOT_APPLICABLE": 0,
-        "UNKNOWN": 42
+        "UNKNOWN": 41
       }
     }
   },
   "tegenspraken": [],
   "herstelKlassen": {
-    "UNKNOWN": 42
+    "UNKNOWN": 41,
+    "COMPENSATABLE": 1
   },
   "nietGemeten": {
     "crashHerstel": "Wat er gebeurt als het proces sterft tussen de bevestiging van een provider en de grootboekregel, is in dit huis nergens beproefd. Geen meting, dus geen getal -- en nadrukkelijk geen nul.",
@@ -130,7 +133,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -147,7 +151,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -164,7 +169,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -181,7 +187,8 @@
       "padproefInstrument": null,
       "terugweg": "compensatie",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -198,7 +205,8 @@
       "padproefInstrument": null,
       "terugweg": "exact",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -215,7 +223,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -232,7 +241,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -250,7 +260,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -267,7 +278,8 @@
       "padproefInstrument": null,
       "terugweg": "compensatie",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -284,7 +296,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -301,7 +314,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -318,7 +332,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -335,7 +350,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -352,7 +368,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -369,7 +386,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -386,7 +404,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -403,7 +422,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -420,7 +440,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -437,7 +458,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -454,7 +476,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -471,7 +494,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -488,7 +512,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -505,7 +530,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -523,7 +549,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -543,8 +570,9 @@
       "padproef": "PROVEN",
       "padproefInstrument": "factuurproef",
       "terugweg": "geen tegenhanger beproefd",
-      "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelKlasse": "COMPENSATABLE",
+      "herstelGrond": "Deze route verwerkt een factuur economisch af: het saldo gaat eraf, de factuur sluit en er gaat een afdracht naar de RTFoundation. Dat zijn drie vastgelegde gebeurtenissen, en de afdracht is al de deur uit richting een derde partij. Ze terugdraaien zou betekenen dat je doet alsof de betaling nooit heeft plaatsgevonden terwijl de stichting haar deel heeft gekregen. De correctie hoort dus ERNAAST: een tegenboeking die het saldo goedmaakt, met de oorspronkelijke gebeurtenis er nog steeds onder.",
+      "herstelBewijs": "BLOCKED"
     },
     {
       "methode": "POST",
@@ -562,7 +590,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -581,7 +610,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -598,7 +628,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -615,7 +646,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -634,7 +666,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -651,7 +684,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -668,7 +702,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -685,7 +720,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -702,7 +738,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -719,7 +756,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -736,7 +774,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -753,7 +792,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -770,7 +810,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -787,7 +828,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -804,7 +846,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -821,7 +864,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     },
     {
       "methode": "POST",
@@ -838,7 +882,8 @@
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
       "herstelKlasse": "UNKNOWN",
-      "herstelGrond": null
+      "herstelGrond": null,
+      "herstelBewijs": null
     }
   ]
 }

@@ -9394,6 +9394,22 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "crashtaxonomie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/crashtaxonomie.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "idemvoorziening.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/idemwereld.js",
+      "operator": "-->+#0",
+      "gezakt": 1,
+      "geprobeerd": 14
     }
   }
 }

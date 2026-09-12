@@ -496,3 +496,80 @@ de hashes. `bakverschil()` valt daar zelf op terug en zegt met `hashVergelijkbaa
 dat hij het doet; `test/factuurproef.test.js` houdt dat vast met een mutatie,
 want een versie die de hashes tóch vergelijkt meldt elke geldbak als bewogen en
 maakt de crashfase permanent rood.
+
+## Het correctiemodel — besluit van de eigenaar, 12 september 2026
+
+Dit document ging tot nu toe over de HEENWEG: komt een financiële mutatie heel
+en één keer op schijf. De vraag erna — wat als hij achteraf fout blijkt — was
+nooit beantwoord, en `HERSTELBESLUIT.json` stond daarom met opzet leeg. Dat
+besluit is nu genomen, en het staat in dat register zodat het naast de getallen
+leeft in plaats van in een herinnering.
+
+> **RTG gebruikt append-only economische geschiedenis en corrigeert primair met
+> compensaties. Geen generieke undo.** Iedere geldroute verklaart expliciet of
+> hij REVERSIBLE, COMPENSATABLE, FINAL of NOT_APPLICABLE is. UNKNOWN blijft
+> zichtbaar en ratelt alleen omlaag.
+
+**Voor geld is COMPENSATABLE de standaard, niet REVERSIBLE.** Financiële
+geschiedenis hoort niet te worden herschreven: is een factuur eenmaal
+economisch verwerkt, dan wil je niet achteraf doen alsof die gebeurtenis nooit
+heeft bestaan. Je wilt de fout ernáást zien staan.
+
+```
++500   de oorspronkelijke gebeurtenis
+-500   de compensatie
++450   de correcte boeking
+```
+
+en niet: *de oude 500 stil verwijderen*. Dat is wat audit, boekhouding en bewijs
+nodig hebben, en het is de enige vorm die later refunds, chargebacks,
+settlementcorrecties, payrollcorrecties en partnerafrekeningen kan dragen zonder
+de geschiedenis te vervalsen.
+
+`REVERSIBLE` mag wel bestaan, maar alleen waar de domeinregels aantonen dat een
+toestand werkelijk atomair terug te draaien is én er geen economische gebeurtenis
+is vastgelegd die zou moeten blijven staan. Een pre-settlement toestand kan dat
+zijn; een verwerkte betaling niet.
+
+### Een verklaring is geen bewijs, en dat is machinaal afgedwongen
+
+Dit is de scherpste kant van het besluit. `HERSTELBESLUIT.json` zegt wat de
+BEDOELING is; `bewijs` zegt of die bedoeling ergens is uitgevoerd. Zonder dat
+onderscheid wordt de as groen op de dag dat iemand `COMPENSATABLE` tikt —
+precies de faalvorm die de idempotentie-as al kent, waar een `stand` in een
+contract ook niet als meting telt.
+
+`scripts/gelddekking.js` kent daarom vier uitkomsten op deze as, en `BLOCKED` is
+er nieuw bij:
+
+```
+PROVEN           verklaard EN de terugweg is ergens uitgevoerd
+BLOCKED          verklaard, maar er valt (nog) niets uit te voeren -- mét watErMoetKomen
+NOT_APPLICABLE   FINAL of geen corrigeerbare waarde-eindtoestand: beantwoord, geen gat
+UNKNOWN          nog niet geclassificeerd -- de schuld die alleen mag dalen
+```
+
+Drie mutaties houden dat vast (`test/gelddekking.test.js`): een verklaring zonder
+bewijs als PROVEN tellen, FINAL als gat tellen, en het bewijsveld negeren. Alle
+drie laten ze de toets zakken.
+
+### De eerste verklaring, en waarom het er één is
+
+`POST /api/pay/saldo` staat op **COMPENSATABLE**, en dat is de enige route
+waarvan de terugweg werkelijk is GEMETEN in plaats van beredeneerd. De grond
+staat in het register: deze route legt drie gebeurtenissen vast — saldo eraf,
+factuur dicht, afdracht naar de RTFoundation — en die afdracht is al bij een
+derde partij. Ze terugdraaien zou betekenen dat je doet alsof de betaling nooit
+heeft plaatsgevonden terwijl de stichting haar deel heeft gekregen.
+
+Haar bewijs staat op `BLOCKED`, met wat er moet komen: er is nog geen route die
+op een betaalde factuur een tegenboeking zet. `npm run factuurproef` stap 7 mat
+dat — nul kandidaat-tegenhangers in `HERSTEL.json`, en de compenserende
+bouwsteen `pay.huisUit` bestaat wél maar heeft geen enkele aanroeper op een
+factuur. **De bouwsteen ligt er, de bedrading ontbreekt.**
+
+De andere 41 blijven UNKNOWN. Eenenveertig standen verzinnen omdat er nu een
+beleid is, zou precies de grens breken die boven het register staat: een stand
+wordt nooit afgeleid uit bewijs, en een beleid is geen stand. De ratel
+(`geldRoutesHerstelOnbesloten` in `NORM.json`) staat op de dag van invoering op
+**41** en mag daarna alleen dalen.

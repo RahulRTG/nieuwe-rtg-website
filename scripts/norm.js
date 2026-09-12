@@ -489,6 +489,20 @@ const METERS = [
      hetzelfde met een VERSE meting; deze tand houdt het register zelf vast, ook
      als niemand die browserronde draait. */
   { sleutel: 'appwerktDefecten', richting: 'omlaag', wat: 'onderdelen uit MAPPEN met een defect bewijs (uit APPWERKT.json)' },
+  /* DE EERSTE MINUUT (EERSTEMINUUT.json, npm run eersteminuut).
+
+     Wat een mens die RTG niet kent in zijn eerste minuut krijgt. Deze meter
+     bestaat omdat `tikken` en `vindbaar` allebei de vraag van een EXPERT
+     stellen -- de kortste weg voor wie weet waar hij heen wil, en of een woord
+     ergens heen leidt voor wie dat woord al kent. Ze stonden allebei groen
+     terwijl het beginscherm van een vers lid nul leesbare handelingen droeg en
+     het menu opende met `01Universe`.
+
+     Geteld wordt het aantal GEZAKTE toetsen, en dat mag alleen omlaag. Niet het
+     aantal gehaalde: dan zou een toets weghalen als vooruitgang lezen. En niet
+     `nietMeetbaar`, want dat is geen uitslag over de app maar over de meter --
+     die twee optellen is precies de fout die MENS.md par. 0 beschrijft. */
+  { sleutel: 'eersteMinuutGezakt', richting: 'omlaag', wat: 'toetsen van de eerste minuut die ZAKKEN (uit EERSTEMINUUT.json)' },
   /* Het BEREIK van de carrierevormmeter (CARRIERE.md par. 0): hoeveel
      talentdomeinen hij werkelijk heeft gezien. Omhoog, want dit mag niet stil
      dalen -- zie de kop bij CARRIEREVORM.json in ./lib/metingen.js. */
@@ -1206,6 +1220,7 @@ function meet(bronnen) {
     lussenKritiek: leesRegister('LUSSEN.json', (j) => j.ratel.kritiek),
     lussenZonderOverlapRem: leesRegister('LUSSEN.json', (j) => j.ratel.wekkersAsyncZonderRem),
     appwerktDefecten: leesRegister('APPWERKT.json', (j) => j.gemeten.defecten),
+    eersteMinuutGezakt: leesRegister('EERSTEMINUUT.json', (j) => j.telling.gezakt),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
        milliseconden en een afdruk die achterloopt zou hier een groen getal

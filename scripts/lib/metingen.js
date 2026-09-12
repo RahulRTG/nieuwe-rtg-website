@@ -152,6 +152,12 @@ const REGISTER = {
      en die is met een mutatie zien zakken; zie BETROUWBAARHEID.md par. 5. */
   'APPWERKT.json': { meter: ['appwerktDefecten'] },
 
+  /* EERSTEMINUUT.json hangt om dezelfde reden aan de NORM-ratel als APPWERKT:
+     een verse meting vraagt een browser en een registratie, en dat hoort niet
+     in `npm test`. Wat eraan hangt is het getal dat ertoe doet --
+     `eersteMinuutGezakt` mag alleen omlaag. */
+  'EERSTEMINUUT.json': { meter: ['eersteMinuutGezakt'] },
+
   /* DE ZEVEN REGISTERS VAN MAATSTAF.md, en waarom ze hier mogen staan. Elk van
      deze toetsen doet HETZELFDE: hij meet vers en vergelijkt met wat er in het
      register staat, zodat een achterlopend register de bouw laat zakken in

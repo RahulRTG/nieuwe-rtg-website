@@ -243,8 +243,8 @@ body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-world-dashboard-ready="t
 }
 body[data-rtg-world-dashboard-ready="true"]::after{opacity:.28}
 body[data-rtg-world-dashboard-ready="true"] .rtg-world-dashboard{
-  width:min(100%,1180px)!important;
-  max-width:1180px!important;
+  width:min(100%,1600px)!important;
+  max-width:1600px!important;
   padding:clamp(18px,3vw,36px)!important;
   padding-bottom:clamp(92px,10vw,124px)!important;
 }
@@ -314,6 +314,22 @@ body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-world-dashboard-ready="t
 body.rtg-travel-experience[data-rtg-skin="heritage"][data-rtg-world="travel"][data-rtg-world-dashboard-ready="true"] .actieknop :is(span,b){
   color:var(--rtg-world-action-ink)!important
 }
+
+/* Tekst op fotografische dashboardvlakken houdt ook bij een gemiddeld lichte
+   uitsnede zijn volledige leescontrast. */
+body[data-rtg-skin="heritage"][data-rtg-world="living"][data-rtg-world-dashboard-ready="true"] .standen button{
+  color:var(--rtg-world-ink)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world="living"][data-rtg-world-dashboard-ready="true"] .momentnaam{
+  padding:2px 5px;background:var(--rtg-world-bg)!important;color:var(--rtg-world-ink)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world="living"][data-rtg-world-dashboard-ready="true"] .kompasblok :where(
+  p,span,.sub,a,.kompasuur,.kompaswat){color:var(--rtg-world-ink)!important}
+body[data-rtg-skin="heritage"][data-rtg-world="living"][data-rtg-world-dashboard-ready="true"] .rtgdeel-vast>.ey{
+  color:var(--rtg-world-ink)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world="work"][data-rtg-world-dashboard-ready="true"] :is(
+  .merkkop .onder,.wereldvoet span){color:#d8d2c9!important}
 
 /* Het echte beginscherm volgt dezelfde volgorde als de referentie: eerst de
    menselijke vraag, daarna vier herkenbare werelden. Geen verzonnen activiteit. */
@@ -437,8 +453,8 @@ body[data-ios-home][data-rtg-skin="heritage"]:has(#gate:not([style*="display: no
     border:1px solid var(--edge-line)!important;border-radius:50%!important;color:var(--edge-copy)!important
   }
   .rtg-edge-bottom{
-    left:8px!important;right:8px!important;bottom:max(8px,env(safe-area-inset-bottom,0px))!important;
-    width:auto!important;height:60px!important;
+    left:8px!important;right:8px!important;bottom:0!important;
+    width:auto!important;height:var(--edge-bottom)!important;
     grid-template-columns:repeat(5,minmax(0,1fr))!important;
     padding:0 4px!important;border:1px solid color-mix(in srgb,var(--rtg-world-signature) 38%,var(--edge-line))!important;
     background:color-mix(in srgb,var(--rtg-world-bg) 94%,transparent)!important;
@@ -447,7 +463,7 @@ body[data-ios-home][data-rtg-skin="heritage"]:has(#gate:not([style*="display: no
     overflow:visible!important;backdrop-filter:blur(22px)!important
   }
   .rtg-edge-bottom>a,.rtg-edge-bottom>button{
-    min-width:0!important;height:58px!important;border:0!important
+    width:100%!important;min-width:44px!important;height:calc(var(--edge-bottom) - 2px)!important;border:0!important
   }
   .rtg-edge-bottom>a{grid-column:1;grid-row:1}
   .rtg-edge-worlds-trigger{display:flex!important;grid-column:2;grid-row:1}

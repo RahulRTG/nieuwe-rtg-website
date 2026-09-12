@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2291,
+    "bewijsAchterstand": 2380,
     "bewijsAlleenKeten": 16,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -75,8 +75,8 @@
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
     "geldRoutesZonderIdemBewijs": 9,
-    "geldRoutesZonderTerugweg": 39,
-    "geldRoutesHerstelOnbesloten": 42,
+    "geldRoutesZonderTerugweg": 42,
+    "geldRoutesHerstelOnbesloten": 44,
     "geldRoutesHerstelTegenspraak": 0,
     "geldpadGezakt": 0,
     "geldpadOnbewezen": 1,
@@ -2136,6 +2136,26 @@
       "meter": "toetsenNietGemeten 611 -> 612",
       "reden": "test/menscontext.test.js komt erbij en de mutatiemotor is er niet langs. De toets handhaaft de contextlaag van fase 4: dezelfde zin met drie verschillende schermen krijgt drie antwoorden, AANGEBODEN en GEBRUIKT zijn twee beweringen, PENDING_INTERACTION is niet p.wacht, en een verwijzing wordt nooit uit zichzelf een object. Vijftien beweringen, en ze zijn met de hand nagetrokken met tien mutaties op de bron -- waarvan er twee NIETS deden en dus zijn vervangen (de beginwaarde `let magHet = false` wordt door de catch in elke tak overschreven, en het weghalen van de `typeof o.mag`-tak laat diezelfde catch hem alsnog op false vangen). Handwerk is geen motorronde: dit is instrumentdekking en geen groenverklaring.",
       "waarheen": "laat de mutatiemotor over test/menscontext.test.js lopen in dezelfde ronde als de toetsen van 2026-09-08 en 2026-09-10 (zelfde sleutel, zelfde vervaldatum); levert dat pogingen zonder uitslag op, dan hoort hij in GEEN_BRONMUTATIE met het aantal pogingen erbij, en anders gewoon gemeten"
+    },
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2291,
+      "vervalt": "2026-12-01",
+      "meter": "bewijsAchterstand 2291 -> 2380",
+      "reden": "DIT IS GEEN REGRESSIE VAN DEZE TAK MAAR WERK DAT IN BEELD KWAM, en dat is nagerekend in plaats van aangenomen. IDEMPROEF.json stond gestempeld op 3 september 2026 (commit 40ff1c66) en is in deze tak voor het eerst sinds die datum opnieuw gedraaid. De ronde meet nu 4912 routes in plaats van 4729: +183, want de codebase is sindsdien gegroeid. Die 183 nieuwe routes zijn nog ongeclassificeerd op herhaalbaarheid, en daar komt de groei vandaan -- idem-ongeclassificeerd gaat van 1486 naar 1578 (+92) tegen een achterstand die met 89 stijgt.\n\nDE OUDE EN DE NIEUWE WAARDE HEBBEN DUS NIET DEZELFDE NOEMER. 2291 is gemeten over 4729 routes en 2380 over 4912; ze vergelijken is hetzelfde als een p99 van een andere machine naast de lat leggen. De ratel kan dat verschil niet zien, en daarom staat de reden hier.\n\nWAT ER WEL BETER WERD IN DEZELFDE RONDE: gevolg-onbekend daalt van 90 naar 87, en de zes geldpaden die op BLOCKED_BY_TEST_FIXTURE stonden (bank/pas/sluit, bank/pas/betaal, geld/beleid/weg, pay/verzoek/intrek, supplier/pos/checkout, supplier/pay/treasury/apart) staan sinds deze ronde alle zes op `beschermd`. De richting van deze tak is dus de andere kant op dan dit getal suggereert.\n\nWAAROM NIET GEWOON NIET HERMETEN. Dat is precies de faalvorm die dit huis elders beschrijft: een register dat getallen toont van een instrument dat al negen dagen niet meer is gedraaid, is de gevaarlijkste vorm van schijnzekerheid die er is. De achterstand verbergen door de meter stil te zetten, is erger dan hem zien stijgen.",
+      "waarheen": "de 183 nieuwe routes classificeren op herhaalbaarheid (IDEMBESLUIT.json en de mutatiecontracten), zodat idem-ongeclassificeerd weer daalt. Vervalt 2026-12-01: staat hij dan nog op 2380 of hoger, dan is dit geen afdrift meer maar achterstand die niemand aflost."
+    },
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "geldRoutesZonderTerugweg",
+      "van": 39,
+      "vervalt": "2026-12-01",
+      "meter": "geldRoutesZonderTerugweg 39 -> 42, geldRoutesHerstelOnbesloten 42 -> 44",
+      "reden": "DRIE GELDROUTES ERBIJ IN DE NOEMER, EN GEEN ENKELE VERSLECHTERING IN DE TELLER. GELDKAART.json is in deze tak hermeten en vindt 45 waardebewegende routes in plaats van 42: /api/bank/salaris, /api/bank/sepa en /api/supplier/pay/uitbetaal bewegen aantoonbaar waarde en stonden niet op de kaart. Ze zijn niet nieuw in de code -- ze waren nooit gemeten.\n\nVoor allebei deze tanden geldt dus hetzelfde: 39 en 42 zijn gemeten over 42 routes, 42 en 44 over 45. Elke nieuwe geldroute begint per definitie zonder beproefde tegenhanger en zonder verklaard correctiemodel, want die twee zijn er niet vanzelf. De ratel kan dat verschil in noemer niet zien.\n\nWAT ER IN DEZELFDE RONDE WEL GEBEURDE, en het is de andere kant op: de drie hebben nu een verklaarde semantiek (geldRoutesZonderSemantiek blijft op 1 in plaats van naar 4 te gaan), geldRoutesZonderIdemBewijs daalt van 9 naar 3, en de idempotentie-as staat op 42 van 45 PROVEN met NUL geblokkeerd. Het correctiemodel is deze tak bovendien pas INGEVOERD: voor 12 september bestond er geen enkele verklaring, nu is er een.\n\nWAAROM DE DRIE NIET METEEN VERKLAARD ZIJN. HERSTELBESLUIT.json verbiedt een stand af te leiden uit iets anders dan een besluit met een grond. Drie standen bijzetten omdat een ratel anders rood staat, is precies de omkering die dat register tegenhoudt -- en juist bij deze drie zou het zwaar wegen, want het geld verlaat bij alle drie het huis.",
+      "waarheen": "de terugweg van deze drie beproeven (HERSTELPROEF.json) en hun correctiemodel verklaren in HERSTELBESLUIT.json, met de grond dat geld dat bij een externe bank ligt niet door RTG is terug te draaien. Vervalt 2026-12-01."
     }
   ],
   "prestatie": {
@@ -2160,7 +2180,7 @@
     "inlineStijlAttributen": "2026-09-11",
     "ratelTanden": "2026-09-12",
     "metingenZonderRatel": "2026-08-18",
-    "bewijsAchterstand": "2026-09-06",
+    "bewijsAchterstand": "2026-09-12",
     "toetsenOngevoeligPct": "2026-09-05",
     "endpointsZonderTest": "2026-09-11",
     "dekkingPct": "2026-09-06",

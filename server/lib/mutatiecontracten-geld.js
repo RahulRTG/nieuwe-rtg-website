@@ -74,27 +74,27 @@ const CONTRACTEN = {
     bewijs: { gemeten: 'IDEMPROEF.json: beschermd', op: '2026-09-12' }
   },
   'POST /api/bank/pas/sluit': {
-    mutatieId: 'bank.pas.sluit', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
+    mutatieId: 'bank.pas.sluit', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'PROTECTED', afgetekend: AFGETEKEND,
     waarom: 'kern/bank/passen.js: `delete passen()[id]`. Een tweede aanroep geeft 404 ' +
       '"De pas bestaat niet" -- een toestandscontrole, geen tweede effect. De eindstand ' +
       'na een en na twee aanroepen is identiek: de pas is weg. Er wordt bij het sluiten ' +
       'GEEN saldo verplaatst, dus er valt ook niets dubbel te doen.',
-    watErMoetKomen: "een UITGEGEVEN bankpas. Zelfde voorziening als bij bank.pas.betaal; met de pas erbij meet een tweede aanroep of hij netjes 404 geeft in plaats van iets te doen.",
-    bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen uitgegeven pas in de proefwereld)', op: '2026-09-12' }
+    watErMoetKomen: null,
+    bewijs: { gemeten: 'PROTECTED: gemeten in de idempotentieronde van 12 september 2026. De route was niet geblokkeerd door een ontbrekende wereld maar door een onderwerp dat op was voordat de meting begon -- de pasladder-ijkoproep doet echt werk. Een voorziening (scripts/lib/idemwereld.js) maakt het onderwerp nu vers, na die ijkoproep en voor de eerste gemeten oproep.', op: '2026-09-12' }
   },
   'POST /api/geld/beleid/weg': {
-    mutatieId: 'geld.beleid.weg', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
+    mutatieId: 'geld.beleid.weg', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'PROTECTED', afgetekend: AFGETEKEND,
     waarom: 'kern/geldbeleid: een regel verwijderen. Twee keer weghalen laat hem weg.',
-    watErMoetKomen: "een bestaande beleidsregel van het lid, aangemaakt langs de gewone route. Zonder regel is er niets te verwijderen en doet de eerste oproep al geen werk.",
-    bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen regel om weg te halen)', op: '2026-09-12' }
+    watErMoetKomen: null,
+    bewijs: { gemeten: 'PROTECTED: gemeten in de idempotentieronde van 12 september 2026. De route was niet geblokkeerd door een ontbrekende wereld maar door een onderwerp dat op was voordat de meting begon -- de pasladder-ijkoproep doet echt werk. Een voorziening (scripts/lib/idemwereld.js) maakt het onderwerp nu vers, na die ijkoproep en voor de eerste gemeten oproep.', op: '2026-09-12' }
   },
   'POST /api/pay/verzoek/intrek': {
-    mutatieId: 'pay.verzoek.intrek', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
+    mutatieId: 'pay.verzoek.intrek', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'PROTECTED', afgetekend: AFGETEKEND,
     waarom: 'kern/pay/verzoeken.js: `v.status = "ingetrokken"`, met ervoor een weigering ' +
       'als de stand niet `open` is (409 "Dit verzoek is al afgehandeld"). Een tweede ' +
       'aanroep verandert niets meer.',
-    watErMoetKomen: "een OPEN betaalverzoek van het lid zelf. Zonder verzoek geeft de route 404 en zegt een herhaling niets.",
-    bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen open verzoek)', op: '2026-09-12' }
+    watErMoetKomen: null,
+    bewijs: { gemeten: 'PROTECTED: gemeten in de idempotentieronde van 12 september 2026. De route was niet geblokkeerd door een ontbrekende wereld maar door een onderwerp dat op was voordat de meting begon -- de pasladder-ijkoproep doet echt werk. Een voorziening (scripts/lib/idemwereld.js) maakt het onderwerp nu vers, na die ijkoproep en voor de eerste gemeten oproep.', op: '2026-09-12' }
   },
   'POST /api/pay/saldo': {
     mutatieId: 'pay.factuur.saldo', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'PROTECTED', afgetekend: AFGETEKEND,

@@ -1,12 +1,13 @@
 {
   "stempel": {
-    "op": "2026-09-12T17:02:59.872Z",
-    "commit": "5a2b0e0b",
+    "op": "2026-09-12T17:48:27.122Z",
+    "commit": "88411c2d",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/menstaalproef.js",
     "node": "v22.22.2"
   },
+  "rail": "deterministisch",
   "wat": "hoe ver elke menselijke zin werkelijk komt, gemeten uit het stuurspoor, afgezet tegen de `sideEffectMax` die het contract voor die zin noemt",
   "meet": "server/kern/stuur/menstaal.json tegen server/kern/stuur/spoor.js",
   "corpus": {

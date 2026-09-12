@@ -1524,6 +1524,36 @@ const IJKINGEN = {
       (j) => { j.gemeten.defecten = (j.gemeten.defecten || 0) + 3; return j; },
       () => norm.meet().appwerktDefecten - voor.appwerktDefecten)
   },
+  /* DE VIER TANDEN VAN 12 SEPTEMBER 2026: de economische dekking
+     (GELDDEKKING.json). Elk van de vier leest EEN veld uit `ratel`, en dat is
+     precies wat hier misgaan kan -- vier meters die naar hetzelfde register
+     kijken, en waarvan er drie stilletjes hetzelfde veld zouden kunnen lezen.
+     Daarom krijgt elke meter zijn EIGEN veld opgehoogd en wordt er gemeten of
+     juist DIE meter meebeweegt: leest er een het verkeerde veld, dan blijft hij
+     staan waar hij stond en zakt deze ijking.
+
+     Ze gaan alle vier OMHOOG in de proef, want dat is de richting die ertoe
+     doet: ze mogen volgens de ratel alleen dalen. */
+  geldRoutesPubliek: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesPubliek = (j.ratel.geldRoutesPubliek || 0) + 2; return j; },
+      () => norm.meet().geldRoutesPubliek - voor.geldRoutesPubliek)
+  },
+  geldRoutesZonderSemantiek: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesZonderSemantiek = (j.ratel.geldRoutesZonderSemantiek || 0) + 3; return j; },
+      () => norm.meet().geldRoutesZonderSemantiek - voor.geldRoutesZonderSemantiek)
+  },
+  geldRoutesZonderIdemBewijs: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesZonderIdemBewijs = (j.ratel.geldRoutesZonderIdemBewijs || 0) + 4; return j; },
+      () => norm.meet().geldRoutesZonderIdemBewijs - voor.geldRoutesZonderIdemBewijs)
+  },
+  geldRoutesZonderTerugweg: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesZonderTerugweg = (j.ratel.geldRoutesZonderTerugweg || 0) + 5; return j; },
+      () => norm.meet().geldRoutesZonderTerugweg - voor.geldRoutesZonderTerugweg)
+  },
   /* DE TAND VAN 10 SEPTEMBER 2026: bewijsAlleenKeten telt de bewijsmechanismen
      die alleen in de keten draaien en niet lokaal (BEWIJSLADDER.json). Zelfde
      vorm als de vier hierboven -- hij telt een POST in een register, dus hij

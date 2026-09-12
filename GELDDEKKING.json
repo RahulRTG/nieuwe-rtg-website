@@ -1,0 +1,605 @@
+{
+  "soort": "meting",
+  "uitleg": "Economische dekking: wat er van elke waardebewegende ROUTE bewezen is, samengesteld uit GELDKAART.json (welke routes), MUTATIECONTRACT.json (semantiek en toegang), IDEMPROEF.json (idempotentie) en HERSTELPROEF.json (de terugweg).",
+  "stempel": {
+    "op": "2026-09-12T14:19:21.577Z",
+    "commit": "a8ec8f9f",
+    "boomVuil": false,
+    "boomAnders": 1,
+    "instrument": "scripts/gelddekking.js",
+    "node": "v22.22.2"
+  },
+  "grens": "Er komt met opzet GEEN samengesteld dekkingspercentage. Elke as draagt haar eigen teller en noemer; ze worden nooit gemiddeld. De noemer zelf is een ONDERgrens: hij komt uit de geldkaart, die alleen routes ziet waar de idempotentieproef langskwam. Een as waarvoor geen meting bestaat staat in nietGemeten en telt nergens als nul mee.",
+  "klachten": [],
+  "gemeten": {
+    "geldroutes": 42,
+    "inMutatiecontract": 42,
+    "semantiek": {
+      "onbekend": 16,
+      "sleutelVereist": 12,
+      "nietHerhaalbaar": 5,
+      "idempotent": 9
+    },
+    "toegang": {
+      "AUTHENTICATED": 42
+    },
+    "idempotentie": {
+      "ongemeten": 10,
+      "beschermd": 32
+    },
+    "terugweg": {
+      "geen tegenhanger beproefd": 39,
+      "compensatie": 2,
+      "exact": 1
+    }
+  },
+  "ratel": {
+    "geldRoutesPubliek": 0,
+    "geldRoutesZonderSemantiek": 16,
+    "geldRoutesZonderIdemBewijs": 10,
+    "geldRoutesZonderTerugweg": 39
+  },
+  "nietGemeten": {
+    "crashHerstel": "Wat er gebeurt als het proces sterft tussen de bevestiging van een provider en de grootboekregel, is in dit huis nergens beproefd. Geen meting, dus geen getal -- en nadrukkelijk geen nul.",
+    "externeSettlement": "Geen providersleutel staat gezet (server/betaal.js weigert dan fail-closed), dus er is nooit een extern betaalpad uitgevoerd om over te rapporteren."
+  },
+  "rijen": [
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/betaal",
+      "rol": "member",
+      "collecties": [
+        "bankPassen"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "ongemeten",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/bevries",
+      "rol": "member",
+      "collecties": [
+        "bankPassen"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/limiet",
+      "rol": "member",
+      "collecties": [
+        "bankPassen"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/sluit",
+      "rol": "member",
+      "collecties": [
+        "bankPassen"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "ongemeten",
+      "terugweg": "compensatie"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/uitgeven",
+      "rol": "member",
+      "collecties": [
+        "bankPassen"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "terugweg": "exact"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/rekening/open",
+      "rol": "member",
+      "collecties": [
+        "bankRekeningen"
+      ],
+      "semantiek": "nietHerhaalbaar",
+      "toegang": "AUTHENTICATED",
+      "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/spaardoel",
+      "rol": "member",
+      "collecties": [
+        "bankRekeningen"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/storten",
+      "rol": "member",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/terugkerend/zet",
+      "rol": "member",
+      "collecties": [
+        "bankTerugkerend"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "terugweg": "compensatie"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/boardroom/betalingen/proef",
+      "rol": "techniek",
+      "collecties": [
+        "betaalRegie"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "ongemeten",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/geld/beleid/weg",
+      "rol": "member",
+      "collecties": [
+        "geldbeleid"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "ongemeten",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/geld/cockpit",
+      "rol": "member",
+      "collecties": [
+        "labFonds"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/geld/grens",
+      "rol": "member",
+      "collecties": [
+        "geldbeleid"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/gemeente/belasting/mijn",
+      "rol": "member",
+      "collecties": [
+        "gemeenteAanslagen"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/kosten/vooruitblik",
+      "rol": "member",
+      "collecties": [
+        "economie"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/labfonds/locatie/maak",
+      "rol": "member",
+      "collecties": [
+        "labFonds"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/ai/tegoed",
+      "rol": "member",
+      "collecties": [
+        "aiTegoed"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/draai",
+      "rol": "boardroom",
+      "collecties": [
+        "bankregie"
+      ],
+      "semantiek": "nietHerhaalbaar",
+      "toegang": "AUTHENTICATED",
+      "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/leden",
+      "rol": "office",
+      "collecties": [
+        "bankregie"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/mislukking",
+      "rol": "office",
+      "collecties": [
+        "bankregie"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/nood",
+      "rol": "office",
+      "collecties": [
+        "bankregie"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/rechtsvormwacht",
+      "rol": "office",
+      "collecties": [
+        "aiTegoed"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/kascode",
+      "rol": "member",
+      "collecties": [
+        "payCodes"
+      ],
+      "semantiek": "nietHerhaalbaar",
+      "toegang": "AUTHENTICATED",
+      "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/oplaad",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/saldo",
+      "rol": "member",
+      "collecties": [
+        "fondsAfdrachten",
+        "invoices",
+        "payBoekingen",
+        "paySaldi",
+        "socialeAfdrachten"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "ongemeten",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/stuur",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/tegoed/koop",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi",
+        "payTegoed"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/tikcode",
+      "rol": "member",
+      "collecties": [
+        "payTikCodes"
+      ],
+      "semantiek": "nietHerhaalbaar",
+      "toegang": "AUTHENTICATED",
+      "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/verzoek",
+      "rol": "member",
+      "collecties": [
+        "payVerzoeken"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/verzoek/betaal",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi",
+        "payVerzoeken"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/verzoek/intrek",
+      "rol": "member",
+      "collecties": [
+        "payVerzoeken"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "ongemeten",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/punten",
+      "rol": "member",
+      "collecties": [
+        "punten"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/betaalverzoek",
+      "rol": "supplier",
+      "collecties": [
+        "betaalVerzoeken"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/facturen/maak",
+      "rol": "supplier",
+      "collecties": [
+        "facturen"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/facturen/pdf",
+      "rol": "supplier",
+      "collecties": [
+        "facturen"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "ongemeten",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/giftcard/sell",
+      "rol": "supplier",
+      "collecties": [
+        "giftcards"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/oog/overzicht",
+      "rol": "supplier",
+      "collecties": [
+        "directOntvangsten"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "ongemeten",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pay/treasury/apart",
+      "rol": "supplier",
+      "collecties": [
+        "waardeOormerken"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "ongemeten",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pay/treasury/zet",
+      "rol": "supplier",
+      "collecties": [
+        "payTreasury"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pos/checkout",
+      "rol": "supplier",
+      "collecties": [
+        "posSales"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "ongemeten",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/wallet",
+      "rol": "member",
+      "collecties": [
+        "wallet"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/wallet/voeg",
+      "rol": "member",
+      "collecties": [
+        "wallet"
+      ],
+      "semantiek": "nietHerhaalbaar",
+      "toegang": "AUTHENTICATED",
+      "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+      "idempotentie": "beschermd",
+      "terugweg": "geen tegenhanger beproefd"
+    }
+  ]
+}

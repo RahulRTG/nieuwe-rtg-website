@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-12T13:31:30.175Z",
-    "commit": "aaa5b407",
+    "op": "2026-09-12T14:19:33.246Z",
+    "commit": "a8ec8f9f",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2762,6 +2762,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "gelddekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/gelddekking.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "geldgraaf.test.js": {
       "soort": "server",

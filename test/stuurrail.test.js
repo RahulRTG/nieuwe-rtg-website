@@ -148,7 +148,14 @@ test('10. elk pad in het corpus bestaat echt in het beleid', () => {
      MUTATIE: zet /api/verzonnen/pad in een planstap, of haal `bewustVerboden`
      weg bij "parijs vrijdag". */
   const { beleidVoor } = require('../server/kern/stuur/beleid');
-  const zinnen = require('../server/kern/stuur/rail-corpus-zinnen');
+  /* HET HELE CORPUS EN NIET EEN BESTAND. De gouden plak verhuisde naar
+     ./rail-corpus-goudenplak.js toen rail-corpus-zinnen.js door de omvangband
+     ging; keek deze toets naar een enkel bestand, dan bewaakte hij de
+     bewust-verboden regel niet meer. Hij leest nu wat de rail werkelijk laadt.
+     Dat is binnen een dag de zesde wacht die door een splitsing blind werd. */
+  const zinnen = Object.assign({}, require('../server/kern/stuur/rail-corpus-zinnen'),
+    require('../server/kern/stuur/rail-corpus-context'),
+    require('../server/kern/stuur/rail-corpus-goudenplak'));
   let gezien = 0, bewust = 0;
   for (const [zin, regel] of Object.entries(zinnen)) {
     for (const stap of regel.stappen || []) {

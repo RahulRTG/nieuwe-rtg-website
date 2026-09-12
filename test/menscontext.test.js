@@ -342,10 +342,18 @@ test('11. de twee corpusbronnen botsen niet', () => {
      Object.assign zou er stil een winnen.
      MUTATIE: zet een van de zinnen uit rail-corpus-zinnen.js ook in
      rail-corpus-context.js. */
-  const a = Object.keys(require('../server/kern/stuur/rail-corpus-zinnen'));
-  const b = Object.keys(require('../server/kern/stuur/rail-corpus-context'));
-  const dubbel = a.filter((k) => b.includes(k));
-  assert.deepEqual(dubbel, [], 'deze sleutels staan in beide corpusbestanden: ' + dubbel.join(', '));
+  const bronnen = { zinnen: require('../server/kern/stuur/rail-corpus-zinnen'),
+    context: require('../server/kern/stuur/rail-corpus-context'),
+    goudenplak: require('../server/kern/stuur/rail-corpus-goudenplak') };
+  const gezien = new Map();
+  for (const [naam, bron] of Object.entries(bronnen))
+    for (const k of Object.keys(bron)) {
+      assert.equal(gezien.has(k), false,
+        'sleutel "' + k + '" staat in zowel ' + gezien.get(k) + ' als ' + naam +
+        '; Object.assign zou er stil een winnen');
+      gezien.set(k, naam);
+    }
+  const a = [...gezien.keys()], b = [];
   /* En elke sleutel is genormaliseerd: een sleutel met een hoofdletter of een
      leesteken wordt nooit gevonden. */
   for (const k of a.concat(b))

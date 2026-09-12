@@ -529,6 +529,37 @@ registers van **verschillende leeftijd is een leeftijdsverschil en geen
 tegenspraak** (CODE.md par. 0.9) -- die twee staan apart en worden nooit
 opgeteld, want ze samenvoegen maakt van een oude meting een fout.
 
+### Wat de projectie meteen zichtbaar maakte
+
+Zodra het detail per zin naast de stand kwam te liggen, vielen er drie dingen op
+die als alinea al bekend waren maar nooit als getal bestonden.
+
+**De resolver gebruikt de context in geen enkel scenario.** Van de 31 zinnen komt
+er bij <!--getal:menselijk.contextAangeboden-->6<!--/getal--> context aan die door
+het contract heen komt, bij <!--getal:menselijk.contextGebruikt-->0<!--/getal-->
+raakt een contextwoord aantoonbaar een pad, en bij
+<!--getal:menselijk.niemandKeek-->16<!--/getal--> heeft de resolver niet eens
+gedraaid — dan heeft *niemand gekeken*, en dat is iets anders dan "de context deed
+niets". Dat nulgetal is geen defect: `resolver.js` geeft bij dun bewijs de volle
+lijst terug, en deze zinnen dragen te weinig woorden om te versmallen.
+`test/menscontext.test.js` toets 2 laat zien dát het mechanisme werkt. Wat hier
+staat is dat **geen enkele zin uit het contract het van begin tot eind uitoefent** —
+een gat in het corpus, niet in de code.
+
+**De mandaatgrendel weegt, maar haalt er niets af.** `MANDATE_EVALUATED` staat op
+PASS met `{voor: 120, na: 120}`: de allowlist heeft het werk al eerder gedaan.
+Daarom bijt mutatie 5 wél op `test/stuurspoor.test.js` (dat een versmallende
+filter meegeeft) en zou hij op de echte route niets hebben gemerkt.
+
+**En er zat een leeg veld in het spoor.** `CONSEQUENCE_EVALUATED` droeg sinds de
+bouw `{ graad: gevolg.graad }`, en `kern/stuur/gevolg.js` geeft helemaal geen
+`graad` terug — die woont per stap, niet over het plan. Het detail viel dus weg in
+de JSON en de fase zag er keurig gemeten uit. Een veld dat nooit één keer een
+waarde heeft gedragen is erger dan een ontbrekend veld: het leest als bewijs. Het
+merk draagt nu wat er echt is (stappen, geraakte collecties, en hoeveel daarvan
+`gemeten`, `geen-effect-gemeten` of `onbekend` zijn) — en die drie worden nooit
+opgeteld.
+
 ### Wat hiermee NIET bewezen is
 
 Dat een MODEL de zinnen zo zou uitleggen. De interpretatie is vandaag gescript;

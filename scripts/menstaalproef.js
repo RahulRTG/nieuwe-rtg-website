@@ -114,6 +114,48 @@ function bereikteTrede(spoor) {
   return { trede, uit };
 }
 
+/* WAT DE KETEN ER ONDERWEG VAN BEGREEP -- de DETAILS uit het spoor, en niet
+   alleen de standen.
+
+   Hier stonden per zin uitsluitend de fase-STANDEN, en daarmee viel juist het
+   onderscheid weg waar fase 7 om draait: CONTEXT_SANITIZED zegt dat er context
+   is AANGEBODEN, en of de resolver hem ook GEBRUIKT heeft staat in het detail
+   van INTENT_RESOLVED. Die twee zijn twee beweringen, en een register dat er
+   maar een van bewaart, laat de andere als bewezen lezen.
+
+   `gebruikt: null` IS GEEN `false`. Liep INTENT_RESOLVED niet, dan is er niets
+   gewogen en heeft niemand gekeken -- dat is `onbekend` en niet "nee". Dezelfde
+   regel als bij `nietGemeten` hierboven: "ik kon niet kijken" is geen "er
+   gebeurde niets". */
+function uitSpoor(spoor) {
+  const merk = (f) => (spoor.merken || []).filter((m) => m.fase === f).pop();
+  const ctx = merk('CONTEXT_SANITIZED'), intent = merk('INTENT_RESOLVED');
+  const gevolg = merk('CONSEQUENCE_EVALUATED'), mand = merk('MANDATE_EVALUATED');
+  const paden = (spoor.merken || [])
+    .filter((m) => m.fase === 'CAPABILITY_SELECTED' && m.stand === 'PASS')
+    .map((m) => (m.detail && m.detail.pad) || null).filter(Boolean);
+  const d = (m) => (m && m.detail) || {};
+  return {
+    context: {
+      aangeboden: (ctx && ctx.stand) || 'OVERGESLAGEN',
+      woorden: d(ctx).woorden, gewist: d(ctx).gewist,
+      verwijzingen: d(ctx).verwijzingen, canoniek: d(ctx).canoniek,
+      /* null en niet false: zonder resolverbeurt heeft niemand gekeken. */
+      gebruikt: intent ? !!d(intent).contextGebruikt : null,
+      geraakt: intent ? (d(intent).contextRaak || []) : undefined
+    },
+    interpretatie: intent
+      ? { versmald: !!d(intent).versmald, paden: d(intent).paden, gekozen: paden }
+      : { versmald: null, paden: null, gekozen: paden,
+          reden: 'de resolver is niet geraakt; er is niets te interpreteren geweest' },
+    gevolg: gevolg ? { stappen: d(gevolg).stappen, collecties: d(gevolg).collecties,
+      gemeten: d(gevolg).gemeten, geenEffect: d(gevolg).geenEffect, onbekend: d(gevolg).onbekend }
+      : undefined,
+    mandaatWeging: mand && mand.stand === 'PASS'
+      ? { voor: d(mand).voor, na: d(mand).na } : undefined
+  };
+}
+
 /* HOEVEEL BLOKKERENDE VRAGEN STELT HET ANTWOORD -- het tweede contractveld dat
    nu wel gemeten wordt, en dat is geen woordspel maar een gevolg van de rail.
 
@@ -399,7 +441,7 @@ async function versLid(basis, n) {
 
 /* DE WACHT VOOR HET REQUIREN (scripts/meetkeuring.js regel `wacht`). Zonder dit
    start een laadcontrole een wegwerpserver en overschrijft het register. */
-if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; return; }
+if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede, uitSpoor, blokkerendeVragen }; return; }
 
 (async () => {
   const stil = process.argv.includes('--stil');
@@ -444,10 +486,13 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
       const teVer = TREDEN.indexOf(b.trede) > TREDEN.indexOf(g.sideEffectMax);
       const planMerk = (spoor.merken || []).find((m) => m.fase === 'PLAN_COMPILED');
       const vragen = blokkerendeVragen(r.data.antwoord);
+      const uitSp = uitSpoor(spoor);
       rijen.push({ id: g.id, input: g.input, klasse: g.klasse, verwachteRoute: g.verwachteRoute,
         mag: g.sideEffectMax, kwam: b.trede, uit: b.uit,
         vragen, magVragen: g.blockingVraagMax,
         teVeelVragen: vragen > g.blockingVraagMax,
+        context: uitSp.context, interpretatie: uitSp.interpretatie,
+        gevolg: uitSp.gevolg, mandaatWeging: uitSp.mandaatWeging,
         planReden: planMerk && planMerk.detail ? planMerk.detail.eersteBezwaar : undefined,
         uitslag: teVer ? 'TE_VER' : 'binnen',
         fasen: Object.fromEntries(Object.entries(spoor.perFase).map(([k, v]) => [k, v.stand])) });

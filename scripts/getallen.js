@@ -333,6 +333,17 @@ const GETALLEN = {
     wat: 'mutaties die een wacht lieten zakken' },
   'mensmutatie.zonderWacht': { bron: 'MENSMUTATIE.json', veld: 'telling.geenWacht',
     wat: 'garanties die je kunt weghalen zonder dat een wacht afgaat' },
+  /* DE MENSELIJKE UITVOERING (MENSELIJKE_UITVOERING.json). Drie getallen over
+     EEN vraag, en ze mogen nooit tot een percentage worden samengetrokken:
+     context die AANKOMT, context die de resolver GEBRUIKT, en gevallen waarin de
+     resolver niet eens draaide -- dan heeft NIEMAND GEKEKEN, en dat is iets
+     anders dan "de context deed niets". */
+  'menselijk.contextAangeboden': { bron: 'MENSELIJKE_UITVOERING.json', veld: 'telling.contextAangeboden',
+    wat: 'scenario\'s waarin context is aangeboden en gesaneerd' },
+  'menselijk.contextGebruikt': { bron: 'MENSELIJKE_UITVOERING.json', veld: 'telling.contextGebruikt',
+    wat: 'scenario\'s waarin de resolver de context aantoonbaar gebruikte' },
+  'menselijk.niemandKeek': { bron: 'MENSELIJKE_UITVOERING.json', veld: 'telling.contextNiemandKeek',
+    wat: 'scenario\'s waarin de resolver niet draaide, dus niemand naar de context keek' },
   /* De duur van die parseronde staat MET OPZET niet in deze lijst. Een levend
      getal moet uit een register komen dat bij gelijke code hetzelfde zegt; een
      tijdmeting doet dat niet (4,6 of 4,8 op dezelfde commit), en een controle

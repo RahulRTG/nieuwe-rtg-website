@@ -63,7 +63,22 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil, spoor }) {
              WAAROM er niets kan, en dat is nu juist het antwoord. */
           eersteBezwaar: (gewogen.bezwaren || [])[0] ? (gewogen.bezwaren[0].reden || '').slice(0, 120) : undefined });
       const gevolg = voorspel(gewogen);
-      spoor && spoor.mark('CONSEQUENCE_EVALUATED', 'PASS', { graad: gevolg && gevolg.graad });
+      /* WAT HIER STAAT, IS WAT ./gevolg.js WERKELIJK TERUGGEEFT. Hier stond
+         `{ graad: gevolg.graad }`, en voorspel() heeft geen `graad` -- die woont
+         per STAP, niet over het plan. Het merk droeg dus sinds de bouw een leeg
+         veld: het detail viel weg in de JSON en de fase leek keurig gemeten.
+         Gevonden door MENSELIJKE_UITVOERING.json, dat het detail per zin naast
+         de stand legde en overal niets vond. Een veld dat nooit een waarde heeft
+         gehad, is erger dan een ontbrekend veld -- het leest als bewijs.
+
+         `onbekend` staat er apart bij en wordt nergens bij `gemeten` opgeteld:
+         "van deze stap is niet gemeten wat hij aanraakt" is iets anders dan
+         "deze stap raakt niets aan" (./gevolg.js zegt dat zelf ook). */
+      const gt = (gevolg && gevolg.telling) || {};
+      spoor && spoor.mark('CONSEQUENCE_EVALUATED', 'PASS',
+        { stappen: (gevolg && gevolg.stappen || []).length,
+          collecties: (gevolg && gevolg.geraakteCollecties || []).length,
+          gemeten: gt.gemeten, geenEffect: gt['geen-effect-gemeten'], onbekend: gt.onbekend });
       const uit = Object.assign({}, gewogen, { gevolg });
       acties.push({ pad: 'plan', status: uit.uitvoerbaar ? 200 : 409, gevraagd: true });
       return uit;

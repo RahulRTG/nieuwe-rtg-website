@@ -54,6 +54,41 @@ const crypto = require('crypto');
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'MENSELIJKE_UITVOERING.json');
 
+/* DE GEVRAAGDE VELDEN, EN WIE ZE LEVERT. Deze kaart staat in de uitvoer zelf en
+   niet alleen in commentaar, want de regel eronder is: geen veld toevoegen omdat
+   het mooi klinkt. Elk veld noemt de PROBE die hem levert; kan geen enkele probe
+   hem leveren, dan staat dat er met de reden en blijft het veld leeg in plaats
+   van geraden.
+
+   De twee die hier NIET uit een probe komen zijn met opzet verschillend:
+   `architectuurkeuzes` kan niemand meten (uit tekst niet af te lezen zonder te
+   raden), en dat is een besluit; `gevolgstatus` kon dat WEL maar deed het niet
+   -- het merk droeg een veld `graad` dat kern/stuur/gevolg.js nooit teruggeeft,
+   dus het stond er leeg. Dat is inmiddels gerepareerd. Het verschil tussen "kan
+   niet" en "deed het niet" hoort zichtbaar te blijven. */
+const VELDEN = {
+  scenario: 'menstaal.json (id)',
+  input: 'menstaal.json (input)',
+  contextklasse: 'menstaal.json (context)',
+  interpretatie: 'stuurspoor INTENT_RESOLVED-detail via MENSTAALPROEF.json',
+  ambiguiteit: 'menstaal.json (ambigu)',
+  contextAangebodenGebruikt: 'stuurspoor CONTEXT_SANITIZED-stand + INTENT_RESOLVED-detail ' +
+    '(twee beweringen, en `gebruikt: null` betekent dat niemand keek)',
+  planstatus: 'stuurspoor PLAN_COMPILED + het eerste bezwaar van de compiler',
+  gevolgstatus: 'stuurspoor CONSEQUENCE_EVALUATED-detail (stappen, collecties, onbekend)',
+  mandaatstatus: 'stuurspoor MANDATE_EVALUATED-detail (de lijst voor en na de grendel)',
+  capability: 'stuurspoor CAPABILITY_SELECTED -- alleen of er EEN gekozen is',
+  bereikteTrede: 'MENSTAALPROEF.json (kwam), afgeleid uit het spoor en niet uit de tekst',
+  uitvoeringsstatus: 'stuurspoor EXECUTED (NOT_RUN bij een 428: een voorstel, geen uitvoering)',
+  blockingVragen: 'geteld in het ANTWOORD -- exact op de deterministische rail, een schatting op ' +
+    'een modelrail',
+  architectuurkeuzes: 'GEEN PROBE. Of een antwoord de mens een wereld of app laat kiezen is niet ' +
+    'uit de tekst af te lezen zonder te raden; mutatie 10b van MENSMUTATIE.json laat zien dat er ' +
+    'vandaag dus geen wacht op staat.',
+  mutationEvidence: 'MENSMUTATIE.json, gejoind op het veld `bewaakt` van elke mutatie',
+  unknowns: 'per rij samengesteld uit wat de probes NIET leverden'
+};
+
 const BRONNEN = ['server/kern/stuur/menstaal.json', 'MENSTAALPROEF.json',
   'MENSMUTATIE.json', 'PAKTE.json', 'scripts/menselijkeuitvoering.js'];
 
@@ -187,10 +222,20 @@ function bouw() {
         MANDATE_EVALUATED: f.MANDATE_EVALUATED, CAPABILITY_SELECTED: f.CAPABILITY_SELECTED,
         PROJECTED: f.PROJECTED, EXECUTED: f.EXECUTED
       },
+      /* AANGEBODEN EN GEBRUIKT ZIJN TWEE BEWERINGEN, en ze staan hier daarom
+         naast elkaar en niet samengevat. `gebruikt: null` is geen `false`: liep
+         de resolver niet, dan heeft niemand gekeken. */
+      context: r.context,
+      interpretatie: r.interpretatie,
       capability,
       waarom: r.planReden || undefined,
-      mandaat: { mag: g.sideEffectMax, kwam: r.kwam, binnen: r.uitslag === 'binnen', uit: r.uit },
+      gevolg: r.gevolg,
+      mandaat: { mag: g.sideEffectMax, kwam: r.kwam, binnen: r.uitslag === 'binnen', uit: r.uit,
+        weging: r.mandaatWeging },
       vragen: { mag: r.magVragen, gesteld: r.vragen, binnen: !r.teVeelVragen },
+      /* Een leeg veld zou lezen als nul keuzes. Het staat er met de reden. */
+      architectuurkeuzes: { mag: g.architectuurKeuzesMax, gemeten: false,
+        reden: 'geen probe -- zie VELDEN.architectuurkeuzes' },
       bewijs: bewijsVan(f, bewijsPer),
       onbekend
     });
@@ -202,6 +247,7 @@ function bouw() {
       'hij kwam, en welke wacht er aantoonbaar afgaat als een schakel wordt weggehaald',
     vorm: 'PROJECTIE -- afgeleid uit de registers hieronder, nooit met de hand bijgewerkt. ' +
       'test/menselijkeuitvoering.test.js hercompileert hem en vergelijkt byte voor byte.',
+    velden: VELDEN,
     bronnen: Object.fromEntries(BRONNEN.map((b) => [b, vingerafdruk(b)])),
     gemetenOp: leeftijden,
     /* EEN PROJECTIE OVER REGISTERS VAN VERSCHILLENDE LEEFTIJD IS GEEN FOUT, maar
@@ -212,6 +258,9 @@ function bouw() {
       binnenContract: tel((s) => s.mandaat && s.mandaat.binnen === true),
       buitenContract: tel((s) => s.mandaat && s.mandaat.binnen === false),
       nietGemeten: tel((s) => s.keten === 'ONBEPAALD'),
+      contextAangeboden: tel((s) => s.context && s.context.aangeboden === 'PASS'),
+      contextGebruikt: tel((s) => s.context && s.context.gebruikt === true),
+      contextNiemandKeek: tel((s) => s.context && s.context.gebruikt === null),
       totUitvoering: tel((s) => s.keten !== 'ONBEPAALD' && s.keten.EXECUTED !== 'OVERGESLAGEN'),
       tegenspraken: tegenspraken.length, leeftijdsverschillen: leeftijdsverschillen.length },
     tegenspraken, leeftijdsverschillen,
@@ -240,7 +289,7 @@ function bewijsVan(fasen, bewijsPer) {
 
 function tekst(k) { return JSON.stringify(k, null, 1) + '\n'; }
 
-if (require.main !== module) { module.exports = { bouw, tekst, BRONNEN, soortVerschil }; return; }
+if (require.main !== module) { module.exports = { bouw, tekst, BRONNEN, VELDEN, soortVerschil }; return; }
 
 const controle = process.argv.includes('--controle');
 const k = bouw();

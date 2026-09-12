@@ -137,8 +137,8 @@ const MUTATIES = [
     tekst: [
       { bestand: LS, van: 'const gevolg = voorspel(gewogen);', naar: 'const gevolg = null;' },
       { bestand: LS,
-        van: "spoor && spoor.mark('CONSEQUENCE_EVALUATED', 'PASS', { graad: gevolg && gevolg.graad });",
-        naar: "false && spoor.mark('CONSEQUENCE_EVALUATED', 'PASS', { graad: gevolg && gevolg.graad });" }] },
+        van: "spoor && spoor.mark('CONSEQUENCE_EVALUATED', 'PASS',",
+        naar: "false && spoor.mark('CONSEQUENCE_EVALUATED', 'PASS'," }] },
 
   { nr: '5', naam: 'mandaat bypass',
     bewaakt: 'MANDATE_EVALUATED',

@@ -98,13 +98,18 @@ const CONTRACTEN = {
   },
   'POST /api/pay/saldo': {
     mutatieId: 'pay.factuur.saldo', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
-    waarom: 'HET SLOT ZIT OP DE TOESTAND EN NIET OP EEN SLEUTEL, en dat is hier bewust ' +
-      'nagekeken omdat deze route geld over vijf collecties beweegt zonder idem-sleutel. ' +
-      'kern/factuursaldo.js draagt drie grendels voor er een cent beweegt: `status === ' +
-      '"paid"` geeft 409, niets meer open geeft 409, en een al lopende betaling geeft 409 ' +
-      '(een vlucht-slot voor twee gelijktijdige verzoeken). Een tweede aanroep op dezelfde ' +
-      'factuur kan dus niet twee keer betalen. Een sleutel zou hier netter zijn, maar het ' +
-      'ontbreken ervan is geen gat: de factuurstand IS de sleutel.',
+    waarom: 'DRIE SLOTEN, EN DE DERDE IS EEN SLEUTEL DIE DE AANROEPER NIET KAN WEGLATEN. ' +
+      'Deze route beweegt geld over vijf collecties, dus hij is nagekeken. kern/factuursaldo.js ' +
+      'draagt (1) de factuurstand -- `status === "paid"` geeft 409 en niets meer open geeft 409; ' +
+      '(2) een in-vlucht-slot op wie+factuur, voor twee verzoeken die tegelijk binnenkomen en ' +
+      'allebei "open" lezen; en (3) een DETERMINISTISCHE idem-sleutel richting pay.huisIn, ' +
+      'samengesteld uit de aanroeper en het factuurnummer (`wie + ":inv-saldo:" + inv.id`). ' +
+      'Juist die derde maakt de klasse `idempotent` en niet `sleutelVereist`: de sleutel wordt ' +
+      'server-side afgeleid, dus een aanroeper kan hem niet weglaten om een tweede handeling ' +
+      'te krijgen. HIER STOND EERST DAT ER GEEN SLEUTEL WAS en dat de factuurstand hem verving. ' +
+      'Dat was fout, gevonden door de kop en de body van kern/factuursaldo.js verder te lezen ' +
+      'dan de eerste grendels -- en het is precies de reden dat een verklaring uit de CODE komt ' +
+      'en niet uit een meting: de meting had hier hetzelfde gezegd en de fout niet gevonden.',
     watErMoetKomen: "een OPENSTAANDE factuur op naam van het lid, plus genoeg saldo om hem te voldoen. Dit is de belangrijkste van de zeven: de route beweegt geld over vijf collecties en haar bescherming hangt aan de factuurSTAND en niet aan een sleutel. Pas met deze wereld is te meten of dat slot werkelijk sluit.",
     bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen openstaande factuur)', op: '2026-09-12' }
   }

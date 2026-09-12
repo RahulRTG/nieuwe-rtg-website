@@ -506,7 +506,18 @@
       "maxMandaat": "geen",
       "blockingVraagMax": 1,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Agenda",
+        "deel": "Deze week",
+        "interactie": {
+          "soort": "keuze",
+          "opties": [
+            "Afspraak dinsdag 10:00",
+            "Afspraak donderdag 15:00"
+          ]
+        }
+      }
     },
     {
       "id": "amb-doe-maar-leeg",
@@ -603,7 +614,8 @@
       "maxMandaat": "tonen",
       "blockingVraagMax": 0,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "FASE4",
+      "let op": "de contextconditie is \"na een datumvoorstel\", en die vorm bestaat wel in het contract (een `interactie` met opties). Hij is nog niet gescript omdat de drie toestanden van \"liever later\" dezelfde bewering al dragen -- context verfijnt de intentie -- en een vierde variant daarvan meet niets nieuws. Wie hem alsnog activeert, schrijft de verwachting uit DIT contract en niet uit wat een rail toevallig doet."
     },
     {
       "id": "fup-met-zn-tweeen",
@@ -617,7 +629,8 @@
       "maxMandaat": "tonen",
       "blockingVraagMax": 0,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "FASE4",
+      "let op": "idem: \"na een reisvraag\" is dezelfde vorm als de reiscontext van \"liever later\", en die bewering staat al. Bovendien loopt hij tegen dezelfde productgap aan als \"parijs vrijdag\": er is voor een lid geen reis-capability op de AI-allowlist."
     },
     {
       "id": "fup-ja-doe-maar",
@@ -705,7 +718,8 @@
       "maxMandaat": "geen",
       "blockingVraagMax": 1,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "FASE4",
+      "let op": "de contextconditie is \"met locatiecontext\", en die vorm bestaat NIET in het contract van server/kern/stuur/menscontext.js: dat kent presentatie, verwijzingen en interactie, en een locatie is geen van drieen. Hem in `selectie` proppen zou een vierde contextsoort binnensmokkelen via een tekstveld. Dit wacht dus op een besluit over of locatie een eigen contractdeel wordt."
     },
     {
       "id": "ctx-zelfde-met",
@@ -719,7 +733,8 @@
       "maxMandaat": "tonen",
       "blockingVraagMax": 1,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "FASE4",
+      "let op": "de contextconditie is \"met geschiedenis\", en die bestaat met opzet niet: de menselijke context is VLUCHTIG (fase 4 -- current request, pending interaction, current selection) en draagt geen verleden. \"Zelfde als vorige keer\" vraagt om langetermijngeheugen, en dat is een ander productprobleem dan deze laag oplost."
     },
     {
       "id": "ctx-zelfde-zonder",

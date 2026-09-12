@@ -534,22 +534,28 @@ opgeteld, want ze samenvoegen maakt van een oude meting een fout.
 Zodra het detail per zin naast de stand kwam te liggen, vielen er drie dingen op
 die als alinea al bekend waren maar nooit als getal bestonden.
 
-**De resolver gebruikt de context in geen enkel scenario.** Van de 31 zinnen komt
-er bij <!--getal:menselijk.contextAangeboden-->13<!--/getal--> context aan die door
+**De resolver gebruikt de context bijna nergens.** Van de
+<!--getal:menselijk.scenarios-->39<!--/getal--> zinnen komt
+er bij <!--getal:menselijk.contextAangeboden-->14<!--/getal--> context aan die door
 het contract heen komt, bij <!--getal:menselijk.contextGebruikt-->2<!--/getal-->
 raakt een contextwoord aantoonbaar een pad, en bij
-<!--getal:menselijk.niemandKeek-->20<!--/getal--> heeft de resolver niet eens
+<!--getal:menselijk.niemandKeek-->21<!--/getal--> heeft de resolver niet eens
 gedraaid — dan heeft *niemand gekeken*, en dat is iets anders dan "de context deed
 niets".
 
-Dat middelste getal stond op **nul** tot de drie geldgevallen erbij kwamen (par.
-3f), en het is niet omhooggegaan doordat er een geval voor ontworpen is: het is
-`amb-betaal-die-1`, en daar versmalt het schermwoord *RTG Geld* de resolver van
-120 paden naar 12. Bij de andere zinnen geeft `resolver.js` bij dun bewijs nog
-steeds de volle lijst terug — te weinig woorden om te versmallen. Eén van de
-vierendertig is dus geen prestatie maar wel een bewijs: het mechanisme werkt niet
-alleen in een unittoets (`test/menscontext.test.js` toets 2) maar ook van begin
-tot eind.
+Dat middelste getal stond op **nul** toen deze alinea werd geschreven, en het is
+sindsdien twee keer opgelopen zonder dat er ooit een geval voor is ontworpen. De
+eerste is `amb-betaal-die-1` (par. 3e), waar het schermwoord *RTG Geld* de
+resolver van 120 paden naar 12 brengt; de tweede is `ctx-open-hem` (par. 3f),
+waar het woord *documenten* uit de selectie hem op 3 paden zet. Let op wat daar
+NIET gebeurt: `canoniek` staat bij dat tweede geval op nul, dus het is de
+contextWOORDEN-weg die versmalt en niet de verwijzingsoplossing — twee
+mechanismen die makkelijk voor elkaar worden aangezien. Bij de andere zinnen
+geeft `resolver.js` bij dun bewijs nog steeds de volle lijst terug — te weinig
+woorden om te versmallen. Twee van de
+<!--getal:menselijk.scenarios-->39<!--/getal--> is dus geen prestatie maar wel
+een bewijs: het mechanisme werkt niet alleen in een unittoets
+(`test/menscontext.test.js` toets 2) maar ook van begin tot eind.
 
 **De mandaatgrendel weegt, maar haalt er niets af.** `MANDATE_EVALUATED` staat op
 PASS met `{voor: 120, na: 120}`: de allowlist heeft het werk al eerder gedaan.
@@ -571,7 +577,7 @@ Dat een MODEL de zinnen zo zou uitleggen. De interpretatie is vandaag gescript;
 wat vaststaat is dat alles ONDER de interpretatie werkt, weigert en meet zoals
 het belooft.
 
-### 3f. "Betaal die" — en een gebrek dat het spoor al die tijd had
+### 3e. "Betaal die" — en een gebrek dat het spoor al die tijd had
 
 Het contract droeg dertien gevallen die als **vooruitlopend** te boek stonden:
 geschreven, maar nergens gedraaid. Drie ervan zijn nu geactiveerd, en met opzet
@@ -608,7 +614,7 @@ corpusbestanden** bij die meteen afdreef toen er één bij kwam; die vraagt het 
 aan de rail zelf, want een tweede lijst naast de samenvoeging is precies de
 dubbeling die dit huis elders telt.
 
-### 3h. Een selectie zegt WELK object, nooit WAT ermee moet
+### 3f. Een selectie zegt WELK object, nooit WAT ermee moet
 
 Drie zinnen op dezelfde context — een geselecteerd document in de kluis — en het
 verschil is of de zin een **werkwoord** draagt.
@@ -631,6 +637,22 @@ rest ook staat. De derde zin draagt bovendien een **verwijzing** in plaats van e
 tekstselectie, en die blijft `ONOPGELOST`: er is geen opzoeker bedraad. Dat staat
 zo in het register, want een verwijzing die stil bruikbaar wordt is precies wat
 `menscontext-ref.js` moet voorkomen.
+
+**En de duurste vorm van dezelfde dubbelzinnigheid staat er nu naast.** "Annuleer
+hem" met twee kandidaten is taalkundig gelijk aan "die andere" met twee
+alternatieven; wat verschilt is wat een gok kóst — een verkeerd scherm tegenover
+een afspraak die niet had moeten verdwijnen. De uitkomst is **exact gelijk**, en
+dat is de bewering: de keten wordt niet voorzichtiger *omdat* het werkwoord
+gevaarlijk is, hij was het al. Zou hij bij "die andere" wel kiezen en hier niet,
+dan zat de voorzichtigheid in het woord en niet in de laag.
+
+Wat er van het contract nog geparkeerd staat, draagt nu **per geval een eigen
+reden** in plaats van de oude blanket-uitleg. Twee ervan zijn geen bouwwerk maar
+een besluit: "daar" vraagt om een locatiecontext, en die is geen van de drie
+contractdelen — hem in `selectie` proppen zou een vierde contextsoort
+binnensmokkelen via een tekstveld. En "zelfde als vorige keer" vraagt om
+geschiedenis, en die bestaat met opzet niet: de menselijke context is **vluchtig**.
+Dat is een ander productprobleem dan deze laag oplost.
 
 ### 3g. "Ja doe maar" — de gevaarlijkste twee woorden
 
@@ -659,7 +681,7 @@ intrekken, of alleen op de knop waar hij het ook bevestigt? Zolang dat niet
 besloten is, blijft het geval een vooruitlopend contract. Er een corpusregel voor
 schrijven die iets ánders doet dan intrekken, zou de belofte stil veranderen.
 
-### 3e. De tweede rail: het apparaat staat, het oordeel niet
+### 3h. De tweede rail: het apparaat staat, het oordeel niet
 
 De laatste stap is dezelfde 41 gevallen tegen een lokaal model en tegen de
 externe rails, tegen exact hetzelfde contract. Dat apparaat staat nu, en de

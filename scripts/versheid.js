@@ -229,6 +229,7 @@ const REGISTERS = [
      test/geldkaart.test.js: geen kernbak buiten zijn eigen poort. Dat is een nul
      die nul moet blijven en die zakt gewoon, ook als dit register oud is. */
   ['GELDKAART.json', 'npm run geldkaart', 'of elke waardemutatie door haar eigen poort ging (RTG Pay en RTG Bank)'],
+  ['GELDDEKKING.json', 'npm run gelddekking', 'wat er van elke waardebewegende route bewezen is'],
 
   /* DE BEWIJSLADDER (KEURING.md par. 7): welke soorten bewijs dit huis levert,
      waar ze draaien en wat ze achterlaten. Hij hoort hier omdat hij veroudert

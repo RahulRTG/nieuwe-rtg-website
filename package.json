@@ -194,6 +194,7 @@
     "contextproef": "node scripts/contextproef.js",
     "kernherkomst": "node scripts/kernherkomst.js",
     "faalproef": "node scripts/faalproef.js",
+    "gelddekking": "node scripts/gelddekking.js",
     "geldkaart": "node scripts/geldkaart.js",
     "getallen": "node scripts/getallen.js",
     "getallen:controle": "node scripts/getallen.js --controle",

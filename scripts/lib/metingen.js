@@ -198,6 +198,11 @@ const REGISTER = {
      die nul moet blijven: geen kernbak buiten zijn eigen poort. Die ratel woont
      daarom in de toets en niet in NORM.json. */
   'GELDKAART.json': { eigenRatel: 'test/geldkaart.test.js' },
+  /* GELDDEKKING.json hangt WEL aan NORM.json -- vier tanden, zie de kop daar.
+     Anders dan de geldkaart draagt hij voorraden die mogen dalen in plaats van
+     een nul die nul moet blijven, en dat is precies wat een ratel meet. */
+  'GELDDEKKING.json': { meter: ['geldRoutesPubliek', 'geldRoutesZonderSemantiek',
+    'geldRoutesZonderIdemBewijs', 'geldRoutesZonderTerugweg'] },
 
   'TIKKEN.json': { eigenRatel: 'test/sprongindex.test.js' },
   'VINDBAAR.json': { eigenRatel: 'test/sprongindex.test.js' },

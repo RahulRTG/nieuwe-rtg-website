@@ -489,6 +489,20 @@ const METERS = [
      hetzelfde met een VERSE meting; deze tand houdt het register zelf vast, ook
      als niemand die browserronde draait. */
   { sleutel: 'appwerktDefecten', richting: 'omlaag', wat: 'onderdelen uit MAPPEN met een defect bewijs (uit APPWERKT.json)' },
+  /* DE VIER VAN DE ECONOMISCHE DEKKING (GELDDEKKING.json). Ze staan hier als
+     VIER tanden en niet als een samengesteld dekkingscijfer, en dat is dezelfde
+     regel als hierboven bij de geblende tellers: 42 van 42 bevoegdheden bewezen
+     en 3 van 42 terugwegen beproefd zijn geen 53% -- het zijn twee uitspraken
+     waarvan de tweede alarmerend is en de eerste geruststellend.
+
+     De eerste is de scherpste en staat op nul: een route die geld beweegt en die
+     een onbekende mag aanroepen. De andere drie zijn VOORRADEN -- ze mogen niet
+     stil groeien, en ze hoeven niet vandaag leeg. Wie er een geldroute bij bouwt
+     zonder verklaarde semantiek of zonder beproefde terugweg, ziet dat hier. */
+  { sleutel: 'geldRoutesPubliek', richting: 'omlaag', wat: 'wegen die waarde bewegen en publiek aanroepbaar zijn (GELDDEKKING.json)' },
+  { sleutel: 'geldRoutesZonderSemantiek', richting: 'omlaag', wat: 'geldroutes zonder verklaarde tweede-aanroep' },
+  { sleutel: 'geldRoutesZonderIdemBewijs', richting: 'omlaag', wat: 'geldroutes waarvan de herhaalbaarheid ongemeten is' },
+  { sleutel: 'geldRoutesZonderTerugweg', richting: 'omlaag', wat: 'geldroutes zonder beproefde tegenhanger' },
   /* Het BEREIK van de carrierevormmeter (CARRIERE.md par. 0): hoeveel
      talentdomeinen hij werkelijk heeft gezien. Omhoog, want dit mag niet stil
      dalen -- zie de kop bij CARRIEREVORM.json in ./lib/metingen.js. */
@@ -1206,6 +1220,10 @@ function meet(bronnen) {
     lussenKritiek: leesRegister('LUSSEN.json', (j) => j.ratel.kritiek),
     lussenZonderOverlapRem: leesRegister('LUSSEN.json', (j) => j.ratel.wekkersAsyncZonderRem),
     appwerktDefecten: leesRegister('APPWERKT.json', (j) => j.gemeten.defecten),
+    geldRoutesPubliek: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesPubliek),
+    geldRoutesZonderSemantiek: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderSemantiek),
+    geldRoutesZonderIdemBewijs: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderIdemBewijs),
+    geldRoutesZonderTerugweg: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderTerugweg),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
        milliseconden en een afdruk die achterloopt zou hier een groen getal

@@ -63,7 +63,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const { spawnSync, execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
 const SNEL = process.argv.includes('--snel');
@@ -106,11 +106,13 @@ const KERNBAKKEN = Object.freeze({
   bankSaldi: 'bank', bankBoekingen: 'bank'
 });
 
-function stempel() {
-  let commit = 'onbekend';
-  try { commit = execSync('git rev-parse --short HEAD', { cwd: WORTEL }).toString().trim(); } catch (e) { /* geen git */ }
-  return { datum: new Date().toISOString().slice(0, 10), commit };
-}
+/* HET STEMPEL KOMT UIT scripts/lib/stempel.js EN IS NIET ZELFGEMAAKT. De eerste
+   versie zette hier datum + commit, en dat ziet er compleet uit terwijl het veld
+   ontbreekt waar het om draait: `boomVuil`. Een meting uit een werkboom met
+   ongecommitte code is NIET te herhalen, en een register dat daarover zwijgt
+   leest als een reproduceerbare meting. De norm telt zulke registers apart
+   (`registersUitVuileBoom`) -- en dat werkt alleen als het veld er staat. */
+const { stempel } = require('./lib/stempel');
 
 /* ---------------------------------------------------------------- AS 1 */
 function kaart() {

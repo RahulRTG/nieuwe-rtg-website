@@ -156,7 +156,7 @@ test('10. elk pad in het corpus bestaat echt in het beleid', () => {
   const zinnen = Object.assign({}, require('../server/kern/stuur/rail-corpus-zinnen'),
     require('../server/kern/stuur/rail-corpus-context'),
     require('../server/kern/stuur/rail-corpus-goudenplak'));
-  let gezien = 0, bewust = 0;
+  let gezien = 0; const bewust = [];
   for (const [zin, regel] of Object.entries(zinnen)) {
     for (const stap of regel.stappen || []) {
       for (const t of stap.tools || []) {
@@ -164,7 +164,7 @@ test('10. elk pad in het corpus bestaat echt in het beleid', () => {
         for (const s of t.input.stappen || []) {
           gezien++;
           const oordeel = beleidVoor(s.capability, 'member');
-          if (oordeel.niveau === 'verboden' && regel.bewustVerboden) { bewust++; continue; }
+          if (oordeel.niveau === 'verboden' && regel.bewustVerboden) { bewust.push(zin); continue; }
           assert.notEqual(oordeel.niveau, 'verboden',
             'corpusregel "' + zin + '" plant op ' + s.capability +
             ', en dat pad staat niet op de member-allowlist -- dan zakt het plan altijd. ' +
@@ -174,11 +174,20 @@ test('10. elk pad in het corpus bestaat echt in het beleid', () => {
     }
   }
   assert.ok(gezien > 0, 'geen enkele planstap gevonden; dan bewaakt deze toets niets');
-  /* En de verklaarde uitzondering moet ECHT bestaan: verdwijnt hij, dan is er
-     niets meer dat bewijst dat een ontbrekende capability zichtbaar wordt. */
-  assert.equal(bewust, 1,
-    'er hoort precies EEN bewust-verboden planstap te zijn (de gouden plak, negatieve helft); ' +
-    'gevonden: ' + bewust);
+  /* DE VERKLAARDE UITZONDERINGEN STAAN HIER MET NAAM, en niet als aantal. Ze
+     bestaan allebei om hetzelfde te bewijzen -- dat een ONTBREKENDE capability
+     zichtbaar wordt in plaats van stil -- en er mag er geen bijkomen zonder dat
+     iemand deze lijst aanraakt. Een teller had dat verborgen: die gaat net zo
+     goed van 1 naar 2 als iemand per ongeluk op een verboden pad plant en er
+     een reden bij verzint.
+       parijs vrijdag  de gouden plak, negatieve helft
+       liever later    fase 7, toestand A: reiscontext */
+  const VERKLAARD = ['parijs vrijdag',
+    'liever later actieve context scherm rtg reizen deel parijs vrijdag keuze vertrek 09 12 ' +
+    'vertrek 17 40 gekozen vertrek 09 12'];
+  assert.deepEqual(bewust.sort(), VERKLAARD.slice().sort(),
+    'de bewust-verboden planstappen wijken af van de verklaarde lijst; gevonden: ' +
+    JSON.stringify(bewust));
 });
 
 test('11. normaliseren blijft dom', () => {

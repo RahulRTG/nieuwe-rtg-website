@@ -46,8 +46,9 @@ module.exports = {
     ],
     projectie: 'Parijs \u00b7 vrijdag\nDit kan ik niet voor je regelen: reizen boeken staat niet ' +
       'op wat ik namens jou mag doen. Wat ik wel kan is het klaarzetten in je agenda.' },
-  /* DE GOUDEN PLAK, POSITIEVE HELFT -- en de enige regel in dit corpus die een
-     `doe` draagt. De kopregel hierboven zegt dat er nooit een `doe` in staat,
+  /* DE GOUDEN PLAK, POSITIEVE HELFT -- de eerste regel in dit corpus die een
+     `doe` draagt (fase 7 voegde er een tweede aan toe, in
+     ./rail-corpus-context.js). De kopregel hierboven zegt dat er nooit een `doe` in staat,
      en dat was waar zolang het corpus alleen de WEGING moest laten zien. Maar
      een keten die nooit tot het eind wordt uitgevoerd, is tot het eind ook
      nooit bewezen: CAPABILITY_SELECTED en EXECUTED waren tot nu toe altijd

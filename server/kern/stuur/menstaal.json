@@ -463,7 +463,20 @@
       "maxMandaat": "tonen",
       "blockingVraagMax": 1,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Reizen",
+        "deel": "Parijs vrijdag",
+        "interactie": {
+          "soort": "keuze",
+          "opties": [
+            "vertrek 09:12",
+            "vertrek 17:40"
+          ],
+          "gekozen": "vertrek 09:12"
+        }
+      },
+      "let op": "FASE 7, toestand A. Dezelfde twee woorden als -afspraak en -geen; alleen het scherm verschilt. De uitkomst hoort NIET te raken aan die van B: dit gaat over een later VERTREK, en die capability bestaat voor een lid niet -- de keten hoort dat te zeggen in plaats van de zin stil op de agenda te betrekken."
     },
     {
       "id": "fup-liever-later-afspraak",
@@ -473,11 +486,24 @@
       "verwachteRoute": "OPERATIONAL",
       "verwachtDoel": "agenda",
       "ambigu": false,
-      "sideEffectMax": "tonen",
-      "maxMandaat": "tonen",
+      "sideEffectMax": "klaarzetten",
+      "maxMandaat": "klaarzetten",
       "blockingVraagMax": 1,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Agenda",
+        "deel": "Vrijdag",
+        "interactie": {
+          "soort": "keuze",
+          "opties": [
+            "14:00 tandarts",
+            "16:30 tandarts"
+          ],
+          "gekozen": "14:00 tandarts"
+        }
+      },
+      "let op": "FASE 7, toestand B. Zelfde zin, ander scherm, andere betekenis: een latere TIJD. Hier bestaat de capability wel, dus de keten komt tot een voorstel dat een mens bevestigt. Komt dit geval ooit op dezelfde uitkomst uit als A, dan is de context niet gebruikt."
     },
     {
       "id": "fup-liever-later-geen",

@@ -1584,6 +1584,20 @@ const IJKINGEN = {
       (j) => { j.goudenPlak.gebreken = (j.goudenPlak.gebreken || []).concat(['ijkproef', 'ijkproef']); return j; },
       () => norm.meet().goudenPlakGebreken - voor.goudenPlakGebreken)
   },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (vijfde): samenhangGebreken telt wat er
+     mankeert aan de drie toestanden van "liever later" (MENSTAALPROEF.json,
+     gesprekssamenhang.gebreken). Zelfde vorm als de vorige twee.
+
+     De meter zelf is met DRIE mutaties zien uitslaan, en dat is waar het bij
+     deze om gaat: context uit het verzoek halen (A en B vallen op elkaar), de
+     reiscontext door de afspraakcontext vervangen (A slaat om en overschrijdt
+     bovendien zijn contract), en het geen-context-pad toch laten kiezen (C
+     verzint een referent). Zie de kop van scripts/menstaalproef.js. */
+  samenhangGebreken: {
+    proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
+      (j) => { j.gesprekssamenhang.gebreken = (j.gesprekssamenhang.gebreken || []).concat(['ijk', 'ijk']); return j; },
+      () => norm.meet().samenhangGebreken - voor.samenhangGebreken)
+  },
   /* DE TAND VAN 10 SEPTEMBER 2026: bewijsAlleenKeten telt de bewijsmechanismen
      die alleen in de keten draaien en niet lokaal (BEWIJSLADDER.json). Zelfde
      vorm als de vier hierboven -- hij telt een POST in een register, dus hij

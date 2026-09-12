@@ -171,6 +171,101 @@ function goudenPlak(rijen) {
   };
 }
 
+/* GESPREKSSAMENHANG -- krijgt dezelfde korte vervolgzin een andere betekenis
+   door wat er openstaat, en verzint hij niets als er niets openstaat?
+
+   "liever later" betekent op zichzelf niets: later dan WAT. De drie toestanden
+   hieronder moeten elkaar dus niet raken, en het verschil moet in het SPOOR
+   staan en niet alleen in de zin die eruit komt.
+
+     A  reiscontext     -> een later VERTREK; die capability bestaat voor een
+                           lid niet, dus de keten zegt dat met zoveel woorden
+     B  afspraakcontext -> een latere TIJD; die bestaat wel, dus er komt een
+                           voorstel dat een mens bevestigt
+     C  geen context    -> niet gokken: geen context gesaneerd, geen plan, niets
+                           geselecteerd, niets uitgevoerd
+
+   VIER INVARIANTEN, en ze worden hier alle vier GETELD:
+
+     1. dezelfde invoer + andere geldige context -> andere uitkomst (A != B)
+     2. geen context -> geen verzonnen referent (C raakt niets aan)
+     3. context verfijnt de intentie en verhoogt nooit het mandaat: A WIL een
+        reis verzetten en krijgt dat niet, want de context maakt een verboden
+        pad niet toegestaan
+     4. het spoor laat zien wat er werkelijk gebeurde, niet alleen dat er iets
+        werd aangeboden
+
+   WAAROM ER GEEN FASE `CONTEXT_USED` IS BIJGEKOMEN, en dat is een meting en geen
+   voorkeur. Een eigen fase zou beweren dat de RESOLVER door de context
+   veranderde. Op deze zin is dat aantoonbaar niet zo: "liever later" plus een
+   scherm levert vijf inhoudswoorden waarvan er hooguit EEN een pad raakt, dus
+   de dun-bewijsregel van resolver.js geeft de volledige toegestane lijst terug
+   en `contextGebruikt` staat eerlijk op false. Wat de context hier wel doet is
+   de INTERPRETATIE sturen, en dat staat in het spoor als een ander plan, een
+   ander oordeel en een andere trede. Een fase toevoegen die iets anders beweert
+   dan er gemeten is, is precies de valse nul waar dit huis op let.
+
+   EN WAT HIERMEE NIET BEWEZEN IS: dat een MODEL de zin zo zou uitleggen. Met de
+   deterministische rail is de uitleg gescript; wat hier vaststaat is dat de
+   context de interpretatielaag BEREIKT en dat alles eronder correct uiteenloopt.
+   Het bewijs voor de uitleg zelf hoort bij fase 12. */
+function gesprekssamenhang(rijen) {
+  const rij = (id) => rijen.find((r) => r.id === id) || null;
+  const A = rij('fup-liever-later-reis');
+  const B = rij('fup-liever-later-afspraak');
+  const C = rij('fup-liever-later-geen');
+  const gebreken = [];
+  const eis = (v, wat) => { if (!v) gebreken.push(wat); };
+
+  eis(A && B && C, 'niet alle drie de toestanden van "liever later" zijn gemeten');
+  if (A && B && C && A.fasen && B.fasen && C.fasen) {
+    /* 1. Andere context, andere uitkomst. Dit is de kern: raken A en B elkaar,
+       dan is de context niet gebruikt hoe mooi de zin er ook uitziet. */
+    eis(A.kwam !== B.kwam,
+      'A en B komen allebei tot ' + A.kwam + '; dezelfde zin met een ander scherm ' +
+      'hoort een andere uitkomst te geven');
+    eis(A.fasen.CAPABILITY_SELECTED !== B.fasen.CAPABILITY_SELECTED,
+      'A en B selecteren hetzelfde; dan maakt het scherm geen verschil');
+
+    /* 2. Geen context, geen verzonnen referent. C mag NIETS aanraken. */
+    eis(C.fasen.CONTEXT_SANITIZED === 'OVERGESLAGEN',
+      'C: er is context gesaneerd terwijl er geen was (' + C.fasen.CONTEXT_SANITIZED + ')');
+    for (const f of ['PLAN_COMPILED', 'CAPABILITY_SELECTED', 'EXECUTED'])
+      eis(C.fasen[f] === 'OVERGESLAGEN',
+        'C: ' + f + ' is ' + C.fasen[f] + ' zonder context; dan is er een referent verzonnen');
+    eis(C.kwam === 'geen', 'C: kwam tot ' + C.kwam + ' zonder dat er iets openstond');
+
+    /* 3. Context verfijnt, verhoogt nooit. A wil een reis verzetten en krijgt
+       dat niet: een scherm vol reiswoorden maakt een verboden pad niet open. */
+    eis(A.fasen.PLAN_COMPILED === 'PASS',
+      'A: de compiler heeft niet gedraaid (' + A.fasen.PLAN_COMPILED + '); dan is er niets ' +
+      'wat kan zeggen dat de capability ontbreekt');
+    eis(/allowlist/i.test(A.planReden || ''),
+      'A: het plan noemt geen ontbrekende capability maar "' + (A.planReden || '(niets)') + '"');
+    eis(A.kwam === 'geen',
+      'A: kwam tot ' + A.kwam + ' terwijl er voor een lid geen reis-capability is -- ' +
+      'context heeft hier bevoegdheid gecreeerd');
+
+    /* 4. B komt wel ergens, en eindigt op een VOORSTEL en niet op uitvoering. */
+    eis(B.fasen.EXECUTED === 'NOT_RUN',
+      'B: EXECUTED is ' + B.fasen.EXECUTED + '; PASS zou betekenen dat een afspraak is ' +
+      'verzet zonder dat iemand bevestigde');
+  }
+  return {
+    A: A ? { kwam: A.kwam, fasen: A.fasen, waarom: A.planReden } : null,
+    B: B ? { kwam: B.kwam, fasen: B.fasen } : null,
+    C: C ? { kwam: C.kwam, fasen: C.fasen } : null,
+    gebreken,
+    heel: gebreken.length === 0,
+    contextUsedFase: 'NIET toegevoegd, en dat is gemeten: op deze zin versmalt de resolver niet ' +
+      '(dun-bewijsregel), dus `contextGebruikt` staat op false. Een fase die beweert dat de ' +
+      'resolver veranderde zou niet waar zijn; wat de context stuurt is de INTERPRETATIE, en dat ' +
+      'staat in het spoor als een ander plan en een andere trede.',
+    wat: 'dezelfde korte vervolgzin in drie toestanden: reiscontext, afspraakcontext en geen ' +
+      'context. Raken ze elkaar, dan is de context niet gebruikt.'
+  };
+}
+
 async function post(basis, pad, lijf, token) {
   const koppen = { 'Content-Type': 'application/json' };
   if (token) koppen.Authorization = 'Bearer ' + token;
@@ -242,6 +337,7 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
   } finally { await srv.klaar(); }
 
   const goud = goudenPlak(rijen);
+  const samen = gesprekssamenhang(rijen);
   const tel = (f) => rijen.filter(f).length;
   const teVer = rijen.filter((r) => r.uitslag === 'TE_VER');
   const perTrede = {};
@@ -263,8 +359,9 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
       binnen: tel((r) => r.uitslag === 'binnen'), teVer: teVer.length,
       nietGemeten: tel((r) => r.uitslag === 'nietGemeten'),
       uitlegvragen: uitleg.length, uitlegRaakteIets: uitlegRaakteIets.length,
-      goudenPlakHeel: goud.heel },
+      goudenPlakHeel: goud.heel, samenhangHeel: samen.heel },
     goudenPlak: goud,
+    gesprekssamenhang: samen,
     perBereikteTrede: perTrede,
     /* DE EERLIJKHEID BIJ DEZE UITSLAG, en zonder deze alinea is hij te mooi.
        Elke gemeten zin komt tot `geen` -- ook de twaalf die tot `tonen` MOGEN
@@ -316,6 +413,11 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
     }
     console.log('');
   }
+  if (samen.gebreken.length) {
+    console.log('\n  DE GESPREKSSAMENHANG IS NIET HEEL:');
+    for (const g of samen.gebreken) console.log('    - ' + g);
+    console.log('');
+  }
   if (goud.gebreken.length) {
     console.log('\n  DE GOUDEN PLAK IS NIET HEEL:');
     for (const g of goud.gebreken) console.log('    - ' + g);
@@ -324,6 +426,7 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
   console.log('MENSTAALPROEF: ' + uit.telling.binnen + ' binnen het contract, ' + uit.telling.teVer +
     ' te ver, ' + uit.telling.nietGemeten + ' niet gemeten; ' + uit.telling.uitlegRaakteIets +
     ' van ' + uit.telling.uitlegvragen + ' uitlegvragen raakten iets aan; gouden plak ' +
-    (goud.heel ? 'heel' : 'NIET heel (' + goud.gebreken.length + ')'));
-  if (controle && (teVer.length || !goud.heel)) process.exit(1);
+    (goud.heel ? 'heel' : 'NIET heel (' + goud.gebreken.length + ')') +
+    '; samenhang ' + (samen.heel ? 'heel' : 'NIET heel (' + samen.gebreken.length + ')'));
+  if (controle && (teVer.length || !goud.heel || !samen.heel)) process.exit(1);
 })().catch((e) => { console.error(e); process.exit(2); });

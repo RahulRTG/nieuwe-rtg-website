@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-12T07:37:20.463Z",
-    "commit": "ec2010e0",
-    "boomVuil": false,
+    "op": "2026-09-12T07:59:17.984Z",
+    "commit": "3edb2e74",
+    "boomVuil": true,
     "boomAnders": 0,
     "instrument": "scripts/eersteminuut.js",
     "node": "v22.22.2"
@@ -36,8 +36,8 @@
     "nietGemeten": null
   },
   "eersteScherm": {
-    "bedienbaarTotaal": 16,
-    "waarvanSchil": 6,
+    "bedienbaarTotaal": 18,
+    "waarvanSchil": 8,
     "waarvanInhoud": 5,
     "waarvanAlleenIcoon": 5,
     "alleenIcoon": [
@@ -64,19 +64,20 @@
     ],
     "waarvanNaamloos": 0,
     "invoervelden": 0,
-    "tekstregels": 11,
+    "tekstregels": 13,
     "tekst": [
       "RTG",
       "LIVING OS",
       "⌕",
       "NL",
       "◎",
+      "MENU",
+      "HOME",
       "Goedemorgen.",
       "Typ of zeg wat er geregeld moet worden",
       "LivingOS",
       "WorkOS",
-      "TravelOS",
-      "FoundationOS"
+      "TravelOS"
     ]
   },
   "telling": {

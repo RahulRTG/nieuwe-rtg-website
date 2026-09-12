@@ -556,7 +556,28 @@ test('passkey-first opent zonder e-mailadres en landt op de lege wereldkiezer',
     }));
     assert.equal(geland.poortVerborgen, true, 'de passkey sluit de inlogpoort na de echte sessie');
     assert.equal(geland.bladen, 0, 'de snelle deur opent geen demo-activiteit');
-    assert.equal(geland.tekst, 'Kies een wereld om te beginnen.');
+    /* HET HUIS OPENT NOOIT LEEG (WERELD.md, herzien 12 september 2026).
+
+       Hier stond `assert.equal(geland.tekst, 'Kies een wereld om te beginnen.')`
+       -- de oude doctrine, waarin de tafel leeg opende. Die regel is herzien op
+       grond van een meting: `npm run eersteminuut` telde op dat scherm NUL
+       leesbare handelingen voor een vers lid.
+
+       De toets is niet verzwakt maar omgedraaid. Wat hij bewaakte blijft staan
+       en wordt hieronder nog steeds geëist (`bladen === 0`: de inlog opent geen
+       activiteit). Wat erbij komt is de nieuwe belofte: er staat betekenis, een
+       ingang en ten minste een bruikbare volgende stap.
+
+       DE MUTATIE: laat leeg() in shared/command/beginscherm.js alleen de oude
+       regel tekst terugzetten; dan zakt dit op de werelden. */
+    assert.ok(!/Kies een wereld om te beginnen\./.test(geland.tekst || ''),
+      'het beginscherm opent nog steeds met de oude lege regel');
+    assert.match(geland.tekst || '', /Goede(morgen|middag|navond)|Goedenacht/,
+      'het beginscherm draagt geen begroeting');
+    assert.match(geland.tekst || '', /LivingOS/,
+      'de werelden staan niet met hun naam op het beginscherm');
+    assert.match(geland.tekst || '', /geregeld moet worden/,
+      'er staat geen ingang in gewone taal');
     assert.deepEqual(fouten, [], 'geen JS-fouten');
   } finally {
     await ctx.close();
@@ -636,7 +657,28 @@ test('na inloggen landt een lid rechtstreeks op de lege wereldkiezer',
     assert.equal(geland.appActief, true, 'voorwaarde: de sessie is werkelijk hersteld');
     assert.equal(geland.gateVerborgen, true, 'de inlogpoort hoort na de sessie weg te zijn');
     assert.equal(geland.bladen, 0, 'de inlog mag geen wereld of activiteit vooraf openen');
-    assert.equal(geland.tekst, 'Kies een wereld om te beginnen.');
+    /* HET HUIS OPENT NOOIT LEEG (WERELD.md, herzien 12 september 2026).
+
+       Hier stond `assert.equal(geland.tekst, 'Kies een wereld om te beginnen.')`
+       -- de oude doctrine, waarin de tafel leeg opende. Die regel is herzien op
+       grond van een meting: `npm run eersteminuut` telde op dat scherm NUL
+       leesbare handelingen voor een vers lid.
+
+       De toets is niet verzwakt maar omgedraaid. Wat hij bewaakte blijft staan
+       en wordt hieronder nog steeds geëist (`bladen === 0`: de inlog opent geen
+       activiteit). Wat erbij komt is de nieuwe belofte: er staat betekenis, een
+       ingang en ten minste een bruikbare volgende stap.
+
+       DE MUTATIE: laat leeg() in shared/command/beginscherm.js alleen de oude
+       regel tekst terugzetten; dan zakt dit op de werelden. */
+    assert.ok(!/Kies een wereld om te beginnen\./.test(geland.tekst || ''),
+      'het beginscherm opent nog steeds met de oude lege regel');
+    assert.match(geland.tekst || '', /Goede(morgen|middag|navond)|Goedenacht/,
+      'het beginscherm draagt geen begroeting');
+    assert.match(geland.tekst || '', /LivingOS/,
+      'de werelden staan niet met hun naam op het beginscherm');
+    assert.match(geland.tekst || '', /geregeld moet worden/,
+      'er staat geen ingang in gewone taal');
     /* WAT DEZE REGEL BEWAAKT is dat er ONDERAAN NIETS ANDERS STAAT: een tweede
        rij, een tabbalk of een teruggekeerd springboard maakt deze strook meteen
        ~96px of meer. De balk zelf is CSS-vast op 48px (shared/command.css).

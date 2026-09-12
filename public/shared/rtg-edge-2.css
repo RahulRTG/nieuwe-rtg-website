@@ -285,7 +285,50 @@ body[data-rtg-edge-2-rendered="true"][data-ios]{--ios-thuis-ruimte:0px!important
     display:none!important
   }
   body.rtg-command[data-rtg-edge-2-rendered="true"]:not([data-rtg-edge-2-state="focus"]) #rtgCommand .cmd-balk{
-    --rtg-txt:#211e19;--rtg-muted:#70695f;--rtg-soft:#8b8276;--rtg-line:rgba(33,30,25,.13);--gold-tekst:#8a7317;
+    /* DE INKT KOMT VAN DE RAND WAAR HIJ OP LIGT, EN IS NIET ZELF GEKOZEN.
+
+       Hier stond een vaste lichte inktset: #211e19 / #70695f. Dat is
+       --rtg-world-ink en --rtg-world-muted -- de inkt van het CONTENTvlak
+       van de wereld, en dat vlak is licht (#f4f0e8). Maar deze balk ligt
+       niet op het contentvlak. Hij ligt in de onderrand van Edge, en die
+       schildert --edge-bar-bg: in LivingOS is dat #4a0c1e, bordeaux.
+
+       Edge geeft per wereld een GEKOPPELD PAAR uit -- --edge-bar-bg naast
+       --edge-bar-copy -- juist zodat wie in die rand schrijft de goede
+       inkt heeft. Command las dat paar niet en koos zijn eigen inkt tegen
+       een grond die Edge niet schildert. Dat is de doctrine uit
+       ADAPTIEF.md omgedraaid: Edge bezit het oppervlak, Command bezit de
+       functies IN dat oppervlak, en dus LEEST Command de inkt van Edge.
+
+       Er komt hier geen kleur bij. De balk gebruikt voortaan de kleur
+       waarin Edge zijn eigen opschriften al zet.
+
+       WAT HIERVAN GEMETEN IS, EN WAT NIET -- want dat scheelt.
+
+         GEMETEN. Dat deze tokens werkelijk doorlopen tot in de verf: de
+         haarlijnen in de onderrand komen er in een schermafdruk uit op
+         (105,52,65), en dat is exact rgba(247,240,230,.18) over #4a0c1e.
+         Tot op 1/255. De grond onder die rand is dus aantoonbaar donker,
+         en donkere inkt hoorde daar niet.
+
+         NIET GEMETEN. Wat een mens na deze wijziging ZIET. Er is geprobeerd
+         de knoppen in de verf na te meten, en dat instrument is gezakt op
+         zijn eigen controleproef: met `background:#00FF00!important` op
+         .cmd-actie -- een vlak van 44x48 -- leverde de schermafdruk van
+         .cmd-balk NUL groene pixels. Een meter die een lime blok niet ziet,
+         bewijst niets over een haarlijn van 1,27px. Elk getal dat uit die
+         afdrukken kwam is daarom uit deze uitleg gehaald in plaats van
+         hier te blijven staan; wie hier een contrastcijfer wil, meet eerst
+         een instrument dat zijn controleproef haalt.
+
+       Let bij dat alles op wat elementsFromPoint hier NIET kan: de rand
+       draagt pointer-events:none, dus hij komt in de trefstapel niet voor
+       en elke knop meet als `onbedekt`. En wie de grond zoekt via de
+       OUDERS komt op wit uit, want de rand is een broer en geen ouder.
+       Twee groene metingen boven een vraag die geen van beide stelt. */
+    --rtg-txt:var(--edge-bar-copy,#f7f0e6);--rtg-muted:var(--edge-bar-dim,#d4c3c5);
+    --rtg-soft:var(--edge-bar-dim,#d4c3c5);--rtg-line:var(--edge-bar-line,rgba(247,240,230,.18));
+    --gold-tekst:var(--edge-bar-accent,#d0b77b);
     position:fixed!important;z-index:8801!important;grid-row:auto!important;
     left:calc(var(--edge-side) + 44px)!important;right:0!important;
     bottom:env(safe-area-inset-bottom,0px)!important;width:auto!important;height:var(--edge-bottom)!important;

@@ -316,9 +316,17 @@ test('werktafel: niet over de ondertekening heen, en hij begint leeg',
        ook een vierde wereld bij gekomen. Wat de bewering doet is onveranderd:
        de LADE en de RAIL horen hetzelfde aanbod te dragen, want anders krijgt
        een telefoon minder deuren dan een computer. */
-    const bankKnop = await page.$('.rtg-edge-menu[data-rtg-command-brug="true"]')
-      ? '.rtg-edge-menu[data-rtg-command-brug="true"]'
-      : '.cmd-lade';
+    /* INVARIANT 3 UIT ADAPTIEF.md: de brug bestaat, en is geen terugval.
+
+       Hier stond `? de brug : '.cmd-lade'`. Dat leest als voorzichtigheid en
+       is het tegenovergestelde: verdween de brug, dan pakte de toets stil de
+       lade en bleef groen. Precies de faalvorm die dit bestand elders wel
+       tegenhoudt. De brug IS het contract tussen Edge en Command -- Edge
+       bezit het oppervlak, Command de functies erin, en dit is de knoop
+       ertussen -- dus zijn afwezigheid hoort de bouw te laten zakken. */
+    const brug = await page.$('.rtg-edge-menu[data-rtg-command-brug="true"]');
+    assert.ok(brug, 'de Command-brug op de Edge-knop ontbreekt; Edge en Command zijn losgekoppeld');
+    const bankKnop = '.rtg-edge-menu[data-rtg-command-brug="true"]';
     await page.click(bankKnop);
     await require('./helper').edgeWerkbladen(page);
     /* `inBeeld` is de echte vraag en niet display:none -- de bank SCHUIFT, dus

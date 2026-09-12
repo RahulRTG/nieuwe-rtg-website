@@ -157,9 +157,75 @@ test('bouw(): een ontbrekende rij is `null` en nooit stilzwijgend "in orde"', ()
 });
 
 test('bouw(): zonder bronnen komt er een KLACHT en geen lege nul', () => {
-  const r = bouw({ kaart: null, contract: null, herstelproef: null });
+  const r = bouw({ kaart: null, contract: null, herstelproef: null, herstelbesluit: null });
   assert.equal(r.gemeten.geldroutes, 0);
-  assert.equal(r.klachten.length, 3, 'elke ontbrekende bron hoort zichzelf te melden');
+  /* VIER bronnen, vier klachten. Dit getal staat er hard en niet als `>= 1`:
+     komt er een bron bij zonder dat hij zichzelf meldt, dan hoort deze toets te
+     zakken -- precies wat er gebeurde toen HERSTELBESLUIT.json erbij kwam. */
+  assert.equal(r.klachten.length, 4, 'elke ontbrekende bron hoort zichzelf te melden');
   /* De CLI zakt hierop (zie het einde van scripts/gelddekking.js). Zonder die
      klacht zou een register met nul routes eruitzien als een schoon huis. */
+});
+
+/* ============ HET CORRECTIEMODEL (HERSTELBESLUIT.json) ============
+   De vraag is niet "heeft iedere actie een undo?" maar "draagt iedere
+   waardeactie een expliciet fout-/correctiemodel?". Sommige handelingen horen
+   bewust FINAL te zijn; wat niet mag is dat niemand het heeft opgeschreven. */
+
+test('elke route draagt een correctiemodel uit de gesloten lijst', () => {
+  const r = lees('GELDDEKKING.json');
+  const besluit = lees('HERSTELBESLUIT.json');
+  const toegestaan = new Set(Object.keys(besluit.klassen));
+  assert.ok(toegestaan.has('UNKNOWN'), 'UNKNOWN hoort de eerlijke restklasse te zijn');
+  for (const rij of r.rijen)
+    assert.ok(toegestaan.has(rij.herstelKlasse),
+      rij.pad + ' draagt klasse "' + rij.herstelKlasse + '", die niet in HERSTELBESLUIT.json staat');
+});
+
+test('de verklaring wordt NOOIT uit de meting afgeleid', () => {
+  /* Dit is de grens van het hele register (MUTATIECONTRACT.md: een stand wordt
+     nooit afgeleid uit bewijs). Zou gelddekking.js een gemeten `exact` stil als
+     REVERSIBLE verklaren, dan zou deze toets zakken -- en dan bewijst het
+     register alleen nog dat de meting bestaat. */
+  const r = lees('GELDDEKKING.json');
+  const besluit = lees('HERSTELBESLUIT.json');
+  for (const rij of r.rijen) {
+    if (besluit.routes[rij.pad]) continue;       // wel verklaard: mag alles zijn
+    assert.equal(rij.herstelKlasse, 'UNKNOWN',
+      rij.pad + ' staat niet in HERSTELBESLUIT.json maar draagt toch klasse "' +
+      rij.herstelKlasse + '". Een verklaring die uit de meting is afgeleid, is geen verklaring.');
+  }
+});
+
+test('een verklaring die de meting tegenspreekt, wordt gemeld', () => {
+  /* Beide richtingen nagetrokken met een mutatie op het register:
+       FINAL naast een gemeten `exact`        -> de route is wel degelijk terug te draaien
+       NOT_APPLICABLE op een kernbak-route    -> hij raakt wel degelijk een saldo
+     Zie de commit; hier staat de uitkomst vast zodat de detectie niet stil kan
+     verdwijnen. */
+  const { bouw } = require('../scripts/gelddekking.js');
+  const w = {
+    kaart: { as1Kaart: { geldroutes: [
+      { methode: 'POST', pad: '/api/x', rol: 'member', collecties: ['bankPassen'], idempotentie: 'beschermd' },
+      { methode: 'POST', pad: '/api/y', rol: 'member', collecties: ['paySaldi'], idempotentie: 'beschermd' }
+    ] } },
+    contract: { rijen: [
+      { route: 'POST /api/x', semantiek: { klasse: 'idempotent' }, toegang: { waargenomen: 'AUTHENTICATED' } },
+      { route: 'POST /api/y', semantiek: { klasse: 'idempotent' }, toegang: { waargenomen: 'AUTHENTICATED' } }
+    ] },
+    herstelproef: { per: [{ heen: '/api/x', uitslag: 'exact' }] },
+    herstelbesluit: { routes: {
+      '/api/x': { klasse: 'FINAL' },
+      '/api/y': { klasse: 'NOT_APPLICABLE' }
+    } }
+  };
+  const r = bouw(w);
+  assert.equal(r.ratel.geldRoutesHerstelTegenspraak, 2, 'beide tegenspraken horen gezien te worden');
+  assert.ok(r.tegenspraken.some(t => t.pad === '/api/x' && /FINAL/.test(t.wat)));
+  assert.ok(r.tegenspraken.some(t => t.pad === '/api/y' && /NOT_APPLICABLE/.test(t.wat)));
+  /* En zonder die verklaringen is er GEEN tegenspraak -- anders zou de melding
+     ontstaan door de meting alleen, en dat zou hem waardeloos maken. */
+  const schoon = bouw({ ...w, herstelbesluit: { routes: {} } });
+  assert.equal(schoon.ratel.geldRoutesHerstelTegenspraak, 0);
+  assert.equal(schoon.ratel.geldRoutesHerstelOnbesloten, 2);
 });

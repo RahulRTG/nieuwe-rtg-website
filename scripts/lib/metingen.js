@@ -202,7 +202,13 @@ const REGISTER = {
      Anders dan de geldkaart draagt hij voorraden die mogen dalen in plaats van
      een nul die nul moet blijven, en dat is precies wat een ratel meet. */
   'GELDDEKKING.json': { meter: ['geldRoutesPubliek', 'geldRoutesZonderSemantiek',
-    'geldRoutesZonderIdemBewijs', 'geldRoutesZonderTerugweg'] },
+    'geldRoutesZonderIdemBewijs', 'geldRoutesZonderTerugweg',
+    'geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak'] },
+  /* HERSTELBESLUIT.json is een VERKLARING en geen meting -- dezelfde vorm als
+     ROLLBACKBESLUIT.json hierboven, dat ook aan een geteld gevolg hangt. Wie
+     hier een regel bijzet of weghaalt, beweegt een van deze twee tellers: een
+     ontbrekende verklaring zit in `onbesloten`, een verkeerde in `tegenspraak`. */
+  'HERSTELBESLUIT.json': { meter: ['geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak'] },
 
   'TIKKEN.json': { eigenRatel: 'test/sprongindex.test.js' },
   'VINDBAAR.json': { eigenRatel: 'test/sprongindex.test.js' },

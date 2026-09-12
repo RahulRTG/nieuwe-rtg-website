@@ -1554,6 +1554,16 @@ const IJKINGEN = {
       (j) => { j.ratel.geldRoutesZonderTerugweg = (j.ratel.geldRoutesZonderTerugweg || 0) + 5; return j; },
       () => norm.meet().geldRoutesZonderTerugweg - voor.geldRoutesZonderTerugweg)
   },
+  geldRoutesHerstelOnbesloten: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesHerstelOnbesloten = (j.ratel.geldRoutesHerstelOnbesloten || 0) + 6; return j; },
+      () => norm.meet().geldRoutesHerstelOnbesloten - voor.geldRoutesHerstelOnbesloten)
+  },
+  geldRoutesHerstelTegenspraak: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesHerstelTegenspraak = (j.ratel.geldRoutesHerstelTegenspraak || 0) + 7; return j; },
+      () => norm.meet().geldRoutesHerstelTegenspraak - voor.geldRoutesHerstelTegenspraak)
+  },
   /* DE TAND VAN 10 SEPTEMBER 2026: bewijsAlleenKeten telt de bewijsmechanismen
      die alleen in de keten draaien en niet lokaal (BEWIJSLADDER.json). Zelfde
      vorm als de vier hierboven -- hij telt een POST in een register, dus hij

@@ -267,7 +267,7 @@ fs.writeFileSync(path.join(WORTEL, 'GELDKAART.json'), JSON.stringify(register, n
 
 /* ---------------------------------------------------------------- scherm */
 const g = n => String(n).padStart(5);
-console.log('\nRTG GELDKAART   ' + register.stempel.datum + '  ' + register.stempel.commit);
+console.log('\nRTG GELDKAART   ' + String(register.stempel.op).slice(0, 10) + '  ' + register.stempel.commit);
 console.log('─'.repeat(64));
 console.log('AS 1  de kaart (structureel, ONDERgrens)');
 console.log('  geldcollecties in het register   ' + g(as1.geldcollecties));

@@ -503,6 +503,20 @@ const METERS = [
   { sleutel: 'geldRoutesZonderSemantiek', richting: 'omlaag', wat: 'geldroutes zonder verklaarde tweede-aanroep' },
   { sleutel: 'geldRoutesZonderIdemBewijs', richting: 'omlaag', wat: 'geldroutes waarvan de herhaalbaarheid ongemeten is' },
   { sleutel: 'geldRoutesZonderTerugweg', richting: 'omlaag', wat: 'geldroutes zonder beproefde tegenhanger' },
+  /* DE TWEE VAN HET CORRECTIEMODEL (HERSTELBESLUIT.json). Ze staan NAAST
+     `geldRoutesZonderTerugweg` en niet in plaats daarvan, want ze meten iets
+     anders: die telt of de PROEF een tegenhanger heeft zien werken, deze twee
+     of een MENS heeft opgeschreven wat er hoort te gebeuren als het misgaat.
+
+     De vraag is niet "heeft iedere actie een undo?" -- sommige horen bewust
+     FINAL te zijn -- maar "draagt iedere waardeactie een expliciet
+     fout-/correctiemodel?". Vandaar `onbesloten` en niet `zonderHerstel`.
+
+     De tweede is de scherpste en hoort nul te zijn: een verklaring die de meting
+     tegenspreekt. FINAL naast een gemeten `exact` zegt dat de route wel degelijk
+     terug te draaien is terwijl een mens hem definitief noemde. */
+  { sleutel: 'geldRoutesHerstelOnbesloten', richting: 'omlaag', wat: 'geldroutes zonder verklaard correctiemodel (HERSTELBESLUIT.json)' },
+  { sleutel: 'geldRoutesHerstelTegenspraak', richting: 'omlaag', wat: 'geldroutes waar de herstelverklaring de meting tegenspreekt' },
   /* Het BEREIK van de carrierevormmeter (CARRIERE.md par. 0): hoeveel
      talentdomeinen hij werkelijk heeft gezien. Omhoog, want dit mag niet stil
      dalen -- zie de kop bij CARRIEREVORM.json in ./lib/metingen.js. */
@@ -1224,6 +1238,8 @@ function meet(bronnen) {
     geldRoutesZonderSemantiek: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderSemantiek),
     geldRoutesZonderIdemBewijs: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderIdemBewijs),
     geldRoutesZonderTerugweg: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderTerugweg),
+    geldRoutesHerstelOnbesloten: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesHerstelOnbesloten),
+    geldRoutesHerstelTegenspraak: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesHerstelTegenspraak),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
        milliseconden en een afdruk die achterloopt zou hier een groen getal

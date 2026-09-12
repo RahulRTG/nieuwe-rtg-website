@@ -230,6 +230,10 @@ const REGISTERS = [
      die nul moet blijven en die zakt gewoon, ook als dit register oud is. */
   ['GELDKAART.json', 'npm run geldkaart', 'of elke waardemutatie door haar eigen poort ging (RTG Pay en RTG Bank)'],
   ['GELDDEKKING.json', 'npm run gelddekking', 'wat er van elke waardebewegende route bewezen is'],
+  /* Een VERKLARING veroudert anders dan een meting: niet omdat de code beweegt
+     maar omdat er routes bijkomen waarover niemand iets heeft gezegd. Meldt dus,
+     net als de dekking zelf. */
+  ['HERSTELBESLUIT.json', 'met de hand, door een mens', 'welk correctiemodel elke waardebewegende route draagt'],
 
   /* DE BEWIJSLADDER (KEURING.md par. 7): welke soorten bewijs dit huis levert,
      waar ze draaien en wat ze achterlaten. Hij hoort hier omdat hij veroudert

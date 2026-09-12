@@ -65,11 +65,12 @@ const { stempel } = require('./lib/stempel');
 
    `bouw` krijgt de drie registers als gewone argumenten. Geen fs, geen paden,
    geen process.exit -- dat staat allemaal onder require.main hieronder. */
-function bouw({ kaart, contract, herstelproef }) {
+function bouw({ kaart, contract, herstelproef, herstelbesluit }) {
   const klachten = [];
   if (!kaart) klachten.push('GELDKAART.json ontbreekt -- draai npm run geldkaart');
   if (!contract) klachten.push('MUTATIECONTRACT.json ontbreekt');
   if (!herstelproef) klachten.push('HERSTELPROEF.json ontbreekt');
+  if (!herstelbesluit) klachten.push('HERSTELBESLUIT.json ontbreekt -- zonder verklaringsregister is elk correctiemodel UNKNOWN');
 
   const geldroutes = (kaart && kaart.as1Kaart && kaart.as1Kaart.geldroutes) || [];
 
@@ -81,6 +82,10 @@ function bouw({ kaart, contract, herstelproef }) {
   for (const r of (contract && contract.rijen) || []) perRoute.set(r.route, r);
   const perHeen = new Map();
   for (const p of (herstelproef && herstelproef.per) || []) perHeen.set(p.heen, p);
+  /* De VERKLARING staat los van de METING en wordt er nooit uit afgeleid. Een
+     route die hier niet in staat is UNKNOWN -- de eerlijke restklasse, en de
+     enige die vanzelf ontstaat. */
+  const besloten = (herstelbesluit && herstelbesluit.routes) || {};
 
   const rijen = [];
   for (const g of geldroutes) {
@@ -95,7 +100,14 @@ function bouw({ kaart, contract, herstelproef }) {
       toegang: m ? ((m.toegang && m.toegang.waargenomen) || 'onbekend') : null,
       stand: m ? m.stand : null,
       idempotentie: g.idempotentie || 'ongemeten',
-      terugweg: h ? h.uitslag : 'geen tegenhanger beproefd'
+      terugweg: h ? h.uitslag : 'geen tegenhanger beproefd',
+      /* TWEE KOLOMMEN DIE NOOIT SAMENVALLEN. `terugweg` is wat de proef ZAG toen
+         zij de tegenhanger uitvoerde; `herstelKlasse` is wat een mens heeft
+         VERKLAARD dat het correctiemodel is. De vraag is niet "heeft dit een
+         undo?" maar "is er een expliciet en bewezen fout-/correctiemodel?" --
+         en die twee kunnen elkaar tegenspreken. */
+      herstelKlasse: (besloten[g.pad] && besloten[g.pad].klasse) || 'UNKNOWN',
+      herstelGrond: (besloten[g.pad] && besloten[g.pad].grond) || null
     });
   }
 
@@ -108,11 +120,31 @@ function bouw({ kaart, contract, herstelproef }) {
   /* DE RATELTANDEN. Vier getallen die alleen omlaag mogen, elk met zijn eigen
      noemer ernaast in `gemeten`. De eerste is de scherpste en hoort nul te zijn:
      een route die geld beweegt en die een onbekende mag aanroepen. */
+  /* TEGENSPRAAK TUSSEN METING EN VERKLARING. Beide zijn geldig op zichzelf; dat
+     ze botsen is de bevinding. `FINAL` naast een gemeten `exact` zegt dat de
+     route WEL terug te draaien is terwijl een mens hem definitief noemde --
+     precies het soort stilte waar een correctiemodel op stukloopt. En
+     `NOT_APPLICABLE` op een route die paySaldi of bankSaldi raakt, is de
+     makkelijkste verkeerde indeling van allemaal. */
+  const KERNBAKKEN = ['paySaldi', 'payBoekingen', 'bankSaldi', 'bankBoekingen'];
+  const tegenspraken = [];
+  for (const r of rijen) {
+    if (r.herstelKlasse === 'FINAL' && (r.terugweg === 'exact' || r.terugweg === 'compensatie'))
+      tegenspraken.push({ pad: r.pad, wat: 'verklaard FINAL, maar de proef herstelde hem (' + r.terugweg + ')' });
+    if (r.herstelKlasse === 'NOT_APPLICABLE' && r.collecties.some(c => KERNBAKKEN.includes(c)))
+      tegenspraken.push({ pad: r.pad, wat: 'verklaard NOT_APPLICABLE, maar raakt een kernbak (' +
+        r.collecties.filter(c => KERNBAKKEN.includes(c)).join(', ') + ')' });
+  }
+
   const ratel = {
     geldRoutesPubliek: rijen.filter(r => r.toegang === 'PUBLIC').length,
     geldRoutesZonderSemantiek: rijen.filter(r => r.semantiek === 'onbekend' || r.semantiek === null).length,
     geldRoutesZonderIdemBewijs: rijen.filter(r => r.idempotentie !== 'beschermd').length,
-    geldRoutesZonderTerugweg: rijen.filter(r => r.terugweg !== 'exact' && r.terugweg !== 'compensatie').length
+    geldRoutesZonderTerugweg: rijen.filter(r => r.terugweg !== 'exact' && r.terugweg !== 'compensatie').length,
+    /* Niet "zonder terugweg" maar "zonder VERKLAARD correctiemodel". Een route
+       mag FINAL zijn; wat niet mag is dat niemand het heeft opgeschreven. */
+    geldRoutesHerstelOnbesloten: rijen.filter(r => r.herstelKlasse === 'UNKNOWN').length,
+    geldRoutesHerstelTegenspraak: tegenspraken.length
   };
 
   return {
@@ -133,6 +165,8 @@ function bouw({ kaart, contract, herstelproef }) {
       idempotentie: tel('idempotentie'), terugweg: tel('terugweg')
     },
     ratel,
+    tegenspraken,
+    herstelKlassen: (() => { const u = {}; for (const r of rijen) u[r.herstelKlasse] = (u[r.herstelKlasse] || 0) + 1; return u; })(),
     nietGemeten: {
       crashHerstel: 'Wat er gebeurt als het proces sterft tussen de bevestiging van een ' +
         'provider en de grootboekregel, is in dit huis nergens beproefd. Geen meting, dus ' +
@@ -152,7 +186,8 @@ function main() {
 const register = bouw({
   kaart: lees('GELDKAART.json'),
   contract: lees('MUTATIECONTRACT.json'),
-  herstelproef: lees('HERSTELPROEF.json')
+  herstelproef: lees('HERSTELPROEF.json'),
+  herstelbesluit: lees('HERSTELBESLUIT.json')
 });
 const { klachten, ratel, rijen } = register;
 const N = register.gemeten.geldroutes;
@@ -162,7 +197,7 @@ fs.writeFileSync(path.join(WORTEL, 'GELDDEKKING.json'), JSON.stringify(register,
 /* ---------------------------------------------------------------- scherm */
 const g = n => String(n).padStart(4);
 const staaf = (aantal) => aantal + '/' + N;
-console.log('\nRTG ECONOMISCHE DEKKING   ' + register.stempel.datum + '  ' + register.stempel.commit);
+console.log('\nRTG ECONOMISCHE DEKKING   ' + String(register.stempel.op).slice(0, 10) + '  ' + register.stempel.commit);
 console.log('─'.repeat(68));
 if (klachten.length) { for (const k of klachten) console.log('  KLACHT: ' + k); console.log(''); }
 console.log('  wegen die waarde bewegen        ' + g(N) + '   (ONDERgrens: uit de geldkaart)');
@@ -179,6 +214,14 @@ as('idempotentie bewezen', N - ratel.geldRoutesZonderIdemBewijs,
   ratel.geldRoutesZonderIdemBewijs + ' ongemeten');
 as('terugweg beproefd', N - ratel.geldRoutesZonderTerugweg,
   ratel.geldRoutesZonderTerugweg + ' zonder beproefde tegenhanger');
+as('correctiemodel verklaard', N - ratel.geldRoutesHerstelOnbesloten,
+  ratel.geldRoutesHerstelOnbesloten + ' op UNKNOWN (HERSTELBESLUIT.json)');
+console.log('  \x1b[2m    ' + Object.entries(register.herstelKlassen)
+  .map(([k, v]) => k + ':' + v).join('  ') + '\x1b[0m');
+if (ratel.geldRoutesHerstelTegenspraak) {
+  console.log('\n  TEGENSPRAAK tussen meting en verklaring:');
+  for (const t of register.tegenspraken) console.log('    ' + t.pad + ' -- ' + t.wat);
+}
 console.log('  crash-herstel                   ' + 'ONBEKEND'.padStart(7) + '   geen meting in dit huis');
 console.log('  externe settlement              ' + 'ONBEKEND'.padStart(7) + '   geen providersleutel gezet');
 console.log('');
@@ -192,6 +235,11 @@ if (ratel.geldRoutesPubliek) {
   console.error('ZAKT: ' + ratel.geldRoutesPubliek + ' route(s) bewegen waarde en zijn publiek aanroepbaar.');
   for (const r of rijen.filter(x => x.toegang === 'PUBLIC'))
     console.error('  ' + r.methode + ' ' + r.pad + '  ->  ' + r.collecties.join(', '));
+  process.exit(1);
+}
+if (ratel.geldRoutesHerstelTegenspraak) {
+  console.error('ZAKT: ' + ratel.geldRoutesHerstelTegenspraak +
+    ' route(s) waar de verklaring en de meting elkaar tegenspreken.');
   process.exit(1);
 }
 if (klachten.length) { console.error('ZAKT: een bron ontbreekt; de tellers hierboven zijn onvolledig.'); process.exit(1); }

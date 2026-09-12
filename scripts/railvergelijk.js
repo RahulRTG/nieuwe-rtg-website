@@ -91,8 +91,8 @@ function oordeel(a, b, contractMax) {
    vergelijken en wordt er ook niets vergeleken.
 
    DIT IS DE GRENDEL DIE VOORKOMT DAT DE MEETLAT MEEBEWEEGT. Het corpus heeft
-   vandaag bekende gaten -- geen enkele zin laat de resolver op de context
-   versmallen, bijvoorbeeld. De verleiding bij een tweede rail is om zo'n gat te
+   vandaag bekende gaten -- op EEN zin na versmalt geen enkele de resolver op de
+   context, bijvoorbeeld. De verleiding bij een tweede rail is om zo'n gat te
    vullen met een geval dat die rail toevallig goed doet; dan leest de
    vergelijking als vooruitgang terwijl er een andere lat ligt. Eerst meten tegen
    het BESTAANDE contract; of het corpus uitgebreid moet worden is een besluit

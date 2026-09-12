@@ -437,7 +437,11 @@
       "maxMandaat": "geen",
       "blockingVraagMax": 1,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Geld",
+        "deel": "Facturen"
+      }
     },
     {
       "id": "amb-betaal-die-1",
@@ -451,8 +455,18 @@
       "maxMandaat": "klaarzetten",
       "blockingVraagMax": 1,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4",
-      "let op": "ook met een eenduidige referent gaat geld nooit vanzelf; klaarzetten is het plafond en een mens bevestigt"
+      "beproefbaar": "NU",
+      "let op": "ook met een eenduidige referent gaat geld nooit vanzelf; klaarzetten is het plafond en een mens bevestigt",
+      "contextGeval": {
+        "app": "RTG Geld",
+        "deel": "Facturen",
+        "interactie": {
+          "soort": "keuze",
+          "opties": [
+            "Factuur 2026-014"
+          ]
+        }
+      }
     },
     {
       "id": "amb-betaal-die-3",
@@ -466,7 +480,19 @@
       "maxMandaat": "geen",
       "blockingVraagMax": 1,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Geld",
+        "deel": "Facturen",
+        "interactie": {
+          "soort": "keuze",
+          "opties": [
+            "Factuur 2026-014",
+            "Factuur 2026-015",
+            "Factuur 2026-016"
+          ]
+        }
+      }
     },
     {
       "id": "amb-annuleer-hem",

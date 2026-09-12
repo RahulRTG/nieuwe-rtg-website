@@ -586,6 +586,14 @@ const METERS = [
      dan is de dubbelzinnigheid opgelost door bevoegdheid te VERONDERSTELLEN, en
      dat is het verschil tussen een handige en een betrouwbare assistent. */
   { sleutel: 'referentGebreken', richting: 'omlaag', wat: 'gebreken in de referentveiligheid (uit MENSTAALPROEF.json)' },
+  /* DE GELDVEILIGHEID (MENSTAALPROEF.json). `gebreken` telt wat er mankeert aan
+     de drie toestanden van "betaal die". Hij lijkt op referentGebreken en meet
+     iets anders: daar gaat het om een verwijzing die wel of niet op te lossen
+     is, hier geldt er een regel BOVENOP -- ook met een eenduidige referent komt
+     de keten tot een VOORSTEL en geen stap verder, want geld gaat nooit vanzelf.
+     De ernstigste uitslag die deze tand kan vangen is een 2xx op /api/bank/pas/
+     betaal na een zin van twee woorden. */
+  { sleutel: 'geldGebreken', richting: 'omlaag', wat: 'gebreken in de geldveiligheid (uit MENSTAALPROEF.json)' },
   /* DE TIEN MUTATIES (MENSMUTATIE.json). `geenWacht` telt de garanties die je
      uit de bron kunt HALEN zonder dat er een wacht afgaat. Dat is een uitspraak
      over de TOETSEN en niet over de code: de keten doet nog steeds het goede,
@@ -1330,6 +1338,7 @@ function meet(bronnen) {
     goudenPlakGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.goudenPlak.gebreken || []).length),
     samenhangGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.gesprekssamenhang.gebreken || []).length),
     referentGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.referentveiligheid.gebreken || []).length),
+    geldGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.geldveiligheid.gebreken || []).length),
     mensmutatieZonderWacht: leesRegister('MENSMUTATIE.json', (j) => j.telling.geenWacht),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar

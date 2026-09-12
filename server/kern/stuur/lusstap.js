@@ -150,10 +150,18 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil, spoor }) {
 
     spoor && spoor.mark('CAPABILITY_SELECTED', 'PASS', { pad });
     const uit = await stuurRoep(req, pad, (t.input || {}).body, { wereld });
-    /* EXECUTED of niet. Een 428 betekent dat de server een VOORSTEL teruggaf en
-       er dus niets is uitgevoerd -- dat is NOT_RUN en geen mislukking. */
-    spoor && spoor.mark('EXECUTED', uit && uit.bevestigNodig ? 'NOT_RUN' : 'PASS',
-      { status: uit && uit.status });
+    /* EXECUTED: DRIE UITKOMSTEN IN TWEE STANDEN (2xx = PASS, 428 = voorstel,
+       al het andere = geweigerd). Hier stond `bevestigNodig ? NOT_RUN : PASS`,
+       en daarmee las een GEWEIGERDE aanroep -- 403, 409, 503 -- als een
+       uitgevoerde. Zonder status is het NOT_RUN: een uitvoering claimen die we
+       niet kunnen zien, is de valse nul andersom. Zie MENS.md par. 3f. */
+    const st = uit && typeof uit.status === 'number' ? uit.status : null;
+    const voorstel = !!(uit && uit.bevestigNodig);
+    const gelukt = st !== null && st >= 200 && st < 300 && !voorstel;
+    spoor && spoor.mark('EXECUTED', gelukt ? 'PASS' : 'NOT_RUN',
+      { status: st === null ? undefined : st, voorstel: voorstel || undefined,
+        geweigerd: (!gelukt && !voorstel) || undefined,
+        statusOnbekend: st === null || undefined });
     acties.push({ pad, status: uit.status,
       goedkeuring: uit && uit.goedkeuring ? uit.goedkeuring : undefined });
     /* MELDEN VOOR HET ANTWOORD HET GESPREK IN GAAT. Zie de kop: erna is de

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-12T17:48:13.127Z",
-    "commit": "88411c2d",
+    "op": "2026-09-12T19:41:30.015Z",
+    "commit": "86cc6979",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/mensmutatie.js",
@@ -54,7 +54,7 @@
         },
         {
           "wacht": "menstaalproef",
-          "melding": "- B: kwam tot geen terwijl het alternatief eenduidig en leesbaar is -- dan gebeurt er niets met een verwijzing die wel op te lossen was"
+          "melding": "- B: kwam tot geen terwijl de ene openstaande factuur eenduidig is -- dan gebeurt er niets met een verwijzing die op te lossen was"
         }
       ],
       "bleefGroen": [

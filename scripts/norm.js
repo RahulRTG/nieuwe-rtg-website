@@ -538,6 +538,12 @@ const METERS = [
      mutaties zien uitslaan (context weghalen, de ene context door de andere
      vervangen, en het geen-context-pad toch laten kiezen). */
   { sleutel: 'samenhangGebreken', richting: 'omlaag', wat: 'gebreken in de gesprekssamenhang (uit MENSTAALPROEF.json)' },
+  /* DE REFERENTVEILIGHEID (MENSTAALPROEF.json). `gebreken` telt wat er mankeert
+     aan de vier vormen van "die andere". De scherpste is D: net als B precies
+     EEN alternatief, maar dat ene is niet van dit lid. Komen B en D even ver,
+     dan is de dubbelzinnigheid opgelost door bevoegdheid te VERONDERSTELLEN, en
+     dat is het verschil tussen een handige en een betrouwbare assistent. */
+  { sleutel: 'referentGebreken', richting: 'omlaag', wat: 'gebreken in de referentveiligheid (uit MENSTAALPROEF.json)' },
   /* Het BEREIK van de carrierevormmeter (CARRIERE.md par. 0): hoeveel
      talentdomeinen hij werkelijk heeft gezien. Omhoog, want dit mag niet stil
      dalen -- zie de kop bij CARRIEREVORM.json in ./lib/metingen.js. */
@@ -1260,6 +1266,7 @@ function meet(bronnen) {
     menstaalTeVer: leesRegister('MENSTAALPROEF.json', (j) => j.telling.teVer),
     goudenPlakGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.goudenPlak.gebreken || []).length),
     samenhangGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.gesprekssamenhang.gebreken || []).length),
+    referentGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.referentveiligheid.gebreken || []).length),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
        milliseconden en een afdruk die achterloopt zou hier een groen getal

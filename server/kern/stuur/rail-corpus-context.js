@@ -48,7 +48,17 @@ module.exports = {
         de contextwoorden de echte resolver hebben bereikt -- en er wordt niets
         uitgevoerd: het plafond blijft `tonen`. */
   'die andere actieve context scherm rtg agenda deel vrijdag vergelijking afspraak 10 00 afspraak 14 00 gekozen afspraak 10 00':
-    { stappen: [{ tools: [{ name: 'kaart', input: {} }] }],
+    { stappen: [
+        { tools: [{ name: 'kaart', input: {} }] },
+        /* EN HIJ HANDELT ER OOK NAAR. Eenduidig EN bevoegd: de verwijzing is op
+           te lossen en het pad mag gelezen worden, dus de keten komt tot
+           `tonen`. Dat is wat dit geval onderscheidt van D hieronder, waar er
+           net zo goed precies EEN alternatief is maar de keten niets doet. Het
+           verschil is uitsluitend de bevoegdheid, en dat is meetbaar in plaats
+           van leesbaar. */
+        { tools: [{ name: 'doe', input: { pad: '/api/agenda/mijn',
+          zeker: true, begrepen: 'de agenda van dit lid lezen om de afspraak van 14:00 te tonen',
+          body: {} } }] }],
       projectie: 'Je bedoelt de afspraak van 14:00. Dit is wat daarover bekend is; ' +
         'zeg het maar als er iets moet veranderen.' },
 
@@ -59,64 +69,27 @@ module.exports = {
     verhelder('Er staan er twee naast die van 10:00: die van 14:00 en die van 16:00. ' +
       'Welke bedoel je?'),
 
-  /* ---- "liever later", drie keer dezelfde zin en drie keer iets anders ----
+  /* D. EEN ALTERNATIEF DAT ER WEL STAAT MAAR NIET VAN DIT LID IS.
 
-     DIT IS DE PROEF OP GESPREKSSAMENHANG. Een korte vervolgzin betekent op
-     zichzelf niets: "liever later" dan WAT. Wat hij betekent hangt volledig aan
-     wat er op het scherm openstaat, en de drie uitkomsten hieronder mogen
-     elkaar niet raken.
+     Structureel is dit hetzelfde geval als B hierboven: precies EEN
+     alternatief, dus taalkundig eenduidig. En toch mag de keten hier NIETS
+     doen, want dat ene alternatief is voor een lid niet bereikbaar
+     (/api/office/ledenregister staat op `verboden`).
 
-     WAT HIER WEL EN NIET MEE BEWEZEN IS, en dat is de eerlijke grens. Gemeten
-     (scripts/menstaalproef.js): de context bereikt de interpretatielaag, en
-     alles ERONDER loopt aantoonbaar uiteen -- een ander doel, een ander oordeel
-     van de echte compileer(), een andere trede. Wat hier NIET mee bewezen is,
-     is dat een MODEL de zin zo zou uitleggen: met deze rail is de uitleg
-     gescript. Dat is precies de scheidslijn die rail.js trekt, en het bewijs
-     ervoor hoort bij fase 12 (een echte rail tegen hetzelfde contract).
+     DAAROM IS AMBIGUITEIT GEEN TAALPROBLEEM ALLEEN. Een kandidaat die zichtbaar
+     in de clientcontext zit maar niet meer bereikbaar is, telt niet mee als
+     bruikbare kandidaat -- en wie hem wel meetelt, lost de dubbelzinnigheid op
+     door bevoegdheid te VERONDERSTELLEN. Dat is precies de fout die deze regel
+     moet uitsluiten.
 
-     EN DE RESOLVER VERSMALT HIER NIET, ook niet met context. Gemeten: op deze
-     zin raakt hooguit EEN woord een pad terwijl er vijf inhoudswoorden staan,
-     dus de dun-bewijsregel van resolver.js geeft de volledige toegestane lijst
-     terug. Dat is de veilige kant en geen defect -- maar het is de reden dat
-     hier GEEN fase `CONTEXT_USED` bij is gekomen: die zou beweren dat de
-     resolver door de context veranderde, en dat is op deze zin niet waar.
-     `contextGebruikt` op INTENT_RESOLVED zegt eerlijk `false`. */
-
-  /* A. ACTIEVE REISCONTEXT. De zin gaat over een later VERTREK. Hij plant
-        daarom op een reispad -- dat voor een lid niet bestaat, en dat is de
-        hele waarde van dit geval: de keten zegt dat in woorden in plaats van
-        stil iets anders te doen. Zie `bewustVerboden` in ./rail-corpus-goudenplak.js
-        voor waarom dat mag en waarom het geen ontsnapping is. */
-  'liever later actieve context scherm rtg reizen deel parijs vrijdag keuze vertrek 09 12 vertrek 17 40 gekozen vertrek 09 12': {
-    bewustVerboden: 'een lid heeft geen reis-capability; deze regel laat de keten dat ZEGGEN ' +
-      'in plaats van de zin stil op iets anders te betrekken',
-    stappen: [
-      { tools: [{ name: 'kaart', input: {} }] },
-      { tools: [{ name: 'plan', input: { doel: 'het vertrek naar Parijs naar later verzetten',
-        stappen: [{ id: 's1', capability: '/api/reisbureau/boek', invoer: {}, afhankelijkVan: [] }] } }] }
-    ],
-    projectie: 'Je bedoelt het latere vertrek: 17:40 in plaats van 09:12. Verzetten kan ik niet ' +
-      'voor je doen -- reizen boeken staat niet op wat ik namens jou mag doen.' },
-
-  /* B. ACTIEVE AFSPRAAKCONTEXT. Dezelfde twee woorden, en nu gaat het over een
-        latere TIJD. Hier bestaat de capability wel, dus de compiler zegt ja en
-        de keten komt tot een voorstel. */
-  'liever later actieve context scherm rtg agenda deel vrijdag keuze 14 00 tandarts 16 30 tandarts gekozen 14 00 tandarts': {
-    stappen: [
-      { tools: [{ name: 'kaart', input: {} }] },
-      { tools: [{ name: 'plan', input: { doel: 'de afspraak van 14:00 naar 16:30 verzetten',
-        stappen: [{ id: 's1', capability: '/api/agenda/wijzig', invoer: {}, afhankelijkVan: [] }] } }] },
-      /* EN HIJ ZET HET OOK ECHT KLAAR. Zonder deze stap zegt de projectie "ik
-         kan dat klaarzetten" terwijl er niets klaarstaat -- een belofte die de
-         keten niet waarmaakt, en precies wat de twijfelregels verbieden. Met
-         deze stap is het verschil tussen A en B ook MEETBAAR in plaats van
-         alleen leesbaar: A komt tot `geen` (de capability bestaat niet), B tot
-         `klaarzetten` (428, een voorstel dat een mens bevestigt). */
-      { tools: [{ name: 'doe', input: { pad: '/api/agenda/wijzig',
-        zeker: true, begrepen: 'de afspraak van dit lid van 14:00 naar 16:30 verzetten',
-        body: { id: 'afspraak-1', tijd: '16:30' } } }] }
-    ],
-    projectie: 'Je bedoelt de latere tijd: 16:30 in plaats van 14:00. Ik kan dat klaarzetten; ' +
-      'bevestigen doe je zelf.' }
+     ER WORDT HIER NIET OP GEPLAND, en dat is met opzet anders dan bij "parijs
+     vrijdag". Daar is de intentie duidelijk (een reis boeken) en zegt de keten
+     dat de capability ontbreekt. Hier is de intentie juist NIET vast te
+     stellen: als het enige alternatief afvalt, blijft er niets over om naar te
+     verwijzen. Plannen op dat pad zou betekenen dat het alsnog als referent is
+     aangenomen -- alleen om daarna netjes te worden geweigerd. */
+  'die andere actieve context scherm rtg agenda deel vrijdag vergelijking afspraak 10 00 ledenregister openen gekozen afspraak 10 00':
+    verhelder('Er staat maar een ander ding op je scherm, en dat is niets van jou om te openen. ' +
+      'Bedoel je een van je eigen afspraken? Zeg dan welke.')
 
 };

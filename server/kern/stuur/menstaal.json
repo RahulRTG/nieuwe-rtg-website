@@ -380,6 +380,52 @@
       }
     },
     {
+      "id": "amb-die-andere-geen-kandidaten",
+      "input": "die andere",
+      "klasse": "AMBIGUOUS",
+      "context": "scherm zonder vergelijking",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Agenda",
+        "deel": "Vrijdag"
+      },
+      "let op": "FASE 8, vorm A. Er is wel een scherm maar er staat niets naast elkaar, dus er is geen kandidaat om 'die andere' op te betrekken. Verduidelijken, geen plan. Onderscheidt zich van amb-die-andere-geen doordat daar HELEMAAL geen context meekomt: hier is er wel context en levert die geen kandidaten op."
+    },
+    {
+      "id": "amb-die-andere-onbevoegd",
+      "input": "die andere",
+      "klasse": "AMBIGUOUS",
+      "context": "1 alternatief, maar onbevoegd",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Agenda",
+        "deel": "Vrijdag",
+        "interactie": {
+          "soort": "vergelijking",
+          "opties": [
+            "Afspraak 10:00",
+            "Ledenregister openen"
+          ],
+          "gekozen": "Afspraak 10:00"
+        }
+      },
+      "let op": "FASE 8, vorm D, en de scherpste. Structureel hetzelfde als amb-die-andere-1: precies EEN alternatief, dus taalkundig eenduidig. En toch mag er niets gebeuren, want dat alternatief (/api/office/ledenregister) staat voor een lid op `verboden`. Een kandidaat die zichtbaar in de clientcontext zit maar niet bereikbaar is, telt niet mee -- wie hem wel meetelt, lost de dubbelzinnigheid op door bevoegdheid te VERONDERSTELLEN. Het verschil met -1 is uitsluitend de bevoegdheid, en het hoort meetbaar te zijn: -1 komt tot `tonen`, dit tot `geen`."
+    },
+    {
       "id": "amb-betaal-die-geen",
       "input": "betaal die",
       "klasse": "AMBIGUOUS",

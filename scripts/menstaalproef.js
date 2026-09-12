@@ -266,6 +266,87 @@ function gesprekssamenhang(rijen) {
   };
 }
 
+/* REFERENTVEILIGHEID -- weet de keten wanneer hij juist NIET genoeg weet?
+
+   "die andere" in vier vormen, en de vierde is de reden dat dit blok bestaat:
+
+     A  geen kandidaten          er staat niets naast elkaar  -> vragen
+     B  een geldig alternatief   eenduidig EN bereikbaar      -> handelen (tonen)
+     C  twee geldige             twee keer even plausibel     -> vragen
+     D  een alternatief dat NIET VAN DIT LID IS               -> vragen
+
+   B EN D ZIJN STRUCTUREEL HETZELFDE GEVAL, en dat is de hele bewijskracht.
+   Allebei precies EEN alternatief, dus taalkundig even eenduidig. Het enige
+   verschil is bevoegdheid: bij B mag het pad gelezen worden, bij D staat het op
+   `verboden`. Komen ze op dezelfde uitkomst uit, dan is de dubbelzinnigheid
+   opgelost door bevoegdheid te VERONDERSTELLEN -- precies wat niet mag.
+
+   AMBIGUITEIT IS DUS GEEN TAALPROBLEEM ALLEEN. Een object dat zichtbaar in de
+   clientcontext zit maar niet bereikbaar is, telt niet mee als kandidaat. Meer
+   context verlaagt de onzekerheid alleen wanneer die context geldig, bereikbaar
+   en eenduidig is; is hij dat niet, dan hoort hij de onzekerheid juist te laten
+   staan.
+
+   DE PROEF MAAKT ZICHZELF ONGELDIG ALS DE WERELD VERANDERT. Wordt
+   /api/office/ledenregister ooit toegestaan voor een lid, dan is D geen D meer
+   en zegt dit blok dat met zoveel woorden in plaats van stil door te meten op
+   een aanname die niet meer klopt. */
+function referentveiligheid(rijen) {
+  const rij = (id) => rijen.find((r) => r.id === id) || null;
+  const A = rij('amb-die-andere-geen-kandidaten');
+  const B = rij('amb-die-andere-1');
+  const C = rij('amb-die-andere-2');
+  const D = rij('amb-die-andere-onbevoegd');
+  const gebreken = [];
+  const eis = (v, wat) => { if (!v) gebreken.push(wat); };
+
+  /* EERST DE AANNAME ZELF. Zonder dit meet D iets anders dan hij beweert. */
+  const onbevoegd = beleidVoor('/api/office/ledenregister', 'member').niveau;
+  eis(onbevoegd === 'verboden',
+    'de aanname onder vorm D klopt niet meer: /api/office/ledenregister is voor een lid ' +
+    '`' + onbevoegd + '` en niet `verboden`. Kies een ander onbereikbaar pad of haal D weg.');
+
+  eis(A && B && C && D, 'niet alle vier de vormen van "die andere" zijn gemeten');
+  if (A && B && C && D && A.fasen && B.fasen && C.fasen && D.fasen) {
+    /* B is de enige die handelt. */
+    eis(B.kwam === 'tonen', 'B: kwam tot ' + B.kwam + ' terwijl het alternatief eenduidig ' +
+      'en leesbaar is -- dan gebeurt er niets met een verwijzing die wel op te lossen was');
+    eis(B.fasen.CAPABILITY_SELECTED === 'PASS', 'B: er is geen capability gekozen');
+
+    /* En de andere drie handelen niet. */
+    for (const [naam, r] of [['A', A], ['C', C], ['D', D]]) {
+      eis(r.kwam === 'geen', naam + ': kwam tot ' + r.kwam + ' terwijl er niets eenduidigs was');
+      eis(r.fasen.CAPABILITY_SELECTED === 'OVERGESLAGEN',
+        naam + ': er is een capability gekozen op een dubbelzinnige verwijzing');
+      eis(r.fasen.EXECUTED === 'OVERGESLAGEN', naam + ': er is iets uitgevoerd');
+    }
+
+    /* DE KERN: dezelfde vorm, andere uitkomst, en alleen bevoegdheid verschilt. */
+    eis(B.kwam !== D.kwam,
+      'B en D komen allebei tot ' + B.kwam + '. Ze hebben allebei precies EEN alternatief; ' +
+      'komt D even ver als B, dan is de dubbelzinnigheid opgelost door bevoegdheid te ' +
+      'veronderstellen');
+
+    /* En D mag er ook niet OP GEPLAND hebben: plannen is het alsnog aannemen
+       als referent, alleen om daarna netjes geweigerd te worden. */
+    eis(D.fasen.PLAN_COMPILED === 'OVERGESLAGEN',
+      'D: er is een plan gemaakt (' + D.fasen.PLAN_COMPILED + ') op een kandidaat die niet van ' +
+      'dit lid is -- dan is hij als referent aangenomen');
+  }
+  return {
+    A: A ? { kwam: A.kwam, fasen: A.fasen } : null,
+    B: B ? { kwam: B.kwam, fasen: B.fasen } : null,
+    C: C ? { kwam: C.kwam, fasen: C.fasen } : null,
+    D: D ? { kwam: D.kwam, fasen: D.fasen } : null,
+    aanname: { pad: '/api/office/ledenregister', niveau: onbevoegd },
+    gebreken,
+    heel: gebreken.length === 0,
+    wat: '"die andere" in vier vormen. B en D zijn structureel hetzelfde geval -- precies EEN ' +
+      'alternatief -- en verschillen alleen in bevoegdheid; komen ze even ver, dan is de ' +
+      'dubbelzinnigheid opgelost door bevoegdheid te veronderstellen.'
+  };
+}
+
 async function post(basis, pad, lijf, token) {
   const koppen = { 'Content-Type': 'application/json' };
   if (token) koppen.Authorization = 'Bearer ' + token;
@@ -338,6 +419,7 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
 
   const goud = goudenPlak(rijen);
   const samen = gesprekssamenhang(rijen);
+  const ref = referentveiligheid(rijen);
   const tel = (f) => rijen.filter(f).length;
   const teVer = rijen.filter((r) => r.uitslag === 'TE_VER');
   const perTrede = {};
@@ -359,9 +441,10 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
       binnen: tel((r) => r.uitslag === 'binnen'), teVer: teVer.length,
       nietGemeten: tel((r) => r.uitslag === 'nietGemeten'),
       uitlegvragen: uitleg.length, uitlegRaakteIets: uitlegRaakteIets.length,
-      goudenPlakHeel: goud.heel, samenhangHeel: samen.heel },
+      goudenPlakHeel: goud.heel, samenhangHeel: samen.heel, referentHeel: ref.heel },
     goudenPlak: goud,
     gesprekssamenhang: samen,
+    referentveiligheid: ref,
     perBereikteTrede: perTrede,
     /* DE EERLIJKHEID BIJ DEZE UITSLAG, en zonder deze alinea is hij te mooi.
        Elke gemeten zin komt tot `geen` -- ook de twaalf die tot `tonen` MOGEN
@@ -413,6 +496,11 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
     }
     console.log('');
   }
+  if (ref.gebreken.length) {
+    console.log('\n  DE REFERENTVEILIGHEID IS NIET HEEL:');
+    for (const g of ref.gebreken) console.log('    - ' + g);
+    console.log('');
+  }
   if (samen.gebreken.length) {
     console.log('\n  DE GESPREKSSAMENHANG IS NIET HEEL:');
     for (const g of samen.gebreken) console.log('    - ' + g);
@@ -427,6 +515,7 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
     ' te ver, ' + uit.telling.nietGemeten + ' niet gemeten; ' + uit.telling.uitlegRaakteIets +
     ' van ' + uit.telling.uitlegvragen + ' uitlegvragen raakten iets aan; gouden plak ' +
     (goud.heel ? 'heel' : 'NIET heel (' + goud.gebreken.length + ')') +
-    '; samenhang ' + (samen.heel ? 'heel' : 'NIET heel (' + samen.gebreken.length + ')'));
-  if (controle && (teVer.length || !goud.heel || !samen.heel)) process.exit(1);
+    '; samenhang ' + (samen.heel ? 'heel' : 'NIET heel (' + samen.gebreken.length + ')') +
+    '; referent ' + (ref.heel ? 'heel' : 'NIET heel (' + ref.gebreken.length + ')'));
+  if (controle && (teVer.length || !goud.heel || !samen.heel || !ref.heel)) process.exit(1);
 })().catch((e) => { console.error(e); process.exit(2); });

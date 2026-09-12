@@ -344,6 +344,7 @@ test('11. de twee corpusbronnen botsen niet', () => {
      rail-corpus-context.js. */
   const bronnen = { zinnen: require('../server/kern/stuur/rail-corpus-zinnen'),
     context: require('../server/kern/stuur/rail-corpus-context'),
+    samenhang: require('../server/kern/stuur/rail-corpus-samenhang'),
     goudenplak: require('../server/kern/stuur/rail-corpus-goudenplak') };
   const gezien = new Map();
   for (const [naam, bron] of Object.entries(bronnen))
@@ -375,8 +376,12 @@ test('12. het contract en het corpus zeggen hetzelfde over deze gevallen', () =>
     const r = menscontext.saneer(g.contextGeval);
     assert.equal(r.stand, 'PASS', g.id + ' heeft een context die niets oplevert');
     const sleutel = normaliseer(g.input + '\n\nActieve context: ' + menscontext.handtekening(r));
-    assert.ok(Object.prototype.hasOwnProperty.call(
-      require('../server/kern/stuur/rail-corpus-context'), sleutel),
+    /* Het HELE corpus: een contextgeval mag in elk van de contextbestanden
+       staan, en de rail voegt ze toch samen. */
+    const alleZinnen = Object.assign({}, require('../server/kern/stuur/rail-corpus-context'),
+      require('../server/kern/stuur/rail-corpus-samenhang'),
+      require('../server/kern/stuur/rail-corpus-goudenplak'));
+    assert.ok(Object.prototype.hasOwnProperty.call(alleZinnen, sleutel),
     g.id + ' heeft geen corpusregel; de rail zou NIET_HERKEND geven op:\n    ' + sleutel);
   }
 });

@@ -155,6 +155,7 @@ test('10. elk pad in het corpus bestaat echt in het beleid', () => {
      Dat is binnen een dag de zesde wacht die door een splitsing blind werd. */
   const zinnen = Object.assign({}, require('../server/kern/stuur/rail-corpus-zinnen'),
     require('../server/kern/stuur/rail-corpus-context'),
+    require('../server/kern/stuur/rail-corpus-samenhang'),
     require('../server/kern/stuur/rail-corpus-goudenplak'));
   let gezien = 0; const bewust = [];
   for (const [zin, regel] of Object.entries(zinnen)) {

@@ -1598,6 +1598,19 @@ const IJKINGEN = {
       (j) => { j.gesprekssamenhang.gebreken = (j.gesprekssamenhang.gebreken || []).concat(['ijk', 'ijk']); return j; },
       () => norm.meet().samenhangGebreken - voor.samenhangGebreken)
   },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (zesde): referentGebreken telt wat er mankeert
+     aan de vier vormen van "die andere" (MENSTAALPROEF.json,
+     referentveiligheid.gebreken). Zelfde vorm als de vorige drie.
+
+     De meter zelf is met drie mutaties zien uitslaan: D de onbevoegde kandidaat
+     toch als referent laten nemen (4 gebreken, plus 1 te ver op het contract),
+     C toch laten kiezen uit twee alternatieven (3), en B laten ophouden met
+     handelen (3 -- waarop B en D op elkaar vallen en de kernbewering zakt). */
+  referentGebreken: {
+    proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
+      (j) => { j.referentveiligheid.gebreken = (j.referentveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
+      () => norm.meet().referentGebreken - voor.referentGebreken)
+  },
   /* DE TAND VAN 10 SEPTEMBER 2026: bewijsAlleenKeten telt de bewijsmechanismen
      die alleen in de keten draaien en niet lokaal (BEWIJSLADDER.json). Zelfde
      vorm als de vier hierboven -- hij telt een POST in een register, dus hij

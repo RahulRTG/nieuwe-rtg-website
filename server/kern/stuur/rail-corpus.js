@@ -34,15 +34,18 @@
    -- overgenomen uit ./gereedschap.js en ./plan.js, niet verzonnen. */
 'use strict';
 
-/* Drie bronnen, EEN corpus. ./rail-corpus-zinnen.js draagt wat een ZIN
+/* Vier bronnen, EEN corpus. ./rail-corpus-zinnen.js draagt wat een ZIN
    oplevert, ./rail-corpus-context.js wat dezelfde zin MET een scherm eronder
-   oplevert, en ./rail-corpus-goudenplak.js de twee zinnen die de keten tot het
-   EIND uitvoeren -- die tweede kan pas bestaan sinds de gesaneerde context onder de
+   oplevert (de VERWIJZING: "die andere"), ./rail-corpus-samenhang.js wat een
+   korte vervolgzin krijgt van wat er openstaat ("liever later"), en
+   ./rail-corpus-goudenplak.js de twee zinnen die de keten tot het EIND
+   uitvoeren -- die tweede kan pas bestaan sinds de gesaneerde context onder de
    vraag meereist (./menscontext.js). Ze worden hier samengevoegd en niet in
    elkaar geschoven: een sleutel die in allebei staat, is een botsing en geen
    voorrangsregel, en test/menscontext.test.js laat de bouw daarop zakken. */
 const ZINNEN = Object.assign({}, require('./rail-corpus-zinnen'),
-  require('./rail-corpus-context'), require('./rail-corpus-goudenplak'));
+  require('./rail-corpus-context'), require('./rail-corpus-samenhang'),
+  require('./rail-corpus-goudenplak'));
 
 /* Normaliseren is met opzet het domste wat werkt. Elke regel die hier bij komt
    is begrip, en begrip hoort in de echte rail. */

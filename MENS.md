@@ -481,10 +481,10 @@ zijn niet herschreven; twee ervan bleken er twee te zijn.
 | 10a | het contract staat een wereldkeuze toe | menstaal |
 | 10b | het antwoord laat de mens werkelijk kiezen | **geen** |
 
-<!--getal:mensmutatie.gezakt-->9<!--/getal--> van de twaalf laten een wacht
+<!--getal:mensmutatie.gezakt-->11<!--/getal--> van de twaalf laten een wacht
 zakken, met de melding erbij in `MENSMUTATIE.json` — niet met een vinkje, want
 een wacht die om de verkeerde reden zakt bewijst niets. Er blijft
-<!--getal:mensmutatie.zonderWacht-->3<!--/getal--> over, en dat getal is een tand
+<!--getal:mensmutatie.zonderWacht-->1<!--/getal--> over, en dat getal is een tand
 in `NORM.json` die alleen omlaag mag.
 
 ### De drie dingen die dit opleverde en die je nergens anders moet herhalen
@@ -538,7 +538,7 @@ die als alinea al bekend waren maar nooit als getal bestonden.
 er bij <!--getal:menselijk.contextAangeboden-->10<!--/getal--> context aan die door
 het contract heen komt, bij <!--getal:menselijk.contextGebruikt-->1<!--/getal-->
 raakt een contextwoord aantoonbaar een pad, en bij
-<!--getal:menselijk.niemandKeek-->19<!--/getal--> heeft de resolver niet eens
+<!--getal:menselijk.niemandKeek-->18<!--/getal--> heeft de resolver niet eens
 gedraaid — dan heeft *niemand gekeken*, en dat is iets anders dan "de context deed
 niets".
 

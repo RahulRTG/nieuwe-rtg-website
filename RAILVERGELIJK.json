@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-12T19:41:37.596Z",
-    "commit": "86cc6979",
+    "op": "2026-09-12T20:05:40.938Z",
+    "commit": "0df7f561",
     "boomVuil": false,
     "boomAnders": 3,
     "instrument": "scripts/railvergelijk.js",
@@ -21,13 +21,13 @@
     "reden": "de tweede uitslag ontbreekt of is niet te lezen (MENSTAALPROEF-LOKAAL.json). Draai `node scripts/menstaalproef.js --rail=lokaal --uit=...` in een omgeving waar die rail bestaat; zonder LOCAL_AI_URL is er niets om te meten, en dat is iets anders dan \"er is geen verschil\"."
   },
   "telling": {
-    "zinnen": 34,
+    "zinnen": 35,
     "gelijk": 0,
     "hoger": 0,
     "lager": 0,
     "ingevuld": 0,
     "overtreding": 0,
-    "nietGemeten": 34
+    "nietGemeten": 35
   },
   "grens": "DIT ZEGT NIETS OVER DE KWALITEIT VAN HET ANTWOORD. Of een rail de zin beter begreep, is hier niet te zien en wordt niet beweerd; gemeten wordt of de machine eronder binnen zijn beloften bleef. `HOGER` en `LAGER` worden nooit samengeteld: voorzichtiger blijven is geen schending, verder komen wel. En `INGEVULD` staat apart van `HOGER` omdat een dubbelzinnige zin die alsnog wordt ingevuld een andere fout is dan een zin die een trede verder komt.",
   "ijking": {
@@ -303,6 +303,14 @@
     {
       "id": "fup-liever-later-geen",
       "input": "liever later",
+      "mag": "geen",
+      "basis": "geen",
+      "soort": "NIET_GEMETEN",
+      "reden": "deze zin staat niet in de tweede uitslag"
+    },
+    {
+      "id": "fup-ja-doe-maar",
+      "input": "ja doe maar",
       "mag": "geen",
       "basis": "geen",
       "soort": "NIET_GEMETEN",

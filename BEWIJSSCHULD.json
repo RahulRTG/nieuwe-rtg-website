@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-12T19:23:47.011Z",
-  "commit": "99daf7b7",
+  "op": "2026-09-12T19:56:51.230Z",
+  "commit": "3613c196",
   "boomVuil": false,
-  "boomAnders": 8,
+  "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v22.22.2"
  },
@@ -11,14 +11,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 2057,
+  "meetwerk": 2059,
   "instrument": 323,
   "grens": 645
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 2380,
+  "staat": 2382,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,7 +28,7 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 2380,
+  "achterstand": 2382,
   "randVanDeMethode": 645,
   "auth-onbeslist": 1,
   "capability-in-handler": 549,
@@ -45,7 +45,7 @@
   "proefruis": 1,
   "gevolg-onbekend": 87,
   "droogloop-onbeoordeeld": 2,
-  "herstel-onbevestigd": 47,
+  "herstel-onbevestigd": 49,
   "idem-ongeclassificeerd": 1578,
   "wegwerpserver-kopieen": 3
  },
@@ -174,7 +174,7 @@
    "id": "herstel-onbevestigd",
    "soort": "meetwerk",
    "wat": "vermoede tegenhangers (annuleren, terugdraaien) die nog niet zijn uitgevoerd",
-   "aantal": 47,
+   "aantal": 49,
    "waarom": "HERSTEL.json leidt tegenhangers af uit NAMEN, en de hoogste graad die dat kan opleveren is `vermoed`. Dat /api/x/annuleer bestaat naast /api/x/boek zegt niet dat de eerste de tweede werkelijk ongedaan maakt.",
    "sluit": "wat hier nog staat, vraagt een WERELD die de proef niet opzet: een zaak met de werkvorm journalistiek, een ingericht landpakket, een salon, een geplande reisoptie. Elk draagt in HERSTELPROEF.json wat er zou moeten bestaan (`wereldOntbreekt`). Sluiten betekent hier dus die wereld opzetten in scripts/lib/herstelwereld.js -- per stuk, en alleen langs de gewone routes. Wat de afleiding uberhaupt niet ziet blijft daarbuiten: een terugweg die anders heet, en een schakelaar met een vlag in het lichaam."
   },
@@ -417,7 +417,7 @@
    },
    {
     "op": "2026-09-12",
-    "aantal": 47
+    "aantal": 49
    }
   ],
   "idem-ongeclassificeerd": [
@@ -493,12 +493,6 @@
    "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: dezelfde weg als gevolg-onbekend: het pad in een proefronde krijgen. Deze post is daarvan de kleine, zichtbare kant -- hij staat er apart omdat een droogloop met vijf onbeoordeelde stappen er groen uitziet en niets bewijst."
   },
   {
-   "id": "herstel-onbevestigd",
-   "aantal": 47,
-   "meetdagen": 3,
-   "reden": "staat 3 meetdagen op hetzelfde getal; de aflossing stokt hier. Sluitweg: wat hier nog staat, vraagt een WERELD die de proef niet opzet: een zaak met de werkvorm journalistiek, een ingericht landpakket, een salon, een geplande reisoptie. Elk draagt in HERSTELPROEF.json wat er zou moeten bestaan (`wereldOntbreekt`). Sluiten betekent hier dus die wereld opzetten in scripts/lib/herstelwereld.js -- per stuk, en alleen langs de gewone routes. Wat de afleiding uberhaupt niet ziet blijft daarbuiten: een terugweg die anders heet, en een schakelaar met een vlag in het lichaam."
-  },
-  {
    "id": "wegwerpserver-kopieen",
    "aantal": 3,
    "meetdagen": 3,
@@ -565,6 +559,12 @@
    "van": 2291,
    "naar": 2380,
    "reden": "de idempotentieronde is voor het eerst sinds 3 september opnieuw gedraaid en meet 4912 routes in plaats van 4729 (+183). Die nieuwe routes zijn nog ongeclassificeerd op herhaalbaarheid (idem-ongeclassificeerd 1486 -> 1578). Werk dat in beeld kwam, niet werk dat slechter werd; gevolg-onbekend daalt van 90 naar 87 en de zes geblokkeerde geldpaden staan sinds deze ronde op beschermd. Zie de notitie bij bewijsAchterstand in NORM.json."
+  },
+  {
+   "op": "2026-09-12",
+   "van": 2380,
+   "naar": 2382,
+   "reden": "dezelfde oorzaak als de notitie bij bewijsAchterstand van vandaag, een register verder: HERSTEL.json is hergenereerd op de verse idempotentieronde en telt daardoor 49 vermoede tegenhangers in plaats van 47. De twee erbij zijn /api/rtfos/bescherming/open en /sluit -- een naam-paar dat de oude ronde (4729 routes) niet kende. Geen terugweg stukgegaan, geen proef die minder meet: bevestigd blijft op 43."
   }
  ]
 }

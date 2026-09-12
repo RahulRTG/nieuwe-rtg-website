@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2380,
+    "bewijsAchterstand": 2382,
     "bewijsAlleenKeten": 16,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -2059,6 +2059,16 @@
       "meter": "geldRoutesZonderTerugweg 39 -> 42, geldRoutesHerstelOnbesloten 42 -> 44",
       "reden": "DRIE GELDROUTES ERBIJ IN DE NOEMER, EN GEEN ENKELE VERSLECHTERING IN DE TELLER. GELDKAART.json is in deze tak hermeten en vindt 45 waardebewegende routes in plaats van 42: /api/bank/salaris, /api/bank/sepa en /api/supplier/pay/uitbetaal bewegen aantoonbaar waarde en stonden niet op de kaart. Ze zijn niet nieuw in de code -- ze waren nooit gemeten.\n\nVoor allebei deze tanden geldt dus hetzelfde: 39 en 42 zijn gemeten over 42 routes, 42 en 44 over 45. Elke nieuwe geldroute begint per definitie zonder beproefde tegenhanger en zonder verklaard correctiemodel, want die twee zijn er niet vanzelf. De ratel kan dat verschil in noemer niet zien.\n\nWAT ER IN DEZELFDE RONDE WEL GEBEURDE, en het is de andere kant op: de drie hebben nu een verklaarde semantiek (geldRoutesZonderSemantiek blijft op 1 in plaats van naar 4 te gaan), geldRoutesZonderIdemBewijs daalt van 9 naar 3, en de idempotentie-as staat op 42 van 45 PROVEN met NUL geblokkeerd. Het correctiemodel is deze tak bovendien pas INGEVOERD: voor 12 september bestond er geen enkele verklaring, nu is er een.\n\nWAAROM DE DRIE NIET METEEN VERKLAARD ZIJN. HERSTELBESLUIT.json verbiedt een stand af te leiden uit iets anders dan een besluit met een grond. Drie standen bijzetten omdat een ratel anders rood staat, is precies de omkering die dat register tegenhoudt -- en juist bij deze drie zou het zwaar wegen, want het geld verlaat bij alle drie het huis.",
       "waarheen": "de terugweg van deze drie beproeven (HERSTELPROEF.json) en hun correctiemodel verklaren in HERSTELBESLUIT.json, met de grond dat geld dat bij een externe bank ligt niet door RTG is terug te draaien. Vervalt 2026-12-01."
+    },
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2380,
+      "vervalt": "2026-12-01",
+      "meter": "bewijsAchterstand 2380 -> 2382",
+      "reden": "DEZELFDE OORZAAK ALS DE NOTITIE HIERBOVEN, EEN REGISTER VERDER, en daarom een eigen regel in plaats van de vorige stilletjes op te hogen. HERSTEL.json leidt kandidaat-tegenhangers af uit de NAMEN van de routes in IDEMPROEF.json, en is na de verse ronde hergenereerd: 49 vermoede tegenhangers in plaats van 47. De post `herstel-onbevestigd` gaat daarmee met 2 omhoog.\n\nDe twee erbij zijn /api/rtfos/bescherming/open en /api/rtfos/bescherming/sluit -- een naam-paar dat de oude ronde over 4729 routes niet kende. Geen geldroutes. `bevestigd` blijft op 43: er is dus geen terugweg stukgegaan en de proef meet niet minder.\n\nWie deze twee notities naast elkaar leest: het is EEN hermeting die door drie registers heen werkt (IDEMPROEF -> BEWIJSSCHULD, en IDEMPROEF -> HERSTEL -> BEWIJSSCHULD). Dat het in twee stappen zichtbaar werd, komt doordat HERSTEL.json pas in de tweede ronde is bijgetrokken.",
+      "waarheen": "die twee paren beproeven met scripts/herstelproef.js, zodat ze van `vermoed` naar `exact` of `compensatie` gaan en de post daalt in plaats van stil te blijven staan. Vervalt 2026-12-01, samen met de notitie hierboven."
     }
   ],
   "prestatie": {

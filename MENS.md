@@ -535,16 +535,21 @@ Zodra het detail per zin naast de stand kwam te liggen, vielen er drie dingen op
 die als alinea al bekend waren maar nooit als getal bestonden.
 
 **De resolver gebruikt de context in geen enkel scenario.** Van de 31 zinnen komt
-er bij <!--getal:menselijk.contextAangeboden-->6<!--/getal--> context aan die door
-het contract heen komt, bij <!--getal:menselijk.contextGebruikt-->0<!--/getal-->
+er bij <!--getal:menselijk.contextAangeboden-->9<!--/getal--> context aan die door
+het contract heen komt, bij <!--getal:menselijk.contextGebruikt-->1<!--/getal-->
 raakt een contextwoord aantoonbaar een pad, en bij
-<!--getal:menselijk.niemandKeek-->16<!--/getal--> heeft de resolver niet eens
+<!--getal:menselijk.niemandKeek-->18<!--/getal--> heeft de resolver niet eens
 gedraaid — dan heeft *niemand gekeken*, en dat is iets anders dan "de context deed
-niets". Dat nulgetal is geen defect: `resolver.js` geeft bij dun bewijs de volle
-lijst terug, en deze zinnen dragen te weinig woorden om te versmallen.
-`test/menscontext.test.js` toets 2 laat zien dát het mechanisme werkt. Wat hier
-staat is dat **geen enkele zin uit het contract het van begin tot eind uitoefent** —
-een gat in het corpus, niet in de code.
+niets".
+
+Dat middelste getal stond op **nul** tot de drie geldgevallen erbij kwamen (par.
+3f), en het is niet omhooggegaan doordat er een geval voor ontworpen is: het is
+`amb-betaal-die-1`, en daar versmalt het schermwoord *RTG Geld* de resolver van
+120 paden naar 12. Bij de andere zinnen geeft `resolver.js` bij dun bewijs nog
+steeds de volle lijst terug — te weinig woorden om te versmallen. Eén van de
+vierendertig is dus geen prestatie maar wel een bewijs: het mechanisme werkt niet
+alleen in een unittoets (`test/menscontext.test.js` toets 2) maar ook van begin
+tot eind.
 
 **De mandaatgrendel weegt, maar haalt er niets af.** `MANDATE_EVALUATED` staat op
 PASS met `{voor: 120, na: 120}`: de allowlist heeft het werk al eerder gedaan.
@@ -642,9 +647,9 @@ contract waartegen zij is gemeten, en `railvergelijk.js` **weigert te
 vergelijken** zodra die twee verschillen — dan wordt de tweede ronde niet eens
 gelezen en komt elke rij op `NIET_GEMETEN` uit, met de reden bovenaan. De
 verleiding bij een tweede rail is anders precies die: het corpus heeft bekende
-gaten (geen enkele zin laat de resolver op de context versmallen), en een geval
-toevoegen dat de nieuwe rail toevallig goed doet, leest dan als vooruitgang
-terwijl er een andere lat ligt. Eerst meten tegen het bestaande contract;
+gaten (op één na versmalt geen enkele zin de resolver op de context), en een
+geval toevoegen dat de nieuwe rail toevallig goed doet, leest dan als
+vooruitgang terwijl er een andere lat ligt. Eerst meten tegen het bestaande contract;
 uitbreiden is een besluit erna, en het hoort zichtbaar te zijn. Een ontbrekende
 vingerafdruk telt daarbij als *niet hetzelfde* en niet als *wel hetzelfde* — een
 oude uitslag van vóór deze grendel mag niet stilzwijgend meedoen.

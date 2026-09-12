@@ -86,7 +86,7 @@ test('6. NIET GEMETEN IS GEEN GELIJK -- aan beide kanten', () => {
 
 test('7. TWEE RAILS TEGEN TWEE CONTRACTEN WORDEN NIET VERGELEKEN', () => {
   /* De meetlat mag niet meebewegen. Het corpus heeft vandaag bekende gaten --
-     geen enkele zin laat de resolver op de context versmallen -- en de
+     op EEN zin na versmalt geen enkele de resolver op de context -- en de
      verleiding bij een tweede rail is om zo'n gat te vullen met een geval dat
      die rail toevallig goed doet. Dan leest de vergelijking als vooruitgang
      terwijl er een andere lat ligt.

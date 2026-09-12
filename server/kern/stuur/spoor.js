@@ -32,6 +32,14 @@
    dat is iets anders dan "het plafond heeft gewogen" -- precies het verschil
    dat een bewijsmerk moet dragen.
 
+   CONTEXT_SANITIZED DRAAGT ALLE DRIE DE STANDEN, en dat is geen toeval maar
+   precies waar ./menscontext.js voor gemaakt is: geen context meegestuurd ->
+   OVERGESLAGEN, wel context maar er blijft niets bruikbaars over -> NOT_RUN,
+   iets gesaneerd -> PASS. En PASS zegt alleen dat er GESANEERD is; of de
+   resolver de context ook heeft GEBRUIKT staat apart op INTENT_RESOLVED
+   (`contextGebruikt`). Die twee bij elkaar optellen zou een aangeboden context
+   laten lezen als een gewogen context.
+
    HET SPOOR WORDT IN ./lus.js GEMAAKT en niet door de route. Een route hoort
    niets van sporen te weten: zij levert een vraag, wij weten welke fasen er
    bestaan. Een aanroeper die zijn eigen spoor meegeeft -- een proef die de id

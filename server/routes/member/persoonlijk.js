@@ -5,7 +5,7 @@ const plafond = require('../../kern/stuur/plafond');
 
 module.exports = (kern) => {
   const { app, auth, liveCodename, pestgrens, bus, noteerBeurt, zorgVan, zorgZet, locDeel, locStopKlant, locMijn, stuurLus } = kern;
-  const { fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus, sparLijst, sparParkeer, sparStatus } = kern.fluister;
+  const { fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus } = kern.fluister;
   const aiStatus = () => require('../../ai-stand').beschikbaarheid(kern.anthropic);
 
 /* ---- de zorgvolle keten (kern/gastzorg.js) ----
@@ -60,6 +60,10 @@ app.post('/api/fluister', auth, async (req, res) => {
     const lus = await stuurLus(req, {
       vraag: req.body.q,
       wereld: 'member',
+      /* De schermcontext van de client, ONGESANEERD meegegeven: saneren doet
+         kern/stuur/menscontext.js, op een plek waar de grens ook getoetst is.
+         Hier hem alvast opknippen zou een tweede contract zijn. */
+      context: req.body.context,
       // streamende voortgang voor een zware taak: elke stap wordt live
       // "Stap X/24: taxi zoeken..." op de eigen SSE-verbinding (de UI toont het)
       opStap: (v) => {
@@ -133,23 +137,9 @@ app.post('/api/fluister/vergeet', auth, (req, res) => {
 // de inklap-laag deelt (alleen) tellers van schermgebruik, zodat Fluister leert
 app.post('/api/fluister/focus', auth, (req, res) => res.json(fluisterFocus(req.session.key, req.body.scores)));
 
-/* ---- Sparren (kern/fluister/sparren.js): Rahul denkt mee om het idee beter te
-   maken, en parkeert een gedachte die je noemt op een druk moment. Op een
-   rustig moment (thuis, lege agenda) kaart hij hem uit zichzelf weer aan. */
-app.post('/api/spar/lijst', auth, (req, res) => res.json(sparLijst(req.session.key)));
-app.post('/api/spar/parkeer', auth, (req, res) => {
-  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
-  const r = sparParkeer(req.session.key, req.body.tekst, 'app');
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json(r);
-});
-app.post('/api/spar/status', auth, (req, res) => {
-  const st = req.body.status === 'weg' ? 'weg' : 'besproken';
-  const r = sparStatus(req.session.key, String(req.body.id || ''), st);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json(r);
-});
-
+/* Sparren staat apart (./persoonlijk-spar.js): een ander onderwerp, en dit
+   bestand zat tegen de omvangband van keuringsregel `omvang` aan. */
+require('./persoonlijk-spar')(kern);
 require('./persoonlijk-assets')(kern);
 
 // Toren 4, RTG Care (zorg & welzijn) staat apart, in ./persoonlijk-care.js

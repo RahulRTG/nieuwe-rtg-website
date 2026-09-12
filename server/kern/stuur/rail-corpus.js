@@ -34,7 +34,14 @@
    -- overgenomen uit ./gereedschap.js en ./plan.js, niet verzonnen. */
 'use strict';
 
-const ZINNEN = require('./rail-corpus-zinnen');
+/* Twee bronnen, EEN corpus. ./rail-corpus-zinnen.js draagt wat een ZIN
+   oplevert, ./rail-corpus-context.js wat dezelfde zin MET een scherm eronder
+   oplevert -- die tweede kan pas bestaan sinds de gesaneerde context onder de
+   vraag meereist (./menscontext.js). Ze worden hier samengevoegd en niet in
+   elkaar geschoven: een sleutel die in allebei staat, is een botsing en geen
+   voorrangsregel, en test/menscontext.test.js laat de bouw daarop zakken. */
+const ZINNEN = Object.assign({}, require('./rail-corpus-zinnen'),
+  require('./rail-corpus-context'));
 
 /* Normaliseren is met opzet het domste wat werkt. Elke regel die hier bij komt
    is begrip, en begrip hoort in de echte rail. */

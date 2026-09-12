@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1608,
-    "toetsenNietGemeten": 611,
+    "toetsenNietGemeten": 612,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -2073,6 +2073,16 @@
       "meter": "kernBreedte 1565 -> 1569, kernGedeeld 231 -> 235, activeringOndergrens 48 -> 49",
       "reden": "DE SAMENVOEGING DRAAGT DE GROEI VAN BEIDE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Deze tak voegt PR #232, #235 en #237 samen. De strengste waarde per meter was het uitgangspunt, maar voor deze drie kan de samengevoegde boom die niet halen: de kern bevat nu zowel `carriereledger` en `vakschema` (#232) als de afsprakenlaag (#235), en de gemeten waarde is exact het eindpunt van de notities die #232 en #235 hier zelf al bij hebben geschreven -- 1569, 235 en 49. Er komt hier dus geen nieuwe verruiming bij; de lat gaat naar de som van twee verruimingen die elk al zijn afgewogen. Tegelijk gaat registersUitVuileBoom van 2 naar 1, want de registers van deze ronde zijn na de commit opnieuw gemeten.",
       "waarheen": "de notities van 2026-09-11 op kernBreedte (1567->1568, 1568->1569), kernGedeeld (233->234, 234->235) en activeringOndergrens (48->49) dragen elk hun eigen grond; deze regel telt ze alleen bij elkaar op"
+    },
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 611,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 611 -> 612",
+      "reden": "test/menscontext.test.js komt erbij en de mutatiemotor is er niet langs. De toets handhaaft de contextlaag van fase 4: dezelfde zin met drie verschillende schermen krijgt drie antwoorden, AANGEBODEN en GEBRUIKT zijn twee beweringen, PENDING_INTERACTION is niet p.wacht, en een verwijzing wordt nooit uit zichzelf een object. Vijftien beweringen, en ze zijn met de hand nagetrokken met tien mutaties op de bron -- waarvan er twee NIETS deden en dus zijn vervangen (de beginwaarde `let magHet = false` wordt door de catch in elke tak overschreven, en het weghalen van de `typeof o.mag`-tak laat diezelfde catch hem alsnog op false vangen). Handwerk is geen motorronde: dit is instrumentdekking en geen groenverklaring.",
+      "waarheen": "laat de mutatiemotor over test/menscontext.test.js lopen in dezelfde ronde als de toetsen van 2026-09-08 en 2026-09-10 (zelfde sleutel, zelfde vervaldatum); levert dat pogingen zonder uitslag op, dan hoort hij in GEEN_BRONMUTATIE met het aantal pogingen erbij, en anders gewoon gemeten"
     }
   ],
   "prestatie": {

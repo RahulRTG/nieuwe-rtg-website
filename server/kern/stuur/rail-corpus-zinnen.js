@@ -10,12 +10,14 @@
    niet in, dan is het antwoord NIET_HERKEND en gebeurt er niets. De rail raadt
    niet: dat is geen tekortkoming maar het punt.
 
-   WAAROM DE CONTEXTGEVALLEN HIER ONTBREKEN. Het contract draagt "die andere"
-   drie keer -- zonder vergelijking, met een alternatief, met twee. Die
-   normaliseren alle drie naar dezelfde sleutel, dus deze rail kan er maar EEN
-   van scripten. Ze staan in menstaal.json op `FASE4` en wachten op de dag dat
-   context de resolver bereikt. Dat is geen omissie die je met een vierde veld
-   oplost; het is de reden dat contextdoorvoer een eigen fase is.
+   WAAROM DE CONTEXTGEVALLEN HIER NIET STAAN. Ze bestaan wel, sinds fase 4, maar
+   in ./rail-corpus-context.js -- want daar is de sleutel vraag PLUS scherm. Dat
+   die scheiding er is, is de hele reden dat fase 4 bestond: "die andere"
+   normaliseerde zonder context drie keer naar dezelfde sleutel, dus deze rail
+   kon er maar EEN van scripten. Nu plakt ./lus.js de gesaneerde handtekening
+   van ./menscontext.js onder de vraag, en heeft elke variant zijn eigen sleutel.
+   Zet een zin met context dus daar en niet hier: een sleutel die in allebei
+   staat is een botsing, en test/menscontext.test.js laat de bouw daarop zakken.
 
    DE PADEN ZIJN ECHT en staan op de member-allowlist van ./beleid.js. Een
    corpus dat naar een verzonnen of verboden pad wijst, bewijst dat het plan

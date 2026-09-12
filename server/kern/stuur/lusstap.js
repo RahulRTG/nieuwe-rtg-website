@@ -22,6 +22,7 @@
 
 const { magDoen } = require('../rahul/twijfel');
 const { resolveer } = require('./resolver');
+const { woordenUit } = require('./resolver-woorden');
 const { compileer } = require('./plan');
 const { voorspel } = require('./gevolg');
 
@@ -69,7 +70,7 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil, spoor }) {
     return { mag: dwingt ? oordeel.mag : true, oordeel, schaduw: !oordeel.mag && !dwingt };
   }
 
-  async function voerUit(req, t, { wereld, kaartVraag, paden, acties }) {
+  async function voerUit(req, t, { wereld, kaartVraag, paden, acties, ctxWoorden }) {
     if (t.name === 'plan') {
       /* Wegen, niet doen. De compiler krijgt de rol mee en raakt niets aan; wat
          hij teruggeeft is een oordeel dat het model aan de gebruiker kan
@@ -94,8 +95,17 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil, spoor }) {
       const uit = (t.input && t.input.alles)
         ? { paden: toegestaan, versmald: false, reden: 'De volledige lijst voor deze rol, op verzoek.' }
         : resolveer(kaartVraag, toegestaan);
+      /* HEEFT DE CONTEXT ECHT MEEGEWOGEN? CONTEXT_SANITIZED zegt alleen dat er
+         iets gesaneerd is; dit zegt of een van die woorden ook werkelijk een
+         pad heeft geraakt. `ctxWoorden` draagt al alleen wat de context BOVEN
+         de vraag toevoegt (./lus.js), dus een treffer hier komt niet uit de
+         zin van de mens zelf. Vraagt hij om de volledige lijst, dan is er
+         niets gewogen -- dat is `false` en geen stilte. */
+      const ctxw = new Set(woordenUit((ctxWoorden || []).join(' ')));
+      const ctxRaak = (uit.raakvlak || []).filter((w) => ctxw.has(w));
       spoor && spoor.mark('INTENT_RESOLVED', 'PASS',
-        { versmald: !!uit.versmald, paden: (uit.paden || []).length });
+        { versmald: !!uit.versmald, paden: (uit.paden || []).length,
+          contextWoorden: ctxw.size, contextGebruikt: ctxRaak.length > 0, contextRaak: ctxRaak });
       /* WAT ER DOOR EEN BEVEILIGINGSSTAND WEGVIEL, ZEGT DE KAART ERBIJ. Zonder
          deze regel denkt het model dat die vermogens niet BESTAAN, en zegt het
          "dat kan ik niet" in plaats van "dat kan nu niet, omdat". EXECUTIE.md

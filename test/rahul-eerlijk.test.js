@@ -16,7 +16,13 @@ const aiVerhaal = () => lees('server/kern/ai/prompt.js') + '\n' + lees('server/k
 // de tool-lus van het stuur is afgesplitst: de dispatcher staat in stuur.js, de
 // eigenlijke Claude-lus (met het doctrine-prompt) in de submodule stuur/lus.js.
 // We lezen beide, zodat de bewaking klopt waar de doctrine ook precies leeft.
-const stuurLus = () => lees('server/kern/stuur.js') + '\n' + lees('server/kern/stuur/lus.js');
+/* De doctrine van de stuurlus stond letterlijk in stuur/lus.js en verhuisde op
+   12 september 2026 naar stuur/lusregels.js toen lus.js door de omvangband ging.
+   Deze toets viel daar terecht over -- zelfde geval als dienst-fluister.js
+   hieronder, en met dezelfde keerzijde: was de tekst naar een bestand verhuisd
+   waar hij toevallig al in stond, dan was hij stil blijven slagen. */
+const stuurLus = () => lees('server/kern/stuur.js') + '\n' + lees('server/kern/stuur/lus.js') +
+  '\n' + lees('server/kern/stuur/lusregels.js');
 /* Alleen de CODE, zonder het commentaar eromheen. Dit huis legt in commentaar
    uit wat er vroeger fout stond -- dat hoort er te staan -- maar een bewaking
    die op de uitleg aanslaat meet de verkeerde helft. */

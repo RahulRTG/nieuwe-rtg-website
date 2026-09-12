@@ -54,9 +54,11 @@ const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'PAKTE.json');
 const CORPUS = require('../server/kern/stuur/menstaal.json');
 
-/* Alleen de gevallen die vandaag te draaien zijn. FASE4 hangt aan context, en
-   context bereikt de resolver nog niet -- die meenemen zou een uitkomst
-   opleveren over een weg die niet bestaat. */
+/* Alleen de gevallen die vandaag te draaien zijn. Sinds fase 4 hoort daar ook
+   een geval bij dat een `contextGeval` draagt: dat wordt MET die context
+   gepost, want zonder context meet je een andere vraag dan het contract stelt.
+   Wat op FASE4 blijft staan, heeft geen machineleesbare context en zou een
+   uitkomst opleveren over een weg die er voor dat geval niet is. */
 const GEVALLEN = CORPUS.gevallen.filter((g) => g.beproefbaar === 'NU');
 
 async function post(basis, pad, lijf, token) {
@@ -95,7 +97,9 @@ if (require.main !== module) { module.exports = { GEVALLEN }; return; }
       const token = await versLid(srv.basis, i);
       if (!token) { rijen.push({ id: g.id, klasse: g.klasse, uitslag: 'niet-gemeten',
         reden: 'registratie mislukte; zonder eigen lid is de meting vervuild door het gespreksgeheugen' }); continue; }
-      const r = await post(srv.basis, '/api/fluister', { q: g.input }, token);
+      const lijf = { q: g.input };
+      if (g.contextGeval) lijf.context = g.contextGeval;
+      const r = await post(srv.basis, '/api/fluister', lijf, token);
       if (r.status === 429) { rijen.push({ id: g.id, klasse: g.klasse, uitslag: 'niet-gemeten',
         reden: 'de snelheidsrem sloeg aan (429); dat is geen uitkomst over wie de vraag claimde' }); continue; }
       if (r.status !== 200 || !r.data) { rijen.push({ id: g.id, klasse: g.klasse, uitslag: 'niet-gemeten',
@@ -103,7 +107,7 @@ if (require.main !== module) { module.exports = { GEVALLEN }; return; }
       /* DE SCHEIDSLIJN. Alleen de stuurtak zet `plafond` in het antwoord. */
       const stuur = Object.prototype.hasOwnProperty.call(r.data, 'plafond');
       rijen.push({ id: g.id, klasse: g.klasse, input: g.input,
-        verwachteRoute: g.verwachteRoute,
+        verwachteRoute: g.verwachteRoute, metContext: !!g.contextGeval,
         pakte: !stuur,
         uitslag: stuur ? 'stuur' : 'antwoordrail' });
     }
@@ -146,7 +150,8 @@ if (require.main !== module) { module.exports = { GEVALLEN }; return; }
     wat: 'wie claimt de vraag voordat de stuurketen hem ziet: de antwoordrail (pakte=true) of het stuur',
     meet: 'server/routes/member/persoonlijk.js `if (stuurLus && !r.pakte)`',
     verandertNiets: true,
-    corpus: { bestand: 'server/kern/stuur/menstaal.json', gevallenNU: GEVALLEN.length },
+    corpus: { bestand: 'server/kern/stuur/menstaal.json', gevallenNU: GEVALLEN.length,
+      metContext: GEVALLEN.filter((g) => g.contextGeval).length },
     telling: { gemeten: tel((r) => r.uitslag !== 'niet-gemeten'),
       antwoordrail: tel((r) => r.uitslag === 'antwoordrail'),
       stuur: tel((r) => r.uitslag === 'stuur'),
@@ -163,7 +168,9 @@ if (require.main !== module) { module.exports = { GEVALLEN }; return; }
       'bestaat stuurLus om een andere reden. Alleen de gevallen die vandaag beproefbaar zijn ' +
       'tellen mee; de contextgevallen (FASE4) zijn niet gemeten. En elk geval kreeg een VERS lid, ' +
       'dus er is geen gespreksgeschiedenis: in een lopend gesprek kan de antwoordrail vaker ' +
-      'claimen dan hier, omdat p.wacht en het geheugen dan gevuld zijn.',
+      'claimen dan hier, omdat p.wacht en het geheugen dan gevuld zijn. De gevallen met een ' +
+      '`contextGeval` zijn MET die context gepost; dat is de context uit het CONTRACT en niet ' +
+      'die van een echt scherm.',
     rijen
   };
   fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');

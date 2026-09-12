@@ -38,9 +38,19 @@ const path = require('path');
 const TRANSPORT = new Set(['ai.js', 'ai-kort.js', 'anthropic.js', 'openai.js', 'gemini.js', 'local-ai.js']);
 
 // Twee geldige manieren om de toegangsregel te dragen:
-//  1) de gedeelde basis eronder (RAHUL_BASIS -> RAHUL_LEAD, of de per-pas aiSystemPrompt);
-//  2) de regel letterlijk in dit bestand (zoals kern/stuur/lus.js doet).
-const BASIS = /RAHUL_LEAD|RAHUL_BASIS|rahulLeadVoor|aiSystemPrompt/;
+//  1) een gedeelde promptbasis eronder (RAHUL_BASIS -> RAHUL_LEAD, de per-pas
+//     aiSystemPrompt, of LUS_REGELS uit kern/stuur/lusregels.js);
+//  2) de regel letterlijk in dit bestand.
+//
+// LUS_REGELS STOND HIER EERST NIET, en dat vond deze poort meteen. De regels van
+// de stuurlus stonden tot 12 september 2026 letterlijk IN kern/stuur/lus.js
+// (manier 2); toen dat bestand door de omvangband ging, verhuisden ze naar
+// kern/stuur/lusregels.js en zag de scanner ze niet meer -- een SPLITSING kan
+// een lexicale poort dus blind maken zonder dat er een regel verdwijnt. De naam
+// erbij zetten is alleen eerlijk zolang hij ook echt de regel draagt; dat is
+// geen aanname maar een toets (test/menscontext.test.js, "de promptbasis draagt
+// de toegangsregel nog steeds").
+const BASIS = /RAHUL_LEAD|RAHUL_BASIS|rahulLeadVoor|aiSystemPrompt|LUS_REGELS/;
 const REGEL = /Lifestyle of Business|geen toegang|geen goedkeuring|nooit toegang|belooft nooit|beloof nooit|nooit een pas|nooit een baan/i;
 function draagtRegel(code) { return BASIS.test(code) || REGEL.test(code); }
 

@@ -20,8 +20,22 @@
 
    ZONDER NETTE OPDELING IS HET EEN KLUS. Geeft de planner niets bruikbaars
    terug, dan wordt de hele vraag als een deeltaak gedraaid. Dat is met opzet
-   geen foutmelding: de opdeling is een besparing, geen voorwaarde. */
+   geen foutmelding: de opdeling is een besparing, geen voorwaarde.
+
+   DE HUISREGELS MOETEN HIER LEXICAAL STAAN, EN DAT IS GEEN FORMALITEIT. Deze
+   afsplitsing maakte een gat dat keuringsregel 34 meteen vond: de SYNTHESE
+   schrijft vrije tekst aan een lid, en droeg de toegangsregel alleen doordat
+   ./lus.js `systeem` meegaf. Wie `zwaar()` ooit zonder dat veld aanroept, laat
+   die regel stil verdwijnen -- en een merkregel die aan een parameter hangt, is
+   geen merkregel. Vandaar de terugval op LUS_REGELS hieronder: hij faalt naar
+   de VEILIGE kant en is bovendien te zien voor wie het bestand leest.
+
+   De PLANNER-aanroep draagt hem met opzet niet. Die vraagt uitsluitend een
+   JSON-array met namen van deeltaken en schrijft niets aan een mens; dat is
+   dezelfde categorie als de bestaande uitzonderingen in scripts/check.js. */
 'use strict';
+
+const { LUS_REGELS } = require('./lusregels');
 
 async function zwaar({ anthropic, parseSubs, loop, opStap, systeem, vraag, metContext, totaal, acties }) {
   let subs = [];
@@ -55,7 +69,9 @@ async function zwaar({ anthropic, parseSubs, loop, opStap, systeem, vraag, metCo
   let eind = deel.join('\n');
   try {
     const synth = await anthropic.messages.create({
-      model: 'claude-sonnet-5', max_tokens: 500, system: systeem,
+      /* Leeg is hier niet "geen regels" maar de gedeelde basis: een synthese
+         zonder doctrine schrijft vrije tekst aan een lid zonder de merkregel. */
+      model: 'claude-sonnet-5', max_tokens: 500, system: systeem || LUS_REGELS,
       messages: [{ role: 'user', content: 'Vat voor de gebruiker kort en concreet samen wat er is gedaan ' +
         '(en wat niet lukte, eerlijk). Deelresultaten:\n' + deel.join('\n') }]
     });

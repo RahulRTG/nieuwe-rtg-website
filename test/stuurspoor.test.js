@@ -18,7 +18,7 @@ const fs = require('fs');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
-const { maakSpoor, FASEN, STANDEN } = require('../server/kern/stuur/spoor');
+const { maakSpoor, spoorNaarBuiten, FASEN, STANDEN } = require('../server/kern/stuur/spoor');
 const { maakCorpusRail } = require('../server/kern/stuur/rail-corpus');
 const { toegestanePaden } = require('../server/kern/stuur/beleid');
 const { classificeer, parseSubs } = require('../server/kern/stuur/classificatie');
@@ -182,4 +182,30 @@ test('10. de standen zijn een gesloten lijst', () => {
   s.mark('PLAN_COMPILED', 'MISSCHIEN');
   assert.equal(s.uitslag().perFase.PLAN_COMPILED.stand, 'PASS',
     'een onbekende stand hoort genormaliseerd te worden, niet bewaard');
+});
+
+test('10. het spoor verlaat de server fail-closed, en zegt altijd waarom', () => {
+  /* Zonder deze grendel is fase 12 onmogelijk (een andere rail valt dan niet te
+     meten) en met een te ruime grendel lekt hij wat RTG voor een echt lid aan
+     het doen was. Drie standen, en de productieregel wint van alles.
+     MUTATIE: laat productie erdoor zodra RTG_SPOOR_UIT=1 staat. */
+  const det = spoorNaarBuiten({ env: {}, railNaam: 'DETERMINISTISCH' });
+  assert.equal(det.mag, true, 'de deterministische rail draagt een gescript corpus');
+
+  /* Een modelrail is dicht tenzij iemand hem met opzet opent. */
+  assert.equal(spoorNaarBuiten({ env: {}, railNaam: 'LOKAAL' }).mag, false);
+  assert.equal(spoorNaarBuiten({ env: {}, railNaam: 'CLAUDE' }).mag, false);
+  assert.equal(spoorNaarBuiten({ env: { RTG_SPOOR_UIT: '1' }, railNaam: 'LOKAAL' }).mag, true);
+
+  /* PRODUCTIE WINT VAN ALLES, ook van de deterministische rail en ook mét de
+     vlag. Een slot dat opengaat als iemand iets vergeet, is geen slot. */
+  for (const rail of ['DETERMINISTISCH', 'LOKAAL', 'CLAUDE', 'GEEN'])
+    for (const vlag of [{}, { RTG_SPOOR_UIT: '1' }])
+      assert.equal(spoorNaarBuiten({ env: Object.assign({ NODE_ENV: 'production' }, vlag), railNaam: rail }).mag,
+        false, 'het spoor kwam in productie naar buiten op rail ' + rail);
+
+  /* En elke uitkomst draagt een leesbare reden -- ook de ja's. */
+  for (const g of [det, spoorNaarBuiten({ env: {}, railNaam: 'LOKAAL' }),
+    spoorNaarBuiten({ env: { NODE_ENV: 'production' }, railNaam: 'DETERMINISTISCH' })])
+    assert.ok(g.reden && g.reden.length > 30, 'een uitkomst zonder uitgeschreven reden: ' + JSON.stringify(g));
 });

@@ -74,6 +74,8 @@
     "mensmutatie:controle": "node scripts/mensmutatie.js --controle",
     "menselijkeuitvoering": "node scripts/menselijkeuitvoering.js",
     "menselijkeuitvoering:controle": "node scripts/menselijkeuitvoering.js --controle",
+    "railvergelijk": "node scripts/railvergelijk.js",
+    "railvergelijk:controle": "node scripts/railvergelijk.js --controle",
     "vindbaar:controle": "node scripts/vindbaar.js --controle",
     "beproeving:mega": "node --max-old-space-size=8192 scripts/beproeving.js",
     "slotsuite": "node scripts/slotsuite.js",

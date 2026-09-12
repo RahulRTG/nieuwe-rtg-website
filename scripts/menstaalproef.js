@@ -61,6 +61,7 @@
      node scripts/menstaalproef.js --controle zakt zodra een zin te ver komt
      node scripts/menstaalproef.js --stil     alleen de eindregels
      node scripts/menstaalproef.js --niet-schrijven  meet zonder het register bij te werken
+     node scripts/menstaalproef.js --rail=lokaal --uit=/tmp/lokaal.json   dezelfde zinnen, andere rail
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -451,8 +452,26 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede, uitSp
      een uitslag uit kapotte code in het register te staan. Dat is hier een keer
      echt gebeurd met APPWERKT.json, en het viel pas op in de commit. */
   const nietSchrijven = process.argv.includes('--niet-schrijven');
-  const srv = await start({ naam: 'menstaalproef', gereed: 'ready',
-    env: { RTG_INTENT_RAIL: 'deterministisch' } });
+  /* WELKE INTERPRETATIERAIL. Standaard de deterministische, want dat is de
+     enige die zonder sleutel en zonder netwerk draait. Fase 12 stelt exact
+     DEZELFDE zinnen aan een andere rail -- daarom is dit een vlag en geen
+     tweede proef: een tweede proef zou binnen een jaar iets anders meten en
+     dan is de vergelijking fictie.
+
+     `--uit=` schrijft de uitslag ergens anders heen, zodat twee rails naast
+     elkaar bewaard kunnen worden zonder dat de een het register van de ander
+     overschrijft. */
+  const railArg = (process.argv.find((a2) => a2.startsWith('--rail=')) || '').slice(7);
+  const rail = railArg || 'deterministisch';
+  const uitArg = (process.argv.find((a2) => a2.startsWith('--uit=')) || '').slice(6);
+  const doel = uitArg ? path.resolve(WORTEL, uitArg) : DOEL;
+  /* RTG_SPOOR_UIT gaat mee zodra de rail NIET deterministisch is: zonder spoor
+     is er niets te meten (kern/stuur/spoor.js, spoorNaarBuiten). De grendel
+     blijft fail-closed -- hij gaat hier open omdat dit een wegwerpserver met
+     verzonnen leden is, en nooit vanzelf. */
+  const srvEnv = { RTG_INTENT_RAIL: rail };
+  if (rail !== 'deterministisch') srvEnv.RTG_SPOOR_UIT = '1';
+  const srv = await start({ naam: 'menstaalproef', gereed: 'ready', env: srvEnv });
   const rijen = [];
   try {
     for (let i = 0; i < GEVALLEN.length; i++) {
@@ -517,6 +536,11 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede, uitSp
 
   const uit = {
     stempel: stempel(),
+    /* DE RAIL STAAT IN DE UITSLAG, en dat is geen sierveld. Twee uitslagen van
+       verschillende rails zien er identiek uit; zonder dit veld is achteraf niet
+       te zeggen welke interpretatielaag er is gemeten, en dan is elke
+       vergelijking waardeloos. */
+    rail,
     wat: 'hoe ver elke menselijke zin werkelijk komt, gemeten uit het stuurspoor, ' +
       'afgezet tegen de `sideEffectMax` die het contract voor die zin noemt',
     meet: 'server/kern/stuur/menstaal.json tegen server/kern/stuur/spoor.js',
@@ -577,7 +601,7 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede, uitSp
       'tools kiezen, en dan zegt deze uitslag niets over die rail.',
     rijen
   };
-  if (!nietSchrijven) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
+  if (!nietSchrijven) fs.writeFileSync(doel, JSON.stringify(uit, null, 2) + '\n');
 
   if (!stil) {
     for (const r of rijen.filter((x) => x.uitslag !== 'nietGemeten'))

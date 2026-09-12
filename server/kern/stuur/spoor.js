@@ -73,6 +73,43 @@ const FASEN = Object.freeze([
    NOT_RUN zegt dat hij aan de beurt was en terecht niets deed. */
 const STANDEN = Object.freeze(['PASS', 'NOT_RUN', 'OVERGESLAGEN']);
 
+/* MAG HET SPOOR DE SERVER VERLATEN? Drie grendels, fail-closed, in de vorm van
+   kern/stuur/rail.js en server/betaal/synthetisch.js.
+
+   WAAROM DIT EEN VRAAG IS. Het spoor zegt WAT er binnen de machine gebeurde:
+   welke paden geselecteerd zijn, welke collecties geraakt, hoe ver de keten
+   kwam. Op de deterministische rail is dat een gescript corpus in een
+   testomgeving -- daar valt niets van een mens te lekken. Op een MODELrail is
+   het een echt verzoek van een echt lid, en dan is dezelfde uitvoer een
+   inkijkje in wat RTG voor die persoon aan het doen was.
+
+   En toch moet hij daar naar buiten kunnen, want anders is fase 12 onmogelijk:
+   zonder spoor is van een lokaal model niet te meten of het tot dezelfde VEILIGE
+   uitkomsten komt als het contract. De uitweg is dezelfde als bij de
+   simulatiebank: niet een vlag die iets uitzet, maar een grendel die alleen
+   opengaat als iemand hem met opzet opent, buiten productie.
+
+     1. DETERMINISTISCH mag altijd -- gescript corpus, geen mens erachter.
+     2. Elke andere rail alleen met RTG_SPOOR_UIT=1.
+     3. Nooit in productie, ook mét die vlag.
+
+   Geeft altijd een REDEN terug, ook bij ja. "Niet beschikbaar" laat iemand
+   drie kwartier zoeken (rail.js). */
+function spoorNaarBuiten({ env, railNaam }) {
+  const e = env || {};
+  if (e.NODE_ENV === 'production')
+    return { mag: false, reden: 'het stuurspoor verlaat de server nooit in productie: het zegt ' +
+      'wat RTG voor dit lid aan het doen was, en dat hoort niet in een antwoord aan de client' };
+  if (railNaam === 'DETERMINISTISCH')
+    return { mag: true, reden: 'de deterministische rail draait een gescript corpus; er zit geen ' +
+      'mens achter deze zin' };
+  if (e.RTG_SPOOR_UIT === '1')
+    return { mag: true, reden: 'RTG_SPOOR_UIT=1 buiten productie -- met opzet opengezet om een ' +
+      'andere interpretatierail tegen hetzelfde contract te meten' };
+  return { mag: false, reden: 'rail ' + (railNaam || 'GEEN') + ' is geen gescript corpus; zet ' +
+    'RTG_SPOOR_UIT=1 in een omgeving die geen productie is om hem te kunnen meten' };
+}
+
 function maakSpoor(opties) {
   const o = opties || {};
   const id = o.id || crypto.randomUUID();
@@ -130,4 +167,4 @@ function maakSpoor(opties) {
   return { id, mark: spoorMerk, uitslag: spoorstand, FASEN };
 }
 
-module.exports = { maakSpoor, FASEN, STANDEN };
+module.exports = { maakSpoor, spoorNaarBuiten, FASEN, STANDEN };

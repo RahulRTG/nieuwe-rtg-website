@@ -564,9 +564,48 @@ opgeteld.
 
 Dat een MODEL de zinnen zo zou uitleggen. De interpretatie is vandaag gescript;
 wat vaststaat is dat alles ONDER de interpretatie werkt, weigert en meet zoals
-het belooft. Het bewijs voor de interpretatie zelf hoort bij de laatste stap —
-dezelfde gevallen tegen een lokaal model en tegen de externe rails, tegen exact
-hetzelfde contract.
+het belooft.
+
+### 3e. De tweede rail: het apparaat staat, het oordeel niet
+
+De laatste stap is dezelfde 41 gevallen tegen een lokaal model en tegen de
+externe rails, tegen exact hetzelfde contract. Dat apparaat staat nu, en de
+eerlijke stand is dat er in deze omgeving **geen tweede rail te bereiken is** —
+geen `LOCAL_AI_URL`, geen sleutel. `RAILVERGELIJK.json` zegt dat met zoveel
+woorden (`tweedeRail.gemeten: false`, met de reden), en niet met een nul.
+
+Drie dingen die daarvoor moesten gebeuren en die je nergens anders moet
+herhalen.
+
+**Het spoor moest naar buiten kunnen op een andere rail, en dat is een grendel
+en geen vlag.** `spoorNaarBuiten()` in `kern/stuur/spoor.js`: de
+deterministische rail mag altijd (gescript corpus, geen mens erachter), elke
+andere rail alleen met `RTG_SPOOR_UIT=1`, en **nooit in productie, ook mét die
+vlag**. De reden is niet ceremonieel: op een modelrail is het spoor een echt
+verzoek van een echt lid, en dan is dezelfde uitvoer een inkijkje in wat RTG
+voor die persoon aan het doen was. Zonder deze grendel is de laatste fase
+onmogelijk; met een te ruime grendel lekt zij.
+
+**De proef is één vlag geworden en geen tweede proef.**
+`npm run menstaalproef -- --rail=lokaal --uit=...` stelt exact dezelfde zinnen
+aan een andere rail. Een tweede proef zou binnen een jaar iets anders meten, en
+dan is de vergelijking fictie.
+
+**En de vergelijking gaat over VEILIGHEID, niet over tekst.** Een
+probabilistische rail formuleert anders; dat mag. Wat niet mag is verder komen
+dan het contract, handelen waar de ander om opheldering vroeg, of een
+dubbelzinnige verwijzing alsnog invullen. `scripts/railvergelijk.js` kent daarom
+zes uitkomsten waarvan er drie nooit worden samengeteld: `OVERTREDING` (het
+contract is de belofte en weegt zwaarder dan de andere rail), `INGEVULD` (de
+ernstigste vorm die binnen het contract past) en `HOGER` tegenover `LAGER` —
+voorzichtiger blijven is geen schending.
+
+De vergelijker is met vier rondes geijkt door het CORPUS te muteren: dat is een
+rail die dezelfde zinnen anders interpreteert, zonder dat er een model aan te
+pas komt. Twee rondes vonden elk hun eigen soort, één bewees dat voorzichtiger
+geen schending is, en de vierde was twee onafhankelijke rondes van dezelfde rail
+— 30 gelijk, 0 afwijkend, dus een verschil komt straks van de rail en niet van
+de meting.
 
 ---
 

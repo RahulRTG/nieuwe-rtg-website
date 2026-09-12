@@ -8,7 +8,7 @@
 const { TOOLS } = require('./gereedschap');
 const besmetting = require('./besmetting');
 const maakLusstap = require('./lusstap');
-const { maakSpoor } = require('./spoor');
+const { maakSpoor, spoorNaarBuiten } = require('./spoor');
 const { zwaar } = require('./lus-zwaar');
 const menscontext = require('./menscontext');
 const { LUS_REGELS, CONTEXT_REGELS } = require('./lusregels');
@@ -17,9 +17,14 @@ const beleid = require('./beleid');
 const { maakIsolatiefilter } = require('./isolatiefilter');
 
 module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs, isolatie, railNaam }) => {
-  /* Het spoor gaat alleen naar buiten op de deterministische rail; die keuze
-     hoort hier, want alleen hier is bekend welke rail draaide (./spoor.js). */
-  const spoorMag = railNaam === 'DETERMINISTISCH';
+  /* Of het spoor naar buiten mag, beslist ./spoor.js -- die keuze hoort bij het
+     spoor en niet bij de lus. Hier is alleen bekend WELKE rail draaide, en dat
+     is de ene invoer die hij nodig heeft. Buiten de deterministische rail gaat
+     hij alleen met RTG_SPOOR_UIT=1 en nooit in productie; zonder dat is fase 12
+     onmogelijk, want dan valt een lokaal model niet tegen hetzelfde contract te
+     meten. */
+  const spoorUit = spoorNaarBuiten({ env: process.env, railNaam });
+  const spoorMag = spoorUit.mag;
   /* De isolatiecontext staat in ./luscontext.js: klein stuk, groot gevolg. */
   const isoContextVan = require('./luscontext')({ isolatie });
   /* De huisregels die met elke beurt meegaan staan in ./lusregels.js. */

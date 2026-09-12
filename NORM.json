@@ -45,7 +45,7 @@
     "lussenZonderOverlapRem": 3,
     "meetleerBlind": 8,
     "metersOngeijkt": 0,
-    "metingenZonderRatel": 49,
+    "metingenZonderRatel": 50,
     "onbewaakt": 0,
     "ratelTanden": 83,
     "registersUitVuileBoom": 1,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1613,
-    "toetsenNietGemeten": 614,
+    "toetsenNietGemeten": 615,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -81,6 +81,26 @@
     "mensmutatieZonderWacht": 1
   },
   "notities": [
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 614,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 614 -> 615",
+      "reden": "test/railvergelijk.test.js komt erbij -- zes toetsen op het oordeel van scripts/railvergelijk.js (fase 12) -- en staat nog niet in MUTATIES.json. Alle zes zijn met de hand gemuteerd en zakten elk op hun eigen bewering: LAGER gelijkstellen aan HOGER laat 1 zakken, de HOGER-tak weghalen laat 2 en 4 zakken, de contracttoets NA de tredevergelijking zetten laat 3 zakken, de INGEVULD-tak weghalen laat 4 zakken, de vragencontrole weghalen laat 5 zakken, en een ontbrekende tweede rij als GELIJK tellen laat 6 zakken. Het oordeel is met opzet een PURE functie: er draait vandaag maar een rail, dus een toets op de echte lijsten zou niets kunnen zien zakken -- dezelfde fout als bij soortVerschil in scripts/menselijkeuitvoering.js.",
+      "waarheen": "test/railvergelijk.test.js draagt de belofte met de hand: zes beweringen, alle zes gedraaid en zien zakken. Laat scripts/mutatie.js over dat bestand lopen, samen met menselijkeuitvoering, mensmutatie, stuurspoor, stuurrail, menstaal en stuurplafond uit de notities hieronder."
+    },
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "metingenZonderRatel",
+      "van": 49,
+      "vervalt": "2026-12-15",
+      "meter": "metingenZonderRatel 49 -> 50",
+      "reden": "RAILVERGELIJK.json komt erbij en hangt aan GEEN ratel, en dat is met opzet. Een tand op `overtredingen: 0` zou vandaag een VALSE NUL zijn: er is in deze omgeving geen tweede interpretatierail (geen LOCAL_AI_URL, geen sleutel), dus die nul betekent `niemand heeft gekeken` en niet `geen enkele rail overtreedt`. Het register zegt dat zelf met `tweedeRail.gemeten: false` en de reden erbij. De kop van scripts/lib/metingen.js is hier expliciet over: een meetbestand waarvan je de ratel niet kent hoort er NIET met een gok in, want dan daalt het getal doordat er regels bijkomen in plaats van ratels. De vergelijker zelf is wel geijkt -- vier rondes met een gemuteerd corpus als tweede rail, zie het veld `ijking`.",
+      "waarheen": "de tand komt er zodra er een tweede rail te bereiken is: draai `npm run menstaalproef -- --rail=lokaal --uit=MENSTAALPROEF-LOKAAL.json` en `npm run railvergelijk`, en hang dan `overtredingen + ingevuld` als meter met richting omlaag in NORM.json. Tot die tijd is de eerlijke stand dat er niets te ratelen valt."
+    },
     {
       "datum": "2026-09-12",
       "soort": "schuld",

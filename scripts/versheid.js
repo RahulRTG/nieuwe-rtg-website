@@ -146,6 +146,12 @@ const REGISTERS = [
      opnieuw draait, dan beweert het register dat een garantie bewaakt wordt
      terwijl de wacht die hem zag er niet meer is. */
   ['MENSMUTATIE.json', 'npm run mensmutatie', 'welke garanties je kunt weghalen zonder dat een wacht afgaat'],
+  /* DE RAILVERGELIJKING. Hij legt twee MENSTAALPROEF-rondes naast elkaar, dus
+     hij veroudert met allebei: verandert het corpus, het beleid of een poort,
+     dan gaat hij over rails die niet meer zo werken. Hij draagt daarom wel een
+     stempel (anders dan MENSELIJKE_UITVOERING.json, die uit vingerafdrukken
+     leeft). */
+  ['RAILVERGELIJK.json', 'npm run railvergelijk', 'komt een tweede interpretatierail tot dezelfde veilige uitkomsten'],
   /* DE NULMETING OP DE ROUTER. Ook dit is een METING VAN GEDRAG en geen afdruk
      uit de code: hij start een server, registreert per geval een vers lid en
      kijkt wie de vraag claimt. Verandert de antwoordrail of het corpus zonder

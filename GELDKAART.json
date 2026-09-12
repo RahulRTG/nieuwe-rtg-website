@@ -2,10 +2,10 @@
   "soort": "meting",
   "uitleg": "De geldkaart: welke wegen waarde bewegen (As 1, structureel uit IDEMPROEF.json x effectcollecties.js) en of elke beweging door de waardepoort ging (As 2, dynamisch gemeten met scripts/lib/geldwacht.js).",
   "stempel": {
-    "op": "2026-09-12T18:45:46.817Z",
-    "commit": "55b660111",
+    "op": "2026-09-12T19:18:03.781Z",
+    "commit": "f3b843264",
     "boomVuil": false,
-    "boomAnders": 6,
+    "boomAnders": 1,
     "instrument": "scripts/geldkaart.js",
     "node": "v24.18.0"
   },
@@ -525,15 +525,15 @@
       "geslaagd": 153,
       "gezakt": 0
     },
-    "schrijfacties": 1763,
-    "beheerst": 1476,
-    "buitenKern": 192,
+    "schrijfacties": 2037,
+    "beheerst": 1689,
+    "buitenKern": 255,
     "kernBuitenPoort": [],
     "buiten": [
       {
         "collectie": "payCodes",
         "door": "server/routes/pay-tegoed.js:64",
-        "aantal": 37,
+        "aantal": 71,
         "stack": [
           "server/kern/pay/kassa.js:36",
           "server/routes/pay-tegoed.js:64",
@@ -554,9 +554,21 @@
         "kernbak": false
       },
       {
+        "collectie": "payTikCodes",
+        "door": "server/routes/pay-tegoed.js:46",
+        "aantal": 20,
+        "stack": [
+          "server/kern/pay/tik.js:35",
+          "server/routes/pay-tegoed.js:46",
+          "server/lib/foutisolatie.js:45",
+          "server/web/routing.js:34"
+        ],
+        "kernbak": false
+      },
+      {
         "collectie": "bankRekeningen",
         "door": "server/lib/idem.js:100",
-        "aantal": 13,
+        "aantal": 14,
         "stack": [
           "server/kern/bank/rekeningen.js:73",
           "server/lib/idem.js:100",
@@ -578,14 +590,14 @@
         "kernbak": false
       },
       {
-        "collectie": "geldbeleid",
-        "door": "server/kern/geldbeleid/index.js:36",
-        "aantal": 8,
+        "collectie": "bankTerugkerend",
+        "door": "server/lib/idem.js:124",
+        "aantal": 9,
         "stack": [
-          "server/kern/geldbeleid/index.js:36",
-          "server/kern/eigencollectie.js:109",
-          "server/kern/geldbeleid/index.js:36",
-          "server/kern/geldbeleid/index.js:42"
+          "server/kern/bank/incasso.js:35",
+          "server/lib/idem.js:124",
+          "server/db/bijeen.js:104",
+          "server/lib/idem.js:144"
         ],
         "kernbak": false
       },
@@ -626,6 +638,18 @@
         "kernbak": false
       },
       {
+        "collectie": "geldbeleid",
+        "door": "server/kern/geldbeleid/index.js:36",
+        "aantal": 7,
+        "stack": [
+          "server/kern/geldbeleid/index.js:36",
+          "server/kern/eigencollectie.js:109",
+          "server/kern/geldbeleid/index.js:36",
+          "server/kern/geldbeleid/index.js:42"
+        ],
+        "kernbak": false
+      },
+      {
         "collectie": "bankregie",
         "door": "server/kern/bankregie/vergunning.js:32",
         "aantal": 6,
@@ -650,6 +674,18 @@
         "kernbak": false
       },
       {
+        "collectie": "bankRekeningen",
+        "door": "server/lib/idem.js:124",
+        "aantal": 4,
+        "stack": [
+          "server/kern/bank/rekeningen.js:73",
+          "server/lib/idem.js:124",
+          "server/db/bijeen.js:104",
+          "server/lib/idem.js:144"
+        ],
+        "kernbak": false
+      },
+      {
         "collectie": "waardePosities",
         "door": "server/kern/waarde/index.js:112",
         "aantal": 3,
@@ -662,18 +698,6 @@
         "kernbak": false
       },
       {
-        "collectie": "bankRekeningen",
-        "door": "server/lib/idem.js:124",
-        "aantal": 3,
-        "stack": [
-          "server/kern/bank/rekeningen.js:73",
-          "server/lib/idem.js:124",
-          "server/db/bijeen.js:104",
-          "server/lib/idem.js:144"
-        ],
-        "kernbak": false
-      },
-      {
         "collectie": "bankregie",
         "door": "server/kern/bankregie/nood.js:39",
         "aantal": 3,
@@ -682,6 +706,18 @@
           "server/routes/kantoren/bank.js:82",
           "server/routes/kantoren/index.js:13",
           "server/routes/kantoren/bank.js:80"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankPassen",
+        "door": "server/lib/idem.js:124",
+        "aantal": 3,
+        "stack": [
+          "server/kern/bank/passen.js:44",
+          "server/lib/idem.js:124",
+          "server/db/bijeen.js:104",
+          "server/lib/idem.js:144"
         ],
         "kernbak": false
       },
@@ -704,18 +740,6 @@
         "stack": [
           "server/kern/facturatie/motor.js:101",
           "server/kern/facturatie/motor.js:129"
-        ],
-        "kernbak": false
-      },
-      {
-        "collectie": "payTikCodes",
-        "door": "server/routes/pay-tegoed.js:46",
-        "aantal": 2,
-        "stack": [
-          "server/kern/pay/tik.js:35",
-          "server/routes/pay-tegoed.js:46",
-          "server/lib/foutisolatie.js:45",
-          "server/web/routing.js:34"
         ],
         "kernbak": false
       },
@@ -744,18 +768,6 @@
         "kernbak": false
       },
       {
-        "collectie": "bankTerugkerend",
-        "door": "server/lib/idem.js:124",
-        "aantal": 2,
-        "stack": [
-          "server/kern/bank/incasso.js:35",
-          "server/lib/idem.js:124",
-          "server/db/bijeen.js:104",
-          "server/lib/idem.js:144"
-        ],
-        "kernbak": false
-      },
-      {
         "collectie": "socialeAfdrachten",
         "door": "server/kern/commercie/allocatie.js:97",
         "aantal": 2,
@@ -780,6 +792,18 @@
         "kernbak": false
       },
       {
+        "collectie": "payVerzoeken",
+        "door": "server/lib/idem.js:124",
+        "aantal": 2,
+        "stack": [
+          "server/kern/pay/verzoeken.js:93",
+          "server/lib/idem.js:124",
+          "server/db/bijeen.js:104",
+          "server/lib/idem.js:144"
+        ],
+        "kernbak": false
+      },
+      {
         "collectie": "posSales",
         "door": "server/routes/supplier/kassa/verkoop.js:109",
         "aantal": 1,
@@ -800,18 +824,6 @@
           "server/lib/idem.js:124",
           "server/db/bijeen.js:104",
           "server/lib/idem.js:144"
-        ],
-        "kernbak": false
-      },
-      {
-        "collectie": "waardePosities",
-        "door": "server/kern/waarde/terugname.js:35",
-        "aantal": 1,
-        "stack": [
-          "server/kern/waarde/terugname.js:35",
-          "server/kern/pay/budget.js:60",
-          "server/lib/idem.js:124",
-          "server/db/bijeen.js:104"
         ],
         "kernbak": false
       },
@@ -848,6 +860,17 @@
           "server/kern/labfonds.js:118",
           "server/kern/geldgraaf/bronnen.js:116",
           "server/kern/geldgraaf/bronnen.js:194"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "betaalVerzoeken",
+        "door": "server/db/tx/index.js:99",
+        "aantal": 1,
+        "stack": [
+          "server/db/tx/index.js:99",
+          "server/db/tx/namen.js:51",
+          "test/txgeld.test.js:142"
         ],
         "kernbak": false
       },
@@ -1020,17 +1043,6 @@
         "kernbak": false
       },
       {
-        "collectie": "betaalVerzoeken",
-        "door": "server/db/tx/index.js:99",
-        "aantal": 1,
-        "stack": [
-          "server/db/tx/index.js:99",
-          "server/db/tx/namen.js:51",
-          "test/txgeld.test.js:142"
-        ],
-        "kernbak": false
-      },
-      {
         "collectie": "bankregie",
         "door": "server/kern/bankregie/index.js:110",
         "aantal": 1,
@@ -1089,18 +1101,6 @@
           "server/routes/kantoren/bank-bevoegd.js:47"
         ],
         "kernbak": false
-      },
-      {
-        "collectie": "bankPassen",
-        "door": "server/lib/idem.js:124",
-        "aantal": 1,
-        "stack": [
-          "server/kern/bank/passen.js:44",
-          "server/lib/idem.js:124",
-          "server/db/bijeen.js:104",
-          "server/lib/idem.js:144"
-        ],
-        "kernbak": false
       }
     ],
     "perCollectie": {
@@ -1140,17 +1140,17 @@
         "poorten": {}
       },
       "payBoekingen": {
-        "beheerst": 396,
+        "beheerst": 550,
         "buitenKern": 0,
         "uitgezonderd": 10,
         "container": 0,
         "poorten": {
-          "pay": 396
+          "pay": 550
         }
       },
       "waardePosities": {
         "beheerst": 8,
-        "buitenKern": 4,
+        "buitenKern": 3,
         "uitgezonderd": 0,
         "container": 0,
         "poorten": {
@@ -1158,56 +1158,56 @@
         }
       },
       "paySaldi": {
-        "beheerst": 124,
+        "beheerst": 140,
         "buitenKern": 0,
         "uitgezonderd": 0,
         "container": 0,
         "poorten": {
-          "pay": 124
+          "pay": 140
         }
       },
-      "payVerzoeken": {
+      "payCodes": {
         "beheerst": 0,
-        "buitenKern": 2,
+        "buitenKern": 71,
         "uitgezonderd": 0,
-        "container": 1,
+        "container": 4,
         "poorten": {}
-      },
-      "geldbeleid": {
-        "beheerst": 7,
-        "buitenKern": 8,
-        "uitgezonderd": 0,
-        "container": 1,
-        "poorten": {
-          "pay": 7
-        }
       },
       "waardeOormerken": {
         "beheerst": 0,
         "buitenKern": 0,
         "uitgezonderd": 0,
-        "container": 7,
+        "container": 6,
         "poorten": {}
       },
-      "payCodes": {
-        "beheerst": 0,
-        "buitenKern": 37,
+      "geldbeleid": {
+        "beheerst": 6,
+        "buitenKern": 7,
         "uitgezonderd": 0,
-        "container": 5,
-        "poorten": {}
+        "container": 1,
+        "poorten": {
+          "pay": 6
+        }
       },
       "payTreasury": {
         "beheerst": 0,
         "buitenKern": 0,
         "uitgezonderd": 0,
-        "container": 4,
+        "container": 3,
         "poorten": {}
       },
       "bankRekeningen": {
         "beheerst": 0,
-        "buitenKern": 16,
+        "buitenKern": 18,
         "uitgezonderd": 0,
         "container": 1,
+        "poorten": {}
+      },
+      "payVerzoeken": {
+        "beheerst": 0,
+        "buitenKern": 4,
+        "uitgezonderd": 0,
+        "container": 2,
         "poorten": {}
       },
       "facturen": {
@@ -1219,7 +1219,7 @@
       },
       "payTikCodes": {
         "beheerst": 0,
-        "buitenKern": 2,
+        "buitenKern": 20,
         "uitgezonderd": 0,
         "container": 1,
         "poorten": {}
@@ -1238,6 +1238,24 @@
         "container": 1,
         "poorten": {}
       },
+      "bankSaldi": {
+        "beheerst": 82,
+        "buitenKern": 0,
+        "uitgezonderd": 0,
+        "container": 4,
+        "poorten": {
+          "bank": 82
+        }
+      },
+      "bankBoekingen": {
+        "beheerst": 903,
+        "buitenKern": 0,
+        "uitgezonderd": 0,
+        "container": 3,
+        "poorten": {
+          "bank": 903
+        }
+      },
       "payTegoed": {
         "beheerst": 0,
         "buitenKern": 5,
@@ -1245,34 +1263,16 @@
         "container": 1,
         "poorten": {}
       },
-      "bankSaldi": {
-        "beheerst": 80,
-        "buitenKern": 0,
-        "uitgezonderd": 0,
-        "container": 4,
-        "poorten": {
-          "bank": 80
-        }
-      },
-      "bankBoekingen": {
-        "beheerst": 861,
-        "buitenKern": 0,
-        "uitgezonderd": 0,
-        "container": 3,
-        "poorten": {
-          "bank": 861
-        }
-      },
       "bankPassen": {
         "beheerst": 0,
-        "buitenKern": 2,
+        "buitenKern": 4,
         "uitgezonderd": 0,
         "container": 1,
         "poorten": {}
       },
       "bankTerugkerend": {
         "beheerst": 0,
-        "buitenKern": 2,
+        "buitenKern": 9,
         "uitgezonderd": 0,
         "container": 1,
         "poorten": {}
@@ -1296,10 +1296,10 @@
     "processen": 15,
     "klachten": [],
     "uitgezonderd": 20,
-    "container": 75,
+    "container": 73,
     "perPoort": {
-      "pay": 535,
-      "bank": 941
+      "pay": 704,
+      "bank": 985
     },
     "containerSchrijvers": [
       {
@@ -1329,25 +1329,19 @@
       {
         "collectie": "waardeOormerken",
         "door": "server/kern/eigencollectie.js:108",
-        "aantal": 7,
+        "aantal": 6,
         "kernbak": false
       },
       {
         "collectie": "payCodes",
         "door": "server/routes/pay-tegoed.js:64",
-        "aantal": 5,
+        "aantal": 4,
         "kernbak": false
       },
       {
         "collectie": "payTreasury",
         "door": "server/lib/idem.js:124",
-        "aantal": 4,
-        "kernbak": false
-      },
-      {
-        "collectie": "payVerzoeken",
-        "door": "server/lib/idem.js:100",
-        "aantal": 1,
+        "aantal": 3,
         "kernbak": false
       },
       {
@@ -1357,8 +1351,8 @@
         "kernbak": false
       },
       {
-        "collectie": "geldbeleid",
-        "door": "server/kern/eigencollectie.js:108",
+        "collectie": "payVerzoeken",
+        "door": "server/lib/idem.js:100",
         "aantal": 1,
         "kernbak": false
       },
@@ -1381,6 +1375,12 @@
         "kernbak": false
       },
       {
+        "collectie": "geldbeleid",
+        "door": "server/kern/eigencollectie.js:108",
+        "aantal": 1,
+        "kernbak": false
+      },
+      {
         "collectie": "labFonds",
         "door": "server/kern/eigencollectie.js:108",
         "aantal": 1,
@@ -1393,16 +1393,16 @@
         "kernbak": false
       },
       {
-        "collectie": "payTegoed",
-        "door": "server/lib/idem.js:124",
-        "aantal": 1,
-        "kernbak": false
-      },
-      {
         "collectie": "bankSaldi",
         "door": "server/lib/idem.js:124",
         "aantal": 1,
         "kernbak": true
+      },
+      {
+        "collectie": "payTegoed",
+        "door": "server/lib/idem.js:124",
+        "aantal": 1,
+        "kernbak": false
       },
       {
         "collectie": "bankPassen",
@@ -1457,6 +1457,12 @@
         "door": "server/db/collectie-publicatie.js:91",
         "aantal": 1,
         "kernbak": true
+      },
+      {
+        "collectie": "payVerzoeken",
+        "door": "server/lib/idem.js:124",
+        "aantal": 1,
+        "kernbak": false
       }
     ],
     "verkeerdePoort": []

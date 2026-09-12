@@ -216,6 +216,19 @@ const REGISTERS = [
   ['HERSTELPROEF.json', 'npm run herstelproef', 'of de tegenhanger werkelijk ongedaan maakt wat de heenweg deed'],
   ['DROOGLOOP.json', 'npm run droogloop', 'een plan werkelijk laten lopen, maar nergens waar het telt'],
   ['ONDERZOEKSKETEN.json', 'npm run onderzoeksketen', 'welke stations van het onderzoek van elkaar weten'],
+  /* DE GELDKAART MELDT EN IS GEEN POORT, en dat is tegen de intuitie: hij gaat
+     over geld, en de kolom GELD bestaat juist daarvoor. De grond is mechanisch
+     en staat hierboven bij BEPROEVING en SABOTAGE -- alleen de registers die
+     `npm run meetronde` in DEZELFDE job vers maakt mogen een poort zijn. Deze
+     komt uit `npm run geldkaart`, die daar niet in zit en die veertien
+     toetsbestanden aandrijft; als poort zou hij rood staan zodra iemand een
+     regel code wijzigt, en een poort die per constructie rood staat wordt binnen
+     twee weken uitgezet -- en neemt dan de vier mee die wel werken.
+
+     Wat de HARDE kant van deze meting bewaakt, hangt niet hier maar in
+     test/geldkaart.test.js: geen kernbak buiten zijn eigen poort. Dat is een nul
+     die nul moet blijven en die zakt gewoon, ook als dit register oud is. */
+  ['GELDKAART.json', 'npm run geldkaart', 'of elke waardemutatie door haar eigen poort ging (RTG Pay en RTG Bank)'],
 
   /* DE BEWIJSLADDER (KEURING.md par. 7): welke soorten bewijs dit huis levert,
      waar ze draaien en wat ze achterlaten. Hij hoort hier omdat hij veroudert

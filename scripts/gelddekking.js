@@ -253,7 +253,8 @@ function bouw({ kaart, contract, herstelproef, herstelbesluit, padproef }) {
       if (r.herstelKlasse === 'NOT_APPLICABLE') return 'NOT_APPLICABLE';
       if (r.herstelKlasse === 'FINAL') return 'NOT_APPLICABLE';
       if (r.herstelBewijs === 'BLOCKED') return 'BLOCKED';
-      return 'PROVEN';
+      if (r.herstelBewijs === 'uitgevoerd' || r.herstelBewijs === 'PROVEN') return 'PROVEN';
+      return 'UNKNOWN';
     })
   };
 

@@ -421,8 +421,9 @@ function terugweg(uit) {
     const b = require('../HERSTELBESLUIT.json');
     besluit = (b.routes && (b.routes['POST ' + ROUTE_PAD] || b.routes[ROUTE_PAD])) || null;
   } catch (e) { besluit = null; }
-  const stand = !besluit ? 'UNKNOWN'
-    : (besluit.bewijs && besluit.bewijs.stand === 'BLOCKED') ? 'BLOCKED' : 'PROVEN';
+  // Deze stap voert geen compensatie uit. Ook een gewijzigde verklaring kan
+  // daarom nooit bewijs uit deze proef opleveren.
+  const stand = !besluit ? 'UNKNOWN' : 'BLOCKED';
   uit.stappen.push(uitslag(stap(7, 'de terugweg: is deze betaling terug te draaien of te compenseren'),
     stand,
     !besluit ? 'er is geen verklaring voor dit pad in HERSTELBESLUIT.json'

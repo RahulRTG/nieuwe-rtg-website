@@ -62,7 +62,7 @@ function weeg(perGrens) {
   const alle = Object.keys(GRENZEN);
   const bewezen = alle.filter(g => perGrens[g] === 'PROVEN');
   const gezakt = alle.filter(g => perGrens[g] === 'FAILED');
-  const open = alle.filter(g => !perGrens[g] || perGrens[g] === 'UNKNOWN');
+  const open = alle.filter(g => perGrens[g] !== 'PROVEN' && perGrens[g] !== 'FAILED');
   const stand = gezakt.length ? 'FAILED'
     : bewezen.length === 0 ? 'UNKNOWN'
       : open.length === 0 ? 'PROVEN' : 'PROVEN_PARTIAL';

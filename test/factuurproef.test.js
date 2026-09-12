@@ -13,6 +13,18 @@ const test = require('node:test');
 const assert = require('node:assert');
 const fp = require('../scripts/factuurproef.js');
 
+test('een verklaard herstelbewijs vervangt geen uitgevoerde compensatieproef', () => {
+  const besluit = require('../HERSTELBESLUIT.json');
+  const route = besluit.routes['POST /api/pay/saldo'];
+  const bewaard = route.bewijs;
+  try {
+    route.bewijs = { stand: 'uitgevoerd' };
+    const uit = { stappen: [] };
+    fp.terugweg(uit);
+    assert.equal(uit.stappen[0].stand, 'BLOCKED');
+  } finally { route.bewijs = bewaard; }
+});
+
 const beeld = (zout, bakken) => ({ zoutId: zout, collecties: bakken });
 const bak = (n, h) => ({ n, h });
 

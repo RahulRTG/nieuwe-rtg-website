@@ -419,6 +419,15 @@ test('een verklaarde stand MET bewijs telt wel als PROVEN', () => {
   assert.equal(r.assen.correctiemodel.telling.PROVEN, 1);
 });
 
+test('ontbrekend of onbekend correctiebewijs levert geen PROVEN op', () => {
+  const { bouw } = require('../scripts/gelddekking.js');
+  for (const bewijs of [undefined, {}, { stand: 'UNKNOWN' }, { stand: 'onbekend' }]) {
+    const r = bouw(wereldH({ 'POST /api/h': { stand: 'COMPENSATABLE', bewijs } }));
+    assert.equal(r.assen.correctiemodel.telling.PROVEN, 0);
+    assert.equal(r.assen.correctiemodel.telling.UNKNOWN, 1);
+  }
+});
+
 /* FINAL is een BESLUIT en geen tekort: daar valt niets uit te voeren, dus ook
    niets te bewijzen. Hem als UNKNOWN of BLOCKED tellen zou een beantwoorde
    vraag als een gat laten lezen -- dezelfde fout die de idempotentie-as met

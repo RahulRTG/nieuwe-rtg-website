@@ -10,6 +10,16 @@ const test = require('node:test');
 const assert = require('node:assert');
 const tax = require('../scripts/lib/crashtaxonomie.js');
 
+test('geblokkeerde en onbekende bewijswoorden blijven open crashgrenzen', () => {
+  for (const stand of ['BLOCKED', 'NOT_APPLICABLE', 'onbekend']) {
+    const grenzen = Object.fromEntries(Object.keys(tax.GRENZEN).map(g => [g, stand]));
+    grenzen['na-commit-voor-antwoord'] = 'PROVEN';
+    const u = tax.weeg(grenzen);
+    assert.equal(u.stand, 'PROVEN_PARTIAL');
+    assert.equal(u.open.length, 5);
+  }
+});
+
 test('een enkele bewezen grens is PROVEN_PARTIAL en nooit PROVEN', () => {
   const u = tax.weeg({ 'na-commit-voor-antwoord': 'PROVEN' });
   assert.equal(u.stand, 'PROVEN_PARTIAL');

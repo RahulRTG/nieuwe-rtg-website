@@ -156,6 +156,32 @@ test('8. een kijkvraag laat EXECUTED op OVERGESLAGEN', async () => {
   assert.equal(geroepen.length, 0, 'er is een echte API-aanroep gedaan');
 });
 
+test('een geweigerde of onbevestigde aanroep is geen uitvoering', async () => {
+  /* De echte lus krijgt verschillende antwoorden van dezelfde aanroep.
+     De oude niet-428-regel maakt 403, 409 en 503 hier ten onrechte PASS. */
+  for (const [antwoord, verwacht] of [
+    [{ status: 200 }, 'PASS'], [{ status: 201 }, 'PASS'], [{ status: 204 }, 'PASS'],
+    [{ status: 403 }, 'NOT_RUN'], [{ status: 409 }, 'NOT_RUN'],
+    [{ status: 503 }, 'NOT_RUN'], [{ status: 428 }, 'NOT_RUN'],
+    [{ status: 428, bevestigNodig: true }, 'NOT_RUN'],
+    [{ status: 200, bevestigNodig: true }, 'NOT_RUN'],
+    [{}, 'NOT_RUN'], [{ status: '200' }, 'NOT_RUN']
+  ]) {
+    let aanroepen = 0;
+    const { lus } = maakLus({
+      anthropic: maakCorpusRail({ corpus: { 'controleer mijn agenda': {
+        stappen: [{ tools: [{ name: 'doe', input: { pad: '/api/agenda/mijn',
+          zeker: true, begrepen: 'de eigen agenda lezen', body: {} } }] }],
+        projectie: 'De aanroep is afgehandeld.'
+      } } }),
+      stuurRoep: async () => { aanroepen++; return antwoord; }
+    });
+    const uit = await lus(NEPREQ, { vraag: 'controleer mijn agenda', wereld: 'member' });
+    assert.equal(aanroepen, 1, 'het antwoord moet uit een werkelijk doorlopen aanroep komen');
+    assert.equal(uit.spoor.perFase.EXECUTED.stand, verwacht, JSON.stringify(antwoord));
+  }
+});
+
 test('9. de mandaatgrendel wordt gemeten waar hij WEEGT', async () => {
   /* Niet waar de trede wordt gekozen maar waar hij de padenlijst versmalt.
      Zonder filter is er niets gewogen, en dan is NOT_RUN de eerlijke stand --

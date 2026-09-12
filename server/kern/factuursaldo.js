@@ -18,8 +18,32 @@
 
    De betaalkern wordt pas na deze module gebouwd (kernlaag), vandaar payVan
    als late binding -- hetzelfde draadje als payOplaadAfronden in de
-   settlement. */
-function maakFactuurSaldo({ db, accounts, settleFactuur, payVan, broadcastSync }) {
+   settlement.
+
+   EEN DUURZAME COMMIT VOOR ALLEBEI, EN WAAROM DAT HIER MOEST.
+
+   Dit waren twee duurzame momenten: pay.huisIn legde boeking en idem-sleutel
+   vast, en settleFactuur sloot daarna de factuur en boekte de afdracht. Tussen
+   die twee zat een venster, en `npm run factuurproef` mat wat daarin gebeurt
+   als het proces sterft (RTG_VERRAAD=sterf-na-commit, drie rondes, identieke
+   uitslag): het saldo is afgeschreven, de factuur staat NOG OPEN en er is geen
+   afdracht. Het lid heeft betaald voor niets.
+
+   Dat geneest bij elke herhaling -- de sleutel overleefde, dus huisIn geeft
+   dezelfde boeking terug en de afwikkeling loopt alsnog -- maar er is geen
+   herstelronde die halve betalingen opruimt. Blijft de herhaling uit, dan
+   blijft het staan.
+
+   Nu opent deze module de bundel en doet pay.huisIn erin mee -- db/bijeen.js
+   sluit sinds dezelfde ronde aan op een openstaande bundel die dezelfde
+   belofte doet. Er is daarmee nog een duurzame commit en geen twee, dus de
+   uitkomst is heel: of het hele geldpad staat op schijf, of niets ervan.
+
+   Dit is de spiegel van de fout die GELDLAT.md in augustus weerlegde -- toen
+   verdween het geld en klopte het grootboek, nu stond het geld vast en was de
+   tegenprestatie zoek. Dezelfde oorzaak: twee dingen die bij elkaar horen in
+   twee commits. */
+function maakFactuurSaldo({ db, accounts, settleFactuur, payVan, broadcastSync, bijeen }) {
   const bezig = new Set();
 
   async function factuurSaldo({ own, accountId, wie, tier, codenaam, invoiceId }) {
@@ -44,17 +68,46 @@ function maakFactuurSaldo({ db, accounts, settleFactuur, payVan, broadcastSync }
     if (bezig.has(slot)) return { status: 409, error: 'Deze betaling loopt al.' };
     bezig.add(slot);
     try {
-      const b = await pay.huisIn({
-        vanCodenaam: codenaam, centen,
-        oms: 'RTG factuur ' + inv.id,
-        idem: wie + ':inv-saldo:' + inv.id
-      });
-      if (b.error) return b;
-      await settleFactuur(
-        { soort: 'factuur', wie, invoiceId: inv.id, own, accountId },
-        { id: 'pay:' + b.boeking, centen: b.centen, hoe: 'Betaald uit RTG Pay-saldo' });
+      /* HET GELDPAD, IN EEN BUNDEL. `werk` staat los zodat de bundel er
+         omheen kan en de code er zonder bundel exact hetzelfde uitziet --
+         zonder `bijeen` gedraagt deze module zich als voorheen, en dat is
+         geen vrijblijvendheid maar de reden dat de toetsen die hem los
+         bouwen niet hoeven te weten wat een bundel is.
+
+         De SEINTJES staan er bewust BUITEN (zie hieronder): een uitgaand
+         bericht binnen een bundel vertelt iemand iets dat de opslag nog niet
+         heeft bevestigd. */
+      let uit = null;
+      const werk = async () => {
+        const b = await pay.huisIn({
+          vanCodenaam: codenaam, centen,
+          oms: 'RTG factuur ' + inv.id,
+          idem: wie + ':inv-saldo:' + inv.id
+        });
+        if (b.error) { uit = b; return; }
+        const s = await settleFactuur(
+          { soort: 'factuur', wie, invoiceId: inv.id, own, accountId },
+          { id: 'pay:' + b.boeking, centen: b.centen, hoe: 'Betaald uit RTG Pay-saldo' });
+        /* EEN MISLUKTE AFWIKKELING MAG DE BUNDEL NIET LATEN SLAGEN. Gaf
+           settleFactuur een fout, dan hoort de afschrijving er ook niet te
+           staan -- dat is precies de halve uitkomst waar deze bundel voor is.
+           De worp gaat omhoog en de bundel committeert niets. */
+        if (s && s.error) { uit = s; throw new Error('[factuursaldo] afwikkeling mislukt: ' + s.error); }
+        uit = { ok: true, betaald: b.centen, bijgeladen: b.bijgeladen || 0 };
+      };
+      if (typeof bijeen === 'function') {
+        try { await bijeen(werk, { duurzaam: true }); }
+        catch (e) {
+          /* De bundel wierp: of de afwikkeling hierboven, of de opslag die de
+             commit niet kon bevestigen. In allebei de gevallen is er NIETS
+             vastgelegd, en een 200 zou daarover liegen. */
+          return uit && uit.error ? uit
+            : { status: 503, error: 'De betaling kon niet worden vastgelegd; er is niets afgeschreven.' };
+        }
+      } else await werk();
+      if (uit && uit.error) return uit;
       if (broadcastSync && tier) broadcastSync([tier], 'payments');
-      return { ok: true, betaald: b.centen, bijgeladen: b.bijgeladen || 0 };
+      return uit;
     } finally { bezig.delete(slot); }
   }
 

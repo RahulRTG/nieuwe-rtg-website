@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-11T21:03:33.053Z",
-    "commit": "9e6d605f4",
+    "op": "2026-09-12T17:51:31.137Z",
+    "commit": "64d170b8",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2404,6 +2404,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "factuurproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/factuurproef.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
     "factuursaldo.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2763,6 +2771,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "gelddekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/gelddekking.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "geldgraaf.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2776,6 +2792,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "geldkaart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/geldwacht.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "geldregie.test.js": {
       "soort": "server",
@@ -3503,6 +3527,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "idembundel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/bijeen.js",
+      "operator": "true->false#0",
+      "gezakt": 3,
+      "geprobeerd": 7
     },
     "idemproef.test.js": {
       "soort": "puur",

@@ -103,3 +103,6 @@ dump.rdb
 .cilokaal
 # werkbomen van Claude Code-agenten: een volledige kopie van de bron die nooit mee hoort
 .claude/worktrees/
+
+# de ruwe waarnemingen van scripts/lib/geldwacht.js (GELDKAART.json is de uitslag)
+.geldwacht.jsonl

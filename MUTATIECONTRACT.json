@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-11T20:43:02.412Z",
-  "commit": "7f0359591",
+  "op": "2026-09-12T17:51:30.841Z",
+  "commit": "64d170b8",
   "boomVuil": false,
-  "boomAnders": 4,
+  "boomAnders": 3,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
@@ -13,13 +13,13 @@
   "totaal": 4922,
   "geclassificeerd": 4922,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3251,
-   "NOT_APPLICABLE": 1147,
-   "PROTECTED": 400,
-   "INTENTIONALLY_NON_IDEMPOTENT": 124
+   "BLOCKED_BY_TEST_FIXTURE": 3242,
+   "NOT_APPLICABLE": 1150,
+   "PROTECTED": 405,
+   "INTENTIONALLY_NON_IDEMPOTENT": 125
   },
-  "vastgesteldDoorMens": 1715,
-  "afgeleidDoorScript": 3207,
+  "vastgesteldDoorMens": 1730,
+  "afgeleidDoorScript": 3192,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4061,
    "PUBLIC": 123,
@@ -3912,7 +3912,7 @@
    "mutatieId": "bank.pas.betaal",
    "route": "POST /api/bank/pas/betaal",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -3931,7 +3931,7 @@
     "hindernis": "Onvoldoende saldo of rood-staan-ruimte."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -3939,7 +3939,7 @@
    "mutatieId": "bank.pas.bevries",
    "route": "POST /api/bank/pas/bevries",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -3957,8 +3957,8 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -3966,7 +3966,7 @@
    "mutatieId": "bank.pas.limiet",
    "route": "POST /api/bank/pas/limiet",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -3984,8 +3984,8 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -3993,7 +3993,7 @@
    "mutatieId": "bank.pas.sluit",
    "route": "POST /api/bank/pas/sluit",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -4012,7 +4012,7 @@
     "hindernis": "De pas bestaat niet."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -4206,10 +4206,10 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "bank.spaardoel",
+   "mutatieId": "bank.spaardoel.zet",
    "route": "POST /api/bank/spaardoel",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -4227,8 +4227,8 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -8164,10 +8164,10 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "boardroom.betalingen.proef",
+   "mutatieId": "betaalregie.proef",
    "route": "POST /api/boardroom/betalingen/proef",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "nietHerhaalbaar"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -8185,8 +8185,8 @@
     "grond": null,
     "hindernis": "Onbekende betaalprovider."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -27323,7 +27323,7 @@
    "mutatieId": "geld.beleid.weg",
    "route": "POST /api/geld/beleid/weg",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -27342,7 +27342,7 @@
     "hindernis": "Deze regel bestaat niet."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -31572,7 +31572,7 @@
    "mutatieId": "kosten.vooruitblik",
    "route": "POST /api/kosten/vooruitblik",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": "leest",
    "toegang": {
@@ -31590,8 +31590,8 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -74073,10 +74073,10 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "pay.saldo",
+   "mutatieId": "pay.factuur.saldo",
    "route": "POST /api/pay/saldo",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -74094,8 +74094,8 @@
     "grond": null,
     "hindernis": "Deze factuur is al betaald."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -74427,7 +74427,7 @@
    "mutatieId": "pay.verzoek.intrek",
    "route": "POST /api/pay/verzoek/intrek",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -74446,7 +74446,7 @@
     "hindernis": "Dit verzoek is al afgehandeld."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -100461,10 +100461,10 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "supplier.facturen.maak",
+   "mutatieId": "facturatie.maak",
    "route": "POST /api/supplier/facturen/maak",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "compenseerbaar"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -100482,8 +100482,8 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -100515,10 +100515,10 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "supplier.facturen.pdf",
+   "mutatieId": "facturatie.pdf",
    "route": "POST /api/supplier/facturen/pdf",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -100536,8 +100536,8 @@
     "grond": null,
     "hindernis": "Factuur niet gevonden."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -111139,10 +111139,10 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "supplier.oog.overzicht",
+   "mutatieId": "oog.overzicht",
    "route": "POST /api/supplier/oog/overzicht",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -111160,8 +111160,8 @@
     "grond": null,
     "hindernis": "Deze functie is voor dit genre zaken uitgeschakeld door RTG."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -112138,10 +112138,10 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "supplier.pay.treasury.apart",
+   "mutatieId": "pay.treasury.apart",
    "route": "POST /api/supplier/pay/treasury/apart",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "compenseerbaar"
    },
    "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
@@ -112160,7 +112160,7 @@
     "hindernis": "Er is niet genoeg saldo om dit apart te zetten."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -113083,10 +113083,10 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "supplier.pos.checkout",
+   "mutatieId": "kassa.checkout",
    "route": "POST /api/supplier/pos/checkout",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -113105,7 +113105,7 @@
     "hindernis": "Geen open rekening voor deze kamer of tafel."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

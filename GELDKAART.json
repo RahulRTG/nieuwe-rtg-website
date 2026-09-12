@@ -1,0 +1,1486 @@
+{
+  "soort": "meting",
+  "uitleg": "De geldkaart: welke wegen waarde bewegen (As 1, structureel uit IDEMPROEF.json x effectcollecties.js) en of elke beweging door de waardepoort ging (As 2, dynamisch gemeten met scripts/lib/geldwacht.js).",
+  "stempel": {
+    "op": "2026-09-12T17:51:26.057Z",
+    "commit": "64d170b8",
+    "boomVuil": false,
+    "boomAnders": 1,
+    "instrument": "scripts/geldkaart.js",
+    "node": "v22.22.2"
+  },
+  "grens": "De twee assen worden NOOIT opgeteld. As 1 telt routes en is een ONDERgrens: alleen routes waar de idempotentieproef langskwam hebben een gemeten collectie, en een collectie die tussen drie oproepen gelijk bleef geldt als niet geschreven. As 2 telt schrijfacties tijdens een draai en ziet alleen wat er werkelijk is uitgevoerd: nul buiten de poort betekent \"geen gevonden onder de waargenomen schrijfacties\", nooit \"er zijn er geen\". Daarom staat de noemer altijd in de uitslag.",
+  "graad": {
+    "as1": "gemeten",
+    "as2": "gemeten",
+    "toelichting": "As 1 leunt op een gemeten register maar erft zijn plafond; As 2 is een waarneming op de schrijfkant en erft de dekking van de aandrijvende toetsen."
+  },
+  "as1Kaart": {
+    "geldcollecties": 31,
+    "routesMetGemetenOpslag": 4729,
+    "geldroutes": [
+      {
+        "route": "130",
+        "methode": "POST",
+        "pad": "/api/bank/pas/betaal",
+        "rol": "member",
+        "collecties": [
+          "bankPassen"
+        ],
+        "idempotentie": "ongemeten"
+      },
+      {
+        "route": "131",
+        "methode": "POST",
+        "pad": "/api/bank/pas/bevries",
+        "rol": "member",
+        "collecties": [
+          "bankPassen"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "132",
+        "methode": "POST",
+        "pad": "/api/bank/pas/limiet",
+        "rol": "member",
+        "collecties": [
+          "bankPassen"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "133",
+        "methode": "POST",
+        "pad": "/api/bank/pas/sluit",
+        "rol": "member",
+        "collecties": [
+          "bankPassen"
+        ],
+        "idempotentie": "ongemeten"
+      },
+      {
+        "route": "134",
+        "methode": "POST",
+        "pad": "/api/bank/pas/uitgeven",
+        "rol": "member",
+        "collecties": [
+          "bankPassen"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "137",
+        "methode": "POST",
+        "pad": "/api/bank/rekening/open",
+        "rol": "member",
+        "collecties": [
+          "bankRekeningen"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "141",
+        "methode": "POST",
+        "pad": "/api/bank/spaardoel",
+        "rol": "member",
+        "collecties": [
+          "bankRekeningen"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "142",
+        "methode": "POST",
+        "pad": "/api/bank/storten",
+        "rol": "member",
+        "collecties": [
+          "bankBoekingen",
+          "bankSaldi"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "145",
+        "methode": "POST",
+        "pad": "/api/bank/terugkerend/zet",
+        "rol": "member",
+        "collecties": [
+          "bankTerugkerend"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "192",
+        "methode": "POST",
+        "pad": "/api/boardroom/betalingen/proef",
+        "rol": "techniek",
+        "collecties": [
+          "betaalRegie"
+        ],
+        "idempotentie": "ongemeten"
+      },
+      {
+        "route": "583",
+        "methode": "POST",
+        "pad": "/api/geld/beleid/weg",
+        "rol": "member",
+        "collecties": [
+          "geldbeleid"
+        ],
+        "idempotentie": "ongemeten"
+      },
+      {
+        "route": "585",
+        "methode": "POST",
+        "pad": "/api/geld/cockpit",
+        "rol": "member",
+        "collecties": [
+          "labFonds"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "586",
+        "methode": "POST",
+        "pad": "/api/geld/grens",
+        "rol": "member",
+        "collecties": [
+          "geldbeleid"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "601",
+        "methode": "POST",
+        "pad": "/api/gemeente/belasting/mijn",
+        "rol": "member",
+        "collecties": [
+          "gemeenteAanslagen"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "728",
+        "methode": "POST",
+        "pad": "/api/kosten/vooruitblik",
+        "rol": "member",
+        "collecties": [
+          "economie"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "846",
+        "methode": "POST",
+        "pad": "/api/labfonds/locatie/maak",
+        "rol": "member",
+        "collecties": [
+          "labFonds"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "999",
+        "methode": "POST",
+        "pad": "/api/member/ai/tegoed",
+        "rol": "member",
+        "collecties": [
+          "aiTegoed"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "1580",
+        "methode": "POST",
+        "pad": "/api/office/bank/draai",
+        "rol": "boardroom",
+        "collecties": [
+          "bankregie"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "1587",
+        "methode": "POST",
+        "pad": "/api/office/bank/leden",
+        "rol": "office",
+        "collecties": [
+          "bankregie"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "1588",
+        "methode": "POST",
+        "pad": "/api/office/bank/mislukking",
+        "rol": "office",
+        "collecties": [
+          "bankregie"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "1590",
+        "methode": "POST",
+        "pad": "/api/office/bank/nood",
+        "rol": "office",
+        "collecties": [
+          "bankregie"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "1848",
+        "methode": "POST",
+        "pad": "/api/office/rechtsvormwacht",
+        "rol": "office",
+        "collecties": [
+          "aiTegoed"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "2241",
+        "methode": "POST",
+        "pad": "/api/pay/kascode",
+        "rol": "member",
+        "collecties": [
+          "payCodes"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "2242",
+        "methode": "POST",
+        "pad": "/api/pay/oplaad",
+        "rol": "member",
+        "collecties": [
+          "payBoekingen",
+          "paySaldi"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "2246",
+        "methode": "POST",
+        "pad": "/api/pay/saldo",
+        "rol": "member",
+        "collecties": [
+          "fondsAfdrachten",
+          "invoices",
+          "payBoekingen",
+          "paySaldi",
+          "socialeAfdrachten"
+        ],
+        "idempotentie": "ongemeten"
+      },
+      {
+        "route": "2247",
+        "methode": "POST",
+        "pad": "/api/pay/stuur",
+        "rol": "member",
+        "collecties": [
+          "payBoekingen",
+          "paySaldi"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "2249",
+        "methode": "POST",
+        "pad": "/api/pay/tegoed/koop",
+        "rol": "member",
+        "collecties": [
+          "payBoekingen",
+          "paySaldi",
+          "payTegoed"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "2255",
+        "methode": "POST",
+        "pad": "/api/pay/tikcode",
+        "rol": "member",
+        "collecties": [
+          "payTikCodes"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "2257",
+        "methode": "POST",
+        "pad": "/api/pay/verzoek",
+        "rol": "member",
+        "collecties": [
+          "payVerzoeken"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "2258",
+        "methode": "POST",
+        "pad": "/api/pay/verzoek/betaal",
+        "rol": "member",
+        "collecties": [
+          "payBoekingen",
+          "paySaldi",
+          "payVerzoeken"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "2259",
+        "methode": "POST",
+        "pad": "/api/pay/verzoek/intrek",
+        "rol": "member",
+        "collecties": [
+          "payVerzoeken"
+        ],
+        "idempotentie": "ongemeten"
+      },
+      {
+        "route": "2290",
+        "methode": "POST",
+        "pad": "/api/punten",
+        "rol": "member",
+        "collecties": [
+          "punten"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "2828",
+        "methode": "POST",
+        "pad": "/api/supplier/betaalverzoek",
+        "rol": "supplier",
+        "collecties": [
+          "betaalVerzoeken"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "2991",
+        "methode": "POST",
+        "pad": "/api/supplier/facturen/maak",
+        "rol": "supplier",
+        "collecties": [
+          "facturen"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "2993",
+        "methode": "POST",
+        "pad": "/api/supplier/facturen/pdf",
+        "rol": "supplier",
+        "collecties": [
+          "facturen"
+        ],
+        "idempotentie": "ongemeten"
+      },
+      {
+        "route": "3042",
+        "methode": "POST",
+        "pad": "/api/supplier/giftcard/sell",
+        "rol": "supplier",
+        "collecties": [
+          "giftcards"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "3385",
+        "methode": "POST",
+        "pad": "/api/supplier/oog/overzicht",
+        "rol": "supplier",
+        "collecties": [
+          "directOntvangsten"
+        ],
+        "idempotentie": "ongemeten"
+      },
+      {
+        "route": "3422",
+        "methode": "POST",
+        "pad": "/api/supplier/pay/treasury/apart",
+        "rol": "supplier",
+        "collecties": [
+          "waardeOormerken"
+        ],
+        "idempotentie": "ongemeten"
+      },
+      {
+        "route": "3424",
+        "methode": "POST",
+        "pad": "/api/supplier/pay/treasury/zet",
+        "rol": "supplier",
+        "collecties": [
+          "payTreasury"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "3457",
+        "methode": "POST",
+        "pad": "/api/supplier/pos/checkout",
+        "rol": "supplier",
+        "collecties": [
+          "posSales"
+        ],
+        "idempotentie": "ongemeten"
+      },
+      {
+        "route": "3926",
+        "methode": "POST",
+        "pad": "/api/wallet",
+        "rol": "member",
+        "collecties": [
+          "wallet"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "3929",
+        "methode": "POST",
+        "pad": "/api/wallet/voeg",
+        "rol": "member",
+        "collecties": [
+          "wallet"
+        ],
+        "idempotentie": "beschermd"
+      }
+    ],
+    "perCollectie": {
+      "bankPassen": 5,
+      "bankRekeningen": 2,
+      "bankBoekingen": 1,
+      "bankSaldi": 1,
+      "bankTerugkerend": 1,
+      "betaalRegie": 1,
+      "geldbeleid": 2,
+      "labFonds": 2,
+      "gemeenteAanslagen": 1,
+      "economie": 1,
+      "aiTegoed": 2,
+      "bankregie": 4,
+      "payCodes": 1,
+      "payBoekingen": 5,
+      "paySaldi": 5,
+      "fondsAfdrachten": 1,
+      "invoices": 1,
+      "socialeAfdrachten": 1,
+      "payTegoed": 1,
+      "payTikCodes": 1,
+      "payVerzoeken": 3,
+      "punten": 1,
+      "betaalVerzoeken": 1,
+      "facturen": 2,
+      "giftcards": 1,
+      "directOntvangsten": 1,
+      "waardeOormerken": 1,
+      "payTreasury": 1,
+      "posSales": 1,
+      "wallet": 2
+    },
+    "gronden": {
+      "bankSaldi": "het saldo van een rekening",
+      "bankBoekingen": "de boekingen waaruit dat saldo volgt",
+      "bankRekeningen": "het bestaan en de eigenaar van een rekening",
+      "bankPassen": "een betaalmiddel: uitgeven, bevriezen, limiet",
+      "bankTerugkerend": "een opdracht die vanzelf blijft betalen",
+      "bankregie": "de bediening van de bankkant",
+      "paySaldi": "het tegoed in RTG Pay",
+      "payBoekingen": "de grootboekregels van RTG Pay",
+      "payTegoed": "tegoed dat besteed kan worden",
+      "payVerzoeken": "een betaalverzoek dat een ander bereikt",
+      "payTreasury": "de treasury van een ondernemer",
+      "payCodes": "codes waarmee betaald wordt",
+      "payTikCodes": "zelfde reden",
+      "betaalRegie": "de bediening van de betaalproviders",
+      "betaalVerzoeken": "een openstaand betaalverzoek",
+      "directOntvangsten": "geld dat binnenkomt",
+      "waardePosities": "WAARDE.md: een positie IS waarde met een eigenaar",
+      "waardeOormerken": "geld dat apart is gezet, en dat blijft",
+      "giftcards": "inwisselbaar tegoed",
+      "wallet": "de portemonnee zelf",
+      "facturen": "een vordering op iemand",
+      "invoices": "zelfde reden, andere naam",
+      "fondsAfdrachten": "geld dat naar de RTFoundation gaat",
+      "socialeAfdrachten": "zelfde reden",
+      "labFonds": "bijdragen aan het fonds",
+      "posSales": "een afgerekende verkoop",
+      "aiTegoed": "COMMERCIE.md: verbruik boven het tegoed kost geld",
+      "punten": "een spaarwaarde die iets waard is",
+      "economie": "ECONOMIE.md: de doorbelasting tussen de werelden",
+      "geldbeleid": "de eigen geldgrens die betalingen weigert",
+      "gemeenteAanslagen": "een aanslag is een vordering"
+    }
+  },
+  "as2Poort": {
+    "gedraaid": true,
+    "toetsbestanden": 14,
+    "toetsen": {
+      "totaal": 153,
+      "geslaagd": 153,
+      "gezakt": 0
+    },
+    "schrijfacties": 1889,
+    "beheerst": 1575,
+    "buitenKern": 217,
+    "kernBuitenPoort": [],
+    "buiten": [
+      {
+        "collectie": "payCodes",
+        "door": "server/routes/pay-tegoed.js:64",
+        "aantal": 46,
+        "stack": [
+          "server/kern/pay/kassa.js:36",
+          "server/routes/pay-tegoed.js:64",
+          "server/lib/foutisolatie.js:45",
+          "server/web/routing.js:34"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "betaalVerzoeken",
+        "door": "server/db/tx/index.js:82",
+        "aantal": 34,
+        "stack": [
+          "server/db/tx/index.js:82",
+          "server/db/tx/namen.js:51",
+          "test/txgeld.test.js:83"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankRekeningen",
+        "door": "server/lib/idem.js:100",
+        "aantal": 14,
+        "stack": [
+          "server/kern/bank/rekeningen.js:73",
+          "server/lib/idem.js:100",
+          "server/kern/bank/rekeningen.js:65",
+          "server/routes/bank.js:20"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/index.js:84",
+        "aantal": 13,
+        "stack": [
+          "server/kern/bankregie/index.js:84",
+          "server/kern/bankregie/autorisatie.js:61",
+          "server/routes/kantoren/bank.js:58",
+          "server/routes/kantoren/index.js:13"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankTerugkerend",
+        "door": "server/lib/idem.js:124",
+        "aantal": 9,
+        "stack": [
+          "server/kern/bank/incasso.js:35",
+          "server/lib/idem.js:124",
+          "server/db/bijeen.js:104",
+          "server/lib/idem.js:144"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "geldbeleid",
+        "door": "server/kern/geldbeleid/index.js:36",
+        "aantal": 8,
+        "stack": [
+          "server/kern/geldbeleid/index.js:36",
+          "server/kern/eigencollectie.js:109",
+          "server/kern/geldbeleid/index.js:36",
+          "server/kern/geldbeleid/index.js:46"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/autorisatie.js:41",
+        "aantal": 8,
+        "stack": [
+          "server/kern/bankregie/autorisatie.js:41",
+          "server/kern/bankregie/index.js:131",
+          "server/routes/kantoren/bank.js:52",
+          "server/routes/kantoren/index.js:13"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/index.js:88",
+        "aantal": 8,
+        "stack": [
+          "server/kern/bankregie/index.js:88",
+          "server/kern/bankregie/autorisatie.js:61",
+          "server/routes/kantoren/bank.js:58",
+          "server/routes/kantoren/index.js:13"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/autorisatie.js:63",
+        "aantal": 8,
+        "stack": [
+          "server/kern/bankregie/autorisatie.js:63",
+          "server/routes/kantoren/bank.js:58",
+          "server/routes/kantoren/index.js:13",
+          "server/routes/kantoren/bank.js:57"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/vergunning.js:32",
+        "aantal": 6,
+        "stack": [
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48",
+          "server/routes/kantoren/index.js:13",
+          "server/routes/kantoren/bank-bevoegd.js:47"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "payTikCodes",
+        "door": "server/routes/pay-tegoed.js:46",
+        "aantal": 5,
+        "stack": [
+          "server/kern/pay/tik.js:35",
+          "server/routes/pay-tegoed.js:46",
+          "server/lib/foutisolatie.js:45",
+          "server/web/routing.js:34"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "payTegoed",
+        "door": "server/lib/idem.js:124",
+        "aantal": 5,
+        "stack": [
+          "server/kern/pay/tegoed-bon.js:57",
+          "server/kern/pay/tegoed.js:67",
+          "server/lib/idem.js:124",
+          "server/db/bijeen.js:104"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankRekeningen",
+        "door": "server/lib/idem.js:124",
+        "aantal": 4,
+        "stack": [
+          "server/kern/bank/rekeningen.js:73",
+          "server/lib/idem.js:124",
+          "server/db/bijeen.js:104",
+          "server/lib/idem.js:144"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/nood.js:39",
+        "aantal": 3,
+        "stack": [
+          "server/kern/bankregie/nood.js:39",
+          "server/routes/kantoren/bank.js:82",
+          "server/routes/kantoren/index.js:13",
+          "server/routes/kantoren/bank.js:80"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankPassen",
+        "door": "server/lib/idem.js:124",
+        "aantal": 3,
+        "stack": [
+          "server/kern/bank/passen.js:44",
+          "server/lib/idem.js:124",
+          "server/db/bijeen.js:104",
+          "server/lib/idem.js:144"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "waardePosities",
+        "door": "server/kern/waarde/index.js:112",
+        "aantal": 3,
+        "stack": [
+          "server/kern/waarde/index.js:112",
+          "server/kern/waarde/uitgifte.js:64",
+          "server/kern/pay/budget.js:51",
+          "server/lib/idem.js:124"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/nood.js:17",
+        "aantal": 2,
+        "stack": [
+          "server/kern/bankregie/nood.js:17",
+          "server/routes/kantoren/bank.js:76",
+          "server/routes/kantoren/index.js:13",
+          "server/routes/kantoren/bank.js:75"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/nood.js:18",
+        "aantal": 2,
+        "stack": [
+          "server/kern/bankregie/nood.js:18",
+          "server/routes/kantoren/bank.js:76",
+          "server/routes/kantoren/index.js:13",
+          "server/routes/kantoren/bank.js:75"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "socialeAfdrachten",
+        "door": "server/kern/commercie/allocatie.js:97",
+        "aantal": 2,
+        "stack": [
+          "server/kern/commercie/allocatie.js:97",
+          "server/kern/fonds.js:97",
+          "server/db/bijeen.js:104",
+          "server/kern/fonds.js:80"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "fondsAfdrachten",
+        "door": "server/kern/fonds.js:105",
+        "aantal": 2,
+        "stack": [
+          "server/kern/fonds.js:105",
+          "server/db/bijeen.js:104",
+          "server/kern/fonds.js:80",
+          "server/routes/member/betalen.js:71"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "payVerzoeken",
+        "door": "server/lib/idem.js:124",
+        "aantal": 2,
+        "stack": [
+          "server/kern/pay/verzoeken.js:93",
+          "server/lib/idem.js:124",
+          "server/db/bijeen.js:104",
+          "server/lib/idem.js:144"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "payVerzoeken",
+        "door": "server/lib/idem.js:100",
+        "aantal": 2,
+        "stack": [
+          "server/kern/pay/verzoeken.js:93",
+          "server/lib/idem.js:100",
+          "server/kern/pay/verzoeken.js:86",
+          "server/routes/pay.js:69"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "facturen",
+        "door": "server/kern/facturatie/motor.js:101",
+        "aantal": 2,
+        "stack": [
+          "server/kern/facturatie/motor.js:101",
+          "server/kern/facturatie/motor.js:129"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "labFonds",
+        "door": "server/kern/labfonds.js:30",
+        "aantal": 1,
+        "stack": [
+          "server/kern/labfonds.js:30",
+          "server/kern/labfonds.js:118",
+          "server/kern/geldgraaf/bronnen.js:116",
+          "server/kern/geldgraaf/bronnen.js:194"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "labFonds",
+        "door": "server/kern/labfonds.js:31",
+        "aantal": 1,
+        "stack": [
+          "server/kern/labfonds.js:31",
+          "server/kern/labfonds.js:118",
+          "server/kern/geldgraaf/bronnen.js:116",
+          "server/kern/geldgraaf/bronnen.js:194"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "labFonds",
+        "door": "server/kern/labfonds.js:32",
+        "aantal": 1,
+        "stack": [
+          "server/kern/labfonds.js:32",
+          "server/kern/labfonds.js:118",
+          "server/kern/geldgraaf/bronnen.js:116",
+          "server/kern/geldgraaf/bronnen.js:194"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/stand.js:7",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/stand.js:7",
+          "server/kern/bankregie/index.js:33",
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/stand.js:8",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/stand.js:8",
+          "server/kern/bankregie/index.js:33",
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/stand.js:9",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/stand.js:9",
+          "server/kern/bankregie/index.js:33",
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/stand.js:10",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/stand.js:10",
+          "server/kern/bankregie/index.js:33",
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/stand.js:11",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/stand.js:11",
+          "server/kern/bankregie/index.js:33",
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/stand.js:14",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/stand.js:14",
+          "server/kern/bankregie/index.js:33",
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/stand.js:15",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/stand.js:15",
+          "server/kern/bankregie/index.js:33",
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/stand.js:16",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/stand.js:16",
+          "server/kern/bankregie/index.js:33",
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/stand.js:17",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/stand.js:17",
+          "server/kern/bankregie/index.js:33",
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/stand.js:18",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/stand.js:18",
+          "server/kern/bankregie/index.js:33",
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/stand.js:19",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/stand.js:19",
+          "server/kern/bankregie/index.js:33",
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/stand.js:20",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/stand.js:20",
+          "server/kern/bankregie/index.js:33",
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/stand.js:21",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/stand.js:21",
+          "server/kern/bankregie/index.js:33",
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/stand.js:22",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/stand.js:22",
+          "server/kern/bankregie/index.js:33",
+          "server/kern/bankregie/vergunning.js:32",
+          "server/routes/kantoren/bank-bevoegd.js:48"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/index.js:110",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/index.js:110",
+          "server/routes/kantoren/bank.js:89",
+          "server/routes/kantoren/index.js:13",
+          "server/routes/kantoren/bank.js:88"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/nood.js:11",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/nood.js:11",
+          "server/routes/kantoren/bank.js:71",
+          "server/routes/kantoren/index.js:13",
+          "server/routes/kantoren/bank.js:70"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/nood.js:42",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/nood.js:42",
+          "server/routes/kantoren/bank.js:82",
+          "server/routes/kantoren/index.js:13",
+          "server/routes/kantoren/bank.js:80"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankPassen",
+        "door": "server/lib/idem.js:100",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bank/passen.js:44",
+          "server/lib/idem.js:100",
+          "server/kern/bank/passen.js:39",
+          "server/routes/bank.js:40"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/vergunning.js:27",
+        "aantal": 1,
+        "stack": [
+          "server/kern/bankregie/vergunning.js:27",
+          "server/routes/kantoren/bank-bevoegd.js:48",
+          "server/routes/kantoren/index.js:13",
+          "server/routes/kantoren/bank-bevoegd.js:47"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "posSales",
+        "door": "server/routes/supplier/kassa/verkoop.js:109",
+        "aantal": 1,
+        "stack": [
+          "server/routes/supplier/kassa/verkoop.js:109",
+          "server/lib/idem.js:124",
+          "server/db/bijeen.js:104",
+          "server/lib/idem.js:144"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "posSales",
+        "door": "server/routes/supplier/kassa/verkoop.js:111",
+        "aantal": 1,
+        "stack": [
+          "server/routes/supplier/kassa/verkoop.js:111",
+          "server/lib/idem.js:124",
+          "server/db/bijeen.js:104",
+          "server/lib/idem.js:144"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "waardePosities",
+        "door": "server/kern/waarde/terugname.js:35",
+        "aantal": 1,
+        "stack": [
+          "server/kern/waarde/terugname.js:35",
+          "server/kern/pay/budget.js:60",
+          "server/lib/idem.js:124",
+          "server/db/bijeen.js:104"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "betaalVerzoeken",
+        "door": "server/db/tx/index.js:99",
+        "aantal": 1,
+        "stack": [
+          "server/db/tx/index.js:99",
+          "server/db/tx/namen.js:51",
+          "test/txgeld.test.js:142"
+        ],
+        "kernbak": false
+      }
+    ],
+    "perCollectie": {
+      "gemeenteAanslagen": {
+        "beheerst": 0,
+        "buitenKern": 0,
+        "uitgezonderd": 0,
+        "container": 10,
+        "poorten": {}
+      },
+      "punten": {
+        "beheerst": 0,
+        "buitenKern": 0,
+        "uitgezonderd": 0,
+        "container": 10,
+        "poorten": {}
+      },
+      "posSales": {
+        "beheerst": 0,
+        "buitenKern": 2,
+        "uitgezonderd": 0,
+        "container": 10,
+        "poorten": {}
+      },
+      "giftcards": {
+        "beheerst": 0,
+        "buitenKern": 0,
+        "uitgezonderd": 0,
+        "container": 10,
+        "poorten": {}
+      },
+      "betaalVerzoeken": {
+        "beheerst": 0,
+        "buitenKern": 35,
+        "uitgezonderd": 10,
+        "container": 0,
+        "poorten": {}
+      },
+      "payBoekingen": {
+        "beheerst": 445,
+        "buitenKern": 0,
+        "uitgezonderd": 10,
+        "container": 0,
+        "poorten": {
+          "pay": 445
+        }
+      },
+      "bankRekeningen": {
+        "beheerst": 0,
+        "buitenKern": 18,
+        "uitgezonderd": 0,
+        "container": 1,
+        "poorten": {}
+      },
+      "geldbeleid": {
+        "beheerst": 7,
+        "buitenKern": 8,
+        "uitgezonderd": 0,
+        "container": 1,
+        "poorten": {
+          "pay": 7
+        }
+      },
+      "waardePosities": {
+        "beheerst": 8,
+        "buitenKern": 4,
+        "uitgezonderd": 0,
+        "container": 0,
+        "poorten": {
+          "pay": 8
+        }
+      },
+      "paySaldi": {
+        "beheerst": 130,
+        "buitenKern": 0,
+        "uitgezonderd": 0,
+        "container": 0,
+        "poorten": {
+          "pay": 130
+        }
+      },
+      "payCodes": {
+        "beheerst": 0,
+        "buitenKern": 46,
+        "uitgezonderd": 0,
+        "container": 5,
+        "poorten": {}
+      },
+      "waardeOormerken": {
+        "beheerst": 0,
+        "buitenKern": 0,
+        "uitgezonderd": 0,
+        "container": 7,
+        "poorten": {}
+      },
+      "payTreasury": {
+        "beheerst": 0,
+        "buitenKern": 0,
+        "uitgezonderd": 0,
+        "container": 5,
+        "poorten": {}
+      },
+      "labFonds": {
+        "beheerst": 0,
+        "buitenKern": 3,
+        "uitgezonderd": 0,
+        "container": 1,
+        "poorten": {}
+      },
+      "bankregie": {
+        "beheerst": 0,
+        "buitenKern": 68,
+        "uitgezonderd": 0,
+        "container": 1,
+        "poorten": {}
+      },
+      "bankSaldi": {
+        "beheerst": 82,
+        "buitenKern": 0,
+        "uitgezonderd": 0,
+        "container": 4,
+        "poorten": {
+          "bank": 82
+        }
+      },
+      "bankBoekingen": {
+        "beheerst": 903,
+        "buitenKern": 0,
+        "uitgezonderd": 0,
+        "container": 3,
+        "poorten": {
+          "bank": 903
+        }
+      },
+      "bankPassen": {
+        "beheerst": 0,
+        "buitenKern": 4,
+        "uitgezonderd": 0,
+        "container": 1,
+        "poorten": {}
+      },
+      "bankTerugkerend": {
+        "beheerst": 0,
+        "buitenKern": 9,
+        "uitgezonderd": 0,
+        "container": 1,
+        "poorten": {}
+      },
+      "socialeAfdrachten": {
+        "beheerst": 0,
+        "buitenKern": 2,
+        "uitgezonderd": 0,
+        "container": 1,
+        "poorten": {}
+      },
+      "fondsAfdrachten": {
+        "beheerst": 0,
+        "buitenKern": 2,
+        "uitgezonderd": 0,
+        "container": 0,
+        "poorten": {}
+      },
+      "payVerzoeken": {
+        "beheerst": 0,
+        "buitenKern": 4,
+        "uitgezonderd": 0,
+        "container": 2,
+        "poorten": {}
+      },
+      "facturen": {
+        "beheerst": 0,
+        "buitenKern": 2,
+        "uitgezonderd": 0,
+        "container": 2,
+        "poorten": {}
+      },
+      "payTikCodes": {
+        "beheerst": 0,
+        "buitenKern": 5,
+        "uitgezonderd": 0,
+        "container": 1,
+        "poorten": {}
+      },
+      "payTegoed": {
+        "beheerst": 0,
+        "buitenKern": 5,
+        "uitgezonderd": 0,
+        "container": 1,
+        "poorten": {}
+      }
+    },
+    "processen": 15,
+    "klachten": [],
+    "uitgezonderd": 20,
+    "container": 77,
+    "perPoort": {
+      "pay": 590,
+      "bank": 985
+    },
+    "containerSchrijvers": [
+      {
+        "collectie": "gemeenteAanslagen",
+        "door": "server/kern/gemeente/index.js:59",
+        "aantal": 10,
+        "kernbak": false
+      },
+      {
+        "collectie": "punten",
+        "door": "server/kern/initdata/deel1-basis.js:40",
+        "aantal": 10,
+        "kernbak": false
+      },
+      {
+        "collectie": "posSales",
+        "door": "server/kern/initdata/deel1-basis.js:79",
+        "aantal": 10,
+        "kernbak": false
+      },
+      {
+        "collectie": "giftcards",
+        "door": "server/kern/initdata/deel4-genres.js:97",
+        "aantal": 10,
+        "kernbak": false
+      },
+      {
+        "collectie": "waardeOormerken",
+        "door": "server/kern/eigencollectie.js:108",
+        "aantal": 7,
+        "kernbak": false
+      },
+      {
+        "collectie": "payCodes",
+        "door": "server/routes/pay-tegoed.js:64",
+        "aantal": 5,
+        "kernbak": false
+      },
+      {
+        "collectie": "payTreasury",
+        "door": "server/lib/idem.js:124",
+        "aantal": 5,
+        "kernbak": false
+      },
+      {
+        "collectie": "bankRekeningen",
+        "door": "server/routes/bank.js:16",
+        "aantal": 1,
+        "kernbak": false
+      },
+      {
+        "collectie": "geldbeleid",
+        "door": "server/kern/eigencollectie.js:108",
+        "aantal": 1,
+        "kernbak": false
+      },
+      {
+        "collectie": "labFonds",
+        "door": "server/kern/eigencollectie.js:108",
+        "aantal": 1,
+        "kernbak": false
+      },
+      {
+        "collectie": "bankregie",
+        "door": "server/kern/bankregie/index.js:32",
+        "aantal": 1,
+        "kernbak": false
+      },
+      {
+        "collectie": "bankSaldi",
+        "door": "server/lib/idem.js:124",
+        "aantal": 1,
+        "kernbak": true
+      },
+      {
+        "collectie": "bankPassen",
+        "door": "server/routes/bank.js:40",
+        "aantal": 1,
+        "kernbak": false
+      },
+      {
+        "collectie": "bankTerugkerend",
+        "door": "server/lib/idem.js:124",
+        "aantal": 1,
+        "kernbak": false
+      },
+      {
+        "collectie": "socialeAfdrachten",
+        "door": "server/kern/eigencollectie.js:108",
+        "aantal": 1,
+        "kernbak": false
+      },
+      {
+        "collectie": "bankBoekingen",
+        "door": "server/db/economische-boeking-sqlite.js:79",
+        "aantal": 1,
+        "kernbak": true
+      },
+      {
+        "collectie": "bankSaldi",
+        "door": "server/db/economische-boeking-sqlite.js:79",
+        "aantal": 1,
+        "kernbak": true
+      },
+      {
+        "collectie": "bankBoekingen",
+        "door": "server/db/economische-boeking-sqlite.js:82",
+        "aantal": 1,
+        "kernbak": true
+      },
+      {
+        "collectie": "bankSaldi",
+        "door": "server/db/economische-boeking-sqlite.js:82",
+        "aantal": 1,
+        "kernbak": true
+      },
+      {
+        "collectie": "bankBoekingen",
+        "door": "server/db/collectie-publicatie.js:91",
+        "aantal": 1,
+        "kernbak": true
+      },
+      {
+        "collectie": "bankSaldi",
+        "door": "server/db/collectie-publicatie.js:91",
+        "aantal": 1,
+        "kernbak": true
+      },
+      {
+        "collectie": "payVerzoeken",
+        "door": "server/lib/idem.js:124",
+        "aantal": 1,
+        "kernbak": false
+      },
+      {
+        "collectie": "payVerzoeken",
+        "door": "server/lib/idem.js:100",
+        "aantal": 1,
+        "kernbak": false
+      },
+      {
+        "collectie": "facturen",
+        "door": "server/kern/facturatie/motor.js:13",
+        "aantal": 1,
+        "kernbak": false
+      },
+      {
+        "collectie": "facturen",
+        "door": "server/kern/facturatie/motor.js:102",
+        "aantal": 1,
+        "kernbak": false
+      },
+      {
+        "collectie": "payTikCodes",
+        "door": "server/routes/pay-tegoed.js:46",
+        "aantal": 1,
+        "kernbak": false
+      },
+      {
+        "collectie": "payTegoed",
+        "door": "server/lib/idem.js:124",
+        "aantal": 1,
+        "kernbak": false
+      }
+    ],
+    "verkeerdePoort": []
+  },
+  "nietGemeten": {
+    "externeRails": "Geen enkele providersleutel staat gezet, dus betaal.js weigert fail-closed en geen enkel extern betaalpad is in deze meting uitgevoerd.",
+    "reconciliatie": "Er is geen meting van intern grootboek tegen providerstand; die bestaat niet.",
+    "ongedektePaden": "Geldpaden die geen enkele aandrijvende toets aanroept, zijn niet waargenomen."
+  }
+}

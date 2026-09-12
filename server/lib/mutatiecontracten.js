@@ -60,6 +60,13 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-isolatie').CONTRACTEN,
   require('./mutatiecontracten-isolatie-lid').CONTRACTEN,
   require('./mutatiecontracten-samenvoeging').CONTRACTEN,
+  /* De zestien waardebewegende routes die nog op `onbekend` stonden
+     (GELDDEKKING.json). Eigen bestand om dezelfde reden als hierboven, en omdat
+     ze een gedeelde herkomst hebben: ze zijn alle zestien gelezen in een ronde,
+     met de meting ernaast als bevestiging en nooit als reden. */
+  require('./mutatiecontracten-geld').CONTRACTEN,
+  require('./mutatiecontracten-geld-b').CONTRACTEN,
+  require('./mutatiecontracten-geld-lees').CONTRACTEN,
   /* RTG Service: eenentwintig nieuwe schrijfroutes, en dus eenentwintig
      contracten VOORAF -- MUTATIECONTRACT.md verbiedt `onbekend` voor wat nieuw
      publiek aanroepbaar wordt. Eigen bestand om de reden hierboven. */

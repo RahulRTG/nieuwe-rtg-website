@@ -1,0 +1,13 @@
+{
+  "uitleg": "Per waardebewegende route: WAT het correctiemodel is als de handeling fout gaat. Niet 'heeft dit een undo?' maar 'is er een expliciet en bewezen fout-/correctiemodel?'. HERSTELPROEF.json MEET wat er gebeurt als je de tegenhanger uitvoert; dit register VERKLAART wat de bedoeling is. De twee worden nooit samengevoegd -- scripts/gelddekking.js zet ze naast elkaar en meldt het als ze elkaar tegenspreken.",
+  "grens": "EEN STAND WORDT NOOIT AFGELEID UIT BEWIJS (MUTATIECONTRACT.md). Een gemeten 'exact' is een VOORSTEL om REVERSIBLE te verklaren, geen verklaring. Daarom staat `routes` leeg tot een mens hem vult: alles wat hier niet in staat telt als UNKNOWN, en UNKNOWN blijft UNKNOWN tot er een besluit is. Een register dat zichzelf invult op grond van een meting, bewijst alleen dat de meting bestaat.",
+  "klassen": {
+    "REVERSIBLE": "Er bestaat een echte terugweg die de oude toestand herstelt. Een refund op een nog niet afgewikkelde betaling is de schoolvoorbeeld. Te bewijzen met HERSTELPROEF.json: uitslag `exact`.",
+    "COMPENSATABLE": "De handeling is niet terug te draaien, maar wel te CORRIGEREN met een nieuwe, tegengestelde boeking. Een creditnota wist geen factuur -- er komt een regel bij die het saldo goedmaakt. Te bewijzen met HERSTELPROEF.json: uitslag `compensatie`. Let op: `exact` en `compensatie` worden nooit opgeteld, want ze beloven de lezer iets anders.",
+    "FINAL": "Met opzet definitief. Een extern afgewikkelde settlement die juridisch vaststaat kan RTG niet terugdraaien en ook niet zelfstandig compenseren; wie hier een knop belooft, belooft iets wat de buitenwereld niet honoreert. FINAL is een BESLUIT en geen tekort -- maar het vraagt wel dat er ergens anders een pad is waarlangs een mens het rechtzet.",
+    "NOT_APPLICABLE": "De route verplaatst geen waarde die gecorrigeerd zou moeten worden. Denk aan het aanmaken van een code of het vastleggen van een voornemen dat zelf nog geen geld raakt. Dit is de klasse die het makkelijkst verkeerd wordt gebruikt: raakt de route WEL een saldo, dan hoort hij hier niet.",
+    "UNKNOWN": "Hier is nog niet over besloten. Dit is de eerlijke restklasse en de enige die vanzelf ontstaat: elke route die niet in `routes` staat, valt hierop terug. Hij hoort te dalen doordat er besluiten bijkomen, nooit doordat de definitie wordt opgerekt."
+  },
+  "routes": {},
+  "waaromLeeg": "Dit register is vandaag met opzet leeg. De meting (HERSTELPROEF.json) kent over de hele boom 13 paren `exact` en 30 `compensatie`, maar van de 42 waardebewegende routes zijn er 3 met een beproefde tegenhanger. Die drie automatisch verklaren zou de grens hierboven breken en de andere 39 zouden er niet beter van worden. Wie hier een regel bijzet, doet dat als mens en met een grond."
+}

@@ -216,6 +216,42 @@ const REGISTERS = [
   ['HERSTELPROEF.json', 'npm run herstelproef', 'of de tegenhanger werkelijk ongedaan maakt wat de heenweg deed'],
   ['DROOGLOOP.json', 'npm run droogloop', 'een plan werkelijk laten lopen, maar nergens waar het telt'],
   ['ONDERZOEKSKETEN.json', 'npm run onderzoeksketen', 'welke stations van het onderzoek van elkaar weten'],
+  /* DE GELDKAART MELDT EN IS GEEN POORT, en dat is tegen de intuitie: hij gaat
+     over geld, en de kolom GELD bestaat juist daarvoor. De grond is mechanisch
+     en staat hierboven bij BEPROEVING en SABOTAGE -- alleen de registers die
+     `npm run meetronde` in DEZELFDE job vers maakt mogen een poort zijn. Deze
+     komt uit `npm run geldkaart`, die daar niet in zit en die veertien
+     toetsbestanden aandrijft; als poort zou hij rood staan zodra iemand een
+     regel code wijzigt, en een poort die per constructie rood staat wordt binnen
+     twee weken uitgezet -- en neemt dan de vier mee die wel werken.
+
+     Wat de HARDE kant van deze meting bewaakt, hangt niet hier maar in
+     test/geldkaart.test.js: geen kernbak buiten zijn eigen poort. Dat is een nul
+     die nul moet blijven en die zakt gewoon, ook als dit register oud is. */
+  ['GELDKAART.json', 'npm run geldkaart', 'of elke waardemutatie door haar eigen poort ging (RTG Pay en RTG Bank)'],
+  ['GELDDEKKING.json', 'npm run gelddekking', 'wat er van elke waardebewegende route bewezen is'],
+  /* OOK EEN MELDER EN GEEN POORT, om exact dezelfde mechanische grond als de
+     geldkaart hierboven: hij komt niet uit `npm run meetronde`. En er is hier
+     een tweede reden die zwaarder weegt dan de eerste -- deze proef start drie
+     servers, doodt er een met een crashverraad en kost een paar minuten. Een
+     poort die dat bij elke commit afdwingt, staat binnen twee weken uit.
+
+     Wat deze meting HARD maakt, hangt net als bij de geldkaart niet hier maar
+     in een toets: test/factuurproef.test.js bewaakt de regel die bepaalt wat
+     als een economische mutatie telt, en die zakt gewoon. */
+  ['FACTUURPROEF.json', 'npm run factuurproef:vast', 'of een geldpad van begin tot eind heel blijft: tweede aanroep, crash, herhaling'],
+  /* HERSTELBESLUIT.json STAAT HIER BEWUST NIET, en dat is geen vergetelheid.
+     Deze lijst is de INSTRUMENTENlijst: scripts/meetkeuring.js leest hem om te
+     bepalen welk script welk register vult, en eist van elk instrument een
+     stempel. Een met de hand bijgehouden VERKLARING wordt door geen script
+     geschreven; een stempel erop zou beweren dat er gemeten is waar een mens
+     heeft besloten. IDEMBESLUIT.json en ROLLBACKBESLUIT.json staan er om
+     dezelfde reden niet in.
+
+     Zijn veroudering wordt wel bewaakt, maar langs de andere weg: hij hangt in
+     scripts/lib/metingen.js aan geldRoutesHerstelOnbesloten en
+     geldRoutesHerstelTegenspraak. Komt er een geldroute bij waarover niemand
+     iets heeft gezegd, dan stijgt de eerste en zakt de ratel. */
 
   /* DE BEWIJSLADDER (KEURING.md par. 7): welke soorten bewijs dit huis levert,
      waar ze draaien en wat ze achterlaten. Hij hoort hier omdat hij veroudert

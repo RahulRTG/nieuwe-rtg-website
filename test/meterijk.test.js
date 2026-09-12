@@ -1524,6 +1524,63 @@ const IJKINGEN = {
       (j) => { j.gemeten.defecten = (j.gemeten.defecten || 0) + 3; return j; },
       () => norm.meet().appwerktDefecten - voor.appwerktDefecten)
   },
+  /* DE VIER TANDEN VAN 12 SEPTEMBER 2026: de economische dekking
+     (GELDDEKKING.json). Elk van de vier leest EEN veld uit `ratel`, en dat is
+     precies wat hier misgaan kan -- vier meters die naar hetzelfde register
+     kijken, en waarvan er drie stilletjes hetzelfde veld zouden kunnen lezen.
+     Daarom krijgt elke meter zijn EIGEN veld opgehoogd en wordt er gemeten of
+     juist DIE meter meebeweegt: leest er een het verkeerde veld, dan blijft hij
+     staan waar hij stond en zakt deze ijking.
+
+     Ze gaan alle vier OMHOOG in de proef, want dat is de richting die ertoe
+     doet: ze mogen volgens de ratel alleen dalen. */
+  geldRoutesPubliek: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesPubliek = (j.ratel.geldRoutesPubliek || 0) + 2; return j; },
+      () => norm.meet().geldRoutesPubliek - voor.geldRoutesPubliek)
+  },
+  geldRoutesZonderSemantiek: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesZonderSemantiek = (j.ratel.geldRoutesZonderSemantiek || 0) + 3; return j; },
+      () => norm.meet().geldRoutesZonderSemantiek - voor.geldRoutesZonderSemantiek)
+  },
+  geldRoutesZonderIdemBewijs: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesZonderIdemBewijs = (j.ratel.geldRoutesZonderIdemBewijs || 0) + 4; return j; },
+      () => norm.meet().geldRoutesZonderIdemBewijs - voor.geldRoutesZonderIdemBewijs)
+  },
+  geldRoutesZonderTerugweg: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesZonderTerugweg = (j.ratel.geldRoutesZonderTerugweg || 0) + 5; return j; },
+      () => norm.meet().geldRoutesZonderTerugweg - voor.geldRoutesZonderTerugweg)
+  },
+  geldRoutesHerstelOnbesloten: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesHerstelOnbesloten = (j.ratel.geldRoutesHerstelOnbesloten || 0) + 6; return j; },
+      () => norm.meet().geldRoutesHerstelOnbesloten - voor.geldRoutesHerstelOnbesloten)
+  },
+  geldRoutesHerstelTegenspraak: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesHerstelTegenspraak = (j.ratel.geldRoutesHerstelTegenspraak || 0) + 7; return j; },
+      () => norm.meet().geldRoutesHerstelTegenspraak - voor.geldRoutesHerstelTegenspraak)
+  },
+  /* DE TWEE TANDEN VAN DE VERTICALE GELDPROEF (FACTUURPROEF.json). Ze lezen
+     verschillende velden uit dezelfde `telling`, en juist dat is hier de
+     faalvorm: `geldpadOnbewezen` telt BLOCKED plus UNKNOWN, en een versie die
+     er maar een van leest beweegt bij deze ijking niet genoeg mee. Daarom
+     krijgen die twee velden EEN ONGELIJKE ophoging (2 en 3), zodat een meter
+     die er een vergeet een ander getal geeft dan 5 en de ijking zakt. */
+  geldpadGezakt: {
+    proef: (voor) => metVervangenJson('FACTUURPROEF.json',
+      (j) => { j.telling.FAILED = (j.telling.FAILED || 0) + 4; return j; },
+      () => norm.meet().geldpadGezakt - voor.geldpadGezakt)
+  },
+  geldpadOnbewezen: {
+    proef: (voor) => metVervangenJson('FACTUURPROEF.json',
+      (j) => { j.telling.BLOCKED = (j.telling.BLOCKED || 0) + 2;
+        j.telling.UNKNOWN = (j.telling.UNKNOWN || 0) + 3; return j; },
+      () => norm.meet().geldpadOnbewezen - voor.geldpadOnbewezen)
+  },
   /* DE TAND VAN 10 SEPTEMBER 2026: bewijsAlleenKeten telt de bewijsmechanismen
      die alleen in de keten draaien en niet lokaal (BEWIJSLADDER.json). Zelfde
      vorm als de vier hierboven -- hij telt een POST in een register, dus hij

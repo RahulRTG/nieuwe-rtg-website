@@ -194,6 +194,27 @@ const REGISTER = {
   'HERSTEL.json': { eigenRatel: 'test/herstel.test.js' },
   'HERSTELPROEF.json': { eigenRatel: 'test/herstelproef.test.js' },
   'DROOGLOOP.json': { eigenRatel: 'test/droogloop.test.js' },
+  /* De scherpe bewering van de geldkaart is geen getal dat mag dalen maar een NUL
+     die nul moet blijven: geen kernbak buiten zijn eigen poort. Die ratel woont
+     daarom in de toets en niet in NORM.json. */
+  'GELDKAART.json': { eigenRatel: 'test/geldkaart.test.js' },
+  /* GELDDEKKING.json hangt WEL aan NORM.json -- vier tanden, zie de kop daar.
+     Anders dan de geldkaart draagt hij voorraden die mogen dalen in plaats van
+     een nul die nul moet blijven, en dat is precies wat een ratel meet. */
+  'GELDDEKKING.json': { meter: ['geldRoutesPubliek', 'geldRoutesZonderSemantiek',
+    'geldRoutesZonderIdemBewijs', 'geldRoutesZonderTerugweg',
+    'geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak'] },
+  /* FACTUURPROEF.json hangt aan TWEE tanden en niet aan een, en dat is een
+     besluit en geen slordigheid: `geldpadGezakt` is een defect dat naar nul
+     moet, `geldpadOnbewezen` is werk dat nog niet gedaan is. Een tand die die
+     twee optelt, laat een crashbevinding wegvallen tegen een stap die iemand
+     nog moet meten. Zie de kop van NORM's METERS. */
+  'FACTUURPROEF.json': { meter: ['geldpadGezakt', 'geldpadOnbewezen'] },
+  /* HERSTELBESLUIT.json is een VERKLARING en geen meting -- dezelfde vorm als
+     ROLLBACKBESLUIT.json hierboven, dat ook aan een geteld gevolg hangt. Wie
+     hier een regel bijzet of weghaalt, beweegt een van deze twee tellers: een
+     ontbrekende verklaring zit in `onbesloten`, een verkeerde in `tegenspraak`. */
+  'HERSTELBESLUIT.json': { meter: ['geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak'] },
 
   'TIKKEN.json': { eigenRatel: 'test/sprongindex.test.js' },
   'VINDBAAR.json': { eigenRatel: 'test/sprongindex.test.js' },

@@ -128,9 +128,17 @@ test('de huisregels kennen een regel die saveDuurzaam bewaakt', () => {
    het venster waarin de klant niet weet dat het gelukt is en het opnieuw
    probeert -- en waar durability en idempotentie samenkomen (zie GELDLAT.md).
 
-   Deze twee toetsen bewijzen het INJECTIEPUNT, niet de geldketen. Dat de
-   herhaling daarna exact één economische mutatie oplevert, is scenario 3 en
-   staat nog open: de geldcommit hangt nog niet aan saveDuurzaam. */
+   Deze twee toetsen bewijzen het INJECTIEPUNT, niet de geldketen.
+
+   SCENARIO 3 IS INMIDDELS GEMETEN, en hier stond het omgekeerde. "De geldcommit
+   hangt nog niet aan saveDuurzaam" was al achterhaald toen GELDLAT.md zijn
+   tabel op AANGESLOTEN zette -- de vraag was dus meetbaar en niemand stelde
+   hem, precies omdat hier stond dat het niet kon. `npm run factuurproef` stelt
+   hem wel, op POST /api/pay/saldo, en met een uitkomst die de moeite was: de
+   herhaling levert inderdaad exact EEN economische mutatie (stap 6), maar
+   ZONDER herhaling blijft er een halve toestand staan -- het lid is
+   afgeschreven en zijn factuur staat nog open. Zie GELDLAT.md, "Scenario 3,
+   gemeten op een echt geldpad". */
 
 test('sterf-na-commit doodt het proces NA de duurzame schrijfactie', () => {
   const map = verseMap();

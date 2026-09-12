@@ -147,3 +147,28 @@ test('een worp binnen een genestelde bundel laat niets achter', async () => {
   }, { duurzaam: true }));
   assert.equal(b.commits.length, 0, 'een mislukte bundel commit niets');
 });
+
+test('een onzekere opslagbevestiging belooft geen afwezige afschrijving', async () => {
+  const data = { saldo: 1000, invoices: [{ id: 'f1', bijdrage: 5, status: 'open' }] };
+  let opgeslagen;
+  const bundel = require('../server/db/bijeen')({
+    save: () => {},
+    saveDuurzaam: () => {
+      opgeslagen = JSON.parse(JSON.stringify(data));
+      return { bevestigbaar: true, duurzaam: false, reden: 'bevestiging verloren' };
+    }
+  });
+  const save = () => { bundel.bundelDoos().nodig = true; };
+  const { factuurSaldo } = require('../server/kern/factuursaldo').maakFactuurSaldo({
+    db: { data }, bijeen: bundel.bijeen,
+    payVan: () => ({ huisIn: async () => {
+      data.saldo -= 500; save(); return { boeking: 'b1', centen: 500 };
+    } }),
+    settleFactuur: async () => { data.invoices[0].status = 'paid'; save(); return { ok: true }; }
+  });
+  const uit = await factuurSaldo({ own: false, wie: 'lid1', invoiceId: 'f1' });
+  assert.equal(opgeslagen.saldo, 500, 'een bevestigingsfout kan na de boeking optreden');
+  assert.equal(opgeslagen.invoices[0].status, 'paid');
+  assert.equal(uit.status, 503);
+  assert.doesNotMatch(uit.error, /niets afgeschreven|niet afgeschreven/);
+});

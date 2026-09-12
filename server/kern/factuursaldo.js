@@ -37,7 +37,9 @@
    Nu opent deze module de bundel en doet pay.huisIn erin mee -- db/bijeen.js
    sluit sinds dezelfde ronde aan op een openstaande bundel die dezelfde
    belofte doet. Er is daarmee nog een duurzame commit en geen twee, dus de
-   uitkomst is heel: of het hele geldpad staat op schijf, of niets ervan.
+   geslaagde afwikkeling staat als geheel op schijf. `bijeen` bundelt saves,
+   maar draait mutaties niet terug wanneer werk of opslag een fout meldt.
+   Een mislukte bevestiging zegt dus niet dat er niets is afgeschreven.
 
    Dit is de spiegel van de fout die GELDLAT.md in augustus weerlegde -- toen
    verdween het geld en klopte het grootboek, nu stond het geld vast en was de
@@ -88,21 +90,18 @@ function maakFactuurSaldo({ db, accounts, settleFactuur, payVan, broadcastSync, 
         const s = await settleFactuur(
           { soort: 'factuur', wie, invoiceId: inv.id, own, accountId },
           { id: 'pay:' + b.boeking, centen: b.centen, hoe: 'Betaald uit RTG Pay-saldo' });
-        /* EEN MISLUKTE AFWIKKELING MAG DE BUNDEL NIET LATEN SLAGEN. Gaf
-           settleFactuur een fout, dan hoort de afschrijving er ook niet te
-           staan -- dat is precies de halve uitkomst waar deze bundel voor is.
-           De worp gaat omhoog en de bundel committeert niets. */
+        /* Een mislukte afwikkeling mag geen geslaagd antwoord geven. De worp
+           betekent geen rollback: bijeen kan eerdere saves nog vastleggen. */
         if (s && s.error) { uit = s; throw new Error('[factuursaldo] afwikkeling mislukt: ' + s.error); }
         uit = { ok: true, betaald: b.centen, bijgeladen: b.bijgeladen || 0 };
       };
       if (typeof bijeen === 'function') {
         try { await bijeen(werk, { duurzaam: true }); }
         catch (e) {
-          /* De bundel wierp: of de afwikkeling hierboven, of de opslag die de
-             commit niet kon bevestigen. In allebei de gevallen is er NIETS
-             vastgelegd, en een 200 zou daarover liegen. */
+          /* Geen bevestiging is geen bewijs dat er niets is geboekt. De opslag
+             kan de mutatie al hebben ontvangen voordat zij een fout meldt. */
           return uit && uit.error ? uit
-            : { status: 503, error: 'De betaling kon niet worden vastgelegd; er is niets afgeschreven.' };
+            : { status: 503, error: 'De betaling kon niet worden bevestigd. Controleer de betaalstatus voordat je het opnieuw probeert.' };
         }
       } else await werk();
       if (uit && uit.error) return uit;

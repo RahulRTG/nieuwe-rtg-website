@@ -2,8 +2,8 @@
   "soort": "meting",
   "uitleg": "Economische dekking: wat er van elke waardebewegende ROUTE bewezen is, samengesteld uit GELDKAART.json (welke routes), MUTATIECONTRACT.json (semantiek en toegang), IDEMPROEF.json (idempotentie) en HERSTELPROEF.json (de terugweg).",
   "stempel": {
-    "op": "2026-09-12T19:18:03.975Z",
-    "commit": "f3b843264",
+    "op": "2026-09-12T19:46:25.211Z",
+    "commit": "739cad757",
     "boomVuil": false,
     "boomAnders": 2,
     "instrument": "scripts/gelddekking.js",
@@ -12,24 +12,24 @@
   "grens": "Er komt met opzet GEEN samengesteld dekkingspercentage. Elke as draagt haar eigen teller en noemer; ze worden nooit gemiddeld. De noemer zelf is een ONDERgrens: hij komt uit de geldkaart, die alleen routes ziet waar de idempotentieproef langskwam. Een as waarvoor geen meting bestaat staat in nietGemeten en telt nergens als nul mee.",
   "klachten": [],
   "gemeten": {
-    "geldroutes": 42,
-    "inMutatiecontract": 42,
+    "geldroutes": 45,
+    "inMutatiecontract": 45,
     "semantiek": {
-      "sleutelVereist": 14,
-      "idempotent": 19,
+      "sleutelVereist": 18,
+      "idempotent": 18,
       "nietHerhaalbaar": 6,
       "onbekend": 1,
       "compenseerbaar": 2
     },
     "toegang": {
-      "AUTHENTICATED": 42
+      "AUTHENTICATED": 45
     },
     "idempotentie": {
-      "ongemeten": 10,
-      "beschermd": 32
+      "beschermd": 41,
+      "ongemeten": 4
     },
     "terugweg": {
-      "geen tegenhanger beproefd": 39,
+      "geen tegenhanger beproefd": 42,
       "compensatie": 2,
       "exact": 1
     }
@@ -37,9 +37,9 @@
   "ratel": {
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
-    "geldRoutesZonderIdemBewijs": 9,
-    "geldRoutesZonderTerugweg": 39,
-    "geldRoutesHerstelOnbesloten": 41,
+    "geldRoutesZonderIdemBewijs": 3,
+    "geldRoutesZonderTerugweg": 42,
+    "geldRoutesHerstelOnbesloten": 44,
     "geldRoutesHerstelTegenspraak": 0
   },
   "assen": {
@@ -50,7 +50,7 @@
         "UNKNOWN"
       ],
       "telling": {
-        "PROVEN": 42,
+        "PROVEN": 45,
         "FAILED": 0,
         "UNKNOWN": 0
       }
@@ -64,9 +64,9 @@
         "UNKNOWN"
       ],
       "telling": {
-        "PROVEN": 33,
+        "PROVEN": 42,
         "FAILED": 0,
-        "BLOCKED": 6,
+        "BLOCKED": 0,
         "NOT_APPLICABLE": 3,
         "UNKNOWN": 0
       }
@@ -77,7 +77,7 @@
         "UNKNOWN"
       ],
       "telling": {
-        "PROVEN": 41,
+        "PROVEN": 44,
         "UNKNOWN": 1
       }
     },
@@ -90,7 +90,7 @@
       "telling": {
         "PROVEN": 3,
         "BLOCKED": 0,
-        "UNKNOWN": 39
+        "UNKNOWN": 42
       }
     },
     "correctiemodel": {
@@ -104,13 +104,13 @@
         "PROVEN": 0,
         "BLOCKED": 1,
         "NOT_APPLICABLE": 0,
-        "UNKNOWN": 41
+        "UNKNOWN": 44
       }
     }
   },
   "tegenspraken": [],
   "herstelKlassen": {
-    "UNKNOWN": 41,
+    "UNKNOWN": 44,
     "COMPENSATABLE": 1
   },
   "nietGemeten": {
@@ -123,12 +123,14 @@
       "pad": "/api/bank/pas/betaal",
       "rol": "member",
       "collecties": [
-        "bankPassen"
+        "bankBoekingen",
+        "bankPassen",
+        "bankSaldi"
       ],
       "semantiek": "sleutelVereist",
       "toegang": "AUTHENTICATED",
-      "stand": "BLOCKED_BY_TEST_FIXTURE",
-      "idempotentie": "ongemeten",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
@@ -181,8 +183,8 @@
       ],
       "semantiek": "idempotent",
       "toegang": "AUTHENTICATED",
-      "stand": "BLOCKED_BY_TEST_FIXTURE",
-      "idempotentie": "ongemeten",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
       "terugweg": "compensatie",
@@ -218,6 +220,44 @@
       "semantiek": "nietHerhaalbaar",
       "toegang": "AUTHENTICATED",
       "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/salaris",
+      "rol": "member",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/sepa",
+      "rol": "member",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
       "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
@@ -308,8 +348,8 @@
       ],
       "semantiek": "idempotent",
       "toegang": "AUTHENTICATED",
-      "stand": "BLOCKED_BY_TEST_FIXTURE",
-      "idempotentie": "ongemeten",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
@@ -615,6 +655,25 @@
     },
     {
       "methode": "POST",
+      "pad": "/api/pay/tik",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
       "pad": "/api/pay/tikcode",
       "rol": "member",
       "collecties": [
@@ -678,8 +737,8 @@
       ],
       "semantiek": "idempotent",
       "toegang": "AUTHENTICATED",
-      "stand": "BLOCKED_BY_TEST_FIXTURE",
-      "idempotentie": "ongemeten",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
@@ -800,12 +859,17 @@
       "pad": "/api/supplier/pay/treasury/apart",
       "rol": "supplier",
       "collecties": [
+        "facturen",
+        "payBoekingen",
+        "payCodes",
+        "paySaldi",
+        "posSales",
         "waardeOormerken"
       ],
       "semantiek": "compenseerbaar",
       "toegang": "AUTHENTICATED",
-      "stand": "BLOCKED_BY_TEST_FIXTURE",
-      "idempotentie": "ongemeten",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
@@ -833,15 +897,16 @@
     },
     {
       "methode": "POST",
-      "pad": "/api/supplier/pos/checkout",
+      "pad": "/api/supplier/pay/uitbetaal",
       "rol": "supplier",
       "collecties": [
-        "posSales"
+        "payBoekingen",
+        "paySaldi"
       ],
       "semantiek": "sleutelVereist",
       "toegang": "AUTHENTICATED",
-      "stand": "BLOCKED_BY_TEST_FIXTURE",
-      "idempotentie": "ongemeten",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,
       "terugweg": "geen tegenhanger beproefd",
@@ -851,14 +916,15 @@
     },
     {
       "methode": "POST",
-      "pad": "/api/wallet",
-      "rol": "member",
+      "pad": "/api/supplier/pos/checkout",
+      "rol": "supplier",
       "collecties": [
-        "wallet"
+        "facturen",
+        "posSales"
       ],
-      "semantiek": "idempotent",
+      "semantiek": "sleutelVereist",
       "toegang": "AUTHENTICATED",
-      "stand": "NOT_APPLICABLE",
+      "stand": "PROTECTED",
       "idempotentie": "beschermd",
       "padproef": null,
       "padproefInstrument": null,

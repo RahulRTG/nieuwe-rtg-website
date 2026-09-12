@@ -3,10 +3,10 @@
   "uitleg": "Een geldpad van begin tot eind, ECONOMISCH gemeten: niet de status van de route maar de toestand van de vijf geldcollecties eromheen. Zeven stappen, waaronder een crashpunt uit de verraadsmotor (sterf-na-commit) en de herhaling erna. Zie GELDLAT.md, \"Scenario 3, gemeten op een echt geldpad\".",
   "grens": "DIT IS EEN PAD EN GEEN DEKKING. Wat hier bewezen is, geldt voor POST /api/pay/saldo en voor niets anders. De hashes van de vingerafdruk zijn per proces gezouten, dus over de crash heen zijn alleen aantallen en bedragen vergelijkbaar -- dat staat per stap in de meting. En `PROVEN` op stap 3 gaat over de tweede aanroep, nooit over de crashwindow.",
   "stempel": {
-    "op": "2026-09-12T17:21:16.856Z",
-    "commit": "2e9275d2",
-    "boomVuil": false,
-    "boomAnders": 0,
+    "op": "2026-09-12T17:47:57.513Z",
+    "commit": "c1c9d332",
+    "boomVuil": true,
+    "boomAnders": 5,
     "instrument": "scripts/factuurproef.js",
     "node": "v22.22.2"
   },
@@ -21,7 +21,7 @@
     "fondsAfdrachten",
     "socialeAfdrachten"
   ],
-  "gemetenOp": "2026-09-12T17:20:56.860Z",
+  "gemetenOp": "2026-09-12T17:47:37.509Z",
   "stappen": [
     {
       "nr": 1,
@@ -108,15 +108,15 @@
     {
       "nr": 5,
       "wat": "na de herstart is de uitkomst HEEL: helemaal gebeurd of helemaal niet",
-      "stand": "FAILED",
-      "reden": "de crash liet een halve uitkomst achter",
+      "stand": "PROVEN",
+      "reden": null,
       "gemeten": {
-        "uitkomst": "HALF",
+        "uitkomst": "volledig doorgegaan",
         "saldoVoor": 20000,
         "saldoNa": 12135,
-        "factuurStand": "open",
+        "factuurStand": "paid",
         "factuurBoekingen": 1,
-        "afdrachten": 0
+        "afdrachten": 1
       }
     },
     {
@@ -125,7 +125,7 @@
       "stand": "PROVEN",
       "reden": null,
       "gemeten": {
-        "status": 200,
+        "status": 409,
         "saldoCenten": 12135,
         "factuurStand": "paid",
         "factuurBoekingen": 1,
@@ -147,7 +147,7 @@
     }
   ],
   "idempotent": true,
-  "crashUitkomst": "half",
+  "crashUitkomst": "doorgegaan",
   "correctiemodel": "UNKNOWN",
   "economischeUitkomst": {
     "saldoCenten": 12135,
@@ -157,12 +157,12 @@
   },
   "telling": {
     "stappen": 7,
-    "PROVEN": 5,
-    "FAILED": 1,
+    "PROVEN": 6,
+    "FAILED": 0,
     "BLOCKED": 0,
     "NOT_APPLICABLE": 0,
     "UNKNOWN": 1
   },
-  "gezakt": true,
+  "gezakt": false,
   "volledigBewezen": false
 }

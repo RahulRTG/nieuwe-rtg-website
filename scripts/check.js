@@ -3359,7 +3359,17 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
        en na een herstart stond het weggegooide ontwerp er weer. De zeven modules
        staan hier NIET op: die kennen de duurzame commit niet, ze kennen deze
        helper, en dat is het punt van een gedeelde plek. */
-    ['server/kern/kantoorwissen.js', 'de kantoorverwijdering: wie te horen krijgt dat iets weg is, hoort het na een herstart niet terug te zien']
+    ['server/kern/kantoorwissen.js', 'de kantoorverwijdering: wie te horen krijgt dat iets weg is, hoort het na een herstart niet terug te zien'],
+    /* HET ZEVENDE, en het is geen NIEUWE duurzame belofte maar het REPAREREN van
+       een bestaande. De afschrijving liep al duurzaam via pay.huisIn; de
+       afwikkeling eronder -- factuur sluiten, 30%-afdracht -- deed dat niet, en
+       dus waren het twee commits met een gat ertussen. `npm run factuurproef`
+       mat wat er in dat gat gebeurt: het lid is afgeschreven en zijn factuur
+       staat nog open. Hier opent nu EEN bundel om allebei heen, zodat de
+       uitkomst heel is. Zie GELDLAT.md par. "Scenario 3, gemeten op een echt
+       geldpad". */
+    ['server/kern/factuursaldo.js', 'geld: de afschrijving en de afwikkeling van dezelfde factuur horen als EEN duurzame commit te landen, anders staat het geld vast en de tegenprestatie niet'],
+    ['test/idembundel.test.js', 'de toets die bewijst dat een genestelde bundel meedoet en dat een gewone bundel een geldcommit niet degradeert']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze

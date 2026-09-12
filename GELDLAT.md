@@ -163,6 +163,7 @@ en een noodstop die twee milliseconden langer duurt is geen noodstop minder.
 
 ```
 GELD        kern/pay -> lib/idem -> bijeen({duurzaam:true})     AANGESLOTEN
+FACTUUR     kern/factuursaldo -> bijeen({duurzaam:true})        AANGESLOTEN
 NOTITIES    kern/notities -> lib/duurzaam -> bijeen(...)        AANGESLOTEN
 AGENDA      -                                                   OPEN
 BESTANDEN   -                                                   OPEN
@@ -334,10 +335,14 @@ instrument bestaat:
 2 PROVEN    het geldpad voert uit: saldo af, factuur dicht, afdracht geboekt
 3 PROVEN    een identieke tweede aanroep verplaatst NUL waarde
 4 PROVEN    het proces sterft na de duurzame boeking en voor het antwoord
-5 FAILED    na de herstart is de uitkomst HEEL
+5 PROVEN    na de herstart is de uitkomst HEEL   <- stond op FAILED; gerepareerd
 6 PROVEN    de herhaling na de crash levert over alles heen exact EEN mutatie
 7 UNKNOWN   de terugweg
 ```
+
+**Stap 5 stond bij de eerste ronde op FAILED.** Wat hij vond en hoe het is
+gerepareerd, staat hieronder uitgeschreven; het is de reden dat deze proef
+bestaat en het hoort niet weggepoetst te worden tot een groene regel.
 
 ### Stap 3 is bewezen, en scherper dan de idempotentieproef hem kan stellen
 
@@ -348,7 +353,7 @@ iets: gelijk aantal én gelijke hash op `paySaldi`, `payBoekingen`, `invoices`,
 in plaats van weggefilterd te worden. "We negeren de rest" is precies hoe een
 echte dubbele mutatie ongezien blijft.
 
-### Stap 5 is GEZAKT, en dat is de opbrengst van deze proef
+### Stap 5 was GEZAKT, en dat is de opbrengst van deze proef
 
 Reproduceerbaar over drie rondes:
 
@@ -386,21 +391,44 @@ herstelronde die halve betalingen opruimt (drie seconden na de herstart gewacht
 en nagemeten — er is er geen). Blijft de herhaling uit, dan blijft de factuur
 open terwijl hij betaald is.
 
-### Wat de reparatie zou zijn, en waarom die een besluit vraagt
+### De reparatie, en waar zij uiteindelijk terechtkwam
 
-De vorm ligt er al en hij is klein: `bijeen()` kan genest worden, en
-`kern/fonds.js` laat zien hoe (`inBundel()` vragen, en zo ja meedoen in de
-bundel die al openstaat). De reparatie is dan twee stappen:
+De eerste poging deed het bij de aanroepers: `server/lib/idem.js` zou eerst
+`inBundel()` vragen en meedoen in een openstaande bundel, en
+`server/kern/factuursaldo.js` zou er een om de boeking én de afwikkeling heen
+openen. Dat werkt, en het is precies wat `server/lib/duurzaam.js` en
+`kern/fonds.js` al deden.
 
-1. `server/lib/idem.js` laten meedoen in een reeds openstaande bundel in plaats
-   van er altijd een eigen te openen;
-2. `server/kern/factuursaldo.js` de boeking én de afwikkeling in één duurzame
-   bundel zetten.
+**En juist dat was het argument om het níét daar te doen.** Twee modules
+stelden die vraag al elk apart, een derde (`lib/idem.js`) vergat hem, en er
+werd niets rood — de geldketen verloor stil zijn atomiciteit. Een regel die
+elke aanroeper apart moet onthouden, is een regel die de volgende vergeet.
 
-Vandaag wikkelt niemand een bundel om `metIdem` heen, dus stap 1 is voor alle
-bestaande aanroepers een no-op. Toch raakt die wijziging de duurzame commit van
-**elk** geldpad in dit huis, en dat is geen reparatie die je er ongevraagd bij
-doet. De bevinding staat daarom hier, met de maat en de oorzaak erbij.
+De vraag woont daarom in **`server/db/bijeen.js`** zelf: een `bijeen()` binnen
+een openstaande bundel die dezelfde belofte doet, doet daarin mee in plaats van
+een eigen doos te openen. Wie de vraag al stelde krijgt hetzelfde antwoord en
+verandert niets; wie hem vergat, is nu gedekt. `kern/factuursaldo.js` opent de
+bundel om boeking en afwikkeling heen, en dat is de hele wijziging aan de
+geldkant.
+
+**De grendel eromheen is even belangrijk als de reparatie.** Meedoen mag alleen
+in een bundel die dezelfde belofte doet: een NIET-duurzame buitenbundel zou een
+geldcommit stil degraderen van "bevestigd als de opslag het heeft" naar
+write-behind — precies de belofte die dit document in augustus weerlegde. Zulke
+bundels bestaan ook echt (`db/economische-boeking.js` opent er een zonder de
+vlag), dus `inBundel({ duurzaam: true })` geeft daar `false` en de geldcommit
+opent gewoon zijn eigen duurzame doos. `test/idembundel.test.js` houdt die
+grendel vast; vier mutaties nagetrokken, waaronder "altijd meedoen" en "de eis
+genegeerd".
+
+En één ding is bewust NIET in de bundel gezet: het seintje naar het lid
+(`broadcastSync`) staat erbuiten. Een uitgaand bericht binnen een bundel
+vertelt iemand iets dat de opslag nog niet heeft bevestigd.
+
+Na de reparatie meldt stap 5 `volledig doorgegaan`: saldo af, factuur betaald,
+afdracht geboekt — de crash valt nu ná de commit van het hele pad. Stap 6 geeft
+409 met alles ongewijzigd, dus over crash en herhaling heen staat er nog steeds
+exact één mutatie.
 
 ### Stap 7 blijft UNKNOWN, en dat is geen tekortkoming van de proef
 

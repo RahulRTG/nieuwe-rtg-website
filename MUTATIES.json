@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-12T17:22:46.444Z",
-    "commit": "2e9275d2",
-    "boomVuil": false,
+    "op": "2026-09-12T17:43:39.736Z",
+    "commit": "c1c9d332",
+    "boomVuil": true,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
@@ -3527,6 +3527,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "idembundel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/db/bijeen.js",
+      "operator": "true->false#0",
+      "gezakt": 3,
+      "geprobeerd": 7
     },
     "idemproef.test.js": {
       "soort": "puur",

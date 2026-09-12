@@ -114,9 +114,9 @@ const CONTRACTEN = {
        die hij vroeg lag er al (RTG-2026-0207 in server/seed/leden.js). Wie de
        andere zes leest: kijk eerst in de zaaiset.
 
-       PROTECTED gaat over de TWEEDE AANROEP en niet over de crashwindow, en die
-       twee worden niet samengevoegd -- de proef vond daar een halve toestand.
-       Het hele verhaal staat in GELDLAT.md, "Scenario 3, gemeten op een echt
+       PROTECTED gaat over de TWEEDE AANROEP en niet over de crashwindow: die
+       twee worden niet samengevoegd, ook niet nu allebei bewezen zijn. De
+       crashkant staat in GELDLAT.md, "Scenario 3, gemeten op een echt
        geldpad"; hier alleen de stand en waar hij vandaan komt. */
     watErMoetKomen: null,
     bewijs: { gemeten: 'PROTECTED: een identieke tweede aanroep verplaatst nul waarde over alle vijf de geldcollecties (npm run factuurproef, stap 3)',

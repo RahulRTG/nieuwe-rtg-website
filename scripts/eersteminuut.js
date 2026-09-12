@@ -244,7 +244,11 @@ const ZICHTBAAR = () => {
       })()
     })),
     velden: bedienbaar.filter((el) => /input|textarea|select/.test(el.tagName.toLowerCase())).length,
-    strengeZichtbaarheid: typeof document.body.checkVisibility === 'function'
+    strengeZichtbaarheid: typeof document.body.checkVisibility === 'function',
+    /* IS DIT ZELF HET BEGINSCHERM? De werktafel tekent zijn beginstand in
+       `.cmd-leeg` (shared/command/werktafel.js). Dat is geen gok maar een
+       markering die de schil zelf zet. */
+    isBeginscherm: !!document.querySelector('.cmd-leeg')
   };
 };
 
@@ -339,6 +343,37 @@ function vind(lijst, tekst) {
        minuut. Wie alleen station 1 meet, verklaart een leeg scherm schoon
        omdat het jargon net buiten beeld ligt. */
     await p.waitForTimeout(1200);
+
+    /* EERST BEWIJZEN DAT WE BINNEN ZIJN, DAN PAS METEN.
+
+       Dit is hier echt misgegaan en het is de duurste faalvorm die deze meter
+       heeft. Een scriptfout in de schil (`lade is not defined`) liet de app
+       terugvallen op het RTG iD-scherm -- "Welkom terug", "Ga verder met je
+       passkey" -- en deze meter mat dat scherm en meldde EERSTE_MINUUT: OK.
+       Een inlogscherm heeft nu eenmaal geen intern jargon, geen vrije plekken
+       en geen onnodige vragen; het haalt alle toetsen omdat het de app niet is.
+
+       Niet-gemeten mag nooit als "in orde" langskomen (dezelfde regel als de
+       overgeslagen rol in scripts/tikken.js). Dus: staat de commandoschil er
+       niet EN staat de onboarding-poort er niet, dan is er niets van de app
+       gezien en wordt er geen uitslag geveld. */
+    const binnen = await p.evaluate(() => ({
+      schil: !!document.querySelector('#rtgCommand'),
+      poort: !!document.querySelector('#onbGate'),
+      kop: ((document.querySelector('h1,h2') || {}).textContent || '').trim().slice(0, 60)
+    }));
+    if (!binnen.schil && !binnen.poort) {
+      const uit = { stempel: stempel(), gemeten: false,
+        reden: 'de ledenapp is niet bereikt: geen #rtgCommand en geen #onbGate. ' +
+               'Er is dus NIETS gemeten. Bovenste kop op het scherm: "' + binnen.kop + '".',
+        hoe: 'node scripts/eersteminuut.js' };
+      fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
+      console.error('NIET GEMETEN: de ledenapp is niet bereikt (kop: "' + binnen.kop + '").');
+      console.log('EERSTE_MINUUT: NIET GEMETEN');
+      await browser.close();
+      process.exit(controle ? 1 : 2);
+    }
+
     beeld = await p.evaluate(ZICHTBAAR);
     await p.screenshot({ path: path.join(WORTEL, 'server', 'data', 'eersteminuut.png') }).catch(() => {});
 
@@ -409,9 +444,24 @@ function vind(lijst, tekst) {
         ? beeld.velden + ' invoerveld(en) direct op het beginscherm'
         : 'geen invoerveld; alleen een zoekKNOP -- de mens moet eerst tikken voordat hij iets kan zeggen',
       bewijs: [] },
+    /* EEN WEG TERUG WORDT GEVRAAGD WAAR JE ERGENS BENT, EN HET BEGINSCHERM IS
+       NERGENS HEEN. Deze toets zocht onvoorwaardelijk naar home/terug/sluiten,
+       en dat leek te kloppen zolang de edge-balk hier een HOME-knop had. Toen
+       die balk de rand losliet, zakte de toets -- terwijl er niets kapot was:
+       op de werktafel BEN je thuis.
+
+       Dat is geen reden om de toets te verzwakken maar om hem preciezer te
+       stellen. Staat er een beginscherm (de schil zet zelf `.cmd-leeg`), dan is
+       "thuis" de huidige plek en is een knop ernaartoe een lus. Staat er iets
+       anders, dan geldt de eis onverkort. De uitslag zegt welk van de twee
+       gold, zodat niemand hoeft te raden waarom hij groen is. */
     { naam: 'terugweg', station: 'beginscherm', vraag: 'Is er een zichtbare weg terug of naar huis?',
-      uitslag: bedienbaar.some((b) => /home|terug|sluit|×|✕/i.test(b.tekst)) ? 'gehaald' : 'gezakt',
-      gemeten: 'gezocht op home/terug/sluiten', bewijs: [] },
+      uitslag: (beeld.isBeginscherm || bedienbaar.some((b) => /home|terug|sluit|×|✕/i.test(b.naam || b.tekst)))
+        ? 'gehaald' : 'gezakt',
+      gemeten: beeld.isBeginscherm
+        ? 'dit IS het beginscherm (.cmd-leeg), dus er is geen plek om naar terug te gaan'
+        : 'gezocht op home/terug/sluiten in de naam van elke bedienbare zaak',
+      bewijs: [] },
     { naam: 'taal-consistent', vraag: 'Is alles wat er staat Nederlands, bij een Nederlandse sessie?',
       uitslag: 'nietMeetbaar',
       reden: 'een woordenlijst die Engels van Nederlands scheidt bestaat hier nog niet, en raden ' +

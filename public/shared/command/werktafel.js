@@ -41,12 +41,12 @@
        sloot sluit(0) twee keer hetzelfde en bleef het tweede staan. */
     function sluitAlles(){panes.slice().forEach(function(p){var i=panes.indexOf(p);if(i>=0)sluit(i)})}
     function wis(){panes.slice().forEach(function(p){p.el.remove()});panes=[];actief=-1}
-    /* NUL BLADEN IS EEN TOESTAND, GEEN EINDE: de werktafel is het beginscherm,
-       dus inloggen en het laatste blad sluiten komen op dezelfde plek uit. Hier
-       stond sloop(), en dat klopte zolang de klok de landing was. */
+    /* NUL BLADEN IS EEN TOESTAND, GEEN EINDE: inloggen en het laatste blad
+       sluiten komen op dezelfde plek uit. WAT er dan staat woont in
+       ./beginscherm.js -- eigen onderwerp, eigen bestand. */
     function leeg(){var vak=root.querySelector('.cmd-panes');vak.textContent='';
-      var m=d.createElement('div');m.className='cmd-leeg';
-      m.innerHTML='<span>Kies een wereld om te beginnen.</span>';vak.appendChild(m)}
+      w.RTGCommandBeginscherm(vak,{werelden:o.werelden,open:o.open,
+        praat:function(){if(praatLaag)praatLaag.open()}})}
     /* Op telefoon is dit de enige schilbalk; Adaptief vult de handelingen. */
     function balk(){
       var rij=root.querySelector('.cmd-balkbladen'),kruis=root.querySelector('.cmd-balksluit');

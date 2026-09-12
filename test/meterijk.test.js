@@ -1524,6 +1524,21 @@ const IJKINGEN = {
       (j) => { j.gemeten.defecten = (j.gemeten.defecten || 0) + 3; return j; },
       () => norm.meet().appwerktDefecten - voor.appwerktDefecten)
   },
+  /* DE TAND VAN 12 SEPTEMBER 2026: eersteMinuutGezakt telt de toetsen van de
+     eerste minuut die ZAKKEN (EERSTEMINUUT.json, telling.gezakt). Zelfde vorm
+     als de vier hierboven -- hij leest een getal uit een bestaand register, dus
+     hij wordt geijkt door dat veld tijdelijk op te hogen.
+
+     WAAROM `gezakt` EN NIET `gehaald`: bij het tweede zou een toets WEGHALEN
+     als vooruitgang lezen. En `nietMeetbaar` telt niet mee, want dat is een
+     uitslag over de METER en niet over de app; die twee optellen is precies de
+     fout die MENS.md par. 0 beschrijft. Leest deze meter het verkeerde veld, of
+     een ontbrekend bestand als nul, dan beweegt hij hier niet mee. */
+  eersteMinuutGezakt: {
+    proef: (voor) => metVervangenJson('EERSTEMINUUT.json',
+      (j) => { j.telling.gezakt = (j.telling.gezakt || 0) + 3; return j; },
+      () => norm.meet().eersteMinuutGezakt - voor.eersteMinuutGezakt)
+  },
   /* DE TAND VAN 10 SEPTEMBER 2026: bewijsAlleenKeten telt de bewijsmechanismen
      die alleen in de keten draaien en niet lokaal (BEWIJSLADDER.json). Zelfde
      vorm als de vier hierboven -- hij telt een POST in een register, dus hij

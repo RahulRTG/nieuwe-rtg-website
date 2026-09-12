@@ -63,6 +63,21 @@
     /* De lade hoort aan de ankerzijde bij de bank, Rahul aan de duimzijde. Bij
        een linkshandige wisselen die twee uiteinden van plek; wat ertussen staat
        (de bladen en de sluitknop) houdt zijn eigen volgorde. */
+    /* GEEN APARTE HOME-KNOP IN DEZE BALK, EN DAT IS GEMETEN.
+
+       Toen de edge-balk de rand losliet (rtg-edge-2.css) verdween MENU en HOME
+       met hem mee, en er heeft hier even een `cmd-thuis` gestaan om die tweede
+       terug te geven. Dat brak twee dingen tegelijk: de knop kost 48 van de 390
+       pixels, waardoor de actierij in de werkbladstand naar 26px zakte en
+       test/adaptief.e2e.js zakte met "de actierij loopt over: 44 in 26" -- de
+       overloop kan de laatste knop niet wegnemen (balk.js stopt bij een kind).
+
+       Bij nader inzien heeft deze schil er ook geen nodig. MENU is de lade
+       ernaast: die opent de bank met alle werelden. En HOME is hier geen plek
+       maar een toestand -- op de werktafel BEN je thuis, en zodra er een
+       werkblad open staat is `cmd-balksluit` de weg terug, precies op het
+       moment dat hij betekenis heeft. Op elk scherm ZONDER commandobalk houdt
+       de edge-balk zijn eigen HOME; daar verandert niets. */
     var lade = '<button class="cmd-lade" aria-label="Werelden" aria-expanded="false">' + svg('menu') + '</button>';
     var rahul = '<form class="cmd-vraagvorm"><input class="cmd-vraagveld" type="text" maxlength="300" autocomplete="off" aria-label="Vraag Rahul" placeholder="Vraag Rahul\u2026"><button class="cmd-vraagstuur" type="submit" aria-label="Stuur naar Rahul">' + svg('verder') + '</button></form><button class="cmd-mondknop" type="button" aria-label="Vraag Rahul"></button>';
     var midden = '<div class="cmd-balkbladen" role="tablist"></div><button class="cmd-balksluit" aria-label="Sluit dit werkblad" hidden>' + svg('kruis') + '</button>';

@@ -149,6 +149,37 @@ body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="co
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-top{transform:translateY(-101%)!important;visibility:hidden;pointer-events:none}
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-side{transform:translateX(-101%)!important;visibility:hidden;pointer-events:none}
 body[data-rtg-edge-2][data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"] .rtg-edge-bottom{transform:translateY(101%)!important;visibility:hidden;pointer-events:none}
+/* ============================================================================
+   DE ONDERSTE RAND HEEFT EEN EIGENAAR, EN DAT IS .cmd-balk.
+
+   ADAPTIEF.md legt EEN onderbalk vast met drie zones: links de bank, in het
+   midden de werelden of de bladacties, rechts Rahul. Er stonden er twee. Op
+   390x844 bezetten `.cmd-balk` (fixed, z-index 8801) en `.rtg-edge-bottom`
+   (absolute) allebei dezelfde 48 pixels, en de tweede schilderde over de
+   eerste heen. Gevolg: de vier werelden stonden er, waren aan te tikken, en
+   waren onzichtbaar -- `npm run eersteminuut` telde nul leesbare handelingen
+   op het beginscherm van een vers lid.
+
+   Twee shell-lagen op dezelfde plek is geen opmaakfout maar een
+   eigenaarsvraag, en die komt terug bij safe-area, het toetsenbord, de
+   Continue Key, selectiebediening en mobiele tabs. Daarom EEN eigenaar.
+
+   DE MARKERING IS BESTAANDE CODE EN GEEN NIEUW MECHANISME. `body.rtg-command`
+   wordt gezet door command/werktafel.js op het moment dat de schil wordt
+   gebouwd, en verwijderd als hij wordt gesloopt. Bestaat de commandobalk, dan
+   is hij de eigenaar; bestaat hij niet (elk gewoon scherm, LivingOS, de
+   leverancier-app), dan verandert er niets en blijft de edge-balk de enige.
+
+   DE VORM IS OOK BESTAAND: precies de drie eigenschappen waarmee de standen
+   `compact` en `focus` hierboven de rand al loslaten. Geen vierde manier.
+
+   BOVEN 1000px GEBEURT DIT NIET, en dat is geen vergetelheid: daar toont
+   `.cmd-acties` niets (adaptief.css) en is de bank een vaste rail, dus daar
+   is de edge-balk niet de tweede maar de enige. */
+@media (max-width:999px){
+  body.rtg-command .rtg-edge-bottom{
+    transform:translateY(101%)!important;visibility:hidden!important;pointer-events:none!important}
+}
 body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"]{padding:0!important}
 body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="focus"]{padding:0!important}
 body.rtg-edge-host[data-rtg-edge-2-rendered="true"][data-rtg-edge-2-state="compact"]>header:not(.rtg-edge-top),

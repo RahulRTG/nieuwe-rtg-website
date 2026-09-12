@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-12T06:28:48.781Z",
-    "commit": "93f4f254",
-    "boomVuil": false,
-    "boomAnders": 0,
+    "op": "2026-09-12T06:53:18.453Z",
+    "commit": "09557b02",
+    "boomVuil": true,
+    "boomAnders": 1,
     "instrument": "scripts/eersteminuut.js",
     "node": "v22.22.2"
   },
@@ -36,9 +36,9 @@
     "nietGemeten": null
   },
   "eersteScherm": {
-    "bedienbaarTotaal": 13,
-    "waarvanSchil": 8,
-    "waarvanInhoud": 0,
+    "bedienbaarTotaal": 16,
+    "waarvanSchil": 6,
+    "waarvanInhoud": 5,
     "waarvanAlleenIcoon": 5,
     "alleenIcoon": [
       {
@@ -64,21 +64,24 @@
     ],
     "waarvanNaamloos": 0,
     "invoervelden": 0,
-    "tekstregels": 8,
+    "tekstregels": 11,
     "tekst": [
       "RTG",
       "LIVING OS",
       "⌕",
       "NL",
       "◎",
-      "MENU",
-      "HOME",
-      "Kies een wereld om te beginnen."
+      "Goedemorgen.",
+      "Typ of zeg wat er geregeld moet worden",
+      "LivingOS",
+      "WorkOS",
+      "TravelOS",
+      "FoundationOS"
     ]
   },
   "telling": {
-    "gehaald": 6,
-    "gezakt": 1,
+    "gehaald": 7,
+    "gezakt": 0,
     "nietMeetbaar": 2
   },
   "toetsen": [
@@ -86,9 +89,40 @@
       "naam": "inhoud-zonder-menu",
       "station": "beginscherm",
       "vraag": "Staat er iets te doen zonder dat de mens eerst MENU opent?",
-      "uitslag": "gezakt",
-      "gemeten": "0 dingen met een LEESBAAR opschrift; 5 alleen als pictogram met aria-label (LivingOS, WorkOS, TravelOS, FoundationOS, Vraag Rahul) -- een schermlezer noemt die, een ziend mens ziet ze niet",
-      "bewijs": []
+      "uitslag": "gehaald",
+      "gemeten": "5 dingen met een LEESBAAR opschrift; 5 alleen als pictogram met aria-label (LivingOS, WorkOS, TravelOS, FoundationOS, Vraag Rahul) -- een schermlezer noemt die, een ziend mens ziet ze niet",
+      "bewijs": [
+        {
+          "naam": "Typ of zeg wat er geregeld moet worden",
+          "soort": "button",
+          "doel": "",
+          "waar": "button.cmd-intentie < div.cmd-leeg < div.cmd-panes < main.cmd-werk"
+        },
+        {
+          "naam": "LivingOS",
+          "soort": "button",
+          "doel": "/apps/rtg.html",
+          "waar": "button.cmd-startwereld < nav.cmd-startwerelden < div.cmd-leeg < div.cmd-panes"
+        },
+        {
+          "naam": "WorkOS",
+          "soort": "button",
+          "doel": "/apps/kantoor.html",
+          "waar": "button.cmd-startwereld < nav.cmd-startwerelden < div.cmd-leeg < div.cmd-panes"
+        },
+        {
+          "naam": "TravelOS",
+          "soort": "button",
+          "doel": "/apps/reizen.html",
+          "waar": "button.cmd-startwereld < nav.cmd-startwerelden < div.cmd-leeg < div.cmd-panes"
+        },
+        {
+          "naam": "FoundationOS",
+          "soort": "button",
+          "doel": "/apps/foundation/os-publiek.html",
+          "waar": "button.cmd-startwereld < nav.cmd-startwerelden < div.cmd-leeg < div.cmd-panes"
+        }
+      ]
     },
     {
       "naam": "geen-interne-termen",
@@ -135,7 +169,7 @@
       "station": "beginscherm",
       "vraag": "Is er een zichtbare weg terug of naar huis?",
       "uitslag": "gehaald",
-      "gemeten": "gezocht op home/terug/sluiten",
+      "gemeten": "dit IS het beginscherm (.cmd-leeg), dus er is geen plek om naar terug te gaan",
       "bewijs": []
     },
     {

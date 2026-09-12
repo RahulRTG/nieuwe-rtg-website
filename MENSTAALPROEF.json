@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-12T20:46:44.191Z",
-    "commit": "5b9730d6",
+    "op": "2026-09-12T21:21:34.906Z",
+    "commit": "787bcd74b",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/menstaalproef.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "rail": "deterministisch",
   "wat": "hoe ver elke menselijke zin werkelijk komt, gemeten uit het stuurspoor, afgezet tegen de `sideEffectMax` die het contract voor die zin noemt",

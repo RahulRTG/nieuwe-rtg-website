@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-12T20:46:44.314Z",
-    "commit": "5b9730d6",
+    "op": "2026-09-12T21:21:35.084Z",
+    "commit": "787bcd74b",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 1,
     "instrument": "scripts/railvergelijk.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "wat": "twee interpretatierails tegen hetzelfde mensentaal-contract: komt de tweede tot dezelfde VEILIGE uitkomsten als de eerste, en blijft hij binnen zijn contract",
   "rails": {
@@ -18,7 +18,7 @@
   },
   "tweedeRail": {
     "gemeten": false,
-    "reden": "de tweede uitslag ontbreekt of is niet te lezen (MENSTAALPROEF-LOKAAL.json). Draai `node scripts/menstaalproef.js --rail=lokaal --uit=...` in een omgeving waar die rail bestaat; zonder LOCAL_AI_URL is er niets om te meten, en dat is iets anders dan \"er is geen verschil\"."
+    "reden": "de tweede uitslag ontbreekt of is niet te lezen (MENSTAALPROEF-ANDER.json). Draai `node scripts/menstaalproef.js --rail=lokaal --uit=...` in een omgeving waar die rail bestaat; zonder LOCAL_AI_URL is er niets om te meten, en dat is iets anders dan \"er is geen verschil\"."
   },
   "telling": {
     "zinnen": 38,

@@ -2,10 +2,10 @@
   "soort": "meting",
   "uitleg": "De geldkaart: welke wegen waarde bewegen (As 1, structureel uit IDEMPROEF.json x effectcollecties.js) en of elke beweging door de waardepoort ging (As 2, dynamisch gemeten met scripts/lib/geldwacht.js).",
   "stempel": {
-    "op": "2026-09-12T17:51:26.057Z",
-    "commit": "64d170b8",
+    "op": "2026-09-12T19:22:23.241Z",
+    "commit": "99daf7b7",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 7,
     "instrument": "scripts/geldkaart.js",
     "node": "v22.22.2"
   },
@@ -17,7 +17,7 @@
   },
   "as1Kaart": {
     "geldcollecties": 31,
-    "routesMetGemetenOpslag": 4729,
+    "routesMetGemetenOpslag": 4912,
     "geldroutes": [
       {
         "route": "130",
@@ -25,9 +25,11 @@
         "pad": "/api/bank/pas/betaal",
         "rol": "member",
         "collecties": [
-          "bankPassen"
+          "bankBoekingen",
+          "bankPassen",
+          "bankSaldi"
         ],
-        "idempotentie": "ongemeten"
+        "idempotentie": "beschermd"
       },
       {
         "route": "131",
@@ -57,7 +59,7 @@
         "collecties": [
           "bankPassen"
         ],
-        "idempotentie": "ongemeten"
+        "idempotentie": "beschermd"
       },
       {
         "route": "134",
@@ -76,6 +78,28 @@
         "rol": "member",
         "collecties": [
           "bankRekeningen"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "139",
+        "methode": "POST",
+        "pad": "/api/bank/salaris",
+        "rol": "member",
+        "collecties": [
+          "bankBoekingen",
+          "bankSaldi"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "140",
+        "methode": "POST",
+        "pad": "/api/bank/sepa",
+        "rol": "member",
+        "collecties": [
+          "bankBoekingen",
+          "bankSaldi"
         ],
         "idempotentie": "beschermd"
       },
@@ -111,7 +135,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "192",
+        "route": "196",
         "methode": "POST",
         "pad": "/api/boardroom/betalingen/proef",
         "rol": "techniek",
@@ -121,17 +145,17 @@
         "idempotentie": "ongemeten"
       },
       {
-        "route": "583",
+        "route": "598",
         "methode": "POST",
         "pad": "/api/geld/beleid/weg",
         "rol": "member",
         "collecties": [
           "geldbeleid"
         ],
-        "idempotentie": "ongemeten"
+        "idempotentie": "beschermd"
       },
       {
-        "route": "585",
+        "route": "600",
         "methode": "POST",
         "pad": "/api/geld/cockpit",
         "rol": "member",
@@ -141,7 +165,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "586",
+        "route": "601",
         "methode": "POST",
         "pad": "/api/geld/grens",
         "rol": "member",
@@ -151,7 +175,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "601",
+        "route": "616",
         "methode": "POST",
         "pad": "/api/gemeente/belasting/mijn",
         "rol": "member",
@@ -161,7 +185,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "728",
+        "route": "756",
         "methode": "POST",
         "pad": "/api/kosten/vooruitblik",
         "rol": "member",
@@ -171,7 +195,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "846",
+        "route": "874",
         "methode": "POST",
         "pad": "/api/labfonds/locatie/maak",
         "rol": "member",
@@ -181,7 +205,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "999",
+        "route": "1028",
         "methode": "POST",
         "pad": "/api/member/ai/tegoed",
         "rol": "member",
@@ -191,7 +215,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "1580",
+        "route": "1624",
         "methode": "POST",
         "pad": "/api/office/bank/draai",
         "rol": "boardroom",
@@ -201,7 +225,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "1587",
+        "route": "1634",
         "methode": "POST",
         "pad": "/api/office/bank/leden",
         "rol": "office",
@@ -211,7 +235,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "1588",
+        "route": "1635",
         "methode": "POST",
         "pad": "/api/office/bank/mislukking",
         "rol": "office",
@@ -221,7 +245,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "1590",
+        "route": "1637",
         "methode": "POST",
         "pad": "/api/office/bank/nood",
         "rol": "office",
@@ -231,7 +255,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "1848",
+        "route": "1898",
         "methode": "POST",
         "pad": "/api/office/rechtsvormwacht",
         "rol": "office",
@@ -241,7 +265,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "2241",
+        "route": "2331",
         "methode": "POST",
         "pad": "/api/pay/kascode",
         "rol": "member",
@@ -251,7 +275,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "2242",
+        "route": "2332",
         "methode": "POST",
         "pad": "/api/pay/oplaad",
         "rol": "member",
@@ -262,7 +286,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "2246",
+        "route": "2336",
         "methode": "POST",
         "pad": "/api/pay/saldo",
         "rol": "member",
@@ -276,7 +300,7 @@
         "idempotentie": "ongemeten"
       },
       {
-        "route": "2247",
+        "route": "2337",
         "methode": "POST",
         "pad": "/api/pay/stuur",
         "rol": "member",
@@ -287,7 +311,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "2249",
+        "route": "2339",
         "methode": "POST",
         "pad": "/api/pay/tegoed/koop",
         "rol": "member",
@@ -299,7 +323,18 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "2255",
+        "route": "2344",
+        "methode": "POST",
+        "pad": "/api/pay/tik",
+        "rol": "member",
+        "collecties": [
+          "payBoekingen",
+          "paySaldi"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "2345",
         "methode": "POST",
         "pad": "/api/pay/tikcode",
         "rol": "member",
@@ -309,7 +344,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "2257",
+        "route": "2347",
         "methode": "POST",
         "pad": "/api/pay/verzoek",
         "rol": "member",
@@ -319,7 +354,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "2258",
+        "route": "2348",
         "methode": "POST",
         "pad": "/api/pay/verzoek/betaal",
         "rol": "member",
@@ -331,17 +366,17 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "2259",
+        "route": "2349",
         "methode": "POST",
         "pad": "/api/pay/verzoek/intrek",
         "rol": "member",
         "collecties": [
           "payVerzoeken"
         ],
-        "idempotentie": "ongemeten"
+        "idempotentie": "beschermd"
       },
       {
-        "route": "2290",
+        "route": "2382",
         "methode": "POST",
         "pad": "/api/punten",
         "rol": "member",
@@ -351,7 +386,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "2828",
+        "route": "2965",
         "methode": "POST",
         "pad": "/api/supplier/betaalverzoek",
         "rol": "supplier",
@@ -361,7 +396,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "2991",
+        "route": "3130",
         "methode": "POST",
         "pad": "/api/supplier/facturen/maak",
         "rol": "supplier",
@@ -371,7 +406,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "2993",
+        "route": "3132",
         "methode": "POST",
         "pad": "/api/supplier/facturen/pdf",
         "rol": "supplier",
@@ -381,7 +416,7 @@
         "idempotentie": "ongemeten"
       },
       {
-        "route": "3042",
+        "route": "3181",
         "methode": "POST",
         "pad": "/api/supplier/giftcard/sell",
         "rol": "supplier",
@@ -391,7 +426,7 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "3385",
+        "route": "3526",
         "methode": "POST",
         "pad": "/api/supplier/oog/overzicht",
         "rol": "supplier",
@@ -401,17 +436,22 @@
         "idempotentie": "ongemeten"
       },
       {
-        "route": "3422",
+        "route": "3563",
         "methode": "POST",
         "pad": "/api/supplier/pay/treasury/apart",
         "rol": "supplier",
         "collecties": [
+          "facturen",
+          "payBoekingen",
+          "payCodes",
+          "paySaldi",
+          "posSales",
           "waardeOormerken"
         ],
-        "idempotentie": "ongemeten"
+        "idempotentie": "beschermd"
       },
       {
-        "route": "3424",
+        "route": "3565",
         "methode": "POST",
         "pad": "/api/supplier/pay/treasury/zet",
         "rol": "supplier",
@@ -421,27 +461,29 @@
         "idempotentie": "beschermd"
       },
       {
-        "route": "3457",
+        "route": "3566",
         "methode": "POST",
-        "pad": "/api/supplier/pos/checkout",
+        "pad": "/api/supplier/pay/uitbetaal",
         "rol": "supplier",
         "collecties": [
-          "posSales"
-        ],
-        "idempotentie": "ongemeten"
-      },
-      {
-        "route": "3926",
-        "methode": "POST",
-        "pad": "/api/wallet",
-        "rol": "member",
-        "collecties": [
-          "wallet"
+          "payBoekingen",
+          "paySaldi"
         ],
         "idempotentie": "beschermd"
       },
       {
-        "route": "3929",
+        "route": "3598",
+        "methode": "POST",
+        "pad": "/api/supplier/pos/checkout",
+        "rol": "supplier",
+        "collecties": [
+          "facturen",
+          "posSales"
+        ],
+        "idempotentie": "beschermd"
+      },
+      {
+        "route": "4109",
         "methode": "POST",
         "pad": "/api/wallet/voeg",
         "rol": "member",
@@ -452,10 +494,10 @@
       }
     ],
     "perCollectie": {
+      "bankBoekingen": 4,
       "bankPassen": 5,
+      "bankSaldi": 4,
       "bankRekeningen": 2,
-      "bankBoekingen": 1,
-      "bankSaldi": 1,
       "bankTerugkerend": 1,
       "betaalRegie": 1,
       "geldbeleid": 2,
@@ -464,9 +506,9 @@
       "economie": 1,
       "aiTegoed": 2,
       "bankregie": 4,
-      "payCodes": 1,
-      "payBoekingen": 5,
-      "paySaldi": 5,
+      "payCodes": 2,
+      "payBoekingen": 8,
+      "paySaldi": 8,
       "fondsAfdrachten": 1,
       "invoices": 1,
       "socialeAfdrachten": 1,
@@ -475,13 +517,13 @@
       "payVerzoeken": 3,
       "punten": 1,
       "betaalVerzoeken": 1,
-      "facturen": 2,
+      "facturen": 4,
       "giftcards": 1,
       "directOntvangsten": 1,
+      "posSales": 2,
       "waardeOormerken": 1,
       "payTreasury": 1,
-      "posSales": 1,
-      "wallet": 2
+      "wallet": 1
     },
     "gronden": {
       "bankSaldi": "het saldo van een rekening",
@@ -525,15 +567,15 @@
       "geslaagd": 153,
       "gezakt": 0
     },
-    "schrijfacties": 1889,
-    "beheerst": 1575,
-    "buitenKern": 217,
+    "schrijfacties": 1978,
+    "beheerst": 1632,
+    "buitenKern": 249,
     "kernBuitenPoort": [],
     "buiten": [
       {
         "collectie": "payCodes",
         "door": "server/routes/pay-tegoed.js:64",
-        "aantal": 46,
+        "aantal": 70,
         "stack": [
           "server/kern/pay/kassa.js:36",
           "server/routes/pay-tegoed.js:64",
@@ -586,6 +628,18 @@
           "server/lib/idem.js:124",
           "server/db/bijeen.js:104",
           "server/lib/idem.js:144"
+        ],
+        "kernbak": false
+      },
+      {
+        "collectie": "payTegoed",
+        "door": "server/lib/idem.js:124",
+        "aantal": 9,
+        "stack": [
+          "server/kern/pay/tegoed-bon.js:57",
+          "server/kern/pay/tegoed.js:67",
+          "server/lib/idem.js:124",
+          "server/db/bijeen.js:104"
         ],
         "kernbak": false
       },
@@ -650,6 +704,18 @@
         "kernbak": false
       },
       {
+        "collectie": "payVerzoeken",
+        "door": "server/lib/idem.js:124",
+        "aantal": 5,
+        "stack": [
+          "server/kern/pay/verzoeken.js:93",
+          "server/lib/idem.js:124",
+          "server/db/bijeen.js:104",
+          "server/lib/idem.js:144"
+        ],
+        "kernbak": false
+      },
+      {
         "collectie": "payTikCodes",
         "door": "server/routes/pay-tegoed.js:46",
         "aantal": 5,
@@ -662,14 +728,14 @@
         "kernbak": false
       },
       {
-        "collectie": "payTegoed",
-        "door": "server/lib/idem.js:124",
-        "aantal": 5,
+        "collectie": "waardePosities",
+        "door": "server/kern/waarde/index.js:112",
+        "aantal": 4,
         "stack": [
-          "server/kern/pay/tegoed-bon.js:57",
-          "server/kern/pay/tegoed.js:67",
-          "server/lib/idem.js:124",
-          "server/db/bijeen.js:104"
+          "server/kern/waarde/index.js:112",
+          "server/kern/waarde/uitgifte.js:64",
+          "server/kern/pay/budget.js:51",
+          "server/lib/idem.js:124"
         ],
         "kernbak": false
       },
@@ -706,18 +772,6 @@
           "server/lib/idem.js:124",
           "server/db/bijeen.js:104",
           "server/lib/idem.js:144"
-        ],
-        "kernbak": false
-      },
-      {
-        "collectie": "waardePosities",
-        "door": "server/kern/waarde/index.js:112",
-        "aantal": 3,
-        "stack": [
-          "server/kern/waarde/index.js:112",
-          "server/kern/waarde/uitgifte.js:64",
-          "server/kern/pay/budget.js:51",
-          "server/lib/idem.js:124"
         ],
         "kernbak": false
       },
@@ -766,18 +820,6 @@
           "server/db/bijeen.js:104",
           "server/kern/fonds.js:80",
           "server/routes/member/betalen.js:71"
-        ],
-        "kernbak": false
-      },
-      {
-        "collectie": "payVerzoeken",
-        "door": "server/lib/idem.js:124",
-        "aantal": 2,
-        "stack": [
-          "server/kern/pay/verzoeken.js:93",
-          "server/lib/idem.js:124",
-          "server/db/bijeen.js:104",
-          "server/lib/idem.js:144"
         ],
         "kernbak": false
       },
@@ -1152,12 +1194,12 @@
         "poorten": {}
       },
       "payBoekingen": {
-        "beheerst": 445,
+        "beheerst": 490,
         "buitenKern": 0,
         "uitgezonderd": 10,
         "container": 0,
         "poorten": {
-          "pay": 445
+          "pay": 490
         }
       },
       "bankRekeningen": {
@@ -1177,26 +1219,26 @@
         }
       },
       "waardePosities": {
-        "beheerst": 8,
-        "buitenKern": 4,
+        "beheerst": 9,
+        "buitenKern": 5,
         "uitgezonderd": 0,
         "container": 0,
         "poorten": {
-          "pay": 8
+          "pay": 9
         }
       },
       "paySaldi": {
-        "beheerst": 130,
+        "beheerst": 141,
         "buitenKern": 0,
         "uitgezonderd": 0,
         "container": 0,
         "poorten": {
-          "pay": 130
+          "pay": 141
         }
       },
       "payCodes": {
         "beheerst": 0,
-        "buitenKern": 46,
+        "buitenKern": 70,
         "uitgezonderd": 0,
         "container": 5,
         "poorten": {}
@@ -1277,7 +1319,7 @@
       },
       "payVerzoeken": {
         "beheerst": 0,
-        "buitenKern": 4,
+        "buitenKern": 7,
         "uitgezonderd": 0,
         "container": 2,
         "poorten": {}
@@ -1298,7 +1340,7 @@
       },
       "payTegoed": {
         "beheerst": 0,
-        "buitenKern": 5,
+        "buitenKern": 9,
         "uitgezonderd": 0,
         "container": 1,
         "poorten": {}
@@ -1309,7 +1351,7 @@
     "uitgezonderd": 20,
     "container": 77,
     "perPoort": {
-      "pay": 590,
+      "pay": 647,
       "bank": 985
     },
     "containerSchrijvers": [

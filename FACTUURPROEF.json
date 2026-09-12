@@ -3,10 +3,10 @@
   "uitleg": "Een geldpad van begin tot eind, ECONOMISCH gemeten: niet de status van de route maar de toestand van de vijf geldcollecties eromheen. Zeven stappen, waaronder een crashpunt uit de verraadsmotor (sterf-na-commit) en de herhaling erna. Zie GELDLAT.md, \"Scenario 3, gemeten op een echt geldpad\".",
   "grens": "DIT IS EEN PAD EN GEEN DEKKING. Wat hier bewezen is, geldt voor POST /api/pay/saldo en voor niets anders. De hashes van de vingerafdruk zijn per proces gezouten, dus over de crash heen zijn alleen aantallen en bedragen vergelijkbaar -- dat staat per stap in de meting. En `PROVEN` op stap 3 gaat over de tweede aanroep, nooit over de crashwindow.",
   "stempel": {
-    "op": "2026-09-12T18:32:26.993Z",
-    "commit": "f30c5aa5",
-    "boomVuil": true,
-    "boomAnders": 1,
+    "op": "2026-09-12T19:21:20.149Z",
+    "commit": "99daf7b7",
+    "boomVuil": false,
+    "boomAnders": 3,
     "instrument": "scripts/factuurproef.js",
     "node": "v22.22.2"
   },
@@ -21,7 +21,7 @@
     "fondsAfdrachten",
     "socialeAfdrachten"
   ],
-  "gemetenOp": "2026-09-12T18:32:06.965Z",
+  "gemetenOp": "2026-09-12T19:20:59.715Z",
   "stappen": [
     {
       "nr": 1,

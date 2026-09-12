@@ -2,7 +2,7 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-d117349b';
+const CACHE = 'rtf-premium-foundation-meedoen-ontdekken-4a297a05';
 const SHELL = [
   '/apps/foundation/', '/apps/foundation/index.html', '/apps/foundation/campus.html',
   '/apps/foundation/samen-thuis.html', '/apps/foundation/samen-thuis.js', '/apps/foundation/samen-thuis-weergave.js',
@@ -72,6 +72,7 @@ const SHELL = [
   '/shared/rtg-operation.js', '/shared/rtg-side-sheet.js',
   '/shared/rtg-heritage.css', '/shared/rtg-heritage-materials.css',
   '/shared/rtg-heritage-adapters.css', '/shared/rtg-heritage-experiences.css', '/shared/rtg-heritage-components.css',
+  '/shared/rtg-simple.css',
   '/shared/rtg-heritage-motion.css', '/shared/rtg-heritage-motion.js',
   '/shared/rtg-continue-key.css', '/shared/rtg-continue-key-core.js',
   '/shared/rtg-continue-key.js', '/shared/rtg-heritage-order.js',

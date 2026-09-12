@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-11T20:43:02.412Z",
-  "commit": "7f0359591",
+  "op": "2026-09-12T16:02:32.582Z",
+  "commit": "24671033",
   "boomVuil": false,
-  "boomAnders": 4,
+  "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
@@ -13,13 +13,13 @@
   "totaal": 4922,
   "geclassificeerd": 4922,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3251,
-   "NOT_APPLICABLE": 1147,
-   "PROTECTED": 400,
-   "INTENTIONALLY_NON_IDEMPOTENT": 124
+   "BLOCKED_BY_TEST_FIXTURE": 3243,
+   "NOT_APPLICABLE": 1150,
+   "PROTECTED": 404,
+   "INTENTIONALLY_NON_IDEMPOTENT": 125
   },
   "vastgesteldDoorMens": 1715,
-  "afgeleidDoorScript": 3207,
+  "afgeleidDoorScript": 3192,
   "toegangWaargenomen": {
    "AUTHENTICATED": 4061,
    "PUBLIC": 123,
@@ -3912,13 +3912,13 @@
    "mutatieId": "bank.pas.betaal",
    "route": "POST /api/bank/pas/betaal",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -3931,7 +3931,7 @@
     "hindernis": "Onvoldoende saldo of rood-staan-ruimte."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -3939,13 +3939,13 @@
    "mutatieId": "bank.pas.bevries",
    "route": "POST /api/bank/pas/bevries",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -3957,8 +3957,8 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -3966,13 +3966,13 @@
    "mutatieId": "bank.pas.limiet",
    "route": "POST /api/bank/pas/limiet",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -3984,8 +3984,8 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -3993,13 +3993,13 @@
    "mutatieId": "bank.pas.sluit",
    "route": "POST /api/bank/pas/sluit",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -4012,7 +4012,7 @@
     "hindernis": "De pas bestaat niet."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -4206,16 +4206,16 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "bank.spaardoel",
+   "mutatieId": "bank.spaardoel.zet",
    "route": "POST /api/bank/spaardoel",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen gast, en de bank moet live zijn",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -4227,8 +4227,8 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -8164,16 +8164,16 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "boardroom.betalingen.proef",
+   "mutatieId": "betaalregie.proef",
    "route": "POST /api/boardroom/betalingen/proef",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "nietHerhaalbaar"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "techAuth"
     ]
@@ -8185,8 +8185,8 @@
     "grond": null,
     "hindernis": "Onbekende betaalprovider."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -27323,13 +27323,13 @@
    "mutatieId": "geld.beleid.weg",
    "route": "POST /api/geld/beleid/weg",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -27342,7 +27342,7 @@
     "hindernis": "Deze regel bestaat niet."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -31572,13 +31572,13 @@
    "mutatieId": "kosten.vooruitblik",
    "route": "POST /api/kosten/vooruitblik",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -31590,8 +31590,8 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "NOT_APPLICABLE",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -74073,16 +74073,16 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "pay.saldo",
+   "mutatieId": "pay.factuur.saldo",
    "route": "POST /api/pay/saldo",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -74095,7 +74095,7 @@
     "hindernis": "Deze factuur is al betaald."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -74427,13 +74427,13 @@
    "mutatieId": "pay.verzoek.intrek",
    "route": "POST /api/pay/verzoek/intrek",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -74446,7 +74446,7 @@
     "hindernis": "Dit verzoek is al afgehandeld."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -100461,16 +100461,16 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "supplier.facturen.maak",
+   "mutatieId": "facturatie.maak",
    "route": "POST /api/supplier/facturen/maak",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "compenseerbaar"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth"
     ]
@@ -100482,8 +100482,8 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "PROTECTED",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -100515,16 +100515,16 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "supplier.facturen.pdf",
+   "mutatieId": "facturatie.pdf",
    "route": "POST /api/supplier/facturen/pdf",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth"
     ]
@@ -100536,8 +100536,8 @@
     "grond": null,
     "hindernis": "Factuur niet gevonden."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "NOT_APPLICABLE",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -111139,16 +111139,16 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "supplier.oog.overzicht",
+   "mutatieId": "oog.overzicht",
    "route": "POST /api/supplier/oog/overzicht",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "idempotent"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth"
     ]
@@ -111160,8 +111160,8 @@
     "grond": null,
     "hindernis": "Deze functie is voor dit genre zaken uitgeschakeld door RTG."
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "NOT_APPLICABLE",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -112138,16 +112138,16 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "supplier.pay.treasury.apart",
+   "mutatieId": "pay.treasury.apart",
    "route": "POST /api/supplier/pay/treasury/apart",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "compenseerbaar"
    },
    "duplicaatregel": "zelfdeVerzoek",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "manager",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth"
     ]
@@ -112160,7 +112160,7 @@
     "hindernis": "Er is niet genoeg saldo om dit apart te zetten."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -113083,16 +113083,16 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "supplier.pos.checkout",
+   "mutatieId": "kassa.checkout",
    "route": "POST /api/supplier/pos/checkout",
    "semantiek": {
-    "klasse": "onbekend"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth"
     ]
@@ -113105,7 +113105,7 @@
     "hindernis": "Geen open rekening voor deze kamer of tafel."
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "herkomst": null,
    "voorstel": null,
    "voorstelGrond": null
   },

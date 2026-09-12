@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-12T06:12:50.465Z",
-    "commit": "16676d86",
+    "op": "2026-09-12T06:17:30.549Z",
+    "commit": "7fc39af7",
     "boomVuil": true,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/eersteminuut.js",
     "node": "v22.22.2"
   },
@@ -17,36 +17,15 @@
     "nietMeetbaar": "kan hier niet worden vastgesteld, met de reden erbij"
   },
   "poorten": {
-    "totaal": 4,
+    "totaal": 1,
     "nodig": 1,
-    "onnodig": 3,
+    "onnodig": 0,
     "rijen": [
       {
         "soort": "overeenkomst",
         "nodig": true,
         "grond": "zonder handtekening bestaat het lidmaatschap niet -- NU NODIG (punt 7)",
         "kop": "Laatste stap: de RTG-lidmaatschaps- en reisovereenkomst. Typ je volledige naam om te teken"
-      },
-      {
-        "soort": "vraag",
-        "nodig": false,
-        "grond": "gesteld voordat de mens iets heeft gedaan waarvoor het antwoord nodig is",
-        "kop": "Getekend, welkom. Zodra je iets bestelt of laat bezorgen heb ik een paar gegevens nodig. Z",
-        "uitweg": "Liever later"
-      },
-      {
-        "soort": "vraag",
-        "nodig": false,
-        "grond": "gesteld voordat de mens iets heeft gedaan waarvoor het antwoord nodig is",
-        "kop": "De Salon is van de leden, en hij begint leeg. Wil je er meteen iets neerzetten?",
-        "uitweg": "Sla dit over"
-      },
-      {
-        "soort": "vraag",
-        "nodig": false,
-        "grond": "gesteld voordat de mens iets heeft gedaan waarvoor het antwoord nodig is",
-        "kop": "Heb je een bedrijf? Dan kan het hier zijn eigen plek krijgen.",
-        "uitweg": "Sla dit over"
       }
     ]
   },
@@ -98,8 +77,8 @@
     ]
   },
   "telling": {
-    "gehaald": 4,
-    "gezakt": 3,
+    "gehaald": 6,
+    "gezakt": 1,
     "nietMeetbaar": 2
   },
   "toetsen": [
@@ -115,28 +94,9 @@
       "naam": "geen-interne-termen",
       "station": "beginscherm + menu",
       "vraag": "Staat er een woord dat alleen binnen dit huis iets betekent?",
-      "uitslag": "gezakt",
-      "gemeten": "3 interne termen zichtbaar",
-      "bewijs": [
-        {
-          "woord": "Universe",
-          "waarom": "view-naam uit shared/rtg-edge-worlds.js; stond als `01Universe` bovenaan het ledenmenu",
-          "voorbeeld": "01Universe→",
-          "keer": 1
-        },
-        {
-          "woord": "Intent",
-          "waarom": "interne naam van de intentielaag (kern/stuur/); voor een lid een leeg woord",
-          "voorbeeld": "02Intent→",
-          "keer": 1
-        },
-        {
-          "woord": "Worlds",
-          "waarom": "Engelse dubbel van \"werelden\", naast de Nederlandse variant in hetzelfde menu",
-          "voorbeeld": "03Worlds→",
-          "keer": 1
-        }
-      ]
+      "uitslag": "gehaald",
+      "gemeten": "0 interne termen zichtbaar",
+      "bewijs": []
     },
     {
       "naam": "geen-vrije-plekken",
@@ -158,13 +118,9 @@
       "naam": "geen-onnodige-vragen",
       "station": "weg naar het beginscherm",
       "vraag": "Hoeveel vragen komen er vóór de eerste waarde die niet NU NODIG zijn?",
-      "uitslag": "gezakt",
-      "gemeten": "3 onnodige poorten, 1 terecht",
-      "bewijs": [
-        "Getekend, welkom. Zodra je iets bestelt of laat bezorgen heb ik een paar gegevens nodig. Z",
-        "De Salon is van de leden, en hij begint leeg. Wil je er meteen iets neerzetten?",
-        "Heb je een bedrijf? Dan kan het hier zijn eigen plek krijgen."
-      ]
+      "uitslag": "gehaald",
+      "gemeten": "0 onnodige poorten, 1 terecht",
+      "bewijs": []
     },
     {
       "naam": "zoeken-of-intentie",

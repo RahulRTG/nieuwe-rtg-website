@@ -65,19 +65,33 @@
       if (a.prim) b.className = 'prim'; b.addEventListener('click', a.doe); box.appendChild(b);
     });
   }
-  /* Het inrichten: ná het tekenen biedt Rahul één keer aan in te vullen wat de
-     gegevenspoort anders per keer komt vragen. Een aanbod, geen poort -- waarom
-     en waar het landt staat in server/kern/onboarding/inrichten.js. */
+  /* NA HET TEKENEN IS HET LID BINNEN, EN VERDER NIETS.
+
+     Hier stonden drie vragen tussen de handtekening en de app: vul alvast je
+     bezorggegevens in, wil je meteen iets in De Salon zetten, en heb je een
+     bedrijf. Alle drie vrijwillig, alle drie met een uitweg -- en samen alsnog
+     drie schermen voordat een mens ook maar iets van RTG had gezien.
+
+     De regel die dit terugdringt staat in MENS.md par. 5 en komt uit punt 7:
+     een stroom mag alleen blokkeren op wat NU NODIG is. De overeenkomst is dat
+     -- zonder handtekening bestaat het lidmaatschap niet. De andere drie zijn
+     dat niet: ze worden gesteld omdat het antwoord OOIT van pas komt.
+
+     ER GAAT GEEN FUNCTIE WEG, en dat is nagekeken voordat dit werd geschrapt:
+
+       - de gegevens vraagt de gegevenspoort zelf, op het moment dat er
+         werkelijk iets bezorgd of besteld wordt. Dat is precies wat het oude
+         commentaar hier al zei ("wat de gegevenspoort anders per keer komt
+         vragen") -- alleen vooruit gesteld in plaats van op zijn moment;
+       - een bericht in De Salon plaatst een lid op /apps/salon.html;
+       - een bedrijf aanmelden gaat via /apps/partner-worden.html, en
+         server/kern/onboarding/meebouwen.js blijft ongemoeid: die deur is er
+         nog, alleen staat hij niet meer in de gang naar binnen.
+
+     `npm run eersteminuut` telt deze poorten; komt er ooit weer een vraag vóór
+     de eerste waarde, dan zakt de toets geen-onnodige-vragen. */
   let onbInr = [], onbInrHuidig = null;
-  async function onbInrichtenAanbod(){
-    let st; try { st = await API.call('/onboarding/inrichten'); } catch(e){ return onbMeebouwen(); }
-    if (!st || st.klaar || !(st.open || []).length) return onbMeebouwen();
-    onbInr = st.open.slice(); onbStap = 'inrichten-aanbod';
-    const rij = onbEl('onbRij'); if (rij) rij.style.display = 'none';
-    onbZeg(T('onb.inr.aanbod','Getekend, welkom. Zodra je iets bestelt of laat bezorgen heb ik een paar gegevens nodig. Zal ik ze nu in één keer doorlopen?'));
-    onbActies([{ txt: T('onb.inr.ja','Ja, nu meteen'), prim: true, doe: onbInrVolgende },
-      { txt: T('onb.inr.later','Liever later'), doe: onbMeebouwen }]);
-  }
+  async function onbInrichtenAanbod(){ return onbKlaar(); }
   function onbInrVolgende(){
     if (!onbInr.length) return onbMeebouwen();
     onbInrHuidig = onbInr.shift(); onbStap = 'inrichten';

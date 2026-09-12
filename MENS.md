@@ -29,7 +29,10 @@ vóór er een letter ontwerp op papier stond.
 echte route, opent de app in een echte browser op 390×844 in het Nederlands, en
 kijkt wat die mens krijgt. **Drie van de negen toetsen zakken vandaag.**
 
-| toets | uitslag | wat er gemeten is |
+*Stand na de eerste reparatieronde (12 september): van de drie zakkende toetsen
+staan er twee groen. De derde is geen reparatie maar een besluit — par. 3a.*
+
+| toets | uitslag bij het schrijven | wat er gemeten is |
 |---|---|---|
 | inhoud-zonder-menu | **ZAKT** | 0 dingen met een leesbaar opschrift; de vier werelden staan er als pictogram met alleen een `aria-label` |
 | geen-interne-termen | **ZAKT** | `Universe`, `Intent`, `Worlds` — bovenaan het ledenmenu |
@@ -322,10 +325,10 @@ dan de vijftig eronder.
 
 | # | stap | stand | waarom eerst |
 |---|---|---|---|
-| 1 | `EERSTEMINUUT.json` in de keuring | **staat** (`npm run eersteminuut:controle`) | zonder poort is elke volgende stap een mening |
-| 2 | `01Universe` → weg uit het ledenmenu | **stap weg** | drie interne termen, één bestand, direct meetbaar |
-| 3 | vier werelden een opschrift geven | **stap weg** | ze staan er al; ze zijn alleen onzichtbaar |
-| 4 | de drie intake-vragen naar hun moment | **stap weg** | punt 6/7: vragen wanneer het antwoord nodig is |
+| 1 | `EERSTEMINUUT.json` als meter | **staat** (`npm run eersteminuut`) | zonder poort is elke volgende stap een mening. Hangt bewust nog niet in de keuring: zie hieronder |
+| 2 | `01Universe` → weg uit het ledenmenu | **GEDAAN** | vijf interne view-namen vervangen door namen uit de panelen van dat scherm zelf; toets `geen-interne-termen` staat groen |
+| 3 | vier werelden een opschrift geven | **besluit, niet stap weg** | par. 3a: ze worden overschilderd door een tweede onderbalk, en met opschrift past de vierde niet meer in de rij. Een opmaakingreep lost dit niet op |
+| 4 | de drie intake-vragen naar hun moment | **GEDAAN** | na de handtekening gaat een lid rechtstreeks de app in; toets `geen-onnodige-vragen` staat groen, 1 terechte poort over |
 | 5 | één navigatieregister, consumentenprojectie eruit | **besluit** | par. 3; raakt `MAPPEN`, `rtg-edge-worlds.js` en de zoekindex |
 | 6 | beginscherm: taal-ingang boven de werelden | **besluit van de eigenaar** | draait WERELD.md 17 aug terug; zie 2.6 |
 | 7 | `CONSUMENTENTAAL.json` (punt 57) | **stap weg** | maakt toets 8 meetbaar in plaats van `nietMeetbaar` |

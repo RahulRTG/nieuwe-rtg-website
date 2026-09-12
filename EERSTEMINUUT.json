@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-12T07:02:05.424Z",
-    "commit": "e03d3dcd",
-    "boomVuil": false,
+    "op": "2026-09-12T07:24:21.065Z",
+    "commit": "01fbec18",
+    "boomVuil": true,
     "boomAnders": 0,
     "instrument": "scripts/eersteminuut.js",
     "node": "v22.22.2"

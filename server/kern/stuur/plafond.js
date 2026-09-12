@@ -130,4 +130,40 @@ function plafondVan(opties) {
   };
 }
 
-module.exports = { plafondVan, TREDEN, NIVEAUS_BIJ_TREDE, STANDAARD };
+/* DE GRENDEL PER PAD, voor een aanroeper die zelf een bovengrens meegeeft.
+
+   `plafondVan` hierboven rekent het volledige plafond uit (mandaat inbegrepen)
+   en heeft daarvoor de hele padenlijst nodig. De lus bouwt die lijst zelf en
+   filtert per pad; daar past een predicaat beter.
+
+   GEEN GEVRAAGDE TREDE IS GEEN GRENDEL, en dat is met opzet geen `tonen`. Deze
+   route wordt ook gebruikt door rahul-tab, metgezel en de handenvrij-balk, en
+   die zijn met opzet gebouwd om te HANDELEN. Wie hier stilzwijgend `tonen` van
+   maakt, haalt bij die drie een functie weg in naam van veiligheid. De nieuwe
+   aanroeper vraagt zijn eigen grendel expliciet aan; dat is zichtbaar in het
+   verzoek en in het antwoord, in plaats van een stille standaard die niemand
+   kan terugvinden.
+
+   Hij kan alleen VERSMALLEN: hij toetst per pad tegen het niveau dat
+   beleid.js al gaf, en voegt nooit iets toe. */
+function grendelVoor(trede, wereld) {
+  const t = geldigeTrede(trede);
+  if (!t) return null;
+  const toegestaan = NIVEAUS_BIJ_TREDE[t] || [];
+  return (pad) => toegestaan.indexOf(beleidVoor(pad, String(wereld || '')).niveau) >= 0;
+}
+
+/* WAT DE EERSTE AANROEPER HIERMEE DOET, en waarom dat een reparatie was.
+
+   De vraagbalk van de commandoschil riep /api/fluister al aan -- de keten was
+   dus niet onverbonden, zoals de eerste inventaris nog aannam. Maar de route
+   bouwde in de stuur-tak een NIEUW antwoordobject zonder het veld `pakte`,
+   terwijl de client daar juist op toetst (app-main-29b.js). Gevolg: de hele
+   keten draaide, deed op de server wat hij mocht, en de client gooide het
+   antwoord weg om alsnog een kaal model te vragen. De handelingen gebeurden,
+   het antwoord kwam van iets anders.
+
+   Sinds die reparatie draagt de stuur-tak `pakte: true` en toont de balk wat de
+   keten zei. Precies daarom vraagt die balk tegelijk het plafond `tonen` aan:
+   wat hij laat zien mag lezen en rekenen, niet veranderen. */
+module.exports = { plafondVan, grendelVoor, geldigeTrede, TREDEN, NIVEAUS_BIJ_TREDE, STANDAARD };

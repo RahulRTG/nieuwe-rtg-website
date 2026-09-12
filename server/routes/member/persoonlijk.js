@@ -2,6 +2,8 @@
    De logica woont in de kernmodules. */
 const { maakLiveTwin } = require('../../ai-live-twin');
 
+const plafond = require('../../kern/stuur/plafond');
+
 module.exports = (kern) => {
   const { app, auth, liveCodename, pestgrens, bus, noteerBeurt, zorgVan, zorgZet, locDeel, locStopKlant, locMijn, stuurLus } = kern;
   const { fluisterZeg, fluisterPush, fluisterProfiel, fluisterOnthoud, fluisterVergeet, fluisterFocus, sparLijst, sparParkeer, sparStatus } = kern.fluister;
@@ -44,6 +46,8 @@ app.post('/api/fluister', auth, async (req, res) => {
      verder zoals altijd: geen ander antwoord, geen extra veld, geen vinkje.
      Elk zichtbaar verschil zou de functie kapotmaken. */
   if (kern.codewoordCheck) { try { kern.codewoordCheck(req.session.key, req.body.q, 'rahul'); } catch (e) {} }
+  const plafondTrede = plafond.geldigeTrede(req.body.plafond);
+  const grendel = plafond.grendelVoor(plafondTrede, 'member');
   const grens = pestgrens.poort(req.session.key, req.body.q);
   if (grens) return res.json({ antwoord: grens.antwoord, pestgrens: true, weg: !!grens.weg });
   // sessie mee voor doen (reserveren, 24 uur plannen)
@@ -68,7 +72,8 @@ app.post('/api/fluister', auth, async (req, res) => {
           envelop: { actor: liveCodename(req.session), classificatie: 'persoonsgegeven' } }); } catch (e) {}
       },
       // Leden- en Foundationpaden wel; werkwerelden blijven buiten bereik.
-      filter: p => !['/api/supplier', '/api/staff', '/api/office', '/api/partner'].some(w => p.startsWith(w)),
+          filter: p => !['/api/supplier', '/api/staff', '/api/office', '/api/partner'].some(w => p.startsWith(w))
+        && (!grendel || grendel(p)),
       systeem: require('../../kern/rahul').RAHUL_LEAD +
         'Je helpt een RTG-lid (codenaam ' + liveCodename(req.session) + ', pas: ' + (req.session.tier || 'rtg') + ') in de leden-app. ' +
         'Je regelt niet alleen reizen, bestellen, betalen en de Salon, maar ook de RTFoundation voor het gezin (bijvoorbeeld het babyboek, school, toetsen of het zakgeldpotje) als het lid daar recht op heeft.'
@@ -76,7 +81,8 @@ app.post('/api/fluister', auth, async (req, res) => {
     if (lus && lus.tekst) {
       onthoudGesprek(req, lus.tekst);
       const stand = aiStatus();
-      const antwoord = { antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
+      const antwoord = { pakte: true, plafond: plafondTrede,
+        antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
         goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring),
         goedkeuringWereld: 'member',
         aiBeschikbaar: true, modus: stand.modus, verwerking: stand.verwerking, kompas: stand.kompas };

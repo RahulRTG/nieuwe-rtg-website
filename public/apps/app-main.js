@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '24571a5a';
+var RTG_BOUW = '7b985c6a';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -6158,7 +6158,16 @@ var RTG_BOUW = '24571a5a';
       aiDraad.scrollTop = aiDraad.scrollHeight;
     };
     try {
-      const r = await API.call('/fluister', { q });
+      /* De vraagbalk praat met de stuurketen, met context en een gevraagd
+         plafond. `tonen` is de veiligheidsregel van de migratie: een vraag die
+         hier gisteren tekst opleverde mag geen side effect krijgen omdat er een
+         motor achter staat. De grendel kan alleen versmallen; waarom, staat in
+         server/kern/stuur/plafond.js. De context komt uit RTGRahulTabHelpers --
+         hetzelfde contract als de Rahul-tab, geen tweede bouwer. */
+      const ctx = (window.RTGRahulTabHelpers && window.RTGRahulTabHelpers.context)
+        ? window.RTGRahulTabHelpers.context() : null;
+      const r = await API.call('/fluister', ctx ? { q, plafond: 'tonen', context: ctx }
+                                                 : { q, plafond: 'tonen' });
       if (r && r.pakte && r.antwoord) {
         zet(r.antwoord);
         if (r.gedaan) toast(T('fl.gedaan', 'Rahul heeft het geregeld.'));

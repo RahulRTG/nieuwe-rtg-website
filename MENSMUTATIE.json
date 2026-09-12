@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-12T20:05:32.821Z",
-    "commit": "0df7f561",
+    "op": "2026-09-12T20:46:35.952Z",
+    "commit": "5b9730d6",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/mensmutatie.js",
@@ -54,7 +54,7 @@
         },
         {
           "wacht": "menstaalproef",
-          "melding": "- de context is niet gesaneerd (OVERGESLAGEN); dan is dit geval veilig omdat er niets aankwam, en niet omdat de laag zich goed gedroeg"
+          "melding": "- B: kwam tot geen; \"open hem\" is kijken en niet meer"
         }
       ],
       "bleefGroen": [
@@ -86,7 +86,7 @@
         },
         {
           "wacht": "menstaalproef",
-          "melding": "- positief: INTENT_RESOLVED is OVERGESLAGEN en niet PASS"
+          "melding": "- B: de resolver heeft de context niet aantoonbaar gebruikt (null). Dit is het enige geval waarin dat van begin tot eind gemeten wordt; valt het weg, dan is die weg weer onbewezen."
         }
       ],
       "bleefGroen": [

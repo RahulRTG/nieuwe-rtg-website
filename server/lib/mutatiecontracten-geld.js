@@ -57,44 +57,47 @@ const s = (klasse) => ({ klasse });
 const CONTRACTEN = {
   /* ---- een waarde zetten of wissen: dezelfde stand na twee aanroepen ---- */
   'POST /api/bank/pas/bevries': {
-    mutatieId: 'bank.pas.bevries', semantiek: s('idempotent'), stand: 'PROTECTED', afgetekend: AFGETEKEND,
+    mutatieId: 'bank.pas.bevries', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'PROTECTED', afgetekend: AFGETEKEND,
     waarom: 'kern/bank/passen.js: `p.bevroren = aan === true`. Twee keer bevriezen laat ' +
       'de pas bevroren; de meegegeven stand bepaalt de uitkomst, niet het aantal aanroepen.',
     bewijs: { gemeten: 'IDEMPROEF.json: beschermd', op: '2026-09-12' }
   },
   'POST /api/bank/pas/limiet': {
-    mutatieId: 'bank.pas.limiet', semantiek: s('idempotent'), stand: 'PROTECTED', afgetekend: AFGETEKEND,
+    mutatieId: 'bank.pas.limiet', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'PROTECTED', afgetekend: AFGETEKEND,
     waarom: 'kern/bank/passen.js: `p.dagLimietCenten = centen`. Een waarde zetten.',
     bewijs: { gemeten: 'IDEMPROEF.json: beschermd', op: '2026-09-12' }
   },
   'POST /api/bank/spaardoel': {
-    mutatieId: 'bank.spaardoel.zet', semantiek: s('idempotent'), stand: 'PROTECTED', afgetekend: AFGETEKEND,
+    mutatieId: 'bank.spaardoel.zet', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'PROTECTED', afgetekend: AFGETEKEND,
     waarom: 'bankSpaardoelZet zet een bedrag op de rekening. Twee keer hetzelfde doel ' +
       'zetten geeft dezelfde eindstand.',
     bewijs: { gemeten: 'IDEMPROEF.json: beschermd', op: '2026-09-12' }
   },
   'POST /api/bank/pas/sluit': {
-    mutatieId: 'bank.pas.sluit', semantiek: s('idempotent'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
+    mutatieId: 'bank.pas.sluit', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
     waarom: 'kern/bank/passen.js: `delete passen()[id]`. Een tweede aanroep geeft 404 ' +
       '"De pas bestaat niet" -- een toestandscontrole, geen tweede effect. De eindstand ' +
       'na een en na twee aanroepen is identiek: de pas is weg. Er wordt bij het sluiten ' +
       'GEEN saldo verplaatst, dus er valt ook niets dubbel te doen.',
+    watErMoetKomen: "een UITGEGEVEN bankpas. Zelfde voorziening als bij bank.pas.betaal; met de pas erbij meet een tweede aanroep of hij netjes 404 geeft in plaats van iets te doen.",
     bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen uitgegeven pas in de proefwereld)', op: '2026-09-12' }
   },
   'POST /api/geld/beleid/weg': {
-    mutatieId: 'geld.beleid.weg', semantiek: s('idempotent'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
+    mutatieId: 'geld.beleid.weg', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
     waarom: 'kern/geldbeleid: een regel verwijderen. Twee keer weghalen laat hem weg.',
+    watErMoetKomen: "een bestaande beleidsregel van het lid, aangemaakt langs de gewone route. Zonder regel is er niets te verwijderen en doet de eerste oproep al geen werk.",
     bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen regel om weg te halen)', op: '2026-09-12' }
   },
   'POST /api/pay/verzoek/intrek': {
-    mutatieId: 'pay.verzoek.intrek', semantiek: s('idempotent'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
+    mutatieId: 'pay.verzoek.intrek', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
     waarom: 'kern/pay/verzoeken.js: `v.status = "ingetrokken"`, met ervoor een weigering ' +
       'als de stand niet `open` is (409 "Dit verzoek is al afgehandeld"). Een tweede ' +
       'aanroep verandert niets meer.',
+    watErMoetKomen: "een OPEN betaalverzoek van het lid zelf. Zonder verzoek geeft de route 404 en zegt een herhaling niets.",
     bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen open verzoek)', op: '2026-09-12' }
   },
   'POST /api/pay/saldo': {
-    mutatieId: 'pay.factuur.saldo', semantiek: s('idempotent'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
+    mutatieId: 'pay.factuur.saldo', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
     waarom: 'HET SLOT ZIT OP DE TOESTAND EN NIET OP EEN SLEUTEL, en dat is hier bewust ' +
       'nagekeken omdat deze route geld over vijf collecties beweegt zonder idem-sleutel. ' +
       'kern/factuursaldo.js draagt drie grendels voor er een cent beweegt: `status === ' +
@@ -102,12 +105,13 @@ const CONTRACTEN = {
       '(een vlucht-slot voor twee gelijktijdige verzoeken). Een tweede aanroep op dezelfde ' +
       'factuur kan dus niet twee keer betalen. Een sleutel zou hier netter zijn, maar het ' +
       'ontbreken ervan is geen gat: de factuurstand IS de sleutel.',
+    watErMoetKomen: "een OPENSTAANDE factuur op naam van het lid, plus genoeg saldo om hem te voldoen. Dit is de belangrijkste van de zeven: de route beweegt geld over vijf collecties en haar bescherming hangt aan de factuurSTAND en niet aan een sleutel. Pas met deze wereld is te meten of dat slot werkelijk sluit.",
     bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen openstaande factuur)', op: '2026-09-12' }
   },
 
   /* ---- lezen of rekenen: geen eigen stand ---- */
   'POST /api/kosten/vooruitblik': {
-    mutatieId: 'kosten.vooruitblik', semantiek: s('idempotent'), stand: 'NOT_APPLICABLE', nagekeken: 'Claude (Opus 5) door de handler te lezen, 2026-09-12; geen mens heeft hem nagelezen', afgetekend: AFGETEKEND,
+    mutatieId: 'kosten.vooruitblik', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'NOT_APPLICABLE', nagekeken: 'Claude (Opus 5) door de handler te lezen, 2026-09-12; geen mens heeft hem nagelezen', afgetekend: AFGETEKEND,
     waarom: 'De route rekent een vooruitblik uit en geeft hem terug; er wordt niets van ' +
       'de gebruiker vastgelegd. Dat de opslagmeting `economie` zag bewegen komt van de ' +
       'kostenmeter die ELK verzoek telt (kern/kosten/haak.js) en niet van deze handeling ' +
@@ -115,13 +119,13 @@ const CONTRACTEN = {
     bewijs: { gemeten: 'IDEMPROEF.json: beschermd', op: '2026-09-12' }
   },
   'POST /api/supplier/facturen/pdf': {
-    mutatieId: 'facturatie.pdf', semantiek: s('idempotent'), stand: 'NOT_APPLICABLE', nagekeken: 'Claude (Opus 5) door de handler te lezen, 2026-09-12; geen mens heeft hem nagelezen', afgetekend: AFGETEKEND,
+    mutatieId: 'facturatie.pdf', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'NOT_APPLICABLE', nagekeken: 'Claude (Opus 5) door de handler te lezen, 2026-09-12; geen mens heeft hem nagelezen', afgetekend: AFGETEKEND,
     waarom: 'De handler zoekt de factuur op, controleert of hij van deze zaak is, en ' +
       'rendert een PDF. Geen schrijfactie.',
     bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen factuur van deze zaak)', op: '2026-09-12' }
   },
   'POST /api/supplier/oog/overzicht': {
-    mutatieId: 'oog.overzicht', semantiek: s('idempotent'), stand: 'NOT_APPLICABLE', nagekeken: 'Claude (Opus 5) door de handler te lezen, 2026-09-12; geen mens heeft hem nagelezen', afgetekend: AFGETEKEND,
+    mutatieId: 'oog.overzicht', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'NOT_APPLICABLE', nagekeken: 'Claude (Opus 5) door de handler te lezen, 2026-09-12; geen mens heeft hem nagelezen', afgetekend: AFGETEKEND,
     waarom: 'De handler is `res.json(oogOverzicht(req.supplier))` -- puur lezen.',
     bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE', op: '2026-09-12' }
   }

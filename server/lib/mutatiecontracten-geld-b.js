@@ -20,11 +20,12 @@ const s = (klasse) => ({ klasse });
 const CONTRACTEN = {
   /* ---- een sleutel ervoor: herhalen mag, maar alleen met dezelfde ---- */
   'POST /api/bank/pas/betaal': {
-    mutatieId: 'bank.pas.betaal', semantiek: s('sleutelVereist'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
+    mutatieId: 'bank.pas.betaal', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('sleutelVereist'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
     waarom: 'kern/bank/passen.js wikkelt de boeking in `metIdem`, en het commentaar erboven ' +
       'legt de fout vast die dat nodig maakte: "Een herhaling schreef het bedrag nog een keer ' +
       'af EN telde nog een keer mee voor de daglimiet". Zonder sleutel is een tweede aanroep ' +
       'dus een tweede betaling.',
+    watErMoetKomen: "een UITGEGEVEN bankpas op een rekening met saldo, plus een daglimiet die de betaling toelaat. Bouw dat in scripts/lib/idemwereld.js -- die zet al een rekening en stort er geld op; wat ontbreekt is /api/bank/pas/uitgeven ervoor. Pas dan meet een herhaling of het idem-slot in kern/bank/passen.js werkelijk houdt, in plaats van dat de daglimiet hem tegenhoudt.",
     bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen uitgegeven pas)', op: '2026-09-12' }
   },
   /* POST /api/pay/verzoek/betaal STAAT HIER BEWUST NIET, en dat is de enige van
@@ -49,18 +50,19 @@ const CONTRACTEN = {
      had ik kunnen halen door een besluit van iemand anders te overschrijven. */
 
   'POST /api/supplier/pos/checkout': {
-    mutatieId: 'kassa.checkout', semantiek: s('sleutelVereist'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
+    mutatieId: 'kassa.checkout', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('sleutelVereist'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
     waarom: 'De hele handler loopt door `herhaling.eenmalig`, die met `sleutelVan(body)` een ' +
       'sleutel UIT HET LICHAAM afleidt en daarmee `metIdem` aanroept. Dat levert hetzelfde ' +
       'contract als een meegegeven sleutel -- met een kanttekening die hier hoort: levert het ' +
       'lichaam geen sleutel op, dan draait het werk ONBESCHERMD (`if (!s) return werk()`). ' +
       'De bescherming hangt dus aan de bonvelden en niet aan de aanroeper.',
+    watErMoetKomen: "een OPEN kamer- of tafelrekening bij de zaak met minstens een regel erop; de handler weigert nu met 404. Let bij het bouwen op de kanttekening in `waarom`: de bescherming komt uit het LICHAAM, dus de proef moet twee keer hetzelfde lichaam sturen om iets te meten.",
     bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen open kamerrekening)', op: '2026-09-12' }
   },
 
   /* ---- een tegenboeking erachter ---- */
   'POST /api/supplier/facturen/maak': {
-    mutatieId: 'facturatie.maak', semantiek: s('compenseerbaar'), stand: 'PROTECTED', afgetekend: AFGETEKEND,
+    mutatieId: 'facturatie.maak', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('compenseerbaar'), stand: 'PROTECTED', afgetekend: AFGETEKEND,
     waarom: 'Een tweede aanroep maakt een TWEEDE factuur: kern/facturatie/motor.js kent geen ' +
       'idem-sleutel en geen ontdubbeling (nagekeken). Dat is te herstellen met een creditnota, ' +
       'en daarmee is dit compenseerbaar en niet onherstelbaar. LET OP EEN VERSCHIL DAT HIER ' +
@@ -71,17 +73,18 @@ const CONTRACTEN = {
     bewijs: { gemeten: 'IDEMPROEF.json: beschermd -- in tegenspraak met de code, zie waarom', op: '2026-09-12' }
   },
   'POST /api/supplier/pay/treasury/apart': {
-    mutatieId: 'pay.treasury.apart', semantiek: s('compenseerbaar'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
+    mutatieId: 'pay.treasury.apart', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('compenseerbaar'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
     waarom: 'Geld apart zetten maakt een oormerk (WAARDE.md: een oormerk is u die uw eigen ' +
       'geld apart zet, en dat blijft). Twee keer apart zetten geeft twee oormerken. Er is een ' +
       'uitgeschreven tegenhanger -- /api/supplier/pay/treasury/vrij -- dus het is recht te ' +
       'zetten zonder dat er geld verdwenen is.',
+    watErMoetKomen: "een treasury-positie van de zaak met vrij saldo om apart te zetten. De zaak bestaat al in de proefwereld; wat ontbreekt is de positie en het saldo erop.",
     bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen treasury-positie)', op: '2026-09-12' }
   },
 
   /* ---- en de uitzondering: een journaalregel per aanroep ---- */
   'POST /api/boardroom/betalingen/proef': {
-    mutatieId: 'betaalregie.proef', semantiek: s('nietHerhaalbaar'), stand: 'INTENTIONALLY_NON_IDEMPOTENT', afgetekend: AFGETEKEND,
+    mutatieId: 'betaalregie.proef', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('nietHerhaalbaar'), stand: 'INTENTIONALLY_NON_IDEMPOTENT', afgetekend: AFGETEKEND,
     waarom: 'kern/betaalregie.js schrijft bij ELKE aanroep `audit(r, "configuratieproef", ...)`. ' +
       'Dat is letterlijk het voorbeeld dat kern/mutatie.js bij deze klasse noemt: een regel aan ' +
       'een journaal toevoegen. Herhalen IS hier een tweede gebeurtenis en dat is de bedoeling -- ' +

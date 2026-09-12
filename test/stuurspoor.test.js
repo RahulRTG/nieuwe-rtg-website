@@ -35,7 +35,12 @@ function maakLus(extra) {
   const stuurRoep = async (req, pad) => { geroepen.push(pad); return { status: 200, antwoord: {} }; };
   const alle = toegestanePaden(KANDIDATEN, 'member');
   const lus = require('../server/kern/stuur/lus')(Object.assign({
-    anthropic: maakCorpusRail({}), app: {}, log: null, stuurRoep,
+    /* `railNaam` moet mee: het spoor verlaat de lus alleen op de
+       deterministische rail (kern/stuur/lus.js), en deze proef IS die rail.
+       Vergeet je hem, dan komt er geen spoor terug en zakt de toets luid --
+       precies de kant op die je wilt. */
+    anthropic: maakCorpusRail({}), railNaam: 'DETERMINISTISCH',
+    app: {}, log: null, stuurRoep,
     stuurPaden: () => alle, classificeer, parseSubs, isolatie: null
   }, extra || {}));
   return { lus, geroepen };

@@ -137,7 +137,7 @@ function maakStuur({ log, anthropic, app, crypto, isolatie }) {
     log.warn ? log.warn('stuur: deterministische intentierail actief (' + gekozenRail.reden + ')')
       : console.warn('stuur: deterministische intentierail actief');
   const stuurLus = require('./stuur/lus')({ anthropic: gekozenRail.client, app, log, stuurRoep,
-    stuurPaden, classificeer, parseSubs, isolatie });
+    stuurPaden, classificeer, parseSubs, isolatie, railNaam: gekozenRail.naam });
 
   return { stuurToets, stuurRoep, stuurBevestig, stuurPaden, stuurLus, classificeer, parseSubs,
     /* De stand van de rail is uit te lezen: een keten die niet kan zeggen

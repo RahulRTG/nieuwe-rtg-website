@@ -73,17 +73,13 @@ module.exports = (kern) => {
       if (lus && lus.tekst) {
         onthoudGesprek(req, lus.tekst);
         const stand = aiStatus();
-        /* HET STUURSPOOR VERLAAT DE SERVER ALLEEN OP DE DETERMINISTISCHE RAIL.
-           Het spoor zegt WELKE fasen liepen (kern/stuur/spoor.js); dat is een
-           binnenkaart en geen antwoord aan een lid. Maar zonder hem is van buitenaf
-           niet te bewijzen dat een uitlegvraag NIETS heeft aangeraakt -- dan is die
-           belofte een bewering. De voorwaarde is daarom de rail zelf: die staat al
-           achter drie fail-closed grendels (kern/stuur/rail.js) en kan nooit in
-           productie aanstaan. Er komt dus geen tweede schakelaar bij, en in
-           productie draagt het antwoord geen letter extra. */
-        const railNu = kern.stuurRail ? kern.stuurRail() : null;
-        const antwoord = { pakte: true, plafond: plafondTrede,
-          spoor: (railNu && railNu.naam === 'DETERMINISTISCH') ? lus.spoor : undefined,
+        /* HET STUURSPOOR REIST MEE ALS DE LUS HEM MEEGEEFT, en die geeft hem
+           alleen op de deterministische rail (kern/stuur/lus.js). Zonder dat
+           spoor is van buitenaf niet te bewijzen dat een uitlegvraag NIETS
+           heeft aangeraakt -- dan is die belofte een bewering. Deze route
+           beslist er niets over: dat zou betekenen dat zij de railnaam moet
+           kunnen opvragen, en daarmee verder reikt dan zij hoeft. */
+        const antwoord = { pakte: true, plafond: plafondTrede, spoor: lus.spoor,
           antwoord: lus.tekst, gedaan: lus.acties.some(a => a.status < 400), stuur: lus.acties,
           goedkeuringen: lus.acties.filter(a => a.goedkeuring).map(a => a.goedkeuring),
           goedkeuringWereld: 'member',

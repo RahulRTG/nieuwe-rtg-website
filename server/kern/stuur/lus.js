@@ -9,13 +9,17 @@ const { TOOLS } = require('./gereedschap');
 const besmetting = require('./besmetting');
 const maakLusstap = require('./lusstap');
 const { maakSpoor } = require('./spoor');
+const { zwaar } = require('./lus-zwaar');
 const menscontext = require('./menscontext');
 const { LUS_REGELS, CONTEXT_REGELS } = require('./lusregels');
 const { inhoudswoorden } = require('./resolver-woorden');
 const beleid = require('./beleid');
 const { maakIsolatiefilter } = require('./isolatiefilter');
 
-module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs, isolatie }) => {
+module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs, isolatie, railNaam }) => {
+  /* Het spoor gaat alleen naar buiten op de deterministische rail; die keuze
+     hoort hier, want alleen hier is bekend welke rail draaide (./spoor.js). */
+  const spoorMag = railNaam === 'DETERMINISTISCH';
   /* De isolatiecontext staat in ./luscontext.js: klein stuk, groot gevolg. */
   const isoContextVan = require('./luscontext')({ isolatie });
   /* De huisregels die met elke beurt meegaan staan in ./lusregels.js. */
@@ -110,50 +114,14 @@ module.exports = ({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, pa
       if (!cls.zwaar) {
         const r = await loop([{ role: 'user', content: metContext(vraag) }], 4, 0, 4, 'Bezig...');
         spoor && spoor.mark('PROJECTED', r.tekst ? 'PASS' : 'NOT_RUN', { tekens: (r.tekst || '').length });
-        return { tekst: r.tekst || 'Gedaan.', acties, zwaar: false, stappen: r.tel, spoor: spoor ? spoor.uitslag() : undefined };
+        return { tekst: r.tekst || 'Gedaan.', acties, zwaar: false, stappen: r.tel, spoor: (spoorMag && spoor) ? spoor.uitslag() : undefined };
       }
 
-      // ---- zware taak: de hoofd-agent splitst in max 3 deeltaken, elk een
-      //      eigen kleine lus; samen binnen een budget van 24 stappen ----
-      const totaal = cls.maxStappen; // 24
-      let subs = [];
-      try {
-        const plan = await anthropic.messages.create({
-          model: 'claude-sonnet-5', max_tokens: 350,
-          system: 'Je bent een planner. Verdeel de opdracht in maximaal 3 concrete, uitvoerbare deeltaken. ' +
-            'Antwoord UITSLUITEND met een JSON-array van korte NL-strings, niets anders.',
-          messages: [{ role: 'user', content: vraag }]
-        });
-        subs = parseSubs(plan.content.filter(c => c.type === 'text').map(c => c.text).join(''));
-      } catch (e) { subs = []; }
-      if (!subs.length) subs = [vraag]; // geen nette splitsing? dan als één klus
-
-      let tel = 0; const deel = [];
-      const perSub = Math.max(4, Math.floor(totaal / subs.length));
-      for (let i = 0; i < subs.length && tel < totaal; i++) {
-        const label = subs[i];
-        try { opStap({ stap: tel, totaal, bericht: label }); } catch (e) {}
-        const seed = [{ role: 'user', content:
-          'Hoofddoel van de gebruiker: ' + metContext(vraag) + '\nVoer NU alleen deze deeltaak volledig uit: ' + label +
-          '\nStop zodra deze deeltaak klaar is en meld kort het resultaat.' }];
-        const r = await loop(seed, Math.min(perSub, totaal - tel), tel, totaal, label, label);
-        tel = r.tel;
-        deel.push('- ' + label + ': ' + (r.tekst || 'gedaan'));
-      }
-
-      // ---- synthese: één kort antwoord voor de gebruiker ----
-      let eind = deel.join('\n');
-      try {
-        const synth = await anthropic.messages.create({
-          model: 'claude-sonnet-5', max_tokens: 500, system: systeem,
-          messages: [{ role: 'user', content: 'Vat voor de gebruiker kort en concreet samen wat er is gedaan ' +
-            '(en wat niet lukte, eerlijk). Deelresultaten:\n' + deel.join('\n') }]
-        });
-        const st = synth.content.filter(c => c.type === 'text').map(c => c.text).join('').trim();
-        if (st) eind = st;
-      } catch (e) {}
-      try { opStap({ stap: totaal, totaal, bericht: 'Klaar', klaar: true }); } catch (e) {}
-      return { tekst: eind || 'Gedaan.', acties, zwaar: true, stappen: tel, deeltaken: subs };
+      /* ---- zware taak: opknippen in max 3 deeltaken binnen een budget van
+         24 stappen. De taakverdeling woont in ./lus-zwaar.js; elke deeltaak
+         loopt door DEZELFDE `loop` en dus langs dezelfde poorten. */
+      return zwaar({ anthropic, parseSubs, loop, opStap, systeem, vraag, metContext,
+        totaal: cls.maxStappen, acties });
     } catch (e) {
       try { log && log.warn && log.warn('stuurlus', { fout: (e && e.message || '').slice(0, 120) }); } catch (e2) {}
       return null; // de vaste antwoorden vangen het op

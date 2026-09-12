@@ -44,10 +44,53 @@ titels van de vorige.
 `shared/command.js`, `hervat()` en `sync()` in `shared/command/werktafel.js`.
 *Wat het bewaakt:* `test/werktafelgeheugen.test.js` en `test/werktafel.e2e.js`.
 
-Op een lege tafel zegt het scherm wat het is: *"Kies een wereld om te beginnen."*
-Er staat dan niets voorgekookt open. Het huis opent uit zichzelf nog steeds geen
-activiteit, geen voorbeeld en geen dashboard — het legt alleen terug wat je zelf
-had opengelaten.
+### En sinds 12 september 2026: het huis opent nooit leeg
+
+Hier stond: *op een lege tafel zegt het scherm wat het is — "Kies een wereld om
+te beginnen." Er staat dan niets voorgekookt open.* Die regel was goed bedoeld
+en pakte slecht uit. Hij is herzien op grond van een meting, niet van een
+mening: `npm run eersteminuut` liet een vers lid registreren, tekende de
+overeenkomst, en telde op het scherm dat daarna verscheen **nul** leesbare
+handelingen. De vier werelden stonden er wel — in de schilbalk, als pictogram
+zonder opschrift, onder een tweede onderbalk die eroverheen schilderde.
+
+**De nieuwe regel:**
+
+> Het huis opent nooit leeg. De eerste zichtbare toestand geeft direct
+> betekenis, een herkenbare ingang en ten minste één bruikbare volgende stap.
+> RTG mag context tonen, maar start geen onomkeerbare activiteit zonder
+> aanleiding of toestemming.
+
+Wat daarmee NIET verandert, en wat de oude regel terecht beschermde: er gaat nog
+steeds niets vanzelf lopen. Het beginscherm laadt niets, opent niets en
+verstuurt niets. Wat er staat is een begroeting, een ingang in gewone taal en de
+werelden bij naam — en verder legt de tafel alleen terug wat je zelf had
+opengelaten.
+
+Wat de regel bewust ruim laat: of daar later ook een Vandaag, een hervatbare
+journey of adaptieve inhoud bij komt. *"Het huis opent altijd een dashboard"*
+zou dezelfde fout in spiegelbeeld zijn — te specifiek, en over een half jaar
+weer in de weg.
+
+*Waar dat staat:* `shared/command/beginscherm.js` (eigen bestand; de werelden
+komen uit `o.werelden()`, dezelfde bron als de bank, en de ingang opent de
+bestaande balk van Rahul — geen tweede lijst, geen tweede pad).
+*Wat het bewaakt:* `npm run eersteminuut` (`EERSTEMINUUT.json`), met de tand
+`eersteMinuutGezakt` in `NORM.json` op nul: die mag alleen omlaag.
+
+### De onderste rand heeft één eigenaar
+
+Hoort bij dezelfde herziening, want het was de helft van de oorzaak. Op
+telefoonformaat bezetten twee balken dezelfde 48 pixels: `.cmd-balk` van RTG
+Command en `.rtg-edge-bottom` van de Edge-schil. De tweede schilderde over de
+eerste heen, en daardoor was de navigatie van dit beginscherm onzichtbaar en
+tegelijk aantikbaar.
+
+ADAPTIEF.md legt één balk met drie zones vast, en die ene is `.cmd-balk`. Waar
+een commandobalk bestaat (`body.rtg-command`, onder 1000px) laat de edge-balk de
+rand los; op elk scherm zonder commandobalk verandert er niets en houdt hij zijn
+eigen MENU en HOME. Wie hier ooit een tweede vaste balk op dezelfde rand zet,
+krijgt dit probleem terug bij safe-area, het toetsenbord en de Continue Key.
 
 ## Wat hier stond, en waarom het weg is
 

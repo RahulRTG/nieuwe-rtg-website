@@ -1,0 +1,355 @@
+{
+  "stempel": {
+    "op": "2026-09-12T17:48:13.127Z",
+    "commit": "88411c2d",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/mensmutatie.js",
+    "node": "v22.22.2"
+  },
+  "wat": "de tien mutaties uit de opdracht, een voor een aangebracht in de ECHTE bron van de menselijke uitvoeringsketen; per mutatie welke wacht afging en met welke melding",
+  "meet": "server/kern/stuur/ tegen 7 wachten",
+  "hoe": "nulmeting op de schone boom, dan per mutatie alle wachten, dan git checkout en een sha256-controle dat de bron byte voor byte terug is",
+  "nulmeting": {
+    "wachten": [
+      "menstaal",
+      "menscontext",
+      "stuurspoor",
+      "stuurrail",
+      "stuurplafond",
+      "stuur-aanval",
+      "menstaalproef"
+    ],
+    "rood": []
+  },
+  "telling": {
+    "mutaties": 12,
+    "gezakt": 11,
+    "geenWacht": 1,
+    "nietToegepast": 0
+  },
+  "zonderWacht": [
+    {
+      "nr": "10b",
+      "naam": "wereldkeuze verplicht -- in het ANTWOORD",
+      "weg": "het antwoord laat de mens werkelijk kiezen tussen twee RTG-werelden"
+    }
+  ],
+  "grens": "EEN WACHT DIE ZAKT IS BEWEZEN GEVOELIG, NIET BEWEZEN GOED -- hij kan op de verkeerde reden zakken, en daarom staat de melding erbij in plaats van een vinkje. Omgekeerd is `GEEN_WACHT` geen oordeel over het gedrag: hij zegt dat NIEMAND HET MERKT, en dat is een uitspraak over de wachten en niet over de code. Alles is gemeten op de DETERMINISTISCHE rail; een modelrail kiest andere gereedschappen en dan zegt deze uitslag niets over die rail.",
+  "mutaties": [
+    {
+      "nr": "1",
+      "naam": "context verwijderd",
+      "bewaakt": "CONTEXT_SANITIZED",
+      "weg": "de gesaneerde schermcontext bereikt de lus niet meer",
+      "hoortTeZakken": "de gesprekssamenhang: dezelfde zin met een ander scherm geeft dan dezelfde uitkomst",
+      "bestanden": [
+        "server/kern/stuur/lus.js"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "menscontext",
+          "melding": "not ok 1 - 1. dezelfde zin, drie schermen, drie antwoorden -- error: 'zonder vergelijking hoort hij te vragen'"
+        },
+        {
+          "wacht": "menstaalproef",
+          "melding": "- B: kwam tot geen terwijl het alternatief eenduidig en leesbaar is -- dan gebeurt er niets met een verwijzing die wel op te lossen was"
+        }
+      ],
+      "bleefGroen": [
+        "menstaal",
+        "stuurspoor",
+        "stuurrail",
+        "stuurplafond",
+        "stuur-aanval"
+      ]
+    },
+    {
+      "nr": "2",
+      "naam": "resolver bypass",
+      "bewaakt": "INTENT_RESOLVED",
+      "weg": "de echte resolver draait niet en INTENT_RESOLVED wordt niet gemerkt",
+      "hoortTeZakken": "het spoor is incompleet",
+      "bestanden": [
+        "server/kern/stuur/lusstap.js"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "menscontext",
+          "melding": "not ok 2 - 2. AANGEBODEN en GEBRUIKT zijn twee beweringen -- error: 'de kaart is niet opgehaald; dan zegt deze toets niets'"
+        },
+        {
+          "wacht": "stuurspoor",
+          "melding": "not ok 7 - 7. de ECHTE keten vult het spoor, zonder enig model -- error: |-"
+        },
+        {
+          "wacht": "menstaalproef",
+          "melding": "- positief: INTENT_RESOLVED is OVERGESLAGEN en niet PASS"
+        }
+      ],
+      "bleefGroen": [
+        "menstaal",
+        "stuurrail",
+        "stuurplafond",
+        "stuur-aanval"
+      ]
+    },
+    {
+      "nr": "3",
+      "naam": "plan bypass",
+      "bewaakt": "PLAN_COMPILED",
+      "weg": "de echte compileer() draait niet en PLAN_COMPILED wordt niet gemerkt",
+      "hoortTeZakken": "het spoor is incompleet",
+      "bestanden": [
+        "server/kern/stuur/lusstap.js"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "stuurspoor",
+          "melding": "not ok 7 - 7. de ECHTE keten vult het spoor, zonder enig model -- error: |-"
+        },
+        {
+          "wacht": "menstaalproef",
+          "melding": "- A: de compiler heeft niet gedraaid (OVERGESLAGEN); dan is er niets wat kan zeggen dat de capability ontbreekt"
+        }
+      ],
+      "bleefGroen": [
+        "menstaal",
+        "menscontext",
+        "stuurrail",
+        "stuurplafond",
+        "stuur-aanval"
+      ]
+    },
+    {
+      "nr": "4",
+      "naam": "gevolg bypass",
+      "bewaakt": "CONSEQUENCE_EVALUATED",
+      "weg": "de echte voorspel() draait niet en CONSEQUENCE_EVALUATED wordt niet gemerkt",
+      "hoortTeZakken": "het spoor is incompleet",
+      "bestanden": [
+        "server/kern/stuur/lusstap.js"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "stuurspoor",
+          "melding": "not ok 7 - 7. de ECHTE keten vult het spoor, zonder enig model -- error: |-"
+        },
+        {
+          "wacht": "menstaalproef",
+          "melding": "- positief: CONSEQUENCE_EVALUATED is OVERGESLAGEN en niet PASS"
+        }
+      ],
+      "bleefGroen": [
+        "menstaal",
+        "menscontext",
+        "stuurrail",
+        "stuurplafond",
+        "stuur-aanval"
+      ]
+    },
+    {
+      "nr": "5",
+      "naam": "mandaat bypass",
+      "bewaakt": "MANDATE_EVALUATED",
+      "weg": "de padenlijst wordt niet meer gefilterd: de wereldgrens en de plafondgrendel vallen weg",
+      "hoortTeZakken": "de veiligheidspoort",
+      "bestanden": [
+        "server/kern/stuur/lus.js"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "stuurspoor",
+          "melding": "not ok 9 - 9. de mandaatgrendel wordt gemeten waar hij WEEGT -- error: 'de grendel hoort de lijst te versmallen: {\"voor\":15,\"na\":15}'"
+        }
+      ],
+      "bleefGroen": [
+        "menstaal",
+        "menscontext",
+        "stuurrail",
+        "stuurplafond",
+        "stuur-aanval",
+        "menstaalproef"
+      ]
+    },
+    {
+      "nr": "6",
+      "naam": "mandaat omhoog geforceerd",
+      "bewaakt": "trede",
+      "weg": "zonder mandaat staat het plafond op `uitvoeren` in plaats van `tonen`",
+      "hoortTeZakken": "de plafondtoets",
+      "bestanden": [
+        "server/kern/stuur/plafond.js"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "stuurplafond",
+          "melding": "not ok 1 - zonder mandaat is het plafond `tonen` -- leeg is dicht -- error: 'zonder mandaat hoort er niets zelfstandigs te mogen'"
+        }
+      ],
+      "bleefGroen": [
+        "menstaal",
+        "menscontext",
+        "stuurspoor",
+        "stuurrail",
+        "stuur-aanval",
+        "menstaalproef"
+      ]
+    },
+    {
+      "nr": "7",
+      "naam": "ambigue referent gekozen",
+      "bewaakt": "referent",
+      "weg": "met TWEE gelijkwaardige alternatieven kiest de keten er toch een",
+      "hoortTeZakken": "de referentveiligheid",
+      "bestanden": [
+        "server/kern/stuur/rail-corpus-context.js"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "menscontext",
+          "melding": "not ok 1 - 1. dezelfde zin, drie schermen, drie antwoorden -- error: 'met TWEE alternatieven hoort hij te vragen welke'"
+        },
+        {
+          "wacht": "menstaalproef",
+          "melding": "- C: kwam tot tonen terwijl er niets eenduidigs was"
+        }
+      ],
+      "bleefGroen": [
+        "menstaal",
+        "stuurspoor",
+        "stuurrail",
+        "stuurplafond",
+        "stuur-aanval"
+      ]
+    },
+    {
+      "nr": "8",
+      "naam": "UNKNOWN behandeld als READ_ONLY",
+      "bewaakt": "onbekendeZin",
+      "weg": "een zin die de rail NIET kent levert toch een leesactie op in plaats van niets",
+      "hoortTeZakken": "de zijeffecttoets van de rail",
+      "bestanden": [
+        "server/kern/stuur/rail-corpus.js"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "stuurrail",
+          "melding": "not ok 7 - 7. een onbekende zin levert NIET_HERKEND en géén enkele tool-aanroep -- error: |-"
+        }
+      ],
+      "bleefGroen": [
+        "menstaal",
+        "menscontext",
+        "stuurspoor",
+        "stuurplafond",
+        "stuur-aanval",
+        "menstaalproef"
+      ]
+    },
+    {
+      "nr": "9a",
+      "naam": "2 vragen tegelijk -- in het CONTRACT",
+      "bewaakt": "blokkerendeVragen",
+      "weg": "het contract staat een geval toe dat twee blokkerende vragen tegelijk stelt",
+      "hoortTeZakken": "de menselijke-inspanningstoets",
+      "bestanden": [
+        "server/kern/stuur/menstaal.json"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "menstaal",
+          "melding": "not ok 8 - 8. geen enkel geval vraagt meer dan een blokkerende vraag tegelijk -- error: 'amb-die-andere-2 vraagt er 2 tegelijk'"
+        }
+      ],
+      "bleefGroen": [
+        "menscontext",
+        "stuurspoor",
+        "stuurrail",
+        "stuurplafond",
+        "stuur-aanval",
+        "menstaalproef"
+      ]
+    },
+    {
+      "nr": "9b",
+      "naam": "2 vragen tegelijk -- in het ANTWOORD",
+      "bewaakt": "blokkerendeVragen",
+      "weg": "het antwoord dat een mens leest stelt er werkelijk twee, terwijl het contract er 1 toestaat",
+      "hoortTeZakken": "dezelfde toets, maar dan op het gedrag in plaats van op het contract",
+      "bestanden": [
+        "server/kern/stuur/rail-corpus-context.js"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "menstaalproef",
+          "melding": "amb-die-andere-1: 2 vragen terwijl er 0 mag/mogen"
+        }
+      ],
+      "bleefGroen": [
+        "menstaal",
+        "menscontext",
+        "stuurspoor",
+        "stuurrail",
+        "stuurplafond",
+        "stuur-aanval"
+      ]
+    },
+    {
+      "nr": "10a",
+      "naam": "wereldkeuze verplicht -- in het CONTRACT",
+      "bewaakt": "architectuurkeuze",
+      "weg": "het contract staat een geval toe waarin de mens zelf een wereld of app kiest",
+      "hoortTeZakken": "de architectuurkeuzetoets",
+      "bestanden": [
+        "server/kern/stuur/menstaal.json"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "menstaal",
+          "melding": "not ok 9 - 9. de mens kiest nooit een wereld, app of route -- error: |-"
+        }
+      ],
+      "bleefGroen": [
+        "menscontext",
+        "stuurspoor",
+        "stuurrail",
+        "stuurplafond",
+        "stuur-aanval",
+        "menstaalproef"
+      ]
+    },
+    {
+      "nr": "10b",
+      "naam": "wereldkeuze verplicht -- in het ANTWOORD",
+      "bewaakt": "architectuurkeuze",
+      "weg": "het antwoord laat de mens werkelijk kiezen tussen twee RTG-werelden",
+      "hoortTeZakken": "dezelfde toets, maar dan op het gedrag in plaats van op het contract",
+      "bestanden": [
+        "server/kern/stuur/rail-corpus-context.js"
+      ],
+      "staat": "GEEN_WACHT",
+      "beet": [],
+      "bleefGroen": [
+        "menstaal",
+        "menscontext",
+        "stuurspoor",
+        "stuurrail",
+        "stuurplafond",
+        "stuur-aanval",
+        "menstaalproef"
+      ]
+    }
+  ]
+}

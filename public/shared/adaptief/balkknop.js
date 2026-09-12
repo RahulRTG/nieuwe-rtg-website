@@ -70,6 +70,28 @@
     return b;
   }
 
+  /* WAAROM DE WERELDEN HIER GEEN OPSCHRIFT DRAGEN, EN DAT IS GEMETEN.
+
+     Een aria-label is geen opschrift (MENS.md par. 4, grens 7), dus de
+     verleiding is groot om hier een `small` onder de glyf te zetten. Dat is
+     twee keer geprobeerd en het past niet -- niet als mening maar als
+     rekensom, op 390px gemeten nadat de rand een eigenaar had gekregen:
+
+       beschikbaar voor de actiezone      210px
+       HOME 48 + mond van Rahul 44        (buiten die 210)
+       overloopknop                        44px
+       LivingOS 70 + WorkOS 61 + TravelOS 68 + FoundationOS ~80 = 279px
+
+     Er passen er dus twee. De derde en vierde vallen in de lade, en dan zakken
+     test/adaptief.e2e.js toets 1 ("de werelden staan IN de balk, niet twee
+     tikken diep") en toets 3 ("de balk blijft binnen de schermbreedte") --
+     allebei terecht.
+
+     DE OPLOSSING IS NIET EEN KLEINER LETTERTJE MAAR EEN ANDERE PLEK. De vier
+     werelden dragen hun naam op het BEGINSCHERM zelf, waar ruimte is en waar
+     een mens ze zoekt; de balk houdt zijn pictogrammen als snelweg voor wie de
+     weg al kent. Zo is "zichtbaar" opgelost zonder een belofte te breken.
+     Wie hier opnieuw een opschrift wil: meet eerst de rij opnieuw. */
   function zetTeken(b, it) {
     if (it.teken && it.teken.nodeType === 1) { b.appendChild(it.teken.cloneNode(true)); return; }
     if (typeof it.teken === 'function') {
@@ -78,7 +100,6 @@
     }
     b.textContent = it.label || it.naam;
   }
-
   /* ELKE TIK LOOPT LANGS HET GEWICHT. Dat is de reden dat een zware handeling
      niet per ongeluk licht kan worden: er is één ingang, en die kent de trap.
      Ontbreekt de gewichtlaag, dan draait alleen wat licht is -- stil zwaar

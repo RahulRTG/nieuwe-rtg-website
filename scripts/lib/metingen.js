@@ -152,6 +152,19 @@ const REGISTER = {
      en die is met een mutatie zien zakken; zie BETROUWBAARHEID.md par. 5. */
   'APPWERKT.json': { meter: ['appwerktDefecten'] },
 
+  /* EERSTEMINUUT.json hangt om dezelfde reden aan de NORM-ratel als APPWERKT:
+     een verse meting vraagt een browser en een registratie, en dat hoort niet
+     in `npm test`. Wat eraan hangt is het getal dat ertoe doet --
+     `eersteMinuutGezakt` mag alleen omlaag. */
+  'EERSTEMINUUT.json': { meter: ['eersteMinuutGezakt'] },
+  'PAKTE.json': { meter: ['pakteMisgelopen'] },
+  'MENSTAALPROEF.json': { meter: ['menstaalTeVer', 'goudenPlakGebreken', 'samenhangGebreken', 'referentGebreken'] },
+  /* MENSMUTATIE.json hangt om dezelfde reden aan de NORM-ratel: een verse ronde
+     muteert de bron twaalf keer en draait zeven wachten, en dat hoort niet in
+     `npm test`. Wat eraan hangt is het getal dat ertoe doet -- het aantal
+     garanties dat je kunt weghalen zonder dat iemand het merkt. */
+  'MENSMUTATIE.json': { meter: ['mensmutatieZonderWacht'] },
+
   /* DE ZEVEN REGISTERS VAN MAATSTAF.md, en waarom ze hier mogen staan. Elk van
      deze toetsen doet HETZELFDE: hij meet vers en vergelijkt met wat er in het
      register staat, zodat een achterlopend register de bouw laat zakken in
@@ -191,6 +204,12 @@ const REGISTER = {
   'WACHTWIJZE.json': { eigenRatel: 'test/wachtwijze.test.js' },
   'HANDELINGSKLASSE.json': { eigenRatel: 'test/handelingsklasse.test.js' },
   'EXECUTION_MAP.json': { eigenRatel: 'test/executionmap.test.js' },
+  /* MENSELIJKE_UITVOERING.json is net als EXECUTION_MAP.json een PROJECTIE
+     zonder tijdstempel: hij draagt vingerafdrukken van zijn bronnen in plaats
+     van een klok, en test/menselijkeuitvoering.test.js hercompileert hem byte
+     voor byte. Dat is strenger dan een ouderdomscontrole -- een projectie die
+     achterloopt op zijn bron zakt meteen. */
+  'MENSELIJKE_UITVOERING.json': { eigenRatel: 'test/menselijkeuitvoering.test.js' },
   'HERSTEL.json': { eigenRatel: 'test/herstel.test.js' },
   'HERSTELPROEF.json': { eigenRatel: 'test/herstelproef.test.js' },
   'DROOGLOOP.json': { eigenRatel: 'test/droogloop.test.js' },

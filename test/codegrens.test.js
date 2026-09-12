@@ -29,7 +29,12 @@ const WORTEL = path.join(__dirname, '..');
    wat ze mag versmallen (mandaat). */
 const INGANGEN = ['server/kern/stuur/lus.js', 'server/kern/stuur/gereedschap.js', 'server/kern/stuur/plan.js',
   'server/kern/stuur/resolver.js', 'server/kern/stuur/beleid.js', 'server/kern/stuur/mandaat.js',
-  'server/kern/stuur/gevolg.js', 'server/kern/stuur/goedkeuring.js'];
+  'server/kern/stuur/gevolg.js', 'server/kern/stuur/goedkeuring.js',
+  /* menscontext-ref.js heeft vandaag geen enkele aanroeper (er is geen opzoeker
+     gewired) en valt dus buiten de sluiting van lus.js. Juist daarom staat hij
+     hier: een stuurbestand dat niemand laadt, is het bestand waar een
+     readFileSync het langst onopgemerkt kan blijven staan. */
+  'server/kern/stuur/menscontext-ref.js'];
 
 function sluiting(start) {
   const gezien = new Set(); const rij = start.filter(f => fs.existsSync(path.join(WORTEL, f)));

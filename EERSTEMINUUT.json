@@ -1,0 +1,236 @@
+{
+  "stempel": {
+    "op": "2026-09-12T13:11:20.387Z",
+    "commit": "2b834167",
+    "boomVuil": false,
+    "boomAnders": 5,
+    "instrument": "scripts/eersteminuut.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Wat een mens die RTG niet kent in zijn eerste minuut krijgt. Een verse registratie langs de echte route, een echte browser op 390x844, Nederlands. Gemeten wordt de weg van registratie tot het eerste scherm waar iets te doen is, en wat daar staat.",
+  "hoe": "node scripts/eersteminuut.js  (--controle zakt zodra een toets ZAKT)",
+  "grens": "Een toets die ZAKT blokkeert. `nietMeetbaar` blokkeert niet, maar telt ook nooit als gehaald -- een bewijs dat je weglaat leest als een bewijs dat je haalt (BETROUWBAARHEID.md). Wat hier niet gemeten kan worden, draagt zijn reden.",
+  "blindeVlek": "DEZE METER TOETST AANTIKBAARHEID, NIET VERF. Zichtbaarheid wordt bepaald met checkVisibility() en elementFromPoint. Een element dat door een andere laag wordt OVERSCHILDERD terwijl die laag op dat punt geen muisdoel is (pointer-events), komt er dus doorheen: elementFromPoint geeft het element terug, en de meter noemt het zichtbaar terwijl een mens het niet ziet. Dat is hier echt het geval -- de vier werelden in .cmd-balk worden overschilderd door .rtg-edge-bottom op dezelfde 48px rand (MENS.md par. 3a). Ze zijn wel aan te tikken. Wie deze meter groen ziet op inhoud-zonder-menu, heeft daarmee nog geen bewijs dat het scherm ook gevuld OOGT; daarvoor is een schermafdruk nodig en die beoordeelt geen script.",
+  "standen": {
+    "gehaald": "gemeten en in orde",
+    "gezakt": "gemeten en niet in orde",
+    "nietMeetbaar": "kan hier niet worden vastgesteld, met de reden erbij"
+  },
+  "voorwaarden": {
+    "gemeten": {
+      "offline": true,
+      "geenKlokwacht": true,
+      "wat": "offline = de pagina belde nergens buiten deze server heen. geenKlokwacht = elke wacht haalde zijn TOESTAND binnen de tijd, dus er is niet op de klok gemeten. Deze twee komen uit deze ronde zelf."
+    },
+    "handwerk": {
+      "op": "2026-09-12",
+      "deterministisch": "drie rondes achter elkaar gaven dezelfde negen uitslagen en dezelfde telling (7 gehaald, 0 gezakt, 2 nietMeetbaar). Het lid verschilt per ronde (een verse registratie), dus byte-identiek is de uitslag NIET en hoort dat ook niet te zijn -- wat gelijk moet blijven is het oordeel.",
+      "mutatiebewijs": "5 van de 7 meetbare toetsen zijn met een mutatie op de ECHTE app zien zakken, elk precies de eigen toets en geen andere: geen-interne-termen (jargon terug in een opschrift), geen-vrije-plekken, geen-technische-status, inhoud-zonder-menu (de inhoud onzichtbaar) en geen-onnodige-vragen (een vraag terug in de gang naar binnen).",
+      "nietGemuteerd": "zoeken-of-intentie en terugweg. Allebei zijn ze waar bij EEN van twee onafhankelijke signalen (een invoerveld OF een zoekknop; op het beginscherm staan OF een home-knop hebben), dus een enkele mutatie laat ze niet zakken. Dat is een zwakte van die twee beweringen en geen tekortkoming van de proef -- het staat hier omdat een weggelaten bewijs leest als een gehaald bewijs.",
+      "val": "EEN MUTATIE OP EEN BUNDELDEEL DOET NIETS. public/apps/app-main.js wordt GEBOUWD uit public/apps/app-main/*.js, en de browser krijgt het gebouwde bestand. De eerste poging muteerde het deel, de meter bleef groen, en dat zag eruit als een toets die niet bijt. Wie hier muteert, muteert wat er GESERVEERD wordt."
+    }
+  },
+  "buitenDeDeur": {
+    "herkomsten": [],
+    "wat": "elke herkomst buiten deze server waar de pagina tijdens de meting heen belde. Leeg betekent dat deze uitslag aan niemand anders zijn server hangt -- geen model, geen CDN, geen lettertype van buiten. Dit is gemeten en niet beloofd."
+  },
+  "wachten": {
+    "alleGehaald": true,
+    "langste": 278,
+    "afgelopen": [],
+    "rijen": [
+      {
+        "naam": "app-staat-er",
+        "ms": 262,
+        "gehaald": true
+      },
+      {
+        "naam": "overeenkomst-weg",
+        "ms": 278,
+        "gehaald": true
+      },
+      {
+        "naam": "schil-of-poort",
+        "ms": 80,
+        "gehaald": true
+      },
+      {
+        "naam": "menu-open",
+        "ms": 54,
+        "gehaald": true
+      }
+    ]
+  },
+  "poorten": {
+    "totaal": 1,
+    "nodig": 1,
+    "onnodig": 0,
+    "rijen": [
+      {
+        "soort": "overeenkomst",
+        "nodig": true,
+        "grond": "zonder handtekening bestaat het lidmaatschap niet -- NU NODIG (punt 7)",
+        "kop": "Laatste stap: de RTG-lidmaatschaps- en reisovereenkomst. Typ je volledige naam om te teken"
+      }
+    ]
+  },
+  "zichtbaarheid": "checkVisibility: voorouders meegewogen (display, visibility, opacity)",
+  "stations": {
+    "beginscherm": "zoals het landt, zonder enige tik",
+    "menu": "beginscherm met het menu open (een tik)",
+    "nietGemeten": null
+  },
+  "eersteScherm": {
+    "bedienbaarTotaal": 18,
+    "waarvanSchil": 8,
+    "waarvanInhoud": 5,
+    "waarvanAlleenIcoon": 5,
+    "alleenIcoon": [
+      {
+        "naam": "LivingOS",
+        "waar": "button.cmd-actie < div.cmd-actierij < div.cmd-acties < div.cmd-balk"
+      },
+      {
+        "naam": "WorkOS",
+        "waar": "button.cmd-actie < div.cmd-actierij < div.cmd-acties < div.cmd-balk"
+      },
+      {
+        "naam": "TravelOS",
+        "waar": "button.cmd-actie < div.cmd-actierij < div.cmd-acties < div.cmd-balk"
+      },
+      {
+        "naam": "FoundationOS",
+        "waar": "button.cmd-actie < div.cmd-actierij < div.cmd-acties < div.cmd-balk"
+      },
+      {
+        "naam": "Vraag Rahul",
+        "waar": "button.cmd-mondknop < div.cmd-balk < main.cmd-werk < div#rtgCommand.rtg-interface-second-screen.rtg-ss-peek"
+      }
+    ],
+    "waarvanNaamloos": 0,
+    "invoervelden": 0,
+    "tekstregels": 13,
+    "tekst": [
+      "RTG",
+      "LIVING OS",
+      "⌕",
+      "NL",
+      "◎",
+      "MENU",
+      "HOME",
+      "Goedemiddag.",
+      "Typ of zeg wat er geregeld moet worden",
+      "LivingOS",
+      "WorkOS",
+      "TravelOS"
+    ]
+  },
+  "telling": {
+    "gehaald": 7,
+    "gezakt": 0,
+    "nietMeetbaar": 2
+  },
+  "toetsen": [
+    {
+      "naam": "inhoud-zonder-menu",
+      "station": "beginscherm",
+      "vraag": "Staat er iets te doen zonder dat de mens eerst MENU opent?",
+      "uitslag": "gehaald",
+      "gemeten": "5 dingen met een LEESBAAR opschrift; 5 alleen als pictogram met aria-label (LivingOS, WorkOS, TravelOS, FoundationOS, Vraag Rahul) -- een schermlezer noemt die, een ziend mens ziet ze niet",
+      "bewijs": [
+        {
+          "naam": "Typ of zeg wat er geregeld moet worden",
+          "soort": "button",
+          "doel": "",
+          "waar": "button.cmd-intentie < div.cmd-leeg < div.cmd-panes < main.cmd-werk"
+        },
+        {
+          "naam": "LivingOS",
+          "soort": "button",
+          "doel": "/apps/rtg.html",
+          "waar": "button.cmd-startwereld < nav.cmd-startwerelden < div.cmd-leeg < div.cmd-panes"
+        },
+        {
+          "naam": "WorkOS",
+          "soort": "button",
+          "doel": "/apps/kantoor.html",
+          "waar": "button.cmd-startwereld < nav.cmd-startwerelden < div.cmd-leeg < div.cmd-panes"
+        },
+        {
+          "naam": "TravelOS",
+          "soort": "button",
+          "doel": "/apps/reizen.html",
+          "waar": "button.cmd-startwereld < nav.cmd-startwerelden < div.cmd-leeg < div.cmd-panes"
+        },
+        {
+          "naam": "FoundationOS",
+          "soort": "button",
+          "doel": "/apps/foundation/os-publiek.html",
+          "waar": "button.cmd-startwereld < nav.cmd-startwerelden < div.cmd-leeg < div.cmd-panes"
+        }
+      ]
+    },
+    {
+      "naam": "geen-interne-termen",
+      "station": "beginscherm + menu",
+      "vraag": "Staat er een woord dat alleen binnen dit huis iets betekent?",
+      "uitslag": "gehaald",
+      "gemeten": "0 interne termen zichtbaar",
+      "bewijs": []
+    },
+    {
+      "naam": "geen-vrije-plekken",
+      "station": "beginscherm + menu",
+      "vraag": "Staat er bouwsteiger op het scherm?",
+      "uitslag": "gehaald",
+      "gemeten": "0 placeholders zichtbaar",
+      "bewijs": []
+    },
+    {
+      "naam": "geen-technische-status",
+      "station": "beginscherm + menu",
+      "vraag": "Staat er een technische statuscode in consumententaal?",
+      "uitslag": "gehaald",
+      "gemeten": "0 codes van de vorm IETS_IN_HOOFDLETTERS",
+      "bewijs": []
+    },
+    {
+      "naam": "geen-onnodige-vragen",
+      "station": "weg naar het beginscherm",
+      "vraag": "Hoeveel vragen komen er vóór de eerste waarde die niet NU NODIG zijn?",
+      "uitslag": "gehaald",
+      "gemeten": "0 onnodige poorten, 1 terecht",
+      "bewijs": []
+    },
+    {
+      "naam": "zoeken-of-intentie",
+      "station": "beginscherm",
+      "vraag": "Kan de mens zeggen wat hij wil, in plaats van zoeken waar het zit?",
+      "uitslag": "gehaald",
+      "gemeten": "geen invoerveld; alleen een zoekKNOP -- de mens moet eerst tikken voordat hij iets kan zeggen",
+      "bewijs": []
+    },
+    {
+      "naam": "terugweg",
+      "station": "beginscherm",
+      "vraag": "Is er een zichtbare weg terug of naar huis?",
+      "uitslag": "gehaald",
+      "gemeten": "dit IS het beginscherm (.cmd-leeg), dus er is geen plek om naar terug te gaan",
+      "bewijs": []
+    },
+    {
+      "naam": "taal-consistent",
+      "vraag": "Is alles wat er staat Nederlands, bij een Nederlandse sessie?",
+      "uitslag": "nietMeetbaar",
+      "reden": "een woordenlijst die Engels van Nederlands scheidt bestaat hier nog niet, en raden zou merknamen (RTG, Salon, Pass) als fout aanmerken. De interne termen hierboven vangen vandaag het deel dat aantoonbaar fout is; de rest wacht op punt 57 (CONSUMENTENTAAL.json).",
+      "bewijs": []
+    },
+    {
+      "naam": "begrijpt-de-mens-het",
+      "vraag": "Snapt een mens die RTG niet kent wat hij hier kan?",
+      "uitslag": "nietMeetbaar",
+      "reden": "geen enkele browsermeting kan dit vaststellen. Dit blijft punt 56: echte mensen, zonder instructie, met een opdracht. Het staat hier zodat de afwezigheid ervan zichtbaar blijft in plaats van stil.",
+      "bewijs": []
+    }
+  ]
+}

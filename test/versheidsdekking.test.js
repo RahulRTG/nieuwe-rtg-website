@@ -129,7 +129,15 @@ const BUITEN = {
   'EXECUTION_MAP.json': 'een PROJECTIE uit de bronnen; test/executionmap.test.js eist byte-gelijkheid met de hercompilatie',
   'GEZAGSHANDELINGEN.json': 'een afdruk uit de code, met een eigen toets (test/gezagshandelingen.test.js)',
   'HANDELINGSKLASSE.json': 'een afdruk uit de code, met een eigen toets (test/handelingsklasse.test.js)',
-  'WACHTWIJZE.json': 'een afdruk uit de code, met een eigen toets (test/wachtwijze.test.js)'
+  'WACHTWIJZE.json': 'een afdruk uit de code, met een eigen toets (test/wachtwijze.test.js)',
+  /* DEZELFDE GROND ALS EXECUTION_MAP HIERBOVEN, en met opzet niet "hij is nieuw".
+     MENSELIJKE_UITVOERING.json draagt geen stempel maar vingerafdrukken van zijn
+     bronnen; ouderdom is er niet aan af te lezen en hoeft dat ook niet, want
+     test/menselijkeuitvoering.test.js hercompileert hem byte voor byte EN gooit
+     hem in toets 7 werkelijk weg om hem opnieuw te laten maken. Loopt hij achter
+     op een bron, dan zakt die toets meteen -- een versheidsmelding zou daar
+     alleen later hetzelfde zeggen. */
+  'MENSELIJKE_UITVOERING.json': 'een PROJECTIE uit vier registers; test/menselijkeuitvoering.test.js eist byte-gelijkheid met de hercompilatie en maakt hem in toets 7 vanaf nul opnieuw'
 };
 
 function schrijvers() {

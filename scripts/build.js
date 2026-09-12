@@ -106,7 +106,8 @@ function stempelBouw() {
   const commandDelen = ['shared/command.js', 'shared/command/catalog.js', 'shared/command/console.js',
     'shared/command/verdeler.js', 'shared/command/bank.js', 'shared/command/praat.js',
     'shared/command/inlogpoort.js', 'shared/command/bladhaak.js', 'shared/command/romp.js',
-    'shared/command/geheugen.js', 'shared/command/werktafel.js', 'shared/command.css', 'shared/rtg-schil.js']
+    'shared/command/geheugen.js', 'shared/command/beginscherm.js', 'shared/command/werktafel.js',
+    'shared/command.css', 'shared/rtg-schil.js']
     .map(p => path.join(PUB, p)).concat(interfaceDelen.sort());
   if (!fs.existsSync(html) || !fs.existsSync(js)) return;
   let s = fs.readFileSync(js, 'utf8');

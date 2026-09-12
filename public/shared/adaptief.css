@@ -164,7 +164,24 @@ body.rtg-command .cmd-werk{min-width:0;}
 .cmd-actierij::-webkit-scrollbar{display:none;}
 .cmd-actie{flex:0 0 auto;min-width:var(--rtg-raak);min-height:var(--rtg-raak);
   border:0;border-right:1px solid var(--rtg-line);background:transparent;
-  color:var(--rtg-muted,#8A8680);padding:0 .55rem;cursor:pointer;display:grid;place-items:center;
+  /* WAAROM HIER GEEN OPSCHRIFT ONDER DE GLYF STAAT, EN DAT IS GEMETEN.
+
+     De vier werelden staan in deze balk als knoppen met alleen een glyf en een
+     `aria-label`. Een schermlezer noemt ze, een ziend mens ziet een pictogram.
+     In deze tak is geprobeerd daar een `small` onder te zetten, in het ritme
+     van de edge-balk ernaast -- en dat brak een belofte die zwaarder weegt:
+     met opschrift worden de knoppen 62-70px in plaats van 44, en dan past
+     FoundationOS niet meer naast de bank, de mond van Rahul en de overloop.
+     Hij viel in de lade, en `test/adaptief.e2e.js` zakte terecht met
+     "op het beginscherm staan de werelden IN de balk, niet twee tikken diep".
+
+     Op 390px is er simpelweg geen ruimte voor vier opschriften. Dat is geen
+     opmaakdetail maar een ontwerpvraag, en hij hangt aan de vraag uit MENS.md
+     par. 3a: welke van de twee onderbalken bezit deze rand? Zolang MENU en
+     HOME 88px van dezelfde 390 innemen en er bovendien overheen schilderen,
+     is elke keuze hier een pleister. Niet stilletjes oplossen. */
+  color:var(--rtg-muted,#8A8680);padding:0 .55rem;cursor:pointer;
+  display:grid;place-items:center;
   font:500 .82rem var(--rtg-interface,'Inter',sans-serif);
   transition:color 140ms ease,background 140ms ease;}
 .cmd-actie:last-child{border-right:0;}

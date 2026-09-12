@@ -163,4 +163,11 @@ function resolveer(vraag, paden, opties) {
   };
 }
 
-module.exports = { resolveer, segmentenVan, nietszeggendeSegmenten, STANDAARD_MAX };
+/* TWEE FUNCTIES HETEN HIER `resolveer` EN DOEN IETS ANDERS: deze lost een
+   vraag op naar PADEN, kern/naamlaag.js tekst naar een CODENAAM. Wie de
+   verkeerde importeert merkt dat pas als er een codenaam in een padenlijst
+   belandt. Nieuwe code gebruikt `resolveerIntent`; dit is een ALIAS en geen
+   tweede implementatie. */
+const resolveerIntent = resolveer;
+
+module.exports = { resolveer, resolveerIntent, segmentenVan, nietszeggendeSegmenten, STANDAARD_MAX };

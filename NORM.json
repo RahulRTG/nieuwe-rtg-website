@@ -45,7 +45,7 @@
     "lussenZonderOverlapRem": 3,
     "meetleerBlind": 8,
     "metersOngeijkt": 0,
-    "metingenZonderRatel": 49,
+    "metingenZonderRatel": 50,
     "onbewaakt": 0,
     "ratelTanden": 85,
     "registersUitVuileBoom": 1,
@@ -59,7 +59,7 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1612,
+    "testbestanden": 1613,
     "toetsenNietGemeten": 607,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
@@ -79,9 +79,96 @@
     "geldRoutesHerstelOnbesloten": 42,
     "geldRoutesHerstelTegenspraak": 0,
     "geldpadGezakt": 0,
-    "geldpadOnbewezen": 1
+    "geldpadOnbewezen": 1,
+    "eersteMinuutGezakt": 0,
+    "pakteMisgelopen": 0,
+    "menstaalTeVer": 0,
+    "goudenPlakGebreken": 0,
+    "samenhangGebreken": 0,
+    "referentGebreken": 0,
+    "mensmutatieZonderWacht": 1
   },
   "notities": [
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 614,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 614 -> 615",
+      "reden": "test/railvergelijk.test.js komt erbij -- zes toetsen op het oordeel van scripts/railvergelijk.js (fase 12) -- en staat nog niet in MUTATIES.json. Alle zes zijn met de hand gemuteerd en zakten elk op hun eigen bewering: LAGER gelijkstellen aan HOGER laat 1 zakken, de HOGER-tak weghalen laat 2 en 4 zakken, de contracttoets NA de tredevergelijking zetten laat 3 zakken, de INGEVULD-tak weghalen laat 4 zakken, de vragencontrole weghalen laat 5 zakken, en een ontbrekende tweede rij als GELIJK tellen laat 6 zakken. Het oordeel is met opzet een PURE functie: er draait vandaag maar een rail, dus een toets op de echte lijsten zou niets kunnen zien zakken -- dezelfde fout als bij soortVerschil in scripts/menselijkeuitvoering.js.",
+      "waarheen": "test/railvergelijk.test.js draagt de belofte met de hand: zes beweringen, alle zes gedraaid en zien zakken. Laat scripts/mutatie.js over dat bestand lopen, samen met menselijkeuitvoering, mensmutatie, stuurspoor, stuurrail, menstaal en stuurplafond uit de notities hieronder."
+    },
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "metingenZonderRatel",
+      "van": 49,
+      "vervalt": "2026-12-15",
+      "meter": "metingenZonderRatel 49 -> 50",
+      "reden": "RAILVERGELIJK.json komt erbij en hangt aan GEEN ratel, en dat is met opzet. Een tand op `overtredingen: 0` zou vandaag een VALSE NUL zijn: er is in deze omgeving geen tweede interpretatierail (geen LOCAL_AI_URL, geen sleutel), dus die nul betekent `niemand heeft gekeken` en niet `geen enkele rail overtreedt`. Het register zegt dat zelf met `tweedeRail.gemeten: false` en de reden erbij. De kop van scripts/lib/metingen.js is hier expliciet over: een meetbestand waarvan je de ratel niet kent hoort er NIET met een gok in, want dan daalt het getal doordat er regels bijkomen in plaats van ratels. De vergelijker zelf is wel geijkt -- vier rondes met een gemuteerd corpus als tweede rail, zie het veld `ijking`.",
+      "waarheen": "de tand komt er zodra er een tweede rail te bereiken is: draai `npm run menstaalproef -- --rail=lokaal --uit=MENSTAALPROEF-LOKAAL.json` en `npm run railvergelijk`, en hang dan `overtredingen + ingevuld` als meter met richting omlaag in NORM.json. Tot die tijd is de eerlijke stand dat er niets te ratelen valt."
+    },
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 613,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 613 -> 614",
+      "reden": "test/menselijkeuitvoering.test.js komt erbij -- zeven toetsen op MENSELIJKE_UITVOERING.json als PROJECTIE (byte voor byte hercompileerbaar, vingerafdrukken die kloppen, zelf niets meten, leeftijdsverschil nooit bij tegenspraak optellen, onbekenden met een reden, bewijs dat naar een gezakte mutatie wijst en niet naar een spoor-id) -- en staat nog niet in MUTATIES.json. Alle zeven zijn met de hand gemuteerd en zien zakken: minder scenarios laat 0 zakken, een getal met de hand veranderen laat 1 zakken, een liegende vingerafdruk laat 2 zakken, de generator laten meten laat 3 zakken, elk verschil een tegenspraak noemen laat 4 zakken, de vaste onbekende weghalen laat 5 zakken, en een lege join met MENSMUTATIE.json laat 6 zakken. Let op wat daar onderweg misging: de eerste versie van toets 4 toetste alleen de LIJSTEN, en omdat er vandaag nul leeftijdsverschillen zijn was elke mutatie erop een no-op -- een toets die niet kon zakken. Het onderscheid staat nu als functie (soortVerschil) en wordt op afgedwongen invoer beproefd.",
+      "waarheen": "test/menselijkeuitvoering.test.js draagt de belofte met de hand: zeven beweringen, alle zeven gedraaid en zien zakken. Laat scripts/mutatie.js over dat bestand lopen -- samen met mensmutatie, stuurspoor, stuurrail, menstaal en stuurplafond uit de notities hieronder, want het is dezelfde ronde."
+    },
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 612,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 612 -> 613",
+      "reden": "test/mensmutatie.test.js komt erbij -- vijf toetsen die bewaken dat de twaalf semantische mutaties van scripts/mensmutatie.js niet afdrijven van de bron die zij aangrijpen -- en staat nog niet in MUTATIES.json. ALLE VIJF zijn met de hand gemuteerd en zakten elk op hun eigen bewering: een ankerpunt dat niet meer bestaat laat 1 zakken, een contractveld dat al op de doelwaarde staat laat 2 zakken, een dubbel mutatienummer laat 3 zakken, de menstaalproef uit de wachtenlijst halen laat 4 en 5 zakken, en --niet-schrijven weghalen laat 5 zakken. Herstellen gaf telkens 5/5, en de bron kwam byte voor byte terug.",
+      "waarheen": "test/mensmutatie.test.js draagt de belofte met de hand: vijf beweringen, alle vijf gedraaid en zien zakken. Laat scripts/mutatie.js over dat bestand lopen -- samen met stuurspoor, stuurrail, menstaal en stuurplafond uit de vier notities hieronder, want het is dezelfde ronde -- en leg MUTATIES.json opnieuw vast uit een schone commit."
+    },
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 610,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 610 -> 611",
+      "reden": "test/stuurspoor.test.js komt erbij -- tien toetsen op de fase-bewijslaag (server/kern/stuur/spoor.js) -- en staat nog niet in MUTATIES.json. Drie mutaties zijn met de hand gedraaid en raakten elk hun eigen bewering: het spoor tot poort maken laat 2 zakken, NOT_RUN bij PASS optellen laat 4 zakken, en MANDATE_EVALUATED altijd PASS maken laat 9 zakken.",
+      "waarheen": "test/stuurspoor.test.js draagt de belofte met de hand: tien beweringen, elk met zijn mutatie in het bestand zelf, drie ervan gedraaid en zien zakken. Laat scripts/mutatie.js over dat bestand lopen -- samen met stuurrail, menstaal en stuurplafond uit de drie notities hieronder, want het is dezelfde ronde."
+    },
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 609,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 609 -> 610",
+      "reden": "test/menstaal.test.js komt erbij -- twaalf toetsen op het mensentaal-contract (server/kern/stuur/menstaal.json, 41 gevallen) -- en staat nog niet in MUTATIES.json. Dat is de definitie van deze teller en geen zwakkere toets: VIER mutaties zijn met de hand gedraaid en raakten elk precies hun eigen bewering -- een ambigu geval iets laten klaarzetten laat 6 zakken, een vijfde gezagstrede toevoegen laat 1 zakken, de rail een zin laten verstaan die niet in het contract staat laat 10 zakken, en drie zinnen uit het script halen laat 11 zakken. Herstellen gaf telkens 12/12.",
+      "waarheen": "test/menstaal.test.js draagt de belofte met de hand: twaalf beweringen, elk met zijn mutatie in het bestand zelf, vier ervan gedraaid en zien zakken. Laat scripts/mutatie.js over dat bestand lopen -- samen met test/stuurrail.test.js en test/stuurplafond.test.js uit de twee notities hieronder, want het is dezelfde ronde -- en leg MUTATIES.json opnieuw vast uit een schone commit."
+    },
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 608,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 608 -> 609",
+      "reden": "test/stuurrail.test.js komt erbij -- de veertien toetsen onder de vervangbare interpretatierail (kern/stuur/rail.js en rail-corpus.js) -- en staat nog niet in MUTATIES.json. Dat is de definitie van deze teller en geen zwakkere toets: VIER mutaties zijn met de hand gedraaid en raakten elk precies hun eigen bewering -- de modelclient-grendel weghalen laat 3 zakken, de stapindex als moduletoestand laat 8 zakken, de rail de resolver laten importeren laat 6 zakken, en de planstap uit het corpus halen laat 8, 9, 10 en 12 zakken. Herstellen gaf telkens 14/14. `npm run mutatie` draait hier niet omdat hij de hele suite per mutatie afgaat; hij vult deze rij bij de eerstvolgende volle ronde.",
+      "waarheen": "test/stuurrail.test.js draagt de belofte met de hand: veertien beweringen, elk met zijn mutatie in het bestand zelf, vier ervan gedraaid en zien zakken. Laat scripts/mutatie.js over dat bestand lopen -- samen met test/stuurplafond.test.js uit de notitie hieronder, want het is dezelfde ronde -- en leg MUTATIES.json opnieuw vast uit een schone commit."
+    },
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 607,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 607 -> 608",
+      "reden": "test/stuurplafond.test.js komt erbij (de grendel onder de routewissel, kern/stuur/plafond.js) en staat nog niet in MUTATIES.json, dus de mutatiemotor is er niet langs geweest. Dat is de definitie van deze teller en niet een zwakkere toets: elke van de negen beweringen draagt in het bestand zelf zijn MUTATIE, en twee daarvan zijn met de hand gedraaid -- STANDAARD op 'uitvoeren' laat er 5 zakken, `klein` toelaten op de trede `tonen` laat er 2 zakken, herstellen maakt alle negen weer groen. `npm run mutatie` is hier afgebroken omdat hij de hele suite per mutatie draait; hij vult deze rij alsnog bij de eerstvolgende volle ronde en dan mag dit getal weer omlaag.",
+      "waarheen": "test/stuurplafond.test.js draagt de belofte nu met de hand: negen beweringen, elk met zijn mutatie in het bestand zelf, twee ervan gedraaid en zien zakken. Laat scripts/mutatie.js over dat bestand lopen en leg MUTATIES.json opnieuw vast uit een schone boom -- dan mag deze teller terug naar 607."
+    },
     {
       "datum": "2026-09-08",
       "soort": "structureel",
@@ -2039,6 +2126,16 @@
       "meter": "kernBreedte 1565 -> 1569, kernGedeeld 231 -> 235, activeringOndergrens 48 -> 49",
       "reden": "DE SAMENVOEGING DRAAGT DE GROEI VAN BEIDE TAKKEN, EN GEEN GROEI VAN ZICHZELF. Deze tak voegt PR #232, #235 en #237 samen. De strengste waarde per meter was het uitgangspunt, maar voor deze drie kan de samengevoegde boom die niet halen: de kern bevat nu zowel `carriereledger` en `vakschema` (#232) als de afsprakenlaag (#235), en de gemeten waarde is exact het eindpunt van de notities die #232 en #235 hier zelf al bij hebben geschreven -- 1569, 235 en 49. Er komt hier dus geen nieuwe verruiming bij; de lat gaat naar de som van twee verruimingen die elk al zijn afgewogen. Tegelijk gaat registersUitVuileBoom van 2 naar 1, want de registers van deze ronde zijn na de commit opnieuw gemeten.",
       "waarheen": "de notities van 2026-09-11 op kernBreedte (1567->1568, 1568->1569), kernGedeeld (233->234, 234->235) en activeringOndergrens (48->49) dragen elk hun eigen grond; deze regel telt ze alleen bij elkaar op"
+    },
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 611,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 611 -> 612",
+      "reden": "test/menscontext.test.js komt erbij en de mutatiemotor is er niet langs. De toets handhaaft de contextlaag van fase 4: dezelfde zin met drie verschillende schermen krijgt drie antwoorden, AANGEBODEN en GEBRUIKT zijn twee beweringen, PENDING_INTERACTION is niet p.wacht, en een verwijzing wordt nooit uit zichzelf een object. Vijftien beweringen, en ze zijn met de hand nagetrokken met tien mutaties op de bron -- waarvan er twee NIETS deden en dus zijn vervangen (de beginwaarde `let magHet = false` wordt door de catch in elke tak overschreven, en het weghalen van de `typeof o.mag`-tak laat diezelfde catch hem alsnog op false vangen). Handwerk is geen motorronde: dit is instrumentdekking en geen groenverklaring.",
+      "waarheen": "laat de mutatiemotor over test/menscontext.test.js lopen in dezelfde ronde als de toetsen van 2026-09-08 en 2026-09-10 (zelfde sleutel, zelfde vervaldatum); levert dat pogingen zonder uitslag op, dan hoort hij in GEEN_BRONMUTATIE met het aantal pogingen erbij, en anders gewoon gemeten"
     }
   ],
   "prestatie": {
@@ -2108,7 +2205,13 @@
     "geldRoutesHerstelOnbesloten": "2026-09-12",
     "geldRoutesHerstelTegenspraak": "2026-09-12",
     "geldpadGezakt": "2026-09-12",
-    "geldpadOnbewezen": "2026-09-12"
+    "geldpadOnbewezen": "2026-09-12",
+    "eersteMinuutGezakt": "2026-09-12",
+    "menstaalTeVer": "2026-09-12",
+    "goudenPlakGebreken": "2026-09-12",
+    "samenhangGebreken": "2026-09-12",
+    "referentGebreken": "2026-09-12",
+    "mensmutatieZonderWacht": "2026-09-12"
   },
   "uitzonderingen": [
     {

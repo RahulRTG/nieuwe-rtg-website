@@ -16,7 +16,13 @@ const aiVerhaal = () => lees('server/kern/ai/prompt.js') + '\n' + lees('server/k
 // de tool-lus van het stuur is afgesplitst: de dispatcher staat in stuur.js, de
 // eigenlijke Claude-lus (met het doctrine-prompt) in de submodule stuur/lus.js.
 // We lezen beide, zodat de bewaking klopt waar de doctrine ook precies leeft.
-const stuurLus = () => lees('server/kern/stuur.js') + '\n' + lees('server/kern/stuur/lus.js');
+/* De doctrine van de stuurlus stond letterlijk in stuur/lus.js en verhuisde op
+   12 september 2026 naar stuur/lusregels.js toen lus.js door de omvangband ging.
+   Deze toets viel daar terecht over -- zelfde geval als dienst-fluister.js
+   hieronder, en met dezelfde keerzijde: was de tekst naar een bestand verhuisd
+   waar hij toevallig al in stond, dan was hij stil blijven slagen. */
+const stuurLus = () => lees('server/kern/stuur.js') + '\n' + lees('server/kern/stuur/lus.js') +
+  '\n' + lees('server/kern/stuur/lusregels.js');
 /* Alleen de CODE, zonder het commentaar eromheen. Dit huis legt in commentaar
    uit wat er vroeger fout stond -- dat hoort er te staan -- maar een bewaking
    die op de uitleg aanslaat meet de verkeerde helft. */
@@ -104,7 +110,15 @@ test('elke gespreks-assistent begint met het gedeelde karakter (RAHUL_LEAD)', ()
      daar terecht over -- een pad dat niet meer klopt is precies wat hij hoort
      te merken. Let op de keerzijde: was het naar een bestand verhuisd waar de
      tekst toevallig al in stond, dan was hij stil blijven slagen. */
-  for (const p of ['server/routes/supplier/ai/index.js', 'server/routes/member/persoonlijk.js',
+  /* EN OP 12 SEPTEMBER 2026 VERHUISDE HIJ NOG EENS: de Rahul-beurt zelf ging
+     van persoonlijk.js naar persoonlijk-rahul.js toen dat bestand door de
+     omvangband ging. Dat is binnen een dag de DERDE lexicale wacht die door een
+     splitsing blind werd (de andere twee: keuringsregel 34 en de doctrine-toets
+     hierboven, allebei op stuur/lus.js -> stuur/lusregels.js). De les is niet
+     "splits minder" maar: een wacht die op een BESTANDSNAAM staat, hoort bij
+     elke splitsing nagelopen te worden -- en hij zakt luid, wat precies is wat
+     je wilt. */
+  for (const p of ['server/routes/supplier/ai/index.js', 'server/routes/member/persoonlijk-rahul.js',
     'server/routes/staff/dienst-fluister.js', 'server/routes/techniek/boardroom/ai.js', 'server/kern/fluister/gesprek.js'])
     assert.match(lees(p), /RAHUL_LEAD|rahulLeadVoor/, p + ' gebruikt het gedeelde karakter');
 });

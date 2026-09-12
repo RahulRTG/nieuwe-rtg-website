@@ -887,4 +887,132 @@ function geldLijf(w) {
   return uit;
 }
 
-module.exports = { zetWereldKlaar, gedeeldLijf, geldLijf, voorvoegselLijf, BUITEN_IBAN };
+/* ============================================================================
+   DE VOORZIENING -- een VERS onderwerp, vlak voordat de route wordt gemeten.
+
+   HET PROBLEEM, en het is geen ontbrekende fixture. De wereld hierboven maakt
+   elk onderwerp EEN keer, voor de hele ronde. Een route die zijn onderwerp
+   OPMAAKT -- een pas sluiten, een betaalverzoek intrekken, saldo uitgeven --
+   vindt het daarna niet meer. En de eerste die het opmaakt is de proef zelf:
+   scripts/lib/idemproef.js doet voor elke LEDENroute eerst een pasladder-
+   ijkoproep om te zien welke pas werkt, en die oproep DOET ECHT WERK.
+
+   Nagemeten op 12 september 2026, en het reproduceert woordelijk wat er in
+   IDEMPROEF.json stond:
+
+     /api/bank/pas/sluit      ijkoproep 200 (gesloten) -> A 404 "De pas bestaat niet."
+     /api/pay/verzoek/intrek  ijkoproep 200            -> A 409 "Dit verzoek is al afgehandeld."
+
+   Die twee stonden daardoor op `ongemeten` met een reden die klopte maar naar
+   het verkeerde wees: er was geen ontbrekende wereld, er was een onderwerp dat
+   was opgebruikt voordat de meting begon. De bron waarschuwt er zelf voor ("dit
+   is een EXTRA oproep per ledenroute, en die kan werk doen"); wat ontbrak was
+   de tegenmaatregel.
+
+   DE VORM KOMT UIT ./herstelwereld.js, waar hij zich al bewijst. Een
+   voorziening MAAKT het onderwerp langs de GEWONE route, met de gewone poorten
+   ervoor, en geeft de identificerende velden terug die in het lijf moeten. Zij
+   zet geen uitkomst klaar en slaat geen controle over.
+
+   ZIJ KRIJGT `tokenVoor` EN GEEN VASTE ROL. Een voorziening heeft soms meer dan
+   een rol nodig: de zaak kan pas iets oormerken nadat een LID haar heeft
+   betaald. De eerste versie gaf haar het token van de route mee, en op een
+   leveranciersroute deed haar ledenoproep het daardoor met het verkeerde token
+   (401). Wie een voorziening een rol oplegt, bepaalt ongemerkt wat zij kan.
+
+   EN ZIJ LIEGT NIET ALS ZIJ FAALT. Lukt het niet, dan geeft zij `{ fout }` en
+   blijft de route eerlijk ongemeten met de hindernis van de route zelf -- plus
+   de reden waarom de voorziening het niet redde. Een voorziening die stilletjes
+   een half onderwerp achterlaat, is erger dan geen.
+   ========================================================================== */
+/* ELKE VOORZIENING DRAAGT EEN UNIEKE SLEUTEL, en dat is geen nettigheid.
+
+   De eerste versie maakte een "vers" betaalverzoek zonder `idem`. Het antwoord
+   kwam terug met `herhaald: true` en met het id van het klompje dat de wereld
+   al eerder had gemaakt -- de idem-poort herkende de oproep terecht als een
+   dubbeltik (server/lib/idemsleutels.js leidt daar een sleutel uit de inhoud
+   af). De voorziening dacht dat zij een nieuw onderwerp had gemaakt en gaf het
+   OUDE terug, dat de ijkoproep net had ingetrokken. Uitslag: `ongemeten`, met
+   een reden die nergens naar wees.
+
+   Een voorziening vraagt dus expliciet om een NIEUW ding. Dat is precies wat
+   een unieke sleutel betekent, en het is dezelfde regel die elke client hier
+   volgt. */
+let teller = 0;
+const versSleutel = (wat) => 'voorziening-' + wat + '-' + (++teller) + '-' + Date.now();
+
+const VOORZIENINGEN = {
+  /* Een VERSE pas, want de ijkoproep sluit de vorige. */
+  '/api/bank/pas/sluit': async ({ post, tokenVoor, w }) => {
+    if (!w.iban) return { fout: 'geen rekening in de wereld' };
+    const r = await post('/api/bank/pas/uitgeven',
+      { iban: w.iban, soort: 'debit', naam: 'Verse proefpas', idem: versSleutel('pas') }, tokenVoor('member'));
+    const id = r && r.data && r.data.pas && r.data.pas.id;
+    return id ? { id } : { fout: 'pas/uitgeven gaf ' + (r && r.status) };
+  },
+  /* Een verse pas EN geld erop. `pas/betaal` stond op 402 "Onvoldoende saldo":
+     de wereld stort eenmalig, en tientallen bankroutes geven dat daarna uit. */
+  '/api/bank/pas/betaal': async ({ post, tokenVoor, w }) => {
+    if (!w.iban) return { fout: 'geen rekening in de wereld' };
+    await post('/api/bank/storten', { iban: w.iban, centen: 100000, route: 'ideal', idem: versSleutel('storting') }, tokenVoor('member'));
+    const r = await post('/api/bank/pas/uitgeven',
+      { iban: w.iban, soort: 'debit', naam: 'Verse betaalpas', idem: versSleutel('betaalpas') }, tokenVoor('member'));
+    const id = r && r.data && r.data.pas && r.data.pas.id;
+    return id ? { id } : { fout: 'pas/uitgeven gaf ' + (r && r.status) };
+  },
+  /* Een vers klompje VAN mij, want de ijkoproep trekt het vorige in. */
+  '/api/pay/verzoek/intrek': async ({ post, tokenVoor, w }) => {
+    if (!w.cn2) return { fout: 'geen tweede codenaam in de wereld' };
+    const r = await post('/api/pay/verzoek',
+      { aan: [w.cn2], totaalCenten: 500, oms: 'vers proefklompje', idem: versSleutel('klompje') }, tokenVoor('member'));
+    const v = r && r.data && r.data.verzoeken;
+    const id = (Array.isArray(v) && v[0] && v[0].id) || (r && r.data && r.data.verzoek && r.data.verzoek.id);
+    return id ? { id } : { fout: 'pay/verzoek gaf ' + (r && r.status) };
+  },
+  /* Een beleidsregel om weg te gooien. De wereld maakte er geen; `beleid/weg`
+     stond daardoor op 404 "Deze regel bestaat niet". `minimumbuffer` is de
+     eenvoudigste van de vier soorten: geen pot nodig, geen niveau-uitzondering. */
+  '/api/geld/beleid/weg': async ({ post, tokenVoor }) => {
+    const r = await post('/api/geld/beleid/zet', { soort: 'minimumbuffer', drempelCenten: 10000, idem: versSleutel('beleidregel') }, tokenVoor('member'));
+    const d = r && r.data;
+    const id = (d && d.regel && d.regel.id) ||
+      (d && Array.isArray(d.regels) && d.regels.length && d.regels[d.regels.length - 1].id) || null;
+    return id ? { id } : { fout: 'beleid/zet gaf ' + (r && r.status) + ' ' + ((d && d.error) || '') };
+  },
+  /* Een OPEN kamerrekening met een regel erop. `method: 'kamer'` eist geen
+     bestaande tafel (dat doet alleen 'tafel'), dus dit is de kortste weg naar
+     een echte openstaande rekening. */
+  '/api/supplier/pos/checkout': async ({ post, tokenVoor }) => {
+    const kamer = 'Proefkamer-' + Math.random().toString(36).slice(2, 8);
+    const r = await post('/api/supplier/pos/sale',
+      { total: 12.5, method: 'kamer', room: kamer, items: [{ name: 'Proefregel', qty: 1, price: 12.5 }],
+        idem: versSleutel('kamerbon') }, tokenVoor('supplier'));
+    if (!(r && r.status >= 200 && r.status < 300)) return { fout: 'pos/sale gaf ' + (r && r.status) };
+    return { room: kamer, method: 'contant' };
+  },
+  /* Saldo op de rekening van de ZAAK, want oormerken kan niet uit niets. De zaak
+     ontvangt via een VERSE kascode van het LID -- twee rollen in een voorziening,
+     en de kascode uit de wereld is eenmalig en allang op. */
+  '/api/supplier/pay/treasury/apart': async ({ post, tokenVoor }) => {
+    /* Onder het plafond van de kascode blijven: die weigerde een verkoop van
+       200 met "Boven het maximum van deze code (150.00 euro)". Een voorziening
+       die tegen een echte grens aanloopt, verlaagt haar bedrag -- zij verhoogt
+       geen plafond. */
+    const kas = await post('/api/pay/kascode', { centen: 10000, idem: versSleutel('kascode') }, tokenVoor('member'));
+    const code = (kas.data && (kas.data.code || (kas.data.kascode && kas.data.kascode.code))) || null;
+    if (!code) return { fout: 'pay/kascode gaf ' + kas.status };
+    const verkoop = await post('/api/supplier/pos/sale',
+      { total: 100, method: 'rtgpay', payCode: code, idem: versSleutel('treasury') }, tokenVoor('supplier'));
+    if (!(verkoop.status >= 200 && verkoop.status < 300))
+      return { fout: 'pos/sale (rtgpay) gaf ' + verkoop.status + ' ' + ((verkoop.data && verkoop.data.error) || '') };
+    return { naam: 'Proefoormerk', centen: 1000, doel: 'btw' };
+  }
+};
+
+/* Geeft de voorziening van dit pad, of null. De aanroeper draait hem NA de
+   pasladder-ijkoproep en VOOR de eerste gemeten oproep -- dat is de enige plek
+   waar het onderwerp gegarandeerd vers is. */
+const voorzieningVoor = (pad) => VOORZIENINGEN[pad] || null;
+
+module.exports = { zetWereldKlaar, gedeeldLijf, geldLijf, voorvoegselLijf, BUITEN_IBAN,
+  VOORZIENINGEN, voorzieningVoor };

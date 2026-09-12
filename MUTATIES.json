@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-12T17:51:31.137Z",
-    "commit": "64d170b8",
-    "boomVuil": false,
+    "op": "2026-09-12T18:19:10.971Z",
+    "commit": "d358c6ee",
+    "boomVuil": true,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
@@ -3543,6 +3543,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "idemvoorziening.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/idemwereld.js",
+      "operator": "-->+#0",
+      "gezakt": 1,
+      "geprobeerd": 14
     },
     "idemwereld-voorvoegsel.test.js": {
       "soort": "puur",

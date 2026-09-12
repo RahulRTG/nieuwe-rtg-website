@@ -348,7 +348,98 @@ INT-04, KANTOORMACHT.md en HDI.md tegelijk — ook intern als sorteersleutel.
 
 ---
 
-## 4. De grenzen
+## 3c. De inventaris vóór de begrijplaag
+
+*De opdracht schrijft voor: eerst meten, dan pas code. Dit is die meting,
+12 september 2026. Zeven vragen, zeven getallen.*
+
+### 1. Hoe wordt `resolver.js` vandaag aangeroepen?
+
+**Eén keer in productie.** `server/kern/stuur/lusstap.js:92`, en alleen voor het
+gereedschap `kaart` — dus alleen binnen de agent-lus, om de padenlijst voor het
+model te versmallen. De vier andere aanroepen zijn meters
+(`scripts/resolver.js`, `resolverbereik.js`, `rommeltaal.js`).
+
+Let op een naambotsing die niets met elkaar te maken heeft: `kern/naamlaag.js`
+draagt óók een `resolveer()`, en dat is de codenaam-oplosser. Wie op de naam
+zoekt, vindt twee dingen.
+
+### 2. Welke invoervormen worden ondersteund?
+
+**Eén: tekst.** Beide AI-routes nemen een string aan. Er is geen spraak- of
+beeldingang naar deze keten; `kern/spraaktekst.js` bestaat wel, maar die voedt
+de ondertiteling en niet het stuur.
+
+### 3. Hoeveel capabilities zijn bereikbaar?
+
+| rol | paden | van 4729 POST-routes |
+|---|---|---|
+| `member` | **120** | 2,5% |
+| `supplier` | 40 | 0,8% |
+| `staff` | 16 | 0,3% |
+| `office` | **0** | — |
+| `guest` | **0** | — |
+
+Die nul bij `office` is geen storing maar beleid (`beleid.js` kent geen
+`/api/office`-paden; KANTOORMACHT.md blok 9 legt uit waarom).
+
+### 4. Welke context is er vandaag al?
+
+**Meer dan verwacht, en hij komt nergens aan.** `public/shared/rahul-tab.js`
+stelt per vraag een context samen — `app`, `deel`, `selectie` — en stuurt die
+mee in het lichaam naar `/api/fluister`. De server ontvangt hem ook.
+
+Maar `req.body.context` wordt op precies twee plaatsen gelezen
+(`routes/member/persoonlijk.js` regel 83 en 92), en allebei voeden ze
+`maakLiveTwin` — een VISUALISATIE. De aanroep van `stuurLus()` ernaast krijgt
+`{ vraag, wereld, opStap, filter, systeem }` en **geen context**. En
+`resolveer(vraag, paden, opties)` heeft geen contextparameter.
+
+Dus: de context wordt verzameld, verstuurd, ontvangen, getoond — en bereikt de
+resolver nooit. Punt 3 van het voorstel ("context als officiële invoer") is
+daarmee geen nieuwe pijplijn maar het doortrekken van een leiding die al ligt.
+
+### 5. Welke menselijke ingang ontbreekt?
+
+**Geen enkele — er is er een verkeerd aangesloten.** Er zijn twee AI-routes voor
+een lid en er zit een hele motor verschil tussen:
+
+| route | wat erachter zit | wie hem aanroept |
+|---|---|---|
+| `/api/fluister` | fluister → **stuurLus** → resolver → plan → gevolg → mandaat | `rahul-tab.js`, `metgezel.js`, `handenvrij-balk.js` |
+| `/api/ai` | het model, rechtstreeks. Geen gereedschap, geen resolver | `app-main` (`osRahulVraag`), 4 plekken |
+
+De vraagbalk van de commandoschil (`shared/command/praat.js` →
+`RTGThuisRahul.vraag` → `/api/ai`) gaat langs de **tweede**. Wie daar typt,
+praat met een taalmodel; de hele keten uit de opdracht staat ernaast en wordt
+niet geraakt. Dat geldt ook voor de ingang die op 12 september op het
+beginscherm is gezet: die opent diezelfde balk.
+
+### 6. Welke registers zijn er al?
+
+`IDEMPROEF.json` (de echte POST-routes), `beleid.js` (`toegestanePaden`),
+`GEZAGSNOEMER.json` (de vier treden), `EXECUTION_MAP.json` (de projectie over
+3282 routes), `HERSTELPROEF.json` (terugweg per paar), `IDEMBESLUIT.json`
+(herhaalgedrag). Er hoeft geen routelijst, gezagsschaal of herhaalregister bij.
+
+### 7. Wat ontbreekt, in getallen
+
+| ontbreekt | gemeten |
+|---|---|
+| context in de resolver | 0 van 3 velden komen aan |
+| gevolgvoorspelling | **93 `onbekend`** van 176 bereikbare paden |
+| bekende terugweg | **91 van 115** AI-schrijfpaden hebben er geen |
+| risicomodule | **0** — bestaat nergens (KANTOORMACHT.md) |
+| aanroepers van `mandaat.js` | **0** in productie |
+| begrip van rommelige taal | 5 van 18 versmallen, 3 daarvan fout (par. 3b) |
+
+**Wat dit betekent voor de volgorde.** De verticale snede uit de opdracht
+(*"parijs vrijdag"* van invoer tot uitkomst) vraagt vandaag geen nieuwe laag
+maar drie draden: de vraagbalk naar `/api/fluister` in plaats van `/api/ai`,
+de context door `stuurLus` naar `resolveer()`, en `mandaat.js` zijn eerste
+aanroeper. Alle drie bestaan aan beide kanten. Wat daarna nog ontbreekt —
+risico, gevolg voor de helft van de paden, terugweg voor 79% — is meetwerk en
+geen ontwerp, en het staat hierboven met een getal in plaats van een aanname.
 
 Zeven, bovenop die van GRAMMATICA.md en ADAPTIEF.md.
 

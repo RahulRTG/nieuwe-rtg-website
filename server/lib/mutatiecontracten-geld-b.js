@@ -20,7 +20,7 @@ const s = (klasse) => ({ klasse });
 const CONTRACTEN = {
   /* ---- een sleutel ervoor: herhalen mag, maar alleen met dezelfde ---- */
   'POST /api/bank/pas/betaal': {
-    mutatieId: 'bank.pas.betaal', semantiek: s('sleutelVereist'), afgetekend: AFGETEKEND,
+    mutatieId: 'bank.pas.betaal', semantiek: s('sleutelVereist'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
     waarom: 'kern/bank/passen.js wikkelt de boeking in `metIdem`, en het commentaar erboven ' +
       'legt de fout vast die dat nodig maakte: "Een herhaling schreef het bedrag nog een keer ' +
       'af EN telde nog een keer mee voor de daglimiet". Zonder sleutel is een tweede aanroep ' +
@@ -49,7 +49,7 @@ const CONTRACTEN = {
      had ik kunnen halen door een besluit van iemand anders te overschrijven. */
 
   'POST /api/supplier/pos/checkout': {
-    mutatieId: 'kassa.checkout', semantiek: s('sleutelVereist'), afgetekend: AFGETEKEND,
+    mutatieId: 'kassa.checkout', semantiek: s('sleutelVereist'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
     waarom: 'De hele handler loopt door `herhaling.eenmalig`, die met `sleutelVan(body)` een ' +
       'sleutel UIT HET LICHAAM afleidt en daarmee `metIdem` aanroept. Dat levert hetzelfde ' +
       'contract als een meegegeven sleutel -- met een kanttekening die hier hoort: levert het ' +
@@ -60,7 +60,7 @@ const CONTRACTEN = {
 
   /* ---- een tegenboeking erachter ---- */
   'POST /api/supplier/facturen/maak': {
-    mutatieId: 'facturatie.maak', semantiek: s('compenseerbaar'), afgetekend: AFGETEKEND,
+    mutatieId: 'facturatie.maak', semantiek: s('compenseerbaar'), stand: 'PROTECTED', afgetekend: AFGETEKEND,
     waarom: 'Een tweede aanroep maakt een TWEEDE factuur: kern/facturatie/motor.js kent geen ' +
       'idem-sleutel en geen ontdubbeling (nagekeken). Dat is te herstellen met een creditnota, ' +
       'en daarmee is dit compenseerbaar en niet onherstelbaar. LET OP EEN VERSCHIL DAT HIER ' +
@@ -71,7 +71,7 @@ const CONTRACTEN = {
     bewijs: { gemeten: 'IDEMPROEF.json: beschermd -- in tegenspraak met de code, zie waarom', op: '2026-09-12' }
   },
   'POST /api/supplier/pay/treasury/apart': {
-    mutatieId: 'pay.treasury.apart', semantiek: s('compenseerbaar'), afgetekend: AFGETEKEND,
+    mutatieId: 'pay.treasury.apart', semantiek: s('compenseerbaar'), stand: 'BLOCKED_BY_TEST_FIXTURE', afgetekend: AFGETEKEND,
     waarom: 'Geld apart zetten maakt een oormerk (WAARDE.md: een oormerk is u die uw eigen ' +
       'geld apart zet, en dat blijft). Twee keer apart zetten geeft twee oormerken. Er is een ' +
       'uitgeschreven tegenhanger -- /api/supplier/pay/treasury/vrij -- dus het is recht te ' +
@@ -81,7 +81,7 @@ const CONTRACTEN = {
 
   /* ---- en de uitzondering: een journaalregel per aanroep ---- */
   'POST /api/boardroom/betalingen/proef': {
-    mutatieId: 'betaalregie.proef', semantiek: s('nietHerhaalbaar'), afgetekend: AFGETEKEND,
+    mutatieId: 'betaalregie.proef', semantiek: s('nietHerhaalbaar'), stand: 'INTENTIONALLY_NON_IDEMPOTENT', afgetekend: AFGETEKEND,
     waarom: 'kern/betaalregie.js schrijft bij ELKE aanroep `audit(r, "configuratieproef", ...)`. ' +
       'Dat is letterlijk het voorbeeld dat kern/mutatie.js bij deze klasse noemt: een regel aan ' +
       'een journaal toevoegen. Herhalen IS hier een tweede gebeurtenis en dat is de bedoeling -- ' +

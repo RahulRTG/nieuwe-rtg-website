@@ -182,6 +182,16 @@ function bouw({ kaart, contract, herstelproef, herstelbesluit }) {
       if (r.idempotentie === 'beschermd') return 'PROVEN';
       if (r.idempotentie === 'onbeschermd') return 'FAILED';
       if (r.stand === 'BLOCKED_BY_TEST_FIXTURE') return 'BLOCKED';
+      /* Structureel niet van buiten te beproeven is iets anders dan een
+         ontbrekende fixture, maar voor DEZE as komen ze op hetzelfde neer: er
+         valt niet te meten, en dat is bekend en verklaard. */
+      if (r.stand === 'UNTESTABLE_WITH_JUSTIFIED_REASON') return 'BLOCKED';
+      /* EEN BEWUST NIET-IDEMPOTENTE ROUTE IS GEEN OPEN VRAAG. De vraag "is
+         herhalen veilig?" is daar beantwoord met "nee, en dat hoort zo" -- een
+         teller, een journaalregel, een bericht dat je verstuurt. Dat als UNKNOWN
+         tellen zou een beantwoorde vraag als een gat laten lezen, en dan daalt
+         het getal alleen nog door routes te herclassificeren. */
+      if (r.stand === 'INTENTIONALLY_NON_IDEMPOTENT') return 'NOT_APPLICABLE';
       if (r.stand === 'NOT_APPLICABLE') return 'NOT_APPLICABLE';
       return 'UNKNOWN';
     }),

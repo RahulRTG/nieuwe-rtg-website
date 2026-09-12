@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-12T17:48:27.245Z",
-    "commit": "88411c2d",
+    "op": "2026-09-12T18:24:56.047Z",
+    "commit": "1202d6e3",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 2,
     "instrument": "scripts/railvergelijk.js",
     "node": "v22.22.2"
   },
@@ -11,6 +11,10 @@
   "rails": {
     "basis": "deterministisch",
     "ander": null
+  },
+  "contract": {
+    "zelfde": null,
+    "reden": "er is geen tweede ronde"
   },
   "tweedeRail": {
     "gemeten": false,

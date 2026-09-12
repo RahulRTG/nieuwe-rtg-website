@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-12T17:48:27.122Z",
-    "commit": "88411c2d",
+    "op": "2026-09-12T18:24:55.925Z",
+    "commit": "1202d6e3",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/menstaalproef.js",
     "node": "v22.22.2"
   },
@@ -12,7 +12,8 @@
   "meet": "server/kern/stuur/menstaal.json tegen server/kern/stuur/spoor.js",
   "corpus": {
     "bestand": "server/kern/stuur/menstaal.json",
-    "gevallenNU": 31
+    "gevallenNU": 31,
+    "vingerafdruk": "c231e0cb8cabf46a"
   },
   "telling": {
     "gemeten": 30,

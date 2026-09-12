@@ -671,8 +671,13 @@
       "maxMandaat": "geen",
       "blockingVraagMax": 1,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4",
-      "let op": "een selectie zegt WELK object, niet WAT ermee moet; alleen 'deze' blijft dus een vraag"
+      "beproefbaar": "NU",
+      "let op": "een selectie zegt WELK object, niet WAT ermee moet; alleen 'deze' blijft dus een vraag",
+      "contextGeval": {
+        "app": "RTG Kluis",
+        "deel": "Documenten",
+        "selectie": "Paspoort 2026"
+      }
     },
     {
       "id": "ctx-deze-zonder",
@@ -742,7 +747,17 @@
       "maxMandaat": "geen",
       "blockingVraagMax": 0,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Kluis",
+        "deel": "Documenten",
+        "verwijzingen": [
+          {
+            "soort": "document",
+            "id": "doc-1"
+          }
+        ]
+      }
     },
     {
       "id": "ctx-open-hem",
@@ -756,7 +771,12 @@
       "maxMandaat": "tonen",
       "blockingVraagMax": 0,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Kluis",
+        "deel": "Documenten",
+        "selectie": "Paspoort 2026"
+      }
     }
   ],
   "contextGeval": "Een machineleesbare HumanContext voor dit geval, in de vorm die server/kern/stuur/menscontext.js saneert: presentatie (app/deel/selectie/wereld), verwijzingen (soort + id, NOOIT een object) en interactie (soort/opties/gekozen). Ontbreekt hij, dan wordt het geval zonder context gedraaid. Let op: `interactie` is NIET p.wacht -- een client die zegt dat er iets openstaat, maakt daarmee geen uitvoerbaar voorstel."

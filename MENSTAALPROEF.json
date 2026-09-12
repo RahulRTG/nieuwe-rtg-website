@@ -1,33 +1,34 @@
 {
   "stempel": {
-    "op": "2026-09-12T20:41:00.743Z",
-    "commit": "9f9115176",
+    "op": "2026-09-12T20:46:44.191Z",
+    "commit": "5b9730d6",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/menstaalproef.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "rail": "deterministisch",
   "wat": "hoe ver elke menselijke zin werkelijk komt, gemeten uit het stuurspoor, afgezet tegen de `sideEffectMax` die het contract voor die zin noemt",
   "meet": "server/kern/stuur/menstaal.json tegen server/kern/stuur/spoor.js",
   "corpus": {
     "bestand": "server/kern/stuur/menstaal.json",
-    "gevallenNU": 35,
-    "vingerafdruk": "336f28bdd5d34677"
+    "gevallenNU": 38,
+    "vingerafdruk": "4482e2511bed977f"
   },
   "telling": {
-    "gemeten": 34,
-    "binnen": 34,
+    "gemeten": 37,
+    "binnen": 37,
     "teVer": 0,
     "nietGemeten": 1,
-    "uitlegvragen": 8,
+    "uitlegvragen": 9,
     "uitlegRaakteIets": 0,
     "teVeelVragen": 0,
     "goudenPlakHeel": true,
     "samenhangHeel": true,
     "referentHeel": true,
     "geldHeel": true,
-    "bevestigHeel": true
+    "bevestigHeel": true,
+    "verwijzingHeel": true
   },
   "goudenPlak": {
     "positief": {
@@ -262,10 +263,62 @@
     "heel": true,
     "wat": "of een instemming in het gesprek een klaargezette handeling kan afmaken. Gemeten aan twee kanten: de poort weigert het, en de taal probeert het niet eens."
   },
+  "verwijzingveiligheid": {
+    "A": {
+      "kwam": "geen",
+      "vragen": 1,
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    "B": {
+      "kwam": "tonen",
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 5,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": true,
+        "geraakt": [
+          "documenten"
+        ]
+      },
+      "interpretatie": {
+        "versmald": true,
+        "paden": 3,
+        "gekozen": [
+          "/api/asset/mijn"
+        ]
+      }
+    },
+    "C": {
+      "kwam": "geen",
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 4,
+        "gewist": 0,
+        "verwijzingen": 1,
+        "canoniek": 0,
+        "gebruikt": null
+      }
+    },
+    "gebreken": [],
+    "heel": true,
+    "wat": "dezelfde context, drie zinnen. Het verschil is of de zin een werkwoord draagt; komen A en B op dezelfde uitkomst uit, dan stuurt de selectie de handeling en niet de mens."
+  },
   "perBereikteTrede": {
-    "geen": 30,
+    "geen": 32,
     "klaarzetten": 3,
-    "tonen": 1
+    "tonen": 2
   },
   "ijking": {
     "op": "2026-09-12",
@@ -1695,6 +1748,44 @@
       }
     },
     {
+      "id": "ctx-deze-met",
+      "input": "deze",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "verwachteRoute": "CLARIFY",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "vragen": 1,
+      "magVragen": 1,
+      "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 5,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
       "id": "ctx-deze-zonder",
       "input": "deze",
       "klasse": "CONTEXTUAL_REFERENCE",
@@ -1768,6 +1859,93 @@
         "CAPABILITY_SELECTED": "OVERGESLAGEN",
         "PROJECTED": "PASS",
         "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "ctx-leg-dit-uit",
+      "input": "leg dit uit",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "verwachteRoute": "ANSWER",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "vragen": 0,
+      "magVragen": 0,
+      "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 4,
+        "gewist": 0,
+        "verwijzingen": 1,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "ctx-open-hem",
+      "input": "open hem",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "tonen",
+      "kwam": "tonen",
+      "uit": [
+        "pad /api/asset/mijn (lezen) -> tonen",
+        "EXECUTED status 200"
+      ],
+      "vragen": 0,
+      "magVragen": 0,
+      "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 5,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": true,
+        "geraakt": [
+          "documenten"
+        ]
+      },
+      "interpretatie": {
+        "versmald": true,
+        "paden": 3,
+        "gekozen": [
+          "/api/asset/mijn"
+        ]
+      },
+      "mandaatWeging": {
+        "voor": 120,
+        "na": 120
+      },
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "PASS",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "PASS",
+        "CAPABILITY_SELECTED": "PASS",
+        "PROJECTED": "PASS",
+        "EXECUTED": "PASS"
       }
     }
   ]

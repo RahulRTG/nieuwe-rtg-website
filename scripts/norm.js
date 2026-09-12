@@ -602,6 +602,13 @@ const METERS = [
      blijft gedragen -- want dan is de goedkeuring buiten het gesprek een
      formaliteit geworden. */
   { sleutel: 'bevestigGebreken', richting: 'omlaag', wat: 'gebreken in de bevestigveiligheid (uit MENSTAALPROEF.json)' },
+  /* DE VERWIJZINGVEILIGHEID (MENSTAALPROEF.json). `gebreken` telt wat er
+     mankeert aan drie zinnen op DEZELFDE context, waar het verschil is of de
+     zin een werkwoord draagt. Zakt hij, dan stuurt de SELECTIE de handeling en
+     niet de mens -- een aanwijzende muisklik wordt dan een opdracht. Hij
+     bewaakt bovendien de enige plek waar de context de resolver aantoonbaar
+     versmalt; valt die eis weg, dan is die weg weer onbewezen in de keten. */
+  { sleutel: 'verwijzingGebreken', richting: 'omlaag', wat: 'gebreken in de verwijzingveiligheid (uit MENSTAALPROEF.json)' },
   /* DE TIEN MUTATIES (MENSMUTATIE.json). `geenWacht` telt de garanties die je
      uit de bron kunt HALEN zonder dat er een wacht afgaat. Dat is een uitspraak
      over de TOETSEN en niet over de code: de keten doet nog steeds het goede,
@@ -1348,6 +1355,7 @@ function meet(bronnen) {
     referentGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.referentveiligheid.gebreken || []).length),
     geldGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.geldveiligheid.gebreken || []).length),
     bevestigGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.bevestigveiligheid.gebreken || []).length),
+    verwijzingGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.verwijzingveiligheid.gebreken || []).length),
     mensmutatieZonderWacht: leesRegister('MENSMUTATIE.json', (j) => j.telling.geenWacht),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar

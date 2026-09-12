@@ -535,10 +535,10 @@ Zodra het detail per zin naast de stand kwam te liggen, vielen er drie dingen op
 die als alinea al bekend waren maar nooit als getal bestonden.
 
 **De resolver gebruikt de context in geen enkel scenario.** Van de 31 zinnen komt
-er bij <!--getal:menselijk.contextAangeboden-->10<!--/getal--> context aan die door
-het contract heen komt, bij <!--getal:menselijk.contextGebruikt-->1<!--/getal-->
+er bij <!--getal:menselijk.contextAangeboden-->13<!--/getal--> context aan die door
+het contract heen komt, bij <!--getal:menselijk.contextGebruikt-->2<!--/getal-->
 raakt een contextwoord aantoonbaar een pad, en bij
-<!--getal:menselijk.niemandKeek-->18<!--/getal--> heeft de resolver niet eens
+<!--getal:menselijk.niemandKeek-->20<!--/getal--> heeft de resolver niet eens
 gedraaid — dan heeft *niemand gekeken*, en dat is iets anders dan "de context deed
 niets".
 
@@ -607,6 +607,30 @@ welke van de twee. En `test/menscontext.test.js` hield een **handmatige lijst
 corpusbestanden** bij die meteen afdreef toen er één bij kwam; die vraagt het nu
 aan de rail zelf, want een tweede lijst naast de samenvoeging is precies de
 dubbeling die dit huis elders telt.
+
+### 3h. Een selectie zegt WELK object, nooit WAT ermee moet
+
+Drie zinnen op dezelfde context — een geselecteerd document in de kluis — en het
+verschil is of de zin een **werkwoord** draagt.
+
+| zin | wat er gebeurt |
+|---|---|
+| "deze" | aanwijzing zonder werkwoord → één vraag, verder niets |
+| "open hem" | hetzelfde scherm, wel een werkwoord → `tonen` |
+| "leg dit uit" | een vraag om KENNIS → er wordt niets uit dit huis gehaald |
+
+Het eerste paar is wat ertoe doet. Dezelfde context, dezelfde selectie, hetzelfde
+beleid; alleen de zin verschilt. Komen ze op dezelfde uitkomst uit, dan **stuurt
+de selectie de handeling en niet de mens** — dan wordt een aanwijzende muisklik
+een opdracht.
+
+**En "open hem" is de plek waar de context de resolver aantoonbaar versmalt**: van
+120 paden naar 3. Die eis staat daarom expliciet in het blok, want valt hij weg,
+dan is de hele context-naar-resolver-weg weer onbewezen in de keten — hoe groen de
+rest ook staat. De derde zin draagt bovendien een **verwijzing** in plaats van een
+tekstselectie, en die blijft `ONOPGELOST`: er is geen opzoeker bedraad. Dat staat
+zo in het register, want een verwijzing die stil bruikbaar wordt is precies wat
+`menscontext-ref.js` moet voorkomen.
 
 ### 3g. "Ja doe maar" — de gevaarlijkste twee woorden
 

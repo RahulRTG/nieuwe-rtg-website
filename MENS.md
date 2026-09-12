@@ -535,10 +535,10 @@ Zodra het detail per zin naast de stand kwam te liggen, vielen er drie dingen op
 die als alinea al bekend waren maar nooit als getal bestonden.
 
 **De resolver gebruikt de context in geen enkel scenario.** Van de 31 zinnen komt
-er bij <!--getal:menselijk.contextAangeboden-->13<!--/getal--> context aan die door
+er bij <!--getal:menselijk.contextAangeboden-->14<!--/getal--> context aan die door
 het contract heen komt, bij <!--getal:menselijk.contextGebruikt-->2<!--/getal-->
 raakt een contextwoord aantoonbaar een pad, en bij
-<!--getal:menselijk.niemandKeek-->20<!--/getal--> heeft de resolver niet eens
+<!--getal:menselijk.niemandKeek-->21<!--/getal--> heeft de resolver niet eens
 gedraaid — dan heeft *niemand gekeken*, en dat is iets anders dan "de context deed
 niets".
 

@@ -20,26 +20,26 @@
   "unknowns": "per rij samengesteld uit wat de probes NIET leverden"
  },
  "bronnen": {
-  "server/kern/stuur/menstaal.json": "4482e2511bed977f",
-  "MENSTAALPROEF.json": "fc4d50e06e7a9783",
-  "MENSMUTATIE.json": "129b55147b0a0b2d",
+  "server/kern/stuur/menstaal.json": "b62006aa51fbc5a8",
+  "MENSTAALPROEF.json": "1cea3333315d4658",
+  "MENSMUTATIE.json": "e26bebd258fe9c3b",
   "PAKTE.json": "b6b6c84ac29f7ad7",
   "scripts/menselijkeuitvoering.js": "b211632b87591468"
  },
  "gemetenOp": {
-  "MENSTAALPROEF.json": "787bcd74b",
-  "MENSMUTATIE.json": "5b9730d6",
+  "MENSTAALPROEF.json": "254a4c75",
+  "MENSMUTATIE.json": "254a4c75",
   "PAKTE.json": "c933e406"
  },
  "eenLeeftijd": false,
  "telling": {
-  "scenarios": 38,
-  "binnenContract": 37,
+  "scenarios": 39,
+  "binnenContract": 38,
   "buitenContract": 0,
   "nietGemeten": 1,
-  "contextAangeboden": 13,
+  "contextAangeboden": 14,
   "contextGebruikt": 2,
-  "contextNiemandKeek": 20,
+  "contextNiemandKeek": 21,
   "totUitvoering": 5,
   "tegenspraken": 0,
   "leeftijdsverschillen": 0
@@ -2072,6 +2072,75 @@
    "context": {
     "aangeboden": "PASS",
     "woorden": 8,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": null,
+   "ambigu": true,
+   "keten": {
+    "CONTEXT_SANITIZED": "PASS",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 1,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "amb-annuleer-hem",
+   "input": "annuleer hem",
+   "klasse": "AMBIGUOUS",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 7,
     "gewist": 0,
     "verwijzingen": 0,
     "canoniek": 0,

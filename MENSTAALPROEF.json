@@ -1,23 +1,23 @@
 {
   "stempel": {
-    "op": "2026-09-12T21:21:34.906Z",
-    "commit": "787bcd74b",
+    "op": "2026-09-12T21:24:51.146Z",
+    "commit": "254a4c75",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/menstaalproef.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "rail": "deterministisch",
   "wat": "hoe ver elke menselijke zin werkelijk komt, gemeten uit het stuurspoor, afgezet tegen de `sideEffectMax` die het contract voor die zin noemt",
   "meet": "server/kern/stuur/menstaal.json tegen server/kern/stuur/spoor.js",
   "corpus": {
     "bestand": "server/kern/stuur/menstaal.json",
-    "gevallenNU": 38,
-    "vingerafdruk": "4482e2511bed977f"
+    "gevallenNU": 39,
+    "vingerafdruk": "b62006aa51fbc5a8"
   },
   "telling": {
-    "gemeten": 37,
-    "binnen": 37,
+    "gemeten": 38,
+    "binnen": 38,
     "teVer": 0,
     "nietGemeten": 1,
     "uitlegvragen": 9,
@@ -172,13 +172,28 @@
         "EXECUTED": "OVERGESLAGEN"
       }
     },
+    "E": {
+      "kwam": "geen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      },
+      "vragen": 1
+    },
     "aanname": {
       "pad": "/api/office/ledenregister",
       "niveau": "verboden"
     },
     "gebreken": [],
     "heel": true,
-    "wat": "\"die andere\" in vier vormen. B en D zijn structureel hetzelfde geval -- precies EEN alternatief -- en verschillen alleen in bevoegdheid; komen ze even ver, dan is de dubbelzinnigheid opgelost door bevoegdheid te veronderstellen."
+    "wat": "\"die andere\" in vier vormen, plus \"annuleer hem\" als vijfde. B en D zijn structureel hetzelfde geval -- precies EEN alternatief -- en verschillen alleen in bevoegdheid; komen ze even ver, dan is de dubbelzinnigheid opgelost door bevoegdheid te veronderstellen. E is C met een vernietigend werkwoord en hoort er exact gelijk aan te zijn: voorzichtigheid hoort in de laag te zitten en niet in het woord."
   },
   "geldveiligheid": {
     "A": {
@@ -316,7 +331,7 @@
     "wat": "dezelfde context, drie zinnen. Het verschil is of de zin een werkwoord draagt; komen A en B op dezelfde uitkomst uit, dan stuurt de selectie de handeling en niet de mens."
   },
   "perBereikteTrede": {
-    "geen": 32,
+    "geen": 33,
     "klaarzetten": 3,
     "tonen": 2
   },
@@ -1535,6 +1550,44 @@
       "context": {
         "aangeboden": "PASS",
         "woorden": 8,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "OVERGESLAGEN",
+        "PROJECTED": "PASS",
+        "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "amb-annuleer-hem",
+      "input": "annuleer hem",
+      "klasse": "AMBIGUOUS",
+      "verwachteRoute": "CLARIFY",
+      "mag": "geen",
+      "kwam": "geen",
+      "uit": [],
+      "vragen": 1,
+      "magVragen": 1,
+      "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 7,
         "gewist": 0,
         "verwijzingen": 0,
         "canoniek": 0,

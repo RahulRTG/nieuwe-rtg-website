@@ -158,7 +158,7 @@ const REGISTER = {
      `eersteMinuutGezakt` mag alleen omlaag. */
   'EERSTEMINUUT.json': { meter: ['eersteMinuutGezakt'] },
   'PAKTE.json': { meter: ['pakteMisgelopen'] },
-  'MENSTAALPROEF.json': { meter: ['menstaalTeVer', 'goudenPlakGebreken', 'samenhangGebreken', 'referentGebreken', 'geldGebreken', 'bevestigGebreken'] },
+  'MENSTAALPROEF.json': { meter: ['menstaalTeVer', 'goudenPlakGebreken', 'samenhangGebreken', 'referentGebreken', 'geldGebreken', 'bevestigGebreken', 'verwijzingGebreken'] },
   /* MENSMUTATIE.json hangt om dezelfde reden aan de NORM-ratel: een verse ronde
      muteert de bron twaalf keer en draait zeven wachten, en dat hoort niet in
      `npm test`. Wat eraan hangt is het getal dat ertoe doet -- het aantal

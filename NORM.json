@@ -80,6 +80,7 @@
     "referentGebreken": 0,
     "geldGebreken": 0,
     "bevestigGebreken": 0,
+    "verwijzingGebreken": 0,
     "mensmutatieZonderWacht": 1
   },
   "notities": [
@@ -2209,6 +2210,7 @@
     "referentGebreken": "2026-09-12",
     "geldGebreken": "2026-09-12",
     "bevestigGebreken": "2026-09-12",
+    "verwijzingGebreken": "2026-09-12",
     "mensmutatieZonderWacht": "2026-09-12"
   },
   "uitzonderingen": [

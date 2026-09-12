@@ -1611,6 +1611,18 @@ const IJKINGEN = {
       (j) => { j.referentveiligheid.gebreken = (j.referentveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
       () => norm.meet().referentGebreken - voor.referentGebreken)
   },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (tiende): verwijzingGebreken telt wat er
+     mankeert aan drie zinnen op dezelfde context (MENSTAALPROEF.json,
+     verwijzingveiligheid.gebreken). De meter is met twee mutaties zien
+     uitslaan: "deze" zich laten gedragen als "open hem" (vier gebreken,
+     waaronder dat het paar op elkaar valt), en de kaartstap uit "open hem"
+     halen -- dan komt de context wel aan maar bereikt hij de resolver niet, en
+     is de enige gemeten context-naar-resolver-weg weg. */
+  verwijzingGebreken: {
+    proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
+      (j) => { j.verwijzingveiligheid.gebreken = (j.verwijzingveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
+      () => norm.meet().verwijzingGebreken - voor.verwijzingGebreken)
+  },
   /* DE TAND VAN 12 SEPTEMBER 2026 (negende): bevestigGebreken telt wat er
      mankeert aan de vraag of een instemming in het gesprek een klaargezette
      handeling kan afmaken (MENSTAALPROEF.json, bevestigveiligheid.gebreken).

@@ -3,10 +3,10 @@
   "uitleg": "Een geldpad van begin tot eind, ECONOMISCH gemeten: niet de status van de route maar de toestand van de vijf geldcollecties eromheen. Zeven stappen, waaronder een crashpunt uit de verraadsmotor (sterf-na-commit) en de herhaling erna. Zie GELDLAT.md, \"Scenario 3, gemeten op een echt geldpad\".",
   "grens": "DIT IS EEN PAD EN GEEN DEKKING. Wat hier bewezen is, geldt voor POST /api/pay/saldo en voor niets anders. De hashes van de vingerafdruk zijn per proces gezouten, dus over de crash heen zijn alleen aantallen en bedragen vergelijkbaar -- dat staat per stap in de meting. En `PROVEN` op stap 3 gaat over de tweede aanroep, nooit over de crashwindow.",
   "stempel": {
-    "op": "2026-09-12T17:51:06.945Z",
-    "commit": "64d170b8",
-    "boomVuil": false,
-    "boomAnders": 0,
+    "op": "2026-09-12T18:32:26.993Z",
+    "commit": "f30c5aa5",
+    "boomVuil": true,
+    "boomAnders": 1,
     "instrument": "scripts/factuurproef.js",
     "node": "v22.22.2"
   },
@@ -21,7 +21,7 @@
     "fondsAfdrachten",
     "socialeAfdrachten"
   ],
-  "gemetenOp": "2026-09-12T17:50:46.779Z",
+  "gemetenOp": "2026-09-12T18:32:06.965Z",
   "stappen": [
     {
       "nr": 1,
@@ -137,31 +137,62 @@
     {
       "nr": 7,
       "wat": "de terugweg: is deze betaling terug te draaien of te compenseren",
-      "stand": "UNKNOWN",
-      "reden": "er is geen tegenhanger gevonden, dus er is er ook geen uitgevoerd. De compenserende bouwsteen pay.huisUit bestaat wel en heeft geen aanroeper op een factuur. FINAL zou hier een BESLUIT van de eigenaar zijn en geen meting; daarom blijft dit UNKNOWN.",
+      "stand": "BLOCKED",
+      "reden": "verklaard als COMPENSATABLE, maar er is niets uit te voeren: een route die op een BETAALDE factuur een tegenboeking zet via pay.huisUit, met dezelfde duurzame bundel als de heenweg (kern/factuursaldo.js), en die de afdracht NIET stil terugdraait maar haar eigen correctieregel schrijft. Pas met die route is er iets uit te voeren en kan HERSTELPROEF.json hier `compensatie` meten in plaats van `geen tegenhanger beproefd`. -- een verklaring is geen uitgevoerde terugweg.",
       "gemeten": {
         "kandidatenInHerstelRegister": 0,
         "compenserendePrimitiveAanwezig": true,
-        "correctiemodel": "UNKNOWN"
+        "correctiemodel": "COMPENSATABLE",
+        "bewijsVanDeTerugweg": "BLOCKED"
       }
     }
   ],
   "idempotent": true,
   "crashUitkomst": "doorgegaan",
-  "correctiemodel": "UNKNOWN",
+  "correctiemodel": "COMPENSATABLE",
   "economischeUitkomst": {
     "saldoCenten": 12135,
     "factuurStand": "paid",
     "factuurCenten": -7865,
     "afdrachten": 1
   },
+  "crash": {
+    "contracten": {
+      "ATOMIC": "PROVEN",
+      "RECOVERABLE": "PROVEN",
+      "EXTERNALLY_RECONCILABLE": "UNKNOWN"
+    },
+    "contractReden": {
+      "ATOMIC": "stap 5: na de herstart is de uitkomst heel, of hij is het niet",
+      "RECOVERABLE": "stap 6: de herhaling na de crash levert over alles heen exact EEN mutatie",
+      "EXTERNALLY_RECONCILABLE": "niet gemeten: deze opstelling kent geen aanbieder, dus er is niets te verzoenen. Geen providersleutel gezet betekent hier geen nul maar een ontbrekende meting."
+    },
+    "grenzen": {
+      "na-commit-voor-antwoord": "PROVEN"
+    },
+    "uitslag": {
+      "stand": "PROVEN_PARTIAL",
+      "bewezen": [
+        "na-commit-voor-antwoord"
+      ],
+      "gezakt": [],
+      "open": [
+        "voor-eerste-mutatie",
+        "in-de-opslag",
+        "na-commit-voor-bericht",
+        "providercommit-zonder-antwoord",
+        "ambigu-extern-resultaat"
+      ],
+      "waarom": "bewezen op 1 van de 6 crashgrenzen; open: voor-eerste-mutatie, in-de-opslag, na-commit-voor-bericht, providercommit-zonder-antwoord, ambigu-extern-resultaat"
+    }
+  },
   "telling": {
     "stappen": 7,
     "PROVEN": 6,
     "FAILED": 0,
-    "BLOCKED": 0,
+    "BLOCKED": 1,
     "NOT_APPLICABLE": 0,
-    "UNKNOWN": 1
+    "UNKNOWN": 0
   },
   "gezakt": false,
   "volledigBewezen": false

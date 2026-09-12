@@ -54,6 +54,7 @@ const W = require('./lib/wegwerpserver.js');
    in plaats van stil een andere te pakken: een proef die zijn eigen onderwerp
    verzint, meet iets anders dan hij zegt. */
 const FACTUUR = 'RTG-2026-0207';
+const ROUTE_PAD = '/api/pay/saldo';
 const OPLADING = 20000;   // ruim boven het factuurbedrag (EUR 78,65)
 
 /* DE GELDCOLLECTIES VAN DIT PAD. Niet alle tachtig uit effectcollecties.js:
@@ -404,14 +405,34 @@ function terugweg(uit) {
   try {
     primitive = /huisUit/.test(fs.readFileSync(path.join(W.WORTEL, 'server/kern/pay/verzoeken.js'), 'utf8'));
   } catch (e) { primitive = null; }
+  /* HET BESLUIT IS GENOMEN, EN DE PROEF LEEST HET IN PLAATS VAN HET TE HERHALEN.
+
+     Tot 12 september stond hier UNKNOWN met als grond dat FINAL een besluit van
+     de eigenaar zou zijn en geen meting. Dat besluit is er nu
+     (HERSTELBESLUIT.json `beleid`: append-only, compensatie als standaard), en
+     deze route is verklaard als COMPENSATABLE.
+
+     Dat maakt de stap niet PROVEN. Een VERKLARING is geen uitgevoerde terugweg,
+     en er is nog steeds niets uit te voeren: nul kandidaten in HERSTEL.json, en
+     de compenserende bouwsteen pay.huisUit heeft geen aanroeper op een factuur.
+     De stand is dus BLOCKED -- met, zoals het register eist, wat er moet komen. */
+  let besluit = null;
+  try {
+    const b = require('../HERSTELBESLUIT.json');
+    besluit = (b.routes && (b.routes['POST ' + ROUTE_PAD] || b.routes[ROUTE_PAD])) || null;
+  } catch (e) { besluit = null; }
+  const stand = !besluit ? 'UNKNOWN'
+    : (besluit.bewijs && besluit.bewijs.stand === 'BLOCKED') ? 'BLOCKED' : 'PROVEN';
   uit.stappen.push(uitslag(stap(7, 'de terugweg: is deze betaling terug te draaien of te compenseren'),
-    'UNKNOWN',
-    'er is geen tegenhanger gevonden, dus er is er ook geen uitgevoerd. ' +
-    'De compenserende bouwsteen pay.huisUit bestaat wel en heeft geen aanroeper op een factuur. ' +
-    'FINAL zou hier een BESLUIT van de eigenaar zijn en geen meting; daarom blijft dit UNKNOWN.',
+    stand,
+    !besluit ? 'er is geen verklaring voor dit pad in HERSTELBESLUIT.json'
+      : 'verklaard als ' + besluit.stand + ', maar er is niets uit te voeren: ' +
+        (besluit.bewijs && besluit.bewijs.watErMoetKomen) +
+        ' -- een verklaring is geen uitgevoerde terugweg.',
     { kandidatenInHerstelRegister: kandidaten, compenserendePrimitiveAanwezig: primitive,
-      correctiemodel: 'UNKNOWN' }));
-  uit.correctiemodel = 'UNKNOWN';
+      correctiemodel: besluit ? besluit.stand : 'UNKNOWN',
+      bewijsVanDeTerugweg: besluit && besluit.bewijs ? besluit.bewijs.stand : null }));
+  uit.correctiemodel = besluit ? besluit.stand : 'UNKNOWN';
 }
 
 /* ---------------------------------------------------------------------------
@@ -424,6 +445,48 @@ async function meet() {
   await geldpad(uit);
   await crashpad(uit);
   terugweg(uit);
+  /* ---------------------------------------------------------------------------
+     DE CRASHUITSLAG, TEGEN DE TAXONOMIE EN NIET ALS EEN WOORD.
+
+     "crash-herstel: PROVEN" is een bewering over EEN moment, en welk moment dat
+     was is precies wat er niet in past. ./lib/crashtaxonomie.js houdt de drie
+     contracten en de gesloten lijst crashgrenzen op EEN plek; hier wordt alleen
+     gezegd welke grens deze proef heeft aangeraakt en wat eruit kwam.
+
+     Deze proef raakt er EEN: `na-commit-voor-antwoord`. Dat is wat
+     RTG_VERRAAD=sterf-na-commit nabootst, en het is met opzet de gemeenste --
+     maar het is er een van zes, en de uitslag heet daarom PROVEN_PARTIAL met
+     de open grenzen ernaast.
+
+     ATOMIC en RECOVERABLE komen uit TWEE VERSCHILLENDE stappen, en ze worden
+     niet samengevoegd: stap 5 zegt of de uitkomst heel was (atomair), stap 6
+     of RTG er daarna deterministisch op verder kon (herstelbaar). Een route kan
+     het eerste halen en het tweede niet. EXTERNALLY_RECONCILABLE blijft
+     UNKNOWN: er is geen aanbieder in deze opstelling, dus er valt niets te
+     verzoenen -- en dat is geen nul maar een ontbrekende meting. */
+  const tax = require('./lib/crashtaxonomie.js');
+  const stapStand = (nr) => (uit.stappen.find(x => x.nr === nr) || {}).stand || 'UNKNOWN';
+  const atomair = stapStand(5), herstel = stapStand(6);
+  uit.crash = {
+    contracten: {
+      ATOMIC: atomair,
+      RECOVERABLE: herstel,
+      EXTERNALLY_RECONCILABLE: 'UNKNOWN'
+    },
+    contractReden: {
+      ATOMIC: 'stap 5: na de herstart is de uitkomst heel, of hij is het niet',
+      RECOVERABLE: 'stap 6: de herhaling na de crash levert over alles heen exact EEN mutatie',
+      EXTERNALLY_RECONCILABLE: 'niet gemeten: deze opstelling kent geen aanbieder, dus er is niets te verzoenen. ' +
+        'Geen providersleutel gezet betekent hier geen nul maar een ontbrekende meting.'
+    },
+    /* Alleen de grens die werkelijk is aangeraakt krijgt een uitslag, en die is
+       de STRENGSTE van de twee contracten die eraan hangen -- zakt een van
+       beide, dan is de grens niet gehaald. */
+    grenzen: { 'na-commit-voor-antwoord': (atomair === 'PROVEN' && herstel === 'PROVEN') ? 'PROVEN'
+      : (atomair === 'FAILED' || herstel === 'FAILED') ? 'FAILED' : 'UNKNOWN' }
+  };
+  uit.crash.uitslag = tax.weeg(uit.crash.grenzen);
+
   const t = { stappen: uit.stappen.length, PROVEN: 0, FAILED: 0, BLOCKED: 0, NOT_APPLICABLE: 0, UNKNOWN: 0 };
   for (const s of uit.stappen) t[s.stand] = (t[s.stand] || 0) + 1;
   uit.telling = t;
@@ -443,6 +506,10 @@ function druk(u) {
   for (const s of u.stappen) {
     console.log('  ' + String(s.nr).padStart(2) + '. [' + s.stand.padEnd(14) + '] ' + s.wat);
     if (s.reden) console.log('      ' + s.reden);
+  }
+  if (u.crash) {
+    console.log('\n  crash-herstel: ' + u.crash.uitslag.stand + ' -- ' + u.crash.uitslag.waarom);
+    for (const [c, st] of Object.entries(u.crash.contracten)) console.log('     ' + c.padEnd(26) + st);
   }
   console.log(u.gezakt ? '\nEr is een stap GEZAKT: er bewoog geld waar dat niet mocht.'
     : u.volledigBewezen ? '\nHet hele pad is bewezen.'

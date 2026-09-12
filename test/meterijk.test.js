@@ -1611,6 +1611,26 @@ const IJKINGEN = {
       (j) => { j.referentveiligheid.gebreken = (j.referentveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
       () => norm.meet().referentGebreken - voor.referentGebreken)
   },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (zevende): mensmutatieZonderWacht telt de
+     garanties die je uit de bron kunt HALEN zonder dat een wacht afgaat
+     (MENSMUTATIE.json, telling.geenWacht). Zelfde vorm als de vorige vier -- een
+     getal uit een bestaand register, dus geijkt door dat veld op te hogen.
+
+     DE MOTOR ZELF is niet met een ijkbestand geijkt maar met de echte bron: hij
+     verbouwt server/kern/stuur/ twaalf keer, draait er zeven wachten tegenaan en
+     zet alles met git terug met een sha256-controle erachter. Elf van de twaalf
+     lieten een wacht zakken, met de melding erbij in het register; nummer 10b
+     niet, en dat IS het getal dat deze tand bewaakt.
+
+     Let op een fout die daar onderweg in zat en die deze tand niet zou vinden:
+     mutatie 10b zakte eerst wel, maar op de VRAGENteller -- de projectie eindigde
+     op een vraagteken. Een wacht die om de verkeerde reden zakt, poetst een gat
+     weg in plaats van het te tonen. */
+  mensmutatieZonderWacht: {
+    proef: (voor) => metVervangenJson('MENSMUTATIE.json',
+      (j) => { j.telling.geenWacht = (j.telling.geenWacht || 0) + 2; return j; },
+      () => norm.meet().mensmutatieZonderWacht - voor.mensmutatieZonderWacht)
+  },
   /* DE TAND VAN 10 SEPTEMBER 2026: bewijsAlleenKeten telt de bewijsmechanismen
      die alleen in de keten draaien en niet lokaal (BEWIJSLADDER.json). Zelfde
      vorm als de vier hierboven -- hij telt een POST in een register, dus hij

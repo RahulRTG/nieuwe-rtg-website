@@ -431,6 +431,99 @@ aanroeper. Alle drie bestaan aan beide kanten. Wat daarna nog ontbreekt —
 risico, gevolg voor de helft van de paden, terugweg voor 79% — is meetwerk en
 geen ontwerp, en het staat hierboven met een getal in plaats van een aanname.
 
+---
+
+## 3d. De keten zonder model, en de twaalf mutaties die hem bewijzen
+
+De opdracht van de eigenaar in een zin: *de Human Execution-keten moet volledig
+bewijsbaar kunnen draaien zonder OpenAI, Anthropic of enig ander extern model —
+een model mag de interpretatie verbeteren, maar mag nooit nodig zijn om de
+RTG-machine te kunnen testen.*
+
+Dat staat. De vorm is die van MAGNAATLAB.md en hij is letterlijk aangehouden:
+**een simulatie-adapter vervangt de rail, nooit de poort.**
+`kern/stuur/rail-corpus.js` levert wat `anthropic.messages.create()` levert en
+verder niets; alles eronder is de echte machine — de echte `resolveer()`, de
+echte `compileer()`, de echte `voorspel()`, de echte twijfel- en herkomstpoort.
+`test/stuurrail.test.js` toetst dat op de BRON: zodra die rail resolver, plan,
+gevolg, plafond, mandaat of beleid importeert, zakt hij. Een rail die zelf gaat
+begrijpen, toetst straks zichzelf.
+
+Wat daaronder is bijgekomen: een fase-spoor dat observeert en niets beslist
+(`kern/stuur/spoor.js`, negen fasen, drie standen waarvan `NOT_RUN` een
+volwaardige is), een getypeerde schermcontext die niets kan openen
+(`kern/stuur/menscontext.js`, drie delen, en een verwijzing is een VERMOEDEN tot
+hij opnieuw is geautoriseerd), en een mensentaal-contract van 41 gevallen
+(`kern/stuur/menstaal.json`) dat per zin zegt hoe ver hij mag komen.
+`MENSTAALPROEF.json` meet dat tegen de echte route.
+
+### Waarom "alles groen" hier niets bewees
+
+De proef stond groen, de vier tanden stonden op nul en `npm test` was heel. Dat
+zegt alleen dat er niets zákt — niet dat er íets kán zakken. `npm run mensmutatie`
+haalt daarom een voor een een GARANTIE uit de echte bron en kijkt welke wacht
+afgaat. Nulmeting eerst, dan muteren, dan `git checkout` met een sha256-controle
+dat de bron byte voor byte terug is. De tien mutaties komen uit de opdracht en
+zijn niet herschreven; twee ervan bleken er twee te zijn.
+
+| # | wat er weggaat | wacht die afging |
+|---|---|---|
+| 1 | de gesaneerde schermcontext bereikt de lus niet | menscontext, menstaalproef |
+| 2 | de echte resolver draait niet | menscontext, stuurspoor, menstaalproef |
+| 3 | de echte `compileer()` draait niet | stuurspoor, menstaalproef |
+| 4 | de echte `voorspel()` draait niet | stuurspoor, menstaalproef |
+| 5 | de padenlijst wordt niet meer gefilterd | stuurspoor |
+| 6 | zonder mandaat staat het plafond op `uitvoeren` | stuurplafond |
+| 7 | met twee gelijkwaardige alternatieven kiest hij er toch een | menscontext, menstaalproef |
+| 8 | een onbekende zin levert toch een leesactie op | stuurrail |
+| 9a | het contract staat twee blokkerende vragen toe | menstaal |
+| 9b | het antwoord stelt er werkelijk twee | menstaalproef |
+| 10a | het contract staat een wereldkeuze toe | menstaal |
+| 10b | het antwoord laat de mens werkelijk kiezen | **geen** |
+
+<!--getal:mensmutatie.gezakt-->11<!--/getal--> van de twaalf laten een wacht
+zakken, met de melding erbij in `MENSMUTATIE.json` — niet met een vinkje, want
+een wacht die om de verkeerde reden zakt bewijst niets. Er blijft
+<!--getal:mensmutatie.zonderWacht-->1<!--/getal--> over, en dat getal is een tand
+in `NORM.json` die alleen omlaag mag.
+
+### De drie dingen die dit opleverde en die je nergens anders moet herhalen
+
+**Mutatie 9b was een echt gat en is gedicht.** `blockingVraagMax` stond in het
+contract van elk geval en werd nergens aan het ANTWOORD getoetst — je kon er dus
+twee vragen in zetten zonder dat iemand het merkte. Dat het niet gemeten werd,
+had een goede reden ("met een regex niet vast te stellen zonder te raden") die
+alleen voor een MODELrail geldt: op de deterministische rail is het antwoord een
+letterlijke corpusregel, en dan is tellen precies tellen. De grens is daarmee
+verhuisd van *we weten het niet* naar *we weten het voor deze rail*, en zo staat
+hij ook in het register.
+
+**Mutatie 10b is het gat dat blijft, en dat is een besluit en geen taak.** Of een
+antwoord de mens een WERELD laat kiezen, is niet uit de tekst af te lezen zonder
+te raden: twee wereldnamen in een zin kunnen net zo goed een uitleg zijn. Een
+meter die dat toch beweert, is precies de schijnzekerheid die dit huis elders
+weigert. De eerlijke stand is dus: de belofte staat in het contract, wordt op het
+contract gehandhaafd, en op het gedrag door niemand.
+
+**Een wacht die om de verkeerde reden zakt, poetst een gat weg.** De eerste
+versie van mutatie 10b eindigde op een vraagteken en liet daarmee de
+vragenteller van 9b afgaan. Er stond `gezakt` bij een mutatie die over iets heel
+anders ging, en het gat was onzichtbaar. Dezelfde fout zit in de ijking van
+`scripts/menstaalproef.js` uitgeschreven: een mutatie die door een ándere poort
+wordt tegengehouden dan de bedoelde, bewijst niets.
+
+### Wat hiermee NIET bewezen is
+
+Dat een MODEL de zinnen zo zou uitleggen. De interpretatie is vandaag gescript;
+wat vaststaat is dat alles ONDER de interpretatie werkt, weigert en meet zoals
+het belooft. Het bewijs voor de interpretatie zelf hoort bij de laatste stap —
+dezelfde gevallen tegen een lokaal model en tegen de externe rails, tegen exact
+hetzelfde contract.
+
+---
+
+## 4. De grenzen
+
 Zeven, bovenop die van GRAMMATICA.md en ADAPTIEF.md.
 
 1. **Een projectie bezit niets.** Geen `humans`-tabel (HDI.md par. 5.1), geen

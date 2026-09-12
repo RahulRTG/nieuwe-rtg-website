@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1613,
-    "toetsenNietGemeten": 612,
+    "toetsenNietGemeten": 613,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -77,9 +77,20 @@
     "menstaalTeVer": 0,
     "goudenPlakGebreken": 0,
     "samenhangGebreken": 0,
-    "referentGebreken": 0
+    "referentGebreken": 0,
+    "mensmutatieZonderWacht": 1
   },
   "notities": [
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 612,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 612 -> 613",
+      "reden": "test/mensmutatie.test.js komt erbij -- vijf toetsen die bewaken dat de twaalf semantische mutaties van scripts/mensmutatie.js niet afdrijven van de bron die zij aangrijpen -- en staat nog niet in MUTATIES.json. ALLE VIJF zijn met de hand gemuteerd en zakten elk op hun eigen bewering: een ankerpunt dat niet meer bestaat laat 1 zakken, een contractveld dat al op de doelwaarde staat laat 2 zakken, een dubbel mutatienummer laat 3 zakken, de menstaalproef uit de wachtenlijst halen laat 4 en 5 zakken, en --niet-schrijven weghalen laat 5 zakken. Herstellen gaf telkens 5/5, en de bron kwam byte voor byte terug.",
+      "waarheen": "test/mensmutatie.test.js draagt de belofte met de hand: vijf beweringen, alle vijf gedraaid en zien zakken. Laat scripts/mutatie.js over dat bestand lopen -- samen met stuurspoor, stuurrail, menstaal en stuurplafond uit de vier notities hieronder, want het is dezelfde ronde -- en leg MUTATIES.json opnieuw vast uit een schone commit."
+    },
     {
       "datum": "2026-09-12",
       "soort": "schuld",
@@ -2153,7 +2164,8 @@
     "menstaalTeVer": "2026-09-12",
     "goudenPlakGebreken": "2026-09-12",
     "samenhangGebreken": "2026-09-12",
-    "referentGebreken": "2026-09-12"
+    "referentGebreken": "2026-09-12",
+    "mensmutatieZonderWacht": "2026-09-12"
   },
   "uitzonderingen": [
     {

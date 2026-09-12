@@ -44,17 +44,23 @@
    "Ik kon niet kijken" is geen "er gebeurde niets"; dat verschil weglaten zou
    van deze proef een geruststelling maken.
 
-   EN TWEE CONTRACTVELDEN WORDEN HIER NIET GEMETEN: `blockingVraagMax` en
-   `architectuurKeuzesMax`. Die gaan over de TEKST van het antwoord (hoeveel
-   vragen stelt het, hoeveel keuzes legt het bij de mens), en dat is met een
-   regex niet vast te stellen zonder te gaan raden. Ze staan in de uitslag als
+   EEN CONTRACTVELD WORDT HIER NIET GEMETEN: `architectuurKeuzesMax`. Dat gaat
+   over de vraag of het antwoord de mens een WERELD of APP laat kiezen, en die
+   is niet uit de tekst af te lezen zonder te gaan raden -- twee wereldnamen in
+   een zin kunnen net zo goed een uitleg zijn. Het staat in de uitslag als
    `nietGemeten` met de reden, want een bewijs dat je weglaat leest als een
    bewijs dat je haalt (BETROUWBAARHEID.md).
+
+   `blockingVraagMax` WERD hier ook niet gemeten, en dat was een gat: mutatie 9b
+   van scripts/mensmutatie.js zet twee vragen in een antwoord en er ging geen
+   enkele wacht af. Hij wordt nu wel geteld -- zie blokkerendeVragen() hieronder
+   voor waarom dat op DEZE rail tellen is en geen raden.
 
    DRAAIEN
      node scripts/menstaalproef.js            meet, schrijft MENSTAALPROEF.json
      node scripts/menstaalproef.js --controle zakt zodra een zin te ver komt
      node scripts/menstaalproef.js --stil     alleen de eindregels
+     node scripts/menstaalproef.js --niet-schrijven  meet zonder het register bij te werken
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -106,6 +112,29 @@ function bereikteTrede(spoor) {
     }
   }
   return { trede, uit };
+}
+
+/* HOEVEEL BLOKKERENDE VRAGEN STELT HET ANTWOORD -- het tweede contractveld dat
+   nu wel gemeten wordt, en dat is geen woordspel maar een gevolg van de rail.
+
+   Hier stond dat `blockingVraagMax` niet te meten is zonder te raden. Dat klopt
+   voor een MODELrail: die schrijft vrije tekst, en dan is elk vraagteken een
+   interpretatie. Op de deterministische rail is het antwoord een LETTERLIJKE
+   regel uit het corpus, en dan is tellen precies tellen. De grens verhuist
+   daarmee van "we weten het niet" naar "we weten het voor deze rail", en dat
+   staat ook zo in de uitslag.
+
+   WAAROM EEN VRAAGTEKEN HIER BLOKKEREND IS. Deze projectie is de LAATSTE beurt:
+   de rail heeft geen stap meer, dus het gesprek staat stil tot de mens antwoordt.
+   Elke vraag erin is er dus een die de mens moet beantwoorden voordat er iets
+   gebeurt -- dat is precies wat het contractveld bedoelt.
+
+   scripts/mensmutatie.js heeft dit gat GEVONDEN: mutatie 9b zet twee vragen in
+   een projectie en er ging geen enkele wacht af. Het tweede gat (10b, een
+   antwoord dat de mens een wereld laat kiezen) is met opzet NIET zo gedicht --
+   zie `architectuurKeuzesMax` in de grens onderaan. */
+function blokkerendeVragen(tekst) {
+  return (String(tekst || '').match(/\?/g) || []).length;
 }
 
 /* DE GOUDEN PLAK -- EEN KETEN DIE VAN BEGIN TOT EIND IS NAGELOPEN, in twee
@@ -375,6 +404,11 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
 (async () => {
   const stil = process.argv.includes('--stil');
   const controle = process.argv.includes('--controle');
+  /* NIET SCHRIJVEN -- voor scripts/mensmutatie.js. Die draait deze proef terwijl
+     de BRON gemuteerd is; zou de proef dan MENSTAALPROEF.json bijwerken, dan komt
+     een uitslag uit kapotte code in het register te staan. Dat is hier een keer
+     echt gebeurd met APPWERKT.json, en het viel pas op in de commit. */
+  const nietSchrijven = process.argv.includes('--niet-schrijven');
   const srv = await start({ naam: 'menstaalproef', gereed: 'ready',
     env: { RTG_INTENT_RAIL: 'deterministisch' } });
   const rijen = [];
@@ -409,8 +443,11 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
       const b = bereikteTrede(spoor);
       const teVer = TREDEN.indexOf(b.trede) > TREDEN.indexOf(g.sideEffectMax);
       const planMerk = (spoor.merken || []).find((m) => m.fase === 'PLAN_COMPILED');
+      const vragen = blokkerendeVragen(r.data.antwoord);
       rijen.push({ id: g.id, input: g.input, klasse: g.klasse, verwachteRoute: g.verwachteRoute,
         mag: g.sideEffectMax, kwam: b.trede, uit: b.uit,
+        vragen, magVragen: g.blockingVraagMax,
+        teVeelVragen: vragen > g.blockingVraagMax,
         planReden: planMerk && planMerk.detail ? planMerk.detail.eersteBezwaar : undefined,
         uitslag: teVer ? 'TE_VER' : 'binnen',
         fasen: Object.fromEntries(Object.entries(spoor.perFase).map(([k, v]) => [k, v.stand])) });
@@ -430,6 +467,8 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
      zien of dat iets kost. */
   const uitleg = rijen.filter((r) => r.verwachteRoute === 'ANSWER');
   const uitlegRaakteIets = uitleg.filter((r) => r.kwam && r.kwam !== 'geen');
+  /* MEER BLOKKERENDE VRAGEN DAN HET CONTRACT TOESTAAT. Zie blokkerendeVragen(). */
+  const teVeelVragen = rijen.filter((r) => r.teVeelVragen);
 
   const uit = {
     stempel: stempel(),
@@ -441,6 +480,7 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
       binnen: tel((r) => r.uitslag === 'binnen'), teVer: teVer.length,
       nietGemeten: tel((r) => r.uitslag === 'nietGemeten'),
       uitlegvragen: uitleg.length, uitlegRaakteIets: uitlegRaakteIets.length,
+      teVeelVragen: teVeelVragen.length,
       goudenPlakHeel: goud.heel, samenhangHeel: samen.heel, referentHeel: ref.heel },
     goudenPlak: goud,
     gesprekssamenhang: samen,
@@ -470,6 +510,13 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
         'die verder kwam dan zijn contract toestond.'
     },
     teVer: teVer.map((r) => ({ id: r.id, input: r.input, mag: r.mag, kwam: r.kwam, uit: r.uit })),
+    teVeelVragen: teVeelVragen.map((r) => ({ id: r.id, input: r.input,
+      magVragen: r.magVragen, vragen: r.vragen })),
+    architectuurKeuzes: { gemeten: false,
+      reden: 'of een antwoord de mens een WERELD of APP laat kiezen, is niet uit de tekst af te ' +
+        'lezen zonder te raden -- twee wereldnamen in een zin kunnen net zo goed een uitleg zijn. ' +
+        'Mutatie 10b van scripts/mensmutatie.js laat zien dat er vandaag dus geen wacht op staat; ' +
+        'dat is een besluit van de eigenaar en geen ontbrekende functie.' },
     uitlegRaakteIets: uitlegRaakteIets.map((r) => ({ id: r.id, input: r.input, kwam: r.kwam, uit: r.uit })),
     grens: 'NUL KEER TE VER IS HIER GEEN UITHOUDINGSPROEF. Alle gemeten zinnen komen tot `geen`, ' +
       'ook de twaalf die tot `tonen` mogen komen, want het corpus van de deterministische rail ' +
@@ -478,13 +525,14 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
       'Verder zegt hij NIET of het antwoord goed was; alleen hoe ver de machine kwam. Een zin die ' +
       'de ANTWOORDRAIL claimde draagt geen spoor en telt als nietGemeten -- die laag heeft eigen ' +
       'handelingen buiten het stuur om, en "ik kon niet kijken" is geen "er gebeurde niets". ' +
-      'Twee contractvelden worden hier NIET gemeten: `blockingVraagMax` en ' +
-      '`architectuurKeuzesMax` gaan over de tekst van het antwoord, en die met een regex ' +
-      'beoordelen is raden. Gemeten met de DETERMINISTISCHE rail: een modelrail kan andere ' +
+      'Een contractveld wordt hier NIET gemeten: `architectuurKeuzesMax` -- zie het veld ' +
+      '`architectuurKeuzes` voor de reden. `blockingVraagMax` wordt WEL geteld, maar alleen ' +
+      'doordat het antwoord op deze rail een letterlijke corpusregel is; op een modelrail is ' +
+      'dat getal een schatting. Gemeten met de DETERMINISTISCHE rail: een modelrail kan andere ' +
       'tools kiezen, en dan zegt deze uitslag niets over die rail.',
     rijen
   };
-  fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
+  if (!nietSchrijven) fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
 
   if (!stil) {
     for (const r of rijen.filter((x) => x.uitslag !== 'nietGemeten'))
@@ -511,11 +559,19 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede }; ret
     for (const g of goud.gebreken) console.log('    - ' + g);
     console.log('');
   }
+  if (teVeelVragen.length) {
+    console.log('\n  TE VEEL BLOKKERENDE VRAGEN:');
+    for (const r of teVeelVragen) console.log('    ' + r.id + ': ' + r.vragen +
+      ' vragen terwijl er ' + r.magVragen + ' mag/mogen');
+    console.log('');
+  }
   console.log('MENSTAALPROEF: ' + uit.telling.binnen + ' binnen het contract, ' + uit.telling.teVer +
-    ' te ver, ' + uit.telling.nietGemeten + ' niet gemeten; ' + uit.telling.uitlegRaakteIets +
+    ' te ver, ' + uit.telling.teVeelVragen + ' te veel vragen, ' +
+    uit.telling.nietGemeten + ' niet gemeten; ' + uit.telling.uitlegRaakteIets +
     ' van ' + uit.telling.uitlegvragen + ' uitlegvragen raakten iets aan; gouden plak ' +
     (goud.heel ? 'heel' : 'NIET heel (' + goud.gebreken.length + ')') +
     '; samenhang ' + (samen.heel ? 'heel' : 'NIET heel (' + samen.gebreken.length + ')') +
     '; referent ' + (ref.heel ? 'heel' : 'NIET heel (' + ref.gebreken.length + ')'));
-  if (controle && (teVer.length || !goud.heel || !samen.heel || !ref.heel)) process.exit(1);
+  if (controle && (teVer.length || teVeelVragen.length || !goud.heel || !samen.heel || !ref.heel))
+    process.exit(1);
 })().catch((e) => { console.error(e); process.exit(2); });

@@ -159,6 +159,11 @@ const REGISTER = {
   'EERSTEMINUUT.json': { meter: ['eersteMinuutGezakt'] },
   'PAKTE.json': { meter: ['pakteMisgelopen'] },
   'MENSTAALPROEF.json': { meter: ['menstaalTeVer', 'goudenPlakGebreken', 'samenhangGebreken', 'referentGebreken'] },
+  /* MENSMUTATIE.json hangt om dezelfde reden aan de NORM-ratel: een verse ronde
+     muteert de bron twaalf keer en draait zeven wachten, en dat hoort niet in
+     `npm test`. Wat eraan hangt is het getal dat ertoe doet -- het aantal
+     garanties dat je kunt weghalen zonder dat iemand het merkt. */
+  'MENSMUTATIE.json': { meter: ['mensmutatieZonderWacht'] },
 
   /* DE ZEVEN REGISTERS VAN MAATSTAF.md, en waarom ze hier mogen staan. Elk van
      deze toetsen doet HETZELFDE: hij meet vers en vergelijkt met wat er in het

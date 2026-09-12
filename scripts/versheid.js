@@ -140,6 +140,12 @@ const REGISTERS = [
      opnieuw draait, dan beweert het register iets over een keten die er niet
      meer is. */
   ['MENSTAALPROEF.json', 'npm run menstaalproef', 'hoe ver elke menselijke zin werkelijk komt'],
+  /* DE TIEN MUTATIES. Ook een METING VAN GEDRAG, en de duurste soort: hij
+     verbouwt de echte bron twaalf keer en draait er zeven wachten tegenaan.
+     Komt er een poort bij of valt er een toets weg zonder dat deze ronde
+     opnieuw draait, dan beweert het register dat een garantie bewaakt wordt
+     terwijl de wacht die hem zag er niet meer is. */
+  ['MENSMUTATIE.json', 'npm run mensmutatie', 'welke garanties je kunt weghalen zonder dat een wacht afgaat'],
   /* DE NULMETING OP DE ROUTER. Ook dit is een METING VAN GEDRAG en geen afdruk
      uit de code: hij start een server, registreert per geval een vers lid en
      kijkt wie de vraag claimt. Verandert de antwoordrail of het corpus zonder

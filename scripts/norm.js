@@ -544,6 +544,16 @@ const METERS = [
      dan is de dubbelzinnigheid opgelost door bevoegdheid te VERONDERSTELLEN, en
      dat is het verschil tussen een handige en een betrouwbare assistent. */
   { sleutel: 'referentGebreken', richting: 'omlaag', wat: 'gebreken in de referentveiligheid (uit MENSTAALPROEF.json)' },
+  /* DE TIEN MUTATIES (MENSMUTATIE.json). `geenWacht` telt de garanties die je
+     uit de bron kunt HALEN zonder dat er een wacht afgaat. Dat is een uitspraak
+     over de TOETSEN en niet over de code: de keten doet nog steeds het goede,
+     alleen zou niemand het merken als dat morgen verandert.
+
+     Hij staat op 1 en niet op 0, en dat is met opzet zichtbaar: een antwoord dat
+     de mens tussen twee RTG-werelden laat kiezen, wordt nergens gemeten. De
+     andere elf mutaties lieten allemaal een wacht zakken, met de melding erbij
+     in het register. Richting omlaag: er mag er geen bij komen. */
+  { sleutel: 'mensmutatieZonderWacht', richting: 'omlaag', wat: 'garanties die je kunt weghalen zonder dat een wacht afgaat (uit MENSMUTATIE.json)' },
   /* Het BEREIK van de carrierevormmeter (CARRIERE.md par. 0): hoeveel
      talentdomeinen hij werkelijk heeft gezien. Omhoog, want dit mag niet stil
      dalen -- zie de kop bij CARRIEREVORM.json in ./lib/metingen.js. */
@@ -1267,6 +1277,7 @@ function meet(bronnen) {
     goudenPlakGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.goudenPlak.gebreken || []).length),
     samenhangGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.gesprekssamenhang.gebreken || []).length),
     referentGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.referentveiligheid.gebreken || []).length),
+    mensmutatieZonderWacht: leesRegister('MENSMUTATIE.json', (j) => j.telling.geenWacht),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
        milliseconden en een afdruk die achterloopt zou hier een groen getal

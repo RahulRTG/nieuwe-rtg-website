@@ -79,35 +79,7 @@ function loadRing(file, vault) {
 /* De gelijktijdigheidsstand van een verbinding. Staat apart zodat de VOLGORDE
    beproefbaar is (test/pragmavolgorde.test.js) in plaats van alleen bedoeld. */
 function zetGelijktijdigheid(db) {
-  /* WAL + busy_timeout: lezers en schrijvers blokkeren elkaar niet meer, en
-     als twee processen dezelfde accountsdatabase raken (failover-trio, een
-     herstart die de oude instance een tel overlapt, parallelle testservers)
-     wacht de tweede even in plaats van hard te crashen op "database is
-     locked". Dit was de bron van de sporadische testflake.
-
-     DE VOLGORDE IS DE HELFT VAN DIE REPARATIE, en die stond hier fout. Het
-     aanzetten van WAL neemt zelf een exclusief slot; zonder wachttijd DAARVOOR
-     krijgt het tweede proces meteen "database is locked" en valt het om --
-     precies de crash die deze regels moesten voorkomen. server/db/sqlite.js
-     had dat al door en zette de wachttijd vooraan; deze plek en
-     server/db/tx/sqliteachter.js waren nooit meegegaan. Gemeten met zes
-     processen die tegelijk migreren (test/migratierace.test.js): met de oude
-     volgorde vielen er een tot drie om, met deze geen. */
-  db.exec('PRAGMA busy_timeout=5000');
-  const staatIn = () => String((db.prepare('PRAGMA journal_mode').get() || {}).journal_mode || '').toLowerCase();
-  const tot = Date.now() + 5000;
-  for (;;) {
-    if (staatIn() === 'wal') break;
-    try { db.exec('PRAGMA journal_mode=WAL'); break; }
-    catch (e) {
-      const bezet = /lock|busy/i.test(String((e && e.message) || e));
-      if (!bezet || Date.now() >= tot) throw e;
-      // De server luistert hier nog niet; synchroon wachten voorkomt dat de
-      // rest van de opstart op een half ingestelde verbinding doorgaat.
-      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 25);
-    }
-  }
-  db.exec('PRAGMA synchronous=NORMAL');
+  require('../lib/sqlite-gelijktijdigheid')(db);
 
   /* Het schema komt uit server/migraties: genummerde stappen die precies een
      keer draaien, met een grootboek erbij en een weigering om te starten op een

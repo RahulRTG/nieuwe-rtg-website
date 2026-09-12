@@ -107,27 +107,6 @@ const CONTRACTEN = {
       'ontbreken ervan is geen gat: de factuurstand IS de sleutel.',
     watErMoetKomen: "een OPENSTAANDE factuur op naam van het lid, plus genoeg saldo om hem te voldoen. Dit is de belangrijkste van de zeven: de route beweegt geld over vijf collecties en haar bescherming hangt aan de factuurSTAND en niet aan een sleutel. Pas met deze wereld is te meten of dat slot werkelijk sluit.",
     bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen openstaande factuur)', op: '2026-09-12' }
-  },
-
-  /* ---- lezen of rekenen: geen eigen stand ---- */
-  'POST /api/kosten/vooruitblik': {
-    mutatieId: 'kosten.vooruitblik', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'NOT_APPLICABLE', nagekeken: 'Claude (Opus 5) door de handler te lezen, 2026-09-12; geen mens heeft hem nagelezen', afgetekend: AFGETEKEND,
-    waarom: 'De route rekent een vooruitblik uit en geeft hem terug; er wordt niets van ' +
-      'de gebruiker vastgelegd. Dat de opslagmeting `economie` zag bewegen komt van de ' +
-      'kostenmeter die ELK verzoek telt (kern/kosten/haak.js) en niet van deze handeling ' +
-      '-- anders zou geen enkele route van dit huis idempotent kunnen heten.',
-    bewijs: { gemeten: 'IDEMPROEF.json: beschermd', op: '2026-09-12' }
-  },
-  'POST /api/supplier/facturen/pdf': {
-    mutatieId: 'facturatie.pdf', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'NOT_APPLICABLE', nagekeken: 'Claude (Opus 5) door de handler te lezen, 2026-09-12; geen mens heeft hem nagelezen', afgetekend: AFGETEKEND,
-    waarom: 'De handler zoekt de factuur op, controleert of hij van deze zaak is, en ' +
-      'rendert een PDF. Geen schrijfactie.',
-    bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE (geen factuur van deze zaak)', op: '2026-09-12' }
-  },
-  'POST /api/supplier/oog/overzicht': {
-    mutatieId: 'oog.overzicht', herkomst: 'mens', toegang: { klasse: 'AUTHENTICATED' }, semantiek: s('idempotent'), stand: 'NOT_APPLICABLE', nagekeken: 'Claude (Opus 5) door de handler te lezen, 2026-09-12; geen mens heeft hem nagelezen', afgetekend: AFGETEKEND,
-    waarom: 'De handler is `res.json(oogOverzicht(req.supplier))` -- puur lezen.',
-    bewijs: { gemeten: 'niet gemeten: BLOCKED_BY_TEST_FIXTURE', op: '2026-09-12' }
   }
 };
 

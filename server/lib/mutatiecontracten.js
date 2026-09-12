@@ -66,6 +66,7 @@ const CONTRACTEN = Object.assign({},
      met de meting ernaast als bevestiging en nooit als reden. */
   require('./mutatiecontracten-geld').CONTRACTEN,
   require('./mutatiecontracten-geld-b').CONTRACTEN,
+  require('./mutatiecontracten-geld-lees').CONTRACTEN,
   /* RTG Service: eenentwintig nieuwe schrijfroutes, en dus eenentwintig
      contracten VOORAF -- MUTATIECONTRACT.md verbiedt `onbekend` voor wat nieuw
      publiek aanroepbaar wordt. Eigen bestand om de reden hierboven. */

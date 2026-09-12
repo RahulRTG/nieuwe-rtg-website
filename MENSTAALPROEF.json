@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-12T21:24:51.146Z",
-    "commit": "254a4c75",
+    "op": "2026-09-12T22:06:54.321Z",
+    "commit": "005f7b39",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 4,
     "instrument": "scripts/menstaalproef.js",
     "node": "v22.22.2"
   },

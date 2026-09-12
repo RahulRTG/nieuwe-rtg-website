@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-12T21:24:51.268Z",
-    "commit": "254a4c75",
+    "op": "2026-09-12T22:06:54.465Z",
+    "commit": "005f7b39",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 4,
     "instrument": "scripts/railvergelijk.js",
     "node": "v22.22.2"
   },
@@ -18,7 +18,7 @@
   },
   "tweedeRail": {
     "gemeten": false,
-    "reden": "de tweede uitslag ontbreekt of is niet te lezen (MENSTAALPROEF-LOKAAL.json). Draai `node scripts/menstaalproef.js --rail=lokaal --uit=...` in een omgeving waar die rail bestaat; zonder LOCAL_AI_URL is er niets om te meten, en dat is iets anders dan \"er is geen verschil\"."
+    "reden": "de tweede uitslag ontbreekt of is niet te lezen (MENSTAALPROEF-ANDER.json). Draai `node scripts/menstaalproef.js --rail=lokaal --uit=...` in een omgeving waar die rail bestaat; zonder LOCAL_AI_URL is er niets om te meten, en dat is iets anders dan \"er is geen verschil\"."
   },
   "telling": {
     "zinnen": 39,

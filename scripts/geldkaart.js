@@ -235,6 +235,17 @@ function poortproef() {
 }
 
 /* ---------------------------------------------------------------- uitslag */
+/* DE WACHT, en waarom hij hier hoort. scripts/meetkeuring.js eist dat een
+   instrument zijn werk achter `require.main` zet, en die regel komt uit een
+   echte fout in dit huis: een laadcontrole van de rolproef startte een VOLLEDIGE
+   ronde en schreef ROLPROEF.json van 3377 beproefde routes terug naar 292.
+   Zonder deze wacht doet dit script hetzelfde -- wie `require('./geldkaart')`
+   schrijft om bij bouw() te komen, draait veertien toetsbestanden en overschrijft
+   GELDKAART.json. De keuring wees dit bestand aan zodra het in versheid.js
+   kwam te staan, en dat was terecht. */
+if (require.main === module) hoofd();
+
+function hoofd() {
 const as1 = kaart();
 const as2 = poortproef();
 
@@ -335,3 +346,8 @@ if (as2.gedraaid && as2.toetsen && as2.toetsen.gezakt) {
   fout = 1;
 }
 process.exit(fout);
+}
+
+/* Wat dit bestand WEL naar buiten geeft: de twee assen als functie, zodat een
+   toets ze kan draaien zonder de hele ronde te starten. */
+module.exports = { kaart, poortproef };

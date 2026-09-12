@@ -154,7 +154,7 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil, spoor }) {
        al het andere = geweigerd). Hier stond `bevestigNodig ? NOT_RUN : PASS`,
        en daarmee las een GEWEIGERDE aanroep -- 403, 409, 503 -- als een
        uitgevoerde. Zonder status is het NOT_RUN: een uitvoering claimen die we
-       niet kunnen zien, is de valse nul andersom. Zie MENS.md par. 3f. */
+       niet kunnen zien, is de valse nul andersom. Zie MENS.md par. 3e. */
     const st = uit && typeof uit.status === 'number' ? uit.status : null;
     const voorstel = !!(uit && uit.bevestigNodig);
     const gelukt = st !== null && st >= 200 && st < 300 && !voorstel;

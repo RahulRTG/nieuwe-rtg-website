@@ -2,10 +2,10 @@
   "soort": "meting",
   "uitleg": "Economische dekking: wat er van elke waardebewegende ROUTE bewezen is, samengesteld uit GELDKAART.json (welke routes), MUTATIECONTRACT.json (semantiek en toegang), IDEMPROEF.json (idempotentie) en HERSTELPROEF.json (de terugweg).",
   "stempel": {
-    "op": "2026-09-12T15:07:43.517Z",
-    "commit": "763b1873",
+    "op": "2026-09-12T15:46:08.188Z",
+    "commit": "03f6dc1a",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/gelddekking.js",
     "node": "v22.22.2"
   },
@@ -40,6 +40,70 @@
     "geldRoutesZonderTerugweg": 39,
     "geldRoutesHerstelOnbesloten": 42,
     "geldRoutesHerstelTegenspraak": 0
+  },
+  "assen": {
+    "bevoegdheid": {
+      "kan": [
+        "PROVEN",
+        "FAILED",
+        "UNKNOWN"
+      ],
+      "telling": {
+        "PROVEN": 42,
+        "FAILED": 0,
+        "UNKNOWN": 0
+      }
+    },
+    "idempotentie": {
+      "kan": [
+        "PROVEN",
+        "FAILED",
+        "BLOCKED",
+        "NOT_APPLICABLE",
+        "UNKNOWN"
+      ],
+      "telling": {
+        "PROVEN": 32,
+        "FAILED": 0,
+        "BLOCKED": 10,
+        "NOT_APPLICABLE": 0,
+        "UNKNOWN": 0
+      }
+    },
+    "semantiek": {
+      "kan": [
+        "PROVEN",
+        "UNKNOWN"
+      ],
+      "telling": {
+        "PROVEN": 26,
+        "UNKNOWN": 16
+      }
+    },
+    "terugweg": {
+      "kan": [
+        "PROVEN",
+        "BLOCKED",
+        "UNKNOWN"
+      ],
+      "telling": {
+        "PROVEN": 3,
+        "BLOCKED": 0,
+        "UNKNOWN": 39
+      }
+    },
+    "correctiemodel": {
+      "kan": [
+        "PROVEN",
+        "NOT_APPLICABLE",
+        "UNKNOWN"
+      ],
+      "telling": {
+        "PROVEN": 0,
+        "NOT_APPLICABLE": 0,
+        "UNKNOWN": 42
+      }
+    }
   },
   "tegenspraken": [],
   "herstelKlassen": {

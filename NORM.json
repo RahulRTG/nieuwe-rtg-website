@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 49,
     "onbewaakt": 0,
-    "ratelTanden": 83,
+    "ratelTanden": 85,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -59,7 +59,7 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1610,
+    "testbestanden": 1611,
     "toetsenNietGemeten": 607,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
@@ -74,10 +74,12 @@
     "zelfpoortendeToetsen": 28,
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
-    "geldRoutesZonderIdemBewijs": 10,
+    "geldRoutesZonderIdemBewijs": 9,
     "geldRoutesZonderTerugweg": 39,
     "geldRoutesHerstelOnbesloten": 42,
-    "geldRoutesHerstelTegenspraak": 0
+    "geldRoutesHerstelTegenspraak": 0,
+    "geldpadGezakt": 1,
+    "geldpadOnbewezen": 1
   },
   "notities": [
     {
@@ -2104,7 +2106,9 @@
     "geldRoutesZonderIdemBewijs": "2026-09-12",
     "geldRoutesZonderTerugweg": "2026-09-12",
     "geldRoutesHerstelOnbesloten": "2026-09-12",
-    "geldRoutesHerstelTegenspraak": "2026-09-12"
+    "geldRoutesHerstelTegenspraak": "2026-09-12",
+    "geldpadGezakt": "2026-09-12",
+    "geldpadOnbewezen": "2026-09-12"
   },
   "uitzonderingen": [
     {

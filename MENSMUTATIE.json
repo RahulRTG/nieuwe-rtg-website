@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-12T15:37:43.246Z",
-    "commit": "a83a2b5b",
+    "op": "2026-09-12T16:21:07.277Z",
+    "commit": "8354e97e",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/mensmutatie.js",
@@ -40,6 +40,7 @@
     {
       "nr": "1",
       "naam": "context verwijderd",
+      "bewaakt": "CONTEXT_SANITIZED",
       "weg": "de gesaneerde schermcontext bereikt de lus niet meer",
       "hoortTeZakken": "de gesprekssamenhang: dezelfde zin met een ander scherm geeft dan dezelfde uitkomst",
       "bestanden": [
@@ -67,6 +68,7 @@
     {
       "nr": "2",
       "naam": "resolver bypass",
+      "bewaakt": "INTENT_RESOLVED",
       "weg": "de echte resolver draait niet en INTENT_RESOLVED wordt niet gemerkt",
       "hoortTeZakken": "het spoor is incompleet",
       "bestanden": [
@@ -97,6 +99,7 @@
     {
       "nr": "3",
       "naam": "plan bypass",
+      "bewaakt": "PLAN_COMPILED",
       "weg": "de echte compileer() draait niet en PLAN_COMPILED wordt niet gemerkt",
       "hoortTeZakken": "het spoor is incompleet",
       "bestanden": [
@@ -124,6 +127,7 @@
     {
       "nr": "4",
       "naam": "gevolg bypass",
+      "bewaakt": "CONSEQUENCE_EVALUATED",
       "weg": "de echte voorspel() draait niet en CONSEQUENCE_EVALUATED wordt niet gemerkt",
       "hoortTeZakken": "het spoor is incompleet",
       "bestanden": [
@@ -151,6 +155,7 @@
     {
       "nr": "5",
       "naam": "mandaat bypass",
+      "bewaakt": "MANDATE_EVALUATED",
       "weg": "de padenlijst wordt niet meer gefilterd: de wereldgrens en de plafondgrendel vallen weg",
       "hoortTeZakken": "de veiligheidspoort",
       "bestanden": [
@@ -175,6 +180,7 @@
     {
       "nr": "6",
       "naam": "mandaat omhoog geforceerd",
+      "bewaakt": "trede",
       "weg": "zonder mandaat staat het plafond op `uitvoeren` in plaats van `tonen`",
       "hoortTeZakken": "de plafondtoets",
       "bestanden": [
@@ -199,6 +205,7 @@
     {
       "nr": "7",
       "naam": "ambigue referent gekozen",
+      "bewaakt": "referent",
       "weg": "met TWEE gelijkwaardige alternatieven kiest de keten er toch een",
       "hoortTeZakken": "de referentveiligheid",
       "bestanden": [
@@ -226,6 +233,7 @@
     {
       "nr": "8",
       "naam": "UNKNOWN behandeld als READ_ONLY",
+      "bewaakt": "onbekendeZin",
       "weg": "een zin die de rail NIET kent levert toch een leesactie op in plaats van niets",
       "hoortTeZakken": "de zijeffecttoets van de rail",
       "bestanden": [
@@ -250,6 +258,7 @@
     {
       "nr": "9a",
       "naam": "2 vragen tegelijk -- in het CONTRACT",
+      "bewaakt": "blokkerendeVragen",
       "weg": "het contract staat een geval toe dat twee blokkerende vragen tegelijk stelt",
       "hoortTeZakken": "de menselijke-inspanningstoets",
       "bestanden": [
@@ -274,6 +283,7 @@
     {
       "nr": "9b",
       "naam": "2 vragen tegelijk -- in het ANTWOORD",
+      "bewaakt": "blokkerendeVragen",
       "weg": "het antwoord dat een mens leest stelt er werkelijk twee, terwijl het contract er 1 toestaat",
       "hoortTeZakken": "dezelfde toets, maar dan op het gedrag in plaats van op het contract",
       "bestanden": [
@@ -298,6 +308,7 @@
     {
       "nr": "10a",
       "naam": "wereldkeuze verplicht -- in het CONTRACT",
+      "bewaakt": "architectuurkeuze",
       "weg": "het contract staat een geval toe waarin de mens zelf een wereld of app kiest",
       "hoortTeZakken": "de architectuurkeuzetoets",
       "bestanden": [
@@ -322,6 +333,7 @@
     {
       "nr": "10b",
       "naam": "wereldkeuze verplicht -- in het ANTWOORD",
+      "bewaakt": "architectuurkeuze",
       "weg": "het antwoord laat de mens werkelijk kiezen tussen twee RTG-werelden",
       "hoortTeZakken": "dezelfde toets, maar dan op het gedrag in plaats van op het contract",
       "bestanden": [

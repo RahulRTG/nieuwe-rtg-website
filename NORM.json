@@ -77,11 +77,13 @@
   "notities": [
     {
       "datum": "2026-09-12",
-      "soort": "structureel",
+      "soort": "schuld",
       "sleutel": "toetsenNietGemeten",
       "van": 607,
+      "vervalt": "2026-12-15",
       "meter": "toetsenNietGemeten 607 -> 608",
-      "reden": "test/stuurplafond.test.js komt erbij (de grendel onder de routewissel, kern/stuur/plafond.js) en staat nog niet in MUTATIES.json, dus de mutatiemotor is er niet langs geweest. Dat is de definitie van deze teller en niet een zwakkere toets: elke van de negen beweringen draagt in het bestand zelf zijn MUTATIE, en twee daarvan zijn met de hand gedraaid -- STANDAARD op 'uitvoeren' laat er 5 zakken, `klein` toelaten op de trede `tonen` laat er 2 zakken, herstellen maakt alle negen weer groen. `npm run mutatie` is hier afgebroken omdat hij de hele suite per mutatie draait; hij vult deze rij alsnog bij de eerstvolgende volle ronde en dan mag dit getal weer omlaag."
+      "reden": "test/stuurplafond.test.js komt erbij (de grendel onder de routewissel, kern/stuur/plafond.js) en staat nog niet in MUTATIES.json, dus de mutatiemotor is er niet langs geweest. Dat is de definitie van deze teller en niet een zwakkere toets: elke van de negen beweringen draagt in het bestand zelf zijn MUTATIE, en twee daarvan zijn met de hand gedraaid -- STANDAARD op 'uitvoeren' laat er 5 zakken, `klein` toelaten op de trede `tonen` laat er 2 zakken, herstellen maakt alle negen weer groen. `npm run mutatie` is hier afgebroken omdat hij de hele suite per mutatie draait; hij vult deze rij alsnog bij de eerstvolgende volle ronde en dan mag dit getal weer omlaag.",
+      "waarheen": "test/stuurplafond.test.js draagt de belofte nu met de hand: negen beweringen, elk met zijn mutatie in het bestand zelf, twee ervan gedraaid en zien zakken. Laat scripts/mutatie.js over dat bestand lopen en leg MUTATIES.json opnieuw vast uit een schone boom -- dan mag deze teller terug naar 607."
     },
     {
       "datum": "2026-09-08",

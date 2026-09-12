@@ -1570,6 +1570,20 @@ const IJKINGEN = {
       (j) => { j.telling.teVer = (j.telling.teVer || 0) + 2; return j; },
       () => norm.meet().menstaalTeVer - voor.menstaalTeVer)
   },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (vierde): goudenPlakGebreken telt wat er
+     mankeert aan de ene keten die van begin tot eind is nagelopen
+     (MENSTAALPROEF.json, goudenPlak.gebreken). Zelfde vorm -- een lijst in een
+     bestaand register, dus geijkt door er regels bij te zetten.
+
+     De meter ZELF is apart geijkt en niet alleen hier: PLAN_COMPILED terugzetten
+     op `uitvoerbaar ? PASS : NOT_RUN` liet de negatieve helft zakken, en de
+     `doe`-stap uit de positieve helft halen liet er drie zakken. Zie de kop van
+     scripts/menstaalproef.js. */
+  goudenPlakGebreken: {
+    proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
+      (j) => { j.goudenPlak.gebreken = (j.goudenPlak.gebreken || []).concat(['ijkproef', 'ijkproef']); return j; },
+      () => norm.meet().goudenPlakGebreken - voor.goudenPlakGebreken)
+  },
   /* DE TAND VAN 10 SEPTEMBER 2026: bewijsAlleenKeten telt de bewijsmechanismen
      die alleen in de keten draaien en niet lokaal (BEWIJSLADDER.json). Zelfde
      vorm als de vier hierboven -- hij telt een POST in een register, dus hij

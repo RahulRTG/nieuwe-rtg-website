@@ -524,6 +524,13 @@ const METERS = [
      meter is geijkt met een corpusregel die wel een schrijfpad aanroept, en
      die liet hem uitslaan. Dat staat in het register onder `ijking`. */
   { sleutel: 'menstaalTeVer', richting: 'omlaag', wat: 'zinnen die verder komen dan hun sideEffectMax (uit MENSTAALPROEF.json)' },
+  /* DE GOUDEN PLAK (MENSTAALPROEF.json). `gebreken` telt wat er mankeert aan de
+     ENE keten die van begin tot eind is nagelopen -- positief tot een voorstel,
+     negatief tot een uitgesproken "dit bestaat niet voor een lid". Hij staat op
+     nul en is de enige plek waar CAPABILITY_SELECTED en EXECUTED ooit iets
+     anders zijn dan overgeslagen; zakt hij, dan is de keten niet meer tot het
+     eind bewezen. */
+  { sleutel: 'goudenPlakGebreken', richting: 'omlaag', wat: 'gebreken in de gouden plak (uit MENSTAALPROEF.json)' },
   /* Het BEREIK van de carrierevormmeter (CARRIERE.md par. 0): hoeveel
      talentdomeinen hij werkelijk heeft gezien. Omhoog, want dit mag niet stil
      dalen -- zie de kop bij CARRIEREVORM.json in ./lib/metingen.js. */
@@ -1244,6 +1251,7 @@ function meet(bronnen) {
     eersteMinuutGezakt: leesRegister('EERSTEMINUUT.json', (j) => j.telling.gezakt),
     pakteMisgelopen: leesRegister('PAKTE.json', (j) => j.telling.misgelopen),
     menstaalTeVer: leesRegister('MENSTAALPROEF.json', (j) => j.telling.teVer),
+    goudenPlakGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.goudenPlak.gebreken || []).length),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
        milliseconden en een afdruk die achterloopt zou hier een groen getal

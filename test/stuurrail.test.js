@@ -136,13 +136,20 @@ test('9. het corpus draagt de BESTAANDE toolvorm en geen nieuwe', () => {
 });
 
 test('10. elk pad in het corpus bestaat echt in het beleid', () => {
-  /* Een corpus dat naar een verzonnen pad wijst, bewijst hooguit dat het plan
-     terecht zakt. `verboden` is hier de uitslag die telt: het pad mag bestaan
-     en toch dicht zijn, maar het mag niet NERGENS over gaan.
-     MUTATIE: zet /api/verzonnen/pad in een planstap. */
+  /* Een corpus dat PER ONGELUK naar een verboden pad wijst, bewijst hooguit dat
+     het plan terecht zakt. `verboden` is hier de uitslag die telt: het pad mag
+     bestaan en toch dicht zijn, maar het mag niet NERGENS over gaan.
+
+     EEN REGEL DIE HET MET EEN REDEN OPSCHRIJFT IS HET TEGENOVERGESTELDE VAN PER
+     ONGELUK. `bewustVerboden` is daarvoor, en het is geen ontsnapping: de
+     gouden plak moet kunnen BEWIJZEN dat er voor een lid geen reis-capability
+     bestaat, en dat kan alleen door het te vragen en de echte compileer() nee
+     te laten zeggen. Verdwijnt die reden, dan zakt deze toets alsnog.
+     MUTATIE: zet /api/verzonnen/pad in een planstap, of haal `bewustVerboden`
+     weg bij "parijs vrijdag". */
   const { beleidVoor } = require('../server/kern/stuur/beleid');
   const zinnen = require('../server/kern/stuur/rail-corpus-zinnen');
-  let gezien = 0;
+  let gezien = 0, bewust = 0;
   for (const [zin, regel] of Object.entries(zinnen)) {
     for (const stap of regel.stappen || []) {
       for (const t of stap.tools || []) {
@@ -150,14 +157,21 @@ test('10. elk pad in het corpus bestaat echt in het beleid', () => {
         for (const s of t.input.stappen || []) {
           gezien++;
           const oordeel = beleidVoor(s.capability, 'member');
+          if (oordeel.niveau === 'verboden' && regel.bewustVerboden) { bewust++; continue; }
           assert.notEqual(oordeel.niveau, 'verboden',
             'corpusregel "' + zin + '" plant op ' + s.capability +
-            ', en dat pad staat niet op de member-allowlist -- dan zakt het plan altijd');
+            ', en dat pad staat niet op de member-allowlist -- dan zakt het plan altijd. ' +
+            'Is dat de bedoeling, zet er dan `bewustVerboden` bij met de reden.');
         }
       }
     }
   }
   assert.ok(gezien > 0, 'geen enkele planstap gevonden; dan bewaakt deze toets niets');
+  /* En de verklaarde uitzondering moet ECHT bestaan: verdwijnt hij, dan is er
+     niets meer dat bewijst dat een ontbrekende capability zichtbaar wordt. */
+  assert.equal(bewust, 1,
+    'er hoort precies EEN bewust-verboden planstap te zijn (de gouden plak, negatieve helft); ' +
+    'gevonden: ' + bewust);
 });
 
 test('11. normaliseren blijft dom', () => {

@@ -26,49 +26,14 @@ const { woordenUit } = require('./resolver-woorden');
 const { compileer } = require('./plan');
 const { voorspel } = require('./gevolg');
 
-/* DE POORT BIJT ALLEEN MET DE VLAG OM, EN DAT IS EEN BESLUIT MET EEN PRIJS.
-
-   CONTROLPLANE.md: een nieuwe handhavingsregel loopt eerst mee zonder te
-   blokkeren -- je kunt niet afdwingen wat nooit in de schaduw heeft gelopen. De
-   prijs is gemeten en niet geschat: na de eerste geslaagde `doe` gaat een lid van
-   120 naar 36 AI-paden en een zaak van 53 naar 9. Dat getal hoort een mens te
-   zien voordat de vlag omgaat.
-
-   HIER STONDEN EERST 43 EN 9, EN DIE WAREN VEROUDERD. Ze zijn gemeten VOORDAT de
-   leesset-vrijstelling werd aangescherpt (../isolatie/herkomstpoort.js:
-   SCHRIJFNIVEAUS -- een bewezen lezer die het beleid een SCHRIJVER noemt, is
-   onder onvertrouwde invoer geen lezer meer). Een gemeten getal in commentaar dat
-   niet meer klopt, is precies het soort stille onwaarheid waar deze laag voor is
-   gebouwd; wie hem verandert, meet opnieuw.
-
-   In de schaduw TELT hij en houdt hij niets tegen; de telling reist mee in het
-   antwoord van de kaart, zodat de eigenaar de prijs op zijn scherm heeft in
-   plaats van in een logregel. */
-const AFDWINGEN = require('./herkomstschakelaar');
-const telling = require('./schaduwtelling');
+/* De herkomstpoort en zijn schaduwtelling staan in ./lusstap-herkomst.js: een
+   beveiligingspoort met een eigen meting is iets anders dan het uitvoeren van
+   een gereedschap, en dit bestand ging door de omvangband. */
+const maakHerkomstpoort = require('./lusstap-herkomst');
 
 module.exports = function maakLusstap({ stuurRoep, filter, vuil, spoor }) {
 
-  /* De schaduwtelling van deze lus. Geen module-toestand: twee gesprekken
-     tegelijk zouden elkaars getal opschrijven. */
-  const schaduw = { gewogen: 0, zouSluiten: 0, paden: [] };
-
-  function herkomstpoort(pad, wereld) {
-    if (!filter || !filter.magMetHerkomst) return { mag: true, schaduw: false };
-    const oordeel = filter.magMetHerkomst(pad, wereld, vuil.bronnen());
-    schaduw.gewogen++;
-    if (!oordeel.mag) {
-      schaduw.zouSluiten++;
-      if (schaduw.paden.length < 20) schaduw.paden.push(pad);
-    }
-    /* En dezelfde weging OPGETELD over alle gesprekken. De telling hierboven
-       leeft één gesprek en verdwijnt; zonder de optelling is "hoe vaak zou hij
-       bijten" niet te beantwoorden, en dan is de vlag omzetten een gok. Het is
-       een teller en geen journaal -- zie ./schaduwtelling.js. */
-    telling.noteer(wereld, pad, !oordeel.mag);
-    const dwingt = AFDWINGEN(wereld);
-    return { mag: dwingt ? oordeel.mag : true, oordeel, schaduw: !oordeel.mag && !dwingt };
-  }
+  const { herkomstpoort, schaduw, AFDWINGEN } = maakHerkomstpoort({ filter, vuil });
 
   async function voerUit(req, t, { wereld, kaartVraag, paden, acties, ctxWoorden }) {
     if (t.name === 'plan') {
@@ -81,8 +46,22 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil, spoor }) {
          meting wat de stappen aanraakten. Het plan bezit de voorspelling niet
          (EXECUTIE.md blok 3: PLAN bezit niets). */
       const gewogen = compileer(t.input || {}, wereld);
-      spoor && spoor.mark('PLAN_COMPILED', gewogen.uitvoerbaar ? 'PASS' : 'NOT_RUN',
-        { bezwaren: (gewogen.bezwaren || []).length });
+      /* DE COMPILER DIE NEE ZEGT, HEEFT GEDRAAID. Hier stond `uitvoerbaar ?
+         PASS : NOT_RUN`, en dat is in strijd met de betekenis die ./spoor.js
+         zelf aan NOT_RUN geeft: "hij was aan de beurt en deed terecht niets".
+         Een plan dat wordt AFGEWEZEN is geen niets-doen maar het werk zelf --
+         de compiler heeft gewogen en een reden geproduceerd. De stand gaat over
+         de FASE, de uitkomst staat in het detail.
+
+         Dat verschil is precies wat een gouden plak moet kunnen tonen: "parijs
+         vrijdag" hoort te eindigen op een compiler die PASS is en een
+         capability die er niet IS -- niet op een fase die eruitziet alsof hij
+         is overgeslagen. */
+      spoor && spoor.mark('PLAN_COMPILED', 'PASS',
+        { uitvoerbaar: !!gewogen.uitvoerbaar, bezwaren: (gewogen.bezwaren || []).length,
+          /* De eerste reden staat erbij: een telling van bezwaren zegt niet
+             WAAROM er niets kan, en dat is nu juist het antwoord. */
+          eersteBezwaar: (gewogen.bezwaren || [])[0] ? (gewogen.bezwaren[0].reden || '').slice(0, 120) : undefined });
       const gevolg = voorspel(gewogen);
       spoor && spoor.mark('CONSEQUENCE_EVALUATED', 'PASS', { graad: gevolg && gevolg.graad });
       const uit = Object.assign({}, gewogen, { gevolg });

@@ -158,7 +158,7 @@ const REGISTER = {
      `eersteMinuutGezakt` mag alleen omlaag. */
   'EERSTEMINUUT.json': { meter: ['eersteMinuutGezakt'] },
   'PAKTE.json': { meter: ['pakteMisgelopen'] },
-  'MENSTAALPROEF.json': { meter: ['menstaalTeVer'] },
+  'MENSTAALPROEF.json': { meter: ['menstaalTeVer', 'goudenPlakGebreken'] },
 
   /* DE ZEVEN REGISTERS VAN MAATSTAF.md, en waarom ze hier mogen staan. Elk van
      deze toetsen doet HETZELFDE: hij meet vers en vergelijkt met wat er in het

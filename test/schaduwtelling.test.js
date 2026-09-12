@@ -94,12 +94,18 @@ test('4. er staat geen percentage in', () => {
 });
 
 test('5. de lusstap voedt de telling, en niet alleen zijn eigen gesprek', () => {
+  /* DE POORT VERHUISDE OP 12 SEPTEMBER 2026 naar lusstap-herkomst.js toen
+     lusstap.js door de omvangband ging, en deze toets viel daar terecht over.
+     Hij kijkt naar EEN bestand en lexicaal, dus een splitsing maakt hem blind;
+     dat is binnen een dag de vijfde wacht met die vorm. Hij zakt luid en dat is
+     precies wat je wilt -- maar wie splitst, loopt de wachten na.
+     MUTATIE: haal `telling.noteer(` uit lusstap-herkomst.js. */
   const bron = require('fs').readFileSync(
-    require('path').join(__dirname, '..', 'server/kern/stuur/lusstap.js'), 'utf8');
+    require('path').join(__dirname, '..', 'server/kern/stuur/lusstap-herkomst.js'), 'utf8');
   assert.match(bron, /require\('\.\/schaduwtelling'\)/,
-    'lusstap.js telt niet mee in de optelling; dan verdwijnt de schaduw weer per gesprek');
+    'de herkomstpoort telt niet mee in de optelling; dan verdwijnt de schaduw weer per gesprek');
   assert.match(bron, /telling\.noteer\(/,
-    'lusstap.js laadt de telling maar noteert er niets in -- een dode koppeling leest als een levende');
+    'de herkomstpoort laadt de telling maar noteert er niets in -- een dode koppeling leest als een levende');
 });
 
 /* ============================================================================

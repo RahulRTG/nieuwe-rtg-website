@@ -2,12 +2,12 @@
   "soort": "meting",
   "uitleg": "Economische dekking: wat er van elke waardebewegende ROUTE bewezen is, samengesteld uit GELDKAART.json (welke routes), MUTATIECONTRACT.json (semantiek en toegang), IDEMPROEF.json (idempotentie) en HERSTELPROEF.json (de terugweg).",
   "stempel": {
-    "op": "2026-09-12T18:23:23.271Z",
-    "commit": "2a91650b",
-    "boomVuil": true,
-    "boomAnders": 1,
+    "op": "2026-09-12T18:46:20.600Z",
+    "commit": "55b660111",
+    "boomVuil": false,
+    "boomAnders": 6,
     "instrument": "scripts/gelddekking.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "grens": "Er komt met opzet GEEN samengesteld dekkingspercentage. Elke as draagt haar eigen teller en noemer; ze worden nooit gemiddeld. De noemer zelf is een ONDERgrens: hij komt uit de geldkaart, die alleen routes ziet waar de idempotentieproef langskwam. Een as waarvoor geen meting bestaat staat in nietGemeten en telt nergens als nul mee.",
   "klachten": [],

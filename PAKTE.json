@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-12T10:36:45.462Z",
-    "commit": "26db7469",
+    "op": "2026-09-12T10:40:18.574Z",
+    "commit": "a4891c3d",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/pakte.js",
@@ -89,7 +89,7 @@
       "input": "wie kan mijn gegevens zien"
     }
   ],
-  "watDitNietMeet": "of de antwoordrail een GOED antwoord gaf. Alleen wie hem claimde.",
+  "grens": "Dit zegt NIET of de antwoordrail een goed antwoord gaf; alleen wie de vraag claimde. Het is gemeten met de DETERMINISTISCHE rail -- een modelrail kan anders claimen, want dan bestaat stuurLus om een andere reden. Alleen de gevallen die vandaag beproefbaar zijn tellen mee; de contextgevallen (FASE4) zijn niet gemeten. En elk geval kreeg een VERS lid, dus er is geen gespreksgeschiedenis: in een lopend gesprek kan de antwoordrail vaker claimen dan hier, omdat p.wacht en het geheugen dan gevuld zijn.",
   "rijen": [
     {
       "id": "info-travelos",

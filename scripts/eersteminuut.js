@@ -271,6 +271,22 @@ function vind(lijst, tekst) {
   return gevonden;
 }
 
+/* DE WACHT VOOR HET REQUIREN -- zonder dit overschrijft een laadcontrole het
+   register. Dat is hier geen theorie: exact zo is ROLPROEF.json een keer van
+   3377 beproefde routes teruggeschreven naar 292 door een `node -e
+   "require(...)"`, en het register zag er daarna volkomen normaal uit.
+
+   Deze meter is erger dan de meeste: hij start een Chromium, registreert een
+   VERS LID langs de echte route, en schrijft daarna EERSTEMINUUT.json. Wie hem
+   per ongeluk requiret, maakt dus ook nog een account aan.
+
+   `scripts/meetkeuring.js` regel `wacht` handhaaft dit, en hij vond precies
+   dit gat -- de meter was geschreven zonder. */
+if (require.main !== module) {
+  module.exports = { INTERNE_TERMEN, stempel };
+  return;
+}
+
 (async () => {
   const { laadBrowser } = require('../test/browser');
   const pw = laadBrowser();

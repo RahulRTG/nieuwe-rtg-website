@@ -68,6 +68,8 @@
     "rommeltaal": "node scripts/rommeltaal.js",
     "eersteminuut": "node scripts/eersteminuut.js",
     "eersteminuut:controle": "node scripts/eersteminuut.js --controle",
+    "menstaalproef": "node scripts/menstaalproef.js",
+    "menstaalproef:controle": "node scripts/menstaalproef.js --controle",
     "vindbaar:controle": "node scripts/vindbaar.js --controle",
     "beproeving:mega": "node --max-old-space-size=8192 scripts/beproeving.js",
     "slotsuite": "node scripts/slotsuite.js",

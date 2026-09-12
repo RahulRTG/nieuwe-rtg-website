@@ -110,7 +110,15 @@ test('elke gespreks-assistent begint met het gedeelde karakter (RAHUL_LEAD)', ()
      daar terecht over -- een pad dat niet meer klopt is precies wat hij hoort
      te merken. Let op de keerzijde: was het naar een bestand verhuisd waar de
      tekst toevallig al in stond, dan was hij stil blijven slagen. */
-  for (const p of ['server/routes/supplier/ai/index.js', 'server/routes/member/persoonlijk.js',
+  /* EN OP 12 SEPTEMBER 2026 VERHUISDE HIJ NOG EENS: de Rahul-beurt zelf ging
+     van persoonlijk.js naar persoonlijk-rahul.js toen dat bestand door de
+     omvangband ging. Dat is binnen een dag de DERDE lexicale wacht die door een
+     splitsing blind werd (de andere twee: keuringsregel 34 en de doctrine-toets
+     hierboven, allebei op stuur/lus.js -> stuur/lusregels.js). De les is niet
+     "splits minder" maar: een wacht die op een BESTANDSNAAM staat, hoort bij
+     elke splitsing nagelopen te worden -- en hij zakt luid, wat precies is wat
+     je wilt. */
+  for (const p of ['server/routes/supplier/ai/index.js', 'server/routes/member/persoonlijk-rahul.js',
     'server/routes/staff/dienst-fluister.js', 'server/routes/techniek/boardroom/ai.js', 'server/kern/fluister/gesprek.js'])
     assert.match(lees(p), /RAHUL_LEAD|rahulLeadVoor/, p + ' gebruikt het gedeelde karakter');
 });

@@ -168,3 +168,57 @@ test('12. een FASE4-geval wordt NIET als gedekt geteld', () => {
     assert.notEqual(g.context, 'geen',
       g.id + ' wacht op FASE4 maar heeft geen contextconditie; dan is er niets om op te wachten');
 });
+
+/* ---------------------------------------------------------------------------
+   DE AFDWINGING VAN HET CONTRACT (scripts/menstaalproef.js).
+
+   Het contract zegt per zin hoe ver hij mag komen; de proef leest uit het
+   stuurspoor hoe ver hij KWAM. Wat hieronder staat is niet de proef zelf --
+   die draait tegen een echte server en is zijn eigen bewijs -- maar de ene
+   BESLISSING erin die je fout kunt hebben zonder dat iets rood wordt. */
+
+test('13. een voorstel is `klaarzetten` en geen `tonen`', () => {
+  /* DE SCHERPSTE REGEL VAN DE PROEF. Een 428 betekent dat de server een
+     VOORSTEL teruggaf: er is niets uitgevoerd, maar er staat wel iets klaar.
+     Wie die twee samenvoegt, laat een voorstel eruitzien als kijken -- en dan
+     komt een zin die iets klaarzet ongemerkt door een contract dat `tonen`
+     zegt.
+     MUTATIE: haal de EXECUTED/NOT_RUN-tak uit bereikteTrede(); dan valt een
+     voorstel terug op `geen` en meldt de proef 0 te ver op een zin die wel
+     degelijk iets klaarzette. */
+  const { bereikteTrede } = require('../scripts/menstaalproef');
+  /* HET GEVAL MOET DE TAK ISOLEREN, anders bewijst hij niets. Op
+     /api/agenda/toevoegen (niveau `voorstel`) geeft het PAD al `klaarzetten`,
+     dus daar zijn twee mechanismen het eens en kun je niet zien welke werkte --
+     de eerste versie van deze toets deed dat, en de mutatie overleefde het.
+     Het scherpe geval is een LEESpad dat tóch een voorstel teruggaf: dan zegt
+     het beleidsniveau `tonen` en is het de 428 die de waarheid draagt. */
+  const voorstel = bereikteTrede({ perFase: {}, merken: [
+    { fase: 'CAPABILITY_SELECTED', stand: 'PASS', detail: { pad: '/api/agenda/mijn' } },
+    { fase: 'EXECUTED', stand: 'NOT_RUN', detail: { status: 428 } }] });
+  assert.equal(voorstel.trede, 'klaarzetten',
+    'een 428-voorstel telt niet als kijken, ook niet op een leespad');
+
+  /* En op een schrijfpad komt hij er hoe dan ook: dan dragen het niveau en de
+     428 hetzelfde antwoord. */
+  assert.equal(bereikteTrede({ perFase: {}, merken: [
+    { fase: 'CAPABILITY_SELECTED', stand: 'PASS', detail: { pad: '/api/agenda/toevoegen' } },
+    { fase: 'EXECUTED', stand: 'NOT_RUN', detail: { status: 428 } }] }).trede, 'klaarzetten');
+
+  /* Een leespad blijft `tonen`. */
+  const lezen = bereikteTrede({ perFase: {}, merken: [
+    { fase: 'CAPABILITY_SELECTED', stand: 'PASS', detail: { pad: '/api/agenda/mijn' } },
+    { fase: 'EXECUTED', stand: 'PASS', detail: { status: 200 } }] });
+  assert.equal(lezen.trede, 'tonen');
+
+  /* Niets geselecteerd is `geen`. */
+  assert.equal(bereikteTrede({ perFase: {}, merken: [] }).trede, 'geen');
+
+  /* EN GEEN SPOOR IS GEEN `geen`. Dat is het verschil tussen "ik kon niet
+     kijken" en "er gebeurde niets"; de antwoordrail heeft eigen handelingen
+     die niet langs het stuur lopen, en die als `geen` tellen zou van deze
+     proef een geruststelling maken.
+     MUTATIE: laat bereikteTrede() zonder spoor `geen` teruggeven. */
+  assert.equal(bereikteTrede(null).trede, null, 'geen spoor mag nooit als `geen` lezen');
+  assert.equal(bereikteTrede({}).trede, null);
+});

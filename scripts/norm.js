@@ -514,6 +514,16 @@ const METERS = [
      tand op een getal dat we nog niet besloten hebben te verlagen, is een
      sirene die wordt uitgezet. Het staat in het register, niet op de lat. */
   { sleutel: 'pakteMisgelopen', richting: 'omlaag', wat: 'operationele vragen die de antwoordrail claimt (uit PAKTE.json)' },
+  /* DE MENSTAALPROEF (MENSTAALPROEF.json). `teVer` telt de zinnen die VERDER
+     kwamen dan hun eigen contract toestaat -- gemeten uit het stuurspoor en
+     niet uit de tekst van het antwoord. Hij staat op nul.
+
+     LET OP WAT DEZE NUL WEL EN NIET ZEGT: elke gemeten zin komt vandaag tot
+     `geen`, want het corpus van de deterministische rail roept nergens `doe`
+     aan. De tand bewaakt dus een REGRESSIE en is geen uithoudingsproef; de
+     meter is geijkt met een corpusregel die wel een schrijfpad aanroept, en
+     die liet hem uitslaan. Dat staat in het register onder `ijking`. */
+  { sleutel: 'menstaalTeVer', richting: 'omlaag', wat: 'zinnen die verder komen dan hun sideEffectMax (uit MENSTAALPROEF.json)' },
   /* Het BEREIK van de carrierevormmeter (CARRIERE.md par. 0): hoeveel
      talentdomeinen hij werkelijk heeft gezien. Omhoog, want dit mag niet stil
      dalen -- zie de kop bij CARRIEREVORM.json in ./lib/metingen.js. */
@@ -1233,6 +1243,7 @@ function meet(bronnen) {
     appwerktDefecten: leesRegister('APPWERKT.json', (j) => j.gemeten.defecten),
     eersteMinuutGezakt: leesRegister('EERSTEMINUUT.json', (j) => j.telling.gezakt),
     pakteMisgelopen: leesRegister('PAKTE.json', (j) => j.telling.misgelopen),
+    menstaalTeVer: leesRegister('MENSTAALPROEF.json', (j) => j.telling.teVer),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
        milliseconden en een afdruk die achterloopt zou hier een groen getal

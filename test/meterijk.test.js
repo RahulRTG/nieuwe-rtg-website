@@ -1554,6 +1554,22 @@ const IJKINGEN = {
       (j) => { j.telling.misgelopen = (j.telling.misgelopen || 0) + 3; return j; },
       () => norm.meet().pakteMisgelopen - voor.pakteMisgelopen)
   },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (derde): menstaalTeVer telt de zinnen die
+     verder kwamen dan hun eigen `sideEffectMax` (MENSTAALPROEF.json,
+     telling.teVer). Zelfde vorm -- een getal uit een bestaand register, dus
+     geijkt door dat veld tijdelijk op te hogen.
+
+     DE METER ZELF is apart geijkt en niet alleen hier: met een corpusregel die
+     `doe` aanroept op /api/agenda/toevoegen sloeg de proef uit met de reden
+     erbij. Dat staat in het register onder `ijking`, inclusief de eerste
+     poging die NIET uitsloeg -- `begrepen: true` haalt de twijfelpoort niet,
+     dus die mutatie werd door een andere poort tegengehouden dan de bedoelde
+     en bewees niets. */
+  menstaalTeVer: {
+    proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
+      (j) => { j.telling.teVer = (j.telling.teVer || 0) + 2; return j; },
+      () => norm.meet().menstaalTeVer - voor.menstaalTeVer)
+  },
   /* DE TAND VAN 10 SEPTEMBER 2026: bewijsAlleenKeten telt de bewijsmechanismen
      die alleen in de keten draaien en niet lokaal (BEWIJSLADDER.json). Zelfde
      vorm als de vier hierboven -- hij telt een POST in een register, dus hij

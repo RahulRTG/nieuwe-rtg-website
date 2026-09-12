@@ -134,6 +134,12 @@ const REGISTERS = [
      richting omlaag, nu 0) -- die staat los van zijn ouderdom, en dit is
      precies het gat ertussen. */
   ['EERSTEMINUUT.json', 'npm run eersteminuut', 'wat een mens die RTG niet kent in de eerste minuut krijgt'],
+  /* DE MENSTAALPROEF. Ook een METING VAN GEDRAG: hij start een server, stelt
+     elke zin uit het contract en leest uit het stuurspoor hoe ver hij kwam.
+     Verandert het corpus, het beleid of een poort zonder dat deze ronde
+     opnieuw draait, dan beweert het register iets over een keten die er niet
+     meer is. */
+  ['MENSTAALPROEF.json', 'npm run menstaalproef', 'hoe ver elke menselijke zin werkelijk komt'],
   /* DE NULMETING OP DE ROUTER. Ook dit is een METING VAN GEDRAG en geen afdruk
      uit de code: hij start een server, registreert per geval een vers lid en
      kijkt wie de vraag claimt. Verandert de antwoordrail of het corpus zonder

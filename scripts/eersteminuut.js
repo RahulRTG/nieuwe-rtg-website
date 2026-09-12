@@ -69,6 +69,32 @@ const stil = process.argv.includes('--stil');
 const BASIS = process.env.RTG_BASIS || 'http://localhost:3000';
 
 /* ---------------------------------------------------------------------------
+   WACHTEN OP EEN TOESTAND, NIET OP DE KLOK.
+
+   Hier stonden vijf vaste `waitForTimeout` van samen 11,5 seconde. Dat is
+   precies de vorm die een meter onbetrouwbaar maakt op een machine die je niet
+   kent: op een trage bouwmachine is 3200 ms te weinig en meet hij een app die
+   nog niet gestart is -- en dan telt hij nul dingen om te doen en meldt hij een
+   RODE uitslag die niets met het scherm te maken heeft. Op een snelle machine
+   staat hij elf seconden te wachten op iets dat er allang is.
+
+   Elke wacht kijkt daarom naar een TOESTAND, met een ruime bovengrens. En hij
+   wordt OPGESCHREVEN: haalt een wacht zijn toestand niet binnen de tijd, dan
+   staat dat in het register in plaats van dat de meting stilletjes doorloopt op
+   een scherm dat nog niet klaar was. Een wacht die afloopt is geen uitslag --
+   hij is de reden waarom je een uitslag moet wantrouwen. */
+const wachtSpoor = [];
+async function wacht(p, naam, fn, arg, max) {
+  const t0 = Date.now();
+  let gehaald = true;
+  try { await p.waitForFunction(fn, arg, { timeout: max || 20000, polling: 100 }); }
+  catch (e) { gehaald = false; }
+  wachtSpoor.push({ naam, ms: Date.now() - t0, gehaald });
+  return gehaald;
+}
+
+
+/* ---------------------------------------------------------------------------
    INTERNE TERMEN DIE EEN LID NOOIT HOORT TE ZIEN.
 
    Dit is geen stijllijst en geen anglicismejacht. Het is een lijst van woorden
@@ -302,6 +328,7 @@ if (require.main !== module) {
   }
 
   const browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+  const buitenDeDeur = new Set();
   const poorten = [];
   let beeld = null;
   let beeldMenu = null;
@@ -312,6 +339,18 @@ if (require.main !== module) {
       locale: 'nl-NL', extraHTTPHeaders: { 'Accept-Language': 'nl-NL,nl;q=0.9' }
     });
     const p = await ctx.newPage();
+    /* WAAR DE PAGINA HEEN BELT, en dat is een MEETPUNT en geen belofte. Deze
+       meter hoort zonder enig extern model en zonder enige vreemde server te
+       kunnen draaien; anders hangt zijn uitslag aan iemand anders zijn uptime.
+       Elke herkomst buiten dit huis wordt hier opgeschreven in plaats van
+       beweerd -- en een CDN die er morgen bij komt, staat er dan meteen in. */
+    p.on('request', (r) => {
+      try {
+        const u = new URL(r.url());
+        if (u.protocol === 'data:' || u.protocol === 'blob:') return;
+        if (u.origin !== new URL(BASIS).origin) buitenDeDeur.add(u.origin);
+      } catch (e) { /* een onleesbare url is geen herkomst */ }
+    });
     await p.goto(BASIS + '/apps/app.html');
     await p.evaluate((t) => {
       localStorage.setItem('rtg_member_token', t);
@@ -319,7 +358,10 @@ if (require.main !== module) {
       localStorage.setItem('rtg_lang', 'nl');
     }, token);
     await p.goto(BASIS + '/apps/app.html');
-    await p.waitForTimeout(3200);
+    /* De app is er als de schil staat, of de onboarding-poort, of een veld om
+       in te vullen. Alle drie zijn geldige eerste schermen. */
+    await wacht(p, 'app-staat-er', () => !!(document.querySelector('#rtgCommand') ||
+      document.querySelector('#onbGate') || document.querySelector('input[placeholder]')));
 
     /* STAP 1 -- de overeenkomst. NU NODIG: zonder handtekening geen lidmaatschap. */
     const naamveld = await p.$('input[placeholder*="naam" i], input[placeholder*="name" i]');
@@ -330,7 +372,15 @@ if (require.main !== module) {
         kop: (b.tekst.find((s) => s.length > 25) || '').slice(0, 90) });
       await naamveld.fill('Eerste Minuut');
       await p.keyboard.press('Enter');
-      await p.waitForTimeout(2800);
+      /* Getekend is pas getekend als het naamveld niet meer TE ZIEN is -- niet
+         als het uit de DOM verdwijnt. De poort blijft namelijk staan en wordt
+         alleen verborgen, en op `!querySelector` wachten liep daardoor elke
+         keer de volle twintig seconden af. Dat is precies wat de oude vaste
+         sleep van 2800 ms nooit kon vertellen: die liep gewoon door. */
+      await wacht(p, 'overeenkomst-weg', () => {
+        const e = document.querySelector('input[placeholder*="naam" i], input[placeholder*="name" i]');
+        return !e || !(e.checkVisibility ? e.checkVisibility() : e.offsetParent);
+      });
     }
 
     /* STAP 2 -- alles wat daarna nog VRAAGT voordat er iets te doen is. */
@@ -346,7 +396,11 @@ if (require.main !== module) {
       const el = await p.$(`text="${uitweg.tekst}"`);
       if (!el || !(await el.isVisible())) break;
       await el.click();
-      await p.waitForTimeout(1900);
+      /* De uitweg is genomen als de knop met die tekst niet meer zichtbaar is.
+         Op de klok wachten zou hier een tweede vraagscherm kunnen missen. */
+      await wacht(p, 'vraagscherm-weg', (t) => ![...document.querySelectorAll(
+        'button,a,[role="button"]')].some((e) => e.textContent.trim() === t &&
+        e.checkVisibility && e.checkVisibility()), uitweg.tekst);
     }
 
     /* STAP 3 -- TWEE STATIONS, en met opzet niet een.
@@ -358,7 +412,8 @@ if (require.main !== module) {
        van het menu de enige handeling die er is, dus dat hoort bij de eerste
        minuut. Wie alleen station 1 meet, verklaart een leeg scherm schoon
        omdat het jargon net buiten beeld ligt. */
-    await p.waitForTimeout(1200);
+    await wacht(p, 'schil-of-poort', () => !!(document.querySelector('#rtgCommand') ||
+      document.querySelector('#onbGate')));
 
     /* EERST BEWIJZEN DAT WE BINNEN ZIJN, DAN PAS METEN.
 
@@ -401,7 +456,9 @@ if (require.main !== module) {
     });
     if (knop) {
       await p.mouse.click(knop.x, knop.y);
-      await p.waitForTimeout(2400);
+      /* Het menu is open als het indexpaneel niet meer verborgen is. */
+      await wacht(p, 'menu-open', () => !!document.querySelector(
+        '.rtg-edge-index[aria-hidden="false"], .rtg-edge-index:not([aria-hidden])'));
       beeldMenu = await p.evaluate(ZICHTBAAR);
     } else {
       menuReden = 'geen menuknop (.rtg-edge-menu) gevonden; station 2 is NIET gemeten';
@@ -512,6 +569,54 @@ if (require.main !== module) {
            'daarvoor is een schermafdruk nodig en die beoordeelt geen script.',
     standen: { gehaald: 'gemeten en in orde', gezakt: 'gemeten en niet in orde',
                nietMeetbaar: 'kan hier niet worden vastgesteld, met de reden erbij' },
+    /* DE WACHTTIJDEN, en vooral of ze hun toestand HAALDEN. Hier stonden vijf
+       vaste sleeps; die zijn vervangen door wachten op een toestand, want een
+       vaste sleep meet op een trage machine een app die nog niet gestart is en
+       meldt dan een rode uitslag die niets met het scherm te maken heeft.
+       Een wacht die AFLOOPT is geen uitslag maar de reden om er een te
+       wantrouwen -- daarom staat hij hier en niet alleen in een logregel. */
+    /* DE VIER VOORWAARDEN OM DEZE METER IN DE KEURING TE HANGEN, en twee ervan
+       worden ELKE RONDE gemeten terwijl de andere twee HANDWERK zijn. Die twee
+       soorten staan hier apart: een handmatig nagetrokken bewering die tussen
+       gemeten getallen staat, leest na een maand als een meting. */
+    voorwaarden: {
+      gemeten: {
+        offline: buitenDeDeur.size === 0,
+        geenKlokwacht: wachtSpoor.every((w) => w.gehaald),
+        wat: 'offline = de pagina belde nergens buiten deze server heen. geenKlokwacht = elke ' +
+          'wacht haalde zijn TOESTAND binnen de tijd, dus er is niet op de klok gemeten. ' +
+          'Deze twee komen uit deze ronde zelf.'
+      },
+      handwerk: {
+        op: '2026-09-12',
+        deterministisch: 'drie rondes achter elkaar gaven dezelfde negen uitslagen en dezelfde ' +
+          'telling (7 gehaald, 0 gezakt, 2 nietMeetbaar). Het lid verschilt per ronde (een verse ' +
+          'registratie), dus byte-identiek is de uitslag NIET en hoort dat ook niet te zijn -- ' +
+          'wat gelijk moet blijven is het oordeel.',
+        mutatiebewijs: '5 van de 7 meetbare toetsen zijn met een mutatie op de ECHTE app zien ' +
+          'zakken, elk precies de eigen toets en geen andere: geen-interne-termen (jargon terug ' +
+          'in een opschrift), geen-vrije-plekken, geen-technische-status, inhoud-zonder-menu ' +
+          '(de inhoud onzichtbaar) en geen-onnodige-vragen (een vraag terug in de gang naar ' +
+          'binnen).',
+        nietGemuteerd: 'zoeken-of-intentie en terugweg. Allebei zijn ze waar bij EEN van twee ' +
+          'onafhankelijke signalen (een invoerveld OF een zoekknop; op het beginscherm staan OF ' +
+          'een home-knop hebben), dus een enkele mutatie laat ze niet zakken. Dat is een ' +
+          'zwakte van die twee beweringen en geen tekortkoming van de proef -- het staat hier ' +
+          'omdat een weggelaten bewijs leest als een gehaald bewijs.',
+        val: 'EEN MUTATIE OP EEN BUNDELDEEL DOET NIETS. public/apps/app-main.js wordt GEBOUWD ' +
+          'uit public/apps/app-main/*.js, en de browser krijgt het gebouwde bestand. De eerste ' +
+          'poging muteerde het deel, de meter bleef groen, en dat zag eruit als een toets die ' +
+          'niet bijt. Wie hier muteert, muteert wat er GESERVEERD wordt.'
+      }
+    },
+    buitenDeDeur: { herkomsten: [...buitenDeDeur],
+      wat: 'elke herkomst buiten deze server waar de pagina tijdens de meting heen belde. ' +
+        'Leeg betekent dat deze uitslag aan niemand anders zijn server hangt -- geen model, ' +
+        'geen CDN, geen lettertype van buiten. Dit is gemeten en niet beloofd.' },
+    wachten: { alleGehaald: wachtSpoor.every((w) => w.gehaald),
+               langste: wachtSpoor.reduce((m, w) => Math.max(m, w.ms), 0),
+               afgelopen: wachtSpoor.filter((w) => !w.gehaald).map((w) => w.naam),
+               rijen: wachtSpoor },
     poorten: { totaal: poorten.length, nodig: poorten.filter((p) => p.nodig).length,
                onnodig: onnodig.length, rijen: poorten },
     zichtbaarheid: beeld.strengeZichtbaarheid

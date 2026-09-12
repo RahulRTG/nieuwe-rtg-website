@@ -87,11 +87,39 @@ function oordeel(a, b, contractMax) {
   return { soort: 'GELIJK', reden: 'zelfde bereikte trede (`' + b.kwam + '`)' };
 }
 
+/* IS ER TEGEN HETZELFDE CONTRACT GEMETEN? Zo niet, dan is er niets te
+   vergelijken en wordt er ook niets vergeleken.
+
+   DIT IS DE GRENDEL DIE VOORKOMT DAT DE MEETLAT MEEBEWEEGT. Het corpus heeft
+   vandaag bekende gaten -- geen enkele zin laat de resolver op de context
+   versmallen, bijvoorbeeld. De verleiding bij een tweede rail is om zo'n gat te
+   vullen met een geval dat die rail toevallig goed doet; dan leest de
+   vergelijking als vooruitgang terwijl er een andere lat ligt. Eerst meten tegen
+   het BESTAANDE contract; of het corpus uitgebreid moet worden is een besluit
+   erna, en het hoort zichtbaar te zijn.
+
+   Hij vergelijkt de VINGERAFDRUK en niet het aantal gevallen: een geval
+   vervangen door een ander laat de telling gelijk. */
+function zelfdeContract(A, B) {
+  const a = A && A.corpus && A.corpus.vingerafdruk;
+  const b = B && B.corpus && B.corpus.vingerafdruk;
+  if (!a || !b) return { zelfde: false, reden: 'een van beide uitslagen draagt geen ' +
+    'vingerafdruk van het contract; die is er sinds 12 september 2026, dus meet opnieuw' };
+  if (a !== b) return { zelfde: false, reden: 'de twee rondes zijn tegen VERSCHILLENDE ' +
+    'contracten gemeten (' + a + ' tegenover ' + b + '). Er is dan niets te vergelijken: ' +
+    'een verschil in uitkomst kan net zo goed een verschil in de vraagstelling zijn.' };
+  return { zelfde: true, vingerafdruk: a };
+}
+
 function bouw(basisPad, anderPad) {
   const A = lees(basisPad), B = lees(anderPad);
   if (!A) return { fout: 'de eerste uitslag is niet te lezen: ' + basisPad };
+  const contract = B ? zelfdeContract(A, B) : { zelfde: null, reden: 'er is geen tweede ronde' };
   const perId = new Map((A.rijen || []).map((r) => [r.id, r]));
-  const bId = new Map(((B && B.rijen) || []).map((r) => [r.id, r]));
+  /* GEEN VERGELIJKING OVER TWEE CONTRACTEN. De tweede ronde wordt dan NIET
+     gelezen: elke rij komt op NIET_GEMETEN uit, en de reden staat bovenaan. Een
+     half oordeel is hier gevaarlijker dan geen oordeel. */
+  const bId = new Map(((contract.zelfde === false ? [] : (B && B.rijen) || [])).map((r) => [r.id, r]));
 
   const rijen = [];
   for (const [id, a] of perId) {
@@ -106,6 +134,7 @@ function bouw(basisPad, anderPad) {
     wat: 'twee interpretatierails tegen hetzelfde mensentaal-contract: komt de tweede tot ' +
       'dezelfde VEILIGE uitkomsten als de eerste, en blijft hij binnen zijn contract',
     rails: { basis: (A && A.rail) || 'onbekend', ander: (B && B.rail) || null },
+    contract,
     /* GEEN TWEEDE RAIL IS EEN UITSLAG EN GEEN LEEGTE. */
     tweedeRail: B ? { gemeten: true } : { gemeten: false,
       reden: 'de tweede uitslag ontbreekt of is niet te lezen (' + anderPad + '). Draai ' +
@@ -154,7 +183,7 @@ function bouw(basisPad, anderPad) {
   };
 }
 
-if (require.main !== module) { module.exports = { bouw, oordeel }; return; }
+if (require.main !== module) { module.exports = { bouw, oordeel, zelfdeContract }; return; }
 
 const args = process.argv.slice(2).filter((a) => !a.startsWith('--'));
 const controle = process.argv.includes('--controle');
@@ -166,5 +195,7 @@ console.log('RAILVERGELIJK: ' + uit.rails.basis + ' tegenover ' + (uit.rails.and
   ' -- ' + t.gelijk + ' gelijk, ' + t.lager + ' voorzichtiger, ' + t.hoger + ' hoger, ' +
   t.ingevuld + ' ingevuld, ' + t.overtreding + ' overtreding(en), ' + t.nietGemeten + ' niet gemeten');
 if (!uit.tweedeRail.gemeten) console.log('\n  GEEN TWEEDE RAIL: ' + uit.tweedeRail.reden + '\n');
+if (uit.contract.zelfde === false) console.log('\n  NIET VERGELEKEN: ' + uit.contract.reden + '\n');
 for (const r of uit.afwijkingen) console.log('  ' + r.soort.padEnd(12) + r.id + ': ' + r.reden);
-if (controle && (t.overtreding || t.ingevuld)) process.exit(1);
+/* Een vergelijking die niet KON plaatsvinden is geen groen licht. */
+if (controle && (t.overtreding || t.ingevuld || uit.contract.zelfde === false)) process.exit(1);

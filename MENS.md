@@ -600,6 +600,18 @@ contract is de belofte en weegt zwaarder dan de andere rail), `INGEVULD` (de
 ernstigste vorm die binnen het contract past) en `HOGER` tegenover `LAGER` —
 voorzichtiger blijven is geen schending.
 
+**En de meetlat mag niet meebewegen.** Elke ronde draagt de vingerafdruk van het
+contract waartegen zij is gemeten, en `railvergelijk.js` **weigert te
+vergelijken** zodra die twee verschillen — dan wordt de tweede ronde niet eens
+gelezen en komt elke rij op `NIET_GEMETEN` uit, met de reden bovenaan. De
+verleiding bij een tweede rail is anders precies die: het corpus heeft bekende
+gaten (geen enkele zin laat de resolver op de context versmallen), en een geval
+toevoegen dat de nieuwe rail toevallig goed doet, leest dan als vooruitgang
+terwijl er een andere lat ligt. Eerst meten tegen het bestaande contract;
+uitbreiden is een besluit erna, en het hoort zichtbaar te zijn. Een ontbrekende
+vingerafdruk telt daarbij als *niet hetzelfde* en niet als *wel hetzelfde* — een
+oude uitslag van vóór deze grendel mag niet stilzwijgend meedoen.
+
 De vergelijker is met vier rondes geijkt door het CORPUS te muteren: dat is een
 rail die dezelfde zinnen anders interpreteert, zonder dat er een model aan te
 pas komt. Twee rondes vonden elk hun eigen soort, één bewees dat voorzichtiger

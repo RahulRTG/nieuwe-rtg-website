@@ -65,6 +65,7 @@
    ========================================================================== */
 'use strict';
 const fs = require('fs');
+const crypto = require('crypto');
 const path = require('path');
 const { stempel } = require('./lib/stempel');
 const { start } = require('./lib/wegwerpserver');
@@ -544,7 +545,17 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede, uitSp
     wat: 'hoe ver elke menselijke zin werkelijk komt, gemeten uit het stuurspoor, ' +
       'afgezet tegen de `sideEffectMax` die het contract voor die zin noemt',
     meet: 'server/kern/stuur/menstaal.json tegen server/kern/stuur/spoor.js',
-    corpus: { bestand: 'server/kern/stuur/menstaal.json', gevallenNU: GEVALLEN.length },
+    /* DE VINGERAFDRUK VAN HET CONTRACT, en dat is geen sierveld maar een
+       grendel voor fase 12. Twee rails vergelijken heeft alleen betekenis als
+       ze tegen HETZELFDE contract zijn gemeten. Zonder deze afdruk kan iemand
+       tussen twee rondes een geval toevoegen dat de tweede rail toevallig goed
+       doet, en dan leest de vergelijking als vooruitgang terwijl de meetlat is
+       verschoven. scripts/railvergelijk.js weigert te vergelijken zodra de twee
+       afdrukken verschillen. */
+    corpus: { bestand: 'server/kern/stuur/menstaal.json', gevallenNU: GEVALLEN.length,
+      vingerafdruk: crypto.createHash('sha256')
+        .update(fs.readFileSync(path.join(WORTEL, 'server/kern/stuur/menstaal.json')))
+        .digest('hex').slice(0, 16) },
     telling: { gemeten: tel((r) => r.uitslag !== 'nietGemeten'),
       binnen: tel((r) => r.uitslag === 'binnen'), teVer: teVer.length,
       nietGemeten: tel((r) => r.uitslag === 'nietGemeten'),

@@ -14,7 +14,7 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert');
-const { oordeel } = require('../scripts/railvergelijk');
+const { oordeel, zelfdeContract } = require('../scripts/railvergelijk');
 
 /* Een rij zoals MENSTAALPROEF.json hem schrijft, zo klein mogelijk. */
 const rij = (kwam, koos, extra) => Object.assign({
@@ -82,4 +82,35 @@ test('6. NIET GEMETEN IS GEEN GELIJK -- aan beide kanten', () => {
   for (const o of [oordeel(rij('tonen', true), null, 'tonen'),
     oordeel(rij('tonen', true), rij('tonen', true), 'tonen')])
     assert.ok(o.reden && o.reden.length > 15, 'een oordeel zonder uitgeschreven reden');
+});
+
+test('7. TWEE RAILS TEGEN TWEE CONTRACTEN WORDEN NIET VERGELEKEN', () => {
+  /* De meetlat mag niet meebewegen. Het corpus heeft vandaag bekende gaten --
+     geen enkele zin laat de resolver op de context versmallen -- en de
+     verleiding bij een tweede rail is om zo'n gat te vullen met een geval dat
+     die rail toevallig goed doet. Dan leest de vergelijking als vooruitgang
+     terwijl er een andere lat ligt.
+
+     Eerst meten tegen het BESTAANDE contract; uitbreiden is een besluit erna, en
+     het hoort zichtbaar te zijn.
+     MUTATIE: laat zelfdeContract() altijd `true` teruggeven. */
+  const met = (v) => ({ corpus: { vingerafdruk: v } });
+  assert.equal(zelfdeContract(met('aaaa'), met('aaaa')).zelfde, true);
+
+  const anders = zelfdeContract(met('aaaa'), met('bbbb'));
+  assert.equal(anders.zelfde, false, 'twee verschillende contracten zijn niet te vergelijken');
+  assert.match(anders.reden, /VERSCHILLENDE/);
+  /* De reden noemt BEIDE afdrukken, anders is niet na te gaan welke kant is
+     verschoven. */
+  assert.match(anders.reden, /aaaa/);
+  assert.match(anders.reden, /bbbb/);
+
+  /* EEN ONTBREKENDE AFDRUK IS GEEN GELIJK. Een oude uitslag van voor deze
+     grendel draagt er geen; die mag niet stilzwijgend als "zelfde contract"
+     langskomen. */
+  assert.equal(zelfdeContract(met('aaaa'), {}).zelfde, false);
+  assert.equal(zelfdeContract({}, met('bbbb')).zelfde, false);
+  assert.equal(zelfdeContract(null, null).zelfde, false);
+  for (const g of [anders, zelfdeContract(met('aaaa'), {})])
+    assert.ok(g.reden && g.reden.length > 30, 'een weigering zonder uitgeschreven reden');
 });

@@ -21,13 +21,13 @@
  },
  "bronnen": {
   "server/kern/stuur/menstaal.json": "99fa3d3290893920",
-  "MENSTAALPROEF.json": "fb21fb3fb0751f2f",
+  "MENSTAALPROEF.json": "3752c42b5c447543",
   "MENSMUTATIE.json": "d64af3f950107ceb",
   "PAKTE.json": "b6b6c84ac29f7ad7",
   "scripts/menselijkeuitvoering.js": "b211632b87591468"
  },
  "gemetenOp": {
-  "MENSTAALPROEF.json": "86cc6979",
+  "MENSTAALPROEF.json": "b919cc62f",
   "MENSMUTATIE.json": "86cc6979",
   "PAKTE.json": "c933e406"
  },

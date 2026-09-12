@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1608,
-    "toetsenNietGemeten": 607,
+    "toetsenNietGemeten": 608,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -75,6 +75,14 @@
     "eersteMinuutGezakt": 0
   },
   "notities": [
+    {
+      "datum": "2026-09-12",
+      "soort": "structureel",
+      "sleutel": "toetsenNietGemeten",
+      "van": 607,
+      "meter": "toetsenNietGemeten 607 -> 608",
+      "reden": "test/stuurplafond.test.js komt erbij (de grendel onder de routewissel, kern/stuur/plafond.js) en staat nog niet in MUTATIES.json, dus de mutatiemotor is er niet langs geweest. Dat is de definitie van deze teller en niet een zwakkere toets: elke van de negen beweringen draagt in het bestand zelf zijn MUTATIE, en twee daarvan zijn met de hand gedraaid -- STANDAARD op 'uitvoeren' laat er 5 zakken, `klein` toelaten op de trede `tonen` laat er 2 zakken, herstellen maakt alle negen weer groen. `npm run mutatie` is hier afgebroken omdat hij de hele suite per mutatie draait; hij vult deze rij alsnog bij de eerstvolgende volle ronde en dan mag dit getal weer omlaag."
+    },
     {
       "datum": "2026-09-08",
       "soort": "structureel",

@@ -195,7 +195,12 @@ test('de verklaring wordt NOOIT uit de meting afgeleid', () => {
   const r = lees('GELDDEKKING.json');
   const besluit = lees('HERSTELBESLUIT.json');
   for (const rij of r.rijen) {
-    if (besluit.routes[rij.pad]) continue;       // wel verklaard: mag alles zijn
+    /* TWEE SLEUTELVORMEN, en dat is geen slordigheid maar de reden dat deze
+       toets zakte toen de eerste verklaring werd bijgezet: die staat op
+       "POST /api/pay/saldo" en hier werd op het kale pad gekeken. Een pad kan
+       meer dan een methode dragen, dus METHODE + PAD is de juiste sleutel --
+       en de kale vorm blijft leesbaar zolang er oude regels staan. */
+    if (besluit.routes[rij.methode + ' ' + rij.pad] || besluit.routes[rij.pad]) continue;
     assert.equal(rij.herstelKlasse, 'UNKNOWN',
       rij.pad + ' staat niet in HERSTELBESLUIT.json maar draagt toch klasse "' +
       rij.herstelKlasse + '". Een verklaring die uit de meting is afgeleid, is geen verklaring.');
@@ -375,4 +380,95 @@ test('zonder padproef verandert er niets aan de uitslag', () => {
   const c = bouw(wereld({ padproef: null }));
   assert.deepEqual(a.assen.idempotentie.telling, b.assen.idempotentie.telling);
   assert.deepEqual(a.assen.idempotentie.telling, c.assen.idempotentie.telling);
+});
+
+/* ---------- het correctiemodel: verklaard is niet bewezen ----------
+
+   Besluit van de eigenaar, 12 september 2026 (HERSTELBESLUIT.json `beleid`):
+   RTG gebruikt append-only economische geschiedenis en corrigeert primair met
+   COMPENSATIES. Geen generieke undo; iedere geldroute verklaart expliciet of hij
+   REVERSIBLE, COMPENSATABLE, FINAL of NOT_APPLICABLE is, en UNKNOWN blijft
+   zichtbaar en ratelt alleen omlaag.
+
+   De scherpste kant daarvan is machinaal te handhaven en staat hieronder: een
+   VERKLAARDE stand is geen BEWEZEN terugweg. Zonder dat onderscheid wordt deze
+   as groen door een woord te typen. */
+
+const wereldH = (routes) => ({
+  kaart: { as1Kaart: { geldroutes: [
+    { methode: 'POST', pad: '/api/h', collecties: ['paySaldi'], idempotentie: 'beschermd' }
+  ] } },
+  contract: { rijen: [
+    { route: 'POST /api/h', semantiek: { klasse: 'idempotent' },
+      toegang: { waargenomen: 'AUTHENTICATED' }, stand: 'PROTECTED' }
+  ] },
+  herstelproef: { per: [] }, herstelbesluit: { routes: routes || {} }
+});
+
+test('een verklaarde COMPENSATABLE zonder uitgevoerd bewijs is BLOCKED, niet PROVEN', () => {
+  const { bouw } = require('../scripts/gelddekking.js');
+  const r = bouw(wereldH({ 'POST /api/h': { stand: 'COMPENSATABLE', bewijs: { stand: 'BLOCKED' } } }));
+  assert.equal(r.assen.correctiemodel.telling.BLOCKED, 1);
+  assert.equal(r.assen.correctiemodel.telling.PROVEN, 0,
+    'een verklaring is geen uitgevoerde terugweg');
+});
+
+test('een verklaarde stand MET bewijs telt wel als PROVEN', () => {
+  const { bouw } = require('../scripts/gelddekking.js');
+  const r = bouw(wereldH({ 'POST /api/h': { stand: 'COMPENSATABLE', bewijs: { stand: 'uitgevoerd' } } }));
+  assert.equal(r.assen.correctiemodel.telling.PROVEN, 1);
+});
+
+/* FINAL is een BESLUIT en geen tekort: daar valt niets uit te voeren, dus ook
+   niets te bewijzen. Hem als UNKNOWN of BLOCKED tellen zou een beantwoorde
+   vraag als een gat laten lezen -- dezelfde fout die de idempotentie-as met
+   INTENTIONALLY_NON_IDEMPOTENT al een keer heeft gemaakt. */
+test('FINAL telt als beantwoord en niet als gat', () => {
+  const { bouw } = require('../scripts/gelddekking.js');
+  const r = bouw(wereldH({ 'POST /api/h': { stand: 'FINAL', reden: 'juridisch definitief' } }));
+  assert.equal(r.assen.correctiemodel.telling.NOT_APPLICABLE, 1);
+  assert.equal(r.assen.correctiemodel.telling.UNKNOWN, 0);
+});
+
+test('een route zonder verklaring blijft UNKNOWN', () => {
+  const { bouw } = require('../scripts/gelddekking.js');
+  const r = bouw(wereldH({}));
+  assert.equal(r.assen.correctiemodel.telling.UNKNOWN, 1);
+});
+
+/* HET BESLUIT ZELF STAAT IN HET REGISTER, en niet alleen in een document. Een
+   beleid dat nergens naast de getallen staat, is over een half jaar een
+   herinnering. */
+test('HERSTELBESLUIT.json draagt het besluit van de eigenaar', () => {
+  const b = lees('HERSTELBESLUIT.json');
+  assert.equal(b.beleid.standaardVoorGeld, 'COMPENSATABLE');
+  assert.match(b.beleid.regel, /append-only/i);
+  assert.match(b.beleid.regel, /geen generieke undo/i);
+  for (const k of ['REVERSIBLE', 'COMPENSATABLE', 'FINAL', 'NOT_APPLICABLE', 'UNKNOWN'])
+    assert.ok(b.klassen[k], k + ' hoort een grond te dragen');
+});
+
+/* EEN BLOCKED BEWIJS ZONDER `watErMoetKomen` IS EEN GAT DAT ALS BESLUIT LEEST.
+   Dezelfde discipline als bij de mutatiecontracten. */
+test('elk geblokkeerd correctiebewijs zegt wat er moet komen', () => {
+  const b = lees('HERSTELBESLUIT.json');
+  for (const [route, r] of Object.entries(b.routes || {})) {
+    if (!r.bewijs || r.bewijs.stand !== 'BLOCKED') continue;
+    assert.ok(r.bewijs.watErMoetKomen && r.bewijs.watErMoetKomen.length > 40,
+      route + ': BLOCKED zonder watErMoetKomen');
+  }
+});
+
+/* EN ELKE VERKLARING DRAAGT HAAR HERKOMST. `herkomst: mens` is wat dit register
+   onderscheidt van een meting; zonder dat veld kan een gegenereerde stand hier
+   ongemerkt als beleid gaan lezen. */
+test('elke verklaarde route draagt herkomst en een aftekening', () => {
+  const b = lees('HERSTELBESLUIT.json');
+  const routes = Object.entries(b.routes || {});
+  assert.ok(routes.length >= 1, 'na het besluit hoort er minstens een verklaring te staan');
+  for (const [route, r] of routes) {
+    assert.equal(r.herkomst, 'mens', route + ': een verklaring komt van een mens');
+    assert.ok(r.afgetekend, route + ': zonder aftekening is niet te zien wie dit zegt');
+    assert.ok(r.reden && r.reden.length > 40, route + ': een stand zonder grond is een woord');
+  }
 });

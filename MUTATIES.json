@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-12T17:51:31.137Z",
-    "commit": "64d170b8",
+    "op": "2026-09-12T18:33:00.684Z",
+    "commit": "5996ece9a",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -4783,6 +4783,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "menscontext.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/menscontext.js",
+      "operator": "!==->===#0",
+      "gezakt": 9,
+      "geprobeerd": 2
+    },
     "mensdeur-route.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4805,12 +4813,36 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "menselijkeuitvoering.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/menselijkeuitvoering.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "menselijkverkeer.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "mensmutatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/mensmutatie.js",
+      "operator": "!==->===#1",
+      "gezakt": 6,
+      "geprobeerd": 10
+    },
+    "menstaal.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/menstaalproef.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 19
     },
     "merge3.property.test.js": {
       "soort": "puur",
@@ -6122,6 +6154,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "railvergelijk.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/railvergelijk.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
     },
     "rampbeeld.test.js": {
       "soort": "server",
@@ -7856,6 +7896,30 @@
       "operator": "liegpoort /api/",
       "gezakt": 9,
       "scherp": "gezakt"
+    },
+    "stuurplafond.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/plafond.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "stuurrail.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/rail.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "stuurspoor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/spoor.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
     },
     "supplier-comm-mob-payroll.test.js": {
       "soort": "server",

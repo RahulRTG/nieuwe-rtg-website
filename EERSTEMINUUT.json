@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-12T13:11:20.387Z",
-    "commit": "2b834167",
+    "op": "2026-09-12T18:38:26.809Z",
+    "commit": "8edfcbca7",
     "boomVuil": false,
-    "boomAnders": 5,
+    "boomAnders": 4,
     "instrument": "scripts/eersteminuut.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Wat een mens die RTG niet kent in zijn eerste minuut krijgt. Een verse registratie langs de echte route, een echte browser op 390x844, Nederlands. Gemeten wordt de weg van registratie tot het eerste scherm waar iets te doen is, en wat daar staat.",
   "hoe": "node scripts/eersteminuut.js  (--controle zakt zodra een toets ZAKT)",
@@ -36,27 +36,27 @@
   },
   "wachten": {
     "alleGehaald": true,
-    "langste": 278,
+    "langste": 459,
     "afgelopen": [],
     "rijen": [
       {
         "naam": "app-staat-er",
-        "ms": 262,
+        "ms": 459,
         "gehaald": true
       },
       {
         "naam": "overeenkomst-weg",
-        "ms": 278,
+        "ms": 102,
         "gehaald": true
       },
       {
         "naam": "schil-of-poort",
-        "ms": 80,
+        "ms": 73,
         "gehaald": true
       },
       {
         "naam": "menu-open",
-        "ms": 54,
+        "ms": 45,
         "gehaald": true
       }
     ]
@@ -118,7 +118,7 @@
       "◎",
       "MENU",
       "HOME",
-      "Goedemiddag.",
+      "Goedenavond.",
       "Typ of zeg wat er geregeld moet worden",
       "LivingOS",
       "WorkOS",

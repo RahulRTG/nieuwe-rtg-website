@@ -195,9 +195,29 @@ test('13. een voorstel is `klaarzetten` en geen `tonen`', () => {
      het beleidsniveau `tonen` en is het de 428 die de waarheid draagt. */
   const voorstel = bereikteTrede({ perFase: {}, merken: [
     { fase: 'CAPABILITY_SELECTED', stand: 'PASS', detail: { pad: '/api/agenda/mijn' } },
-    { fase: 'EXECUTED', stand: 'NOT_RUN', detail: { status: 428 } }] });
+    { fase: 'EXECUTED', stand: 'NOT_RUN', detail: { status: 428, voorstel: true } }] });
   assert.equal(voorstel.trede, 'klaarzetten',
     'een 428-voorstel telt niet als kijken, ook niet op een leespad');
+  /* DE OUDE VORM TELT OOK. Het merk zet `voorstel: true` pas sinds 12 september
+     2026; sporen van daarvoor dragen alleen de status. Die mogen niet ineens
+     als weigering lezen, want dan verschuift de betekenis van elk bewaard
+     register met terugwerkende kracht.
+     MUTATIE: laat bereikteTrede alleen op `detail.voorstel` kijken. */
+  assert.equal(bereikteTrede({ perFase: {}, merken: [
+    { fase: 'CAPABILITY_SELECTED', stand: 'PASS', detail: { pad: '/api/agenda/mijn' } },
+    { fase: 'EXECUTED', stand: 'NOT_RUN', detail: { status: 428 } }] }).trede, 'klaarzetten',
+    'een spoor van voor het vlaggetje leest nu als een weigering');
+
+  /* EN EEN WEIGERING IS GEEN VOORSTEL. Allebei NOT_RUN, en alleen de eerste
+     zet iets klaar; de tweede mag de trede niet verhogen.
+     MUTATIE: laat een weigering ook `klaarzetten` opleveren. */
+  const geweigerd = bereikteTrede({ perFase: {}, merken: [
+    { fase: 'CAPABILITY_SELECTED', stand: 'PASS', detail: { pad: '/api/agenda/mijn' } },
+    { fase: 'EXECUTED', stand: 'NOT_RUN', detail: { status: 403, geweigerd: true } }] });
+  assert.equal(geweigerd.trede, 'tonen',
+    'een geweigerde aanroep zette niets klaar; hij hoort de trede niet te verhogen');
+  assert.ok(geweigerd.uit.some((u) => /geweigerd/.test(u)),
+    'het spoor zegt niet dat de aanroep is geweigerd: ' + geweigerd.uit.join('; '));
 
   /* En op een schrijfpad komt hij er hoe dan ook: dan dragen het niveau en de
      428 hetzelfde antwoord. */

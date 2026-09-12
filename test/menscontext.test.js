@@ -368,6 +368,7 @@ test('12. het contract en het corpus zeggen hetzelfde over deze gevallen', () =>
      MUTATIE: zet amb-die-andere-1 terug op FASE4 zonder de corpusregel weg te
      halen, of haal `contextGeval` weg. */
   const corpus = require('../server/kern/stuur/menstaal.json');
+  const RAIL = require('../server/kern/stuur/rail-corpus').maakCorpusRail({});
   const metContext = corpus.gevallen.filter((g) => g.contextGeval);
   assert.ok(metContext.length >= 2, 'er is geen enkel geval met een machineleesbare context');
   for (const g of metContext) {
@@ -376,12 +377,14 @@ test('12. het contract en het corpus zeggen hetzelfde over deze gevallen', () =>
     const r = menscontext.saneer(g.contextGeval);
     assert.equal(r.stand, 'PASS', g.id + ' heeft een context die niets oplevert');
     const sleutel = normaliseer(g.input + '\n\nActieve context: ' + menscontext.handtekening(r));
-    /* Het HELE corpus: een contextgeval mag in elk van de contextbestanden
-       staan, en de rail voegt ze toch samen. */
-    const alleZinnen = Object.assign({}, require('../server/kern/stuur/rail-corpus-context'),
-      require('../server/kern/stuur/rail-corpus-samenhang'),
-      require('../server/kern/stuur/rail-corpus-goudenplak'));
-    assert.ok(Object.prototype.hasOwnProperty.call(alleZinnen, sleutel),
+    /* HET HELE CORPUS, EN UIT DE RAIL ZELF. Hier stonden de contextbestanden met
+       de hand opgesomd, en die lijst dreef af zodra er een bestand bij kwam:
+       rail-corpus-geld.js ontbrak, en de toets meldde dat een geval geen
+       corpusregel had terwijl de rail hem prima kende. Een tweede lijst naast
+       de samenvoeging in rail-corpus.js is precies de dubbeling die dit huis
+       elders telt -- dus wordt hij nu aan de RAIL gevraagd.
+       MUTATIE: voeg een contextgeval toe zonder corpusregel. */
+    assert.ok(RAIL.kentZin(sleutel),
     g.id + ' heeft geen corpusregel; de rail zou NIET_HERKEND geven op:\n    ' + sleutel);
   }
 });

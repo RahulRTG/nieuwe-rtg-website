@@ -33,7 +33,7 @@
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
-    "keuringOmvang": 321,
+    "keuringOmvang": 322,
     "keuringScheef": 16,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
@@ -78,9 +78,20 @@
     "goudenPlakGebreken": 0,
     "samenhangGebreken": 0,
     "referentGebreken": 0,
+    "geldGebreken": 0,
     "mensmutatieZonderWacht": 1
   },
   "notities": [
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 321,
+      "vervalt": "2026-12-15",
+      "meter": "keuringOmvang 321 -> 322",
+      "reden": "server/kern/stuur/lusstap.js groeide deze sessie van 8340 naar 9927 bytes en komt daarmee in de waarschuwingsband onder 10 kB; de harde grens haalt hij niet. De groei is commentaar en geen code: drie fase-merken kregen hun reden erbij, waarvan de laatste een gebrek documenteert dat er sinds de bouw in zat (EXECUTED zette elke niet-428 uitkomst op PASS, dus ook een geweigerde 403). Het langste stuk daarvan is naar MENS.md par. 3f verhuisd; wat er staat is de regel zelf.",
+      "waarheen": "de naad die dit aflost is echt en niet cosmetisch: lusstap.js voert DRIE gereedschappen uit, en `plan` en `kaart` WEGEN terwijl `doe` HANDELT -- met de twijfelpoort, de herkomstpoort en de enige plek waar stuurRoep wordt aangeroepen. Die twee uit elkaar halen is de juiste knip. Bewust niet in deze wijziging: elke splitsing in dit bestand heeft in deze sessie een lexicale wacht blind gemaakt (keuringsregel 34, rahul-eerlijk, schaduwtelling, stuurrail toets 10), en die les kost meer dan de 527 bytes waard zijn. Doe hem als eigen wijziging, met de vier wachten erbij."
+    },
     {
       "datum": "2026-09-12",
       "soort": "schuld",
@@ -2195,6 +2206,7 @@
     "goudenPlakGebreken": "2026-09-12",
     "samenhangGebreken": "2026-09-12",
     "referentGebreken": "2026-09-12",
+    "geldGebreken": "2026-09-12",
     "mensmutatieZonderWacht": "2026-09-12"
   },
   "uitzonderingen": [

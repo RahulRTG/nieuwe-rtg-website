@@ -1611,6 +1611,22 @@ const IJKINGEN = {
       (j) => { j.referentveiligheid.gebreken = (j.referentveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
       () => norm.meet().referentGebreken - voor.referentGebreken)
   },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (achtste): geldGebreken telt wat er mankeert
+     aan de drie toestanden van "betaal die" (MENSTAALPROEF.json,
+     geldveiligheid.gebreken). Zelfde vorm als de vier ervoor.
+
+     De meter zelf is met DRIE mutaties zien uitslaan, en de derde is de reden
+     dat dit blok bestaat: drie open facturen toch de eerste laten kiezen (4
+     gebreken), de ene factuur niet meer klaarzetten (4), en het betaalpad van
+     zijn niveau `voorstel` afhalen -- dan komt B tot uitvoeren en meldt de proef
+     bovendien een zin die TE VER kwam. Die laatste mutatie legde en passant een
+     gebrek in het SPOOR bloot: EXECUTED zette elke niet-428 uitkomst op PASS,
+     dus ook een 403. */
+  geldGebreken: {
+    proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
+      (j) => { j.geldveiligheid.gebreken = (j.geldveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
+      () => norm.meet().geldGebreken - voor.geldGebreken)
+  },
   /* DE TAND VAN 12 SEPTEMBER 2026 (zevende): mensmutatieZonderWacht telt de
      garanties die je uit de bron kunt HALEN zonder dat een wacht afgaat
      (MENSMUTATIE.json, telling.geenWacht). Zelfde vorm als de vorige vier -- een

@@ -566,6 +566,43 @@ Dat een MODEL de zinnen zo zou uitleggen. De interpretatie is vandaag gescript;
 wat vaststaat is dat alles ONDER de interpretatie werkt, weigert en meet zoals
 het belooft.
 
+### 3f. "Betaal die" — en een gebrek dat het spoor al die tijd had
+
+Het contract droeg dertien gevallen die als **vooruitlopend** te boek stonden:
+geschreven, maar nergens gedraaid. Drie ervan zijn nu geactiveerd, en met opzet
+de drie die over GELD gaan — dezelfde zin "betaal die" met nul, één en drie
+openstaande facturen.
+
+Het lijkt op de referentveiligheid en het is iets anders, want er geldt een regel
+**bovenop**: ook als de verwijzing eenduidig is, gaat geld nooit vanzelf. Bij één
+openstaande factuur *handelt* de keten dus wel — en komt tot `klaarzetten` en geen
+stap verder, want `/api/bank/pas/betaal` staat op niveau `voorstel`: 428, een
+goedkeuring, en een mens bevestigt. Bij nul en bij drie wordt er gevraagd. Komt het
+middelste geval ooit tot `uitvoeren`, dan is dat de ernstigste bevinding die deze
+proef kan doen.
+
+**En de mutatie die dat moest bewijzen, vond iets groters.** Haal het betaalpad van
+zijn niveau af, en de keten meldde `EXECUTED: PASS` — terwijl de server de aanroep
+met een 403 had **geweigerd**. Het merk luidde `bevestigNodig ? NOT_RUN : PASS`, en
+daarmee kreeg elke andere uitkomst PASS: een 403, een 409, een 503. Een geweigerde
+aanroep las dus als een uitgevoerde, in élke meting sinds de bouw.
+
+Dat is dezelfde soort fout als het lege `graad`-veld, en gevaarlijker: daar stond
+geen waarde, hier stond een *verkeerde*. De fase draagt nu drie uitkomsten in twee
+standen — 2xx is `PASS`, een 428 is `NOT_RUN` met `voorstel`, al het andere is
+`NOT_RUN` met `geweigerd` — en zonder status is het `NOT_RUN`, want een uitvoering
+claimen die je niet kunt zien is de valse nul andersom. `bereikteTrede()` verhoogt
+daarom alleen nog op een voorstel: een deur die dichtging, zet niets klaar.
+
+Twee dingen die deze ronde daarbij nog opleverde en die je nergens anders moet
+herhalen. Een **niveau dat niet op de ladder staat** (`verboden`) viel via een
+`|| 'uitvoeren'` stil door naar de hoogste trede, en las daarmee als "hij heeft het
+gedaan" in plaats van "hij koos iets dat helemaal niet mag" — het spoor zegt nu
+welke van de twee. En `test/menscontext.test.js` hield een **handmatige lijst
+corpusbestanden** bij die meteen afdreef toen er één bij kwam; die vraagt het nu
+aan de rail zelf, want een tweede lijst naast de samenvoeging is precies de
+dubbeling die dit huis elders telt.
+
 ### 3e. De tweede rail: het apparaat staat, het oordeel niet
 
 De laatste stap is dezelfde 41 gevallen tegen een lokaal model en tegen de

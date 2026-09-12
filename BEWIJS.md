@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1825 bestanden en 12904 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1825 bestanden en 12905 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,12 +13,12 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1825 |
-| losse beweringen (`test(...)`) | 12904 |
+| losse beweringen (`test(...)`) | 12905 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1202 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1203 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 66 |
-| alleen in de kop *genoemd*, nog niet gemeten | 155 |
+| alleen in de kop *genoemd*, nog niet gemeten | 154 |
 | niets van beide | 402 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1609 bestanden, 12522 beweringen.
+1609 bestanden, 12523 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -461,7 +461,7 @@ toets omvalt.
 | `geldeenheid.test.js` | 10 | -- | DE EENHEID VAN GELD -- en de naam die drie dingen betekende. DEZE TOETS KOMT UIT EEN METING. |
 | `geldgraaf.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Geldgraaf, fase 1 van GELD.md: de cockpit staat voor een vers lid, de patroonherkenning vindt terugkerende posten en meldt een prijsstijging als 'post-duurder', een minimumbuffer-regel geeft een uitzondering met... |
 | `geldgrens.test.js` | 8 | gezakt op `liegpoort /api/` | DE EIGEN GELDGRENS -- een regel die het lid over zichzelf stelt en die echt weigert. WAAROM DEZE TOETS ER IS kern/geldbeleid/regels.js kent vier regelsoorten en ze WAARSCHUWEN allemaal. |
-| `geldkaart.test.js` | 6 | genoemd | DE ZELFIJKING VAN DE GELDKAART. Deze meter beweert iets dat een mens niet kan nakijken: dat elke waardemutatie op de vier kernbakken door haar eigen poort ging. |
+| `geldkaart.test.js` | 7 | gezakt op `===->!==#0` | DE ZELFIJKING VAN DE GELDKAART. Deze meter beweert iets dat een mens niet kan nakijken: dat elke waardemutatie op de vier kernbakken door haar eigen poort ging. |
 | `geldregie.test.js` | 5 | gezakt op `liegpoort /api/` | De geld-regie van de boardroom: RTG bepaalt de pasprijzen (publiek zichtbaar, de voorwaarden volgen live), de interne partnervergoeding per genre of per zaak, en het RTG-ledenvoordeel per genre (RTG legt bij; de zaak... |
 | `geldroutes.test.js` | 5 | gezakt op `!==->===#0` | GEEN SLEUTEL IS GEEN VERZOEK -- op de handelingen die geld verplaatsen. Overal elders in dit huis is een idem-sleutel een vangnet: is hij er niet, dan gebeurt het werk gewoon. |
 | `geldveilig.test.js` | 5 | gezakt op `true->false#0` | Veiligheidsgrenzen rond echt geld. Deze toetsen sturen niets naar buiten: Stripe wijst naar een dichte lokale poort en de DirectPay-provider is nep. |

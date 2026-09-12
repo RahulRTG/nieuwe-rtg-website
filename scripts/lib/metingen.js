@@ -194,6 +194,10 @@ const REGISTER = {
   'HERSTEL.json': { eigenRatel: 'test/herstel.test.js' },
   'HERSTELPROEF.json': { eigenRatel: 'test/herstelproef.test.js' },
   'DROOGLOOP.json': { eigenRatel: 'test/droogloop.test.js' },
+  /* De scherpe bewering van de geldkaart is geen getal dat mag dalen maar een NUL
+     die nul moet blijven: geen kernbak buiten zijn eigen poort. Die ratel woont
+     daarom in de toets en niet in NORM.json. */
+  'GELDKAART.json': { eigenRatel: 'test/geldkaart.test.js' },
 
   'TIKKEN.json': { eigenRatel: 'test/sprongindex.test.js' },
   'VINDBAAR.json': { eigenRatel: 'test/sprongindex.test.js' },

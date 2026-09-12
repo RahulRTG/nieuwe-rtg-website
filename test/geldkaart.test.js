@@ -98,3 +98,46 @@ test('de kernbakken van de geldkaart dekken beide grootboeken', () => {
       'versie van deze meter kende alleen dat van RTG Pay -- waardoor 984 bankschrijfacties ' +
       'ten onrechte buiten-kern heetten.');
 });
+
+/* ================== DE RATEL OP GELDKAART.json ==================
+   Hierboven staat of de WACHT deugt. Dit gaat over de UITSLAG: wat er in het
+   register staat mag niet stilletjes slechter worden.
+
+   Waarom dit hier hangt en niet in scripts/norm.js: de norm ratelt getallen die
+   een meter oplevert, maar de scherpe bewering van deze kaart is geen getal dat
+   mag stijgen of dalen -- hij is een NUL die nul moet blijven. scripts/lib/
+   metingen.js wijst daarom dit bestand aan als de eigen ratel van GELDKAART.json. */
+test('GELDKAART.json: geen kernbak wordt buiten zijn eigen poort geschreven', () => {
+  const pad = path.join(WORTEL, 'GELDKAART.json');
+  assert.ok(fs.existsSync(pad), 'GELDKAART.json ontbreekt -- draai npm run geldkaart');
+  const r = JSON.parse(fs.readFileSync(pad, 'utf8'));
+  const as2 = r.as2Poort || {};
+
+  /* EERST DE NOEMER, en dat is geen formaliteit. Een register waarin de
+     poortproef niet gedraaid heeft, meldt overal nul -- en die nul zou deze
+     toets groen houden terwijl er niets gemeten is. Een nul zonder noemer is
+     een geruststelling zonder grond, en precies de faalvorm die deze hele
+     meter moet uitsluiten. */
+  assert.ok(as2.gedraaid, 'de poortproef heeft niet gedraaid; de nullen hieronder betekenen niets');
+  assert.ok(as2.schrijfacties > 500,
+    'er zijn maar ' + as2.schrijfacties + ' schrijfacties waargenomen. Zakt dat sterk, ' +
+    'dan meet de kaart minder dan hij deed en zeggen zijn nullen minder -- kijk of ' +
+    'de aandrijvende toetsen in scripts/geldkaart.js nog bestaan.');
+  assert.equal(as2.toetsen && as2.toetsen.gezakt, 0,
+    'de poortproef draaide op een huis met gezakte toetsen; die uitslag telt niet');
+
+  for (const [bak, hoort] of Object.entries({ paySaldi: 'pay', payBoekingen: 'pay',
+    bankSaldi: 'bank', bankBoekingen: 'bank' })) {
+    const c = (as2.perCollectie || {})[bak];
+    assert.ok(c, bak + ' is niet waargenomen; dan bewijst deze kaart niets over ' + hoort);
+    assert.equal(c.buitenKern, 0,
+      bak + ' werd ' + c.buitenKern + 'x buiten de ' + hoort + '-poort geschreven. ' +
+      'Dat is de bevinding waarvoor deze meter bestaat: zie GELDKAART.json -> ' +
+      'as2Poort.kernBuitenPoort voor bestand en regelnummer.');
+  }
+
+  assert.deepEqual(as2.verkeerdePoort || [], [],
+    'een kernbak is via de VERKEERDE poort geschreven. Beheerst is dan niet genoeg: ' +
+    'de betaalpoort en de bankpoort toetsen niet hetzelfde beleid (kern/bank/grootboek.js ' +
+    'raadpleegt kern/waarde nul keer), dus zo raakt een oormerk stil zijn werking kwijt.');
+});

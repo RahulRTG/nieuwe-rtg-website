@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-11T21:03:33.053Z",
-    "commit": "9e6d605f4",
+    "op": "2026-09-12T13:31:30.175Z",
+    "commit": "aaa5b407",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2776,6 +2776,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "geldkaart.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/geldwacht.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "geldregie.test.js": {
       "soort": "server",

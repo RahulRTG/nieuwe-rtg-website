@@ -1927,6 +1927,9 @@ const settleFactuur = maakSettlement({ db, save, accounts, fonds, log, dpRegistr
    de kernlaag; vandaar dezelfde late binding als payOplaadAfronden. */
 const { factuurSaldo } = require('./kern/factuursaldo').maakFactuurSaldo({
   db, accounts, settleFactuur, broadcastSync,
+  /* De bundel erbij: de afschrijving en de afwikkeling horen als EEN duurzame
+     commit op schijf te landen. Zie de kop van kern/factuursaldo.js. */
+  bijeen,
   payVan: () => kern.pay });
 
 /* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig

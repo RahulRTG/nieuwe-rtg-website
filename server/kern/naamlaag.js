@@ -78,5 +78,10 @@ module.exports = ({ db, save, schoon }) => {
     return c || null;
   }
 
-  return { zetNaam, naamVoor, kaartVoor, verrijk, aliasNaar, resolveer };
+  /* ZIE DE KOP VAN kern/stuur/resolver.js: er zijn twee `resolveer` in dit
+     huis en ze doen iets totaal anders. Deze lost tekst op naar een CODENAAM,
+     die andere een vraag naar een werkveld van paden. Nieuwe code hoort de
+     sprekende naam te gebruiken; `resolveer` blijft voor wie hem al zo noemt.
+     Een alias, geen tweede implementatie. */
+  return { zetNaam, naamVoor, kaartVoor, verrijk, aliasNaar, resolveer, resolveerCodenaam: resolveer };
 };

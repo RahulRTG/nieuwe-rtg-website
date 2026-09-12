@@ -50,7 +50,16 @@ const BUITEN = {
   'NORM.json': 'de normtanden zelf -- hij IS de ratel en wordt door de ratels geschreven, niet door een meetronde',
   'SUITEDUUR.json': 'een tijdmeting die bij elke testronde meeschrijft; SUITE.json draagt de stand die telt',
   'KRIMP.json': 'een historielijst die aangroeit; er is geen "huidige meting" om te verouderen',
-  'MUTATIESEMANTIEK.json': 'hoort bij MUTATIES.json en wordt in dezelfde ronde geschreven',
+  /* HIER STOND DAT HIJ MEELIFT OP MUTATIES.json, EN DAT WAS NIET WAAR. Die twee
+     worden door twee verschillende scripts in twee verschillende rondes
+     geschreven -- MUTATIES.json door scripts/mutatie.js (die WEL in de
+     versheidslijst staat), dit register door scripts/mutatiesemantiek.js. Op
+     12 september liepen ze daardoor een dag uit elkaar: MUTATIES.json was vers
+     en dit register droeg nog de telling van de vorige idempotentieronde, wat
+     pas in CI opviel. Een vrijstelling is zo goed als haar reden, en deze
+     beloofde een koppeling die er niet is. De echte wacht is zijn eigen
+     afdruktoets, net als bij de twee hieronder. */
+  'MUTATIESEMANTIEK.json': 'een afdruk uit de code, met een eigen toets (test/mutatiesemantiek.test.js, toets 9) -- hij lift NIET mee op de ronde van MUTATIES.json, zie de opmerking hierboven',
   'BEGROTING.json': 'een begroting is een voornemen en geen meting',
   'A11Y-INGELOGD.json': 'wordt door een schermtoets geschreven, niet door een meetronde',
   'CONTROLS.json': 'een beleidsafdruk; de meting eronder staat in andere registers',
@@ -129,7 +138,15 @@ const BUITEN = {
   'EXECUTION_MAP.json': 'een PROJECTIE uit de bronnen; test/executionmap.test.js eist byte-gelijkheid met de hercompilatie',
   'GEZAGSHANDELINGEN.json': 'een afdruk uit de code, met een eigen toets (test/gezagshandelingen.test.js)',
   'HANDELINGSKLASSE.json': 'een afdruk uit de code, met een eigen toets (test/handelingsklasse.test.js)',
-  'WACHTWIJZE.json': 'een afdruk uit de code, met een eigen toets (test/wachtwijze.test.js)'
+  'WACHTWIJZE.json': 'een afdruk uit de code, met een eigen toets (test/wachtwijze.test.js)',
+  /* DEZELFDE GROND ALS EXECUTION_MAP HIERBOVEN, en met opzet niet "hij is nieuw".
+     MENSELIJKE_UITVOERING.json draagt geen stempel maar vingerafdrukken van zijn
+     bronnen; ouderdom is er niet aan af te lezen en hoeft dat ook niet, want
+     test/menselijkeuitvoering.test.js hercompileert hem byte voor byte EN gooit
+     hem in toets 7 werkelijk weg om hem opnieuw te laten maken. Loopt hij achter
+     op een bron, dan zakt die toets meteen -- een versheidsmelding zou daar
+     alleen later hetzelfde zeggen. */
+  'MENSELIJKE_UITVOERING.json': 'een PROJECTIE uit vier registers; test/menselijkeuitvoering.test.js eist byte-gelijkheid met de hercompilatie en maakt hem in toets 7 vanaf nul opnieuw'
 };
 
 function schrijvers() {

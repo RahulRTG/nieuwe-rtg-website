@@ -56,13 +56,50 @@ module.exports = ({ save, saveDuurzaam }) => {
 
      Dus vraagt de binnenste laag eerst of er al een bundel loopt; zo ja, dan doet
      hij zijn mutatie gewoon mee in die bundel. Zie server/lib/duurzaam.js. */
-  function inBundel() {
+  /* `eis.duurzaam` VRAAGT ERNAAR, en dat is geen verfijning maar een grendel.
+
+     Meedoen in een bundel die er al is, is goed -- zolang die bundel dezelfde
+     belofte doet. Een NIET-duurzame buitenbundel zou een geldcommit stilletjes
+     degraderen van "bevestigd als de opslag het heeft" naar write-behind, en
+     dat is precies de belofte die GELDLAT.md weerlegde. Zo'n bundel bestaat
+     ook echt: db/economische-boeking.js opent er een zonder de vlag.
+
+     Wie duurzaamheid nodig heeft, vraagt er dus naar en krijgt `false` als de
+     openstaande bundel hem niet biedt -- dan opent hij zijn eigen duurzame
+     bundel, precies zoals voorheen. Zonder `eis` is dit exact de oude vraag. */
+  function inBundel(eis) {
     const doos = bijeenContext.getStore();
-    return !!(doos && doos.open);
+    if (!(doos && doos.open)) return false;
+    if (eis && eis.duurzaam) return !!doos.duurzaam;
+    return true;
   }
 
   async function bijeen(fn, opties) {
     const duurzaam = !!(opties && opties.duurzaam);
+    /* STAAT ER AL EEN BUNDEL OPEN DIE DEZELFDE BELOFTE DOET? DAN MEEDOEN.
+
+       Hier opende elke aanroep een NIEUWE doos, ook binnen een openstaande
+       bundel -- en dan committeert de binnenste eerst. Precies tussen die twee
+       commits stond op schijf een halve toestand, en dat is geen theorie: `npm
+       run factuurproef` mat het op een echt geldpad. pay.huisIn legde boeking
+       en idem-sleutel duurzaam vast, het proces stierf, en de afwikkeling
+       eronder (factuur sluiten, afdracht boeken) had nooit gedraaid. Het lid
+       was afgeschreven en zijn factuur stond nog open. Zie GELDLAT.md par.
+       "Scenario 3, gemeten op een echt geldpad".
+
+       DE VRAAG HOORT HIER EN NIET BIJ DE AANROEPERS. server/lib/duurzaam.js en
+       kern/fonds.js stelden hem al elk apart, en dat werkt precies zolang
+       niemand hem vergeet -- server/lib/idem.js vergat hem, en dat kostte de
+       geldketen zijn atomiciteit zonder dat er iets rood werd. Nu is meedoen
+       het gedrag van de bundel zelf; wie hem al stelt, krijgt hetzelfde
+       antwoord en hoeft niets te veranderen.
+
+       DEZELFDE BELOFTE, want anders is meedoen een degradatie. Een
+       niet-duurzame buitenbundel (db/economische-boeking.js opent er zo een)
+       zou een geldcommit stil write-behind maken -- juist de belofte die
+       GELDLAT.md weerlegde. Dan dus NIET meedoen, maar een eigen duurzame doos
+       openen, exact zoals hiervoor. */
+    if (inBundel(duurzaam ? { duurzaam: true } : undefined)) return fn();
     const doos = { open: true, nodig: false, duurzaam };
     try { return await bijeenContext.run(doos, fn); }
     finally {

@@ -152,6 +152,19 @@ const REGISTER = {
      en die is met een mutatie zien zakken; zie BETROUWBAARHEID.md par. 5. */
   'APPWERKT.json': { meter: ['appwerktDefecten'] },
 
+  /* EERSTEMINUUT.json hangt om dezelfde reden aan de NORM-ratel als APPWERKT:
+     een verse meting vraagt een browser en een registratie, en dat hoort niet
+     in `npm test`. Wat eraan hangt is het getal dat ertoe doet --
+     `eersteMinuutGezakt` mag alleen omlaag. */
+  'EERSTEMINUUT.json': { meter: ['eersteMinuutGezakt'] },
+  'PAKTE.json': { meter: ['pakteMisgelopen'] },
+  'MENSTAALPROEF.json': { meter: ['menstaalTeVer', 'goudenPlakGebreken', 'samenhangGebreken', 'referentGebreken', 'geldGebreken', 'bevestigGebreken', 'verwijzingGebreken'] },
+  /* MENSMUTATIE.json hangt om dezelfde reden aan de NORM-ratel: een verse ronde
+     muteert de bron twaalf keer en draait zeven wachten, en dat hoort niet in
+     `npm test`. Wat eraan hangt is het getal dat ertoe doet -- het aantal
+     garanties dat je kunt weghalen zonder dat iemand het merkt. */
+  'MENSMUTATIE.json': { meter: ['mensmutatieZonderWacht'] },
+
   /* DE ZEVEN REGISTERS VAN MAATSTAF.md, en waarom ze hier mogen staan. Elk van
      deze toetsen doet HETZELFDE: hij meet vers en vergelijkt met wat er in het
      register staat, zodat een achterlopend register de bouw laat zakken in
@@ -191,9 +204,36 @@ const REGISTER = {
   'WACHTWIJZE.json': { eigenRatel: 'test/wachtwijze.test.js' },
   'HANDELINGSKLASSE.json': { eigenRatel: 'test/handelingsklasse.test.js' },
   'EXECUTION_MAP.json': { eigenRatel: 'test/executionmap.test.js' },
+  /* MENSELIJKE_UITVOERING.json is net als EXECUTION_MAP.json een PROJECTIE
+     zonder tijdstempel: hij draagt vingerafdrukken van zijn bronnen in plaats
+     van een klok, en test/menselijkeuitvoering.test.js hercompileert hem byte
+     voor byte. Dat is strenger dan een ouderdomscontrole -- een projectie die
+     achterloopt op zijn bron zakt meteen. */
+  'MENSELIJKE_UITVOERING.json': { eigenRatel: 'test/menselijkeuitvoering.test.js' },
   'HERSTEL.json': { eigenRatel: 'test/herstel.test.js' },
   'HERSTELPROEF.json': { eigenRatel: 'test/herstelproef.test.js' },
   'DROOGLOOP.json': { eigenRatel: 'test/droogloop.test.js' },
+  /* De scherpe bewering van de geldkaart is geen getal dat mag dalen maar een NUL
+     die nul moet blijven: geen kernbak buiten zijn eigen poort. Die ratel woont
+     daarom in de toets en niet in NORM.json. */
+  'GELDKAART.json': { eigenRatel: 'test/geldkaart.test.js' },
+  /* GELDDEKKING.json hangt WEL aan NORM.json -- vier tanden, zie de kop daar.
+     Anders dan de geldkaart draagt hij voorraden die mogen dalen in plaats van
+     een nul die nul moet blijven, en dat is precies wat een ratel meet. */
+  'GELDDEKKING.json': { meter: ['geldRoutesPubliek', 'geldRoutesZonderSemantiek',
+    'geldRoutesZonderIdemBewijs', 'geldRoutesZonderTerugweg',
+    'geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak'] },
+  /* FACTUURPROEF.json hangt aan TWEE tanden en niet aan een, en dat is een
+     besluit en geen slordigheid: `geldpadGezakt` is een defect dat naar nul
+     moet, `geldpadOnbewezen` is werk dat nog niet gedaan is. Een tand die die
+     twee optelt, laat een crashbevinding wegvallen tegen een stap die iemand
+     nog moet meten. Zie de kop van NORM's METERS. */
+  'FACTUURPROEF.json': { meter: ['geldpadGezakt', 'geldpadOnbewezen'] },
+  /* HERSTELBESLUIT.json is een VERKLARING en geen meting -- dezelfde vorm als
+     ROLLBACKBESLUIT.json hierboven, dat ook aan een geteld gevolg hangt. Wie
+     hier een regel bijzet of weghaalt, beweegt een van deze twee tellers: een
+     ontbrekende verklaring zit in `onbesloten`, een verkeerde in `tegenspraak`. */
+  'HERSTELBESLUIT.json': { meter: ['geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak'] },
 
   'TIKKEN.json': { eigenRatel: 'test/sprongindex.test.js' },
   'VINDBAAR.json': { eigenRatel: 'test/sprongindex.test.js' },

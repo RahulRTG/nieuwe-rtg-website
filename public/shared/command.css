@@ -311,6 +311,34 @@ body.rtg-stijl main.cmd-werk,.cmd-werk{min-width:0;min-height:0;width:auto;max-w
   color:var(--rtg-soft);font-size:.85rem;padding:2rem}
 .cmd-leeg span{max-width:34ch;text-align:center;line-height:1.6}
 
+/* ------------------------------------------------------- het beginscherm --
+   Het huis opent nooit leeg (WERELD.md). Wat hier staat is het minimum dat die
+   norm haalt: een begroeting, een ingang in gewone taal en de werelden met hun
+   naam. Geen dashboard en geen tegelrooster -- veel lucht, een kolom, en de
+   werelden als tekst zodat ze leesbaar zijn en niet als pictogram raden.
+
+   Bodoni op de begroeting omdat dat een ceremoniele rol is (ONTWERP.md); de
+   ingang en de werelden staan in Inter, want dat is werk. */
+.cmd-leeg{align-content:center}
+.cmd-groet{margin:0 0 .25rem;font-family:var(--rtg-display,'Bodoni Moda',serif);
+  font-size:clamp(1.6rem,6vw,2.2rem);line-height:1.15;color:var(--rtg-txt);text-align:center}
+.cmd-intentie{display:block;width:min(34ch,100%);margin:0 auto 2.25rem;padding:.85rem 1.1rem;
+  border:1px solid var(--rtg-line);border-radius:0;background:transparent;
+  color:var(--rtg-soft);font:400 .95rem var(--rtg-interface,'Inter',sans-serif);
+  text-align:left;cursor:pointer;transition:border-color 140ms ease,color 140ms ease}
+.cmd-intentie:hover,.cmd-intentie:focus-visible{border-color:var(--rtg-txt);color:var(--rtg-txt)}
+.cmd-startwerelden{display:flex;flex-direction:column;gap:0;width:min(34ch,100%);margin:0 auto}
+.cmd-startwereld{display:block;width:100%;padding:.95rem .25rem;border:0;
+  border-top:1px solid var(--rtg-line);background:transparent;color:var(--rtg-txt);
+  font:400 1.05rem var(--rtg-interface,'Inter',sans-serif);text-align:left;cursor:pointer;
+  transition:color 140ms ease,padding-left 140ms ease}
+.cmd-startwereld:last-child{border-bottom:1px solid var(--rtg-line)}
+.cmd-startwereld:hover,.cmd-startwereld:focus-visible{padding-left:.7rem}
+.cmd-leegreden{max-width:34ch;text-align:center;line-height:1.6}
+@media (prefers-reduced-motion:reduce){
+  .cmd-intentie,.cmd-startwereld{transition:none}
+}
+
 /* --------------------------------------------------------------- de console --
    Op een telefoon spant hij de volle breedte en houdt hij afstand tot de
    thuisindicator; op een breed scherm ligt hij als een los paneel linksonder. */

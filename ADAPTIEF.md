@@ -156,6 +156,84 @@ een andere plek AAN; hij bouwt hem niet na. Een tweede implementatie van "vet" i
 een tweede vet — ze zijn een week gelijk, en daarna is de vraag welke van de twee
 de echte is (`LAT.md` regel 4).
 
+## Wie de onderste rand bezit
+
+Dit stond een tijd open, en het is beslist: **Edge bezit het oppervlak, Command
+bezit de functies in dat oppervlak.** Geen twee eigenaren van dezelfde 48 pixels,
+maar één containerlaag en één inhoudslaag met een expliciet contract ertussen.
+
+| | bezit |
+|---|---|
+| **Edge** | positie, hoogte, safe-area, achtergrond en materiaal, de globale schilgrens — en hij levert de brug |
+| **Command** | de functies binnen dat oppervlak: wereldkeuze, contextacties, de commandbank. Nooit een tweede verticale rij. |
+| **De brug** | `data-rtg-command-brug` verbindt een Edge-knop met Command. Hij mag niet verdwijnen. |
+
+Een eerder besluit maakte `.cmd-balk` eigenaar van de hele rand. Dat is
+teruggedraaid: het was te grof, en het is door uitvoerbaar bewijs weerlegd —
+`test/werktafel.e2e.js` dwingt al af dat beide lagen dezelfde onderrand bewonen,
+en de brug staat in de code. Niet het document won dat argument en niet de
+assistent, maar de toets.
+
+Vier invarianten volgen eruit:
+
+1. `edgeBottom == commandBottom` — één zichtbare rand, geen tweede strook.
+2. `commandCreatesSecondRow == false` — Command voegt nooit een eigen rij toe.
+3. `commandBridgePresent == true` — de brug bestaat, en is geen terugval.
+4. `expectedCommandControlsVisuallyUnoccluded == true` — wat er hoort te staan, is
+   ook werkelijk te zien.
+
+De eerste twee worden vandaag afgedwongen. **De derde niet**: de e2e-toets valt
+terug op `.cmd-lade` als de brug er niet is, dus een verdwenen brug laat hem
+groen. **De vierde ook niet**, en dat is de moeilijkste van de vier — zie
+hieronder.
+
+### Een regel die uit dit bezit volgt, en die niemand had opgeschreven
+
+Bezit Edge het materiaal, dan **leest Command zijn inkt van Edge** en kiest hij er
+zelf geen. Edge geeft per wereld een gekoppeld paar uit (`--edge-bar-bg` naast
+`--edge-bar-copy`) juist om die reden.
+
+Dat ging mis. `.cmd-balk` droeg een vaste lichte inktset (`#211e19`, `#70695f`) —
+dat is `--rtg-world-ink`, de inkt van het lichte *contentvlak* van de wereld,
+gebruikt op de *bar*grond van Edge, die in LivingOS bordeaux `#4a0c1e` is. De
+balk koos inkt tegen een grond die Edge niet schildert. Hij leest die tokens nu.
+
+### VISUEEL ONBEWEZEN — een faalvorm die geen van onze meters stelt
+
+De aanleiding was het vermoeden dat Command-functies wél bestaan maar niet te
+zien zijn. Twee meters zeggen daar niets over, en allebei zien ze er groen uit:
+
+- `elementsFromPoint()` **kan de rand niet zien**. `.rtg-edge-bottom` draagt
+  `pointer-events:none`, dus hij komt in de trefstapel niet voor en elke knop
+  meet als `onbedekt` — ook als er iets overheen geschilderd zou zijn.
+- De grond zoeken via de **ouders** komt op wit uit, want de rand is een broer
+  en geen ouder.
+
+Dus: aanwezig, aantikbaar, door een schermlezer benoemd, geometrisch correct — en
+over wat een mens ziet zegt geen van beide iets. Dat is de bugklasse, en hij
+verdient zijn naam: **`VISUEEL_ONBEWEZEN`**.
+
+**Wat er hier eerlijk over vastligt: hij is nog niet gemeten.** Er is een
+verfmeting gebouwd die de onderrand uit een schermafdruk leest, en die is gezakt
+op zijn eigen controleproef: met `background:#00FF00!important` op `.cmd-actie`
+— een vlak van 44x48 — leverde de afdruk van `.cmd-balk` **nul** groene pixels.
+Een meter die een lime blok niet ziet, bewijst niets over een pictogramlijn van
+1,27px, en elk contrastgetal dat eruit kwam is daarom weggegooid in plaats van
+opgeschreven.
+
+Invariant 4 staat dus in dit document als **eis zonder handhaver**, en niet als
+gehaalde toets. Wat een geldige meter moet halen voordat hij iets mag beweren:
+
+1. een controleproef — een opzettelijk vlak van één kleur op de plek die hij
+   meet, en hij moet het zien;
+2. de verf en niet de DOM, want DOM-zichtbaarheid is precies wat hier faalt;
+3. een uitslag `niet vast te stellen` naast `in orde` en `stuk`, want een meter
+   die alleen kan slagen of zakken, liegt bij zijn eigen storing.
+
+Zolang die drie er niet zijn, is de juiste uitslag `onbekend` en niet `in orde`.
+Een groene EERSTE_MINUUT zegt dat de eerste oriëntatie klopt; hij zegt niets over
+of de Command-laag geschilderd wordt. Twee beweringen, twee meters.
+
 ## De schilbalk is het eerste instrument
 
 De balk onderaan de werktafel had drie zones: de bank links, waar je bent in het

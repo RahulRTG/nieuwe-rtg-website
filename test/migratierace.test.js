@@ -205,9 +205,14 @@ test('overal geldt de wachttijd VOOR het aanzetten van WAL, en niet erna', () =>
     const geduld = bron.search(/exec\(\s*['"`]PRAGMA busy_timeout/i);
     if (geduld < 0 || geduld > wal) fout.push(path.relative(WORTEL, p));
   }
-  assert.ok(gezien >= 3,
-    'nul of bijna nul plekken met journal_mode=WAL gevonden -- dan zoekt deze toets de verkeerde ' +
-    'vorm en bewaakt hij niets (gezien: ' + gezien + ')');
+  // De drie openers delen nu dezelfde WAL-instelling. Bewaak hun aansluiting
+  // én de volgorde in de implementatie, in plaats van drie kopieën te eisen.
+  for (const naam of ['accounts/index.js', 'db/sqlite.js', 'db/tx/sqliteachter.js']) {
+    assert.match(fs.readFileSync(path.join(wortel, naam), 'utf8'),
+      /require\(['"][^'"]*lib\/sqlite-gelijktijdigheid['"]\)\(/,
+      naam + ' gebruikt de gedeelde WAL-opstart');
+  }
+  assert.ok(gezien >= 1, 'de gedeelde WAL-omschakeling is niet gevonden');
   assert.deepEqual(fout, [],
     'hier staat de wachttijd NA het aanzetten van WAL, of helemaal niet. Twee processen die ' +
     'tegelijk opstarten botsen dan op "database is locked":\n  ' + fout.join('\n  '));

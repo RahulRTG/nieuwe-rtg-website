@@ -1,0 +1,2796 @@
+{
+ "wat": "per menselijke zin: welke schakels van de uitvoeringsketen werkelijk liepen, hoe ver hij kwam, en welke wacht er aantoonbaar afgaat als een schakel wordt weggehaald",
+ "vorm": "PROJECTIE -- afgeleid uit de registers hieronder, nooit met de hand bijgewerkt. test/menselijkeuitvoering.test.js hercompileert hem en vergelijkt byte voor byte.",
+ "velden": {
+  "scenario": "menstaal.json (id)",
+  "input": "menstaal.json (input)",
+  "contextklasse": "menstaal.json (context)",
+  "interpretatie": "stuurspoor INTENT_RESOLVED-detail via MENSTAALPROEF.json",
+  "ambiguiteit": "menstaal.json (ambigu)",
+  "contextAangebodenGebruikt": "stuurspoor CONTEXT_SANITIZED-stand + INTENT_RESOLVED-detail (twee beweringen, en `gebruikt: null` betekent dat niemand keek)",
+  "planstatus": "stuurspoor PLAN_COMPILED + het eerste bezwaar van de compiler",
+  "gevolgstatus": "stuurspoor CONSEQUENCE_EVALUATED-detail (stappen, collecties, onbekend)",
+  "mandaatstatus": "stuurspoor MANDATE_EVALUATED-detail (de lijst voor en na de grendel)",
+  "capability": "stuurspoor CAPABILITY_SELECTED -- alleen of er EEN gekozen is",
+  "bereikteTrede": "MENSTAALPROEF.json (kwam), afgeleid uit het spoor en niet uit de tekst",
+  "uitvoeringsstatus": "stuurspoor EXECUTED (NOT_RUN bij een 428: een voorstel, geen uitvoering)",
+  "blockingVragen": "geteld in het ANTWOORD -- exact op de deterministische rail, een schatting op een modelrail",
+  "architectuurkeuzes": "GEEN PROBE. Of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden; mutatie 10b van MENSMUTATIE.json laat zien dat er vandaag dus geen wacht op staat.",
+  "mutationEvidence": "MENSMUTATIE.json, gejoind op het veld `bewaakt` van elke mutatie",
+  "unknowns": "per rij samengesteld uit wat de probes NIET leverden"
+ },
+ "bronnen": {
+  "server/kern/stuur/menstaal.json": "4482e2511bed977f",
+  "MENSTAALPROEF.json": "fc4d50e06e7a9783",
+  "MENSMUTATIE.json": "129b55147b0a0b2d",
+  "PAKTE.json": "b6b6c84ac29f7ad7",
+  "scripts/menselijkeuitvoering.js": "b211632b87591468"
+ },
+ "gemetenOp": {
+  "MENSTAALPROEF.json": "787bcd74b",
+  "MENSMUTATIE.json": "5b9730d6",
+  "PAKTE.json": "c933e406"
+ },
+ "eenLeeftijd": false,
+ "telling": {
+  "scenarios": 38,
+  "binnenContract": 37,
+  "buitenContract": 0,
+  "nietGemeten": 1,
+  "contextAangeboden": 13,
+  "contextGebruikt": 2,
+  "contextNiemandKeek": 20,
+  "totUitvoering": 5,
+  "tegenspraken": 0,
+  "leeftijdsverschillen": 0
+ },
+ "tegenspraken": [],
+ "leeftijdsverschillen": [],
+ "schakelsZonderWacht": {
+  "architectuurkeuze": [
+   "mutatie 10b: wereldkeuze verplicht -- in het ANTWOORD"
+  ]
+ },
+ "grens": "DIT REGISTER MEET NIETS ZELF. Het legt registers naast elkaar die hun eigen ronde al hebben gedraaid; klopt een van die rondes niet, dan klopt dit ook niet. `bewijs` verwijst met opzet niet naar een spoor-id (die is verzoekgebonden en weg na de aanroep) maar naar een mutatie die iemand heeft zien zakken. Een schakel die in `schakelsZonderWacht` staat, liep wel maar wordt door niets bewaakt -- dat is een uitspraak over de toetsen en niet over de code. En alles hier is gemeten op de deterministische rail.",
+ "scenarios": [
+  {
+   "scenario": "info-travelos",
+   "input": "wat is travelos",
+   "klasse": "INFORMATION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": "uitleg",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "info-wat-kan-rtg",
+   "input": "wat kan rtg",
+   "klasse": "INFORMATION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": "uitleg",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "info-betalen",
+   "input": "hoe werkt betalen",
+   "klasse": "INFORMATION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": "uitleg",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "info-passen",
+   "input": "wat is het verschil tussen de passen",
+   "klasse": "INFORMATION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": "uitleg",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "info-codenaam",
+   "input": "waar staat mijn codenaam voor",
+   "klasse": "INFORMATION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": "uitleg",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "info-salon",
+   "input": "wat is de salon",
+   "klasse": "INFORMATION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": "uitleg",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "info-rtfoundation",
+   "input": "wat doet de rtfoundation",
+   "klasse": "INFORMATION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": "uitleg",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "info-gegevens",
+   "input": "wie kan mijn gegevens zien",
+   "klasse": "INFORMATION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": "uitleg",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "act-parijs-vrijdag",
+   "input": "parijs vrijdag",
+   "klasse": "ACTION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "reis",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "PASS",
+    "CONSEQUENCE_EVALUATED": "PASS",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": false,
+    "paden": 120,
+    "gekozen": []
+   },
+   "capability": "nietGekozen",
+   "waarom": "Deze actie staat niet op de expliciete AI-allowlist voor member.",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 0,
+    "onbekend": 1
+   },
+   "mandaat": {
+    "mag": "tonen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "PLAN_COMPILED: mutatie 3 -> stuurspoor, menstaalproef",
+    "CONSEQUENCE_EVALUATED: mutatie 4 -> stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "act-agenda-vrijdag",
+   "input": "zet vrijdag in mijn agenda",
+   "klasse": "ACTION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "agenda",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "PASS",
+    "CONSEQUENCE_EVALUATED": "PASS",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 11,
+    "gekozen": []
+   },
+   "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 2,
+    "collecties": 1,
+    "gemeten": 1,
+    "geenEffect": 1,
+    "onbekend": 0
+   },
+   "mandaat": {
+    "mag": "tonen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "PLAN_COMPILED: mutatie 3 -> stuurspoor, menstaalproef",
+    "CONSEQUENCE_EVALUATED: mutatie 4 -> stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "act-agenda-tandarts",
+   "input": "zet de tandarts vrijdag om 14:00 in mijn agenda",
+   "klasse": "ACTION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "agenda",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "PASS",
+    "CONSEQUENCE_EVALUATED": "PASS",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "PASS",
+    "PROJECTED": "PASS",
+    "EXECUTED": "NOT_RUN"
+   },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 11,
+    "gekozen": [
+     "/api/agenda/toevoegen"
+    ]
+   },
+   "capability": "gekozen",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 1,
+    "gemeten": 1,
+    "geenEffect": 0,
+    "onbekend": 0
+   },
+   "mandaat": {
+    "mag": "klaarzetten",
+    "kwam": "klaarzetten",
+    "binnen": true,
+    "uit": [
+     "pad /api/agenda/toevoegen (voorstel) -> klaarzetten",
+     "een voorstel gezet (bevestigNodig)"
+    ],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "PLAN_COMPILED: mutatie 3 -> stuurspoor, menstaalproef",
+    "CONSEQUENCE_EVALUATED: mutatie 4 -> stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    }
+   ]
+  },
+  {
+   "scenario": "act-agenda-morgen",
+   "input": "wat staat er morgen in mijn agenda",
+   "klasse": "ACTION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "agenda",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "PASS",
+    "CONSEQUENCE_EVALUATED": "PASS",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": false,
+    "paden": 120,
+    "gekozen": []
+   },
+   "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 1,
+    "onbekend": 0
+   },
+   "mandaat": {
+    "mag": "tonen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "PLAN_COMPILED: mutatie 3 -> stuurspoor, menstaalproef",
+    "CONSEQUENCE_EVALUATED: mutatie 4 -> stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "act-bestelling",
+   "input": "waar is mijn bestelling",
+   "klasse": "ACTION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "bestelling",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "PASS",
+    "CONSEQUENCE_EVALUATED": "PASS",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 3,
+    "gekozen": []
+   },
+   "capability": "nietGekozen",
+   "waarom": "Deze actie staat niet op de expliciete AI-allowlist voor member.",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 1,
+    "onbekend": 0
+   },
+   "mandaat": {
+    "mag": "tonen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "PLAN_COMPILED: mutatie 3 -> stuurspoor, menstaalproef",
+    "CONSEQUENCE_EVALUATED: mutatie 4 -> stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "act-locatie-deel",
+   "input": "deel mijn locatie",
+   "klasse": "ACTION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "locatie",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "PASS",
+    "CONSEQUENCE_EVALUATED": "PASS",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 4,
+    "gekozen": []
+   },
+   "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 2,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 1,
+    "onbekend": 1
+   },
+   "mandaat": {
+    "mag": "tonen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "PLAN_COMPILED: mutatie 3 -> stuurspoor, menstaalproef",
+    "CONSEQUENCE_EVALUATED: mutatie 4 -> stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "act-locatie-stop",
+   "input": "stop met mijn locatie delen",
+   "klasse": "ACTION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "locatie",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "PASS",
+    "CONSEQUENCE_EVALUATED": "PASS",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 4,
+    "gekozen": []
+   },
+   "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 0,
+    "onbekend": 1
+   },
+   "mandaat": {
+    "mag": "tonen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "PLAN_COMPILED: mutatie 3 -> stuurspoor, menstaalproef",
+    "CONSEQUENCE_EVALUATED: mutatie 4 -> stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "act-documenten",
+   "input": "toon mijn documenten",
+   "klasse": "ACTION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "documenten",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "PASS",
+    "CONSEQUENCE_EVALUATED": "PASS",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 1,
+    "gekozen": []
+   },
+   "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 1,
+    "onbekend": 0
+   },
+   "mandaat": {
+    "mag": "tonen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "PLAN_COMPILED: mutatie 3 -> stuurspoor, menstaalproef",
+    "CONSEQUENCE_EVALUATED: mutatie 4 -> stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "act-vakken",
+   "input": "wat zijn mijn vakken",
+   "klasse": "ACTION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "onderwijs",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "PASS",
+    "CONSEQUENCE_EVALUATED": "PASS",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 1,
+    "gekozen": []
+   },
+   "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 0,
+    "onbekend": 1
+   },
+   "mandaat": {
+    "mag": "tonen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "PLAN_COMPILED: mutatie 3 -> stuurspoor, menstaalproef",
+    "CONSEQUENCE_EVALUATED: mutatie 4 -> stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "act-site-maak",
+   "input": "maak een nieuwe site",
+   "klasse": "ACTION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "site",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "PASS",
+    "CONSEQUENCE_EVALUATED": "PASS",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 20,
+    "gekozen": []
+   },
+   "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 2,
+    "collecties": 1,
+    "gemeten": 1,
+    "geenEffect": 1,
+    "onbekend": 0
+   },
+   "mandaat": {
+    "mag": "tonen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "PLAN_COMPILED: mutatie 3 -> stuurspoor, menstaalproef",
+    "CONSEQUENCE_EVALUATED: mutatie 4 -> stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "act-afspraak-dinsdag",
+   "input": "plan een afspraak volgende week dinsdag",
+   "klasse": "ACTION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "agenda",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "PASS",
+    "CONSEQUENCE_EVALUATED": "PASS",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 12,
+    "gekozen": []
+   },
+   "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 2,
+    "collecties": 1,
+    "gemeten": 1,
+    "geenEffect": 1,
+    "onbekend": 0
+   },
+   "mandaat": {
+    "mag": "tonen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "PLAN_COMPILED: mutatie 3 -> stuurspoor, menstaalproef",
+    "CONSEQUENCE_EVALUATED: mutatie 4 -> stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "act-meet-maak",
+   "input": "zet een ontmoeting op",
+   "klasse": "ACTION",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "ontmoeting",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "PASS",
+    "CONSEQUENCE_EVALUATED": "PASS",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 1,
+    "gekozen": []
+   },
+   "capability": "nietGekozen",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 1,
+    "gemeten": 1,
+    "geenEffect": 0,
+    "onbekend": 0
+   },
+   "mandaat": {
+    "mag": "tonen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "PLAN_COMPILED: mutatie 3 -> stuurspoor, menstaalproef",
+    "CONSEQUENCE_EVALUATED: mutatie 4 -> stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "amb-die-andere-geen",
+   "input": "die andere",
+   "klasse": "AMBIGUOUS",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": null,
+   "ambigu": true,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 1,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "amb-die-andere-1",
+   "input": "die andere",
+   "klasse": "AMBIGUOUS",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 4,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "het enige alternatief",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "PASS",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "PASS",
+    "PROJECTED": "PASS",
+    "EXECUTED": "PASS"
+   },
+   "interpretatie": {
+    "versmald": false,
+    "paden": 120,
+    "gekozen": [
+     "/api/agenda/mijn"
+    ]
+   },
+   "capability": "gekozen",
+   "mandaat": {
+    "mag": "tonen",
+    "kwam": "tonen",
+    "binnen": true,
+    "uit": [
+     "pad /api/agenda/mijn (lezen) -> tonen",
+     "EXECUTED status 200"
+    ],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef",
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    }
+   ]
+  },
+  {
+   "scenario": "amb-die-andere-2",
+   "input": "die andere",
+   "klasse": "AMBIGUOUS",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 4,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": null,
+   "ambigu": true,
+   "keten": {
+    "CONTEXT_SANITIZED": "PASS",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 1,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "amb-die-andere-geen-kandidaten",
+   "input": "die andere",
+   "klasse": "AMBIGUOUS",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 3,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": null,
+   "ambigu": true,
+   "keten": {
+    "CONTEXT_SANITIZED": "PASS",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 1,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "amb-die-andere-onbevoegd",
+   "input": "die andere",
+   "klasse": "AMBIGUOUS",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 6,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": null,
+   "ambigu": true,
+   "keten": {
+    "CONTEXT_SANITIZED": "PASS",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 1,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "amb-betaal-die-geen",
+   "input": "betaal die",
+   "klasse": "AMBIGUOUS",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 3,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": null,
+   "ambigu": true,
+   "keten": {
+    "CONTEXT_SANITIZED": "PASS",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 1,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "amb-betaal-die-1",
+   "input": "betaal die",
+   "klasse": "AMBIGUOUS",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 6,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": true,
+    "geraakt": [
+     "pay"
+    ]
+   },
+   "verwachtDoel": "betaling",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "PASS",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "PASS",
+    "PROJECTED": "PASS",
+    "EXECUTED": "NOT_RUN"
+   },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 12,
+    "gekozen": [
+     "/api/bank/pas/betaal"
+    ]
+   },
+   "capability": "gekozen",
+   "mandaat": {
+    "mag": "klaarzetten",
+    "kwam": "klaarzetten",
+    "binnen": true,
+    "uit": [
+     "pad /api/bank/pas/betaal (voorstel) -> klaarzetten",
+     "een voorstel gezet (bevestigNodig)"
+    ],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef",
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    }
+   ]
+  },
+  {
+   "scenario": "amb-betaal-die-3",
+   "input": "betaal die",
+   "klasse": "AMBIGUOUS",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 8,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": null,
+   "ambigu": true,
+   "keten": {
+    "CONTEXT_SANITIZED": "PASS",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 1,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "amb-doe-maar-leeg",
+   "input": "doe maar",
+   "klasse": "AMBIGUOUS",
+   "context": "geen",
+   "keten": "ONBEPAALD",
+   "mandaat": "ONBEPAALD",
+   "onbekend": [
+    {
+     "wat": "de hele keten",
+     "waarom": "de antwoordrail claimde deze zin (geen stuurspoor). Die laag heeft eigen handelingen die niet langs het stuur lopen; hoe ver deze zin kwam is hier niet vast te stellen."
+    }
+   ]
+  },
+  {
+   "scenario": "fup-liever-later-reis",
+   "input": "liever later",
+   "klasse": "FOLLOWUP",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 5,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "reis",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "PASS",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "PASS",
+    "CONSEQUENCE_EVALUATED": "PASS",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": false,
+    "paden": 120,
+    "gekozen": []
+   },
+   "capability": "nietGekozen",
+   "waarom": "Deze actie staat niet op de expliciete AI-allowlist voor member.",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 0,
+    "onbekend": 1
+   },
+   "mandaat": {
+    "mag": "tonen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": [],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef",
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "PLAN_COMPILED: mutatie 3 -> stuurspoor, menstaalproef",
+    "CONSEQUENCE_EVALUATED: mutatie 4 -> stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "fup-liever-later-afspraak",
+   "input": "liever later",
+   "klasse": "FOLLOWUP",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 4,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": false,
+    "geraakt": []
+   },
+   "verwachtDoel": "agenda",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "PASS",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "PASS",
+    "CONSEQUENCE_EVALUATED": "PASS",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "PASS",
+    "PROJECTED": "PASS",
+    "EXECUTED": "NOT_RUN"
+   },
+   "interpretatie": {
+    "versmald": false,
+    "paden": 120,
+    "gekozen": [
+     "/api/agenda/wijzig"
+    ]
+   },
+   "capability": "gekozen",
+   "gevolg": {
+    "stappen": 1,
+    "collecties": 0,
+    "gemeten": 0,
+    "geenEffect": 0,
+    "onbekend": 1
+   },
+   "mandaat": {
+    "mag": "klaarzetten",
+    "kwam": "klaarzetten",
+    "binnen": true,
+    "uit": [
+     "pad /api/agenda/wijzig (voorstel) -> klaarzetten",
+     "een voorstel gezet (bevestigNodig)"
+    ],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef",
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "PLAN_COMPILED: mutatie 3 -> stuurspoor, menstaalproef",
+    "CONSEQUENCE_EVALUATED: mutatie 4 -> stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    }
+   ]
+  },
+  {
+   "scenario": "fup-liever-later-geen",
+   "input": "liever later",
+   "klasse": "FOLLOWUP",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": null,
+   "ambigu": true,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 1,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "fup-ja-doe-maar",
+   "input": "ja doe maar",
+   "klasse": "FOLLOWUP",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 5,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": null,
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "PASS",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "ctx-deze-met",
+   "input": "deze",
+   "klasse": "CONTEXTUAL_REFERENCE",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 5,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": null,
+   "ambigu": true,
+   "keten": {
+    "CONTEXT_SANITIZED": "PASS",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 1,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "ctx-deze-zonder",
+   "input": "deze",
+   "klasse": "CONTEXTUAL_REFERENCE",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": null,
+   "ambigu": true,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 1,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "ctx-zelfde-zonder",
+   "input": "zelfde als vorige keer",
+   "klasse": "CONTEXTUAL_REFERENCE",
+   "context": {
+    "aangeboden": "OVERGESLAGEN",
+    "woorden": 0,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": null,
+   "ambigu": true,
+   "keten": {
+    "CONTEXT_SANITIZED": "OVERGESLAGEN",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 1,
+    "gesteld": 1,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "ctx-leg-dit-uit",
+   "input": "leg dit uit",
+   "klasse": "CONTEXTUAL_REFERENCE",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 4,
+    "gewist": 0,
+    "verwijzingen": 1,
+    "canoniek": 0,
+    "gebruikt": null
+   },
+   "verwachtDoel": "uitleg",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "PASS",
+    "INTENT_RESOLVED": "OVERGESLAGEN",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "OVERGESLAGEN",
+    "CAPABILITY_SELECTED": "OVERGESLAGEN",
+    "PROJECTED": "PASS",
+    "EXECUTED": "OVERGESLAGEN"
+   },
+   "interpretatie": {
+    "versmald": null,
+    "paden": null,
+    "gekozen": [],
+    "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+   },
+   "capability": "nietGekozen",
+   "mandaat": {
+    "mag": "geen",
+    "kwam": "geen",
+    "binnen": true,
+    "uit": []
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    },
+    {
+     "wat": "waarom er geen capability was",
+     "waarom": "het plan liet geen bezwaar achter; het spoor zegt alleen dat er niets is gekozen"
+    },
+    {
+     "wat": "de terugweg",
+     "waarom": "er is niets uitgevoerd, dus er valt niets terug te draaien -- HERSTELPROEF.json zegt niets over een keten die niet tot uitvoering kwam"
+    }
+   ]
+  },
+  {
+   "scenario": "ctx-open-hem",
+   "input": "open hem",
+   "klasse": "CONTEXTUAL_REFERENCE",
+   "context": {
+    "aangeboden": "PASS",
+    "woorden": 5,
+    "gewist": 0,
+    "verwijzingen": 0,
+    "canoniek": 0,
+    "gebruikt": true,
+    "geraakt": [
+     "documenten"
+    ]
+   },
+   "verwachtDoel": "openen",
+   "ambigu": false,
+   "keten": {
+    "CONTEXT_SANITIZED": "PASS",
+    "INTENT_RESOLVED": "PASS",
+    "PLAN_COMPILED": "OVERGESLAGEN",
+    "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+    "MANDATE_EVALUATED": "PASS",
+    "CAPABILITY_SELECTED": "PASS",
+    "PROJECTED": "PASS",
+    "EXECUTED": "PASS"
+   },
+   "interpretatie": {
+    "versmald": true,
+    "paden": 3,
+    "gekozen": [
+     "/api/asset/mijn"
+    ]
+   },
+   "capability": "gekozen",
+   "mandaat": {
+    "mag": "tonen",
+    "kwam": "tonen",
+    "binnen": true,
+    "uit": [
+     "pad /api/asset/mijn (lezen) -> tonen",
+     "EXECUTED status 200"
+    ],
+    "weging": {
+     "voor": 120,
+     "na": 120
+    }
+   },
+   "vragen": {
+    "mag": 0,
+    "gesteld": 0,
+    "binnen": true
+   },
+   "architectuurkeuzes": {
+    "mag": 0,
+    "gemeten": false,
+    "reden": "geen probe -- zie VELDEN.architectuurkeuzes"
+   },
+   "bewijs": [
+    "CONTEXT_SANITIZED: mutatie 1 -> menscontext, menstaalproef",
+    "INTENT_RESOLVED: mutatie 2 -> menscontext, stuurspoor, menstaalproef",
+    "MANDATE_EVALUATED: mutatie 5 -> stuurspoor"
+   ],
+   "onbekend": [
+    {
+     "wat": "architectuurKeuzesMax",
+     "waarom": "niet gemeten: of een antwoord de mens een wereld of app laat kiezen is niet uit de tekst af te lezen zonder te raden (MENSTAALPROEF.json, veld architectuurKeuzes)"
+    },
+    {
+     "wat": "de interpretatie zelf",
+     "waarom": "gemeten op de DETERMINISTISCHE rail: de uitleg van deze zin is gescript, dus hier staat wat de machine ONDER de interpretatie deed en niet dat een model hem zo zou uitleggen"
+    }
+   ]
+  }
+ ]
+}

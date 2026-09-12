@@ -48,10 +48,15 @@
     ], ['vandaag', 'vluchten', 'hotels', 'reisbureau', 'mobiliteit', 'navigatie', 'rit', 'reisboek', 'hangar']),
 
     living: wereld({ naam: 'LIVING OS', kort: 'LIVING', kaart: 'LivingOS', huis: '/apps/rtg.html', home: '/apps/living-os.html', workspace: '/apps/werkruimte.html?gebied=living', actie: 'Vergelijk werelden' }, [
+      /* Nederlandse namen, afgeleid uit de panelen van living-os.html zelf
+         ("ROUTES VERGELIJKEN", "DECISION GRAPH") en niet verzonnen. Hier stond
+         Universe / Intent / Worlds / Decisions / Replay: interne view-namen die
+         als `01Universe` bovenaan het ledenmenu belandden. De id's blijven, dus
+         `?view=universe` werkt nog. Waarom dit een poort heeft: MENS.md par. 0. */
       ['Leefmodel', [
-        ['universe', 'Universe', 'spark', '/apps/living-os.html?view=universe'], ['intent', 'Intent', 'target', '/apps/living-os.html?view=intent'],
-        ['worlds', 'Worlds', 'grid', '/apps/living-os.html?view=worlds'], ['decisions', 'Decisions', 'branch', '/apps/living-os.html?view=decisions'],
-        ['evidence', 'Replay', 'replay', '/apps/living-os.html?view=evidence']
+        ['universe', 'Overzicht', 'spark', '/apps/living-os.html?view=universe'], ['intent', 'Voornemen', 'target', '/apps/living-os.html?view=intent'],
+        ['worlds', 'Routes vergelijken', 'grid', '/apps/living-os.html?view=worlds'], ['decisions', 'Beslissingen', 'branch', '/apps/living-os.html?view=decisions'],
+        ['evidence', 'Terugkijken', 'replay', '/apps/living-os.html?view=evidence']
       ]],
       ['Uw leven', [
         ['leven', 'Mijn leven', 'heart', '/apps/leven.html'], ['geld', 'RTG Geld', 'money', '/apps/geld.html'],

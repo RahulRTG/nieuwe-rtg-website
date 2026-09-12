@@ -24,6 +24,7 @@ const { beleidVoor, toegestanePaden, NIVEAUS } = require('./stuur/beleid');
 /* De verbodslijst, de licht/zwaar-classificatie en de deeltakenparser wonen in
    ./stuur/classificatie.js; ze worden hier nog steeds geexporteerd. */
 const { VERBODEN, classificeer, parseSubs } = require('./stuur/classificatie');
+const rail = require('./stuur/rail');
 
 function maakStuur({ log, anthropic, app, crypto, isolatie }) {
   const goedkeuring = require('./stuur/goedkeuring')({ crypto, log });
@@ -114,13 +115,34 @@ function maakStuur({ log, anthropic, app, crypto, isolatie }) {
   const { stuurPaden } = require('./stuur/paden')({ VERBODEN, stuurUit, isolatie });
 
   /* ---- de tool-lus: Rahul aan het stuur ----
-     Met een AI-sleutel verstaat Rahul een vrije vraag en voert hij hem ook uit
+     Met een rail verstaat Rahul een vrije vraag en voert hij hem ook uit
      (tools 'kaart' en 'doe'), met de inlog en de remmen van hierboven; zonder
-     sleutel geeft de lus null terug. De lus zelf draait als submodule op deze
-     context; zie stuur/lus.js. */
-  const stuurLus = require('./stuur/lus')({ anthropic, app, log, stuurRoep, stuurPaden, classificeer, parseSubs, isolatie });
+     rail geeft de lus null terug. De lus zelf draait als submodule op deze
+     context; zie stuur/lus.js.
 
-  return { stuurToets, stuurRoep, stuurBevestig, stuurPaden, stuurLus, classificeer, parseSubs };
+     WELKE RAIL DAT IS, IS SINDS ./stuur/rail.js EEN KEUZE MET EEN NAAM. Tot dan
+     kreeg de lus rechtstreeks de modelclient, en was de hele keten eronder --
+     resolver, plan, gevolg, plafond, mandaat, capability -- in een omgeving
+     zonder sleutel onbewijsbaar. Niet stuk, niet uit: niet te beproeven. De
+     rail is vervangbaar, alles eronder is RTG.
+
+     De deterministische rail zit achter drie fail-closed grendels en komt
+     NOOIT vanzelf op als er geen sleutel is; zie de kop van rail.js voor
+     waarom dat de belangrijkste van de drie is. */
+  const gekozenRail = rail.kies({
+    env: process.env, modelclient: anthropic,
+    corpusRail: () => require('./stuur/rail-corpus').maakCorpusRail({})
+  });
+  if (log && gekozenRail.naam === 'DETERMINISTISCH')
+    log.warn ? log.warn('stuur: deterministische intentierail actief (' + gekozenRail.reden + ')')
+      : console.warn('stuur: deterministische intentierail actief');
+  const stuurLus = require('./stuur/lus')({ anthropic: gekozenRail.client, app, log, stuurRoep,
+    stuurPaden, classificeer, parseSubs, isolatie, railNaam: gekozenRail.naam });
+
+  return { stuurToets, stuurRoep, stuurBevestig, stuurPaden, stuurLus, classificeer, parseSubs,
+    /* De stand van de rail is uit te lezen: een keten die niet kan zeggen
+       WELKE rail hem interpreteerde, is niet te beoordelen. */
+    stuurRail: () => ({ naam: gekozenRail.naam, reden: gekozenRail.reden }) };
 }
 
 /* VERBODEN hoort bij het contract van het stuur (test/rahul-eerlijk.test.js

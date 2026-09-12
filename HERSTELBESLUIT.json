@@ -1,0 +1,35 @@
+{
+ "uitleg": "Per waardebewegende route: WAT het correctiemodel is als de handeling fout gaat. Niet 'heeft dit een undo?' maar 'is er een expliciet en bewezen fout-/correctiemodel?'. HERSTELPROEF.json MEET wat er gebeurt als je de tegenhanger uitvoert; dit register VERKLAART wat de bedoeling is. De twee worden nooit samengevoegd -- scripts/gelddekking.js zet ze naast elkaar en meldt het als ze elkaar tegenspreken.",
+ "grens": "EEN STAND WORDT NOOIT AFGELEID UIT BEWIJS (MUTATIECONTRACT.md). Een gemeten 'exact' is een VOORSTEL om REVERSIBLE te verklaren, geen verklaring. Andersom geldt hetzelfde en dat is sinds het besluit van 12 september de scherpste kant: een VERKLAARDE COMPENSATABLE is geen BEWEZEN terugweg. De verklaring zegt wat de bedoeling is; `bewijs` zegt of die bedoeling ergens is uitgevoerd. Staat daar BLOCKED, dan hoort er `watErMoetKomen` bij -- nooit een kale BLOCKED, want dan leest een gat als een besluit.",
+ "klassen": {
+  "REVERSIBLE": "Er bestaat een echte terugweg die de oude toestand herstelt. Een refund op een nog niet afgewikkelde betaling is de schoolvoorbeeld. Te bewijzen met HERSTELPROEF.json: uitslag `exact`.",
+  "COMPENSATABLE": "De handeling is niet terug te draaien, maar wel te CORRIGEREN met een nieuwe, tegengestelde boeking. Een creditnota wist geen factuur -- er komt een regel bij die het saldo goedmaakt. Te bewijzen met HERSTELPROEF.json: uitslag `compensatie`. Let op: `exact` en `compensatie` worden nooit opgeteld, want ze beloven de lezer iets anders.",
+  "FINAL": "Met opzet definitief. Een extern afgewikkelde settlement die juridisch vaststaat kan RTG niet terugdraaien en ook niet zelfstandig compenseren; wie hier een knop belooft, belooft iets wat de buitenwereld niet honoreert. FINAL is een BESLUIT en geen tekort -- maar het vraagt wel dat er ergens anders een pad is waarlangs een mens het rechtzet.",
+  "NOT_APPLICABLE": "De route verplaatst geen waarde die gecorrigeerd zou moeten worden. Denk aan het aanmaken van een code of het vastleggen van een voornemen dat zelf nog geen geld raakt. Dit is de klasse die het makkelijkst verkeerd wordt gebruikt: raakt de route WEL een saldo, dan hoort hij hier niet.",
+  "UNKNOWN": "Hier is nog niet over besloten. Dit is de eerlijke restklasse en de enige die vanzelf ontstaat: elke route die niet in `routes` staat, valt hierop terug. Hij hoort te dalen doordat er besluiten bijkomen, nooit doordat de definitie wordt opgerekt."
+ },
+ "routes": {
+  "POST /api/pay/saldo": {
+   "stand": "COMPENSATABLE",
+   "herkomst": "mens",
+   "afgetekend": "besluit van de eigenaar, 12 september 2026, opgeschreven door Claude (Opus 5) en niet door een mens nagelezen op deze formulering",
+   "reden": "Deze route verwerkt een factuur economisch af: het saldo gaat eraf, de factuur sluit en er gaat een afdracht naar de RTFoundation. Dat zijn drie vastgelegde gebeurtenissen, en de afdracht is al de deur uit richting een derde partij. Ze terugdraaien zou betekenen dat je doet alsof de betaling nooit heeft plaatsgevonden terwijl de stichting haar deel heeft gekregen. De correctie hoort dus ERNAAST: een tegenboeking die het saldo goedmaakt, met de oorspronkelijke gebeurtenis er nog steeds onder.",
+   "uitvoerder": null,
+   "uitvoerderReden": "Er is er geen. `npm run factuurproef` stap 7 mat het: HERSTEL.json kent nul kandidaat-tegenhangers voor dit pad, en de compenserende bouwsteen pay.huisUit bestaat wel maar heeft geen enkele aanroeper op een factuur. De bouwsteen ligt er, de bedrading ontbreekt.",
+   "bewijs": {
+    "stand": "BLOCKED",
+    "watErMoetKomen": "een route die op een BETAALDE factuur een tegenboeking zet via pay.huisUit, met dezelfde duurzame bundel als de heenweg (kern/factuursaldo.js), en die de afdracht NIET stil terugdraait maar haar eigen correctieregel schrijft. Pas met die route is er iets uit te voeren en kan HERSTELPROEF.json hier `compensatie` meten in plaats van `geen tegenhanger beproefd`."
+   }
+  }
+ },
+ "waaromLeeg": "Hij is niet meer leeg. Tot 12 september 2026 stond hier met opzet niets: de meting alleen mag geen stand invullen, en er was nog geen besluit. Dat besluit is er nu (zie `beleid`), en de eerste route is verklaard -- de enige waarvan de terugweg werkelijk is GEMETEN in plaats van beredeneerd. De andere 41 blijven UNKNOWN: 41 standen verzinnen omdat er nu een beleid is, zou precies de fout zijn die de grens hierboven verbiedt.",
+ "beleid": {
+  "besloten": "12 september 2026, door de eigenaar",
+  "regel": "RTG gebruikt append-only economische geschiedenis en corrigeert primair met COMPENSATIES. Er komt geen generieke undo-regel; iedere geldroute verklaart expliciet of hij REVERSIBLE, COMPENSATABLE, FINAL of NOT_APPLICABLE is.",
+  "standaardVoorGeld": "COMPENSATABLE",
+  "waarom": "Financiele geschiedenis hoort niet te worden herschreven. Is een factuur eenmaal economisch verwerkt, dan wil je niet achteraf doen alsof die gebeurtenis nooit heeft bestaan -- je wilt de fout ERNAAST zien staan. Dat is wat audit, boekhouding en bewijs nodig hebben, en het is de enige vorm die later refunds, chargebacks, settlementcorrecties, payrollcorrecties en partnerafrekeningen kan dragen zonder de geschiedenis te vervalsen.",
+  "voorbeeld": "+500 oorspronkelijke gebeurtenis / -500 compensatie / +450 correctie -- in plaats van de oude 500 stil verwijderen.",
+  "REVERSIBLE mag wel": "Maar alleen waar de domeinregels aantonen dat een toestand werkelijk atomair terug te draaien is EN er geen economische gebeurtenis is vastgelegd die zou moeten blijven staan. Een pre-settlement toestand kan dat zijn; een verwerkte betaling niet.",
+  "UNKNOWN is schuld": "UNKNOWN blokkeert geen release, maar het aantal mag vanaf vandaag nooit meer stijgen. De ratel heet `geldRoutesHerstelOnbesloten` in NORM.json en staat op de dag van invoering op 42."
+ }
+}

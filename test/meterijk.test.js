@@ -1524,6 +1524,213 @@ const IJKINGEN = {
       (j) => { j.gemeten.defecten = (j.gemeten.defecten || 0) + 3; return j; },
       () => norm.meet().appwerktDefecten - voor.appwerktDefecten)
   },
+  /* DE VIER TANDEN VAN 12 SEPTEMBER 2026: de economische dekking
+     (GELDDEKKING.json). Elk van de vier leest EEN veld uit `ratel`, en dat is
+     precies wat hier misgaan kan -- vier meters die naar hetzelfde register
+     kijken, en waarvan er drie stilletjes hetzelfde veld zouden kunnen lezen.
+     Daarom krijgt elke meter zijn EIGEN veld opgehoogd en wordt er gemeten of
+     juist DIE meter meebeweegt: leest er een het verkeerde veld, dan blijft hij
+     staan waar hij stond en zakt deze ijking.
+
+     Ze gaan alle vier OMHOOG in de proef, want dat is de richting die ertoe
+     doet: ze mogen volgens de ratel alleen dalen. */
+  geldRoutesPubliek: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesPubliek = (j.ratel.geldRoutesPubliek || 0) + 2; return j; },
+      () => norm.meet().geldRoutesPubliek - voor.geldRoutesPubliek)
+  },
+  geldRoutesZonderSemantiek: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesZonderSemantiek = (j.ratel.geldRoutesZonderSemantiek || 0) + 3; return j; },
+      () => norm.meet().geldRoutesZonderSemantiek - voor.geldRoutesZonderSemantiek)
+  },
+  geldRoutesZonderIdemBewijs: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesZonderIdemBewijs = (j.ratel.geldRoutesZonderIdemBewijs || 0) + 4; return j; },
+      () => norm.meet().geldRoutesZonderIdemBewijs - voor.geldRoutesZonderIdemBewijs)
+  },
+  geldRoutesZonderTerugweg: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesZonderTerugweg = (j.ratel.geldRoutesZonderTerugweg || 0) + 5; return j; },
+      () => norm.meet().geldRoutesZonderTerugweg - voor.geldRoutesZonderTerugweg)
+  },
+  geldRoutesHerstelOnbesloten: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesHerstelOnbesloten = (j.ratel.geldRoutesHerstelOnbesloten || 0) + 6; return j; },
+      () => norm.meet().geldRoutesHerstelOnbesloten - voor.geldRoutesHerstelOnbesloten)
+  },
+  geldRoutesHerstelTegenspraak: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesHerstelTegenspraak = (j.ratel.geldRoutesHerstelTegenspraak || 0) + 7; return j; },
+      () => norm.meet().geldRoutesHerstelTegenspraak - voor.geldRoutesHerstelTegenspraak)
+  },
+  /* DE TWEE TANDEN VAN DE VERTICALE GELDPROEF (FACTUURPROEF.json). Ze lezen
+     verschillende velden uit dezelfde `telling`, en juist dat is hier de
+     faalvorm: `geldpadOnbewezen` telt BLOCKED plus UNKNOWN, en een versie die
+     er maar een van leest beweegt bij deze ijking niet genoeg mee. Daarom
+     krijgen die twee velden EEN ONGELIJKE ophoging (2 en 3), zodat een meter
+     die er een vergeet een ander getal geeft dan 5 en de ijking zakt. */
+  geldpadGezakt: {
+    proef: (voor) => metVervangenJson('FACTUURPROEF.json',
+      (j) => { j.telling.FAILED = (j.telling.FAILED || 0) + 4; return j; },
+      () => norm.meet().geldpadGezakt - voor.geldpadGezakt)
+  },
+  geldpadOnbewezen: {
+    proef: (voor) => metVervangenJson('FACTUURPROEF.json',
+      (j) => { j.telling.BLOCKED = (j.telling.BLOCKED || 0) + 2;
+        j.telling.UNKNOWN = (j.telling.UNKNOWN || 0) + 3; return j; },
+      () => norm.meet().geldpadOnbewezen - voor.geldpadOnbewezen)
+  },
+  /* DE TAND VAN 12 SEPTEMBER 2026: eersteMinuutGezakt telt de toetsen van de
+     eerste minuut die ZAKKEN (EERSTEMINUUT.json, telling.gezakt). Zelfde vorm
+     als de vier hierboven -- hij leest een getal uit een bestaand register, dus
+     hij wordt geijkt door dat veld tijdelijk op te hogen.
+
+     WAAROM `gezakt` EN NIET `gehaald`: bij het tweede zou een toets WEGHALEN
+     als vooruitgang lezen. En `nietMeetbaar` telt niet mee, want dat is een
+     uitslag over de METER en niet over de app; die twee optellen is precies de
+     fout die MENS.md par. 0 beschrijft. Leest deze meter het verkeerde veld, of
+     een ontbrekend bestand als nul, dan beweegt hij hier niet mee. */
+  eersteMinuutGezakt: {
+    proef: (voor) => metVervangenJson('EERSTEMINUUT.json',
+      (j) => { j.telling.gezakt = (j.telling.gezakt || 0) + 3; return j; },
+      () => norm.meet().eersteMinuutGezakt - voor.eersteMinuutGezakt)
+  },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (tweede): pakteMisgelopen telt de
+     OPERATIONELE vragen die de antwoordrail claimt (PAKTE.json,
+     telling.misgelopen). Zelfde vorm -- een getal uit een bestaand register,
+     dus geijkt door dat veld tijdelijk op te hogen.
+
+     WAAROM `misgelopen` EN NIET `antwoordrail`: dat tweede telt ook de claims
+     die volkomen terecht zijn. "doe maar" wordt geclaimd en keurig beantwoord
+     met "er staat niets open"; dat als verlies tellen maakt van correct gedrag
+     een defect. Leest deze meter het verkeerde veld, dan beweegt hij hier niet
+     mee. */
+  pakteMisgelopen: {
+    proef: (voor) => metVervangenJson('PAKTE.json',
+      (j) => { j.telling.misgelopen = (j.telling.misgelopen || 0) + 3; return j; },
+      () => norm.meet().pakteMisgelopen - voor.pakteMisgelopen)
+  },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (derde): menstaalTeVer telt de zinnen die
+     verder kwamen dan hun eigen `sideEffectMax` (MENSTAALPROEF.json,
+     telling.teVer). Zelfde vorm -- een getal uit een bestaand register, dus
+     geijkt door dat veld tijdelijk op te hogen.
+
+     DE METER ZELF is apart geijkt en niet alleen hier: met een corpusregel die
+     `doe` aanroept op /api/agenda/toevoegen sloeg de proef uit met de reden
+     erbij. Dat staat in het register onder `ijking`, inclusief de eerste
+     poging die NIET uitsloeg -- `begrepen: true` haalt de twijfelpoort niet,
+     dus die mutatie werd door een andere poort tegengehouden dan de bedoelde
+     en bewees niets. */
+  menstaalTeVer: {
+    proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
+      (j) => { j.telling.teVer = (j.telling.teVer || 0) + 2; return j; },
+      () => norm.meet().menstaalTeVer - voor.menstaalTeVer)
+  },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (vierde): goudenPlakGebreken telt wat er
+     mankeert aan de ene keten die van begin tot eind is nagelopen
+     (MENSTAALPROEF.json, goudenPlak.gebreken). Zelfde vorm -- een lijst in een
+     bestaand register, dus geijkt door er regels bij te zetten.
+
+     De meter ZELF is apart geijkt en niet alleen hier: PLAN_COMPILED terugzetten
+     op `uitvoerbaar ? PASS : NOT_RUN` liet de negatieve helft zakken, en de
+     `doe`-stap uit de positieve helft halen liet er drie zakken. Zie de kop van
+     scripts/menstaalproef.js. */
+  goudenPlakGebreken: {
+    proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
+      (j) => { j.goudenPlak.gebreken = (j.goudenPlak.gebreken || []).concat(['ijkproef', 'ijkproef']); return j; },
+      () => norm.meet().goudenPlakGebreken - voor.goudenPlakGebreken)
+  },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (vijfde): samenhangGebreken telt wat er
+     mankeert aan de drie toestanden van "liever later" (MENSTAALPROEF.json,
+     gesprekssamenhang.gebreken). Zelfde vorm als de vorige twee.
+
+     De meter zelf is met DRIE mutaties zien uitslaan, en dat is waar het bij
+     deze om gaat: context uit het verzoek halen (A en B vallen op elkaar), de
+     reiscontext door de afspraakcontext vervangen (A slaat om en overschrijdt
+     bovendien zijn contract), en het geen-context-pad toch laten kiezen (C
+     verzint een referent). Zie de kop van scripts/menstaalproef.js. */
+  samenhangGebreken: {
+    proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
+      (j) => { j.gesprekssamenhang.gebreken = (j.gesprekssamenhang.gebreken || []).concat(['ijk', 'ijk']); return j; },
+      () => norm.meet().samenhangGebreken - voor.samenhangGebreken)
+  },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (zesde): referentGebreken telt wat er mankeert
+     aan de vier vormen van "die andere" (MENSTAALPROEF.json,
+     referentveiligheid.gebreken). Zelfde vorm als de vorige drie.
+
+     De meter zelf is met drie mutaties zien uitslaan: D de onbevoegde kandidaat
+     toch als referent laten nemen (4 gebreken, plus 1 te ver op het contract),
+     C toch laten kiezen uit twee alternatieven (3), en B laten ophouden met
+     handelen (3 -- waarop B en D op elkaar vallen en de kernbewering zakt). */
+  referentGebreken: {
+    proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
+      (j) => { j.referentveiligheid.gebreken = (j.referentveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
+      () => norm.meet().referentGebreken - voor.referentGebreken)
+  },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (tiende): verwijzingGebreken telt wat er
+     mankeert aan drie zinnen op dezelfde context (MENSTAALPROEF.json,
+     verwijzingveiligheid.gebreken). De meter is met twee mutaties zien
+     uitslaan: "deze" zich laten gedragen als "open hem" (vier gebreken,
+     waaronder dat het paar op elkaar valt), en de kaartstap uit "open hem"
+     halen -- dan komt de context wel aan maar bereikt hij de resolver niet, en
+     is de enige gemeten context-naar-resolver-weg weg. */
+  verwijzingGebreken: {
+    proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
+      (j) => { j.verwijzingveiligheid.gebreken = (j.verwijzingveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
+      () => norm.meet().verwijzingGebreken - voor.verwijzingGebreken)
+  },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (negende): bevestigGebreken telt wat er
+     mankeert aan de vraag of een instemming in het gesprek een klaargezette
+     handeling kan afmaken (MENSTAALPROEF.json, bevestigveiligheid.gebreken).
+
+     De meter zelf is met TWEE mutaties zien uitslaan, een per kant:
+     /api/stuur/bevestig opendoen voor de rail (de poort), en de corpusregel het
+     tóch laten proberen (de taal). Let op dat de eerste poging een NO-OP was --
+     een tweede `member`-sleutel in hetzelfde object wordt door de eerste
+     overschreven, dus het niveau bewoog niet en de tand dus ook niet. Een
+     mutatie die niets verandert bewijst niets. */
+  bevestigGebreken: {
+    proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
+      (j) => { j.bevestigveiligheid.gebreken = (j.bevestigveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
+      () => norm.meet().bevestigGebreken - voor.bevestigGebreken)
+  },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (achtste): geldGebreken telt wat er mankeert
+     aan de drie toestanden van "betaal die" (MENSTAALPROEF.json,
+     geldveiligheid.gebreken). Zelfde vorm als de vier ervoor.
+
+     De meter zelf is met DRIE mutaties zien uitslaan, en de derde is de reden
+     dat dit blok bestaat: drie open facturen toch de eerste laten kiezen (4
+     gebreken), de ene factuur niet meer klaarzetten (4), en het betaalpad van
+     zijn niveau `voorstel` afhalen -- dan komt B tot uitvoeren en meldt de proef
+     bovendien een zin die TE VER kwam. Die laatste mutatie legde en passant een
+     gebrek in het SPOOR bloot: EXECUTED zette elke niet-428 uitkomst op PASS,
+     dus ook een 403. */
+  geldGebreken: {
+    proef: (voor) => metVervangenJson('MENSTAALPROEF.json',
+      (j) => { j.geldveiligheid.gebreken = (j.geldveiligheid.gebreken || []).concat(['ijk', 'ijk']); return j; },
+      () => norm.meet().geldGebreken - voor.geldGebreken)
+  },
+  /* DE TAND VAN 12 SEPTEMBER 2026 (zevende): mensmutatieZonderWacht telt de
+     garanties die je uit de bron kunt HALEN zonder dat een wacht afgaat
+     (MENSMUTATIE.json, telling.geenWacht). Zelfde vorm als de vorige vier -- een
+     getal uit een bestaand register, dus geijkt door dat veld op te hogen.
+
+     DE MOTOR ZELF is niet met een ijkbestand geijkt maar met de echte bron: hij
+     verbouwt server/kern/stuur/ twaalf keer, draait er zeven wachten tegenaan en
+     zet alles met git terug met een sha256-controle erachter. Elf van de twaalf
+     lieten een wacht zakken, met de melding erbij in het register; nummer 10b
+     niet, en dat IS het getal dat deze tand bewaakt.
+
+     Let op een fout die daar onderweg in zat en die deze tand niet zou vinden:
+     mutatie 10b zakte eerst wel, maar op de VRAGENteller -- de projectie eindigde
+     op een vraagteken. Een wacht die om de verkeerde reden zakt, poetst een gat
+     weg in plaats van het te tonen. */
+  mensmutatieZonderWacht: {
+    proef: (voor) => metVervangenJson('MENSMUTATIE.json',
+      (j) => { j.telling.geenWacht = (j.telling.geenWacht || 0) + 2; return j; },
+      () => norm.meet().mensmutatieZonderWacht - voor.mensmutatieZonderWacht)
+  },
   /* DE TAND VAN 10 SEPTEMBER 2026: bewijsAlleenKeten telt de bewijsmechanismen
      die alleen in de keten draaien en niet lokaal (BEWIJSLADDER.json). Zelfde
      vorm als de vier hierboven -- hij telt een POST in een register, dus hij

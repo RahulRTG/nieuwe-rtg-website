@@ -489,6 +489,136 @@ const METERS = [
      hetzelfde met een VERSE meting; deze tand houdt het register zelf vast, ook
      als niemand die browserronde draait. */
   { sleutel: 'appwerktDefecten', richting: 'omlaag', wat: 'onderdelen uit MAPPEN met een defect bewijs (uit APPWERKT.json)' },
+  /* DE VIER VAN DE ECONOMISCHE DEKKING (GELDDEKKING.json). Ze staan hier als
+     VIER tanden en niet als een samengesteld dekkingscijfer, en dat is dezelfde
+     regel als hierboven bij de geblende tellers: 42 van 42 bevoegdheden bewezen
+     en 3 van 42 terugwegen beproefd zijn geen 53% -- het zijn twee uitspraken
+     waarvan de tweede alarmerend is en de eerste geruststellend.
+
+     De eerste is de scherpste en staat op nul: een route die geld beweegt en die
+     een onbekende mag aanroepen. De andere drie zijn VOORRADEN -- ze mogen niet
+     stil groeien, en ze hoeven niet vandaag leeg. Wie er een geldroute bij bouwt
+     zonder verklaarde semantiek of zonder beproefde terugweg, ziet dat hier. */
+  { sleutel: 'geldRoutesPubliek', richting: 'omlaag', wat: 'wegen die waarde bewegen en publiek aanroepbaar zijn (GELDDEKKING.json)' },
+  { sleutel: 'geldRoutesZonderSemantiek', richting: 'omlaag', wat: 'geldroutes zonder verklaarde tweede-aanroep' },
+  { sleutel: 'geldRoutesZonderIdemBewijs', richting: 'omlaag', wat: 'geldroutes waarvan de herhaalbaarheid ongemeten is' },
+  { sleutel: 'geldRoutesZonderTerugweg', richting: 'omlaag', wat: 'geldroutes zonder beproefde tegenhanger' },
+  /* DE TWEE VAN HET CORRECTIEMODEL (HERSTELBESLUIT.json). Ze staan NAAST
+     `geldRoutesZonderTerugweg` en niet in plaats daarvan, want ze meten iets
+     anders: die telt of de PROEF een tegenhanger heeft zien werken, deze twee
+     of een MENS heeft opgeschreven wat er hoort te gebeuren als het misgaat.
+
+     De vraag is niet "heeft iedere actie een undo?" -- sommige horen bewust
+     FINAL te zijn -- maar "draagt iedere waardeactie een expliciet
+     fout-/correctiemodel?". Vandaar `onbesloten` en niet `zonderHerstel`.
+
+     De tweede is de scherpste en hoort nul te zijn: een verklaring die de meting
+     tegenspreekt. FINAL naast een gemeten `exact` zegt dat de route wel degelijk
+     terug te draaien is terwijl een mens hem definitief noemde. */
+  { sleutel: 'geldRoutesHerstelOnbesloten', richting: 'omlaag', wat: 'geldroutes zonder verklaard correctiemodel (HERSTELBESLUIT.json)' },
+  { sleutel: 'geldRoutesHerstelTegenspraak', richting: 'omlaag', wat: 'geldroutes waar de herstelverklaring de meting tegenspreekt' },
+  /* DE VERTICALE GELDPROEF, EN MET OPZET TWEE TANDEN (FACTUURPROEF.json).
+
+     Eén tand zou de zeven stappen tot een cijfer maken, en dan verdwijnt precies
+     het onderscheid waarvoor de vijfdeling bestaat: een stap die GEZAKT is (er
+     bewoog geld waar dat niet mocht) en een stap die ONBEWEZEN is (er is niets
+     gemeten) vragen het tegenovergestelde. De eerste is een defect dat naar nul
+     moet, de tweede is werk dat nog niet gedaan is.
+
+     `geldpadGezakt` staat vandaag op 1 en dat is geen achterstand maar een
+     VONDST: een crash tussen de duurzame geldcommit en de afwikkeling laat het
+     lid afgeschreven achter met een open factuur. Zie GELDLAT.md par.
+     "Scenario 3". Hij hoort naar nul en de weg erheen staat er beschreven. */
+  { sleutel: 'geldpadGezakt', richting: 'omlaag', wat: 'stappen in de verticale geldproef waar geld bewoog dat niet mocht (FACTUURPROEF.json)' },
+  { sleutel: 'geldpadOnbewezen', richting: 'omlaag', wat: 'stappen in de verticale geldproef zonder bewijs (BLOCKED of UNKNOWN)' },
+  /* DE EERSTE MINUUT (EERSTEMINUUT.json, npm run eersteminuut).
+
+     Wat een mens die RTG niet kent in zijn eerste minuut krijgt. Deze meter
+     bestaat omdat `tikken` en `vindbaar` allebei de vraag van een EXPERT
+     stellen -- de kortste weg voor wie weet waar hij heen wil, en of een woord
+     ergens heen leidt voor wie dat woord al kent. Ze stonden allebei groen
+     terwijl het beginscherm van een vers lid nul leesbare handelingen droeg en
+     het menu opende met `01Universe`.
+
+     Geteld wordt het aantal GEZAKTE toetsen, en dat mag alleen omlaag. Niet het
+     aantal gehaalde: dan zou een toets weghalen als vooruitgang lezen. En niet
+     `nietMeetbaar`, want dat is geen uitslag over de app maar over de meter --
+     die twee optellen is precies de fout die MENS.md par. 0 beschrijft. */
+  { sleutel: 'eersteMinuutGezakt', richting: 'omlaag', wat: 'toetsen van de eerste minuut die ZAKKEN (uit EERSTEMINUUT.json)' },
+  /* DE NULMETING OP DE ROUTER (PAKTE.json). `misgelopen` telt de OPERATIONELE
+     vragen die de antwoordrail claimt voordat de stuurketen ze ziet -- dan
+     krijgt de motor die vraag nooit, hoe goed hij ook werkt. Hij staat op nul
+     en hoort daar te blijven; een routingwijziging die hem omhoog duwt, neemt
+     vermogen weg zonder dat iemand het merkt.
+
+     Met OPZET niet `uitlegNaarStuur` als tand, hoewel dat getal vandaag 8 is:
+     dat is een RISICO en nog geen verlies (het plafond staat op tonen), en een
+     tand op een getal dat we nog niet besloten hebben te verlagen, is een
+     sirene die wordt uitgezet. Het staat in het register, niet op de lat. */
+  { sleutel: 'pakteMisgelopen', richting: 'omlaag', wat: 'operationele vragen die de antwoordrail claimt (uit PAKTE.json)' },
+  /* DE MENSTAALPROEF (MENSTAALPROEF.json). `teVer` telt de zinnen die VERDER
+     kwamen dan hun eigen contract toestaat -- gemeten uit het stuurspoor en
+     niet uit de tekst van het antwoord. Hij staat op nul.
+
+     LET OP WAT DEZE NUL WEL EN NIET ZEGT: elke gemeten zin komt vandaag tot
+     `geen`, want het corpus van de deterministische rail roept nergens `doe`
+     aan. De tand bewaakt dus een REGRESSIE en is geen uithoudingsproef; de
+     meter is geijkt met een corpusregel die wel een schrijfpad aanroept, en
+     die liet hem uitslaan. Dat staat in het register onder `ijking`. */
+  { sleutel: 'menstaalTeVer', richting: 'omlaag', wat: 'zinnen die verder komen dan hun sideEffectMax (uit MENSTAALPROEF.json)' },
+  /* DE GOUDEN PLAK (MENSTAALPROEF.json). `gebreken` telt wat er mankeert aan de
+     ENE keten die van begin tot eind is nagelopen -- positief tot een voorstel,
+     negatief tot een uitgesproken "dit bestaat niet voor een lid". Hij staat op
+     nul en is de enige plek waar CAPABILITY_SELECTED en EXECUTED ooit iets
+     anders zijn dan overgeslagen; zakt hij, dan is de keten niet meer tot het
+     eind bewezen. */
+  { sleutel: 'goudenPlakGebreken', richting: 'omlaag', wat: 'gebreken in de gouden plak (uit MENSTAALPROEF.json)' },
+  /* DE GESPREKSSAMENHANG (MENSTAALPROEF.json). `gebreken` telt wat er mankeert
+     aan de drie toestanden van "liever later": reiscontext, afspraakcontext en
+     geen context. Raken twee van de drie elkaar, dan is de context niet gebruikt
+     -- hoe goed de zin er ook uitziet. Hij staat op nul, en hij is met drie
+     mutaties zien uitslaan (context weghalen, de ene context door de andere
+     vervangen, en het geen-context-pad toch laten kiezen). */
+  { sleutel: 'samenhangGebreken', richting: 'omlaag', wat: 'gebreken in de gesprekssamenhang (uit MENSTAALPROEF.json)' },
+  /* DE REFERENTVEILIGHEID (MENSTAALPROEF.json). `gebreken` telt wat er mankeert
+     aan de vier vormen van "die andere". De scherpste is D: net als B precies
+     EEN alternatief, maar dat ene is niet van dit lid. Komen B en D even ver,
+     dan is de dubbelzinnigheid opgelost door bevoegdheid te VERONDERSTELLEN, en
+     dat is het verschil tussen een handige en een betrouwbare assistent. */
+  { sleutel: 'referentGebreken', richting: 'omlaag', wat: 'gebreken in de referentveiligheid (uit MENSTAALPROEF.json)' },
+  /* DE GELDVEILIGHEID (MENSTAALPROEF.json). `gebreken` telt wat er mankeert aan
+     de drie toestanden van "betaal die". Hij lijkt op referentGebreken en meet
+     iets anders: daar gaat het om een verwijzing die wel of niet op te lossen
+     is, hier geldt er een regel BOVENOP -- ook met een eenduidige referent komt
+     de keten tot een VOORSTEL en geen stap verder, want geld gaat nooit vanzelf.
+     De ernstigste uitslag die deze tand kan vangen is een 2xx op /api/bank/pas/
+     betaal na een zin van twee woorden. */
+  { sleutel: 'geldGebreken', richting: 'omlaag', wat: 'gebreken in de geldveiligheid (uit MENSTAALPROEF.json)' },
+  /* DE BEVESTIGVEILIGHEID (MENSTAALPROEF.json). `gebreken` telt wat er mankeert
+     aan de vraag of een instemming in het GESPREK een klaargezette handeling kan
+     afmaken. Hij meet twee kanten en dat is het punt: de POORT houdt elk pad
+     rond een staand voorstel op `verboden`, en de TAAL probeert het niet eens.
+     Gaat die poort ooit open, dan zakt deze tand ook als de zin zich keurig
+     blijft gedragen -- want dan is de goedkeuring buiten het gesprek een
+     formaliteit geworden. */
+  { sleutel: 'bevestigGebreken', richting: 'omlaag', wat: 'gebreken in de bevestigveiligheid (uit MENSTAALPROEF.json)' },
+  /* DE VERWIJZINGVEILIGHEID (MENSTAALPROEF.json). `gebreken` telt wat er
+     mankeert aan drie zinnen op DEZELFDE context, waar het verschil is of de
+     zin een werkwoord draagt. Zakt hij, dan stuurt de SELECTIE de handeling en
+     niet de mens -- een aanwijzende muisklik wordt dan een opdracht. Hij
+     bewaakt bovendien de enige plek waar de context de resolver aantoonbaar
+     versmalt; valt die eis weg, dan is die weg weer onbewezen in de keten. */
+  { sleutel: 'verwijzingGebreken', richting: 'omlaag', wat: 'gebreken in de verwijzingveiligheid (uit MENSTAALPROEF.json)' },
+  /* DE TIEN MUTATIES (MENSMUTATIE.json). `geenWacht` telt de garanties die je
+     uit de bron kunt HALEN zonder dat er een wacht afgaat. Dat is een uitspraak
+     over de TOETSEN en niet over de code: de keten doet nog steeds het goede,
+     alleen zou niemand het merken als dat morgen verandert.
+
+     Hij staat op 1 en niet op 0, en dat is met opzet zichtbaar: een antwoord dat
+     de mens tussen twee RTG-werelden laat kiezen, wordt nergens gemeten. De
+     andere elf mutaties lieten allemaal een wacht zakken, met de melding erbij
+     in het register. Richting omlaag: er mag er geen bij komen. */
+  { sleutel: 'mensmutatieZonderWacht', richting: 'omlaag', wat: 'garanties die je kunt weghalen zonder dat een wacht afgaat (uit MENSMUTATIE.json)' },
   /* Het BEREIK van de carrierevormmeter (CARRIERE.md par. 0): hoeveel
      talentdomeinen hij werkelijk heeft gezien. Omhoog, want dit mag niet stil
      dalen -- zie de kop bij CARRIEREVORM.json in ./lib/metingen.js. */
@@ -1206,6 +1336,27 @@ function meet(bronnen) {
     lussenKritiek: leesRegister('LUSSEN.json', (j) => j.ratel.kritiek),
     lussenZonderOverlapRem: leesRegister('LUSSEN.json', (j) => j.ratel.wekkersAsyncZonderRem),
     appwerktDefecten: leesRegister('APPWERKT.json', (j) => j.gemeten.defecten),
+    geldRoutesPubliek: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesPubliek),
+    geldRoutesZonderSemantiek: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderSemantiek),
+    geldRoutesZonderIdemBewijs: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderIdemBewijs),
+    geldRoutesZonderTerugweg: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderTerugweg),
+    geldRoutesHerstelOnbesloten: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesHerstelOnbesloten),
+    geldRoutesHerstelTegenspraak: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesHerstelTegenspraak),
+    geldpadGezakt: leesRegister('FACTUURPROEF.json', (j) => j.telling.FAILED),
+    /* BLOCKED en UNKNOWN worden hier WEL opgeteld, en alleen hier: allebei
+       betekenen ze "geen bewijs", en de tand die ertoe doet is de andere. Het
+       verschil tussen die twee staat per stap in het register zelf. */
+    geldpadOnbewezen: leesRegister('FACTUURPROEF.json', (j) => (j.telling.BLOCKED || 0) + (j.telling.UNKNOWN || 0)),
+    eersteMinuutGezakt: leesRegister('EERSTEMINUUT.json', (j) => j.telling.gezakt),
+    pakteMisgelopen: leesRegister('PAKTE.json', (j) => j.telling.misgelopen),
+    menstaalTeVer: leesRegister('MENSTAALPROEF.json', (j) => j.telling.teVer),
+    goudenPlakGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.goudenPlak.gebreken || []).length),
+    samenhangGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.gesprekssamenhang.gebreken || []).length),
+    referentGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.referentveiligheid.gebreken || []).length),
+    geldGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.geldveiligheid.gebreken || []).length),
+    bevestigGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.bevestigveiligheid.gebreken || []).length),
+    verwijzingGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.verwijzingveiligheid.gebreken || []).length),
+    mensmutatieZonderWacht: leesRegister('MENSMUTATIE.json', (j) => j.telling.geenWacht),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
        milliseconden en een afdruk die achterloopt zou hier een groen getal

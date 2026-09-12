@@ -43,6 +43,39 @@ process.stdout.write('vast\\n');
 setTimeout(() => { d.exec('COMMIT'); d.close(); }, 400);
 `;
 
+for (const [naam, bestandnaam, open] of [
+  ['collectieopslag', 'store.db', "require('./server/db/sqlite').loadSqlite()"],
+  ['transactiegrootboek', 'grootboek.db', "await require('./server/db/tx/sqliteachter')(require('./server/db/opslag')).schema()"]
+]) {
+  test(naam + ' komt ook op terwijl een ander proces de verse database bezet houdt', async () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-pragma-opslag-'));
+    let kind;
+    try {
+      kind = spawn(process.execPath, ['-e', KIND, path.join(tmp, bestandnaam)],
+        { stdio: ['ignore', 'pipe', 'ignore'] });
+      await new Promise((resolve, reject) => {
+        const grens = setTimeout(() => reject(new Error('het slot werd niet vastgelegd')), 15000);
+        kind.stdout.on('data', b => { if (String(b).includes('vast')) { clearTimeout(grens); resolve(); } });
+        kind.on('exit', () => { clearTimeout(grens); reject(new Error('slotproces stopte voortijdig')); });
+      });
+      const { spawnSync } = require('node:child_process');
+      const code = '(async()=>{' + open + ';console.log("opslag-open");})().catch(e=>{console.error(e);process.exitCode=1;});';
+      const uit = spawnSync(process.execPath, ['-e', code], {
+        cwd: path.join(__dirname, '..'), encoding: 'utf8', timeout: 15000,
+        env: { ...process.env, RTG_DATA_DIR: tmp, RTG_STORE: 'sqlite', DATABASE_URL: '' }
+      });
+      assert.equal(uit.status, 0, uit.stderr);
+      assert.match(uit.stdout, /opslag-open/);
+      const controle = new DatabaseSync(path.join(tmp, bestandnaam));
+      try { assert.equal(controle.prepare('PRAGMA journal_mode').get().journal_mode, 'wal'); }
+      finally { controle.close(); }
+    } finally {
+      if (kind) try { kind.kill('SIGKILL'); } catch (e) {}
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+}
+
 test('de gelijktijdigheidsstand wacht een bezette database uit in plaats van erop stuk te lopen', async () => {
   /* Een VERSE database, want alleen daar schakelt WAL werkelijk om; op een
      database die al in WAL staat is die regel een lege huls en bewijst hij

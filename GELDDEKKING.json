@@ -1,0 +1,955 @@
+{
+  "soort": "meting",
+  "uitleg": "Economische dekking: wat er van elke waardebewegende ROUTE bewezen is, samengesteld uit GELDKAART.json (welke routes), MUTATIECONTRACT.json (semantiek en toegang), IDEMPROEF.json (idempotentie) en HERSTELPROEF.json (de terugweg).",
+  "stempel": {
+    "op": "2026-09-12T20:42:13.305Z",
+    "commit": "9f9115176",
+    "boomVuil": false,
+    "boomAnders": 5,
+    "instrument": "scripts/gelddekking.js",
+    "node": "v24.18.0"
+  },
+  "grens": "Er komt met opzet GEEN samengesteld dekkingspercentage. Elke as draagt haar eigen teller en noemer; ze worden nooit gemiddeld. De noemer zelf is een ONDERgrens: hij komt uit de geldkaart, die alleen routes ziet waar de idempotentieproef langskwam. Een as waarvoor geen meting bestaat staat in nietGemeten en telt nergens als nul mee.",
+  "klachten": [],
+  "gemeten": {
+    "geldroutes": 45,
+    "inMutatiecontract": 45,
+    "semantiek": {
+      "sleutelVereist": 18,
+      "idempotent": 18,
+      "nietHerhaalbaar": 6,
+      "onbekend": 1,
+      "compenseerbaar": 2
+    },
+    "toegang": {
+      "AUTHENTICATED": 45
+    },
+    "idempotentie": {
+      "beschermd": 41,
+      "ongemeten": 4
+    },
+    "terugweg": {
+      "geen tegenhanger beproefd": 42,
+      "compensatie": 2,
+      "exact": 1
+    }
+  },
+  "ratel": {
+    "geldRoutesPubliek": 0,
+    "geldRoutesZonderSemantiek": 1,
+    "geldRoutesZonderIdemBewijs": 3,
+    "geldRoutesZonderTerugweg": 42,
+    "geldRoutesHerstelOnbesloten": 44,
+    "geldRoutesHerstelTegenspraak": 0
+  },
+  "assen": {
+    "bevoegdheid": {
+      "kan": [
+        "PROVEN",
+        "FAILED",
+        "UNKNOWN"
+      ],
+      "telling": {
+        "PROVEN": 45,
+        "FAILED": 0,
+        "UNKNOWN": 0
+      }
+    },
+    "idempotentie": {
+      "kan": [
+        "PROVEN",
+        "FAILED",
+        "BLOCKED",
+        "NOT_APPLICABLE",
+        "UNKNOWN"
+      ],
+      "telling": {
+        "PROVEN": 42,
+        "FAILED": 0,
+        "BLOCKED": 0,
+        "NOT_APPLICABLE": 3,
+        "UNKNOWN": 0
+      }
+    },
+    "semantiek": {
+      "kan": [
+        "PROVEN",
+        "UNKNOWN"
+      ],
+      "telling": {
+        "PROVEN": 44,
+        "UNKNOWN": 1
+      }
+    },
+    "terugweg": {
+      "kan": [
+        "PROVEN",
+        "BLOCKED",
+        "UNKNOWN"
+      ],
+      "telling": {
+        "PROVEN": 3,
+        "BLOCKED": 0,
+        "UNKNOWN": 42
+      }
+    },
+    "correctiemodel": {
+      "kan": [
+        "PROVEN",
+        "BLOCKED",
+        "NOT_APPLICABLE",
+        "UNKNOWN"
+      ],
+      "telling": {
+        "PROVEN": 0,
+        "BLOCKED": 1,
+        "NOT_APPLICABLE": 0,
+        "UNKNOWN": 44
+      }
+    }
+  },
+  "tegenspraken": [],
+  "herstelKlassen": {
+    "UNKNOWN": 44,
+    "COMPENSATABLE": 1
+  },
+  "nietGemeten": {
+    "crashHerstel": "Wat er gebeurt als het proces sterft tussen de bevestiging van een provider en de grootboekregel, is in dit huis nergens beproefd. Geen meting, dus geen getal -- en nadrukkelijk geen nul.",
+    "externeSettlement": "Geen providersleutel staat gezet (server/betaal.js weigert dan fail-closed), dus er is nooit een extern betaalpad uitgevoerd om over te rapporteren."
+  },
+  "rijen": [
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/betaal",
+      "rol": "member",
+      "collecties": [
+        "bankBoekingen",
+        "bankPassen",
+        "bankSaldi"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/bevries",
+      "rol": "member",
+      "collecties": [
+        "bankPassen"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/limiet",
+      "rol": "member",
+      "collecties": [
+        "bankPassen"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/sluit",
+      "rol": "member",
+      "collecties": [
+        "bankPassen"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "compensatie",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/uitgeven",
+      "rol": "member",
+      "collecties": [
+        "bankPassen"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "exact",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/rekening/open",
+      "rol": "member",
+      "collecties": [
+        "bankRekeningen"
+      ],
+      "semantiek": "nietHerhaalbaar",
+      "toegang": "AUTHENTICATED",
+      "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/salaris",
+      "rol": "member",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/sepa",
+      "rol": "member",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/spaardoel",
+      "rol": "member",
+      "collecties": [
+        "bankRekeningen"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/storten",
+      "rol": "member",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/terugkerend/zet",
+      "rol": "member",
+      "collecties": [
+        "bankTerugkerend"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "compensatie",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/boardroom/betalingen/proef",
+      "rol": "techniek",
+      "collecties": [
+        "betaalRegie"
+      ],
+      "semantiek": "nietHerhaalbaar",
+      "toegang": "AUTHENTICATED",
+      "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+      "idempotentie": "ongemeten",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/geld/beleid/weg",
+      "rol": "member",
+      "collecties": [
+        "geldbeleid"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/geld/cockpit",
+      "rol": "member",
+      "collecties": [
+        "labFonds"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/geld/grens",
+      "rol": "member",
+      "collecties": [
+        "geldbeleid"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/gemeente/belasting/mijn",
+      "rol": "member",
+      "collecties": [
+        "gemeenteAanslagen"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/kosten/vooruitblik",
+      "rol": "member",
+      "collecties": [
+        "economie"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/labfonds/locatie/maak",
+      "rol": "member",
+      "collecties": [
+        "labFonds"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/ai/tegoed",
+      "rol": "member",
+      "collecties": [
+        "aiTegoed"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/draai",
+      "rol": "boardroom",
+      "collecties": [
+        "bankregie"
+      ],
+      "semantiek": "nietHerhaalbaar",
+      "toegang": "AUTHENTICATED",
+      "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/leden",
+      "rol": "office",
+      "collecties": [
+        "bankregie"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/mislukking",
+      "rol": "office",
+      "collecties": [
+        "bankregie"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/nood",
+      "rol": "office",
+      "collecties": [
+        "bankregie"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/rechtsvormwacht",
+      "rol": "office",
+      "collecties": [
+        "aiTegoed"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/kascode",
+      "rol": "member",
+      "collecties": [
+        "payCodes"
+      ],
+      "semantiek": "nietHerhaalbaar",
+      "toegang": "AUTHENTICATED",
+      "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/oplaad",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/saldo",
+      "rol": "member",
+      "collecties": [
+        "fondsAfdrachten",
+        "invoices",
+        "payBoekingen",
+        "paySaldi",
+        "socialeAfdrachten"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "ongemeten",
+      "padproef": "PROVEN",
+      "padproefInstrument": "factuurproef",
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "COMPENSATABLE",
+      "herstelGrond": "Deze route verwerkt een factuur economisch af: het saldo gaat eraf, de factuur sluit en er gaat een afdracht naar de RTFoundation. Dat zijn drie vastgelegde gebeurtenissen, en de afdracht is al de deur uit richting een derde partij. Ze terugdraaien zou betekenen dat je doet alsof de betaling nooit heeft plaatsgevonden terwijl de stichting haar deel heeft gekregen. De correctie hoort dus ERNAAST: een tegenboeking die het saldo goedmaakt, met de oorspronkelijke gebeurtenis er nog steeds onder.",
+      "herstelBewijs": "BLOCKED"
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/stuur",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/tegoed/koop",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi",
+        "payTegoed"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/tik",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/tikcode",
+      "rol": "member",
+      "collecties": [
+        "payTikCodes"
+      ],
+      "semantiek": "nietHerhaalbaar",
+      "toegang": "AUTHENTICATED",
+      "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/verzoek",
+      "rol": "member",
+      "collecties": [
+        "payVerzoeken"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/verzoek/betaal",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi",
+        "payVerzoeken"
+      ],
+      "semantiek": "onbekend",
+      "toegang": "AUTHENTICATED",
+      "stand": "BLOCKED_BY_TEST_FIXTURE",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/verzoek/intrek",
+      "rol": "member",
+      "collecties": [
+        "payVerzoeken"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/punten",
+      "rol": "member",
+      "collecties": [
+        "punten"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/betaalverzoek",
+      "rol": "supplier",
+      "collecties": [
+        "betaalVerzoeken"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/facturen/maak",
+      "rol": "supplier",
+      "collecties": [
+        "facturen"
+      ],
+      "semantiek": "compenseerbaar",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/facturen/pdf",
+      "rol": "supplier",
+      "collecties": [
+        "facturen"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "ongemeten",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/giftcard/sell",
+      "rol": "supplier",
+      "collecties": [
+        "giftcards"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/oog/overzicht",
+      "rol": "supplier",
+      "collecties": [
+        "directOntvangsten"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "NOT_APPLICABLE",
+      "idempotentie": "ongemeten",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pay/treasury/apart",
+      "rol": "supplier",
+      "collecties": [
+        "facturen",
+        "payBoekingen",
+        "payCodes",
+        "paySaldi",
+        "posSales",
+        "waardeOormerken"
+      ],
+      "semantiek": "compenseerbaar",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pay/treasury/zet",
+      "rol": "supplier",
+      "collecties": [
+        "payTreasury"
+      ],
+      "semantiek": "idempotent",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pay/uitbetaal",
+      "rol": "supplier",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pos/checkout",
+      "rol": "supplier",
+      "collecties": [
+        "facturen",
+        "posSales"
+      ],
+      "semantiek": "sleutelVereist",
+      "toegang": "AUTHENTICATED",
+      "stand": "PROTECTED",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/wallet/voeg",
+      "rol": "member",
+      "collecties": [
+        "wallet"
+      ],
+      "semantiek": "nietHerhaalbaar",
+      "toegang": "AUTHENTICATED",
+      "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+      "idempotentie": "beschermd",
+      "padproef": null,
+      "padproefInstrument": null,
+      "terugweg": "geen tegenhanger beproefd",
+      "herstelKlasse": "UNKNOWN",
+      "herstelGrond": null,
+      "herstelBewijs": null
+    }
+  ]
+}

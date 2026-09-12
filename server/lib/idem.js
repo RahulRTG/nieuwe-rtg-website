@@ -34,7 +34,13 @@ const MAX = 20000; // ring: zoveel sleutels houden we vast
    toestand op schijf waarin de boeking bestaat en de sleutel niet -- en een
    kill -9 precies daar plus de retry waar idem-sleutels voor bestaan, boekt
    dubbel. Zo gevonden, met een echte dubbele boeking van 137 centen. Geef
-   bijeen alleen mee als het werk geen echte I/O afwacht (zie db/index.js). */
+   bijeen alleen mee als het werk geen echte I/O afwacht (zie db/index.js).
+
+   STAAT ER AL EEN BUNDEL OPEN BIJ DE AANROEPER, dan doet deze commit daarin
+   mee. Dat wordt hier NIET geregeld: `bijeen()` zelf sluit sinds 12 september
+   aan op een openstaande bundel die dezelfde belofte doet (db/bijeen.js). Dat
+   is met opzet daar en niet hier -- anders zou elke aanroeper van een commit
+   die vraag apart moeten stellen, en de eerste die hem vergeet doet dat stil. */
 module.exports = function maakIdem({ d, save, naam, bijeen, duurzaam }) {
   function store() {
     if (!d()[naam] || typeof d()[naam] !== 'object') d()[naam] = { _keys: [] };

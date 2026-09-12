@@ -3359,7 +3359,17 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
        en na een herstart stond het weggegooide ontwerp er weer. De zeven modules
        staan hier NIET op: die kennen de duurzame commit niet, ze kennen deze
        helper, en dat is het punt van een gedeelde plek. */
-    ['server/kern/kantoorwissen.js', 'de kantoorverwijdering: wie te horen krijgt dat iets weg is, hoort het na een herstart niet terug te zien']
+    ['server/kern/kantoorwissen.js', 'de kantoorverwijdering: wie te horen krijgt dat iets weg is, hoort het na een herstart niet terug te zien'],
+    /* HET ZEVENDE, en het is geen NIEUWE duurzame belofte maar het REPAREREN van
+       een bestaande. De afschrijving liep al duurzaam via pay.huisIn; de
+       afwikkeling eronder -- factuur sluiten, 30%-afdracht -- deed dat niet, en
+       dus waren het twee commits met een gat ertussen. `npm run factuurproef`
+       mat wat er in dat gat gebeurt: het lid is afgeschreven en zijn factuur
+       staat nog open. Hier opent nu EEN bundel om allebei heen, zodat de
+       uitkomst heel is. Zie GELDLAT.md par. "Scenario 3, gemeten op een echt
+       geldpad". */
+    ['server/kern/factuursaldo.js', 'geld: de afschrijving en de afwikkeling van dezelfde factuur horen als EEN duurzame commit te landen, anders staat het geld vast en de tegenprestatie niet'],
+    ['test/idembundel.test.js', 'de toets die bewijst dat een genestelde bundel meedoet en dat een gewone bundel een geldcommit niet degradeert']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
      duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze
@@ -5607,6 +5617,102 @@ console.log('\n69) de locatieschakelaar heeft precies een lezer');
         EIGENAAR + ' (RTGPlek.aan/vraag/volg). Een tweede lezer loopt achter zodra de contractlaag iets verandert, en dat is stil.');
     }
     if (!anderen) ok('alleen ' + EIGENAAR + ' leest rtg_os_gps; ' + bestanden.length + ' bestanden nagekeken');
+  }
+}
+
+/* 70) de eerste minuut van een vers lid is gemeten, en niemand is er blind in.
+
+   WAAROM DEZE REGEL ER PAS NU IS. scripts/eersteminuut.js bestond al, maar hing
+   bewust NIET in de keuring: er zakte een toets (`inhoud-zonder-menu`), en een
+   nieuwe handhavingsregel die de bouw meteen rood zet is geen handhaving maar
+   een blokkade (CONTROLPLANE.md: eerst in de schaduw). Die toets is groen sinds
+   Edge en Command de onderste rand delen in plaats van elkaar te overschilderen,
+   en daarmee vervalt de reden om hem buiten te houden.
+
+   DEZE REGEL DRAAIT DE METER NIET. Dat kan hier ook niet: hij heeft een browser
+   en een draaiende server nodig, en check.js is statisch en snel. Wat hier wordt
+   afgedwongen is de UITSLAG in het register, plus de twee voorwaarden die de
+   meter over zichzelf meet. Of dat register vers genoeg is, is een andere vraag
+   en die heeft zijn eigen wachter (scripts/versheid.js --dekking). Wie deze
+   regel groen ziet, weet daarmee nog niet dat er vandaag gemeten is.
+
+   WAT DEZE REGEL WEL EN NIET BEZIT, en dat is het verschil tussen twee wachters.
+   Hoeveel toetsen er MOGEN zakken is al belegd: `eersteMinuutGezakt` is een
+   ratel in NORM.json, en die kent ook de enige nette manier om er tijdelijk
+   boven te zitten -- een schuld met een reden en een einddatum. Zou deze regel
+   hard op nul zakken, dan is dat een tweede, strengere norm die nergens staat
+   en die een uitgeschreven schuld onmogelijk maakt. Hij leest de ratel dus, en
+   zakt pas BOVEN de norm.
+
+   Wat deze regel wel bezit, is iets wat geen enkele ratel meet: of de uitslag
+   te VERTROUWEN is. Drie dingen zakken hier, elk om een eigen reden:
+     - een WACHT die afliep: dan is er gemeten op een scherm dat nog niet klaar
+       was, en is de uitslag -- groen of rood -- niets waard.
+     - een HERKOMST buiten dit huis: dan hangt de uitslag aan iemand anders zijn
+       server, en dat is geen meting maar een gok met een goede dag.
+     - een VUILE BOOM: een uitslag die niet te reproduceren is, is geen bewijs
+       (dezelfde regel als de deltapoort). */
+console.log('\n70) de eerste minuut van een vers lid is gemeten, en niemand is er blind in');
+{
+  const P = path.join(ROOT, 'EERSTEMINUUT.json');
+  if (!fs.existsSync(P)) {
+    fout('EERSTEMINUUT.json ontbreekt -- draai: npm run eersteminuut');
+  } else {
+    let r = null;
+    try { r = JSON.parse(fs.readFileSync(P, 'utf8')); } catch (e) { r = null; }
+    if (!r || !r.telling) {
+      fout('EERSTEMINUUT.json is onleesbaar of draagt geen telling -- draai: npm run eersteminuut');
+    } else {
+      const gezakt = (r.toetsen || []).filter((t) => t.uitslag === 'gezakt');
+      const wacht = r.wachten || {};
+      const buiten = (r.buitenDeDeur && r.buitenDeDeur.herkomsten) || [];
+      let mis = 0;
+      /* De ratel bezit het budget; deze regel leest het. Ontbreekt hij, dan is
+         nul de enige verdedigbare waarde -- niet "dan maar alles goed". */
+      let norm = 0;
+      try { norm = JSON.parse(fs.readFileSync(path.join(ROOT, 'NORM.json'), 'utf8')).meters.eersteMinuutGezakt; }
+      catch (e) { norm = 0; }
+      if (gezakt.length > norm) {
+        mis++;
+        fout('de eerste minuut zakt op ' + gezakt.length + ' toets(en) terwijl de norm ' + norm +
+          ' is: ' + gezakt.map((t) => t.naam).join(', ') +
+          ' -- herstel het, of verlaag de ratel `eersteMinuutGezakt` in NORM.json met een reden en een einddatum');
+      } else for (const t of gezakt) {
+        /* Binnen de norm is het geen overtreding, maar het hoort wel op het
+           scherm: een uitgeschreven schuld die niemand meer ziet, is geen
+           schuld maar een gewoonte. */
+        console.log('  \x1b[2m· binnen de norm, maar niet in orde: "' + t.naam + '" -- ' +
+          String(t.gemeten || t.reden || '').slice(0, 110) + '\x1b[0m');
+      }
+      if (wacht.alleGehaald === false) {
+        mis++;
+        fout('een wacht in de meting liep af (' + (wacht.afgelopen || []).join(', ') +
+          '); er is dan gemeten op een scherm dat nog niet klaar was, dus deze uitslag telt niet');
+      }
+      if (buiten.length) {
+        mis++;
+        fout('de eerste minuut belde buiten dit huis: ' + buiten.join(', ') +
+          ' -- een uitslag die aan iemand anders zijn server hangt, is geen meting');
+      }
+      /* EEN UITSLAG DIE OP EEN VUILE BOOM IS GEMETEN, IS GEEN UITSLAG. Hij is
+         niet te reproduceren en hij hoort dus niet groen te maken -- dezelfde
+         regel als de deltapoort. Dit is de eigen stempel van het register en
+         geen tweede definitie van vers; hoe OUD een verse meting is, blijft de
+         vraag van scripts/versheid.js --dekking. */
+      const st = r.stempel || {};
+      if (st.boomVuil) {
+        mis++;
+        fout('EERSTEMINUUT.json is gemeten met ongecommit werk in de boom (commit ' +
+          (st.commit || '?') + '); die uitslag is niet te reproduceren -- meet opnieuw op een schone boom');
+      }
+      if (!mis) {
+        const t = r.telling;
+        ok(t.gehaald + ' toets(en) gehaald, ' + gezakt.length + ' gezakt (norm ' + norm + '), ' +
+          t.nietMeetbaar + ' niet meetbaar met de reden erbij; ' +
+          'geen aflopende wacht, geen herkomst buiten dit huis, gemeten op ' + (st.commit || '?') +
+          ' (hoe oud die meting is, zegt scripts/versheid.js --dekking en niet deze regel)');
+      }
+    }
   }
 }
 

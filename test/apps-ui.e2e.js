@@ -125,8 +125,17 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
       assert.deepEqual(start.werelden,
         ['/apps/rtg.html', '/apps/kantoor.html', '/apps/reizen.html', '/apps/foundation/os-publiek.html'],
         'de vier werelden staan niet in de bank');
-      assert.match(start.leeg, /Kies een wereld/i,
-        'de werktafel begint niet op een lege keuze: "' + start.leeg + '"');
+      /* Hier stond /Kies een wereld/i -- de oude doctrine, waarin de werktafel
+         LEEG opende. WERELD.md is op 12 september 2026 herzien op grond van een
+         meting (nul leesbare handelingen voor een vers lid), en deze toets is
+         meegedraaid in plaats van verzwakt: hij eist nu wat er wél hoort te
+         staan. Dat het huis nog steeds geen activiteit opent, blijft hieronder
+         staan (springboard en klok uit) en wordt elders geëist met bladen === 0.
+         DE MUTATIE: zet in shared/command/beginscherm.js de oude regel terug. */
+      assert.match(start.leeg, /LivingOS/,
+        'de werelden staan niet met hun naam op de werktafel: "' + start.leeg + '"');
+      assert.match(start.leeg, /geregeld moet worden/,
+        'er staat geen ingang in gewone taal op de werktafel: "' + start.leeg + '"');
       assert.equal(start.springboard, false, 'het springboard staat weer in beeld');
       assert.equal(start.klok, false, 'de klok is terug op het beginscherm');
 

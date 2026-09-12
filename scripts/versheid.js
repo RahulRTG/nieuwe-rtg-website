@@ -120,6 +120,46 @@ const REGISTERS = [
   ['BEPROEVING.json', 'npm run beproeving', 'storm, geld, misbruik en herstel'],
   ['SCHERMLEUGEN.json', 'node --test test/liegend-scherm.e2e.js', 'of een scherm iets toont dat er niet is'],
   ['SABOTAGE.json', 'node scripts/sabotage.js', 'of elke handhaver echt aan staat'],
+  /* DE EERSTE MINUUT. Hij hoort hier en niet in BUITEN, want hij is geen afdruk
+     uit de code maar een METING VAN GEDRAG: een vers lid, de echte registratie,
+     een echte browser op 390x844. Verandert de onboarding, het menu of het
+     beginscherm zonder dat deze ronde opnieuw draait, dan beweert het register
+     iets over een app die niet meer bestaat -- en juist bij dit register is dat
+     gevaarlijk, omdat hij gaat over wat een mens ZIET.
+
+     Melding en geen poort, om de reden uit de kop van dit bestand: hij vraagt
+     een Chromium en een paar minuten, en een poort die per constructie rood
+     staat op een machine zonder browser wordt met `|| true` uitgezet. Wat hem
+     vandaag tegenhoudt is zijn eigen tand in NORM.json (eersteMinuutGezakt,
+     richting omlaag, nu 0) -- die staat los van zijn ouderdom, en dit is
+     precies het gat ertussen. */
+  ['EERSTEMINUUT.json', 'npm run eersteminuut', 'wat een mens die RTG niet kent in de eerste minuut krijgt'],
+  /* DE MENSTAALPROEF. Ook een METING VAN GEDRAG: hij start een server, stelt
+     elke zin uit het contract en leest uit het stuurspoor hoe ver hij kwam.
+     Verandert het corpus, het beleid of een poort zonder dat deze ronde
+     opnieuw draait, dan beweert het register iets over een keten die er niet
+     meer is. */
+  ['MENSTAALPROEF.json', 'npm run menstaalproef', 'hoe ver elke menselijke zin werkelijk komt'],
+  /* DE TIEN MUTATIES. Ook een METING VAN GEDRAG, en de duurste soort: hij
+     verbouwt de echte bron twaalf keer en draait er zeven wachten tegenaan.
+     Komt er een poort bij of valt er een toets weg zonder dat deze ronde
+     opnieuw draait, dan beweert het register dat een garantie bewaakt wordt
+     terwijl de wacht die hem zag er niet meer is. */
+  ['MENSMUTATIE.json', 'npm run mensmutatie', 'welke garanties je kunt weghalen zonder dat een wacht afgaat'],
+  /* DE RAILVERGELIJKING. Hij legt twee MENSTAALPROEF-rondes naast elkaar, dus
+     hij veroudert met allebei: verandert het corpus, het beleid of een poort,
+     dan gaat hij over rails die niet meer zo werken. Hij draagt daarom wel een
+     stempel (anders dan MENSELIJKE_UITVOERING.json, die uit vingerafdrukken
+     leeft). */
+  ['RAILVERGELIJK.json', 'npm run railvergelijk', 'komt een tweede interpretatierail tot dezelfde veilige uitkomsten'],
+  /* DE NULMETING OP DE ROUTER. Ook dit is een METING VAN GEDRAG en geen afdruk
+     uit de code: hij start een server, registreert per geval een vers lid en
+     kijkt wie de vraag claimt. Verandert de antwoordrail of het corpus zonder
+     dat deze ronde opnieuw draait, dan beweert het register iets over een
+     routing die niet meer bestaat -- en juist dit getal is de grond onder de
+     vraag of `r.pakte` aangeraakt mag worden. Melding en geen poort, om
+     dezelfde reden als hierboven: hij vraagt een server en een paar minuten. */
+  ['PAKTE.json', 'node scripts/pakte.js', 'wie claimt een menselijke vraag: de antwoordrail of het stuur'],
   ['WAAROM.json', 'node scripts/waarom.js --vastleggen', 'waarom een route niet te bewijzen valt, in zijn eigen woorden'],
   /* EN DE SCHULDENLIJST. Hij leest de registers hierboven en is dus per
      definitie zo oud als de oudste daarvan -- maar hij droeg zijn eigen
@@ -216,6 +256,42 @@ const REGISTERS = [
   ['HERSTELPROEF.json', 'npm run herstelproef', 'of de tegenhanger werkelijk ongedaan maakt wat de heenweg deed'],
   ['DROOGLOOP.json', 'npm run droogloop', 'een plan werkelijk laten lopen, maar nergens waar het telt'],
   ['ONDERZOEKSKETEN.json', 'npm run onderzoeksketen', 'welke stations van het onderzoek van elkaar weten'],
+  /* DE GELDKAART MELDT EN IS GEEN POORT, en dat is tegen de intuitie: hij gaat
+     over geld, en de kolom GELD bestaat juist daarvoor. De grond is mechanisch
+     en staat hierboven bij BEPROEVING en SABOTAGE -- alleen de registers die
+     `npm run meetronde` in DEZELFDE job vers maakt mogen een poort zijn. Deze
+     komt uit `npm run geldkaart`, die daar niet in zit en die veertien
+     toetsbestanden aandrijft; als poort zou hij rood staan zodra iemand een
+     regel code wijzigt, en een poort die per constructie rood staat wordt binnen
+     twee weken uitgezet -- en neemt dan de vier mee die wel werken.
+
+     Wat de HARDE kant van deze meting bewaakt, hangt niet hier maar in
+     test/geldkaart.test.js: geen kernbak buiten zijn eigen poort. Dat is een nul
+     die nul moet blijven en die zakt gewoon, ook als dit register oud is. */
+  ['GELDKAART.json', 'npm run geldkaart', 'of elke waardemutatie door haar eigen poort ging (RTG Pay en RTG Bank)'],
+  ['GELDDEKKING.json', 'npm run gelddekking', 'wat er van elke waardebewegende route bewezen is'],
+  /* OOK EEN MELDER EN GEEN POORT, om exact dezelfde mechanische grond als de
+     geldkaart hierboven: hij komt niet uit `npm run meetronde`. En er is hier
+     een tweede reden die zwaarder weegt dan de eerste -- deze proef start drie
+     servers, doodt er een met een crashverraad en kost een paar minuten. Een
+     poort die dat bij elke commit afdwingt, staat binnen twee weken uit.
+
+     Wat deze meting HARD maakt, hangt net als bij de geldkaart niet hier maar
+     in een toets: test/factuurproef.test.js bewaakt de regel die bepaalt wat
+     als een economische mutatie telt, en die zakt gewoon. */
+  ['FACTUURPROEF.json', 'npm run factuurproef:vast', 'of een geldpad van begin tot eind heel blijft: tweede aanroep, crash, herhaling'],
+  /* HERSTELBESLUIT.json STAAT HIER BEWUST NIET, en dat is geen vergetelheid.
+     Deze lijst is de INSTRUMENTENlijst: scripts/meetkeuring.js leest hem om te
+     bepalen welk script welk register vult, en eist van elk instrument een
+     stempel. Een met de hand bijgehouden VERKLARING wordt door geen script
+     geschreven; een stempel erop zou beweren dat er gemeten is waar een mens
+     heeft besloten. IDEMBESLUIT.json en ROLLBACKBESLUIT.json staan er om
+     dezelfde reden niet in.
+
+     Zijn veroudering wordt wel bewaakt, maar langs de andere weg: hij hangt in
+     scripts/lib/metingen.js aan geldRoutesHerstelOnbesloten en
+     geldRoutesHerstelTegenspraak. Komt er een geldroute bij waarover niemand
+     iets heeft gezegd, dan stijgt de eerste en zakt de ratel. */
 
   /* DE BEWIJSLADDER (KEURING.md par. 7): welke soorten bewijs dit huis levert,
      waar ze draaien en wat ze achterlaten. Hij hoort hier omdat hij veroudert

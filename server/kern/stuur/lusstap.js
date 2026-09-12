@@ -22,54 +22,20 @@
 
 const { magDoen } = require('../rahul/twijfel');
 const { resolveer } = require('./resolver');
+const { woordenUit } = require('./resolver-woorden');
 const { compileer } = require('./plan');
 const { voorspel } = require('./gevolg');
 
-/* DE POORT BIJT ALLEEN MET DE VLAG OM, EN DAT IS EEN BESLUIT MET EEN PRIJS.
+/* De herkomstpoort en zijn schaduwtelling staan in ./lusstap-herkomst.js: een
+   beveiligingspoort met een eigen meting is iets anders dan het uitvoeren van
+   een gereedschap, en dit bestand ging door de omvangband. */
+const maakHerkomstpoort = require('./lusstap-herkomst');
 
-   CONTROLPLANE.md: een nieuwe handhavingsregel loopt eerst mee zonder te
-   blokkeren -- je kunt niet afdwingen wat nooit in de schaduw heeft gelopen. De
-   prijs is gemeten en niet geschat: na de eerste geslaagde `doe` gaat een lid van
-   120 naar 36 AI-paden en een zaak van 53 naar 9. Dat getal hoort een mens te
-   zien voordat de vlag omgaat.
+module.exports = function maakLusstap({ stuurRoep, filter, vuil, spoor }) {
 
-   HIER STONDEN EERST 43 EN 9, EN DIE WAREN VEROUDERD. Ze zijn gemeten VOORDAT de
-   leesset-vrijstelling werd aangescherpt (../isolatie/herkomstpoort.js:
-   SCHRIJFNIVEAUS -- een bewezen lezer die het beleid een SCHRIJVER noemt, is
-   onder onvertrouwde invoer geen lezer meer). Een gemeten getal in commentaar dat
-   niet meer klopt, is precies het soort stille onwaarheid waar deze laag voor is
-   gebouwd; wie hem verandert, meet opnieuw.
+  const { herkomstpoort, schaduw, AFDWINGEN } = maakHerkomstpoort({ filter, vuil });
 
-   In de schaduw TELT hij en houdt hij niets tegen; de telling reist mee in het
-   antwoord van de kaart, zodat de eigenaar de prijs op zijn scherm heeft in
-   plaats van in een logregel. */
-const AFDWINGEN = require('./herkomstschakelaar');
-const telling = require('./schaduwtelling');
-
-module.exports = function maakLusstap({ stuurRoep, filter, vuil }) {
-
-  /* De schaduwtelling van deze lus. Geen module-toestand: twee gesprekken
-     tegelijk zouden elkaars getal opschrijven. */
-  const schaduw = { gewogen: 0, zouSluiten: 0, paden: [] };
-
-  function herkomstpoort(pad, wereld) {
-    if (!filter || !filter.magMetHerkomst) return { mag: true, schaduw: false };
-    const oordeel = filter.magMetHerkomst(pad, wereld, vuil.bronnen());
-    schaduw.gewogen++;
-    if (!oordeel.mag) {
-      schaduw.zouSluiten++;
-      if (schaduw.paden.length < 20) schaduw.paden.push(pad);
-    }
-    /* En dezelfde weging OPGETELD over alle gesprekken. De telling hierboven
-       leeft één gesprek en verdwijnt; zonder de optelling is "hoe vaak zou hij
-       bijten" niet te beantwoorden, en dan is de vlag omzetten een gok. Het is
-       een teller en geen journaal -- zie ./schaduwtelling.js. */
-    telling.noteer(wereld, pad, !oordeel.mag);
-    const dwingt = AFDWINGEN(wereld);
-    return { mag: dwingt ? oordeel.mag : true, oordeel, schaduw: !oordeel.mag && !dwingt };
-  }
-
-  async function voerUit(req, t, { wereld, kaartVraag, paden, acties }) {
+  async function voerUit(req, t, { wereld, kaartVraag, paden, acties, ctxWoorden }) {
     if (t.name === 'plan') {
       /* Wegen, niet doen. De compiler krijgt de rol mee en raakt niets aan; wat
          hij teruggeeft is een oordeel dat het model aan de gebruiker kan
@@ -80,7 +46,40 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil }) {
          meting wat de stappen aanraakten. Het plan bezit de voorspelling niet
          (EXECUTIE.md blok 3: PLAN bezit niets). */
       const gewogen = compileer(t.input || {}, wereld);
-      const uit = Object.assign({}, gewogen, { gevolg: voorspel(gewogen) });
+      /* DE COMPILER DIE NEE ZEGT, HEEFT GEDRAAID. Hier stond `uitvoerbaar ?
+         PASS : NOT_RUN`, en dat is in strijd met de betekenis die ./spoor.js
+         zelf aan NOT_RUN geeft: "hij was aan de beurt en deed terecht niets".
+         Een plan dat wordt AFGEWEZEN is geen niets-doen maar het werk zelf --
+         de compiler heeft gewogen en een reden geproduceerd. De stand gaat over
+         de FASE, de uitkomst staat in het detail.
+
+         Dat verschil is precies wat een gouden plak moet kunnen tonen: "parijs
+         vrijdag" hoort te eindigen op een compiler die PASS is en een
+         capability die er niet IS -- niet op een fase die eruitziet alsof hij
+         is overgeslagen. */
+      spoor && spoor.mark('PLAN_COMPILED', 'PASS',
+        { uitvoerbaar: !!gewogen.uitvoerbaar, bezwaren: (gewogen.bezwaren || []).length,
+          /* De eerste reden staat erbij: een telling van bezwaren zegt niet
+             WAAROM er niets kan, en dat is nu juist het antwoord. */
+          eersteBezwaar: (gewogen.bezwaren || [])[0] ? (gewogen.bezwaren[0].reden || '').slice(0, 120) : undefined });
+      const gevolg = voorspel(gewogen);
+      /* WAT HIER STAAT, IS WAT ./gevolg.js WERKELIJK TERUGGEEFT. Hier stond
+         `{ graad: gevolg.graad }`, en voorspel() heeft geen `graad` -- die woont
+         per STAP, niet over het plan. Het merk droeg dus sinds de bouw een leeg
+         veld: het detail viel weg in de JSON en de fase leek keurig gemeten.
+         Gevonden door MENSELIJKE_UITVOERING.json, dat het detail per zin naast
+         de stand legde en overal niets vond. Een veld dat nooit een waarde heeft
+         gehad, is erger dan een ontbrekend veld -- het leest als bewijs.
+
+         `onbekend` staat er apart bij en wordt nergens bij `gemeten` opgeteld:
+         "van deze stap is niet gemeten wat hij aanraakt" is iets anders dan
+         "deze stap raakt niets aan" (./gevolg.js zegt dat zelf ook). */
+      const gt = (gevolg && gevolg.telling) || {};
+      spoor && spoor.mark('CONSEQUENCE_EVALUATED', 'PASS',
+        { stappen: (gevolg && gevolg.stappen || []).length,
+          collecties: (gevolg && gevolg.geraakteCollecties || []).length,
+          gemeten: gt.gemeten, geenEffect: gt['geen-effect-gemeten'], onbekend: gt.onbekend });
+      const uit = Object.assign({}, gewogen, { gevolg });
       acties.push({ pad: 'plan', status: uit.uitvoerbaar ? 200 : 409, gevraagd: true });
       return uit;
     }
@@ -90,6 +89,17 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil }) {
       const uit = (t.input && t.input.alles)
         ? { paden: toegestaan, versmald: false, reden: 'De volledige lijst voor deze rol, op verzoek.' }
         : resolveer(kaartVraag, toegestaan);
+      /* HEEFT DE CONTEXT ECHT MEEGEWOGEN? CONTEXT_SANITIZED zegt alleen dat er
+         iets gesaneerd is; dit zegt of een van die woorden ook werkelijk een
+         pad heeft geraakt. `ctxWoorden` draagt al alleen wat de context BOVEN
+         de vraag toevoegt (./lus.js), dus een treffer hier komt niet uit de
+         zin van de mens zelf. Vraagt hij om de volledige lijst, dan is er
+         niets gewogen -- dat is `false` en geen stilte. */
+      const ctxw = new Set(woordenUit((ctxWoorden || []).join(' ')));
+      const ctxRaak = (uit.raakvlak || []).filter((w) => ctxw.has(w));
+      spoor && spoor.mark('INTENT_RESOLVED', 'PASS',
+        { versmald: !!uit.versmald, paden: (uit.paden || []).length,
+          contextWoorden: ctxw.size, contextGebruikt: ctxRaak.length > 0, contextRaak: ctxRaak });
       /* WAT ER DOOR EEN BEVEILIGINGSSTAND WEGVIEL, ZEGT DE KAART ERBIJ. Zonder
          deze regel denkt het model dat die vermogens niet BESTAAN, en zegt het
          "dat kan ik niet" in plaats van "dat kan nu niet, omdat". EXECUTIE.md
@@ -138,7 +148,20 @@ module.exports = function maakLusstap({ stuurRoep, filter, vuil }) {
           'en niet dat de mogelijkheid niet bestaat.' };
     }
 
+    spoor && spoor.mark('CAPABILITY_SELECTED', 'PASS', { pad });
     const uit = await stuurRoep(req, pad, (t.input || {}).body, { wereld });
+    /* EXECUTED: DRIE UITKOMSTEN IN TWEE STANDEN (2xx = PASS, 428 = voorstel,
+       al het andere = geweigerd). Hier stond `bevestigNodig ? NOT_RUN : PASS`,
+       en daarmee las een GEWEIGERDE aanroep -- 403, 409, 503 -- als een
+       uitgevoerde. Zonder status is het NOT_RUN: een uitvoering claimen die we
+       niet kunnen zien, is de valse nul andersom. Zie MENS.md par. 3f. */
+    const st = uit && typeof uit.status === 'number' ? uit.status : null;
+    const voorstel = !!(uit && uit.bevestigNodig);
+    const gelukt = st !== null && st >= 200 && st < 300 && !voorstel;
+    spoor && spoor.mark('EXECUTED', gelukt ? 'PASS' : 'NOT_RUN',
+      { status: st === null ? undefined : st, voorstel: voorstel || undefined,
+        geweigerd: (!gelukt && !voorstel) || undefined,
+        statusOnbekend: st === null || undefined });
     acties.push({ pad, status: uit.status,
       goedkeuring: uit && uit.goedkeuring ? uit.goedkeuring : undefined });
     /* MELDEN VOOR HET ANTWOORD HET GESPREK IN GAAT. Zie de kop: erna is de

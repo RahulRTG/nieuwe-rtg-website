@@ -105,7 +105,25 @@ test('5. de grens van de methode staat in de uitslag en niet in een commentaarre
    terugweg stukgegaan of is de proef minder gaan meten, en die twee wil je
    allebei zien. */
 test('7. bevestigd groeit, vermoed krimpt', () => {
-  const grond = { bevestigd: 43, vermoed: 47 };
+  /* 47 -> 49 op 12 september 2026, EN DAT IS PRECIES WAT DEZE TOETS VRAAGT:
+     niet groeien "zonder dat iemand het ziet". Hier is wat er gezien is.
+
+     `bouw()` leidt kandidaat-tegenhangers af uit de NAMEN van de routes in
+     IDEMPROEF.json, en dat register is in deze tak voor het eerst sinds
+     3 september opnieuw gedraaid: 4912 routes in plaats van 4729. Twee van de
+     183 nieuwe dragen een naam die elkaars omkering is:
+
+       /api/rtfos/bescherming/open  <->  /api/rtfos/bescherming/sluit
+
+     Er is dus geen terugweg stukgegaan en de proef is niet minder gaan meten --
+     de twee stonden er al en werden nooit geteld. `bevestigd` blijft op 43,
+     precies zoals het hoort als er niets is bewezen en niets is verloren.
+
+     De richting van de post verandert niet: `herstel-onbevestigd` moet naar
+     nul, en deze twee horen daar met een beproefd paar uit te verdwijnen -- niet
+     door de grond te verhogen. Wie hem opnieuw moet verhogen, hoort eerst te
+     kijken of er echt weer routes bij zijn gekomen. */
+  const grond = { bevestigd: 43, vermoed: 49 };
   const vermoed = Object.values(R.per).filter(v => v.graad === 'vermoed').length;
   assert.ok(R.bevestigd.length >= grond.bevestigd,
     'bevestigde tegenhangers: ' + R.bevestigd.length + ' < ' + grond.bevestigd +

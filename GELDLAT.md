@@ -163,6 +163,7 @@ en een noodstop die twee milliseconden langer duurt is geen noodstop minder.
 
 ```
 GELD        kern/pay -> lib/idem -> bijeen({duurzaam:true})     AANGESLOTEN
+FACTUUR     kern/factuursaldo -> bijeen({duurzaam:true})        AANGESLOTEN
 NOTITIES    kern/notities -> lib/duurzaam -> bijeen(...)        AANGESLOTEN
 AGENDA      -                                                   OPEN
 BESTANDEN   -                                                   OPEN
@@ -310,3 +311,265 @@ Dat is met opzet en het is de kortste samenvatting van dit hele document:
 CI rood houden om een onderzoeksbevinding leert iedereen om rood weg te kijken.
 De route groen maken zou liegen. De bevinding staat waar hij hoort: in de
 matrixcel van de route zelf.
+
+## Scenario 3, gemeten op een echt geldpad — 12 september 2026
+
+Het scenario hierboven stond hier sinds augustus als eis, en `test/saveduurzaam.test.js`
+bewees er de helft van: dat het **injectiepunt** werkt (het proces sterft
+werkelijk ná de duurzame schrijfactie, en de data overleeft). Die toets zegt er
+zelf bij dat de geldketen nog open stond — die opmerking was inmiddels verouderd,
+want de tabel hierboven zet `GELD` al op AANGESLOTEN. De vraag was dus meetbaar
+en was nooit gemeten.
+
+`npm run factuurproef` (`scripts/factuurproef.js`) meet hem, op het dunste
+volledige geldpad dat dit huis heeft: `POST /api/pay/saldo` — de maandfactuur
+betalen uit het eigen RTG Pay-saldo. Zeven stappen, en de maat is telkens de
+**toestand** en nooit de status. Dat onderscheid is de hele reden dat dit
+instrument bestaat:
+
+> een route kan keurig 409 weigeren terwijl drie van de vijf geldcollecties al
+> tweemaal zijn aangeraakt.
+
+```
+1 PROVEN    de factuur staat open en het saldo dekt hem
+2 PROVEN    het geldpad voert uit: saldo af, factuur dicht, afdracht geboekt
+3 PROVEN    een identieke tweede aanroep verplaatst NUL waarde
+4 PROVEN    het proces sterft na de duurzame boeking en voor het antwoord
+5 PROVEN    na de herstart is de uitkomst HEEL   <- stond op FAILED; gerepareerd
+6 PROVEN    de herhaling na de crash levert over alles heen exact EEN mutatie
+7 UNKNOWN   de terugweg
+```
+
+**Stap 5 stond bij de eerste ronde op FAILED.** Wat hij vond en hoe het is
+gerepareerd, staat hieronder uitgeschreven; het is de reden dat deze proef
+bestaat en het hoort niet weggepoetst te worden tot een groene regel.
+
+### Stap 3 is bewezen, en scherper dan de idempotentieproef hem kan stellen
+
+Na de tweede, identieke aanroep bewoog er in **geen van de vijf geldcollecties**
+iets: gelijk aantal én gelijke hash op `paySaldi`, `payBoekingen`, `invoices`,
+`fondsAfdrachten` en `socialeAfdrachten`. Wat wél bewoog is het audittrail
+(`apiSpoor`, `handelingLog`) — dat hoort zo, en het staat met naam in de uitslag
+in plaats van weggefilterd te worden. "We negeren de rest" is precies hoe een
+echte dubbele mutatie ongezien blijft.
+
+### Stap 5 was GEZAKT, en dat is de opbrengst van deze proef
+
+Reproduceerbaar over drie rondes:
+
+```
+saldo vóór          20000        saldo ná        12135   (EUR 78,65 afgeschreven)
+factuurstand        open  <-- nog steeds open
+boekingen op deze factuur   1
+afdracht RTFoundation       0
+```
+
+**Het lid is afgeschreven en zijn factuur staat nog open.** De oorzaak is
+eenduidig aan te wijzen en volgt uit waar het crashpunt zit: `sterf-na-commit`
+vuurt uitsluitend in `saveDuurzaam()`, en de enige duurzame commit op dit pad is
+die van `pay.huisIn` (boeking + idem-sleutel, via `lib/idem.js`). De afwikkeling
+die daarna komt — `settleFactuur`, die de factuur sluit en de 30%-afdracht boekt
+— staat **buiten** die bundel. Het venster is dus exact:
+
+```
+pay.huisIn  -> duurzame commit (geld + sleutel)   VAST
+            -> [crash]
+settleFactuur -> factuur dicht, afdracht          NOOIT GEBEURD
+```
+
+Dit is niet de fout die dit document in augustus weerlegde. Toen verdween het
+geld en klopte het grootboek. Nu staat het geld vást en is de tegenprestatie
+zoek — de spiegel ervan, met dezelfde onderliggende oorzaak: twee dingen die bij
+elkaar horen landen in twee commits.
+
+**De toestand geneest bij elke herhaling** (dat is stap 6, en die is PROVEN): de
+idem-sleutel overleefde de crash, dus `pay.huisIn` geeft dezelfde boeking terug,
+`settleFactuur` loopt alsnog, en over crash + herhaling heen staat er exact één
+boeking, één betaalbewijs en één afdracht. Er wordt niets dubbel geboekt. Maar
+de genezing hangt volledig aan een klant die het opnieuw probeert; er is geen
+herstelronde die halve betalingen opruimt (drie seconden na de herstart gewacht
+en nagemeten — er is er geen). Blijft de herhaling uit, dan blijft de factuur
+open terwijl hij betaald is.
+
+### De reparatie, en waar zij uiteindelijk terechtkwam
+
+De eerste poging deed het bij de aanroepers: `server/lib/idem.js` zou eerst
+`inBundel()` vragen en meedoen in een openstaande bundel, en
+`server/kern/factuursaldo.js` zou er een om de boeking én de afwikkeling heen
+openen. Dat werkt, en het is precies wat `server/lib/duurzaam.js` en
+`kern/fonds.js` al deden.
+
+**En juist dat was het argument om het níét daar te doen.** Twee modules
+stelden die vraag al elk apart, een derde (`lib/idem.js`) vergat hem, en er
+werd niets rood — de geldketen verloor stil zijn atomiciteit. Een regel die
+elke aanroeper apart moet onthouden, is een regel die de volgende vergeet.
+
+De vraag woont daarom in **`server/db/bijeen.js`** zelf: een `bijeen()` binnen
+een openstaande bundel die dezelfde belofte doet, doet daarin mee in plaats van
+een eigen doos te openen. Wie de vraag al stelde krijgt hetzelfde antwoord en
+verandert niets; wie hem vergat, is nu gedekt. `kern/factuursaldo.js` opent de
+bundel om boeking en afwikkeling heen, en dat is de hele wijziging aan de
+geldkant.
+
+**De grendel eromheen is even belangrijk als de reparatie.** Meedoen mag alleen
+in een bundel die dezelfde belofte doet: een NIET-duurzame buitenbundel zou een
+geldcommit stil degraderen van "bevestigd als de opslag het heeft" naar
+write-behind — precies de belofte die dit document in augustus weerlegde. Zulke
+bundels bestaan ook echt (`db/economische-boeking.js` opent er een zonder de
+vlag), dus `inBundel({ duurzaam: true })` geeft daar `false` en de geldcommit
+opent gewoon zijn eigen duurzame doos. `test/idembundel.test.js` houdt die
+grendel vast; vier mutaties nagetrokken, waaronder "altijd meedoen" en "de eis
+genegeerd".
+
+En één ding is bewust NIET in de bundel gezet: het seintje naar het lid
+(`broadcastSync`) staat erbuiten. Een uitgaand bericht binnen een bundel
+vertelt iemand iets dat de opslag nog niet heeft bevestigd.
+
+Na de reparatie meldt stap 5 `volledig doorgegaan`: saldo af, factuur betaald,
+afdracht geboekt — de crash valt nu ná de commit van het hele pad. Stap 6 geeft
+409 met alles ongewijzigd, dus over crash en herhaling heen staat er nog steeds
+exact één mutatie.
+
+### Stap 7 blijft UNKNOWN, en dat is geen tekortkoming van de proef
+
+`HERSTEL.json` leidt kandidaat-tegenhangers af uit de naam van een route en
+noemt `/api/pay/saldo` **nul** keer. Zonder kandidaat valt er niets uit te
+voeren, en niets komt boven de graad `vermoed` uit een naam. De compenserende
+bouwsteen bestaat wél — `pay.huisUit` is de spiegel van de `pay.huisIn` die dit
+pad gebruikt, en hij heeft echte aanroepers bij Assets en bij de punten — maar
+geen ervan hangt aan een factuur. De bevinding is dus niet "er is geen terugweg"
+maar **de bouwsteen ligt er en de bedrading ontbreekt**.
+
+`FINAL` zou hier een besluit van de eigenaar zijn en geen meting. Daarom staat er
+`UNKNOWN`, precies zoals `HERSTELBESLUIT.json` het bedoelt.
+
+### Wat dit zegt over de zeven geblokkeerde geldpaden
+
+De proef is gebouwd om te ontdekken welke gedeelde bouwstenen die paden
+werkelijk nodig hebben, in plaats van er een crashwereld voor te verzinnen. Wat
+er nodig bleek is opvallend weinig, en dat is zelf de uitkomst:
+
+- **een wereld** — een lidsessie, een oplading en een bestaand onderwerp uit de
+  zaaiset. Meer niet. `scripts/lib/wegwerpserver.js` levert de server, de map en
+  de opruiming al.
+- **een crashpunt** — bestaat al, ingebouwd, deterministisch, en er hoefde géén
+  testhaak in productiecode: `RTG_VERRAAD=sterf-na-commit`. De enige truc die
+  eromheen nodig was, is dat de opstelling schoon draait en pas de tweede start
+  het verraad draagt, want de opstelling schrijft zelf duurzaam.
+- **een economische momentopname** — en die bestond ook al, in twee helften:
+  `/api/techniek/vingerafdruk` (bewóóg er iets: aantal + gezouten hash per
+  collectie) en de domeinroutes van het lid zelf (de bedragen). Twee getuigen,
+  want de vingerafdruk ziet een stille rij die geen route toont, en de bedragen
+  zien een hash die toevallig gelijk blijft.
+
+En dan de vondst die de hele lijst raakt. Dit pad stond zelf op
+`BLOCKED_BY_TEST_FIXTURE` met als reden "geen openstaande factuur" — **en die
+factuur lag er gewoon**, in `server/seed/leden.js`, als `RTG-2026-0207`. De
+blokkade was een aanname en geen meting, en ze hield het geldpad dat over vijf
+collecties beweegt een maand lang ongemeten.
+
+Dat is geen incident. `POST /api/pay/verzoek/intrek` stond om dezelfde soort
+reden geblokkeerd ("zonder verzoek geeft de route 404"), en er is nagemeten wat
+daar werkelijk voor nodig was: **één opzetaanroep**. Twee lidsessies, `POST
+/api/pay/verzoek` met de codenaam van de tweede, en het onderwerp bestaat —
+`intrek` geeft dan 200 en een tweede poging 409. Er is geen wereld te bouwen, er
+was een aanroep te doen.
+
+De verwachting was dat deze zes een crashwereld nodig hadden. Wat ze nodig
+hebben is dat iemand het onderwerp langs de gewone route laat ontstaan. Wie de
+resterende vijf oppakt: begin met kijken of de zaaiset of een bestaande route het
+al levert, en verander pas een `stand` nadat je gemeten hebt — hier is die stand
+vervangen door `PROTECTED` mét het instrument en de datum erbij, niet door een
+betere aanname.
+
+Eén echte tekortkoming in de fixture is er ook, en die is het noteren
+waard: **de zaaiset heeft precies
+één open factuur, en dat is een abonnementsfactuur.** Er is dus geen open
+factuur zonder RTFoundation-afdracht om tegenaan te meten, en de afwikkeling van
+een niet-abonnement is daarmee op dit pad niet te beproeven.
+
+Let ten slotte op één beperking van de meetopstelling zelf, die in de uitslag
+staat en niet weggepoetst hoort te worden: het zout van de vingerafdruk wordt
+per proces getrokken (met reden, zie `server/lib/vingerafdruk.js`). Over een
+crash heen zijn dus alleen de **aantallen** en de bedragen vergelijkbaar, niet
+de hashes. `bakverschil()` valt daar zelf op terug en zegt met `hashVergelijkbaar`
+dat hij het doet; `test/factuurproef.test.js` houdt dat vast met een mutatie,
+want een versie die de hashes tóch vergelijkt meldt elke geldbak als bewogen en
+maakt de crashfase permanent rood.
+
+## Het correctiemodel — besluit van de eigenaar, 12 september 2026
+
+Dit document ging tot nu toe over de HEENWEG: komt een financiële mutatie heel
+en één keer op schijf. De vraag erna — wat als hij achteraf fout blijkt — was
+nooit beantwoord, en `HERSTELBESLUIT.json` stond daarom met opzet leeg. Dat
+besluit is nu genomen, en het staat in dat register zodat het naast de getallen
+leeft in plaats van in een herinnering.
+
+> **RTG gebruikt append-only economische geschiedenis en corrigeert primair met
+> compensaties. Geen generieke undo.** Iedere geldroute verklaart expliciet of
+> hij REVERSIBLE, COMPENSATABLE, FINAL of NOT_APPLICABLE is. UNKNOWN blijft
+> zichtbaar en ratelt alleen omlaag.
+
+**Voor geld is COMPENSATABLE de standaard, niet REVERSIBLE.** Financiële
+geschiedenis hoort niet te worden herschreven: is een factuur eenmaal
+economisch verwerkt, dan wil je niet achteraf doen alsof die gebeurtenis nooit
+heeft bestaan. Je wilt de fout ernáást zien staan.
+
+```
++500   de oorspronkelijke gebeurtenis
+-500   de compensatie
++450   de correcte boeking
+```
+
+en niet: *de oude 500 stil verwijderen*. Dat is wat audit, boekhouding en bewijs
+nodig hebben, en het is de enige vorm die later refunds, chargebacks,
+settlementcorrecties, payrollcorrecties en partnerafrekeningen kan dragen zonder
+de geschiedenis te vervalsen.
+
+`REVERSIBLE` mag wel bestaan, maar alleen waar de domeinregels aantonen dat een
+toestand werkelijk atomair terug te draaien is én er geen economische gebeurtenis
+is vastgelegd die zou moeten blijven staan. Een pre-settlement toestand kan dat
+zijn; een verwerkte betaling niet.
+
+### Een verklaring is geen bewijs, en dat is machinaal afgedwongen
+
+Dit is de scherpste kant van het besluit. `HERSTELBESLUIT.json` zegt wat de
+BEDOELING is; `bewijs` zegt of die bedoeling ergens is uitgevoerd. Zonder dat
+onderscheid wordt de as groen op de dag dat iemand `COMPENSATABLE` tikt —
+precies de faalvorm die de idempotentie-as al kent, waar een `stand` in een
+contract ook niet als meting telt.
+
+`scripts/gelddekking.js` kent daarom vier uitkomsten op deze as, en `BLOCKED` is
+er nieuw bij:
+
+```
+PROVEN           verklaard EN de terugweg is ergens uitgevoerd
+BLOCKED          verklaard, maar er valt (nog) niets uit te voeren -- mét watErMoetKomen
+NOT_APPLICABLE   FINAL of geen corrigeerbare waarde-eindtoestand: beantwoord, geen gat
+UNKNOWN          nog niet geclassificeerd -- de schuld die alleen mag dalen
+```
+
+Drie mutaties houden dat vast (`test/gelddekking.test.js`): een verklaring zonder
+bewijs als PROVEN tellen, FINAL als gat tellen, en het bewijsveld negeren. Alle
+drie laten ze de toets zakken.
+
+### De eerste verklaring, en waarom het er één is
+
+`POST /api/pay/saldo` staat op **COMPENSATABLE**, en dat is de enige route
+waarvan de terugweg werkelijk is GEMETEN in plaats van beredeneerd. De grond
+staat in het register: deze route legt drie gebeurtenissen vast — saldo eraf,
+factuur dicht, afdracht naar de RTFoundation — en die afdracht is al bij een
+derde partij. Ze terugdraaien zou betekenen dat je doet alsof de betaling nooit
+heeft plaatsgevonden terwijl de stichting haar deel heeft gekregen.
+
+Haar bewijs staat op `BLOCKED`, met wat er moet komen: er is nog geen route die
+op een betaalde factuur een tegenboeking zet. `npm run factuurproef` stap 7 mat
+dat — nul kandidaat-tegenhangers in `HERSTEL.json`, en de compenserende
+bouwsteen `pay.huisUit` bestaat wél maar heeft geen enkele aanroeper op een
+factuur. **De bouwsteen ligt er, de bedrading ontbreekt.**
+
+De andere 41 blijven UNKNOWN. Eenenveertig standen verzinnen omdat er nu een
+beleid is, zou precies de grens breken die boven het register staat: een stand
+wordt nooit afgeleid uit bewijs, en een beleid is geen stand. De ratel
+(`geldRoutesHerstelOnbesloten` in `NORM.json`) staat op de dag van invoering op
+**41** en mag daarna alleen dalen.

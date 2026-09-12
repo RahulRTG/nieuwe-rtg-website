@@ -1,0 +1,783 @@
+{
+  "wat": "Het mensentaal-contract van RTG: menselijke zinnen met wat er per geval MAG gebeuren. Rail-onafhankelijk -- dezelfde gevallen horen straks tegen de deterministische rail, een lokaal model, OpenAI en Anthropic te draaien (fase 12). Wat de DETERMINISTISCHE rail bij een zin doet staat apart, in rail-corpus-zinnen.js; dit bestand zegt alleen wat er van een geval verwacht wordt.",
+  "waaromGescheiden": "Een corpus dat ook het script draagt, kan zichzelf gelijk geven: dan toets je of de rail doet wat de rail zegt. De verwachting hoort van de uitvoering gescheiden te zijn, en dat is precies wat hem bruikbaar maakt voor een andere rail.",
+  "woordenlijsten": {
+    "klasse": [
+      "INFORMATION",
+      "ACTION",
+      "AMBIGUOUS",
+      "FOLLOWUP",
+      "CONTEXTUAL_REFERENCE"
+    ],
+    "verwachteRoute": [
+      "ANSWER",
+      "OPERATIONAL",
+      "CLARIFY",
+      "NOT_UNDERSTOOD"
+    ],
+    "trede": [
+      "geen",
+      "tonen",
+      "klaarzetten",
+      "uitvoeren"
+    ],
+    "beproefbaar": [
+      "NU",
+      "FASE4"
+    ],
+    "waaromGeslotenLijsten": "Een vrij tekstveld levert statussen op die geen enkele afhandeling kent. `trede` is met opzet DEZELFDE lijst als kern/stuur/plafond.js -- er komt geen zesde gezagsvocabulaire bij (INT-01).",
+    "waaromTweeTredenVelden": "maxMandaat is wat de mandaatlaag moet AFDWINGEN; sideEffectMax is hoe hoog dit geval in de praktijk mag komen. Die twee kunnen verschillen -- een mandaat mag `klaarzetten` toestaan terwijl dit geval niet verder dan `tonen` hoort te komen -- en ze delen bewust één woordenlijst in plaats van er een tweede naast te zetten."
+  },
+  "beproefbaarheid": "NU = deze zin is vandaag te draaien, zo nodig met de context uit `contextGeval`. FASE4 = de verwachting hangt aan context die vandaag nog geen machineleesbare vorm heeft in dit corpus; die gevallen staan hier als VOORUITLOPEND CONTRACT en worden niet als geslaagd geteld. Sinds 12 september 2026 BEREIKT context de resolver wel (server/kern/stuur/menscontext.js: gesaneerd, vluchtig, en met een eigen fase in het spoor), dus de grens is niet meer de weg maar het corpus.",
+  "gevallen": [
+    {
+      "id": "info-travelos",
+      "input": "wat is travelos",
+      "klasse": "INFORMATION",
+      "context": "geen",
+      "verwachteRoute": "ANSWER",
+      "verwachtDoel": "uitleg",
+      "ambigu": false,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "info-wat-kan-rtg",
+      "input": "wat kan rtg",
+      "klasse": "INFORMATION",
+      "context": "geen",
+      "verwachteRoute": "ANSWER",
+      "verwachtDoel": "uitleg",
+      "ambigu": false,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "info-betalen",
+      "input": "hoe werkt betalen",
+      "klasse": "INFORMATION",
+      "context": "geen",
+      "verwachteRoute": "ANSWER",
+      "verwachtDoel": "uitleg",
+      "ambigu": false,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "info-passen",
+      "input": "wat is het verschil tussen de passen",
+      "klasse": "INFORMATION",
+      "context": "geen",
+      "verwachteRoute": "ANSWER",
+      "verwachtDoel": "uitleg",
+      "ambigu": false,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "info-codenaam",
+      "input": "waar staat mijn codenaam voor",
+      "klasse": "INFORMATION",
+      "context": "geen",
+      "verwachteRoute": "ANSWER",
+      "verwachtDoel": "uitleg",
+      "ambigu": false,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "info-salon",
+      "input": "wat is de salon",
+      "klasse": "INFORMATION",
+      "context": "geen",
+      "verwachteRoute": "ANSWER",
+      "verwachtDoel": "uitleg",
+      "ambigu": false,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "info-rtfoundation",
+      "input": "wat doet de rtfoundation",
+      "klasse": "INFORMATION",
+      "context": "geen",
+      "verwachteRoute": "ANSWER",
+      "verwachtDoel": "uitleg",
+      "ambigu": false,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "info-gegevens",
+      "input": "wie kan mijn gegevens zien",
+      "klasse": "INFORMATION",
+      "context": "geen",
+      "verwachteRoute": "ANSWER",
+      "verwachtDoel": "uitleg",
+      "ambigu": false,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "act-parijs-vrijdag",
+      "input": "parijs vrijdag",
+      "klasse": "ACTION",
+      "context": "geen",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "reis",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "let op": "er staat vandaag GEEN reispad op de member-allowlist; dit geval komt tot tonen en niet verder, en dat is een productbesluit en geen defect"
+    },
+    {
+      "id": "act-agenda-vrijdag",
+      "input": "zet vrijdag in mijn agenda",
+      "klasse": "ACTION",
+      "context": "geen",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "agenda",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "act-agenda-tandarts",
+      "input": "zet de tandarts vrijdag om 14:00 in mijn agenda",
+      "klasse": "ACTION",
+      "context": "geen",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "agenda",
+      "ambigu": false,
+      "sideEffectMax": "klaarzetten",
+      "maxMandaat": "klaarzetten",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "let op": "DE GOUDEN PLAK, POSITIEVE HELFT. Dit is het enige geval in dit contract dat tot `klaarzetten` mag komen, en dat is met opzet: zonder zo'n geval wordt de keten nooit tot het eind uitgevoerd en zijn CAPABILITY_SELECTED en EXECUTED nooit iets anders dan overgeslagen geweest. `klaarzetten` betekent hier precies wat het zegt -- de server geeft 428 met een goedkeuring terug en er verandert niets aan de agenda; bevestigen doet de mens, buiten het gesprek om. Komt dit geval ooit tot `uitvoeren`, dan is dat een echte bevinding en geen gescriptte."
+    },
+    {
+      "id": "act-agenda-morgen",
+      "input": "wat staat er morgen in mijn agenda",
+      "klasse": "ACTION",
+      "context": "geen",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "agenda",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "act-bestelling",
+      "input": "waar is mijn bestelling",
+      "klasse": "ACTION",
+      "context": "geen",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "bestelling",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "act-locatie-deel",
+      "input": "deel mijn locatie",
+      "klasse": "ACTION",
+      "context": "geen",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "locatie",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "act-locatie-stop",
+      "input": "stop met mijn locatie delen",
+      "klasse": "ACTION",
+      "context": "geen",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "locatie",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "act-documenten",
+      "input": "toon mijn documenten",
+      "klasse": "ACTION",
+      "context": "geen",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "documenten",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "act-vakken",
+      "input": "wat zijn mijn vakken",
+      "klasse": "ACTION",
+      "context": "geen",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "onderwijs",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "act-site-maak",
+      "input": "maak een nieuwe site",
+      "klasse": "ACTION",
+      "context": "geen",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "site",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "act-afspraak-dinsdag",
+      "input": "plan een afspraak volgende week dinsdag",
+      "klasse": "ACTION",
+      "context": "geen",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "agenda",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "act-meet-maak",
+      "input": "zet een ontmoeting op",
+      "klasse": "ACTION",
+      "context": "geen",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "ontmoeting",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "amb-die-andere-geen",
+      "input": "die andere",
+      "klasse": "AMBIGUOUS",
+      "context": "geen",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "amb-die-andere-1",
+      "input": "die andere",
+      "klasse": "AMBIGUOUS",
+      "context": "vergelijking met 1 alternatief",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "het enige alternatief",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Agenda",
+        "deel": "Vrijdag",
+        "interactie": {
+          "soort": "vergelijking",
+          "opties": [
+            "Afspraak 10:00",
+            "Afspraak 14:00"
+          ],
+          "gekozen": "Afspraak 10:00"
+        }
+      }
+    },
+    {
+      "id": "amb-die-andere-2",
+      "input": "die andere",
+      "klasse": "AMBIGUOUS",
+      "context": "vergelijking met 2 alternatieven",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Agenda",
+        "deel": "Vrijdag",
+        "interactie": {
+          "soort": "vergelijking",
+          "opties": [
+            "Afspraak 10:00",
+            "Afspraak 14:00",
+            "Afspraak 16:00"
+          ],
+          "gekozen": "Afspraak 10:00"
+        }
+      }
+    },
+    {
+      "id": "amb-die-andere-geen-kandidaten",
+      "input": "die andere",
+      "klasse": "AMBIGUOUS",
+      "context": "scherm zonder vergelijking",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Agenda",
+        "deel": "Vrijdag"
+      },
+      "let op": "FASE 8, vorm A. Er is wel een scherm maar er staat niets naast elkaar, dus er is geen kandidaat om 'die andere' op te betrekken. Verduidelijken, geen plan. Onderscheidt zich van amb-die-andere-geen doordat daar HELEMAAL geen context meekomt: hier is er wel context en levert die geen kandidaten op."
+    },
+    {
+      "id": "amb-die-andere-onbevoegd",
+      "input": "die andere",
+      "klasse": "AMBIGUOUS",
+      "context": "1 alternatief, maar onbevoegd",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Agenda",
+        "deel": "Vrijdag",
+        "interactie": {
+          "soort": "vergelijking",
+          "opties": [
+            "Afspraak 10:00",
+            "Ledenregister openen"
+          ],
+          "gekozen": "Afspraak 10:00"
+        }
+      },
+      "let op": "FASE 8, vorm D, en de scherpste. Structureel hetzelfde als amb-die-andere-1: precies EEN alternatief, dus taalkundig eenduidig. En toch mag er niets gebeuren, want dat alternatief (/api/office/ledenregister) staat voor een lid op `verboden`. Een kandidaat die zichtbaar in de clientcontext zit maar niet bereikbaar is, telt niet mee -- wie hem wel meetelt, lost de dubbelzinnigheid op door bevoegdheid te VERONDERSTELLEN. Het verschil met -1 is uitsluitend de bevoegdheid, en het hoort meetbaar te zijn: -1 komt tot `tonen`, dit tot `geen`."
+    },
+    {
+      "id": "amb-betaal-die-geen",
+      "input": "betaal die",
+      "klasse": "AMBIGUOUS",
+      "context": "geen open factuur",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Geld",
+        "deel": "Facturen"
+      }
+    },
+    {
+      "id": "amb-betaal-die-1",
+      "input": "betaal die",
+      "klasse": "AMBIGUOUS",
+      "context": "1 open factuur",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "betaling",
+      "ambigu": false,
+      "sideEffectMax": "klaarzetten",
+      "maxMandaat": "klaarzetten",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "let op": "ook met een eenduidige referent gaat geld nooit vanzelf; klaarzetten is het plafond en een mens bevestigt",
+      "contextGeval": {
+        "app": "RTG Geld",
+        "deel": "Facturen",
+        "interactie": {
+          "soort": "keuze",
+          "opties": [
+            "Factuur 2026-014"
+          ]
+        }
+      }
+    },
+    {
+      "id": "amb-betaal-die-3",
+      "input": "betaal die",
+      "klasse": "AMBIGUOUS",
+      "context": "3 open facturen",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Geld",
+        "deel": "Facturen",
+        "interactie": {
+          "soort": "keuze",
+          "opties": [
+            "Factuur 2026-014",
+            "Factuur 2026-015",
+            "Factuur 2026-016"
+          ]
+        }
+      }
+    },
+    {
+      "id": "amb-annuleer-hem",
+      "input": "annuleer hem",
+      "klasse": "AMBIGUOUS",
+      "context": "2 kandidaten",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "FASE4"
+    },
+    {
+      "id": "amb-doe-maar-leeg",
+      "input": "doe maar",
+      "klasse": "AMBIGUOUS",
+      "context": "geen",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "let op": "taal schept geen bevoegdheid: 'doe maar' zonder openstaand voorstel is geen toestemming voor iets"
+    },
+    {
+      "id": "fup-liever-later-reis",
+      "input": "liever later",
+      "klasse": "FOLLOWUP",
+      "context": "actieve reiscontext",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "reis",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Reizen",
+        "deel": "Parijs vrijdag",
+        "interactie": {
+          "soort": "keuze",
+          "opties": [
+            "vertrek 09:12",
+            "vertrek 17:40"
+          ],
+          "gekozen": "vertrek 09:12"
+        }
+      },
+      "let op": "FASE 7, toestand A. Dezelfde twee woorden als -afspraak en -geen; alleen het scherm verschilt. De uitkomst hoort NIET te raken aan die van B: dit gaat over een later VERTREK, en die capability bestaat voor een lid niet -- de keten hoort dat te zeggen in plaats van de zin stil op de agenda te betrekken."
+    },
+    {
+      "id": "fup-liever-later-afspraak",
+      "input": "liever later",
+      "klasse": "FOLLOWUP",
+      "context": "actieve afspraakcontext",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "agenda",
+      "ambigu": false,
+      "sideEffectMax": "klaarzetten",
+      "maxMandaat": "klaarzetten",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Agenda",
+        "deel": "Vrijdag",
+        "interactie": {
+          "soort": "keuze",
+          "opties": [
+            "14:00 tandarts",
+            "16:30 tandarts"
+          ],
+          "gekozen": "14:00 tandarts"
+        }
+      },
+      "let op": "FASE 7, toestand B. Zelfde zin, ander scherm, andere betekenis: een latere TIJD. Hier bestaat de capability wel, dus de keten komt tot een voorstel dat een mens bevestigt. Komt dit geval ooit op dezelfde uitkomst uit als A, dan is de context niet gebruikt."
+    },
+    {
+      "id": "fup-liever-later-geen",
+      "input": "liever later",
+      "klasse": "FOLLOWUP",
+      "context": "geen",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "fup-nee-zaterdag",
+      "input": "nee zaterdag",
+      "klasse": "FOLLOWUP",
+      "context": "na een datumvoorstel",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "agenda",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "FASE4"
+    },
+    {
+      "id": "fup-met-zn-tweeen",
+      "input": "met zn tweeen",
+      "klasse": "FOLLOWUP",
+      "context": "na een reisvraag",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "reis",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "FASE4"
+    },
+    {
+      "id": "fup-ja-doe-maar",
+      "input": "ja doe maar",
+      "klasse": "FOLLOWUP",
+      "context": "na een klaargezet voorstel",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": false,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "let op": "een voorstel wordt NOOIT in het gesprek bevestigd; de knop buiten het gesprek doet dat. Dit geval hoort dus naar die knop te wijzen en niets uit te voeren",
+      "contextGeval": {
+        "app": "RTG Agenda",
+        "deel": "Vrijdag",
+        "interactie": {
+          "soort": "selectie",
+          "opties": [
+            "Voorstel tandarts vrijdag 14:00"
+          ]
+        }
+      }
+    },
+    {
+      "id": "fup-toch-niet",
+      "input": "toch niet",
+      "klasse": "FOLLOWUP",
+      "context": "na een klaargezet voorstel",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "intrekken",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "FASE4",
+      "let op": "NIET TE DRAAIEN, EN NIET OM DE CONTEXT. Het contract wil hier `intrekken`, en er is voor deze rail geen pad om een klaargezet voorstel in te trekken: /api/goedkeuring/intrek, /api/stuur/bevestig en /api/stuur/voorstellen staan alle drie op `verboden`. Dat is geen gat in de bedrading maar een PRODUCTVRAAG -- mag een lid een staand voorstel via Rahul intrekken, of alleen op de knop waar hij het ook bevestigt? Zolang dat niet is besloten, blijft dit geval een vooruitlopend contract; een corpusregel schrijven die iets anders doet dan intrekken, zou de belofte stil veranderen."
+    },
+    {
+      "id": "ctx-deze-met",
+      "input": "deze",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "context": "met selectie",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "let op": "een selectie zegt WELK object, niet WAT ermee moet; alleen 'deze' blijft dus een vraag",
+      "contextGeval": {
+        "app": "RTG Kluis",
+        "deel": "Documenten",
+        "selectie": "Paspoort 2026"
+      }
+    },
+    {
+      "id": "ctx-deze-zonder",
+      "input": "deze",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "context": "geen",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "ctx-daar",
+      "input": "daar",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "context": "met locatiecontext",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "FASE4"
+    },
+    {
+      "id": "ctx-zelfde-met",
+      "input": "zelfde als vorige keer",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "context": "met geschiedenis",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "herhaling",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "FASE4"
+    },
+    {
+      "id": "ctx-zelfde-zonder",
+      "input": "zelfde als vorige keer",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "context": "geen",
+      "verwachteRoute": "CLARIFY",
+      "verwachtDoel": null,
+      "ambigu": true,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU"
+    },
+    {
+      "id": "ctx-leg-dit-uit",
+      "input": "leg dit uit",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "context": "met actief object",
+      "verwachteRoute": "ANSWER",
+      "verwachtDoel": "uitleg",
+      "ambigu": false,
+      "sideEffectMax": "geen",
+      "maxMandaat": "geen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Kluis",
+        "deel": "Documenten",
+        "verwijzingen": [
+          {
+            "soort": "document",
+            "id": "doc-1"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ctx-open-hem",
+      "input": "open hem",
+      "klasse": "CONTEXTUAL_REFERENCE",
+      "context": "met selectie",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "openen",
+      "ambigu": false,
+      "sideEffectMax": "tonen",
+      "maxMandaat": "tonen",
+      "blockingVraagMax": 0,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Kluis",
+        "deel": "Documenten",
+        "selectie": "Paspoort 2026"
+      }
+    }
+  ],
+  "contextGeval": "Een machineleesbare HumanContext voor dit geval, in de vorm die server/kern/stuur/menscontext.js saneert: presentatie (app/deel/selectie/wereld), verwijzingen (soort + id, NOOIT een object) en interactie (soort/opties/gekozen). Ontbreekt hij, dan wordt het geval zonder context gedraaid. Let op: `interactie` is NIET p.wacht -- een client die zegt dat er iets openstaat, maakt daarmee geen uitvoerbaar voorstel."
+}

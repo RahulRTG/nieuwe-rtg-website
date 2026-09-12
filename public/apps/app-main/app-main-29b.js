@@ -115,7 +115,16 @@
       aiDraad.scrollTop = aiDraad.scrollHeight;
     };
     try {
-      const r = await API.call('/fluister', { q });
+      /* De vraagbalk praat met de stuurketen, met context en een gevraagd
+         plafond. `tonen` is de veiligheidsregel van de migratie: een vraag die
+         hier gisteren tekst opleverde mag geen side effect krijgen omdat er een
+         motor achter staat. De grendel kan alleen versmallen; waarom, staat in
+         server/kern/stuur/plafond.js. De context komt uit RTGRahulTabHelpers --
+         hetzelfde contract als de Rahul-tab, geen tweede bouwer. */
+      const ctx = (window.RTGRahulTabHelpers && window.RTGRahulTabHelpers.context)
+        ? window.RTGRahulTabHelpers.context() : null;
+      const r = await API.call('/fluister', ctx ? { q, plafond: 'tonen', context: ctx }
+                                                 : { q, plafond: 'tonen' });
       if (r && r.pakte && r.antwoord) {
         zet(r.antwoord);
         if (r.gedaan) toast(T('fl.gedaan', 'Rahul heeft het geregeld.'));

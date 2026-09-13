@@ -29,11 +29,12 @@ const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 const M = require('../scripts/refundmigratie');
 
-/* DE RATEL. Gemeten op 13 september 2026, nadat de schermen erbij waren gezet
-   en de bundels eruit. Hij mag alleen omlaag: elke lezer die iemand indeelt,
-   verlaagt hem. Wie hem verhoogt om een toets groen te krijgen, haalt de reden
-   weg waarom deze kaart bestaat. */
-const ONVERKLAARD_MAX = 36;
+/* DE RATEL. Gemeten op 13 september 2026, nadat alle lezers van BESTELLINGEN
+   met de hand waren nagelopen; wat overblijft leest tickets of boekingen, en
+   die collecties zijn nog niet om. Hij mag alleen omlaag: elke lezer die iemand
+   indeelt, verlaagt hem. Wie hem verhoogt om een toets groen te krijgen, haalt
+   de reden weg waarom deze kaart bestaat. */
+const ONVERKLAARD_MAX = 15;
 
 test('0. de kaart raakt haar eigen werk niet kwijt', () => {
   const u = M.meet();
@@ -50,11 +51,30 @@ test('1. elke plek in de kaart bestaat ook echt', () => {
 test('2. elke lezer draagt een soort, een collectie, een stand en een reden', () => {
   for (const [rel, l] of Object.entries(M.LEZERS)) {
     assert.ok(['toont', 'telt', 'grendel'].includes(l.soort), rel + ': onbekende soort');
-    assert.ok(M.COLLECTIES.includes(l.collectie), rel + ': onbekende collectie');
-    assert.ok(['om', 'geen-werk'].includes(l.stand), rel + ': onbekende stand');
+    for (const c of [].concat(l.collectie))
+      assert.ok(M.COLLECTIES.includes(c), rel + ': onbekende collectie ' + c);
+    assert.ok(['om', 'geen-werk', 'wacht'].includes(l.stand), rel + ': onbekende stand');
     assert.ok(l.wat && l.wat.length > 15, rel + ': zegt niet wat hij leest');
-    assert.ok(l.gedaan && l.gedaan.length > 25, rel + ': zegt niet wat ermee gedaan is');
+    /* Een stand die zegt dat er NIETS te doen is, en een stand die zegt dat er
+       LATER iets te doen is, dragen een ander veld -- en allebei een reden. Een
+       `wacht` zonder `tedoen` is een lezer die op de dag van de omzetting nog
+       een keer helemaal gelezen moet worden, en dan is de kaart niets waard. */
+    if (l.stand === 'wacht')
+      assert.ok(l.tedoen && l.tedoen.length > 25, rel + ': wacht, maar zegt niet waarop');
+    else
+      assert.ok(l.gedaan && l.gedaan.length > 25, rel + ': zegt niet wat ermee gedaan is');
   }
+});
+
+test('2b. de collectie die OM is, heeft geen enkele onverklaarde lezer meer', () => {
+  /* Bestellingen dragen de tegenboeking sinds 13 september, dus daar is een
+     onverklaarde lezer geen schuld maar een RISICO: hij leest vandaag een
+     `paid` die iets anders betekent dan toen hij geschreven werd. Voor tickets
+     en boekingen geldt dat niet -- die wissen hun betaalstand nog. */
+  const u = M.meet();
+  const open = u.onbekend.filter(o => o.collecties.includes('orders')).map(o => o.bestand);
+  assert.deepEqual(open, [],
+    'deze lezer(s) raken bestellingen en zijn niet ingedeeld, terwijl die collectie al om is');
 });
 
 test('3. de twee lezers die geld OPTELDEN, lezen de terugstorting nu ook', () => {

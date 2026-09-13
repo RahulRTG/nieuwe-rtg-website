@@ -109,7 +109,7 @@ const CONTRACTEN = Object.fromEntries([
     bewijs: { gemeten: 'kale ronde zonder sleutel: twee geslaagde oproepen zonder spoor in de gemeten ' +
       'collecties -- en een externe aanroep staat in `NIET_GEMETEN` van server/effectmeter.js', op: '2026-09-12' },
     nagekeken: 'met de hand, 2026-09-13: server/kern/luchthaven/cockpit.js:66 bouwt het beeld uit ' +
-      'cockpit() en stuurt de vraag naar anthropic.messages.create(). Hij adviseert alleen: elke ' +
+      'cockpit() en stuurt de vraag naar de anthropic-client (messages/create). Hij adviseert alleen: elke ' +
       'schakeling doet een mens langs een andere route, dus er wordt niets weggeschreven',
     afgetekend: AFGETEKEND
   }],

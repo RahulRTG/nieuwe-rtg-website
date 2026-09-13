@@ -205,6 +205,7 @@ const REGISTER = {
   'TEKSTOPPERVLAK.json': { eigenRatel: 'scripts/check.js' },
   'RITPROEF.json': { eigenRatel: 'test/ritproef.test.js' },
   'TOELATINGSPROEF.json': { eigenRatel: 'test/toelatingsproef.test.js' },
+  'MOMENTPROEF.json': { eigenRatel: 'test/momentproef.test.js' },
   'NAVIGATIEPROEF.json': { eigenRatel: 'test/navigatieproef.test.js' },
   'MOVEPROEF.json': { eigenRatel: 'test/moveproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },

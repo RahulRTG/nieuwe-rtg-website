@@ -90,8 +90,13 @@ test('5. de woordenlijst is uitgebreid, en dat staat er eerlijk bij', () => {
 
 test('6. de ketenvorm telt over ALLE ketens en niet over de eerste twee', () => {
   const v = lees('KETENVORM.json');
-  assert.equal(v.telling.ketens, 3);
-  assert.equal(v.ketens.length, 3);
+  /* HET AANTAL STOND HIER ALS 3, en toen de momentproef erbij kwam zakte deze
+     toets op een getal in plaats van op een gebrek. Dat is precies de fout die
+     hij zelf beschrijft: de eis is niet EEN AANTAL maar dat de meter alle ketens
+     meeneemt. De ondergrens blijft drie, want twee punten liggen altijd op een
+     lijn en de hele vergelijking begint pas bij de derde. */
+  assert.ok(v.telling.ketens >= 3, 'minder dan drie ketens; dan vergelijkt de meter niets');
+  assert.equal(v.ketens.length, v.telling.ketens);
   const { zonderCommentaar } = require('../scripts/lib/bron');
   assert.doesNotMatch(zonderCommentaar(vormBron), /gelezen\[1\]/,
     'de meter indexeert nog op de tweede keten; dan telt een derde stil niet mee');
@@ -100,8 +105,9 @@ test('6. de ketenvorm telt over ALLE ketens en niet over de eerste twee', () => 
 test('7. gedeeld is in ALLE ketens, en dat verschilt van "in meer dan een"', () => {
   const v = lees('KETENVORM.json');
   const t = v.beloften.telling;
-  for (const thema of v.beloften.gedeeld) assert.equal(t[thema], 3, thema + ' heet gedeeld maar zit niet in alle drie');
-  for (const thema of v.beloften.bijna) assert.ok(t[thema] > 1 && t[thema] < 3, thema + ' staat verkeerd in "bijna"');
+  const n = v.telling.ketens;
+  for (const thema of v.beloften.gedeeld) assert.equal(t[thema], n, thema + ' heet gedeeld maar zit niet in alle ' + n);
+  for (const thema of v.beloften.bijna) assert.ok(t[thema] > 1 && t[thema] < n, thema + ' staat verkeerd in "bijna"');
   for (const [k, lijst] of Object.entries(v.beloften.eigen))
     for (const thema of lijst) assert.equal(t[thema], 1, thema + ' heet "alleen ' + k + '" en zit in meer ketens');
 });

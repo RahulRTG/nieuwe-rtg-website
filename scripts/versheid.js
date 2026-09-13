@@ -342,15 +342,16 @@ const REGISTERS = [
      "de keten sluit" meldt terwijl er sindsdien een schakel is verlegd, is erger
      dan geen meting.
 
-     Ze staan in de volgorde waarin ze iets zeggen: eerst de drie gouden ketens
+     Ze staan in de volgorde waarin ze iets zeggen: eerst de vier gouden ketens
      en wat ze delen, dan de metingen over de code zelf, dan de twee kaarten. */
   ['TAFELPROEF.json', 'npm run tafelproef:vast', 'of de horecaketen sluit, van tafel tot correctie'],
   ['RITPROEF.json', 'npm run ritproef:vast', 'of de ritketen sluit, van aanvraag tot afronding'],
   ['TOELATINGSPROEF.json', 'npm run toelatingsproef:vast', 'of de toelatingsketen sluit, van aanvraag tot zaak'],
-  /* De navigatieproef staat NAAST de drie gouden ketens en niet ertussen: hij
+  ['MOMENTPROEF.json', 'npm run momentproef:vast', 'of de publieke keten sluit, van een feit bij de bron tot een melding bij een volger'],
+  /* De navigatieproef staat NAAST de vier gouden ketens en niet ertussen: hij
      meet geen keten tussen actoren maar de belofte van EEN scherm, in een echte
      browser (BETROUWBAARHEID.md par. 1). Daarom telt scripts/ketenvorm.js hem
-     ook niet mee -- wat drie ketens delen, wordt vertroebeld door een vierde die
+     ook niet mee -- wat de ketens delen, wordt vertroebeld door een meting die
      iets anders is. Veroudering weegt hier even zwaar: hij draait tegen een
      draaiende server EN een browser, dus zijn uitslag hoort bij de code van die
      dag en bij geen andere. */

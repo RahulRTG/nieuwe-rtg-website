@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T09:55:05.301Z",
-    "commit": "d4b1afe7",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-13T11:24:22.574Z",
+    "commit": "3b6ef433",
+    "boomVuil": true,
+    "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -5037,6 +5037,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "momentproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/momentproef.js",
+      "operator": "===->!==#48",
+      "gezakt": 1,
+      "geprobeerd": 157
     },
     "mond.test.js": {
       "soort": "puur",

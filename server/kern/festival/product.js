@@ -106,8 +106,11 @@ module.exports = (ctx) => {
       if (!k || !k.aanwezigZorg || !k.mediaNieuwMoment) return null;
       const f = ctx.festivalVind(fid);
       if (!f) return null;
-      const a = k.aanwezigZorg('zaak', f.eigenaar, f.naam);
-      return a ? k.mediaNieuwMoment(a.id, 'kaartverkoop', product && product.naam) : null;
+      /* De naam van de ZAAK en niet van het festival -- zie ./index.js,
+         dragerNaam, en de reparatie in ./artiest.js. */
+      const a = k.aanwezigZorg('zaak', f.eigenaar, ctx.dragerNaam(f));
+      const wat = product && product.naam;
+      return a ? k.mediaNieuwMoment(a.id, 'kaartverkoop', wat ? wat + ' voor ' + f.naam : f.naam) : null;
     } catch (e) { return null; }
   }
 

@@ -60,6 +60,17 @@ module.exports = (ctx) => {
      aan domeinen die in dezelfde ronde worden samengesteld. Zie de kop daar. */
   const k = { db, save, bewerkCollectie, crypto, schoon, kern: ctx.kern };
 
+  /* DE NAAM VAN DE DRAGER van de publieke aanwezigheid: de ZAAK, niet het
+     festival. Hij staat hier en niet twee keer in de haken van ./artiest.js en
+     ./product.js, want twee kopieen lopen uiteen (LAT-regel 4). Kent de server de
+     zaak niet, dan valt hij terug op de code: een lege naam zou een naamloze
+     aanwezigheid opleveren, en daar kan een volger niets mee. */
+  k.dragerNaam = (f) => {
+    const bag = ctx.kern ? ctx.kern() : null;
+    const s = bag && bag.findSupplier ? bag.findSupplier(f && f.eigenaar) : null;
+    return (s && s.name) || (f && f.eigenaar) || null;
+  };
+
   Object.assign(k, require('./model')(k));
   Object.assign(k, require('./terrein')(k));
   Object.assign(k, require('./rechten')(k));

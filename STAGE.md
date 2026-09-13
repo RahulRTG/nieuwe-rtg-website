@@ -399,28 +399,107 @@ die volgers oplevert en nooit naar het woord, en `test/wekdekking.test.js` toets
 
 ## 6. De momentproef
 
-Zoals `tafelproef`, `ritproef` en `toelatingsproef`: één synthetisch mens, één
-keten, echt gelopen, en daarna met opzet kapotgemaakt. De drie bestaande ketens
-vonden samen vier dingen die geen enkele routetoets zag; deze keten raakt meer
-domeinen dan alle drie samen.
+*Gedraaid op 13 september 2026. `npm run momentproef`, register `MOMENTPROEF.json`.*
 
-**De keten.** Public Presence → publiceert werk → volger krijgt de melding waar
-hij ja tegen zei → kondigt een optreden aan → kaartje gereserveerd → betaald →
-uitgegeven → capsule klaar → reist → scant offline → maker gaat live → kijker
-stelt een vraag → koopt tijdens de uitzending → meet & greet opent → afloop →
-herinnering → machtiging ingetrokken → de publieke wereld blijft van de maker.
+De vierde gouden keten naast `tafelproef`, `ritproef` en `toelatingsproef` -- en
+de eerste die over een **projectie** gaat in plaats van over een levering. De
+drie bestaande eindigen alle bij een geleverde dienst of een verleende toegang;
+deze eindigt bij **iemand die iets weet**. Er wordt niets geleverd, en aan de
+bron verandert niets.
 
-**De storingen**, en dit is de helft die telt: internet weg, voorraad-race,
-dubbele betaling, toestel van de maker offline, machtiging ingetrokken tijdens
-het publiceren, relay valt uit, kaartje al gescand, kamer verlopen, fan blokkeert
-maker, maker blokkeert fan, minderjarige gebruiker, en een RTG-medewerker die
-vanuit de kantoorcontext probeert te publiceren.
+**De keten die werkelijk gelopen is.** Drie bronnen in één keten, want dat is de
+eigenlijke vraag: gedragen drie verschillende domeinen zich hetzelfde als publiek
+moment?
 
-Twee dingen vooraf vastleggen, geleerd van de drie bestaande proeven: er komt
-een stand `openBekend` voor een schakel die aantoonbaar open staat met een
-uitgeschreven reden (anders heeft een proef die iets echts vindt maar twee
-uitgangen: zakken, of de bevinding wegpoetsen), en `sluit` en
-`sluitMetBevinding` worden apart gemeld en nooit tot één cijfer opgeteld.
+| | van → naar | wat | stand |
+|---|---|---|---|
+| 1 | festival → publieke wereld | bevestigt een boeking; de aanwezigheid van de ZAAK ontstaat | gesloten |
+| 2 | publieke wereld → fan | de fan **vindt** die aanwezigheid | **openBekend** |
+| 3 | fan → publieke wereld | volgt, expliciet, en leest vooraf waarvoor hij tekent | gesloten |
+| 4 | festival → fan | zet een kaart klaar; de volger wordt gewekt | gesloten |
+| 5 | fan → festival | **handelt** naar aanleiding van de wek | **openBekend** |
+| 6 | lid → publieke wereld | plaatst in De Salon; er ontstaat GEEN aanwezigheid | gesloten |
+| 7 | kantoor → publieke wereld | licht uit, op naam en met een grond; de aanwezigheid van de AUTEUR ontstaat | gesloten |
+| 8 | publieke wereld → tweede fan | volgt de maker; de volgende uitlichting wekt hem | gesloten |
+| 9 | fan → publieke wereld | ontvolgt; het volgende feit bereikt hem niet | gesloten |
+| 10 | sportclub → publieke wereld | legt een wedstrijd vast | **openBekend** |
+
+Zeven gesloten, drie open met een uitgeschreven reden, dertien storingen
+gehouden, vier architectuurbeweringen gehouden. `sluit: false`,
+`sluitMetBevinding: true` -- en die twee worden nooit tot één cijfer opgeteld.
+
+**De drie bevindingen zijn besluiten en geen defecten**, en de eerste twee zijn
+elkaars spiegelbeeld:
+
+- **Schakel 2 -- de fan kan een aanwezigheid niet VINDEN.** Er is geen route die
+  publieke aanwezigheden opsomt of doorzoekt; `/api/mediaos/aanwezig` vraagt een
+  id dat de fan al moet kennen, en `/aanwezig/mijn` toont uitsluitend wat hij al
+  volgt. Dat is het Discovery-blok uit par. 4, en waarom het er niet zomaar bij
+  kan staat in `routes/festival/gast.js`: *"er is in dit huis geen publieke kant,
+  en een line-up is het eerste dat er een van zou maken"*.
+- **Schakel 5 -- na de wek kan de fan niets DOEN.** De melding draagt geen
+  bestemming (geen enkele `notify()` in dit huis doet dat), en er is geen
+  ledenroute die de kaarten van een festival toont of verkoopt; kopen gebeurt aan
+  de balie. Dit is exact de scheiding *moment ≠ notificatie* uit par. 3: de wek
+  werkt, de weg terug naar het moment bestaat niet. Dat is de Fan Inbox.
+- **Schakel 10 -- geteld is niet gelopen.** De wedstrijd van een sportclub is de
+  vierde aanleiding en `WEKDEKKING.json` telt hem, maar `/api/sport/*` eist een
+  zaak van het type `sportclub`, de zaaiset heeft er geen, en geen route zet dat
+  type. De haak staat; de keten is er niet doorheen gegaan. Het besluit is of de
+  zaaiset een sportclub krijgt.
+
+**De architectuurproef, en waarom hij er is.** De schakels bewijzen dat de keten
+loopt; deze vier bewijzen dat hij de goede kant op loopt. Een keten die sluit
+terwijl de projectie ondertussen een tweede waarheid is geworden, heeft niets
+bewezen -- dat is de `Asset`-fout, een laag later.
+
+| | bewering | hoe gemeten |
+|---|---|---|
+| A | de bron legt het feit vast terwijl er **niemand** luistert | product zonder een enkele volger: staat in de bron, en er ging niets uit |
+| B | geen handeling van Stage verandert het **ANTWOORD** van de bron | het volledige antwoord teken voor teken gelijk, voor en na volgen/ontvolgen/lezen |
+| C | de projectie draagt geen veld en geen verwijzing die de bron niet al heeft | vorm gesloten op vijf velden, id letterlijk `drager:code`, geen verwijzing naar een boeking, product of post |
+| D | de Stage-laag schrijft alleen in haar **eigen twee collecties** | gelezen uit de bron van de laag: elke `db.data.<collectie>` ⊆ `mediaAanwezig`, `mediaVolgt` |
+
+**D bestaat omdat B aantoonbaar een gat heeft, en dat is de scherpste les van
+deze proef.** B is met een mutatie nagetrokken: de volgroute kreeg er een regel
+bij die een volgersteller TERUGSCHREEF in de producten van het festival -- precies
+de creep waar deze laag tegen ontworpen is. **B bleef groen.** De bron vórmt zijn
+antwoord, dus een onbekend veld haalt `/api/festival/producten` nooit en van
+buiten is er niets te zien. B meet daarom wat hij meet -- het antwoord -- en niet
+meer dan dat, en dat staat nu ook zo in zijn bewering. D leest het andere:
+welke collecties de laag aanraakt. Zwart-doos en bron zijn hier geen keuze maar
+twee helften, en ze worden apart gemeld.
+
+**Wat de proef zelf vond en wat er gerepareerd is.** De publieke aanwezigheid van
+een zaak droeg de naam van het FESTIVAL. Maar de aanwezigheid hangt aan de
+DRAGER (`zaak:NACHT`), en een zaak kan meer dan één festival draaien: het tweede
+festival hernoemde dus de aanwezigheid van het eerste, en een volger die op
+"Eerste Festival" had gedrukt zag daarna "Tweede Festival" in zijn lijst staan
+zonder dat hij iets had gedaan. De naam van het festival hoort in de **titel van
+het moment** (die gaat over wat er gebeurd is), de naam van de aanwezigheid gaat
+over **wie er spreekt** -- `kern/festival/index.js`, `dragerNaam`. Storing 12
+houdt dat vast. Twee assertions in de eerste versie van de proef waren daarnaast
+tandeloos: ze lazen een veld `uitlichtingen` op het redactiebord, en dat bord
+heet `lopend` en `geschiedenis` -- een lege lijst die altijd leeg is, bewijst
+niets.
+
+**Wat de keten NIET bewijst**, en dat staat even groot in het register: er komt
+geen browser aan te pas, er wordt niets betaald, en het is de festival- en
+salonkant -- Podium, Clips en het Theater hebben hun eigen naden. Van de vier
+Moment-aanleidingen zijn er drie echt gelopen.
+
+**En wat de vier ketens samen delen, is geteld en niet verklaard**
+(`npm run ketenvorm`): **0 van 18 actoren** in alle vier, en 2 van 10
+beloftethema's -- dezelfde twee als bij drie ketens, en allebei over de MACHINE
+(mag dit twee keer, en zegt een weigering waarom) en niet over het domein. Acht
+van de dertien storingen van deze keten vallen buiten élk thema; die lijst is met
+opzet niet opnieuw verbreed, want een meter die je uitbreidt tot hij past, zegt
+wat je wilt horen. De vierde keten legde daarbij een etiketteringsfout bloot die
+er al stond: "alleen tafel" betekende *niet in alle ketens* in plaats van *in
+precies deze*, dus `zaak` stond zowel als "alleen tafel" als als "alleen
+toelating". Er is nu een middenbak -- `kantoor`, `lid` en `zaak` zitten in meer
+dan één keten en in geen enkele in alle vier -- en het kopgetal bewoog daar niet
+van.
 
 ---
 

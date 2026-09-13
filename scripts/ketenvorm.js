@@ -47,7 +47,13 @@ const KETENS = [
      een lijn. Deze is met opzet maximaal anders -- de klant is geen lid, er zit
      een kantoor in, het gaat over een document met een houdbaarheid, en de
      uitkomst is toegang in plaats van een geleverde dienst. */
-  { naam: 'toelating', register: 'TOELATINGSPROEF.json', domein: 'aanmeldingen', proef: 'scripts/toelatingsproef.js' }
+  { naam: 'toelating', register: 'TOELATINGSPROEF.json', domein: 'aanmeldingen', proef: 'scripts/toelatingsproef.js' },
+  /* DE VIERDE, en de eerste die niets LEVERT. De drie hierboven eindigen alle
+     bij een geleverde dienst of een verleende toegang; deze eindigt bij iemand
+     die iets WEET. Als de gedeelde vorm daar ook overheen zou liggen, zou dat
+     voor het eerst iets betekenen -- en als hij dat niet doet, is dat het
+     duidelijkste antwoord dat deze meting kan geven. */
+  { naam: 'moment', register: 'MOMENTPROEF.json', domein: 'mediaos', proef: 'scripts/momentproef.js' }
 ];
 
 /* De woorden waarop een belofte wordt ingedeeld. Een gesloten lijst, want een
@@ -139,9 +145,24 @@ function meet() {
     actoren[k.naam] = [...s].sort();
   }
   const actorGedeeld = snijAlle(gelezen.map(k => actoren[k.naam]));
+  /* DEZELFDE CORRECTIE ALS BIJ DE THEMAS HIERONDER, en de vierde keten liet zien
+     dat hij hier nog niet stond. "Eigen" was hier "niet in alle", en dat drukte
+     een actor die twee ketens delen af als "alleen toelating" EN als "alleen
+     moment" -- twee keer alleen. Met drie ketens viel dat nauwelijks op (`zaak`
+     stond al twee keer in de lijst); met vier kwamen `kantoor` en `lid` erbij, en
+     dan leest de uitslag alsof er geen enkele actor ergens gedeeld wordt terwijl
+     er drie in twee ketens staan.
+
+     Het KOPGETAL verandert hier niet van: gedeeld blijft "in ALLE ketens", en dat
+     is nul. Wat erbij komt is de middenbak, want zonder die bak verdwijnt een
+     vondst zodra er een keten bijkomt die hem niet heeft. */
+  const actorTelling = {};
+  for (const k of gelezen) for (const a of actoren[k.naam]) actorTelling[a] = (actorTelling[a] || 0) + 1;
+  const actorBijna = Object.keys(actorTelling)
+    .filter(a => actorTelling[a] > 1 && !actorGedeeld.includes(a)).sort();
   const actorEigen = {};
   for (const k of gelezen)
-    actorEigen[k.naam] = actoren[k.naam].filter(a => !actorGedeeld.includes(a));
+    actorEigen[k.naam] = actoren[k.naam].filter(a => actorTelling[a] === 1);
 
   /* 3. DE BELOFTEN. */
   const perKeten = {};
@@ -179,7 +200,7 @@ function meet() {
       sluit: k.data.sluit === true,
       bevindingen: (k.data.bevindingen || []).length })),
     vorm: { gedeeld: vormGedeeld, apart: vormApart, let: 'gelijke vorm is de ondergrens en geen vondst: beide proeven zijn zo geschreven' },
-    actoren: { perKeten: actoren, gedeeld: actorGedeeld, eigen: actorEigen },
+    actoren: { perKeten: actoren, gedeeld: actorGedeeld, bijna: actorBijna, eigen: actorEigen },
     beloften: { perKeten, gedeeld: themaGedeeld, bijna: themaBijna, telling: themaTelling,
       eigen: themaEigen, nietIngedeeld,
       let: '"gedeeld" is in ALLE ketens; "bijna" in meer dan een maar niet in alle. Dat onderscheid staat er ' +
@@ -201,7 +222,8 @@ function druk(u) {
     k.storingen + ' storingen' + (k.bevindingen ? ', ' + k.bevindingen + ' bevinding(en)' : '') + ')').join('  |  '));
   console.log('\n  ACTOREN');
   for (const [k, v] of Object.entries(u.actoren.perKeten)) console.log('    ' + k.padEnd(8) + v.join(', '));
-  console.log('    gedeeld: ' + (u.actoren.gedeeld.join(', ') || '(geen)'));
+  console.log('    in alle ' + u.telling.ketens + ': ' + (u.actoren.gedeeld.join(', ') || '(geen)'));
+  if (u.actoren.bijna.length) console.log('    in meer dan een, niet in alle: ' + u.actoren.bijna.join(', '));
   for (const [k, v] of Object.entries(u.actoren.eigen)) if (v.length) console.log('    alleen ' + k + ': ' + v.join(', '));
   console.log('\n  BELOFTEN (waar de storingen over gaan)');
   for (const [k, v] of Object.entries(u.beloften.perKeten)) console.log('    ' + k.padEnd(8) + v.join(', '));

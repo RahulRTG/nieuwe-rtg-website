@@ -53,7 +53,7 @@ een marge of een leverancierscijfer bouwt. Het belangrijkste dat het document
 tegenhoudt is een `journeys`-tabel: een reis die mensen, geld, documenten én
 reserveringen BEZIT is de `Asset`-fout opnieuw, en de meting staat er
 (`KETENVORM.json`: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
-<!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> gedeelde actoren over drie
+<!--getal:ketenvorm.actorenTotaal-->18<!--/getal--> gedeelde actoren over drie
 ketens). De vorm die wél werkt is die van `kern/levensgraaf/graaf.js` — een
 PROJECTIE met vijf etiketten, hier plus de **herkomst** als zesde. Zeven grenzen
 bovenop die van REIZEN.md, waarvan de drie scherpste: geld wordt klaargezet en
@@ -399,8 +399,30 @@ waarvan de twee die het verst reiken: er komt **geen fanladder** (wat iemand
 heeft gedaan is een feit, waar hij "staat" is een oordeel) en **de meeteenheid
 is de gebeurtenis en nooit de mens** -- die regel staat vandaag in vier
 documenten met nul handhavers, en Stage is de eerste laag die er een kan
-krijgen. Par. 6 is de `momentproef`: de vierde ketenproef, met een stand
-`openBekend` voor een schakel die aantoonbaar open staat met een reden.
+krijgen. Par. 6 is de `momentproef`: de vierde ketenproef, en de eerste die over
+een PROJECTIE gaat in plaats van over een levering -- hij eindigt niet bij een
+geleverde dienst maar bij iemand die iets WEET. Tien schakels (zeven gesloten,
+drie `openBekend`), dertien storingen gehouden, en daarnaast vier
+ARCHITECTUURbeweringen, want een keten die sluit terwijl de projectie ondertussen
+een tweede waarheid is geworden heeft niets bewezen. Drie dingen daar niet
+wegpoetsen. De twee open schakels zijn ELKAARS spiegelbeeld en allebei een
+besluit van de eigenaar: de fan kan een aanwezigheid niet VINDEN (geen enkele
+route somt ze op -- Discovery), en hij kan na de wek niets DOEN (een melding is
+in dit huis een wek en geen link, en er is geen ledenroute om een festivalkaart
+te kopen -- de Fan Inbox). De derde is de vierde aanleiding zelf: de wedstrijd
+van een sportclub is wel GETELD door `wekdekking.js` maar niet GELOPEN, want de
+zaaiset heeft geen zaak van het type `sportclub` en geen route maakt er een --
+geteld is niet gelopen. En bewering **B is met een mutatie nagetrokken en bleef
+groen**: een volgersteller die vanuit de volgroute werd TERUGGESCHREVEN in de
+producten van het festival haalt het antwoord van de bron nooit, want dat wordt
+gevormd. Daarom staat er een bewering **D** naast die de BRON van de laag leest
+(welke `db.data`-collecties raakt Stage aan), en die vangt hem wel. Zwart-doos en
+bron zijn hier geen keuze maar twee helften. De proef vond zelf ook een defect
+dat geen enkele toets zag: de publieke aanwezigheid van een zaak droeg de naam
+van het FESTIVAL, dus een tweede festival hernoemde de aanwezigheid van het
+eerste en een volger zag een andere naam in zijn lijst zonder iets te hebben
+gedaan. De naam van het festival hoort in de TITEL van het moment; de naam van de
+aanwezigheid gaat over wie er spreekt (`kern/festival/index.js`, `dragerNaam`).
 
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
@@ -912,7 +934,7 @@ mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanl
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
 `SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->123<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->105<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->389<!--/getal-->
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->105<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->390<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -1543,23 +1565,29 @@ gat, en hij zit nu in de meting (storing 1 en 7) in plaats van eromheen.
 **En wat de ketens werkelijk delen is GEMETEN** (`scripts/ketenvorm.js`,
 `KETENVORM.json`) in plaats van verklaard -- de proeven delen met opzet geen
 module, want een gedeelde ketenklasse eroverheen zou de `Asset`-fout zijn.
-Uitkomst over drie ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
-van <!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> actoren gedeeld
+Uitkomst over vier ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
+van <!--getal:ketenvorm.actorenTotaal-->18<!--/getal--> actoren gedeeld
 (gast/zaal/keuken tegenover lid/vervoerder/dispatch/chauffeur tegenover
-aanvrager/kantoor/keurder/dossier/tijd) en
-<!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van
-<!--getal:ketenvorm.themasTotaal-->10<!--/getal--> beloftethema's in ALLE drie.
+aanvrager/kantoor/keurder/dossier/tijd tegenover fan/festival/publieke
+wereld) en <!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van
+<!--getal:ketenvorm.themasTotaal-->10<!--/getal--> beloftethema's in ALLE vier.
 Die twee gaan allebei over de MACHINE en niet over het domein: mag dit twee
-keer, en zegt een weigering waarom. Er is een woord dat twee ketens delen --
-`zaak` -- en het betekent er niet hetzelfde (ontvanger tegenover uitkomst),
-precies de vorm die `SEMANTIEK.json` meet. **Een status-, actor- of
+keer, en zegt een weigering waarom. **Een status-, actor- of
 uitkomstcontract over domeinen heen is daarmee niet gerechtvaardigd**, en dat is
 een antwoord op MAATSTAF.md U40/U41 en geen uitstel; wat er wel onder ligt is de
 grens die OS.md trekt tussen platformvermogen en domeinvermogen, nu met bewijs
-uit drie onafhankelijke ketens. Let bij het lezen op een eerlijkheid die in de
-bron staat: de themalijst is een keer uitgebreid toen zes van de zeven beloften
+uit vier onafhankelijke ketens. Let bij het lezen op twee eerlijkheden die in de
+bron staan. De themalijst is een keer uitgebreid toen zes van de zeven beloften
 van de derde keten erbuiten vielen -- de actoren zijn niet aangeraakt, en die
-staan op nul.
+staan op nul; van de vierde keten vallen er acht van de dertien buiten elk thema,
+en die lijst is met opzet NIET opnieuw verbreed (dat zou de meter laten zeggen
+wat je wilt horen). En de vierde keten legde een etiketteringsfout bloot die er
+al stond: "alleen tafel" betekende *niet in alle ketens* in plaats van *in
+precies deze*, dus een actor die twee ketens delen stond twee keer als "alleen".
+De beloftenkant was daar al voor gerepareerd, de actorenkant niet. Er is nu een
+middenbak (`kantoor`, `lid` en `zaak` staan in meer dan een keten, in geen enkele
+in alle vier) -- en het KOPGETAL bewoog daar niet van: gedeeld blijft "in alle
+ketens", en dat is nul.
 
 **`INTELLIGENTIE.md` is de laag BOVEN het stuur** -- de RTG Intelligence Layer,
 als richtingsdocument met per onderdeel of het **staat**, **een stap weg** is,

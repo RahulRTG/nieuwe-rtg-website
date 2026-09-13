@@ -1,5 +1,5 @@
 {
-  "stempel": "2026-09-03",
+  "stempel": "2026-09-13",
   "uitleg": "Wat drie onafhankelijk geschreven ketenproeven werkelijk delen, geteld uit hun registers. De vorm is per definitie gelijk (beide proeven zijn zo geschreven) en zegt dus niets; de actoren en de beloften zeggen wel iets. Zie de kop van scripts/ketenvorm.js.",
   "grens": "Drie ketens is een kleine steekproef, en ze zijn door dezelfde hand geschreven -- gedeelde beloften kunnen dus ook gedeelde gewoonte zijn. Een derde keten van een andere hand zou dat scheiden. De thema-indeling gebruikt een gesloten woordenlijst; wat er niet in past staat in nietIngedeeld en verdwijnt niet.",
   "ketens": [
@@ -29,6 +29,15 @@
       "storingen": 7,
       "sluit": true,
       "bevindingen": 0
+    },
+    {
+      "naam": "moment",
+      "domein": "mediaos",
+      "proef": "scripts/momentproef.js",
+      "schakels": 10,
+      "storingen": 13,
+      "sluit": false,
+      "bevindingen": 3
     }
   ],
   "vorm": {
@@ -53,6 +62,7 @@
     },
     "apart": {
       "schakel": [
+        "antwoord",
         "bekend"
       ],
       "storing": []
@@ -80,29 +90,46 @@
         "keurder",
         "tijd",
         "zaak"
+      ],
+      "moment": [
+        "fan",
+        "festival",
+        "kantoor",
+        "lid",
+        "publieke wereld",
+        "sportclub",
+        "tweede fan"
       ]
     },
     "gedeeld": [],
+    "bijna": [
+      "kantoor",
+      "lid",
+      "zaak"
+    ],
     "eigen": {
       "tafel": [
         "gast",
         "keuken",
-        "zaak",
         "zaal"
       ],
       "rit": [
         "chauffeur",
         "dispatch",
-        "lid",
         "vervoerder"
       ],
       "toelating": [
         "aanvrager",
         "dossier",
-        "kantoor",
         "keurder",
-        "tijd",
-        "zaak"
+        "tijd"
+      ],
+      "moment": [
+        "fan",
+        "festival",
+        "publieke wereld",
+        "sportclub",
+        "tweede fan"
       ]
     }
   },
@@ -130,6 +157,11 @@
         "herhaling",
         "nietsKlaarZonderGrond",
         "weigeringMetReden"
+      ],
+      "moment": [
+        "herhaling",
+        "onbekendObject",
+        "weigeringMetReden"
       ]
     },
     "gedeeld": [
@@ -145,10 +177,10 @@
       "bereikbareWeg": 1,
       "dubbelObject": 1,
       "geldKlaargezet": 1,
-      "herhaling": 3,
-      "onbekendObject": 2,
+      "herhaling": 4,
+      "onbekendObject": 3,
       "volgorde": 2,
-      "weigeringMetReden": 3,
+      "weigeringMetReden": 4,
       "nietsKlaarZonderGrond": 2,
       "geslotenLijst": 1,
       "handelingMetNaam": 1
@@ -163,7 +195,8 @@
       "toelating": [
         "geslotenLijst",
         "handelingMetNaam"
-      ]
+      ],
+      "moment": []
     },
     "nietIngedeeld": [
       {
@@ -190,17 +223,57 @@
         "keten": "rit",
         "storing": "een losse chauffeur die zichzelf een rit toewijst",
         "belofte": "kan dat op eigen naam, en ziet de rit op zijn eigen dispatchbord"
+      },
+      {
+        "keten": "moment",
+        "storing": "een voornemen is geen publiek feit",
+        "belofte": "een boeking die nog niet bevestigd is, wekt geen enkele volger"
+      },
+      {
+        "keten": "moment",
+        "storing": "geen bevestiging zonder bewijs",
+        "belofte": "wie \"bevestigd\" zet zonder te zeggen waaruit dat blijkt, wordt geweigerd -- en er gaat niets uit"
+      },
+      {
+        "keten": "moment",
+        "storing": "uitlichten gebeurt op naam",
+        "belofte": "met de gedeelde kantoorcode lukt uitlichten niet -- ook lezen niet"
+      },
+      {
+        "keten": "moment",
+        "storing": "een wek wordt niet met terugwerkende kracht gewist",
+        "belofte": "de ingetrokken uitlichting staat met haar reden in de geschiedenis, de andere loopt door, en de al verstuurde melding blijft staan"
+      },
+      {
+        "keten": "moment",
+        "storing": "de maker wekt zichzelf niet",
+        "belofte": "de auteur krijgt geen melding over zijn eigen uitgelichte werk, en kan zichzelf niet volgen"
+      },
+      {
+        "keten": "moment",
+        "storing": "een gast heeft geen publieke relaties",
+        "belofte": "zonder lidmaatschap geen volglijst"
+      },
+      {
+        "keten": "moment",
+        "storing": "een tweede festival hernoemt de aanwezigheid niet",
+        "belofte": "de naam in de volglijst van een fan verandert niet doordat de zaak iets anders begint"
+      },
+      {
+        "keten": "moment",
+        "storing": "een wek draagt geen publiek",
+        "belofte": "geen enkele melding noemt een aantal volgers of gebruikt aandrang"
       }
     ],
     "let": "\"gedeeld\" is in ALLE ketens; \"bijna\" in meer dan een maar niet in alle. Dat onderscheid staat er omdat een vondst anders verdwijnt zodra er een keten bijkomt die hem niet heeft."
   },
   "telling": {
     "actorenGedeeld": 0,
-    "ketens": 3,
-    "actorenTotaal": 13,
+    "ketens": 4,
+    "actorenTotaal": 18,
     "themasGedeeld": 2,
     "themasBijna": 3,
     "themasTotaal": 10,
-    "nietIngedeeld": 5
+    "nietIngedeeld": 13
   }
 }

@@ -173,8 +173,8 @@ heeft die fout al één keer gemaakt en toen gemeten:
   precies één domein horen**. `Asset` bestaat niet — tafel, kamer, podium en
   leaseauto delen niets buiten hun verpakking. Er kwamen vier kandidaten uit, en
   er haalde er **één** de drempel.
-- `KETENVORM.json`: over drie onafhankelijke ketens (horeca, rit, toelating) is
-  **0 van 13 actoren gedeeld** en 2 van 10 beloftethema's — en die twee gaan
+- `KETENVORM.json`: over vier onafhankelijke ketens (horeca, rit, toelating, moment) is
+  **0 van 18 actoren gedeeld** en 2 van 10 beloftethema's — en die twee gaan
   allebei over de machine (mag dit twee keer, zegt een weigering waarom) en niet
   over het domein.
 - `SEMANTIEK.json`: van 118 namen die in meer dan één domein staan dragen er

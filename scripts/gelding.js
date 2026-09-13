@@ -54,8 +54,8 @@
    in het register zelf bij:
 
      GECLAIMD_GEEN_DRAGER_GEVONDEN betekent NIET dat er geen drager is. Alleen
-     dat DEZE dragersensor er geen vond -- en die ziet vandaag alleen de
-     handeling `opslaan`.
+     dat DEZE dragersensor er geen vond -- en die ziet vandaag `opslaan` en
+     `tonen`, en `projecteren` en `rangschikken` niet.
 
      GEDRAGEN_NIET_GEZIEN betekent NIET "ongetest". Misschien bewaakt een
      centrale laag de cel alsnog op een manier die deze wachtersensor niet ziet.
@@ -154,13 +154,14 @@ function asClaim() {
 }
 
 /* DRAAG. Uit de VORMEN van bewaarde dingen -- welke koppelt een persoonssleutel
-   aan een waarderend veld? Deze as ziet vandaag alleen de handeling `opslaan`;
-   voor de andere drie geeft hij niets, en dat is een tekort van de sensor en
-   geen uitspraak over het product. */
+   aan een waarderend veld? -- plus ROUTEBRON.json voor de vraag of diezelfde
+   module een API-route afhandelt. Die twee bronnen geven twee handelingen:
+   `opslaan` en `tonen`. Voor `projecteren` en `rangschikken` geeft de as niets,
+   en dat is een tekort van de SENSOR en geen uitspraak over het product. */
 const MENSVELD = /^(handle|codenaam|lid|lidSleutel|staffId|persoon|persoonId|member|memberKey|leerling|medewerker|deelnemer|speler)$/i;
 const WAARDEVELD = /^(score|punten|rang|ranking|niveau|positie|gemiddelde|percentiel|beoordeling|cijfer|waardering|sterren|rapport)$/i;
 
-function asDraag(vormen) {
+function asDraag(vormen, routesPerBestand) {
   const cellen = new Map();
   const dragers = [];
   for (const v of vormen) {
@@ -169,13 +170,48 @@ function asDraag(vormen) {
     if (!mens.length || !waarde.length) continue;
     const context = contextVan(v.module);
     if (!context) continue;
-    dragers.push({ module: v.module, context, mens, waarde });
-    /* Een bewaarde vorm is de handeling `opslaan`. Wie hem leest is niet uit de
-       vorm af te leiden, dus de actor blijft hier onbepaald: de cel wordt gezet
-       voor elke actor en de onzekerheid staat in de uitslag. */
-    for (const actor of GEVAL.actoren) cellen.set(sleutel('opslaan', context, actor), true);
+
+    /* HANDELING 2, `tonen`: handelt deze dragermodule ook een API-route af? Dan
+       verlaat het bewaarde oordeel het systeem. Dat komt uit ROUTEBRON.json --
+       een derde bron, onafhankelijk van zowel de vormen als de wachter.
+
+       WAAROM `projecteren` EN `rangschikken` HIER NIET STAAN, en dat is gemeten
+       en niet aangenomen: een module die ergens een persoonssleutel noemt en
+       ergens `.map(` of `.sort(` gebruikt, levert 410 respectievelijk 155
+       treffers. Dat is dezelfde precisie als de woordsensor die hierboven al is
+       afgekeurd. Zolang er geen vorm- of graafsignaal voor is, blijven die twee
+       handelingen onbepaald -- met de reden in het register. */
+    const routes = (routesPerBestand && routesPerBestand.get(v.module)) || [];
+    dragers.push({ module: v.module, context, mens, waarde, routes: routes.length,
+      handelingen: routes.length ? ['opslaan', 'tonen'] : ['opslaan'] });
+
+    /* Wie de bewaarde vorm leest is niet uit de vorm af te leiden, dus de actor
+       blijft onbepaald: de cel wordt gezet voor elke actor en die onzekerheid
+       staat in de uitslag. */
+    for (const actor of GEVAL.actoren) {
+      cellen.set(sleutel('opslaan', context, actor), true);
+      if (routes.length) cellen.set(sleutel('tonen', context, actor), true);
+    }
   }
   return { cellen, dragers };
+}
+
+/* Welke bestanden handelen een API-route af? Uit ROUTEBRON.json, dat uit de
+   ROUTER komt en niet uit de bronboom. Ontbreekt het register, dan geeft deze
+   lezer een lege kaart en meldt de DRAAG-as dat hij `tonen` niet kon zien --
+   een sensor die niet kon kijken is iets anders dan een sensor die niets zag. */
+function routesPerBestand() {
+  try {
+    const rb = JSON.parse(fs.readFileSync(path.join(WORTEL, 'ROUTEBRON.json'), 'utf8'));
+    const rijen = Array.isArray(rb.perRoute) ? rb.perRoute : [];
+    const kaart = new Map();
+    for (const r of rijen) {
+      if (!r || !r.bestand) continue;
+      if (!kaart.has(r.bestand)) kaart.set(r.bestand, []);
+      kaart.get(r.bestand).push(r.route);
+    }
+    return { kaart, stand: 'gemeten' };
+  } catch (e) { return { kaart: new Map(), stand: 'geenBron' }; }
 }
 
 /* WACHT. Uit de BRON van de wachter: welke paden scant hij? */
@@ -220,7 +256,9 @@ function oordeel(claimt, draagt, wacht) {
 
 function meet(vormen) {
   const claim = asClaim();
-  const draag = asDraag(vormen);
+  const routes = routesPerBestand();
+  const draag = asDraag(vormen, routes.kaart);
+  draag.routeStand = routes.stand;
   const wacht = asWacht();
 
   const cellen = [];
@@ -265,23 +303,47 @@ function draai() {
     grens: 'GEEN PERCENTAGE, en dat is een ontwerpkeuze: voor een verhouding moet eerst vaststaan wat een ' +
       'telbare eenheid is, en bij een centrale architectuur kan een objectfamilie zwaarder wegen dan twintig ' +
       'mappen. TWEE UITSLAGEN ZIJN GEMAKKELIJK VERKEERD TE LEZEN: GECLAIMD_GEEN_DRAGER_GEVONDEN betekent ' +
-      'NIET dat er geen drager is, alleen dat DEZE sensor er geen vond -- en die ziet vandaag alleen de ' +
-      'handeling `opslaan`. GEDRAGEN_NIET_GEZIEN betekent NIET "ongetest": misschien bewaakt een centrale ' +
-      'laag de cel op een manier die deze wachtersensor niet ziet.',
+      'NIET dat er geen drager is, alleen dat DEZE sensor er geen vond -- en die ziet vandaag `opslaan` ' +
+      'en `tonen`, en `projecteren` en `rangschikken` niet. GEDRAGEN_NIET_GEZIEN betekent NIET "ongetest": ' +
+      'misschien bewaakt een centrale laag de cel op een manier die deze wachtersensor niet ziet.',
     geval: { id: GEVAL.id, objectfamilie: GEVAL.objectfamilie, aspect: GEVAL.aspect,
       handelingen: GEVAL.handelingen, contexten: GEVAL.contexten, actoren: GEVAL.actoren },
     assen: {
       claim: { soort: GEVAL.claim.soort, strekking: GEVAL.claim.strekking,
         citaten: GEVAL.claim.citaten, citaatKapot: m.claim.kapot.map(c => c.bestand + ': ' + c.anker),
         uitzonderingen: GEVAL.claim.uitzonderingen },
-      draag: { bron: 'scripts/objectmodel.js (vormen van bewaarde dingen)',
-        ziet: ['opslaan'], zietNiet: ['projecteren', 'rangschikken', 'tonen'],
-        zietNietWaarom: 'een bewaarde vorm toont wat er is opgeslagen, niet wat ermee wordt getoond of geordend',
+      draag: { bron: 'scripts/objectmodel.js (vormen van bewaarde dingen) + ROUTEBRON.json (routebereik)',
+        ziet: ['opslaan', 'tonen'], zietNiet: ['projecteren', 'rangschikken'],
+        zietNietWaarom: 'GEMETEN en niet aangenomen: een module die ergens een persoonssleutel noemt en ergens ' +
+          '`.map(` of `.sort(` gebruikt levert 410 respectievelijk 155 treffers -- dezelfde precisie als de ' +
+          'woordsensor die al is afgekeurd. Zonder vorm- of graafsignaal blijven die twee handelingen onbepaald.',
+        tonenBron: 'ROUTEBRON.json (welke module handelt een API-route af)',
+        tonenStand: m.draag.routeStand,
+        /* LAT.md regel 13: een meter kent zijn eigen grens, en deze tak heeft er
+           een die je moet kennen voordat je de cel leest. */
+        tonenGrens: 'WAT HIER GEMETEN IS, is dat de dragermodule een API-route afhandelt -- niet dat die ' +
+          'route het oordeel TOONT. Alle veertien routes van de twee schooldragers zijn POST, en dit huis ' +
+          'gebruikt POST ook om te lezen (/api/foundation/school/toets/lijst), dus de methode scheidt ' +
+          'schrijven en tonen niet. `tonen` betekent hier dus: het bewaarde oordeel is van buiten de module ' +
+          'bereikbaar. Dat is een ONDERgrens voor bereikbaarheid en een BOVENgrens voor tonen in enge zin.',
         dragers: m.draag.dragers },
       wacht: { bron: GEVAL.wachter.bestand + ' :: ' + GEVAL.wachter.lijst, stand: m.wacht.bron,
         paden: m.wacht.paden, contexten: m.wacht.contexten || [] },
     },
     telling,
+    /* EEN VONDST UIT HET VERBREDEN ZELF, en hij wordt hier OPGESCHREVEN in plaats
+       van weggewerkt. Dat is de vorm van `openBekend` in scripts/tikken.js en van
+       `sluitMetBevinding` in scripts/ritproef.js: een proef die iets echts vindt
+       en maar twee uitgangen heeft -- zakken of de bevinding wegpoetsen -- levert
+       op den duur alleen nog wegpoetsen op. */
+    bevinding: 'Het verbreden van de DRAAG-as naar `tonen` zette vier nieuwe cellen op GEDRAGEN_NIET_GEZIEN: ' +
+      'tonen | school | elk van de vier actoren. Dat is geen overtreding (zie `grens`), maar het stelt een ' +
+      'vraag die de CLAIM-as vandaag niet KAN beantwoorden: de uitzondering voor School is verklaard op de ' +
+      'HANDELING `opslaan` en kent geen actor. Een cijfer tonen aan de leerling zelf of aan zijn docent is ' +
+      'dezelfde leerstof als het bewaren ervan; hetzelfde cijfer tonen aan een partner of een externe lezer ' +
+      'is precies wat SCHOOL.md par. 11.1 tegenhoudt. De uitzondering is dus vermoedelijk te grof. Hem hier ' +
+      'verbreden zou een DOCTRINEBESLUIT zijn, en dat neemt een mens en geen sensor -- daarom staat hij ' +
+      'ongewijzigd en staat de vraag hier.',
     cellen: m.cellen,
   };
 

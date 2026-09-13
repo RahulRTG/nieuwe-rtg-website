@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T20:19:39.015Z",
-    "commit": "fb760d6aa",
+    "op": "2026-09-13T20:30:30.272Z",
+    "commit": "3602f82f4",
     "boomVuil": true,
-    "boomAnders": 5,
+    "boomAnders": 9,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -6479,8 +6479,11 @@
     },
     "refundmigratie.test.js": {
       "soort": "puur",
-      "staat": "al rood",
-      "gezakteZonderMutatie": 2
+      "staat": "gezakt",
+      "module": "scripts/refundmigratie.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "regexmutatie.test.js": {
       "soort": "puur",

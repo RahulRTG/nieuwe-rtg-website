@@ -36,7 +36,8 @@ const SOORT_NAAM = {
   wedstrijd: 'een wedstrijd in de agenda', uitgelicht: 'uitgelicht werk'
 };
 
-function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, db, save }) {
+function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, opslag: gegevenOpslag, db, save }) {
+  const opslag = gegevenOpslag || (db ? require('./opslag')({ db, save }) : null);
   /* ---- HET MOMENTREGISTER, EN WAAROM HET ER NIET WAS ----
 
      GEVONDEN DOOR SCHAKEL 5 VAN scripts/momentproef.js (13 september 2026).
@@ -72,54 +73,9 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, db, save 
      heeft staan (`meldVan`). Dus: de feed is de tijdlijn van de aanwezigheid, de
      wek is mijn meldingsvoorkeur. Wie ze samenvoegt, laat een lid zijn eigen
      geschiedenis kwijtraken door een vinkje uit te zetten. */
-  const MAX = 500;
-
-  function M() {
-    if (!db || !db.data) return [];
-    if (!Array.isArray(db.data.mediaMomenten)) db.data.mediaMomenten = [];
-    return db.data.mediaMomenten;
-  }
-
-  function leg(aanwezigheidId, soort, titel) {
-    if (!db || !db.data) return null;
-    const lijst = M();
-    const m = { id: 'mo' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
-      aanwezigheid: String(aanwezigheidId), soort,
-      titel: titel == null ? null : String(titel).slice(0, 120), at: new Date().toISOString() };
-    lijst.push(m);
-    /* Een plafond, en hij snijdt de OUDSTE weg. Zonder plafond groeit dit
-       register ongelimiteerd mee met elke wedstrijd en elk optreden. */
-    if (lijst.length > MAX) db.data.mediaMomenten = lijst.slice(-MAX);
-    if (save) save();
-    return m;
-  }
-
-  /* DE FAN INBOX: de momenten van de aanwezigheden die dit lid volgt.
-
-     Hij leest de VOLGLIJST als filter en de aanwezigheid voor de naam -- dus wie
-     ontvolgt, ziet de tijdlijn van die aanwezigheid niet meer, en wie later weer
-     volgt ziet hem terug. Dat is geen gat: de feed is een VENSTER op publieke
-     tijdlijnen en geen persoonlijke postbus. Een echte postbus zou per lid
-     moeten bewaren wat hij heeft gezien, en dat is een tweede register over
-     dezelfde feiten. */
-  function momentenVoor(key, grens) {
-    if (!aanwezig) return { momenten: [], volgt: 0 };
-    const mijn = aanwezig.aanwezigMijn(key) || [];
-    const opId = new Map(mijn.map(a => [a.id, a]));
-    const n = Math.min(Math.max(Number(grens) || 50, 1), 100);
-    const uit = M().filter(m => opId.has(m.aanwezigheid)).slice(-n).reverse()
-      .map(m => ({
-        id: m.id, soort: m.soort, wat: SOORT_NAAM[m.soort] || m.soort,
-        titel: m.titel, at: m.at,
-        aanwezigheid: m.aanwezigheid,
-        /* LIVE opgehaald en niet meegeschreven -- zie de kop hierboven. */
-        naam: (opId.get(m.aanwezigheid) || {}).naam || null
-      }));
-    return {
-      momenten: uit, volgt: mijn.length,
-      watDitNietDoet: 'Dit is een venster op de tijdlijnen die u volgt, geen postbus: er wordt niet bijgehouden wat u al heeft gezien, en er staat geen volgorde op populariteit.'
-    };
-  }
+  const { leg, momentenVoor } = require('./momenten')({
+    opslag, aanwezig, soortNaam: SOORT_NAAM
+  });
 
   /* De volgers van een maker: de vereniging van de twee gratis volgrelaties
      die de Media OS ook zet (Clips en het Theater). Een betaald podium-

@@ -1,41 +1,12 @@
-/* Media OS (deelmodule): DE PUBLIEKE AANWEZIGHEID, EN DE ENE VOLGRELATIE.
-
-   HET BESLUIT DAT HIERONDER LIGT (13 september 2026). WEKDEKKING.json vond vier
-   publieke momenten waarvan er drie niemand konden wekken: festival en sportclub
-   hebben geen volgrelatie. De voor de hand liggende oplossing -- `volgtZaak`
-   naast `volgtLid`, en morgen `volgtClub` en `volgtFestival` -- is precies de
-   vorm die dit huis al twee keer heeft afgewezen: dan krijgt ieder nieuw publiek
-   subject zijn eigen sociale administratie, en binnen een jaar zijn het er zes
-   die uit elkaar lopen (LAT.md regel 4).
-
-   DUS EEN BEGRIP EN NIET VIER: een lid volgt een PUBLIEKE AANWEZIGHEID. Die
-   aanwezigheid kan gedragen worden door een mens of door een organisatie, en dat
-   verandert niets aan de relatie. Ajax wordt geen mens en Mila wordt geen zaak;
-   de aanwezigheid is alleen het publieke aanspreekpunt waarop iemand zich kan
-   abonneren.
-
-   DE HARDE INVARIANT, en die is de reden dat deze module zo klein is:
-
-     EEN AANWEZIGHEID HEEFT NOOIT MEER BEVOEGDHEID DAN HAAR DRAGER.
-
-   Zij is een PROJECTIEADRES en geen actor. Zij tekent niets, ontvangt geen geld,
-   wijst niemand aan en bezit geen rechten. Wie hier een veld toevoegt waarmee
-   zij iets KAN, heeft een tweede identiteitssysteem gebouwd -- en dat is exact
-   de `humans`-tabelgrens uit HDI.md par. 5.1, nu aan de publieke kant.
-   test/aanwezigheid.test.js bewaakt dat: de vorm is gesloten.
-
-   VOLGEN IS ALTIJD EXPLICIET. Een kaartje kopen is geen volgen. Lid zijn is geen
-   volgen. Ergens werken is geen volgen. Merchandise kopen is geen volgen. De
-   mens drukt zelf, of er is geen relatie. Zonder die regel ontstaat vanzelf een
-   publiek dat nooit gevraagd is -- en dan is "volgers" een verkooplijst.
-
-   WAAROM DE DOMEINLIJSTEN BLIJVEN BESTAAN. Clips, het Theater en De Salon hebben
-   elk een eigen volgrelatie, en die zijn van HEN: ze voeden ook hun eigen feed en
-   hun eigen zaal. De Media OS leest ze en bezit ze niet (./volgen.js). Wat hier
-   bij komt is EEN lijst voor alle aanwezigheden samen -- geen lijst per subject.
-   ./wekken.js voegt de bronnen samen, precies zoals hij dat met Clips en het
-   Theater al deed. */
+/* Media OS: één expliciete volgrelatie voor een publieke aanwezigheid, gedragen
+   door een lid of zaak. De aanwezigheid is een projectieadres en nooit een
+   actor: zij tekent niets, ontvangt geen geld en bezit geen rechten. Een kaartje,
+   aankoop of dienstverband maakt niemand automatisch volger. Domeinen houden
+   hun eigen lijsten; deze laag voegt alleen het ontbrekende publieke adres toe.
+   test/aanwezigheid.test.js bewaakt de gesloten vorm en bevoegdheidsgrens. */
 'use strict';
+
+const { beeld } = require('./aanwezigheid-beeld');
 
 /* De soorten die een aanwezigheid kan uitzenden. Dit is de woordenschat van de
    MELDINGSVOORKEUR en niet van de domeinen: een lid kiest hier wat hij wil
@@ -48,13 +19,12 @@ const SOORTEN = ['muziek', 'video', 'flow', 'live', 'optreden', 'kaartverkoop', 
    besluit en geen uitbreiding. */
 const DRAGERS = ['lid', 'zaak'];
 
-module.exports = ({ db, save, schoon, codenaamVan }) => {
+module.exports = ({ opslag: gegevenOpslag, db, save, schoon, codenaamVan }) => {
+  const opslag = gegevenOpslag || require('./opslag')({ db, save });
   const nu = () => new Date().toISOString();
 
   function A() {
-    if (!db.data.mediaAanwezig || typeof db.data.mediaAanwezig !== 'object') db.data.mediaAanwezig = {};
-    if (!db.data.mediaVolgt || typeof db.data.mediaVolgt !== 'object') db.data.mediaVolgt = {};
-    return db.data;
+    return opslag.aanwezigheid();
   }
 
   const sleutel = (soort, code) => soort + ':' + code;
@@ -81,12 +51,12 @@ module.exports = ({ db, save, schoon, codenaamVan }) => {
     if (!DRAGERS.includes(soort) || !code) return null;
     const d = A();
     const id = sleutel(soort, code);
-    if (!d.mediaAanwezig[id]) { d.mediaAanwezig[id] = vorm(soort, code, naam, soorten); save(); }
+    if (!d.mediaAanwezig[id]) { d.mediaAanwezig[id] = vorm(soort, code, naam, soorten); opslag.bewaar(); }
     else if (naam && d.mediaAanwezig[id].naam !== schoon(naam, 80)) {
       /* De naam mag bijgewerkt worden -- een club hernoemt, een lid kiest een
          andere codenaam. De relatie hangt aan de ID en niet aan de naam, dus
          volgers raken niemand kwijt. */
-      d.mediaAanwezig[id].naam = schoon(naam, 80); save();
+      d.mediaAanwezig[id].naam = schoon(naam, 80); opslag.bewaar();
     }
     return d.mediaAanwezig[id];
   }
@@ -107,7 +77,7 @@ module.exports = ({ db, save, schoon, codenaamVan }) => {
     const i = lijst.indexOf(a.id);
     if (aan && i < 0) lijst.push(a.id);
     if (!aan && i >= 0) lijst.splice(i, 1);
-    save();
+    opslag.bewaar();
     return { status: 200, ok: true, volgIk: lijst.includes(a.id), aanwezigheid: beeld(a) };
   }
 
@@ -120,20 +90,6 @@ module.exports = ({ db, save, schoon, codenaamVan }) => {
     const gezocht = String(id || '');
     return Object.keys(d.mediaVolgt).filter(k => (d.mediaVolgt[k] || []).includes(gezocht));
   }
-
-  /* WAT EEN LID ZIET ALS HIJ OP VOLGEN DRUKT. Niet "mediaos/optreden" maar wat
-     hij gaat horen. Een aanwezigheid die vier dingen kan uitzenden en dat niet
-     zegt, laat iemand op een knop drukken zonder te weten waarvoor -- en dan
-     activeert een tik ongemerkt vijf kanalen. */
-  const WOORD = {
-    muziek: 'muziek', video: "video's", flow: 'korte video', live: 'live',
-    optreden: 'optredens', kaartverkoop: 'kaartverkoop', wedstrijd: 'wedstrijden',
-    uitgelicht: 'uitgelicht werk'
-  };
-  const beeld = (a) => a && ({
-    id: a.id, naam: a.naam, drager: a.drager.soort,
-    soorten: a.soorten, watUKrijgt: a.soorten.map(s => WOORD[s] || s)
-  });
 
   /* De aanwezigheden die dit lid volgt, met hun beeld. */
   function mijn(key) {

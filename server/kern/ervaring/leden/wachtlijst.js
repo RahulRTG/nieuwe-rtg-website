@@ -17,8 +17,8 @@ module.exports = (ctx) => {
      sseToSupplier, sseToCustomer, ticketsVoorSlot) -- die zouden pas bij een
      echte annulering met een wachtlijst zijn opgevallen, als een ReferenceError
      midden in een geldpad. */
-  const { db, save, findSupplier, notify, notifySupplier, sseToSupplier,
-    sseToCustomer, ticketsVoorSlot, id, nu } = ctx;
+  const { save, findSupplier, notify, notifySupplier, sseToSupplier,
+    sseToCustomer, ticketsVoorSlot, id, nu, wachtlijstOpslag } = ctx;
 
   /* ---- 8. wachtlijst ----
      Bij een vol event of tijdslot. Komt er een plek vrij (annulering), dan
@@ -43,23 +43,25 @@ module.exports = (ctx) => {
       doel = 'slot:' + s.code + ':' + act.id + ':' + datum + ':' + tijd;
       omschrijving = act.naam + ' bij ' + s.name + ' (' + datum + ' ' + tijd + ')';
     } else return { status: 400, error: 'Geef een event of tijdslot op.' };
-    const lijst = db.data.wachtlijsten;
+    const lijst = wachtlijstOpslag.lees();
     if (lijst.some(w => w.doel === doel && w.key === sess.key)) return { status: 409, error: 'U staat al op deze wachtlijst.' };
     lijst.push({ id: id(), doel, supplierCode: s.code, omschrijving, key: sess.key, codename, at: nu() });
-    db.data.wachtlijsten = lijst.slice(-20000);
+    wachtlijstOpslag.vervang(lijst.slice(-20000));
     save();
     const positie = lijst.filter(w => w.doel === doel).length;
     return { ok: true, positie, omschrijving };
   }
   function mijnWachtlijst(key) {
-    return (db.data.wachtlijsten || []).filter(w => w.key === key)
-      .map(w => ({ id: w.id, omschrijving: w.omschrijving, at: w.at, positie: db.data.wachtlijsten.filter(x => x.doel === w.doel && x.at <= w.at).length }));
+    const lijst = wachtlijstOpslag.lees();
+    return lijst.filter(w => w.key === key)
+      .map(w => ({ id: w.id, omschrijving: w.omschrijving, at: w.at, positie: lijst.filter(x => x.doel === w.doel && x.at <= w.at).length }));
   }
   // een plek is vrijgekomen: de eerste op de lijst krijgt bericht en valt eraf
   function meldWachtlijst(doel) {
-    const i = (db.data.wachtlijsten || []).findIndex(w => w.doel === doel);
+    const lijst = wachtlijstOpslag.lees();
+    const i = lijst.findIndex(w => w.doel === doel);
     if (i < 0) return null;
-    const [w] = db.data.wachtlijsten.splice(i, 1);
+    const [w] = lijst.splice(i, 1);
     save();
     notify(w.key, { icon: 'ster', title: 'Er is een plek vrij!', body: 'Er kwam een plek vrij voor ' + w.omschrijving + '. Wees er snel bij: de plek is niet gereserveerd.', scope: 'wachtlijst' });
     sseToCustomer(w.key, 'sync', { scope: 'wachtlijst' });

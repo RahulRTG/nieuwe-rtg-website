@@ -11,8 +11,7 @@ module.exports = (kern) => {
     mediaBieb, mediaBewaar, mediaSmaakVan, mediaSmaakStuur, mediaBord,
     mediaLijsten, mediaLijst, mediaLijstMaak, mediaLijstZet, mediaLijstStuk, mediaLijstDeel,
     mediaSamenStart, mediaSamenNodig, mediaSamenIn, mediaSamenUit, mediaSamenZet, mediaSamenMijn,
-    aanwezigVolg, aanwezigMijn, aanwezigMet, aanwezigVolgtHij, aanwezigBeeld,
-    aanwezigZoek, mediaMomentenVoor } = kern;
+    aanwezigVolg, aanwezigMijn, aanwezigMet, aanwezigVolgtHij, aanwezigBeeld } = kern;
   if (!mediaWereld) return;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
@@ -183,9 +182,9 @@ module.exports = (kern) => {
      een anonieme variant naast zonder dat besluit opnieuw te nemen. */
   app.post('/api/mediaos/aanwezig/zoek', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    if (!aanwezigZoek) return res.status(503).json({ error: 'Deze laag draait hier niet.' });
+    if (!mediaBord.aanwezigZoek) return res.status(503).json({ error: 'Deze laag draait hier niet.' });
     const b = req.body || {};
-    res.json(Object.assign({ ok: true }, aanwezigZoek(sess(req).key, b.q, b.soort)));
+    res.json(Object.assign({ ok: true }, mediaBord.aanwezigZoek(sess(req).key, b.q, b.soort)));
   });
 
   /* DE FAN INBOX -- van de wek terug naar het moment (schakel 5).
@@ -197,7 +196,7 @@ module.exports = (kern) => {
      iets is, dit scherm zegt WAT. */
   app.post('/api/mediaos/momenten', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    if (!mediaMomentenVoor) return res.status(503).json({ error: 'Deze laag draait hier niet.' });
-    res.json(Object.assign({ ok: true }, mediaMomentenVoor(sess(req).key, (req.body || {}).grens)));
+    if (!mediaBord.momentenVoor) return res.status(503).json({ error: 'Deze laag draait hier niet.' });
+    res.json(Object.assign({ ok: true }, mediaBord.momentenVoor(sess(req).key, (req.body || {}).grens)));
   });
 };

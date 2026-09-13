@@ -60,18 +60,12 @@ const CONTRACTEN = {
     },
     afgetekend: AFGETEKEND
   },
-  /* HIER STOND `nietHerhaalbaar`, EN DE METING SPREEKT DAT TEGEN. Op 13 september
-     kreeg deze route een `mutatie:`-regel in de bron (scripts/mutatiesemantiek.js
-     leest die), en toen kwam er een tegenspraak uit die er tot dan niet kon zijn:
-     `IDEMPROEF.json` meet deze route als `beschermd` -- met dezelfde sleutel is er
-     GEEN tweede deurticket (a: 1, b: 0, c: 1 met een verse sleutel), en zonder
-     sleutel wel ("dit is de dubbeltik"). Dat is letterlijk de omschrijving van
-     `sleutelVereist` in kern/mutatie.js, en dus is dat de klasse.
-
-     De STAND blijft staan, want die gaat over iets anders en is nog steeds waar:
-     een tweede aanvraag ZONDER sleutel hoort een tweede aanvraag te zijn. Wat er
-     verandert is de klasse, niet het besluit -- en de klasse hoorde altijd al bij
-     de meting te passen. */
+  /* HIER STOND `nietHerhaalbaar`, EN DE METING SPRAK DAT TEGEN. `IDEMPROEF.json`
+     meet deze route als `beschermd`: met dezelfde sleutel komt er GEEN tweede
+     deurticket (a: 1, b: 0, c: 1 met een verse sleutel), zonder sleutel wel. Dat
+     is de omschrijving van `sleutelVereist` in kern/mutatie.js. De STAND blijft
+     staan -- die gaat over iets anders en is nog waar. Zichtbaar geworden toen de
+     route een `mutatie:`-regel kreeg; zie scripts/mutatiesemantiek.js. */
   'POST /api/office/bank/incasso': {
     mutatieId: 'bank.incasso.aanvragen',
     herkomst: 'mens',
@@ -80,13 +74,11 @@ const CONTRACTEN = {
     stand: 'INTENTIONALLY_NON_IDEMPOTENT',
     waarom: 'Zonder idempotentiesleutel is een tweede aanroep een tweede aanvraag, en dat hoort zo: ' +
       'de aanvraag verandert zelf niets aan de bank. De ronde is wel gevoelig voor herhaling -- zij ' +
-      'int geld -- maar die gevoeligheid zit achter de bevestiging, en een bevestiging werkt precies ' +
-      'een keer. MET een sleutel merkt de poort de herhaling wel; vandaar de klasse `sleutelVereist`.',
+      'int geld -- maar die gevoeligheid zit achter de bevestiging, en die werkt precies een keer.',
     bewijs: {
       gemeten: 'test/tweedehandtekening.test.js toets 6: de aanvraag draagt `needsAuth` en geen ' +
         '`uitgevoerd`; de ronde draait pas na de tweede handtekening. En IDEMPROEF.json: met ' +
-        'dezelfde sleutel een tweede oproep zonder tweede deurticket (`beschermd`), zonder sleutel ' +
-        'twee tickets (`onbeschermd`).',
+        'sleutel `beschermd`, zonder sleutel twee tickets.',
       op: '2026-09-13'
     },
     afgetekend: AFGETEKEND

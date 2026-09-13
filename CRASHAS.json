@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T05:41:08.057Z",
-    "commit": "1320e4b71",
+    "op": "2026-09-13T07:11:20.584Z",
+    "commit": "822f0cbe5",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/crashas.js",
@@ -32,12 +32,12 @@
   },
   "injectiepunten": {
     "voor-eerste-mutatie": {
-      "verraad": null,
-      "waarom": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
+      "verraad": "sterf-voor-mutatie",
+      "waarom": "ingebouwd in server/db/bijeen.js, voor fn() van de buitenste bundel: op dat punt staat vast dat er nog niets is gemuteerd"
     },
     "in-de-opslag": {
       "verraad": null,
-      "waarom": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+      "waarom": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
     },
     "na-commit-voor-antwoord": {
       "verraad": "sterf-na-commit",
@@ -60,26 +60,26 @@
     "actief": false,
     "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen."
   },
-  "gemetenOp": "2026-09-13T05:41:08.021Z",
+  "gemetenOp": "2026-09-13T07:11:20.545Z",
   "telling": {
     "routes": 45,
     "paren": 270,
-    "bestaat": 135,
-    "bestaatNiet": 90,
+    "bestaat": 90,
+    "bestaatNiet": 135,
     "onbekend": 45,
-    "meetbaar": 45,
+    "meetbaar": 90,
     "gemeten": 1,
     "perGrens": {
       "voor-eerste-mutatie": {
         "bestaat": 45,
         "bestaatNiet": 0,
         "onbekend": 0,
-        "meetbaar": 0,
+        "meetbaar": 45,
         "gemeten": 0
       },
       "in-de-opslag": {
-        "bestaat": 45,
-        "bestaatNiet": 0,
+        "bestaat": 0,
+        "bestaatNiet": 45,
         "onbekend": 0,
         "meetbaar": 0,
         "gemeten": 0
@@ -131,18 +131,7 @@
           "grond": "de idempotentieproef zag deze route 3 collectie(s) aanraken: bankBoekingen, bankPassen, bankSaldi",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 3 collectie(s) aanraken: bankBoekingen, bankPassen, bankSaldi",
-          "vorm": "samengesteld (3 collecties)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -151,6 +140,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 3,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -197,18 +197,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -217,6 +206,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -263,18 +263,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -283,6 +272,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -329,18 +329,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -349,6 +338,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -395,18 +395,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -415,6 +404,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -461,18 +461,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankRekeningen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankRekeningen",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -481,6 +470,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -528,18 +528,7 @@
           "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi",
-          "vorm": "samengesteld (2 collecties)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -548,6 +537,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -595,18 +595,7 @@
           "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi",
-          "vorm": "samengesteld (2 collecties)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -615,6 +604,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -661,18 +661,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankRekeningen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankRekeningen",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -681,6 +670,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -728,18 +728,7 @@
           "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi",
-          "vorm": "samengesteld (2 collecties)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -748,6 +737,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -794,18 +794,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankTerugkerend",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankTerugkerend",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -814,6 +803,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -860,18 +860,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalRegie",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalRegie",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -880,6 +869,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -926,18 +926,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: geldbeleid",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: geldbeleid",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -946,6 +935,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -992,18 +992,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: labFonds",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: labFonds",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1012,6 +1001,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1058,18 +1058,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: geldbeleid",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: geldbeleid",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1078,6 +1067,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1124,18 +1124,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: gemeenteAanslagen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: gemeenteAanslagen",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1144,6 +1133,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1190,18 +1190,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: economie",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: economie",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1210,6 +1199,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1256,18 +1256,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: labFonds",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: labFonds",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1276,6 +1265,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1322,18 +1322,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: aiTegoed",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: aiTegoed",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1342,6 +1331,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1388,18 +1388,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1408,6 +1397,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1454,18 +1454,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1474,6 +1463,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1520,18 +1520,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1540,6 +1529,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1586,18 +1586,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1606,6 +1595,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1652,18 +1652,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: aiTegoed",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: aiTegoed",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1672,6 +1661,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1718,18 +1718,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payCodes",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payCodes",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1738,6 +1727,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1785,18 +1785,7 @@
           "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
-          "vorm": "samengesteld (2 collecties)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1805,6 +1794,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1855,18 +1855,7 @@
           "grond": "de idempotentieproef zag deze route 5 collectie(s) aanraken: fondsAfdrachten, invoices, payBoekingen, paySaldi, socialeAfdrachten",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 5 collectie(s) aanraken: fondsAfdrachten, invoices, payBoekingen, paySaldi, socialeAfdrachten",
-          "vorm": "samengesteld (5 collecties)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1875,6 +1864,17 @@
           "uitslag": "PROVEN",
           "instrument": "scripts/factuurproef.js",
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 5,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1922,18 +1922,7 @@
           "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
-          "vorm": "samengesteld (2 collecties)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -1942,6 +1931,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -1990,18 +1990,7 @@
           "grond": "de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payTegoed",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payTegoed",
-          "vorm": "samengesteld (3 collecties)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2010,6 +1999,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 3,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2057,18 +2057,7 @@
           "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
-          "vorm": "samengesteld (2 collecties)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2077,6 +2066,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2123,18 +2123,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payTikCodes",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payTikCodes",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2143,6 +2132,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2189,18 +2189,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payVerzoeken",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payVerzoeken",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2209,6 +2198,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2257,18 +2257,7 @@
           "grond": "de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payVerzoeken",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payVerzoeken",
-          "vorm": "samengesteld (3 collecties)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2277,6 +2266,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 3,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2323,18 +2323,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payVerzoeken",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payVerzoeken",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2343,6 +2332,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2389,18 +2389,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: punten",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: punten",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2409,6 +2398,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2455,18 +2455,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalVerzoeken",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalVerzoeken",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2475,6 +2464,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2521,18 +2521,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2541,6 +2530,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2587,18 +2587,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2607,6 +2596,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2653,18 +2653,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: giftcards",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: giftcards",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2673,6 +2662,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2719,18 +2719,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: directOntvangsten",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: directOntvangsten",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2739,6 +2728,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2790,18 +2790,7 @@
           "grond": "de idempotentieproef zag deze route 6 collectie(s) aanraken: facturen, payBoekingen, payCodes, paySaldi, posSales, waardeOormerken",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 6 collectie(s) aanraken: facturen, payBoekingen, payCodes, paySaldi, posSales, waardeOormerken",
-          "vorm": "samengesteld (6 collecties)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2810,6 +2799,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 6,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2856,18 +2856,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payTreasury",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payTreasury",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2876,6 +2865,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2923,18 +2923,7 @@
           "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
-          "vorm": "samengesteld (2 collecties)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -2943,6 +2932,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -2990,18 +2990,7 @@
           "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: facturen, posSales",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: facturen, posSales",
-          "vorm": "samengesteld (2 collecties)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -3010,6 +2999,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",
@@ -3056,18 +3056,7 @@
           "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: wallet",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; sterf-na-commit slaat per definitie te laat toe"
-        },
-        "in-de-opslag": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: wallet",
-          "vorm": "enkelvoudig (1 collectie)",
-          "uitslag": null,
-          "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een proces dat midden IN de schrijfactie sterft -- dat is een ander moment"
+          "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
@@ -3076,6 +3065,17 @@
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
         },
         "na-commit-voor-bericht": {
           "bestaat": "onbekend",

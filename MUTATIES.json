@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T19:26:02.464Z",
-    "commit": "654971e5",
+    "op": "2026-09-13T19:54:50.889Z",
+    "commit": "70aa76ba",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -6284,6 +6284,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "registereigenaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/registereigenaar.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "reisagenda.test.js": {
       "soort": "server",

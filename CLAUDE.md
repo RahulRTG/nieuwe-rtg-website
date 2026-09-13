@@ -1665,6 +1665,41 @@ kwam sprong het bronbereik naar 100%, want een index noemt elk bestand. Structuu
 (welke functies wonen hier) en gedrag (schrijft het, is het bewezen) staan daarom
 apart, en alleen die tweede zegt nog iets.
 
+**`MACHINE.md` is de laag die de motoren aan elkaar riemt** -- RTG Execution
+Physics (de uitvoeringskant van hetzelfde voorstel waarvan RUNTIME.md de
+werkelijkheidskant is), als richtingsdocument met per onderdeel of het **staat**, **een stap
+weg** is, **een besluit vraagt** of **jaren weg** is. Lees die vóór je een
+zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
+motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
+gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
+legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
+bestaande meter deed: van de <!--getal:machine.muterend-->4952<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2818<!--/getal--> geen
+enkele as, <!--getal:machine.motorenZonderRoute-->3<!--/getal--> motoren bereiken
+geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
+geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele
+handeling die de keten heeft gelopen. Twee assen per motor die **nooit worden
+opgeteld** (handlertekst en routebestand: twee ondergrenzen die verschillende
+dingen missen), en de meter heeft zichzelf twee keer betrapt op dezelfde fout van
+twee kanten: een hub in de kern-tas zette 4162 routes op "idempotent", en
+`/api/notifications` scoorde tien assen omdat die route zelf in `server/server.js`
+woont (143 requires). Vandaar de hubgrens en de
+<!--getal:machine.hubRoutes-->28<!--/getal--> routes waarvoor de bestandsas met
+naam en toenaam onbruikbaar is verklaard. Zeven begrippen uit het voorstel zijn
+al bezet en dat is de goedkoopste paragraaf van het document: **`envelop` is
+gesloten op acht velden en zegt met opzet nooit WAT** (dus het uitvoerkapsel
+verwijst ernaar en heet niet zo), **`doel` draagt al twee betekenissen** over 28
+modules (een levensdoel en de AVG-doelbinding -- een planner-doel heet
+`streefstand`), een **samengesteld integratiecijfer** (`15/15`, een
+confidence-percentage) is precies wat BEWIJSMACHINE.md en INT-04 verbieden,
+**assurance is een trede en geen kommagetal** (de samenstelling is een MINIMUM,
+niet een gewogen gemiddelde), en `EXPERIMENTAL -> TRUSTED -> DEGRADED` zou de
+**zesde gezagsladder** zijn -- de drie die er al zijn (bewijsgraden,
+vervalstaten, schaduwmodi) dekken het samen. Wat er jaren weg is, staat er met
+het getal dat het blokkeert: een planner op `gevolg.js` heeft 96 van 176 paden
+`onbekend`, en een promotiesysteem boven
+<!--getal:vertrouwen.bewezen-->0<!--/getal--> bewezen routes promoveert niets.
+
 **`LAT.md` is de technische lat** — elf regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)

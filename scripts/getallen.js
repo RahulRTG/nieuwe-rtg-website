@@ -55,6 +55,22 @@ const GETALLEN = {
     wat: 'routes met de vervalstaat bewezen' },
   'vertrouwen.geschorst': { bron: 'VERTROUWEN.json', veld: 'telling.geschorst',
     wat: 'routes met de vervalstaat geschorst' },
+  'machine.muterend': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.muterend',
+    wat: 'muterende routes (methode x pad) die de machinedekking heeft gewogen' },
+  'machine.zonderAs': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.mutatiesZonderEnigeAs',
+    wat: 'muterende routes die geen enkele as van de eigen machinerie raken' },
+  'machine.motorenZonderRoute': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.motorenZonderRouteBereik',
+    wat: 'motoren die geen enkele route bereiken' },
+  'machine.hubRoutes': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.bestandsasOnbruikbaar',
+    wat: 'routes waarvoor de bestandsas onbruikbaar is omdat ze zelf in een hub wonen' },
+  'machine.bewijsDraagt': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.perAs.bewijsDraagt.bestand',
+    wat: 'routes die het bewijstoken raken (proof-carrying authorization)' },
+  'machine.mandaat': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.perAs.mandaat.bestand',
+    wat: 'routes die de mandaatgrammatica raken' },
+  'machine.envelop': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.perAs.envelop.bestand',
+    wat: 'routes die de gebeurtenisenvelop raken' },
+  'machine.mensAanDeDeur': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.perAs.mensAanDeDeur.bestand',
+    wat: 'routes waar de deur een bewezen mens eist' },
   'capabiliteit.lijsten': { bron: 'CAPABILITEIT.json', veld: 'woordenlijsten',
     wat: 'losse capability-woordenlijsten in de code' },
   'capabiliteit.leden': { bron: 'CAPABILITEIT.json', veld: 'leden',
@@ -356,7 +372,7 @@ const GETALLEN = {
    dag ook iets dat niemand had bedoeld. */
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
-  'TRAVELCOMMERCE.md', 'MENS.md'];
+  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

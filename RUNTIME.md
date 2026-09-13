@@ -39,6 +39,15 @@ bestaande projectie verbreden — niet een nieuw objectmodel eroverheen verklare
 
 ---
 
+**De uitvoeringskant van dit voorstel staat in `MACHINE.md`.** Dit document
+beantwoordt *wat is waar* (één projectie, en waarover die mag gaan); dat
+document beantwoordt *komt een handeling langs de motoren die dit huis daarvoor
+heeft gebouwd* -- met `npm run machinedekking` als meting, die zestien motoren
+voor het eerst naast elkaar op DEZELFDE route legt. Twee vragen, twee documenten,
+en geen tweede telling van hetzelfde.
+
+---
+
 ## 1. De meting die dit document eerlijk houdt
 
 Drie bestaande metingen raken de dragende bewering rechtstreeks. Ze zijn niet

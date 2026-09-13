@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T08:54:31.812Z",
-    "commit": "863091f6",
-    "boomVuil": false,
-    "boomAnders": 2,
+    "op": "2026-09-13T09:49:10.903Z",
+    "commit": "a7dd3dac",
+    "boomVuil": true,
+    "boomAnders": 10,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -56,6 +56,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "aanwezigheid-routes.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "aanwezigheid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/mediaos/aanwezigheid.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "accountroutes.test.js": {
       "soort": "puur",

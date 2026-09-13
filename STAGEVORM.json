@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T07:34:17.598Z",
-    "commit": "dd423b66",
+    "op": "2026-09-13T09:36:45.922Z",
+    "commit": "a7dd3dac",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 4,
     "instrument": "scripts/stagevorm.js",
     "node": "v22.22.2"
   },
@@ -79,14 +79,14 @@
       }
     ],
     "vorm": {
-      "vormen": 63,
+      "vormen": 67,
       "domeinen": 10,
-      "velden": 136,
+      "velden": 143,
       "inAlleDomeinen": 0,
       "inMinstensDeHelft": 0,
       "helftDrempel": 5,
-      "veldenDomeineigen": 121,
-      "domeineigenPct": 89,
+      "veldenDomeineigen": 126,
+      "domeineigenPct": 88.1,
       "perDomein": [
         {
           "domein": "kern/clips",
@@ -106,7 +106,7 @@
         },
         {
           "domein": "kern/mediaos",
-          "velden": 13
+          "velden": 16
         },
         {
           "domein": "kern/muziek",
@@ -118,7 +118,7 @@
         },
         {
           "domein": "kern/salon",
-          "velden": 10
+          "velden": 16
         },
         {
           "domein": "kern/sportclub",
@@ -160,6 +160,14 @@
           "waar": [
             "kern/podium",
             "kern/theater"
+          ]
+        },
+        {
+          "veld": "ingetrokken",
+          "domeinen": 2,
+          "waar": [
+            "kern/festival",
+            "kern/salon"
           ]
         },
         {
@@ -235,6 +243,14 @@
           ]
         },
         {
+          "veld": "toelichting",
+          "domeinen": 2,
+          "waar": [
+            "kern/muziek",
+            "kern/salon"
+          ]
+        },
+        {
           "veld": "vanMij",
           "domeinen": 2,
           "waar": [
@@ -254,26 +270,25 @@
     },
     "haak": {
       "publiekeDomeinen": 11,
-      "metHaak": 5,
+      "metHaak": 8,
       "zonderHaak": [
         "kern/creator",
         "kern/events",
-        "kern/festival",
-        "kern/galerij",
-        "kern/salon",
-        "kern/sportclub"
+        "kern/galerij"
       ],
-      "soorten": [
-        "muziek",
-        "video",
-        "flow",
-        "live"
-      ],
+      "soorten": [],
       "waar": [
         {
           "domein": "kern/clips",
           "bestanden": [
             "server/kern/clips.js"
+          ]
+        },
+        {
+          "domein": "kern/festival",
+          "bestanden": [
+            "server/kern/festival/artiest.js",
+            "server/kern/festival/product.js"
           ]
         },
         {
@@ -292,6 +307,18 @@
           "domein": "kern/podium",
           "bestanden": [
             "server/kern/podium/kanaal.js"
+          ]
+        },
+        {
+          "domein": "kern/salon",
+          "bestanden": [
+            "server/kern/salon/uitlichten.js"
+          ]
+        },
+        {
+          "domein": "kern/sportclub",
+          "bestanden": [
+            "server/kern/sportclub/sportief.js"
           ]
         },
         {

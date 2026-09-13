@@ -14,8 +14,8 @@
     "carriereDomeinenGemeten": 15,
     "stageDomeinenGemeten": 10,
     "wekZonderUitspraak": 0,
-    "dbDeuren": 525,
-    "dbDeurenSchrijvend": 273,
+    "dbDeuren": 527,
+    "dbDeurenSchrijvend": 275,
     "dekkingPct": 82,
     "dekkingWaargenomenPct": 100,
     "delenZonderOnderwerp": 0,
@@ -30,7 +30,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1569,
+    "kernBreedte": 1575,
     "kernGedeeld": 235,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -2181,6 +2181,33 @@
       "meter": "bewijsAchterstand 2380 -> 2382",
       "reden": "DEZELFDE OORZAAK ALS DE NOTITIE HIERBOVEN, EEN REGISTER VERDER, en daarom een eigen regel in plaats van de vorige stilletjes op te hogen. HERSTEL.json leidt kandidaat-tegenhangers af uit de NAMEN van de routes in IDEMPROEF.json, en is na de verse ronde hergenereerd: 49 vermoede tegenhangers in plaats van 47. De post `herstel-onbevestigd` gaat daarmee met 2 omhoog.\n\nDe twee erbij zijn /api/rtfos/bescherming/open en /api/rtfos/bescherming/sluit -- een naam-paar dat de oude ronde over 4729 routes niet kende. Geen geldroutes. `bevestigd` blijft op 43: er is dus geen terugweg stukgegaan en de proef meet niet minder.\n\nWie deze twee notities naast elkaar leest: het is EEN hermeting die door drie registers heen werkt (IDEMPROEF -> BEWIJSSCHULD, en IDEMPROEF -> HERSTEL -> BEWIJSSCHULD). Dat het in twee stappen zichtbaar werd, komt doordat HERSTEL.json pas in de tweede ronde is bijgetrokken.",
       "waarheen": "die twee paren beproeven met scripts/herstelproef.js, zodat ze van `vermoed` naar `exact` of `compensatie` gaan en de post daalt in plaats van stil te blijven staan. Vervalt 2026-12-01, samen met de notitie hierboven."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "groei",
+      "sleutel": "dbDeuren",
+      "van": 525,
+      "naar": 527,
+      "meter": "dbDeuren 525 -> 527",
+      "reden": "De publieke laag (STAGE.md par. 5a) voegt twee opslagdeuren toe: db.data.mediaAanwezig (de publieke aanwezigheden) en db.data.mediaVolgt (de ene volgrelatie). Dat is GROEI en geen verval -- het alternatief was volgtZaak naast volgtLid, en morgen volgtClub en volgtFestival, en dan waren het er vier. De ratel hoort deze stijging zichtbaar te maken en niet te verbieden; daarom met de hand verzet, met deze regel als besluit in de historie."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "groei",
+      "sleutel": "dbDeurenSchrijvend",
+      "van": 273,
+      "naar": 275,
+      "meter": "dbDeurenSchrijvend 273 -> 275",
+      "reden": "Dezelfde twee deuren als hierboven; beide worden geschreven (volgen zet een vlag, een aanwezigheid ontstaat bij publiceren). db.data.salonUitlicht valt binnen een bestaande deur."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "groei",
+      "sleutel": "kernBreedte",
+      "van": 1569,
+      "naar": 1575,
+      "meter": "kernBreedte 1569 -> 1575",
+      "reden": "Zes kernnamen erbij: vijf voor de aanwezigheidslaag (aanwezigZorg, aanwezigVan, aanwezigMet, aanwezigVolg, aanwezigVolgtHij/aanwezigMijn/aanwezigVolgersVan/aanwezigBeeld, samengeteld als de laag) en salonUitlichten voor de redactiehandeling. Ze horen bij twee besluiten van de eigenaar en niet bij toevallige groei; wie ze weer weghaalt, haalt de besluiten weg."
     }
   ],
   "prestatie": {
@@ -2213,8 +2240,8 @@
     "keuringTeGroot": "2026-09-05",
     "keuringDubbeling": "2026-09-07",
     "keuringDekkingAdvies": "2026-09-06",
-    "dbDeuren": "2026-08-28",
-    "dbDeurenSchrijvend": "2026-08-28",
+    "dbDeuren": "2026-09-13",
+    "dbDeurenSchrijvend": "2026-09-13",
     "browserpoortToetsen": "2026-09-12",
     "e2eBestanden": "2026-09-12",
     "schermenZonderVormtaal": "2026-08-28",
@@ -2232,7 +2259,7 @@
     "wekkersZonderTrede": "2026-09-02",
     "wekkersOnverklaard": "2026-09-02",
     "meetleerBlind": "2026-09-02",
-    "kernBreedte": "2026-09-02",
+    "kernBreedte": "2026-09-13",
     "kernGedeeld": "2026-09-05",
     "registersUitVuileBoom": "2026-09-10",
     "laatSpoorVerdacht": "2026-09-03",

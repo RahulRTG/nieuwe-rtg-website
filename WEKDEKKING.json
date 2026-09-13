@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T08:54:05.311Z",
-    "commit": "863091f6",
+    "op": "2026-09-13T09:36:47.508Z",
+    "commit": "a7dd3dac",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 5,
     "instrument": "scripts/wekdekking.js",
     "node": "v22.22.2"
   },
@@ -16,55 +16,19 @@
     "stil": 3,
     "niet": 6,
     "publiekeDomeinen": 11,
-    "domeinenMetHaak": 5,
+    "domeinenMetHaak": 8,
     "zonderUitspraak": 0,
-    "momentZonderWekweg": 4,
-    "momentZonderVolgers": 3,
-    "momentZonderAanleiding": 1,
+    "momentZonderWekweg": 0,
+    "momentZonderVolgers": 0,
+    "momentZonderAanleiding": 0,
     "bronWeg": 0,
     "foutKlasse": 0,
     "registerLoopUit": 0
   },
   "zonderUitspraak": [],
-  "zonderWekweg": [
-    {
-      "gebeurtenis": "festival.boeking_bevestigd",
-      "domein": "kern/festival"
-    },
-    {
-      "gebeurtenis": "festival.verkoop_geopend",
-      "domein": "kern/festival"
-    },
-    {
-      "gebeurtenis": "stadion.wedstrijd_gepland",
-      "domein": "kern/sportclub"
-    },
-    {
-      "gebeurtenis": "salon.post_uitgelicht",
-      "domein": "kern/salon"
-    }
-  ],
-  "zonderVolgers": [
-    {
-      "gebeurtenis": "festival.boeking_bevestigd",
-      "domein": "kern/festival"
-    },
-    {
-      "gebeurtenis": "festival.verkoop_geopend",
-      "domein": "kern/festival"
-    },
-    {
-      "gebeurtenis": "stadion.wedstrijd_gepland",
-      "domein": "kern/sportclub"
-    }
-  ],
-  "zonderAanleiding": [
-    {
-      "gebeurtenis": "salon.post_uitgelicht",
-      "bron": "server/kern/salonpromo.js",
-      "aanleiding": "featured ="
-    }
-  ],
+  "zonderWekweg": [],
+  "zonderVolgers": [],
+  "zonderAanleiding": [],
   "bronWeg": [],
   "foutKlasse": [],
   "registerLoopUit": [],
@@ -75,8 +39,17 @@
       "moment": 2,
       "stil": 0,
       "niet": 2,
-      "haak": false,
-      "volgrelatie": null
+      "haak": true,
+      "volgrelatie": [
+        {
+          "bestand": "server/kern/festival/artiest.js",
+          "weg": "aanwezigheid"
+        },
+        {
+          "bestand": "server/kern/festival/product.js",
+          "weg": "aanwezigheid"
+        }
+      ]
     },
     {
       "domein": "kern/sportclub",
@@ -84,8 +57,13 @@
       "moment": 1,
       "stil": 1,
       "niet": 1,
-      "haak": false,
-      "volgrelatie": null
+      "haak": true,
+      "volgrelatie": [
+        {
+          "bestand": "server/kern/sportclub/sportief.js",
+          "weg": "aanwezigheid"
+        }
+      ]
     },
     {
       "domein": "kern/salon",
@@ -93,9 +71,16 @@
       "moment": 1,
       "stil": 1,
       "niet": 0,
-      "haak": false,
+      "haak": true,
       "volgrelatie": [
-        "server/kern/salon/profiel.js"
+        {
+          "bestand": "server/kern/salon/profiel.js",
+          "weg": "domein"
+        },
+        {
+          "bestand": "server/kern/salon/uitlichten.js",
+          "weg": "aanwezigheid"
+        }
       ]
     },
     {

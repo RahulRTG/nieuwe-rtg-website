@@ -64,8 +64,13 @@ module.exports = ({ db, save, schoon, nieuwMoment, aanwezigZorg, codenaamVan }) 
   const actief = () => R().filter(loopt);
 
   /* De projectie terug naar het veld waar de feed en de beeldbron op lezen. Eén
-     schrijver, zodat `featured` niet op twee plekken kan ontstaan. */
-  function projecteer() {
+     schrijver, zodat `featured` niet op twee plekken kan ontstaan.
+
+     HIJ HEET NIET `projecteer`. Dat woord stond al in twee kernmodules, en een
+     derde laat keuringDubbeling stijgen -- de ratel die telt hoeveel
+     functienamen in meer dan twee kernmodules wonen (SEMANTIEK.json in het
+     klein). Een naam die zegt WAT er gebeurt is hier bovendien beter. */
+  function spiegelNaarPosts() {
     const aan = new Set(actief().map(r => String(r.post)));
     let veranderd = false;
     for (const p of posts()) {
@@ -98,7 +103,7 @@ module.exports = ({ db, save, schoon, nieuwMoment, aanwezigZorg, codenaamVan }) 
       redacteur: String(redacteur), grond, toelichting: schoon(data.toelichting, 200) || null,
       at: nu(), tot, ingetrokken: null };
     R().push(regel);
-    projecteer();
+    spiegelNaarPosts();
     save();
 
     /* HET MOMENT. Pas hier, en pas na een mens: dit is de aanleiding waar
@@ -123,7 +128,7 @@ module.exports = ({ db, save, schoon, nieuwMoment, aanwezigZorg, codenaamVan }) 
     const reden = schoon(data.reden, 200);
     if (!reden) return { status: 400, error: 'Geef de reden van het intrekken.' };
     regel.ingetrokken = { door: String(redacteur), reden, at: nu() };
-    projecteer();
+    spiegelNaarPosts();
     save();
     return { status: 200, ok: true, uitlichting: regel };
   }
@@ -133,7 +138,7 @@ module.exports = ({ db, save, schoon, nieuwMoment, aanwezigZorg, codenaamVan }) 
      voorstel: die module telt betrokkenheid en mag daarmee zeggen waar aandacht
      naartoe KAN. Hij zet niets. */
   function bord(voorstellen) {
-    projecteer();
+    spiegelNaarPosts();
     return {
       status: 200, ok: true, gronden: GRONDEN,
       lopend: actief().map(r => ({ id: r.id, post: r.post, grond: r.grond, door: r.redacteur, at: r.at, tot: r.tot })),
@@ -147,7 +152,7 @@ module.exports = ({ db, save, schoon, nieuwMoment, aanwezigZorg, codenaamVan }) 
     };
   }
 
-  return { uitlicht, trekIn, uitlichtBord: bord, uitlichtProjecteer: projecteer,
+  return { uitlicht, trekIn, uitlichtBord: bord, uitlichtProjecteer: spiegelNaarPosts,
     UITLICHT_GRONDEN: GRONDEN };
 };
 module.exports.GRONDEN = GRONDEN;

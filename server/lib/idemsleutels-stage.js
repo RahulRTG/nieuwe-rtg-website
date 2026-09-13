@@ -7,15 +7,36 @@
    doet er niets, en een tweede aanroep hoort het antwoord van NU te krijgen
    (dezelfde redenering als in ./idemsleutels-move.js).
 
-   EN LET OP DE TWEEDE UITLICHTING. Die wordt GEWEIGERD met 409 "Deze post is al
-   uitgelicht", en dat is een TOESTANDSCONTROLE en geen idempotentie
-   (MUTATIECONTRACT.md). Een herhaling die wordt tegengehouden door de stand van
-   het onderwerp is iets anders dan een herhaling die stil hetzelfde antwoord
-   teruggeeft, en wie die twee samenvoegt kan later niet meer zien of de route
-   veilig te herhalen IS of alleen toevallig niets deed. Vandaar `zelfdeVerzoek`
-   op het venster van de dubbeltik en niet `nietIdempotent`: binnen vijf seconden
-   is een tweede identieke uitlichting een haperend netwerk, daarbuiten komt hij
-   bij de 409 uit -- en beide uitkomsten zijn goed.
+   EN LET OP DE TWEEDE UITLICHTING, want die heeft TWEE DEUREN en dat is geen
+   slordigheid maar het venster.
+
+   In de MODULE wordt zij GEWEIGERD met 409 "Deze post is al uitgelicht", en dat
+   is een TOESTANDSCONTROLE en geen idempotentie (MUTATIECONTRACT.md). Een
+   herhaling die wordt tegengehouden door de stand van het onderwerp is iets
+   anders dan een herhaling die stil hetzelfde antwoord teruggeeft, en wie die
+   twee samenvoegt kan later niet meer zien of de route veilig te herhalen IS of
+   alleen toevallig niets deed.
+
+   Op de ROUTE staat de dubbeltikpoort ervoor. Daarom `velden` -- hetzelfde
+   venster van vijf seconden als `zelfdeVerzoek`, alleen met een smallere
+   identiteit -- en niet `nietIdempotent`: binnen dat venster is een woordelijk
+   gelijk verzoek een haperend netwerk en krijgt het het antwoord van de eerste
+   terug (200, `herhaald: true`, dezelfde uitlichting-id). Buiten het venster,
+   en bij elk verzoek dat NIET woordelijk gelijk is, draait de handler wel en
+   komt hij op de 409 uit.
+
+   DE IDENTITEIT IS `postId` + `grond`, EN DAT IS EEN BESLUIT. Dezelfde post met
+   een andere grond is geen dubbeltik maar een tweede redactiebesluit; die hoort
+   dus langs de poort en tegen de toestandscontrole aan te lopen. Alleen de grond
+   meetellen en de toelichting niet, is dezelfde regel als BUITEN_AFDRUK in
+   ./idem-poort.js: vrije tekst maakt er geen ander verzoek van.
+
+   BEIDE DEUREN BEWAREN DEZELFDE INVARIANT: er ontstaat nooit een tweede
+   uitlichting. test/aanwezigheid-routes.e2e.js legt ze allebei vast en telt
+   daarna de lopende uitlichtingen -- want twee statuscodes zeggen op zichzelf
+   niets over wat er in het register staat. Die toets zakte eerst, en terecht:
+   hij eiste onvoorwaardelijk 409 en beschreef daarmee de wereld van voordat dit
+   bestand bestond.
 
    DE VOLGKNOP IS EEN STAND EN GEEN TELLER. `/aanwezig/volg` draagt `aan`, en
    twee keer "aan" zetten is een keer volgen: de lijst is een verzameling en geen

@@ -964,6 +964,28 @@ function geldLijf(w) {
 let teller = 0;
 const versSleutel = (wat) => 'voorziening-' + wat + '-' + (++teller) + '-' + Date.now();
 
+/* SALDO OP DE REKENING VAN DE ZAAK -- twee voorzieningen hadden hem nodig, dus
+   hij staat een keer. De zaak ontvangt via een VERSE kascode van het LID: twee
+   rollen in een voorziening, en de kascode uit de wereld is eenmalig en allang
+   op tegen de tijd dat deze routes aan de beurt zijn.
+
+   Onder het plafond van de kascode blijven: die weigerde een verkoop van 200 met
+   "Boven het maximum van deze code (150.00 euro)". Een voorziening die tegen een
+   echte grens aanloopt, verlaagt haar bedrag -- zij verhoogt geen plafond.
+
+   Geeft een string terug bij mislukking en null bij succes, zodat de aanroeper
+   hem rechtstreeks in zijn `fout` kan zetten. */
+async function zaakSaldo({ post, tokenVoor }) {
+  const kas = await post('/api/pay/kascode', { centen: 10000, idem: versSleutel('kascode') }, tokenVoor('member'));
+  const code = (kas.data && (kas.data.code || (kas.data.kascode && kas.data.kascode.code))) || null;
+  if (!code) return 'pay/kascode gaf ' + kas.status;
+  const verkoop = await post('/api/supplier/pos/sale',
+    { total: 100, method: 'rtgpay', payCode: code, idem: versSleutel('zaaksaldo') }, tokenVoor('supplier'));
+  if (!(verkoop.status >= 200 && verkoop.status < 300))
+    return 'pos/sale (rtgpay) gaf ' + verkoop.status + ' ' + ((verkoop.data && verkoop.data.error) || '');
+  return null;
+}
+
 const VOORZIENINGEN = {
   /* Een VERSE pas, want de ijkoproep sluit de vorige. */
   '/api/bank/pas/sluit': async ({ post, tokenVoor, w }) => {
@@ -1030,22 +1052,39 @@ const VOORZIENINGEN = {
     return id ? { id } : { fout: 'facturen/maak gaf ' + (r && r.status) +
       ' ' + ((r && r.data && (r.data.error || r.data.fout)) || '') };
   },
-  /* Saldo op de rekening van de ZAAK, want oormerken kan niet uit niets. De zaak
-     ontvangt via een VERSE kascode van het LID -- twee rollen in een voorziening,
-     en de kascode uit de wereld is eenmalig en allang op. */
+  /* Saldo op de rekening van de ZAAK, want oormerken kan niet uit niets. */
   '/api/supplier/pay/treasury/apart': async ({ post, tokenVoor }) => {
-    /* Onder het plafond van de kascode blijven: die weigerde een verkoop van
-       200 met "Boven het maximum van deze code (150.00 euro)". Een voorziening
-       die tegen een echte grens aanloopt, verlaagt haar bedrag -- zij verhoogt
-       geen plafond. */
-    const kas = await post('/api/pay/kascode', { centen: 10000, idem: versSleutel('kascode') }, tokenVoor('member'));
-    const code = (kas.data && (kas.data.code || (kas.data.kascode && kas.data.kascode.code))) || null;
-    if (!code) return { fout: 'pay/kascode gaf ' + kas.status };
-    const verkoop = await post('/api/supplier/pos/sale',
-      { total: 100, method: 'rtgpay', payCode: code, idem: versSleutel('treasury') }, tokenVoor('supplier'));
-    if (!(verkoop.status >= 200 && verkoop.status < 300))
-      return { fout: 'pos/sale (rtgpay) gaf ' + verkoop.status + ' ' + ((verkoop.data && verkoop.data.error) || '') };
+    const f = await zaakSaldo({ post, tokenVoor });
+    if (f) return { fout: f };
     return { naam: 'Proefoormerk', centen: 1000, doel: 'btw' };
+  },
+  /* UITBETALEN VRAAGT TWEE DINGEN, en het eerste is niet wat het lijkt.
+
+     De triagelijst had de 409 hier genoteerd als "niets uit te betalen". De bron
+     zegt iets anders (kern/pay/partner.js partnerUitbetaal): de EERSTE poort is
+     of er uberhaupt een bankrekening van de zaak bekend is --
+
+       "Er staat geen bankrekening voor deze zaak. Zonder rekening zou het saldo
+        van de wallet af gaan zonder ergens aan te komen, en dat gebeurt hier niet."
+
+     -- en dat is de 409 die de proef werkelijk zag (reden `geen-rekening`). Pas
+     DAARNA komt het saldo, en dat geeft een 400 en geen 409. Wie de status uit
+     een broertje had afgeleid, had hier saldo aangeschoven en was op dezelfde
+     409 blijven staan.
+
+     De rekening wordt voor het EERST gezet en niet gewijzigd, en dat scheelt de
+     wachttijd: zaakRekeningZet() geeft een nieuwe rekening `bruikbaarVanaf` nu,
+     terwijl een WIJZIGING vier uur wacht -- een rem tegen iemand die de inlog
+     van een zaak overneemt. Die rem wordt hier niet omzeild maar niet geraakt. */
+  '/api/supplier/pay/uitbetaal': async ({ post, tokenVoor }) => {
+    const rek = await post('/api/supplier/pay/rekening',
+      { iban: BUITEN_IBAN, naam: 'Proefzaak Uitbetaling', idem: versSleutel('zaakrekening') },
+      tokenVoor('supplier'));
+    if (!(rek.status >= 200 && rek.status < 300))
+      return { fout: 'pay/rekening gaf ' + rek.status + ' ' + ((rek.data && rek.data.error) || '') };
+    const f = await zaakSaldo({ post, tokenVoor });
+    if (f) return { fout: f };
+    return {};
   }
 };
 

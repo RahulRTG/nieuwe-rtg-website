@@ -249,12 +249,24 @@ test('HET REGISTER IS SAMENGESTELD, en een dubbele definitie valt om bij het LAD
   };
   assert.throws(() => samen([['a.js', { '/api/x': {} }], ['b.js', { '/api/x': {} }]]), /twee delen claimen/);
   /* En de echte samenstelling gooit niet: de delen overlappen niet. */
-  const bank = require('../server/kern/stuur/gevolgcontract/register-bank');
-  const lid = require('../server/kern/stuur/gevolgcontract/register-lid');
-  const overlap = Object.keys(bank.BANK).filter(p => lid.LID[p]);
-  assert.deepStrictEqual(overlap, [], 'de delen claimen hetzelfde pad: ' + overlap.join(', '));
-  assert.deepStrictEqual(Object.keys(CONTRACTEN).sort(),
-    Object.keys(bank.BANK).concat(Object.keys(lid.LID)).sort(),
+  /* ALLE DELEN, en niet twee met de hand. Hier stonden `bank` en `lid` uitgeschreven, en
+     toen er twee pay-delen bijkwamen zei deze toets dat het register niet de som van zijn
+     delen was -- terwijl het dat wel was; de toets kende de som niet. Een lijst delen die
+     met de hand meegroeit, is precies de tweede waarheid die dit register vermijdt. */
+  const DELEN = ['register-bank', 'register-lid', 'register-pay-oplaad', 'register-pay-stuur',
+    'register-pay-factuur']
+    .map(n => [n + '.js', Object.values(require('../server/kern/stuur/gevolgcontract/' + n))[0]]);
+  assert.ok(DELEN.length >= 4, 'de delenlijst is leeg of onvolledig');
+  for (const [naam, deel] of DELEN)
+    assert.ok(deel && Object.keys(deel).length, naam + ' levert geen enkel contract');
+  /* Geen twee delen claimen hetzelfde pad -- over ALLE paren en niet alleen bank/lid. */
+  const gezien = {};
+  for (const [naam, deel] of DELEN)
+    for (const pad of Object.keys(deel)) {
+      assert.ok(!gezien[pad], pad + ' staat in ' + gezien[pad] + ' EN in ' + naam);
+      gezien[pad] = naam;
+    }
+  assert.deepStrictEqual(Object.keys(CONTRACTEN).sort(), Object.keys(gezien).sort(),
     'het samengestelde register is niet de som van zijn delen');
 });
 
@@ -303,6 +315,78 @@ test('de route waar het geld BEWEEGT is verklaard, en zijn gevolg is GEDELEGEERD
    vergeleken op de gesloten woordenlijst van kern/isolatie/effectwoorden.js.
    ------------------------------------------------------------------------- */
 const vg = require('../server/kern/stuur/gevolgcontract/vergelijk');
+
+test('GELD_BEWEGEN EN `lezen` KUNNEN NIET SAMEN: het contract toetst de allowlist', () => {
+  /* DIT IS DE ALGEMENE REGEL ACHTER EEN CONCREET GAT. /api/pay/saldo stond in de LEZEN-lijst
+     van kern/stuur/beleid-lijsten.js -- die belooft "haalt op en verandert niets" -- en
+     betaalt de maandfactuur uit het eigen saldo. Hij is op 13 september 2026 naar `voorstel`
+     gegaan (toets 4b van test/stuur-niveaus.test.js).
+
+     Die verplaatsing is een losse reparatie; DIT is de regel die hem had gevonden. Zodra een
+     handeling een gevolgcontract heeft dat GELD_BEWEGEN verklaart, mag zij niet op een
+     niveau staan waarop het stuur haar zonder bevestiging uitvoert -- `lezen` en `klein`
+     zijn precies die twee (DIRECT is hun vereniging). De twee registers toetsen elkaar dus,
+     in plaats van allebei apart te worden nagekeken.
+
+     MUTATIEPROEF: zet `saldo` terug in de LEZEN-regex en deze toets zakt naast 4b. */
+  const { beleidVoor } = require('../server/kern/stuur/beleid');
+  const ZONDER_BEVESTIGING = ['lezen', 'klein'];
+  let getoetst = 0;
+  const stuk = [];
+  for (const [pad, c] of Object.entries(CONTRACTEN)) {
+    if (!(c.veroorzaakt || []).includes('GELD_BEWEGEN')) continue;
+    for (const rol of ['member', 'supplier', 'staff']) {
+      const n = beleidVoor(pad, rol).niveau;
+      if (n === 'verboden') continue;       // buiten het bereik van de AI: geen uitspraak
+      getoetst++;
+      if (ZONDER_BEVESTIGING.includes(n)) stuk.push(pad + ' (' + rol + ') staat op `' + n + '`');
+    }
+  }
+  assert.deepStrictEqual(stuk, [],
+    'een handeling die volgens haar eigen gevolgcontract GELD_BEWEGEN veroorzaakt, staat op een ' +
+    'niveau waarop het stuur haar zonder bevestiging uitvoert: ' + stuk.join('; '));
+  /* EN DE TOETS MAG NIET LEEGLOPEN. Zonder deze regel zou hij groen blijven op het moment dat
+     er geen enkel geldcontract meer AI-bereikbaar is -- en dan bewaakt hij niets. */
+  assert.ok(getoetst >= 4, 'deze toets heeft maar ' + getoetst + ' geldpad(en) kunnen wegen; ' +
+    'dat is te weinig om iets te bewaken -- staan de contracten nog in het register?');
+});
+
+test('DE WALLET-CONTRACTEN: `nooit` wordt AFGEDWONGEN tegen de bron, niet beweerd', () => {
+  /* Dit is het verschil tussen een contract en een voornemen. Beide walletcontracten zetten
+     `EXTERN_BEREIKEN` in `nooit` met de reden dat er geen mail, sms of push uit de pay-kern
+     gaat -- het enige seintje is een SSE-tik met alleen `{scope:'pay'}` erin. Zolang dat
+     alleen in de tekst staat, is het waar tot iemand er een mail bij zet.
+
+     MUTATIEPROEF: zet een sendMail- of notify-aanroep in server/kern/pay/ en deze toets
+     zakt, met de naam van het bestand erbij. */
+  const fs = require('fs');
+  const pad = require('path');
+  const map = pad.join(__dirname, '..', 'server', 'kern', 'pay');
+  const UITGANGEN = /\b(sendMail|sendSms|notify)\s*\(|require\((['"])[^'"]*\/mail/;
+  const stuk = [];
+  for (const naam of fs.readdirSync(map).filter(n => n.endsWith('.js'))) {
+    const bron = fs.readFileSync(pad.join(map, naam), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|[^:])\/\/.*$/gm, '$1');
+    if (UITGANGEN.test(bron)) stuk.push(naam);
+  }
+  assert.deepStrictEqual(stuk, [],
+    'de pay-kern heeft een bericht-uitgang gekregen (' + stuk.join(', ') + '), en twee ' +
+    'gevolgcontracten beweren `nooit: EXTERN_BEREIKEN`. Pas het contract aan of haal de uitgang weg');
+
+  /* EN DE NAAD TUSSEN DE TWEE DELEN IS EEN BEWERING, dus hij wordt getoetst: sturen raakt
+     andermans gegevens en opladen niet. Valt dat verschil weg, dan is er geen reden meer
+     voor twee bestanden -- en erger: dan klopt een van de twee niet. */
+  const opl = CONTRACTEN['/api/pay/oplaad'];
+  const stu = CONTRACTEN['/api/pay/stuur'];
+  assert.ok(stu.veroorzaakt.includes('SCHRIJVEN_ANDERMANS'),
+    '/api/pay/stuur boekt naar rekLid(aan): dat verandert het saldo van een ANDER lid');
+  assert.ok(opl.nooit.includes('SCHRIJVEN_ANDERMANS'),
+    '/api/pay/oplaad raakt alleen de eigen wallet');
+  for (const c of [opl, stu]) {
+    assert.ok(c.veroorzaakt.includes('GELD_BEWEGEN'), c.capability + ' verplaatst geld');
+    assert.ok(c.nooit.includes('EXTERN_BEREIKEN'), c.capability + ' claimt geen bericht naar buiten');
+  }
+});
 
 test('de werkwoorden worden GELEEND van het effectmodel en niet bedacht', () => {
   /* Een eigen lijst hier zou de 22e vermogenslijst van dit huis zijn

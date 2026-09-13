@@ -26,7 +26,7 @@ const LEZEN = Object.freeze({
     /^\/api\/asset\/(document|mijn)$/,
     /^\/api\/site\/(mijn|haal|versies|spoor|cijfers|sjablonen|sjabloon|fotos)$/,
     /^\/api\/meet\/mijn$/,
-    /^\/api\/pay\/(overzicht|saldo|tiks)$/,
+    /^\/api\/pay\/(overzicht|tiks)$/,
     /^\/api\/bank\/(overzicht|rekening|afschrift|rente-voorbeeld|passen|krediet|terugkerend|advies|hart|inzichten|vastelasten)$/,
     /^\/api\/bookings\/mine$/
   ],
@@ -74,6 +74,28 @@ const KLEIN = Object.freeze({
   staff: []
 });
 
+/* DE ZESDE DIE SCHRIJFT, en de eerste die GELD verplaatst: /api/pay/saldo stond in de
+   LEZEN-lijst hierboven en betaalt de maandfactuur uit het eigen RTG Pay-saldo
+   (server/routes/pay.js -> kern/factuursaldo.js: afschrijven via pay.huisIn, de factuur
+   sluiten via settleFactuur, en de 30%-afdracht aan de RTFoundation). De meting bevestigt
+   het: kern/stuur/gevolg.js ziet er NEGEN collecties bewegen, waaronder paySaldi,
+   payBoekingen, invoices en fondsAfdrachten -- terwijl zijn twee lijstgenoten
+   (overzicht, tiks) allebei `geen-effect-gemeten` zijn.
+
+   WAAROM DAT ERGER WAS DAN DE VIJF VAN 31 AUGUSTUS. `DIRECT` is de vereniging van LEZEN
+   en KLEIN en betekent: de AI mag dit ZONDER bevestiging. Er stond geen frictiebodem op
+   dit pad (bodemVoorPad geeft null), terwijl elk ander geldpad van een lid op `voorstel`
+   staat en /api/bank/sepa er nog een bodem `assist` bovenop draagt. Dit was dus het enige
+   geldpad van een lid dat het stuur stil kon uitvoeren.
+
+   NIET NAAR KLEIN MAAR NAAR VOORSTEL, en dat volgt uit de kop van KLEIN zelf: die eist
+   omkeerbaar EN zonder geld. Een betaalde factuur met een afdracht is geen van beide.
+   Hij gaat daarom bij zijn eigen soort staan, in de pay-groep hieronder.
+
+   Gevonden op 13 september 2026 bij het schrijven van de gevolgcontracten voor de
+   pay-rail -- niet door een toets, want test/stuur-niveaus.test.js voerde dit pad juist
+   AAN als voorbeeld van een leesroute. Die toets staat nu op de geldweg en niet meer op
+   de aanname. */
 const VOORSTEL = Object.freeze({
   member: [
     /^\/api\/kantoorpakket\/(maak|bewaar|deel|weg|ster|terug|fase|vul)$/,
@@ -86,7 +108,7 @@ const VOORSTEL = Object.freeze({
     /^\/api\/meet\/(maak|kom|verlaat|weg|sein)$/,
     /^\/api\/booking\/(request|pay)$/,
     /^\/api\/reservering\/annuleer$/,
-    /^\/api\/pay\/(oplaad|stuur|verzoek|verzoek\/betaal|verzoek\/intrek|tik|kascode)$/,
+    /^\/api\/pay\/(oplaad|stuur|verzoek|verzoek\/betaal|verzoek\/intrek|tik|kascode|saldo)$/,
     /^\/api\/bank\/(akkoord|rekening\/open|bevries|storten|overboek|naar-wallet|van-wallet|sepa|spaardoel|veeg)$/,
     /^\/api\/bank\/pas\/(uitgeven|bevries|limiet|betaal|sluit)$/,
     /^\/api\/bank\/krediet\/(aanvraag|aflossing)$/,

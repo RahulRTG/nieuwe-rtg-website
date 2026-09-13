@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-13T10:32:45.765Z",
-  "commit": "16c98892",
+  "op": "2026-09-13T15:22:07.930Z",
+  "commit": "b8998fbb",
   "boomVuil": false,
-  "boomAnders": 6,
+  "boomAnders": 4,
   "instrument": "scripts/gevolgdekking.js",
   "node": "v22.22.2"
  },
@@ -14,9 +14,9 @@
   "onbekendeEffectpaden": 87,
   "effectGemeten": 38,
   "effectGeenEffectGemeten": 48,
-  "contractVolledig": 1,
+  "contractVolledig": 4,
   "contractGedeeltelijk": 0,
-  "contractOnbekend": 172,
+  "contractOnbekend": 169,
   "contractenGezakt": 0,
   "contractenBuitenBereik": 2
  },
@@ -2379,20 +2379,9 @@
     "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
    },
    "verklaring": {
-    "stand": "ONBEKEND",
-    "open": [
-     "direct",
-     "afgeleid",
-     "buiten",
-     "mislukking"
-    ],
-    "nietVerklaard": [
-     "betaalIdem",
-     "payBoekingen",
-     "payIdem",
-     "payIdemAfdruk",
-     "paySaldi"
-    ]
+    "stand": "VOLLEDIG",
+    "open": [],
+    "nietVerklaard": []
    }
   },
   {
@@ -2422,7 +2411,7 @@
    "rollen": [
     "member"
    ],
-   "niveau": "lezen",
+   "niveau": "voorstel",
    "meting": {
     "graad": "gemeten",
     "collecties": [
@@ -2439,24 +2428,9 @@
     "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
    },
    "verklaring": {
-    "stand": "ONBEKEND",
-    "open": [
-     "direct",
-     "afgeleid",
-     "buiten",
-     "mislukking"
-    ],
-    "nietVerklaard": [
-     "betaalIdem",
-     "economischeRuntime",
-     "fondsAfdrachten",
-     "invoices",
-     "payBoekingen",
-     "payIdem",
-     "payIdemAfdruk",
-     "paySaldi",
-     "socialeAfdrachten"
-    ]
+    "stand": "VOLLEDIG",
+    "open": [],
+    "nietVerklaard": []
    }
   },
   {
@@ -2476,19 +2450,9 @@
     "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
    },
    "verklaring": {
-    "stand": "ONBEKEND",
-    "open": [
-     "direct",
-     "afgeleid",
-     "buiten",
-     "mislukking"
-    ],
-    "nietVerklaard": [
-     "payBoekingen",
-     "payIdem",
-     "payIdemAfdruk",
-     "paySaldi"
-    ]
+    "stand": "VOLLEDIG",
+    "open": [],
+    "nietVerklaard": []
    }
   },
   {

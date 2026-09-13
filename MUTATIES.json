@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T09:40:10.453Z",
-    "commit": "5c2d145f",
-    "boomVuil": true,
-    "boomAnders": 8,
+    "op": "2026-09-13T11:07:26.106Z",
+    "commit": "8533363f",
+    "boomVuil": false,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -547,6 +547,11 @@
       "module": "server/kern/rtmail.js",
       "operator": "return-weg",
       "gezakt": 8
+    },
+    "autonomiegrens.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "leest EXECUTION_MAP.json en ROLPROEF.json en geen servermodule; 0 mutaties geprobeerd (geen module gevonden). Toets 3 is de tegenproef: een blind pad autonoom maken laat de grens uitslaan"
     },
     "autoverkoop.test.js": {
       "soort": "server",
@@ -5273,6 +5278,11 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "ondernemerbewijs.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "leest registers en geen servermodule; 0 mutaties geprobeerd (geen module gevonden). De faalklasse staat in de toets zelf: vier tegenproeven op gemuteerde registers in een wegwerpmap, elk aantoonbaar raak"
+    },
     "ondernemerpoort-e2e.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -7936,6 +7946,14 @@
       "operator": "===->!==#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "supplier-activity.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/routes/supplier/tafels-team.js",
+      "operator": "&&->||#2",
+      "gezakt": 5,
+      "geprobeerd": 13
     },
     "supplier-comm-mob-payroll.test.js": {
       "soort": "server",

@@ -170,6 +170,8 @@
     "magnaatlab:vast": "node scripts/magnaatlab.js --vastleggen",
     "commerce": "node scripts/commerce.js",
     "commerce:vast": "node scripts/commerce.js --vastleggen",
+    "doctrine": "node scripts/doctrine.js",
+    "doctrine:toon": "node scripts/doctrine.js --toon",
     "semantiek": "node scripts/semantiek.js",
     "verstrengeling": "node scripts/verstrengeling.js",
     "verstrengeling:vast": "node scripts/verstrengeling.js --vastleggen",

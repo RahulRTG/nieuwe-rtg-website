@@ -276,6 +276,13 @@ const REGISTER = {
      hetzelfde register. Twee metingen, een ratel. */
   'A11Y-INGELOGD.json': { eigenRatel: 'scripts/a11y.js' },
   'SABOTAGE.json': { eigenRatel: 'scripts/wetten.js' },
+  /* DOCTRINE.json draagt GEEN getal dat naar nul of naar honderd moet, en dat is
+     een ontwerpbesluit en geen tekort: het aantal kandidaten stijgt zodra er een
+     document bijkomt, en dat is gewoon werk en geen verslechtering. Een ratel in
+     NORM.json zou daar rood van staan. Wat wel kan zakken is de compiler zelf --
+     zijn zelfijking, zijn zinsherkenning en de graad op zijn uitslag -- en dat
+     bewaakt test/doctrine.test.js. */
+  'DOCTRINE.json': { eigenRatel: 'test/doctrine.test.js' },
 
   /* En twee die door een TOETS worden vastgehouden in plaats van door een
      script. Allebei zeggen het in hun eigen uitleg met zoveel woorden: "MAG

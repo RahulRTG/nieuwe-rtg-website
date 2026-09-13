@@ -120,6 +120,11 @@ const REGISTERS = [
   ['BEPROEVING.json', 'npm run beproeving', 'storm, geld, misbruik en herstel'],
   ['SCHERMLEUGEN.json', 'node --test test/liegend-scherm.e2e.js', 'of een scherm iets toont dat er niet is'],
   ['SABOTAGE.json', 'node scripts/sabotage.js', 'of elke handhaver echt aan staat'],
+  /* De doctrinecompiler veroudert met de DOCUMENTEN en niet met de klok: hij telt
+     welke harde uitspraken er staan en welke het wettenregister kent. Komt er een
+     doctrine-document bij (of een wet), dan is de vorige telling een antwoord op
+     een oudere vraag. */
+  ['DOCTRINE.json', 'npm run doctrine', 'welke harde uitspraken de doctrine draagt, en welke het wettenregister kent'],
   /* DE EERSTE MINUUT. Hij hoort hier en niet in BUITEN, want hij is geen afdruk
      uit de code maar een METING VAN GEDRAG: een vers lid, de echte registratie,
      een echte browser op 390x844. Verandert de onboarding, het menu of het

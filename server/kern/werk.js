@@ -8,7 +8,7 @@
 
 const VAC_SOORTEN = ['bijbaan', 'fulltime', 'parttime', 'stage', 'vrijwilliger', 'vakantiewerk'];
 
-function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, sseToCustomer, notifySupplier, notify, commWerk }) {
+function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, sseToCustomer, notifySupplier, notify, commWerk, rtf, meldLidVan }) {
   /* Chatvertaling: iedereen schrijft in de eigen taal, de ontvanger leest het in
      de zijne. Vertalingen worden per bericht gecachet. */
   async function trChat(messages, to) {
@@ -146,27 +146,13 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
     return rest;
   }
 
-  // Solliciteerde een RTG-lid, dan hoort het lid direct van het besluit:
-  // live in de app en (bij demo-profielen) als notificatie met push.
-  function notifyApplicant(a, supplier) {
-    const hired = a.status === 'aangenomen';
-    // e-mail werkt voor iedereen met een e-mailadres als contact, ook zonder RTG-account
-    if (/@/.test(a.contact || '')) {
-      mail.send(a.contact, hired ? 'U bent aangenomen bij ' + supplier.name : 'Uw sollicitatie bij ' + supplier.name,
-        'Beste ' + a.name + ',\n\n' + supplier.name + ' heeft uw sollicitatie als ' + a.func +
-        (hired ? ' geaccepteerd. Het bedrijf neemt contact met u op over uw eerste werkdag.' : ' helaas afgewezen.') +
-        '\n\nRahul Travel Group');
-    }
-    if (!a.key) return;
-    if (db.data.notifications[a.key]) {
-      notify(a.key, {
-        icon: hired ? 'ster' : 'werk',
-        title: hired ? 'U bent aangenomen!' : 'Sollicitatie afgerond',
-        body: supplier.name + ' heeft uw sollicitatie als ' + a.func + (hired ? ' geaccepteerd. Het bedrijf neemt contact met u op.' : ' helaas afgewezen.')
-      });
-    }
-    sseToCustomer(a.key, 'sync', { scope: 'apply' });
-  }
+  /* De bezorging van een besluit bij de sollicitant staat in een DEELMODULE.
+     Niet om de omvangband te halen maar omdat het een eigen onderwerp is: dit
+     bestand gaat over vacatures en de sollicitatiechat, en ./werk-bezorging.js
+     over de vraag langs welke weg je een mens bereikt die misschien geen lid
+     is. Dezelfde naad als foundation/leeftijdsgroepen.js. */
+  const { notifyApplicant } = require('./werk-bezorging')({
+    rtf, mail, meldLidVan, sseToCustomer });
 
   return { trChat, chatApplicant, ensureApplyChat, applyChatPubliek, applyChatVertaald, chatStuur, meldWerkgever, openVacatures, werkgeverSollicitatie, notifyApplicant };
 }

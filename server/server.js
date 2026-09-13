@@ -1640,7 +1640,13 @@ const { trChat, chatApplicant, ensureApplyChat, applyChatPubliek, applyChatVerta
     /* Late binding: de communicatiekern wordt pas in kernlaag4 gebouwd, ver na
        deze regel. Een verwijzing zou hier voor altijd undefined zijn en de
        sollicitatiechat stil op de oude tak zetten. */
-    commWerk: () => kern.commWerk });
+    commWerk: () => kern.commWerk,
+    /* De twee wegen naar een sollicitant die GEEN lid is. `rtf` staat hierboven
+       al (poortwachters, regel 492) en kan rechtstreeks mee; `meldLid` wordt
+       pas in kernlaag1 op de kern gezet -- ruim duizend regels verderop -- dus
+       die gaat als late binding, net als commWerk hierboven. */
+    rtf,
+    meldLidVan: () => kern.meldLid });
 
 /* De leverancier-laag (publieke weergave, dashboard/supplierState, kassa,
    gastchat, kamers/HK, deuren, tickets, De Salon, AI-zoekhulpjes, zaak-opties)

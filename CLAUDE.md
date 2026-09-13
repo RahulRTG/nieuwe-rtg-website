@@ -53,7 +53,7 @@ een marge of een leverancierscijfer bouwt. Het belangrijkste dat het document
 tegenhoudt is een `journeys`-tabel: een reis die mensen, geld, documenten én
 reserveringen BEZIT is de `Asset`-fout opnieuw, en de meting staat er
 (`KETENVORM.json`: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
-<!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> gedeelde actoren over drie
+<!--getal:ketenvorm.actorenTotaal-->19<!--/getal--> gedeelde actoren over vier
 ketens). De vorm die wél werkt is die van `kern/levensgraaf/graaf.js` — een
 PROJECTIE met vijf etiketten, hier plus de **herkomst** als zesde. Zeven grenzen
 bovenop die van REIZEN.md, waarvan de drie scherpste: geld wordt klaargezet en
@@ -1505,12 +1505,12 @@ gat, en hij zit nu in de meting (storing 1 en 7) in plaats van eromheen.
 **En wat de ketens werkelijk delen is GEMETEN** (`scripts/ketenvorm.js`,
 `KETENVORM.json`) in plaats van verklaard -- de proeven delen met opzet geen
 module, want een gedeelde ketenklasse eroverheen zou de `Asset`-fout zijn.
-Uitkomst over drie ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
-van <!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> actoren gedeeld
+Uitkomst over vier ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
+van <!--getal:ketenvorm.actorenTotaal-->19<!--/getal--> actoren gedeeld
 (gast/zaal/keuken tegenover lid/vervoerder/dispatch/chauffeur tegenover
-aanvrager/kantoor/keurder/dossier/tijd) en
+aanvrager/kantoor/keurder/dossier/tijd tegenover gezin/Adam/werkgever/mens) en
 <!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van
-<!--getal:ketenvorm.themasTotaal-->10<!--/getal--> beloftethema's in ALLE drie.
+<!--getal:ketenvorm.themasTotaal-->10<!--/getal--> beloftethema's in ALLE vier.
 Die twee gaan allebei over de MACHINE en niet over het domein: mag dit twee
 keer, en zegt een weigering waarom. Er is een woord dat twee ketens delen --
 `zaak` -- en het betekent er niet hetzelfde (ontvanger tegenover uitkomst),
@@ -1518,10 +1518,111 @@ precies de vorm die `SEMANTIEK.json` meet. **Een status-, actor- of
 uitkomstcontract over domeinen heen is daarmee niet gerechtvaardigd**, en dat is
 een antwoord op MAATSTAF.md U40/U41 en geen uitstel; wat er wel onder ligt is de
 grens die OS.md trekt tussen platformvermogen en domeinvermogen, nu met bewijs
-uit drie onafhankelijke ketens. Let bij het lezen op een eerlijkheid die in de
-bron staat: de themalijst is een keer uitgebreid toen zes van de zeven beloften
-van de derde keten erbuiten vielen -- de actoren zijn niet aangeraakt, en die
-staan op nul.
+uit vier onafhankelijke ketens. Let bij het lezen op een eerlijkheid die in de
+bron staat: de themalijst is TWEE keer uitgebreid -- bij de derde keten vielen
+zes van de zeven beloften erbuiten, bij de vierde alle negen, en de uitslag zakte
+daardoor even naar 0 gedeelde thema's terwijl die keten herhaling en weigering
+met een reden gewoon toetst. Drie patronen erbij (elk generaliserend voorbij de
+zin die hem aanleiding gaf) bracht hem terug op 2 -- dus die twee overleven een
+vierde, totaal andere keten. De actoren zijn nooit aangeraakt, en die staan op
+nul.
+
+**De vierde keten leverde een REGEL en een METER op** (`MAATSTAF.md` par. 7f,
+`DOELGROEPBEREIK.json`, `npm run doelgroepbereik`). De regel geldt breder dan
+ketens en heeft twee helften die elkaar spiegelen: **een bericht is pas bezorgd
+als er een bewezen LEESpad bestaat, en een capability is pas beschikbaar als de
+verklaarde doelgroep een bewezen TOEGANGSpad heeft.** De eerste helft staat in
+code (`kern/ontvanger.js`: elke weg heeft een lezer, en dat is gemeten -- een
+melding naar `db.data.notifications` voor een gezinslid zag er goed uit en had
+NUL lezers), de tweede in een meter die per cel (functie x doelgroep) vraagt of
+de VERKLAARDE doelgroep zijn eigen paden opent met een echte sessie. Uitslag:
+1736 cellen, 578 waar, **33 registerleugens** over tien functies en 132 keer
+binnen zonder verklaring -- en die twee worden nooit opgeteld, want een leugen is
+een defect en de andere richting een triagelijst. Drie dingen daar niet
+wegpoetsen. `dicht` betekent precies een ding (de sessie maakte geen enkel
+verschil met anoniem) en alles daartussen heet `onbepaald` -- elke 403 als dichte
+deur lezen verzon 144 leugens, elke afwijkende weigering als "binnen" lezen
+verzon honderden gaten. De meter **beantwoordt geen productvraag**: een doelgroep
+die niet is verklaard en niet binnenkomt heet `correct-afgesloten`, ook als
+iemand vindt dat hij erbij zou moeten kunnen. En de naam `bereikbaar` was al
+bezet -- `test/bereikbaar.test.js` bewaakt BEREIK.json, de schuldlijst van
+SCHERMEN die je niet kunt aantikken, en die toets is tijdens het bouwen
+overschreven zonder dat een enkele toets het zag; de ratel `metingenZonderRatel`
+sprong van 50 naar 51 en wees het aan.
+
+**En daarboven staat de AANVOER** (`MAATSTAF.md` par. 7g,
+`server/kern/knelpunt/aanvoer*.js`, `AANVOERVORM.json`). De openingenkaart wijst
+per terrein EEN deur aan; de aanvoer is wat erachter staat. Of daar een gedeeld
+objecttype onder kan, is eerst GEMETEN en niet verklaard -- zelfde reden als bij
+`Asset`, met de lezer van `scripts/objectmodel.js` zodat de getallen naast elkaar
+te leggen zijn, en over TWEE domeinlijsten zodat de uitslag niet op de lijst
+drijft (de les van `carrierevorm.js`, die op een versmalling omsloeg van 0 naar
+8). Ruim: **0 velden in alle vijf terreinen**, 93,8% in precies een. Smal: 0 in
+alle, 100% in precies een, en geen enkel PAAR deelt iets. Dus geen `Manier`-type
+maar een PROJECTIE met vijf verplichte etiketten (`terrein`, `wat`, `ingang`,
+`dektNiet`, `herkomst`) plus `beschikbaarheid` die `null` blijft tenzij een bron
+hem noemt. Drie dingen daar niet wegpoetsen. **De laag krijgt de mens niet, en
+dat staat in de handtekening**: `vondsten()` neemt een randvoorwaarde en verder
+niets, waardoor een geschiktheidstoets hier structureel niet KAN in plaats van
+verboden is -- een vondst die toch een gegeven over de mens draagt wordt
+GEWEIGERD met het veld erbij. Het woord **`manier` was al bezet in ditzelfde
+domein** (`kern/knelpunt/index.js`: een WEG naar het doel, met een eigen stand),
+dus heet het een vondst -- gemeten vrij, vier kernbestanden noemen het woord en
+nul als veldnaam. En **een lege bron is geen stille lijst**: vacatures zijn
+aangesloten (`aanvoer-werk.js`, zonder enige filtering op de mens -- wat een
+vacature EIST staat zichtbaar in `wat` en wordt nooit toegepast), en de drie
+fouten die dat opleverde waren geen van drieën met lezen te zien -- een lus over
+een veld dat niet bestaat, een `const { openVacatures } = kern` die op
+montagemoment `undefined` bevriest, en zaadgegevens met NUL open vacatures. De
+elf contracttoetsen zagen er geen enkele van; twee toetsen tegen een echte server
+wel.
+
+**De TWEEDE bron is de eigenlijke proef** (`MAATSTAF.md` par. 7h,
+`kern/knelpunt/aanvoer-opleiding.js`): een contract dat op EEN bron past is geen
+contract maar een adapter met een mooie naam. Leerstof is daarom niet gekozen
+omdat het nuttig is maar omdat het maximaal ANDERS is -- geen lijst (2 x
+1.000.000 procedureel, niets opgeslagen), geen aanbieder, geen eis, geen
+schaarste. Uitslag: **het contract paste zonder een letter te veranderen**, en
+toets 14 houdt dat vast op de scherpste manier die er is -- de contractlaag mag
+in CODE geen enkele domeinnaam kennen (geen `vacature`, `leerpad`, `beroep`,
+`openVacatures`, `beroepenbieb`); in de UITLEG mag het woord wel. Waar het wel
+anders moest zit in de BRON: de eerste 25 van twee miljoen zijn geen vondsten
+maar willekeur met een net randje, dus er wordt gezocht -- en het zoekwoord komt
+uit de RANDVOORWAARDE en nergens anders. Noemt die geen vak, dan levert de bron
+NIETS met de reden erbij, want een verzonnen beroep is een verzonnen advies. Twee
+dingen daar niet wegpoetsen: die beperking is echt en niet tijdelijk, en de prijs
+staat opgeschreven in plaats van weggewerkt -- `kernGedeeld` 235 -> 236 omdat het
+domein `knelpunt` nu `beroepenbieb` mag lezen, als BESLUIT met reden in NORM.json
+(een aanvoerlaag is per definitie een lezer, dus een bron aansluiten IS koppeling
+toevoegen; rechtstreeks requiren zou een tweede instantie met een eigen db-greep
+maken en dat is duurder). Twee punten liggen altijd op een lijn: pas een DERDE
+bron die geen van beide vormen deelt, zet de projectie boven twijfel.
+
+**EN DE EIGENAAR HEEFT STAP 5 GENOMEN** (13 september 2026, `MAATSTAF.md` par.
+7i): de RTFoundation mag de knelpuntmotor gebruiken -- met opzet SMAL. Een gezin
+mag zijn eigen vraag laten beantwoorden met vondsten, en dat is iets anders dan
+"de foundation mag bij `/api/knelpunt/*`". Er komt EEN deur bij op EEN functie
+(`/api/rtf/knelpunt`) en `auth` wordt niet verzwakt; beide deuren roepen dezelfde
+`beantwoord()` aan, zodat een gezin nooit een ander antwoord kan krijgen dan een
+lid (gemeten: byte voor byte gelijk). Drie grenzen, alle drie in CODE: de sessie
+opent de deur en gaat nergens heen (de handtekening `vondsten(voorwaarde)` maakt
+een profiel structureel onmogelijk), **een vondst is geen recht** -- dat Adam een
+vacature ziet zegt niets over of hij mag solliciteren, en die vraag blijft bij de
+sollicitatielaag die de leeftijd uit het PROFIEL leest -- en er wordt niets
+gerangschikt. **Het pad hoort BIJ die functie en niet in een eigen**: zonder
+`/api/rtf/knelpunt` in `paden` valt de gezinsdeur onder `rtf-contacten` en zet
+het bord de ene helft van de functie uit en de andere niet, exact de
+`social`-fout. En de meter bewijst het besluit in plaats van het te geloven:
+`knelpunt x foundation` ging van `correct-afgesloten` naar **`waar`** zonder dat
+de 33 leugens bewogen -- het besluit is een PRODUCTvraag, of de deur daarna
+opengaat een METING. De keten staat op 12 schakels, 11 gesloten; schakel 12 is de
+belofte dat een Foundation-profiel vanuit EEN doel echte werk- EN leermogelijkheden
+bereikt zonder dat een bron wordt verzonnen, gladgestreken of als advies vermomd.
+**Schakel 4 blijft open met een SMALLERE reden**, en dat is met opzet: er is nu
+aanvoer, maar die levert vondsten bij een RANDVOORWAARDE en geen wegen bij een
+kaal DOEL -- wie "ik wil weer aan het werk" intikt bedenkt de manieren nog steeds
+zelf. Een bevinding wegpoetsen omdat er iets naast is komen staan, maakt kwijt
+wat er nog echt ontbreekt.
 
 **`INTELLIGENTIE.md` is de laag BOVEN het stuur** -- de RTG Intelligence Layer,
 als richtingsdocument met per onderdeel of het **staat**, **een stap weg** is,
@@ -1541,7 +1642,7 @@ vier ervan corrigeren een voorstel dat op het eerste gezicht klopt: er komt
 heet `kern/stuur/mandaat.js`, dat nul productie-aanroepers heeft; `autonoom` en
 `begrensd` zijn sinds 31 augustus EIGENSCHAPPEN en geen trede), het **wereldmodel
 wordt gemeten en niet verklaard** (INT-02 -- `OBJECTMODEL.json` zegt 71%
-domeineigen en `KETENVORM.json` 0 van 13 gedeelde actoren, dus een typemodel
+domeineigen en `KETENVORM.json` 0 van 19 gedeelde actoren, dus een typemodel
 eroverheen is de `Asset`-fout; de uitweg is de projectievorm van
 `kern/levensgraaf/graaf.js`), het **Mensmodel hangt aan de codenaam** met een
 bewaartermijn en een `deel`-poort (INT-03 -- `scripts/afleidbaar.js` vond al
@@ -1732,7 +1833,7 @@ het getal dat het blokkeert: een planner op `gevolg.js` heeft 96 van 176 paden
 `onbekend`, en een promotiesysteem boven
 <!--getal:vertrouwen.bewezen-->0<!--/getal--> bewezen routes promoveert niets.
 
-**`LAT.md` is de technische lat** — elf regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
+**`LAT.md` is de technische lat** — regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). En regel 13 vóór je pusht: **"mijn gebruikelijke controles" is niet "het oordeel van de keten"** — een CI-job die als EEN release-oordeel geldt heeft meer poorten dan iemand onthoudt, en `npm run ci:lokaal` draait ze allemaal omdat hij ze AFLEIDT uit `.github/workflows` in plaats van ze over te typen. Een handlijst poorten is een tweede waarheid naast ci.yml en loopt uit elkaar. LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)
 

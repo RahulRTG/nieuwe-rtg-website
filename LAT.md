@@ -11,7 +11,16 @@ hetzelfde en doen alsof van wel is de eerste manier om hem te verliezen.
 
 ---
 
-## De twaalf regels
+## De regels
+
+*Ze zijn GENUMMERD en niet GETELD, en dat verschil is er een van vandaag. De
+nummers dragen betekenis -- `scripts/check.js` citeert er zes bij naam ("LAT.md
+regel 4", "regel 8", "regel 10"), dus een regel hernummeren breekt een
+verwijzing. Het TOTAAL droeg niets: het stond in CLAUDE.md als "elf regels"
+terwijl het er twaalf waren, verouderde stil, en had geen enkele handhaver. Een
+aantal dat niemand nakijkt is een bewering zonder handhaver -- regel 6, op het
+document zelf.*
+
 
 ### 1. Repareer de oorzaak, niet het symptoom
 
@@ -426,6 +435,49 @@ dan), `test/schermronde.test.js`, `test/meetkeuring.test.js` toets 7, en
 repareren valt als hij niet start). Voor de mens die een slecht cijfer leest en
 zich niet afvraagt of er wel gemeten is, bestaat geen handhaver; daarvoor staat
 deze regel hier.
+
+### 13. "Mijn gebruikelijke controles" is niet "het oordeel van de keten"
+
+Een CI-job die als ÉÉN release-oordeel geldt, bestaat uit meer poorten dan
+iemand onthoudt. Wie er lokaal een paar van draait en dan pusht, heeft niet de
+keten nagespeeld maar zijn gewoonte -- en het verschil tussen die twee is
+precies waar een rode ronde vandaan komt.
+
+De regel is dus niet "draai meer". Het is: **een samengesteld oordeel hoort
+lokaal als één opdracht te bestaan**, zodat er geen ruimte zit tussen *ik heb
+mijn controles gedaan* en *ik heb het oordeel gereproduceerd*.
+
+*Het geval, 13 september 2026:* een tak zakte op `De keuringen (statisch) en
+PostgreSQL`. De oorzaak was klein -- een notitie in `NORM.json` droeg
+`soort: "besluit"` en het verval kent alleen `structureel` en `schuld` -- maar
+de manier waarop hij ontsnapte is de les. Van de vier poorten in die job waren er
+lokaal twee gedraaid (`check.js`, `norm.js`); `deltapoort.js` en
+`normverval.js` niet. Allebei hadden ze hem gevonden: `normverval` in 200
+milliseconden.
+
+*En het gereedschap bestond al.* `scripts/ci-lokaal.js` draait precies die keten
+en leidt de poorten AF uit `.github/workflows` in plaats van ze over te typen --
+`normverval` staat er als tweede regel in. Wat ontbrak was niet een mechanisme
+maar het gebruik ervan; in de PR-tekst stond het vakje `npm run ci:lokaal` zelfs
+uitdrukkelijk ONGEVINKT, en dat is erger dan vergeten.
+
+*Waarom dit niet met een langere checklist op te lossen is:* een handgeschreven
+lijst poorten is een tweede waarheid naast `ci.yml` (regel 4), en die loopt uit
+elkaar zodra iemand een poort toevoegt. De kop van `ci-lokaal.js` zegt het zelf:
+*"Een handgeschreven lijst hier zou dat oplossen tot de eerste keer dat iemand
+hem vergeet bij te werken -- en daarna bewaakt hij niets meer en denkt iedereen
+van wel."* De afleiding uit de werkstroom IS de handhaving.
+
+*Wat de keten hier niet kan, meldt hij als NIET GEDRAAID met de reden* -- geen
+Redis, geen PostgreSQL, geen docker -- en nooit als `staat`. Dat is regel 12 in
+het klein: een poort die je overslaat en groen noemt, is erger dan een poort die
+je niet hebt.
+
+**Handhaver:** `scripts/ci-lokaal.js` (afgeleid uit `.github/workflows` via
+`scripts/lib/werkstroom.js`; `--controle` zakt zodra de gewone ronde een poort
+niet meer bereikt) en `scripts/ci-keten.js`, die eist dat elke poort leesbaar
+genoeg blijft om hier na te spelen. Voor de mens die hem niet draait bestaat geen
+handhaver; daarvoor staat deze regel hier.
 
 ---
 

@@ -2,24 +2,24 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-13",
   "gemeten": {
-    "bestanden": 2225,
-    "domeinenTotaal": 606,
-    "koopbareVormen": 537,
+    "bestanden": 2224,
+    "domeinenTotaal": 608,
+    "koopbareVormen": 534,
     "koopbareDomeinen": 114,
     "envelopDrempel": 7,
     "envelop": 46,
     "veldenDomeineigen": 735,
-    "veldenNietEnvelop": 955,
+    "veldenNietEnvelop": 953,
     "gelijkendeVormparen": 8,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
     "werkwoordCombinaties": 45,
-    "wagenVormen": 33,
-    "wagenVormenUniek": 30,
+    "wagenVormen": 32,
+    "wagenVormenUniek": 29,
     "wagenDomeinen": 22,
-    "optellingen": 113,
+    "optellingen": 112,
     "optelDomeinen": 56,
-    "optelCenten": 63,
+    "optelCenten": 62,
     "optelEuro": 5,
     "optelGemengd": 0,
     "optelOnbekend": 45
@@ -2469,14 +2469,6 @@
       ]
     },
     {
-      "domein": "kern/bank",
-      "plekken": 2,
-      "waar": [
-        "server/kern/bank/hart.js",
-        "server/kern/bank/incasso.js"
-      ]
-    },
-    {
       "domein": "kern/fluister",
       "plekken": 2,
       "waar": [
@@ -2570,6 +2562,14 @@
       "waar": [
         "server/bedrijf/beeld.js",
         "server/bedrijf/klant.js"
+      ]
+    },
+    {
+      "domein": "school",
+      "plekken": 2,
+      "waar": [
+        "server/school/analyse.js",
+        "server/school/financien-beheer.js"
       ]
     }
   ]

@@ -70,7 +70,11 @@ test('4. de proef meet ANDERE dingen dan de twee voorgangers', () => {
 });
 
 test('5. de woordenlijst is uitgebreid, en dat staat er eerlijk bij', () => {
-  assert.match(vormBron, /DE LIJST IS EEN KEER UITGEBREID/,
+  /* Het aantal keer dat de lijst is uitgebreid staat in de kop van
+     scripts/ketenvorm.js, en het mag groeien -- wat vastligt is dat het ER
+     STAAT. Een vast "EEN KEER" zou bij de vierde keten zakken op de eerlijkheid
+     in plaats van op het gebrek eraan. */
+  assert.match(vormBron, /DE LIJST IS \w+ KEER UITGEBREID/,
     'de themalijst is aangepast zonder dat ergens staat waarom -- dan is de overlap gefabriceerd');
   assert.match(vormBron, /HETZELFDE zegt/, 'de regel waaronder een patroon erbij mag, staat er niet');
   /* Wat NIET is aangepast: de actoren. Dat is de uitslag die telt. */
@@ -90,8 +94,13 @@ test('5. de woordenlijst is uitgebreid, en dat staat er eerlijk bij', () => {
 
 test('6. de ketenvorm telt over ALLE ketens en niet over de eerste twee', () => {
   const v = lees('KETENVORM.json');
-  assert.equal(v.telling.ketens, 3);
-  assert.equal(v.ketens.length, 3);
+  /* AFGELEID EN NIET OVERGETYPT. Hier stond `3`, en bij de vierde keten
+     (scripts/adamproef.js) zakte deze toets op het feit dat er een keten BIJ
+     was gekomen -- precies andersom dan de bedoeling. De eis is dat het
+     register gelijk loopt met de ketenlijst, niet dat het er drie zijn. */
+  const { KETENS } = require('../scripts/ketenvorm');
+  assert.equal(v.telling.ketens, KETENS.length);
+  assert.equal(v.ketens.length, KETENS.length);
   const { zonderCommentaar } = require('../scripts/lib/bron');
   assert.doesNotMatch(zonderCommentaar(vormBron), /gelezen\[1\]/,
     'de meter indexeert nog op de tweede keten; dan telt een derde stil niet mee');
@@ -100,8 +109,9 @@ test('6. de ketenvorm telt over ALLE ketens en niet over de eerste twee', () => 
 test('7. gedeeld is in ALLE ketens, en dat verschilt van "in meer dan een"', () => {
   const v = lees('KETENVORM.json');
   const t = v.beloften.telling;
-  for (const thema of v.beloften.gedeeld) assert.equal(t[thema], 3, thema + ' heet gedeeld maar zit niet in alle drie');
-  for (const thema of v.beloften.bijna) assert.ok(t[thema] > 1 && t[thema] < 3, thema + ' staat verkeerd in "bijna"');
+  const n = require('../scripts/ketenvorm').KETENS.length;
+  for (const thema of v.beloften.gedeeld) assert.equal(t[thema], n, thema + ' heet gedeeld maar zit niet in alle ketens');
+  for (const thema of v.beloften.bijna) assert.ok(t[thema] > 1 && t[thema] < n, thema + ' staat verkeerd in "bijna"');
   for (const [k, lijst] of Object.entries(v.beloften.eigen))
     for (const thema of lijst) assert.equal(t[thema], 1, thema + ' heet "alleen ' + k + '" en zit in meer ketens');
 });

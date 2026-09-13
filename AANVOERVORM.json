@@ -1,0 +1,295 @@
+{
+  "stempel": {
+    "op": "2026-09-13T11:41:14.674Z",
+    "commit": "b9ef5d31",
+    "boomVuil": false,
+    "boomAnders": 2,
+    "instrument": "scripts/aanvoervorm.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Delen de vijf terreinen van kern/knelpunt/openingen-kaart.js een VORM? Gemeten met de lezer van scripts/objectmodel.js -- dezelfde als bij de Asset- en Koopbaar-metingen, want een tweede parser maakt de vergelijking waardeloos. De as is het TERREIN en niet de module, en er wordt over TWEE domeinlijsten gemeten (ruim en smal) zodat de uitslag niet op de lijst drijft.",
+  "grens": "Dit meet de vorm van de DATA en niet of aanvoer als PROCES bestaat -- dat is de vraag van een ketenproef (scripts/adamproef.js). Een lage uitslag zegt dat aanvoer geen OBJECT is, niet dat er geen aanvoer is. Envelopvelden (id, naam, status, at, ...) vallen eruit: die staan overal en meten de verpakking. En de lezer van objectmodel.js kijkt alleen in server/kern, server/bedrijf, server/school en server/papieren -- een bron die in een ROUTE woont is voor deze meter onzichtbaar, en dat is geen nul maar een blinde vlek. Zie `terreinenLeeg`.",
+  "conclusie": "GEEN GEDEELDE VORM: geen enkel veld staat in alle gemeten terreinen, onder geen van beide domeinlijsten. Een `Vondst` als objecttype met verplichte velden is daarmee niet gerechtvaardigd; de vorm die overleeft is een PROJECTIE met een klein aantal etiketten, per aanroep samengesteld door het brondomein zelf -- de vorm van kern/levensgraaf/graaf.js, en de uitweg die COMMERCE.md voor `Koopbaar` al koos.",
+  "geenGedeeldeVorm": true,
+  "ruim": {
+    "uitleg": "Delen de vijf terreinen van kern/knelpunt/openingen-kaart.js een VORM? Gemeten met de lezer van scripts/objectmodel.js -- dezelfde als bij de Asset- en Koopbaar-metingen, want een tweede parser maakt de vergelijking waardeloos. De as is het TERREIN en niet de module.",
+    "grens": "Dit meet de vorm van de DATA en niet of aanvoer als proces bestaat -- dat is de vraag van een ketenproef. Een lage uitslag zegt dat aanvoer geen OBJECT is, niet dat er geen aanvoer is. De modulelijst per terrein is met opzet ruim: een module die er ten onrechte bij staat verlaagt hooguit de gedeeldheid, een module die ontbreekt VERBERGT juist een gedeelde vorm. De uitslag is dus een ONDERgrens voor \"ze delen niets\". Envelopvelden (id, naam, status, at, ...) vallen eruit: die staan overal en meten de verpakking.",
+    "terreinen": [
+      "werk",
+      "opleiding",
+      "opvang",
+      "vervoer",
+      "wonen"
+    ],
+    "terreinenLeeg": [],
+    "vormen": 100,
+    "velden": 211,
+    "perTerrein": {
+      "werk": {
+        "velden": 19,
+        "modules": [
+          "server/kern/werk.js",
+          "server/kern/werkplaats.js",
+          "server/kern/werkplek.js"
+        ]
+      },
+      "opleiding": {
+        "velden": 137,
+        "modules": [
+          "server/kern/beroepenbieb/index.js",
+          "server/kern/onderwijs-ladder.js",
+          "server/school/aanwezigheid.js",
+          "server/school/beheer.js",
+          "server/school/bijdrage.js",
+          "server/school/directie.js",
+          "server/school/dossier.js",
+          "server/school/excursie.js",
+          "server/school/financien-beheer.js",
+          "server/school/financien.js",
+          "server/school/gezin.js",
+          "server/school/hr-verlof.js",
+          "server/school/hr.js",
+          "server/school/hulplijn.js",
+          "server/school/inschrijving.js",
+          "server/school/klas.js",
+          "server/school/koppelingen.js",
+          "server/school/machtiging.js",
+          "server/school/omroep.js",
+          "server/school/opvolging.js",
+          "server/school/ouderportaal-mijn.js",
+          "server/school/ouderportaal.js",
+          "server/school/peiling-antwoord.js",
+          "server/school/peiling.js",
+          "server/school/personeel-inlog.js",
+          "server/school/personeelstoegang.js",
+          "server/school/planner.js",
+          "server/school/rapport.js",
+          "server/school/rollen.js",
+          "server/school/toets.js",
+          "server/school/toetsbieb.js",
+          "server/school/veiligheid-incident.js",
+          "server/school/veiligheid.js",
+          "server/school/verbonden.js",
+          "server/school/verlof.js",
+          "server/school/zorg.js"
+        ]
+      },
+      "opvang": {
+        "velden": 5,
+        "modules": [
+          "server/kern/verzorging/opvang.js",
+          "server/kern/verzorging/opvangleden.js"
+        ]
+      },
+      "vervoer": {
+        "velden": 60,
+        "modules": [
+          "server/kern/mobiliteit/abonnement.js",
+          "server/kern/mobiliteit/assets.js",
+          "server/kern/mobiliteit/cdt-export.js",
+          "server/kern/mobiliteit/dispatch.js",
+          "server/kern/mobiliteit/modulecatalogus.js",
+          "server/kern/mobiliteit/overeenkomst.js",
+          "server/kern/mobiliteit/pendel-rooster.js",
+          "server/kern/mobiliteit/pendel.js",
+          "server/kern/mobiliteit/plekken.js",
+          "server/kern/mobiliteit/reis.js",
+          "server/kern/mobiliteit/reisplan-etappe.js",
+          "server/kern/mobiliteit/storing.js"
+        ]
+      },
+      "wonen": {
+        "velden": 3,
+        "modules": [
+          "server/kern/woningonderhoud.js"
+        ]
+      }
+    },
+    "inAlleTerreinen": [],
+    "inMinstensHelft": [],
+    "inEenTerreinPct": 93.8,
+    "paren": [
+      {
+        "paar": [
+          "werk",
+          "opleiding"
+        ],
+        "gedeeld": 7,
+        "overlap": 0.047,
+        "velden": [
+          "af",
+          "doel",
+          "grootteMB",
+          "icon",
+          "sterren",
+          "versie",
+          "winkelwaardeCenten"
+        ]
+      },
+      {
+        "paar": [
+          "opleiding",
+          "vervoer"
+        ],
+        "gedeeld": 4,
+        "overlap": 0.021,
+        "velden": [
+          "geldigTot",
+          "ingetrokken",
+          "organisatie",
+          "terugbetaald"
+        ]
+      },
+      {
+        "paar": [
+          "opvang",
+          "vervoer"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.016,
+        "velden": [
+          "capaciteit"
+        ]
+      },
+      {
+        "paar": [
+          "opleiding",
+          "wonen"
+        ],
+        "gedeeld": 1,
+        "overlap": 0.007,
+        "velden": [
+          "plek"
+        ]
+      },
+      {
+        "paar": [
+          "werk",
+          "opvang"
+        ],
+        "gedeeld": 0,
+        "overlap": 0,
+        "velden": []
+      },
+      {
+        "paar": [
+          "werk",
+          "vervoer"
+        ],
+        "gedeeld": 0,
+        "overlap": 0,
+        "velden": []
+      },
+      {
+        "paar": [
+          "werk",
+          "wonen"
+        ],
+        "gedeeld": 0,
+        "overlap": 0,
+        "velden": []
+      },
+      {
+        "paar": [
+          "opleiding",
+          "opvang"
+        ],
+        "gedeeld": 0,
+        "overlap": 0,
+        "velden": []
+      },
+      {
+        "paar": [
+          "opvang",
+          "wonen"
+        ],
+        "gedeeld": 0,
+        "overlap": 0,
+        "velden": []
+      },
+      {
+        "paar": [
+          "vervoer",
+          "wonen"
+        ],
+        "gedeeld": 0,
+        "overlap": 0,
+        "velden": []
+      }
+    ]
+  },
+  "smal": {
+    "uitleg": "Delen de vijf terreinen van kern/knelpunt/openingen-kaart.js een VORM? Gemeten met de lezer van scripts/objectmodel.js -- dezelfde als bij de Asset- en Koopbaar-metingen, want een tweede parser maakt de vergelijking waardeloos. De as is het TERREIN en niet de module.",
+    "grens": "Dit meet de vorm van de DATA en niet of aanvoer als proces bestaat -- dat is de vraag van een ketenproef. Een lage uitslag zegt dat aanvoer geen OBJECT is, niet dat er geen aanvoer is. De modulelijst per terrein is met opzet ruim: een module die er ten onrechte bij staat verlaagt hooguit de gedeeldheid, een module die ontbreekt VERBERGT juist een gedeelde vorm. De uitslag is dus een ONDERgrens voor \"ze delen niets\". Envelopvelden (id, naam, status, at, ...) vallen eruit: die staan overal en meten de verpakking.",
+    "terreinen": [
+      "werk",
+      "opleiding",
+      "opvang"
+    ],
+    "terreinenLeeg": [
+      {
+        "terrein": "vervoer",
+        "reden": "geen enkele objectvorm gevonden onder /^server\\/kern\\/vervoer\\.js$/"
+      },
+      {
+        "terrein": "wonen",
+        "reden": "geen enkele objectvorm gevonden onder /^server\\/routes\\/member\\/handel\\/vastgoed\\.js$/"
+      }
+    ],
+    "vormen": 7,
+    "velden": 17,
+    "perTerrein": {
+      "werk": {
+        "velden": 3,
+        "modules": [
+          "server/kern/werk.js"
+        ]
+      },
+      "opleiding": {
+        "velden": 9,
+        "modules": [
+          "server/kern/beroepenbieb/index.js"
+        ]
+      },
+      "opvang": {
+        "velden": 5,
+        "modules": [
+          "server/kern/verzorging/opvang.js",
+          "server/kern/verzorging/opvangleden.js"
+        ]
+      }
+    },
+    "inAlleTerreinen": [],
+    "inMinstensHelft": [],
+    "inEenTerreinPct": 100,
+    "paren": [
+      {
+        "paar": [
+          "werk",
+          "opleiding"
+        ],
+        "gedeeld": 0,
+        "overlap": 0,
+        "velden": []
+      },
+      {
+        "paar": [
+          "werk",
+          "opvang"
+        ],
+        "gedeeld": 0,
+        "overlap": 0,
+        "velden": []
+      },
+      {
+        "paar": [
+          "opleiding",
+          "opvang"
+        ],
+        "gedeeld": 0,
+        "overlap": 0,
+        "velden": []
+      }
+    ]
+  }
+}

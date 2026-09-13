@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T01:09:35.723Z",
-    "commit": "72eee529",
+    "op": "2026-09-13T11:44:14.990Z",
+    "commit": "456cdaa6",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -49,6 +49,15 @@
       "module": "server/kern/aanmeldingen.js",
       "operator": "false->true",
       "gezakt": 1
+    },
+    "aanvoer.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/knelpunt/aanvoer.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1,
+      "scherp": "gezakt"
     },
     "aanwezig.test.js": {
       "soort": "server",
@@ -117,6 +126,14 @@
       "operator": "===->!==#0",
       "gezakt": 5,
       "geprobeerd": 1
+    },
+    "adamproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "adaptief.test.js": {
       "soort": "puur",
@@ -2018,6 +2035,14 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "doelgroepbereik.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/functies/register/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "domeinalleen.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2805,14 +2830,6 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/lib/geldwacht.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "geldketen.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/kantoor/geldketen.js",
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
@@ -4394,14 +4411,6 @@
       "gezakt": 18,
       "geprobeerd": 1
     },
-    "machinedekking.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/machinedekking.js",
-      "operator": "true->false#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
     "magnaat-capabilities.test.js": {
       "soort": "puur",
       "staat": "geen bruikbare mutatie",
@@ -5549,6 +5558,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "ontvanger.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ontvanger.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
     },
     "ontwerp.test.js": {
       "soort": "puur",

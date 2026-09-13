@@ -273,7 +273,12 @@ function bestandenMetPaid() {
   const uit = new Map();
   function loop(map, laag) {
     for (const naam of fs.readdirSync(map)) {
-      if (naam === 'node_modules' || naam === 'data') continue;
+      /* `dist` is BOUWUITVOER en geen bron: de geminificeerde kopie van elk
+         serveerbaar script, buiten git gehouden en door scripts/build.js zelf
+         overgeslagen. Wie hem meetelt, krijgt elke lezer een tweede keer in de
+         kaart -- en dan hangt de uitslag ervan af of iemand toevallig de build
+         heeft gedraaid. Dat is precies wat een meting niet mag doen. */
+      if (naam === 'node_modules' || naam === 'data' || naam === 'dist') continue;
       const p = path.join(map, naam);
       const st = fs.statSync(p);
       if (st.isDirectory()) { loop(p, laag); continue; }

@@ -1527,6 +1527,29 @@ zin die hem aanleiding gaf) bracht hem terug op 2 -- dus die twee overleven een
 vierde, totaal andere keten. De actoren zijn nooit aangeraakt, en die staan op
 nul.
 
+**De vierde keten leverde een REGEL en een METER op** (`MAATSTAF.md` par. 7f,
+`DOELGROEPBEREIK.json`, `npm run doelgroepbereik`). De regel geldt breder dan
+ketens en heeft twee helften die elkaar spiegelen: **een bericht is pas bezorgd
+als er een bewezen LEESpad bestaat, en een capability is pas beschikbaar als de
+verklaarde doelgroep een bewezen TOEGANGSpad heeft.** De eerste helft staat in
+code (`kern/ontvanger.js`: elke weg heeft een lezer, en dat is gemeten -- een
+melding naar `db.data.notifications` voor een gezinslid zag er goed uit en had
+NUL lezers), de tweede in een meter die per cel (functie x doelgroep) vraagt of
+de VERKLAARDE doelgroep zijn eigen paden opent met een echte sessie. Uitslag:
+1736 cellen, 578 waar, **33 registerleugens** over tien functies en 132 keer
+binnen zonder verklaring -- en die twee worden nooit opgeteld, want een leugen is
+een defect en de andere richting een triagelijst. Drie dingen daar niet
+wegpoetsen. `dicht` betekent precies een ding (de sessie maakte geen enkel
+verschil met anoniem) en alles daartussen heet `onbepaald` -- elke 403 als dichte
+deur lezen verzon 144 leugens, elke afwijkende weigering als "binnen" lezen
+verzon honderden gaten. De meter **beantwoordt geen productvraag**: een doelgroep
+die niet is verklaard en niet binnenkomt heet `correct-afgesloten`, ook als
+iemand vindt dat hij erbij zou moeten kunnen. En de naam `bereikbaar` was al
+bezet -- `test/bereikbaar.test.js` bewaakt BEREIK.json, de schuldlijst van
+SCHERMEN die je niet kunt aantikken, en die toets is tijdens het bouwen
+overschreven zonder dat een enkele toets het zag; de ratel `metingenZonderRatel`
+sprong van 50 naar 51 en wees het aan.
+
 **`INTELLIGENTIE.md` is de laag BOVEN het stuur** -- de RTG Intelligence Layer,
 als richtingsdocument met per onderdeel of het **staat**, **een stap weg** is,
 **een besluit vraagt** of **jaren weg** is. Lees die voor je iets bouwt waarmee

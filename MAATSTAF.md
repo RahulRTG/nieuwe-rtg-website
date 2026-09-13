@@ -1100,6 +1100,107 @@ telt. `test/toelatingsproef.test.js` toets 5 houdt vast dat die uitleg blijft
 staan, en `test/adamproef.test.js` toets 7 dat een nieuwe keten niet stil buiten
 de meter valt.
 
+## 7f. Verklaard is niet bereikbaar — de doelgroepbereikmeter
+
+`DOELGROEPBEREIK.json` (`npm run doelgroepbereik`) is de meter die uit de
+vierde keten volgt. De Adam-keten vond dat `/api/knelpunt` voor een
+gezinsprofiel niet te openen is. Het functieregister **liegt daar niet** — het
+zegt netjes `doelgroepen: LEDEN` — maar dat werd pas zichtbaar door de keten met
+de hand te lopen. Zonder meter zijn *verklaard* en *bereikbaar* hetzelfde woord
+tot iemand toevallig kijkt.
+
+De regel die hij afdwingt is met opzet smaller dan het beginsel erboven:
+
+> **Een functie waarvan de verklaarde doelgroep zijn eigen paden niet kan
+> bereiken, is een leugen in het register.**
+
+Het beginsel luidt *een capability die een mens inhoudelijk kan helpen maar die
+voor die mens niet bereikbaar is, telt niet als beschikbare capability.* Dat is
+de goede zin om op te sturen en de verkeerde om af te dwingen: "een mens die
+geholpen kán worden" is een oordeel en geen meting. Wat draait is de helft die
+een machine ziet — het register zegt WIE, de deur zegt of die WIE langskomt.
+
+**Twee richtingen, en ze worden nooit opgeteld.** Een `registerleugen` is een
+defect; `bereikbaar-zonder-verklaring` is een triagelijst, want of dat een gat in
+de autorisatie is of een gat in het register zegt deze meter níét. `klopt` gaat
+alleen over de eerste.
+
+### De uitslag (13 september 2026, commit 91dbf92a)
+
+| uitslag | cellen |
+|---|---|
+| waar (verklaard én bereikbaar) | 578 |
+| correct afgesloten | 166 |
+| geen deur (ook anoniem bereikbaar) | 133 |
+| onbepaald (wie weigerde: onbekend) | 690 |
+| niet beproefd, met reden | 4 |
+| sessie ontbreekt | 0 |
+| **bereikbaar zonder verklaring** | **132** |
+| **REGISTERLEUGEN** | **33** |
+
+1736 cellen (functie × doelgroep) over 5010 routes, met een **echte sessie per
+doelgroep** tegen een wegwerpserver (`scripts/lib/doelgroepsessies.js`) — nooit
+een nagebouwd token, want dat meet je eigen aanname en niet de deur.
+
+De 33 leugens zitten in tien functies, en ze vallen in drie soorten. `dom-lucht`
+en `dom-kmar` zijn verklaard voor rtg/lifestyle/business terwijl élke route
+antwoordt met *"Niet ingelogd als leverancier"* — leveranciersroutes met een
+ledendoelgroep. `social` verklaart rtg/lifestyle/business maar zijn enige pad is
+`/api/rtf/social`; de ledenhelft van diezelfde gedeelde sociale laag woont op
+`/api/member/find` en `/api/member/connect`, en het gevolg is dat de
+boardroomschakelaar "Sociale laag" alleen de RTF-helft uitzet. De rest
+(`bedrijf`, `tenant`, `dom-werkvloer`, `dom-sport`, `dom-appstore-uitgever`,
+`rtf-contacten`, `tg-sso`) is nog niet met de hand nagelopen.
+
+### Drie dingen die hem eerlijk houden, en alle drie uit een verzonnen uitslag
+
+Deze meter velt een oordeel over het register, en zo'n oordeel is een
+**beschuldiging** — dezelfde regel als bij `scripts/herstelproef.js`. Hij heeft
+er tijdens het bouwen twee keer een verzonnen, en beide keren zag de uitslag er
+geloofwaardig uit.
+
+1. **Elke 403 als dichte deur lezen gaf 144 leugens.** `/api/member/dm` weigert
+   een lid met *"Je bent nog niet verbonden met deze codenaam"* — dat is de
+   handler en niet de bewaker. `dicht` betekent daarom precies één ding: de
+   sessie van deze doelgroep maakte **geen enkel verschil met een anoniem
+   verzoek**. Sterker is van buiten niet te meten.
+2. **Elke afwijkende weigering als "binnen" lezen gaf honderden gaten.** `auth`
+   zegt tegen een kantoortoken *"Niet ingelogd als lid."* en anoniem *"Niet
+   ingelogd."* — andere tekst, dezelfde bewaker. Daarom drie deurstanden en geen
+   twee: `onbepaald` is hier een eersteklas uitslag naast langs en dicht
+   (BESTUUR.md), en 690 cellen staan erop. Nul onbepaalde cellen zou verdacht
+   zijn.
+3. **Een doelgroep met meer sessievormen levert nooit een leugen.**
+   `foundation` dekt gezinnen, leerlingen én scholen en de meter draagt er één.
+   Dat gaf dertig leugens die de beperking van de meter waren en niet van het
+   huis; ze staan nu als `onbepaald` met de reden uitgeschreven
+   (`MEER_SESSIEVORMEN`).
+
+En hij **beantwoordt geen productvraag**. Of de RTFoundation toegang krijgt tot
+de knelpuntmotor is een besluit van de eigenaar. Vandaag is die doelgroep daar
+niet verklaard en komt hij er niet in; dat heet `correct-afgesloten`, en toets 6
+van `test/doelgroepbereik.test.js` houdt vast dat die ene cel noch een leugen
+noch een gat is. De meter wordt daar pas rood van als iemand de doelgroep
+tóévoegt.
+
+### Wat hij niet meet
+
+Dit meet de **deur en niet de kamer**: er gaat een leeg lichaam heen, dus of een
+doelgroep de functie ook zinnig kan gebruiken staat hier niet. Een functie heet
+bereikbaar zodra **één** van haar paden opengaat — negen dichte routes naast één
+open route zijn hier geen leugen.
+
+### De naam was bezet, en de ratel ving dat
+
+Hij heet `doelgroepbereik` en niet `bereikbaar`, omdat `test/bereikbaar.test.js`
+al bestond: die bewaakt `BEREIK.json`, de schuldlijst van **schermen** die je
+niet kunt aantikken. Tijdens het bouwen is dat bestand overschreven. Geen enkele
+toets zag dat — de ratel `metingenZonderRatel` sprong van 50 naar 51, en die ene
+tand wees aan dat er een bestaande toets stil was verdwenen. Bereikbaarheid is
+hier dus twee vragen en ze houden twee namen: kan een **mens** het scherm
+aantikken (`BEREIK.json`), en kan de **verklaarde doelgroep** de deur erachter
+open (`DOELGROEPBEREIK.json`).
+
 ## 8. De volgorde
 
 1. **Dit document** — welke uitspraak huisgrond heeft, welke wordt

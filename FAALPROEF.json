@@ -2,9 +2,9 @@
  "soort": "meting",
  "uitleg": "De FAILURE-cel per route: faalt hij netjes als er iets onder hem wegvalt. Het contract wordt eerst bepaald uit het gemeten effectprofiel (X-RTG-Effect / X-RTG-Staat) en pas daarna beproefd met het verraad dat daarbij hoort.",
  "stempel": {
-  "op": "2026-09-13T09:29:24.054Z",
-  "commit": "5dea560c",
-  "boomVuil": false,
+  "op": "2026-09-13T09:58:02.043Z",
+  "commit": "d47e7080",
+  "boomVuil": true,
   "boomAnders": 0,
   "instrument": "scripts/faalproef.js",
   "node": "v22.22.2"
@@ -33,12 +33,12 @@
  "verradenNietGedraaid": {},
  "gemeten": {
   "routes": 4952,
-  "duurzaamSchrijvend": 72,
-  "nietToeTeSchrijven": 124,
+  "duurzaamSchrijvend": 70,
+  "nietToeTeSchrijven": 125,
   "voorziening": 63,
   "bewezen": 69,
-  "gezakt": 3,
-  "ongemeten": 4880,
+  "gezakt": 1,
+  "ongemeten": 4882,
   "verradenInCatalogus": 2,
   "verradenGedraaid": 2
  },
@@ -1362,21 +1362,12 @@
    "pad": "/api/bank/akkoord",
    "route": "POST /api/bank/akkoord",
    "rol": "member",
-   "profiel": "duurzaam",
-   "effect": "opslag=1",
+   "profiel": "leest",
+   "effect": "geen",
    "effect2": null,
-   "perVerraad": {
-    "schrijf-faalt": {
-     "staat": "bewezen",
-     "reden": "expliciete fout (status 500) in plaats van een bevestiging"
-    },
-    "schrijf-verloren": {
-     "staat": "gezakt",
-     "reden": "status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
-    }
-   },
-   "failure": "gezakt",
-   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
   },
   {
    "methode": "POST",
@@ -18447,21 +18438,12 @@
    "pad": "/api/office/asset/fees",
    "route": "POST /api/office/asset/fees",
    "rol": "office",
-   "profiel": "duurzaam",
-   "effect": "opslag=1",
+   "profiel": "leest",
+   "effect": "geen",
    "effect2": null,
-   "perVerraad": {
-    "schrijf-faalt": {
-     "staat": "bewezen",
-     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
-    },
-    "schrijf-verloren": {
-     "staat": "gezakt",
-     "reden": "status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
-    }
-   },
-   "failure": "gezakt",
-   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
   },
   {
    "methode": "POST",
@@ -22173,12 +22155,12 @@
    "pad": "/api/office/payroll/match",
    "route": "POST /api/office/payroll/match",
    "rol": "office",
-   "profiel": "leest",
+   "profiel": "onzeker",
    "effect": "geen",
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
+   "reden": "de momentopname bewoog maar de effectmeter zag geen save(); die opname is globaal en sequentieel, dus dit kan net zo goed een achtergrondschrijver zijn. Niet aan deze route toe te schrijven, en dus niet te beoordelen."
   },
   {
    "methode": "POST",

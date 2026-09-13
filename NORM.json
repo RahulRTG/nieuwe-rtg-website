@@ -91,7 +91,8 @@
     "geldGebreken": 0,
     "bevestigGebreken": 0,
     "verwijzingGebreken": 0,
-    "mensmutatieZonderWacht": 1
+    "mensmutatieZonderWacht": 1,
+    "momentOpenBekend": 3
   },
   "notities": [
     {
@@ -2291,7 +2292,8 @@
     "geldGebreken": "2026-09-12",
     "bevestigGebreken": "2026-09-12",
     "verwijzingGebreken": "2026-09-12",
-    "mensmutatieZonderWacht": "2026-09-12"
+    "mensmutatieZonderWacht": "2026-09-12",
+    "momentOpenBekend": "2026-09-13"
   },
   "uitzonderingen": [
     {

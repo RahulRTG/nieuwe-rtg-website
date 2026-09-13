@@ -25,7 +25,7 @@
       "status": 200,
       "ziet": "de enige lijst is /aanwezig/mijn en die staat op 0: hij toont wat je al volgt, niet wat er is",
       "fout": null,
-      "ms": 4
+      "ms": 8
     },
     {
       "nr": 3,
@@ -49,7 +49,7 @@
       "status": 200,
       "ziet": "\"Sal Nocturna: kaartverkoop open -- \"Weekendpas voor Proeffestival\".\" (0 -> 1 meldingen)",
       "fout": null,
-      "ms": 20
+      "ms": 13
     },
     {
       "nr": 5,
@@ -61,7 +61,7 @@
       "status": 200,
       "ziet": "de melding draagt geen bestemming (velden buiten de vaste zes: geen), en de gastenkant geeft 0 passen -- er is geen route om er een te kopen",
       "fout": null,
-      "ms": 10
+      "ms": 9
     },
     {
       "nr": 6,
@@ -73,7 +73,7 @@
       "status": 200,
       "ziet": "twee posts, 0 lopende uitlichtingen, en de maker draagt 0 aanwezigheden",
       "fout": null,
-      "ms": 19
+      "ms": 18
     },
     {
       "nr": 7,
@@ -109,7 +109,7 @@
       "status": 200,
       "ziet": "1 melding(en) over kaartverkoop, en het Dagticket zit er niet bij",
       "fout": null,
-      "ms": 17
+      "ms": 20
     },
     {
       "nr": 10,
@@ -120,7 +120,7 @@
       "stand": "openBekend",
       "status": 403,
       "antwoord": "Alleen voor de sportclub.",
-      "ms": 6
+      "ms": 5
     }
   ],
   "storingen": [

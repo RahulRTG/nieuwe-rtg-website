@@ -1539,6 +1539,23 @@ const IJKINGEN = {
       (j) => { j.gemeten.zonderUitspraak = (j.gemeten.zonderUitspraak || 0) + 3; return j; },
       () => norm.meet().wekZonderUitspraak - voor.wekZonderUitspraak)
   },
+  /* DE TAND VAN 13 SEPTEMBER 2026 (derde): momentOpenBekend telt de schakels in
+     de publieke keten die aantoonbaar OPENSTAAN met een uitgeschreven reden
+     (MOMENTPROEF.json, STAGE.md par. 6). Elke open schakel is een openstaand
+     besluit van de eigenaar, dus er mogen er alleen minder worden.
+
+     DE IJKING GAAT HIER OMHOOG, en dat is de richting die ertoe doet. De uitweg
+     `openBekend` is bedoeld voor een schakel die niet sluit terwijl er een
+     besluit over loopt, en zo'n uitweg verwatert vanzelf tot "alles wat niet
+     werkt krijgt een zinnetje". Wat deze tand moet vangen is dus dat er STIL een
+     vierde bij komt; leest de meter het verkeerde veld -- `telling.open` in
+     plaats van `telling.openBekend`, die naast elkaar staan en allebei op een
+     getal lijken -- dan beweegt hij niet mee en zakt deze ijking. */
+  momentOpenBekend: {
+    proef: (voor) => metVervangenJson('MOMENTPROEF.json',
+      (j) => { j.telling.openBekend = (j.telling.openBekend || 0) + 2; return j; },
+      () => norm.meet().momentOpenBekend - voor.momentOpenBekend)
+  },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
      de meter leest `gemeten.defecten` uit een register dat er al is, dus hij

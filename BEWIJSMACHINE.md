@@ -470,6 +470,25 @@ meter.
 Wie een meter toevoegt, loopt die vier af. Wie er een overslaat, ontdekt hem één
 CI-ronde later — en dat is precies wat deze tabel bespaart.
 
+### De vijfde, en die heeft geen huisbrede handhaver
+
+Eén ronde later dan de vier hierboven meldde zich een vijfde, en hij past niet in
+de tabel omdat er geen enkele meter over gaat. Vier registers lieten CI zakken op
+een toets die **in het register zelf woont**: `CAPABILITEIT.json`,
+`MAGNAATLAB.json`, `MUTATIESEMANTIEK.json` en `SEMANTIEK.json` dragen elk een
+eigen toets die "loopt achter op de code" meldt zodra hun getal niet meer klopt
+met een verse meting. Dat is precies goed — maar `scripts/check.js` kent ze niet,
+`scripts/versheid.js` kent ze niet, en `metingenZonderRatel` telt ze niet, want ze
+hángen aan een ratel. Ze liften mee op de OMVANG van de kern, dus elke tak die
+code toevoegt laat ze zakken, en je vindt ze alleen door de scherf lokaal te
+reproduceren of door `grep "loopt achter op" test/*.test.js` te draaien.
+
+De vorm van die vijfde is dus: *een register dat door niemand wordt bewaakt
+behalve door zijn eigen toets, en dat meebeweegt met iets waar het niet over
+gaat.* Dat is hier alleen OPGEMERKT en niet opgelost; de vraag die eronder ligt
+(welke registers lopen mee op de kernomvang, en hoort die groei bij hun
+onderwerp?) hoort bij par. 6 en niet bij deze checklist.
+
 ### De regel eronder, en die is breder dan meters
 
 De vierde administratie lijkt de saaiste en is de gevaarlijkste. `STAGEVORM.json`

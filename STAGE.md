@@ -505,15 +505,37 @@ van.
 
 ## 7. De besluiten van de eigenaar
 
-Vijf, en de eerste drie blokkeren de rest.
+Twee zijn er genomen; zeven staan er open, en drie daarvan zijn door de
+momentproef van *vermoed* naar *gemeten* gegaan.
 
-0. **Wat betekent een festival of een club VOLGEN?** Nieuw sinds par. 5a, en het
-   blokkeert drie van de vier publieke momenten. Vandaag is er geen volgrelatie
-   op een organisatie — alleen op een mens. Zolang dat zo is, wekt een wekhaak
-   daar niemand. Dit is een productbesluit en geen bedrading.
-0b. **Wie licht een Salon-post uit?** `featured` bestaat alleen in de seed,
-   terwijl de merkregel zegt dat RTG cureert. Zonder die handeling is het enige
-   aansluitbare moment een belofte zonder oorzaak.
+**Genomen op 13 september 2026:**
+
+0. ~~**Wat betekent een festival of een club VOLGEN?**~~ **Genomen: één
+   begrip en niet vier.** Een lid volgt een publieke AANWEZIGHEID, gedragen door
+   een mens óf door een organisatie (`kern/mediaos/aanwezigheid.js`). De harde
+   invariant: *een aanwezigheid heeft nooit méér bevoegdheid dan haar drager* —
+   zij is een projectieadres en geen actor. En volgen is altijd expliciet: een
+   kaartje kopen is geen volgen, lid zijn is geen volgen, ergens werken is geen
+   volgen, merchandise kopen is geen volgen.
+0b. ~~**Wie licht een Salon-post uit?**~~ **Genomen: een mens, op naam, met een
+   grond uit een gesloten lijst** (`kern/salon/uitlichten.js`). De grond hoeft
+   niet publiek te zijn, maar hij moet er zijn — geen grond, geen uitlichting —
+   en intrekken is even expliciet. `salonviraal` mag alleen VOORSTELLEN.
+
+**Open, en de eerste twee zijn nu gemeten in plaats van vermoed:**
+
+0c. **Discovery — hoe vindt een fan een publieke aanwezigheid?** Vandaag: niet.
+   Er is geen route die ze opsomt of doorzoekt, en `routes/festival/gast.js` legt
+   uit waarom dat er niet zomaar bij kan: *"er is in dit huis geen publieke kant,
+   en een line-up is het eerste dat er een van zou maken"*. Schakel 2 van de
+   momentproef.
+0d. **De Fan Inbox — hoe komt een fan van de wek terug bij het moment?**
+   Vandaag: niet. Een melding is in dit huis een WEK en geen link; geen enkele
+   `notify()` draagt een bestemming. Schakel 5 van de momentproef, en de
+   praktische vorm van *moment ≠ notificatie*.
+0e. **Krijgt de zaaiset een zaak van het type `sportclub`?** Zonder die is de
+   vierde Moment-aanleiding wel geteld door `wekdekking.js` maar nooit gelopen —
+   en geteld is niet gelopen. Schakel 10 van de momentproef.
 1. **Hoe heet het?** `moment` draagt al zes betekenissen (par. 1.1). Hernoemen
    of uitwijken — `presence`, `broadcast`, `drop` en `stage` zijn vrij.
 2. **Mag een vertegenwoordiger publiceren?** Een tiende bevoegdheid in een

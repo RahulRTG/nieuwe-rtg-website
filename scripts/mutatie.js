@@ -461,6 +461,26 @@ const EIGEN_MODULE = new Map([
      Bevestigd door de motor, en dat is hier de voorwaarde: een geraden module
      geeft de toets de schuld van wat deze lijst fout heeft. */
   ['versheid-uitvoer.test.js', ['scripts/versheid.js']],
+  /* DE WEKDEKKING laadt zijn meter via een PADVARIABELE (de toets vervangt het
+     besluitregister op schijf en moet daarna vers laden, dus de require staat
+     achter `require(METER)`). Statisch ziet de motor daardoor alleen
+     scripts/lib/wekbesluit.js -- en dat is een REGISTER: tekst, geen logica, en
+     dus geen bruikbare mutatiepositie. Dan blijft de toets buiten de meting en
+     bestraft toetsenNietGemeten precies het schrijven van deze toets.
+
+     Bevestigd door de motor, en dat is hier de voorwaarde: met deze regel
+     muteert hij scripts/wekdekking.js en zakt de toets erop. */
+  ['wekdekking.test.js', ['scripts/wekdekking.js']],
+  /* DE MOMENTPROEF wordt door zijn toets als TEKST gelezen (fs.readFileSync) en
+     niet gerequired: de toets bewaakt de VORM van het instrument -- zakt het op
+     een open schakel, draagt elke bevinding een reden, staan B en D er allebei --
+     en dat zijn beweringen over de bron zelf. Statisch ziet de motor daardoor
+     geen module, en dan blijft de toets buiten de meting en bestraft
+     toetsenNietGemeten precies het schrijven ervan.
+
+     Bevestigd door de motor, en dat is hier de voorwaarde: met deze regel
+     muteert hij scripts/momentproef.js en zakt de toets erop. */
+  ['momentproef.test.js', ['scripts/momentproef.js']],
   /* DE BUDGETTERUGNAME toetst de GRENS van registratieTerug (alleen terugnemen
      wat aantoonbaar leeg is) en de poort van MAX_PER_LID -- maar requiret
      kern/waarde als geheel, dus de motor mikte op index.js: de compositiewortel,

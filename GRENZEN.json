@@ -578,6 +578,7 @@
       "boardroomAuth",
       "boardroomLijst",
       "boardroomUser",
+      "boardroomWie",
       "capGezondheid",
       "commercieRechten",
       "commercieRonde",
@@ -608,6 +609,7 @@
       "reisaanbod",
       "reisbureau",
       "reisuitnodiging",
+      "salonUitlichten",
       "stad",
       "studio",
       "stuur",
@@ -739,6 +741,11 @@
       "markt"
     ],
     "mediaos": [
+      "aanwezigBeeld",
+      "aanwezigMet",
+      "aanwezigMijn",
+      "aanwezigVolg",
+      "aanwezigVolgtHij",
       "mediaBewaar",
       "mediaBieb",
       "mediaBord",

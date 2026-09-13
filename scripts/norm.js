@@ -696,6 +696,25 @@ const METERS = [
      ./lib/metingen.js. De invariant omlaag, het bereik omhoog. */
   { sleutel: 'aiContextLek', richting: 'omlaag', wat: 'velden die het kantoor schrijft en die Rahuls ledencontext ook leest (AICONTEXT.json)' },
   { sleutel: 'aiContextVeldenGezien', richting: 'omhoog', wat: 'velden van de ledenstaat die de contextmeter werkelijk heeft gezien' },
+  /* Het BEREIK van de stagevormmeter (STAGE.md par. 0), en om precies dezelfde
+     reden omhoog: de UITKOMST (0 gedeelde velden) mag bewegen, het aantal
+     publieke domeinen dat de meter ziet niet stil dalen. */
+  { sleutel: 'stageDomeinenGemeten', richting: 'omhoog', wat: 'publieke domeinen die de stagevormmeter werkelijk heeft gezien' },
+  /* Publieke domeinen waarover scripts/lib/wekbesluit.js geen uitspraak doet.
+     Omlaag, en hij staat op nul: een domein dat publiek is en waarvan niemand
+     heeft besloten of het de publieke rail op mag, hoort niet stil te kunnen
+     ontstaan (STAGE.md par. 8). */
+  { sleutel: 'wekZonderUitspraak', richting: 'omlaag', wat: 'publieke domeinen zonder uitspraak in het wekbesluitregister' },
+  /* SCHAKELS IN DE PUBLIEKE KETEN DIE OPENSTAAN MET EEN REDEN (MOMENTPROEF.json).
+     Omlaag, en dit is de tand die de uitweg `openBekend` eerlijk houdt: hij is
+     bedoeld voor een schakel die aantoonbaar niet sluit terwijl er een besluit
+     over openstaat, en zo'n uitweg verwatert vanzelf tot "alles wat niet werkt
+     krijgt een zinnetje". Elke open schakel is een openstaand besluit; er mogen
+     er dus alleen minder worden.
+
+     Wat hier NIET staat is het aantal gesloten schakels. Dat zou stijgen door de
+     proef langer te maken, en dan wordt een meter beter door hem te verlengen. */
+  { sleutel: 'momentOpenBekend', richting: 'omlaag', wat: 'schakels in de publieke keten die openstaan met een uitgeschreven reden (MOMENTPROEF.json)' },
   { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' },
   /* DE LUSINDEX (LUSSEN.json, npm run lussen). Drie tanden, en alle drie tellen
      ze een SCHULD en geen prestatie -- anders maakt lussen toevoegen de meter
@@ -1407,6 +1426,9 @@ function meet(bronnen) {
     carriereDomeinenGemeten: leesRegister('CARRIEREVORM.json', (j) => j.gemeten.domeinen),
     aiContextLek: leesRegister('AICONTEXT.json', (j) => j.muur.lek.length),
     aiContextVeldenGezien: leesRegister('AICONTEXT.json', (j) => j.ledenstaat.aantal),
+    stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
+    wekZonderUitspraak: leesRegister('WEKDEKKING.json', (j) => j.gemeten.zonderUitspraak),
+    momentOpenBekend: leesRegister('MOMENTPROEF.json', (j) => j.telling.openBekend),
     lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),
     lussenKritiek: leesRegister('LUSSEN.json', (j) => j.ratel.kritiek),
     lussenZonderOverlapRem: leesRegister('LUSSEN.json', (j) => j.ratel.wekkersAsyncZonderRem),

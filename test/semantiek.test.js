@@ -25,6 +25,12 @@ const fs = require('fs');
 const path = require('path');
 const S = require('../scripts/semantiek');
 
+/* MEET NIET NAAST EEN MOTOR DIE DE BRON VERBOUWT (scripts/lib/verseboom.js).
+   Deze toets meet de boom OPNIEUW en legt de uitslag naast SEMANTIEK.json;
+   loopt er intussen een meterijking of de mutatiemotor, dan telt hij hun
+   tijdelijke aanbouw mee en is het verschil met het register betekenisloos.
+   Zo meldde test/magnaatlab.test.js een keer 2069 waar er 2068 stonden. */
+const { afbouwInDeWeg } = require('../scripts/lib/verseboom');
 const WORTEL = path.join(__dirname, '..');
 const cat = (bestand, naam, leden) => ({
   bestand, naam, leden,
@@ -153,7 +159,13 @@ test('6d. het GETAL en de LIJST van dubbelingen kunnen niet uiteenlopen', () => 
     'het getal is de lengte van de lijst, en niet een tweede telling');
 });
 
-test('7. de echte meting draait, en klopt met wat er is vastgelegd', () => {
+test('7. de echte meting draait, en klopt met wat er is vastgelegd', (t) => {
+  /* De vergelijking hieronder is alleen iets waard op een boom die NIEMAND
+     aan het verbouwen is; zie scripts/lib/verseboom.js. Overslaan is hier geen
+     slagen: de reden gaat mee de uitslag in. */
+  const inDeWeg = afbouwInDeWeg('semantiek');
+  if (inDeWeg) return t.skip(inDeWeg);
+
   const r = S.meet();
   assert.ok(r.catalogi >= 200, 'er zijn catalogi gevonden (' + r.catalogi + ')');
   assert.ok(r.verschillendeNamen >= 100, 'en verschillende namen (' + r.verschillendeNamen + ')');

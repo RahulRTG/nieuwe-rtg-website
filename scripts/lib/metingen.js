@@ -97,6 +97,22 @@ const REGISTER = {
      naam) meldt diezelfde nul over minder bewijs. Een lek van nul uit een meter
      die niets meer ziet, is de gevaarlijkste vorm van groen. */
   'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
+  /* STAGEVORM.json meet of de publieke domeinen een datavorm delen (STAGE.md
+     par. 0). Om dezelfde reden als bij CARRIEREVORM.json hierboven is de
+     geratelde waarde het BEREIK en niet de uitkomst: dat er 0 velden gedeeld
+     worden is de bevinding waar het document op staat, en een bevinding die
+     beweegt is nieuws. Wat NIET mag bewegen is hoeveel publieke domeinen de
+     meter heeft gezien -- zakt dat stil, dan daalt de gedeeldheid door een
+     hernoemde map in plaats van door een feit, en leest de nul plotseling als
+     bevestiging terwijl hij een blinde vlek is. */
+  'STAGEVORM.json': { meter: ['stageDomeinenGemeten'] },
+  /* WEKDEKKING.json zet het BESLUIT (welke brongebeurtenis mag de publieke rail
+     op, scripts/lib/wekbesluit.js) naast de METING. Geratelde is
+     `wekZonderUitspraak`: publieke domeinen waarover het besluitregister
+     zwijgt. Die hoort op nul te staan en te blijven -- hij stijgt zodra er een
+     publiek domein bijkomt waar niemand over heeft nagedacht, en dat is precies
+     de stille groei die deze tand moet vangen. */
+  'WEKDEKKING.json': { meter: ['wekZonderUitspraak'] },
   'BEPROEVING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   /* De ACTUELE meting naast de geaccepteerde basislijn hierboven: scripts/
      beproeving.js schrijft hem na ELKE ronde, ook een gezakte, zodat rood
@@ -205,6 +221,7 @@ const REGISTER = {
   'ADAMPROEF.json': { eigenRatel: 'test/adamproef.test.js' },
   'DOELGROEPBEREIK.json': { eigenRatel: 'test/doelgroepbereik.test.js' },
   'AANVOERVORM.json': { eigenRatel: 'test/aanvoer.test.js' },
+  'MOMENTPROEF.json': { eigenRatel: 'test/momentproef.test.js' },
   'NAVIGATIEPROEF.json': { eigenRatel: 'test/navigatieproef.test.js' },
   'MOVEPROEF.json': { eigenRatel: 'test/moveproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },

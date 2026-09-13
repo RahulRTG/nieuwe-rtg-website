@@ -376,15 +376,16 @@ const REGISTERS = [
      "de keten sluit" meldt terwijl er sindsdien een schakel is verlegd, is erger
      dan geen meting.
 
-     Ze staan in de volgorde waarin ze iets zeggen: eerst de gouden ketens
+     Ze staan in de volgorde waarin ze iets zeggen: eerst de vijf gouden ketens
      en wat ze delen, dan de metingen over de code zelf, dan de twee kaarten. */
   ['TAFELPROEF.json', 'npm run tafelproef:vast', 'of de horecaketen sluit, van tafel tot correctie'],
   ['RITPROEF.json', 'npm run ritproef:vast', 'of de ritketen sluit, van aanvraag tot afronding'],
   ['TOELATINGSPROEF.json', 'npm run toelatingsproef:vast', 'of de toelatingsketen sluit, van aanvraag tot zaak'],
   ['ADAMPROEF.json', 'npm run adamproef:vast', 'of een jongere van 17 zonder account een mogelijkheid bereikt, en het zelf ziet'],
+  ['MOMENTPROEF.json', 'npm run momentproef:vast', 'of de publieke keten sluit, van een feit bij de bron tot een melding bij een volger'],
   ['DOELGROEPBEREIK.json', 'npm run doelgroepbereik:vast', 'of de VERKLAARDE doelgroep van een functie zijn eigen paden werkelijk kan bereiken'],
   ['AANVOERVORM.json', 'npm run aanvoervorm:vast', 'of de vijf terreinen van de aanvoer een VORM delen -- de vraag onder het aanvoercontract'],
-  /* De navigatieproef staat NAAST de drie gouden ketens en niet ertussen: hij
+  /* De navigatieproef staat NAAST de vijf gouden ketens en niet ertussen: hij
      meet geen keten tussen actoren maar de belofte van EEN scherm, in een echte
      browser (BETROUWBAARHEID.md par. 1). Daarom telt scripts/ketenvorm.js hem
      ook niet mee -- wat de ketens delen, wordt vertroebeld door een meting die
@@ -419,7 +420,18 @@ const REGISTERS = [
      uitweg zijn, terwijl er sindsdien drie bij kunnen zijn gekomen -- en aan dat
      getal hangt sinds 11 september 2026 een normtand. */
   ['LUSSEN.json', 'npm run lussen', 'elke cyclische gedraging met zijn terminatiegraad, en de drie schulden waar NORM.json op ratelt'],
-  ['CARRIEREVORM.json', 'node scripts/carrierevorm.js --vastleggen', 'of de talentdomeinen een datavorm delen -- CARRIERE.md par. 0 rust erop, dus een verouderde uitslag draagt daar een conclusie die niemand nog heeft nagerekend']
+  ['CARRIEREVORM.json', 'node scripts/carrierevorm.js --vastleggen', 'of de talentdomeinen een datavorm delen -- CARRIERE.md par. 0 rust erop, dus een verouderde uitslag draagt daar een conclusie die niemand nog heeft nagerekend'],
+  /* Zelfde soort als zijn buurman hierboven, en om dezelfde reden `overig`: het
+     is een uitslag waar een DOCUMENT op rust en geen poort waar iemand langs
+     binnenkomt. Wel scherper in een opzicht -- de uitslag is een NUL (0 velden
+     gedeeld over tien publieke domeinen), en STAGE.md par. 0 draagt daarop het
+     besluit dat een Moment een projectie is en geen object. Een verouderde nul
+     ziet er exact zo uit als een verse. */
+  ['STAGEVORM.json', 'npm run stagevorm:vast', 'of de publieke domeinen een datavorm delen -- STAGE.md par. 0 rust erop, en de uitslag is een nul die er vers en verouderd hetzelfde uitziet'],
+  /* Ook een nul, en om dezelfde reden hier: `zonderUitspraak: 0` betekent dat
+     elk publiek domein een besluit draagt. Verouderd betekent diezelfde nul
+     alleen nog dat er destijds geen domein ontbrak. */
+  ['WEKDEKKING.json', 'npm run wekdekking:vast', 'welke brongebeurtenis de publieke rail op mag -- de nul zegt dat geen publiek domein onbesproken is, en dat is alleen waar als hij vers is']
 ];
 
 /* De lezer van beide stempelvormen woont in ./lib/stempel.js -- hij stond hier

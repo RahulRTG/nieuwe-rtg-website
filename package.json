@@ -323,6 +323,8 @@
     "doodspoor:controle": "node scripts/doodspoor.js --controle",
     "tafelproef": "node scripts/tafelproef.js",
     "tafelproef:vast": "node scripts/tafelproef.js --vastleggen",
+    "momentproef": "node scripts/momentproef.js",
+    "momentproef:vast": "node scripts/momentproef.js --vastleggen",
     "ritproef": "node scripts/ritproef.js",
     "ritproef:vast": "node scripts/ritproef.js --vastleggen",
     "ketenvorm": "node scripts/ketenvorm.js",
@@ -362,7 +364,11 @@
     "crashas:vast": "node scripts/crashas.js --vastleggen",
     "crashgrenzen": "node scripts/crashgrenzen.js",
     "crashproef": "node scripts/crashproef.js",
-    "crashproef:vast": "node scripts/crashproef.js --vastleggen"
+    "crashproef:vast": "node scripts/crashproef.js --vastleggen",
+    "stagevorm": "node scripts/stagevorm.js",
+    "stagevorm:vast": "node scripts/stagevorm.js --vastleggen",
+    "wekdekking": "node scripts/wekdekking.js",
+    "wekdekking:vast": "node scripts/wekdekking.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

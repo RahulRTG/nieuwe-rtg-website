@@ -26,6 +26,12 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const M = require('../scripts/makers');
 
+/* MEET NIET NAAST EEN MOTOR DIE DE BRON VERBOUWT (scripts/lib/verseboom.js).
+   Deze toets meet de boom OPNIEUW en legt de uitslag naast MAKERS.json;
+   loopt er intussen een meterijking of de mutatiemotor, dan telt hij hun
+   tijdelijke aanbouw mee en is het verschil met het register betekenisloos.
+   Zo meldde test/magnaatlab.test.js een keer 2069 waar er 2068 stonden. */
+const { afbouwInDeWeg } = require('../scripts/lib/verseboom');
 /* Verzonnen makers, zodat er te toetsen valt met een uitkomst die je vooraf
    weet. Dat is de reden dat analyse() los staat van lees() (LAT-regel 10). */
 const maker = (id, o) => Object.assign({ id, naam: id, bestanden: 1, paden: ['x/' + id + '.js'],
@@ -123,7 +129,13 @@ test('7 - de echte meting draait, en vindt precies de twee webmakers', () => {
     'en het bewijs is de bloktaal, niet de huishouding');
 });
 
-test('8b - MAKERS.json is een AFDRUK van de meting en geen los verhaal', () => {
+test('8b - MAKERS.json is een AFDRUK van de meting en geen los verhaal', (t) => {
+  /* De vergelijking hieronder is alleen iets waard op een boom die NIEMAND
+     aan het verbouwen is; zie scripts/lib/verseboom.js. Overslaan is hier geen
+     slagen: de reden gaat mee de uitslag in. */
+  const inDeWeg = afbouwInDeWeg('makers');
+  if (inDeWeg) return t.skip(inDeWeg);
+
   /* Deze toets stond er eerst NIET, en dat was een gat dat dit huis al eens had
      gedicht: test/objectmodel.test.js toets 7 doet precies dit voor
      OBJECTMODEL.json, met de reden erbij -- twee plaatsen met dezelfde waarheid

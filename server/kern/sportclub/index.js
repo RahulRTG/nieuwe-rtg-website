@@ -20,7 +20,11 @@ const VELD_STATUS = ['goed', 'onderhoud', 'afgekeurd'];
 const VOORZIENINGEN = ['horeca', 'wc', 'entree', 'ehbo'];
 const KAMP_KETEN = ['aangevraagd', 'bevestigd', 'afgewezen'];
 
-function maakSportclub({ db, save, crypto, anthropic }) {
+/* `kern` is LAAT GEBONDEN en optioneel: de Media OS wordt in een latere laag
+   samengesteld (opzet/mediaos.js) terwijl de sportclub in kernlaag3 ontstaat.
+   Zonder hem werkt de club precies zoals hiervoor -- er gaat alleen geen
+   publiek moment uit. */
+function maakSportclub({ db, save, crypto, anthropic, kern }) {
   const nu = () => new Date().toISOString();
   const id = p => (p || 'sp') + crypto.randomBytes(4).toString('hex');
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
@@ -101,7 +105,7 @@ function maakSportclub({ db, save, crypto, anthropic }) {
   const vindWedstrijd = (c, wid) => c.wedstrijden.find(w => w.id === String(wid || ''));
 
   // de gedeelde ctx voor de deelbestanden
-  const ctx = { db, save, crypto, anthropic, nu, id, schoon, vandaag, club, clubs, seed, vindWedstrijd,
+  const ctx = { db, save, crypto, anthropic, kern, nu, id, schoon, vandaag, club, clubs, seed, vindWedstrijd,
     TEAM_CATEGORIEEN, VELD_STATUS, VOORZIENINGEN, KAMP_KETEN };
   const api = { seed, isSportclub };
   Object.assign(api, require('./stadion')(ctx));

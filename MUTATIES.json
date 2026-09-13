@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T12:44:03.547Z",
-    "commit": "72036c97",
+    "op": "2026-09-13T11:36:52.070Z",
+    "commit": "dba17d1f",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -56,6 +56,21 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "aanwezigheid-routes.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "aanwezigheid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/mediaos/aanwezigheid.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "accountroutes.test.js": {
       "soort": "puur",
@@ -273,14 +288,6 @@
       "module": "server/openai.js",
       "operator": "===->!==",
       "gezakt": 2
-    },
-    "aicontext-allowlist.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bron.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
     },
     "aidata.test.js": {
       "soort": "server",
@@ -4050,13 +4057,6 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
-    "ledenbaliespoor.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 4,
-      "scherp": "gezakt"
-    },
     "ledengids-race.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4994,27 +4994,6 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
-    "mn01-bevoegdheidsvoordeel.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 7,
-      "scherp": "gezakt"
-    },
-    "mn02-hoedanigheidsscheiding.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 4,
-      "scherp": "gezakt"
-    },
-    "mn02ai-contextbesmetting.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 7,
-      "scherp": "gezakt"
-    },
     "mobiliteit-werkkant-routes.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5058,6 +5037,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "momentproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/momentproef.js",
+      "operator": "===->!==#48",
+      "gezakt": 1,
+      "geprobeerd": 157
     },
     "mond.test.js": {
       "soort": "puur",
@@ -6178,11 +6165,12 @@
       "reden": "de tekst staat in server/kern/rahul-hart.js en niet in de module die de export draagt; wat hij vastlegt zijn woorden in een system prompt, en geen bronoperator raakt een letterlijke string. Met de hand tweemaal raak: een passie weghalen laat toets 1 zakken, scrypt -> md5 laat toets 2 zakken"
     },
     "rahul-mens.test.js": {
-      "soort": "server",
+      "soort": "puur",
       "staat": "gezakt",
-      "operator": "liegpoort /api/",
+      "module": "server/kern/rahul/taal.js",
+      "operator": "return-weg#0",
       "gezakt": 1,
-      "scherp": "gezakt"
+      "geprobeerd": 3
     },
     "rahul-omgang.test.js": {
       "soort": "puur",
@@ -6290,14 +6278,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
-    },
-    "registerklopt.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/registerklopt.js",
-      "operator": "getal+1#1",
-      "gezakt": 1,
-      "geprobeerd": 8
     },
     "reisagenda.test.js": {
       "soort": "server",
@@ -7809,6 +7789,14 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "stagevorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/stagevorm.js",
+      "operator": "getal+1#0",
+      "gezakt": 3,
+      "geprobeerd": 4
+    },
     "stempel.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -8945,6 +8933,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "wekdekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/wekdekking.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 2
     },
     "wekkers.test.js": {
       "soort": "puur",

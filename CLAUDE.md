@@ -581,6 +581,66 @@ C2PA 2.4 (april 2026) bevestigd, de OpenID4VCI-datum klopte niet (26 februari
 is echt", en *"dit bestand draagt herkomst"* en *"RTG heeft dit op datum X
 ontvangen"* worden nooit vermengd.
 
+**`STAGE.md` is de publieke laag boven de media- en eventdomeinen** -- RTG
+Stage: de publieke en sociale projectie van een mens, organisatie, werk of
+gebeurtenis. Niet een app naast Podium, Theater, Clips, Klankwerk, Salon,
+Festival en Sportclub, maar de laag die ze samen laat leven. Lees die vóór je
+iets bouwt waarmee een maker zijn publiek bereikt of een fan bij een optreden
+komt. De dragende bewering van de opzet -- *`Moment` wordt de fundamentele
+eenheid over acht domeinen* -- is eerst **gemeten** (`npm run stagevorm`,
+`STAGEVORM.json`, op de lezer van `scripts/objectmodel.js`) in plaats van
+aangenomen, want dat is exact de vorm waarin `Asset` en de carrierelus allebei
+al sneuvelden. De uitslag is streng: over 10 publieke domeinen staan er **0** van
+136 velden in álle domeinen, **0** in zelfs maar de helft, en **89%** in precies
+één -- de publieke domeinen zijn dus mínder verwant dan een willekeurige
+doorsnede van dit huis (71%). De meter is een mutatie aangedaan en bewoog:
+versmald tot `clips`+`theater` slaat hij om naar 5 gedeelde velden. Een
+`Moment`-OBJECT is daarmee niet gerechtvaardigd; de vorm die overleeft is de
+**projectie** van `kern/levensgraaf/graaf.js`, hier met zes etiketten
+(onderwerp, soort, bron, wanneer, deel, vermogens) waarvan `deel` een POORT is
+en geen etiket. Zeven correcties die je nergens anders moet herhalen, waarvan de
+vier scherpste: **`moment` is bezet en zesvoudig** (7 plekken in 6 domeinen, en
+de gevaarlijkste is `kern/socialegraaf/bronnen.js` -- een PRIVATE
+levensgebeurtenis onder dezelfde naam als een PUBLIEK moment is de
+`VERMOGENS`-botsing op de centrale naam van een hele laag); **de momentmotor
+bestaat al** en heet `kern/mediaos/wekken.js` (vier soorten, en 5 van de 11
+publieke domeinen roepen de haak `nieuwWerk()` aan -- het werk is aansluiten en
+niet uitvinden); **ManagementOS bestaat en heet `kern/vertegenwoordiging/`**
+(machtiging, de permission-diff in `simulatie.js`, het jeugdbestuur in
+`jeugd.js`) maar zijn bevoegdhedenlijst is met opzet GESLOTEN op negen en
+`publiceren` staat er niet bij -- dus "een manager mag publiceren zonder het
+wachtwoord" is een BESLUIT en geen bouwtaak; en **de relay-boom heeft geen
+terugval** (`herstelBoom()` herkoppelt alleen wezen), wat de voorwaarde is vóór
+er een kaartje verkocht wordt voor een uitzending. Acht grenzen in par. 5,
+waarvan de twee die het verst reiken: er komt **geen fanladder** (wat iemand
+heeft gedaan is een feit, waar hij "staat" is een oordeel) en **de meeteenheid
+is de gebeurtenis en nooit de mens** -- die regel staat vandaag in vier
+documenten met nul handhavers, en Stage is de eerste laag die er een kan
+krijgen. Par. 6 is de `momentproef`: de vierde ketenproef, en de eerste die over
+een PROJECTIE gaat in plaats van over een levering -- hij eindigt niet bij een
+geleverde dienst maar bij iemand die iets WEET. Tien schakels (zeven gesloten,
+drie `openBekend`), dertien storingen gehouden, en daarnaast vier
+ARCHITECTUURbeweringen, want een keten die sluit terwijl de projectie ondertussen
+een tweede waarheid is geworden heeft niets bewezen. Drie dingen daar niet
+wegpoetsen. De twee open schakels zijn ELKAARS spiegelbeeld en allebei een
+besluit van de eigenaar: de fan kan een aanwezigheid niet VINDEN (geen enkele
+route somt ze op -- Discovery), en hij kan na de wek niets DOEN (een melding is
+in dit huis een wek en geen link, en er is geen ledenroute om een festivalkaart
+te kopen -- de Fan Inbox). De derde is de vierde aanleiding zelf: de wedstrijd
+van een sportclub is wel GETELD door `wekdekking.js` maar niet GELOPEN, want de
+zaaiset heeft geen zaak van het type `sportclub` en geen route maakt er een --
+geteld is niet gelopen. En bewering **B is met een mutatie nagetrokken en bleef
+groen**: een volgersteller die vanuit de volgroute werd TERUGGESCHREVEN in de
+producten van het festival haalt het antwoord van de bron nooit, want dat wordt
+gevormd. Daarom staat er een bewering **D** naast die de BRON van de laag leest
+(welke `db.data`-collecties raakt Stage aan), en die vangt hem wel. Zwart-doos en
+bron zijn hier geen keuze maar twee helften. De proef vond zelf ook een defect
+dat geen enkele toets zag: de publieke aanwezigheid van een zaak droeg de naam
+van het FESTIVAL, dus een tweede festival hernoemde de aanwezigheid van het
+eerste en een volger zag een andere naam in zijn lijst zonder iets te hebben
+gedaan. De naam van het festival hoort in de TITEL van het moment; de naam van de
+aanwezigheid gaat over wie er spreekt (`kern/festival/index.js`, `dragerNaam`).
+
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
 schakelaar *ís* de juridische positie — geen twee dingen die toevallig
@@ -1725,13 +1785,11 @@ module, want een gedeelde ketenklasse eroverheen zou de `Asset`-fout zijn.
 Uitkomst over vier ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
 van <!--getal:ketenvorm.actorenTotaal-->19<!--/getal--> actoren gedeeld
 (gast/zaal/keuken tegenover lid/vervoerder/dispatch/chauffeur tegenover
-aanvrager/kantoor/keurder/dossier/tijd tegenover gezin/Adam/werkgever/mens) en
+aanvrager/kantoor/keurder/dossier/tijd tegenover gezin/Adam/werkgever/mens tegenover fan/festival/publieke wereld) en
 <!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van
 <!--getal:ketenvorm.themasTotaal-->10<!--/getal--> beloftethema's in ALLE vier.
 Die twee gaan allebei over de MACHINE en niet over het domein: mag dit twee
-keer, en zegt een weigering waarom. Er is een woord dat twee ketens delen --
-`zaak` -- en het betekent er niet hetzelfde (ontvanger tegenover uitkomst),
-precies de vorm die `SEMANTIEK.json` meet. **Een status-, actor- of
+keer, en zegt een weigering waarom. **Een status-, actor- of
 uitkomstcontract over domeinen heen is daarmee niet gerechtvaardigd**, en dat is
 een antwoord op MAATSTAF.md U40/U41 en geen uitstel; wat er wel onder ligt is de
 grens die OS.md trekt tussen platformvermogen en domeinvermogen, nu met bewijs
@@ -1743,6 +1801,14 @@ met een reden gewoon toetst. Drie patronen erbij (elk generaliserend voorbij de
 zin die hem aanleiding gaf) bracht hem terug op 2 -- dus die twee overleven een
 vierde, totaal andere keten. De actoren zijn nooit aangeraakt, en die staan op
 nul.
+
+En de vijfde keten legde een etiketteringsfout bloot die er
+al stond: "alleen tafel" betekende *niet in alle ketens* in plaats van *in
+precies deze*, dus een actor die twee ketens delen stond twee keer als "alleen".
+De beloftenkant was daar al voor gerepareerd, de actorenkant niet. Er is nu een
+middenbak (`kantoor`, `lid` en `zaak` staan in meer dan een keten, in geen enkele
+in alle vier) -- en het KOPGETAL bewoog daar niet van: gedeeld blijft "in alle
+ketens", en dat is nul.
 
 **De vierde keten leverde een REGEL en een METER op** (`MAATSTAF.md` par. 7f,
 `DOELGROEPBEREIK.json`, `npm run doelgroepbereik`). De regel geldt breder dan

@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-13",
   "gemeten": {
-    "bestanden": 2222,
-    "vormen": 1391,
-    "velden": 2018,
-    "modules": 761,
+    "bestanden": 2220,
+    "vormen": 1395,
+    "velden": 2021,
+    "modules": 763,
     "domeinen": 272,
     "envelopDrempel": 17,
     "envelop": 29,
-    "veldenDomeineigen": 1422,
+    "veldenDomeineigen": 1424,
     "veldenGedeeldVanafVier": 201,
     "gelijkendeVormparen": 20
   },
@@ -54,7 +54,7 @@
         "kern/clubs",
         "kern/command",
         "kern/commercie",
-        "kern/ledenbalie-inzage"
+        "kern/ledenbalie"
       ]
     },
     {
@@ -334,6 +334,18 @@
       ]
     },
     {
+      "veld": "ingetrokken",
+      "domeinen": 11,
+      "waar": [
+        "bedrijf",
+        "kern/beschermzaak",
+        "kern/carriereledger",
+        "kern/command",
+        "kern/festival",
+        "kern/mobiliteit"
+      ]
+    },
+    {
       "veld": "voor",
       "domeinen": 11,
       "waar": [
@@ -389,7 +401,7 @@
         "kern/commercie",
         "kern/concern",
         "kern/labfonds",
-        "kern/ledenbalie-inzage",
+        "kern/ledenbalie",
         "kern/livinglab"
       ]
     },
@@ -451,18 +463,6 @@
         "kern/frictie",
         "kern/geldbeleid",
         "kern/kantoor"
-      ]
-    },
-    {
-      "veld": "ingetrokken",
-      "domeinen": 10,
-      "waar": [
-        "bedrijf",
-        "kern/beschermzaak",
-        "kern/carriereledger",
-        "kern/command",
-        "kern/festival",
-        "kern/mobiliteit"
       ]
     },
     {

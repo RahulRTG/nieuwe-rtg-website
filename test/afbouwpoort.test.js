@@ -147,3 +147,46 @@ test('de twee documentgeneratoren roepen de gedeelde poort ook echt aan', () => 
       'scripts/' + naam + ' hoort de gedeelde poort aan te roepen (en niet in commentaar)');
   }
 });
+
+test('elk tijdelijk ijkbestand staat in .gitignore', () => {
+  /* DE AANLEIDING, 13 september 2026. test/meterijk.test.js zet voor de ijking
+     van `verstrengelingOnverklaard` `server/kern/zzijkbron.js` neer. Die naam
+     mist met OPZET de koppeltekens van zijn acht broertjes (de meter groepeert
+     op `familie` -- alles voor het eerste koppelteken -- dus `zz-ijk-bron` en
+     `zz-ijk-doel` zouden allebei familie `zz` heten en de meter zou niet
+     bewegen). Precies daardoor viel hij buiten elk `zz-ijk-tijdelijk*`-patroon
+     in .gitignore, en is hij met een `git add -A` meegecommit terwijl de ijking
+     liep.
+
+     .gitignore waarschuwt daar zelf al voor -- "`git add -A` genoeg om ze per
+     ongeluk mee te committen, dat scheelde hier een keer een haar" -- maar die
+     waarschuwing werd bewaakt door de patronen zelf, en een nieuw bestand met
+     een naam die er niet op past, ontsnapt daar per definitie aan.
+
+     Dit is dus de handhaver die ontbrak: niet de PATRONEN nalopen maar de
+     LIJST BESTANDEN die de ijking werkelijk neerzet. Komt er een negende bij
+     met weer een andere naam, dan zakt deze toets in plaats van dat het bestand
+     stil in de repo belandt. */
+  const fs = require('fs');
+  const path = require('path');
+  const { execFileSync } = require('child_process');
+  const WORTEL = path.join(__dirname, '..');
+  const bron = fs.readFileSync(path.join(__dirname, 'meterijk.test.js'), 'utf8');
+
+  const paden = [...new Set([...bron.matchAll(/metTijdelijkBestand\(\s*'([^']+)'/g)].map(m => m[1]))];
+  assert.ok(paden.length >= 8,
+    'geen tijdelijke ijkpaden gevonden (' + paden.length + ') -- dan bewaakt deze toets niets');
+
+  const nietGenegeerd = [];
+  for (const p of paden) {
+    /* `git check-ignore` geeft exitcode 1 als het pad NIET genegeerd wordt; dat
+       is hier de uitslag en geen fout, dus de worp wordt gevangen. */
+    let genegeerd = true;
+    try { execFileSync('git', ['check-ignore', '-q', p], { cwd: WORTEL, stdio: 'ignore' }); }
+    catch (e) { genegeerd = false; }
+    if (!genegeerd) nietGenegeerd.push(p);
+  }
+  assert.deepEqual(nietGenegeerd, [],
+    'deze tijdelijke ijkbestanden staan niet in .gitignore en kunnen dus met een ' +
+    '`git add -A` in de repo belanden terwijl de ijking loopt:\n  ' + nietGenegeerd.join('\n  '));
+});

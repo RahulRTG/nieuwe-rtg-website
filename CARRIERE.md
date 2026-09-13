@@ -73,7 +73,7 @@ daaruit niet de conclusie "dan is er geen commerce" maar: *`Koopbaar` wordt een
 model daarvoor is `kern/appstore/machtigingen.js` — het enige bestand in dit
 huis met een doel én een grens per item.
 
-En `KETENVORM.json` wees dezelfde kant op: over drie ketens 0 van 13 gedeelde
+En `KETENVORM.json` wees dezelfde kant op: over vier ketens 0 van 18 gedeelde
 actoren, maar 2 van 10 beloftethema's in álle drie — en **die twee gaan over de
 machine en niet over het domein** (mag dit twee keer, en zegt een weigering
 waarom).

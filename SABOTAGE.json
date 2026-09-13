@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:31:18.036Z",
-    "commit": "aa3d15bf",
-    "boomVuil": false,
-    "boomAnders": 0,
+    "op": "2026-09-13T12:00:50.786Z",
+    "commit": "d261541d",
+    "boomVuil": true,
+    "boomAnders": 2,
     "instrument": "scripts/sabotage.js",
     "node": "v22.22.2"
   },
@@ -359,6 +359,13 @@
       "reden": "3. een verklaarde grondwaarheid draagt ook een ijkUITSLAG in het register",
       "wachter": "test:test/meterwet.test.js",
       "duurMs": 783
+    },
+    "techniek-bewijsveld-een-relatie": {
+      "stand": "raak",
+      "afdruk": "8cda96c425619326",
+      "reden": "2. geen verklaring die verder reikt dan de meting",
+      "wachter": "test:test/bewijsveld.test.js",
+      "duurMs": 2442
     }
   }
 }

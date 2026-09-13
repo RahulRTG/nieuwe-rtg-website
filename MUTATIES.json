@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T10:10:01.671Z",
-    "commit": "ddf40c28",
+    "op": "2026-09-13T10:29:21.131Z",
+    "commit": "715e7c78",
     "boomVuil": false,
     "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
@@ -56,7 +56,8 @@
       "module": "server/kern/knelpunt/aanvoer.js",
       "operator": "===->!==#0",
       "gezakt": 9,
-      "geprobeerd": 1
+      "geprobeerd": 1,
+      "scherp": "gezakt"
     },
     "aanwezig.test.js": {
       "soort": "server",

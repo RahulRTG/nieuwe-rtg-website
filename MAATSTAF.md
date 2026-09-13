@@ -1201,6 +1201,91 @@ hier dus twee vragen en ze houden twee namen: kan een **mens** het scherm
 aantikken (`BEREIK.json`), en kan de **verklaarde doelgroep** de deur erachter
 open (`DOELGROEPBEREIK.json`).
 
+## 7g. De aanvoer: wat een bron minimaal moet leveren
+
+`openingen-kaart.js` wijst per terrein **één deur** aan ("hier kunt u kijken").
+De aanvoer is wat erachter staat: de vacatures zelf, de leerpaden zelf, de vrije
+opvangplekken zelf. Daarvoor is een contract nodig, en de verleiding is dat
+contract te **verklaren** — een `Manier` met vaste velden waar elk brondomein
+zich naar voegt. Dat is exact de vorm waarin `Asset` al een keer is gesneuveld,
+dus is het eerst gemeten.
+
+### De meting (`AANVOERVORM.json`, `npm run aanvoervorm`)
+
+Met de lezer van `scripts/objectmodel.js` — dezelfde als bij de Asset- en
+Koopbaar-metingen, want een tweede parser maakt de vergelijking waardeloos — en
+over **twee** domeinlijsten. Dat tweede is de les van `carrierevorm.js`, die op
+een versmalling omsloeg van 0 naar 8 van de 10 gedeelde velden: een uitslag die
+op de domeinlijst drijft, is geen uitslag.
+
+| | terreinen | velden | in ALLE | in precies één |
+|---|---|---|---|---|
+| **ruim** (alles wat naar het terrein ruikt) | 5 | 211 | **0** | 93,8% |
+| **smal** (de bron die de kaart noemt) | 3 | 17 | **0** | 100% |
+
+Onder de smalle lijst deelt zelfs geen enkel *paar* terreinen iets. Dat is
+scherper dan de Asset-meting (71% domeineigen) en scherper dan de
+carrière-meting (88,2%). Een `Manier` als **objecttype met verplichte velden is
+daarmee niet gerechtvaardigd**; wat overleeft is de vorm die dit huis al twee
+keer heeft gevonden — een **projectie met een klein aantal etiketten**, per
+aanroep samengesteld door het brondomein zelf (`kern/levensgraaf/graaf.js`, en de
+uitweg die COMMERCE.md voor `Koopbaar` koos).
+
+Twee dingen staan er als bevinding bij en zijn niet weggepoetst. `wonen` en
+`vervoer` hebben onder de smalle lijst **geen enkele kernvorm**: hun bron woont
+in een route, en de lezer van `objectmodel.js` kijkt alleen in `server/kern`,
+`server/bedrijf`, `server/school` en `server/papieren`. Dat is een blinde vlek en
+geen nul. En de ruime lijst maakt van `opleiding` vooral het schooldomein,
+terwijl de kaart zelf zegt dat die lijst *"van de schooladministratie is en niet
+van u"*.
+
+### Het contract
+
+`kern/knelpunt/aanvoer.js` is die afspraak: vijf verplichte etiketten
+(`terrein`, `wat`, `ingang`, `dektNiet`, `herkomst`) plus `beschikbaarheid`, die
+`null` blijft tenzij een bron zelf een aantal noemt. `dektNiet` is de duurste van
+de vijf — de gevaarlijkste lezer van deze laag is niet degene die een leegte voor
+een gat aanziet, maar degene die aanbod leest als "dit is geregeld".
+
+**De scherpste keuze staat in de handtekening: de laag krijgt de mens niet.**
+`vondsten()` neemt een randvoorwaarde en verder niets — geen profiel, geen
+codenaam, geen leeftijd. Daardoor is een geschiktheidstoets hier niet iets om af
+te leren maar iets dat **structureel niet kan** (FOUNDATION.md par. 5: een
+eligibility-motor mag alleen toevoegen; HDI.md par. 5.1). Een vondst die tóch een
+gegeven over de mens draagt, wordt **geweigerd met het veld erbij** en niet stil
+gefilterd.
+
+Het heet een **vondst** en geen "manier", omdat dat woord in ditzelfde domein al
+bezet is en er iets anders betekent: `kern/knelpunt/index.js` noemt een manier
+een *weg naar het doel*, met een eigen stand. `vondst` is gekozen omdat hij
+gemeten vrij was — vier kernbestanden noemen het woord, nul gebruiken het als
+veldnaam.
+
+### De eerste echte bron, en drie dingen die pas bij het draaien bleken
+
+`kern/knelpunt/aanvoer-werk.js` levert de openstaande vacatures. Geen van de drie
+fouten hieronder was met lezen te zien, en geen van de elf contracttoetsen kon er
+één van vangen — vandaar dat er twee toetsen tegen een **echte server** bij staan.
+
+1. **De lus liep over een veld dat niet bestaat.** Knelpunten komen uit de motor
+   als platte rij, en een knelpunt *is* de randvoorwaarde. Er kwam nul uit
+   terwijl alles werkte, en een lege lijst zag er precies zo uit als "geen
+   vacatures".
+2. **De bron gaf stilletjes een lege lijst**, omdat `const { openVacatures } =
+   kern` op montagemoment `undefined` bevriest — waar de kop van
+   `opzet/aanbouw3.js` letterlijk voor waarschuwt. Nu een late ophaler, en een
+   niet-aangesloten bron **gooit** in plaats van te zwijgen.
+3. **De zaadgegevens dragen nul open vacatures.** De keten klopte dus wel, maar de
+   wereld was leeg. Sinds `vondstenBronLeeg` is *"deze bron heeft hier niets"* te
+   onderscheiden van *"niet aangesloten"* — dezelfde regel als in
+   `kern/ontvanger.js`, en hij komt uit dezelfde fout.
+
+Vier van de vijf terreinen hebben nog geen bron. Dat staat in het antwoord als
+`vondstenZonderBron` **met de reden**, en alleen over de terreinen die het
+knelpunt werkelijk raakt: "voor wonen is geen bron aangesloten" onder een vraag
+die niets met wonen te maken heeft, leest als een tekortkoming in plaats van als
+een mededeling.
+
 ## 8. De volgorde
 
 1. **Dit document** — welke uitspraak huisgrond heeft, welke wordt

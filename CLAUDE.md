@@ -1550,6 +1550,33 @@ SCHERMEN die je niet kunt aantikken, en die toets is tijdens het bouwen
 overschreven zonder dat een enkele toets het zag; de ratel `metingenZonderRatel`
 sprong van 50 naar 51 en wees het aan.
 
+**En daarboven staat de AANVOER** (`MAATSTAF.md` par. 7g,
+`server/kern/knelpunt/aanvoer*.js`, `AANVOERVORM.json`). De openingenkaart wijst
+per terrein EEN deur aan; de aanvoer is wat erachter staat. Of daar een gedeeld
+objecttype onder kan, is eerst GEMETEN en niet verklaard -- zelfde reden als bij
+`Asset`, met de lezer van `scripts/objectmodel.js` zodat de getallen naast elkaar
+te leggen zijn, en over TWEE domeinlijsten zodat de uitslag niet op de lijst
+drijft (de les van `carrierevorm.js`, die op een versmalling omsloeg van 0 naar
+8). Ruim: **0 velden in alle vijf terreinen**, 93,8% in precies een. Smal: 0 in
+alle, 100% in precies een, en geen enkel PAAR deelt iets. Dus geen `Manier`-type
+maar een PROJECTIE met vijf verplichte etiketten (`terrein`, `wat`, `ingang`,
+`dektNiet`, `herkomst`) plus `beschikbaarheid` die `null` blijft tenzij een bron
+hem noemt. Drie dingen daar niet wegpoetsen. **De laag krijgt de mens niet, en
+dat staat in de handtekening**: `vondsten()` neemt een randvoorwaarde en verder
+niets, waardoor een geschiktheidstoets hier structureel niet KAN in plaats van
+verboden is -- een vondst die toch een gegeven over de mens draagt wordt
+GEWEIGERD met het veld erbij. Het woord **`manier` was al bezet in ditzelfde
+domein** (`kern/knelpunt/index.js`: een WEG naar het doel, met een eigen stand),
+dus heet het een vondst -- gemeten vrij, vier kernbestanden noemen het woord en
+nul als veldnaam. En **een lege bron is geen stille lijst**: vacatures zijn
+aangesloten (`aanvoer-werk.js`, zonder enige filtering op de mens -- wat een
+vacature EIST staat zichtbaar in `wat` en wordt nooit toegepast), en de drie
+fouten die dat opleverde waren geen van drieën met lezen te zien -- een lus over
+een veld dat niet bestaat, een `const { openVacatures } = kern` die op
+montagemoment `undefined` bevriest, en zaadgegevens met NUL open vacatures. De
+elf contracttoetsen zagen er geen enkele van; twee toetsen tegen een echte server
+wel.
+
 **`INTELLIGENTIE.md` is de laag BOVEN het stuur** -- de RTG Intelligence Layer,
 als richtingsdocument met per onderdeel of het **staat**, **een stap weg** is,
 **een besluit vraagt** of **jaren weg** is. Lees die voor je iets bouwt waarmee

@@ -1,11 +1,11 @@
 {
   "uitleg": "Gemeten met scripts/mutatiesemantiek.js; de vraag en de methode staan in de kop van dat bestand en in CREATE.md par. 10. Dit script plakt geen etiketten: het legt VERKLAARD naast GEMETEN en meldt de tegenspraak.",
-  "vastgelegd": "2026-09-12",
+  "vastgelegd": "2026-09-13",
   "gemeten": {
     "routesMetRol": 4179,
-    "routesGevonden": 4436,
+    "routesGevonden": 4437,
     "verklaard": 35,
-    "onverklaard": 4401,
+    "onverklaard": 4402,
     "beproefd": 1668,
     "onbereikbaarVoorDeProef": 3244,
     "verklaardEnBeproefd": 12,

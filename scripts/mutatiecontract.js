@@ -47,6 +47,11 @@ const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'MUTATIECONTRACT.json');
 const vastleggen = process.argv.includes('--vastleggen');
 const toonOpen = process.argv.includes('--open');
+/* --telling: alleen de tellingen naar stdout, als JSON. Bestaat zodat
+   test/mutatiecontract.test.js het register kan HERBEREKENEN in plaats van het
+   te geloven -- zie de toets "de afdruk loopt niet achter op de code" daar, en
+   de kop van dit bestand. */
+const alleenTelling = process.argv.includes('--telling');
 
 const sleutelVan = (methode, pad) => String(methode || 'POST').toUpperCase() + ' ' + pad;
 
@@ -506,6 +511,22 @@ for (const r of routes) {
 }
 
 const t = contract.telling(rijen);
+
+/* DE VROEGE UITGANG VOOR --telling. Alleen de tellingen, als JSON, en verder
+   niets -- geen bord, geen bestand. test/mutatiecontract.test.js gebruikt hem om
+   het ingecheckte register te HERBEREKENEN in plaats van het te geloven.
+
+   Waarom dat nodig was: de poort op LEGACY_PENDING_CLASSIFICATION las het
+   ingecheckte artefact, en dat kan een commit achterlopen. Op 9 september kromp
+   MUTATIECONTRACT-AFGELEID.json van 3192 naar 3142 zonder dat dit register werd
+   meegeregenereerd; de poort stond daarna vier dagen groen op nul terwijl er 47
+   routes zonder contract stonden. Precies de valkuil die EXECUTION_MAP.json al
+   een keer heeft opgelost: de autoriteit komt LIVE en nooit uit een
+   bouwartefact. */
+if (alleenTelling) {
+  process.stdout.write(JSON.stringify({ totaal: t.totaal, perStand: t.perStand }) + '\n');
+  process.exit(0);
+}
 
 /* ---------------------------------------------------------------------------
    HET BORD

@@ -52,7 +52,6 @@ const NOG_ZONDER = [
   'POST /api/foundation/gezin/uitnodiging/bekijk',
   'POST /api/foundation/gezin/uitnodiging/intrek',
   'POST /api/foundation/gezin/uitnodiging/maak',
-  'POST /api/foundation/kosten',
   'POST /api/foundation/mail/lees',
   'POST /api/foundation/mail/stuur',
   'POST /api/foundation/school/personeel/inlog/accepteer',

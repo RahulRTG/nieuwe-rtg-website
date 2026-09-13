@@ -25,6 +25,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const contract = require('../server/kern/mutatiecontract');
 const mutatie = require('../server/kern/mutatie');
@@ -277,6 +278,51 @@ test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {
     'er staan ' + nu + ' onverklaarde schrijfroutes en de grens is ' + GRENS + '. ' +
     'Een nieuwe schrijfroute hoort een contract te krijgen in server/lib/mutatiecontracten.js ' +
     'VOORDAT hij bestaat -- zie de kop van dat bestand.');
+});
+
+test('de afdruk loopt niet achter op de code', () => {
+  /* DE POORT DIE HIER ONTBRAK, EN DAT KOSTTE VIER DAGEN.
+
+     De twee toetsen hierboven lezen het INGECHECKTE MUTATIECONTRACT.json. Dat is
+     een bouwartefact, en een bouwartefact kan een commit achterlopen -- precies
+     wat EXECUTION_MAP.json al een keer heeft opgelost met "de autoriteit komt
+     LIVE en nooit uit een bouwartefact".
+
+     Op 9 september kromp MUTATIECONTRACT-AFGELEID.json van 3192 naar 3142 regels
+     (de proef kwam er wel bij, dus de afgeleide stand viel terecht weg) zonder
+     dat dit register werd meegeregenereerd. De poort op
+     LEGACY_PENDING_CLASSIFICATION stond daarna vier dagen groen op NUL terwijl er
+     47 schrijfroutes zonder contract waren -- en zij kwamen pas boven toen een
+     andere tak het register toevallig vers schreef.
+
+     Deze toets HERBEREKENT de telling in plaats van haar te geloven. Hij draait
+     hetzelfde instrument (scripts/mutatiecontract.js --telling, een eigen uitgang
+     die alleen de tellingen als JSON geeft), zodat er geen tweede lezer van
+     dezelfde waarheid ontstaat -- LAT.md regel 4.
+
+     DE MUTATIE: verwijder een regel uit server/lib/mutatiecontracten-naleesronde.js
+     zonder het register opnieuw te schrijven -> deze toets zakt met het verschil
+     erbij, en de twee toetsen hierboven blijven groen. Dat is het gat, en dit is
+     de dekking. */
+  const uit = execFileSync(process.execPath,
+    [path.join(WORTEL, 'scripts', 'mutatiecontract.js'), '--telling'],
+    { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
+  const vers = JSON.parse(uit.trim().split('\n').pop());
+
+  assert.strictEqual(vers.totaal, register.gemeten.totaal,
+    'MUTATIECONTRACT.json telt ' + register.gemeten.totaal + ' schrijfroutes en de code ' +
+    vers.totaal + ' -- de afdruk loopt achter; draai: node scripts/mutatiecontract.js --vastleggen');
+
+  /* ELKE STAND, en niet alleen LEGACY. Een afdruk die maar half wordt vergeleken
+     is een afdruk die half achterloopt (zelfde les als test/capabilities.test.js
+     toets 8). Een stand die in de ene en niet in de andere staat, telt als nul. */
+  const standen = new Set([...Object.keys(vers.perStand), ...Object.keys(register.gemeten.perStand)]);
+  for (const stand of standen) {
+    assert.strictEqual(vers.perStand[stand] || 0, register.gemeten.perStand[stand] || 0,
+      'MUTATIECONTRACT.json loopt achter op "' + stand + '" (' +
+      (register.gemeten.perStand[stand] || 0) + ' vastgelegd, ' + (vers.perStand[stand] || 0) +
+      ' gemeten) -- draai: node scripts/mutatiecontract.js --vastleggen');
+  }
 });
 
 test('het register telt hetzelfde als de mutatie-inventaris', () => {

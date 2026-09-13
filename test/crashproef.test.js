@@ -320,3 +320,93 @@ test('zelfijking: de drie uitkomsten zijn werkelijk drie', () => {
   const alle = new Set([oordeel(0, null), oordeel(3, { zelfdeVerzoek: true }), oordeel(3, null)]);
   assert.equal(alle.size, 3, 'de regel valt niet uiteen in drie uitkomsten en weegt dus niets');
 });
+
+/* ============================================================================
+   DE HAAK NAAR DE VOORZIENING -- de meetfout die zes routes de verkeerde kant
+   op stuurde, en waarom hij hier drie toetsen krijgt.
+
+   scripts/crashproef.js riep de voorziening van idemwereld.js aan met
+   `{ post, tokens }` terwijl zij `{ post, tokenVoor, rol, w }` verwacht, en
+   ving het gevolg op in een LEGE catch. Nagemeten op 13 september: elke
+   voorziening in dat bestand gooide erop ("tokenVoor is not a function",
+   "Cannot read properties of undefined (reading 'iban')"). De rijen meldden
+   daarna keurig BLOCKED_WORLD -- een blokkade die van de PROEF was en niet van
+   de route, en die er van buiten precies zo uitzag als echt ontbrekend werk.
+
+   De drie toetsen dekken de drie manieren waarop dit terugglijdt: de aanroep
+   verliest weer een veld, de uitkomst wordt weer weggegooid, of de reden zwijgt
+   erover. */
+test('de aanroep geeft een ECHTE voorziening genoeg om te werken, en zet het in het lijf', async () => {
+  const { voorzieningVoor } = require('../scripts/lib/idemwereld.js');
+  const maak = voorzieningVoor('/api/bank/pas/sluit');
+  assert.ok(maak, 'dit pad hoort een voorziening te hebben -- anders meet deze toets niets');
+  const lijf = { bestond: 'al' };
+  const uit = await cp.draaiVoorziening({ maak, lijf, rol: 'member',
+    post: async () => ({ status: 200, data: { pas: { id: 'verse-pas' } } }),
+    tokenVoor: () => 'token', w: { iban: 'NL00RTG0000000001' } });
+  assert.equal(uit.stand, 'gelukt', 'onder het juiste contract hoort zij te lukken: ' + (uit && uit.reden));
+  assert.equal(lijf.id, 'verse-pas', 'en haar id hoort IN het lijf -- anders noemt de route het oude');
+  assert.equal(lijf.bestond, 'al', 'zonder de rest van het lijf weg te gooien');
+});
+
+/* DE TWEE VELDEN DIE ONTBRAKEN, ELK APART. De oude aanroep miste `tokenVoor`
+   EN `w`; met maar een van beide terug zou hij nog steeds omvallen, en dan is
+   een toets die alleen het geheel dekt te grof om te wijzen waar het misging. */
+test('mist de aanroep een veld, dan MELDT hij dat -- hij zwijgt nooit', async () => {
+  const { voorzieningVoor } = require('../scripts/lib/idemwereld.js');
+  const post = async () => ({ status: 200, data: { pas: { id: 'p' } } });
+  const zonderWereld = await cp.draaiVoorziening({ maak: voorzieningVoor('/api/bank/pas/sluit'),
+    lijf: {}, post, tokenVoor: () => 't', rol: 'member', w: null });
+  assert.equal(zonderWereld.stand, 'mislukt', 'zonder wereld kan zij geen pas uitgeven');
+  assert.match(zonderWereld.reden, /rekening|iban/i, 'en zegt wat zij miste');
+
+  const zonderToken = await cp.draaiVoorziening({ maak: voorzieningVoor('/api/supplier/pos/checkout'),
+    lijf: {}, post, tokenVoor: undefined, rol: 'supplier', w: {} });
+  assert.equal(zonderToken.stand, 'mislukt', 'dit was de fout: zij viel om en niemand hoorde het');
+  assert.match(zonderToken.reden, /viel om/, 'nu draagt zij de val zelf');
+});
+
+test('geen voorziening is geen uitslag -- null en niet een verzonnen `gelukt`', async () => {
+  assert.equal(await cp.draaiVoorziening({ maak: null, lijf: {} }), null);
+});
+
+test('elke voorziening overleeft het contract waarmee de crashproef haar aanroept', async () => {
+  const { VOORZIENINGEN } = require('../scripts/lib/idemwereld.js');
+  /* Een neppe wereld met alles erin wat een voorziening kan opvragen: het gaat
+     hier om de VORM van de aanroep, niet om een echte ronde. */
+  /* EEN NEPANTWOORD DAT ELKE VORM DRAAGT DIE EEN VOORZIENING LEEST, en dat is
+     hier een bewuste zwakte met een bewuste opbrengst. Zwak, want een fixture
+     die alles teruggeeft houdt zich aan de vorm die de code AANNEEMT in plaats
+     van aan die van de echte server -- precies hoe achttien groene toetsen
+     eerder een kapotte functie dekten. De opbrengst is dat een NIEUWE
+     voorziening wier vorm hier niet in staat, deze toets laat zakken: dat is op
+     13 september gebeurd bij facturen/pdf, en het is de bedoeling. Wat er
+     werkelijk uitkomt, meet de crashronde tegen een echte server. */
+  const post = async () => ({ status: 200, data: { pas: { id: 'p1' }, code: 'k1',
+    verzoeken: [{ id: 'v1' }], regel: { id: 'r1' }, factuur: { id: 'F-1' } } });
+  const tokenVoor = () => 'token';
+  const w = { iban: 'NL00RTG0000000001', iban2: 'NL00RTG0000000002', cn2: 'CN-2' };
+  for (const [pad, maak] of Object.entries(VOORZIENINGEN)) {
+    const v = await maak({ post, tokenVoor, rol: 'member', w });
+    assert.ok(v && typeof v === 'object', pad + ': een voorziening geeft altijd een object terug');
+    assert.ok(!v.fout, pad + ': viel om op een wereld die alles heeft -- ' + v.fout);
+  }
+});
+
+test('een omgevallen voorziening staat IN de reden en verdwijnt niet in een catch', () => {
+  const zonder = cp.weegBlokkade({ status: 404, leestBody: true });
+  const met = cp.weegBlokkade({ status: 404, leestBody: true,
+    voorziening: { stand: 'mislukt', reden: 'tokenVoor is not a function' } });
+  assert.equal(met.blokkeertOp, 'WERELD', 'de stand blijft: wij weten niet waar hij met een heel onderwerp strandt');
+  assert.notEqual(met.reden, zonder.reden, 'maar de reden mag dit feit niet verzwijgen');
+  assert.match(met.reden, /voorziening/, 'en noemt waar de lezer eerst moet kijken');
+  assert.match(met.reden, /tokenVoor is not a function/, 'met de werkelijke fout erbij');
+});
+
+test('een GELUKTE voorziening laat de reden met rust -- geen waarschuwing zonder grond', () => {
+  const schoon = cp.weegBlokkade({ status: 400, leestBody: true });
+  const gelukt = cp.weegBlokkade({ status: 400, leestBody: true,
+    voorziening: { stand: 'gelukt', velden: ['id'] } });
+  assert.equal(gelukt.reden, schoon.reden,
+    'een voorziening die het deed, is geen reden om aan de meting te twijfelen');
+});

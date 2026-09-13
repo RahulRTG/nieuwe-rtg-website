@@ -896,7 +896,30 @@ function geldLijf(w) {
        openbreekt om een getal te halen, meet niets meer. Die twee blijven dus
        blind, en dat staat in KANTOORMACHT.json met hun reden. */
     '/api/office/bank/rekening/open': { codenaam: w.cn2, soort: 'spaar', naamRek: 'Kantoorproefpot' },
-    '/api/office/bank/rekening/rood': { iban: w.iban, euro: 100 }
+    '/api/office/bank/rekening/rood': { iban: w.iban, euro: 100 },
+    /* ====================================================================
+       DE ZAAKKANT, en die vraagt andere velden dan de ledenkant -- elk
+       hieronder is uit de BRON gelezen en niet uit een broertje afgeleid.
+
+       De verleiding was om er een gedeeld "supplier-lijf" van te maken. Dat
+       zou precies de fout zijn waar deze module tegen bestaat: de vier routes
+       delen geen enkel veld, en drie ervan rekenen in een andere eenheid dan
+       hun buurman. `giftcard/sell` is daarvan de scherpste: hij leest
+       `req.body.bedrag` als EURO'S en weigert buiten 10..5000, terwijl elke
+       geldroute eronder in CENTEN rekent. Wie daar 500 centen instuurt, krijgt
+       geen foutmelding over de eenheid maar een cadeaukaart van vijfhonderd
+       euro -- of, met 100, een 400 die eruitziet als een ontbrekend veld.
+       ==================================================================== */
+    '/api/supplier/betaalverzoek': { codename: w.cn2, centen: 500, omschrijving: 'proefverzoek' },
+    /* `bedrag` in EURO'S: zie hierboven. 25 ligt binnen 10..5000. */
+    '/api/supplier/giftcard/sell': { bedrag: 25 },
+    /* `regels[]` met `stuk` als prijs, en `koperNaam` naast `codenaam`: de
+       eerste is wat op de factuur komt te staan, de tweede wie hem krijgt.
+       boekMetCodenaam() valt zonder regels terug op een enkele regel uit
+       losse velden -- die terugval is hier met opzet niet gebruikt, want dan
+       beproeft de meting een pad dat een echte zaak nooit neemt. */
+    '/api/supplier/facturen/maak': { soort: 'dienst', koperNaam: 'Proef Koper', codenaam: w.cn2,
+      regels: [{ omschrijving: 'Proefregel', aantal: 1, stuk: 25 }] }
   };
   /* Een route waarvan de wereld het benodigde stuk NIET heeft opgeleverd, krijgt
      hier niets. Anders zou hij een lijf met `id: null` krijgen en op een andere
@@ -971,6 +994,28 @@ function geldLijf(w) {
 let teller = 0;
 const versSleutel = (wat) => 'voorziening-' + wat + '-' + (++teller) + '-' + Date.now();
 
+/* SALDO OP DE REKENING VAN DE ZAAK -- twee voorzieningen hadden hem nodig, dus
+   hij staat een keer. De zaak ontvangt via een VERSE kascode van het LID: twee
+   rollen in een voorziening, en de kascode uit de wereld is eenmalig en allang
+   op tegen de tijd dat deze routes aan de beurt zijn.
+
+   Onder het plafond van de kascode blijven: die weigerde een verkoop van 200 met
+   "Boven het maximum van deze code (150.00 euro)". Een voorziening die tegen een
+   echte grens aanloopt, verlaagt haar bedrag -- zij verhoogt geen plafond.
+
+   Geeft een string terug bij mislukking en null bij succes, zodat de aanroeper
+   hem rechtstreeks in zijn `fout` kan zetten. */
+async function zaakSaldo({ post, tokenVoor }) {
+  const kas = await post('/api/pay/kascode', { centen: 10000, idem: versSleutel('kascode') }, tokenVoor('member'));
+  const code = (kas.data && (kas.data.code || (kas.data.kascode && kas.data.kascode.code))) || null;
+  if (!code) return 'pay/kascode gaf ' + kas.status;
+  const verkoop = await post('/api/supplier/pos/sale',
+    { total: 100, method: 'rtgpay', payCode: code, idem: versSleutel('zaaksaldo') }, tokenVoor('supplier'));
+  if (!(verkoop.status >= 200 && verkoop.status < 300))
+    return 'pos/sale (rtgpay) gaf ' + verkoop.status + ' ' + ((verkoop.data && verkoop.data.error) || '');
+  return null;
+}
+
 const VOORZIENINGEN = {
   /* Een VERSE pas, want de ijkoproep sluit de vorige. */
   '/api/bank/pas/sluit': async ({ post, tokenVoor, w }) => {
@@ -1020,22 +1065,56 @@ const VOORZIENINGEN = {
     if (!(r && r.status >= 200 && r.status < 300)) return { fout: 'pos/sale gaf ' + (r && r.status) };
     return { room: kamer, method: 'contant' };
   },
-  /* Saldo op de rekening van de ZAAK, want oormerken kan niet uit niets. De zaak
-     ontvangt via een VERSE kascode van het LID -- twee rollen in een voorziening,
-     en de kascode uit de wereld is eenmalig en allang op. */
+  /* EEN ECHTE FACTUUR om een pdf van te maken. `facturen/pdf` stond op 404
+     "Factuur niet gevonden": de wereld maakt wel een factuur voor de LEDENkant
+     (w.factuurId), maar facturatie.mag() eist dat de VERKOPER dezelfde zaak is
+     als die het opvraagt. Een id uit een andere hoek van de database is dus
+     geen factuur van deze zaak, en dat verschil is precies wat die poort
+     bewaakt -- hem omzeilen zou de proef een deur laten passeren die in
+     productie dicht hoort te zitten. */
+  '/api/supplier/facturen/pdf': async ({ post, tokenVoor, w }) => {
+    if (!w.cn2) return { fout: 'geen tweede codenaam in de wereld' };
+    const r = await post('/api/supplier/facturen/maak',
+      { soort: 'dienst', koperNaam: 'Proef Koper', codenaam: w.cn2,
+        regels: [{ omschrijving: 'Proefregel', aantal: 1, stuk: 25 }],
+        idem: versSleutel('factuur') }, tokenVoor('supplier'));
+    const id = r && r.data && r.data.factuur && r.data.factuur.id;
+    return id ? { id } : { fout: 'facturen/maak gaf ' + (r && r.status) +
+      ' ' + ((r && r.data && (r.data.error || r.data.fout)) || '') };
+  },
+  /* Saldo op de rekening van de ZAAK, want oormerken kan niet uit niets. */
   '/api/supplier/pay/treasury/apart': async ({ post, tokenVoor }) => {
-    /* Onder het plafond van de kascode blijven: die weigerde een verkoop van
-       200 met "Boven het maximum van deze code (150.00 euro)". Een voorziening
-       die tegen een echte grens aanloopt, verlaagt haar bedrag -- zij verhoogt
-       geen plafond. */
-    const kas = await post('/api/pay/kascode', { centen: 10000, idem: versSleutel('kascode') }, tokenVoor('member'));
-    const code = (kas.data && (kas.data.code || (kas.data.kascode && kas.data.kascode.code))) || null;
-    if (!code) return { fout: 'pay/kascode gaf ' + kas.status };
-    const verkoop = await post('/api/supplier/pos/sale',
-      { total: 100, method: 'rtgpay', payCode: code, idem: versSleutel('treasury') }, tokenVoor('supplier'));
-    if (!(verkoop.status >= 200 && verkoop.status < 300))
-      return { fout: 'pos/sale (rtgpay) gaf ' + verkoop.status + ' ' + ((verkoop.data && verkoop.data.error) || '') };
+    const f = await zaakSaldo({ post, tokenVoor });
+    if (f) return { fout: f };
     return { naam: 'Proefoormerk', centen: 1000, doel: 'btw' };
+  },
+  /* UITBETALEN VRAAGT TWEE DINGEN, en het eerste is niet wat het lijkt.
+
+     De triagelijst had de 409 hier genoteerd als "niets uit te betalen". De bron
+     zegt iets anders (kern/pay/partner.js partnerUitbetaal): de EERSTE poort is
+     of er uberhaupt een bankrekening van de zaak bekend is --
+
+       "Er staat geen bankrekening voor deze zaak. Zonder rekening zou het saldo
+        van de wallet af gaan zonder ergens aan te komen, en dat gebeurt hier niet."
+
+     -- en dat is de 409 die de proef werkelijk zag (reden `geen-rekening`). Pas
+     DAARNA komt het saldo, en dat geeft een 400 en geen 409. Wie de status uit
+     een broertje had afgeleid, had hier saldo aangeschoven en was op dezelfde
+     409 blijven staan.
+
+     De rekening wordt voor het EERST gezet en niet gewijzigd, en dat scheelt de
+     wachttijd: zaakRekeningZet() geeft een nieuwe rekening `bruikbaarVanaf` nu,
+     terwijl een WIJZIGING vier uur wacht -- een rem tegen iemand die de inlog
+     van een zaak overneemt. Die rem wordt hier niet omzeild maar niet geraakt. */
+  '/api/supplier/pay/uitbetaal': async ({ post, tokenVoor }) => {
+    const rek = await post('/api/supplier/pay/rekening',
+      { iban: BUITEN_IBAN, naam: 'Proefzaak Uitbetaling', idem: versSleutel('zaakrekening') },
+      tokenVoor('supplier'));
+    if (!(rek.status >= 200 && rek.status < 300))
+      return { fout: 'pay/rekening gaf ' + rek.status + ' ' + ((rek.data && rek.data.error) || '') };
+    const f = await zaakSaldo({ post, tokenVoor });
+    if (f) return { fout: f };
+    return {};
   }
 };
 

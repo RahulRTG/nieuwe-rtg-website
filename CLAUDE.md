@@ -422,15 +422,37 @@ inzagejournaal niet. De klasse-meting bestaat ook al (`FAALPROEF.json`,
 en pas daarna beproefd met beide verraadstanden). En de plek die eerst genoemd
 werd, klopte niet: `kluispoort.js` is een IDENTITEITSpoort die vóór de route
 draait en het onderwerp van de inzage niet kent -- het contract hoort bij het
-journaal en de leesweg, niet bij de deur ervoor. Het duurste getal staat daar:
-van de 570 kantoorroutes in FAALPROEF.json is **528 `ongemeten`**, 33 bewezen en
-**9 gezakt**, en de reden bij de hele ledenbalie is *status 403* -- de proef komt
-met de gedeelde code en de kluispoort weigert die terecht. **De gevoeligste helft
-van dit huis is dus de minst beproefde**, niet door een besluit maar doordat een
-poort die identiteit eist en een proef die er geen heeft elkaar uitsluiten. Die
-negen gezakte routes dragen alle negen dezelfde zin (*schrijf-verloren: status
-200 terwijl de toestand niet veranderde*) en **zeven ervan zijn verwijderroutes**:
-een medewerker hoort dat iets weg is en het staat er nog.
+journaal en de leesweg, niet bij de deur ervoor. **Besluit 5 is inmiddels genomen
+en gebouwd** (13 september 2026, par. 0.6a en besluit 5): `inzagelog.noteerVast()`
+levert een uitslag, `kern/ledenbalie-inzage.js` houdt de inzage tegen als het
+spoor niet vaststaat, en onder beide verraadstanden komt er geen dossier, geen
+trefferlijst en geen herstelbericht meer uit. Vier dingen daar niet wegpoetsen.
+**Plaats een garantie waar alle informatie voor die garantie samenkomt, niet zo
+vroeg mogelijk in de keten** -- de kluispoort kent de MENS en niet het onderwerp,
+het journaal kent het onderwerp en niet wat er getoond zou worden. Het journaal
+zegt **`toegestaan` en nooit `geleverd`**: de regel wordt geschreven vóór het
+dossier wordt samengesteld, dus hij legt vast dat inzage is VERLEEND -- zou er
+`ingezien` staan, dan liegt het spoor bij elke mislukte lezing, en in het
+voordeel van het huis. De sleutelbos van de proeven had **één** kantoormens (de
+eigenaar, die overal doorkomt) en heeft er nu twee, `kantoor-a` en `kantoor-b`,
+waarmee het **vier-ogenprincipe voor het eerst is beproefd**: A tekent zijn eigen
+uitgifte → 409, B tekent → 200. En `balieAuth` stond in de bewakerskaart als
+*verfijner* terwijl hij de rol `office` in zijn GEHEEL weigert -- daaruit volgt
+een regel die breder geldt: **een verfijner boven een rol die geen mens
+vaststelt, is een indelingsfout**. Twee registers spraken elkaar daarover tegen
+(`kantoormacht.js` zette hem al in `EIST_MENS`) en de goedkoopste bepaalde wat er
+beproefd kon worden. Het getal is daarmee ook leesbaar geworden: van de 578
+kantoorroutes is **41 bewezen, 1 gezakt, 132 niet-mutatief, 33 voorziening, 55
+onzeker en 316 niet-bereikt** -- vijf dingen heetten `ongemeten`, waarvan er twee
+een EIGENSCHAP zijn (een leesroute heeft geen bevestiging om te breken) en alleen
+`niet-bereikt` omlaag hoort. En let op de leerzaamste bevinding van de
+opruimronde: **een register dat niet is hergedraaid, is een bewering over het
+verleden** -- zeven van de negen "gezakte" routes waren al gerepareerd door
+`kern/kantoorwissen.js` en alleen het ingecheckte bestand wist het niet. De twee
+die echt overbleven zijn dicht, en `/api/bank/akkoord` draagt de les: die stond
+**al** op de duurzaamheidslijst van regel 47 terwijl het AKKOORD zelf er niet
+onder viel -- **een regel op een afdwinglijst noemt een ROUTE en niet een
+handeling**.
 
 Daaruit volgt de vorm van MN-02, en die is anders dan hij eerst was: niet *"een
 RTG-manager ziet hetzelfde als een externe"* (dat sneuvelt, want `kern/ledenbalie.js`

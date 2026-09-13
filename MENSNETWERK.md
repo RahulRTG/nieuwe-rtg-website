@@ -230,7 +230,14 @@ opslagtoetsen). **Tien toetsbestanden** raken het inzagejournaal. De doorsnede i
 **nul**. Het instrument bestaat, het wordt gebruikt, en juist de laag waarvan de
 hele belofte "elke blik laat een spoor na" is, staat er niet onder.
 
-### 0.7 Het instrument bestaat, de plek klopte niet, en het kantoor is onmeetbaar
+### 0.7 Het instrument bestaat, de plek klopte niet, en het kantoor was onmeetbaar
+
+> **Stand 13 september 2026:** alles in deze paragraaf is nog waar behalve de
+> laatste helft van de titel. Het inzagejournaal staat inmiddels op de lijst van
+> `check.js` regel 47 (via `opzet/inzagespoor.js`), de ledenbalie weigert zonder
+> aantoonbaar spoor, en de kantoorkant is beproefbaar. Zie par. 0.6a voor de
+> getallen en besluit 5 voor wat er precies gebouwd is. De diagnose hieronder
+> blijft staan omdat zij verklaart WAAROM het zo gebouwd is.
 
 Bij het uitwerken van besluit 5 is de code gelezen in plaats van aangenomen, en
 dat corrigeerde drie dingen -- waaronder een bewering van dit document zelf.
@@ -269,38 +276,95 @@ faalt netjes als er iets onder hem wegvalt*: per route, het contract eerst
 afgeleid uit een gemeten effectprofiel en pas daarna beproefd met `schrijf-faalt`
 en `schrijf-verloren`. 4904 routes.
 
-**Maar over het kantoor zegt hij bijna niets, en de reden is dezelfde als bij de
-derde ketenproef.** Van de 570 `/api/office/`-routes in dat register:
+**Maar over het kantoor zei hij bijna niets, en de reden was dezelfde als bij de
+derde ketenproef.** Van de 570 `/api/office/`-routes stond er **528** op
+`ongemeten`, 33 op `bewezen` en **9** op `gezakt`. De hele ledenbalie droeg als
+reden *"de proef kreeg hem niet aan het werk (status 403)"*: de kluispoort die
+zijn werk doet, want de proef kwam binnen met de gedeelde kantoorcode. Exact de
+grens die `toelatingsproef.js` ook vond -- *aftekenen en beslissen eisen een
+naam*. Het gevolg was scherp: **de gevoeligste helft van dit huis was de minst
+beproefde** -- niet omdat iemand dat besloot, maar omdat de poort die identiteit
+eist en de proef die er geen heeft elkaar precies uitsluiten.
 
-| Uitslag | Aantal |
-|---|---|
-| `ongemeten` | **528** |
-| `bewezen` | 33 |
-| `gezakt` | **9** |
+### 0.6a Wat er daarna van die meting overbleef (13 september 2026)
 
-De hele ledenbalie staat op `ongemeten`, met als reden *"de proef kreeg hem niet
-aan het werk (status 403)"*. Dat is de kluispoort die zijn werk doet: de proef
-komt binnen met de gedeelde kantoorcode en die komt er niet door. Exact de grens
-die `toelatingsproef.js` ook vond -- *aftekenen en beslissen eisen een naam*.
+Die drie getallen zijn geen stand meer maar een beginpunt; ze staan hierboven
+omdat ze de RICHTING verklaren en niet omdat ze nog gelden.
 
-**Het gevolg is scherp: de gevoeligste helft van dit huis is de minst beproefde.**
-Niet omdat iemand dat besloot, maar omdat de poort die identiteit eist en de
-proef die geen identiteit heeft, elkaar precies uitsluiten.
+**Het instrument kreeg twee kantoormensen.** De sleutelbos van de proeven
+(`scripts/lib/proefsleutels.js`) had er een, en dat was de eigenaar -- die komt
+door elke kantoordeur en bewijst dus niets over WIE er doorheen kwam. Nu zijn er
+`kantoor-a` en `kantoor-b`: twee verse accounts, allebei niet de eigenaar, die
+de weg van een medewerker lopen. Daarmee is voor het eerst beproefd wat twee
+mensen nodig heeft: A start een uitgifte en tekent → **409, "dezelfde ogen
+tellen niet dubbel"**; B tekent → 200. Het vier-ogenprincipe van
+`server/routes/uitgifte.js` was tot die dag principieel niet te beproeven, niet
+omdat het zwak was maar omdat het instrument geen tweede paar ogen had.
 
-**En er staan al negen kantoorroutes op `gezakt`**, alle negen met dezelfde zin:
-*`schrijf-verloren`: status 200 terwijl de toestand niet veranderde -- bevestigd
-en niet bewaard.*
+**En de balie bleek verkeerd INGEDEELD, niet onbereikbaar.** `balieAuth` stond
+in de bewakerskaart als *verfijner* -- "versmalt binnen een al vastgestelde rol"
+-- terwijl hij de rol `office` in zijn GEHEEL weigert. Twee registers spraken
+elkaar tegen: `scripts/kantoormacht.js` zette hem al in `EIST_MENS`, en de
+goedkoopste van de twee bepaalde wat er beproefd kon worden. Daar kwam een regel
+uit die breder geldt dan deze deur: **een verfijner boven een rol die geen mens
+vaststelt, is een indelingsfout** -- ofwel hij versmalt op een mens die er niet
+is, ofwel hij is een identiteitspoort. `office` is de enige rol op de kaart waar
+dat kan, en balieAuth was er de enige van; `test/bewakers.test.js` houdt het nu
+tegen.
 
-    /api/office/asset/fees              /api/office/magnaat/scan
-    /api/office/atelier/verwijder       /api/office/redactie/artikel/verwijder
-    /api/office/atelierweb/foto-weg     /api/office/studio/verwijder
-    /api/office/hardware/verwijder      /api/office/werkplaats/verwijder
-    /api/office/ideeen/verwijder
+**De negen `gezakt` waren er al zeven minder, en het register wist het niet.**
+De zeven verwijderroutes zijn eerder gerepareerd (`kern/kantoorwissen.js`); het
+INGECHECKTE `FAALPROEF.json` stond nog op de ronde van 10 september. *Een
+register dat niet is hergedraaid, is een bewering over het verleden* -- en het
+zag er precies zo uit als een openstaand gebrek. Dat is dezelfde faalvorm als
+het journaal, een laag hoger: niet een fout in de code, maar een uitslag die
+niemand opnieuw heeft gemeten.
 
-**Zeven van de negen zijn verwijderroutes.** "Bevestigd en niet bewaard" betekent
-daar: een medewerker krijgt te horen dat iets weg is, en het staat er nog. Dat is
-gemeten, het staat opgeschreven, en er is niets mee gedaan -- dezelfde vorm als
-het journaal, alleen deze had al een uitslag.
+De twee die echt overbleven zijn gerepareerd, en de leerzaamste is
+`/api/bank/akkoord`: die stond **al** op de afdwinglijst van `check.js` regel
+47, met de reden *"een geopende rekening en een gegeven akkoord mogen niet
+verdwijnen na een herstart"*. Het OPENEN was duurzaam gemaakt en het AKKOORD
+niet -- en bij een lid dat al een rekening had, was die ene `save()` de enige
+schrijfactie van de hele route. **Een regel op een afdwinglijst noemt een ROUTE
+en niet een handeling**, en dat verschil kostte hier precies de helft die
+juridisch iets betekent. Huisbreed ging `gezakt` van 3 naar 1; aan de
+kantoorkant van 9 naar 1.
+
+**En het getal 528 bleek onleesbaar in plaats van alarmerend.** Vijf
+verschillende dingen heetten `ongemeten`: een LEESroute (geen bevestiging om te
+breken), een klaarzetter (geen duurzame belofte), *niet bereikt* (een tekort van
+het instrument), *onzeker* en het echte onbekende. De eerste twee zijn een
+EIGENSCHAP van de route. Alleen *niet bereikt* hoort omlaag, en zolang ze op een
+hoop staan is niet te zien of een daling vooruitgang is of een route die stopte
+met schrijven. Ze hebben nu elk een eigen stand -- dezelfde vorm als `MET_REDEN`
+in `scripts/tikken.js` en `openBekend` in `scripts/ritproef.js`.
+
+Met die splitsing ziet de kantoorkant er zo uit (578 routes, gemeten 13
+september 2026):
+
+| Stand | Aantal | Wat het is |
+|---|---|---|
+| `niet-bereikt` | **316** | een tekort van het INSTRUMENT -- het enige getal dat omlaag hoort |
+| `niet-mutatief` | 132 | een EIGENSCHAP: deze route schrijft niet, er is geen bevestiging om te breken |
+| `onzeker` | 55 | de twee metingen spraken elkaar tegen |
+| `bewezen` | **41** | faalt aantoonbaar netjes onder beide sabotages |
+| `voorziening` | 33 | zet bij het eerste bezoek zijn standaard klaar; geen duurzame belofte |
+| `gezakt` | **1** | `/api/office/magnaat/scan` |
+
+Van de oude 528 is dus **165 een eigenschap en geen gebrek**, en het echte
+tekort is 316. Dat laatste getal is bovendien geen raadsel meer maar een
+werklijst met een vorm: 219 van die 316 stranden op een **404** en 82 op een
+**400**. De balie zit in die tweede groep -- zij komen sinds deze ronde dóór de
+poort (403 → 400) en stranden nu op het LICHAAM: deze routes eisen een `reden`
+met inhoud en een bestaand lid-id, en `plausibelLijf()` kent geen van beide.
+
+**Dat is bewust niet in deze ronde gerepareerd, en de reden is dezelfde als de
+rest van dit document.** Een veld toevoegen aan `plausibelLijf()` klinkt als één
+regel, maar die functie voedt VIJF proeven -- waaronder de invoerproef, die met
+opzet slechte invoer stuurt. Een verandering daar verschuift de uitslag van vier
+andere meters, en een reparatie waarvan je de blast radius niet hebt gemeten is
+precies wat `MUTATIECONTRACT.md` een schijnzekerheid noemt. Het staat hier met
+het getal erbij zodat de volgende ronde eraan kan beginnen met een noemer.
 
 
 ---
@@ -686,6 +750,24 @@ Bovenop die van `CARRIERE.md` en `RUGDEKKING.md`, die onverkort blijven gelden.
 9. **De audiencerelatie is van de mens die volgt.** Een artiest kan zijn publiek
    bedienen; hij krijgt er geen adreslijst van.
 10. **Herkomst en registratie worden nooit vermengd** (par. 9).
+11. **Plaats een garantie waar alle informatie voor die garantie samenkomt, niet
+    zo vroeg mogelijk in de keten.** Uit besluit 5 en uitgeschreven daar: de
+    kluispoort kent de MENS en niet het onderwerp; het journaal kent het
+    onderwerp en niet wat er zou worden getoond. Vroeg in de keten voelt veilig
+    en weigert het verkeerde.
+12. **Een spoor zegt wat het beweert en nooit meer.** `toegestaan` is niet
+    `geleverd`; een regel die claimt dat er is ingezien, liegt bij elke mislukte
+    lezing -- en in het voordeel van het huis. Falen mag alleen de kant op waar
+    het lid te veel te zien krijgt en niet te weinig.
+13. **Een register dat niet is hergedraaid, is een bewering over het verleden.**
+    Zeven "openstaande gebreken" van deze ronde waren al gerepareerd; alleen het
+    ingecheckte bestand wist het niet. Een uitslag zonder verse stempel telt niet
+    als stand -- dezelfde regel die `BESTUUR.md` al stelt met *vervallen bewijs
+    is geen bewijs*, nu op een meting in plaats van op een control.
+14. **Een regel op een afdwinglijst noemt een ROUTE en niet een handeling.**
+    `/api/bank/akkoord` stond op de duurzaamheidslijst terwijl de helft die
+    juridisch iets betekent -- de instemming zelf -- er niet onder viel. Wie een
+    route op zo'n lijst zet, schrijft erbij WELKE handeling gedekt is.
 
 ---
 
@@ -697,7 +779,8 @@ grens die ná het belang komt is geen grens.
 
 | # | Onderdeel | Stand |
 |---|---|---|
-| **0** | **De faalproef een kantoorsessie op naam geven** -- zonder die stap is 528 van de 570 kantoorroutes onmeetbaar en is besluit 5 niet te bewijzen | **een stap weg**, en hij staat nu vooraan (par. 0.7) |
+| **0** | **De faalproef een kantoorsessie op naam geven** -- zonder die stap is de gevoelige kantoorkant niet te beproeven en is besluit 5 niet te bewijzen | **staat** (13 sept): `kantoor-a` en `kantoor-b`, en het vier-ogenprincipe is voor het eerst gemeten |
+| **0b** | **Besluit 5 zelf** -- geen aantoonbaar journaal, geen inzage | **staat** aan de ledenbalie; de andere 41 aanroepers van `noteer()` gaan per plek om |
 | **1** | **Rugdekking zichtbaar maken** -- een mens moet kunnen zien dat de relatie bestaat | **een halve dag** |
 | **2** | **MN-01 + MN-02 als toets** -- geen macht- en geen informatievoordeel | **een stap weg**, en par. 0.5 zegt waar MN-02 begint |
 | **3** | **MN-03 als regel** -- vóór RTG zichzelf ooit als optie presenteert | **een stap weg** |
@@ -811,7 +894,7 @@ journaalregistratie.**
 
 | Optie | Wat het betekent | Prijs |
 |---|---|---|
-| **A. Geen aantoonbaar journaal, geen inzage** *(aanbevolen)* | Eén contract bij het journaal en de gevoelige leesweg: eerst duurzaam geregistreerd, dan pas gelezen. Lukt dat niet, dan komt het dossier er niet uit. | Eén plek, niet 42 aanroepers -- maar **niet** de kluispoort: die is een identiteitspoort en kent het onderwerp van de inzage niet (par. 0.7). Een opslagstoring legt dan de zware inzage stil. |
+| **A. Geen aantoonbaar journaal, geen inzage** *(gekozen, en gebouwd)* | Eén contract bij het journaal en de gevoelige leesweg: eerst duurzaam geregistreerd, dan pas gelezen. Lukt dat niet, dan komt het dossier er niet uit. | Eén plek, niet 42 aanroepers -- maar **niet** de kluispoort: die is een identiteitspoort en kent het onderwerp van de inzage niet (par. 0.7). Een opslagstoring legt dan de zware inzage stil. |
 | B. Inzage door, maar luid | De blik mag doorgaan; het mislukken wordt een incident in plaats van een lege `catch`. | Goedkoper, en "elke blik laat een spoor na" blijft dan een belofte over de bedoeling. |
 | C. Laten zoals het is | -- | Dan staat er een belofte in `ledenbalie.js` die het huis niet kan waarmaken. |
 
@@ -829,18 +912,52 @@ staat in `db/duurzaam.js` met een poort op zijn aanroeperslijst, en
 de weg" maar **"weigert hij onder `schrijf-verloren`"** -- precies het geval dat
 vandaag stil goed gaat.
 
-**Maar er staat een stap vóór, en par. 0.7 meet hem: die toets kan vandaag niet
-draaien.** De proef komt binnen met de gedeelde kantoorcode, de kluispoort weigert
-die terecht, en daardoor is 528 van de 570 kantoorroutes `ongemeten`. Zolang de
-proef geen kantoorsessie **op naam** heeft, is elke uitspraak over het faalgedrag
-van de gevoelige kantoorkant niet vast te stellen -- en `niet vast te stellen` is
-in dit huis een eersteklas uitslag naast in orde en storing (`BESTUUR.md`), geen
-groen. Besluit 5 bouwen zonder die stap levert een poort op waarvan niemand kan
-laten zien dat hij weigert.
+**Er stond een stap vóór, en die is gezet.** De proef kwam binnen met de gedeelde
+kantoorcode, de kluispoort weigerde die terecht, en daardoor was 528 van de 570
+kantoorroutes `ongemeten`. Besluit 5 bouwen zonder die stap zou een poort
+opleveren waarvan niemand kan laten zien dat hij weigert -- en `niet vast te
+stellen` is in dit huis een eersteklas uitslag naast in orde en storing
+(`BESTUUR.md`), geen groen.
 
-A en B zijn allebei beter dan de huidige stand. De keuze gaat niet over
-veiligheid maar over beschikbaarheid: A zet de zware inzage stil bij een
-opslagstoring, B laat hem doorwerken met een luide melding.
+### Besluit 5 is genomen: A, en hij staat (13 september 2026)
+
+`server/kern/ledenbalie-inzage.js` draagt de regel, `inzagelog.noteerVast()`
+levert de uitslag, en `test/ledenbaliespoor.test.js` houdt hem vast. Onder beide
+verraadstanden komt er geen dossier, geen trefferlijst en geen herstelbericht
+meer uit -- met de mutatie erin levert dezelfde route weer 200 met de codenaam.
+
+Drie dingen daaraan die je nergens anders moet herhalen.
+
+**De plek is gekozen en niet zo vroeg mogelijk.** Niet in `kluispoort.js`: dat is
+een IDENTITEITSpoort die vóór de route draait en het onderwerp van de inzage niet
+kent. Niet in het journaal zelf: dat weet niet wat er zou worden getoond, en een
+poort die weigert zonder te weten waarover, weigert het verkeerde. De regel die
+eruit volgt geldt breder dan deze deur: **plaats een garantie waar alle
+informatie voor die garantie samenkomt, niet zo vroeg mogelijk in de keten** --
+hier is dat de plek waar WIE, WAAROM en OVER WIE tegelijk bekend zijn.
+
+**Het journaal zegt `toegestaan` en nooit `geleverd`.** De regel wordt geschreven
+vóór het dossier wordt samengesteld, dus hij legt vast dat inzage is VERLEEND --
+en dat blijft waar als het lezen daarna stukloopt. Zou er `ingezien` staan, dan
+liegt het spoor bij elke mislukte lezing, in het VOORDEEL van het huis, en dat is
+de verkeerde kant om te falen. Andersom is het veilig: een lid dat leest dat
+iemand toegang kreeg terwijl er niets op diens scherm verscheen, weet iets
+kloppends. Elke regel draagt daarnaast `vast`: heeft de opslag DEZE regel
+bevestigd? `noteer()` kan dat niet zeggen en `noteerVast()` wel, en die twee
+mogen niet op een hoop -- *een spoor dat niet kan zeggen hoe hard het zelf staat,
+is geen bewijs*.
+
+**De andere 41 aanroepers van `noteer()` blijven staan, en dat is een besluit.**
+Ze gaan per plek om, met een reden: bij een lijstscherm dat een naam toont is
+weigeren iets anders dan bij het openen van een identiteitskluis. Wat hier is
+vastgelegd is de VORM, niet de uitrol -- en een toets die nu zou vastleggen dat
+de rest write-behind is, houdt de volgende stap tegen in plaats van hem te
+bewaken.
+
+Wat er NIET mee is opgelost: besluit 6 (de bewaargarantie) en besluit 7 (de
+twaalfde LAT-regel) staan onveranderd open. B blijft daarmee een verdedigbare
+keuze voor lichtere leeswegen; de afweging gaat niet over veiligheid maar over
+beschikbaarheid, en die is per weg anders.
 
 ### Besluit 6 -- Wat is de bewaargarantie van het journaal?
 

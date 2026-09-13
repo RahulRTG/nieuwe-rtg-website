@@ -1574,6 +1574,11 @@ const IJKINGEN = {
       (j) => { j.ratel.geldRoutesMeldOnbesloten = (j.ratel.geldRoutesMeldOnbesloten || 0) + 8; return j; },
       () => norm.meet().geldRoutesMeldOnbesloten - voor.geldRoutesMeldOnbesloten)
   },
+  geldRoutesValsSucces: {
+    proef: (voor) => metVervangenJson('SCHRIJFPROEF.json',
+      (j) => { j.telling.VALS_SUCCES = (j.telling.VALS_SUCCES || 0) + 9; return j; },
+      () => norm.meet().geldRoutesValsSucces - voor.geldRoutesValsSucces)
+  },
   /* DE TWEE TANDEN VAN DE VERTICALE GELDPROEF (FACTUURPROEF.json). Ze lezen
      verschillende velden uit dezelfde `telling`, en juist dat is hier de
      faalvorm: `geldpadOnbewezen` telt BLOCKED plus UNKNOWN, en een versie die

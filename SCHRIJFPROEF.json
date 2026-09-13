@@ -1,0 +1,596 @@
+{
+  "soort": "meting",
+  "uitleg": "per geldroute: wat de aanroeper te zien krijgt als de opslag zijn schrijfactie bevestigt en weggooit (verraad `schrijf-verloren`). De vraag is of een 2xx wordt gegeven over een opslag die aantoonbaar onveranderd bleef.",
+  "grens": "Deze proef velt GEEN oordeel over write-behind als ontwerp. save() belooft geen duurzaamheid en doet dat met opzet; of elke geldroute langs de duurzame commit MOET is een architectuurbesluit van de eigenaar. Hier wordt alleen geteld hoeveel routes vandaag een succes melden over een schrijfactie die er niet is. En hij zegt niets over crashes: dat is scripts/crashproef.js, met een eigen gesloten lijst momenten.",
+  "controle": {
+    "pad": "/api/pay/saldo",
+    "stand": "WEIGERT",
+    "waarom": "de enige route die aantoonbaar langs de duurzame commit loopt. Blijft hij WEIGERT, dan ziet deze proef verschil; slaat hij om naar VALS_SUCCES, dan is er een regressie of een kapotte opstelling en hoort deze ronde rood te zijn."
+  },
+  "standen": {
+    "VALS_SUCCES": "de aanroeper kreeg een 2xx terwijl de opslag aantoonbaar onveranderd bleef",
+    "WEIGERT": "de route gaf een fout toen de opslag niet kon bevestigen -- de aanroeper hoort de waarheid",
+    "SCHREEF_TOCH": "de opslag veranderde alsnog; deze route raakt het verraadpunt niet op dit pad",
+    "ONBEREIKT": "de proef kreeg de route niet aan het werk (geen lijf, geen wereld, of de deur bleef dicht)"
+  },
+  "stempel": {
+    "op": "2026-09-13T20:52:26.565Z",
+    "commit": "e8d83dc87",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/schrijfproef.js",
+    "node": "v22.22.2"
+  },
+  "telling": {
+    "ONBEREIKT": 13,
+    "VALS_SUCCES": 28,
+    "WEIGERT": 2,
+    "SCHREEF_TOCH": 2
+  },
+  "routes": 45,
+  "per": [
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/betaal",
+      "rol": "member",
+      "collecties": [
+        "bankBoekingen",
+        "bankPassen",
+        "bankSaldi"
+      ],
+      "stand": "ONBEREIKT",
+      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "status": 400,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/bevries",
+      "rol": "member",
+      "collecties": [
+        "bankPassen"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/limiet",
+      "rol": "member",
+      "collecties": [
+        "bankPassen"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/sluit",
+      "rol": "member",
+      "collecties": [
+        "bankPassen"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/uitgeven",
+      "rol": "member",
+      "collecties": [
+        "bankPassen"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/rekening/open",
+      "rol": "member",
+      "collecties": [
+        "bankRekeningen"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/salaris",
+      "rol": "member",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "stand": "ONBEREIKT",
+      "reden": "de route wees het verzoek af met 402 voordat hij aan het schrijven toekwam",
+      "status": 402,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/sepa",
+      "rol": "member",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "stand": "ONBEREIKT",
+      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "status": 400,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/spaardoel",
+      "rol": "member",
+      "collecties": [
+        "bankRekeningen"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/storten",
+      "rol": "member",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "stand": "ONBEREIKT",
+      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "status": 400,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/terugkerend/zet",
+      "rol": "member",
+      "collecties": [
+        "bankTerugkerend"
+      ],
+      "stand": "ONBEREIKT",
+      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "status": 400,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/boardroom/betalingen/proef",
+      "rol": "techniek",
+      "collecties": [
+        "betaalRegie"
+      ],
+      "stand": "ONBEREIKT",
+      "reden": "de route wees het verzoek af met 401 voordat hij aan het schrijven toekwam",
+      "status": 401,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/geld/beleid/weg",
+      "rol": "member",
+      "collecties": [
+        "geldbeleid"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/geld/cockpit",
+      "rol": "member",
+      "collecties": [
+        "labFonds"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/geld/grens",
+      "rol": "member",
+      "collecties": [
+        "geldbeleid"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/gemeente/belasting/mijn",
+      "rol": "member",
+      "collecties": [
+        "gemeenteAanslagen"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/kosten/vooruitblik",
+      "rol": "member",
+      "collecties": [
+        "economie"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/labfonds/locatie/maak",
+      "rol": "member",
+      "collecties": [
+        "labFonds"
+      ],
+      "stand": "ONBEREIKT",
+      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "status": 400,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/ai/tegoed",
+      "rol": "member",
+      "collecties": [
+        "aiTegoed"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/draai",
+      "rol": "boardroom",
+      "collecties": [
+        "bankregie"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/leden",
+      "rol": "office",
+      "collecties": [
+        "bankregie"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/mislukking",
+      "rol": "office",
+      "collecties": [
+        "bankregie"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/nood",
+      "rol": "office",
+      "collecties": [
+        "bankregie"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/rechtsvormwacht",
+      "rol": "office",
+      "collecties": [
+        "aiTegoed"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/kascode",
+      "rol": "member",
+      "collecties": [
+        "payCodes"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/oplaad",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "stand": "ONBEREIKT",
+      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "status": 400,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/saldo",
+      "rol": "member",
+      "collecties": [
+        "fondsAfdrachten",
+        "invoices",
+        "payBoekingen",
+        "paySaldi",
+        "socialeAfdrachten"
+      ],
+      "stand": "WEIGERT",
+      "reden": "de route gaf 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
+      "opslagBewoog": true
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/stuur",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "stand": "ONBEREIKT",
+      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "status": 400,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/tegoed/koop",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi",
+        "payTegoed"
+      ],
+      "stand": "ONBEREIKT",
+      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "status": 400,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/tik",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "stand": "ONBEREIKT",
+      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "status": 400,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/tikcode",
+      "rol": "member",
+      "collecties": [
+        "payTikCodes"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/verzoek",
+      "rol": "member",
+      "collecties": [
+        "payVerzoeken"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/verzoek/betaal",
+      "rol": "member",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi",
+        "payVerzoeken"
+      ],
+      "stand": "ONBEREIKT",
+      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "status": 400,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/verzoek/intrek",
+      "rol": "member",
+      "collecties": [
+        "payVerzoeken"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/punten",
+      "rol": "member",
+      "collecties": [
+        "punten"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/betaalverzoek",
+      "rol": "supplier",
+      "collecties": [
+        "betaalVerzoeken"
+      ],
+      "stand": "SCHREEF_TOCH",
+      "reden": "de opslag veranderde ondanks het verraad -- deze route raakt het injectiepunt niet op dit pad, dus hier is niets bewezen",
+      "status": 200,
+      "opslagBewoog": true
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/facturen/maak",
+      "rol": "supplier",
+      "collecties": [
+        "facturen"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/facturen/pdf",
+      "rol": "supplier",
+      "collecties": [
+        "facturen"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/giftcard/sell",
+      "rol": "supplier",
+      "collecties": [
+        "giftcards"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/oog/overzicht",
+      "rol": "supplier",
+      "collecties": [
+        "directOntvangsten"
+      ],
+      "stand": "WEIGERT",
+      "reden": "de route gaf 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "status": 503,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pay/treasury/apart",
+      "rol": "supplier",
+      "collecties": [
+        "facturen",
+        "payBoekingen",
+        "payCodes",
+        "paySaldi",
+        "posSales",
+        "waardeOormerken"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pay/treasury/zet",
+      "rol": "supplier",
+      "collecties": [
+        "payTreasury"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pay/uitbetaal",
+      "rol": "supplier",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "stand": "SCHREEF_TOCH",
+      "reden": "de opslag veranderde ondanks het verraad -- deze route raakt het injectiepunt niet op dit pad, dus hier is niets bewezen",
+      "status": 200,
+      "opslagBewoog": true
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pos/checkout",
+      "rol": "supplier",
+      "collecties": [
+        "facturen",
+        "posSales"
+      ],
+      "stand": "VALS_SUCCES",
+      "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
+      "status": 200,
+      "opslagBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/wallet/voeg",
+      "rol": "member",
+      "collecties": [
+        "wallet"
+      ],
+      "stand": "ONBEREIKT",
+      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "status": 400,
+      "opslagBewoog": false
+    }
+  ]
+}

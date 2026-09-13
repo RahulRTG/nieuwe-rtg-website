@@ -526,6 +526,7 @@ const METERS = [
      terug te draaien is terwijl een mens hem definitief noemde. */
   { sleutel: 'geldRoutesHerstelOnbesloten', richting: 'omlaag', wat: 'geldroutes zonder verklaard correctiemodel (HERSTELBESLUIT.json)' },
   { sleutel: 'geldRoutesMeldOnbesloten', richting: 'omlaag', wat: 'geldroutes zonder verklaarde meldplicht (MELDBESLUIT.json)' },
+  { sleutel: 'geldRoutesValsSucces', richting: 'omlaag', wat: 'geldroutes die een 2xx geven terwijl hun schrijfactie is verdwenen (SCHRIJFPROEF.json)' },
   { sleutel: 'geldRoutesHerstelTegenspraak', richting: 'omlaag', wat: 'geldroutes waar de herstelverklaring de meting tegenspreekt' },
   /* DE VERTICALE GELDPROEF, EN MET OPZET TWEE TANDEN (FACTUURPROEF.json).
 
@@ -1420,6 +1421,9 @@ function meet(bronnen) {
     geldRoutesZonderTerugweg: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderTerugweg),
     geldRoutesHerstelOnbesloten: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesHerstelOnbesloten),
     geldRoutesMeldOnbesloten: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesMeldOnbesloten),
+    /* Uit de TELLING en niet uit `per`: deze stand is per route en niet per
+       (route x grens), dus rij en route zijn hier hetzelfde ding. */
+    geldRoutesValsSucces: leesRegister('SCHRIJFPROEF.json', (j) => j.telling.VALS_SUCCES || 0),
     geldRoutesHerstelTegenspraak: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesHerstelTegenspraak),
     geldpadGezakt: leesRegister('FACTUURPROEF.json', (j) => j.telling.FAILED),
     /* BLOCKED en UNKNOWN worden hier WEL opgeteld, en alleen hier: allebei

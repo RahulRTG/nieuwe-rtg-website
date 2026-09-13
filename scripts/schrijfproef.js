@@ -95,14 +95,26 @@ function beeld(map) {
    aan het werk) en pas daarna een stand -- dezelfde volgorde als in de
    crashproef, en om dezelfde reden: een conclusie uit een enkel negatief
    signaal is hoe je de proef de schuld van de route laat dragen. */
-function weeg({ status, opslagBewoog }) {
+function weeg({ status, opslagBewoog, basisStatus }) {
+  /* DE BASISMETING EERST, en zonder haar is `WEIGERT` een leugen. De eerste
+     versie las elke 5xx als "de route weigert omdat de opslag niet kon
+     bevestigen". /api/supplier/oog/overzicht gaf daarmee WEIGERT terwijl hij
+     503 geeft omdat zijn DIENST uitstaat -- met of zonder verraad. Een dode
+     route las dus als een veilige, en juist in het gunstige vak.
+
+     Daarom wordt elke route OOK zonder verraad aangeroepen. Werkte hij daar al
+     niet, dan bewijst zijn antwoord onder verraad niets over duurzaamheid. */
+  if (basisStatus !== null && basisStatus !== undefined && !(basisStatus >= 200 && basisStatus < 300))
+    return { stand: 'ONBEREIKT', reden: 'deze route gaf ZONDER verraad al ' + basisStatus +
+      ', dus zijn antwoord eronder (' + status + ') zegt niets over een verloren schrijfactie' };
   if (status === 0) return { stand: 'ONBEREIKT', reden: 'de verbinding brak; er is geen antwoord om te wegen' };
   if (status >= 200 && status < 300) return opslagBewoog
     ? { stand: 'SCHREEF_TOCH', reden: 'de opslag veranderde ondanks het verraad -- deze route raakt ' +
         'het injectiepunt niet op dit pad, dus hier is niets bewezen' }
     : { stand: 'VALS_SUCCES', reden: 'de aanroeper kreeg ' + status + ' terwijl er niets is bewaard' };
-  if (status >= 500) return { stand: 'WEIGERT', reden: 'de route gaf ' + status + ': de opslag kon niet ' +
-    'bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen' };
+  if (status >= 500) return { stand: 'WEIGERT', reden: 'de route werkte zonder verraad (' + basisStatus +
+    ') en gaf eronder ' + status + ': de opslag kon niet bevestigen en dat is aan de aanroeper ' +
+    'verteld in plaats van verzwegen' };
   return { stand: 'ONBEREIKT', reden: 'de route wees het verzoek af met ' + status +
     ' voordat hij aan het schrijven toekwam' };
 }
@@ -134,8 +146,19 @@ async function meetRoute(route) {
     const r = await post(srv.basis, route.pad, lijf, tok);
     const na = beeld(map);
     const opslagBewoog = voor !== na;
-    const u = weeg({ status: r.status, opslagBewoog });
-    return { ...u, status: r.status, opslagBewoog };
+    /* DE BASISMETING KOMT NA DE GEMETEN OPROEP, en die volgorde is de hele
+       truc. Ervoor zou zij het onderwerp opmaken -- dezelfde fout die de
+       pasladder-ijkoproep in de idempotentieproef maakte, waar een route zijn
+       eigen wereld had opgebruikt voordat de meting begon. Erna kan het juist
+       wel: onder `schrijf-verloren` is er per definitie niets bewaard, dus de
+       wereld is nog precies zoals hij was. Voor een route die TOCH schreef,
+       staat de basismeting op een aangeraakte wereld -- maar die weten we dan
+       al aan het werk, en zijn stand hangt er niet van af. */
+    try { srv.kind.kill('SIGKILL'); } catch (e) {}
+    srv = await W.start({ datamap: map, env: OMGEVING });
+    const basis = await post(srv.basis, route.pad, lijf, tok);
+    const u = weeg({ status: r.status, opslagBewoog, basisStatus: basis.status });
+    return { ...u, status: r.status, basisStatus: basis.status, opslagBewoog };
   } catch (e) {
     return { stand: 'ONBEREIKT', reden: 'de ronde brak af: ' + String(e.message).slice(0, 120),
       status: null, opslagBewoog: null };

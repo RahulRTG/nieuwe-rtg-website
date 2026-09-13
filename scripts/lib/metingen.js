@@ -252,6 +252,13 @@ const REGISTER = {
      waarvan niemand heeft gezegd of er bericht hoort te gaan. Leeg is hier geen
      nul maar 45 -- de teller telt wat er NIET verklaard is. */
   'MELDBESLUIT.json': { meter: ['geldRoutesMeldOnbesloten'] },
+  /* SCHRIJFPROEF.json meet iets ANDERS dan CRASHPROEF.json en hangt daarom aan
+     een eigen tand: niet wat er van een uitkomst overblijft na een crash, maar
+     of de aanroeper een succes te zien krijgt over een schrijfactie die is
+     verdwenen. `ONBEREIKT` krijgt met opzet geen tand -- dat is bereik van het
+     instrument en geen defect van een route, dezelfde grond waarop
+     GEEN_DUURZAME_WEG er ook geen heeft. */
+  'SCHRIJFPROEF.json': { meter: ['geldRoutesValsSucces'] },
 
   'TIKKEN.json': { eigenRatel: 'test/sprongindex.test.js' },
   'VINDBAAR.json': { eigenRatel: 'test/sprongindex.test.js' },

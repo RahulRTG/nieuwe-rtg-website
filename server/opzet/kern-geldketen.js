@@ -38,5 +38,17 @@ module.exports = ({ kern, voornemens, token, eigen }) => {
        VERZOEK opgehaald, en is hij er dan niet, dan staat dat in het dossier. */
     frictie: () => (kern.command && kern.command.risico) || null });
 
+  /* DE BRUG NAAR DE EFFECTBON, EN DEZE LAAG IS DE ENIGE PLEK WAAR DIE MAG LIGGEN.
+     server/effectbon.js observeert wat een verzoek werkelijk veroorzaakte en wil dat
+     tegen de VOORSPELLING houden; die voorspelling woont in deze keten. Kern hoort
+     niets naar de serverlaag te duwen en de bon hoort niet te weten dat er een
+     geldketen bestaat -- dus geeft opzet, dat beide kent, een zuiver lezende functie
+     mee. Zelfde vorm als de frictiemotor hierboven: niet een module, maar precies de
+     ene functie die nodig is.
+
+     Hangt hij er niet in (een kale opzet, een unittoets), dan draagt de bon geen
+     nameting. Dat is geen fout: dan heeft niemand iets voorspeld. */
+  require('../effectbon').zetVoorspeller((verzoek) => geldketen.voorspellingVan(verzoek));
+
   return { beslis: geldbesluit.beslis, geldbevoegdheden: geldbesluit.LIJST, geldketen };
 };

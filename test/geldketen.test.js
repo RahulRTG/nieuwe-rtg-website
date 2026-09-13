@@ -325,3 +325,34 @@ test('13. een handeling ZONDER contract blokkeert niet, en heet ook niet in orde
   assert.equal(as.graad, 'onbekend');
   assert.match(as.reden, /niet hetzelfde als "geen conflict"/);
 });
+
+test('14. de keten onthoudt WELK verzoek uitvoerde, en geeft zijn voorspelling terug', async () => {
+  /* De brug naar server/effectbon.js. Die bon wordt pas gemaakt als het antwoord de deur
+     uit gaat, dus de keten kan hem niet lezen -- maar met dit id wordt hij straks wel
+     gevonden. Zonder deze brug is de voorspelling van de aanvraag niet meer te koppelen
+     aan de observatie van de uitvoering, en dan is er geen causale keten maar een
+     voorspelling die nooit tegen iets wordt gehouden. */
+  const { ketenlaag } = huis();
+  const klaar = ketenlaag.klaarzet(OPGAVE());
+  assert.ok(klaar.ok, JSON.stringify(klaar).slice(0, 200));
+  const id = klaar.voornemen.id;
+
+  /* De voorspelling staat op de as zodra de poort hem heeft gezien -- en NIET pas na de
+     uitvoering: een voorspelling die je achteraf reconstrueert is geen voorspelling. */
+  const as = ketenlaag.dossier(id).dossier.assen.find(a => a.as === 'gevolgcontract');
+  assert.deepEqual(as.voorspeld, ['GELD_BEWEGEN', 'SCHRIJVEN_ANDERMANS']);
+
+  /* Voor de uitvoering weet niemand welk verzoek het gaat doen. */
+  assert.equal(ketenlaag.voorspellingVan('verzoek-1'), null);
+
+  ketenlaag.tekenAf({ id, door: 'bert' });
+  const r = await ketenlaag.uitvoer({ id, door: 'bert', verzoek: 'verzoek-1',
+    doe: async () => ({ ok: true, uitgevoerd: 2, bedragCenten: 4000 }) });
+  assert.ok(r.ok, JSON.stringify(r).slice(0, 200));
+
+  assert.deepEqual(ketenlaag.voorspellingVan('verzoek-1'), ['GELD_BEWEGEN', 'SCHRIJVEN_ANDERMANS']);
+  /* En een ander verzoek krijgt NULL en geen lege lijst: "niemand heeft iets voorspeld"
+     is iets anders dan "er is voorspeld dat er niets gebeurt". */
+  assert.equal(ketenlaag.voorspellingVan('verzoek-2'), null);
+  assert.equal(ketenlaag.voorspellingVan(''), null);
+});

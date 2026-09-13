@@ -38,7 +38,13 @@ function gevolgpoort(o, dossier, leg) {
       error: 'De vooruitblik van deze handeling spreekt haar gevolgcontract tegen. Er gaat niets ' +
         'verder tot een mens heeft uitgezocht welke van de twee onjuist is.',
       vergelijking: vs };
+  /* DE VOORSPELDE KLASSEN GAAN MEE OP DE AS, en niet omdat de as ze nodig heeft: de
+     NAMETING heeft ze straks nodig, en dan is deze voorspelling het enige wat er nog van
+     over is. Ze later opnieuw afleiden zou een tweede afleiding zijn van iets dat hier
+     al vaststond -- en een voorspelling die je na de handeling reconstrueert, is geen
+     voorspelling meer. */
   leg(dossier, 'gevolgcontract', {
+    voorspeld: Array.isArray(tf.effecten) ? tf.effecten.slice() : null,
     graad: (vs.uitslag === 'IN_ORDE' || vs.uitslag === 'GATEN') ? 'gemeten' : 'onbekend',
     uitslag: vs.uitslag, over: vs.over,
     gaten: vs.conflicten.filter(x => x.soort === 'GAT').map(x => x.werkwoord),

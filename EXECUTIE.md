@@ -919,6 +919,82 @@ twee verschillende vragen onder één woord.
 **En dit was géén droogloop.** Er werd een eerdere meting op het plan
 geprojecteerd; het plan liep niet. Dat deel staat er nu wel.
 
+#### De effectbon: de observatie die ALTIJD bestaat (13 september 2026)
+
+Tot nu hing elke observatie aan `RTG_STAATLOG`. Dat is juist voor zware diagnostiek, maar
+het heeft één gevolg dat de hele laag ondermijnt: **als de observatie alleen bestaat
+wanneer een diagnostische vlag aanstaat, dan heeft dit huis geen causale runtime maar een
+meetopstelling** — en dan is elke voorspelling in productie onweerlegbaar.
+
+`server/effectbon.js` staat daarom altijd aan (`RTG_EFFECTBON=0` zet hem uit, voor het
+geval dat en niet als normale stand) en draagt zeven velden en niet meer:
+
+| veld | waar het uit komt |
+|---|---|
+| `verzoek`, `oorzaak` | de correlatie van `req.envelop` — **geen tweede id** |
+| `capability` | dezelfde envelop |
+| `klassen` | de WAARGENOMEN effectklassen, via `kern/isolatie/effectcollecties.js` |
+| `objectrefs` | de collecties die bewogen — **namen, nooit rijen of sleutels** |
+| `at` | wanneer |
+| `dekking` | wat deze bon wél en níét kon zien, bij naam |
+
+**Hij bouwt niets na.** Alle drie de bronnen bestonden: `staatlog.stand()` is in de
+ondiepe stand alleen `.length` per array (O(1) per collectie), de effectmeter telt op drie
+choke points, en `effectcollecties.js` vertaalt een collectie naar een klasse met een
+grond. Een tweede implementatie van "wat is er gebeurd" zou LAT.md regel 4 zijn op de
+plek waar het het duurst is — `test/effectbon.test.js` toetst op de bron dat hij geen
+eigen hash, geen eigen `stringify` en geen eigen collectietabel heeft.
+
+**En de vlag VERDIEPT, hij schakelt niet aan.** Met `RTG_STAATLOG=2` wordt `stand()`
+dieper en ziet de bon ook een wijziging op zijn plaats; wat hij in de ondiepe stand niet
+kan zien staat in `dekking.blind`. Geen payload, geen momentopname, geen diff: een bon met
+inhoud is een gedragslogboek per lid, en dat is precies wat `KOSTEN.md` weigert.
+
+##### De vier uitkomsten, en de vierde is de enige die echt moet
+
+`kern/stuur/gevolgcontract/nameting.js` houdt de **voorspelde** klassen tegen de
+**waargenomen** klassen:
+
+| uitkomst | wat het betekent |
+|---|---|
+| `VOORSPELD_EN_GEZIEN` | voorspeld en waargenomen |
+| `VOORSPELD_NIET_GEZIEN` | voorspeld, niet gezien, **en de meter had dekking** — of de voorspelling klopt niet, of het effect bleef uit |
+| `GEZIEN_NIET_VOORSPELD` | een onverklaarde bijwerking: dit is wat een effectcontract hoort te vinden |
+| `NIET_MEETBAAR` | voorspeld, niet gezien, en de meter **kon** het niet zien |
+
+**Zonder die vierde verandert "geen observatie" stilletjes in "geen effect"**, en dan is
+de laag een machine die zichzelf gerust stelt. De dekking wordt daarom uit de bon GELEZEN
+en niet aangenomen: `UITGAANDE_AANROEP` komt langs geen enkel choke point en is dus altijd
+`NIET_MEETBAAR`; is er niets geschreven terwijl het choke point aanstond, dan is "niet
+gezien" juist wél het signaal; is er wél geschreven maar niet in een ingedeelde collectie,
+dan zegt "niet gezien" niets zolang de bon ondiep is. Er komt **geen samengesteld cijfer**
+boven die vier: een score van 3 op 4 middelt precies de vierde weg.
+
+**De brug is een id en geen identiteit.** De bon bestaat pas als het antwoord de deur uit
+gaat, dus de geldketen kan hem niet lezen — maar hij kan hem terugvinden: `uitvoer()`
+onthoudt `uitvoerVerzoek`, en de voorspelling staat al op de as `gevolgcontract` (achteraf
+reconstrueren zou geen voorspelling meer zijn). De richting van de koppeling is bewust:
+**kern duwt niets naar de serverlaag**, dus geeft `server/opzet/kern-geldketen.js` — dat
+beide kent — een zuiver lezende functie aan de bon mee, zelfde vorm als de frictiemotor
+die lui aan die baan wordt meegegeven.
+
+**Wat dit over HTTP bewijst:** `test/tweedehandtekening.test.js` toets 6 verplaatst met
+twee kantoormensen op naam echt geld, en het verzoek dat dat deed meldt in zijn eigen kop
+`X-RTG-Effectbon: GELD_BEWEGEN` — **zonder `RTG_STAATLOG`**. Zet de bon uit met zijn eigen
+uitweg en die toets zakt met "(geen kop)".
+
+**Drie dingen die dit bouwen blootlegde.** De tellers moesten altijd aan (alleen de KOPPEN
+hangen nog aan de vlag), en `perVerzoek` mocht daardoor niet meer NESTEN: met een verse
+teller in de binnenste schil schreef `tel()` daarin en zag de buitenste nul — de bon zou
+dan melden dat er geen mail uitging. Twee bestaande toetsen in
+`test/effectmeter.test.js` eisten het omgekeerde en zijn **met de reden erbij** van
+betekenis veranderd; één van de twee slaagde daarna nog steeds, maar om een andere reden
+dan zijn boodschap zei, en dat is erger dan zakken. En de derde: de uitvoerder van
+`bank.incasso` is een **closure die de tweede-handtekeningmodule aanroept en niet de
+route**, dus `req` bestaat daar niet. Dat gaf een 500 met "req is not defined" die alleen
+de e2e tegen een echte server vond — een unittoets roept die closure nooit vanuit een
+verzoek aan.
+
 #### De echte droogloop (`scripts/droogloop.js`, `npm run droogloop`)
 
 Het plan draait werkelijk — tegen een **wegwerpserver met een eigen datamap**

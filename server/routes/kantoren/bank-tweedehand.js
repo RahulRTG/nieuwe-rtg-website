@@ -86,7 +86,16 @@ module.exports = (ctx) => {
          kern/commercie/voornemen/uitvoeren.js niets uit. */
       if (tekenen && tekenen.error && tekenen.status !== 409) return tekenen;
 
-      const r = await ketenlaag.uitvoer({ id: vid, door: bevestiger,
+      /* `verzoek` is de brug naar de effectbon: die wordt pas gemaakt als dit antwoord de
+         deur uit gaat, dus de keten kan hem niet lezen -- met dit id wordt hij straks wel
+         gevonden. Een id en geen identiteit.
+
+         HIJ KOMT VIA `wie` EN NIET VIA `req`, want die bestaat hier niet: deze uitvoerder
+         is een closure die kern/kantoor/tweedehandtekening.js aanroept en niet de route.
+         Dat leek te werken tot de e2e-toets een 500 gaf met "req is not defined" -- een
+         unittoets zou dat niet hebben gezien, want daar wordt deze closure nooit vanuit
+         een echt verzoek aangeroepen. */
+      const r = await ketenlaag.uitvoer({ id: vid, door: bevestiger, verzoek: wie && wie.verzoek,
         doe: async (stap) => bank.bankIncassoRonde({ tot: Number(stap.gegevens && stap.gegevens.tot) }) });
       if (r && r.ok) {
         /* De uitkomst van de ronde zit IN de stap en niet naast het antwoord:
@@ -129,7 +138,10 @@ module.exports = (ctx) => {
     veilig(res, () => tweedeHand.open()));
 
   app.post('/api/office/bank/handtekening/bevestig', kluisAuth, async (req, res) => {
-    const r = await tweedeHand.bevestig({ id: String((req.body || {}).id || ''), door: req.officeKey });
+    /* `verzoek` loopt mee tot in de uitvoerder: dat is de brug naar de effectbon, die
+       pas bestaat als dit antwoord de deur uit gaat (server/effectbon.js). */
+    const r = await tweedeHand.bevestig({ id: String((req.body || {}).id || ''),
+      door: req.officeKey, verzoek: req.id });
     veilig(res, () => {
       if (r.ok) afdelingen.audit(req.officeKey, 'Tweede handtekening gezet op "' + r.wat +
         '" (aangevraagd door ' + r.aangevraagdDoor + ')');

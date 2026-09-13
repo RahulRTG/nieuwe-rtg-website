@@ -27,10 +27,26 @@
      VERKLAARD_MAAR_ONBEREIKBAAR   het register belooft een doelgroep iets wat
                                    die niet kan openen. De harde fout.
      BEREIKBAAR_ZONDER_VERKLARING  een doelgroep komt ergens binnen waar het
-                                   register hem niet noemt. Dat kan een gat in
-                                   de autorisatie zijn of een gat in het
-                                   register -- welke van de twee zegt deze meter
-                                   NIET, want dat is een oordeel.
+                                   register hem niet noemt.
+
+   EN DIE TWEEDE IS EEN KEER VERKEERD GELABELD, dus let op wat hij WEL zegt.
+   Hier stond dat het "een gat in de autorisatie of een gat in het register" kon
+   zijn. Het eerste kan niet: `f.doelgroepen` is nergens een slot.
+   `functies/toegang.js` valt zonder eigen stand terug op de GLOBALE schakelaar
+   (`functieAanVoor`), en de enige standaard-weigering in dat bestand hangt aan
+   `alleenGenres` en niet aan de doelgroep. Wie hier binnenkomt, komt binnen
+   langs `auth` -- en daar gaat dit register niet over.
+
+   Wat het WEL is, is een BESTUURSgat, en dat is scherper dan het klonk:
+   `routes/techniek/boardroom/schakelaar.js` weigert een schakelaar voor een
+   niet-verklaarde doelgroep met *"Deze functie kent die doelgroep niet"*,
+   terwijl `functieAanVoor` die stand gewoon zou lezen. De eigenaar kan deze
+   functie dus NIET uitzetten voor deze doelgroep -- alleen globaal, en dat
+   raakt ook wie ervoor betaalt. Dezelfde vorm als de `social`-leugen in de
+   andere richting: een schakelaar die de helft van zijn functie niet haalt.
+
+   `triage` deelt die richting op in drie (zie de triagepas onderaan), want een
+   stapel van 132 zonder onderscheid is geen bevinding maar een berg.
 
    DRIE DINGEN DIE HEM EERLIJK HOUDEN:
 
@@ -272,6 +288,7 @@ async function meet() {
           if (stand === ONBEPAALD) { twijfel++; continue; }
           if (stand === DICHT) continue;
           open = r.methode + ' ' + r.pad;
+          cel.openRoute = r;
           if (heeftDeur(an)) { openMetDeur = open; break; }   // langs een echte deur is het sterkste bewijs
         }
         cel.beproefd = gezien;
@@ -289,6 +306,60 @@ async function meet() {
         else if (MEER_SESSIEVORMEN[d]) { cel.uitslag = 'onbepaald'; cel.reden = MEER_SESSIEVORMEN[d]; }
         else cel.uitslag = verklaard ? 'registerleugen' : 'correct-afgesloten';
         uit.cellen.push(cel);
+      }
+    }
+
+    /* ---------------------------------------------------------------------
+       DE TRIAGE VAN DE TWEEDE RICHTING.
+
+       Zonder deze pas is `bereikbaar-zonder-verklaring` een stapel van 132
+       waar niemand iets mee kan. De vraag die hem opdeelt is klein en
+       machinaal te stellen: krijgt een doelgroep die WEL verklaard is op
+       DEZELFDE route hetzelfde antwoord?
+
+         gelijk-aan-verklaard  ja -- de functie bedient deze doelgroep precies
+                               zoals de verklaarde. Het register loopt achter,
+                               en het gevolg is een BESTUURSgat: het bord kan
+                               deze functie niet uitzetten voor deze doelgroep
+                               (schakelaar.js weigert met "kent die doelgroep
+                               niet") terwijl de motor die stand wel zou lezen.
+         ruimer-dan-verklaard  nee -- elke verklaarde doelgroep wordt hier
+                               geweigerd en deze komt er langs. Dat is de enige
+                               tak die een TOEGANGSvraag stelt, en hij is er
+                               een voor een mens.
+         onbepaald             geen verklaarde doelgroep met een sessie, of de
+                               antwoorden spreken elkaar tegen.
+       --------------------------------------------------------------------- */
+    for (const cel of uit.cellen) {
+      if (cel.uitslag !== 'bereikbaar-zonder-verklaring' || !cel.openRoute) continue;
+      const f = FUNCTIES.find((x) => x.id === cel.functie);
+      const verklaarde = (f.doelgroepen || []).filter((d) => dragers[d]);
+      if (!verklaarde.length) {
+        cel.triage = 'onbepaald';
+        cel.triageReden = 'geen enkele verklaarde doelgroep heeft hier een sessie, dus er is niets om mee te vergelijken';
+        continue;
+      }
+      const mijnA = await klop(srv.basis, cel.openRoute, dragers[cel.doelgroep]);
+      let zelfde = 0, geweigerd = 0, onbekend = 0;
+      for (const d of verklaarde) {
+        const a = await klop(srv.basis, cel.openRoute, dragers[d]);
+        if (a.onbepaald || mijnA.onbepaald) { onbekend++; continue; }
+        if (a.status === mijnA.status && a.reden === mijnA.reden) zelfde++;
+        else if (WEIGERSTATUS.has(a.status)) geweigerd++;
+        else onbekend++;
+      }
+      cel.triageBewijs = { zelfde, geweigerd, onbekend, vergeleken: verklaarde.length };
+      if (zelfde) {
+        cel.triage = 'gelijk-aan-verklaard';
+        cel.triageReden = 'een verklaarde doelgroep krijgt op ' + cel.open + ' exact hetzelfde antwoord; ' +
+          'het register loopt achter en het bord kan deze functie niet per doelgroep uitzetten';
+      } else if (geweigerd && !onbekend) {
+        cel.triage = 'ruimer-dan-verklaard';
+        cel.triageReden = 'elke verklaarde doelgroep wordt op ' + cel.open + ' geweigerd en deze komt er langs; ' +
+          'dit is een toegangsvraag voor een mens';
+      } else {
+        cel.triage = 'onbepaald';
+        cel.triageReden = 'de verklaarde doelgroepen antwoorden verschillend of onbepaald op ' + cel.open;
       }
     }
   } finally { srv.klaar(); }

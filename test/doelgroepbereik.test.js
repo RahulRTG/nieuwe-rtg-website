@@ -129,3 +129,62 @@ test('9. de acht doelgroepen komen uit het register en niet uit een eigen lijst'
   const j = lees('DOELGROEPBEREIK.json');
   assert.deepEqual(j.doelgroepen, DOELGROEP_IDS);
 });
+
+test('10. de tweede richting claimt geen autorisatiegat', () => {
+  /* HIER STOND EEN FOUT, en hij was niet klein. De meter noemde
+     `bereikbaar-zonder-verklaring` "een gat in de autorisatie of een gat in het
+     register". Het eerste kan niet: `f.doelgroepen` is nergens een slot.
+     functies/toegang.js valt zonder eigen stand terug op de GLOBALE schakelaar,
+     en de enige standaard-weigering daar hangt aan `alleenGenres`.
+
+     Wat het wel is, staat in routes/techniek/boardroom/schakelaar.js: die
+     weigert een schakelaar voor een niet-verklaarde doelgroep, terwijl
+     functieAanVoor die stand gewoon zou lezen. De eigenaar kan de functie dus
+     niet per doelgroep uitzetten -- een BESTUURSgat. */
+  /* De oude zin MAG er staan -- als citaat in de correctie, want een fout die
+     je wegpoetst kan iemand morgen opnieuw maken. Wat niet mag is hem als
+     BEWERING laten staan. Daarom niet op het woord getoetst maar op de
+     weerlegging: hij komt precies een keer voor, en de ontkenning staat erbij. */
+  const claims = bron.match(/gat in\s+de autorisatie/g) || [];
+  assert.equal(claims.length, 1,
+    'de zin over een autorisatiegat staat er vaker dan een keer; dan is hij geen citaat meer maar een bewering');
+  assert.match(bron, /Het eerste kan niet: `f\.doelgroepen` is nergens een slot/,
+    'de weerlegging bij dat citaat is weg; dan leest de fout weer als de uitleg');
+  assert.match(bron, /BESTUURSgat/, 'de uitleg noemt niet wat het wel is');
+  /* De bewering over de schakelaar wordt tegen de CODE gehouden en niet
+     geloofd: zakt deze, dan is de uitleg van de meter een verhaal geworden. */
+  const schakelaar = fs.readFileSync(path.join(WORTEL, 'server', 'routes', 'techniek',
+    'boardroom', 'schakelaar.js'), 'utf8');
+  assert.match(schakelaar, /doelgroepen \|\| \[\]\)\.includes\(dg\)/,
+    'het bord weigert niet langer een niet-verklaarde doelgroep; dan klopt de uitleg van de meter niet meer');
+  const toegang = fs.readFileSync(path.join(WORTEL, 'server', 'functies', 'toegang.js'), 'utf8');
+  assert.doesNotMatch(toegang, /f\.doelgroepen.*includes\(c\.doelgroep\)/,
+    'de doelgroeplijst is een slot geworden; dan meet deze meter iets anders dan hij zegt');
+});
+
+test('11. elke cel in de tweede richting draagt een triage', () => {
+  /* Een stapel van 132 zonder onderscheid is geen bevinding maar een berg. */
+  const j = lees('DOELGROEPBEREIK.json');
+  const SOORTEN = ['gelijk-aan-verklaard', 'ruimer-dan-verklaard', 'onbepaald'];
+  for (const c of j.zonderVerklaring) {
+    assert.ok(SOORTEN.includes(c.triage),
+      c.functie + ' x ' + c.doelgroep + ' draagt geen geldige triage (' + c.triage + ')');
+    assert.ok(c.triageReden && c.triageReden.length > 20, 'de triage draagt geen uitgeschreven reden');
+  }
+  assert.ok(j.zonderVerklaring.length > 0);
+});
+
+test('12. "ruimer dan verklaard" wordt nooit zonder bewijs gezegd', () => {
+  /* Dat is de enige tak die een TOEGANGSvraag stelt, en dus de enige die als
+     beschuldiging leest. Hij mag alleen staan als ELKE verklaarde doelgroep op
+     diezelfde route geweigerd werd en er niets onbepaald tussen zat. */
+  const j = lees('DOELGROEPBEREIK.json');
+  for (const c of j.zonderVerklaring) {
+    if (c.triage !== 'ruimer-dan-verklaard') continue;
+    assert.ok(c.triageBewijs, 'geen bewijs bij een toegangsvraag');
+    assert.equal(c.triageBewijs.zelfde, 0, 'een verklaarde doelgroep kreeg hetzelfde antwoord; dan is dit geen verruiming');
+    assert.equal(c.triageBewijs.onbekend, 0, 'er zat een onbepaald antwoord tussen; dan is dit onbepaald en geen verruiming');
+    assert.ok(c.triageBewijs.geweigerd > 0);
+    assert.ok(c.open, 'er is geen route genoemd waar dit op geldt');
+  }
+});

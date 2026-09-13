@@ -1183,6 +1183,74 @@ van `test/doelgroepbereik.test.js` houdt vast dat die ene cel noch een leugen
 noch een gat is. De meter wordt daar pas rood van als iemand de doelgroep
 tóévoegt.
 
+### De triage van de tweede richting — en een label dat fout was
+
+De 132 zijn getrieerd, en dat begon met het corrigeren van de meter zelf. Hier
+stond dat `bereikbaar-zonder-verklaring` *"een gat in de autorisatie of een gat
+in het register"* kon zijn. **Het eerste kan niet.** `f.doelgroepen` is nergens
+een slot: `functies/toegang.js` valt zonder eigen stand terug op de GLOBALE
+schakelaar (`functieAanVoor`), en de enige standaard-weigering in dat bestand
+hangt aan `alleenGenres`. Wie hier binnenkomt, komt binnen langs `auth` — en
+daar gaat dit register niet over.
+
+Wat het **wel** is, is scherper dan het klonk.
+`routes/techniek/boardroom/schakelaar.js` regel 44 weigert een schakelaar voor
+een niet-verklaarde doelgroep met *"Deze functie kent die doelgroep niet"*,
+terwijl `functieAanVoor` die stand gewoon zou lezen. De eigenaar kan zo'n functie
+dus **niet uitzetten voor die doelgroep** — alleen globaal, en dat raakt ook wie
+ervoor betaalt. Een **bestuursgat**, dezelfde vorm als de `social`-leugen in de
+andere richting: een schakelaar die de helft van zijn functie niet haalt.
+
+De triage draait mee in de meter (geen tweede lijst) en vraagt per cel één
+machinale vraag: krijgt een doelgroep die **wel** verklaard is op **dezelfde**
+route hetzelfde antwoord?
+
+| triage | cellen | wat het betekent |
+|---|---|---|
+| `gelijk-aan-verklaard` | 102 | het register loopt achter; het bord kan hier niet per doelgroep schakelen |
+| `ruimer-dan-verklaard` | 30 | elke verklaarde doelgroep wordt hier geweigerd en deze komt langs — de enige toegangsvraag |
+| `onbepaald` | 0 | — |
+
+**Het antwoord op `gast: 76`: geen privilegelek.** 71 van de 76 zijn
+`gelijk-aan-verklaard` — de gratis app krijgt op die functies exact hetzelfde
+antwoord als een betalend lid. Met de hand geijkt: `/api/doelen`,
+`/api/medicatie`, `/api/noodkaart`, `/api/veiligheid`, `/api/punten` en
+`/api/vertegenwoordiging/bevoegdheden` geven een gast en een RTG-lid een
+identieke 200. En de geldpaden die er gevaarlijk uitzagen
+(`/api/contract/teken`, `/api/splits/betaal`, `/api/ride/pay`,
+`/api/facturen/pdf`) geven **allebei** een 404: er is daar geen verschil tussen
+een gast en een lid, alleen een lege wereld. Het product komt dus wél in
+beeld — de gratis app gebruikt RTG Life-functies en dat is niet per pas uit te
+zetten — maar het is een besluit van de eigenaar en geen defect.
+
+### Wat de triage vond en wat de meter zelf verborg
+
+De 30 `ruimer-dan-verklaard` concentreren: **20 ervan zitten op vijf functies
+die uitsluitend voor `foundation` zijn verklaard** — `dom-onderwijs`,
+`dom-leerstof`, `ov-bijles`, `dom-labfonds` en `dom-samen`. Met de hand geijkt
+tegen een echte server:
+
+| route | gezinssessie | lid |
+|---|---|---|
+| `/api/onderwijs/advies` | 401 *Niet ingelogd.* | 200 |
+| `/api/leerstof/antwoord` | 401 *Niet ingelogd.* | 400 (begin eerst een sessie) |
+| `/api/bijles/gesprek` | 401 *Niet ingelogd.* | 200 |
+| `/api/labfonds/beslis` | 401 *Niet ingelogd.* | 404 |
+| `/api/samen/chat` | 401 *Niet ingelogd.* | 404 |
+
+Dat is de Adam-bevinding, veralgemeend en met namen: vijf onderwijs- en
+ontwikkelfuncties die voor de RTFoundation zijn verklaard en die een gezin niet
+kan openen, terwijl een lid erlangs komt.
+
+**En de meter hield dat zelf verborgen.** Alle vijf staan voor `foundation` op
+`onbepaald` — de `MEER_SESSIEVORMEN`-uitzondering, die terecht zegt dat die
+doelgroep gezin, leerling én school dekt terwijl de meter er één draagt. Die
+voorzichtigheid is goed en blijft staan; wat zij kostte is dat de bevinding
+alleen van de ANDERE kant zichtbaar werd. Daarom is de grens hier scherper te
+formuleren dan "ik weet het niet": **de gezinssessie wordt geweigerd, en of een
+schoolsessie erlangs komt is niet gemeten.** Het eerste is bewezen, het tweede
+niet, en die twee mogen niet samenvallen.
+
 ### Wat hij niet meet
 
 Dit meet de **deur en niet de kamer**: er gaat een leeg lichaam heen, dus of een

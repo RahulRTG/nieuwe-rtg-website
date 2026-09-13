@@ -651,14 +651,18 @@ collecties veranderden: dat is het veld `opslag` in `IDEMPROEF.json`. Voor
 `bankIdemAfdruk`. Die vier zijn geen aanname — ze zijn één keer echt gebeurd.
 Over alle routes: **331 met een gemeten effect over 196 collecties**.
 
-**Drie graden, en de derde is de grootste.** Over de 176 paden die de AI mag
-bedienen:
+**Drie graden, en de derde is de grootste.** Over de <!--getal:effect.bereikbaar-->173<!--/getal-->
+paden die de AI mag bedienen:
 
 | graad | aantal | wat het zegt |
 |---|---|---|
-| `gemeten` | 36 | de proef raakte deze collecties aan |
-| `geen-effect-gemeten` | 44 | de proef draaide en raakte niets aan |
-| **`onbekend`** | **96** | de proef kwam er niet bij (404, 403, geen geldige invoer) |
+| `gemeten` | <!--getal:effect.gemeten-->38<!--/getal--> | de proef raakte deze collecties aan |
+| `geen-effect-gemeten` | <!--getal:effect.geenEffect-->48<!--/getal--> | de proef draaide en raakte niets aan |
+| **`onbekend`** | **<!--getal:effect.onbekend-->87<!--/getal-->** | de proef kwam er niet bij (404, 403, geen geldige invoer) |
+
+Die getallen stonden hier tot 13 september OVERGETYPT, en waren verouderd: er stond
+96 van 176. Ze komen nu uit `EFFECTDEKKING.json` via `npm run getallen`, zodat het
+document niet meer kan achterlopen op zijn eigen meting.
 
 **Die laatste twee mogen nooit door elkaar lopen**, en dat is de scherpste toets
 van dit blok. "De proef kwam er niet bij" is iets anders dan "er gebeurt niets",
@@ -671,6 +675,61 @@ zij zegt wélke collecties en nooit wat erin verandert; zij is gemeten met de
 invoer van de proef, dus een ander lichaam kan andere collecties raken; alles
 buiten de opslag valt erbuiten (mail, een betaalprovider, een derde partij); en
 zij is een momentopname van de laatste proefronde, niet van deze commit.
+
+#### Het effectcontract: de VERKLARING naast de meting (13 september 2026)
+
+De meting hierboven is hard en smal: zij zegt wélke collecties veranderen, van
+<!--getal:effect.gemeten-->38<!--/getal--> van de <!--getal:effect.bereikbaar-->173<!--/getal-->
+bereikbare handelingen. Over <!--getal:effect.onbekend-->87<!--/getal--> weet zij niets, en
+over de buitenwereld weet zij per definitie niets — mail, een provider, de bank van
+de ontvanger staan in geen enkele collectie. Een planner die daarop zou leunen, plant
+in het donker.
+
+`server/kern/stuur/effectcontract.js` voegt de andere helft toe: een **verklaring
+van een mens** over wat een handeling veroorzaakt, in vier soorten — `direct`
+(de opslag verandert), `afgeleid` (volgt eruit), `buiten` (valt buiten elke
+collectie) en `mislukking` (wat er achterblijft als het halverwege stopt). Alleen
+de eerste is machinaal te bevestigen; dat is geen reden om de andere drie weg te
+laten maar de reden dat ze hun graad zelf dragen.
+
+**Twee assen, nooit opgeteld** — dezelfde vorm als `machinedekking` en
+`kantoormacht`. En één regel houdt het geheel eerlijk: *een contract mag MEER zeggen
+dan de meting, maar nooit iets ANDERS.* Claimt het `gemeten` op een collectie die de
+proef daar nooit zag, dan weigert de keuring; en een gevolg `buiten` de opslag kan
+nooit `gemeten` heten, want de meting kijkt alleen naar collecties.
+
+**Er komt geen zesde zekerheidsladder bij.** Het voorstel vroeg
+`KNOWN / BOUNDED / UNKNOWN`; dit huis heeft al vier bewijsgraden, drie graden in
+`gevolg.js`, vijf assurance-standen, acht uitkomsten in `CONTROLPLANE.md`, vier
+fiscale zekerheidsklassen — en zelfs het woord *begrensd* is bezet
+(`bewezenBegrensd` in `scripts/lib/lusvorm.js`). `AFSPRAAK.md` verbiedt de zesde.
+De bedoeling blijft wel overeind, als **tweede as** in plaats van als derde trede:
+de graad zegt hoe hard we het weten, en het veld `uitkomsten` zegt of de
+uitkomstRUIMTE benoemd en gesloten is. Een uitgaande SEPA laat alle drie de soorten
+zekerheid op één handeling zien:
+
+| gevolg | graad | uitkomstruimte |
+|---|---|---|
+| het eigen saldo daalt | `gemeten` | — (het is gebeurd) |
+| de provider bevestigt, weigert of boekt terug | `vermoed` | **gesloten**: drie benoemde uitkomsten |
+| de bank van de ontvanger schrijft bij | `onbekend` | geen: daar komt geen signaal van terug |
+
+**Drie dingen worden actief geweigerd**, elk omdat de naam al bezet was: `reversible`
+(herstel is hier GEMETEN met vijf uitslagen — `scripts/herstelproef.js` — en een
+boolean slaat het verschil tussen een creditnota en een gewiste factuur plat),
+`doel`/`goals` (dat heet `streefstand`) en `privacyImpact` (dat heet
+`classificatie`, geleend uit `kern/envelop.js` en niet overgeschreven).
+
+`npm run effectdekking` meet het, zonder percentage erboven:
+<!--getal:effect.contractVolledig-->1<!--/getal--> volledig,
+<!--getal:effect.contractOnbekend-->172<!--/getal--> zonder contract. `--controle` zakt zodra
+de onbekende paden stijgen, een volledige verklaring verdwijnt, of een contract de
+keuring niet haalt.
+
+**Wat er nog niet is, en dat hoort erbij:** de enige lezer is vandaag de meter. Een
+runtime-lezer — `tegenfeit.js` die het contract naast zijn eigen vooruitblik legt —
+bestaat niet. Een laag zonder aanroeper is precies wat `CONTROLPLANE.md` meet, dus
+dat staat hier als gat en niet als belofte.
 
 **En dit was géén droogloop.** Er werd een eerdere meting op het plan
 geprojecteerd; het plan liep niet. Dat deel staat er nu wel.

@@ -56,7 +56,7 @@ voor dit voorstel gedaan, en dat maakt ze bruikbaar.
 | meting | uitkomst | wat dat zegt over "één objectmodel" |
 |---|---|---|
 | `OBJECTMODEL.json` | **1418 van 2010 velden** (70,5%) horen bij precies één domein; 267 domeinen; `Asset` bestaat niet | een gedeeld TYPEmodel is hier al een keer gesneuveld |
-| `KETENVORM.json` | **0 van 18 actoren** gedeeld over vier onafhankelijke ketens; 2 van 10 beloftethema's, en die twee gaan over de MACHINE en niet over het domein | een status-, actor- of uitkomstcontract over domeinen heen is niet gerechtvaardigd |
+| `KETENVORM.json` | **0 van 33 actoren** gedeeld over zeven onafhankelijke ketens; 2 van 10 beloftethema's, en die twee gaan over de MACHINE en niet over het domein | een status-, actor- of uitkomstcontract over domeinen heen is niet gerechtvaardigd |
 | `SEMANTIEK.json` | **100 namen** dragen meer dan één betekenis, samen 379; `SOORTEN` op 47 | een nieuw kernbegrip landt zelden op vrij terrein |
 
 De conclusie is niet "geen graaf". De conclusie is: **de graaf mag over

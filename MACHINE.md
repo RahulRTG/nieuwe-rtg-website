@@ -275,7 +275,7 @@ betekenissen).
 - **Routes als bijproduct.** Kan pas als de capability-laag is **afgeleid**;
   `OBJECTMODEL.json` (71% van de velden hoort bij één domein) en
   `KETENVORM.json` (<!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
-  <!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> gedeelde actoren over drie
+  <!--getal:ketenvorm.actorenTotaal-->33<!--/getal--> gedeelde actoren over drie
   ketens) zeggen dat een model eroverheen de `Asset`-fout is.
 
 ---

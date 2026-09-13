@@ -489,7 +489,7 @@ salonkant -- Podium, Clips en het Theater hebben hun eigen naden. Van de vier
 Moment-aanleidingen zijn er drie echt gelopen.
 
 **En wat de vier ketens samen delen, is geteld en niet verklaard**
-(`npm run ketenvorm`): **0 van 18 actoren** in alle vier, en 2 van 10
+(`npm run ketenvorm`): **0 van 33 actoren** in alle zeven, en 2 van 10
 beloftethema's -- dezelfde twee als bij drie ketens, en allebei over de MACHINE
 (mag dit twee keer, en zegt een weigering waarom) en niet over het domein. Acht
 van de dertien storingen van deze keten vallen buiten élk thema; die lijst is met

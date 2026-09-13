@@ -382,7 +382,14 @@ const REGISTERS = [
      uitweg zijn, terwijl er sindsdien drie bij kunnen zijn gekomen -- en aan dat
      getal hangt sinds 11 september 2026 een normtand. */
   ['LUSSEN.json', 'npm run lussen', 'elke cyclische gedraging met zijn terminatiegraad, en de drie schulden waar NORM.json op ratelt'],
-  ['CARRIEREVORM.json', 'node scripts/carrierevorm.js --vastleggen', 'of de talentdomeinen een datavorm delen -- CARRIERE.md par. 0 rust erop, dus een verouderde uitslag draagt daar een conclusie die niemand nog heeft nagerekend']
+  ['CARRIEREVORM.json', 'node scripts/carrierevorm.js --vastleggen', 'of de talentdomeinen een datavorm delen -- CARRIERE.md par. 0 rust erop, dus een verouderde uitslag draagt daar een conclusie die niemand nog heeft nagerekend'],
+  /* Zelfde soort als zijn buurman hierboven, en om dezelfde reden `overig`: het
+     is een uitslag waar een DOCUMENT op rust en geen poort waar iemand langs
+     binnenkomt. Wel scherper in een opzicht -- de uitslag is een NUL (0 velden
+     gedeeld over tien publieke domeinen), en STAGE.md par. 0 draagt daarop het
+     besluit dat een Moment een projectie is en geen object. Een verouderde nul
+     ziet er exact zo uit als een verse. */
+  ['STAGEVORM.json', 'npm run stagevorm:vast', 'of de publieke domeinen een datavorm delen -- STAGE.md par. 0 rust erop, en de uitslag is een nul die er vers en verouderd hetzelfde uitziet']
 ];
 
 /* De lezer van beide stempelvormen woont in ./lib/stempel.js -- hij stond hier

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-12T22:06:54.321Z",
-    "commit": "005f7b39",
-    "boomVuil": false,
-    "boomAnders": 4,
+    "op": "2026-09-13T05:46:41.574Z",
+    "commit": "a1c31115",
+    "boomVuil": true,
+    "boomAnders": 0,
     "instrument": "scripts/menstaalproef.js",
     "node": "v22.22.2"
   },
@@ -12,12 +12,12 @@
   "meet": "server/kern/stuur/menstaal.json tegen server/kern/stuur/spoor.js",
   "corpus": {
     "bestand": "server/kern/stuur/menstaal.json",
-    "gevallenNU": 39,
-    "vingerafdruk": "b62006aa51fbc5a8"
+    "gevallenNU": 41,
+    "vingerafdruk": "a5d240eb89cff875"
   },
   "telling": {
-    "gemeten": 38,
-    "binnen": 38,
+    "gemeten": 40,
+    "binnen": 40,
     "teVer": 0,
     "nietGemeten": 1,
     "uitlegvragen": 9,
@@ -266,14 +266,11 @@
       "vragen": 0
     },
     "poorten": {
-      "/api/stuur/goedkeuring": "verboden",
-      "/api/stuur/bevestig": "verboden",
-      "/api/goedkeuring/intrek": "verboden",
-      "/api/stuur/voorstellen": "verboden"
+      "/api/member/doe": "verboden",
+      "/api/member/doe/bevestig": "verboden",
+      "/api/member/doe/kaart": "verboden"
     },
-    "nietGemeten": {
-      "fup-toch-niet": "er is voor deze rail geen pad om een klaargezet voorstel in te trekken; dat is een productvraag en geen gat in de bedrading"
-    },
+    "intrekken": "de tegenhanger (fup-toch-niet) wordt sinds 13 september gemeten; zie intrekveiligheid",
     "gebreken": [],
     "heel": true,
     "wat": "of een instemming in het gesprek een klaargezette handeling kan afmaken. Gemeten aan twee kanten: de poort weigert het, en de taal probeert het niet eens."
@@ -330,10 +327,49 @@
     "heel": true,
     "wat": "dezelfde context, drie zinnen. Het verschil is of de zin een werkwoord draagt; komen A en B op dezelfde uitkomst uit, dan stuurt de selectie de handeling en niet de mens."
   },
+  "intrekveiligheid": {
+    "niveau": "klein",
+    "gevallen": {
+      "een": {
+        "kwam": "uitvoeren",
+        "fasen": {
+          "INPUT_RECEIVED": "PASS",
+          "CONTEXT_SANITIZED": "PASS",
+          "INTENT_RESOLVED": "OVERGESLAGEN",
+          "PLAN_COMPILED": "OVERGESLAGEN",
+          "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+          "MANDATE_EVALUATED": "OVERGESLAGEN",
+          "CAPABILITY_SELECTED": "PASS",
+          "PROJECTED": "PASS",
+          "EXECUTED": "PASS"
+        },
+        "vragen": 0
+      },
+      "twee": {
+        "kwam": "uitvoeren",
+        "fasen": {
+          "INPUT_RECEIVED": "PASS",
+          "CONTEXT_SANITIZED": "PASS",
+          "INTENT_RESOLVED": "OVERGESLAGEN",
+          "PLAN_COMPILED": "OVERGESLAGEN",
+          "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+          "MANDATE_EVALUATED": "OVERGESLAGEN",
+          "CAPABILITY_SELECTED": "PASS",
+          "PROJECTED": "PASS",
+          "EXECUTED": "NOT_RUN"
+        },
+        "vragen": 1
+      }
+    },
+    "gebreken": [],
+    "heel": true,
+    "wat": "of een nog niet uitgevoerd voorstel conversationeel kan vervallen -- bij precies EEN wel, bij twee niet, en nooit via een id dat de laag zelf aanwijst."
+  },
   "perBereikteTrede": {
     "geen": 33,
     "klaarzetten": 3,
-    "tonen": 2
+    "tonen": 2,
+    "uitvoeren": 2
   },
   "ijking": {
     "op": "2026-09-12",
@@ -677,7 +713,7 @@
       },
       "interpretatie": {
         "versmald": false,
-        "paden": 120,
+        "paden": 121,
         "gekozen": []
       },
       "gevolg": {
@@ -688,8 +724,8 @@
         "onbekend": 1
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "planReden": "Deze actie staat niet op de expliciete AI-allowlist voor member.",
       "uitslag": "binnen",
@@ -738,8 +774,8 @@
         "onbekend": 0
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "uitslag": "binnen",
       "fasen": {
@@ -792,8 +828,8 @@
         "onbekend": 0
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "uitslag": "binnen",
       "fasen": {
@@ -830,7 +866,7 @@
       },
       "interpretatie": {
         "versmald": false,
-        "paden": 120,
+        "paden": 121,
         "gekozen": []
       },
       "gevolg": {
@@ -841,8 +877,8 @@
         "onbekend": 0
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "uitslag": "binnen",
       "fasen": {
@@ -890,8 +926,8 @@
         "onbekend": 0
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "planReden": "Deze actie staat niet op de expliciete AI-allowlist voor member.",
       "uitslag": "binnen",
@@ -940,8 +976,8 @@
         "onbekend": 1
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "uitslag": "binnen",
       "fasen": {
@@ -989,8 +1025,8 @@
         "onbekend": 1
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "uitslag": "binnen",
       "fasen": {
@@ -1038,8 +1074,8 @@
         "onbekend": 0
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "uitslag": "binnen",
       "fasen": {
@@ -1087,8 +1123,8 @@
         "onbekend": 1
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "uitslag": "binnen",
       "fasen": {
@@ -1136,8 +1172,8 @@
         "onbekend": 0
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "uitslag": "binnen",
       "fasen": {
@@ -1185,8 +1221,8 @@
         "onbekend": 0
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "uitslag": "binnen",
       "fasen": {
@@ -1234,8 +1270,8 @@
         "onbekend": 0
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "uitslag": "binnen",
       "fasen": {
@@ -1313,14 +1349,14 @@
       },
       "interpretatie": {
         "versmald": false,
-        "paden": 120,
+        "paden": 121,
         "gekozen": [
           "/api/agenda/mijn"
         ]
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "uitslag": "binnen",
       "fasen": {
@@ -1520,8 +1556,8 @@
         ]
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "uitslag": "binnen",
       "fasen": {
@@ -1642,7 +1678,7 @@
       },
       "interpretatie": {
         "versmald": false,
-        "paden": 120,
+        "paden": 121,
         "gekozen": []
       },
       "gevolg": {
@@ -1653,8 +1689,8 @@
         "onbekend": 1
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "planReden": "Deze actie staat niet op de expliciete AI-allowlist voor member.",
       "uitslag": "binnen",
@@ -1695,7 +1731,7 @@
       },
       "interpretatie": {
         "versmald": false,
-        "paden": 120,
+        "paden": 121,
         "gekozen": [
           "/api/agenda/wijzig"
         ]
@@ -1708,8 +1744,8 @@
         "onbekend": 1
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "uitslag": "binnen",
       "fasen": {
@@ -1798,6 +1834,92 @@
         "CAPABILITY_SELECTED": "OVERGESLAGEN",
         "PROJECTED": "PASS",
         "EXECUTED": "OVERGESLAGEN"
+      }
+    },
+    {
+      "id": "fup-toch-niet",
+      "input": "toch niet",
+      "klasse": "FOLLOWUP",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "uitvoeren",
+      "kwam": "uitvoeren",
+      "uit": [
+        "pad /api/member/voorstel/intrek (klein) -> uitvoeren",
+        "EXECUTED status 200"
+      ],
+      "vragen": 0,
+      "magVragen": 0,
+      "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 5,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [
+          "/api/member/voorstel/intrek"
+        ],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "PASS",
+        "PROJECTED": "PASS",
+        "EXECUTED": "PASS"
+      }
+    },
+    {
+      "id": "fup-laat-maar-twee",
+      "input": "laat maar",
+      "klasse": "FOLLOWUP",
+      "verwachteRoute": "OPERATIONAL",
+      "mag": "uitvoeren",
+      "kwam": "uitvoeren",
+      "uit": [
+        "pad /api/member/voorstel/intrek (klein) -> uitvoeren",
+        "aanroep geweigerd (status 409): niets uitgevoerd en niets klaargezet"
+      ],
+      "vragen": 1,
+      "magVragen": 1,
+      "teVeelVragen": false,
+      "context": {
+        "aangeboden": "PASS",
+        "woorden": 4,
+        "gewist": 0,
+        "verwijzingen": 0,
+        "canoniek": 0,
+        "gebruikt": null
+      },
+      "interpretatie": {
+        "versmald": null,
+        "paden": null,
+        "gekozen": [
+          "/api/member/voorstel/intrek"
+        ],
+        "reden": "de resolver is niet geraakt; er is niets te interpreteren geweest"
+      },
+      "uitslag": "binnen",
+      "fasen": {
+        "INPUT_RECEIVED": "PASS",
+        "CONTEXT_SANITIZED": "PASS",
+        "INTENT_RESOLVED": "OVERGESLAGEN",
+        "PLAN_COMPILED": "OVERGESLAGEN",
+        "CONSEQUENCE_EVALUATED": "OVERGESLAGEN",
+        "MANDATE_EVALUATED": "OVERGESLAGEN",
+        "CAPABILITY_SELECTED": "PASS",
+        "PROJECTED": "PASS",
+        "EXECUTED": "NOT_RUN"
       }
     },
     {
@@ -1985,8 +2107,8 @@
         ]
       },
       "mandaatWeging": {
-        "voor": 120,
-        "na": 120
+        "voor": 121,
+        "na": 121
       },
       "uitslag": "binnen",
       "fasen": {

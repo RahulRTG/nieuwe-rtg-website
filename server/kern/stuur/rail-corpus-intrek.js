@@ -46,17 +46,22 @@ module.exports = {
       projectie: 'Ik heb het klaargezette voorstel laten vervallen; er is niets uitgevoerd. ' +
         'Zeg het maar als je het alsnog wilt.' },
 
-  /* B. TWEE OPENSTAANDE VOORSTELLEN. Exact dezelfde aanroep -- de rail ziet het
-        verschil niet -- en de POORT weigert met hoeveel er openstaan. Daarna
-        vraagt de keten welke, en dat is de ene blokkerende vraag die het
-        contract hier toestaat.
+  /* B. TWEE OPENSTAANDE VOORSTELLEN, EN HET SCHERM TOONT ZE NIET. Exact dezelfde
+        aanroep -- de rail ziet het verschil met A niet en mag het niet zien --
+        en de POORT weigert met hoeveel er openstaan. Daarna vraagt de keten
+        welke, en dat is de ene blokkerende vraag die het contract hier toestaat.
+
+        DE PROJECTIE NOEMT DE TWEE NIET BIJ NAAM, en dat is geen slordigheid: de
+        rail wéét hier niets van tandartsen of kappers. Zou hij ze opnoemen, dan
+        had het corpus kennis die de machine hem niet gaf, en dan toets je het
+        corpus.
 
         Let op wat hier NIET in de projectie staat: geen id. De route geeft ze
         ook niet af (kern/stuur/goedkeuring.js), want dat token is de sleutel
         waarmee elders een handeling wordt vrijgegeven. */
-  'laat maar actieve context scherm rtg agenda deel deze week selectie voorstel tandarts vrijdag 14 00 voorstel kapper maandag 09 00':
+  'laat maar actieve context scherm rtg agenda deel deze week':
     { stappen: [ intrek('het klaargezette voorstel van dit lid laten vervallen voordat het is uitgevoerd') ],
-      projectie: 'Er staan er twee open en ik weet niet welke je bedoelt, dus ik heb er geen ' +
-        'laten vervallen. Welke moet weg: de tandarts van vrijdag of de kapper van maandag?' }
+      projectie: 'Er staan er meer dan een open en ik weet niet welke je bedoelt, dus ik heb ' +
+        'er geen laten vervallen. Welke moet ik laten vervallen?' }
 
 };

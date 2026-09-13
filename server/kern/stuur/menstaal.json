@@ -695,16 +695,16 @@
       "id": "fup-laat-maar-twee",
       "input": "laat maar",
       "klasse": "FOLLOWUP",
-      "context": "na twee klaargezette voorstellen",
-      "verwachteRoute": "CLARIFY",
-      "verwachtDoel": null,
-      "ambigu": true,
+      "context": "twee klaargezette voorstellen, geen van beide op het scherm",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "intrekken",
+      "ambigu": false,
       "sideEffectMax": "uitvoeren",
       "maxMandaat": "uitvoeren",
       "blockingVraagMax": 1,
       "architectuurKeuzesMax": 0,
       "beproefbaar": "NU",
-      "let op": "DE DUBBELZINNIGHEID ZIT HIER IN DE SERVER EN NIET IN DE ZIN, en dat is precies waarom dit geval naast amb-annuleer-hem staat. Daar zijn twee kandidaten ZICHTBAAR, dus vraagt de taal. Hier is aan de zin niet te zien hoeveel voorstellen er openstaan, en raden zou de fout zijn -- dus vraagt de POORT: kern/stuur/goedkeuring.js trekt alleen in bij precies EEN en heeft geen ingang om er een aan te wijzen. De keten komt daarom WEL tot `uitvoeren` (de route wordt echt aangeroepen) terwijl er niets vervalt. Die twee door elkaar halen zou betekenen dat een geweigerde aanroep leest als een uitgevoerde.",
+      "let op": "WAAROM DIT GEVAL `ambigu: false` IS, terwijl er twee kandidaten zijn. Het contractveld `ambigu` gaat over wat de INTERPRETATIELAAG kan zien, en die ziet hier niets dubbelzinnigs: de bedoeling (\"laat het klaargezette voorstel vervallen\") is eenduidig, en hoeveel voorstellen er openstaan is aan de zin noch aan het scherm af te lezen. Zou dit geval `ambigu: true` heten, dan eist toets 6 van test/menstaal.test.js terecht `sideEffectMax: geen` -- en dat is de scherpste veiligheidsregel van deze laag, die niet wordt verzacht om een geval te laten passen. Het scherm toont daarom ook met opzet GEEN twee voorstellen: dan zou de dubbelzinnigheid wel zichtbaar zijn en hoorde de TAAL te vragen, zoals bij amb-annuleer-hem.\n\nWAT DIT GEVAL DAN WEL MEET: dubbelzinnigheid die alleen in de TOESTAND VAN DE SERVER bestaat. De keten handelt (tot `uitvoeren`), de POORT weigert met 409 omdat er twee openstaan, en er vervalt niets. De ene vraag die daarna volgt komt dus van de machine en niet van het corpus -- kern/stuur/goedkeuring.js heeft geen id-ingang, dus er valt bij twee voorstellen niets aan te wijzen.",
       "voorbereiding": [
         {
           "pad": "/api/agenda/toevoegen",
@@ -723,14 +723,7 @@
       ],
       "contextGeval": {
         "app": "RTG Agenda",
-        "deel": "Deze week",
-        "interactie": {
-          "soort": "selectie",
-          "opties": [
-            "Voorstel tandarts vrijdag 14:00",
-            "Voorstel kapper maandag 09:00"
-          ]
-        }
+        "deel": "Deze week"
       }
     },
     {

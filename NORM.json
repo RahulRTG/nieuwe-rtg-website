@@ -33,7 +33,7 @@
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
-    "keuringOmvang": 322,
+    "keuringOmvang": 323,
     "keuringScheef": 16,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
@@ -2202,6 +2202,16 @@
       "meter": "crashasOnbekend 45 -> 89",
       "reden": "De oude 45 was niet beter maar ONWAAR. crashas.js leidde `bestaat` af uit \"deze route schrijft collecties\", en telde de twee duurzame crashgrenzen daarmee op alle 45 geldroutes als BESTAAND. scripts/crashproef.js heeft dat weerlegd door de routes werkelijk te laten sterven: 41 van de 90 rijen komen langs geen van beide injectiepunten, omdat die routes met de gewone write-behind save() schrijven (server/kern/bank/passen.js). Of een crashgrens bestaat hangt aan de SCHRIJFWEG en niet aan het feit dat er geschreven wordt -- de vierde as uit crashtaxonomie.js, en die is niet af te leiden. Wat de proef niet aan het werk kreeg (44 rijen) verhuist daarmee van een gevolgtrekking `ja` naar een eerlijk `onbekend`. Dat is epistemische schuld en geen technische: RTG weet nog niet wat het weet. Tegelijk daalde `bestaat` van 90 naar 5 en steeg `gemeten` van 1 naar 5, zodat elke grens die BESTAAT nu ook werkelijk is gemeten.",
       "waarheen": "omlaag door te KIJKEN, niet door patroonherkenning en niet door af te leiden uit soortgelijke routes. Per route: krijg scripts/crashproef.js hem aan het werk (een lijf of een wereld die zijn voorwaarden dekt), en de proef zegt dan zelf of de grens op zijn pad ligt. De teller `crashproefOnbereikt` (44) is precies dat werk, en die twee dalen samen."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 322,
+      "vervalt": "2026-12-15",
+      "meter": "keuringOmvang 322 -> 323",
+      "reden": "server/kern/bankregie/index.js komt in de waarschuwingsband onder 10 kB (9681 byte); de harde grens van keuringsregel 13 haalt hij niet. De groei is de reparatie van drie gezakte crashrijen plus de reden erbij: /api/office/bank/leden, /draai en /nood muteerden `bankregie` duurzaam terwijl het proces stierf en de auditregel NIET landde, dus een schakelaar die bepaalt of de leden-bank live is kon omgaan zonder spoor van wie. De helper `besluit` zet mutatie en spoor samen in een duurzame bundel. Het commentaar is al ingekort -- de lange kant staat in routes/kantoren/bank.js -- en wat overblijft legt uit waarom deze module als enige van de bankregie de duurzame commit mag bereiken (keuringsregel 47).",
+      "waarheen": "bankregie/index.js draagt vier onderwerpen (stand, clearing, plafonds, de knop). De knop plus `besluit` is de natuurlijke naad naar een eigen bestand, net zoals nood.js, autorisatie.js en instellingen.js er al af zijn. Dat is een verhuizing en geen herschrijving."
     }
   ],
   "prestatie": {

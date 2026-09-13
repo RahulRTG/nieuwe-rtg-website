@@ -27,7 +27,29 @@ const NOOD_DREMPEL = 3;            // zoveel mislukte eigen-clearings achter elk
 const AUTORISATIE_MS = 10 * 60 * 1000; // de tweede persoon heeft tien minuten
 const normaliseer = require('./stand')({ MODI });
 
-function maakBankregie({ db, save }) {
+function maakBankregie({ db, save, bijeen }) {
+  /* EEN BESTUURSBESLUIT EN ZIJN SPOOR LANDEN SAMEN, OF GEEN VAN BEIDE.
+
+     scripts/crashproef.js mat drie routes als gezakt op ATOMIC: ledenAan stond
+     op true, de oproep stierf bij de eerste bundel, en na de herstart stond hij
+     op false -- terwijl de auditregel NIET landde. De schakelaar die bepaalt of
+     de leden-bank live is, kon dus omgaan zonder spoor van WIE. Voor een
+     besturingsvlak is dat de duurste halve uitkomst: de macht verschuift en de
+     verantwoording niet.
+
+     De oorzaak stond hieronder: `d().x = ...; save()` is write-behind en staat
+     in geen bundel; de bundel kwam pas later, met de audit. Nu gaan mutatie en
+     spoor er samen in.
+
+     Het spoor is een CALLBACK omdat de route pas na de uitkomst weet wat erin
+     hoort (een opschaling wacht op een tweede persoon). De SSE-sync blijft
+     erbuiten: een scherm mag niet horen van een besluit dat nog niet vaststaat.
+     Zie routes/kantoren/bank.js voor die kant. */
+  const besluit = async (doe, audit) => bijeen(async () => {
+    const r = doe();
+    if (audit && r && !r.error) { try { audit(r); } catch (e) { /* het spoor mag het besluit niet breken */ } }
+    return r;
+  }, { duurzaam: true });
   function d() {
     if (!db.data.bankregie || typeof db.data.bankregie !== 'object') db.data.bankregie = {};
     return normaliseer(db.data.bankregie);
@@ -127,15 +149,17 @@ function maakBankregie({ db, save }) {
     bankVergunningZet: verg.vergunningZet, bankPartnerRailZet: verg.partnerRailZet,
     bankTerugstorting: verg.terugstorting, bankTerugstortingZet: verg.terugstortingZet,
     // de knop, nu via vier-ogen bij het opschalen
-    bankModusZet: ({ modus: m, wie }) => aut.aanvraag({ actie: 'modus', modus: m, door: wie }),
-    bankDraai: ({ wie } = {}) => aut.aanvraag({ actie: 'draai', door: wie }),
-    bankOperationeelZet: ({ aan, wie }) => aut.aanvraag({ actie: aan ? 'operationeel-aan' : 'operationeel-uit', door: wie }),
-    bankDraaiTerug: ({ wie } = {}) => _modusZet(MODI[Math.max(RANG[d().modus] - 1, 0)], wie),
+    bankModusZet: ({ modus: m, wie, audit }) => besluit(() => aut.aanvraag({ actie: 'modus', modus: m, door: wie }), audit),
+    bankDraai: ({ wie, audit } = {}) => besluit(() => aut.aanvraag({ actie: 'draai', door: wie }), audit),
+    bankOperationeelZet: ({ aan, wie, audit }) => besluit(() => aut.aanvraag({ actie: aan ? 'operationeel-aan' : 'operationeel-uit', door: wie }), audit),
+    bankDraaiTerug: ({ wie, audit } = {}) => besluit(() => _modusZet(MODI[Math.max(RANG[d().modus] - 1, 0)], wie), audit),
     bankAutoriseerBevestig: aut.bevestig, bankAutoriseerStatus: aut.status, bankAutoriseerAnnuleer: aut.annuleer,
     // nood-fallback
-    bankNoodMeld: nood.noodMeld, bankNoodHerstel: nood.noodHerstel, bankClearingMislukt: nood.clearingMislukt, bankClearingGelukt: nood.clearingGelukt,
+    bankNoodMeld: ({ reden, wie, audit } = {}) => besluit(() => nood.noodMeld({ reden, wie }), audit),
+    bankNoodHerstel: ({ wie, audit } = {}) => besluit(() => nood.noodHerstel({ wie }), audit), bankClearingMislukt: nood.clearingMislukt, bankClearingGelukt: nood.clearingGelukt,
     // leden-bank live
-    bankLedenAan: ledenAan, bankLedenZet: ledenZet,
+    bankLedenAan: ledenAan,
+    bankLedenZet: ({ aan, wie, audit } = {}) => besluit(() => ledenZet({ aan, wie }), audit),
     bankPlafonds: plafonds,
     bankInstellingenZet: inst.instellingenZet, bankregieOverzicht: overzicht
   };

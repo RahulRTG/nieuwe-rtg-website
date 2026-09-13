@@ -622,6 +622,72 @@ En de aanvalsproef: **maak de eigenaar van RTG zelf manager van een testtalent
 en bewijs dat hij zonder machtiging niets kan.** Dat is overtuigender dan tien
 alinea's.
 
+### 4a. MN-01 als toets (13 september 2026)
+
+`test/mn01-bevoegdheidsvoordeel.test.js`. Tot deze toets bestond werd MN-01
+afgedwongen door een **afwezigheid**: er was geen kantoorweg naar een
+machtiging, en `routes/vertegenwoordiging.js` draait achter de domeingrens
+`vertegenwoordiging` en kan per definitie niet bij `kluisAuth`. Dat is waar, en
+het is geen handhaver -- wie er morgen een route bij zet, breekt de regel zonder
+dat er iets rood wordt, en de eerste die het merkt is een cliënt.
+
+**Twee helften, en ze bewijzen verschillende dingen.**
+
+*Structureel* (snel, geen server): geen kantoorroute raakt de machtigingslaag, op
+één verklaarde uitzondering na. Die uitzondering is `POST /api/office/voogdij/besluit`
+achter `kluisAuth`, en de reden staat erbij: een voogdijbesluit gaat over een
+minderjarige, en dáár kan de cliënt zelf geen toestemming geven. Het is dus geen
+omweg om toestemming heen maar de plek waar toestemming nog niet kan bestaan. De
+toets eist ook de DEUR: verhuist die uitzondering ooit naar de gedeelde
+backofficecode, dan is zij iets anders geworden.
+
+*De aanvalsproef*: de **eigenaar** van RTG -- de sterkste rol die dit huis kent,
+want hij komt door `officeAuth` zonder code, door `boardroomAuth` en door
+`kluisAuth` -- krijgt nul toegang tot het leven van een cliënt. Kan hij niets,
+dan kan niemand met een organisatorische relatie iets.
+
+**De scherpste toets kwam er pas na drie pogingen, en elke keer vond een mutatie
+dat hij niets mat.** Dat hoort hier te staan, want het is leerzamer dan de
+uitkomst:
+
+1. Eerste versie: handelen op een *verzonnen* id, dat afketste. Dat bewijst
+   alleen dat een ONBEKEND id wordt geweigerd. Erger: het id ging mee in het
+   veld `mid` terwijl de route `id` leest, dus de route kreeg een lege string en
+   had ook zonder enige controle geweigerd.
+2. Tweede versie: `/mijn` met een leeg lichaam opvragen en vaststellen dat het
+   team van de eigenaar de codenaam van het slachtoffer niet bevat. Dat team is
+   leeg, dus dat was altijd waar. Met `mijn((req.body||{}).key || req.session.key)`
+   in de route bleef de toets groen: het gat stond open en niemand merkte het.
+3. Derde versie: het slachtoffer krijgt eerst een eigen grens, zodat er iets te
+   lekken válT, en de aanval duwt op vijf plausibele veldnamen in plaats van op
+   één.
+
+Wat de proef nu doet is **één machtiging, echt aanvaard door de cliënt, met twee
+aanroepen erop**: de gemachtigde agent krijgt 200, de eigenaar van RTG krijgt op
+HETZELFDE id 404. Het id is dus aantoonbaar geldig, en het enige verschil is wie
+het vraagt. Dat is MN-01 in twee regels.
+
+**Die opstelling kon pas sinds par. 0.6a.** De cliënt moet door `volwassen()` --
+18 jaar én A3, dus RTG heeft het identiteitsbewijs gezien -- en die weg loopt via
+het kantoor (`/api/office/verify`, achter `kluisAuth`). Zonder een kantoorsessie
+op naam is deze proef niet te bouwen. De sleutelbos uit stap 1 van de
+betrouwbaarheidsronde was dus niet alleen voor de faalproef nodig.
+
+**Vijf mutaties, elk door zijn eigen toets gepakt**: een tweede kantoorroute naar
+de laag, de uitzondering verhuisd naar de gedeelde code, `/mijn` dat zijn sleutel
+uit het lichaam leest, de 18+-poort eruit, de eigenaarscontrole bij handelen
+eruit, en een intrekking die niets vastlegt.
+
+**Eén detail dat geen toets is maar wel een regel.** De structurele helft leest
+**code en geen proza**. `routes/office/werk.js` NOEMT deze laag in een kop die
+uitlegt waarom hij er juist niet bij kan -- op de rauwe bron stond dat bestand op
+de overtrederslijst omdat het de regel goed had begrepen. Dezelfde les als
+`npm run check` regel 47.
+
+**Wat deze toets NIET dekt:** MN-02. Dat een medewerker via de ledenbalie méér
+weet is legitiem (par. 0.5), en de regel daarover gaat over
+niet-overdraagbaarheid en niet over gelijkheid. Die staat apart, als regel 2b.
+
 ### MN-02 -- scheiding van hoedanigheden
 
 > **Geen bevoegdheid of kennis die in hoedanigheid A is verkregen, mag

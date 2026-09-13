@@ -351,6 +351,57 @@ september 2026):
 | `voorziening` | 33 | zet bij het eerste bezoek zijn standaard klaar; geen duurzame belofte |
 | `gezakt` | **1** | `/api/office/magnaat/scan` |
 
+### 0.6b De laatste gezakte route, en waarom hij dat blijft
+
+`/api/office/magnaat/scan` is de enige die overbleef, en hij is NAGEMETEN in
+plaats van weggewerkt -- want het makkelijke antwoord (hem aan de duurzame
+commit hangen) zou precies de fout zijn waar `db/duurzaam.js` in zijn eigen kop
+voor waarschuwt: *"Zodra iemand hem leest als 'de veilige save', staat hij binnen
+een half jaar onder een profielwijziging en een like."* Een meter groen maken
+door de schaarste van een primitief op te geven, is het register optimaliseren in
+plaats van het systeem.
+
+**Wat de scan werkelijk schrijft, gemeten op een draaiende server.** De zestien
+voorstellen die hij teruggeeft staan in de ZAAISET; de scan maakt ze niet. Twee
+scans achter elkaar geven allebei `nieuw=0`, en na een herstart staan ze er nog,
+vóór er opnieuw is gescand. Het enige dat deze route wegschrijft is
+`s.laatsteScan` -- een tijdstempel die de dagelijkse herhaling afremt.
+
+**En het verlies daarvan valt de veilige kant op.** Raakt die tijdstempel weg,
+dan slaat de volgende scan de daggrens NIET over en draait hij gewoon. Dat kost
+rekenwerk en verliest niets. Ook een scan die wél iets vindt is herstelbaar: de
+voorstellen worden ontdubbeld op `kans.sleutel`, dus wat verloren ging komt bij
+de volgende ronde terug.
+
+**Daarmee is `gezakt` hier waar én misleidend tegelijk**, en die twee gaan samen.
+Het contract van de faalproef is mechanisch -- 200 terwijl de toestand niet
+veranderde -- en dat is precies wat er gebeurde. Wat het contract niet kan zien
+is of het gevolg HERREKENBAAR is, en bij een cache-tijdstempel is dat het hele
+verschil met een verwijderde map of een verdwenen bankakkoord.
+
+**De instrumentfout eronder is groter dan deze route.** `profielVan()` kent
+`voorziening` voor een route die bij zijn EERSTE bezoek zijn standaard klaarzet
+(eerste oproep schrijft, tweede niet). Deze schrijft bij ELKE oproep, en dus valt
+hij in `duurzaam` -- terwijl het geschrevene geen duurzame belofte is. Er is geen
+categorie voor *schrijft altijd, maar het is een cache*, en zolang die er niet is
+komt elke zulke route als een bevinding binnen.
+
+Dit is een **besluit** en geen bouwtaak, met de vorm die `MUTATIECONTRACT.md` al
+heeft gekozen: meting en besluit naast elkaar, waarbij het besluit de meting
+nooit wegdrukt (`IDEMBESLUIT.json`). Drie wegen:
+
+| Optie | Wat het betekent | Prijs |
+|---|---|---|
+| **A. Een besluitregister naast de meting** *(aanbevolen)* | Per route een verklaring `herrekenbaar` met een grond, zoals `IDEMBESLUIT.json` dat voor herhaalbaarheid doet. De meting blijft `gezakt` staan. | Een register erbij, en iemand moet de gronden schrijven. |
+| B. Een profielsoort erbij (`cache`) | De klasseerder leert het onderscheid en de route valt niet meer in `duurzaam`. | Het oordeel verhuist naar de METER, en die kan niet weten of een schrijfactie herrekenbaar is -- dat is domeinkennis. |
+| C. De route duurzaam maken | Eén getal groen. | De schaarste van `saveDuurzaam()` opgeven voor een tijdstempel in de simulatiewereld. |
+
+Zolang er niets is gekozen blijft de route `gezakt` staan, met deze paragraaf
+ernaast. Dat is de eerlijke stand: één gemeten bevinding, één uitgeschreven reden
+waarom hij niet is gerepareerd, en geen stille uitzondering.
+
+---
+
 Van de oude 528 is dus **165 een eigenschap en geen gebrek**, en het echte
 tekort is 316. Dat laatste getal is bovendien geen raadsel meer maar een
 werklijst met een vorm: 219 van die 316 stranden op een **404** en 82 op een

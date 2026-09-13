@@ -1581,6 +1581,28 @@ const IJKINGEN = {
         j.telling.UNKNOWN = (j.telling.UNKNOWN || 0) + 3; return j; },
       () => norm.meet().geldpadOnbewezen - voor.geldpadOnbewezen)
   },
+  /* DE TWEE TANDEN VAN 13 SEPTEMBER 2026 (CRASHAS.json), en ze worden apart
+     geijkt omdat ze apart bestaan.
+
+     `crashasOnbekend` leest `telling.onbekend` rechtstreeks -- zelfde vorm als
+     de vier hierboven, dus ophogen en kijken of de meter meebeweegt.
+
+     `crashasNietMeetbaar` is de interessantere: hij staat NIET als veld in het
+     register maar wordt gerekend als `bestaat - meetbaar`. Een meter die een
+     verschil leest, kan op twee manieren stukgaan -- hij leest het verkeerde
+     veld, of hij leest er maar een. Daarom beweegt deze proef alleen `meetbaar`
+     en laat hij `bestaat` staan: gaat de meter dan niet omhoog, dan rekent hij
+     niet met het verschil maar met een van de twee. */
+  crashasOnbekend: {
+    proef: (voor) => metVervangenJson('CRASHAS.json',
+      (j) => { j.telling.onbekend = (j.telling.onbekend || 0) + 7; return j; },
+      () => norm.meet().crashasOnbekend - voor.crashasOnbekend)
+  },
+  crashasNietMeetbaar: {
+    proef: (voor) => metVervangenJson('CRASHAS.json',
+      (j) => { j.telling.meetbaar = (j.telling.meetbaar || 0) - 5; return j; },
+      () => norm.meet().crashasNietMeetbaar - voor.crashasNietMeetbaar)
+  },
   /* DE TAND VAN 12 SEPTEMBER 2026: eersteMinuutGezakt telt de toetsen van de
      eerste minuut die ZAKKEN (EERSTEMINUUT.json, telling.gezakt). Zelfde vorm
      als de vier hierboven -- hij leest een getal uit een bestaand register, dus

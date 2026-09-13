@@ -89,7 +89,9 @@
     "geldGebreken": 0,
     "bevestigGebreken": 0,
     "verwijzingGebreken": 0,
-    "mensmutatieZonderWacht": 1
+    "mensmutatieZonderWacht": 1,
+    "crashasOnbekend": 45,
+    "crashasNietMeetbaar": 90
   },
   "notities": [
     {
@@ -2189,6 +2191,16 @@
       "meter": "dbDeuren 525 -> 526, kernBreedte 1569 -> 1570",
       "reden": "EEN MODULE EN EEN KERN-NAAM ERBIJ, EN ALLEBEI DE TANDEN LOPEN DAAR PER DEFINITIE IN MEE. server/kern/factuurcorrectie.js is de terugweg van kern/factuursaldo.js en raakt db.data op exact dezelfde drie plekken als zijn heenweg-broer: de zekering (db.data.techniek.zekeringen.betalingen), de afdrachtenlijst (db.data.fondsAfdrachten) en db.data als ledenstaat wanneer er geen eigen account is. Dat is een deur erbij in de telling.\n\nHET ALTERNATIEF IS SLECHTERE CODE EN GEEN BETERE TELLING. Die drie wegleiden via een extra functie in de fabriek haalt de teller omlaag zonder dat er iets verandert aan WIE er bij de opslag kan -- het verplaatst de deur en noemt hem anders. De ratel meet dan zichzelf.\n\nkernBreedte is nog directer: `corrigeerFactuur` is een nieuwe kern-eigenschap die een route aanraakt, en dat is per stuk +1. Een capability toevoegen zonder deze tand te raken kan alleen door hem niet toe te voegen.\n\nWAT ER IN DEZELFDE RONDE WEL DE ANDERE KANT OP GING: het correctiemodel staat voor het eerst op 1 PROVEN in plaats van 0, geldRoutesHerstelOnbesloten stijgt NIET (deze route krijgt een verklaard model in plaats van er een te missen), en toetsenNietGemeten is niet verhoogd -- de mutatiemotor is over test/factuurcorrectie.test.js gegaan en noemt hem bewezen gevoelig: hij zakt op de INHOUD en niet alleen op de inlog.",
       "waarheen": "Deze twee dalen niet vanzelf en horen ook niet apart te worden teruggedrongen. Ze dalen als de db.data-toegang van de GELDKANT als geheel achter een smallere poort komt: kern/factuursaldo.js en kern/factuurcorrectie.js raken dezelfde drie plekken, en een gedeelde geldpoort haalt er in een keer twee weg in plaats van deze ene te verbergen. Dat is werk voor de laag die GELDLAT.md beschrijft, niet voor deze tak."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "grondwaarde",
+      "sleutel": "crashasOnbekend, crashasNietMeetbaar",
+      "van": null,
+      "vervalt": null,
+      "meter": "crashasOnbekend 45, crashasNietMeetbaar 90 (CRASHAS.json, npm run crashas)",
+      "reden": "TWEE NIEUWE TANDEN, GEEN VERHOGING. Stap 5 van de werkopdracht begint met classificeren en niet met beproeven: over 45 geldroutes x 6 crashgrenzen zijn er 270 paren, waarvan er 135 BESTAAN, 90 niet (geen aanbieder, server/betaal.js weigert fail-closed) en 45 ONBEKEND zijn.\n\nDe twee tanden staan er los omdat ze het tegenovergestelde vragen. crashasOnbekend (45) is de berichtgrens over alle geldroutes: in de gemeten collecties staat geen berichtbak, maar de idempotentieproef hoeft die weg niet geraakt te hebben -- dat is een open VRAAG en hij gaat omlaag door te kijken. crashasNietMeetbaar (90) is iets anders: daar staat vast DAT de grens bestaat, maar server/lib/verraad.js heeft er geen injectiepunt voor. Dat gaat alleen omlaag door gereedschap te bouwen.\n\nEen tand die ze optelt zou een ontbrekend instrument laten wegvallen tegen een open vraag, en dat is precies de fout die FACTUURPROEF.json met geldpadGezakt/geldpadOnbewezen al een keer heeft voorkomen.",
+      "waarheen": "crashasNietMeetbaar daalt met 90 zodra er twee verraadsmodi bij komen: een die het proces doodt VOOR de eerste mutatie en een die het MIDDEN IN de schrijfactie doodt. Beide staan al ontworpen in de catalogus van server/lib/verraad.js met waar: null. crashasOnbekend daalt per route zodra vaststaat of hij een bericht stuurt; dat is vandaag statisch niet te volgen omdat een routebestand via de contexttas naar de kern delegeert, dus het vraagt een meting op de berichtweg en niet nog een lezing."
     }
   ],
   "prestatie": {

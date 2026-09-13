@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1839 bestanden en 13065 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1840 bestanden en 13073 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1839 |
-| losse beweringen (`test(...)`) | 13065 |
+| toetsbestanden | 1840 |
+| losse beweringen (`test(...)`) | 13073 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1217 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1218 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 66 |
 | alleen in de kop *genoemd*, nog niet gemeten | 154 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1623 bestanden, 12683 beweringen.
+1624 bestanden, 12691 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -292,6 +292,7 @@ toets omvalt.
 | `contract.test.js` | 13 | gezakt op `liegpoort /api/` | HET CONTRACT: maand 13, en de prijs die vaststaat. kern/aanmeldingen/betaalschema.js zette twaalf termijnen klaar en hield op. |
 | `controlekamer.test.js` | 4 | gezakt op `liegpoort /api/` | De controlekamer: de eigenaar zet functies aan/uit PER DOELGROEP op de beveiligde technische pagina. Bewijs dat een functie uit kan voor de ene doelgroep (bijv. |
 | `controls.test.js` | 28 | gezakt op `return-weg#0` | HET CONTROLREGISTER (scripts/controls.js) en het uitzendcontract uit TOEZICHT.md. WAAROM DEZE TOETS ER IS. |
+| `crashas.test.js` | 8 | gezakt op `===->!==#0` | DE CRASH-AS-CLASSIFICATIE -- wat er hier bewaakt wordt, en waarom. scripts/crashas.js beantwoordt per geldroute en per crashgrens de vraag of die grens er WERKELIJK is. |
 | `crashtaxonomie.test.js` | 8 | gezakt op `===->!==#0` | DE CRASH-TAXONOMIE -- drie contracten, zes grenzen, en geen afronding. "Overleeft route X een crash?" geeft EEN antwoord op drie vragen die verschillende dingen beloven. |
 | `creator-portfolio.test.js` | 2 | gezakt op `liegpoort /api/` | HET PORTFOLIO VAN EEN CREATOR -- de laatste losse supplier-route. creator/portfolio stond als nooit aangeroepen in de waargenomen dekkingsmeting. |
 | `creator.test.js` | 5 | gezakt op `liegpoort /api/` | End-to-end tests voor het content-creator-genre (kern/creator.js): het carriere-profiel, platforms met bereik, tarieven, de content-kalender en de AI content/script-helper (zonder Claude-sleutel via de sjablonen). De... |

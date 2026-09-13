@@ -229,6 +229,13 @@ const REGISTER = {
      twee optelt, laat een crashbevinding wegvallen tegen een stap die iemand
      nog moet meten. Zie de kop van NORM's METERS. */
   'FACTUURPROEF.json': { meter: ['geldpadGezakt', 'geldpadOnbewezen'] },
+  /* CRASHAS.json volgt diezelfde tweedeling, een niveau breder: de factuurproef
+     meet EEN route diep, dit classificeert ALLE geldroutes over de zes
+     crashgrenzen. `crashasOnbekend` is een open vraag, `crashasNietMeetbaar` is
+     een ontbrekend injectiepunt -- en die twee gaan nooit in een tand samen,
+     want de eerste los je op door te kijken en de tweede door gereedschap te
+     bouwen. */
+  'CRASHAS.json': { meter: ['crashasOnbekend', 'crashasNietMeetbaar'] },
   /* HERSTELBESLUIT.json is een VERKLARING en geen meting -- dezelfde vorm als
      ROLLBACKBESLUIT.json hierboven, dat ook aan een geteld gevolg hangt. Wie
      hier een regel bijzet of weghaalt, beweegt een van deze twee tellers: een

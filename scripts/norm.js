@@ -531,6 +531,24 @@ const METERS = [
      "Scenario 3". Hij hoort naar nul en de weg erheen staat er beschreven. */
   { sleutel: 'geldpadGezakt', richting: 'omlaag', wat: 'stappen in de verticale geldproef waar geld bewoog dat niet mocht (FACTUURPROEF.json)' },
   { sleutel: 'geldpadOnbewezen', richting: 'omlaag', wat: 'stappen in de verticale geldproef zonder bewijs (BLOCKED of UNKNOWN)' },
+  /* DE CRASH-AS OVER DE GELDROUTES (CRASHAS.json, npm run crashas), en om
+     dezelfde reden TWEE tanden als hierboven.
+
+     `crashasOnbekend` is een (route, grens)-paar waarvan niemand weet of die
+     grens er is. Dat is werk: uitzoeken of een route een bericht stuurt maakt
+     hem `ja` of `nee`, en beide zijn beter dan onbekend. Hij staat vandaag op
+     45 -- de berichtgrens over alle geldroutes.
+
+     `crashasNietMeetbaar` is een paar waarvan we WEL weten dat de grens er is,
+     maar waarvoor geen injectiepunt bestaat: 90 van de 135. Dat is geen
+     onwetendheid maar gereedschap dat ontbreekt, en het gaat omlaag door
+     server/lib/verraad.js uit te breiden, niet door beter te kijken.
+
+     Ze worden nooit opgeteld. "We hebben niet gekeken" en "we kunnen niet
+     kijken" vragen het tegenovergestelde, en een tand die ze samenvoegt laat
+     een ontbrekend instrument wegvallen tegen een open vraag. */
+  { sleutel: 'crashasOnbekend', richting: 'omlaag', wat: '(route, grens)-paren waarvan niet vaststaat of de crashgrens bestaat (CRASHAS.json)' },
+  { sleutel: 'crashasNietMeetbaar', richting: 'omlaag', wat: 'bestaande crashgrenzen zonder injectiepunt om ze te beproeven' },
   /* DE EERSTE MINUUT (EERSTEMINUUT.json, npm run eersteminuut).
 
      Wat een mens die RTG niet kent in zijn eerste minuut krijgt. Deze meter
@@ -1347,6 +1365,11 @@ function meet(bronnen) {
        betekenen ze "geen bewijs", en de tand die ertoe doet is de andere. Het
        verschil tussen die twee staat per stap in het register zelf. */
     geldpadOnbewezen: leesRegister('FACTUURPROEF.json', (j) => (j.telling.BLOCKED || 0) + (j.telling.UNKNOWN || 0)),
+    crashasOnbekend: leesRegister('CRASHAS.json', (j) => j.telling.onbekend),
+    /* Bestaand MIN meetbaar, en niet een eigen veld in het register: de twee
+       getallen die dit verschil dragen staan daar al, en een derde dat ze
+       samenvat zou bij de eerstvolgende wijziging uit de pas lopen. */
+    crashasNietMeetbaar: leesRegister('CRASHAS.json', (j) => j.telling.bestaat - j.telling.meetbaar),
     eersteMinuutGezakt: leesRegister('EERSTEMINUUT.json', (j) => j.telling.gezakt),
     pakteMisgelopen: leesRegister('PAKTE.json', (j) => j.telling.misgelopen),
     menstaalTeVer: leesRegister('MENSTAALPROEF.json', (j) => j.telling.teVer),

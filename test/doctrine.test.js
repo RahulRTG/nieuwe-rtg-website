@@ -39,10 +39,19 @@ test('1. de zelfijking van de compiler slaagt, en hij ijkt twee kanten', () => {
    een leesteken", want de markdown breekt af op ongeveer 76 tekens. */
 test('2. een kandidaat is een hele zin en geen afgebroken regel', () => {
   const { stukken } = D.leesDocument('FOUNDATION.md');
+  /* Alleen de WOORDas: een kop of een vette openingszin eindigt van nature niet
+     op een leesteken, en die eis daarop leggen zou de structuuras slopen. */
   const kandidaten = stukken.filter(s => {
+    if (s.as !== 'woord') return false;
     const sig = D.signaalVan(s.zin, s.inGrenssectie);
     return sig && sig.sterkte === 'sterk';
   });
+  const structuur = stukken.filter(s => s.as === 'structuur');
+  assert.ok(structuur.length >= 5, 'FOUNDATION.md heeft koppen die zelf een bewering zijn (5.2 t/m 5.7); ' +
+    'vindt de structuuras er minder dan vijf, dan leest hij geen koppen meer');
+  for (const s of structuur) {
+    assert.doesNotMatch(s.zin, /^[\d.]+\s/, 'het paragraafnummer hoort niet in de kandidaattekst: ' + JSON.stringify(s.zin));
+  }
   assert.ok(kandidaten.length >= 5, 'FOUNDATION.md draagt zeven grenzen; minder dan vijf kandidaten ' +
     'betekent dat de lezer stuk is, niet dat het document leeg is');
 
@@ -104,8 +113,15 @@ test('5. het register draagt zijn graad en zijn grens, en telt zichzelf niet als
   }
   const j = JSON.parse(fs.readFileSync(pad, 'utf8'));
   assert.equal(j.graad, 'vermoed', 'deze meting leest woorden en geen betekenis; elke hardere graad is een bewering');
-  assert.match(j.grens, /LEXICAAL/, 'de grens van de meting hoort in het register zelf te staan');
-  assert.match(j.grens, /ONDERGRENS/, 'het getal is een ondergrens en dat hoort er te staan');
+  assert.match(j.grens, /LEXICAAL EN STRUCTUREEL/, 'de grens van de meting hoort in het register zelf te staan');
+  /* De oude eis was het woord ONDERGRENS. Die is vervangen door een strengere:
+     sinds de ijking bestaat is de RECALL gemeten (48 van 50) en de PRECISIE
+     niet, en juist dat verschil hoort een lezer te weten. Een register dat 96%
+     recall meldt en zwijgt over precisie, laat "96%" lezen als kwaliteit. */
+  assert.match(j.grens, /PRECISIE is niets gemeten/,
+    'het register hoort te zeggen dat over de precisie niets is vastgesteld');
+  assert.match(j.grens, /nooit worden opgeteld/,
+    'dat de twee assen niet optelbaar zijn, hoort in het register zelf te staan');
 
   /* Een kandidaat is geen wet. Zou dit register een stand `wet` kunnen zetten,
      dan promoveert een woordenlijst een besluit -- en dan is WETTEN.json niet
@@ -129,4 +145,50 @@ test('6. wat is overgeslagen staat er met een reden bij', () => {
   assert.ok(j.overgeslagen.codeblokregels > 0 && j.overgeslagen.tabelregels > 0,
     'deze documenten bevatten aantoonbaar code en tabellen; nul overgeslagen regels betekent ' +
     'dat de filters niet draaien en dat er code als doctrine wordt geteld');
+});
+
+/* MUTATIE GEZIEN ZAKKEN: in leesDocument() de kop-tak (`verklaring(kop)`)
+   weggehaald; de recall viel van 48 naar 34 en deze toets zakte met de namen van
+   de gemiste wetten erbij. */
+test('7. de extractor vindt de wetten terug die dit huis al kent (recall)', () => {
+  const j = JSON.parse(fs.readFileSync(path.join(WORTEL, 'DOCTRINE.json'), 'utf8'));
+  const ij = j.ijking;
+  assert.ok(ij, 'zonder ijking rapporteert dit register duizenden kandidaten zonder te zeggen ' +
+    'hoeveel het bewijsbare het al mist -- en dat is gevaarlijker dan geen register');
+
+  assert.equal(ij.wettenBekend, require('../WETTEN.json').wetten.length,
+    'de ijking hoort tegen ALLE wetten te lopen; loopt hij tegen minder, dan is de recall opgepoetst ' +
+    'door de grondwaarheid te verkleinen');
+
+  /* DE VLOER STAAT OP 45 EN NIET OP 48. Een toets die exact het huidige getal
+     eist, zakt zodra iemand een wet TOEVOEGT die nog geen kandidaat heeft -- en
+     dat is gewoon werk. Wat niet mag is stil wegzakken. */
+  assert.ok(ij.gevonden >= 45,
+    'de recall is gezakt naar ' + ij.gevonden + ' van ' + ij.wettenBekend + '; de extractor is blind ' +
+    'geworden voor wetten die dit huis al heeft vastgesteld. Gemist: ' +
+    ij.gemist.map(g => g.id).join(', '));
+
+  /* Elke gemiste wet draagt zijn naam. Een aantal zonder namen is niet na te
+     lopen, en dan wordt het een getal dat iemand ooit accepteert. */
+  for (const g of ij.gemist) {
+    assert.ok(g.id && g.doc, 'een gemiste wet zonder naam of document is niet na te lopen');
+  }
+});
+
+/* MUTATIE GEZIEN ZAKKEN: `kandidatenStructuur` en `kandidatenWoord` opgeteld tot
+   een enkel getal; zakte hier. */
+test('8. de twee assen staan apart en worden niet opgeteld tot een oordeel', () => {
+  const j = JSON.parse(fs.readFileSync(path.join(WORTEL, 'DOCTRINE.json'), 'utf8'));
+  const t = j.telling;
+  assert.ok(t.kandidatenStructuur > 0, 'de structuuras draagt de recall; staat hij op nul, dan leest ' +
+    'de extractor geen koppen meer en is de ijking hierboven toevallig groen');
+  assert.ok(t.kandidatenWoord > 0, 'de woordas hoort te bestaan naast de structuuras');
+  assert.equal(t.kandidatenStructuur + t.kandidatenWoord, t.kandidatenSterk,
+    'de twee assen horen samen de kandidaten te dekken; klopt dat niet, dan valt er een soort buiten beeld');
+
+  /* De structuuras hoort de recall te DRAGEN. Zou de woordas dat in zijn eentje
+     doen, dan is de hele redenering in de kop van scripts/doctrine.js achterhaald
+     en hoort die tekst mee te veranderen. */
+  assert.match(j.grens, /nooit worden opgeteld/,
+    'dat de assen niet optelbaar zijn, hoort in het register zelf te staan en niet alleen in een commentaar');
 });

@@ -50,14 +50,42 @@
         onderscheiden (dezelfde vorm als test/cijferopmens.test.js en
         test/getallen.test.js). `--ijk` plant een zin en eist dat hij hem vindt.
 
-   DE GRAAD IS `vermoed`, EN DAT IS GEEN BESCHEIDENHEID
+   TWEE ASSEN, EN ZE WORDEN NOOIT OPGETELD
 
-   Dit is een LEXICALE meting: hij leest woorden, geen betekenis. Hij mist elke
-   harde uitspraak die zonder signaalwoord is geschreven ("de kluis blijft
-   gescheiden"), en hij vindt zinnen die nergens over gaan. Het getal is dus een
-   ONDERGRENS voor wat er staat en een BOVENGRENS voor wat het waard is. Zelfde
-   regel als `anoniem` in KANTOORMACHT.json: de harde as hangt aan de router, de
-   zachte as telt niet als bewijs.
+     STRUCTUUR  koppen en vette openingszinnen. Wie in een doctrinedocument
+                "Een kind is geen profiel" als kop zet, DOET een bewering -- het
+                zetten van de kop is de handeling, en een signaalwoord is daar
+                niet voor nodig. Deze as draagt de recall.
+     WOORD      verbodsvormen in lopende tekst ("mag nooit", "er komt geen").
+                Preciezer, en veel blinder.
+
+   Een gemiddelde van die twee betekent niets; ze meten iets anders. Dezelfde
+   reden waarom scripts/tredeproef.js zuiver en beproefd apart houdt.
+
+   DE IJKING IS HET BELANGRIJKSTE GETAL HIER
+
+   Er ligt een grondwaarheid die niemand hoeft te maken: WETTEN.json. Elke wet
+   daar wijst een plek aan waar een MENS heeft vastgesteld dat een harde
+   uitspraak staat. Vindt de extractor daar niets, dan is hij blind voor een
+   bekende wet -- en dan zegt zijn getal over de onbekende evenmin iets.
+
+   Dat is geen theorie. De eerste versie van dit bestand meldde 1088 kandidaten
+   zonder enige uitspraak over zijn eigen trefzekerheid, en haalde 21 van de 50.
+   Van de 29 die hij miste stond het anker van er 15 op een KOP, van 4 op een
+   vette openingszin en van 2 in een blokcitaat -- drie plekken die hij per
+   ontwerp niet las. Met de structuuras erbij staat hij op 48 van de 50.
+
+   DE GRAAD BLIJFT `vermoed`, EN DAT IS GEEN BESCHEIDENHEID
+
+   96% recall op de BEKENDE wetten zegt niets over precisie: van de duizenden
+   kandidaten is niet gemeten welk deel werkelijk een harde uitspraak is. De
+   uitslag is een werkvoorraad voor een mens en geen oordeel.
+
+   WAT ER NIET IN ZIT, en dat is gemeten in plaats van vermoed: de woordas
+   verbreden met "is geen" en "is niet" brengt de recall van de woordas van 21
+   naar 32, maar kost 1580 extra kandidaten -- ongeveer 179 per extra gevonden
+   wet. Die ruil is niet gemaakt; de structuuras levert dezelfde recall zonder
+   die prijs.
 
    Draai:  node scripts/doctrine.js              (schrijft DOCTRINE.json)
            node scripts/doctrine.js --toon        (laat zien, schrijft niets)
@@ -128,6 +156,40 @@ const GEEN_UITSPRAAK = [
   [/^\s*>/, 'een citaat uit een ander document; de bron telt daar en niet hier'],
 ];
 
+/* ---------------------------------------------------------- de structuuras */
+
+/* IS DIT EEN VERKLARING, OF EEN ETIKET?
+
+   DE MEETUITSLAG DIE DEZE FUNCTIE AFDWONG. De eerste versie van deze compiler
+   zocht alleen naar SIGNAALWOORDEN in lopende tekst, en haalde daarmee 21 van de
+   50 wetten die dit huis al kent. Van de 29 die hij miste stond het anker van er
+   15 op een KOP en van 4 op een vetgedrukte openingszin.
+
+   De reden is dat een kop in een doctrinedocument geen signaalwoord NODIG heeft:
+   wie "Een kind is geen profiel" of "Bodoni is ceremonieel" als kop zet, DOET
+   een bewering -- het zetten van de kop is de handeling. De woordtoets is daar
+   dus de verkeerde toets. Met koppen en vette openingszinnen erbij gaat de
+   recall van 21 naar 48 van de 50.
+
+   WAT DEZE FUNCTIE ER WEL UIT HOUDT: etiketten. "De grenzen", "Inleiding",
+   "Wat er niet komt" zijn wegwijzers en geen uitspraken. De grens ligt op vier
+   woorden plus een korte lijst van kopwoorden die een afdeling aankondigen in
+   plaats van iets te beweren.
+
+   WAAROM GEEN STRENGERE FILTER. Gemeten: op vijf woorden zakt de recall naar 37,
+   op zes naar 31. Elke verscherping koopt rust in de lijst met blindheid voor
+   wetten die dit huis AL heeft vastgesteld -- en dat is de verkeerde ruil voor
+   een instrument dat juist moet laten zien wat er over het hoofd wordt gezien. */
+const ETIKET = /^(de |het |een )?(grens|grenzen|inleiding|samenvatting|bijlage|de stand|de meting|de kern|de opzet|het probleem|de volgorde|de bronnen)\b/i;
+
+function verklaring(tekst) {
+  const t = String(tekst || '').replace(/^[\d.]+\s*/, '').replace(/\*\*/g, '').trim();
+  const woorden = t.split(/\s+/).filter(Boolean);
+  if (woorden.length < 4) return false;
+  if (ETIKET.test(t) && woorden.length < 6) return false;
+  return true;
+}
+
 /* ------------------------------------------------------------ het uitlezen */
 
 const STOP = new Set(('de het een en of van in op te dat die dit deze der den aan met voor is zijn wordt worden was waren als bij uit om ook niet geen nog maar dan er wat wie waar hoe dus want zo al meer dan ze hij zij wij jij je u we ik hun haar hem naar over onder boven tussen per tot dat').split(' '));
@@ -182,7 +244,8 @@ function leesDocument(bestand) {
          niet in de toets. */
       const t = zin.trim().replace(/^[*_]+/, '').replace(/[*_]+$/, '').trim();
       if (t.length < 25) continue;
-      stukken.push({ zin: t, regel: alineaRegel, kop, kopNr, kopRegel, inGrenssectie: grensNiveau > 0 });
+      stukken.push({ zin: t, regel: alineaRegel, kop, kopNr, kopRegel, as: 'woord',
+        inGrenssectie: grensNiveau > 0 });
     }
   };
 
@@ -190,7 +253,17 @@ function leesDocument(bestand) {
     if (/^\s*```/.test(regel)) { sluitAlinea(); inCode = !inCode; over.codeblok++; return; }
     if (inCode) { over.codeblok++; return; }
     if (/^\s*\|/.test(regel)) { sluitAlinea(); over.tabel++; return; }
-    if (/^\s*>/.test(regel)) { sluitAlinea(); over.citaat++; return; }
+    /* EEN `>` IS IN DIT HUIS NADRUK EN GEEN CITAAT, en die aanname was fout.
+       WERELD.md zet zijn hardste zin als blokcitaat -- *"Er is een beginscherm,
+       en dat is de werktafel van RTG Command"* -- en die is een WET in
+       WETTEN.json. Hem overslaan als "een citaat uit een ander document" maakte
+       de extractor blind voor zijn eigen bron. De regel wordt dus gelezen, met
+       het teken eraf. */
+    if (/^\s*>/.test(regel)) {
+      over.citaat++;
+      regel = regel.replace(/^\s*>\s?/, '');
+      if (!regel.trim()) { sluitAlinea(); return; }
+    }
     const k = regel.match(/^(#{1,6})\s+(.*)$/);
     if (k) {
       sluitAlinea();
@@ -204,13 +277,31 @@ function leesDocument(bestand) {
           !/implementatiegrens|frame-grens|migratiegrens|productgrens|runtimegrens/i.test(kop)) {
         grensNiveau = niveau;
       }
+      if (verklaring(kop)) {
+        /* Het paragraafnummer staat al in `paragraaf`; in de kandidaattekst is
+           het ruis voor wie de lijst leest. */
+        stukken.push({ zin: kop.replace(/^[\d.]+\s*/, '').trim(), regel: i + 1, kop, kopNr, kopRegel,
+          as: 'structuur', vorm: 'kop', inGrenssectie: grensNiveau > 0 });
+      }
       return;
     }
     if (!regel.trim()) { sluitAlinea(); return; }
     /* Een nieuw opsommingsteken begint een nieuwe uitspraak, ook zonder lege
        regel ertussen -- anders lopen zeven grenzen in een lijst aan elkaar. */
     if (/^\s*(\d+\.|[-*])\s+/.test(regel)) sluitAlinea();
-    if (!alinea.length) alineaRegel = i + 1;
+    if (!alinea.length) {
+      alineaRegel = i + 1;
+      /* DE VETTE OPENINGSZIN IS DE TWEEDE STRUCTUURVORM. ISOLATIE.md schrijft
+         zijn vier SEC-LOCK-wetten zo: **SEC-LOCK-004 -- onbekend is niet
+         normaal.** Dat is dezelfde handeling als een kop zetten, alleen
+         midden in een paragraaf. Zonder deze vorm bleef de extractor blind
+         voor alle vier. */
+      const vet = regel.replace(/^\s*(\d+\.|[-*])\s+/, '').match(/^\*\*(.+?)\*\*/);
+      if (vet && verklaring(vet[1])) {
+        stukken.push({ zin: vet[1].trim(), regel: i + 1, kop, kopNr, kopRegel, as: 'structuur',
+          vorm: 'vet', inGrenssectie: grensNiveau > 0 });
+      }
+    }
     alinea.push(regel.replace(/^\s*(\d+\.|[-*])\s+/, '').replace(/\*\*/g, '').trim());
   });
   sluitAlinea();
@@ -260,6 +351,63 @@ function ankersPerKop(bestand, wetten) {
     kaart.get(kop).push(w.id);
   }
   return kaart;
+}
+
+/* --------------------------------------------- de recall tegen de grondwaarheid */
+
+/* HOEVEEL VAN DE WETTEN DIE DIT HUIS AL KENT, VINDT DEZE EXTRACTOR TERUG?
+
+   Dit is de belangrijkste meter van het bestand, en hij bestaat omdat er een
+   GRONDWAARHEID ligt die niemand hoeft te maken: WETTEN.json. Elke wet daarin
+   wijst een plek aan waar aantoonbaar een harde uitspraak staat -- vastgesteld
+   door een mens, met een handhaver en een sabotage eronder. Vindt de extractor
+   op die plek niets, dan is hij blind voor een BEKENDE wet, en dan zegt zijn
+   getal over de onbekende ook niets.
+
+   Zonder deze meter rapporteerde de eerste versie 1088 kandidaten zonder enige
+   uitspraak over zijn eigen trefzekerheid -- en hij haalde 21 van de 50. Een
+   instrument dat 42% van het bewijsbare mist en dat niet zegt, is gevaarlijker
+   dan geen instrument.
+
+   DRIE UITSLAGEN, EN ZE WORDEN NOOIT OPGETELD:
+     gevonden          de extractor vond een kandidaat in de sectie van het anker
+     gemist            er staat daar tekst, en hij zag hem niet -- ECHTE blindheid
+     ankerZonderTekst  het anker wijst een codeblok of tabel aan; daar staat geen
+                       zin, dus dit is geen tekort van de extractor maar een
+                       eigenschap van de bron. Wie die twee optelt, jaagt op een
+                       getal dat niet van hem is (CODE.md: de fout zat in de METER). */
+function ijkTegenWetten(wettenPerDoc, docs) {
+  const uit = { bekend: 0, gevonden: 0, gemist: [], ankerZonderTekst: [] };
+  for (const [doc, ws] of Object.entries(wettenPerDoc)) {
+    if (docs && !docs.includes(doc)) continue;
+    let regels, stukken;
+    try {
+      regels = fs.readFileSync(path.join(WORTEL, doc), 'utf8').split('\n');
+      stukken = leesDocument(doc).stukken;
+    } catch (e) { continue; }
+    const raak = new Set();
+    for (const s of stukken) {
+      if (s.as === 'structuur') { raak.add(s.kopRegel); continue; }
+      const sig = signaalVan(s.zin, s.inGrenssectie);
+      if (sig && sig.sterkte === 'sterk') raak.add(s.kopRegel);
+    }
+    for (const [kop, ids] of ankersPerKop(doc, ws)) {
+      for (const id of ids) {
+        uit.bekend++;
+        if (raak.has(kop)) { uit.gevonden++; continue; }
+        const w = ws.find(x => x.id === id);
+        const ix = regels.findIndex(r => r.includes(w.bron.anker));
+        let hekjes = 0;
+        for (let i = 0; i < ix; i++) if (/^\s*```/.test(regels[i])) hekjes++;
+        if (hekjes % 2 === 1 || /^\s*\|/.test(regels[ix] || '')) {
+          uit.ankerZonderTekst.push({ id, doc, waarom: 'het anker wijst een codeblok of tabel aan; daar staat geen zin om te vinden' });
+        } else {
+          uit.gemist.push({ id, doc, anker: w.bron.anker });
+        }
+      }
+    }
+  }
+  return uit;
 }
 
 /* ------------------------------------------------------------- de zelfijking */
@@ -331,15 +479,22 @@ function draai() {
     const ankers = ankersPerKop(doc, wettenPerDoc[doc] || []);
     for (const s of stukken) {
       zinnen++;
-      const sig = signaalVan(s.zin, s.inGrenssectie);
-      if (!sig) continue;
+      let sig;
+      if (s.as === 'structuur') {
+        /* De structuuras vraagt GEEN signaalwoord: de kop of de vette
+           openingszin is zelf de handeling. Zie verklaring(). */
+        sig = { sterkte: 'sterk', signaal: s.vorm, grond: 'structuur' };
+      } else {
+        sig = signaalVan(s.zin, s.inGrenssectie);
+        if (!sig) continue;
+      }
       const uitgesloten = GEEN_UITSPRAAK.find(([re]) => re.test(s.zin));
       if (uitgesloten) { over.geenUitspraak++; continue; }
       if (sig.sterkte === 'zwak') { zwak++; continue; }
       const wet = ankers.get(s.kopRegel) || null;
       kandidaten.push({
         doc, paragraaf: s.kopNr, kop: s.kop, regel: s.regel, zin: s.zin,
-        signaal: sig.signaal, grond: sig.grond, inGrenssectie: s.inGrenssectie,
+        as: s.as, signaal: sig.signaal, grond: sig.grond, inGrenssectie: s.inGrenssectie,
         /* GEDEKT of ONBEPAALD, en nooit "ongedekt". Dat een lexicale scan geen
            wet naast deze zin vindt, bewijst niet dat hij niet gehandhaafd wordt
            -- test/cijferopmens.test.js handhaaft een grens uit vier documenten
@@ -374,7 +529,9 @@ function draai() {
     }
   }
 
+  const ijking = ijkTegenWetten(wettenPerDoc, DOC_FILTER ? [DOC_FILTER] : null);
   const gedekt = kandidaten.filter(k => k.stand === 'gedekt').length;
+  const structuur = kandidaten.filter(k => k.as === 'structuur').length;
   const meerdereDocs = groepen.filter(g => g.documenten.length > 1);
   const perDoc = {};
   for (const k of kandidaten) {
@@ -390,14 +547,22 @@ function draai() {
       'wat een wet is, is een besluit van een mens en dat woont in WETTEN.json. Dit register wijst alleen aan waar een ' +
       'mens naar moet kijken.',
     graad: 'vermoed',
-    grens: 'LEXICAAL. Deze meting leest woorden en geen betekenis. Zij mist elke harde uitspraak zonder signaalwoord ' +
-      '("de kluis blijft gescheiden") en vindt zinnen die nergens over gaan. Het aantal kandidaten is dus een ONDERGRENS ' +
-      'voor wat er staat en zegt niets over wat het waard is. Het is ook geen percentage dat naar 100 moet: meerdere ' +
-      'zinnen beschrijven vaak een onderliggende wet, en daarvoor staan de groepen eronder.',
+    grens: 'LEXICAAL EN STRUCTUREEL, in twee assen die nooit worden opgeteld. De ijking hieronder zegt wat deze ' +
+      'extractor terugvindt van de wetten die dit huis AL kent (de recall); over de PRECISIE is niets gemeten -- van de ' +
+      'kandidaten is niet vastgesteld welk deel werkelijk een harde uitspraak is. Het aantal is dus een werkvoorraad ' +
+      'voor een mens en geen oordeel, en zeker geen percentage dat naar 100 moet: meerdere zinnen uit meerdere ' +
+      'documenten beschrijven vaak een onderliggende wet, en daarvoor staan de groepen.',
     telling: {
       documenten: docs.length,
       zinnen,
       kandidatenSterk: kandidaten.length,
+      /* TWEE ASSEN, NOOIT OPGETELD TOT EEN OORDEEL. De structuuras (koppen en
+         vette openingszinnen) draagt de recall: 39 van de 48 gevonden wetten
+         staan alleen daar. De woordas draagt de verbodsvormen in lopende tekst.
+         Ze meten iets anders en een gemiddelde ervan betekent niets -- dezelfde
+         reden waarom scripts/tredeproef.js zuiver en beproefd apart houdt. */
+      kandidatenStructuur: structuur,
+      kandidatenWoord: kandidaten.length - structuur,
       kandidatenZwak: zwak,
       gedekt,
       onbepaald: kandidaten.length - gedekt,
@@ -406,6 +571,16 @@ function draai() {
       documentenMetKandidaat: Object.keys(perDoc).length,
       groepen: groepen.length,
       groepenOverMeerdereDocumenten: meerdereDocs.length,
+    },
+    ijking: {
+      uitleg: 'De recall van deze extractor, gemeten tegen WETTEN.json als grondwaarheid: elke wet daar ' +
+        'wijst een plek aan waar een mens heeft vastgesteld dat er een harde uitspraak staat. Vindt de ' +
+        'extractor daar niets, dan is hij blind voor een BEKENDE wet -- en dan zegt zijn getal over de ' +
+        'onbekende uitspraken evenmin iets.',
+      wettenBekend: ijking.bekend,
+      gevonden: ijking.gevonden,
+      gemist: ijking.gemist,
+      ankerZonderTekst: ijking.ankerZonderTekst,
     },
     overgeslagen: {
       codeblokregels: over.codeblok, tabelregels: over.tabel, citaatregels: over.citaat,
@@ -427,10 +602,14 @@ function draai() {
 function toonKort(uit) {
   const t = uit.telling;
   console.log('');
-  console.log(K.vet + '  DE DOCTRINE, LEXICAAL GELEZEN' + K.uit + K.grijs + '  (graad: vermoed -- een ondergrens)' + K.uit);
+  console.log(K.vet + '  DE DOCTRINE, GELEZEN OP STRUCTUUR EN WOORD' + K.uit + K.grijs + '  (graad: vermoed -- recall gemeten, precisie niet)' + K.uit);
   console.log('');
   console.log('    ' + String(t.documenten).padStart(6) + '  documenten gelezen');
-  console.log('    ' + String(t.kandidatenSterk).padStart(6) + '  sterke kandidaten (nooit, geen enkele, uitsluitend, ...)');
+  console.log('    ' + String(t.kandidatenStructuur).padStart(6) + '  op de STRUCTUURas' + K.grijs +
+    ' (koppen en vette openingszinnen -- de kop is zelf de bewering)' + K.uit);
+  console.log('    ' + String(t.kandidatenWoord).padStart(6) + '  op de WOORDas' + K.grijs +
+    ' (verbodsvormen in lopende tekst)' + K.uit);
+  console.log(K.grijs + '           de twee worden niet opgeteld tot een oordeel; ze meten iets anders' + K.uit);
   console.log('    ' + String(t.kandidatenZwak).padStart(6) + K.grijs + '  zwakke signalen (moet, altijd, hoort) -- geteld, niet uitgeschreven' + K.uit);
   console.log('    ' + K.groen + String(t.gedekt).padStart(6) + K.uit + '  kandidaten die een wet in WETTEN.json aanwijst');
   console.log('    ' + K.geel + String(t.onbepaald).padStart(6) + K.uit + '  onbepaald' + K.grijs +
@@ -438,6 +617,20 @@ function toonKort(uit) {
   console.log('    ' + String(t.inGrenssectie).padStart(6) + '  daarvan in een expliciete grenssectie');
   console.log('    ' + String(t.groepenOverMeerdereDocumenten).padStart(6) + '  groepen die over meer dan een document lopen' +
     K.grijs + ' (kandidaat om samen te nemen)' + K.uit);
+  console.log('');
+  const ij = uit.ijking;
+  const pct = ij.wettenBekend ? Math.round((ij.gevonden / ij.wettenBekend) * 100) : 0;
+  console.log(K.vet + '  DE IJKING -- vindt hij de wetten terug die dit huis AL kent?' + K.uit);
+  console.log('    ' + (pct >= 90 ? K.groen : K.geel) + String(ij.gevonden).padStart(6) + ' van ' +
+    ij.wettenBekend + K.uit + '  (' + pct + '%)');
+  if (ij.gemist.length) {
+    console.log('    ' + K.geel + String(ij.gemist.length).padStart(6) + K.uit + '  ECHT gemist: ' +
+      ij.gemist.map(g => g.id).join(', '));
+  }
+  if (ij.ankerZonderTekst.length) {
+    console.log('    ' + K.grijs + String(ij.ankerZonderTekst.length).padStart(6) +
+      '  anker wijst een codeblok of tabel aan -- geen zin om te vinden, geen tekort van de extractor' + K.uit);
+  }
   console.log('');
   const rijen = Object.entries(uit.perDocument).map(([d, v]) => [d, v.kandidaten, v.gedekt])
     .sort((a, b) => (b[1] - b[2]) - (a[1] - a[2])).slice(0, 12);

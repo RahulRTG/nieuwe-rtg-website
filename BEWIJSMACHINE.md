@@ -463,6 +463,113 @@ laten zien dat het werkt: één samenvoeging haalde tien dubbelingen weg.
 
 ---
 
+## 6a. Een proef kan een geldige uitslag geven en toch het verkeerde experiment zijn
+
+> **Een bewijs draagt niet alleen zijn uitslag, maar ook zijn INDELING en zijn
+> foutmodel -- en die twee zijn zelf aantoonbaar of ze zijn niet waar.**
+
+Dit is geen nieuwe wet maar een klasse die dit huis in één week vier keer heeft
+gezien, elke keer in een andere gedaante en elke keer met een keurige groene
+uitslag eroverheen. De uitslag was niet vals; het experiment was het.
+
+| Waar | Wat er gemeten werd | Wat er gemeten had moeten worden |
+|---|---|---|
+| `scripts/mutatie.js` | `isServerToets()` herkende alleen `require('./helper')` en niet `require('./helper.js')` -- drie toetsen zaten daardoor stil in de verkeerde bewijsklasse en kregen een bronmutatie in plaats van de liegpoort | de vorm, niet één spelling ervan |
+| `test/mutatiewacht.test.js` | de eerste wacht daarop matchte op zijn EIGEN commentaar en bleef groen met de bewaakte code weg | de code, met het commentaar eraf |
+| `scripts/aicontext.js` | de ledenstaat heet ook `st`, en dat woord betekent huisbreed ook status, stand en state: 91 velden in plaats van 25 | een naam is alleen die ledenstaat in het bestand waar hij eraan gebonden is |
+| `test/mn02ai-contextbesmetting.test.js` | een marker (`bewaarVerzoek.door`) die woordelijk in de vaste tekst van Rahuls karakter staat, wees een lek aan dat er niet was | alleen ONDERSCHEIDENDE markers: wat er vóór de handeling al stond, is er niet door gekomen |
+
+Vier gedaanten, één vorm: **de proef draaide, gaf een geldige uitslag, en mat
+iets anders dan waar hij over ging.** Daar helpt LAT.md regel 2 niet tegen -- die
+eist dat je een toets hebt zien zakken, en deze toetsen zakten keurig, alleen op
+de verkeerde vraag.
+
+**Wat een proef daarom hoort te dragen, en waar het vandaag staat:**
+
+| Eigenschap | Wat het betekent | Waar het wordt afgedwongen |
+|---|---|---|
+| **indeling** | in welke bewijsklasse valt deze proef, en is die indeling zelf beproefd | `test/mutatiewacht.test.js` (voor `isServerToets`) |
+| **foutmodel** | welke storing wordt er ingespoten, en raakt die de bron waar het over gaat | `server/lib/verraad.js` + `scripts/faalproef.js` |
+| **geraakte bron** | welk bestand of welke opslag verandert er werkelijk door die storing | `FAALPROEF.json`, per route |
+| **verwachte waarneming** | wat zou er anders zijn als de bewering onwaar was | vandaag: **de toets zelf, en verder niemand** |
+| **levendheid** | kan dit instrument überhaupt uitslaan | vandaag: **twee plekken, met de hand** |
+
+De laatste twee rijen zijn de open kant. De levendheidscontrole is het goedkoopst
+en het meest verwaarloosd: `test/mn02ai-contextbesmetting.test.js` toets 5 en 6,
+en `scripts/herstelproef.js` met zijn opwarmronde, zijn vandaag de enige plekken
+waar een instrument moet bewijzen dat het kán uitslaan. Toets 6 bestaat omdat de
+proef zonder hem volledig groen bleef onder een cache-mutatie -- de gelijkheid
+die hij bewaakt heeft een blinde vlek die er precies uitziet als succes.
+
+### 6a.1 Code en commentaar zijn twee dingen, en een meter die dat niet scheidt meet zijn eigen toelichting
+
+Dit is de goedkoopste helft van par. 6a en hij is machinaal te sluiten.
+`scripts/lib/bron.js` draagt `zonderCommentaar()` al, in drie standen (weghalen,
+platslaan met behoud van regelnummers, en per taal).
+
+**De eerste telling was de verkeerde noemer, en dat is zelf een voorbeeld van
+par. 6a.** Er stond hier "195 scripts lezen broncode, 19 scheiden code van
+commentaar", en dat leest als 176 fouten. Dat is het niet: het merendeel van die
+scripts telt bestanden of paden en raakt een regel commentaar nooit. De klasse
+die ertoe doet is smaller, en `npm run meterklasse` (`METERKLASSE.json`) meet
+haar apart:
+
+| | |
+|---|---|
+| scripts die broncode lezen | **201** |
+| daarvan: leiden SEMANTIEK af uit de VORM van die code | **73** |
+| daarvan: scheiden code en commentaar | **13** |
+| daarvan: doen dat niet | **60** |
+
+Alleen die 73 hoeven door `zonderCommentaar()`, want juist een toelichting
+beschrijft wat de code doet en bevat dus per definitie de woorden waar je op
+zoekt. Dat is hier twee keer echt gebeurd: `test/mutatiewacht.test.js` bleef
+groen met de bewaakte code weg omdat hij zijn eigen commentaar las, en de kop van
+`server/kern/ai/prompt.js` bevat `...md` letterlijk als voorbeeld van wat NIET
+mag -- een toets die zijn onderwerp met commentaar en al leest, zakt daar op de
+uitleg van de regel die hij bewaakt.
+
+### 6a.2 Een generator hoort zijn eigen klasse te kennen
+
+Daar staat een tweede, even goedkope regel naast, en die is groter dan
+proceshygiëne. `eisSchoneBoom()` in `scripts/lib/stempel.js` weigert een ronde
+die toch `boomVuil: true` zou opleveren; `stempel()` MELDT het achteraf, als de
+tijd al op is en de meter `registersUitVuileBoom` al omhoog is gerateld. Gemeten
+door hetzelfde script:
+
+| | |
+|---|---|
+| scripts die een artefact schrijven | **187** |
+| daarvan: stempelen, en claimen dus repo-waarheid | **79** |
+| daarvan: weigeren een vuile boom | **12** |
+| daarvan: doen dat niet | **67** |
+| grendelen zonder te stempelen | **0** |
+
+**Die 67 zijn geen foutenlijst.** Uitvoer die bewust worktree-lokaal is, of een
+tussenronde, hoort de grendel juist niet te hebben. Het punt is dat
+`registersUitVuileBoom` daarmee ophoudt een incidentklasse te zijn en een
+SYSTEMATISCH ONGEDEKT CONTRACT wordt: van de 79 artefacten die zich als
+repo-waarheid gedragen, kan er bij 67 niemand zeggen of dat expliciet zo bedoeld
+is. De laatste rij is het enige wat vandaag hard is -- er is er geen die grendelt
+zonder te stempelen, dus de poort is een strikte deelverzameling van de claim en
+niemand grendelt iets dat geen waarheid pretendeert.
+
+**Wat er dus moet komen is geen regel voor alle 79 maar een VERKLARING per
+generator**: dit artefact is repo-waarheid (en dan grendelt hij), of dit artefact
+is worktree-lokaal (en dan zegt hij dat). Zolang die verklaring ontbreekt, is elk
+getal over vuile bomen een meting van toeval. `scripts/aicontext.js` en
+`scripts/meterklasse.js` zijn de eerste twee die de grendel meebrengen; de
+verklaring per generator is een besluit dat nog openstaat.
+
+**En daarom staat `METERKLASSE.json` bewust nog niet in de repo.** Een meetbestand
+in de wortel hoort aan een ratel te hangen en die ratel hoort geijkt te zijn. Voor
+de tweede vraag is de tand evident -- het aantal vormlezers zonder scheiding hoort
+te dalen. Voor de eerste is hij dat niet: 67 kan alleen dalen door grendels toe te
+voegen, en een deel van die 67 hoort er juist geen te hebben. Een ratel die daarop
+duwt maakt het huis slechter en de meter groener, en dat is precies de faalvorm
+waar dit hoofdstuk over gaat. Tot de verklaring per generator een besluit is, is
+`npm run meterklasse` een commando dat je draait en geen getal dat meetelt.
+
 ## 7. Wat dit niet wordt
 
 - **Geen enkel groen woord bovenaan.** `LAT.md` regel 11 en `check.js` regel 48

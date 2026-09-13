@@ -57,92 +57,23 @@ module.exports = ({ db, save, accounts, onboarding, geldPasprijzen, magBoardroom
   const zaken = require('./ledenbalie-zaken')({ db, save, inzagelog, serviceEnvelop,
     hulp: { nu, rid, kort, inhoud, wie, redenOf, lidOf, pasVan, PASSEN, REDEN_MIN, geenReden, geenLid } });
 
-  /* DE STEUNCODE: waarmee een lid zich aan de balie meldt zonder zijn naam te
-     noemen. Afgeleid uit de key plus een zout dat per installatie eenmalig
-     wordt aangemaakt -- niet per lid opgeslagen, want dan was er een tweede
-     lijst om te bewaren en te wissen. Het zout is er omdat een code die
-     rechtstreeks uit het account-id volgt door iedereen na te rekenen is.
+  /* De steuncode en de stad komen uit ./ledenbalie-pseudoniem.js: daar woont de
+     vertaling van een sleutel naar iets dat een mens aan de balie kan noemen. */
+  const { steuncodeVan, stadVan } = require('./ledenbalie-pseudoniem')({ db, save, crypto, onboarding });
 
-     Let op wat dit NIET is: een bewijs. De steuncode vindt iemand, hij
-     bevestigt niemand. Alles wat erna komt (herstel, voorstel) loopt langs het
-     lid zelf of langs een mens. */
-  function zout() {
-    if (!db.data.balieSteunZout) { db.data.balieSteunZout = crypto.randomBytes(16).toString('hex'); save(); }
-    return db.data.balieSteunZout;
-  }
-  function steuncodeVan(key) {
-    return 'RTG-' + crypto.createHash('sha256').update(zout() + '|' + String(key))
-      .digest('hex').slice(0, 6).toUpperCase();
-  }
+  /* Het abonnementsbeeld komt uit ./ledenbalie-abo.js: dat heeft zijn eigen
+     bronnen (de prijslijst, de pasladder) en die raken de rest van de balie
+     niet. */
+  const aboVan = require('./ledenbalie-abo')({ pasVan, geldPasprijzen, maandCentenVoor,
+    contractueel, voorstellenVan: (id) => zaken.voorstellenVan(id) });
 
-  // de stad komt uit het onboardingprofiel, net als in kern/ledenregister.js
-  function stadVan(key) {
-    const p = ((onboarding && onboarding.store && onboarding.store().profielen) || {})[key];
-    const w = p && p.velden && p.velden.woonplaats;
-    return w ? String(w).trim() : null;
-  }
-
-  /* ---------- zoeken ---------- */
-  /* Op codenaam of op steuncode. `door` hoort niet bij de zoekvraag maar bij
-     het spoor: zonder wie er keek is een journaalregel een half antwoord. */
-  function balieZoek({ codenaam, steuncode, door } = {}) {
-    const c = kort(codenaam, 60).toLowerCase();
-    const s = kort(steuncode, 20).toUpperCase().replace(/\s+/g, '');
-    if (!c && !s) return { status: 400, error: 'Zoek op codenaam of op de steuncode van het lid.' };
-    if (c && c.length < 2) return { status: 400, error: 'Geef minstens twee tekens van de codenaam.' };
-    const rijen = accounts.ledenRegisterRijen ? accounts.ledenRegisterRijen(20000) : [];
-    const treffers = rijen.filter(r =>
-      (c && String(r.codename || '').toLowerCase().includes(c)) || (s && steuncodeVan(r.key) === s)
-    ).slice(0, 20).map(r => {
-      const u = lidOf(r.id);
-      return { id: r.id, key: r.key, codename: r.codename || null, pas: pasVan(r.tier),
-        land: r.land || null, stad: stadVan(r.key), sinds: (u && u.created_at) || null };
-    });
-    /* Een lijstscherm hoort als EEN regel in het journaal (zie noteerVeel);
-       twintig losse regels per zoekopdracht verdrinken het echte signaal. */
-    try {
-      inzagelog.noteerVeel({ door, overIds: treffers.map(t => t.id),
-        waarom: 'Ledenbalie: lid opzoeken', bron: 'ledenbalie/zoek' });
-    } catch (e) {}
-    return { ok: true, treffers };
-  }
-
-  /* ---------- dossier ---------- */
-  function balieDossier(id, { door, reden } = {}) {
-    const r = redenOf(reden);
-    if (!r) return geenReden;
-    const u = lidOf(id);
-    if (!u) return geenLid;
-    try {
-      inzagelog.noteer({ door, over: { id: u.id, codenaam: u.codename }, waarom: r, bron: 'ledenbalie/dossier' });
-    } catch (e) {}
-    /* Veld voor veld opgebouwd, nooit een spread van de accountrij. Dat is het
-       verschil tussen "we tonen deze acht dingen" en "we tonen alles wat er
-       morgen aan kolommen bij komt" -- en die kolom is een keer het
-       telefoonnummer. */
-    return { ok: true, lid: {
-      codename: u.codename || null,
-      pas: pasVan(u.tier),
-      land: (accounts.getMemberState ? (accounts.getMemberState(u.id) || {}) : {}).land || null,
-      stad: stadVan('user-' + u.id),
-      sinds: u.created_at || null,
-      abo: aboVan(u),
-      klachten: zaken.klachtenVan(u.id),
-      steuncode: steuncodeVan('user-' + u.id)
-    } };
-  }
-
-  function aboVan(u) {
-    const pas = pasVan(u.tier);
-    const passen = (() => { try { const p = geldPasprijzen && geldPasprijzen(); return (p && p.passen) || null; } catch (e) { return null; } })();
-    const centen = maandCentenVoor(passen, pas);
-    return { pas, pasNaam: (passen && passen[pas] && passen[pas].naam) || pas,
-      // contractueel (Business, Lifestyle) heeft geen bedrag in de prijslijst
-      opMaat: contractueel(pas),
-      maandbijdrage: centen == null ? null : Math.round(centen) / 100,
-      status: pas === 'gratis' ? 'gratis app' : 'lopend',
-      voorstellen: zaken.voorstellenVan(u.id) };
-  }
+  /* Zoeken en het dossier staan in ./ledenbalie-inzage.js: dat zijn de twee
+     wegen die WERKELIJK in de kluis kijken, en ze delen sinds 13 september 2026
+     een harde regel -- geen aantoonbaar journaal, geen inzage. Die regel is een
+     eigen subject en hoort niet verspreid over de bedrading te staan. */
+  const { balieZoek, balieDossier } = require('./ledenbalie-inzage')({
+    inzagelog, kort, redenOf, lidOf, geenReden, geenLid, accounts,
+    steuncodeVan, stadVan, aboVan, klachtenVan: (id) => zaken.klachtenVan(id), pasVan });
 
   /* ---------- wachtwoordherstel ---------- */
   /* De balie zet GEEN wachtwoord en ziet het adres niet. Ze zet de bestaande
@@ -156,16 +87,20 @@ module.exports = ({ db, save, accounts, onboarding, geldPasprijzen, magBoardroom
      Ontbreekt hij, dan zeggen we dat luid: een balie die denkt te hebben
      geholpen terwijl er niets is verstuurd, is erger dan een balie die
      weigert. */
-  function balieHerstel(id, { door, reden } = {}) {
+  /* Dezelfde volgorde als bij het dossier, en hier telt hij zwaarder: dit zet
+     een herstelstroom in gang naar de telefoon en het adres van een lid. Het
+     spoor staat er dus VOOR de envelop op de bus gaat -- andersom zou een
+     mislukte commit een bericht achterlaten dat niemand meer kan verklaren. */
+  async function balieHerstel(id, { door, reden } = {}) {
     const r = redenOf(reden);
     if (!r) return geenReden;
     const u = lidOf(id);
     if (!u) return geenLid;
     if (typeof herstelStart !== 'function')
       return { status: 500, error: 'De herstelstroom is niet aangesloten. Meld dit; er is niets verstuurd.' };
-    try {
-      inzagelog.noteer({ door, over: { id: u.id, codenaam: u.codename }, waarom: r, bron: 'ledenbalie/herstel' });
-    } catch (e) {}
+    const spoor = await inzagelog.noteerVast({
+      door, over: { id: u.id, codenaam: u.codename }, waarom: r, bron: 'ledenbalie/herstel' });
+    if (!spoor.ok) return { status: spoor.status || 503, error: spoor.error + ' Er is niets verstuurd.', spoor: spoor.reden };
     try {
       const p = herstelStart(u);
       if (p && typeof p.catch === 'function') p.catch(e => console.error('[ledenbalie] herstel', e));

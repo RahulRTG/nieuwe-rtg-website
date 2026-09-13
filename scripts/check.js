@@ -3370,6 +3370,24 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
        uitkomst heel is. Zie GELDLAT.md par. "Scenario 3, gemeten op een echt
        geldpad". */
     ['server/kern/factuursaldo.js', 'geld: de afschrijving en de afwikkeling van dezelfde factuur horen als EEN duurzame commit te landen, anders staat het geld vast en de tegenprestatie niet'],
+    /* HET ACHTSTE, en het is de tweelingbroer van de bewaking hierboven. Het
+       inzagejournaal (server/inzagelog.js) legt vast wie de IDENTITEITSKLUIS
+       van een mens heeft geopend, en het faalde open: noteer() geeft een
+       uitslag terug die geen van de 42 aanroepers leest, het wegschrijven zit
+       in een lege catch, en zonder database schrijft hij in een weggegooide
+       array en meldt succes. Een spoor dat niet kan weigeren, is geen belofte.
+       De bedrading staat apart zodat deze regel op een bestand slaat dat er
+       werkelijk over gaat; server.js zou hier met een reden over drie regels
+       komen te staan. */
+    /* HET NEGENDE, en het is dezelfde vorm als factuursaldo.js hierboven: de
+       BETALING liep al duurzaam (kern/pay) en het MERKTEKEN dat zij geind was
+       niet, dus stonden er twee commits met een gat ertussen. Onder
+       `schrijf-verloren` gaf /api/office/asset/fees 200 met "geind: N" terwijl
+       feeJaar en de kas verdwenen -- en dan telt de volgende ronde de kas een
+       tweede keer op terwijl het lid door de idem-sleutel maar een keer wordt
+       afgeschreven. Eenmaal betaald, tweemaal geboekt. */
+    ['server/kern/assets.js', 'de servicefee: geind geld en het merkteken dat het geind is, horen als EEN duurzame commit te landen -- anders boekt de volgende ronde de kas nog een keer'],
+    ['server/opzet/inzagespoor.js', 'het inzagejournaal: wie te horen krijgt dat een kluis is geopend, hoort dat spoor na een herstart terug te vinden -- en waar het spoor niet vaststaat, gaat de inzage niet door'],
     ['test/idembundel.test.js', 'de toets die bewijst dat een genestelde bundel meedoet en dat een gewone bundel een geldcommit niet degradeert']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel

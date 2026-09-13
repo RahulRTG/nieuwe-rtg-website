@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:44:14.990Z",
-    "commit": "456cdaa6",
+    "op": "2026-09-13T12:44:03.547Z",
+    "commit": "72036c97",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -49,15 +49,6 @@
       "module": "server/kern/aanmeldingen.js",
       "operator": "false->true",
       "gezakt": 1
-    },
-    "aanvoer.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/knelpunt/aanvoer.js",
-      "operator": "===->!==#0",
-      "gezakt": 9,
-      "geprobeerd": 1,
-      "scherp": "gezakt"
     },
     "aanwezig.test.js": {
       "soort": "server",
@@ -126,14 +117,6 @@
       "operator": "===->!==#0",
       "gezakt": 5,
       "geprobeerd": 1
-    },
-    "adamproef.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bron.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 5
     },
     "adaptief.test.js": {
       "soort": "puur",
@@ -290,6 +273,14 @@
       "module": "server/openai.js",
       "operator": "===->!==",
       "gezakt": 2
+    },
+    "aicontext-allowlist.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "aidata.test.js": {
       "soort": "server",
@@ -2034,14 +2025,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
-    },
-    "doelgroepbereik.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/functies/register/index.js",
-      "operator": "!==->===#0",
-      "gezakt": 1,
-      "geprobeerd": 1
     },
     "domeinalleen.test.js": {
       "soort": "puur",
@@ -4067,6 +4050,13 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "ledenbaliespoor.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
     "ledengids-race.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5004,6 +4994,27 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "mn01-bevoegdheidsvoordeel.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "mn02-hoedanigheidsscheiding.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "mn02ai-contextbesmetting.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
     "mobiliteit-werkkant-routes.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5558,14 +5569,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
-    },
-    "ontvanger.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/ontvanger.js",
-      "operator": "===->!==#0",
-      "gezakt": 6,
-      "geprobeerd": 1
     },
     "ontwerp.test.js": {
       "soort": "puur",
@@ -6175,12 +6178,11 @@
       "reden": "de tekst staat in server/kern/rahul-hart.js en niet in de module die de export draagt; wat hij vastlegt zijn woorden in een system prompt, en geen bronoperator raakt een letterlijke string. Met de hand tweemaal raak: een passie weghalen laat toets 1 zakken, scrypt -> md5 laat toets 2 zakken"
     },
     "rahul-mens.test.js": {
-      "soort": "puur",
+      "soort": "server",
       "staat": "gezakt",
-      "module": "server/kern/rahul/taal.js",
-      "operator": "return-weg#0",
+      "operator": "liegpoort /api/",
       "gezakt": 1,
-      "geprobeerd": 3
+      "scherp": "gezakt"
     },
     "rahul-omgang.test.js": {
       "soort": "puur",
@@ -6288,6 +6290,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "registerklopt.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/registerklopt.js",
+      "operator": "getal+1#1",
+      "gezakt": 1,
+      "geprobeerd": 8
     },
     "reisagenda.test.js": {
       "soort": "server",

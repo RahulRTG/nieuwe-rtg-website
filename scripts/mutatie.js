@@ -1201,9 +1201,21 @@ function isServerToets(naam) {
   if (GEEN_BRONMUTATIE.has(path.basename(naam))) return false;
   /* De zoekterm opgeknipt, precies zoals de patronen in regel 36 van
      scripts/check.js: voluit gespeld leest een andere keuringsregel dit als een
-     require van scripts/helper.js, die niet bestaat. */
-  const teken = "require('./" + "helper')";
-  return fs.readFileSync(path.join(TEST, naam), 'utf8').includes(teken);
+     require van scripts/helper.js, die niet bestaat.
+
+     EN MET EN ZONDER EXTENSIE, want dat is dezelfde require en het verschil
+     kostte een stille misklassering. Drie toetsbestanden schrijven hem als
+     `require('./helper.js')` tegenover 973 zonder; die drie vielen hier uit het
+     servervak en werden met een BRONMUTATIE beproefd in plaats van met de
+     liegpoort. Voor test/rahul-mens.test.js liep dat al zo sinds hij bestaat,
+     en het viel niemand op omdat hij toevallig ook een servermodule requiret en
+     dus gewoon een uitslag kreeg -- een uitslag van de verkeerde proef.
+
+     Dat is de faalvorm waar dit bestand zelf voor is gebouwd: niet een toets
+     die zakt, maar een meter die een getal geeft. */
+  const bron = fs.readFileSync(path.join(TEST, naam), 'utf8');
+  const teken = "require('./" + "helper";
+  return bron.includes(teken + "')") || bron.includes(teken + ".js')");
 }
 
 /* DE SERVERTOETSEN in EEN ronde: de liegpoort aan voor alle /api/-paden. Per

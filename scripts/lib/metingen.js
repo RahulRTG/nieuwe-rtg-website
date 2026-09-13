@@ -84,6 +84,19 @@ const REGISTER = {
      dezelfde conclusie over minder bewijs, en dat is precies de faalvorm waar
      een ratel voor is. */
   'CARRIEREVORM.json': { meter: ['carriereDomeinenGemeten'] },
+  /* AICONTEXT.json meet waar Rahul zijn ledencontext samenstelt en wat daar
+     samenkomt (MENSNETWERK.md par. 4c). Twee tanden, en ze doen iets anders.
+
+     `aiContextLek` is de INVARIANT: velden die een kantoorroute schrijft en die
+     de samensteller ook leest. Nul, en dat hoort nul te blijven -- wat het
+     kantoor over een lid vastlegt, gaat niet naar een modelaanbieder.
+
+     `aiContextVeldenGezien` is het BEREIK, om dezelfde reden als bij
+     CARRIEREVORM.json hierboven: de veldinventaris is lexicaal, dus een meter
+     die stil minder velden ziet (iemand bindt de ledenstaat aan een nieuwe
+     naam) meldt diezelfde nul over minder bewijs. Een lek van nul uit een meter
+     die niets meer ziet, is de gevaarlijkste vorm van groen. */
+  'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
   'BEPROEVING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   /* De ACTUELE meting naast de geaccepteerde basislijn hierboven: scripts/
      beproeving.js schrijft hem na ELKE ronde, ook een gezakte, zodat rood

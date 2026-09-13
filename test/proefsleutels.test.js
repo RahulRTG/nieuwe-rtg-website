@@ -49,13 +49,32 @@ test('elke munter zegt waarom zijn weg de juiste is', () => {
    toetsen is zonder een echte RTG te starten. */
 function nepPost(mislukt = new Set()) {
   const gezien = [];
+  let nr = 0;
   return {
     gezien,
     post: async (pad, lijf, tok) => {
       gezien.push({ pad, tok: tok || null });
       if (mislukt.has(pad)) return { status: 403, data: { error: 'nee' } };
       if (pad === '/api/techniek/sso') return { status: 200, data: { ok: true } };
+      /* DE VORM VAN HET REGISTRATIE-ANTWOORD IS ECHT NAGEKEKEN, en dat is hier
+         geen overdaad. De munter van kantoor-a/-b leest het account-id uit
+         `state.user.id`; gaf deze nep-server alleen een token terug, dan zou de
+         zetelstap stil worden overgeslagen en zou deze toets groen staan over
+         iets dat op een echte server nooit gebeurt. Precies de fixture-val uit
+         CARRIERE.md par. 5: de fixture houdt zich aan de vorm die de code
+         AANNEEMT in plaats van aan de vorm die de server geeft.
+         Nagemeten tegen een draaiende server op 13 september 2026. */
+      if (pad === '/api/auth/register') {
+        nr += 1;
+        return { status: 200, data: { token: 't:register:' + nr, state: { user: { id: 1000 + nr } } } };
+      }
       if (pad === '/api/techniek/sso/scimsleutel') return { status: 200, data: { sleutel: 'rtgscim_' + 'x'.repeat(30) } };
+      /* EEN SESSIE HOORT BIJ EEN ACCOUNT, ook in een nep-server. Gaf deze regel
+         voor /api/account/start altijd hetzelfde token terug, dan kregen twee
+         VERSCHILLENDE kantoormensen dezelfde sleutel -- en dan staat er groen
+         over een opstelling die in werkelijkheid een mens is. Het token van de
+         aanroeper gaat daarom mee in het antwoord. */
+      if (pad === '/api/account/start' && tok) return { status: 200, data: { token: 't:' + pad + ':' + tok } };
       return { status: 200, data: { token: 't:' + pad } };
     }
   };
@@ -122,6 +141,70 @@ test('de scim-sleutel wordt gedraaid en niet verzonnen', async () => {
   assert.ok(gezien.some(g => g.pad === '/api/techniek/sso'), 'eerst de SSO-koppeling: een SCIM-sleutel hoort bij een organisatie');
   assert.ok(gezien.some(g => g.pad === '/api/techniek/sso/scimsleutel'));
   assert.ok(String(b.tokens.scim).startsWith('rtgscim_'), 'de scim-sleutel draagt het voorvoegsel uit server/scim/sleutels.js');
+});
+
+/* ============================================================================
+   TWEE KANTOORMENSEN, EN ZE MOGEN NOOIT EEN WORDEN.
+
+   Tot 13 september 2026 had deze sleutelbos precies EEN mens aan het kantoor:
+   de eigenaar. Dat opent elke deur en bewijst daarom niets over WIE er doorheen
+   kwam. Het scherpst bij server/routes/uitgifte.js, dat twee PERSONEN onder een
+   document eist: met een sleutelbos van een mens is die eis niet te beproeven,
+   en een eis die niet beproefd kan worden is een vormvereiste.
+
+   Gemeten met de verse sleutelbos tegen een echte server (13 september 2026):
+   A start een uitgifte en tekent -> 409 "dezelfde ogen tellen niet dubbel";
+   B tekent -> 200. Dat was voor deze stap niet te draaien.
+
+   DE MUTATIE: laat `kantoor-b` hetzelfde token teruggeven als `kantoor-a`
+   (bijvoorbeeld `bos['kantoor-a']`) -> deze toets zakt.
+   ========================================================================== */
+test('kantoor A en kantoor B zijn twee VERSCHILLENDE mensen', async () => {
+  const { post, gezien } = nepPost();
+  const b = await bos.haalSleutels({ post });
+  for (const rol of ['kantoor-a', 'kantoor-b']) {
+    assert.ok(b.tokens[rol], 'geen sleutel voor ' + rol);
+  }
+  assert.notStrictEqual(b.tokens['kantoor-a'], b.tokens['kantoor-b'],
+    'A en B dragen dezelfde sleutel; dan is het EEN mens met twee namen');
+  /* En de sleutel is het gevolg, niet de oorzaak: twee TOKENS uit een gedeelde
+     registratie zijn nog steeds een gedeelde mens. Dus ook de weg ernaartoe. */
+  const registraties = gezien.filter(g => g.pad === '/api/auth/register');
+  assert.ok(registraties.length >= 2,
+    'A en B horen elk hun eigen account te registreren; nu ' + registraties.length +
+    ' registratie(s). Delen ze er een, dan is het vier-ogenprincipe niet te beproeven.');
+});
+
+test('kantoor-op-naam is een MEDEWERKER, met de boardroom alleen als terugval', async () => {
+  const { post } = nepPost();
+  const b = await bos.haalSleutels({ post });
+  assert.strictEqual(b.tokens['kantoor-op-naam'], b.tokens['kantoor-a'],
+    'kantoor-op-naam hoort kantoor-a te zijn: de eigenaar komt overal door en bewijst dus niets over de deur');
+
+  /* EN DE TERUGVAL MOET WERKEN, want een reparatie die dekking KOST is geen
+     reparatie. Valt de registratieweg weg, dan hoort kantoor-op-naam terug te
+     vallen op de boardroom in plaats van te verdwijnen -- anders verliezen de
+     routes achter kluisAuth en naamAuth in een uitgeklede omgeving hun sleutel. */
+  const kaal = nepPost(new Set(['/api/auth/register']));
+  const b2 = await bos.haalSleutels({ post: kaal.post });
+  assert.ok(!b2.tokens['kantoor-a'], 'zonder registratie hoort kantoor-a te ontbreken');
+  assert.strictEqual(b2.tokens['kantoor-op-naam'], b2.tokens.boardroom,
+    'zonder medewerker hoort kantoor-op-naam op de boardroom terug te vallen');
+});
+
+/* De zetel is geen bijzaak: kern/ledenbalie-zetels.js laat iedereen behalve de
+   boardroom alleen met een zetel toe, dus zonder deze stap staat er een
+   medewerker voor een deur die dicht blijft -- en dat leest als een uitslag
+   over de ROUTE terwijl het een uitslag over de opstelling is. */
+test('een kantoormedewerker krijgt zijn baliezetel van de boardroom', async () => {
+  const { post, gezien } = nepPost();
+  const b = await bos.haalSleutels({ post });
+  const zetels = gezien.filter(g => g.pad === '/api/office/balie/zetel');
+  assert.ok(zetels.length >= 1,
+    'geen enkele zetel uitgedeeld; dan blijven de 31 baliewegen achter een 403 die de proef zelf uitlokte');
+  assert.ok(zetels.every(z => z.tok === b.tokens.boardroom),
+    'de zetel hoort door de BOARDROOM gezet te worden; /api/office/balie/zetel hangt aan boardroomAuth, ' +
+    'en met de sleutel van de medewerker zelf zou hij zichzelf toelaten');
 });
 
 test('de basisrollen zijn de drie zonder welke een proef niets meet', () => {

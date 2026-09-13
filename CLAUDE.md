@@ -364,6 +364,223 @@ betaler leest de gezondheid nooit. Er komt géén vijfde wereld: een toptalent
 staat in LivingOS, WorkOS, TravelOS en FoundationOS tegelijk, en par. 7 zet de
 vier besluiten van de eigenaar op een rij.
 
+**`MENSNETWERK.md` is de grondwet voor menselijke vertegenwoordiging** -- niet
+wat een talent IS (`CARRIERE.md`) en niet hoe het geld heet dat naar hem gaat
+(`RUGDEKKING.md`), maar wie iets mag DOEN namens een mens, wie iets over hem mag
+WETEN, en wie VERDIENT aan welke keuze. Lees die vóór je een aanmeldweg, een
+vertegenwoordigingsmodel of een RTG-managementdienst bouwt. De kern in één zin:
+**geen organisatorische relatie met RTG kan menselijke toestemming vervangen,
+verruimen, doorgeven of reconstrueren.** De keten is met opzet omgedraaid -- van
+*mens → waarde → talentstatus → management* naar *mens → behoefte → relaties →
+expliciete bevoegdheden → dienst → bewijs* -- want een mens hoeft niet door RTG
+beoordeeld te worden om binnen te komen. Drie grondwetsregels, en ze staan vóór
+de dienst die ze moet beteugelen: **MN-01 geen bevoegdheidsvoordeel** (tien
+bewijsgevallen, met als aanvalsproef dat de eigenaar van RTG zelf manager wordt
+van een testtalent en zonder machtiging niets kan), **MN-02 scheiding van
+hoedanigheden** en **MN-03 geen commercieel voordeel** (de AI zegt erbij dat RTG
+aan één van de opties verdient).
+
+**MN-01 en MN-02 zijn sinds 13 september 2026 TOETSEN en geen zinnen** (par. 4a
+en 4b). Ze staan bewust apart, want het zijn twee soorten regels: MN-01 gaat over
+BEVOEGDHEID en is structureel te meten (de aanvalsproef: de EIGENAAR van RTG
+krijgt op dezelfde machtiging 404 waar de gemachtigde 200 krijgt -- zelfde
+object, zelfde actie, andere actor), MN-02 over KENNIS. Bij die tweede is de
+verkeerde formulering verleidelijk: *"een medewerker mag niet meer weten"* is
+aantoonbaar onwaar én soms gewenst, want de ledenbalie is een legitieme kennisweg
+met reden, journaal en melding. De regel is **niet-overdraagbaarheid**, en de
+proef heeft daarom een TEGENproef: de kantoorweg moet 200 blijven geven, anders
+is de goedkoopste implementatie "blokkeer alles voor managers" en staat de toets
+groen terwijl het product stuk is. Eén mens, twee sessies, en de managercontext
+wordt vóór én na de kantoorinzage byte voor byte vergeleken.
+**En let op de poort die eruit volgde:** `npm run registerklopt` draait de
+negentien toetsen die een register tegen een VERSE meting houden. Die zijn geen
+van alle onderdeel van `npm run check`, en dat kostte een rode CI terwijl lokaal
+*Alles in orde* stond -- *een register dat door een toets wordt bewaakt, is niet
+gedekt door een groene keuring tenzij die toets onderdeel is van die keuring.*
+Het is een VIERDE begrip naast `versheid` (is de meting van een recente commit),
+`meterijk` (ziet de meter een foute invoer) en `check` (de statische regels).
+
+**Zes metingen gaan vooraf, en twee daarvan veranderen het ontwerp.** Het
+bevoegdheidsvoordeel is al dicht en niet beloofd: er is geen kantoorweg naar een
+machtiging, en `routes/vertegenwoordiging.js` kan per definitie niet bij
+`kluisAuth`. Maar **het journaal faalt open, en niemand heeft dat gekozen**:
+`server/inzagelog.js` geeft `noteer()` een uitslag terug die **geen van de 42
+aanroepende bestanden leest**, het wegschrijven zit in een lege `catch`, en
+zonder database schrijft hij in een weggegooide array en meldt succes. De inzage
+gaat dus door als het spoor niet geschreven wordt -- dezelfde stille faalvorm als
+`res.append` in AFSPRAAK.md. Daarbij is het journaal een ringbuffer (MAX 5000,
+oudste valt eraf) met wél een hashketen eronder: wat er staat is onvervalsbaar,
+maar een keten bewijst niet dat er niets ontbreekt. De reparatie hoort op ÉÉN
+plek (`kern/kantoor/kluispoort.js`) en niet in 42 -- *geen aantoonbaar journaal,
+geen inzage* -- en dat is besluit 5. **Daar hoort een tweede invariant bij, en
+zonder die tweede is de eerste een schijnoplossing**: "geregistreerd" mag niet
+betekenen dat `noteer()` geen fout gooide maar dat de COMMIT geslaagd is, want
+`save()` in `server/db/index.js` zet binnen een bundel alleen een vlag en
+markeert in PostgreSQL-modus uitsluitend dat de responsepoort vóór het antwoord
+één autoritatieve commit moet doen -- succesvol terugkeren betekent daar dus niet
+dat er iets staat. Anders verschuift het probleem van een genegeerde uitzondering
+naar een VALSE BEVESTIGING, en die is erger want hij ziet eruit als bewijs. En
+dat is beproefbaar zonder iets nieuws te bouwen: `server/lib/verraad.js` kent
+`schrijf-verloren` ("keert NORMAAL terug zonder iets te bewaren") en
+`schrijf-faalt` ("een aanroeper die dat stil wegvangt, meldt succes over niets"),
+acht toetsbestanden gebruiken ze, tien raken het inzagejournaal, en de doorsnede
+is **nul** -- de toets bij besluit 5 is dus niet "werkt de poort" maar *weigert de
+poort onder `schrijf-verloren`*. De ringbuffer is een APART besluit (6): een
+hashketen bewijst de integriteit van wat er staat en zegt niets over wat eraf
+viel, dus integriteit en retentie zijn twee eigenschappen en de ene wordt hier
+makkelijk voor de andere aangezien. En besluit 7 legt de vraag voor of *een
+belofte over een spoor is pas een regel als het spoor kan weigeren* de twaalfde
+regel van `LAT.md` wordt -- de vorm is niet uniek voor het journaal: 468 lege
+`catch`-blokken in `server/`, waarvan 13 letterlijk `try { save(); } catch`, en
+dat is een vorm en geen aanklacht. **Par. 0.7 keert de volgorde om, en corrigeert
+dit document zelf.** Het duurzame primitief bestaat al en is bewust schaars
+(`db/duurzaam.js`: synchroon met fsync, keert pas terug als de opslag bevestigt,
+met `check.js` regel 47 op zijn AANROEPERSLIJST) -- en deze laag staat er al op:
+`vertegenwoordiging`, `rugdekking` en het carrièreledger zijn duurzaam, het
+inzagejournaal niet. De klasse-meting bestaat ook al (`FAALPROEF.json`,
+`scripts/faalproef.js`: per route, contract afgeleid uit een gemeten effectprofiel
+en pas daarna beproefd met beide verraadstanden). En de plek die eerst genoemd
+werd, klopte niet: `kluispoort.js` is een IDENTITEITSpoort die vóór de route
+draait en het onderwerp van de inzage niet kent -- het contract hoort bij het
+journaal en de leesweg, niet bij de deur ervoor. **Besluit 5 is inmiddels genomen
+en gebouwd** (13 september 2026, par. 0.6a en besluit 5): `inzagelog.noteerVast()`
+levert een uitslag, `kern/ledenbalie-inzage.js` houdt de inzage tegen als het
+spoor niet vaststaat, en onder beide verraadstanden komt er geen dossier, geen
+trefferlijst en geen herstelbericht meer uit. Vier dingen daar niet wegpoetsen.
+**Plaats een garantie waar alle informatie voor die garantie samenkomt, niet zo
+vroeg mogelijk in de keten** -- de kluispoort kent de MENS en niet het onderwerp,
+het journaal kent het onderwerp en niet wat er getoond zou worden. Het journaal
+zegt **`toegestaan` en nooit `geleverd`**: de regel wordt geschreven vóór het
+dossier wordt samengesteld, dus hij legt vast dat inzage is VERLEEND -- zou er
+`ingezien` staan, dan liegt het spoor bij elke mislukte lezing, en in het
+voordeel van het huis. De sleutelbos van de proeven had **één** kantoormens (de
+eigenaar, die overal doorkomt) en heeft er nu twee, `kantoor-a` en `kantoor-b`,
+waarmee het **vier-ogenprincipe voor het eerst is beproefd**: A tekent zijn eigen
+uitgifte → 409, B tekent → 200. En `balieAuth` stond in de bewakerskaart als
+*verfijner* terwijl hij de rol `office` in zijn GEHEEL weigert -- daaruit volgt
+een regel die breder geldt: **een verfijner boven een rol die geen mens
+vaststelt, is een indelingsfout**. Twee registers spraken elkaar daarover tegen
+(`kantoormacht.js` zette hem al in `EIST_MENS`) en de goedkoopste bepaalde wat er
+beproefd kon worden. Het getal is daarmee ook leesbaar geworden: van de 578
+kantoorroutes is **41 bewezen, 1 gezakt, 132 niet-mutatief, 33 voorziening, 55
+onzeker en 316 niet-bereikt** -- vijf dingen heetten `ongemeten`, waarvan er twee
+een EIGENSCHAP zijn (een leesroute heeft geen bevestiging om te breken) en alleen
+`niet-bereikt` omlaag hoort. En let op de leerzaamste bevinding van de
+opruimronde: **een register dat niet is hergedraaid, is een bewering over het
+verleden** -- zeven van de negen "gezakte" routes waren al gerepareerd door
+`kern/kantoorwissen.js` en alleen het ingecheckte bestand wist het niet. De twee
+die echt overbleven zijn dicht, en `/api/bank/akkoord` draagt de les: die stond
+**al** op de duurzaamheidslijst van regel 47 terwijl het AKKOORD zelf er niet
+onder viel -- **een regel op een afdwinglijst noemt een ROUTE en niet een
+handeling**.
+
+**En par. 4c is de AI-helft, die par. 4b hardop openliet.**
+`scripts/aicontext.js` (`AICONTEXT.json`) meet eerst waar Rahul zijn ledencontext
+samenstelt (`aiSystemPrompt` in `kern/ai/prompt.js`): **twaalf invoeren -- 3 op
+het LID, 2 op de PAS, 4 op het HUIS, 3 vaste tekst**. De uitslag die het ontwerp
+stuurt is dat **de muur een VELDSELECTIE is en geen grens**: de ledenstaat draagt
+25 velden, 9 daarvan worden door een KANTOORroute geschreven (`bewaarVerzoek`
+voorop, en die draagt de echte naam van de medewerker uit de kluis), en de
+samensteller leest er twee -- `trip` en `invoices`. De doorsnede is leeg, maar de
+andere drieëntwintig liggen in hetzelfde object, één `...md` verwijderd van een
+tekst die woordelijk naar een modelaanbieder gaat. De architectuur hoeft dus niet
+om; de veldselectie had een handhaver nodig, en die is er nu. **De waarneming is
+de prompt zelf**: hij staat op geen enkel scherm, dus de proef zet een
+nep-modelserver op `127.0.0.1` met `LOCAL_AI_URL` ernaartoe en vangt hem op zoals
+het model hem krijgt. Drie dingen daar niet wegpoetsen. **De dragende toets is de
+GELIJKHEID en niet de woordenlijst** -- een afgeleide regel ("dit lid woont in
+dezelfde regio als het laatst geopende dossier") draagt geen enkele waarde, en
+van de vijf mutaties is dat precies de ene die alleen dáár op zakt. **Een
+gelijkheidstoets heeft een blinde vlek die eruitziet als succes**: met een cache
+op `key` bleef de hele proef groen, dus staat er nu een BESTURINGSPROEF naast die
+iets verandert dat wél hoort door te komen -- *een instrument dat niet kan
+uitslaan, is geen instrument*. En de meting vond onderweg een echt gebrek dat
+niets met contaminatie te maken had: de regel die het lid NOEMT las
+`PERSONAS[tier]`, de DEMO-rij per pas, dus **elk echt RTG-Pass-lid werd aan het
+model voorgesteld als "Amberen Vos, lid sinds Maart 2026"** terwijl zijn eigen
+codenaam iets anders was. Dezelfde fout als de demo-reis twee regels hoger in
+hetzelfde bestand, blijven staan omdat de context nergens te zien is; de
+reparatie neemt **twee velden op naam** over en nooit een spread, want
+`publicUser()` draagt ook `full` en dat is de echte naam.
+**`BEWIJSMACHINE.md` par. 6a is de les erboven, en hij geldt huisbreed: een proef
+kan een geldige uitslag geven en toch het verkeerde experiment zijn uitgevoerd.**
+Vier keer in een week, elke keer met een keurig groen vinkje: `isServerToets`
+herkende één spelling van `require('./helper')`, de wacht daarop las zijn eigen
+commentaar, de veldinventaris telde op de naam `st` het halve huis mee, en een
+marker die woordelijk in Rahuls karakterportret staat wees een lek aan dat er
+niet was. Een bewijs draagt dus niet alleen zijn uitslag maar ook zijn
+**indeling** en zijn **foutmodel**, en die twee zijn zelf aantoonbaar of ze zijn
+niet waar. Twee goedkope helften hebben een eigen meter gekregen
+(`npm run meterklasse`, `METERKLASSE.json`), en **de eerste telling had de
+verkeerde noemer -- zelf een voorbeeld van de regel**: "195 scripts lezen bron, 19
+scheiden commentaar" leest als 176 fouten, terwijl het merendeel bestanden telt en
+nooit een regel commentaar raakt. De klasse die ertoe doet is **73 scripts die
+SEMANTIEK afleiden uit de VORM van de code**, waarvan er 13 scheiden en 60 niet.
+De tweede helft is groter dan proceshygiëne: van de **79 generatoren die stempelen
+(en dus repo-waarheid claimen) grendelen er 12 op een schone boom**, en **0
+grendelen zonder te stempelen**. Die 67 zijn geen foutenlijst -- worktree-lokale
+uitvoer hoort de grendel juist niet te hebben -- maar daarmee is
+`registersUitVuileBoom` geen incidentklasse meer maar een **systematisch ongedekt
+contract**: bij 67 artefacten kan niemand zeggen of "repo-waarheid" expliciet zo
+bedoeld is. Wat er moet komen is geen regel voor alle 79 maar een VERKLARING per
+generator, en dat besluit staat open.
+**En par. 4d is de grondwet die uit die ronde volgt -- AI-CONTEXT-01 t/m 06**, met
+per regel wie hem handhaaft en waar dat niemand is. De dragende is de eerste:
+**een AI-context wordt opgebouwd uit een POSITIEVE lijst velden, nooit uit een
+object waar daarna gevoelige velden uit worden gehaald.** Dat gaat over RICHTING
+en niet over stijl: bij `{ ...md }` gevolgd door `delete` passeert elk NIEUW veld
+de grens vanzelf, bij `{ trip: md.trip }` blijft elk nieuw veld buiten tot iemand
+het er bewust bij zet. `test/aicontext-allowlist.test.js` handhaaft dat met drie
+eisen tegelijk (de gelezen velden zijn gelijk aan een verklaarde `LEDENVELDEN`,
+de ledenstaat wordt nergens in zijn geheel gekopieerd, en er wordt nergens iets
+uit een context VERWIJDERD), en de lijst is met opzet een VERKLARING en geen
+serialisatie -- er wordt niet overheen gelopen, want dan was hij zelf de generieke
+serializer waar de regel voor waarschuwt. AI-CONTEXT-02 (hoedanigheid in de
+cachesleutel) heeft vandaag **geen handhaver** en dat staat er liever dan een
+schijnbewaker: er is geen cache, en wat er wel is, is de besturingsproef die
+omvalt zodra iemand er een bouwt zonder.
+
+Daaruit volgt de vorm van MN-02, en die is anders dan hij eerst was: niet *"een
+RTG-manager ziet hetzelfde als een externe"* (dat sneuvelt, want `kern/ledenbalie.js`
+is een LEGITIEME kennisweg met reden, journaal en melding), maar **geen
+bevoegdheid of kennis uit hoedanigheid A mag stilzwijgend worden gebruikt in
+hoedanigheid B**. Zeven proeven, waarvan de laatste drie de moeilijke zijn:
+terugkeer naar de managercontext neemt niets mee, de AI-context krijgt het ook
+niet als VERBORGEN context, en export, rapport en cache besmetten elkaar niet --
+je kunt namelijk perfect afgeschermde routes hebben terwijl een contextbouwer
+twee werelden alsnog samenvoegt. En het systeem wisselt **nooit vanzelf** van
+context: dat is een beveiligingsgrens en geen sierfunctie. **De hoedanigheid is
+trouwens veel groter dan deze laag**: het woord komt in `server/` voor in vier
+bestanden en alle vier in `kern/vertegenwoordiging/`, terwijl `kern/envelop.js`
+wél `actor` draagt en géén hoedanigheid -- dus dit is de eerste plek waar de
+regel hard bewezen kan worden, en wat hier wordt vastgelegd wordt later
+platformbreed geciteerd.
+
+Verder: acht naamsbotsingen, en **de tweede helft is de leerzaamste** -- na
+`kluis` (192 bestanden), `paspoort` (139), `wallet` (87) en `firewall` (26) zijn
+ook de vier VERVANGENDE namen gemeten, en drie daarvan zijn óók bezet:
+`loopbaanbewijs` is al een scherm, `herkomst` heeft zeven eigen modules, en
+**`bewijsmap` bestaat al als precies deze functie** (`kern/rtgid-bewijs.js` +
+`/apps/bewijsmap.html`), waarvan de kop zegt dat HDI.md die naam koos omdat
+`wallet` bezet was. Alleen `rechtenregister` is vrij; een codenaam en een
+schermnaam hoeven niet hetzelfde te zijn. Drie correcties die niet mogen
+verwateren: een **talentladder**, een **bijdragegrafiek per persoon** en een
+**netwerkwaarde in euro's per mens** zijn alle drie een cijfer op een mens
+(CAR-05) -- de uitweg is meten één niveau omhoog verplaatsen, **RTG meet wat een
+PROGRAMMA oplevert en nooit wat een mens waard is**; er komt **geen `economisch
+persoon` en geen vijfde wereld** (CAR-01 is één van vier losse vragen en blijft
+dicht tot het juridische besluit genomen kan worden); en **pods botsen met de
+NOOIT-lijst**, dus een team is een **mandaatconstellatie** van losse machtigingen
+die de cliënt per stuk aanvinkt, waarbij een lead een specialist alleen kan
+VOORSTELLEN. Par. 7 zet drie poorten vóór het besluit en daarna een **vierde
+ketenproef** in de vorm van `tafelproef.js`: twaalf schakels van zelf beheerd tot
+vertrek, plus tien storingen waarvan de laatste geen hypothese meer is. Par. 9 is
+de nazoekronde die `CARRIERE.md` par. 3 eiste: WebAuthn L3 (25 augustus 2026) en
+C2PA 2.4 (april 2026) bevestigd, de OpenID4VCI-datum klopte niet (26 februari
+2026), en **herkomst is een signaal en geen bewijs** -- nooit een groen "deze foto
+is echt", en *"dit bestand draagt herkomst"* en *"RTG heeft dit op datum X
+ontvangen"* worden nooit vermengd.
+
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
 schakelaar *ís* de juridische positie — geen twee dingen die toevallig

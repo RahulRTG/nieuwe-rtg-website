@@ -179,6 +179,19 @@ const REGISTERS = [
      (KANTOOR.md par. 14, blok 1) -- vanaf dat moment is een verouderd getal wel
      een uitspraak over wie er binnenkomt. Dat is een besluit en geen automatisme. */
   ['KANTOORMACHT.json', 'npm run kantoormacht:vast', 'of er een mens achter een kantoorhandeling staat'],
+  /* DE MACHINEDEKKING (MACHINE.md). Hij hoort hier om dezelfde reden als de
+     kantoormacht ernaast: zijn getallen zijn afgeleid uit de ROUTER en uit
+     registers, dus ze verouderen met elke route die erbij komt zonder dat er iets
+     aan de meter verandert. En hij hoort op `overig` en niet op BEVEILIGING, met
+     de lezing die de overleving hieronder uitschrijft: een poortklasse zegt hier
+     niet WAAROVER een register gaat maar dat een verouderd exemplaar de RONDE
+     tegenhoudt, en dat is voorbehouden aan de vier die `npm run meetronde` ook
+     werkelijk ververst.
+
+     Zijn tanden zitten waar ze horen, op de INHOUD en niet op de ouderdom
+     (test/machinedekking.test.js, via npm run machinedekking:controle): twee
+     schulden die alleen mogen dalen, en `volledigeKetens` die alleen mag stijgen. */
+  ['MACHINEDEKKING.json', 'npm run machinedekking:vastleggen', 'of de motoren van dit huis bij dezelfde handeling langskomen'],
   /* DE OVERLEVING STAAT MET OPZET OP `overig` EN NIET OP BEVEILIGING, en dat is
      de correctie op een eerste versie die hem die vlag wel gaf -- "hij gaat over
      beveiliging, dus hij hoort in de beveiligingsklasse". Dat is de verkeerde

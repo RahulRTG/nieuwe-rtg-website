@@ -2197,6 +2197,16 @@
       "meter": "bewijsAchterstand 2380 -> 2382",
       "reden": "DEZELFDE OORZAAK ALS DE NOTITIE HIERBOVEN, EEN REGISTER VERDER, en daarom een eigen regel in plaats van de vorige stilletjes op te hogen. HERSTEL.json leidt kandidaat-tegenhangers af uit de NAMEN van de routes in IDEMPROEF.json, en is na de verse ronde hergenereerd: 49 vermoede tegenhangers in plaats van 47. De post `herstel-onbevestigd` gaat daarmee met 2 omhoog.\n\nDe twee erbij zijn /api/rtfos/bescherming/open en /api/rtfos/bescherming/sluit -- een naam-paar dat de oude ronde over 4729 routes niet kende. Geen geldroutes. `bevestigd` blijft op 43: er is dus geen terugweg stukgegaan en de proef meet niet minder.\n\nWie deze twee notities naast elkaar leest: het is EEN hermeting die door drie registers heen werkt (IDEMPROEF -> BEWIJSSCHULD, en IDEMPROEF -> HERSTEL -> BEWIJSSCHULD). Dat het in twee stappen zichtbaar werd, komt doordat HERSTEL.json pas in de tweede ronde is bijgetrokken.",
       "waarheen": "die twee paren beproeven met scripts/herstelproef.js, zodat ze van `vermoed` naar `exact` of `compensatie` gaan en de post daalt in plaats van stil te blijven staan. Vervalt 2026-12-01, samen met de notitie hierboven."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "schuld",
+      "sleutel": "kernBreedte",
+      "van": 1569,
+      "vervalt": "2026-12-15",
+      "meter": "kernBreedte 1569 -> 1570",
+      "reden": "de gouden weg (MACHINE.md par. 5a) hangt EEN naam in de kern-tas: `geldketen`, gebruikt door routes/kantoren/bank-incasso.js en bank-tweedehand.js. Die naam is de baan waarlangs een geldhandeling langs alle motoren gaat, en hij staat in GRENZEN.json bij kantoren -- de domeingrens hield de brug tegen tot hij daar stond. Een alternatief dat de breedte NIET verhoogt is er niet: de baan uit ctx laten komen (zoals tweedeHand) verplaatst de naam naar routes/kantoren/index.js, en dat is ook een routebestand, dus de meter telt hem daar net zo. Twee exemplaren bouwen zou wel de tas sparen en kost een tweede journaal dat het eerste niet ziet -- precies wat kern/kantoor/tweedehandtekening.js in zijn kop verbiedt.",
+      "waarheen": "deze schuld lost af zodra de gouden weg meer dan een handeling draagt: zodra de tweede en derde geldhandeling langs dezelfde baan lopen (KANTOORMACHT.md blok 1: de dertien zware kantoorpaden), draagt die ENE naam er n in plaats van een -- de breedte blijft dan 1570 terwijl de dekking stijgt. Wordt de baan ooit weer tot een enkele handeling teruggebracht, dan hoort de naam mee te verdwijnen en de norm terug naar 1569."
     }
   ],
   "prestatie": {

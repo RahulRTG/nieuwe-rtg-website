@@ -131,6 +131,12 @@ const SLEUTELS = {
     waarom: 'de route weigert de tweede correctie zelf met een 409 die zegt wat er al is gebeurd; ' +
       'de poort die tik laten opslikken zou die mededeling wegnemen bij precies de mens die hem nodig heeft' },
   'POST /api/office/handelingen': { leest: true },
+  /* Het dossier van de geldketen (kern/kantoor/geldketen/dossier.js): per as wat
+     er gebeurde en welke VERPLICHTE as nog open staat. Alleen lezen -- de baan
+     zelf wordt gezet op /api/office/bank/incasso en afgemaakt bij de tweede
+     handtekening. Twee keer opvragen geeft hetzelfde dossier; er valt niets te
+     dedupliceren. */
+  'POST /api/office/bank/incasso/dossier': { leest: true },
   /* De schaduwmeting van de kantoordeur (KANTOOR.md par. 3). Leest de stand op;
      de TELLING gebeurt in officeAuth op res.on('finish') en niet in deze
      handler, dus twee keer opvragen verandert niets aan wat er geteld is. */

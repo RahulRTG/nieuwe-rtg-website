@@ -204,6 +204,16 @@ const REGISTER = {
   'WACHTWIJZE.json': { eigenRatel: 'test/wachtwijze.test.js' },
   'HANDELINGSKLASSE.json': { eigenRatel: 'test/handelingsklasse.test.js' },
   'EXECUTION_MAP.json': { eigenRatel: 'test/executionmap.test.js' },
+  /* De machinedekking (MACHINE.md par. 0): raken de zestien motoren dezelfde
+     handeling? Twee getallen dragen de ratel en beide mogen alleen DALEN --
+     `mutatiesZonderEnigeAs` (muterende routes die geen enkele as raken) en
+     `motorenZonderRouteBereik`. Ze staan hier en niet in NORM.json omdat het er
+     twee zijn met een eigen grondwaarde in het register zelf; toets 8 van het
+     genoemde bestand vergelijkt de VERSE meting met die grondwaarde. Die toets
+     is zien zakken (het vastgelegde getal op 2000 gezet, waarna hij de stijging
+     naar 2818 meldde), dus deze regel is geen bewering -- zie de kop over de
+     helft die mensenwerk blijft. */
+  'MACHINEDEKKING.json': { eigenRatel: 'test/machinedekking.test.js' },
   /* MENSELIJKE_UITVOERING.json is net als EXECUTION_MAP.json een PROJECTIE
      zonder tijdstempel: hij draagt vingerafdrukken van zijn bronnen in plaats
      van een klok, en test/menselijkeuitvoering.test.js hercompileert hem byte

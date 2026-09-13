@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-13T06:07:55.000Z",
-  "commit": "27001f01",
+  "op": "2026-09-13T01:15:46.673Z",
+  "commit": "190efed9",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
@@ -14,8 +14,8 @@
   "geclassificeerd": 4876,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3186,
-   "NOT_APPLICABLE": 1150,
-   "PROTECTED": 415,
+   "NOT_APPLICABLE": 1151,
+   "PROTECTED": 414,
    "INTENTIONALLY_NON_IDEMPOTENT": 125,
    "LEGACY_PENDING_CLASSIFICATION": 47
   },
@@ -50343,27 +50343,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "stuur.voorstel.intrek.lid",
-   "route": "POST /api/member/voorstel/intrek",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "member.vooruit",
    "route": "POST /api/member/vooruit",
    "semantiek": {
@@ -55354,6 +55333,27 @@
     "hindernis": null
    },
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bank.incasso.dossier.lezen",
+   "route": "POST /api/office/bank/incasso/dossier",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

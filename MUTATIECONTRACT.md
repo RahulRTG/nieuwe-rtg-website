@@ -1209,6 +1209,59 @@ de proef er niet bij kwam". Zodra er wél gemeten is, geldt die stand niet meer.
 **Een betere meting hoort classificatiewerk zichtbaar te maken in plaats van het
 stil te laten verdwijnen** — en dat is precies waarvoor de grens op nul staat.
 
+## 5t. De nul was een artefact, en de 47 staan nu bij naam
+
+Par. 5p meldt dat de poort op nul staat, en dat was op die dag waar. Op 13
+september bleek het getal daarna niet meer te volgen uit zijn eigen bronnen.
+
+**De rekensom.** Op 12 september 19:25:52 schreef één ronde met
+`--afleiden --vastleggen` twee bestanden achtendertig milliseconden na elkaar:
+
+| tijd | bestand | inhoud |
+|---|---|---|
+| .314 | `MUTATIECONTRACT-AFGELEID.json` | 3.142 regels |
+| .352 | `MUTATIECONTRACT.json` | `afgeleidDoorScript: 3189`, `LEGACY: 0` |
+
+Verschil precies **47**. `scripts/mutatiecontract.js` leest de afgeleide helft
+één keer bovenaan en bouwt `rijen` daaruit; de afleidgang schrijft daarna een
+nieuwe afgeleide set. Het register beschreef dus de set die het net had
+vervangen. Die 47 routes waren hun afgeleide regel kwijtgeraakt — de verse
+idempotentieproef vond geen hindernis meer, en `BLOCKED_BY_TEST_FIXTURE` zegt
+juist *de proef kwam er niet bij* — en hoorden op `LEGACY` te staan. De
+releasepoort stond groen over een oudere werkelijkheid.
+
+**De oorzaak is gerepareerd, niet het getal.** De combinatie van beide vlaggen
+wordt geweigerd met een foutcode: de afgeleide set wordt wel weggeschreven, het
+register niet, en een gecombineerde ronde loopt niet stil door. De prozaregel
+("draai daarna opnieuw met `--vastleggen`") stond er al en hield niemand tegen.
+De toets eronder hangt niet aan die twee vlaggen maar aan de **eigenschap**: het
+register kan nooit meer regels aan een script toeschrijven dan het afgeleide
+bestand er heeft. Met opzet een ongelijkheid — een mens die een afgeleide route
+alsnog indeelt wint van het script, en dan hoort die teller juist te zakken.
+
+**En de 47 staan nu bij NAAM in de poort** (`BEKEND_OPEN` in
+`test/mutatiecontract.test.js`), als besluit van de eigenaar. Niet als verhoogde
+bovengrens, want een getal laat een RUILING door: wie één van deze routes indeelt
+en tegelijk een nieuwe onverklaarde toevoegt, houdt het aantal gelijk en de poort
+groen. Bij naam zakt de toets op élke route die er niet in staat, dus voor nieuwe
+schrijfroutes blijft de eis nul — precies het besluit van 30 augustus. Twee
+richtingen, en ze missen verschillende dingen:
+
+- een onverklaarde route die niet op de lijst staat → de poort zakt;
+- een route op de lijst die inmiddels wél is ingedeeld → de toets zakt óók, want
+  een verklaarde uitzondering die niet meer geldt is een alibi.
+
+Beide zijn met een mutatie nagetrokken.
+
+**Wat hen weghaalt, en het is handwerk en geen ronde.** Van de 47 stelt de meter
+er 37 voor als `NOT_APPLICABLE` (een POST die leest: twee meters, twee keer nul),
+2 als `PROTECTED` met "na te kijken", en 8 dragen geen voorstel omdat de
+herhaling het werk opnieuw deed. Die laatste tien vragen een oordeel over de
+BEDOELING, en dat leest niemand uit een meting af. Ze lopen over
+`foundation/school`, `gemeente`, `lucht`, `rtfos`, `kosten`, `supplier`,
+`notifications` en `office/rtgai`; het adres van het werk is dus zeven domeinen
+en niet één module. De lijst mag alleen krimpen.
+
 ## 6. De poort
 
 Regel 64 van `scripts/check.js` meldt wanneer het register achterloopt op de

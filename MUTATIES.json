@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T08:03:01.187Z",
-    "commit": "f9897cb69",
+    "op": "2026-09-13T01:09:35.723Z",
+    "commit": "72eee529",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1873,22 +1873,6 @@
       "gezakt": 7,
       "geprobeerd": 4
     },
-    "crashas.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/crashas.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
-    "crashproef.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/crashproef.js",
-      "operator": "===->!==#0",
-      "gezakt": 3,
-      "geprobeerd": 1
-    },
     "crashtaxonomie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2428,13 +2412,6 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
-    "factuurcorrectie.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 11,
-      "scherp": "gezakt"
-    },
     "factuurproef.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2828,6 +2805,14 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/lib/geldwacht.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "geldketen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kantoor/geldketen.js",
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
@@ -4407,6 +4392,14 @@
       "module": "scripts/ast/parser.js",
       "operator": "===->!==#0",
       "gezakt": 18,
+      "geprobeerd": 1
+    },
+    "machinedekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/machinedekking.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "magnaat-capabilities.test.js": {

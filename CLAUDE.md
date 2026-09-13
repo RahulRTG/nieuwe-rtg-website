@@ -1665,6 +1665,73 @@ kwam sprong het bronbereik naar 100%, want een index noemt elk bestand. Structuu
 (welke functies wonen hier) en gedrag (schrijft het, is het bewezen) staan daarom
 apart, en alleen die tweede zegt nog iets.
 
+**`MACHINE.md` is de laag die de motoren aan elkaar riemt** -- RTG Execution
+Physics (de uitvoeringskant van hetzelfde voorstel waarvan RUNTIME.md de
+werkelijkheidskant is), als richtingsdocument met per onderdeel of het **staat**, **een stap
+weg** is, **een besluit vraagt** of **jaren weg** is. Lees die vóór je een
+zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
+motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
+gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
+legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
+bestaande meter deed: van de <!--getal:machine.muterend-->4953<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2818<!--/getal--> geen
+enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
+geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
+geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele
+handeling die de keten heeft gelopen. Twee assen per motor die **nooit worden
+opgeteld** (handlertekst en routebestand: twee ondergrenzen die verschillende
+dingen missen), en de meter heeft zichzelf twee keer betrapt op dezelfde fout van
+twee kanten: een hub in de kern-tas zette 4162 routes op "idempotent", en
+`/api/notifications` scoorde tien assen omdat die route zelf in `server/server.js`
+woont (143 requires). Vandaar de hubgrens en de
+<!--getal:machine.hubRoutes-->28<!--/getal--> routes waarvoor de bestandsas met
+naam en toenaam onbruikbaar is verklaard. **De eerste keten is rond** (par. 5a):
+`/api/office/bank/incasso` -> `handtekening/bevestig` -> `incasso/dossier`, vijftien
+verplichte assen voor haar klasse en alle vijftien gelopen, met
+`kern/kantoor/geldketen.js` als BAAN en niet als zeventiende motor. Daarom een
+vierde teller die de andere kant op gaat: `volledigeKetens` staat op
+<!--getal:machine.volledigeKetens-->1<!--/getal--> (zestien verplichte assen,
+alle zestien gelopen) en mag alleen STIJGEN (de twee
+andere zijn schulden en mogen alleen dalen) -- haal er één as uit en hij zakt naar
+nul met de naam van die as erbij. Twee handelingsklassen, en het verschil is
+precies één as: bij `geld-eenmalig` is `atomair` verplicht, bij `geld-reeks` met
+opzet NIET, want alles-of-niets is daar de verkeerde garantie (dat één lid te weinig
+saldo heeft mag de inning bij de andere negenennegentig niet tegenhouden) en
+`hervatbaar` komt ervoor in de plaats. Zes dingen die het bouwen blootlegde en die
+geen bestaande toets zag: **de beslislaag was nooit gemount** (`zoekBevoegdheid`
+werd nergens gevuld, dus de keuring van een voornemen kwam nooit tot een besluit),
+**de 503 die de keuring belooft kwam nooit** (de meegegeven wrapper is altijd een
+functie, dus `if (!beslis)` sloeg niet aan en de laag las `uitkomst` uit `null` --
+een TypeError waar een nette weigering hoorde), **de frictie-as was stil leeg** (de
+bedrading gaf de MODULE mee in plaats van een motor; een module heeft geen
+`beoordeel`), **de graad van een as is niet de graad van zijn getal** (de
+bovengrens van een incasso-vooruitblik maakte de keten onhaalbaar tot die twee
+werden gescheiden), **een herhaalde aanvraag struikelde over zijn eigen
+idempotentie** (hetzelfde voornemen ging opnieuw langs de keuring en kreeg 409), en
+het zwaarste: **`uitvoering` stond niet in de verplichte assen**, dus de uitvoering
+kon buiten de keten om lopen terwijl het dossier er rond uitzag -- gevonden met een
+mutatie, want geen enkele toets zakte. Die twee laatste zijn door de e2e-proef
+gevonden en niet door een unittoets: `test/tweedehandtekening.test.js` toets 6
+verplaatst met twee kantoormensen op naam echt geld door de hele baan, en het
+dossier blijft daar eerlijk op **niet rond** staan omdat die medewerkers geen
+passkey hebben (de as `assurance` staat op `vermoed`, met de reden erbij). Let ook op wat dezelfde commit met de meter deed: een handvol
+woorden in één routebestand liet `tegenfeit` van 28 naar 54 springen op de
+bestandsas terwijl er één handeling bijkwam -- lees op de handleras, en gebruik de
+bestandsas alleen om te zien waar iets in de buurt hangt. Zeven begrippen uit het
+voorstel zijn al bezet en dat is de goedkoopste paragraaf van het document: **`envelop` is
+gesloten op acht velden en zegt met opzet nooit WAT** (dus het uitvoerkapsel
+verwijst ernaar en heet niet zo), **`doel` draagt al twee betekenissen** over 28
+modules (een levensdoel en de AVG-doelbinding -- een planner-doel heet
+`streefstand`), een **samengesteld integratiecijfer** (`15/15`, een
+confidence-percentage) is precies wat BEWIJSMACHINE.md en INT-04 verbieden,
+**assurance is een trede en geen kommagetal** (de samenstelling is een MINIMUM,
+niet een gewogen gemiddelde), en `EXPERIMENTAL -> TRUSTED -> DEGRADED` zou de
+**zesde gezagsladder** zijn -- de drie die er al zijn (bewijsgraden,
+vervalstaten, schaduwmodi) dekken het samen. Wat er jaren weg is, staat er met
+het getal dat het blokkeert: een planner op `gevolg.js` heeft 96 van 176 paden
+`onbekend`, en een promotiesysteem boven
+<!--getal:vertrouwen.bewezen-->0<!--/getal--> bewezen routes promoveert niets.
+
 **`LAT.md` is de technische lat** — elf regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)

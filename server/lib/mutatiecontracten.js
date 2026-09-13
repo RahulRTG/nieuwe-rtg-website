@@ -123,6 +123,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-afleidrest-b').CONTRACTEN,
   require('./mutatiecontracten-afleidrest-c').CONTRACTEN,
   require('./mutatiecontracten-afleidrest-d').CONTRACTEN,
+  require('./mutatiecontracten-afleidrest-e').CONTRACTEN,
   /* ALS LAATSTE, en dat is geen willekeur. Deze 788 vallen onder een BESLUIT
      over de bewijsstandaard en niet onder een mens die ze een voor een las. De
      vier hierboven zijn specifieker; Object.assign laat de laatste winnen, dus
@@ -158,7 +159,8 @@ const CONTRACTEN = Object.assign({},
     require('./mutatiecontracten-afleidrest').CONTRACTEN,
     require('./mutatiecontracten-afleidrest-b').CONTRACTEN,
     require('./mutatiecontracten-afleidrest-c').CONTRACTEN,
-    require('./mutatiecontracten-afleidrest-d').CONTRACTEN);   // ook hier: de guard moet hem kennen
+    require('./mutatiecontracten-afleidrest-d').CONTRACTEN,
+    require('./mutatiecontracten-afleidrest-e').CONTRACTEN);   // ook hier: de guard moet hem kennen
   const overschreven = Object.keys(effect).filter(k => k in eerder);
   if (overschreven.length) {
     throw new Error('mutatiecontracten: ./mutatiecontracten-effect overschrijft een specifieker ' +

@@ -364,6 +364,43 @@ betaler leest de gezondheid nooit. Er komt géén vijfde wereld: een toptalent
 staat in LivingOS, WorkOS, TravelOS en FoundationOS tegelijk, en par. 7 zet de
 vier besluiten van de eigenaar op een rij.
 
+**`MENSNETWERK.md` is de laag ernaast** -- niet wat een talent IS (`CARRIERE.md`)
+en niet hoe het geld heet dat naar hem gaat (`RUGDEKKING.md`), maar hoe zo'n mens
+BINNENKOMT en wie er NAAST hem mag staan. Lees die vóór je een aanmeldweg, een
+vertegenwoordigingsmodel of een RTG-managementdienst bouwt. De kern in één zin:
+RTG biedt geen managementmodel aan maar een keuze uit modellen, en de enige reden
+dat die keuze geloofwaardig is, is dat de manager van RTG door precies dezelfde
+deur moet als die van de concurrent. Dat is vandaag geen belofte maar een
+afgedwongen eigenschap: er is **geen enkele** kantoorweg naar een machtiging, en
+`routes/vertegenwoordiging.js` kan per definitie niet bij `kluisAuth` -- alleen
+een toets die dat vasthoudt ontbreekt (MN-01). Vier metingen gaan vóór alles: van
+de zeventien voorgestelde onderdelen staan er **vijf**, staan er zes half en
+bestaan er zes niet (dus "de helft staat er al" klopt, en het werk is bedraden en
+niet uitvinden); vier voorgestelde productnamen dragen een woord dat hier al iets
+anders betekent, geteld in `server/kern/` -- **kluis** 192 bestanden (de
+identiteitskluis), **wallet** 87 (geld), **paspoort** 139 (het identiteitsbewijs,
+bron van `leeftijdBron`) en **firewall** 26 (de economische firewall); en het
+voorgestelde machtigingsscherm is bijna letterlijk het bestaande -- zeven
+gevraagde managerhandelingen vallen één op één op de negen bevoegdheden, en de
+drie verboden op de NOOIT-lijst. Drie dingen die de opzet corrigeren en die je
+nergens anders moet herhalen. Een **talentladder** (discovered → ... → legacy) en
+een **contributiegrafiek met acht balken** zijn allebei een cijfer op een mens en
+vallen onder CAR-05; de scherpste vorm daarvan is een acquisitiewaarde in euro's
+per persoon -- meet het PROGRAMMA en nooit de mens (`kern/rtfos/gemeente.js` is de
+bestaande vorm). **`Economic Person` is geen vijfde wereld**: de natuurlijke
+persoon heeft er al een (`consument`), dus CAR-01 is geen datamodelschuld maar een
+vergunningsvraag, en de schakelaar bestaat al en staat dicht
+(`RUGDEKKING_BEURS`). En **pods botsen met de NOOIT-lijst**: een lead manager die
+werk doorzet naar specialisten is delegatie, en de uitweg is strenger én eerlijker
+-- elke specialist heeft zijn eigen machtiging van de cliënt, met een
+machtigingsbundel als enige nieuwe steen. Par. 9 is de nazoekronde die
+`CARRIERE.md` par. 3 eiste: WebAuthn L3 (Recommendation 25 augustus 2026) en C2PA
+2.4 (april 2026) zijn bevestigd en gaan van `vermoed` naar `gemeten`, de
+OpenID4VCI-datum klopte niet (zelfcertificering sinds 26 februari 2026), en bij
+C2PA hoort de beperking in dezelfde zin als de belofte -- uploads, schermafdrukken
+en exports breken de metadata, dus het is een herkomstsignaal en geen bewijs op
+zichzelf.
+
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
 schakelaar *ís* de juridische positie — geen twee dingen die toevallig

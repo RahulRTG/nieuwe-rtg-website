@@ -1,9 +1,9 @@
 {
-  "catalogi": 1075,
+  "catalogi": 1077,
   "verschillendeNamen": 633,
   "namenInMeerDomeinen": 123,
   "woordenMetMeerBetekenissen": 105,
-  "betekenissenTotaal": 389,
+  "betekenissenTotaal": 391,
   "ergsteWoord": "SOORTEN",
   "ergsteAantal": 47,
   "dubbelingen": 33,
@@ -222,7 +222,7 @@
     },
     {
       "naam": "NIET_GEBOUWD",
-      "betekenissenVanDitWoord": 5,
+      "betekenissenVanDitWoord": 6,
       "waar": [
         "server/kern/command/opslag-register.js",
         "server/kern/concern/opslag.js",
@@ -2826,8 +2826,8 @@
     },
     {
       "naam": "NIET_GEBOUWD",
-      "domeinen": 11,
-      "betekenissen": 5,
+      "domeinen": 12,
+      "betekenissen": 6,
       "hoogsteOverlap": 1,
       "soort": "gemengd",
       "waar": [
@@ -2871,6 +2871,18 @@
             "retourlabel",
             "automatisch-terugboeken",
             "retourpercentage"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/factuurcorrectie-gronden.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "de-factuur-weer-openzetten",
+            "gedeeltelijk-corrigeren",
+            "correctie-door-het-lid",
+            "de-afdracht-terugboeken"
           ]
         },
         {
@@ -3436,6 +3448,63 @@
       ]
     },
     {
+      "naam": "GRONDEN",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/commerce/retourlijst.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "bedenktijd",
+            "niet-zoals-beschreven",
+            "defect",
+            "beschadigd-aangekomen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/factuurcorrectie-gronden.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "onterecht",
+            "dubbel",
+            "bedrag-te-hoog",
+            "niet-geleverd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/horeca/correctielijst.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "verkeerd-bereid",
+            "niet-gebracht",
+            "teruggestuurd",
+            "vergissing"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/identiteit/doelen.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "overeenkomst",
+            "wettelijk",
+            "bescherming",
+            "toestemming"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "HANDELINGEN",
       "domeinen": 4,
       "betekenissen": 4,
@@ -3490,63 +3559,7 @@
           ]
         }
       ]
-    },
-    {
-      "naam": "KLASSEN",
-      "domeinen": 4,
-      "betekenissen": 4,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/fiscaal/zekerheid.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "bepaald",
-            "uitlegbaar",
-            "advies",
-            "voorbehouden"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/mutatie.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "idempotent",
-            "compenseerbaar",
-            "onbekend"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/overdracht.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "inschrijving",
-            "continuiteit",
-            "toestemming",
-            "nooit"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/waarde/klassen.js"
-          ],
-          "leden": 6,
-          "voorbeeld": [
-            "PERSONAL_FUNDED",
-            "EMPLOYER_BUDGET",
-            "MUNICIPAL",
-            "LOYALTY"
-          ]
-        }
-      ]
     }
   ],
-  "bestanden": 3369
+  "bestanden": 3396
 }

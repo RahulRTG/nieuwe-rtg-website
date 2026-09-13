@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1838 bestanden en 13054 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1839 bestanden en 13065 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1838 |
-| losse beweringen (`test(...)`) | 13054 |
+| toetsbestanden | 1839 |
+| losse beweringen (`test(...)`) | 13065 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1216 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1217 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 66 |
 | alleen in de kop *genoemd*, nog niet gemeten | 154 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1622 bestanden, 12672 beweringen.
+1623 bestanden, 12683 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -371,6 +371,7 @@ toets omvalt.
 | `facturatie.test.js` | 6 | gezakt op `liegpoort /api/` | De centrale facturatielaag (kern/facturatie.js): bij elke verkoop krijgt zowel de verkoper als de koper automatisch dezelfde factuur in de app; de PDF is te downloaden; en de AI-factuurtool maakt in gewone taal een... |
 | `factuur.test.js` | 5 | gezakt op `liegpoort /api/` | Facturen downloaden. Zelfgebouwde PDF-schrijver (geen pakketten) + de leden-endpoints om een factuur en een jaaroverzicht op te halen. |
 | `factuurbevroren.test.js` | 4 | gezakt op `===->!==#0` | EEN FACTUUR LEEST NOOIT DE PRIJS VAN VANDAAG. DE FOUT DIE DIT VASTLEGT. |
+| `factuurcorrectie.test.js` | 11 | gezakt op `liegpoort /api/` | DE TERUGWEG VAN /api/pay/saldo -- een betaalde factuur corrigeren. HERSTELBESLUIT.json verklaarde dat pad COMPENSATABLE en zette het bewijs op BLOCKED, met `watErMoetKomen`. |
 | `factuurproef.test.js` | 8 | gezakt op `!==->===#0` | De verticale geldproef -- de PURE helft ervan. De ronde zelf start drie servers en injecteert een crash; dat is een instrument en geen unittoets (`npm run factuurproef`). |
 | `factuursaldo.test.js` | 6 | gezakt op `liegpoort /api/` | De maandfactuur betalen uit het eigen RTG Pay-saldo (/api/pay/saldo, kern/factuursaldo.js): de derde betaalweg naast kaart en munten. De afschrijving loopt via pay.huisIn (autolaad inbegrepen, idempotent) en de... |
 | `fases.test.js` | 4 | gezakt op `liegpoort /api/` | Uitrolfases: de gefaseerde uitrol als voorinstelling. Alles is gebouwd; lanceren is een fase kiezen in plaats van tientallen schakelaars omzetten. |

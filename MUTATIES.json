@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-12T18:33:00.684Z",
-    "commit": "5996ece9a",
+    "op": "2026-09-12T22:10:52.377Z",
+    "commit": "5eff40bfb",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 8,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -1873,6 +1873,14 @@
       "gezakt": 7,
       "geprobeerd": 4
     },
+    "crashtaxonomie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/crashtaxonomie.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "creator-portfolio.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2403,6 +2411,13 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "factuurcorrectie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
     },
     "factuurproef.test.js": {
       "soort": "puur",
@@ -3543,6 +3558,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "idemvoorziening.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/idemwereld.js",
+      "operator": "-->+#0",
+      "gezakt": 1,
+      "geprobeerd": 14
     },
     "idemwereld-voorvoegsel.test.js": {
       "soort": "puur",
@@ -9394,22 +9417,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
-    },
-    "crashtaxonomie.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/crashtaxonomie.js",
-      "operator": "===->!==#0",
-      "gezakt": 3,
-      "geprobeerd": 1
-    },
-    "idemvoorziening.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/idemwereld.js",
-      "operator": "-->+#0",
-      "gezakt": 1,
-      "geprobeerd": 14
     }
   }
 }

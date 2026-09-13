@@ -1932,6 +1932,16 @@ const { factuurSaldo } = require('./kern/factuursaldo').maakFactuurSaldo({
   bijeen,
   payVan: () => kern.pay });
 
+/* DE TERUGWEG VAN DIE BETALING (kern/factuurcorrectie.js). HERSTELBESLUIT.json
+   verklaart /api/pay/saldo als COMPENSATABLE; dit is de uitvoerder die daarbij
+   hoort. Hij draait de heenweg niet terug maar boekt ernaast: de factuur blijft
+   `paid`, het betaalbewijs blijft staan, en het lid krijgt zijn geld op zijn
+   wallet. De afdracht aan de RTFoundation krijgt haar eigen regel en wordt NIET
+   stil teruggehaald -- er is geen positie om aan te betalen (GIFT.md). */
+const { corrigeerFactuur } = require('./kern/factuurcorrectie').maakFactuurCorrectie({
+  db, accounts, fonds, broadcastSync, log, bijeen,
+  payVan: () => kern.pay });
+
 /* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig
    en toestemmingsgestuurd kanaal waarlangs een partner de identiteit achter een
    codenaam kan opvragen (ja/nee, ID-kaart of volledige scan), met melding en
@@ -2281,7 +2291,7 @@ const kern = {
   findSupplier, forgetSession, forgetSessionDuurzaam, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, rugdekking, carriereledger, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, rugdekking, carriereledger, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, corrigeerFactuur, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, mensdeurStand, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, ritBezetting, ritVerder, rtf,

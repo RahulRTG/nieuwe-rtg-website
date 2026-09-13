@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-09-12",
+  "vastgelegd": "2026-09-13",
   "meters": {
     "activeringOnbepaald": 3,
     "activeringOndergrens": 49,
@@ -12,7 +12,7 @@
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 341,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 525,
+    "dbDeuren": 526,
     "dbDeurenSchrijvend": 273,
     "dekkingPct": 82,
     "dekkingWaargenomenPct": 100,
@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1569,
+    "kernBreedte": 1570,
     "kernGedeeld": 235,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -2179,6 +2179,16 @@
       "meter": "bewijsAchterstand 2380 -> 2382",
       "reden": "DEZELFDE OORZAAK ALS DE NOTITIE HIERBOVEN, EEN REGISTER VERDER, en daarom een eigen regel in plaats van de vorige stilletjes op te hogen. HERSTEL.json leidt kandidaat-tegenhangers af uit de NAMEN van de routes in IDEMPROEF.json, en is na de verse ronde hergenereerd: 49 vermoede tegenhangers in plaats van 47. De post `herstel-onbevestigd` gaat daarmee met 2 omhoog.\n\nDe twee erbij zijn /api/rtfos/bescherming/open en /api/rtfos/bescherming/sluit -- een naam-paar dat de oude ronde over 4729 routes niet kende. Geen geldroutes. `bevestigd` blijft op 43: er is dus geen terugweg stukgegaan en de proef meet niet minder.\n\nWie deze twee notities naast elkaar leest: het is EEN hermeting die door drie registers heen werkt (IDEMPROEF -> BEWIJSSCHULD, en IDEMPROEF -> HERSTEL -> BEWIJSSCHULD). Dat het in twee stappen zichtbaar werd, komt doordat HERSTEL.json pas in de tweede ronde is bijgetrokken.",
       "waarheen": "die twee paren beproeven met scripts/herstelproef.js, zodat ze van `vermoed` naar `exact` of `compensatie` gaan en de post daalt in plaats van stil te blijven staan. Vervalt 2026-12-01, samen met de notitie hierboven."
+    },
+    {
+      "datum": "2026-09-12",
+      "soort": "schuld",
+      "sleutel": "dbDeuren",
+      "van": 525,
+      "vervalt": "2026-12-01",
+      "meter": "dbDeuren 525 -> 526, kernBreedte 1569 -> 1570",
+      "reden": "EEN MODULE EN EEN KERN-NAAM ERBIJ, EN ALLEBEI DE TANDEN LOPEN DAAR PER DEFINITIE IN MEE. server/kern/factuurcorrectie.js is de terugweg van kern/factuursaldo.js en raakt db.data op exact dezelfde drie plekken als zijn heenweg-broer: de zekering (db.data.techniek.zekeringen.betalingen), de afdrachtenlijst (db.data.fondsAfdrachten) en db.data als ledenstaat wanneer er geen eigen account is. Dat is een deur erbij in de telling.\n\nHET ALTERNATIEF IS SLECHTERE CODE EN GEEN BETERE TELLING. Die drie wegleiden via een extra functie in de fabriek haalt de teller omlaag zonder dat er iets verandert aan WIE er bij de opslag kan -- het verplaatst de deur en noemt hem anders. De ratel meet dan zichzelf.\n\nkernBreedte is nog directer: `corrigeerFactuur` is een nieuwe kern-eigenschap die een route aanraakt, en dat is per stuk +1. Een capability toevoegen zonder deze tand te raken kan alleen door hem niet toe te voegen.\n\nWAT ER IN DEZELFDE RONDE WEL DE ANDERE KANT OP GING: het correctiemodel staat voor het eerst op 1 PROVEN in plaats van 0, geldRoutesHerstelOnbesloten stijgt NIET (deze route krijgt een verklaard model in plaats van er een te missen), en toetsenNietGemeten is niet verhoogd -- de mutatiemotor is over test/factuurcorrectie.test.js gegaan en noemt hem bewezen gevoelig: hij zakt op de INHOUD en niet alleen op de inlog.",
+      "waarheen": "Deze twee dalen niet vanzelf en horen ook niet apart te worden teruggedrongen. Ze dalen als de db.data-toegang van de GELDKANT als geheel achter een smallere poort komt: kern/factuursaldo.js en kern/factuurcorrectie.js raken dezelfde drie plekken, en een gedeelde geldpoort haalt er in een keer twee weg in plaats van deze ene te verbergen. Dat is werk voor de laag die GELDLAT.md beschrijft, niet voor deze tak."
     }
   ],
   "prestatie": {
@@ -2211,7 +2221,7 @@
     "keuringTeGroot": "2026-09-05",
     "keuringDubbeling": "2026-09-07",
     "keuringDekkingAdvies": "2026-09-06",
-    "dbDeuren": "2026-08-28",
+    "dbDeuren": "2026-09-12",
     "dbDeurenSchrijvend": "2026-08-28",
     "browserpoortToetsen": "2026-09-12",
     "e2eBestanden": "2026-09-12",
@@ -2230,7 +2240,7 @@
     "wekkersZonderTrede": "2026-09-02",
     "wekkersOnverklaard": "2026-09-02",
     "meetleerBlind": "2026-09-02",
-    "kernBreedte": "2026-09-02",
+    "kernBreedte": "2026-09-12",
     "kernGedeeld": "2026-09-05",
     "registersUitVuileBoom": "2026-09-10",
     "laatSpoorVerdacht": "2026-09-03",

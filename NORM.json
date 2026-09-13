@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 99,
+    "ratelTanden": 102,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -92,7 +92,11 @@
     "mensmutatieZonderWacht": 1,
     "crashasOnbekend": 89,
     "crashasNietMeetbaar": 0,
-    "crashproefGezakt": 3
+    "crashproefGezakt": 0,
+    "crashproefGeenLijf": 30,
+    "crashproefGeenWereld": 10,
+    "crashproefGeenRol": 2,
+    "crashproefOnbepaald": 0
   },
   "notities": [
     {
@@ -2200,7 +2204,7 @@
       "van": 45,
       "meter": "crashasOnbekend 45 -> 89",
       "reden": "De oude 45 was niet beter maar ONWAAR. crashas.js leidde `bestaat` af uit \"deze route schrijft collecties\", en telde de twee duurzame crashgrenzen daarmee op alle 45 geldroutes als BESTAAND. scripts/crashproef.js heeft dat weerlegd door de routes werkelijk te laten sterven: 41 van de 90 rijen komen langs geen van beide injectiepunten, omdat die routes met de gewone write-behind save() schrijven (server/kern/bank/passen.js). Of een crashgrens bestaat hangt aan de SCHRIJFWEG en niet aan het feit dat er geschreven wordt -- de vierde as uit crashtaxonomie.js, en die is niet af te leiden. Wat de proef niet aan het werk kreeg (44 rijen) verhuist daarmee van een gevolgtrekking `ja` naar een eerlijk `onbekend`. Dat is epistemische schuld en geen technische: RTG weet nog niet wat het weet. Tegelijk daalde `bestaat` van 90 naar 5 en steeg `gemeten` van 1 naar 5, zodat elke grens die BESTAAT nu ook werkelijk is gemeten.",
-      "waarheen": "omlaag door te KIJKEN, niet door patroonherkenning en niet door af te leiden uit soortgelijke routes. Per route: krijg scripts/crashproef.js hem aan het werk (een lijf of een wereld die zijn voorwaarden dekt), en de proef zegt dan zelf of de grens op zijn pad ligt. De teller `crashproefOnbereikt` (44) is precies dat werk, en die twee dalen samen."
+      "waarheen": "omlaag door te KIJKEN, niet door patroonherkenning en niet door af te leiden uit soortgelijke routes. Per route: krijg scripts/crashproef.js hem aan het werk, en de proef zegt dan zelf of de grens op zijn pad ligt. Dat werk staat sinds 13 september in DRIE tanden in plaats van een: crashproefGeenLijf (30 -- er ontbreekt een lijf), crashproefGeenWereld (10 -- er ontbreekt een voorziening) en crashproefGeenRol (2 -- de deur ging niet open). De eerdere verwijzing hier naar `crashproefOnbereikt` (44) klopt niet meer: die tand telde die drie soorten werk bij elkaar op en is daarom ingetrokken."
     },
     {
       "datum": "2026-09-13",
@@ -2290,7 +2294,11 @@
     "bevestigGebreken": "2026-09-12",
     "verwijzingGebreken": "2026-09-12",
     "mensmutatieZonderWacht": "2026-09-12",
-    "crashproefGezakt": "2026-09-13"
+    "crashproefGezakt": "2026-09-13",
+    "crashproefGeenLijf": "2026-09-13",
+    "crashproefGeenWereld": "2026-09-13",
+    "crashproefGeenRol": "2026-09-13",
+    "crashproefOnbepaald": "2026-09-13"
   },
   "uitzonderingen": [
     {

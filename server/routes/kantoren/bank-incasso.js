@@ -131,21 +131,15 @@ module.exports = (ctx) => {
 
   /* HET DOSSIER: wat er per as gebeurde, en welke VERPLICHTE as nog open staat.
 
-     OOK LEZEN VRAAGT HIER EEN NAAM, en dat was eerst anders. De eerste versie
-     stond achter de gedeelde kantoorcode, met als reden dat het dossier over de
-     HANDELING gaat en niet over een mens. Dat argument hield geen stand tegen de
-     meting: `npm run kantoormacht` rekent dit pad tot de zware wegen
-     (`bank/incasso` valt onder GELD_BEWEGEN) en zette `zwaarePaden.zonderMens`
-     daarmee van nul op EEN -- een teller die in dit huis alleen omlaag hoort. De
-     ratel `kantoormacht:controle` hangt aan een andere as en ving het niet; een
-     verse ronde vond het.
+     OOK LEZEN VRAAGT EEN NAAM. Eerst stond dit achter de gedeelde code, omdat het
+     dossier over de HANDELING gaat en niet over een mens. Dat hield geen stand:
+     `npm run kantoormacht` rekent dit pad tot de zware wegen (GELD_BEWEGEN) en
+     zette `zwaarePaden.zonderMens` van nul op EEN. En het dossier toont de
+     bedragen van leden en de NAMEN van beide ondertekenaars; dat het journaal die
+     al droeg, zegt dat het elders lekt en niet dat het hier mag.
 
-     En bij nalezen was de reden zelf zwak: het dossier toont de bedragen van
-     leden, de streefstand en de NAMEN van de aanvrager en de tweede
-     ondertekenaar. Dat het journaal die namen ook al droeg, is een argument dat
-     het elders al lekt -- niet dat het hier mag. Nu eist de hele gouden weg van
-     de aanvraag tot de nalezing een mens, en dat is wat deze baan hoort te zijn:
-     de strengste weg van het huis. */
+     DIT IS OOK DE NAAD als dit bestand ooit over de 10 kB gaat: de leeskant hoort
+     bij ./bank-incasso-dossier.js en niet bij de baan. */
   /* mutatie: idempotent -- alleen lezen; de enige schrijver van het journaal is de
      baan zelf (klaarzetten, tekenen, uitvoeren). Twee keer lezen laat dezelfde
      stand achter. */

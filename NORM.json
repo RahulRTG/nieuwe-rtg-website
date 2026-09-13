@@ -14,8 +14,8 @@
     "carriereDomeinenGemeten": 15,
     "stageDomeinenGemeten": 10,
     "wekZonderUitspraak": 0,
-    "dbDeuren": 527,
-    "dbDeurenSchrijvend": 275,
+    "dbDeuren": 528,
+    "dbDeurenSchrijvend": 276,
     "dekkingPct": 82,
     "dekkingWaargenomenPct": 100,
     "delenZonderOnderwerp": 0,
@@ -30,12 +30,12 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1575,
+    "kernBreedte": 1577,
     "kernGedeeld": 235,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
-    "keuringOmvang": 322,
+    "keuringOmvang": 323,
     "keuringScheef": 16,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
@@ -92,9 +92,45 @@
     "bevestigGebreken": 0,
     "verwijzingGebreken": 0,
     "mensmutatieZonderWacht": 1,
-    "momentOpenBekend": 3
+    "momentOpenBekend": 0
   },
   "notities": [
+    {
+      "datum": "2026-09-13",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 322,
+      "vervalt": "2026-12-15",
+      "meter": "keuringOmvang 322 -> 323",
+      "reden": "server/kern/mediaos/index.js komt op 9832 bytes in de waarschuwingsband onder de 10 kB-grens. Dat is de uitkomst van een reparatie en niet van groei: aanwezigheid.js en wekken.js waren WEL over de grens, en zijn gesplitst in tijdlijn.js (4829) en zoeken.js (3244). keuringTeGroot ging daarmee van 16 terug naar 14 en keuringScheef van 18 naar 16. Wat overblijft is de bedrading in index.js, en die verder opknippen zou een meter dienen in plaats van de code."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "schuld",
+      "sleutel": "kernBreedte",
+      "van": 1575,
+      "vervalt": "2026-12-15",
+      "meter": "kernBreedte 1575 -> 1577",
+      "reden": "Twee nieuwe kernnamen voor twee nieuwe ledenroutes: aanwezigZoek (Discovery, /api/mediaos/aanwezig/zoek) en mediaMomentenVoor (de Fan Inbox, /api/mediaos/momenten). Ze sluiten schakel 2 en 5 van de momentproef, die daarmee van 7 naar 10 gesloten schakels ging. Twee routes vragen twee namen; er is hier niets samen te voegen zonder een van beide capabilities te verbergen."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "schuld",
+      "sleutel": "dbDeurenSchrijvend",
+      "van": 275,
+      "vervalt": "2026-12-15",
+      "meter": "dbDeurenSchrijvend 275 -> 276",
+      "reden": "Dezelfde ene deur als hierboven: server/kern/mediaos/tijdlijn.js is de enige schrijver van mediaMomenten, wat regel 63 van de keuring ook eist. De collectie houdt een lezer en een schrijver."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "schuld",
+      "sleutel": "dbDeuren",
+      "van": 527,
+      "vervalt": "2026-12-15",
+      "meter": "dbDeuren 527 -> 528",
+      "reden": "De Fan Inbox vraagt een momentREGISTER, en dat was het echte gat onder schakel 5 van de momentproef: nieuwMoment() wekte wel en bewaarde niets, dus een gewekt lid kon nergens terugvinden waarover. server/kern/mediaos/tijdlijn.js is de eigenaar van de nieuwe collectie mediaMomenten. Een nieuwe collectie heeft per definitie een bestand dat db.data aanraakt; de keuze is WELK bestand, en die is bewust gemaakt: de wekmotor (wekken.js) bezit hem NIET -- een motor die ook opslag heeft is twee dingen tegelijk. Discovery (zoeken.js) raakt db.data om dezelfde reden niet aan en leest via aanwezigAlle, zodat deze meter maar EEN deur erbij krijgt in plaats van twee."
+    },
     {
       "datum": "2026-09-12",
       "soort": "schuld",

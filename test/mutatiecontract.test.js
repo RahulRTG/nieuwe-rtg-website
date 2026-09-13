@@ -279,6 +279,38 @@ test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {
     'VOORDAT hij bestaat -- zie de kop van dat bestand.');
 });
 
+test('het register claimt nooit meer afgeleide regels dan er afgeleid zijn', () => {
+  /* DE TOETS DIE 47 ONZICHTBARE SCHRIJFROUTES HAD GEVONDEN.
+
+     Op 12 september 2026 schreef een ronde met `--afleiden --vastleggen` twee
+     bestanden achtendertig milliseconden na elkaar: eerst een afgeleide set van
+     3142 regels, daarna een register dat `afgeleidDoorScript: 3189` meldde en
+     `LEGACY_PENDING_CLASSIFICATION: 0`. Het register beschreef de set die net
+     VERVANGEN was. Precies 47 routes waren hun afgeleide regel kwijt -- de verse
+     idempotentieproef vond geen hindernis meer, dus BLOCKED_BY_TEST_FIXTURE gold
+     niet langer -- en die 47 hadden op LEGACY moeten staan. De releasepoort stond
+     op groen omdat de meter over een oudere werkelijkheid rapporteerde.
+
+     scripts/mutatiecontract.js weigert die combinatie sindsdien. Deze toets hangt
+     niet aan die vlaggen maar aan de EIGENSCHAP, want de volgende manier om twee
+     artefacten uit elkaar te laten lopen ziet er anders uit: het register kan
+     nooit meer regels aan een script toeschrijven dan het afgeleide bestand er
+     heeft.
+
+     HET IS EEN ONGELIJKHEID EN GEEN GELIJKHEID, en dat is geen slordigheid: een
+     mens die een afgeleide route alsnog indeelt, wint van het script
+     (`alleBedoelingen` in de meter), en dan hoort de teller juist te ZAKKEN
+     terwijl het afgeleide bestand zijn regel nog draagt. */
+  const geclaimd = register.gemeten.afgeleidDoorScript || 0;
+  const aanwezig = Object.keys(AFGELEID).length;
+  assert.ok(geclaimd <= aanwezig,
+    'het register schrijft ' + geclaimd + ' regels aan een script toe, maar ' +
+    'MUTATIECONTRACT-AFGELEID.json draagt er ' + aanwezig + '. Het verschil (' +
+    (geclaimd - aanwezig) + ') zijn routes die het register als ingedeeld telt terwijl er geen ' +
+    'afgeleide regel meer voor bestaat -- leg het register opnieuw vast met een APARTE ronde ' +
+    '(node scripts/mutatiecontract.js --vastleggen), zonder --afleiden.');
+});
+
 test('het register telt hetzelfde als de mutatie-inventaris', () => {
   /* Twee meters die hetzelfde universum tellen en verschillende getallen geven,
      is hoe "het aantal routes" in dit huis vier verschillende waarden kreeg. */

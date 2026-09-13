@@ -28,6 +28,9 @@
 
    Draaien:  node scripts/mutatiecontract.js [--vastleggen] [--open]
              --open toont de eerste vijftig regels die nog een besluit vragen
+             --afleiden schrijft de afgeleide helft opnieuw, en gaat NIET samen
+             met --vastleggen: zie de weigering onderaan dit bestand, met het
+             getal dat die regel heeft afgedwongen
    ========================================================================== */
 'use strict';
 
@@ -46,6 +49,7 @@ const duplicaatregel = new Set(Object.entries(
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'MUTATIECONTRACT.json');
 const vastleggen = process.argv.includes('--vastleggen');
+const afleiden = process.argv.includes('--afleiden');
 const toonOpen = process.argv.includes('--open');
 
 const sleutelVan = (methode, pad) => String(methode || 'POST').toUpperCase() + ' ' + pad;
@@ -573,7 +577,7 @@ if (toonOpen) {
    proef aantoonbaar niet bij kwam. Alleen die stand, want alleen die doet geen
    uitspraak over gedrag -- zie de kop van kern/mutatiecontract/index.js.
    ------------------------------------------------------------------------- */
-if (process.argv.includes('--afleiden')) {
+if (afleiden) {
   /* De kale ronde per route, om de STILLE hindernis te herkennen (zie hieronder). */
   const proefRij = new Map(Object.values(proef.perRoute || {})
     .map(x => [String(x.methode || 'POST').toUpperCase() + ' ' + x.pad, x]));
@@ -690,7 +694,39 @@ if (process.argv.includes('--afleiden')) {
   console.log('  Draai daarna opnieuw met --vastleggen om ze in het register te krijgen.');
 }
 
-if (vastleggen) {
+if (vastleggen && afleiden) {
+  /* AFLEIDEN EN VASTLEGGEN IN EEN RONDE MAG NIET, EN DAT IS GEEN NETHEID.
+
+     `alleBedoelingen` wordt bovenaan dit bestand EEN keer gelezen (regel 70), en
+     `rijen` is daaruit gebouwd. De afleidgang hierboven schrijft daarna een NIEUWE
+     MUTATIECONTRACT-AFGELEID.json. In een ronde met beide vlaggen beschrijft het
+     register dus de afgeleide set die net VERVANGEN is -- niet de set die er nu
+     staat. De prozaregel ("draai daarna opnieuw met --vastleggen") stond er al;
+     hij hield niemand tegen.
+
+     DIT IS EEN KEER ECHT GEBEURD, en het is na te rekenen in de artefacten zelf.
+     Op 12 september 2026, 19:25:52, schreef een ronde met beide vlaggen:
+
+       .314  MUTATIECONTRACT-AFGELEID.json   3142 regels
+       .352  MUTATIECONTRACT.json            afgeleidDoorScript 3189, legacy 0
+
+     Achtendertig milliseconden, en precies 47 verschil. Die 47 routes waren hun
+     afgeleide regel kwijtgeraakt (de verse idempotentieproef vond geen hindernis
+     meer, dus BLOCKED_BY_TEST_FIXTURE gold niet langer) en hadden op
+     LEGACY_PENDING_CLASSIFICATION moeten staan. Het register meldde nul, de
+     releasepoort stond op groen, en niemand kon zien dat er 47 schrijfroutes
+     zonder indeling in het huis stonden. Precies de schijnzekerheid waar de kop
+     van dit bestand over gaat -- gemaakt door de meter zelf.
+
+     Vandaar een WEIGERING en geen waarschuwing: een verkeerd register is erger
+     dan geen register, en de foutcode zorgt dat een gecombineerde ronde in een
+     pijplijn niet stil doorloopt. De afgeleide set is wel weggeschreven; er is dus
+     niets verloren, alleen nog een tweede ronde nodig. */
+  console.error('\n  MUTATIECONTRACT.json NIET geschreven: --afleiden en --vastleggen in een ronde.');
+  console.error('  De afgeleide set is net vervangen; dit register zou de OUDE beschrijven.');
+  console.error('  MUTATIECONTRACT-AFGELEID.json staat er. Draai nu: node scripts/mutatiecontract.js --vastleggen');
+  process.exitCode = 1;
+} else if (vastleggen) {
   fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),
     uitleg: 'Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag ' +

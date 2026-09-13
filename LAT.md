@@ -635,6 +635,74 @@ vertrouwd.
 
 ---
 
+### 17. Een poort bewijst alleen zijn eigen bereik
+
+Regel 11 gaat over twee soorten groen die verschillende dingen betekenen. Dit is
+de gemenere variant: **een** soort groen, correct gemeten, en daarna in woorden
+ruimer gemaakt dan hij is.
+
+*Waar dit fout ging, twee keer op een dag:* op 13 september 2026 stonden
+`npm run check`, `npm run norm` en de deltapoort alle drie groen, en dat is in
+dit verslag "de gate is groen" gaan heten. CI bleef daarna terecht rood, twee
+keer achter elkaar en om twee verschillende dingen:
+
+- `test/routedekking.test.js` vond een route die de server registreert en die
+  nooit door een toets was aangeraakt (`POST /api/supplier/activity`);
+- keuringsregel 41 zakte omdat `BEWIJS.md` achterliep op de toetsen.
+
+Geen van beide ligt binnen wat die drie poorten meten. Er was dus niets mis met
+de meting -- de uitspraak was ruimer dan het bewijs. Dat is precies de fout die
+regel 11 in het groot beschrijft, nu in het klein en daarom veel makkelijker te
+maken.
+
+**Elke poort heeft een bereik, en dat bereik is klein:**
+
+| Poort | Bewijst | Bewijst NIET |
+|---|---|---|
+| `npm run check` | statische huisregels, registers, documentwaarheid | gedrag, routedekking, ketens, go-live |
+| `npm run norm` | de ratels en aantalsnormen in `NORM.json` | alles wat geen ratel heeft |
+| `npm run deltapoort` | geen verslechtering t.o.v. de basis, op de **gewijzigde** bestanden | de rest van het huis; gedrag; routedekking |
+| `npm test` | gedrag van wat een toets aanroept | wat geen toets aanroept |
+| `test/routedekking.test.js` | elke geregistreerde route is door een toets geraakt | of die aanraking iets zinnigs toetst |
+| de ketenproeven | dat één benoemde keten van begin tot eind sluit | de negentien andere |
+| `npm run golive` | operationeel en juridisch mogen starten | de software |
+| CI | de samenstelling van al het bovenstaande | niets daarbuiten |
+
+Voortaan dus niet "de gate is groen" maar **"statische poort groen; gedrag en
+routedekking nog niet bevestigd"**. Dat klinkt kleiner en het is waar.
+
+**Het gevolg voor een nieuwe HTTP-route.** Dezelfde dag kwam de tweede helft van
+deze les binnen, en die is architectonisch. `POST /api/supplier/activity` HAD een
+toets: `test/supplier-activity.test.js`, die de handler op een nagemaakte app
+monteert. Die toets is goed en bewijst één ding van de drie die een route nodig
+heeft:
+
+1. **handlergedrag** -- doet de functie wat zij belooft (een nagemaakte app kan dit);
+2. **echte montage en transport** -- is de route werkelijk geregistreerd en bereikbaar;
+3. **bevoegdheid op een echte server** -- weigert de echte deur de verkeerde rol.
+
+Een nagemaakte app bewijst alleen de eerste. Daaruit volgt de regel: **geen
+nieuwe HTTP-route zonder ten minste één treffer op een echte server in een
+gewone CI-toets.** Niet als losse lijst die iemand moet bijhouden, maar
+mechanisch -- route-inventaris tegenover routejournaal, en dat is precies wat
+`test/routedekking.test.js` al doet. De les is dus niet dat er een poort bij
+moet, maar dat die poort tot de definitie van "in CI bewezen" hoort en niet tot
+het optionele meetwerk eromheen.
+
+Let op de valkuil die dit geval eronder verstopte: de route WERD wel over HTTP
+geraakt, door `scripts/zaakliveproef.js`. Maar dat is een SCRIPT: het draait in
+de meetronde en niet in elke CI-run. Dat onderscheid staat al in de kop van
+`test/integratie-routes.test.js`, waar het na een eerdere vondst van de
+deltapoort is opgeschreven -- en is hier alsnog opnieuw gemaakt.
+
+**Handhaver:** `scripts/check.js`, `scripts/norm.js` en `scripts/deltapoort.js`
+drukken sinds deze dag zelf hun bereik af, op de groene EN de rode uitgang. Een
+tabel in een document had deze fout niet voorkomen; een poort die zijn eigen
+grens meeleest wel, want dan staat de beperking op het scherm van wie hem
+draait. Voor de mens die drie groene poorten optelt tot één zin bestaat verder
+geen handhaver -- daarvoor staat deze regel hier, net als bij regel 11.
+
+
 ## Wat de lat betekent per tijdvak
 
 ### De toekomst

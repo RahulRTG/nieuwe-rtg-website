@@ -261,7 +261,24 @@ function diagnose(g, a) {
       (wezen.length ? '  ->  ' + wezen.map(w => 'pid ' + w.pid + ' (start ' + w.start + ')').join(', ') : '') + '\n' +
     '      reden:            ' + g.reden + '\n' +
     '      actie:            ' + (wezen.length
-      ? 'ruim eerst op: node -e "require(\'./scripts/lib/afbouw-afloop\').ruimOp()"'
+      /* GEEN PLAKBARE require() IN DEZE TEKST, en dat is geen stijlkwestie.
+
+         Hier stond een plakbaar `node -e`-commando dat deze module met een
+         relatief pad inlaadde.
+         sluiting() in scripts/lib/stempel.js zoekt in de BRON naar require(...)
+         om te bepalen wat een instrument inleest, en een require met iets anders
+         dan een letterlijke tekst maakt die sluiting ONBEKEND -- fail-closed, en
+         terecht. Het vond deze aanroep binnen een string, en daarmee viel de
+         sluiting van elk instrument dat dit bestand bereikt (via afbouw-slot.js
+         ook scripts/poortwacht.js) op null. Gevolg: toets 12 van
+         test/schoneboom.test.js zakte op iets wat alleen een hulpzin was.
+
+         De les is groter dan deze regel, en ik ben er bij het OPSCHRIJVEN nog
+         een keer in getrapt: de eerste versie van dit commentaar citeerde het
+         kapotte commando letterlijk, en toen bleef de sluiting gewoon null. Die
+         zeef leest commentaar net zo goed als code. Noem het bestand en de
+         functie dus met woorden, ook in een uitleg. */
+      ? 'ruim eerst op met ruimOp() uit scripts/lib/afbouw-afloop.js'
       : 'sluit de ronde met de hand af: herstel({ stand: \'ABORTED\', reden, door }) -- PASSED kan alleen de ronde zelf');
 }
 

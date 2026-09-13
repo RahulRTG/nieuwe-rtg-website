@@ -1,8 +1,15 @@
-/* DE VIER ROUTES DIE DEZE TAKKEN TOEVOEGDEN, over HTTP.
+/* DE VIJF ROUTES DIE DEZE TAKKEN TOEVOEGDEN, over HTTP.
 
    `endpointsZonderTest` in NORM.json telt endpoints die in geen enkele toets
    voorkomen. Vier daarvan zijn hier bijgekomen, en ze hadden alle vier wel
    unit-toetsen maar geen enkele die ze als ROUTE aanroept.
+
+   DE VIJFDE KWAM ER OP 13 SEPTEMBER 2026 BIJ, en die is de scherpste illustratie
+   van alles hieronder: /api/supplier/activity HAD een toets, maar die monteerde
+   de handler op een NAGEMAAKTE app. Over HTTP raakte hem alleen een script. De
+   dekkingspoort (test/routedekking.test.js) vond hem daarom als enige gat van
+   5042 routes -- met een harde nulgrens en geen norm om die eis mee te verlagen.
+   Deze kop stond er toen al. Zie LAT.md regel 13.
 
    DE VIERDE STOND ER EERST NIET BIJ, en de deltapoort vond hem: de
    correctieroute wordt wel over HTTP beproefd, maar door

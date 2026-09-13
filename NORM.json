@@ -92,8 +92,7 @@
     "mensmutatieZonderWacht": 1,
     "crashasOnbekend": 89,
     "crashasNietMeetbaar": 0,
-    "crashproefGezakt": 3,
-    "crashproefOnbereikt": 44
+    "crashproefGezakt": 3
   },
   "notities": [
     {
@@ -2291,8 +2290,7 @@
     "bevestigGebreken": "2026-09-12",
     "verwijzingGebreken": "2026-09-12",
     "mensmutatieZonderWacht": "2026-09-12",
-    "crashproefGezakt": "2026-09-13",
-    "crashproefOnbereikt": "2026-09-13"
+    "crashproefGezakt": "2026-09-13"
   },
   "uitzonderingen": [
     {

@@ -241,7 +241,7 @@ const REGISTER = {
      overlevingscontract en dus een defect; `crashproefOnbereikt` is bereik van
      het instrument. GEEN_DUURZAME_WEG hangt met opzet aan geen van beide -- dat
      is een gemeten niet-van-toepassing en geen schuld. */
-  'CRASHPROEF.json': { meter: ['crashproefGezakt', 'crashproefOnbereikt'] },
+  'CRASHPROEF.json': { meter: ['crashproefGezakt', 'crashproefGeenLijf', 'crashproefGeenWereld'] },
   /* HERSTELBESLUIT.json is een VERKLARING en geen meting -- dezelfde vorm als
      ROLLBACKBESLUIT.json hierboven, dat ook aan een geteld gevolg hangt. Wie
      hier een regel bijzet of weghaalt, beweegt een van deze twee tellers: een

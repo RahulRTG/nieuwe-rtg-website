@@ -3,8 +3,8 @@
   "uitleg": "per geldroute en per crashgrens: wat er van de uitkomst overblijft als het proces op dat moment sterft. De vraag is economisch -- wat staat er in de opslag na de herstart -- en niet wat de route antwoordde, want bij een crash antwoordt hij niet.",
   "grens": "drie dingen die deze proef NIET zegt. (1) Wat een aanbieder buiten de deur al had gecommit ziet hij niet -- dat is EXTERNALLY_RECONCILABLE en dat wacht op een echte aanbieder. (2) Het OORDEEL hangt aan de collecties die GELDDEKKING.json per route declareert; een halve schrijfactie in een collectie die daar niet staat, komt terug in `buitenDeRoute` maar laat de uitslag niet zakken. Die lijst is dus de bovengrens van wat hier te vinden is. (3) Een PROVEN geldt voor DIT lijf op DEZE wereld -- een andere invoer kan een ander pad door de route nemen.",
   "stempel": {
-    "op": "2026-09-13T09:55:39.551Z",
-    "commit": "c90a90807",
+    "op": "2026-09-13T11:31:04.782Z",
+    "commit": "0adf3909a",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/crashproef.js",
@@ -748,11 +748,11 @@
         "bankregie"
       ],
       "idempotentie": "beschermd",
-      "stand": "FAILED",
+      "stand": "NIET_BEPROEFD",
       "claims": {
         "toestand": {
-          "stand": "FAILED",
-          "reden": "1 collectie(s) veranderden terwijl er niets gemuteerd mocht zijn"
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
         },
         "geenHalf": {
           "stand": "NIET_BEPROEFD",
@@ -768,10 +768,8 @@
         }
       },
       "statusVanDeAanroep": 0,
-      "reden": "toestand: 1 collectie(s) veranderden terwijl er niets gemuteerd mocht zijn | geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand | geenDubbel: de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien",
-      "geraakt": [
-        "store.db:bankregie"
-      ],
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand | geenDubbel: de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien",
+      "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
       "herhaling": {
@@ -796,14 +794,44 @@
         "bankregie"
       ],
       "idempotentie": "beschermd",
-      "stand": "GEEN_DUURZAME_WEG",
-      "statusVanDeAanroep": 200,
-      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-na-commit: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "stand": "NIET_BEPROEFD",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 1 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand | geenDubbel: de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien",
       "geraakt": [
         "store.db:bankregie"
       ],
-      "buitenDeRoute": [],
-      "eigenLijf": false
+      "buitenDeRoute": [
+        "store.db:kantoorAudit"
+      ],
+      "eigenLijf": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:bankregie"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": [
+          "store.db:bankregie"
+        ]
+      }
     },
     {
       "methode": "POST",
@@ -816,11 +844,11 @@
         "bankregie"
       ],
       "idempotentie": "beschermd",
-      "stand": "FAILED",
+      "stand": "NIET_BEPROEFD",
       "claims": {
         "toestand": {
-          "stand": "FAILED",
-          "reden": "1 collectie(s) veranderden terwijl er niets gemuteerd mocht zijn"
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
         },
         "geenHalf": {
           "stand": "NIET_BEPROEFD",
@@ -836,15 +864,15 @@
         }
       },
       "statusVanDeAanroep": 0,
-      "reden": "toestand: 1 collectie(s) veranderden terwijl er niets gemuteerd mocht zijn | geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand",
-      "geraakt": [
-        "store.db:bankregie"
-      ],
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand",
+      "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
       "herhaling": {
         "status": 200,
-        "deed": [],
+        "deed": [
+          "store.db:bankregie"
+        ],
         "tweedeStatus": 200,
         "bijgekomen": []
       }
@@ -860,14 +888,40 @@
         "bankregie"
       ],
       "idempotentie": "beschermd",
-      "stand": "GEEN_DUURZAME_WEG",
-      "statusVanDeAanroep": 200,
-      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-na-commit: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "stand": "NIET_BEPROEFD",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 1 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand",
       "geraakt": [
         "store.db:bankregie"
       ],
-      "buitenDeRoute": [],
-      "eigenLijf": false
+      "buitenDeRoute": [
+        "store.db:kantoorAudit"
+      ],
+      "eigenLijf": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -920,11 +974,11 @@
         "bankregie"
       ],
       "idempotentie": "beschermd",
-      "stand": "FAILED",
+      "stand": "NIET_BEPROEFD",
       "claims": {
         "toestand": {
-          "stand": "FAILED",
-          "reden": "1 collectie(s) veranderden terwijl er niets gemuteerd mocht zijn"
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
         },
         "geenHalf": {
           "stand": "NIET_BEPROEFD",
@@ -940,10 +994,8 @@
         }
       },
       "statusVanDeAanroep": 0,
-      "reden": "toestand: 1 collectie(s) veranderden terwijl er niets gemuteerd mocht zijn | geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand | geenDubbel: de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien",
-      "geraakt": [
-        "store.db:bankregie"
-      ],
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand | geenDubbel: de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien",
+      "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
       "herhaling": {
@@ -968,14 +1020,44 @@
         "bankregie"
       ],
       "idempotentie": "beschermd",
-      "stand": "GEEN_DUURZAME_WEG",
-      "statusVanDeAanroep": 200,
-      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-na-commit: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "stand": "NIET_BEPROEFD",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 1 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand | geenDubbel: de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien",
       "geraakt": [
         "store.db:bankregie"
       ],
-      "buitenDeRoute": [],
-      "eigenLijf": false
+      "buitenDeRoute": [
+        "store.db:kantoorAudit"
+      ],
+      "eigenLijf": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:bankregie"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": [
+          "store.db:bankregie"
+        ]
+      }
     },
     {
       "methode": "POST",
@@ -1919,8 +2001,8 @@
   ],
   "telling": {
     "GEEN_WERK": 44,
-    "GEEN_DUURZAME_WEG": 41,
-    "FAILED": 3,
+    "GEEN_DUURZAME_WEG": 38,
+    "NIET_BEPROEFD": 6,
     "PROVEN": 2
   },
   "ruis": [

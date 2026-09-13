@@ -40,8 +40,12 @@
                        en dat is geen geruststelling, want wat hem wel bedreigt
                        is een VERLOREN schrijfactie, en dat is `schrijf-verloren`
                        en niet deze proef
-     GEEN_WERK         de oproep kwam niet aan het werk (status erbij), dus er
-                       viel niets te crashen
+     BLOCKED_BODY      de oproep kwam niet aan het werk EN idemwereld.js kent
+                       geen lijf voor dit pad -- er ging een algemeen lijf heen
+                       en de route wees het af. Wat ontbreekt is een LIJF
+     BLOCKED_WORLD     de oproep kwam niet aan het werk terwijl het lijf WEL
+                       voor deze route is gemaakt. Het verzoek klopt dus van
+                       vorm; wat ontbreekt is een VOORWAARDE in de wereld
      WERELD_ONTBREEKT  deze route heeft een onderwerp nodig dat de wereld niet
                        klaarzette -- met erbij WAT er zou moeten bestaan
      BLOCKED           de opstelling zelf kwam niet rond
@@ -383,13 +387,30 @@ async function ronde(route, grens, ruis) {
        bevestigen, komt hier ook terecht. Op sqlite bevestigt hij. */
     if (!gestorven) {
       const deedWerk = r.status >= 200 && r.status < 300;
-      return { stand: deedWerk ? 'GEEN_DUURZAME_WEG' : 'GEEN_WERK', statusVanDeAanroep: r.status,
-        reden: deedWerk
-          ? 'de route gaf ' + r.status + ' en het proces leefde door, dus hij liep niet langs ' +
-            'het injectiepunt van ' + grens.modus + ': hij schrijft via de gewone write-behind ' +
-            'save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een ' +
-            'VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet'
-          : 'de oproep kwam niet aan het werk (status ' + r.status + ')',
+      /* NIET AAN HET WERK IS TWEE SOORTEN ONTBREKEND BEWIJS, en ze vragen
+         verschillend werk. Eerst heette dit allebei GEEN_WERK, en dan werk je
+         aan "vierenveertig rijen" in plaats van aan twee soorten gat.
+
+         De scheiding leunt NIET op het uitlezen van de statuscode -- 400 kan
+         even goed een ontbrekend veld als een ontbrekende voorwaarde zijn --
+         maar op iets wat we ZEKER weten: heeft idemwereld.js een lijf voor DIT
+         pad gemaakt, of ging er een algemeen lijf heen? Is het lijf voor deze
+         route gemaakt, dan klopt het verzoek van vorm en ontbreekt er dus een
+         voorwaarde in de wereld. De statuscode blijft er in beide gevallen bij
+         staan, zodat de triage hem kan lezen zonder dat de INDELING erop leunt. */
+      if (deedWerk) return { stand: 'GEEN_DUURZAME_WEG', statusVanDeAanroep: r.status,
+        reden: 'de route gaf ' + r.status + ' en het proces leefde door, dus hij liep niet langs ' +
+          'het injectiepunt van ' + grens.modus + ': hij schrijft via de gewone write-behind ' +
+          'save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een ' +
+          'VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet',
+        geraakt: binnen, buitenDeRoute: buiten, eigenLijf };
+      return { stand: eigenLijf ? 'BLOCKED_WORLD' : 'BLOCKED_BODY', statusVanDeAanroep: r.status,
+        reden: eigenLijf
+          ? 'het lijf is voor DEZE route gemaakt (idemwereld.js), dus het verzoek klopt van vorm; ' +
+            'de route gaf ' + r.status + ' en wat ontbreekt is een VOORWAARDE in de wereld'
+          : 'idemwereld.js kent geen lijf voor dit pad, dus er ging een algemeen lijf heen en de ' +
+            'route gaf ' + r.status + '. Wat ontbreekt is een LIJF; pas daarna is te zien of de ' +
+            'wereld ook nog iets mist',
         geraakt: binnen, buitenDeRoute: buiten, eigenLijf };
     }
 

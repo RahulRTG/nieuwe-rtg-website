@@ -1621,10 +1621,15 @@ const IJKINGEN = {
       (j) => { j.telling.FAILED = (j.telling.FAILED || 0) + 6; return j; },
       () => norm.meet().crashproefGezakt - voor.crashproefGezakt)
   },
-  crashproefOnbereikt: {
+  crashproefGeenLijf: {
     proef: (voor) => metVervangenJson('CRASHPROEF.json',
-      (j) => { j.telling.GEEN_WERK = (j.telling.GEEN_WERK || 0) + 9; return j; },
-      () => norm.meet().crashproefOnbereikt - voor.crashproefOnbereikt)
+      (j) => { j.telling.BLOCKED_BODY = (j.telling.BLOCKED_BODY || 0) + 9; return j; },
+      () => norm.meet().crashproefGeenLijf - voor.crashproefGeenLijf)
+  },
+  crashproefGeenWereld: {
+    proef: (voor) => metVervangenJson('CRASHPROEF.json',
+      (j) => { j.telling.BLOCKED_WORLD = (j.telling.BLOCKED_WORLD || 0) + 7; return j; },
+      () => norm.meet().crashproefGeenWereld - voor.crashproefGeenWereld)
   },
   /* DE TAND VAN 12 SEPTEMBER 2026: eersteMinuutGezakt telt de toetsen van de
      eerste minuut die ZAKKEN (EERSTEMINUUT.json, telling.gezakt). Zelfde vorm

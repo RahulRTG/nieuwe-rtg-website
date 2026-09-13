@@ -61,7 +61,22 @@ const KETENS = [
      die iets WEET. Als de gedeelde vorm daar ook overheen zou liggen, zou dat
      voor het eerst iets betekenen -- en als hij dat niet doet, is dat het
      duidelijkste antwoord dat deze meting kan geven. */
-  { naam: 'moment', register: 'MOMENTPROEF.json', domein: 'mediaos', proef: 'scripts/momentproef.js' }
+  { naam: 'moment', register: 'MOMENTPROEF.json', domein: 'mediaos', proef: 'scripts/momentproef.js' },
+  /* De vierde. Hij is toegevoegd omdat hij de meting scherper maakt en niet
+     omdat er een keten bij moest: zijn uitkomst is ZICHTBAARHEID VOOR DERDEN,
+     een soort die de eerste drie geen van alle hadden, en zijn voltooiende
+     actor is de KLANT en niet een medewerker. Blijven de actoren en beloften
+     ook met hem erbij uit elkaar liggen, dan is dat een sterker negatief dan
+     met drie; komt er ineens overlap, dan is dat de eerste echte aanwijzing
+     voor een gedeeld contract. */
+  { naam: 'zaaklive', register: 'ZAAKLIVEPROEF.json', domein: 'ondernemerpoort', proef: 'scripts/zaakliveproef.js' },
+  /* De vijfde, en de eerste die over GELD gaat. Hij zit er om dezelfde reden
+     als de vierde: hij maakt de meting scherper. Zijn uitkomst is een GETAL en
+     geen toestand, en zijn tweede actor is geen mens maar een PROJECTIE
+     (financeVoor) -- twee soorten die de eerste vier geen van alle hadden.
+     Blijven de actoren ook met hem erbij op nul, dan is dat het sterkste
+     negatief dat hier te halen is. */
+  { naam: 'omzet', register: 'OMZETPROEF.json', domein: 'fiscaal', proef: 'scripts/omzetproef.js' }
 ];
 
 /* De woorden waarop een belofte wordt ingedeeld. Een gesloten lijst, want een
@@ -113,8 +128,21 @@ const KETENS = [
    telt in plaats van mensen. Dat zijn echte soorten fout, maar ze komen in geen
    van de andere drie ketens voor -- en dan is het geen gedeelde vorm.
 
-   Wat NIET is gebeurd: de actoren aanpassen. Die staan op nul gedeeld over vier
-   ketens en negentien actoren, en dat blijft de scherpste uitslag. */
+   Wat NIET is gebeurd: de actoren aanpassen. Die staan op nul gedeeld, en dat
+   blijft de scherpste uitslag.
+
+   EEN DERDE UITBREIDING, BIJ DE ZESDE KETEN (13 september 2026), en hij valt
+   onder dezelfde regel: `weigeringMetReden` kende alleen de BEDRIJVENDE vorm
+   ("weigert met de reden") en niet de lijdende ("wordt geweigerd met de
+   reden"). Dat is hetzelfde gezegd, in een andere werkwoordsvorm -- geen
+   ander idee. Zonder dat patroon zakte een thema dat aantoonbaar in alle vijf
+   de ketens staat naar `bijna`, en dan meet deze meter de Nederlandse
+   grammatica in plaats van de vorm van de ketens.
+
+   Let bij het lezen op wat die uitbreiding NIET deed: `themasGedeeld` ging van
+   1 naar 2 en dat is nog steeds LAGER dan de 2 van vier ketens over 10 themas,
+   want de vijfde keten bracht geen enkel eigen thema mee dat de anderen ook
+   hadden. En de actoren zijn opnieuw niet aangeraakt: 0 van 21. */
 const THEMAS = {
   herhaling: [/dezelfde sleutel/i, /twee keer/i, /tweede keer/i, /tweede betaling/i, /geen tweede/i],
   volgorde: [/alleen vooruit/i, /nog niet betaald/i, /terugzetten/i, /eerder/i],

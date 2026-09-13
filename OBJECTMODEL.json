@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-13",
   "gemeten": {
-    "bestanden": 2220,
-    "vormen": 1395,
-    "velden": 2021,
-    "modules": 763,
-    "domeinen": 272,
+    "bestanden": 2218,
+    "vormen": 1392,
+    "velden": 2018,
+    "modules": 762,
+    "domeinen": 273,
     "envelopDrempel": 17,
     "envelop": 29,
-    "veldenDomeineigen": 1424,
-    "veldenGedeeldVanafVier": 201,
+    "veldenDomeineigen": 1422,
+    "veldenGedeeldVanafVier": 202,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -334,18 +334,6 @@
       ]
     },
     {
-      "veld": "ingetrokken",
-      "domeinen": 11,
-      "waar": [
-        "bedrijf",
-        "kern/beschermzaak",
-        "kern/carriereledger",
-        "kern/command",
-        "kern/festival",
-        "kern/mobiliteit"
-      ]
-    },
-    {
       "veld": "voor",
       "domeinen": 11,
       "waar": [
@@ -466,6 +454,18 @@
       ]
     },
     {
+      "veld": "ingetrokken",
+      "domeinen": 10,
+      "waar": [
+        "bedrijf",
+        "kern/beschermzaak",
+        "kern/carriereledger",
+        "kern/command",
+        "kern/festival",
+        "kern/mobiliteit"
+      ]
+    },
+    {
       "veld": "op",
       "domeinen": 10,
       "waar": [
@@ -514,15 +514,15 @@
       ]
     },
     {
-      "veld": "geldigTot",
-      "domeinen": 9,
+      "veld": "name",
+      "domeinen": 10,
       "waar": [
-        "bedrijf",
-        "kern/aanmeldingen",
-        "kern/concern",
-        "kern/festival",
-        "kern/mobiliteit",
-        "kern/navigatie"
+        "kern/experience",
+        "kern/gast",
+        "kern/kantoor",
+        "kern/leverancier",
+        "kern/lidacties",
+        "kern/personeel"
       ]
     }
   ],

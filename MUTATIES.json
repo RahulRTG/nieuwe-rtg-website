@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:36:52.070Z",
-    "commit": "dba17d1f",
+    "op": "2026-09-13T12:18:49.716Z",
+    "commit": "3ff6ecea",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -56,21 +56,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
-    },
-    "aanwezigheid-routes.e2e.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 1,
-      "scherp": "gezakt"
-    },
-    "aanwezigheid.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/mediaos/aanwezigheid.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
     },
     "accountroutes.test.js": {
       "soort": "puur",
@@ -183,6 +168,16 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "afbouwafloop.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "de afbouwwet woont in scripts/ en niet in server/; vijf handmutaties, alle vijf raak (zie de kop hierboven)"
+    },
+    "afbouwketen.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "idem, met echte processen; de vijf handmutaties vonden er twee echte gaten mee (hartslag, PASSED-only)"
     },
     "afbouwpoort.test.js": {
       "soort": "puur",
@@ -562,6 +557,11 @@
       "module": "server/kern/rtmail.js",
       "operator": "return-weg",
       "gezakt": 8
+    },
+    "autonomiegrens.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "leest EXECUTION_MAP.json en ROLPROEF.json en geen servermodule; 0 mutaties geprobeerd (geen module gevonden). Toets 3 is de tegenproef: een blind pad autonoom maken laat de grens uitslaan"
     },
     "autoverkoop.test.js": {
       "soort": "server",
@@ -5038,14 +5038,6 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
-    "momentproef.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/momentproef.js",
-      "operator": "===->!==#48",
-      "gezakt": 1,
-      "geprobeerd": 157
-    },
     "mond.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -5295,6 +5287,11 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "ondernemerbewijs.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "leest registers en geen servermodule; 0 mutaties geprobeerd (geen module gevonden). De faalklasse staat in de toets zelf: vier tegenproeven op gemuteerde registers in een wegwerpmap, elk aantoonbaar raak"
     },
     "ondernemerpoort-e2e.test.js": {
       "soort": "server",
@@ -7789,14 +7786,6 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
-    "stagevorm.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/stagevorm.js",
-      "operator": "getal+1#0",
-      "gezakt": 3,
-      "geprobeerd": 4
-    },
     "stempel.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -7967,6 +7956,14 @@
       "operator": "===->!==#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "supplier-activity.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/routes/supplier/tafels-team.js",
+      "operator": "&&->||#2",
+      "gezakt": 5,
+      "geprobeerd": 13
     },
     "supplier-comm-mob-payroll.test.js": {
       "soort": "server",
@@ -8933,14 +8930,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
-    },
-    "wekdekking.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/wekdekking.js",
-      "operator": "===->!==#0",
-      "gezakt": 3,
-      "geprobeerd": 2
     },
     "wekkers.test.js": {
       "soort": "puur",

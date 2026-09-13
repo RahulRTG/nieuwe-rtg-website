@@ -368,7 +368,13 @@
     "stagevorm": "node scripts/stagevorm.js",
     "stagevorm:vast": "node scripts/stagevorm.js --vastleggen",
     "wekdekking": "node scripts/wekdekking.js",
-    "wekdekking:vast": "node scripts/wekdekking.js --vastleggen"
+    "wekdekking:vast": "node scripts/wekdekking.js --vastleggen",
+    "ondernemerbewijs": "node scripts/ondernemerbewijs.js",
+    "ondernemerbewijs:vast": "node scripts/ondernemerbewijs.js --vastleggen",
+    "zaakliveproef": "node scripts/zaakliveproef.js",
+    "zaakliveproef:vast": "node scripts/zaakliveproef.js --vastleggen",
+    "omzetproef": "node scripts/omzetproef.js",
+    "omzetproef:vast": "node scripts/omzetproef.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

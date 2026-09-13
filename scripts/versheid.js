@@ -389,6 +389,22 @@ const REGISTERS = [
      meet geen keten tussen actoren maar de belofte van EEN scherm, in een echte
      browser (BETROUWBAARHEID.md par. 1). Daarom telt scripts/ketenvorm.js hem
      ook niet mee -- wat de ketens delen, wordt vertroebeld door een meting die
+  /* De VIERDE gouden keten. Hij begint waar de toelating ophoudt -- daar staat
+     de zaak klaar, hier wordt zij bruikbaar en zichtbaar voor een lid -- en hij
+     veroudert om dezelfde reden even hard: zijn uitslag gaat over de poort van
+     die dag. Een ZAAKLIVEPROEF.json die "de keten sluit" meldt terwijl iemand
+     sindsdien de poortstappen heeft verlegd, is erger dan geen meting. */
+  ['ZAAKLIVEPROEF.json', 'npm run zaakliveproef:vast', 'of de ondernemerketen sluit, van goedgekeurde aanvraag tot een zaak die een lid ziet'],
+  ['OMZETPROEF.json', 'npm run omzetproef:vast', 'of de geldketen sluit, van bestelling tot het cijfer waar btw over wordt afgedragen'],
+  /* De Business Proof Map is GEEN keten maar een PROJECTIE over zeven registers,
+     en juist daarom veroudert hij snel: hij is precies zo vers als zijn oudste
+     bron. Een uitslag die "2786 routes bevoegd" meldt op een ROLPROEF van drie
+     weken oud, meldt iets over drie weken geleden. */
+  ['ONDERNEMERBEWIJS.json', 'npm run ondernemerbewijs:vast', 'wat de registers samen over de twaalf bewijslagen van een ondernemer-capability zeggen'],
+  /* De navigatieproef staat NAAST de drie gouden ketens en niet ertussen: hij
+     meet geen keten tussen actoren maar de belofte van EEN scherm, in een echte
+     browser (BETROUWBAARHEID.md par. 1). Daarom telt scripts/ketenvorm.js hem
+     ook niet mee -- wat de gouden ketens delen, wordt vertroebeld door een meting die
      iets anders is. Veroudering weegt hier even zwaar: hij draait tegen een
      draaiende server EN een browser, dus zijn uitslag hoort bij de code van die
      dag en bij geen andere. */

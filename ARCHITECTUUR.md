@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5047 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5042 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5047 |
-| servermodules (`server/**/*.js`) | 3419 |
+| API-endpoints | 5042 |
+| servermodules (`server/**/*.js`) | 3417 |
 | routebestanden (`server/routes/**`) | 589 |
-| kernmodules (`server/kern/**`) | 2134 |
+| kernmodules (`server/kern/**`) | 2132 |
 | schermen (`public/**/*.html`) | 318 |
 | gedeelde browsermodules (`public/shared/*.js`) | 353 |
-| toetsbestanden (`test/*.test.js`) | 1626 |
-| schermtoetsen (`test/*.e2e.js`) | 217 |
+| toetsbestanden (`test/*.test.js`) | 1628 |
+| schermtoetsen (`test/*.e2e.js`) | 216 |
 
 ## 2. De weg van een verzoek
 
@@ -111,12 +111,12 @@ zie §5 -- er zijn nog 235 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 20 | 6 | 8 | 52 |
 | `member` | 696 | 72 | 16 | 427 |
-| `supplier` | 622 | 124 | 6 | 333 |
+| `supplier` | 623 | 124 | 6 | 333 |
 | `office` | 70 | 20 | 3 | 82 |
 | `staff` | 26 | 8 | 1 | 42 |
 | `social` | 76 | 10 | 31 | 71 |
 | `techniek` | 77 | 19 | 1 | 64 |
-| `zakelijk` | 13 | 2 | 0 | 0 |
+| `zakelijk` | 13 | 2 | 0 | 25 |
 | `wereld` | 15 | 3 | 0 | 0 |
 
 "Zonder bewaker" betekent: geen `auth`/`supplierAuth`/`officeAuth`-achtige middleware
@@ -127,7 +127,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3422 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3416 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -135,9 +135,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1575 |
+| kern-namen die routes aanraken | 1569 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 235 |
-| daarvan door precies één domein | 1340 |
+| daarvan door precies één domein | 1334 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

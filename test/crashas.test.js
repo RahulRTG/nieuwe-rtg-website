@@ -50,12 +50,51 @@ test('een ONGEMETEN route is onbekend en nooit `nee`', () => {
   }
 });
 
-test('een route die aantoonbaar schrijft, draagt de schrijfgrenzen als gemeten', () => {
+/* DEZE TOETS STOND HET OMGEKEERDE TE BEWAKEN, en hij had gelijk over de vorm en
+   ongelijk over de inhoud. Hij eiste dat een route die aantoonbaar SCHRIJFT de
+   twee duurzame grenzen als `ja` draagt. Dat is over-claimen: schrijven zegt
+   niets over de WEG waarlangs, en scripts/crashproef.js heeft eenenveertig van
+   de negentig rijen gemeten als "komt langs geen van beide injectiepunten" --
+   die routes schrijven met de gewone write-behind save().
+
+   De regel is nu: schrijft hij aantoonbaar niets, dan bestaat de grens niet;
+   heeft de PROEF hem geraakt, dan bestaat hij; in alle andere gevallen is het
+   `onbekend`. Dat laatste is de belangrijke helft -- het oude `ja` was een
+   gevolgtrekking die nergens op steunde. */
+test('schrijven alleen maakt een crashgrens NIET bestaand -- dat is de schrijfweg', () => {
   const k = ca.classificeer(rij({ collecties: ['paySaldi', 'payBoekingen'] }));
   for (const g of ['voor-eerste-mutatie', 'na-commit-voor-antwoord']) {
-    assert.equal(k[g].bestaat, 'ja');
-    assert.equal(k[g].graad, 'gemeten', 'de collecties zijn GEMETEN, niet geraden');
+    assert.equal(k[g].bestaat, 'onbekend',
+      g + ': deze fixture staat niet in CRASHPROEF.json, dus de schrijfweg is niet gemeten');
+    assert.notEqual(k[g].bestaat, 'ja',
+      'dit was de over-claim: "hij schrijft" gelezen als "de grens bestaat"');
+    assert.match(k[g].grond, /SCHRIJFWEG|schrijfweg/,
+      'en de reden noemt waar het werkelijk aan hangt');
   }
+});
+
+/* DE BEDRADING NAAR DE PROEF, tegen het ECHTE register en niet tegen een
+   verzonnen fixture. Een fixture zou zich houden aan de vorm die deze code
+   aanneemt in plaats van aan de vorm die het register werkelijk heeft -- dat
+   is hoe achttien groene toetsen eerder een kapotte functie hebben gedekt. */
+test('een grens die de proef HEEFT geraakt, staat op ja; een pad zonder weg op nee', () => {
+  const cp = require('../CRASHPROEF.json');
+  const geraakt = cp.per.find(r => r.stand === 'PROVEN' || r.stand === 'FAILED');
+  const zonderWeg = cp.per.find(r => r.stand === 'GEEN_DUURZAME_WEG');
+  assert.ok(geraakt && zonderWeg, 'het register hoort allebei de gevallen te bevatten');
+
+  const kg = ca.classificeer({ methode: geraakt.methode, pad: geraakt.pad,
+    collecties: geraakt.collecties, semantiek: 'idempotent' });
+  assert.equal(kg[geraakt.grens].bestaat, 'ja');
+  assert.equal(kg[geraakt.grens].graad, 'gemeten');
+
+  const kz = ca.classificeer({ methode: zonderWeg.methode, pad: zonderWeg.pad,
+    collecties: zonderWeg.collecties, semantiek: 'idempotent' });
+  assert.equal(kz[zonderWeg.grens].bestaat, 'nee');
+  assert.equal(kz[zonderWeg.grens].graad, 'gemeten', 'dit is nagemeten en niet geredeneerd');
+  assert.ok(kz[zonderWeg.grens].wordtRelevantAls, 'een `nee` dat kan omslaan zegt wat hem omslaat');
+  assert.match(kz[zonderWeg.grens].wordtRelevantAls, /schrijf-verloren/,
+    'en wijst naar de modus die hem WEL bedreigt -- anders leest het als een vrijspraak');
 });
 
 /* DE GRENS DIE NIET BESTAAT, EN WAAROM DAT EEN TOETS VERDIENT.

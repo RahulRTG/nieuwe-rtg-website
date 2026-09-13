@@ -133,6 +133,48 @@ function schrijftDezeRoute(rij) {
       (rij.idempotentie || 'onbekend') + '), dus of er iets geschreven wordt is hier niet vast te stellen' };
 }
 
+/* ============================================================================
+   HET GEMETEN UITVOERINGSPAD -- en waarom dit register hier gelezen wordt.
+
+   Deze classificatie leidde `bestaat` af uit een enkel gegeven: schrijft deze
+   route collecties? Zo ja, dan bestaan de twee duurzame crashgrenzen. Dat is
+   over-claimen, en scripts/crashproef.js heeft het weerlegd door de routes
+   werkelijk te laten sterven: EENENVEERTIG van de negentig rijen komen langs
+   geen van beide injectiepunten, omdat die routes met de gewone write-behind
+   save() schrijven (na te lezen in server/kern/bank/passen.js). De grens hangt
+   dus niet aan "schrijft hij" maar aan WELKE SCHRIJFWEG hij neemt -- de vierde
+   as uit crashtaxonomie.js, en die is niet af te leiden.
+
+   Daarom leest deze module CRASHPROEF.json. Geen kringloop: die proef leest
+   GELDDEKKING.json en nooit dit register.
+
+   ZONDER REGISTER VALT HIJ TERUG OP `onbekend` EN NIET OP DE OUDE AANNAME. Dat
+   is het hele punt: de oude aanname was fout, dus hem gebruiken als terugval
+   zou de fout op elke machine zonder meting terugzetten. */
+const CRASHPROEF = (() => {
+  try {
+    const j = JSON.parse(fs.readFileSync(path.join(WORTEL, 'CRASHPROEF.json'), 'utf8'));
+    const op = new Map();
+    for (const r of j.per || []) op.set(r.methode + ' ' + r.pad + ' ' + r.grens, r.stand);
+    return { op, stempel: j.stempel };
+  } catch (e) { return { op: new Map(), stempel: null }; }
+})();
+
+/* Wat zegt de PROEF over deze route en deze grens? Drie uitkomsten die alle
+   drie iets anders betekenen, en die nooit mogen samenvallen. */
+function padOordeel(rij, grens) {
+  const stand = CRASHPROEF.op.get(rij.methode + ' ' + rij.pad + ' ' + grens);
+  if (stand === 'PROVEN' || stand === 'FAILED') return { bestaat: VERDICT.JA, graad: 'gemeten',
+    grond: 'scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (' + stand + ')' };
+  if (stand === 'GEEN_DUURZAME_WEG') return { bestaat: VERDICT.NEE, graad: 'gemeten',
+    grond: 'gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, ' +
+      'dus hij loopt niet langs bijeen() of saveDuurzaam() -- hij schrijft met de gewone ' +
+      'write-behind save(), en die kent dit moment niet',
+    wordtRelevantAls: 'deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU ' +
+      'bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens' };
+  return null;
+}
+
 function classificeer(rij) {
   const w = schrijftDezeRoute(rij);
   const uit = {};
@@ -145,11 +187,20 @@ function classificeer(rij) {
      vereenvoudiging: de opslag is transactioneel, dus dat moment bestaat niet.
      Hij krijgt hieronder een eigen `nee` met de grond erbij. */
   for (const g of ['voor-eerste-mutatie', 'na-commit-voor-antwoord']) {
-    uit[g] = w.schrijft === true
-      ? { bestaat: VERDICT.JA, graad: w.graad, grond: w.grond }
-      : w.schrijft === false
-        ? { bestaat: VERDICT.NEE, graad: w.graad, grond: w.grond }
-        : { bestaat: VERDICT.ONBEKEND, graad: 'onbekend', grond: w.grond };
+    /* Schrijft de route aantoonbaar NIETS, dan bestaat de grens niet -- dat is
+       geen aanname maar het ontbreken van een mutatie. */
+    if (w.schrijft === false) { uit[g] = { bestaat: VERDICT.NEE, graad: w.graad, grond: w.grond }; continue; }
+    /* Anders beslist de PROEF, en niet de gevolgtrekking uit "hij schrijft". */
+    const gemeten = padOordeel(rij, g);
+    if (gemeten) { uit[g] = gemeten; continue; }
+    /* Geen proefuitslag voor dit paar. Dat is `onbekend` en nadrukkelijk niet
+       het oude `ja`: dat de route schrijft, zegt niets over de weg waarlangs. */
+    uit[g] = { bestaat: VERDICT.ONBEKEND, graad: 'onbekend',
+      grond: w.schrijft === true
+        ? 'de route schrijft aantoonbaar (' + w.grond + '), maar scripts/crashproef.js kreeg hem ' +
+          'niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af ' +
+          'of deze grens op zijn pad ligt'
+        : w.grond };
   }
 
   /* `in-de-opslag` BESTAAT HIER NIET, en dat is gemeten. De vraag was of een
@@ -198,15 +249,35 @@ function classificeer(rij) {
    --------------------------------------------------------------------------- */
 function gemetenUitslagen() {
   const uit = {};
+  const zet = (route, grens, stand, instrument, op) => {
+    uit[route] = uit[route] || {};
+    uit[route][grens] = { stand, instrument, op: op || null };
+  };
   try {
     const f = lees('FACTUURPROEF.json');
     const route = f.route || 'POST /api/pay/saldo';
     const g = (f.crash && f.crash.grenzen) || {};
-    for (const [grens, stand] of Object.entries(g)) {
-      uit[route] = uit[route] || {};
-      uit[route][grens] = { stand, instrument: 'scripts/factuurproef.js', op: f.gemetenOp || null };
-    }
+    for (const [grens, stand] of Object.entries(g))
+      zet(route, grens, stand, 'scripts/factuurproef.js', f.gemetenOp);
   } catch (e) { /* geen proef, geen uitslagen */ }
+
+  /* DE CRASHPROEF TELT OOK MEE, en die toevoeging is een reparatie van de
+     andere kant. Toen deze module `bestaat` ging lezen uit CRASHPROEF.json,
+     stond `gemeten` er nog op 0 terwijl diezelfde proef vier grenzen werkelijk
+     had geraakt. Een register dat zijn eigen bron half leest, onderschat wat er
+     bekend is -- en dat is net zo onwaar als overschatten.
+
+     Alleen PROVEN en FAILED tellen als GEMETEN: bij die twee is de grens
+     werkelijk geraakt. GEEN_DUURZAME_WEG is een uitspraak over de schrijfweg en
+     geen meting AAN de grens, en GEEN_WERK is helemaal niets. Zouden die
+     meetellen, dan telde "de proef kwam er niet bij" als bewijs. */
+  try {
+    const c = lees('CRASHPROEF.json');
+    for (const r of c.per || [])
+      if (r.stand === 'PROVEN' || r.stand === 'FAILED')
+        zet(r.methode + ' ' + r.pad, r.grens, r.stand, 'scripts/crashproef.js',
+          c.stempel && c.stempel.op);
+  } catch (e) { /* geen crashproef, geen uitslagen */ }
   return uit;
 }
 
@@ -249,7 +320,7 @@ function meet() {
       'en is hij te beproeven. Dit is een classificatie en geen oordeel over de code.',
     grens: 'Bestaan en meetbaarheid worden nooit opgeteld. Een grens die niet bestaat is geen ' +
       'bewezen grens, en een grens zonder injectiepunt is niet weerlegd maar ongemeten.',
-    bronnen: ['GELDDEKKING.json', 'scripts/lib/crashtaxonomie.js', 'server/lib/verraad.js', 'FACTUURPROEF.json'],
+    bronnen: ['GELDDEKKING.json', 'scripts/lib/crashtaxonomie.js', 'server/lib/verraad.js', 'FACTUURPROEF.json', 'CRASHPROEF.json'],
     contracten: tax.CONTRACTEN, grenzen: tax.GRENZEN, injectiepunten: INJECTIE,
     aanbieder: { actief: AANBIEDER_ACTIEF, grond: AANBIEDER_GROND },
     gemetenOp: new Date().toISOString(), telling: t, per

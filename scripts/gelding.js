@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 /* ============================================================================
-   HET BEREIK -- waar geldt een wet, waar leeft hij, en waar kan iemand hem zien?
+   DE GELDING -- waar geldt een wet, waar leeft hij, en waar kan iemand hem zien?
+
+   DE NAAM IS NIET `bereik`, EN DAT IS EEN GELEERDE LES. Dit register heette in
+   zijn eerste uur BEREIK.json, en dat bestond al: het schermbereik-register dat
+   scripts/check.js leest ("schermen zonder zichtbare klikroute"). Het werd er
+   stilletjes door overschreven. Precies de naambotsing waar dit huis zes keer
+   voor waarschuwt -- Pulse, envelop, Kanaal, capability, VERMOGENS, wallet --
+   en ze werd gemaakt door de meter die over naamverwarring gaat.
 
    DRIE VRAGEN DIE ONDER EEN NAAM LIEPEN
 
@@ -17,7 +24,7 @@
 
    Zou de DRAAG-as de woordenlijst van de wachter gebruiken, dan bewegen die twee
    bij elke wijziging samen en meet je een echo in plaats van een verschil. Het
-   ijkcriterium staat daarom in test/bereik.test.js: een drager weghalen mag
+   ijkcriterium staat daarom in test/gelding.test.js: een drager weghalen mag
    alleen de DRAAG-as verschuiven, een wachterpad weghalen alleen de WACHT-as.
    Beweegt er een tweede as mee zonder oorzaak, dan is er een verborgen gedeelde
    bron -- precies de fout die deze hele laag moet uitsluiten.
@@ -53,8 +60,8 @@
      GEDRAGEN_NIET_GEZIEN betekent NIET "ongetest". Misschien bewaakt een
      centrale laag de cel alsnog op een manier die deze wachtersensor niet ziet.
 
-   Draai:  node scripts/bereik.js            (schrijft BEREIK.json)
-           node scripts/bereik.js --toon      (laat zien, schrijft niets)
+   Draai:  node scripts/gelding.js            (schrijft BEREIK.json)
+           node scripts/gelding.js --toon      (laat zien, schrijft niets)
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -62,7 +69,7 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
-const DOEL = path.join(WORTEL, 'BEREIK.json');
+const DOEL = path.join(WORTEL, 'GELDING.json');
 const K = { rood: '\x1b[31m', groen: '\x1b[32m', geel: '\x1b[33m', grijs: '\x1b[90m', vet: '\x1b[1m', uit: '\x1b[0m' };
 const TOON = process.argv.includes('--toon');
 
@@ -173,7 +180,7 @@ function asDraag(vormen) {
 
 /* WACHT. Uit de BRON van de wachter: welke paden scant hij? */
 function asWacht(bronTekst) {
-  /* De bron is een PARAMETER zodat test/bereik.test.js hem kan verhangen zonder
+  /* De bron is een PARAMETER zodat test/gelding.test.js hem kan verhangen zonder
      een bestand aan te raken -- en zodat deze as aantoonbaar niets anders leest
      dan deze tekst. */
   let bron = bronTekst;
@@ -238,7 +245,7 @@ function stempel() {
   const git = (...a) => { try { return execFileSync('git', a, { cwd: WORTEL, encoding: 'utf8' }).trim(); } catch (e) { return null; } };
   const vuil = git('status', '--porcelain');
   return { op: new Date().toISOString(), commit: git('rev-parse', '--short', 'HEAD'),
-    boomVuil: vuil === null ? null : vuil.length > 0, instrument: 'scripts/bereik.js', node: process.version };
+    boomVuil: vuil === null ? null : vuil.length > 0, instrument: 'scripts/gelding.js', node: process.version };
 }
 
 function draai() {
@@ -253,7 +260,7 @@ function draai() {
     stempel: stempel(),
     uitleg: 'Waar geldt een wet (CLAIM), waar leeft hij (DRAAG), en waar kan een wachter hem zien (WACHT)? ' +
       'De drie assen worden onafhankelijk gevuld en pas daarna vergeleken; zij delen geen bron, en ' +
-      'test/bereik.test.js houdt dat vast.',
+      'test/gelding.test.js houdt dat vast.',
     graad: 'vermoed',
     grens: 'GEEN PERCENTAGE, en dat is een ontwerpkeuze: voor een verhouding moet eerst vaststaan wat een ' +
       'telbare eenheid is, en bij een centrale architectuur kan een objectfamilie zwaarder wegen dan twintig ' +
@@ -281,7 +288,7 @@ function draai() {
   if (TOON) { toon(uit); return; }
   fs.writeFileSync(DOEL, JSON.stringify(uit, null, 2) + '\n');
   toon(uit);
-  console.log(K.grijs + 'BEREIK.json geschreven.' + K.uit);
+  console.log(K.grijs + 'GELDING.json geschreven.' + K.uit);
 }
 
 function toon(uit) {

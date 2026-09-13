@@ -95,12 +95,12 @@ const METERS = {
 
   /* ------------------------------------- dragen een dekkingsgetal, niet geijkt */
 
-  'BEREIK.json': {
+  'GELDING.json': {
     grondwaarheid: 'GEEN', claim: 'waarneming', grensveld: 'grens',
     reden: 'dit register doet geen dekkingsclaim en telt met opzet geen percentage: het zegt per cel welke ' +
       'van de drie assen iets zag, en zijn grensveld schrijft uit dat GECLAIMD_GEEN_DRAGER_GEVONDEN niet ' +
       'betekent dat er geen drager is. Wat hier wel geijkt is, is de ONAFHANKELIJKHEID van de assen ' +
-      '(test/bereik.test.js), en dat is een andere vraag dan recall.',
+      '(test/gelding.test.js), en dat is een andere vraag dan recall.',
   },
 
   /* --------------------------------- claim versmald in plaats van geijkt */

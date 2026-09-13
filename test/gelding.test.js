@@ -1,5 +1,5 @@
 /* ============================================================================
-   DE DRIE BEREIKASSEN -- en de ene eigenschap die ze waardevol maakt.
+   DE DRIE GELDINGSASSEN -- en de ene eigenschap die ze waardevol maakt.
 
    CLAIM, DRAAG en WACHT beantwoorden drie verschillende vragen: waar GELDT een
    wet, waar LEEFT hij, en waar kan iemand hem ZIEN. Die drie hebben alleen
@@ -15,7 +15,7 @@
    Beweegt er een tweede as mee zonder oorzaak, dan is er een verborgen gedeelde
    bron -- precies de fout die deze laag moet uitsluiten.
 
-   Draai los: node --test test/bereik.test.js
+   Draai los: node --test test/gelding.test.js
    ========================================================================== */
 'use strict';
 const test = require('node:test');
@@ -24,13 +24,13 @@ const fs = require('fs');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
-const B = require('../scripts/bereik.js');
+const B = require('../scripts/gelding.js');
 /* KAAL, dus zonder commentaar. De eerste versie hiervan zakte op zijn EIGEN
    uitleg: een zin die vertelt dat asWacht niets van asDraag leest, bevat het
    woord asDraag. Dezelfde lezer als elke andere bronkeuring in dit huis
    (LAT.md: commentaar eruit, maar geen code opeten). */
 const { zonderCommentaar } = require('../scripts/lib/bron.js');
-const BRON = zonderCommentaar(fs.readFileSync(path.join(WORTEL, 'scripts/bereik.js'), 'utf8'));
+const BRON = zonderCommentaar(fs.readFileSync(path.join(WORTEL, 'scripts/gelding.js'), 'utf8'));
 
 /* Een kleine vormenverzameling, zodat de ijking niet van de echte code afhangt:
    een wijziging in het product mag deze toets niet laten zakken. */
@@ -114,8 +114,8 @@ test('4. de claim verandert: CLAIM verschuift, DRAAG en WACHT niet', () => {
 
 /* MUTATIE GEZIEN ZAKKEN: de waarschuwing uit `grens` gehaald; zakte hier. */
 test('5. de twee misleesbare uitslagen dragen hun waarschuwing in het register', () => {
-  const pad = path.join(WORTEL, 'BEREIK.json');
-  assert.ok(fs.existsSync(pad), 'BEREIK.json ontbreekt; draai `npm run bereik`. Niet-gemeten mag nooit ' +
+  const pad = path.join(WORTEL, 'GELDING.json');
+  assert.ok(fs.existsSync(pad), 'GELDING.json ontbreekt; draai `npm run gelding`. Niet-gemeten mag nooit ' +
     'als in orde langskomen');
   const j = JSON.parse(fs.readFileSync(pad, 'utf8'));
 

@@ -132,7 +132,7 @@ const REGISTERS = [
   /* De bereikmeting veroudert met de DOCTRINE, met de PRODUCTVORMEN en met de
      WACHTER tegelijk: elk van de drie assen kan verschuiven zonder dat de andere
      twee bewegen, en dan is de vorige vergelijking er een van gisteren. */
-  ['BEREIK.json', 'npm run bereik', 'waar een wet geldt, waar hij leeft en waar een wachter hem kan zien'],
+  ['GELDING.json', 'npm run gelding', 'waar een wet geldt, waar hij leeft en waar een wachter hem kan zien'],
   /* DE EERSTE MINUUT. Hij hoort hier en niet in BUITEN, want hij is geen afdruk
      uit de code maar een METING VAN GEDRAG: een vers lid, de echte registratie,
      een echte browser op 390x844. Verandert de onboarding, het menu of het

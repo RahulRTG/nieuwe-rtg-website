@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T12:25:05.561Z",
-    "commit": "b1600666",
+    "op": "2026-09-13T19:17:14.949Z",
+    "commit": "07362031",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -789,6 +789,14 @@
       "operator": "+->-#2",
       "gezakt": 1,
       "geprobeerd": 17
+    },
+    "bereik.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bereik.js",
+      "operator": "getal+1#0",
+      "gezakt": 1,
+      "geprobeerd": 6
     },
     "bereikbaar.test.js": {
       "soort": "puur",

@@ -338,6 +338,8 @@
     "toelatingsproef:vast": "node scripts/toelatingsproef.js --vastleggen",
     "doelgroepbereik": "node scripts/doelgroepbereik.js",
     "doelgroepbereik:vast": "node scripts/doelgroepbereik.js --vastleggen",
+    "aanvoervorm": "node scripts/aanvoervorm.js",
+    "aanvoervorm:vast": "node scripts/aanvoervorm.js --vastleggen",
     "kantoormacht": "node scripts/kantoormacht.js",
     "kantoormacht:vast": "node scripts/kantoormacht.js --vastleggen",
     "kantoormacht:controle": "node scripts/kantoormacht.js --controle",

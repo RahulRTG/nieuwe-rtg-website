@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T12:00:50.786Z",
-    "commit": "d261541d",
-    "boomVuil": true,
-    "boomAnders": 2,
+    "op": "2026-09-13T12:08:40.504Z",
+    "commit": "4b4601dc",
+    "boomVuil": false,
+    "boomAnders": 0,
     "instrument": "scripts/sabotage.js",
     "node": "v22.22.2"
   },
@@ -365,7 +365,7 @@
       "afdruk": "8cda96c425619326",
       "reden": "2. geen verklaring die verder reikt dan de meting",
       "wachter": "test:test/bewijsveld.test.js",
-      "duurMs": 2442
+      "duurMs": 2340
     }
   }
 }

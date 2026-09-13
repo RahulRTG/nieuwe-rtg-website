@@ -26,7 +26,7 @@ const fs = require('fs');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
-const { METERS, CLAIMSLEUTELS, GEEN_CLAIM } = require('../scripts/lib/ijking.js');
+const { METERS, isDekkingsclaim, GEEN_CLAIM } = require('../scripts/lib/ijking.js');
 
 /* Welke registers in de wortel dragen een dekkingsclaim? Afgeleid uit de
    bestanden zelf en niet uit een lijst -- anders groeit de blinde vlek mee met
@@ -40,8 +40,9 @@ function registersMetClaim() {
     let raak = null;
     (function loop(o, diep) {
       if (raak || !o || typeof o !== 'object' || diep > 3) return;
+      const buren = Object.keys(o);
       for (const [k, v] of Object.entries(o)) {
-        if (CLAIMSLEUTELS.test(k) && (typeof v === 'number' || typeof v === 'string')) { raak = k; return; }
+        if (isDekkingsclaim(k, v, buren)) { raak = k + '=' + v; return; }
         if (v && typeof v === 'object') loop(v, diep + 1);
       }
     })(j, 0);
@@ -51,7 +52,7 @@ function registersMetClaim() {
 }
 
 /* MUTATIE GEZIEN ZAKKEN: DOCTRINE.json uit METERS gehaald; zakte met de naam
-   erbij. En andersom nagetrokken: de ijklijst leeggemaakt -> twaalf namen rood. */
+   erbij. En andersom nagetrokken: de ijklijst leeggemaakt -> acht namen rood. */
 test('1. elk register met een dekkingsclaim verklaart zijn grondwaarheid', () => {
   const claims = registersMetClaim();
   assert.ok(claims.length >= 5, 'de scan vindt bijna geen registers met een dekkingsclaim; dan meet deze ' +
@@ -109,15 +110,28 @@ test('3. een verklaarde grondwaarheid draagt ook een ijkUITSLAG in het register'
   }
 });
 
-/* MUTATIE GEZIEN ZAKKEN: een dertiende ONBEPAALD toegevoegd; zakte op de vloer.
+/* MUTATIE GEZIEN ZAKKEN: een zevende ONBEPAALD toegevoegd; zakte op de vloer.
    De vloer mag alleen OMLAAG: het getal hoort te dalen doordat er geijkt wordt,
    niet doordat er regels verdwijnen. */
 test('4. het aantal ongeijkte meters mag dalen en niet stijgen', () => {
   const onbepaald = Object.entries(METERS).filter(([, m]) => m.grondwaarheid === 'ONBEPAALD');
-  assert.ok(onbepaald.length <= 10,
-    'er staan ' + onbepaald.length + ' meters als ONBEPAALD, en dat waren er 10 op 13 september 2026. ' +
+  assert.ok(onbepaald.length <= 6,
+    'er staan ' + onbepaald.length + ' meters als ONBEPAALD, en dat waren er 6 op 13 september 2026. ' +
     'Een nieuwe meter met een dekkingsclaim hoort geijkt te worden, niet bij de historie gezet: ' +
     onbepaald.map(([n]) => n).join(', '));
+
+  /* "Omlaag" moet betekenen: opgelost naar een expliciete toestand. Een meter
+     die uit dit register verdwijnt of stil op `waarneming` wordt gezet zonder
+     reden, is weggeclassificeerd en niet geijkt. Toets 2 eist de reden; deze
+     eist dat de versmalling naar een grens in het register zelf wijst. */
+  for (const [naam, m] of Object.entries(METERS)) {
+    if (m.claim !== 'waarneming') continue;
+    assert.ok(m.grensveld, naam + ' heeft zijn claim versmald tot een waarneming zonder te zeggen in welk ' +
+      'veld van zijn eigen register die grens staat; dan is de versmalling een bewering hier en niet daar');
+    const j = JSON.parse(fs.readFileSync(path.join(WORTEL, naam), 'utf8'));
+    assert.ok(String(j[m.grensveld] || '').length > 40,
+      naam + ' wijst naar grensveld "' + m.grensveld + '", en daar staat geen uitgeschreven grens');
+  }
 });
 
 /* MUTATIE GEZIEN ZAKKEN: de zin uit LAT.md gehaald; zakte hier. Een wet die van

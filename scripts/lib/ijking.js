@@ -21,6 +21,20 @@
                       'dekking'     mag over recall of volledigheid spreken,
                                     en dat MAG alleen met een grondwaarheid.
 
+   EN ER IS EEN VIERDE UITWEG DIE GEEN GRONDWAARHEID NODIG HEEFT: de claim
+   versmallen. Niet elke ongeijkte meter vraagt om een nieuwe bron; soms is de
+   meting prima en is de NAAM te breed. APPWERKT.json is daarvan het voorbeeld in
+   dit huis en het loste het zelf al op: zijn grensveld zegt *"Een BEWEZEN rij
+   betekent: de ingang opent voor zijn persona en de bediening breekt niet. Het
+   betekent NIET dat de functie werkt."* Dat is een versmalde claim, geen
+   ontbrekende ijking. Zo'n meter hoort hier als `waarneming` met zijn grensveld
+   erbij, en niet als ONBEPAALD.
+
+     ONBEPAALD  ->  GEIJKT                     (er is een bron gevonden)
+     ONBEPAALD  ->  GEEN + reden               (verdedigbaar geen bron mogelijk)
+     ONBEPAALD  ->  claim versmald naar waarneming
+     ONBEPAALD  ->  "we noemen de generator zelf maar grondwaarheid"   NOOIT
+
    WAAROM ONBEPAALD BESTAAT EN NIET STIL WORDT WEGGELATEN. Toen deze regel werd
    geschreven droegen twaalf registers in de wortel een dekkings- of
    recallachtig getal. Twee daarvan zijn hier gebouwd en dus te verantwoorden;
@@ -60,35 +74,78 @@ const METERS = {
 
   /* ------------------------------------- dragen een dekkingsgetal, niet geijkt */
 
-  'APPWERKT.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
-    reden: NOGNIET('bestaat er een lijst functies waarvan met de hand is vastgesteld dat ze werken?') },
-  'EXECUTION_MAP.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
-    reden: NOGNIET('de kaart is een projectie van vier bronnen; welke daarvan geldt als waarheid voor bereik?') },
+  /* --------------------------------- claim versmald in plaats van geijkt */
+
+  /* APPWERKT.json is de vierde uitweg uit de kop, en hij had hem zelf al
+     genomen. Zijn `gevonden` is het aantal bedienbare elementen op EEN scherm --
+     een waarneming, geen dekking -- en zijn grensveld versmalt de claim in
+     woorden die geen ruimte laten. Hij stond hier eerst als ONBEPAALD, en dat
+     was mijn fout en niet die van dat register. */
+  'APPWERKT.json': {
+    grondwaarheid: 'GEEN', claim: 'waarneming', grensveld: 'grens',
+    reden: 'dit register doet geen dekkingsclaim: het meet drie van de acht bewijzen uit BETROUWBAARHEID.md ' +
+      'en zegt in zijn eigen grensveld dat een BEWEZEN rij NIET betekent dat de functie werkt. Een meter die ' +
+      'zijn claim al heeft versmald, heeft geen grondwaarheid nodig om eerlijk te zijn.',
+  },
+
+  /* ------------------------------------- dragen een dekkingsgetal, niet geijkt */
+
   'HERSTEL.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
     reden: NOGNIET('HERSTELPROEF.json beproeft paren echt -- is die uitslag de grondwaarheid voor de afleiding uit namen?') },
-  'ISOLATIEPROEF.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
-    reden: NOGNIET('welke isolatiegevallen zijn met de hand vastgesteld?') },
   'KANTOORMACHT.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
     reden: NOGNIET('de deur-assen komen uit de router en zijn hard; de as `anoniem` is lexicaal -- is de harde as de grondwaarheid voor de zachte?') },
   'NORM.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
     reden: NOGNIET('de ratel draagt getallen van andere meters; zijn dekkingsgetal is geleend en heeft geen eigen ijking') },
+
+  /* Deze is de scherpste van de vier, want hij is ZELFREFERENTIEEL en het script
+     ziet daar maar de helft van. `resolverbereik.js` genereert een proef voor elk
+     pad uit `toegestanePaden` en vraagt of dat pad overleeft: dezelfde bron
+     levert de gevallen EN de definitie van volledig. Het script benoemt de
+     woordhelft daarvan eerlijk ("deels een identiteitstest") en dekt hem af met
+     zeven vervormingen -- maar de INVENTARIS-helft niet: een pad dat in
+     `toegestanePaden` ontbreekt, is voor de proef en voor de waarheid even
+     onzichtbaar, en dan kan 100% blind betekenen. */
   'RESOLVERBEREIK.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
-    reden: NOGNIET('de proeven worden gegenereerd uit de toegestane paden -- is dat een grondwaarheid of dezelfde bron als de meting?') },
-  'TAALOORDEEL.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
-    reden: NOGNIET('het oordeel van een spreker is menselijk bewijs; geldt dat als grondwaarheid voor de automatische keuring?') },
+    reden: 'zelfreferentieel: de proeven worden gegenereerd uit `toegestanePaden` en diezelfde lijst bepaalt ' +
+      'wat volledig is. Een onafhankelijke inventaris van resolverbare paden -- of een klein canoniek corpus ' +
+      'dat bewust buiten de generator staat -- zou de grondwaarheid zijn; die bestaat vandaag niet.' },
+
   'TAALSCHIL.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
     reden: NOGNIET('welke schilteksten zijn met de hand als volledig vastgesteld?') },
   'VINDBAAR.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
     reden: NOGNIET('is er een lijst functies waarvan een mens heeft vastgesteld met welk woord je hem zoekt?') },
 };
 
-/* Sleutels die een DEKKINGSCLAIM verraden: ze spreken over volledigheid en niet
-   over een waarneming. `gevonden` hoort er bewust bij -- "gevonden: 48 van 50"
-   is een recall, en juist die vorm was de aanleiding voor regel 13. */
+/* WANNEER IS EEN GETAL EEN DEKKINGSCLAIM?
+
+   NIET op de sleutelnaam alleen, en dat is gemeten. De eerste versie hiervan
+   keek naar de naam en vond twaalf registers -- waaronder APPWERKT.json, waar
+   `gevonden: 34` het aantal bedienbare elementen op EEN scherm is, en
+   EXECUTION_MAP.json, waar `bereik: "verboden"` een etiket is. Een te brede
+   detector in de handhaver van regel 13 is precies de fout die regel 13 verbiedt.
+
+   Een claimsleutel telt daarom pas als zijn WAARDE zich als verhouding gedraagt:
+     - een breuk tussen 0 en 1        (VINDBAAR: dekking 0,6539)
+     - een sleutel op -Pct            (HERSTEL, KANTOORMACHT, NORM)
+     - een telling met een NOEMER ernaast  (DOCTRINE: gevonden 48, van 50)
+
+   Dat brengt het van twaalf naar acht, en de twee die er bij de eerste
+   versmalling ten onrechte uit vielen (VINDBAAR en TAALSCHIL, allebei een breuk)
+   staan er weer in. */
 const CLAIMSLEUTELS = /^(recall|dekking|dekkingPct|bereik|volledig|compleet|gevonden)$/i;
+const NOEMERSLEUTELS = /^(van|totaal|bekend|alle|mogelijk|verwacht|wettenBekend|noemer|randenWachter)$/i;
+
+/* Is deze sleutel-waarde-combinatie een dekkingsclaim? `buren` zijn de sleutels
+   van hetzelfde object, want daar woont de noemer. */
+function isDekkingsclaim(sleutel, waarde, buren) {
+  if (!CLAIMSLEUTELS.test(sleutel) || typeof waarde !== 'number') return false;
+  if (/Pct$/.test(sleutel)) return true;
+  if (waarde > 0 && waarde < 1) return true;
+  return (buren || []).some(b => NOEMERSLEUTELS.test(b));
+}
 
 /* Registers die een claimsleutel dragen maar er aantoonbaar geen claim mee doen.
    Elke regel is een BESLUIT met een reden; een lege reden laat de toets zakken. */
 const GEEN_CLAIM = {};
 
-module.exports = { METERS, CLAIMSLEUTELS, GEEN_CLAIM };
+module.exports = { METERS, CLAIMSLEUTELS, NOEMERSLEUTELS, isDekkingsclaim, GEEN_CLAIM };

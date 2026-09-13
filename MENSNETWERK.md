@@ -990,6 +990,42 @@ De vorm die dat oplost is openheid en geen zwijgen:
 Dat is bovendien de enige variant die overleeft naast de bestaande regel dat de
 AI nooit zelf toegang belooft of verleent.
 
+### 4e. MN-03 als toets: een vooruitgeschoven post (13 september 2026)
+
+MN-01 en MN-02 waren te beproeven omdat hun onderwerp bestond. MN-03 niet, en dat
+is **gemeten en geen aanname**:
+
+| Aanname waarop MN-03 rust | Stand |
+|---|---|
+| RTG verdient niets aan de omzet van een partner | `PARTNER_COMMISSIE = 0` in `kern/commercie/vergoeding.js` -- een INVARIANT, geen instelling, geen boardroomknop |
+| RTG is zelf geen partij in een keuzepad | 9 hoedanigheden in `kern/vertegenwoordiging/bevoegdheden.js`, allemaal een MENS; "RTG Management" komt in `server/` en `public/` **nul keer** voor |
+
+**MN-03 heeft dus vandaag geen onderwerp, en dat is een eigenschap van het product
+en geen toeval.** Beveelt de AI een partner aan, dan is er geen belang om te
+melden -- niet omdat we het verzwijgen, maar omdat het er niet is. Er is geen RTG
+Management om bovenaan te zetten.
+
+**Daarom bewaakt `test/mn03-commercieelvoordeel.test.js` niet de openbaarmaking
+maar de twee AANNAMES**, en hij zakt op de dag dat een ervan verschuift. Dan
+krijgt MN-03 een onderwerp, en dan hoort er een keuzepad te komen dat het belang
+noemt -- de zin uit MN-03 hierboven, met *"RTG verdient aan die laatste"* erin.
+De foutmelding zegt dat er ook bij: *deze toets hoort dan niet te worden
+aangepast maar VERVANGEN door een proef op het keuzepad.*
+
+**Waarom een tripdraad en geen gebouwde openbaarmaking.** Een keuzepad bouwen met
+een vierde optie die niet bestaat, is het product verzinnen om de regel te kunnen
+toetsen -- en dan toetst de toets zijn eigen fictie. Dezelfde grond als
+AI-CONTEXT-02 in par. 4d, dat ook bewust geen handhaver heeft: er valt niets te
+bewaken, en een schijnbewaker is erger dan een uitgeschreven gat.
+
+Vier bewijzen, vier mutaties, elk door precies zijn eigen zaak gepakt: de
+commissie op 12 (toets 1), `rtg-management` als hoedanigheid (toets 2), de
+hoedanigheden leeggemaakt (toets 3, de TEGENproef -- sloop de laag en er is per
+definitie geen commercieel voordeel), en de weigering teruggebracht tot "Nee."
+(toets 4). Die laatste draagt de tweede helft van MN-03: de regel wordt opgelost
+met **openheid en niet met zwijgen**, dus een weigering die niet uitlegt wat RTG
+dan wél rekent, is alsnog zwijgen.
+
 ### De vier eronder
 
 | # | Regel | Handhaver |
@@ -1123,6 +1159,7 @@ grens die ná het belang komt is geen grens.
 | **2a** | **MN-01 als toets** -- geen bevoegdheidsvoordeel | **staat** (13 sept): zeven bewijzen, vijf mutaties gezien zakken -- par. 4a |
 | **2b** | **MN-02 als toets** -- geen kennis die overdraagt tussen hoedanigheden | **staat** (13 sept): vier bewijzen met een TEGENproef, vier mutaties gezien zakken -- par. 4b |
 | **2c** | **MN-02-AI** -- de contextbouwer van Rahul lekt niet tussen hoedanigheden | **staat** (13 sept): zeven bewijzen met twee TEGENproeven en een besturingsproef, vijf mutaties gezien zakken; de meting eronder is `AICONTEXT.json` -- par. 4c |
+| **2d** | **MN-03 als toets** -- geen commercieel voordeel | **staat als VOORUITGESCHOVEN POST** (13 sept): de regel heeft vandaag geen onderwerp (commissie nul, RTG geen hoedanigheid), dus bewaakt de toets die twee aannames en zakt zodra een ervan verschuift -- vier bewijzen, vier mutaties, par. 4e |
 | **3** | **MN-03 als regel** -- vóór RTG zichzelf ooit als optie presenteert | **een stap weg** |
 | **4** | **Besluit: wordt RTG juridisch en commercieel vertegenwoordiger?** | **een besluit van de eigenaar** |
 | **5** | **Eén intern testtalent, een volledige synthetische loopbaan** | **na 4** -- zie hieronder |

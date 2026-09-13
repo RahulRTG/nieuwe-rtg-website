@@ -380,8 +380,21 @@ van een testtalent en zonder machtiging niets kan), **MN-02 scheiding van
 hoedanigheden** en **MN-03 geen commercieel voordeel** (de AI zegt erbij dat RTG
 aan één van de opties verdient).
 
-**MN-01 en MN-02 zijn sinds 13 september 2026 TOETSEN en geen zinnen** (par. 4a
-en 4b). Ze staan bewust apart, want het zijn twee soorten regels: MN-01 gaat over
+**Alle drie de grondwetsregels zijn sinds 13 september 2026 TOETSEN en geen
+zinnen** (par. 4a, 4b, 4c, 4e) -- en de derde op een andere manier dan de eerste
+twee. **MN-03 heeft vandaag geen ONDERWERP, en dat is gemeten**: de
+partnervergoeding over omzet is een invariant op nul (geen instelling, geen
+boardroomknop) en RTG is zelf geen hoedanigheid (negen rollen, allemaal een mens;
+"RTG Management" komt nul keer voor). Beveelt de AI dus een partner aan, dan is er
+geen belang om te melden -- niet omdat het verzwegen wordt, maar omdat het er niet
+is. `test/mn03-commercieelvoordeel.test.js` bewaakt daarom niet de openbaarmaking
+maar die twee AANNAMES, en zakt zodra een ervan verschuift; de foutmelding zegt
+erbij dat de toets dan niet moet worden aangepast maar VERVANGEN door een proef op
+het keuzepad. **Een keuzepad bouwen met een vierde optie die niet bestaat, is het
+product verzinnen om de regel te kunnen toetsen** -- dezelfde grond waarop
+AI-CONTEXT-02 bewust geen handhaver heeft.
+
+**MN-01 en MN-02** (par. 4a en 4b). Ze staan bewust apart, want het zijn twee soorten regels: MN-01 gaat over
 BEVOEGDHEID en is structureel te meten (de aanvalsproef: de EIGENAAR van RTG
 krijgt op dezelfde machtiging 404 waar de gemachtigde 200 krijgt -- zelfde
 object, zelfde actie, andere actor), MN-02 over KENNIS. Bij die tweede is de

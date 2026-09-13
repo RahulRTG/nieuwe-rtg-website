@@ -58,7 +58,7 @@ test('de keten levert alle stukken op die de geldroutes nodig hebben', async () 
   assert.equal(wereld.terugkerendId, 'TK1');
   assert.equal(wereld.tikcode, 'TIK999');
   assert.equal(wereld.factuurId, 'RTG-2026-0002', 'de OPENSTAANDE factuur, niet de eerste de beste');
-  assert.equal(Object.keys(perRoute).length, 20, 'twintig geldroutes krijgen een eigen lijf');
+  assert.equal(Object.keys(perRoute).length, 23, 'drieentwintig geldroutes krijgen een eigen lijf');
   assert.deepEqual(extra, { iban: 'NL00EEN', aan: 'Gouden Ibis', codenaam: 'Gouden Ibis',
     naarCodenaam: 'Gouden Ibis', code: 'ABC123' });
 });
@@ -145,7 +145,15 @@ test('een wereld die niets oplevert laat de proef meten als vanouds', async () =
   const { extra, perRoute } = await zetWereldKlaar({ post: async () => ({ status: 500, data: {} }),
     tokens: { member: 'lid', office: 'kantoor' } });
   assert.deepEqual(extra, {});
-  assert.deepEqual(Object.keys(perRoute), ['/api/bank/rekening/open']);
+  /* `giftcard/sell` staat er sinds 13 september bij, en om exact dezelfde reden
+     als `rekening/open`: zijn lijf is `{ bedrag: 25 }` -- een vast bedrag binnen
+     de grenzen die de route zelf stelt (10..5000 EURO, geen centen), en het
+     vraagt niets uit de wereld. Deze lijst is dus geen opsomming van
+     uitzonderingen maar de uitkomst van EEN regel: wat niets uit de wereld
+     nodig heeft, blijft staan. Wie hier een route bijzet die WEL iets uit de
+     wereld leest, breekt die regel en niet deze verwachting. */
+  assert.deepEqual(Object.keys(perRoute).sort(),
+    ['/api/bank/rekening/open', '/api/supplier/giftcard/sell']);
 });
 
 test('de halve-lijf-regel kijkt ook IN lijsten en posten', () => {

@@ -13,7 +13,7 @@
       "status": 200,
       "ziet": "aanwezigheid \"Sal Nocturna\" (drager: zaak), zendt uit: muziek, video's, korte video, live, optredens, kaartverkoop, wedstrijden, uitgelicht werk",
       "fout": null,
-      "ms": 17
+      "ms": 23
     },
     {
       "nr": 2,
@@ -25,7 +25,7 @@
       "status": 200,
       "ziet": "zoeken op de naam geeft 1 treffer(s); de aanwezigheid van het festival staat erbij met volgIk=false en zendt uit: muziek, video's, korte video, live, optredens, kaartverkoop, wedstrijden, uitgelicht werk",
       "fout": null,
-      "ms": 10
+      "ms": 13
     },
     {
       "nr": 3,
@@ -37,7 +37,7 @@
       "status": 200,
       "ziet": "volgt er 1, en kreeg vooraf te lezen: muziek, video's, korte video, live, optredens, kaartverkoop, wedstrijden, uitgelicht werk",
       "fout": null,
-      "ms": 13
+      "ms": 20
     },
     {
       "nr": 4,
@@ -49,7 +49,7 @@
       "status": 200,
       "ziet": "\"Sal Nocturna: kaartverkoop open -- \"Weekendpas voor Proeffestival\".\" (0 -> 1 meldingen)",
       "fout": null,
-      "ms": 44
+      "ms": 20
     },
     {
       "nr": 5,
@@ -61,7 +61,7 @@
       "status": 200,
       "ziet": "de melding draagt geen bestemming (velden buiten de vaste zes: geen), en de tijdlijn van wat hij volgt geeft 2 moment(en) -- de kaartverkoop staat erbij als \"Sal Nocturna: kaartverkoop open\"",
       "fout": null,
-      "ms": 18
+      "ms": 12
     },
     {
       "nr": 6,
@@ -73,7 +73,7 @@
       "status": 200,
       "ziet": "twee posts, 0 lopende uitlichtingen, en de maker draagt 0 aanwezigheden",
       "fout": null,
-      "ms": 21
+      "ms": 25
     },
     {
       "nr": 7,
@@ -85,7 +85,7 @@
       "status": 200,
       "ziet": "moment op lid:lifestyle -- drager: lid, naam: Gouden Ibis",
       "fout": null,
-      "ms": 18
+      "ms": 22
     },
     {
       "nr": 8,
@@ -97,7 +97,7 @@
       "status": 200,
       "ziet": "\"Gouden Ibis: uitgelicht werk -- \"En de tweede middag was stiller.\".\"",
       "fout": null,
-      "ms": 24
+      "ms": 28
     },
     {
       "nr": 9,
@@ -109,7 +109,7 @@
       "status": 200,
       "ziet": "1 melding(en) over kaartverkoop, en het Dagticket zit er niet bij",
       "fout": null,
-      "ms": 20
+      "ms": 30
     },
     {
       "nr": 10,
@@ -121,7 +121,7 @@
       "status": 200,
       "ziet": "de supporter vond \"FC RTG\" via de zoeker, en na de wedstrijd 0 -> 1 meldingen (1 over een wedstrijd); zijn tijdlijn draagt 2 wedstrijdmoment(en) van de club",
       "fout": null,
-      "ms": 26
+      "ms": 24
     }
   ],
   "storingen": [
@@ -227,7 +227,7 @@
       "id": "D",
       "bewering": "de Stage-laag schrijft en leest alleen in haar eigen twee collecties",
       "stand": "gehouden",
-      "gemeten": "alleen mediaAanwezig en mediaVolgt en mediaMomenten, in 2 bestanden"
+      "gemeten": "alleen mediaAanwezig en mediaVolgt en mediaMomenten, in 4 bestanden"
     }
   ],
   "wereld": {

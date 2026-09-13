@@ -811,7 +811,12 @@ async function architectuur(basis, uit, s) {
        aantal eigen. Wat hij blijft vangen is Stage die in festival, salon of
        sportclub schrijft, en dat is precies waar hij voor bestaat. */
     const EIGEN = ['mediaAanwezig', 'mediaVolgt', 'mediaMomenten'];
-    const BESTANDEN = ['server/kern/mediaos/aanwezigheid.js', 'server/kern/mediaos/wekken.js'];
+    /* VIER BESTANDEN SINDS DE SPLITSING, en die lijst hoort mee te groeien: een
+       nieuw bestand in deze laag dat niet hier staat, is een bestand dat deze
+       bewering niet leest. ./tijdlijn.js bezit `mediaMomenten`, ./zoeken.js
+       raakt db.data met opzet niet aan. */
+    const BESTANDEN = ['server/kern/mediaos/aanwezigheid.js', 'server/kern/mediaos/wekken.js',
+      'server/kern/mediaos/tijdlijn.js', 'server/kern/mediaos/zoeken.js'];
     const vreemd = [];
     for (const rel of BESTANDEN) {
       const bron = fs.readFileSync(path.join(WORTEL, rel), 'utf8');

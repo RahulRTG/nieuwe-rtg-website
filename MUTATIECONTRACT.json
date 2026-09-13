@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-09-13T06:02:09.828Z",
-  "commit": "93affa8f",
-  "boomVuil": true,
+  "op": "2026-09-13T06:07:55.000Z",
+  "commit": "27001f01",
+  "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
@@ -10,19 +10,19 @@
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4925,
-  "geclassificeerd": 4878,
+  "totaal": 4923,
+  "geclassificeerd": 4876,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3186,
    "NOT_APPLICABLE": 1150,
-   "PROTECTED": 417,
+   "PROTECTED": 415,
    "INTENTIONALLY_NON_IDEMPOTENT": 125,
    "LEGACY_PENDING_CLASSIFICATION": 47
   },
-  "vastgesteldDoorMens": 1736,
+  "vastgesteldDoorMens": 1734,
   "afgeleidDoorScript": 3142,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4064,
+   "AUTHENTICATED": 4062,
    "PUBLIC": 123,
    "OBJECT_SCOPED": 718,
    "(niet af te leiden -- vraagt een verklaring)": 4,
@@ -33,7 +33,7 @@
    "kale ronde: beschermd": 132,
    "kale ronde: onbeschermd": 97,
    "kale ronde: geen uitspraak": 4683,
-   "niet gemeten": 13
+   "niet gemeten": 11
   },
   "voorstellen": {
    "NOT_APPLICABLE": 37,
@@ -95348,27 +95348,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "stuur.voorstel.intrek.personeel",
-   "route": "POST /api/staff/voorstel/intrek",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "supplierAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "state",
    "route": "POST /api/state",
    "semantiek": {
@@ -120622,27 +120601,6 @@
     "hindernis": null
    },
    "stand": "NOT_APPLICABLE",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "stuur.voorstel.intrek.zaak",
-   "route": "POST /api/supplier/voorstel/intrek",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "supplierAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

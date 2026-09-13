@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5044 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5042 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,7 +18,7 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5044 |
+| API-endpoints | 5042 |
 | servermodules (`server/**/*.js`) | 3418 |
 | routebestanden (`server/routes/**`) | 589 |
 | kernmodules (`server/kern/**`) | 2133 |
@@ -127,7 +127,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3419 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3417 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 

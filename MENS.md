@@ -433,7 +433,7 @@ geen ontwerp, en het staat hierboven met een getal in plaats van een aanname.
 
 ---
 
-## 3d. De keten zonder model, en de twaalf mutaties die hem bewijzen
+## 3d. De keten zonder model, en de <!--getal:mensmutatie.totaal-->16<!--/getal--> mutaties die hem bewijzen
 
 De opdracht van de eigenaar in een zin: *de Human Execution-keten moet volledig
 bewijsbaar kunnen draaien zonder OpenAI, Anthropic of enig ander extern model —
@@ -481,7 +481,7 @@ zijn niet herschreven; twee ervan bleken er twee te zijn.
 | 10a | het contract staat een wereldkeuze toe | menstaal |
 | 10b | het antwoord laat de mens werkelijk kiezen | **geen** |
 
-<!--getal:mensmutatie.gezakt-->15<!--/getal--> van de twaalf laten een wacht
+<!--getal:mensmutatie.gezakt-->15<!--/getal--> van de <!--getal:mensmutatie.totaal-->16<!--/getal--> laten een wacht
 zakken, met de melding erbij in `MENSMUTATIE.json` — niet met een vinkje, want
 een wacht die om de verkeerde reden zakt bewijst niets. Er blijft
 <!--getal:mensmutatie.zonderWacht-->1<!--/getal--> over, en dat getal is een tand
@@ -663,25 +663,101 @@ inhoud die in het gesprek belandt (een toolantwoord, een mail, een bericht van
 iemand anders) de bevestiging schrijven in plaats van de mens.
 
 Dat is nu gemeten, **aan twee kanten**, en die twee samen zijn het punt. De
-*poort*: elk pad rond een staand voorstel is voor deze rail `verboden` —
-`/api/stuur/goedkeuring`, `/api/stuur/bevestig`, `/api/goedkeuring/intrek` en
-`/api/stuur/voorstellen`. De *taal*: de zin probeert het niet eens — geen enkele
-tool, dus geen enkele poort die nee hoefde te zeggen. Zou de rail het wél proberen
-en de poort het weigeren, dan was de uitkomst even veilig maar de bewering een
-andere, en dat verschil hoort zichtbaar te zijn.
+*taal*: de zin probeert het niet eens — geen enkele tool, dus geen enkele poort
+die nee hoefde te zeggen. De *poort*: de route die het wél zou kunnen afmaken,
+`/api/member/doe/bevestig`, is voor het stuur onbereikbaar — niet door de
+allowlist maar door de verbodsregel in `kern/stuur/classificatie.js`, die de hele
+tak `/api/(member|supplier|staff)/doe` weert tegen rondzingen.
 
-Beide kanten zijn met een mutatie zien bijten: het bevestigingspad opendoen laat
-de poortkant zakken, en de corpusregel het toch laten proberen de taalkant.
+**En hier stond tot 13 september een meting die niets mat.** De poortkant toetste
+dat `/api/stuur/goedkeuring`, `/api/stuur/bevestig`, `/api/goedkeuring/intrek` en
+`/api/stuur/voorstellen` alle vier `verboden` waren. **Geen van die vier bestaat
+als route** (`ROUTEBRON.json`), en `beleidVoor()` geeft `verboden` voor elke
+onbekende tekenreeks — de assertie was dus net zo waar voor `/api/bananen`. Vier
+groene vinkjes over spoken, terwijl de echte deur nergens werd genoemd. Dat is
+dezelfde faalvorm als het lege `graad`-veld van par. 3e: niet een fout antwoord,
+maar een bewering die er is zonder ergens aan te hangen.
 
-**En het zusje van dit geval blijft met opzet ongemeten.** Het contract wil bij
-"toch niet" een `intrekken`, en er is voor deze rail geen pad om een klaargezet
-voorstel in te trekken — die staan alle drie op `verboden`. Dat is geen gat in de
-bedrading maar een **productvraag**: mag een lid een staand voorstel via Rahul
-intrekken, of alleen op de knop waar hij het ook bevestigt? Zolang dat niet
-besloten is, blijft het geval een vooruitlopend contract. Er een corpusregel voor
-schrijven die iets ánders doet dan intrekken, zou de belofte stil veranderen.
+Beide kanten zijn met een mutatie zien bijten: de verbodsregex stukmaken laat de
+poortkant zakken (mutatie 14), en de corpusregel het toch laten proberen de
+taalkant.
 
-### 3h. De tweede rail: het apparaat staat, het oordeel niet
+### 3h. "Toch niet" — en waarom dat wél mag
+
+Het zusje van 3g is geen verbod maar een **besluit van de eigenaar** (13 september
+2026): wie iets kan laten klaarzetten, moet het conversationeel ook weer kunnen
+terugtrekken. "Toch niet", "laat maar", "annuleer dat voorstel".
+
+Dat lijkt inconsequent naast 3g en is het niet. **Bevestigen GEEFT een handeling
+vrij, intrekken kan er alleen een WEGNEMEN.** De ernstigste afloop van een
+verkeerde intrekking is dat een lid opnieuw moet vragen; de ernstigste afloop van
+een verkeerde bevestiging is dat er geld weg is. Een route die uitsluitend
+vermogen inlevert, kan door misbruik niets laten gebeuren.
+
+**De eis is een vorm geworden en geen regel.** De eigenaar stelde hem scherp: het
+mag alleen bij *precies één eenduidig, nog geldig* voorstel, anders verduidelijken.
+`trekEnige(req, wereld)` in `kern/stuur/goedkeuring.js` heeft daarom **geen
+id-ingang**. Bij twee openstaande voorstellen ís er niets om aan te wijzen: de
+interpretatielaag kan niet gehoorzamen en niet ongehoorzaam zijn. Een regel die een
+aanroeper kan overslaan is vervangen door een handtekening die hij niet kan
+overslaan — en die handtekening wordt op de bron getoetst.
+
+**De twee soorten dubbelzinnigheid, en dat is wat dit geval toevoegt aan 3f.** Bij
+"annuleer hem" staat de dubbelzinnigheid *op het scherm*: twee afspraken zichtbaar,
+dus de TAAL kan zien dat er niets eenduidigs is en vraagt. Bij "laat maar" staat zij
+in de *toestand van de server*: hoeveel voorstellen er openstaan is aan de zin niet
+te zien en mag er niet uit worden geraden. Daarom vraagt hier de **poort** en niet de
+taal. De rail probeert het in beide gevallen even hard — zou hij bij twee zelf al
+gaan vragen, dan zat de voorzichtigheid in het corpus in plaats van in de machine,
+en dan bewijst een groene proef niets over RTG.
+
+Gemeten, niet beweerd:
+
+| | |
+|---|---|
+| één openstaand voorstel | tot `uitvoeren`, **status 200**, nul vragen — het voorstel vervalt |
+| twee openstaande voorstellen | dezelfde trede, **status 409**, niets uitgevoerd, precies één vraag |
+
+**De trede is `uitvoeren` en dat is geen versoepeling maar een meting.**
+`/api/member/voorstel/intrek` staat op `klein`, en `klein` beeldt af op `uitvoeren`
+(`GEZAGSNOEMER`). De trede zegt hoe zelfstandig de machine handelt, niet hoe erg
+het is als hij ernaast zit — en die twee lopen hier uit elkaar. Het oude `tonen` in
+het contract was een aanname uit de tijd dat het besluit nog niet genomen was.
+
+**En mijn eerste versie botste met de scherpste regel van de laag.** Toets 6 van
+`test/menstaal.test.js` zegt: *een geval dat zichzelf ambigu noemt en toch een
+effect toestaat, is een gat in het contract zelf.* Mijn nieuwe geval heette
+`ambigu: true` met `sideEffectMax: uitvoeren`. De regel is niet verzacht; het
+**label was fout**. Het veld `ambigu` gaat over wat de interpretatielaag kan zien,
+en die ziet hier niets dubbelzinnigs. Het scherm van dat geval toont de twee
+voorstellen daarom ook met opzet niet — zou het dat wel doen, dan hoorde de taal te
+vragen.
+
+Drie vondsten die het bouwen opleverde en die je nergens anders moet herhalen.
+
+**De zin kwam nooit aan.** `kern/fluister/bevestig.js` claimt "toch niet", "laat
+maar" en "nee" al jaren, en werkt op `p.wacht` — de *eigen* voorstellenlijst van die
+laag. Er zijn dus **twee soorten klaargezet voorstel**, en bij een 428-goedkeuring
+van het stuur antwoordde die laag *"Er stond niets open; alles blijft zoals het
+was."* Dat is geen onhandige zin maar een **onware**, en geen enkele toets zag hem.
+Opgelost zonder een tweede intrekweg: had die laag niets van zichzelf, dan markeert
+zij de beurt en laat de route het stuur kijken. Vindt het stuur niets, dan blijft
+het oude antwoord staan — een zin die vandaag niets doet, doet pas iets zodra er
+echt een voorstel openstaat.
+
+**De domeingrens hield hem tegen**, precies zoals bij de ritbrug: `stuurIntrek` gaf
+500 tot hij in `GRENZEN.json` stond. En de `EXECUTED`-reparatie van par. 3e
+verdiende zich meteen terug — die 500 las als `NOT_RUN`. Onder de oude code was dit
+als een *geslaagde* intrekking in het register beland.
+
+**En de wacht eromheen hield eerst niets tegen.** `intrekveiligheid` rekende alles
+netjes uit, schreef het in het register en drukte het af — en stond niet in de
+foutcode van `--controle`. De mutatiebatterij vond het: 11, 12 en 13 verbouwden de
+poort met opzet en kwamen alle drie **groen** terug. De zeven blokken staan nu in
+één object waar de foutcode uit volgt, zodat het achtste niet opnieuw stil vergeten
+kan worden.
+
+### 3i. De tweede rail: het apparaat staat, het oordeel niet
 
 De laatste stap is dezelfde 41 gevallen tegen een lokaal model en tegen de
 externe rails, tegen exact hetzelfde contract. Dat apparaat staat nu, en de

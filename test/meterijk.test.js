@@ -196,6 +196,16 @@ function journaalMetGat(weglaten) {
 /* De registratie. Elke meter uit scripts/norm.js staat hier, met OF een
    proef die hem laat uitslaan, OF een reden waarom dat in een toets niet
    kan. scripts/check.js regel 35 bewaakt dat die lijst compleet blijft. */
+/* Rijen voor de crashproef-ijkingen: `aantal` rijen met elk een UNIEK pad,
+   want die vier tanden tellen verschillende ROUTES en geen rijen. */
+function ijkRijen(stand, aantal) {
+  const uit = [];
+  for (let i = 0; i < aantal; i++)
+    uit.push({ methode: 'POST', pad: '/api/ijk/' + stand.toLowerCase() + '/' + i,
+      rol: 'member', grens: 'voor-eerste-mutatie', stand, collecties: [] });
+  return uit;
+}
+
 const IJKINGEN = {
   bewijsCellenBewezen: {
     /* De 100%-tand op het bewijs zelf. De teller krijgt een nep-register
@@ -1636,24 +1646,37 @@ const IJKINGEN = {
       (j) => { j.telling.FAILED = (j.telling.FAILED || 0) + 6; return j; },
       () => norm.meet().crashproefGezakt - voor.crashproefGezakt)
   },
+  /* DEZE VIER IJKEN OP `per` EN NIET OP `telling`, en dat verschil is met een
+     RODE IJKING geleerd. De tanden telden RIJEN en lazen daarvoor
+     `j.telling.BLOCKED_*`; sinds ze ROUTES tellen leiden ze hun getal af uit
+     `j.per` -- het aantal verschillende paden in een stand. De ijkingen bleven
+     `telling` ophogen en bewogen daarna NIETS: vier meters die prima werkten
+     maar niet meer beproefd werden. Dat is precies wat deze toets moet vangen,
+     en hij ving het -- een dag nadat ik de eenheid omzette en de ijking vergat.
+
+     Elke ijking zet RIJEN bij met een EIGEN, uniek pad: twee rijen met hetzelfde
+     pad tellen als EEN route, dus wie hier een pad herhaalt ijkt op nul en
+     concludeert ten onrechte dat de meter stuk is. De ongelijke aantallen
+     (9/7/5/4) blijven, om dezelfde reden als hiervoor: vier tanden uit hetzelfde
+     register mogen niet op een gedeeld getal kunnen slagen. */
   crashproefGeenLijf: {
     proef: (voor) => metVervangenJson('CRASHPROEF.json',
-      (j) => { j.telling.BLOCKED_BODY = (j.telling.BLOCKED_BODY || 0) + 9; return j; },
+      (j) => { j.per = j.per.concat(ijkRijen('BLOCKED_BODY', 9)); return j; },
       () => norm.meet().crashproefGeenLijf - voor.crashproefGeenLijf)
   },
   crashproefGeenWereld: {
     proef: (voor) => metVervangenJson('CRASHPROEF.json',
-      (j) => { j.telling.BLOCKED_WORLD = (j.telling.BLOCKED_WORLD || 0) + 7; return j; },
+      (j) => { j.per = j.per.concat(ijkRijen('BLOCKED_WORLD', 7)); return j; },
       () => norm.meet().crashproefGeenWereld - voor.crashproefGeenWereld)
   },
   crashproefGeenRol: {
     proef: (voor) => metVervangenJson('CRASHPROEF.json',
-      (j) => { j.telling.BLOCKED_ROLE = (j.telling.BLOCKED_ROLE || 0) + 5; return j; },
+      (j) => { j.per = j.per.concat(ijkRijen('BLOCKED_ROLE', 5)); return j; },
       () => norm.meet().crashproefGeenRol - voor.crashproefGeenRol)
   },
   crashproefOnbepaald: {
     proef: (voor) => metVervangenJson('CRASHPROEF.json',
-      (j) => { j.telling.BLOCKED_ONBEPAALD = (j.telling.BLOCKED_ONBEPAALD || 0) + 4; return j; },
+      (j) => { j.per = j.per.concat(ijkRijen('BLOCKED_ONBEPAALD', 4)); return j; },
       () => norm.meet().crashproefOnbepaald - voor.crashproefOnbepaald)
   },
   /* DE TAND VAN 12 SEPTEMBER 2026: eersteMinuutGezakt telt de toetsen van de

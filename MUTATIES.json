@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:34:12.852Z",
-    "commit": "5b765b02",
+    "op": "2026-09-13T12:07:18.751Z",
+    "commit": "1539be46",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -1036,6 +1036,11 @@
       "operator": "&&->||#0",
       "gezakt": 11,
       "geprobeerd": 4
+    },
+    "bewijsveld.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "een census over de registers tegen een verklaring van louter literalen; geen bronoperator raakt dat. De gevoeligheid is machinaal bewezen door de sabotagemotor: techniek-bewijsveld-een-relatie staat op RAAK"
     },
     "bezitsbewijs.test.js": {
       "soort": "puur",

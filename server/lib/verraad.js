@@ -50,6 +50,33 @@ const CATALOGUS = [
     wat: 'de schijf meldt ruimte, de schrijfactie mislukt alsnog',
     waar: 'server/db/index.js save()',
     raakt: 'FAILURE -- een aanroeper die dit stil wegvangt, meldt succes over niets' },
+  /* DRIE DODEN OP DRIE MOMENTEN, en ze horen bij elkaar te staan omdat ze
+     samen de interne crashgrenzen van scripts/lib/crashtaxonomie.js afdekken.
+     Eerst was er alleen de derde; CRASHAS.json mat daardoor 90 van de 135
+     bestaande grenzen als NIET TE BEPROEVEN -- geen onwetendheid maar
+     ontbrekend gereedschap.
+
+     Het verschil tussen de drie is het hele punt. Wie ze samenvoegt tot "een
+     crash", meet drie keer hetzelfde moment en noemt dat dekking. */
+  { naam: 'sterf-voor-mutatie',
+    wat: 'het proces sterft VOORDAT er iets is gemuteerd',
+    waar: 'server/db/bijeen.js bijeen(), voor fn()',
+    raakt: 'ATOMIC -- er hoort geen spoor te zijn, en een retry hoort schoon te beginnen' },
+  /* EN DE DERDE IS ER NIET, met een gemeten reden in plaats van een voornemen.
+     Een dood MIDDENIN de schrijfactie vraagt een opslag met een waarneembaar
+     middelpunt. db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`: de save
+     is EEN transactie die heel commit of heel terugrolt. Een injectiepunt
+     ertussen bestaat dus niet -- geprobeerd tussen de schrijfopdracht en de
+     checkpoint, en scripts/crashgrenzen.js liet zien dat de betaling daarna
+     gewoon vaststond: een tweede sterf-na-commit met een andere naam.
+
+     Daarom `waar: null` en geen regel code. Op een opslag die WEL kan scheuren
+     (de json-stand schrijft een tijdelijk bestand en hernoemt het) hoort hij
+     alsnog, en dan tussen die twee. */
+  { naam: 'sterf-in-de-opslag',
+    wat: 'het proces sterft MIDDENIN de onderliggende schrijfactie',
+    waar: null,
+    raakt: 'ATOMIC -- niet te bouwen op een transactionele opslag: er is geen middelpunt' },
   { naam: 'sterf-na-commit',
     wat: 'het proces sterft NA de duurzame schrijfactie en VOOR het antwoord',
     waar: 'server/db/index.js saveDuurzaam()',

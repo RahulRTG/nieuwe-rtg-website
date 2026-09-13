@@ -66,12 +66,18 @@ const vastleggen = process.argv.includes('--vastleggen');
    oude cache) en hoort niets van deze as te weten.
    --------------------------------------------------------------------------- */
 const INJECTIE = {
-  'voor-eerste-mutatie': { verraad: null,
-    waarom: 'er is geen verraad dat het proces doodt VOORDAT de eerste mutatie is geschreven; ' +
-      'sterf-na-commit slaat per definitie te laat toe' },
+  'voor-eerste-mutatie': { verraad: 'sterf-voor-mutatie',
+    waarom: 'ingebouwd in server/db/bijeen.js, voor fn() van de buitenste bundel: op dat punt ' +
+      'staat vast dat er nog niets is gemuteerd' },
+  /* GEMETEN EN NIET AANGENOMEN. scripts/crashgrenzen.js liep dit geldpad met
+     een dood tussen de schrijfopdracht en de checkpoint, en kreeg exact de
+     uitkomst van sterf-na-commit terug: de betaling stond vast. De oorzaak
+     staat in db/sqlite.js -- `BEGIN IMMEDIATE ... COMMIT` maakt de save EEN
+     transactie. Er is geen middelpunt om in te sterven, dus deze grens BESTAAT
+     hier niet; zie het `nee` dat classificeer() eraan geeft. */
   'in-de-opslag': { verraad: null,
-    waarom: 'schrijf-faalt en schrijf-verloren bootsen een MISLUKTE schrijfactie na, niet een ' +
-      'proces dat midden IN de schrijfactie sterft -- dat is een ander moment' },
+    waarom: 'de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is ' +
+      'geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven' },
   /* De plek staat hier BEWUST zonder de functienaam erin. Keuringsregel 47
      bewaakt wie aan de duurzame commit komt, strippt commentaar maar houdt
      STRINGS -- en dit veld is een string. De naam hier voluit schrijven zet dit
@@ -131,10 +137,14 @@ function classificeer(rij) {
   const w = schrijftDezeRoute(rij);
   const uit = {};
 
-  /* De drie INTERNE grenzen die aan een schrijfactie hangen. Ze vallen samen in
-     hun voorwaarde -- is er iets te muteren -- en niet in hun moment. Dat is de
-     hele reden dat het er drie zijn en geen een. */
-  for (const g of ['voor-eerste-mutatie', 'in-de-opslag', 'na-commit-voor-antwoord']) {
+  /* De INTERNE grenzen die aan een schrijfactie hangen. Ze vallen samen in hun
+     voorwaarde -- is er iets te muteren -- en niet in hun moment. Dat is de hele
+     reden dat het er meer dan een zijn.
+
+     `in-de-opslag` staat hier NIET meer bij, en dat is een meetuitslag en geen
+     vereenvoudiging: de opslag is transactioneel, dus dat moment bestaat niet.
+     Hij krijgt hieronder een eigen `nee` met de grond erbij. */
+  for (const g of ['voor-eerste-mutatie', 'na-commit-voor-antwoord']) {
     uit[g] = w.schrijft === true
       ? { bestaat: VERDICT.JA, graad: w.graad, grond: w.grond }
       : w.schrijft === false
@@ -142,14 +152,24 @@ function classificeer(rij) {
         : { bestaat: VERDICT.ONBEKEND, graad: 'onbekend', grond: w.grond };
   }
 
-  /* `in-de-opslag` verdient een eigen aantekening zodra er MEER dan een
-     collectie bij betrokken is: dan is een half geschreven uitkomst niet alleen
-     denkbaar maar samengesteld uit meerdere bakken, en is de vraag of de bundel
-     ze samen duurzaam maakt. Bij een enkele bak gaat het alleen over de
-     atomiciteit van de opslag zelf. */
-  if (uit['in-de-opslag'].bestaat === VERDICT.JA) {
-    uit['in-de-opslag'].vorm = w.n > 1 ? 'samengesteld (' + w.n + ' collecties)' : 'enkelvoudig (1 collectie)';
-  }
+  /* `in-de-opslag` BESTAAT HIER NIET, en dat is gemeten. De vraag was of een
+     half geschreven uitkomst mogelijk is -- bij meer dan een collectie klinkt
+     dat waarschijnlijk. Het antwoord is nee, en niet omdat het onwaarschijnlijk
+     is maar omdat db/sqlite.js alle collecties in EEN transactie wegschrijft:
+     hij commit heel of rolt heel terug. scripts/crashgrenzen.js heeft dat
+     nagemeten door er een dood in te injecteren en exact de uitkomst van
+     sterf-na-commit terug te krijgen.
+
+     Het aantal collecties staat er wel bij: op een opslag die WEL kan scheuren
+     is dat het getal dat het risico bepaalt, en dan is dit `nee` niet langer
+     waar. */
+  uit['in-de-opslag'] = { bestaat: VERDICT.NEE, graad: 'gemeten',
+    grond: 'de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, ' +
+      'dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood ' +
+      'tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.',
+    collecties: w.n,
+    wordtRelevantAls: 'de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en ' +
+      'hernoemt het, en daartussen bestaat het moment wel' };
 
   /* De berichtgrens. */
   const bericht = (rij.collecties || []).filter(c => BERICHTBAKKEN.has(c));

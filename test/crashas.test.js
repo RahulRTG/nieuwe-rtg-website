@@ -43,21 +43,51 @@ test('`bestaat` is een gesloten woord: ja, nee of onbekend', () => {
    is iets anders dan "er gebeurt niets". */
 test('een ONGEMETEN route is onbekend en nooit `nee`', () => {
   const k = ca.classificeer(rij({ collecties: [], idempotentie: 'ongemeten' }));
-  for (const g of ['voor-eerste-mutatie', 'in-de-opslag', 'na-commit-voor-antwoord']) {
+  for (const g of ['voor-eerste-mutatie', 'na-commit-voor-antwoord']) {
     assert.equal(k[g].bestaat, 'onbekend', g + ' hoort onbekend te zijn');
     assert.equal(k[g].graad, 'onbekend', 'en de graad hoort dat te weerspiegelen');
     assert.ok(k[g].grond && k[g].grond.length > 20, 'met een uitgeschreven reden');
   }
 });
 
-test('een route die aantoonbaar schrijft, draagt de drie schrijfgrenzen als gemeten', () => {
+test('een route die aantoonbaar schrijft, draagt de schrijfgrenzen als gemeten', () => {
   const k = ca.classificeer(rij({ collecties: ['paySaldi', 'payBoekingen'] }));
-  for (const g of ['voor-eerste-mutatie', 'in-de-opslag', 'na-commit-voor-antwoord']) {
+  for (const g of ['voor-eerste-mutatie', 'na-commit-voor-antwoord']) {
     assert.equal(k[g].bestaat, 'ja');
     assert.equal(k[g].graad, 'gemeten', 'de collecties zijn GEMETEN, niet geraden');
   }
-  assert.match(k['in-de-opslag'].vorm, /samengesteld/,
-    'twee collecties maken van een half geschreven uitkomst een samengesteld risico');
+});
+
+/* DE GRENS DIE NIET BESTAAT, EN WAAROM DAT EEN TOETS VERDIENT.
+
+   `in-de-opslag` stond eerst op `ja` voor elke schrijvende route -- een half
+   geschreven uitkomst klinkt immers waarschijnlijk zodra er twee collecties bij
+   betrokken zijn. scripts/crashgrenzen.js mat het na en vond het tegendeel: de
+   opslag schrijft met BEGIN IMMEDIATE ... COMMIT, dus hij commit heel of rolt
+   heel terug. Een injectie tussen de schrijfopdracht en de checkpoint gaf exact
+   de uitkomst van sterf-na-commit.
+
+   Deze toets houdt twee dingen vast die makkelijk terugglijden: het is een
+   `nee` met een GEMETEN grond (geen aanname), en het zegt WAT hem weer relevant
+   maakt -- op een opslag die wel kan scheuren bestaat dit moment wel. */
+test('`in-de-opslag` bestaat NIET op een transactionele opslag, met de grond erbij', () => {
+  const k = ca.classificeer(rij({ collecties: ['paySaldi', 'payBoekingen'] }));
+  assert.equal(k['in-de-opslag'].bestaat, 'nee');
+  assert.equal(k['in-de-opslag'].graad, 'gemeten', 'dit is nagemeten en niet geredeneerd');
+  assert.match(k['in-de-opslag'].grond, /transactioneel|COMMIT/,
+    'de grond noemt waarom er geen middelpunt is');
+  assert.ok(k['in-de-opslag'].wordtRelevantAls, 'een `nee` dat kan omslaan zegt wat hem omslaat');
+  assert.equal(k['in-de-opslag'].collecties, 2,
+    'het aantal collecties blijft staan: op een opslag die WEL kan scheuren bepaalt dat het risico');
+});
+
+/* EN DE HEFBOOM ZELF: `voor-eerste-mutatie` is sinds 13 september te beproeven.
+   Zonder deze toets kan dat stil terugvallen naar onmeetbaar en merkt niemand
+   dat de crash-as weer een grens armer is. */
+test('`voor-eerste-mutatie` heeft een injectiepunt en is dus meetbaar', () => {
+  assert.equal(ca.INJECTIE['voor-eerste-mutatie'].verraad, 'sterf-voor-mutatie');
+  const u = ca.meet();
+  for (const r of u.per) assert.equal(r.grenzen['voor-eerste-mutatie'].meetbaar, 'sterf-voor-mutatie');
 });
 
 /* EEN `nee` DIE KAN OMSLAAN, MOET ZEGGEN WAT HEM OMSLAAT. De twee externe

@@ -214,7 +214,9 @@ const REGISTER = {
      naar 2818 meldde), dus deze regel is geen bewering -- zie de kop over de
      helft die mensenwerk blijft. */
   'MACHINEDEKKING.json': { eigenRatel: 'test/machinedekking.test.js' },
-  'EFFECTDEKKING.json': { eigenRatel: 'test/effectcontract.test.js' },
+  /* Drie tanden in NORM.json, geen eigenRatel: de gevraagde meter is "onbekende
+     gevolgpaden mag alleen dalen", en dat is precies wat een ratel doet. */
+  'GEVOLGDEKKING.json': { meter: ['gevolgPadenOnbekend', 'gevolgContractVolledig', 'gevolgContractenGezakt'] },
   /* MENSELIJKE_UITVOERING.json is net als EXECUTION_MAP.json een PROJECTIE
      zonder tijdstempel: hij draagt vingerafdrukken van zijn bronnen in plaats
      van een klok, en test/menselijkeuitvoering.test.js hercompileert hem byte

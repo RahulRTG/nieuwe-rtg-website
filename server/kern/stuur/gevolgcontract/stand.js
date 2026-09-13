@@ -1,4 +1,4 @@
-/* DE STAND PER CAPABILITY -- de LEESKANT van ../effectcontract.js.
+/* DE STAND PER CAPABILITY -- de LEESKANT van ../gevolgcontract.js.
 
    AFGESPLITST omdat het bestand over de 10 kB ging en de keuringsregel gelijk had:
    keuren (mag deze verklaring bestaan) en tellen (hoe volledig is zij) zijn twee

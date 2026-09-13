@@ -531,6 +531,32 @@ const METERS = [
      "Scenario 3". Hij hoort naar nul en de weg erheen staat er beschreven. */
   { sleutel: 'geldpadGezakt', richting: 'omlaag', wat: 'stappen in de verticale geldproef waar geld bewoog dat niet mocht (FACTUURPROEF.json)' },
   { sleutel: 'geldpadOnbewezen', richting: 'omlaag', wat: 'stappen in de verticale geldproef zonder bewijs (BLOCKED of UNKNOWN)' },
+  /* DE GEVOLGDEKKING, EN MET OPZET DRIE TANDEN ZONDER PERCENTAGE ERBOVEN
+     (GEVOLGDEKKING.json, npm run gevolgdekking).
+
+     Van hoeveel AI-bedienbare handelingen weet dit huis wat zij VEROORZAKEN? Twee
+     assen die nooit worden opgeteld: de METING (wat de idempotentieproef zag
+     bewegen, via kern/stuur/gevolg.js) en de VERKLARING (het gevolgcontract van
+     een mens). Een samengesteld getal eroverheen zou verbergen welke van de twee
+     bewoog, en dat is precies wat keuringsregel 48 en BEWIJSMACHINE.md verbieden.
+
+       gevolgPadenOnbekend      de proef kwam er niet bij. Dit is de rem op een
+                                planner: een plan mag alleen over handelingen gaan
+                                waarvan het gevolg voldoende bekend is. Alleen omlaag.
+       gevolgContractVolledig   handelingen met een volledige verklaring. Alleen
+                                omhoog -- een verklaring die verdwijnt, droeg niet.
+       gevolgContractenGezakt   contracten die de keuring niet halen. Hoort NUL te
+                                zijn en is geen voorraad: een contract dat
+                                `gemeten` claimt waar de meting zweeg, is precies
+                                het valse groen waar deze laag tegen is gebouwd.
+
+     WAAROM DE DERDE APART STAAT EN NIET BIJ DE EERSTE OPGETELD. Een pad zonder
+     meting en een contract dat LIEGT vragen het tegenovergestelde: het eerste is
+     werk dat nog niet gedaan is, het tweede een defect. Zelfde reden als de
+     tweedeling bij `geldpadGezakt` / `geldpadOnbewezen` hierboven. */
+  { sleutel: 'gevolgPadenOnbekend', richting: 'omlaag', wat: 'AI-bereikbare handelingen waarvan het gevolg ongemeten is (GEVOLGDEKKING.json)' },
+  { sleutel: 'gevolgContractVolledig', richting: 'omhoog', wat: 'handelingen met een VOLLEDIG gevolgcontract' },
+  { sleutel: 'gevolgContractenGezakt', richting: 'omlaag', wat: 'gevolgcontracten die de keuring niet halen (hoort nul te zijn)' },
   /* DE EERSTE MINUUT (EERSTEMINUUT.json, npm run eersteminuut).
 
      Wat een mens die RTG niet kent in zijn eerste minuut krijgt. Deze meter
@@ -1347,6 +1373,9 @@ function meet(bronnen) {
        betekenen ze "geen bewijs", en de tand die ertoe doet is de andere. Het
        verschil tussen die twee staat per stap in het register zelf. */
     geldpadOnbewezen: leesRegister('FACTUURPROEF.json', (j) => (j.telling.BLOCKED || 0) + (j.telling.UNKNOWN || 0)),
+    gevolgPadenOnbekend: leesRegister('GEVOLGDEKKING.json', (j) => j.tellers.onbekendeEffectpaden),
+    gevolgContractVolledig: leesRegister('GEVOLGDEKKING.json', (j) => j.tellers.contractVolledig),
+    gevolgContractenGezakt: leesRegister('GEVOLGDEKKING.json', (j) => j.tellers.contractenGezakt),
     eersteMinuutGezakt: leesRegister('EERSTEMINUUT.json', (j) => j.telling.gezakt),
     pakteMisgelopen: leesRegister('PAKTE.json', (j) => j.telling.misgelopen),
     menstaalTeVer: leesRegister('MENSTAALPROEF.json', (j) => j.telling.teVer),

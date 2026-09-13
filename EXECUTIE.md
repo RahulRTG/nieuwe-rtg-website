@@ -651,17 +651,17 @@ collecties veranderden: dat is het veld `opslag` in `IDEMPROEF.json`. Voor
 `bankIdemAfdruk`. Die vier zijn geen aanname — ze zijn één keer echt gebeurd.
 Over alle routes: **331 met een gemeten effect over 196 collecties**.
 
-**Drie graden, en de derde is de grootste.** Over de <!--getal:effect.bereikbaar-->173<!--/getal-->
+**Drie graden, en de derde is de grootste.** Over de <!--getal:gevolg.bereikbaar-->173<!--/getal-->
 paden die de AI mag bedienen:
 
 | graad | aantal | wat het zegt |
 |---|---|---|
-| `gemeten` | <!--getal:effect.gemeten-->38<!--/getal--> | de proef raakte deze collecties aan |
-| `geen-effect-gemeten` | <!--getal:effect.geenEffect-->48<!--/getal--> | de proef draaide en raakte niets aan |
-| **`onbekend`** | **<!--getal:effect.onbekend-->87<!--/getal-->** | de proef kwam er niet bij (404, 403, geen geldige invoer) |
+| `gemeten` | <!--getal:gevolg.gemeten-->38<!--/getal--> | de proef raakte deze collecties aan |
+| `geen-effect-gemeten` | <!--getal:gevolg.geenEffect-->48<!--/getal--> | de proef draaide en raakte niets aan |
+| **`onbekend`** | **<!--getal:gevolg.onbekend-->87<!--/getal-->** | de proef kwam er niet bij (404, 403, geen geldige invoer) |
 
 Die getallen stonden hier tot 13 september OVERGETYPT, en waren verouderd: er stond
-96 van 176. Ze komen nu uit `EFFECTDEKKING.json` via `npm run getallen`, zodat het
+96 van 176. Ze komen nu uit `GEVOLGDEKKING.json` via `npm run getallen`, zodat het
 document niet meer kan achterlopen op zijn eigen meting.
 
 **Die laatste twee mogen nooit door elkaar lopen**, en dat is de scherpste toets
@@ -676,16 +676,16 @@ invoer van de proef, dus een ander lichaam kan andere collecties raken; alles
 buiten de opslag valt erbuiten (mail, een betaalprovider, een derde partij); en
 zij is een momentopname van de laatste proefronde, niet van deze commit.
 
-#### Het effectcontract: de VERKLARING naast de meting (13 september 2026)
+#### Het gevolgcontract: de VERKLARING naast de meting (13 september 2026)
 
 De meting hierboven is hard en smal: zij zegt wélke collecties veranderen, van
-<!--getal:effect.gemeten-->38<!--/getal--> van de <!--getal:effect.bereikbaar-->173<!--/getal-->
-bereikbare handelingen. Over <!--getal:effect.onbekend-->87<!--/getal--> weet zij niets, en
+<!--getal:gevolg.gemeten-->38<!--/getal--> van de <!--getal:gevolg.bereikbaar-->173<!--/getal-->
+bereikbare handelingen. Over <!--getal:gevolg.onbekend-->87<!--/getal--> weet zij niets, en
 over de buitenwereld weet zij per definitie niets — mail, een provider, de bank van
 de ontvanger staan in geen enkele collectie. Een planner die daarop zou leunen, plant
 in het donker.
 
-`server/kern/stuur/effectcontract.js` voegt de andere helft toe: een **verklaring
+`server/kern/stuur/gevolgcontract.js` voegt de andere helft toe: een **verklaring
 van een mens** over wat een handeling veroorzaakt, in vier soorten — `direct`
 (de opslag verandert), `afgeleid` (volgt eruit), `buiten` (valt buiten elke
 collectie) en `mislukking` (wat er achterblijft als het halverwege stopt). Alleen
@@ -720,11 +720,51 @@ boolean slaat het verschil tussen een creditnota en een gewiste factuur plat),
 `doel`/`goals` (dat heet `streefstand`) en `privacyImpact` (dat heet
 `classificatie`, geleend uit `kern/envelop.js` en niet overgeschreven).
 
-`npm run effectdekking` meet het, zonder percentage erboven:
-<!--getal:effect.contractVolledig-->1<!--/getal--> volledig,
-<!--getal:effect.contractOnbekend-->172<!--/getal--> zonder contract. `--controle` zakt zodra
+`npm run gevolgdekking` meet het, zonder percentage erboven:
+<!--getal:gevolg.contractVolledig-->1<!--/getal--> volledig,
+<!--getal:gevolg.contractOnbekend-->172<!--/getal--> zonder contract. `--controle` zakt zodra
 de onbekende paden stijgen, een volledige verklaring verdwijnt, of een contract de
 keuring niet haalt.
+
+**En de tellers hangen aan de huisratel, niet alleen aan hun eigen script** — drie
+tanden in `NORM.json`, en ze staan met opzet apart: `gevolgPadenOnbekend` (alleen
+omlaag: dit is de rem op een planner), `gevolgContractVolledig` (alleen omhoog: een
+verklaring die verdwijnt, droeg niet) en `gevolgContractenGezakt` (hoort nul te zijn,
+en is geen voorraad). Die derde bij de eerste optellen zou een pad zonder meting
+laten lezen als een contract dat liegt; dat zijn twee dingen die het
+tegenovergestelde vragen — dezelfde tweedeling als `geldpadGezakt` /
+`geldpadOnbewezen`.
+
+##### Waarom deze laag `gevolg` heet en niet `effect`
+
+Hij heette bij het schrijven `effectcontract`, met een meter `effectdekking`. Toen
+bleek `test/effectdekking.test.js` al te bestaan — over de **derde bron van het
+effectmodel** (`server/kern/isolatie/effecten.js`), iets heel anders. Er stonden dus
+een meter en een gelijknamige toets die over verschillende dingen gingen. Het woord
+`effect` is in dit huis **vijf keer bezet**: het effectmodel (welke
+platformwerkwoorden een pad draagt, met vier ANDERE graden —
+verklaard/afgeleid/vermoed/onbekend), `scripts/effectcontracten.js` (voorstellen voor
+`NOT_APPLICABLE`-mutatiecontracten, één letter verschil), `server/effectmeter.js`, en
+de twee toetsen daarvan.
+
+Dat is exact de fout die `SEMANTIEK.json` meet en die `BEWIJSMACHINE.md` de duurste
+van het huis noemt — hier bijna gemaakt door de laag die valse zekerheid moest
+voorkomen. `gevolg` is wél het juiste woord: `kern/stuur/gevolg.js`,
+`kern/move/gevolg.js` en `server/bedrijf/gevolg.js` dragen het alle drie met
+DEZELFDE betekenis (wat een verandering met de rest doet) — één betekenis op drie
+plekken is de goede kant van die meting, vijf betekenissen op één woord de slechte.
+`test/gevolgcontract.test.js` houdt het vast van twee kanten: geen bestand van deze
+laag draagt `effect` in zijn naam, en niemand anders in huis mag `gevolgcontract` of
+`gevolgdekking` gaan heten zonder hier langs te komen.
+
+**De algemene regel eronder is meetbaar en niet gebouwd, met de reden.** Wat deze
+botsing had gevonden vóór de naam viel, is één vraag: noemt `test/X.test.js` het
+script `scripts/X.js`? Vandaag zijn er **11** scripts met een gelijknamige toets die
+het script niet noemt. Dat is te veel voor een poort en te weinig onderzocht voor een
+ratel — de meeste zijn vermoedelijk een toets die via `npm run` of via het register
+werkt. Het staat hier als leeslijst en niet als meter, want een twaalfde meter
+toevoegen op een getal dat niemand heeft nagelopen, is precies wat dit document
+elders tegenhoudt.
 
 **Wat er nog niet is, en dat hoort erbij:** de enige lezer is vandaag de meter. Een
 runtime-lezer — `tegenfeit.js` die het contract naast zijn eigen vooruitblik legt —

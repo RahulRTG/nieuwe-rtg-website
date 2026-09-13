@@ -1,5 +1,5 @@
 /* ============================================================================
-   HET EFFECTCONTRACT -- wat een capability VEROORZAAKT, verklaard en begrensd.
+   HET GEVOLGCONTRACT -- wat een capability VEROORZAAKT, verklaard en begrensd.
 
    WAAROM DIT NAAST ./gevolg.js STAAT EN HEM NIET VERVANGT. `gevolg.js` MEET: hij
    leest de `opslag` van IDEMPROEF.json en zegt welke collecties een route een
@@ -62,34 +62,10 @@
 
 const gevolg = require('./gevolg');
 
-/* De vier huisgraden. Niet hier bedacht: kern/objectlaag/pagina.js en
-   kern/identiteit/sessievelden.js dragen deze lijst al woordelijk, en BESTUUR.md
-   maakt er de huisregel van. */
-const GRADEN = Object.freeze(['onbekend', 'vermoed', 'gemeten', 'bewezen']);
-
-/* De soorten gevolg. Vier, en ze verschillen in WIE ze kan vaststellen:
-
-     direct      de opslag verandert -- gevolg.js kan dit MEten
-     afgeleid    volgt uit het directe gevolg (uren, dekking, een plafond)
-     buiten      valt buiten elke collectie: mail, sms, een provider, een bank
-     mislukking  wat er achterblijft als de handeling halverwege stopt
-
-   Alleen `direct` is machinaal te bevestigen. Dat is geen reden om de andere drie
-   weg te laten -- het is de reden dat ze hun graad zelf moeten dragen. */
-const SOORTEN = Object.freeze(['direct', 'afgeleid', 'buiten', 'mislukking']);
-
-/* De classificaties uit kern/envelop.js. Hier overgeschreven zou een tweede
-   woordenlijst zijn; dus wordt hij geleend en bij een botsing valt deze weg. */
-let ENVELOPKLASSEN = null;
-function klassen() {
-  if (ENVELOPKLASSEN) return ENVELOPKLASSEN;
-  /* Een OBJECT met de reden per klasse, geen lijst -- daarom Object.keys. Dat de
-     vorm anders was dan hier eerst stond, is precies waarom hij geleend wordt en
-     niet overgeschreven: een kopie had die vorm nooit gecorrigeerd. */
-  try { ENVELOPKLASSEN = Object.keys(require('../envelop').CLASSIFICATIES || {}); } catch (e) { ENVELOPKLASSEN = []; }
-  if (!ENVELOPKLASSEN.length) ENVELOPKLASSEN = ['onbekend'];
-  return ENVELOPKLASSEN;
-}
+/* De graden, de soorten en de geleende classificaties wonen in
+   ./gevolgcontract/woorden.js -- daar staat ook waarom deze laag `gevolg` heet en
+   niet `effect`, want dat woord is in dit huis vijf keer bezet. */
+const { GRADEN, SOORTEN, klassen } = require('./gevolgcontract/woorden');
 
 /* ---------------------------------------------------------------------------
    DE KEURING. Een contract komt er alleen door als elke bewering draagbaar is.
@@ -161,6 +137,6 @@ function keur(c) {
   return fout;
 }
 
-const { stand, STANDEN } = require('./effectcontract/stand');
+const { stand, STANDEN } = require('./gevolgcontract/stand');
 
 module.exports = { keur, stand, GRADEN, SOORTEN, STANDEN, klassen };

@@ -1,9 +1,9 @@
 /* ============================================================================
-   DE EERSTE EFFECTCONTRACTEN -- met opzet twee, en met opzet DEZE twee.
+   DE EERSTE GEVOLGCONTRACTEN -- met opzet twee, en met opzet DEZE twee.
 
    Dit register vult zich zoals server/lib/mutatiecontracten.js dat doet: langzaam,
    per regel door een mens nagekeken, en nooit door een script aangevuld. De
-   keuring staat in ../effectcontract.js; wat hier staat moet daar door.
+   keuring staat in ../gevolgcontract.js; wat hier staat moet daar door.
 
    WAAROM TWEE EN NIET ZEVENTIG. Een register dat in een middag vol wordt gezet,
    is precies het valse groen dat deze laag moest voorkomen -- dat is letterlijk de

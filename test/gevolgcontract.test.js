@@ -1,5 +1,5 @@
 /* ============================================================================
-   HET EFFECTCONTRACT -- de poort en de twee assen.
+   HET GEVOLGCONTRACT -- de poort en de twee assen.
 
    WAT HIER WORDT AFGEDWONGEN, en het is een ding: een contract mag MEER zeggen dan
    de meting, maar nooit iets ANDERS. Zonder die regel is dit register binnen een
@@ -13,8 +13,8 @@
 const { test } = require('node:test');
 const assert = require('node:assert');
 
-const ec = require('../server/kern/stuur/effectcontract');
-const { CONTRACTEN } = require('../server/kern/stuur/effectcontract/register');
+const ec = require('../server/kern/stuur/gevolgcontract');
+const { CONTRACTEN } = require('../server/kern/stuur/gevolgcontract/register');
 const envelop = require('../server/kern/envelop');
 const gevolg = require('../server/kern/stuur/gevolg');
 
@@ -167,4 +167,63 @@ test('elk contract in het register haalt de keuring, en is VOLLEDIG of zegt wat 
         pad + ': niet volledig, maar zegt niet wat er open staat');
     assert.ok(c.nagekeken, pad + ': elk contract draagt wie het heeft nagekeken');
   }
+});
+
+test('DE NAAM VAN DEZE LAAG BOTST MET NIETS, en `effect` was bezet', () => {
+  /* WAAROM DEZE TOETS BESTAAT. Deze laag heette bij het schrijven `effectcontract`
+     met een meter `effectdekking`, en toen bleek `test/effectdekking.test.js` al te
+     bestaan -- over de DERDE BRON VAN HET EFFECTMODEL (kern/isolatie/effecten.js),
+     iets heel anders. Een meter en een gelijknamige toets die over verschillende
+     dingen gaan, is exact de fout die SEMANTIEK.json meet en die BEWIJSMACHINE.md
+     de duurste van het huis noemt -- hier bijna gemaakt door de laag die valse
+     zekerheid moest voorkomen.
+
+     Hij is hernoemd naar `gevolg`, hetzelfde woord als ../gevolg.js waar hij de
+     verklaring naast legt. Deze toets houdt dat vast van twee kanten: geen bestand
+     van deze laag draagt `effect` in zijn naam, en niemand anders in huis mag
+     `gevolgcontract` of `gevolgdekking` gaan heten zonder hier langs te komen. */
+  const fs = require('node:fs');
+  const path = require('node:path');
+
+  const EIGEN = [
+    'server/kern/stuur/gevolgcontract.js',
+    'server/kern/stuur/gevolgcontract/woorden.js',
+    'server/kern/stuur/gevolgcontract/stand.js',
+    'server/kern/stuur/gevolgcontract/register.js',
+    'scripts/gevolgdekking.js',
+    'test/gevolgcontract.test.js'
+  ];
+  const WORTEL = path.join(__dirname, '..');
+  for (const p of EIGEN)
+    assert.ok(fs.existsSync(path.join(WORTEL, p)), p + ': hoort bij deze laag en bestaat niet meer');
+
+  /* Elk bestand in huis met onze naam erin, is van ons. Komt er elders een
+     `gevolgcontract` of `gevolgdekking` bij, dan zakt deze toets en hoort iemand
+     te kiezen: hetzelfde onderwerp (voeg samen) of een ander (hernoem). */
+  const gevonden = [];
+  const sla = new Set(['node_modules', '.git', 'dekking', 'data']);
+  (function loop(map) {
+    for (const naam of fs.readdirSync(map, { withFileTypes: true })) {
+      if (sla.has(naam.name)) continue;
+      const vol = path.join(map, naam.name);
+      if (naam.isDirectory()) { loop(vol); continue; }
+      if (!/^(gevolgcontract|gevolgdekking)/i.test(naam.name)) continue;
+      gevonden.push(path.relative(WORTEL, vol).split(path.sep).join('/'));
+    }
+  })(WORTEL);
+  /* GEVOLGDEKKING.json hoort er ook bij: het register van de meter. */
+  const mag = new Set(EIGEN.concat(['GEVOLGDEKKING.json']));
+  const vreemd = gevonden.filter(p => !mag.has(p));
+  assert.deepStrictEqual(vreemd, [], 'een tweede `gevolg*`-naam in huis: ' + vreemd.join(', '));
+
+  /* EN DE ANDERE KANT: geen bestand van deze laag draagt `effect` in zijn naam. */
+  for (const p of EIGEN)
+    assert.ok(!/effect/i.test(path.basename(p)), p + ': `effect` is vijf keer bezet (zie gevolgcontract/woorden.js)');
+
+  /* De twee gradenladders zijn NIET dezelfde lijst, en dat hoort zichtbaar te
+     blijven: het effectmodel zegt WAARUIT iets volgt, deze laag HOE HARD het
+     vaststaat. Wie ze ooit samenvoegt, komt hier langs. */
+  const model = require('../server/kern/isolatie/effecten');
+  assert.ok(Array.isArray(model.VERKLAARD), 'het effectmodel hoort zijn verklaringen te dragen');
+  assert.notDeepStrictEqual(ec.GRADEN, ['verklaard', 'afgeleid', 'vermoed', 'onbekend']);
 });

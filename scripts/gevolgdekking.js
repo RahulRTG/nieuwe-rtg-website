@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* ============================================================================
-   DE EFFECTDEKKING -- van hoeveel AI-bedienbare handelingen weet RTG wat zij
+   DE GEVOLGDEKKING -- van hoeveel AI-bedienbare handelingen weet RTG wat zij
    veroorzaken?
 
    DE VRAAG DIE HIERONDER LIGT, en het is de vraag die een planner blokkeert: een
@@ -13,7 +13,7 @@
    scripts/machinedekking.js en scripts/kantoormacht.js, en om dezelfde reden:
 
      de METING     wat de proef zag veranderen (gemeten / geen-effect / onbekend)
-     de VERKLARING het effectcontract van een mens (VOLLEDIG / GEDEELTELIJK / ONBEKEND)
+     de VERKLARING het gevolgcontract van een mens (VOLLEDIG / GEDEELTELIJK / ONBEKEND)
 
    Een gemeten pad zonder contract weet WELKE collecties veranderen en niet wat dat
    betekent. Een contract zonder meting is een bewering. Pas samen zeggen ze iets --
@@ -32,23 +32,23 @@
    daarvoor al een toets die zakt zodra het oordeel uit de kaart komt in plaats van
    uit het beleid. Dezelfde regel hier.
 
-   Draai:  node scripts/effectdekking.js
-           node scripts/effectdekking.js --vastleggen
-           node scripts/effectdekking.js --controle     (zakt als de tellers verkeerd bewegen)
+   Draai:  node scripts/gevolgdekking.js
+           node scripts/gevolgdekking.js --vastleggen
+           node scripts/gevolgdekking.js --controle     (zakt als de tellers verkeerd bewegen)
    ========================================================================== */
 'use strict';
 const fs = require('fs');
 const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
-const DOEL = path.join(WORTEL, 'EFFECTDEKKING.json');
+const DOEL = path.join(WORTEL, 'GEVOLGDEKKING.json');
 const { stempel } = require('./lib/stempel');
 const { alleRoutes, isSchakel } = require('./lib/routes');
 
 const beleid = require(path.join(WORTEL, 'server/kern/stuur/beleid.js'));
 const gevolg = require(path.join(WORTEL, 'server/kern/stuur/gevolg.js'));
-const contract = require(path.join(WORTEL, 'server/kern/stuur/effectcontract.js'));
-const { CONTRACTEN } = require(path.join(WORTEL, 'server/kern/stuur/effectcontract/register.js'));
+const contract = require(path.join(WORTEL, 'server/kern/stuur/gevolgcontract.js'));
+const { CONTRACTEN } = require(path.join(WORTEL, 'server/kern/stuur/gevolgcontract/register.js'));
 
 const argv = process.argv.slice(2);
 const vastleggen = argv.includes('--vastleggen');
@@ -98,7 +98,7 @@ function meet() {
   }
 
   /* CONTRACTEN BUITEN HET BEREIK VAN DE AI, met naam. De gouden weg is zo'n geval:
-     /api/office/bank/incasso heeft een effectcontract maar `beleid.js` kent geen
+     /api/office/bank/incasso heeft een gevolgcontract maar `beleid.js` kent geen
      enkel /api/office-pad (KANTOORMACHT.md par. 9), dus hij valt buiten de noemer
      van deze meter. Hem stil weglaten zou de indruk geven dat het werk er niet is
      -- en een correctie die de vorige telling onzichtbaar maakt, is geen correctie
@@ -124,13 +124,13 @@ const tellers = {
 if (argv.includes('--json')) {
   process.stdout.write(JSON.stringify({ tellers, rijen: u.rijen, fouten: u.fouten }, null, 1) + '\n');
 } else {
-  console.log('\n\x1b[1mDE EFFECTDEKKING\x1b[0m \x1b[2m(twee assen, nooit opgeteld)\x1b[0m\n');
+  console.log('\n\x1b[1mDE GEVOLGDEKKING\x1b[0m \x1b[2m(twee assen, nooit opgeteld)\x1b[0m\n');
   console.log('  AI-bereikbare handelingen   : ' + tellers.bereikbaarPerRol + '   \x1b[2m(live uit beleid.js)\x1b[0m');
   console.log('\n  \x1b[1mde METING\x1b[0m \x1b[2m(wat de proef zag veranderen)\x1b[0m');
   console.log('    gemeten                   : ' + tellers.effectGemeten);
   console.log('    geen effect gemeten       : ' + tellers.effectGeenEffectGemeten);
   console.log('    \x1b[31mONBEKEND\x1b[0m                  : ' + tellers.onbekendeEffectpaden + '   \x1b[2m(moet dalen)\x1b[0m');
-  console.log('\n  \x1b[1mde VERKLARING\x1b[0m \x1b[2m(het effectcontract van een mens)\x1b[0m');
+  console.log('\n  \x1b[1mde VERKLARING\x1b[0m \x1b[2m(het gevolgcontract van een mens)\x1b[0m');
   console.log('    VOLLEDIG                  : ' + tellers.contractVolledig + '   \x1b[2m(mag stijgen)\x1b[0m');
   console.log('    GEDEELTELIJK              : ' + tellers.contractGedeeltelijk);
   console.log('    ONBEKEND                  : ' + tellers.contractOnbekend);
@@ -150,20 +150,20 @@ if (vastleggen) {
   fs.writeFileSync(DOEL, JSON.stringify({
     stempel: stempel(),
     uitleg: 'Per AI-bereikbare handeling twee assen: de METING (wat de idempotentieproef zag ' +
-      'veranderen, via kern/stuur/gevolg.js) en de VERKLARING (het effectcontract van een mens, ' +
-      'via kern/stuur/effectcontract.js). Ze worden nooit opgeteld.',
+      'veranderen, via kern/stuur/gevolg.js) en de VERKLARING (het gevolgcontract van een mens, ' +
+      'via kern/stuur/gevolgcontract.js). Ze worden nooit opgeteld.',
     grens: 'De meting zegt WELKE collecties, nooit hoeveel erin verandert, en zij kijkt niet buiten ' +
       'de opslag (geen mail, geen provider, geen bank). De verklaring mag MEER zeggen dan de meting ' +
       'maar nooit iets anders: waar zij `gemeten` claimt, moet de meting dat bevestigen.',
     tellers, fouten: u.fouten, buitenBereik: u.buitenBereik, rijen: u.rijen
   }, null, 1) + '\n');
-  console.log('  EFFECTDEKKING.json geschreven.\n');
+  console.log('  GEVOLGDEKKING.json geschreven.\n');
 }
 
 if (controle) {
   let oud = null;
   try { oud = JSON.parse(fs.readFileSync(DOEL, 'utf8')); } catch (e) { oud = null; }
-  if (!oud) { console.error('  Geen EFFECTDEKKING.json om tegen te vergelijken; leg eerst vast.'); process.exit(2); }
+  if (!oud) { console.error('  Geen GEVOLGDEKKING.json om tegen te vergelijken; leg eerst vast.'); process.exit(2); }
   const fout = [];
   if (tellers.onbekendeEffectpaden > oud.tellers.onbekendeEffectpaden)
     fout.push('onbekendeEffectpaden steeg van ' + oud.tellers.onbekendeEffectpaden + ' naar ' +
@@ -172,8 +172,8 @@ if (controle) {
     fout.push('contractVolledig zakte van ' + oud.tellers.contractVolledig + ' naar ' +
       tellers.contractVolledig + ' -- een verklaring die verdwijnt is een verklaring die niet droeg');
   if (tellers.contractenGezakt > 0)
-    fout.push(tellers.contractenGezakt + ' effectcontract(en) halen de keuring niet');
-  if (fout.length) { console.error('\n  DE EFFECTDEKKING IS VERSLECHTERD\n'); for (const f of fout) console.error('    ' + f); console.error(''); process.exit(1); }
+    fout.push(tellers.contractenGezakt + ' gevolgcontract(en) halen de keuring niet');
+  if (fout.length) { console.error('\n  DE GEVOLGDEKKING IS VERSLECHTERD\n'); for (const f of fout) console.error('    ' + f); console.error(''); process.exit(1); }
   console.log('  in orde: ' + tellers.onbekendeEffectpaden + ' onbekend (was ' +
     oud.tellers.onbekendeEffectpaden + '), ' + tellers.contractVolledig + ' volledig (was ' +
     oud.tellers.contractVolledig + ').\n');

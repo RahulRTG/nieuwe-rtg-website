@@ -234,3 +234,69 @@ test('13. een lege wereld heet bronLeeg en niet "geen vondsten"', async () => {
     assert.deepEqual(r.d.vondstenGeweigerd, [], 'een lege wereld is geen weigering');
   } finally { await stop(child); }
 });
+
+/* ---------------------------------------------------------------------------
+   DE TWEEDE BRON -- de eigenlijke proef op het contract.
+
+   Een contract dat op EEN bron past, is geen contract maar een adapter met een
+   mooie naam. Leerstof is daarom met opzet maximaal anders gekozen dan
+   vacatures: geen lijst (2 x 1.000.000 procedureel), geen aanbieder, geen eis,
+   geen schaarste -- en dus een selectie die fundamenteel anders werkt.
+   ------------------------------------------------------------------------- */
+const bronnenContract = fs.readFileSync(path.join(WORTEL, 'server', 'kern', 'knelpunt',
+  'aanvoer-bronnen.js'), 'utf8');
+
+test('14. de contractlaag kent geen enkele domeinnaam', () => {
+  /* DIT IS DE PROEF DAT ER GEEN VERVORMING NODIG WAS. Zodra aanvoer-bronnen.js
+     of de keuring in aanvoer.js iets weet van vacatures, leerpaden of beroepen,
+     is het contract meegebogen met zijn eerste bron -- en dan meet de tweede
+     bron niets meer. `vacature` mag in aanvoer.js alleen in de UITLEG staan
+     ("een vacature is geen inkomen"), nooit in code. */
+  const codeVan = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  for (const [naam, tekst] of [['aanvoer.js', bron], ['aanvoer-bronnen.js', bronnenContract]]) {
+    assert.doesNotMatch(codeVan(tekst), /vacature|leerpad|beroep|openVacatures|beroepenbieb/i,
+      naam + ' kent een domeinbegrip; het contract is meegebogen met een bron');
+  }
+});
+
+test('15. een tweede, totaal andere bron past zonder wijziging in hetzelfde contract', async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bron2-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP,
+    NODE_ENV: 'test', RTG_DEMO: '1' } });
+  try {
+    const lid = await roep(base, '/api/login', { tier: 'rtg' });
+    const vw = { id: 'diploma', wat: 'een diploma als lasser om te kunnen werken', stand: 'ontbreekt' };
+    const r = await roep(base, '/api/knelpunt', { doel: 'aan het werk komen',
+      randvoorwaarden: [vw], manieren: [{ id: 'w', wat: 'werken', nodig: ['diploma'] }] }, lid.d.token);
+    assert.equal(r.status, 200);
+    const v = (r.d.vondsten || []).filter((x) => x.terrein === 'opleiding');
+    assert.ok(v.length > 0, 'de opleidingsbron levert niets op een randvoorwaarde die een vak noemt');
+    assert.equal(v[0].herkomst, 'opleiding');
+    assert.match(v[0].wat, /Lasser/i, 'er is niet op het woord uit de randvoorwaarde gezocht');
+    /* De bibliotheek kent geen schaarste EN noemt geen aantal. "Onbeperkt" zou
+       een bewering zijn die de bron zelf niet doet. */
+    assert.equal(v[0].beschikbaarheid, null);
+    assert.match(v[0].dektNiet, /leerSTOF en geen inschrijving/);
+    assert.deepEqual(r.d.vondstenGeweigerd, []);
+  } finally { await stop(child); }
+});
+
+test('16. zonder een woord om op te zoeken grijpt de bron NIET in het wilde weg', async () => {
+  /* Twee miljoen combinaties: de "eerste 25" zijn geen vondsten maar willekeur
+     met een net randje. Een verzonnen beroep is een verzonnen advies, dus de
+     eerlijke uitkomst is leeg MET reden -- en die reden noemt de bron. */
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bron2-leeg-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP,
+    NODE_ENV: 'test', RTG_DEMO: '1' } });
+  try {
+    const lid = await roep(base, '/api/login', { tier: 'rtg' });
+    const vw = { id: 'diploma', wat: 'een diploma nodig voor de opleiding', stand: 'ontbreekt' };
+    const r = await roep(base, '/api/knelpunt', { doel: 'aan het werk komen',
+      randvoorwaarden: [vw], manieren: [{ id: 'w', wat: 'werken', nodig: ['diploma'] }] }, lid.d.token);
+    assert.equal(r.status, 200);
+    assert.equal((r.d.vondsten || []).filter((x) => x.terrein === 'opleiding').length, 0);
+    assert.ok((r.d.vondstenBronLeeg || []).some((b) => b.herkomst === 'opleiding'),
+      'de lege opleidingsbron meldt zich niet; dan lijkt "geen leerstof" op "niet aangesloten"');
+    assert.deepEqual(r.d.vondstenGeweigerd, [], 'een lege uitkomst is geen weigering');
+  } finally { await stop(child); }
+});

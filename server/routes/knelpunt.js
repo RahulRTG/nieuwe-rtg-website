@@ -31,10 +31,14 @@ module.exports = (kern) => {
   const openingen = require('../kern/knelpunt/openingen');
   const { maakAanvoer } = require('../kern/knelpunt/aanvoer-bronnen');
   const { maakWerkbron } = require('../kern/knelpunt/aanvoer-werk');
+  const { maakOpleidingbron } = require('../kern/knelpunt/aanvoer-opleiding');
   /* De aanvoer wordt EEN keer samengesteld, bij het bedraden. Per verzoek
      opnieuw bouwen zou de bronnenlijst per aanroep laten verschillen, en dan is
      "welke bronnen zijn er" geen vraag meer met een antwoord. */
-  const aanvoer = maakAanvoer({ werk: maakWerkbron(() => kern.openVacatures) });
+  const aanvoer = maakAanvoer({
+    werk: maakWerkbron(() => kern.openVacatures),
+    opleiding: maakOpleidingbron(() => kern.beroepenbieb)
+  });
 
   app.post('/api/knelpunt', auth, (req, res) => {
     const r = knelpunt.reken(req.body || {});

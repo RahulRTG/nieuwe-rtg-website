@@ -1603,6 +1603,29 @@ const IJKINGEN = {
       (j) => { j.telling.meetbaar = (j.telling.meetbaar || 0) - 5; return j; },
       () => norm.meet().crashasNietMeetbaar - voor.crashasNietMeetbaar)
   },
+  /* DE TWEE TANDEN VAN DE CRASHPROEF (CRASHPROEF.json), en ze worden apart
+     geijkt om dezelfde reden als hierboven: ze tellen verschillende dingen en
+     mogen nooit worden opgeteld.
+
+     `crashproefGezakt` telt gebroken overlevingscontracten -- een DEFECT.
+     `crashproefOnbereikt` telt rijen waar de proef de route niet aan het werk
+     kreeg -- BEREIK van het instrument.
+
+     Er is een derde stand in dat register, GEEN_DUURZAME_WEG, en die hangt aan
+     GEEN van beide tanden: dat is een gemeten niet-van-toepassing en geen
+     schuld. Daarom hoogt elke proef hieronder alleen ZIJN EIGEN veld op; zou
+     een meter meebewegen met het andere veld, dan telt hij iets samen wat apart
+     hoort te staan. */
+  crashproefGezakt: {
+    proef: (voor) => metVervangenJson('CRASHPROEF.json',
+      (j) => { j.telling.FAILED = (j.telling.FAILED || 0) + 6; return j; },
+      () => norm.meet().crashproefGezakt - voor.crashproefGezakt)
+  },
+  crashproefOnbereikt: {
+    proef: (voor) => metVervangenJson('CRASHPROEF.json',
+      (j) => { j.telling.GEEN_WERK = (j.telling.GEEN_WERK || 0) + 9; return j; },
+      () => norm.meet().crashproefOnbereikt - voor.crashproefOnbereikt)
+  },
   /* DE TAND VAN 12 SEPTEMBER 2026: eersteMinuutGezakt telt de toetsen van de
      eerste minuut die ZAKKEN (EERSTEMINUUT.json, telling.gezakt). Zelfde vorm
      als de vier hierboven -- hij leest een getal uit een bestaand register, dus

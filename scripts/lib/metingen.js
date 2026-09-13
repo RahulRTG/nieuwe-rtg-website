@@ -236,6 +236,12 @@ const REGISTER = {
      want de eerste los je op door te kijken en de tweede door gereedschap te
      bouwen. */
   'CRASHAS.json': { meter: ['crashasOnbekend', 'crashasNietMeetbaar'] },
+  /* CRASHPROEF.json volgt dezelfde tweedeling nog een niveau verder: CRASHAS
+     classificeert, dit VOERT UIT. `crashproefGezakt` is een gebroken
+     overlevingscontract en dus een defect; `crashproefOnbereikt` is bereik van
+     het instrument. GEEN_DUURZAME_WEG hangt met opzet aan geen van beide -- dat
+     is een gemeten niet-van-toepassing en geen schuld. */
+  'CRASHPROEF.json': { meter: ['crashproefGezakt', 'crashproefOnbereikt'] },
   /* HERSTELBESLUIT.json is een VERKLARING en geen meting -- dezelfde vorm als
      ROLLBACKBESLUIT.json hierboven, dat ook aan een geteld gevolg hangt. Wie
      hier een regel bijzet of weghaalt, beweegt een van deze twee tellers: een

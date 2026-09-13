@@ -549,6 +549,30 @@ const METERS = [
      een ontbrekend instrument wegvallen tegen een open vraag. */
   { sleutel: 'crashasOnbekend', richting: 'omlaag', wat: '(route, grens)-paren waarvan niet vaststaat of de crashgrens bestaat (CRASHAS.json)' },
   { sleutel: 'crashasNietMeetbaar', richting: 'omlaag', wat: 'bestaande crashgrenzen zonder injectiepunt om ze te beproeven' },
+  /* DE CRASHPROEF (CRASHPROEF.json, npm run crashproef), en om DEZELFDE reden
+     twee tanden -- maar let op wat er met opzet NIET in zit.
+
+     `crashproefGezakt` is een rij waarvan het overlevingscontract is gebroken:
+     de toestand na de herstart klopt niet, er staat een half resultaat, de
+     aanroeper kreeg een vals antwoord, of een herhaling verdubbelde het effect.
+     Dat is een DEFECT en moet naar nul.
+
+     `crashproefOnbereikt` is een rij waar de proef de route niet aan het werk
+     kreeg (GEEN_WERK): een lijf dat deze route niet accepteert, een voorwaarde
+     die de wereld niet klaarzette. Dat is BEREIK van het instrument en geen
+     uitspraak over de route -- het gaat omlaag door de wereld of het lijf te
+     verbeteren, niet door beter na te denken over crashes.
+
+     WAT ER NIET IN ZIT is GEEN_DUURZAME_WEG (41 rijen). Dat is een GEMETEN
+     mededeling dat de grens op het pad van die route niet bestaat -- de
+     tegenhanger van NOT_APPLICABLE -- en dat als schuld tellen zou een route
+     straffen voor een waarheid over zijn schrijfweg. Het staat wel in het
+     register, met de modus erbij die hem WEL zou raken.
+
+     Ze worden nooit opgeteld: "het contract is gebroken" en "de proef kwam er
+     niet bij" vragen het tegenovergestelde. */
+  { sleutel: 'crashproefGezakt', richting: 'omlaag', wat: 'geldroutes waarvan het overlevingscontract na een crash is gebroken (CRASHPROEF.json)' },
+  { sleutel: 'crashproefOnbereikt', richting: 'omlaag', wat: 'crashproefrijen waar de route niet aan het werk kwam -- bereik van het instrument' },
   /* DE EERSTE MINUUT (EERSTEMINUUT.json, npm run eersteminuut).
 
      Wat een mens die RTG niet kent in zijn eerste minuut krijgt. Deze meter
@@ -1370,6 +1394,8 @@ function meet(bronnen) {
        getallen die dit verschil dragen staan daar al, en een derde dat ze
        samenvat zou bij de eerstvolgende wijziging uit de pas lopen. */
     crashasNietMeetbaar: leesRegister('CRASHAS.json', (j) => j.telling.bestaat - j.telling.meetbaar),
+    crashproefGezakt: leesRegister('CRASHPROEF.json', (j) => j.telling.FAILED || 0),
+    crashproefOnbereikt: leesRegister('CRASHPROEF.json', (j) => j.telling.GEEN_WERK || 0),
     eersteMinuutGezakt: leesRegister('EERSTEMINUUT.json', (j) => j.telling.gezakt),
     pakteMisgelopen: leesRegister('PAKTE.json', (j) => j.telling.misgelopen),
     menstaalTeVer: leesRegister('MENSTAALPROEF.json', (j) => j.telling.teVer),

@@ -288,6 +288,11 @@ const REGISTER = {
      nog geen sensor ziet, dan daalt het percentage door gewoon werk. De vloer
      staat daarom in de toets en niet in NORM.json, met de reden erbij. */
   'VERBAND.json': { eigenRatel: 'test/verband.test.js' },
+  /* BEREIK.json draagt met opzet GEEN percentage en dus geen getal dat een kant
+     op moet: het aantal cellen per uitslag verschuift zodra de projectieruimte
+     verandert, en dat is een besluit en geen verslechtering. Wat wel kan zakken
+     is de ONAFHANKELIJKHEID van de drie assen, en dat bewaakt test/bereik.test.js. */
+  'BEREIK.json': { eigenRatel: 'test/bereik.test.js' },
 
   /* En twee die door een TOETS worden vastgehouden in plaats van door een
      script. Allebei zeggen het in hun eigen uitleg met zoveel woorden: "MAG

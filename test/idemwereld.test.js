@@ -58,7 +58,17 @@ test('de keten levert alle stukken op die de geldroutes nodig hebben', async () 
   assert.equal(wereld.terugkerendId, 'TK1');
   assert.equal(wereld.tikcode, 'TIK999');
   assert.equal(wereld.factuurId, 'RTG-2026-0002', 'de OPENSTAANDE factuur, niet de eerste de beste');
-  assert.equal(Object.keys(perRoute).length, 20, 'twintig geldroutes krijgen een eigen lijf');
+  /* TWEEENTWINTIG, en de laatste twee staan er apart bij. Een kale telling laat
+     een RUILING door: wie een lijf weghaalt en een ander toevoegt, houdt het
+     getal gelijk. De twee kantoorroutes zijn erbij gekomen om de effect-as van
+     `npm run kantoormacht` uit zijn blindheid te halen -- die was blind voor
+     twaalf van de veertien zware kantoorroutes omdat de proef ze niet aan het
+     werk kreeg, en bij deze twee kwam dat door een WOORD en niet door een deur
+     (`soort` betekent bij een pas iets anders dan bij een rekening). */
+  assert.equal(Object.keys(perRoute).length, 22, 'tweeentwintig geldroutes krijgen een eigen lijf');
+  for (const pad of ['/api/office/bank/rekening/open', '/api/office/bank/rekening/rood']) {
+    assert.ok(perRoute[pad], 'de zware kantoorroute ' + pad + ' hoort een eigen lijf te krijgen');
+  }
   assert.deepEqual(extra, { iban: 'NL00EEN', aan: 'Gouden Ibis', codenaam: 'Gouden Ibis',
     naarCodenaam: 'Gouden Ibis', code: 'ABC123' });
 });

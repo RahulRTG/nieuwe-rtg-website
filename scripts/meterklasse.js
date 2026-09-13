@@ -87,6 +87,12 @@ function meet() {
   const vormlezers = lezers.filter(l => l.vorm);
   return {
     graad: 'vermoed',
+    /* WAT DIT NIET AANTOONT (meetkeuring, regel `grens`). */
+    grens: 'dit telt KLASSEN en velt geen oordeel per script: een generator zonder grendel kan volkomen ' +
+      'terecht geen grendel hebben (worktree-lokale uitvoer), en een bronlezer zonder commentaarscheiding ' +
+      'kan volkomen terecht geen patroon op de tekst draaien. Het zegt ook niets over of een grendel WERKT ' +
+      'of een scheiding VOLLEDIG is -- alleen of hij er staat. Beide tellingen zijn lexicaal en dus een ' +
+      'ONDERgrens: wie het op een andere manier doet, valt erbuiten.',
     waarom: 'beide vragen zijn lexicaal beantwoord; de klasse wijst een lijst aan om na te lopen ' +
       'en velt geen oordeel per script -- daarom staan de namen erbij',
     schoneBoom: {
@@ -105,22 +111,35 @@ function meet() {
   };
 }
 
-const stand = meet();
-if (process.argv.includes('--vastleggen')) {
-  const poort = eisSchoneBoom('meterklasse');
-  if (!poort.ok) { console.error('[meterklasse] ' + poort.reden); process.exit(2); }
-  fs.writeFileSync(DOEL, JSON.stringify(Object.assign({ stempel: stempel() }, stand), null, 2) + '\n');
-  console.log('METERKLASSE.json geschreven.');
+/* NIET UITVOEREN BIJ HET REQUIREN (meetkeuring, regel `wacht`). Dit script
+   schrijft een register zodra --vastleggen meekomt, en een laadcontrole met die
+   vlag in argv zou het overschrijven. De regel geldt hier ook al staat
+   METERKLASSE.json met opzet niet in de repo: de keuring slaat vandaag niet aan
+   omdat het bestand ontbreekt, en dat is geen eigenschap om op te leunen. */
+function toon(stand) {
+  const b = stand.schoneBoom, c = stand.commentaar;
+  console.log('\nKENT EEN METER ZIJN EIGEN KLASSE?\n');
+  console.log('  DE SCHONE BOOM');
+  console.log('    ' + b.schrijvers + ' scripts schrijven een artefact');
+  console.log('    ' + b.claimenRepoWaarheid + ' daarvan stempelen (en claimen dus repo-waarheid)');
+  console.log('    ' + b.metGrendel + ' daarvan weigeren een vuile boom, ' + b.zonderGrendel.length + ' niet');
+  console.log('    ' + b.grendelZonderStempel.length + ' grendelen zonder te stempelen');
+  console.log('\n  CODE EN COMMENTAAR');
+  console.log('    ' + c.lezenBron + ' scripts lezen broncode');
+  console.log('    ' + c.leidenSemantiekAfUitVorm + ' daarvan leiden semantiek af uit de VORM van die code');
+  console.log('    ' + c.metScheiding + ' daarvan scheiden code en commentaar, ' + c.zonderScheiding.length + ' niet');
+  console.log('\n  graad: ' + stand.graad + ' -- ' + stand.waarom + '\n');
 }
-const b = stand.schoneBoom, c = stand.commentaar;
-console.log('\nKENT EEN METER ZIJN EIGEN KLASSE?\n');
-console.log('  DE SCHONE BOOM');
-console.log('    ' + b.schrijvers + ' scripts schrijven een artefact');
-console.log('    ' + b.claimenRepoWaarheid + ' daarvan stempelen (en claimen dus repo-waarheid)');
-console.log('    ' + b.metGrendel + ' daarvan weigeren een vuile boom, ' + b.zonderGrendel.length + ' niet');
-console.log('    ' + b.grendelZonderStempel.length + ' grendelen zonder te stempelen');
-console.log('\n  CODE EN COMMENTAAR');
-console.log('    ' + c.lezenBron + ' scripts lezen broncode');
-console.log('    ' + c.leidenSemantiekAfUitVorm + ' daarvan leiden semantiek af uit de VORM van die code');
-console.log('    ' + c.metScheiding + ' daarvan scheiden code en commentaar, ' + c.zonderScheiding.length + ' niet');
-console.log('\n  graad: ' + stand.graad + ' -- ' + stand.waarom + '\n');
+
+if (require.main === module) {
+  const stand = meet();
+  if (process.argv.includes('--vastleggen')) {
+    const poort = eisSchoneBoom('meterklasse');
+    if (!poort.ok) { console.error('[meterklasse] ' + poort.reden); process.exit(2); }
+    fs.writeFileSync(DOEL, JSON.stringify(Object.assign({ stempel: stempel() }, stand), null, 2) + '\n');
+    console.log('METERKLASSE.json geschreven.');
+  }
+  toon(stand);
+}
+
+module.exports = { meet };

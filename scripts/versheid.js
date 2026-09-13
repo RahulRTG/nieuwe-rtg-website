@@ -115,6 +115,20 @@ const REGISTERS = [
   ['UITVOERPROEF.json', 'npm run meetronde -- --alleen=uitvoerproef', 'of een antwoord gegevens van een ander bevat', BEVEILIGING],
   ['BEWIJSMATRIX.json', 'npm run bewijsmatrix:vast', 'de elf schakels per route, uit de vijf registers hierboven'],
   ['MUTATIES.json', 'npm run mutatie', 'welke toetsen kunnen zakken'],
+  /* DE LEDENCONTEXT VAN RAHUL (MENSNETWERK.md par. 4d). Hij veroudert met de
+     CODE en niet met de klok: hij telt welke velden van een lid in een
+     modelprompt terechtkomen, en die telling is niets waard zodra
+     kern/ai/prompt.js of een schrijver van de ledenstaat is veranderd zonder
+     hem opnieuw te draaien.
+
+     MELDING EN GEEN POORT, en dat is met opzet. Er staan al twee dingen hard op
+     dit register: de tand `aiContextLek` in NORM.json (richting omlaag, nu 0) en
+     test/aicontext-allowlist.test.js toets 4, die eist dat het register en de
+     verklaarde LEDENVELDEN hetzelfde zeggen. Een derde harde poort zou volgens
+     de kop van dit bestand de sirene zijn die iedereen uitzet; wat hier telt is
+     dat zijn OUDERDOM zichtbaar wordt, want een stale register maakt die tand
+     bot zonder dat iemand het merkt. */
+  ['AICONTEXT.json', 'npm run aicontext:vast', 'welke velden van een lid in de system prompt van Rahul terechtkomen'],
   ['LAATSTE_METING.json', 'npm run beproeving', 'de laatste stormproef, ook wanneer hij zakt'],
   ['HEAPPROEF.json', 'npm run heapproef', 'geheugengedrag onder herhaalde verzoeken'],
   ['BEPROEVING.json', 'npm run beproeving', 'storm, geld, misbruik en herstel'],

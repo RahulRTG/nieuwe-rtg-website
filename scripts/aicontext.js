@@ -214,6 +214,14 @@ function main() {
   const stand = {
     gemeten: new Date().toISOString(),
     graad: 'vermoed',
+    /* WAT DIT REGISTER NIET AANTOONT (meetkeuring, regel `grens`). Zonder deze
+       zin leest "lek: leeg" als "er kan niets naar een model lekken", en dat is
+       drie stappen te ver. */
+    grens: 'dit meet de LEDENcontext van Rahul (kern/ai/prompt.js) en verder niets: de werkcontexten ' +
+      '(zaak, personeel, kantoor) hebben eigen samenstellers en zijn hier niet gemeten. Het zegt ook ' +
+      'niets over wat een model met de context DOET, niets over andere wegen waarlangs gegevens het ' +
+      'huis verlaten, en de veldinventaris is lexicaal -- een ledenstaat onder een naam die deze meter ' +
+      'niet kent, valt erbuiten. Een lege doorsnede betekent dus "niet gevonden", niet "kan niet bestaan".',
     waarom: 'de veldinventaris is lexicaal en dus een ONDERgrens: een ledenstaat onder een ' +
       'andere naam valt erbuiten. De muur is hoogstens dunner dan hier staat, nooit dikker.',
     samensteller: { bestand: SAMENSTELLER, functie: 'aiSystemPrompt(tier, lang, key)' },
@@ -238,34 +246,41 @@ function main() {
   return stand;
 }
 
-const stand = main();
-if (process.argv.includes('--vastleggen')) {
-  /* DE POORT VOORAF, EN NIET ALLEEN HET STEMPEL ACHTERAF.
-
-     `stempel()` meldt met `boomVuil: true` dat deze meting bij een stand hoort
-     die nergens is vastgelegd -- maar pas als hij al geschreven is, en dan
-     ratelt `registersUitVuileBoom` omhoog. De poort die dat vooraf tegenhoudt
-     bestaat (lib/stempel.js: eisSchoneBoom) en wordt door 12 van de 80
-     stempelende scripts aangeroepen. Dit is er een van, want een register
-     zonder poort is een register dat op een dag uit een vuile boom komt.
-
-     RTG_METEN_OP_VUILE_BOOM=1 is de uitgeschreven uitzondering: die zegt "ik
-     weet dat deze uitslag niet als bewijs telt". */
-  const poort = eisSchoneBoom('aicontext');
-  if (!poort.ok) { console.error('[aicontext] ' + poort.reden); process.exit(2); }
-  fs.writeFileSync(DOEL, JSON.stringify(Object.assign({ stempel: stempel() }, stand), null, 2) + '\n');
-  console.log('AICONTEXT.json geschreven.');
+/* NIET UITVOEREN BIJ HET REQUIREN (meetkeuring, regel `wacht`). Een
+   laadcontrole (`node -e "require(...)"`) zou anders de meting draaien, en met
+   --vastleggen in argv het register overschrijven. Dat is hier geen theorie: zo
+   is ROLPROEF.json ooit van 3377 beproefde routes naar 292 teruggeschreven, en
+   het bestand zag er daarna volkomen normaal uit. */
+function toon(stand) {
+  const t = stand.telling;
+  console.log('\nDE LEDENCONTEXT VAN RAHUL -- ' + stand.samensteller.bestand);
+  console.log('\n  invoeren: ' + t.lid + ' op het LID, ' + t.pas + ' op de PAS, ' +
+    t.globaal + ' op het HUIS, ' + t.statisch + ' vaste tekst');
+  for (const i of stand.invoeren) console.log('    ' + i.sleutel.padEnd(10) + i.aanroep);
+  console.log('\n  ledenstaat: ' + stand.ledenstaat.aantal + ' velden, waarvan ' +
+    stand.ledenstaat.doorKantoorGeschreven.length + ' door een kantoorroute geschreven');
+  console.log('    kantoor schrijft: ' + (stand.ledenstaat.doorKantoorGeschreven.join(', ') || '(geen)'));
+  console.log('\n  DE MUUR: ' + stand.muur.aantalGelezen + ' van ' + stand.ledenstaat.aantal +
+    ' velden bereiken het model (' + stand.muur.gelezenVelden.join(', ') + ')');
+  console.log('    ' + stand.muur.aantalNietGelezen + ' velden liggen in hetzelfde object en worden NIET gelezen.');
+  console.log('    doorsnede kantoorveld x gelezen veld: ' + (stand.muur.lek.join(', ') || 'leeg'));
+  console.log('\n  graad: ' + stand.graad + ' -- ' + stand.waarom + '\n');
 }
-const t = stand.telling;
-console.log('\nDE LEDENCONTEXT VAN RAHUL -- ' + stand.samensteller.bestand);
-console.log('\n  invoeren: ' + t.lid + ' op het LID, ' + t.pas + ' op de PAS, ' +
-  t.globaal + ' op het HUIS, ' + t.statisch + ' vaste tekst');
-for (const i of stand.invoeren) console.log('    ' + i.sleutel.padEnd(10) + i.aanroep);
-console.log('\n  ledenstaat: ' + stand.ledenstaat.aantal + ' velden, waarvan ' +
-  stand.ledenstaat.doorKantoorGeschreven.length + ' door een kantoorroute geschreven');
-console.log('    kantoor schrijft: ' + (stand.ledenstaat.doorKantoorGeschreven.join(', ') || '(geen)'));
-console.log('\n  DE MUUR: ' + stand.muur.aantalGelezen + ' van ' + stand.ledenstaat.aantal +
-  ' velden bereiken het model (' + stand.muur.gelezenVelden.join(', ') + ')');
-console.log('    ' + stand.muur.aantalNietGelezen + ' velden liggen in hetzelfde object en worden NIET gelezen.');
-console.log('    doorsnede kantoorveld x gelezen veld: ' + (stand.muur.lek.join(', ') || 'leeg'));
-console.log('\n  graad: ' + stand.graad + ' -- ' + stand.waarom + '\n');
+
+if (require.main === module) {
+  const stand = main();
+  if (process.argv.includes('--vastleggen')) {
+    /* DE POORT VOORAF, EN NIET ALLEEN HET STEMPEL ACHTERAF. `stempel()` meldt met
+       `boomVuil: true` dat deze meting bij een stand hoort die nergens is
+       vastgelegd -- maar pas als hij al geschreven is, en dan ratelt
+       `registersUitVuileBoom` omhoog. De poort die dat vooraf tegenhoudt hangt
+       aan 12 van de 79 stempelende scripts; dit is er een van. */
+    const poort = eisSchoneBoom('aicontext');
+    if (!poort.ok) { console.error('[aicontext] ' + poort.reden); process.exit(2); }
+    fs.writeFileSync(DOEL, JSON.stringify(Object.assign({ stempel: stempel() }, main()), null, 2) + '\n');
+    console.log('AICONTEXT.json geschreven.');
+  }
+  toon(stand);
+}
+
+module.exports = { meet: main };

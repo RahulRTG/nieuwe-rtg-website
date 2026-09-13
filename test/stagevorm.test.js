@@ -54,8 +54,8 @@ test('1. zelfijking: versmald tot twee verwante domeinen VINDT de meter wel een 
 test('2. de momentsoorten komen ONGEWRONGEN uit de bron, en zijn dus niet leeg', () => {
   const h = S.meet().gemeten.haak;
   assert.ok(h.soorten.length > 0, 'de soortenlijst is gevuld; leeg betekende hier een leesfout en geen bevinding');
-  const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/mediaos/eigen.js'), 'utf8');
-  for (const s of h.soorten) assert.ok(bron.includes("'" + s + "'"), 'de soort `' + s + '` staat echt in kern/mediaos/eigen.js');
+  const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/mediaos/aanwezigheid.js'), 'utf8');
+  for (const s of h.soorten) assert.ok(bron.includes("'" + s + "'"), 'de soort `' + s + '` staat echt in kern/mediaos/aanwezigheid.js');
 });
 
 test('3. de haak wordt geteld waar hij echt wordt aangeroepen', () => {
@@ -64,8 +64,14 @@ test('3. de haak wordt geteld waar hij echt wordt aangeroepen', () => {
      erin staan, en een domein dat hem aantoonbaar niet aanroept eruit. Zonder
      de tweede helft zou een meter die ALTIJD ja zegt deze toets halen. */
   assert.ok(h.waar.some(x => x.domein === 'kern/podium'), 'kern/podium roept nieuwWerk() aan bij live gaan');
-  assert.ok(h.zonderHaak.includes('kern/festival'), 'kern/festival doet dat niet');
-  assert.ok(!fs.readFileSync(path.join(WORTEL, 'server/kern/festival/artiest.js'), 'utf8').includes('nieuwWerk('),
+  /* kern/festival stond hier tot 13 september als het domein ZONDER haak. Sinds
+     de aansluiting roept het er wel een aan (mediaNieuwMoment via de
+     aanwezigheid), dus de tegenproef verhuist naar een domein dat er
+     aantoonbaar geen heeft -- en dat is er ook een met een BESLUIT erachter:
+     kern/creator kent alleen `niet`-gebeurtenissen, dus daar hoort geen haak. */
+  assert.ok(h.zonderHaak.includes('kern/creator'), 'kern/creator roept geen haak aan');
+  assert.ok(!/\b(nieuwWerk|nieuwMoment|mediaNieuwMoment)\s*\(/.test(
+    fs.readFileSync(path.join(WORTEL, 'server/kern/creator.js'), 'utf8')),
     'en dat klopt ook echt in de bron');
 });
 

@@ -206,11 +206,17 @@ function haak() {
      EN HIER NIET DOOR DE WRINGER. `wring()` haalt juist de TEKENREEKSEN eruit,
      en deze lijst BESTAAT uit tekenreeksen -- de eerste versie las hem gewrongen
      en gaf een lege lijst terug. Dat is de gevaarlijke faalvorm: geen fout, geen
-     waarschuwing, een nul op het scherm waar geen nul is. Voor het zoeken naar
-     namen is de wringer goed (commentaar mag niet meetellen), voor het LEZEN van
-     een waarde is hij verkeerd. */
-  const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/mediaos/eigen.js'), 'utf8');
-  const m = /MELD_SOORTEN\s*=\s*\[([^\]]*)\]/.exec(bron);
+     waarschuwing, een nul op het scherm waar geen nul is.
+
+     EN HIJ IS VERHUISD, en dat is precies waarom deze meter een toets heeft. De
+     lijst stond in kern/mediaos/eigen.js en woont sinds 13 september in
+     ./aanwezigheid.js -- eigen.js LEEST hem daar nu, want de soorten die een lid
+     kan aanzetten zijn dezelfde als die een publieke aanwezigheid uitzendt. Een
+     meter die op de oude plek blijft kijken, geeft stilletjes een lege lijst:
+     geen fout, geen uitzondering, alleen een nul. Toets 2 van
+     test/stagevorm.test.js ving dat binnen een minuut. */
+  const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/mediaos/aanwezigheid.js'), 'utf8');
+  const m = /SOORTEN\s*=\s*\[([^\]]*)\]/.exec(bron);
   const soorten = m ? m[1].split(',').map(s => s.replace(/['"\s]/g, '')).filter(Boolean) : [];
   return {
     publiekeDomeinen: alle.length,

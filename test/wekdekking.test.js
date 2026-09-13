@@ -50,26 +50,30 @@ test('1. zelfijking: een domein uit het register halen laat de meter uitslaan', 
 
 test('2. een moment zonder aanleiding wordt gemeld, en een verzonnen aanleiding ook', () => {
   const voor = vers();
-  /* salon.post_uitgelicht staat er vandaag als enige in: `featured` wordt
-     nergens gezet behalve in de seed. Dat is de bevinding, geen fout. */
-  assert.equal(voor.gemeten.momentZonderAanleiding, 1);
-  assert.equal(voor.zonderAanleiding[0].gebeurtenis, 'salon.post_uitgelicht');
+  /* DIT GETAL STOND OP 1 EN IS NU 0, en dat verschil is de hele opbrengst van
+     deze meter. `salon.post_uitgelicht` was een belofte zonder oorzaak --
+     `featured` werd nergens gezet behalve in de seed -- en kern/salon/
+     uitlichten.js heeft die handeling gebouwd. De toets is daarop bijgewerkt en
+     niet andersom: hij zakte toen de reparatie landde, precies zoals hij hoort. */
+  assert.equal(voor.gemeten.momentZonderAanleiding, 0,
+    'elk publiek moment heeft een aanleiding die in zijn bron staat');
 
   const na = metVervangenRegister(
-    (src) => src.replace("aanleiding: 'wedstrijdMaak'", "aanleiding: 'zzDezeTekstBestaatNiet'"),
+    (src) => src.replace("aanleiding: 'momentVoorClub'", "aanleiding: 'zzDezeTekstBestaatNiet'"),
     () => vers());
-  assert.equal(na.gemeten.momentZonderAanleiding, 2, 'een aanleiding die nergens staat, telt mee');
+  assert.equal(na.gemeten.momentZonderAanleiding, 1, 'een aanleiding die nergens staat, telt mee');
+  assert.equal(na.zonderAanleiding[0].gebeurtenis, 'stadion.wedstrijd_gepland');
 });
 
 test('3. een aanleiding die alleen in commentaar staat, telt niet', () => {
   /* De meter leest de GEWRONGEN bron. Zonder die wringer zou een aanleiding
      "bewijsbaar" zijn doordat iemand hem in een uitleg heeft genoemd. */
   const na = metVervangenRegister(
-    (src) => src.replace("aanleiding: 'wedstrijdMaak'", "aanleiding: 'het wedstrijdprogramma met uitslagen'"),
+    (src) => src.replace("aanleiding: 'momentVoorClub'", "aanleiding: 'het wedstrijdprogramma met uitslagen'"),
     () => vers());
   const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/sportclub/sportief.js'), 'utf8');
   assert.ok(bron.includes('het wedstrijdprogramma met uitslagen'), 'die tekst staat er wel degelijk, in de kop van het bestand');
-  assert.equal(na.gemeten.momentZonderAanleiding, 2, 'maar hij telt niet als aanleiding');
+  assert.equal(na.gemeten.momentZonderAanleiding, 1, 'maar hij telt niet als aanleiding');
 });
 
 test('4. `volgers` als GETAL is geen volgrelatie', () => {

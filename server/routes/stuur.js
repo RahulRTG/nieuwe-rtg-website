@@ -91,9 +91,19 @@ module.exports = (kern) => {
     if (r.error) return res.status(r.status || 500).json(r);
     return res.json({ ok: true, ingetrokken: r.ingetrokken, aantal: r.aantal });
   };
+  /* ALLEEN HET LID, en dat is een besluit en geen halve oplevering. De eerste
+     versie hing hem ook voor supplier en staff op, "voor de symmetrie". De
+     deltapoort wees dat terecht af: die twee stonden in geen enkele toets, en
+     een endpoint dat later een toets krijgt, krijgt hem niet.
+
+     Maar de echte reden is een maat dieper. Het besluit van de eigenaar ging
+     over een LID, en de allowlist opent het pad ook alleen daar
+     (kern/stuur/beleid-lijsten.js). Een route voor een zaak zou dus bestaan
+     zonder dat Rahul hem mag gebruiken en zonder dat een scherm hem aanroept --
+     een ingang naar niets. Die twee komen er zodra er besloten is hoe de
+     werkwerelden erin staan; tot dan is het gat zichtbaar in plaats van
+     dichtgeplamuurd. */
   app.post('/api/member/voorstel/intrek', auth, intrekHandler('member'));
-  app.post('/api/supplier/voorstel/intrek', supplierAuth, intrekHandler('supplier'));
-  app.post('/api/staff/voorstel/intrek', supplierAuth, intrekHandler('staff'));
 
   app.post('/api/member/doe', auth, doeHandler('member'));
   app.post('/api/member/doe/bevestig', auth, bevestigHandler('member'));

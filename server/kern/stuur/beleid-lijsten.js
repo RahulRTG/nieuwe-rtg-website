@@ -64,11 +64,12 @@ const KLEIN = Object.freeze({
        hoe erg het is als hij ernaast zit -- en die twee lopen hier uit elkaar. */
     /^\/api\/member\/voorstel\/intrek$/
   ],
-  /* MET OPZET NIET VOOR supplier EN staff. De route bestaat daar wel (een zaak
-     moet zijn eigen voorstel ook kunnen laten vervallen), maar het besluit van
-     de eigenaar ging over een LID. Deze twee lijsten zijn vandaag leeg, en de
-     eerste `klein` in een wereld openzetten is een uitspraak over de houding van
-     die wereld -- geen bijvangst van een lid-besluit. */
+  /* MET OPZET NIET VOOR supplier EN staff, en daar bestaat de ROUTE ook niet.
+     Het besluit van de eigenaar ging over een LID. Een intrekpad voor een zaak
+     openzetten is twee besluiten in een: dat de werkwerelden hun eerste `klein`
+     krijgen, en dat een zaak zijn voorstel conversationeel mag terugtrekken.
+     Die twee horen apart gesteld te worden, en tot dan staat het gat zichtbaar
+     in plaats van half gebouwd (zie routes/stuur.js). */
   supplier: [],
   staff: []
 });

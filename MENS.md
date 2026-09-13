@@ -481,7 +481,7 @@ zijn niet herschreven; twee ervan bleken er twee te zijn.
 | 10a | het contract staat een wereldkeuze toe | menstaal |
 | 10b | het antwoord laat de mens werkelijk kiezen | **geen** |
 
-<!--getal:mensmutatie.gezakt-->11<!--/getal--> van de twaalf laten een wacht
+<!--getal:mensmutatie.gezakt-->15<!--/getal--> van de twaalf laten een wacht
 zakken, met de melding erbij in `MENSMUTATIE.json` — niet met een vinkje, want
 een wacht die om de verkeerde reden zakt bewijst niets. Er blijft
 <!--getal:mensmutatie.zonderWacht-->1<!--/getal--> over, en dat getal is een tand
@@ -535,11 +535,11 @@ Zodra het detail per zin naast de stand kwam te liggen, vielen er drie dingen op
 die als alinea al bekend waren maar nooit als getal bestonden.
 
 **De resolver gebruikt de context bijna nergens.** Van de
-<!--getal:menselijk.scenarios-->39<!--/getal--> zinnen komt
-er bij <!--getal:menselijk.contextAangeboden-->14<!--/getal--> context aan die door
+<!--getal:menselijk.scenarios-->41<!--/getal--> zinnen komt
+er bij <!--getal:menselijk.contextAangeboden-->16<!--/getal--> context aan die door
 het contract heen komt, bij <!--getal:menselijk.contextGebruikt-->2<!--/getal-->
 raakt een contextwoord aantoonbaar een pad, en bij
-<!--getal:menselijk.niemandKeek-->21<!--/getal--> heeft de resolver niet eens
+<!--getal:menselijk.niemandKeek-->23<!--/getal--> heeft de resolver niet eens
 gedraaid — dan heeft *niemand gekeken*, en dat is iets anders dan "de context deed
 niets".
 
@@ -553,7 +553,7 @@ contextWOORDEN-weg die versmalt en niet de verwijzingsoplossing — twee
 mechanismen die makkelijk voor elkaar worden aangezien. Bij de andere zinnen
 geeft `resolver.js` bij dun bewijs nog steeds de volle lijst terug — te weinig
 woorden om te versmallen. Twee van de
-<!--getal:menselijk.scenarios-->39<!--/getal--> is dus geen prestatie maar wel
+<!--getal:menselijk.scenarios-->41<!--/getal--> is dus geen prestatie maar wel
 een bewijs: het mechanisme werkt niet alleen in een unittoets
 (`test/menscontext.test.js` toets 2) maar ook van begin tot eind.
 

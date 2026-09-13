@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T08:49:37.194Z",
-    "commit": "3ac209ff",
-    "boomVuil": true,
-    "boomAnders": 1,
+    "op": "2026-09-13T08:54:05.311Z",
+    "commit": "863091f6",
+    "boomVuil": false,
+    "boomAnders": 0,
     "instrument": "scripts/wekdekking.js",
     "node": "v22.22.2"
   },

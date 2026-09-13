@@ -329,6 +329,74 @@ verbiedt. Een daglimiet is een aparte, open vraag (par. 7).
 
 ---
 
+## 5a. De wekdekking: wat mag de publieke rail op?
+
+*Gemeten met `npm run wekdekking` → `WEKDEKKING.json`, tegen het besluitregister
+`scripts/lib/wekbesluit.js`.*
+
+Par. 1.3 zei dat de opdracht "aansluiten en niet uitvinden" is. Dat klopt nog
+steeds, maar het is niet hetzelfde als "zes haken zetten". Niet elke mutatie
+verdient een melding: wie zes domeinen aansluit zonder eerst te besluiten wát
+er de rail op mag, bouwt binnen een jaar een feed van administratieve ruis.
+
+**Drie klassen, en de middelste bestond nergens:**
+
+| klasse | betekenis |
+|---|---|
+| `moment` | publiek moment — mag Stage bereiken **en** mag wekken |
+| `stil` | publiek maar stil — Stage mag het tonen wanneer iemand kijkt; geen melding |
+| `niet` | mag de publieke rail überhaupt niet op |
+
+Die middelste is het besluit dat het meeste tegenhoudt. *Zichtbaar* en *de
+moeite van een onderbreking waard* zijn twee verschillende vragen, en zonder een
+eigen klasse ertussen wordt alles wat zichtbaar mag zijn vanzelf een melding.
+
+Dertien besluiten over de zes domeinen: **4 moment, 3 stil, 6 niet.** Een
+onbevestigde artiestenboeking staat er als `niet` — `kern/festival/gast.js`
+houdt voornemens al uit het gastprogramma, en Stage mag niet de achterdeur om
+die regel heen worden.
+
+### Wat de meting vond, en waarom er nog niets bedraad is
+
+| meting | uitkomst |
+|---|---|
+| domeinen zonder uitspraak | **0** — en dit getal staat op de ratel, zodat een zevende domein niet stil kan verschijnen |
+| momenten zonder wekweg | **4** — alle vier zitten in een domein dat de haak niet aanroept |
+| momenten zonder volgers | **3** — festival (2×) en sportclub hebben géén volgrelatie |
+| momenten zonder aanleiding | **1** — `salon.post_uitgelicht` |
+
+**Geen van de vier momenten kan vandaag eerlijk worden aangesloten**, en elk om
+een eigen reden. Dat is de uitkomst die de volgorde van het werk bepaalt, en zij
+was niet te zien zonder te meten.
+
+1. **Festival en sportclub hebben niemand om te wekken.** De wekhaak wekt
+   VOLGERS, en die lijst komt uit het domein zelf. Er is geen volgrelatie op een
+   festival of een club. Een haak daar zetten levert een mechanisme dat in het
+   niets vuurt — en dat is niet zichtbaar, want nul meldingen ziet er hetzelfde
+   uit als nul volgers. *Wat volgen hier betekent, is een besluit en geen
+   bedrading.*
+2. **De Salon heeft als enige wél een echte volgrelatie** (`volgtLid`, gelezen
+   door `kern/salon/profiel.js`, en die geeft ledensleutels). Zij hangt vandaag
+   niet aan de medialaag. Dit is het enige domein waar aansluiten werkelijk
+   bedrading is.
+3. **Maar het Salon-moment heeft geen oorzaak.** `featured` wordt nergens gezet
+   behalve in de seed, terwijl `kern/salonviraal.js` én `CLAUDE.md` allebei
+   zeggen dat RTG cureert. Er is geen handeling waarmee dat gebeurt. Dat is een
+   gat in een bestaande merkregel en niet in Stage — en het is de reden dat elk
+   `moment` in het register zijn **aanleiding** noemt, die de meter in de
+   gewrongen bron opzoekt. Een wachter zonder bron hoort te zeggen dat hij niet
+   kijkt.
+
+### De val die deze meter voor zichzelf zette
+
+`creator.volgers` is een **getal** over een extern platform — het bereik dat de
+maker zelf opgeeft — en geen relatie met RTG-leden. Een meter die het woord
+`volgers` zoekt, ziet daar een volgerslijst. Daarom zoekt hij naar een FUNCTIE
+die volgers oplevert en nooit naar het woord, en `test/wekdekking.test.js` toets
+4 houdt dat vast.
+
+---
+
 ## 6. De momentproef
 
 Zoals `tafelproef`, `ritproef` en `toelatingsproef`: één synthetisch mens, één
@@ -360,6 +428,13 @@ uitgangen: zakken, of de bevinding wegpoetsen), en `sluit` en
 
 Vijf, en de eerste drie blokkeren de rest.
 
+0. **Wat betekent een festival of een club VOLGEN?** Nieuw sinds par. 5a, en het
+   blokkeert drie van de vier publieke momenten. Vandaag is er geen volgrelatie
+   op een organisatie — alleen op een mens. Zolang dat zo is, wekt een wekhaak
+   daar niemand. Dit is een productbesluit en geen bedrading.
+0b. **Wie licht een Salon-post uit?** `featured` bestaat alleen in de seed,
+   terwijl de merkregel zegt dat RTG cureert. Zonder die handeling is het enige
+   aansluitbare moment een belofte zonder oorzaak.
 1. **Hoe heet het?** `moment` draagt al zes betekenissen (par. 1.1). Hernoemen
    of uitwijken — `presence`, `broadcast`, `drop` en `stage` zijn vrij.
 2. **Mag een vertegenwoordiger publiceren?** Een tiende bevoegdheid in een

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T08:51:55.694Z",
-    "commit": "3ac209ff",
-    "boomVuil": true,
-    "boomAnders": 3,
+    "op": "2026-09-13T08:54:31.812Z",
+    "commit": "863091f6",
+    "boomVuil": false,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },

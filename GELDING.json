@@ -1,14 +1,14 @@
 {
   "stempel": {
-    "op": "2026-09-13T19:24:53.719Z",
-    "commit": "9ba5c8c5",
+    "op": "2026-09-13T19:54:34.020Z",
+    "commit": "397ff23f",
     "boomVuil": false,
     "instrument": "scripts/gelding.js",
     "node": "v22.22.2"
   },
   "uitleg": "Waar geldt een wet (CLAIM), waar leeft hij (DRAAG), en waar kan een wachter hem zien (WACHT)? De drie assen worden onafhankelijk gevuld en pas daarna vergeleken; zij delen geen bron, en test/gelding.test.js houdt dat vast.",
   "graad": "vermoed",
-  "grens": "GEEN PERCENTAGE, en dat is een ontwerpkeuze: voor een verhouding moet eerst vaststaan wat een telbare eenheid is, en bij een centrale architectuur kan een objectfamilie zwaarder wegen dan twintig mappen. TWEE UITSLAGEN ZIJN GEMAKKELIJK VERKEERD TE LEZEN: GECLAIMD_GEEN_DRAGER_GEVONDEN betekent NIET dat er geen drager is, alleen dat DEZE sensor er geen vond -- en die ziet vandaag alleen de handeling `opslaan`. GEDRAGEN_NIET_GEZIEN betekent NIET \"ongetest\": misschien bewaakt een centrale laag de cel op een manier die deze wachtersensor niet ziet.",
+  "grens": "GEEN PERCENTAGE, en dat is een ontwerpkeuze: voor een verhouding moet eerst vaststaan wat een telbare eenheid is, en bij een centrale architectuur kan een objectfamilie zwaarder wegen dan twintig mappen. TWEE UITSLAGEN ZIJN GEMAKKELIJK VERKEERD TE LEZEN: GECLAIMD_GEEN_DRAGER_GEVONDEN betekent NIET dat er geen drager is, alleen dat DEZE sensor er geen vond -- en die ziet vandaag `opslaan` en `tonen`, en `projecteren` en `rangschikken` niet. GEDRAGEN_NIET_GEZIEN betekent NIET \"ongetest\": misschien bewaakt een centrale laag de cel op een manier die deze wachtersensor niet ziet.",
   "geval": {
     "id": "geen-cijfer-op-mens",
     "objectfamilie": "MENS",
@@ -64,16 +64,19 @@
       ]
     },
     "draag": {
-      "bron": "scripts/objectmodel.js (vormen van bewaarde dingen)",
+      "bron": "scripts/objectmodel.js (vormen van bewaarde dingen) + ROUTEBRON.json (routebereik)",
       "ziet": [
-        "opslaan"
+        "opslaan",
+        "tonen"
       ],
       "zietNiet": [
         "projecteren",
-        "rangschikken",
-        "tonen"
+        "rangschikken"
       ],
-      "zietNietWaarom": "een bewaarde vorm toont wat er is opgeslagen, niet wat ermee wordt getoond of geordend",
+      "zietNietWaarom": "GEMETEN en niet aangenomen: een module die ergens een persoonssleutel noemt en ergens `.map(` of `.sort(` gebruikt levert 410 respectievelijk 155 treffers -- dezelfde precisie als de woordsensor die al is afgekeurd. Zonder vorm- of graafsignaal blijven die twee handelingen onbepaald.",
+      "tonenBron": "ROUTEBRON.json (welke module handelt een API-route af)",
+      "tonenStand": "gemeten",
+      "tonenGrens": "WAT HIER GEMETEN IS, is dat de dragermodule een API-route afhandelt -- niet dat die route het oordeel TOONT. Alle veertien routes van de twee schooldragers zijn POST, en dit huis gebruikt POST ook om te lezen (/api/foundation/school/toets/lijst), dus de methode scheidt schrijven en tonen niet. `tonen` betekent hier dus: het bewaarde oordeel is van buiten de module bereikbaar. Dat is een ONDERgrens voor bereikbaarheid en een BOVENgrens voor tonen in enge zin.",
       "dragers": [
         {
           "module": "server/kern/command/bijstand.js",
@@ -83,6 +86,10 @@
           ],
           "waarde": [
             "niveau"
+          ],
+          "routes": 0,
+          "handelingen": [
+            "opslaan"
           ]
         },
         {
@@ -93,6 +100,10 @@
           ],
           "waarde": [
             "niveau"
+          ],
+          "routes": 0,
+          "handelingen": [
+            "opslaan"
           ]
         },
         {
@@ -103,6 +114,10 @@
           ],
           "waarde": [
             "niveau"
+          ],
+          "routes": 0,
+          "handelingen": [
+            "opslaan"
           ]
         },
         {
@@ -113,6 +128,11 @@
           ],
           "waarde": [
             "cijfer"
+          ],
+          "routes": 8,
+          "handelingen": [
+            "opslaan",
+            "tonen"
           ]
         },
         {
@@ -123,6 +143,11 @@
           ],
           "waarde": [
             "cijfer"
+          ],
+          "routes": 6,
+          "handelingen": [
+            "opslaan",
+            "tonen"
           ]
         }
       ]
@@ -141,10 +166,11 @@
     }
   },
   "telling": {
-    "GECLAIMD_GEEN_DRAGER_GEVONDEN": 56,
+    "GECLAIMD_GEEN_DRAGER_GEVONDEN": 52,
     "ONBEPAALD": 4,
-    "GEDRAGEN_NIET_GEZIEN": 4
+    "GEDRAGEN_NIET_GEZIEN": 8
   },
+  "bevinding": "Het verbreden van de DRAAG-as naar `tonen` zette vier nieuwe cellen op GEDRAGEN_NIET_GEZIEN: tonen | school | elk van de vier actoren. Dat is geen overtreding (zie `grens`), maar het stelt een vraag die de CLAIM-as vandaag niet KAN beantwoorden: de uitzondering voor School is verklaard op de HANDELING `opslaan` en kent geen actor. Een cijfer tonen aan de leerling zelf of aan zijn docent is dezelfde leerstof als het bewaren ervan; hetzelfde cijfer tonen aan een partner of een externe lezer is precies wat SCHOOL.md par. 11.1 tegenhoudt. De uitzondering is dus vermoedelijk te grof. Hem hier verbreden zou een DOCTRINEBESLUIT zijn, en dat neemt een mens en geen sensor -- daarom staat hij ongewijzigd en staat de vraag hier.",
   "cellen": [
     {
       "handeling": "opslaan",
@@ -623,36 +649,36 @@
       "context": "school",
       "actor": "systeem",
       "claim": true,
-      "draag": false,
+      "draag": true,
       "wacht": false,
-      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+      "uitslag": "GEDRAGEN_NIET_GEZIEN"
     },
     {
       "handeling": "tonen",
       "context": "school",
       "actor": "medewerker",
       "claim": true,
-      "draag": false,
+      "draag": true,
       "wacht": false,
-      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+      "uitslag": "GEDRAGEN_NIET_GEZIEN"
     },
     {
       "handeling": "tonen",
       "context": "school",
       "actor": "partner",
       "claim": true,
-      "draag": false,
+      "draag": true,
       "wacht": false,
-      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+      "uitslag": "GEDRAGEN_NIET_GEZIEN"
     },
     {
       "handeling": "tonen",
       "context": "school",
       "actor": "externeLezer",
       "claim": true,
-      "draag": false,
+      "draag": true,
       "wacht": false,
-      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+      "uitslag": "GEDRAGEN_NIET_GEZIEN"
     },
     {
       "handeling": "tonen",

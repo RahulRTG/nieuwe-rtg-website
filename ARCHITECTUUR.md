@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5047 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5049 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,10 +18,10 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5047 |
-| servermodules (`server/**/*.js`) | 3420 |
+| API-endpoints | 5049 |
+| servermodules (`server/**/*.js`) | 3422 |
 | routebestanden (`server/routes/**`) | 589 |
-| kernmodules (`server/kern/**`) | 2134 |
+| kernmodules (`server/kern/**`) | 2136 |
 | schermen (`public/**/*.html`) | 318 |
 | gedeelde browsermodules (`public/shared/*.js`) | 353 |
 | toetsbestanden (`test/*.test.js`) | 1626 |
@@ -127,7 +127,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3422 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3424 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -135,9 +135,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1575 |
+| kern-namen die routes aanraken | 1577 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 235 |
-| daarvan door precies één domein | 1340 |
+| daarvan door precies één domein | 1342 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

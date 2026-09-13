@@ -392,7 +392,27 @@ gaat dus door als het spoor niet geschreven wordt -- dezelfde stille faalvorm al
 oudste valt eraf) met wél een hashketen eronder: wat er staat is onvervalsbaar,
 maar een keten bewijst niet dat er niets ontbreekt. De reparatie hoort op ÉÉN
 plek (`kern/kantoor/kluispoort.js`) en niet in 42 -- *geen aantoonbaar journaal,
-geen inzage* -- en dat is besluit 5.
+geen inzage* -- en dat is besluit 5. **Daar hoort een tweede invariant bij, en
+zonder die tweede is de eerste een schijnoplossing**: "geregistreerd" mag niet
+betekenen dat `noteer()` geen fout gooide maar dat de COMMIT geslaagd is, want
+`save()` in `server/db/index.js` zet binnen een bundel alleen een vlag en
+markeert in PostgreSQL-modus uitsluitend dat de responsepoort vóór het antwoord
+één autoritatieve commit moet doen -- succesvol terugkeren betekent daar dus niet
+dat er iets staat. Anders verschuift het probleem van een genegeerde uitzondering
+naar een VALSE BEVESTIGING, en die is erger want hij ziet eruit als bewijs. En
+dat is beproefbaar zonder iets nieuws te bouwen: `server/lib/verraad.js` kent
+`schrijf-verloren` ("keert NORMAAL terug zonder iets te bewaren") en
+`schrijf-faalt` ("een aanroeper die dat stil wegvangt, meldt succes over niets"),
+acht toetsbestanden gebruiken ze, tien raken het inzagejournaal, en de doorsnede
+is **nul** -- de toets bij besluit 5 is dus niet "werkt de poort" maar *weigert de
+poort onder `schrijf-verloren`*. De ringbuffer is een APART besluit (6): een
+hashketen bewijst de integriteit van wat er staat en zegt niets over wat eraf
+viel, dus integriteit en retentie zijn twee eigenschappen en de ene wordt hier
+makkelijk voor de andere aangezien. En besluit 7 legt de vraag voor of *een
+belofte over een spoor is pas een regel als het spoor kan weigeren* de twaalfde
+regel van `LAT.md` wordt -- de vorm is niet uniek voor het journaal: 468 lege
+`catch`-blokken in `server/`, waarvan 13 letterlijk `try { save(); } catch`, en
+dat is een vorm en geen aanklacht.
 
 Daaruit volgt de vorm van MN-02, en die is anders dan hij eerst was: niet *"een
 RTG-manager ziet hetzelfde als een externe"* (dat sneuvelt, want `kern/ledenbalie.js`

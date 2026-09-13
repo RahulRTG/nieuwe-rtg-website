@@ -199,10 +199,41 @@ zin:
   ongemerkt worden veranderd. Maar een keten bewijst dat wat er staat klopt, niet
   dat er niets ontbreekt.
 
+**En "geen exception" is hier niet hetzelfde als "vastgelegd".** Dat is geen
+theoretisch bezwaar maar de gemeten semantiek van `save()` in `server/db/index.js`:
+
+- **Binnen een bundel** (`bijeen()`) zet `save()` alleen een vlag --
+  `if (doos && doos.open) { doos.nodig = true; return; }` -- en de echte
+  schrijfactie gebeurt aan het eind, buiten die context.
+- **In PostgreSQL-modus** werkt een verzoek op een geïsoleerde copy-on-write
+  weergave, en markeert `save()` uitsluitend dat de responsepoort vóór het
+  antwoord één autoritatieve commit moet doen.
+
+In allebei de gevallen keert `save()` dus succesvol terug terwijl er nog niets
+duurzaam staat. Een poort die zich tevredenstelt met "er kwam geen fout uit"
+verplaatst het probleem alleen van een genegeerde uitzondering naar een **valse
+bevestiging**.
+
+**Het huis heeft de foutinjector die dit bewijst al gebouwd, en hij is nooit op
+het journaal gericht.** `server/lib/verraad.js` kent precies deze twee
+scenario's, en de kop van `save()` beschrijft de fout van `inzagelog.js`
+woordelijk zonder hem aan te wijzen:
+
+> `schrijf-verloren` -- *"deze functie keert NORMAAL terug zonder iets te
+> bewaren: de aanroeper krijgt zijn 200 en gelooft dat het vaststaat."*
+> `schrijf-faalt` -- *"een aanroeper die dat stil wegvangt, meldt succes over
+> niets."*
+
+Gemeten: **acht toetsbestanden** beproeven hun domein onder `schrijf-verloren`
+(notities, bank, rem, aidata, persistentiestand, kantoorawait en twee
+opslagtoetsen). **Tien toetsbestanden** raken het inzagejournaal. De doorsnede is
+**nul**. Het instrument bestaat, het wordt gebruikt, en juist de laag waarvan de
+hele belofte "elke blik laat een spoor na" is, staat er niet onder.
+
 **De reparatie hoort op één plek en niet in 42.** `kern/kantoor/kluispoort.js`
 bestaat al als de poort voor de zware inzage (hij hangt vandaag aan 8 van de 585
-kantoorroutes, `KANTOOR.md`). Daar hoort de regel te staan, en daar is hij ook
-uitvoerbaar: **geen aantoonbaar journaal, geen inzage.**
+kantoorroutes, `KANTOOR.md`). Daar hoort het contract te staan, en het is er ook
+uitvoerbaar: **eerst aantoonbaar geregistreerd, dan pas gelezen.**
 
 ---
 
@@ -448,6 +479,24 @@ bericht, en ze staat met reden in het inzagejournaal."*). Wat ontbreekt is dat
 een medewerker die een machtiging houdt voor een cliënt, voor díé cliënt een
 belanghebbende is -- en dat dat aan de kant van het lid zichtbaar wordt.
 
+**De vorm waarin dit uiteindelijk afdwingbaar wordt, is een familie van vijf
+velden rond de handelende mens** -- en drie ervan staan al in `kern/envelop.js`:
+
+| Veld | Vraag | Stand |
+|---|---|---|
+| `actor` | wie handelt | **staat** (een codenaam) |
+| `hoedanigheid` | in welke rol | **bestaat niet** buiten `kern/vertegenwoordiging/` |
+| `principal` | voor wie, namens wie | **bestaat niet** |
+| `oorzaak` | waardoor gebeurt dit | **staat** |
+| `correlatie` | bij welk proces hoort dit | **staat** |
+
+Met die vijf zijn regels af te dwingen die met routepermissies niet te schrijven
+zijn -- *een kantoorcontext mag dit dossier lezen, en die kennis stroomt niet door
+naar een managementcontext of een AI-context.* Maar let op de prijs die
+`CARRIERE.md` par. 2 al noemde: de envelop is met opzet **gesloten op acht
+velden**, dus twee velden erbij is een **versiesprong** en geen toevoeging. Wie
+ze in de inhoud propt, heeft de grens omzeild zonder hem te veranderen.
+
 **En de UX-regel die erbij hoort, want hij is een beveiligingsgrens en geen
 sierfunctie.** Een mens kiest niet voortdurend een technische rol, maar op een
 risicovol kruispunt is de context onmiskenbaar: *Management · namens Mila* of
@@ -556,7 +605,9 @@ Bovenop die van `CARRIERE.md` en `RUGDEKKING.md`, die onverkort blijven gelden.
    context (MN-02).
 4. **Een belofte over een spoor is pas een regel als het spoor kan weigeren.**
    Logging naast een handeling is een bedoeling; logging vóór een handeling is
-   een grens (par. 0.6).
+   een grens (par. 0.6). En "er kwam geen fout uit" is geen registratie zolang de
+   commit niet vaststaat.
+
 5. **Een mens hoeft niet beoordeeld te worden om binnen te komen** (par. 0.1).
 6. **Een merk zoekt geen mensen.** Het beschrijft een programma; de mens meldt
    zich aan.
@@ -605,6 +656,11 @@ keten écht lopen en per SCHAKEL en per STORING meten. De vierde hoort hier, en
 hij is met opzet geen talentketen maar de eerste **mens-relatie-keten**: één
 synthetische mens -- Mila, achttien, zelf beheerd, met een actieve bewijsmap --
 die twaalf overgangen doorloopt.
+
+En wat hij werkelijk meet is niet *kan een mens van manager wisselen*, maar:
+**blijven identiteit, bevoegdheid, kennis en bewijs correct gescheiden terwijl
+dezelfde mens door verschillende relaties en hoedanigheden beweegt?** Dat is de
+vraag waar de meeste systemen alleen een beleidstekst over hebben.
 
 | # | Schakel | Wat bewezen wordt |
 |---|---|---|
@@ -681,15 +737,79 @@ de stand die er is, en het besluit eronder is besluit 5.
 Par. 0.6 meet dat dit vandaag al beantwoord wordt, en niet door iemand die het
 besloten heeft: de inzage gaat door en de aanroeper merkt niets.
 
+De regel in één zin: **geen gevoelige kantoorinzage zonder aantoonbaar geslaagde
+journaalregistratie.**
+
 | Optie | Wat het betekent | Prijs |
 |---|---|---|
-| **A. Geen aantoonbaar journaal, geen inzage** *(aanbevolen)* | Voor de zware inzage in `kern/kantoor/kluispoort.js`: lukt de regel niet, dan gaat de deur niet open. | Eén poort, niet 42 aanroepers. Een storing in de opslag legt dan wel de ledenbalie stil -- en dat is precies wat de belofte waard maakt. |
-| B. Inzage door, maar luid | De blik mag doorgaan; het mislukken wordt een incident in plaats van een lege `catch`. | Goedkoper, en de belofte "elke blik laat een spoor na" blijft dan een belofte over de bedoeling. |
-| C. Laten zoals het is | -- | Dan staat er een belofte in `ledenbalie.js` die het huis niet kan waarmaken, en dat is precies wat `LAT.md` een belofte in plaats van een regel noemt. |
+| **A. Geen aantoonbaar journaal, geen inzage** *(aanbevolen)* | Eén contract in `kern/kantoor/kluispoort.js`: eerst geregistreerd, dan pas gelezen. Lukt de registratie niet, dan gaat de deur niet open. | Eén poort, niet 42 aanroepers. Een opslagstoring legt dan de zware inzage stil -- en dat is precies wat de belofte waard maakt. |
+| B. Inzage door, maar luid | De blik mag doorgaan; het mislukken wordt een incident in plaats van een lege `catch`. | Goedkoper, en "elke blik laat een spoor na" blijft dan een belofte over de bedoeling. |
+| C. Laten zoals het is | -- | Dan staat er een belofte in `ledenbalie.js` die het huis niet kan waarmaken. |
 
-Let op dat A en B allebei beter zijn dan de huidige stand, en dat de keuze niet
-over veiligheid gaat maar over beschikbaarheid: A zet de ledenbalie stil bij een
+**Bij optie A hoort een tweede invariant, en zonder die tweede is de eerste een
+schijnoplossing.** "Geregistreerd" mag niet betekenen *`noteer()` gooide geen
+fout*, maar *de commit die deze regel draagt is geslaagd* -- in PostgreSQL-modus
+dus de autoritatieve commit van de responsepoort, en binnen een bundel het einde
+van `bijeen()`. Anders verschuift het probleem van een genegeerde uitzondering
+naar een valse bevestiging, en die is erger: hij ziet eruit als bewijs.
+
+Dat is bovendien **beproefbaar zonder iets nieuws te bouwen**: `schrijf-verloren`
+en `schrijf-faalt` bestaan al in `server/lib/verraad.js`, acht toetsbestanden
+gebruiken ze, en het journaal is er geen van. De toets bij dit besluit is dus
+niet "werkt de poort" maar **"weigert de poort onder `schrijf-verloren`"** -- en
+dat is precies het geval dat vandaag stil goed gaat.
+
+A en B zijn allebei beter dan de huidige stand. De keuze gaat niet over
+veiligheid maar over beschikbaarheid: A zet de zware inzage stil bij een
 opslagstoring, B laat hem doorwerken met een luide melding.
+
+### Besluit 6 -- Wat is de bewaargarantie van het journaal?
+
+Dit is een apart besluit en geen bijzin bij besluit 5. Het journaal is een
+ringbuffer: `MAX = 5000`, en loopt hij vol dan valt de oudste eraf. Dat is geen
+bug zolang de belofte eerlijk is -- maar *"u kunt zien wie uw dossier heeft
+bekeken"* en *"wij bewaren de laatste vijfduizend inzages"* zijn twee
+verschillende beloften, en vandaag staat alleen de eerste op het scherm.
+
+**De hashketen lost dit niet op.** `lib/keten.js` bewijst de integriteit van wat
+er staat; hij zegt niets over wat eraf gevallen is. Integriteit en retentie zijn
+twee eigenschappen, en de ene wordt hier makkelijk voor de andere aangezien.
+
+| Optie | Wat het betekent | Prijs |
+|---|---|---|
+| **A. Een termijn vastleggen en die tonen** *(aanbevolen)* | Niet een aantal regels maar een tijd, met wat er daarna gebeurt (vervallen of archiveren), en dat staat waar het lid het leest. | Klein als het vervallen is, groter als het archiveren wordt. |
+| B. Aantal regels, eerlijk benoemd | Laat de 5000 staan en zeg het erbij. | Een grens die met het gebruik meebeweegt: bij druk verkeer is de horizon korter dan bij rustig, en niemand ziet dat. |
+| C. Archiveren met een anker | De afgevallen staart blijft controleerbaar buiten de database. | Het duurst, en `AFSPRAAK.md` waarschuwt al: een anker in dezelfde database is geen anker. |
+
+### Besluit 7 -- Wordt dit de twaalfde regel van `LAT.md`?
+
+Grens 4 van par. 6 is hier geformuleerd voor het inzagejournaal, maar hij gaat
+nergens specifiek over inzage:
+
+> **Een belofte over een spoor is pas een regel als het spoor kan weigeren.**
+
+Dezelfde vraag staat open bij financiële logging, bij consent, bij het
+mutatiebewijs, bij het akkoord op voorwaarden en bij gevoelige AI-handelingen --
+overal waar dit huis zegt dat iets wordt vastgelegd. `LAT.md` is de plek voor een
+regel die overal geldt, en zijn elf regels komen alle elf uit een fout die hier
+écht is gemaakt. Deze zou de twaalfde zijn, en hij heeft die fout nu ook.
+
+**De omvang is gemeten en hij is bewust ruw.** In `server/` staan **468** lege
+`catch`-blokken, waarvan er **13** letterlijk de vorm `try { save(); } catch`
+hebben -- dezelfde als `inzagelog.js`.
+
+Dat getal is een **vorm en geen aanklacht**, in de zin van `DOODSPOOR.json`: veruit
+de meeste lege catches zijn terecht (opruimwerk waar mislukken niet uitmaakt --
+`try { res.destroy(err); } catch (e) {}` is geen bug). De dertien zijn de plekken
+waar een duurzaamheidsfout wordt weggeslikt, en pas per stuk nakijken zegt of
+daar ook een belofte boven hangt. Wat de meting wél vaststelt: de vorm is niet
+uniek voor het journaal, en een regel die hem vangt heeft meer dan één klant.
+
+| Optie | Wat het betekent | Prijs |
+|---|---|---|
+| **A. Ja, maar pas na de eerste handhaver** *(aanbevolen)* | De regel komt in `LAT.md` zodra besluit 5 gebouwd is, zodat hij met een werkend voorbeeld binnenkomt in plaats van als voornemen. | Een regel meer, en de dertien vragen dan een ronde: draagt hier een belofte boven? |
+| B. Ja, nu | Sneller vastgelegd. | `LAT.md` zegt zelf dat een regel zonder handhaver een belofte is; dat zou de twaalfde regel meteen overtreden. |
+| C. Nee, hij blijft van deze laag | Geen huisbrede belofte die niemand nakomt. | Dan wordt hij per domein opnieuw ontdekt, en dat is precies hoe deze er kwam. |
 
 ---
 
@@ -755,8 +875,13 @@ steeds vaker de verkeerde eerste vraag.
 
 De goede eerste vraag is:
 
-> **welke bestaande waarheid hebben we al, en welke verbinding ontbreekt
-> waardoor een mens haar nog niet als één geheel ervaart?**
+> **welke waarheid bestaat al, welke belofte denken we dat die waarheid geeft,
+> en is die belofte ook aantoonbaar onder storing?**
+
+Die derde helft is de nieuwe. Par. 0.6 is er het voorbeeld van: de waarheid
+bestond (een journaal met een hashketen), de belofte leek te volgen ("elke blik
+laat een spoor na"), en onder storing hield zij geen stand. Niemand had dat
+verkeerd gedaan -- er was alleen nooit iemand die de derde vraag stelde.
 
 Het werk verschuift daarmee van functies naar semantiek, bedrading en harde
 invarianten. Dat is een moeilijker probleem, en een volwassener.

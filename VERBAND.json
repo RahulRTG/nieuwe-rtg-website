@@ -1,55 +1,56 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:06:34.746Z",
-    "commit": "46719192",
+    "op": "2026-09-13T11:35:40.792Z",
+    "commit": "f03f045e",
     "boomVuil": false,
     "instrument": "scripts/verband.js",
     "node": "v22.22.2"
   },
   "uitleg": "De ijking van de verbandlaag: kan een onafhankelijke waarnemer de wet->wachter-randen terugvinden die WETTEN.json verklaart? Het veld `handhaver` is hier de REFERENTIE en wordt door geen enkele sensor gelezen -- anders ijkt de machine zichzelf en is de uitslag altijd honderd procent.",
   "graad": "vermoed",
-  "grens": "De RECALL is gemeten, de PRECISIE niet: van de voorstellen per sensor is niet vastgesteld welk deel een echte handhaver aanwijst. De vijf sensoren worden NOOIT tot een cijfer gemiddeld -- `anker` haalt 7 van de 56 met 11 voorstellen en `wettekst` 51 met 403, dus een gemiddelde verbergt precies het verschil waar een lezer op moet wegen. Een rand draagt daarom WELKE sensoren hem zagen en geen betrouwbaarheidspercentage.",
+  "grens": "De RECALL is gemeten, de PRECISIE niet: van de voorstellen per sensor is niet vastgesteld welk deel een echte handhaver aanwijst. De vijf sensoren worden NOOIT tot een cijfer gemiddeld -- `anker` haalt 8 van de 57 met 12 voorstellen en `wettekst` 52 met 411, dus een gemiddelde verbergt precies het verschil waar een lezer op moet wegen. Een rand draagt daarom WELKE sensoren hem zagen en geen betrouwbaarheidspercentage.",
   "telling": {
-    "wetten": 50,
-    "randenWachter": 56,
-    "randenImplementatie": 35,
-    "gevonden": 54,
+    "wetten": 51,
+    "randenWachter": 57,
+    "randenImplementatie": 36,
+    "gevonden": 55,
     "gemist": 2
   },
   "tweeRelaties": {
-    "uitleg": "Het veld `handhaver` draagt twee verschillende beweringen: een WACHTER die rood wordt, en de IMPLEMENTATIE die de regel draagt. Deze meter ijkt alleen de eerste.",
-    "wachter": 56,
-    "implementatie": 35
+    "uitleg": "Het veld `handhaver` draagt twee verschillende beweringen: een WACHTER die rood wordt (relatie BEWAAKT_DOOR), en de IMPLEMENTATIE die de regel draagt (relatie DRAAGT). Deze meter ijkt alleen de eerste. Elke rand draagt daarom een `relatie` die zegt WAT hij is, naast een `bronrelatie` die zegt wat er in WETTEN.json stond.",
+    "interpretatie": "ONBEPAALD IN DE BRON: WETTEN.json kent een veldnaam voor twee relaties. De splitsing hier is een LEZING van deze meter en geen besluit -- WETTEN.json is niet aangeraakt. Wie die twee daar uit elkaar trekt, doet dat als besluit en niet als berekening.",
+    "wachter": 57,
+    "implementatie": 36
   },
   "sensoren": {
     "causaal": {
-      "recall": 3,
-      "van": 56,
-      "voorstellen": 8,
+      "recall": 4,
+      "van": 57,
+      "voorstellen": 9,
       "bron": "gemeten"
     },
     "document": {
-      "recall": 35,
-      "van": 56,
-      "voorstellen": 322,
+      "recall": 36,
+      "van": 57,
+      "voorstellen": 356,
       "bron": "gemeten"
     },
     "anker": {
-      "recall": 7,
-      "van": 56,
-      "voorstellen": 11,
+      "recall": 8,
+      "van": 57,
+      "voorstellen": 12,
       "bron": "gemeten"
     },
     "doelbestand": {
-      "recall": 32,
-      "van": 56,
-      "voorstellen": 98,
+      "recall": 33,
+      "van": 57,
+      "voorstellen": 99,
       "bron": "gemeten"
     },
     "wettekst": {
-      "recall": 51,
-      "van": 56,
-      "voorstellen": 403,
+      "recall": 52,
+      "van": 57,
+      "voorstellen": 411,
       "bron": "gemeten"
     }
   },
@@ -70,7 +71,9 @@
       "gezienDoor": [
         "document",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "merk-twee-letterrollen",
@@ -79,7 +82,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "merk-pearl-is-warm",
@@ -88,7 +93,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "merk-goud-is-mat",
@@ -97,14 +104,18 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "merk-geen-emoji",
       "wachter": "scripts/check.js",
       "gezienDoor": [
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "vorm-bodoni-ceremonieel",
@@ -113,7 +124,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "vorm-modus-is-volledig",
@@ -122,7 +135,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "vorm-status-niet-op-kleur",
@@ -131,7 +146,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "vorm-geen-inline-handlers",
@@ -139,7 +156,9 @@
       "gezienDoor": [
         "document",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "toegang-ai-belooft-niets",
@@ -148,7 +167,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "toegang-ai-belooft-niets",
@@ -157,7 +178,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "toegang-ai-liegt-niet-over-boekingen",
@@ -166,7 +189,9 @@
         "anker",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "toegang-codenaam-boven-naam",
@@ -174,21 +199,27 @@
       "gezienDoor": [
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "toegang-geen-kluisgegevens-van-een-ander",
       "wachter": "test/grens-sweep.test.js",
       "gezienDoor": [
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "toegang-grendel-hangt-aan-het-doel",
       "wachter": "test/eenaccount.test.js",
       "gezienDoor": [
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "toegang-progressie-stopt-bij-18",
@@ -197,7 +228,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "toegang-elke-route-heeft-een-poort",
@@ -205,7 +238,9 @@
       "gezienDoor": [
         "document",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "toegang-authorization-echt-verifieren",
@@ -213,21 +248,27 @@
       "gezienDoor": [
         "document",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "geld-conservatie",
       "wachter": "test/geld-conservatie-last.test.js",
       "gezienDoor": [
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "leven-bijdrage-telt-nergens-op",
       "wachter": "test/levensgraafleven.test.js",
       "gezienDoor": [
         "document"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "leven-talent-blijft-bij-het-lid",
@@ -236,7 +277,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "concern-geen-derde-rechtenmodel",
@@ -244,24 +287,32 @@
       "gezienDoor": [
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "concern-geen-score-zonder-afwijking",
       "wachter": "test/onderneming-dagbeeld.test.js",
-      "gezienDoor": []
+      "gezienDoor": [],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "concern-werknemer-koopt-geen-pas",
       "wachter": "test/eenaccount-werkruimte.test.js",
-      "gezienDoor": []
+      "gezienDoor": [],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "werkruimte-alleen-een-verwijzing",
       "wachter": "test/werkgrens.test.js",
       "gezienDoor": [
         "doelbestand"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "wereld-een-app-een-wereld",
@@ -270,7 +321,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "wereld-geen-twee-beginschermen",
@@ -279,7 +332,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-geen-productie-zonder-grootboek",
@@ -287,7 +342,9 @@
       "gezienDoor": [
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-domeingrens-houdt-tegen",
@@ -296,7 +353,9 @@
         "causaal",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-elke-meter-is-geijkt",
@@ -305,7 +364,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-elke-meter-is-geijkt",
@@ -315,7 +376,9 @@
         "anker",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-geen-dode-configuratie",
@@ -323,7 +386,9 @@
       "gezienDoor": [
         "document",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-bedradingscontract",
@@ -331,14 +396,18 @@
       "gezienDoor": [
         "document",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-bedradingscontract",
       "wachter": "scripts/kruisscan.js",
       "gezienDoor": [
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-zelfpoortende-toets-in-de-draaier",
@@ -347,7 +416,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-zelfpoortende-toets-in-de-draaier",
@@ -355,7 +426,9 @@
       "gezienDoor": [
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-routepad-staat-voluit",
@@ -363,14 +436,18 @@
       "gezienDoor": [
         "document",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-routepad-staat-voluit",
       "wachter": "scripts/schakelbaar.js",
       "gezienDoor": [
         "anker"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-gegenereerde-kaarten-lopen-niet-achter",
@@ -379,7 +456,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-gegenereerde-kaarten-lopen-niet-achter",
@@ -388,7 +467,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-gegenereerde-kaarten-lopen-niet-achter",
@@ -397,7 +478,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-strenge-toetspoort",
@@ -405,7 +488,9 @@
       "gezienDoor": [
         "document",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-strenge-toetspoort",
@@ -413,7 +498,9 @@
       "gezienDoor": [
         "causaal",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-wetten-hebben-een-bron",
@@ -422,7 +509,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-sabotage-meet-zichzelf",
@@ -431,7 +520,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-sabotage-meet-zichzelf",
@@ -440,7 +531,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "geld-poort-kent-geen-spelstand",
@@ -449,7 +542,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "geld-simulatiebank-nooit-in-productie",
@@ -457,7 +552,9 @@
       "gezienDoor": [
         "document",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "toegang-actor-op-de-bus-is-een-codenaam",
@@ -466,7 +563,9 @@
         "causaal",
         "document",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-geen-gedeelde-laagnaam",
@@ -475,7 +574,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-geen-gedeelde-laagnaam",
@@ -484,7 +585,9 @@
         "document",
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "techniek-een-genoemde-cap-bestaat",
@@ -492,7 +595,9 @@
       "gezienDoor": [
         "doelbestand",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "beveiliging-geen-verlaging-zonder-ceremonie",
@@ -500,7 +605,9 @@
       "gezienDoor": [
         "anker",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "beveiliging-ai-heft-beveiliging-niet-op",
@@ -508,7 +615,9 @@
       "gezienDoor": [
         "anker",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "beveiliging-lagere-drager-neutraliseert-niet",
@@ -516,7 +625,9 @@
       "gezienDoor": [
         "anker",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
     },
     {
       "wet": "beveiliging-onbekende-stand-is-niet-normaal",
@@ -524,7 +635,240 @@
       "gezienDoor": [
         "anker",
         "wettekst"
-      ]
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "techniek-meter-kent-zijn-grens",
+      "wachter": "test/meterwet.test.js",
+      "gezienDoor": [
+        "causaal",
+        "document",
+        "anker",
+        "doelbestand",
+        "wettekst"
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "handhaver"
+    }
+  ],
+  "implementatie": [
+    {
+      "wet": "merk-twee-letterrollen",
+      "bestand": "public/shared/rtg-materiaal.css",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "vorm-bodoni-ceremonieel",
+      "bestand": "public/shared/rtg-ontwerp.css",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "vorm-modus-is-volledig",
+      "bestand": "public/shared/rtg-ontwerp.css",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "vorm-status-niet-op-kleur",
+      "bestand": "public/shared/rtg-ontwerp.css",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "vorm-geen-inline-handlers",
+      "bestand": "server/middleware/voordeur.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "toegang-ai-belooft-niets",
+      "bestand": "server/kern/ai/prompt.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "toegang-ai-liegt-niet-over-boekingen",
+      "bestand": "server/kern/ai/prompt.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "toegang-codenaam-boven-naam",
+      "bestand": "server/accounts/kluis.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "toegang-geen-kluisgegevens-van-een-ander",
+      "bestand": "server/accounts/kluis.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "toegang-grendel-hangt-aan-het-doel",
+      "bestand": "server/pinslot.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "toegang-progressie-stopt-bij-18",
+      "bestand": "server/kern/spellen/grens.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "geld-conservatie",
+      "bestand": "server/kern/pay/boeking.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "leven-bijdrage-telt-nergens-op",
+      "bestand": "server/kern/levensgraaf/bronnen-leven-bijdrage.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "leven-talent-blijft-bij-het-lid",
+      "bestand": "server/kern/levensgraaf/bronnen-leven.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "concern-geen-derde-rechtenmodel",
+      "bestand": "server/kern/onderneming/toegang.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "concern-geen-score-zonder-afwijking",
+      "bestand": "server/kern/onderneming/meter.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "concern-juridisch-gegeven-heeft-een-bron",
+      "bestand": "server/kern/concern/bron.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "concern-juridisch-gegeven-heeft-een-bron",
+      "bestand": "server/kern/concern/tijd.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "concern-werknemer-koopt-geen-pas",
+      "bestand": "server/kern/eenaccount/starten.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "werkruimte-alleen-een-verwijzing",
+      "bestand": "server/bedrijf/herkomst.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "wereld-een-app-een-wereld",
+      "bestand": "public/apps/app-main/app-main-24a2.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "wereld-geen-twee-beginschermen",
+      "bestand": "public/shared/command.css",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "techniek-geen-productie-zonder-grootboek",
+      "bestand": "server/config/productie-opslag.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "techniek-domeingrens-houdt-tegen",
+      "bestand": "server/opzet/domeingrens.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "techniek-domeingrens-houdt-tegen",
+      "bestand": "GRENZEN.json",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "techniek-elke-meter-is-geijkt",
+      "bestand": "NORM.json",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "techniek-wetten-hebben-een-bron",
+      "bestand": "WETTEN.json",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "geld-poort-kent-geen-spelstand",
+      "bestand": "server/kern/pay/poort.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "geld-simulatiebank-nooit-in-productie",
+      "bestand": "server/betaal/synthetisch.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "toegang-actor-op-de-bus-is-een-codenaam",
+      "bestand": "server/kern/envelop.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "techniek-een-genoemde-cap-bestaat",
+      "bestand": "server/seed/genres-lijst.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "beveiliging-geen-verlaging-zonder-ceremonie",
+      "bestand": "server/kern/isolatie/ordening.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "beveiliging-ai-heft-beveiliging-niet-op",
+      "bestand": "server/kern/stuur/beleid-lijsten.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "beveiliging-lagere-drager-neutraliseert-niet",
+      "bestand": "server/kern/isolatie/ordening.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "beveiliging-onbekende-stand-is-niet-normaal",
+      "bestand": "server/kern/incidentcontrole-stand.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
+    },
+    {
+      "wet": "techniek-meter-kent-zijn-grens",
+      "bestand": "scripts/lib/ijking.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "handhaver"
     }
   ]
 }

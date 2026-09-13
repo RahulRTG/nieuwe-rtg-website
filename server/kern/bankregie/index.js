@@ -33,23 +33,26 @@ function maakBankregie({ db, save, bijeen }) {
      scripts/crashproef.js mat drie routes als gezakt op ATOMIC: ledenAan stond
      op true, de oproep stierf bij de eerste bundel, en na de herstart stond hij
      op false -- terwijl de auditregel NIET landde. De schakelaar die bepaalt of
-     de leden-bank live is, kon dus omgaan zonder spoor van WIE. Voor een
-     besturingsvlak is dat de duurste halve uitkomst: de macht verschuift en de
-     verantwoording niet.
+     de leden-bank live is, kon dus omgaan zonder spoor van WIE.
 
-     De oorzaak stond hieronder: `d().x = ...; save()` is write-behind en staat
-     in geen bundel; de bundel kwam pas later, met de audit. Nu gaan mutatie en
-     spoor er samen in.
+     De oorzaak: `d().x = ...; save()` stond in geen bundel, en de bundel kwam
+     pas later met de audit. Nu gaan mutatie en spoor er samen in.
 
-     Het spoor is een CALLBACK omdat de route pas na de uitkomst weet wat erin
-     hoort (een opschaling wacht op een tweede persoon). De SSE-sync blijft
-     erbuiten: een scherm mag niet horen van een besluit dat nog niet vaststaat.
-     Zie routes/kantoren/bank.js voor die kant. */
+     GEEN DUURZAME bundel, en dat is een correctie op de eerste versie. Die
+     vroeg `{ duurzaam: true }` en deed daarmee meer dan nodig: zo'n bundel
+     GOOIT als de opslag niet bevestigt, dus de knop weigerde op elke opslag die
+     dat niet kan -- test/bankduurzaam.test.js viel erover, en die legt juist
+     vast dat de kantoorhandeling ook op een liegende opslag hoort aan te komen.
+     Het gebrek was samenhang, niet duurzaamheid.
+
+     Het spoor is een CALLBACK: pas de uitkomst zegt of er is uitgevoerd of op
+     een tweede persoon wordt gewacht. De SSE-sync blijft erbuiten -- zie
+     routes/kantoren/bank.js. */
   const besluit = async (doe, audit) => bijeen(async () => {
     const r = doe();
     if (audit && r && !r.error) { try { audit(r); } catch (e) { /* het spoor mag het besluit niet breken */ } }
     return r;
-  }, { duurzaam: true });
+  });
   function d() {
     if (!db.data.bankregie || typeof db.data.bankregie !== 'object') db.data.bankregie = {};
     return normaliseer(db.data.bankregie);

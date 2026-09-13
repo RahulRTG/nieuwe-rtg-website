@@ -3323,7 +3323,6 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/pay/index.js', 'geld: bevestigen vóór duurzaamheid is een belofte die de opslag nog niet deed'],
     ['server/kern/economie/runtime/index.js', 'economische waarheid: intent, ledger en evidence worden vóór bevestiging als één bundel vastgelegd'],
     ['server/kern/fonds.js', 'fondsallocatie: een bevestigde verdeling mag niet na een herstart verdwijnen'],
-    ['server/kern/bankregie/index.js', 'de knop die bepaalt hoe RTG cleart en of de leden-bank live is: scripts/crashproef.js mat dat de stand duurzaam omging terwijl het proces stierf EN de auditregel niet landde, dus een schakelaar kon omgaan zonder spoor van wie -- besluit en spoor gaan nu samen de duurzame bundel in, of geen van beide'],
     ['server/kern/factuurcorrectie.js', 'geld terug naar een lid: de terugboeking en de correctieregel horen als een duurzame commit op schijf, net als de heenweg in kern/factuursaldo.js -- een lid dat "terugbetaald" leest terwijl de opslag het nog niet heeft, is precies de halve uitkomst waar de factuurproef voor is gebouwd'],
     ['server/kern/experience/index.js', 'menselijke bevestiging: acknowledgement en action evidence worden vóór succes duurzaam vastgelegd'],
     ['server/kern/notities.js', 'werk van een lid: een bevestigde notitie mag niet verdwijnen bij een opslagfout'],

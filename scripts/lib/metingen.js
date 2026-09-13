@@ -143,6 +143,14 @@ const REGISTER = {
      een bewering zijn, en dat is precies wat de kop hierboven verbiedt. */
   'ONDERNEMERBEWIJS.json': { eigenRatel: 'test/ondernemerbewijs.test.js' },
   'ZAAKLIVEPROEF.json': { eigenRatel: 'test/ondernemerbewijs.test.js' },
+  /* De geldketen heeft een EIGEN ratelbestand en niet die van de projectie.
+     Reden: zijn twee tanden gaan over dingen die ONDERNEMERBEWIJS.json niet
+     kent -- of het verkochte bedrag ongeschonden in de maand landt, en of de
+     twee bevindingen (btw-categorie uit de werkplek, terugstorting die de
+     verkoop wist) nog steeds als bevinding in het register staan. Een bevinding
+     die verdwijnt zonder besluit is precies de stille faalvorm die deze laag
+     moet vangen. */
+  'OMZETPROEF.json': { eigenRatel: 'test/omzetproef.test.js' },
 
   /* De adressen die de documenten noemen. De toets bevriest het register NIET --
      ADRESSEN.json beweegt bij elke documentregel die een pad noemt, en een tand

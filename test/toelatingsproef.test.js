@@ -84,25 +84,27 @@ test('5. de woordenlijst is uitgebreid, en dat staat er eerlijk bij', () => {
      dezelfde naam, twee betekenissen. Daarom telt hij niet als gedeelde actor. */
   const perKeten = v.actoren.perKeten;
   const metZaak = Object.keys(perKeten).filter(k => perKeten[k].includes('zaak'));
-  /* DRIE KETENS DRAGEN NU HET WOORD `zaak`, EN HET BETEKENT ER DRIE DINGEN.
+  /* VIER KETENS DRAGEN NU HET WOORD `zaak`, EN HET BETEKENT ER VIER DINGEN.
      In de tafelketen is het de horecazaak die BEDIENT, in de toelatingsketen de
-     zaak die ONTSTAAT, en in de zaak-live-keten de zaak die ZICHTBAAR wordt --
-     ontvanger, uitkomst, onderwerp. Dat is geen gedeelde actor maar precies de
-     vorm die SEMANTIEK.json meet: dezelfde naam, meer betekenissen. Komt er een
-     vierde keten met `zaak` bij, dan hoort deze lijst weer te zakken zodat
-     iemand kijkt of het daar hetzelfde betekent. */
-  assert.deepEqual(metZaak.sort(), ['tafel', 'toelating', 'zaaklive'],
+     zaak die ONTSTAAT, in de zaak-live-keten de zaak die ZICHTBAAR wordt, en in
+     de omzetketen de zaak in wiens BOEKEN het geld landt -- ontvanger, uitkomst,
+     onderwerp, eigenaar van de waarheid. Dat is geen gedeelde actor maar precies
+     de vorm die SEMANTIEK.json meet: dezelfde naam, meer betekenissen. En hij
+     wordt met elke keten erger, niet beter: vier ketens, vier betekenissen, nul
+     gedeelde rol. Komt er een vijfde keten met `zaak` bij, dan hoort deze lijst
+     weer te zakken zodat iemand kijkt of het daar hetzelfde betekent. */
+  assert.deepEqual(metZaak.sort(), ['omzet', 'tafel', 'toelating', 'zaaklive'],
     'het woord `zaak` staat nu in andere ketens; kijk of het daar hetzelfde betekent');
 });
 
 test('6. de ketenvorm telt over ALLE ketens en niet over de eerste twee', () => {
   const v = lees('KETENVORM.json');
-  /* VIER sinds 13 september 2026: scripts/zaakliveproef.js kwam erbij. Dit
-     getal hoort mee te groeien met KETENS in scripts/ketenvorm.js -- staat het
-     stil, dan telt een nieuwe keten stilletjes niet mee en meet de vorm nog
-     steeds de oude verzameling. */
-  assert.equal(v.telling.ketens, 4);
-  assert.equal(v.ketens.length, 4);
+  /* VIJF sinds 13 september 2026: eerst scripts/zaakliveproef.js en daarna
+     scripts/omzetproef.js. Dit getal hoort mee te groeien met KETENS in
+     scripts/ketenvorm.js -- staat het stil, dan telt een nieuwe keten
+     stilletjes niet mee en meet de vorm nog steeds de oude verzameling. */
+  assert.equal(v.telling.ketens, 5);
+  assert.equal(v.ketens.length, 5);
   const { zonderCommentaar } = require('../scripts/lib/bron');
   assert.doesNotMatch(zonderCommentaar(vormBron), /gelezen\[1\]/,
     'de meter indexeert nog op de tweede keten; dan telt een derde stil niet mee');

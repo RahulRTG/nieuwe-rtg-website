@@ -353,6 +353,7 @@ const REGISTERS = [
      die dag. Een ZAAKLIVEPROEF.json die "de keten sluit" meldt terwijl iemand
      sindsdien de poortstappen heeft verlegd, is erger dan geen meting. */
   ['ZAAKLIVEPROEF.json', 'npm run zaakliveproef:vast', 'of de ondernemerketen sluit, van goedgekeurde aanvraag tot een zaak die een lid ziet'],
+  ['OMZETPROEF.json', 'npm run omzetproef:vast', 'of de geldketen sluit, van bestelling tot het cijfer waar btw over wordt afgedragen'],
   /* De Business Proof Map is GEEN keten maar een PROJECTIE over zeven registers,
      en juist daarom veroudert hij snel: hij is precies zo vers als zijn oudste
      bron. Een uitslag die "2786 routes bevoegd" meldt op een ROLPROEF van drie

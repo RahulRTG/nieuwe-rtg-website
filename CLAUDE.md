@@ -53,7 +53,7 @@ een marge of een leverancierscijfer bouwt. Het belangrijkste dat het document
 tegenhoudt is een `journeys`-tabel: een reis die mensen, geld, documenten én
 reserveringen BEZIT is de `Asset`-fout opnieuw, en de meting staat er
 (`KETENVORM.json`: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
-<!--getal:ketenvorm.actorenTotaal-->18<!--/getal--> gedeelde actoren over drie
+<!--getal:ketenvorm.actorenTotaal-->21<!--/getal--> gedeelde actoren over vijf
 ketens). De vorm die wél werkt is die van `kern/levensgraaf/graaf.js` — een
 PROJECTIE met vijf etiketten, hier plus de **herkomst** als zesde. Zeven grenzen
 bovenop die van REIZEN.md, waarvan de drie scherpste: geld wordt klaargezet en
@@ -1502,13 +1502,47 @@ alleen als er een lid-account achter het kantoortoken hangt -- wie met de
 GEDEELDE kantoorcode inlogt, kan de keten niet afmaken. Dat is een grens en geen
 gat, en hij zit nu in de meting (storing 1 en 7) in plaats van eromheen.
 
+**DE VIJFDE KETEN IS DE EERSTE DIE OVER GELD GAAT** (`scripts/omzetproef.js`,
+`npm run omzetproef`): van consumentintentie tot het cijfer waar een ondernemer
+btw over afdraagt -- bestellen, betalen, economische gebeurtenis, fiscale
+verdeling, ondernemersbeeld. De vraag is niet "werkt de betaalknop" maar: komt
+exact diezelfde gebeurtenis, met hetzelfde bedrag, dezelfde tijd, dezelfde
+fiscale betekenis en dezelfde eigenaar, correct terug in de financiele
+werkelijkheid van die zaak? Zeven schakels, acht storingen, gemeten met TWEE
+echte zaken -- want de tenant-naad is niet te meten met een verzonnen code. Hij
+vond drie dingen die geen enkele routetoets zag, en ze zijn met opzet niet
+hetzelfde soort vondst. **Een is gerepareerd**: de btw-CATEGORIE van een
+verkochte regel werd bij elke uitlezing opnieuw afgeleid uit de menukaart van
+VANDAAG, dus een gerecht van de kaart halen verplaatste AL VERKOCHTE omzet naar
+een andere btw-pot (gemeten: vier koffies, drankpot 20,00 -> 0,00, ook als de
+aangifte over die maand al gedaan was). Het TARIEF was wel tijdgetrouw -- de
+categorie niet, en dat verschil zag niemand. De bestelregel draagt nu zijn eigen
+`station`, precies zoals hij zijn eigen `price` draagt; een oude regel zonder dat
+veld blijft de kaart lezen, want anders zou de reparatie in een keer alle
+historische drankomzet naar eten schuiven. **Twee zijn BESLUITEN van de eigenaar
+en staan als bevinding in het register**: de btw-categorie wordt afgeleid uit de
+WERKPLEK (`station === 'bar' -> drank -> 21%`) terwijl de landentabel er zelf bij
+zegt dat in NL eten en NIET-ALCOHOLISCHE dranken 9% zijn -- een Flat White uit de
+bar valt dus op 21%, en de scheidslijn alcohol-ja/nee bestaat al twintig regels
+verderop in `kern/lidacties/bestellen.js` maar niet aan de fiscale kant. En een
+terugstorting WIST de verkoop uit de maand waarin hij stond in plaats van er een
+tegenboeking naast te zetten (`financeVoor` telt op `o.paid`, en
+`/api/supplier/refund` zet die op false), zodat de omzet van een afgesloten maand
+met terugwerkende kracht verandert en "er is nooit verkocht" niet meer te
+onderscheiden is van "er is verkocht en teruggestort". Twee dingen daar niet
+wegpoetsen: `test/omzetproef.test.js` houdt die twee bevindingen VAST met hun
+reden -- een bevinding die verdwijnt zonder besluit is de stilste faalvorm die
+deze laag kent -- en de proef zelf had een gat in zijn eigen poort
+(`sluitMetBevinding` telde `gebroken` niet mee, dus de eerste ronde zou zijn
+eigen vondst hebben laten passeren).
+
 **En wat de ketens werkelijk delen is GEMETEN** (`scripts/ketenvorm.js`,
 `KETENVORM.json`) in plaats van verklaard -- de proeven delen met opzet geen
 module, want een gedeelde ketenklasse eroverheen zou de `Asset`-fout zijn.
-Uitkomst over drie ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
-van <!--getal:ketenvorm.actorenTotaal-->18<!--/getal--> actoren gedeeld
+Uitkomst over VIJF ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
+van <!--getal:ketenvorm.actorenTotaal-->21<!--/getal--> actoren gedeeld
 (gast/zaal/keuken tegenover lid/vervoerder/dispatch/chauffeur tegenover
-aanvrager/kantoor/keurder/dossier/tijd) en
+aanvrager/kantoor/keurder/dossier/tijd tegenover lid/betaalrail/boekhouding/fiscus) en
 <!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van
 <!--getal:ketenvorm.themasTotaal-->10<!--/getal--> beloftethema's in ALLE drie.
 Die twee gaan allebei over de MACHINE en niet over het domein: mag dit twee

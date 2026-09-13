@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-13T12:11:47.204Z",
-  "commit": "75e425af",
-  "boomVuil": false,
-  "boomAnders": 0,
+  "op": "2026-09-13T12:30:59.165Z",
+  "commit": "cf3e6792",
+  "boomVuil": true,
+  "boomAnders": 2,
   "instrument": "scripts/ondernemerbewijs.js",
   "node": "v22.22.2"
  },
@@ -424,9 +424,9 @@
   "uitleg": "Verklaard, niet gemeten: welke ketens geldverdienend zijn is een besluit. Wat gemeten wordt is of er een proef bestaat die de keten sluit.",
   "telling": {
    "totaal": 20,
-   "sluit": 3,
+   "sluit": 4,
    "deels": 1,
-   "geen": 16
+   "geen": 15
   },
   "lijst": [
    {
@@ -456,11 +456,17 @@
    {
     "id": "bestelling-boekhouding",
     "naam": "Klant -> bestelling -> betaling -> boekhouding",
-    "proef": null,
-    "waar": "routes/supplier/orders, kern/pay/poort.js, routes/supplier/financien.js",
-    "mist": "de naad bestelling -> grootboek. TAFELPROEF stopt bij de afrekening en raakt de boekhouding niet",
-    "dekt": "geen",
-    "bewijs": null
+    "proef": "OMZETPROEF.json",
+    "dekt": "sluit",
+    "waar": "scripts/omzetproef.js -- 7 schakels, 8 storingen, twee echte zaken",
+    "mist": "de proef meet de PROJECTIE financeVoor en EEN maand; periodeafsluiting, aangifte en de weg naar een grootboekregel liggen erbuiten",
+    "bewijs": {
+     "schakels": 7,
+     "gesloten": 6,
+     "storingen": 8,
+     "gehouden": 8,
+     "stempel": "2026-09-13"
+    }
    },
    {
     "id": "tafel-rekening",

@@ -105,8 +105,41 @@ function basisCat(s, caps) {
    Buiten 'eten' en 'logies' verandert een artikel de categorie nooit: wat aan
    boord van een privejet wordt geschonken volgt het tarief van de vlucht, en
    dat is een fiscale keuze die hier niet stilletjes omgegooid wordt. */
-function catVanItem(s, naam, basis) {
+/* DE WERKPLEK VAN DE VERKOCHTE REGEL, EN WAAROM DIE MEE MAG REIZEN.
+
+   Deze functie zocht het gerecht op NAAM in de kaart van VANDAAG. Het bedrag
+   van een verkoop staat vast op het moment van verkopen, en het btw-TARIEF
+   komt uit de tabel van de transactiedag (`regelbron.tariefOp`) -- maar de
+   CATEGORIE werd elke keer opnieuw afgeleid uit de huidige menukaart. Haalde
+   een zaak een drankje van de kaart, dan vond deze functie het niet meer, viel
+   terug op de basiscategorie van de zaak, en verhuisde de AL VERKOCHTE omzet
+   van de drankpot (21%) naar de etenpot (9%).
+
+   Gemeten met scripts/omzetproef.js op 13 september 2026: vier koffies van
+   EUR 5 stonden voor de menuwijziging op drank@21% = 20,00 en erna op 0,00.
+   De maand van de zaak veranderde dus door een handeling die niets met die
+   maand te maken had -- ook als de aangifte er al over was gedaan.
+
+   DE OPLOSSING IS DE REGEL ZELF, EN NIET DEZE FUNCTIE. Wie hier een
+   kaart-met-geschiedenis zou bouwen, verplaatst het probleem: de vraag is niet
+   "hoe zag de kaart eruit" maar "wat is er verkocht". De bestelregel draagt
+   daarom sinds diezelfde dag zijn eigen `station` (kern/lidacties/bestellen.js),
+   precies zoals hij zijn eigen `price` draagt, en die wint hier van de kaart.
+
+   WAT HIERMEE NIET IS OPGELOST, en dat hoort er hardop bij: `basisCat` leest
+   nog steeds de capaciteiten van de zaak zoals ZIJ VANDAAG zijn. Een zaak die
+   van genre verandert, verplaatst daarmee nog altijd haar eigen verleden. Dat
+   is zeldzamer en het is een ander besluit; het staat als grens in
+   OMZETPROEF.json en niet stilzwijgend hier. */
+function catVanItem(s, naam, basis, regel) {
   if (basis !== 'eten' && basis !== 'logies') return basis;
+  /* De werkplek die MET de verkoop is vastgelegd gaat voor. `undefined` is hier
+     geen 'keuken': een oude regel zonder veld hoort de kaart te blijven lezen,
+     anders zou deze reparatie alle historische drankomzet naar eten schuiven --
+     precies de fout die zij bestrijdt, dan in een keer voor alles wat er al
+     staat. */
+  const werkplek = regel && typeof regel.station === 'string' ? regel.station : null;
+  if (werkplek) return werkplek === 'bar' ? 'drank' : 'eten';
   const m = ((s && s.menu) || []).find(x => x.name === naam);
   if (!m) return basis;
   return m.station === 'bar' ? 'drank' : 'eten';

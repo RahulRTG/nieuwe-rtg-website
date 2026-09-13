@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1843 bestanden en 13085 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1844 bestanden en 13093 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1843 |
-| losse beweringen (`test(...)`) | 13085 |
+| toetsbestanden | 1844 |
+| losse beweringen (`test(...)`) | 13093 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1217 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 70 |
 | alleen in de kop *genoemd*, nog niet gemeten | 154 |
-| niets van beide | 402 |
+| niets van beide | 403 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1627 bestanden, 12703 beweringen.
+1628 bestanden, 12711 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -920,6 +920,7 @@ toets omvalt.
 | `office.test.js` | 12 | gezakt op `liegpoort /api/` | RTG Office: het eigen kantoorpakket. Tekstdocumenten en rekenbladen op het account (op elk toestel terug), alleen-lezen delen op codenaam (nooit op echte naam), en per-lid/per-document begrenzingen. |
 | `officebord.test.js` | 2 | gezakt op `liegpoort /api/` | Het bord (Trello) als kantoortool in RTG Office. Getoetst: een lid maakt een bord, bewaart lijsten met kaarten en leest ze terug (de sanitizer klemt labels en datums); de zaak heeft hetzelfde bord als team-drive; en... |
 | `ogen.test.js` | 5 | -- | DE OGENREGEL OP EEN PLEK. "Dezelfde ogen tellen niet dubbel" stond in vier formuleringen in huis en werd op vijf plekken gebruikt: de documentenuitgifte, de naheffingsaanslag, het bezwaar, het dwangbevel en de... |
+| `omzetproef.test.js` | 8 | -- | DE GELDKETEN BLIJFT KLOPPEN -- de ratel onder scripts/omzetproef.js. De proef zelf draait een wegwerpserver op en duurt tientallen seconden; die hoort in een meetronde en niet in `npm test`. |
 | `onbewezen.test.js` | 8 | genoemd | DE TRECHTER ONDER ONBEWEZEN. Waarom hij bestaat staat in de kop van scripts/onbewezen.js: "3430 zonder bewijs" is een werkvoorraad waar niemand aan begint, en wie er wel aan begint leest broncode voor routes die op... |
 | `onboarding-inrichten.test.js` | 3 | -- | HET INRICHTEN: in één keer invullen wat het huis anders per keer komt vragen. De voordeur vraagt vier dingen en zet de rest op 'later': telefoon en adres worden pas gevraagd op het moment dat een handeling ze nodig... |
 | `onboarding-meebouwen.test.js` | 4 | -- | MEEBOUWEN: de twee dingen die een nieuw lid aan het platform zelf bijdraagt, elk met een toestemming die ergens op slaat. Sinds de demo-inhoud eruit is begint een installatie leeg -- De Salon zonder berichten, de... |

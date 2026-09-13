@@ -925,6 +925,29 @@ const GEEN_BRONMUTATIE = new Map([
      weghalen laat de vierde zakken. Zonder die twee zou "de schuld staat op nul"
      een bewering zijn over een meter die niemand ooit heeft zien uitslaan. */
   ['klokwacht.test.js', 'overleefde 2 mutaties in scripts/klokwacht.js, en dat kan niet anders: de ratel staat op nul, dus een gedragsmatige mutatie in de teller laat de uitkomst nul. De telling zelf is apart gezet (telIn) en met de hand op twee echte fouten nagetrokken -- commentaar niet strippen, en de haak uit het patroon -- die allebei raak zijn'],
+  /* TWEE TOETSEN DIE REGISTERS LEZEN EN GEEN SERVERMODULE.
+
+     Deze motor zoekt bij een toets de bronmodule die hij beschrijft en muteert
+     die. Bij deze twee vindt hij er geen ("geen module gevonden", 0 mutaties
+     geprobeerd) -- en dat is juist, want hun invoer is geen code maar zijn de
+     JSON-registers van dit huis. Een operator omdraaien in server/ raakt niets
+     wat zij beweren.
+
+     DE FAALKLASSE IS WEL NAGETROKKEN, en niet met de hand maar in de toetsen
+     zelf: allebei draaien ze hun eigen tegenproeven op GEMUTEERDE registers in
+     een wegwerpmap. ondernemerbewijs.test.js zet een ACL op `open` en eist dat
+     de capability naar GEBLOKKEERD klapt (toets 1), schorst een bewijs en eist
+     hetzelfde langs een andere laag (toets 2), haalt een bron weg en eist dat
+     het script ZAKT (toets 3), en breekt een ketenproef open (toets 6 en 7).
+     autonomiegrens.test.js zet een blind pad in de autonome lijst en eist dat
+     de grens hem noemt (toets 3). Dat is precies het bewijs dat deze motor bij
+     een bronmutatie zou zoeken -- alleen op de as waar deze toetsen over gaan.
+
+     Ze horen dus niet als `overleefd` te tellen (dat zou zeggen: de toets legt
+     het gedrag niet vast, en dat is aantoonbaar onwaar) en niet als niet-gemeten
+     (dat zou eerlijk werk bestraffen, zie de kop van deze lijst). */
+  ['ondernemerbewijs.test.js', 'leest registers en geen servermodule; 0 mutaties geprobeerd (geen module gevonden). De faalklasse staat in de toets zelf: vier tegenproeven op gemuteerde registers in een wegwerpmap, elk aantoonbaar raak'],
+  ['autonomiegrens.test.js', 'leest EXECUTION_MAP.json en ROLPROEF.json en geen servermodule; 0 mutaties geprobeerd (geen module gevonden). Toets 3 is de tegenproef: een blind pad autonoom maken laat de grens uitslaan'],
   /* Ik heb dit bestand eerst in EIGEN_MODULE gezet met public/apps/voertuig.js en
      rit.js erbij -- de twee modules die deze toets echt leest. De motor probeerde
      er 17 en de toets overleefde ze allemaal, en dat is hier GEEN uitspraak over

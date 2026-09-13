@@ -159,3 +159,52 @@ test('9. de bronnenlijst van deze toets loopt niet achter op het script', () => 
   for (const b of gevraagd)
     assert.ok(BRONNEN.includes(b), 'scripts/ondernemerbewijs.js leest ' + b + ', maar BRONNEN in deze toets kent hem niet');
 });
+
+/* ==========================================================================
+   DE TWEE RATELTANDEN.
+
+   scripts/lib/metingen.js wijst dit bestand aan als `eigenRatel` van
+   ONDERNEMERBEWIJS.json en ZAAKLIVEPROEF.json. Dat register zegt met zoveel
+   woorden dat zo'n regel alleen telt als er werkelijk een tand achter zit -- een
+   meetbestand met een regel maar zonder tand maakt het getal
+   `metingenZonderRatel` kleiner zonder dat er iets bewaakt wordt, en dat is het
+   tegenovergestelde van wat die meter moet laten zien.
+
+   De vloeren hieronder zijn de stand van 13 september 2026. Ze mogen OMHOOG
+   wanneer een meting beter wordt, en omlaag alleen met de hand en met de reden
+   in de commit -- dezelfde afspraak als bij elke andere ratel in dit huis.
+   ========================================================================== */
+const VLOER_ROUTES = {           // per bewijslaag: zoveel routes stonden er groen
+  bevoegd: 2786, herstelbaar: 1135, auditbaar: 762,
+  uitlegbaar: 439, persistent: 217, omkeerbaar: 36
+};
+
+test('R1. de vierde gouden keten blijft sluiten', () => {
+  /* ZAAKLIVEPROEF.json is een uitslag over de ondernemerspoort van die dag. Zakt
+     een schakel open, dan staat er vanaf dat moment "de keten sluit" in een
+     bestand waar het niet meer waar is -- en dat is erger dan geen meting. */
+  const k = JSON.parse(fs.readFileSync(path.join(WORTEL, 'ZAAKLIVEPROEF.json'), 'utf8'));
+  assert.equal(k.sluit, true, 'de zaak-live-keten sluit niet meer -- draai npm run zaakliveproef');
+  assert.ok(k.telling.schakels >= 9, 'er zijn schakels verdwenen: ' + k.telling.schakels);
+  assert.equal(k.telling.open, 0);
+  assert.equal(k.telling.stuk, 0);
+  assert.equal(k.telling.gebroken, 0, 'een storing houdt haar belofte niet meer');
+  assert.ok(k.telling.gehouden >= 8, 'er zijn storingen verdwenen: ' + k.telling.gehouden);
+});
+
+test('R2. geen bewijslaag zakt onder zijn vloer', () => {
+  /* De faalvorm die deze tand vangt is stil: een bronregister veroudert of komt
+     uit een vuile boom, de projectie leest er minder uit, en het getal in
+     ONDERNEMERBEWIJS.json daalt zonder dat iemand iets merkt. */
+  const a = JSON.parse(fs.readFileSync(path.join(WORTEL, 'ONDERNEMERBEWIJS.json'), 'utf8'));
+  for (const [laag, vloer] of Object.entries(VLOER_ROUTES)) {
+    const nu = (a.perLaag[laag] && a.perLaag[laag].routes && a.perLaag[laag].routes.groen) || 0;
+    assert.ok(nu >= vloer,
+      'laag `' + laag + '` zakte van ' + vloer + ' naar ' + nu + ' groene routes. ' +
+      'Is een bronregister verouderd, draai het opnieuw; is dit een bewuste verlaging, ' +
+      'pas de vloer met de hand aan met de reden in de commit.');
+  }
+  assert.equal(a.telling.geblokkeerd, 0,
+    'er staan capabilities op GEBLOKKEERD: ' +
+    a.capabilities.filter(c => c.stand === 'GEBLOKKEERD').map(c => c.id).join(', '));
+});

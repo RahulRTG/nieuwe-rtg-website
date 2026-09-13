@@ -84,14 +84,25 @@ test('5. de woordenlijst is uitgebreid, en dat staat er eerlijk bij', () => {
      dezelfde naam, twee betekenissen. Daarom telt hij niet als gedeelde actor. */
   const perKeten = v.actoren.perKeten;
   const metZaak = Object.keys(perKeten).filter(k => perKeten[k].includes('zaak'));
-  assert.deepEqual(metZaak.sort(), ['tafel', 'toelating'],
+  /* DRIE KETENS DRAGEN NU HET WOORD `zaak`, EN HET BETEKENT ER DRIE DINGEN.
+     In de tafelketen is het de horecazaak die BEDIENT, in de toelatingsketen de
+     zaak die ONTSTAAT, en in de zaak-live-keten de zaak die ZICHTBAAR wordt --
+     ontvanger, uitkomst, onderwerp. Dat is geen gedeelde actor maar precies de
+     vorm die SEMANTIEK.json meet: dezelfde naam, meer betekenissen. Komt er een
+     vierde keten met `zaak` bij, dan hoort deze lijst weer te zakken zodat
+     iemand kijkt of het daar hetzelfde betekent. */
+  assert.deepEqual(metZaak.sort(), ['tafel', 'toelating', 'zaaklive'],
     'het woord `zaak` staat nu in andere ketens; kijk of het daar hetzelfde betekent');
 });
 
 test('6. de ketenvorm telt over ALLE ketens en niet over de eerste twee', () => {
   const v = lees('KETENVORM.json');
-  assert.equal(v.telling.ketens, 3);
-  assert.equal(v.ketens.length, 3);
+  /* VIER sinds 13 september 2026: scripts/zaakliveproef.js kwam erbij. Dit
+     getal hoort mee te groeien met KETENS in scripts/ketenvorm.js -- staat het
+     stil, dan telt een nieuwe keten stilletjes niet mee en meet de vorm nog
+     steeds de oude verzameling. */
+  assert.equal(v.telling.ketens, 4);
+  assert.equal(v.ketens.length, 4);
   const { zonderCommentaar } = require('../scripts/lib/bron');
   assert.doesNotMatch(zonderCommentaar(vormBron), /gelezen\[1\]/,
     'de meter indexeert nog op de tweede keten; dan telt een derde stil niet mee');
@@ -100,13 +111,14 @@ test('6. de ketenvorm telt over ALLE ketens en niet over de eerste twee', () => 
 test('7. gedeeld is in ALLE ketens, en dat verschilt van "in meer dan een"', () => {
   const v = lees('KETENVORM.json');
   const t = v.beloften.telling;
-  for (const thema of v.beloften.gedeeld) assert.equal(t[thema], 3, thema + ' heet gedeeld maar zit niet in alle drie');
-  for (const thema of v.beloften.bijna) assert.ok(t[thema] > 1 && t[thema] < 3, thema + ' staat verkeerd in "bijna"');
+  const N = v.telling.ketens;
+  for (const thema of v.beloften.gedeeld) assert.equal(t[thema], N, thema + ' heet gedeeld maar zit niet in alle ' + N);
+  for (const thema of v.beloften.bijna) assert.ok(t[thema] > 1 && t[thema] < N, thema + ' staat verkeerd in "bijna"');
   for (const [k, lijst] of Object.entries(v.beloften.eigen))
     for (const thema of lijst) assert.equal(t[thema], 1, thema + ' heet "alleen ' + k + '" en zit in meer ketens');
 });
 
-test('8. wat de drie ketens delen, gaat over de machine en niet over het domein', () => {
+test('8. wat de ketens delen, gaat over de machine en niet over het domein', () => {
   /* Dit is het antwoord op MAATSTAF.md U40/U41, en het is een MEETUITSLAG en
      geen wens: zodra er een domeinbegrip in de gedeelde lijst verschijnt, is
      dat een echte vondst en hoort deze toets te zakken zodat iemand kijkt. */

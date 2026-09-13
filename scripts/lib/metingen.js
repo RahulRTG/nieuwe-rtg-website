@@ -134,6 +134,15 @@ const REGISTER = {
   'ISOLATIEPROEF.json': { eigenRatel: 'test/isolatieregisters.test.js' },
   'RESOLVERBEREIK.json': { eigenRatel: 'test/resolverbereik.test.js' },
   'GEZAGSNOEMER.json': { eigenRatel: 'test/gezagsnoemer.test.js' },
+  /* De Business Proof Map en de vierde gouden keten. Beide hangen aan
+     test/ondernemerbewijs.test.js, en dat is geen regel-om-de-regel: die toets
+     draagt twee echte tanden. De ene eist dat de ketenproef blijft SLUITEN
+     (negen schakels dicht, geen gebroken storing); de andere legt een VLOER
+     onder de route-dekking per bewijslaag, zodat een laag niet stilletjes
+     terugzakt doordat een bron verouderde. Zonder die twee zou dit register
+     een bewering zijn, en dat is precies wat de kop hierboven verbiedt. */
+  'ONDERNEMERBEWIJS.json': { eigenRatel: 'test/ondernemerbewijs.test.js' },
+  'ZAAKLIVEPROEF.json': { eigenRatel: 'test/ondernemerbewijs.test.js' },
 
   /* De adressen die de documenten noemen. De toets bevriest het register NIET --
      ADRESSEN.json beweegt bij elke documentregel die een pad noemt, en een tand

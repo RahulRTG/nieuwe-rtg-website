@@ -396,6 +396,34 @@ async function storingen(basis, uit, w) {
     'status ' + nogmaalsTerug.status + ' -- ' + ((nogmaalsTerug.data && nogmaalsTerug.data.error) || '') +
       ', omzet ' + naRefund + ' -> ' + naTweede);
 
+  /* KAN ELK SCHERM DE WAARHEID NOG ZIEN? Dit is de prijs van de tegenboeking en
+     hij wordt hier betaald in plaats van aangenomen. Voor de wijziging zei
+     `paid === false` tegen ELKE lezer dat het geld weg was; nu blijft `paid`
+     staan en moet elke lezer er `refunded` naast lezen. Een lezer die dat niet
+     KAN -- omdat de projectie het veld niet stuurt -- toont een teruggestorte
+     bon als betaald, en niets aan dat scherm kan dat repareren.
+
+     Gevonden met scripts/refundmigratie.js: het kantoorscherm was zo'n lezer.
+     /api/office/timeline stuurde `paid` en niet `refunded`, dus de tijdlijn zei
+     "betaald" naast een status "terugbetaald". Daarom worden hier BEIDE
+     projecties nagekeken -- die van de zaak en die van het kantoor -- en niet
+     alleen de projectie van het lid (die staat in storing 2). */
+  /* De zaakstand komt terug als `{ state: ... }` en niet plat. De eerste versie
+     las `data.orders`, vond niets, en meldde `refunded undefined` -- wat er
+     precies zo uitziet als een projectie die het veld niet stuurt. Een lege
+     lezing is geen bevinding; daarom staat de bon-check hieronder apart. */
+  const zaakStand = ((await P('/api/supplier/state', {}, w.A.S)).data || {}).state || {};
+  const zaakBon = (zaakStand.orders || []).find(o => o.ref === uit.ref) || null;
+  const kantoor = await P('/api/office/login', { code: KANTOOR });
+  const tl = await P('/api/office/timeline', { q: uit.ref }, (kantoor.data || {}).token);
+  const tlBon = (((tl.data || {}).items) || []).find(x => x.ref === uit.ref) || {};
+  noteer('een teruggestorte bon opzoeken bij de zaak en bij het kantoor',
+    'beide projecties dragen de terugstorting, zodat een scherm hem kan tonen',
+    !!zaakBon && zaakBon.refunded === true && tlBon.teruggestort === true,
+    (zaakBon ? 'zaak: paid ' + zaakBon.paid + ' / refunded ' + zaakBon.refunded
+             : 'zaak: de bon staat niet in haar eigen stand') +
+      ', kantoor: paid ' + tlBon.paid + ' / teruggestort ' + tlBon.teruggestort);
+
   /* 3. DE TENANT-NAAD (naad 6). Zaak B vraagt haar eigen cijfers op. De omzet
      van zaak A mag daar onder geen enkele omstandigheid in zitten -- en dit is
      de enige storing die met twee ECHTE zaken meet in plaats van met een
@@ -497,7 +525,8 @@ async function meet() {
       '(financeVoor is daar een pure projectie over db.data) -- twee mutaties nagetrokken. ' +
       'EN ZIJ GELDT ALLEEN VOOR BESTELLINGEN: kern/fiscaal/index.js telt rides en boekingen nog op `paid` ' +
       'zonder tegenboeking, en hun annuleerweg zet die vlag nog op false. Die twee (plus tickets) gaan pas ' +
-      'om met hun eigen gemeten lezerskaart -- ruw geteld 11, 22 en 7 lezers, tegenover 17 voor orders.',
+      'om met hun eigen gemeten lezerskaart: REFUNDMIGRATIE.json telt de lezers per collectie en houdt ze op ' +
+      '`onbekend` tot iemand ze met de hand heeft ingedeeld.',
     genre: GENRE, bruto: BRUTO, schakels: [], storingen: [], ref: null };
   const srv = await start({ naam: 'omzetproef', gereed: 'ready',
     env: { NODE_ENV: 'test', RTG_DEMO: '1', OFFICE_CODE: KANTOOR } });

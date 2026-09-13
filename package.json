@@ -326,6 +326,8 @@
     "ritproef:vast": "node scripts/ritproef.js --vastleggen",
     "ketenvorm": "node scripts/ketenvorm.js",
     "ketenvorm:vast": "node scripts/ketenvorm.js --vastleggen",
+    "refundmigratie": "node scripts/refundmigratie.js",
+    "refundmigratie:vast": "node scripts/refundmigratie.js --vastleggen",
     "ritmigratie": "node scripts/ritmigratie.js",
     "ritmigratie:vast": "node scripts/ritmigratie.js --vastleggen",
     "doorwerking": "node scripts/doorwerking.js",

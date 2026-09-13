@@ -346,7 +346,9 @@
     "moveproef:vast": "node scripts/moveproef.js --vastleggen",
     "crashas": "node scripts/crashas.js",
     "crashas:vast": "node scripts/crashas.js --vastleggen",
-    "crashgrenzen": "node scripts/crashgrenzen.js"
+    "crashgrenzen": "node scripts/crashgrenzen.js",
+    "crashproef": "node scripts/crashproef.js",
+    "crashproef:vast": "node scripts/crashproef.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

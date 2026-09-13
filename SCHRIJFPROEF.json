@@ -14,17 +14,17 @@
     "ONBEREIKT": "de proef kreeg de route niet aan het werk (geen lijf, geen wereld, of de deur bleef dicht)"
   },
   "stempel": {
-    "op": "2026-09-13T20:52:26.565Z",
-    "commit": "e8d83dc87",
+    "op": "2026-09-13T21:08:01.691Z",
+    "commit": "73fbb6a59",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/schrijfproef.js",
     "node": "v22.22.2"
   },
   "telling": {
-    "ONBEREIKT": 13,
+    "ONBEREIKT": 14,
     "VALS_SUCCES": 28,
-    "WEIGERT": 2,
+    "WEIGERT": 1,
     "SCHREEF_TOCH": 2
   },
   "routes": 45,
@@ -39,8 +39,9 @@
         "bankSaldi"
       ],
       "stand": "ONBEREIKT",
-      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
       "status": 400,
+      "basisStatus": 400,
       "opslagBewoog": false
     },
     {
@@ -53,6 +54,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -65,6 +67,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -77,6 +80,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -89,6 +93,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -101,6 +106,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -112,8 +118,9 @@
         "bankSaldi"
       ],
       "stand": "ONBEREIKT",
-      "reden": "de route wees het verzoek af met 402 voordat hij aan het schrijven toekwam",
+      "reden": "deze route gaf ZONDER verraad al 402, dus zijn antwoord eronder (402) zegt niets over een verloren schrijfactie",
       "status": 402,
+      "basisStatus": 402,
       "opslagBewoog": false
     },
     {
@@ -125,8 +132,9 @@
         "bankSaldi"
       ],
       "stand": "ONBEREIKT",
-      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
       "status": 400,
+      "basisStatus": 400,
       "opslagBewoog": false
     },
     {
@@ -139,6 +147,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -150,8 +159,9 @@
         "bankSaldi"
       ],
       "stand": "ONBEREIKT",
-      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
       "status": 400,
+      "basisStatus": 400,
       "opslagBewoog": false
     },
     {
@@ -162,8 +172,9 @@
         "bankTerugkerend"
       ],
       "stand": "ONBEREIKT",
-      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
       "status": 400,
+      "basisStatus": 400,
       "opslagBewoog": false
     },
     {
@@ -174,8 +185,9 @@
         "betaalRegie"
       ],
       "stand": "ONBEREIKT",
-      "reden": "de route wees het verzoek af met 401 voordat hij aan het schrijven toekwam",
+      "reden": "deze route gaf ZONDER verraad al 401, dus zijn antwoord eronder (401) zegt niets over een verloren schrijfactie",
       "status": 401,
+      "basisStatus": 401,
       "opslagBewoog": false
     },
     {
@@ -188,6 +200,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -200,6 +213,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -212,6 +226,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -224,6 +239,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -236,6 +252,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -246,8 +263,9 @@
         "labFonds"
       ],
       "stand": "ONBEREIKT",
-      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
       "status": 400,
+      "basisStatus": 400,
       "opslagBewoog": false
     },
     {
@@ -260,6 +278,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -272,6 +291,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -284,6 +304,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -296,6 +317,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -308,6 +330,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -320,6 +343,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -332,6 +356,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -343,8 +368,9 @@
         "paySaldi"
       ],
       "stand": "ONBEREIKT",
-      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
       "status": 400,
+      "basisStatus": 400,
       "opslagBewoog": false
     },
     {
@@ -359,8 +385,9 @@
         "socialeAfdrachten"
       ],
       "stand": "WEIGERT",
-      "reden": "de route gaf 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "reden": "de route werkte zonder verraad (200) en gaf eronder 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
       "status": 503,
+      "basisStatus": 200,
       "opslagBewoog": true
     },
     {
@@ -372,8 +399,9 @@
         "paySaldi"
       ],
       "stand": "ONBEREIKT",
-      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
       "status": 400,
+      "basisStatus": 400,
       "opslagBewoog": false
     },
     {
@@ -386,8 +414,9 @@
         "payTegoed"
       ],
       "stand": "ONBEREIKT",
-      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
       "status": 400,
+      "basisStatus": 400,
       "opslagBewoog": false
     },
     {
@@ -399,8 +428,9 @@
         "paySaldi"
       ],
       "stand": "ONBEREIKT",
-      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
       "status": 400,
+      "basisStatus": 400,
       "opslagBewoog": false
     },
     {
@@ -413,6 +443,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -425,6 +456,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -437,8 +469,9 @@
         "payVerzoeken"
       ],
       "stand": "ONBEREIKT",
-      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
       "status": 400,
+      "basisStatus": 400,
       "opslagBewoog": false
     },
     {
@@ -451,6 +484,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -463,6 +497,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -475,6 +510,7 @@
       "stand": "SCHREEF_TOCH",
       "reden": "de opslag veranderde ondanks het verraad -- deze route raakt het injectiepunt niet op dit pad, dus hier is niets bewezen",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": true
     },
     {
@@ -487,6 +523,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -499,6 +536,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -511,6 +549,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -520,9 +559,10 @@
       "collecties": [
         "directOntvangsten"
       ],
-      "stand": "WEIGERT",
-      "reden": "de route gaf 503: de opslag kon niet bevestigen en dat is aan de aanroeper verteld in plaats van verzwegen",
+      "stand": "ONBEREIKT",
+      "reden": "deze route gaf ZONDER verraad al 503, dus zijn antwoord eronder (503) zegt niets over een verloren schrijfactie",
       "status": 503,
+      "basisStatus": 503,
       "opslagBewoog": false
     },
     {
@@ -540,6 +580,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -552,6 +593,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -565,6 +607,7 @@
       "stand": "SCHREEF_TOCH",
       "reden": "de opslag veranderde ondanks het verraad -- deze route raakt het injectiepunt niet op dit pad, dus hier is niets bewezen",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": true
     },
     {
@@ -578,6 +621,7 @@
       "stand": "VALS_SUCCES",
       "reden": "de aanroeper kreeg 200 terwijl er niets is bewaard",
       "status": 200,
+      "basisStatus": 200,
       "opslagBewoog": false
     },
     {
@@ -588,8 +632,9 @@
         "wallet"
       ],
       "stand": "ONBEREIKT",
-      "reden": "de route wees het verzoek af met 400 voordat hij aan het schrijven toekwam",
+      "reden": "deze route gaf ZONDER verraad al 400, dus zijn antwoord eronder (400) zegt niets over een verloren schrijfactie",
       "status": 400,
+      "basisStatus": 400,
       "opslagBewoog": false
     }
   ]

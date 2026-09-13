@@ -1090,6 +1090,18 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede, uitSp
     '; bevestig ' + (bevestig.heel ? 'heel' : 'NIET heel (' + bevestig.gebreken.length + ')') +
     '; verwijzing ' + (verw.heel ? 'heel' : 'NIET heel (' + verw.gebreken.length + ')') +
     '; intrek ' + (intrek.heel ? 'heel' : 'NIET heel (' + intrek.gebreken.length + ')'));
-  if (controle && (teVer.length || teVeelVragen.length || !goud.heel || !samen.heel ||
-    !ref.heel || !geld.heel || !bevestig.heel || !verw.heel)) process.exit(1);
+  /* ELK BLOK STAAT HIER, en dat moet je nalopen als je er een toevoegt.
+
+     `intrekveiligheid` stond er eerst NIET bij. Het blok werd berekend, in het
+     register geschreven en netjes afgedrukt -- en liet de opdracht niet zakken.
+     Een wacht die alles meet en niets tegenhoudt, is geen wacht; hij leest
+     alleen als een. De mutatiebatterij vond het: 11, 12 en 13 verbouwden de
+     poort met opzet en kwamen allemaal groen terug.
+
+     Dat is dezelfde faalvorm als het lege `graad`-veld en als de vier
+     spookpaden van bevestigveiligheid: niet een fout antwoord, maar een
+     bewering die er is zonder ergens aan te hangen. */
+  const blokken = { goud, samen, ref, geld, bevestig, verw, intrek };
+  const stuk = Object.entries(blokken).filter(([, b]) => !b.heel).map(([n]) => n);
+  if (controle && (teVer.length || teVeelVragen.length || stuk.length)) process.exit(1);
 })().catch((e) => { console.error(e); process.exit(2); });

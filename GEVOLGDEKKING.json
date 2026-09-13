@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-13T15:22:07.930Z",
-  "commit": "b8998fbb",
+  "op": "2026-09-13T15:55:18.323Z",
+  "commit": "48ff5f65",
   "boomVuil": false,
   "boomAnders": 4,
   "instrument": "scripts/gevolgdekking.js",
@@ -14,9 +14,9 @@
   "onbekendeEffectpaden": 87,
   "effectGemeten": 38,
   "effectGeenEffectGemeten": 48,
-  "contractVolledig": 4,
+  "contractVolledig": 6,
   "contractGedeeltelijk": 0,
-  "contractOnbekend": 169,
+  "contractOnbekend": 167,
   "contractenGezakt": 0,
   "contractenBuitenBereik": 2
  },
@@ -2525,18 +2525,9 @@
     "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
    },
    "verklaring": {
-    "stand": "ONBEKEND",
-    "open": [
-     "direct",
-     "afgeleid",
-     "buiten",
-     "mislukking"
-    ],
-    "nietVerklaard": [
-     "payIdem",
-     "payIdemAfdruk",
-     "payVerzoeken"
-    ]
+    "stand": "VOLLEDIG",
+    "open": [],
+    "nietVerklaard": []
    }
   },
   {
@@ -2557,20 +2548,9 @@
     "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
    },
    "verklaring": {
-    "stand": "ONBEKEND",
-    "open": [
-     "direct",
-     "afgeleid",
-     "buiten",
-     "mislukking"
-    ],
-    "nietVerklaard": [
-     "payBoekingen",
-     "payIdem",
-     "payIdemAfdruk",
-     "paySaldi",
-     "payVerzoeken"
-    ]
+    "stand": "VOLLEDIG",
+    "open": [],
+    "nietVerklaard": []
    }
   },
   {

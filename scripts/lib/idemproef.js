@@ -215,7 +215,7 @@ function weegZonderSleutel(d, e, staat) {
     reden: 'een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik' };
 }
 
-async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hernieuw, maxRoutes, staatVan, vastlegging, metenZonderSleutel, pasladder, wacht, voorzieningVoor, wereld }) {
+async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hernieuw, maxRoutes, staatVan, herijk, vastlegging, metenZonderSleutel, pasladder, wacht, voorzieningVoor, wereld }) {
   const perRoute = {};
   let gedaan = 0, hernieuwd = 0, uitOpslag = 0, verworpen = 0, pasGewisseld = 0;
   const tel = { beschermd: 0, onbeschermd: 0, ongemeten: 0 };
@@ -250,11 +250,19 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
 
        WAT HET KOST, EERLIJK: dit is een EXTRA oproep per ledenroute, en die kan
        werk doen. Op een creatieroute staat er dus een item meer in de wereld dan
-       zonder deze lus. Dat vertroebelt de meting niet -- `staatVan` geeft het
-       verschil PER oproep, en deze valt buiten de drie die gewogen worden -- maar
-       het is wel een mutatie die niemand heeft gevraagd, en daarom staat hij hier
-       genoemd in plaats van verstopt. Hij kan alleen op een wegwerpmap, en de
-       proef draait ook nergens anders. */
+       zonder deze lus. Het is een mutatie die niemand heeft gevraagd, en daarom
+       staat hij hier genoemd in plaats van verstopt. Hij kan alleen op een
+       wegwerpmap, en de proef draait ook nergens anders.
+
+       EN HIER STOND EEN ONWAARHEID, die op 13 september 2026 is weggehaald omdat
+       zij een echte meetfout dekte. Er stond: "dat vertroebelt de meting niet --
+       `staatVan` geeft het verschil PER oproep, en deze valt buiten de drie die
+       gewogen worden". Hij valt er NIET buiten. `staatVan` schuift het ijkpunt
+       alleen op wanneer hij wordt AANGEROEPEN, en dat gebeurt uitsluitend voor de
+       drie gewogen oproepen -- dus belandde alles wat deze ijkoproep schreef in
+       `dA`, het vak waarin staat wat de gemeten handeling aanraakte. Vandaar
+       `herijk` hieronder, en de uitleg bij zijn definitie in
+       scripts/idemproef-route.js. */
     /* De rol die deze route werkelijk nodig heeft. Meestal die van de bewaker,
        maar een voorvoegselregel kan er een opleggen -- het werkplek-huis laat
        alleen de eigenaar binnen en draagt zelf geen bewakersrol. */
@@ -263,12 +271,17 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
     if (gevraagdeRol === 'member' && Array.isArray(pasladder) && pasladder.length > 1) {
       const eerste = await post(r.pad, { ...lijf }, tokenVoor('member'));
       gedaan++;
+      /* HERIJKEN NA ELKE IJKOPROEP, en niet alleen na de laatste: elke oproep in
+         deze lus kan werk doen, dus elke oproep hoort het ijkpunt op te schuiven.
+         Deed alleen de laatste dat, dan bleef het werk van de eerdere in `dA`. */
+      if (herijk) herijk(eerste);
       if (eerste.status === 403) {
         for (const kandidaat of pasladder.slice(1)) {
           const t = tokenVoor(kandidaat);
           if (!t) continue;
           const proef = await post(r.pad, { ...lijf }, t);
           gedaan++;
+          if (herijk) herijk(proef);
           if (proef.status !== 403) { pas = kandidaat; pasGewisseld++; break; }
         }
       }
@@ -300,7 +313,20 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
            verkeerde token en kreeg 401. Een voorziening mag meerdere rollen
            nodig hebben (de zaak ontvangt geld VAN een lid); wie haar een vaste
            rol oplegt, bepaalt ongemerkt wat zij kan. */
-        const v = await maakVoorziening({ post, tokenVoor, rol: pas, w: wereld || {} });
+        /* DE VOORZIENING KRIJGT EEN POST DIE HERIJKT. Zij doet haar schrijfwerk zelf,
+           via deze `post` -- dus is dit de enige plek waar het ijkpunt kan meeschuiven
+           met wat zij aanmaakt. Zonder deze wikkel belandt alles wat het onderwerp
+           heeft gekost in `dA` van de route die er daarna op wordt gemeten, en dat is
+           precies hoe /api/pay/verzoek/intrek aan payIdem en payIdemAfdruk kwam.
+
+           Elke oproep schuift op en niet alleen de laatste: een voorziening mag
+           meerdere rollen en meerdere stappen nodig hebben. Antwoorden zonder
+           `staat` (een 401, iets buiten /api) schuiven niets op -- dat is geen
+           volledige dekking, en het staat als beperking in de kop van dit bestand. */
+        const postHerijkend = herijk
+          ? (async (...args) => { const st = await post(...args); herijk(st); return st; })
+          : post;
+        const v = await maakVoorziening({ post: postHerijkend, tokenVoor, rol: pas, w: wereld || {} });
         if (v && v.fout) voorziening = { stand: 'mislukt', reden: String(v.fout) };
         else if (v && typeof v === 'object') { lijf = { ...lijf, ...v }; voorziening = { stand: 'gelukt', velden: Object.keys(v) }; }
         else voorziening = { stand: 'mislukt', reden: 'de voorziening gaf niets terug' };

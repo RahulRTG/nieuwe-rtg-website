@@ -361,6 +361,36 @@ function wachtOpSchoneBoom() {
     return d;
   };
 
+  /* DE HERIJKING, EN WAAROM ZIJ MOEST BESTAAN (13 september 2026).
+
+     `vorigeStand` schuift alleen op wanneer `staatVan` wordt AANGEROEPEN, en dat
+     gebeurt uitsluitend voor de drie gewogen oproepen. Alles wat de proef VOOR die
+     drie doet -- de pasladder-ijkoproep en de voorziening die het onderwerp
+     aanmaakt -- schrijft dus wel, maar schuift het ijkpunt niet op. Het verschil
+     dat die schrijfacties achterlieten belandde daardoor in `dA`, het vak waarin
+     staat wat de GEMETEN handeling aanraakte.
+
+     De kop van scripts/lib/idemproef.js beweerde het tegenovergestelde: "dat
+     vertroebelt de meting niet -- staatVan geeft het verschil PER oproep, en deze
+     valt buiten de drie die gewogen worden". Die gerustheid is precies de reden dat
+     niemand keek. Hij valt er NIET buiten, want niet-gemeten werk verschuift het
+     ijkpunt niet.
+
+     GEVONDEN AAN EEN ECHT GEVAL: /api/pay/verzoek/intrek kreeg payIdem en
+     payIdemAfdruk toegerekend, terwijl verzoekIntrek() in kern/pay/verzoeken.js
+     geen metIdem aanroept en de route geen sleutel meegeeft. Die twee rijen komen
+     van de voorziening, die het klompje eerst langs /api/pay/verzoek aanmaakt --
+     en dat pad schrijft ze wel. Het is dus geen afrondingsruis maar een
+     toerekening aan de verkeerde handeling, en kern/stuur/gevolg.js leest precies
+     dat vak.
+
+     `herijk` schuift het ijkpunt op zonder een verschil te melden. Hij geeft geen
+     delta terug en telt nergens mee: hij zegt alleen "wat hiervoor gebeurde, hoort
+     niet bij de meting". */
+  const herijk = !staatWerkt ? null : (antwoord) => {
+    if (antwoord && antwoord.staat != null) vorigeStand = antwoord.staat;
+  };
+
   let register = {};
   try { register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMBESLUIT.json'), 'utf8')); } catch (e) {}
   const besluiten = register.routes || {};
@@ -451,7 +481,7 @@ function wachtOpSchoneBoom() {
       if (vv.alleenRol && r.rol !== vv.alleenRol) return r.rol;
       return vv.rol;
     },
-    maxRoutes: MAX, staatVan,
+    maxRoutes: MAX, staatVan, herijk,
     /* De voorziening maakt een VERS onderwerp vlak voor de meting. Nodig omdat
        de pasladder-ijkoproep echt werk doet en een opmaakbare route zijn eigen
        onderwerp kwijt is voordat A draait -- zie de kop bij VOORZIENINGEN in

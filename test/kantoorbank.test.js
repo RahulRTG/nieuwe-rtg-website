@@ -1,5 +1,5 @@
-/* KAN DEZE HANDELING NA COMMIT EEN GELDPOSITIE WIJZIGEN?
-   (server/kern/isolatie/geldpositie.js)
+/* KAN DEZE HANDELING NA COMMIT EEN KANTOORBANK WIJZIGEN?
+   (server/kern/isolatie/kantoorbank.js)
 
    DE VRAAG DIE DEZE SUITE AFDWINGT is met opzet NIET "zit deze route in het
    bankdomein". Dat tweede vermengt handelingstype met domeincontext, en daarmee wordt
@@ -26,7 +26,7 @@
 const { test } = require('node:test');
 const assert = require('node:assert');
 
-const { GELDPOSITIE, BEREIK, geldpositieVan } = require('../server/kern/isolatie/geldpositie');
+const { KANTOORBANK, BEREIK, geldpositieVan, klassenVan } = require('../server/kern/isolatie/kantoorbank');
 const effecten = require('../server/kern/isolatie/effecten');
 const effectcollecties = require('../server/kern/isolatie/effectcollecties');
 const { alleRoutes } = require('../scripts/lib/routes');
@@ -50,12 +50,12 @@ test('1. DE TABEL IS GESLOTEN: elke kantoor-bankroute heeft een antwoord', () =>
   /* En andersom: de tabel noemt geen route die niet bestaat. Een verklaring over een
      verdwenen route is een alibi -- zelfde regel als BEKEND_OPEN in
      test/mutatiecontract.test.js. */
-  const spook = Object.keys(GELDPOSITIE).filter(p => !kantoorbank().has(p)).sort();
+  const spook = Object.keys(KANTOORBANK).filter(p => !kantoorbank().has(p)).sort();
   assert.deepStrictEqual(spook, [], 'de tabel verklaart routes die niet bestaan: ' + spook.join(', '));
 });
 
 test('2. elke `true` draagt werkelijk GELD_BEWEGEN', () => {
-  const ja = Object.keys(GELDPOSITIE).filter(p => GELDPOSITIE[p][0]);
+  const ja = Object.keys(KANTOORBANK).filter(p => KANTOORBANK[p][0]);
   assert.ok(ja.length >= 5, 'er horen geldbewegende kantoorroutes te zijn (' + ja.length + ')');
   for (const p of ja) {
     const uit = effecten.effectenVan(p, 'POST', null);
@@ -73,7 +73,7 @@ test('3. een `false` krijgt GELD_BEWEGEN nooit uit een VERKLARING', () => {
   /* Uit een METING mag het wel: zag de proef een geldcollectie bewegen, dan bewoog die,
      en een verklaring die een meting overstemt is de rangorde die effecten.js verbiedt.
      Wat hier wordt afgedwongen is dat de tabel zelf niets toevoegt op een nee. */
-  const nee = Object.keys(GELDPOSITIE).filter(p => !GELDPOSITIE[p][0]);
+  const nee = Object.keys(KANTOORBANK).filter(p => !KANTOORBANK[p][0]);
   assert.ok(nee.length >= 25, 'de meeste kantoor-bankroutes bewegen geen geld (' + nee.length + ')');
   for (const p of nee) {
     const uit = effecten.effectenVan(p, 'POST', null);
@@ -167,10 +167,76 @@ test('7. een `nee` mag de METING niet tegenspreken -- en die controle kan zakken
   assert.deepStrictEqual(geldCollectiesVan(['kantoorAudit']), []);
 
   /* en dan de echte ronde */
-  for (const p of Object.keys(GELDPOSITIE).filter(x => !GELDPOSITIE[x][0])) {
+  for (const p of Object.keys(KANTOORBANK).filter(x => !KANTOORBANK[x][0])) {
     const geld = geldCollectiesVan(proefmeting.collectiesVan(p));
     assert.deepStrictEqual(geld, [],
       p + ': verklaard als "wijzigt geen geldpositie" terwijl de proef ' + geld.join(', ') +
       ' zag bewegen. Een verklaring hoort een meting niet te overstemmen');
   }
+});
+
+test('8. elke NEE-route draagt ook zijn EIGEN klasse, of een lege lijst met een grond', () => {
+  /* De tweede helft van de tabel. "Deze route beweegt geen geld" is een antwoord op EEN
+     vraag; wat zij dan wel doet is een tweede, en een leeg vak daar is geen antwoord maar
+     een stilte. Sinds 13 september bestaan de vier werkwoorden die dat kunnen zeggen. */
+  const woorden = require('../server/kern/isolatie/effectwoorden').NAMEN;
+  const nee = Object.keys(KANTOORBANK).filter(p => !KANTOORBANK[p][0]);
+  let metWoord = 0;
+  for (const p of nee) {
+    const k = klassenVan(p);
+    assert.ok(Array.isArray(k), p + ': de derde kolom hoort een lijst te zijn, ook als hij leeg is');
+    for (const w of k) assert.ok(woorden.includes(w), p + ': onbekend werkwoord ' + w);
+    if (k.length) metWoord++;
+  }
+  /* GEEN DREMPEL OP HET AANTAL, en dat is een besluit: een getal kiezen dat net haalt is
+     achterstevoren toetsen. De echte invariant is dat elke nee-route OF een werkwoord
+     draagt OF een grond die uitlegt waarom er geen past -- /gezond leest een systeemstand,
+     /bevoegdheid een matrix per land. Hoeveel het er zijn, is dan een uitkomst en geen eis.
+     Vandaag: 25 van de 32 met een woord, 7 met opzet zonder. */
+  for (const p of nee) if (!klassenVan(p).length)
+    assert.ok(KANTOORBANK[p][1].length > 10,
+      p + ': geen klasse EN geen grond is een leeg vak, en dat is precies wat deze tabel moet voorkomen');
+  assert.ok(metWoord > 0, 'geen enkele nee-route draagt een klasse; dan doet de tweede kolom niets');
+});
+
+test('9. `[]` en `null` lijken NIET op elkaar, en het effectmodel blijft fail-closed', () => {
+  /* `[]` betekent "verklaard, en geen van de werkwoorden past"; `null` betekent "hierover
+     is niets verklaard". Wie beide als leeg leest, heeft een bron gebouwd die zwijgen als
+     antwoord geeft. */
+  assert.deepStrictEqual(klassenVan('/api/office/bank/gezond'), []);
+  assert.strictEqual(klassenVan('/api/bank/sepa'), null, 'buiten de tabel hoort null te komen');
+
+  /* EN DE GRENS DIE DAARUIT VOLGT: een declaratie zonder werkwoord blijft in het
+     effectmodel `onbekend`, want dat bestand mag nooit een lege lijst teruggeven -- dan
+     keurt het goed wat het niet begrijpt. De verklaring is niet verloren, zij woont hier. */
+  const uit = effecten.effectenVan('/api/office/bank/gezond', 'POST', null);
+  assert.strictEqual(uit.graad, 'onbekend');
+  assert.strictEqual(uit.effecten, null, 'het effectmodel hoort nooit [] terug te geven');
+});
+
+test('10. de vier nieuwe werkwoorden landen echt, en elk met zijn standbesluit', () => {
+  const sluiting = require('../server/kern/isolatie/standsluiting');
+  const verwacht = {
+    PLAFOND_WIJZIGEN: '/api/office/bank/rekening/rood',
+    CONFIGUREREN: '/api/office/bank/modus',
+    VOORSTEL_MAKEN: '/api/office/bank/salaris/voorstel',
+    LEZEN_ANDERMANS: '/api/office/bank/afschrift'
+  };
+  for (const [woord, pad] of Object.entries(verwacht)) {
+    const uit = effecten.effectenVan(pad, 'POST', null);
+    assert.ok((uit.effecten || []).includes(woord), pad + ' draagt ' + woord + ' niet: ' +
+      JSON.stringify(uit.effecten));
+  }
+  /* DE STANDBESLUITEN, en ze staan hier omdat ze anders alleen in commentaar bestaan.
+     `isolatie` sluit alles behalve LEZEN_EIGEN, dus alle vier gaan daar dicht; `beschermd`
+     sluit een expliciete lijst en daar is per woord over besloten. */
+  for (const w of Object.keys(verwacht))
+    assert.ok(sluiting.TREDE_SLUIT.isolatie.includes(w), w + ' blijft open in isolatie');
+  assert.ok(sluiting.BESCHERMD_SLUIT.includes('PLAFOND_WIJZIGEN'),
+    'een limiet verhogen hoort in de beschermstand dicht te gaan');
+  assert.ok(sluiting.BESCHERMD_SLUIT.includes('CONFIGUREREN'));
+  assert.ok(!sluiting.BESCHERMD_SLUIT.includes('LEZEN_ANDERMANS'),
+    'beschermd bevriest mutaties en bevoorrechte handelingen; lezen is geen van beide');
+  assert.ok(!sluiting.BESCHERMD_SLUIT.includes('VOORSTEL_MAKEN'),
+    'een voorstel verandert niets; het tegenhouden stopt geen effect');
 });

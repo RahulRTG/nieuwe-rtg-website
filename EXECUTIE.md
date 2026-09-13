@@ -766,6 +766,53 @@ werkt. Het staat hier als leeslijst en niet als meter, want een twaalfde meter
 toevoegen op een getal dat niemand heeft nagelopen, is precies wat dit document
 elders tegenhoudt.
 
+##### De effectklassen van de kantoorbank: semantiek, niet domein
+
+De vraag die het effectmodel moet beantwoorden is *kan deze handeling na commit een
+geldpositie wijzigen* — en niet *zit deze route in het bankdomein*. Dat tweede vermengt
+handelingstype met domeincontext, en dan wordt het model juist minder waar op het moment dat
+je het voor causaliteit wilt gebruiken.
+
+`server/kern/isolatie/kantoorbank.js` beantwoordt per route **twee** vragen: de scherpe
+(geldpositie, met zijn eigen toets) en de tweede (wat doet zij dan wel). 39 routes, 7 ja en
+32 nee, elk met een grond. Het bestand heet daarom niet meer `geldpositie.js`: een tabel die
+ook `CONFIGUREREN` draagt, is geen geldtabel.
+
+**Vier werkwoorden erbij** in `effectwoorden.js`, omdat de dertien voor ISOLATIE zijn
+gebouwd (*wat kan een aanvaller hiermee bereiken*) en vier klassen niet konden uitdrukken die
+een causale laag nodig heeft. Per werkwoord is in `standsluiting.js` besloten of hij ook in
+de **beschermstand** dichtgaat — `isolatie` sluit alles behalve `LEZEN_EIGEN`, dus daar gaan
+alle vier vanzelf dicht:
+
+| werkwoord | beschermstand | waarom |
+|---|---|---|
+| `PLAFOND_WIJZIGEN` | **dicht** | een limiet verhogen maakt geld mogelijk; tijdens een beschermde stand vergroot niemand die ruimte |
+| `CONFIGUREREN` | **dicht** | een stand zetten terwijl het huis beschermd staat is wat je juist niet wilt |
+| `LEZEN_ANDERMANS` | open | `beschermd` bevriest mutaties en bevoorrechte handelingen; lezen is geen van beide — in isolatie gaat hij wél dicht, en dat is precies het onderscheid dat dit woord moest maken |
+| `VOORSTEL_MAKEN` | open | een voorstel verandert niets en wacht op een tweede mens; het klaarzetten tegenhouden stopt geen effect |
+
+**Twee vervalsingen zijn gerepareerd, en geen van beide is een versoepeling** — dat is de
+voorwaarde bij een waarheidscorrectie in deze laag. `bankregie` stond als `GELD_BEWEGEN` met
+de grond *"de bediening van de bankkant"*, waardoor vier bankSTANDEN dat label droegen
+terwijl geen van hen een euro verplaatst; hij is nu `BEVEILIGING_VERZWAKKEN`, dat net als
+`GELD_BEWEGEN` in `BESCHERMD_SLUIT` staat. En `sso` matchte op de letters in
+inca-**sso**: `/api/office/bank/incasso` droeg *"een blijvende relatie met iets buiten de
+sessie"* — op de grootste geldweg van dit huis, en `/incasso/dossier` is zelfs een leesroute.
+**Mijn eerste reparatie was ook fout** (`sso[-_/]` matchte "incasso/dossier" alsnog): een
+grens aan één kant is geen grens, het moet een SEGMENT zijn. Gevonden doordat de toets beide
+paden noemt en niet alleen het eerste.
+
+**`[]` en `null` lijken niet op elkaar.** `klassenVan()` geeft `[]` voor *verklaard, en geen
+van de zeventien werkwoorden past* (`/gezond` leest een systeemstand, `/bevoegdheid` een
+matrix per land) en `null` voor *hierover is niets verklaard*. Het effectmodel houdt daarbij
+zijn eigen grens: een declaratie zonder werkwoord blijft daar `onbekend`, want dat bestand mag
+nooit een lege lijst teruggeven — dan keurt het goed wat het niet begrijpt.
+
+En de toets draagt **geen drempel op het aantal**: een getal kiezen dat net haalt is
+achterstevoren toetsen. De invariant is dat elke nee-route óf een werkwoord draagt óf een
+grond die uitlegt waarom er geen past; hoeveel het er zijn (vandaag 25 van 32) is een uitkomst
+en geen eis.
+
 ##### De runtime-lezer staat, en hij zit niet waar het voorstel hem zocht
 
 Het voorstel wees naar `tegenfeit.js`. Dat bestand blijkt iets anders te zijn: het is

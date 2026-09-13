@@ -766,10 +766,56 @@ werkt. Het staat hier als leeslijst en niet als meter, want een twaalfde meter
 toevoegen op een getal dat niemand heeft nagelopen, is precies wat dit document
 elders tegenhoudt.
 
-**Wat er nog niet is, en dat hoort erbij:** de enige lezer is vandaag de meter. Een
-runtime-lezer — `tegenfeit.js` die het contract naast zijn eigen vooruitblik legt —
-bestaat niet. Een laag zonder aanroeper is precies wat `CONTROLPLANE.md` meet, dus
-dat staat hier als gat en niet als belofte.
+##### De runtime-lezer staat, en hij zit niet waar het voorstel hem zocht
+
+Het voorstel wees naar `tegenfeit.js`. Dat bestand blijkt iets anders te zijn: het is
+een **beleidscontrafeit** (`kern/commercie/tegenfeit.js`) — het draait een gewijzigde
+regel tegen de geschiedenis om te zien hoeveel handelingen anders zouden zijn gelopen.
+Dat gaat over een regel en niet over een handeling, en het leest geen contract.
+
+De plek waar de verklaring hoort, bestond al: `kern/stuur/gevolg.js` hangt met
+`voorspel()` een gevolgvoorspelling **naast** een gewogen plan, en `lusstap.js` doet dat
+bij elke `plan`-aanroep. Daar is nu de tweede as bij gekomen, in
+`kern/stuur/gevolgcontract/voorspelling.js`:
+
+| as | komt uit | zegt |
+|---|---|---|
+| meting | `gevolg.js` ← IDEMPROEF.json | welke collecties bewogen, in de laatste proefronde |
+| verklaring | `gevolgcontract.js` | wat een mens verklaart, óók buiten de opslag en bij een mislukking |
+
+**Een verklaring vult een meting aan en vervangt haar nooit.** Dat is de scherpste
+regel van de schil, en hij is bijna ongemerkt weggevallen: de eerste versie van de
+toets erop stond GROEN terwijl een mutatie die de graad opwaardeerde naar `gemeten`
+zodra er een volledige verklaring stond, er ongestraft door kwam. In de fixture was
+het pad met een contract toch al gemeten en het ongemeten pad had geen contract — de
+combinatie die de bewering draagt (ongemeten mét een volledige verklaring) ontbrak, en
+die bestaat vandaag in geen enkel echt pad. Het register is daarom een parameter met
+een standaard geworden, zodat die combinatie te maken is.
+
+**En de regel die eruit volgt weigert niets.** *Een plan gaat alleen over handelingen
+waarvan het gevolg voldoende bekend is* loopt in de **schaduw**: het plan zegt hoeveel
+stappen het zou afwijzen en welke, en wijst niets af. Met
+<!--getal:gevolg.onbekend-->87<!--/getal--> van de
+<!--getal:gevolg.bereikbaar-->173<!--/getal--> paden ongemeten zou afdwingen vandaag het
+halve stuur stilzetten, en dan wordt de regel losgedraaid in plaats van gehaald
+(`CONTROLPLANE.md`: eerst zonder te blokkeren). `geen-effect-gemeten` telt daarbij als
+BEKEND — de proef heeft de route echt gedraaid en er bewoog niets — en dat is iets
+anders dan "de proef kwam er niet bij".
+
+**Twee dingen die dit bouwen corrigeerde en die je nergens anders moet herhalen.** De
+eerste versie zette de gevolgkennis PER STAP in `plan.js`, en dat verbood de code al
+met zoveel woorden: *"hij hangt NAAST het plan en niet erin: PLAN bezit niets, en dat
+blijft zo"* (slotalinea van `gevolg.js`) — bovendien deed `lusstap.js` het al, dus het
+was een tweede lezer van dezelfde waarheid. En de samenstelling kan **niet** in een van
+de twee lagen zelf zitten: `gevolgcontract.js` laadt `gevolg.js` (zijn poort toetst een
+`gemeten` claim tegen de meting), dus omgekeerd zou een kring zijn. Zij hoort bij de
+aanroeper, en die stond er al.
+
+**Wat er nog niet is, en dat hoort erbij:** het register draagt twee contracten. De
+runtime-lezer leest ze, de meter telt ze, en de andere
+<!--getal:gevolg.contractOnbekend-->172<!--/getal--> bereikbare handelingen hebben er
+geen. Dat is werk per regel door een mens, en niet iets dat een script in een middag
+kan vullen — dat is letterlijk de les uit de kop van `server/lib/mutatiecontracten.js`.
 
 **En dit was géén droogloop.** Er werd een eerdere meting op het plan
 geprojecteerd; het plan liep niet. Dat deel staat er nu wel.

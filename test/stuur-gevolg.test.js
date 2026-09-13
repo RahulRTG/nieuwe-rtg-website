@@ -113,3 +113,127 @@ test('8. een leeg of afgewezen plan levert een lege maar eerlijke voorspelling',
   assert.ok(g.samenvatting.length > 10);
   assert.equal(g.telling.onbekend, 0);
 });
+
+/* ---------------------------------------------------------------------------
+   DE TWEEDE AS: de VERKLARING naast de meting
+   (server/kern/stuur/gevolgcontract/voorspelling.js, EXECUTIE.md blok 4).
+
+   De meting hierboven is hard en smal. Wat zij per definitie niet kan zien --
+   wat er BUITEN de opslag gebeurt, en wat er bij een mislukking achterblijft --
+   staat in een verklaring van een mens. Deze blok bewaakt drie dingen: de twee
+   assen worden nooit opgeteld, een contract dat de keuring niet haalt telt niet
+   als verklaring, en de regel die eruit volgt WEIGERT VANDAAG NIETS.
+
+   Die laatste is de belangrijkste. "Een plan gaat alleen over handelingen waarvan
+   het gevolg voldoende bekend is" is precies het soort regel dat CONTROLPLANE.md
+   eerst in de schaduw laat lopen; met 87 van de 173 paden ongemeten zou afdwingen
+   het halve stuur stilzetten, en dan wordt de regel losgedraaid in plaats van
+   gehaald.
+   ------------------------------------------------------------------------- */
+const vp = require('../server/kern/stuur/gevolgcontract/voorspelling');
+
+test('9. de twee assen staan APART en worden nooit opgeteld', () => {
+  const plan = compileer({ doel: 'gemengd', stappen: [
+    { id: 'a', capability: '/api/bank/sepa' },
+    { id: 'b', capability: '/api/agenda/bewaar' }
+  ] }, 'member');
+  const u = vp.voorspelMet(plan);
+  for (const s of u.stappen) {
+    /* De meting blijft exact wat gevolgVan() zegt: de schil vult aan en corrigeert
+       niets. Zou zij de graad opwaarderen omdat er een verklaring is, dan zou een
+       verklaring een meting kunnen vervangen -- en dat is het valse groen waar de
+       hele laag tegen is gebouwd. */
+    assert.equal(s.graad, gevolgVan(s.capability).graad, s.capability + ': de meting is gewijzigd');
+    assert.equal(typeof s.verklaring.stand, 'string', s.capability + ': geen tweede as');
+  }
+  assert.equal(u.stappen[0].verklaring.stand, 'VOLLEDIG', '/api/bank/sepa heeft een contract');
+  assert.equal(u.stappen[1].verklaring.stand, 'ONBEKEND');
+  assert.match(u.stappen[1].verklaring.reden, /geen enkel gevolgcontract/);
+
+  /* HET GEVAARLIJKE GEVAL, en het stond er eerst NIET in. De mutatie "waardeer de
+     graad op naar `gemeten` zodra er een volledige verklaring staat" liet deze
+     toets groen: in de fixture hierboven is het pad met een contract toch al
+     gemeten, en het ongemeten pad heeft geen contract. Precies de combinatie die
+     de bewering draagt -- ONGEMETEN MET EEN VOLLEDIGE VERKLARING -- ontbrak.
+
+     Die combinatie bestaat vandaag in geen enkel echt pad, dus het register wordt
+     geinjecteerd. Een verklaring mag een meting AANVULLEN en nooit VERVANGEN: wie
+     hier `gemeten` gaat schrijven omdat iemand het heeft opgeschreven, heeft het
+     stempel van de proef aan een mens gegeven. */
+  const blindMetContract = { '/api/agenda/bewaar': {
+    capability: '/api/agenda/bewaar',
+    gevolgen: [
+      { soort: 'direct', graad: 'vermoed', wat: 'de agenda krijgt een item', reden: 'gelezen in de route' },
+      { soort: 'afgeleid', graad: 'vermoed', wat: 'de dag raakt voller', reden: 'volgt eruit' },
+      { soort: 'buiten', graad: 'vermoed', wat: 'geen enkel gevolg buiten de opslag', reden: 'geen bericht' },
+      { soort: 'mislukking', graad: 'vermoed', wat: 'er blijft niets half staan', reden: 'een schrijfactie' }
+    ],
+    nagekeken: 'de toets'
+  } };
+  const m = vp.voorspelMet(compileer({ doel: 'y',
+    stappen: [{ id: 'a', capability: '/api/agenda/bewaar' }] }, 'member'), blindMetContract);
+  assert.equal(m.stappen[0].verklaring.stand, 'VOLLEDIG', 'de geinjecteerde verklaring hoort te gelden');
+  assert.equal(m.stappen[0].graad, 'onbekend',
+    'een volledige verklaring heeft de METING opgewaardeerd -- zij vult aan, zij vervangt niet');
+  /* En hij is dan wel niet meer BLIND: dat is de bedoeling van de tweede as. Die
+     twee uitspraken staan naast elkaar zonder elkaar te overschrijven. */
+  assert.equal(m.verklaring.zouAfwijzen, 0);
+});
+
+test('10. DE SCHADUWREGEL WEIGERT NIETS, en noemt de paden erbij', () => {
+  const plan = compileer({ doel: 'blind', stappen: [
+    { id: 'a', capability: '/api/agenda/bewaar' },
+    { id: 'b', capability: '/api/bank/sepa' }
+  ] }, 'member');
+  const u = vp.voorspelMet(plan);
+  assert.equal(plan.uitvoerbaar, true, 'een onbekend gevolg mag een plan NIET afwijzen');
+  assert.equal(u.verklaring.afgedwongen, false);
+  assert.equal(u.verklaring.zouAfwijzen, 1);
+  /* Een AANTAL alleen laat een SWAP door: een pad dat blind wordt en een dat
+     bekend wordt, geeft hetzelfde getal. Vandaar de paden. */
+  assert.deepEqual(u.verklaring.paden, ['/api/agenda/bewaar']);
+  assert.ok(u.verklaring.waarom.length > 30, 'de schaduw zegt waarom, niet alleen hoeveel');
+});
+
+test('11. `geen-effect-gemeten` telt als BEKEND, en een volledige verklaring ook', () => {
+  /* Een besluit, en het staat in voorspelling.js uitgeschreven: "de proef kwam er
+     niet bij" en "de proef draaide en er bewoog niets" zijn twee dingen. Ze door
+     elkaar halen is exact de fout die gevolg.js in zijn eigen GRENZEN benoemt. */
+  assert.equal(vp.blindVoorGevolg({ graad: 'geen-effect-gemeten', verklaring: { stand: 'ONBEKEND' } }), false);
+  assert.equal(vp.blindVoorGevolg({ graad: 'onbekend', verklaring: { stand: 'ONBEKEND' } }), true);
+  /* En de twee assen VULLEN elkaar aan: een ongemeten pad met een volledige
+     verklaring is niet blind. */
+  assert.equal(vp.blindVoorGevolg({ graad: 'onbekend', verklaring: { stand: 'VOLLEDIG' } }), false);
+});
+
+test('12. een contract dat de keuring niet haalt, telt NIET als verklaring', () => {
+  /* Anders draagt een plan zekerheid die op een afgekeurde regel rust. Het echte
+     register is bevroren en bevat terecht geen afgekeurd contract, dus de lezer
+     wordt GEINJECTEERD -- zonder dat zou deze regel groen staan zonder ooit
+     gedraaid te zijn (zelfde snit als `norm.meet({ leesMutaties })`). */
+  const kapot = { '/api/bank/sepa': {
+    capability: '/api/bank/sepa',
+    gevolgen: [{ soort: 'direct', graad: 'gemeten', collectie: 'verzonnenCollectie',
+      wat: 'saldo daalt', reden: 'verzonnen' }],
+    nagekeken: 'de toets'
+  } };
+  const na = vp.verklaringVan('/api/bank/sepa', kapot);
+  assert.equal(na.stand, 'ONBEKEND');
+  /* En het verdwijnt niet STIL: de reden zegt dat er wel een contract is en dat
+     het zakte. "Er staat niets" en "er staat iets dat niet draagt" zijn twee
+     verschillende antwoorden. */
+  assert.match(na.reden, /haalt de keuring niet/);
+});
+
+test('13. de voorspelling verandert het plan nog steeds niet', () => {
+  /* Regel uit de kop van gevolg.js, en de tweede as mag hem niet slopen: PLAN
+     bezit niets. De eerste versie van deze stap zette de gevolgkennis PER STAP in
+     plan.js, en dat is precies wat deze toets tegenhoudt. */
+  const plan = compileer({ doel: 'x', stappen: [{ id: 'a', capability: '/api/bank/sepa' }] }, 'member');
+  const voor = JSON.stringify(plan);
+  vp.voorspelMet(plan);
+  assert.equal(JSON.stringify(plan), voor, 'de voorspelling heeft het plan aangeraakt');
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'server/kern/stuur/plan.js'), 'utf8');
+  assert.ok(!/gevolgcontract|gevolgVanStap/.test(bron),
+    'plan.js is de gevolgkennis gaan bezitten; zij hangt ERNAAST (zie gevolg.js, slotalinea)');
+});

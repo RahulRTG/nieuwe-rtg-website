@@ -58,21 +58,27 @@ const BESLUITEN = [
      gastprogramma. Een voornemen hoort dus ook buiten Stage -- anders is Stage
      de achterdeur om de regel heen. */
   { domein: 'kern/festival', gebeurtenis: 'festival.boeking_bevestigd', klasse: 'moment',
-    bron: 'server/kern/festival/artiest.js', aanleiding: 'bevestigd',
+    bron: 'server/kern/festival/artiest.js', aanleiding: 'momentVoorFestival',
     grond: 'Een mens van de organisatie heeft vastgelegd DAT de artiest bevestigd heeft. Pas dan is er een programmapunt en geen wens.' },
   { domein: 'kern/festival', gebeurtenis: 'festival.boeking_voorgenomen', klasse: 'niet',
     bron: 'server/kern/festival/artiest.js',
     grond: 'Een voornemen is geen boeking. Wie dit publiek maakt, laat iemand een kaartje kopen voor een naam die er niet staat.' },
-  { domein: 'kern/festival', gebeurtenis: 'festival.verkoop_geopend', klasse: 'moment',
-    bron: 'server/kern/festival/verkoop.js', aanleiding: 'reserveer',
-    grond: 'Dat de kaartverkoop opengaat is het moment waarop iemand iets KAN doen. Dat is de enige soort melding die geen verzonnen urgentie is.' },
+  /* HERNOEMD OP 13 SEPTEMBER, en de correctie hoort erbij te staan. Dit heette
+     `festival.verkoop_geopend` met `reserveer` als aanleiding, en zo'n handeling
+     BESTAAT NIET: een festival opent de verkoop niet, het zet een product klaar
+     en dan is het koopbaar. `reserveer` is een AANKOOP -- die aanleiding zou een
+     "verkoop open"-moment hebben afgevuurd bij elke koper. Gevonden door het te
+     bedraden; de meter zag het niet, want de tekst `reserveer` stond er wel. */
+  { domein: 'kern/festival', gebeurtenis: 'festival.product_beschikbaar', klasse: 'moment',
+    bron: 'server/kern/festival/product.js', aanleiding: 'momentVoorProduct',
+    grond: 'Er is iets te koop: het moment waarop iemand iets KAN doen. Alleen bij een NIEUW product -- een prijs bijwerken is geen nieuwe kaartverkoop.' },
   { domein: 'kern/festival', gebeurtenis: 'festival.changeover_gewijzigd', klasse: 'niet',
     bron: 'server/kern/festival/terrein.js',
     grond: 'Werkverkeer van de organisatie. Raakt geen bezoeker en hoort de publieke rail niet op.' },
 
   /* ---- kern/sportclub ---------------------------------------------------- */
   { domein: 'kern/sportclub', gebeurtenis: 'stadion.wedstrijd_gepland', klasse: 'moment',
-    bron: 'server/kern/sportclub/sportief.js', aanleiding: 'wedstrijdMaak',
+    bron: 'server/kern/sportclub/sportief.js', aanleiding: 'momentVoorClub',
     grond: 'Een vastgelegde wedstrijd is een publiek feit met een datum, en de supporter kan er iets mee (komen, kaartje, reizen).' },
   { domein: 'kern/sportclub', gebeurtenis: 'stadion.uitslag_vastgelegd', klasse: 'stil',
     bron: 'server/kern/sportclub/sportief.js',
@@ -89,8 +95,8 @@ const BESLUITEN = [
     bron: 'server/kern/salon/index.js',
     grond: 'De Salon heeft echte volgers, maar een melding per post maakt van een gesprek een feed. Zichtbaar voor wie kijkt; geen onderbreking.' },
   { domein: 'kern/salon', gebeurtenis: 'salon.post_uitgelicht', klasse: 'moment',
-    bron: 'server/kern/salonpromo.js', aanleiding: 'featured =',
-    grond: 'Uitlichten is een menselijk besluit van RTG (geen algoritme), en het is zeldzaam. Precies daarom mag het wekken. LET OP: die handeling BESTAAT vandaag niet -- `featured` wordt nergens gezet behalve in de seed, terwijl salonviraal.js en CLAUDE.md allebei zeggen dat RTG cureert. De meter telt dit daarom als een moment zonder aanleiding, en dat is een gat in een bestaande merkregel en niet in Stage.' },
+    bron: 'server/kern/salon/uitlichten.js', aanleiding: 'nieuwMoment',
+    grond: 'Uitlichten is een menselijk besluit van RTG (geen algoritme), en het is zeldzaam. Precies daarom mag het wekken. De handeling bestaat sinds 13 september: kern/salon/uitlichten.js, op naam, met een grond uit een gesloten lijst en met intrekken dat even expliciet is. Daarvoor werd `featured` nergens gezet behalve in de seed, terwijl salonviraal.js en CLAUDE.md allebei zeiden dat RTG cureert.' },
 
   /* ---- kern/creator ------------------------------------------------------
      LET OP DE NAAMVAL DIE HIER BIJNA IS GEMAAKT. `creator.volgers` is een

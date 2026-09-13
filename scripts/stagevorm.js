@@ -170,10 +170,20 @@ function vorm() {
 /* ---------------------------------------------------------------------------
    C. DE HAAK -- hoever reikt de momentmotor die er al is?
    ------------------------------------------------------------------------ */
-/* `nieuwWerk(key, soort, titel)` is de laat gebonden haak waarmee een domein de
-   Media OS wekt (kern/mediaos/wekken.js). Wie hem aanroept, produceert vandaag
-   al een moment; wie hem niet aanroept, heeft wel een publieke gebeurtenis en
-   geen manier om er iemand over te wekken. Dat verschil IS de opdracht. */
+/* DE TWEE HAKEN waarmee een domein de Media OS wekt (kern/mediaos/wekken.js):
+
+     nieuwWerk(key, soort, titel)        begint bij een MAKER met een ledensleutel
+     mediaNieuwMoment(id, soort, titel)  begint bij een AANWEZIGHEID
+
+   Allebei worden ze INGESPOTEN, en dan heten ze in het domein soms korter
+   (`nieuwMoment`). Daarom staan alle drie de namen hier: een meter die alleen de
+   naam aan de gevende kant kent, ziet de ontvangende kant niet.
+
+   Die tweede kwam er op 13 september bij, omdat de eerste een festival en een
+   club niet kan bedienen: die hebben geen ledensleutel. Beide tellen hier mee --
+   een meter die alleen de oude haak kent, zou een domein dat wel degelijk wekt
+   als onaangesloten melden, en dan daalt een getal door een hernoeming in plaats
+   van door een feit. */
 function haak() {
   const paden = om.BRONNEN.reduce((a, m) => om.bestanden(m, a), []);
   const roept = new Map();
@@ -182,7 +192,7 @@ function haak() {
     if (!DOMEINEN.test(p)) continue;
     publiek.add(stageDomein(p));
     const s = om.wring(fs.readFileSync(path.join(WORTEL, p), 'utf8'));
-    if (/\bnieuwWerk\s*\(/.test(s)) {
+    if (/\b(nieuwWerk|nieuwMoment|mediaNieuwMoment)\s*\(/.test(s)) {
       const d = stageDomein(p);
       if (!roept.has(d)) roept.set(d, []);
       roept.get(d).push(p);

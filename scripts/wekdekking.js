@@ -78,6 +78,17 @@ function haakStand() {
    geschreven (const, function, of als objectveld). */
 const VOLGVORM = /\b(?:function\s+)?(volgersVan|abonneesVan|volgerskeys)\s*(?:=\s*)?(?:\(|=>|function)/;
 
+/* EN DE TWEEDE WEG, sinds het besluit van 13 september: een domein dat zijn
+   subject aanmeldt als PUBLIEKE AANWEZIGHEID heeft daarmee volgers, ook al staat
+   er in het domein zelf geen volgerslijst. Dat is precies de bedoeling -- de
+   relatie is van de Media OS en niet van Festival of Sportclub, want anders
+   krijgt ieder nieuw publiek subject zijn eigen sociale administratie.
+
+   Deze meter mat tot die dag alleen de eerste weg, en meldde festival en
+   sportclub daarom als "geen volgrelatie" terwijl ze er net een hadden gekregen.
+   Een meter die het oude model meet, straft precies de reparatie af. */
+const AANWEZIGVORM = /\baanwezigZorg\s*\(/;
+
 function volgrelaties() {
   const paden = om.BRONNEN.reduce((a, m) => om.bestanden(m, a), []);
   const uit = new Map();
@@ -86,7 +97,8 @@ function volgrelaties() {
     const d = sv.stageDomein(p);
     if (!uit.has(d)) uit.set(d, []);
     const s = om.wring(fs.readFileSync(path.join(WORTEL, p), 'utf8'));
-    if (VOLGVORM.test(s)) uit.get(d).push(p);
+    if (VOLGVORM.test(s)) uit.get(d).push({ bestand: p, weg: 'domein' });
+    else if (AANWEZIGVORM.test(s)) uit.get(d).push({ bestand: p, weg: 'aanwezigheid' });
   }
   return uit;
 }
@@ -189,7 +201,7 @@ if (require.main === module) {
   console.log('\n  per domein:');
   for (const d of r.perDomein) {
     console.log('    ' + d.domein.padEnd(16) + String(d.besluiten).padStart(2) + ' besluit(en)  haak: ' +
-      (d.haak ? 'ja ' : 'nee') + '  volgrelatie: ' + (d.volgrelatie ? d.volgrelatie[0] : 'geen'));
+      (d.haak ? 'ja ' : 'nee') + '  volgrelatie: ' + (d.volgrelatie ? d.volgrelatie[0].weg + ' (' + d.volgrelatie[0].bestand + ')' : 'geen'));
   }
   console.log('');
 }

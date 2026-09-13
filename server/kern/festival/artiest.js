@@ -130,7 +130,28 @@ module.exports = (ctx) => {
     }
     x.stand = stand;
     save();
+    /* HET PUBLIEKE MOMENT (STAGE.md par. 5a). Pas hier, en alleen hier: een
+       VOORNEMEN blijft buiten Stage om exact dezelfde reden als het buiten het
+       gastprogramma blijft -- anders koopt iemand een kaartje voor een naam die
+       er niet staat. De aanwezigheid is die van het FESTIVAL en niet van de
+       artiest: RTG weet niet of die artiest hier een account heeft, en een
+       aanwezigheid verzinnen voor iemand die er niet om vroeg is precies wat
+       kern/mediaos/aanwezigheid.js verbiedt. */
+    if (stand === 'bevestigd') momentVoorFestival(fid, x);
     return { ok: true, boeking: x };
+  }
+
+  /* Laat gebonden: de Media OS wordt in een latere laag samengesteld, en zonder
+     haak gaat de boeking gewoon door -- er wordt dan alleen niemand gewekt. */
+  function momentVoorFestival(fid, boeking) {
+    try {
+      const k = ctx.kern ? ctx.kern() : null;
+      if (!k || !k.aanwezigZorg || !k.mediaNieuwMoment) return null;
+      const f = ctx.festivalVind(fid);
+      if (!f) return null;
+      const a = k.aanwezigZorg('zaak', f.eigenaar, f.naam);
+      return a ? k.mediaNieuwMoment(a.id, 'optreden', boeking && boeking.naam) : null;
+    } catch (e) { return null; }
   }
 
   function boekingenVan(fid, eid, dagId) {

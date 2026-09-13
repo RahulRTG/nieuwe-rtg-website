@@ -735,6 +735,11 @@
       "markt"
     ],
     "mediaos": [
+      "aanwezigBeeld",
+      "aanwezigMet",
+      "aanwezigMijn",
+      "aanwezigVolg",
+      "aanwezigVolgtHij",
       "mediaBewaar",
       "mediaBieb",
       "mediaBord",

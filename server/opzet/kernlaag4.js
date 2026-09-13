@@ -76,6 +76,15 @@ kern.salonReacties = require('../kern/salon/reacties')({ db, save, liveCodename,
   keyVanCodenaam: kern.keyVanCodenaam, zijnVrienden: kern.zijnVrienden, salon: kern.salon, notify });
 kern.salonAI = require('../kern/salon/ai')({ anthropic, salon: kern.salon });
 kern.salonInzicht = require('../kern/salon/inzicht')({ db, save, salon: kern.salon });
+/* UITLICHTEN is een redactiehandeling en geen vinkje (kern/salon/uitlichten.js).
+   De twee haken naar de Media OS zijn LAAT GEBONDEN: die laag wordt pas in
+   opzet/mediaos.js samengesteld, en zonder haak licht de redactie gewoon uit --
+   er gaat dan alleen geen melding uit. Zelfde patroon als `nieuwWerk`. */
+kern.salonUitlichten = require('../kern/salon/uitlichten')({
+  db, save, schoon, codenaamVan: kern.codenaamVan,
+  nieuwMoment: (id, soort, titel) => (kern.mediaNieuwMoment ? kern.mediaNieuwMoment(id, soort, titel) : null),
+  aanwezigZorg: (soort, code, naam) => (kern.aanwezigZorg ? kern.aanwezigZorg(soort, code, naam) : null)
+});
 
 /* Métier (kern/metier/): de beroepskant. Het profiel draait op de codenaam, RTG
    bevestigt alleen wat het echt zag (de bewezen rollen komen uit de sleutelbos

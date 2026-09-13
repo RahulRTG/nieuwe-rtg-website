@@ -12,7 +12,7 @@
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 341,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 525,
+    "dbDeuren": 526,
     "dbDeurenSchrijvend": 273,
     "dekkingPct": 82,
     "dekkingWaargenomenPct": 100,
@@ -2179,6 +2179,15 @@
       "meter": "bewijsAchterstand 2380 -> 2382",
       "reden": "DEZELFDE OORZAAK ALS DE NOTITIE HIERBOVEN, EEN REGISTER VERDER, en daarom een eigen regel in plaats van de vorige stilletjes op te hogen. HERSTEL.json leidt kandidaat-tegenhangers af uit de NAMEN van de routes in IDEMPROEF.json, en is na de verse ronde hergenereerd: 49 vermoede tegenhangers in plaats van 47. De post `herstel-onbevestigd` gaat daarmee met 2 omhoog.\n\nDe twee erbij zijn /api/rtfos/bescherming/open en /api/rtfos/bescherming/sluit -- een naam-paar dat de oude ronde over 4729 routes niet kende. Geen geldroutes. `bevestigd` blijft op 43: er is dus geen terugweg stukgegaan en de proef meet niet minder.\n\nWie deze twee notities naast elkaar leest: het is EEN hermeting die door drie registers heen werkt (IDEMPROEF -> BEWIJSSCHULD, en IDEMPROEF -> HERSTEL -> BEWIJSSCHULD). Dat het in twee stappen zichtbaar werd, komt doordat HERSTEL.json pas in de tweede ronde is bijgetrokken.",
       "waarheen": "die twee paren beproeven met scripts/herstelproef.js, zodat ze van `vermoed` naar `exact` of `compensatie` gaan en de post daalt in plaats van stil te blijven staan. Vervalt 2026-12-01, samen met de notitie hierboven."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "schuld",
+      "sleutel": "dbDeuren",
+      "van": 525,
+      "vervalt": "2026-12-01",
+      "meter": "dbDeuren 525 -> 526",
+      "reden": "Een bestand is er twee geworden, geen enkele aanraking is erbij gekomen: kern/ervaring/leden/annuleren.js stond op 10237 van de 10240 bytes van keuringsregel 13 en is gesplitst in annuleren.js (1 db.data-verwijzing) en wachtlijst.js (6, allemaal naar db.data.wachtlijsten). Voor de splitsing waren dat er 7 in een bestand; erna 7 in twee. Deze ratel telt BESTANDEN en kan dat verschil niet zien. De toegang is niet achter een parameter verstopt om de teller te plezieren -- dat zou de meter bespelen en de code slechter maken. Aflossen is db.data.wachtlijsten achter een opslagdeur brengen, zoals kern/payroll/opslag.js dat voor zijn domein doet; checkregel 63 (collectie-eigenaren) bleef groen, dus er schrijft niemand in andermans collectie."
     }
   ],
   "prestatie": {
@@ -2211,7 +2220,7 @@
     "keuringTeGroot": "2026-09-05",
     "keuringDubbeling": "2026-09-07",
     "keuringDekkingAdvies": "2026-09-06",
-    "dbDeuren": "2026-08-28",
+    "dbDeuren": "2026-09-13",
     "dbDeurenSchrijvend": "2026-08-28",
     "browserpoortToetsen": "2026-09-12",
     "e2eBestanden": "2026-09-12",

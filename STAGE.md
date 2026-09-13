@@ -414,19 +414,25 @@ moment?
 | | van → naar | wat | stand |
 |---|---|---|---|
 | 1 | festival → publieke wereld | bevestigt een boeking; de aanwezigheid van de ZAAK ontstaat | gesloten |
-| 2 | publieke wereld → fan | de fan **vindt** die aanwezigheid | **openBekend** |
+| 2 | publieke wereld → fan | de fan **vindt** die aanwezigheid | gesloten |
 | 3 | fan → publieke wereld | volgt, expliciet, en leest vooraf waarvoor hij tekent | gesloten |
 | 4 | festival → fan | zet een kaart klaar; de volger wordt gewekt | gesloten |
-| 5 | fan → festival | **handelt** naar aanleiding van de wek | **openBekend** |
+| 5 | fan → festival | **vindt het moment terug** na de wek | gesloten |
 | 6 | lid → publieke wereld | plaatst in De Salon; er ontstaat GEEN aanwezigheid | gesloten |
 | 7 | kantoor → publieke wereld | licht uit, op naam en met een grond; de aanwezigheid van de AUTEUR ontstaat | gesloten |
 | 8 | publieke wereld → tweede fan | volgt de maker; de volgende uitlichting wekt hem | gesloten |
 | 9 | fan → publieke wereld | ontvolgt; het volgende feit bereikt hem niet | gesloten |
-| 10 | sportclub → publieke wereld | legt een wedstrijd vast | **openBekend** |
+| 10 | sportclub → publieke wereld | legt een wedstrijd vast; de supporter wordt gewekt | gesloten |
 
-Zeven gesloten, drie open met een uitgeschreven reden, dertien storingen
-gehouden, vier architectuurbeweringen gehouden. `sluit: false`,
-`sluitMetBevinding: true` -- en die twee worden nooit tot één cijfer opgeteld.
+**Tien gesloten, dertien storingen gehouden, vier architectuurbeweringen
+gehouden. `sluit: true`.**
+
+Dat was op de eerste ronde anders, en die eerste uitslag staat hieronder
+onverkort: zeven gesloten en drie `openBekend`. De drie zijn daarna gesloten op
+besluit van de eigenaar (13 september), en wat dat opleverde is leerzamer dan de
+tien: **één van de drie was helemaal geen besluit maar een gebrek in de proef
+zelf**, en het sluiten van de andere twee legde nog drie defecten bloot die geen
+enkele toets zag. Zie par. 6a.
 
 **De drie bevindingen zijn besluiten en geen defecten**, en de eerste twee zijn
 elkaars spiegelbeeld:
@@ -458,7 +464,7 @@ bewezen -- dat is de `Asset`-fout, een laag later.
 | A | de bron legt het feit vast terwijl er **niemand** luistert | product zonder een enkele volger: staat in de bron, en er ging niets uit |
 | B | geen handeling van Stage verandert het **ANTWOORD** van de bron | het volledige antwoord teken voor teken gelijk, voor en na volgen/ontvolgen/lezen |
 | C | de projectie draagt geen veld en geen verwijzing die de bron niet al heeft | vorm gesloten op vijf velden, id letterlijk `drager:code`, geen verwijzing naar een boeking, product of post |
-| D | de Stage-laag schrijft alleen in haar **eigen twee collecties** | gelezen uit de bron van de laag: elke `db.data.<collectie>` ⊆ `mediaAanwezig`, `mediaVolgt` |
+| D | de Stage-laag schrijft alleen in haar **eigen collecties** | gelezen uit de bron van de laag: elke `db.data.<collectie>` ⊆ `mediaAanwezig`, `mediaVolgt`, `mediaMomenten` |
 
 **D bestaat omdat B aantoonbaar een gat heeft, en dat is de scherpste les van
 deze proef.** B is met een mutatie nagetrokken: de volgroute kreeg er een regel
@@ -503,10 +509,84 @@ van.
 
 ---
 
+## 6a. Wat het SLUITEN van de drie schakels opleverde
+
+*13 september 2026, na het besluit van de eigenaar om schakel 2 en 5 in hun
+kleine vorm te bouwen.*
+
+De drie bevindingen van par. 6 heetten alle drie een **besluit**. Bij het
+uitvoeren bleek dat maar voor twee ervan te kloppen, en het sluiten van die twee
+legde nog drie defecten bloot die geen enkele bestaande toets zag. Dat is de
+opbrengst die hier telt: niet dat de keten nu sluit, maar wat er tevoorschijn
+kwam door hem te willen sluiten.
+
+**Schakel 10 was geen besluit maar een gebrek in de PROEF.** De reden luidde "de
+zaaiset heeft geen enkele zaak van het type `sportclub`". Dat is onwaar: FC RTG
+staat er gewoon in (`kern/sportclub/index.js`) -- alleen **lui** gezaaid, diep in
+zijn eigen wereldmodule, en de proef heeft die wereld nooit aangeraakt. Nagemeten
+met `DEMO_SUPPLIER=FCRTG`: supplier-login 200 met `type: 'sportclub'`,
+`/api/sport/cockpit` 200, `/api/sport/wedstrijd/maak` 200. De proef telde dus een
+eigenschap van haar eigen **opstelling** als een eigenschap van het **huis** --
+precies de vergissing waartegen zij bestaat, nu in haarzelf. *Geteld is niet
+gelopen* gold dubbel.
+
+**En daaronder lag een echte fout, van dezelfde familie als die van het
+festival.** `momentVoorClub` gaf de aanwezigheid de naam `club(code).naam`, en
+dat veld bestaat niet -- het clubdossier draagt teams, wedstrijden en velden,
+geen naam. De publieke aanwezigheid van een club heette dus **`FCRTG`** in plaats
+van *FC RTG*, en een supporter die op de naam van zijn club zocht, vond hem niet.
+Dezelfde les als eerder: wie een aanwezigheid benoemt uit zijn eigen dossier in
+plaats van vanaf de **drager**, laat het publieke adres iets anders heten dan de
+zaak.
+
+**De Fan Inbox legde bloot dat een moment nergens werd VASTGELEGD.**
+`nieuwMoment()` wekte wel en bewaarde niets. Een lid werd dus gewekt over een
+optreden en kon daarna nergens terugvinden waarover. Dat is *moment ≠ notificatie*
+uit par. 3 met één helft ontbrekend: de wek werkte, het feit werd niet bewaard.
+Het register dat er nu ligt (`db.data.mediaMomenten`) draagt daarom een scherpe
+grens, want anders is het precies de tweede waarheid die deze laag verbiedt:
+
+> Wat er staat is een **gebeurtenis** -- dat deze aanwezigheid op dit tijdstip dit
+> soort heeft uitgezonden, met de tekst die er TOEN bij hoorde. Wat er **niet**
+> staat is alles wat leeft: de naam wordt bij het lezen uit de aanwezigheid
+> gehaald, zodat een club die hernoemt overal meteen goed staat.
+
+De feed en de wek zijn daarbij met opzet twee dingen: vastleggen gebeurt zodra de
+**aanwezigheid** iets uitzendt, gewekt wordt alleen wie dat soort aan heeft
+staan. Wie ze samenvoegt, laat een lid zijn eigen geschiedenis kwijtraken door
+een vinkje uit te zetten.
+
+**Discovery maakt geen publieke kant, en dat is de grens en geen detail.** De
+zoeker hangt aan de **ledendeur**; de waarschuwing in `routes/festival/gast.js`
+gaat over een *publieke* line-up, en die is er nog steeds niet. Drie dingen doet
+hij met opzet niet: geen volgerstelling (niet in de uitvoer en niet als
+sorteersleutel -- gesorteerd op naam), geen aanbeveling, en geen echte namen.
+
+**En de duurste vondst kwam van de nieuwe toets zelf: de volgknop loog.** Met de
+declaratie `velden: ['id', 'aan']` stond `/aanwezig/volg` in het dubbeltikvenster
+van vijf seconden. Gemeten:
+
+    volg(aan:true)  -> 200, volgIk: true
+    volg(aan:false) -> 200, volgIk: false
+    volg(aan:true)  -> 200, volgIk: true, herhaald: true
+    ... en /aanwezig/mijn staat op NUL.
+
+Het derde verzoek is woordelijk gelijk aan het eerste, dus de poort gaf het
+antwoord van toen terug en de handler kwam er niet aan te pas. **Een lid dat
+binnen vijf seconden volgt, ontvolgt en opnieuw volgt, volgt niet -- en de API
+zegt van wel.** Geen randgeval maar een gewone vinger op een knop. De rem is
+eraf gehaald: `volg()` is zelf al idempotent (hij zet een stand met `indexOf`),
+dus de poort voegde niets toe en kostte correctheid.
+
+Daarbij hoort een eerlijke kanttekening die in `server/lib/idemsleutels-stage.js`
+voluit staat: de gekozen vorm heet `nietIdempotent`, en die naam dekt de lading
+niet -- dit is geen worp en geen teller. Er bestaat vandaag **geen vorm** die
+zegt *"de handler is zelf idempotent, dus dedupliceren is overbodig en voor een
+toggle schadelijk"*. Die vijfde vorm verzinnen is een besluit en geen bouwtaak.
+
 ## 7. De besluiten van de eigenaar
 
-Twee zijn er genomen; zeven staan er open, en drie daarvan zijn door de
-momentproef van *vermoed* naar *gemeten* gegaan.
+Vijf zijn er genomen; vier staan er open.
 
 **Genomen op 13 september 2026:**
 
@@ -522,20 +602,26 @@ momentproef van *vermoed* naar *gemeten* gegaan.
    niet publiek te zijn, maar hij moet er zijn — geen grond, geen uitlichting —
    en intrekken is even expliciet. `salonviraal` mag alleen VOORSTELLEN.
 
-**Open, en de eerste twee zijn nu gemeten in plaats van vermoed:**
+0c. ~~**Discovery — hoe vindt een fan een publieke aanwezigheid?**~~ **Genomen:
+   ja, maar achter de LEDENdeur** (`aanwezigZoek` in `kern/mediaos/aanwezigheid.js`,
+   route `/api/mediaos/aanwezig/zoek` met `auth`). Er komt dus geen publieke kant
+   bij — de waarschuwing in `routes/festival/gast.js` gaat over een *publieke*
+   line-up. Drie dingen doet de zoeker met opzet niet: geen volgerstelling (ook
+   niet als sorteersleutel — hij sorteert op naam), geen aanbeveling, en geen
+   echte namen. Schakel 2 sluit.
+0d. ~~**De Fan Inbox — hoe komt een fan van de wek terug bij het moment?**~~
+   **Genomen: het lid opent zelf de tijdlijn van wat hij volgt**
+   (`/api/mediaos/momenten`). `notify()` is niet aangeraakt: een melding blijft
+   een WEK zonder bestemming, en dat wordt in schakel 5 ook gemeten. Wat ervoor
+   moest komen was het **momentregister**, want een moment werd nergens
+   vastgelegd — zie par. 6a voor de grens die voorkomt dat dat een tweede
+   waarheid wordt. Schakel 5 sluit.
+0e. ~~**Krijgt de zaaiset een zaak van het type `sportclub`?**~~ **Vervallen: de
+   vraag was verkeerd gesteld.** FC RTG stond er al in, lui gezaaid; de proef had
+   die wereld nooit aangeraakt. Schakel 10 sluit, op een eigen wegwerpserver —
+   zie par. 6a.
 
-0c. **Discovery — hoe vindt een fan een publieke aanwezigheid?** Vandaag: niet.
-   Er is geen route die ze opsomt of doorzoekt, en `routes/festival/gast.js` legt
-   uit waarom dat er niet zomaar bij kan: *"er is in dit huis geen publieke kant,
-   en een line-up is het eerste dat er een van zou maken"*. Schakel 2 van de
-   momentproef.
-0d. **De Fan Inbox — hoe komt een fan van de wek terug bij het moment?**
-   Vandaag: niet. Een melding is in dit huis een WEK en geen link; geen enkele
-   `notify()` draagt een bestemming. Schakel 5 van de momentproef, en de
-   praktische vorm van *moment ≠ notificatie*.
-0e. **Krijgt de zaaiset een zaak van het type `sportclub`?** Zonder die is de
-   vierde Moment-aanleiding wel geteld door `wekdekking.js` maar nooit gelopen —
-   en geteld is niet gelopen. Schakel 10 van de momentproef.
+**Open:**
 1. **Hoe heet het?** `moment` draagt al zes betekenissen (par. 1.1). Hernoemen
    of uitwijken — `presence`, `broadcast`, `drop` en `stage` zijn vrij.
 2. **Mag een vertegenwoordiger publiceren?** Een tiende bevoegdheid in een

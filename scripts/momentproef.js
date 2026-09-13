@@ -104,9 +104,12 @@ async function bronBeeld(basis, S, w) {
   return JSON.stringify({ boekingen: b.data, producten: p.data, terrein: t.data });
 }
 
-async function loop(basis, uit) {
-  const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
-  const stap = async (s, doe, zien) => {
+/* STAP STAAT HIER EN NIET IN loop(), want de sportclubketen hieronder draait op
+   een EIGEN server en heeft hem ook nodig. Hem daar overschrijven zou twee
+   definities geven van wat een schakel is, en die lopen binnen een week uiteen
+   (LAT.md regel 4). */
+function maakStap(uit) {
+  return async (s, doe, zien) => {
     const t0 = Date.now();
     let r, gezien = null, fout = null;
     try {
@@ -131,6 +134,11 @@ async function loop(basis, uit) {
       ziet: gezien ? gezien.wat : null, fout, ms: Date.now() - t0 }));
     return r;
   };
+}
+
+async function loop(basis, uit) {
+  const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
+  const stap = maakStap(uit);
 
   /* ---- drie mensen en een zaak ----
 
@@ -204,19 +212,38 @@ async function loop(basis, uit) {
           ((aw && aw.watUKrijgt) || []).join(', ') };
     });
 
-  /* ================= 2 -- kan de fan die aanwezigheid VINDEN? ============= */
+  /* ================= 2 -- kan de fan die aanwezigheid VINDEN? =============
+
+     STOND OPEN TOT 13 SEPTEMBER 2026, en het besluit is genomen: Discovery komt
+     er, maar achter de LEDENdeur. Er is dus geen publieke kant bijgekomen -- de
+     waarschuwing in routes/festival/gast.js gaat over een PUBLIEKE line-up, en
+     die is er nog steeds niet.
+
+     WAT HIER GEMETEN WORDT is niet "geeft de route 200" maar of de fan het
+     festival werkelijk VINDT zonder het id te kennen: hij zoekt op een stuk van
+     de naam, en de aanwezigheid die hij nog niet volgt moet erbij staan met
+     `volgIk: false`. Zou de zoeker alleen teruggeven wat je al volgt, dan gaf
+     hij 200 en was de schakel nog steeds dicht. */
   await stap(
-    schakel(2, 'publieke wereld', 'fan', 'de fan vindt de aanwezigheid van het festival',
-      'Er is geen route die publieke aanwezigheden opsomt of doorzoekt: /api/mediaos/aanwezig vraagt een id ' +
-      'dat de fan al moet kennen, en /aanwezig/mijn toont uitsluitend wat hij al volgt. Dat is geen gat in ' +
-      'deze laag maar het ontbrekende Discovery-blok uit STAGE.md par. 4, en de reden dat het er niet zomaar ' +
-      'bij kan staat in routes/festival/gast.js: "er is in dit huis geen publieke kant, en een line-up is het ' +
-      'eerste dat er een van zou maken". Het besluit ligt bij de eigenaar -- STAGE.md par. 7.'),
-    () => P('/api/mediaos/aanwezig/mijn', {}, F),
+    schakel(2, 'publieke wereld', 'fan', 'de fan vindt de aanwezigheid van het festival'),
+    /* ZOEKEN OP DE NAAM VAN DE DRAGER EN NIET VAN HET FESTIVAL. De eerste versie
+       zocht op "Proeffestival" en vond niets -- terecht, want de aanwezigheid
+       hangt aan de ZAAK en draagt dus haar naam ("Sal Nocturna"). Dat is precies
+       het besluit dat deze tak eerder heeft rechtgezet: de naam van het festival
+       hoort in de TITEL van het moment, de naam van de aanwezigheid gaat over wie
+       er spreekt. De proef hield zich daar zelf niet aan. */
+    async () => {
+      const a = await P('/api/mediaos/aanwezig', { id: 'zaak:' + ZAAK }, F);
+      const naam = a.data && a.data.aanwezigheid && a.data.aanwezigheid.naam;
+      return P('/api/mediaos/aanwezig/zoek', { q: String(naam || '').slice(0, 4) }, F);
+    },
     async (r) => {
-      const n = ((r.data && r.data.aanwezigheden) || []).length;
-      return { klopt: false, wat: 'de enige lijst is /aanwezig/mijn en die staat op ' + n +
-        ': hij toont wat je al volgt, niet wat er is' };
+      const lijst = (r.data && r.data.aanwezigheden) || [];
+      const raak = lijst.find(a => a.id === 'zaak:' + ZAAK);
+      return { klopt: !!raak && raak.volgIk === false && !!(raak.watUKrijgt || []).length,
+        wat: 'zoeken op de naam geeft ' + lijst.length + ' treffer(s); de aanwezigheid van het festival ' +
+          (raak ? 'staat erbij met volgIk=' + raak.volgIk + ' en zendt uit: ' + (raak.watUKrijgt || []).join(', ')
+                : 'ontbreekt') };
     });
 
   /* ================= 3 -- de fan volgt, expliciet ========================
@@ -260,24 +287,32 @@ async function loop(basis, uit) {
 
   /* ================= 5 -- en dan? ========================================
 
-     De fan weet nu dat de kaartverkoop open is. Wat hij daarmee KAN, is de vraag
-     van deze schakel, en het antwoord is de tweede bevinding van deze proef. */
+     De fan weet nu dat de kaartverkoop open is. Wat hij daarmee KAN, was de
+     tweede bevinding van deze proef, en het besluit is genomen: de Fan Inbox.
+
+     DE MELDING IS GEEN LINK GEWORDEN, en dat is de kern van de gekozen vorm.
+     `notify()` is niet aangeraakt -- de melding draagt nog steeds geen
+     bestemming, en dat wordt hieronder ook GEMETEN in plaats van aangenomen.
+     Wat erbij kwam is de andere helft: het lid opent zelf de tijdlijn van wat
+     hij volgt, en daar staat het moment. Zo is "moment is geen notificatie" uit
+     STAGE.md par. 3 eindelijk in twee helften waar in plaats van in een.
+
+     DEZE SCHAKEL MEET DUS TWEE DINGEN TEGELIJK, en beide moeten kloppen: de wek
+     draagt GEEN adres, en de fan komt er tOch. Was alleen het tweede gemeten,
+     dan had een bestemming in de melding er stil bij kunnen sluipen. */
   await stap(
-    schakel(5, 'fan', 'festival', 'handelt naar aanleiding van de wek: hij zoekt de kaart',
-      'De wek draagt geen adres en er is geen ledenroute die de kaarten van een festival toont of verkoopt. ' +
-      'Een melding is in dit huis een WEK en geen link -- geen enkele notify() draagt een bestemming -- en ' +
-      '/api/festival/gast/* toont alleen de passen en het programma van een editie waar je AL iets hebt; ' +
-      'kopen gebeurt aan de balie (/api/festival/verkoop, supplierAuth). Dit is exact de scheiding ' +
-      '"moment is geen notificatie" uit STAGE.md par. 3: de wek werkt, de weg terug naar het moment bestaat ' +
-      'niet. Het besluit ligt bij de eigenaar -- STAGE.md par. 7, de Fan Inbox.'),
-    () => P('/api/festival/gast/passen', { festival: fid, editie: eid }, F),
+    schakel(5, 'fan', 'festival', 'handelt naar aanleiding van de wek: hij vindt het moment terug'),
+    () => P('/api/mediaos/momenten', {}, F),
     async (r) => {
       const melding = noemt(await meldingen(basis, F), 'kaartverkoop')[0] || {};
       const extra = Object.keys(melding).filter(k => !['id', 'read', 'at', 'title', 'body', 'scope', 'icon'].includes(k));
-      const passen = (r.data && r.data.passen) || [];
-      return { klopt: false,
-        wat: 'de melding draagt geen bestemming (velden buiten de vaste zes: ' + (extra.length ? extra.join(', ') : 'geen') +
-          '), en de gastenkant geeft ' + passen.length + ' passen -- er is geen route om er een te kopen' };
+      const mom = (r.data && r.data.momenten) || [];
+      const kaart = mom.find(m => m.soort === 'kaartverkoop' && m.aanwezigheid === 'zaak:' + ZAAK);
+      return { klopt: extra.length === 0 && !!kaart && !!kaart.naam && !!kaart.at,
+        wat: 'de melding draagt geen bestemming (velden buiten de vaste zes: ' +
+          (extra.length ? extra.join(', ') : 'geen') + '), en de tijdlijn van wat hij volgt geeft ' +
+          mom.length + ' moment(en) -- de kaartverkoop staat erbij als "' +
+          (kaart ? kaart.naam + ': ' + kaart.wat : 'ONTBREEKT') + '"' };
     });
 
   /* ================= 6 -- plaatsen is geen publiek moment ================
@@ -373,18 +408,6 @@ async function loop(basis, uit) {
         wat: kaarten.length + ' melding(en) over kaartverkoop, en het Dagticket zit er niet bij' };
     });
 
-  /* ================= 10 -- de vierde aanleiding ========================== */
-  await stap(
-    schakel(10, 'sportclub', 'publieke wereld', 'legt een wedstrijd vast; de supporters worden gewekt',
-      'Niet door deze keten gelopen: /api/sport/* eist een zaak met type `sportclub` (kern/sportclub/index.js, ' +
-      'isSportclub), de zaaiset heeft geen enkele zaak van dat type, en er is geen route waarmee een zaak haar ' +
-      'type zet -- dat is een aanmelding met een keuring. De haak zelf staat wel (kern/sportclub/sportief.js, ' +
-      'momentVoorClub) en scripts/wekdekking.js telt hem, maar geteld is niet gelopen. Het besluit is of de ' +
-      'zaaiset een sportclub krijgt; tot dan is dit de enige van de vier aanleidingen zonder ketenbewijs.'),
-    () => P('/api/sport/cockpit', {}, S),
-    async (r) => ({ klopt: false, wat: 'de zaak ' + ZAAK + ' is geen sportclub: /api/sport/cockpit gaf ' +
-      r.status + ' "' + ((r.data && r.data.error) || '') + '"' }));
-
   return { F, F2, M, S, persoon, w };
 }
 
@@ -394,6 +417,73 @@ async function loop(basis, uit) {
    Een keten die alleen bij goed weer sluit, bewijst niets. Elke storing draagt
    een BELOFTE in gewone woorden, en de proef meet of die belofte gehouden wordt.
    ========================================================================== */
+/* ================= 10 -- DE VIERDE AANLEIDING, OP EEN EIGEN SERVER =========
+
+   WAT HIER IS RECHTGEZET (13 september 2026), en het is een fout van de PROEF en
+   niet van de code. Deze schakel stond `openBekend` met als reden: "de zaaiset
+   heeft geen enkele zaak van type `sportclub`". Dat klopte niet. FC RTG staat er
+   gewoon in (kern/sportclub/index.js) -- alleen LUI gezaaid, diep in zijn eigen
+   wereldmodule, en de proef heeft die wereld nooit aangeraakt. Nagemeten met een
+   sessie op DEMO_SUPPLIER=FCRTG: supplier-login 200 met `type: 'sportclub'`,
+   /api/sport/cockpit 200, /api/sport/wedstrijd/maak 200.
+
+   Dat is precies de vergissing waar deze proef tegen bestaat, nu in haarzelf: ze
+   telde "geen zaak van dat type" als een eigenschap van het HUIS, terwijl het een
+   eigenschap was van haar eigen opstelling. "Geteld is niet gelopen" gold dus
+   dubbel.
+
+   WAAROM EEN EIGEN SERVER. De demo-inlog koppelt precies EEN zaak aan het
+   eigenaarsaccount, op grond van DEMO_SUPPLIER (server.js). Twee zaken op een
+   server is er dus niet bij, en het festival heeft NACHT nodig. Deze schakel is
+   bovendien een eigen mini-keten -- club legt vast, fan vindt, fan volgt, club
+   legt opnieuw vast, fan wordt gewekt -- dus hij heeft aan zijn eigen wereld
+   genoeg. Wat hij NIET deelt met de hoofdketen is met opzet: een tweede server
+   is een tweede database, en daar niets van lenen houdt de uitslagen los. */
+async function sportclubKeten(uit) {
+  const stap = maakStap(uit);
+  const srv = await start({ naam: 'momentproef-sport', gereed: 'ready',
+    env: { NODE_ENV: 'test', RTG_DEMO: '1', DEMO_SUPPLIER: 'FCRTG', OFFICE_CODE: KANTOORCODE } });
+  try {
+    const basis = srv.basis;
+    const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
+    const club = (await P('/api/supplier/login', { username: 'rahul', password: 'Imran' })).data;
+    const fan = (await P('/api/login', { tier: 'rtg' })).data;
+    if (!club || !club.token) throw new Error('geen clubsessie -- draait de server met DEMO_SUPPLIER=FCRTG?');
+    if (!fan || !fan.token) throw new Error('geen ledensessie op de sportserver');
+    const C = club.token, FS = fan.token;
+
+    /* De aanwezigheid ONTSTAAT door publiek te worden en niet door een knop:
+       deze eerste wedstrijd is wat FC RTG een publiek adres geeft. Hij staat
+       daarom vóór de schakel en telt zelf niet mee -- de wereld klaarzetten is
+       geen valsspelen, een uitslag klaarzetten wel. */
+    await P('/api/sport/wedstrijd/maak', { tegenstander: 'Es Vedra FC', thuis: false }, C);
+
+    /* De supporter vindt de club langs dezelfde Discovery als de fan van het
+       festival, en volgt hem expliciet. */
+    const gevonden = await P('/api/mediaos/aanwezig/zoek', { q: 'FC RTG' }, FS);
+    const club_a = ((gevonden.data && gevonden.data.aanwezigheden) || []).find(a => a.id === 'zaak:FCRTG');
+    if (club_a) await P('/api/mediaos/aanwezig/volg', { id: 'zaak:FCRTG', aan: true }, FS);
+    const voor = (await meldingen(basis, FS)).length;
+
+    await stap(
+      schakel(10, 'sportclub', 'publieke wereld', 'legt een wedstrijd vast; de supporters worden gewekt'),
+      () => P('/api/sport/wedstrijd/maak', { tegenstander: 'CD Salinas', thuis: true }, C),
+      async () => {
+        const na = await meldingen(basis, FS);
+        const wed = na.filter(n => /wedstrijd/i.test(String(n.body || '')));
+        const tijdlijn = await P('/api/mediaos/momenten', {}, FS);
+        const mom = ((tijdlijn.data && tijdlijn.data.momenten) || [])
+          .filter(m => m.soort === 'wedstrijd' && m.aanwezigheid === 'zaak:FCRTG');
+        return {
+          klopt: !!club_a && na.length > voor && wed.length >= 1 && mom.length >= 1,
+          wat: 'de supporter vond "' + (club_a ? club_a.naam : 'NIETS') + '" via de zoeker, en na de wedstrijd ' +
+            voor + ' -> ' + na.length + ' meldingen (' + wed.length + ' over een wedstrijd); zijn tijdlijn draagt ' +
+            mom.length + ' wedstrijdmoment(en) van de club'
+        };
+      });
+  } finally { srv.klaar(); }
+}
+
 async function storingen(basis, uit, s) {
   const P = (pad, lijf, tok) => post(basis, pad, lijf, tok);
   const { F, F2, M, S, persoon, w } = s;
@@ -474,15 +564,31 @@ async function storingen(basis, uit, s) {
     w.postId3 = id3;
   }
 
-  /* 6 -- HOOGUIT EEN KEER. Een tweede uitlichting van dezelfde post is een
-     TOESTANDSCONTROLE en geen idempotentie: hij wordt geweigerd met 409, en niet
-     stil met 200 beantwoord (MUTATIECONTRACT.md). */
+  /* 6 -- HOOGUIT EEN KEER, EN DAT HEEFT TWEE DEUREN.
+
+     Op de ROUTE staat de dubbeltikpoort ervoor (server/lib/idemsleutels-stage.js
+     zet deze route in het venster van vijf seconden), en in de MODULE staat de
+     toestandscontrole. Deze storing eiste onvoorwaardelijk 409 en zag daardoor
+     alleen de tweede deur -- terwijl de eerste als eerste antwoordt.
+
+     Allebei bewaren ze dezelfde invariant, en die is wat hier telt: er ontstaat
+     NOOIT een tweede uitlichting. Een woordelijk gelijk verzoek krijgt het
+     antwoord van de eerste terug (200 met `herhaald`), een ander verzoek --
+     dezelfde post, een andere grond -- loopt tegen de 409. Wie alleen het
+     tweede meet, laat de eerste deur ongemeten; wie alleen het eerste meet, mist
+     dat de stand uberhaupt bewaakt wordt. */
   {
-    const r = await P('/api/office/salon/uitlicht', { postId: w.postId, grond: 'bijzonder' }, persoon);
+    const herhaald = await P('/api/office/salon/uitlicht', { postId: w.postId, grond: 'bijzonder' }, persoon);
+    const ander = await P('/api/office/salon/uitlicht', { postId: w.postId, grond: 'talent' }, persoon);
+    const bord = await P('/api/office/salon/uitlicht/bord', {}, persoon);
+    const lopend = ((bord.data && bord.data.lopend) || []).filter(x => String(x.post) === String(w.postId)).length;
     noteer('hooguit een keer uitgelicht',
-      'dezelfde post twee keer uitlichten wordt geweigerd en wekt niemand opnieuw',
-      r.status === 409,
-      'tweede uitlichting gaf ' + r.status + ' "' + ((r.data && r.data.error) || '') + '"');
+      'een woordelijk gelijk verzoek is een herhaling, een ander verzoek stuit op de toestandscontrole, en er loopt precies EEN uitlichting',
+      herhaald.status === 200 && herhaald.data && herhaald.data.herhaald === true &&
+        ander.status === 409 && lopend === 1,
+      'herhaling gaf ' + herhaald.status + (herhaald.data && herhaald.data.herhaald ? ' (herhaald)' : '') +
+        ', een andere grond gaf ' + ander.status + ' "' + ((ander.data && ander.data.error) || '') +
+        '", en er loopt ' + lopend + ' uitlichting');
   }
 
   /* 7 -- INTREKKEN VRAAGT EEN REDEN, net als uitlichten. Een redactiebesluit
@@ -699,7 +805,12 @@ async function architectuur(basis, uit, s) {
      Stage-laag zijn -- en zij leest en beslist niets over de code
      (CODE.md, CODE-AI-001: meters lezen de bron en bedienen niets). */
   {
-    const EIGEN = ['mediaAanwezig', 'mediaVolgt'];
+    /* DE EIGEN COLLECTIES VAN DEZE LAAG. `mediaMomenten` kwam er op 13 september
+       bij (het momentregister onder de Fan Inbox) en hoort hier omdat hij VAN
+       Stage is -- deze bewering gaat over VREEMDE collecties, niet over het
+       aantal eigen. Wat hij blijft vangen is Stage die in festival, salon of
+       sportclub schrijft, en dat is precies waar hij voor bestaat. */
+    const EIGEN = ['mediaAanwezig', 'mediaVolgt', 'mediaMomenten'];
     const BESTANDEN = ['server/kern/mediaos/aanwezigheid.js', 'server/kern/mediaos/wekken.js'];
     const vreemd = [];
     for (const rel of BESTANDEN) {
@@ -718,7 +829,7 @@ async function meet() {
   const uit = {
     stempel: new Date().toISOString().slice(0, 10),
     uitleg: 'Een publieke keten van een feit bij de bron tot een melding bij iemand die daar zelf ja tegen zei, gemeten per SCHAKEL (handelt actor A, en weet actor B het?) en per STORING (houdt de keten zijn belofte als het misgaat?). Vierde keten naast tafelproef, ritproef en toelatingsproef -- zie STAGE.md par. 6.',
-    grens: 'Drie van de vier Moment-aanleidingen lopen hier echt (festivalboeking, festivalproduct, uitlichting in De Salon); de wedstrijd van een sportclub niet -- zie schakel 10. Er komt geen browser aan te pas, en er wordt niets betaald: dat een fan werkelijk een kaart KAN kopen is niet gemeten, want die route bestaat aan de ledenkant niet (schakel 5).',
+    grens: 'Alle vier de Moment-aanleidingen lopen hier echt: festivalboeking, festivalproduct en de uitlichting in De Salon op de hoofdserver, de wedstrijd van een sportclub op een eigen server (schakel 10 -- zie de kop van sportclubKeten voor waarom dat een tweede server vraagt). Wat hier NIET gemeten is: er komt geen browser aan te pas, en er wordt niets betaald -- dat een fan werkelijk een kaart KAN kopen blijft ongemeten, want die route bestaat aan de ledenkant niet. Schakel 5 meet dat hij het moment TERUGVINDT, niet dat hij het kan afrekenen.',
     schakels: [], storingen: [], architectuur: [], wereld: null
   };
   const srv = await start({ naam: 'momentproef', gereed: 'ready',
@@ -728,6 +839,10 @@ async function meet() {
     await storingen(srv.basis, uit, s);
     await architectuur(srv.basis, uit, s);
   } finally { srv.klaar(); }
+
+  /* De vierde aanleiding draait op een eigen server -- zie de kop van
+     sportclubKeten() voor waarom dat moet en waarom het mag. */
+  await sportclubKeten(uit);
 
   /* DRIE TELLERS EN NIET EEN. De eerste versie liet de architectuurbeweringen in
      dezelfde `gehouden` lopen als de storingen, en dan meldde de proef twaalf

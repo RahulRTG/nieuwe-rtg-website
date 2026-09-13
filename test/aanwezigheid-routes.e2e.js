@@ -157,10 +157,71 @@ test('de publieke laag: volgen op naam, en uitlichten alleen door een mens', asy
     assert.equal((await post('/api/mediaos/aanwezig', { id: 'zaak:bestaat-niet' }, lid.token)).status, 404);
     assert.equal((await post('/api/mediaos/aanwezig/volg', { id: 'zaak:bestaat-niet', aan: true }, lid.token)).status, 404);
 
-    /* 5. En een gast komt er niet in: de Media OS is voor leden. */
+    /* 4a. VOLGEN, ONTVOLGEN, OPNIEUW VOLGEN -- binnen het dubbeltikvenster.
+
+       DEZE TOETS VOND EEN ECHT DEFECT, en het zat in onze eigen verklaring. Met
+       `velden: ['id', 'aan']` was het derde verzoek woordelijk gelijk aan het
+       eerste, dus de dubbeltikpoort gaf het antwoord van toen terug en de
+       handler kwam er niet aan te pas: het lid VOLGDE NIETS terwijl de API 200
+       en volgIk:true zei. Een gewone vinger op een knop, en een stille
+       onwaarheid tegen het lid.
+
+       De drie oproepen staan hier bewust achter elkaar zonder pauze -- met een
+       wachttijd van vijf seconden ertussen zou deze toets altijd slagen en
+       nooit iets bewijzen. */
+    assert.equal((await post('/api/mediaos/aanwezig/volg', { id: aanwezigId, aan: true }, lid2.token)).body.volgIk, true);
+    assert.equal((await post('/api/mediaos/aanwezig/volg', { id: aanwezigId, aan: false }, lid2.token)).body.volgIk, false);
+    const derde = await post('/api/mediaos/aanwezig/volg', { id: aanwezigId, aan: true }, lid2.token);
+    assert.equal(derde.body.volgIk, true, 'de derde zegt dat hij volgt');
+    assert.notEqual(derde.body.herhaald, true, 'en hij is GEEN herhaling: de handler heeft echt gedraaid');
+    assert.equal((await post('/api/mediaos/aanwezig/mijn', {}, lid2.token)).body.aanwezigheden.length, 1,
+      'en dan volgt hij er ook echt een -- dit is de regel die zakte');
+    await post('/api/mediaos/aanwezig/volg', { id: aanwezigId, aan: false }, lid2.token);
+
+    /* 4b. DISCOVERY EN DE FAN INBOX over de echte route (13 september 2026).
+
+       De twee helften die schakel 2 en 5 van de momentproef openhielden. Wat
+       hier bewezen wordt is niet dat ze 200 geven maar dat ze DOEN wat ze
+       beloven: een aanwezigheid VINDEN zonder het id te kennen, en het moment
+       TERUGVINDEN zonder dat de melding een adres draagt. */
+    /* Zoeken op een stuk van de ECHTE naam van de aanwezigheid. Die komt uit de
+       codenaam van de auteur en niet uit een vast voorvoegsel -- de eerste
+       versie van deze toets zocht op de stub uit de unittoets en vond niets. */
+    const naamVanA = (await post('/api/mediaos/aanwezig', { id: aanwezigId }, lid2.token)).body.aanwezigheid.naam;
+    assert.ok(naamVanA && naamVanA.length >= 3, 'de aanwezigheid draagt een naam om op te zoeken');
+    const gezocht = await post('/api/mediaos/aanwezig/zoek', { q: naamVanA.slice(0, 4) }, lid2.token);
+    assert.equal(gezocht.status, 200);
+    assert.ok(Array.isArray(gezocht.body.aanwezigheden), 'de zoeker geeft een lijst');
+    const raak = gezocht.body.aanwezigheden.find(a => a.id === aanwezigId);
+    assert.ok(raak, 'de aanwezigheid van de auteur is te vinden op een stuk van de naam');
+    assert.equal(raak.volgIk, false, 'en lid2 heeft hem net ontvolgd, dus volgIk is false');
+
+    /* De grens die op de route net zo hard staat als in de module: geen
+       volgerstelling, ook niet verstopt in een veldnaam. */
+    for (const sleutel of Object.keys(raak))
+      assert.ok(!/volgers|aantal|score|rang|populair/i.test(sleutel),
+        'de zoeker geeft geen telling terug (veld ' + sleutel + ')');
+
+    /* De tijdlijn is een venster op wat je volgt: eerst niets, dan iets. */
+    assert.equal((await post('/api/mediaos/momenten', {}, lid2.token)).body.momenten.length, 0,
+      'wie niets volgt, ziet niets');
+    await post('/api/mediaos/aanwezig/volg', { id: aanwezigId, aan: true }, lid2.token);
+    const tijdlijn = await post('/api/mediaos/momenten', {}, lid2.token);
+    assert.equal(tijdlijn.status, 200);
+    const uitgelicht = tijdlijn.body.momenten.find(m => m.soort === 'uitgelicht');
+    assert.ok(uitgelicht, 'de uitlichting van eerder staat in de tijdlijn');
+    assert.equal(uitgelicht.aanwezigheid, aanwezigId);
+    assert.ok(uitgelicht.at, 'met een tijdstip');
+    assert.ok(uitgelicht.naam, 'en de naam van de aanwezigheid, live gelezen');
+    await post('/api/mediaos/aanwezig/volg', { id: aanwezigId, aan: false }, lid2.token);
+
+    /* 5. En een gast komt er niet in: de Media OS is voor leden. Alle vier de
+       ledenroutes van deze laag, zodat de deur niet per route kan verschillen. */
     const gast = (await post('/api/login', { tier: 'guest' })).body;
     if (gast.token) {
-      assert.equal((await post('/api/mediaos/aanwezig/mijn', {}, gast.token)).status, 403);
+      for (const pad of ['/api/mediaos/aanwezig/mijn', '/api/mediaos/aanwezig/zoek', '/api/mediaos/momenten']) {
+        assert.equal((await post(pad, {}, gast.token)).status, 403, pad + ' is niet voor een gast');
+      }
     }
   } finally {
     await stop(srv);

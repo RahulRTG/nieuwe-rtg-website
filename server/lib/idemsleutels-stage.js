@@ -38,21 +38,63 @@
    hij eiste onvoorwaardelijk 409 en beschreef daarmee de wereld van voordat dit
    bestand bestond.
 
-   DE VOLGKNOP IS EEN STAND EN GEEN TELLER. `/aanwezig/volg` draagt `aan`, en
-   twee keer "aan" zetten is een keer volgen: de lijst is een verzameling en geen
-   optelling (kern/mediaos/aanwezigheid.js gebruikt indexOf voor het zetten).
-   Daarom telt `id` samen met `aan` als identiteit -- zonder `aan` zou een
-   volg-gevolgd-door-ontvolg binnen het venster als herhaling wegvallen, en dan
-   blijft iemand volgen die net heeft afgezegd. */
+   DE VOLGKNOP IS EEN STAND EN GEEN TELLER, EN DAAROM MAG DE POORT HEM NIET
+   DEDUPLICEREN. Dit is op 13 september herschreven nadat de eigen e2e-toets er
+   een echt defect mee vond, en de eerste versie van deze alinea was de oorzaak.
+
+   Die versie declareerde `velden: ['id', 'aan']` en redeneerde: twee keer "aan"
+   zetten is een keer volgen, en door `aan` mee te tellen valt een
+   volg-gevolgd-door-ontvolg niet als herhaling weg. Het eerste klopt. Het tweede
+   niet, en het verschil is GEMETEN:
+
+       volg(aan:true)  -> 200, volgIk: true
+       volg(aan:false) -> 200, volgIk: false
+       volg(aan:true)  -> 200, volgIk: true, herhaald: true
+       ... en /aanwezig/mijn staat op NUL.
+
+   Het derde verzoek is woordelijk gelijk aan het eerste, dus de dubbeltikpoort
+   gaf het antwoord van toen terug en de handler kwam er niet aan te pas. Een lid
+   dat binnen vijf seconden volgt, ontvolgt en opnieuw volgt, VOLGT NIET -- en de
+   API zegt van wel. Dat is geen randgeval maar een gewone vinger op een knop, en
+   een stille onwaarheid tegen het lid.
+
+   De rem hoort er dus af. `volg()` is namelijk ZELF al idempotent: hij zet een
+   stand met indexOf en telt niets op, dus tweemaal uitvoeren geeft precies
+   dezelfde uitkomst als eenmaal. De poort voegt hier niets toe en kost
+   correctheid.
+
+   EN DE NAAM VAN DE VORM DEKT DE LADING NIET, dus dat staat er hardop bij.
+   `nietIdempotent` betekent in lib/idemsleutels.js "een herhaling is een ECHTE
+   tweede handeling" -- de worp, de teller, het trekken van een kaart. Dat is
+   deze route niet. Wat hij wél deelt met die familie is het enige dat
+   lib/idem-sleutelbepaling.js regel 82 ermee doet: geen sleutel, dus de poort
+   laat elke aanroep door. Er bestaat vandaag geen vorm die zegt "de handler is
+   zelf idempotent, dus dedupliceren is overbodig en voor een toggle schadelijk",
+   en die vijfde vorm verzinnen is een besluit en geen bouwtaak -- vandaar deze
+   uitleg in plaats van een nieuw woord.
+
+   LET OP DE TWEE ASSEN, want ze spreken elkaar hier niet tegen. In
+   ../lib/mutatiecontracten-stage.js staat deze route als
+   `semantiek: { klasse: 'idempotent' }`, en dat blijft waar: dat gaat over wat
+   de HANDELING is. Dit bestand gaat over wat de POORT met een tweede aanroep
+   doet. MUTATIECONTRACT.md houdt die twee met opzet uit elkaar. */
 'use strict';
 const SLEUTELS = {
   /* Lezen: opzoeken, de eigen volglijst, en het redactiebord. */
   'POST /api/mediaos/aanwezig': { leest: true },
   'POST /api/mediaos/aanwezig/mijn': { leest: true },
   'POST /api/office/salon/uitlicht/bord': { leest: true },
+  /* En de twee die schakel 2 en 5 van de momentproef sloten. Allebei LEZEN ze:
+     Discovery doorzoekt de aanwezigheden, de Fan Inbox leest de tijdlijn van wat
+     je volgt. Herhalen hoort hier het antwoord van NU te geven -- wie tweemaal
+     zoekt na een nieuw optreden, wil dat optreden zien en niet het antwoord van
+     vijf seconden geleden. */
+  'POST /api/mediaos/aanwezig/zoek': { leest: true },
+  'POST /api/mediaos/momenten': { leest: true },
 
   /* Schrijven. */
-  'POST /api/mediaos/aanwezig/volg': { velden: ['id', 'aan'] },
+  'POST /api/mediaos/aanwezig/volg': { nietIdempotent: true,
+    waarom: 'Een TOGGLE, en de poort mag hem niet dedupliceren. volg() is zelf idempotent (hij zet een stand met indexOf), dus herhalen is veilig -- maar het venster van vijf seconden gaf bij volgen-ontvolgen-volgen het antwoord van de eerste terug en sloeg de derde over: het lid volgde niets terwijl de API 200 en volgIk:true zei. Zie de kop voor de meting en voor waarom de NAAM van deze vorm de lading hier niet dekt.' },
   'POST /api/office/salon/uitlicht': { velden: ['postId', 'grond'] },
   'POST /api/office/salon/uitlicht/intrek': { velden: ['postId'] }
 };

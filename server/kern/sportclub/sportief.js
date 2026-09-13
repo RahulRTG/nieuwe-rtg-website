@@ -61,8 +61,18 @@ module.exports = (ctx) => {
     try {
       const k = ctx.kern ? ctx.kern() : null;
       if (!k || !k.aanwezigZorg || !k.mediaNieuwMoment) return null;
-      const c = club(code);
-      const a = k.aanwezigZorg('zaak', code, (c && c.naam) || code);
+      /* DE NAAM VAN DE AANWEZIGHEID KOMT VAN DE DRAGER EN NIET UIT DIT DOSSIER.
+         Hier stond `club(code).naam`, en dat veld bestaat niet: het clubdossier
+         draagt teams, wedstrijden en velden, geen naam. De aanwezigheid viel dus
+         terug op de CODE, en een supporter zocht tevergeefs naar "FC RTG"
+         terwijl zijn club in de lijst "FCRTG" heette.
+
+         Gevonden door schakel 10 van scripts/momentproef.js, en het is dezelfde
+         fout als die bij het festival: wie de aanwezigheid een naam geeft uit
+         zijn eigen dossier in plaats van van de drager, laat het publieke adres
+         iets anders heten dan de zaak. */
+      const s = k.findSupplier ? k.findSupplier(code) : null;
+      const a = k.aanwezigZorg('zaak', code, (s && s.name) || code);
       const titel = wedstrijd ? (wedstrijd.thuis ? 'thuis tegen ' : 'uit tegen ') + wedstrijd.tegenstander : null;
       return a ? k.mediaNieuwMoment(a.id, 'wedstrijd', titel) : null;
     } catch (e) { return null; }

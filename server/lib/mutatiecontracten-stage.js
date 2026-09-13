@@ -55,6 +55,28 @@ module.exports = { CONTRACTEN: {
     nagekeken: 'Claude, 2026-09-13: de handler las ik regel voor regel -- aanwezigMet() en aanwezigVolgtHij(), allebei lezend. Geen bestand, geen externe dienst, geen teller buiten de database.',
     afgetekend: AFGETEKEND
   },
+  /* DISCOVERY EN DE FAN INBOX (13 september 2026) -- de twee routes die schakel
+     2 en 5 van de momentproef sloten. Allebei LEZEN ze, en allebei dragen ze
+     `bewijs` EN `nagekeken` om dezelfde reden als de twee hierboven: de
+     opslagmeter kijkt alleen naar collecties, dus "schrijft niets" leunt op zijn
+     blinde stuk en hoort door een mens gelezen te zijn. */
+  'POST /api/mediaos/aanwezig/zoek': {
+    mutatieId: 'mediaos.aanwezig.zoek', herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
+    bewijs: BEWIJS('toets 13: zoeken vindt een aanwezigheid op naam en op soort, en laat het register onaangeroerd'),
+    nagekeken: 'Claude, 2026-09-13: de handler las ik regel voor regel -- hij roept alleen aanwezigZoek() aan, en die filtert en sorteert een kopie van de sleutels. Geen save(), geen bestand, geen externe dienst, geen teller.',
+    afgetekend: AFGETEKEND
+  },
+  'POST /api/mediaos/momenten': {
+    mutatieId: 'mediaos.momenten', herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
+    bewijs: BEWIJS('toets 14: de tijdlijn toont het moment van een gevolgde aanwezigheid en niets van een ongevolgde'),
+    nagekeken: 'Claude, 2026-09-13: de handler las ik regel voor regel -- mediaMomentenVoor() leest de volglijst en het momentregister en vormt daar een antwoord uit. De enige schrijver van dat register is nieuwMoment(), en die hangt aan een domein dat iets uitzendt, niet aan deze route.',
+    afgetekend: AFGETEKEND
+  },
+
   /* Het redactiebord leest, maar het projecteert ook: een uitlichting waarvan de
      looptijd om is, valt hier van `featured`. Dat CONVERGEERT -- tweemaal
      projecteren geeft dezelfde uitkomst -- dus idempotent en geen tweede

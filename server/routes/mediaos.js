@@ -11,7 +11,8 @@ module.exports = (kern) => {
     mediaBieb, mediaBewaar, mediaSmaakVan, mediaSmaakStuur, mediaBord,
     mediaLijsten, mediaLijst, mediaLijstMaak, mediaLijstZet, mediaLijstStuk, mediaLijstDeel,
     mediaSamenStart, mediaSamenNodig, mediaSamenIn, mediaSamenUit, mediaSamenZet, mediaSamenMijn,
-    aanwezigVolg, aanwezigMijn, aanwezigMet, aanwezigVolgtHij, aanwezigBeeld } = kern;
+    aanwezigVolg, aanwezigMijn, aanwezigMet, aanwezigVolgtHij, aanwezigBeeld,
+    aanwezigZoek, mediaMomentenVoor } = kern;
   if (!mediaWereld) return;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
@@ -170,5 +171,33 @@ module.exports = (kern) => {
     const a = aanwezigMet((req.body || {}).id);
     if (!a) return res.status(404).json({ error: 'Deze aanwezigheid bestaat niet.' });
     res.json({ ok: true, aanwezigheid: aanwezigBeeld(a), volgIk: aanwezigVolgtHij(sess(req).key, a.id) });
+  });
+
+  /* DISCOVERY -- een lid kan een aanwezigheid VINDEN (schakel 2 van de
+     momentproef, die hierop openstond).
+
+     ACHTER `auth`, EN DAT IS DE GRENS EN GEEN DETAIL. routes/festival/gast.js
+     schrijft het uit: "er is in dit huis geen publieke kant, en een line-up is
+     het eerste dat er een van zou maken". Deze route maakt die publieke kant
+     dus niet -- zij opent alleen voor LEDEN wat er al publiek is. Zet hier nooit
+     een anonieme variant naast zonder dat besluit opnieuw te nemen. */
+  app.post('/api/mediaos/aanwezig/zoek', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    if (!aanwezigZoek) return res.status(503).json({ error: 'Deze laag draait hier niet.' });
+    const b = req.body || {};
+    res.json(Object.assign({ ok: true }, aanwezigZoek(sess(req).key, b.q, b.soort)));
+  });
+
+  /* DE FAN INBOX -- van de wek terug naar het moment (schakel 5).
+
+     EEN MELDING BLIJFT EEN WEK EN GEEN LINK. Er is met opzet niets aan
+     `notify()` veranderd: geen bestemming, geen adres in het bericht. In plaats
+     daarvan kan het lid ZELF de tijdlijn openen van wat hij volgt. Dat is de
+     scheiding uit STAGE.md par. 3 met beide helften erin -- de wek zegt DAT er
+     iets is, dit scherm zegt WAT. */
+  app.post('/api/mediaos/momenten', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    if (!mediaMomentenVoor) return res.status(503).json({ error: 'Deze laag draait hier niet.' });
+    res.json(Object.assign({ ok: true }, mediaMomentenVoor(sess(req).key, (req.body || {}).grens)));
   });
 };

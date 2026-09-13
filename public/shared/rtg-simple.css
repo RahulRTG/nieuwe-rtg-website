@@ -213,6 +213,37 @@ body.rtg-travel-experience[data-rtg-skin="heritage"][data-rtg-world="travel"][da
   color:var(--rtg-world-action-ink)!important
 }
 
+/* Houd lokaal samengestelde voorgronden en achtergronden als één contrastpaar.
+   Deze zes routes mengen bewust hun eigen lichte of donkere materiaal met de
+   gedeelde wereldaccenten; zonder de voorgrondhelft van het paar kon een
+   bordeaux/royal accent daar decoratief mooi maar als tekst onleesbaar worden. */
+body.rtg-travel-experience[data-rtg-skin="heritage"][data-rtg-world="travel"][data-rtg-world-dashboard-ready="true"] .actieknop{
+  color:var(--rtg-world-action-ink)!important
+}
+body.rtg-reisboek[data-rtg-skin="heritage"] .reisboek-nav [aria-current],
+body.rtg-reisboek[data-rtg-skin="heritage"] .reisboek-nav [aria-current] b,
+body.rtg-arrival-experience[data-rtg-skin="heritage"] .rtg-deep-nav a[aria-current="page"],
+body.rtg-arrival-experience[data-rtg-skin="heritage"] .rtg-deep-nav a[aria-current="page"] b{
+  color:#e7a8b8!important
+}
+body.foundation-hulp[data-rtg-skin="heritage"] .fh-nav .is-actief,
+body.foundation-hulp[data-rtg-skin="heritage"] .fh-nav .is-actief span{
+  color:#b9c9ee!important
+}
+body[data-ios-home][data-rtg-skin="heritage"] .rtg-toegang-signatuur,
+body.magnaat-voorzijde-actief[data-rtg-skin="heritage"] .rtg-toegang-signatuur{
+  color:#51473d!important
+}
+body[data-ios-home][data-rtg-skin="heritage"] .rtg-toegang-id,
+body.magnaat-voorzijde-actief[data-rtg-skin="heritage"] .rtg-toegang-id{
+  color:#312820!important
+}
+@media(max-width:520px){
+  body.rtg-work-experience[data-rtg-skin="heritage"] .doelgroepnav a{
+    min-inline-size:44px!important
+  }
+}
+
 /* Tekst op fotografische dashboardvlakken houdt ook bij een gemiddeld lichte
    uitsnede zijn volledige leescontrast. */
 body[data-rtg-skin="heritage"][data-rtg-world="living"][data-rtg-world-dashboard-ready="true"] .standen button{

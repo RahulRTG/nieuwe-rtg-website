@@ -1,0 +1,374 @@
+# RTG Stage — de publieke laag
+
+*De publieke en sociale projectie van een mens, een organisatie, een werk of een
+gebeurtenis binnen RTG.*
+
+Niet een app naast Podium, Theater, Clips, Klankwerk, Salon, Festival en
+Sportclub. Die blijven hun eigen specialistische motoren. Stage is de laag
+erboven die ze samen laat leven, en de kernbelofte is:
+
+> **Volg niet alleen iemand. Stap zijn wereld binnen.**
+
+Dit is een **richtingsdocument** zoals `PLATFORM.md`, `ECONOMIE.md`, `HDI.md` en
+`CARRIERE.md`: per onderdeel staat er of het **staat**, **een stap weg** is, **een
+besluit vraagt** of **jaren weg** is — zodat niemand die vier voor elkaar
+aanziet.
+
+---
+
+## 0. De meting die dit document eerlijk houdt
+
+De opzet rust op één bewering: *de nieuwe fundamentele eenheid moet `Moment`
+worden — niet post, niet video, niet event, niet ticket.*
+
+Die bewering is aantrekkelijk en zij is precies de vorm waarin dit huis al twee
+keer is gestruikeld. `Asset` klonk net zo vanzelfsprekend over tafel, kamer,
+podium en leaseauto (`OBJECTMODEL.json`), en de carrièrelus klonk net zo
+vanzelfsprekend over vijftien talentdomeinen (`CARRIEREVORM.json`). Allebei
+sneuvelden ze toen iemand ze tegen de code hield.
+
+Dus is zij **gemeten** en niet aangenomen: `npm run stagevorm` →
+`STAGEVORM.json`. Op de lezer van `scripts/objectmodel.js`, want een tweede
+parser maakt de vergelijking met die twee metingen waardeloos — en daar rust de
+conclusie nu juist op.
+
+**A. De naam.** Is `moment` vrij?
+
+| naam | plekken | domeinen |
+|---|---|---|
+| `momenten` | 7 | 6 — baby, rtfos, socialegraaf, sportclub, veiligheid, school |
+| `moment` | 1 | 1 — magnaat |
+| `capsule` | 1 | 1 — livinglab |
+| `presence`, `broadcast`, `drop`, `stage` | 0 | 0 |
+
+**B. De vorm.** 63 vormen in 10 publieke domeinen, 136 velden na aftrek van de
+envelop:
+
+- **0** velden in álle domeinen
+- **0** velden in zelfs maar de helft (drempel 5)
+- **121 (89%)** in precies één domein
+
+Ter vergelijking: platformbreed is dat 71% (`OBJECTMODEL.json`), over de
+talentdomeinen 88,2% (`CARRIEREVORM.json`). De publieke domeinen zijn dus
+**mínder verwant dan een willekeurige doorsnede van dit huis.** Het hoogst
+gedeelde veld staat in **twee** domeinen; niets haalt drie.
+
+**C. De haak.** Van de 11 publieke domeinen roepen er **5** de bestaande wekhaak
+`nieuwWerk()` aan (clips, mediaos, muziek, podium, theater) en **6** niet
+(creator, events, festival, galerij, salon, sportclub). De momentsoorten die de
+meldingsvoorkeur vandaag kent zijn er **vier**: `muziek`, `video`, `flow`,
+`live`.
+
+**De meter is een mutatie aangedaan en hij bewoog.** Versmald tot `clips` +
+`theater` — twee aantoonbaar verwante videodomeinen — slaat "in alle domeinen"
+om van 0 naar **5** (`duurS`, `mb`, `online`, `poster`, `reacties`). De nul over
+tien domeinen is dus een bevinding en geen kapotte meter.
+
+> Wat deze meting **niet** zegt: dat er geen gedeeld PROCES is. Zij kijkt naar
+> bewaarde vormen en naar namen in de bron, niet naar werkwoorden, volgorde of
+> uitkomst. `KETENVORM.json` laat zien dat die twee vragen verschillende
+> antwoorden geven (0 van 13 gedeelde actoren, terwijl alle drie de ketens wel
+> degelijk werkten). Voor de procesvraag is de vorm een **ketenproef** — par. 6.
+
+---
+
+## 1. Zeven correcties op de opzet
+
+Deze zeven horen nergens anders herhaald te worden.
+
+### 1.1 `moment` is bezet, en zesvoudig
+
+Het woord draagt in deze code al zes betekenissen: een socialpost van een club
+(`kern/sportclub`), een AI-mijlpaal in een gezinsboek (`kern/baby`), een
+doorlooppunt van een subsidieaanvraag (`kern/rtfos/subsidies`), een gedeeld
+moment waar een veiligheidskring op meekijkt (`kern/veiligheid/opslag`), een
+dagopname van een simulatie (`kern/magnaat-economie`) — en, het gevaarlijkst,
+**een levensgebeurtenis uit een stille bron** (`kern/socialegraaf/bronnen`, de
+voeding van de levensgraaf).
+
+Dat laatste is geen naamgevingsprobleem maar een veiligheidsprobleem. Een
+PUBLIEK moment naast een PRIVAAT moment, onder dezelfde naam, in hetzelfde huis:
+dat is de `VERMOGENS`-botsing uit `OS.md` op de centrale naam van een hele laag,
+en de faalvorm is dat iemand op een dag de verkeerde leest. `SEMANTIEK.json`
+telt 105 namen die dit al overkwam; dit zou nummer 106 zijn, en dan meteen op de
+duurste plek.
+
+**De nieuwe naam hernoemt dus eerst of wijkt uit.** `presence`, `broadcast`,
+`drop` en `stage` zijn wél vrij (0 plekken) — die vier kosten niets.
+
+### 1.2 Moment is geen object; het is een projectie
+
+Dit is geen weerlegging van de opzet maar het bewijs eronder. De opzet zegt zelf
+al het juiste: *Stage moet niets bezitten wat elders de bronwaarheid heeft.* De
+meting geeft daar tanden aan: met 0 gedeelde velden over tien domeinen en 89%
+domeineigen zou een `Moment`-OBJECT alles wat de domeinen onderscheidt naar een
+`extra`-veld duwen — en dan heeft wie erop bouwt acht keer werk in plaats van
+één keer.
+
+Alleen het woord **"fundamentele eenheid"** moet dus weg. De vorm die overleeft
+staat al in dit huis en is `kern/levensgraaf/graaf.js`: **een projectie met
+etiketten, die elke keer opnieuw uit de domeinen wordt gebouwd.** Zie par. 3.
+
+### 1.3 De momentmotor bestaat al en heet `wekken.js`
+
+`kern/mediaos/wekken.js` is de momentmotor in embryo: vier momenten
+(uitgave, video-bytes binnen, nieuwe clip, live gáán), drie filters (wie volgt,
+waarvoor, en de algemene meldingsschakelaar), en een laat gebonden haak
+`nieuwWerk(key, soort, titel)` die de domeinen zelf aanroepen.
+
+De opdracht is daarmee **aansluiten en niet uitvinden** — dezelfde uitkomst als
+`HDI.md` par. 1. Concreet: 6 van de 11 publieke domeinen aansluiten, en de
+soortenlijst van vier verbreden. Dat is werk van dagen, niet van kwartalen.
+
+### 1.4 ManagementOS bestaat, en heet `kern/vertegenwoordiging/`
+
+Punt 29, 30 en 44 van de opzet zijn grotendeels gebouwd:
+`machtiging.js` (mens-namens-mens, met de grammatica uit `kern/stuur/mandaat.js`:
+een mandaat VERSMALT bestaand vermogen en verleent er nooit), `simulatie.js`
+(letterlijk de permission-diff die de opzet vraagt — en hij toont **even groot**
+wat er níét opengaat) en `jeugd.js` (het jeugdbestuur, met LEVEN.md par. 2
+erboven: een kind is geen profiel, de jongere tekent zelf mee).
+
+**Maar de bevoegdhedenlijst is met opzet GESLOTEN** op negen bevoegdheden, en
+`publiceren` staat er niet bij. Punt 30 — *Emma mag PUBLISH_CLIP uitvoeren voor
+Mila tot 31 december* — is daarmee geen bouwtaak maar **een besluit van de
+eigenaar**: een tiende bevoegdheid in een gesloten lijst, met een grond. De
+NOOIT-lijst (zeven regels) verbiedt publiceren níét, dus de weg staat open.
+
+Twee dingen daar niet wegpoetsen: de poort is `volwassen()` en dus **A3**, zodat
+er vandaag geen machtiging kan worden afgegeven voordat RTG het
+identiteitsbewijs heeft gezien; en de simulator toont een verschil en niet een
+lijst — dat is waarom hij een tweede keer gelezen wordt.
+
+### 1.5 Drie dingen bestaan hier niet waar de opzet ze veronderstelt
+
+- **`MENSNETWERK.md` bestaat niet** in deze repo. Wat er wél is, is
+  `kern/vertegenwoordiging/` (par. 1.4) plus `CARRIERE.md` en `RUGDEKKING.md`.
+- **De schil `Vandaag · Doen · Inbox · Ruimtes · Jij` bestaat niet als zodanig.**
+  `WERELD.md` legt vast dat er precies één beginscherm is — de werktafel van RTG
+  Command — met de werelden bovenaan de bank en Rahul in de schilbalk. Stage
+  hoeft daar geen tweede navigatiegrammatica naast te zetten, maar het moet de
+  bestáánde aanspreken en niet een andere.
+- **`beschermstand` is bezet.** `kern/beschermstand.js` is de veilige noodstand
+  van een ORGANISATIE (per categorie bevriezen), niet een Safety Mode voor een
+  publiek persoon. Punt 43 is dus nieuw werk onder een nieuwe naam.
+
+### 1.6 De Event Capsule bestaat half, en aan de verkeerde kant
+
+Punt 19 leunt op "de offline bundel van Festival". Die bestaat, maar hij is van
+de **poortmedewerker**: `kern/festival/toegang.js` speelt een bundel gescande
+codes achteraf af, sorteert op tijd, laat de eerste winnen en meldt de rest als
+dubbel — *"een offline poort kan een dubbele doorlaten, en dat is geen bug maar
+natuurkunde"*.
+
+Wat de BEZOEKER offline in handen heeft, bestaat niet. De Event Capsule is dus
+nieuw werk aan de gastkant, en de bestaande bundel is er het bewijs dat de
+denkwijze klopt — niet de helft van de implementatie.
+
+### 1.7 De relay-boom heeft vandaag géén terugval
+
+De zorg in punt 7 is terecht en meetbaar. `kern/podium/boom.js` kent één
+distributievorm: `herstelBoom()` herkoppelt wezen wanneer een knoop wegvalt, en
+verder is er geen edge-relay, geen serverpad en geen fallback. Bij een kanaal
+met betalende kaartjes is dat een enkelvoudig afhankelijkheidspunt.
+
+Dat is geen reden om de P2P-filosofie weg te gooien — zij is juist het
+onderscheid — maar wel om een tweede weg te hebben vóór er een kaartje verkocht
+wordt in de zone `evenement`.
+
+---
+
+## 2. Wat er al staat (de inventaris)
+
+| Onderdeel uit de opzet | Stand | Waar |
+|---|---|---|
+| Live uitzenden, chat, cadeaus, abonnement, kaartje, live verkopen | **staat** | `kern/podium/` (7 zones) |
+| Eén volgknop over vier mediavormen, zonder tweede administratie | **staat** | `kern/mediaos/volgen.js` |
+| Wekken bij nieuw werk, per maker en per soort | **staat** (4 van 11 domeinen) | `kern/mediaos/wekken.js` |
+| Samen kijken/luisteren als gedeelde aanwijzer | **staat** | `kern/mediaos/samen.js` |
+| Makersprofiel en stuk-hub | **staat** | `kern/mediaos/hub.js` |
+| Kaartverkoop zonder oververkoop (hold → pay → commit → issue) | **staat** | `kern/festival/verkoop.js` |
+| Scan aan de poort, drie standen, offline replay | **staat** | `kern/festival/toegang.js` |
+| Machtiging mens-namens-mens + permission-diff + jeugdbestuur | **staat** | `kern/vertegenwoordiging/` |
+| Passkey-bevestiging bij zwaar werk | **staat** | `server/webauthn/` (`/api/webauthn/bevestig/opties`) |
+| Event vraagt om een capability i.p.v. een genre | **staat** | `kern/objectlaag/eventwereld.js` |
+| Videokamers op codenaam (de bouwsteen voor meet & greet) | **staat** | `kern/meet.js` |
+| Moment als projectie over alle publieke domeinen | **een stap weg** | par. 3 |
+| De 6 domeinen zonder wekhaak aansluiten | **een stap weg** | par. 4 |
+| Eén `ACCESS`-capability over de vier ticketrails | **een stap weg** | par. 4 |
+| Broadcast met expliciete toestemming per soort | **een stap weg** | `kern/mediaos/eigen.js` draagt de voorkeur al |
+| Publiceren als bevoegdheid van een manager | **vraagt een besluit** | par. 1.4 |
+| Event Capsule voor de bezoeker | **vraagt een besluit** (bewaartermijn, sleutel) | par. 1.6 |
+| Terugval naast de relay-boom | **vraagt een besluit** (kosten) | par. 1.7 |
+| C2PA / content provenance | **jaren weg** — 0 treffers in de hele repo | par. 5.7 |
+| Semantische venue-objecten, Presence Mode, Memory Mode | **jaren weg** | — |
+| Generative UI binnen goedgekeurde componenten | **jaren weg** | `VERTROUWEN.json`: 0 bewezen |
+
+---
+
+## 3. De vorm die overleeft
+
+Een Moment is een **projectie**, geen rij. Hij wordt bij het opvragen gebouwd
+uit het domein dat de waarheid al bezit, en hij voegt alleen toe wat nergens
+stond: de etiketten. De vorm is die van `kern/levensgraaf/graaf.js` — vijf
+etiketten daar, hier zes:
+
+```
+onderwerp   over wie of wat gaat dit (een codenaam of een zaakcode)
+soort       wat er gebeurt (release, live, wedstrijd, verkoop open, ...)
+bron        uit welk domein het komt, en dus wie het verandert
+wanneer     het tijdstip waarop het publiek iets betekent
+deel        wie het mag zien -- een POORT en geen etiket
+vermogens   wat je hier kunt doen, en dat komt uit de capability-laag
+```
+
+Vier regels die daaruit volgen en die niet mogen sneuvelen:
+
+1. **Een Moment bezit niets.** Geen video, geen kaartje, geen voorraad, geen
+   identiteit. Verdwijnt de bron, dan verdwijnt de projectie — hij wordt niet
+   stil een kopie die achterloopt (LAT.md regel 4).
+2. **`deel` is een poort en geen etiket.** Precies zoals in de levensgraaf: de
+   filter zit in de bouwer, niet in het scherm. Een Moment dat een kijker niet
+   mag zien, bestaat niet voor hem.
+3. **`vermogens` wordt berekend, niet opgeslagen.** Dat is de regel van
+   `LINK.md`: *een code zegt wie of wat, nooit wat er mag.* Wat een kijker bij
+   dit Moment kan doen, hangt af van wie hij is, waar hij staat en wat hij al
+   mocht.
+4. **Een Moment zonder bron bestaat niet.** Geen handmatig aangemaakte
+   momenten, geen redactionele rij die nergens vandaan komt — anders is de
+   projectie binnen een jaar zelf de negende waarheid.
+
+---
+
+## 4. De negen stenen, met hun echte status
+
+| Steen | De opzet zegt | De meting zegt |
+|---|---|---|
+| Public Presence | nieuw | **nieuw**, en de naam is vrij |
+| Moment-object | nieuw | **projectie, geen object** (par. 3) |
+| Stage-projector | nieuw | **nieuw** |
+| Broadcast-toestemming | nieuw | **half** — de voorkeur per maker/soort staat, de zendkant niet |
+| Eén `ACCESS`-capability | deels | **deels** — vier rails, één gebruikersbegrip; par. 5.3 |
+| Event Capsule | deels | **gastkant is nieuw** (par. 1.6) |
+| Meet-capability | bedrading | **bedrading** — `kern/meet.js` staat |
+| Drop-capability | bedrading | **bedrading** — `kern/podium/handel.js` staat, fulfilment niet |
+| Moment Analytics | nieuw | **nieuw, en dit is de plek waar een huisregel eindelijk een handhaver krijgt** (par. 5.5) |
+
+---
+
+## 5. De grenzen
+
+### 5.1 Er komt geen fanladder, en geen score op een mens
+
+`LIFE.md` par. 4: een relatie is geen trechter. `CARRIERE.md` par. 4.2 wees de
+ladder *bekijkt → volgt → … → ambassadeur* al af. De vorm die overleeft is:
+**wat iemand heeft gedaan is een feit; waar hij "staat" is een oordeel.**
+
+De relatietypes uit punt 37 (`FOLLOW`, `SUBSCRIBE`, `ATTEND`, `MEMBER`, `ASK`,
+`MEET`, `PURCHASE`) zijn daarom **naast elkaar en nooit boven elkaar**. Geen
+ervan betekent "betere fan". Er komt ook geen interne sorteersleutel op een mens
+— niet zichtbaar en niet onzichtbaar.
+
+### 5.2 De meeteenheid is de gebeurtenis, nooit de mens
+
+Punt 38 heeft gelijk en het is scherper dan het lijkt. Deze regel staat vandaag
+in vier documenten (`KANTOORMACHT.md`, `HDI.md`, `ONTMOETEN.md`, INT-04 in
+`INTELLIGENTIE.md`) en heeft **nul handhavers**. Stage is de eerste laag die er
+een kan krijgen, omdat hier voor het eerst getallen over publiek ontstaan.
+
+Toegestaan: *8.422 kaartjes, 8.077 ingecheckt, 12.201 kijkers, 1.104
+bestellingen.* Verboden: elk getal waarvan de eenheid één mens is.
+
+### 5.3 Vier ticketrails blijven vier rails
+
+Punt 17 heeft gelijk: de problemen zijn echt verschillend (een live-kaartje, een
+festivalpas met dagdelen, een stoel in een vak, een tijdslot in een museum).
+Stage toont één gebruikersbegrip — **mijn toegang** — en voegt de motoren niet
+samen. Wat wél mag: de volwassen rail van `kern/festival/verkoop.js` als
+referentie nemen, zodat niet elke rail opnieuw zijn eigen race-condition
+uitvindt.
+
+### 5.4 Een broadcast is een toestemming, geen bereik
+
+Geen bulk-DM. Een maker bereikt alleen wie per soort expliciet ja heeft gezegd,
+en de lijst met wie dat zijn komt nooit naar buiten. Wie "concertnieuws ja,
+merch nee" zegt, krijgt geen merch — ook niet één keer, ook niet "omdat het
+belangrijk is".
+
+### 5.5 Wat niet gemeten is, wordt niet als getal getoond
+
+Punt 39 is hier al huisregel: Clips-beeld passeert de server nooit en het
+Theater telt geen weergaven. Een Moment dat een aantal toont, draagt dus de
+**dekking** erbij (`gemeten op deelnemende toestellen`, `gedeeltelijk`), in de
+vorm van de bewijsgraden uit `BESTUUR.md`. Een leeg vak wordt gevuld met iemands
+eigen indruk; dat is erger dan een lelijk getal.
+
+### 5.6 Een publiek persoon zendt zijn plaats niet uit
+
+Punt 43 hoort tot de grenzen en niet tot de functies. Stage toont hooguit de
+plaats die bij het Moment hoort (*Amsterdam*), nooit waar iemand nu is. Voor
+minderjarig publiek talent gelden bovendien `LEVEN.md` par. 2 en het
+jeugdbestuur uit `kern/vertegenwoordiging/jeugd.js` onverkort: geen publieke
+plaatsbepaling, geen zichtbaarheidsverplichting, en geen ranglijst van talenten
+(`RUGDEKKING.md`).
+
+### 5.7 Herkomst is niet hetzelfde als waarheid
+
+Als C2PA ooit wordt ingebouwd, zegt het scherm *"herkomstinformatie
+beschikbaar"* en nooit *"dit is echt"*. Twee claims die niet worden samengeperst
+tot één vinkje: wat RTG zelf weet (dit bestand is op die datum door dit account
+aangeleverd) en wat het bestand zelf draagt. Metadata kan onderweg verdwijnen,
+en een badge die dat niet weet, liegt zachtjes.
+
+### 5.8 Een cadeau is waardering en geen status
+
+De vaste bedragen van `kern/podium/index.js` blijven vast. Er komt geen
+ranglijst van gulle gevers, geen publieke optelsom per kijker en geen
+wedstrijdje — dat is precies het verslavende engagement-patroon dat `CLAUDE.md`
+verbiedt. Een daglimiet is een aparte, open vraag (par. 7).
+
+---
+
+## 6. De momentproef
+
+Zoals `tafelproef`, `ritproef` en `toelatingsproef`: één synthetisch mens, één
+keten, echt gelopen, en daarna met opzet kapotgemaakt. De drie bestaande ketens
+vonden samen vier dingen die geen enkele routetoets zag; deze keten raakt meer
+domeinen dan alle drie samen.
+
+**De keten.** Public Presence → publiceert werk → volger krijgt de melding waar
+hij ja tegen zei → kondigt een optreden aan → kaartje gereserveerd → betaald →
+uitgegeven → capsule klaar → reist → scant offline → maker gaat live → kijker
+stelt een vraag → koopt tijdens de uitzending → meet & greet opent → afloop →
+herinnering → machtiging ingetrokken → de publieke wereld blijft van de maker.
+
+**De storingen**, en dit is de helft die telt: internet weg, voorraad-race,
+dubbele betaling, toestel van de maker offline, machtiging ingetrokken tijdens
+het publiceren, relay valt uit, kaartje al gescand, kamer verlopen, fan blokkeert
+maker, maker blokkeert fan, minderjarige gebruiker, en een RTG-medewerker die
+vanuit de kantoorcontext probeert te publiceren.
+
+Twee dingen vooraf vastleggen, geleerd van de drie bestaande proeven: er komt
+een stand `openBekend` voor een schakel die aantoonbaar open staat met een
+uitgeschreven reden (anders heeft een proef die iets echts vindt maar twee
+uitgangen: zakken, of de bevinding wegpoetsen), en `sluit` en
+`sluitMetBevinding` worden apart gemeld en nooit tot één cijfer opgeteld.
+
+---
+
+## 7. De besluiten van de eigenaar
+
+Vijf, en de eerste drie blokkeren de rest.
+
+1. **Hoe heet het?** `moment` draagt al zes betekenissen (par. 1.1). Hernoemen
+   of uitwijken — `presence`, `broadcast`, `drop` en `stage` zijn vrij.
+2. **Mag een vertegenwoordiger publiceren?** Een tiende bevoegdheid in een
+   gesloten lijst van negen, met een grond. Zonder dit besluit is punt 30 niet
+   te bouwen (par. 1.4).
+3. **Krijgt de relay-boom een terugval?** Dat kost geld en het is de voorwaarde
+   om een kaartje te mogen verkopen voor een uitzending (par. 1.7).
+4. **Komt er een daglimiet op cadeaus?** De bedragen zijn al vast en er is geen
+   ranglijst; een limiet is de derde rem en hij is er nog niet.
+5. **Wie vervult een drop?** Zolang RTG niets bezorgt, mag geen scherm iets
+   anders beloven (`LAT.md` regel 6). Fulfilment als capability is de uitweg,
+   en dat is een besluit vóór het een bouwtaak is.

@@ -364,6 +364,44 @@ betaler leest de gezondheid nooit. Er komt géén vijfde wereld: een toptalent
 staat in LivingOS, WorkOS, TravelOS en FoundationOS tegelijk, en par. 7 zet de
 vier besluiten van de eigenaar op een rij.
 
+**`STAGE.md` is de publieke laag boven de media- en eventdomeinen** -- RTG
+Stage: de publieke en sociale projectie van een mens, organisatie, werk of
+gebeurtenis. Niet een app naast Podium, Theater, Clips, Klankwerk, Salon,
+Festival en Sportclub, maar de laag die ze samen laat leven. Lees die vóór je
+iets bouwt waarmee een maker zijn publiek bereikt of een fan bij een optreden
+komt. De dragende bewering van de opzet -- *`Moment` wordt de fundamentele
+eenheid over acht domeinen* -- is eerst **gemeten** (`npm run stagevorm`,
+`STAGEVORM.json`, op de lezer van `scripts/objectmodel.js`) in plaats van
+aangenomen, want dat is exact de vorm waarin `Asset` en de carrierelus allebei
+al sneuvelden. De uitslag is streng: over 10 publieke domeinen staan er **0** van
+136 velden in álle domeinen, **0** in zelfs maar de helft, en **89%** in precies
+één -- de publieke domeinen zijn dus mínder verwant dan een willekeurige
+doorsnede van dit huis (71%). De meter is een mutatie aangedaan en bewoog:
+versmald tot `clips`+`theater` slaat hij om naar 5 gedeelde velden. Een
+`Moment`-OBJECT is daarmee niet gerechtvaardigd; de vorm die overleeft is de
+**projectie** van `kern/levensgraaf/graaf.js`, hier met zes etiketten
+(onderwerp, soort, bron, wanneer, deel, vermogens) waarvan `deel` een POORT is
+en geen etiket. Zeven correcties die je nergens anders moet herhalen, waarvan de
+vier scherpste: **`moment` is bezet en zesvoudig** (7 plekken in 6 domeinen, en
+de gevaarlijkste is `kern/socialegraaf/bronnen.js` -- een PRIVATE
+levensgebeurtenis onder dezelfde naam als een PUBLIEK moment is de
+`VERMOGENS`-botsing op de centrale naam van een hele laag); **de momentmotor
+bestaat al** en heet `kern/mediaos/wekken.js` (vier soorten, en 5 van de 11
+publieke domeinen roepen de haak `nieuwWerk()` aan -- het werk is aansluiten en
+niet uitvinden); **ManagementOS bestaat en heet `kern/vertegenwoordiging/`**
+(machtiging, de permission-diff in `simulatie.js`, het jeugdbestuur in
+`jeugd.js`) maar zijn bevoegdhedenlijst is met opzet GESLOTEN op negen en
+`publiceren` staat er niet bij -- dus "een manager mag publiceren zonder het
+wachtwoord" is een BESLUIT en geen bouwtaak; en **de relay-boom heeft geen
+terugval** (`herstelBoom()` herkoppelt alleen wezen), wat de voorwaarde is vóór
+er een kaartje verkocht wordt voor een uitzending. Acht grenzen in par. 5,
+waarvan de twee die het verst reiken: er komt **geen fanladder** (wat iemand
+heeft gedaan is een feit, waar hij "staat" is een oordeel) en **de meeteenheid
+is de gebeurtenis en nooit de mens** -- die regel staat vandaag in vier
+documenten met nul handhavers, en Stage is de eerste laag die er een kan
+krijgen. Par. 6 is de `momentproef`: de vierde ketenproef, met een stand
+`openBekend` voor een schakel die aantoonbaar open staat met een reden.
+
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die
 schakelaar *ís* de juridische positie — geen twee dingen die toevallig

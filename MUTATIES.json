@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T10:58:20.528Z",
-    "commit": "27c22be4",
+    "op": "2026-09-13T11:46:12.475Z",
+    "commit": "8f3f0e26",
     "boomVuil": false,
-    "boomAnders": 7,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2204,6 +2204,14 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "effectbon.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/effectbon.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "effectdekking.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2814,6 +2822,14 @@
       "staat": "gezakt",
       "module": "server/kern/kantoor/geldketen.js",
       "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "geldpositie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/isolatie/geldpositie.js",
+      "operator": "getal+1#0",
       "gezakt": 2,
       "geprobeerd": 1
     },

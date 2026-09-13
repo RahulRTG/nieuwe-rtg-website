@@ -1,11 +1,11 @@
 {
-  "catalogi": 1075,
+  "catalogi": 1078,
   "verschillendeNamen": 633,
   "namenInMeerDomeinen": 123,
   "woordenMetMeerBetekenissen": 105,
-  "betekenissenTotaal": 389,
+  "betekenissenTotaal": 392,
   "ergsteWoord": "SOORTEN",
-  "ergsteAantal": 47,
+  "ergsteAantal": 48,
   "dubbelingen": 33,
   "dubbelingLijst": [
     {
@@ -222,7 +222,7 @@
     },
     {
       "naam": "NIET_GEBOUWD",
-      "betekenissenVanDitWoord": 5,
+      "betekenissenVanDitWoord": 6,
       "waar": [
         "server/kern/command/opslag-register.js",
         "server/kern/concern/opslag.js",
@@ -257,7 +257,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 47,
+      "betekenissenVanDitWoord": 48,
       "waar": [
         "server/kern/avond/plan.js",
         "server/kern/invoer.js"
@@ -485,7 +485,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 47,
+      "betekenissenVanDitWoord": 48,
       "waar": [
         "server/kern/bank/index.js",
         "server/kern/koppel.js"
@@ -832,8 +832,8 @@
   "top": [
     {
       "naam": "SOORTEN",
-      "domeinen": 49,
-      "betekenissen": 47,
+      "domeinen": 50,
+      "betekenissen": 48,
       "hoogsteOverlap": 0.2,
       "soort": "gemengd",
       "waar": [
@@ -1169,6 +1169,18 @@
             "bundel",
             "evenement",
             "seizoen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mediaos/aanwezigheid.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "muziek",
+            "video",
+            "flow",
+            "live"
           ]
         },
         {
@@ -2826,8 +2838,8 @@
     },
     {
       "naam": "NIET_GEBOUWD",
-      "domeinen": 11,
-      "betekenissen": 5,
+      "domeinen": 12,
+      "betekenissen": 6,
       "hoogsteOverlap": 1,
       "soort": "gemengd",
       "waar": [
@@ -2871,6 +2883,18 @@
             "retourlabel",
             "automatisch-terugboeken",
             "retourpercentage"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/factuurcorrectie-gronden.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "de-factuur-weer-openzetten",
+            "gedeeltelijk-corrigeren",
+            "correctie-door-het-lid",
+            "de-afdracht-terugboeken"
           ]
         },
         {
@@ -3436,6 +3460,63 @@
       ]
     },
     {
+      "naam": "GRONDEN",
+      "domeinen": 4,
+      "betekenissen": 4,
+      "hoogsteOverlap": 0,
+      "soort": "botsing",
+      "waar": [
+        {
+          "bestanden": [
+            "server/kern/commerce/retourlijst.js"
+          ],
+          "leden": 6,
+          "voorbeeld": [
+            "bedenktijd",
+            "niet-zoals-beschreven",
+            "defect",
+            "beschadigd-aangekomen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/factuurcorrectie-gronden.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "onterecht",
+            "dubbel",
+            "bedrag-te-hoog",
+            "niet-geleverd"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/horeca/correctielijst.js"
+          ],
+          "leden": 5,
+          "voorbeeld": [
+            "verkeerd-bereid",
+            "niet-gebracht",
+            "teruggestuurd",
+            "vergissing"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/identiteit/doelen.js"
+          ],
+          "leden": 4,
+          "voorbeeld": [
+            "overeenkomst",
+            "wettelijk",
+            "bescherming",
+            "toestemming"
+          ]
+        }
+      ]
+    },
+    {
       "naam": "HANDELINGEN",
       "domeinen": 4,
       "betekenissen": 4,
@@ -3490,63 +3571,7 @@
           ]
         }
       ]
-    },
-    {
-      "naam": "KLASSEN",
-      "domeinen": 4,
-      "betekenissen": 4,
-      "hoogsteOverlap": 0,
-      "soort": "botsing",
-      "waar": [
-        {
-          "bestanden": [
-            "server/kern/fiscaal/zekerheid.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "bepaald",
-            "uitlegbaar",
-            "advies",
-            "voorbehouden"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/mutatie.js"
-          ],
-          "leden": 3,
-          "voorbeeld": [
-            "idempotent",
-            "compenseerbaar",
-            "onbekend"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/overdracht.js"
-          ],
-          "leden": 4,
-          "voorbeeld": [
-            "inschrijving",
-            "continuiteit",
-            "toestemming",
-            "nooit"
-          ]
-        },
-        {
-          "bestanden": [
-            "server/kern/waarde/klassen.js"
-          ],
-          "leden": 6,
-          "voorbeeld": [
-            "PERSONAL_FUNDED",
-            "EMPLOYER_BUDGET",
-            "MUNICIPAL",
-            "LOYALTY"
-          ]
-        }
-      ]
     }
   ],
-  "bestanden": 3394
+  "bestanden": 3452
 }

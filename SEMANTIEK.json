@@ -1,11 +1,11 @@
 {
-  "catalogi": 1075,
+  "catalogi": 1076,
   "verschillendeNamen": 633,
   "namenInMeerDomeinen": 123,
   "woordenMetMeerBetekenissen": 105,
-  "betekenissenTotaal": 389,
+  "betekenissenTotaal": 390,
   "ergsteWoord": "SOORTEN",
-  "ergsteAantal": 47,
+  "ergsteAantal": 48,
   "dubbelingen": 33,
   "dubbelingLijst": [
     {
@@ -257,7 +257,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 47,
+      "betekenissenVanDitWoord": 48,
       "waar": [
         "server/kern/avond/plan.js",
         "server/kern/invoer.js"
@@ -485,7 +485,7 @@
     },
     {
       "naam": "SOORTEN",
-      "betekenissenVanDitWoord": 47,
+      "betekenissenVanDitWoord": 48,
       "waar": [
         "server/kern/bank/index.js",
         "server/kern/koppel.js"
@@ -832,8 +832,8 @@
   "top": [
     {
       "naam": "SOORTEN",
-      "domeinen": 49,
-      "betekenissen": 47,
+      "domeinen": 50,
+      "betekenissen": 48,
       "hoogsteOverlap": 0.2,
       "soort": "gemengd",
       "waar": [
@@ -1169,6 +1169,18 @@
             "bundel",
             "evenement",
             "seizoen"
+          ]
+        },
+        {
+          "bestanden": [
+            "server/kern/mediaos/aanwezigheid.js"
+          ],
+          "leden": 8,
+          "voorbeeld": [
+            "muziek",
+            "video",
+            "flow",
+            "live"
           ]
         },
         {
@@ -3548,5 +3560,5 @@
       ]
     }
   ],
-  "bestanden": 3369
+  "bestanden": 3396
 }

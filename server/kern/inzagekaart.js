@@ -46,27 +46,9 @@
 const inzagelog = require('../inzagelog');
 const { idVanKey } = require('../lib/lidsleutel');
 
+const { PASPOORT_TEKST, EIGEN_HANDELING } = require('./inzagekaart-woorden');
+
 const MAX = 200;
-
-/* Wat er in de paspoortlaag gebeurde, in de woorden van het lid. De sleutel is
-   de `soort` die kern/paspoort logt; een soort die hier niet staat, krijgt zijn
-   eigen naam te zien en verdwijnt niet stilletjes van de kaart. */
-const PASPOORT_TEKST = {
-  bevestiging: 'controleerde of u RTG-geverifieerd bent (ja/nee, geen gegevens gedeeld)',
-  aanvraag: 'vroeg uw identiteitsbewijs op',
-  goedgekeurd: 'u keurde die aanvraag goed',
-  geweigerd: 'u weigerde die aanvraag',
-  ingetrokken: 'u trok de toegang weer in',
-  inzage: 'opende uw identiteitsbewijs',
-  'incident-ingediend': 'eiste uw identiteit op na een incident',
-  'incident-vrijgegeven': 'RTG gaf uw identiteit vrij na beoordeling van dat incident',
-  'incident-afgewezen': 'RTG wees dat incident af; er is niets gedeeld'
-};
-
-/* Regels die over uw EIGEN handeling gaan in plaats van over een kijker. Ze
-   staan wel op de kaart -- zonder uw goedkeuring is een inzage erboven niet te
-   begrijpen -- maar ze tellen niet mee als "er is in mijn gegevens gekeken". */
-const EIGEN_HANDELING = new Set(['goedgekeurd', 'geweigerd', 'ingetrokken']);
 
 module.exports = ({ kern }) => {
   /* Elke bron apart, en een bron die het niet doet wordt gemeld. Op deze kaart
@@ -170,4 +152,7 @@ module.exports = ({ kern }) => {
   return { inzagekaartVan: kaartVan };
 };
 
+/* De woordenlijst blijft hier bereikbaar, zodat een lezer die deze module al
+   heeft niet ook nog het buurbestand moet kennen. EEN waarde, twee adressen --
+   er wordt niets overgetypt (LAT.md regel 4). */
 module.exports.PASPOORT_TEKST = PASPOORT_TEKST;

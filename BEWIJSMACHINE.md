@@ -468,7 +468,7 @@ laten zien dat het werkt: één samenvoeging haalde tien dubbelingen weg.
 > **Een bewijs draagt niet alleen zijn uitslag, maar ook zijn INDELING en zijn
 > foutmodel -- en die twee zijn zelf aantoonbaar of ze zijn niet waar.**
 
-Dit is geen nieuwe wet maar een klasse die dit huis in één week vier keer heeft
+Dit is geen nieuwe wet maar een klasse die dit huis in één week vijf keer heeft
 gezien, elke keer in een andere gedaante en elke keer met een keurige groene
 uitslag eroverheen. De uitslag was niet vals; het experiment was het.
 
@@ -478,8 +478,20 @@ uitslag eroverheen. De uitslag was niet vals; het experiment was het.
 | `test/mutatiewacht.test.js` | de eerste wacht daarop matchte op zijn EIGEN commentaar en bleef groen met de bewaakte code weg | de code, met het commentaar eraf |
 | `scripts/aicontext.js` | de ledenstaat heet ook `st`, en dat woord betekent huisbreed ook status, stand en state: 91 velden in plaats van 25 | een naam is alleen die ledenstaat in het bestand waar hij eraan gebonden is |
 | `test/mn02ai-contextbesmetting.test.js` | een marker (`bewaarVerzoek.door`) die woordelijk in de vaste tekst van Rahuls karakter staat, wees een lek aan dat er niet was | alleen ONDERSCHEIDENDE markers: wat er vóór de handeling al stond, is er niet door gekomen |
+| `scripts/stilspoor.js` | elke bevinding droeg een regelnummer uit de bron NÁ `zonderCommentaar()`, en die plet een blokcommentaar tot één spatie -- elk regelnummer erna schoof op, dus 42 bevindingen wezen naar regels die iets anders bevatten | `zonderCommentaar(bron, { regelsHeel: true })`, de derde stand die `scripts/lib/bron.js` in zijn eigen kop al noemt |
 
-Vier gedaanten, één vorm: **de proef draaide, gaf een geldige uitslag, en mat
+**De vijfde is de leerzaamste, want hij is gemaakt IN de handhaver van een regel
+over stille fouten** -- LAT.md regel 13, op de dag dat hij werd geschreven. De
+uitslag was op geen enkel punt verdacht: dezelfde tellingen (18 en 24), dezelfde
+bestandsnamen, een plausibel regelnummer erachter. Alleen wees dat nummer naar de
+verkeerde regel, en dat is precies zo onzichtbaar als de smoringen waar de meter
+over gaat. Wat hem ving was niet een toets maar het NALOPEN: elke gemelde plek
+met `sed` opgevraagd en gekeken of er een `catch` staat. **Een meter die een
+PLAATS noemt, hoort op die plaats te worden nagekeken voordat zijn getal ergens
+wordt geciteerd** -- het getal en de plaats zijn twee beweringen, en de eerste
+kan waar zijn terwijl de tweede onzin is.
+
+Vijf gedaanten, één vorm: **de proef draaide, gaf een geldige uitslag, en mat
 iets anders dan waar hij over ging.** Daar helpt LAT.md regel 2 niet tegen -- die
 eist dat je een toets hebt zien zakken, en deze toetsen zakten keurig, alleen op
 de verkeerde vraag.

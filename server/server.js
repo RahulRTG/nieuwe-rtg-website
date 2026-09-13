@@ -54,7 +54,7 @@ const rtgKlok = require('./lib/klok');
 /* De hashketen onder het inlog-auditlog; zie logInlog verderop voor waarom juist
    dat log eraan hangt. */
 const { noteerIn: ketenNoteerIn, verifieer: ketenVerifieer, top: ketenTop } = require('./lib/keten');
-const { db, load, save, bijeen, inBundel, bewerkCollectie, economischeBoekingEenmaal, DATA_DIR, STORE, opslagKlaar: opslagMotorKlaar, pgPoolStatus, postgresSchrijfStand, postgresVerzoekMiddleware, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
+const { db, load, save, bijeen, inBundel, persistentieStand, bewerkCollectie, economischeBoekingEenmaal, DATA_DIR, STORE, opslagKlaar: opslagMotorKlaar, pgPoolStatus, postgresSchrijfStand, postgresVerzoekMiddleware, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsHaalWacht,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
@@ -221,7 +221,7 @@ const betaalRegie = require('./kern/betaalregie')({
    een spoor achterlaat. De bedrading staat in een eigen bestand omdat `npm run
    check` regel 47 op bestandsnaam bewaakt wie tot duurzaam schrijven besluit --
    zie opzet/inzagespoor.js. */
-require('./opzet/inzagespoor')({ db, save, bijeen, inBundel });
+require('./opzet/inzagespoor')({ db, save, bijeen, inBundel, persistentieStand });
 
 /* Is het eigenaarschap ooit overgedragen vanuit de boardroom, dan staat de
    opvolger in de database. Dat zetten we hier meteen terug in de eigenaar-

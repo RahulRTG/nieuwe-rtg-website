@@ -128,3 +128,41 @@ test('5. de gedeelde kantoorcode komt hier nog steeds niet door', async () => {
   assert.equal(d.status, 403, 'de gedeelde code hoort 403 te krijgen en niet de 503 van het spoor');
   assert.match(String(d.body.error || ''), /zetel op naam/i);
 });
+
+/* ============================================================================
+   `vast` VOLGT DE UITSLAG EN NIET HET VOORNEMEN.
+
+   Dit was bijna een valse bevestiging in precies het veld dat zegt hoe hard de
+   regel zelf staat. `bijeen({duurzaam:true})` gooit alleen wanneer bevestigen
+   MOGELIJK was en toch mislukte (server/db/bijeen.js) -- terecht, want een
+   opslag die niet kan tellen mag geen transactie laten mislukken. Maar op zo'n
+   opslag SLAAGT de commit dus zonder dat er iets is aangetoond, en de eerste
+   versie van deze laag schreef daar onvoorwaardelijk `vast: true`.
+
+   Op sqlite (de opstelling van deze toets) KAN het worden aangetoond, dus hier
+   hoort er `vast: true` te staan -- en dat is wat deze toets vastlegt. Wat hij
+   NIET kan beproeven is de andere kant: daarvoor is een opslag zonder teller
+   nodig, en die draait in de PostgreSQL-baan van CI. Dat staat er zo bij in
+   plaats van te worden weggelaten.
+
+   DE MUTATIE: laat `vast` weer op `true` staan ongeacht `kanBewijzen()` ->
+   deze toets blijft groen, want sqlite kan het aantonen. Dat is de eerlijke
+   grens van deze toets, en de reden dat de bron-controle eronder staat.
+   ========================================================================== */
+test('6. een journaalregel zegt of zijn duurzaamheid is AANGETOOND', async () => {
+  const d = await api(eerlijk.base, '/api/office/balie/dossier', { id: lidId, reden: REDEN }, balieA);
+  assert.equal(d.status, 200, 'de opzet van deze toets vraagt een geslaagde inzage');
+
+  /* Het journaal van een lid leest zijn eigen regels niet terug met `vast`
+     erin (voorBetrokkene geeft alleen at/waarom/bron -- de kijker is
+     persoonsdata van een ander). De bewering wordt daarom op de BRON
+     vastgelegd: `vast` hangt aan kanBewijzen() en niet aan een constante. */
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'server', 'inzagelog-vast.js'), 'utf8');
+  assert.doesNotMatch(bron, /extra:\s*\{[^}]*vast:\s*true/,
+    'inzagelog-vast.js schrijft weer onvoorwaardelijk `vast: true`; op een opslag die duurzaamheid ' +
+    'niet kan bevestigen is dat een bevestiging die niemand heeft gegeven');
+  assert.match(bron, /vast:\s*hard/,
+    '`vast` hoort de uitslag van kanBewijzen() te dragen');
+  assert.match(bron, /vastWaarom/,
+    'staat er `vast: false`, dan hoort de REDEN erbij -- anders is het niet van een storing te onderscheiden');
+});

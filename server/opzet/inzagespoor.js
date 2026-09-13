@@ -33,8 +33,14 @@
 
 const maakVastleggen = require('../lib/duurzaam');
 
-module.exports = function sluitInzagespoorAan({ db, save, bijeen, inBundel }) {
+module.exports = function sluitInzagespoorAan({ db, save, bijeen, inBundel, persistentieStand }) {
   const vastleggen = maakVastleggen({ bijeen, save, inBundel, bron: 'inzagelog' });
-  require('../inzagelog').zet(db, save, vastleggen);
+  /* BEVESTIGBAAR IS IETS ANDERS DAN GESLAAGD, en het journaal hoort dat verschil
+     te kennen. Op een opslag zonder teller slaagt de duurzame bundel zonder iets
+     aan te tonen (zie db/bijeen.js: er wordt alleen gegooid als bevestigen
+     MOGELIJK was en toch mislukte). De regel draagt dan `vast: false` met de
+     reden erbij, in plaats van een bevestiging die niemand heeft gegeven. */
+  require('../inzagelog').zet(db, save, vastleggen,
+    () => (typeof persistentieStand === 'function' ? persistentieStand() !== null : true));
   return vastleggen;
 };

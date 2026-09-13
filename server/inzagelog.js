@@ -42,8 +42,10 @@ const { nu, datum } = require('./lib/klok');
    noteer() is dan write-behind, precies als hiervoor -- maar kan noteerVast()
    niets BEWIJZEN, en dat zegt hij dan ook met zoveel woorden in plaats van
    stilletjes op de gewone save() terug te vallen. */
-let DB = null, SAVE = null, VASTLEGGEN = null;
-function zet(db, save, vastleggen) { DB = db; SAVE = save; VASTLEGGEN = vastleggen || null; }
+let DB = null, SAVE = null, VASTLEGGEN = null, BEVESTIGBAAR = null;
+function zet(db, save, vastleggen, bevestigbaar) {
+  DB = db; SAVE = save; VASTLEGGEN = vastleggen || null; BEVESTIGBAAR = bevestigbaar || null;
+}
 
 function rij() {
   if (!DB || !DB.data) return [];
@@ -160,7 +162,8 @@ function veelOpdracht({ door, overIds, waarom, bron } = {}) {
 const { noteerVast, noteerVeelVast } = require('./inzagelog-vast')({
   rij, zelf, schrijfRegel, veelOpdracht,
   heeftOpslag: () => !!(DB && DB.data),
-  vastlegger: () => VASTLEGGEN });
+  vastlegger: () => VASTLEGGEN,
+  bevestigbaar: () => (typeof BEVESTIGBAAR === 'function' ? BEVESTIGBAAR() : true) });
 
 /* De LEESKANT staat in ./inzagelog-lezen.js: lezen, verantwoorden en de keten
    nalopen zijn een ander onderwerp dan schrijven, met andere lezers. De rij

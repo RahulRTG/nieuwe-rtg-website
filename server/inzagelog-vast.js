@@ -10,7 +10,28 @@
    ========================================================================== */
 'use strict';
 
-module.exports = ({ rij, zelf, schrijfRegel, veelOpdracht, heeftOpslag, vastlegger }) => {
+module.exports = ({ rij, zelf, schrijfRegel, veelOpdracht, heeftOpslag, vastlegger, bevestigbaar }) => {
+  /* KAN DEZE OPSLAG DUURZAAMHEID AANTONEN? Dat is een andere vraag dan of de
+     commit slaagde, en het verschil zat bijna verkeerd in dit bestand.
+
+     `bijeen({duurzaam:true})` gooit alleen `if (uit.bevestigbaar && !uit.duurzaam)`
+     (server/db/bijeen.js), en dat is de juiste keuze: een opslag die niet kan
+     tellen mag geen transactie laten mislukken -- dat brak eerder vier
+     geldtoetsen. Het gevolg is wel dat de commit op zo'n opslag SLAAGT zonder
+     dat er iets is aangetoond. Zou `vast` dan toch `true` zijn, dan staat er een
+     VALSE BEVESTIGING in precies het veld dat zegt hoe hard de regel zelf staat
+     -- de fout waar dit hele bestand tegen is gebouwd, een laag dieper.
+
+     Vandaar dat `vast` de UITSLAG volgt en niet het VOORNEMEN: op een opslag die
+     het niet kan aantonen staat er `vast: false` met een reden. De inzage gaat
+     daar wel gewoon door -- de weigering hangt aan de COMMIT en niet aan de
+     bewijsbaarheid ervan, want anders zou een opslag zonder teller de hele balie
+     sluiten. Zo staat er in het journaal wat er werkelijk over bekend is, en dat
+     is bij een spoor het hele punt. */
+  const kanBewijzen = () => {
+    if (typeof bevestigbaar !== 'function') return true;
+    try { return bevestigbaar() !== false; } catch (e) { return false; }
+  };
   /* ============================================================================
      HET SPOOR DAT KAN WEIGEREN -- noteerVast()
 
@@ -78,8 +99,11 @@ module.exports = ({ rij, zelf, schrijfRegel, veelOpdracht, heeftOpslag, vastlegg
        hashketen dekt de regel zoals hij wordt weggeschreven; hem daarna bijstellen
        laat verifieer() een vervalsing aanwijzen op de enige plek waar niemand
        heeft gesjoemeld. Dezelfde reden waarom `extra` bestaat -- zie noteerVeel(). */
+    const hard = kanBewijzen();
     const uit = await VASTLEGGEN(() => {
-      regel = schrijfRegel({ ...opdracht, extra: { ...(opdracht.extra || {}), vast: true } });
+      regel = schrijfRegel({ ...opdracht, extra: { ...(opdracht.extra || {}),
+        vast: hard,
+        ...(hard ? {} : { vastWaarom: 'deze opslag kan duurzaamheid niet bevestigen' }) } });
     });
     if (uit) {
       /* De vastlegger geeft {status, error} als de opslag niet bevestigde. Die

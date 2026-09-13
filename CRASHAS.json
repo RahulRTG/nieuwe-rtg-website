@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T07:11:20.584Z",
-    "commit": "822f0cbe5",
+    "op": "2026-09-13T10:49:58.911Z",
+    "commit": "ca7925ecc",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 3,
     "instrument": "scripts/crashas.js",
     "node": "v22.22.2"
   },
@@ -15,7 +15,8 @@
     "GELDDEKKING.json",
     "scripts/lib/crashtaxonomie.js",
     "server/lib/verraad.js",
-    "FACTUURPROEF.json"
+    "FACTUURPROEF.json",
+    "CRASHPROEF.json"
   ],
   "contracten": {
     "ATOMIC": "Een interne operatie is alles of niets. Er bestaat geen moment waarop een deel van de uitkomst duurzaam is en de rest niet -- ook niet als het proces er middenin sterft.",
@@ -60,22 +61,22 @@
     "actief": false,
     "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen."
   },
-  "gemetenOp": "2026-09-13T07:11:20.545Z",
+  "gemetenOp": "2026-09-13T10:49:58.875Z",
   "telling": {
     "routes": 45,
     "paren": 270,
-    "bestaat": 90,
-    "bestaatNiet": 135,
-    "onbekend": 45,
-    "meetbaar": 90,
-    "gemeten": 1,
+    "bestaat": 5,
+    "bestaatNiet": 176,
+    "onbekend": 89,
+    "meetbaar": 5,
+    "gemeten": 5,
     "perGrens": {
       "voor-eerste-mutatie": {
-        "bestaat": 45,
-        "bestaatNiet": 0,
-        "onbekend": 0,
-        "meetbaar": 45,
-        "gemeten": 0
+        "bestaat": 4,
+        "bestaatNiet": 19,
+        "onbekend": 22,
+        "meetbaar": 4,
+        "gemeten": 4
       },
       "in-de-opslag": {
         "bestaat": 0,
@@ -85,10 +86,10 @@
         "gemeten": 0
       },
       "na-commit-voor-antwoord": {
-        "bestaat": 45,
-        "bestaatNiet": 0,
-        "onbekend": 0,
-        "meetbaar": 45,
+        "bestaat": 1,
+        "bestaatNiet": 22,
+        "onbekend": 22,
+        "meetbaar": 1,
         "gemeten": 1
       },
       "na-commit-voor-bericht": {
@@ -126,17 +127,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 3 collectie(s) aanraken: bankBoekingen, bankPassen, bankSaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: bankBoekingen, bankPassen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 3 collectie(s) aanraken: bankBoekingen, bankPassen, bankSaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: bankBoekingen, bankPassen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -192,17 +193,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -258,17 +261,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -324,17 +329,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -390,17 +397,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -456,17 +465,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankRekeningen",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankRekeningen",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -523,17 +534,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -590,17 +601,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -656,17 +667,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankRekeningen",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankRekeningen",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -723,17 +736,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -789,17 +802,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankTerugkerend",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: bankTerugkerend), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankTerugkerend",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: bankTerugkerend), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -855,17 +868,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalRegie",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalRegie), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalRegie",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalRegie), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -921,17 +934,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: geldbeleid",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: geldbeleid), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: geldbeleid",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: geldbeleid), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -987,17 +1000,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: labFonds",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: labFonds",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1053,17 +1068,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: geldbeleid",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: geldbeleid",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1119,17 +1136,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: gemeenteAanslagen",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: gemeenteAanslagen",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1185,17 +1204,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: economie",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: economie",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1251,17 +1272,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: labFonds",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: labFonds), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: labFonds",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: labFonds), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1317,17 +1338,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: aiTegoed",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: aiTegoed",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1385,15 +1408,16 @@
         "voor-eerste-mutatie": {
           "bestaat": "ja",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
-          "uitslag": null,
-          "instrument": null,
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (FAILED)",
+          "uitslag": "FAILED",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1451,15 +1475,16 @@
         "voor-eerste-mutatie": {
           "bestaat": "ja",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
-          "uitslag": null,
-          "instrument": null,
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (FAILED)",
+          "uitslag": "FAILED",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1515,17 +1540,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1583,15 +1610,16 @@
         "voor-eerste-mutatie": {
           "bestaat": "ja",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
-          "uitslag": null,
-          "instrument": null,
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (FAILED)",
+          "uitslag": "FAILED",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1647,17 +1675,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: aiTegoed",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: aiTegoed",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1713,17 +1743,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payCodes",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payCodes",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1780,17 +1812,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1852,17 +1884,17 @@
         "voor-eerste-mutatie": {
           "bestaat": "ja",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 5 collectie(s) aanraken: fondsAfdrachten, invoices, payBoekingen, paySaldi, socialeAfdrachten",
-          "uitslag": null,
-          "instrument": null,
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
           "bestaat": "ja",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 5 collectie(s) aanraken: fondsAfdrachten, invoices, payBoekingen, paySaldi, socialeAfdrachten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
           "uitslag": "PROVEN",
-          "instrument": "scripts/factuurproef.js",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-na-commit"
         },
         "in-de-opslag": {
@@ -1917,17 +1949,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1985,17 +2017,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payTegoed",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payTegoed), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payTegoed",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payTegoed), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2052,17 +2084,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2118,17 +2150,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payTikCodes",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payTikCodes",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2184,17 +2218,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payVerzoeken",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payVerzoeken",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2252,17 +2288,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payVerzoeken",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payVerzoeken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payVerzoeken",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payVerzoeken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2318,17 +2354,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payVerzoeken",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payVerzoeken",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2384,17 +2422,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: punten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: punten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2450,17 +2490,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalVerzoeken",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalVerzoeken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalVerzoeken",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalVerzoeken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2516,17 +2556,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2582,17 +2622,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2648,17 +2688,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: giftcards",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: giftcards), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: giftcards",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: giftcards), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2714,17 +2754,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: directOntvangsten",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: directOntvangsten), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: directOntvangsten",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: directOntvangsten), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2785,17 +2825,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 6 collectie(s) aanraken: facturen, payBoekingen, payCodes, paySaldi, posSales, waardeOormerken",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 6 collectie(s) aanraken: facturen, payBoekingen, payCodes, paySaldi, posSales, waardeOormerken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 6 collectie(s) aanraken: facturen, payBoekingen, payCodes, paySaldi, posSales, waardeOormerken",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 6 collectie(s) aanraken: facturen, payBoekingen, payCodes, paySaldi, posSales, waardeOormerken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2851,17 +2891,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payTreasury",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
+          "bestaat": "nee",
           "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: payTreasury",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2918,17 +2960,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2985,17 +3027,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: facturen, posSales",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: facturen, posSales), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 2 collectie(s) aanraken: facturen, posSales",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: facturen, posSales), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -3051,17 +3093,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: wallet",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: wallet), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "de idempotentieproef zag deze route 1 collectie(s) aanraken: wallet",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: wallet), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"

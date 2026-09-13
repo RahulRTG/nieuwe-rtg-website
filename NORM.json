@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 102,
+    "ratelTanden": 103,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -96,7 +96,8 @@
     "crashproefGeenLijf": 11,
     "crashproefGeenWereld": 1,
     "crashproefGeenRol": 1,
-    "crashproefOnbepaald": 0
+    "crashproefOnbepaald": 0,
+    "geldRoutesMeldOnbesloten": 45
   },
   "notities": [
     {
@@ -2307,7 +2308,8 @@
     "crashproefGeenLijf": "2026-09-13",
     "crashproefGeenWereld": "2026-09-13",
     "crashproefGeenRol": "2026-09-13",
-    "crashproefOnbepaald": "2026-09-13"
+    "crashproefOnbepaald": "2026-09-13",
+    "geldRoutesMeldOnbesloten": "2026-09-13"
   },
   "uitzonderingen": [
     {

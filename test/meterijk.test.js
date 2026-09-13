@@ -1564,6 +1564,16 @@ const IJKINGEN = {
       (j) => { j.ratel.geldRoutesHerstelTegenspraak = (j.ratel.geldRoutesHerstelTegenspraak || 0) + 7; return j; },
       () => norm.meet().geldRoutesHerstelTegenspraak - voor.geldRoutesHerstelTegenspraak)
   },
+  /* De meldplicht-tand, met een EIGEN ophoging (8) en niet dezelfde als zijn
+     buren hierboven: alle drie lezen ze uit `j.ratel` van hetzelfde register,
+     en met een gedeeld getal zou een meter die de verkeerde sleutel leest toch
+     het goede verschil geven. Dat is precies de faalvorm die de leeswijzer bij
+     de factuurproef-tanden hieronder beschrijft. */
+  geldRoutesMeldOnbesloten: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesMeldOnbesloten = (j.ratel.geldRoutesMeldOnbesloten || 0) + 8; return j; },
+      () => norm.meet().geldRoutesMeldOnbesloten - voor.geldRoutesMeldOnbesloten)
+  },
   /* DE TWEE TANDEN VAN DE VERTICALE GELDPROEF (FACTUURPROEF.json). Ze lezen
      verschillende velden uit dezelfde `telling`, en juist dat is hier de
      faalvorm: `geldpadOnbewezen` telt BLOCKED plus UNKNOWN, en een versie die

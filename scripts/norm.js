@@ -525,6 +525,7 @@ const METERS = [
      tegenspreekt. FINAL naast een gemeten `exact` zegt dat de route wel degelijk
      terug te draaien is terwijl een mens hem definitief noemde. */
   { sleutel: 'geldRoutesHerstelOnbesloten', richting: 'omlaag', wat: 'geldroutes zonder verklaard correctiemodel (HERSTELBESLUIT.json)' },
+  { sleutel: 'geldRoutesMeldOnbesloten', richting: 'omlaag', wat: 'geldroutes zonder verklaarde meldplicht (MELDBESLUIT.json)' },
   { sleutel: 'geldRoutesHerstelTegenspraak', richting: 'omlaag', wat: 'geldroutes waar de herstelverklaring de meting tegenspreekt' },
   /* DE VERTICALE GELDPROEF, EN MET OPZET TWEE TANDEN (FACTUURPROEF.json).
 
@@ -1418,6 +1419,7 @@ function meet(bronnen) {
     geldRoutesZonderIdemBewijs: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderIdemBewijs),
     geldRoutesZonderTerugweg: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderTerugweg),
     geldRoutesHerstelOnbesloten: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesHerstelOnbesloten),
+    geldRoutesMeldOnbesloten: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesMeldOnbesloten),
     geldRoutesHerstelTegenspraak: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesHerstelTegenspraak),
     geldpadGezakt: leesRegister('FACTUURPROEF.json', (j) => j.telling.FAILED),
     /* BLOCKED en UNKNOWN worden hier WEL opgeteld, en alleen hier: allebei

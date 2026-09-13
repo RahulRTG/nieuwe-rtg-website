@@ -248,6 +248,10 @@ const REGISTER = {
      hier een regel bijzet of weghaalt, beweegt een van deze twee tellers: een
      ontbrekende verklaring zit in `onbesloten`, een verkeerde in `tegenspraak`. */
   'HERSTELBESLUIT.json': { meter: ['geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak'] },
+  /* MELDBESLUIT.json is net zo'n VERKLARING: hij hangt aan het aantal geldroutes
+     waarvan niemand heeft gezegd of er bericht hoort te gaan. Leeg is hier geen
+     nul maar 45 -- de teller telt wat er NIET verklaard is. */
+  'MELDBESLUIT.json': { meter: ['geldRoutesMeldOnbesloten'] },
 
   'TIKKEN.json': { eigenRatel: 'test/sprongindex.test.js' },
   'VINDBAAR.json': { eigenRatel: 'test/sprongindex.test.js' },

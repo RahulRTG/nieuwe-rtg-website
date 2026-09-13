@@ -329,6 +329,8 @@
     "ketenvorm:vast": "node scripts/ketenvorm.js --vastleggen",
     "aicontext": "node scripts/aicontext.js",
     "aicontext:vast": "node scripts/aicontext.js --vastleggen",
+    "stilspoor": "node scripts/stilspoor.js",
+    "stilspoor:vast": "node scripts/stilspoor.js --vastleggen",
     "meterklasse": "node scripts/meterklasse.js",
     "meterklasse:vast": "node scripts/meterklasse.js --vastleggen",
     "ritmigratie": "node scripts/ritmigratie.js",

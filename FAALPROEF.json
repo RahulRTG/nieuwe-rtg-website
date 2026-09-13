@@ -2,10 +2,10 @@
  "soort": "meting",
  "uitleg": "De FAILURE-cel per route: faalt hij netjes als er iets onder hem wegvalt. Het contract wordt eerst bepaald uit het gemeten effectprofiel (X-RTG-Effect / X-RTG-Staat) en pas daarna beproefd met het verraad dat daarbij hoort.",
  "stempel": {
-  "op": "2026-09-13T10:02:36.719Z",
-  "commit": "d88085f3",
+  "op": "2026-09-13T20:01:12.460Z",
+  "commit": "6dacd5e8",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/faalproef.js",
   "node": "v22.22.2"
  },
@@ -39,6 +39,8 @@
   "bewezen": 69,
   "gezakt": 1,
   "ongemeten": 0,
+  "gezaktMetBesluit": 1,
+  "gezaktZonderBesluit": 0,
   "nietMutatief": 283,
   "nietBereikt": 4410,
   "onzeker": 126,
@@ -6108,12 +6110,12 @@
    "pad": "/api/festival/mijn",
    "route": "POST /api/festival/mijn",
    "rol": "supplier",
-   "profiel": "onzeker",
+   "profiel": "leest",
    "effect": "geen",
    "effect2": null,
    "perVerraad": {},
-   "failure": "onzeker",
-   "reden": "de momentopname bewoog maar de effectmeter zag geen save(); die opname is globaal en sequentieel, dus dit kan net zo goed een achtergrondschrijver zijn. Niet aan deze route toe te schrijven, en dus niet te beoordelen."
+   "failure": "niet-mutatief",
+   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
   },
   {
    "methode": "POST",
@@ -21200,7 +21202,12 @@
     }
    },
    "failure": "gezakt",
-   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard",
+   "besluit": {
+    "klasse": "cache",
+    "grond": "Het enige dat deze route wegschrijft is `s.laatsteScan`, een tijdstempel die de dagelijkse herhaling afremt. De zestien voorstellen die hij teruggeeft staan in de ZAAISET; de scan maakt ze niet. Gemeten op een draaiende server: twee scans achter elkaar geven allebei nieuw=0, en na een herstart staan de voorstellen er nog voordat er opnieuw is gescand. Raakt de tijdstempel weg, dan slaat de volgende scan de daggrens niet over en draait hij gewoon -- dat kost rekenwerk en verliest niets. Ook een scan die wel iets vindt is herstelbaar: de voorstellen worden ontdubbeld op kans.sleutel, dus wat verloren ging komt de volgende ronde terug.",
+    "besloten": "2026-09-13"
+   }
   },
   {
    "methode": "POST",
@@ -22002,12 +22009,12 @@
    "pad": "/api/office/payroll/aangifte/lijst",
    "route": "POST /api/office/payroll/aangifte/lijst",
    "rol": "office",
-   "profiel": "leest",
+   "profiel": "onzeker",
    "effect": "geen",
    "effect2": null,
    "perVerraad": {},
-   "failure": "niet-mutatief",
-   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
+   "failure": "onzeker",
+   "reden": "de momentopname bewoog maar de effectmeter zag geen save(); die opname is globaal en sequentieel, dus dit kan net zo goed een achtergrondschrijver zijn. Niet aan deze route toe te schrijven, en dus niet te beoordelen."
   },
   {
    "methode": "POST",

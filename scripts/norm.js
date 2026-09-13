@@ -629,6 +629,12 @@ const METERS = [
   { sleutel: 'aiContextLek', richting: 'omlaag', wat: 'velden die het kantoor schrijft en die Rahuls ledencontext ook leest (AICONTEXT.json)' },
   { sleutel: 'aiContextVeldenGezien', richting: 'omhoog', wat: 'velden van de ledenstaat die de contextmeter werkelijk heeft gezien' },
   { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' },
+  /* HET SPOOR DAT NIET KAN WEIGEREN (STILSPOOR.json, npm run stilspoor), de
+     handhaver bij LAT.md regel 13. Twee schulden omlaag, het bereik omhoog;
+     zie de kop bij het register in ./lib/metingen.js. */
+  { sleutel: 'stilSpoor', richting: 'omlaag', wat: 'spoor-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
+  { sleutel: 'stilleOpslag', richting: 'omlaag', wat: 'opslag-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
+  { sleutel: 'stilSpoorAanroepen', richting: 'omhoog', wat: 'spoor-schrijvers die de stilspoormeter werkelijk heeft gevonden' },
   /* DE LUSINDEX (LUSSEN.json, npm run lussen). Drie tanden, en alle drie tellen
      ze een SCHULD en geen prestatie -- anders maakt lussen toevoegen de meter
      beter.
@@ -1339,6 +1345,9 @@ function meet(bronnen) {
     carriereDomeinenGemeten: leesRegister('CARRIEREVORM.json', (j) => j.gemeten.domeinen),
     aiContextLek: leesRegister('AICONTEXT.json', (j) => j.muur.lek.length),
     aiContextVeldenGezien: leesRegister('AICONTEXT.json', (j) => j.ledenstaat.aantal),
+    stilSpoor: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorGesmoord),
+    stilleOpslag: leesRegister('STILSPOOR.json', (j) => j.gemeten.opslagGesmoord),
+    stilSpoorAanroepen: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorAanroepen),
     lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),
     lussenKritiek: leesRegister('LUSSEN.json', (j) => j.ratel.kritiek),
     lussenZonderOverlapRem: leesRegister('LUSSEN.json', (j) => j.ratel.wekkersAsyncZonderRem),

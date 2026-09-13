@@ -1535,6 +1535,31 @@ const IJKINGEN = {
       (j) => { j.ledenstaat.aantal = Math.max(0, (j.ledenstaat.aantal || 0) - 4); return j; },
       () => voor.aiContextVeldenGezien - norm.meet().aiContextVeldenGezien)
   },
+  /* DE DRIE TANDEN VAN 13 SEPTEMBER 2026: het spoor dat niet kan weigeren
+     (STILSPOOR.json, LAT.md regel 13). Drie meters op EEN register, dus elk
+     krijgt zijn EIGEN veld verstoord -- leest er een het verkeerde veld, dan
+     blijft hij staan waar hij stond en zakt deze ijking.
+
+     DE TWEE SCHULDEN GAAN IN DE PROEF OMHOOG en het BEREIK omlaag, en dat is
+     niet symmetrisch bedoeld. Bij een schuld is de vraag of de meter een
+     nieuwe smoring werkelijk ziet. Bij het bereik is de gevaarlijke richting
+     de andere: een meter die stil minder spoor-schrijvers vindt, meldt
+     dezelfde lage schuld over minder bewijs -- en dat leest als vooruitgang. */
+  stilSpoor: {
+    proef: (voor) => metVervangenJson('STILSPOOR.json',
+      (j) => { j.gemeten.spoorGesmoord = (j.gemeten.spoorGesmoord || 0) + 5; return j; },
+      () => norm.meet().stilSpoor - voor.stilSpoor)
+  },
+  stilleOpslag: {
+    proef: (voor) => metVervangenJson('STILSPOOR.json',
+      (j) => { j.gemeten.opslagGesmoord = (j.gemeten.opslagGesmoord || 0) + 7; return j; },
+      () => norm.meet().stilleOpslag - voor.stilleOpslag)
+  },
+  stilSpoorAanroepen: {
+    proef: (voor) => metVervangenJson('STILSPOOR.json',
+      (j) => { j.gemeten.spoorAanroepen = Math.max(0, (j.gemeten.spoorAanroepen || 0) - 40); return j; },
+      () => voor.stilSpoorAanroepen - norm.meet().stilSpoorAanroepen)
+  },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
      de meter leest `gemeten.defecten` uit een register dat er al is, dus hij

@@ -113,7 +113,11 @@ module.exports = ({ kern }) => {
           die daar verplicht is. Dit is de enige bron met een WAAROM, en dat is
           geen toeval: het is de enige waar een mens een reden moet typen. */
     const lidId = idVanKey(key);
-    const kluis = lidId == null ? [] : pak('Ledendossier', () => inzagelog.voorBetrokkene(lidId));
+    /* HET ANTWOORD DRAAGT ZIJN EIGEN BELOFTE (besluit 6). Een kale lijst leest
+       als "dit is alles" terwijl het "dit is alles binnen de termijn" is; de
+       termijn komt daarom mee en gaat hieronder door naar `bewaring`. */
+    const kluisAntwoord = lidId == null ? null : pak('Ledendossier', () => inzagelog.voorBetrokkene(lidId));
+    const kluis = (kluisAntwoord && kluisAntwoord.regels) || [];
     for (const r of kluis || []) {
       /* Het journaal draagt twee soorten regels: een kluisopvraging (iemand haalde
          uw NAAM op) en een zorgprofiel-lezing (een zaak zag uw allergieen). Ze
@@ -133,10 +137,32 @@ module.exports = ({ kern }) => {
       ok: true, kaart, storingen,
       gekeken: kaart.filter(r => r.gekeken).length,
       bronnen: ['RTG iD', 'Identiteitsbewijs', 'Ledendossier', 'Zorgprofiel'],
+      /* PER BRON, en met opzet niet als een getal over het geheel: een enkel
+         getal over vier bronnen maakt de langste of de kortste tot waarheid, en
+         allebei is onwaar. `null` is hier een uitspraak en geen leeg veld. */
+      bewaring: {
+        Ledendossier: (kluisAntwoord && kluisAntwoord.bewaardagen) || null,
+        Zorgprofiel: (kluisAntwoord && kluisAntwoord.bewaardagen) || null,
+        'RTG iD': null,
+        Identiteitsbewijs: null,
+        uitleg: kluisAntwoord && kluisAntwoord.bewaardagen
+          ? 'Het ledendossier en het zorgprofiel kijken ' + kluisAntwoord.bewaardagen +
+            ' dagen terug. Hoe lang RTG iD en de identiteitslaag bewaren, weet deze kaart niet; ' +
+            'dat staat bij die lagen zelf.'
+          : 'Hoe ver deze kaart terugkijkt, is hier niet vast te stellen.'
+      },
       nietZichtbaar: [
         { naam: 'Een ID-/leeftijdscheck met het Zegel',
           reden: 'Het Zegel draagt een pseudoniem dat per partner verschilt, zodat zaken u niet aan elkaar kunnen herkennen. Diezelfde bescherming maakt dat RTG een controle niet aan uw account kan terugkoppelen; de controle staat wel in het activiteitenlog van de zaak zelf.' }
-      ],
+      ].concat(
+        /* EEN TEKORT HOORT OP DE KAART EN NIET IN EEN LOGREGEL. Bijt de noodrem
+           van het journaal, dan is de belofte aan dit lid niet waargemaakt, en
+           dan hoort dat in dezelfde lijst als de rest van wat deze kaart niet
+           kan tonen. Bijt hij niet, dan staat er niets. */
+        kluisAntwoord && kluisAntwoord.volledig === false
+          ? [{ naam: 'Een deel van het oudere ledendossier-spoor', reden: kluisAntwoord.tekort }]
+          : []
+      ),
       voorbehoud: 'Deze kaart brengt vier sporen samen. Een vijfde weg die iemand morgen bouwt, staat er niet vanzelf op -- dat blijft mensenwerk, en test/inzagekaart.test.js zegt bij welke bronnen het is gebleven.'
     };
   }

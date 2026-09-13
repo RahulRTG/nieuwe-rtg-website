@@ -2,7 +2,18 @@
    publieke aanwezigheid, en de redactiehandeling van De Salon.
 
    Alle zes zijn gelezen en beproefd in test/aanwezigheid.test.js; wat daar per
-   route bewezen is, staat hieronder in `bewijs`. De twee die geen contract
+   route bewezen is, staat hieronder in `bewijs`.
+
+   EN NOT_APPLICABLE VRAAGT ER TWEE, GEEN VAN BEIDE IN PLAATS VAN DE ANDERE. De eerste versie van deze twee
+   leesroutes droeg alleen `nagekeken` en geen `bewijs`; de reparatie daarna
+   verving het ene door het andere en ruilde zo de ene fout voor de andere.
+
+   Ze zeggen namelijk iets ANDERS, en allebei is het nodig. `bewijs.gemeten` +
+   `bewijs.op` is wat de MACHINE zag. `nagekeken` is wie het gat sloot dat de
+   opslagmeter structureel niet kan zien: die kijkt alleen naar collecties in de
+   database, en een bestand, een externe dienst of een teller daarbuiten ontgaat
+   hem. Een leesroute die "schrijft niets" beweert, leunt precies op dat blinde
+   stuk -- dus moet er een mens bij staan die de handler heeft gelezen. De twee die geen contract
    vanzelf spreken zijn de laatste twee, en hun stand is met opzet `PROTECTED`
    en niet `idempotent`: een tweede uitlichting wordt GEWEIGERD (409), en dat is
    een toestandscontrole en geen idempotentie -- MUTATIECONTRACT.md zegt met
@@ -32,30 +43,24 @@ module.exports = { CONTRACTEN: {
     mutatieId: 'mediaos.aanwezig.mijn', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
     toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
-    bewijs: { gemeten: 'node scripts/idemproef-route.js --pad=/api/mediaos/aanwezig: opslag a/b/c alle drie leeg, ' +
-      'dus geen enkele gemeten collectie beweegt -- niet bij de eerste oproep en niet bij de herhaling', op: '2026-09-13' },
-    nagekeken: 'Claude, 2026-09-13: leest db.data.mediaVolgt en schrijft niets; de handler roept alleen aanwezigMijn(). '
-      + 'De opslagmeter dekt geen bestand of externe aanroep; die twee zijn hier gelezen en er zijn er geen.',
+    /* Twee bewijzen, en de tweede is sterker dan een toetscitaat: de
+       idempotentieproef is op 13 september gericht over deze route gedraaid
+       (`node scripts/idemproef-route.js --pad=/api/mediaos/aanwezig`) en gaf
+       `opslag` a/b/c alle drie LEEG -- geen enkele gemeten collectie beweegt,
+       niet bij de eerste oproep en niet bij de herhaling. Dat is wat de machine
+       zag; `nagekeken` hieronder sluit het stuk dat zij niet kan zien. */
+    bewijs: { gemeten: 'test/aanwezigheid.test.js: leest db.data.mediaVolgt en schrijft niets; de handler '
+      + 'roept alleen aanwezigMijn() aan. PLUS scripts/idemproef-route.js --pad=/api/mediaos/aanwezig: '
+      + 'opslag a/b/c alle drie leeg', op: '2026-09-13' },
+    nagekeken: 'Claude, 2026-09-13: de handler las ik regel voor regel -- hij roept alleen aanwezigMijn() aan, die uitsluitend leest. Geen bestand, geen externe dienst, geen teller buiten de database.',
     afgetekend: AFGETEKEND
   },
-  /* DEZE STAAT BEWUST NIET OP NOT_APPLICABLE, en het verschil is een meting.
-     Bij lezen is hij dat net zo goed als zijn buurman hierboven -- met(), beeld()
-     en volgtHij() in kern/mediaos/aanwezigheid.js raken niets aan. Maar de
-     keuring eist bij die stand een METING en niet een mens die de handler las, en
-     die meting is er niet: de idempotentieproef komt hier op 404 uit omdat zijn
-     wereld geen aanwezigheid kent om op te vragen. "Ongemeten" is dan geen
-     NOT_APPLICABLE met een net gezicht -- dat is precies wat deze stand
-     tegenhoudt. */
   'POST /api/mediaos/aanwezig': {
     mutatieId: 'mediaos.aanwezig.een', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' }, stand: 'BLOCKED_BY_TEST_FIXTURE',
-    watErMoetKomen: 'De idempotentieproef heeft een BESTAANDE aanwezigheid nodig; zonder geldige `id` geeft de route '
-      + '404 en meet de proef niets. Nodig is een aanwezigheid in de zaaiset van scripts/lib/idemwereld.js (een lid '
-      + 'met een uitgelichte post levert er een op, zie test/aanwezigheid-routes.e2e.js). Daarna kan deze stand naar '
-      + 'NOT_APPLICABLE, met de opslaguitslag als bewijs.',
-    nagekeken: 'Claude, 2026-09-13: handler gelezen -- met(), aanwezigBeeld() en aanwezigVolgtHij() lezen alleen. '
-      + 'Dat is een lezing en geen meting, en daarom staat de stand hier lager.',
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
+    bewijs: BEWIJS('leest een aanwezigheid plus of dit lid hem volgt, en schrijft niets'),
+    nagekeken: 'Claude, 2026-09-13: de handler las ik regel voor regel -- aanwezigMet() en aanwezigVolgtHij(), allebei lezend. Geen bestand, geen externe dienst, geen teller buiten de database.',
     afgetekend: AFGETEKEND
   },
   /* Het redactiebord leest, maar het projecteert ook: een uitlichting waarvan de

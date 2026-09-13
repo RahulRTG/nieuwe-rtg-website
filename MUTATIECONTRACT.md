@@ -1262,6 +1262,71 @@ BEDOELING, en dat leest niemand uit een meting af. Ze lopen over
 `notifications` en `office/rtgai`; het adres van het werk is dus zeven domeinen
 en niet één module. De lijst mag alleen krimpen.
 
+## 5u. Waarom de poort groen stond op een bestand in plaats van op een meting
+
+*Deze paragraaf komt uit PR #248 en beschrijft de OORZAAK van dezelfde dag als 5t
+hierboven. Hij is bewaard omdat 5t het gevolg beschrijft en deze het mechanisme;
+de afloop staat aan het eind.*
+
+De zin hierboven — *een betere meting hoort classificatiewerk zichtbaar te maken
+in plaats van het stil te laten verdwijnen* — is op **13 september 2026** precies
+één keer te veel waar gebleken. Niet als slordigheid, maar als een vorm die
+niemand kon zien.
+
+**De vondst.** Op een schone `origin/main`, zonder één regel van de tak die dit
+opmerkte, geeft `node scripts/mutatiecontract.js` **47 `LEGACY`** en 3.186
+`BLOCKED`. Het ingecheckte `MUTATIECONTRACT.json` meldt op datzelfde punt 3.233
+`BLOCKED` en **geen enkele** `LEGACY`. Het register was dus in tegenspraak met
+zichzelf, en de poort stond groen omdat hij dat bestand las.
+
+**De oorzaak is de grens uit 5h, en die deed zijn werk.** De `stilGeenWerk`-tak
+mag alleen aanslaan als de effectmeter wél iets telde; telde hij niets, dan is de
+route een kandidaat voor `NOT_APPLICABLE` en zou `BLOCKED` hem daar wegkapen.
+Alle 47 lezen *"de effectmeter telde op allebei `geen`"*. Toen die rem scherper
+werd, zette de afleidgang ze er terecht uit — en verdween daarmee de **grond**
+onder hun stand. Een verse `--afleiden` geeft vandaag byte voor byte dezelfde
+3.142 regels, dus het afgeleide bestand is actueel en het register is het
+achtergebleven stuk. In de rijen zelf staat het er onbedoeld bij: stand
+`BLOCKED_BY_TEST_FIXTURE` ("de proef kwam er niet bij") naast bewijs
+`hindernis: null`.
+
+**Waarom het maanden onzichtbaar bleef.** Twee dingen moesten samenvallen.
+Regel 64 van de keuring regenereert alleen wanneer de routetelling verandert, dus
+zonder nieuwe schrijfroute werd er niets herrekend. En `scripts/mutatiecontract.js`
+leest `MUTATIECONTRACT-AFGELEID.json` bij het **opstarten**, schrijft hem
+halverwege opnieuw bij `--afleiden`, en legt het register pas daarna vast bij
+`--vastleggen`: wie beide vlaggen in één gang meegeeft, legt een register vast op
+grond van het **vorige** afgeleide bestand. Eén gang verschil, en het bleef staan.
+
+**De regel die eruit volgt**, en hij reikt verder dan dit register:
+
+> Vervallen bewijs is geen bewijs — ook tussen twee registers onderling. Een rij
+> die zegt dat een script haar stand zette, moet dat script nog steeds achter
+> zich hebben.
+
+Dat is nu een toets en geen zin: *geen afgeleide stand zonder afgeleid contract*
+in `test/mutatiecontract.test.js` legt beide registers naast elkaar en zakt op
+elke rij met `herkomst: afgeleid` die niet meer in het afgeleide bestand staat.
+Hij kijkt naar **herkomst** en niet naar stand — een mens mag een route wel
+degelijk op `BLOCKED` zetten, en dan hoort hij er juist niet in. Nagetrokken met
+het register van `origin/main`: de bestaande poort slaagt daarop, de nieuwe zakt
+en noemt de 47 bij naam.
+
+**De grens staat daarom eenmalig op 47 in plaats van op 0**, uitgeschreven in de
+toets zelf met de reproductie en het adres van wat hem omlaag brengt. Van de 47
+dragen er 37 een `NOT_APPLICABLE`-voorstel op twee onafhankelijke meters, 2 een
+`PROTECTED`-voorstel dat nagekeken moet worden, en 8 geen voorstel — bij die acht
+deed de herhaling het werk opnieuw, en geen meting beantwoordt of dat een
+dubbeltik is of een tweede handeling. Alleen die acht vragen een oordeel; de
+andere 39 vragen iemand die de handler leest en aftekent.
+
+**De afloop.** PR #252 heeft alle 47 met de hand geclassificeerd, dus een verse
+ronde meldt nul `LEGACY_PENDING_CLASSIFICATION` over 4933 schrijfroutes. Het
+plafond `GRENS = 47` dat deze paragraaf voorstelde is daarmee niet nodig: een
+opgehoogd getal laat een RUILING door (indeel er een, voeg er een toe, en de poort
+blijft groen), en `test/mutatiecontract.test.js` draagt in plaats daarvan een LEGE
+lijst bij naam.
+
 ## 6. De poort
 
 Regel 64 van `scripts/check.js` meldt wanneer het register achterloopt op de

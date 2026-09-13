@@ -2622,18 +2622,101 @@ console.log('\n36) geen proefrestant in de laatste commit');
 
        Dat is precies de vorm die de rest van deze lijst probeert te voorkomen: een
        handhaver die iets net niet dekt is gevaarlijker dan geen handhaver, want
-       hij geeft groen. Dus nu ook de namenlijst van de commit. */
+       hij geeft groen. Dus nu ook de namenlijst van de commit.
+
+       EN OP 13 SEPTEMBER 2026 GEBEURDE HET EEN DERDE KEER, met dezelfde vorm en
+       een andere naam: server/kern/zzijkbron.js kwam mee in een commit terwijl
+       de ijking liep, en deze regel gaf groen. De marker (opgeknipt, zie onder) zit
+       niet in die naam en niet in die inhoud -- en dat is geen slordigheid van
+       de ijking maar een EIS: de meter die hij voedt groepeert op `familie`,
+       alles voor het eerste koppelteken, dus `zz-ijk-bron` en `zz-ijk-doel`
+       zouden allebei familie `zz` heten en de meter zou niet bewegen.
+
+       Drie keer dezelfde ontsnapping is geen toeval maar een vorm: deze regel
+       zocht een PATROON dat hij zelf had opgeschreven, terwijl de ijking haar
+       eigen namen kiest. Regel 37 hieronder doet het al goed en zegt ook waarom
+       -- "de klassen komen uit het blad zelf en niet uit een lijst hier: een
+       tweede lijst loopt binnen een week uit de pas (LAT.md regel 4)".
+
+       EN DE NAAM STAAT HIER NERGENS VOLUIT, net als in de patronen hierboven:
+       deze regel grep't de hele boom inclusief zijn eigen bron, dus wie de
+       marker in een uitleg voluit schrijft, laat de regel over zijn eigen
+       commentaar klagen. Dat is hier prompt gebeurd in een eerste versie van
+       deze reparatie.
+
+       Dus nu uit de BRON: de paden komen uit test/meterijk.test.js zelf, uit de
+       aanroepen van metTijdelijkBestand(). Komt er een ijkbestand bij met weer
+       een eigen naam, dan dekt deze regel het vanzelf. De marker blijft er als
+       tweede net naast staan, want die vangt de varianten (-a, -b, -c) die in
+       augustus langskwamen en die geen eigen aanroep in de lijst hebben. */
+    const ijkbron = path.join(ROOT, 'test', 'meterijk.test.js');
+    let ijkpaden = [], bronVanDeIjking = '';
+    try {
+      bronVanDeIjking = fs.readFileSync(ijkbron, 'utf8');
+      ijkpaden = [...new Set([...bronVanDeIjking.matchAll(/metTijdelijkBestand\(\s*'([^']+)'/g)].map(m => m[1]))];
+    } catch (e) { ijkpaden = []; bronVanDeIjking = ''; }
+    /* EEN LEGE OF ONVERWACHT KLEINE BRONVERZAMELING IS EEN FOUT VAN DE
+       HANDHAVER, GEEN BEWIJS VAN AFWEZIGHEID.
+
+       Dat is het principe en het reikt verder dan deze regel. Zonder deze
+       controle levert een parserfout namelijk exact dit op: nul gevonden
+       tijdelijke bestanden, nul verboden bestanden in de commit, groen. Een
+       meter die niets meer MEET en daarom alles GOEDKEURT -- en dat is de
+       gevaarlijkste faalvorm die dit huis kent, want hij is van buiten niet te
+       onderscheiden van een schone commit.
+
+       Acht is geen magisch getal maar de ondergrens van wat de ijking vandaag
+       aantoonbaar neerzet; wordt het er een minder, dan hoort iemand te kijken
+       of dat een besluit was of een afleider die stukging. */
+    if (ijkpaden.length < 8) {
+      fout('uit test/meterijk.test.js komen maar ' + ijkpaden.length + ' tijdelijke ijkpaden; ' +
+        'dan meet de namencontrole van deze regel niets meer');
+    }
+    /* De losse namen die in de INHOUD van zo'n bestand kunnen staan: zzijkbron
+       requireert ./zzijkdoel, en dat woord staat in geen enkele bestandsnaam van
+       de commit. Zonder deze afgeleide zou een bestand dat alleen VERWIJST naar
+       een ijkbestand er nog steeds doorheen komen. */
+    const ijknamen = [...new Set([
+      ...ijkpaden.map(p => path.basename(p).replace(/\.[a-z0-9]+$/i, '')),
+      /* EN DE NAMEN DIE ALLEEN IN DE INHOUD VAN ZO'N BESTAND STAAN. zzijkbron.js
+         bevat `require('./zzijkdoel')`, en `zzijkdoel` is nooit een pad in de
+         lijst hierboven -- de meter leest de brontekst en voert hem niet uit, dus
+         dat bestand bestaat niet eens. Zonder deze afleiding zou een commit die
+         alleen dat woord draagt er nog steeds doorheen komen. */
+      ...[...bronVanDeIjking.matchAll(/require\(\\?['"]\.\/([A-Za-z0-9_-]+)/g)].map(m => m[1])
+    ])].filter(n => n && n.startsWith('zz') && n !== 'zz' + '-ijk-tijdelijk');
+
     const lijst = git('ls-tree', '-r', '--name-only', 'HEAD');
     if (lijst.status !== 0) {
       fout('kan de bestandenlijst van HEAD niet lezen: ' + String(lijst.stderr || '').trim());
     } else {
       const marker = 'zz' + '-ijk-tijdelijk';
+      const uitDeIjking = new Set(ijkpaden);
       for (const pad of String(lijst.stdout || '').split('\n').filter(Boolean)) {
-        if (!pad.includes(marker)) continue;
+        const viaMarker = pad.includes(marker);
+        const viaLijst = uitDeIjking.has(pad);
+        if (!viaMarker && !viaLijst) continue;
         gevonden++;
         fout('ijkrestant als BESTAND in de commit: ' + pad +
+          (viaLijst && !viaMarker ? ' (uit de lijst van test/meterijk.test.js)' : '') +
           '\n    een ijking maakt dit bestand en ruimt het op; hier is er gecommit tussen die twee' +
           ' -- git rm het bestand en commit opnieuw');
+      }
+    }
+    /* En de INHOUD, voor de namen die geen bestandsnaam in de commit zijn. */
+    if (ijknamen.length) {
+      const r2 = git('grep', '-n', '-E', ijknamen.join('|'), 'HEAD', '--', '*.js', '*.json', '*.html', '*.css');
+      if (r2.status > 1) {
+        fout('git grep faalde voor de ijknamen: ' + String(r2.stderr || '').trim());
+      } else {
+        for (const regel of String(r2.stdout || '').split('\n').filter(Boolean)) {
+          const pad = regel.replace(/^HEAD:/, '').split(':')[0];
+          if (/^test\/meterijk\.test\.js$/.test(pad)) continue;   // daar worden ze gemaakt
+          if (/^(\.gitignore|scripts\/check\.js|test\/afbouwpoort\.test\.js)$/.test(pad)) continue;
+          gevonden++;
+          fout('ijkrestant in de INHOUD: ' + regel.replace(/^HEAD:/, '').slice(0, 160) +
+            '\n    dit noemt een ijkbestand van test/meterijk.test.js -- zet het terug en commit opnieuw');
+        }
       }
     }
     if (!gevonden) ok('de laatste commit draagt geen ijk- of mutatierestant, in inhoud noch in naam');

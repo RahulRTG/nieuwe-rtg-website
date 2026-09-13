@@ -438,10 +438,19 @@ dat is beproefbaar zonder iets nieuws te bouwen: `server/lib/verraad.js` kent
 `schrijf-faalt` ("een aanroeper die dat stil wegvangt, meldt succes over niets"),
 acht toetsbestanden gebruiken ze, tien raken het inzagejournaal, en de doorsnede
 is **nul** -- de toets bij besluit 5 is dus niet "werkt de poort" maar *weigert de
-poort onder `schrijf-verloren`*. De ringbuffer is een APART besluit (6): een
-hashketen bewijst de integriteit van wat er staat en zegt niets over wat eraf
-viel, dus integriteit en retentie zijn twee eigenschappen en de ene wordt hier
-makkelijk voor de andere aangezien. En besluit 7 is genomen: *een belofte over
+poort onder `schrijf-verloren`*. De ringbuffer was een APART besluit (6) en is
+genomen: een hashketen bewijst de integriteit van wat er STAAT en zegt niets over
+wat eraf viel, dus integriteit en retentie zijn twee eigenschappen en de ene
+wordt makkelijk voor de andere aangezien. `server/inzagelog-bewaring.js` bewaart
+daarom op TIJD en niet op aantal -- 730 dagen, want het journaal is het bewijs
+OVER toegang en hoort de gegevens waarover het gaat te overleven -- en `MAX` is
+een NOODREM geworden die, als hij bijt, dat TELT en hardop zegt. Verjaren en
+afgekapt worden gaan nooit op een hoop: het eerste is de termijn die werkt, het
+tweede de belofte die breekt. De belofte reist mee met het antwoord tot aan het
+scherm: de inzagekaart draagt `bewaring` PER BRON (`null` waar deze laag de
+termijn van een andere laag niet kent -- een getal over vier bronnen zou de
+langste of de kortste tot waarheid maken) en zet een tekort van de noodrem in
+`nietZichtbaar`, tussen de rest van wat die kaart niet kan tonen. En besluit 7 is genomen: *een belofte over
 een spoor is pas een regel als het spoor kan weigeren* is **regel 13 van
 `LAT.md`** -- niet de twaalfde, want die was al bezet (*een meting die niet heeft
 gedraaid is geen slechte uitslag*), en dat is precies de soort verwarring waar

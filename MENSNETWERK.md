@@ -1354,6 +1354,48 @@ twee eigenschappen, en de ene wordt hier makkelijk voor de andere aangezien.
 | B. Aantal regels, eerlijk benoemd | Laat de 5000 staan en zeg het erbij. | Een grens die met het gebruik meebeweegt: bij druk verkeer is de horizon korter dan bij rustig, en niemand ziet dat. |
 | C. Archiveren met een anker | De afgevallen staart blijft controleerbaar buiten de database. | Het duurst, en `AFSPRAAK.md` waarschuwt al: een anker in dezelfde database is geen anker. |
 
+#### Besluit 6 is genomen: A, en hij staat (13 september 2026)
+
+**De bewaring volgt de belofte, en niet andersom.** `server/inzagelog-bewaring.js`
+houdt de termijn op EEN plek: `BEWAARDAGEN = 730`, en dat is een keuze met een
+grond -- het inzagejournaal is het bewijs OVER toegang, dus het hoort de gegevens
+waarover het gaat te overleven. Het identiteitsbewijs zelf valt na een jaar
+(`server/bewaarveger.js`); het spoor dat iemand ernaar keek blijft daar een jaar
+overheen staan.
+
+**`MAX` is gebleven, maar het is nu een NOODREM en geen bewaartermijn.** 200.000
+in plaats van 5.000, dus ruim boven wat de termijn oplevert -- en bijt hij toch,
+dan telt het journaal dat (`inzageLogAfgekapt`) en zegt het antwoord het hardop.
+Vier dingen daar niet wegpoetsen.
+
+**Verjaren en afgekapt worden zijn twee soorten verlies en ze gaan nooit op een
+hoop.** Een regel die VERJAART is de bewaartermijn die werkt; een regel die door
+de noodrem valt is de belofte die breekt. Alleen de tweede wordt geteld, want
+alleen de tweede is een tekort -- wie ze samentelt verbergt het tekort in het
+normale verloop.
+
+**De belofte reist mee met het antwoord.** `voorBetrokkene()` gaf een kale array
+terug, en dan raadt het scherm wat zij betekent: het raadt *"dit is alles"*,
+terwijl het *"dit is alles binnen de termijn"* is. Het antwoord draagt nu
+`bewaardagen`, een uitgeschreven `belofte`, een expliciet `volledig` en bij een
+tekort de zin die dat zegt. Nul is daar een UITSPRAAK en geen leeg veld: het zegt
+dat de noodrem nooit heeft gebeten, en dus dat de termijn de hele belofte draagt.
+
+**De vormwijziging legde drie productie-lezers bloot die er niet zouden zijn.**
+De eerste aanname was dat `voorBetrokkene()` geen aanroepers had; er zijn er
+drie, en twee toetsen stonden er rood door. Alle drie zijn AANGESLOTEN in plaats
+van teruggedraaid, want juist daar hoort de belofte te landen:
+
+| Lezer | Wat hij nu draagt |
+|---|---|
+| `kern/inzagekaart.js` | `bewaring` **per bron** -- het journaal kent zijn termijn, RTG iD en de paspoortlaag houden hun eigen bewaring bij en deze laag weet die niet. `null` is daar een uitspraak, en de onbekende helft staat even groot op het scherm. |
+| idem | bijt de noodrem, dan verschijnt dat tekort in `nietZichtbaar` -- in dezelfde lijst als de rest van wat de kaart niet kan tonen, want dat is precies wat het is. |
+| `/api/privacy/inzage` en de AVG-export | `inzage` blijft de lijst (geen bestaand scherm merkt er iets van), `bewaring` staat ernaast. |
+
+**Een getal over vier bronnen zou de langste of de kortste tot waarheid maken,
+en allebei is onwaar.** Daarom per bron en niet als een cijfer over het geheel --
+dezelfde regel als overal in dit huis: er staat nooit een getal waar er geen is.
+
 ### Besluit 7 -- Wordt dit een eigen regel van `LAT.md`?
 
 Grens 4 van par. 6 is hier geformuleerd voor het inzagejournaal, maar hij gaat

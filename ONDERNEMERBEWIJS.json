@@ -1,4 +1,12 @@
 {
+ "stempel": {
+  "op": "2026-09-13T12:11:47.204Z",
+  "commit": "75e425af",
+  "boomVuil": false,
+  "boomAnders": 0,
+  "instrument": "scripts/ondernemerbewijs.js",
+  "node": "v22.22.2"
+ },
  "soort": "projectie",
  "uitleg": "Per ondernemer-capability: wat de bestaande registers over haar twaalf bewijslagen zeggen. Dit bestand MEET niets -- het legt zeven registers naast elkaar langs de capability uit server/functies/register/. Waar geen register spreekt staat ONBEKEND met de reden.",
  "grens": "ONBEKEND is geen ROOD en geen GROEN. Een capability heet pas VERKOOPBAAR als alle twaalf lagen groen zijn; dat is met opzet streng. De bronnen zijn op verschillende commits gemeten -- hun stempels staan hieronder en hun uitslagen worden nooit tot een samengesteld cijfer opgeteld.",

@@ -1911,6 +1911,7 @@
     "stuur": [
       "isolatie",
       "stuurBevestig",
+      "stuurIntrek",
       "stuurPaden",
       "stuurRoep"
     ],

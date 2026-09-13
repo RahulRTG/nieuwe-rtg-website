@@ -51,8 +51,25 @@ const KLEIN = Object.freeze({
   member: [
     /^\/api\/mediaos\/(stuur|volg)$/,   // zet de smaak / het volgen van dit lid
     /^\/api\/leerstof\/(oefen|antwoord)$/, // schrijft de oefenstand van dit lid
-    /^\/api\/bijles\/vraag$/           // roept een model aan: omkeerbaar, maar niet gratis
+    /^\/api\/bijles\/vraag$/,          // roept een model aan: omkeerbaar, maar niet gratis
+    /* INTREKKEN van een eigen klaargezet voorstel (besluit van de eigenaar,
+       13 september 2026). Hij hoort hier en niet bij `lezen`, want hij verandert
+       toestand; en hij hoort niet bij `voorstel`, want een voorstel om een
+       voorstel te laten vervallen is een cirkel.
+
+       WAAROM DIT DE MINST GEVAARLIJKE `klein` VAN DE DRIE IS, ondanks dat hij de
+       hoogste gezagstrede haalt: de andere drie hierboven LATEN iets gebeuren
+       (een smaak wordt gezet, een model wordt betaald). Deze kan uitsluitend
+       vermogen INLEVEREN. De trede zegt hoe zelfstandig de machine handelt, niet
+       hoe erg het is als hij ernaast zit -- en die twee lopen hier uit elkaar. */
+    /^\/api\/member\/voorstel\/intrek$/
   ],
+  /* MET OPZET NIET VOOR supplier EN staff, en daar bestaat de ROUTE ook niet.
+     Het besluit van de eigenaar ging over een LID. Een intrekpad voor een zaak
+     openzetten is twee besluiten in een: dat de werkwerelden hun eerste `klein`
+     krijgen, en dat een zaak zijn voorstel conversationeel mag terugtrekken.
+     Die twee horen apart gesteld te worden, en tot dan staat het gat zichtbaar
+     in plaats van half gebouwd (zie routes/stuur.js). */
   supplier: [],
   staff: []
 });

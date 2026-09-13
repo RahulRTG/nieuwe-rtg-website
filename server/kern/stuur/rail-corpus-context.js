@@ -90,6 +90,24 @@ module.exports = {
      aangenomen -- alleen om daarna netjes te worden geweigerd. */
   'die andere actieve context scherm rtg agenda deel vrijdag vergelijking afspraak 10 00 ledenregister openen gekozen afspraak 10 00':
     verhelder('Er staat maar een ander ding op je scherm, en dat is niets van jou om te openen. ' +
-      'Bedoel je een van je eigen afspraken? Zeg dan welke.')
+      'Bedoel je een van je eigen afspraken? Zeg dan welke.'),
+
+  /* E. DEZELFDE DUBBELZINNIGHEID, MAAR MET EEN VERNIETIGEND WERKWOORD.
+
+     "annuleer hem" met twee kandidaten is taalkundig hetzelfde geval als "die
+     andere" met twee alternatieven: er is niets eenduidigs, dus er wordt
+     gevraagd. Wat het toevoegt is de PRIJS van een gok. Bij "die andere" kost
+     een verkeerde keuze een verkeerd scherm; hier kost hij een afspraak die
+     niet had moeten verdwijnen, en dat is niet terug te draaien met een
+     vriendelijke zin.
+
+     De uitkomst hoort daarom exact gelijk te zijn aan die van C -- niets
+     geselecteerd, een vraag -- en dat is precies de bewering: de keten wordt
+     niet voorzichtiger OMDAT het werkwoord gevaarlijk is, hij was het al. Zou
+     hij hier wel kiezen en bij "die andere" niet, dan zit de voorzichtigheid in
+     het woord en niet in de laag. */
+  'annuleer hem actieve context scherm rtg agenda deel deze week keuze afspraak dinsdag 10 00 afspraak donderdag 15 00':
+    verhelder('Er staan er twee deze week: dinsdag 10:00 en donderdag 15:00. Welke moet ik ' +
+      'afzeggen?')
 
 };

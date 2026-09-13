@@ -758,8 +758,8 @@ laag draagt `effect` in zijn naam, en niemand anders in huis mag `gevolgcontract
 `gevolgdekking` gaan heten zonder hier langs te komen.
 
 **De algemene regel eronder is meetbaar en niet gebouwd, met de reden.** Wat deze
-botsing had gevonden vóór de naam viel, is één vraag: noemt `test/X.test.js` het
-script `scripts/X.js`? Vandaag zijn er **11** scripts met een gelijknamige toets die
+botsing had gevonden vóór de naam viel, is één vraag: noemt een toets met dezelfde naam
+als een script dat script ook? Vandaag zijn er **11** scripts met een gelijknamige toets die
 het script niet noemt. Dat is te veel voor een poort en te weinig onderzocht voor een
 ratel — de meeste zijn vermoedelijk een toets die via `npm run` of via het register
 werkt. Het staat hier als leeslijst en niet als meter, want een twaalfde meter

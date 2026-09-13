@@ -20,7 +20,8 @@
 
 module.exports = (kern, hulp) => {
   const { db, save, notify, capGezondheid } = hulp;
-  const eigen = require('../kern/eigencollectie')({ db, domein: 'opzet/kernlaag3c', bezit: { kernjournaal: 'lijst' } });
+  const eigen = require('../kern/eigencollectie')({ db, domein: 'opzet/kernlaag3c',
+    bezit: { kernjournaal: 'lijst', geldketenJournaal: 'lijst', geldketenDossiers: 'lijst' } });
 
 /* DE COMMERCIELE RONDE (kern/commercie/ronde.js): het werk dat wel gebouwd was
    en nooit werd gedaan. Vier lagen legden verplichtingen vast -- mislukte
@@ -148,6 +149,12 @@ Object.assign(kern, (() => {
        plaats van stilzwijgend ja. */
     beslis: (vraag) => (kern.beslis ? kern.beslis(vraag) : null) });
 
+  /* De beslislaag en de gouden weg staan apart: ./kern-geldketen.js. Ze horen bij
+     elkaar (de baan kan niet wegen zonder besluit) en niet in deze laag, die over
+     de commerciele kern gaat. */
+  const { beslis, geldbevoegdheden, geldketen } =
+    require('./kern-geldketen')({ kern, voornemens, token, eigen });
+
   /* HET RECHTENBORD. Alles wat hierboven is opgehangen, in EEN antwoord: wat
      het productprofiel zegt, en wat er vandaag werkelijk gebeurt. Die twee lopen
      uiteen zodra een handhavingsregel nog meeloopt, en dat gat -- de belofte
@@ -157,6 +164,7 @@ Object.assign(kern, (() => {
     zaakAbonnement, schaduw, tegoed, contracten: kern.contracten || null });
 
   return { commercieBewijstoken: token, voornemens, commercieRechten: rechten, veiligheidskern,
+    beslis, geldbevoegdheden, geldketen,
     /* De gezondheid per capability wordt in server.js gebouwd -- hij moet ouder
        zijn dan de betaalrail die erop meldt -- en hier alleen aan de kern
        gehangen, zodat het kantoor erbij kan. */

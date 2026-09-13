@@ -44,11 +44,63 @@ module.exports = (ctx) => {
     }
   });
 
+  /* DE INCASSORONDE LOOPT VIA DE GELDKETEN, EN NERGENS OMHEEN (MACHINE.md).
+
+     De aanvraag heeft de hele baan al gelopen (./bank-rekeningen.js): assurance,
+     mandaat, streefstand, tegenfeit, frictie, gevolg, en een VOORNEMEN met een
+     besluit en een bewijstoken. Wat hier gebeurt is het sluitstuk, en het is EEN
+     menselijke daad die in twee registers landt:
+
+       1. het voornemen wordt afgetekend door deze tweede mens -- waarna het
+          besluit opnieuw langs het beleid gaat, nu MET de goedkeuring erin;
+       2. de uitvoering loopt door kern/commercie/voornemen/uitvoeren.js, die de
+          vingerafdruk nakijkt, het bewijstoken inlevert en de veiligheidskern
+          langsgaat voordat er een cent beweegt.
+
+     ER KOMT GEEN TWEEDE TWEEDE-HANDTEKENING BIJ: deze deur BLIJFT de deur. Het
+     voornemen weigert zelf al een handtekening van dezelfde persoon, en die
+     vergelijking staat hierboven op de harde sleutel -- twee mechanismen voor
+     dezelfde garantie is de dubbeling die LAT.md regel 4 verbiedt.
+
+     EEN AANVRAAG ZONDER VOORNEMEN GAAT NIET DOOR. Dat is geen strengheid om de
+     strengheid: een openstaande aanvraag van voor deze verandering zou anders
+     stilletjes de oude weg nemen -- geld dat beweegt zonder besluit, zonder
+     bewijs en zonder spoor. Hij weigert met de weg erbij (opnieuw aanvragen). */
   tweedeHand.registreer('bank.incasso', {
     wat: 'een incassoronde draaien (vaste betalingen innen)',
-    voerUit: async (lijf) => {
-      const r = await bank.bankIncassoRonde(lijf && lijf.tot != null ? { tot: Number(lijf.tot) } : {});
-      if (r.ok && r.uitgevoerd > 0) { afdelingen.audit('tweede handtekening', 'Incassoronde: ' + r.uitgevoerd + ' vaste betaling(en), € ' + (r.bedragCenten / 100).toFixed(2)); sync(); }
+    voerUit: async (lijf, wie) => {
+      const ketenlaag = kern.geldketen;
+      if (!ketenlaag) return { status: 503,
+        error: 'De geldketen is niet gemount; een incassoronde gaat niet buiten de keten om.' };
+      const vid = lijf && lijf.voornemen ? String(lijf.voornemen) : '';
+      if (!vid) return { status: 409,
+        error: 'Deze aanvraag draagt geen voornemen en is van voor de geldketen. Vraag de ' +
+          'incassoronde opnieuw aan; dan loopt zij langs het besluit en het bewijs.' };
+
+      const bevestiger = (wie && wie.bevestigdDoor) || null;
+      const tekenen = ketenlaag.tekenAf({ id: vid, door: bevestiger });
+      /* Een voornemen dat NIET op WACHT stond, hoeft niet te worden afgetekend --
+         een klein bedrag komt door de keuring zonder tweede handtekening. Dan is
+         409 hier geen fout maar de normale gang, en de uitvoering gaat door. Elke
+         ANDERE weigering stopt de handeling: zonder geldige stand voert
+         kern/commercie/voornemen/uitvoeren.js niets uit. */
+      if (tekenen && tekenen.error && tekenen.status !== 409) return tekenen;
+
+      const r = await ketenlaag.uitvoer({ id: vid, door: bevestiger,
+        doe: async (stap) => bank.bankIncassoRonde({ tot: Number(stap.gegevens && stap.gegevens.tot) }) });
+      if (r && r.ok) {
+        /* De uitkomst van de ronde zit IN de stap en niet naast het antwoord:
+           kern/commercie/voornemen/uitvoeren.js hangt wat `doe` teruggaf aan
+           `stappen[].uitkomst`. Dat verkeerd lezen zou hier een auditregel met
+           "? betalingen, EUR 0,00" opleveren terwijl de ronde gewoon liep -- een
+           spoor dat naast de waarheid staat is erger dan geen spoor. */
+        const stap = (r.voornemen && r.voornemen.stappen && r.voornemen.stappen[0]) || null;
+        const uit = (stap && stap.uitkomst) || {};
+        afdelingen.audit('tweede handtekening', 'Incassoronde uit voornemen ' + vid + ': ' +
+          (uit.uitgevoerd != null ? uit.uitgevoerd : '?') + ' vaste betaling(en), € ' +
+          ((Number(uit.bedragCenten) || 0) / 100).toFixed(2));
+        sync();
+      }
       return r;
     }
   });

@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5041 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5042 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5041 |
-| servermodules (`server/**/*.js`) | 3416 |
-| routebestanden (`server/routes/**`) | 589 |
-| kernmodules (`server/kern/**`) | 2132 |
+| API-endpoints | 5042 |
+| servermodules (`server/**/*.js`) | 3425 |
+| routebestanden (`server/routes/**`) | 590 |
+| kernmodules (`server/kern/**`) | 2139 |
 | schermen (`public/**/*.html`) | 318 |
 | gedeelde browsermodules (`public/shared/*.js`) | 353 |
-| toetsbestanden (`test/*.test.js`) | 1622 |
+| toetsbestanden (`test/*.test.js`) | 1624 |
 | schermtoetsen (`test/*.e2e.js`) | 216 |
 
 ## 2. De weg van een verzoek
@@ -127,7 +127,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3416 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3417 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -135,9 +135,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1569 |
+| kern-namen die routes aanraken | 1570 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 235 |
-| daarvan door precies één domein | 1334 |
+| daarvan door precies één domein | 1335 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

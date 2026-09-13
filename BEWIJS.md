@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1838 bestanden en 13054 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1840 bestanden en 13072 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1838 |
-| losse beweringen (`test(...)`) | 13054 |
+| toetsbestanden | 1840 |
+| losse beweringen (`test(...)`) | 13072 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1216 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1218 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 66 |
 | alleen in de kop *genoemd*, nog niet gemeten | 154 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1622 bestanden, 12672 beweringen.
+1624 bestanden, 12690 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -465,6 +465,7 @@ toets omvalt.
 | `geldgraaf.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Geldgraaf, fase 1 van GELD.md: de cockpit staat voor een vers lid, de patroonherkenning vindt terugkerende posten en meldt een prijsstijging als 'post-duurder', een minimumbuffer-regel geeft een uitzondering met... |
 | `geldgrens.test.js` | 8 | gezakt op `liegpoort /api/` | DE EIGEN GELDGRENS -- een regel die het lid over zichzelf stelt en die echt weigert. WAAROM DEZE TOETS ER IS kern/geldbeleid/regels.js kent vier regelsoorten en ze WAARSCHUWEN allemaal. |
 | `geldkaart.test.js` | 7 | gezakt op `===->!==#0` | DE ZELFIJKING VAN DE GELDKAART. Deze meter beweert iets dat een mens niet kan nakijken: dat elke waardemutatie op de vier kernbakken door haar eigen poort ging. |
+| `geldketen.test.js` | 9 | gezakt op `===->!==#0` | DE GOUDEN WEG (server/kern/kantoor/geldketen.js). Deze toets beproeft de BAAN en niet de motoren: die hebben hun eigen toetsen. |
 | `geldregie.test.js` | 5 | gezakt op `liegpoort /api/` | De geld-regie van de boardroom: RTG bepaalt de pasprijzen (publiek zichtbaar, de voorwaarden volgen live), de interne partnervergoeding per genre of per zaak, en het RTG-ledenvoordeel per genre (RTG legt bij; de zaak... |
 | `geldroutes.test.js` | 5 | gezakt op `!==->===#0` | GEEN SLEUTEL IS GEEN VERZOEK -- op de handelingen die geld verplaatsen. Overal elders in dit huis is een idem-sleutel een vangnet: is hij er niet, dan gebeurt het werk gewoon. |
 | `geldveilig.test.js` | 5 | gezakt op `true->false#0` | Veiligheidsgrenzen rond echt geld. Deze toetsen sturen niets naar buiten: Stripe wijst naar een dichte lokale poort en de DirectPay-provider is nep. |
@@ -761,6 +762,7 @@ toets omvalt.
 | `luchthaven.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Airport (kern/luchthaven.js): de gehele luchthavenoperatie. Getest: de passagiersketen (boeken -> inchecken -> boarding pass + koffertags), de operationele grendels (een kist boardt pas als de draai rond is;... |
 | `luchtzijde-taal.test.js` | 5 | gezakt op `liegpoort /api/` | De luchtzijde-stand voor partners (boarding pass aan de deur, dubbele prijzen op de kassa, de vertaalknop) + de moedertaal van het account (iedereen praat de eigen taal, de ander leest de zijne in de vriendenchat). |
 | `lussen.test.js` | 27 | gezakt op `===->!==#0` | DE LUSINDEX (scripts/lussen.js + scripts/lib/lusvorm.js). WAT DEZE TOETS WERKELIJK BEWAAKT. |
+| `machinedekking.test.js` | 9 | gezakt op `true->false#0` | DE MACHINEDEKKING (scripts/machinedekking.js). Deze meter beweert iets dat makkelijk stil kan verschuiven: hoeveel van de eigen motoren raakt een handeling. |
 | `magnaat-capabilities.test.js` | 7 | geen bruikbare mutatie | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `magnaat-controle.test.js` | 9 | gezakt op `!==->===#0` | Het RTG Controleregister: ieder gevonden codepunt heeft dezelfde veilige schakelaar, taakmotor en bestuursaudit, terwijl ontbrekend bronbewijs en ontbrekende echte gameplay zichtbaar rood blijven. |
 | `magnaat-economenlab.test.js` | 6 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

@@ -491,10 +491,10 @@ async function meet() {
       'Belastingdienst. Hij meet EEN genre (restaurant, NL) en zegt niets over logies, vervoer of de ' +
       'buitenlandse tarieventabellen. En hij meet de PROJECTIE financeVoor: dat de zaak dit cijfer ziet, ' +
       'bewijst niet dat er een grootboekregel onder ligt. ' +
-      'DE TEGENBOEKING IS MAAR HALF BEWEZEN: verkoop en terugstorting vallen hier in DEZELFDE maand, dus ' +
-      'dat de verkoop blijft staan is gemeten, maar niet dat de tegenboeking in de juiste maand landt ' +
-      'wanneer zij in een andere valt -- en dat is nou net waar het besluit over ging. Daarvoor zou de ' +
-      'klok tegen een draaiende server verzet moeten worden. ' +
+      'DE MAANDGRENS WORDT HIER NIET GEMETEN: verkoop en terugstorting vallen in deze proef in DEZELFDE ' +
+      'maand, want de klok is tegen een draaiende server niet te verzetten. Dat de tegenboeking in de ' +
+      'JUISTE maand landt wanneer zij in een andere valt, staat als unittoets in test/kern-fiscaal.test.js ' +
+      '(financeVoor is daar een pure projectie over db.data) -- twee mutaties nagetrokken. ' +
       'EN ZIJ GELDT ALLEEN VOOR BESTELLINGEN: kern/fiscaal/index.js telt rides en boekingen nog op `paid` ' +
       'zonder tegenboeking, en hun annuleerweg zet die vlag nog op false. Die twee (plus tickets) gaan pas ' +
       'om met hun eigen gemeten lezerskaart -- ruw geteld 11, 22 en 7 lezers, tegenover 17 voor orders.',

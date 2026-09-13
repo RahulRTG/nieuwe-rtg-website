@@ -1,7 +1,7 @@
 {
   "stempel": "2026-09-13",
   "uitleg": "Van consumentintentie tot het cijfer waar een ondernemer btw over afdraagt: bestelling, betaling, economische gebeurtenis, fiscale verdeling, ondernemersbeeld. Gemeten met twee echte zaken en twee echte leden, op een wegwerpserver.",
-  "grens": "Geen browser en geen echte bank (kern/pay draait op de demo-rail). De proef kijkt naar EEN maand -- de huidige -- en dus niet naar periodeafsluiting, kwartaalaangifte of de weg naar de Belastingdienst. Hij meet EEN genre (restaurant, NL) en zegt niets over logies, vervoer of de buitenlandse tarieventabellen. En hij meet de PROJECTIE financeVoor: dat de zaak dit cijfer ziet, bewijst niet dat er een grootboekregel onder ligt. DE TEGENBOEKING IS MAAR HALF BEWEZEN: verkoop en terugstorting vallen hier in DEZELFDE maand, dus dat de verkoop blijft staan is gemeten, maar niet dat de tegenboeking in de juiste maand landt wanneer zij in een andere valt -- en dat is nou net waar het besluit over ging. Daarvoor zou de klok tegen een draaiende server verzet moeten worden. EN ZIJ GELDT ALLEEN VOOR BESTELLINGEN: kern/fiscaal/index.js telt rides en boekingen nog op `paid` zonder tegenboeking, en hun annuleerweg zet die vlag nog op false. Die twee (plus tickets) gaan pas om met hun eigen gemeten lezerskaart -- ruw geteld 11, 22 en 7 lezers, tegenover 17 voor orders.",
+  "grens": "Geen browser en geen echte bank (kern/pay draait op de demo-rail). De proef kijkt naar EEN maand -- de huidige -- en dus niet naar periodeafsluiting, kwartaalaangifte of de weg naar de Belastingdienst. Hij meet EEN genre (restaurant, NL) en zegt niets over logies, vervoer of de buitenlandse tarieventabellen. En hij meet de PROJECTIE financeVoor: dat de zaak dit cijfer ziet, bewijst niet dat er een grootboekregel onder ligt. DE MAANDGRENS WORDT HIER NIET GEMETEN: verkoop en terugstorting vallen in deze proef in DEZELFDE maand, want de klok is tegen een draaiende server niet te verzetten. Dat de tegenboeking in de JUISTE maand landt wanneer zij in een andere valt, staat als unittoets in test/kern-fiscaal.test.js (financeVoor is daar een pure projectie over db.data) -- twee mutaties nagetrokken. EN ZIJ GELDT ALLEEN VOOR BESTELLINGEN: kern/fiscaal/index.js telt rides en boekingen nog op `paid` zonder tegenboeking, en hun annuleerweg zet die vlag nog op false. Die twee (plus tickets) gaan pas om met hun eigen gemeten lezerskaart -- ruw geteld 11, 22 en 7 lezers, tegenover 17 voor orders.",
   "genre": "restaurant",
   "bruto": 45,
   "schakels": [
@@ -13,9 +13,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "ref RTG-O-85EAE6, totaal 45 (verwacht 45), betaald false",
+      "ziet": "ref RTG-O-168A64, totaal 45 (verwacht 45), betaald false",
       "fout": null,
-      "ms": 19
+      "ms": 20
     },
     {
       "nr": 2,
@@ -27,7 +27,7 @@
       "status": 200,
       "ziet": "omzet 0 (voor de bestelling: 0)",
       "fout": null,
-      "ms": 7
+      "ms": 9
     },
     {
       "nr": 3,
@@ -37,9 +37,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "betaald true, op 2026-09-13T16:29:56.727Z, 4500 cent (verwacht 4500)",
+      "ziet": "betaald true, op 2026-09-13T19:14:03.317Z, 4500 cent (verwacht 4500)",
       "fout": null,
-      "ms": 26
+      "ms": 23
     },
     {
       "nr": 4,
@@ -63,7 +63,7 @@
       "status": 200,
       "ziet": "potten: eten@9% = 40, drank@21% = 5 -- de koffie (5,00) staat bij drank/21%",
       "fout": null,
-      "ms": 8
+      "ms": 6
     },
     {
       "nr": 6,
@@ -75,7 +75,7 @@
       "status": 200,
       "ziet": "2 pot(ten), allemaal met tarief: true, eten staat op 9%",
       "fout": null,
-      "ms": 6
+      "ms": 5
     },
     {
       "nr": 7,
@@ -85,9 +85,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "ref RTG-O-85EAE6, 45, betaald true",
+      "ziet": "ref RTG-O-168A64, 45, betaald true",
       "fout": null,
-      "ms": 4
+      "ms": 5
     }
   ],
   "storingen": [
@@ -146,7 +146,7 @@
       "wat": "status 404 -- Bestelling niet gevonden."
     }
   ],
-  "ref": "RTG-O-85EAE6",
+  "ref": "RTG-O-168A64",
   "zaken": {
     "a": "PROEFZAAKA",
     "b": "PROEFZAAKB"

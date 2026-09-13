@@ -412,7 +412,25 @@ makkelijk voor de andere aangezien. En besluit 7 legt de vraag voor of *een
 belofte over een spoor is pas een regel als het spoor kan weigeren* de twaalfde
 regel van `LAT.md` wordt -- de vorm is niet uniek voor het journaal: 468 lege
 `catch`-blokken in `server/`, waarvan 13 letterlijk `try { save(); } catch`, en
-dat is een vorm en geen aanklacht.
+dat is een vorm en geen aanklacht. **Par. 0.7 keert de volgorde om, en corrigeert
+dit document zelf.** Het duurzame primitief bestaat al en is bewust schaars
+(`db/duurzaam.js`: synchroon met fsync, keert pas terug als de opslag bevestigt,
+met `check.js` regel 47 op zijn AANROEPERSLIJST) -- en deze laag staat er al op:
+`vertegenwoordiging`, `rugdekking` en het carrièreledger zijn duurzaam, het
+inzagejournaal niet. De klasse-meting bestaat ook al (`FAALPROEF.json`,
+`scripts/faalproef.js`: per route, contract afgeleid uit een gemeten effectprofiel
+en pas daarna beproefd met beide verraadstanden). En de plek die eerst genoemd
+werd, klopte niet: `kluispoort.js` is een IDENTITEITSpoort die vóór de route
+draait en het onderwerp van de inzage niet kent -- het contract hoort bij het
+journaal en de leesweg, niet bij de deur ervoor. Het duurste getal staat daar:
+van de 570 kantoorroutes in FAALPROEF.json is **528 `ongemeten`**, 33 bewezen en
+**9 gezakt**, en de reden bij de hele ledenbalie is *status 403* -- de proef komt
+met de gedeelde code en de kluispoort weigert die terecht. **De gevoeligste helft
+van dit huis is dus de minst beproefde**, niet door een besluit maar doordat een
+poort die identiteit eist en een proef die er geen heeft elkaar uitsluiten. Die
+negen gezakte routes dragen alle negen dezelfde zin (*schrijf-verloren: status
+200 terwijl de toestand niet veranderde*) en **zeven ervan zijn verwijderroutes**:
+een medewerker hoort dat iets weg is en het staat er nog.
 
 Daaruit volgt de vorm van MN-02, en die is anders dan hij eerst was: niet *"een
 RTG-manager ziet hetzelfde als een externe"* (dat sneuvelt, want `kern/ledenbalie.js`

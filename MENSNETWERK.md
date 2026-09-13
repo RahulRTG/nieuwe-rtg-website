@@ -230,10 +230,78 @@ opslagtoetsen). **Tien toetsbestanden** raken het inzagejournaal. De doorsnede i
 **nul**. Het instrument bestaat, het wordt gebruikt, en juist de laag waarvan de
 hele belofte "elke blik laat een spoor na" is, staat er niet onder.
 
-**De reparatie hoort op één plek en niet in 42.** `kern/kantoor/kluispoort.js`
-bestaat al als de poort voor de zware inzage (hij hangt vandaag aan 8 van de 585
-kantoorroutes, `KANTOOR.md`). Daar hoort het contract te staan, en het is er ook
-uitvoerbaar: **eerst aantoonbaar geregistreerd, dan pas gelezen.**
+### 0.7 Het instrument bestaat, de plek klopte niet, en het kantoor is onmeetbaar
+
+Bij het uitwerken van besluit 5 is de code gelezen in plaats van aangenomen, en
+dat corrigeerde drie dingen -- waaronder een bewering van dit document zelf.
+
+**Het duurzame primitief bestaat al, en het is bewust schaars.**
+`db.saveDuurzaam()` (`server/db/duurzaam.js`) slaat het write-behind plannen over
+en schrijft **synchroon met een fsync**, en keert pas terug als de opslag heeft
+bevestigd. Zijn eigen kop draagt de waarschuwing die hier anders bedacht had
+moeten worden: *"Zodra iemand hem leest als 'de veilige save', staat hij binnen
+een half jaar onder een profielwijziging en een like."* `scripts/check.js` regel
+47 bewaakt daarom de **aanroeperslijst**, en elke regel daarin noemt zijn reden.
+Er hoeft dus geen tweede contract naast `save()` bedacht te worden; het staat er,
+met een poort eromheen.
+
+**En deze laag staat er al op.** In die lijst staan
+`kern/vertegenwoordiging/index.js` (*"een machtiging is de bevoegdheid van een
+mens over het leven van een ander"*), `kern/rugdekking/index.js` (*"een sporter
+denkt dat RTG achter hem staat terwijl er niets staat"*),
+`kern/carriereledger/index.js` en `carriereledger/deel.js`. De machtiging, het
+programma en het loopbaanboek zijn dus **duurzaam**. Het inzagejournaal staat er
+niet op -- en dat is precies de laag waarvan de hele belofte een spoor is.
+
+**De plek die par. 0.6 noemde, klopt niet.** Dit document schreef dat de
+reparatie in `kern/kantoor/kluispoort.js` hoort. Gelezen blijkt die poort een
+**identiteitspoort**: hij draait vóór de route, vraagt via `officeAuth` of deze
+sessie een mens draagt (`sess.lidKey`), en roept dan `next()`. Hij weet niet naar
+wie er gekeken wordt en met welke reden -- dat ontstaat pas in de handler. Een
+journaalcontract daar neerleggen zou de poort iets laten registreren wat hij nog
+niet kent. Het contract hoort dus bij **het journaal en de gevoelige leesweg**,
+niet bij de deur ervoor. Dat de reparatie op één plek hoort en niet in 42, blijft
+staan; alleen de plek was verkeerd gekozen.
+
+**En de klasse-meting die hierbij hoort, bestaat ook al.**
+`FAALPROEF.json` (`scripts/faalproef.js`) is precies de vraag *welke belofte
+faalt netjes als er iets onder hem wegvalt*: per route, het contract eerst
+afgeleid uit een gemeten effectprofiel en pas daarna beproefd met `schrijf-faalt`
+en `schrijf-verloren`. 4904 routes.
+
+**Maar over het kantoor zegt hij bijna niets, en de reden is dezelfde als bij de
+derde ketenproef.** Van de 570 `/api/office/`-routes in dat register:
+
+| Uitslag | Aantal |
+|---|---|
+| `ongemeten` | **528** |
+| `bewezen` | 33 |
+| `gezakt` | **9** |
+
+De hele ledenbalie staat op `ongemeten`, met als reden *"de proef kreeg hem niet
+aan het werk (status 403)"*. Dat is de kluispoort die zijn werk doet: de proef
+komt binnen met de gedeelde kantoorcode en die komt er niet door. Exact de grens
+die `toelatingsproef.js` ook vond -- *aftekenen en beslissen eisen een naam*.
+
+**Het gevolg is scherp: de gevoeligste helft van dit huis is de minst beproefde.**
+Niet omdat iemand dat besloot, maar omdat de poort die identiteit eist en de
+proef die geen identiteit heeft, elkaar precies uitsluiten.
+
+**En er staan al negen kantoorroutes op `gezakt`**, alle negen met dezelfde zin:
+*`schrijf-verloren`: status 200 terwijl de toestand niet veranderde -- bevestigd
+en niet bewaard.*
+
+    /api/office/asset/fees              /api/office/magnaat/scan
+    /api/office/atelier/verwijder       /api/office/redactie/artikel/verwijder
+    /api/office/atelierweb/foto-weg     /api/office/studio/verwijder
+    /api/office/hardware/verwijder      /api/office/werkplaats/verwijder
+    /api/office/ideeen/verwijder
+
+**Zeven van de negen zijn verwijderroutes.** "Bevestigd en niet bewaard" betekent
+daar: een medewerker krijgt te horen dat iets weg is, en het staat er nog. Dat is
+gemeten, het staat opgeschreven, en er is niets mee gedaan -- dezelfde vorm als
+het journaal, alleen deze had al een uitslag.
+
 
 ---
 
@@ -629,6 +697,7 @@ grens die ná het belang komt is geen grens.
 
 | # | Onderdeel | Stand |
 |---|---|---|
+| **0** | **De faalproef een kantoorsessie op naam geven** -- zonder die stap is 528 van de 570 kantoorroutes onmeetbaar en is besluit 5 niet te bewijzen | **een stap weg**, en hij staat nu vooraan (par. 0.7) |
 | **1** | **Rugdekking zichtbaar maken** -- een mens moet kunnen zien dat de relatie bestaat | **een halve dag** |
 | **2** | **MN-01 + MN-02 als toets** -- geen macht- en geen informatievoordeel | **een stap weg**, en par. 0.5 zegt waar MN-02 begint |
 | **3** | **MN-03 als regel** -- vóór RTG zichzelf ooit als optie presenteert | **een stap weg** |
@@ -742,7 +811,7 @@ journaalregistratie.**
 
 | Optie | Wat het betekent | Prijs |
 |---|---|---|
-| **A. Geen aantoonbaar journaal, geen inzage** *(aanbevolen)* | Eén contract in `kern/kantoor/kluispoort.js`: eerst geregistreerd, dan pas gelezen. Lukt de registratie niet, dan gaat de deur niet open. | Eén poort, niet 42 aanroepers. Een opslagstoring legt dan de zware inzage stil -- en dat is precies wat de belofte waard maakt. |
+| **A. Geen aantoonbaar journaal, geen inzage** *(aanbevolen)* | Eén contract bij het journaal en de gevoelige leesweg: eerst duurzaam geregistreerd, dan pas gelezen. Lukt dat niet, dan komt het dossier er niet uit. | Eén plek, niet 42 aanroepers -- maar **niet** de kluispoort: die is een identiteitspoort en kent het onderwerp van de inzage niet (par. 0.7). Een opslagstoring legt dan de zware inzage stil. |
 | B. Inzage door, maar luid | De blik mag doorgaan; het mislukken wordt een incident in plaats van een lege `catch`. | Goedkoper, en "elke blik laat een spoor na" blijft dan een belofte over de bedoeling. |
 | C. Laten zoals het is | -- | Dan staat er een belofte in `ledenbalie.js` die het huis niet kan waarmaken. |
 
@@ -754,10 +823,20 @@ van `bijeen()`. Anders verschuift het probleem van een genegeerde uitzondering
 naar een valse bevestiging, en die is erger: hij ziet eruit als bewijs.
 
 Dat is bovendien **beproefbaar zonder iets nieuws te bouwen**: `schrijf-verloren`
-en `schrijf-faalt` bestaan al in `server/lib/verraad.js`, acht toetsbestanden
-gebruiken ze, en het journaal is er geen van. De toets bij dit besluit is dus
-niet "werkt de poort" maar **"weigert de poort onder `schrijf-verloren`"** -- en
-dat is precies het geval dat vandaag stil goed gaat.
+en `schrijf-faalt` bestaan al in `server/lib/verraad.js`, het duurzame primitief
+staat in `db/duurzaam.js` met een poort op zijn aanroeperslijst, en
+`FAALPROEF.json` is de klasse-meting. De toets bij dit besluit is dus niet "werkt
+de weg" maar **"weigert hij onder `schrijf-verloren`"** -- precies het geval dat
+vandaag stil goed gaat.
+
+**Maar er staat een stap vóór, en par. 0.7 meet hem: die toets kan vandaag niet
+draaien.** De proef komt binnen met de gedeelde kantoorcode, de kluispoort weigert
+die terecht, en daardoor is 528 van de 570 kantoorroutes `ongemeten`. Zolang de
+proef geen kantoorsessie **op naam** heeft, is elke uitspraak over het faalgedrag
+van de gevoelige kantoorkant niet vast te stellen -- en `niet vast te stellen` is
+in dit huis een eersteklas uitslag naast in orde en storing (`BESTUUR.md`), geen
+groen. Besluit 5 bouwen zonder die stap levert een poort op waarvan niemand kan
+laten zien dat hij weigert.
 
 A en B zijn allebei beter dan de huidige stand. De keuze gaat niet over
 veiligheid maar over beschikbaarheid: A zet de zware inzage stil bij een

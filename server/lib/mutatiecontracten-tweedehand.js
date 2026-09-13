@@ -77,6 +77,29 @@ const CONTRACTEN = {
     afgetekend: AFGETEKEND
   },
 
+  /* HET DOSSIER VAN DE GOUDEN WEG (MACHINE.md par. 5a). Een POST die LEEST: hij
+     geeft per as terug wat er gebeurde en welke verplichte as nog open staat. Hij
+     staat achter de gedeelde code en niet achter de kluis, en dat is een besluit:
+     het dossier gaat over de HANDELING en niet over een mens, en de namen erin
+     stonden al in het auditjournaal. */
+  'POST /api/office/bank/incasso/dossier': {
+    mutatieId: 'bank.incasso.dossier.lezen',
+    herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'NOT_APPLICABLE',
+    bewijs: {
+      gemeten: 'niet gemeten door de idempotentieproef: de route is nieuw. Wat er WEL over bewezen ' +
+        'is: test/geldketen.test.js toets 1 en 5 lezen het dossier twee keer en vergelijken de assen, ' +
+        'en de leeslaag (kern/kantoor/geldketen/dossier.js) schrijft nergens.',
+      op: '2026-09-13'
+    },
+    nagekeken: 'Claude (Opus 5), 2026-09-13: de handler roept `dossier(id)` of `lijst()` aan plus ' +
+      '`journaalTop`/`journaalVerifieer`. Alle vier zijn lezers; de enige schrijver van het journaal ' +
+      'is de baan zelf (klaarzetten, tekenen, uitvoeren). Twee keer lezen laat dezelfde stand achter.',
+    afgetekend: AFGETEKEND
+  },
+
   /* ---- het loket ---- */
   'POST /api/office/bank/handtekening/open': {
     mutatieId: 'bank.handtekening.lezen',

@@ -60,24 +60,24 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->4952<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->4953<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
 |---|---|---|---|
-| bewijsDraagt (proof-carrying) | 0 | <!--getal:machine.bewijsDraagt-->0<!--/getal--> | `kern/commercie/bewijstoken.js` |
-| beleid (veiligheidskern) | 0 | 0 | `kern/commercie/veiligheidskern.js` |
+| bewijsDraagt (proof-carrying) | 1 | <!--getal:machine.bewijsDraagt-->17<!--/getal--> | `kern/commercie/bewijstoken.js` |
+| beleid (veiligheidskern) | 0 | 15 | `kern/commercie/veiligheidskern.js` |
 | gevolg (wat raakt dit aan) | 0 | 0 | `kern/stuur/gevolg.js` |
 | bewijsstand (bewezen) | 0 | 0 | `VERTROUWEN.json` |
 | mandaat | 0 | <!--getal:machine.mandaat-->1<!--/getal--> | `kern/stuur/mandaat.js` |
 | atomair | 1 | 17 | `pg/verzoektransactie.js` |
 | bewijsketen (hash) | 4 | 23 | `lib/keten.js` |
 | autoriteit | 1 | 28 | `kern/commercie/rechten.js` |
-| tegenfeit | 2 | 28 | `kern/commercie/tegenfeit.js` |
+| tegenfeit | 4 | 54 | `kern/commercie/tegenfeit.js` |
 | schaduw | 3 | 29 | `kern/commercie/schaduw.js` |
-| voornemen (execution plan) | 3 | 44 | `kern/commercie/voornemen.js` |
+| voornemen (execution plan) | 3 | 59 | `kern/commercie/voornemen.js` |
 | assurance (passkey, stap-op) | 2 | 49 | `kern/identiteit/vertrouwen.js` |
-| frictie | 1 | 72 | `kern/frictie/motor.js` |
+| frictie | 2 | 98 | `kern/frictie/motor.js` |
 | simulatie | 10 | 103 | `kern/command/simulatie.js` |
 | envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->109<!--/getal--> | `kern/envelop.js` |
 | idempotentie | 13 | 114 | `lib/idem-poort.js` |
@@ -90,17 +90,29 @@ Vier assen staan als **ongemeten met een reden** en nooit als 0: doelvindbaarhei
 `KANTOORMACHT.md` par. 3), de terugweg (een naam is geen bewijs) en de kostprijs
 per handeling (hangt aan een async-context, niet aan een route).
 
+**De vierde teller, en hij gaat de andere kant op.** `volledigeKetens` staat op
+<!--getal:machine.volledigeKetens-->1<!--/getal-->. De twee tellers hieronder zijn
+SCHULDEN en mogen alleen dalen; deze is een BEZIT en mag alleen stijgen -- en dat
+is een andere vraag dan "hoeveel routes raken een motor". Een keten heet volledig
+wanneer élke as die zijn handelingsklasse verplicht stelt, werkelijk op de routes
+van die keten voorkomt, op de strengste van de twee assen. Haal er één as uit en
+de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
+`zwaar.eis` uit de incassoroute te halen.
+
 **De drie getallen die de richting bepalen:**
 
 1. <!--getal:machine.zonderAs-->2818<!--/getal--> van de
-   <!--getal:machine.muterend-->4952<!--/getal--> muterende routes raken **geen
+   <!--getal:machine.muterend-->4953<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 2. De hoogst geïntegreerde handeling buiten de hubs raakt **drie** assen
    (`/api/bank/rekening/open`, `/api/office/boardroom`,
    `/api/office/commercie/zaakabonnement/zet`). Er is geen enkele handeling in
    dit huis die de keten heeft gelopen.
-3. <!--getal:machine.motorenZonderRoute-->3<!--/getal--> motoren bereiken geen
-   enkele route: het bewijstoken, de veiligheidskern en de gevolgmeting.
+3. <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motor bereikt geen enkele
+   route op de route-as: de **gevolgmeting**. Hij wordt wél aangeroepen -- de
+   gouden keten van par. 5a doet het bij elke aanvraag -- maar via de kern-tas, en
+   die is voor de route-as per constructie onzichtbaar. Vóór die keten waren het er
+   drie (bewijstoken, veiligheidskern, gevolgmeting).
 
 Dat is de meetkundige vorm van de stelling: **niet te weinig motoren, te weinig
 handelingen die erlangs gaan.** De prijs van de sprong is dus bedrading en geen
@@ -200,7 +212,7 @@ betekenissen).
 |---|---|---|
 | execution plan | `kern/commercie/voornemen.js` | één echte aanroeper: vandaag alleen het boardroomscherm |
 | proof-carrying auth | `kern/commercie/bewijstoken.js` | een inlever-plek: het token wordt uitgegeven en nergens verzilverd |
-| tegenfeit | `kern/commercie/tegenfeit.js` | 28 routes op de ruime as, 2 in een handler |
+| tegenfeit | `kern/commercie/tegenfeit.js` | 4 handlers, waarvan de gouden keten er een is |
 | machtskaart | `kern/commercie/rechten.js` | leest alleen, en niemand leest hém |
 | frictie (hand/assist/auto) | `kern/frictie/` | 0 lid- of zaakroutes: hij draait alleen in de ops-cockpit |
 | gebeurtenisenvelop | `kern/envelop.js` | één requirer (`bus.js`); 95 bestanden melden buiten de bus om |
@@ -292,6 +304,83 @@ betekenissen).
 
 ---
 
+## 5a. De eerste keten die rond is: de incassoronde
+
+`/api/office/bank/incasso` → `/api/office/bank/handtekening/bevestig` →
+`/api/office/bank/incasso/dossier`. Zestien verplichte assen voor haar klasse,
+alle zestien gelopen -- en in een echte HTTP-proef met twee kantoormensen op naam
+**verplaatst er werkelijk geld** door de hele baan
+(`test/tweedehandtekening.test.js` toets 6). De baan staat in `kern/kantoor/geldketen.js` en is geen
+zeventiende motor: zij is de ORDE waarin de bestaande zestien elkaar raken, met
+per as een uitslag, een graad en een reden.
+
+**Waarom deze handeling.** Zij had de twee duurste stukken al -- een deur die een
+NAAM eist (`kluisAuth`) en een TWEEDE MENS
+(`kern/kantoor/tweedehandtekening.js`) -- en zij beweegt echt geld. Wat eromheen
+ontbrak is nu aangesloten: assurance (passkey), mandaat, streefstand, het
+voornemen met zijn besluit en bewijstoken, het tegenfeit, de frictie, de envelop,
+de hashketen en het gemeten gevolg.
+
+**Twee handelingsklassen, en het verschil is precies één as.** Voor
+`geld-eenmalig` is `atomair` verplicht; voor `geld-reeks` is het dat met opzet
+NIET, want alles-of-niets is daar de verkéérde garantie: dat één lid te weinig
+saldo heeft, mag de inning bij de andere negenennegentig niet tegenhouden. In de
+plaats komt `hervatbaar`. Elke as die de ene klasse eist en de andere niet, draagt
+een uitgeschreven reden -- een toets zakt zodra er één ontbreekt.
+
+**Zes dingen die het bouwen blootlegde, en geen ervan zag een bestaande toets.**
+
+1. **De beslislaag was nooit gemount.** `kern/commercie/besluit.js` is compleet,
+   maar `zoekBevoegdheid` werd nergens gevuld en `kern.beslis` bestond niet --
+   dus de keuring van een voornemen kwam nooit tot een besluit. De hele
+   commercie-kluster stond op een ontbrekende invoer.
+2. **En dat gat was erger dan leeg.** De keuring krijgt
+   `beslis: (vraag) => (kern.beslis ? kern.beslis(vraag) : null)`. Die wrapper is
+   altijd een functie, dus de controle `if (!beslis) return 503` sloeg nooit aan:
+   hij werd aangeroepen, gaf `null`, en de volgende regel las `uitkomst` uit null.
+   Een TypeError op exact de plek waar de laag een nette 503 belooft. Nu valt het
+   dicht zoals beloofd.
+3. **De frictie-as was stil leeg.** De bedrading gaf de MODULE mee
+   (`require('../kern/frictie')`) in plaats van een motor; een module heeft geen
+   `beoordeel`, dus de as stond op `onbekend` zonder dat iets klaagde. De motor
+   komt nu lui binnen, want hij kan niet bestaan voordat kern/command zijn
+   beleidsregister heeft gebouwd.
+4. **De graad van een as en de graad van een getal zijn twee dingen.** Eerst stond
+   de graad van het tegenfeit op de as, en daarmee was de keten onhaalbaar
+   gemaakt: een vooruitblik op een incassoronde is per definitie een bovengrens
+   (`vermoed`). De as gaat over de vraag of er vooraf is uitgerekend wat de
+   handeling zou doen; hoe hard dat getal is, staat ernaast.
+
+5. **Een herhaalde aanvraag struikelde over zijn eigen idempotentie.** Dezelfde
+   grens geeft hetzelfde voornemen terug (dat is de economische sleutel), en dat
+   voornemen ging vervolgens opnieuw langs de keuring -- die terecht 409 gaf. Een
+   tweede klik kreeg dus een fout terwijl er niets mis was. Gevonden door de
+   e2e-proef, niet door een unittoets.
+6. **En de zwaarste: `uitvoering` stond niet in de verplichte assen.** De
+   e2e-proef liet de uitvoering buiten de keten om lopen (de incassoronde
+   rechtstreeks aanroepen in plaats van via `voornemen.voerUit`) en **geen enkele
+   toets zakte**: het geld bewoog, het dossier zag er rond uit, want alle vijftien
+   assen gingen over het KLAARZETTEN. Een keten die alleen zijn voorbereiding
+   eist, bewijst niets over de handeling zelf. Er is nu een zestiende as, en
+   dezelfde mutatie zakt wel.
+
+**Wat de proef wél en niet bewijst.** Wél: twee mensen op naam, een echte
+incassoronde, 100 cent die aantoonbaar van de ene rekening naar de andere gaat,
+een dossier dat per as zegt wat er gebeurde, en een hashketen die zichzelf
+verifieert. En het dossier is eerlijker dan prettig: deze medewerkers hebben geen
+passkey, dus `kern/zwaarbewijs.js` laat de handeling DOOR op de terugval en de as
+`assurance` blijft op `vermoed` staan -- de keten is gelopen, het geld is
+verplaatst, en de keten heet **niet rond**, met de naam van die ene as erbij. Wie
+die toets groen wil hebben, geeft de medewerker een passkey; wie hem groen maakt
+door `vermoed` te laten meetellen, sloopt het verschil tussen een as die gelopen
+is en een as die aanwezig lijkt.
+
+Niet bewezen: dat de `VOLLEDIGE_KETENS`-teller iets over het GEDRAG zegt. Hij
+meet de bedrading (staat de as op de route), de toets meet het gedrag (doet de as
+iets). Die twee worden niet opgeteld.
+
+---
+
 ## 6. De volgorde
 
 De eerste drie kosten samen dagen, niet maanden, en ze bewegen alle drie een
@@ -300,9 +389,9 @@ getal uit par. 1:
 1. **Kluispoort op de dertien zware kantoorpaden en de vier zware lezende.** De
    poort bestaat; dit is bedrading, en het haalt de anoniem-uitvoerbare as omlaag
    waar hij het meest kost.
-2. **Eén echte aanroeper voor het voornemen**, op een meerstapsgeldweg. De laag
-   is af, getoetst en heeft vijf harde regels; wat ontbreekt is de eerste klant.
-   Daarmee krijgt ook het bewijstoken zijn eerste inlever-plek.
+2. ~~**Eén echte aanroeper voor het voornemen**~~ — **gedaan** (par. 5a): de
+   incassoronde loopt de hele baan, en het bewijstoken heeft daarmee zijn eerste
+   inlever-plek.
 3. **De envelop op de kantoormutaties.** `kern/envelop.js` staat, de keten loopt
    vanzelf door, en dit is de auditketen die `KANTOORMACHT.md` al aanwijst.
 

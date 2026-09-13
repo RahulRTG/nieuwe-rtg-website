@@ -3,8 +3,8 @@
  "uitleg": "Per handeling: hoeveel van de eigen machinerie raakt hij? Zestien motoren die ieder apart gemeten zijn, hier voor het eerst naast elkaar op DEZELFDE route.",
  "grens": "Twee assen die verschillende dingen missen, nooit opgeteld: `handler` is lexicaal binnen de tekst van de handler (mist een hulpfunctie en de kern-tas) en `bestand` rekent het routebestand plus zijn DIRECTE requires (vangt de hulpfunctie, markeert alle routes in een bestand, mist nog steeds de kern-tas). De tas zit met opzet niet in de route-as: een hub als server.js zette zo 4162 routes op \"idempotent\". Woont een route ZELF in een hub, dan vervalt de bestandsas (bestandsasOnbruikbaar) en is ook zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. De assen uit EXECUTION_MAP.json zijn gelezen en niet hier geteld.",
  "stempel": {
-  "op": "2026-09-13T00:13:57.652Z",
-  "commit": "23a3ac37",
+  "op": "2026-09-13T01:00:29.525Z",
+  "commit": "f9e1213f",
   "node": "v22.22.2"
  },
  "bronnen": {
@@ -209,8 +209,8 @@
   }
  },
  "gemeten": {
-  "routes": 5041,
-  "muterend": 4952,
+  "routes": 5042,
+  "muterend": 4953,
   "assen": 19,
   "perAs": {
    "mensAanDeDeur": {
@@ -231,19 +231,19 @@
    },
    "bewijsDraagt": {
     "handler": 0,
-    "bestand": 0
+    "bestand": 17
    },
    "voornemen": {
-    "handler": 3,
-    "bestand": 44
+    "handler": 4,
+    "bestand": 61
    },
    "beleid": {
     "handler": 0,
-    "bestand": 0
+    "bestand": 15
    },
    "tegenfeit": {
-    "handler": 2,
-    "bestand": 28
+    "handler": 3,
+    "bestand": 45
    },
    "simulatie": {
     "handler": 10,
@@ -251,7 +251,7 @@
    },
    "frictie": {
     "handler": 1,
-    "bestand": 72
+    "bestand": 89
    },
    "envelop": {
     "handler": 2,
@@ -326,9 +326,11 @@
     "motor": "mandaat",
     "bron": "server/kern/stuur/mandaat.js",
     "bestaat": true,
-    "moduleLezers": 1,
+    "moduleLezers": 3,
     "zakLezers": 0,
     "lezers": [
+     "server/kern/kantoor/geldketen/klaarzet.js",
+     "server/kern/kantoor/geldketen.js",
      "server/kern/stuur/plafond.js"
     ],
     "routesHandler": 0,
@@ -356,7 +358,7 @@
     "zakLezers": 0,
     "lezers": [],
     "routesHandler": 0,
-    "routesBestand": 0,
+    "routesBestand": 17,
     "tokens": 2,
     "graad": "vermoed"
    },
@@ -367,8 +369,8 @@
     "moduleLezers": 0,
     "zakLezers": 0,
     "lezers": [],
-    "routesHandler": 3,
-    "routesBestand": 44,
+    "routesHandler": 4,
+    "routesBestand": 61,
     "tokens": 3,
     "graad": "vermoed"
    },
@@ -380,7 +382,7 @@
     "zakLezers": 0,
     "lezers": [],
     "routesHandler": 0,
-    "routesBestand": 0,
+    "routesBestand": 15,
     "tokens": 1,
     "graad": "vermoed"
    },
@@ -393,8 +395,8 @@
     "lezers": [
      "server/routes/kantoren/geld/commercie.js"
     ],
-    "routesHandler": 2,
-    "routesBestand": 28,
+    "routesHandler": 3,
+    "routesBestand": 45,
     "tokens": 1,
     "graad": "vermoed"
    },
@@ -422,7 +424,7 @@
      "server/kern/frictie/index.js"
     ],
     "routesHandler": 1,
-    "routesBestand": 72,
+    "routesBestand": 89,
     "tokens": 2,
     "graad": "vermoed"
    },
@@ -430,10 +432,13 @@
     "motor": "envelop",
     "bron": "server/kern/envelop.js",
     "bestaat": true,
-    "moduleLezers": 1,
+    "moduleLezers": 4,
     "zakLezers": 0,
     "lezers": [
-     "server/bus.js"
+     "server/bus.js",
+     "server/kern/kantoor/geldketen/klaarzet.js",
+     "server/kern/kantoor/geldketen/weging.js",
+     "server/kern/kantoor/geldketen.js"
     ],
     "routesHandler": 2,
     "routesBestand": 109,
@@ -470,10 +475,12 @@
     "motor": "bewijsketen",
     "bron": "server/lib/keten.js",
     "bestaat": true,
-    "moduleLezers": 6,
+    "moduleLezers": 8,
     "zakLezers": 0,
     "lezers": [
      "server/inzagelog.js",
+     "server/kern/kantoor/geldketen/boeken.js",
+     "server/kern/kantoor/geldketen.js",
      "server/kern/lidboard/journaal.js",
      "server/kern/livinglab/opslag.js",
      "server/lib/handelingsspoor.js",
@@ -489,9 +496,11 @@
     "motor": "gevolg",
     "bron": "server/kern/stuur/gevolg.js",
     "bestaat": true,
-    "moduleLezers": 1,
+    "moduleLezers": 3,
     "zakLezers": 0,
     "lezers": [
+     "server/kern/kantoor/geldketen/klaarzet.js",
+     "server/kern/kantoor/geldketen.js",
      "server/kern/stuur/lusstap.js"
     ],
     "routesHandler": 0,
@@ -514,11 +523,48 @@
     "graad": "vermoed"
    }
   ],
-  "motorenZonderRouteBereik": 3,
+  "motorenZonderRouteBereik": 1,
   "motorenZonderRouteBereikNamen": [
-   "bewijsDraagt",
-   "beleid",
    "gevolg"
+  ],
+  "volledigeKetens": 1,
+  "ketens": [
+   {
+    "naam": "incassoronde",
+    "klasse": "geld-reeks",
+    "handeling": "GELD_INNEN",
+    "routes": [
+     "/api/office/bank/incasso",
+     "/api/office/bank/handtekening/bevestig",
+     "/api/office/bank/incasso/dossier"
+    ],
+    "routesBestaan": 3,
+    "routesGeteld": 3,
+    "verplicht": 16,
+    "gevonden": {
+     "mensbewijs": "/api/office/bank/incasso",
+     "assurance": "/api/office/bank/incasso",
+     "mandaat": "/api/office/bank/incasso",
+     "streefstand": "/api/office/bank/incasso",
+     "voornemen": "/api/office/bank/incasso",
+     "autoriteit": "/api/office/bank/incasso",
+     "tegenfeit": "/api/office/bank/incasso",
+     "bewijsDraagt": "/api/office/bank/incasso",
+     "frictie": "/api/office/bank/incasso",
+     "tweedeMens": "/api/office/bank/incasso",
+     "idempotentie": "/api/office/bank/incasso",
+     "hervatbaar": "/api/office/bank/incasso",
+     "envelop": "/api/office/bank/incasso",
+     "bewijsketen": "/api/office/bank/incasso",
+     "gevolg": "/api/office/bank/incasso",
+     "uitvoering": "/api/office/bank/incasso"
+    },
+    "open": [],
+    "volledig": true,
+    "waaromNiet": {
+     "atomair": "alles-of-niets is hier de VERKEERDE garantie: een incassoronde int bij honderd leden van honderd eigen rekeningen, en dat een van hen te weinig saldo heeft mag de inning bij de andere negenennegentig niet tegenhouden. Wat er in de plaats komt is `hervatbaar`: elke post draagt zijn eigen sleutel en een mislukte post blijft staan in plaats van de ronde om te gooien."
+    }
+   }
   ],
   "mutatiesZonderEnigeAs": 2818,
   "mutatiesZonderHandlerSpan": 0,
@@ -537,7 +583,7 @@
   "assenPerMutatie": [
    {
     "assen": 0,
-    "routes": 2995
+    "routes": 2996
    },
    {
     "assen": 1,
@@ -545,7 +591,7 @@
    },
    {
     "assen": 2,
-    "routes": 140
+    "routes": 139
    },
    {
     "assen": 3,
@@ -553,7 +599,7 @@
    },
    {
     "assen": 4,
-    "routes": 1
+    "routes": 2
    }
   ]
  },
@@ -18691,6 +18737,11 @@
     "herhaling"
    ],
    "boven": [
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie",
     "envelop",
     "herhaling"
    ]
@@ -18716,6 +18767,11 @@
    ],
    "boven": [
     "mensAanDeDeur",
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie",
     "envelop",
     "herhaling"
    ]
@@ -18729,6 +18785,11 @@
    ],
    "boven": [
     "mensAanDeDeur",
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie",
     "envelop"
    ]
   },
@@ -18753,6 +18814,11 @@
    ],
    "boven": [
     "mensAanDeDeur",
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie",
     "envelop",
     "herhaling"
    ]
@@ -18765,6 +18831,11 @@
     "herhaling"
    ],
    "boven": [
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie",
     "envelop",
     "herhaling"
    ]
@@ -18777,7 +18848,12 @@
     "mensAanDeDeur"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie"
    ]
   },
   {
@@ -18788,7 +18864,12 @@
     "mensAanDeDeur"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie"
    ]
   },
   {
@@ -18801,6 +18882,11 @@
    ],
    "boven": [
     "mensAanDeDeur",
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie",
     "herhaling"
    ]
   },
@@ -18812,6 +18898,11 @@
     "herhaling"
    ],
    "boven": [
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie",
     "envelop",
     "herhaling"
    ]
@@ -18819,14 +18910,32 @@
   {
    "methode": "POST",
    "pad": "/api/office/bank/incasso",
-   "bestand": "server/routes/kantoren/bank-rekeningen.js",
+   "bestand": "server/routes/kantoren/bank-incasso.js",
    "onder": [
     "mensAanDeDeur",
+    "voornemen",
+    "tegenfeit",
     "herhaling"
    ],
    "boven": [
     "mensAanDeDeur",
+    "bewijsDraagt",
+    "voornemen",
+    "tegenfeit",
+    "frictie",
     "herhaling"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/incasso/dossier",
+   "bestand": "server/routes/kantoren/bank-incasso.js",
+   "onder": [],
+   "boven": [
+    "bewijsDraagt",
+    "voornemen",
+    "tegenfeit",
+    "frictie"
    ]
   },
   {
@@ -18837,6 +18946,11 @@
     "herhaling"
    ],
    "boven": [
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie",
     "envelop",
     "herhaling"
    ]
@@ -18871,6 +18985,11 @@
     "herhaling"
    ],
    "boven": [
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie",
     "envelop",
     "herhaling"
    ]
@@ -18883,6 +19002,11 @@
     "herhaling"
    ],
    "boven": [
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie",
     "envelop",
     "herhaling"
    ]
@@ -18896,6 +19020,11 @@
    ],
    "boven": [
     "mensAanDeDeur",
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie",
     "envelop"
    ]
   },
@@ -18907,6 +19036,11 @@
     "herhaling"
    ],
    "boven": [
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie",
     "envelop",
     "herhaling"
    ]
@@ -18950,6 +19084,11 @@
    ],
    "boven": [
     "mensAanDeDeur",
+    "bewijsDraagt",
+    "voornemen",
+    "beleid",
+    "tegenfeit",
+    "frictie",
     "envelop",
     "herhaling"
    ]

@@ -88,6 +88,13 @@ const crypto = require('crypto');
 const { execFileSync } = require('child_process');
 const { alleRoutes } = require('./lib/routes.js');
 const { EIST_MENS } = require('./kantoormacht.js');
+/* DE DEFINITIE VAN EEN VOLLEDIGE KETEN KOMT UIT DE CODE EN NIET UIT DEZE METER.
+   server/kern/kantoor/geldketen.js bezit de handelingsklassen (welke assen zijn
+   verplicht, en waarom een as die NIET verplicht is dat niet is) en de declaratie
+   van welke handelingen de baan werkelijk lopen. Een meter die zelf mag bepalen
+   wanneer hij tevreden is, meet zijn eigen tevredenheid -- dezelfde regel als
+   scripts/getallen.js: de bron is altijd het register, nooit een berekening hier. */
+const { KLASSEN, KETENS } = require('../server/kern/kantoor/geldketen.js');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'MACHINEDEKKING.json');
@@ -196,6 +203,36 @@ const UIT_EXECUTIONMAP = {
     raakt: v => v === 'bewezen', graad: 'gemeten' },
   herhaling: { wat: 'wat een tweede identieke aanroep doet', veld: 'herhaling',
     raakt: v => v === 'beschermd', graad: 'gemeten' },
+};
+
+/* ---------------------------------------------------------------------------
+   DE KETENASSEN -- de assen die een BAAN heeft en een losse route niet.
+
+   Een geldhandeling loopt over drie menselijke stappen en dus over drie routes.
+   Vijf assen van zo'n baan zijn daarom per constructie niet op een enkele handler
+   te vinden: ze gaan over de baan. Ze staan hier met hun woord, zodat de
+   ketendekking hieronder dezelfde namen gebruikt als het dossier in
+   kern/kantoor/geldketen.js -- twee lijsten met dezelfde bedoeling en andere
+   woorden is de botsing die SEMANTIEK.json meet.
+   ------------------------------------------------------------------------- */
+const KETENAS_TOKENS = {
+  streefstand: ['streefstand'],
+  tweedeMens: ['tweedeHand', 'tweedehandtekening', 'tweedeMens'],
+  hervatbaar: ['uitvoerbelofte', 'hervatbaar'],
+  autoriteit: ['geldketen', 'commercie/besluit', 'commercieRechten'],
+  bewijsDraagt: ['geldketen', 'bewijstoken'],
+  voornemen: ['geldketen', 'commercie/voornemen', 'voornemens.'],
+  mandaat: ['geldketen', 'stuur/mandaat', 'speelruimte', 'magZelfstandig'],
+  tegenfeit: ['geldketen', 'tegenfeit', 'vooruitblik'],
+  assurance: ['zwaarbewijs', 'zwaarBeveiliging', 'zwaar.eis'],
+  envelop: ['geldketen', 'kern/envelop', 'envelopWie'],
+  bewijsketen: ['geldketen', 'lib/keten', 'ketenAnker'],
+  gevolg: ['geldketen', 'stuur/gevolg'],
+  frictie: ['geldketen', 'frictie'],
+  idempotentie: ['geldketen', 'idem', 'sleutel'],
+  atomair: ['verzoektransactie', 'collectietransactie', 'metTransactie'],
+  mensbewijs: ['kluisAuth', 'naamAuth', 'boardroomAuth'],
+  uitvoering: ['geldketen', 'ketenlaag.uitvoer', 'voerUit'],
 };
 
 /* Wat deze meter NIET kan meten, met de reden -- nooit als 0. */
@@ -413,6 +450,59 @@ function meet() {
     }
   }
 
+  /* ------------------------------------------------------------------------
+     VOLLEDIGE KETENS -- de enige teller hier die alleen mag STIJGEN.
+
+     De twee andere tellers zijn schulden (ze mogen alleen dalen); deze is een
+     BEZIT. Hij zegt of dit huis van losse integraties naar samengestelde
+     uitvoering beweegt, en dat is een andere vraag dan "hoeveel routes raken een
+     motor".
+
+     DE DEFINITIE IS STRENG, en dat is de hele waarde: een keten heet volledig
+     wanneer ELKE as die zijn handelingsklasse verplicht stelt, ergens op de
+     routes van die keten werkelijk voorkomt -- op de HANDLERAS, de strengste van
+     de twee. Aanwezigheid in een bestand telt hier niet mee, want dat is precies
+     de verwarring die deze meter twee keer over zichzelf heeft ontdekt (een hub
+     in de tas en een hub als routebestand).
+
+     WAT HIJ NIET BEWIJST: dat de as bij de UITVOERING ook werkelijk iets deed.
+     Dat is wat test/geldketen.test.js beproeft, met een mutatie per grendel. Deze
+     meter ziet de bedrading; die toets ziet het gedrag. Twee dingen, en ze worden
+     niet opgeteld.
+     ---------------------------------------------------------------------- */
+  const perPad = new Map();
+  for (const r of routes) {
+    if (!perPad.has(r.pad)) perPad.set(r.pad, []);
+    perPad.get(r.pad).push(r);
+  }
+  const ketens = [];
+  for (const k of KETENS) {
+    const klasse = KLASSEN[k.klasse];
+    const open = [], gevonden = {};
+    const bestaat = k.routes.filter(p => perPad.has(p));
+    for (const as of (klasse ? klasse.verplicht : [])) {
+      const tokens = KETENAS_TOKENS[as] || [];
+      let waar = null;
+      for (const pad of k.routes) {
+        for (const r of (perPad.get(pad) || [])) {
+          const tekst = span.get(r) || '';
+          if (tokens.some(tok => tekst.includes(tok))) { waar = pad; break; }
+        }
+        if (waar) break;
+      }
+      if (waar) gevonden[as] = waar; else open.push(as);
+    }
+    ketens.push({
+      naam: k.naam, klasse: k.klasse, handeling: k.handeling,
+      routes: k.routes, routesBestaan: bestaat.length, routesGeteld: k.routes.length,
+      verplicht: klasse ? klasse.verplicht.length : 0,
+      gevonden, open,
+      volledig: !!klasse && open.length === 0 && bestaat.length === k.routes.length,
+      waaromNiet: klasse ? klasse.waaromNiet : {},
+    });
+  }
+  const volledig = ketens.filter(k => k.volledig).length;
+
   /* HOEVEEL BEREIKT EEN MOTOR? Dit is de onderbenut-vraag van de vorige ronde,
      en hier staat hij op de as waarop hij hard is: MODULES. `moduleLezers` telt
      de bestanden die de bron rechtstreeks requiren, `zakLezers` de bestanden die
@@ -464,6 +554,8 @@ function meet() {
       motoren,
       motorenZonderRouteBereik: zonderBereik.length,
       motorenZonderRouteBereikNamen: zonderBereik,
+      volledigeKetens: volledig,
+      ketens,
       mutatiesZonderEnigeAs: zonderEnigeAs,
       mutatiesZonderHandlerSpan: geenSpan,
       bestandsasOnbruikbaar: hubRoutes,
@@ -488,6 +580,14 @@ function toon(u) {
     const kleur = v.bestand === 0 ? K.rood : v.handler === 0 ? K.geel : '';
     console.log('    ' + kleur + naam.padEnd(18) + String(v.handler).padStart(8) + String(v.bestand).padStart(22) +
       (v.uitKaart ? K.grijs + '   uit EXECUTION_MAP' : '') + K.reset);
+  }
+  console.log('\n  VOLLEDIGE KETENS (mag alleen stijgen): ' +
+    (g.volledigeKetens ? K.groen : K.rood) + g.volledigeKetens + K.reset + ' van ' + g.ketens.length + ' verklaard');
+  for (const k of g.ketens) {
+    console.log('    ' + (k.volledig ? K.groen + 'rond   ' : K.geel + 'open   ') + K.reset +
+      k.naam.padEnd(16) + K.grijs + k.klasse + ' -- ' + Object.keys(k.gevonden).length + ' van ' +
+      k.verplicht + ' verplichte assen op ' + k.routesBestaan + '/' + k.routesGeteld + ' routes' + K.reset);
+    if (k.open.length) console.log('           open: ' + k.open.join(', '));
   }
   console.log('\n  muterende routes die GEEN ENKELE as raken (bovengrens): ' +
     (g.mutatiesZonderEnigeAs ? K.rood : K.groen) + g.mutatiesZonderEnigeAs + K.reset +
@@ -540,6 +640,18 @@ function main() {
     try { oud = JSON.parse(fs.readFileSync(DOEL, 'utf8')); }
     catch (e) { console.error('GEZAKT: MACHINEDEKKING.json ontbreekt. Draai eerst --vastleggen.'); process.exitCode = 1; return; }
     let gezakt = false;
+    /* DEZE TELLER GAAT DE ANDERE KANT OP. `volledigeKetens` is een bezit en geen
+       schuld: hij mag alleen STIJGEN. Dat is geen spiegelbeeld van de twee
+       hieronder maar een ander soort bewaking -- de twee schulden zeggen hoeveel
+       er nog buiten de machine om gaat, deze zegt of er werkelijk iets IN de
+       machine is komen te liggen. */
+    const wasK = oud.gemeten.volledigeKetens, nuK = u.gemeten.volledigeKetens;
+    if (typeof wasK === 'number' && nuK < wasK) {
+      console.error(K.rood + 'GEZAKT: volledigeKetens ' + wasK + ' -> ' + nuK +
+        '. Deze teller mag alleen stijgen: een keten die rond was, hoort niet stil open te gaan staan.' + K.reset);
+      gezakt = true;
+    } else if (typeof wasK === 'number') console.log('  in orde: volledigeKetens ' + nuK + ' (was ' + wasK + ')');
+
     for (const veld of ['mutatiesZonderEnigeAs', 'motorenZonderRouteBereik']) {
       const was = oud.gemeten[veld], nu = u.gemeten[veld];
       if (typeof was !== 'number') continue;

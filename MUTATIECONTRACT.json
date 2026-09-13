@@ -1,27 +1,28 @@
 {
  "stempel": {
-  "op": "2026-09-12T19:25:52.352Z",
-  "commit": "99daf7b7",
-  "boomVuil": false,
-  "boomAnders": 9,
+  "op": "2026-09-13T01:00:33.801Z",
+  "commit": "f9e1213f",
+  "boomVuil": true,
+  "boomAnders": 10,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4922,
-  "geclassificeerd": 4922,
+  "totaal": 4923,
+  "geclassificeerd": 4876,
   "perStand": {
-   "BLOCKED_BY_TEST_FIXTURE": 3233,
-   "NOT_APPLICABLE": 1150,
+   "BLOCKED_BY_TEST_FIXTURE": 3186,
+   "NOT_APPLICABLE": 1151,
    "PROTECTED": 414,
-   "INTENTIONALLY_NON_IDEMPOTENT": 125
+   "INTENTIONALLY_NON_IDEMPOTENT": 125,
+   "LEGACY_PENDING_CLASSIFICATION": 47
   },
-  "vastgesteldDoorMens": 1733,
-  "afgeleidDoorScript": 3189,
+  "vastgesteldDoorMens": 1734,
+  "afgeleidDoorScript": 3142,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4061,
+   "AUTHENTICATED": 4062,
    "PUBLIC": 123,
    "OBJECT_SCOPED": 718,
    "(niet af te leiden -- vraagt een verklaring)": 4,
@@ -32,9 +33,12 @@
    "kale ronde: beschermd": 132,
    "kale ronde: onbeschermd": 97,
    "kale ronde: geen uitspraak": 4683,
-   "niet gemeten": 10
+   "niet gemeten": 11
   },
-  "voorstellen": {},
+  "voorstellen": {
+   "NOT_APPLICABLE": 37,
+   "PROTECTED": 2
+  },
   "metingVan": "2026-09-12T18:47:56.456Z"
  },
  "tegenspraken": [
@@ -19966,14 +19970,12 @@
   {
    "mutatieId": "foundation.kosten",
    "route": "POST /api/foundation/kosten",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -19983,10 +19985,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "foundation.les.join",
@@ -20773,14 +20775,12 @@
   {
    "mutatieId": "foundation.school.aanwezigheid.leerling",
    "route": "POST /api/foundation/school/aanwezigheid/leerling",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -20790,10 +20790,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "foundation.school.aanwezigheid.zet",
@@ -20973,14 +20973,12 @@
   {
    "mutatieId": "foundation.school.belasting.mij",
    "route": "POST /api/foundation/school/belasting/mij",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -20990,10 +20988,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "foundation.school.bericht.controleer",
@@ -21673,14 +21671,12 @@
   {
    "mutatieId": "foundation.school.dossier",
    "route": "POST /api/foundation/school/dossier",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -21690,22 +21686,20 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "foundation.school.dossier.contact",
    "route": "POST /api/foundation/school/dossier/contact",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -21715,10 +21709,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "foundation.school.excursie.gps",
@@ -22248,14 +22242,12 @@
   {
    "mutatieId": "foundation.school.hr.uren",
    "route": "POST /api/foundation/school/hr/uren",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -22265,10 +22257,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "foundation.school.hr.verlof.besluit",
@@ -23123,14 +23115,12 @@
   {
    "mutatieId": "foundation.school.leerling.overstap",
    "route": "POST /api/foundation/school/leerling/overstap",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -23140,10 +23130,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "foundation.school.leerling.uitschrijf",
@@ -23173,14 +23163,12 @@
   {
    "mutatieId": "foundation.school.leraar.klas.maak",
    "route": "POST /api/foundation/school/leraar/klas/maak",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -23190,22 +23178,20 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "foundation.school.leraar.overzicht",
    "route": "POST /api/foundation/school/leraar/overzicht",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -23215,10 +23201,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "foundation.school.les.concept",
@@ -23523,14 +23509,12 @@
   {
    "mutatieId": "foundation.school.mijn-rechten",
    "route": "POST /api/foundation/school/mijn-rechten",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -23540,10 +23524,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "foundation.school.nieuwsbrief",
@@ -24023,14 +24007,12 @@
   {
    "mutatieId": "foundation.school.peiling.mijn-personeel",
    "route": "POST /api/foundation/school/peiling/mijn-personeel",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -24040,10 +24022,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "foundation.school.peiling.sluit",
@@ -24198,14 +24180,12 @@
   {
    "mutatieId": "foundation.school.personeel.mail.inbox",
    "route": "POST /api/foundation/school/personeel/mail/inbox",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -24215,10 +24195,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "foundation.school.personeel.mail.lees",
@@ -24248,14 +24228,12 @@
   {
    "mutatieId": "foundation.school.personeel.mail.overzicht",
    "route": "POST /api/foundation/school/personeel/mail/overzicht",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -24265,10 +24243,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "foundation.school.personeel.mail.stuur",
@@ -24298,14 +24276,12 @@
   {
    "mutatieId": "foundation.school.personeel.mail.verzonden",
    "route": "POST /api/foundation/school/personeel/mail/verzonden",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -24315,10 +24291,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "foundation.school.personeel.rollen",
@@ -24348,14 +24324,12 @@
   {
    "mutatieId": "foundation.school.personeel.start",
    "route": "POST /api/foundation/school/personeel/start",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -24365,22 +24339,20 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "foundation.school.personeel.status",
    "route": "POST /api/foundation/school/personeel/status",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -24390,10 +24362,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "foundation.school.personeel.toegang.intrek",
@@ -24773,14 +24745,12 @@
   {
    "mutatieId": "foundation.school.rooster.zet",
    "route": "POST /api/foundation/school/rooster/zet",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: klasCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -24790,10 +24760,10 @@
     "grond": "opslag",
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "PROTECTED",
+   "voorstelGrond": "kale ronde (opslag): het verschil zat in wacht. NA TE KIJKEN: is dat werk van deze route, of een rem/meter die alleen de eerste keer aansloeg? In dat laatste geval is de juiste stand NOT_APPLICABLE en niet PROTECTED."
   },
   {
    "mutatieId": "foundation.school.school.activeren",
@@ -26048,14 +26018,12 @@
   {
    "mutatieId": "foundation.school.zorg.zet",
    "route": "POST /api/foundation/school/zorg/zet",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "OBJECT_SCOPED",
     "uitHandler": "object: schoolCode",
-    "bedoeld": "OBJECT_SCOPED",
+    "bedoeld": null,
     "bewakers": []
    },
    "bewijs": {
@@ -26065,10 +26033,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "foundation.schrift.opslaan",
@@ -27712,14 +27680,12 @@
   {
    "mutatieId": "gemeente.afspraken",
    "route": "POST /api/gemeente/afspraken",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth",
      "gem"
@@ -27732,10 +27698,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "gemeente.afspraken.mijn",
@@ -27794,14 +27760,12 @@
   {
    "mutatieId": "gemeente.bekendmaking",
    "route": "POST /api/gemeente/bekendmaking",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth",
      "gem"
@@ -27814,10 +27778,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "gemeente.bekendmakingen",
@@ -28039,14 +28003,12 @@
   {
    "mutatieId": "gemeente.meldingen",
    "route": "POST /api/gemeente/meldingen",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth",
      "gem"
@@ -28059,10 +28021,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "gemeente.meldingen.mijn",
@@ -28094,14 +28056,12 @@
   {
    "mutatieId": "gemeente.regie",
    "route": "POST /api/gemeente/regie",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth",
      "gem"
@@ -28114,22 +28074,20 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "gemeente.triage",
    "route": "POST /api/gemeente/triage",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth",
      "gem"
@@ -28142,10 +28100,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "gemeente.vergunning",
@@ -28205,14 +28163,12 @@
   {
    "mutatieId": "gemeente.vergunningen",
    "route": "POST /api/gemeente/vergunningen",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth",
      "gem"
@@ -28225,10 +28181,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "gemeente.vergunningen.mijn",
@@ -31619,14 +31575,12 @@
   {
    "mutatieId": "kosten.grens",
    "route": "POST /api/kosten/grens",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -31638,10 +31592,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "kosten.grens.zet",
@@ -31700,14 +31654,12 @@
   {
    "mutatieId": "kosten.mij",
    "route": "POST /api/kosten/mij",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -31719,10 +31671,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "kosten.vooruitblik",
@@ -33315,14 +33267,12 @@
   {
    "mutatieId": "lab2.ledger.studie",
    "route": "POST /api/lab2/ledger/studie",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "officeAuth"
     ]
@@ -33334,10 +33284,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "lab2.mens.bij",
@@ -36297,14 +36247,12 @@
   {
    "mutatieId": "lucht.ai",
    "route": "POST /api/lucht/ai",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth",
      "poort"
@@ -36317,22 +36265,20 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "lucht.bagage",
    "route": "POST /api/lucht/bagage",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth",
      "poort"
@@ -36345,10 +36291,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "lucht.bagage.zet",
@@ -36381,14 +36327,12 @@
   {
    "mutatieId": "lucht.bord",
    "route": "POST /api/lucht/bord",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth",
      "poort"
@@ -36401,10 +36345,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "lucht.charter.beslis",
@@ -36437,14 +36381,12 @@
   {
    "mutatieId": "lucht.charters",
    "route": "POST /api/lucht/charters",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth",
      "poort"
@@ -36457,22 +36399,20 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "lucht.cockpit",
    "route": "POST /api/lucht/cockpit",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth",
      "poort"
@@ -36485,10 +36425,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "lucht.draai.taak",
@@ -36521,14 +36461,12 @@
   {
    "mutatieId": "lucht.lounge",
    "route": "POST /api/lucht/lounge",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth",
      "poort"
@@ -36541,10 +36479,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "lucht.lounge.in",
@@ -36662,14 +36600,12 @@
   {
    "mutatieId": "lucht.vip.lijst",
    "route": "POST /api/lucht/vip/lijst",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth",
      "poort"
@@ -36682,10 +36618,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "lucht.vip.maak",
@@ -36774,14 +36710,12 @@
   {
    "mutatieId": "lucht.vlucht.maak",
    "route": "POST /api/lucht/vlucht/maak",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth",
      "poort"
@@ -36794,10 +36728,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "de eerste kale oproep deed geen werk (status 409)"
   },
   {
    "mutatieId": "lucht.vlucht.status",
@@ -53593,14 +53527,12 @@
   {
    "mutatieId": "notifications.read",
    "route": "POST /api/notifications/read",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth"
     ]
@@ -53612,10 +53544,10 @@
     "grond": "opslag",
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "PROTECTED",
+   "voorstelGrond": "kale ronde (opslag): het verschil zat in wacht. NA TE KIJKEN: is dat werk van deze route, of een rem/meter die alleen de eerste keer aansloeg? In dat laatste geval is de juiste stand NOT_APPLICABLE en niet PROTECTED."
   },
   {
    "mutatieId": "notities.bewaar",
@@ -55401,6 +55333,27 @@
     "hindernis": null
    },
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bank.incasso.dossier.lezen",
+   "route": "POST /api/office/bank/incasso/dossier",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -63834,14 +63787,12 @@
   {
    "mutatieId": "office.rtgai.train",
    "route": "POST /api/office/rtgai/train",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "officeAuth"
     ]
@@ -63853,10 +63804,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "kale ronde: de herhaling deed het werk OPNIEUW -- of dat een dubbeltik is of een tweede handeling, beantwoordt geen meting"
   },
   {
    "mutatieId": "rugdekking.alle",
@@ -86035,14 +85986,12 @@
   {
    "mutatieId": "rtfos.gift.machtiging.mijn",
    "route": "POST /api/rtfos/gift/machtiging/mijn",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth",
      "mw"
@@ -86055,10 +86004,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "rtfos.gift.machtiging.teken",
@@ -86118,14 +86067,12 @@
   {
    "mutatieId": "rtfos.gift.plan.mijn",
    "route": "POST /api/rtfos/gift/plan/mijn",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth",
      "mw"
@@ -86138,10 +86085,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "rtfos.gift.plan.stop",
@@ -86229,14 +86176,12 @@
   {
    "mutatieId": "rtfos.gift.projecten",
    "route": "POST /api/rtfos/gift/projecten",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth",
      "mw"
@@ -86249,22 +86194,20 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "rtfos.gift.stand",
    "route": "POST /api/rtfos/gift/stand",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth",
      "mw"
@@ -86277,10 +86220,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "rtfos.gift.stand.kantoor",
@@ -88189,14 +88132,12 @@
   {
    "mutatieId": "rtfos.ruil.mijn",
    "route": "POST /api/rtfos/ruil/mijn",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth",
      "mw"
@@ -88209,10 +88150,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "rtfos.ruil.plaats",
@@ -89461,14 +89402,12 @@
   {
    "mutatieId": "rtfos.winkel",
    "route": "POST /api/rtfos/winkel",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth",
      "mw"
@@ -89481,10 +89420,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "rtfos.winkel.artikel.zet",
@@ -89598,14 +89537,12 @@
   {
    "mutatieId": "rtfos.winkel.mijn",
    "route": "POST /api/rtfos/winkel/mijn",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "auth",
      "mw"
@@ -89618,10 +89555,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "rtfos.winkel.stand",
@@ -105293,14 +105230,12 @@
   {
    "mutatieId": "supplier.horeca.keuken.tijden",
    "route": "POST /api/supplier/horeca/keuken/tijden",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": null,
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth"
     ]
@@ -105312,10 +105247,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
    "voorstel": null,
-   "voorstelGrond": null
+   "voorstelGrond": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien"
   },
   {
    "mutatieId": "supplier.horeca.korting",
@@ -109073,14 +109008,12 @@
   {
    "mutatieId": "supplier.kosten",
    "route": "POST /api/supplier/kosten",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth"
     ]
@@ -109092,10 +109025,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "supplier.kosten.herkomst",
@@ -109127,14 +109060,12 @@
   {
    "mutatieId": "supplier.kosten.vooruitblik",
    "route": "POST /api/supplier/kosten/vooruitblik",
-   "semantiek": {
-    "klasse": "onbekend"
-   },
+   "semantiek": null,
    "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
+    "bedoeld": null,
     "bewakers": [
      "supplierAuth"
     ]
@@ -109146,10 +109077,10 @@
     "grond": null,
     "hindernis": null
    },
-   "stand": "BLOCKED_BY_TEST_FIXTURE",
-   "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
+   "stand": "LEGACY_PENDING_CLASSIFICATION",
+   "herkomst": null,
+   "voorstel": "NOT_APPLICABLE",
+   "voorstelGrond": "kale ronde: twee geslaagde oproepen zonder spoor in de opslag, EN de effectmeter telde op allebei `geen` (geen schrijfpoging, geen mail, geen sms). Twee meters, twee keer nul. Wat geen van beide ziet: bestand,externe-aanroep."
   },
   {
    "mutatieId": "supplier.leave.decide",

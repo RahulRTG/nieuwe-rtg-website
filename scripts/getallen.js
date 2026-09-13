@@ -55,6 +55,8 @@ const GETALLEN = {
     wat: 'routes met de vervalstaat bewezen' },
   'vertrouwen.geschorst': { bron: 'VERTROUWEN.json', veld: 'telling.geschorst',
     wat: 'routes met de vervalstaat geschorst' },
+  'machine.volledigeKetens': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.volledigeKetens',
+    wat: 'handelingen die de hele baan van de machine lopen (deze teller mag alleen stijgen)' },
   'machine.muterend': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.muterend',
     wat: 'muterende routes (methode x pad) die de machinedekking heeft gewogen' },
   'machine.zonderAs': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.mutatiesZonderEnigeAs',

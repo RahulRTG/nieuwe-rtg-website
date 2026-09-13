@@ -25,6 +25,7 @@ const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 const { meet, bouwGraaf, ASSEN, UIT_EXECUTIONMAP, ONGEMETEN } = require('../scripts/machinedekking');
+const { KLASSEN, KETENS } = require('../server/kern/kantoor/geldketen');
 
 const WORTEL = path.join(__dirname, '..');
 const U = meet();
@@ -144,4 +145,39 @@ test('8. de poort hangt aan absolute getallen die alleen mogen dalen', () => {
       '. Deze teller mag alleen dalen: een nieuwe handeling hoort de machine te gebruiken, ' +
       'niet eromheen te lopen.');
   }
+});
+
+test('9. de ketenteller is streng, en hij komt uit de code en niet uit deze meter', () => {
+  const g = U.gemeten;
+  assert.equal(typeof g.volledigeKetens, 'number');
+  assert.equal(g.ketens.length, KETENS.length,
+    'de meter telt andere ketens dan server/kern/kantoor/geldketen.js verklaart');
+
+  for (const k of g.ketens) {
+    const klasse = KLASSEN[k.klasse];
+    assert.ok(klasse, 'keten ' + k.naam + ' hangt aan een klasse die niet bestaat');
+    assert.equal(k.verplicht, klasse.verplicht.length,
+      'de meter rekent met een ander aantal verplichte assen dan de klasse noemt');
+    /* Een keten heet alleen volledig als ELKE verplichte as gevonden is EN al zijn
+       routes bestaan. Dat is de hele strengheid: een declaratie die een route
+       noemt die niet bestaat, mag nooit rond heten. */
+    if (k.volledig) {
+      assert.deepEqual(k.open, []);
+      assert.equal(k.routesBestaan, k.routesGeteld,
+        'keten ' + k.naam + ' heet volledig terwijl niet al zijn routes bestaan');
+      assert.equal(Object.keys(k.gevonden).length, k.verplicht);
+    } else {
+      assert.ok(k.open.length > 0 || k.routesBestaan < k.routesGeteld,
+        'keten ' + k.naam + ' heet niet volledig maar noemt geen enkele open as');
+    }
+  }
+
+  /* EN DE TELLER GAAT DE ANDERE KANT OP DAN DE TWEE SCHULDEN. Dit is de enige
+     teller in dit register die alleen mag STIJGEN; staat hij ooit lager dan het
+     vastgelegde register, dan is er een keten stil open gegaan. */
+  const oud = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MACHINEDEKKING.json'), 'utf8'));
+  if (typeof oud.gemeten.volledigeKetens === 'number')
+    assert.ok(g.volledigeKetens >= oud.gemeten.volledigeKetens,
+      'volledigeKetens is gezakt van ' + oud.gemeten.volledigeKetens + ' naar ' + g.volledigeKetens +
+      '. Een keten die rond was, hoort niet stil open te gaan staan.');
 });

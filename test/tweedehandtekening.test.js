@@ -180,19 +180,108 @@ test('5. een bevestiging wordt opgebruikt, ook bij een tweede poging', async () 
   assert.equal(nog.status, 404, 'dezelfde bevestiging werkte een tweede keer');
 });
 
-test('6. de incassoronde vraagt dezelfde twee mensen', async () => {
-  const r = await api('/api/office/bank/incasso', { tot: Date.now() + 86400000 }, eenA);
-  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 160));
+test('6. de incassoronde vraagt dezelfde twee mensen, en loopt de hele gouden weg', async () => {
+  /* DE FIXTURE IS HET HALVE BEWIJS. De seed heeft geen vaste betaling die aan de
+     beurt is, en sinds de gouden weg (MACHINE.md par. 5a) weigert de aanvraag een
+     LEGE ronde: een voornemen van nul cent is een plan zonder inhoud, en het zou
+     een tweede handtekening opsouperen voor een handeling die niets doet. Dus
+     zetten we er een echte vaste betaling klaar en kijken of er werkelijk geld
+     beweegt -- dit is de enige toets in dit huis waar een euro de hele machine
+     doorloopt. */
+  const u2 = (Date.now() + 991).toString(36);
+  const lid2 = (await api('/api/auth/register', { name: 'Ontvanger', email: 'ov' + u2 + '@voorbeeld.test',
+    phone: '06' + String(10000000 + Math.floor(Math.random() * 8e7)), password: 'Geheim123!',
+    geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' })).body.token;
+  const akk2 = await api('/api/bank/akkoord', {}, lid2);
+  assert.equal(akk2.status, 200, 'de tweede rekening: ' + JSON.stringify(akk2.body).slice(0, 140));
+  const naarIban = akk2.body.rekening.iban;
+
+  const vast = await api('/api/bank/terugkerend/zet',
+    /* De geldgrens van lib/idem.js weigert een geldopdracht zonder sleutel, en
+       terecht: twee klikken op een vaste betaling betalen niet een keer te veel
+       maar elke maand opnieuw. */
+    { vanIban: iban, naarIban, centen: 100, interval: 'maand', oms: 'Proefincasso',
+      idem: 'proef-incasso-' + u2 }, lid);
+  assert.equal(vast.status, 200, 'de vaste betaling: ' + JSON.stringify(vast.body).slice(0, 160));
+
+  /* 31 dagen vooruit: dan is een maandelijkse betaling een keer aan de beurt. */
+  const tot = Date.now() + 31 * 86400000;
+
+  const r = await api('/api/office/bank/incasso', { tot }, eenA);
+  assert.equal(r.status, 200, JSON.stringify(r.body).slice(0, 200));
   assert.equal(r.body.needsAuth, true, 'de incassoronde ging zonder tweede mens door');
   assert.equal(r.body.uitgevoerd, undefined, 'de ronde heeft al gedraaid bij de aanvraag');
 
+  /* DE BAAN IS GELOPEN VOORDAT ER IETS BEWEEGT. Het voornemen staat er, met het
+     totaal uit de vooruitblik, en het dossier zegt per as wat er gebeurde. */
+  assert.ok(r.body.voornemen && r.body.voornemen.id, 'de aanvraag draagt geen voornemen');
+  assert.equal(r.body.voornemen.totaalCenten, 100, 'het gewogen totaal komt uit de vooruitblik');
+  assert.equal(r.body.vooruitblik.boekingen, 1);
+  const assen = Object.fromEntries((r.body.dossier.assen || []).map(a => [a.as, a]));
+  for (const as of ['mensbewijs', 'assurance', 'mandaat', 'streefstand', 'tegenfeit', 'frictie',
+    'voornemen', 'autoriteit', 'envelop', 'bewijsketen', 'gevolg', 'idempotentie', 'hervatbaar'])
+    assert.ok(assen[as], 'de as "' + as + '" staat niet in het dossier van de aanvraag');
+  assert.equal(assen.mandaat.uitslag, 'niet zelfstandig',
+    'het mandaat hoort hier NEE te zeggen: geld is nooit autonoom');
+
+  /* DE ECONOMISCHE SLEUTEL: dezelfde grens is hetzelfde voornemen, geen tweede. */
+  const nog = await api('/api/office/bank/incasso', { tot }, eenA);
+  assert.equal(nog.status, 200, JSON.stringify(nog.body).slice(0, 160));
+  assert.equal(nog.body.voornemen.id, r.body.voornemen.id,
+    'een tweede aanvraag op dezelfde grens maakte een TWEEDE voornemen -- dan int een dubbeltik twee keer');
+  /* Die tweede klik laat wel een tweede DEURTICKET achter (zie de kop van
+     routes/kantoren/bank-incasso.js: rommel, geen risico). Hier halen we hem weg,
+     zodat toets 7 straks een leeg loket aantreft en niet over onze rommel valt. */
+  await api('/api/office/bank/handtekening/intrek', { id: nog.body.aanvraag.id }, eenA);
+
   const zelf = await api('/api/office/bank/handtekening/bevestig', { id: r.body.aanvraag.id }, eenA);
   assert.equal(zelf.status, 403, 'de aanvrager kon zijn eigen incassoronde aftekenen');
+
+  /* Het saldo van de ONTVANGER, langs de weg die een lid werkelijk heeft
+     (/api/bank/rekening geeft de detail van een eigen rekening). */
+  const saldoVan = async () => (await api('/api/bank/rekening', { iban: naarIban }, lid2)).body;
+  const saldoVoor = await saldoVan();
   const ok = await api('/api/office/bank/handtekening/bevestig', { id: r.body.aanvraag.id }, eenB);
-  assert.equal(ok.status, 200, JSON.stringify(ok.body).slice(0, 160));
+  assert.equal(ok.status, 200, JSON.stringify(ok.body).slice(0, 200));
   assert.equal(ok.body.handeling, 'bank.incasso');
-  assert.equal(typeof ok.body.uitgevoerd, 'number',
-    'het eigen `uitgevoerd` van de incassoronde (het aantal betalingen) hoort te blijven staan');
+
+  /* EN NU HET ENIGE DAT ER ECHT TELT: is er geld verplaatst? */
+  const saldoNa = await saldoVan();
+  const c = (r) => Number((r.rekening || r).saldoCenten);
+  assert.equal(c(saldoNa) - c(saldoVoor), 100,
+    'de incassoronde heeft geen geld verplaatst: ' + JSON.stringify(saldoVoor).slice(0, 120) +
+    ' -> ' + JSON.stringify(saldoNa).slice(0, 120));
+
+  /* HET DOSSIER NA DE UITVOERING: de keten is rond, en dat is niet beweerd maar
+     te lezen -- inclusief de hashketen die zichzelf verifieert. */
+  const dos = await api('/api/office/bank/incasso/dossier', { voornemen: r.body.voornemen.id }, gedeeld);
+  assert.equal(dos.status, 200, JSON.stringify(dos.body).slice(0, 160));
+
+  /* EN HIER IS HET DOSSIER EERLIJKER DAN PRETTIG, en dat is precies waarom het
+     bestaat. Deze medewerkers hebben geen passkey: kern/zwaarbewijs.js laat de
+     handeling dan DOOR op de terugval en meldt dat aan de beveiliging, dus de as
+     `assurance` staat op `vermoed` en telt niet als gehaald. De keten is dus
+     gelopen, het geld is verplaatst, en de keten heet NIET rond -- met de naam van
+     de ene as die eraan ontbreekt en de reden erbij.
+
+     Wie deze toets ooit op `rond: true` wil hebben, geeft de medewerker een
+     passkey; wie hem groen maakt door `vermoed` te laten meetellen, sloopt het
+     verschil tussen een as die gelopen is en een as die aanwezig lijkt. */
+  assert.deepEqual(dos.body.dossier.open, ['assurance'],
+    'open assen na de uitvoering: ' + (dos.body.dossier.open || []).join(', '));
+  assert.equal(dos.body.dossier.rond, false);
+  const ass = dos.body.dossier.assen.find(a => a.as === 'assurance');
+  assert.equal(ass.graad, 'vermoed');
+  assert.match(ass.reden, /passkey/i, 'de open as zegt niet waarom hij open staat');
+  const tweede = dos.body.dossier.assen.find(a => a.as === 'tweedeMens');
+  const eerste = dos.body.dossier.assen.find(a => a.as === 'mensbewijs');
+  assert.ok(tweede && tweede.uitslag, 'de tweede mens staat niet in het dossier');
+  assert.notEqual(tweede.uitslag, eerste.wie,
+    'aanvrager en bevestiger staan als dezelfde in het dossier -- dan zegt het dossier iets anders dan de deur');
+
+  const bord = await api('/api/office/bank/incasso/dossier', {}, gedeeld);
+  assert.equal(bord.body.ketenHeel.ok, true, 'de hashketen van de baan is niet heel');
+  assert.equal(typeof bord.body.rond, 'number', 'het bord telt de ronde ketens niet');
 });
 
 /* De invoerkeuring hoort bij de AANVRAAG en niet pas bij de bevestiging: een

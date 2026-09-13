@@ -44,6 +44,16 @@ function maakKeuring({ vind, zet, publiek, save, tijd, beslis }) {
     const o = opties || {};
     const b = beslis({ actor: v.actor, handeling: v.handeling, doel: v.doel,
       waardeCenten: v.totaalCenten, context: o.context || {} });
+    /* EEN LEEG ANTWOORD IS GEEN ANTWOORD, en dit is geen theoretisch geval.
+       ../../opzet/kernlaag3c.js geeft deze laag `(vraag) => (kern.beslis ?
+       kern.beslis(vraag) : null)` mee. Die wrapper is ALTIJD een functie, dus de
+       controle `if (!beslis)` hierboven sloeg nooit aan zolang er geen beslislaag
+       gemount was: hij werd aangeroepen, gaf `null`, en de volgende regel las
+       `uitkomst` uit null. Een TypeError op exact de plek waar de kop van dit
+       bestand een nette 503 belooft -- onvindbaar, want er was geen aanroeper.
+       Nu valt het dicht zoals beloofd, en een storing blijft een storing. */
+    if (!b || !b.uitkomst)
+      return { status: 503, error: 'De beslislaag gaf geen uitkomst; er wordt niets goedgekeurd.' };
     v.besluit = { uitkomst: b.uitkomst, reden: b.reden, beleid: b.beleid, at: tijd() };
     if (b.bewijstoken) v.bewijstoken = b.bewijstoken;
 

@@ -1673,9 +1673,9 @@ zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
 motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
-bestaande meter deed: van de <!--getal:machine.muterend-->4952<!--/getal-->
+bestaande meter deed: van de <!--getal:machine.muterend-->4953<!--/getal-->
 muterende routes raken er <!--getal:machine.zonderAs-->2818<!--/getal--> geen
-enkele as, <!--getal:machine.motorenZonderRoute-->3<!--/getal--> motoren bereiken
+enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele
 handeling die de keten heeft gelopen. Twee assen per motor die **nooit worden
@@ -1685,8 +1685,40 @@ twee kanten: een hub in de kern-tas zette 4162 routes op "idempotent", en
 `/api/notifications` scoorde tien assen omdat die route zelf in `server/server.js`
 woont (143 requires). Vandaar de hubgrens en de
 <!--getal:machine.hubRoutes-->28<!--/getal--> routes waarvoor de bestandsas met
-naam en toenaam onbruikbaar is verklaard. Zeven begrippen uit het voorstel zijn
-al bezet en dat is de goedkoopste paragraaf van het document: **`envelop` is
+naam en toenaam onbruikbaar is verklaard. **De eerste keten is rond** (par. 5a):
+`/api/office/bank/incasso` -> `handtekening/bevestig` -> `incasso/dossier`, vijftien
+verplichte assen voor haar klasse en alle vijftien gelopen, met
+`kern/kantoor/geldketen.js` als BAAN en niet als zeventiende motor. Daarom een
+vierde teller die de andere kant op gaat: `volledigeKetens` staat op
+<!--getal:machine.volledigeKetens-->1<!--/getal--> (zestien verplichte assen,
+alle zestien gelopen) en mag alleen STIJGEN (de twee
+andere zijn schulden en mogen alleen dalen) -- haal er één as uit en hij zakt naar
+nul met de naam van die as erbij. Twee handelingsklassen, en het verschil is
+precies één as: bij `geld-eenmalig` is `atomair` verplicht, bij `geld-reeks` met
+opzet NIET, want alles-of-niets is daar de verkeerde garantie (dat één lid te weinig
+saldo heeft mag de inning bij de andere negenennegentig niet tegenhouden) en
+`hervatbaar` komt ervoor in de plaats. Zes dingen die het bouwen blootlegde en die
+geen bestaande toets zag: **de beslislaag was nooit gemount** (`zoekBevoegdheid`
+werd nergens gevuld, dus de keuring van een voornemen kwam nooit tot een besluit),
+**de 503 die de keuring belooft kwam nooit** (de meegegeven wrapper is altijd een
+functie, dus `if (!beslis)` sloeg niet aan en de laag las `uitkomst` uit `null` --
+een TypeError waar een nette weigering hoorde), **de frictie-as was stil leeg** (de
+bedrading gaf de MODULE mee in plaats van een motor; een module heeft geen
+`beoordeel`), **de graad van een as is niet de graad van zijn getal** (de
+bovengrens van een incasso-vooruitblik maakte de keten onhaalbaar tot die twee
+werden gescheiden), **een herhaalde aanvraag struikelde over zijn eigen
+idempotentie** (hetzelfde voornemen ging opnieuw langs de keuring en kreeg 409), en
+het zwaarste: **`uitvoering` stond niet in de verplichte assen**, dus de uitvoering
+kon buiten de keten om lopen terwijl het dossier er rond uitzag -- gevonden met een
+mutatie, want geen enkele toets zakte. Die twee laatste zijn door de e2e-proef
+gevonden en niet door een unittoets: `test/tweedehandtekening.test.js` toets 6
+verplaatst met twee kantoormensen op naam echt geld door de hele baan, en het
+dossier blijft daar eerlijk op **niet rond** staan omdat die medewerkers geen
+passkey hebben (de as `assurance` staat op `vermoed`, met de reden erbij). Let ook op wat dezelfde commit met de meter deed: een handvol
+woorden in één routebestand liet `tegenfeit` van 28 naar 54 springen op de
+bestandsas terwijl er één handeling bijkwam -- lees op de handleras, en gebruik de
+bestandsas alleen om te zien waar iets in de buurt hangt. Zeven begrippen uit het
+voorstel zijn al bezet en dat is de goedkoopste paragraaf van het document: **`envelop` is
 gesloten op acht velden en zegt met opzet nooit WAT** (dus het uitvoerkapsel
 verwijst ernaar en heet niet zo), **`doel` draagt al twee betekenissen** over 28
 modules (een levensdoel en de AVG-doelbinding -- een planner-doel heet

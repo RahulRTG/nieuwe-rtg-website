@@ -82,13 +82,25 @@ test('5. de woordenlijst is uitgebreid, en dat staat er eerlijk bij', () => {
   assert.equal(v.telling.actorenGedeeld, 0,
     'er is nu een actor die alle drie de ketens delen -- dat is een vondst, en die hoort in MAATSTAF.md');
   assert.ok(v.telling.actorenTotaal >= 13);
-  /* Er is wel een WOORD dat twee ketens delen: `zaak`. In de tafelketen is dat
-     de horecazaak die bedient, in de toelatingsketen de zaak die ontstaat --
-     ontvanger tegenover uitkomst. Precies de vorm die SEMANTIEK.json meet:
-     dezelfde naam, twee betekenissen. Daarom telt hij niet als gedeelde actor. */
+  /* Er is wel een WOORD dat meerdere ketens delen: `zaak`. Sinds de bundel van
+     13 september staat hij in VIER, en in elke keten met een andere rol:
+
+       tafel     -- de horecazaak die BEDIENT        (ontvanger)
+       toelating -- de zaak die ONTSTAAT             (uitkomst)
+       zaaklive  -- de zaak die AANGAAT              (onderwerp)
+       omzet     -- de zaak wier omzet wordt GEBOEKT (subject van de boeken)
+
+     Dat is precies de vorm die SEMANTIEK.json meet: dezelfde naam, meer
+     betekenissen. Hij telt daarom niet als gedeelde actor, en het negatief is er
+     sterker van geworden in plaats van zwakker -- vier ketens die het woord delen
+     en geen van vieren hetzelfde bedoelen, is een beter bewijs dan twee.
+
+     DEZE BEWERING IS EEN WACHTER EN GEEN TELLING. Zij zakt zodra `zaak` in een
+     keten opduikt die hier niet staat, want dan moet iemand opnieuw kijken of het
+     daar hetzelfde betekent. Een `>= 2` zou dat nooit vragen. */
   const perKeten = v.actoren.perKeten;
   const metZaak = Object.keys(perKeten).filter(k => perKeten[k].includes('zaak'));
-  assert.deepEqual(metZaak.sort(), ['tafel', 'toelating'],
+  assert.deepEqual(metZaak.sort(), ['omzet', 'tafel', 'toelating', 'zaaklive'],
     'het woord `zaak` staat nu in andere ketens; kijk of het daar hetzelfde betekent');
 });
 

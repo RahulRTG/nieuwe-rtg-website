@@ -32,14 +32,30 @@ module.exports = { CONTRACTEN: {
     mutatieId: 'mediaos.aanwezig.mijn', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
     toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
-    nagekeken: 'Claude, 2026-09-13: leest db.data.mediaVolgt en schrijft niets; de handler roept alleen aanwezigMijn().',
+    bewijs: { gemeten: 'node scripts/idemproef-route.js --pad=/api/mediaos/aanwezig: opslag a/b/c alle drie leeg, ' +
+      'dus geen enkele gemeten collectie beweegt -- niet bij de eerste oproep en niet bij de herhaling', op: '2026-09-13' },
+    nagekeken: 'Claude, 2026-09-13: leest db.data.mediaVolgt en schrijft niets; de handler roept alleen aanwezigMijn(). '
+      + 'De opslagmeter dekt geen bestand of externe aanroep; die twee zijn hier gelezen en er zijn er geen.',
     afgetekend: AFGETEKEND
   },
+  /* DEZE STAAT BEWUST NIET OP NOT_APPLICABLE, en het verschil is een meting.
+     Bij lezen is hij dat net zo goed als zijn buurman hierboven -- met(), beeld()
+     en volgtHij() in kern/mediaos/aanwezigheid.js raken niets aan. Maar de
+     keuring eist bij die stand een METING en niet een mens die de handler las, en
+     die meting is er niet: de idempotentieproef komt hier op 404 uit omdat zijn
+     wereld geen aanwezigheid kent om op te vragen. "Ongemeten" is dan geen
+     NOT_APPLICABLE met een net gezicht -- dat is precies wat deze stand
+     tegenhoudt. */
   'POST /api/mediaos/aanwezig': {
     mutatieId: 'mediaos.aanwezig.een', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
-    toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
-    nagekeken: 'Claude, 2026-09-13: leest een aanwezigheid plus of dit lid hem volgt; schrijft niets.',
+    toegang: { klasse: 'AUTHENTICATED' }, stand: 'BLOCKED_BY_TEST_FIXTURE',
+    watErMoetKomen: 'De idempotentieproef heeft een BESTAANDE aanwezigheid nodig; zonder geldige `id` geeft de route '
+      + '404 en meet de proef niets. Nodig is een aanwezigheid in de zaaiset van scripts/lib/idemwereld.js (een lid '
+      + 'met een uitgelichte post levert er een op, zie test/aanwezigheid-routes.e2e.js). Daarna kan deze stand naar '
+      + 'NOT_APPLICABLE, met de opslaguitslag als bewijs.',
+    nagekeken: 'Claude, 2026-09-13: handler gelezen -- met(), aanwezigBeeld() en aanwezigVolgtHij() lezen alleen. '
+      + 'Dat is een lezing en geen meting, en daarom staat de stand hier lager.',
     afgetekend: AFGETEKEND
   },
   /* Het redactiebord leest, maar het projecteert ook: een uitlichting waarvan de

@@ -59,7 +59,7 @@ const CONTRACTEN = {
        in het lijf staat (`code` + `token`, nagekeken door rtf.verifieerProfiel).
        Twee mensen met dezelfde rol krijgen hier hetzelfde antwoord, maar alleen
        met een geldig profiel van HUN gezin -- zonder dat is het 403. */
-    toegang: { klasse: 'OBJECT_SCOPED', veld: 'code + token (het gezinsprofiel)' },
+    toegang: { klasse: 'OBJECT_SCOPED', objectVeld: 'code' },
     stand: 'NOT_APPLICABLE',
     nagekeken: 'Claude, 2026-09-13: dezelfde handler als POST /api/knelpunt -- `beantwoord()` in ' +
       'routes/knelpunt.js staat een keer en beide deuren roepen hem aan, juist zodat een gezin nooit ' +

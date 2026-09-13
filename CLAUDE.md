@@ -364,42 +364,60 @@ betaler leest de gezondheid nooit. Er komt géén vijfde wereld: een toptalent
 staat in LivingOS, WorkOS, TravelOS en FoundationOS tegelijk, en par. 7 zet de
 vier besluiten van de eigenaar op een rij.
 
-**`MENSNETWERK.md` is de laag ernaast** -- niet wat een talent IS (`CARRIERE.md`)
-en niet hoe het geld heet dat naar hem gaat (`RUGDEKKING.md`), maar hoe zo'n mens
-BINNENKOMT en wie er NAAST hem mag staan. Lees die vóór je een aanmeldweg, een
+**`MENSNETWERK.md` is de grondwet voor menselijke vertegenwoordiging** -- niet
+wat een talent IS (`CARRIERE.md`) en niet hoe het geld heet dat naar hem gaat
+(`RUGDEKKING.md`), maar wie iets mag DOEN namens een mens, wie iets over hem mag
+WETEN, en wie VERDIENT aan welke keuze. Lees die vóór je een aanmeldweg, een
 vertegenwoordigingsmodel of een RTG-managementdienst bouwt. De kern in één zin:
-RTG biedt geen managementmodel aan maar een keuze uit modellen, en de enige reden
-dat die keuze geloofwaardig is, is dat de manager van RTG door precies dezelfde
-deur moet als die van de concurrent. Dat is vandaag geen belofte maar een
-afgedwongen eigenschap: er is **geen enkele** kantoorweg naar een machtiging, en
-`routes/vertegenwoordiging.js` kan per definitie niet bij `kluisAuth` -- alleen
-een toets die dat vasthoudt ontbreekt (MN-01). Vier metingen gaan vóór alles: van
-de zeventien voorgestelde onderdelen staan er **vijf**, staan er zes half en
-bestaan er zes niet (dus "de helft staat er al" klopt, en het werk is bedraden en
-niet uitvinden); vier voorgestelde productnamen dragen een woord dat hier al iets
-anders betekent, geteld in `server/kern/` -- **kluis** 192 bestanden (de
-identiteitskluis), **wallet** 87 (geld), **paspoort** 139 (het identiteitsbewijs,
-bron van `leeftijdBron`) en **firewall** 26 (de economische firewall); en het
-voorgestelde machtigingsscherm is bijna letterlijk het bestaande -- zeven
-gevraagde managerhandelingen vallen één op één op de negen bevoegdheden, en de
-drie verboden op de NOOIT-lijst. Drie dingen die de opzet corrigeren en die je
-nergens anders moet herhalen. Een **talentladder** (discovered → ... → legacy) en
-een **contributiegrafiek met acht balken** zijn allebei een cijfer op een mens en
-vallen onder CAR-05; de scherpste vorm daarvan is een acquisitiewaarde in euro's
-per persoon -- meet het PROGRAMMA en nooit de mens (`kern/rtfos/gemeente.js` is de
-bestaande vorm). **`Economic Person` is geen vijfde wereld**: de natuurlijke
-persoon heeft er al een (`consument`), dus CAR-01 is geen datamodelschuld maar een
-vergunningsvraag, en de schakelaar bestaat al en staat dicht
-(`RUGDEKKING_BEURS`). En **pods botsen met de NOOIT-lijst**: een lead manager die
-werk doorzet naar specialisten is delegatie, en de uitweg is strenger én eerlijker
--- elke specialist heeft zijn eigen machtiging van de cliënt, met een
-machtigingsbundel als enige nieuwe steen. Par. 9 is de nazoekronde die
-`CARRIERE.md` par. 3 eiste: WebAuthn L3 (Recommendation 25 augustus 2026) en C2PA
-2.4 (april 2026) zijn bevestigd en gaan van `vermoed` naar `gemeten`, de
-OpenID4VCI-datum klopte niet (zelfcertificering sinds 26 februari 2026), en bij
-C2PA hoort de beperking in dezelfde zin als de belofte -- uploads, schermafdrukken
-en exports breken de metadata, dus het is een herkomstsignaal en geen bewijs op
-zichzelf.
+**geen organisatorische relatie met RTG kan menselijke toestemming vervangen,
+verruimen, doorgeven of reconstrueren.** De keten is met opzet omgedraaid -- van
+*mens → waarde → talentstatus → management* naar *mens → behoefte → relaties →
+expliciete bevoegdheden → dienst → bewijs* -- want een mens hoeft niet door RTG
+beoordeeld te worden om binnen te komen. Drie grondwetsregels, en ze staan vóór
+de dienst die ze moet beteugelen: **MN-01 geen bevoegdheidsvoordeel** (tien
+bewijsgevallen, met als aanvalsproef dat de eigenaar van RTG zelf manager wordt
+van een testtalent en zonder machtiging niets kan), **MN-02 geen
+informatievoordeel** en **MN-03 geen commercieel voordeel** (de AI zegt erbij dat
+RTG aan één van de opties verdient). Vijf metingen gaan vooraf. Het
+bevoegdheidsvoordeel is al dicht en niet beloofd: er is geen kantoorweg naar een
+machtiging, en `routes/vertegenwoordiging.js` kan per definitie niet bij
+`kluisAuth`. **Het informatievoordeel is NIET dicht, en hoort dat ook niet te
+zijn**: `kern/ledenbalie.js` is een legitieme kennisweg (codenaam, pas, land,
+abo-stand -- nooit een naam) met een spoor in `server/inzagelog.js`, dus een
+medewerker die óók iemands manager is weet meer dan een externe manager met
+dezelfde machtiging. MN-02 is daarom een CONFLICTREGEL en geen verbod, en het
+handhavingspunt bestaat al. Verder: acht naamsbotsingen, en **de tweede helft is
+de leerzaamste** -- na `kluis` (192 bestanden), `wallet` (87), `paspoort` (139) en
+`firewall` (26) zijn ook de vier VERVANGENDE namen gemeten, en drie daarvan zijn
+óók bezet: `loopbaanbewijs` is al een scherm, `herkomst` heeft zeven eigen
+modules, en **`bewijsmap` bestaat al als precies deze functie** -- `kern/rtgid-bewijs.js`
+plus `/apps/bewijsmap.html`, en de kop daarvan zegt dat HDI.md die naam koos omdat
+`wallet` bezet was. Dit huis heeft dus al een keer dezelfde afweging gemaakt en
+is op dezelfde vervanger uitgekomen; alleen `rechtenregister` is vrij. Een
+codenaam en een schermnaam hoeven trouwens niet hetzelfde te zijn. Drie
+correcties die niet mogen verwateren. Een **talentladder**, een
+**bijdragegrafiek per persoon** en een **netwerkwaarde in euro's per mens** zijn
+alle drie een cijfer op een mens (CAR-05); de uitweg is niet stoppen met meten
+maar het één niveau omhoog verplaatsen -- **RTG meet wat een PROGRAMMA oplevert,
+nooit wat een mens waard is** (`kern/rtfos/gemeente.js` is de bestaande vorm).
+**Er komt geen `economisch persoon` en geen vijfde wereld**: de natuurlijke
+persoon bestaat al als `consument`, en CAR-01 is geen datamodelvraag maar één van
+vier losse vragen (kan ontvangen / kan vertegenwoordigen / kan verkopen / kan
+uitbetaald worden) waarvan alleen de laatste dicht is -- die blijft dicht tot het
+juridische besluit genomen kan worden, en er wordt geen architectuur omheen
+gebouwd. En **pods botsen met de NOOIT-lijst**: doorzetten naar een specialist is
+delegatie, dus een team is een **mandaatconstellatie** van losse machtigingen die
+de cliënt per stuk aanvinkt, waarbij een lead manager een specialist alleen kan
+VOORSTELLEN en nooit toevoegen. Par. 7 zet drie poorten vóór het besluit
+(rugdekking zichtbaar, MN-01+02, MN-03) en daarna een vierde ketenproef in de
+vorm van `tafelproef.js` -- een volledige synthetische loopbaan van zelf beheerd
+tot RTG verlaten, waarbij per overgang bewezen wordt dat de mens intact blijft en
+de bevoegdheden exact veranderen. Par. 9 is de nazoekronde die `CARRIERE.md` par.
+3 eiste: WebAuthn L3 (Recommendation 25 augustus 2026) en C2PA 2.4 (april 2026)
+bevestigd, de OpenID4VCI-datum klopte niet (zelfcertificering sinds 26 februari
+2026), en **herkomst is een signaal en geen bewijs** -- er komt nooit een groen
+"deze foto is echt", en *"dit bestand draagt herkomst"* en *"RTG heeft dit bestand
+op datum X ontvangen"* worden nooit vermengd.
 
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die

@@ -623,6 +623,11 @@ const METERS = [
      talentdomeinen hij werkelijk heeft gezien. Omhoog, want dit mag niet stil
      dalen -- zie de kop bij CARRIEREVORM.json in ./lib/metingen.js. */
   { sleutel: 'carriereDomeinenGemeten', richting: 'omhoog', wat: 'talentdomeinen die de carrierevormmeter werkelijk heeft gezien' },
+  /* DE LEDENCONTEXT VAN RAHUL (AICONTEXT.json, npm run aicontext). Twee tanden
+     die het tegenovergestelde doen; zie de kop bij het register in
+     ./lib/metingen.js. De invariant omlaag, het bereik omhoog. */
+  { sleutel: 'aiContextLek', richting: 'omlaag', wat: 'velden die het kantoor schrijft en die Rahuls ledencontext ook leest (AICONTEXT.json)' },
+  { sleutel: 'aiContextVeldenGezien', richting: 'omhoog', wat: 'velden van de ledenstaat die de contextmeter werkelijk heeft gezien' },
   { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' },
   /* DE LUSINDEX (LUSSEN.json, npm run lussen). Drie tanden, en alle drie tellen
      ze een SCHULD en geen prestatie -- anders maakt lussen toevoegen de meter
@@ -1332,6 +1337,8 @@ function meet(bronnen) {
     rollbackUitzonderingen: leesRegister('ROLLBACKBESLUIT.json', (j) => Object.keys(j.routes || {}).length),
     faalproefGezakt: leesRegister('FAALPROEF.json', (j) => j.gemeten.gezakt),
     carriereDomeinenGemeten: leesRegister('CARRIEREVORM.json', (j) => j.gemeten.domeinen),
+    aiContextLek: leesRegister('AICONTEXT.json', (j) => j.muur.lek.length),
+    aiContextVeldenGezien: leesRegister('AICONTEXT.json', (j) => j.ledenstaat.aantal),
     lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),
     lussenKritiek: leesRegister('LUSSEN.json', (j) => j.ratel.kritiek),
     lussenZonderOverlapRem: leesRegister('LUSSEN.json', (j) => j.ratel.wekkersAsyncZonderRem),

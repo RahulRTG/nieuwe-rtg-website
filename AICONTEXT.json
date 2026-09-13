@@ -1,0 +1,152 @@
+{
+  "stempel": {
+    "op": "2026-09-13T11:56:29.693Z",
+    "commit": "2397416e",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/aicontext.js",
+    "node": "v22.22.2"
+  },
+  "gemeten": "2026-09-13T11:56:29.653Z",
+  "graad": "vermoed",
+  "waarom": "de veldinventaris is lexicaal en dus een ONDERgrens: een ledenstaat onder een andere naam valt erbuiten. De muur is hoogstens dunner dan hier staat, nooit dikker.",
+  "samensteller": {
+    "bestand": "server/kern/ai/prompt.js",
+    "functie": "aiSystemPrompt(tier, lang, key)"
+  },
+  "invoeren": [
+    {
+      "naam": "db",
+      "sleutel": "globaal",
+      "aanroep": "db",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "PERSONAS",
+      "sleutel": "pas",
+      "aanroep": "PERSONAS",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "AI_TONE",
+      "sleutel": "pas",
+      "aanroep": "AI_TONE",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "naamEn",
+      "sleutel": "globaal",
+      "aanroep": "naamEn(lang | lang)",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "dagContext",
+      "sleutel": "globaal",
+      "aanroep": "dagContext()",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "stemmingVoor",
+      "sleutel": "globaal",
+      "aanroep": "stemmingVoor({ kind: false, werk: false })",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "geloofRegel",
+      "sleutel": "lid",
+      "aanroep": "geloofRegel(key)",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "ledenInhoudVan",
+      "sleutel": "lid",
+      "aanroep": "ledenInhoudVan(key)",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "rahulOmgangVoor",
+      "sleutel": "lid",
+      "aanroep": "rahulOmgangVoor(key)",
+      "herkomst": "../rahul"
+    },
+    {
+      "naam": "RAHUL_KARAKTER",
+      "sleutel": "statisch",
+      "aanroep": "RAHUL_KARAKTER",
+      "herkomst": "./karakter"
+    },
+    {
+      "naam": "TAALREGELS",
+      "sleutel": "statisch",
+      "aanroep": "TAALREGELS",
+      "herkomst": "../rahul/taal"
+    },
+    {
+      "naam": "TWIJFELREGELS",
+      "sleutel": "statisch",
+      "aanroep": "TWIJFELREGELS",
+      "herkomst": "../rahul/twijfel"
+    }
+  ],
+  "telling": {
+    "lid": 3,
+    "pas": 2,
+    "globaal": 4,
+    "statisch": 3
+  },
+  "ledenstaat": {
+    "namen": [
+      "md",
+      "st"
+    ],
+    "velden": [
+      "aanhef",
+      "adres",
+      "bewaarVerzoek",
+      "conversation",
+      "emailBevestiging",
+      "faceMatch",
+      "fase",
+      "foundationMeldingen",
+      "geboren",
+      "geborenBron",
+      "geloof",
+      "geslacht",
+      "geverifieerdOp",
+      "invoices",
+      "mailwissel",
+      "nationaliteit",
+      "needsConcierge",
+      "omgang",
+      "paspoort",
+      "publiekeMailLokaal",
+      "selfie",
+      "toegankelijk",
+      "vakbewijsNummers",
+      "via",
+      "voornaamwoord"
+    ],
+    "aantal": 25,
+    "doorKantoorGeschreven": [
+      "bewaarVerzoek",
+      "conversation",
+      "faceMatch",
+      "geboren",
+      "geborenBron",
+      "geslacht",
+      "geverifieerdOp",
+      "nationaliteit",
+      "needsConcierge"
+    ]
+  },
+  "muur": {
+    "vorm": "veldselectie op naam in server/kern/ai/prompt.js",
+    "gelezenVelden": [
+      "invoices",
+      "trip"
+    ],
+    "aantalGelezen": 2,
+    "aantalNietGelezen": 24,
+    "lek": []
+  }
+}

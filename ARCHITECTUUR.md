@@ -19,9 +19,9 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 5041 |
-| servermodules (`server/**/*.js`) | 3420 |
+| servermodules (`server/**/*.js`) | 3422 |
 | routebestanden (`server/routes/**`) | 589 |
-| kernmodules (`server/kern/**`) | 2135 |
+| kernmodules (`server/kern/**`) | 2137 |
 | schermen (`public/**/*.html`) | 318 |
 | gedeelde browsermodules (`public/shared/*.js`) | 353 |
 | toetsbestanden (`test/*.test.js`) | 1626 |
@@ -155,7 +155,7 @@ rtf(15) tooManyTries(14) geenGast(14) crypto(12) express(12) findSupplier(12) ap
 pay(11) anthropic(11) noteFailedTry(10) boardroomAuth(10) keyVanCodenaam(10) rtmail(10)
 kern(9) gegevensStop(9) logActivity(9) sseToOffice(9) payrollOS(9) loginFails(8)
 stuur(8) mail(7) sseToSupplier(7) onboarding(6) notifySupplier(6) talen(6) tenant(5)
-logInlog(5) veilig(5) overheid(5) sseToCustomer(5)
+logInlog(5) veilig(5) openVacatures(5) overheid(5) sseToCustomer(5)
 ```
 
 **De breedste routebestanden** -- hier zou je beginnen:

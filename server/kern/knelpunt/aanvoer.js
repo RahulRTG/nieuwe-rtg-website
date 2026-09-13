@@ -1,10 +1,10 @@
 /* ============================================================================
-   DE AANVOER -- wat een BRON minimaal moet leveren om een manier te heten.
+   DE AANVOER -- wat een BRON minimaal moet leveren om een vondst te heten.
 
    ./openingen-kaart.js wijst per terrein EEN deur aan ("hier kunt u kijken").
    Dit is de stap erna: niet de deur maar wat erachter staat -- de vacatures
    zelf, de leerpaden zelf, de vrije opvangplekken zelf. Daarvoor is een
-   contract nodig, en de verleiding is dat contract te VERKLAREN: een `Manier`
+   contract nodig, en de verleiding is dat contract te VERKLAREN: een `Vondst`
    met een vaste set velden waar elk brondomein zich naar voegt.
 
    DAT IS GEMETEN EN HET MAG NIET. `scripts/aanvoervorm.js` (AANVOERVORM.json)
@@ -16,16 +16,16 @@
    terreinen onderling niets. Dat is scherper dan de Asset-meting (71%) en
    scherper dan de carriere-meting (88,2%).
 
-   Een `Manier` als OBJECTTYPE met verplichte velden is daarmee niet
+   Een `Vondst` als OBJECTTYPE met verplichte velden is daarmee niet
    gerechtvaardigd. Wat overleeft is de vorm die dit huis al twee keer heeft
    gevonden: een PROJECTIE met een klein aantal etiketten, per aanroep
    samengesteld door het brondomein zelf -- kern/levensgraaf/graaf.js, en de
    uitweg die COMMERCE.md voor `Koopbaar` koos (een verklaring van werkwoorden,
-   geen interface van verplichte methodes). Er komt dus GEEN `manieren`-tabel en
+   geen interface van verplichte methodes). Er komt dus GEEN `vondsten`-tabel en
    geen gedeelde basisklasse; er komt een AFSPRAAK over vijf etiketten.
 
    DE SCHERPSTE KEUZE STAAT IN DE HANDTEKENING: DEZE LAAG KRIJGT DE MENS NIET.
-   `manieren()` neemt een randvoorwaarde en verder niets -- geen profiel, geen
+   `vondsten()` neemt een randvoorwaarde en verder niets -- geen profiel, geen
    codenaam, geen leeftijd, geen postcode. Daardoor is een geschiktheidstoets
    hier niet iets dat je moet onthouden af te leren, maar iets dat structureel
    niet KAN. FOUNDATION.md par. 5: een eligibility-motor mag alleen toevoegen.
@@ -57,7 +57,7 @@
    1. EEN GETAL OP EEN MENS. Er is geen mens in deze laag om er een op te
       zetten. Geen match-score, geen rangorde, ook niet intern als
       sorteersleutel (LEVEN.md par. 2.4, ONTMOETEN.md par. 4, HDI.md).
-   2. EEN TERREIN WEGSTREPEN. `manieren()` voegt samen en trekt nooit af. Een
+   2. EEN TERREIN WEGSTREPEN. `vondsten()` voegt samen en trekt nooit af. Een
       bron die niets heeft, levert een LEGE lijst met een reden -- en dat is een
       uitslag, geen stilte (dezelfde regel als kern/ontvanger.js).
    3. IETS AANVRAGEN. Geen boeking, geen reservering, geen bericht aan een
@@ -69,8 +69,27 @@
    voorgeschoteld. Dat is niet te beloven maar te METEN, en de meter bestaat:
    DOELGROEPBEREIK.json zegt per functie x doelgroep of de deur opengaat. Dit is
    de spiegel van regel 4 in kern/ontvanger.js (*elke weg heeft een lezer, en
-   dat is gemeten*): een manier wijzen naar een deur die voor deze mens dicht
+   dat is gemeten*): een vondst wijzen naar een deur die voor deze mens dicht
    zit, is precies zo'n stille non-bezorging.
+
+   WAAROM EEN VONDST EN GEEN "MANIER". Dat woord is in ditzelfde domein al
+   bezet en het betekent er iets anders: ./index.js noemt een MANIER een weg
+   naar het doel, aangeleverd door de aanroeper, met een eigen stand (open,
+   geblokkeerd, onbepaald). Wat hier ontstaat is geen weg maar iets concreets
+   dat ACHTER een deur staat en een randvoorwaarde zou kunnen opheffen. Twee
+   betekenissen onder een naam in een module is precies wat SEMANTIEK.json meet
+   (105 van 123 gedeelde namen dragen meer dan een betekenis, en `VERMOGENS`
+   stond twee keer in hetzelfde huis met nul gedeelde leden). `vondst` is
+   gekozen omdat hij gemeten vrij was: vier kernbestanden noemen het woord en
+   nul gebruiken het als veldnaam.
+
+   AFGESPLITST OP DE NAAD DIE TELT. Hier staat WAT een vondst is (de etiketten
+   en de keuring); in ./aanvoer-bronnen.js staat HOE de bronnen worden gevraagd.
+   Twee dingen op een andere klok -- de etiketten veranderen als de definitie
+   verandert, het vragen als het bronnenmodel verandert -- en precies dezelfde
+   splitsing als ./openingen.js tegenover ./openingen-kaart.js. De aanleiding
+   was keuringsregel 13: dit bestand kwam op 10168 bytes tegen de 10 kB-band
+   aan, en die band is het signaal dat er een tweede onderwerp in zit.
 
    GEEN OPSLAG. Alles komt binnen als argument, net als ./index.js en
    ./openingen.js, en om dezelfde reden: zonder database uit te rekenen is
@@ -80,20 +99,20 @@
 
 const { TERREINEN } = require('./openingen-kaart');
 
-/* De etiketten die een manier draagt. Gesloten en bevroren, om dezelfde reden
+/* De etiketten die een vondst draagt. Gesloten en bevroren, om dezelfde reden
    als SOORTEN in kern/ontvanger.js: een etiket erbij hoort een besluit te zijn
    en niet iets dat ontstaat doordat een bron een nieuw veld meestuurt. */
 const ETIKETTEN = Object.freeze(['terrein', 'wat', 'ingang', 'dektNiet', 'herkomst', 'beschikbaarheid']);
 const VERPLICHT = Object.freeze(['terrein', 'wat', 'ingang', 'dektNiet', 'herkomst']);
 
-/* Velden waaraan te zien is dat een bron de MENS heeft meegekregen. Een manier
+/* Velden waaraan te zien is dat een bron de MENS heeft meegekregen. Een vondst
    die een van deze draagt, wordt geweigerd -- niet gefilterd maar geweigerd,
    met de naam van het veld erbij, zodat de bouwer van die bron het ziet in
    plaats van dat het stil wordt weggepoetst. */
 const MENSVELDEN = Object.freeze(['key', 'codenaam', 'profielId', 'bsn', 'naam', 'geboortedatum',
   'leeftijd', 'postcode', 'adres', 'score', 'match', 'rangorde', 'geschikt']);
 
-/* Keurt EEN manier. Geeft `{ ok: true, manier }` of `{ ok: false, reden }`.
+/* Keurt EEN vondst. Geeft `{ ok: true, vondst }` of `{ ok: false, reden }`.
    Nooit een uitzondering: een kapotte bron mag de andere niet meenemen. */
 function keur(ruw, herkomst) {
   const m = ruw && typeof ruw === 'object' ? ruw : null;
@@ -114,7 +133,7 @@ function keur(ruw, herkomst) {
   const onbekend = Object.keys(m).filter((k) => !ETIKETTEN.includes(k));
   if (onbekend.length) return { ok: false, reden: 'etiket onbekend: ' + onbekend.join(', ') };
 
-  return { ok: true, manier: {
+  return { ok: true, vondst: {
     terrein: m.terrein,
     wat: String(m.wat),
     ingang: String(m.ingang),
@@ -125,47 +144,4 @@ function keur(ruw, herkomst) {
   } };
 }
 
-/* Maakt een aanvoerlaag op de bronnen die dit huis werkelijk heeft.
-
-   `bronnen` is een object { herkomst: fn }, waarbij fn EEN randvoorwaarde
-   krijgt en een lijst ruwe manieren teruggeeft. De herkomst is de sleutel, en
-   die wordt door DEZE laag gezet en niet door de bron: een bron die zijn eigen
-   herkomst mag opschrijven, kan zich voordoen als een andere. */
-function maakAanvoer(bronnen) {
-  const lijst = bronnen && typeof bronnen === 'object' ? bronnen : {};
-
-  /* `voorwaarde` is de randvoorwaarde uit ./index.js en draagt GEEN mens.
-     Er is met opzet geen tweede argument: wie er een wil meegeven, moet deze
-     handtekening veranderen, en dan is het een besluit. */
-  function manieren(voorwaarde) {
-    const uit = { manieren: [], geenBron: [], geweigerd: [], bronnenGevraagd: 0 };
-    for (const herkomst of Object.keys(lijst)) {
-      const fn = lijst[herkomst];
-      if (typeof fn !== 'function') { uit.geweigerd.push({ herkomst, reden: 'bron-is-geen-functie' }); continue; }
-      uit.bronnenGevraagd++;
-      let ruw;
-      /* Een kapotte bron neemt de andere niet mee -- dezelfde regel als in
-         kern/ontvanger.js en opzet/meldaan.js. */
-      try { ruw = fn(voorwaarde); } catch (e) {
-        uit.geweigerd.push({ herkomst, reden: 'bron-brak: ' + ((e && e.message) || e) }); continue;
-      }
-      if (!Array.isArray(ruw)) { uit.geweigerd.push({ herkomst, reden: 'bron gaf geen lijst' }); continue; }
-      /* Niets hebben is een UITSLAG en geen stilte. Zonder deze regel is een
-         bron die stuk is niet te onderscheiden van een bron die leeg is. */
-      if (!ruw.length) { uit.geenBron.push({ herkomst, reden: 'deze bron heeft hier niets' }); continue; }
-      for (const r of ruw) {
-        const k = keur(r, herkomst);
-        if (k.ok) uit.manieren.push(k.manier);
-        else uit.geweigerd.push({ herkomst, reden: k.reden });
-      }
-    }
-    /* De volgorde is die van de bronnen en verder niets: er wordt NIET
-       gesorteerd. Een rangorde is een oordeel, en deze laag kent de mens niet
-       eens om er een over te vellen. */
-    return uit;
-  }
-
-  return { manieren, ETIKETTEN, VERPLICHT };
-}
-
-module.exports = { maakAanvoer, keur, ETIKETTEN, VERPLICHT, MENSVELDEN };
+module.exports = { keur, ETIKETTEN, VERPLICHT, MENSVELDEN };

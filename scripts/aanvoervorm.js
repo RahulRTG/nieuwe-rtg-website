@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 'use strict';
 /* ============================================================================
-   DE AANVOERVORM -- heeft een "manier" EEN vorm, of vijf?
+   DE AANVOERVORM -- heeft een "vondst" EEN vorm, of vijf?
 
    DE VRAAG DIE HIJ BEANTWOORDT. kern/knelpunt/openingen-kaart.js wijst per
    terrein EEN ingang aan ("hier kunt u kijken"). De stap erna is aanvoer: niet
    de deur maar wat erachter staat -- de vacatures zelf, de leerpaden zelf, de
    vrije opvangplekken zelf. Daarvoor is een contract nodig, en de verleiding is
-   dat contract te VERKLAREN: een `Manier` met een vaste set velden waar elk
+   dat contract te VERKLAREN: een `Vondst` met een vaste set velden waar elk
    brondomein zich naar voegt.
 
    DAT IS EXACT DE FOUT DIE `Asset` AL EEN KEER HEEFT GEMAAKT. DEVELOPERCLOUD.md
@@ -180,7 +180,7 @@ function meet() {
   const geenGedeeldeVorm = ruim.inAlleTerreinen.length === 0 && smal.inAlleTerreinen.length === 0;
   const conclusie = geenGedeeldeVorm
     ? 'GEEN GEDEELDE VORM: geen enkel veld staat in alle gemeten terreinen, onder geen van beide ' +
-      'domeinlijsten. Een `Manier` als objecttype met verplichte velden is daarmee niet gerechtvaardigd; ' +
+      'domeinlijsten. Een `Vondst` als objecttype met verplichte velden is daarmee niet gerechtvaardigd; ' +
       'de vorm die overleeft is een PROJECTIE met een klein aantal etiketten, per aanroep samengesteld ' +
       'door het brondomein zelf -- de vorm van kern/levensgraaf/graaf.js, en de uitweg die COMMERCE.md ' +
       'voor `Koopbaar` al koos.'
@@ -223,7 +223,7 @@ function drukRonde(naam, u) {
 }
 
 function druk(u) {
-  console.log('\nDE AANVOERVORM -- heeft een "manier" EEN vorm, of vijf?');
+  console.log('\nDE AANVOERVORM -- heeft een "vondst" EEN vorm, of vijf?');
   drukRonde('RUIM (alles wat naar het terrein ruikt)', u.ruim);
   drukRonde('SMAL (de bron die openingen-kaart.js noemt)', u.smal);
   console.log('\n' + (u.geenGedeeldeVorm ? '\x1b[32m' : '\x1b[33m') + u.conclusie + '\x1b[0m');

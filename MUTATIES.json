@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T09:54:00.308Z",
-    "commit": "74c67521",
+    "op": "2026-09-13T10:10:01.671Z",
+    "commit": "ddf40c28",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -49,6 +49,14 @@
       "module": "server/kern/aanmeldingen.js",
       "operator": "false->true",
       "gezakt": 1
+    },
+    "aanvoer.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/knelpunt/aanvoer.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1
     },
     "aanwezig.test.js": {
       "soort": "server",

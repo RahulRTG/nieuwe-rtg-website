@@ -811,8 +811,37 @@ de twee lagen zelf zitten: `gevolgcontract.js` laadt `gevolg.js` (zijn poort toe
 `gemeten` claim tegen de meting), dus omgekeerd zou een kring zijn. Zij hoort bij de
 aanroeper, en die stond er al.
 
-**Wat er nog niet is, en dat hoort erbij:** het register draagt twee contracten. De
-runtime-lezer leest ze, de meter telt ze, en de andere
+##### Het derde contract: de route waar het geld werkelijk beweegt
+
+De gouden geldweg heeft twee routes, en de namen zeggen het omgekeerde van de
+waarheid: `/api/office/bank/incasso` **zet klaar** en verplaatst geen euro,
+`/api/office/bank/handtekening/bevestig` **voert uit**. Die tweede had geen contract,
+en zijn meting staat op `onbekend` met een eerlijke reden — *de proef kwam niet bij de
+muterende code*. Dat is geen tekort dat op te lossen is: de route eist twee
+kantoormensen op naam, en een script kan de tweede niet zijn. **Dit is dus precies het
+geval waarvoor de tweede as bestaat**, en het contract claimt daarom nergens `gemeten`.
+
+Twee dingen daar niet wegpoetsen. Zijn gevolg is **gedelegeerd**: de route voert uit
+wat er is aangevraagd (`uitvoerders.get(a.actie)`), dus wat hij veroorzaakt staat in
+het contract van *die* capability. De uitkomstruimte is daarom gesloten en klein —
+`bank.rood` en `bank.incasso` — en de toets leest die lijst uit de route zelf, zodat
+een derde geregistreerde handeling het contract laat zakken in plaats van stil te
+verouderen (met een mutatie beide kanten op nagetrokken). En de duurste regel: **de
+handtekening is OPGEBRUIKT ook als de uitvoering faalt**, want `splice()` staat vóór
+`voerUit()`. Dat is beleid uit de kop van de module — *een nee wordt geen ja door het
+nog eens te vragen* — en het staat als `mislukking`-gevolg in het contract.
+
+Het register bestaat sindsdien uit **delen** (`register-bank.js`, `register-lid.js`) met
+`register.js` als enige samensteller, en die **gooit bij het LADEN** zodra twee delen
+hetzelfde pad claimen. Dat is de les uit `server/lib/mutatiecontracten.js`: een register
+waarin het ene deel het andere stilzwijgend overschrijft, laat twee mensen een contract
+schrijven waarvan er één nooit wordt gelezen. De naad tussen de delen is niet de omvang
+maar de **lezer**: de kantoorpaden staan niet in de AI-allowlist en tellen dus niet mee
+in de noemer van de meter (hij meldt ze apart als `contractenBuitenBereik`), het
+ledenpad wel.
+
+**Wat er nog niet is, en dat hoort erbij:** het register draagt drie contracten, waarvan
+één in de noemer van de meter. De andere
 <!--getal:gevolg.contractOnbekend-->172<!--/getal--> bereikbare handelingen hebben er
 geen. Dat is werk per regel door een mens, en niet iets dat een script in een middag
 kan vullen — dat is letterlijk de les uit de kop van `server/lib/mutatiecontracten.js`.

@@ -227,3 +227,69 @@ test('DE NAAM VAN DEZE LAAG BOTST MET NIETS, en `effect` was bezet', () => {
   assert.ok(Array.isArray(model.VERKLAARD), 'het effectmodel hoort zijn verklaringen te dragen');
   assert.notDeepStrictEqual(ec.GRADEN, ['verklaard', 'afgeleid', 'vermoed', 'onbekend']);
 });
+
+test('HET REGISTER IS SAMENGESTELD, en een dubbele definitie valt om bij het LADEN', () => {
+  /* De les uit server/lib/mutatiecontracten.js: een samengesteld register waarin het
+     ene deel het andere stilzwijgend overschrijft, laat twee mensen een contract
+     schrijven waarvan er een nooit wordt gelezen. Omvallen bij het laden is het
+     goedkoopste moment.
+
+     De echte delen zijn bevroren, dus de samenstelling wordt hier NAGEDAAN met
+     dezelfde regel -- en dat is geen tweede kopie van de waarheid: de bewering is
+     "twee delen die hetzelfde pad claimen horen te gooien", en die is alleen te
+     toetsen op invoer die het register niet heeft. */
+  const samen = (delen) => {
+    const uit = {};
+    for (const [naam, deel] of delen)
+      for (const pad of Object.keys(deel)) {
+        if (uit[pad]) throw new Error('twee delen claimen ' + pad + ' (de tweede is ' + naam + ')');
+        uit[pad] = deel[pad];
+      }
+    return uit;
+  };
+  assert.throws(() => samen([['a.js', { '/api/x': {} }], ['b.js', { '/api/x': {} }]]), /twee delen claimen/);
+  /* En de echte samenstelling gooit niet: de delen overlappen niet. */
+  const bank = require('../server/kern/stuur/gevolgcontract/register-bank');
+  const lid = require('../server/kern/stuur/gevolgcontract/register-lid');
+  const overlap = Object.keys(bank.BANK).filter(p => lid.LID[p]);
+  assert.deepStrictEqual(overlap, [], 'de delen claimen hetzelfde pad: ' + overlap.join(', '));
+  assert.deepStrictEqual(Object.keys(CONTRACTEN).sort(),
+    Object.keys(bank.BANK).concat(Object.keys(lid.LID)).sort(),
+    'het samengestelde register is niet de som van zijn delen');
+});
+
+test('de route waar het geld BEWEEGT is verklaard, en zijn gevolg is GEDELEGEERD', () => {
+  /* Dit is het geval waarvoor de tweede as bestaat: de meting kan hier structureel
+     niet komen (twee kantoormensen op naam, en een script kan de tweede niet zijn),
+     dus staat er zuiver verklaring -- en dan hoort elke regel een adres in de code
+     te dragen. */
+  const pad = '/api/office/bank/handtekening/bevestig';
+  const c = CONTRACTEN[pad];
+  assert.ok(c, 'de route waar het geld beweegt hoort een contract te hebben');
+  assert.strictEqual(gevolg.gevolgVan(pad).graad, 'onbekend',
+    'zodra deze route WEL gemeten wordt, hoort dit contract zijn graden bij te werken');
+  assert.deepStrictEqual(ec.keur(c), []);
+  assert.strictEqual(ec.stand(c, pad).stand, 'VOLLEDIG');
+
+  /* Geen enkel gevolg claimt `gemeten`: dat zou de poort ook weigeren, maar hier
+     staat het als bewering -- een contract op een ongemeten pad hoort nergens het
+     stempel van de proef te dragen. */
+  for (const g of c.gevolgen)
+    assert.notStrictEqual(g.graad, 'gemeten', g.wat + ': claimt gemeten op een ongemeten pad');
+
+  /* HET GEDELEGEERDE GEVOLG draagt een GESLOTEN uitkomstruimte, en die hoort te
+     kloppen met de handelingen die werkelijk geregistreerd zijn. Komt er een derde
+     bij zonder dat dit contract meebeweegt, dan zakt deze toets. */
+  const gedelegeerd = c.gevolgen.find(g => Array.isArray(g.uitkomsten));
+  assert.ok(gedelegeerd, 'het gedelegeerde gevolg hoort zijn uitkomstruimte te noemen');
+  const route = require('node:fs').readFileSync(
+    require('node:path').join(__dirname, '..', 'server/routes/kantoren/bank-tweedehand.js'), 'utf8');
+  const geregistreerd = [...route.matchAll(/tweedeHand\.registreer\('([^']+)'/g)].map(m => m[1]).sort();
+  assert.deepStrictEqual(gedelegeerd.uitkomsten.slice().sort(), geregistreerd,
+    'de uitkomstruimte van het gedelegeerde gevolg loopt achter op de geregistreerde handelingen');
+
+  /* En de duurste regel van dit contract: de handtekening is opgebruikt ook als de
+     uitvoering faalt. Dat is beleid uit de kop van de module, geen toeval. */
+  const mislukking = c.gevolgen.find(g => g.soort === 'mislukking');
+  assert.match(mislukking.wat, /OPGEBRUIKT/);
+});

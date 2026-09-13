@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T10:48:23.314Z",
-    "commit": "a685e862",
-    "boomVuil": false,
-    "boomAnders": 0,
+    "op": "2026-09-13T11:21:59.115Z",
+    "commit": "4212e97f",
+    "boomVuil": true,
+    "boomAnders": 1,
     "instrument": "scripts/doelgroepbereik.js",
     "node": "v22.22.2"
   },
@@ -8855,7 +8855,7 @@
       "naam": "Knelpunten (welke weg ligt open)",
       "doelgroep": "rtg",
       "verklaard": true,
-      "routes": 1,
+      "routes": 2,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/knelpunt",
@@ -8865,9 +8865,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 39,
+        "regel": 103,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, beantwoord);"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
@@ -8879,7 +8879,7 @@
       "naam": "Knelpunten (welke weg ligt open)",
       "doelgroep": "lifestyle",
       "verklaard": true,
-      "routes": 1,
+      "routes": 2,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/knelpunt",
@@ -8889,9 +8889,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 39,
+        "regel": 103,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, beantwoord);"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
@@ -8903,7 +8903,7 @@
       "naam": "Knelpunten (welke weg ligt open)",
       "doelgroep": "business",
       "verklaard": true,
-      "routes": 1,
+      "routes": 2,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/knelpunt",
@@ -8913,9 +8913,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 39,
+        "regel": 103,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, beantwoord);"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
@@ -8927,7 +8927,7 @@
       "naam": "Knelpunten (welke weg ligt open)",
       "doelgroep": "gast",
       "verklaard": false,
-      "routes": 1,
+      "routes": 2,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/knelpunt",
@@ -8937,9 +8937,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 39,
+        "regel": 103,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, beantwoord);"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
@@ -8947,9 +8947,9 @@
       "uitslag": "bereikbaar-zonder-verklaring",
       "triageBewijs": {
         "zelfde": 3,
-        "geweigerd": 0,
+        "geweigerd": 1,
         "onbekend": 0,
-        "vergeleken": 3
+        "vergeleken": 4
       },
       "triage": "gelijk-aan-verklaard",
       "triageReden": "een verklaarde doelgroep krijgt op POST /api/knelpunt exact hetzelfde antwoord; het register loopt achter en het bord kan deze functie niet per doelgroep uitzetten"
@@ -8959,48 +8959,58 @@
       "naam": "Knelpunten (welke weg ligt open)",
       "doelgroep": "leverancier",
       "verklaard": false,
-      "routes": 1,
-      "beproefd": 1,
+      "routes": 2,
+      "beproefd": 2,
       "onbepaaldeRoutes": 1,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "1 van de 1 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "1 van de 2 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "knelpunt",
       "naam": "Knelpunten (welke weg ligt open)",
       "doelgroep": "personeel",
       "verklaard": false,
-      "routes": 1,
-      "beproefd": 1,
+      "routes": 2,
+      "beproefd": 2,
       "onbepaaldeRoutes": 1,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "1 van de 1 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "1 van de 2 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "knelpunt",
       "naam": "Knelpunten (welke weg ligt open)",
       "doelgroep": "foundation",
-      "verklaard": false,
-      "routes": 1,
-      "beproefd": 1,
+      "verklaard": true,
+      "routes": 2,
+      "openRoute": {
+        "methode": "POST",
+        "pad": "/api/rtf/knelpunt",
+        "bewakers": [],
+        "bewakersBekend": true,
+        "viaRouter": false,
+        "bestand": "server/routes/knelpunt.js",
+        "regel": 138,
+        "samengesteld": false,
+        "rauw": ", (req, res) => {"
+      },
+      "beproefd": 2,
       "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "onbepaald",
-      "reden": "deze doelgroep dekt gezinnen, leerlingen EN scholen; de meter draagt alleen een gezinssessie"
+      "open": "POST /api/rtf/knelpunt",
+      "uitslag": "waar"
     },
     {
       "functie": "knelpunt",
       "naam": "Knelpunten (welke weg ligt open)",
       "doelgroep": "intern",
       "verklaard": false,
-      "routes": 1,
-      "beproefd": 1,
+      "routes": 2,
+      "beproefd": 2,
       "onbepaaldeRoutes": 1,
       "open": null,
       "uitslag": "onbepaald",
-      "reden": "1 van de 1 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
+      "reden": "1 van de 2 routes weigerden anders dan anoniem; van buiten niet te zien of dat de bewaker was of de handler"
     },
     {
       "functie": "vertegenwoordiging",
@@ -31459,16 +31469,16 @@
   ],
   "telling": {
     "cellen": 1736,
-    "waar": 578,
+    "waar": 579,
     "correct-afgesloten": 166,
     "registerleugen": 33,
     "bereikbaar-zonder-verklaring": 132,
     "geen-deur": 133,
-    "onbepaald": 690,
+    "onbepaald": 689,
     "niet-beproefd": 4,
     "sessie-ontbreekt": 0
   },
-  "routesGezien": 5010,
+  "routesGezien": 5011,
   "leugens": [
     {
       "functie": "social",
@@ -32928,7 +32938,7 @@
       "naam": "Knelpunten (welke weg ligt open)",
       "doelgroep": "gast",
       "verklaard": false,
-      "routes": 1,
+      "routes": 2,
       "openRoute": {
         "methode": "POST",
         "pad": "/api/knelpunt",
@@ -32938,9 +32948,9 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 39,
+        "regel": 103,
         "samengesteld": false,
-        "rauw": ", auth, (req, res) => {"
+        "rauw": ", auth, beantwoord);"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
@@ -32948,9 +32958,9 @@
       "uitslag": "bereikbaar-zonder-verklaring",
       "triageBewijs": {
         "zelfde": 3,
-        "geweigerd": 0,
+        "geweigerd": 1,
         "onbekend": 0,
-        "vergeleken": 3
+        "vergeleken": 4
       },
       "triage": "gelijk-aan-verklaard",
       "triageReden": "een verklaarde doelgroep krijgt op POST /api/knelpunt exact hetzelfde antwoord; het register loopt achter en het bord kan deze functie niet per doelgroep uitzetten"

@@ -26,7 +26,7 @@
    geen knelpunt om iets bij te zoeken, en een half antwoord met een halve kaart
    leest als een uitkomst. */
 module.exports = (kern) => {
-  const { app, auth } = kern;
+  const { app, auth, rtf } = kern;
   const knelpunt = require('../kern/knelpunt');
   const openingen = require('../kern/knelpunt/openingen');
   const { maakAanvoer } = require('../kern/knelpunt/aanvoer-bronnen');
@@ -40,7 +40,10 @@ module.exports = (kern) => {
     opleiding: maakOpleidingbron(() => kern.beroepenbieb)
   });
 
-  app.post('/api/knelpunt', auth, (req, res) => {
+  /* Eén afhandeling voor twee deuren. Ze apart schrijven zou betekenen dat een
+     gezin een ANDER antwoord krijgt dan een lid zodra iemand er een aanpast --
+     en dat is precies de soort stille tweedeling die deze laag moet uitsluiten. */
+  function beantwoord(req, res) {
     const r = knelpunt.reken(req.body || {});
     const { status, ...rest } = r;
     if (!r.ok) return res.status(status || 200).json(rest);
@@ -95,5 +98,46 @@ module.exports = (kern) => {
       vondsten, vondstenZonderBron: zonderBron,
       vondstenGeweigerd: bronMeldingen, vondstenBronLeeg: bronLeeg, vondstenGeleverd: geleverd,
       aannames: rest.aannames.concat(o.aannames), openingenGrens: o.grens });
+  }
+
+  app.post('/api/knelpunt', auth, beantwoord);
+
+  /* ---------------------------------------------------------------------
+     DE FOUNDATION-INGANG -- een besluit van de eigenaar, 13 september 2026.
+
+     WAT HIER WEL EN NIET IS OPENGEZET. Een gezin mag zijn EIGEN vraag laten
+     beantwoorden met vondsten. Dat is niet hetzelfde als "de foundation mag
+     bij /api/knelpunt/*": er is één deur bij gekomen voor één functie, en de
+     rest van deze laag verandert niet. De aanleiding staat in de Adam-keten --
+     de motor die precies de vraag van een zeventienjarige beantwoordt, was
+     voor dat gezin niet te openen.
+
+     DRIE GRENZEN, EN ALLE DRIE STAAN ZE IN DE CODE EN NIET ALLEEN HIER:
+
+     1. GEEN PROFIEL NAAR DE AANVOER. `beantwoord()` leest alleen `req.body`,
+        en de sessie wordt hier ALLEEN gebruikt om de deur te openen -- er gaat
+        niets van `sess` mee naar de motor of de bronnen. De handtekening van
+        `vondsten(voorwaarde)` maakt dat structureel onmogelijk; deze route
+        maakt er geen uitzondering op.
+     2. EEN VONDST IS GEEN RECHT. Dat Adam een vacature ZIET, zegt niets over
+        of hij erop mag solliciteren. Die vraag blijft bij de sollicitatielaag,
+        die de leeftijd uit het PROFIEL leest en niet uit dit antwoord
+        (routes/member/werk/rtf.js: *"de leeftijd komt uit het PROFIEL, niet
+        uit het verzoek"*). Deze laag ordent mogelijkheden; de domeinen blijven
+        eigenaar van hun eigen handelingen.
+     3. GEEN RANGORDE DIE ALS ADVIES LEEST. Er wordt niets gesorteerd, en het
+        antwoord draagt per bron `getoond` naast `gevonden` zodat een korte
+        lijst niet als "dit is alles" en een lange niet als "dit is het beste"
+        leest.
+
+     IEDEREEN IN HET GEZIN MAG KIJKEN, ook een gast-profiel -- dezelfde regel
+     als bij /api/rtf/beroepen. Wie mag KIJKEN begrenzen zou hier een
+     geschiktheidsoordeel zijn over wie zijn eigen mogelijkheden mag zien, en
+     dat is precies wat FOUNDATION.md par. 5 verbiedt.
+     --------------------------------------------------------------------- */
+  app.post('/api/rtf/knelpunt', (req, res) => {
+    const sess = rtf.verifieerProfiel((req.body || {}).code, (req.body || {}).token);
+    if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
+    return beantwoord(req, res);
   });
 };

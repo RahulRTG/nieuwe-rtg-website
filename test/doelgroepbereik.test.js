@@ -86,17 +86,30 @@ test('5. een doelgroep met meer sessievormen levert nooit een leugen', () => {
       'foundation levert een registerleugen; dat is de meter die zijn eigen beperking als bevinding leest');
 });
 
-test('6. de meter beantwoordt geen productvraag', () => {
-  /* Of de RTFoundation toegang KRIJGT tot de knelpuntmotor is een besluit van
-     de eigenaar. Vandaag is die doelgroep daar niet verklaard en komt hij er
-     niet in -- dat hoort consistent te heten en geen bevinding te zijn. De
-     meter wordt daar pas rood van als de doelgroep is TOEGEVOEGD. */
+test('6. de meter beantwoordt geen productvraag -- en bewijst er wel een besluit mee', () => {
+  /* HIER STOND HET OMGEKEERDE, EN DAT IS DE BEDOELING. Tot 13 september hield
+     deze toets vast dat `knelpunt x foundation` noch een leugen noch een gat
+     was: die doelgroep was niet verklaard en kwam er niet in, en dat heet
+     `correct-afgesloten` -- ook als iemand vond dat hij erbij zou moeten
+     kunnen. De meter mocht die vraag niet beantwoorden.
+
+     De eigenaar heeft hem beantwoord: de RTFoundation is nu een VERKLAARDE
+     doelgroep op deze ene functie. En dan doet de meter precies waar hij voor
+     is -- hij bewijst of de deur technisch werkelijk opengaat. `waar` is het
+     enige dat hier nog mag staan: `registerleugen` zou betekenen dat het
+     besluit is opgeschreven maar niet uitgevoerd. */
   const j = lees('DOELGROEPBEREIK.json');
   const cel = j.cellen.find((c) => c.functie === 'knelpunt' && c.doelgroep === 'foundation');
   assert.ok(cel, 'de cel knelpunt x foundation ontbreekt; dan bewaakt deze toets niets');
-  assert.equal(cel.verklaard, false);
-  assert.notEqual(cel.uitslag, 'registerleugen');
-  assert.notEqual(cel.uitslag, 'bereikbaar-zonder-verklaring');
+  assert.equal(cel.verklaard, true, 'de grant is uit het register verdwenen');
+  assert.equal(cel.uitslag, 'waar',
+    'de foundation is verklaard maar bereikt de knelpuntmotor niet: een besluit op papier zonder deur');
+
+  /* En de regel zelf blijft staan voor alles wat NIET is besloten: een
+     doelgroep die niet verklaard is en niet binnenkomt, is geen bevinding. */
+  const stil = j.cellen.filter((c) => c.uitslag === 'correct-afgesloten');
+  assert.ok(stil.length > 100, 'er zijn bijna geen correct-afgesloten cellen meer; ' +
+    'dan is de meter productvragen gaan beantwoorden');
 });
 
 test('7. de twee richtingen worden nooit opgeteld', () => {

@@ -1,16 +1,16 @@
 {
  "stempel": {
-  "op": "2026-09-11T20:42:39.738Z",
-  "commit": "7f0359591",
-  "boomVuil": false,
+  "op": "2026-09-13T11:27:33.101Z",
+  "commit": "4212e97f",
+  "boomVuil": true,
   "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 623,
-  "bewaakt": 533,
+  "zonderBewakerslaag": 624,
+  "bewaakt": 534,
   "openbaarMetReden": 51,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
@@ -112,15 +112,15 @@
    "aantal": 7
   },
   {
+   "naam": "rtf.verifieerProfiel",
+   "aantal": 6
+  },
+  {
    "naam": "sessie",
    "aantal": 5
   },
   {
    "naam": "mijn -> personeelVan",
-   "aantal": 5
-  },
-  {
-   "naam": "rtf.verifieerProfiel",
    "aantal": 5
   },
   {
@@ -3255,6 +3255,12 @@
    "bestand": "server/routes/geloofbieb.js:31",
    "staat": "bewaakt",
    "wacht": "profiel"
+  },
+  {
+   "sleutel": "POST /api/rtf/knelpunt",
+   "bestand": "server/routes/knelpunt.js:138",
+   "staat": "bewaakt",
+   "wacht": "rtf.verifieerProfiel"
   },
   {
    "sleutel": "POST /api/rtf/onboarding/opslaan",

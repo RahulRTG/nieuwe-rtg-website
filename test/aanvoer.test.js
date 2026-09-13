@@ -389,3 +389,83 @@ test('20. een echte vraag raakt beide werelden, met een identieke vondstvorm', a
     assert.ok(opl.gevonden > opl.getoond, 'de opleidingsbron meldt geen afkapping terwijl hij afkapt');
   } finally { await stop(child); }
 });
+
+/* ---------------------------------------------------------------------------
+   DE FOUNDATION-DEUR -- een besluit van de eigenaar, 13 september 2026.
+
+   Een gezin mag zijn eigen vraag laten beantwoorden met vondsten. Wat hier
+   bewaakt wordt is niet dat de deur OPEN is (dat meet DOELGROEPBEREIK.json)
+   maar dat hij niet MEER opent dan besloten.
+   ------------------------------------------------------------------------- */
+
+test('21. een gezin krijgt hetzelfde antwoord als een lid, en niets extra', async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfknel-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP,
+    NODE_ENV: 'test', RTG_DEMO: '1' } });
+  try {
+    /* De gezinssessie langs de ECHTE route, met dezelfde oproep als
+       scripts/lib/proefsessies.js -- wie de inlog van een gezin twee keer
+       opschrijft, heeft over een half jaar twee verschillende gezinnen. */
+    const gezin = await roep(base, '/api/foundation/gezin/maak', { gezinsnaam: 'Proefgezin',
+      naam: 'Papa', pin: '1234', bevoegdGezin: true, privacyAkkoord: true });
+    const code = gezin.d && gezin.d.code, token = gezin.d && gezin.d.token;
+    assert.ok(code && token, 'geen gezinssessie; dan zet deze toets niets op');
+
+    const vraag = { doel: 'verder leren of werken',
+      randvoorwaarden: [{ id: 'vak', wat: 'een diploma als lasser om te kunnen werken', stand: 'ontbreekt' }],
+      manieren: [{ id: 'w', wat: 'aan de slag', nodig: ['vak'] }] };
+
+    const lid = await roep(base, '/api/login', { tier: 'rtg' });
+    const alsLid = await roep(base, '/api/knelpunt', vraag, lid.d.token);
+    const alsGezin = await roep(base, '/api/rtf/knelpunt', Object.assign({ code, token }, vraag));
+
+    assert.equal(alsGezin.status, 200, 'de gezinsdeur gaat niet open');
+    /* EEN handler achter twee deuren: een gezin mag nooit een ander antwoord
+       krijgen dan een lid, want dat zou een stille tweedeling zijn. */
+    assert.deepEqual(alsGezin.d.vondsten, alsLid.d.vondsten);
+    assert.deepEqual(alsGezin.d.terreinen, alsLid.d.terreinen);
+
+    /* En de deur geeft niets van de sessie door: geen enkel veld uit MENSVELDEN
+       komt in een vondst terecht. */
+    for (const v of (alsGezin.d.vondsten || []))
+      for (const m of MENSVELDEN)
+        assert.ok(!Object.prototype.hasOwnProperty.call(v, m), 'een vondst draagt ' + m);
+  } finally { await stop(child); }
+});
+
+test('22. zonder gezinsprofiel gaat de deur niet open', async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rtfknel-dicht-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP,
+    NODE_ENV: 'test', RTG_DEMO: '1' } });
+  try {
+    const vraag = { doel: 'verder leren of werken',
+      randvoorwaarden: [{ id: 'vak', wat: 'werk', stand: 'ontbreekt' }],
+      manieren: [{ id: 'w', wat: 'aan de slag', nodig: ['vak'] }] };
+    const kaal = await roep(base, '/api/rtf/knelpunt', vraag);
+    assert.equal(kaal.status, 403, 'de gezinsdeur staat open zonder profiel');
+    /* Een verzonnen code en token komen er evenmin langs: het PROFIEL achter
+       het token beslist, niet de code in het verzoek. */
+    const vals = await roep(base, '/api/rtf/knelpunt',
+      Object.assign({ code: 'ZZZZZZ', token: 'nep' }, vraag));
+    assert.equal(vals.status, 403);
+  } finally { await stop(child); }
+});
+
+test('23. de grant staat in het register, op EEN functie en met beide deuren', () => {
+  /* Zonder het tweede pad valt de Foundation-ingang onder `rtf-contacten`
+     (paden /api/rtf), en dan schakelt het bord de ene helft van deze functie
+     wel uit en de andere niet -- precies de `social`-fout die
+     DOELGROEPBEREIK.json aanwijst. */
+  const { FUNCTIES } = require('../server/functies/register');
+  const { functieVoorPad } = require('../server/functies/toegangpad');
+  const f = FUNCTIES.find((x) => x.id === 'knelpunt');
+  assert.ok(f.doelgroepen.includes('foundation'), 'de grant is uit het register verdwenen');
+  assert.deepEqual(f.paden, ['/api/knelpunt', '/api/rtf/knelpunt']);
+  for (const pad of f.paden)
+    assert.equal((functieVoorPad(pad) || {}).id, 'knelpunt',
+      pad + ' valt onder een andere functie; dan is de schakelaar gesplitst');
+  /* En de grant blijft SMAL: er is geen tweede functie die de foundation op de
+     hele knelpuntlaag zet. */
+  const breed = FUNCTIES.filter((x) => (x.paden || []).some((p) => p === '/api/knelpunt') && x.id !== 'knelpunt');
+  assert.deepEqual(breed, [], 'een tweede functie claimt /api/knelpunt');
+});

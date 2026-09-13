@@ -255,14 +255,20 @@ async function loop(basis, uit) {
      Dat is geen defect -- elke regel code klopt -- en daarom draagt hij een
      reden in plaats van een rood kruis. */
   await stap(
-    schakel(2, 'Adam', 'knelpuntmotor', 'legt zijn doel voor en vraagt welke wegen openliggen',
-      'WAT ONTBREEKT: een ingang op /api/knelpunt voor een RTF-gezinsprofiel. ' +
-      'WAAROM: routes/knelpunt.js hangt achter `auth` (opzet/diensten2.js), en dat eist een lidsessie ' +
-      'met een account of een demo-persona; een gezinstoken van /api/foundation is een andere sessie. ' +
-      'De motor is dus bereikbaar voor wie een RTG-account heeft en niet voor het gezin waar hij voor ' +
-      'beschreven is. WIE EROVER GAAT: de eigenaar -- dit is dezelfde vraag als de ouderingang op de ' +
-      'kinderopvang (kern/verzorging/opvangleden.js), die er kwam als BESLUIT en niet als functie.'),
-    () => P('/api/knelpunt', { doel: 'weer aan het werk of aan het leren' }, w.adam.token));
+    /* DEZE SCHAKEL WAS EEN BEVINDING EN IS HET NIET MEER. Hij stond open omdat
+       /api/knelpunt achter `auth` hangt en een gezinstoken een andere sessie
+       is: de motor was bereikbaar voor wie een RTG-account had en niet voor het
+       gezin waar hij voor beschreven is. De eigenaar heeft dat besluit genomen
+       op 13 september 2026 -- niet door `auth` te verzwakken maar met een EIGEN
+       deur op dezelfde functie (/api/rtf/knelpunt). Zie de kop van
+       routes/knelpunt.js voor wat er wel en niet is opengezet. */
+    schakel(2, 'Adam', 'knelpuntmotor', 'legt zijn doel voor en vraagt welke wegen openliggen'),
+    () => P('/api/rtf/knelpunt', { code: w.code, token: w.adam.token,
+      doel: 'weer aan het werk of aan het leren',
+      randvoorwaarden: [{ id: 'diploma', wat: 'een startkwalificatie', stand: 'ontbreekt' }],
+      manieren: [{ id: 'bbl', wat: 'een bbl-opleiding', nodig: ['diploma'] }] }),
+    async r => ({ klopt: !!(r.data && r.data.ok && Array.isArray(r.data.manieren)),
+      wat: 'de motor antwoordt het gezin: ' + (((r.data && r.data.manieren) || []).length) + ' wegen beoordeeld' }));
 
   /* 3 -- DEZELFDE VRAAG ALS LID. Zonder deze schakel is schakel 2 niet te
      lezen: een dichte deur en een kapotte motor zien er van buiten hetzelfde
@@ -317,15 +323,16 @@ async function loop(basis, uit) {
      rekenmachine er staat en de aanvoer niet. */
   await stap(
     schakel(4, 'mens', 'knelpuntmotor', 'noemt alleen een doel; iets in dit huis levert de mogelijke wegen aan',
-      'WAT ONTBREEKT: een bron die uit een doel de MANIEREN samenstelt. kern/knelpunt/ rekent ze door, ' +
-      'maar krijgt ze van de aanroeper -- en /api/knelpunt heeft nul aanroepers (geen scherm in public/, ' +
-      'geen module in server/; alleen de route, lib/mutatiecontracten-knelpunt.js, ' +
-      'lib/idemsleutels-bescherming.js en functies/register/cat-life.js noemen het pad). ' +
+      'WAT ONTBREEKT: een bron die uit een DOEL de MANIEREN samenstelt. ' +
+      'DEZE REDEN IS SINDS 13 SEPTEMBER 2026 SMALLER GEWORDEN EN NIET WEGGEVALLEN, en dat verschil is ' +
+      'de moeite waard. Er is nu wel aanvoer (kern/knelpunt/aanvoer*.js, twee bronnen), maar die ' +
+      'levert VONDSTEN bij een RANDVOORWAARDE -- wat zou dit knelpunt kunnen opheffen -- en geen WEGEN ' +
+      'bij een kaal doel. Wie "ik wil weer aan het werk" intikt, heeft nog steeds zelf de manieren te ' +
+      'bedenken; pas daarna vindt het huis er iets bij. ' +
       'WAAROM: de motor is met opzet een rekenmachine en geen zoeker -- hij mag niet rangschikken en niets ' +
-      'weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. De aanvoer hoort ' +
-      'ernaast te staan en niet erin. WIE EROVER GAAT: de eigenaar. Dit is de kern van het voorstel voor ' +
-      'een kansengraaf: kern/knelpunt/openingen-kaart.js dekt vandaag 5 terreinen (werk, opleiding, opvang, ' +
-      'vervoer, wonen) en die kaart geeft INGANGEN bij een knelpunt, geen wegen bij een doel.'),
+      'weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. ' +
+      'WIE EROVER GAAT: de eigenaar. De stap die nog ontbreekt is klein en eerlijk te benoemen: van een ' +
+      'doel naar een handvol manieren, zonder ze te rangschikken.'),
     () => P('/api/knelpunt', { doel: 'ik wil weer aan het werk' }, M),
     async r => ({ klopt: !!(r.data && r.data.manieren && r.data.manieren.length),
       wat: 'de motor gaf ' + (((r.data && r.data.manieren) || []).length) + ' wegen bij een kaal doel' }));
@@ -444,6 +451,49 @@ async function loop(basis, uit) {
       const s = rijVan(await sollicitatiesVanAdam(basis, w.code, w.adam.token), 'Keukenhulp');
       return { klopt: !!s && s.status === 'aangenomen' && !!s.bedrijf,
         wat: s ? 'blijft staan: ' + s.func + ' bij ' + s.bedrijf + ' (' + s.status + ')' : 'de uitkomst is weg' };
+    });
+
+  /* 12 -- DE BELOFTE DIE DE EIGENAAR ERBIJ VROEG (13 september 2026), en het
+     is er met opzet EEN en niet drie:
+
+       *Een Foundation-profiel kan vanuit een eigen doel zowel echte werk- als
+       leermogelijkheden bereiken, zonder dat een bron wordt verzonnen,
+       gladgestreken of als advies vermomd.*
+
+     Alle vier de helften worden hier gemeten en niet aangenomen. BEREIKEN: de
+     gezinsdeur geeft vondsten uit twee onafhankelijke domeinen. NIET VERZONNEN:
+     de vacature is er een die de werkgever in schakel 5 echt heeft opengezet.
+     NIET GLADGESTREKEN: `getoond` en `gevonden` staan per bron apart, dus een
+     schilfer van tienduizend leerpaden leest niet als "dit is alles". NIET ALS
+     ADVIES: een vondstvorm over beide domeinen, geen rangorde, en geen woord
+     over welke weg beter is.
+
+     En de vijfde, die er niet in de zin staat maar wel in de grens: geen enkele
+     vondst draagt iets over de mens. */
+  await stap(
+    schakel(12, 'Adam', 'twee werelden', 'bereikt vanuit een doel echte werk- en leermogelijkheden tegelijk'),
+    () => P('/api/rtf/knelpunt', { code: w.code, token: w.adam.token,
+      doel: 'verder leren of werken',
+      randvoorwaarden: [{ id: 'vak', wat: 'een diploma als keukenhulp om te kunnen werken', stand: 'ontbreekt' }],
+      manieren: [{ id: 'aan-de-slag', wat: 'aan de slag', nodig: ['vak'] }] }),
+    async r => {
+      const v = (r.data && r.data.vondsten) || [];
+      const geleverd = (r.data && r.data.vondstenGeleverd) || [];
+      const terreinen = [...new Set(v.map(x => x.terrein))].sort();
+      const vormen = [...new Set(v.map(x => Object.keys(x).sort().join(',')))];
+      /* Draagt een vondst iets over Adam? De lijst is die van
+         kern/knelpunt/aanvoer.js, zodat hij niet uiteenloopt. */
+      const { MENSVELDEN } = require('../server/kern/knelpunt/aanvoer');
+      const lek = v.filter(x => MENSVELDEN.some(m => Object.prototype.hasOwnProperty.call(x, m)));
+      /* Gladgestreken betekent hier: een bron die afkapt zonder te zeggen
+         hoeveel hij vond. Een bron die alles toont mag getoond === gevonden. */
+      const stil = geleverd.filter(g => g.gevonden === null);
+      return {
+        klopt: terreinen.length >= 2 && vormen.length === 1 && !lek.length && !stil.length,
+        wat: terreinen.join(' + ') + '; ' + v.length + ' vondsten in ' + vormen.length + ' vorm; ' +
+          geleverd.map(g => g.herkomst + ' ' + g.getoond + '/' + g.gevonden).join(', ') +
+          (lek.length ? '; LEKT ' + lek.length : '') + (stil.length ? '; ZWIJGT ' + stil.length : '')
+      };
     });
 
   return { w, S, M, vacId };

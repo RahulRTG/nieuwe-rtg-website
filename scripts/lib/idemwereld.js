@@ -866,7 +866,37 @@ function geldLijf(w) {
     '/api/pay/verzoek/betaal': { id: w.verzoekAanMij },
     '/api/pay/verzoek/intrek': { id: w.verzoekVanMij },
     '/api/pay/tik': { code: w.tikcode, centen: 100, oms: 'prooftik' },
-    '/api/pay/saldo': { invoiceId: w.factuurId }
+    '/api/pay/saldo': { invoiceId: w.factuurId },
+
+    /* ---- twee ZWARE KANTOORROUTES, en waarom ze hier horen ----
+
+       `npm run kantoormacht` heeft naast de as op PAD een as op EFFECT, en die
+       leest de `opslag` van deze proef. Hij was BLIND voor twaalf van de veertien
+       zware kantoorroutes, met per stuk dezelfde reden: "de proef kreeg deze route
+       niet aan het werk". Beide onderstaande routes gaven 400, en niet omdat ze
+       streng zijn maar omdat het gedeelde lijf de verkeerde velden droeg.
+
+       `rekening/open` struikelde over precies de botsing die in de kop van dit
+       bestand staat: het gedeelde lijf zet `soort` voor de PASroutes ('debit'), en
+       `bank/rekening/open` bedoelt met datzelfde woord een REKENINGsoort -- dus
+       "Onbekende rekeningsoort". En de veldnaam van de rekeningnaam is hier
+       `naamRek` en niet `naam`, omdat `naam` in het gedeelde lijf al iets anders
+       is. Twee routes, twee keer hetzelfde patroon: niet de deur was het
+       probleem, maar het woord.
+
+       `rekening/rood` vraagt een BETAALrekening (roodKeur weigert een spaarpot) en
+       een bedrag tussen 0 en 50.000 euro. `w.iban` is de rekening uit
+       /api/bank/akkoord en dus een betaalrekening.
+
+       WAT ER NIET BIJ STAAT, met de reden. `bank/salaris/run` eist een DEFINITIEVE
+       loonrun (een zaak, medewerkers, klokuren, een voorstel, goedkeuring) -- dat
+       is een eigen wereld en geen lijf. En `bank/krediet/besluit` vraagt een
+       bestaande kredietaanvraag, en die hangt aan de vergunning die de kop van dit
+       bestand met zoveel woorden niet forceert: een proef die zijn eigen meetobject
+       openbreekt om een getal te halen, meet niets meer. Die twee blijven dus
+       blind, en dat staat in KANTOORMACHT.json met hun reden. */
+    '/api/office/bank/rekening/open': { codenaam: w.cn2, soort: 'spaar', naamRek: 'Kantoorproefpot' },
+    '/api/office/bank/rekening/rood': { iban: w.iban, euro: 100 }
   };
   /* Een route waarvan de wereld het benodigde stuk NIET heeft opgeleverd, krijgt
      hier niets. Anders zou hij een lijf met `id: null` krijgen en op een andere

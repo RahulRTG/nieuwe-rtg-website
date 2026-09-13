@@ -71,7 +71,7 @@ const LAGEN = [
     bron: 'APPWERKT.json', korrel: 'scherm', graad: 'gemeten' },
   { id: 'begrijpelijk', naam: 'Begrijpelijk', vraag: 'begrijpt hij zonder uitleg wat hij moet doen',
     bron: null, korrel: 'mens', graad: 'onbekend',
-    reden: 'geen enkel register meet dit. VINDBAAR.json komt het dichtst in de buurt maar meet of je een functie TERUGVINDT met het woord dat erop staat -- dat is vindbaarheid, niet begrijpelijkheid. Deze laag vraagt een mens, geen meter.' },
+    reden: 'Geen register meet dit voor een ondernemer, maar het INSTRUMENT bestaat wel en het hoort niet opnieuw uitgevonden te worden: EERSTEMINUUT.json meet in een echte browser op telefoonformaat wat een mens die RTG niet kent in zijn eerste minuut krijgt, van registratie tot het eerste scherm. Dat is precies deze vraag -- alleen gesteld aan een LID en niet aan een ondernemer. De weg vooruit is die proef uitbreiden naar de ondernemerskant, niet een dertiende meter bouwen. (VINDBAAR.json meet iets anders: of je een functie terugvindt met het woord dat erop staat. Dat is vindbaarheid.) Zolang dat niet gebeurd is, blijft deze laag ONBEKEND -- en een laag die een mens vraagt, hoort niet door een script groen gezet te worden.' },
   { id: 'bedienbaar', naam: 'Bedienbaar', vraag: 'werken alle essentiele knoppen en flows',
     bron: 'APPWERKT.json', korrel: 'scherm', graad: 'gemeten' },
   { id: 'voltooibaar', naam: 'Voltooibaar', vraag: 'kan de volledige taak worden afgemaakt',
@@ -88,8 +88,8 @@ const LAGEN = [
   { id: 'herstelbaar', naam: 'Herstelbaar', vraag: 'beschadigt een storing, timeout of dubbele actie niets',
     bron: 'IDEMPROEF.json', korrel: 'route', graad: 'gemeten' },
   { id: 'uitlegbaar', naam: 'Uitlegbaar', vraag: 'kan RTG aangeven waarom iets gebeurde',
-    bron: null, korrel: 'route', graad: 'onbekend',
-    reden: 'WAAROM.json lijkt hierop te gaan maar doet het niet: dat zegt per POST-route waarom hij niet te BEWIJZEN valt, in de woorden van de route zelf. Dat is provability, niet uitlegbaarheid naar een gebruiker. Niemand meet of een ondernemer te horen krijgt waarom er iets gebeurde.' },
+    bron: 'HANDELINGPROEF.json', korrel: 'route', graad: 'vermoed',
+    reden: 'LET OP WAT DIT WEL EN NIET ZEGT. HANDELINGPROEF.json meet of een geslaagde oproep een GEKETENDE regel naliet in het handelingsspoor -- een regel die via correlatie en oorzaak (kern/envelop.js) terug te volgen is naar wat hem veroorzaakte. Dat is het SUBSTRAAT van uitlegbaarheid en niet de uitleg zelf: dat een gevolg naar zijn oorzaak wijst, betekent niet dat een ondernemer het in woorden te horen krijgt. Daarom graad `vermoed`. Het verschil met `auditbaar` is echt en niet cosmetisch: AUDITPROEF vraagt OF er een spoor is, deze of dat spoor een KETEN vormt. Niet samenvoegen. En niet verwarren met WAAROM.json -- dat zegt per route waarom hij niet te BEWIJZEN valt, wat provability is en geen uitlegbaarheid.' },
   { id: 'omkeerbaar', naam: 'Omkeerbaar', vraag: 'kan een actie waar dat logisch is veilig terug',
     bron: 'HERSTELPROEF.json', korrel: 'routepaar', graad: 'gemeten',
     reden: 'let op de naamsbotsing met `herstelbaar` hierboven: dat gaat over een tweede identieke aanroep, dit over een TEGENHANGER die de handeling ongedaan maakt. Twee verschillende vragen, twee verschillende registers.' },
@@ -123,7 +123,8 @@ const BRON = {
   herstel: lees('HERSTELPROEF.json'),
   appwerkt: lees('APPWERKT.json'),
   execmap: lees('EXECUTION_MAP.json'),
-  idor: lees('IDOR.json')
+  idor: lees('IDOR.json'),
+  handeling: lees('HANDELINGPROEF.json')
 };
 const ontbreekt = Object.keys(BRON).filter(k => !BRON[k]);
 if (ontbreekt.length) {
@@ -215,6 +216,8 @@ for (const rij of Object.values(BRON.idem.perRoute || {})) {
   if (!oud || rang(stand) > rang(oud.stand)) r.uitslag.persistent = { stand, waarde: raakte ? 'opslag-geraakt' : 'geen-schrijfbeeld',
     reden: raakte ? null : 'de proef zag deze route geen collectie veranderen; dat kan een leesroute zijn of een route die de proef niet aan het werk kreeg' };
 }
+// --- uitlegbaar: HANDELINGPROEF (is het spoor een KETEN?) ---
+uitRijen(BRON.handeling.perRoute, 'uitlegbaar', 'audit', new Set(['bewezen']), new Set(['gezakt', 'gebroken']));
 // --- autonoom veilig: VERTROUWEN (vervalstaat) ---
 for (const [sleutel, rij] of Object.entries(BRON.vertrouwen.perRoute || {})) {
   const sp = sleutel.indexOf(' ');
@@ -353,9 +356,9 @@ for (const l of LAGEN) {
    en nooit `sluit`. Anders is een gate die zichzelf groen rekent.
 --------------------------------------------------------------------------- */
 const KETENS = [
-  { id: 'zaak-live', naam: 'Zaak aanmaken -> live', proef: null,
-    waar: 'server/kern/ondernemerpoort.js, routes/supplier/poort.js',
-    mist: 'de poort (salonpagina + kassarondleiding + werkrondleiding -> online) is nooit end-to-end gelopen' },
+  { id: 'zaak-live', naam: 'Zaak aanmaken -> live', proef: 'ZAAKLIVEPROEF.json', dekt: 'sluit',
+    waar: 'scripts/zaakliveproef.js -- 9 schakels, 8 storingen',
+    mist: null },
   { id: 'medewerker-dienst', naam: 'Medewerker uitnodigen -> eerste dienst', proef: null,
     waar: 'kern/concern/uitnodiging.js, wervingslink, staff',
     mist: 'de overdracht werkgever -> mens -> rooster kruist drie rollen en is nooit als keten beproefd' },

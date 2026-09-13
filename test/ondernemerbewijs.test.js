@@ -23,9 +23,15 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 
 const WORTEL = path.join(__dirname, '..');
+/* De registers die de projectie leest. Deze lijst MOET meegroeien met
+   scripts/ondernemerbewijs.js: komt er een bron bij en blijft hij hier staan,
+   dan mist de wegwerpmap hem en zakt het script -- terecht, want dat is
+   lat-regel 3. Dat is een keer gebeurd toen HANDELINGPROEF.json erbij kwam, en
+   toets 9 hieronder houdt de twee lijsten sindsdien aan elkaar. */
 const BRONNEN = ['VERTROUWEN.json', 'AUDITPROEF.json', 'ROLPROEF.json', 'IDEMPROEF.json',
                  'HERSTELPROEF.json', 'APPWERKT.json', 'EXECUTION_MAP.json', 'IDOR.json',
-                 'TAFELPROEF.json', 'RITPROEF.json', 'TOELATINGSPROEF.json'];
+                 'HANDELINGPROEF.json',
+                 'TAFELPROEF.json', 'RITPROEF.json', 'TOELATINGSPROEF.json', 'ZAAKLIVEPROEF.json'];
 
 /* Een wegwerpmap met kopieen van de registers. De mutatie gebeurt daar, nooit
    in de repo -- een toets die het ingecheckte register aanraakt, laat een
@@ -119,7 +125,13 @@ test('6. de ketens tellen alleen als hun proef werkelijk sluit', () => {
   const uit = wereld(map => pas(map, 'RITPROEF.json', a => { a.telling.open = 1; a.telling.gesloten -= 1; }));
   const rit = uit.ketens.lijst.find(k => k.id === 'rit');
   assert.equal(rit.dekt, 'geen', 'een keten met een open schakel dekt niets');
-  assert.ok(uit.ketens.telling.sluit < 2);
+  /* Tellen ten opzichte van de ONGEMUTEERDE ronde, niet tegen een vast getal.
+     De eerste versie eiste `sluit < 2` en zakte zodra er een vierde keten bij
+     kwam die ook sluit -- een toets die breekt op vooruitgang meet het
+     verkeerde. Wat hier telt is dat de mutatie er precies EEN afhaalt. */
+  const heel = wereld(null);
+  assert.equal(uit.ketens.telling.sluit, heel.ketens.telling.sluit - 1,
+    'een open schakel hoort precies deze ene keten uit de sluitende telling te halen');
 });
 
 test('7. een ketenproef zonder leesbare telling dekt niets', () => {
@@ -134,4 +146,16 @@ test('8. een sluitende keten draagt de datum waarop hij gemeten is', () => {
   for (const k of uit.ketens.lijst.filter(x => x.dekt !== 'geen'))
     assert.match(String(k.bewijs.stempel), /^\d{4}-\d{2}-\d{2}$/,
       'keten ' + k.id + ' sluit maar zegt niet wanneer dat gemeten is');
+});
+
+test('9. de bronnenlijst van deze toets loopt niet achter op het script', () => {
+  /* De faalvorm die dit voorkomt is vervelend om te debuggen: voeg je in het
+     script een register toe zonder het hier te kopieren, dan zakt ELKE toets in
+     dit bestand met "bron ontbreekt" -- wat eruitziet als een kapot script in
+     plaats van een stale fixture. */
+  const bron = fs.readFileSync(path.join(WORTEL, 'scripts/ondernemerbewijs.js'), 'utf8');
+  const gevraagd = [...bron.matchAll(/lees\('([A-Z_]+\.json)'\)/g)].map(m => m[1]);
+  assert.ok(gevraagd.length >= 8, 'geen lees()-aanroepen gevonden -- is het script verbouwd?');
+  for (const b of gevraagd)
+    assert.ok(BRONNEN.includes(b), 'scripts/ondernemerbewijs.js leest ' + b + ', maar BRONNEN in deze toets kent hem niet');
 });

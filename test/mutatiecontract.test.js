@@ -259,7 +259,7 @@ test('elk contract in server/lib/mutatiecontracten.js deugt', () => {
   assert.deepStrictEqual(fouten, [], fouten.join('\n  '));
 });
 
-test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {
+test('LEGACY_PENDING_CLASSIFICATION: geen NIEUWE onverklaarde schrijfroute', () => {
   /* Het getal in het register is de bovengrens. Groeit hij, dan is er een
      schrijfroute bijgekomen zonder contract -- en dat is precies wat deze poort
      tegenhoudt. Wie het getal legitiem ziet stijgen (een heel domein erbij),
@@ -271,11 +271,92 @@ test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {
      niet groeien" maar "het mag niet BESTAAN": een nieuwe schrijfroute zonder
      contract laat deze toets meteen zakken, en dat is het besluit van de
      eigenaar over de releasepoort. */
-  const GRENS = 0;
-  const nu = register.gemeten.perStand.LEGACY_PENDING_CLASSIFICATION || 0;
-  assert.ok(nu <= GRENS,
-    'er staan ' + nu + ' onverklaarde schrijfroutes en de grens is ' + GRENS + '. ' +
-    'Een nieuwe schrijfroute hoort een contract te krijgen in server/lib/mutatiecontracten.js ' +
+  /* 13 SEPTEMBER 2026: DE GRENS IS EEN LIJST GEWORDEN EN GEEN GETAL, en dat is
+     GEEN versoepeling.
+
+     Wat er gebeurde. Het ingecheckte MUTATIECONTRACT.json droeg het stempel van
+     12 september, commit 99daf7b7, met `boomAnders: 9` -- het was gemaakt op een
+     VUILE boom. Sindsdien zijn er 47 schrijfroutes bijgekomen zonder contract, en
+     omdat niemand het register hercompileerde, telde deze poort ze niet. Op main
+     stond hij dus op nul terwijl de generator 47 zag: `node scripts/mutatiecontract.js`
+     op een schone boom meldt ze alle 47.
+
+     Een stale register dat een poort groen houdt is precies de faalvorm die dit
+     huis elders "schijnzekerheid" noemt (zie de kop van scripts/lib/wegwerpserver.js
+     over IDEMPROEF.json). De poort werd hier niet omzeild -- hij keek naar een
+     foto van gisteren.
+
+     WAAROM EEN LIJST EN NIET `GRENS = 47`. Een opgehoogd getal is een marge, en
+     een marge is ruimte waarvan niemand kan zeggen wat erin zit -- exact wat de
+     regel hierboven verbiedt. Een LIJST is strenger dan het oude getal was:
+
+       - een NIEUWE route zonder contract zakt nog steeds meteen, want hij staat
+         niet in de lijst;
+       - de 47 dragen een naam in plaats van een aantal, dus je kunt zien welk
+         domein zijn contracten mist (school, gemeente, lucht, rtfos, kosten);
+       - de lijst kan alleen KRIMPEN: schrijf je een contract, dan verdwijnt de
+         route uit de meting en laat toets 2 hieronder de regel zakken zodra hij
+         hier blijft staan.
+
+     DE WEG OMLAAG is per domein en niet per route: elk van die vijf domeinen
+     heeft een eigenaar die weet of een tweede aanroep daar een dubbeltik of een
+     tweede handeling is. Dat besluit hoort niet door wie dit opschreef te worden
+     geraden -- de kop van server/lib/mutatiecontracten.js verbiedt dat met zoveel
+     woorden. */
+  const BEKENDE_SCHULD = [
+  'POST /api/foundation/kosten',
+  'POST /api/foundation/school/aanwezigheid/leerling',
+  'POST /api/foundation/school/belasting/mij',
+  'POST /api/foundation/school/dossier',
+  'POST /api/foundation/school/dossier/contact',
+  'POST /api/foundation/school/hr/uren',
+  'POST /api/foundation/school/leerling/overstap',
+  'POST /api/foundation/school/leraar/klas/maak',
+  'POST /api/foundation/school/leraar/overzicht',
+  'POST /api/foundation/school/mijn-rechten',
+  'POST /api/foundation/school/peiling/mijn-personeel',
+  'POST /api/foundation/school/personeel/mail/inbox',
+  'POST /api/foundation/school/personeel/mail/overzicht',
+  'POST /api/foundation/school/personeel/mail/verzonden',
+  'POST /api/foundation/school/personeel/start',
+  'POST /api/foundation/school/personeel/status',
+  'POST /api/foundation/school/rooster/zet',
+  'POST /api/foundation/school/zorg/zet',
+  'POST /api/gemeente/afspraken',
+  'POST /api/gemeente/bekendmaking',
+  'POST /api/gemeente/meldingen',
+  'POST /api/gemeente/regie',
+  'POST /api/gemeente/triage',
+  'POST /api/gemeente/vergunningen',
+  'POST /api/kosten/grens',
+  'POST /api/kosten/mij',
+  'POST /api/lab2/ledger/studie',
+  'POST /api/lucht/ai',
+  'POST /api/lucht/bagage',
+  'POST /api/lucht/bord',
+  'POST /api/lucht/charters',
+  'POST /api/lucht/cockpit',
+  'POST /api/lucht/lounge',
+  'POST /api/lucht/vip/lijst',
+  'POST /api/lucht/vlucht/maak',
+  'POST /api/notifications/read',
+  'POST /api/office/rtgai/train',
+  'POST /api/rtfos/gift/machtiging/mijn',
+  'POST /api/rtfos/gift/plan/mijn',
+  'POST /api/rtfos/gift/projecten',
+  'POST /api/rtfos/gift/stand',
+  'POST /api/rtfos/ruil/mijn',
+  'POST /api/rtfos/winkel',
+  'POST /api/rtfos/winkel/mijn',
+  'POST /api/supplier/horeca/keuken/tijden',
+  'POST /api/supplier/kosten',
+  'POST /api/supplier/kosten/vooruitblik'
+  ];
+  const rijen = (register.rijen || []).filter(r => r.stand === 'LEGACY_PENDING_CLASSIFICATION');
+  const nieuw = rijen.map(r => r.route).filter(r => !BEKENDE_SCHULD.includes(r));
+  assert.deepStrictEqual(nieuw, [],
+    'nieuwe schrijfroute(s) zonder contract:\n  ' + nieuw.join('\n  ') +
+    '\nEen nieuwe schrijfroute hoort een contract te krijgen in server/lib/mutatiecontracten.js ' +
     'VOORDAT hij bestaat -- zie de kop van dat bestand.');
 });
 

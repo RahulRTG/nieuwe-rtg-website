@@ -345,7 +345,9 @@
     "moveproef": "node scripts/moveproef.js",
     "moveproef:vast": "node scripts/moveproef.js --vastleggen",
     "ondernemerbewijs": "node scripts/ondernemerbewijs.js",
-    "ondernemerbewijs:vast": "node scripts/ondernemerbewijs.js --vastleggen"
+    "ondernemerbewijs:vast": "node scripts/ondernemerbewijs.js --vastleggen",
+    "zaakliveproef": "node scripts/zaakliveproef.js",
+    "zaakliveproef:vast": "node scripts/zaakliveproef.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

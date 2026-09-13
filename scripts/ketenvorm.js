@@ -47,7 +47,15 @@ const KETENS = [
      een lijn. Deze is met opzet maximaal anders -- de klant is geen lid, er zit
      een kantoor in, het gaat over een document met een houdbaarheid, en de
      uitkomst is toegang in plaats van een geleverde dienst. */
-  { naam: 'toelating', register: 'TOELATINGSPROEF.json', domein: 'aanmeldingen', proef: 'scripts/toelatingsproef.js' }
+  { naam: 'toelating', register: 'TOELATINGSPROEF.json', domein: 'aanmeldingen', proef: 'scripts/toelatingsproef.js' },
+  /* De vierde. Hij is toegevoegd omdat hij de meting scherper maakt en niet
+     omdat er een keten bij moest: zijn uitkomst is ZICHTBAARHEID VOOR DERDEN,
+     een soort die de eerste drie geen van alle hadden, en zijn voltooiende
+     actor is de KLANT en niet een medewerker. Blijven de actoren en beloften
+     ook met hem erbij uit elkaar liggen, dan is dat een sterker negatief dan
+     met drie; komt er ineens overlap, dan is dat de eerste echte aanwijzing
+     voor een gedeeld contract. */
+  { naam: 'zaaklive', register: 'ZAAKLIVEPROEF.json', domein: 'ondernemerpoort', proef: 'scripts/zaakliveproef.js' }
 ];
 
 /* De woorden waarop een belofte wordt ingedeeld. Een gesloten lijst, want een

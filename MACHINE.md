@@ -60,7 +60,7 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->4953<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->4963<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
@@ -82,7 +82,7 @@ aantal routes dat hem raakt (`handler` / `bestand`):
 | envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->109<!--/getal--> | `kern/envelop.js` |
 | idempotentie | 13 | 114 | `lib/idem-poort.js` |
 | aiVindbaar | 173 | 173 | `kern/stuur/beleid.js` |
-| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->235<!--/getal--> | `kern/kantoor/kluispoort.js` |
+| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->238<!--/getal--> | `kern/kantoor/kluispoort.js` |
 | herhaling (beschermd) | 1675 | 1675 | `IDEMPROEF.json` |
 
 Vier assen staan als **ongemeten met een reden** en nooit als 0: doelvindbaarheid
@@ -101,8 +101,8 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2818<!--/getal--> van de
-   <!--getal:machine.muterend-->4953<!--/getal--> muterende routes raken **geen
+1. <!--getal:machine.zonderAs-->2825<!--/getal--> van de
+   <!--getal:machine.muterend-->4963<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 2. De hoogst geïntegreerde handeling buiten de hubs raakt **drie** assen
    (`/api/bank/rekening/open`, `/api/office/boardroom`,

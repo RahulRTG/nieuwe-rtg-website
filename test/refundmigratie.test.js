@@ -90,3 +90,31 @@ test('5. de telling spreekt zichzelf niet tegen', () => {
   assert.equal(u.telling.server + u.telling.scherm, u.telling.verklaard + u.telling.onbekend,
     'elke rij hoort een laag te dragen (server of scherm)');
 });
+
+test('6. het register bestaat en klopt met een verse meting', () => {
+  const pad = path.join(WORTEL, 'REFUNDMIGRATIE.json');
+  assert.ok(fs.existsSync(pad), 'REFUNDMIGRATIE.json ontbreekt -- draai: npm run refundmigratie:vast');
+  const j = JSON.parse(fs.readFileSync(pad, 'utf8'));
+  const u = M.meet();
+  assert.equal(j.telling.bestanden, u.telling.bestanden,
+    'het register loopt achter op de code -- draai npm run refundmigratie:vast');
+  assert.equal(j.telling.verklaard, u.telling.verklaard);
+  assert.equal(j.telling.onbekend, u.telling.onbekend);
+});
+
+test('7. de server laadt de migratiekaart niet in', () => {
+  /* Zelfde grens als scripts/ritmigratie.js en CODE-AI-001: een meter LEEST de
+     bron en bedient niets. Zou server-code deze kaart inladen, dan bepaalt een
+     handgeschreven lijst opeens gedrag. */
+  const uit = [];
+  (function loop(map) {
+    for (const naam of fs.readdirSync(map)) {
+      if (naam === 'node_modules' || naam === 'data') continue;
+      const p = path.join(map, naam);
+      if (fs.statSync(p).isDirectory()) { loop(p); continue; }
+      if (naam.endsWith('.js') && /refundmigratie/.test(fs.readFileSync(p, 'utf8')))
+        uit.push(path.relative(WORTEL, p));
+    }
+  })(path.join(WORTEL, 'server'));
+  assert.deepEqual(uit, [], 'server-code laadt de migratiekaart in');
+});

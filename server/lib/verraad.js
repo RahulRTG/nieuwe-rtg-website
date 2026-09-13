@@ -57,29 +57,32 @@ const CATALOGUS = [
      ontbrekend gereedschap.
 
      Het verschil tussen de drie is het hele punt. Wie ze samenvoegt tot "een
-     crash", meet drie keer hetzelfde moment en noemt dat dekking. */
+     crash", meet drie keer hetzelfde moment en noemt dat dekking.
+
+     TWEE WOORDENLIJSTEN, EN ZE LIEPEN HIER EEN KEER DOOR ELKAAR. `raakt` noemt
+     een SCHAKEL van de bewijsmatrix, `contract` een CRASHCONTRACT uit
+     scripts/lib/crashtaxonomie.js. Waarom dat verschil ertoe doet, staat in
+     test/verraad.test.js, dat het ook bewaakt. */
   { naam: 'sterf-voor-mutatie',
     wat: 'het proces sterft VOORDAT er iets is gemuteerd',
     waar: 'server/db/bijeen.js bijeen(), voor fn()',
-    raakt: 'ATOMIC -- er hoort geen spoor te zijn, en een retry hoort schoon te beginnen' },
-  /* EN DE DERDE IS ER NIET, met een gemeten reden in plaats van een voornemen.
-     Een dood MIDDENIN de schrijfactie vraagt een opslag met een waarneembaar
-     middelpunt. db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`: de save
-     is EEN transactie die heel commit of heel terugrolt. Een injectiepunt
-     ertussen bestaat dus niet -- geprobeerd tussen de schrijfopdracht en de
-     checkpoint, en scripts/crashgrenzen.js liet zien dat de betaling daarna
-     gewoon vaststond: een tweede sterf-na-commit met een andere naam.
-
+    contract: 'ATOMIC',
+    raakt: 'ROLLBACK, STATE -- er hoort geen spoor te zijn, en een retry hoort schoon te beginnen' },
+  /* EN DE DERDE IS ER NIET, met een GEMETEN reden in plaats van een voornemen.
+     db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save heeft
+     geen waarneembaar middelpunt: geprobeerd tussen schrijfopdracht en
+     checkpoint, en scripts/crashgrenzen.js mat er een tweede sterf-na-commit.
      Daarom `waar: null` en geen regel code. Op een opslag die WEL kan scheuren
-     (de json-stand schrijft een tijdelijk bestand en hernoemt het) hoort hij
-     alsnog, en dan tussen die twee. */
+     hoort hij alsnog -- server/db/duurzaam.js draagt de vindplaats. */
   { naam: 'sterf-in-de-opslag',
     wat: 'het proces sterft MIDDENIN de onderliggende schrijfactie',
     waar: null,
-    raakt: 'ATOMIC -- niet te bouwen op een transactionele opslag: er is geen middelpunt' },
+    contract: 'ATOMIC',
+    raakt: 'ROLLBACK -- niet te bouwen op een transactionele opslag: er is geen middelpunt' },
   { naam: 'sterf-na-commit',
     wat: 'het proces sterft NA de duurzame schrijfactie en VOOR het antwoord',
     waar: 'server/db/index.js saveDuurzaam()',
+    contract: 'RECOVERABLE',
     raakt: 'IDEMPOTENCY, ROLLBACK -- de klant weet niet dat het gelukt is en probeert opnieuw' },
   { naam: 'klok-vooruit',
     wat: 'de klok loopt voor of achter',

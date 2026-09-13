@@ -332,7 +332,16 @@ async function loop(basis, uit) {
       'WAAROM: de motor is met opzet een rekenmachine en geen zoeker -- hij mag niet rangschikken en niets ' +
       'weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. ' +
       'WIE EROVER GAAT: de eigenaar. De stap die nog ontbreekt is klein en eerlijk te benoemen: van een ' +
-      'doel naar een handvol manieren, zonder ze te rangschikken.'),
+      'doel naar een handvol manieren, zonder ze te rangschikken. ' +
+      'DE VORM IS INMIDDELS BESLOTEN (eigenaar, 13 september 2026) EN NOG NIET GEBOUWD, en dat ' +
+      'onderscheid hoort hier te staan in plaats van in een gesprek. De manieren volgen uit de BRONNEN ' +
+      'die er zijn -- via werk, via opleiding, via opvang -- en niet uit een lijst die iemand bedenkt. ' +
+      'Daarmee wordt er niets verzonnen (elke manier heeft een aantoonbare bron), niets gerangschikt ' +
+      '(de volgorde is die van de terreinen) en niets weggelaten. HET VELD `nodig` BLIJFT LEEG, en dat ' +
+      'is de kern van het besluit: welke voorwaarden een weg vergt, weet dit huis niet, en ze afleiden ' +
+      'uit de trefwoorden van openingen-kaart.js zou de motor laten GOKKEN welke randvoorwaarde bij ' +
+      'welke weg hoort. Liever een manier zonder voorwaarden dan een voorwaarde die niemand heeft ' +
+      'gemeten -- dat is grens zes van kern/knelpunt/index.js (hij rekent niets uit wat hij niet weet).'),
     () => P('/api/knelpunt', { doel: 'ik wil weer aan het werk' }, M),
     async r => ({ klopt: !!(r.data && r.data.manieren && r.data.manieren.length),
       wat: 'de motor gaf ' + (((r.data && r.data.manieren) || []).length) + ' wegen bij een kaal doel' }));

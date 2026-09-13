@@ -42,12 +42,6 @@
     if (!A) return;
     var e = A, c = e.ctx, t = e.cfg.tools, cr = e.root.querySelector('.rtg-edge-crumbs');
     cr.innerHTML = '<button type="button" data-crumb="home">' + esc(e.cfg.naam) + '</button><i aria-hidden="true">/</i><button type="button" data-crumb="scope">' + esc(c.scope) + '</button><i aria-hidden="true">/</i><button type="button" data-crumb="current">' + esc(c.title) + '</button>';
-    /* DE WERELDEN STAAN IN DE BALK EN NIET MEER IN EEN EIGEN STROOK. Elk
-       wereldscherm droeg zijn eigen `.os-switcher`: dezelfde vier namen, in
-       eigen opmaak, op vier plekken overgetikt -- en boven een schil die die
-       vier al kende (`.rtg-edge-worlds` in het menu). De opmaak komt uit
-       dezelfde bibliotheek als die menulijst, dus in dezelfde volgorde en met
-       hetzelfde adres: verdwijnt een wereld, dan verdwijnt hij op beide. */
     e.root.querySelector('.rtg-edge-worldbar').innerHTML = L.balk(e, C, esc);
     e.root.querySelector('.rtg-edge-scope').textContent = c.scope;
     e.root.querySelector('.rtg-edge-tools').innerHTML = t.map(function (x, i) { return '<a class="rtg-edge-tool" data-tool="' + x[0] + '" data-shortcut="' + (i + 1) + '" href="' + x[3] + '" aria-label="' + esc(x[1]) + '" ' + ((c.tool === x[0] || (!c.tool && actief(x))) ? 'aria-current="page"' : '') + '>' + s(x[2]) + '<span class="rtg-edge-tip">' + esc(x[1]) + '<kbd>Alt+' + (i + 1) + '</kbd></span></a>'; }).join('');
@@ -89,6 +83,8 @@
     r.querySelector('[data-go="next"]').onclick = function () { history.forward(); };
     r.querySelector('.rtg-edge-layout').onclick = function () { if (!e.workspace) { location.href = e.cfg.workspace; return; } setLayout(e.layout === 1 ? 2 : e.layout === 2 ? 4 : 1); };
     r.querySelector('.rtg-edge-action [data-rtg-edge-primary]').onclick = voerActie;
+    r.querySelector('.rtg-edge-worlds-trigger').onclick=function(){openIndex(false);r.querySelector('.rtg-edge-worlds a').focus()};
+    r.querySelector('.rtg-edge-actions-trigger').onclick=function(){var b=r.querySelector('.rtg-edge-2-context-button');b?b.click():voerActie()};
     ai.onclick = function () { var open = ai.getAttribute('aria-expanded') !== 'true'; sluitLagen(); ai.setAttribute('aria-expanded', String(open)); panel.setAttribute('aria-hidden', String(!open)); if (open) neemAI(); };
     state.onclick = function () { var open = state.getAttribute('aria-expanded') !== 'true'; sluitLagen(); state.setAttribute('aria-expanded', String(open)); status.setAttribute('aria-hidden', String(!open)); if(open)L.refresh(e); };
     d.addEventListener('keydown', function (ev) {
@@ -120,7 +116,8 @@
   function neemAI() {
     if (!A) return;
     var mond = A.root.querySelector('.rtg-edge-mouth');
-    if (w.RTGMond && mond && !mond.querySelector('canvas')) { var c = d.createElement('canvas'); c.width = 440; c.height = 200; c.setAttribute('aria-hidden', 'true'); c.style.cssText = 'width:31px;height:15px;display:block'; mond.textContent = ''; mond.appendChild(c); w.RTGMond.maak(c); }
+    if(!w.RTGMond){var ms=d.querySelector('script[src="/shared/mond.js"]'),nieuw=!ms;if(!ms){ms=d.createElement('script');ms.src='/shared/mond.js'}ms.addEventListener('load',neemAI,{once:true});if(nieuw)d.head.appendChild(ms);return}
+    if (mond && !mond.querySelector('canvas')) { var c = d.createElement('canvas'); c.width = 440; c.height = 200; c.setAttribute('aria-hidden', 'true'); c.style.cssText = 'width:64px;height:30px;display:block;background:transparent!important'; mond.textContent = ''; mond.appendChild(c); w.RTGMond.maak(c); }
     var p = A.root.querySelector('.rtg-edge-ai-panel'), x = d.querySelector('.mgz-blok') || d.querySelector('.lo-rahul');
     if (x && !p.contains(x)) { p.textContent = ''; p.appendChild(x); x.style.display = ''; }
     if (x || aiWatcher || !d.body || !w.MutationObserver) return;

@@ -65,7 +65,13 @@ test('de keten levert alle stukken op die de geldroutes nodig hebben', async () 
      twaalf van de veertien zware kantoorroutes omdat de proef ze niet aan het
      werk kreeg, en bij deze twee kwam dat door een WOORD en niet door een deur
      (`soort` betekent bij een pas iets anders dan bij een rekening). */
-  assert.equal(Object.keys(perRoute).length, 22, 'tweeentwintig geldroutes krijgen een eigen lijf');
+  /* VIJFENTWINTIG sinds de bundelronde van 13 september 2026. Twee takken breidden
+     deze lijst onafhankelijk uit -- de ledenkant met twee zware kantoorroutes (zie
+     hierboven) en de zaakkant van PR #242 met drie -- en de vereniging telt 25
+     verschillende paden zonder een enkele dubbele sleutel. Dat laatste is hier de
+     echte eis: een dubbele sleutel in een objectliteraal verdwijnt STIL (de laatste
+     wint), dus een te laag getal zou hier het enige signaal zijn geweest. */
+  assert.equal(Object.keys(perRoute).length, 25, 'vijfentwintig geldroutes krijgen een eigen lijf');
   for (const pad of ['/api/office/bank/rekening/open', '/api/office/bank/rekening/rood']) {
     assert.ok(perRoute[pad], 'de zware kantoorroute ' + pad + ' hoort een eigen lijf te krijgen');
   }
@@ -151,11 +157,17 @@ test('een wereld die niets oplevert laat de proef meten als vanouds', async () =
   /* Geen uitzondering, geen halve waarheid: geeft het huis niets terug, dan
      krijgt de proef geen verzonnen waarden. Wat overblijft is alleen wat NIETS
      uit de wereld nodig had -- `rekening/open` vraagt om een geldige
-     rekeningsoort en verder niets, en die mag gewoon blijven staan. */
+     rekeningsoort en verder niets, en die mag gewoon blijven staan.
+
+     SINDS DE BUNDELRONDE VAN 13 SEPTEMBER STAAT ER EEN TWEEDE, en het is dezelfde
+     soort: `giftcard/sell` draagt `{ bedrag: 25 }`, een constante zonder een enkel
+     veld uit de wereld. Dat hij een lege wereld overleeft is de regel en geen gat.
+     Hij is er niet bij verzonnen maar kwam mee uit PR #242, waar de kop bij dat
+     lijf uitlegt waarom het getal in EURO'S staat en niet in centen. */
   const { extra, perRoute } = await zetWereldKlaar({ post: async () => ({ status: 500, data: {} }),
     tokens: { member: 'lid', office: 'kantoor' } });
   assert.deepEqual(extra, {});
-  assert.deepEqual(Object.keys(perRoute), ['/api/bank/rekening/open']);
+  assert.deepEqual(Object.keys(perRoute).sort(), ['/api/bank/rekening/open', '/api/supplier/giftcard/sell']);
 });
 
 test('de halve-lijf-regel kijkt ook IN lijsten en posten', () => {

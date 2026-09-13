@@ -661,7 +661,7 @@ maken.
 |---|---|---|
 | `npm run check` | statische huisregels, registers, documentwaarheid | gedrag, routedekking, ketens, go-live |
 | `npm run norm` | de ratels en aantalsnormen in `NORM.json` | alles wat geen ratel heeft |
-| `npm run deltapoort` | geen verslechtering t.o.v. de basis, op de **gewijzigde** bestanden | de rest van het huis; gedrag; routedekking |
+| `npm run delta` | geen verslechtering t.o.v. de basis, op de **gewijzigde** bestanden | de rest van het huis; gedrag; routedekking |
 | `npm test` | gedrag van wat een toets aanroept | wat geen toets aanroept |
 | `test/routedekking.test.js` | elke geregistreerde route is door een toets geraakt | of die aanraking iets zinnigs toetst |
 | de ketenproeven | dat één benoemde keten van begin tot eind sluit | de negentien andere |

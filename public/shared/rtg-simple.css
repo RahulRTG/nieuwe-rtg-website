@@ -404,9 +404,6 @@ body[data-ios-home][data-rtg-skin="heritage"] #gate .ag-welkom{font-size:clamp(3
 body[data-ios-home][data-rtg-skin="heritage"]:has(#gate:not([style*="display: none"])) .rtg-edge-bottom{
   display:none!important
 }
-body[data-ios-home][data-rtg-skin="heritage"]:has(#gate:not([style*="display: none"])) #rtgCommand :is(.cmd-balk,.cmd-bank){
-  display:none!important
-}
 body[data-ios-home][data-rtg-skin="heritage"]:has(#gate:not([style*="display: none"])) :is(
   .rtg-edge-index,.rtg-edge-ai-panel,.rtg-edge-status-panel){
   display:none!important
@@ -427,7 +424,7 @@ body[data-ios-home][data-rtg-skin="heritage"]:has(#gate:not([style*="display: no
 body[data-rtg-edge-2-rendered="true"]>.verderbalk:empty{display:none!important}
 
 @media(max-width:767px){
-  :root{--edge-top:58px;--edge-side:0px;--edge-bottom:68px}
+  :root{--edge-top:44px;--edge-side:0px;--edge-bottom:48px}
   body.rtg-edge-host{
     padding-top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important;
     padding-left:0!important;
@@ -482,30 +479,42 @@ body[data-rtg-edge-2-rendered="true"]>.verderbalk:empty{display:none!important}
   .rtg-edge-bottom>a,.rtg-edge-bottom>button{
     width:100%!important;min-width:44px!important;height:calc(var(--edge-bottom) - 2px)!important;border:0!important
   }
-  .rtg-edge-bottom>a{grid-column:1;grid-row:1}
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-bottom>a{
+    grid-column:1;grid-row:1
+  }
   body[data-rtg-edge-2-rendered="true"]:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-bottom>a{
     display:flex!important
   }
-  .rtg-edge-worlds-trigger{display:flex!important;grid-column:2;grid-row:1}
-  .rtg-edge-ai{grid-column:3;grid-row:1;position:relative!important;color:var(--rtg-world-signature)!important}
-  .rtg-edge-action{
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-worlds-trigger{
+    display:flex!important;grid-column:2;grid-row:1
+  }
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-ai{
+    grid-column:3;grid-row:1;position:relative!important;color:var(--rtg-world-signature)!important
+  }
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-action{
     grid-column:4;grid-row:1;display:flex!important;min-width:0!important;
     width:100%!important;height:calc(var(--edge-bottom) - 2px)!important;
     padding:0 4px!important;align-items:center;justify-content:center;overflow:hidden
   }
-  .rtg-edge-action::before{display:none!important}
-  .rtg-edge-action>button,.rtg-edge-action>a{
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-action::before{
+    display:none!important
+  }
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-action>button,
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-action>a{
     width:100%!important;min-width:44px!important;max-width:100%!important;
     min-height:44px!important;height:calc(var(--edge-bottom) - 2px)!important;
     padding:0 3px!important;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
     text-align:center;font-size:9px!important;letter-spacing:.02em!important
   }
-  body[data-rtg-world-dashboard-ready="true"] .rtg-edge-action{display:none!important}
-  body[data-rtg-world-dashboard-ready="true"] .rtg-edge-actions-trigger{
-    display:flex!important;grid-column:4;grid-row:1
+  body[data-rtg-skin="heritage"][data-rtg-world-dashboard-ready="true"] .rtg-edge-chrome .rtg-edge-action{
+    display:flex!important;grid-template-columns:none!important
   }
-  .rtg-edge-menu{grid-column:5;grid-row:1}
-  .rtg-edge-history,.rtg-edge-layout,.rtg-edge-appslot{display:none!important}
+  body[data-rtg-world-dashboard-ready="true"] .rtg-edge-action>.rtg-edge-2-context-button,
+  body[data-rtg-world-dashboard-ready="true"] .rtg-edge-action>.xp-trigger{display:none!important}
+  body:not(.rtg-command):not([data-rtg-edge-appbar="true"]):not(:has(>nav.balk[aria-label="Hoofdnavigatie"])):not(:has(>.wos-dock)) .rtg-edge-menu{
+    grid-column:5;grid-row:1
+  }
+  .rtg-edge-history,.rtg-edge-layout{display:none!important}
   .rtg-edge-worlds-trigger,.rtg-edge-actions-trigger,.rtg-edge-menu,.rtg-edge-ai,.rtg-edge-bottom>a{
     flex-direction:column;align-items:center;justify-content:center;gap:4px;
     color:var(--edge-dim)!important;font-size:10px!important;letter-spacing:.04em

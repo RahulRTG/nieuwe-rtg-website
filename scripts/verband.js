@@ -23,9 +23,10 @@
    vals groen die er is. test/verband.test.js houdt vast dat geen enkele sensor
    eraan komt.
 
-   HET VELD MENGT TWEE RELATIES, en dat is hier zichtbaar geworden. Van de 91
-   verklaarde randen wijzen er 56 naar een WACHTER (een toets of een script dat
-   rood wordt) en 35 naar de IMPLEMENTATIE die de regel draagt (server/, public/).
+   HET VELD MENGT TWEE RELATIES, en dat is hier zichtbaar geworden. Van de 93
+   verklaarde randen wijzen er 57 naar een WACHTER (een toets of een script dat
+   rood wordt) en 36 naar de IMPLEMENTATIE die de regel draagt (server/, public/,
+   scripts/lib/).
    Dat zijn twee verschillende beweringen onder een naam. Deze meter gaat over de
    eerste; de tweede staat apart in de uitslag en wordt er niet bij opgeteld.
    Of WETTEN.json die twee uit elkaar moet trekken is een BESLUIT en geen
@@ -42,8 +43,8 @@
      doelbestand  de wachter noemt het bestand dat de sabotage muteert.
      wettekst     de wachter deelt de helft van de inhoudswoorden van de wet.
 
-   Een gemiddelde van die vijf betekent niets: `anker` haalt 7 van de 56 met 11
-   voorstellen, `wettekst` haalt er 51 met 403. De een is bijna ruisloos, de
+   Een gemiddelde van die vijf betekent niets: `anker` haalt 8 van de 57 met 12
+   voorstellen, `wettekst` haalt er 52 met 411. De een is bijna ruisloos, de
    ander bijna blind voor niets. Dezelfde reden waarom DOCTRINE.json zijn
    structuur- en woordas apart houdt.
 
@@ -51,7 +52,7 @@
    welke sensoren hem zagen, en de lezer weegt zelf. `87% zeker` zou verbergen
    dat de ene sensor causaal is en de andere een woordoverlap.
 
-   DE GRAAD IS `vermoed`. De RECALL is gemeten (54 van de 56); de PRECISIE niet
+   DE GRAAD IS `vermoed`. De RECALL is gemeten (55 van de 57); de PRECISIE niet
    -- van de honderden voorstellen is niet vastgesteld welk deel een echte
    handhaver aanwijst.
 
@@ -82,8 +83,19 @@ const STOP = new Set(('de het een en of van in op te dat die dit deze aan met vo
 const kernwoorden = (t) => new Set(String(t).toLowerCase()
   .replace(/[^a-z0-9à-ÿ\s]/g, ' ').split(/\s+/).filter(x => x.length > 4 && !STOP.has(x)));
 
-/* Is dit pad een WACHTER (iets dat rood kan worden) of de IMPLEMENTATIE? */
-const isWachter = (p) => p.startsWith('test/') || p.startsWith('scripts/');
+/* Is dit pad een WACHTER (iets dat rood kan worden) of de IMPLEMENTATIE?
+
+   DIT IS EEN HEURISTIEK OP HET PAD EN HIJ IS EEN KEER MIS GEWEEST. `scripts/`
+   telde in zijn geheel als wachter, en toen kwam `scripts/lib/ijking.js` in het
+   register: een BIBLIOTHEEK met besluiten erin, die niets uitvoert en dus nooit
+   rood wordt. Hij is de DRAGER van zijn wet, niet de wachter -- exact dezelfde
+   fout als die deze meter in het veld `handhaver` aanwees, nu in de meter zelf.
+
+   Een wachter is dus iets dat DRAAIT: een toets, of een script dat je aanroept.
+   Wat onder scripts/lib/ woont wordt door een ander aangeroepen en hoort bij de
+   implementatie. */
+const isWachter = (p) => p.startsWith('test/') ||
+  (p.startsWith('scripts/') && !p.startsWith('scripts/lib/'));
 
 /* ---------------------------------------------------------------- de sensoren */
 
@@ -215,7 +227,7 @@ function draai() {
     graad: 'vermoed',
     grens: 'De RECALL is gemeten, de PRECISIE niet: van de voorstellen per sensor is niet vastgesteld welk ' +
       'deel een echte handhaver aanwijst. De vijf sensoren worden NOOIT tot een cijfer gemiddeld -- `anker` ' +
-      'haalt 7 van de 56 met 11 voorstellen en `wettekst` 51 met 403, dus een gemiddelde verbergt precies ' +
+      'haalt 8 van de 57 met 12 voorstellen en `wettekst` 52 met 411, dus een gemiddelde verbergt precies ' +
       'het verschil waar een lezer op moet wegen. Een rand draagt daarom WELKE sensoren hem zagen en geen ' +
       'betrouwbaarheidspercentage.',
     telling: {

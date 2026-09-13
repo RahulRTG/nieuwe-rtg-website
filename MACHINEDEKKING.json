@@ -3,8 +3,8 @@
  "uitleg": "Per handeling: hoeveel van de eigen machinerie raakt hij? Zestien motoren die ieder apart gemeten zijn, hier voor het eerst naast elkaar op DEZELFDE route.",
  "grens": "Twee assen die verschillende dingen missen, nooit opgeteld: `handler` is lexicaal binnen de tekst van de handler (mist een hulpfunctie en de kern-tas) en `bestand` rekent het routebestand plus zijn DIRECTE requires (vangt de hulpfunctie, markeert alle routes in een bestand, mist nog steeds de kern-tas). De tas zit met opzet niet in de route-as: een hub als server.js zette zo 4162 routes op \"idempotent\". Woont een route ZELF in een hub, dan vervalt de bestandsas (bestandsasOnbruikbaar) en is ook zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. De assen uit EXECUTION_MAP.json zijn gelezen en niet hier geteld.",
  "stempel": {
-  "op": "2026-09-13T01:00:29.525Z",
-  "commit": "f9e1213f",
+  "op": "2026-09-13T01:05:51.674Z",
+  "commit": "0da4fdd9",
   "node": "v22.22.2"
  },
  "bronnen": {

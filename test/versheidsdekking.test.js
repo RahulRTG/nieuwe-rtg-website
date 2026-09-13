@@ -146,7 +146,17 @@ const BUITEN = {
      hem in toets 7 werkelijk weg om hem opnieuw te laten maken. Loopt hij achter
      op een bron, dan zakt die toets meteen -- een versheidsmelding zou daar
      alleen later hetzelfde zeggen. */
-  'MENSELIJKE_UITVOERING.json': 'een PROJECTIE uit vier registers; test/menselijkeuitvoering.test.js eist byte-gelijkheid met de hercompilatie en maakt hem in toets 7 vanaf nul opnieuw'
+  'MENSELIJKE_UITVOERING.json': 'een PROJECTIE uit vier registers; test/menselijkeuitvoering.test.js eist byte-gelijkheid met de hercompilatie en maakt hem in toets 7 vanaf nul opnieuw',
+  /* METERKLASSE.json STAAT MET OPZET NIET IN DE REPO, en daarom ook niet in de
+     versheidslijst: er is niets om te verouderen. `npm run meterklasse` print
+     twee klassen (welke generatoren repo-waarheid claimen, en welke bronlezers
+     semantiek uit de codevorm afleiden); `--vastleggen` bestaat voor de dag dat
+     er een ratel bij hoort. Die ratel kan er vandaag niet zijn: het getal 67 kan
+     alleen dalen door grendels toe te voegen, en een deel van die 67 hoort er
+     juist geen te hebben -- een tand die daarop duwt maakt het huis slechter en
+     de meter groener. Zie BEWIJSMACHINE.md par. 6a.2; zodra de verklaring per
+     generator een besluit is, verhuist hij hiervandaan naar REGISTERS. */
+  'METERKLASSE.json': 'wordt met opzet niet in de repo gezet: een commando dat je draait, geen register dat meetelt (BEWIJSMACHINE.md par. 6a.2)'
 };
 
 function schrijvers() {

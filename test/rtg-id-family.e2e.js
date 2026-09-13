@@ -196,10 +196,10 @@ test('RTG ID vormt op telefoon en bureau een familie met de ene Edge',
             labelOnderMond: !!(mond && mond.parentElement.querySelector('small'))
           };
         });
-        assert.ok(eersteBalk.zichtbaar && eersteBalk.onder && eersteBalk.onder.height >= 48,
+        assert.ok(eersteBalk.zichtbaar && eersteBalk.onder && eersteBalk.onder.height >= 72,
           'telefoon: de gedeelde balk staat ook op het eerste inlogscherm');
-        assert.ok(eersteBalk.onder.left <= 1 && eersteBalk.onder.right >= maat.width - 1,
-          'telefoon: de balk vult de hele onderrand');
+        assert.ok(eersteBalk.onder.left >= 9 && eersteBalk.onder.right <= maat.width - 9,
+          'telefoon: de balk zweeft als een enkele goed aanraakbare capsule');
         assert.ok(eersteBalk.homeZichtbaar && eersteBalk.wereldenZichtbaar &&
           eersteBalk.actiesZichtbaar && eersteBalk.menuZichtbaar,
         'telefoon: Home, Werelden, Acties en Menu staan in dezelfde balk');
@@ -282,7 +282,8 @@ test('RTG ID vormt op telefoon en bureau een familie met de ene Edge',
       assert.ok(stand.vraag.top > stand.top.bottom - 1, maat.width + ': de vraag blijft onder Edge');
       assert.ok(stand.vraag.bottom <= stand.rij.top + 1, maat.width + ': de handeling volgt de vraag');
       assert.ok(stand.rij.bottom <= stand.stappen.top + 1, maat.width + ': voortgang volgt de handeling');
-      assert.ok(stand.stappen.bottom < stand.onder.top + 1, maat.width + ': voortgang blijft boven Edge');
+      assert.ok(stand.stappen.bottom < stand.onder.top + 1,
+        maat.width + ': voortgang blijft boven Edge: ' + JSON.stringify({ stappen: stand.stappen, onder: stand.onder }));
       if (maat.width < 900) {
         assert.ok(stand.vraag.left >= 12 && stand.vraag.right <= maat.width - 12,
           'telefoon: de vraag blijft binnen het leesvlak');

@@ -19,7 +19,8 @@
       br2 += (doel.breed - br2) * volg; du2 += (doel.duw - du2) * volg; sc2 += (doel.scheef - sc2) * volg;
       mctx.setTransform(1, 0, 0, 1, 0, 0);
       mctx.clearRect(0, 0, canvas.width, canvas.height);
-      mctx.scale(canvas.width / 220, canvas.height / 100);
+      mctx.scale(canvas.width / 150, canvas.height / 72);
+      mctx.translate(-35, -16);
       /* De WebGL-tekenaar draait om y=52, deze om het midden van 0..100 (dus
          50). Zonder deze twee eenheden staat dezelfde mond in de terugval twee
          eenheden hoger dan in de hoofdweg -- klein, maar dan is het niet meer

@@ -2,8 +2,8 @@
  "soort": "meting",
  "uitleg": "De FAILURE-cel per route: faalt hij netjes als er iets onder hem wegvalt. Het contract wordt eerst bepaald uit het gemeten effectprofiel (X-RTG-Effect / X-RTG-Staat) en pas daarna beproefd met het verraad dat daarbij hoort.",
  "stempel": {
-  "op": "2026-09-10T13:09:21.020Z",
-  "commit": "61c400cc",
+  "op": "2026-09-13T09:29:24.054Z",
+  "commit": "5dea560c",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/faalproef.js",
@@ -32,13 +32,13 @@
  ],
  "verradenNietGedraaid": {},
  "gemeten": {
-  "routes": 4904,
-  "duurzaamSchrijvend": 71,
-  "nietToeTeSchrijven": 123,
+  "routes": 4952,
+  "duurzaamSchrijvend": 72,
+  "nietToeTeSchrijven": 124,
   "voorziening": 63,
-  "bewezen": 61,
-  "gezakt": 10,
-  "ongemeten": 4833,
+  "bewezen": 69,
+  "gezakt": 3,
+  "ongemeten": 4880,
   "verradenInCatalogus": 2,
   "verradenGedraaid": 2
  },
@@ -1524,12 +1524,12 @@
      "reden": "expliciete fout (status 404) in plaats van een bevestiging"
     },
     "schrijf-verloren": {
-     "staat": "ongemeten",
-     "reden": "het verraad greep hier niet aan: de toestand veranderde gewoon"
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 404) in plaats van een bevestiging"
     }
    },
    "failure": "bewezen",
-   "reden": "schrijf-faalt: expliciete fout (status 404) in plaats van een bevestiging"
+   "reden": "schrijf-verloren: expliciete fout (status 404) in plaats van een bevestiging"
   },
   {
    "methode": "POST",
@@ -1545,12 +1545,12 @@
      "reden": "expliciete fout (status 404) in plaats van een bevestiging"
     },
     "schrijf-verloren": {
-     "staat": "ongemeten",
-     "reden": "het verraad greep hier niet aan: de toestand veranderde gewoon"
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 404) in plaats van een bevestiging"
     }
    },
    "failure": "bewezen",
-   "reden": "schrijf-faalt: expliciete fout (status 404) in plaats van een bevestiging"
+   "reden": "schrijf-verloren: expliciete fout (status 404) in plaats van een bevestiging"
   },
   {
    "methode": "POST",
@@ -2757,6 +2757,78 @@
    "perVerraad": {},
    "failure": "ongemeten",
    "reden": "de proef kreeg hem niet aan het werk (status 404)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/carriere/ledger/deel",
+   "route": "POST /api/carriere/ledger/deel",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/carriere/ledger/delen",
+   "route": "POST /api/carriere/ledger/delen",
+   "rol": "member",
+   "profiel": "leest",
+   "effect": "geen",
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/carriere/ledger/intrek",
+   "route": "POST /api/carriere/ledger/intrek",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/carriere/ledger/mijn",
+   "route": "POST /api/carriere/ledger/mijn",
+   "rol": "member",
+   "profiel": "leest",
+   "effect": "geen",
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/carriere/ledger/stopdelen",
+   "route": "POST /api/carriere/ledger/stopdelen",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/carriere/ledger/zet",
+   "route": "POST /api/carriere/ledger/zet",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 400)"
   },
   {
    "methode": "POST",
@@ -8249,7 +8321,7 @@
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 500)"
+   "reden": "de proef kreeg hem niet aan het werk (status 400)"
   },
   {
    "methode": "POST",
@@ -17025,6 +17097,42 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/mijn/abonnement",
+   "route": "POST /api/mijn/abonnement",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mijn/abonnement/opzeggen",
+   "route": "POST /api/mijn/abonnement/opzeggen",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mijn/abonnement/opzegvoorbeeld",
+   "route": "POST /api/mijn/abonnement/opzegvoorbeeld",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/mijn/gegevens",
    "route": "POST /api/mijn/gegevens",
    "rol": "member",
@@ -17517,6 +17625,54 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/move/gevolg",
+   "route": "POST /api/move/gevolg",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/move/reis",
+   "route": "POST /api/move/reis",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/move/volgende",
+   "route": "POST /api/move/volgende",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/move/vooraf",
+   "route": "POST /api/move/vooraf",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/munt/direct",
    "route": "POST /api/munt/direct",
    "rol": "member",
@@ -17783,6 +17939,54 @@
    "methode": "POST",
    "pad": "/api/nav/bestemmingen",
    "route": "POST /api/nav/bestemmingen",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/nav/gebied/kies",
+   "route": "POST /api/nav/gebied/kies",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/nav/gebied/pakket",
+   "route": "POST /api/nav/gebied/pakket",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/nav/gebied/weg",
+   "route": "POST /api/nav/gebied/weg",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/nav/gebieden",
+   "route": "POST /api/nav/gebieden",
    "rol": "member",
    "profiel": "geen-werk",
    "effect": null,
@@ -18390,12 +18594,12 @@
      "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     },
     "schrijf-verloren": {
-     "staat": "gezakt",
-     "reden": "status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     }
    },
-   "failure": "gezakt",
-   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+   "failure": "bewezen",
+   "reden": "schrijf-verloren: expliciete fout (status 503) in plaats van een bevestiging"
   },
   {
    "methode": "POST",
@@ -18459,12 +18663,12 @@
      "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     },
     "schrijf-verloren": {
-     "staat": "gezakt",
-     "reden": "status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     }
    },
-   "failure": "gezakt",
-   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+   "failure": "bewezen",
+   "reden": "schrijf-verloren: expliciete fout (status 503) in plaats van een bevestiging"
   },
   {
    "methode": "POST",
@@ -18539,61 +18743,61 @@
    "methode": "POST",
    "pad": "/api/office/balie/abo",
    "route": "POST /api/office/balie/abo",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 400)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/balie/dossier",
    "route": "POST /api/office/balie/dossier",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 400)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/balie/herstel",
    "route": "POST /api/office/balie/herstel",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 400)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/balie/klacht",
    "route": "POST /api/office/balie/klacht",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/balie/klacht/status",
    "route": "POST /api/office/balie/klacht/status",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
@@ -18623,13 +18827,13 @@
    "methode": "POST",
    "pad": "/api/office/balie/zoek",
    "route": "POST /api/office/balie/zoek",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 400)"
   },
   {
    "methode": "POST",
@@ -18661,11 +18865,11 @@
    "route": "POST /api/office/bank/autoriseer/annuleer",
    "rol": "boardroom",
    "profiel": "voorziening",
-   "effect": "opslag=1",
+   "effect": "opslag=2",
    "effect2": "geen",
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de eerste oproep schreef (opslag=1) en de tweede niet (geen): dit is een route die bij het eerste bezoek zijn standaard klaarzet, geen route die werk vastlegt. Een verraad op de schrijfweg meet hier niets, dus er wordt geen oordeel geveld."
+   "reden": "de eerste oproep schreef (opslag=2) en de tweede niet (geen): dit is een route die bij het eerste bezoek zijn standaard klaarzet, geen route die werk vastlegt. Een verraad op de schrijfweg meet hier niets, dus er wordt geen oordeel geveld."
   },
   {
    "methode": "POST",
@@ -18697,7 +18901,7 @@
    "route": "POST /api/office/bank/draai",
    "rol": "boardroom",
    "profiel": "duurzaam",
-   "effect": "opslag=1",
+   "effect": "opslag=2",
    "effect2": null,
    "perVerraad": {
     "schrijf-faalt": {
@@ -18766,7 +18970,7 @@
    "route": "POST /api/office/bank/herstel",
    "rol": "office",
    "profiel": "duurzaam",
-   "effect": "opslag=1",
+   "effect": "opslag=2",
    "effect2": null,
    "perVerraad": {
     "schrijf-faalt": {
@@ -18808,11 +19012,11 @@
    "route": "POST /api/office/bank/instellingen",
    "rol": "office",
    "profiel": "voorziening",
-   "effect": "opslag=1",
+   "effect": "opslag=2",
    "effect2": "geen",
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de eerste oproep schreef (opslag=1) en de tweede niet (geen): dit is een route die bij het eerste bezoek zijn standaard klaarzet, geen route die werk vastlegt. Een verraad op de schrijfweg meet hier niets, dus er wordt geen oordeel geveld."
+   "reden": "de eerste oproep schreef (opslag=2) en de tweede niet (geen): dit is een route die bij het eerste bezoek zijn standaard klaarzet, geen route die werk vastlegt. Een verraad op de schrijfweg meet hier niets, dus er wordt geen oordeel geveld."
   },
   {
    "methode": "POST",
@@ -18844,11 +19048,11 @@
    "route": "POST /api/office/bank/leden",
    "rol": "office",
    "profiel": "voorziening",
-   "effect": "opslag=1",
+   "effect": "opslag=2",
    "effect2": "geen",
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de eerste oproep schreef (opslag=1) en de tweede niet (geen): dit is een route die bij het eerste bezoek zijn standaard klaarzet, geen route die werk vastlegt. Een verraad op de schrijfweg meet hier niets, dus er wordt geen oordeel geveld."
+   "reden": "de eerste oproep schreef (opslag=2) en de tweede niet (geen): dit is een route die bij het eerste bezoek zijn standaard klaarzet, geen route die werk vastlegt. Een verraad op de schrijfweg meet hier niets, dus er wordt geen oordeel geveld."
   },
   {
    "methode": "POST",
@@ -18889,7 +19093,7 @@
    "route": "POST /api/office/bank/nood",
    "rol": "office",
    "profiel": "duurzaam",
-   "effect": "opslag=1",
+   "effect": "opslag=2",
    "effect2": null,
    "perVerraad": {
     "schrijf-faalt": {
@@ -18946,11 +19150,11 @@
    "route": "POST /api/office/bank/operationeel",
    "rol": "boardroom",
    "profiel": "voorziening",
-   "effect": "opslag=1",
+   "effect": "opslag=2",
    "effect2": "geen",
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de eerste oproep schreef (opslag=1) en de tweede niet (geen): dit is een route die bij het eerste bezoek zijn standaard klaarzet, geen route die werk vastlegt. Een verraad op de schrijfweg meet hier niets, dus er wordt geen oordeel geveld."
+   "reden": "de eerste oproep schreef (opslag=2) en de tweede niet (geen): dit is een route die bij het eerste bezoek zijn standaard klaarzet, geen route die werk vastlegt. Een verraad op de schrijfweg meet hier niets, dus er wordt geen oordeel geveld."
   },
   {
    "methode": "POST",
@@ -19207,7 +19411,7 @@
    "route": "POST /api/office/boardroom/alles",
    "rol": "boardroom",
    "profiel": "duurzaam",
-   "effect": "opslag=1",
+   "effect": "opslag=2",
    "effect2": null,
    "perVerraad": {
     "schrijf-faalt": {
@@ -19422,6 +19626,18 @@
    "perVerraad": {},
    "failure": "ongemeten",
    "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/carriere/ledger/bevestig",
+   "route": "POST /api/office/carriere/ledger/bevestig",
+   "rol": "kantoor-op-naam",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
@@ -20034,12 +20250,12 @@
      "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     },
     "schrijf-verloren": {
-     "staat": "gezakt",
-     "reden": "status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     }
    },
-   "failure": "gezakt",
-   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+   "failure": "bewezen",
+   "reden": "schrijf-verloren: expliciete fout (status 503) in plaats van een bevestiging"
   },
   {
    "methode": "POST",
@@ -20151,12 +20367,12 @@
      "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     },
     "schrijf-verloren": {
-     "staat": "gezakt",
-     "reden": "status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     }
    },
-   "failure": "gezakt",
-   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+   "failure": "bewezen",
+   "reden": "schrijf-verloren: expliciete fout (status 503) in plaats van een bevestiging"
   },
   {
    "methode": "POST",
@@ -22413,12 +22629,12 @@
      "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     },
     "schrijf-verloren": {
-     "staat": "gezakt",
-     "reden": "status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     }
    },
-   "failure": "gezakt",
-   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+   "failure": "bewezen",
+   "reden": "schrijf-verloren: expliciete fout (status 503) in plaats van een bevestiging"
   },
   {
    "methode": "POST",
@@ -22602,6 +22818,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/reisbureau/afzeggen",
+   "route": "POST /api/office/reisbureau/afzeggen",
+   "rol": "office",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 400)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/reisbureau/besluit",
    "route": "POST /api/office/reisbureau/besluit",
    "rol": "office",
@@ -22683,6 +22911,18 @@
    "perVerraad": {},
    "failure": "ongemeten",
    "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/reisbureau/wijziging",
+   "route": "POST /api/office/reisbureau/wijziging",
+   "rol": "office",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 400)"
   },
   {
    "methode": "POST",
@@ -22851,6 +23091,54 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/rugdekking/alle",
+   "route": "POST /api/office/rugdekking/alle",
+   "rol": "kantoor-op-naam",
+   "profiel": "onzeker",
+   "effect": "geen",
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de momentopname bewoog maar de effectmeter zag geen save(); die opname is globaal en sequentieel, dus dit kan net zo goed een achtergrondschrijver zijn. Niet aan deze route toe te schrijven, en dus niet te beoordelen."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rugdekking/beurs",
+   "route": "POST /api/office/rugdekking/beurs",
+   "rol": "kantoor-op-naam",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 400)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rugdekking/stel",
+   "route": "POST /api/office/rugdekking/stel",
+   "rol": "kantoor-op-naam",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/rugdekking/stop",
+   "route": "POST /api/office/rugdekking/stop",
+   "rol": "kantoor-op-naam",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/salon-naleving",
    "route": "POST /api/office/salon-naleving",
    "rol": "office",
@@ -22925,301 +23213,301 @@
    "methode": "POST",
    "pad": "/api/office/service/ai/mag",
    "route": "POST /api/office/service/ai/mag",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/ai/vraag",
    "route": "POST /api/office/service/ai/vraag",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/bericht",
    "route": "POST /api/office/service/bericht",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/bevestiging/code",
    "route": "POST /api/office/service/bevestiging/code",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 400)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/bevestiging/vraag",
    "route": "POST /api/office/service/bevestiging/vraag",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/bundel",
    "route": "POST /api/office/service/bundel",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 400)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/eigenaar",
    "route": "POST /api/office/service/eigenaar",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/foutsignaal/koppel",
    "route": "POST /api/office/service/foutsignaal/koppel",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/foutsignalen",
    "route": "POST /api/office/service/foutsignalen",
-   "rol": "office",
-   "profiel": "geen-werk",
-   "effect": null,
+   "rol": "kantoor-op-naam",
+   "profiel": "leest",
+   "effect": "geen",
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/gesprek/eind",
    "route": "POST /api/office/service/gesprek/eind",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/gesprek/neem",
    "route": "POST /api/office/service/gesprek/neem",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/gesprek/signaal",
    "route": "POST /api/office/service/gesprek/signaal",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/gesprekken",
    "route": "POST /api/office/service/gesprekken",
-   "rol": "office",
-   "profiel": "geen-werk",
-   "effect": null,
+   "rol": "kantoor-op-naam",
+   "profiel": "leest",
+   "effect": "geen",
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/incident/hersteld",
    "route": "POST /api/office/service/incident/hersteld",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 400)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/kanalen",
    "route": "POST /api/office/service/kanalen",
-   "rol": "office",
-   "profiel": "geen-werk",
-   "effect": null,
+   "rol": "kantoor-op-naam",
+   "profiel": "leest",
+   "effect": "geen",
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/koppel",
    "route": "POST /api/office/service/koppel",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/kwaliteit",
    "route": "POST /api/office/service/kwaliteit",
-   "rol": "office",
-   "profiel": "geen-werk",
-   "effect": null,
+   "rol": "kantoor-op-naam",
+   "profiel": "leest",
+   "effect": "geen",
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/machtiging/intrek",
    "route": "POST /api/office/service/machtiging/intrek",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/machtiging/tekenbij",
    "route": "POST /api/office/service/machtiging/tekenbij",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/machtigingen",
    "route": "POST /api/office/service/machtigingen",
-   "rol": "office",
-   "profiel": "geen-werk",
-   "effect": null,
+   "rol": "kantoor-op-naam",
+   "profiel": "leest",
+   "effect": "geen",
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/patronen",
    "route": "POST /api/office/service/patronen",
-   "rol": "office",
-   "profiel": "geen-werk",
-   "effect": null,
+   "rol": "kantoor-op-naam",
+   "profiel": "onzeker",
+   "effect": "geen",
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de momentopname bewoog maar de effectmeter zag geen save(); die opname is globaal en sequentieel, dus dit kan net zo goed een achtergrondschrijver zijn. Niet aan deze route toe te schrijven, en dus niet te beoordelen."
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/stand",
    "route": "POST /api/office/service/stand",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/wachtrij",
    "route": "POST /api/office/service/wachtrij",
-   "rol": "office",
-   "profiel": "geen-werk",
-   "effect": null,
+   "rol": "kantoor-op-naam",
+   "profiel": "leest",
+   "effect": "geen",
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/weeg",
    "route": "POST /api/office/service/weeg",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
    "pad": "/api/office/service/zaak",
    "route": "POST /api/office/service/zaak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "profiel": "geen-werk",
    "effect": null,
    "effect2": null,
    "perVerraad": {},
    "failure": "ongemeten",
-   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
@@ -23565,12 +23853,12 @@
      "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     },
     "schrijf-verloren": {
-     "staat": "gezakt",
-     "reden": "status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     }
    },
-   "failure": "gezakt",
-   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+   "failure": "bewezen",
+   "reden": "schrijf-verloren: expliciete fout (status 503) in plaats van een bevestiging"
   },
   {
    "methode": "POST",
@@ -23937,6 +24225,18 @@
    "perVerraad": {},
    "failure": "ongemeten",
    "reden": "de momentopname bewoog maar de effectmeter zag geen save(); die opname is globaal en sequentieel, dus dit kan net zo goed een achtergrondschrijver zijn. Niet aan deze route toe te schrijven, en dus niet te beoordelen."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/voogdij/besluit",
+   "route": "POST /api/office/voogdij/besluit",
+   "rol": "kantoor-op-naam",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
@@ -24615,12 +24915,21 @@
    "pad": "/api/office/weefsel/reeks/veeg",
    "route": "POST /api/office/weefsel/reeks/veeg",
    "rol": "office",
-   "profiel": "onzeker",
-   "effect": "geen",
+   "profiel": "duurzaam",
+   "effect": "opslag=1",
    "effect2": null,
-   "perVerraad": {},
-   "failure": "ongemeten",
-   "reden": "de momentopname bewoog maar de effectmeter zag geen save(); die opname is globaal en sequentieel, dus dit kan net zo goed een achtergrondschrijver zijn. Niet aan deze route toe te schrijven, en dus niet te beoordelen."
+   "perVerraad": {
+    "schrijf-faalt": {
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
+    },
+    "schrijf-verloren": {
+     "staat": "ongemeten",
+     "reden": "het verraad greep hier niet aan: de toestand veranderde gewoon"
+    }
+   },
+   "failure": "bewezen",
+   "reden": "schrijf-faalt: expliciete fout (status 503) in plaats van een bevestiging"
   },
   {
    "methode": "POST",
@@ -24868,7 +25177,7 @@
    "route": "POST /api/office/weefsel/werk/maak",
    "rol": "office",
    "profiel": "duurzaam",
-   "effect": "opslag=1",
+   "effect": "opslag=2",
    "effect2": null,
    "perVerraad": {
     "schrijf-faalt": {
@@ -25062,12 +25371,12 @@
      "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     },
     "schrijf-verloren": {
-     "staat": "gezakt",
-     "reden": "status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
     }
    },
-   "failure": "gezakt",
-   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+   "failure": "bewezen",
+   "reden": "schrijf-verloren: expliciete fout (status 503) in plaats van een bevestiging"
   },
   {
    "methode": "POST",
@@ -25120,7 +25429,7 @@
    "route": "POST /api/office/zelfzorg/herstel",
    "rol": "office",
    "profiel": "duurzaam",
-   "effect": "opslag=2",
+   "effect": "opslag=3",
    "effect2": null,
    "perVerraad": {
     "schrijf-faalt": {
@@ -25141,7 +25450,7 @@
    "route": "POST /api/office/zelfzorg/opruim",
    "rol": "office",
    "profiel": "duurzaam",
-   "effect": "opslag=1",
+   "effect": "opslag=2",
    "effect2": null,
    "perVerraad": {
     "schrijf-faalt": {
@@ -25162,7 +25471,7 @@
    "route": "POST /api/office/zelfzorg/upgrade",
    "rol": "office",
    "profiel": "duurzaam",
-   "effect": "opslag=3",
+   "effect": "opslag=4",
    "effect2": null,
    "perVerraad": {
     "schrijf-faalt": {
@@ -28539,6 +28848,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/reisbureau/afzeggen",
+   "route": "POST /api/reisbureau/afzeggen",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/reisbureau/annuleer",
    "route": "POST /api/reisbureau/annuleer",
    "rol": "member",
@@ -28565,6 +28886,18 @@
    "methode": "POST",
    "pad": "/api/reisbureau/mijn",
    "route": "POST /api/reisbureau/mijn",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/reisbureau/wijzig",
+   "route": "POST /api/reisbureau/wijzig",
    "rol": "member",
    "profiel": "geen-werk",
    "effect": null,
@@ -32040,6 +32373,30 @@
    "perVerraad": {},
    "failure": "ongemeten",
    "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rugdekking/lijst",
+   "route": "POST /api/rugdekking/lijst",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rugdekking/mijn",
+   "route": "POST /api/rugdekking/mijn",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
   },
   {
    "methode": "POST",
@@ -35525,6 +35882,30 @@
    "methode": "POST",
    "pad": "/api/supplier/care/vastleggen",
    "route": "POST /api/supplier/care/vastleggen",
+   "rol": "supplier",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/carriere/bevestig",
+   "route": "POST /api/supplier/carriere/bevestig",
+   "rol": "supplier",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/carriere/intrek",
+   "route": "POST /api/supplier/carriere/intrek",
    "rol": "supplier",
    "profiel": "geen-werk",
    "effect": null,
@@ -44943,6 +45324,30 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/supplier/vakschema/mijn",
+   "route": "POST /api/supplier/vakschema/mijn",
+   "rol": "supplier",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/vakschema/voorstel",
+   "route": "POST /api/supplier/vakschema/voorstel",
+   "rol": "supplier",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/supplier/vastgoed/overzicht",
    "route": "POST /api/supplier/vastgoed/overzicht",
    "rol": "supplier",
@@ -47316,6 +47721,42 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/training/voorstel/aanvaard",
+   "route": "POST /api/training/voorstel/aanvaard",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/training/voorstel/weiger",
+   "route": "POST /api/training/voorstel/weiger",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/training/voorstellen",
+   "route": "POST /api/training/voorstellen",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/training/weg",
    "route": "POST /api/training/weg",
    "rol": "member",
@@ -48086,6 +48527,138 @@
    "methode": "POST",
    "pad": "/api/vertaal/talen",
    "route": "POST /api/vertaal/talen",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vertegenwoordiging/aanvaard",
+   "route": "POST /api/vertegenwoordiging/aanvaard",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vertegenwoordiging/bevoegdheden",
+   "route": "POST /api/vertegenwoordiging/bevoegdheden",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vertegenwoordiging/grens",
+   "route": "POST /api/vertegenwoordiging/grens",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vertegenwoordiging/handel",
+   "route": "POST /api/vertegenwoordiging/handel",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vertegenwoordiging/intrek",
+   "route": "POST /api/vertegenwoordiging/intrek",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vertegenwoordiging/mijn",
+   "route": "POST /api/vertegenwoordiging/mijn",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vertegenwoordiging/simulatie",
+   "route": "POST /api/vertegenwoordiging/simulatie",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vertegenwoordiging/voogd/rol",
+   "route": "POST /api/vertegenwoordiging/voogd/rol",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vertegenwoordiging/voogd/tekent",
+   "route": "POST /api/vertegenwoordiging/voogd/tekent",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vertegenwoordiging/voogd/vraag",
+   "route": "POST /api/vertegenwoordiging/voogd/vraag",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/vertegenwoordiging/voorstel",
+   "route": "POST /api/vertegenwoordiging/voorstel",
    "rol": "member",
    "profiel": "geen-werk",
    "effect": null,
@@ -50630,6 +51203,18 @@
    "methode": "POST",
    "pad": "/api/book",
    "route": "POST /api/book",
+   "rol": null,
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "ongemeten",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/carriere/regel/toon",
+   "route": "POST /api/carriere/regel/toon",
    "rol": null,
    "profiel": "geen-werk",
    "effect": null,

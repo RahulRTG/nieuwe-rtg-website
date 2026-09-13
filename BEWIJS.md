@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1876 bestanden en 13411 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1876 bestanden en 13413 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1876 |
-| losse beweringen (`test(...)`) | 13411 |
+| losse beweringen (`test(...)`) | 13413 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1246 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1659 bestanden, 13028 beweringen.
+1659 bestanden, 13030 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -326,7 +326,7 @@ toets omvalt.
 | `doctrine.test.js` | 8 | gezakt op `===->!==#0` | DE DOCTRINECOMPILER ZELF -- kan hij zakken? scripts/doctrine.js telt harde uitspraken in de doctrine-documenten. |
 | `doelbinding.test.js` | 12 | gezakt op `===->!==#0` | DOELBINDING -- waarvoor mag dit gegeven gebruikt worden? DE TOETS DIE DE TWEE REGISTERS AAN ELKAAR HOUDT staat in 1. |
 | `doelen.test.js` | 8 | gezakt op `liegpoort /api/` | De doelenmotor (kern/doelen.js). Het punt van deze motor is dat mijlpalen worden AFGELEID en niet bewaard: een gemiste week is dan geen mislukking maar een ander pad. |
-| `doelgroepbereik.test.js` | 12 | gezakt op `!==->===#0` | DE DOELGROEPBEREIKMETER -- en vooral: wat hij NIET mag beweren. WAAROM HIJ ZO HEET EN NIET "BEREIKBAAR". |
+| `doelgroepbereik.test.js` | 14 | gezakt op `!==->===#0` | DE DOELGROEPBEREIKMETER -- en vooral: wat hij NIET mag beweren. WAAROM HIJ ZO HEET EN NIET "BEREIKBAAR". |
 | `domeinalleen.test.js` | 2 | gezakt op `!==->===#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `domeingrens.test.js` | 8 | gezakt op `===->!==#0` | DE DOMEINGRENS: laat hij door wat mag, en houdt hij tegen wat niet mag? Waar dit over gaat: server.js geeft elke router hetzelfde object `kern` met ruim negenhonderd eigenschappen, dus kan elk domein bij alles van... |
 | `doodspoor.test.js` | 19 | gezakt op `===->!==#0` | DE DOODSPOORMETER (scripts/doodspoor.js) -- ziet hij een dood spoor? MAATSTAF.md par. |

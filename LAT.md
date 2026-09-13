@@ -703,6 +703,73 @@ draait. Voor de mens die drie groene poorten optelt tot één zin bestaat verder
 geen handhaver -- daarvoor staat deze regel hier, net als bij regel 11.
 
 
+### 17. Een poort die een artefact leest, herberekent het of bewaakt niets
+
+Een register in de wortel is een **bouwartefact**, en een artefact kan een commit
+achterlopen. Een poort die zo'n bestand leest en er een uitspraak op doet, doet
+die uitspraak over de laatste meetstand en niet noodzakelijk over de huidige code.
+
+`EXECUTION_MAP.json` heeft dit al opgelost: de autoriteit komt live en nooit uit
+een bouwartefact. De vorm die werkt staat in `test/capabilities.test.js`: draai
+het instrument opnieuw en vergelijk elk getal met wat er is vastgelegd.
+
+*Het geval, 13 september 2026:* de poort `LEGACY_PENDING_CLASSIFICATION mag
+alleen krimpen` stond vier dagen groen op nul terwijl er 47 schrijfroutes zonder
+contract waren. `MUTATIECONTRACT-AFGELEID.json` was veranderd zonder dat
+`MUTATIECONTRACT.json` was meegeregenereerd. Een versheidswaarschuwing alleen is
+niet genoeg: die zegt dat een bestand oud is, niet of het nog klopt. Vergelijk
+daarom elk getal, niet slechts een handvol.
+
+**Handhaver:** `test/mutatiecontract.test.js` draait de actuele telling en
+vergelijkt elke stand; `test/capabilities.test.js` en
+`test/objectmodel.test.js` doen hetzelfde voor hun registers. Voor registers
+zonder zo'n toets bestaat geen handhaver, en daarvoor staat deze regel hier.
+
+---
+
+### 18. Tijdens een meetronde is de werkboom niet van jou
+
+Een meetketen schrijft registers en journalen en zet bij ijkingen bewust
+verkeerde waarden neer die zij daarna zelf terugzet. Wie tijdens zo'n ronde
+`git status` leest, ziet een momentopname midden in een proef. Wie er
+`git add -A` op loslaat, schrijft die momentopname de geschiedenis in.
+
+Op 13 september 2026 gebeurde dat in drie vormen: een `GLUURRONDE.json` uit een
+vuile boom, tijdelijke ijkgegevens in `package.json` en `LUSSEN.json`, en een
+half `.schermjournaal` na het afbreken van de e2e-fase. De regel die eruit volgt:
+draai nooit twee meetketens tegelijk, commit niet door een lopende ronde heen en
+beëindig een keten niet halverwege een fase.
+
+**Handhaver:** `scripts/lib/stempel.js` zet `boomVuil` op elk register en
+`scripts/norm.js` ratelt `registersUitVuileBoom`; de deltapoort meldt hem per
+bestand met de reden. Voor de mens die midden in een ronde commit bestaat geen
+handhaver.
+
+---
+
+### 19. Een handhaver die één vorm kent, bewaakt één vorm
+
+Een poort die op een patroon zoekt, vindt dat patroon en niet automatisch het
+hele probleem. Zodra dezelfde fout anders wordt geschreven, kan groen ten
+onrechte als een uitspraak over alle vormen worden gelezen.
+
+*Het geval, 13 september 2026:* de pipe-regel vond
+`console.log(JSON.stringify(...))` gevolgd door `process.exit()`, maar niet de
+gelijkwaardige variant met `process.stdout.write`. Hetzelfde gebeurde in
+`scripts/dekking.js`: twee takken telden de unie van de route- en
+schermjournalen, terwijl de tak die de suite zelf draaide alleen het eigen
+journaal gebruikte. Browser-only routes konden daar dus nooit gedekt raken.
+
+De vraag bij elke handhaver is daarom niet alleen "vindt hij dit geval?", maar
+ook "hoe ziet dit geval eruit als iemand het anders schrijft?". Waar dat
+onbekend is, hoort het expliciet te worden vermeld.
+
+**Handhaver:** `scripts/mutatie.js` muteert de code en eist dat een toets zakt.
+Een handhaver die een tweede schrijfwijze niet ziet, zakt daar niet op, en
+daarvoor staat deze regel hier.
+
+---
+
 ## Wat de lat betekent per tijdvak
 
 ### De toekomst

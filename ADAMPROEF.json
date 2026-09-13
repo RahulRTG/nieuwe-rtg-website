@@ -11,7 +11,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Paarse Bever B2BF",
+      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Blauwe Egel 29FB",
       "fout": null,
       "ms": 0
     },
@@ -57,7 +57,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "vacature 8b44af6f, minimumleeftijd 16",
+      "ziet": "vacature d2340cfb, minimumleeftijd 16",
       "fout": null,
       "ms": 5
     },
@@ -83,7 +83,7 @@
       "status": 200,
       "ziet": "aangenomen door de route: true",
       "fout": null,
-      "ms": 8
+      "ms": 9
     },
     {
       "nr": 8,
@@ -93,7 +93,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "sollicitatie b0b78b52, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
+      "ziet": "sollicitatie e87d1bc0, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
       "fout": null,
       "ms": 13
     },
@@ -107,7 +107,7 @@
       "status": 200,
       "ziet": "Adam ziet status \"uitgenodigd\" bij Cafe Brisa",
       "fout": null,
-      "ms": 22
+      "ms": 23
     },
     {
       "nr": 10,
@@ -119,7 +119,7 @@
       "status": 200,
       "ziet": "stand bij Adam: \"aangenomen\", bericht op zijn bord: \"Aangenomen bij Cafe Brisa -- Uw personeelsuitnodiging staat ...\" van RTG, ongelezen: true",
       "fout": null,
-      "ms": 21
+      "ms": 20
     },
     {
       "nr": 11,
@@ -131,7 +131,7 @@
       "status": 200,
       "ziet": "blijft staan: Keukenhulp bij Cafe Brisa (aangenomen)",
       "fout": null,
-      "ms": 2
+      "ms": 1
     }
   ],
   "storingen": [

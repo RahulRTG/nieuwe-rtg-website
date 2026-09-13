@@ -220,9 +220,15 @@ const REGISTER = {
   /* GELDDEKKING.json hangt WEL aan NORM.json -- vier tanden, zie de kop daar.
      Anders dan de geldkaart draagt hij voorraden die mogen dalen in plaats van
      een nul die nul moet blijven, en dat is precies wat een ratel meet. */
+  /* `geldRoutesMeldOnbesloten` hoort HIER en niet alleen bij MELDBESLUIT.json.
+     De VERKLARING woont daar, maar het GETAL komt uit de `ratel` van dit
+     register -- en test/gelddekking.test.js eist terecht dat elke sleutel in die
+     ratel ook in deze meterlijst staat. Anders draait de meter nog en bewaakt
+     hij niets meer, precies het gat dat die toets beschrijft. */
   'GELDDEKKING.json': { meter: ['geldRoutesPubliek', 'geldRoutesZonderSemantiek',
     'geldRoutesZonderIdemBewijs', 'geldRoutesZonderTerugweg',
-    'geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak'] },
+    'geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak',
+    'geldRoutesMeldOnbesloten'] },
   /* FACTUURPROEF.json hangt aan TWEE tanden en niet aan een, en dat is een
      besluit en geen slordigheid: `geldpadGezakt` is een defect dat naar nul
      moet, `geldpadOnbewezen` is werk dat nog niet gedaan is. Een tand die die

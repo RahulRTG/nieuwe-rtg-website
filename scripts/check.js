@@ -5716,5 +5716,44 @@ console.log('\n70) de eerste minuut van een vers lid is gemeten, en niemand is e
   }
 }
 
+/* 71) de vorige bronmuterende ronde is netjes afgelopen EN heeft niets achtergelaten.
+
+   WAAROM DEZE REGEL ER IS. Op 13 september 2026 brak ik een ijkronde af die 146
+   bestanden gesaboteerd had staan. Een wachtketting toetste "draait het proces
+   nog?", las de afwezigheid als "klaar" en startte de volgende stap. Er bleven
+   bovendien drie processen achter -- een toets met twee servers eraan -- die
+   negentien minuten poorten vasthielden zonder eigenaar.
+
+   TWEE BEGRIPPEN, en ze liepen door elkaar:
+     WERKSTATUS    is de ronde af?        PASSED / FAILED / ABORTED
+     PROCESBEZIT   is de runtime schoon?  leeft er nog iets van die ronde?
+   Een ronde kan ABORTED zijn terwijl haar kinderen nog draaien. Dan is een
+   volgende meting formeel nieuw en materieel vervuild.
+
+   HET VERSCHIL MET eisGeenAfbouw(), en dat zijn twee vragen die niet in elkaar
+   mogen schuiven. Die poort vraagt "draait er NU iets"; deze regel vraagt "is de
+   VORIGE ronde netjes afgelopen". Ze samenvoegen zou binnen elke toets weigeren
+   -- precies de fout die in de kop van afbouw-slot.js staat beschreven.
+
+   DEZE REGEL NOEMT WAT HEM BLOKKEERT. Een afbouwslot dat alleen "rood" zegt,
+   wordt in de CI een mysterie dat mensen leren wegkijken; daarom staat er welke
+   run, welke stand, welke procesidentiteit nog leeft, en wat de actie is. */
+console.log('\n71) de vorige bronmuterende ronde is netjes afgelopen en heeft niets achtergelaten');
+{
+  const afloop = require('./lib/afbouw-afloop');
+  const vorige = afloop.lees();
+  if (!vorige) {
+    ok('geen eerdere ronde vastgelegd; de eerste die pak() aanroept legt er een aan');
+  } else {
+    const g = afloop.magStarten();
+    if (g.mag) {
+      ok('vorige ronde ' + (vorige.taak || '?') + ' (' + vorige.runId + ') staat op ' + vorige.stand +
+        ' en haar proceskring is leeg');
+    } else {
+      fout(afloop.diagnose(g, vorige));
+    }
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

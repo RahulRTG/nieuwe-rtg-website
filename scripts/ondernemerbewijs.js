@@ -54,10 +54,21 @@
    ============================================================================ */
 const fs = require('fs');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(process.env.RTG_BEWIJS_DOEL ? path.resolve(process.env.RTG_BEWIJS_DOEL) : WORTEL, 'ONDERNEMERBEWIJS.json');
 const VAST = process.argv.includes('--vastleggen');
+
+/* DE WACHT. Dit script doet zijn hele meting op moduleniveau en schrijft aan
+   het eind een register. Wie het requirede -- een laadcontrole, een toets die
+   even bij een constante wil -- draaide dus de volle meting en overschreef
+   ONDERNEMERBEWIJS.json met wat er op DAT moment toevallig in de bronmap stond.
+   Dat is niet theoretisch: exact zo schreef een `node -e "require(...)"` ooit
+   ROLPROEF.json van 3377 beproefde routes terug naar 292, en het register zag
+   er daarna volkomen normaal uit. `scripts/meetkeuring.js` regel `wacht` houdt
+   dat tegen; deze regel is het antwoord erop. */
+if (require.main !== module) return;
 
 /* ---------------------------------------------------------------------------
    1. DE TWAALF LAGEN, en per laag welk register hem beantwoordt.
@@ -504,7 +515,14 @@ const blindeVlekken = [blindeVlek(BRON.rol, 'bevoegd'), blindeVlek(BRON.idem, 'h
       reden: 'dit register telt zijn niet-beproefbare routes per reden (' + somm + ' in totaal) maar noemt de routes niet, dus zij zijn niet aan een capability toe te wijzen. Dat is een tekort van de rapportage, geen afwezigheid van blinde vlekken.' };
   });
 
+/* HET EIGEN STEMPEL. De `bronnen` hieronder dragen de stempels van de
+   registers waarop deze projectie leunt -- dat zegt hoe oud de INVOER is, niet
+   wanneer deze projectie zelf is gedraaid. Zonder een eigen stempel is een
+   projectie van gisteren niet te onderscheiden van een van vanochtend, en
+   `scripts/meetkeuring.js` kon er alleen over zwijgen omdat het woord
+   `stempel` toevallig in de bron voorkwam. */
 const uit = {
+  stempel: stempel(),
   soort: 'projectie',
   uitleg: 'Per ondernemer-capability: wat de bestaande registers over haar twaalf bewijslagen zeggen. Dit bestand MEET niets -- het legt zeven registers naast elkaar langs de capability uit server/functies/register/. Waar geen register spreekt staat ONBEKEND met de reden.',
   grens: 'ONBEKEND is geen ROOD en geen GROEN. Een capability heet pas VERKOOPBAAR als alle twaalf lagen groen zijn; dat is met opzet streng. De bronnen zijn op verschillende commits gemeten -- hun stempels staan hieronder en hun uitslagen worden nooit tot een samengesteld cijfer opgeteld.',

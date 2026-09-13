@@ -53,7 +53,7 @@ een marge of een leverancierscijfer bouwt. Het belangrijkste dat het document
 tegenhoudt is een `journeys`-tabel: een reis die mensen, geld, documenten én
 reserveringen BEZIT is de `Asset`-fout opnieuw, en de meting staat er
 (`KETENVORM.json`: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
-<!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> gedeelde actoren over drie
+<!--getal:ketenvorm.actorenTotaal-->18<!--/getal--> gedeelde actoren over drie
 ketens). De vorm die wél werkt is die van `kern/levensgraaf/graaf.js` — een
 PROJECTIE met vijf etiketten, hier plus de **herkomst** als zesde. Zeven grenzen
 bovenop die van REIZEN.md, waarvan de drie scherpste: geld wordt klaargezet en
@@ -1506,7 +1506,7 @@ gat, en hij zit nu in de meting (storing 1 en 7) in plaats van eromheen.
 `KETENVORM.json`) in plaats van verklaard -- de proeven delen met opzet geen
 module, want een gedeelde ketenklasse eroverheen zou de `Asset`-fout zijn.
 Uitkomst over drie ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
-van <!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> actoren gedeeld
+van <!--getal:ketenvorm.actorenTotaal-->18<!--/getal--> actoren gedeeld
 (gast/zaal/keuken tegenover lid/vervoerder/dispatch/chauffeur tegenover
 aanvrager/kantoor/keurder/dossier/tijd) en
 <!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van

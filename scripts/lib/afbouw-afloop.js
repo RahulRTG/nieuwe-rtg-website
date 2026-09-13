@@ -179,19 +179,51 @@ function magStarten(taak) {
   const terminaal = TERMINAAL.includes(a.stand);
   const wezen = wezenVan(a);
   if (!terminaal) {
+    /* EEN WAARNEMER BEOORDEELT, HIJ HERSCHRIJFT NIET.
+
+       Hier stond de verleiding om `ABORTED` weg te schrijven zodra de wortel
+       dood blijkt. Dat zou de fout zijn die deze hele module bestrijdt, een
+       niveau hoger: dan reconstrueert een OPVOLGER een terminale toestand uit
+       een AFWEZIGHEID, en daarna is niet meer te zien of de ronde zelf heeft
+       gezegd dat zij stopte of dat iemand anders dat voor haar invulde.
+
+       De opgeslagen stand blijft dus RUNNING, en wat deze functie teruggeeft is
+       een OORDEEL: `ONVOLTOOID`. Een terminale stand kan alleen ontstaan bij de
+       eigenaar van de ronde (via klaar() of de exitcode) of bij een expliciete
+       herstel() met naam en reden. */
     /* RUNNING. Leeft de wortel nog, dan loopt er echt iets. Leeft hij niet, dan
        is de ronde gestorven zonder iets te schrijven -- en dat is precies de
        toestand waar deze hele module voor bestaat: het is GEEN klaar. */
     const leeft = zelfdeProces(a.wortel);
     return { mag: false, stand: a.stand, wezen,
+      oordeel: leeft ? 'LOOPT' : 'ONVOLTOOID',
       reden: leeft ? 'de vorige ronde loopt nog (' + a.taak + ', PID ' + a.wortel.pid + ')'
-        : 'de vorige ronde schreef geen terminale toestand -- zij is gestorven of afgebroken, en dat is geen geslaagde afronding' };
+        : 'de opgeslagen stand is RUNNING en de wortel leeft niet meer: gestorven zonder eigen afloop. ' +
+          'Die stand wordt hier NIET herschreven -- een terminale toestand komt van de eigenaar of van een expliciete herstel()' };
   }
-  if (wezen.length) return { mag: false, stand: a.stand, wezen,
+  if (wezen.length) return { mag: false, stand: a.stand, wezen, oordeel: 'VUILE_RUNTIME',
     reden: 'de vorige ronde is ' + a.stand + ' maar ' + wezen.length + ' proces(sen) uit haar kring leven nog; een nieuwe meting zou langs hun poorten en bestanden meten' };
-  if (a.stand !== 'PASSED') return { mag: false, stand: a.stand, wezen: [],
-    reden: 'de vorige ronde eindigde op ' + a.stand + '; alleen PASSED geeft een opvolger vrij' };
-  return { mag: true, stand: 'PASSED', reden: 'de vorige ronde is PASSED en haar proceskring is leeg' };
+  /* MAG ER GEWERKT WORDEN, EN IS HET RESULTAAT BEWIJS -- twee vragen, en hier
+     stond maar een antwoord.
+
+     De eerste versie liet alleen PASSED een opvolger vrijgeven. Dat is strenger
+     dan de wet ("een expliciete terminale toestand EN een aantoonbaar beeindigde
+     proceskring") en het zet de machine vast: een mutatieronde die overlevende
+     mutanten vindt eindigt FAILED, en dat is een VOLTOOIDE ronde. Daarna kwam er
+     nooit meer een volgende, tot iemand met de hand in het bestand ging --
+     precies de poort-die-nooit-opengaat waar de kop van wezenVan() voor
+     waarschuwt, een niveau hoger.
+
+     De tweede vraag verdwijnt daarmee niet, hij krijgt zijn eigen veld.
+     `resultaatBruikbaar` zegt of de UITKOMST van die ronde als bewijs mag
+     meetellen, en dat blijft alleen bij PASSED. Wie een FAILED ronde als bewijs
+     wil lezen, moet dat veld negeren en dat is dan zichtbaar. */
+  return { mag: true, stand: a.stand, oordeel: a.stand, wezen: [],
+    resultaatBruikbaar: a.stand === 'PASSED',
+    reden: a.stand === 'PASSED'
+      ? 'de vorige ronde is PASSED en haar proceskring is leeg'
+      : 'de vorige ronde eindigde op ' + a.stand + ' en haar proceskring is leeg: zij is voltooid, ' +
+        'dus er mag gewerkt worden -- haar UITKOMST telt niet als bewijs' };
 }
 
 /* Bekende wezen beeindigen. Alleen processen die ALS ZELFDE PROCES herkend
@@ -207,11 +239,69 @@ function ruimOp() {
   return geraakt;
 }
 
+/* DE DIAGNOSE, EN WAAROM HIJ HIER STAAT EN NIET IN scripts/check.js.
+
+   Een afbouwslot dat alleen "rood" zegt, wordt in de CI een mysterie dat mensen
+   leren wegkijken. De weigering hoort dus te noemen WELKE run blokkeert, welke
+   stand die heeft, welke procesidentiteit nog leeft, en wat de actie is.
+
+   Dat formaat woont hier omdat er twee lezers zijn -- de keuring en
+   test/afbouwafloop.test.js -- en twee kopieen van dezelfde tekst lopen uiteen
+   zodra er een veld bijkomt. De toets kan nu de ECHTE diagnose beproeven in
+   plaats van een nagebouwde. */
+function diagnose(g, a) {
+  const wezen = g.wezen || [];
+  return 'afbouwslot: GEWEIGERD\n' +
+    '      vorige run:       ' + ((a && a.runId) || '?') + '  (' + ((a && a.taak) || 'onbenoemd') + ')\n' +
+    '      opgeslagen stand: ' + ((a && a.stand) || '?') +
+      (a && a.gestart ? '  gestart ' + a.gestart : '') +
+      (a && a.geeindigd ? ', geeindigd ' + a.geeindigd : ', nooit afgerond') + '\n' +
+    '      oordeel:          ' + (g.oordeel || '?') + '\n' +
+    '      levende kinderen: ' + wezen.length +
+      (wezen.length ? '  ->  ' + wezen.map(w => 'pid ' + w.pid + ' (start ' + w.start + ')').join(', ') : '') + '\n' +
+    '      reden:            ' + g.reden + '\n' +
+    '      actie:            ' + (wezen.length
+      ? 'ruim eerst op: node -e "require(\'./scripts/lib/afbouw-afloop\').ruimOp()"'
+      : 'sluit de ronde met de hand af: herstel({ stand: \'ABORTED\', reden, door }) -- PASSED kan alleen de ronde zelf');
+}
+
+/* EEN RONDE MET DE HAND AFSLUITEN -- de enige weg uit een ONVOLTOOID.
+
+   magStarten() weigert een ronde die RUNNING staat met een dode wortel, en hij
+   herschrijft die stand met opzet niet. Zonder deze functie zou daar geen uitweg
+   zijn: het slot gaat correct dicht en niemand komt er ooit uit. Een poort
+   zonder uitgang wordt vanzelf het volgende productieprobleem.
+
+   HIJ KAN NOOIT `PASSED` SCHRIJVEN, en dat is de kern. Een herstelhandeling weet
+   dat de ronde stopte; zij weet NIET dat het werk goed is gegaan -- alleen de
+   ronde zelf kan dat zeggen, en die is er niet meer. Wie hier PASSED zou mogen
+   zetten, kan elke afgebroken meting alsnog tot bewijs verklaren.
+
+   De uitslag draagt WIE het deed en WAAROM, zodat later te zien is dat deze
+   terminale toestand van een mens komt en niet van de ronde. */
+function herstel({ stand, reden, door } = {}) {
+  if (!['ABORTED', 'FAILED'].includes(stand))
+    throw new Error('herstel() sluit een ronde af als ABORTED of FAILED; PASSED kan alleen de ronde zelf schrijven');
+  if (!reden || String(reden).trim().length < 5)
+    throw new Error('herstel() vraagt een reden -- een terminale toestand zonder reden is een vinkje');
+  const a = lees();
+  if (!a) throw new Error('er is geen ronde om te herstellen');
+  const wezen = wezenVan(a);
+  if (wezen.length)
+    throw new Error('er leven nog ' + wezen.length + ' proces(sen) uit deze ronde; ruim die eerst op (ruimOp)');
+  schrijf(Object.assign({}, a, {
+    stand, geeindigd: a.geeindigd || new Date().toISOString(),
+    hersteld: { door: door || 'onbekend', reden: String(reden), op: new Date().toISOString(),
+      wasStand: a.stand }
+  }));
+  return lees();
+}
+
 /* ---------------------------------------------------------------------------
    EEN RONDE BEGINNEN. Geeft een klaar()-functie terug; wordt die niet
    aangeroepen, dan blijft ABORTED staan.
 --------------------------------------------------------------------------- */
-function begin({ taak, commit, basis, verwachteUitvoer, poorten } = {}) {
+function begin({ taak, commit, basis, verwachteUitvoer, poorten, uitExitcode } = {}) {
   const runId = 'run-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
   const wortel = merk(process.pid);
   const start = {
@@ -227,10 +317,49 @@ function begin({ taak, commit, basis, verwachteUitvoer, poorten } = {}) {
   };
   schrijf(start);
 
+  /* DE HARTSLAG -- en die is er omdat test/afbouwketen.test.js een gat vond dat
+     precies in het midden van deze wet zat.
+
+     De kring werd alleen bij leg() vastgelegd, dus alleen bij een NETTE afloop.
+     Maar het geval waar deze module voor bestaat is juist de ONNETTE: een ronde
+     die door SIGKILL wordt geveld schrijft niets, en dan stond er `kring: []`.
+     wezenVan() vond dus nul wezen, de diagnose noemde geen enkel levend kind, en
+     de drie processen die negentien minuten poorten vasthielden zouden opnieuw
+     onzichtbaar zijn geweest. De wet beloofde iets wat de implementatie alleen
+     kon waarmaken als er niets ergs gebeurde.
+
+     WAAROM EEN HARTSLAG EN GEEN PROCESGROEP. De verleiding is om bij begin() de
+     procesgroep vast te leggen en na de dood van de wortel alles in die groep
+     als wees te tellen. Dat is korter en het is fout: een ronde die als
+     `npm run ...` uit een schil start, deelt haar groep met die schil en met
+     alles wat daar verder draait. Dan ruimt ruimOp() het verkeerde proces op,
+     en dat is de duurste fout die deze module kan maken.
+
+     De hartslag legt dus af en toe de ECHTE afstammingskring vast, uit /proc.
+     De prijs staat er eerlijk bij: wat in de laatste tel voor de kill is
+     gestart, staat er niet in. Een bronmuterende ronde duurt uren; dit venster
+     is seconden. De interval is te zetten met RTG_AFLOOP_HARTSLAG (ms) zodat
+     een toets hem kan beproeven zonder erop te wachten. */
+  const hartslagMs = Number(process.env.RTG_AFLOOP_HARTSLAG) > 0
+    ? Number(process.env.RTG_AFLOOP_HARTSLAG) : 5000;
   let af = false;
+  const klop = () => {
+    if (af) return;
+    const a = lees();
+    /* Alleen de eigen ronde bijwerken. Heeft iemand anders inmiddels herstel()
+       gedraaid of een nieuwe ronde geopend, dan hoort deze hartslag te zwijgen
+       in plaats van eroverheen te schrijven. */
+    if (!a || a.runId !== runId || a.stand !== 'RUNNING') return;
+    try { schrijf(Object.assign({}, a, { kring: kringVan(process.pid), kringGepeild: new Date().toISOString() })); }
+    catch (e) { /* een getuige mag een ronde nooit laten vallen */ }
+  };
+  const hartslag = setInterval(klop, hartslagMs);
+  if (hartslag.unref) hartslag.unref();   // de hartslag houdt het proces nooit in leven
+
   const leg = (stand, extra) => {
     if (af) return;
     af = true;
+    clearInterval(hartslag);
     const a = lees() || start;
     schrijf(Object.assign({}, a, {
       stand, geeindigd: new Date().toISOString(),
@@ -243,7 +372,18 @@ function begin({ taak, commit, basis, verwachteUitvoer, poorten } = {}) {
      dekken een nette kill. SIGKILL dekt niets en KAN niets dekken -- en juist
      daarom staat er al RUNNING op schijf, zodat de volgende ronde ziet dat er
      nooit iets terminaals is geschreven. */
-  process.once('exit', () => leg('ABORTED'));
+  /* DE UITKOMST UIT DE EXITCODE, en dat is iets anders dan "het proces is weg".
+     Een exitcode is een expliciete terminale uitspraak van het proces zelf: 0
+     betekent dat het zijn werk afmaakte, alles daarboven dat het faalde. Wie
+     door SIGKILL wordt geveld schrijft NIETS -- en dan blijft RUNNING staan,
+     precies de toestand die magStarten() als "gestorven zonder af te ronden"
+     herkent.
+
+     Zonder deze afleiding zou elke geslaagde ronde ABORTED heten, want de vier
+     aanroepers van afbouw-slot.pak() roepen hun geefVrij() zonder argument aan.
+     Dan weigert de poort voortaan altijd, en een poort die nooit opengaat is
+     geen poort (dezelfde les als de wortel-als-wees hierboven). */
+  process.once('exit', (code) => leg(uitExitcode ? (code === 0 ? 'PASSED' : 'FAILED') : 'ABORTED'));
   for (const [sig, code] of [['SIGINT', 2], ['SIGTERM', 15]]) {
     process.once(sig, () => { leg('ABORTED'); process.exit(128 + code); });
   }
@@ -257,4 +397,4 @@ function begin({ taak, commit, basis, verwachteUitvoer, poorten } = {}) {
   };
 }
 
-module.exports = { begin, lees, magStarten, ruimOp, wezenVan, kringVan, zelfdeProces, procesLeeft, AFLOOP, STANDEN, TERMINAAL };
+module.exports = { begin, lees, magStarten, ruimOp, herstel, diagnose, wezenVan, kringVan, zelfdeProces, procesLeeft, AFLOOP, STANDEN, TERMINAAL };

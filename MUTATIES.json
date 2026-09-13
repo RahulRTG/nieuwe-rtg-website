@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T20:15:13.459Z",
-    "commit": "d69b19b9c",
+    "op": "2026-09-13T20:17:36.378Z",
+    "commit": "bdb156efe",
     "boomVuil": true,
-    "boomAnders": 4,
+    "boomAnders": 6,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -5177,6 +5177,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "mn03-commercieelvoordeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/commercie/vergoeding.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "mobiliteit-werkkant-routes.test.js": {
       "soort": "server",

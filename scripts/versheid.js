@@ -348,6 +348,7 @@ const REGISTERS = [
   ['RITPROEF.json', 'npm run ritproef:vast', 'of de ritketen sluit, van aanvraag tot afronding'],
   ['TOELATINGSPROEF.json', 'npm run toelatingsproef:vast', 'of de toelatingsketen sluit, van aanvraag tot zaak'],
   ['ADAMPROEF.json', 'npm run adamproef:vast', 'of een jongere van 17 zonder account een mogelijkheid bereikt, en het zelf ziet'],
+  ['DOELGROEPBEREIK.json', 'npm run doelgroepbereik:vast', 'of de VERKLAARDE doelgroep van een functie zijn eigen paden werkelijk kan bereiken'],
   /* De navigatieproef staat NAAST de drie gouden ketens en niet ertussen: hij
      meet geen keten tussen actoren maar de belofte van EEN scherm, in een echte
      browser (BETROUWBAARHEID.md par. 1). Daarom telt scripts/ketenvorm.js hem

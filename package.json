@@ -336,6 +336,8 @@
     "adamproef:vast": "node scripts/adamproef.js --vastleggen",
     "toelatingsproef": "node scripts/toelatingsproef.js",
     "toelatingsproef:vast": "node scripts/toelatingsproef.js --vastleggen",
+    "doelgroepbereik": "node scripts/doelgroepbereik.js",
+    "doelgroepbereik:vast": "node scripts/doelgroepbereik.js --vastleggen",
     "kantoormacht": "node scripts/kantoormacht.js",
     "kantoormacht:vast": "node scripts/kantoormacht.js --vastleggen",
     "kantoormacht:controle": "node scripts/kantoormacht.js --controle",

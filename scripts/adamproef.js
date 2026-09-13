@@ -45,6 +45,9 @@
 const fs = require('fs');
 const path = require('path');
 const { start } = require('./lib/wegwerpserver');
+/* Het volle stempel (commit + boomVuil) en niet een kale datum: zonder
+   waartegen-is-dit-gemeten is een register niet na te lopen. */
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'ADAMPROEF.json');
@@ -589,7 +592,7 @@ async function storingen(basis, uit, ctx) {
 
 async function meet() {
   const uit = {
-    stempel: new Date().toISOString().slice(0, 10),
+    stempel: stempel(),
     uitleg: 'Een keten rond een jongere van 17 zonder RTG-account: van een doel naar een mogelijkheid die ' +
       'hij zelf ziet. Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de ' +
       'keten zijn belofte als het misgaat?). Vierde keten naast tafel-, rit- en toelatingsproef; met opzet ' +

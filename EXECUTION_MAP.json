@@ -22910,7 +22910,7 @@
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": {
-    "member": "lezen",
+    "member": "voorstel",
     "supplier": "verboden",
     "staff": "verboden"
    }

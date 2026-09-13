@@ -214,6 +214,7 @@ const REGISTER = {
      naar 2818 meldde), dus deze regel is geen bewering -- zie de kop over de
      helft die mensenwerk blijft. */
   'MACHINEDEKKING.json': { eigenRatel: 'test/machinedekking.test.js' },
+  'EFFECTDEKKING.json': { eigenRatel: 'test/effectcontract.test.js' },
   /* MENSELIJKE_UITVOERING.json is net als EXECUTION_MAP.json een PROJECTIE
      zonder tijdstempel: hij draagt vingerafdrukken van zijn bronnen in plaats
      van een klok, en test/menselijkeuitvoering.test.js hercompileert hem byte

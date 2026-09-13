@@ -84,6 +84,13 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-hardening-checkpoint').CONTRACTEN,
   require('./mutatiecontracten-beschermzaak').CONTRACTEN,
   require('./mutatiecontracten-knelpunt').CONTRACTEN,
+  /* De naleesronde van 13 september 2026: 47 routes waarvan de AFGELEIDE stand
+     wegviel toen de proef er wel bij kwam, en waaronder nooit een menselijk
+     contract had gelegen. Drie bestanden, gesplitst op wat een tweede oproep
+     doet -- zie de kop van het eerste. */
+  require('./mutatiecontracten-naleesronde').CONTRACTEN,
+  require('./mutatiecontracten-naleesronde-b').CONTRACTEN,
+  require('./mutatiecontracten-naleesronde-c').CONTRACTEN,
   require('./mutatiecontracten-opvangwijzer').CONTRACTEN,
   require('./mutatiecontracten-horeca-correctie').CONTRACTEN,
   /* De nazorg van een reisaanvraag: vier routes die samen de weg terug uit een

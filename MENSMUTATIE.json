@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-12T22:06:33.333Z",
-    "commit": "005f7b39",
+    "op": "2026-09-13T05:55:29.800Z",
+    "commit": "5283e3ac",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 0,
     "instrument": "scripts/mensmutatie.js",
     "node": "v22.22.2"
   },
@@ -23,8 +23,8 @@
     "rood": []
   },
   "telling": {
-    "mutaties": 12,
-    "gezakt": 11,
+    "mutaties": 16,
+    "gezakt": 15,
     "geenWacht": 1,
     "nietToegepast": 0
   },
@@ -349,6 +349,106 @@
         "stuurplafond",
         "stuur-aanval",
         "menstaalproef"
+      ]
+    },
+    {
+      "nr": "11",
+      "naam": "poort kiest bij twee voorstellen",
+      "bewaakt": "intrekken",
+      "weg": "bij twee openstaande voorstellen wordt er een gekozen in plaats van gevraagd",
+      "hoortTeZakken": "intrekveiligheid (409 en EXECUTED NOT_RUN bij twee)",
+      "bestanden": [
+        "server/kern/stuur/goedkeuring.js"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "menstaalproef",
+          "melding": "MENSTAALPROEF: 40 binnen het contract, 0 te ver, 0 te veel vragen, 1 niet gemeten; 0 van 9 uitlegvragen raakten iets aan; gouden plak heel; samenhang heel; referent heel; geld heel; bevestig heel; verwijzing heel; intrek NIET heel (2)"
+        }
+      ],
+      "bleefGroen": [
+        "menstaal",
+        "menscontext",
+        "stuurspoor",
+        "stuurrail",
+        "stuurplafond",
+        "stuur-aanval"
+      ]
+    },
+    {
+      "nr": "12",
+      "naam": "intrekken op een aangewezen id",
+      "bewaakt": "intrekken",
+      "weg": "de interpretatielaag kan bij twee voorstellen zelf aanwijzen welke vervalt",
+      "hoortTeZakken": "de bronassertie op de handtekening van trekEnige",
+      "bestanden": [
+        "server/kern/stuur/goedkeuring.js"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "menstaalproef",
+          "melding": "MENSTAALPROEF: 40 binnen het contract, 0 te ver, 0 te veel vragen, 1 niet gemeten; 0 van 9 uitlegvragen raakten iets aan; gouden plak heel; samenhang heel; referent heel; geld heel; bevestig heel; verwijzing heel; intrek NIET heel (1)"
+        }
+      ],
+      "bleefGroen": [
+        "menstaal",
+        "menscontext",
+        "stuurspoor",
+        "stuurrail",
+        "stuurplafond",
+        "stuur-aanval"
+      ]
+    },
+    {
+      "nr": "13",
+      "naam": "intrekpad naar `voorstel`",
+      "bewaakt": "intrekken",
+      "weg": "een voorstel is nodig om een voorstel te laten vervallen; het besluit werkt niet meer",
+      "hoortTeZakken": "intrekveiligheid (niveau `klein`)",
+      "bestanden": [
+        "server/kern/stuur/beleid-lijsten.js"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "menstaalproef",
+          "melding": "MENSTAALPROEF: 40 binnen het contract, 0 te ver, 0 te veel vragen, 1 niet gemeten; 0 van 9 uitlegvragen raakten iets aan; gouden plak heel; samenhang heel; referent heel; geld heel; bevestig heel; verwijzing heel; intrek NIET heel (4)"
+        }
+      ],
+      "bleefGroen": [
+        "menstaal",
+        "menscontext",
+        "stuurspoor",
+        "stuurrail",
+        "stuurplafond",
+        "stuur-aanval"
+      ]
+    },
+    {
+      "nr": "14",
+      "naam": "de bevestigdeur meegeopend",
+      "bewaakt": "intrekken",
+      "weg": "het stuur kan zijn eigen klaargezette handeling bevestigen",
+      "hoortTeZakken": "bevestigveiligheid (de poort op /api/member/doe/bevestig)",
+      "bestanden": [
+        "server/kern/stuur/classificatie.js"
+      ],
+      "staat": "GEZAKT",
+      "beet": [
+        {
+          "wacht": "menstaalproef",
+          "melding": "- het pad /api/member/doe wordt door geen enkele regel in kern/stuur/classificatie.js geweerd; dan hangt de stuurdeur nog uitsluitend aan de allowlist, en is een toevoeging daar genoeg om het stuur zichzelf te laten bedienen."
+        }
+      ],
+      "bleefGroen": [
+        "menstaal",
+        "menscontext",
+        "stuurspoor",
+        "stuurrail",
+        "stuurplafond",
+        "stuur-aanval"
       ]
     }
   ]

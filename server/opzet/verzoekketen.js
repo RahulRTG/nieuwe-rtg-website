@@ -68,12 +68,10 @@ module.exports = function verzoekketen(deps) {
      parkeert. Zie server/effectmeter.js.
 
      Zonder RTG_STAATLOG hangt hij helemaal niet in de keten. */
-  /* DE EFFECTBON STAAT ERBOVEN, EN DIE ORDE IS GELEEND VAN DE LES HIERBOVEN. Hij staat
-     ALTIJD aan (RTG_EFFECTBON=0 zet hem uit) en hij is degene die de tellercontext
-     opent; de effectmeter hergebruikt die als hij er is. Stond hij eronder, dan opende
-     hij zijn context na de body-lezer en zou hij precies de stilte melden die de
-     opmerking hierboven beschrijft -- op de laag die in PRODUCTIE moet werken, dus waar
-     niemand hem draait om te kijken. Zie server/effectbon.js. */
+  /* DE EFFECTBON STAAT ERBOVEN, om precies de les hierboven: hij opent de tellercontext
+     (de effectmeter hergebruikt die) en staat ALTIJD aan. Eronder zou hij zijn context na
+     de body-lezer openen en dezelfde stilte melden -- op de laag die in PRODUCTIE moet
+     werken. Zie server/effectbon.js. */
   require('../effectbon').haak(app);
   require('../effectmeter').haak(app);
   /* In PostgreSQL-modus is dit de antwoordgrens: de request krijgt een

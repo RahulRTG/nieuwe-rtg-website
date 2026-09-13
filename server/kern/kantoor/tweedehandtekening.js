@@ -150,10 +150,7 @@ module.exports = function maakTweedeHandtekening({ db, save }) {
 
     const u = uitvoerders.get(a.actie);
     if (!u) return { status: 409, error: 'De handeling bestaat niet meer; vraag hem opnieuw aan.' };
-    /* `verzoek` reist MEE en wordt hier niet gebruikt: het is het id van het verzoek dat
-       bevestigt, en de uitvoerder heeft het nodig om zijn gevolgen straks terug te vinden
-       (server/effectbon.js). Deze module kent die bon niet en hoort dat ook niet te doen. */
-    const r = await u.voerUit(a.lijf, { aangevraagdDoor: a.door, bevestigdDoor: door, verzoek: verzoek || null });
+    const r = await u.voerUit(a.lijf, { aangevraagdDoor: a.door, bevestigdDoor: door, verzoek });
     if (r && r.error) {
       return { status: r.status || 409, error: r.error, handeling: null,
         aangevraagdDoor: a.door, bevestigdDoor: door, scheiding: oordeel.graad };

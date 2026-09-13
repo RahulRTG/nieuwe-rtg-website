@@ -138,7 +138,8 @@ Object.assign(SLEUTELS,
   /* De publieke laag: drie die LEZEN en drie die schrijven. Waarom de tweede
      uitlichting `zelfdeVerzoek`-achtig is en geen `nietIdempotent`, staat in de
      kop van dat bestand -- een 409 op de stand is een toestandscontrole. */
-  require('./idemsleutels-stage').SLEUTELS);
+  require('./idemsleutels-stage').SLEUTELS,
+  require('./idemsleutels-bundel').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:
    geen route in twee zijbestanden, elke verklaring compleet, en vier routes die

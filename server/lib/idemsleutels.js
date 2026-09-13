@@ -87,6 +87,8 @@ function sleutelVoor(methode, pad) {
    loopt is geen controle. */
 Object.assign(SLEUTELS,
   require('./idemsleutels-basis').SLEUTELS,
+  /* De vijf dubbeltikken uit de leesronde van 13 september; zie de kop daar. */
+  require('./idemsleutels-afleidrest').SLEUTELS,
   /* De isolatielaag: drie groepen, en het onderscheid staat in de kop daar. */
   require('./idemsleutels-isolatie').SLEUTELS,
   require('./idemsleutels-werelden').SLEUTELS,

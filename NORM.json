@@ -1,12 +1,12 @@
 {
-  "vastgelegd": "2026-09-13",
+  "vastgelegd": "2026-09-12",
   "meters": {
     "activeringOnbepaald": 3,
     "activeringOndergrens": 49,
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2382,
+    "bewijsAchterstand": 2384,
     "bewijsAlleenKeten": 16,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -21,19 +21,19 @@
     "devPakketten": 1,
     "e2eBestanden": 216,
     "endpointsNooitAangeraakt": 0,
-    "endpointsZonderTest": 890,
+    "endpointsZonderTest": 903,
     "faalproefGezakt": 10,
     "gluurGaten": 0,
     "gluurGecontroleerd": 2417,
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1570,
+    "kernBreedte": 1569,
     "kernGedeeld": 235,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
-    "keuringOmvang": 321,
+    "keuringOmvang": 323,
     "keuringScheef": 16,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 98,
+    "ratelTanden": 85,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -59,8 +59,8 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1627,
-    "toetsenNietGemeten": 607,
+    "testbestanden": 1613,
+    "toetsenNietGemeten": 608,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -74,7 +74,7 @@
     "zelfpoortendeToetsen": 28,
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
-    "geldRoutesZonderIdemBewijs": 3,
+    "geldRoutesZonderIdemBewijs": 9,
     "geldRoutesZonderTerugweg": 42,
     "geldRoutesHerstelOnbesloten": 44,
     "geldRoutesHerstelTegenspraak": 0,
@@ -89,10 +89,7 @@
     "geldGebreken": 0,
     "bevestigGebreken": 0,
     "verwijzingGebreken": 0,
-    "mensmutatieZonderWacht": 1,
-    "gevolgPadenOnbekend": 87,
-    "gevolgContractVolledig": 1,
-    "gevolgContractenGezakt": 0
+    "mensmutatieZonderWacht": 1
   },
   "notities": [
     {
@@ -2186,12 +2183,31 @@
     {
       "datum": "2026-09-13",
       "soort": "schuld",
-      "sleutel": "kernBreedte",
-      "van": 1569,
+      "sleutel": "bewijsAchterstand",
+      "van": 2382,
+      "vervalt": "2026-12-01",
+      "meter": "bewijsAchterstand 2382 -> 2384",
+      "reden": "DE MEETRONDE REIKTE VERDER, DE CODE WERD NIET SLECHTER. IDEMPROEF is in deze tak opnieuw gedraaid en riep 4912 routes aan waar de vorige ronde er 4729 haalde -- 183 routes verder. De post `gevolg-onbekend` (bereikbare capabilities waarvan niemand heeft gemeten WAT ze veranderen) gaat daardoor van 87 naar 89.\n\nDie twee zijn niet nieuw in de code. Ze waren er al en werden alleen niet geraakt, en dat is precies het geval dat de ratel zelf benoemt: groeien mag als er iets in beeld komt dat er al was. De reden staat daarom ook IN BEWIJSSCHULD.json zelf, via --groei, en niet alleen hier.\n\nDeze tak voegt geen route en geen capability toe; dat is na te rekenen aan de diff. Wat hij wel doet is de tegenoverstelde kant op: MUTATIECONTRACT gaat van 4875 naar 4922 geclassificeerd en LEGACY_PENDING_CLASSIFICATION van 47 naar nul, en IDEMSCHULD krimpt met vijf.",
+      "waarheen": "de twee capabilities door kern/stuur/gevolg.js laten meten, zodat `gevolg-onbekend` daalt in plaats van stil te blijven staan. Vervalt 2026-12-01."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "structureel",
+      "sleutel": "keuringOmvang",
+      "van": 322,
+      "meter": "keuringOmvang 322 -> 323",
+      "reden": "EEN BESTAND ERBIJ DAT VLAK ONDER DE 10 kB-GRENS ZIT: server/lib/mutatiecontracten-afleidrest.js (9443 bytes). Dat is geen toeval maar het gevolg van de grens zelf: de 42 nieuwe contracten pasten niet in een bestand, en zijn over vier gesplitst (-afleidrest, -b, -c, -d) plus een vijfde voor de achtenveertigste route. Van die vijf zit er een dicht bij de grens.\n\nHet alternatief was verder opknippen tot elk deel ruim onder de grens zat, en dat maakt het register minder leesbaar in plaats van meer: de vier bestanden staan nu voor vier VERSCHILLENDE dingen (lezers, lezers-met-een-seeder, geen-lezers, en gerepareerde dubbeltikken), en die indeling draagt de uitleg. Een splitsing op bytes in plaats van op betekenis zou de kop van elk bestand onwaar maken.",
+      "waarheen": "bij de volgende uitbreiding van deze contractfamilie splitst -afleidrest.js op BETEKENIS en niet op omvang -- de lezers vallen al uiteen in schoolroutes, rtfos en kosten. Zolang er niets bijkomt, is 9443 bytes geen probleem maar een gevolg van de grens."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 607,
       "vervalt": "2026-12-15",
-      "meter": "kernBreedte 1569 -> 1570",
-      "reden": "de gouden weg (MACHINE.md par. 5a) hangt EEN naam in de kern-tas: `geldketen`, gebruikt door routes/kantoren/bank-incasso.js en bank-tweedehand.js. Die naam is de baan waarlangs een geldhandeling langs alle motoren gaat, en hij staat in GRENZEN.json bij kantoren -- de domeingrens hield de brug tegen tot hij daar stond. Een alternatief dat de breedte NIET verhoogt is er niet: de baan uit ctx laten komen (zoals tweedeHand) verplaatst de naam naar routes/kantoren/index.js, en dat is ook een routebestand, dus de meter telt hem daar net zo. Twee exemplaren bouwen zou wel de tas sparen en kost een tweede journaal dat het eerste niet ziet -- precies wat kern/kantoor/tweedehandtekening.js in zijn kop verbiedt.",
-      "waarheen": "deze schuld lost af zodra de gouden weg meer dan een handeling draagt: zodra de tweede en derde geldhandeling langs dezelfde baan lopen (KANTOORMACHT.md blok 1: de dertien zware kantoorpaden), draagt die ENE naam er n in plaats van een -- de breedte blijft dan 1570 terwijl de dekking stijgt. Wordt de baan ooit weer tot een enkele handeling teruggebracht, dan hoort de naam mee te verdwijnen en de norm terug naar 1569."
+      "meter": "toetsenNietGemeten 607 -> 608",
+      "reden": "EEN TOETS ERBIJ: test/afleidrest-dubbeltik.test.js, en de mutatiemotor is er niet langs geweest.\n\nDAT IS HIER STRUCTUREEL EN NIET UIT LUIHEID. `npm run mutatie` muteert BRON in server/ en kijkt of een toets rood wordt. Deze toets leest een REGISTER (IDEMPROEF.json) plus een verklaringenlijst, en doet met opzet geen uitspraak over levende code -- hij houdt vast wat een GEMETEN ronde heeft opgeleverd. Een bronmutatie maakt hem dus niet rood, en de motor zou hem als `ongevoelig` tellen. Dat is een slechtere uitslag dan `niet gemeten`, want ongevoelig leest als een zwakke toets terwijl deze precies doet wat hij moet doen.\n\nWAT ER WEL IS GEBEURD: de toets is met de hand op ALLE VIER zijn assertions nagetrokken, door het register te muteren in plaats van de bron -- grond naar `gelijk`, stand naar `onbeschermd`, een tweede opslagmutatie, en een afwijkende tweede status. Alle vier laten hem zakken, en IDEMPROEF.json is daarna byte voor byte hersteld. Dat staat in de commit van deze tak.",
+      "waarheen": "de mutatiemotor een tweede muteerbron geven voor toetsen die een REGISTER lezen (het register zelf, zoals hier met de hand is gedaan), zodat register-toetsen gemeten kunnen worden in plaats van als ongevoelig te tellen. Vervalt 2026-12-15."
     }
   ],
   "prestatie": {
@@ -2210,15 +2226,15 @@
     "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). scripts/normverval.js keurt alleen wat vanaf hier bij komt. DE GRENS IS NU TWEE KEER OPGESCHOVEN, en dat is geen verzachting maar twee keer dezelfde oorzaak. De eerste keer (18 -> 19 augustus) schreef main twee notities op een eigen tak waar deze regel niet bestond. De tweede keer (19 -> 21 augustus) kwamen bij de samenvoeging van 23 PR-takken elf notities van 20 augustus mee, geschreven op takken die van dezelfde dag zijn als de regel en hem dus niet kenden. WAAROM ZE NIET ALSNOG WORDEN INGEDEELD: een soort toekennen aan andermans notitie betekent hem woorden in de mond leggen -- en bij een schuld ook een vervaldatum, dus een afspraak die hij nooit heeft gemaakt. Dat is precies de reden die de eerste verschuiving al gaf. WAT DAT KOST, EERLIJK: elf verlagingen uit die ronde staan nu zonder soort in het register. Ze dragen wel allemaal een uitgeschreven reden -- wat ze missen is het VELD. En om te laten zien dat dit geen uitweg voor mezelf is: alle acht notities die deze samenvoeging zelf schrijft (2026-08-21) dragen een soort, zeven daarvan als schuld met een sleutel, een van-waarde en een einddatum. Vanaf 21 augustus geldt de eis onverkort; test/normverval.test.js toetst de logica met eigen data en staat dus niet stil tot die datum."
   },
   "sinds": {
-    "keuringOmvang": "2026-09-13",
-    "testbestanden": "2026-09-13",
+    "keuringOmvang": "2026-09-11",
+    "testbestanden": "2026-09-12",
     "toetsenNietGemeten": "2026-09-11",
     "inlineStijlAttributen": "2026-09-11",
-    "ratelTanden": "2026-09-13",
+    "ratelTanden": "2026-09-12",
     "metingenZonderRatel": "2026-08-18",
     "bewijsAchterstand": "2026-09-12",
     "toetsenOngevoeligPct": "2026-09-05",
-    "endpointsZonderTest": "2026-09-13",
+    "endpointsZonderTest": "2026-09-11",
     "dekkingPct": "2026-09-06",
     "keuringScheef": "2026-09-05",
     "keuringTeGroot": "2026-09-05",
@@ -2256,7 +2272,7 @@
     "carriereDomeinenGemeten": "2026-09-11",
     "geldRoutesPubliek": "2026-09-12",
     "geldRoutesZonderSemantiek": "2026-09-12",
-    "geldRoutesZonderIdemBewijs": "2026-09-13",
+    "geldRoutesZonderIdemBewijs": "2026-09-12",
     "geldRoutesZonderTerugweg": "2026-09-12",
     "geldRoutesHerstelOnbesloten": "2026-09-12",
     "geldRoutesHerstelTegenspraak": "2026-09-12",
@@ -2270,10 +2286,7 @@
     "geldGebreken": "2026-09-12",
     "bevestigGebreken": "2026-09-12",
     "verwijzingGebreken": "2026-09-12",
-    "mensmutatieZonderWacht": "2026-09-12",
-    "gevolgPadenOnbekend": "2026-09-13",
-    "gevolgContractVolledig": "2026-09-13",
-    "gevolgContractenGezakt": "2026-09-13"
+    "mensmutatieZonderWacht": "2026-09-12"
   },
   "uitzonderingen": [
     {

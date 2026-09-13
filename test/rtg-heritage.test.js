@@ -13,6 +13,8 @@ const TOKENS = lees('public/shared/rtg-heritage.css');
 const MATERIALEN = lees('public/shared/rtg-heritage-materials.css');
 const ADAPTERS = lees('public/shared/rtg-heritage-adapters.css');
 const COMPONENTEN = lees('public/shared/rtg-heritage-components.css');
+const SIMPLE = lees('public/shared/rtg-simple.css');
+const EDGE = lees('public/shared/rtg-edge-library.js');
 const CHECK = lees('scripts/check.js');
 
 test('de centrale laag blijft klein, gesplitst en laat alle delen één keer binnen', () => {
@@ -115,6 +117,70 @@ test('bestaande echte DOM wordt geadapteerd zonder knoppen of data te kopiëren'
   assert.match(ADAPTERS, /@media\(pointer:coarse\)[\s\S]*min-height:var\(--rtg-target\)/);
   assert.match(ADAPTERS, /@media\(max-width:700px\)[\s\S]*min-height:var\(--rtg-target\)/);
   assert.match(ADAPTERS, /prefers-reduced-motion:reduce/);
+});
+
+test('Heritage laadt de centrale visuele standaard als laatste laag', () => {
+  assert.match(TOKENS, /@import url\('\/shared\/rtg-simple\.css\?v=17'\);/);
+  assert.equal((TOKENS.match(/rtg-simple\.css/g) || []).length, 1);
+});
+
+test('de vier werelden hebben elk een eigen foto en merkaccent', () => {
+  const werelden = {
+    living: ['living-heritage-v2.jpg', '#ebcc94'],
+    travel: ['travel-heritage-v2.jpg', '#a82c51'],
+    work: ['work-heritage-v2.jpg', '#c8bda9'],
+    foundation: ['foundation-heritage-v2.jpg', '#3d68c9']
+  };
+  for (const [wereld, [foto, accent]] of Object.entries(werelden)) {
+    const omgeving = SIMPLE.match(new RegExp(
+      'body\\[data-rtg-skin="heritage"\\]\\[data-rtg-world="' + wereld +
+      '"\\]:not\\(\\[data-rtg-eigenvlak\\]\\)\\{([^}]+)\\}'
+    ));
+    assert.ok(omgeving, wereld + ' mist de gedeelde fotografische omgeving');
+    assert.ok(omgeving[1].includes('/images/worlds/heritage/' + foto), wereld + ' mist de juiste foto');
+    assert.ok(SIMPLE.includes('--edge-bar-accent:' + accent), wereld + ' mist het juiste accent');
+    const kaart = SIMPLE.match(new RegExp(
+      '\\.cmd-startwereld\\[data-world="' + wereld + '"\\]\\{([^}]+)\\}'
+    ));
+    assert.ok(kaart, wereld + ' mist de fotografische wereldkaart');
+    assert.ok(kaart[1].includes('/images/worlds/heritage/' + foto), wereld + ' kaart mist de juiste foto');
+  }
+});
+
+test('mobiel gebruikt overal één goed aanraakbare Meta-achtige RTG-rand', () => {
+  const mobiel = SIMPLE.slice(SIMPLE.indexOf('/* DE ENE MOBIELE RAND'));
+  assert.match(mobiel, /grid-template-columns:repeat\(5,minmax\(0,1fr\)\)!important/);
+  assert.match(mobiel, /height:72px!important/);
+  assert.match(mobiel, /border-radius:var\(--rtg-radius-system\)!important/);
+  assert.match(mobiel, /min-height:60px!important/);
+  assert.match(mobiel, /\.rtg-edge-ai\{[\s\S]*grid-column:3!important/);
+  assert.match(mobiel, /\.rtg-edge-ai\{[\s\S]*position:absolute!important/);
+  assert.match(mobiel, /left:50%!important;top:6px!important;width:64px!important;transform:translateX\(-50%\)!important/);
+  assert.match(mobiel, /\.rtg-edge-mouth\{width:64px!important;height:34px!important\}/);
+  assert.match(mobiel, /\.rtg-edge-ai small\{display:none!important\}/);
+  for (const oud of ['.rtgdeel-balk', '.ios-thuis', '.tos-nav', '.tos-topbar', '.wos-dock', '.ws-balk'])
+    assert.ok(mobiel.includes(oud), oud + ' wordt niet centraal verborgen');
+});
+
+test('de vaste volgorde is Home, Werelden, AI, Acties, Menu', () => {
+  const footer = EDGE.match(/<footer class="rtg-edge-bottom">([\s\S]+?)<\/footer>/);
+  assert.ok(footer);
+  const html = footer[1];
+  const posities = [
+    html.indexOf('aria-label="Naar home"'), html.indexOf('rtg-edge-worlds-trigger'),
+    html.indexOf('rtg-edge-ai"'), html.indexOf('rtg-edge-actions-trigger'),
+    html.indexOf('rtg-edge-menu')
+  ];
+  assert.ok(posities.every(positie => positie >= 0));
+  assert.equal(new Set(posities).size, posities.length);
+  for (const [selector, kolom] of [
+    ['.rtg-edge-bottom>a', 1], ['.rtg-edge-worlds-trigger', 2],
+    ['.rtg-edge-ai', 3], ['.rtg-edge-actions-trigger', 4], ['.rtg-edge-menu', 5]
+  ]) {
+    const patroon = new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') +
+      '\\{[\\s\\S]*?grid-column:' + kolom + '!important');
+    assert.match(SIMPLE.slice(SIMPLE.indexOf('/* DE ENE MOBIELE RAND')), patroon);
+  }
 });
 
 test('Heritage overschrijft geen route-eigen tekstinkt op donkere eilanden', () => {

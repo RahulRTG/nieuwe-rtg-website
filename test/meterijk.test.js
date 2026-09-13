@@ -1528,6 +1528,17 @@ const IJKINGEN = {
       (j) => { j.gemeten.vorm.domeinen = Math.max(0, (j.gemeten.vorm.domeinen || 0) - 4); return j; },
       () => voor.stageDomeinenGemeten - norm.meet().stageDomeinenGemeten)
   },
+  /* DE TAND VAN 13 SEPTEMBER 2026 (tweede): wekZonderUitspraak telt de publieke
+     domeinen waarover het wekbesluitregister zwijgt. Hij staat op NUL, en dat
+     maakt hem een ander geval dan de meters hierboven: bij een nul is "de meter
+     is stuk" en "er is niets aan de hand" van buiten identiek. De ijking gaat
+     daarom OMHOOG -- zet er drie onbesproken domeinen in het register en de
+     meter hoort exact drie te melden. */
+  wekZonderUitspraak: {
+    proef: (voor) => metVervangenJson('WEKDEKKING.json',
+      (j) => { j.gemeten.zonderUitspraak = (j.gemeten.zonderUitspraak || 0) + 3; return j; },
+      () => norm.meet().wekZonderUitspraak - voor.wekZonderUitspraak)
+  },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
      de meter leest `gemeten.defecten` uit een register dat er al is, dus hij

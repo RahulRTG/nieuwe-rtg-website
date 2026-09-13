@@ -345,7 +345,9 @@
     "moveproef": "node scripts/moveproef.js",
     "moveproef:vast": "node scripts/moveproef.js --vastleggen",
     "stagevorm": "node scripts/stagevorm.js",
-    "stagevorm:vast": "node scripts/stagevorm.js --vastleggen"
+    "stagevorm:vast": "node scripts/stagevorm.js --vastleggen",
+    "wekdekking": "node scripts/wekdekking.js",
+    "wekdekking:vast": "node scripts/wekdekking.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

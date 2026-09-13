@@ -1,0 +1,129 @@
+{
+  "stempel": {
+    "op": "2026-09-13T08:49:37.194Z",
+    "commit": "3ac209ff",
+    "boomVuil": true,
+    "boomAnders": 1,
+    "instrument": "scripts/wekdekking.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Gemeten met scripts/wekdekking.js tegen het besluitregister scripts/lib/wekbesluit.js. Het besluit (welke brongebeurtenis mag de publieke rail op) is mensenwerk; deze meting houdt dat besluit tegen de code. De twee worden nooit opgeteld.",
+  "grens": "Wat deze meter NIET aantoont: dat de klassen JUIST zijn gekozen -- dat is een besluit van een mens en geen meetuitslag. Hij toont ook niet dat een gebeurtenis werkelijk optreedt in de code: hij controleert dat het genoemde BRONBESTAND bestaat, niet dat er een regel in staat die precies deze gebeurtenis veroorzaakt. En `zonderUitspraak` telt alleen publieke domeinen ZONDER wekhaak: een domein dat de haak al aanroept, wordt hier niet opnieuw beoordeeld.",
+  "vastgelegd": "2026-09-13",
+  "gemeten": {
+    "besluiten": 13,
+    "moment": 4,
+    "stil": 3,
+    "niet": 6,
+    "publiekeDomeinen": 11,
+    "domeinenMetHaak": 5,
+    "zonderUitspraak": 0,
+    "momentZonderWekweg": 4,
+    "momentZonderVolgers": 3,
+    "momentZonderAanleiding": 1,
+    "bronWeg": 0,
+    "foutKlasse": 0,
+    "registerLoopUit": 0
+  },
+  "zonderUitspraak": [],
+  "zonderWekweg": [
+    {
+      "gebeurtenis": "festival.boeking_bevestigd",
+      "domein": "kern/festival"
+    },
+    {
+      "gebeurtenis": "festival.verkoop_geopend",
+      "domein": "kern/festival"
+    },
+    {
+      "gebeurtenis": "stadion.wedstrijd_gepland",
+      "domein": "kern/sportclub"
+    },
+    {
+      "gebeurtenis": "salon.post_uitgelicht",
+      "domein": "kern/salon"
+    }
+  ],
+  "zonderVolgers": [
+    {
+      "gebeurtenis": "festival.boeking_bevestigd",
+      "domein": "kern/festival"
+    },
+    {
+      "gebeurtenis": "festival.verkoop_geopend",
+      "domein": "kern/festival"
+    },
+    {
+      "gebeurtenis": "stadion.wedstrijd_gepland",
+      "domein": "kern/sportclub"
+    }
+  ],
+  "zonderAanleiding": [
+    {
+      "gebeurtenis": "salon.post_uitgelicht",
+      "bron": "server/kern/salonpromo.js",
+      "aanleiding": "featured ="
+    }
+  ],
+  "bronWeg": [],
+  "foutKlasse": [],
+  "registerLoopUit": [],
+  "perDomein": [
+    {
+      "domein": "kern/festival",
+      "besluiten": 4,
+      "moment": 2,
+      "stil": 0,
+      "niet": 2,
+      "haak": false,
+      "volgrelatie": null
+    },
+    {
+      "domein": "kern/sportclub",
+      "besluiten": 3,
+      "moment": 1,
+      "stil": 1,
+      "niet": 1,
+      "haak": false,
+      "volgrelatie": null
+    },
+    {
+      "domein": "kern/salon",
+      "besluiten": 2,
+      "moment": 1,
+      "stil": 1,
+      "niet": 0,
+      "haak": false,
+      "volgrelatie": [
+        "server/kern/salon/profiel.js"
+      ]
+    },
+    {
+      "domein": "kern/creator",
+      "besluiten": 2,
+      "moment": 0,
+      "stil": 0,
+      "niet": 2,
+      "haak": false,
+      "volgrelatie": null
+    },
+    {
+      "domein": "kern/galerij",
+      "besluiten": 1,
+      "moment": 0,
+      "stil": 1,
+      "niet": 0,
+      "haak": false,
+      "volgrelatie": null
+    },
+    {
+      "domein": "kern/events",
+      "besluiten": 1,
+      "moment": 0,
+      "stil": 0,
+      "niet": 1,
+      "haak": false,
+      "volgrelatie": null
+    }
+  ]
+}

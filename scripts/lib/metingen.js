@@ -93,6 +93,13 @@ const REGISTER = {
      hernoemde map in plaats van door een feit, en leest de nul plotseling als
      bevestiging terwijl hij een blinde vlek is. */
   'STAGEVORM.json': { meter: ['stageDomeinenGemeten'] },
+  /* WEKDEKKING.json zet het BESLUIT (welke brongebeurtenis mag de publieke rail
+     op, scripts/lib/wekbesluit.js) naast de METING. Geratelde is
+     `wekZonderUitspraak`: publieke domeinen waarover het besluitregister
+     zwijgt. Die hoort op nul te staan en te blijven -- hij stijgt zodra er een
+     publiek domein bijkomt waar niemand over heeft nagedacht, en dat is precies
+     de stille groei die deze tand moet vangen. */
+  'WEKDEKKING.json': { meter: ['wekZonderUitspraak'] },
   'BEPROEVING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   /* De ACTUELE meting naast de geaccepteerde basislijn hierboven: scripts/
      beproeving.js schrijft hem na ELKE ronde, ook een gezakte, zodat rood

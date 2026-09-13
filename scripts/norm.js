@@ -627,6 +627,11 @@ const METERS = [
      reden omhoog: de UITKOMST (0 gedeelde velden) mag bewegen, het aantal
      publieke domeinen dat de meter ziet niet stil dalen. */
   { sleutel: 'stageDomeinenGemeten', richting: 'omhoog', wat: 'publieke domeinen die de stagevormmeter werkelijk heeft gezien' },
+  /* Publieke domeinen waarover scripts/lib/wekbesluit.js geen uitspraak doet.
+     Omlaag, en hij staat op nul: een domein dat publiek is en waarvan niemand
+     heeft besloten of het de publieke rail op mag, hoort niet stil te kunnen
+     ontstaan (STAGE.md par. 8). */
+  { sleutel: 'wekZonderUitspraak', richting: 'omlaag', wat: 'publieke domeinen zonder uitspraak in het wekbesluitregister' },
   { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' },
   /* DE LUSINDEX (LUSSEN.json, npm run lussen). Drie tanden, en alle drie tellen
      ze een SCHULD en geen prestatie -- anders maakt lussen toevoegen de meter
@@ -1337,6 +1342,7 @@ function meet(bronnen) {
     faalproefGezakt: leesRegister('FAALPROEF.json', (j) => j.gemeten.gezakt),
     carriereDomeinenGemeten: leesRegister('CARRIEREVORM.json', (j) => j.gemeten.domeinen),
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
+    wekZonderUitspraak: leesRegister('WEKDEKKING.json', (j) => j.gemeten.zonderUitspraak),
     lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),
     lussenKritiek: leesRegister('LUSSEN.json', (j) => j.ratel.kritiek),
     lussenZonderOverlapRem: leesRegister('LUSSEN.json', (j) => j.ratel.wekkersAsyncZonderRem),

@@ -389,7 +389,11 @@ const REGISTERS = [
      gedeeld over tien publieke domeinen), en STAGE.md par. 0 draagt daarop het
      besluit dat een Moment een projectie is en geen object. Een verouderde nul
      ziet er exact zo uit als een verse. */
-  ['STAGEVORM.json', 'npm run stagevorm:vast', 'of de publieke domeinen een datavorm delen -- STAGE.md par. 0 rust erop, en de uitslag is een nul die er vers en verouderd hetzelfde uitziet']
+  ['STAGEVORM.json', 'npm run stagevorm:vast', 'of de publieke domeinen een datavorm delen -- STAGE.md par. 0 rust erop, en de uitslag is een nul die er vers en verouderd hetzelfde uitziet'],
+  /* Ook een nul, en om dezelfde reden hier: `zonderUitspraak: 0` betekent dat
+     elk publiek domein een besluit draagt. Verouderd betekent diezelfde nul
+     alleen nog dat er destijds geen domein ontbrak. */
+  ['WEKDEKKING.json', 'npm run wekdekking:vast', 'welke brongebeurtenis de publieke rail op mag -- de nul zegt dat geen publiek domein onbesproken is, en dat is alleen waar als hij vers is']
 ];
 
 /* De lezer van beide stempelvormen woont in ./lib/stempel.js -- hij stond hier

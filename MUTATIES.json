@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T07:47:44.167Z",
-    "commit": "3ad77ac8",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-13T08:51:55.694Z",
+    "commit": "3ac209ff",
+    "boomVuil": true,
+    "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -8910,6 +8910,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "wekdekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/wekdekking.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 2
     },
     "wekkers.test.js": {
       "soort": "puur",

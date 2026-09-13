@@ -29,7 +29,7 @@
     b.setAttribute('data-rtg-edge-2-hoofdactie', 'edge');
   }
 
-  /* Verplaats de echte knop; maak geen kloon of tweede status. */
+  /* Verplaats de echte knop; geen kloon. */
   function neemRandknop(q) {
     var e = w.RTGEdge && w.RTGEdge.active;
     var slot = e && e.root.querySelector('.rtg-edge-action');
@@ -46,7 +46,7 @@
     setTimeout(function () { wacht.disconnect(); }, 10000);
   }
 
-  /* Werk gebruikt zijn bestaande Rahul-werkruimte als enige waarheid. */
+  /* Werk gebruikt zijn bestaande Rahul-werkruimte. */
   function koppelWerkRahul() {
     var e = w.RTGEdge && w.RTGEdge.active;
     var rand = e && e.root.querySelector('.rtg-edge-ai');
@@ -160,6 +160,7 @@
     koppelWerkRahul();
     koppelWerkScroll();
   }
+  else if (pad === '/apps/move.html') neemRandknop('#verder');
   else if (pad === '/apps/clips.html') neemHoofdactie('Maak een clip', '#studioOpen');
 
   function bron(tag, attribuut, pad) {

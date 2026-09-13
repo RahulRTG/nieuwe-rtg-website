@@ -125,6 +125,82 @@ test('GEEN_DUURZAME_WEG wijst naar de modus die hem WEL zou raken', () => {
     'hoort te zeggen welke modus dat wel meet -- anders leest hij als een vrijspraak');
 });
 
+/* ============================================================================
+   HET OVERLEVINGSCONTRACT -- vier beweringen, en de strengste wint.
+
+   "Het proces stierf en kwam terug" is geen crashbewijs: een route kan netjes
+   sterven, netjes herstarten, en ondertussen de helft van zijn uitkomst hebben
+   laten staan. De vier beweringen hieronder worden APART gewogen en nooit
+   opgeteld, en de regel wordt AANGEROEPEN en niet overgeschreven. */
+test('de vier beweringen staan apart en de strengste bepaalt de stand', () => {
+  assert.deepEqual(Object.keys(cp.CLAIMS).sort(),
+    ['geenDubbel', 'geenHalf', 'geenVals', 'toestand'].sort());
+  const schoon = cp.weegContract({ verwachtLeeg: true, geraakt: 0, aantalCollecties: 5,
+    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, idempotentie: 'beschermd' });
+  assert.equal(schoon.stand, 'PROVEN');
+  assert.equal(Object.keys(schoon.claims).length, 4, 'alle vier worden gewogen, ook de gehaalde');
+});
+
+/* HET HALVE RESULTAAT IS DE HELE REDEN DAT DIT CONTRACT BESTAAT. Een route mag
+   netjes weigeren terwijl drie van de vijf collecties al zijn aangepast. */
+test('een half resultaat zakt op toestand EN op geenHalf, en niet op een van de twee', () => {
+  const half = cp.weegContract({ verwachtLeeg: true, geraakt: 2, aantalCollecties: 5,
+    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, idempotentie: 'beschermd' });
+  assert.equal(half.stand, 'FAILED');
+  assert.equal(half.claims.toestand.stand, 'FAILED');
+  assert.equal(half.claims.geenHalf.stand, 'FAILED');
+  assert.match(half.claims.geenHalf.reden, /2 van de 5/);
+});
+
+/* "HALF" BESTAAT NIET BIJ EEN COLLECTIE, en dan is dit geen bewijs maar een
+   tautologie. Een tautologie die als PROVEN meetelt, tilt het dekkingscijfer op
+   zonder dat er iets is aangetoond -- vandaar NIET_BEPROEFD met de reden. */
+test('bij een enkele collectie is `geenHalf` NIET_BEPROEFD en niet stilzwijgend bewezen', () => {
+  const een = cp.weegContract({ verwachtLeeg: true, geraakt: 0, aantalCollecties: 1,
+    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, idempotentie: 'beschermd' });
+  assert.equal(een.claims.geenHalf.stand, 'NIET_BEPROEFD');
+  assert.ok(een.claims.geenHalf.reden.length > 20, 'met de reden erbij');
+  assert.equal(een.stand, 'NIET_BEPROEFD', 'en de strengste stand trekt de hele rij mee omlaag');
+});
+
+/* DE GRENS NA DE COMMIT BELOOFT HET TEGENOVERGESTELDE van die ervoor: daar hoort
+   de uitkomst er JUIST te staan. Een lege uitkomst betekent dan dat de commit de
+   herstart niet heeft overleefd. */
+test('na de commit is een LEGE uitkomst een gebroken belofte, geen schone lei', () => {
+  const leeg = cp.weegContract({ verwachtLeeg: false, geraakt: 0, aantalCollecties: 5,
+    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, idempotentie: 'beschermd' });
+  assert.equal(leeg.claims.toestand.stand, 'FAILED');
+  assert.match(leeg.claims.toestand.reden, /overleefde de herstart niet/);
+});
+
+/* VALS SUCCES EN VALS FALEN. Een crash geeft GEEN antwoord, en dat is eerlijk:
+   de aanroeper weet dat hij het niet weet. Vals wordt het als er wel een
+   antwoord kwam dat niet klopt met wat er is blijven staan. */
+test('geen antwoord is eerlijk; een antwoord dat niet klopt met de opslag is vals', () => {
+  const stil = cp.weegContract({ verwachtLeeg: true, geraakt: 0, aantalCollecties: 2,
+    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, idempotentie: 'beschermd' });
+  assert.equal(stil.claims.geenVals.stand, 'PROVEN');
+
+  const valsSucces = cp.weegContract({ verwachtLeeg: false, geraakt: 0, aantalCollecties: 2,
+    status: 200, gestorven: false, herhaalStatus: 200, bijgekomen: 0, idempotentie: 'beschermd' });
+  assert.equal(valsSucces.claims.geenVals.stand, 'FAILED');
+  assert.match(valsSucces.claims.geenVals.reden, /vals succes/);
+
+  const valsFalen = cp.weegContract({ verwachtLeeg: false, geraakt: 3, aantalCollecties: 3,
+    status: 500, gestorven: false, herhaalStatus: 200, bijgekomen: 0, idempotentie: 'beschermd' });
+  assert.equal(valsFalen.claims.geenVals.stand, 'FAILED');
+  assert.match(valsFalen.claims.geenVals.reden, /vals falen/);
+});
+
+/* CRASHVEILIGHEID ZONDER RETRY-PROEF IS MAAR DE HELFT VAN CRASHVEILIGHEID. */
+test('zonder uitgevoerde herhaling is `geenDubbel` NIET_BEPROEFD', () => {
+  const zonder = cp.weegContract({ verwachtLeeg: true, geraakt: 0, aantalCollecties: 2,
+    status: 0, gestorven: true, herhaalStatus: null, bijgekomen: 0, idempotentie: 'beschermd' });
+  assert.equal(zonder.claims.geenDubbel.stand, 'NIET_BEPROEFD');
+  assert.equal(zonder.stand, 'NIET_BEPROEFD',
+    'en dat trekt de hele rij omlaag: half bewijs is geen bewijs');
+});
+
 /* DE ZELFIJKING. Een toets die je niet hebt zien zakken is geen toets: de regel
    hierboven MOET op verschillende invoer verschillend uitvallen. Geeft hij
    overal hetzelfde, dan rekent dit bestand niets na. */

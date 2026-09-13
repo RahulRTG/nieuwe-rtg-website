@@ -146,24 +146,52 @@ async function meetHerstartruis() {
    declareert? De sleutels heten `boek:collectie`, dus het laatste deel telt. */
 const vanRoute = (route) => (sleutel) => route.collecties.includes(String(sleutel).split(':').pop());
 
+/* ============================================================================
+   HET OVERLEVINGSCONTRACT -- vier beweringen, en de strengste wint.
+
+   "Het proces stierf en kwam terug" is geen crashbewijs. Een route kan netjes
+   sterven, netjes herstarten, en ondertussen de helft van zijn uitkomst hebben
+   laten staan. Daarom declareert elke proef vooraf wat er NA de herstart waar
+   moet zijn, en worden er vier dingen apart bewezen:
+
+     toestand    de toestand na herstart is wat DEZE grens belooft
+     geenHalf    er staat geen half resultaat -- niet een deel van de collecties
+     geenVals    de aanroeper kreeg geen vals succes en geen vals falen
+     geenDubbel  opnieuw aanbieden veroorzaakt geen tweede effect
+
+   DIE LAATSTE IS DE HELFT VAN HET GEHEEL. Crashveiligheid zonder retry-proef is
+   maar de helft van crashveiligheid: een route die na een crash-voor-de-mutatie
+   niets heeft achtergelaten, is pas veilig als je hem OPNIEUW mag aanbieden en
+   er dan precies een effect ontstaat. Vandaar dat ook de ATOMIC-grens een
+   retry-proef draagt, en niet alleen de grens na de commit.
+
+   De vier staan APART en worden nooit opgeteld. De stand van een rij is de
+   STRENGSTE van zijn beweringen -- dezelfde regel als in BETROUWBAARHEID.md --
+   en een bewering die niet beproefd kon worden heet NIET_BEPROEFD met de reden,
+   nooit stilzwijgend PROVEN. Een bewijs dat je weglaat, leest als een bewijs dat
+   je haalt. */
+const CLAIMS = Object.freeze({
+  toestand: 'de toestand na herstart is wat deze crashgrens belooft',
+  geenHalf: 'er staat geen half resultaat: niet een deel van de collecties van deze route',
+  geenVals: 'de aanroeper kreeg geen vals succes en geen vals falen',
+  geenDubbel: 'opnieuw aanbieden veroorzaakt geen tweede effect'
+});
+
+const STRENGSTE = ['FAILED', 'NIET_BEPROEFD', 'PROVEN'];
+const strengste = (standen) => STRENGSTE.find(s => standen.includes(s)) || 'NIET_BEPROEFD';
+
 /* DE WEGING VAN EEN HERHALING NA DE HERSTART -- DRIE UITKOMSTEN EN NIET TWEE.
 
    De eerste versie had er twee te weinig: alles wat niet `beschermd` heet ging
    naar PROVEN_PARTIAL met de reden "deze route hoort bij een tweede oproep werk
    te doen". Dat is `ongemeten` gelezen als `niet idempotent` -- dezelfde fout
-   als `onbekend` lezen als `nee`, en juist de fout die dit huis overal elders
-   tegenhoudt. IDEMPROEF.json zegt van vier geldroutes niets; dat is geen
-   uitspraak over hun gedrag. /api/pay/saldo is er een van, en factuurproef.js
-   heeft de idempotentie ervan gewoon BEWEZEN.
-
-   Het is ook niet nodig, want de meting is er al: de herhaling is uitgevoerd en
-   de collecties zijn nageteld. Legt zij niets bovenop, dan is de belofte
-   gehouden -- wat het register ook nog niet wist. Alleen bij een herhaling die
-   WEL werk deed maakt het uit wat er over de route bekend is.
+   als `onbekend` lezen als `nee`. IDEMPROEF.json zegt van vier geldroutes niets;
+   dat is geen uitspraak over hun gedrag, en factuurproef.js heeft de
+   idempotentie van /api/pay/saldo gewoon BEWEZEN.
 
    Deze functie staat apart en wordt geexporteerd omdat test/crashproef.test.js
    hem narekent. Een toets die de regel OVERSCHRIJFT in plaats van aanroept,
-   blijft groen als de regel verandert -- en dan bewaakt hij niets. */
+   blijft groen als de regel verandert. */
 function weegHerhaling(bijgekomen, idempotentie) {
   if (bijgekomen === 0) return { stand: 'PROVEN',
     reden: 'de herhaling na de herstart legde niets bovenop de uitkomst' };
@@ -174,6 +202,65 @@ function weegHerhaling(bijgekomen, idempotentie) {
     reden: 'de herstart lukte en de opslag is leesbaar, maar de herhaling deed werk in ' +
       bijgekomen + ' collectie(s). Of dat een gebroken belofte is of het bedoelde gedrag, ' +
       'kan deze proef niet zeggen: IDEMPROEF.json noemt deze route ' + idempotentie + '.' };
+}
+
+/* Weegt de vier beweringen uit de gemeten grootheden. Alle invoer is GEMETEN;
+   deze functie redeneert alleen. Zij staat apart zodat de toets haar aanroept.
+
+   `verwachtLeeg` zegt of DEZE grens belooft dat er niets veranderd is (dat is de
+   ATOMIC-grens) of juist dat de uitkomst er hoort te staan (na de commit). */
+function weegContract({ verwachtLeeg, geraakt, aantalCollecties, status, gestorven,
+  herhaalStatus, bijgekomen, idempotentie }) {
+  const c = {};
+
+  /* 1. TOESTAND. Voor de grens voor de mutatie: er hoort niets te staan. Voor de
+        grens na de commit: de uitkomst hoort er juist WEL te staan -- een lege
+        uitkomst betekent daar dat de commit niet duurzaam was. */
+  if (verwachtLeeg) c.toestand = geraakt === 0
+    ? { stand: 'PROVEN', reden: 'geen enkele collectie van deze route veranderde' }
+    : { stand: 'FAILED', reden: geraakt + ' collectie(s) veranderden terwijl er niets gemuteerd mocht zijn' };
+  else c.toestand = geraakt > 0
+    ? { stand: 'PROVEN', reden: 'de uitkomst staat na de herstart in ' + geraakt + ' collectie(s)' }
+    : { stand: 'FAILED', reden: 'na de commit hoort de uitkomst er te staan, maar geen enkele ' +
+        'collectie van deze route veranderde -- de commit overleefde de herstart niet' };
+
+  /* 2. GEEN HALF RESULTAAT. Alleen te vellen als de route MEER dan een collectie
+        schrijft: bij een enkele collectie bestaat "half" niet, en dan is dit
+        geen bewijs maar een tautologie. */
+  if (aantalCollecties < 2) c.geenHalf = { stand: 'NIET_BEPROEFD',
+    reden: 'deze route schrijft een collectie, dus "half" bestaat hier niet als toestand' };
+  else if (geraakt === 0 || geraakt === aantalCollecties) c.geenHalf = { stand: 'PROVEN',
+    reden: geraakt === 0 ? 'er staat niets, dus zeker niets half'
+      : 'alle ' + aantalCollecties + ' collecties bewogen samen' };
+  else c.geenHalf = { stand: 'FAILED',
+    reden: geraakt + ' van de ' + aantalCollecties + ' collecties veranderden -- dit is precies ' +
+      'het halve resultaat dat het ATOMIC-contract uitsluit' };
+
+  /* 3. GEEN VALS SUCCES EN GEEN VALS FALEN. Een crash geeft GEEN antwoord, en
+        dat is eerlijk: de aanroeper weet dat hij het niet weet. Het wordt pas
+        vals als er wel een antwoord kwam en dat antwoord niet klopt met wat er
+        is blijven staan. */
+  if (gestorven) c.geenVals = { stand: 'PROVEN',
+    reden: 'de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse' };
+  else if (status >= 200 && status < 300 && geraakt === 0 && !verwachtLeeg) c.geenVals =
+    { stand: 'FAILED', reden: 'de aanroeper kreeg ' + status + ' maar er bleef niets staan: vals succes' };
+  else if (status >= 500 && geraakt > 0) c.geenVals =
+    { stand: 'FAILED', reden: 'de aanroeper kreeg ' + status + ' terwijl er wel degelijk ' + geraakt +
+      ' collectie(s) veranderden: vals falen' };
+  else c.geenVals = { stand: 'PROVEN',
+    reden: 'het antwoord (' + status + ') komt overeen met wat er is blijven staan' };
+
+  /* 4. GEEN DUBBEL EFFECT. De helft van crashveiligheid. */
+  if (herhaalStatus === null || herhaalStatus === undefined) c.geenDubbel =
+    { stand: 'NIET_BEPROEFD', reden: 'de herhaling is niet uitgevoerd' };
+  else {
+    const h = weegHerhaling(bijgekomen, idempotentie);
+    c.geenDubbel = h.stand === 'PROVEN_PARTIAL'
+      ? { stand: 'NIET_BEPROEFD', reden: h.reden }
+      : { stand: h.stand, reden: h.reden };
+  }
+
+  return { claims: c, stand: strengste(Object.values(c).map(x => x.stand)) };
 }
 
 async function ronde(route, grens, ruis) {
@@ -286,28 +373,41 @@ async function ronde(route, grens, ruis) {
         geraakt: binnen, buitenDeRoute: buiten, eigenLijf };
     }
 
-    if (grens.grens === 'voor-eerste-mutatie') {
-      return { stand: binnen.length === 0 ? 'PROVEN' : 'FAILED', statusVanDeAanroep: 0,
-        reden: binnen.length === 0
-          ? 'na de herstart is geen enkele collectie van deze route veranderd'
-          : binnen.length + ' collectie(s) van deze route veranderden terwijl er niets gemuteerd mocht zijn',
-        geraakt: binnen, buitenDeRoute: buiten, eigenLijf };
-    }
+    /* DE RETRY-PROEF HOORT BIJ ALLEBEI DE GRENZEN, en dat ontbrak.
 
-    /* na-commit-voor-antwoord: de schrijfactie is duurzaam en de klant heeft
-       niets gehoord. De belofte is dus niet "er staat niets" maar "een tweede
-       poging legt er niets bovenop" -- en die vraag mag alleen gesteld worden
-       aan een route die zich idempotent NOEMT. Bij de rest hoort een tweede
-       oproep werk te doen, en dan is een verschil geen fout maar de bedoeling. */
-    const na2Voor = inhoudsBeeld(map);
+       Voor de grens na de commit was hij er al: de uitkomst staat vast, dus de
+       vraag is of een tweede poging er iets bovenop legt. Maar voor de grens
+       VOOR de mutatie is hij even belangrijk en het spiegelbeeld ervan: er is
+       niets gebeurd, dus de belofte is dat je het OPNIEUW MAG AANBIEDEN en er
+       dan precies een effect ontstaat. Crashveiligheid zonder retry-proef is
+       maar de helft van crashveiligheid.
+
+       Daarom hieronder een keer aanbieden (dat hoort te lukken en werk te doen)
+       en daarna nog een keer (dat hoort er niets bovenop te leggen). De tweede
+       meting is wat `geenDubbel` weegt; de eerste is wat na de ATOMIC-grens
+       bewijst dat de route niet stuk is achtergebleven. */
+    const voorHerhaling = inhoudsBeeld(map);
     const herhaal = await post(srv.basis, route.pad, lijf, tok);
-    const na2 = inhoudsBeeld(map);
-    const bijgekomen = schoon(verschil(na2Voor, na2)).filter(vanRoute(route));
+    const naHerhaling = inhoudsBeeld(map);
+    const herhaalDeed = schoon(verschil(voorHerhaling, naHerhaling)).filter(vanRoute(route));
 
-    const w = weegHerhaling(bijgekomen.length, route.idempotentie);
-    return { stand: w.stand, reden: w.reden, statusVanDeAanroep: 0,
+    const tweede = await post(srv.basis, route.pad, lijf, tok);
+    const naTweede = inhoudsBeeld(map);
+    const bijgekomen = schoon(verschil(naHerhaling, naTweede)).filter(vanRoute(route));
+
+    const verwachtLeeg = grens.grens === 'voor-eerste-mutatie';
+    const c = weegContract({ verwachtLeeg, geraakt: binnen.length,
+      aantalCollecties: route.collecties.length, status: r.status, gestorven,
+      herhaalStatus: herhaal.status, bijgekomen: bijgekomen.length,
+      idempotentie: route.idempotentie });
+
+    return { stand: c.stand, claims: c.claims, statusVanDeAanroep: 0,
+      reden: Object.entries(c.claims).filter(([, v]) => v.stand !== 'PROVEN')
+        .map(([k, v]) => k + ': ' + v.reden).join(' | ') ||
+        'alle vier de beweringen van het overlevingscontract zijn bewezen',
       geraakt: binnen, buitenDeRoute: buiten, eigenLijf,
-      herhaling: { status: herhaal.status, bijgekomen } };
+      herhaling: { status: herhaal.status, deed: herhaalDeed,
+        tweedeStatus: tweede.status, bijgekomen } };
   } catch (e) {
     return { stand: 'BLOCKED', reden: 'de ronde brak af: ' + String(e.message).slice(0, 140) };
   } finally {
@@ -398,4 +498,4 @@ if (require.main === module) {
   }).catch(e => { console.error(e); process.exitCode = 2; });
 }
 
-module.exports = { meet, ronde, meetHerstartruis, weegHerhaling, GRENZEN };
+module.exports = { meet, ronde, meetHerstartruis, weegHerhaling, weegContract, CLAIMS, GRENZEN };

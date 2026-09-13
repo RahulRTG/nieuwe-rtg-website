@@ -289,6 +289,18 @@ const REGISTERS = [
      classificatie is, en dat is hier het punt: een crash-as die op een oudere
      routelijst is gemeten, beweert iets over routes die er niet meer zijn. */
   ['CRASHAS.json', 'npm run crashas:vast', 'welke van de zes crashgrenzen er per geldroute werkelijk bestaan, en welke te beproeven zijn'],
+  /* CRASHPROEF.json hoort hier om dezelfde reden als CRASHAS.json, en om een
+     scherpere. Dit is geen classificatie maar een UITGEVOERDE proef: hij laat
+     per geldroute het proces sterven en kijkt wat er van de uitkomst
+     overblijft. Zo'n uitslag veroudert harder dan een classificatie -- een
+     PROVEN op een route die sindsdien een tweede collectie is gaan schrijven,
+     beweert iets dat niemand meer heeft nagemeten. En hij is DUUR (ongeveer
+     negentig serverstarts), dus hij draait niet vanzelf mee; juist dan hoort
+     zijn leeftijd hardop gemeld te worden in plaats van stil te verstrijken.
+
+     Ook hier een melding en geen poort: als poort zou hij rood staan op takken
+     die niets met geld te maken hebben. */
+  ['CRASHPROEF.json', 'npm run crashproef:vast', 'wat er per geldroute van de uitkomst overblijft als het proces op een crashgrens sterft'],
   /* HERSTELBESLUIT.json STAAT HIER BEWUST NIET, en dat is geen vergetelheid.
      Deze lijst is de INSTRUMENTENlijst: scripts/meetkeuring.js leest hem om te
      bepalen welk script welk register vult, en eist van elk instrument een

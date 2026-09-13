@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T07:40:50.103Z",
-    "commit": "a1d73fce6",
+    "op": "2026-09-13T08:03:01.187Z",
+    "commit": "f9897cb69",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -1879,6 +1879,14 @@
       "module": "scripts/crashas.js",
       "operator": "===->!==#0",
       "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "crashproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/crashproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
       "geprobeerd": 1
     },
     "crashtaxonomie.test.js": {

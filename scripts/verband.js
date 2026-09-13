@@ -83,19 +83,17 @@ const STOP = new Set(('de het een en of van in op te dat die dit deze aan met vo
 const kernwoorden = (t) => new Set(String(t).toLowerCase()
   .replace(/[^a-z0-9à-ÿ\s]/g, ' ').split(/\s+/).filter(x => x.length > 4 && !STOP.has(x)));
 
-/* Is dit pad een WACHTER (iets dat rood kan worden) of de IMPLEMENTATIE?
+/* Is dit pad een WACHTER of de IMPLEMENTATIE?
 
-   DIT IS EEN HEURISTIEK OP HET PAD EN HIJ IS EEN KEER MIS GEWEEST. `scripts/`
-   telde in zijn geheel als wachter, en toen kwam `scripts/lib/ijking.js` in het
-   register: een BIBLIOTHEEK met besluiten erin, die niets uitvoert en dus nooit
-   rood wordt. Hij is de DRAGER van zijn wet, niet de wachter -- exact dezelfde
-   fout als die deze meter in het veld `handhaver` aanwees, nu in de meter zelf.
-
-   Een wachter is dus iets dat DRAAIT: een toets, of een script dat je aanroept.
-   Wat onder scripts/lib/ woont wordt door een ander aangeroepen en hoort bij de
-   implementatie. */
-const isWachter = (p) => p.startsWith('test/') ||
-  (p.startsWith('scripts/') && !p.startsWith('scripts/lib/'));
+   SINDS DE SPLITSING HOEFT DEZE METER DAT NIET MEER TE RADEN. WETTEN.json draagt
+   `bewaaktDoor` en `draagt` als aparte velden, en scripts/lib/wetrelatie.js
+   beslist mechanisch of een pad daar hoort. De padheuristiek die hier stond
+   (`alles onder scripts/` is een wachter) is een keer misgegaan op
+   scripts/lib/ijking.js -- een bibliotheek in de wachter-bak -- en dat was de
+   tweede keer dat dit huis dezelfde fout maakte. De derde keer staat er nu een
+   veld in plaats van een vermoeden. */
+const { kantVan } = require('./lib/wetrelatie');
+const isWachter = (p) => kantVan(p) === 'bewaaktDoor';
 
 /* ---------------------------------------------------------------- de sensoren */
 
@@ -165,9 +163,15 @@ function meet() {
   const grond = [];
   const implementatie = [];
   for (const w of wetten) {
+    /* De VELDEN zijn de bron. `handhaver` blijft als terugval staan zolang er
+       nog een wet mee kan opduiken; test/wetrelatie.test.js houdt die lijst leeg. */
+    for (const h of (w.bewaaktDoor || [])) grond.push({ wet: w.id, wachter: h, w });
+    for (const h of (w.draagt || [])) {
+      implementatie.push({ wet: w.id, bestand: h, relatie: 'DRAAGT', bronrelatie: 'draagt' });
+    }
     for (const h of (w.handhaver || [])) {
       if (isWachter(h)) grond.push({ wet: w.id, wachter: h, w });
-      else implementatie.push({ wet: w.id, bestand: h, relatie: 'DRAAGT', bronrelatie: 'handhaver' });
+      else implementatie.push({ wet: w.id, bestand: h, relatie: 'DRAAGT', bronrelatie: 'handhaver (legacy)' });
     }
   }
   const wachters = [...new Set(grond.map(g => g.wachter))];
@@ -192,7 +196,7 @@ function meet() {
          een van. Zou hier alleen `handhaver` staan, dan bouwt de volgende laag
          door op een dubbelzinnigheid die deze meter al gemeten heeft. */
       relatie: 'BEWAAKT_DOOR',
-      bronrelatie: 'handhaver',
+      bronrelatie: 'bewaaktDoor',
     });
     if (!zag.length) gemist.push({ wet: g.wet, wachter: g.wachter });
   }

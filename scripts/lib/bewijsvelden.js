@@ -34,12 +34,19 @@ const GESPLITST = {
       'Een implementatiebestand kan de wet dragen zonder ooit rood te worden, en een toets kan rood worden ' +
       'zonder de implementatie te zijn.',
     relaties: {
-      BEWAAKT_DOOR: { waar: 'VERBAND.json:randen', uitleg: 'een toets of script dat rood wordt bij overtreding' },
-      DRAAGT: { waar: 'VERBAND.json:implementatie', uitleg: 'de code waarin de regel wordt uitgevoerd' },
+      BEWAAKT_DOOR: { waar: 'WETTEN.json:bewaaktDoor', uitleg: 'een toets of script dat rood wordt bij overtreding' },
+      DRAAGT: { waar: 'WETTEN.json:draagt', uitleg: 'de code waarin de regel in het product wordt uitgevoerd' },
     },
-    /* De splitsing woont in de LEZING (VERBAND.json) en niet in de bron.
-       WETTEN.json aanraken is een besluit van de eigenaar. */
-    bronGesplitst: false,
+    /* DE BRON IS GESPLITST (13 september 2026, besluit van de eigenaar). Het
+       veld heette `handhaver` en woont nu als `bewaaktDoor` en `draagt` in
+       WETTEN.json zelf, niet meer alleen in de lezing.
+
+       EN TWEE KOLOMMEN WAREN NIET GENOEG: scripts/lib/wetrelatie.js beslist
+       mechanisch welke kant een pad op hoort, zodat een DRAGER onder
+       `bewaaktDoor` of een WACHTER onder `draagt` wordt afgewezen. Zonder die
+       controle zou de oude foutklasse er nog staan, alleen netter opgemaakt --
+       met een getal eronder dat officieel "wachters" heet. */
+    bronGesplitst: true,
   },
 
   bereik: {
@@ -74,7 +81,9 @@ const GEBRUIKERS = {
      klinkt, en geen van beide draagt het veld. Een verklaring die verder reikt
      dan de meting is precies zo fout als een meting zonder verklaring. */
   bereik: ['MAGNAATLAB.json', 'TAALOORDEEL.json', 'EXECUTION_MAP.json'],
-  handhaver: ['WETTEN.json'],
+  /* Sinds de splitsing draagt WETTEN.json het veld niet meer; wat overblijft is
+     de LEGACY-terugval in de lezers, die test/wetrelatie.test.js leeg houdt. */
+  handhaver: [],
 };
 
 module.exports = { GESPLITST, ENKELVOUDIG, GEBRUIKERS };

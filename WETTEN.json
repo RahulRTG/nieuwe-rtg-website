@@ -9,9 +9,6 @@
         "bestand": "CLAUDE.md",
         "anker": "--burgundy:#7F1634"
       },
-      "handhaver": [
-        "scripts/check.js"
-      ],
       "sabotage": {
         "wat": "zet het bordeaux van het logo een groenstap hoger -- het verschil dat niemand met het oog ziet",
         "bestand": "public/shared/rtg-materiaal.css",
@@ -20,7 +17,10 @@
         "wachters": [
           "check:23"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "scripts/check.js"
+      ]
     },
     {
       "id": "merk-twee-letterrollen",
@@ -30,10 +30,6 @@
         "bestand": "MATERIAAL.md",
         "anker": "Typografie: twee rollen"
       },
-      "handhaver": [
-        "test/materiaal.test.js",
-        "public/shared/rtg-materiaal.css"
-      ],
       "sabotage": {
         "wat": "laat het materialenblad zelf een lettertype noemen in plaats van een rol",
         "bestand": "public/shared/rtg-materiaal.css",
@@ -42,7 +38,13 @@
         "wachters": [
           "test:test/materiaal.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/materiaal.test.js"
+      ],
+      "draagt": [
+        "public/shared/rtg-materiaal.css"
+      ]
     },
     {
       "id": "merk-pearl-is-warm",
@@ -52,9 +54,6 @@
         "bestand": "MATERIAAL.md",
         "anker": "levend wit"
       },
-      "handhaver": [
-        "test/materiaal.test.js"
-      ],
       "sabotage": {
         "wat": "draai de rood- en blauwkanalen van Pearl om, zodat het klinisch koel wit wordt",
         "bestand": "public/shared/rtg-materiaal.css",
@@ -63,7 +62,10 @@
         "wachters": [
           "test:test/materiaal.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/materiaal.test.js"
+      ]
     },
     {
       "id": "merk-goud-is-mat",
@@ -73,9 +75,6 @@
         "bestand": "MATERIAAL.md",
         "anker": "geborsteld massief goud"
       },
-      "handhaver": [
-        "test/materiaal.test.js"
-      ],
       "sabotage": {
         "wat": "vervang de logotoon door internet-goud (#FFD700)",
         "bestand": "public/shared/rtg-materiaal.css",
@@ -84,7 +83,10 @@
         "wachters": [
           "test:test/materiaal.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/materiaal.test.js"
+      ]
     },
     {
       "id": "merk-geen-emoji",
@@ -94,9 +96,6 @@
         "bestand": "ONTWERP.md",
         "anker": "iconensysteem"
       },
-      "handhaver": [
-        "scripts/check.js"
-      ],
       "sabotage": {
         "wat": "zet een emoji in de kop van een servermodule",
         "bestand": "server/pinslot.js",
@@ -105,7 +104,10 @@
         "wachters": [
           "check:3b"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "scripts/check.js"
+      ]
     },
     {
       "id": "vorm-bodoni-ceremonieel",
@@ -115,10 +117,6 @@
         "bestand": "ONTWERP.md",
         "anker": "Merk-elementen en werk-elementen"
       },
-      "handhaver": [
-        "test/ontwerp.test.js",
-        "public/shared/rtg-ontwerp.css"
-      ],
       "sabotage": {
         "wat": "geef ook de werk-rollen een serif, zodat de ceremonie overal staat",
         "bestand": "public/shared/rtg-ontwerp.css",
@@ -127,7 +125,13 @@
         "wachters": [
           "test:test/ontwerp.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/ontwerp.test.js"
+      ],
+      "draagt": [
+        "public/shared/rtg-ontwerp.css"
+      ]
     },
     {
       "id": "vorm-modus-is-volledig",
@@ -137,10 +141,6 @@
         "bestand": "ONTWERP.md",
         "anker": "Drie modi: World, Pro, Command"
       },
-      "handhaver": [
-        "test/ontwerp.test.js",
-        "public/shared/rtg-ontwerp.css"
-      ],
       "sabotage": {
         "wat": "haal een van de vier maten uit de Command-modus weg",
         "bestand": "public/shared/rtg-ontwerp.css",
@@ -149,7 +149,13 @@
         "wachters": [
           "test:test/ontwerp.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/ontwerp.test.js"
+      ],
+      "draagt": [
+        "public/shared/rtg-ontwerp.css"
+      ]
     },
     {
       "id": "vorm-status-niet-op-kleur",
@@ -159,10 +165,6 @@
         "bestand": "ONTWERP.md",
         "anker": "Status nooit op kleur alleen"
       },
-      "handhaver": [
-        "test/ontwerp.test.js",
-        "public/shared/rtg-ontwerp.css"
-      ],
       "sabotage": {
         "wat": "haal het teken weg en laat alleen de kleur het verschil dragen",
         "bestand": "public/shared/rtg-ontwerp.css",
@@ -171,7 +173,13 @@
         "wachters": [
           "test:test/ontwerp.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/ontwerp.test.js"
+      ],
+      "draagt": [
+        "public/shared/rtg-ontwerp.css"
+      ]
     },
     {
       "id": "vorm-geen-inline-handlers",
@@ -181,10 +189,6 @@
         "bestand": "README.md",
         "anker": "CSP"
       },
-      "handhaver": [
-        "scripts/check.js",
-        "server/middleware/voordeur.js"
-      ],
       "sabotage": {
         "wat": "zet een inline onclick op een echte pagina",
         "bestand": "public/site/404.html",
@@ -193,7 +197,13 @@
         "wachters": [
           "check:2"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "scripts/check.js"
+      ],
+      "draagt": [
+        "server/middleware/voordeur.js"
+      ]
     },
     {
       "id": "toegang-ai-belooft-niets",
@@ -203,11 +213,6 @@
         "bestand": "CLAUDE.md",
         "anker": "de AI mag **nooit** zelf toegang beloven of verlenen"
       },
-      "handhaver": [
-        "scripts/check.js",
-        "scripts/ai-oproepen.js",
-        "server/kern/ai/prompt.js"
-      ],
       "sabotage": {
         "wat": "haal een erkende uitzondering van de lijst weg, zodat een AI-ingang zonder de regel ongezien kan bestaan",
         "bestand": "scripts/check.js",
@@ -216,7 +221,14 @@
         "wachters": [
           "check:34"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "scripts/check.js",
+        "scripts/ai-oproepen.js"
+      ],
+      "draagt": [
+        "server/kern/ai/prompt.js"
+      ]
     },
     {
       "id": "toegang-ai-liegt-niet-over-boekingen",
@@ -226,10 +238,6 @@
         "bestand": "CLAUDE.md",
         "anker": "nooit claimen dat een boeking daadwerkelijk verwerkt is"
       },
-      "handhaver": [
-        "test/rahul-eerlijk.test.js",
-        "server/kern/ai/prompt.js"
-      ],
       "sabotage": {
         "wat": "zet de instructie terug die Rahul opdroeg te bevestigen dat het geregeld is",
         "bestand": "server/kern/ai/prompt.js",
@@ -238,7 +246,13 @@
         "wachters": [
           "test:test/rahul-eerlijk.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/rahul-eerlijk.test.js"
+      ],
+      "draagt": [
+        "server/kern/ai/prompt.js"
+      ]
     },
     {
       "id": "toegang-codenaam-boven-naam",
@@ -248,10 +262,6 @@
         "bestand": "CLAUDE.md",
         "anker": "klantdata draait op codenamen"
       },
-      "handhaver": [
-        "test/rahul-eerlijk.test.js",
-        "server/accounts/kluis.js"
-      ],
       "sabotage": {
         "wat": "laat de promptlaag de volledige naam nemen zodra die er is, in plaats van de codenaam",
         "bestand": "server/kern/ai/prompt.js",
@@ -261,7 +271,13 @@
           "test:test/rahul-eerlijk.test.js"
         ]
       },
-      "kanttekening": "Deze proef kwam eerst AFGESLAGEN terug, en dat was een echte vondst: de toets deed assert.match(bron, /persona.codename/) -- een deelstring die ook groen blijft als de voorkeur is omgedraaid en de ECHTE naam naar de modelaanbieder gaat. De toets kijkt sindsdien naar de volgorde."
+      "kanttekening": "Deze proef kwam eerst AFGESLAGEN terug, en dat was een echte vondst: de toets deed assert.match(bron, /persona.codename/) -- een deelstring die ook groen blijft als de voorkeur is omgedraaid en de ECHTE naam naar de modelaanbieder gaat. De toets kijkt sindsdien naar de volgorde.",
+      "bewaaktDoor": [
+        "test/rahul-eerlijk.test.js"
+      ],
+      "draagt": [
+        "server/accounts/kluis.js"
+      ]
     },
     {
       "id": "toegang-geen-kluisgegevens-van-een-ander",
@@ -271,10 +287,6 @@
         "bestand": "CLAUDE.md",
         "anker": "echte namen staan in de gescheiden kluis"
       },
-      "handhaver": [
-        "test/grens-sweep.test.js",
-        "server/accounts/kluis.js"
-      ],
       "sabotage": {
         "wat": "hang er een nieuw, ongepoort endpoint in dat de hele gebruikersrij van het meegestuurde id teruggeeft -- precies de soort route waar de sweep voor bestaat",
         "bestand": "server/routes/klok.js",
@@ -284,7 +296,13 @@
           "test:test/grens-sweep.test.js"
         ]
       },
-      "kanttekening": "De sweep kijkt alleen naar endpoints die in GEEN ENKELE toets voorkomen -- dat is precies zijn opzet: hij is de vloer onder het ongedekte deel. Een lek in een route die wel een eigen toets heeft, ziet hij niet, en dat staat ook zo in zijn eigen kop."
+      "kanttekening": "De sweep kijkt alleen naar endpoints die in GEEN ENKELE toets voorkomen -- dat is precies zijn opzet: hij is de vloer onder het ongedekte deel. Een lek in een route die wel een eigen toets heeft, ziet hij niet, en dat staat ook zo in zijn eigen kop.",
+      "bewaaktDoor": [
+        "test/grens-sweep.test.js"
+      ],
+      "draagt": [
+        "server/accounts/kluis.js"
+      ]
     },
     {
       "id": "toegang-grendel-hangt-aan-het-doel",
@@ -294,10 +312,6 @@
         "bestand": "LAT.md",
         "anker": "Een grendel hangt aan het doel, niet aan de aanvrager"
       },
-      "handhaver": [
-        "server/pinslot.js",
-        "test/eenaccount.test.js"
-      ],
       "sabotage": {
         "wat": "zet de teller van het pinslot zo hoog dat hij nooit meer dichtgaat",
         "bestand": "server/pinslot.js",
@@ -306,7 +320,13 @@
         "wachters": [
           "test:test/eenaccount.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/eenaccount.test.js"
+      ],
+      "draagt": [
+        "server/pinslot.js"
+      ]
     },
     {
       "id": "toegang-progressie-stopt-bij-18",
@@ -316,10 +336,6 @@
         "bestand": "CLAUDE.md",
         "anker": "De progressielaag stopt bij 18+"
       },
-      "handhaver": [
-        "server/kern/spellen/grens.js",
-        "test/spelbeleid.test.js"
-      ],
       "sabotage": {
         "wat": "zet de leeftijdspoort van de progressielaag open",
         "bestand": "server/kern/spellen/grens.js",
@@ -329,7 +345,13 @@
           "test:test/spelbeleid.test.js"
         ]
       },
-      "kanttekening": "Deze proef kwam eerst AFGESLAGEN terug: elke spellentoets gaf progressieMag ZELF mee, dus de bedrading van grens.js naar volwassen() werd nergens geraakt. De poort helemaal openzetten bleef groen. test/spelbeleid.test.js gaat er nu doorheen in plaats van eromheen."
+      "kanttekening": "Deze proef kwam eerst AFGESLAGEN terug: elke spellentoets gaf progressieMag ZELF mee, dus de bedrading van grens.js naar volwassen() werd nergens geraakt. De poort helemaal openzetten bleef groen. test/spelbeleid.test.js gaat er nu doorheen in plaats van eromheen.",
+      "bewaaktDoor": [
+        "test/spelbeleid.test.js"
+      ],
+      "draagt": [
+        "server/kern/spellen/grens.js"
+      ]
     },
     {
       "id": "toegang-elke-route-heeft-een-poort",
@@ -339,9 +361,6 @@
         "bestand": "LAT.md",
         "anker": "een route die je vergeet te poorten geeft geen fout en geen log"
       },
-      "handhaver": [
-        "scripts/check.js"
-      ],
       "sabotage": {
         "wat": "hang er een API-route in zonder poortwachter en zonder vermelding op de publieke lijst",
         "bestand": "server/routes/klok.js",
@@ -350,7 +369,10 @@
         "wachters": [
           "check:28"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "scripts/check.js"
+      ]
     },
     {
       "id": "toegang-authorization-echt-verifieren",
@@ -360,9 +382,6 @@
         "bestand": "LAT.md",
         "anker": "Een controle op vorm is geen controle"
       },
-      "handhaver": [
-        "scripts/check.js"
-      ],
       "sabotage": {
         "wat": "zet een vormcontrole op de Authorization-kop in een servermodule, zonder verifier erachter",
         "bestand": "server/pinslot.js",
@@ -371,7 +390,10 @@
         "wachters": [
           "check:29"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "scripts/check.js"
+      ]
     },
     {
       "id": "geld-conservatie",
@@ -381,10 +403,6 @@
         "bestand": "GELD.md",
         "anker": "Een tweede boekhouding"
       },
-      "handhaver": [
-        "server/kern/pay/boeking.js",
-        "test/geld-conservatie-last.test.js"
-      ],
       "sabotage": {
         "wat": "boek de tik wel BIJ de ontvanger maar niet AF bij de zender -- dan komt er geld bij dat nooit is opgeladen",
         "bestand": "server/kern/pay/boeking.js",
@@ -394,7 +412,13 @@
           "test:test/geld-conservatie-last.test.js"
         ]
       },
-      "kanttekening": "Twee recepten eerder afgeslagen, en die twee zeggen iets. zorgSaldo() laadt automatisch bij, dus de saldocontrole daar weigert bijna nooit; en de ondergrens in het grootboek wordt in deze route nooit geraakt, juist omdat er eerst is bijgeladen. Wat de conservatie werkelijk draagt is pasToe(), en daar zit het recept nu op. Op 24 augustus 2026 is pasToe() met boek() en boekAsync() verhuisd naar server/kern/pay/boeking.js, omdat index.js over de 10 kB-grens ging. Het recept is meeverhuisd en niet blijven staan: een sabotagerecept dat naar een verplaatste regel wijst, slaat af en meldt dat als 'de wet houdt' -- de gevaarlijkste uitkomst die een wetstoets kan geven."
+      "kanttekening": "Twee recepten eerder afgeslagen, en die twee zeggen iets. zorgSaldo() laadt automatisch bij, dus de saldocontrole daar weigert bijna nooit; en de ondergrens in het grootboek wordt in deze route nooit geraakt, juist omdat er eerst is bijgeladen. Wat de conservatie werkelijk draagt is pasToe(), en daar zit het recept nu op. Op 24 augustus 2026 is pasToe() met boek() en boekAsync() verhuisd naar server/kern/pay/boeking.js, omdat index.js over de 10 kB-grens ging. Het recept is meeverhuisd en niet blijven staan: een sabotagerecept dat naar een verplaatste regel wijst, slaat af en meldt dat als 'de wet houdt' -- de gevaarlijkste uitkomst die een wetstoets kan geven.",
+      "bewaaktDoor": [
+        "test/geld-conservatie-last.test.js"
+      ],
+      "draagt": [
+        "server/kern/pay/boeking.js"
+      ]
     },
     {
       "id": "geld-geen-autonome-betalingen",
@@ -404,7 +428,6 @@
         "bestand": "GELD.md",
         "anker": "Autonome betalingen"
       },
-      "handhaver": [],
       "mensenwerk": "GELD.md par. 3 beschrijft vier niveaus van automatisering en zet de grens bij het vierde, maar er is geen enkele plek in de code waar 'naar buiten' als een begrip bestaat -- er is geen uitgaande betaalkoppeling. De wet is dus vandaag waar omdat het mechanisme ontbreekt, niet omdat iets hem tegenhoudt. Dat is de gevaarlijkste soort waarheid: hij vervalt stil op de dag dat de koppeling er wel komt. Wie die bouwt, hoort hier eerst een handhaver neer te zetten."
     },
     {
@@ -415,10 +438,6 @@
         "bestand": "LEVEN.md",
         "anker": "De bijdrage-spiegel is nooit vergelijkend"
       },
-      "handhaver": [
-        "server/kern/levensgraaf/bronnen-leven-bijdrage.js",
-        "test/levensgraafleven.test.js"
-      ],
       "sabotage": {
         "wat": "geef een bijdrageknoop een waarde, zodat de graaf er vanzelf een som van maakt",
         "bestand": "server/kern/levensgraaf/bronnen-leven-bijdrage.js",
@@ -427,7 +446,13 @@
         "wachters": [
           "test:test/levensgraafleven.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/levensgraafleven.test.js"
+      ],
+      "draagt": [
+        "server/kern/levensgraaf/bronnen-leven-bijdrage.js"
+      ]
     },
     {
       "id": "leven-talent-blijft-bij-het-lid",
@@ -437,10 +462,6 @@
         "bestand": "LEVEN.md",
         "anker": "geen zichtbaarheid voor anderen zonder"
       },
-      "handhaver": [
-        "server/kern/levensgraaf/bronnen-leven.js",
-        "test/levensgraafleven.test.js"
-      ],
       "sabotage": {
         "wat": "zet de deelstand van een talentknoop op de Rechterhand",
         "bestand": "server/kern/levensgraaf/bronnen-leven.js",
@@ -449,7 +470,13 @@
         "wachters": [
           "test:test/levensgraafleven.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/levensgraafleven.test.js"
+      ],
+      "draagt": [
+        "server/kern/levensgraaf/bronnen-leven.js"
+      ]
     },
     {
       "id": "leven-kind-is-geen-profiel",
@@ -459,7 +486,6 @@
         "bestand": "LEVEN.md",
         "anker": "Een kind is geen profiel"
       },
-      "handhaver": [],
       "mensenwerk": "De helft is machinaal te zien (waar een gegeven heen mag) en die helft valt onder leven-talent-blijft-bij-het-lid. De andere helft -- 'mag daarna geen kans beperken' -- gaat over gebruik in de toekomst door mensen en systemen die er nog niet zijn. Geen enkele toets kan zien dat een gegeven straks niet tegen iemand wordt gebruikt. Hier wordt op mensen vertrouwd, en dat hoort te blijven staan in plaats van te worden weggeschreven met een toets die iets anders meet."
     },
     {
@@ -470,7 +496,6 @@
         "bestand": "LEVEN.md",
         "anker": "Nooit sturen, alleen openen"
       },
-      "handhaver": [],
       "mensenwerk": "Dit is een uitspraak over de STREKKING van gegenereerde tekst, en die is niet binair. Een toets kan de zin 'dit is niets voor jou' verbieden en dan zegt het model het net anders. Wat wel machinaal staat, is dat de promptlaag de regel draagt; dat valt onder toegang-ai-belooft-niets. De strekking blijft mensenwerk, en dat is eerlijker dan een woordfilter dat vertrouwen koopt."
     },
     {
@@ -481,10 +506,6 @@
         "bestand": "CONCERN.md",
         "anker": "Toegang verlenen gebeurt waar de rol woont"
       },
-      "handhaver": [
-        "server/kern/onderneming/toegang.js",
-        "test/onderneming-toegang.test.js"
-      ],
       "sabotage": {
         "wat": "laat de leeslaag zelf een rol wegschrijven -- dan is het een derde model en geen leeslaag",
         "bestand": "server/kern/onderneming/toegang.js",
@@ -494,7 +515,13 @@
           "test:test/onderneming-toegang.test.js"
         ]
       },
-      "kanttekening": "Het eerste recept hing er alleen een functie naast en kwam AFGESLAGEN terug. De toets kijkt (terecht) naar een SCHRIJFACTIE in de laag, niet naar het bestaan van een naam -- dus zet het recept er nu een echte save() in."
+      "kanttekening": "Het eerste recept hing er alleen een functie naast en kwam AFGESLAGEN terug. De toets kijkt (terecht) naar een SCHRIJFACTIE in de laag, niet naar het bestaan van een naam -- dus zet het recept er nu een echte save() in.",
+      "bewaaktDoor": [
+        "test/onderneming-toegang.test.js"
+      ],
+      "draagt": [
+        "server/kern/onderneming/toegang.js"
+      ]
     },
     {
       "id": "concern-geen-score-zonder-afwijking",
@@ -504,10 +531,6 @@
         "bestand": "CONCERN.md",
         "anker": "Geen score zonder afwijking"
       },
-      "handhaver": [
-        "server/kern/onderneming/meter.js",
-        "test/onderneming-dagbeeld.test.js"
-      ],
       "sabotage": {
         "wat": "geef ook een cijfer waar er te weinig bronnen zijn om iets te meten",
         "bestand": "server/kern/onderneming/meter.js",
@@ -516,7 +539,13 @@
         "wachters": [
           "test:test/onderneming-dagbeeld.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/onderneming-dagbeeld.test.js"
+      ],
+      "draagt": [
+        "server/kern/onderneming/meter.js"
+      ]
     },
     {
       "id": "concern-juridisch-gegeven-heeft-een-bron",
@@ -526,10 +555,6 @@
         "bestand": "CONCERN.md",
         "anker": "Een gegeven zonder bron bestaat niet"
       },
-      "handhaver": [
-        "server/kern/concern/bron.js",
-        "server/kern/concern/tijd.js"
-      ],
       "sabotage": {
         "wat": "laat de tijdmachine een gegeven ZONDER bron alsnog vastleggen, met bron null -- precies de stille vorm die ./bron.js kwam voorkomen",
         "bestand": "server/kern/concern/tijd.js",
@@ -538,7 +563,11 @@
         "wachters": [
           "test:test/concern.test.js"
         ]
-      }
+      },
+      "draagt": [
+        "server/kern/concern/bron.js",
+        "server/kern/concern/tijd.js"
+      ]
     },
     {
       "id": "concern-werknemer-koopt-geen-pas",
@@ -548,10 +577,6 @@
         "bestand": "CONCERN.md",
         "anker": "Een werknemer koopt nooit een pas om te mogen werken"
       },
-      "handhaver": [
-        "server/kern/eenaccount/starten.js",
-        "test/eenaccount-werkruimte.test.js"
-      ],
       "sabotage": {
         "wat": "eis een betaalde pas voordat een werkrol een sessie oplevert",
         "bestand": "server/kern/eenaccount/starten.js",
@@ -560,7 +585,13 @@
         "wachters": [
           "test:test/eenaccount-werkruimte.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/eenaccount-werkruimte.test.js"
+      ],
+      "draagt": [
+        "server/kern/eenaccount/starten.js"
+      ]
     },
     {
       "id": "werkruimte-alleen-een-verwijzing",
@@ -570,10 +601,6 @@
         "bestand": "WERKRUIMTE.md",
         "anker": "de shell verstuurt alleen een **verwijzing**"
       },
-      "handhaver": [
-        "server/bedrijf/herkomst.js",
-        "test/werkgrens.test.js"
-      ],
       "sabotage": {
         "wat": "laat de gewone leesroute de verwijzing wel oplossen, met titel en al",
         "bestand": "server/bedrijf/herkomst.js",
@@ -582,7 +609,13 @@
         "wachters": [
           "test:test/werkgrens.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/werkgrens.test.js"
+      ],
+      "draagt": [
+        "server/bedrijf/herkomst.js"
+      ]
     },
     {
       "id": "wereld-een-app-een-wereld",
@@ -592,10 +625,6 @@
         "bestand": "PLATFORM.md",
         "anker": "super-app-regel"
       },
-      "handhaver": [
-        "scripts/check.js",
-        "public/apps/app-main/app-main-24a2.js"
-      ],
       "sabotage": {
         "wat": "zet dezelfde app in een tweede wereld op het beginscherm",
         "bestand": "public/apps/app-main/app-main-24a2.js",
@@ -605,7 +634,13 @@
           "check:44"
         ]
       },
-      "kanttekening": "Het eerste recept haalde de dubbelcontrole UIT de keuringsregel in plaats van een dubbele app neer te zetten -- en toen meldde de regel netjes dat er niets dubbel stond. Afgeslagen, en dat was de juiste uitkomst: een detector uitzetten is geen overtreding. Nu staat er een echte tweede vermelding."
+      "kanttekening": "Het eerste recept haalde de dubbelcontrole UIT de keuringsregel in plaats van een dubbele app neer te zetten -- en toen meldde de regel netjes dat er niets dubbel stond. Afgeslagen, en dat was de juiste uitkomst: een detector uitzetten is geen overtreding. Nu staat er een echte tweede vermelding.",
+      "bewaaktDoor": [
+        "scripts/check.js"
+      ],
+      "draagt": [
+        "public/apps/app-main/app-main-24a2.js"
+      ]
     },
     {
       "id": "wereld-geen-twee-beginschermen",
@@ -615,10 +650,6 @@
         "bestand": "WERELD.md",
         "anker": "Er is één beginscherm, en dat is de werktafel van RTG Command."
       },
-      "handhaver": [
-        "test/appmenu.e2e.js",
-        "public/shared/command.css"
-      ],
       "sabotage": {
         "wat": "laat het springboard weer onder de werktafel doorkomen als tweede beginscherm",
         "bestand": "public/shared/command.css",
@@ -628,7 +659,13 @@
           "e2e:test/appmenu.e2e.js"
         ]
       },
-      "kanttekening": "De wet is meeverhuisd met wat hij bewaakt. Hij ging over de wereldstand en het rooster -- twee standen van het klokscherm, dat er sinds 17 augustus 2026 niet meer is. De belofte eronder is dezelfde gebleven en staat nu op de werktafel. De enige handhaver is een schermtoets, en die heeft een browser nodig. In een omgeving zonder browser is de uitkomst `blind` en niet groen -- dat is het eerlijke antwoord en het hoort in de uitslag te blijven staan."
+      "kanttekening": "De wet is meeverhuisd met wat hij bewaakt. Hij ging over de wereldstand en het rooster -- twee standen van het klokscherm, dat er sinds 17 augustus 2026 niet meer is. De belofte eronder is dezelfde gebleven en staat nu op de werktafel. De enige handhaver is een schermtoets, en die heeft een browser nodig. In een omgeving zonder browser is de uitkomst `blind` en niet groen -- dat is het eerlijke antwoord en het hoort in de uitslag te blijven staan.",
+      "bewaaktDoor": [
+        "test/appmenu.e2e.js"
+      ],
+      "draagt": [
+        "public/shared/command.css"
+      ]
     },
     {
       "id": "techniek-geen-productie-zonder-grootboek",
@@ -638,10 +675,6 @@
         "bestand": "LAT.md",
         "anker": "geen productiestart op een opslag zonder grootboek"
       },
-      "handhaver": [
-        "server/config/productie-opslag.js",
-        "test/opslagblokkade.test.js"
-      ],
       "sabotage": {
         "wat": "maak van de blokkade weer een waarschuwing",
         "bestand": "server/config/productie-opslag.js",
@@ -650,7 +683,13 @@
         "wachters": [
           "test:test/opslagblokkade.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/opslagblokkade.test.js"
+      ],
+      "draagt": [
+        "server/config/productie-opslag.js"
+      ]
     },
     {
       "id": "techniek-domeingrens-houdt-tegen",
@@ -660,11 +699,6 @@
         "bestand": "LAT.md",
         "anker": "Nooit twee plekken die een waarheid vasthouden"
       },
-      "handhaver": [
-        "server/opzet/domeingrens.js",
-        "test/domeingrens.test.js",
-        "GRENZEN.json"
-      ],
       "sabotage": {
         "wat": "laat een vreemde naam stil undefined worden in plaats van gooien",
         "bestand": "server/opzet/domeingrens.js",
@@ -673,7 +707,14 @@
         "wachters": [
           "test:test/domeingrens.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/domeingrens.test.js"
+      ],
+      "draagt": [
+        "server/opzet/domeingrens.js",
+        "GRENZEN.json"
+      ]
     },
     {
       "id": "techniek-elke-meter-is-geijkt",
@@ -683,11 +724,6 @@
         "bestand": "LAT.md",
         "anker": "Een meter die je niet hebt zien uitslaan, meet niets"
       },
-      "handhaver": [
-        "scripts/check.js",
-        "test/meterijk.test.js",
-        "NORM.json"
-      ],
       "sabotage": {
         "wat": "voeg een nieuwe meter toe die in de ijkregistratie niet voorkomt",
         "bestand": "scripts/norm.js",
@@ -696,7 +732,14 @@
         "wachters": [
           "check:35"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "scripts/check.js",
+        "test/meterijk.test.js"
+      ],
+      "draagt": [
+        "NORM.json"
+      ]
     },
     {
       "id": "techniek-geen-dode-configuratie",
@@ -706,9 +749,6 @@
         "bestand": "LAT.md",
         "anker": "Een belofte in tekst is een belofte in code"
       },
-      "handhaver": [
-        "scripts/check.js"
-      ],
       "sabotage": {
         "wat": "laat de productiekeuring een omgevingsvariabele aanraden die niets in server/ of scripts/ leest",
         "bestand": "server/config/productie-opslag.js",
@@ -718,7 +758,10 @@
           "check:27"
         ]
       },
-      "kanttekening": "Het eerste recept zette de belofte in PRODUCTION.md en kwam AFGESLAGEN terug. Terecht, en het is de moeite waard: keuringsregel 27 leest de beloften uit server/config/ en docker-compose.yml, NIET uit de documentatie. Een omgevingsvariabele die alleen in een .md wordt aangeraden, valt dus buiten deze regel -- dat is een echt gat, en het staat hier zodat het niet als gedekt doorgaat."
+      "kanttekening": "Het eerste recept zette de belofte in PRODUCTION.md en kwam AFGESLAGEN terug. Terecht, en het is de moeite waard: keuringsregel 27 leest de beloften uit server/config/ en docker-compose.yml, NIET uit de documentatie. Een omgevingsvariabele die alleen in een .md wordt aangeraden, valt dus buiten deze regel -- dat is een echt gat, en het staat hier zodat het niet als gedekt doorgaat.",
+      "bewaaktDoor": [
+        "scripts/check.js"
+      ]
     },
     {
       "id": "techniek-bedradingscontract",
@@ -728,10 +771,6 @@
         "bestand": "LAT.md",
         "anker": "elke naam die je uit een module haalt bestaat"
       },
-      "handhaver": [
-        "scripts/check.js",
-        "scripts/kruisscan.js"
-      ],
       "sabotage": {
         "wat": "pak een naam uit een lokale module die daar niet bestaat",
         "bestand": "server/pinslot.js",
@@ -741,7 +780,11 @@
           "check:26"
         ]
       },
-      "kanttekening": "Het eerste recept pakte een verzonnen naam uit require('path'). Afgeslagen, en terecht: regel 26 leest alleen LOKALE modules statisch uit -- een ingebouwde module kan hij niet nakijken. Nu op een echte lokale module met een objectliteraal als export."
+      "kanttekening": "Het eerste recept pakte een verzonnen naam uit require('path'). Afgeslagen, en terecht: regel 26 leest alleen LOKALE modules statisch uit -- een ingebouwde module kan hij niet nakijken. Nu op een echte lokale module met een objectliteraal als export.",
+      "bewaaktDoor": [
+        "scripts/check.js",
+        "scripts/kruisscan.js"
+      ]
     },
     {
       "id": "techniek-zelfpoortende-toets-in-de-draaier",
@@ -751,10 +794,6 @@
         "bestand": "LAT.md",
         "anker": "Een meter zakt als zijn invoer ontbreekt"
       },
-      "handhaver": [
-        "scripts/check.js",
-        "scripts/pgtoetsen.js"
-      ],
       "sabotage": {
         "wat": "haal een zelfpoortende toets uit de lijst van de draaier, zodat hij nergens meer draait",
         "bestand": "scripts/pgtoetsen.js",
@@ -763,7 +802,11 @@
         "wachters": [
           "check:25"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "scripts/check.js",
+        "scripts/pgtoetsen.js"
+      ]
     },
     {
       "id": "techniek-routepad-staat-voluit",
@@ -773,10 +816,6 @@
         "bestand": "LAT.md",
         "anker": "staat elke functie in de boardroom"
       },
-      "handhaver": [
-        "scripts/check.js",
-        "scripts/schakelbaar.js"
-      ],
       "sabotage": {
         "wat": "bouw een routepad uit stukken op",
         "bestand": "server/routes/klok.js",
@@ -785,7 +824,11 @@
         "wachters": [
           "check:45"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "scripts/check.js",
+        "scripts/schakelbaar.js"
+      ]
     },
     {
       "id": "techniek-gegenereerde-kaarten-lopen-niet-achter",
@@ -795,11 +838,6 @@
         "bestand": "LAT.md",
         "anker": "Een belofte in tekst is een belofte in code"
       },
-      "handhaver": [
-        "scripts/check.js",
-        "scripts/bewijs.js",
-        "scripts/kaart.js"
-      ],
       "sabotage": {
         "wat": "zet een regel in het gegenereerde bewijsregister die er niet uit de code in kan komen",
         "bestand": "BEWIJS.md",
@@ -808,7 +846,12 @@
         "wachters": [
           "check:41"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "scripts/check.js",
+        "scripts/bewijs.js",
+        "scripts/kaart.js"
+      ]
     },
     {
       "id": "techniek-strenge-toetspoort",
@@ -818,10 +861,6 @@
         "bestand": "LAT.md",
         "anker": "Niets slaat stil over"
       },
-      "handhaver": [
-        "test/helper.js",
-        "test/strenge-poort.test.js"
-      ],
       "sabotage": {
         "wat": "haal de serverfout uit het patroon waar de strenge poort op let",
         "bestand": "test/helper.js",
@@ -830,7 +869,13 @@
         "wachters": [
           "test:test/strenge-poort.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/strenge-poort.test.js"
+      ],
+      "draagt": [
+        "test/helper.js"
+      ]
     },
     {
       "id": "techniek-wetten-hebben-een-bron",
@@ -840,10 +885,6 @@
         "bestand": "LAT.md",
         "anker": "Een belofte in tekst is een belofte in code"
       },
-      "handhaver": [
-        "scripts/wetten.js",
-        "WETTEN.json"
-      ],
       "sabotage": {
         "wat": "laat een wet naar een zin wijzen die in het bronbestand niet voorkomt",
         "bestand": "WETTEN.json",
@@ -852,7 +893,13 @@
         "wachters": [
           "script:node scripts/wetten.js --controle"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "scripts/wetten.js"
+      ],
+      "draagt": [
+        "WETTEN.json"
+      ]
     },
     {
       "id": "techniek-sabotage-meet-zichzelf",
@@ -862,10 +909,6 @@
         "bestand": "LAT.md",
         "anker": "Een meter die je niet hebt zien uitslaan, meet niets"
       },
-      "handhaver": [
-        "scripts/sabotage.js",
-        "test/wetten.test.js"
-      ],
       "sabotage": {
         "wat": "laat de motor de nulmeting overslaan, zodat een al rode wachter als bewijs telt",
         "bestand": "scripts/sabotage.js",
@@ -874,7 +917,11 @@
         "wachters": [
           "test:test/wetten.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "scripts/sabotage.js",
+        "test/wetten.test.js"
+      ]
     },
     {
       "id": "geld-poort-kent-geen-spelstand",
@@ -884,10 +931,6 @@
         "bestand": "MAGNAATLAB.md",
         "anker": "Een simulatie-adapter vervangt de **rail**, nooit de **poort**"
       },
-      "handhaver": [
-        "server/kern/pay/poort.js",
-        "test/simulatiebank.test.js"
-      ],
       "sabotage": {
         "wat": "smokkelt een demostand de waardepoort binnen, met een naam die aan een woordgrens ontsnapt",
         "bestand": "server/kern/pay/poort.js",
@@ -896,7 +939,13 @@
         "wachters": [
           "test:test/simulatiebank.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/simulatiebank.test.js"
+      ],
+      "draagt": [
+        "server/kern/pay/poort.js"
+      ]
     },
     {
       "id": "geld-simulatiebank-nooit-in-productie",
@@ -906,10 +955,6 @@
         "bestand": "MAGNAATLAB.md",
         "anker": "weigert altijd in productie"
       },
-      "handhaver": [
-        "server/betaal/synthetisch.js",
-        "test/simulatiebank.test.js"
-      ],
       "sabotage": {
         "wat": "haalt de productiegrendel van de simulatiebank weg",
         "bestand": "server/betaal/synthetisch.js",
@@ -918,7 +963,13 @@
         "wachters": [
           "test:test/simulatiebank.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/simulatiebank.test.js"
+      ],
+      "draagt": [
+        "server/betaal/synthetisch.js"
+      ]
     },
     {
       "id": "toegang-actor-op-de-bus-is-een-codenaam",
@@ -928,10 +979,6 @@
         "bestand": "OS.md",
         "anker": "De actor is een codenaam."
       },
-      "handhaver": [
-        "server/kern/envelop.js",
-        "test/envelop.test.js"
-      ],
       "sabotage": {
         "wat": "zet de zeef uit die een e-mailadres als actor tegenhoudt",
         "bestand": "server/kern/envelop.js",
@@ -940,7 +987,13 @@
         "wachters": [
           "test:test/envelop.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/envelop.test.js"
+      ],
+      "draagt": [
+        "server/kern/envelop.js"
+      ]
     },
     {
       "id": "techniek-geen-gedeelde-laagnaam",
@@ -950,10 +1003,6 @@
         "bestand": "OS.md",
         "anker": "Twee lagenmodellen delen nooit een laagnaam."
       },
-      "handhaver": [
-        "scripts/lagen.js",
-        "test/genrecap.test.js"
-      ],
       "sabotage": {
         "wat": "zet het woord terug dat in twee lagenmodellen niet hetzelfde betekende",
         "bestand": "PLATFORM.md",
@@ -962,7 +1011,11 @@
         "wachters": [
           "test:test/genrecap.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "scripts/lagen.js",
+        "test/genrecap.test.js"
+      ]
     },
     {
       "id": "techniek-een-genoemde-cap-bestaat",
@@ -972,10 +1025,6 @@
         "bestand": "CLAUDE.md",
         "anker": "Een cap die een document noemt, wordt sindsdien tegen de"
       },
-      "handhaver": [
-        "test/genrecap.test.js",
-        "server/seed/genres-lijst.js"
-      ],
       "sabotage": {
         "wat": "zet de niet-bestaande cap terug die de btw op een overnachting fout liet rekenen",
         "bestand": "PLATFORM.md",
@@ -984,7 +1033,13 @@
         "wachters": [
           "test:test/genrecap.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/genrecap.test.js"
+      ],
+      "draagt": [
+        "server/seed/genres-lijst.js"
+      ]
     },
     {
       "id": "beveiliging-geen-verlaging-zonder-ceremonie",
@@ -994,10 +1049,6 @@
         "bestand": "ISOLATIE.md",
         "anker": "geen verlaging zonder ceremonie"
       },
-      "handhaver": [
-        "test/seclock.test.js",
-        "server/kern/isolatie/ordening.js"
-      ],
       "sabotage": {
         "wat": "laat een niet te ordenen overgang doorgaan voor \"geen verlaging\", zodat beschermd -> beperkt zonder ceremonie kan",
         "bestand": "server/kern/isolatie/ordening.js",
@@ -1006,7 +1057,13 @@
         "wachters": [
           "test:test/seclock.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/seclock.test.js"
+      ],
+      "draagt": [
+        "server/kern/isolatie/ordening.js"
+      ]
     },
     {
       "id": "beveiliging-ai-heft-beveiliging-niet-op",
@@ -1016,10 +1073,6 @@
         "bestand": "ISOLATIE.md",
         "anker": "de AI kan de beveiliging niet opheffen"
       },
-      "handhaver": [
-        "test/seclock.test.js",
-        "server/kern/stuur/beleid-lijsten.js"
-      ],
       "sabotage": {
         "wat": "zet de isolatielaag van een lid op de AI-allowlist, zodat het stuur de bescherming van dat lid kan opheffen",
         "bestand": "server/kern/stuur/beleid-lijsten.js",
@@ -1028,7 +1081,13 @@
         "wachters": [
           "test:test/seclock.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/seclock.test.js"
+      ],
+      "draagt": [
+        "server/kern/stuur/beleid-lijsten.js"
+      ]
     },
     {
       "id": "beveiliging-lagere-drager-neutraliseert-niet",
@@ -1038,10 +1097,6 @@
         "bestand": "ISOLATIE.md",
         "anker": "een kind neutraliseert zijn ouder niet"
       },
-      "handhaver": [
-        "test/seclock.test.js",
-        "server/kern/isolatie/ordening.js"
-      ],
       "sabotage": {
         "wat": "vervang de join door \"de laatste drager wint\", zodat een sessie op normaal een huis in isolatie opheft",
         "bestand": "server/kern/isolatie/ordening.js",
@@ -1050,7 +1105,13 @@
         "wachters": [
           "test:test/seclock.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/seclock.test.js"
+      ],
+      "draagt": [
+        "server/kern/isolatie/ordening.js"
+      ]
     },
     {
       "id": "beveiliging-onbekende-stand-is-niet-normaal",
@@ -1060,10 +1121,6 @@
         "bestand": "ISOLATIE.md",
         "anker": "onbekend is niet normaal"
       },
-      "handhaver": [
-        "test/seclock.test.js",
-        "server/kern/incidentcontrole-stand.js"
-      ],
       "sabotage": {
         "wat": "laat een beschadigd standveld terugvallen op normaal -- de fail-open die hier eerder stond",
         "bestand": "server/kern/incidentcontrole-stand.js",
@@ -1072,7 +1129,13 @@
         "wachters": [
           "test:test/seclock.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/seclock.test.js"
+      ],
+      "draagt": [
+        "server/kern/incidentcontrole-stand.js"
+      ]
     },
     {
       "id": "techniek-meter-kent-zijn-grens",
@@ -1082,10 +1145,6 @@
         "bestand": "LAT.md",
         "anker": "Een meter kent zijn eigen grens"
       },
-      "handhaver": [
-        "test/meterwet.test.js",
-        "scripts/lib/ijking.js"
-      ],
       "sabotage": {
         "wat": "laat een meter beweren dat hij geijkt is tegen een grondwaarheid, terwijl de uitslag van die ijking nergens in zijn register staat -- de goedkoopste vorm van een belofte zonder bewijs",
         "bestand": "scripts/lib/ijking.js",
@@ -1094,7 +1153,13 @@
         "wachters": [
           "test:test/meterwet.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/meterwet.test.js"
+      ],
+      "draagt": [
+        "scripts/lib/ijking.js"
+      ]
     },
     {
       "id": "techniek-bewijsveld-een-relatie",
@@ -1104,19 +1169,23 @@
         "bestand": "LAT.md",
         "anker": "Een bewijsveld draagt een bewijsrelatie"
       },
-      "handhaver": [
-        "test/bewijsveld.test.js",
-        "scripts/lib/bewijsvelden.js"
-      ],
       "sabotage": {
         "wat": "verklaar een register voor een gesplitst veld dat dat veld helemaal niet draagt -- de stille kant van de fout, want een te ruime verklaring ziet er net zo verzorgd uit als een juiste",
         "bestand": "scripts/lib/bewijsvelden.js",
-        "zoek": "  handhaver: ['WETTEN.json'],",
-        "zet": "  handhaver: ['WETTEN.json', 'CODEWERELD.json'],",
+        "zoek": "  bereik: ['MAGNAATLAB.json', 'TAALOORDEEL.json', 'EXECUTION_MAP.json'],",
+        "zet": "  bereik: ['MAGNAATLAB.json', 'TAALOORDEEL.json', 'EXECUTION_MAP.json', 'CODEWERELD.json'],",
         "wachters": [
           "test:test/bewijsveld.test.js"
         ]
-      }
+      },
+      "bewaaktDoor": [
+        "test/bewijsveld.test.js",
+        "test/wetrelatie.test.js"
+      ],
+      "draagt": [
+        "scripts/lib/bewijsvelden.js",
+        "scripts/lib/wetrelatie.js"
+      ]
     }
   ]
 }

@@ -71,9 +71,13 @@ test('3. de unie vindt de bekende randen terug, en iedere misser draagt zijn naa
     'is geen groen: niet-gemeten mag nooit als in orde langskomen');
   const j = JSON.parse(fs.readFileSync(pad, 'utf8'));
 
-  assert.equal(j.telling.randenWachter + j.telling.randenImplementatie,
-    require('../WETTEN.json').wetten.flatMap(w => w.handhaver || []).length,
-    'de twee soorten randen horen samen alle verklaarde handhavers te dekken; klopt dat niet, ' +
+  /* Sinds de splitsing (LAT.md regel 14) staan de twee relaties als eigen velden
+     in WETTEN.json. `handhaver` blijft in deze som meetellen zolang de legacy-
+     terugval bestaat; test/wetrelatie.test.js houdt die lijst leeg. */
+  const verklaard = require('../WETTEN.json').wetten
+    .flatMap(w => [...(w.bewaaktDoor || []), ...(w.draagt || []), ...(w.handhaver || [])]).length;
+  assert.equal(j.telling.randenWachter + j.telling.randenImplementatie, verklaard,
+    'de twee soorten randen horen samen alle verklaarde paden te dekken; klopt dat niet, ' +
     'dan valt er een soort stil buiten de ijking');
 
   /* De vloer staat op 50 en niet op 54: een NIEUWE wet met een wachter die geen

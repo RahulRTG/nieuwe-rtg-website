@@ -51,8 +51,17 @@ function registersMet(veld) {
 test('1. elk register dat een gesplitst veld draagt, is verklaard', () => {
   for (const veld of Object.keys(GESPLITST)) {
     const echt = registersMet(veld);
-    assert.ok(echt.length > 0, 'het veld "' + veld + '" staat als gesplitst in het register maar komt in geen ' +
-      'enkel bestand voor; dan bewaakt deze regel iets wat niet meer bestaat');
+    /* Een gesplitst veld dat NERGENS meer voorkomt is geen dode regel als de
+       BRON is gesplitst: dan is de migratie af en bewaakt deze regel dat hij
+       niet terugkomt (test/wetrelatie.test.js toets 1). Staat `bronGesplitst`
+       op false en komt het veld nergens voor, dan bewaakt hij wel iets wat niet
+       bestaat, en dat blijft rood. */
+    if (!echt.length) {
+      assert.equal(GESPLITST[veld].bronGesplitst, true,
+        'het veld "' + veld + '" staat als gesplitst maar komt in geen enkel bestand voor, terwijl de bron ' +
+        'niet is gesplitst; dan bewaakt deze regel iets wat niet meer bestaat');
+      continue;
+    }
 
     const verklaard = GEBRUIKERS[veld] || [];
     const onverklaard = echt.filter(f => !verklaard.includes(f));

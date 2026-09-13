@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T09:36:45.922Z",
-    "commit": "a7dd3dac",
+    "op": "2026-09-13T10:05:58.440Z",
+    "commit": "58d0ec7c",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 0,
     "instrument": "scripts/stagevorm.js",
     "node": "v22.22.2"
   },
@@ -276,7 +276,16 @@
         "kern/events",
         "kern/galerij"
       ],
-      "soorten": [],
+      "soorten": [
+        "muziek",
+        "video",
+        "flow",
+        "live",
+        "optreden",
+        "kaartverkoop",
+        "wedstrijd",
+        "uitgelicht"
+      ],
       "waar": [
         {
           "domein": "kern/clips",

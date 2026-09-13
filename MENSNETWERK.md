@@ -758,6 +758,68 @@ alleen de andere bevoegd is, dan **wisselt het systeem nooit vanzelf**:
 Automatisch wisselen zou van de grens een formaliteit maken, en precies dat is
 wat `GRAMMATICA.md` bedoelt met een verhindering die altijd een reden draagt.
 
+### 4b. MN-02 als toets (13 september 2026)
+
+`test/mn02-hoedanigheidsscheiding.test.js`. Dit is een **ander soort proef** dan
+4a, en ze mogen niet op een hoop: MN-01 gaat over BEVOEGDHEID en is structureel
+te meten -- er is een deur, en die gaat niet open. MN-02 gaat over KENNIS, en
+daar is de verkeerde formulering verleidelijk:
+
+> FOUT: *"een RTG-medewerker mag niet meer weten dan een externe manager"*
+> GOED: *"wat hij in hoedanigheid A weet, is in hoedanigheid B niet beschikbaar
+> zonder eigen grond"*
+
+De eerste is aantoonbaar onwaar én soms gewenst -- `kern/ledenbalie.js` is een
+legitieme kennisweg met een reden, een journaalregel en bericht aan de
+betrokkene (par. 0.5). Een toets die die weg dichtzet, meet niet MN-02 maar
+breekt de balie.
+
+**Daarom twee helften die de andere kant op trekken**, en alleen samen bewijzen
+ze iets:
+
+1. legitieme extra kennis **blijft mogelijk** -- de kantoorweg geeft 200;
+2. en die kennis **draagt niet over** -- de managerweg blijft schoon.
+
+Zonder (1) is de goedkoopste implementatie *"blokkeer alle kantoorinzage voor
+managers"*, en dan staat de toets groen terwijl het product stuk is. Dat is geen
+theoretisch bezwaar: het is de vierde mutatie hieronder, en zonder toets 2 zou
+die er ongezien doorheen komen.
+
+**Eén mens, twee sessies.** R is tegelijk benoemd kantoormedewerker mét een
+baliezetel én manager van Mila via een aanvaarde machtiging -- met opzet op
+hetzelfde account. Bij twee verschillende mensen meet je toegangsscheiding en
+niet hoedanigheidsscheiding. (Daarom niet via `kantoorAlsPersoon()` uit
+`test/helper.js`: die registreert een vers account, en dan zijn het twee mensen.)
+
+**De volgorde is het bewijs.** De managercontext wordt VÓÓR en NA de
+kantoorinzage opgehaald en moet byte voor byte gelijk zijn. Drie asserties, elk
+tegen een andere overdrachtsweg: geen veldnaam uit de kantoorweg, geen WAARDE
+ervan (een veld is te hernoemen), en niets veranderd (de gedeelde cache).
+
+**Vier mutaties, elk door de juiste toets gepakt:**
+
+| Mutatie | Gepakt door |
+|---|---|
+| een kantoorVELDNAAM in de contextbouwer | toets 3 (a) |
+| dezelfde WAARDE onder een onschuldige naam | toets 3 (b) |
+| de managercontext niet-deterministisch | toets 3 (c) |
+| **de luie MN-02: kantoorinzage voor iedereen dicht** | **toets 2** |
+
+**En assertie (c) draagt uitgeschreven wat zij wél en niet bewijst.** Zij is
+aantoonbaar levend -- de derde mutatie laat alleen háár zakken -- maar dat toont
+dat zij een VERSCHIL tussen twee oproepen ziet, niet dat zij een echte
+cache-verrijking door de kantoorinzage ziet. Zo'n gedeelde cache bestaat vandaag
+niet. Deze regel is dus een **vooruitgeschoven post en geen bewezen eigenschap**;
+wie er ooit een gedeelde projectie tussen deze twee wegen bij bouwt, hoort hier
+langs te komen.
+
+**Wat nog niet is beproefd**, en dat staat er liever dan dat het meelift: de
+AI-contextbouwer. `/api/rahul/kijk` bleek beeldherkenning en geen contextbouwer,
+en waar de AI zijn ledencontext samenstelt is in deze ronde niet gemeten. De
+regel eronder geldt er onverkort -- een contextbouwer die twee bronnen samenvoegt
+maakt perfect afgeschermde routes zinloos -- maar er is vandaag geen toets die
+het tegenhoudt.
+
 ### MN-03 -- geen commercieel voordeel
 
 > **Een commercieel belang van RTG verandert het onafhankelijke keuzepad van een

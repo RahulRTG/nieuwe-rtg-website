@@ -380,6 +380,26 @@ van een testtalent en zonder machtiging niets kan), **MN-02 scheiding van
 hoedanigheden** en **MN-03 geen commercieel voordeel** (de AI zegt erbij dat RTG
 aan één van de opties verdient).
 
+**MN-01 en MN-02 zijn sinds 13 september 2026 TOETSEN en geen zinnen** (par. 4a
+en 4b). Ze staan bewust apart, want het zijn twee soorten regels: MN-01 gaat over
+BEVOEGDHEID en is structureel te meten (de aanvalsproef: de EIGENAAR van RTG
+krijgt op dezelfde machtiging 404 waar de gemachtigde 200 krijgt -- zelfde
+object, zelfde actie, andere actor), MN-02 over KENNIS. Bij die tweede is de
+verkeerde formulering verleidelijk: *"een medewerker mag niet meer weten"* is
+aantoonbaar onwaar én soms gewenst, want de ledenbalie is een legitieme kennisweg
+met reden, journaal en melding. De regel is **niet-overdraagbaarheid**, en de
+proef heeft daarom een TEGENproef: de kantoorweg moet 200 blijven geven, anders
+is de goedkoopste implementatie "blokkeer alles voor managers" en staat de toets
+groen terwijl het product stuk is. Eén mens, twee sessies, en de managercontext
+wordt vóór én na de kantoorinzage byte voor byte vergeleken.
+**En let op de poort die eruit volgde:** `npm run registerklopt` draait de
+negentien toetsen die een register tegen een VERSE meting houden. Die zijn geen
+van alle onderdeel van `npm run check`, en dat kostte een rode CI terwijl lokaal
+*Alles in orde* stond -- *een register dat door een toets wordt bewaakt, is niet
+gedekt door een groene keuring tenzij die toets onderdeel is van die keuring.*
+Het is een VIERDE begrip naast `versheid` (is de meting van een recente commit),
+`meterijk` (ziet de meter een foute invoer) en `check` (de statische regels).
+
 **Zes metingen gaan vooraf, en twee daarvan veranderen het ontwerp.** Het
 bevoegdheidsvoordeel is al dicht en niet beloofd: er is geen kantoorweg naar een
 machtiging, en `routes/vertegenwoordiging.js` kan per definitie niet bij

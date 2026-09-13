@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:22:35.178Z",
-    "commit": "420eea4d",
+    "op": "2026-09-13T11:27:06.701Z",
+    "commit": "6edd6ac4",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -4987,16 +4987,18 @@
       "geprobeerd": 1
     },
     "mn01-bevoegdheidsvoordeel.test.js": {
-      "soort": "puur",
+      "soort": "server",
       "staat": "gezakt",
-      "module": "scripts/lib/routes.js",
-      "operator": "&&->||#0",
-      "gezakt": 2,
-      "geprobeerd": 4
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
     },
     "mn02-hoedanigheidsscheiding.test.js": {
-      "soort": "puur",
-      "staat": "geen module gevonden"
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "mobiliteit-werkkant-routes.test.js": {
       "soort": "server",
@@ -6161,12 +6163,11 @@
       "reden": "de tekst staat in server/kern/rahul-hart.js en niet in de module die de export draagt; wat hij vastlegt zijn woorden in een system prompt, en geen bronoperator raakt een letterlijke string. Met de hand tweemaal raak: een passie weghalen laat toets 1 zakken, scrypt -> md5 laat toets 2 zakken"
     },
     "rahul-mens.test.js": {
-      "soort": "puur",
+      "soort": "server",
       "staat": "gezakt",
-      "module": "server/kern/rahul/taal.js",
-      "operator": "return-weg#0",
+      "operator": "liegpoort /api/",
       "gezakt": 1,
-      "geprobeerd": 3
+      "scherp": "gezakt"
     },
     "rahul-omgang.test.js": {
       "soort": "puur",

@@ -84,6 +84,15 @@ const REGISTER = {
      dezelfde conclusie over minder bewijs, en dat is precies de faalvorm waar
      een ratel voor is. */
   'CARRIEREVORM.json': { meter: ['carriereDomeinenGemeten'] },
+  /* STAGEVORM.json meet of de publieke domeinen een datavorm delen (STAGE.md
+     par. 0). Om dezelfde reden als bij CARRIEREVORM.json hierboven is de
+     geratelde waarde het BEREIK en niet de uitkomst: dat er 0 velden gedeeld
+     worden is de bevinding waar het document op staat, en een bevinding die
+     beweegt is nieuws. Wat NIET mag bewegen is hoeveel publieke domeinen de
+     meter heeft gezien -- zakt dat stil, dan daalt de gedeeldheid door een
+     hernoemde map in plaats van door een feit, en leest de nul plotseling als
+     bevestiging terwijl hij een blinde vlek is. */
+  'STAGEVORM.json': { meter: ['stageDomeinenGemeten'] },
   'BEPROEVING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   /* De ACTUELE meting naast de geaccepteerde basislijn hierboven: scripts/
      beproeving.js schrijft hem na ELKE ronde, ook een gezakte, zodat rood

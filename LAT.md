@@ -479,6 +479,120 @@ niet meer bereikt) en `scripts/ci-keten.js`, die eist dat elke poort leesbaar
 genoeg blijft om hier na te spelen. Voor de mens die hem niet draait bestaat geen
 handhaver; daarvoor staat deze regel hier.
 
+### 14. Een poort die een artefact leest, herberekent het of bewaakt niets
+
+Een register in de wortel is een **bouwartefact**, en een artefact kan een commit
+achterlopen. Een poort die zo'n bestand LEEST en er een uitspraak op doet, doet
+die uitspraak dus over de stand van de laatste keer dat iemand eraan dacht -- en
+dat is precies zo lang groen als het duurt voordat het misgaat.
+
+`EXECUTION_MAP.json` heeft dit al een keer opgelost: *de autoriteit komt LIVE en
+nooit uit een bouwartefact*. De vorm die werkt staat in
+`test/capabilities.test.js` toets 8: draai het instrument opnieuw en vergelijk
+elk getal met wat er is vastgelegd.
+
+*Het geval, 13 september 2026:* de poort `LEGACY_PENDING_CLASSIFICATION mag
+alleen krimpen` staat sinds 30 augustus op nul -- een besluit van de eigenaar
+over de releasepoort. Op 9 september kromp `MUTATIECONTRACT-AFGELEID.json` van
+3192 naar 3142 regels (de proef kwam er wel bij, dus de afgeleide stand viel
+terecht weg) zonder dat `MUTATIECONTRACT.json` werd meegeregenereerd. De poort
+stond daarna **vier dagen groen op nul terwijl er 47 schrijfroutes zonder
+contract waren**, en zij kwamen pas boven toen een andere tak het register
+toevallig vers schreef.
+
+*Wat het niet is:* een versheidswacht erop zetten. Die meldt dat een bestand oud
+is; hij zegt niet of het nog klopt. De uitzondering in
+`test/versheidsdekking.test.js` zei bovendien "ververst door de keuring" --
+onwaar, de keuring LAS hem alleen. **Een uitzonderingsreden die niet klopt is
+gevaarlijker dan geen uitzondering, want zij wordt geloofd.**
+
+*En vergelijk élk getal, niet een handvol.* Een afdruk die maar half wordt
+vergeleken, is een afdruk die half achterloopt -- dezelfde les die
+`CAPABILITEIT.json` al een keer opleverde toen het toevoegen van één kernmodule
+twee tellers verschoof zonder dat iets klaagde.
+
+**Handhaver:** `test/mutatiecontract.test.js` ("de afdruk loopt niet achter op de
+code") draait `scripts/mutatiecontract.js --telling` en vergelijkt elke stand;
+`test/capabilities.test.js` toets 8 en `test/objectmodel.test.js` doen hetzelfde
+voor hun register. Voor de registers zonder zo'n toets bestaat geen handhaver, en
+daarvoor staat deze regel hier.
+
+---
+
+### 15. Tijdens een meetronde is de werkboom niet van jou
+
+Een meetketen SCHRIJFT. Registers, journalen, en -- bij de ijkingen -- met opzet
+verkeerde waarden die zij daarna zelf terugzet. Wie tijdens zo'n ronde `git
+status` leest, ziet geen stand van zaken maar **een momentopname midden in een
+proef**. En wie er `git add -A` op loslaat, schrijft die momentopname de
+geschiedenis in.
+
+*Drie gevallen op één dag, 13 september 2026:*
+
+1. `git add -A` nam een `GLUURRONDE.json` mee dat mijn eigen lokale ci-keten net
+   had geschreven terwijl ik in diezelfde run bestanden wijzigde: stempel
+   `boomVuil: true`. Een meting uit een vuile werkboom is per definitie niet te
+   herhalen, en de norm `registersUitVuileBoom` deed precies zijn werk -- ik keek
+   niet.
+2. `test/meterijk.test.js` zet met opzet een nepafhankelijkheid
+   (`zz-ijk-tijdelijk`) in `package.json` en blaast `LUSSEN.json` op van
+   `kritiek: 1` naar `7`, om te controleren dat de meters meebewegen. Allebei
+   ruimt hij zelf op. Committen zou een nepdependency vastleggen in een project
+   dat er nul heeft; terugzetten zou zijn herstel slopen. **Niets doen is hier
+   het werk.**
+3. De lokale ci-keten met `pkill -9` doodschieten midden in de e2e-fase liet een
+   half `.schermjournaal` achter. Een dekkingsmeting telde dat als volwaardig mee
+   en meldde vijf gaten die geen gaten waren -- ze stonden alle vijf gewoon in het
+   ingecheckte register. Dat kostte twee volle meetrondes.
+
+*De regel die eruit volgt:* draai nooit twee meetketens tegelijk, commit niet
+door een lopende ronde heen, en beëindig een keten niet halverwege een fase. Wat
+een suite als neveneffect schrijft (een nieuw tijdstempel in `VINDBAAR.json`,
+`SUITE.json`, `LADDER.json`) hoort niet in een diff: het is ruis die de volgende
+lezer moet uitpluizen voor niets.
+
+**Handhaver:** `lib/stempel.js` zet `boomVuil` op elk register en
+`scripts/norm.js` ratelt `registersUitVuileBoom`; de deltapoort meldt hem per
+bestand met de reden. Voor de mens die midden in een ronde commit bestaat geen
+handhaver.
+
+---
+
+### 16. Een handhaver die één vorm kent, bewaakt één vorm
+
+Een poort die op een PATROON zoekt, vindt dat patroon. Niet het probleem. Zodra
+dezelfde fout er anders uitziet, is hij stil -- en zijn groen leest dan als een
+uitspraak over het probleem in plaats van over de vorm.
+
+*Het geval, 13 september 2026:* de pipe-regel in `scripts/meetkeuring.js` bestaat
+omdat de poortwacht 484 KB JSON printte en `process.exit()` aanriep: naar een
+BESTAND schrijft node synchroon, naar een PIPE niet, en er kwam 146176 bytes uit
+-- geldige tekst, kapotte JSON, exitcode 0. Twee derde weg zonder signaal. De
+regel zoekt sindsdien naar `console.log(JSON.stringify(` met een `process.exit(`
+er vlak achter, en vond diezelfde dag terecht `scripts/aanvoervorm.js`.
+
+Wat hij NIET vond was de variant die ik een uur eerder zelf had geschreven:
+`process.stdout.write(JSON.stringify(…))` gevolgd door `process.exit(0)`.
+Hetzelfde risico, ander werkwoord, en juist die uitvoer wordt door een pipe
+gelezen -- door `execFileSync` in de toets die ik er net bij had gezet.
+
+*Hetzelfde patroon, andere plek:* `scripts/dekking.js` belooft in zijn kop de
+UNIE van alle journalen te tellen. Twee van de drie takken deden dat; de tak die
+de suite vers draait zette `journalen = [eigen]`. Browser-only routes kwamen daar
+dus altijd als gat terug, en met vijf zulke routes kan die tak de eis van 100%
+nooit halen -- `--vastleggen` kon er structureel niet slagen. Dat is regel 6 in
+het klein: de belofte stond in de tekst en gold voor twee derde van de code.
+
+*Wat de regel vraagt:* vraag bij elke handhaver niet "vindt hij dit geval?" maar
+**"hoe ziet dit geval eruit als iemand het anders schrijft?"** -- en waar het
+antwoord onbekend is, hoort dat erbij te staan in plaats van weggelaten te worden.
+
+**Handhaver:** `scripts/mutatie.js` is de bestaande vorm ervan: hij muteert de
+code en eist dat een toets zakt. Een handhaver die een tweede schrijfwijze niet
+ziet, zakt daar niet op -- en daarvoor staat deze regel hier.
+
+---
+
 ---
 
 ## Wat de lat betekent per tijdvak
@@ -584,6 +698,9 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | waargenomen endpoint-dekking uit het routejournaal | `scripts/dekking.js` |
 | welke apps een toets ECHT heeft geopend ("af" is geen bewering) | `scripts/schermen.js` + `NORM.json` |
 | elke meter een keer zien uitslaan voor hij een oordeel draagt | `test/meterijk.test.js` + `check.js` regel 35 |
+| een register-afdruk loopt niet achter op de code die hij beschrijft | `test/mutatiecontract.test.js` + `test/capabilities.test.js` toets 8 |
+| een meting uit een vuile werkboom is geen bewijs | `lib/stempel.js` (`boomVuil`) + `registersUitVuileBoom` in `NORM.json` |
+| grote uitvoer gevolgd door `process.exit()` kapt bij een pipe af | de pipe-regel in `scripts/meetkeuring.js` |
 | de prestatielat: p99, doorvoer, event-loop, herstel | `BEPROEVING.json` + `scripts/norm.js` |
 | wie bewaakt wat, en wat bewaakt niemand | `scripts/samenhang.js` |
 | hoeveel losse schalen beantwoorden "mag de machine dit zelf" (vijf, en ze kennen elkaar niet) | `GEZAG.json` + `scripts/gezag.js` |

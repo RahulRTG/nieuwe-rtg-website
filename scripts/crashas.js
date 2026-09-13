@@ -168,7 +168,8 @@ function padOordeel(rij, grens) {
     grond: 'scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (' + stand + ')' };
   if (stand === 'GEEN_DUURZAME_WEG') return { bestaat: VERDICT.NEE, graad: 'gemeten',
     grond: 'gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, ' +
-      'dus hij loopt niet langs bijeen() of saveDuurzaam() -- hij schrijft met de gewone ' +
+      'dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame ' +
+      'commit) -- hij schrijft met de gewone ' +
       'write-behind save(), en die kent dit moment niet',
     wordtRelevantAls: 'deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU ' +
       'bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens' };

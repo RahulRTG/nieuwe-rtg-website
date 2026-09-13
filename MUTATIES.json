@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T10:26:21.885Z",
-    "commit": "026beb8f",
+    "op": "2026-09-13T10:54:38.184Z",
+    "commit": "e265a5dd",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4985,6 +4985,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "mn01-bevoegdheidsvoordeel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/routes.js",
+      "operator": "&&->||#0",
+      "gezakt": 2,
+      "geprobeerd": 4
     },
     "mobiliteit-werkkant-routes.test.js": {
       "soort": "server",

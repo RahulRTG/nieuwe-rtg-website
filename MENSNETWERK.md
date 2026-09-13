@@ -718,9 +718,15 @@ AI nooit zelf toegang belooft of verleent.
 | MN-06 | **Vertrek is een knop en geen gesprek.** Intrekken kan per direct, zonder tussenkomst van wie wordt ingetrokken. | `kern/vertegenwoordiging/acties.js` -- staat |
 | MN-07 | **RTG stelt geen oordeel vast over de vertegenwoordiger van iemand anders.** Feiten uit een contract mogen; een kwalificatie is `advies` en draagt zijn klasse. | par. 2.6 -- de juridische zekerheidsindeling bestaat niet |
 
-Van de zeven hebben er vandaag **twee** een handhaver (MN-01 deels, MN-06). Dat
-is de eerlijke stand, en het is dezelfde waarin `KANTOOR.md` par. 13 zijn tien
-wetten aantrof.
+Van de zeven hebben er vandaag **twee** een handhaver (MN-01, MN-06). Dat is de
+eerlijke stand, en het is dezelfde waarin `KANTOOR.md` par. 13 zijn tien wetten
+aantrof.
+
+> **13 september 2026:** MN-01 stond hier als *"deels"*, en dat woord dekte iets
+> ongemakkelijks: de regel werd afgedwongen door een AFWEZIGHEID. Er was geen
+> kantoorweg naar een machtiging, en wie er morgen een toevoegde brak de regel
+> zonder dat er iets rood werd. `test/mn01-bevoegdheidsvoordeel.test.js` maakt
+> er een bewering van die kan zakken -- zie par. 4a.
 
 **MN-04 verdient een waarschuwing apart.** Tot 20 augustus 2026 had de boardroom
 een generieke commissieknop: standaard 12 procent, per genre te zetten, tot 30
@@ -833,7 +839,8 @@ grens die ná het belang komt is geen grens.
 | **0** | **De faalproef een kantoorsessie op naam geven** -- zonder die stap is de gevoelige kantoorkant niet te beproeven en is besluit 5 niet te bewijzen | **staat** (13 sept): `kantoor-a` en `kantoor-b`, en het vier-ogenprincipe is voor het eerst gemeten |
 | **0b** | **Besluit 5 zelf** -- geen aantoonbaar journaal, geen inzage | **staat** aan de ledenbalie; de andere 41 aanroepers van `noteer()` gaan per plek om |
 | **1** | **Rugdekking zichtbaar maken** -- een mens moet kunnen zien dat de relatie bestaat | **een halve dag** |
-| **2** | **MN-01 + MN-02 als toets** -- geen macht- en geen informatievoordeel | **een stap weg**, en par. 0.5 zegt waar MN-02 begint |
+| **2a** | **MN-01 als toets** -- geen bevoegdheidsvoordeel | **staat** (13 sept): zeven bewijzen, vijf mutaties gezien zakken -- par. 4a |
+| **2b** | **MN-02 als toets** -- geen informatievoordeel dat overdraagt | **een stap weg**, en par. 0.5 zegt waar hij begint |
 | **3** | **MN-03 als regel** -- vóór RTG zichzelf ooit als optie presenteert | **een stap weg** |
 | **4** | **Besluit: wordt RTG juridisch en commercieel vertegenwoordiger?** | **een besluit van de eigenaar** |
 | **5** | **Eén intern testtalent, een volledige synthetische loopbaan** | **na 4** -- zie hieronder |

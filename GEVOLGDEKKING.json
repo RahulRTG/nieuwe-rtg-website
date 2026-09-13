@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-13T10:05:17.420Z",
-  "commit": "fd3d8cab",
+  "op": "2026-09-13T10:32:45.765Z",
+  "commit": "16c98892",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 6,
   "instrument": "scripts/gevolgdekking.js",
   "node": "v22.22.2"
  },
@@ -18,10 +18,11 @@
   "contractGedeeltelijk": 0,
   "contractOnbekend": 172,
   "contractenGezakt": 0,
-  "contractenBuitenBereik": 1
+  "contractenBuitenBereik": 2
  },
  "fouten": [],
  "buitenBereik": [
+  "/api/office/bank/handtekening/bevestig",
   "/api/office/bank/incasso"
  ],
  "rijen": [

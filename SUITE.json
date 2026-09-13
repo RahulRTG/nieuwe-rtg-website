@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-13T13:52:12.225Z",
-  "commit": "42569ace0d07fd88aa60f9fd778d5195a7c05367",
+  "op": "2026-09-13T15:07:09.271Z",
+  "commit": "ba0e92ac468682073d4b5d3b9e48d8e5c1698763",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/test-runner.js",
   "node": "v22.22.2"
  },
@@ -17,9 +17,9 @@
   "afsluitcode": 1,
   "groen": false,
   "tapVolledig": true,
-  "tests": 13181,
-  "geslaagdeTests": 13154,
-  "mislukt": 5,
+  "tests": 13138,
+  "geslaagdeTests": 13114,
+  "mislukt": 2,
   "geannuleerd": 0,
   "overgeslagen": 22,
   "todo": 0

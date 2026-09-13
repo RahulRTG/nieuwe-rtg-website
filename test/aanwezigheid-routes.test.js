@@ -1,5 +1,18 @@
 /* DE ZES ROUTES VAN DE PUBLIEKE LAAG, tegen een echte server.
 
+   WAAROM DIT EEN .test.js IS EN GEEN .e2e.js, want dat is het een dag lang wel
+   geweest en het liet CI zakken. De `.e2e.js`-suite is de SCHERMsuite: 212 van
+   de 217 bestanden daar sturen een browser aan, en zij schrijft haar eigen
+   journaal (`.schermjournaal`). Deze toets start wel een echte server maar
+   opent geen browser -- net als 745 andere `.test.js`-bestanden -- en hoorde
+   dus nooit in die suite.
+
+   WAT DAT KOSTTE: `test/routedekking.test.js` eist dat ELKE route die de server
+   registreert tijdens de suite echt is aangeraakt, en kent geen norm om die eis
+   te verlagen. De zes routes hieronder werden alleen door dit bestand geraakt,
+   dus stonden ze als "nooit aangeraakt" -- terwijl er een toets voor was. Een
+   toets in de verkeerde suite dekt niets.
+
    test/aanwezigheid.test.js beproeft de MODULES; deze toets beproeft de weg
    ernaartoe. Dat verschil is hier geen formaliteit: de twee besluiten van
    13 september gaan allebei over WIE iets mag doen, en dat staat op de route en

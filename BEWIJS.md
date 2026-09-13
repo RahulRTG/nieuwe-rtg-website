@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1838 bestanden en 13054 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1839 bestanden en 13063 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1838 |
-| losse beweringen (`test(...)`) | 13054 |
+| toetsbestanden | 1839 |
+| losse beweringen (`test(...)`) | 13063 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1216 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 66 |
-| alleen in de kop *genoemd*, nog niet gemeten | 154 |
+| alleen in de kop *genoemd*, nog niet gemeten | 155 |
 | niets van beide | 402 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1622 bestanden, 12672 beweringen.
+1623 bestanden, 12681 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -922,6 +922,7 @@ toets omvalt.
 | `onboarding-meebouwen.test.js` | 4 | -- | MEEBOUWEN: de twee dingen die een nieuw lid aan het platform zelf bijdraagt, elk met een toestemming die ergens op slaat. Sinds de demo-inhoud eruit is begint een installatie leeg -- De Salon zonder berichten, de... |
 | `onboarding.test.js` | 11 | gezakt op `liegpoort /api/` | De verplichte onboarding + het contract: elk account vult de standaardgegevens in (paspoort, e-mail, telefoon, adres, ...) en tekent het contract. De eigenaar past de eisen en het contract aan (met AI in gewone taal,... |
 | `onderhoud.test.js` | 8 | gezakt op `===->!==#0` | DE VEGER MAG DE REM NIET LOSSEN. WAT ER MIS WAS, EN TWEE KEER. |
+| `ondernemerbewijs.test.js` | 9 | genoemd | DE BUSINESS PROOF MAP: kan hij zakken? ONDERNEMERBEWIJS.json is een PROJECTIE over zeven bestaande registers. |
 | `ondernemerpoort-e2e.test.js` | 4 | gezakt op `liegpoort /api/` | Ondernemer-poort, end-to-end: een zaak die offline staat is niet zichtbaar voor leden; pas na de poort (Salon-pagina + rondleiding kassa en werk-apps) kan de manager de zaak online zetten en verschijnt hij weer. npm test |
 | `ondernemerpoort.test.js` | 6 | gezakt op `true->false#0` | Ondernemer-poort (kern/ondernemerpoort.js): een nieuwe zaak loopt eerst de basis door (Salon-pagina + rondleiding kassa en werk-apps) voordat hij online mag. Bestaande zaken zijn grandfathered (online tenzij... |
 | `onderneming-belasting.test.js` | 16 | gezakt op `===->!==#0` | Ronde: de belastingreservering. Vier beweringen, en ze gaan alle vier over het verschil tussen een HARD getal en een INDICATIE: 1. |

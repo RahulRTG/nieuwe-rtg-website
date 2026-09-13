@@ -1514,6 +1514,20 @@ const IJKINGEN = {
       (j) => { j.gemeten.domeinen = Math.max(0, (j.gemeten.domeinen || 0) - 3); return j; },
       () => voor.carriereDomeinenGemeten - norm.meet().carriereDomeinenGemeten)
   },
+  /* DE TAND VAN 13 SEPTEMBER 2026: stageDomeinenGemeten telt de publieke
+     domeinen die scripts/stagevorm.js werkelijk heeft gezien (STAGE.md par. 0).
+     Dezelfde vorm en dezelfde richting als zijn zuster hierboven, en om dezelfde
+     reden OMLAAG: de uitkomst van die meter is een NUL (0 velden gedeeld over
+     tien domeinen), en op een nul rust een architectuurbesluit. Ziet de meter
+     stil minder domeinen, dan blijft diezelfde nul op het scherm staan terwijl
+     hij iets anders is gaan betekenen -- van "deze domeinen delen niets" naar
+     "we hebben minder gekeken". Dat is precies de verwarring die deze tand moet
+     tegenhouden, en ze is van buiten niet te zien. */
+  stageDomeinenGemeten: {
+    proef: (voor) => metVervangenJson('STAGEVORM.json',
+      (j) => { j.gemeten.vorm.domeinen = Math.max(0, (j.gemeten.vorm.domeinen || 0) - 4); return j; },
+      () => voor.stageDomeinenGemeten - norm.meet().stageDomeinenGemeten)
+  },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
      de meter leest `gemeten.defecten` uit een register dat er al is, dus hij

@@ -2,9 +2,9 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-13",
   "gemeten": {
-    "bestanden": 2238,
-    "domeinenTotaal": 606,
-    "koopbareVormen": 537,
+    "bestanden": 2253,
+    "domeinenTotaal": 613,
+    "koopbareVormen": 538,
     "koopbareDomeinen": 114,
     "envelopDrempel": 7,
     "envelop": 46,
@@ -79,7 +79,7 @@
     "reserveer": 28,
     "bevestig": 54,
     "lever": 20,
-    "annuleer": 29,
+    "annuleer": 30,
     "retour": 7
   },
   "overalAanwezig": [],
@@ -870,6 +870,26 @@
       "telt": 4
     },
     {
+      "domein": "kern/stuur",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": false,
+        "reserveer": true,
+        "bevestig": true,
+        "lever": false,
+        "annuleer": true,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "lijst",
+        "reserveer": "inhoudswoorden",
+        "bevestig": "stuurBevestig",
+        "annuleer": "intrek"
+      },
+      "telt": 4
+    },
+    {
       "domein": "kern/verblijf",
       "heeft": {
         "toon": true,
@@ -1154,25 +1174,6 @@
         "toon": "overzicht",
         "bevestig": "boek",
         "annuleer": "annuleer"
-      },
-      "telt": 3
-    },
-    {
-      "domein": "kern/stuur",
-      "heeft": {
-        "toon": true,
-        "prijs": false,
-        "beschikbaarheid": false,
-        "reserveer": true,
-        "bevestig": true,
-        "lever": false,
-        "annuleer": false,
-        "retour": false
-      },
-      "bewijs": {
-        "toon": "lijst",
-        "reserveer": "inhoudswoorden",
-        "bevestig": "stuurBevestig"
       },
       "telt": 3
     },

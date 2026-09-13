@@ -154,7 +154,7 @@ test('elk tijdelijk ijkbestand staat in .gitignore', () => {
      mist met OPZET de koppeltekens van zijn acht broertjes (de meter groepeert
      op `familie` -- alles voor het eerste koppelteken -- dus `zz-ijk-bron` en
      `zz-ijk-doel` zouden allebei familie `zz` heten en de meter zou niet
-     bewegen). Precies daardoor viel hij buiten elk `zz-ijk-tijdelijk*`-patroon
+     bewegen). Precies daardoor viel hij buiten elk patroon voor tijdelijke ijkbestanden
      in .gitignore, en is hij met een `git add -A` meegecommit terwijl de ijking
      liep.
 

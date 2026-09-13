@@ -1,30 +1,30 @@
 {
  "stempel": {
-  "op": "2026-09-13T11:44:55.996Z",
-  "commit": "3bab9bdf",
+  "op": "2026-09-13T13:31:07.849Z",
+  "commit": "2da9ad12",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 3,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4922,
-  "geclassificeerd": 4922,
+  "totaal": 4933,
+  "geclassificeerd": 4933,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3189,
-   "NOT_APPLICABLE": 1174,
-   "PROTECTED": 431,
+   "NOT_APPLICABLE": 1179,
+   "PROTECTED": 437,
    "INTENTIONALLY_NON_IDEMPOTENT": 128
   },
-  "vastgesteldDoorMens": 1781,
+  "vastgesteldDoorMens": 1792,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4061,
+   "AUTHENTICATED": 4071,
    "PUBLIC": 123,
    "OBJECT_SCOPED": 718,
-   "(niet af te leiden -- vraagt een verklaring)": 4,
+   "(niet af te leiden -- vraagt een verklaring)": 5,
    "SERVICE_TO_SERVICE": 15,
    "SYSTEM_INTERNAL": 1
   },
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 136,
    "kale ronde: onbeschermd": 92,
    "kale ronde: geen uitspraak": 4684,
-   "niet gemeten": 10
+   "niet gemeten": 21
   },
   "voorstellen": {},
   "metingVan": "2026-09-13T11:40:04.658Z"
@@ -38067,6 +38067,69 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "mediaos.aanwezig.een",
+   "route": "POST /api/mediaos/aanwezig",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "mediaos.aanwezig.mijn",
+   "route": "POST /api/mediaos/aanwezig/mijn",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "mediaos.aanwezig.volg",
+   "route": "POST /api/mediaos/aanwezig/volg",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "velden",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "geen anonieme demo-gast",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "mediaos.bewaar",
    "route": "POST /api/mediaos/bewaar",
    "semantiek": {
@@ -50409,6 +50472,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "stuur.voorstel.intrek.lid",
+   "route": "POST /api/member/voorstel/intrek",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "nietIdempotent",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "auth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "member.vooruit",
    "route": "POST /api/member/vooruit",
    "semantiek": {
@@ -55382,7 +55466,7 @@
    "mutatieId": "bank.incasso.aanvragen",
    "route": "POST /api/office/bank/incasso",
    "semantiek": {
-    "klasse": "nietHerhaalbaar"
+    "klasse": "sleutelVereist"
    },
    "duplicaatregel": null,
    "toegang": {
@@ -55401,6 +55485,27 @@
     "hindernis": null
    },
    "stand": "INTENTIONALLY_NON_IDEMPOTENT",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "bank.incasso.dossier.lezen",
+   "route": "POST /api/office/bank/incasso/dossier",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "kluisAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
@@ -61456,6 +61561,27 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "pay.factuur.correctie",
+   "route": "POST /api/office/pay/factuurcorrectie",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "zelfdeVerzoek",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "officeAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "office.payroll.aangifte",
    "route": "POST /api/office/payroll/aangifte",
    "semantiek": {
@@ -64044,6 +64170,69 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "salon.uitlicht",
+   "route": "POST /api/office/salon/uitlicht",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": "velden",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "salon.uitlicht.bord",
+   "route": "POST /api/office/salon/uitlicht/bord",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "salon.uitlicht.intrek",
+   "route": "POST /api/office/salon/uitlicht/intrek",
+   "semantiek": {
+    "klasse": "hooguitEens"
+   },
+   "duplicaatregel": "velden",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "boardroomAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -79172,6 +79361,25 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "knelpunt.reken.gezin",
+   "route": "POST /api/rtf/knelpunt",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": null,
+    "uitHandler": null,
+    "bedoeld": "OBJECT_SCOPED",
+    "bewakers": []
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -95784,6 +95992,27 @@
     "hindernis": null
    },
    "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "supplier.activity.lezen",
+   "route": "POST /api/supplier/activity",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": "manager",
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
    "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null

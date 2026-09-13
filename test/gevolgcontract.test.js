@@ -253,7 +253,8 @@ test('HET REGISTER IS SAMENGESTELD, en een dubbele definitie valt om bij het LAD
      toen er twee pay-delen bijkwamen zei deze toets dat het register niet de som van zijn
      delen was -- terwijl het dat wel was; de toets kende de som niet. Een lijst delen die
      met de hand meegroeit, is precies de tweede waarheid die dit register vermijdt. */
-  const DELEN = ['register-bank', 'register-lid', 'register-pay-oplaad', 'register-pay-stuur']
+  const DELEN = ['register-bank', 'register-lid', 'register-pay-oplaad', 'register-pay-stuur',
+    'register-pay-factuur']
     .map(n => [n + '.js', Object.values(require('../server/kern/stuur/gevolgcontract/' + n))[0]]);
   assert.ok(DELEN.length >= 4, 'de delenlijst is leeg of onvolledig');
   for (const [naam, deel] of DELEN)
@@ -314,6 +315,41 @@ test('de route waar het geld BEWEEGT is verklaard, en zijn gevolg is GEDELEGEERD
    vergeleken op de gesloten woordenlijst van kern/isolatie/effectwoorden.js.
    ------------------------------------------------------------------------- */
 const vg = require('../server/kern/stuur/gevolgcontract/vergelijk');
+
+test('GELD_BEWEGEN EN `lezen` KUNNEN NIET SAMEN: het contract toetst de allowlist', () => {
+  /* DIT IS DE ALGEMENE REGEL ACHTER EEN CONCREET GAT. /api/pay/saldo stond in de LEZEN-lijst
+     van kern/stuur/beleid-lijsten.js -- die belooft "haalt op en verandert niets" -- en
+     betaalt de maandfactuur uit het eigen saldo. Hij is op 13 september 2026 naar `voorstel`
+     gegaan (toets 4b van test/stuur-niveaus.test.js).
+
+     Die verplaatsing is een losse reparatie; DIT is de regel die hem had gevonden. Zodra een
+     handeling een gevolgcontract heeft dat GELD_BEWEGEN verklaart, mag zij niet op een
+     niveau staan waarop het stuur haar zonder bevestiging uitvoert -- `lezen` en `klein`
+     zijn precies die twee (DIRECT is hun vereniging). De twee registers toetsen elkaar dus,
+     in plaats van allebei apart te worden nagekeken.
+
+     MUTATIEPROEF: zet `saldo` terug in de LEZEN-regex en deze toets zakt naast 4b. */
+  const { beleidVoor } = require('../server/kern/stuur/beleid');
+  const ZONDER_BEVESTIGING = ['lezen', 'klein'];
+  let getoetst = 0;
+  const stuk = [];
+  for (const [pad, c] of Object.entries(CONTRACTEN)) {
+    if (!(c.veroorzaakt || []).includes('GELD_BEWEGEN')) continue;
+    for (const rol of ['member', 'supplier', 'staff']) {
+      const n = beleidVoor(pad, rol).niveau;
+      if (n === 'verboden') continue;       // buiten het bereik van de AI: geen uitspraak
+      getoetst++;
+      if (ZONDER_BEVESTIGING.includes(n)) stuk.push(pad + ' (' + rol + ') staat op `' + n + '`');
+    }
+  }
+  assert.deepStrictEqual(stuk, [],
+    'een handeling die volgens haar eigen gevolgcontract GELD_BEWEGEN veroorzaakt, staat op een ' +
+    'niveau waarop het stuur haar zonder bevestiging uitvoert: ' + stuk.join('; '));
+  /* EN DE TOETS MAG NIET LEEGLOPEN. Zonder deze regel zou hij groen blijven op het moment dat
+     er geen enkel geldcontract meer AI-bereikbaar is -- en dan bewaakt hij niets. */
+  assert.ok(getoetst >= 4, 'deze toets heeft maar ' + getoetst + ' geldpad(en) kunnen wegen; ' +
+    'dat is te weinig om iets te bewaken -- staan de contracten nog in het register?');
+});
 
 test('DE WALLET-CONTRACTEN: `nooit` wordt AFGEDWONGEN tegen de bron, niet beweerd', () => {
   /* Dit is het verschil tussen een contract en een voornemen. Beide walletcontracten zetten

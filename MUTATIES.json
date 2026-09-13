@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T12:07:18.751Z",
-    "commit": "1539be46",
+    "op": "2026-09-13T12:25:05.561Z",
+    "commit": "b1600666",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -9188,6 +9188,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "wetrelatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/wetrelatie.js",
+      "operator": "return-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "wetten.test.js": {
       "soort": "puur",

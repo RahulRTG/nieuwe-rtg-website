@@ -120,7 +120,7 @@ test('bestaande echte DOM wordt geadapteerd zonder knoppen of data te kopiëren'
 });
 
 test('Heritage laadt de centrale visuele standaard als laatste laag', () => {
-  assert.match(TOKENS, /@import url\('\/shared\/rtg-simple\.css\?v=16'\);/);
+  assert.match(TOKENS, /@import url\('\/shared\/rtg-simple\.css\?v=17'\);/);
   assert.equal((TOKENS.match(/rtg-simple\.css/g) || []).length, 1);
 });
 
@@ -154,6 +154,8 @@ test('mobiel gebruikt overal één goed aanraakbare Meta-achtige RTG-rand', () =
   assert.match(mobiel, /border-radius:var\(--rtg-radius-system\)!important/);
   assert.match(mobiel, /min-height:60px!important/);
   assert.match(mobiel, /\.rtg-edge-ai\{[\s\S]*grid-column:3!important/);
+  assert.match(mobiel, /\.rtg-edge-ai\{[\s\S]*position:absolute!important/);
+  assert.match(mobiel, /left:50%!important;top:6px!important;width:64px!important;transform:translateX\(-50%\)!important/);
   assert.match(mobiel, /\.rtg-edge-mouth\{width:64px!important;height:34px!important\}/);
   assert.match(mobiel, /\.rtg-edge-ai small\{display:none!important\}/);
   for (const oud of ['.rtgdeel-balk', '.ios-thuis', '.tos-nav', '.tos-topbar', '.wos-dock', '.ws-balk'])

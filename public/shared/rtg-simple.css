@@ -632,7 +632,8 @@ body[data-rtg-edge-2-rendered="true"]>.verderbalk:empty{display:none!important}
     display:flex!important;grid-column:2!important
   }
   body.rtg-edge-host .rtg-edge-ai{
-    display:flex!important;grid-column:3!important;position:relative!important;
+    display:flex!important;grid-column:3!important;position:absolute!important;
+    left:50%!important;top:6px!important;width:64px!important;transform:translateX(-50%)!important;
     color:var(--edge-bar-accent)!important;filter:drop-shadow(0 0 8px color-mix(in srgb,var(--edge-bar-accent) 52%,transparent))
   }
   body.rtg-edge-host .rtg-edge-actions-trigger{

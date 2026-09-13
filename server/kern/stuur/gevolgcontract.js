@@ -60,83 +60,16 @@
    ========================================================================== */
 'use strict';
 
-const gevolg = require('./gevolg');
 
 /* De graden, de soorten en de geleende classificaties wonen in
    ./gevolgcontract/woorden.js -- daar staat ook waarom deze laag `gevolg` heet en
    niet `effect`, want dat woord is in dit huis vijf keer bezet. */
-const { GRADEN, SOORTEN, klassen } = require('./gevolgcontract/woorden');
+const { GRADEN, SOORTEN, klassen, werkwoorden } = require('./gevolgcontract/woorden');
 
-/* ---------------------------------------------------------------------------
-   DE KEURING. Een contract komt er alleen door als elke bewering draagbaar is.
-   ------------------------------------------------------------------------- */
-function keur(c) {
-  const fout = [];
-  const pad = (c && c.capability) || null;
-  if (!pad || !String(pad).startsWith('/api/')) fout.push('een contract zonder capability-pad');
-
-  /* GEEN HANDMATIG HERSTEL. Zie punt 1 in de kop: herstel is gemeten en heeft
-     vijf uitslagen; een verklaring eroverheen is een platslag. */
-  for (const verboden of ['reversible', 'omkeerbaar', 'herstelbaar', 'compensation']) {
-    if (c && Object.prototype.hasOwnProperty.call(c, verboden))
-      fout.push('het veld "' + verboden + '" wordt niet verklaard maar GEMETEN ' +
-        '(scripts/herstelproef.js, vijf uitslagen); verwijs ernaar in plaats van het te beweren');
-  }
-  /* En de drie namen die al bezet zijn. Een botsing op een centrale naam is de
-     duurste fout die SEMANTIEK.json meet, dus hij wordt hier geweigerd en niet
-     stilzwijgend omgezet. */
-  const bezet = { doel: 'streefstand', doelen: 'streefstand', privacyImpact: 'classificatie',
-    goals: 'streefstand' };
-  for (const [naam, ipv] of Object.entries(bezet))
-    if (c && Object.prototype.hasOwnProperty.call(c, naam))
-      fout.push('het veld "' + naam + '" heet hier "' + ipv + '" -- die naam is elders al bezet');
-
-  /* Elke bewering draagt een SOORT, een graad uit de vier, en een reden. */
-  const beweringen = Array.isArray(c && c.gevolgen) ? c.gevolgen : [];
-  if (!beweringen.length) fout.push('een contract zonder enkel gevolg; dan is er niets verklaard');
-  for (const g of beweringen) {
-    const merk = (g && g.wat) ? String(g.wat).slice(0, 40) : '(zonder wat)';
-    if (!g || !SOORTEN.includes(g.soort)) fout.push(merk + ': soort hoort een van ' + SOORTEN.join('/') + ' te zijn');
-    if (!g || !GRADEN.includes(g.graad)) fout.push(merk + ': graad hoort een van ' + GRADEN.join('/') + ' te zijn');
-    if (!g || !g.wat) fout.push('een gevolg zonder `wat`');
-    if (g && !g.reden) fout.push(merk + ': elk gevolg draagt een reden, ook een gemeten');
-    /* DE UITKOMSTRUIMTE IS EEN VELD EN GEEN TREDE (punt 2 in de kop). Staat hij
-       er, dan is hij GESLOTEN: een lijst met minstens twee benoemde uitkomsten.
-       Een lijst van een is geen ruimte maar een bewering. */
-    if (g && g.uitkomsten !== undefined) {
-      if (!Array.isArray(g.uitkomsten) || g.uitkomsten.length < 2)
-        fout.push(merk + ': `uitkomsten` is een GESLOTEN set van minstens twee benoemde uitkomsten');
-    }
-    /* Een gevolg BUITEN de opslag kan nooit `gemeten` zijn: de meting kijkt
-       alleen naar collecties. Dat staat in GRENZEN van gevolg.js als punt 3, en
-       hier wordt het afgedwongen in plaats van gehoopt. */
-    if (g && g.soort === 'buiten' && (g.graad === 'gemeten' || g.graad === 'bewezen'))
-      fout.push(merk + ': een gevolg buiten de opslag kan niet `' + g.graad +
-        '` zijn -- gevolg.js kijkt alleen naar collecties (zie zijn GRENZEN, punt 3)');
-  }
-
-  if (c && c.classificatie !== undefined && !klassen().includes(c.classificatie))
-    fout.push('classificatie "' + c.classificatie + '" staat niet in de woordenlijst van kern/envelop.js');
-
-  /* DE BELANGRIJKSTE: EEN GEMETEN DIRECT GEVOLG MOET DOOR DE METING GEDEKT ZIJN.
-     Claimt het contract dat een collectie verandert en zag de proef die collectie
-     nooit, dan is dat geen verklaring maar een wens. Omgekeerd mag de meting MEER
-     zien dan het contract noemt -- dat is een onvolledig contract en geen leugen,
-     en `dekking()` hieronder telt het als GEDEELTELIJK. */
-  if (pad) {
-    const m = gevolg.gevolgVan(pad);
-    const gemeten = new Set(m.collecties || []);
-    for (const g of beweringen) {
-      if (!g || g.soort !== 'direct' || g.graad !== 'gemeten') continue;
-      if (!g.collectie) { fout.push(String(g.wat).slice(0, 40) + ': een gemeten direct gevolg noemt zijn collectie'); continue; }
-      if (!gemeten.has(g.collectie))
-        fout.push(String(g.wat).slice(0, 40) + ': claimt `gemeten` op collectie "' + g.collectie +
-          '" maar de proef zag die daar nooit veranderen (gevolg.js zegt: ' + m.graad + ')');
-    }
-  }
-  return fout;
-}
-
+/* De keuring woont in ./gevolgcontract/keuring.js -- zij groeit met elke regel die
+   iemand erbij bedenkt, en deze laag hoort daar niet mee te groeien (dezelfde naad
+   als server/kern/mutatiecontract/keuring.js naast zijn register). */
+const { keur } = require('./gevolgcontract/keuring');
 const { stand, STANDEN } = require('./gevolgcontract/stand');
 
-module.exports = { keur, stand, GRADEN, SOORTEN, STANDEN, klassen };
+module.exports = { keur, stand, GRADEN, SOORTEN, STANDEN, klassen, werkwoorden };

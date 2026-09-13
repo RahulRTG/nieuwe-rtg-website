@@ -293,3 +293,101 @@ test('de route waar het geld BEWEEGT is verklaard, en zijn gevolg is GEDELEGEERD
   const mislukking = c.gevolgen.find(g => g.soort === 'mislukking');
   assert.match(mislukking.wat, /OPGEBRUIKT/);
 });
+
+/* ---------------------------------------------------------------------------
+   DE VERGELIJKER (server/kern/stuur/gevolgcontract/vergelijk.js).
+
+   Drie soorten conflict, en de scherpste eis is dat hij ze niet op naamgelijkheid
+   vindt: een vooruitblik zegt "2 posten, 4000 cent" en een contract zegt "de
+   collectie bankSaldi verandert". Die twee hebben geen woord gemeen, dus wordt er
+   vergeleken op de gesloten woordenlijst van kern/isolatie/effectwoorden.js.
+   ------------------------------------------------------------------------- */
+const vg = require('../server/kern/stuur/gevolgcontract/vergelijk');
+
+test('de werkwoorden worden GELEEND van het effectmodel en niet bedacht', () => {
+  /* Een eigen lijst hier zou de 22e vermogenslijst van dit huis zijn
+     (CAPABILITEIT.json). Dat de twee lagen dezelfde woorden ANDERS gebruiken is geen
+     botsing maar de bedoeling: het effectmodel wijst een pad zijn werkwoorden toe om
+     isolatie te beslissen, hier verklaart een mens wat een handeling veroorzaakt. */
+  const model = require('../server/kern/isolatie/effectwoorden');
+  assert.deepStrictEqual(ec.werkwoorden(), model.NAMEN);
+  /* En de keuring weigert een woord dat er niet in staat: een tikfout is geen nieuw
+     effect. */
+  const fout = ec.keur({ capability: '/api/x', veroorzaakt: ['GELD_BEWEGE'],
+    gevolgen: [{ soort: 'direct', graad: 'vermoed', wat: 'x', reden: 'y' }] });
+  assert.ok(fout.some(f => /woordenlijst van kern\/isolatie/.test(f)), fout.join(' | '));
+});
+
+test('een werkwoord in `veroorzaakt` EN in `nooit` wordt geweigerd', () => {
+  /* Dan zegt het contract niets, en een vergelijker die daar een winnaar kiest
+     verzint beleid. */
+  const fout = ec.keur({ capability: '/api/x', veroorzaakt: ['GELD_BEWEGEN'], nooit: ['GELD_BEWEGEN'],
+    gevolgen: [{ soort: 'direct', graad: 'vermoed', wat: 'x', reden: 'y' }] });
+  assert.ok(fout.some(f => /zegt het contract niets/.test(f)), fout.join(' | '));
+});
+
+test('DE DRIE SOORTEN, en alleen twee ervan blokkeren', () => {
+  const bevestig = '/api/office/bank/handtekening/bevestig';
+  /* TEGENSPRAAK: het contract van de AANVRAAG sluit GELD_BEWEGEN uit. */
+  const t = vg.vergelijk({ over: '/api/office/bank/incasso', effecten: ['GELD_BEWEGEN'] });
+  assert.strictEqual(t.uitslag, 'CONFLICT');
+  assert.strictEqual(t.blokkeert, true);
+  assert.deepStrictEqual(t.conflicten.map(c => c.soort), ['TEGENSPRAAK']);
+
+  /* GAT: het contract zegt niets over BULK_UITVOER. Dat blokkeert NIET -- wie daarop
+     blokkeert, zet het huis stil op zijn eigen achterstand. */
+  const g = vg.vergelijk({ over: bevestig, effecten: ['GELD_BEWEGEN', 'BULK_UITVOER'] });
+  assert.strictEqual(g.uitslag, 'GATEN');
+  assert.strictEqual(g.blokkeert, false);
+  assert.deepStrictEqual(g.conflicten.map(c => c.werkwoord), ['BULK_UITVOER']);
+
+  /* OVERCLAIM: aangeroepen en niet nagebouwd -- een contract dat `gemeten` claimt op
+     een collectie die de proef daar nooit zag, zakt op de keuring en dat telt hier als
+     conflict. Het register is bevroren, dus de lezer wordt geinjecteerd. */
+  const o = vg.vergelijk({ over: '/api/bank/sepa', effecten: ['GELD_BEWEGEN'] }, { contracten: {
+    '/api/bank/sepa': { capability: '/api/bank/sepa', veroorzaakt: ['GELD_BEWEGEN'],
+      gevolgen: [{ soort: 'direct', graad: 'gemeten', collectie: 'verzonnenCollectie',
+        wat: 'x', reden: 'y' }] } } });
+  assert.strictEqual(o.uitslag, 'CONFLICT');
+  assert.strictEqual(o.blokkeert, true);
+  assert.ok(o.conflicten.some(c => c.soort === 'OVERCLAIM'), JSON.stringify(o.conflicten));
+
+  /* En BLOKKEERT woont op EEN plek, zodat er niet twee zijn die dat beslissen. */
+  assert.deepStrictEqual(vg.BLOKKEERT.slice().sort(), ['OVERCLAIM', 'TEGENSPRAAK']);
+});
+
+test('er wordt NIET op naamgelijkheid vergeleken: een vooruitblik in getallen levert niets', () => {
+  /* De faalvorm die deze module moet uitsluiten: nul conflicten uit een vergelijker
+     die niets kan zien. Een vooruitblik met alleen getallen erin draagt geen
+     werkwoorden, en dan is de uitslag NIET "in orde" maar "er is niets om tegen te
+     houden". Die twee op elkaar laten lijken is het gevaarlijkste groen dat er is. */
+  const r = vg.vergelijk({ over: '/api/bank/sepa', uitslag: { aantal: 2, bedragCenten: 4000 } });
+  assert.strictEqual(r.uitslag, 'ZONDER_WERKWOORDEN');
+  assert.strictEqual(r.blokkeert, false);
+  assert.match(r.reden, /ontbrekende lijst is geen lege lijst/);
+  /* Een EXPLICIET lege lijst is wel een bewering en komt door. */
+  assert.strictEqual(vg.vergelijk({ over: '/api/bank/sepa', effecten: [] }).uitslag, 'IN_ORDE');
+
+  /* EN EEN WOORD DAT NIET IN DE LIJST STAAT MAAKT DE VERGELIJKING ONBRUIKBAAR, en
+     wordt niet stil als gat doorgelaten. Dit gat zat er: een mutatie die de controle
+     uitzette liet `GELD_VERZONNEN` doorvallen naar de vergelijking, waar hij netjes
+     als GAT verscheen -- een tikfout werd dan een bevinding over het contract in
+     plaats van een bevinding over de voorspelling. */
+  const raar = vg.vergelijk({ over: '/api/bank/sepa', effecten: ['GELD_VERZONNEN'] });
+  assert.strictEqual(raar.uitslag, 'ONBRUIKBAAR');
+  assert.strictEqual(raar.blokkeert, false);
+  assert.deepStrictEqual(raar.conflicten, [], 'een onbruikbare vergelijking levert geen bevindingen');
+  assert.match(raar.reden, /niets om tegen te vergelijken/);
+});
+
+test('"geen contract" en "geen conflict" lijken niet op elkaar', () => {
+  const r = vg.vergelijk({ over: '/api/agenda/bewaar', effecten: ['GELD_BEWEGEN'] });
+  assert.strictEqual(r.uitslag, 'ZONDER_CONTRACT');
+  /* Expliciet false en niet undefined: een aanroeper die `if (blokkeert)` schrijft,
+     hoort geen verschil te merken tussen "niets aan de hand" en "het veld bestaat niet". */
+  assert.strictEqual(r.blokkeert, false);
+  /* En het SUBJECT wordt niet geraden: zonder `over` is er niets te vergelijken. */
+  const zonder = vg.vergelijk({ effecten: ['GELD_BEWEGEN'] });
+  assert.strictEqual(zonder.uitslag, 'ZONDER_CONTRACT');
+  assert.match(zonder.reden, /zonder subject is elke vergelijking een gok/);
+});

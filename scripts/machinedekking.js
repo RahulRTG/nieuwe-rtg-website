@@ -228,6 +228,10 @@ const KETENAS_TOKENS = {
   envelop: ['geldketen', 'kern/envelop', 'envelopWie'],
   bewijsketen: ['geldketen', 'lib/keten', 'ketenAnker'],
   gevolg: ['geldketen', 'stuur/gevolg'],
+  /* De zeventiende as (13 september 2026). Hij staat NAAST `gevolg` en niet erin:
+     die zegt wat de proef ooit zag bewegen, deze dat de vooruitblik van DEZE
+     handeling tegen haar gevolgcontract is gehouden. */
+  gevolgcontract: ['geldketen', 'gevolgcontract', 'gevolgpoort'],
   frictie: ['geldketen', 'frictie'],
   idempotentie: ['geldketen', 'idem', 'sleutel'],
   atomair: ['verzoektransactie', 'collectietransactie', 'metTransactie'],

@@ -18,6 +18,13 @@ const LID = Object.freeze({
     classificatie: 'persoonsgegeven',
     streefstand: 'het bedrag staat van de eigen rekening af en er ligt een betaalopdracht ' +
       'die het kantoor kan volgen tot hij is bevestigd of teruggekomen',
+    /* DE WERKWOORDEN. `UITGAANDE_AANROEP` staat er wel bij en dat is het verschil met
+       de kantoorweg hierboven: deze betaling gaat achter de betaal-naad langs een
+       provider (kern/bank/overboeken.js, payout). `EXTERN_BEREIKEN` staat in NOOIT en
+       niet in veroorzaakt: het geld gaat naar buiten, maar dit huis stuurt er geen
+       bericht over -- nagelezen, er staat geen notify of mail in dat pad. */
+    veroorzaakt: ['GELD_BEWEGEN', 'SCHRIJVEN_EIGEN', 'UITGAANDE_AANROEP'],
+    nooit: ['EXTERN_BEREIKEN', 'DERDENCODE_UITVOEREN', 'ONVERTROUWDE_BYTES', 'IDENTITEIT_WIJZIGEN'],
     voorwaarden: [
       { wat: 'een ledensessie en een eigen rekening met dekking', bron: 'auth + bankSaldi' },
       { wat: 'een idempotentiesleutel', bron: 'lib/idem.js weigert een geldhandeling zonder sleutel' }

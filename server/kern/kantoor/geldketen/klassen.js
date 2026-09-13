@@ -43,13 +43,22 @@
    voorbereiding eist, bewijst niets over de handeling zelf -- precies de faalvorm
    die deze hele laag moet uitsluiten. Vandaar een zestiende as die zegt: de
    uitvoering IS door de baan gegaan (vingerafdruk nagekeken, bewijstoken ingeleverd,
-   veiligheidskern langs). */
+   veiligheidskern langs).
+
+   EN EEN ZEVENTIENDE (13 september 2026): `gevolgcontract`. `gevolg` zegt wat de PROEF
+   ooit zag bewegen, en dat is een meting uit het verleden; deze as zegt dat de
+   vooruitblik van DEZE handeling tegen haar gevolgcontract is gehouden en niet is
+   tegengesproken. Ze staan naast elkaar en niet in elkaar: een as die een meting en een
+   vergelijking in een graad samenperst, laat niet zien welke van de twee ontbrak --
+   precies de fout die deze laag over `tegenfeit` al een keer heeft gemaakt (de graad van
+   de as tegenover de graad van het getal). Wie hem eruit haalt, haalt de enige as weg
+   die op een TEGENSPRAAK kan weigeren. */
 const KLASSEN = Object.freeze({
   'geld-eenmalig': Object.freeze({
     wat: 'een handeling die EEN geldbeweging doet',
     verplicht: Object.freeze(['mensbewijs', 'assurance', 'mandaat', 'streefstand', 'voornemen',
       'autoriteit', 'tegenfeit', 'bewijsDraagt', 'frictie', 'tweedeMens', 'idempotentie',
-      'atomair', 'envelop', 'bewijsketen', 'gevolg', 'uitvoering']),
+      'atomair', 'envelop', 'bewijsketen', 'gevolg', 'gevolgcontract', 'uitvoering']),
     waaromNiet: Object.freeze({
       hervatbaar: 'bij EEN geldbeweging is er niets om op te pakken: hij gaat heel door of ' +
         'helemaal niet, en dat is precies wat `atomair` hier verplicht stelt. Hervatbaarheid eisen ' +
@@ -60,7 +69,7 @@ const KLASSEN = Object.freeze({
     wat: 'een handeling die N onafhankelijke geldbewegingen doet',
     verplicht: Object.freeze(['mensbewijs', 'assurance', 'mandaat', 'streefstand', 'voornemen',
       'autoriteit', 'tegenfeit', 'bewijsDraagt', 'frictie', 'tweedeMens', 'idempotentie',
-      'hervatbaar', 'envelop', 'bewijsketen', 'gevolg', 'uitvoering']),
+      'hervatbaar', 'envelop', 'bewijsketen', 'gevolg', 'gevolgcontract', 'uitvoering']),
     waaromNiet: Object.freeze({
       atomair: 'alles-of-niets is hier de VERKEERDE garantie: een incassoronde int bij honderd ' +
         'leden van honderd eigen rekeningen, en dat een van hen te weinig saldo heeft mag de inning ' +

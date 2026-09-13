@@ -840,11 +840,81 @@ maar de **lezer**: de kantoorpaden staan niet in de AI-allowlist en tellen dus n
 in de noemer van de meter (hij meldt ze apart als `contractenBuitenBereik`), het
 ledenpad wel.
 
+##### De vergelijker: de laag wordt voor het eerst ACTIEF (as 17 van de geldketen)
+
+Een laag met een register, toetsen en een meter maar zonder productgedrag is een patroon
+dat dit huis vaker heeft gevonden dan het zou willen. De vergelijker maakt er een eind
+aan: hij houdt de **vooruitblik van het domein** tegen het **gevolgcontract van de
+handeling**, en de gouden geldweg loopt erdoor.
+
+```
+voorgenomen handeling
+       ↓  het domein rekent vooruit wat zij zou doen  (as `tegenfeit`)
+       ↓
+het gevolgcontract zegt wat zij veroorzaakt en wat zij NOOIT veroorzaakt
+       ↓
+de vergelijker  (kern/stuur/gevolgcontract/vergelijk.js)
+       ├─ IN_ORDE / GATEN → de keten loopt door, gaten met naam in het dossier
+       └─ CONFLICT        → de keten STOPT, met de soort en de reden erbij
+```
+
+**Er wordt niet op naamgelijkheid vergeleken, en dat is de dragende keuze.** De
+vooruitblik zegt *"2 posten, 4.000 cent"*; het contract zegt *"de collectie `bankSaldi`
+verandert"*. Die twee hebben geen woord gemeen, dus een tekstvergelijking zou altijd nul
+vinden — en **nul conflicten uit een vergelijker die niets kan zien is het gevaarlijkste
+groen dat er is**. Er wordt daarom vergeleken op een gesloten, gedeelde woordenlijst: de
+dertien effectwerkwoorden uit `kern/isolatie/effectwoorden.js`, **geleend en niet
+bedacht** (een eigen lijst hier zou de 22e vermogenslijst van dit huis zijn). Dat de twee
+lagen diezelfde woorden ánders gebruiken is geen botsing maar de bedoeling: het
+effectmodel wijst een pad zijn werkwoorden toe om isolatie te beslissen, hier verklaart
+een mens wat een handeling veroorzaakt.
+
+| soort | wat het is | blokkeert |
+|---|---|---|
+| **TEGENSPRAAK** | de vooruitblik impliceert een werkwoord dat het contract UITSLUIT | **ja** |
+| **GAT** | de vooruitblik impliceert een werkwoord waarover het contract niets zegt | nee |
+| **OVERCLAIM** | het contract beweert harder dan de meting toelaat (`keuring.js`, aangeroepen en niet nagebouwd) | **ja** |
+
+Waarom die tweedeling: een tegenspraak en een overclaim zijn **defecten tussen twee
+verklaringen van mensen** — beide kanten staan opgeschreven, dus daar is geen
+dekkingsprobleem aan dat eerst in de schaduw hoort te lopen. Een gat is een *ontbrekende*
+verklaring, en wie daarop blokkeert zet het huis stil op zijn eigen achterstand. Die
+weging woont op één plek (`BLOKKEERT` in `vergelijk.js`), want twee plekken die beslissen
+wat blokkeert zijn een halve dag zoeken zodra ze uiteenlopen.
+
+**Het subject komt van het domein en wordt niet geraden.** In deze keten staat de
+vooruitblik bij de **aanvraag** (`/api/office/bank/incasso`) en beschrijft hij wat de
+**ronde** zou doen — en die ronde loopt op een andere route
+(`/handtekening/bevestig`). Tegen het contract van de aanvraag gehouden zou élke
+geldvoorspelling een tegenspraak zijn, want die aanvraag verplaatst met zoveel woorden
+geen euro. Vandaar `tegenfeit.over`. Een vergelijker die het subject raadt, vindt precies
+de conflicten die er niet zijn — en toets 10 van `test/geldketen.test.js` gebruikt juist
+die verkeerde paring om te bewijzen dat de poort werkelijk weigert.
+
+**De keten heeft er een zeventiende as door**, `gevolgcontract`, naast `gevolg` en niet
+erin: die zegt wat de proef ooit zag bewegen, deze dat de vooruitblik van *deze*
+handeling is nagekeken. `npm run machinedekking` staat op **17 van 17 op 3/3 routes** en
+`volledigeKetens` blijft 1. Haal de as eruit en de keten zakt naar nul, met zijn naam
+erbij.
+
+**En het vond een gat in zichzelf.** De eerste versie gaf op een vooruitblik zonder
+werkwoorden de uitslag `IN_ORDE`: er werd niets geïmpliceerd, dus sprak niets iets tegen.
+De hele suite stond daar 9 van 9 groen bij terwijl de as leeg was — precies de stille
+poort waar deze laag tegen is gebouwd. **Een ontbrekende lijst is geen lege lijst**: dat
+laatste moet het domein zéggen (`effecten: []`), en `Array.isArray` is exact dat
+onderscheid. Een tweede gat zat in een tikfout: een werkwoord buiten de lijst viel door
+naar de vergelijking en verscheen daar netjes als *gat*, waarmee een fout in de
+voorspelling een bevinding over het contract werd. Beide gevonden met een mutatie, beide
+nu vastgelegd.
+
 **Wat er nog niet is, en dat hoort erbij:** het register draagt drie contracten, waarvan
 één in de noemer van de meter. De andere
 <!--getal:gevolg.contractOnbekend-->172<!--/getal--> bereikbare handelingen hebben er
-geen. Dat is werk per regel door een mens, en niet iets dat een script in een middag
-kan vullen — dat is letterlijk de les uit de kop van `server/lib/mutatiecontracten.js`.
+geen — en die vullen is nadrukkelijk **niet** de volgende stap: pas nu de vergelijker er
+beslissingen mee neemt, betekent een contract erbij iets meer dan een JSON-regel erbij.
+De grens die blijft staan: `kern/commercie/tegenfeit.js` is en blijft het
+**beleids**contrafeit (wat als we `maxCenten` verlagen), niet deze vergelijker — dat zijn
+twee verschillende vragen onder één woord.
 
 **En dit was géén droogloop.** Er werd een eerdere meting op het plan
 geprojecteerd; het plan liep niet. Dat deel staat er nu wel.

@@ -63,4 +63,32 @@ function klassen() {
   return ENVELOPKLASSEN;
 }
 
-module.exports = { GRADEN, SOORTEN, klassen };
+/* DE EFFECTWERKWOORDEN, GELEEND UIT kern/isolatie/effectwoorden.js.
+
+   WAAROM GELEEND EN NIET BEDACHT. Een vergelijker die een voorspelling tegen een
+   contract houdt, moet iets GEDEELDS hebben om op te vergelijken. Vrije tekst
+   werkt niet -- vergelijken op naamgelijkheid vindt alleen wat toevallig hetzelfde
+   heet -- en een eigen lijst hier zou de 22e vermogenslijst van dit huis zijn
+   (CAPABILITEIT.json). Die lijst bestaat al: dertien werkwoorden die de vraag
+   beantwoorden "wat kan een aanvaller hiermee bereiken", en dat is precies de
+   juiste korrel: `GELD_BEWEGEN` is platformvermogen en `bookings` niet (OS.md par. 4).
+
+   HET IS EEN ANDER GEBRUIK VAN DEZELFDE WOORDEN, en dat is geen botsing maar de
+   bedoeling: het effectmodel wijst een pad zijn werkwoorden toe om te beslissen wat
+   er in ISOLATIE dichtgaat, hier verklaart een mens welke werkwoorden een handeling
+   veroorzaakt en welke zij NOOIT veroorzaakt. Dezelfde woordenlijst, twee lezers --
+   en dat is precies het tegenovergestelde van twee lijsten met een gedeelde naam.
+
+   De grens die meekomt: `stuur` mag `isolatie` aanraken (GRENZEN.json), dus deze
+   leenweg voegt geen domeinkoppeling toe. Bij een botsing valt deze weg terug op
+   een lege lijst, en dan weigert de keuring elke verklaarde werkwoordenlijst --
+   liever niets kunnen verklaren dan het tegen een verzonnen lijst houden. */
+let WERKWOORDEN = null;
+function werkwoorden() {
+  if (WERKWOORDEN) return WERKWOORDEN;
+  try { WERKWOORDEN = require('../../isolatie/effectwoorden').NAMEN.slice(); }
+  catch (e) { WERKWOORDEN = []; }
+  return WERKWOORDEN;
+}
+
+module.exports = { GRADEN, SOORTEN, klassen, werkwoorden };

@@ -20,6 +20,11 @@ const BANK = Object.freeze({
     classificatie: 'intern',
     streefstand: 'er staat een gewogen voornemen klaar dat een tweede mens kan aftekenen; ' +
       'er is nog geen euro verplaatst',
+    /* ALLEEN `nooit`, en dat is geen luiheid: de geleende woordenlijst heeft geen
+       werkwoord voor "een verzoek klaarzetten voor een tweede mens" (zie
+       ./vergelijk.js). Wat vaststaat is wat deze route NIET doet -- en dat is exact
+       de bewering die de naam "incasso" tegenspreekt. Nagelezen in de route. */
+    nooit: ['GELD_BEWEGEN', 'EXTERN_BEREIKEN', 'UITGAANDE_AANROEP'],
     /* De voorwaarden staan hier met hun HANDHAVER erbij, want een voorwaarde
        zonder adres is een wens. Alle drie zijn na te lopen in de route. */
     voorwaarden: [
@@ -84,6 +89,12 @@ const BANK = Object.freeze({
     classificatie: 'intern',
     streefstand: 'de aangevraagde geldhandeling is uitgevoerd door een ANDERE mens dan wie hem ' +
       'aanvroeg, en de openstaande aanvraag bestaat niet meer',
+    /* DE WERKWOORDEN GELDEN VOOR BEIDE gedelegeerde handelingen -- anders is de lijst
+       onwaar zodra de andere wordt bevestigd. Nagelezen: de incassoronde roept alleen
+       boekAsync aan en bank.rood zet een limiet; geen van beide bericht iemand of
+       laadt code van buiten. Bij een DERDE handeling zakt de uitkomsttoets. */
+    veroorzaakt: ['GELD_BEWEGEN', 'SCHRIJVEN_ANDERMANS'],
+    nooit: ['EXTERN_BEREIKEN', 'DERDENCODE_UITVOEREN', 'ONVERTROUWDE_BYTES'],
     voorwaarden: [
       { wat: 'een kantoorsessie op naam', bron: 'kluisAuth (kern/kantoor/kluispoort.js)' },
       { wat: 'een andere mens dan de aanvrager', bron: 'kern/appstore/vierogen.js -- een sleutelvergelijking, ' +

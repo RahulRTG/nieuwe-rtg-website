@@ -15,6 +15,7 @@ const envelopLaag = require('../../envelop');
 const mandaatLaag = require('../../stuur/mandaat');
 const gevolgLaag = require('../../stuur/gevolg');
 const { KLASSEN } = require('./klassen');
+const { gevolgpoort } = require('./gevolgpoort');
 
 function maakKlaarzet({ voornemens, frictie, mandaatBron, tijd, leg, noteer, bewaar, publiek }) {
   const weeg = require('./weging').maakWeging({ voornemens, tijd, leg, noteer, bewaar, publiek });
@@ -118,6 +119,12 @@ function maakKlaarzet({ voornemens, frictie, mandaatBron, tijd, leg, noteer, bew
           `onbekend` is hier geen nul: het betekent dat niemand heeft gekeken. */
     const g = gevolgLaag.gevolgVan(o.pad || '');
     leg(dossier, 'gevolg', { graad: g.graad, uitslag: g.collecties, reden: g.reden });
+
+    /* 8. DE GEVOLGPOORT: de vooruitblik van het domein tegen het gevolgcontract van
+          deze handeling. Woont in ./gevolgpoort.js -- hij kan WEIGEREN en raakt een
+          andere laag aan, en dat is een ander onderwerp dan het klaarzetten zelf. */
+    const poort = gevolgpoort(o, dossier, leg);
+    if (poort) return poort;
 
     /* En dan het plan wegen: zie ./weging.js. */
     return weeg(o, dossier, env, klasse, mens);

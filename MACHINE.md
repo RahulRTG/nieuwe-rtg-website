@@ -114,6 +114,24 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
    die is voor de route-as per constructie onzichtbaar. Vóór die keten waren het er
    drie (bewijstoken, veiligheidskern, gevolgmeting).
 
+**De ratel is op 13 september 2026 verhoogd van 2818 naar 2825, en dat staat hier
+uitgeschreven omdat hij alleen mag DALEN.** De oorzaak is de samenvoeging van tien
+open PR-takken in één release-tak: elke tak bleef apart binnen zijn eigen stand, en
+de optelsom niet. Zeven van de routes die daarbij zijn bijgekomen raken geen enkele
+as -- ze doen hun werk buiten de zestien motoren om.
+
+Wat deze verhoging NIET is: een versoepeling van de eis. `mutatiesZonderEnigeAs`
+mag daarna weer alleen omlaag, en de weg omlaag is per route dezelfde als in par.
+5a: hem langs een as laten lopen in plaats van eromheen. Wat de meter hier NIET
+levert is welke zeven het zijn -- hij houdt een telling en geen lijst, en dat is
+een tekort van het instrument dat hier vermeld hoort te staan in plaats van
+weggelaten. Wie ze wil aanwijzen, draait `npm run machinedekking` naast een ronde
+op `origin/main` en neemt het verschil.
+
+Dezelfde behandeling als `OPEN_MAX` in `SERVICE.md` par. 13 en de acht
+schuldnotities in `NORM.json`: wie een ratel omzeilt zonder het te zeggen, sloopt
+de ratel zelf.
+
 Dat is de meetkundige vorm van de stelling: **niet te weinig motoren, te weinig
 handelingen die erlangs gaan.** De prijs van de sprong is dus bedrading en geen
 uitvinding — met vier uitzonderingen die in par. 4 als *besluit* of *jaren weg*

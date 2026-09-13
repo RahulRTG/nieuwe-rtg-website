@@ -54,6 +54,48 @@ function laadAfloop(pad) {
   return require(AFLOOP_MOD);
 }
 const leesRauw = (pad) => fs.readFileSync(pad, 'utf8');
+
+/* DE OPRUIMER, EN WAAROM HIJ ER IS -- deze toets maakte precies de fout waar hij
+   over gaat.
+
+   De eerste versie kilde haar processen aan het EIND van de test. Zakte er een
+   bewering daarvoor, dan gooide node er meteen uit en bleven de ronde en haar
+   kind draaien. Erger: `spawn` houdt de event loop van de OUDER open, dus het
+   toetsproces kon zelf niet afsluiten en de hele suite hing zonder uitslag. Ik
+   heb dat vandaag zien gebeuren: een handmutatie liet toets 1 zakken en de
+   opdracht liep in een tijdslimiet in plaats van in een foutmelding.
+
+   Een toets die bij een defect HANGT in plaats van zakt, is erger dan geen
+   toets: een timeout in de CI draagt geen diagnose, en het gedrag lijkt op een
+   flake. Vandaar: elk gespawned proces gaat meteen in `tekil`, de handles
+   worden ge-unreft zodat ze de ouder nooit openhouden, en t.after() ruimt op
+   ongeacht de uitslag. */
+function opruimer(t) {
+  const tekil = [];
+  const pidBestanden = [];
+  t.after(() => {
+    /* OOK WAT DE TOETS NOOIT HEEFT GELEZEN. Zakt een bewering vóór de regel die
+       kind.pid uitleest, dan staat dat kleinkind in geen enkele lijst -- en dan
+       leeft het door. Gezien gebeuren tijdens de handmutaties van deze ronde:
+       twee ronden bleven achter omdat hun kind nooit was genoteerd. De opruimer
+       leest die bestanden daarom zelf, in plaats van te vertrouwen op hoe ver de
+       toets is gekomen. */
+    for (const b of pidBestanden) {
+      try { tekil.push(Number(fs.readFileSync(b, 'utf8'))); } catch (e) { /* nooit geschreven */ }
+    }
+    for (const pid of tekil) { try { process.kill(pid, 'SIGKILL'); } catch (e) { /* al weg */ } }
+  });
+  return {
+    pidBestand: (b) => { pidBestanden.push(b); return b; },
+    volg: (pid) => { if (pid) tekil.push(Number(pid)); return pid; },
+    start: (argv, env) => {
+      const p = spawn(process.execPath, argv, { env, stdio: 'ignore' });
+      tekil.push(p.pid);
+      p.unref();          // de ouder mag hier nooit op wachten
+      return p;
+    }
+  };
+}
 function wachtOp(fn, ms = 5000) {
   const eind = Date.now() + ms;
   while (Date.now() < eind) {
@@ -75,9 +117,10 @@ const RONDE = `
   setInterval(() => {}, 1000);
 `;
 
-test('DE KETEN: van claim tot herstel, met echte processen', () => {
+test('DE KETEN: van claim tot herstel, met echte processen', (t) => {
+  const op = opruimer(t);
   const w = wereld();
-  const kindPad = path.join(w.map, 'kind.pid');
+  const kindPad = op.pidBestand(path.join(w.map, 'kind.pid'));
 
   // --- slot vrij, en er is nog geen ronde ---
   const A0 = laadAfloop(w.afloop);
@@ -85,11 +128,10 @@ test('DE KETEN: van claim tot herstel, met echte processen', () => {
   assert.equal(A0.magStarten().mag, true, 'en laat dus door');
 
   // --- geslaagde claim -> RUNNING, met een kind ---
-  const ronde = spawn(process.execPath, ['-e', RONDE, path.join(WORTEL, 'scripts/afbouw-slot.js'), kindPad],
-    { env: w.env(), stdio: 'ignore' });
+  const ronde = op.start(['-e', RONDE, path.join(WORTEL, 'scripts/afbouw-slot.js'), kindPad], w.env());
   assert.ok(wachtOp(() => fs.existsSync(kindPad) && fs.existsSync(w.afloop)),
     'de ronde hoort een afloop en een kind te hebben aangemaakt');
-  const kind = Number(fs.readFileSync(kindPad, 'utf8'));
+  const kind = op.volg(Number(fs.readFileSync(kindPad, 'utf8')));
   const A = laadAfloop(w.afloop);
   const tijdensLoop = A.lees();
   assert.equal(tijdensLoop.stand, 'RUNNING', 'pak() hoort de ronde als RUNNING te publiceren');
@@ -164,20 +206,20 @@ test('DE KETEN: van claim tot herstel, met echte processen', () => {
   fs.rmSync(w.map, { recursive: true, force: true });
 });
 
-test('NEGATIEF: een mislukte claim registreert geen ronde', () => {
+test('NEGATIEF: een mislukte claim registreert geen ronde', (t) => {
+  const op = opruimer(t);
   /* "Ik probeerde eigenaar te worden" is niet hetzelfde als "ik was eigenaar".
      Zou pak() de afloop schrijven voordat het slot binnen is, dan ziet een
      mislukte claim eruit als een gestorven meetronde -- en blokkeert hij de
      machine om werk dat nooit is begonnen. */
   const w = wereld();
-  const kindPad = path.join(w.map, 'kind.pid');
+  const kindPad = op.pidBestand(path.join(w.map, 'kind.pid'));
 
-  const eerste = spawn(process.execPath, ['-e', RONDE, path.join(WORTEL, 'scripts/afbouw-slot.js'), kindPad],
-    { env: w.env(), stdio: 'ignore' });
+  const eerste = op.start(['-e', RONDE, path.join(WORTEL, 'scripts/afbouw-slot.js'), kindPad], w.env());
   assert.ok(wachtOp(() => fs.existsSync(w.afloop)), 'de eerste ronde draait');
   const A = laadAfloop(w.afloop);
   const vanEerste = leesRauw(w.afloop);
-  const kind = Number(fs.readFileSync(kindPad, 'utf8'));
+  const kind = op.volg(Number(fs.readFileSync(kindPad, 'utf8')));
 
   /* De tweede claim MOET stuklopen: het slot is bezet door een levend proces. */
   const tweede = spawnSync(process.execPath,
@@ -191,7 +233,5 @@ test('NEGATIEF: een mislukte claim registreert geen ronde', () => {
     'ronde op een gestorven meetronde en blokkeert hij de machine om werk dat nooit bestond');
   assert.equal(A.lees().taak, 'proefronde', 'de afloop hoort nog van de EERSTE ronde te zijn');
 
-  process.kill(eerste.pid, 'SIGKILL');
-  try { process.kill(kind, 'SIGKILL'); } catch (e) { /* al weg */ }
-  fs.rmSync(w.map, { recursive: true, force: true });
+  fs.rmSync(w.map, { recursive: true, force: true });   // de processen ruimt t.after() op
 });

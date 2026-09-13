@@ -951,8 +951,9 @@ een mogelijkheid die hij zelf ziet. Hij is opnieuw maximaal ánders:
   niet; wat ervoor in de plaats komt is **bereikbaarheid**.
 - **de uitkomst is een mogelijkheid**, geen geleverde dienst.
 
-Acht van de elf schakels sluiten, negen van de negen storingen houden hun
-belofte, en er staan **drie bevindingen** die een besluit vragen.
+Negen van de elf schakels sluiten, negen van de negen storingen houden hun
+belofte, en er staan **twee bevindingen** over die een besluit vragen. De derde
+is gerepareerd; zie hieronder.
 
 **Bevinding 1 — de motor die voor deze mens gemaakt is, is voor deze mens niet
 bereikbaar.** `kern/knelpunt/` beantwoordt precies de Adam-vraag: welke wegen
@@ -976,16 +977,51 @@ wil weer aan het werk"*; dat is een doel zonder wegen. De rekenmachine staat er,
 de aanvoer niet. `kern/knelpunt/openingen-kaart.js` dekt vijf terreinen en geeft
 **ingangen bij een knelpunt**, geen **wegen bij een doel**.
 
-**Bevinding 3 — een aangenomen sollicitant uit een gezin wordt niet gehaald.**
-`notifyApplicant` in `kern/werk.js` stopt met `if (!a.key) return`, en `a.key` is
-een lidsessiesleutel; de rij die `routes/member/werk/rtf.js` aanmaakt draagt
-`rtf: { code, profielId }` en geen key. De stand wordt wél bijgewerkt — Adam kan
-het zien als hij kijkt — maar er komt geen melding. Dit is exact de vorm die op
-10 september al een keer is gerepareerd (par. 9a van `TRAVELCOMMERCE.md`: *"ook
-dat van een aangenomen sollicitant"*). Die reparatie ging over leden; deze kant,
-het gezin, bleef staan. Dezelfde fout, een deur verder.
+**Bevinding 3 — een aangenomen sollicitant uit een gezin werd niet gehaald.
+GEREPAREERD.** `notifyApplicant` in `kern/werk.js` stopte met
+`if (!a.key) return`, en `a.key` is een lidsessiesleutel; de rij die
+`routes/member/werk/rtf.js` aanmaakt draagt `rtf: { code, profielId }` en geen
+key. De stand werd wél bijgewerkt — hij kon het zien als hij keek — maar er kwam
+geen melding. Dat was exact de vorm die op 10 september al een keer is
+gerepareerd (par. 9a van `TRAVELCOMMERCE.md`: *"ook dat van een aangenomen
+sollicitant"*); die reparatie ging over leden, en deze kant bleef staan.
 
-**Twee meetfouten horen er even groot bij**, want ze zijn allebei als uitslag
+De reparatie is met opzet **geen tweede tak voor RTF**. Een `else if` zou de
+volgende ontvangervorm precies zo laten vallen — dezelfde fout, een deur
+verder. De vraag zelf staat nu in `kern/ontvanger.js`: gegeven een ontvanger,
+welke wegen bestaan er, en wat gebeurde er met elk. Vier regels liggen daar
+vast, en de eerste is de hele les — **hij geeft altijd een uitslag**; stilte is
+de faalvorm die hem opleverde. Verder: de soortenlijst is gesloten (`lid`,
+`gezin`, `mail`), hij verzint geen ontvanger uit een naam of codenaam, en elke
+weg moet een **lezer** hebben.
+
+Die laatste regel is de eigenlijke vondst. Er bestaat een universele adresvorm
+voor een gezinslid — `rtf:CODE:profielId`, met `socialProfielen()` en
+`profielInfoVanHandle()` als heen- en terugweg — en `db.data.notifications` is
+naar zijn vorm sleutel-agnostisch. Daar schrijven lag voor de hand en is fout:
+**geen enkele foundation-route leest die bak.** Gemeten, niet aangenomen. Een
+melding daarheen ziet er in de code goed uit en komt nergens aan; het dode spoor
+zou een deur verder zijn verplaatst. Wat een gezinslid wél leest is het
+gezinsbord, en daar landt het nu (`foundation/systeembericht.js`): persoonlijk
+geadresseerd (`naar` is de profiel-id en nooit `allen`, want of een
+zeventienjarige is aangenomen is zijn nieuws) en met het huis als afzender.
+
+**Twee stille vallen zijn geraakt en niet één.** Ook het vervolgbericht na een
+aanname had een eigen `if (a.key && ...)` — en dat is juist het bericht dat een
+niet-lid nodig heeft, want `direct` is voor hem per definitie vals en hij is
+degene die de uitnodigingslink moet vragen. Het gaat nu mee met het besluit in
+plaats van in een eigen blok, zodat er geen tweede plek is waar iemand opnieuw
+`if (!a.key)` kan schrijven.
+
+Drie dingen die onderweg zijn gecorrigeerd en die geen detail zijn: de scope is
+`apply` en geen verzonnen woord (`meldLid` filtert alleen op `=== false`, dus
+een onbekende scope zou een lid dat sollicitatiemeldingen heeft uitgezet ze
+alsnog bezorgen); `kern/werk.js` ging door de omvangband van keuringsregel 13,
+wat hier het signaal was dat er een tweede onderwerp in zat
+(`kern/werk-bezorging.js`); en de domeingrens hield het geheel tegen tot de
+relatie verklaard was, precies zoals bedoeld.
+
+**Drie meetfouten horen er even groot bij**, want ze zijn alle drie als uitslag
 gepasseerd voordat ze werden gevonden. De proef las eerst `/api/supplier/apply`
 voor de sollicitatielijst van de werkgever — dat is de **publieke** route waarmee
 iemand van buiten solliciteert, en het antwoord "Bedrijf niet gevonden" zag eruit
@@ -997,6 +1033,14 @@ stond op dat moment groen via een `|| mijn[0]`-terugval — een fallback die een
 mismatch verbergt is erger dan geen fallback. Beide staan nu in de bron
 uitgeschreven, want een proef die zijn eigen fouten wegpoetst, meet de volgende
 keer weer mee.
+
+De derde kwam bij de reparatie van bevinding 3 en is de leerzaamste:
+`/gezin/:code/berichten` en `/gezin/:code/mij` zijn **GET**-routes, en de proef
+postte ernaartoe. Dat geeft geen fout maar een *ander* antwoord — `ongelezen`
+ontbrak, werd als 0 gelezen, en de schakel meldde dat Adam niets hoorde terwijl
+het bericht gewoon op zijn bord stond. De reparatie werkte al terwijl de meting
+zei van niet. Een verkeerde methode is hier dus geen storing maar een
+meetuitslag, en dat is precies hoe zoiets als waarheid passeert.
 
 ### De uitslag
 

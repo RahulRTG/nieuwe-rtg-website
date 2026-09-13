@@ -139,11 +139,11 @@ test('5. de gedeelde kantoorcode komt hier nog steeds niet door', async () => {
    opslag SLAAGT de commit dus zonder dat er iets is aangetoond, en de eerste
    versie van deze laag schreef daar onvoorwaardelijk `vast: true`.
 
-   Op sqlite (de opstelling van deze toets) KAN het worden aangetoond, dus hier
-   hoort er `vast: true` te staan -- en dat is wat deze toets vastlegt. Wat hij
-   NIET kan beproeven is de andere kant: daarvoor is een opslag zonder teller
-   nodig, en die draait in de PostgreSQL-baan van CI. Dat staat er zo bij in
-   plaats van te worden weggelaten.
+   Op sqlite (de opstelling van deze toets) KAN het worden aangetoond. De ANDERE
+   kant -- een opslag die het niet kan -- is toets 7 hieronder, en die hoefde
+   niet op PostgreSQL te wachten: `persistentieStand()` geeft `null` voor ELKE
+   niet-sqlite opslag (server/db/duurzaam.js), dus de json-opslag loopt door
+   exact dezelfde tak.
 
    DE MUTATIE: laat `vast` weer op `true` staan ongeacht `kanBewijzen()` ->
    deze toets blijft groen, want sqlite kan het aantonen. Dat is de eerlijke
@@ -166,3 +166,72 @@ test('6. een journaalregel zegt of zijn duurzaamheid is AANGETOOND', async () =>
   assert.match(bron, /vastWaarom/,
     'staat er `vast: false`, dan hoort de REDEN erbij -- anders is het niet van een storing te onderscheiden');
 });
+
+/* ============================================================================
+   DE ANDERE KANT: EEN OPSLAG DIE HET NIET KAN AANTONEN.
+
+   `persistentieStand()` geeft `null` voor elke niet-sqlite opslag, en
+   `bijeen({duurzaam:true})` gooit dan NIET -- de commit slaagt zonder dat er
+   iets is aangetoond (server/db/bijeen.js: alleen gooien waar bevestigen
+   mogelijk was). Twee dingen moeten daar tegelijk waar zijn, en ze trekken de
+   andere kant op:
+
+     - de inzage gaat DOOR. De weigering hangt aan de commit en niet aan de
+       bewijsbaarheid ervan; anders sluit een opslag zonder teller de hele
+       balie, en dat is een storing in plaats van een grens.
+     - de regel LIEGT NIET. Hij draagt `vast: false` met de reden, want een
+       spoor dat niet kan zeggen hoe hard het zelf staat, is geen bewijs.
+
+   Dit is de tak waar PostgreSQL doorheen loopt, hier beproefd met de
+   json-opslag omdat het dezelfde tak is -- niet een benadering ervan.
+
+   DE MUTATIE: zet `vast: hard` terug op `vast: true` -> deze toets zakt op de
+   tweede bewering, terwijl toets 6 groen blijft. Dat is precies waarom het er
+   twee zijn.
+   ========================================================================== */
+test('7. een opslag die niets kan aantonen laat de inzage door en zegt het erbij', async () => {
+  const kaal = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: verseMap(), RTG_STORE: 'json' } });
+  try {
+    const balie = await kantoorAlsPersoon(kaal.base);
+    assert.ok(balie, 'geen kantoorsessie op de json-opslag');
+
+    let lid = null;
+    for (const proef of ['en', 'er', 'aa', 'de', 'an']) {
+      const z = await api(kaal.base, '/api/office/balie/zoek', { codenaam: proef }, balie);
+      if (z.body && z.body.treffers && z.body.treffers.length) { lid = z.body.treffers[0]; break; }
+    }
+    assert.ok(lid, 'geen lid gevonden op de json-opslag');
+
+    const d = await api(kaal.base, '/api/office/balie/dossier', { id: lid.id, reden: REDEN }, balie);
+    assert.equal(d.status, 200,
+      'de inzage hoort DOOR te gaan als de opslag duurzaamheid niet kan aantonen; ' +
+      'een weigering daar is een storing en geen grens: ' + JSON.stringify(d.body).slice(0, 160));
+
+    /* En nu het spoor zelf. Het techniekbord geeft de samenvatting met de
+       recente regels; het lid krijgt ze niet zo te zien (voorBetrokkene laat de
+       kijker weg -- dat is persoonsdata van een ander). */
+    const st = await fetch(kaal.base + '/api/techniek/status',
+      { headers: { Authorization: 'Bearer ' + (await eigenaarsToken(kaal.base)) } });
+    const bord = await st.json().catch(() => ({}));
+    const recent = (bord.inzage && bord.inzage.recent) || [];
+    const regel = recent.find(r => String(r.bron || '').startsWith('ledenbalie'));
+    assert.ok(regel, 'geen journaalregel van de ledenbalie teruggevonden: ' + JSON.stringify(recent).slice(0, 200));
+    assert.equal(regel.stand, 'toegestaan',
+      'de regel hoort te zeggen dat inzage is VERLEEND, nooit dat er is ingezien');
+    assert.equal(regel.vast, false,
+      'de regel claimt `vast: true` op een opslag die duurzaamheid niet kan bevestigen -- ' +
+      'dat is een bevestiging die niemand heeft gegeven');
+    assert.match(String(regel.vastWaarom || ''), /niet bevestigen/,
+      'staat er `vast: false`, dan hoort de REDEN erbij; anders is het niet van een storing te onderscheiden');
+  } finally {
+    stop(kaal && kaal.child);
+  }
+});
+
+/* Het eigenaarstoken opent het techniekbord (techAuth verifieert het als ECHT
+   account en magInzien() laat de eigenaar door; een demo-persona strandt al op
+   de eerste stap). Zelfde weg als scripts/lib/proefsleutels.js. */
+async function eigenaarsToken(base) {
+  const r = await api(base, '/api/auth/login', { login: 'Rahul', password: 'Imran' });
+  return (r.body && r.body.token) || '';
+}

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T12:06:17.712Z",
-    "commit": "50a43305",
+    "op": "2026-09-13T19:19:34.902Z",
+    "commit": "d8faee41",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -3583,6 +3583,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "idemtoerekening.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/idemproef.js",
+      "operator": "return-weg#4",
+      "gezakt": 4,
+      "geprobeerd": 28
     },
     "idemvoorziening.test.js": {
       "soort": "puur",

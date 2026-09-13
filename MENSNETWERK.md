@@ -603,7 +603,8 @@ grens die ná het belang komt is geen grens.
 ketenproeven (`tafelproef.js`, `ritproef.js`, `toelatingsproef.js`) die een hele
 keten écht lopen en per SCHAKEL en per STORING meten. De vierde hoort hier, en
 hij is met opzet geen talentketen maar de eerste **mens-relatie-keten**: één
-synthetische mens die twaalf overgangen doorloopt.
+synthetische mens -- Mila, achttien, zelf beheerd, met een actieve bewijsmap --
+die twaalf overgangen doorloopt.
 
 | # | Schakel | Wat bewezen wordt |
 |---|---|---|

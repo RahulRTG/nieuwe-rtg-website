@@ -1675,6 +1675,7 @@ function main() {
 
   if (slechter.length) {
     console.log('\n\x1b[31m  DE NORM IS NIET GEHAALD.\x1b[0m\n');
+  console.log('  \x1b[2mbereik: de ratels en aantalsnormen in NORM.json. Zegt niets over gedrag, routedekking, ketens of documentwaarheid.\x1b[0m\n');
     for (const s of slechter)
       console.log('    ' + s.m.sleutel + ': ' + s.nu + ' terwijl de norm ' + s.norm + ' is  -- ' + s.m.wat);
     console.log('\n  Dit is geen advies. Wat een keer goed was, hoort niet stilletjes slechter te');
@@ -1694,6 +1695,7 @@ function main() {
       (beterDan.length + presBeter.length ? ', en op ' + (beterDan.length + presBeter.length) + ' punt(en) ruim' : '') +
       (nieuw.length + presNieuw.length ? '; ' + (nieuw.length + presNieuw.length) + ' meter(s) wachten nog op een grondwaarde' : '') + '.');
     console.log('  \x1b[2mLeg dat vast met: node scripts/norm.js --vastleggen\x1b[0m\n');
+  console.log('  \x1b[2mbereik: de ratels en aantalsnormen in NORM.json. Zegt niets over gedrag, routedekking, ketens of documentwaarheid.\x1b[0m\n');
     return 0;
   }
   /* HIER STOND `if (beterDan.length && vastleggen)`. Een meter die je toevoegt
@@ -1753,6 +1755,7 @@ function main() {
   }
 
   console.log('\n  \x1b[32mDe norm is gehaald.\x1b[0m\n');
+  console.log('  \x1b[2mbereik: de ratels en aantalsnormen in NORM.json. Zegt niets over gedrag, routedekking, ketens of documentwaarheid.\x1b[0m\n');
   return 0;
 }
 

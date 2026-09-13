@@ -5755,5 +5755,19 @@ console.log('\n71) de vorige bronmuterende ronde is netjes afgelopen en heeft ni
   }
 }
 
+/* HET BEREIK VAN DEZE POORT, en waarom hij het ZELF zegt.
+
+   Op 13 september 2026 heb ik twee keer op een dag "de gate is groen" gezegd op
+   grond van check + norm + deltapoort, terwijl CI daarna terecht rood bleef:
+   test/routedekking.test.js vond een route die nooit door een toets was
+   aangeraakt, en keuringsregel 41 zakte op een afdruk. Geen van beide valt
+   binnen wat die drie meten -- de uitspraak was ruimer dan het bewijs.
+
+   Een tabel in een document had dat niet voorkomen; dit wel. De poort zegt
+   voortaan zelf wat hij bewijst EN wat hij niet bewijst, zodat wie hem draait de
+   grens meeleest in plaats van hem te moeten onthouden. LAT.md regel 13. */
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
+console.log('\x1b[2mbereik: statische huisregels, registers en documentwaarheid.' +
+  ' Zegt niets over gedrag (npm test), routedekking (test/routedekking.test.js),' +
+  ' ketens (de ketenproeven) of go-live (npm run golive).\x1b[0m');
 process.exit(fouten ? 1 : 0);

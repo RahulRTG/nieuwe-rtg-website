@@ -474,6 +474,50 @@ die echt overbleven zijn dicht, en `/api/bank/akkoord` draagt de les: die stond
 onder viel -- **een regel op een afdwinglijst noemt een ROUTE en niet een
 handeling**.
 
+**En par. 4c is de AI-helft, die par. 4b hardop openliet.**
+`scripts/aicontext.js` (`AICONTEXT.json`) meet eerst waar Rahul zijn ledencontext
+samenstelt (`aiSystemPrompt` in `kern/ai/prompt.js`): **twaalf invoeren -- 3 op
+het LID, 2 op de PAS, 4 op het HUIS, 3 vaste tekst**. De uitslag die het ontwerp
+stuurt is dat **de muur een VELDSELECTIE is en geen grens**: de ledenstaat draagt
+25 velden, 9 daarvan worden door een KANTOORroute geschreven (`bewaarVerzoek`
+voorop, en die draagt de echte naam van de medewerker uit de kluis), en de
+samensteller leest er twee -- `trip` en `invoices`. De doorsnede is leeg, maar de
+andere drieëntwintig liggen in hetzelfde object, één `...md` verwijderd van een
+tekst die woordelijk naar een modelaanbieder gaat. De architectuur hoeft dus niet
+om; de veldselectie had een handhaver nodig, en die is er nu. **De waarneming is
+de prompt zelf**: hij staat op geen enkel scherm, dus de proef zet een
+nep-modelserver op `127.0.0.1` met `LOCAL_AI_URL` ernaartoe en vangt hem op zoals
+het model hem krijgt. Drie dingen daar niet wegpoetsen. **De dragende toets is de
+GELIJKHEID en niet de woordenlijst** -- een afgeleide regel ("dit lid woont in
+dezelfde regio als het laatst geopende dossier") draagt geen enkele waarde, en
+van de vijf mutaties is dat precies de ene die alleen dáár op zakt. **Een
+gelijkheidstoets heeft een blinde vlek die eruitziet als succes**: met een cache
+op `key` bleef de hele proef groen, dus staat er nu een BESTURINGSPROEF naast die
+iets verandert dat wél hoort door te komen -- *een instrument dat niet kan
+uitslaan, is geen instrument*. En de meting vond onderweg een echt gebrek dat
+niets met contaminatie te maken had: de regel die het lid NOEMT las
+`PERSONAS[tier]`, de DEMO-rij per pas, dus **elk echt RTG-Pass-lid werd aan het
+model voorgesteld als "Amberen Vos, lid sinds Maart 2026"** terwijl zijn eigen
+codenaam iets anders was. Dezelfde fout als de demo-reis twee regels hoger in
+hetzelfde bestand, blijven staan omdat de context nergens te zien is; de
+reparatie neemt **twee velden op naam** over en nooit een spread, want
+`publicUser()` draagt ook `full` en dat is de echte naam.
+**`BEWIJSMACHINE.md` par. 6a is de les erboven, en hij geldt huisbreed: een proef
+kan een geldige uitslag geven en toch het verkeerde experiment zijn uitgevoerd.**
+Vier keer in een week, elke keer met een keurig groen vinkje: `isServerToets`
+herkende één spelling van `require('./helper')`, de wacht daarop las zijn eigen
+commentaar, de veldinventaris telde op de naam `st` het halve huis mee, en een
+marker die woordelijk in Rahuls karakterportret staat wees een lek aan dat er
+niet was. Een bewijs draagt dus niet alleen zijn uitslag maar ook zijn
+**indeling** en zijn **foutmodel**, en die twee zijn zelf aantoonbaar of ze zijn
+niet waar. Twee goedkope helften staan er met een getal bij: **195 scripts lezen
+broncode en 19 scheiden code van commentaar** (`zonderCommentaar()` bestaat al,
+in drie standen -- een meter die op een patroon matcht hoort erdoor, want juist
+een toelichting bevat de woorden waar je op zoekt), en **`eisSchoneBoom()` hangt
+aan 12 van de 80 stempelende generatoren** -- het stempel is een verslag achteraf,
+de poort is een grendel vooraf, en dát is waarom `registersUitVuileBoom` blijft
+terugkomen.
+
 Daaruit volgt de vorm van MN-02, en die is anders dan hij eerst was: niet *"een
 RTG-manager ziet hetzelfde als een externe"* (dat sneuvelt, want `kern/ledenbalie.js`
 is een LEGITIEME kennisweg met reden, journaal en melding), maar **geen

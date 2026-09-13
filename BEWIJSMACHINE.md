@@ -463,6 +463,67 @@ laten zien dat het werkt: één samenvoeging haalde tien dubbelingen weg.
 
 ---
 
+## 6a. Een proef kan een geldige uitslag geven en toch het verkeerde experiment zijn
+
+> **Een bewijs draagt niet alleen zijn uitslag, maar ook zijn INDELING en zijn
+> foutmodel -- en die twee zijn zelf aantoonbaar of ze zijn niet waar.**
+
+Dit is geen nieuwe wet maar een klasse die dit huis in één week vier keer heeft
+gezien, elke keer in een andere gedaante en elke keer met een keurige groene
+uitslag eroverheen. De uitslag was niet vals; het experiment was het.
+
+| Waar | Wat er gemeten werd | Wat er gemeten had moeten worden |
+|---|---|---|
+| `scripts/mutatie.js` | `isServerToets()` herkende alleen `require('./helper')` en niet `require('./helper.js')` -- drie toetsen zaten daardoor stil in de verkeerde bewijsklasse en kregen een bronmutatie in plaats van de liegpoort | de vorm, niet één spelling ervan |
+| `test/mutatiewacht.test.js` | de eerste wacht daarop matchte op zijn EIGEN commentaar en bleef groen met de bewaakte code weg | de code, met het commentaar eraf |
+| `scripts/aicontext.js` | de ledenstaat heet ook `st`, en dat woord betekent huisbreed ook status, stand en state: 91 velden in plaats van 25 | een naam is alleen die ledenstaat in het bestand waar hij eraan gebonden is |
+| `test/mn02ai-contextbesmetting.test.js` | een marker (`bewaarVerzoek.door`) die woordelijk in de vaste tekst van Rahuls karakter staat, wees een lek aan dat er niet was | alleen ONDERSCHEIDENDE markers: wat er vóór de handeling al stond, is er niet door gekomen |
+
+Vier gedaanten, één vorm: **de proef draaide, gaf een geldige uitslag, en mat
+iets anders dan waar hij over ging.** Daar helpt LAT.md regel 2 niet tegen -- die
+eist dat je een toets hebt zien zakken, en deze toetsen zakten keurig, alleen op
+de verkeerde vraag.
+
+**Wat een proef daarom hoort te dragen, en waar het vandaag staat:**
+
+| Eigenschap | Wat het betekent | Waar het wordt afgedwongen |
+|---|---|---|
+| **indeling** | in welke bewijsklasse valt deze proef, en is die indeling zelf beproefd | `test/mutatiewacht.test.js` (voor `isServerToets`) |
+| **foutmodel** | welke storing wordt er ingespoten, en raakt die de bron waar het over gaat | `server/lib/verraad.js` + `scripts/faalproef.js` |
+| **geraakte bron** | welk bestand of welke opslag verandert er werkelijk door die storing | `FAALPROEF.json`, per route |
+| **verwachte waarneming** | wat zou er anders zijn als de bewering onwaar was | vandaag: **de toets zelf, en verder niemand** |
+| **levendheid** | kan dit instrument überhaupt uitslaan | vandaag: **drie toetsen, met de hand** |
+
+De laatste twee rijen zijn de open kant. De levendheidscontrole is het goedkoopst
+en het meest verwaarloosd: `test/mn02ai-contextbesmetting.test.js` toets 5 en 6,
+en `scripts/herstelproef.js` met zijn opwarmronde, zijn vandaag de enige plekken
+waar een instrument moet bewijzen dat het kán uitslaan. Toets 6 bestaat omdat de
+proef zonder hem volledig groen bleef onder een cache-mutatie -- de gelijkheid
+die hij bewaakt heeft een blinde vlek die er precies uitziet als succes.
+
+### 6a.1 Code en commentaar zijn twee dingen, en een meter die dat niet scheidt meet zijn eigen toelichting
+
+Dit is de goedkoopste helft van par. 6a en hij is machinaal te sluiten.
+`scripts/lib/bron.js` draagt `zonderCommentaar()` al, in drie standen (weghalen,
+platslaan met behoud van regelnummers, en per taal). **Gemeten op 13 september
+2026: 195 scripts in `scripts/` lezen broncode, en 19 daarvan scheiden code van
+commentaar.** Dat is een lexicale telling en dus een ONDERgrens aan het probleem,
+geen aanklacht: de meeste van die 195 tellen bestanden of paden en raken een
+regel commentaar nooit. Maar elke meter die op een PATROON in de bron matcht,
+moet door die functie -- en dat is precies waar de twee vondsten hierboven
+zaten, want juist een toelichting beschrijft wat de code doet en bevat dus per
+definitie de woorden waar je op zoekt.
+
+Daar staat een tweede, even goedkope regel naast. **De poort vóór een meting
+bestaat en hangt aan 12 van de 80 stempelende generatoren.** `eisSchoneBoom()` in
+`scripts/lib/stempel.js` weigert een ronde die toch `boomVuil: true` zou
+opleveren; `stempel()` MELDT het achteraf, als de tijd al op is en de meter
+`registersUitVuileBoom` al omhoog is geratteld. Dat die meter deze maand twee
+keer op één dag van 1 naar 2 ging, is daar het gevolg van en geen toeval: het
+stempel is een verslag, de poort is een grendel, en 68 generatoren hebben alleen
+het verslag. Wie een generator schrijft, hangt hem aan de poort --
+`scripts/aicontext.js` is de eerste die daarmee begint.
+
 ## 7. Wat dit niet wordt
 
 - **Geen enkel groen woord bovenaan.** `LAT.md` regel 11 en `check.js` regel 48

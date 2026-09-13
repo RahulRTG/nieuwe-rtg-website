@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:27:06.701Z",
-    "commit": "6edd6ac4",
-    "boomVuil": false,
-    "boomAnders": 3,
+    "op": "2026-09-13T11:50:29.778Z",
+    "commit": "e4d47b47",
+    "boomVuil": true,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -4998,6 +4998,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "mn02ai-contextbesmetting.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
       "scherp": "gezakt"
     },
     "mobiliteit-werkkant-routes.test.js": {

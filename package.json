@@ -327,6 +327,8 @@
     "ritproef:vast": "node scripts/ritproef.js --vastleggen",
     "ketenvorm": "node scripts/ketenvorm.js",
     "ketenvorm:vast": "node scripts/ketenvorm.js --vastleggen",
+    "aicontext": "node scripts/aicontext.js",
+    "aicontext:vast": "node scripts/aicontext.js --vastleggen",
     "ritmigratie": "node scripts/ritmigratie.js",
     "ritmigratie:vast": "node scripts/ritmigratie.js --vastleggen",
     "doorwerking": "node scripts/doorwerking.js",

@@ -813,12 +813,105 @@ niet. Deze regel is dus een **vooruitgeschoven post en geen bewezen eigenschap**
 wie er ooit een gedeelde projectie tussen deze twee wegen bij bouwt, hoort hier
 langs te komen.
 
-**Wat nog niet is beproefd**, en dat staat er liever dan dat het meelift: de
-AI-contextbouwer. `/api/rahul/kijk` bleek beeldherkenning en geen contextbouwer,
-en waar de AI zijn ledencontext samenstelt is in deze ronde niet gemeten. De
-regel eronder geldt er onverkort -- een contextbouwer die twee bronnen samenvoegt
-maakt perfect afgeschermde routes zinloos -- maar er is vandaag geen toets die
-het tegenhoudt.
+**Wat in die ronde nog niet was beproefd** was de AI-contextbouwer.
+`/api/rahul/kijk` bleek beeldherkenning en geen contextbouwer, en waar de AI zijn
+ledencontext samenstelt was toen niet gemeten. Par. 4c hieronder is dat gat.
+
+### 4c. MN-02-AI: de contextbouwer, gemeten en beproefd (13 september 2026)
+
+`scripts/aicontext.js` (`npm run aicontext`, `AICONTEXT.json`) beantwoordt eerst
+de vraag VOOR de proef: wat komt er in die context samen? De samensteller is
+`aiSystemPrompt(tier, lang, key)` in `server/kern/ai/prompt.js`, en hij heeft
+**twaalf invoeren -- 3 op het LID, 2 op de PAS, 4 op het HUIS en 3 vaste tekst.**
+Alleen de drie lid-gesleutelde kunnen kennis over één mens dragen, en alle drie
+lopen ze langs de sleutel van dát lid.
+
+**De uitslag die het ontwerp stuurt staat in de derde regel van dat register: de
+muur is een VELDSELECTIE en geen grens.** De ledenstaat draagt **25 velden**
+(lexicaal geteld, dus een ONDERgrens), waarvan er **9 door een kantoorroute
+worden geschreven** -- `bewaarVerzoek` voorop, en die draagt de ECHTE NAAM van de
+medewerker uit de identiteitskluis. De samensteller leest er **twee** van: `trip`
+en `invoices`. De doorsnede van "kantoor schrijft het" en "het model krijgt het"
+is vandaag **leeg**, en dat is geen architectuur maar één regel code: de andere
+drieëntwintig velden liggen in hetzelfde object, één `...md` verwijderd van een
+tekst die woordelijk naar een modelaanbieder gaat.
+
+**Het antwoord op de vraag of de contextarchitectuur moet veranderen is dus
+nee -- en de veldselectie moet een handhaver krijgen.** Die is er nu, en dat is
+`test/mn02ai-contextbesmetting.test.js`.
+
+**De waarneming is de prompt zelf, en dat is het hele punt.** De samengestelde
+context staat op geen enkel scherm en komt in geen enkel antwoord terug; de enige
+plek waar hij te zien is, is waar hij het huis verlaat. De proef zet daarom een
+nep-modelserver op `127.0.0.1` met `LOCAL_AI_URL` ernaartoe en vangt de system
+prompt op zoals het model hem krijgt -- geen fixture van wat de code zou doen,
+maar wat er werkelijk uitgaat. Dat is hetzelfde onderscheid dat
+`test/vertegenwoordiging.e2e.test.js` afdwong toen de unittoetsen groen stonden
+op een verzonnen vorm.
+
+Het experiment: R is één mens met twee hoedanigheden (lid én kantoor, op één
+account, met een baliezetel op naam). Tussen twee momentopnamen van zijn
+ledencontext gebeuren **twee** kantoorhandelingen, want de vraag heeft twee
+richtingen: R LEEST als kantoor het dossier van een ander lid S, en er wordt van
+kantoorzijde iets OP het account van R geschreven (een bewaarverzoek).
+
+**Zeven bewijzen, en de dragende is de gelijkheid.** Een lek dat de waarde van S
+letterlijk meeneemt is de makkelijke vorm; de gevaarlijke is een AFGELEIDE ("dit
+lid woont in dezelfde regio als het laatst geopende dossier"). Daar komt geen
+enkele waarde in voor en een zoek-op-waarde ziet hem niet. Verandert de context
+na een kantoorhandeling ook maar één teken, dan is er iets overgestoken.
+
+| Mutatie | Gepakt door |
+|---|---|
+| een kantoorveld MET naam in de prompt | toets 2b en 3 |
+| dezelfde waarde onder een neutrale naam | toets 2b en 3 |
+| **een AFGELEIDE regel, zonder enige waarde erin** | **alleen toets 3** |
+| een contextcache op `key`, zonder hoedanigheid | alleen toets 6 |
+| de identiteitsreparatie terugdraaien | alleen toets 1 |
+
+**De vierde regel van die tabel is de leerzaamste van deze ronde.** In zijn eerste
+vorm had de proef geen toets 6, en toen sloeg de cache-mutatie **nergens** aan:
+wie de prompt bewaart op `key` krijgt twee identieke momentopnamen ongeacht wat
+ertussen gebeurde, en dan staat de hele proef groen terwijl hij niets meer meet.
+De gelijkheidstoets heeft een blinde vlek die er precies uitziet als succes. Toets
+6 sluit hem met een BESTURINGSPROEF: verander iets dat de context wél hoort te
+raken (R zet zijn eigen omgangsvorm om) en eis dat de context meebeweegt. *Een
+instrument dat niet kan uitslaan, is geen instrument* -- dezelfde gedachte als
+toets 5, die van de normalisatie eist dat zij aantoonbaar iets normaliseert.
+
+**En er zijn twee TEGENproeven, want zonder die haalt de luie oplossing het.**
+Geef Rahul geen ledencontext en er lekt niets; draai de balie dicht en er lekt
+ook niets. Toets 1 eist daarom dat de context wél over dít lid gaat, en toets 4
+dat de rechtmatige inzage gewoon 200 blijft geven met het dossier erin.
+
+**Wat de meting onderweg vond, en het was geen contaminatie.** Toets 1 zakte
+meteen, en niet op een lek: de regel die het lid NOEMT las `PERSONAS[tier]`, en
+dat is de DEMO-rij per pas. Elk echt RTG-Pass-lid werd aan het model voorgesteld
+als *"Het lid: Amberen Vos, lid sinds Maart 2026"*, ongeacht wie hij was --
+terwijl zijn eigen codenaam `Nachtorchidee E01A` luidde. Precies dezelfde fout als
+de demo-reis en de demo-facturen twee regels hoger in hetzelfde bestand, met
+dezelfde oorzaak, en daar wél gerepareerd. Hij bleef staan omdat hij onzichtbaar
+is: de context staat op geen enkel scherm. De meting vond hem omdat zij `PERSONAS`
+op de PAS sleutelde en `ledenInhoudVan` op het LID, en toen opviel dat juist de
+identiteitsregel de eerste gebruikte. **De reparatie neemt twee velden op naam
+over en nooit een spread**: `publicUser()` draagt ook `full`, en dat is de echte
+naam uit de kluis.
+
+**Twee valse bevindingen uit deze ronde, allebei van dezelfde soort, en geen van
+beide weggepoetst.** De veldinventaris telde eerst 91 velden in plaats van 25,
+omdat de ledenstaat in dit huis ook `st` heet en dat woord huisbreed ook status,
+stand en state betekent -- een naam is alleen een ledenstaat in het bestand waar
+hij eraan gebonden is. En toets 2b wees een lek aan dat er niet was, omdat
+`bewaarVerzoek.door` de echte naam van de eigenaar draagt en die naam woordelijk
+in Rahuls karakterportret staat. **Een marker die ook in de vaste tekst voorkomt,
+is geen marker.** Beide zijn dezelfde klasse als de `isServerToets`-vondst: een
+nette uitslag uit een experiment dat iets anders mat. Zie `BEWIJSMACHINE.md`
+par. 6a.
+
+**Wat hier NIET wordt beweerd:** dit gaat over de LEDENcontext. De werkcontexten
+(zaak, personeel, kantoor) hebben hun eigen samenstellers en zijn niet gemeten.
+En de cache-vorm uit de tabel bestaat vandaag niet -- toets 6 is daarvoor een
+vooruitgeschoven post, net als assertie (c) in par. 4b.
 
 ### MN-03 -- geen commercieel voordeel
 
@@ -969,6 +1062,7 @@ grens die ná het belang komt is geen grens.
 | **1** | **Rugdekking zichtbaar maken** -- een mens moet kunnen zien dat de relatie bestaat | **een halve dag** |
 | **2a** | **MN-01 als toets** -- geen bevoegdheidsvoordeel | **staat** (13 sept): zeven bewijzen, vijf mutaties gezien zakken -- par. 4a |
 | **2b** | **MN-02 als toets** -- geen kennis die overdraagt tussen hoedanigheden | **staat** (13 sept): vier bewijzen met een TEGENproef, vier mutaties gezien zakken -- par. 4b |
+| **2c** | **MN-02-AI** -- de contextbouwer van Rahul lekt niet tussen hoedanigheden | **staat** (13 sept): zeven bewijzen met twee TEGENproeven en een besturingsproef, vijf mutaties gezien zakken; de meting eronder is `AICONTEXT.json` -- par. 4c |
 | **3** | **MN-03 als regel** -- vóór RTG zichzelf ooit als optie presenteert | **een stap weg** |
 | **4** | **Besluit: wordt RTG juridisch en commercieel vertegenwoordiger?** | **een besluit van de eigenaar** |
 | **5** | **Eén intern testtalent, een volledige synthetische loopbaan** | **na 4** -- zie hieronder |

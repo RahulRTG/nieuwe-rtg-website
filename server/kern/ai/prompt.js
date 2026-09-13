@@ -8,9 +8,42 @@ const { TAALREGELS } = require('../rahul/taal');
 const { TWIJFELREGELS } = require('../rahul/twijfel');
 const { cannedAnswer } = require('./demoantwoorden');
 module.exports = (ctx) => {
-  const { db, PERSONAS, AI_TONE, naamEn, dagContext, stemmingVoor, geloofRegel, ledenInhoudVan } = ctx;
+  const { db, PERSONAS, AI_TONE, naamEn, dagContext, stemmingVoor, geloofRegel, ledenInhoudVan, accounts } = ctx;
+
+  /* WIE IS DIT LID -- en dat was tot 13 september 2026 de demo-persona.
+
+     De regel onderaan luidde `const persona = PERSONAS[tier]`, en die tabel is
+     de DEMO-rij per pas. Elk echt RTG-Pass-lid werd daarmee aan het model
+     voorgesteld als "Amberen Vos, lid sinds Maart 2026", ongeacht wie hij was.
+     Precies dezelfde fout als de demo-reis en de demo-facturen twee regels
+     hoger, in hetzelfde bestand, met dezelfde oorzaak: db.data/PERSONAS is de
+     demo-inhoud en ledenInhoudVan kent het onderscheid. Bij de reis is hij
+     gerepareerd, bij de identiteit bleef hij staan -- en hij is onzichtbaar,
+     want de context staat op geen enkel scherm. Gevonden door de meting van
+     scripts/aicontext.js: PERSONAS is op de PAS gesleuteld en ledenInhoudVan op
+     het LID, en juist de regel die het lid NOEMT gebruikte de eerste.
+
+     TWEE VELDEN, OP NAAM OPGEBOUWD, NOOIT EEN SPREAD. publicUser() draagt ook
+     `full`, en dat is de ECHTE NAAM uit de kluis. Deze tekst gaat woordelijk
+     naar een modelaanbieder; een spread zou het hele privacy-ontwerp van dit
+     huis in een keer over de streep zetten. Zelfde regel als kern/
+     ledenbalie-inzage.js: veld voor veld, zodat een kolom die er morgen bij
+     komt hier niet vanzelf meelift. */
+  function eigenProfiel(key) {
+    const m = /^user-(\d+)$/.exec(String(key || ''));
+    if (!m || !accounts || !accounts.getUserById) return null;
+    try {
+      const u = accounts.getUserById(Number(m[1]));
+      if (!u) return null;
+      const p = accounts.publicUser(u) || {};
+      return { codename: p.codename || null, since: p.since || null };
+    } catch (e) { return null; }
+  }
+
   function aiSystemPrompt(tier, lang, key) {
     const persona = PERSONAS[tier];
+    /* Een echt account leest zichzelf; een demo-sessie houdt de persona. */
+    const eigen = eigenProfiel(key) || {};
     /* DE REIS EN DE FACTUREN VAN DIT LID, NIET DIE VAN DE DEMO.
 
        Hier stond `db.data.trip` en `db.data.invoices`. Dat is de seed-inhoud:
@@ -77,7 +110,7 @@ module.exports = (ctx) => {
          ontwerp telt. /api/fluister doet het aan de ledenkant al goed
          (routes/member/persoonlijk.js geeft liveCodename mee); hier stond nog
          persona.full. Dezelfde tabel draagt de codenaam al. */
-      `Het lid: ${persona.codename || persona.name} (${tier === 'rtg' ? 'RTG Pass' : tier === 'lifestyle' ? 'Lifestyle Pass' : 'Business Pass'}), lid sinds ${persona.since}.`,
+      `Het lid: ${eigen.codename || persona.codename || persona.name} (${tier === 'rtg' ? 'RTG Pass' : tier === 'lifestyle' ? 'Lifestyle Pass' : 'Business Pass'}), lid sinds ${eigen.since || persona.since}.`,
       /* GEEN REIS IS OOK EEN ANTWOORD. Een leeg reisdossier hoort Rahul te
          weten, niet in te vullen: hij vraagt waar het lid heen wil en wat er
          moet gebeuren, en verzint geen bestemming om iets te zeggen te hebben. */

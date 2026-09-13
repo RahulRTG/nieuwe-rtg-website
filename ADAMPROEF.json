@@ -1,5 +1,12 @@
 {
-  "stempel": "2026-09-13",
+  "stempel": {
+    "op": "2026-09-13T09:53:42.838Z",
+    "commit": "91dbf92a",
+    "boomVuil": false,
+    "boomAnders": 1,
+    "instrument": "scripts/adamproef.js",
+    "node": "v22.22.2"
+  },
   "uitleg": "Een keten rond een jongere van 17 zonder RTG-account: van een doel naar een mogelijkheid die hij zelf ziet. Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Vierde keten naast tafel-, rit- en toelatingsproef; met opzet geen gedeelde module -- zie MAATSTAF.md par. 7 en scripts/ketenvorm.js.",
   "grens": "Dit is de WERK-weg naar een mogelijkheid (vacature -> sollicitatie -> aangenomen). De andere terreinen van kern/knelpunt/openingen-kaart.js (opleiding, opvang, vervoer, wonen) hebben eigen naden en zijn hier niet gelopen. Er komt geen browser aan te pas en geen AI: wat Rahul van dit alles zou MAKEN is niet gemeten, alleen wat de routes eronder doen. Adam is een gezinsprofiel en geen echt kind; deze proef zegt niets over of de mens dit ook zo beleeft.",
   "schakels": [
@@ -11,7 +18,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Blauwe Egel 29FB",
+      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Groene Wolf 71B1",
       "fout": null,
       "ms": 0
     },
@@ -47,7 +54,7 @@
       "stand": "openBekend",
       "status": 400,
       "antwoord": "Welke manieren zijn er? Zonder manieren valt er niets te vergelijken.",
-      "ms": 4
+      "ms": 3
     },
     {
       "nr": 5,
@@ -57,9 +64,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "vacature d2340cfb, minimumleeftijd 16",
+      "ziet": "vacature 41fe1c53, minimumleeftijd 16",
       "fout": null,
-      "ms": 5
+      "ms": 6
     },
     {
       "nr": 6,
@@ -83,7 +90,7 @@
       "status": 200,
       "ziet": "aangenomen door de route: true",
       "fout": null,
-      "ms": 9
+      "ms": 8
     },
     {
       "nr": 8,
@@ -93,9 +100,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "sollicitatie e87d1bc0, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
+      "ziet": "sollicitatie e6a7e9f5, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
       "fout": null,
-      "ms": 13
+      "ms": 12
     },
     {
       "nr": 9,
@@ -107,7 +114,7 @@
       "status": 200,
       "ziet": "Adam ziet status \"uitgenodigd\" bij Cafe Brisa",
       "fout": null,
-      "ms": 23
+      "ms": 21
     },
     {
       "nr": 10,
@@ -119,7 +126,7 @@
       "status": 200,
       "ziet": "stand bij Adam: \"aangenomen\", bericht op zijn bord: \"Aangenomen bij Cafe Brisa -- Uw personeelsuitnodiging staat ...\" van RTG, ongelezen: true",
       "fout": null,
-      "ms": 20
+      "ms": 25
     },
     {
       "nr": 11,
@@ -131,7 +138,7 @@
       "status": 200,
       "ziet": "blijft staan: Keukenhulp bij Cafe Brisa (aangenomen)",
       "fout": null,
-      "ms": 1
+      "ms": 2
     }
   ],
   "storingen": [

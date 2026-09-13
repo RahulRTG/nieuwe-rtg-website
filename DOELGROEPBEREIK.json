@@ -1,5 +1,12 @@
 {
-  "stempel": "2026-09-13",
+  "stempel": {
+    "op": "2026-09-13T09:53:08.389Z",
+    "commit": "91dbf92a",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/doelgroepbereik.js",
+    "node": "v22.22.2"
+  },
   "uitleg": "Per functie uit het functieregister en per doelgroep: is die doelgroep VERKLAARD, en kan hij de paden van de functie werkelijk bereiken met een echte sessie? De regel die dit afdwingt: een functie waarvan de verklaarde doelgroep zijn eigen paden niet kan bereiken, is een leugen in het register.",
   "grens": "Dit meet de DEUR en niet de kamer: er gaat een leeg lichaam heen, dus of een doelgroep de functie ook zinnig kan gebruiken staat hier niet. Een functie heet bereikbaar zodra EEN van zijn paden opengaat -- negen dichte routes naast een open route zijn hier geen leugen. `dicht` betekent bovendien precies een ding: de sessie van deze doelgroep maakte geen enkel verschil met een anoniem verzoek. Dat is meestal een bewaker en soms een handler die iedereen gelijk afwijst; sterker is van buiten niet te meten. Een doelgroep met meer dan een sessievorm (foundation dekt gezin, leerling en school) krijgt daarom nooit een leugen maar een `onbepaald` met de reden. En hij beantwoordt geen productvraag: een doelgroep die niet is verklaard en niet binnenkomt heet `correct-afgesloten`, ook als iemand vindt dat hij erbij zou moeten kunnen. Dat is een besluit van de eigenaar en geen meetuitslag.",
   "doelgroepen": [

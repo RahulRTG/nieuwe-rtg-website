@@ -83,8 +83,7 @@ module.exports = (ctx) => {
       assurance: zw,
       streefstand: 'elke vaste betaling die op ' + new Date(tot).toISOString() +
         ' aan de beurt was, is geind of staat met een mislukking bij zijn eigen post',
-      /* `over` is de route die het geld WERKELIJK beweegt en niet deze; zie
-         geldketen/gevolgpoort.js. De werkwoorden volgen uit de eigen getallen. */
+      /* `over` is de weg die het geld echt beweegt; zie geldketen/gevolgpoort.js. */
       tegenfeit: { graad: 'vermoed', uitslag: { aantal: blik.aantal, boekingen: blik.boekingen,
         bedragCenten: blik.bedragCenten }, reden: blik.grens,
         over: '/api/office/bank/handtekening/bevestig',

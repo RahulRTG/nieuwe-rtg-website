@@ -125,6 +125,10 @@ const REGISTERS = [
      doctrine-document bij (of een wet), dan is de vorige telling een antwoord op
      een oudere vraag. */
   ['DOCTRINE.json', 'npm run doctrine', 'welke harde uitspraken de doctrine draagt, en welke het wettenregister kent'],
+  /* De verbandijking veroudert met de WETTEN en met de WACHTERS: komt er een wet
+     bij, of wordt een toets hernoemd, dan is de vorige recall het antwoord op een
+     oudere vraag. */
+  ['VERBAND.json', 'npm run verband', 'of een onafhankelijke waarnemer de bekende wet->wachter-randen zelf terugvindt'],
   /* DE EERSTE MINUUT. Hij hoort hier en niet in BUITEN, want hij is geen afdruk
      uit de code maar een METING VAN GEDRAG: een vers lid, de echte registratie,
      een echte browser op 390x844. Verandert de onboarding, het menu of het

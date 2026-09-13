@@ -283,6 +283,11 @@ const REGISTER = {
      zijn zelfijking, zijn zinsherkenning en de graad op zijn uitslag -- en dat
      bewaakt test/doctrine.test.js. */
   'DOCTRINE.json': { eigenRatel: 'test/doctrine.test.js' },
+  /* VERBAND.json draagt WEL een getal dat niet mag zakken (de unie-recall), maar
+     dat getal hangt aan het AANTAL wetten: komt er een wet bij met een wachter die
+     nog geen sensor ziet, dan daalt het percentage door gewoon werk. De vloer
+     staat daarom in de toets en niet in NORM.json, met de reden erbij. */
+  'VERBAND.json': { eigenRatel: 'test/verband.test.js' },
 
   /* En twee die door een TOETS worden vastgehouden in plaats van door een
      script. Allebei zeggen het in hun eigen uitleg met zoveel woorden: "MAG

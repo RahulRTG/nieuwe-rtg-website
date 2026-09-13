@@ -2184,30 +2184,33 @@
     },
     {
       "datum": "2026-09-13",
-      "soort": "groei",
+      "soort": "structureel",
       "sleutel": "dbDeuren",
       "van": 525,
       "naar": 527,
       "meter": "dbDeuren 525 -> 527",
-      "reden": "De publieke laag (STAGE.md par. 5a) voegt twee opslagdeuren toe: db.data.mediaAanwezig (de publieke aanwezigheden) en db.data.mediaVolgt (de ene volgrelatie). Dat is GROEI en geen verval -- het alternatief was volgtZaak naast volgtLid, en morgen volgtClub en volgtFestival, en dan waren het er vier. De ratel hoort deze stijging zichtbaar te maken en niet te verbieden; daarom met de hand verzet, met deze regel als besluit in de historie."
+      "reden": "De publieke laag (STAGE.md par. 5a) voegt twee opslagdeuren toe: db.data.mediaAanwezig (de publieke aanwezigheden) en db.data.mediaVolgt (de ene volgrelatie). Dat is GROEI en geen verval -- het alternatief was volgtZaak naast volgtLid, en morgen volgtClub en volgtFestival, en dan waren het er vier. De ratel hoort deze stijging zichtbaar te maken en niet te verbieden; daarom met de hand verzet, met deze regel als besluit in de historie.",
+      "waarheen": "De belofte 'geen ongemerkte opslagdeur' is niet weg maar verlegd. De twee nieuwe deuren zijn benoemd in kern/mediaos/aanwezigheid.js, hun vorm is GESLOTEN (test/aanwezigheid.test.js toets 1 stuurt `mag`, `rollen` en `saldo` mee en eist dat ze niet terugkomen), en alleen het domein mediaos mag erbij (GRENZEN.json). Wat de ratel hier losliet, dragen die twee."
     },
     {
       "datum": "2026-09-13",
-      "soort": "groei",
+      "soort": "structureel",
       "sleutel": "dbDeurenSchrijvend",
       "van": 273,
       "naar": 275,
       "meter": "dbDeurenSchrijvend 273 -> 275",
-      "reden": "Dezelfde twee deuren als hierboven; beide worden geschreven (volgen zet een vlag, een aanwezigheid ontstaat bij publiceren). db.data.salonUitlicht valt binnen een bestaande deur."
+      "reden": "Dezelfde twee deuren als hierboven; beide worden geschreven (volgen zet een vlag, een aanwezigheid ontstaat bij publiceren). db.data.salonUitlicht valt binnen een bestaande deur.",
+      "waarheen": "Zelfde twee deuren, nu aan de schrijfkant. Wat ze mogen schrijven ligt vast in zes mutatiecontracten (lib/mutatiecontracten-stage.js): vier PROTECTED met bewijs uit test/aanwezigheid.test.js, twee NOT_APPLICABLE met `nagekeken`. De belofte is daarmee van de ratel naar het contract verhuisd, en dat is strenger: een ratel telt, een contract zegt WAT een tweede aanroep doet."
     },
     {
       "datum": "2026-09-13",
-      "soort": "groei",
+      "soort": "structureel",
       "sleutel": "kernBreedte",
       "van": 1569,
       "naar": 1575,
       "meter": "kernBreedte 1569 -> 1575",
-      "reden": "Zes kernnamen erbij: vijf voor de aanwezigheidslaag (aanwezigZorg, aanwezigVan, aanwezigMet, aanwezigVolg, aanwezigVolgtHij/aanwezigMijn/aanwezigVolgersVan/aanwezigBeeld, samengeteld als de laag) en salonUitlichten voor de redactiehandeling. Ze horen bij twee besluiten van de eigenaar en niet bij toevallige groei; wie ze weer weghaalt, haalt de besluiten weg."
+      "reden": "Zes kernnamen erbij: vijf voor de aanwezigheidslaag (aanwezigZorg, aanwezigVan, aanwezigMet, aanwezigVolg, aanwezigVolgtHij/aanwezigMijn/aanwezigVolgersVan/aanwezigBeeld, samengeteld als de laag) en salonUitlichten voor de redactiehandeling. Ze horen bij twee besluiten van de eigenaar en niet bij toevallige groei; wie ze weer weghaalt, haalt de besluiten weg.",
+      "waarheen": "De zes namen horen bij twee besluiten van de eigenaar (STAGE.md par. 7.0 en 7.0b) en niet bij toevallige groei. Wat ze dragen wordt bewaakt door test/aanwezigheid.test.js (12 toetsen) en test/aanwezigheid-routes.e2e.js tegen een echte server; de haak die ze aanroepen staat in WEKDEKKING.json met vier nullen. Verdwijnen de namen, dan zakken die drie -- dat is waarheen de belofte is gegaan."
     }
   ],
   "prestatie": {

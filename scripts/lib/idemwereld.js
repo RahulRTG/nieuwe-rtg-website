@@ -866,7 +866,30 @@ function geldLijf(w) {
     '/api/pay/verzoek/betaal': { id: w.verzoekAanMij },
     '/api/pay/verzoek/intrek': { id: w.verzoekVanMij },
     '/api/pay/tik': { code: w.tikcode, centen: 100, oms: 'prooftik' },
-    '/api/pay/saldo': { invoiceId: w.factuurId }
+    '/api/pay/saldo': { invoiceId: w.factuurId },
+    /* ====================================================================
+       DE ZAAKKANT, en die vraagt andere velden dan de ledenkant -- elk
+       hieronder is uit de BRON gelezen en niet uit een broertje afgeleid.
+
+       De verleiding was om er een gedeeld "supplier-lijf" van te maken. Dat
+       zou precies de fout zijn waar deze module tegen bestaat: de vier routes
+       delen geen enkel veld, en drie ervan rekenen in een andere eenheid dan
+       hun buurman. `giftcard/sell` is daarvan de scherpste: hij leest
+       `req.body.bedrag` als EURO'S en weigert buiten 10..5000, terwijl elke
+       geldroute eronder in CENTEN rekent. Wie daar 500 centen instuurt, krijgt
+       geen foutmelding over de eenheid maar een cadeaukaart van vijfhonderd
+       euro -- of, met 100, een 400 die eruitziet als een ontbrekend veld.
+       ==================================================================== */
+    '/api/supplier/betaalverzoek': { codename: w.cn2, centen: 500, omschrijving: 'proefverzoek' },
+    /* `bedrag` in EURO'S: zie hierboven. 25 ligt binnen 10..5000. */
+    '/api/supplier/giftcard/sell': { bedrag: 25 },
+    /* `regels[]` met `stuk` als prijs, en `koperNaam` naast `codenaam`: de
+       eerste is wat op de factuur komt te staan, de tweede wie hem krijgt.
+       boekMetCodenaam() valt zonder regels terug op een enkele regel uit
+       losse velden -- die terugval is hier met opzet niet gebruikt, want dan
+       beproeft de meting een pad dat een echte zaak nooit neemt. */
+    '/api/supplier/facturen/maak': { soort: 'dienst', koperNaam: 'Proef Koper', codenaam: w.cn2,
+      regels: [{ omschrijving: 'Proefregel', aantal: 1, stuk: 25 }] }
   };
   /* Een route waarvan de wereld het benodigde stuk NIET heeft opgeleverd, krijgt
      hier niets. Anders zou hij een lijf met `id: null` krijgen en op een andere
@@ -989,6 +1012,23 @@ const VOORZIENINGEN = {
         idem: versSleutel('kamerbon') }, tokenVoor('supplier'));
     if (!(r && r.status >= 200 && r.status < 300)) return { fout: 'pos/sale gaf ' + (r && r.status) };
     return { room: kamer, method: 'contant' };
+  },
+  /* EEN ECHTE FACTUUR om een pdf van te maken. `facturen/pdf` stond op 404
+     "Factuur niet gevonden": de wereld maakt wel een factuur voor de LEDENkant
+     (w.factuurId), maar facturatie.mag() eist dat de VERKOPER dezelfde zaak is
+     als die het opvraagt. Een id uit een andere hoek van de database is dus
+     geen factuur van deze zaak, en dat verschil is precies wat die poort
+     bewaakt -- hem omzeilen zou de proef een deur laten passeren die in
+     productie dicht hoort te zitten. */
+  '/api/supplier/facturen/pdf': async ({ post, tokenVoor, w }) => {
+    if (!w.cn2) return { fout: 'geen tweede codenaam in de wereld' };
+    const r = await post('/api/supplier/facturen/maak',
+      { soort: 'dienst', koperNaam: 'Proef Koper', codenaam: w.cn2,
+        regels: [{ omschrijving: 'Proefregel', aantal: 1, stuk: 25 }],
+        idem: versSleutel('factuur') }, tokenVoor('supplier'));
+    const id = r && r.data && r.data.factuur && r.data.factuur.id;
+    return id ? { id } : { fout: 'facturen/maak gaf ' + (r && r.status) +
+      ' ' + ((r && r.data && (r.data.error || r.data.fout)) || '') };
   },
   /* Saldo op de rekening van de ZAAK, want oormerken kan niet uit niets. De zaak
      ontvangt via een VERSE kascode van het LID -- twee rollen in een voorziening,

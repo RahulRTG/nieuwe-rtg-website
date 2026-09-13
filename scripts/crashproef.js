@@ -133,8 +133,18 @@ function tredeVan(status) {
    voorziening, en een FEATURE los je niet op met een fixture -- daar staat een
    schakelaar. Wie die drie op een hoop gooit, breidt de proefwereld uit om een
    getal groen te krijgen. */
-function weegBlokkade({ status, leestBody }) {
+function weegBlokkade({ status, leestBody, voorziening }) {
   const trede = tredeVan(status);
+  /* HET VIERDE FEIT, EN HET IS EEN FEIT OVER DE PROEF ZELF. Viel de voorziening
+     om, dan is de blokkade niet aantoonbaar van de route: het onderwerp dat zij
+     moest klaarzetten is er nooit gekomen. De stand blijft staan -- wij weten
+     niet waar hij zou stranden met een heel onderwerp -- maar de reden wijst
+     naar de proef en niet naar de wereld. Zonder dit stuurde een kapotte haak
+     zes routes de verkeerde kant op. */
+  const haakStuk = voorziening && voorziening.stand === 'mislukt'
+    ? ' LET OP: de voorziening voor dit pad viel om (' + voorziening.reden + '), dus dit ' +
+      'onderwerp is nooit klaargezet -- kijk daar eerst, want deze blokkade kan van de PROEF zijn'
+    : '';
   if (trede === 'CRASHGRENS' || trede === 'HANDLER_VOLTOOID')
     return { bereiktTot: trede, blokkeertOp: null };
   if (trede === 'ROLPOORT') return { bereiktTot: trede, blokkeertOp: 'ROL',
@@ -149,11 +159,11 @@ function weegBlokkade({ status, leestBody }) {
         'dan is het lijf niet de oorzaak en moet iemand kijken wat hij dan wel afkeurt' };
     return { bereiktTot: trede, blokkeertOp: 'LIJF',
       reden: 'de route keurde het verzoek af (' + status + ') voordat hij aan het werk ging: ' +
-        'het lijf dekt niet wat hij vraagt' };
+        'het lijf dekt niet wat hij vraagt' + haakStuk };
   }
   if (trede === 'DOMEINVOORWAARDE') return { bereiktTot: trede, blokkeertOp: 'WERELD',
     reden: 'het verzoek kwam door de controle heen en strandde op de TOESTAND (' + status + '): ' +
-      'de wereld mist een voorwerp of een stand die deze route nodig heeft' };
+      'de wereld mist een voorwerp of een stand die deze route nodig heeft' + haakStuk };
   return { bereiktTot: 'ONBEPAALD', blokkeertOp: 'ONBEPAALD',
     reden: 'status ' + status + ' past in geen van de treden; niet indelen zonder te kijken' };
 }
@@ -426,6 +436,25 @@ function weegContract({ verwachtLeeg, geraakt, aantalCollecties, status, gestorv
   return { claims: c, stand: strengste(Object.values(c).map(x => x.stand)) };
 }
 
+/* DE AANROEP VAN DE VOORZIENING, OP EEN PLEK. Zij stond inline in ronde() en
+   ging daar op vier punten tegelijk mis; een inline aanroep is bovendien niet
+   te beproeven zonder een hele crashronde te draaien, en dat is precies waarom
+   de fout zo lang kon blijven staan. Hij mutéért `lijf` met opzet -- de
+   identificerende velden van een vers onderwerp horen in het lijf van DEZE
+   route -- en geeft terug wat er is gebeurd, nooit niets. */
+async function draaiVoorziening({ maak, post, tokenVoor, rol, w, lijf }) {
+  if (!maak) return null;
+  try {
+    const v = await maak({ post, tokenVoor, rol, w: w || {} });
+    if (v && v.fout) return { stand: 'mislukt', reden: String(v.fout) };
+    if (v && typeof v === 'object') {
+      Object.assign(lijf, v);
+      return { stand: 'gelukt', velden: Object.keys(v) };
+    }
+    return { stand: 'mislukt', reden: 'de voorziening gaf niets terug' };
+  } catch (e) { return { stand: 'mislukt', reden: 'de voorziening viel om: ' + e.message }; }
+}
+
 async function ronde(route, grens, ruis) {
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-crashproef-'));
   let srv = null;
@@ -444,15 +473,41 @@ async function ronde(route, grens, ruis) {
        route die er niets mee kan, meldt zich daarna met zijn TREDE en zijn
        status -- wat meer zegt dan "geen lijf". WERELD_ONTBREEKT blijft over
        voor het geval dat de wereld helemaal niets opleverde. */
-    const lijf = a.lijven[route.pad] || a.gedeeld;
+    /* EEN EIGEN KOPIE, want de voorziening schrijft er hieronder in. `a.gedeeld`
+       is EEN object dat alle routes van deze ronde delen; er rechtstreeks in
+       schrijven zou het onderwerp van deze route meegeven aan de volgende. */
+    const lijf = { ...(a.lijven[route.pad] || a.gedeeld) };
     if (!lijf || !Object.keys(lijf).length) return { stand: 'WERELD_ONTBREEKT',
       reden: 'idemwereld.js levert geen lijf voor dit pad en de gedeelde wereld is leeg; ' +
         'zonder de echte IBAN/codenaam van DEZE database strandt de oproep op "deed geen werk" ' +
         'in plaats van op de crash' };
     const eigenLijf = !!a.lijven[route.pad];
 
-    const maak = a.voorzieningVoor(route.pad);
-    if (maak) { try { await maak({ post: a.p, tokens: a.bos.tokens }); } catch (e) {} }
+    /* DE VOORZIENING, MET HET CONTRACT DAT ZIJ WERKELIJK HEEFT.
+
+       Hier stond een aanroep die op alle vier de punten verkeerd was, en die
+       vier punten werden verborgen door een lege `catch`. Nagemeten op 13
+       september: ELKE voorziening in idemwereld.js gooit onder de oude aanroep
+       ("tokenVoor is not a function", "Cannot read properties of undefined
+       (reading 'iban')"). Zes routes meldden zich daardoor als BLOCKED_WORLD of
+       BLOCKED_BODY terwijl de wereld prima te bouwen was -- de haak van de proef
+       was stuk, niet de route. Dat is de duurste soort meetfout die dit huis
+       kent: hij wijst het werk naar de verkeerde plek.
+
+       Vier dingen, en scripts/lib/idemproef.js deed ze alle vier al goed:
+
+         1. `tokenVoor` en niet `tokens` -- een voorziening heeft soms MEER dan
+            een rol nodig (de zaak ontvangt geld van een LID), dus zij kiest
+            zelf en krijgt geen rol opgelegd;
+         2. de WERELD mee, want een voorziening leunt op de echte IBAN en
+            codenamen van DEZE database;
+         3. wat zij teruggeeft gaat IN het lijf -- zonder dat maakt zij wel een
+            vers onderwerp, maar noemt de route het oude id nooit;
+         4. haar uitkomst komt in de RIJ. Een voorziening die stil omvalt, laat
+            de rij zeggen "de wereld ontbreekt" terwijl er iets anders aan de
+            hand is. */
+    const voorziening = await draaiVoorziening({ maak: a.voorzieningVoor(route.pad),
+      post: a.p, tokenVoor: a.bos.tokenVoor, rol: route.rol, w: a.wereld, lijf });
 
     /* DE TWEE MOMENTOPNAMEN WORDEN OP DEZELFDE MANIER GEMAAKT, EN DAT IS DE
        HELE REPARATIE: allebei terwijl een VERS OPGESTARTE, SCHONE server draait.
@@ -489,7 +544,7 @@ async function ronde(route, grens, ruis) {
     try { srv.kind.kill('SIGKILL'); } catch (e) {}
     srv = await W.start({ datamap: map, magSterven: true, wachtMs: 30000,
       env: { ...SERVEROMGEVING, RTG_VERRAAD: grens.modus, RTG_VERRAAD_SEED: '20260913' } });
-    if (srv.dood) return { stand: 'BLOCKED',
+    if (srv.dood) return { stand: 'BLOCKED', voorziening,
       reden: 'de server stierf al tijdens het opstarten onder ' + grens.modus };
 
     const r = await post(srv.basis, route.pad, lijf, tok);
@@ -532,18 +587,18 @@ async function ronde(route, grens, ruis) {
          een route die de body niet eens leest. `eigenLijf` blijft in de rij
          staan als FEIT, maar beslist niets meer. */
       const lb = leestBodyVan(route.methode, route.pad);
-      const bl = weegBlokkade({ status: r.status, leestBody: lb.leest });
+      const bl = weegBlokkade({ status: r.status, leestBody: lb.leest, voorziening });
       if (!bl.blokkeertOp) return { stand: 'GEEN_DUURZAME_WEG', statusVanDeAanroep: r.status,
         bereiktTot: bl.bereiktTot, blokkeertOp: null, leestBody: lb.leest, leestBodyGrond: lb.grond,
         reden: 'de route gaf ' + r.status + ' en het proces leefde door, dus hij liep niet langs ' +
           'het injectiepunt van ' + grens.modus + ': hij schrijft via de gewone write-behind ' +
           'save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een ' +
           'VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet',
-        geraakt: binnen, buitenDeRoute: buiten, eigenLijf };
+        geraakt: binnen, buitenDeRoute: buiten, eigenLijf, voorziening };
       return { stand: STAND_VAN_BLOKKADE[bl.blokkeertOp], statusVanDeAanroep: r.status,
         bereiktTot: bl.bereiktTot, blokkeertOp: bl.blokkeertOp,
         leestBody: lb.leest, leestBodyGrond: lb.grond,
-        reden: bl.reden, geraakt: binnen, buitenDeRoute: buiten, eigenLijf };
+        reden: bl.reden, geraakt: binnen, buitenDeRoute: buiten, eigenLijf, voorziening };
     }
 
     /* DE RETRY-PROEF HOORT BIJ ALLEBEI DE GRENZEN, en dat ontbrak.
@@ -578,7 +633,7 @@ async function ronde(route, grens, ruis) {
       reden: Object.entries(c.claims).filter(([, v]) => v.stand !== 'PROVEN')
         .map(([k, v]) => k + ': ' + v.reden).join(' | ') ||
         'alle vier de beweringen van het overlevingscontract zijn bewezen',
-      geraakt: binnen, buitenDeRoute: buiten, eigenLijf,
+      geraakt: binnen, buitenDeRoute: buiten, eigenLijf, voorziening,
       herhaling: { status: herhaal.status, deed: herhaalDeed,
         tweedeStatus: tweede.status, bijgekomen } };
   } catch (e) {
@@ -671,5 +726,5 @@ if (require.main === module) {
   }).catch(e => { console.error(e); process.exitCode = 2; });
 }
 
-module.exports = { meet, ronde, meetHerstartruis, weegHerhaling, weegContract, weegBlokkade,
+module.exports = { meet, ronde, meetHerstartruis, draaiVoorziening, weegHerhaling, weegContract, weegBlokkade,
   tredeVan, leestBodyVan, CLAIMS, GRENZEN, TREDEN, STAND_VAN_BLOKKADE };

@@ -40,12 +40,16 @@
                        en dat is geen geruststelling, want wat hem wel bedreigt
                        is een VERLOREN schrijfactie, en dat is `schrijf-verloren`
                        en niet deze proef
-     BLOCKED_BODY      de oproep kwam niet aan het werk EN idemwereld.js kent
-                       geen lijf voor dit pad -- er ging een algemeen lijf heen
-                       en de route wees het af. Wat ontbreekt is een LIJF
-     BLOCKED_WORLD     de oproep kwam niet aan het werk terwijl het lijf WEL
-                       voor deze route is gemaakt. Het verzoek klopt dus van
-                       vorm; wat ontbreekt is een VOORWAARDE in de wereld
+     BLOCKED_BODY      de route keurde het VERZOEK af (400/422) en raakt
+                       `req.body`. Werk: een lijf in idemwereld.js
+     BLOCKED_WORLD     het verzoek kwam door de controle en strandde op de
+                       TOESTAND (402/404/409/423/429). Werk: een voorziening
+     BLOCKED_FEATURE   de DIENST weigerde (503). Hier staat een schakelaar of
+                       een afhankelijkheid, en daar helpt geen lijf en geen
+                       fixture aan -- niet de proefwereld gaan uitbreiden
+     BLOCKED_ROLE      de deur ging niet open (401/403). Werk: de juiste rol
+     BLOCKED_ONBEPAALD niet in te delen zonder te kijken -- bijvoorbeeld een
+                       route die 400 geeft terwijl hij `req.body` niet aanraakt
      WERELD_ONTBREEKT  deze route heeft een onderwerp nodig dat de wereld niet
                        klaarzette -- met erbij WAT er zou moeten bestaan
      BLOCKED           de opstelling zelf kwam niet rond
@@ -78,6 +82,116 @@ const jsonUit = argv.includes('--json');
 const vastleggen = argv.includes('--vastleggen');
 const alleenPad = (argv.find(a => a.startsWith('--pad=')) || '').slice(6) || null;
 const maxRoutes = Number((argv.find(a => a.startsWith('--routes=')) || '').slice(9)) || 0;
+
+/* ============================================================================
+   DRIE ONAFHANKELIJKE FEITEN, EN PAS DAARNA EEN CONCLUSIE.
+
+   De eerste indeling keek naar EEN ding: heeft idemwereld.js een lijf voor dit
+   pad? Zo nee, dan heette het BLOCKED_BODY. Dat is een NEGATIEF signaal over de
+   proef, gebruikt als uitspraak over de route -- en het ging meteen mis op
+   /api/supplier/oog/overzicht: die route leest de body helemaal niet
+   (`res.json(oogOverzicht(req.supplier))`) en gaf 503. Een lijf schrijven zou
+   daar nooit iets deblokkeren. Dat was een METERfout en geen routeprobleem.
+
+   Daarom nu drie feiten die los van elkaar worden vastgesteld:
+
+     leestBody   raakt de route `req.body`? Gelezen uit de BRON op de regel die
+                 ROUTEBRON.json aanwijst. Lexicaal, dus graad `vermoed`.
+     status      wat de server antwoordde. Hard.
+     bereiktTot  hoe VER de proef kwam, afgeleid uit die status.
+
+   Pas daaruit volgt waar hij blokkeert. Een route die geen body leest, kan
+   nooit op de body stranden -- hoe verleidelijk het ontbrekende lijf ook is.
+
+   BEREIKTTOT IS ZELF DE WINST, los van de blokkade. "De route is aangeroepen"
+   betekent niet dat de duurzame commitgrens is gehaald; deze trede zegt tot
+   hoever de proef werkelijk is gekomen, en dat is precies wat de crash-as nodig
+   heeft om te weten of een grens uberhaupt in zicht was. */
+const TREDEN = Object.freeze({
+  CRASHGRENS: 'het proces stierf: de injectie is geraakt, de crashgrens is gehaald',
+  HANDLER_VOLTOOID: 'de handler liep af en gaf een 2xx',
+  ROLPOORT: 'de deur ging niet open -- de proef kwam niet voorbij de rol',
+  DIENSTPOORT: 'de dienst zelf weigerde (503): een schakelaar of afhankelijkheid, niet het verzoek',
+  VERZOEKCONTROLE: 'de route keurde het verzoek af voordat hij aan het werk ging',
+  DOMEINVOORWAARDE: 'het verzoek klopte, maar de toestand die de route nodig heeft ontbrak',
+  ONBEPAALD: 'de status past in geen van de treden'
+});
+
+function tredeVan(status) {
+  if (status === 0) return 'CRASHGRENS';
+  if (status >= 200 && status < 300) return 'HANDLER_VOLTOOID';
+  if (status === 401 || status === 403) return 'ROLPOORT';
+  if (status === 503) return 'DIENSTPOORT';
+  if (status === 400 || status === 422) return 'VERZOEKCONTROLE';
+  if ([402, 404, 409, 423, 429, 412].includes(status)) return 'DOMEINVOORWAARDE';
+  return 'ONBEPAALD';
+}
+
+/* Waar blokkeert hij, en waarop moet iemand dus werken? De drie soorten vragen
+   totaal verschillende reparaties, en dat is de hele reden dat ze uit elkaar
+   staan: een LIJF schrijf je in idemwereld.js, een WERELD bouw je als
+   voorziening, en een FEATURE los je niet op met een fixture -- daar staat een
+   schakelaar. Wie die drie op een hoop gooit, breidt de proefwereld uit om een
+   getal groen te krijgen. */
+function weegBlokkade({ status, leestBody }) {
+  const trede = tredeVan(status);
+  if (trede === 'CRASHGRENS' || trede === 'HANDLER_VOLTOOID')
+    return { bereiktTot: trede, blokkeertOp: null };
+  if (trede === 'ROLPOORT') return { bereiktTot: trede, blokkeertOp: 'ROL',
+    reden: 'de proef kwam niet voorbij de deur (' + status + '); dat is een rol of een sleutel ' +
+      'en geen lijf' };
+  if (trede === 'DIENSTPOORT') return { bereiktTot: trede, blokkeertOp: 'FEATURE',
+    reden: 'de DIENST weigerde (503), niet het verzoek -- hier staat een schakelaar of een ' +
+      'afhankelijkheid, en daar helpt geen lijf en geen fixture aan' };
+  if (trede === 'VERZOEKCONTROLE') {
+    if (leestBody === false) return { bereiktTot: trede, blokkeertOp: 'ONBEPAALD',
+      reden: 'de route wees het verzoek af (' + status + ') terwijl hij `req.body` niet aanraakt; ' +
+        'dan is het lijf niet de oorzaak en moet iemand kijken wat hij dan wel afkeurt' };
+    return { bereiktTot: trede, blokkeertOp: 'LIJF',
+      reden: 'de route keurde het verzoek af (' + status + ') voordat hij aan het werk ging: ' +
+        'het lijf dekt niet wat hij vraagt' };
+  }
+  if (trede === 'DOMEINVOORWAARDE') return { bereiktTot: trede, blokkeertOp: 'WERELD',
+    reden: 'het verzoek kwam door de controle heen en strandde op de TOESTAND (' + status + '): ' +
+      'de wereld mist een voorwerp of een stand die deze route nodig heeft' };
+  return { bereiktTot: 'ONBEPAALD', blokkeertOp: 'ONBEPAALD',
+    reden: 'status ' + status + ' past in geen van de treden; niet indelen zonder te kijken' };
+}
+
+const STAND_VAN_BLOKKADE = Object.freeze({
+  LIJF: 'BLOCKED_BODY', WERELD: 'BLOCKED_WORLD', FEATURE: 'BLOCKED_FEATURE',
+  ROL: 'BLOCKED_ROLE', ONBEPAALD: 'BLOCKED_ONBEPAALD'
+});
+
+/* LEEST DEZE ROUTE DE BODY? Uit de bron, op de regel die ROUTEBRON.json
+   aanwijst. Het venster loopt tot de volgende route-registratie of veertig
+   regels -- een handler die langer is dan dat en zijn body pas daarna aanraakt,
+   leest hier dus `false`. Lexicaal en dus graad `vermoed`; hij staat als EIGEN
+   veld in de uitslag zodat een lezer hem kan wantrouwen. */
+const ROUTEBRON = (() => {
+  try {
+    const j = JSON.parse(fs.readFileSync(path.join(WORTEL, 'ROUTEBRON.json'), 'utf8'));
+    const op = new Map();
+    for (const r of Object.values(j.perRoute || {})) op.set(r.route, r);
+    return op;
+  } catch (e) { return new Map(); }
+})();
+
+function leestBodyVan(methode, pad) {
+  const b = ROUTEBRON.get(methode + ' ' + pad);
+  if (!b || !b.bestand) return { leest: null, grond: 'ROUTEBRON.json wijst voor dit pad geen bron aan' };
+  let regels;
+  try { regels = fs.readFileSync(path.join(WORTEL, b.bestand), 'utf8').split('\n'); }
+  catch (e) { return { leest: null, grond: 'de bron ' + b.bestand + ' is niet te lezen' }; }
+  const start = Math.max(0, (b.regel || 1) - 1);
+  const eind = Math.min(regels.length, start + 40);
+  for (let i = start; i < eind; i++) {
+    if (i > start && /\bapp\.(post|get|put|delete|patch)\s*\(/.test(regels[i])) break;
+    if (/req\.body/.test(regels[i]))
+      return { leest: true, grond: b.bestand + ':' + (i + 1) + ' raakt req.body' };
+  }
+  return { leest: false, grond: b.bestand + ':' + (b.regel || 1) + ' raakt `req.body` niet binnen de handler' };
+}
 
 /* De twee grenzen die een injectiepunt HEBBEN. `in-de-opslag` staat er met
    opzet niet bij: crashgrenzen.js heeft gemeten dat hij op een transactionele
@@ -302,7 +416,7 @@ async function ronde(route, grens, ruis) {
        de eerste ronde meldde de andere dertig als WERELD_ONTBREEKT en meette ze
        niet. Dat is te streng: het GEDEELDE lijf (de echte IBAN en codenamen uit
        deze database) brengt een deel van die routes gewoon aan het werk, en een
-       route die er niets mee kan, meldt zich daarna als GEEN_WERK MET zijn
+       route die er niets mee kan, meldt zich daarna met zijn TREDE en zijn
        status -- wat meer zegt dan "geen lijf". WERELD_ONTBREEKT blijft over
        voor het geval dat de wereld helemaal niets opleverde. */
     const lijf = a.lijven[route.pad] || a.gedeeld;
@@ -387,31 +501,24 @@ async function ronde(route, grens, ruis) {
        bevestigen, komt hier ook terecht. Op sqlite bevestigt hij. */
     if (!gestorven) {
       const deedWerk = r.status >= 200 && r.status < 300;
-      /* NIET AAN HET WERK IS TWEE SOORTEN ONTBREKEND BEWIJS, en ze vragen
-         verschillend werk. Eerst heette dit allebei GEEN_WERK, en dan werk je
-         aan "vierenveertig rijen" in plaats van aan twee soorten gat.
-
-         De scheiding leunt NIET op het uitlezen van de statuscode -- 400 kan
-         even goed een ontbrekend veld als een ontbrekende voorwaarde zijn --
-         maar op iets wat we ZEKER weten: heeft idemwereld.js een lijf voor DIT
-         pad gemaakt, of ging er een algemeen lijf heen? Is het lijf voor deze
-         route gemaakt, dan klopt het verzoek van vorm en ontbreekt er dus een
-         voorwaarde in de wereld. De statuscode blijft er in beide gevallen bij
-         staan, zodat de triage hem kan lezen zonder dat de INDELING erop leunt. */
-      if (deedWerk) return { stand: 'GEEN_DUURZAME_WEG', statusVanDeAanroep: r.status,
+      /* NIET GESTORVEN. Drie feiten, dan pas een conclusie -- zie weegBlokkade.
+         De eerste versie leunde op EEN negatief signaal (geen eigen lijf) en
+         noemde dat BLOCKED_BODY; daar strandde /api/supplier/oog/overzicht op,
+         een route die de body niet eens leest. `eigenLijf` blijft in de rij
+         staan als FEIT, maar beslist niets meer. */
+      const lb = leestBodyVan(route.methode, route.pad);
+      const bl = weegBlokkade({ status: r.status, leestBody: lb.leest });
+      if (!bl.blokkeertOp) return { stand: 'GEEN_DUURZAME_WEG', statusVanDeAanroep: r.status,
+        bereiktTot: bl.bereiktTot, blokkeertOp: null, leestBody: lb.leest, leestBodyGrond: lb.grond,
         reden: 'de route gaf ' + r.status + ' en het proces leefde door, dus hij liep niet langs ' +
           'het injectiepunt van ' + grens.modus + ': hij schrijft via de gewone write-behind ' +
           'save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een ' +
           'VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet',
         geraakt: binnen, buitenDeRoute: buiten, eigenLijf };
-      return { stand: eigenLijf ? 'BLOCKED_WORLD' : 'BLOCKED_BODY', statusVanDeAanroep: r.status,
-        reden: eigenLijf
-          ? 'het lijf is voor DEZE route gemaakt (idemwereld.js), dus het verzoek klopt van vorm; ' +
-            'de route gaf ' + r.status + ' en wat ontbreekt is een VOORWAARDE in de wereld'
-          : 'idemwereld.js kent geen lijf voor dit pad, dus er ging een algemeen lijf heen en de ' +
-            'route gaf ' + r.status + '. Wat ontbreekt is een LIJF; pas daarna is te zien of de ' +
-            'wereld ook nog iets mist',
-        geraakt: binnen, buitenDeRoute: buiten, eigenLijf };
+      return { stand: STAND_VAN_BLOKKADE[bl.blokkeertOp], statusVanDeAanroep: r.status,
+        bereiktTot: bl.bereiktTot, blokkeertOp: bl.blokkeertOp,
+        leestBody: lb.leest, leestBodyGrond: lb.grond,
+        reden: bl.reden, geraakt: binnen, buitenDeRoute: buiten, eigenLijf };
     }
 
     /* DE RETRY-PROEF HOORT BIJ ALLEBEI DE GRENZEN, en dat ontbrak.
@@ -539,4 +646,5 @@ if (require.main === module) {
   }).catch(e => { console.error(e); process.exitCode = 2; });
 }
 
-module.exports = { meet, ronde, meetHerstartruis, weegHerhaling, weegContract, CLAIMS, GRENZEN };
+module.exports = { meet, ronde, meetHerstartruis, weegHerhaling, weegContract, weegBlokkade,
+  tredeVan, leestBodyVan, CLAIMS, GRENZEN, TREDEN, STAND_VAN_BLOKKADE };

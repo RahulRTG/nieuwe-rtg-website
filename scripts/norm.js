@@ -572,22 +572,33 @@ const METERS = [
      Ze worden nooit opgeteld: "het contract is gebroken" en "de proef kwam er
      niet bij" vragen het tegenovergestelde. */
   { sleutel: 'crashproefGezakt', richting: 'omlaag', wat: 'geldroutes waarvan het overlevingscontract na een crash is gebroken (CRASHPROEF.json)' },
-  /* EEN TAND IS TWEE TANDEN GEWORDEN, en om de reden die dit huis overal
-     hanteert: `crashproefOnbereikt` telde twee soorten ontbrekend bewijs bij
-     elkaar op, en die vragen het TEGENOVERGESTELDE werk.
+  /* VIER TANDEN, EN GEEN VAN ZE MAG BIJ EEN ANDER OPGETELD WORDEN.
 
-       crashproefGeenLijf    idemwereld.js kent geen lijf voor dit pad; er ging
-                             een algemeen lijf heen en de route wees het af.
-                             Werk: een lijf schrijven.
-       crashproefGeenWereld  het lijf is WEL voor deze route gemaakt, dus het
-                             verzoek klopt van vorm en er ontbreekt een
-                             VOORWAARDE. Werk: de wereld uitbreiden.
+     `crashproefOnbereikt` telde eerst alles bij elkaar wat "niet aan het werk
+     kwam". Dat verbergt precies wat je moet weten, want deze vier vragen
+     verschillende reparaties:
 
-     Opgeteld zou vooruitgang op het ene een terugval op het andere maskeren --
-     en juist de eerste bak is waar de schaal zit: acht van de zestien zijn
-     /api/supplier en delen dus EEN ontbrekende wereld, geen acht trucs. */
-  { sleutel: 'crashproefGeenLijf', richting: 'omlaag', wat: 'crashproefrijen zonder eigen lijf in idemwereld.js -- de route wees het algemene lijf af' },
-  { sleutel: 'crashproefGeenWereld', richting: 'omlaag', wat: 'crashproefrijen met een eigen lijf die stranden op een ontbrekende voorwaarde in de wereld' },
+       crashproefGeenLijf     de route keurde het VERZOEK af en raakt req.body.
+                              Werk: een lijf in idemwereld.js.
+       crashproefGeenWereld   het verzoek kwam door de controle en strandde op
+                              de TOESTAND. Werk: een voorziening bouwen.
+       crashproefGeenRol      de deur ging niet open (401/403). Werk: de juiste
+                              rol of sleutel meegeven.
+       crashproefOnbepaald    niet in te delen zonder te kijken. Dit is een
+                              kwaliteitssignaal over de METER zelf en hoort
+                              daarom naar nul: elke rij hier betekent dat de
+                              triage het antwoord schuldig blijft.
+
+     WAT ER MET OPZET GEEN TAND KRIJGT is BLOCKED_FEATURE. Een 503 zegt dat de
+     DIENST weigert -- een schakelaar of een afhankelijkheid -- en dat is geen
+     schuld van de proef. Er een tand op zetten zou iemand verleiden de
+     proefwereld uit te breiden om een getal groen te krijgen, terwijl er niets
+     aan de fixture mankeert. Zelfde grond als GEEN_DUURZAME_WEG: een gemeten
+     feit, geen werk. */
+  { sleutel: 'crashproefGeenLijf', richting: 'omlaag', wat: 'crashproefrijen waar de route het verzoek afkeurde en req.body leest -- er ontbreekt een lijf' },
+  { sleutel: 'crashproefGeenWereld', richting: 'omlaag', wat: 'crashproefrijen die op de toestand strandden -- er ontbreekt een voorziening' },
+  { sleutel: 'crashproefGeenRol', richting: 'omlaag', wat: 'crashproefrijen die niet voorbij de deur kwamen (401/403)' },
+  { sleutel: 'crashproefOnbepaald', richting: 'omlaag', wat: 'crashproefrijen die de triage niet kon indelen -- een signaal over de meter zelf' },
   /* DE EERSTE MINUUT (EERSTEMINUUT.json, npm run eersteminuut).
 
      Wat een mens die RTG niet kent in zijn eerste minuut krijgt. Deze meter
@@ -1412,6 +1423,8 @@ function meet(bronnen) {
     crashproefGezakt: leesRegister('CRASHPROEF.json', (j) => j.telling.FAILED || 0),
     crashproefGeenLijf: leesRegister('CRASHPROEF.json', (j) => j.telling.BLOCKED_BODY || 0),
     crashproefGeenWereld: leesRegister('CRASHPROEF.json', (j) => j.telling.BLOCKED_WORLD || 0),
+    crashproefGeenRol: leesRegister('CRASHPROEF.json', (j) => j.telling.BLOCKED_ROLE || 0),
+    crashproefOnbepaald: leesRegister('CRASHPROEF.json', (j) => j.telling.BLOCKED_ONBEPAALD || 0),
     eersteMinuutGezakt: leesRegister('EERSTEMINUUT.json', (j) => j.telling.gezakt),
     pakteMisgelopen: leesRegister('PAKTE.json', (j) => j.telling.misgelopen),
     menstaalTeVer: leesRegister('MENSTAALPROEF.json', (j) => j.telling.teVer),

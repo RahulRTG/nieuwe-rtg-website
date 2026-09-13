@@ -1631,6 +1631,16 @@ const IJKINGEN = {
       (j) => { j.telling.BLOCKED_WORLD = (j.telling.BLOCKED_WORLD || 0) + 7; return j; },
       () => norm.meet().crashproefGeenWereld - voor.crashproefGeenWereld)
   },
+  crashproefGeenRol: {
+    proef: (voor) => metVervangenJson('CRASHPROEF.json',
+      (j) => { j.telling.BLOCKED_ROLE = (j.telling.BLOCKED_ROLE || 0) + 5; return j; },
+      () => norm.meet().crashproefGeenRol - voor.crashproefGeenRol)
+  },
+  crashproefOnbepaald: {
+    proef: (voor) => metVervangenJson('CRASHPROEF.json',
+      (j) => { j.telling.BLOCKED_ONBEPAALD = (j.telling.BLOCKED_ONBEPAALD || 0) + 4; return j; },
+      () => norm.meet().crashproefOnbepaald - voor.crashproefOnbepaald)
+  },
   /* DE TAND VAN 12 SEPTEMBER 2026: eersteMinuutGezakt telt de toetsen van de
      eerste minuut die ZAKKEN (EERSTEMINUUT.json, telling.gezakt). Zelfde vorm
      als de vier hierboven -- hij leest een getal uit een bestaand register, dus

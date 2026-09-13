@@ -216,6 +216,74 @@ test('zonder uitgevoerde herhaling is `geenDubbel` NIET_BEPROEFD', () => {
     'en dat trekt de hele rij omlaag: half bewijs is geen bewijs');
 });
 
+/* ============================================================================
+   DRIE ONAFHANKELIJKE FEITEN, EN PAS DAARNA EEN CONCLUSIE.
+
+   De eerste indeling keek naar EEN ding -- heeft idemwereld.js een lijf voor dit
+   pad -- en gebruikte dat NEGATIEVE signaal over de proef als uitspraak over de
+   route. Dat ging meteen mis op /api/supplier/oog/overzicht: die leest de body
+   niet (`res.json(oogOverzicht(req.supplier))`) en gaf 503. Een lijf schrijven
+   zou daar nooit iets deblokkeren -- het was een METERfout, geen routeprobleem.
+
+   De regel weegt nu status en leestBody los van elkaar, en wordt AANGEROEPEN
+   en niet overgeschreven. */
+test('een route die de body niet leest, kan nooit op de body stranden', () => {
+  const geen = cp.weegBlokkade({ status: 400, leestBody: false });
+  assert.notEqual(geen.blokkeertOp, 'LIJF',
+    'dit is de fout van 13 september: geen bodyfixture gelezen als "het lijf ontbreekt"');
+  assert.equal(geen.blokkeertOp, 'ONBEPAALD', 'zonder body-lezing is de oorzaak niet bekend');
+  const wel = cp.weegBlokkade({ status: 400, leestBody: true });
+  assert.equal(wel.blokkeertOp, 'LIJF');
+});
+
+test('een 503 is de DIENST die weigert, geen ontbrekende fixture', () => {
+  const f = cp.weegBlokkade({ status: 503, leestBody: false });
+  assert.equal(f.bereiktTot, 'DIENSTPOORT');
+  assert.equal(f.blokkeertOp, 'FEATURE');
+  assert.match(f.reden, /schakelaar|afhankelijkheid/,
+    'de reden moet zeggen dat een lijf of fixture hier niets oplost -- anders breidt iemand ' +
+    'de proefwereld uit om een getal groen te krijgen');
+});
+
+test('de trede zegt hoe VER de proef kwam, los van de blokkade', () => {
+  assert.equal(cp.tredeVan(0), 'CRASHGRENS', 'gestorven = de injectie is geraakt');
+  assert.equal(cp.tredeVan(200), 'HANDLER_VOLTOOID');
+  assert.equal(cp.tredeVan(403), 'ROLPOORT');
+  assert.equal(cp.tredeVan(409), 'DOMEINVOORWAARDE');
+  assert.equal(cp.tredeVan(418), 'ONBEPAALD', 'een status die nergens in past wordt niet geraden');
+  for (const t of Object.keys(cp.TREDEN)) assert.ok(cp.TREDEN[t].length > 20,
+    'elke trede legt uit wat hij betekent: ' + t);
+});
+
+test('een bereikte crashgrens of een voltooide handler is GEEN blokkade', () => {
+  assert.equal(cp.weegBlokkade({ status: 0, leestBody: true }).blokkeertOp, null);
+  assert.equal(cp.weegBlokkade({ status: 200, leestBody: true }).blokkeertOp, null);
+});
+
+/* `leestBody` komt uit de BRON en niet uit een aanname. Deze toets draait tegen
+   de echte bestanden, want een fixture zou zich houden aan de vorm die de code
+   aanneemt in plaats van aan die van het register. */
+test('leestBody wordt uit de bron gelezen, met de vindplaats erbij', () => {
+  const zonder = cp.leestBodyVan('POST', '/api/supplier/oog/overzicht');
+  assert.equal(zonder.leest, false);
+  assert.match(zonder.grond, /oog\.js/, 'met het bestand erbij, zodat iemand het kan nakijken');
+  const met = cp.leestBodyVan('POST', '/api/supplier/facturen/maak');
+  assert.equal(met.leest, true);
+  assert.match(met.grond, /req\.body/);
+  const weg = cp.leestBodyVan('POST', '/api/bestaat/echt/niet');
+  assert.equal(weg.leest, null, 'onbekend is null en niet false -- anders leest "niet gevonden" ' +
+    'als "leest de body niet"');
+});
+
+/* ELKE BLOKKADESOORT HEEFT EEN STAND, en FEATURE heeft met opzet GEEN tand.
+   Een 503 is geen schuld van de proef; er een tand op zetten verleidt iemand de
+   proefwereld uit te breiden terwijl er niets aan de fixture mankeert. */
+test('elke blokkadesoort heeft precies een stand', () => {
+  for (const soort of ['LIJF', 'WERELD', 'FEATURE', 'ROL', 'ONBEPAALD'])
+    assert.ok(cp.STAND_VAN_BLOKKADE[soort], soort + ' heeft geen stand');
+  assert.equal(cp.STAND_VAN_BLOKKADE.FEATURE, 'BLOCKED_FEATURE');
+});
+
 /* DE ZELFIJKING. Een toets die je niet hebt zien zakken is geen toets: de regel
    hierboven MOET op verschillende invoer verschillend uitvallen. Geeft hij
    overal hetzelfde, dan rekent dit bestand niets na. */

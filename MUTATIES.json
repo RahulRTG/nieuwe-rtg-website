@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T01:09:35.723Z",
-    "commit": "72eee529",
+    "op": "2026-09-13T10:05:25.627Z",
+    "commit": "fd3d8cab",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2957,6 +2957,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "gevolgcontract.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/gevolgcontract.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "gewichtdrift.test.js": {
       "soort": "puur",

@@ -1,13 +1,13 @@
 {
  "stempel": {
-  "op": "2026-09-13T08:57:37.401Z",
-  "commit": "89c72e33",
+  "op": "2026-09-13T10:05:17.420Z",
+  "commit": "fd3d8cab",
   "boomVuil": false,
   "boomAnders": 0,
-  "instrument": "scripts/effectdekking.js",
+  "instrument": "scripts/gevolgdekking.js",
   "node": "v22.22.2"
  },
- "uitleg": "Per AI-bereikbare handeling twee assen: de METING (wat de idempotentieproef zag veranderen, via kern/stuur/gevolg.js) en de VERKLARING (het effectcontract van een mens, via kern/stuur/effectcontract.js). Ze worden nooit opgeteld.",
+ "uitleg": "Per AI-bereikbare handeling twee assen: de METING (wat de idempotentieproef zag veranderen, via kern/stuur/gevolg.js) en de VERKLARING (het gevolgcontract van een mens, via kern/stuur/gevolgcontract.js). Ze worden nooit opgeteld.",
  "grens": "De meting zegt WELKE collecties, nooit hoeveel erin verandert, en zij kijkt niet buiten de opslag (geen mail, geen provider, geen bank). De verklaring mag MEER zeggen dan de meting maar nooit iets anders: waar zij `gemeten` claimt, moet de meting dat bevestigen.",
  "tellers": {
   "bereikbaarPerRol": 173,

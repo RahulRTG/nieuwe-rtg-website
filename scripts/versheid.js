@@ -280,6 +280,15 @@ const REGISTERS = [
      in een toets: test/factuurproef.test.js bewaakt de regel die bepaalt wat
      als een economische mutatie telt, en die zakt gewoon. */
   ['FACTUURPROEF.json', 'npm run factuurproef:vast', 'of een geldpad van begin tot eind heel blijft: tweede aanroep, crash, herhaling'],
+  /* MELDT EN IS GEEN POORT, om dezelfde reden als zijn twee buren hierboven.
+     Deze classificatie beweegt mee met ELKE nieuwe geldroute: komt er een bij,
+     dan groeit het aantal (route, grens)-paren en loopt het register achter tot
+     iemand `npm run crashas` draait. Als poort zou hij dus rood staan op takken
+     die niets met crashgedrag te maken hebben -- precies de sirene waar de kop
+     van dit bestand voor waarschuwt. Wat hij WEL doet is zeggen hoe oud de
+     classificatie is, en dat is hier het punt: een crash-as die op een oudere
+     routelijst is gemeten, beweert iets over routes die er niet meer zijn. */
+  ['CRASHAS.json', 'npm run crashas:vast', 'welke van de zes crashgrenzen er per geldroute werkelijk bestaan, en welke te beproeven zijn'],
   /* HERSTELBESLUIT.json STAAT HIER BEWUST NIET, en dat is geen vergetelheid.
      Deze lijst is de INSTRUMENTENlijst: scripts/meetkeuring.js leest hem om te
      bepalen welk script welk register vult, en eist van elk instrument een

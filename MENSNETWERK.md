@@ -913,6 +913,66 @@ par. 6a.
 En de cache-vorm uit de tabel bestaat vandaag niet -- toets 6 is daarvoor een
 vooruitgeschoven post, net als assertie (c) in par. 4b.
 
+### 4d. De AI-contextgrondwet (AI-CONTEXT-01 t/m 06)
+
+Par. 4c beproefde EEN contextbouwer op EEN vraag. Wat daaruit volgt is breder dan
+Rahul en breder dan MN-02, want het gaat over elke plek waar dit huis gegevens
+klaarlegt voor een model. Zes regels, met per regel wie hem vandaag handhaaft --
+en waar dat niemand is, staat dat er.
+
+| | Regel | Handhaver |
+|---|---|---|
+| **AI-CONTEXT-01** | Een AI-context wordt opgebouwd uit een POSITIEVE lijst velden, nooit uit een object waar daarna gevoelige velden uit worden gehaald | `test/aicontext-allowlist.test.js` (4 bewijzen, 4 mutaties) |
+| **AI-CONTEXT-02** | Bestaat er een contextcache, dan zit de HOEDANIGHEID in de sleutel | vandaag **niemand**: er is geen cache. `mn02ai` toets 6 valt zodra er een komt zonder |
+| **AI-CONTEXT-03** | Een echte identiteit valt nooit terug op een demo- of persona-rij | `mn02ai` toets 1 |
+| **AI-CONTEXT-04** | De prompt wordt beproefd als UITGAANDE gegevensstroom, niet als functie-uitkomst | `mn02ai` (nep-modelserver op `LOCAL_AI_URL`) |
+| **AI-CONTEXT-05** | AFGELEIDE kennis telt net zo hard als een gekopieerd veld | `mn02ai` toets 3 (de gelijkheid), bewezen met de afgeleide mutatie |
+| **AI-CONTEXT-06** | Elke scheidingsproef draagt een tegenproef EN een besturingsproef | `mn02ai` toetsen 1, 4 en 6 |
+
+**AI-CONTEXT-01 is de dragende, en hij gaat over RICHTING en niet over stijl.**
+Twee manieren om hetzelfde resultaat te krijgen:
+
+```js
+const context = { ...md };  delete context.bewaarVerzoek;   // NEE
+const context = { trip: md.trip, invoices: md.invoices };   // JA
+```
+
+Bij de eerste passeert elk NIEUW veld de grens vanzelf en moet iemand eraan
+denken het te verwijderen; bij de tweede blijft elk nieuw veld buiten tot iemand
+het er bewust bij zet. Dat is het verschil tussen een grens die werkt als niemand
+oplet en een die alleen werkt als iedereen oplet. De handhaver eist daarom drie
+dingen tegelijk: de gelezen velden zijn gelijk aan een VERKLAARDE lijst
+(`LEDENVELDEN` in de samensteller), de ledenstaat wordt nergens in zijn geheel
+gekopieerd (geen spread, geen `Object.assign({}, md)`, geen `Object.keys(md)`),
+en er wordt nergens iets uit een context VERWIJDERD.
+
+**Waarom de lijst een verklaring is en geen serialisatie.** Er wordt met opzet
+niet overheen gelopen om het object te bouwen -- dan was de lijst zelf de
+generieke serializer waar de regel voor waarschuwt. De code leest elk veld op
+naam; de constante zegt welke dat horen te zijn; de toets houdt die twee gelijk.
+Wie er een veld bij zet, verandert ook die regel, en dat is precies de plek waar
+een mens ernaar kijkt.
+
+**AI-CONTEXT-02 heeft vandaag geen handhaver en dat is eerlijker dan een regel
+met een schijnbewaker.** Er is geen contextcache, dus er valt niets te bewaken.
+Wat er wel is, is een MEETINSTRUMENT dat omvalt zodra iemand er een bouwt zonder
+de hoedanigheid in de sleutel: dat is de besturingsproef van par. 4c, en hij
+bestaat omdat de cache-mutatie zonder hem volledig groen bleef.
+
+**AI-CONTEXT-03 is geen cosmetica.** De demo-persona lekt geen echte mens, dus
+op een privacylijst komt hij niet voor. Maar een model dat over de verkeerde
+identiteit redeneert, kan daarna alles fout hebben terwijl elke route en elke
+bevoegdheid perfect werken -- en het scherm blijft groen, want de prompt staat
+nergens. Dat is de reden dat AI-CONTEXT-04 ernaast staat: een assembler die je
+als functie toetst, geeft je de waarde die je verwachtte; een prompt die je bij
+de uitgang opvangt, geeft je wat er werkelijk gaat.
+
+**AI-CONTEXT-05 is de regel die het duurst is om te vergeten.** Van de vijf
+mutaties in par. 4c droeg er een geen enkele waarde en geen enkele veldnaam --
+alleen het BESTAAN van een kantoorfeit, in eigen woorden. Een zoek-op-waarde ziet
+die niet, een veldnaamlijst ziet die niet, en een mens die de diff leest denkt dat
+er niets gevoeligs in staat. Alleen de gelijkheid ziet hem.
+
 ### MN-03 -- geen commercieel voordeel
 
 > **Een commercieel belang van RTG verandert het onafhankelijke keuzepad van een

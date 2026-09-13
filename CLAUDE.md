@@ -510,13 +510,35 @@ commentaar, de veldinventaris telde op de naam `st` het halve huis mee, en een
 marker die woordelijk in Rahuls karakterportret staat wees een lek aan dat er
 niet was. Een bewijs draagt dus niet alleen zijn uitslag maar ook zijn
 **indeling** en zijn **foutmodel**, en die twee zijn zelf aantoonbaar of ze zijn
-niet waar. Twee goedkope helften staan er met een getal bij: **195 scripts lezen
-broncode en 19 scheiden code van commentaar** (`zonderCommentaar()` bestaat al,
-in drie standen -- een meter die op een patroon matcht hoort erdoor, want juist
-een toelichting bevat de woorden waar je op zoekt), en **`eisSchoneBoom()` hangt
-aan 12 van de 80 stempelende generatoren** -- het stempel is een verslag achteraf,
-de poort is een grendel vooraf, en dát is waarom `registersUitVuileBoom` blijft
-terugkomen.
+niet waar. Twee goedkope helften hebben een eigen meter gekregen
+(`npm run meterklasse`, `METERKLASSE.json`), en **de eerste telling had de
+verkeerde noemer -- zelf een voorbeeld van de regel**: "195 scripts lezen bron, 19
+scheiden commentaar" leest als 176 fouten, terwijl het merendeel bestanden telt en
+nooit een regel commentaar raakt. De klasse die ertoe doet is **73 scripts die
+SEMANTIEK afleiden uit de VORM van de code**, waarvan er 13 scheiden en 60 niet.
+De tweede helft is groter dan proceshygiëne: van de **79 generatoren die stempelen
+(en dus repo-waarheid claimen) grendelen er 12 op een schone boom**, en **0
+grendelen zonder te stempelen**. Die 67 zijn geen foutenlijst -- worktree-lokale
+uitvoer hoort de grendel juist niet te hebben -- maar daarmee is
+`registersUitVuileBoom` geen incidentklasse meer maar een **systematisch ongedekt
+contract**: bij 67 artefacten kan niemand zeggen of "repo-waarheid" expliciet zo
+bedoeld is. Wat er moet komen is geen regel voor alle 79 maar een VERKLARING per
+generator, en dat besluit staat open.
+**En par. 4d is de grondwet die uit die ronde volgt -- AI-CONTEXT-01 t/m 06**, met
+per regel wie hem handhaaft en waar dat niemand is. De dragende is de eerste:
+**een AI-context wordt opgebouwd uit een POSITIEVE lijst velden, nooit uit een
+object waar daarna gevoelige velden uit worden gehaald.** Dat gaat over RICHTING
+en niet over stijl: bij `{ ...md }` gevolgd door `delete` passeert elk NIEUW veld
+de grens vanzelf, bij `{ trip: md.trip }` blijft elk nieuw veld buiten tot iemand
+het er bewust bij zet. `test/aicontext-allowlist.test.js` handhaaft dat met drie
+eisen tegelijk (de gelezen velden zijn gelijk aan een verklaarde `LEDENVELDEN`,
+de ledenstaat wordt nergens in zijn geheel gekopieerd, en er wordt nergens iets
+uit een context VERWIJDERD), en de lijst is met opzet een VERKLARING en geen
+serialisatie -- er wordt niet overheen gelopen, want dan was hij zelf de generieke
+serializer waar de regel voor waarschuwt. AI-CONTEXT-02 (hoedanigheid in de
+cachesleutel) heeft vandaag **geen handhaver** en dat staat er liever dan een
+schijnbewaker: er is geen cache, en wat er wel is, is de besturingsproef die
+omvalt zodra iemand er een bouwt zonder.
 
 Daaruit volgt de vorm van MN-02, en die is anders dan hij eerst was: niet *"een
 RTG-manager ziet hetzelfde als een externe"* (dat sneuvelt, want `kern/ledenbalie.js`

@@ -7,6 +7,35 @@ const RAHUL_KARAKTER = require('./karakter');
 const { TAALREGELS } = require('../rahul/taal');
 const { TWIJFELREGELS } = require('../rahul/twijfel');
 const { cannedAnswer } = require('./demoantwoorden');
+
+/* ============================================================================
+   DE POSITIEVE VELDLIJST -- wat er van een lid in een modelprompt MAG.
+
+   AI-CONTEXT-01 (MENSNETWERK.md par. 4d): een AI-context wordt opgebouwd uit
+   een POSITIEVE lijst velden, nooit uit een object waar daarna gevoelige velden
+   uit worden gehaald. Dus niet
+
+       const context = { ...md }; delete context.bewaarVerzoek;
+
+   maar veld voor veld op naam. Het verschil is niet stijl maar richting: bij de
+   eerste vorm passeert elk NIEUW veld de grens vanzelf en moet iemand eraan
+   denken het te verwijderen; bij de tweede blijft elk nieuw veld buiten tot
+   iemand het er bewust bij zet.
+
+   Dat is hier geen theorie. De ledenstaat draagt 25 velden (AICONTEXT.json,
+   lexicaal gemeten en dus een ONDERgrens), waarvan er negen door een
+   KANTOORroute worden geschreven -- `bewaarVerzoek` draagt de ECHTE NAAM van de
+   medewerker uit de identiteitskluis. Deze tekst gaat woordelijk naar een
+   modelaanbieder. Een enkele spread zet dat allemaal in een keer over de streep,
+   en niemand ziet het: de prompt staat op geen enkel scherm.
+
+   DEZE LIJST IS EEN VERKLARING EN GEEN SERIALISATIE. Er wordt met opzet niet
+   overheen gelopen om het object te bouwen -- dan was hij zelf de generieke
+   serializer waar de regel voor waarschuwt. De code leest elk veld op naam; deze
+   constante zegt WELKE dat horen te zijn, en test/aicontext-allowlist.test.js
+   houdt de twee gelijk. Wie er een veld bij zet, verandert deze regel ook, en
+   dat is precies de plek waar een mens ernaar kijkt. */
+const LEDENVELDEN = ['trip', 'invoices'];
 module.exports = (ctx) => {
   const { db, PERSONAS, AI_TONE, naamEn, dagContext, stemmingVoor, geloofRegel, ledenInhoudVan, accounts } = ctx;
 

@@ -505,24 +505,61 @@ die hij bewaakt heeft een blinde vlek die er precies uitziet als succes.
 
 Dit is de goedkoopste helft van par. 6a en hij is machinaal te sluiten.
 `scripts/lib/bron.js` draagt `zonderCommentaar()` al, in drie standen (weghalen,
-platslaan met behoud van regelnummers, en per taal). **Gemeten op 13 september
-2026: 195 scripts in `scripts/` lezen broncode, en 19 daarvan scheiden code van
-commentaar.** Dat is een lexicale telling en dus een ONDERgrens aan het probleem,
-geen aanklacht: de meeste van die 195 tellen bestanden of paden en raken een
-regel commentaar nooit. Maar elke meter die op een PATROON in de bron matcht,
-moet door die functie -- en dat is precies waar de twee vondsten hierboven
-zaten, want juist een toelichting beschrijft wat de code doet en bevat dus per
-definitie de woorden waar je op zoekt.
+platslaan met behoud van regelnummers, en per taal).
 
-Daar staat een tweede, even goedkope regel naast. **De poort vóór een meting
-bestaat en hangt aan 12 van de 80 stempelende generatoren.** `eisSchoneBoom()` in
-`scripts/lib/stempel.js` weigert een ronde die toch `boomVuil: true` zou
-opleveren; `stempel()` MELDT het achteraf, als de tijd al op is en de meter
-`registersUitVuileBoom` al omhoog is gerateld. Dat die meter deze maand twee
-keer op één dag van 1 naar 2 ging, is daar het gevolg van en geen toeval: het
-stempel is een verslag, de poort is een grendel, en 68 generatoren hebben alleen
-het verslag. Wie een generator schrijft, hangt hem aan de poort --
-`scripts/aicontext.js` is de eerste die daarmee begint.
+**De eerste telling was de verkeerde noemer, en dat is zelf een voorbeeld van
+par. 6a.** Er stond hier "195 scripts lezen broncode, 19 scheiden code van
+commentaar", en dat leest als 176 fouten. Dat is het niet: het merendeel van die
+scripts telt bestanden of paden en raakt een regel commentaar nooit. De klasse
+die ertoe doet is smaller, en `npm run meterklasse` (`METERKLASSE.json`) meet
+haar apart:
+
+| | |
+|---|---|
+| scripts die broncode lezen | **201** |
+| daarvan: leiden SEMANTIEK af uit de VORM van die code | **73** |
+| daarvan: scheiden code en commentaar | **13** |
+| daarvan: doen dat niet | **60** |
+
+Alleen die 73 hoeven door `zonderCommentaar()`, want juist een toelichting
+beschrijft wat de code doet en bevat dus per definitie de woorden waar je op
+zoekt. Dat is hier twee keer echt gebeurd: `test/mutatiewacht.test.js` bleef
+groen met de bewaakte code weg omdat hij zijn eigen commentaar las, en de kop van
+`server/kern/ai/prompt.js` bevat `...md` letterlijk als voorbeeld van wat NIET
+mag -- een toets die zijn onderwerp met commentaar en al leest, zakt daar op de
+uitleg van de regel die hij bewaakt.
+
+### 6a.2 Een generator hoort zijn eigen klasse te kennen
+
+Daar staat een tweede, even goedkope regel naast, en die is groter dan
+proceshygiëne. `eisSchoneBoom()` in `scripts/lib/stempel.js` weigert een ronde
+die toch `boomVuil: true` zou opleveren; `stempel()` MELDT het achteraf, als de
+tijd al op is en de meter `registersUitVuileBoom` al omhoog is gerateld. Gemeten
+door hetzelfde script:
+
+| | |
+|---|---|
+| scripts die een artefact schrijven | **187** |
+| daarvan: stempelen, en claimen dus repo-waarheid | **79** |
+| daarvan: weigeren een vuile boom | **12** |
+| daarvan: doen dat niet | **67** |
+| grendelen zonder te stempelen | **0** |
+
+**Die 67 zijn geen foutenlijst.** Uitvoer die bewust worktree-lokaal is, of een
+tussenronde, hoort de grendel juist niet te hebben. Het punt is dat
+`registersUitVuileBoom` daarmee ophoudt een incidentklasse te zijn en een
+SYSTEMATISCH ONGEDEKT CONTRACT wordt: van de 79 artefacten die zich als
+repo-waarheid gedragen, kan er bij 67 niemand zeggen of dat expliciet zo bedoeld
+is. De laatste rij is het enige wat vandaag hard is -- er is er geen die grendelt
+zonder te stempelen, dus de poort is een strikte deelverzameling van de claim en
+niemand grendelt iets dat geen waarheid pretendeert.
+
+**Wat er dus moet komen is geen regel voor alle 79 maar een VERKLARING per
+generator**: dit artefact is repo-waarheid (en dan grendelt hij), of dit artefact
+is worktree-lokaal (en dan zegt hij dat). Zolang die verklaring ontbreekt, is elk
+getal over vuile bomen een meting van toeval. `scripts/aicontext.js` en
+`scripts/meterklasse.js` zijn de eerste twee die de grendel meebrengen; de
+verklaring per generator is een besluit dat nog openstaat.
 
 ## 7. Wat dit niet wordt
 

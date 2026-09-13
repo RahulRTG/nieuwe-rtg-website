@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:07:26.106Z",
-    "commit": "8533363f",
+    "op": "2026-09-13T12:18:49.716Z",
+    "commit": "3ff6ecea",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -168,6 +168,16 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "afbouwafloop.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "de afbouwwet woont in scripts/ en niet in server/; vijf handmutaties, alle vijf raak (zie de kop hierboven)"
+    },
+    "afbouwketen.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "idem, met echte processen; de vijf handmutaties vonden er twee echte gaten mee (hartslag, PASSED-only)"
     },
     "afbouwpoort.test.js": {
       "soort": "puur",

@@ -17,9 +17,9 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1217 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
-| niet te meten (al rood, geen module gevonden, ...) | 68 |
+| niet te meten (al rood, geen module gevonden, ...) | 70 |
 | alleen in de kop *genoemd*, nog niet gemeten | 154 |
-| niets van beide | 404 |
+| niets van beide | 402 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -59,8 +59,8 @@ toets omvalt.
 | `advocaat-lezer.test.js` | 4 | gezakt op `!==->===#0` | DE ADVOCATE ALS LEZER: EEN AFLOPENDE TOESTEMMING IS EEN TERMIJN HDI.md par. 7 regel 7. |
 | `adyen-config.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `adyen-eigen.test.js` | 2 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `afbouwafloop.test.js` | 7 | -- | GEEN WERK ZONDER EIGENAAR, GEEN OPVOLGER ZOLANG WERK VAN DE VOORGANGER LEEFT. scripts/lib/afbouw-afloop.js legt vast wat er van een meetronde overblijft. |
-| `afbouwketen.test.js` | 2 | -- | DE VOLLEDIGE LEVENSLOOP VAN EEN BRONMUTERENDE RONDE -- met echte processen. test/afbouwafloop.test.js beproeft de module op zichzelf. |
+| `afbouwafloop.test.js` | 7 | geen bronmutatie mogelijk | GEEN WERK ZONDER EIGENAAR, GEEN OPVOLGER ZOLANG WERK VAN DE VOORGANGER LEEFT. scripts/lib/afbouw-afloop.js legt vast wat er van een meetronde overblijft. |
+| `afbouwketen.test.js` | 2 | geen bronmutatie mogelijk | DE VOLLEDIGE LEVENSLOOP VAN EEN BRONMUTERENDE RONDE -- met echte processen. test/afbouwafloop.test.js beproeft de module op zichzelf. |
 | `afbouwpoort.test.js` | 7 | gezakt op `===->!==#3` | MEET NIEMAND TERWIJL EEN MOTOR DE BRON VERBOUWT? Twee motoren in dit huis muteren met opzet echte bestanden en zetten ze in een finally terug: scripts/mutatie.js (de mutatiemotor) en test/meterijk.test.js (de ijking,... |
 | `afleidbaar.test.js` | 9 | gezakt op `===->!==#0` | WAT IS ER AFLEIDBAAR UIT EEN CODENAAM -- en meet die meter dat werkelijk? MAGNAATLAB.md par. |
 | `agenda-pro.test.js` | 5 | gezakt op `liegpoort /api/` | De pro-laag van de agenda: herhalingen die goed uitrollen, uitnodigen op codenaam (nooit een echte naam in beeld), ja/nee dat bij de organisator terugkomt, ICS-export met RRULE, en de eerlijke sluitregels. Draai los:... |

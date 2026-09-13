@@ -1,8 +1,8 @@
 {
  "stempel": {
-  "op": "2026-09-13T12:30:59.165Z",
-  "commit": "cf3e6792",
-  "boomVuil": true,
+  "op": "2026-09-13T12:40:25.472Z",
+  "commit": "9f223793",
+  "boomVuil": false,
   "boomAnders": 2,
   "instrument": "scripts/ondernemerbewijs.js",
   "node": "v22.22.2"

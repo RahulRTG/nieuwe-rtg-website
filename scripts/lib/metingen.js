@@ -68,7 +68,20 @@ const GEEN_METING = new Set([
      een commitboodschap, een PR-bericht. Geen meting en geen kwaliteitsgetal: het
      hoort te GROEIEN naarmate er meer wordt rechtgezet, en een ratel erop zou
      precies het rechtzetten bestraffen. */
-  'CORRECTIES.json'
+  'CORRECTIES.json',
+  /* HERREKENBAAR.json is een register van BESLUITEN en geen meting: het zegt per
+     route waarom een verloren schrijfactie zichzelf herstelt. Daar zit geen getal
+     in dat beter of slechter kan worden -- het aantal verklaringen hoort te
+     groeien naarmate er meer is uitgezocht, en een ratel zou juist het uitzoeken
+     bestraffen. De METING ernaast (FAALPROEF.json) hangt wel aan een tand
+     (faalproefGezakt), en die blijft onverkort tellen: het besluit drukt de
+     meting niet weg.
+
+     IDEMBESLUIT.json is hetzelfde soort bestand en staat vandaag in GEEN van
+     beide lijsten, en telt dus mee in `metingenZonderRatel`. Dat hier rechtzetten
+     zou die tand verschuiven, en dat is een apart besluit -- het staat genoteerd
+     en niet stilletjes meegenomen. */
+  'HERREKENBAAR.json'
 ]);
 
 const REGISTER = {

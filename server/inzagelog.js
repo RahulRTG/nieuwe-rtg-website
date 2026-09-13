@@ -26,9 +26,42 @@
 
    Bewust zonder eigen opslaglaag: het journaal leeft in db.data.inzageLog en
    gaat dus mee in dezelfde duurzame opslag (JSON/SQLite/Postgres) als de rest.
-   Begrensd op MAX regels; loopt hij vol, dan valt de oudste eraf. Wie langer
-   moet bewaren, exporteert periodiek (zie lijst()). */
-const MAX = 5000;
+
+   DE BEWARING VOLGT DE BELOFTE, EN NIET ANDERSOM (besluit 6, 13 september 2026).
+   Hier stond `const MAX = 5000` en verder niets: liep de rij vol, dan viel de
+   oudste eraf. Dat is een andere belofte dan de onze. Tegen een lid zeggen we
+   *"u kunt zien wie uw dossier bekeek"*; wat de code waarmaakte was *"wij bewaren
+   de laatste vijfduizend inzages"*. Bij vijftig inzages per dag is dat honderd
+   dagen, en na honderd dagen is het antwoord op de vraag van een lid stilletjes
+   onvolledig -- zonder dat iemand het merkt, want een afgevallen regel laat niets
+   achter.
+
+   Dus bewaart het journaal nu op TIJD en niet op aantal:
+
+     BEWAARDAGEN  de termijn die de belofte waarmaakt. Twee jaar, en dat is een
+                  keuze met een grond: het inzagejournaal is het bewijs OVER
+                  toegang, dus het hoort de gegevens waarover het gaat te
+                  overleven. Het identiteitsbewijs zelf valt na een jaar
+                  (server/bewaarveger.js); het spoor dat iemand ernaar keek,
+                  blijft daar een jaar overheen staan.
+
+     MAX          een NOODREM en geen bewaartermijn. Ongebreidelde groei in
+                  db.data is een echt risico, dus er blijft een bovengrens --
+                  maar hij ligt nu ruim boven wat de termijn oplevert, en als
+                  hij toch bijt is dat ZICHTBAAR (zie `afgekapt` hieronder).
+
+   EN DAT LAATSTE IS HET PUNT. Een grens die stil afkapt, is een belofte die stil
+   breekt -- precies de faalvorm die deze hele ronde heeft opgeruimd. Bijt de
+   noodrem, dan telt het journaal dat en zegt samenvatting() het hardop. Dan is
+   het een zichtbaar tekort in plaats van een gat dat niemand kan vinden.
+
+   AVG: de termijn verlengen opent hier geen nieuwe vraag. Het journaal draagt
+   geen naam en geen e-mailadres -- alleen een account-id, wie er keek en waarom
+   -- en het blijft bij een accountverwijdering met opzet staan (kern/vergeten.js,
+   AVG art. 17 lid 3). Wat er langer blijft staan is de-geidentificeerd. */
+const BEWAARDAGEN = 730;
+const BEWAARMS = BEWAARDAGEN * 24 * 3600 * 1000;
+const MAX = 200000;
 
 const { hangAan, verifieer, top } = require('./lib/keten');
 const { verankerPunt, verifieerTegenAnker } = require('./lib/keten-anker');
@@ -123,8 +156,33 @@ function schrijfRegel({ door, over, waarom, bron, extra } = {}) {
   const l = rij();
   const r = hangAan(l, kaal);
   l.unshift(r);
-  if (l.length > MAX) l.length = MAX;
+  snoei(l);
   return r;
+}
+
+/* SNOEIEN OP TIJD, MET DE NOODREM ERACHTER.
+
+   De rij staat nieuwste-eerst, dus verjaarde regels vallen aan het EIND weg --
+   dezelfde kant als de oude `l.length = MAX`, zodat de hashketen er niet anders
+   van breekt dan hij al deed. (Een keten bewijst de integriteit van wat er
+   STAAT; wat eraf viel ziet alleen een eerder weggezet anker. Dat was zo en dat
+   blijft zo.)
+
+   TWEE SOORTEN VERLIES, EN ZE WORDEN NOOIT OP EEN HOOP GEGOOID. Een regel die
+   VERJAART is de bewaartermijn die werkt; een regel die door de NOODREM valt is
+   de belofte die breekt. Alleen die tweede wordt geteld, want alleen die tweede
+   is een tekort. Wie ze samentelt, verbergt het tekort in het normale verloop. */
+function snoei(l) {
+  const grens = nu() - BEWAARMS;
+  while (l.length && Date.parse(l[l.length - 1].at) < grens) l.pop();
+  if (l.length > MAX) {
+    const weg = l.length - MAX;
+    l.length = MAX;
+    try {
+      const d = DB && DB.data;
+      if (d) d.inzageLogAfgekapt = (Number(d.inzageLogAfgekapt) || 0) + weg;
+    } catch (e) { /* de telling mag het schrijven nooit tegenhouden */ }
+  }
 }
 
 /* Meerdere accounts in één handeling (een lijstscherm dat namen toont) horen
@@ -169,7 +227,14 @@ const { noteerVast, noteerVeelVast } = require('./inzagelog-vast')({
    nalopen zijn een ander onderwerp dan schrijven, met andere lezers. De rij
    gaat als FUNCTIE mee, zodat er maar een plek is die weet waar het journaal
    woont. */
-const lezen = require('./inzagelog-lezen')({ rij });
+const lezen = require('./inzagelog-lezen')({
+  rij,
+  /* De termijn en de noodremteller gaan MEE naar de leeskant in plaats van dat
+     die ze zelf ophaalt: zo is er een plek die weet hoe lang dit huis bewaart,
+     en kan een scherm niet iets anders beweren dan de opslag doet. */
+  bewaardagen: BEWAARDAGEN,
+  afgekapt: () => { try { return Number(DB && DB.data && DB.data.inzageLogAfgekapt) || 0; } catch (e) { return 0; } }
+});
 const { lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker } = lezen;
 
-module.exports = { zet, noteer, noteerVast, noteerVeel, noteerVeelVast, lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker, MAX };
+module.exports = { zet, noteer, noteerVast, noteerVeel, noteerVeelVast, lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker, MAX, BEWAARDAGEN };

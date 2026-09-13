@@ -78,6 +78,7 @@ const BUITEN = {
   'GEZAG.json': 'een afdruk uit de code, met een eigen toets',
   'VERTROUWEN.json': 'de vervalstaten, afgeleid uit de andere registers',
   'IDEMBESLUIT.json': 'een register van BESLUITEN, met de hand bijgehouden',
+  'HERREKENBAAR.json': 'een register van BESLUITEN over herrekenbaarheid, met de hand bijgehouden; de meting ernaast is FAALPROEF.json en die veroudert wel',
   'LADDER.json': 'een afdruk uit de code, ververst door de keuring',
   'SLO.json': 'de servicedoelen zelf -- gegevens, geen meting',
   'KLOK.json': 'een tabel, geen meting',

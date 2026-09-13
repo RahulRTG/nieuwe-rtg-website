@@ -561,6 +561,15 @@ getal over vuile bomen een meting van toeval. `scripts/aicontext.js` en
 `scripts/meterklasse.js` zijn de eerste twee die de grendel meebrengen; de
 verklaring per generator is een besluit dat nog openstaat.
 
+**En daarom staat `METERKLASSE.json` bewust nog niet in de repo.** Een meetbestand
+in de wortel hoort aan een ratel te hangen en die ratel hoort geijkt te zijn. Voor
+de tweede vraag is de tand evident -- het aantal vormlezers zonder scheiding hoort
+te dalen. Voor de eerste is hij dat niet: 67 kan alleen dalen door grendels toe te
+voegen, en een deel van die 67 hoort er juist geen te hebben. Een ratel die daarop
+duwt maakt het huis slechter en de meter groener, en dat is precies de faalvorm
+waar dit hoofdstuk over gaat. Tot de verklaring per generator een besluit is, is
+`npm run meterklasse` een commando dat je draait en geen getal dat meetelt.
+
 ## 7. Wat dit niet wordt
 
 - **Geen enkel groen woord bovenaan.** `LAT.md` regel 11 en `check.js` regel 48

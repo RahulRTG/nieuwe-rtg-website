@@ -37,8 +37,21 @@
    er ten onrechte in. Het getal wijst een klasse aan om na te lopen en velt geen
    oordeel per script -- daarom drukt hij de namen af en niet alleen een telling.
 
+   HET REGISTER STAAT BEWUST NOG NIET IN DE REPO. Een meetbestand in de wortel
+   hoort aan een ratel te hangen (`metingenZonderRatel`) en die ratel hoort geijkt
+   te zijn (keuringsregel 35). Voor vraag 2 is die ratel evident -- het aantal
+   vormlezers zonder scheiding hoort te dalen. Voor vraag 1 is hij dat NIET: het
+   getal 67 kan alleen dalen door grendels toe te voegen, en een deel van die 67
+   hoort er juist geen te hebben. Een ratel die daarop duwt, maakt het huis
+   slechter en de meter groener.
+
+   Wat die ratel goed maakt is de VERKLARING per generator (repo-waarheid of
+   worktree-lokaal), en dat is een besluit dat nog openstaat -- zie
+   BEWIJSMACHINE.md par. 6a.2. Tot dat besluit valt, is dit een commando dat je
+   draait en geen bestand dat meetelt. `--vastleggen` bestaat voor de dag erna.
+
    Draaien:  npm run meterklasse            (print)
-             npm run meterklasse:vast       (schrijft METERKLASSE.json)
+             npm run meterklasse:vast       (schrijft METERKLASSE.json -- zie hierboven)
    ============================================================================ */
 const fs = require('fs');
 const path = require('path');

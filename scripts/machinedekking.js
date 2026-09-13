@@ -254,10 +254,14 @@ const digest = (bestand) => {
   try { return crypto.createHash('sha256').update(fs.readFileSync(path.join(WORTEL, bestand))).digest('hex').slice(0, 16); }
   catch (e) { return null; }
 };
-const commit = () => {
-  try { return execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: WORTEL }).toString().trim(); }
-  catch (e) { return null; }
-};
+/* DE STEMPEL KOMT UIT HET HUIS EN NIET UIT DIT BESTAND, en dat is geen
+   opruimwerk. scripts/lib/stempel.js zet er `boomVuil` bij: is de werkboom niet
+   schoon op het moment van meten, dan is de uitslag NIET te herhalen -- en
+   scripts/norm.js telt precies dat (`registersUitVuileBoom`, en die mag alleen
+   dalen). Een eigen stempel zonder dat veld zou deze meter onzichtbaar houden
+   voor die telling: niet vals, maar wel buiten het toezicht dat elk ander
+   register hier wel draagt. */
+const { stempel } = require('./lib/stempel');
 
 /* ---------------------------------------------------------------------------
    DE BESTANDSGRAAF. Twee dingen: welke bestanden requiret een bestand
@@ -535,7 +539,7 @@ function meet() {
       '"idempotent". Woont een route ZELF in een hub, dan vervalt de bestandsas (bestandsasOnbruikbaar) en is ook ' +
       'zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. De assen uit EXECUTION_MAP.json ' +
       'zijn gelezen en niet hier geteld.',
-    stempel: { op: new Date().toISOString(), commit: commit(), node: process.version },
+    stempel: stempel(),
     bronnen: {
       'EXECUTION_MAP.json': digest('EXECUTION_MAP.json'),
       'KERNHERKOMST.json': digest('KERNHERKOMST.json'),

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T00:13:21.194Z",
-    "commit": "23a3ac37",
+    "op": "2026-09-13T01:09:35.723Z",
+    "commit": "72eee529",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2805,6 +2805,14 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "scripts/lib/geldwacht.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "geldketen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kantoor/geldketen.js",
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1

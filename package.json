@@ -170,6 +170,8 @@
     "magnaatlab:vast": "node scripts/magnaatlab.js --vastleggen",
     "commerce": "node scripts/commerce.js",
     "commerce:vast": "node scripts/commerce.js --vastleggen",
+    "gelding": "node scripts/gelding.js",
+    "gelding:toon": "node scripts/gelding.js --toon",
     "verband": "node scripts/verband.js",
     "verband:toon": "node scripts/verband.js --toon",
     "doctrine": "node scripts/doctrine.js",

@@ -721,8 +721,8 @@ boolean slaat het verschil tussen een creditnota en een gewiste factuur plat),
 `classificatie`, geleend uit `kern/envelop.js` en niet overgeschreven).
 
 `npm run gevolgdekking` meet het, zonder percentage erboven:
-<!--getal:gevolg.contractVolledig-->1<!--/getal--> volledig,
-<!--getal:gevolg.contractOnbekend-->172<!--/getal--> zonder contract. `--controle` zakt zodra
+<!--getal:gevolg.contractVolledig-->3<!--/getal--> volledig,
+<!--getal:gevolg.contractOnbekend-->170<!--/getal--> zonder contract. `--controle` zakt zodra
 de onbekende paden stijgen, een volledige verklaring verdwijnt, of een contract de
 keuring niet haalt.
 
@@ -956,7 +956,7 @@ nu vastgelegd.
 
 **Wat er nog niet is, en dat hoort erbij:** het register draagt drie contracten, waarvan
 één in de noemer van de meter. De andere
-<!--getal:gevolg.contractOnbekend-->172<!--/getal--> bereikbare handelingen hebben er
+<!--getal:gevolg.contractOnbekend-->170<!--/getal--> bereikbare handelingen hebben er
 geen — en die vullen is nadrukkelijk **niet** de volgende stap: pas nu de vergelijker er
 beslissingen mee neemt, betekent een contract erbij iets meer dan een JSON-regel erbij.
 De grens die blijft staan: `kern/commercie/tegenfeit.js` is en blijft het

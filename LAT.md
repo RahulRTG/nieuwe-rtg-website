@@ -551,7 +551,7 @@ een suite als neveneffect schrijft (een nieuw tijdstempel in `VINDBAAR.json`,
 `SUITE.json`, `LADDER.json`) hoort niet in een diff: het is ruis die de volgende
 lezer moet uitpluizen voor niets.
 
-**Handhaver:** `lib/stempel.js` zet `boomVuil` op elk register en
+**Handhaver:** `scripts/lib/stempel.js` zet `boomVuil` op elk register en
 `scripts/norm.js` ratelt `registersUitVuileBoom`; de deltapoort meldt hem per
 bestand met de reden. Voor de mens die midden in een ronde commit bestaat geen
 handhaver.
@@ -699,7 +699,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | welke apps een toets ECHT heeft geopend ("af" is geen bewering) | `scripts/schermen.js` + `NORM.json` |
 | elke meter een keer zien uitslaan voor hij een oordeel draagt | `test/meterijk.test.js` + `check.js` regel 35 |
 | een register-afdruk loopt niet achter op de code die hij beschrijft | `test/mutatiecontract.test.js` + `test/capabilities.test.js` toets 8 |
-| een meting uit een vuile werkboom is geen bewijs | `lib/stempel.js` (`boomVuil`) + `registersUitVuileBoom` in `NORM.json` |
+| een meting uit een vuile werkboom is geen bewijs | `scripts/lib/stempel.js` (`boomVuil`) + `registersUitVuileBoom` in `NORM.json` |
 | grote uitvoer gevolgd door `process.exit()` kapt bij een pipe af | de pipe-regel in `scripts/meetkeuring.js` |
 | de prestatielat: p99, doorvoer, event-loop, herstel | `BEPROEVING.json` + `scripts/norm.js` |
 | wie bewaakt wat, en wat bewaakt niemand | `scripts/samenhang.js` |

@@ -92,6 +92,39 @@ test('een herhaling die WEL werk deed, weegt verschillend -- en `ongemeten` is n
     'ONGEMETEN LEZEN ALS NIET-IDEMPOTENT is precies de fout die hier is gemaakt');
 });
 
+/* EEN STAND DIE NOOIT EERLIJK KAN WORDEN TOEGEKEND, HOORT NIET TE BESTAAN.
+
+   De eerste volledige ronde gaf 16 keer `BLINDE_INJECTIE`: de modus stond
+   scherp, de route gaf 200 en het proces leefde door. Dat las als zestien
+   defecten en het waren er nul -- acht routes (pas/bevries en broers) schrijven
+   met de gewone write-behind save(), na te lezen in server/kern/bank/passen.js,
+   en raken `bijeen()` noch `saveDuurzaam()`.
+
+   Het woord is daarom weg, en niet hernoemd-en-bewaard. Van BUITEN is een echte
+   blinde injectie namelijk niet te onderscheiden van een route die het
+   injectiepunt niet raakt: allebei geven ze 200. Een stand die je nooit eerlijk
+   kunt toekennen, is dekking die er niet is.
+
+   Wat ervoor in de plaats kwam zegt alleen wat er gemeten IS, en het is geen
+   geruststelling: deze route loopt niet langs de bundel, dus wat hem bedreigt
+   is een VERLOREN schrijfactie -- een andere modus, die deze proef niet draait. */
+test('`BLINDE_INJECTIE` bestaat niet meer als uitslag, en dat is een besluit', () => {
+  const bron = require('fs').readFileSync(require('path').join(__dirname, '..',
+    'scripts', 'crashproef.js'), 'utf8');
+  const toegekend = /stand: 'BLINDE_INJECTIE'|\? 'BLINDE_INJECTIE'/.test(bron);
+  assert.ok(!toegekend, 'geen enkele tak mag deze stand nog toekennen: van buiten is hij niet ' +
+    'te onderscheiden van een route die het injectiepunt simpelweg niet raakt');
+  assert.match(bron, /GEEN_DUURZAME_WEG/, 'de stand die hem vervangt hoort er wel te zijn');
+});
+
+test('GEEN_DUURZAME_WEG wijst naar de modus die hem WEL zou raken', () => {
+  const bron = require('fs').readFileSync(require('path').join(__dirname, '..',
+    'scripts', 'crashproef.js'), 'utf8');
+  assert.match(bron, /schrijf-verloren/,
+    'een route zonder duurzame weg is niet veilig maar anders bedreigd, en de uitslag ' +
+    'hoort te zeggen welke modus dat wel meet -- anders leest hij als een vrijspraak');
+});
+
 /* DE ZELFIJKING. Een toets die je niet hebt zien zakken is geen toets: de regel
    hierboven MOET op verschillende invoer verschillend uitvallen. Geeft hij
    overal hetzelfde, dan rekent dit bestand niets na. */

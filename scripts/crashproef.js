@@ -33,9 +33,13 @@
                        deze route hoort bij een tweede oproep werk te doen, dus
                        "er kwam iets bij" is hier geen fout
      FAILED            de grens is geraakt en er staat iets wat er niet hoort
-     BLINDE_INJECTIE   de modus stond scherp, de route deed werk en stierf NIET
-                       -- dat is een bevinding: deze schrijfweg loopt niet langs
-                       het punt waar de injectie zit
+     GEEN_DUURZAME_WEG de modus stond scherp, de route deed zijn werk en stierf
+                       NIET. Dan heeft hij `bijeen()` noch `saveDuurzaam()`
+                       aangeroepen: hij schrijft via de gewone write-behind
+                       save(). Deze twee grenzen BESTAAN dus niet op zijn pad --
+                       en dat is geen geruststelling, want wat hem wel bedreigt
+                       is een VERLOREN schrijfactie, en dat is `schrijf-verloren`
+                       en niet deze proef
      GEEN_WERK         de oproep kwam niet aan het werk (status erbij), dus er
                        viel niets te crashen
      WERELD_ONTBREEKT  deze route heeft een onderwerp nodig dat de wereld niet
@@ -99,7 +103,9 @@ async function stelOp(datamap) {
   const bos = await haalSleutels({ post: p });
   const { zetWereldKlaar, voorzieningVoor } = require('./lib/idemwereld');
   const w = await zetWereldKlaar({ post: p, tokens: bos.tokens, datamap });
-  return { srv, p, bos, wereld: w.wereld, lijven: w.perRoute || {}, voorzieningVoor };
+  const { gedeeldLijf } = require('./lib/idemwereld');
+  return { srv, p, bos, wereld: w.wereld, lijven: w.perRoute || {},
+    gedeeld: gedeeldLijf(w.wereld), voorzieningVoor };
 }
 
 /* De ruis van een herstart: wat schrijft de server uit zichzelf? Een keer
@@ -165,10 +171,21 @@ async function ronde(route, grens, ruis) {
     srv = a.srv;
     const tok = a.bos.tokenVoor ? a.bos.tokenVoor(route.rol) : a.bos.tokens[route.rol];
     if (!tok && route.rol) return { stand: 'BLOCKED', reden: 'geen sleutel voor rol ' + route.rol };
-    const lijf = a.lijven[route.pad] || null;
-    if (!lijf) return { stand: 'WERELD_ONTBREEKT',
-      reden: 'idemwereld.js levert geen lijf voor dit pad; zonder de echte IBAN/codenaam van ' +
-        'DEZE database strandt de oproep op "deed geen werk" in plaats van op de crash' };
+    /* HET LIJF, MET EEN TERUGVAL -- want zonder terugval viel tweederde weg.
+
+       idemwereld.js kent een eigen lijf voor een stuk of vijftien geldroutes;
+       de eerste ronde meldde de andere dertig als WERELD_ONTBREEKT en meette ze
+       niet. Dat is te streng: het GEDEELDE lijf (de echte IBAN en codenamen uit
+       deze database) brengt een deel van die routes gewoon aan het werk, en een
+       route die er niets mee kan, meldt zich daarna als GEEN_WERK MET zijn
+       status -- wat meer zegt dan "geen lijf". WERELD_ONTBREEKT blijft over
+       voor het geval dat de wereld helemaal niets opleverde. */
+    const lijf = a.lijven[route.pad] || a.gedeeld;
+    if (!lijf || !Object.keys(lijf).length) return { stand: 'WERELD_ONTBREEKT',
+      reden: 'idemwereld.js levert geen lijf voor dit pad en de gedeelde wereld is leeg; ' +
+        'zonder de echte IBAN/codenaam van DEZE database strandt de oproep op "deed geen werk" ' +
+        'in plaats van op de crash' };
+    const eigenLijf = !!a.lijven[route.pad];
 
     const maak = a.voorzieningVoor(route.pad);
     if (maak) { try { await maak({ post: a.p, tokens: a.bos.tokens }); } catch (e) {} }
@@ -194,14 +211,38 @@ async function ronde(route, grens, ruis) {
     const binnen = geraakt.filter(vanRoute(route));
     const buiten = geraakt.filter(k => !vanRoute(route)(k));
 
+    /* NIET GESTORVEN -- EN DAT IS TWEE VERSCHILLENDE DINGEN.
+
+       De eerste ronde noemde allebei `BLINDE_INJECTIE`, en dat was een vals
+       alarm op acht routes. Een blinde injectie hoort te betekenen: de modus
+       stond scherp, de route liep LANGS het injectiepunt, en er gebeurde niets.
+       Wat hier werkelijk aan de hand was, is iets anders: de route KOMT er niet
+       langs. /api/bank/pas/bevries en zeven broers schrijven met de gewone
+       write-behind save() -- nagelezen in server/kern/bank/passen.js -- en
+       raken dus `bijeen()` noch `saveDuurzaam()`.
+
+       Dat maakt het geen bevinding OVER de route maar een uitspraak over zijn
+       schrijfweg, en die is scherp: deze twee grenzen bestaan daar niet, want
+       een write-behind save heeft geen moment waarop iets half duurzaam is. Wat
+       hem WEL bedreigt is een schrijfactie die beloofd en niet bewaard wordt,
+       en dat is `schrijf-verloren` -- een andere modus, die deze proef niet
+       draait.
+
+       Een 200 bewijst dat de route zijn werk afmaakte, dus was hij niet in de
+       bundel: daar zou hij gestorven zijn. Voor sterf-na-commit zit er een rand
+       aan: die vuurt alleen als de duurzame schrijfactie ook BEVESTIGD werd,
+       dus een route die saveDuurzaam roept op een opslag die niet kan
+       bevestigen, komt hier ook terecht. Op sqlite bevestigt hij. */
     if (!gestorven) {
       const deedWerk = r.status >= 200 && r.status < 300;
-      return { stand: deedWerk ? 'BLINDE_INJECTIE' : 'GEEN_WERK', statusVanDeAanroep: r.status,
+      return { stand: deedWerk ? 'GEEN_DUURZAME_WEG' : 'GEEN_WERK', statusVanDeAanroep: r.status,
         reden: deedWerk
-          ? 'de modus stond scherp, de route gaf ' + r.status + ' en het proces leefde door: ' +
-            'deze schrijfweg loopt niet langs het injectiepunt van ' + grens.modus
+          ? 'de route gaf ' + r.status + ' en het proces leefde door, dus hij liep niet langs ' +
+            'het injectiepunt van ' + grens.modus + ': hij schrijft via de gewone write-behind ' +
+            'save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een ' +
+            'VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet'
           : 'de oproep kwam niet aan het werk (status ' + r.status + ')',
-        geraakt: binnen, buitenDeRoute: buiten };
+        geraakt: binnen, buitenDeRoute: buiten, eigenLijf };
     }
 
     if (grens.grens === 'voor-eerste-mutatie') {
@@ -209,7 +250,7 @@ async function ronde(route, grens, ruis) {
         reden: binnen.length === 0
           ? 'na de herstart is geen enkele collectie van deze route veranderd'
           : binnen.length + ' collectie(s) van deze route veranderden terwijl er niets gemuteerd mocht zijn',
-        geraakt: binnen, buitenDeRoute: buiten };
+        geraakt: binnen, buitenDeRoute: buiten, eigenLijf };
     }
 
     /* na-commit-voor-antwoord: de schrijfactie is duurzaam en de klant heeft
@@ -224,7 +265,7 @@ async function ronde(route, grens, ruis) {
 
     const w = weegHerhaling(bijgekomen.length, route.idempotentie);
     return { stand: w.stand, reden: w.reden, statusVanDeAanroep: 0,
-      geraakt: binnen, buitenDeRoute: buiten,
+      geraakt: binnen, buitenDeRoute: buiten, eigenLijf,
       herhaling: { status: herhaal.status, bijgekomen } };
   } catch (e) {
     return { stand: 'BLOCKED', reden: 'de ronde brak af: ' + String(e.message).slice(0, 140) };
@@ -303,7 +344,14 @@ if (require.main === module) {
     console.log('\n  \x1b[1muitslag\x1b[0m');
     for (const [k, v] of Object.entries(u.telling).sort((a, b) => b[1] - a[1]))
       console.log('    ' + k.padEnd(18) + String(v).padStart(4));
-    const hard = (u.telling.FAILED || 0) + (u.telling.BLINDE_INJECTIE || 0);
+    /* ALLEEN FAILED IS EEN BEVINDING. `BLINDE_INJECTIE` stond hier eerst naast,
+       en die stand is bewust verdwenen: van buiten is een blinde injectie niet
+       te onderscheiden van een route die het injectiepunt niet raakt, want in
+       allebei de gevallen komt er een 200 terug. Een stand die nooit eerlijk
+       kan worden toegekend, hoort niet in de lijst -- dat is dekking die er
+       niet is. Wat overblijft heet GEEN_DUURZAME_WEG en zegt wat er gemeten IS:
+       deze route liep niet langs de bundel. */
+    const hard = u.telling.FAILED || 0;
     if (hard) { console.log('\n  \x1b[31m' + hard + ' bevinding(en).\x1b[0m'); process.exitCode = 1; }
     else console.log('\n  \x1b[32mGeen bevindingen.\x1b[0m');
   }).catch(e => { console.error(e); process.exitCode = 2; });

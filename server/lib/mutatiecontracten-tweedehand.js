@@ -60,19 +60,34 @@ const CONTRACTEN = {
     },
     afgetekend: AFGETEKEND
   },
+  /* HIER STOND `nietHerhaalbaar`, EN DE METING SPREEKT DAT TEGEN. Op 13 september
+     kreeg deze route een `mutatie:`-regel in de bron (scripts/mutatiesemantiek.js
+     leest die), en toen kwam er een tegenspraak uit die er tot dan niet kon zijn:
+     `IDEMPROEF.json` meet deze route als `beschermd` -- met dezelfde sleutel is er
+     GEEN tweede deurticket (a: 1, b: 0, c: 1 met een verse sleutel), en zonder
+     sleutel wel ("dit is de dubbeltik"). Dat is letterlijk de omschrijving van
+     `sleutelVereist` in kern/mutatie.js, en dus is dat de klasse.
+
+     De STAND blijft staan, want die gaat over iets anders en is nog steeds waar:
+     een tweede aanvraag ZONDER sleutel hoort een tweede aanvraag te zijn. Wat er
+     verandert is de klasse, niet het besluit -- en de klasse hoorde altijd al bij
+     de meting te passen. */
   'POST /api/office/bank/incasso': {
     mutatieId: 'bank.incasso.aanvragen',
     herkomst: 'mens',
-    semantiek: { klasse: 'nietHerhaalbaar' },
+    semantiek: { klasse: 'sleutelVereist' },
     toegang: { klasse: 'AUTHENTICATED' },
     stand: 'INTENTIONALLY_NON_IDEMPOTENT',
-    waarom: 'Zelfde vorm als hierboven: een tweede aanroep is een tweede aanvraag en de ronde ' +
-      'draait er niet van. De ronde zelf is wel gevoelig voor herhaling -- zij int geld -- maar ' +
-      'die gevoeligheid zit achter de bevestiging, en een bevestiging werkt precies een keer.',
+    waarom: 'Zonder idempotentiesleutel is een tweede aanroep een tweede aanvraag, en dat hoort zo: ' +
+      'de aanvraag verandert zelf niets aan de bank. De ronde is wel gevoelig voor herhaling -- zij ' +
+      'int geld -- maar die gevoeligheid zit achter de bevestiging, en een bevestiging werkt precies ' +
+      'een keer. MET een sleutel merkt de poort de herhaling wel; vandaar de klasse `sleutelVereist`.',
     bewijs: {
       gemeten: 'test/tweedehandtekening.test.js toets 6: de aanvraag draagt `needsAuth` en geen ' +
-        '`uitgevoerd`; de ronde draait pas na de tweede handtekening.',
-      op: '2026-09-09'
+        '`uitgevoerd`; de ronde draait pas na de tweede handtekening. En IDEMPROEF.json: met ' +
+        'dezelfde sleutel een tweede oproep zonder tweede deurticket (`beschermd`), zonder sleutel ' +
+        'twee tickets (`onbeschermd`).',
+      op: '2026-09-13'
     },
     afgetekend: AFGETEKEND
   },

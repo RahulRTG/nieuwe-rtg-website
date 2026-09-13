@@ -50,6 +50,9 @@ module.exports = (ctx) => {
      twee verschillende client-sleutels en innen twee keer. Op dezelfde grens is
      het hetzelfde voornemen.
      ---------------------------------------------------------------------- */
+  /* mutatie: sleutelVereist -- MET dezelfde sleutel merkt de poort de herhaling
+     (IDEMPROEF: beschermd); ZONDER sleutel is een tweede aanroep een tweede
+     deurticket. Nooit een tweede inning: die hangt aan de handtekening. */
   app.post('/api/office/bank/incasso', kluisAuth, async (req, res) => {
     const ketenlaag = kern.geldketen;
     if (!ketenlaag) { veilig(res, () => ({ status: 503,
@@ -130,6 +133,9 @@ module.exports = (ctx) => {
      Lezen mag achter de gedeelde code -- het dossier gaat over de HANDELING en
      niet over een mens, en de namen erin zijn kantoornamen die in het journaal al
      stonden. */
+  /* mutatie: idempotent -- alleen lezen; de enige schrijver van het journaal is de
+     baan zelf (klaarzetten, tekenen, uitvoeren). Twee keer lezen laat dezelfde
+     stand achter. */
   app.post('/api/office/bank/incasso/dossier', officeAuth, (req, res) => veilig(res, () => {
     if (!kern.geldketen) return { status: 503, error: 'De geldketen is niet gemount.' };
     const id = String((req.body || {}).voornemen || '');

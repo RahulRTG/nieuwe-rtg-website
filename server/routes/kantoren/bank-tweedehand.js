@@ -100,6 +100,20 @@ module.exports = (ctx) => {
           (uit.uitgevoerd != null ? uit.uitgevoerd : '?') + ' vaste betaling(en), € ' +
           ((Number(uit.bedragCenten) || 0) / 100).toFixed(2));
         sync();
+        /* DE UITSLAG VAN DE RONDE BLIJFT NAAR BUITEN GAAN, met de keten ERNAAST.
+
+           Dit is een contract van voor de geldketen: deze uitvoerder gaf altijd
+           het antwoord van `bankIncassoRonde` terug (`uitgevoerd`, `mislukt`,
+           `bedragCenten`), en kern/kantoor/tweedehandtekening.js#bevestig legt dat
+           ongewijzigd naar buiten. De eerste versie van deze baan gaf in plaats
+           daarvan het VOORNEMEN terug, en daarmee verdween `uitgevoerd` uit het
+           antwoord van de bevestiging -- de ronde liep, maar niemand aan de
+           buitenkant kon meer zien wat zij deed. test/bank.test.js vond dat, en
+           terecht: een baan eromheen leggen mag de handeling niet overschreeuwen.
+
+           De keten komt er dus BIJ en niet IN plaats van. Wie het volledige spoor
+           wil, leest /api/office/bank/incasso/dossier. */
+        return Object.assign({}, uit, { status: 200, ok: true, voornemen: r.voornemen });
       }
       return r;
     }

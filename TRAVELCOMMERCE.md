@@ -64,9 +64,9 @@ al een keer sneuvelde als `Asset`, en de meting is er nog:
 
 - `OBJECTMODEL.json`: 2.010 velden over 267 domeinen, waarvan **1.418 (71%) in
   precies één domein wonen**; 20 gelijkende vormparen in het hele huis.
-- `KETENVORM.json`: over drie complete ketens (tafel, rit, toelating)
+- `KETENVORM.json`: over vier complete ketens (tafel, rit, toelating, adam)
   <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
-  <!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> gedeelde actoren, en
+  <!--getal:ketenvorm.actorenTotaal-->19<!--/getal--> gedeelde actoren, en
   <!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van
   <!--getal:ketenvorm.themasTotaal-->10<!--/getal--> gedeelde beloftethema's --
   en die twee gaan allebei over de MACHINE (mag dit twee keer, zegt een weigering

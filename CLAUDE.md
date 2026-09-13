@@ -53,7 +53,7 @@ een marge of een leverancierscijfer bouwt. Het belangrijkste dat het document
 tegenhoudt is een `journeys`-tabel: een reis die mensen, geld, documenten én
 reserveringen BEZIT is de `Asset`-fout opnieuw, en de meting staat er
 (`KETENVORM.json`: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
-<!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> gedeelde actoren over drie
+<!--getal:ketenvorm.actorenTotaal-->19<!--/getal--> gedeelde actoren over vier
 ketens). De vorm die wél werkt is die van `kern/levensgraaf/graaf.js` — een
 PROJECTIE met vijf etiketten, hier plus de **herkomst** als zesde. Zeven grenzen
 bovenop die van REIZEN.md, waarvan de drie scherpste: geld wordt klaargezet en
@@ -1505,12 +1505,12 @@ gat, en hij zit nu in de meting (storing 1 en 7) in plaats van eromheen.
 **En wat de ketens werkelijk delen is GEMETEN** (`scripts/ketenvorm.js`,
 `KETENVORM.json`) in plaats van verklaard -- de proeven delen met opzet geen
 module, want een gedeelde ketenklasse eroverheen zou de `Asset`-fout zijn.
-Uitkomst over drie ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
-van <!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> actoren gedeeld
+Uitkomst over vier ketens: <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal-->
+van <!--getal:ketenvorm.actorenTotaal-->19<!--/getal--> actoren gedeeld
 (gast/zaal/keuken tegenover lid/vervoerder/dispatch/chauffeur tegenover
-aanvrager/kantoor/keurder/dossier/tijd) en
+aanvrager/kantoor/keurder/dossier/tijd tegenover gezin/Adam/werkgever/mens) en
 <!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van
-<!--getal:ketenvorm.themasTotaal-->10<!--/getal--> beloftethema's in ALLE drie.
+<!--getal:ketenvorm.themasTotaal-->10<!--/getal--> beloftethema's in ALLE vier.
 Die twee gaan allebei over de MACHINE en niet over het domein: mag dit twee
 keer, en zegt een weigering waarom. Er is een woord dat twee ketens delen --
 `zaak` -- en het betekent er niet hetzelfde (ontvanger tegenover uitkomst),
@@ -1518,10 +1518,14 @@ precies de vorm die `SEMANTIEK.json` meet. **Een status-, actor- of
 uitkomstcontract over domeinen heen is daarmee niet gerechtvaardigd**, en dat is
 een antwoord op MAATSTAF.md U40/U41 en geen uitstel; wat er wel onder ligt is de
 grens die OS.md trekt tussen platformvermogen en domeinvermogen, nu met bewijs
-uit drie onafhankelijke ketens. Let bij het lezen op een eerlijkheid die in de
-bron staat: de themalijst is een keer uitgebreid toen zes van de zeven beloften
-van de derde keten erbuiten vielen -- de actoren zijn niet aangeraakt, en die
-staan op nul.
+uit vier onafhankelijke ketens. Let bij het lezen op een eerlijkheid die in de
+bron staat: de themalijst is TWEE keer uitgebreid -- bij de derde keten vielen
+zes van de zeven beloften erbuiten, bij de vierde alle negen, en de uitslag zakte
+daardoor even naar 0 gedeelde thema's terwijl die keten herhaling en weigering
+met een reden gewoon toetst. Drie patronen erbij (elk generaliserend voorbij de
+zin die hem aanleiding gaf) bracht hem terug op 2 -- dus die twee overleven een
+vierde, totaal andere keten. De actoren zijn nooit aangeraakt, en die staan op
+nul.
 
 **`INTELLIGENTIE.md` is de laag BOVEN het stuur** -- de RTG Intelligence Layer,
 als richtingsdocument met per onderdeel of het **staat**, **een stap weg** is,
@@ -1541,7 +1545,7 @@ vier ervan corrigeren een voorstel dat op het eerste gezicht klopt: er komt
 heet `kern/stuur/mandaat.js`, dat nul productie-aanroepers heeft; `autonoom` en
 `begrensd` zijn sinds 31 augustus EIGENSCHAPPEN en geen trede), het **wereldmodel
 wordt gemeten en niet verklaard** (INT-02 -- `OBJECTMODEL.json` zegt 71%
-domeineigen en `KETENVORM.json` 0 van 13 gedeelde actoren, dus een typemodel
+domeineigen en `KETENVORM.json` 0 van 19 gedeelde actoren, dus een typemodel
 eroverheen is de `Asset`-fout; de uitweg is de projectievorm van
 `kern/levensgraaf/graaf.js`), het **Mensmodel hangt aan de codenaam** met een
 bewaartermijn en een `deel`-poort (INT-03 -- `scripts/afleidbaar.js` vond al

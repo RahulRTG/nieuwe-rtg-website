@@ -67,7 +67,7 @@ de tabel na en zakt zodra de telregel eronder niet meer klopt.
 | U18 | Autonomieniveaus A0–A4 als eigen schaal | EXECUTIE.md: de noemer geen / tonen / klaarzetten / uitvoeren | `scripts/gezagsnoemer.js` | `test/gezagsnoemer.test.js` | noemer op 18 evident | **geprojecteerd** |
 | U19 | A2 "veilige, omkeerbare acties zelfstandig uitvoeren" als platformwaarheid | FOUNDATION.md par. 2: geen `EXECUTE_LOW_RISK`, wie bouwt weet niet in wiens leven hij staat | `klein` bestaat in LivingOS en WorkOS; niet in FoundationOS | toetsen op de wereldgrens | per wereld anders | **geprojecteerd** |
 | U20 | De gebruiker ziet vooraf wat er gaat gebeuren en achteraf wat er gebeurde, als verschil | EXECUTIE.md blok 4 | `kern/stuur/gevolg.js` projecteert een eerdere meting; geen droogloop in de zandbak | toets: `onbekend` en `geen-effect` lopen nooit door elkaar | 36 gemeten, 44 geen effect, 96 onbekend van 176 | **stap weg** |
-| U21 | Eén canoniek objectmodel voor de volledige economie (Person … Asset … Vehicle … Room) | DEVELOPERCLOUD.md par. 2, OBJECTMODEL.json, COMMERCE.json | `scripts/objectmodel.js`, `scripts/ketenvorm.js` | `test/objectmodel*.test.js`, `test/ritproef.test.js` toets 8 | `Asset` bestaat niet; 0 domeinen met alle acht werkwoorden; en over drie ketens <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van <!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> gedeelde actoren (par. 7.6) | **geprojecteerd** |
+| U21 | Eén canoniek objectmodel voor de volledige economie (Person … Asset … Vehicle … Room) | DEVELOPERCLOUD.md par. 2, OBJECTMODEL.json, COMMERCE.json | `scripts/objectmodel.js`, `scripts/ketenvorm.js` | `test/objectmodel*.test.js`, `test/ritproef.test.js` toets 8 | `Asset` bestaat niet; 0 domeinen met alle acht werkwoorden; en over vier ketens <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van <!--getal:ketenvorm.actorenTotaal-->19<!--/getal--> gedeelde actoren (par. 7.6) | **geprojecteerd** |
 | U22 | Elke overgang van een object is een benoemd commando met actor, voorwaarde, gegevens, beleid, bewijs en gevolg | MUTATIECONTRACT.md (semantiek per route) | `kern/mutatie.js`; geen statusmachine | `test/mutatiecontract*.test.js` op de classificatie | 1573 beproefd, 3156 ongemeten | **stap weg** |
 | U23 | Negen perspectieven per productfamilie, beoordeeld en verklaard | par. 5 hieronder | `kern/platformregister/` kent functie, route, bewijs, scherm; geen actor | geen | geen | **stap weg** |
 | U24 | De handoff-matrix tussen actoren wordt gemeten | par. 3 hieronder | `DOODSPOOR.json` veld `matrix` | toets 1 en 2 in `test/doodspoor.test.js` | gemeten, smalle lens | **staat** |
@@ -86,8 +86,8 @@ de tabel na en zakt zodra de telregel eronder niet meer klopt.
 | U37 | Alle geld gaat door één ledger, dubbel geboekt; een correctie is een nieuwe boeking en nooit geschiedenis herschrijven | WAARDE.md, GELD.md: geen tweede boekhouding | `kern/pay/poort.js`, `kern/waarde/` | check.js regel 62 en 63 (een domein raakt opslag alleen door zijn eigen deur) | toetsen | **staat** |
 | U38 | RTG Grade 0–5 als productscore | LAT-regel 11, `scripts/check.js` regel 48: bewijsgroen is geen go-live-groen; BEWIJSMACHINE.md | `scripts/zekerheid.js` | regel 48 zakt zodra de go-live-keuring een bewijsregister leest | — | **geprojecteerd** |
 | U39 | Harde poorten die nooit compenseerbaar zijn: ledger, audit, herstel, toegankelijkheid, prestatie, actor-compleetheid, dood spoor, uitstap | KEURING.md, TOEGANKELIJK.md, TENANT.md (uitgang) | `scripts/check.js` (64 regels), a11y-poorten, `kern/tenant/uitgang.js` | bestaand: ja; dood spoor en actor: nog niet | per poort | **stap weg** |
-| U40 | Elk product draagt een machineleesbaar contract (PRODUCT-360) dat in de toetsing meeloopt | PLATFORM.md par. 0; EXECUTION_MAP.json is een projectie per route | per route: ja; per product: de eenheid "product" is niet vastgesteld | `npm run executionmap` zakt op handwerk; `npm run ketenvorm` over drie ketens | KETENVORM.json: 0 van 13 actoren gedeeld — een contract over domeinen heen is niet gerechtvaardigd (par. 7e) | **besluit** |
-| U41 | Elke capability draagt een contract: objecten, commando's, events, rechten, fouten, herstel, SLO, gebruikers, toetsen | OS.md par. 4; `kern/appstore/machtigingen.js` is het enige bestand met doel én grens | 21 capability-lijsten met 250 leden | `scripts/capabilityroepers.js`, `scripts/ketenvorm.js` | CAPABILITEIT.json; KETENVORM.json: wat drie ketens delen gaat over de machine, niet over het domein (par. 7e) | **besluit** |
+| U40 | Elk product draagt een machineleesbaar contract (PRODUCT-360) dat in de toetsing meeloopt | PLATFORM.md par. 0; EXECUTION_MAP.json is een projectie per route | per route: ja; per product: de eenheid "product" is niet vastgesteld | `npm run executionmap` zakt op handwerk; `npm run ketenvorm` over vier ketens | KETENVORM.json: 0 van 19 actoren gedeeld — een contract over domeinen heen is niet gerechtvaardigd (par. 7e) | **besluit** |
+| U41 | Elke capability draagt een contract: objecten, commando's, events, rechten, fouten, herstel, SLO, gebruikers, toetsen | OS.md par. 4; `kern/appstore/machtigingen.js` is het enige bestand met doel én grens | 21 capability-lijsten met 250 leden | `scripts/capabilityroepers.js`, `scripts/ketenvorm.js` | CAPABILITEIT.json; KETENVORM.json: wat vier ketens delen gaat over de machine, niet over het domein (par. 7e) | **besluit** |
 | U42 | Een journey wordt als volledig verhaal over actoren heen getest, inclusief verstoring, herhaling en herstel | par. 7 hieronder | `scripts/tafelproef.js`, `scripts/ritproef.js` en `scripts/toelatingsproef.js`, los geschreven; `scripts/ketenvorm.js` telt wat ze delen | alle drie geven foutcode 1 op een open schakel; `test/tafelproef.test.js` en `test/ritproef.test.js` bewaken de proeven | tafel <!--getal:tafel.schakels-->11<!--/getal--> schakels en <!--getal:tafel.storingen-->8<!--/getal--> storingen; rit <!--getal:rit.schakels-->8<!--/getal--> gesloten + <!--getal:rit.bevindingen-->0<!--/getal--> bevinding, <!--getal:rit.storingen-->11<!--/getal--> storingen | **staat** |
 | U43 | Het register koppelt product, actor, bedoeling, journey, capability, object, route, event, beleid, bewijs, scherm, toets, prestatie en herstelpad | `kern/platformregister/` | functie ↔ routes ↔ bewijs ↔ scherm | check.js regel 64 | — | **stap weg** |
 | U44 | Volgorde: eerst de gedeelde grond, dan drie gouden ketens (mobiliteit, horeca, werk), dan de families | EXECUTIE.md par. 7: één bewezen keten vóór honderd functies | besloten 3 september 2026: horeca eerst (par. 7) | — | — | **staat** |
@@ -722,7 +722,7 @@ iemand goed heeft geraden."*
 ### 7.6 Wat de ketens delen — gemeten, niet verklaard
 
 > **Bijgewerkt na de derde keten.** Deze paragraaf is geschreven toen er twee
-> waren; de tabel telt inmiddels over drie (par. 7e). De redenering eronder is
+> waren; de tabel telt inmiddels over vier (par. 7e). De redenering eronder is
 > niet veranderd, de uitkomst is scherper geworden.
 
 De verleiding na de tafelproef was een `scripts/lib/keten.js` en beide proeven
@@ -736,7 +736,7 @@ De uitkomst is streng:
 
 | | gedeeld |
 |---|---|
-| **actoren** | <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van <!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> |
+| **actoren** | <!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van <!--getal:ketenvorm.actorenTotaal-->19<!--/getal--> |
 | **beloftethema's** | <!--getal:ketenvorm.themasGedeeld-->2<!--/getal--> van <!--getal:ketenvorm.themasTotaal-->10<!--/getal--> |
 
 **Geen enkele actornaam komt in alle ketens voor.** De tafel kent gast, zaak,
@@ -759,7 +759,7 @@ De vier beloften die alleen de tafel heeft (`geldKlaargezet`, `bereikbareWeg`,
 (`nietsKlaarZonderGrond`) zijn geen gaten in de andere keten: ze zijn de
 domeinhelft. Dat is bij de derde keten bevestigd: die bracht twee eigen thema's
 mee (`handelingMetNaam`, `geslotenLijst`) die de andere twee niet kennen. Wat de
-meting over zichzelf blijft zeggen: drie ketens van dezelfde hand kunnen ook
+meting over zichzelf blijft zeggen: vier ketens van dezelfde hand kunnen ook
 gedeelde gewoonte zijn in plaats van gedeelde vorm — daarvoor is een keten van
 een ándere hand nodig, en die is er niet.
 
@@ -904,7 +904,7 @@ eerlijke uitdraai van wat dit huis over een bijeenkomst kan zeggen. Geld,
 documenten en bewijs staan er leeg bij, met de soort erbij, in plaats van weg te
 zijn.
 
-## 7e. Wat drie ketens delen (U40 en U41)
+## 7e. Wat vier ketens delen (U40 en U41)
 
 Twee ketens dragen geen contract: twee punten liggen altijd op een lijn. Daarom
 is er een derde — `scripts/toelatingsproef.js`, de weg van een aanvraag naar een
@@ -917,7 +917,7 @@ slaan: die deelt de rekening, de kaart en de keuken met de tafel):
   klant altijd een sessie.
 - **er zit een kantoor in**, en dus een mens van RTG die op naam tekent.
 - **het gaat over een document met een houdbaarheid.** Schakel 7 is de enige
-  schakel in de drie ketens die door **tijd** wordt getrokken en niet door een
+  schakel in de vier ketens die door **tijd** wordt getrokken en niet door een
   handeling: niemand doet iets, en toch verandert de stand.
 - **de uitkomst is toegang**, geen geleverde dienst.
 
@@ -936,25 +936,93 @@ op te vallen en in het register staan: de naam die in het dossier landt is een
 **sleutel** (`user-1`) en geen mensennaam, en de weigering bij het besluit noemt
 zelf de uitweg (*"log in met je eigen RTG-account"*).
 
+### De vierde keten: een mens in plaats van een transactie
+
+De eerste drie gaan alle drie over een **transactie** — een rekening, een rit,
+een toelating — en dat is een smallere steekproef dan hij lijkt. Daarom
+`scripts/adamproef.js`: de weg van een zeventienjarige zonder RTG-account naar
+een mogelijkheid die hij zelf ziet. Hij is opnieuw maximaal ánders:
+
+- **de hoofdpersoon is minderjarig en heeft geen eigen account.** Hij is een
+  profiel in een RTF-gezin, met een andere sessie dan een lid. Zeventien is
+  bovendien oud genoeg om te werken (16+) en te jong voor de 18+-poort, dus de
+  leeftijd is niet een detail maar de as.
+- **er komt geen geld aan te pas.** De "is het betaald"-schakel bestaat hier
+  niet; wat ervoor in de plaats komt is **bereikbaarheid**.
+- **de uitkomst is een mogelijkheid**, geen geleverde dienst.
+
+Acht van de elf schakels sluiten, negen van de negen storingen houden hun
+belofte, en er staan **drie bevindingen** die een besluit vragen.
+
+**Bevinding 1 — de motor die voor deze mens gemaakt is, is voor deze mens niet
+bereikbaar.** `kern/knelpunt/` beantwoordt precies de Adam-vraag: welke wegen
+zijn er, wat blokkeert ze, wat is niet nagegaan. Zijn eigen kop noemt het
+voorbeeld waarvoor hij bestaat — *de bottleneck is niet motivatie, de bottleneck
+is kinderopvang.* Maar `routes/knelpunt.js` hangt hem achter `auth`, en dat eist
+een lidsessie. Een gezinstoken is een andere sessie. Elke regel code klopt; de
+deur staat alleen niet open voor het gezin waar de motor voor beschreven is.
+Dezelfde vraag als de ouderingang op de kinderopvang, die er kwam als **besluit**
+en niet als functie.
+
+**Bevinding 2 — er is geen aanvoer, en die is belangrijker dan de deur.** Deze
+is gevonden door een **mutatie** en niet door nadenken: bij het natrekken van
+bevinding 1 is `auth` er tijdelijk afgehaald. De schakel sloot toen alsnog niet —
+hij werd `stuk` met een 400. De motor eist `manieren`, en zonder manieren valt er
+niets te vergelijken. Dat is een eerlijke motor, maar het betekent dat de
+aanroeper de wegen al moet kennen. En niemand levert ze: **`/api/knelpunt` heeft
+nul aanroepers** — geen scherm in `public/`, geen module in `server/`; alleen de
+route zelf, twee registers en een regel in de functielijst. Een mens zegt *"ik
+wil weer aan het werk"*; dat is een doel zonder wegen. De rekenmachine staat er,
+de aanvoer niet. `kern/knelpunt/openingen-kaart.js` dekt vijf terreinen en geeft
+**ingangen bij een knelpunt**, geen **wegen bij een doel**.
+
+**Bevinding 3 — een aangenomen sollicitant uit een gezin wordt niet gehaald.**
+`notifyApplicant` in `kern/werk.js` stopt met `if (!a.key) return`, en `a.key` is
+een lidsessiesleutel; de rij die `routes/member/werk/rtf.js` aanmaakt draagt
+`rtf: { code, profielId }` en geen key. De stand wordt wél bijgewerkt — Adam kan
+het zien als hij kijkt — maar er komt geen melding. Dit is exact de vorm die op
+10 september al een keer is gerepareerd (par. 9a van `TRAVELCOMMERCE.md`: *"ook
+dat van een aangenomen sollicitant"*). Die reparatie ging over leden; deze kant,
+het gezin, bleef staan. Dezelfde fout, een deur verder.
+
+**Twee meetfouten horen er even groot bij**, want ze zijn allebei als uitslag
+gepasseerd voordat ze werden gevonden. De proef las eerst `/api/supplier/apply`
+voor de sollicitatielijst van de werkgever — dat is de **publieke** route waarmee
+iemand van buiten solliciteert, en het antwoord "Bedrijf niet gevonden" zag eruit
+als een kapotte keten. En daarna zocht hij de rij van Adam op `appId`, een veld
+dat `/gezin/sollicitaties` niet teruggeeft; de uitslag luidde toen *"de uitkomst
+is weg"*, wat zou betekenen dat dit huis een aangenomen zeventienjarige
+kwijtraakt. Dat is een **beschuldiging**, en zij was onwaar. De schakel ernaast
+stond op dat moment groen via een `|| mijn[0]`-terugval — een fallback die een
+mismatch verbergt is erger dan geen fallback. Beide staan nu in de bron
+uitgeschreven, want een proef die zijn eigen fouten wegpoetst, meet de volgende
+keer weer mee.
+
 ### De uitslag
 
-`scripts/ketenvorm.js` telt nu over drie registers (hij indexeerde op
+`scripts/ketenvorm.js` telt nu over vier registers (hij indexeerde ooit op
 `gelezen[0]` en `gelezen[1]`; een derde had daar stil niet meegeteld):
 
-| | twee ketens | drie ketens |
-|---|---|---|
-| actoren gedeeld | 0 van 8 | **0 van 13** |
-| beloftethema's in álle ketens | 3 van 8 | **2 van 10** (`herhaling`, `weigeringMetReden`) |
-| in meer dan één, niet in alle | — | 3 (`volgorde`, `onbekendObject`, `nietsKlaarZonderGrond`) |
+| | twee ketens | drie ketens | vier ketens |
+|---|---|---|---|
+| actoren gedeeld | 0 van 8 | 0 van 13 | **0 van 19** |
+| beloftethema's in álle ketens | 3 van 8 | 2 van 10 | **2 van 10** (`herhaling`, `weigeringMetReden`) |
+| in meer dan één, niet in alle | — | 3 | 3 (`volgorde`, `onbekendObject`, `nietsKlaarZonderGrond`) |
 
-**Nul gedeelde actoren over drie domeinen.** Gast, keuken, zaal, zaak tegenover
+**Nul gedeelde actoren over vier domeinen.** Gast, keuken, zaal, zaak tegenover
 lid, vervoerder, dispatch, chauffeur tegenover aanvrager, kantoor, keurder,
-dossier, tijd. Er is één woord dat twee ketens delen — `zaak` — en het betekent
-er niet hetzelfde: in de horecaketen is het de ontvanger die bedient, in de
-toelatingsketen de **uitkomst** die ontstaat. Dezelfde naam, twee betekenissen;
-precies de vorm die `SEMANTIEK.json` meet.
+dossier, tijd tegenover gezin, Adam, werkgever, mens. Er is één woord dat twee
+ketens delen — `zaak` — en het betekent er niet hetzelfde: in de horecaketen is
+het de ontvanger die bedient, in de toelatingsketen de **uitkomst** die ontstaat.
+Dezelfde naam, twee betekenissen; precies de vorm die `SEMANTIEK.json` meet.
 
-En alles wat de drie wél delen, gaat over de **machine** en niet over het
+**De vierde keten liet dat cijfer niet bewegen, en dát is de uitslag.** Bij drie
+ketens kon "nul gedeelde actoren" nog een toevalligheid van drie
+transactieketens zijn. De Adam-keten is geen transactie — er wordt niets betaald
+en niets geleverd — en hij brengt zes nieuwe actoren mee zonder er één te
+herkennen.
+
+En alles wat de vier wél delen, gaat over de **machine** en niet over het
 domein: mag dit twee keer, mag dit nu, en zegt een weigering waarom.
 `test/toelatingsproef.test.js` toets 8 zakt zodra er een domeinbegrip in die
 gedeelde lijst verschijnt — dan is er een echte vondst en hoort iemand te kijken.
@@ -965,15 +1033,28 @@ Een **statuscontract, actorcontract en uitkomstcontract over domeinen heen is
 niet gerechtvaardigd** door deze meting, en dat is een antwoord en geen
 uitstel. Wat er wél onder ligt is een contract over de drie machine-eigenschappen
 — dezelfde grens die OS.md trekt tussen platformvermogen en domeinvermogen, nu
-met bewijs uit drie onafhankelijke ketens in plaats van twee.
+met bewijs uit vier onafhankelijke ketens in plaats van twee.
 
-**Eén eerlijkheid hoort erbij.** De themalijst van `ketenvorm.js` is één keer
-uitgebreid, toen zes van de zeven beloften van de derde keten erbuiten vielen.
-Dat is exact het moment waarop je een overlap kunt fabriceren. De regel die is
-aangehouden staat in de bron: een patroon erbij mag alleen als de belofte
-hetzelfde zegt in andere woorden, en de **actoren zijn niet aangeraakt** — die
-staan op nul, en dat is de uitslag die telt. `test/toelatingsproef.test.js`
-toets 5 houdt vast dat die uitleg blijft staan.
+**Eén eerlijkheid hoort erbij, en zij is inmiddels twee keer nodig geweest.** De
+themalijst van `ketenvorm.js` is uitgebreid bij de derde keten (zes van zeven
+beloften vielen erbuiten) en opnieuw bij de vierde (alle negen). Dat is exact het
+moment waarop je een overlap kunt fabriceren, en bij de vierde was het verschil
+groot: onverbreed zakte de uitslag naar **0 van 10** gedeelde thema's, terwijl de
+Adam-keten herhaling en weigering-met-reden gewoon toetst — de matcher kende
+alleen zijn woorden niet ("tweede keer" naast het bestaande "twee keer"). Drie
+patronen erbij bracht hem terug op 2. De regel die is aangehouden staat in de
+bron: een patroon erbij mag alleen als de belofte hetzelfde zegt in andere
+woorden, en het moet generaliseren voorbij de ene zin die hem aanleiding gaf.
+
+Zes beloften van de Adam-keten staan bewust in `nietIngedeeld` — de server die
+de client niet gelooft over een leeftijd, een afwijzing die op de tijdlijn blijft
+staan, een motor die wegen telt in plaats van mensen. Echte soorten fout, maar
+ze komen in geen van de andere drie voor, en dan is het geen gedeelde vorm.
+
+De **actoren zijn nooit aangeraakt** — die staan op nul, en dat is de uitslag die
+telt. `test/toelatingsproef.test.js` toets 5 houdt vast dat die uitleg blijft
+staan, en `test/adamproef.test.js` toets 7 dat een nieuwe keten niet stil buiten
+de meter valt.
 
 ## 8. De volgorde
 

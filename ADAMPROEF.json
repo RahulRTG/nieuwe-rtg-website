@@ -1,0 +1,237 @@
+{
+  "stempel": "2026-09-13",
+  "uitleg": "Een keten rond een jongere van 17 zonder RTG-account: van een doel naar een mogelijkheid die hij zelf ziet. Gemeten per SCHAKEL (handelt actor A, en ziet actor B dat?) en per STORING (houdt de keten zijn belofte als het misgaat?). Vierde keten naast tafel-, rit- en toelatingsproef; met opzet geen gedeelde module -- zie MAATSTAF.md par. 7 en scripts/ketenvorm.js.",
+  "grens": "Dit is de WERK-weg naar een mogelijkheid (vacature -> sollicitatie -> aangenomen). De andere terreinen van kern/knelpunt/openingen-kaart.js (opleiding, opvang, vervoer, wonen) hebben eigen naden en zijn hier niet gelopen. Er komt geen browser aan te pas en geen AI: wat Rahul van dit alles zou MAKEN is niet gemeten, alleen wat de routes eronder doen. Adam is een gezinsprofiel en geen echt kind; deze proef zegt niets over of de mens dit ook zo beleeft.",
+  "schakels": [
+    {
+      "nr": 1,
+      "van": "gezin",
+      "naar": "Adam",
+      "wat": "zet Adam neer; zijn leeftijdsgroep wordt berekend, niet gekozen",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Zilveren Hert CEE1",
+      "fout": null,
+      "ms": 0
+    },
+    {
+      "nr": 2,
+      "van": "Adam",
+      "naar": "knelpuntmotor",
+      "wat": "legt zijn doel voor en vraagt welke wegen openliggen",
+      "bekend": "WAT ONTBREEKT: een ingang op /api/knelpunt voor een RTF-gezinsprofiel. WAAROM: routes/knelpunt.js hangt achter `auth` (opzet/diensten2.js), en dat eist een lidsessie met een account of een demo-persona; een gezinstoken van /api/foundation is een andere sessie. De motor is dus bereikbaar voor wie een RTG-account heeft en niet voor het gezin waar hij voor beschreven is. WIE EROVER GAAT: de eigenaar -- dit is dezelfde vraag als de ouderingang op de kinderopvang (kern/verzorging/opvangleden.js), die er kwam als BESLUIT en niet als functie.",
+      "stand": "openBekend",
+      "status": 401,
+      "antwoord": "Niet ingelogd.",
+      "ms": 4
+    },
+    {
+      "nr": 3,
+      "van": "lid",
+      "naar": "knelpuntmotor",
+      "wat": "stelt dezelfde vraag met een lidsessie; de motor werkt en rangschikt niet",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "3 wegen, volgorde ongewijzigd: true, geblokkeerde weg blijft staan met \"heb ik een startkwalificatie\"",
+      "fout": null,
+      "ms": 8
+    },
+    {
+      "nr": 4,
+      "van": "mens",
+      "naar": "knelpuntmotor",
+      "wat": "noemt alleen een doel; iets in dit huis levert de mogelijke wegen aan",
+      "bekend": "WAT ONTBREEKT: een bron die uit een doel de MANIEREN samenstelt. kern/knelpunt/ rekent ze door, maar krijgt ze van de aanroeper -- en /api/knelpunt heeft nul aanroepers (geen scherm in public/, geen module in server/; alleen de route, lib/mutatiecontracten-knelpunt.js, lib/idemsleutels-bescherming.js en functies/register/cat-life.js noemen het pad). WAAROM: de motor is met opzet een rekenmachine en geen zoeker -- hij mag niet rangschikken en niets weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. De aanvoer hoort ernaast te staan en niet erin. WIE EROVER GAAT: de eigenaar. Dit is de kern van het voorstel voor een kansengraaf: kern/knelpunt/openingen-kaart.js dekt vandaag 5 terreinen (werk, opleiding, opvang, vervoer, wonen) en die kaart geeft INGANGEN bij een knelpunt, geen wegen bij een doel.",
+      "stand": "openBekend",
+      "status": 400,
+      "antwoord": "Welke manieren zijn er? Zonder manieren valt er niets te vergelijken.",
+      "ms": 2
+    },
+    {
+      "nr": 5,
+      "van": "werkgever",
+      "naar": "huis",
+      "wat": "zet een bijbaan open met een minimumleeftijd van 16",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "vacature ca6708aa, minimumleeftijd 16",
+      "fout": null,
+      "ms": 9
+    },
+    {
+      "nr": 6,
+      "van": "huis",
+      "naar": "Adam",
+      "wat": "toont de vacature en zegt of hij mag solliciteren",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "1 vacatures zichtbaar, magSolliciteren: true",
+      "fout": null,
+      "ms": 10
+    },
+    {
+      "nr": 7,
+      "van": "Adam",
+      "naar": "werkgever",
+      "wat": "solliciteert vanuit zijn gezinsprofiel, met zijn cv",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "aangenomen door de route: true",
+      "fout": null,
+      "ms": 9
+    },
+    {
+      "nr": 8,
+      "van": "werkgever",
+      "naar": "huis",
+      "wat": "ziet de sollicitatie, zonder dat de Foundation-herkomst zichtbaar is",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "sollicitatie bb9b7b8e, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
+      "fout": null,
+      "ms": 10
+    },
+    {
+      "nr": 9,
+      "van": "werkgever",
+      "naar": "Adam",
+      "wat": "nodigt uit voor een kennismaking; Adam ziet de stand veranderen",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "Adam ziet status \"uitgenodigd\" bij Cafe Brisa",
+      "fout": null,
+      "ms": 20
+    },
+    {
+      "nr": 10,
+      "van": "werkgever",
+      "naar": "Adam",
+      "wat": "neemt hem aan; Adam hoort dat, en hoeft er niet zelf naar te zoeken",
+      "bekend": "WAT ONTBREEKT: een melding in de app aan een sollicitant uit een RTF-gezin. WAAROM: kern/werk.js regel 160 stopt met `if (!a.key) return`, en `a.key` is een lidsessiesleutel; de rij die routes/member/werk/rtf.js aanmaakt draagt `rtf: { code, profielId }` en geen key. De stand WORDT bijgewerkt, dus hij kan het zien als hij kijkt -- hij wordt alleen niet gehaald. WIE EROVER GAAT: dit is geen besluit maar een gat, en het is dezelfde vorm als de reparatie van 10 september (TRAVELCOMMERCE.md par. 9a, opzet/meldaan.js): een persoonlijk bericht hoort op de sleutel van de ontvanger, en het gezin heeft een andere sleutel dan een lid.",
+      "stand": "openBekend",
+      "status": 200,
+      "ziet": "stand bij Adam: \"aangenomen\", ongelezen berichten in het gezin: 0",
+      "fout": null,
+      "ms": 16
+    },
+    {
+      "nr": 11,
+      "van": "huis",
+      "naar": "Adam",
+      "wat": "houdt de uitkomst vast in zijn eigen beeld, ook na afloop",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "blijft staan: Keukenhulp bij Cafe Brisa (aangenomen)",
+      "fout": null,
+      "ms": 1
+    }
+  ],
+  "storingen": [
+    {
+      "naam": "een gezinslid van vijftien solliciteert",
+      "belofte": "wordt geweigerd met de leeftijd erbij en met wat er voor hem WEL is",
+      "stand": "gehouden",
+      "wat": "status 403: \"Solliciteren kan vanaf 16 jaar. Jongere gezinsleden vinden in de app juist leer- en groeit\""
+    },
+    {
+      "naam": "de client stuurt een hogere leeftijd mee dan het profiel draagt",
+      "belofte": "verandert niets: de leeftijd komt uit het profiel op de server",
+      "stand": "gehouden",
+      "wat": "status 403 (met leeftijd:25 in het verzoek)"
+    },
+    {
+      "naam": "Adam solliciteert een tweede keer op dezelfde vacature",
+      "belofte": "wordt geweigerd, en er staat er bij de werkgever nog steeds maar EEN",
+      "stand": "gehouden",
+      "wat": "status 409, rijen bij de werkgever: 1"
+    },
+    {
+      "naam": "Adam solliciteert zonder een afgemaakt cv",
+      "belofte": "wordt geweigerd met needCv, en laat geen rij achter bij de werkgever",
+      "stand": "gehouden",
+      "wat": "status 409, needCv: true, rijen voor/na: 1/1"
+    },
+    {
+      "naam": "iemand solliciteert met de gezinscode van Adam en een vreemd token",
+      "belofte": "wordt geweigerd: het profiel achter het token beslist, niet de code in het verzoek",
+      "stand": "gehouden",
+      "wat": "status 403: \"Log opnieuw in bij je gezin om te solliciteren.\""
+    },
+    {
+      "naam": "een sollicitatie van Adam wordt afgewezen",
+      "belofte": "blijft bij Adam staan met de stand erbij, in plaats van te verdwijnen",
+      "stand": "gehouden",
+      "wat": "staat er, stand \"afgewezen\""
+    },
+    {
+      "naam": "de knelpuntmotor telt wat er in de weg staat",
+      "belofte": "telt WEGEN per voorwaarde, en zet geen enkel getal op de mens",
+      "stand": "gehouden",
+      "wat": "diploma:2, vervoer:1; geen mensgetal: true"
+    },
+    {
+      "naam": "een weg waarvan geen enkele voorwaarde is nagegaan",
+      "belofte": "heet \"onbepaald\" en nooit \"open\", en de aannames zeggen waarom",
+      "stand": "gehouden",
+      "wat": "stand \"onbepaald\", 6 aannames"
+    },
+    {
+      "naam": "Adam vraagt zijn eigen levenslijn op met zijn gezinstoken",
+      "belofte": "de deur is dicht EN zegt dat, in plaats van een lege lijn te tonen",
+      "stand": "gehouden",
+      "wat": "status 401: \"Niet ingelogd.\""
+    }
+  ],
+  "wereld": {
+    "gezin": "via /api/foundation/gezin/maak",
+    "adam": "profiel, 17 jaar, rol kind",
+    "zus": "profiel, 15 jaar -- voor storing 1",
+    "werkgever": "BRISA"
+  },
+  "telling": {
+    "schakels": 11,
+    "gesloten": 8,
+    "open": 0,
+    "openBekend": 3,
+    "stuk": 0,
+    "storingen": 9,
+    "gehouden": 9,
+    "gebroken": 0
+  },
+  "sluit": false,
+  "sluitMetBevinding": true,
+  "bevindingen": [
+    {
+      "schakel": 2,
+      "van": "Adam",
+      "naar": "knelpuntmotor",
+      "wat": "legt zijn doel voor en vraagt welke wegen openliggen",
+      "gemeten": "Niet ingelogd.",
+      "reden": "WAT ONTBREEKT: een ingang op /api/knelpunt voor een RTF-gezinsprofiel. WAAROM: routes/knelpunt.js hangt achter `auth` (opzet/diensten2.js), en dat eist een lidsessie met een account of een demo-persona; een gezinstoken van /api/foundation is een andere sessie. De motor is dus bereikbaar voor wie een RTG-account heeft en niet voor het gezin waar hij voor beschreven is. WIE EROVER GAAT: de eigenaar -- dit is dezelfde vraag als de ouderingang op de kinderopvang (kern/verzorging/opvangleden.js), die er kwam als BESLUIT en niet als functie."
+    },
+    {
+      "schakel": 4,
+      "van": "mens",
+      "naar": "knelpuntmotor",
+      "wat": "noemt alleen een doel; iets in dit huis levert de mogelijke wegen aan",
+      "gemeten": "Welke manieren zijn er? Zonder manieren valt er niets te vergelijken.",
+      "reden": "WAT ONTBREEKT: een bron die uit een doel de MANIEREN samenstelt. kern/knelpunt/ rekent ze door, maar krijgt ze van de aanroeper -- en /api/knelpunt heeft nul aanroepers (geen scherm in public/, geen module in server/; alleen de route, lib/mutatiecontracten-knelpunt.js, lib/idemsleutels-bescherming.js en functies/register/cat-life.js noemen het pad). WAAROM: de motor is met opzet een rekenmachine en geen zoeker -- hij mag niet rangschikken en niets weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. De aanvoer hoort ernaast te staan en niet erin. WIE EROVER GAAT: de eigenaar. Dit is de kern van het voorstel voor een kansengraaf: kern/knelpunt/openingen-kaart.js dekt vandaag 5 terreinen (werk, opleiding, opvang, vervoer, wonen) en die kaart geeft INGANGEN bij een knelpunt, geen wegen bij een doel."
+    },
+    {
+      "schakel": 10,
+      "van": "werkgever",
+      "naar": "Adam",
+      "wat": "neemt hem aan; Adam hoort dat, en hoeft er niet zelf naar te zoeken",
+      "gemeten": "stand bij Adam: \"aangenomen\", ongelezen berichten in het gezin: 0",
+      "reden": "WAT ONTBREEKT: een melding in de app aan een sollicitant uit een RTF-gezin. WAAROM: kern/werk.js regel 160 stopt met `if (!a.key) return`, en `a.key` is een lidsessiesleutel; de rij die routes/member/werk/rtf.js aanmaakt draagt `rtf: { code, profielId }` en geen key. De stand WORDT bijgewerkt, dus hij kan het zien als hij kijkt -- hij wordt alleen niet gehaald. WIE EROVER GAAT: dit is geen besluit maar een gat, en het is dezelfde vorm als de reparatie van 10 september (TRAVELCOMMERCE.md par. 9a, opzet/meldaan.js): een persoonlijk bericht hoort op de sleutel van de ontvanger, en het gezin heeft een andere sleutel dan een lid."
+    }
+  ]
+}

@@ -11,7 +11,16 @@ hetzelfde en doen alsof van wel is de eerste manier om hem te verliezen.
 
 ---
 
-## De dertien regels
+## De regels
+
+*Ze zijn GENUMMERD en niet GETELD, en dat verschil is er een van vandaag. De
+nummers dragen betekenis -- `scripts/check.js` citeert er zes bij naam ("LAT.md
+regel 4", "regel 8", "regel 10"), dus een regel hernummeren breekt een
+verwijzing. Het TOTAAL droeg niets: het stond in CLAUDE.md als "elf regels"
+terwijl het er twaalf waren, verouderde stil, en had geen enkele handhaver. Een
+aantal dat niemand nakijkt is een bewering zonder handhaver -- regel 6, op het
+document zelf.*
+
 
 ### 1. Repareer de oorzaak, niet het symptoom
 

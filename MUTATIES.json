@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T12:18:49.716Z",
-    "commit": "3ff6ecea",
+    "op": "2026-09-13T16:14:33.121Z",
+    "commit": "9aabbf70",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -5272,6 +5272,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "omzetproef.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "ratel op een register; elf handmutaties, alle elf raak -- waaronder de twee bevindingen stil wegpoetsen"
     },
     "onboarding.test.js": {
       "soort": "server",

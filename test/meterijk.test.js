@@ -1514,6 +1514,27 @@ const IJKINGEN = {
       (j) => { j.gemeten.domeinen = Math.max(0, (j.gemeten.domeinen || 0) - 3); return j; },
       () => voor.carriereDomeinenGemeten - norm.meet().carriereDomeinenGemeten)
   },
+  /* DE TWEE TANDEN VAN 13 SEPTEMBER 2026: de ledencontext van Rahul
+     (AICONTEXT.json, MENSNETWERK.md par. 4c). Twee meters op EEN register, en
+     dat is precies waar het misgaan kan -- de vorm van de vier gelddekkings-
+     tanden hieronder. Elk krijgt daarom zijn EIGEN veld verstoord en er wordt
+     gemeten of juist DIE meter meebeweegt; leest er een het verkeerde veld, dan
+     blijft hij staan waar hij stond en zakt deze ijking.
+
+     `aiContextLek` gaat in de proef OMHOOG: dat is de invariant, en de vraag is
+     of hij een lek werkelijk ziet. `aiContextVeldenGezien` gaat OMLAAG, want dat
+     is het bereik en de gevaarlijke richting is een meter die stil minder velden
+     ziet -- die meldt een lek van nul over minder bewijs. */
+  aiContextLek: {
+    proef: (voor) => metVervangenJson('AICONTEXT.json',
+      (j) => { j.muur.lek = (j.muur.lek || []).concat(['bewaarVerzoek', 'conversation']); return j; },
+      () => norm.meet().aiContextLek - voor.aiContextLek)
+  },
+  aiContextVeldenGezien: {
+    proef: (voor) => metVervangenJson('AICONTEXT.json',
+      (j) => { j.ledenstaat.aantal = Math.max(0, (j.ledenstaat.aantal || 0) - 4); return j; },
+      () => voor.aiContextVeldenGezien - norm.meet().aiContextVeldenGezien)
+  },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
      de meter leest `gemeten.defecten` uit een register dat er al is, dus hij

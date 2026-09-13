@@ -492,7 +492,7 @@ de verkeerde vraag.
 | **foutmodel** | welke storing wordt er ingespoten, en raakt die de bron waar het over gaat | `server/lib/verraad.js` + `scripts/faalproef.js` |
 | **geraakte bron** | welk bestand of welke opslag verandert er werkelijk door die storing | `FAALPROEF.json`, per route |
 | **verwachte waarneming** | wat zou er anders zijn als de bewering onwaar was | vandaag: **de toets zelf, en verder niemand** |
-| **levendheid** | kan dit instrument überhaupt uitslaan | vandaag: **drie toetsen, met de hand** |
+| **levendheid** | kan dit instrument überhaupt uitslaan | vandaag: **twee plekken, met de hand** |
 
 De laatste twee rijen zijn de open kant. De levendheidscontrole is het goedkoopst
 en het meest verwaarloosd: `test/mn02ai-contextbesmetting.test.js` toets 5 en 6,
@@ -518,7 +518,7 @@ Daar staat een tweede, even goedkope regel naast. **De poort vóór een meting
 bestaat en hangt aan 12 van de 80 stempelende generatoren.** `eisSchoneBoom()` in
 `scripts/lib/stempel.js` weigert een ronde die toch `boomVuil: true` zou
 opleveren; `stempel()` MELDT het achteraf, als de tijd al op is en de meter
-`registersUitVuileBoom` al omhoog is geratteld. Dat die meter deze maand twee
+`registersUitVuileBoom` al omhoog is gerateld. Dat die meter deze maand twee
 keer op één dag van 1 naar 2 ging, is daar het gevolg van en geen toeval: het
 stempel is een verslag, de poort is een grendel, en 68 generatoren hebben alleen
 het verslag. Wie een generator schrijft, hangt hem aan de poort --

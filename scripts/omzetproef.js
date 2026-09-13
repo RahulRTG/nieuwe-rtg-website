@@ -367,18 +367,34 @@ async function storingen(basis, uit, w) {
   const voorRefund = await omzetNu();
   const ref = await P('/api/supplier/refund', { ref: uit.ref }, w.A.S);
   const naRefund = await omzetNu();
-  const gewist = euro(voorRefund - naRefund) === BRUTO;
+  const bon = ((await P('/api/orders/mine', {}, w.L)).data.orders || []).find(o => o.ref === uit.ref) || {};
+  /* DE VERKOOP BLIJFT STAAN, DE TERUGSTORTING KOMT ERNAAST. In deze proef vallen
+     beide gebeurtenissen in dezelfde maand, dus netto hoort de omzet met precies
+     het verkochte bedrag te dalen -- maar NIET doordat de verkoop verdween.
+     Daarom worden allebei apart nagekeken: het bedrag EN de bon. */
   uit.refund = { voor: voorRefund, na: naRefund, status: ref.status,
-    vorm: gewist ? 'wissen' : (euro(voorRefund) === euro(naRefund) ? 'geen effect' : 'anders'),
-    bevinding: gewist
-      ? 'Een terugstorting WIST de verkoop uit de maand waarin hij stond, in plaats van er een tegenboeking naast te zetten. ' +
-        'financeVoor telt op `o.paid`, en /api/supplier/refund zet die op false. Gevolg: de omzet van een AFGESLOTEN maand ' +
-        'verandert met terugwerkende kracht, en het verschil tussen "er is nooit verkocht" en "er is verkocht en teruggestort" ' +
-        'is uit de cijfers niet meer te lezen. Besluit van de eigenaar: tegenboeking met eigen datum, of wissen?'
-      : null };
+    vorm: bon.refunded && bon.paid ? 'tegenboeking'
+      : (bon.paid === false ? 'wissen' : 'onbekend'),
+    verkoopBlijft: bon.paid === true, eigenDatum: !!bon.refundedAt,
+    nettoEffect: euro(voorRefund - naRefund) };
   noteer('een betaalde bestelling terugstorten',
-    'het geld gaat terug EN de boekhouding blijft navolgbaar',
-    ref.status === 200, 'status ' + ref.status + ', omzet ' + voorRefund + ' -> ' + naRefund + ' (' + uit.refund.vorm + ')');
+    'de verkoop blijft staan, de terugstorting krijgt een eigen datum, en netto daalt de maand met het bedrag',
+    ref.status === 200 && bon.paid === true && bon.refunded === true && !!bon.refundedAt &&
+      euro(voorRefund - naRefund) === BRUTO,
+    'status ' + ref.status + ', omzet ' + voorRefund + ' -> ' + naRefund +
+      ', verkoop blijft: ' + (bon.paid === true) + ', eigen datum: ' + !!bon.refundedAt);
+
+  /* EN EEN TWEEDE TERUGSTORTING GAAT NIET. De grendel hing aan `paid`, en die
+     blijft nu staan -- zonder een eigen grendel op `refunded` zou dezelfde bon
+     twee keer geld terugsturen. Dit is de duurste bijwerking van de wijziging
+     hierboven, dus hij wordt hier gemeten en niet aangenomen. */
+  const nogmaalsTerug = await P('/api/supplier/refund', { ref: uit.ref }, w.A.S);
+  const naTweede = await omzetNu();
+  noteer('dezelfde bestelling een tweede keer terugstorten',
+    'wordt geweigerd, en de maand beweegt geen cent',
+    nogmaalsTerug.status === 409 && euro(naTweede) === euro(naRefund),
+    'status ' + nogmaalsTerug.status + ' -- ' + ((nogmaalsTerug.data && nogmaalsTerug.data.error) || '') +
+      ', omzet ' + naRefund + ' -> ' + naTweede);
 
   /* 3. DE TENANT-NAAD (naad 6). Zaak B vraagt haar eigen cijfers op. De omzet
      van zaak A mag daar onder geen enkele omstandigheid in zitten -- en dit is
@@ -474,7 +490,14 @@ async function meet() {
       'maand -- de huidige -- en dus niet naar periodeafsluiting, kwartaalaangifte of de weg naar de ' +
       'Belastingdienst. Hij meet EEN genre (restaurant, NL) en zegt niets over logies, vervoer of de ' +
       'buitenlandse tarieventabellen. En hij meet de PROJECTIE financeVoor: dat de zaak dit cijfer ziet, ' +
-      'bewijst niet dat er een grootboekregel onder ligt.',
+      'bewijst niet dat er een grootboekregel onder ligt. ' +
+      'DE TEGENBOEKING IS MAAR HALF BEWEZEN: verkoop en terugstorting vallen hier in DEZELFDE maand, dus ' +
+      'dat de verkoop blijft staan is gemeten, maar niet dat de tegenboeking in de juiste maand landt ' +
+      'wanneer zij in een andere valt -- en dat is nou net waar het besluit over ging. Daarvoor zou de ' +
+      'klok tegen een draaiende server verzet moeten worden. ' +
+      'EN ZIJ GELDT ALLEEN VOOR BESTELLINGEN: kern/fiscaal/index.js telt rides en boekingen nog op `paid` ' +
+      'zonder tegenboeking, en hun annuleerweg zet die vlag nog op false. Die twee (plus tickets) gaan pas ' +
+      'om met hun eigen gemeten lezerskaart -- ruw geteld 11, 22 en 7 lezers, tegenover 17 voor orders.',
     genre: GENRE, bruto: BRUTO, schakels: [], storingen: [], ref: null };
   const srv = await start({ naam: 'omzetproef', gereed: 'ready',
     env: { NODE_ENV: 'test', RTG_DEMO: '1', OFFICE_CODE: KANTOOR } });
@@ -503,10 +526,6 @@ async function meet() {
   uit.sluitMetBevinding = t.open === 0 && t.stuk === 0 && t.gebroken === 0 && t.schakels >= 7;
   uit.bevindingen = uit.schakels.filter(s => s.stand === 'openBekend')
     .map(s => ({ schakel: s.nr, van: s.van, naar: s.naar, wat: s.wat, gemeten: s.ziet, reden: s.bekend }));
-  if (uit.refund && uit.refund.bevinding)
-    uit.bevindingen.push({ schakel: 'storing 2', van: 'zaak', naar: 'boekhouding',
-      wat: 'een terugstorting wist de verkoop uit zijn eigen maand', gemeten: uit.refund.voor + ' -> ' + uit.refund.na,
-      reden: uit.refund.bevinding });
   if (uit.categorieVerschuiving && uit.categorieVerschuiving.bevinding)
     uit.bevindingen.push({ schakel: 'storing 5', van: 'zaak', naar: 'fiscus',
       wat: 'de kaart wijzigen verplaatst al verkochte omzet naar een andere btw-pot',

@@ -89,8 +89,30 @@ app.post('/api/supplier/refund', supplierAuth, (req, res) => {
   const o = (x => x && x.supplierCode === req.supplier.code ? x : undefined)(orderMetRef(req.body.ref));
   if (!o) return res.status(404).json({ error: 'Bestelling niet gevonden.' });
   if (!o.paid) return res.status(409).json({ error: 'Deze bestelling is niet betaald.' });
-  o.paid = false;
+  /* DE GRENDEL HANGT AAN `refunded` EN NIET MEER AAN `paid`. Hieronder blijft
+     `paid` namelijk staan, dus zonder deze regel kon dezelfde bon twee keer
+     worden teruggestort -- en dan gaat er twee keer geld terug. */
+  if (o.refunded) return res.status(409).json({ error: 'Deze bestelling is al teruggestort.' });
+  /* EEN TERUGSTORTING IS EEN TWEEDE GEBEURTENIS, GEEN WISSER VAN DE EERSTE.
+
+     Hier stond `o.paid = false`. De verkoop verdween daarmee uit de maand waarin
+     hij plaatsvond: kern/fiscaal/index.js telt op `o.paid`, dus de omzet van een
+     AFGESLOTEN maand veranderde met terugwerkende kracht -- ook nadat de
+     btw-aangifte erover was gedaan. En het verschil tussen "er is nooit verkocht"
+     en "er is verkocht en teruggestort" was uit de cijfers niet meer te lezen.
+     Gemeten met scripts/omzetproef.js: 45,00 -> 0,00.
+
+     Een eenmaal geboekte verkoop is historische waarheid. De terugbetaling is een
+     NIEUWE economische gebeurtenis die naar die verkoop verwijst, met een eigen
+     datum -- want hij valt vaak in een andere maand dan de verkoop. Netto kan het
+     nul worden; de geschiedenis blijft heel.
+
+     `paid` zegt dus: er IS betaald. `refunded` zegt: het geld ligt niet meer bij
+     de zaak. Wie wil weten of er nu geld staat, leest ze allebei -- en dat doen
+     de vier plekken die dat bedoelen sinds deze wijziging ook. */
   o.refunded = true;
+  o.refundedAt = new Date().toISOString();
+  o.terugbetaling = { bedrag: o.total, op: o.refundedAt, door: (req.actor && req.actor.id) || null };
   o.status = 'terugbetaald';
   save();
   logActivity(req.supplier.code, req.actor, 'stortte € ' + o.total + ' terug (' + o.ref + ')');

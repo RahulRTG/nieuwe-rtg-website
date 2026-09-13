@@ -55,7 +55,8 @@ module.exports = (ctx) => {
         const terug = await geldTerug(o, 'Bestelling geannuleerd');
         if (terug.error) return terug;
       }
-      if (o.paid) { o.paid = false; o.refunded = true; o.refundedAt = nu(); }
+      // tegenboeking, niet wissen
+      if (o.paid) { o.refunded = true; o.refundedAt = nu(); }
       o.status = wasBetaald ? 'terugbetaald' : 'geweigerd';
       o.geannuleerdDoor = 'lid';
       save();

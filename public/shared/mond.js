@@ -52,20 +52,20 @@
       var z = (lip === 'b' ? 0.20 : 0.26) * bult(x) * (0.55 + 0.45 * lipMidden);
       PUNTEN.push({ x: x, y: y1 + rnd() * (y2 - y1), lip: lip,
         fase: rnd() * Math.PI * 2, maat: 0.5 + rnd() * 0.9,
-        kleur: r < 0.62 ? '#9E1C40' : (r < 0.9 ? '#C9A24B' : '#FFFFFF'),
+        kleur: r < 0.70 ? '#9E1C40' : (r < 0.98 ? '#C9A24B' : '#FFFFFF'),
         diep: diep, z: z });
     }
-    // de gouden middellijn loopt door tot voorbij de mondhoeken en vervaagt; ligt terug
-    for (var j = 0; j < 420; j++) {
-      var mx = 14 + rnd() * 192;
+    // een compacte gouden middellijn houdt boven- en onderlip leesbaar; ligt terug
+    for (var j = 0; j < 260; j++) {
+      var mx = 42 + rnd() * 136;
       PUNTEN.push({ x: mx, y: midden(Math.min(170, Math.max(50, mx))) + (rnd() - 0.5) * 1.6,
         lip: 'm', fase: rnd() * Math.PI * 2, maat: 0.4 + rnd() * 0.7,
-        kleur: '#C9A24B', rand: Math.min(1, Math.min(mx - 14, 206 - mx) / 55), diep: 0, z: -0.05 });
+        kleur: '#C9A24B', rand: Math.min(1, Math.min(mx - 42, 178 - mx) / 30), diep: 0, z: -0.05 });
     }
 
     /* DE TEKENING IN HET MIDDEN VAN ZIJN EIGEN DOEK.
 
-       Beide tekenaars gebruiken y=52 als draaipunt: WebGL rekent -(y-52)/60 en
+       Beide tekenaars gebruiken y=52 als draaipunt: WebGL rekent vanaf y=52 en
        de 2D-terugval schaalt om diezelfde lijn. Maar de mond zelf loopt van
        ongeveer 35 tot 79, dus zijn werkelijke midden ligt op 57 -- vijf eenheden
        LAGER dan het draaipunt. Gevolg: de mond hing in zijn doek naar beneden,
@@ -207,7 +207,7 @@
     var pos = new Float32Array(n * 3), kol = new Float32Array(n * 3), ext = new Float32Array(n * 4), rnd = new Float32Array(n);
     for (var i = 0; i < n; i++) {
       var p = PUNTEN[i];
-      pos[i * 3] = (p.x - 110) / 110; pos[i * 3 + 1] = -(p.y - 52) / 60; pos[i * 3 + 2] = p.z;
+      pos[i * 3] = (p.x - 110) / 70; pos[i * 3 + 1] = -(p.y - 52) / 38; pos[i * 3 + 2] = p.z;
       var c = hex(p.kleur); kol[i * 3] = c[0]; kol[i * 3 + 1] = c[1]; kol[i * 3 + 2] = c[2];
       ext[i * 4] = p.maat; ext[i * 4 + 1] = p.fase; ext[i * 4 + 2] = p.lip === 'o' ? 1 : 0; ext[i * 4 + 3] = p.diep || 0;
       rnd[i] = p.rand == null ? 1 : p.rand;
@@ -296,7 +296,6 @@
       requestAnimationFrame(lus3);
       return { praat: praat3 };
     }
-
     /* ---- 2D-terugval: hetzelfde gezicht, dezelfde spraak, zonder WebGL ----
        Ook hier is de tekenlus opnieuw opgezet: kleuren worden gegroepeerd
        getekend (één fillStyle per kleur in plaats van per puntje) en de alpha
@@ -318,7 +317,8 @@
       br2 += (doel.breed - br2) * volg; du2 += (doel.duw - du2) * volg; sc2 += (doel.scheef - sc2) * volg;
       mctx.setTransform(1, 0, 0, 1, 0, 0);
       mctx.clearRect(0, 0, canvas.width, canvas.height);
-      mctx.scale(canvas.width / 220, canvas.height / 100);
+      mctx.scale(canvas.width / 150, canvas.height / 72);
+      mctx.translate(-35, -16);
       /* De WebGL-tekenaar draait om y=52, deze om het midden van 0..100 (dus
          50). Zonder deze twee eenheden staat dezelfde mond in de terugval twee
          eenheden hoger dan in de hoofdweg -- klein, maar dan is het niet meer

@@ -34,6 +34,23 @@ body[data-rtg-skin="heritage"] :where(dialog,.modal,.sheet,[role="dialog"]){
   border-color:var(--rtg-world-line);border-radius:var(--rtg-radius-system);box-shadow:var(--rtg-depth-system)
 }
 
+/* RTG Simple gebruikt dezelfde twee bestaande hoekmaten. De grote schil- en
+   heldvlakken zijn systeemlagen; kaarten en bediening blijven inhoud. */
+body[data-rtg-skin="heritage"][data-rtg-world-dashboard-ready="true"] :is(.dagkop,.doelgroep,.kaartraster,.onthaal),
+body[data-ios-home][data-rtg-skin="heritage"] #gate .ag-doos:not(.ag-ballotage),
+body[data-rtg-skin="heritage"].rtg-command .cmd-intentie,
+body[data-rtg-skin="heritage"].rtg-edge-host .rtg-edge-bottom{
+  border-radius:var(--rtg-radius-system)
+}
+body[data-rtg-skin="heritage"][data-rtg-world-dashboard-ready="true"] :is(
+  .dagkaart,.kompasblok,.work-open-day,.doenkaart,.buurtkaart,.kompaskaart,
+  .reisregister,.reisdiensten>a,.doelgroeppoorten>a,.wrooster-kaart),
+body[data-ios-home][data-rtg-skin="heritage"] #gate .ag-passkey-kaart,
+body[data-rtg-skin="heritage"].rtg-command .cmd-startwereld,
+body[data-rtg-skin="heritage"].rtg-edge-host :is(.rtg-edge-bottom>a,.rtg-edge-bottom>button,#rtg-cookie){
+  border-radius:var(--rtg-radius-content)
+}
+
 body[data-rtg-skin="heritage"] :where(a.kaart,a.card,button.kaart,button.card,
   .kaart[role="button"],.card[role="button"],[data-rtg-interactive]){
   transition:border-color var(--rtg-time-functional,200ms) var(--rtg-ease-standard,ease),

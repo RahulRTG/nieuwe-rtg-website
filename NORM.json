@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-09-12",
+  "vastgelegd": "2026-09-13",
   "meters": {
     "activeringOnbepaald": 3,
     "activeringOndergrens": 49,
@@ -23,8 +23,8 @@
     "devPakketten": 1,
     "e2eBestanden": 216,
     "endpointsNooitAangeraakt": 0,
-    "endpointsZonderTest": 903,
-    "faalproefGezakt": 10,
+    "endpointsZonderTest": 902,
+    "faalproefGezakt": 1,
     "gluurGaten": 0,
     "gluurGecontroleerd": 2417,
     "gluurOnbewaakt": 0,
@@ -49,7 +49,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 85,
+    "ratelTanden": 100,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -61,7 +61,7 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1613,
+    "testbestanden": 1631,
     "toetsenNietGemeten": 607,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
@@ -76,7 +76,7 @@
     "zelfpoortendeToetsen": 28,
     "geldRoutesPubliek": 0,
     "geldRoutesZonderSemantiek": 1,
-    "geldRoutesZonderIdemBewijs": 9,
+    "geldRoutesZonderIdemBewijs": 3,
     "geldRoutesZonderTerugweg": 42,
     "geldRoutesHerstelOnbesloten": 44,
     "geldRoutesHerstelTegenspraak": 0,
@@ -91,7 +91,10 @@
     "geldGebreken": 0,
     "bevestigGebreken": 0,
     "verwijzingGebreken": 0,
-    "mensmutatieZonderWacht": 1
+    "mensmutatieZonderWacht": 1,
+    "stilSpoor": 18,
+    "stilleOpslag": 24,
+    "stilSpoorAanroepen": 221
   },
   "notities": [
     {
@@ -2200,14 +2203,14 @@
   },
   "sinds": {
     "keuringOmvang": "2026-09-11",
-    "testbestanden": "2026-09-12",
+    "testbestanden": "2026-09-13",
     "toetsenNietGemeten": "2026-09-11",
     "inlineStijlAttributen": "2026-09-11",
-    "ratelTanden": "2026-09-12",
+    "ratelTanden": "2026-09-13",
     "metingenZonderRatel": "2026-08-18",
     "bewijsAchterstand": "2026-09-12",
     "toetsenOngevoeligPct": "2026-09-05",
-    "endpointsZonderTest": "2026-09-11",
+    "endpointsZonderTest": "2026-09-13",
     "dekkingPct": "2026-09-06",
     "keuringScheef": "2026-09-05",
     "keuringTeGroot": "2026-09-05",
@@ -2237,7 +2240,7 @@
     "registersUitVuileBoom": "2026-09-10",
     "laatSpoorVerdacht": "2026-09-03",
     "rollbackUitzonderingen": "2026-09-03",
-    "faalproefGezakt": "2026-09-11",
+    "faalproefGezakt": "2026-09-13",
     "appwerktDefecten": "2026-09-07",
     "lussenGeenUitweg": "2026-09-11",
     "lussenKritiek": "2026-09-11",
@@ -2245,7 +2248,7 @@
     "carriereDomeinenGemeten": "2026-09-11",
     "geldRoutesPubliek": "2026-09-12",
     "geldRoutesZonderSemantiek": "2026-09-12",
-    "geldRoutesZonderIdemBewijs": "2026-09-12",
+    "geldRoutesZonderIdemBewijs": "2026-09-13",
     "geldRoutesZonderTerugweg": "2026-09-12",
     "geldRoutesHerstelOnbesloten": "2026-09-12",
     "geldRoutesHerstelTegenspraak": "2026-09-12",
@@ -2259,7 +2262,10 @@
     "geldGebreken": "2026-09-12",
     "bevestigGebreken": "2026-09-12",
     "verwijzingGebreken": "2026-09-12",
-    "mensmutatieZonderWacht": "2026-09-12"
+    "mensmutatieZonderWacht": "2026-09-12",
+    "stilSpoor": "2026-09-13",
+    "stilleOpslag": "2026-09-13",
+    "stilSpoorAanroepen": "2026-09-13"
   },
   "uitzonderingen": [
     {

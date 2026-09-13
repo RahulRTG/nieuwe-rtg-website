@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T19:15:51.855Z",
-    "commit": "6c92fa44",
+    "op": "2026-09-13T20:34:43.339Z",
+    "commit": "e8f88ae7",
     "boomVuil": false,
     "boomAnders": 3,
     "instrument": "scripts/mutatie.js",
@@ -3231,6 +3231,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "herrekenbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
     "herstel-sandbox.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3651,6 +3659,14 @@
         "scripts/lib/invoerproef.js"
       ],
       "posities": 1
+    },
+    "inzagebewaring.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/inzagelog.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "inzagelog.test.js": {
       "soort": "puur",

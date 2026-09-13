@@ -79,6 +79,12 @@ const BUITEN = {
   'VERTROUWEN.json': 'de vervalstaten, afgeleid uit de andere registers',
   'IDEMBESLUIT.json': 'een register van BESLUITEN, met de hand bijgehouden',
   'HERREKENBAAR.json': 'een register van BESLUITEN over herrekenbaarheid, met de hand bijgehouden; de meting ernaast is FAALPROEF.json en die veroudert wel',
+  /* NOG NIET GESCHREVEN, EN DAAROM JUIST HIER. scripts/stilspoor.js LEEST dit
+     bestand om een verklaarde smoring apart te tellen; er is nog geen enkel
+     besluit genomen, dus het bestaat niet. Een leeg besluitregister zou een
+     belofte zijn die niemand heeft gedaan -- maar een verwijzing die nergens
+     verklaard staat, leest bij de eerste lezer als een vergeten register. */
+  'STILSPOORBESLUIT.json': 'een register van BESLUITEN over gesmoorde schrijfacties (LAT.md regel 13), met de hand bijgehouden en vandaag nog leeg; de meting ernaast is STILSPOOR.json en die veroudert wel',
   'LADDER.json': 'een afdruk uit de code, ververst door de keuring',
   'SLO.json': 'de servicedoelen zelf -- gegevens, geen meting',
   'KLOK.json': 'een tabel, geen meting',

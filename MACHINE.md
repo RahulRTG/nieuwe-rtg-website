@@ -82,7 +82,7 @@ aantal routes dat hem raakt (`handler` / `bestand`):
 | envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->109<!--/getal--> | `kern/envelop.js` |
 | idempotentie | 13 | 114 | `lib/idem-poort.js` |
 | aiVindbaar | 173 | 173 | `kern/stuur/beleid.js` |
-| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->234<!--/getal--> | `kern/kantoor/kluispoort.js` |
+| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->235<!--/getal--> | `kern/kantoor/kluispoort.js` |
 | herhaling (beschermd) | 1675 | 1675 | `IDEMPROEF.json` |
 
 Vier assen staan als **ongemeten met een reden** en nooit als 0: doelvindbaarheid

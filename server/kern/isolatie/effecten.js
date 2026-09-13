@@ -42,6 +42,7 @@ const { VERKLAARD, PER_CATEGORIE } = require('./effectregister');
 const { BESCHERMD_SLUIT, TREDE_SLUIT, TREDE_WAAROM, sluit } = require('./standsluiting');
 const proefmeting = require('./proefmeting');
 const effectcollecties = require('./effectcollecties');
+const kantoorbank = require('./kantoorbank');
 
 /* ---------------------------------------------------------------------------
    DE AFLEIDING.
@@ -58,6 +59,26 @@ function effectenVan(pad, methode, functie) {
     for (const e of r.effecten) uitVerklaring.add(e);
     gronden.push(r.grond);
   }
+
+  /* 1b. EN WAT ER PER ROUTE IS BEANTWOORD (./kantoorbank.js): kan deze handeling na commit
+         een geldpositie wijzigen, en wat doet zij anders wel?
+
+         DIT STAAT NAAST DE PATRONEN EN NIET ERIN, want een patroon leest een NAAM -- en
+         daar zat de fout die deze bron opende: /api/office/bank/ is een DOMEIN en geen
+         handelingstype, dus "zit deze route in bank" gaf vier bankSTANDEN het label
+         GELD_BEWEGEN terwijl de routes die werkelijk boeken op `onbekend` stonden.
+
+         ALLEEN `true` VOEGT GELD_BEWEGEN TOE. Een `false` haalt niets weg: zag de meting
+         een geldcollectie bewegen, dan bewoog die, en een verklaring die een meting
+         overstemt is de rangorde die dit bestand hieronder verbiedt. */
+  const geld = kantoorbank.geldpositieVan(p);
+  if (geld.kan === true) { uitVerklaring.add('GELD_BEWEGEN'); gronden.push('geldpositie: ' + geld.grond); }
+  /* EN WAT ZIJ WEL DOET. Een declaratie ZONDER werkwoord blijft hier `onbekend`: dit
+     bestand mag nooit een lege lijst teruggeven (zie de kop). Die verklaring is niet
+     verloren -- klassenVan() geeft `[]` tegenover `null`, getoetst in ./kantoorbank.js. */
+  const kb = kantoorbank.klassenVan(p);
+  if (kb) for (const k of kb) uitVerklaring.add(k);
+  if (kb && kb.length) gronden.push('kantoorbank: ' + geld.grond);
 
   /* 2. WAT DE PROEF ZAG BEWEGEN -- gemeten collecties, ingedeeld in
         ./effectcollecties.js. Alleen die laatste stap is mensenwerk. */

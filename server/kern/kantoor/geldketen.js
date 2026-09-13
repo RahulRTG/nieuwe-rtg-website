@@ -73,7 +73,7 @@ function maakGeldketen({ voornemens, frictie, bak, nu, mandaatBron }) {
      terwijl de handeling loopt. */
   const boeken = require('./geldketen/boeken').maakBoeken({ bak, tijd });
   const { journaal, dossiers, vindDossier, leg, noteer, bewaar } = boeken;
-  const { publiek, dossier, lijst } = require('./geldketen/dossier').maakDossierlaag({ dossiers, vindDossier });
+  const { publiek, dossier, lijst, voorspellingVan } = require('./geldketen/dossier').maakDossierlaag({ dossiers, vindDossier });
 
   /* De eerste helft van de baan staat apart: zie ./geldketen/klaarzet.js. */
   const klaarzet = require('./geldketen/klaarzet').maakKlaarzet({
@@ -130,10 +130,18 @@ function maakGeldketen({ voornemens, frictie, bak, nu, mandaatBron }) {
      voornemen (vingerafdruk, bewijstoken, veiligheidskern) staan in
      kern/commercie/voornemen/uitvoeren.js en worden hier niet nagedaan.
      ---------------------------------------------------------------------- */
-  async function uitvoer({ id, doe, door }) {
+  async function uitvoer({ id, doe, door, verzoek }) {
     const d = vindDossier(id);
     if (!d) return { status: 404, error: 'Er is geen geldketen met dit voornemen.' };
     if (typeof doe !== 'function') return { status: 400, error: 'Er is geen uitvoerder meegegeven.' };
+
+    /* WELK VERZOEK DEZE UITVOERING DEED, en dat is een id en geen identiteit. Het is de
+       enige brug tussen deze keten en de effectbon van server/effectbon.js: die bon wordt
+       pas gemaakt als het antwoord de deur uit gaat, dus hij kan hier niet gelezen worden
+       -- maar hij kan straks WEL gevonden worden. Zonder dit veld is de voorspelling van
+       de aanvraag niet meer te koppelen aan de observatie van de uitvoering, en dat is
+       precies de koppeling die een causale keten maakt. */
+    if (verzoek) d.uitvoerVerzoek = String(verzoek).slice(0, 64);
 
     const env = envelopLaag.maak({ kanaal: 'office', actor: null, classificatie: 'intern',
       correlatie: d.correlatie, oorzaak: d.envelop });
@@ -153,7 +161,7 @@ function maakGeldketen({ voornemens, frictie, bak, nu, mandaatBron }) {
     return r;
   }
 
-  return { klaarzet, tekenAf, uitvoer, dossier, lijst,
+  return { klaarzet, tekenAf, uitvoer, dossier, lijst, voorspellingVan,
     journaalTop: boeken.top, journaalVerifieer: boeken.verifieer, KLASSEN, KETENS };
 }
 

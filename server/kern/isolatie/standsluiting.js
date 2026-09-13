@@ -19,9 +19,27 @@ const { NAMEN } = require('./effectwoorden');
    zijn zes bevroren categorieën bedoelt: nieuwe bevoorrechte handelingen en
    mutaties van derden. Deze zes zijn de vertaling daarvan naar effecten, en het
    is die vertaling die de schaduwmeting toetst. */
+/* DE VIER WERKWOORDEN VAN 13 SEPTEMBER, en per stuk een besluit -- want deze lijst is
+   EXPLICIET en niet "alles behalve lezen". Wie er een werkwoord bijzet zonder hier te
+   kiezen, laat het stil buiten de beschermstand vallen.
+
+     PLAFOND_WIJZIGEN    ERIN. Een limiet verhogen maakt geld mogelijk, en dat is precies
+       een "nieuwe bevoorrechte handeling": tijdens een beschermde stand hoort niemand de
+       ruimte te vergroten waarbinnen straks geld beweegt.
+     CONFIGUREREN        ERIN. Een stand zetten terwijl het huis beschermd staat, is wat
+       je juist niet wilt -- ook als die instelling zelf geen grens losser maakt. Dit is
+       de voorzichtige kant, en dat is hier de goede kant.
+     LEZEN_ANDERMANS     ERBUITEN. `beschermd` bevriest nieuwe bevoorrechte handelingen en
+       mutaties van derden; LEZEN is geen mutatie. Hij gaat wel dicht in ISOLATIE, want
+       daar blijft alleen LEZEN_EIGEN open -- en dat is exact het onderscheid dat dit
+       werkwoord moest maken.
+     VOORSTEL_MAKEN      ERBUITEN. Een voorstel verandert niets: het wacht op een tweede
+       mens, en die bevestiging valt zelf onder de werkwoorden hierboven. Het klaarzetten
+       tegenhouden stopt geen enkel effect en kost het kantoor zijn voorbereiding. */
 const BESCHERMD_SLUIT = Object.freeze([
   'VERTROUWENSRELATIE_AANGAAN', 'RECHT_VERLENEN', 'IDENTITEIT_WIJZIGEN',
-  'GELD_BEWEGEN', 'BEVEILIGING_VERZWAKKEN', 'SCHRIJVEN_ANDERMANS'
+  'GELD_BEWEGEN', 'BEVEILIGING_VERZWAKKEN', 'SCHRIJVEN_ANDERMANS',
+  'PLAFOND_WIJZIGEN', 'CONFIGUREREN'
 ]);
 
 /* De tredes. `waakzaam` sluit met opzet niets -- hij markeert, en een stand die

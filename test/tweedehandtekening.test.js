@@ -41,7 +41,10 @@ function api(pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
   if (token) h.Authorization = 'Bearer ' + token;
   return fetch(base + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) })
-    .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+    /* De KOPPEN gaan mee, want de effectbon meldt zich zo (X-RTG-Effectbon) en dat is de
+       enige manier om over HTTP te zien wat de server werkelijk heeft waargenomen. */
+    .then(async r => ({ status: r.status, kop: (n) => r.headers.get(n),
+      body: await r.json().catch(() => ({})) }));
 }
 
 /* Een kantoormedewerker OP NAAM: een gewoon lid dat de kantoorrol koppelt met de
@@ -244,6 +247,15 @@ test('6. de incassoronde vraagt dezelfde twee mensen, en loopt de hele gouden we
   const ok = await api('/api/office/bank/handtekening/bevestig', { id: r.body.aanvraag.id }, eenB);
   assert.equal(ok.status, 200, JSON.stringify(ok.body).slice(0, 200));
   assert.equal(ok.body.handeling, 'bank.incasso');
+
+  /* DE EFFECTBON OVER DIT VERZOEK, en dit is de enige plek waar de hele causale keten
+     over HTTP te zien is: het verzoek dat het geld bewoog, meldt in zijn eigen kop welke
+     effectklassen er zijn WAARGENOMEN. Hij staat er zonder RTG_STAATLOG -- dat is de hele
+     reden dat de bon altijd aan staat, want een observatie die alleen in een proef bestaat
+     maakt van een causale runtime een meetopstelling. */
+  assert.match(ok.kop('X-RTG-Effectbon') || '', /GELD_BEWEGEN/,
+    'de bon van het verzoek dat geld verplaatste, noemt GELD_BEWEGEN niet: ' +
+    (ok.kop('X-RTG-Effectbon') || '(geen kop)'));
 
   /* EN NU HET ENIGE DAT ER ECHT TELT: is er geld verplaatst? */
   const saldoNa = await saldoVan();

@@ -1704,6 +1704,34 @@ const IJKINGEN = {
       (j) => { j.telling.BLOCKED_ONBEPAALD = (j.telling.BLOCKED_ONBEPAALD || 0) + 4; return j; },
       () => norm.meet().crashproefOnbepaald - voor.crashproefOnbepaald)
   },
+  /* DE DRIE TANDEN VAN DE GEVOLGDEKKING (GEVOLGDEKKING.json, 13 september 2026).
+
+     Ze lezen drie verschillende velden uit dezelfde `tellers`, en dat is hier de
+     faalvorm: een meter die het verkeerde veld leest, beweegt wel mee maar met een
+     ANDER getal. Vandaar drie ONGELIJKE bedragen (3, 5 en 7) -- met drie keer
+     dezelfde ophoging zou een verwisseling er precies even goed uitzien.
+
+     EN LET OP DE MIDDELSTE: `gevolgContractVolledig` gaat de andere kant op
+     (richting omhoog), dus zijn bekend-foute invoer is een verklaring die
+     VERDWIJNT en niet een die erbij komt. Dat is de echte faalvorm van die tand:
+     een contract dat de keuring niet meer haalt, verdwijnt uit de teller, en een
+     ratel die alleen naar boven kijkt zou dat als "niets veranderd" lezen. Daarom
+     telt de proef het verschil de andere kant op. */
+  gevolgPadenOnbekend: {
+    proef: (voor) => metVervangenJson('GEVOLGDEKKING.json',
+      (j) => { j.tellers.onbekendeEffectpaden = (j.tellers.onbekendeEffectpaden || 0) + 3; return j; },
+      () => norm.meet().gevolgPadenOnbekend - voor.gevolgPadenOnbekend)
+  },
+  gevolgContractVolledig: {
+    proef: (voor) => metVervangenJson('GEVOLGDEKKING.json',
+      (j) => { j.tellers.contractVolledig = (j.tellers.contractVolledig || 0) - 5; return j; },
+      () => voor.gevolgContractVolledig - norm.meet().gevolgContractVolledig)
+  },
+  gevolgContractenGezakt: {
+    proef: (voor) => metVervangenJson('GEVOLGDEKKING.json',
+      (j) => { j.tellers.contractenGezakt = (j.tellers.contractenGezakt || 0) + 7; return j; },
+      () => norm.meet().gevolgContractenGezakt - voor.gevolgContractenGezakt)
+  },
   /* DE TAND VAN 12 SEPTEMBER 2026: eersteMinuutGezakt telt de toetsen van de
      eerste minuut die ZAKKEN (EERSTEMINUUT.json, telling.gezakt). Zelfde vorm
      als de vier hierboven -- hij leest een getal uit een bestaand register, dus

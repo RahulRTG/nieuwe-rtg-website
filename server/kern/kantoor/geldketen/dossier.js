@@ -50,10 +50,30 @@ function maakDossierlaag({ dossiers, vindDossier }) {
       rond: dossiers().filter(d => publiek(d).rond).length };
   }
 
+  /* DE VOORSPELLING VAN HET VERZOEK DAT UITVOERDE -- zuiver lezend, en daarom hier.
+
+     DE BRUG NAAR server/effectbon.js, en met opzet in deze richting. Die laag observeert
+     wat een verzoek werkelijk veroorzaakte en wil dat tegen de voorspelling houden; die
+     voorspelling woont hier. Kern duwt niets naar de serverlaag en de serverlaag mag kern
+     lezen, dus wordt deze functie in server/opzet/kern-geldketen.js aan de bon GEGEVEN --
+     zelfde vorm als de frictiemotor die lui aan de baan wordt meegegeven.
+
+     `null` IS HIER GEEN LEGE LIJST: "niemand heeft iets voorspeld" is iets anders dan "er
+     is voorspeld dat er niets gebeurt", en de nameting hangt precies op dat verschil. */
+  function voorspellingVan(verzoek) {
+    if (!verzoek) return null;
+    for (const d of dossiers()) {
+      if (d.uitvoerVerzoek !== String(verzoek)) continue;
+      const as = (d.assen || []).find(a => a.as === 'gevolgcontract');
+      return (as && Array.isArray(as.voorspeld)) ? as.voorspeld.slice() : null;
+    }
+    return null;
+  }
+
   /* De top van de hashketen: het ene getal dat naar buiten moet om het journaal
      onherschrijfbaar te maken. Verifieren gaat over de hele keten. */
 
-  return { publiek, dossier, lijst };
+  return { publiek, dossier, lijst, voorspellingVan };
 }
 
 module.exports = { maakDossierlaag };

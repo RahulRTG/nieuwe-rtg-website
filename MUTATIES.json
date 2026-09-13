@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T12:25:05.561Z",
-    "commit": "b1600666",
+    "op": "2026-09-13T12:06:17.712Z",
+    "commit": "50a43305",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -1037,11 +1037,6 @@
       "gezakt": 11,
       "geprobeerd": 4
     },
-    "bewijsveld.test.js": {
-      "soort": "puur",
-      "staat": "geen bronmutatie mogelijk",
-      "reden": "een census over de registers tegen een verklaring van louter literalen; geen bronoperator raakt dat. De gevoeligheid is machinaal bewezen door de sabotagemotor: techniek-bewijsveld-een-relatie staat op RAAK"
-    },
     "bezitsbewijs.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2008,14 +2003,6 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
-    "doctrine.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/doctrine.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 1
-    },
     "doelbinding.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2216,6 +2203,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "effectbon.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/effectbon.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "effectdekking.test.js": {
       "soort": "puur",
@@ -2822,6 +2817,22 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "geldketen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/kantoor/geldketen.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "geldpositie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/isolatie/geldpositie.js",
+      "operator": "getal+1#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "geldregie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2962,6 +2973,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "gevolgcontract.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stuur/gevolgcontract.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "gewichtdrift.test.js": {
       "soort": "puur",
@@ -3708,6 +3727,14 @@
       "operator": "===->!==",
       "gezakt": 2
     },
+    "kantoorbank.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/isolatie/kantoorbank.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
     "kantoordienst.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -4399,6 +4426,14 @@
       "gezakt": 18,
       "geprobeerd": 1
     },
+    "machinedekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/machinedekking.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "magnaat-capabilities.test.js": {
       "soort": "puur",
       "staat": "geen bruikbare mutatie",
@@ -4893,14 +4928,6 @@
       "soort": "puur",
       "staat": "muteert zelf",
       "reden": "muteert zelf echte bestanden (waaronder MUTATIES.json) om meters te ijken"
-    },
-    "meterwet.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/ijking.js",
-      "operator": "false->true#0",
-      "gezakt": 1,
-      "geprobeerd": 2
     },
     "metier.test.js": {
       "soort": "server",
@@ -8533,14 +8560,6 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
-    "verband.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/verband.js",
-      "operator": "&&->||#0",
-      "gezakt": 1,
-      "geprobeerd": 5
-    },
     "verblijf.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -9188,14 +9207,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
-    },
-    "wetrelatie.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/wetrelatie.js",
-      "operator": "return-weg#0",
-      "gezakt": 2,
-      "geprobeerd": 2
     },
     "wetten.test.js": {
       "soort": "puur",

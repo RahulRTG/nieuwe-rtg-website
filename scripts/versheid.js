@@ -201,6 +201,10 @@ const REGISTERS = [
      (test/machinedekking.test.js, via npm run machinedekking:controle): twee
      schulden die alleen mogen dalen, en `volledigeKetens` die alleen mag stijgen. */
   ['MACHINEDEKKING.json', 'npm run machinedekking:vastleggen', 'of de motoren van dit huis bij dezelfde handeling langskomen'],
+  /* DE GEVOLGDEKKING (EXECUTIE.md blok 4). Twee assen die nooit worden opgeteld: wat
+     de proef zag veranderen, en wat een mens erover heeft verklaard. Hij veroudert op
+     twee manieren -- een nieuwe AI-bereikbare route, en een verse idempotentieronde. */
+  ['GEVOLGDEKKING.json', 'npm run gevolgdekking:vastleggen', 'van hoeveel AI-bedienbare handelingen bekend is wat zij veroorzaken'],
   /* DE OVERLEVING STAAT MET OPZET OP `overig` EN NIET OP BEVEILIGING, en dat is
      de correctie op een eerste versie die hem die vlag wel gaf -- "hij gaat over
      beveiliging, dus hij hoort in de beveiligingsklasse". Dat is de verkeerde

@@ -3,10 +3,10 @@
  "uitleg": "Per handeling: hoeveel van de eigen machinerie raakt hij? Zestien motoren die ieder apart gemeten zijn, hier voor het eerst naast elkaar op DEZELFDE route.",
  "grens": "Twee assen die verschillende dingen missen, nooit opgeteld: `handler` is lexicaal binnen de tekst van de handler (mist een hulpfunctie en de kern-tas) en `bestand` rekent het routebestand plus zijn DIRECTE requires (vangt de hulpfunctie, markeert alle routes in een bestand, mist nog steeds de kern-tas). De tas zit met opzet niet in de route-as: een hub als server.js zette zo 4162 routes op \"idempotent\". Woont een route ZELF in een hub, dan vervalt de bestandsas (bestandsasOnbruikbaar) en is ook zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. De assen uit EXECUTION_MAP.json zijn gelezen en niet hier geteld.",
  "stempel": {
-  "op": "2026-09-13T01:15:42.653Z",
-  "commit": "190efed9",
+  "op": "2026-09-13T11:39:09.969Z",
+  "commit": "23a3eae2",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 6,
   "instrument": "scripts/machinedekking.js",
   "node": "v22.22.2"
  },
@@ -217,8 +217,8 @@
   "assen": 19,
   "perAs": {
    "mensAanDeDeur": {
-    "handler": 234,
-    "bestand": 234
+    "handler": 235,
+    "bestand": 235
    },
    "assurance": {
     "handler": 2,
@@ -306,8 +306,8 @@
     "lezers": [
      "server/kern/kantoor/index.js"
     ],
-    "routesHandler": 234,
-    "routesBestand": 234,
+    "routesHandler": 235,
+    "routesBestand": 235,
     "tokens": null,
     "graad": "gemeten"
    },
@@ -435,13 +435,14 @@
     "motor": "envelop",
     "bron": "server/kern/envelop.js",
     "bestaat": true,
-    "moduleLezers": 4,
+    "moduleLezers": 5,
     "zakLezers": 0,
     "lezers": [
      "server/bus.js",
      "server/kern/kantoor/geldketen/klaarzet.js",
      "server/kern/kantoor/geldketen/weging.js",
-     "server/kern/kantoor/geldketen.js"
+     "server/kern/kantoor/geldketen.js",
+     "server/kern/stuur/gevolgcontract/woorden.js"
     ],
     "routesHandler": 2,
     "routesBestand": 109,
@@ -499,12 +500,14 @@
     "motor": "gevolg",
     "bron": "server/kern/stuur/gevolg.js",
     "bestaat": true,
-    "moduleLezers": 3,
+    "moduleLezers": 5,
     "zakLezers": 0,
     "lezers": [
      "server/kern/kantoor/geldketen/klaarzet.js",
      "server/kern/kantoor/geldketen.js",
-     "server/kern/stuur/lusstap.js"
+     "server/kern/stuur/gevolgcontract/keuring.js",
+     "server/kern/stuur/gevolgcontract/stand.js",
+     "server/kern/stuur/gevolgcontract/voorspelling.js"
     ],
     "routesHandler": 0,
     "routesBestand": 0,
@@ -543,7 +546,7 @@
     ],
     "routesBestaan": 3,
     "routesGeteld": 3,
-    "verplicht": 16,
+    "verplicht": 17,
     "gevonden": {
      "mensbewijs": "/api/office/bank/incasso",
      "assurance": "/api/office/bank/incasso",
@@ -560,6 +563,7 @@
      "envelop": "/api/office/bank/incasso",
      "bewijsketen": "/api/office/bank/incasso",
      "gevolg": "/api/office/bank/incasso",
+     "gevolgcontract": "/api/office/bank/incasso",
      "uitvoering": "/api/office/bank/incasso"
     },
     "open": [],
@@ -586,11 +590,11 @@
   "assenPerMutatie": [
    {
     "assen": 0,
-    "routes": 2996
+    "routes": 2995
    },
    {
     "assen": 1,
-    "routes": 1813
+    "routes": 1814
    },
    {
     "assen": 2,
@@ -18933,8 +18937,11 @@
    "methode": "POST",
    "pad": "/api/office/bank/incasso/dossier",
    "bestand": "server/routes/kantoren/bank-incasso.js",
-   "onder": [],
+   "onder": [
+    "mensAanDeDeur"
+   ],
    "boven": [
+    "mensAanDeDeur",
     "bewijsDraagt",
     "voornemen",
     "tegenfeit",

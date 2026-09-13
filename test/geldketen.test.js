@@ -69,7 +69,12 @@ const OPGAVE = (extra) => Object.assign({
   mens: { naam: 'ans', sleutel: 'user-1' },
   assurance: { ok: true, bewezen: true },
   streefstand: 'elke vaste betaling die aan de beurt was, is geind of staat met een mislukking bij zijn post',
-  tegenfeit: { graad: 'vermoed', uitslag: { aantal: 2, bedragCenten: 4000 }, reden: 'bovengrens: wat aan de beurt is' },
+  /* De vooruitblik zegt WAAROVER zij gaat en welke werkwoorden zij impliceert -- net
+     als de echte route. `over` is de weg die het geld werkelijk beweegt en niet deze
+     aanvraag; zie geldketen/gevolgpoort.js. Zonder die twee velden is de as
+     `gevolgcontract` onbekend en is de keten niet rond, en dat is de bedoeling. */
+  tegenfeit: { graad: 'vermoed', uitslag: { aantal: 2, bedragCenten: 4000 }, reden: 'bovengrens: wat aan de beurt is',
+    over: '/api/office/bank/handtekening/bevestig', effecten: ['GELD_BEWEGEN', 'SCHRIJVEN_ANDERMANS'] },
   stappen: [{ wat: 'incassoronde', doel: 'tot 1', centen: 4000, gegevens: { tot: 1 } }],
   totaalCenten: 4000,
   sleutel: 'incasso:1',
@@ -228,4 +233,126 @@ test('9. de ketendeclaratie noemt bestaande routes en een bestaande klasse', () 
     assert.ok(k.routes.length >= 2, 'een keten over een enkele route is geen keten');
     for (const r of k.routes) assert.match(r, /^\/api\//);
   }
+});
+
+/* ---------------------------------------------------------------------------
+   DE GEVOLGPOORT (as 17, server/kern/kantoor/geldketen/gevolgpoort.js).
+
+   De vooruitblik van het domein tegen het gevolgcontract van de handeling. Dit is de
+   enige as van deze baan die op een TEGENSPRAAK weigert -- en dat is met opzet: een
+   tegenspraak is een defect tussen twee VERKLARINGEN van mensen, dus daar is geen
+   dekkingsprobleem aan dat eerst in de schaduw hoort te lopen.
+   ------------------------------------------------------------------------- */
+
+test('10. EEN TEGENSPRAAK LAAT DE HELE KETEN ZAKKEN, en zegt welke', () => {
+  /* De opzettelijk foute paring: de geldvooruitblik wordt tegen het contract van de
+     AANVRAAG gehouden, en dat contract sluit GELD_BEWEGEN met zoveel woorden uit
+     (/api/office/bank/incasso zet klaar en verplaatst geen euro). Dit is geen
+     verzonnen geval maar precies de modelleerfout die je maakt als je het subject
+     van een vooruitblik raadt in plaats van het te laten zeggen. */
+  const { ketenlaag } = huis();
+  const r = ketenlaag.klaarzet(OPGAVE({
+    tegenfeit: { graad: 'vermoed', uitslag: { aantal: 2, bedragCenten: 4000 }, reden: 'bovengrens',
+      over: '/api/office/bank/incasso', effecten: ['GELD_BEWEGEN'] } }));
+  assert.equal(r.status, 409, 'er hoort niets klaar te staan: ' + JSON.stringify(r).slice(0, 200));
+  assert.match(r.error, /spreekt haar gevolgcontract tegen/);
+  assert.equal(r.vergelijking.uitslag, 'CONFLICT');
+  assert.equal(r.vergelijking.blokkeert, true);
+  assert.deepEqual(r.vergelijking.conflicten.map(c => c.soort), ['TEGENSPRAAK']);
+  assert.equal(r.vergelijking.conflicten[0].werkwoord, 'GELD_BEWEGEN');
+  /* En er is geen voornemen ontstaan: een keten die stopt, laat niets half staan. */
+  assert.equal(r.voornemen, undefined);
+});
+
+test('11. EEN GAT STOPT DE KETEN NIET, maar staat met naam in het dossier', async () => {
+  /* "Hierover heeft niemand iets verklaard" is geen leugen. Wie daarop blokkeert, zet
+     het huis stil op zijn eigen achterstand -- dus loopt de keten door en staat het
+     gat in de as. BULK_UITVOER staat in geen van de twee lijsten van het contract van
+     /handtekening/bevestig, dus hij is een gat en geen tegenspraak. */
+  const { ketenlaag } = huis();
+  const klaar = ketenlaag.klaarzet(OPGAVE({
+    tegenfeit: { graad: 'vermoed', uitslag: { aantal: 2, bedragCenten: 4000 }, reden: 'bovengrens',
+      over: '/api/office/bank/handtekening/bevestig',
+      effecten: ['GELD_BEWEGEN', 'BULK_UITVOER'] } }));
+  assert.ok(klaar.ok, 'een gat hoort de keten niet te stoppen: ' + JSON.stringify(klaar).slice(0, 200));
+  const as = ketenlaag.dossier(klaar.voornemen.id).dossier.assen.find(a => a.as === 'gevolgcontract');
+  assert.equal(as.uitslag, 'GATEN');
+  assert.deepEqual(as.gaten, ['BULK_UITVOER'], 'het gat hoort met NAAM in de as te staan');
+  /* En de as is toch GEHAALD: de vergelijking heeft gelopen en niets sprak elkaar
+     tegen. De graad van de as gaat over of er vergeleken is -- zelfde onderscheid als
+     bij `tegenfeit`, waar dat verschil deze baan al een keer duur is geweest. */
+  assert.equal(as.graad, 'gemeten');
+});
+
+test('12. EEN VOORUITBLIK ZONDER WERKWOORDEN LAAT DE KETEN NIET ROND ZIJN', () => {
+  /* Dit gat zat er echt in en de suite stond er groen bij: zonder werkwoorden werd er
+     niets geimpliceerd, dus sprak niets iets tegen, dus zei de poort IN_ORDE -- een
+     poort die niets kan zien en toch een vinkje geeft. Een ONTBREKENDE lijst is geen
+     lege lijst; dat laatste moet het domein zeggen. */
+  const { ketenlaag } = huis();
+  const klaar = ketenlaag.klaarzet(OPGAVE({
+    tegenfeit: { graad: 'vermoed', uitslag: { aantal: 2, bedragCenten: 4000 }, reden: 'bovengrens',
+      over: '/api/office/bank/handtekening/bevestig' } }));
+  assert.ok(klaar.ok, 'het hoort niet te WEIGEREN -- er is niets tegengesproken');
+  const d = ketenlaag.dossier(klaar.voornemen.id).dossier;
+  const as = d.assen.find(a => a.as === 'gevolgcontract');
+  assert.equal(as.uitslag, 'ZONDER_WERKWOORDEN');
+  assert.equal(as.graad, 'onbekend', 'niet kunnen vergelijken is geen gehaalde as');
+  assert.ok(d.open.includes('gevolgcontract'), 'deze as hoort open te staan: ' + d.open.join(', '));
+  assert.equal(d.rond, false);
+
+  /* En de tegenproef: een EXPLICIET lege lijst is wel een bewering, en die komt door. */
+  const leeg = ketenlaag.klaarzet(OPGAVE({ sleutel: 'incasso:2',
+    tegenfeit: { graad: 'vermoed', uitslag: { aantal: 0, bedragCenten: 0 }, reden: 'niets op de rol',
+      over: '/api/office/bank/handtekening/bevestig', effecten: [] } }));
+  assert.ok(leeg.ok);
+  const as2 = ketenlaag.dossier(leeg.voornemen.id).dossier.assen.find(a => a.as === 'gevolgcontract');
+  assert.equal(as2.uitslag, 'IN_ORDE');
+  assert.equal(as2.graad, 'gemeten');
+});
+
+test('13. een handeling ZONDER contract blokkeert niet, en heet ook niet in orde', () => {
+  /* De twee horen niet op elkaar te lijken. Zou "geen contract" als in orde tellen,
+     dan keurt deze poort alles goed wat hij niet kent; zou hij blokkeren, dan kan er
+     niets meer bewegen zolang het register drie regels draagt. */
+  const { ketenlaag } = huis();
+  const klaar = ketenlaag.klaarzet(OPGAVE({
+    tegenfeit: { graad: 'vermoed', uitslag: { aantal: 1, bedragCenten: 100 }, reden: 'x',
+      over: '/api/office/bank/rekening/rood', effecten: ['GELD_BEWEGEN'] } }));
+  assert.ok(klaar.ok, 'zonder contract hoort er niets te weigeren');
+  const as = ketenlaag.dossier(klaar.voornemen.id).dossier.assen.find(a => a.as === 'gevolgcontract');
+  assert.equal(as.uitslag, 'ZONDER_CONTRACT');
+  assert.equal(as.graad, 'onbekend');
+  assert.match(as.reden, /niet hetzelfde als "geen conflict"/);
+});
+
+test('14. de keten onthoudt WELK verzoek uitvoerde, en geeft zijn voorspelling terug', async () => {
+  /* De brug naar server/effectbon.js. Die bon wordt pas gemaakt als het antwoord de deur
+     uit gaat, dus de keten kan hem niet lezen -- maar met dit id wordt hij straks wel
+     gevonden. Zonder deze brug is de voorspelling van de aanvraag niet meer te koppelen
+     aan de observatie van de uitvoering, en dan is er geen causale keten maar een
+     voorspelling die nooit tegen iets wordt gehouden. */
+  const { ketenlaag } = huis();
+  const klaar = ketenlaag.klaarzet(OPGAVE());
+  assert.ok(klaar.ok, JSON.stringify(klaar).slice(0, 200));
+  const id = klaar.voornemen.id;
+
+  /* De voorspelling staat op de as zodra de poort hem heeft gezien -- en NIET pas na de
+     uitvoering: een voorspelling die je achteraf reconstrueert is geen voorspelling. */
+  const as = ketenlaag.dossier(id).dossier.assen.find(a => a.as === 'gevolgcontract');
+  assert.deepEqual(as.voorspeld, ['GELD_BEWEGEN', 'SCHRIJVEN_ANDERMANS']);
+
+  /* Voor de uitvoering weet niemand welk verzoek het gaat doen. */
+  assert.equal(ketenlaag.voorspellingVan('verzoek-1'), null);
+
+  ketenlaag.tekenAf({ id, door: 'bert' });
+  const r = await ketenlaag.uitvoer({ id, door: 'bert', verzoek: 'verzoek-1',
+    doe: async () => ({ ok: true, uitgevoerd: 2, bedragCenten: 4000 }) });
+  assert.ok(r.ok, JSON.stringify(r).slice(0, 200));
+
+  assert.deepEqual(ketenlaag.voorspellingVan('verzoek-1'), ['GELD_BEWEGEN', 'SCHRIJVEN_ANDERMANS']);
+  /* En een ander verzoek krijgt NULL en geen lege lijst: "niemand heeft iets voorspeld"
+     is iets anders dan "er is voorspeld dat er niets gebeurt". */
+  assert.equal(ketenlaag.voorspellingVan('verzoek-2'), null);
+  assert.equal(ketenlaag.voorspellingVan(''), null);
 });

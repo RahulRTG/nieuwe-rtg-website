@@ -83,8 +83,11 @@ module.exports = (ctx) => {
       assurance: zw,
       streefstand: 'elke vaste betaling die op ' + new Date(tot).toISOString() +
         ' aan de beurt was, is geind of staat met een mislukking bij zijn eigen post',
+      /* `over` is de weg die het geld echt beweegt; zie geldketen/gevolgpoort.js. */
       tegenfeit: { graad: 'vermoed', uitslag: { aantal: blik.aantal, boekingen: blik.boekingen,
-        bedragCenten: blik.bedragCenten }, reden: blik.grens },
+        bedragCenten: blik.bedragCenten }, reden: blik.grens,
+        over: '/api/office/bank/handtekening/bevestig',
+        effecten: blik.bedragCenten > 0 ? ['GELD_BEWEGEN', 'SCHRIJVEN_ANDERMANS'] : [] },
       /* EEN STAP, en dat is geen armoede maar de waarheid: een incassoronde is
          economisch EEN handeling die N onafhankelijke boekingen doet. Per post een
          stap maken zou de lus van kern/bank/incasso.js nabouwen -- inclusief het

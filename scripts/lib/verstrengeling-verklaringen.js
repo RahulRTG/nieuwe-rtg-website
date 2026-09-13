@@ -322,6 +322,15 @@ module.exports = [
     reden: 'local-ai.js r.18: de lokale server spreekt het OpenAI-protocol, dus hij hergebruikt die client. Dat is een PROTOCOL en geen verbinding naar buiten -- RTG_EXTERNE_AI_UIT=1 raakt de lokale weg niet' },
   { van: 'motor:log', naar: 'domein:doorgeefjournaal', soort: 'DOMEINRELATIE',
     reden: 'log.js r.119 laadt het doorgeefjournaal pas bij gebruik (lui): wat gelogd wordt kan worden doorgegeven, en die keten hoort niet bij het loggen zelf' },
+  /* DE EFFECTBON LEENT DE STANDMETING EN BOUWT HEM NIET NA. server/staatlog.js weet als
+     enige hoe je vaststelt of de opslag is veranderd -- in de ondiepe stand `.length` per
+     array, in de diepe ook een inhoudsafdruk. server/effectbon.js heeft precies dat nodig
+     om een effectbon te maken, en een tweede implementatie ervan zou twee lezers van "wat
+     is er gebeurd" opleveren: LAT.md regel 4 op de plek waar het het duurst is. De rand
+     loopt dus met opzet, en hij loopt EEN kant op. */
+  { van: 'motor:effectbon', naar: 'motor:staatlog', soort: 'DOMEINRELATIE',
+    reden: 'de effectbon stelt met staatlog.stand()/verschil() vast welke collecties bewogen; ' +
+      'een eigen implementatie zou een tweede waarheid over "wat is er gebeurd" zijn' },
   { van: 'motor:mail-bezorgen', naar: 'motor:smtp-direct', soort: 'DOMEINRELATIE',
     reden: 'mail-bezorgen.js r.22: bezorgen zonder tussenpartij is een van de wegen; de andere loopt via een relay' },
   { van: 'motor:mail-opstellen', naar: 'motor:smtp', soort: 'DOMEINRELATIE',

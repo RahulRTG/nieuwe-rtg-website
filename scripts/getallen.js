@@ -55,6 +55,21 @@ const GETALLEN = {
     wat: 'routes met de vervalstaat bewezen' },
   'vertrouwen.geschorst': { bron: 'VERTROUWEN.json', veld: 'telling.geschorst',
     wat: 'routes met de vervalstaat geschorst' },
+  /* DE GEVOLGDEKKING (EXECUTIE.md blok 4). Deze getallen stonden in het document
+     overgetypt en waren daardoor verouderd: er stond 96 van 176 terwijl de verse
+     meting 87 van 173 zegt. Vandaar levend. */
+  'gevolg.bereikbaar': { bron: 'GEVOLGDEKKING.json', veld: 'tellers.bereikbaarPerRol',
+    wat: 'handelingen die het AI-stuur mag bedienen (live uit beleid.js)' },
+  'gevolg.onbekend': { bron: 'GEVOLGDEKKING.json', veld: 'tellers.onbekendeEffectpaden',
+    wat: 'AI-bereikbare handelingen waarvan NIET is gemeten wat zij veroorzaken (moet dalen)' },
+  'gevolg.gemeten': { bron: 'GEVOLGDEKKING.json', veld: 'tellers.effectGemeten',
+    wat: 'AI-bereikbare handelingen waarvan de proef zag welke collecties veranderen' },
+  'gevolg.geenEffect': { bron: 'GEVOLGDEKKING.json', veld: 'tellers.effectGeenEffectGemeten',
+    wat: 'AI-bereikbare handelingen waarbij de proef draaide en niets zag veranderen' },
+  'gevolg.contractVolledig': { bron: 'GEVOLGDEKKING.json', veld: 'tellers.contractVolledig',
+    wat: 'handelingen met een VOLLEDIG gevolgcontract (mag alleen stijgen)' },
+  'gevolg.contractOnbekend': { bron: 'GEVOLGDEKKING.json', veld: 'tellers.contractOnbekend',
+    wat: 'AI-bereikbare handelingen zonder enig gevolgcontract' },
   'machine.volledigeKetens': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.volledigeKetens',
     wat: 'handelingen die de hele baan van de machine lopen (deze teller mag alleen stijgen)' },
   'machine.muterend': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.muterend',

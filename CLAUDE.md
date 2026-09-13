@@ -1577,6 +1577,27 @@ montagemoment `undefined` bevriest, en zaadgegevens met NUL open vacatures. De
 elf contracttoetsen zagen er geen enkele van; twee toetsen tegen een echte server
 wel.
 
+**De TWEEDE bron is de eigenlijke proef** (`MAATSTAF.md` par. 7h,
+`kern/knelpunt/aanvoer-opleiding.js`): een contract dat op EEN bron past is geen
+contract maar een adapter met een mooie naam. Leerstof is daarom niet gekozen
+omdat het nuttig is maar omdat het maximaal ANDERS is -- geen lijst (2 x
+1.000.000 procedureel, niets opgeslagen), geen aanbieder, geen eis, geen
+schaarste. Uitslag: **het contract paste zonder een letter te veranderen**, en
+toets 14 houdt dat vast op de scherpste manier die er is -- de contractlaag mag
+in CODE geen enkele domeinnaam kennen (geen `vacature`, `leerpad`, `beroep`,
+`openVacatures`, `beroepenbieb`); in de UITLEG mag het woord wel. Waar het wel
+anders moest zit in de BRON: de eerste 25 van twee miljoen zijn geen vondsten
+maar willekeur met een net randje, dus er wordt gezocht -- en het zoekwoord komt
+uit de RANDVOORWAARDE en nergens anders. Noemt die geen vak, dan levert de bron
+NIETS met de reden erbij, want een verzonnen beroep is een verzonnen advies. Twee
+dingen daar niet wegpoetsen: die beperking is echt en niet tijdelijk, en de prijs
+staat opgeschreven in plaats van weggewerkt -- `kernGedeeld` 235 -> 236 omdat het
+domein `knelpunt` nu `beroepenbieb` mag lezen, als BESLUIT met reden in NORM.json
+(een aanvoerlaag is per definitie een lezer, dus een bron aansluiten IS koppeling
+toevoegen; rechtstreeks requiren zou een tweede instantie met een eigen db-greep
+maken en dat is duurder). Twee punten liggen altijd op een lijn: pas een DERDE
+bron die geen van beide vormen deelt, zet de projectie boven twijfel.
+
 **`INTELLIGENTIE.md` is de laag BOVEN het stuur** -- de RTG Intelligence Layer,
 als richtingsdocument met per onderdeel of het **staat**, **een stap weg** is,
 **een besluit vraagt** of **jaren weg** is. Lees die voor je iets bouwt waarmee

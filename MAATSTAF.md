@@ -1354,6 +1354,72 @@ knelpunt werkelijk raakt: "voor wonen is geen bron aangesloten" onder een vraag
 die niets met wonen te maken heeft, leest als een tekortkoming in plaats van als
 een mededeling.
 
+## 7h. De tweede bron — de eigenlijke proef op het contract
+
+Een contract dat op één bron past is geen contract maar een adapter met een
+mooie naam. De tweede bron is daarom niet gekozen omdat hij nuttig is maar omdat
+hij **maximaal anders** is — dezelfde redenering waarmee `scripts/ritproef.js`
+de rit nam en niet de bezorging.
+
+| | vacatures | leerstof |
+|---|---|---|
+| vorm | opgeslagen rijen | procedureel, 2 × 1.000.000, niets opgeslagen |
+| aanbieder | een bedrijf dat ja of nee zegt | dit huis zelf |
+| eis | `minLeeftijd` | geen enkele |
+| schaarste | kan vervuld raken | bestaat niet |
+| selectie | de eerste N van een eindige lijst | zoeken, want er is niets om af te lopen |
+
+### De uitslag: geen letter veranderd
+
+`aanvoer.js` en `aanvoer-bronnen.js` zijn niet aangeraakt, de handtekening van
+`vondsten(voorwaarde)` is dezelfde, en de vijf etiketten passen. Toets 14 houdt
+dat vast op de scherpste manier die er is: **de contractlaag mag in CODE geen
+enkele domeinnaam kennen** — geen `vacature`, geen `leerpad`, geen `beroep`,
+geen `openVacatures`, geen `beroepenbieb`. Staat er wel één, dan is het contract
+meegebogen met zijn eerste bron en meet een tweede bron niets meer. (In de
+UITLEG mag het woord staan: *"een vacature is geen inkomen"* is precies de zin
+die `dektNiet` uitlegt.)
+
+### Waar het wél anders moest — en dat zit in de bron, niet in het contract
+
+De werkbron neemt de eerste 25 van een eindige lijst. Dat kan hier niet: **de
+eerste 25 van twee miljoen zijn geen vondsten maar willekeur met een net
+randje.** Er moet dus gezocht worden, en het zoekwoord komt uit de
+**randvoorwaarde** en nergens anders — matchen op het probleem, niet op de
+persoon (FOUNDATION.md par. 5).
+
+Daaruit volgt een beperking die echt is en niet tijdelijk:
+
+- *"een diploma als **lasser** om te kunnen werken"* → 24 leerpaden, allemaal
+  Lasser.
+- *"een diploma nodig voor de opleiding"* → **niets**, met de reden in
+  `vondstenBronLeeg`.
+
+Een knelpunt dat geen vak noemt, is met deze bron niet te beantwoorden zonder te
+weten wélk vak — en dat weten wij niet. De eerlijke uitkomst is dan leeg, niet
+een greep uit de bibliotheek: *een verzonnen beroep is een verzonnen advies.* De
+stoplijst van te algemene woorden is om dezelfde reden kort en met opzet niet
+slim: wie hem uitbreidt tot honderd woorden, bouwt een taalmodel in een
+zoekveld.
+
+### De prijs, en dat hij is opgeschreven
+
+`kernGedeeld` ging van 235 naar 236: het domein `knelpunt` mag sinds deze stap de
+kernnaam `beroepenbieb` lezen. Dat is **geen erosie maar een bewuste koppeling** —
+een aanvoerlaag ís per definitie een lezer van bestaande bronnen (zie de kop van
+`openingen.js`), dus een bron aansluiten is hier koppeling toevoegen, en de meter
+meldt dat terecht. Het alternatief, `kern/beroepenbieb` rechtstreeks requiren in
+plaats van uit de kern-tas, zou een tweede instantie met een eigen db-greep
+maken; dat is de duurdere fout. Het staat als besluit met reden in `NORM.json`, en
+`kernBreedte` beweegt niet — er komt geen kernnaam bij, alleen een domein dat een
+bestaande naam mag lezen.
+
+Daarmee staat de vorm die het doel was: **één menselijk doel → twee onafhankelijke
+werelden → dezelfde minimale vondstvorm.** Wat er nog niet is, is de derde: pas
+bij een bron die géén van beide vormen deelt (vervoer heeft een aanbieder én
+schaarste, maar een rit is geen aanbod dat blijft staan) is de projectie boven
+twijfel. Twee punten liggen altijd op een lijn.
+
 ## 8. De volgorde
 
 1. **Dit document** — welke uitspraak huisgrond heeft, welke wordt

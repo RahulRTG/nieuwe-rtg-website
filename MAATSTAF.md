@@ -1414,6 +1414,53 @@ maken; dat is de duurdere fout. Het staat als besluit met reden in `NORM.json`, 
 `kernBreedte` beweegt niet — er komt geen kernnaam bij, alleen een domein dat een
 bestaande naam mag lezen.
 
+### De twee bronnen naast elkaar — en wat dat blootlegde
+
+Eén randvoorwaarde kan beide terreinen raken: *"een diploma als **lasser** om te
+kunnen werken"* legt `terreinenVan()` op `werk` én `opleiding`. Met een vacature
+in de wereld levert die ene vraag dus uit beide domeinen, en de vorm is
+aantoonbaar één:
+
+```
+etiketten over beide terreinen: ["beschikbaarheid,dektNiet,herkomst,ingang,terrein,wat"]
+```
+
+Eén verzameling, geen twee. Geen onderwijsveld erbij, geen werkveld erbij — toets
+20 zakt zodra die verzameling er twee bevat.
+
+**Maar de eerste uitslag was 1 werk tegen 24 opleiding, en dat las verkeerd.** Een
+lezer ziet daar een oordeel in: blijkbaar is leren de weg en werken niet. Terwijl
+het alleen zegt hoeveel elke bron toevallig heeft.
+
+Het onderzoek daarnaar vond een echte fout, en een van mij: de kop van
+`aanvoer-werk.js` beloofde *"met het totaal erbij in `afgekapt`"* en de code
+sneed stilletjes af — `afgekapt` bestond nergens. Een bewering zonder handhaver,
+precies wat LAT.md verbiedt.
+
+En het gat liep door **beide** bronnen, niet door één domein: de werkbron kapt af
+op een eindige lijst, de opleidingsbron op twee miljoen. Daarom is het protocol
+uitgebreid en niet het etiket — een bron mag nu `{ vondsten, gevonden }`
+teruggeven naast een kale lijst. Dat onderscheid is belangrijk: **er is geen
+zesde etiket bijgekomen.** Een vondst draagt nog steeds precies vijf plus
+`beschikbaarheid`.
+
+Met dat getal erbij leest dezelfde uitslag omgekeerd:
+
+| bron | getoond | gevonden |
+|---|---|---|
+| werk | 1 | **1** |
+| opleiding | 24 | **10.000** |
+
+Die ene vacature is *alle* vacatures; die 24 leerpaden zijn een schilfer van
+tienduizend. Een kale lijst blijft geldig en betekent dan `gevonden: null` —
+**niet nagegaan**, nooit stilzwijgend gelijk aan wat er getoond wordt.
+
+Wat er met opzet **niet** gebeurt is herverdelen. Een quotum per bron zou de
+verhouding gladstrijken, en dat is een rangorde — `kern/knelpunt/index.js` regel
+4 verbiedt die. De ongelijkheid mag er zijn; ze moet alleen leesbaar zijn. Toets
+19 houdt vast dat er niets wordt weggelaten of bijgeteld, en dat de woorden
+`quota`, `aandeel`, `evenredig` en `balans` niet in de laag staan.
+
 Daarmee staat de vorm die het doel was: **één menselijk doel → twee onafhankelijke
 werelden → dezelfde minimale vondstvorm.** Wat er nog niet is, is de derde: pas
 bij een bron die géén van beide vormen deelt (vervoer heeft een aanbieder én

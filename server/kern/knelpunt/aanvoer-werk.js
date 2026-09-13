@@ -23,8 +23,8 @@
    en dat is een keuze van dat scherm en niet van deze laag.
 
    DE AFKAP IS EEN AANTAL EN GEEN OORDEEL. Meer dan `MAX` vacatures worden niet
-   gewogen maar afgekapt in de volgorde waarin de bron ze geeft, met het totaal
-   erbij in `afgekapt`. Sorteren zou een rangorde zijn, en EXECUTIE.md staat
+   gewogen maar afgekapt in de volgorde waarin de bron ze geeft, met het
+   GEVONDEN totaal erbij. Sorteren zou een rangorde zijn, en EXECUTIE.md staat
    daar met de afkapgrens die midden in een GELIJKE score sneed: willekeur die
    eruitziet als een oordeel. Hier is de willekeur zichtbaar in plaats van
    verkleed.
@@ -78,7 +78,10 @@ function maakWerkbron(openVacaturesVan) {
     if (!Array.isArray(alle))
       throw new Error('openVacatures gaf geen lijst terug');
 
-    return alle.slice(0, MAX).map((v) => ({
+    /* Het gevonden totaal gaat mee terug. Zonder dat getal leest "25
+       vacatures" als "er zijn er 25", en dat is een stille onwaarheid -- de
+       vorm staat in de kop van ./aanvoer-bronnen.js. */
+    return { gevonden: alle.length, vondsten: alle.slice(0, MAX).map((v) => ({
       terrein: 'werk',
       /* Wat de vacature van zichzelf eist, staat hier -- zichtbaar en niet
          toegepast. */
@@ -92,7 +95,7 @@ function maakWerkbron(openVacaturesVan) {
       /* Een vacature noemt geen aantal plekken. `null` leest als "niet
          nagegaan" en nooit als vol of leeg. */
       beschikbaarheid: null
-    }));
+    })) };
   };
 }
 

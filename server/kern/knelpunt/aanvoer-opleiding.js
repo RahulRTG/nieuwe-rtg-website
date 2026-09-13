@@ -87,14 +87,21 @@ function maakOpleidingbron(beroepenbiebVan) {
     const termen = zoektermen(voorwaarde);
     if (!termen.length) return [];          // geen woord om op te zoeken -> geenBron, met reden
 
+
     /* Beide werelden, want een randvoorwaarde zegt niet of hij technisch of
        zakelijk is -- en kiezen zou hier hetzelfde zijn als raden. */
     const uit = [];
+    /* Het GEVONDEN totaal komt uit de bibliotheek zelf (`totaal` per zoekterm)
+       en wordt niet geschat. Zonder dat getal leest "24 leerpaden" als "er zijn
+       er 24", terwijl er duizenden kunnen zijn -- zie de kop van
+       ./aanvoer-bronnen.js. */
+    let gevonden = 0;
     for (const term of termen) {
       for (const wereld of ['techniek', 'zaken']) {
         const r = bieb.catalogus(wereld, { zoek: term, per: 24, pagina: 1 });
+        if (r && Number.isFinite(r.totaal)) gevonden += r.totaal;
         for (const app of (r && Array.isArray(r.items) ? r.items : [])) {
-          if (uit.length >= MAX) return uit;
+          if (uit.length >= MAX) return { gevonden, vondsten: uit };
           uit.push({
             terrein: 'opleiding',
             wat: [app.titel || app.naam, app.beroep, app.soort, app.niveau && ('niveau ' + app.niveau)]
@@ -113,7 +120,7 @@ function maakOpleidingbron(beroepenbiebVan) {
       }
       if (uit.length) break;   // de langste term wint; korter zoeken verbreedt alleen
     }
-    return uit;
+    return { gevonden, vondsten: uit };
   };
 }
 

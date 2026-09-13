@@ -41,7 +41,7 @@ function maakAanvoer(bronnen) {
      Er is met opzet geen tweede argument: wie er een wil meegeven, moet deze
      handtekening veranderen, en dan is het een besluit. */
   function vondsten(voorwaarde) {
-    const uit = { vondsten: [], geenBron: [], geweigerd: [], bronnenGevraagd: 0 };
+    const uit = { vondsten: [], geenBron: [], geweigerd: [], geleverd: [], bronnenGevraagd: 0 };
     for (const herkomst of Object.keys(lijst)) {
       const fn = lijst[herkomst];
       if (typeof fn !== 'function') { uit.geweigerd.push({ herkomst, reden: 'bron-is-geen-functie' }); continue; }
@@ -52,15 +52,39 @@ function maakAanvoer(bronnen) {
       try { ruw = fn(voorwaarde); } catch (e) {
         uit.geweigerd.push({ herkomst, reden: 'bron-brak: ' + ((e && e.message) || e) }); continue;
       }
-      if (!Array.isArray(ruw)) { uit.geweigerd.push({ herkomst, reden: 'bron gaf geen lijst' }); continue; }
+      /* TWEE TERUGGAVEVORMEN, en de tweede is er gekomen omdat BEIDE bronnen
+         tegen hetzelfde gat aanliepen -- niet omdat een domein iets bijzonders
+         wilde. Elke bron kapt af (de werkbron op een eindige lijst, de
+         opleidingsbron op twee miljoen), en zonder het GEVONDEN aantal leest
+         "24 leerpaden" als "er zijn er 24". Dat is een stille onwaarheid van
+         precies de soort die deze laag moet uitsluiten.
+
+         De oude vorm blijft gelden: een kale lijst is een bron die niets over
+         zijn totaal zegt, en dan staat `gevonden` op null -- "niet nagegaan",
+         nooit stilzwijgend gelijk aan wat er getoond wordt. */
+      let rijen = ruw, gevonden = null;
+      if (ruw && !Array.isArray(ruw) && Array.isArray(ruw.vondsten)) {
+        rijen = ruw.vondsten;
+        gevonden = Number.isFinite(ruw.gevonden) ? ruw.gevonden : null;
+      }
+      if (!Array.isArray(rijen)) { uit.geweigerd.push({ herkomst, reden: 'bron gaf geen lijst' }); continue; }
       /* Niets hebben is een UITSLAG en geen stilte. Zonder deze regel is een
          bron die stuk is niet te onderscheiden van een bron die leeg is. */
-      if (!ruw.length) { uit.geenBron.push({ herkomst, reden: 'deze bron heeft hier niets' }); continue; }
-      for (const r of ruw) {
+      if (!rijen.length) {
+        uit.geleverd.push({ herkomst, getoond: 0, gevonden });
+        uit.geenBron.push({ herkomst, reden: 'deze bron heeft hier niets' });
+        continue;
+      }
+      /* `getoond` telt wat er DOORKWAM en niet wat de bron aanbood: een
+         geweigerde vondst staat niet op het scherm, dus hem meetellen zou het
+         getal een belofte maken die de lezer niet ziet. */
+      let door = 0;
+      for (const r of rijen) {
         const k = keur(r, herkomst);
-        if (k.ok) uit.vondsten.push(k.vondst);
+        if (k.ok) { uit.vondsten.push(k.vondst); door++; }
         else uit.geweigerd.push({ herkomst, reden: k.reden });
       }
+      uit.geleverd.push({ herkomst, getoond: door, gevonden });
     }
     /* De volgorde is die van de bronnen en verder niets: er wordt NIET
        gesorteerd. Een rangorde is een oordeel, en deze laag kent de mens niet

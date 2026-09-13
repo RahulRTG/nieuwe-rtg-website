@@ -300,3 +300,92 @@ test('16. zonder een woord om op te zoeken grijpt de bron NIET in het wilde weg'
     assert.deepEqual(r.d.vondstenGeweigerd, [], 'een lege uitkomst is geen weigering');
   } finally { await stop(child); }
 });
+
+test('17. een bron mag zijn GEVONDEN totaal melden, en zwijgen is null', () => {
+  /* Dit gat liep door beide bronnen en niet door een domein: de werkbron kapt
+     af op een eindige lijst, de opleidingsbron op twee miljoen. Zonder het
+     gevonden aantal leest "24 leerpaden" als "er zijn er 24".
+
+     Een kale lijst blijft geldig en betekent dan NIET NAGEGAAN -- nooit
+     stilzwijgend gelijk aan wat er getoond wordt. */
+  const a = maakAanvoer({
+    zwijgt: () => [GOED, GOED],
+    meldt: () => ({ vondsten: [GOED], gevonden: 10000 })
+  });
+  const uit = a.vondsten({ id: 'werk', wat: 'werk' });
+  const zwijgt = uit.geleverd.find((g) => g.herkomst === 'zwijgt');
+  const meldt = uit.geleverd.find((g) => g.herkomst === 'meldt');
+  assert.deepEqual(zwijgt, { herkomst: 'zwijgt', getoond: 2, gevonden: null },
+    'een bron die zijn totaal niet noemt, krijgt er stilzwijgend een');
+  assert.deepEqual(meldt, { herkomst: 'meldt', getoond: 1, gevonden: 10000 });
+});
+
+test('18. getoond telt wat DOORKWAM en niet wat de bron aanbood', () => {
+  /* Een geweigerde vondst staat niet op het scherm. Hem meetellen zou het getal
+     een belofte maken die de lezer niet ziet. */
+  const slecht = Object.assign({}, GOED); delete slecht.dektNiet;
+  const a = maakAanvoer({ b: () => ({ vondsten: [GOED, slecht, GOED], gevonden: 3 }) });
+  const uit = a.vondsten({ id: 'werk', wat: 'werk' });
+  assert.equal(uit.vondsten.length, 2);
+  assert.deepEqual(uit.geleverd, [{ herkomst: 'b', getoond: 2, gevonden: 3 }]);
+  assert.equal(uit.geweigerd.length, 1);
+});
+
+test('19. de laag herverdeelt niets tussen bronnen', () => {
+  /* Een bron met een grote catalogus verdringt er een met weinig. Dat mag
+     zichtbaar zijn en het mag NIET worden gladgestreken: herverdelen is een
+     rangorde, en kern/knelpunt/index.js regel 4 verbiedt die. */
+  const a = maakAanvoer({
+    veel: () => ({ vondsten: Array.from({ length: 9 }, () => GOED), gevonden: 9 }),
+    weinig: () => ({ vondsten: [GOED], gevonden: 1 })
+  });
+  const uit = a.vondsten({ id: 'werk', wat: 'werk' });
+  assert.equal(uit.vondsten.length, 10, 'er is iets weggelaten of bijgeteld');
+  const som = uit.geleverd.reduce((n, g) => n + g.getoond, 0);
+  assert.equal(som, uit.vondsten.length, 'de telling per bron klopt niet met de lijst');
+  /* Geen enkele bron wordt op een aandeel gezet. */
+  assert.doesNotMatch(bronnenContract, /quota|aandeel|evenredig|balans/i);
+});
+
+test('20. een echte vraag raakt beide werelden, met een identieke vondstvorm', async () => {
+  /* DE PROEF DIE ER TOE DOET: een doel van een mens, twee onafhankelijke
+     domeinen, en dezelfde minimale vorm. Lukt dit zonder dat de vondsten uit
+     het ene domein er anders uitzien dan uit het andere, dan is de projectie
+     echt en geen vacature-flow met een tweede tak. */
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-samen-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP,
+    NODE_ENV: 'test', RTG_DEMO: '1' } });
+  try {
+    const ro = await roep(base, '/api/supplier/roster', { code: 'KIKUNOI' });
+    const man = ((ro.d && ro.d.staff) || []).find((x) => x.role === 'manager');
+    const inlog = await roep(base, '/api/supplier/login', { code: 'KIKUNOI', staffId: man.id, pin: '1234' });
+    await roep(base, '/api/supplier/vacature', { func: 'Lasser', soort: 'vast', minLeeftijd: 18,
+      omschrijving: 'Lassen in de werkplaats', plaats: 'Rotterdam', uren: '38 uur', open: true },
+      inlog.d.token);
+
+    const lid = await roep(base, '/api/login', { tier: 'rtg' });
+    const vw = { id: 'vak', wat: 'een diploma als lasser om te kunnen werken', stand: 'ontbreekt' };
+    const r = await roep(base, '/api/knelpunt', { doel: 'aan het werk als lasser',
+      randvoorwaarden: [vw], manieren: [{ id: 'w', wat: 'gaan werken', nodig: ['vak'] }] }, lid.d.token);
+
+    const v = r.d.vondsten || [];
+    const terreinen = new Set(v.map((x) => x.terrein));
+    assert.ok(terreinen.has('werk') && terreinen.has('opleiding'),
+      'een randvoorwaarde die beide terreinen raakt levert niet uit beide bronnen: ' + [...terreinen]);
+    /* EEN vorm over beide domeinen -- geen onderwijsveld erbij, geen werkveld
+       erbij. Zodra deze verzameling er twee bevat, is de projectie gebroken. */
+    const vormen = new Set(v.map((x) => Object.keys(x).sort().join(',')));
+    assert.equal(vormen.size, 1, 'de twee domeinen leveren een verschillende vondstvorm: ' + [...vormen]);
+    assert.equal([...vormen][0], 'beschikbaarheid,dektNiet,herkomst,ingang,terrein,wat');
+
+    /* En het verschil in AANTAL is leesbaar in plaats van suggestief: een
+       vacature van een gevonden vacature is iets heel anders dan
+       vierentwintig leerpaden van tienduizend. */
+    const g = r.d.vondstenGeleverd || [];
+    const werk = g.find((x) => x.herkomst === 'werk');
+    const opl = g.find((x) => x.herkomst === 'opleiding');
+    assert.ok(werk && opl, 'niet beide bronnen melden wat ze leverden');
+    assert.equal(werk.getoond, werk.gevonden, 'de werkbron toont niet alles wat hij vond');
+    assert.ok(opl.gevonden > opl.getoond, 'de opleidingsbron meldt geen afkapping terwijl hij afkapt');
+  } finally { await stop(child); }
+});

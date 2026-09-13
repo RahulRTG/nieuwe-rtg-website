@@ -57,7 +57,7 @@ module.exports = (kern) => {
        De randvoorwaarden gaan er EEN voor EEN in. De aanvoerlaag kent de mens
        niet en mag hem ook niet uit een optelsom kunnen afleiden; per
        randvoorwaarde vragen houdt dat zo. */
-    const vondsten = [], bronMeldingen = [], bronLeeg = [];
+    const vondsten = [], bronMeldingen = [], bronLeeg = [], geleverd = [];
     /* De knelpunten gaan er EEN voor EEN in, en een knelpunt IS hier de
        randvoorwaarde -- kern/knelpunt/index.js geeft ze als platte rij
        { id, wat, blokkeertWegen } en niet genest onder een weg. Dat is bij het
@@ -75,6 +75,12 @@ module.exports = (kern) => {
          die twee worden nooit samengevoegd -- dezelfde regel als in
          kern/ontvanger.js. */
       for (const g of a.geenBron) bronLeeg.push(Object.assign({ voorwaarde: k.id }, g));
+      /* Wat elke bron LEVERDE naast wat hij VOND. Zonder dat verschil leest een
+         scherm met een vacature en vierentwintig leerpaden als een oordeel over
+         welke weg de beste is, terwijl het alleen zegt hoeveel elke bron
+         toevallig heeft. Er wordt niets herverdeeld: dat zou een rangorde zijn
+         (kern/knelpunt/index.js regel 4). */
+      for (const g of a.geleverd) geleverd.push(Object.assign({ voorwaarde: k.id }, g));
     }
     /* Alleen over de terreinen die dit knelpunt werkelijk RAAKT wordt gemeld dat
        er geen bron is. Alle vijf melden zou "voor wonen is geen bron
@@ -87,7 +93,7 @@ module.exports = (kern) => {
         'bij de opening hierboven is wat dit huis heeft' }));
     res.json({ ...rest, openingen: o.openingen, terreinen: o.terreinen,
       vondsten, vondstenZonderBron: zonderBron,
-      vondstenGeweigerd: bronMeldingen, vondstenBronLeeg: bronLeeg,
+      vondstenGeweigerd: bronMeldingen, vondstenBronLeeg: bronLeeg, vondstenGeleverd: geleverd,
       aannames: rest.aannames.concat(o.aannames), openingenGrens: o.grens });
   });
 };

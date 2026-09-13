@@ -61,6 +61,13 @@ const { haalSleutels } = require('./lib/proefsleutels.js');
 const verraad = require('../server/lib/verraad.js');
 
 const WORTEL = path.join(__dirname, '..');
+
+/* Elke wegwerpserver hangt een opruimhaak aan `process.exit`, en deze proef
+   start er vier per ronde. Boven de tien waarschuwt node over een lek dat er
+   niet is: de haken horen bij servers die nog kunnen draaien, en ze verdwijnen
+   met het proces. De waarschuwing zou hier wel elke ronde de uitslag
+   vertroebelen. */
+process.setMaxListeners(0);
 const argv = process.argv.slice(2);
 const jsonUit = argv.includes('--json');
 const vastleggen = argv.includes('--vastleggen');
@@ -117,7 +124,14 @@ async function meetHerstartruis() {
   try {
     const a = await stelOp(map);
     srv = a.srv;
+    /* Exact dezelfde vorm als ronde(): beide momentopnamen terwijl een verse
+       schone server draait, en er even veel starts tussen. Een ruisronde die
+       anders meet dan de ronde die hem gebruikt, trekt het verkeerde af. */
+    try { srv.kind.kill('SIGKILL'); } catch (e) {}
+    srv = await W.start({ datamap: map, env: SERVEROMGEVING });
     const voor = inhoudsBeeld(map);
+    try { srv.kind.kill('SIGKILL'); } catch (e) {}
+    srv = await W.start({ datamap: map, env: SERVEROMGEVING });
     try { srv.kind.kill('SIGKILL'); } catch (e) {}
     srv = await W.start({ datamap: map, env: SERVEROMGEVING });
     const na = inhoudsBeeld(map);
@@ -190,11 +204,38 @@ async function ronde(route, grens, ruis) {
     const maak = a.voorzieningVoor(route.pad);
     if (maak) { try { await maak({ post: a.p, tokens: a.bos.tokens }); } catch (e) {} }
 
+    /* DE TWEE MOMENTOPNAMEN WORDEN OP DEZELFDE MANIER GEMAAKT, EN DAT IS DE
+       HELE REPARATIE: allebei terwijl een VERS OPGESTARTE, SCHONE server draait.
+
+       Twee dingen zijn hier achter elkaar misgegaan en ze wezen allebei op
+       hetzelfde. Eerst stond de voormeting voor de kill en de nameting na een
+       herstart. Toen zette ik de voormeting NA de kill -- en dat was erger, want
+       toen las hij minder.
+
+       De oorzaak is de WAL van sqlite. Een momentopname vlak na een SIGKILL
+       opent de .db-bestanden alleen-lezen en kan de WAL niet terugdraaien; wat
+       daar nog in staat, ziet hij dus niet. De eerstvolgende start herstelt de
+       WAL, en dan verschijnt die inhoud alsnog -- wat er als "veranderd door de
+       gemeten oproep" uitziet. Gemeten, zonder ook maar een oproep te doen:
+       vlak-na-de-kill tegen draaiend gaf drie verschillen, draaiend tegen
+       draaiend gaf er een.
+
+       Die ene is echt: `schaduwregels` beweegt bij ELKE start, en die hoort de
+       ruisronde eruit te halen. De andere twee (`rijkVoertuigen`, `suppliers`)
+       waren nooit ruis maar een leesfout, en zolang ze als ruis werden
+       afgetrokken, dekte de proef echte veranderingen in die collecties mee af.
+
+       Symmetrie is hier dus geen netheid maar de meting zelf: twee
+       momentopnamen die op verschillende manieren zijn gemaakt, verschillen
+       altijd. */
+    try { srv.kind.kill('SIGKILL'); } catch (e) {}
+    srv = await W.start({ datamap: map, env: SERVEROMGEVING });
     const voor = inhoudsBeeld(map);
 
-    /* Het verraad gaat pas AAN bij de tweede start. De opstelling schrijft zelf
-       duurzaam, dus met de modus vanaf het begin scherp sterft de server tijdens
-       het inloggen en meet de ronde de opstelling in plaats van de geldroute. */
+    /* Het verraad gaat pas AAN bij de volgende start. De opstelling schrijft
+       zelf duurzaam, dus met de modus vanaf het begin scherp sterft de server
+       tijdens het inloggen en meet de ronde de opstelling in plaats van de
+       geldroute. */
     try { srv.kind.kill('SIGKILL'); } catch (e) {}
     srv = await W.start({ datamap: map, magSterven: true, wachtMs: 30000,
       env: { ...SERVEROMGEVING, RTG_VERRAAD: grens.modus, RTG_VERRAAD_SEED: '20260913' } });

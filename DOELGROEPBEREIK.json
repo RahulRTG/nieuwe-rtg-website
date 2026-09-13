@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:21:59.115Z",
-    "commit": "4212e97f",
-    "boomVuil": true,
+    "op": "2026-09-13T11:40:44.921Z",
+    "commit": "b9ef5d31",
+    "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/doelgroepbereik.js",
     "node": "v22.22.2"

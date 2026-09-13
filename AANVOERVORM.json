@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T10:59:17.798Z",
-    "commit": "b92f3f22",
+    "op": "2026-09-13T11:41:14.674Z",
+    "commit": "b9ef5d31",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 2,
     "instrument": "scripts/aanvoervorm.js",
     "node": "v22.22.2"
   },

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T09:53:42.838Z",
-    "commit": "91dbf92a",
+    "op": "2026-09-13T11:40:40.563Z",
+    "commit": "b9ef5d31",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/adamproef.js",
     "node": "v22.22.2"
   },
@@ -18,7 +18,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Groene Wolf 71B1",
+      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Zilveren Uil 1543",
       "fout": null,
       "ms": 0
     },
@@ -27,11 +27,12 @@
       "van": "Adam",
       "naar": "knelpuntmotor",
       "wat": "legt zijn doel voor en vraagt welke wegen openliggen",
-      "bekend": "WAT ONTBREEKT: een ingang op /api/knelpunt voor een RTF-gezinsprofiel. WAAROM: routes/knelpunt.js hangt achter `auth` (opzet/diensten2.js), en dat eist een lidsessie met een account of een demo-persona; een gezinstoken van /api/foundation is een andere sessie. De motor is dus bereikbaar voor wie een RTG-account heeft en niet voor het gezin waar hij voor beschreven is. WIE EROVER GAAT: de eigenaar -- dit is dezelfde vraag als de ouderingang op de kinderopvang (kern/verzorging/opvangleden.js), die er kwam als BESLUIT en niet als functie.",
-      "stand": "openBekend",
-      "status": 401,
-      "antwoord": "Niet ingelogd.",
-      "ms": 5
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "de motor antwoordt het gezin: 1 wegen beoordeeld",
+      "fout": null,
+      "ms": 6
     },
     {
       "nr": 3,
@@ -43,18 +44,18 @@
       "status": 200,
       "ziet": "3 wegen, volgorde ongewijzigd: true, geblokkeerde weg blijft staan met \"heb ik een startkwalificatie\"",
       "fout": null,
-      "ms": 6
+      "ms": 7
     },
     {
       "nr": 4,
       "van": "mens",
       "naar": "knelpuntmotor",
       "wat": "noemt alleen een doel; iets in dit huis levert de mogelijke wegen aan",
-      "bekend": "WAT ONTBREEKT: een bron die uit een doel de MANIEREN samenstelt. kern/knelpunt/ rekent ze door, maar krijgt ze van de aanroeper -- en /api/knelpunt heeft nul aanroepers (geen scherm in public/, geen module in server/; alleen de route, lib/mutatiecontracten-knelpunt.js, lib/idemsleutels-bescherming.js en functies/register/cat-life.js noemen het pad). WAAROM: de motor is met opzet een rekenmachine en geen zoeker -- hij mag niet rangschikken en niets weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. De aanvoer hoort ernaast te staan en niet erin. WIE EROVER GAAT: de eigenaar. Dit is de kern van het voorstel voor een kansengraaf: kern/knelpunt/openingen-kaart.js dekt vandaag 5 terreinen (werk, opleiding, opvang, vervoer, wonen) en die kaart geeft INGANGEN bij een knelpunt, geen wegen bij een doel.",
+      "bekend": "WAT ONTBREEKT: een bron die uit een DOEL de MANIEREN samenstelt. DEZE REDEN IS SINDS 13 SEPTEMBER 2026 SMALLER GEWORDEN EN NIET WEGGEVALLEN, en dat verschil is de moeite waard. Er is nu wel aanvoer (kern/knelpunt/aanvoer*.js, twee bronnen), maar die levert VONDSTEN bij een RANDVOORWAARDE -- wat zou dit knelpunt kunnen opheffen -- en geen WEGEN bij een kaal doel. Wie \"ik wil weer aan het werk\" intikt, heeft nog steeds zelf de manieren te bedenken; pas daarna vindt het huis er iets bij. WAAROM: de motor is met opzet een rekenmachine en geen zoeker -- hij mag niet rangschikken en niets weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. WIE EROVER GAAT: de eigenaar. De stap die nog ontbreekt is klein en eerlijk te benoemen: van een doel naar een handvol manieren, zonder ze te rangschikken.",
       "stand": "openBekend",
       "status": 400,
       "antwoord": "Welke manieren zijn er? Zonder manieren valt er niets te vergelijken.",
-      "ms": 3
+      "ms": 4
     },
     {
       "nr": 5,
@@ -64,7 +65,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "vacature 41fe1c53, minimumleeftijd 16",
+      "ziet": "vacature d385839a, minimumleeftijd 16",
       "fout": null,
       "ms": 6
     },
@@ -100,9 +101,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "sollicitatie e6a7e9f5, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
+      "ziet": "sollicitatie 0e24afc8, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
       "fout": null,
-      "ms": 12
+      "ms": 9
     },
     {
       "nr": 9,
@@ -114,7 +115,7 @@
       "status": 200,
       "ziet": "Adam ziet status \"uitgenodigd\" bij Cafe Brisa",
       "fout": null,
-      "ms": 21
+      "ms": 20
     },
     {
       "nr": 10,
@@ -126,7 +127,7 @@
       "status": 200,
       "ziet": "stand bij Adam: \"aangenomen\", bericht op zijn bord: \"Aangenomen bij Cafe Brisa -- Uw personeelsuitnodiging staat ...\" van RTG, ongelezen: true",
       "fout": null,
-      "ms": 25
+      "ms": 23
     },
     {
       "nr": 11,
@@ -138,7 +139,19 @@
       "status": 200,
       "ziet": "blijft staan: Keukenhulp bij Cafe Brisa (aangenomen)",
       "fout": null,
-      "ms": 2
+      "ms": 1
+    },
+    {
+      "nr": 12,
+      "van": "Adam",
+      "naar": "twee werelden",
+      "wat": "bereikt vanuit een doel echte werk- en leermogelijkheden tegelijk",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "opleiding + werk; 25 vondsten in 1 vorm; werk 1/1, opleiding 24/20000",
+      "fout": null,
+      "ms": 7
     }
   ],
   "storingen": [
@@ -204,10 +217,10 @@
     "werkgever": "BRISA"
   },
   "telling": {
-    "schakels": 11,
-    "gesloten": 9,
+    "schakels": 12,
+    "gesloten": 11,
     "open": 0,
-    "openBekend": 2,
+    "openBekend": 1,
     "stuk": 0,
     "storingen": 9,
     "gehouden": 9,
@@ -217,20 +230,12 @@
   "sluitMetBevinding": true,
   "bevindingen": [
     {
-      "schakel": 2,
-      "van": "Adam",
-      "naar": "knelpuntmotor",
-      "wat": "legt zijn doel voor en vraagt welke wegen openliggen",
-      "gemeten": "Niet ingelogd.",
-      "reden": "WAT ONTBREEKT: een ingang op /api/knelpunt voor een RTF-gezinsprofiel. WAAROM: routes/knelpunt.js hangt achter `auth` (opzet/diensten2.js), en dat eist een lidsessie met een account of een demo-persona; een gezinstoken van /api/foundation is een andere sessie. De motor is dus bereikbaar voor wie een RTG-account heeft en niet voor het gezin waar hij voor beschreven is. WIE EROVER GAAT: de eigenaar -- dit is dezelfde vraag als de ouderingang op de kinderopvang (kern/verzorging/opvangleden.js), die er kwam als BESLUIT en niet als functie."
-    },
-    {
       "schakel": 4,
       "van": "mens",
       "naar": "knelpuntmotor",
       "wat": "noemt alleen een doel; iets in dit huis levert de mogelijke wegen aan",
       "gemeten": "Welke manieren zijn er? Zonder manieren valt er niets te vergelijken.",
-      "reden": "WAT ONTBREEKT: een bron die uit een doel de MANIEREN samenstelt. kern/knelpunt/ rekent ze door, maar krijgt ze van de aanroeper -- en /api/knelpunt heeft nul aanroepers (geen scherm in public/, geen module in server/; alleen de route, lib/mutatiecontracten-knelpunt.js, lib/idemsleutels-bescherming.js en functies/register/cat-life.js noemen het pad). WAAROM: de motor is met opzet een rekenmachine en geen zoeker -- hij mag niet rangschikken en niets weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. De aanvoer hoort ernaast te staan en niet erin. WIE EROVER GAAT: de eigenaar. Dit is de kern van het voorstel voor een kansengraaf: kern/knelpunt/openingen-kaart.js dekt vandaag 5 terreinen (werk, opleiding, opvang, vervoer, wonen) en die kaart geeft INGANGEN bij een knelpunt, geen wegen bij een doel."
+      "reden": "WAT ONTBREEKT: een bron die uit een DOEL de MANIEREN samenstelt. DEZE REDEN IS SINDS 13 SEPTEMBER 2026 SMALLER GEWORDEN EN NIET WEGGEVALLEN, en dat verschil is de moeite waard. Er is nu wel aanvoer (kern/knelpunt/aanvoer*.js, twee bronnen), maar die levert VONDSTEN bij een RANDVOORWAARDE -- wat zou dit knelpunt kunnen opheffen -- en geen WEGEN bij een kaal doel. Wie \"ik wil weer aan het werk\" intikt, heeft nog steeds zelf de manieren te bedenken; pas daarna vindt het huis er iets bij. WAAROM: de motor is met opzet een rekenmachine en geen zoeker -- hij mag niet rangschikken en niets weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. WIE EROVER GAAT: de eigenaar. De stap die nog ontbreekt is klein en eerlijk te benoemen: van een doel naar een handvol manieren, zonder ze te rangschikken."
     }
   ]
 }

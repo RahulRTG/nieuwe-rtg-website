@@ -5,13 +5,13 @@
 @import url('/shared/rtg-heritage-experiences.css');
 @import url('/shared/rtg-heritage-components.css');
 @import url('/shared/rtg-intelligence.css');
+@import url('/shared/rtg-simple.css?v=14');
 
 /* RTG Heritage
    De vaste beeldtaal van het huis, over ieder echt appscherm heen.
 
-   Deze laag wordt door shared/basis.js als LAATSTE stylesheet geladen. Zij
-   verandert uitsluitend materiaal, typografie en toestand; nooit de positie,
-   maat, zichtbaarheid of werking van een scherm. Daardoor blijven een kaart,
+   Deze laag wordt door basis.js als laatste stylesheet geladen. Zij verandert
+   materiaal en typografie, nooit de werking. Daardoor blijven een kaart,
    camera, speler, werkruimte en Edge gewoon hun eigen gereedschap, maar voelen
    zij wel als kamers in hetzelfde huis.
 

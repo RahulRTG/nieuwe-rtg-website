@@ -70,7 +70,7 @@
     var pos = new Float32Array(n * 3), kol = new Float32Array(n * 3), ext = new Float32Array(n * 4), rnd = new Float32Array(n);
     for (var i = 0; i < n; i++) {
       var p = PUNTEN[i];
-      pos[i * 3] = (p.x - 110) / 110; pos[i * 3 + 1] = -(p.y - 52) / 60; pos[i * 3 + 2] = p.z;
+      pos[i * 3] = (p.x - 110) / 70; pos[i * 3 + 1] = -(p.y - 52) / 38; pos[i * 3 + 2] = p.z;
       var c = hex(p.kleur); kol[i * 3] = c[0]; kol[i * 3 + 1] = c[1]; kol[i * 3 + 2] = c[2];
       ext[i * 4] = p.maat; ext[i * 4 + 1] = p.fase; ext[i * 4 + 2] = p.lip === 'o' ? 1 : 0; ext[i * 4 + 3] = p.diep || 0;
       rnd[i] = p.rand == null ? 1 : p.rand;
@@ -159,4 +159,3 @@
       requestAnimationFrame(lus3);
       return { praat: praat3 };
     }
-

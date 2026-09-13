@@ -1,0 +1,540 @@
+/* RTG SIMPLE ---------------------------------------------------------------
+   Een rustige, herkenbare basis voor ieder Heritage-scherm. De wereld bepaalt
+   alleen het accent en de fotografie; navigatie, materiaal, vorm en ritme
+   blijven overal hetzelfde. Dit blad staat als laatste in rtg-heritage.css. */
+
+body[data-rtg-skin="heritage"]{
+  --rtg-radius-content:16px;
+  --rtg-radius-system:22px;
+  --rtg-world-bg:#080908!important;
+  --rtg-world-ground:linear-gradient(160deg,#11120f 0%,#080908 58%,#050605 100%)!important;
+  --rtg-world-card:#111310!important;
+  --rtg-world-card-strong:#171a16!important;
+  --rtg-world-ink:#f7f2e9!important;
+  --rtg-world-muted:#b9b1a5!important;
+  --rtg-world-line:rgba(247,242,233,.13)!important;
+  --rtg-world-metal:#d0b77b!important;
+  --rtg-world-action:#7f1634!important;
+  --rtg-world-action-ink:#fffaf2!important;
+  --rtg-world-schema:dark!important;
+  --rtg-world-photo-mask:linear-gradient(110deg,rgba(8,9,8,.96),rgba(8,9,8,.62))!important;
+  --rtg-depth-content:inset 0 1px rgba(255,255,255,.045),0 14px 40px rgba(0,0,0,.14);
+  --rtg-depth-focus:inset 0 1px rgba(255,255,255,.07),0 24px 70px rgba(0,0,0,.28);
+  color-scheme:dark;
+  background-color:var(--rtg-world-bg)!important;
+  background-image:
+    radial-gradient(54rem 30rem at 78% -8rem,var(--rtg-world-signature-soft),transparent 72%),
+    var(--rtg-world-ground)!important;
+}
+body[data-rtg-skin="heritage"][data-rtg-world]{
+  --rtg-world-bg:#080908!important;
+  --rtg-world-ground:linear-gradient(160deg,#11120f 0%,#080908 58%,#050605 100%)!important;
+  --rtg-world-card:#111310!important;
+  --rtg-world-card-strong:#171a16!important;
+  --rtg-world-ink:#f7f2e9!important;
+  --rtg-world-muted:#b9b1a5!important;
+  --rtg-world-line:rgba(247,242,233,.13)!important;
+  --rtg-world-metal:#d0b77b!important;
+  --rtg-world-action:#7f1634!important;
+  --rtg-world-action-ink:#fffaf2!important;
+  --edge-bg:#080908!important;--edge-panel:#111310!important;
+  --edge-copy:#f7f2e9!important;--edge-dim:#aaa297!important;
+  --edge-line:rgba(247,242,233,.13)!important;--edge-metal:#d0b77b!important;
+  --edge2-bg:#080908!important;--edge2-panel:#111310!important;
+  --edge2-copy:#f7f2e9!important;--edge2-dim:#aaa297!important;
+  --edge2-line:rgba(247,242,233,.13)!important;--edge2-metal:#d0b77b!important;
+  --edge-bar-bg:#080908!important;--edge-bar-copy:#f7f2e9!important;
+  --edge-bar-dim:#aaa297!important;--edge-bar-line:rgba(247,242,233,.13)!important;
+  --edge-bar-accent:#d0b77b!important;--edge-bar-metal:#d0b77b!important;
+}
+
+/* Werelden zijn kamers in hetzelfde huis. De compositie blijft gelijk; kleur,
+   metaal en een heel lichte gloed geven elke kamer haar eigen materiaal. */
+body[data-rtg-skin="heritage"][data-rtg-world="living"]{
+  --rtg-world-bg:#0a0805!important;
+  --rtg-world-ground:linear-gradient(160deg,#18130c 0%,#0a0805 58%,#050403 100%)!important;
+  --rtg-world-card:#15110b!important;--rtg-world-card-strong:#1d170e!important;
+  --rtg-world-ink:#fff7e9!important;--rtg-world-muted:#c9baa5!important;
+  --rtg-world-line:rgba(231,199,143,.2)!important;
+  --rtg-world-signature:#ddb970!important;--rtg-world-signature-soft:rgba(221,185,112,.17)!important;
+  --rtg-world-metal:#ebcc94!important;--rtg-world-action:#d3aa62!important;
+  --rtg-world-action-ink:#171006!important;
+  --edge-bg:#0a0805!important;--edge-panel:#15110b!important;--edge-copy:#fff7e9!important;
+  --edge-dim:#bcae9a!important;--edge-line:rgba(231,199,143,.2)!important;--edge-metal:#ebcc94!important;
+  --edge2-bg:#0a0805!important;--edge2-panel:#15110b!important;--edge2-copy:#fff7e9!important;
+  --edge2-dim:#bcae9a!important;--edge2-line:rgba(231,199,143,.2)!important;--edge2-metal:#ebcc94!important;
+  --edge-bar-bg:#0a0805!important;--edge-bar-copy:#fff7e9!important;--edge-bar-dim:#bcae9a!important;
+  --edge-bar-line:rgba(231,199,143,.2)!important;--edge-bar-accent:#ebcc94!important;--edge-bar-metal:#ebcc94!important;
+}
+body[data-rtg-skin="heritage"][data-rtg-world="travel"]{
+  --rtg-world-bg:#0c0608!important;
+  --rtg-world-ground:linear-gradient(160deg,#1b0b10 0%,#0c0608 58%,#050304 100%)!important;
+  --rtg-world-card:#160c0f!important;--rtg-world-card-strong:#201015!important;
+  --rtg-world-ink:#fff5f2!important;--rtg-world-muted:#cbb5b8!important;
+  --rtg-world-line:rgba(190,72,108,.23)!important;
+  --rtg-world-signature:#a82c51!important;--rtg-world-signature-soft:rgba(168,44,81,.2)!important;
+  --rtg-world-metal:#ddb5ad!important;--rtg-world-action:#941d42!important;
+  --rtg-world-action-ink:#fff8f6!important;
+  --edge-bg:#0c0608!important;--edge-panel:#160c0f!important;--edge-copy:#fff5f2!important;
+  --edge-dim:#c3adb1!important;--edge-line:rgba(190,72,108,.23)!important;--edge-metal:#ddb5ad!important;
+  --edge2-bg:#0c0608!important;--edge2-panel:#160c0f!important;--edge2-copy:#fff5f2!important;
+  --edge2-dim:#c3adb1!important;--edge2-line:rgba(190,72,108,.23)!important;--edge2-metal:#ddb5ad!important;
+  --edge-bar-bg:#0c0608!important;--edge-bar-copy:#fff5f2!important;--edge-bar-dim:#c3adb1!important;
+  --edge-bar-line:rgba(190,72,108,.23)!important;--edge-bar-accent:#a82c51!important;--edge-bar-metal:#ddb5ad!important;
+}
+body[data-rtg-skin="heritage"][data-rtg-world="work"]{
+  --rtg-world-bg:#040404!important;
+  --rtg-world-ground:linear-gradient(160deg,#121212 0%,#060606 55%,#020202 100%)!important;
+  --rtg-world-card:#0e0e0e!important;--rtg-world-card-strong:#171717!important;
+  --rtg-world-ink:#f8f5ef!important;--rtg-world-muted:#aaa49b!important;
+  --rtg-world-line:rgba(218,210,197,.16)!important;
+  --rtg-world-signature:#c8bda9!important;--rtg-world-signature-soft:rgba(200,189,169,.12)!important;
+  --rtg-world-metal:#d8cebc!important;--rtg-world-action:#191919!important;
+  --rtg-world-action-ink:#fbf7ef!important;
+  --edge-bg:#040404!important;--edge-panel:#0e0e0e!important;--edge-copy:#f8f5ef!important;
+  --edge-dim:#aaa49b!important;--edge-line:rgba(218,210,197,.16)!important;--edge-metal:#d8cebc!important;
+  --edge2-bg:#040404!important;--edge2-panel:#0e0e0e!important;--edge2-copy:#f8f5ef!important;
+  --edge2-dim:#aaa49b!important;--edge2-line:rgba(218,210,197,.16)!important;--edge2-metal:#d8cebc!important;
+  --edge-bar-bg:#040404!important;--edge-bar-copy:#f8f5ef!important;--edge-bar-dim:#aaa49b!important;
+  --edge-bar-line:rgba(218,210,197,.16)!important;--edge-bar-accent:#c8bda9!important;--edge-bar-metal:#d8cebc!important;
+}
+body[data-rtg-skin="heritage"][data-rtg-world="foundation"]{
+  --rtg-world-bg:#05080f!important;
+  --rtg-world-ground:linear-gradient(160deg,#0b1429 0%,#060a13 58%,#03050a 100%)!important;
+  --rtg-world-card:#0b1120!important;--rtg-world-card-strong:#101a31!important;
+  --rtg-world-ink:#f5f8ff!important;--rtg-world-muted:#aebbd2!important;
+  --rtg-world-line:rgba(88,129,221,.24)!important;
+  --rtg-world-signature:#3d68c9!important;--rtg-world-signature-soft:rgba(61,104,201,.2)!important;
+  --rtg-world-metal:#b9c9ee!important;--rtg-world-action:#315dbb!important;
+  --rtg-world-action-ink:#f8faff!important;
+  --edge-bg:#05080f!important;--edge-panel:#0b1120!important;--edge-copy:#f5f8ff!important;
+  --edge-dim:#aebbd2!important;--edge-line:rgba(88,129,221,.24)!important;--edge-metal:#b9c9ee!important;
+  --edge2-bg:#05080f!important;--edge2-panel:#0b1120!important;--edge2-copy:#f5f8ff!important;
+  --edge2-dim:#aebbd2!important;--edge2-line:rgba(88,129,221,.24)!important;--edge2-metal:#b9c9ee!important;
+  --edge-bar-bg:#05080f!important;--edge-bar-copy:#f5f8ff!important;--edge-bar-dim:#aebbd2!important;
+  --edge-bar-line:rgba(88,129,221,.24)!important;--edge-bar-accent:#3d68c9!important;--edge-bar-metal:#b9c9ee!important;
+}
+
+body[data-rtg-skin="heritage"] :where(h1,h2){
+  font-family:var(--rtg-display,"Bodoni Moda",Georgia,serif);
+  font-weight:450;
+  letter-spacing:-.025em;
+}
+body[data-rtg-skin="heritage"] :where(h3,h4,button,input,select,textarea){
+  font-family:var(--rtg-interface,Inter,system-ui,sans-serif);
+}
+
+/* ALLE ECHTE SCHERMEN, EEN VORMTAAL ---------------------------------------
+   De vier homes zijn geen uitzondering: iedere route die de centrale skin
+   draagt krijgt dezelfde tekst-, materiaal- en bedieningsgrammatica. Lokale
+   CSS mag nog bepalen WAT een scherm is (kaart, editor, camera, rooster), maar
+   niet opnieuw uitvinden hoe RTG-kaarten, rijen, tabs en knoppen eruitzien. */
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]){
+  color:var(--rtg-world-ink)!important;
+  font-family:var(--rtg-interface,Inter,system-ui,sans-serif)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]) :where(h1,h2){
+  color:var(--rtg-world-ink)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]) :where(
+  h3,h4,strong,b,legend,th,.kop,.naam,.titel){color:var(--rtg-world-ink)!important}
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]) :where(
+  p,small,.sub,.stil,.meta,.muted,.grijs,.uitleg,.klein,.hint){color:var(--rtg-world-muted)!important}
+
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]) :where(
+  .kaart,.card,.paneel,.panel,.tegel,.tile,.vak,.box,.blok,.sec,.kpi,
+  [data-rtg-component="OperationalPanel"],[data-rtg-component="NarrativePanel"],
+  [data-rtg-component="ContextStrip"],[data-rtg-component="State"]){
+  border-color:var(--rtg-world-line)!important;
+  background-color:color-mix(in srgb,var(--rtg-world-card) 96%,transparent)!important;
+  color:var(--rtg-world-ink)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.045),var(--rtg-depth-content)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]) :where(
+  .rij,.item,.regel,.lijnrij,.taakrij,.lijst>li,tbody>tr){
+  border-color:var(--rtg-world-line)!important;color:var(--rtg-world-ink)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]) :where(
+  .rij,.item,.regel,.lijnrij,.taakrij,.lijst>li,tbody>tr):is(:hover,:focus-within){
+  background-color:var(--rtg-world-signature-soft)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]) :where(
+  .pil,.chip,.badge,.tag,.status){
+  border-color:var(--rtg-world-line)!important;
+  background-color:color-mix(in srgb,var(--rtg-world-card-strong) 92%,transparent)!important;
+  color:var(--rtg-world-muted)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]) :where(
+  .tabs,.tabbar,.toolbar,.balk,.nav,.navigatie){
+  border-color:var(--rtg-world-line)!important;
+  background-color:color-mix(in srgb,var(--rtg-world-bg) 92%,transparent)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]) :where(
+  button,.knop,.btn,[role="button"]){
+  border-color:var(--rtg-world-line)!important;color:var(--rtg-world-ink)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]) :where(
+  button,.knop,.btn,[role="button"]):is(:hover,:focus-visible){
+  border-color:color-mix(in srgb,var(--rtg-world-signature) 58%,var(--rtg-world-line))!important;
+  background-color:var(--rtg-world-signature-soft)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]) :where(
+  button.vol,button.prim,button.primary,button.hoofd,a.vol,a.prim,a.primary,a.hoofd,
+  .knop.vol,.knop.prim,.knop.primary,.knop.hoofd,.btn.vol,.btn.prim,.btn.primary,.btn.hoofd,
+  [data-primary="true"]){
+  border-color:color-mix(in srgb,var(--rtg-world-action) 70%,var(--rtg-world-metal))!important;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--rtg-world-action) 90%,white 10%),var(--rtg-world-action))!important;
+  color:var(--rtg-world-action-ink)!important
+}
+/* Named primary actions that predate the shared component vocabulary. */
+body[data-rtg-skin="heritage"][data-rtg-world] #rahulBtn,
+body[data-rtg-skin="heritage"][data-rtg-world] #rtf-toegang-slot [data-rtf-wissel]{
+  border-color:color-mix(in srgb,var(--rtg-world-action) 72%,var(--rtg-world-line))!important;
+  background:linear-gradient(135deg,var(--rtg-world-action),color-mix(in srgb,var(--rtg-world-action) 76%,#fff))!important;
+  color:var(--rtg-world-action-ink)!important;
+  box-shadow:0 10px 30px color-mix(in srgb,var(--rtg-world-action) 22%,transparent)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]) :where(
+  input:not([type="checkbox"]):not([type="radio"]),select,textarea){
+  border-color:var(--rtg-world-line)!important;
+  background:color-mix(in srgb,var(--rtg-world-card-strong) 94%,transparent)!important;
+  color:var(--rtg-world-ink)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]) :where(
+  a:not(.rtg-world-portal)){color:inherit}
+body[data-rtg-skin="heritage"][data-rtg-world] :where(main,[role="main"]) :where(
+  a:not(.rtg-world-portal)):is(:hover,:focus-visible){color:var(--rtg-world-metal)}
+body[data-rtg-skin="heritage"][data-rtg-world] :where(video,canvas,.zoeker,.speler,
+  [data-rtg-native-canvas]){background-color:#050505!important}
+body[data-rtg-skin="heritage"][data-rtg-world] .rtg-edge-mouth canvas{
+  background:transparent!important
+}
+
+body[data-rtg-skin="heritage"] :where(.kaart,.card,.paneel,.panel,.tegel,.tile,.vak,.rtg-groep){
+  border-color:var(--rtg-world-line)!important;
+  background-color:color-mix(in srgb,var(--rtg-world-card) 96%,transparent)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.045),var(--rtg-depth-content)!important;
+}
+body[data-rtg-skin="heritage"] :where(input:not([type="checkbox"]):not([type="radio"]),select,textarea){
+  background:color-mix(in srgb,var(--rtg-world-card-strong) 94%,transparent)!important;
+}
+
+/* Vier homes, één compositie: dezelfde maat, dezelfde hoek, dezelfde rust. */
+body[data-rtg-world-dashboard-ready="true"]{
+  --rtg-v-bg:var(--rtg-world-bg)!important;
+  --rtg-v-card:var(--rtg-world-card)!important;
+  --rtg-v-card2:var(--rtg-world-card-strong)!important;
+  --rtg-v-ink:var(--rtg-world-ink)!important;
+  --rtg-v-muted:var(--rtg-world-muted)!important;
+  --rtg-v-line:var(--rtg-world-line)!important;
+  --rtg-v-metal:var(--rtg-world-metal)!important;
+  --rtg-v-signature:var(--rtg-world-signature)!important;
+  --rtg-v-accent-soft:var(--rtg-world-signature-soft)!important;
+  --rtg-v-schema:dark!important;
+  background:
+    radial-gradient(44rem 28rem at 82% 0,var(--rtg-world-signature-soft),transparent 72%),
+    var(--rtg-world-ground)!important;
+}
+body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-world-dashboard-ready="true"]{
+  background-color:var(--rtg-world-bg)!important;
+  background-image:
+    radial-gradient(44rem 28rem at 82% 0,var(--rtg-world-signature-soft),transparent 72%),
+    var(--rtg-world-ground)!important;
+}
+body[data-rtg-world-dashboard-ready="true"]::after{opacity:.28}
+body[data-rtg-world-dashboard-ready="true"] .rtg-world-dashboard{
+  width:min(100%,1600px)!important;
+  max-width:1600px!important;
+  padding:clamp(18px,3vw,36px)!important;
+  padding-bottom:clamp(92px,10vw,124px)!important;
+}
+body[data-rtg-world-dashboard-ready="true"] :where(
+  .dagkop,.doelgroep,.kaartraster,.onthaal){
+  min-height:clamp(380px,48vw,560px)!important;
+  margin:0 0 24px!important;
+  padding:clamp(24px,4vw,48px)!important;
+  overflow:hidden!important;
+  border:1px solid color-mix(in srgb,var(--rtg-world-signature) 34%,var(--rtg-world-line))!important;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.045),transparent 34%),
+    radial-gradient(38rem 24rem at 96% 0,var(--rtg-world-signature-soft),transparent 66%),
+    var(--rtg-world-card)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.08),0 26px 70px rgba(0,0,0,.32),
+    0 0 52px color-mix(in srgb,var(--rtg-world-signature) 8%,transparent)!important;
+}
+body[data-rtg-world-dashboard-ready="true"] :where(
+  .dagkop,.doelgroep,.kaartraster,.onthaal) h1{
+  max-width:12ch!important;
+  margin:.45em 0 .28em!important;
+  color:var(--rtg-world-ink)!important;
+  font:450 clamp(48px,7vw,86px)/.94 var(--rtg-display,"Bodoni Moda",Georgia,serif)!important;
+  letter-spacing:-.04em!important;
+}
+body[data-rtg-world-dashboard-ready="true"] :where(
+  .dagkop,.doelgroep,.kaartraster,.onthaal) p{
+  max-width:58ch;color:var(--rtg-world-muted)!important;line-height:1.58
+}
+body[data-rtg-world-dashboard-ready="true"] :where(
+  .dagkaart,.kompasblok,.work-open-day,.doenkaart,.buurtkaart,.kompaskaart,
+  .reisregister,.reisdiensten>a,.doelgroeppoorten>a,.wrooster-kaart){
+  border:1px solid var(--rtg-world-line)!important;
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.035),transparent 42%),
+    color-mix(in srgb,var(--rtg-world-card) 97%,transparent)!important;
+  color:var(--rtg-world-ink)!important;
+  box-shadow:var(--rtg-depth-content)!important;
+}
+body[data-rtg-world-dashboard-ready="true"] :where(
+  .standen,.doelgroepnav,.hoofdtabs,.wereldtabs){
+  gap:8px!important;border:0!important;background:transparent!important
+}
+body[data-rtg-world-dashboard-ready="true"] :where(
+  .standen button,.doelgroepnav a,.hoofdtabs button,.wereldtab){
+  min-height:44px!important;border:1px solid var(--rtg-world-line)!important;
+  background:transparent!important;color:var(--rtg-world-muted)!important
+}
+body[data-rtg-world-dashboard-ready="true"] :where(
+  .standen button.actief,.doelgroepnav a.actief,.hoofdtabs button.actief,.wereldtab[aria-current="page"]){
+  border-color:color-mix(in srgb,var(--rtg-world-metal) 58%,transparent)!important;
+  color:var(--rtg-world-ink)!important;
+  background:color-mix(in srgb,var(--rtg-world-signature) 16%,transparent)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.08),0 0 22px var(--rtg-world-signature-soft)!important
+}
+
+body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-world-dashboard-ready="true"] :where(
+  .rtg-dashboard-hero-cta,.travel-hero-actie,.actieknop){
+  border:1px solid color-mix(in srgb,var(--rtg-world-action) 66%,var(--rtg-world-metal))!important;
+  background:linear-gradient(135deg,color-mix(in srgb,var(--rtg-world-action) 88%,white 12%),var(--rtg-world-action))!important;
+  color:var(--rtg-world-action-ink)!important;
+  box-shadow:inset 0 1px rgba(255,255,255,.2),0 12px 34px color-mix(in srgb,var(--rtg-world-action) 28%,transparent)!important;
+}
+body[data-rtg-skin="heritage"][data-rtg-world][data-rtg-world-dashboard-ready="true"] .actieknop :where(span,b){
+  color:var(--rtg-world-action-ink)!important
+}
+body.rtg-travel-experience[data-rtg-skin="heritage"][data-rtg-world="travel"][data-rtg-world-dashboard-ready="true"] .actieknop :is(span,b){
+  color:var(--rtg-world-action-ink)!important
+}
+
+/* Tekst op fotografische dashboardvlakken houdt ook bij een gemiddeld lichte
+   uitsnede zijn volledige leescontrast. */
+body[data-rtg-skin="heritage"][data-rtg-world="living"][data-rtg-world-dashboard-ready="true"] .standen button{
+  color:var(--rtg-world-ink)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world="living"][data-rtg-world-dashboard-ready="true"] .momentnaam{
+  padding:2px 5px;background:var(--rtg-world-bg)!important;color:var(--rtg-world-ink)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world="living"][data-rtg-world-dashboard-ready="true"] .kompasblok :where(
+  p,span,.sub,a,.kompasuur,.kompaswat){color:var(--rtg-world-ink)!important}
+body[data-rtg-skin="heritage"][data-rtg-world="living"][data-rtg-world-dashboard-ready="true"] .rtgdeel-vast>.ey{
+  color:var(--rtg-world-ink)!important
+}
+body[data-rtg-skin="heritage"][data-rtg-world="work"][data-rtg-world-dashboard-ready="true"] :is(
+  .merkkop .onder,.wereldvoet span){color:#d8d2c9!important}
+
+/* Het echte beginscherm volgt dezelfde volgorde als de referentie: eerst de
+   menselijke vraag, daarna vier herkenbare werelden. Geen verzonnen activiteit. */
+body[data-rtg-skin="heritage"] .cmd-leeg{
+  align-content:start!important;place-items:stretch!important;overflow:auto;
+  padding:clamp(32px,7vw,72px) clamp(18px,6vw,64px) 108px!important;
+  background:transparent!important;color:var(--rtg-world-muted)!important
+}
+body[data-rtg-skin="heritage"] .cmd-groet{
+  width:min(100%,780px);margin:0 auto 8px!important;text-align:left!important;
+  color:var(--rtg-world-ink)!important;font-size:clamp(38px,7vw,64px)!important
+}
+body[data-rtg-skin="heritage"] .cmd-groet::after{
+  content:"Wat wilt u vandaag doen?";display:block;margin-top:8px;
+  color:var(--rtg-world-muted);font:500 14px/1.45 var(--rtg-interface,Inter,sans-serif);
+  letter-spacing:0
+}
+body[data-rtg-skin="heritage"] .cmd-intentie{
+  width:min(100%,780px)!important;min-height:58px;margin:16px auto 34px!important;
+  padding:0 54px 0 18px!important;border:1px solid var(--rtg-world-line)!important;
+  background:var(--rtg-world-card-strong)!important;
+  color:var(--rtg-world-muted)!important;box-shadow:var(--rtg-depth-content)!important
+}
+body[data-rtg-skin="heritage"] .cmd-intentie::after{
+  content:"✦";float:right;color:var(--rtg-world-metal);font-size:18px
+}
+body[data-rtg-skin="heritage"] .cmd-starttitel{
+  width:min(100%,780px);margin:0 auto 12px;color:var(--rtg-world-ink)!important;
+  font:650 14px/1.2 var(--rtg-interface,Inter,sans-serif)!important;letter-spacing:0
+}
+body[data-rtg-skin="heritage"] .cmd-startwerelden{
+  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px!important;
+  width:min(100%,780px)!important;margin:0 auto!important
+}
+body[data-rtg-skin="heritage"] .cmd-startwereld{
+  position:relative;display:flex!important;min-height:118px;padding:18px!important;
+  flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:5px;
+  border:1px solid var(--rtg-world-line)!important;
+  background:
+    radial-gradient(circle at 88% 14%,var(--rtg-world-signature-soft),transparent 46%),
+    var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;
+  box-shadow:var(--rtg-depth-content);text-align:left!important
+}
+body[data-rtg-skin="heritage"] .cmd-startwereld::before{
+  content:"";position:absolute;top:16px;left:16px;width:9px;height:9px;border-radius:50%;
+  background:var(--rtg-world-signature);box-shadow:0 0 0 5px var(--rtg-world-signature-soft)
+}
+body[data-rtg-skin="heritage"] .cmd-startwereld strong{font-size:16px;font-weight:650}
+body[data-rtg-skin="heritage"] .cmd-startwereld small{
+  display:block;color:var(--rtg-world-muted);font-size:11px;line-height:1.35
+}
+body[data-rtg-skin="heritage"] .cmd-startwereld:hover,
+body[data-rtg-skin="heritage"] .cmd-startwereld:focus-visible{
+  padding-left:18px!important;border-color:color-mix(in srgb,var(--rtg-world-metal) 56%,transparent)!important
+}
+
+/* De toegangspoort hoeft geen apart spektakelstuk te zijn. Identiteit,
+   begroeting en de veilige handeling blijven; klok en decoratieve mond wijken. */
+body[data-ios-home][data-rtg-skin="heritage"] #gate{
+  justify-content:center!important;padding:88px 18px 96px!important;
+  background:
+    radial-gradient(44rem 30rem at 50% 0,var(--rtg-world-signature-soft),transparent 72%),
+    var(--rtg-world-ground)!important
+}
+body[data-ios-home][data-rtg-skin="heritage"] #gate>.os-lock,
+body[data-ios-home][data-rtg-skin="heritage"] #gate .ag-mond,
+body[data-ios-home][data-rtg-skin="heritage"] #gate .ag-rahul-label{display:none!important}
+body[data-ios-home][data-rtg-skin="heritage"] #gate .ag-doos:not(.ag-ballotage){
+  width:min(100%,480px)!important;padding:26px 20px!important;border:1px solid var(--rtg-world-line)!important;
+  background:rgba(17,19,16,.92)!important;
+  box-shadow:var(--rtg-depth-focus)!important
+}
+body[data-ios-home][data-rtg-skin="heritage"] #gate .ag-welkom{font-size:clamp(36px,10vw,52px)!important}
+body[data-ios-home][data-rtg-skin="heritage"]:has(#gate:not([style*="display: none"])) .rtg-edge-bottom{
+  display:none!important
+}
+body[data-ios-home][data-rtg-skin="heritage"]:has(#gate:not([style*="display: none"])) #rtgCommand :is(.cmd-balk,.cmd-bank){
+  display:none!important
+}
+body[data-ios-home][data-rtg-skin="heritage"]:has(#gate:not([style*="display: none"])) :is(
+  .rtg-edge-index,.rtg-edge-ai-panel,.rtg-edge-status-panel){
+  display:none!important
+}
+
+/* Eén rustige systeemrand. Op mobiel volgt zij de vijf vertrouwde ankers uit
+   de eerste-minuutopzet: Home, Werelden, Vraag, Acties en Menu. */
+.rtg-edge-worlds-trigger,.rtg-edge-actions-trigger{display:none!important}
+
+@media(max-width:767px){
+  :root{--edge-top:58px;--edge-side:0px;--edge-bottom:68px}
+  body.rtg-edge-host{
+    padding-top:calc(var(--edge-top) + env(safe-area-inset-top,0px))!important;
+    padding-left:0!important;
+    padding-bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px))!important
+  }
+  .rtg-edge-side{display:none!important}
+  .rtg-edge-top{
+    grid-template-columns:auto minmax(0,1fr) 48px!important;
+    height:calc(var(--edge-top) + env(safe-area-inset-top,0px));
+    padding:env(safe-area-inset-top,0px) 8px 0 14px;
+    border-bottom-color:var(--edge-line);
+    background:color-mix(in srgb,var(--rtg-world-bg) 92%,transparent)!important;
+    box-shadow:0 10px 36px rgba(0,0,0,.18)!important
+  }
+  .rtg-edge-top::after{left:14px;width:72px}
+  .rtg-edge-mark{
+    display:flex;align-items:baseline;gap:9px;width:auto;height:var(--edge-top);
+    padding:0;border:0;font:650 21px/1 var(--rtg-display,"Bodoni Moda",Georgia,serif)
+  }
+  .rtg-edge-mark::after{
+    color:var(--edge-copy);font:650 10px/1 Inter,system-ui,sans-serif;
+    letter-spacing:.12em;text-transform:uppercase
+  }
+  body[data-rtg-world="living"] .rtg-edge-mark::after{content:"LivingOS"}
+  body[data-rtg-world="travel"] .rtg-edge-mark::after{content:"TravelOS"}
+  body[data-rtg-world="work"] .rtg-edge-mark::after{content:"WorkOS"}
+  body[data-rtg-world="foundation"] .rtg-edge-mark::after{content:"FoundationOS"}
+  .rtg-edge-crumbs,.rtg-edge-worldbar,.rtg-edge-state,.rtg-edge-search,.rtg-edge-language{display:none!important}
+  .rtg-edge-profile{
+    grid-column:3;display:grid!important;place-items:center;width:42px;height:42px;
+    border:1px solid var(--edge-line)!important;border-radius:50%!important;color:var(--edge-copy)!important
+  }
+  .rtg-edge-bottom{
+    left:8px!important;right:8px!important;bottom:0!important;
+    width:auto!important;height:var(--edge-bottom)!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    padding:0 4px!important;border:1px solid color-mix(in srgb,var(--rtg-world-signature) 38%,var(--edge-line))!important;
+    background:color-mix(in srgb,var(--rtg-world-bg) 94%,transparent)!important;
+    box-shadow:inset 0 1px rgba(255,255,255,.08),0 18px 48px rgba(0,0,0,.4),
+      0 0 34px color-mix(in srgb,var(--rtg-world-signature) 12%,transparent)!important;
+    overflow:visible!important;backdrop-filter:blur(22px)!important
+  }
+  .rtg-edge-bottom>a,.rtg-edge-bottom>button{
+    width:100%!important;min-width:44px!important;height:calc(var(--edge-bottom) - 2px)!important;border:0!important
+  }
+  .rtg-edge-bottom>a{grid-column:1;grid-row:1}
+  .rtg-edge-worlds-trigger{display:flex!important;grid-column:2;grid-row:1}
+  .rtg-edge-ai{grid-column:3;grid-row:1;position:relative!important;color:var(--rtg-world-signature)!important}
+  .rtg-edge-actions-trigger{display:flex!important;grid-column:4;grid-row:1}
+  .rtg-edge-menu{grid-column:5;grid-row:1}
+  .rtg-edge-history,.rtg-edge-layout,.rtg-edge-action,.rtg-edge-appslot{display:none!important}
+  .rtg-edge-worlds-trigger,.rtg-edge-actions-trigger,.rtg-edge-menu,.rtg-edge-ai,.rtg-edge-bottom>a{
+    flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    color:var(--edge-dim)!important;font-size:10px!important;letter-spacing:.04em
+  }
+  .rtg-edge-bottom .rtg-edge-ai{color:var(--rtg-world-signature)!important}
+  .rtg-edge-worlds-trigger small,.rtg-edge-actions-trigger small,.rtg-edge-ai small,.rtg-edge-bottom>a small,.rtg-edge-menu small{
+    display:block!important;color:inherit!important;font-size:9px!important;line-height:1!important
+  }
+  .rtg-edge-worlds-trigger svg,.rtg-edge-actions-trigger svg,.rtg-edge-menu svg,.rtg-edge-bottom>a svg{
+    width:19px!important;height:19px!important
+  }
+
+  body[data-rtg-world-dashboard-ready="true"] .rtg-world-dashboard{
+    padding:16px 10px 92px!important
+  }
+  body[data-rtg-world-dashboard-ready="true"] :where(.dagkop,.doelgroep,.kaartraster,.onthaal){
+    min-height:410px!important;margin-bottom:18px!important;padding:24px 18px!important
+  }
+  body[data-rtg-world-dashboard-ready="true"] :where(.dagkop,.doelgroep,.kaartraster,.onthaal) h1{
+    font-size:clamp(46px,14vw,62px)!important
+  }
+  body[data-rtg-world-dashboard-ready="true"] :where(.dag,.canvasraster,.tweeluik){
+    grid-template-columns:1fr!important;gap:14px!important
+  }
+  body[data-rtg-world-dashboard-ready="true"] :where(.kompas,.landelijk){position:static!important}
+  body[data-rtg-world-dashboard-ready="true"] .doelgroep{display:flex!important;flex-direction:column}
+  body[data-rtg-world-dashboard-ready="true"] .doelgroeptekst{order:1!important}
+  body[data-rtg-world-dashboard-ready="true"] .doelgroepnav{
+    order:2!important;display:grid!important;grid-auto-flow:column;grid-auto-columns:max-content;
+    margin-top:24px!important;overflow-x:auto;scrollbar-width:none
+  }
+  body[data-rtg-world-dashboard-ready="true"] .doelgroepnav::-webkit-scrollbar{display:none}
+  body[data-rtg-world-dashboard-ready="true"] .doelgroepnav a{width:auto!important;padding-inline:18px!important;white-space:nowrap}
+  body[data-rtg-world-dashboard-ready="true"] .doelgroeppoorten{
+    order:3!important;display:grid!important;grid-auto-flow:column;grid-auto-columns:minmax(244px,82%);
+    grid-template-rows:1fr!important;gap:12px!important;margin-top:14px!important;
+    overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x proximity;scrollbar-width:none
+  }
+  body[data-rtg-world-dashboard-ready="true"] .doelgroeppoorten[hidden]{display:none!important}
+  body[data-rtg-world-dashboard-ready="true"] .doelgroeppoorten::-webkit-scrollbar{display:none}
+  body[data-rtg-world-dashboard-ready="true"] .doelgroeppoorten>a{
+    min-height:170px!important;scroll-snap-align:start
+  }
+  body[data-rtg-world-dashboard-ready="true"] .hoofdtabs,
+  body[data-rtg-world-dashboard-ready="true"] .wereldtabs{
+    position:static!important;inset:auto!important;margin:0 0 14px!important;padding:0 0 8px!important;
+    overflow-x:auto!important;border-bottom:1px solid var(--rtg-world-line)!important;
+    backdrop-filter:none!important
+  }
+  body.rtg-edge-host:has(.wereldtabs),body.rtg-edge-host:has(.hoofdtabs){
+    padding-bottom:calc(var(--edge-bottom) + env(safe-area-inset-bottom,0px))!important
+  }
+  #rtg-cookie{
+    left:50%!important;right:auto!important;bottom:calc(var(--edge-bottom) + 18px + env(safe-area-inset-bottom,0px))!important;
+    width:max-content!important;max-width:calc(100vw - 24px)!important;
+    transform:translateX(-50%)!important
+  }
+  body[data-ios-home][data-rtg-skin="heritage"]:has(#gate:not([style*="display: none"])) #rtg-cookie{
+    bottom:14px!important
+  }
+  body[data-rtg-skin="heritage"] .cmd-startwerelden{grid-template-columns:1fr}
+}
+
+@media(min-width:768px){
+  .rtg-edge-top{background:color-mix(in srgb,var(--rtg-world-bg) 92%,transparent)!important}
+  .rtg-edge-side,.rtg-edge-bottom{background:color-mix(in srgb,var(--rtg-world-bg) 92%,transparent)!important}
+}

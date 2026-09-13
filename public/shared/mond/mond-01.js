@@ -52,20 +52,20 @@
       var z = (lip === 'b' ? 0.20 : 0.26) * bult(x) * (0.55 + 0.45 * lipMidden);
       PUNTEN.push({ x: x, y: y1 + rnd() * (y2 - y1), lip: lip,
         fase: rnd() * Math.PI * 2, maat: 0.5 + rnd() * 0.9,
-        kleur: r < 0.62 ? '#9E1C40' : (r < 0.9 ? '#C9A24B' : '#FFFFFF'),
+        kleur: r < 0.70 ? '#9E1C40' : (r < 0.98 ? '#C9A24B' : '#FFFFFF'),
         diep: diep, z: z });
     }
-    // de gouden middellijn loopt door tot voorbij de mondhoeken en vervaagt; ligt terug
-    for (var j = 0; j < 420; j++) {
-      var mx = 14 + rnd() * 192;
+    // een compacte gouden middellijn houdt boven- en onderlip leesbaar; ligt terug
+    for (var j = 0; j < 260; j++) {
+      var mx = 42 + rnd() * 136;
       PUNTEN.push({ x: mx, y: midden(Math.min(170, Math.max(50, mx))) + (rnd() - 0.5) * 1.6,
         lip: 'm', fase: rnd() * Math.PI * 2, maat: 0.4 + rnd() * 0.7,
-        kleur: '#C9A24B', rand: Math.min(1, Math.min(mx - 14, 206 - mx) / 55), diep: 0, z: -0.05 });
+        kleur: '#C9A24B', rand: Math.min(1, Math.min(mx - 42, 178 - mx) / 30), diep: 0, z: -0.05 });
     }
 
     /* DE TEKENING IN HET MIDDEN VAN ZIJN EIGEN DOEK.
 
-       Beide tekenaars gebruiken y=52 als draaipunt: WebGL rekent -(y-52)/60 en
+       Beide tekenaars gebruiken y=52 als draaipunt: WebGL rekent vanaf y=52 en
        de 2D-terugval schaalt om diezelfde lijn. Maar de mond zelf loopt van
        ongeveer 35 tot 79, dus zijn werkelijke midden ligt op 57 -- vijf eenheden
        LAGER dan het draaipunt. Gevolg: de mond hing in zijn doek naar beneden,

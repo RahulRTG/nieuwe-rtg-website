@@ -60,11 +60,24 @@
       var lijst=[];try{lijst=(o.werelden&&o.werelden())||[]}catch(e){}
       lijst=lijst.filter(function(x){return x&&x.naam&&x.url});
       if(lijst.length){
+        var titel=d.createElement('h2');titel.className='cmd-starttitel';
+        titel.textContent='Uw werelden';m.appendChild(titel);
         var nav=d.createElement('nav');nav.className='cmd-startwerelden';
         nav.setAttribute('aria-label','Werelden');
+        var omschrijvingen={
+          living:'Dagelijks leven en welzijn',
+          work:'Werk en organisaties',
+          travel:'Reizen en onderweg',
+          foundation:'Samen helpen en bijdragen'
+        };
         lijst.forEach(function(x){
           var b=d.createElement('button');b.type='button';b.className='cmd-startwereld';
-          b.dataset.url=x.url;b.textContent=x.naam;
+          var sleutel=(x.naam+' '+x.url).toLowerCase();
+          var wereld=sleutel.indexOf('living')>-1?'living':sleutel.indexOf('work')>-1||sleutel.indexOf('kantoor')>-1?'work':
+            sleutel.indexOf('travel')>-1||sleutel.indexOf('reiz')>-1?'travel':'foundation';
+          var naam=d.createElement('strong');naam.textContent=x.naam;
+          var uitleg=d.createElement('small');uitleg.textContent=omschrijvingen[wereld];
+          b.dataset.url=x.url;b.dataset.world=wereld;b.appendChild(naam);b.appendChild(uitleg);
           b.onclick=function(){o.open(x.url,x.naam)};
           nav.appendChild(b);});
         m.appendChild(nav);
@@ -78,4 +91,3 @@
     vak.appendChild(m);
   };
 })(window,document);
-

@@ -34,81 +34,7 @@
    ========================================================================== */
 'use strict';
 
-/* DE CATALOGUS. Elk verraad noemt wat het nabootst, waar het is INGEBOUWD, en
-   -- als het dat niet is -- waar het zou moeten. Een catalogusregel zonder
-   `waar` is een voornemen, en de dekking van de control telt hem niet mee.
-
-   `waar: null` betekent ONTWORPEN, NIET INGEBOUWD. Dat staat er met opzet in
-   plaats van eruit: een lijst die alleen toont wat af is, laat niet zien hoe
-   ver hij nog moet. */
-const CATALOGUS = [
-  { naam: 'schrijf-verloren',
-    wat: 'de database bevestigt de schrijfactie en bewaart hem niet',
-    waar: 'server/db/index.js save()',
-    raakt: 'STATE, ROLLBACK -- de aanroeper krijgt zijn 200 en gelooft dat het vaststaat' },
-  { naam: 'schrijf-faalt',
-    wat: 'de schijf meldt ruimte, de schrijfactie mislukt alsnog',
-    waar: 'server/db/index.js save()',
-    raakt: 'FAILURE -- een aanroeper die dit stil wegvangt, meldt succes over niets' },
-  /* DRIE DODEN OP DRIE MOMENTEN, en ze horen bij elkaar te staan omdat ze
-     samen de interne crashgrenzen van scripts/lib/crashtaxonomie.js afdekken.
-     Eerst was er alleen de derde; CRASHAS.json mat daardoor 90 van de 135
-     bestaande grenzen als NIET TE BEPROEVEN -- geen onwetendheid maar
-     ontbrekend gereedschap.
-
-     Het verschil tussen de drie is het hele punt. Wie ze samenvoegt tot "een
-     crash", meet drie keer hetzelfde moment en noemt dat dekking.
-
-     TWEE WOORDENLIJSTEN, EN ZE LIEPEN HIER EEN KEER DOOR ELKAAR. `raakt` noemt
-     een SCHAKEL van de bewijsmatrix, `contract` een CRASHCONTRACT uit
-     scripts/lib/crashtaxonomie.js. Waarom dat verschil ertoe doet, staat in
-     test/verraad.test.js, dat het ook bewaakt. */
-  { naam: 'sterf-voor-mutatie',
-    wat: 'het proces sterft VOORDAT er iets is gemuteerd',
-    waar: 'server/db/bijeen.js bijeen(), voor fn()',
-    contract: 'ATOMIC',
-    raakt: 'ROLLBACK, STATE -- er hoort geen spoor te zijn, en een retry hoort schoon te beginnen' },
-  /* EN DE DERDE IS ER NIET, met een GEMETEN reden in plaats van een voornemen.
-     db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save heeft
-     geen waarneembaar middelpunt: geprobeerd tussen schrijfopdracht en
-     checkpoint, en scripts/crashgrenzen.js mat er een tweede sterf-na-commit.
-     Daarom `waar: null` en geen regel code. Op een opslag die WEL kan scheuren
-     hoort hij alsnog -- server/db/duurzaam.js draagt de vindplaats. */
-  { naam: 'sterf-in-de-opslag',
-    wat: 'het proces sterft MIDDENIN de onderliggende schrijfactie',
-    waar: null,
-    contract: 'ATOMIC',
-    raakt: 'ROLLBACK -- niet te bouwen op een transactionele opslag: er is geen middelpunt' },
-  { naam: 'sterf-na-commit',
-    wat: 'het proces sterft NA de duurzame schrijfactie en VOOR het antwoord',
-    waar: 'server/db/index.js saveDuurzaam()',
-    contract: 'RECOVERABLE',
-    raakt: 'IDEMPOTENCY, ROLLBACK -- de klant weet niet dat het gelukt is en probeert opnieuw' },
-  { naam: 'klok-vooruit',
-    wat: 'de klok loopt voor of achter',
-    waar: 'server/lib/klok.js (RTG_KLOK, eigen schakelaar)',
-    raakt: 'FAILURE -- verlopen sessies, mandaten en certificaten' },
-  { naam: 'cache-oud',
-    wat: 'de cache geeft een correct maar verouderd antwoord',
-    waar: null,
-    raakt: 'STATE -- een saldo dat al is uitgegeven' },
-  { naam: 'dubbel-verzoek',
-    wat: 'hetzelfde verzoek komt twee keer binnen',
-    waar: null,
-    raakt: 'IDEMPOTENCY -- twee keer afschrijven op een herhaalde POST' },
-  { naam: 'volgorde-om',
-    wat: 'gebeurtenis B arriveert voor gebeurtenis A',
-    waar: null,
-    raakt: 'STATE -- een annulering die voor de boeking aankomt' },
-  { naam: 'traag-antwoord',
-    wat: 'een afhankelijkheid antwoordt tergend langzaam',
-    waar: null,
-    raakt: 'FAILURE -- een timeout die niemand heeft ingesteld' },
-  { naam: 'twee-leiders',
-    wat: 'twee servers denken allebei de actieve te zijn',
-    waar: null,
-    raakt: 'STATE -- dubbele verwerking van dezelfde rij' }
-];
+const { CATALOGUS } = require('./verraad-catalogus');
 
 const OP_NAAM = new Map(CATALOGUS.map(v => [v.naam, v]));
 
@@ -182,7 +108,7 @@ const CONTROL = {
   wat: 'het systeem is te beproeven op een wereld die liegt: database, klok, volgorde',
   eigenaar: 'Techniek',
   bewijs: ['test/verraad.test.js', 'test/verraadtelling.test.js'],
-  bewijsstuk: 'de catalogus in dit bestand -- per verraad waar hij is ingebouwd',
+  bewijsstuk: './verraad-catalogus.js -- per verraad waar hij is ingebouwd',
   grens: 'de motor MAAKT de vraag stelbaar en beantwoordt hem niet. Dat een verraad ' +
     'is ingebouwd zegt niets over hoe het systeem erop reageert; daarvoor moet een ronde ' +
     'draaien en die uitkomst is een bevinding, geen oordeel.',

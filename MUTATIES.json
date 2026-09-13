@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T10:11:25.009Z",
-    "commit": "8d2251e4",
+    "op": "2026-09-13T10:11:42.956Z",
+    "commit": "43679812",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4040,6 +4040,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "ledenbaliespoor.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
       "scherp": "gezakt"
     },
     "ledengids-race.test.js": {

@@ -1073,6 +1073,28 @@
           "test:test/seclock.test.js"
         ]
       }
+    },
+    {
+      "id": "techniek-meter-kent-zijn-grens",
+      "soort": "techniek",
+      "wet": "Een meter die uitspraken doet over onbekend terrein wordt eerst geijkt tegen bekende waarheid; is er geen grondwaarheid, dan zegt hij dat expliciet en beperkt hij zijn conclusies tot wat hij heeft waargenomen.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "Een meter kent zijn eigen grens"
+      },
+      "handhaver": [
+        "test/meterwet.test.js",
+        "scripts/lib/ijking.js"
+      ],
+      "sabotage": {
+        "wat": "laat een meter beweren dat hij geijkt is tegen een grondwaarheid, terwijl de uitslag van die ijking nergens in zijn register staat -- de goedkoopste vorm van een belofte zonder bewijs",
+        "bestand": "scripts/lib/ijking.js",
+        "zoek": "    ijkveld: 'sensoren',",
+        "zet": "    ijkveld: 'bestaatniet',",
+        "wachters": [
+          "test:test/meterwet.test.js"
+        ]
+      }
     }
   ]
 }

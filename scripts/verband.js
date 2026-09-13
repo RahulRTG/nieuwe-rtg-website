@@ -155,7 +155,7 @@ function meet() {
   for (const w of wetten) {
     for (const h of (w.handhaver || [])) {
       if (isWachter(h)) grond.push({ wet: w.id, wachter: h, w });
-      else implementatie.push({ wet: w.id, bestand: h });
+      else implementatie.push({ wet: w.id, bestand: h, relatie: 'DRAAGT', bronrelatie: 'handhaver' });
     }
   }
   const wachters = [...new Set(grond.map(g => g.wachter))];
@@ -173,7 +173,15 @@ function meet() {
       perSensor[naam].voorstellen += kandidaten.length;
       if (kandidaten.includes(g.wachter)) { perSensor[naam].raak++; zag.push(naam); }
     }
-    randen.push({ wet: g.wet, wachter: g.wachter, gezienDoor: zag });
+    randen.push({
+      wet: g.wet, wachter: g.wachter, gezienDoor: zag,
+      /* DE RELATIE HEET WAT HIJ IS, EN DE BRON ZEGT WAT ER STOND.
+         `handhaver` in WETTEN.json draagt twee betekenissen; deze rand is er
+         een van. Zou hier alleen `handhaver` staan, dan bouwt de volgende laag
+         door op een dubbelzinnigheid die deze meter al gemeten heeft. */
+      relatie: 'BEWAAKT_DOOR',
+      bronrelatie: 'handhaver',
+    });
     if (!zag.length) gemist.push({ wet: g.wet, wachter: g.wachter });
   }
   const gevonden = grond.length - gemist.length;
@@ -220,8 +228,13 @@ function draai() {
     /* Twee relaties onder een veldnaam. Ze worden niet opgeteld; welke kant
        WETTEN.json op moet is een besluit en geen berekening. */
     tweeRelaties: {
-      uitleg: 'Het veld `handhaver` draagt twee verschillende beweringen: een WACHTER die rood wordt, en de ' +
-        'IMPLEMENTATIE die de regel draagt. Deze meter ijkt alleen de eerste.',
+      uitleg: 'Het veld `handhaver` draagt twee verschillende beweringen: een WACHTER die rood wordt ' +
+        '(relatie BEWAAKT_DOOR), en de IMPLEMENTATIE die de regel draagt (relatie DRAAGT). Deze meter ijkt ' +
+        'alleen de eerste. Elke rand draagt daarom een `relatie` die zegt WAT hij is, naast een `bronrelatie` ' +
+        'die zegt wat er in WETTEN.json stond.',
+      interpretatie: 'ONBEPAALD IN DE BRON: WETTEN.json kent een veldnaam voor twee relaties. De splitsing ' +
+        'hier is een LEZING van deze meter en geen besluit -- WETTEN.json is niet aangeraakt. Wie die twee ' +
+        'daar uit elkaar trekt, doet dat als besluit en niet als berekening.',
       wachter: m.grond.length,
       implementatie: m.implementatie.length,
     },
@@ -231,6 +244,9 @@ function draai() {
     }])),
     gemist: m.gemist,
     randen: m.randen,
+    /* De DRAAGT-randen staan er WEL in en worden nergens bij de BEWAAKT_DOOR-randen
+       opgeteld. Ze taggen zonder ze te tonen zou de tag decoratie maken. */
+    implementatie: m.implementatie,
   };
 
   if (TOON) { toon(uit); return; }

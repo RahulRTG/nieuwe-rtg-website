@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T20:14:49.977Z",
-    "commit": "e653e9c63",
+    "op": "2026-09-13T20:15:13.459Z",
+    "commit": "d69b19b9c",
     "boomVuil": true,
-    "boomAnders": 11,
+    "boomAnders": 4,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -3674,6 +3674,14 @@
       "operator": "true->false#0",
       "gezakt": 3,
       "geprobeerd": 7
+    },
+    "idemidentiteit-velden.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/idem-kast.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 9
     },
     "idemproef.test.js": {
       "soort": "puur",

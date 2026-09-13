@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T12:00:04.875Z",
-    "commit": "160b146d",
+    "op": "2026-09-13T12:44:03.547Z",
+    "commit": "72036c97",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -273,6 +273,14 @@
       "module": "server/openai.js",
       "operator": "===->!==",
       "gezakt": 2
+    },
+    "aicontext-allowlist.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "aidata.test.js": {
       "soort": "server",

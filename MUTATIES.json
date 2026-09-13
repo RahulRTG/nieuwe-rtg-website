@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:15:04.138Z",
-    "commit": "92bce4fd",
+    "op": "2026-09-13T11:22:35.178Z",
+    "commit": "420eea4d",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -4993,6 +4993,10 @@
       "operator": "&&->||#0",
       "gezakt": 2,
       "geprobeerd": 4
+    },
+    "mn02-hoedanigheidsscheiding.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
     },
     "mobiliteit-werkkant-routes.test.js": {
       "soort": "server",

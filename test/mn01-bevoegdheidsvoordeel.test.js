@@ -132,7 +132,7 @@ test('2. de machtigingsroutes zelf staan op de LEDEN-deur en nergens anders', ()
    ALS.
    ========================================================================== */
 const os = require('os');
-const { startServer, stop, kantoorAlsPersoon } = require('./helper.js');
+const { startServer, stop, kantoorAlsPersoon } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mn01-'));
 let BASE, kind, talentToken, talentCodenaam, talentKey, eigenaarLid, eigenaarKantoor;

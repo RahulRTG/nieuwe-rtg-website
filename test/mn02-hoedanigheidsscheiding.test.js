@@ -42,7 +42,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper.js');
+const { startServer, stop } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mn02-'));
 const CODE = 'RTG-OFFICE-MN02';

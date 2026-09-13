@@ -1049,6 +1049,18 @@ const GEEN_BRONMUTATIE = new Map([
      ijkt de toets al zelf: zijn derde bewering is "de scan kan een nieuwe laag
      ook echt vinden", dus hij toont zijn eigen gevoeligheid. */
   ['consent-dekking.test.js', 'een census over de broncode (welke modules bestaan en staan ze in het register), niet over rekenend gedrag; een bronoperator kan daar niet bij. De toets ijkt zichzelf al: zijn derde bewering laat de scan een nieuwe laag vinden'],
+  /* bewijsveld is dezelfde vorm als consent-dekking, een laag hoger: een CENSUS
+     over de registers (welk bestand draagt welk bewijsveld) tegen een verklaring
+     in scripts/lib/bewijsvelden.js, dat louter literalen bevat. Er is geen
+     rekenend gedrag om te muteren -- de betekenisvolle mutatie is een register
+     uit de verklaring halen of er een verzinnen, en die twee zijn met de hand
+     gedaan en zakken allebei. De TWEEDE is bovendien de sabotage van
+     techniek-bewijsveld-een-relatie in WETTEN.json, en die is machinaal raak:
+     `npm run sabotage techniek-bewijsveld-een-relatie` verklaart CODEWERELD.json
+     voor een veld dat het niet draagt en de toets wordt rood. Deze toets heeft
+     dus wel degelijk een machinale gevoeligheidsproef, alleen niet van deze
+     motor. */
+  ['bewijsveld.test.js', 'een census over de registers tegen een verklaring van louter literalen; geen bronoperator raakt dat. De gevoeligheid is machinaal bewezen door de sabotagemotor: techniek-bewijsveld-een-relatie staat op RAAK'],
   /* Nagetrokken: een aanroep verzinnen die niet bestaat (accounts.bestaatNietXX)
      laat toets 1 zakken, en verifyToken uit de users-export halen laat beide
      toetsen zakken. Wat hij vergelijkt is een EXPORTLIJST tegen aanroepen in de

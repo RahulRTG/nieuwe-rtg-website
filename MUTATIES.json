@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T12:18:49.716Z",
-    "commit": "3ff6ecea",
+    "op": "2026-09-13T12:25:05.561Z",
+    "commit": "b1600666",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -168,16 +168,6 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 2
-    },
-    "afbouwafloop.test.js": {
-      "soort": "puur",
-      "staat": "geen bronmutatie mogelijk",
-      "reden": "de afbouwwet woont in scripts/ en niet in server/; vijf handmutaties, alle vijf raak (zie de kop hierboven)"
-    },
-    "afbouwketen.test.js": {
-      "soort": "puur",
-      "staat": "geen bronmutatie mogelijk",
-      "reden": "idem, met echte processen; de vijf handmutaties vonden er twee echte gaten mee (hartslag, PASSED-only)"
     },
     "afbouwpoort.test.js": {
       "soort": "puur",
@@ -557,11 +547,6 @@
       "module": "server/kern/rtmail.js",
       "operator": "return-weg",
       "gezakt": 8
-    },
-    "autonomiegrens.test.js": {
-      "soort": "puur",
-      "staat": "geen bronmutatie mogelijk",
-      "reden": "leest EXECUTION_MAP.json en ROLPROEF.json en geen servermodule; 0 mutaties geprobeerd (geen module gevonden). Toets 3 is de tegenproef: een blind pad autonoom maken laat de grens uitslaan"
     },
     "autoverkoop.test.js": {
       "soort": "server",
@@ -1051,6 +1036,11 @@
       "operator": "&&->||#0",
       "gezakt": 11,
       "geprobeerd": 4
+    },
+    "bewijsveld.test.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "een census over de registers tegen een verklaring van louter literalen; geen bronoperator raakt dat. De gevoeligheid is machinaal bewezen door de sabotagemotor: techniek-bewijsveld-een-relatie staat op RAAK"
     },
     "bezitsbewijs.test.js": {
       "soort": "puur",
@@ -2017,6 +2007,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "doctrine.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/doctrine.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "doelbinding.test.js": {
       "soort": "puur",
@@ -4896,6 +4894,14 @@
       "staat": "muteert zelf",
       "reden": "muteert zelf echte bestanden (waaronder MUTATIES.json) om meters te ijken"
     },
+    "meterwet.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/ijking.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "metier.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -5287,11 +5293,6 @@
       "operator": "===->!==#0",
       "gezakt": 2,
       "geprobeerd": 1
-    },
-    "ondernemerbewijs.test.js": {
-      "soort": "puur",
-      "staat": "geen bronmutatie mogelijk",
-      "reden": "leest registers en geen servermodule; 0 mutaties geprobeerd (geen module gevonden). De faalklasse staat in de toets zelf: vier tegenproeven op gemuteerde registers in een wegwerpmap, elk aantoonbaar raak"
     },
     "ondernemerpoort-e2e.test.js": {
       "soort": "server",
@@ -7957,14 +7958,6 @@
       "gezakt": 4,
       "geprobeerd": 1
     },
-    "supplier-activity.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/routes/supplier/tafels-team.js",
-      "operator": "&&->||#2",
-      "gezakt": 5,
-      "geprobeerd": 13
-    },
     "supplier-comm-mob-payroll.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -8539,6 +8532,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "verband.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/verband.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 5
     },
     "verblijf.test.js": {
       "soort": "server",
@@ -9187,6 +9188,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "wetrelatie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/wetrelatie.js",
+      "operator": "return-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "wetten.test.js": {
       "soort": "puur",

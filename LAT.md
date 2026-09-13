@@ -477,6 +477,101 @@ je niet hebt.
 `scripts/lib/werkstroom.js`; `--controle` zakt zodra de gewone ronde een poort
 niet meer bereikt) en `scripts/ci-keten.js`, die eist dat elke poort leesbaar
 genoeg blijft om hier na te spelen. Voor de mens die hem niet draait bestaat geen
+
+### 14. Een meter kent zijn eigen grens
+
+Een meter die uitspraken doet over onbekend terrein wordt eerst geijkt tegen
+beschikbare bekende waarheid. Is er geen grondwaarheid beschikbaar, dan zegt de
+meter dat expliciet en beperkt hij zijn conclusies tot wat hij daadwerkelijk
+heeft waargenomen.
+
+Regel 10 gaat over een meter die je niet hebt zien uitslaan. Regel 12 over een
+meting die niet heeft gedraaid. Dit is de derde in die familie en de stilste: een
+meter die WEL draait, WEL uitslaat en een overtuigend getal geeft -- terwijl
+niemand weet of hij het bewijsbare überhaupt ziet.
+
+*Het eerste geval, 13 september 2026:* `scripts/doctrine.js` telde harde
+uitspraken in de doctrine-documenten en meldde 1088 kandidaten. Een net getal,
+netjes uitgesplitst. Toen het tegen `WETTEN.json` werd gehouden -- vijftig
+uitspraken waarvan een mens al had vastgesteld dat ze hard zijn, met een
+handhaver en een sabotage eronder -- vond hij er **21**. Van de 29 die hij miste
+stond het anker van er 15 op een kop, 4 op een vette openingszin en 2 in een
+blokcitaat: drie plekken die hij per ontwerp niet las. Zonder die ijking had
+niemand het gemerkt, want er was niets om het getal tegen af te zetten.
+
+*Het tweede geval, dezelfde dag, en het is de scherpere:* `scripts/verband.js`
+vraagt of een onafhankelijke waarnemer de wet-wachter-randen terugvindt die
+`WETTEN.json` verklaart. Bij het narekenen is er een sensor toegevoegd die het
+veld `handhaver` teruggaf -- precies het veld dat hij moest reconstrueren. De
+uitslag sprong naar 56 van de 56. Honderd procent, en er was niets geleerd. Een
+meter die zijn eigen antwoord leest, ijkt zichzelf en is dan niet fout maar leeg
+-- en hij ziet er beter uit dan de eerlijke versie.
+
+*De helft die niet over percentages gaat.* Deze regel eist NIET dat elke meter
+een score haalt. Voor sommige verschijnselen bestaat geen menselijke catalogus om
+tegen te ijken, en zo'n meter is daarmee niet waardeloos. Hij mag alleen niet
+claimen wat hij niet kan weten: "gevonden: 37 kandidaten" is een waarneming,
+"dekt alle gevallen" is een dekkingsclaim, en die tweede vraagt een grondwaarheid.
+Wie geen grondwaarheid heeft, schrijft op waarom -- dat is een eerlijke stand en
+geen gat dat verstopt wordt, dezelfde vorm als het `mensenwerk` van `WETTEN.json`.
+
+*En de vloer hoort niet op het laatste getal te staan.* De ijking van de
+doctrinecompiler staat op 48 van de 50 en zijn ondergrens op 45; die van de
+verbandlaag op 54 van de 56 met een vloer van 50. Een NIEUWE wet waarvoor nog
+geen sensor bestaat is gewoon werk en mag binnenkomen. Wat niet mag is dat
+bekende zichtbaarheid stil verdwijnt.
+
+**Handhaver:** `scripts/lib/ijking.js` (welke meter tegen welke grondwaarheid is
+geijkt, of waarom er geen is) plus `test/meterwet.test.js`, dat drie dingen laat
+zakken: een meter met een dekkingsclaim die geen grondwaarheid verklaart, een
+`GEEN` zonder reden, en een verklaarde grondwaarheid waarvan de uitslag ontbreekt.
+Voor de mens die een hoog percentage leest en zich niet afvraagt waartegen het is
+gemeten, bestaat geen handhaver; daarvoor staat deze regel hier.
+
+### 15. Een bewijsveld draagt een bewijsrelatie
+
+Wanneer een veld meerdere semantisch verschillende relaties vertegenwoordigt,
+worden die relaties afzonderlijk benoemd en gemeten.
+
+Deze regel staat er pas nadat hij drie keer onafhankelijk is misgegaan, en de
+derde keer was de gevaarlijkste.
+
+*Een, 13 september 2026:* `handhaver` in `WETTEN.json` bleek twee dingen te
+betekenen. Van de 93 verklaarde randen wijzen er 57 naar een WACHTER (een toets
+die rood wordt) en 36 naar de IMPLEMENTATIE die de regel draagt. Een
+implementatiebestand kan de wet perfect dragen zonder ooit rood te worden, en
+een toets kan perfect rood worden zonder de implementatie te zijn. Die twee
+optellen tot "handhavers" telt appels bij peren.
+
+*Twee, dezelfde dag, in de meter die het eerste geval aanwees:* `isWachter` in
+`scripts/verband.js` besliste op het PAD -- alles onder `scripts/` was een
+wachter. Toen `scripts/lib/ijking.js` als handhaver in het register kwam,
+belandde een BIBLIOTHEEK in de wachter-bak: een bestand met besluiten dat niets
+uitvoert en dus nooit rood wordt. De aanwijzer maakte de fout die hij aanwees.
+
+*Drie, en deze kan valse dekking produceren:* het veld `bereik` draagt in de
+bewijsregisters drie betekenissen. In `MAGNAATLAB.json` is het wat de
+simulatielaag werkelijk RAAKT. In `TAALOORDEEL.json` is het *"waarover dit
+oordeel gaat"* -- de gelding. In `EXECUTION_MAP.json` is het wat een rol via het
+AI-stuur MAG. De eerste twee zijn de twee kanten van dezelfde vraag, en ze staan
+onder een naam: wie ze ooit optelt tot een dekkingsgetal, leest waargenomen reik
+als verklaarde gelding. Dat is geen telfout maar een bewering die niemand heeft
+gedaan.
+
+*Waarom dit geen naamgevingskwestie is.* Een veld met twee betekenissen is
+technisch correct en semantisch onjuist, en dat is precies de vorm die geen
+enkele toets ziet: het type klopt, de waarde klopt, de optelling klopt -- alleen
+de vraag die beantwoord wordt is een andere dan de gestelde. Dezelfde familie als
+`SEMANTIEK.json` meet voor constantennamen, hier op de bewijslaag.
+
+*Wat de regel NIET eist:* dat elk veld overal hetzelfde heet. `route` betekent in
+zeventien registers een HTTP-pad en dat is geen overbelasting maar consistentie.
+De regel bijt waar een naam twee verschillende RELATIES draagt binnen dezelfde
+bewijsvraag.
+
+**Handhaver:** `scripts/lib/bewijsvelden.js` (welk veld draagt welke relatie, en
+welke velden zijn aantoonbaar gesplitst) plus `test/bewijsveld.test.js`. Voor de
+mens die twee getallen optelt omdat ze dezelfde kop dragen, bestaat geen
 handhaver; daarvoor staat deze regel hier.
 
 ---
@@ -572,6 +667,8 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | geen bestand plukt een naam uit een bereik dat het niet heeft | `scripts/check.js` regel 51 |
 | WERELDLIJST.md loopt niet achter op het wereldregister | `scripts/check.js` regel 52 |
 | elk scherm is vanaf de bank te bereiken | `scripts/check.js` regel 53 |
+| elke meter met een dekkingsclaim is geijkt tegen bekende waarheid, of zegt waarom dat niet kan | `scripts/lib/ijking.js` + `test/meterwet.test.js` |
+| een bewijsveld draagt een bewijsrelatie; een gesplitst veld wordt apart benoemd en gemeten | `scripts/lib/bewijsvelden.js` + `test/bewijsveld.test.js` |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
 | nieuw werk op de norm, aangeraakt werk niet eronder (geen verrekening) | `scripts/deltapoort.js` |
 | een verlaging van de lat heeft een reden, een soort en een einde | `scripts/normverval.js` |

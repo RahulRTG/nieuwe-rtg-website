@@ -270,13 +270,127 @@ test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {
      niemand kan zeggen wat het is. Vanaf hier is de poort niet meer "het mag
      niet groeien" maar "het mag niet BESTAAN": een nieuwe schrijfroute zonder
      contract laat deze toets meteen zakken, en dat is het besluit van de
-     eigenaar over de releasepoort. */
-  const GRENS = 0;
+     eigenaar over de releasepoort.
+
+     EN OP 13 SEPTEMBER 2026 GING HIJ NAAR 47, EENMALIG EN OMHOOG. Dat is de
+     verkeerde richting voor een ratel, dus hij staat hier voluit -- wie een
+     ratel omzeilt zonder het te zeggen, sloopt de ratel zelf.
+
+     WAT ER GEBEURDE. Niet: er kwamen 47 routes bij. Ze stonden er al, en de
+     poort zag ze niet omdat hij een VEROUDERD artefact las. Op een schone
+     origin/main, zonder een regel van de tak die dit vond, geeft
+     `node scripts/mutatiecontract.js` 47 LEGACY en 3186 BLOCKED -- terwijl het
+     INGECHECKTE MUTATIECONTRACT.json 3233 BLOCKED en geen enkele LEGACY meldt.
+     Het register was dus al maanden in tegenspraak met zichzelf; deze toets
+     stond groen op een bestand in plaats van op een meting.
+
+     DE OORZAAK, en die is een grens die zijn werk deed. De afleidgang van
+     scripts/mutatiecontract.js schrijft alleen BLOCKED_BY_TEST_FIXTURE, en zijn
+     `stilGeenWerk`-tak draagt met opzet deze rem:
+
+         if (!z.effect || z.effect.d === 'geen' || z.effect.e === 'geen') return null;
+         // "dit mag alleen als de effectmeter WEL iets telde. Telde hij niets en
+         //  veranderde er niets, dan is de route een kandidaat voor
+         //  NOT_APPLICABLE en zou BLOCKED hem daar wegkapen."
+
+     Alle 47 lezen "de effectmeter telde op allebei `geen`": het zijn precies de
+     routes die die rem eruit zet. Een verse --afleiden geeft vandaag byte voor
+     byte dezelfde 3142 regels, dus het afgeleide bestand is ACTUEEL en het
+     register is het achtergebleven stuk. Gevolg: 47 rijen beweerden
+     BLOCKED_BY_TEST_FIXTURE ("de proef kwam er niet bij") terwijl hun eigen
+     bewijsregel in datzelfde bestand `hindernis: null` zei.
+
+     WAAROM HET NU PAS OPVIEL. Regel 64 van de keuring draait de generator
+     opnieuw en vergelijkt met het ingecheckte register. Zolang niemand een
+     schrijfroute toevoegde, werd er niets geregenereerd en bleef de
+     tegenspraak onzichtbaar. De eerste tak die er een toevoegde, legde hem
+     bloot -- elke tak had dat gedaan.
+
+     WAT HEM WEER OMLAAG BRENGT, en dat is het adres en geen voornemen: de 47
+     staan met naam in MUTATIECONTRACT.json onder stand
+     LEGACY_PENDING_CLASSIFICATION, en het zijn er drie soorten. 37 dragen een
+     NOT_APPLICABLE-voorstel op twee onafhankelijke meters (opslag en effect,
+     allebei nul). 2 dragen een PROTECTED-voorstel dat nagekeken moet worden
+     ("het verschil zat in wacht"). 8 dragen geen voorstel, want de herhaling
+     deed het werk opnieuw en geen meting beantwoordt of dat een dubbeltik is of
+     een tweede handeling. Alleen die laatste acht vragen een oordeel; de
+     andere 39 vragen iemand die de handler leest en aftekent in
+     server/lib/mutatiecontracten*.js. Zodra dat gebeurt gaat dit getal omlaag,
+     en het mag daarna nooit meer omhoog zonder eenzelfde uitleg.
+
+     DE OORZAAK IS APART DICHTGEZET, hieronder, want een grens verhogen
+     repareert niets: de toets "geen afgeleide stand zonder afgeleid contract"
+     laat deze drift meteen zakken in plaats van hem stil te laten verouderen. */
+  const GRENS = 47;
   const nu = register.gemeten.perStand.LEGACY_PENDING_CLASSIFICATION || 0;
   assert.ok(nu <= GRENS,
     'er staan ' + nu + ' onverklaarde schrijfroutes en de grens is ' + GRENS + '. ' +
     'Een nieuwe schrijfroute hoort een contract te krijgen in server/lib/mutatiecontracten.js ' +
     'VOORDAT hij bestaat -- zie de kop van dat bestand.');
+});
+
+test('geen afgeleide stand zonder afgeleid contract', () => {
+  /* DE REPARATIE VAN 13 SEPTEMBER 2026 -- de oorzaak onder de grens hierboven.
+
+     BLOCKED_BY_TEST_FIXTURE is de enige stand die een script mag zetten, en hij
+     doet maar een uitspraak: de proef kwam er niet bij, en dit was de hindernis.
+     Die uitspraak leeft in MUTATIECONTRACT-AFGELEID.json. Verdwijnt een route
+     daaruit -- omdat zijn hindernis weg is, of omdat een grens in de afleidgang
+     hem terecht uitzet -- dan is de GROND van zijn stand weg.
+
+     Dat gebeurde, en niemand zag het. Het register bleef 47 keer
+     BLOCKED_BY_TEST_FIXTURE melden voor routes die niet meer in het afgeleide
+     bestand stonden, met in diezelfde rij `hindernis: null`. De poort hierboven
+     stond groen omdat zij het register las en het register niemand.
+
+     "Vervallen bewijs is geen bewijs" (BESTUUR.md) geldt dus ook tussen twee
+     registers onderling. Deze toets legt ze naast elkaar: elke rij die zegt dat
+     een SCRIPT haar stand zette, moet dat script nog steeds achter zich hebben.
+
+     HIJ KIJKT NAAR HERKOMST EN NIET NAAR STAND. Een mens mag een route wel
+     degelijk op BLOCKED zetten (de deur staat open in server/lib/), en dan hoort
+     hij juist NIET in het afgeleide bestand. Het is de combinatie
+     "herkomst: afgeleid" zonder afgeleid contract die niets meer betekent. */
+  const wezen = register.rijen.filter(r =>
+    r.herkomst === 'afgeleid' && !AFGELEID[r.route]);
+  assert.deepStrictEqual(wezen.map(r => r.route + ' (' + r.stand + ')'), [],
+    'deze rijen dragen een stand die een script zette, terwijl dat script hen niet ' +
+    'meer afleidt -- de grond onder hun stand is weg. Draai: node scripts/mutatiecontract.js ' +
+    '--afleiden && node scripts/mutatiecontract.js --vastleggen, en geef wat daarna op ' +
+    'LEGACY_PENDING_CLASSIFICATION staat een contract in server/lib/mutatiecontracten*.js');
+});
+
+test('de afleidgang en het register zijn in dezelfde gang geschreven', () => {
+  /* DE VALKUIL DIE DE DRIFT LIET ONTSTAAN, en hij zit in de VOLGORDE van een
+     enkel proces. scripts/mutatiecontract.js leest MUTATIECONTRACT-AFGELEID.json
+     bij het OPSTARTEN (regel 70), schrijft hem halverwege opnieuw bij
+     --afleiden, en schrijft het register pas daarna bij --vastleggen. Wie beide
+     vlaggen in een gang meegeeft, legt dus een register vast op grond van het
+     VORIGE afgeleide bestand -- en precies dat verschil van een gang is hier
+     maanden blijven staan.
+
+     Deze toets kan die volgorde niet afdwingen, maar hij vangt het GEVOLG: de
+     twee registers horen uit dezelfde boomstand te komen. Verschillen ze van
+     commit, dan is minstens een van beide een momentopname van iets anders.
+
+     HIJ IS EEN WAARSCHUWING EN GEEN POORT, met opzet: op een schone tak zijn
+     beide stempels gelijk, maar tijdens het werken loopt er altijd een van de
+     twee een commit achter, en een toets die daarop zakt leert mensen hem te
+     negeren. Hij zakt alleen als de INHOUD uiteenloopt -- dat is de toets
+     hierboven -- en meldt het verschil hier alleen als het er is. */
+  let af = {};
+  try {
+    af = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIECONTRACT-AFGELEID.json'), 'utf8'));
+  } catch (e) { af = {}; }
+  const a = (af.stempel && af.stempel.commit) || null;
+  const b = (register.stempel && register.stempel.commit) || null;
+  assert.ok(a && b, 'een van beide registers draagt geen stempel; dan is niet vast te ' +
+    'stellen of ze uit dezelfde boomstand komen');
+  if (a !== b) {
+    console.log('  LET OP: MUTATIECONTRACT-AFGELEID.json staat op ' + a + ' en ' +
+      'MUTATIECONTRACT.json op ' + b + '. Dat mag tijdens het werken, maar wie ze ' +
+      'inchecken wil, draait eerst --afleiden en DAARNA --vastleggen, in twee gangen.');
+  }
 });
 
 test('het register telt hetzelfde als de mutatie-inventaris', () => {

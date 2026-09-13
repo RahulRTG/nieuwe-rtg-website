@@ -2,7 +2,18 @@
    publieke aanwezigheid, en de redactiehandeling van De Salon.
 
    Alle zes zijn gelezen en beproefd in test/aanwezigheid.test.js; wat daar per
-   route bewezen is, staat hieronder in `bewijs`. De twee die geen contract
+   route bewezen is, staat hieronder in `bewijs`.
+
+   EN NOT_APPLICABLE VRAAGT ER TWEE, GEEN VAN BEIDE IN PLAATS VAN DE ANDERE. De eerste versie van deze twee
+   leesroutes droeg alleen `nagekeken` en geen `bewijs`; de reparatie daarna
+   verving het ene door het andere en ruilde zo de ene fout voor de andere.
+
+   Ze zeggen namelijk iets ANDERS, en allebei is het nodig. `bewijs.gemeten` +
+   `bewijs.op` is wat de MACHINE zag. `nagekeken` is wie het gat sloot dat de
+   opslagmeter structureel niet kan zien: die kijkt alleen naar collecties in de
+   database, en een bestand, een externe dienst of een teller daarbuiten ontgaat
+   hem. Een leesroute die "schrijft niets" beweert, leunt precies op dat blinde
+   stuk -- dus moet er een mens bij staan die de handler heeft gelezen. De twee die geen contract
    vanzelf spreken zijn de laatste twee, en hun stand is met opzet `PROTECTED`
    en niet `idempotent`: een tweede uitlichting wordt GEWEIGERD (409), en dat is
    een toestandscontrole en geen idempotentie -- MUTATIECONTRACT.md zegt met
@@ -32,14 +43,16 @@ module.exports = { CONTRACTEN: {
     mutatieId: 'mediaos.aanwezig.mijn', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
     toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
-    nagekeken: 'Claude, 2026-09-13: leest db.data.mediaVolgt en schrijft niets; de handler roept alleen aanwezigMijn().',
+    bewijs: BEWIJS('leest db.data.mediaVolgt en schrijft niets; de handler roept alleen aanwezigMijn() aan'),
+    nagekeken: 'Claude, 2026-09-13: de handler las ik regel voor regel -- hij roept alleen aanwezigMijn() aan, die uitsluitend leest. Geen bestand, geen externe dienst, geen teller buiten de database.',
     afgetekend: AFGETEKEND
   },
   'POST /api/mediaos/aanwezig': {
     mutatieId: 'mediaos.aanwezig.een', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
     toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
-    nagekeken: 'Claude, 2026-09-13: leest een aanwezigheid plus of dit lid hem volgt; schrijft niets.',
+    bewijs: BEWIJS('leest een aanwezigheid plus of dit lid hem volgt, en schrijft niets'),
+    nagekeken: 'Claude, 2026-09-13: de handler las ik regel voor regel -- aanwezigMet() en aanwezigVolgtHij(), allebei lezend. Geen bestand, geen externe dienst, geen teller buiten de database.',
     afgetekend: AFGETEKEND
   },
   /* Het redactiebord leest, maar het projecteert ook: een uitlichting waarvan de

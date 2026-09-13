@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-13T09:36:44.348Z",
-  "commit": "a7dd3dac",
-  "boomVuil": false,
-  "boomAnders": 3,
+  "op": "2026-09-13T14:48:59.074Z",
+  "commit": "8b91a4a7",
+  "boomVuil": true,
+  "boomAnders": 6,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
@@ -38006,7 +38006,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -38027,7 +38027,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -38048,7 +38048,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "velden",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": "geen anonieme demo-gast",
@@ -64046,7 +64046,7 @@
    "semantiek": {
     "klasse": "hooguitEens"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "velden",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -64067,7 +64067,7 @@
    "semantiek": {
     "klasse": "idempotent"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "leest",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,
@@ -64088,7 +64088,7 @@
    "semantiek": {
     "klasse": "hooguitEens"
    },
-   "duplicaatregel": null,
+   "duplicaatregel": "velden",
    "toegang": {
     "waargenomen": "AUTHENTICATED",
     "uitHandler": null,

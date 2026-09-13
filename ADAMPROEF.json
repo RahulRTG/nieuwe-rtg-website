@@ -11,7 +11,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Zilveren Hert CEE1",
+      "ziet": "groep \"jong\" (17 jaar -> jong, 16 t/m 21), codenaam Paarse Bever B2BF",
       "fout": null,
       "ms": 0
     },
@@ -24,7 +24,7 @@
       "stand": "openBekend",
       "status": 401,
       "antwoord": "Niet ingelogd.",
-      "ms": 4
+      "ms": 5
     },
     {
       "nr": 3,
@@ -36,7 +36,7 @@
       "status": 200,
       "ziet": "3 wegen, volgorde ongewijzigd: true, geblokkeerde weg blijft staan met \"heb ik een startkwalificatie\"",
       "fout": null,
-      "ms": 8
+      "ms": 6
     },
     {
       "nr": 4,
@@ -47,7 +47,7 @@
       "stand": "openBekend",
       "status": 400,
       "antwoord": "Welke manieren zijn er? Zonder manieren valt er niets te vergelijken.",
-      "ms": 2
+      "ms": 4
     },
     {
       "nr": 5,
@@ -57,9 +57,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "vacature ca6708aa, minimumleeftijd 16",
+      "ziet": "vacature 8b44af6f, minimumleeftijd 16",
       "fout": null,
-      "ms": 9
+      "ms": 5
     },
     {
       "nr": 6,
@@ -71,7 +71,7 @@
       "status": 200,
       "ziet": "1 vacatures zichtbaar, magSolliciteren: true",
       "fout": null,
-      "ms": 10
+      "ms": 4
     },
     {
       "nr": 7,
@@ -83,7 +83,7 @@
       "status": 200,
       "ziet": "aangenomen door de route: true",
       "fout": null,
-      "ms": 9
+      "ms": 8
     },
     {
       "nr": 8,
@@ -93,9 +93,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "sollicitatie bb9b7b8e, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
+      "ziet": "sollicitatie b0b78b52, status \"nieuw\", lekt herkomst: false, ziet viaRTG: true",
       "fout": null,
-      "ms": 10
+      "ms": 13
     },
     {
       "nr": 9,
@@ -107,19 +107,19 @@
       "status": 200,
       "ziet": "Adam ziet status \"uitgenodigd\" bij Cafe Brisa",
       "fout": null,
-      "ms": 20
+      "ms": 22
     },
     {
       "nr": 10,
       "van": "werkgever",
       "naar": "Adam",
       "wat": "neemt hem aan; Adam hoort dat, en hoeft er niet zelf naar te zoeken",
-      "bekend": "WAT ONTBREEKT: een melding in de app aan een sollicitant uit een RTF-gezin. WAAROM: kern/werk.js regel 160 stopt met `if (!a.key) return`, en `a.key` is een lidsessiesleutel; de rij die routes/member/werk/rtf.js aanmaakt draagt `rtf: { code, profielId }` en geen key. De stand WORDT bijgewerkt, dus hij kan het zien als hij kijkt -- hij wordt alleen niet gehaald. WIE EROVER GAAT: dit is geen besluit maar een gat, en het is dezelfde vorm als de reparatie van 10 september (TRAVELCOMMERCE.md par. 9a, opzet/meldaan.js): een persoonlijk bericht hoort op de sleutel van de ontvanger, en het gezin heeft een andere sleutel dan een lid.",
-      "stand": "openBekend",
+      "bekend": null,
+      "stand": "gesloten",
       "status": 200,
-      "ziet": "stand bij Adam: \"aangenomen\", ongelezen berichten in het gezin: 0",
+      "ziet": "stand bij Adam: \"aangenomen\", bericht op zijn bord: \"Aangenomen bij Cafe Brisa -- Uw personeelsuitnodiging staat ...\" van RTG, ongelezen: true",
       "fout": null,
-      "ms": 16
+      "ms": 21
     },
     {
       "nr": 11,
@@ -131,7 +131,7 @@
       "status": 200,
       "ziet": "blijft staan: Keukenhulp bij Cafe Brisa (aangenomen)",
       "fout": null,
-      "ms": 1
+      "ms": 2
     }
   ],
   "storingen": [
@@ -198,9 +198,9 @@
   },
   "telling": {
     "schakels": 11,
-    "gesloten": 8,
+    "gesloten": 9,
     "open": 0,
-    "openBekend": 3,
+    "openBekend": 2,
     "stuk": 0,
     "storingen": 9,
     "gehouden": 9,
@@ -224,14 +224,6 @@
       "wat": "noemt alleen een doel; iets in dit huis levert de mogelijke wegen aan",
       "gemeten": "Welke manieren zijn er? Zonder manieren valt er niets te vergelijken.",
       "reden": "WAT ONTBREEKT: een bron die uit een doel de MANIEREN samenstelt. kern/knelpunt/ rekent ze door, maar krijgt ze van de aanroeper -- en /api/knelpunt heeft nul aanroepers (geen scherm in public/, geen module in server/; alleen de route, lib/mutatiecontracten-knelpunt.js, lib/idemsleutels-bescherming.js en functies/register/cat-life.js noemen het pad). WAAROM: de motor is met opzet een rekenmachine en geen zoeker -- hij mag niet rangschikken en niets weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. De aanvoer hoort ernaast te staan en niet erin. WIE EROVER GAAT: de eigenaar. Dit is de kern van het voorstel voor een kansengraaf: kern/knelpunt/openingen-kaart.js dekt vandaag 5 terreinen (werk, opleiding, opvang, vervoer, wonen) en die kaart geeft INGANGEN bij een knelpunt, geen wegen bij een doel."
-    },
-    {
-      "schakel": 10,
-      "van": "werkgever",
-      "naar": "Adam",
-      "wat": "neemt hem aan; Adam hoort dat, en hoeft er niet zelf naar te zoeken",
-      "gemeten": "stand bij Adam: \"aangenomen\", ongelezen berichten in het gezin: 0",
-      "reden": "WAT ONTBREEKT: een melding in de app aan een sollicitant uit een RTF-gezin. WAAROM: kern/werk.js regel 160 stopt met `if (!a.key) return`, en `a.key` is een lidsessiesleutel; de rij die routes/member/werk/rtf.js aanmaakt draagt `rtf: { code, profielId }` en geen key. De stand WORDT bijgewerkt, dus hij kan het zien als hij kijkt -- hij wordt alleen niet gehaald. WIE EROVER GAAT: dit is geen besluit maar een gat, en het is dezelfde vorm als de reparatie van 10 september (TRAVELCOMMERCE.md par. 9a, opzet/meldaan.js): een persoonlijk bericht hoort op de sleutel van de ontvanger, en het gezin heeft een andere sleutel dan een lid."
     }
   ]
 }

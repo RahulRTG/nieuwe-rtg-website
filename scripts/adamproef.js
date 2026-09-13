@@ -111,6 +111,20 @@ async function sollicitatiesVanAdam(basis, code, token) {
    mismatch verbergt is erger dan geen fallback. Beide zijn hier weg. */
 const rijVan = (lijst, func) => lijst.find(x => x.func === func) || null;
 
+/* Het BORD van het gezin, waar een bericht van RTG landt. LET OP DE METHODE:
+   /gezin/:code/berichten is een GET en niet een POST, net als /gezin/:code/mij.
+   Dat kostte een ronde: schakel 10 postte naar /mij, kreeg een antwoord zonder
+   `ongelezen`, las dat als 0 en meldde dat Adam niets hoorde -- terwijl het
+   bericht er gewoon stond. Een verkeerde methode geeft hier geen fout maar een
+   ANDER antwoord, en dat is precies hoe een meetfout als uitslag passeert. */
+async function berichtenVanAdam(basis, code, token) {
+  const r = await fetch(basis + '/api/foundation/gezin/' + code + '/berichten',
+    { headers: { Authorization: 'Bearer ' + token } }).catch(() => null);
+  if (!r) return [];
+  const d = await r.json().catch(() => null);
+  return (d && d.berichten) || [];
+}
+
 /* Wat de WERKGEVER van zijn sollicitaties ziet. Let op dat dit /api/supplier/
    state is en niet /api/supplier/apply: die tweede is de PUBLIEKE route waarmee
    iemand van buiten solliciteert, en hij heeft geen leverancierssessie nodig.
@@ -384,47 +398,38 @@ async function loop(basis, uit) {
         wat: s ? 'Adam ziet status "' + s.status + '" bij ' + (s.bedrijf || '?') : 'Adam ziet zijn sollicitatie niet' };
     });
 
-  /* 10 -- DE WERKGEVER NEEMT AAN, EN KRIJGT ADAM BERICHT?
+  /* 10 -- DE WERKGEVER NEEMT AAN, EN ADAM WORDT GEHAALD.
 
-     DIT IS DE TWEEDE SCHAKEL DIE NAAR VERWACHTING NIET SLUIT, en hij komt uit
-     het lezen van kern/werk.js:160. `notifyApplicant` doet:
+     DIT WAS DE DERDE BEVINDING VAN DE EERSTE RONDE, EN ZIJ IS GEREPAREERD.
+     `notifyApplicant` in kern/werk.js stopte met `if (!a.key) return`; `a.key`
+     is een LIDsessiesleutel en de rij die routes/member/werk/rtf.js aanmaakt
+     draagt `rtf: { code, profielId }`. Een aangenomen zeventienjarige hoorde
+     dus niets -- zijn stand werd wel bijgewerkt, dus hij kon het zien als hij
+     keek, maar hij werd niet gehaald.
 
-         if (!a.key) return;
+     De reparatie is met opzet GEEN tweede tak voor RTF: kern/ontvanger.js stelt
+     de vraag zelf (welke wegen heeft deze ontvanger, en wat gebeurde er met
+     elk), zodat de volgende vorm niet opnieuw stil wegvalt. De gezinsweg loopt
+     via foundation/systeembericht.js naar het gezinsbord en NIET naar
+     db.data.notifications -- die bak heeft aan de foundation-kant nul lezers,
+     en daarheen schrijven zou het dode spoor een deur verder verplaatsen.
 
-     `a.key` is de sleutel van een RTG-LIDsessie. De rij die routes/member/
-     werk/rtf.js aanmaakt heeft dat veld niet -- hij draagt `viaRTF: true` en
-     `rtf: { code, profielId }`. Een sollicitant uit een gezin krijgt dus geen
-     melding in de app; alleen een e-mail, en alleen als zijn contactveld op een
-     e-mailadres lijkt.
-
-     DIT IS EXACT DE VORM DIE OP 10 SEPTEMBER AL EEN KEER IS GEREPAREERD.
-     TRAVELCOMMERCE.md par. 9a: notify() schreef op TIER terwijl een persoonlijk
-     bericht op de SLEUTEL van het lid hoort -- "ook dat van een aangenomen
-     sollicitant". Die reparatie ging over leden. Deze kant, het gezin, bleef
-     staan. Dezelfde fout, een deur verder.
-
-     MEET WAT ER WEL IS en niet alleen wat er niet is: de STAND bij Adam wordt
-     wel bijgewerkt. Hij kan het zien als hij kijkt; hij wordt niet gehaald. */
+     Deze schakel meet de UITKOMST en niet de code: staat er een bericht van
+     RTG op het bord van Adam, ongelezen, en is het aan hem gericht? */
   await stap(
-    schakel(10, 'werkgever', 'Adam', 'neemt hem aan; Adam hoort dat, en hoeft er niet zelf naar te zoeken',
-      'WAT ONTBREEKT: een melding in de app aan een sollicitant uit een RTF-gezin. ' +
-      'WAAROM: kern/werk.js regel 160 stopt met `if (!a.key) return`, en `a.key` is een lidsessiesleutel; ' +
-      'de rij die routes/member/werk/rtf.js aanmaakt draagt `rtf: { code, profielId }` en geen key. ' +
-      'De stand WORDT bijgewerkt, dus hij kan het zien als hij kijkt -- hij wordt alleen niet gehaald. ' +
-      'WIE EROVER GAAT: dit is geen besluit maar een gat, en het is dezelfde vorm als de reparatie van ' +
-      '10 september (TRAVELCOMMERCE.md par. 9a, opzet/meldaan.js): een persoonlijk bericht hoort op de ' +
-      'sleutel van de ontvanger, en het gezin heeft een andere sleutel dan een lid.'),
+    schakel(10, 'werkgever', 'Adam', 'neemt hem aan; Adam hoort dat, en hoeft er niet zelf naar te zoeken'),
     () => P('/api/supplier/apply/decide', { id: sollId, action: 'aannemen' }, S),
     async () => {
-      const s = rijVan(await sollicitatiesVanAdam(basis, w.code, w.adam.token), 'Keukenhulp');
-      const stand = s && s.status;
-      /* De vraag is niet of de stand klopt maar of Adam GEHAALD wordt. Het
-         gezin heeft een berichtenbak (g.berichten); daar hoort dit in te
-         landen zoals het bij een lid in /api/notifications landt. */
-      const bak = await P('/api/foundation/gezin/' + w.code + '/mij', {}, w.adam.token);
-      const ongelezen = (bak.data && bak.data.ongelezen) || 0;
-      return { klopt: stand === 'aangenomen' && ongelezen > 0,
-        wat: 'stand bij Adam: "' + stand + '", ongelezen berichten in het gezin: ' + ongelezen };
+      const s2 = rijVan(await sollicitatiesVanAdam(basis, w.code, w.adam.token), 'Keukenhulp');
+      const bord = await berichtenVanAdam(basis, w.code, w.adam.token);
+      /* Aan HEM gericht en niet aan het gezin: of een zeventienjarige is
+         aangenomen is zijn nieuws. `vanMij` vals bewijst dat de afzender het
+         huis is en geen gezinslid. */
+      const bericht = bord.find(b => b.naar === w.adam.id && b.vanMij === false && /aangenomen/i.test(b.tekst || ''));
+      return { klopt: s2 && s2.status === 'aangenomen' && !!bericht && bericht.gelezen === false,
+        wat: 'stand bij Adam: "' + (s2 && s2.status) + '", bericht op zijn bord: ' +
+          (bericht ? '"' + String(bericht.tekst).slice(0, 60) + '..." van ' + bericht.vanNaam +
+            ', ongelezen: ' + (bericht.gelezen === false) : 'geen') };
     });
 
   /* 11 -- DE UITKOMST KOMT TERUG BIJ ADAM. De laatste schakel van elke keten in

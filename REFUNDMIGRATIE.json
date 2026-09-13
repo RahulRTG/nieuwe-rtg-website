@@ -1,0 +1,610 @@
+{
+ "stempel": {
+  "op": "2026-09-13T20:19:19.582Z",
+  "commit": "05144240f",
+  "boomVuil": true,
+  "boomAnders": 12,
+  "instrument": "scripts/refundmigratie.js",
+  "node": "v24.18.0"
+ },
+ "soort": "meting",
+ "uitleg": "Welke lezer van een betaalstand (`paid`) kan mee naar de tegenboeking. Orders zijn om; rides, tickets en boekingen niet. Dit telt de lezers en wijst ze aan; het VERKLAART ze niet -- een lezer staat op onbekend tot iemand hem met de hand heeft ingedeeld.",
+ "grens": "De toewijzing van een bestand aan een collectie is lexicaal en dus een BOVENgrens: een bestand dat twee collecties noemt, staat bij allebei. Elke rij draagt daarom zijn `bereik` -- `venster` is toegewezen uit vijftien regels rond de treffer en is scherp, `bestand` uit het hele bestand en is ruim. Het zegt ook niets over of een verklaring KLOPT -- alleen dat de plek nog bestaat. En het ziet geen lezer die de betaalstand via een hulpfunctie leest zonder `.paid` te noemen; dat is een ONDERgrens die naast de bovengrens staat en er niet tegen wegvalt.",
+ "perCollectie": {
+  "orders": {
+   "verklaard": 19,
+   "onbekend": 18,
+   "om": 11,
+   "geenWerk": 8,
+   "scherm": 7
+  },
+  "rides": {
+   "verklaard": 0,
+   "onbekend": 4,
+   "om": 0,
+   "geenWerk": 0,
+   "scherm": 0
+  },
+  "tickets": {
+   "verklaard": 0,
+   "onbekend": 13,
+   "om": 0,
+   "geenWerk": 0,
+   "scherm": 2
+  },
+  "boekingen": {
+   "verklaard": 0,
+   "onbekend": 20,
+   "om": 0,
+   "geenWerk": 0,
+   "scherm": 3
+  }
+ },
+ "verklaard": [
+  {
+   "bestand": "server/kern/ervaring/leden/annuleren.js",
+   "treffers": 6,
+   "laag": "server",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "grendel",
+   "stand": "om",
+   "wat": "de tweede terugstortweg: het LID annuleert",
+   "gedaan": "zet `paid` niet meer op false, anders gaf dezelfde gebeurtenis twee cijfers al naar gelang wie annuleerde"
+  },
+  {
+   "bestand": "server/kern/eten/orderbeeld-legacy.js",
+   "treffers": 3,
+   "laag": "server",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "toont",
+   "stand": "om",
+   "wat": "betaald/openstaand bedrag op het orderbeeld",
+   "gedaan": "beide nul bij een terugstorting; een teruggestorte bon is niet betaald en ook niet openstaand"
+  },
+  {
+   "bestand": "server/kern/fiscaal/index.js",
+   "treffers": 2,
+   "laag": "server",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "telt",
+   "stand": "om",
+   "wat": "de omzet van de maand, en sinds deze ronde de tegenboeking ernaast",
+   "gedaan": "telt twee gebeurtenissen per bon: de verkoop op paidAt, de terugstorting negatief op refundedAt"
+  },
+  {
+   "bestand": "server/kern/kantoor/index.js",
+   "treffers": 2,
+   "laag": "server",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "telt",
+   "stand": "geen-werk",
+   "wat": "omzet in het kantoorbeeld",
+   "gedaan": "sloot `terugbetaald` al uit via de status en bewoog vanzelf mee"
+  },
+  {
+   "bestand": "server/kern/kantoor/metrics.js",
+   "treffers": 4,
+   "laag": "server",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "telt",
+   "stand": "geen-werk",
+   "wat": "lopende bestellingen in de kantoormeters",
+   "gedaan": "filtert op status nieuw/in bereiding; een terugstorting zet die op terugbetaald"
+  },
+  {
+   "bestand": "server/kern/lidacties/betalen.js",
+   "treffers": 4,
+   "laag": "server",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "grendel",
+   "stand": "om",
+   "wat": "weigert een tweede betaling van dezelfde bon",
+   "gedaan": "de `refunded`-grendel staat nu VOOR die op `paid`, anders leest een teruggestorte bon als \"Al betaald\""
+  },
+  {
+   "bestand": "server/kern/live.js",
+   "treffers": 2,
+   "laag": "server",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "toont",
+   "stand": "om",
+   "wat": "de betaalstand in de live-stand van het lid",
+   "gedaan": "leest nu `paid && !refunded`; anders zag het lid \"betaald\" bij een teruggestorte bon"
+  },
+  {
+   "bestand": "server/routes/member/zakelijk.js",
+   "treffers": 2,
+   "laag": "server",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "telt",
+   "stand": "om",
+   "wat": "de zakelijke horeca-uitgaven van een lid",
+   "gedaan": "sluit `refunded` uit; een teruggestorte bon is geen uitgave meer"
+  },
+  {
+   "bestand": "server/routes/office/toegang.js",
+   "treffers": 7,
+   "laag": "server",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "toont",
+   "stand": "om",
+   "wat": "de projectie onder de kantoortijdlijn",
+   "gedaan": "stuurt sinds deze ronde `teruggestort`; zonder dat veld KON het scherm de waarheid niet tonen"
+  },
+  {
+   "bestand": "server/routes/supplier/backoffice.js",
+   "treffers": 3,
+   "laag": "server",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "telt",
+   "stand": "geen-werk",
+   "wat": "betaalde bestellingen in de backoffice van een zaak",
+   "gedaan": "idem: sluit `terugbetaald` al uit via de status"
+  },
+  {
+   "bestand": "server/routes/supplier/orders/afhandeling.js",
+   "treffers": 3,
+   "laag": "server",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "grendel",
+   "stand": "om",
+   "wat": "de terugstortroute van de zaak",
+   "gedaan": "de grendel hangt nu aan `refunded`; hing hij aan `paid`, dan kon dezelfde bon twee keer geld terugsturen"
+  },
+  {
+   "bestand": "server/routes/supplier/pda/vloer.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "toont",
+   "stand": "geen-werk",
+   "wat": "trage tafels op de PDA",
+   "gedaan": "filtert op status nieuw/in bereiding en beweegt daarom vanzelf mee"
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-20.js",
+   "treffers": 4,
+   "laag": "scherm",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "toont",
+   "stand": "geen-werk",
+   "wat": "de bestellingen van het lid ter plaatse",
+   "gedaan": "filtert status `terugbetaald` weg voordat het `paid` leest"
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-43.js",
+   "treffers": 7,
+   "laag": "scherm",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "telt",
+   "stand": "om",
+   "wat": "de betaalgeschiedenis van een gratis gebruiker",
+   "gedaan": "telde het teruggestorte bedrag bij wat je hebt betaald; er zijn nu drie bakken (betaald, open, teruggestort)"
+  },
+  {
+   "bestand": "public/apps/backoffice/backoffice-04.js",
+   "treffers": 2,
+   "laag": "scherm",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "toont",
+   "stand": "om",
+   "wat": "betaald/onbetaald op de kantoortijdlijn",
+   "gedaan": "zei \"betaald\" naast een status \"terugbetaald\"; toont nu de derde stand uit `teruggestort`"
+  },
+  {
+   "bestand": "public/apps/leverancier/leverancier-03b.js",
+   "treffers": 1,
+   "laag": "scherm",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "toont",
+   "stand": "geen-werk",
+   "wat": "de kolom \"betaald\" in de bonnenexport",
+   "gedaan": "blijft `ja`, en dat is juist: er IS betaald. De kolom `status` ernaast draagt `terugbetaald`"
+  },
+  {
+   "bestand": "public/apps/leverancier/leverancier-08.js",
+   "treffers": 1,
+   "laag": "scherm",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "toont",
+   "stand": "geen-werk",
+   "wat": "de bonnen op het keuken- en barscherm",
+   "gedaan": "krijgt alleen open bonnen: leverancier-09 filtert `terugbetaald` weg"
+  },
+  {
+   "bestand": "public/apps/leverancier/leverancier-58.js",
+   "treffers": 1,
+   "laag": "scherm",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "telt",
+   "stand": "om",
+   "wat": "\"Ontvangen\" op het beginscherm van de ondernemer",
+   "gedaan": "telde een teruggestorte bon mee in de ontvangen omzet -- stil, want er stond gewoon een bedrag; leest nu `paid && !refunded`"
+  },
+  {
+   "bestand": "public/apps/leverancier/leverancier-59.js",
+   "treffers": 3,
+   "laag": "scherm",
+   "bereik": "venster",
+   "collectie": "orders",
+   "soort": "toont",
+   "stand": "geen-werk",
+   "wat": "de betaalpil en de terugstortknop bij een bon van de zaak",
+   "gedaan": "las `refunded` al -- dit is het scherm waar de terugstorting vandaan komt"
+  }
+ ],
+ "onbekend": [
+  {
+   "bestand": "server/archief.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders",
+    "tickets"
+   ]
+  },
+  {
+   "bestand": "server/db/tx/pgachter.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders"
+   ]
+  },
+  {
+   "bestand": "server/db/tx/rij.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "tickets"
+   ]
+  },
+  {
+   "bestand": "server/db/tx/sqliteachter.js",
+   "treffers": 2,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders"
+   ]
+  },
+  {
+   "bestand": "server/kern/bezorgvolg.js",
+   "treffers": 2,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders"
+   ]
+  },
+  {
+   "bestand": "server/kern/care/leden.js",
+   "treffers": 3,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/kern/care/zaak.js",
+   "treffers": 4,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/kern/ervaring/leden/spaarpot.js",
+   "treffers": 4,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders"
+   ]
+  },
+  {
+   "bestand": "server/kern/ghost.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "rides",
+    "tickets",
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/kern/klantenboek.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders"
+   ]
+  },
+  {
+   "bestand": "server/kern/leverancier/zaak.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders",
+    "tickets",
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/kern/lidacties/rekening.js",
+   "treffers": 2,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders"
+   ]
+  },
+  {
+   "bestand": "server/kern/lidacties/ritten.js",
+   "treffers": 3,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders",
+    "rides"
+   ]
+  },
+  {
+   "bestand": "server/kern/lidacties.js",
+   "treffers": 2,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "tickets",
+    "boekingen",
+    "orders"
+   ]
+  },
+  {
+   "bestand": "server/kern/onderneming/dagbeeld.js",
+   "treffers": 2,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders",
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/kern/onderneming/klussen.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/kern/reiswereld-bronnen-partner.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "tickets",
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/kern/tafelticket.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders",
+    "tickets"
+   ]
+  },
+  {
+   "bestand": "server/kern/vakwerk/index.js",
+   "treffers": 3,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/kern/zaakcommand/signalen.js",
+   "treffers": 3,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders",
+    "rides",
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/routes/member/kopen/tickets.js",
+   "treffers": 3,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "rides",
+    "tickets",
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/routes/member/voertuigen/charter.js",
+   "treffers": 2,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/routes/member/voertuigen/huur.js",
+   "treffers": 2,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/routes/supplier/bezorg.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders"
+   ]
+  },
+  {
+   "bestand": "server/routes/supplier/charter/reis.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "bestand",
+   "collecties": [
+    "orders"
+   ]
+  },
+  {
+   "bestand": "server/routes/supplier/charter/vloot.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/routes/supplier/kassa/afrekenen.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders",
+    "tickets"
+   ]
+  },
+  {
+   "bestand": "server/routes/supplier/kassa/innen.js",
+   "treffers": 4,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "orders"
+   ]
+  },
+  {
+   "bestand": "server/routes/supplier/tickets-dicht.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "tickets",
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/routes/supplier/tickets.js",
+   "treffers": 2,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "tickets",
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "server/routes/supplier/verhuur/rit.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "bestand",
+   "collecties": [
+    "orders"
+   ]
+  },
+  {
+   "bestand": "server/routes/supplier/verhuur/vloot.js",
+   "treffers": 1,
+   "laag": "server",
+   "bereik": "venster",
+   "collecties": [
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-13.js",
+   "treffers": 2,
+   "laag": "scherm",
+   "bereik": "bestand",
+   "collecties": [
+    "tickets",
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-21.js",
+   "treffers": 1,
+   "laag": "scherm",
+   "bereik": "venster",
+   "collecties": [
+    "boekingen"
+   ]
+  },
+  {
+   "bestand": "public/apps/app-main/app-main-45.js",
+   "treffers": 1,
+   "laag": "scherm",
+   "bereik": "bestand",
+   "collecties": [
+    "tickets"
+   ]
+  },
+  {
+   "bestand": "public/apps/foundation/zorg-hulp-weergave.js",
+   "treffers": 2,
+   "laag": "scherm",
+   "bereik": "venster",
+   "collecties": [
+    "boekingen"
+   ]
+  }
+ ],
+ "verdwenen": [],
+ "telling": {
+  "bestanden": 58,
+  "verklaard": 19,
+  "onbekend": 36,
+  "verdwenen": 0,
+  "server": 44,
+  "scherm": 11,
+  "scherp": 51,
+  "ruim": 4
+ }
+}

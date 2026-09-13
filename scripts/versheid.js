@@ -440,6 +440,7 @@ const REGISTERS = [
   ['KETENVORM.json', 'npm run ketenvorm:vast', 'wat de vier gouden ketens werkelijk delen (actoren, beloften)'],
   ['DOODSPOOR.json', 'npm run doodspoor:vast', 'of een handeling ergens AANKOMT, of een verklaring draagt waarom niet'],
   ['DOORWERKING.json', 'npm run doorwerking:vast', 'of een gegeven dat een keer is opgegeven doorwerkt, met doel en actualiteit'],
+  ['REFUNDMIGRATIE.json', 'npm run refundmigratie:vast', 'welke lezers van een betaalstand mee kunnen naar de tegenboeking'],
   ['RITMIGRATIE.json', 'npm run ritmigratie:vast', 'welke lezers van db.data.rides wanneer naar de opdrachtwereld kunnen'],
   ['CODEWERELD.json', 'node scripts/codewereld.js --vastleggen', 'wat de registers samen over deze code beweren'],
   /* Het tekstoppervlak veroudert bij elke merge die schermen meebrengt, en

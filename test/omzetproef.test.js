@@ -86,18 +86,45 @@ test('B1. de btw-categorie hangt nog aan de WERKPLEK en niet aan het product', (
   assert.ok(u.bevindingen.some(b => b.schakel === 5), 'de bevinding staat niet meer in de lijst');
 });
 
-test('B2. een terugstorting WIST de verkoop uit zijn eigen maand', () => {
-  /* financeVoor telt op `o.paid` en /api/supplier/refund zet die op false. De
-     omzet van een maand die al voorbij is, verandert dus met terugwerkende
-     kracht -- en of er nooit verkocht is, of verkocht en teruggestort, is uit
-     de cijfers niet meer te lezen. Besluit van de eigenaar: tegenboeking met
-     een eigen datum, of wissen? */
+test('B2. een terugstorting is een TEGENBOEKING en wist de verkoop niet', () => {
+  /* DIT WAS EEN BEVINDING EN IS NU EEN EIS. De eigenaar heeft besloten: een
+     eenmaal geboekte verkoop is historische waarheid, en een terugbetaling is
+     een nieuwe economische gebeurtenis die ernaar verwijst. Netto kan het nul
+     worden; de geschiedenis blijft heel.
+
+     Daarvoor gold `o.paid = false` en verdween de verkoop uit zijn eigen maand,
+     ook als die maand al was aangegeven. Gemeten: 45,00 -> 0,00. */
   const u = lees('OMZETPROEF.json');
   assert.ok(u.refund, 'de refund-meting is uit de proef verdwenen');
-  assert.equal(u.refund.vorm, 'wissen',
-    'de vorm van een terugstorting is veranderd naar `' + u.refund.vorm + '` -- als dat een BESLUIT was ' +
-    '(tegenboeking in plaats van wissen), werk deze toets dan bij met de reden in de commit');
-  assert.ok(u.bevindingen.some(b => b.schakel === 'storing 2'));
+  assert.equal(u.refund.vorm, 'tegenboeking',
+    'een terugstorting is weer iets anders dan een tegenboeking geworden: ' + u.refund.vorm);
+  assert.equal(u.refund.verkoopBlijft, true, 'de verkoop staat niet meer in de boeken na een terugstorting');
+  assert.equal(u.refund.eigenDatum, true, 'de terugstorting draagt geen eigen datum; dan is hij niet in zijn EIGEN maand te boeken');
+  assert.equal(u.refund.nettoEffect, u.bruto, 'netto daalt de maand niet met het verkochte bedrag');
+  assert.ok(!u.bevindingen.some(b => b.schakel === 'storing 2'),
+    'de refund staat weer als open bevinding genoteerd terwijl er een besluit over is genomen');
+
+  /* De duurste bijwerking van dat besluit: de grendel op een tweede
+     terugstorting hing aan `paid`, en die blijft nu staan. */
+  const tweede = u.storingen.find(x => /tweede keer terugstorten/.test(x.naam));
+  assert.ok(tweede, 'de storing op een dubbele terugstorting is verdwenen');
+  assert.equal(tweede.stand, 'gehouden', 'dezelfde bon kan twee keer geld terugsturen: ' + tweede.wat);
+});
+
+test('B3. wat deze proef over de terugstorting NIET bewijst', () => {
+  /* Verkoop en terugstorting vallen in deze proef in DEZELFDE maand. Daarmee is
+     bewezen dat de verkoop blijft staan en dat er een tegenboeking naast komt --
+     maar niet dat die tegenboeking in de JUISTE maand landt wanneer hij in een
+     andere valt. Die zaak is het hele punt van het besluit (een afgesloten maand
+     mag niet meer bewegen) en hij is hier niet te meten zonder de klok te
+     verzetten tegen een draaiende server.
+
+     Deze toets houdt die grens vast in plaats van hem te laten verdampen: de
+     grens hoort in het register te staan, en wie hem oplost hoort deze toets
+     tegen te komen. */
+  const u = lees('OMZETPROEF.json');
+  assert.match(u.grens, /maand/,
+    'de grens van de proef noemt de maandbeperking niet meer');
 });
 
 test('C. de categorie van een verkochte regel beweegt NIET meer', () => {

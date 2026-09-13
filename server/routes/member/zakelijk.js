@@ -37,7 +37,10 @@ module.exports = (kern) => {
     const vraag = String(req.body.question || '').trim().slice(0, 400);
     if (!vraag) return res.status(400).json({ error: 'Stel een vraag.' });
     const key = req.session.key;
-    const horeca = ordersVanKlant(key).filter(o => o.paid).reduce((x, o) => x + o.total, 0);
+    /* Een teruggestorte bestelling is geen zakelijke uitgave meer: het geld staat
+       weer op de rekening van het lid. `paid` blijft na een terugstorting staan
+       (dat er betaald IS, is historie), dus `refunded` hoort hier expliciet bij. */
+    const horeca = ordersVanKlant(key).filter(o => o.paid && !o.refunded).reduce((x, o) => x + o.total, 0);
     const vervoer = db.data.rides.filter(r => (r.customerKey || r.customerTier) === key && r.paid).reduce((x, r) => x + (r.quote || 0), 0);
     let answer = null;
     if (anthropic) {

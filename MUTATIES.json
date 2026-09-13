@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T20:17:36.378Z",
-    "commit": "bdb156efe",
+    "op": "2026-09-13T20:19:20.799Z",
+    "commit": "05144240f",
     "boomVuil": true,
-    "boomAnders": 6,
+    "boomAnders": 12,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -6468,6 +6468,11 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "refundmigratie.test.js": {
+      "soort": "puur",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 2
     },
     "regexmutatie.test.js": {
       "soort": "puur",

@@ -1,7 +1,7 @@
 {
   "stempel": "2026-09-13",
   "uitleg": "Van consumentintentie tot het cijfer waar een ondernemer btw over afdraagt: bestelling, betaling, economische gebeurtenis, fiscale verdeling, ondernemersbeeld. Gemeten met twee echte zaken en twee echte leden, op een wegwerpserver.",
-  "grens": "Geen browser en geen echte bank (kern/pay draait op de demo-rail). De proef kijkt naar EEN maand -- de huidige -- en dus niet naar periodeafsluiting, kwartaalaangifte of de weg naar de Belastingdienst. Hij meet EEN genre (restaurant, NL) en zegt niets over logies, vervoer of de buitenlandse tarieventabellen. En hij meet de PROJECTIE financeVoor: dat de zaak dit cijfer ziet, bewijst niet dat er een grootboekregel onder ligt.",
+  "grens": "Geen browser en geen echte bank (kern/pay draait op de demo-rail). De proef kijkt naar EEN maand -- de huidige -- en dus niet naar periodeafsluiting, kwartaalaangifte of de weg naar de Belastingdienst. Hij meet EEN genre (restaurant, NL) en zegt niets over logies, vervoer of de buitenlandse tarieventabellen. En hij meet de PROJECTIE financeVoor: dat de zaak dit cijfer ziet, bewijst niet dat er een grootboekregel onder ligt. DE MAANDGRENS WORDT HIER NIET GEMETEN: verkoop en terugstorting vallen in deze proef in DEZELFDE maand, want de klok is tegen een draaiende server niet te verzetten. Dat de tegenboeking in de JUISTE maand landt wanneer zij in een andere valt, staat als unittoets in test/kern-fiscaal.test.js (financeVoor is daar een pure projectie over db.data) -- twee mutaties nagetrokken. EN ZIJ GELDT ALLEEN VOOR BESTELLINGEN: kern/fiscaal/index.js telt rides en boekingen nog op `paid` zonder tegenboeking, en hun annuleerweg zet die vlag nog op false. Die twee (plus tickets) gaan pas om met hun eigen gemeten lezerskaart -- ruw geteld 11, 22 en 7 lezers, tegenover 17 voor orders.",
   "genre": "restaurant",
   "bruto": 45,
   "schakels": [
@@ -13,7 +13,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "ref RTG-O-5A77FB, totaal 45 (verwacht 45), betaald false",
+      "ziet": "ref RTG-O-168A64, totaal 45 (verwacht 45), betaald false",
       "fout": null,
       "ms": 20
     },
@@ -27,7 +27,7 @@
       "status": 200,
       "ziet": "omzet 0 (voor de bestelling: 0)",
       "fout": null,
-      "ms": 6
+      "ms": 9
     },
     {
       "nr": 3,
@@ -37,9 +37,9 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "betaald true, op 2026-09-13T12:29:18.074Z, 4500 cent (verwacht 4500)",
+      "ziet": "betaald true, op 2026-09-13T19:14:03.317Z, 4500 cent (verwacht 4500)",
       "fout": null,
-      "ms": 25
+      "ms": 23
     },
     {
       "nr": 4,
@@ -51,7 +51,7 @@
       "status": 200,
       "ziet": "omzet 45, verschil 45 (verwacht 45)",
       "fout": null,
-      "ms": 15
+      "ms": 14
     },
     {
       "nr": 5,
@@ -63,7 +63,7 @@
       "status": 200,
       "ziet": "potten: eten@9% = 40, drank@21% = 5 -- de koffie (5,00) staat bij drank/21%",
       "fout": null,
-      "ms": 9
+      "ms": 6
     },
     {
       "nr": 6,
@@ -85,7 +85,7 @@
       "bekend": null,
       "stand": "gesloten",
       "status": 200,
-      "ziet": "ref RTG-O-5A77FB, 45, betaald true",
+      "ziet": "ref RTG-O-168A64, 45, betaald true",
       "fout": null,
       "ms": 5
     }
@@ -99,9 +99,15 @@
     },
     {
       "naam": "een betaalde bestelling terugstorten",
-      "belofte": "het geld gaat terug EN de boekhouding blijft navolgbaar",
+      "belofte": "de verkoop blijft staan, de terugstorting krijgt een eigen datum, en netto daalt de maand met het bedrag",
       "stand": "gehouden",
-      "wat": "status 200, omzet 45 -> 0 (wissen)"
+      "wat": "status 200, omzet 45 -> 0, verkoop blijft: true, eigen datum: true"
+    },
+    {
+      "naam": "dezelfde bestelling een tweede keer terugstorten",
+      "belofte": "wordt geweigerd, en de maand beweegt geen cent",
+      "stand": "gehouden",
+      "wat": "status 409 -- Deze bestelling is al teruggestort., omzet 0 -> 0"
     },
     {
       "naam": "zaak B vraagt haar eigen maand op",
@@ -140,7 +146,7 @@
       "wat": "status 404 -- Bestelling niet gevonden."
     }
   ],
-  "ref": "RTG-O-5A77FB",
+  "ref": "RTG-O-168A64",
   "zaken": {
     "a": "PROEFZAAKA",
     "b": "PROEFZAAKB"
@@ -166,8 +172,10 @@
     "voor": 45,
     "na": 0,
     "status": 200,
-    "vorm": "wissen",
-    "bevinding": "Een terugstorting WIST de verkoop uit de maand waarin hij stond, in plaats van er een tegenboeking naast te zetten. financeVoor telt op `o.paid`, en /api/supplier/refund zet die op false. Gevolg: de omzet van een AFGESLOTEN maand verandert met terugwerkende kracht, en het verschil tussen \"er is nooit verkocht\" en \"er is verkocht en teruggestort\" is uit de cijfers niet meer te lezen. Besluit van de eigenaar: tegenboeking met eigen datum, of wissen?"
+    "vorm": "tegenboeking",
+    "verkoopBlijft": true,
+    "eigenDatum": true,
+    "nettoEffect": 45
   },
   "categorieVerschuiving": {
     "voor": {
@@ -187,8 +195,8 @@
     "open": 0,
     "openBekend": 1,
     "stuk": 0,
-    "storingen": 8,
-    "gehouden": 8,
+    "storingen": 9,
+    "gehouden": 9,
     "gebroken": 0
   },
   "sluit": false,
@@ -201,14 +209,6 @@
       "wat": "elke verkochte regel valt in de btw-pot die bij het PRODUCT hoort",
       "gemeten": "potten: eten@9% = 40, drank@21% = 5 -- de koffie (5,00) staat bij drank/21%",
       "reden": "de btw-categorie wordt afgeleid uit de werkplek (station) en niet uit het product: een niet-alcoholisch drankje van de bar valt op 21% terwijl NL 9% kent voor eten en niet-alcoholische dranken. De scheidslijn alcohol-ja/nee bestaat al in kern/lidacties/bestellen.js maar niet in kern/fiscaal/tarief.js. Besluit van de eigenaar: wat is de bron van het tarief, de werkplek of het product?"
-    },
-    {
-      "schakel": "storing 2",
-      "van": "zaak",
-      "naar": "boekhouding",
-      "wat": "een terugstorting wist de verkoop uit zijn eigen maand",
-      "gemeten": "45 -> 0",
-      "reden": "Een terugstorting WIST de verkoop uit de maand waarin hij stond, in plaats van er een tegenboeking naast te zetten. financeVoor telt op `o.paid`, en /api/supplier/refund zet die op false. Gevolg: de omzet van een AFGESLOTEN maand verandert met terugwerkende kracht, en het verschil tussen \"er is nooit verkocht\" en \"er is verkocht en teruggestort\" is uit de cijfers niet meer te lezen. Besluit van de eigenaar: tegenboeking met eigen datum, of wissen?"
     }
   ]
 }

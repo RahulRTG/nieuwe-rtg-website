@@ -242,6 +242,7 @@ const REGISTER = {
   'NAVIGATIEPROEF.json': { eigenRatel: 'test/navigatieproef.test.js' },
   'MOVEPROEF.json': { eigenRatel: 'test/moveproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },
+  'REFUNDMIGRATIE.json': { eigenRatel: 'test/refundmigratie.test.js' },
   'RITMIGRATIE.json': { eigenRatel: 'test/ritmigratie.test.js' },
   'HEAPPROEF.json': { eigenRatel: 'test/heapproef.test.js' },
   'DOORWERKING.json': { eigenRatel: 'test/doorwerking.test.js' },

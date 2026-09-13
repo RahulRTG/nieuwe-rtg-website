@@ -85,10 +85,11 @@ const CONTRACTEN = {
   },
 
   /* HET DOSSIER VAN DE GOUDEN WEG (MACHINE.md par. 5a). Een POST die LEEST: hij
-     geeft per as terug wat er gebeurde en welke verplichte as nog open staat. Hij
-     staat achter de gedeelde code en niet achter de kluis, en dat is een besluit:
-     het dossier gaat over de HANDELING en niet over een mens, en de namen erin
-     stonden al in het auditjournaal. */
+     geeft per as terug wat er gebeurde en welke verplichte as nog open staat. Ook
+     voor het LEZEN staat hij achter de kluisdeur, want het dossier toont de
+     bedragen van leden en de namen van beide ondertekenaars -- `npm run
+     kantoormacht` rekent dit pad tot de zware wegen. De eerste versie stond achter
+     de gedeelde code; die zette `zwaarePaden.zonderMens` van nul op een. */
   'POST /api/office/bank/incasso/dossier': {
     mutatieId: 'bank.incasso.dossier.lezen',
     herkomst: 'mens',

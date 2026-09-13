@@ -252,9 +252,20 @@ test('6. de incassoronde vraagt dezelfde twee mensen, en loopt de hele gouden we
     'de incassoronde heeft geen geld verplaatst: ' + JSON.stringify(saldoVoor).slice(0, 120) +
     ' -> ' + JSON.stringify(saldoNa).slice(0, 120));
 
+  /* OOK LEZEN VRAAGT EEN NAAM, en dit is de grens en geen formaliteit. Het
+     dossier toont de bedragen van leden en de namen van beide ondertekenaars;
+     `npm run kantoormacht` rekent dit pad tot de zware wegen. De gedeelde
+     kantoorcode komt er dus niet door -- en krijgt geen muur maar de weg erheen. */
+  const gesloten = await api('/api/office/bank/incasso/dossier',
+    { voornemen: r.body.voornemen.id }, gedeeld);
+  assert.equal(gesloten.status, 403, 'de gedeelde code leest het geldDOSSIER: ' +
+    JSON.stringify(gesloten.body).slice(0, 140));
+  assert.equal(gesloten.body.watNu, 'inloggen-op-naam',
+    'de weigering zegt niet hoe het wel kan');
+
   /* HET DOSSIER NA DE UITVOERING: de keten is rond, en dat is niet beweerd maar
      te lezen -- inclusief de hashketen die zichzelf verifieert. */
-  const dos = await api('/api/office/bank/incasso/dossier', { voornemen: r.body.voornemen.id }, gedeeld);
+  const dos = await api('/api/office/bank/incasso/dossier', { voornemen: r.body.voornemen.id }, eenB);
   assert.equal(dos.status, 200, JSON.stringify(dos.body).slice(0, 160));
 
   /* EN HIER IS HET DOSSIER EERLIJKER DAN PRETTIG, en dat is precies waarom het
@@ -279,7 +290,7 @@ test('6. de incassoronde vraagt dezelfde twee mensen, en loopt de hele gouden we
   assert.notEqual(tweede.uitslag, eerste.wie,
     'aanvrager en bevestiger staan als dezelfde in het dossier -- dan zegt het dossier iets anders dan de deur');
 
-  const bord = await api('/api/office/bank/incasso/dossier', {}, gedeeld);
+  const bord = await api('/api/office/bank/incasso/dossier', {}, eenB);
   assert.equal(bord.body.ketenHeel.ok, true, 'de hashketen van de baan is niet heel');
   assert.equal(typeof bord.body.rond, 'number', 'het bord telt de ronde ketens niet');
 });

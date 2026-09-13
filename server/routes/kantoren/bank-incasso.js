@@ -20,7 +20,7 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { app, officeAuth, kluisAuth, veilig, kern, naam, tweedeHand, zwaar, boardroomUser } = ctx;
+  const { app, kluisAuth, veilig, kern, naam, tweedeHand, zwaar, boardroomUser } = ctx;
   const bank = kern.bank;
 
   /* ------------------------------------------------------------------------
@@ -130,13 +130,26 @@ module.exports = (ctx) => {
   });
 
   /* HET DOSSIER: wat er per as gebeurde, en welke VERPLICHTE as nog open staat.
-     Lezen mag achter de gedeelde code -- het dossier gaat over de HANDELING en
-     niet over een mens, en de namen erin zijn kantoornamen die in het journaal al
-     stonden. */
+
+     OOK LEZEN VRAAGT HIER EEN NAAM, en dat was eerst anders. De eerste versie
+     stond achter de gedeelde kantoorcode, met als reden dat het dossier over de
+     HANDELING gaat en niet over een mens. Dat argument hield geen stand tegen de
+     meting: `npm run kantoormacht` rekent dit pad tot de zware wegen
+     (`bank/incasso` valt onder GELD_BEWEGEN) en zette `zwaarePaden.zonderMens`
+     daarmee van nul op EEN -- een teller die in dit huis alleen omlaag hoort. De
+     ratel `kantoormacht:controle` hangt aan een andere as en ving het niet; een
+     verse ronde vond het.
+
+     En bij nalezen was de reden zelf zwak: het dossier toont de bedragen van
+     leden, de streefstand en de NAMEN van de aanvrager en de tweede
+     ondertekenaar. Dat het journaal die namen ook al droeg, is een argument dat
+     het elders al lekt -- niet dat het hier mag. Nu eist de hele gouden weg van
+     de aanvraag tot de nalezing een mens, en dat is wat deze baan hoort te zijn:
+     de strengste weg van het huis. */
   /* mutatie: idempotent -- alleen lezen; de enige schrijver van het journaal is de
      baan zelf (klaarzetten, tekenen, uitvoeren). Twee keer lezen laat dezelfde
      stand achter. */
-  app.post('/api/office/bank/incasso/dossier', officeAuth, (req, res) => veilig(res, () => {
+  app.post('/api/office/bank/incasso/dossier', kluisAuth, (req, res) => veilig(res, () => {
     if (!kern.geldketen) return { status: 503, error: 'De geldketen is niet gemount.' };
     const id = String((req.body || {}).voornemen || '');
     if (id) return kern.geldketen.dossier(id);

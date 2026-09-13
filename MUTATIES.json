@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:06:36.420Z",
-    "commit": "0bf470ba",
+    "op": "2026-09-13T11:34:12.852Z",
+    "commit": "5b765b02",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -4888,6 +4888,14 @@
       "soort": "puur",
       "staat": "muteert zelf",
       "reden": "muteert zelf echte bestanden (waaronder MUTATIES.json) om meters te ijken"
+    },
+    "meterwet.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/ijking.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "metier.test.js": {
       "soort": "server",

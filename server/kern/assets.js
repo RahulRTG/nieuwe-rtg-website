@@ -41,7 +41,20 @@ const ACCESS_FACTOR = 0.25;
 const ASSET_FACTOR = 1.15;
 const netjes = n => Math.round(n / 100) * 100; // prijzen op honderden
 
-module.exports = ({ db, save, crypto, schoon, notify, pay }) => {
+module.exports = ({ db, save, bijeen, inBundel, crypto, schoon, notify, pay }) => {
+  /* HET MERKTEKEN VAN EEN GEINDE FEE IS GEEN AFGELEIDE TOESTAND, en daarom
+     hangt deze module aan de duurzame vastlegger. De reden staat uitgeschreven
+     bij assetFeesInnen() in ./assets/kantoor.js: de BETALING was al duurzaam
+     (kern/pay) en het merkteken `feeJaar` niet, dus onder een liegende opslag
+     kwam er 200 terug met "geind: N" terwijl niets van die N vaststond.
+
+     Ontbreekt de bundel (een toets die deze module los opbouwt), dan valt hij
+     terug op de gewone save en verandert er niets aan het oude gedrag -- luid
+     falen bij het opstarten zou hier een toets breken die met dit pad niets te
+     maken heeft. Wat er dan NIET is, staat in de uitslag van de fee-ronde. */
+  const vastleggen = (typeof bijeen === 'function')
+    ? require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'assets' })
+    : null;
   const nu = () => new Date().toISOString();
   const vandaag = () => new Date().toISOString().slice(0, 10);
   const lijsten = () => {
@@ -84,7 +97,7 @@ module.exports = ({ db, save, crypto, schoon, notify, pay }) => {
 
   /* De drie lagen (winkel, gebruik, kantoor) draaien als submodules op een
      gedeelde context, een keer opgebouwd bij het opstarten. */
-  const ctx = { db, save, crypto, schoon, notify, pay,
+  const ctx = { db, save, vastleggen, crypto, schoon, notify, pay,
     TICKETS_PER_OBJECT, UREN_PER_TICKET, JAREN_GELDIG, BETALENDE_PASSEN, BEDENKTIJD_DAGEN,
     TERUGKOOP_VENSTER_DAGEN, SERVICE_FEE_PCT, OVERDRACHT_FEE_PCT, ONDERHOUD_DAGEN, PIEK_MAANDEN,
     ACCESS_FACTOR, ASSET_FACTOR, netjes,

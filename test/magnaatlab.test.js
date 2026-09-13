@@ -31,6 +31,12 @@ const fs = require('fs');
 const path = require('path');
 const M = require('../scripts/magnaatlab');
 
+/* MEET NIET NAAST EEN MOTOR DIE DE BRON VERBOUWT (scripts/lib/verseboom.js).
+   Deze toets meet de boom OPNIEUW en legt de uitslag naast MAGNAATLAB.json;
+   loopt er intussen een meterijking of de mutatiemotor, dan telt hij hun
+   tijdelijke aanbouw mee en is het verschil met het register betekenisloos.
+   Zo meldde test/magnaatlab.test.js een keer 2069 waar er 2068 stonden. */
+const { afbouwInDeWeg } = require('../scripts/lib/verseboom');
 const WORTEL = path.join(__dirname, '..');
 
 /* Een verzonnen module in de vorm die lees() oplevert, zodat analyse() te voeren
@@ -127,7 +133,13 @@ test('7. dezelfde vorm bij hetzelfde onderwerp wordt WEL als dubbeling geteld', 
   assert.equal(r.paren[0].vormgelijkenis, 1);
 });
 
-test('8. de echte meting draait, en klopt met wat er is vastgelegd', () => {
+test('8. de echte meting draait, en klopt met wat er is vastgelegd', (t) => {
+  /* De vergelijking hieronder is alleen iets waard op een boom die NIEMAND
+     aan het verbouwen is; zie scripts/lib/verseboom.js. Overslaan is hier geen
+     slagen: de reden gaat mee de uitslag in. */
+  const inDeWeg = afbouwInDeWeg('magnaatlab');
+  if (inDeWeg) return t.skip(inDeWeg);
+
   const r = M.meet();
   assert.ok(r.simulatiemodules >= 40, 'de simulatielaag is gevonden (' + r.simulatiemodules + ')');
   assert.ok(r.kernmodules >= 500, 'en de kern ook (' + r.kernmodules + ')');

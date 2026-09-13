@@ -1,0 +1,114 @@
+{
+  "stempel": {
+    "op": "2026-09-13T10:05:59.981Z",
+    "commit": "58d0ec7c",
+    "boomVuil": false,
+    "boomAnders": 1,
+    "instrument": "scripts/wekdekking.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Gemeten met scripts/wekdekking.js tegen het besluitregister scripts/lib/wekbesluit.js. Het besluit (welke brongebeurtenis mag de publieke rail op) is mensenwerk; deze meting houdt dat besluit tegen de code. De twee worden nooit opgeteld.",
+  "grens": "Wat deze meter NIET aantoont: dat de klassen JUIST zijn gekozen -- dat is een besluit van een mens en geen meetuitslag. Hij toont ook niet dat een gebeurtenis werkelijk optreedt in de code: hij controleert dat het genoemde BRONBESTAND bestaat, niet dat er een regel in staat die precies deze gebeurtenis veroorzaakt. En `zonderUitspraak` telt alleen publieke domeinen ZONDER wekhaak: een domein dat de haak al aanroept, wordt hier niet opnieuw beoordeeld.",
+  "vastgelegd": "2026-09-13",
+  "gemeten": {
+    "besluiten": 13,
+    "moment": 4,
+    "stil": 3,
+    "niet": 6,
+    "publiekeDomeinen": 11,
+    "domeinenMetHaak": 8,
+    "zonderUitspraak": 0,
+    "momentZonderWekweg": 0,
+    "momentZonderVolgers": 0,
+    "momentZonderAanleiding": 0,
+    "bronWeg": 0,
+    "foutKlasse": 0,
+    "registerLoopUit": 0
+  },
+  "zonderUitspraak": [],
+  "zonderWekweg": [],
+  "zonderVolgers": [],
+  "zonderAanleiding": [],
+  "bronWeg": [],
+  "foutKlasse": [],
+  "registerLoopUit": [],
+  "perDomein": [
+    {
+      "domein": "kern/festival",
+      "besluiten": 4,
+      "moment": 2,
+      "stil": 0,
+      "niet": 2,
+      "haak": true,
+      "volgrelatie": [
+        {
+          "bestand": "server/kern/festival/artiest.js",
+          "weg": "aanwezigheid"
+        },
+        {
+          "bestand": "server/kern/festival/product.js",
+          "weg": "aanwezigheid"
+        }
+      ]
+    },
+    {
+      "domein": "kern/sportclub",
+      "besluiten": 3,
+      "moment": 1,
+      "stil": 1,
+      "niet": 1,
+      "haak": true,
+      "volgrelatie": [
+        {
+          "bestand": "server/kern/sportclub/sportief.js",
+          "weg": "aanwezigheid"
+        }
+      ]
+    },
+    {
+      "domein": "kern/salon",
+      "besluiten": 2,
+      "moment": 1,
+      "stil": 1,
+      "niet": 0,
+      "haak": true,
+      "volgrelatie": [
+        {
+          "bestand": "server/kern/salon/profiel.js",
+          "weg": "domein"
+        },
+        {
+          "bestand": "server/kern/salon/uitlichten.js",
+          "weg": "aanwezigheid"
+        }
+      ]
+    },
+    {
+      "domein": "kern/creator",
+      "besluiten": 2,
+      "moment": 0,
+      "stil": 0,
+      "niet": 2,
+      "haak": false,
+      "volgrelatie": null
+    },
+    {
+      "domein": "kern/galerij",
+      "besluiten": 1,
+      "moment": 0,
+      "stil": 1,
+      "niet": 0,
+      "haak": false,
+      "volgrelatie": null
+    },
+    {
+      "domein": "kern/events",
+      "besluiten": 1,
+      "moment": 0,
+      "stil": 0,
+      "niet": 1,
+      "haak": false,
+      "volgrelatie": null
+    }
+  ]
+}

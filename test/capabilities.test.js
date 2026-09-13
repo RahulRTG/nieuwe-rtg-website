@@ -33,6 +33,12 @@ const fs = require('fs');
 const path = require('path');
 const C = require('../scripts/capabilities');
 
+/* MEET NIET NAAST EEN MOTOR DIE DE BRON VERBOUWT (scripts/lib/verseboom.js).
+   Deze toets meet de boom OPNIEUW en legt de uitslag naast CAPABILITEIT.json;
+   loopt er intussen een meterijking of de mutatiemotor, dan telt hij hun
+   tijdelijke aanbouw mee en is het verschil met het register betekenisloos.
+   Zo meldde test/magnaatlab.test.js een keer 2069 waar er 2068 stonden. */
+const { afbouwInDeWeg } = require('../scripts/lib/verseboom');
 const WORTEL = path.join(__dirname, '..');
 const L = (bestand, naam, leden, blok) => ({ bestand, naam, leden, blok: blok || '{}', bron: '' });
 
@@ -146,7 +152,13 @@ test('7. de zeef laat alleen vermogenslijsten door', () => {
   assert.equal(r.ledenInMeer, 0, 'en tellen dus ook niet mee in de overlap');
 });
 
-test('8. de echte meting draait, en klopt met wat er is vastgelegd', () => {
+test('8. de echte meting draait, en klopt met wat er is vastgelegd', (t) => {
+  /* De vergelijking hieronder is alleen iets waard op een boom die NIEMAND
+     aan het verbouwen is; zie scripts/lib/verseboom.js. Overslaan is hier geen
+     slagen: de reden gaat mee de uitslag in. */
+  const inDeWeg = afbouwInDeWeg('capabilities');
+  if (inDeWeg) return t.skip(inDeWeg);
+
   /* Dezelfde afspraak als test/objectmodel.test.js: het vastgelegde bestand is
      een afdruk en geen tweede waarheid. Loopt hij uiteen, dan is er iets aan de
      code veranderd en hoort de afdruk opnieuw gezet te worden -- met de hand,

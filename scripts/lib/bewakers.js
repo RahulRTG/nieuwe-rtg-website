@@ -128,6 +128,39 @@ const KAART = new Map([
      komen en niet uit het lichaam. */
   ['naamAuth', ['eigenrol', 'kantoor-op-naam',
     'dezelfde kluispoort als kluisAuth: een kantoorsessie op naam. De gedeelde backoffice-code komt er niet door']],
+  /* DE BALIE IS GEEN VERFIJNER, en dat stond hier tot 13 september 2026 wel.
+
+     Een verfijner versmalt BINNEN een al vastgestelde rol: `rijk` en `gem`
+     laten een deel van de leveranciers door, `pro` een deel van de leden. Wie
+     de rol heeft, heeft een kans. balieAuth doet iets anders: hij weigert de
+     rol `office` IN ZIJN GEHEEL. Er bestaat geen backoffice-code die erdoor
+     komt -- de balie vraagt een zetel op naam, en een gedeelde code wijst
+     niemand aan (server/kern/ledenbalie-zetels.js zegt dat met zoveel woorden).
+     Een laag die de hele rol onder zich wegslaat, STELT de rol vast; dat is per
+     definitie geen verfijning.
+
+     WAT DE VERKEERDE INDELING KOSTTE, en het is gemeten en niet geschat. De
+     proeven leiden hun rol af uit deze kaart, dus 31 baliewegen werden met het
+     gedeelde office-token aangeklopt. Antwoord: 403, elke keer. In FAALPROEF.json
+     (stempel 10 september 2026) staan de zes muterende daarvan als `ongemeten`
+     met de reden "de proef kreeg hem niet aan het werk (status 403)" -- de
+     gevoeligste routes van dit huis (dossier, herstel, abo, zoek) onbeproefd,
+     en in een uitslagbestand leest ongemeten als geslaagd.
+
+     HET HUIS WIST HET AL, op een andere plek. scripts/kantoormacht.js zet
+     balieAuth in EIST_MENS ("eist aantoonbaar een mens"), en test/kantoormacht.js
+     houdt dat vast. Twee registers spraken elkaar dus tegen over dezelfde deur,
+     en de goedkoopste van de twee bepaalde wat er beproefd kon worden.
+
+     DE REGEL DIE ERUIT VOLGT en die de toets hieronder afdwingt: een verfijner
+     boven een rol ZONDER identiteit is een indelingsfout. eigenaarAlleen en
+     alleenBaas zijn ook verfijners en ook streng, maar zij hangen boven
+     techAuth en boardroomAuth -- rollen die de identiteit al vaststellen, dus
+     daar verandert de versmalling niets aan welke sleutel er nodig is. Boven
+     officeAuth was balieAuth de enige, en dat is gemeten: van de 864
+     office-routes draagt geen andere verfijner een officeAuth-familiedeur. */
+  ['balieAuth', ['eigenrol', 'kantoor-op-naam',
+    'officeAuth plus een zetel op naam: de gedeelde backoffice-code wordt in zijn geheel geweigerd, dus deze laag STELT de rol vast']],
   ['techAuth', ['eigenrol', 'techniek',
     'verifieert het token als ECHT account en toetst daarna magInzien(); een geldig lid krijgt 403 en een kritieke melding op het veiligheidsbord']],
   ['baasAuth', ['eigenrol', 'werkplekbaas',
@@ -141,7 +174,6 @@ const KAART = new Map([
   ['geenGast', ['verfijner', null, 'sluit meelezende gasten uit binnen auth']],
   ['pro', ['verfijner', null, 'zakelijke laag binnen auth']],
   ['gem', ['verfijner', null, 'gemeentedienst binnen supplierAuth']],
-  ['balieAuth', ['verfijner', null, 'ledenbalie binnen officeAuth']],
   ['kansPoort', ['verfijner', null, 'recht kansenbord.plaatsen binnen auth+pro']],
   ['eigenaarAlleen', ['verfijner', null, 'alleen de eigenaar, binnen techAuth']],
   ['alleenBaas', ['verfijner', null, 'alleen de baas, binnen boardroomAuth of werkmail']],
@@ -248,9 +280,28 @@ function beoordeel(route) {
       ' -- deel hem in in scripts/lib/bewakers.js' };
   }
 
-  // een echte rol wint van alles
-  for (let i = 0; i < namen.length; i++) if (soorten[i] === 'rol') return { rol: rolBij(namen[i]), reden: null };
+  /* DE SMALSTE DEUR WINT, en tot 13 september 2026 stond het hier andersom
+     ("een echte rol wint van alles").
+
+     Een eigenrol is per constructie SMALLER dan een rol: boardroomAuth draait
+     eerst officeAuth en eist daarna meer, kluisAuth doet hetzelfde, balieAuth
+     ook. Staan ze samen op een route, dan is de rol de VOORDEUR en de eigenrol
+     de deur die er werkelijk over beslist. De brede van de twee kiezen betekent
+     aankloppen met een sleutel waarvan vaststaat dat hij geweigerd wordt -- en
+     een 403 die je zelf hebt uitgelokt is geen meting van de route maar van je
+     eigen keuze.
+
+     DE OMVANG IS GEMETEN EN KLEIN. Van de 5041 routes die de router kent,
+     dragen er 31 zowel een rol als een eigenrol, en dat zijn alle 31 de
+     baliewegen (officeAuth + balieAuth). Deze regel verandert dus precies die
+     31 en geen enkele andere -- geen herverdeling van het huis, maar het
+     dichtzetten van de enige plek waar hij afging.
+
+     WAAROM HET GEEN VERLIES IS. Dat de rol ook nodig is, blijft waar: de
+     eigenrol draait hem zelf. Wie met een member-token bij balieAuth aanklopt,
+     strandt nog steeds op officeAuth. De kruisproef verliest dus niets. */
   for (let i = 0; i < namen.length; i++) if (soorten[i] === 'eigenrol') return { rol: rolBij(namen[i]), reden: null };
+  for (let i = 0; i < namen.length; i++) if (soorten[i] === 'rol') return { rol: rolBij(namen[i]), reden: null };
 
   /* Geen enkele laag stelt een identiteit vast. Welke reden dat is, hangt af van
      wat er dan WEL staat -- en de zwaarste telt, want die bepaalt de reparatie. */

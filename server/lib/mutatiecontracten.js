@@ -57,9 +57,13 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-kaleronde').CONTRACTEN,
   require('./mutatiecontracten-kaleronde-b').CONTRACTEN,
   require('./mutatiecontracten-tweedehandeling-b').CONTRACTEN,
+  require('./mutatiecontracten-voorstelintrek').CONTRACTEN,
   require('./mutatiecontracten-isolatie').CONTRACTEN,
   require('./mutatiecontracten-isolatie-lid').CONTRACTEN,
   require('./mutatiecontracten-samenvoeging').CONTRACTEN,
+  /* De publieke laag: volgen op een aanwezigheid, en de redactiehandeling van
+     De Salon (STAGE.md par. 5a). */
+  require('./mutatiecontracten-stage').CONTRACTEN,
   /* De zestien waardebewegende routes die nog op `onbekend` stonden
      (GELDDEKKING.json). Eigen bestand om dezelfde reden als hierboven, en omdat
      ze een gedeelde herkomst hebben: ze zijn alle zestien gelezen in een ronde,
@@ -84,6 +88,10 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-hardening-checkpoint').CONTRACTEN,
   require('./mutatiecontracten-beschermzaak').CONTRACTEN,
   require('./mutatiecontracten-knelpunt').CONTRACTEN,
+  /* De naleesronde van 13 september 2026 -- zie de kop van het eerste bestand. */
+  require('./mutatiecontracten-naleesronde').CONTRACTEN,
+  require('./mutatiecontracten-naleesronde-b').CONTRACTEN,
+  require('./mutatiecontracten-naleesronde-c').CONTRACTEN,
   require('./mutatiecontracten-opvangwijzer').CONTRACTEN,
   require('./mutatiecontracten-horeca-correctie').CONTRACTEN,
   /* De nazorg van een reisaanvraag: vier routes die samen de weg terug uit een
@@ -115,6 +123,15 @@ const CONTRACTEN = Object.assign({},
   /* Het eigenaarsherstel: zeven routes, per stuk beantwoord of een herhaling
      een ander antwoord krijgt. Eigen bestand, zie de kop daar. */
   require('./mutatiecontracten-herstel').CONTRACTEN,
+  /* De zevenenveertig die uit de afleidgang vielen toen die een grens erbij
+     kreeg, met de hand gelezen op 13 september 2026. Drie bestanden omdat ze
+     drie verschillende dingen bleken: lezers, lezers-met-een-seeder, en wat
+     geen lezer was. Zie de kop van het eerste. */
+  require('./mutatiecontracten-afleidrest').CONTRACTEN,
+  require('./mutatiecontracten-afleidrest-b').CONTRACTEN,
+  require('./mutatiecontracten-afleidrest-c').CONTRACTEN,
+  require('./mutatiecontracten-afleidrest-d').CONTRACTEN,
+  require('./mutatiecontracten-afleidrest-e').CONTRACTEN,
   /* ALS LAATSTE, en dat is geen willekeur. Deze 788 vallen onder een BESLUIT
      over de bewijsstandaard en niet onder een mens die ze een voor een las. De
      vier hierboven zijn specifieker; Object.assign laat de laatste winnen, dus
@@ -132,28 +149,7 @@ const CONTRACTEN = Object.assign({},
   require('./mutatiecontracten-objectronde'),
   require('./mutatiecontracten-effect'));
 
-{
-  const effect = require('./mutatiecontracten-effect');
-  const eerder = Object.assign({},
-    require('./mutatiecontracten-beschermd').CONTRACTEN,
-    require('./mutatiecontracten-leest').CONTRACTEN,
-    require('./mutatiecontracten-tweedehandeling').CONTRACTEN,
-    require('./mutatiecontracten-padparameter').CONTRACTEN,
-    require('./mutatiecontracten-kaleronde').CONTRACTEN,
-    require('./mutatiecontracten-kaleronde-b').CONTRACTEN,
-    require('./mutatiecontracten-tweedehandeling-b').CONTRACTEN,
-    require('./mutatiecontracten-isolatie').CONTRACTEN,
-    require('./mutatiecontracten-isolatie-lid').CONTRACTEN,
-    require('./mutatiecontracten-samenvoeging').CONTRACTEN,
-    require('./mutatiecontracten-wonen').CONTRACTEN,
-    require('./mutatiecontracten-lidabonnement').CONTRACTEN);   // ook hier: de guard moet hem kennen
-  const overschreven = Object.keys(effect).filter(k => k in eerder);
-  if (overschreven.length) {
-    throw new Error('mutatiecontracten: ./mutatiecontracten-effect overschrijft een specifieker ' +
-      'contract: ' + overschreven.slice(0, 5).join(', ') + (overschreven.length > 5 ? ' (+' +
-      (overschreven.length - 5) + ')' : '') + '. Haal die route uit scripts/effectcontracten.js zijn ' +
-      'uitkomst -- een besluit over een standaard mag nooit over een gelezen contract heen.');
-  }
-}
+
+require('./mutatiecontracten-effectguard');
 
 module.exports = { CONTRACTEN };

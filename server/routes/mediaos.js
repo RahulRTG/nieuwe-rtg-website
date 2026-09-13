@@ -10,7 +10,8 @@ module.exports = (kern) => {
   const { app, auth, mediaWereld, mediaStuk, mediaMaker, mediaVolg, mediaMeldZet,
     mediaBieb, mediaBewaar, mediaSmaakVan, mediaSmaakStuur, mediaBord,
     mediaLijsten, mediaLijst, mediaLijstMaak, mediaLijstZet, mediaLijstStuk, mediaLijstDeel,
-    mediaSamenStart, mediaSamenNodig, mediaSamenIn, mediaSamenUit, mediaSamenZet, mediaSamenMijn } = kern;
+    mediaSamenStart, mediaSamenNodig, mediaSamenIn, mediaSamenUit, mediaSamenZet, mediaSamenMijn,
+    aanwezigVolg, aanwezigMijn, aanwezigMet, aanwezigVolgtHij, aanwezigBeeld } = kern;
   if (!mediaWereld) return;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
@@ -137,5 +138,37 @@ module.exports = (kern) => {
   app.post('/api/mediaos/bord', auth, (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, mediaBord(sess(req)));
+  });
+
+  /* ---- DE PUBLIEKE AANWEZIGHEID: één volgrelatie, gedragen door een mens of
+     een organisatie (kern/mediaos/aanwezigheid.js).
+
+     VOLGEN IS ALTIJD EXPLICIET. Er is met opzet geen route die iemand volgt als
+     gevolg van iets anders -- een kaartje kopen, lid worden, ergens werken of
+     merchandise kopen zetten hier niets. Deze POST is de enige weg, en hij komt
+     van het lid zelf. */
+  app.post('/api/mediaos/aanwezig/volg', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    if (!aanwezigVolg) return res.status(503).json({ error: 'Deze laag draait hier niet.' });
+    const b = req.body || {};
+    stuur(res, aanwezigVolg(sess(req).key, b.id, b.aan !== false));
+  });
+
+  /* Wat ik volg, en WAT IK DAARVOOR KRIJG. Dat tweede staat er omdat een
+     aanwezigheid meerdere soorten kan uitzenden: wie op volgen drukt zonder te
+     zien wat er binnenkomt, activeert ongemerkt vijf kanalen. */
+  app.post('/api/mediaos/aanwezig/mijn', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    if (!aanwezigMijn) return res.status(503).json({ error: 'Deze laag draait hier niet.' });
+    res.json({ ok: true, aanwezigheden: aanwezigMijn(sess(req).key) });
+  });
+
+  // één aanwezigheid opzoeken, met of ik hem al volg
+  app.post('/api/mediaos/aanwezig', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    if (!aanwezigMet) return res.status(503).json({ error: 'Deze laag draait hier niet.' });
+    const a = aanwezigMet((req.body || {}).id);
+    if (!a) return res.status(404).json({ error: 'Deze aanwezigheid bestaat niet.' });
+    res.json({ ok: true, aanwezigheid: aanwezigBeeld(a), volgIk: aanwezigVolgtHij(sess(req).key, a.id) });
   });
 };

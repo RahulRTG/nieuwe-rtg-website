@@ -63,3 +63,58 @@ test('faalproef.js schrijft methode en pad werkelijk apart weg', () => {
   assert.match(bron, /const rij = \{ methode: r\.methode, pad: r\.pad/,
     'de rij van faalproef.js draagt methode en pad apart');
 });
+
+/* ============================================================================
+   VIJF DINGEN HEETTEN `ongemeten`, EN ZE ZIJN HET NIET.
+
+   Tot 13 september 2026 kreeg elk niet-duurzaam profiel dezelfde stand. Dat gaf
+   een getal -- 4880 huisbreed, 535 aan de kantoorkant -- dat leest als een berg
+   onbeproefde routes, terwijl het merendeel een EIGENSCHAP is: een leesroute
+   heeft geen bevestiging om te breken, en een klaarzetter doet geen duurzame
+   belofte. Alleen `niet-bereikt` is een tekort van het instrument.
+
+   Ze weer op een hoop gooien is geen opruiming maar verlies: dan is niet meer
+   te zien of een daling vooruitgang is of een route die stopte met schrijven.
+
+   DE MUTATIE: laat STAND_VAN_PROFIEL alles op 'ongemeten' zetten -> deze toets
+   zakt. En laat een profiel eruit vallen -> hij zakt ook, want dan valt die
+   soort stil terug op 'ongemeten'.
+   ========================================================================== */
+test('elk niet-duurzaam profiel heeft een EIGEN stand, en ze vallen niet samen', () => {
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'faalproef.js'), 'utf8');
+  const blok = bron.slice(bron.indexOf('const STAND_VAN_PROFIEL'), bron.indexOf('if (p.soort !== \'duurzaam\')'));
+  assert.ok(blok.length > 50, 'STAND_VAN_PROFIEL staat niet meer in faalproef.js');
+
+  /* De profielsoorten komen uit de KLASSEERDER en worden hier niet overgetypt:
+     twee lijsten van dezelfde soorten lopen uiteen zodra er een bij komt, en
+     dan mist juist de nieuwe zijn stand. Dit is de lijst die profielVan() kan
+     teruggeven, en elke niet-duurzame soort hoort een eigen stand te krijgen. */
+  const SOORTEN = ['leest', 'voorziening', 'geen-werk', 'onzeker', 'onmeetbaar'];
+  const standen = new Set();
+  for (const soort of SOORTEN) {
+    const m = blok.match(new RegExp("'?" + soort + "'?\\s*:\\s*'([a-z-]+)'"));
+    assert.ok(m, 'profiel "' + soort + '" heeft geen eigen stand in STAND_VAN_PROFIEL; ' +
+      'hij valt dan terug op `ongemeten` en verdwijnt weer op de hoop');
+    assert.notEqual(m[1], 'ongemeten', 'profiel "' + soort + '" staat weer op `ongemeten`');
+    standen.add(m[1]);
+  }
+  /* Vier en niet vijf: `onzeker` en `onmeetbaar` delen met opzet een stand --
+     over allebei kan deze proef niets zeggen, en dat is een uitslag en geen
+     twee. Meer dan een soort per stand mag dus; ALLES op een stand niet. */
+  assert.ok(standen.size >= 4, 'de standen zijn samengevallen tot ' + standen.size +
+    ' (' + [...standen].join(', ') + '); dan is een eigenschap niet meer van een tekort te onderscheiden');
+});
+
+test('de samenvatting telt eigenschap en tekort APART', () => {
+  const bron = fs.readFileSync(path.join(__dirname, '..', 'scripts', 'faalproef.js'), 'utf8');
+  for (const teller of ['nietMutatief', 'nietBereikt', 'onzeker']) {
+    assert.match(bron, new RegExp(teller + ':\\s*tel\\('),
+      'de samenvatting mist de teller ' + teller + '; zonder die telling staat het getal ' +
+      'alleen per route en leest de kop nog steeds een hoop');
+  }
+  /* En ze mogen niet worden OPGETELD tot een enkel "niet beproefd": een
+     eigenschap van de route en een tekort van het instrument in een getal
+     verbergt welke van de twee bewoog. */
+  assert.doesNotMatch(bron, /nietBeproefd:\s*tel\(/,
+    'er is een samengeteld "nietBeproefd" bijgekomen; dat is precies het getal dat deze splitsing wegneemt');
+});

@@ -531,6 +531,100 @@ const METERS = [
      "Scenario 3". Hij hoort naar nul en de weg erheen staat er beschreven. */
   { sleutel: 'geldpadGezakt', richting: 'omlaag', wat: 'stappen in de verticale geldproef waar geld bewoog dat niet mocht (FACTUURPROEF.json)' },
   { sleutel: 'geldpadOnbewezen', richting: 'omlaag', wat: 'stappen in de verticale geldproef zonder bewijs (BLOCKED of UNKNOWN)' },
+  /* DE CRASH-AS OVER DE GELDROUTES (CRASHAS.json, npm run crashas), en om
+     dezelfde reden TWEE tanden als hierboven.
+
+     `crashasOnbekend` is een (route, grens)-paar waarvan niemand weet of die
+     grens er is. Dat is werk: uitzoeken of een route een bericht stuurt maakt
+     hem `ja` of `nee`, en beide zijn beter dan onbekend. Hij staat vandaag op
+     45 -- de berichtgrens over alle geldroutes.
+
+     `crashasNietMeetbaar` is een paar waarvan we WEL weten dat de grens er is,
+     maar waarvoor geen injectiepunt bestaat: 90 van de 135. Dat is geen
+     onwetendheid maar gereedschap dat ontbreekt, en het gaat omlaag door
+     server/lib/verraad.js uit te breiden, niet door beter te kijken.
+
+     Ze worden nooit opgeteld. "We hebben niet gekeken" en "we kunnen niet
+     kijken" vragen het tegenovergestelde, en een tand die ze samenvoegt laat
+     een ontbrekend instrument wegvallen tegen een open vraag. */
+  { sleutel: 'crashasOnbekend', richting: 'omlaag', wat: '(route, grens)-paren waarvan niet vaststaat of de crashgrens bestaat (CRASHAS.json)' },
+  { sleutel: 'crashasNietMeetbaar', richting: 'omlaag', wat: 'bestaande crashgrenzen zonder injectiepunt om ze te beproeven' },
+  /* DE CRASHPROEF (CRASHPROEF.json, npm run crashproef), en om DEZELFDE reden
+     twee tanden -- maar let op wat er met opzet NIET in zit.
+
+     `crashproefGezakt` is een rij waarvan het overlevingscontract is gebroken:
+     de toestand na de herstart klopt niet, er staat een half resultaat, de
+     aanroeper kreeg een vals antwoord, of een herhaling verdubbelde het effect.
+     Dat is een DEFECT en moet naar nul.
+
+     `crashproefOnbereikt` is een rij waar de proef de route niet aan het werk
+     kreeg (GEEN_WERK): een lijf dat deze route niet accepteert, een voorwaarde
+     die de wereld niet klaarzette. Dat is BEREIK van het instrument en geen
+     uitspraak over de route -- het gaat omlaag door de wereld of het lijf te
+     verbeteren, niet door beter na te denken over crashes.
+
+     WAT ER NIET IN ZIT is GEEN_DUURZAME_WEG (41 rijen). Dat is een GEMETEN
+     mededeling dat de grens op het pad van die route niet bestaat -- de
+     tegenhanger van NOT_APPLICABLE -- en dat als schuld tellen zou een route
+     straffen voor een waarheid over zijn schrijfweg. Het staat wel in het
+     register, met de modus erbij die hem WEL zou raken.
+
+     Ze worden nooit opgeteld: "het contract is gebroken" en "de proef kwam er
+     niet bij" vragen het tegenovergestelde. */
+  { sleutel: 'crashproefGezakt', richting: 'omlaag', wat: 'geldroutes waarvan het overlevingscontract na een crash is gebroken (CRASHPROEF.json)' },
+  /* VIER TANDEN, EN GEEN VAN ZE MAG BIJ EEN ANDER OPGETELD WORDEN.
+
+     `crashproefOnbereikt` telde eerst alles bij elkaar wat "niet aan het werk
+     kwam". Dat verbergt precies wat je moet weten, want deze vier vragen
+     verschillende reparaties:
+
+       crashproefGeenLijf     de route keurde het VERZOEK af en raakt req.body.
+                              Werk: een lijf in idemwereld.js.
+       crashproefGeenWereld   het verzoek kwam door de controle en strandde op
+                              de TOESTAND. Werk: een voorziening bouwen.
+       crashproefGeenRol      de deur ging niet open (401/403). Werk: de juiste
+                              rol of sleutel meegeven.
+       crashproefOnbepaald    niet in te delen zonder te kijken. Dit is een
+                              kwaliteitssignaal over de METER zelf en hoort
+                              daarom naar nul: elke rij hier betekent dat de
+                              triage het antwoord schuldig blijft.
+
+     WAT ER MET OPZET GEEN TAND KRIJGT is BLOCKED_FEATURE. Een 503 zegt dat de
+     DIENST weigert -- een schakelaar of een afhankelijkheid -- en dat is geen
+     schuld van de proef. Er een tand op zetten zou iemand verleiden de
+     proefwereld uit te breiden om een getal groen te krijgen, terwijl er niets
+     aan de fixture mankeert. Zelfde grond als GEEN_DUURZAME_WEG: een gemeten
+     feit, geen werk. */
+  { sleutel: 'crashproefGeenLijf', richting: 'omlaag', wat: 'crashproefrijen waar de route het verzoek afkeurde en req.body leest -- er ontbreekt een lijf' },
+  { sleutel: 'crashproefGeenWereld', richting: 'omlaag', wat: 'crashproefrijen die op de toestand strandden -- er ontbreekt een voorziening' },
+  { sleutel: 'crashproefGeenRol', richting: 'omlaag', wat: 'crashproefrijen die niet voorbij de deur kwamen (401/403)' },
+  { sleutel: 'crashproefOnbepaald', richting: 'omlaag', wat: 'crashproefrijen die de triage niet kon indelen -- een signaal over de meter zelf' },
+  /* DE GEVOLGDEKKING, EN MET OPZET DRIE TANDEN ZONDER PERCENTAGE ERBOVEN
+     (GEVOLGDEKKING.json, npm run gevolgdekking).
+
+     Van hoeveel AI-bedienbare handelingen weet dit huis wat zij VEROORZAKEN? Twee
+     assen die nooit worden opgeteld: de METING (wat de idempotentieproef zag
+     bewegen, via kern/stuur/gevolg.js) en de VERKLARING (het gevolgcontract van
+     een mens). Een samengesteld getal eroverheen zou verbergen welke van de twee
+     bewoog, en dat is precies wat keuringsregel 48 en BEWIJSMACHINE.md verbieden.
+
+       gevolgPadenOnbekend      de proef kwam er niet bij. Dit is de rem op een
+                                planner: een plan mag alleen over handelingen gaan
+                                waarvan het gevolg voldoende bekend is. Alleen omlaag.
+       gevolgContractVolledig   handelingen met een volledige verklaring. Alleen
+                                omhoog -- een verklaring die verdwijnt, droeg niet.
+       gevolgContractenGezakt   contracten die de keuring niet halen. Hoort NUL te
+                                zijn en is geen voorraad: een contract dat
+                                `gemeten` claimt waar de meting zweeg, is precies
+                                het valse groen waar deze laag tegen is gebouwd.
+
+     WAAROM DE DERDE APART STAAT EN NIET BIJ DE EERSTE OPGETELD. Een pad zonder
+     meting en een contract dat LIEGT vragen het tegenovergestelde: het eerste is
+     werk dat nog niet gedaan is, het tweede een defect. Zelfde reden als de
+     tweedeling bij `geldpadGezakt` / `geldpadOnbewezen` hierboven. */
+  { sleutel: 'gevolgPadenOnbekend', richting: 'omlaag', wat: 'AI-bereikbare handelingen waarvan het gevolg ongemeten is (GEVOLGDEKKING.json)' },
+  { sleutel: 'gevolgContractVolledig', richting: 'omhoog', wat: 'handelingen met een VOLLEDIG gevolgcontract' },
+  { sleutel: 'gevolgContractenGezakt', richting: 'omlaag', wat: 'gevolgcontracten die de keuring niet halen (hoort nul te zijn)' },
   /* DE EERSTE MINUUT (EERSTEMINUUT.json, npm run eersteminuut).
 
      Wat een mens die RTG niet kent in zijn eerste minuut krijgt. Deze meter
@@ -623,6 +717,30 @@ const METERS = [
      talentdomeinen hij werkelijk heeft gezien. Omhoog, want dit mag niet stil
      dalen -- zie de kop bij CARRIEREVORM.json in ./lib/metingen.js. */
   { sleutel: 'carriereDomeinenGemeten', richting: 'omhoog', wat: 'talentdomeinen die de carrierevormmeter werkelijk heeft gezien' },
+  /* DE LEDENCONTEXT VAN RAHUL (AICONTEXT.json, npm run aicontext). Twee tanden
+     die het tegenovergestelde doen; zie de kop bij het register in
+     ./lib/metingen.js. De invariant omlaag, het bereik omhoog. */
+  { sleutel: 'aiContextLek', richting: 'omlaag', wat: 'velden die het kantoor schrijft en die Rahuls ledencontext ook leest (AICONTEXT.json)' },
+  { sleutel: 'aiContextVeldenGezien', richting: 'omhoog', wat: 'velden van de ledenstaat die de contextmeter werkelijk heeft gezien' },
+  /* Het BEREIK van de stagevormmeter (STAGE.md par. 0), en om precies dezelfde
+     reden omhoog: de UITKOMST (0 gedeelde velden) mag bewegen, het aantal
+     publieke domeinen dat de meter ziet niet stil dalen. */
+  { sleutel: 'stageDomeinenGemeten', richting: 'omhoog', wat: 'publieke domeinen die de stagevormmeter werkelijk heeft gezien' },
+  /* Publieke domeinen waarover scripts/lib/wekbesluit.js geen uitspraak doet.
+     Omlaag, en hij staat op nul: een domein dat publiek is en waarvan niemand
+     heeft besloten of het de publieke rail op mag, hoort niet stil te kunnen
+     ontstaan (STAGE.md par. 8). */
+  { sleutel: 'wekZonderUitspraak', richting: 'omlaag', wat: 'publieke domeinen zonder uitspraak in het wekbesluitregister' },
+  /* SCHAKELS IN DE PUBLIEKE KETEN DIE OPENSTAAN MET EEN REDEN (MOMENTPROEF.json).
+     Omlaag, en dit is de tand die de uitweg `openBekend` eerlijk houdt: hij is
+     bedoeld voor een schakel die aantoonbaar niet sluit terwijl er een besluit
+     over openstaat, en zo'n uitweg verwatert vanzelf tot "alles wat niet werkt
+     krijgt een zinnetje". Elke open schakel is een openstaand besluit; er mogen
+     er dus alleen minder worden.
+
+     Wat hier NIET staat is het aantal gesloten schakels. Dat zou stijgen door de
+     proef langer te maken, en dan wordt een meter beter door hem te verlengen. */
+  { sleutel: 'momentOpenBekend', richting: 'omlaag', wat: 'schakels in de publieke keten die openstaan met een uitgeschreven reden (MOMENTPROEF.json)' },
   { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' },
   /* DE LUSINDEX (LUSSEN.json, npm run lussen). Drie tanden, en alle drie tellen
      ze een SCHULD en geen prestatie -- anders maakt lussen toevoegen de meter
@@ -1332,6 +1450,11 @@ function meet(bronnen) {
     rollbackUitzonderingen: leesRegister('ROLLBACKBESLUIT.json', (j) => Object.keys(j.routes || {}).length),
     faalproefGezakt: leesRegister('FAALPROEF.json', (j) => j.gemeten.gezakt),
     carriereDomeinenGemeten: leesRegister('CARRIEREVORM.json', (j) => j.gemeten.domeinen),
+    aiContextLek: leesRegister('AICONTEXT.json', (j) => j.muur.lek.length),
+    aiContextVeldenGezien: leesRegister('AICONTEXT.json', (j) => j.ledenstaat.aantal),
+    stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
+    wekZonderUitspraak: leesRegister('WEKDEKKING.json', (j) => j.gemeten.zonderUitspraak),
+    momentOpenBekend: leesRegister('MOMENTPROEF.json', (j) => j.telling.openBekend),
     lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),
     lussenKritiek: leesRegister('LUSSEN.json', (j) => j.ratel.kritiek),
     lussenZonderOverlapRem: leesRegister('LUSSEN.json', (j) => j.ratel.wekkersAsyncZonderRem),
@@ -1347,6 +1470,19 @@ function meet(bronnen) {
        betekenen ze "geen bewijs", en de tand die ertoe doet is de andere. Het
        verschil tussen die twee staat per stap in het register zelf. */
     geldpadOnbewezen: leesRegister('FACTUURPROEF.json', (j) => (j.telling.BLOCKED || 0) + (j.telling.UNKNOWN || 0)),
+    crashasOnbekend: leesRegister('CRASHAS.json', (j) => j.telling.onbekend),
+    /* Bestaand MIN meetbaar, en niet een eigen veld in het register: de twee
+       getallen die dit verschil dragen staan daar al, en een derde dat ze
+       samenvat zou bij de eerstvolgende wijziging uit de pas lopen. */
+    crashasNietMeetbaar: leesRegister('CRASHAS.json', (j) => j.telling.bestaat - j.telling.meetbaar),
+    crashproefGezakt: leesRegister('CRASHPROEF.json', (j) => j.telling.FAILED || 0),
+    crashproefGeenLijf: leesRegister('CRASHPROEF.json', (j) => j.telling.BLOCKED_BODY || 0),
+    crashproefGeenWereld: leesRegister('CRASHPROEF.json', (j) => j.telling.BLOCKED_WORLD || 0),
+    crashproefGeenRol: leesRegister('CRASHPROEF.json', (j) => j.telling.BLOCKED_ROLE || 0),
+    crashproefOnbepaald: leesRegister('CRASHPROEF.json', (j) => j.telling.BLOCKED_ONBEPAALD || 0),
+    gevolgPadenOnbekend: leesRegister('GEVOLGDEKKING.json', (j) => j.tellers.onbekendeEffectpaden),
+    gevolgContractVolledig: leesRegister('GEVOLGDEKKING.json', (j) => j.tellers.contractVolledig),
+    gevolgContractenGezakt: leesRegister('GEVOLGDEKKING.json', (j) => j.tellers.contractenGezakt),
     eersteMinuutGezakt: leesRegister('EERSTEMINUUT.json', (j) => j.telling.gezakt),
     pakteMisgelopen: leesRegister('PAKTE.json', (j) => j.telling.misgelopen),
     menstaalTeVer: leesRegister('MENSTAALPROEF.json', (j) => j.telling.teVer),
@@ -1675,6 +1811,7 @@ function main() {
 
   if (slechter.length) {
     console.log('\n\x1b[31m  DE NORM IS NIET GEHAALD.\x1b[0m\n');
+  console.log('  \x1b[2mbereik: de ratels en aantalsnormen in NORM.json. Zegt niets over gedrag, routedekking, ketens of documentwaarheid.\x1b[0m\n');
     for (const s of slechter)
       console.log('    ' + s.m.sleutel + ': ' + s.nu + ' terwijl de norm ' + s.norm + ' is  -- ' + s.m.wat);
     console.log('\n  Dit is geen advies. Wat een keer goed was, hoort niet stilletjes slechter te');
@@ -1694,6 +1831,7 @@ function main() {
       (beterDan.length + presBeter.length ? ', en op ' + (beterDan.length + presBeter.length) + ' punt(en) ruim' : '') +
       (nieuw.length + presNieuw.length ? '; ' + (nieuw.length + presNieuw.length) + ' meter(s) wachten nog op een grondwaarde' : '') + '.');
     console.log('  \x1b[2mLeg dat vast met: node scripts/norm.js --vastleggen\x1b[0m\n');
+  console.log('  \x1b[2mbereik: de ratels en aantalsnormen in NORM.json. Zegt niets over gedrag, routedekking, ketens of documentwaarheid.\x1b[0m\n');
     return 0;
   }
   /* HIER STOND `if (beterDan.length && vastleggen)`. Een meter die je toevoegt
@@ -1753,6 +1891,7 @@ function main() {
   }
 
   console.log('\n  \x1b[32mDe norm is gehaald.\x1b[0m\n');
+  console.log('  \x1b[2mbereik: de ratels en aantalsnormen in NORM.json. Zegt niets over gedrag, routedekking, ketens of documentwaarheid.\x1b[0m\n');
   return 0;
 }
 

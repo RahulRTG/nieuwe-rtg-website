@@ -33,7 +33,7 @@ const ROLLEN = ['member', 'supplier', 'staff'];
 const UIT_DIRECT_GEHAALD = [
   { pad: '/api/pay/saldo', op: '2026-09-13', naar: 'voorstel',
     reden: 'betaalt de maandfactuur uit het eigen RTG Pay-saldo (kern/factuursaldo.js): ' +
-      'negen collecties gemeten, waaronder paySaldi, invoices en fondsAfdrachten. Hij stond ' +
+      'negen collecties volgens de BRON (de proef komt er niet bij). Hij stond ' +
       'in de LEZEN-lijst en was daarmee het enige geldpad van een lid dat het stuur zonder ' +
       'bevestiging kon uitvoeren' }
 ];

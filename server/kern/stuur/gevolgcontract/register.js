@@ -33,6 +33,7 @@
 'use strict';
 
 const { BANK } = require('./register-bank');
+const { BANK_BEVESTIG } = require('./register-bank-bevestig');
 const { LID } = require('./register-lid');
 const { OPLAAD } = require('./register-pay-oplaad');
 const { STUUR } = require('./register-pay-stuur');
@@ -42,7 +43,8 @@ const { KLOMPJE_BETAAL } = require('./register-pay-klompje-betaal');
 
 const CONTRACTEN = (() => {
   const uit = {};
-  for (const [naam, deel] of [['register-bank.js', BANK], ['register-lid.js', LID],
+  for (const [naam, deel] of [['register-bank.js', BANK],
+    ['register-bank-bevestig.js', BANK_BEVESTIG], ['register-lid.js', LID],
     ['register-pay-oplaad.js', OPLAAD], ['register-pay-stuur.js', STUUR],
     ['register-pay-factuur.js', FACTUUR], ['register-pay-klompje.js', KLOMPJE],
     ['register-pay-klompje-betaal.js', KLOMPJE_BETAAL]]) {

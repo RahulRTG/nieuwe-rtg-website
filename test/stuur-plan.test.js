@@ -91,8 +91,8 @@ test('6. een stap die naar een onbekende stap wijst, zakt', () => {
 test('7. het plan zegt VOORAF hoeveel bevestigingen het gaat vragen', () => {
   /* STAP c IS EEN LEESSTAP en hoort daarom niets aan de teller toe te voegen -- dat is wat
      deze toets aantoont. Hier stond `/api/pay/saldo`, en die bleek geen leesroute maar een
-     geldweg (kern/factuursaldo.js: de maandfactuur uit het eigen saldo, negen gemeten
-     collecties); hij staat sinds 13 september 2026 op `voorstel`. Vervangen door een ECHTE
+     geldweg (kern/factuursaldo.js: de maandfactuur uit het eigen saldo, gelezen in de bron --
+     de proef komt er niet bij); hij staat sinds 13 september 2026 op `voorstel`. Vervangen door een ECHTE
      leesroute in plaats van de verwachting op 3 te zetten: met 3 zou de toets nog wel een
      getal controleren, maar niet meer de eigenschap dat lezen geen bevestiging kost. */
   const r = compileer({ doel: 'twee mutaties', stappen: [

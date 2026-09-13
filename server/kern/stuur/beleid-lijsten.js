@@ -61,9 +61,16 @@ const KLEIN = Object.freeze({
    LEZEN-lijst hierboven en betaalt de maandfactuur uit het eigen RTG Pay-saldo
    (server/routes/pay.js -> kern/factuursaldo.js: afschrijven via pay.huisIn, de factuur
    sluiten via settleFactuur, en de 30%-afdracht aan de RTFoundation). De meting bevestigt
-   het: kern/stuur/gevolg.js ziet er NEGEN collecties bewegen, waaronder paySaldi,
-   payBoekingen, invoices en fondsAfdrachten -- terwijl zijn twee lijstgenoten
-   (overzicht, tiks) allebei `geen-effect-gemeten` zijn.
+   CORRECTIE VAN 13 SEPTEMBER 2026, en zij hoort hier te staan: als derde bron stond hier de
+   MEETUITSLAG ("kern/stuur/gevolg.js ziet er negen collecties bewegen"). Die negen waren
+   VOORWERK van de idempotentieproef, aan dit pad toegerekend -- na de herijking in
+   scripts/lib/idemproef.js is `opslag.a` hier LEEG en is de stand wat hij altijd al was:
+   `ongemeten`, want zonder openstaande factuur komt de proef niet bij de muterende code.
+   De twee bronnen die overblijven (de route en de kop van de module) zijn broncode en
+   dragen deze reparatie zelfstandig; de meting droeg nooit iets bij.
+
+   Zijn twee lijstgenoten (overzicht, tiks) zijn wel echt gemeten en allebei
+   `geen-effect-gemeten`.
 
    WAAROM DAT ERGER WAS DAN DE VIJF VAN 31 AUGUSTUS. `DIRECT` is de vereniging van LEZEN
    en KLEIN en betekent: de AI mag dit ZONDER bevestiging. Er stond geen frictiebodem op

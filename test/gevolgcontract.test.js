@@ -253,7 +253,7 @@ test('HET REGISTER IS SAMENGESTELD, en een dubbele definitie valt om bij het LAD
      toen er twee pay-delen bijkwamen zei deze toets dat het register niet de som van zijn
      delen was -- terwijl het dat wel was; de toets kende de som niet. Een lijst delen die
      met de hand meegroeit, is precies de tweede waarheid die dit register vermijdt. */
-  const DELEN = ['register-bank', 'register-lid', 'register-pay-oplaad', 'register-pay-stuur',
+  const DELEN = ['register-bank', 'register-bank-bevestig', 'register-lid', 'register-pay-oplaad', 'register-pay-stuur',
     'register-pay-factuur', 'register-pay-klompje', 'register-pay-klompje-betaal']
     .map(n => [n + '.js', Object.values(require('../server/kern/stuur/gevolgcontract/' + n))[0]]);
   assert.ok(DELEN.length >= 4, 'de delenlijst is leeg of onvolledig');

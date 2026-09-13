@@ -376,48 +376,64 @@ expliciete bevoegdheden → dienst → bewijs* -- want een mens hoeft niet door 
 beoordeeld te worden om binnen te komen. Drie grondwetsregels, en ze staan vóór
 de dienst die ze moet beteugelen: **MN-01 geen bevoegdheidsvoordeel** (tien
 bewijsgevallen, met als aanvalsproef dat de eigenaar van RTG zelf manager wordt
-van een testtalent en zonder machtiging niets kan), **MN-02 geen
-informatievoordeel** en **MN-03 geen commercieel voordeel** (de AI zegt erbij dat
-RTG aan één van de opties verdient). Vijf metingen gaan vooraf. Het
+van een testtalent en zonder machtiging niets kan), **MN-02 scheiding van
+hoedanigheden** en **MN-03 geen commercieel voordeel** (de AI zegt erbij dat RTG
+aan één van de opties verdient).
+
+**Zes metingen gaan vooraf, en twee daarvan veranderen het ontwerp.** Het
 bevoegdheidsvoordeel is al dicht en niet beloofd: er is geen kantoorweg naar een
 machtiging, en `routes/vertegenwoordiging.js` kan per definitie niet bij
-`kluisAuth`. **Het informatievoordeel is NIET dicht, en hoort dat ook niet te
-zijn**: `kern/ledenbalie.js` is een legitieme kennisweg (codenaam, pas, land,
-abo-stand -- nooit een naam) met een spoor in `server/inzagelog.js`, dus een
-medewerker die óók iemands manager is weet meer dan een externe manager met
-dezelfde machtiging. MN-02 is daarom een CONFLICTREGEL en geen verbod, en het
-handhavingspunt bestaat al. Verder: acht naamsbotsingen, en **de tweede helft is
-de leerzaamste** -- na `kluis` (192 bestanden), `wallet` (87), `paspoort` (139) en
-`firewall` (26) zijn ook de vier VERVANGENDE namen gemeten, en drie daarvan zijn
-óók bezet: `loopbaanbewijs` is al een scherm, `herkomst` heeft zeven eigen
-modules, en **`bewijsmap` bestaat al als precies deze functie** -- `kern/rtgid-bewijs.js`
-plus `/apps/bewijsmap.html`, en de kop daarvan zegt dat HDI.md die naam koos omdat
-`wallet` bezet was. Dit huis heeft dus al een keer dezelfde afweging gemaakt en
-is op dezelfde vervanger uitgekomen; alleen `rechtenregister` is vrij. Een
-codenaam en een schermnaam hoeven trouwens niet hetzelfde te zijn. Drie
-correcties die niet mogen verwateren. Een **talentladder**, een
-**bijdragegrafiek per persoon** en een **netwerkwaarde in euro's per mens** zijn
-alle drie een cijfer op een mens (CAR-05); de uitweg is niet stoppen met meten
-maar het één niveau omhoog verplaatsen -- **RTG meet wat een PROGRAMMA oplevert,
-nooit wat een mens waard is** (`kern/rtfos/gemeente.js` is de bestaande vorm).
-**Er komt geen `economisch persoon` en geen vijfde wereld**: de natuurlijke
-persoon bestaat al als `consument`, en CAR-01 is geen datamodelvraag maar één van
-vier losse vragen (kan ontvangen / kan vertegenwoordigen / kan verkopen / kan
-uitbetaald worden) waarvan alleen de laatste dicht is -- die blijft dicht tot het
-juridische besluit genomen kan worden, en er wordt geen architectuur omheen
-gebouwd. En **pods botsen met de NOOIT-lijst**: doorzetten naar een specialist is
-delegatie, dus een team is een **mandaatconstellatie** van losse machtigingen die
-de cliënt per stuk aanvinkt, waarbij een lead manager een specialist alleen kan
-VOORSTELLEN en nooit toevoegen. Par. 7 zet drie poorten vóór het besluit
-(rugdekking zichtbaar, MN-01+02, MN-03) en daarna een vierde ketenproef in de
-vorm van `tafelproef.js` -- een volledige synthetische loopbaan van zelf beheerd
-tot RTG verlaten, waarbij per overgang bewezen wordt dat de mens intact blijft en
-de bevoegdheden exact veranderen. Par. 9 is de nazoekronde die `CARRIERE.md` par.
-3 eiste: WebAuthn L3 (Recommendation 25 augustus 2026) en C2PA 2.4 (april 2026)
-bevestigd, de OpenID4VCI-datum klopte niet (zelfcertificering sinds 26 februari
-2026), en **herkomst is een signaal en geen bewijs** -- er komt nooit een groen
-"deze foto is echt", en *"dit bestand draagt herkomst"* en *"RTG heeft dit bestand
-op datum X ontvangen"* worden nooit vermengd.
+`kluisAuth`. Maar **het journaal faalt open, en niemand heeft dat gekozen**:
+`server/inzagelog.js` geeft `noteer()` een uitslag terug die **geen van de 42
+aanroepende bestanden leest**, het wegschrijven zit in een lege `catch`, en
+zonder database schrijft hij in een weggegooide array en meldt succes. De inzage
+gaat dus door als het spoor niet geschreven wordt -- dezelfde stille faalvorm als
+`res.append` in AFSPRAAK.md. Daarbij is het journaal een ringbuffer (MAX 5000,
+oudste valt eraf) met wél een hashketen eronder: wat er staat is onvervalsbaar,
+maar een keten bewijst niet dat er niets ontbreekt. De reparatie hoort op ÉÉN
+plek (`kern/kantoor/kluispoort.js`) en niet in 42 -- *geen aantoonbaar journaal,
+geen inzage* -- en dat is besluit 5.
+
+Daaruit volgt de vorm van MN-02, en die is anders dan hij eerst was: niet *"een
+RTG-manager ziet hetzelfde als een externe"* (dat sneuvelt, want `kern/ledenbalie.js`
+is een LEGITIEME kennisweg met reden, journaal en melding), maar **geen
+bevoegdheid of kennis uit hoedanigheid A mag stilzwijgend worden gebruikt in
+hoedanigheid B**. Zeven proeven, waarvan de laatste drie de moeilijke zijn:
+terugkeer naar de managercontext neemt niets mee, de AI-context krijgt het ook
+niet als VERBORGEN context, en export, rapport en cache besmetten elkaar niet --
+je kunt namelijk perfect afgeschermde routes hebben terwijl een contextbouwer
+twee werelden alsnog samenvoegt. En het systeem wisselt **nooit vanzelf** van
+context: dat is een beveiligingsgrens en geen sierfunctie. **De hoedanigheid is
+trouwens veel groter dan deze laag**: het woord komt in `server/` voor in vier
+bestanden en alle vier in `kern/vertegenwoordiging/`, terwijl `kern/envelop.js`
+wél `actor` draagt en géén hoedanigheid -- dus dit is de eerste plek waar de
+regel hard bewezen kan worden, en wat hier wordt vastgelegd wordt later
+platformbreed geciteerd.
+
+Verder: acht naamsbotsingen, en **de tweede helft is de leerzaamste** -- na
+`kluis` (192 bestanden), `paspoort` (139), `wallet` (87) en `firewall` (26) zijn
+ook de vier VERVANGENDE namen gemeten, en drie daarvan zijn óók bezet:
+`loopbaanbewijs` is al een scherm, `herkomst` heeft zeven eigen modules, en
+**`bewijsmap` bestaat al als precies deze functie** (`kern/rtgid-bewijs.js` +
+`/apps/bewijsmap.html`), waarvan de kop zegt dat HDI.md die naam koos omdat
+`wallet` bezet was. Alleen `rechtenregister` is vrij; een codenaam en een
+schermnaam hoeven niet hetzelfde te zijn. Drie correcties die niet mogen
+verwateren: een **talentladder**, een **bijdragegrafiek per persoon** en een
+**netwerkwaarde in euro's per mens** zijn alle drie een cijfer op een mens
+(CAR-05) -- de uitweg is meten één niveau omhoog verplaatsen, **RTG meet wat een
+PROGRAMMA oplevert en nooit wat een mens waard is**; er komt **geen `economisch
+persoon` en geen vijfde wereld** (CAR-01 is één van vier losse vragen en blijft
+dicht tot het juridische besluit genomen kan worden); en **pods botsen met de
+NOOIT-lijst**, dus een team is een **mandaatconstellatie** van losse machtigingen
+die de cliënt per stuk aanvinkt, waarbij een lead een specialist alleen kan
+VOORSTELLEN. Par. 7 zet drie poorten vóór het besluit en daarna een **vierde
+ketenproef** in de vorm van `tafelproef.js`: twaalf schakels van zelf beheerd tot
+vertrek, plus tien storingen waarvan de laatste geen hypothese meer is. Par. 9 is
+de nazoekronde die `CARRIERE.md` par. 3 eiste: WebAuthn L3 (25 augustus 2026) en
+C2PA 2.4 (april 2026) bevestigd, de OpenID4VCI-datum klopte niet (26 februari
+2026), en **herkomst is een signaal en geen bewijs** -- nooit een groen "deze foto
+is echt", en *"dit bestand draagt herkomst"* en *"RTG heeft dit op datum X
+ontvangen"* worden nooit vermengd.
 
 **Let op de terugstortstand (24 augustus 2026).** Of leden hun saldo terugkrijgen
 is een schakelaar in de boardroom (`/api/office/bank/terugstorting`), en die

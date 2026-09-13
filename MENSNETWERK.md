@@ -22,7 +22,7 @@ hem heeft doorbroken.
 
 ---
 
-## 0. De vijf metingen die vóór alles gaan
+## 0. De zes metingen die vóór alles gaan
 
 Gemeten op 13 september 2026, uit de bron. Dezelfde volgorde als bij `Asset`
 (`OBJECTMODEL.json`) en de carrièrelus (`CARRIEREVORM.json`): eerst rekenen, dan
@@ -145,8 +145,6 @@ doorgeven, is geen machtiging maar een sleutel."* Zie par. 3.
 
 ### 0.5 Twee voordelen, en maar één ervan is vandaag dicht
 
-Dit is de meting die MN-02 opende, en zij corrigeert een gerustheid.
-
 **Het bevoegdheidsvoordeel is dicht.** Er is geen kantoorweg naar een
 machtiging, en `routes/vertegenwoordiging.js` draait achter de domeingrens
 `vertegenwoordiging` en **kan per definitie niet bij `kluisAuth`** -- dat staat
@@ -163,17 +161,48 @@ sinds, de abo-stand en de open klachten -- en **elke blik laat een spoor na** in
 het bestaande inzagejournaal (`server/inzagelog.js`), met een reden die iets
 zegt.
 
-Maar dat betekent: **een medewerker van RTG die óók de manager van een cliënt
-is, heeft via zijn dienstverband een kennisweg die de externe manager niet
-heeft.** Niet door een lek, maar door een legitieme voorziening die moet blijven
-bestaan.
+Een medewerker van RTG die óók de manager van een cliënt is, heeft dus via zijn
+dienstverband een kennisweg die de externe manager niet heeft. Niet door een lek,
+maar door een legitieme voorziening die moet blijven bestaan. Daaruit volgt de
+vorm van MN-02 in par. 4: geen gelijkheid, maar **scheiding van hoedanigheden**.
 
-Dat maakt MN-02 geen theoretisch risico en geen verbod, maar een
-**conflictregel**: de weg blijft, en wie hem gebruikt voor een cliënt van
-zichzelf, doet dat zichtbaar voor die cliënt. Het handhavingspunt bestaat al --
-het journaal -- en `kern/consent-register.js` draagt de zin die de vorm geeft:
-*"U krijgt van elke opvraging bericht, en ze staat met reden in het
-inzagejournaal."*
+### 0.6 Het journaal faalt open, en niemand heeft dat gekozen
+
+Dit is de vondst van deze ronde, en zij beantwoordt een vraag die als storing
+werd gesteld: *wat gebeurt er als het journaal niet kan schrijven?*
+
+Gemeten in `server/inzagelog.js`:
+
+- `noteer()` geeft de weggeschreven regel terug, of `null`. **Geen enkele van de
+  42 bestanden die het journaal aanroepen leest die uitslag.** In
+  `kern/ledenbalie.js` staat de aanroep als losse regel en het dossier gaat er
+  direct achteraan de deur uit.
+- Het wegschrijven zelf is `if (SAVE) { try { SAVE(); } catch (e) {} }` -- een
+  mislukte opslag verdwijnt **stil**, precies de faalvorm die `AFSPRAAK.md` al
+  een keer heeft opgeleverd met `res.append`.
+- Zonder database valt `rij()` terug op een lege lijst, en dan schrijft `noteer()`
+  in een array die nergens heen gaat en geeft een regel terug alsof het lukte.
+
+Dus: **vandaag gaat de inzage door, ook als het spoor niet geschreven wordt, en
+de aanroeper merkt er niets van.** Dat is geen besluit dat iemand genomen heeft;
+het is de stand die ontstaat als je logging naast een handeling zet in plaats van
+ervóór.
+
+De belofte *"elke blik laat een spoor na"* is dus vandaag een belofte over de
+bedoeling en niet over de uitkomst. Twee dingen erbij, want ze horen in dezelfde
+zin:
+
+- **Het journaal is een ringbuffer.** `MAX = 5000`, en loopt hij vol dan valt de
+  oudste eraf. De vraag *"wie heeft mijn naam opgezocht?"* heeft dus een horizon.
+- **Wat er staat is wél onvervalsbaar.** Er ligt een hashketen onder
+  (`lib/keten.js` plus `lib/keten-anker.js`), dus een regel die er staat kan niet
+  ongemerkt worden veranderd. Maar een keten bewijst dat wat er staat klopt, niet
+  dat er niets ontbreekt.
+
+**De reparatie hoort op één plek en niet in 42.** `kern/kantoor/kluispoort.js`
+bestaat al als de poort voor de zware inzage (hij hangt vandaag aan 8 van de 585
+kantoorroutes, `KANTOOR.md`). Daar hoort de regel te staan, en daar is hij ook
+uitvoerbaar: **geen aantoonbaar journaal, geen inzage.**
 
 ---
 
@@ -194,6 +223,31 @@ ontworpen, en belang bestaat nog niet -- want RTG heeft er vandaag geen.
 Dat is ook de volgorde waarin ze urgent worden: **belang ontstaat op de dag dat
 RTG zelf gaat managen**, en dat is precies de dag waarop de eerste twee niet meer
 op goed vertrouwen mogen rusten.
+
+### 1.1 De hoedanigheid is groter dan deze laag, en bestaat in vier bestanden
+
+Eén mens kan binnen RTG tegelijk lid zijn, werknemer, ondernemer, ouder,
+manager, cliënt, vrijwilliger van de Foundation en medewerker van RTG. Het
+platform weet dus wel *wie* er handelt, maar niet *in welke hoedanigheid*.
+
+Gemeten: het woord `hoedanigheid` komt in `server/` voor in **vier bestanden, en
+alle vier in `kern/vertegenwoordiging/`.** Het begrip bestaat dus, maar
+uitsluitend als eigenschap van een vertegenwoordiger -- niet als eigenschap van
+de handelende mens. En `CARRIERE.md` par. 2 had dat gat al aan de andere kant
+gemeten: `kern/envelop.js` draagt wél *wie* (`actor`), *waardoor*
+(`correlatie`, `oorzaak`) en *hoe gevoelig* (`classificatie`), maar **niet in
+welke hoedanigheid** -- en die toevoeging is een versiesprong op een envelop die
+gesloten is op acht velden.
+
+Wat er vandaag feitelijk voor doorgaat zijn de auth-deuren: een sessie komt
+binnen als lid, als zaak of als personeel, en dat bepaalt wat zij mag. Dat werkt
+voor toegang en het is geen hoedanigheidsmodel: het zegt langs welke deur iemand
+kwam, niet in welke rol hij nu staat tegenover déze mens.
+
+**Deze laag is daarmee de eerste plek waar de regel hard bewezen kan worden, maar
+de eigenschap is veel groter dan vertegenwoordiging.** Dat is een reden om hem
+hier zorgvuldig te bouwen en geen reden om hem hier te verzinnen: wat hier wordt
+vastgelegd, wordt later platformbreed geciteerd.
 
 ---
 
@@ -354,24 +408,57 @@ En de aanvalsproef: **maak de eigenaar van RTG zelf manager van een testtalent
 en bewijs dat hij zonder machtiging niets kan.** Dat is overtuigender dan tien
 alinea's.
 
-### MN-02 -- geen informatievoordeel
+### MN-02 -- scheiding van hoedanigheden
 
-> **Een medewerker van RTG mag via zijn dienstverband niet meer over een cliënt
-> kunnen weten dan een externe vertegenwoordiger met dezelfde machtiging --
-> tenzij de cliënt dat ziet.**
+> **Geen bevoegdheid of kennis die in hoedanigheid A is verkregen, mag
+> stilzwijgend worden gebruikt in hoedanigheid B.**
 
-Par. 0.5 laat zien dat dit vandaag niet waar is, en dat dat geen fout is: de
-ledenbalie moet bestaan. De regel is dus een **conflictregel** en geen verbod, en
-hij hangt aan drie dingen die al bestaan: het inzagejournaal, de reden die
-daarbij hoort, en het bericht aan het lid.
+Dit is niet *"een RTG-manager ziet altijd precies hetzelfde als een externe"* --
+die formulering sneuvelt op par. 0.5, want een medewerker mág via de ledenbalie
+meer weten, op grond van een andere en legitieme hoedanigheid. De regel gaat dus
+niet over gelijkheid maar over **niet-overdraagbaarheid**.
 
-Wat erbij moet is het kleinste stuk: een medewerker die een machtiging houdt voor
-een cliënt, is voor díé cliënt een belanghebbende -- en dat hoort in het journaal
-te staan, aan de kant van het lid.
+Drie contexten voor één mens, en ze lopen niet in elkaar over:
 
-Let op de breedte: dit gaat niet alleen over de balie, maar over elke weg waarlangs
-kennis ontstaat zonder machtiging -- logs, support, AI-context, exports en
-observability.
+    als manager     → wat de cliënt hem heeft gemachtigd te zien
+    als medewerker  → een legitieme opvraging, met reden, journaal en melding
+    als eigenaar    → geen vierde deur
+
+Zeven proeven, en de laatste drie zijn de moeilijke:
+
+1. Managercontext → ledenbaliegegevens zijn er niet.
+2. Kantoorcontext met een geldige reden → minimale gegevens beschikbaar.
+3. Opvraging → regel in het inzagejournaal.
+4. Opvraging → melding aan de cliënt volgens bestaand beleid.
+5. Terug naar de managercontext → wat zojuist in de kantoorcontext is gezien,
+   reist niet mee.
+6. AI-context van de manager → kantoorgegevens zijn er ook niet als *verborgen*
+   context.
+7. Export, rapport en cache → geen kruisbesmetting.
+
+Nummer 6 en 7 zijn de reden dat deze regel bestaat: **je kunt perfect
+afgeschermde routes hebben terwijl een contextbouwer twee werelden alsnog
+samenvoegt.** Wat hier gebouwd wordt is geen toegangsregel maar
+niet-interferentie tussen hoedanigheden, en dat is een andere en zwaardere
+eigenschap.
+
+Wat er al staat om op te bouwen: het journaal, de verplichte reden, en de
+melding aan het lid (`kern/consent-register.js`: *"U krijgt van elke opvraging
+bericht, en ze staat met reden in het inzagejournaal."*). Wat ontbreekt is dat
+een medewerker die een machtiging houdt voor een cliënt, voor díé cliënt een
+belanghebbende is -- en dat dat aan de kant van het lid zichtbaar wordt.
+
+**En de UX-regel die erbij hoort, want hij is een beveiligingsgrens en geen
+sierfunctie.** Een mens kiest niet voortdurend een technische rol, maar op een
+risicovol kruispunt is de context onmiskenbaar: *Management · namens Mila* of
+*RTG Kantoor · ledenservice*. Probeert iemand vanuit de ene context iets waarvoor
+alleen de andere bevoegd is, dan **wisselt het systeem nooit vanzelf**:
+
+> *"Dit kan niet vanuit het management van Mila. Deze handeling hoort bij je
+> RTG-kantoorrol."*
+
+Automatisch wisselen zou van de grens een formaliteit maken, en precies dat is
+wat `GRAMMATICA.md` bedoelt met een verhindering die altijd een reden draagt.
 
 ### MN-03 -- geen commercieel voordeel
 
@@ -463,16 +550,23 @@ Bovenop die van `CARRIERE.md` en `RUGDEKKING.md`, die onverkort blijven gelden.
    intern, niet als sorteersleutel. Meten mag, op het niveau van het programma.
 2. **Delegatie blijft uitgesloten.** Een team is meerdere machtigingen; een lead
    stelt voor en verleent nooit (par. 3).
-3. **Een mens hoeft niet beoordeeld te worden om binnen te komen** (par. 0.1).
-4. **Een merk zoekt geen mensen.** Het beschrijft een programma; de mens meldt
+3. **Een hoedanigheid draagt niet over.** Kennis of bevoegdheid uit de ene rol
+   reist niet mee naar de andere -- ook niet via een export, een rapport, een
+   cache of de context van de AI. En het systeem wisselt nooit vanzelf van
+   context (MN-02).
+4. **Een belofte over een spoor is pas een regel als het spoor kan weigeren.**
+   Logging naast een handeling is een bedoeling; logging vóór een handeling is
+   een grens (par. 0.6).
+5. **Een mens hoeft niet beoordeeld te worden om binnen te komen** (par. 0.1).
+6. **Een merk zoekt geen mensen.** Het beschrijft een programma; de mens meldt
    zich aan.
-5. **Een bewijs zegt wat het niet zegt, even groot** -- de vorm die
+7. **Een bewijs zegt wat het niet zegt, even groot** -- de vorm die
    `rtgid-bewijs.js` en het Career Ledger allebei al dragen.
-6. **Rechten over gelijkenis kennen geen stilzwijgende ja.** AI-training en
+8. **Rechten over gelijkenis kennen geen stilzwijgende ja.** AI-training en
    synthetische stem zijn aparte vragen, nooit onderdeel van "beeldgebruik".
-7. **De audiencerelatie is van de mens die volgt.** Een artiest kan zijn publiek
+9. **De audiencerelatie is van de mens die volgt.** Een artiest kan zijn publiek
    bedienen; hij krijgt er geen adreslijst van.
-8. **Herkomst en registratie worden nooit vermengd** (par. 9).
+10. **Herkomst en registratie worden nooit vermengd** (par. 9).
 
 ---
 
@@ -507,18 +601,44 @@ grens die ná het belang komt is geen grens.
 
 **Regel 5 verdient zijn eigen vorm, en die bestaat al.** Dit huis heeft drie
 ketenproeven (`tafelproef.js`, `ritproef.js`, `toelatingsproef.js`) die een hele
-keten écht lopen en per schakel en per storing meten. Een vierde hoort hier:
+keten écht lopen en per SCHAKEL en per STORING meten. De vierde hoort hier, en
+hij is met opzet geen talentketen maar de eerste **mens-relatie-keten**: één
+synthetische mens die twaalf overgangen doorloopt.
 
-> zelf beheerd → externe manager → co-management → RTG Management → specialist
-> erbij → manager vervangen → RTG verlaten → opnieuw een externe manager
+| # | Schakel | Wat bewezen wordt |
+|---|---|---|
+| 1 | zelf beheerd | zij bestuurt haar loopbaan zonder dat iemand haar beoordeelt |
+| 2 | externe manager erbij | die ziet uitsluitend zijn scope |
+| 3 | specialist voorgesteld | de manager kan hem **niet** zelf machtigen |
+| 4 | co-management | de cliënt machtigt de specialist apart |
+| 5 | RTG Management erbij | exact dezelfde rail, geen kantoorweg |
+| 6 | die RTG-manager heeft óók ledenbaliewerk | hier wordt MN-02 aangevallen |
+| 7 | kantooropvraging | reden, minimale gegevens, journaal, melding |
+| 8 | terug naar de managercontext | die gegevens zijn daar niet verschenen |
+| 9 | RTG Management ingetrokken | per direct weg |
+| 10 | de externe manager blijft | zijn bevoegdheid verandert niet mee |
+| 11 | manager vervangen | de overdracht laat geen gat |
+| 12 | vertrek | loopbaan, bewijsmap, identiteit en geschiedenis blijven bij haar |
 
-met per overgang twee dingen tegelijk bewezen: **de mens en zijn geschiedenis
-blijven intact, en de bevoegdheden veranderen exact.** Pas daarna een echte
-cliënt.
+En daarna de storingen, want daar zat bij alle drie de bestaande ketens de
+winst -- elk van hen vond iets dat geen enkele losse routetoets zag:
 
-En let op wat de drie bestaande ketenproeven hebben opgeleverd: elk van hen vond
-iets dat geen enkele losse routetoets zag. Dit is niet de dure stap voor de
-zekerheid -- het is de stap waar de fouten zitten.
+- een machtiging verloopt midden in een sessie;
+- intrekking terwijl een voorstel wordt voorbereid;
+- de RTG-manager wordt als werknemer gedeactiveerd terwijl zijn
+  cliëntmachtiging nog loopt;
+- de cliëntmachtiging wordt ingetrokken terwijl de kantoorrol blijft;
+- een specialist probeert een oude URL opnieuw;
+- de AI heeft nog een oude contextsnapshot;
+- twee vertegenwoordigers wijzigen tegelijk hetzelfde voorstel;
+- de cliënt wordt tijdens de overdracht achttien;
+- een managerwissel halverwege een lopend voorstel;
+- **het inzagejournaal kan niet schrijven.**
+
+Die laatste is geen hypothese meer: par. 0.6 meet dat de inzage vandaag gewoon
+doorgaat en dat de aanroeper het niet merkt. De proef hoort dus te beginnen bij
+de stand die er is, en het besluit eronder is besluit 5.
+
 
 ---
 
@@ -554,6 +674,21 @@ zekerheid -- het is de stap waar de fouten zitten.
 |---|---|---|
 | **A. Eigen vorm houden, standaard later** *(aanbevolen)* | De Bewijsmap werkt en is streng. Een standaard eronder is interoperabiliteit, geen functie. | Nul nu; de vraag komt terug zodra een derde partij moet kunnen verifiëren. |
 | B. Nu op VC 2.0 / OpenID4VCI | Externe verifieerbaarheid vanaf dag één. | Middelgroot, en het raakt een laag die vandaag bewezen goed werkt. |
+
+### Besluit 5 -- Wat gebeurt er als het inzagejournaal niet kan schrijven?
+
+Par. 0.6 meet dat dit vandaag al beantwoord wordt, en niet door iemand die het
+besloten heeft: de inzage gaat door en de aanroeper merkt niets.
+
+| Optie | Wat het betekent | Prijs |
+|---|---|---|
+| **A. Geen aantoonbaar journaal, geen inzage** *(aanbevolen)* | Voor de zware inzage in `kern/kantoor/kluispoort.js`: lukt de regel niet, dan gaat de deur niet open. | Eén poort, niet 42 aanroepers. Een storing in de opslag legt dan wel de ledenbalie stil -- en dat is precies wat de belofte waard maakt. |
+| B. Inzage door, maar luid | De blik mag doorgaan; het mislukken wordt een incident in plaats van een lege `catch`. | Goedkoper, en de belofte "elke blik laat een spoor na" blijft dan een belofte over de bedoeling. |
+| C. Laten zoals het is | -- | Dan staat er een belofte in `ledenbalie.js` die het huis niet kan waarmaken, en dat is precies wat `LAT.md` een belofte in plaats van een regel noemt. |
+
+Let op dat A en B allebei beter zijn dan de huidige stand, en dat de keuze niet
+over veiligheid gaat maar over beschikbaarheid: A zet de ledenbalie stil bij een
+opslagstoring, B laat hem doorwerken met een luide melding.
 
 ---
 
@@ -602,3 +737,25 @@ níét zegt.
 - Het zegt niets over wie een programma verdient. Selectie is mensenwerk.
 - Het beweert niet dat RTG Management een goed idee is. Het zegt wat er waar moet
   zijn voordat het er een kan worden.
+
+---
+
+## 11. De vraag die dit document heeft opgeleverd
+
+Van de acht namen die dit ontwerp voorstelde bleken er vier bezet, en één --
+`bewijsmap` -- bleek de functie die werd ontworpen al te ZIJN, gekozen langs
+precies dezelfde redenering. Van de zeventien onderdelen stonden er zes, zes half,
+en waren er vier werkelijk afwezig.
+
+Dat is tegelijk een compliment en een waarschuwing. Het compliment: de
+onderliggende architectuur is verder dan een inventaris van schermen doet
+vermoeden. De waarschuwing: bij een nieuw plan is *"wat moeten we bouwen?"*
+steeds vaker de verkeerde eerste vraag.
+
+De goede eerste vraag is:
+
+> **welke bestaande waarheid hebben we al, en welke verbinding ontbreekt
+> waardoor een mens haar nog niet als één geheel ervaart?**
+
+Het werk verschuift daarmee van functies naar semantiek, bedrading en harde
+invarianten. Dat is een moeilijker probleem, en een volwassener.

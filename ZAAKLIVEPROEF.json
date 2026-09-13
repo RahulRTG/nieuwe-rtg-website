@@ -14,7 +14,7 @@
       "status": 200,
       "ziet": "zaak PROEFHOTEL, rol manager",
       "fout": null,
-      "ms": 278
+      "ms": 124
     },
     {
       "nr": 2,
@@ -26,7 +26,7 @@
       "status": 200,
       "ziet": "3 open stap(pen), 3 met uitleg",
       "fout": null,
-      "ms": 8
+      "ms": 9
     },
     {
       "nr": 3,
@@ -50,7 +50,7 @@
       "status": 200,
       "ziet": "compleet: true",
       "fout": null,
-      "ms": 13
+      "ms": 15
     },
     {
       "nr": 5,
@@ -98,7 +98,7 @@
       "status": 200,
       "ziet": "bio bij het lid: Een klein proefhotel aan de gracht, acht kamers en een binne",
       "fout": null,
-      "ms": 16
+      "ms": 17
     },
     {
       "nr": 9,
@@ -110,7 +110,7 @@
       "status": 200,
       "ziet": "na herinloggen -- klaar: true, online: true",
       "fout": null,
-      "ms": 124
+      "ms": 119
     }
   ],
   "storingen": [
@@ -171,7 +171,7 @@
   "zaak": {
     "code": "PROEFHOTEL",
     "genre": "hotel",
-    "aanmelding": "a85f15c4"
+    "aanmelding": "563ad3aa"
   },
   "telling": {
     "schakels": 9,

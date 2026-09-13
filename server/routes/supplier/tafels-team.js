@@ -122,7 +122,14 @@ app.post('/api/supplier/leave/decide', supplierAuth, (req, res) => {
 app.post('/api/supplier/activity', supplierAuth, (req, res) => {
   if (!managerOnly(req, res)) return;
   const lijst = (db.data.supplierActivity && db.data.supplierActivity[req.supplier.code]) || [];
-  const n = Math.min(Math.max(Number(req.body && req.body.aantal) || 40, 1), 80);
+  /* Onzin valt terug op de standaard en niet op de ondergrens. `Math.max(n, 1)`
+     alleen gaf bij `aantal: -3` precies EEN regel terug -- een antwoord dat
+     eruitziet alsof er bijna niets gebeurd is, terwijl er niets mis was met de
+     zaak maar met het verzoek. Gevonden door test/supplier-activity.test.js
+     toets 4. Boven de bovengrens knippen we wel, want daar is de bedoeling
+     duidelijk: de aanroeper wil zoveel mogelijk. */
+  const gevraagd = Number(req.body && req.body.aantal);
+  const n = Number.isFinite(gevraagd) && gevraagd >= 1 ? Math.min(gevraagd, 80) : 40;
   res.json({ ok: true, activity: lijst.slice(0, n), totaal: lijst.length });
 });
 

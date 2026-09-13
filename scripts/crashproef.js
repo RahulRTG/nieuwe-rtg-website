@@ -237,7 +237,31 @@ const GRENZEN = [
   { grens: 'voor-eerste-mutatie', modus: 'sterf-voor-mutatie',
     belofte: 'er hoort geen spoor te zijn -- de collecties van deze route staan onaangeroerd' },
   { grens: 'na-commit-voor-antwoord', modus: 'sterf-na-commit',
-    belofte: 'de uitkomst staat vast, en een herhaling na de herstart legt er niets bovenop' }
+    belofte: 'de uitkomst staat vast, en een herhaling na de herstart legt er niets bovenop' },
+  /* DE DERDE GRENS, sinds 13 september. CRASHAS.json had `na-commit-voor-bericht`
+     op 45 van de 45 routes `onbekend` -- meer dan de helft van alle 89 open
+     vragen -- en niet uit onwetendheid maar omdat er geen moment was om in te
+     sterven. Dat moment bestaat nu (server/opzet/meldaan.js).
+
+     DE BELOFTE IS HIER ANDERS DAN BIJ DE TWEE HIERBOVEN, en dat is het punt van
+     een eigen grens: die gaan over de UITKOMST, deze over de MENS. Een route mag
+     atomair en herstelbaar zijn en de betrokkene alsnog nooit iets laten horen. */
+  /* DE BELOFTE IS SMALLER DAN DE GRENS, met opzet en met de reden erbij.
+
+     Hier stond eerst "de uitkomst staat vast, EN DE BETROKKENE HOORT ER ALSNOG
+     VAN". Dat tweede deel toetst geen van de vier beweringen van het
+     overlevingscontract, en een belofte die niets handhaaft is precies wat dit
+     huis elders weigert. Om hem WEL te toetsen zou de proef moeten weten of
+     deze route iemand HOORT te berichten, en dat staat nergens: GELDDEKKING.json
+     verklaart per route zijn geldcollecties en geen meldplicht.
+
+     Wat er wel kan, staat in de rij als FEIT en niet als oordeel: `meldingBewoog`
+     zegt of er na de crash een meldingsbak is bewogen. Een `false` daar is geen
+     gezakte belofte -- de meeste geldroutes berichten niemand -- maar het is het
+     signaal waarmee een mens kan besluiten of hier een meldplicht hoort. */
+  { grens: 'na-commit-voor-bericht', modus: 'sterf-voor-bericht',
+    belofte: 'de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht ' +
+      'hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld' }
 ];
 
 const OFFICE = 'RTG-OFFICE-PROEF';
@@ -556,6 +580,11 @@ async function ronde(route, grens, ruis) {
     const geraakt = schoon(verschil(voor, na));
     const binnen = geraakt.filter(vanRoute(route));
     const buiten = geraakt.filter(k => !vanRoute(route)(k));
+    /* EEN FEIT EN GEEN OORDEEL -- zie de leeswijzer bij GRENZEN hierboven. De
+       twee schrijvers van een melding schrijven allebei naar `notifications`;
+       bewoog die bak niet, dan is er na deze dood geen bericht ontstaan. Of dat
+       erg is, weet deze proef niet. */
+    const meldingBewoog = geraakt.some(k => /notif|meld/i.test(k));
 
     /* NIET GESTORVEN -- EN DAT IS TWEE VERSCHILLENDE DINGEN.
 
@@ -594,11 +623,11 @@ async function ronde(route, grens, ruis) {
           'het injectiepunt van ' + grens.modus + ': hij schrijft via de gewone write-behind ' +
           'save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een ' +
           'VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet',
-        geraakt: binnen, buitenDeRoute: buiten, eigenLijf, voorziening };
+        geraakt: binnen, buitenDeRoute: buiten, eigenLijf, voorziening, meldingBewoog };
       return { stand: STAND_VAN_BLOKKADE[bl.blokkeertOp], statusVanDeAanroep: r.status,
         bereiktTot: bl.bereiktTot, blokkeertOp: bl.blokkeertOp,
         leestBody: lb.leest, leestBodyGrond: lb.grond,
-        reden: bl.reden, geraakt: binnen, buitenDeRoute: buiten, eigenLijf, voorziening };
+        reden: bl.reden, geraakt: binnen, buitenDeRoute: buiten, eigenLijf, voorziening, meldingBewoog };
     }
 
     /* DE RETRY-PROEF HOORT BIJ ALLEBEI DE GRENZEN, en dat ontbrak.
@@ -633,7 +662,7 @@ async function ronde(route, grens, ruis) {
       reden: Object.entries(c.claims).filter(([, v]) => v.stand !== 'PROVEN')
         .map(([k, v]) => k + ': ' + v.reden).join(' | ') ||
         'alle vier de beweringen van het overlevingscontract zijn bewezen',
-      geraakt: binnen, buitenDeRoute: buiten, eigenLijf, voorziening,
+      geraakt: binnen, buitenDeRoute: buiten, eigenLijf, voorziening, meldingBewoog,
       herhaling: { status: herhaal.status, deed: herhaalDeed,
         tweedeStatus: tweede.status, bijgekomen } };
   } catch (e) {

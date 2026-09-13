@@ -87,6 +87,17 @@ const SLEUTELS = {
     waarom: 'een opname is een momentopname van het concern; twee keer vragen hoort met recht ' +
       'twee momenten op te leveren, anders is de tweede opname stil de eerste' },
 
+  /* Het lijf is hier ALTIJD leeg: er gaat met opzet geen id mee, want bij twee
+     open voorstellen valt er niets aan te wijzen (kern/stuur/goedkeuring.js).
+     `zelfdeVerzoek` zou dus niet een dubbeltik vangen maar een LEUGEN opleveren
+     -- zie het waarom hieronder. Intrekken kan bovendien alleen vermogen
+     inleveren, dus er valt niets te beschermen. */
+  'POST /api/member/voorstel/intrek': { nietIdempotent: true,
+    waarom: 'het lijf is altijd leeg, dus twee intrekkingen hebben dezelfde afdruk terwijl ze over ' +
+      'VERSCHILLENDE voorstellen gaan. Een herhaling zou het antwoord van de eerste keer teruggeven ' +
+      '("voorstel A is ingetrokken") terwijl het voorstel dat er nu staat blijft staan -- onwaar, en ' +
+      'juist bij een handeling die iets weghaalt' },
+
   /* ---- routes die niets veranderen ----
 
      Een POST die alleen leest. Herhalen is per definitie veilig, en er valt

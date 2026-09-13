@@ -1095,6 +1095,28 @@
           "test:test/meterwet.test.js"
         ]
       }
+    },
+    {
+      "id": "techniek-bewijsveld-een-relatie",
+      "soort": "techniek",
+      "wet": "Een bewijsveld draagt een bewijsrelatie; draagt het er meerdere, dan worden die afzonderlijk benoemd en gemeten en nooit opgeteld.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "Een bewijsveld draagt een bewijsrelatie"
+      },
+      "handhaver": [
+        "test/bewijsveld.test.js",
+        "scripts/lib/bewijsvelden.js"
+      ],
+      "sabotage": {
+        "wat": "verklaar een register voor een gesplitst veld dat dat veld helemaal niet draagt -- de stille kant van de fout, want een te ruime verklaring ziet er net zo verzorgd uit als een juiste",
+        "bestand": "scripts/lib/bewijsvelden.js",
+        "zoek": "  handhaver: ['WETTEN.json'],",
+        "zet": "  handhaver: ['WETTEN.json', 'CODEWERELD.json'],",
+        "wachters": [
+          "test:test/bewijsveld.test.js"
+        ]
+      }
     }
   ]
 }

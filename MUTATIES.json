@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:46:12.475Z",
-    "commit": "8f3f0e26",
+    "op": "2026-09-13T12:06:17.712Z",
+    "commit": "50a43305",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -3726,6 +3726,14 @@
       "module": "public/shared/kaart.js",
       "operator": "===->!==",
       "gezakt": 2
+    },
+    "kantoorbank.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/isolatie/kantoorbank.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "kantoordienst.test.js": {
       "soort": "server",

@@ -152,3 +152,41 @@ test('6. de correctie op een rekeningregel: de regel blijft staan en telt nul', 
   assert.equal(na2.data.rekening.totalen.bruto, na.data.rekening.totalen.bruto,
     'de tweede correctie veranderde het totaal; dan trekt hij twee keer af');
 });
+
+test('7. het activiteitenspoor van een zaak is over HTTP op te vragen, alleen door de manager', async () => {
+  /* DE VIJFDE ROUTE, EN HIJ HERHAALT DE FOUT UIT DE KOP VAN DIT BESTAND.
+
+     `POST /api/supplier/activity` kreeg bij het sluiten van keten 1 een eigen
+     toets (test/supplier-activity.test.js), maar die MONTEERT de handler op een
+     nagemaakte app. Dat beproeft de logica en niet de bedrading -- de route zoals
+     de server hem registreert werd nooit aangeraakt. Over HTTP raakte hem alleen
+     scripts/zaakliveproef.js, en dat is een SCRIPT: het draait in de meetronde en
+     niet in elke CI-run.
+
+     De poort van test/routedekking.test.js vond dat precies zoals bedoeld: 1 van
+     5042 routes nooit aangeraakt, zonder norm om die eis mee te verlagen. Exact
+     het geval dat de kop hierboven al beschrijft -- hier dus nog een keer
+     gemaakt, en nu op dezelfde plek gerepareerd.
+
+     Wat deze toets meet is de bedrading: komt de aanroep aan, achter welke deur,
+     en geeft hij het spoor van DEZE zaak. */
+  const zonder = await post('/api/supplier/activity', {});
+  assert.equal(zonder.status, 401, 'het activiteitenspoor is zonder zaaksessie bereikbaar');
+
+  const sup = await post('/api/supplier/login', { username: 'rahul', password: 'Imran' });
+  const S = sup.data && sup.data.token;
+  assert.ok(S, 'geen zaaksessie (status ' + sup.status + ')');
+
+  const uit = await post('/api/supplier/activity', {}, S);
+  assert.equal(uit.status, 200, 'de manager komt niet bij het spoor van zijn eigen zaak');
+  assert.ok(Array.isArray(uit.data.activity), 'het antwoord draagt geen lijst');
+  assert.equal(typeof uit.data.totaal, 'number', 'het antwoord zegt niet hoeveel er in totaal zijn');
+
+  /* De randgevallen die hier echt zijn gevonden (zie test/supplier-activity.test.js):
+     een negatief aantal gaf er exact EEN terug -- en dat leest als "er is bijna
+     niets gebeurd in deze zaak" in plaats van als een verkeerde vraag. */
+  const negatief = await post('/api/supplier/activity', { aantal: -3 }, S);
+  assert.equal(negatief.status, 200);
+  assert.ok(negatief.data.activity.length !== 1 || uit.data.activity.length <= 1,
+    'een negatief aantal valt niet terug op de standaard maar levert precies een rij');
+});

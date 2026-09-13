@@ -87,6 +87,13 @@ const WACHTEN = [
    stil leeg maken, en dan zou een fase eruitzien alsof niemand hem bewaakt. */
 const L = 'server/kern/stuur/lus.js';
 const LS = 'server/kern/stuur/lusstap.js';
+/* DE PLANTAK WOONT SINDS 13 SEPTEMBER 2026 APART (server/kern/stuur/lusstap-plan.js).
+   Mutatie 3 en 4 grijpen daar aan en niet meer in ./lusstap.js -- die tak is afgesplitst
+   toen de gevolgvoorspelling een tweede as kreeg. Deze regel staat er omdat het anders een
+   zoektocht is: een ankerpunt dat niet meer past wordt OVERGESLAGEN, en dan beweert
+   MENSMUTATIE.json iets over een garantie die nooit is aangeraakt -- precies wat toets 1
+   van test/mensmutatie.test.js vangt, en wat hij hier ook echt heeft gevangen. */
+const LSP = 'server/kern/stuur/lusstap-plan.js';
 const PL = 'server/kern/stuur/plafond.js';
 const RC = 'server/kern/stuur/rail-corpus.js';
 const RCC = 'server/kern/stuur/rail-corpus-context.js';
@@ -128,9 +135,9 @@ const MUTATIES = [
     weg: 'de echte compileer() draait niet en PLAN_COMPILED wordt niet gemerkt',
     hoortTeZakken: 'het spoor is incompleet',
     tekst: [
-      { bestand: LS, van: 'const gewogen = compileer(t.input || {}, wereld);',
+      { bestand: LSP, van: 'const gewogen = compileer(t.input || {}, wereld);',
         naar: 'const gewogen = { uitvoerbaar: true, bezwaren: [], stappen: [] };' },
-      { bestand: LS, van: "spoor && spoor.mark('PLAN_COMPILED', 'PASS',",
+      { bestand: LSP, van: "spoor && spoor.mark('PLAN_COMPILED', 'PASS',",
         naar: "false && spoor.mark('PLAN_COMPILED', 'PASS'," }] },
 
   { nr: '4', naam: 'gevolg bypass',
@@ -138,8 +145,12 @@ const MUTATIES = [
     weg: 'de echte voorspel() draait niet en CONSEQUENCE_EVALUATED wordt niet gemerkt',
     hoortTeZakken: 'het spoor is incompleet',
     tekst: [
-      { bestand: LS, van: 'const gevolg = voorspel(gewogen);', naar: 'const gevolg = null;' },
-      { bestand: LS,
+      /* `voorspel` heet hier `voorspelMet`: de voorspelling kreeg een tweede as (de
+         verklaring uit het gevolgcontract) en wordt samengesteld door
+         kern/stuur/gevolgcontract/voorspelling.js. De mutatie bewaakt hetzelfde: draait de
+         echte voorspelling niet, dan hoort CONSEQUENCE_EVALUATED niet gemerkt te worden. */
+      { bestand: LSP, van: 'const gevolg = voorspelMet(gewogen);', naar: 'const gevolg = null;' },
+      { bestand: LSP,
         van: "spoor && spoor.mark('CONSEQUENCE_EVALUATED', 'PASS',",
         naar: "false && spoor.mark('CONSEQUENCE_EVALUATED', 'PASS'," }] },
 

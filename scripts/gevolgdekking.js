@@ -108,6 +108,20 @@ function meet() {
   return { rijen, meting, verklaring, fouten, buitenBereik, bereikbaar: paden.size };
 }
 
+/* DE WACHT VOOR HET REQUIREN. Dit script schrijft een register; een laadcontrole mag de
+   meting niet starten (scripts/meetkeuring.js, regel `wacht` -- ROLPROEF.json is zo ooit
+   teruggeschreven naar 292 routes).
+
+   HIER TELT DIE REGEL DUBBEL, en dat is de reden dat hij bestaat: `vastleggen` komt uit
+   process.argv, en dat is de argv van wie REQUIRET. Een testronde of een laadcontrole die
+   zelf ergens --vastleggen in zijn opdrachtregel heeft, had dit register dus kunnen
+   overschrijven zonder dat iemand de meter had aangeroepen -- met de tellers van een
+   halve meting erin.
+
+   `meet` gaat naar buiten, zodat een lezer de meting kan doen zonder de CLI eronder. */
+module.exports = { meet };
+if (require.main !== module) return;
+
 const u = meet();
 const tellers = {
   bereikbaarPerRol: u.bereikbaar,

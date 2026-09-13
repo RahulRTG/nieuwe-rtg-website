@@ -524,8 +524,14 @@ const t = contract.telling(rijen);
    een keer heeft opgelost: de autoriteit komt LIVE en nooit uit een
    bouwartefact. */
 if (alleenTelling) {
+  /* EN GEEN process.exit() ERACHTER. Naar een BESTAND schrijft node synchroon, naar
+     een PIPE niet -- en deze uitvoer wordt juist door een pipe gelezen
+     (execFileSync in de toets). Vandaag is zij 130 bytes en past zij in elke buffer;
+     groeit zij, dan zou exit() haar stilletjes afkappen en de toets zou een halve
+     JSON krijgen met exitcode 0. Zie de pipe-regel in scripts/meetkeuring.js, die
+     dit patroon elders in huis al een keer heeft gevonden. */
   process.stdout.write(JSON.stringify({ totaal: t.totaal, perStand: t.perStand }) + '\n');
-  process.exit(0);
+  return;
 }
 
 /* ---------------------------------------------------------------------------

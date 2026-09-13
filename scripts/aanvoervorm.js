@@ -233,7 +233,12 @@ module.exports = { meet, DOEL, RUIM, SMAL };
 
 if (require.main === module) {
   const u = meet();
-  if (process.argv.includes('--json')) { console.log(JSON.stringify(u)); process.exit(0); }
+  /* GEEN process.exit() NA EEN GROTE UITVOER, en dat is geen stijlkwestie: naar een
+     BESTAND schrijft node synchroon, naar een PIPE niet -- de poortwacht printte zo
+     484 KB JSON waarvan er 146176 bytes uitkwamen, geldige tekst met kapotte JSON en
+     exitcode 0. Twee derde weg zonder signaal. Zie de pipe-regel in
+     scripts/meetkeuring.js; een vroege `return` laat de buffer gewoon leeglopen. */
+  if (process.argv.includes('--json')) { console.log(JSON.stringify(u)); return; }
   druk(u);
   if (process.argv.includes('--vastleggen')) {
     fs.writeFileSync(DOEL, JSON.stringify(u, null, 2) + '\n');

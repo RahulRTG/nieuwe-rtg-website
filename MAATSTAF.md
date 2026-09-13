@@ -1467,6 +1467,67 @@ bij een bron die géén van beide vormen deelt (vervoer heeft een aanbieder én
 schaarste, maar een rit is geen aanbod dat blijft staan) is de projectie boven
 twijfel. Twee punten liggen altijd op een lijn.
 
+## 7i. Het besluit: de RTFoundation mag de knelpuntmotor gebruiken
+
+De eigenaar heeft stap 5 genomen op 13 september 2026, en met opzet **smal**: een
+gezin mag zijn eigen vraag laten beantwoorden met vondsten. Dat is iets anders
+dan *"de foundation mag bij `/api/knelpunt/*`"*. Er komt één deur bij op één
+functie, en `auth` wordt niet verzwakt.
+
+`/api/rtf/knelpunt` verifieert het gezinsprofiel en roept daarna **dezelfde**
+`beantwoord()` aan als de ledenroute — één handler achter twee deuren, juist
+zodat een gezin nooit een ander antwoord kan krijgen dan een lid. Gemeten: de
+`vondsten` zijn byte voor byte gelijk.
+
+### De drie grenzen, alle drie in code
+
+1. **Geen profiel naar de aanvoer.** De sessie opent de deur en gaat nergens
+   heen. De handtekening `vondsten(voorwaarde)` maakt een profiel structureel
+   onmogelijk; deze route maakt daar geen uitzondering op.
+2. **Een vondst is geen recht.** Dat Adam een vacature ziet, zegt niets over of
+   hij mag solliciteren. Die vraag blijft bij de sollicitatielaag, die de
+   leeftijd uit het **profiel** leest en niet uit dit antwoord. Deze laag ordent
+   mogelijkheden; de domeinen blijven eigenaar van hun eigen handelingen.
+3. **Geen rangorde die als advies leest.** Niets wordt gesorteerd, en per bron
+   staat `getoond` naast `gevonden` — zodat een korte lijst niet als "dit is
+   alles" en een lange niet als "dit is het beste" leest.
+
+### Het pad hoort bij deze functie
+
+Zonder `/api/rtf/knelpunt` in `paden` valt de gezinsdeur onder `rtf-contacten`
+(paden `/api/rtf`), en dan zet het bord de ene helft van deze functie uit en de
+andere niet — **exact de `social`-fout** die par. 7f aanwijst. Eén functie, één
+schakelaar, beide deuren; `test/aanvoer.test.js` toets 23 zakt zodra dat
+uiteenloopt.
+
+### De meter bewijst het besluit
+
+`knelpunt × foundation` ging van `correct-afgesloten` naar **`waar`**, geopend
+via `POST /api/rtf/knelpunt`; `waar` van 578 naar 579, en de 33 leugens bewogen
+niet. Dat is precies de scheiding waar de meter voor gebouwd is: het besluit is
+een **productvraag**, of de deur daarna werkelijk opengaat een **meting**.
+
+Toets 6 hield tot vandaag het omgekeerde vast — dat die cel geen bevinding mocht
+zijn. Hij houdt nu vast dat een besluit op papier ook een deur heeft, én dat de
+regel blijft gelden voor alles wat niet is besloten (er zijn nog ruim honderd
+`correct-afgesloten` cellen).
+
+### De keten: 12 schakels, 11 gesloten
+
+Schakel 2 sluit — dat was de bevinding die dit besluit opheft. Schakel 12 is de
+belofte die de eigenaar erbij vroeg, en hij meet alle vier haar helften:
+**bereiken** (twee terreinen), **niet verzonnen** (de vacature die de werkgever
+in schakel 5 echt opende), **niet gladgestreken** (`getoond` naast `gevonden`
+per bron) en **niet als advies** (één vondstvorm, geen rangorde) — plus dat geen
+vondst een veld uit `MENSVELDEN` draagt.
+
+**Schakel 4 blijft open, met een smallere reden.** Er is nu aanvoer, maar die
+levert vondsten bij een **randvoorwaarde** en geen wegen bij een kaal **doel**.
+Wie *"ik wil weer aan het werk"* intikt, bedenkt de manieren nog steeds zelf. Die
+bevinding wegpoetsen omdat er iets naast is komen staan, zou kwijtmaken wat er
+nog echt ontbreekt — en de stap die rest is klein en eerlijk te benoemen: van een
+doel naar een handvol manieren, zonder ze te rangschikken.
+
 ## 8. De volgorde
 
 1. **Dit document** — welke uitspraak huisgrond heeft, welke wordt

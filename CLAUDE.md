@@ -1598,6 +1598,32 @@ toevoegen; rechtstreeks requiren zou een tweede instantie met een eigen db-greep
 maken en dat is duurder). Twee punten liggen altijd op een lijn: pas een DERDE
 bron die geen van beide vormen deelt, zet de projectie boven twijfel.
 
+**EN DE EIGENAAR HEEFT STAP 5 GENOMEN** (13 september 2026, `MAATSTAF.md` par.
+7i): de RTFoundation mag de knelpuntmotor gebruiken -- met opzet SMAL. Een gezin
+mag zijn eigen vraag laten beantwoorden met vondsten, en dat is iets anders dan
+"de foundation mag bij `/api/knelpunt/*`". Er komt EEN deur bij op EEN functie
+(`/api/rtf/knelpunt`) en `auth` wordt niet verzwakt; beide deuren roepen dezelfde
+`beantwoord()` aan, zodat een gezin nooit een ander antwoord kan krijgen dan een
+lid (gemeten: byte voor byte gelijk). Drie grenzen, alle drie in CODE: de sessie
+opent de deur en gaat nergens heen (de handtekening `vondsten(voorwaarde)` maakt
+een profiel structureel onmogelijk), **een vondst is geen recht** -- dat Adam een
+vacature ziet zegt niets over of hij mag solliciteren, en die vraag blijft bij de
+sollicitatielaag die de leeftijd uit het PROFIEL leest -- en er wordt niets
+gerangschikt. **Het pad hoort BIJ die functie en niet in een eigen**: zonder
+`/api/rtf/knelpunt` in `paden` valt de gezinsdeur onder `rtf-contacten` en zet
+het bord de ene helft van de functie uit en de andere niet, exact de
+`social`-fout. En de meter bewijst het besluit in plaats van het te geloven:
+`knelpunt x foundation` ging van `correct-afgesloten` naar **`waar`** zonder dat
+de 33 leugens bewogen -- het besluit is een PRODUCTvraag, of de deur daarna
+opengaat een METING. De keten staat op 12 schakels, 11 gesloten; schakel 12 is de
+belofte dat een Foundation-profiel vanuit EEN doel echte werk- EN leermogelijkheden
+bereikt zonder dat een bron wordt verzonnen, gladgestreken of als advies vermomd.
+**Schakel 4 blijft open met een SMALLERE reden**, en dat is met opzet: er is nu
+aanvoer, maar die levert vondsten bij een RANDVOORWAARDE en geen wegen bij een
+kaal DOEL -- wie "ik wil weer aan het werk" intikt bedenkt de manieren nog steeds
+zelf. Een bevinding wegpoetsen omdat er iets naast is komen staan, maakt kwijt
+wat er nog echt ontbreekt.
+
 **`INTELLIGENTIE.md` is de laag BOVEN het stuur** -- de RTG Intelligence Layer,
 als richtingsdocument met per onderdeel of het **staat**, **een stap weg** is,
 **een besluit vraagt** of **jaren weg** is. Lees die voor je iets bouwt waarmee

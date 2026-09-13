@@ -65,7 +65,7 @@ test('elke grens draagt een uitgeschreven belofte -- anders is de uitslag niet t
    is precies hoe achttien groene toetsen eerder een kapotte functie hebben
    gedekt: de fixture hield zich aan de vorm die de code aannam in plaats van
    aan de echte. Vandaar dat scripts/crashproef.js `weegHerhaling` exporteert. */
-const oordeel = (bijgekomen, idempotentie) => cp.weegHerhaling(bijgekomen, idempotentie).stand;
+const oordeel = (bijgekomen, verklaring) => cp.weegHerhaling(bijgekomen, verklaring).stand;
 
 test('de weegregel wordt uit de bron gehaald en niet hier overgeschreven', () => {
   assert.equal(typeof cp.weegHerhaling, 'function',
@@ -76,20 +76,35 @@ test('de weegregel wordt uit de bron gehaald en niet hier overgeschreven', () =>
   }
 });
 
-test('een herhaling die NIETS toevoegt is bewezen, wat het register ook nog niet wist', () => {
-  assert.equal(oordeel(0, 'beschermd'), 'PROVEN');
-  assert.equal(oordeel(0, 'ongemeten'), 'PROVEN',
-    'de meting is er al: legt de herhaling niets bovenop, dan is de belofte gehouden. ' +
-    'Dat IDEMPROEF.json deze route niet kent, maakt de meting niet minder waard');
+test('een herhaling die NIETS toevoegt is bewezen, met of zonder verklaring', () => {
+  assert.equal(oordeel(0, { zelfdeVerzoek: true }), 'PROVEN');
+  assert.equal(oordeel(0, null), 'PROVEN',
+    'de goede afloop heeft geen verklaring nodig: legt de herhaling niets bovenop, dan is de ' +
+    'belofte gehouden. En dat is toestandsbescherming, want de idem-poort is na een herstart uit ' +
+    'beeld -- haar venster is vijf seconden en een herstart duurt langer');
 });
 
-test('een herhaling die WEL werk deed, weegt verschillend -- en `ongemeten` is nooit `nee`', () => {
-  assert.equal(oordeel(3, 'beschermd'), 'FAILED',
-    'een route die zich beschermd noemt en toch dubbelt, breekt zijn eigen belofte');
-  assert.equal(oordeel(3, 'ongemeten'), 'PROVEN_PARTIAL',
-    'bij een ongemeten route kan deze proef niet zeggen of dat een defect is of de bedoeling');
-  assert.notEqual(oordeel(3, 'ongemeten'), 'FAILED',
-    'ONGEMETEN LEZEN ALS NIET-IDEMPOTENT is precies de fout die hier is gemaakt');
+/* DE AUTORITEIT IS DE VERKLARING, NIET DE METING. `beschermd` in IDEMPROEF.json
+   is gemeten met een EXPLICIETE sleutel, en de kale variant leunt op een venster
+   van vijf seconden -- allebei onreproduceerbaar na een crash met een herstart.
+   Twee routes stonden daardoor ten onrechte op FAILED, waaronder
+   /api/office/bank/draai: "de knop een slag verder" HOORT twee keer te draaien. */
+test('een herhaling die WEL werk deed, hangt aan de VERKLARING en niet aan een meting', () => {
+  assert.equal(oordeel(3, { zelfdeVerzoek: true }), 'FAILED',
+    'is verklaard dat een gelijk verzoek een herhaling is, dan is een tweede effect een defect');
+  assert.equal(oordeel(3, { velden: ['naam'] }), 'FAILED', 'de veldvorm telt net zo goed');
+  assert.equal(oordeel(3, null), 'NIET_BEPROEFD',
+    'zonder verklaring is een tweede effect niet te beoordelen -- misschien is het de bedoeling');
+  assert.notEqual(oordeel(3, null), 'FAILED',
+    'een route zonder verklaring beschuldigen is dezelfde fout als `ongemeten` lezen als `nee`');
+});
+
+test('de weegregel noemt het venster van vijf seconden, want dat is waarom de poort hier niet helpt', () => {
+  const bron = require('fs').readFileSync(require('path').join(__dirname, '..',
+    'scripts', 'crashproef.js'), 'utf8');
+  assert.match(bron, /VENSTER_MS|vijf seconden|5 seconden|5s/,
+    'zonder dat gegeven leest een FAILED hier als "de route is stuk" in plaats van als ' +
+    '"bescherming uit de poort overleeft een herstart niet"');
 });
 
 /* EEN STAND DIE NOOIT EERLIJK KAN WORDEN TOEGEKEND, HOORT NIET TE BESTAAN.
@@ -136,7 +151,7 @@ test('de vier beweringen staan apart en de strengste bepaalt de stand', () => {
   assert.deepEqual(Object.keys(cp.CLAIMS).sort(),
     ['geenDubbel', 'geenHalf', 'geenVals', 'toestand'].sort());
   const schoon = cp.weegContract({ verwachtLeeg: true, geraakt: 0, aantalCollecties: 5,
-    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, idempotentie: 'beschermd' });
+    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, verklaring: { zelfdeVerzoek: true } });
   assert.equal(schoon.stand, 'PROVEN');
   assert.equal(Object.keys(schoon.claims).length, 4, 'alle vier worden gewogen, ook de gehaalde');
 });
@@ -145,7 +160,7 @@ test('de vier beweringen staan apart en de strengste bepaalt de stand', () => {
    netjes weigeren terwijl drie van de vijf collecties al zijn aangepast. */
 test('een half resultaat zakt op toestand EN op geenHalf, en niet op een van de twee', () => {
   const half = cp.weegContract({ verwachtLeeg: true, geraakt: 2, aantalCollecties: 5,
-    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, idempotentie: 'beschermd' });
+    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, verklaring: { zelfdeVerzoek: true } });
   assert.equal(half.stand, 'FAILED');
   assert.equal(half.claims.toestand.stand, 'FAILED');
   assert.equal(half.claims.geenHalf.stand, 'FAILED');
@@ -157,7 +172,7 @@ test('een half resultaat zakt op toestand EN op geenHalf, en niet op een van de 
    zonder dat er iets is aangetoond -- vandaar NIET_BEPROEFD met de reden. */
 test('bij een enkele collectie is `geenHalf` NIET_BEPROEFD en niet stilzwijgend bewezen', () => {
   const een = cp.weegContract({ verwachtLeeg: true, geraakt: 0, aantalCollecties: 1,
-    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, idempotentie: 'beschermd' });
+    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, verklaring: { zelfdeVerzoek: true } });
   assert.equal(een.claims.geenHalf.stand, 'NIET_BEPROEFD');
   assert.ok(een.claims.geenHalf.reden.length > 20, 'met de reden erbij');
   assert.equal(een.stand, 'NIET_BEPROEFD', 'en de strengste stand trekt de hele rij mee omlaag');
@@ -168,7 +183,7 @@ test('bij een enkele collectie is `geenHalf` NIET_BEPROEFD en niet stilzwijgend 
    herstart niet heeft overleefd. */
 test('na de commit is een LEGE uitkomst een gebroken belofte, geen schone lei', () => {
   const leeg = cp.weegContract({ verwachtLeeg: false, geraakt: 0, aantalCollecties: 5,
-    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, idempotentie: 'beschermd' });
+    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, verklaring: { zelfdeVerzoek: true } });
   assert.equal(leeg.claims.toestand.stand, 'FAILED');
   assert.match(leeg.claims.toestand.reden, /overleefde de herstart niet/);
 });
@@ -178,16 +193,16 @@ test('na de commit is een LEGE uitkomst een gebroken belofte, geen schone lei', 
    antwoord kwam dat niet klopt met wat er is blijven staan. */
 test('geen antwoord is eerlijk; een antwoord dat niet klopt met de opslag is vals', () => {
   const stil = cp.weegContract({ verwachtLeeg: true, geraakt: 0, aantalCollecties: 2,
-    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, idempotentie: 'beschermd' });
+    status: 0, gestorven: true, herhaalStatus: 200, bijgekomen: 0, verklaring: { zelfdeVerzoek: true } });
   assert.equal(stil.claims.geenVals.stand, 'PROVEN');
 
   const valsSucces = cp.weegContract({ verwachtLeeg: false, geraakt: 0, aantalCollecties: 2,
-    status: 200, gestorven: false, herhaalStatus: 200, bijgekomen: 0, idempotentie: 'beschermd' });
+    status: 200, gestorven: false, herhaalStatus: 200, bijgekomen: 0, verklaring: { zelfdeVerzoek: true } });
   assert.equal(valsSucces.claims.geenVals.stand, 'FAILED');
   assert.match(valsSucces.claims.geenVals.reden, /vals succes/);
 
   const valsFalen = cp.weegContract({ verwachtLeeg: false, geraakt: 3, aantalCollecties: 3,
-    status: 500, gestorven: false, herhaalStatus: 200, bijgekomen: 0, idempotentie: 'beschermd' });
+    status: 500, gestorven: false, herhaalStatus: 200, bijgekomen: 0, verklaring: { zelfdeVerzoek: true } });
   assert.equal(valsFalen.claims.geenVals.stand, 'FAILED');
   assert.match(valsFalen.claims.geenVals.reden, /vals falen/);
 });
@@ -195,7 +210,7 @@ test('geen antwoord is eerlijk; een antwoord dat niet klopt met de opslag is val
 /* CRASHVEILIGHEID ZONDER RETRY-PROEF IS MAAR DE HELFT VAN CRASHVEILIGHEID. */
 test('zonder uitgevoerde herhaling is `geenDubbel` NIET_BEPROEFD', () => {
   const zonder = cp.weegContract({ verwachtLeeg: true, geraakt: 0, aantalCollecties: 2,
-    status: 0, gestorven: true, herhaalStatus: null, bijgekomen: 0, idempotentie: 'beschermd' });
+    status: 0, gestorven: true, herhaalStatus: null, bijgekomen: 0, verklaring: { zelfdeVerzoek: true } });
   assert.equal(zonder.claims.geenDubbel.stand, 'NIET_BEPROEFD');
   assert.equal(zonder.stand, 'NIET_BEPROEFD',
     'en dat trekt de hele rij omlaag: half bewijs is geen bewijs');
@@ -205,6 +220,6 @@ test('zonder uitgevoerde herhaling is `geenDubbel` NIET_BEPROEFD', () => {
    hierboven MOET op verschillende invoer verschillend uitvallen. Geeft hij
    overal hetzelfde, dan rekent dit bestand niets na. */
 test('zelfijking: de drie uitkomsten zijn werkelijk drie', () => {
-  const alle = new Set([oordeel(0, 'beschermd'), oordeel(3, 'beschermd'), oordeel(3, 'ongemeten')]);
+  const alle = new Set([oordeel(0, null), oordeel(3, { zelfdeVerzoek: true }), oordeel(3, null)]);
   assert.equal(alle.size, 3, 'de regel valt niet uiteen in drie uitkomsten en weegt dus niets');
 });

@@ -59,6 +59,7 @@ const W = require('./lib/wegwerpserver.js');
 const { inhoudsBeeld, verschil, isSpoor } = require('./droogloop.js');
 const { haalSleutels } = require('./lib/proefsleutels.js');
 const verraad = require('../server/lib/verraad.js');
+const { sleutelVoor } = require('../server/lib/idemsleutels.js');
 
 const WORTEL = path.join(__dirname, '..');
 
@@ -180,28 +181,52 @@ const CLAIMS = Object.freeze({
 const STRENGSTE = ['FAILED', 'NIET_BEPROEFD', 'PROVEN'];
 const strengste = (standen) => STRENGSTE.find(s => standen.includes(s)) || 'NIET_BEPROEFD';
 
-/* DE WEGING VAN EEN HERHALING NA DE HERSTART -- DRIE UITKOMSTEN EN NIET TWEE.
+/* DE WEGING VAN EEN HERHALING NA DE HERSTART.
 
-   De eerste versie had er twee te weinig: alles wat niet `beschermd` heet ging
-   naar PROVEN_PARTIAL met de reden "deze route hoort bij een tweede oproep werk
-   te doen". Dat is `ongemeten` gelezen als `niet idempotent` -- dezelfde fout
-   als `onbekend` lezen als `nee`. IDEMPROEF.json zegt van vier geldroutes niets;
-   dat is geen uitspraak over hun gedrag, en factuurproef.js heeft de
-   idempotentie van /api/pay/saldo gewoon BEWEZEN.
+   HIER STOND EEN VERKEERDE AUTORITEIT, en dat is een correctie die verder reikt
+   dan deze functie. De regel las `idempotentie` uit GELDDEKKING.json (dus uit
+   IDEMPROEF.json) en velde FAILED zodra een route die `beschermd` heet bij de
+   herhaling opnieuw werk deed. Dat label is echter gemeten onder omstandigheden
+   die een crash-retry NIET kan reproduceren:
+
+     - IDEMPROEF meet met een EXPLICIETE sleutel (K1, K1 opnieuw, K2 vers);
+     - en de kale variant leunt op server/lib/idemsleutels.js, waarvan het
+       venster VIJF SECONDEN is (VENSTER_MS).
+
+   Een crash met een herstart duurt langer dan vijf seconden. De idem-poort kan
+   een herhaling na een crash dus STRUCTUREEL niet herkennen -- niet omdat er
+   iets stuk is, maar omdat het venster verlopen is tegen de tijd dat de klant
+   het opnieuw probeert. Bescherming die een herstart overleeft, moet daarom uit
+   de TOESTAND komen en niet uit de poort. /api/pay/saldo laat zien hoe dat
+   eruitziet: de herhaling krijgt 409 omdat de factuur al betaald IS.
+
+   De juiste autoriteit voor "is een tweede effect een defect of de bedoeling"
+   is de VERKLARING per route in idemsleutels.js -- die zegt precies dat, en
+   niet een meting onder andere omstandigheden. Staat er geen verklaring, dan is
+   het onbeslisbaar en heet het NIET_BEPROEFD. Twee routes stonden op FAILED die
+   daar niet horen: /api/office/bank/draai betekent letterlijk "de knop een slag
+   verder", en dan IS een tweede oproep een tweede handeling.
+
+   Wat geen verklaring nodig heeft, is de goede afloop: legde de herhaling niets
+   bovenop, dan is de belofte gehouden -- dat is een positief feit.
 
    Deze functie staat apart en wordt geexporteerd omdat test/crashproef.test.js
    hem narekent. Een toets die de regel OVERSCHRIJFT in plaats van aanroept,
    blijft groen als de regel verandert. */
-function weegHerhaling(bijgekomen, idempotentie) {
+function weegHerhaling(bijgekomen, verklaring) {
   if (bijgekomen === 0) return { stand: 'PROVEN',
-    reden: 'de herhaling na de herstart legde niets bovenop de uitkomst' };
-  if (idempotentie === 'beschermd') return { stand: 'FAILED',
-    reden: 'deze route heet beschermd, maar de herhaling na de herstart veranderde ' +
-      bijgekomen + ' collectie(s) van deze route opnieuw' };
-  return { stand: 'PROVEN_PARTIAL',
-    reden: 'de herstart lukte en de opslag is leesbaar, maar de herhaling deed werk in ' +
-      bijgekomen + ' collectie(s). Of dat een gebroken belofte is of het bedoelde gedrag, ' +
-      'kan deze proef niet zeggen: IDEMPROEF.json noemt deze route ' + idempotentie + '.' };
+    reden: 'de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een ' +
+      'toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)' };
+  if (verklaring && (verklaring.zelfdeVerzoek || verklaring.velden)) return { stand: 'FAILED',
+    reden: 'idemsleutels.js verklaart een woordelijk gelijk verzoek hier als een HERHALING, maar ' +
+      'na de herstart deed hij opnieuw werk in ' + bijgekomen + ' collectie(s). De poort dekt dit ' +
+      'niet af: haar venster is 5 seconden en een herstart duurt langer, dus deze bescherming ' +
+      'moet uit de toestand komen' };
+  return { stand: 'NIET_BEPROEFD',
+    reden: 'de herhaling deed werk in ' + bijgekomen + ' collectie(s), maar idemsleutels.js ' +
+      'verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een ' +
+      'tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- ' +
+      '"de knop een slag verder" hoort twee keer te draaien' };
 }
 
 /* Weegt de vier beweringen uit de gemeten grootheden. Alle invoer is GEMETEN;
@@ -210,7 +235,7 @@ function weegHerhaling(bijgekomen, idempotentie) {
    `verwachtLeeg` zegt of DEZE grens belooft dat er niets veranderd is (dat is de
    ATOMIC-grens) of juist dat de uitkomst er hoort te staan (na de commit). */
 function weegContract({ verwachtLeeg, geraakt, aantalCollecties, status, gestorven,
-  herhaalStatus, bijgekomen, idempotentie }) {
+  herhaalStatus, bijgekomen, verklaring }) {
   const c = {};
 
   /* 1. TOESTAND. Voor de grens voor de mutatie: er hoort niets te staan. Voor de
@@ -253,12 +278,7 @@ function weegContract({ verwachtLeeg, geraakt, aantalCollecties, status, gestorv
   /* 4. GEEN DUBBEL EFFECT. De helft van crashveiligheid. */
   if (herhaalStatus === null || herhaalStatus === undefined) c.geenDubbel =
     { stand: 'NIET_BEPROEFD', reden: 'de herhaling is niet uitgevoerd' };
-  else {
-    const h = weegHerhaling(bijgekomen, idempotentie);
-    c.geenDubbel = h.stand === 'PROVEN_PARTIAL'
-      ? { stand: 'NIET_BEPROEFD', reden: h.reden }
-      : { stand: h.stand, reden: h.reden };
-  }
+  else c.geenDubbel = weegHerhaling(bijgekomen, verklaring);
 
   return { claims: c, stand: strengste(Object.values(c).map(x => x.stand)) };
 }
@@ -399,7 +419,7 @@ async function ronde(route, grens, ruis) {
     const c = weegContract({ verwachtLeeg, geraakt: binnen.length,
       aantalCollecties: route.collecties.length, status: r.status, gestorven,
       herhaalStatus: herhaal.status, bijgekomen: bijgekomen.length,
-      idempotentie: route.idempotentie });
+      verklaring: sleutelVoor(route.pad) });
 
     return { stand: c.stand, claims: c.claims, statusVanDeAanroep: 0,
       reden: Object.entries(c.claims).filter(([, v]) => v.stand !== 'PROVEN')

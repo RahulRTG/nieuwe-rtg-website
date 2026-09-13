@@ -3,8 +3,8 @@
   "uitleg": "per geldroute en per crashgrens: wat er van de uitkomst overblijft als het proces op dat moment sterft. De vraag is economisch -- wat staat er in de opslag na de herstart -- en niet wat de route antwoordde, want bij een crash antwoordt hij niet.",
   "grens": "drie dingen die deze proef NIET zegt. (1) Wat een aanbieder buiten de deur al had gecommit ziet hij niet -- dat is EXTERNALLY_RECONCILABLE en dat wacht op een echte aanbieder. (2) Het OORDEEL hangt aan de collecties die GELDDEKKING.json per route declareert; een halve schrijfactie in een collectie die daar niet staat, komt terug in `buitenDeRoute` maar laat de uitslag niet zakken. Die lijst is dus de bovengrens van wat hier te vinden is. (3) Een PROVEN geldt voor DIT lijf op DEZE wereld -- een andere invoer kan een ander pad door de route nemen.",
   "stempel": {
-    "op": "2026-09-13T14:52:19.627Z",
-    "commit": "44cb4dcb8",
+    "op": "2026-09-13T20:05:11.946Z",
+    "commit": "ec789193c",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/crashproef.js",
@@ -39,7 +39,8 @@
         "velden": [
           "id"
         ]
-      }
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -69,7 +70,39 @@
         "velden": [
           "id"
         ]
-      }
+      },
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/betaal",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankBoekingen",
+        "bankPassen",
+        "bankSaldi"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "BLOCKED_BODY",
+      "statusVanDeAanroep": 400,
+      "bereiktTot": "VERZOEKCONTROLE",
+      "blokkeertOp": "LIJF",
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/bank.js:43 raakt req.body",
+      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": true,
+      "voorziening": {
+        "stand": "gelukt",
+        "velden": [
+          "id"
+        ]
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -94,7 +127,8 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -119,7 +153,34 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/bevries",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankPassen"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/bank.js:41 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:bankPassen"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -144,7 +205,8 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -169,7 +231,34 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/limiet",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankPassen"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/bank.js:42 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:bankPassen"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -199,7 +288,8 @@
         "velden": [
           "id"
         ]
-      }
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -229,7 +319,39 @@
         "velden": [
           "id"
         ]
-      }
+      },
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/sluit",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankPassen"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/bank.js:44 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:bankPassen"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": true,
+      "voorziening": {
+        "stand": "gelukt",
+        "velden": [
+          "id"
+        ]
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -254,7 +376,8 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -279,7 +402,34 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/pas/uitgeven",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankPassen"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/bank.js:40 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:bankPassen"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -304,7 +454,8 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -329,7 +480,34 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/rekening/open",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankRekeningen"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/bank.js:20 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:bankRekeningen"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -353,7 +531,8 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -377,7 +556,33 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/salaris",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "BLOCKED_WORLD",
+      "statusVanDeAanroep": 402,
+      "bereiktTot": "DOMEINVOORWAARDE",
+      "blokkeertOp": "WERELD",
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/bank.js:58 raakt req.body",
+      "reden": "het verzoek kwam door de controle heen en strandde op de TOESTAND (402): de wereld mist een voorwerp of een stand die deze route nodig heeft",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -401,7 +606,8 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -425,7 +631,33 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/sepa",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "BLOCKED_BODY",
+      "statusVanDeAanroep": 400,
+      "bereiktTot": "VERZOEKCONTROLE",
+      "blokkeertOp": "LIJF",
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/bank.js:34 raakt req.body",
+      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -450,7 +682,8 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -475,7 +708,34 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/spaardoel",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankRekeningen"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/bank.js:35 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:bankRekeningen"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -499,7 +759,8 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -523,7 +784,33 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/storten",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "BLOCKED_BODY",
+      "statusVanDeAanroep": 400,
+      "bereiktTot": "VERZOEKCONTROLE",
+      "blokkeertOp": "LIJF",
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/bank.js:30 raakt req.body",
+      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -546,7 +833,8 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -569,7 +857,32 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/bank/terugkerend/zet",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankTerugkerend"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "BLOCKED_BODY",
+      "statusVanDeAanroep": 400,
+      "bereiktTot": "VERZOEKCONTROLE",
+      "blokkeertOp": "LIJF",
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/bank.js:53 raakt req.body",
+      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -592,7 +905,8 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -615,7 +929,32 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/boardroom/betalingen/proef",
+      "rol": "techniek",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "betaalRegie"
+      ],
+      "idempotentie": "ongemeten",
+      "stand": "BLOCKED_ROLE",
+      "statusVanDeAanroep": 401,
+      "bereiktTot": "ROLPOORT",
+      "blokkeertOp": "ROL",
+      "leestBody": false,
+      "leestBodyGrond": "server/routes/techniek/betalingen.js:42 raakt `req.body` niet binnen de handler",
+      "reden": "de proef kwam niet voorbij de deur (401); dat is een rol of een sleutel en geen lijf",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -645,7 +984,8 @@
         "velden": [
           "id"
         ]
-      }
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -675,7 +1015,39 @@
         "velden": [
           "id"
         ]
-      }
+      },
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/geld/beleid/weg",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "geldbeleid"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": false,
+      "leestBodyGrond": "server/routes/geld.js:101 raakt `req.body` niet binnen de handler",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:geldbeleid"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": {
+        "stand": "gelukt",
+        "velden": [
+          "id"
+        ]
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -698,7 +1070,8 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -721,7 +1094,32 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/geld/cockpit",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "labFonds"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": false,
+      "leestBodyGrond": "server/routes/geld.js:84 raakt `req.body` niet binnen de handler",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -744,7 +1142,8 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -767,7 +1166,32 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/geld/grens",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "geldbeleid"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": false,
+      "leestBodyGrond": "server/routes/geld.js:111 raakt `req.body` niet binnen de handler",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -792,7 +1216,8 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -817,7 +1242,34 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/gemeente/belasting/mijn",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "gemeenteAanslagen"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": false,
+      "leestBodyGrond": "server/routes/member/gemeente.js:32 raakt `req.body` niet binnen de handler",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:gemeenteAanslagen"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -840,7 +1292,8 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -863,7 +1316,32 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/kosten/vooruitblik",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "economie"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/kosten.js:49 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -886,7 +1364,8 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -909,7 +1388,32 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/labfonds/locatie/maak",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "labFonds"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "BLOCKED_BODY",
+      "statusVanDeAanroep": 400,
+      "bereiktTot": "VERZOEKCONTROLE",
+      "blokkeertOp": "LIJF",
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/labfonds.js:30 raakt req.body",
+      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -934,7 +1438,8 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -959,7 +1464,34 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/member/ai/tegoed",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "aiTegoed"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": false,
+      "leestBodyGrond": "server/routes/member/aitegoed.js:29 raakt `req.body` niet binnen de handler",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:aiTegoed"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -997,6 +1529,7 @@
       "buitenDeRoute": [],
       "eigenLijf": false,
       "voorziening": null,
+      "meldingBewoog": false,
       "herhaling": {
         "status": 200,
         "deed": [
@@ -1033,7 +1566,36 @@
         "store.db:kantoorAudit"
       ],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/draai",
+      "rol": "boardroom",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankregie"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": null,
+      "leestBodyGrond": "server/routes/kantoren/bank.js noemt /api/office/bank/draai niet rond regel 50 -- ROUTEBRON.json loopt hier achter op de bron",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:bankregie"
+      ],
+      "buitenDeRoute": [
+        "store.db:kantoorAudit"
+      ],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1071,6 +1633,7 @@
       "buitenDeRoute": [],
       "eigenLijf": false,
       "voorziening": null,
+      "meldingBewoog": false,
       "herhaling": {
         "status": 200,
         "deed": [
@@ -1105,7 +1668,36 @@
         "store.db:kantoorAudit"
       ],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/leden",
+      "rol": "office",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankregie"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": null,
+      "leestBodyGrond": "server/routes/kantoren/bank.js noemt /api/office/bank/leden niet rond regel 88 -- ROUTEBRON.json loopt hier achter op de bron",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:bankregie"
+      ],
+      "buitenDeRoute": [
+        "store.db:kantoorAudit"
+      ],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1130,7 +1722,8 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1155,7 +1748,34 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/mislukking",
+      "rol": "office",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankregie"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": null,
+      "leestBodyGrond": "server/routes/kantoren/bank.js noemt /api/office/bank/mislukking niet rond regel 80 -- ROUTEBRON.json loopt hier achter op de bron",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:bankregie"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1193,6 +1813,7 @@
       "buitenDeRoute": [],
       "eigenLijf": false,
       "voorziening": null,
+      "meldingBewoog": false,
       "herhaling": {
         "status": 200,
         "deed": [
@@ -1229,7 +1850,36 @@
         "store.db:kantoorAudit"
       ],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/nood",
+      "rol": "office",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "bankregie"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": null,
+      "leestBodyGrond": "server/routes/kantoren/bank.js noemt /api/office/bank/nood niet rond regel 70 -- ROUTEBRON.json loopt hier achter op de bron",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:bankregie"
+      ],
+      "buitenDeRoute": [
+        "store.db:kantoorAudit"
+      ],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1252,7 +1902,8 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1275,7 +1926,32 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/rechtsvormwacht",
+      "rol": "office",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "aiTegoed"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": false,
+      "leestBodyGrond": "server/routes/office/ondernemers.js:55 raakt `req.body` niet binnen de handler",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1300,7 +1976,8 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1325,7 +2002,34 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/kascode",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "payCodes"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/pay-tegoed.js:64 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:payCodes"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1351,7 +2055,8 @@
         "store.db:onboarding"
       ],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1377,7 +2082,35 @@
         "store.db:onboarding"
       ],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/oplaad",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "BLOCKED_BODY",
+      "statusVanDeAanroep": 400,
+      "bereiktTot": "VERZOEKCONTROLE",
+      "blokkeertOp": "LIJF",
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/pay.js:56 raakt req.body",
+      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "geraakt": [],
+      "buitenDeRoute": [
+        "store.db:onboarding"
+      ],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1421,6 +2154,7 @@
       ],
       "eigenLijf": true,
       "voorziening": null,
+      "meldingBewoog": false,
       "herhaling": {
         "status": 200,
         "deed": [
@@ -1489,6 +2223,7 @@
       ],
       "eigenLijf": true,
       "voorziening": null,
+      "meldingBewoog": false,
       "herhaling": {
         "status": 409,
         "deed": [],
@@ -1498,6 +2233,49 @@
     },
     {
       "methode": "POST",
+      "pad": "/api/pay/saldo",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "fondsAfdrachten",
+        "invoices",
+        "payBoekingen",
+        "paySaldi",
+        "socialeAfdrachten"
+      ],
+      "idempotentie": "ongemeten",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/pay.js:93 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:fondsAfdrachten",
+        "store.db:invoices",
+        "store.db:payBoekingen",
+        "store.db:paySaldi",
+        "store.db:socialeAfdrachten"
+      ],
+      "buitenDeRoute": [
+        "store.db:betaalIdem",
+        "store.db:economischeRuntime",
+        "store.db:geldbeleid",
+        "store.db:onboarding",
+        "store.db:payIdem",
+        "store.db:payIdemAfdruk",
+        "store.db:waardeOormerken",
+        "store.db:waardePosities"
+      ],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
       "pad": "/api/pay/stuur",
       "rol": "member",
       "grens": "voor-eerste-mutatie",
@@ -1520,7 +2298,8 @@
         "store.db:onboarding"
       ],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1546,7 +2325,35 @@
         "store.db:onboarding"
       ],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/stuur",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "BLOCKED_BODY",
+      "statusVanDeAanroep": 400,
+      "bereiktTot": "VERZOEKCONTROLE",
+      "blokkeertOp": "LIJF",
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/pay.js:64 raakt req.body",
+      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "geraakt": [],
+      "buitenDeRoute": [
+        "store.db:onboarding"
+      ],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1573,7 +2380,8 @@
         "store.db:onboarding"
       ],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1600,7 +2408,36 @@
         "store.db:onboarding"
       ],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/tegoed/koop",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi",
+        "payTegoed"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "BLOCKED_BODY",
+      "statusVanDeAanroep": 400,
+      "bereiktTot": "VERZOEKCONTROLE",
+      "blokkeertOp": "LIJF",
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/pay-tegoed.js:31 raakt req.body",
+      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "geraakt": [],
+      "buitenDeRoute": [
+        "store.db:onboarding"
+      ],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1626,7 +2463,8 @@
         "store.db:onboarding"
       ],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1652,7 +2490,35 @@
         "store.db:onboarding"
       ],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/tik",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "BLOCKED_BODY",
+      "statusVanDeAanroep": 400,
+      "bereiktTot": "VERZOEKCONTROLE",
+      "blokkeertOp": "LIJF",
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/pay-tegoed.js:51 raakt req.body",
+      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "geraakt": [],
+      "buitenDeRoute": [
+        "store.db:onboarding"
+      ],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1677,7 +2543,8 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1702,7 +2569,34 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/tikcode",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "payTikCodes"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": false,
+      "leestBodyGrond": "server/routes/pay-tegoed.js:44 raakt `req.body` niet binnen de handler",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:payTikCodes"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1727,7 +2621,8 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1752,7 +2647,34 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/verzoek",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "payVerzoeken"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/pay.js:69 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:payVerzoeken"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1779,7 +2701,8 @@
         "store.db:onboarding"
       ],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1806,7 +2729,36 @@
         "store.db:onboarding"
       ],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/verzoek/betaal",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi",
+        "payVerzoeken"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "BLOCKED_BODY",
+      "statusVanDeAanroep": 400,
+      "bereiktTot": "VERZOEKCONTROLE",
+      "blokkeertOp": "LIJF",
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/pay.js:75 raakt req.body",
+      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "geraakt": [],
+      "buitenDeRoute": [
+        "store.db:onboarding"
+      ],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1836,7 +2788,8 @@
         "velden": [
           "id"
         ]
-      }
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1866,7 +2819,39 @@
         "velden": [
           "id"
         ]
-      }
+      },
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/pay/verzoek/intrek",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "payVerzoeken"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/pay.js:79 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:payVerzoeken"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": true,
+      "voorziening": {
+        "stand": "gelukt",
+        "velden": [
+          "id"
+        ]
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1889,7 +2874,8 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1912,7 +2898,32 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/punten",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "punten"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": false,
+      "leestBodyGrond": "server/routes/member/handel/uitjes.js:120 raakt `req.body` niet binnen de handler",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1940,7 +2951,8 @@
         "store.db:supplierActivity"
       ],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1968,7 +2980,37 @@
         "store.db:supplierActivity"
       ],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/betaalverzoek",
+      "rol": "supplier",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "betaalVerzoeken"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/supplier/gastcontact.js:81 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:betaalVerzoeken"
+      ],
+      "buitenDeRoute": [
+        "store.db:directOntvangsten",
+        "store.db:supplierActivity"
+      ],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -1997,7 +3039,8 @@
         "store.db:rtmail"
       ],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": true
     },
     {
       "methode": "POST",
@@ -2026,7 +3069,60 @@
         "store.db:rtmail"
       ],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": true
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/facturen/maak",
+      "rol": "supplier",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "facturen"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "NIET_BEPROEFD",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 1 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand | geenDubbel: de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien",
+      "geraakt": [
+        "store.db:facturen"
+      ],
+      "buitenDeRoute": [
+        "store.db:factuurTeller"
+      ],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:facturen"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": [
+          "store.db:facturen"
+        ]
+      }
     },
     {
       "methode": "POST",
@@ -2054,7 +3150,8 @@
         "velden": [
           "id"
         ]
-      }
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2082,7 +3179,37 @@
         "velden": [
           "id"
         ]
-      }
+      },
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/facturen/pdf",
+      "rol": "supplier",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "facturen"
+      ],
+      "idempotentie": "ongemeten",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/facturatie.js:37 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": {
+        "stand": "gelukt",
+        "velden": [
+          "id"
+        ]
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2109,7 +3236,8 @@
         "store.db:supplierActivity"
       ],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2136,7 +3264,36 @@
         "store.db:supplierActivity"
       ],
       "eigenLijf": true,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/giftcard/sell",
+      "rol": "supplier",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "giftcards"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/supplier/kassa/cadeaukaart.js:32 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:giftcards"
+      ],
+      "buitenDeRoute": [
+        "store.db:supplierActivity"
+      ],
+      "eigenLijf": true,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2159,7 +3316,8 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2182,7 +3340,32 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/oog/overzicht",
+      "rol": "supplier",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "directOntvangsten"
+      ],
+      "idempotentie": "ongemeten",
+      "stand": "BLOCKED_FEATURE",
+      "statusVanDeAanroep": 503,
+      "bereiktTot": "DIENSTPOORT",
+      "blokkeertOp": "FEATURE",
+      "leestBody": false,
+      "leestBodyGrond": "server/routes/staff/oog.js:38 raakt `req.body` niet binnen de handler",
+      "reden": "de DIENST weigerde (503), niet het verzoek -- hier staat een schakelaar of een afhankelijkheid, en daar helpt geen lijf en geen fixture aan",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2219,7 +3402,8 @@
           "centen",
           "doel"
         ]
-      }
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2256,7 +3440,46 @@
           "centen",
           "doel"
         ]
-      }
+      },
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pay/treasury/apart",
+      "rol": "supplier",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "facturen",
+        "payBoekingen",
+        "payCodes",
+        "paySaldi",
+        "posSales",
+        "waardeOormerken"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/pay-zaak-treasury.js:37 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:waardeOormerken"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": {
+        "stand": "gelukt",
+        "velden": [
+          "naam",
+          "centen",
+          "doel"
+        ]
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2281,7 +3504,8 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2306,7 +3530,34 @@
       ],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pay/treasury/zet",
+      "rol": "supplier",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "payTreasury"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/pay-zaak-treasury.js:33 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:payTreasury"
+      ],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2340,7 +3591,8 @@
       "voorziening": {
         "stand": "gelukt",
         "velden": []
-      }
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2374,7 +3626,43 @@
       "voorziening": {
         "stand": "gelukt",
         "velden": []
-      }
+      },
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pay/uitbetaal",
+      "rol": "supplier",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/pay-zaak.js:140 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:payBoekingen",
+        "store.db:paySaldi"
+      ],
+      "buitenDeRoute": [
+        "store.db:betaalIdem",
+        "store.db:betaalOpdrachten",
+        "store.db:capGezondheid"
+      ],
+      "eigenLijf": false,
+      "voorziening": {
+        "stand": "gelukt",
+        "velden": []
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2408,7 +3696,8 @@
           "room",
           "method"
         ]
-      }
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2442,7 +3731,43 @@
           "room",
           "method"
         ]
-      }
+      },
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/supplier/pos/checkout",
+      "rol": "supplier",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "facturen",
+        "posSales"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/supplier/kassa/afrekenen.js:21 raakt req.body",
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:posSales"
+      ],
+      "buitenDeRoute": [
+        "store.db:supplierActivity"
+      ],
+      "eigenLijf": false,
+      "voorziening": {
+        "stand": "gelukt",
+        "velden": [
+          "room",
+          "method"
+        ]
+      },
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2465,7 +3790,8 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
     },
     {
       "methode": "POST",
@@ -2488,21 +3814,46 @@
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
-      "voorziening": null
+      "voorziening": null,
+      "meldingBewoog": false
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/wallet/voeg",
+      "rol": "member",
+      "grens": "na-commit-voor-bericht",
+      "modus": "sterf-voor-bericht",
+      "belofte": "de uitkomst staat vast na een dood op het meldmoment; OF de betrokkene bericht hoorde te krijgen staat niet in enig register en wordt hier dus niet beoordeeld",
+      "collecties": [
+        "wallet"
+      ],
+      "idempotentie": "beschermd",
+      "stand": "BLOCKED_BODY",
+      "statusVanDeAanroep": 400,
+      "bereiktTot": "VERZOEKCONTROLE",
+      "blokkeertOp": "LIJF",
+      "leestBody": true,
+      "leestBodyGrond": "server/routes/zorgwallet.js:34 raakt req.body",
+      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "geraakt": [],
+      "buitenDeRoute": [],
+      "eigenLijf": false,
+      "voorziening": null,
+      "meldingBewoog": false
     }
   ],
   "telling": {
-    "BLOCKED_BODY": 22,
-    "GEEN_DUURZAME_WEG": 57,
-    "BLOCKED_WORLD": 2,
-    "BLOCKED_ROLE": 2,
-    "NIET_BEPROEFD": 3,
+    "BLOCKED_BODY": 33,
+    "GEEN_DUURZAME_WEG": 87,
+    "BLOCKED_WORLD": 3,
+    "BLOCKED_ROLE": 3,
+    "NIET_BEPROEFD": 4,
     "PROVEN": 2,
-    "BLOCKED_FEATURE": 2
+    "BLOCKED_FEATURE": 3
   },
   "ruis": [
     "store.db:schaduwregels"
   ],
   "routes": 45,
-  "grenzen": 2
+  "grenzen": 3
 }

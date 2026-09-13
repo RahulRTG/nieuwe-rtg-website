@@ -33,7 +33,7 @@
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
-    "keuringOmvang": 323,
+    "keuringOmvang": 322,
     "keuringScheef": 16,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
@@ -93,9 +93,9 @@
     "crashasOnbekend": 89,
     "crashasNietMeetbaar": 0,
     "crashproefGezakt": 0,
-    "crashproefGeenLijf": 22,
-    "crashproefGeenWereld": 2,
-    "crashproefGeenRol": 2,
+    "crashproefGeenLijf": 11,
+    "crashproefGeenWereld": 1,
+    "crashproefGeenRol": 1,
     "crashproefOnbepaald": 0
   },
   "notities": [
@@ -2215,6 +2215,15 @@
       "meter": "keuringOmvang 322 -> 323",
       "reden": "server/kern/bankregie/index.js komt in de waarschuwingsband onder 10 kB (9681 byte); de harde grens van keuringsregel 13 haalt hij niet. De groei is de reparatie van drie gezakte crashrijen plus de reden erbij: /api/office/bank/leden, /draai en /nood muteerden `bankregie` duurzaam terwijl het proces stierf en de auditregel NIET landde, dus een schakelaar die bepaalt of de leden-bank live is kon omgaan zonder spoor van wie. De helper `besluit` zet mutatie en spoor samen in een duurzame bundel. Het commentaar is al ingekort -- de lange kant staat in routes/kantoren/bank.js -- en wat overblijft legt uit waarom deze module als enige van de bankregie de duurzame commit mag bereiken (keuringsregel 47).",
       "waarheen": "bankregie/index.js draagt vier onderwerpen (stand, clearing, plafonds, de knop). De knop plus `besluit` is de natuurlijke naad naar een eigen bestand, net zoals nood.js, autorisatie.js en instellingen.js er al af zijn. Dat is een verhuizing en geen herschrijving."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "structureel",
+      "sleutel": "crashproefGeenLijf",
+      "van": 22,
+      "meter": "crashproefGeenLijf 22 -> 11, crashproefGeenWereld 2 -> 1, crashproefGeenRol 2 -> 1",
+      "reden": "GEEN VOORUITGANG MAAR EEN ANDERE EENHEID, en wie deze drie als verbetering leest, leest ze verkeerd. De drie blokkadetanden telden RIJEN (route x crashgrens). Op 13 september kwam er een derde crashgrens bij (na-commit-voor-bericht), en daarmee sprongen ze van 22/2/2 naar 33/3/3 zonder dat er ook maar een route slechter was geworden: het zijn dezelfde 11, 1 en 1 routes, nu met drie grenzen elk gemeten in plaats van twee. Een tand die omhoogschiet van werk dat je juist goed deed, leert iedereen om hem te negeren -- dus telt hij nu ROUTES. Dat is bovendien de eenheid van het werk zelf: een lijf schrijf je per route, en dan worden er in een klap drie rijen meetbaar. De getallen van eerder vandaag (30 -> 22 en 10 -> 2) zijn RIJEN en dus niet een-op-een met deze te vergelijken; in routes waren dat 15 -> 11 en 5 -> 1. `crashproefGezakt` blijft met opzet RIJEN tellen: een gebroken belofte op twee grenzen van dezelfde route is twee defecten en niet een. Het routegetal wordt AFGELEID uit `per` en staat niet als eigen veld in het register, om dezelfde reden die bij crashasNietMeetbaar staat: een samenvattend getal loopt bij de eerstvolgende wijziging uit de pas met de rijen waaruit het komt.",
+      "waarheen": "omlaag door per route een lijf, een voorziening of de juiste rol te leveren -- elke route die omgaat, maakt drie crashgrenzen tegelijk meetbaar. Deze tand is vanaf nu ONGEVOELIG voor het aantal grenzen, dus een vierde grens erbij mag hem niet meer laten stijgen; gebeurt dat toch, dan telt er iets weer rijen."
     }
   ],
   "prestatie": {
@@ -2233,7 +2242,7 @@
     "waarom": "Vanaf deze datum heeft elke notitie een soort: \"structureel\" (het gemetene veranderde van vorm; zeg dan met waarheen waar de belofte heen ging) of \"schuld\" (we konden het even niet; zeg dan met sleutel, van en vervalt wanneer hij terug is). scripts/normverval.js keurt alleen wat vanaf hier bij komt. DE GRENS IS NU TWEE KEER OPGESCHOVEN, en dat is geen verzachting maar twee keer dezelfde oorzaak. De eerste keer (18 -> 19 augustus) schreef main twee notities op een eigen tak waar deze regel niet bestond. De tweede keer (19 -> 21 augustus) kwamen bij de samenvoeging van 23 PR-takken elf notities van 20 augustus mee, geschreven op takken die van dezelfde dag zijn als de regel en hem dus niet kenden. WAAROM ZE NIET ALSNOG WORDEN INGEDEELD: een soort toekennen aan andermans notitie betekent hem woorden in de mond leggen -- en bij een schuld ook een vervaldatum, dus een afspraak die hij nooit heeft gemaakt. Dat is precies de reden die de eerste verschuiving al gaf. WAT DAT KOST, EERLIJK: elf verlagingen uit die ronde staan nu zonder soort in het register. Ze dragen wel allemaal een uitgeschreven reden -- wat ze missen is het VELD. En om te laten zien dat dit geen uitweg voor mezelf is: alle acht notities die deze samenvoeging zelf schrijft (2026-08-21) dragen een soort, zeven daarvan als schuld met een sleutel, een van-waarde en een einddatum. Vanaf 21 augustus geldt de eis onverkort; test/normverval.test.js toetst de logica met eigen data en staat dus niet stil tot die datum."
   },
   "sinds": {
-    "keuringOmvang": "2026-09-11",
+    "keuringOmvang": "2026-09-13",
     "testbestanden": "2026-09-13",
     "toetsenNietGemeten": "2026-09-11",
     "inlineStijlAttributen": "2026-09-11",

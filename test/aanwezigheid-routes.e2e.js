@@ -72,9 +72,30 @@ test('de publieke laag: volgen op naam, en uitlichten alleen door een mens', asy
     const aanwezigId = uit.body.moment && uit.body.moment.aanwezigheid;
     assert.ok(aanwezigId, 'de uitlichting leverde een moment met een aanwezigheid');
 
-    /* Hooguit een keer: de tweede keer is een toestandscontrole en geen
-       idempotentie -- daarom 409 en geen stille 200. */
-    assert.equal((await post('/api/office/salon/uitlicht', { postId, grond: 'bijzonder' }, persoon)).status, 409);
+    /* HOOGUIT EEN KEER -- en hier staan TWEE dingen die niet hetzelfde zijn.
+       Deze toets beweerde eerst dat een woordelijk gelijke herhaling meteen 409
+       geeft, en dat is onwaar: server/lib/idemsleutels-stage.js zet op deze route
+       de sleutel ['postId','grond'], dus binnen het dubbeltikvenster speelt de
+       idempotentiepoort het BEWAARDE antwoord terug. Dat is geen gat maar het
+       besluit dat in de kop van dat bestand staat -- binnen vijf seconden is een
+       tweede identieke uitlichting een haperend netwerk.
+
+       Het bewijs dat het een replay is en geen tweede uitlichting: dezelfde `id`.
+       Een nieuwe regel zou een nieuwe dragen.
+
+       DE TOESTANDSCONTROLE ZIT ERONDER en is iets anders. Met een andere grond
+       verschilt de sleutel, dus de handler draait echt -- en dan komt de 409 waar
+       hij hoort. Precies het onderscheid dat de kop van idemsleutels-stage.js
+       maakt: wie replay en toestandscontrole samenvoegt, kan later niet meer zien
+       of een route veilig te herhalen IS of alleen toevallig niets deed. */
+    const herhaald = await post('/api/office/salon/uitlicht', { postId, grond: 'bijzonder' }, persoon);
+    assert.equal(herhaald.status, 200, 'binnen het dubbeltikvenster speelt de poort het antwoord terug');
+    assert.equal(herhaald.body.uitlichting.id, uit.body.uitlichting.id,
+      'en het is echt hetzelfde antwoord: een tweede uitlichting zou een nieuwe id dragen');
+
+    const anders = await post('/api/office/salon/uitlicht', { postId, grond: 'lokaal' }, persoon);
+    assert.equal(anders.status, 409, 'een andere sleutel bereikt de handler, en die weigert op de STAND');
+    assert.match(String(anders.body.error || ''), /al uitgelicht/, 'en zegt waarom');
 
     /* 3b. DE VOLGLUS, en die maakt de lege lijst hierboven pas iets waard.
 

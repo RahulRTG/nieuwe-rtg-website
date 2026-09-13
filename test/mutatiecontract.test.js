@@ -284,53 +284,17 @@ test('elk contract in server/lib/mutatiecontracten.js deugt', () => {
    BEDOELING, en dat leest niemand uit een meting af (zie de kop van
    server/lib/mutatiecontracten.js). Deze lijst mag daarom alleen KRIMPEN. */
 const BEKEND_OPEN = Object.freeze([
-  'POST /api/foundation/kosten',
-  'POST /api/foundation/school/aanwezigheid/leerling',
-  'POST /api/foundation/school/belasting/mij',
-  'POST /api/foundation/school/dossier',
-  'POST /api/foundation/school/dossier/contact',
-  'POST /api/foundation/school/hr/uren',
-  'POST /api/foundation/school/leerling/overstap',
-  'POST /api/foundation/school/leraar/klas/maak',
-  'POST /api/foundation/school/leraar/overzicht',
-  'POST /api/foundation/school/mijn-rechten',
-  'POST /api/foundation/school/peiling/mijn-personeel',
-  'POST /api/foundation/school/personeel/mail/inbox',
-  'POST /api/foundation/school/personeel/mail/overzicht',
-  'POST /api/foundation/school/personeel/mail/verzonden',
-  'POST /api/foundation/school/personeel/start',
-  'POST /api/foundation/school/personeel/status',
-  'POST /api/foundation/school/rooster/zet',
-  'POST /api/foundation/school/zorg/zet',
-  'POST /api/gemeente/afspraken',
-  'POST /api/gemeente/bekendmaking',
-  'POST /api/gemeente/meldingen',
-  'POST /api/gemeente/regie',
-  'POST /api/gemeente/triage',
-  'POST /api/gemeente/vergunningen',
-  'POST /api/kosten/grens',
-  'POST /api/kosten/mij',
-  'POST /api/lab2/ledger/studie',
-  'POST /api/lucht/ai',
-  'POST /api/lucht/bagage',
-  'POST /api/lucht/bord',
-  'POST /api/lucht/charters',
-  'POST /api/lucht/cockpit',
-  'POST /api/lucht/lounge',
-  'POST /api/lucht/vip/lijst',
-  'POST /api/lucht/vlucht/maak',
-  'POST /api/notifications/read',
-  'POST /api/office/rtgai/train',
-  'POST /api/rtfos/gift/machtiging/mijn',
-  'POST /api/rtfos/gift/plan/mijn',
-  'POST /api/rtfos/gift/projecten',
-  'POST /api/rtfos/gift/stand',
-  'POST /api/rtfos/ruil/mijn',
-  'POST /api/rtfos/winkel',
-  'POST /api/rtfos/winkel/mijn',
-  'POST /api/supplier/horeca/keuken/tijden',
-  'POST /api/supplier/kosten',
-  'POST /api/supplier/kosten/vooruitblik',
+  /* LEEG SINDS 13 SEPTEMBER 2026, en dat is de bedoeling van deze lijst.
+
+     De 47 hierboven zijn met de hand geclassificeerd in PR #252 en staan nu in
+     server/lib/mutatiecontracten-afleidrest*.js. Een verse ronde meldt over 4933
+     schrijfroutes nul LEGACY_PENDING_CLASSIFICATION, dus er is niets meer om uit
+     te zonderen -- en de toets hieronder zegt het zelf: een uitzondering die niet
+     meer geldt, is een alibi.
+
+     DE LIJST BLIJFT STAAN, leeg. Hij is de vorm waarin een volgende schuld bij
+     NAAM wordt opgeschreven in plaats van als opgehoogd getal; die keuze staat
+     hierboven uitgeschreven en is niet ingetrokken, alleen afbetaald. */
 ]);
 
 test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {

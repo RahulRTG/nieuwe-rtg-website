@@ -11,7 +11,7 @@ hetzelfde en doen alsof van wel is de eerste manier om hem te verliezen.
 
 ---
 
-## De twaalf regels
+## De dertien regels
 
 ### 1. Repareer de oorzaak, niet het symptoom
 
@@ -427,6 +427,65 @@ repareren valt als hij niet start). Voor de mens die een slecht cijfer leest en
 zich niet afvraagt of er wel gemeten is, bestaat geen handhaver; daarvoor staat
 deze regel hier.
 
+### 13. Een register heeft hoogstens een schrijver, en die bewijst bij publicatie dat hij nog dezelfde wereld meet
+
+Regel 12 gaat over een meting die niet heeft gedraaid. Dit is de derde vorm, en
+hij is van de drie de gevaarlijkste: een meting die **wel** heeft gedraaid, met
+een **correcte** meter, over een wereld die er niet meer is. De uitslag is dan
+plausibel, netjes opgemaakt en volledig -- en fout. Er is geen enkel spoor in het
+bestand waaraan een lezer dat kan zien.
+
+Twee helften, en ze falen los van elkaar.
+
+**De schrijfkant: hoogstens een schrijver.** Loopt er een tweede meter van
+dezelfde soort, dan wint de laatste die klaar is, en dat is niet degene die de
+verste wereld heeft gezien.
+
+*Het geval, 13 september 2026:* een crashproefronde (pid 9598) was gestart voor
+een rebase en leefde daar nog, terwijl ik na de rebase een verse ronde begon.
+Die oude ronde had `CRASHPROEF.json` technisch geldig kunnen schrijven, alleen
+over de wereld van voor de rebase. Hij is gevonden doordat ik op een proces
+wachtte en `ps` er twee vond -- niet door een wachter. Bij de twee pogingen
+ervoor ging het wachten zelf mis: `pgrep -f` matchte zijn eigen opdrachtregel, en
+`pgrep | tail -1` pakte een vluchtige treffer en meldde daarmee "de meting is
+klaar" terwijl er nog een draaide.
+
+**De publicatiekant: dezelfde wereld als bij de start.** `scripts/lib/stempel.js`
+leest de commit op het moment van SCHRIJVEN. Een ronde die op commit A begint en
+publiceert terwijl HEAD op B staat, krijgt dus stempel B -- een bestand dat van
+zichzelf zegt dat het B meet terwijl het A heeft gemeten. Dat is geen
+theoretische mogelijkheid: het is precies wat pid 9598 zou hebben opgeleverd. Een
+stempel die de bronwereld bij de START vastlegt en bij publicatie vergelijkt,
+weigert dan met een reden in plaats van te liegen.
+
+**En er is een leeskant, met een eigen geval op dezelfde dag.** Een register kan
+ook achterlopen op de bron die het beschrijft, en dan geeft het een
+zelfverzekerd verkeerd antwoord aan zijn LEZER. `ROUTEBRON.json` wees voor vier
+bankroutes naar regelnummers van voor mijn bewerking van
+`server/routes/kantoren/bank.js`; `scripts/crashproef.js` las daar `leestBody:
+false` uit voor routes die hun body wel degelijk lezen. De reparatie was niet het
+register verversen maar de LEZER laten twijfelen: het regelnummer werd een
+aanwijzing in plaats van een adres, en een niet-gevonden pad antwoordt `null` en
+niet `false`. Over de 45 geldroutes klopte het regelnummer 40 keer en zat het 5
+keer ernaast.
+
+Drie dingen die uit deze regel volgen en die je nergens anders moet herhalen. Een
+exclusief slot hoort te WEIGEREN en niet te wachten -- een tweede ronde die
+netjes in de rij gaat staan, publiceert alsnog een verouderde wereld zodra hij
+aan de beurt is. Een geweigerde ronde raakt het register NIET aan, ook niet om er
+"mislukt" in te zetten: een half bijgewerkt register is erger dan een oud. En de
+schaal is niet klein: 84 scripts schrijven via `scripts/lib/stempel.js` en er
+staan 138 registers in de wortel, dus dit is een eigenschap van de meetlaag en
+geen eigenaardigheid van de crashproef.
+
+**Handhaver:** vandaag niemand -- en dat is de eerlijke stand, niet een
+vooruitblik. De leeskant is op een plek gerepareerd
+(`scripts/crashproef.js` `leestBodyVan()`, met `null` voor onbekend) en de andere
+lezers van een register zijn niet nagelopen. Het exclusieve slot en de
+vergelijking bij publicatie horen in `scripts/lib/stempel.js`, waar de stempel al
+woont; zolang ze daar niet staan, is dit een regel waar alleen op mensen wordt
+vertrouwd.
+
 ---
 
 ## Wat de lat betekent per tijdvak
@@ -543,6 +602,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | een bovengrens draait in het onderhoud en niet in een schrijfroute | `server/kern/kappen.js` + `test/kappen.test.js` |
 | welke grote krimpen de toetsen echt uitlokken -- met bewijs dat de val aanstond | `KRIMP.json` + `scripts/krimpronde.js` + `test/krimpronde.test.js` |
 | een bronmuterende toets draait alleen, niet naast een server die diezelfde bron leest | `scripts/lib/geisoleerd.js` + `test/bronmutanten.test.js` |
+| een register heeft hoogstens een schrijver, en meet bij publicatie nog dezelfde wereld | **niemand** -- zie regel 13; het slot en de vergelijking horen in `scripts/lib/stempel.js` |
 | staat elke functie in de boardroom (en dus onder een schakelaar) | `scripts/schakelbaar.js` + `NORM.json` |
 | de wisregels van de identiteitskluis en de locatiesporen | `server/bewaarveger.js` |
 | elk scherm opent en geeft een teken van leven (dood is stiller dan stuk) | `test/paginas.e2e.js` |

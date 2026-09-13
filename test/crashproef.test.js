@@ -275,6 +275,35 @@ test('leestBody wordt uit de bron gelezen, met de vindplaats erbij', () => {
     'als "leest de body niet"');
 });
 
+/* HET REGELNUMMER IS EEN AANWIJZING EN GEEN ADRES.
+
+   ROUTEBRON.json wees voor /api/supplier/giftcard/sell naar regel 27 terwijl de
+   `app.post` op 29 staat. Het venster begon dus VOOR de registratie, en de
+   bewaking "stop bij de volgende route" sloeg aan op de EIGEN registratieregel
+   -- ruim voor de `req.body` twee regels verder. Uitslag: leestBody false op een
+   route die zijn body wel degelijk leest, en daardoor BLOCKED_ONBEPAALD in
+   plaats van BLOCKED_BODY.
+
+   Dat het ONBEPAALD-vak dat ving is precies waarvoor dat vak bestaat: de meter
+   zei "ik kan dit niet indelen" in plaats van een verkeerd label te plakken. */
+test('het pad wordt zelf opgezocht, ook als het regelnummer er net naast wijst', () => {
+  const g = cp.leestBodyVan('POST', '/api/supplier/giftcard/sell');
+  assert.equal(g.leest, true, 'deze route doet Math.round(Number(req.body.bedrag))');
+  assert.match(g.grond, /cadeaukaart\.js:3\d/, 'en wijst de regel aan waar het gebeurt');
+});
+
+/* EEN VEROUDERD REGISTER MAG GEEN ZELFVERZEKERD VERKEERD ANTWOORD GEVEN.
+   ROUTEBRON.json is een REGISTER en kan achterlopen op de bron -- vier
+   bankroutes schoven op doordat kantoren/bank.js is bewerkt na die meting.
+   Dan hoort er `null` te staan met de reden, en geen `false`. */
+test('loopt ROUTEBRON achter op de bron, dan is het antwoord onbekend', () => {
+  const b = cp.leestBodyVan('POST', '/api/office/bank/leden');
+  assert.notEqual(b.leest, false,
+    'een verschoven regelnummer mag niet als "leest de body niet" lezen');
+  if (b.leest === null) assert.match(b.grond, /achter op de bron|noemt/,
+    'en zegt dat het register achterloopt, zodat iemand hem opnieuw kan draaien');
+});
+
 /* ELKE BLOKKADESOORT HEEFT EEN STAND, en FEATURE heeft met opzet GEEN tand.
    Een 503 is geen schuld van de proef; er een tand op zetten verleidt iemand de
    proefwereld uit te breiden terwijl er niets aan de fixture mankeert. */

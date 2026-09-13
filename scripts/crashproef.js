@@ -183,14 +183,39 @@ function leestBodyVan(methode, pad) {
   let regels;
   try { regels = fs.readFileSync(path.join(WORTEL, b.bestand), 'utf8').split('\n'); }
   catch (e) { return { leest: null, grond: 'de bron ' + b.bestand + ' is niet te lezen' }; }
-  const start = Math.max(0, (b.regel || 1) - 1);
-  const eind = Math.min(regels.length, start + 40);
-  for (let i = start; i < eind; i++) {
-    if (i > start && /\bapp\.(post|get|put|delete|patch)\s*\(/.test(regels[i])) break;
+
+  /* HET REGELNUMMER IS EEN AANWIJZING EN GEEN ADRES, en die twee door elkaar
+     halen kostte hier een verkeerde uitslag. Twee oorzaken, allebei echt:
+
+       1. ROUTEBRON.json wees voor /api/supplier/giftcard/sell naar regel 27
+          terwijl de `app.post` op 29 staat. Het venster begon dus VOOR de
+          registratie, en de bewaking "stop bij de volgende route" sloeg aan op
+          de EIGEN registratieregel -- twee regels later, ruim voor de
+          `req.body` op regel 32. Uitslag: leestBody false, terwijl die route
+          zijn body wel degelijk leest.
+       2. ROUTEBRON.json is een REGISTER en kan achterlopen op de bron. Vier
+          bankroutes schoven op doordat ik kantoren/bank.js heb bewerkt; het
+          register was daarvoor gemeten.
+
+     Daarom wordt het pad nu ZELF opgezocht in een venster rond de aanwijzing,
+     en begint de handler daar. Wordt het pad niet gevonden, dan is het antwoord
+     `null` -- onbekend -- en nadrukkelijk niet `false`: een verouderd register
+     mag geen zelfverzekerd verkeerd antwoord opleveren. */
+  const hint = Math.max(0, (b.regel || 1) - 1);
+  let begin = -1;
+  for (let i = Math.max(0, hint - 5); i < Math.min(regels.length, hint + 15); i++)
+    if (regels[i].includes("'" + pad + "'") || regels[i].includes('"' + pad + '"')) { begin = i; break; }
+  if (begin < 0) return { leest: null,
+    grond: b.bestand + ' noemt ' + pad + ' niet rond regel ' + (b.regel || 1) +
+      ' -- ROUTEBRON.json loopt hier achter op de bron' };
+
+  const eind = Math.min(regels.length, begin + 40);
+  for (let i = begin; i < eind; i++) {
+    if (i > begin && /\bapp\.(post|get|put|delete|patch)\s*\(/.test(regels[i])) break;
     if (/req\.body/.test(regels[i]))
       return { leest: true, grond: b.bestand + ':' + (i + 1) + ' raakt req.body' };
   }
-  return { leest: false, grond: b.bestand + ':' + (b.regel || 1) + ' raakt `req.body` niet binnen de handler' };
+  return { leest: false, grond: b.bestand + ':' + (begin + 1) + ' raakt `req.body` niet binnen de handler' };
 }
 
 /* De twee grenzen die een injectiepunt HEBBEN. `in-de-opslag` staat er met

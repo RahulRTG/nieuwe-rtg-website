@@ -68,6 +68,33 @@ module.exports = (kern) => {
     const r = await stuurBevestig(req, String(req.body.goedkeuringId || ''), wereld);
     antwoord(res, r);
   };
+  /* ---- INTREKKEN: een klaargezet voorstel laten vervallen voor het loopt ----
+
+     WAAROM DEZE ROUTE NIET ONDER /doe HANGT. `kern/stuur/classificatie.js`
+     verbiedt `/api/(member|supplier|staff)/doe(/|$)` voor het stuur zelf, tegen
+     rondzingen -- en die grens blijft onaangeraakt. Zou intrekken daaronder
+     vallen, dan was hij per definitie onbereikbaar voor de laag die hem juist
+     moet kunnen gebruiken, en de verleiding was geweest die regex te verzachten.
+     Dat zou de bevestiging meeopenen, en dat is exact het gat.
+
+     DE ASYMMETRIE IS DE HELE GRAP: bevestigen geeft een handeling VRIJ en blijft
+     daarom buiten het gesprek; intrekken kan alleen iets WEGNEMEN. Een route die
+     uitsluitend vermogen inlevert, kan door misbruik niets laten gebeuren -- het
+     ergste geval is dat een lid opnieuw moet vragen.
+
+     GEEN ID IN HET LIJF. Zie kern/stuur/goedkeuring.js: er is niets om aan te
+     wijzen, dus bij twee open voorstellen kan hier niet gegokt worden. Het lijf
+     wordt met opzet niet gelezen. */
+  const intrekHandler = (wereld) => (req, res) => {
+    if (!alleenPersoneel(req, res, wereld)) return;
+    const r = kern.stuurIntrek(req, wereld);
+    if (r.error) return res.status(r.status || 500).json(r);
+    return res.json({ ok: true, ingetrokken: r.ingetrokken, aantal: r.aantal });
+  };
+  app.post('/api/member/voorstel/intrek', auth, intrekHandler('member'));
+  app.post('/api/supplier/voorstel/intrek', supplierAuth, intrekHandler('supplier'));
+  app.post('/api/staff/voorstel/intrek', supplierAuth, intrekHandler('staff'));
+
   app.post('/api/member/doe', auth, doeHandler('member'));
   app.post('/api/member/doe/bevestig', auth, bevestigHandler('member'));
   app.post('/api/supplier/doe', supplierAuth, doeHandler('supplier'));

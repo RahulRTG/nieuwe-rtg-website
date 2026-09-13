@@ -139,7 +139,13 @@ function maakStuur({ log, anthropic, app, crypto, isolatie }) {
   const stuurLus = require('./stuur/lus')({ anthropic: gekozenRail.client, app, log, stuurRoep,
     stuurPaden, classificeer, parseSubs, isolatie, railNaam: gekozenRail.naam });
 
-  return { stuurToets, stuurRoep, stuurBevestig, stuurPaden, stuurLus, classificeer, parseSubs,
+  /* INTREKKEN GAAT NIET LANGS stuurRoep, en dat is geen omweg maar de kern van
+     de zaak: er valt hier niets uit te voeren. De route roept deze functie
+     rechtstreeks aan, zij raakt uitsluitend de eigen voorstellenlijst, en zij
+     kan structureel geen enkel API-pad bereiken. Zie ./stuur/goedkeuring.js. */
+  const stuurIntrek = (req, wereld) => goedkeuring.trekEnige(req, wereld);
+
+  return { stuurToets, stuurRoep, stuurBevestig, stuurIntrek, stuurPaden, stuurLus, classificeer, parseSubs,
     /* De stand van de rail is uit te lezen: een keten die niet kan zeggen
        WELKE rail hem interpreteerde, is niet te beoordelen. */
     stuurRail: () => ({ naam: gekozenRail.naam, reden: gekozenRail.reden }) };

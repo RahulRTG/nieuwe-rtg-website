@@ -91,6 +91,9 @@ const PL = 'server/kern/stuur/plafond.js';
 const RC = 'server/kern/stuur/rail-corpus.js';
 const RCC = 'server/kern/stuur/rail-corpus-context.js';
 const CON = 'server/kern/stuur/menstaal.json';
+const GK = 'server/kern/stuur/goedkeuring.js';
+const BL = 'server/kern/stuur/beleid-lijsten.js';
+const CL = 'server/kern/stuur/classificatie.js';
 
 /* De projectie van geval B ("die andere" met EEN alternatief). Drie mutaties
    grijpen hem aan, en met opzet dezelfde: hij is de enige gescriptte zin die
@@ -209,7 +212,61 @@ const MUTATIES = [
     hoortTeZakken: 'dezelfde toets, maar dan op het gedrag in plaats van op het contract',
     tekst: [{ bestand: RCC, van: B_PROJECTIE,
       naar: "projectie: 'Je bedoelt de afspraak van 14:00. Zeg maar of ik dit in RTG Agenda ' +\n" +
-        "        'regel of in RTG Reizen.' }" }] }
+        "        'regel of in RTG Reizen.' }" }] },
+
+  /* ---- 11 t/m 14: het intrekbesluit van 13 september 2026 ----
+
+     Vier garanties die pas bestaan sinds een lid een klaargezet voorstel mag
+     laten vervallen. Ze zijn met opzet niet een mutatie maar vier: de belofte
+     valt in vier stukken die elk apart kunnen sneuvelen, en een enkele mutatie
+     zou drie ervan ongemeten laten. */
+
+  /* 11. DE POORT DIE MAG KIEZEN. Haal de weigering bij twee openstaande
+         voorstellen weg en pak de eerste. Dit is de gevaarlijkste faalvorm van
+         het besluit: een lid zegt "laat maar" en er verdwijnt een ander
+         voorstel dan hij bedoelde -- zonder dat er iets zichtbaar misgaat. */
+  { nr: '11', naam: 'poort kiest bij twee voorstellen',
+    bewaakt: 'intrekken',
+    weg: 'bij twee openstaande voorstellen wordt er een gekozen in plaats van gevraagd',
+    hoortTeZakken: 'intrekveiligheid (409 en EXECUTED NOT_RUN bij twee)',
+    tekst: [{ bestand: GK,
+      van: '    if (rijen.length > 1)',
+      naar: '    if (false)' }] },
+
+  /* 12. DE ID-INGANG. Geef trekEnige een id mee. De vorm die "precies een
+         eenduidig voorstel" afdwingt IS de afwezigheid van dat argument; komt
+         het terug, dan is de eis weer een regel die de aanroeper kan overslaan. */
+  { nr: '12', naam: 'intrekken op een aangewezen id',
+    bewaakt: 'intrekken',
+    weg: 'de interpretatielaag kan bij twee voorstellen zelf aanwijzen welke vervalt',
+    hoortTeZakken: 'de bronassertie op de handtekening van trekEnige',
+    tekst: [{ bestand: GK,
+      van: '  function trekEnige(req, wereld) {',
+      naar: '  function trekEnige(req, wereld, id) {' }] },
+
+  /* 13. INTREKKEN ALS VOORSTEL. Zet het pad op `voorstel` in plaats van
+         `klein`. Dan is er een bevestiging nodig om een bevestiging te laten
+         vervallen -- een cirkel waarin het besluit onuitvoerbaar wordt zonder
+         dat er iets rood wordt. */
+  { nr: '13', naam: 'intrekpad naar `voorstel`',
+    bewaakt: 'intrekken',
+    weg: 'een voorstel is nodig om een voorstel te laten vervallen; het besluit werkt niet meer',
+    hoortTeZakken: 'intrekveiligheid (niveau `klein`)',
+    tekst: [{ bestand: BL,
+      van: "    /^\\/api\\/member\\/voorstel\\/intrek$/",
+      naar: "  ],\n  _weg: [\n    /^\\/api\\/member\\/voorstel\\/intrek$/" }] },
+
+  /* 14. DE BEVESTIGDEUR OPEN. Haal de stuurtak uit de verbodslijst. Intrekken
+         openzetten mag de andere kant nooit meeopenen, en dat is precies wat
+         deze mutatie probeert. Hij hoort te zakken op de ECHTE route -- de
+         vier spookpaden die hier ooit werden getoetst, bestonden niet. */
+  { nr: '14', naam: 'de bevestigdeur meegeopend',
+    bewaakt: 'intrekken',
+    weg: 'het stuur kan zijn eigen klaargezette handeling bevestigen',
+    hoortTeZakken: 'bevestigveiligheid (de poort op /api/member/doe/bevestig)',
+    tekst: [{ bestand: CL,
+      van: '  /^\\/api\\/(member|supplier|staff)\\/doe(?:\\/|$)/ // stuur + menselijke bevestiging: geen rondzingen',
+      naar: '  /^\\/api\\/zzz-nooit\\/doe(?:\\/|$)/ // gemuteerd' }] }
 ];
 
 function hash(p) { return crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex'); }

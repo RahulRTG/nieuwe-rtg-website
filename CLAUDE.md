@@ -2093,8 +2093,8 @@ zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
 motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
-bestaande meter deed: van de <!--getal:machine.muterend-->4963<!--/getal-->
-muterende routes raken er <!--getal:machine.zonderAs-->2825<!--/getal--> geen
+bestaande meter deed: van de <!--getal:machine.muterend-->3784<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2789<!--/getal--> geen
 enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele
@@ -2104,7 +2104,7 @@ dingen missen), en de meter heeft zichzelf twee keer betrapt op dezelfde fout va
 twee kanten: een hub in de kern-tas zette 4162 routes op "idempotent", en
 `/api/notifications` scoorde tien assen omdat die route zelf in `server/server.js`
 woont (143 requires). Vandaar de hubgrens en de
-<!--getal:machine.hubRoutes-->28<!--/getal--> routes waarvoor de bestandsas met
+<!--getal:machine.hubRoutes-->13<!--/getal--> routes waarvoor de bestandsas met
 naam en toenaam onbruikbaar is verklaard. **De eerste keten is rond** (par. 5a):
 `/api/office/bank/incasso` -> `handtekening/bevestig` -> `incasso/dossier`, vijftien
 verplichte assen voor haar klasse en alle vijftien gelopen, met

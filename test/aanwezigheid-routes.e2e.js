@@ -73,27 +73,25 @@ test('de publieke laag: volgen op naam, en uitlichten alleen door een mens', asy
     assert.ok(aanwezigId, 'de uitlichting leverde een moment met een aanwezigheid');
 
     /* HOOGUIT EEN KEER -- EN DAT HEEFT TWEE DEUREN, want op de ROUTE staat de
-       dubbeltikpoort ervoor en in de MODULE de toestandscontrole.
+       dubbeltikpoort ervoor en in de MODULE de toestandscontrole. Deze toets
+       eiste hier ooit onvoorwaardelijk 409, en dat was de wereld van voordat
+       server/lib/idemsleutels-stage.js bestond. Die verklaring kwam er later bij
+       en zette deze route in het dubbeltikvenster van lib/idemsleutels.js --
+       vijf seconden, huisbreed. Sindsdien krijgt een woordelijk gelijk verzoek
+       binnen dat venster het ANTWOORD VAN DE EERSTE terug en komt de handler er
+       niet meer aan toe.
 
-       DEZE TOETS ZAKTE, EN TERECHT. Hij eiste hier onvoorwaardelijk 409, en dat
-       was de wereld van voordat server/lib/idemsleutels-stage.js bestond. Die
-       verklaring kwam er later bij (de idemschuld-zakker) en zette deze route in
-       het dubbeltikvenster van lib/idemsleutels.js -- vijf seconden, huisbreed.
-       Sindsdien krijgt een woordelijk gelijk verzoek binnen dat venster het
-       ANTWOORD VAN DE EERSTE terug en komt de handler er niet meer aan toe.
-
-       Dat is dezelfde vorm als de rest van deze tak: een verklaring veranderde
-       de werkelijkheid en de wachter bleef de oude beweren. De reparatie is dus
-       niet de eis verlagen maar hem VERDUBBELEN -- allebei de deuren staan
-       hieronder, en allebei bewaren ze dezelfde invariant: er ontstaat NOOIT een
-       tweede uitlichting.
+       De reparatie was niet de eis verlagen maar hem VERDUBBELEN. Beide takken
+       die hieraan werkten kwamen onafhankelijk op dezelfde twee deuren uit; wat
+       hier staat is de UNIE ervan, want ze bewaakten elk iets wat de ander niet
+       zag -- de tekst van de weigering, en de invariant eronder.
 
        1. Woordelijk gelijk, binnen het venster: een HERHALING. Niet zomaar een
           200 -- het moet het antwoord van de eerste zijn, dus dezelfde id. Een
           nieuwe id met status 200 zou betekenen dat er wel degelijk een tweede
           handeling was, en daar is deze regel voor. */
     const nogmaals = await post('/api/office/salon/uitlicht', { postId, grond: 'bijzonder' }, persoon);
-    assert.equal(nogmaals.status, 200, 'binnen het dubbeltikvenster is dit een herhaling');
+    assert.equal(nogmaals.status, 200, 'binnen het dubbeltikvenster speelt de poort het antwoord terug');
     assert.equal(nogmaals.body.herhaald, true, 'en hij zegt er ook bij dat het een herhaling is');
     assert.equal(nogmaals.body.uitlichting.id, uit.body.uitlichting.id,
       'een herhaling geeft het antwoord van de EERSTE terug, dus dezelfde uitlichting');

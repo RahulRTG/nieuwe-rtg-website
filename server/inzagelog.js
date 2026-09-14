@@ -35,9 +35,17 @@ const { verankerPunt, verifieerTegenAnker } = require('./lib/keten-anker');
 const { nu, datum } = require('./lib/klok');
 
 /* De db-laag komt via zet() binnen, zodat dit bestand niets circulair
-   importeert en tests hem met een nepdatabase kunnen vullen. */
-let DB = null, SAVE = null;
-function zet(db, save) { DB = db; SAVE = save; }
+   importeert en tests hem met een nepdatabase kunnen vullen.
+
+   `VASTLEGGEN` is de derde en hij is optioneel: de duurzame vastlegger uit
+   server/lib/duurzaam.js. Zonder hem blijft alles werken zoals het werkte --
+   noteer() is dan write-behind, precies als hiervoor -- maar kan noteerVast()
+   niets BEWIJZEN, en dat zegt hij dan ook met zoveel woorden in plaats van
+   stilletjes op de gewone save() terug te vallen. */
+let DB = null, SAVE = null, VASTLEGGEN = null, BEVESTIGBAAR = null;
+function zet(db, save, vastleggen, bevestigbaar) {
+  DB = db; SAVE = save; VASTLEGGEN = vastleggen || null; BEVESTIGBAAR = bevestigbaar || null;
+}
 
 function rij() {
   if (!DB || !DB.data) return [];
@@ -62,8 +70,21 @@ function zelf(door, over) {
      waarom korte, echte aanleiding. Verplicht.
      bron   waar vandaan (route, kamer, scherm).
    Geeft de weggeschreven regel terug, of null als er niets te noteren viel. */
-function noteer({ door, over, waarom, bron, extra } = {}) {
-  if (zelf(door, over)) return null;
+function noteer(opdracht = {}) {
+  if (zelf(opdracht.door, opdracht.over)) return null;
+  const r = schrijfRegel(opdracht);
+  if (SAVE) { try { SAVE(); } catch (e) {} }
+  return r;
+}
+
+/* DE REGEL ZELF -- EEN BOUWER, TWEE BELOFTES.
+
+   noteer() en noteerVast() verschillen in wat ze GARANDEREN en niet in wat ze
+   SCHRIJVEN. Zou elk zijn eigen regel bouwen, dan lopen de twee vormen binnen
+   een half jaar uiteen (LAT.md regel 4) -- en dan dekt de hashketen twee
+   verschillende soorten regels, terwijl juist die keten zegt dat de rij
+   ongemoeid is. Dus een bouwer, en het verschil zit in wie hem vastlegt. */
+function schrijfRegel({ door, over, waarom, bron, extra } = {}) {
   const kaal = {
     at: datum().toISOString(),
     doorId: door && door.id != null ? String(door.id).slice(0, 40) : null,
@@ -73,6 +94,22 @@ function noteer({ door, over, waarom, bron, extra } = {}) {
     over: kort((over && over.codenaam) || (typeof over === 'string' ? over : ''), 60),
     waarom: kort(waarom, 120) || 'GEEN REDEN OPGEGEVEN',
     bron: kort(bron, 60),
+    /* TWEE DINGEN DIE ER ALLEBEI IN MOETEN, EN DIE NIET HETZELFDE ZIJN.
+
+       `stand` gaat over de INZAGE: er is toegang VERLEEND. Met opzet niet
+       'ingezien' of 'geleverd' -- het journaal wordt geschreven voordat het
+       dossier wordt samengesteld, en loopt dat daarna stuk, dan zou 'ingezien'
+       een leugen zijn in het voordeel van het huis. Andersom is het veilig: een
+       lid dat leest dat iemand toegang kreeg terwijl er niets op diens scherm
+       verscheen, weet iets kloppends.
+
+       `vast` gaat over deze REGEL: heeft de opslag hem bevestigd? noteer()
+       schrijft write-behind en kan dat dus niet zeggen; noteerVast() zet hem op
+       true zodra de duurzame commit terug is. Ze scheiden omdat een spoor dat
+       niet kan zeggen hoe hard het zelf staat, geen bewijs is -- en omdat een
+       lezer anders de hardheid van het ene voor het andere aanziet. */
+    stand: 'toegestaan',
+    vast: false,
     ...(extra || {})
   };
   /* DE KETEN SLUIT ALS LAATSTE, en `extra` bestaat precies daarom.
@@ -87,7 +124,6 @@ function noteer({ door, over, waarom, bron, extra } = {}) {
   const r = hangAan(l, kaal);
   l.unshift(r);
   if (l.length > MAX) l.length = MAX;
-  if (SAVE) { try { SAVE(); } catch (e) {} }
   return r;
 }
 
@@ -95,69 +131,45 @@ function noteer({ door, over, waarom, bron, extra } = {}) {
    als ÉÉN regel in het journaal, niet als vijftig. Anders verdrinkt het echte
    signaal -- de gerichte opzoeking van één persoon -- in de ruis van elke
    pagina die iemand opent. Het aantal en de id's blijven wel staan. */
-function noteerVeel({ door, overIds, waarom, bron } = {}) {
+function noteerVeel(opdracht = {}) {
+  const o = veelOpdracht(opdracht);
+  return o ? noteer(o) : null;
+}
+
+/* De vorm van een meervoudige regel, los van wie hem vastlegt -- zodat
+   noteerVeel() en noteerVeelVast() nooit twee verschillende regels schrijven.
+   Dezelfde grond als schrijfRegel(): een hashketen die twee soorten regels dekt,
+   bewijst over geen van beide iets.
+
+   De drie extra velden gaan MEE in plaats van er achteraf op te worden gezet:
+   sinds de keten eronder ligt, dekt de hash de regel zoals hij wordt
+   weggeschreven. Zie de uitleg bij noteer(). */
+function veelOpdracht({ door, overIds, waarom, bron } = {}) {
   const ids = (Array.isArray(overIds) ? overIds : []).map(String);
   if (!ids.length) return null;
-  /* De drie extra velden gaan MEE naar noteer() in plaats van er achteraf op te
-     worden gezet: sinds de keten eronder ligt, dekt de hash de regel zoals hij
-     wordt weggeschreven. Zie de uitleg bij noteer(). */
-  return noteer({ door, over: { id: ids[0] }, waarom, bron, extra: {
+  return { door, over: { id: ids[0] }, waarom, bron, extra: {
     overId: null,                       // het is geen enkele persoon
     aantal: ids.length,
     overIds: ids.slice(0, 200)          // begrensd: een dump van 65M id's helpt niemand
-  } });
+  } };
 }
 
-/* Lezen. Alleen voor de eigenaar/toezicht (de aanroepende route bewaakt dat),
-   en voor een betrokkene die vraagt wie in zijn dossier heeft gekeken. */
-function lijst({ overId, doorId, max } = {}) {
-  let l = rij();
-  if (overId != null) {
-    const s = String(overId);
-    l = l.filter(r => String(r.overId) === s || (Array.isArray(r.overIds) && r.overIds.indexOf(s) >= 0));
-  }
-  if (doorId != null) l = l.filter(r => String(r.doorId) === String(doorId));
-  return l.slice(0, Math.min(Number(max) || 200, 1000));
-}
+/* De DUURZAME kant staat in ./inzagelog-vast.js: noteerVast() en
+   noteerVeelVast() doen een andere belofte over dezelfde regel -- ze komen pas
+   terug als de opslag heeft bevestigd, en ze kunnen zeggen dat hij dat niet
+   kon. De regelbouwers gaan mee zodat er maar EEN vorm van een journaalregel
+   bestaat; wat verschilt is wie hem vastlegt. */
+const { noteerVast, noteerVeelVast } = require('./inzagelog-vast')({
+  rij, zelf, schrijfRegel, veelOpdracht,
+  heeftOpslag: () => !!(DB && DB.data),
+  vastlegger: () => VASTLEGGEN,
+  bevestigbaar: () => (typeof BEVESTIGBAAR === 'function' ? BEVESTIGBAAR() : true) });
 
-/* Wat een betrokkene zelf mag zien over inzage in ZIJN dossier (AVG art. 15).
-   Zonder de kijker bij naam te noemen: dat is de persoonsdata van een ander,
-   en die staat niet automatisch open voor de een omdat de ander vraagt. Wel
-   de functie, de reden en het moment -- dat is waar de vraag over gaat. */
-function voorBetrokkene(overId) {
-  return lijst({ overId, max: 200 }).map(r => ({ at: r.at, waarom: r.waarom, bron: r.bron }));
-}
+/* De LEESKANT staat in ./inzagelog-lezen.js: lezen, verantwoorden en de keten
+   nalopen zijn een ander onderwerp dan schrijven, met andere lezers. De rij
+   gaat als FUNCTIE mee, zodat er maar een plek is die weet waar het journaal
+   woont. */
+const lezen = require('./inzagelog-lezen')({ rij });
+const { lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker } = lezen;
 
-/* IS HET SPOOR ONGEMOEID? De keten nalopen, zodat een beheerder die een regel
-   heeft weggehaald of bijgesteld op een aanwijsbaar punt opvalt. Zie
-   server/lib/keten.js voor wat dit wel en niet tegenhoudt -- kort: stille
-   wijziging wel, een vastberaden beheerder pas als de top naar buiten gaat. */
-function controleer() { return verifieer(rij()); }
-
-/* De top van de keten: het ene getal dat periodiek naar een gescheiden systeem
-   moet om het verleden echt vast te zetten. */
-function ketenTop() { return top(rij()); }
-
-/* HET ANKER. controleer() ziet wat er BINNEN het journaal niet klopt; wie de
-   nieuwste regels weggooit houdt een kloppende keten over. Alleen een eerder
-   naar buiten gebracht anker ziet dat -- zie server/lib/keten.js.
-
-   anker()      maak de momentopname die weggezet moet worden (buiten dit huis).
-   tegenAnker() reken af met een anker dat eerder is weggezet. */
-function anker() { return verankerPunt(rij()); }
-function tegenAnker(a) { return verifieerTegenAnker(rij(), a); }
-
-function samenvatting() {
-  const l = rij();
-  const grens = nu() - 7 * 24 * 3600 * 1000;
-  const week = l.filter(r => Date.parse(r.at) >= grens);
-  return {
-    totaal: l.length,
-    week: week.length,
-    zonderReden: l.filter(r => r.waarom === 'GEEN REDEN OPGEGEVEN').length,
-    keten: controleer(),
-    recent: l.slice(0, 10)
-  };
-}
-
-module.exports = { zet, noteer, noteerVeel, lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker, MAX };
+module.exports = { zet, noteer, noteerVast, noteerVeel, noteerVeelVast, lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker, MAX };

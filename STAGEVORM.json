@@ -1,0 +1,342 @@
+{
+  "stempel": {
+    "op": "2026-09-13T10:05:58.440Z",
+    "commit": "58d0ec7c",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/stagevorm.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Gemeten met scripts/stagevorm.js, op de lezer van scripts/objectmodel.js. De vraag staat in STAGE.md par. 0. Drie metingen die niet hetzelfde zeggen: A de naam, B de datavorm, C het bereik van de bestaande wekhaak.",
+  "grens": "Wat deze meter NIET aantoont: dat er geen gedeeld PROCES is. Hij kijkt naar bewaarde VORMEN en naar namen in de bron, niet naar werkwoorden, volgorde of uitkomst -- KETENVORM.json laat zien dat die twee vragen verschillende antwoorden geven. Meting A wijst naambotsingen aan en bewijst niet dat twee gelijknamige vormen hetzelfde BETEKENEN; dat beslist een mens die beide bestanden opent. Meting C telt of een domein de wekhaak aanroept, niet of het dat ZOU MOETEN: een domein zonder publieke gebeurtenis hoort terecht in de lijst zonder haak.",
+  "vastgelegd": "2026-09-13",
+  "gemeten": {
+    "naam": [
+      {
+        "naam": "momenten",
+        "plekken": 7,
+        "domeinen": [
+          "kern/baby",
+          "kern/rtfos",
+          "kern/socialegraaf",
+          "kern/sportclub",
+          "kern/veiligheid",
+          "school"
+        ],
+        "waar": [
+          "server/kern/baby.js",
+          "server/kern/rtfos/subsidies-keten.js",
+          "server/kern/rtfos/subsidies.js",
+          "server/kern/socialegraaf/bronnen.js",
+          "server/kern/sportclub/index.js",
+          "server/kern/veiligheid/opslag.js",
+          "server/school/ouderportaal.js"
+        ]
+      },
+      {
+        "naam": "moment",
+        "plekken": 1,
+        "domeinen": [
+          "kern/magnaat"
+        ],
+        "waar": [
+          "server/kern/magnaat-economie.js"
+        ]
+      },
+      {
+        "naam": "capsule",
+        "plekken": 1,
+        "domeinen": [
+          "kern/livinglab"
+        ],
+        "waar": [
+          "server/kern/livinglab/capsule.js"
+        ]
+      },
+      {
+        "naam": "presence",
+        "plekken": 0,
+        "domeinen": [],
+        "waar": []
+      },
+      {
+        "naam": "broadcast",
+        "plekken": 0,
+        "domeinen": [],
+        "waar": []
+      },
+      {
+        "naam": "drop",
+        "plekken": 0,
+        "domeinen": [],
+        "waar": []
+      },
+      {
+        "naam": "stage",
+        "plekken": 0,
+        "domeinen": [],
+        "waar": []
+      }
+    ],
+    "vorm": {
+      "vormen": 67,
+      "domeinen": 10,
+      "velden": 143,
+      "inAlleDomeinen": 0,
+      "inMinstensDeHelft": 0,
+      "helftDrempel": 5,
+      "veldenDomeineigen": 126,
+      "domeineigenPct": 88.1,
+      "perDomein": [
+        {
+          "domein": "kern/clips",
+          "velden": 9
+        },
+        {
+          "domein": "kern/creator",
+          "velden": 6
+        },
+        {
+          "domein": "kern/festival",
+          "velden": 36
+        },
+        {
+          "domein": "kern/galerij",
+          "velden": 4
+        },
+        {
+          "domein": "kern/mediaos",
+          "velden": 16
+        },
+        {
+          "domein": "kern/muziek",
+          "velden": 15
+        },
+        {
+          "domein": "kern/podium",
+          "velden": 11
+        },
+        {
+          "domein": "kern/salon",
+          "velden": 16
+        },
+        {
+          "domein": "kern/sportclub",
+          "velden": 22
+        },
+        {
+          "domein": "kern/theater",
+          "velden": 25
+        }
+      ],
+      "gedeeld": [
+        {
+          "veld": "bio",
+          "domeinen": 2,
+          "waar": [
+            "kern/podium",
+            "kern/theater"
+          ]
+        },
+        {
+          "veld": "capaciteit",
+          "domeinen": 2,
+          "waar": [
+            "kern/festival",
+            "kern/sportclub"
+          ]
+        },
+        {
+          "veld": "duurS",
+          "domeinen": 2,
+          "waar": [
+            "kern/clips",
+            "kern/theater"
+          ]
+        },
+        {
+          "veld": "genre",
+          "domeinen": 2,
+          "waar": [
+            "kern/podium",
+            "kern/theater"
+          ]
+        },
+        {
+          "veld": "ingetrokken",
+          "domeinen": 2,
+          "waar": [
+            "kern/festival",
+            "kern/salon"
+          ]
+        },
+        {
+          "veld": "kanaal",
+          "domeinen": 2,
+          "waar": [
+            "kern/podium",
+            "kern/theater"
+          ]
+        },
+        {
+          "veld": "kanaalId",
+          "domeinen": 2,
+          "waar": [
+            "kern/podium",
+            "kern/theater"
+          ]
+        },
+        {
+          "veld": "klaar",
+          "domeinen": 2,
+          "waar": [
+            "kern/muziek",
+            "kern/theater"
+          ]
+        },
+        {
+          "veld": "maker",
+          "domeinen": 2,
+          "waar": [
+            "kern/clips",
+            "kern/festival"
+          ]
+        },
+        {
+          "veld": "mb",
+          "domeinen": 2,
+          "waar": [
+            "kern/clips",
+            "kern/theater"
+          ]
+        },
+        {
+          "veld": "online",
+          "domeinen": 2,
+          "waar": [
+            "kern/clips",
+            "kern/theater"
+          ]
+        },
+        {
+          "veld": "op",
+          "domeinen": 2,
+          "waar": [
+            "kern/galerij",
+            "kern/salon"
+          ]
+        },
+        {
+          "veld": "poster",
+          "domeinen": 2,
+          "waar": [
+            "kern/clips",
+            "kern/theater"
+          ]
+        },
+        {
+          "veld": "reacties",
+          "domeinen": 2,
+          "waar": [
+            "kern/clips",
+            "kern/theater"
+          ]
+        },
+        {
+          "veld": "toelichting",
+          "domeinen": 2,
+          "waar": [
+            "kern/muziek",
+            "kern/salon"
+          ]
+        },
+        {
+          "veld": "vanMij",
+          "domeinen": 2,
+          "waar": [
+            "kern/muziek",
+            "kern/salon"
+          ]
+        },
+        {
+          "veld": "volgers",
+          "domeinen": 2,
+          "waar": [
+            "kern/creator",
+            "kern/theater"
+          ]
+        }
+      ]
+    },
+    "haak": {
+      "publiekeDomeinen": 11,
+      "metHaak": 8,
+      "zonderHaak": [
+        "kern/creator",
+        "kern/events",
+        "kern/galerij"
+      ],
+      "soorten": [
+        "muziek",
+        "video",
+        "flow",
+        "live",
+        "optreden",
+        "kaartverkoop",
+        "wedstrijd",
+        "uitgelicht"
+      ],
+      "waar": [
+        {
+          "domein": "kern/clips",
+          "bestanden": [
+            "server/kern/clips.js"
+          ]
+        },
+        {
+          "domein": "kern/festival",
+          "bestanden": [
+            "server/kern/festival/artiest.js",
+            "server/kern/festival/product.js"
+          ]
+        },
+        {
+          "domein": "kern/mediaos",
+          "bestanden": [
+            "server/kern/mediaos/wekken.js"
+          ]
+        },
+        {
+          "domein": "kern/muziek",
+          "bestanden": [
+            "server/kern/muziek-uitgave.js"
+          ]
+        },
+        {
+          "domein": "kern/podium",
+          "bestanden": [
+            "server/kern/podium/kanaal.js"
+          ]
+        },
+        {
+          "domein": "kern/salon",
+          "bestanden": [
+            "server/kern/salon/uitlichten.js"
+          ]
+        },
+        {
+          "domein": "kern/sportclub",
+          "bestanden": [
+            "server/kern/sportclub/sportief.js"
+          ]
+        },
+        {
+          "domein": "kern/theater",
+          "bestanden": [
+            "server/kern/theater/video.js"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -55,6 +55,91 @@ const GRENZEN = Object.freeze({
   'ambigu-extern-resultaat': 'het externe resultaat is onbeslist en moet worden verzoend'
 });
 
+/* ============================================================================
+   TOEPASSELIJKHEID: EEN GRENS BESTAAT NIET OVERAL.
+
+   De eerste versie van dit bestand deed alsof de zes grenzen overal gelden. Dat
+   is niet waar, en het is op een dure manier niet waar: `in-de-opslag` -- het
+   proces sterft MIDDENIN de schrijfactie -- bestaat op deze opslag helemaal
+   niet. db/sqlite.js schrijft met BEGIN IMMEDIATE ... COMMIT, dus de save is EEN
+   transactie die heel commit of heel terugrolt. Er is geen middelpunt om in te
+   sterven. scripts/crashgrenzen.js heeft dat gemeten: een injectie tussen de
+   schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.
+
+   Een kunstmatig crashpunt maken zodat de matrix mooier wordt, is het
+   tegenovergestelde van meten. NOT_APPLICABLE vastleggen is architectonisch
+   sterker: het zegt iets WAARS over de opslagsemantiek.
+
+   MAAR DAN MAG DE WAARHEID OOK NIET UNIVERSEEL WORDEN GEDAAN. Crashsemantiek
+   hangt niet aan een route alleen, maar aan vier dingen tegelijk:
+
+       capability x opslagmotor x transactiegrens x uitvoeringspad
+
+   Dit bestand dekt de tweede. De vierde -- welk pad een route werkelijk neemt --
+   is NIET af te leiden en staat daarom niet in deze tabel: scripts/crashproef.js
+   MEET hem, en vond dat eenenveertig van de negentig rijen langs geen van beide
+   injectiepunten komen omdat die routes met de gewone write-behind save()
+   schrijven. Een tabel die dat had geraden, had die eenenveertig als bestaande
+   grenzen geteld.
+
+   ELKE REGEL DRAAGT EEN GRAAD, en dat is hier het hele verschil tussen kennis en
+   een aanname (BESTUUR.md):
+
+     gemeten       een proef heeft dit aangetoond, met de proef erbij
+     beredeneerd   volgt uit de opslagsemantiek zelf; niemand heeft het gedraaid
+     onbekend      niet vastgesteld -- en dat blijft staan tot iemand KIJKT
+
+   `onbekend` wordt hier nooit stil een `NOT_APPLICABLE`. Dat is geen technische
+   schuld maar epistemische schuld: RTG weet nog niet wat het weet, en dat hoort
+   ongemakkelijk te blijven staan. */
+const OPSLAGSTRATEGIEEN = Object.freeze({
+  'sqlite-transactie': 'db/sqlite.js schrijft alle collecties in EEN transactie (BEGIN IMMEDIATE ... COMMIT)',
+  'json-tijdelijk-hernoem': 'db/snapshot.js schrijft een tijdelijk bestand, fsync, en hernoemt het',
+  'postgres-transactie': 'db/postgres.js -- eigen transactiegrenzen, apart te beoordelen',
+  'geheugen': 'db/geheugen.js bewaart niets buiten het proces'
+});
+
+const TOEPASSELIJK = Object.freeze({
+  APPLICABLE: 'deze grens bestaat op deze opslag: er is een moment waarop hij geraakt kan worden',
+  NOT_APPLICABLE: 'deze grens bestaat hier niet -- de opslagsemantiek kent dat moment niet',
+  TE_BEOORDELEN: 'niet vastgesteld voor deze opslag; niemand heeft het gemeten of uitgeschreven'
+});
+
+/* Per grens per opslagstrategie: bestaat het moment, met welke graad, en waarom.
+   Alleen `sqlite-transactie` is hier ergens `gemeten` -- dat is de opslag waarop
+   dit huis draait en waarop scripts/crashgrenzen.js heeft gedraaid. De andere
+   drie staan met opzet op TE_BEOORDELEN waar niemand heeft gekeken; ze
+   overnemen van sqlite zou de fout maken waar deze tabel juist tegen bestaat. */
+const TOEPASSELIJKHEID = Object.freeze({
+  'in-de-opslag': {
+    'sqlite-transactie': { stand: 'NOT_APPLICABLE', graad: 'gemeten',
+      grond: 'een save is EEN transactie die heel commit of heel terugrolt; een injectie tussen ' +
+        'de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit',
+      proef: 'scripts/crashgrenzen.js' },
+    'json-tijdelijk-hernoem': { stand: 'TE_BEOORDELEN', graad: 'onbekend',
+      grond: 'de hernoeming is zelf atomair, dus mogelijk bestaat het middelpunt ook hier niet -- ' +
+        'maar dat is geredeneerd en niet gedraaid, en deze tabel neemt geen redenering over als feit' },
+    'postgres-transactie': { stand: 'TE_BEOORDELEN', graad: 'onbekend',
+      grond: 'apart te beoordelen: eigen transactiegrenzen, hier nooit onder een crashproef gehouden' },
+    'geheugen': { stand: 'NOT_APPLICABLE', graad: 'beredeneerd',
+      grond: 'deze opslag belooft geen duurzaamheid, dus er is geen duurzaam middelpunt om in te sterven' }
+  }
+});
+
+/* De toepasselijkheid van EEN grens op EEN opslag. Een grens die hier niet in
+   staat, is niet stilzwijgend APPLICABLE: hij is TE_BEOORDELEN. Het verschil
+   tussen "wij weten dat hij bestaat" en "wij hebben er nooit naar gekeken" is
+   precies wat deze laag moet bewaren. */
+function toepasselijk(grens, opslag) {
+  const rij = TOEPASSELIJKHEID[grens];
+  if (!rij) return { stand: 'TE_BEOORDELEN', graad: 'onbekend',
+    grond: 'voor deze grens is geen toepasselijkheid per opslag vastgelegd' };
+  const cel = rij[opslag];
+  if (!cel) return { stand: 'TE_BEOORDELEN', graad: 'onbekend',
+    grond: 'deze grens is nooit tegen opslagstrategie ' + opslag + ' gehouden' };
+  return cel;
+}
+
 /* De uitslag over een verzameling grenzen. Geen samengesteld cijfer: hij geeft
    een stand EN de lijsten waaruit die stand volgt, zodat een lezer altijd kan
    zien welk moment er wel en niet onder valt. */
@@ -76,4 +161,4 @@ function weeg(perGrens) {
           : 'alle ' + alle.length + ' crashgrenzen beproefd en gehaald' };
 }
 
-module.exports = { CONTRACTEN, GRENZEN, weeg };
+module.exports = { CONTRACTEN, GRENZEN, OPSLAGSTRATEGIEEN, TOEPASSELIJK, TOEPASSELIJKHEID, toepasselijk, weeg };

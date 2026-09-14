@@ -84,6 +84,35 @@ const REGISTER = {
      dezelfde conclusie over minder bewijs, en dat is precies de faalvorm waar
      een ratel voor is. */
   'CARRIEREVORM.json': { meter: ['carriereDomeinenGemeten'] },
+  /* AICONTEXT.json meet waar Rahul zijn ledencontext samenstelt en wat daar
+     samenkomt (MENSNETWERK.md par. 4c). Twee tanden, en ze doen iets anders.
+
+     `aiContextLek` is de INVARIANT: velden die een kantoorroute schrijft en die
+     de samensteller ook leest. Nul, en dat hoort nul te blijven -- wat het
+     kantoor over een lid vastlegt, gaat niet naar een modelaanbieder.
+
+     `aiContextVeldenGezien` is het BEREIK, om dezelfde reden als bij
+     CARRIEREVORM.json hierboven: de veldinventaris is lexicaal, dus een meter
+     die stil minder velden ziet (iemand bindt de ledenstaat aan een nieuwe
+     naam) meldt diezelfde nul over minder bewijs. Een lek van nul uit een meter
+     die niets meer ziet, is de gevaarlijkste vorm van groen. */
+  'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
+  /* STAGEVORM.json meet of de publieke domeinen een datavorm delen (STAGE.md
+     par. 0). Om dezelfde reden als bij CARRIEREVORM.json hierboven is de
+     geratelde waarde het BEREIK en niet de uitkomst: dat er 0 velden gedeeld
+     worden is de bevinding waar het document op staat, en een bevinding die
+     beweegt is nieuws. Wat NIET mag bewegen is hoeveel publieke domeinen de
+     meter heeft gezien -- zakt dat stil, dan daalt de gedeeldheid door een
+     hernoemde map in plaats van door een feit, en leest de nul plotseling als
+     bevestiging terwijl hij een blinde vlek is. */
+  'STAGEVORM.json': { meter: ['stageDomeinenGemeten'] },
+  /* WEKDEKKING.json zet het BESLUIT (welke brongebeurtenis mag de publieke rail
+     op, scripts/lib/wekbesluit.js) naast de METING. Geratelde is
+     `wekZonderUitspraak`: publieke domeinen waarover het besluitregister
+     zwijgt. Die hoort op nul te staan en te blijven -- hij stijgt zodra er een
+     publiek domein bijkomt waar niemand over heeft nagedacht, en dat is precies
+     de stille groei die deze tand moet vangen. */
+  'WEKDEKKING.json': { meter: ['wekZonderUitspraak'] },
   'BEPROEVING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   /* De ACTUELE meting naast de geaccepteerde basislijn hierboven: scripts/
      beproeving.js schrijft hem na ELKE ronde, ook een gezakte, zodat rood
@@ -134,6 +163,23 @@ const REGISTER = {
   'ISOLATIEPROEF.json': { eigenRatel: 'test/isolatieregisters.test.js' },
   'RESOLVERBEREIK.json': { eigenRatel: 'test/resolverbereik.test.js' },
   'GEZAGSNOEMER.json': { eigenRatel: 'test/gezagsnoemer.test.js' },
+  /* De Business Proof Map en de vierde gouden keten. Beide hangen aan
+     test/ondernemerbewijs.test.js, en dat is geen regel-om-de-regel: die toets
+     draagt twee echte tanden. De ene eist dat de ketenproef blijft SLUITEN
+     (negen schakels dicht, geen gebroken storing); de andere legt een VLOER
+     onder de route-dekking per bewijslaag, zodat een laag niet stilletjes
+     terugzakt doordat een bron verouderde. Zonder die twee zou dit register
+     een bewering zijn, en dat is precies wat de kop hierboven verbiedt. */
+  'ONDERNEMERBEWIJS.json': { eigenRatel: 'test/ondernemerbewijs.test.js' },
+  'ZAAKLIVEPROEF.json': { eigenRatel: 'test/ondernemerbewijs.test.js' },
+  /* De geldketen heeft een EIGEN ratelbestand en niet die van de projectie.
+     Reden: zijn twee tanden gaan over dingen die ONDERNEMERBEWIJS.json niet
+     kent -- of het verkochte bedrag ongeschonden in de maand landt, en of de
+     twee bevindingen (btw-categorie uit de werkplek, terugstorting die de
+     verkoop wist) nog steeds als bevinding in het register staan. Een bevinding
+     die verdwijnt zonder besluit is precies de stille faalvorm die deze laag
+     moet vangen. */
+  'OMZETPROEF.json': { eigenRatel: 'test/omzetproef.test.js' },
 
   /* De adressen die de documenten noemen. De toets bevriest het register NIET --
      ADRESSEN.json beweegt bij elke documentregel die een pad noemt, en een tand
@@ -189,6 +235,10 @@ const REGISTER = {
   'TEKSTOPPERVLAK.json': { eigenRatel: 'scripts/check.js' },
   'RITPROEF.json': { eigenRatel: 'test/ritproef.test.js' },
   'TOELATINGSPROEF.json': { eigenRatel: 'test/toelatingsproef.test.js' },
+  'ADAMPROEF.json': { eigenRatel: 'test/adamproef.test.js' },
+  'DOELGROEPBEREIK.json': { eigenRatel: 'test/doelgroepbereik.test.js' },
+  'AANVOERVORM.json': { eigenRatel: 'test/aanvoer.test.js' },
+  'MOMENTPROEF.json': { eigenRatel: 'test/momentproef.test.js' },
   'NAVIGATIEPROEF.json': { eigenRatel: 'test/navigatieproef.test.js' },
   'MOVEPROEF.json': { eigenRatel: 'test/moveproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },
@@ -204,6 +254,19 @@ const REGISTER = {
   'WACHTWIJZE.json': { eigenRatel: 'test/wachtwijze.test.js' },
   'HANDELINGSKLASSE.json': { eigenRatel: 'test/handelingsklasse.test.js' },
   'EXECUTION_MAP.json': { eigenRatel: 'test/executionmap.test.js' },
+  /* De machinedekking (MACHINE.md par. 0): raken de zestien motoren dezelfde
+     handeling? Twee getallen dragen de ratel en beide mogen alleen DALEN --
+     `mutatiesZonderEnigeAs` (muterende routes die geen enkele as raken) en
+     `motorenZonderRouteBereik`. Ze staan hier en niet in NORM.json omdat het er
+     twee zijn met een eigen grondwaarde in het register zelf; toets 8 van het
+     genoemde bestand vergelijkt de VERSE meting met die grondwaarde. Die toets
+     is zien zakken (het vastgelegde getal op 2000 gezet, waarna hij de stijging
+     naar 2818 meldde), dus deze regel is geen bewering -- zie de kop over de
+     helft die mensenwerk blijft. */
+  'MACHINEDEKKING.json': { eigenRatel: 'test/machinedekking.test.js' },
+  /* Drie tanden in NORM.json, geen eigenRatel: de gevraagde meter is "onbekende
+     gevolgpaden mag alleen dalen", en dat is precies wat een ratel doet. */
+  'GEVOLGDEKKING.json': { meter: ['gevolgPadenOnbekend', 'gevolgContractVolledig', 'gevolgContractenGezakt'] },
   /* MENSELIJKE_UITVOERING.json is net als EXECUTION_MAP.json een PROJECTIE
      zonder tijdstempel: hij draagt vingerafdrukken van zijn bronnen in plaats
      van een klok, en test/menselijkeuitvoering.test.js hercompileert hem byte
@@ -229,6 +292,20 @@ const REGISTER = {
      twee optelt, laat een crashbevinding wegvallen tegen een stap die iemand
      nog moet meten. Zie de kop van NORM's METERS. */
   'FACTUURPROEF.json': { meter: ['geldpadGezakt', 'geldpadOnbewezen'] },
+  /* CRASHAS.json volgt diezelfde tweedeling, een niveau breder: de factuurproef
+     meet EEN route diep, dit classificeert ALLE geldroutes over de zes
+     crashgrenzen. `crashasOnbekend` is een open vraag, `crashasNietMeetbaar` is
+     een ontbrekend injectiepunt -- en die twee gaan nooit in een tand samen,
+     want de eerste los je op door te kijken en de tweede door gereedschap te
+     bouwen. */
+  'CRASHAS.json': { meter: ['crashasOnbekend', 'crashasNietMeetbaar'] },
+  /* CRASHPROEF.json volgt dezelfde tweedeling nog een niveau verder: CRASHAS
+     classificeert, dit VOERT UIT. `crashproefGezakt` is een gebroken
+     overlevingscontract en dus een defect; `crashproefOnbereikt` is bereik van
+     het instrument. GEEN_DUURZAME_WEG hangt met opzet aan geen van beide -- dat
+     is een gemeten niet-van-toepassing en geen schuld. */
+  'CRASHPROEF.json': { meter: ['crashproefGezakt', 'crashproefGeenLijf', 'crashproefGeenWereld',
+    'crashproefGeenRol', 'crashproefOnbepaald'] },
   /* HERSTELBESLUIT.json is een VERKLARING en geen meting -- dezelfde vorm als
      ROLLBACKBESLUIT.json hierboven, dat ook aan een geteld gevolg hangt. Wie
      hier een regel bijzet of weghaalt, beweegt een van deze twee tellers: een
@@ -276,6 +353,18 @@ const REGISTER = {
      hetzelfde register. Twee metingen, een ratel. */
   'A11Y-INGELOGD.json': { eigenRatel: 'scripts/a11y.js' },
   'SABOTAGE.json': { eigenRatel: 'scripts/wetten.js' },
+  /* DOCTRINE.json draagt GEEN getal dat naar nul of naar honderd moet, en dat is
+     een ontwerpbesluit en geen tekort: het aantal kandidaten stijgt zodra er een
+     document bijkomt, en dat is gewoon werk en geen verslechtering. Een ratel in
+     NORM.json zou daar rood van staan. Wat wel kan zakken is de compiler zelf --
+     zijn zelfijking, zijn zinsherkenning en de graad op zijn uitslag -- en dat
+     bewaakt test/doctrine.test.js. */
+  'DOCTRINE.json': { eigenRatel: 'test/doctrine.test.js' },
+  /* VERBAND.json draagt WEL een getal dat niet mag zakken (de unie-recall), maar
+     dat getal hangt aan het AANTAL wetten: komt er een wet bij met een wachter die
+     nog geen sensor ziet, dan daalt het percentage door gewoon werk. De vloer
+     staat daarom in de toets en niet in NORM.json, met de reden erbij. */
+  'VERBAND.json': { eigenRatel: 'test/verband.test.js' },
 
   /* En twee die door een TOETS worden vastgehouden in plaats van door een
      script. Allebei zeggen het in hun eigen uitleg met zoveel woorden: "MAG

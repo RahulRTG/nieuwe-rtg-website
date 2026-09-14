@@ -23,6 +23,21 @@ const { LEZEN, KLEIN, DIRECT, VOORSTEL, beleidVoor, toegestanePaden } = require(
 
 const ROLLEN = ['member', 'supplier', 'staff'];
 
+/* WAT ER SINDS DIE NULMETING MET OPZET UIT `direct` IS GEHAALD, met de datum en de reden.
+
+   Dit is geen correctie van de lijst hierboven: die blijft staan zoals hij was, want een
+   nulmeting die je bijwerkt meet niets meer. Een pad dat later bewust van bevoegdheid
+   verandert, hoort ERNAAST te staan -- zichtbaar, met een reden, en door toets 1 als exact
+   dat ene verschil erkend. Zo blijft "de splitsing verplaatste niets" bewijsbaar EN blijft
+   de latere ingreep zichtbaar in plaats van weggepoetst. */
+const UIT_DIRECT_GEHAALD = [
+  { pad: '/api/pay/saldo', op: '2026-09-13', naar: 'voorstel',
+    reden: 'betaalt de maandfactuur uit het eigen RTG Pay-saldo (kern/factuursaldo.js): ' +
+      'negen collecties gemeten, waaronder paySaldi, invoices en fondsAfdrachten. Hij stond ' +
+      'in de LEZEN-lijst en was daarmee het enige geldpad van een lid dat het stuur zonder ' +
+      'bevestiging kon uitvoeren' }
+];
+
 /* De lijst zoals hij VOOR de splitsing was, met de hand overgeschreven uit de
    git-stand ervoor. Een toets die de nieuwe code met zichzelf vergelijkt bewijst
    niets; deze vergelijkt hem met de oude waarheid. */
@@ -73,8 +88,14 @@ test('1. DE SPLITSING VERPLAATST NIETS: lezen + klein is exact de oude direct-li
       const nieuw = raakt(LEZEN[rol], pad) || raakt(KLEIN[rol], pad);
       if (oud !== nieuw) verschil.push((oud ? '-' : '+') + pad);
     }
-    assert.deepEqual(verschil, [], rol + ': de splitsing verschoof ' + verschil.length +
-      ' route(s) de lijst in of uit: ' + verschil.join(' '));
+    /* De benoemde uitzonderingen mogen eruit, en ALLEEN die. Een pad dat erbij KOMT
+       (`+`) is nooit toegestaan: dat is een route die stil van bevestiging-nodig naar
+       direct-uitvoerbaar schuift, en dat is de fout waar deze toets voor bestaat. */
+    const mag = UIT_DIRECT_GEHAALD.map(u => '-' + u.pad);
+    const onverklaard = verschil.filter(v => !mag.includes(v));
+    assert.deepEqual(onverklaard, [], rol + ': de splitsing verschoof ' + onverklaard.length +
+      ' route(s) de lijst in of uit zonder verklaring: ' + onverklaard.join(' ') +
+      ' (verklaard en toegestaan: ' + (mag.join(' ') || 'niets') + ')');
   }
 });
 
@@ -104,8 +125,31 @@ test('4. DE VIJF DIE SCHRIJVEN staan onder klein en nooit meer onder lezen', () 
   }
 });
 
+test('4b. DE ZESDE DIE SCHRIJFT is een GELDWEG: /api/pay/saldo vraagt een bevestiging', () => {
+  /* Toets 4 hierboven houdt de vijf van 31 augustus vast. Dit is de zesde, en hij is van
+     een andere orde: die vijf schreven een voorkeur of een oefenstand, deze betaalt de
+     maandfactuur uit het eigen saldo en boekt de 30%-afdracht aan de RTFoundation.
+
+     HIJ IS NIET DOOR EEN TOETS GEVONDEN MAAR DOOR EEN TOETS VERBORGEN: toets 5 voerde dit
+     pad AAN als voorbeeld van een leesroute, dus stond er een groene bewering op de fout.
+     Vandaar dat hij hier een eigen toets krijgt en niet alleen uit die lijst is gehaald.
+
+     MUTATIEPROEF: zet `saldo` terug in de LEZEN-regex van beleid-lijsten.js en alle drie
+     de beweringen hieronder zakken. */
+  assert.equal(beleidVoor('/api/pay/saldo', 'member').niveau, 'voorstel',
+    '/api/pay/saldo verplaatst geld en hoort dus een bevestiging te vragen');
+  assert.ok(!raakt(LEZEN.member, '/api/pay/saldo'),
+    '/api/pay/saldo staat weer in de lezen-lijst, en die belooft "haalt op en verandert niets"');
+  assert.ok(!raakt(DIRECT.member, '/api/pay/saldo'),
+    'DIRECT betekent: zonder bevestiging. Een geldweg hoort daar niet in');
+  /* EN DE TWEE LIJSTGENOTEN BLIJVEN LEZEN. Zonder deze twee zou een te ruime reparatie
+     (de hele pay-groep naar voorstel) er net zo groen uitzien. */
+  for (const lees of ['/api/pay/overzicht', '/api/pay/tiks'])
+    assert.equal(beleidVoor(lees, 'member').niveau, 'lezen', lees + ' is een echte leesroute');
+});
+
 test('5. een leesroute blijft lezen', () => {
-  for (const pad of ['/api/agenda/mijn', '/api/pay/saldo', '/api/bank/overzicht', '/api/site/versies'])
+  for (const pad of ['/api/agenda/mijn', '/api/pay/overzicht', '/api/bank/overzicht', '/api/site/versies'])
     assert.equal(beleidVoor(pad, 'member').niveau, 'lezen', pad);
 });
 

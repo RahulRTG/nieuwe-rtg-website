@@ -33,6 +33,12 @@ const path = require('path');
 const WORTEL = path.join(__dirname, '..');
 const M = require('../scripts/ritmigratie');
 
+/* MEET NIET NAAST EEN MOTOR DIE DE BRON VERBOUWT (scripts/lib/verseboom.js).
+   Deze toets meet de boom OPNIEUW en legt de uitslag naast RITMIGRATIE.json;
+   loopt er intussen een meterijking of de mutatiemotor, dan telt hij hun
+   tijdelijke aanbouw mee en is het verschil met het register betekenisloos.
+   Zo meldde test/magnaatlab.test.js een keer 2069 waar er 2068 stonden. */
+const { afbouwInDeWeg } = require('../scripts/lib/verseboom');
 test('0. de kaart loopt gelijk met de code', () => {
   const u = M.meet();
   assert.deepEqual(u.onbekend, [],
@@ -94,7 +100,13 @@ test('5. de kaart oordeelt over de code en niet andersom', () => {
   assert.deepEqual(uitServer, [], 'server-code laadt de migratiekaart in');
 });
 
-test('6. het register bestaat en klopt met een verse meting', () => {
+test('6. het register bestaat en klopt met een verse meting', (t) => {
+  /* De vergelijking hieronder is alleen iets waard op een boom die NIEMAND
+     aan het verbouwen is; zie scripts/lib/verseboom.js. Overslaan is hier geen
+     slagen: de reden gaat mee de uitslag in. */
+  const inDeWeg = afbouwInDeWeg('ritmigratie');
+  if (inDeWeg) return t.skip(inDeWeg);
+
   const pad = path.join(WORTEL, 'RITMIGRATIE.json');
   assert.ok(fs.existsSync(pad), 'RITMIGRATIE.json ontbreekt -- draai: npm run ritmigratie:vast');
   const j = JSON.parse(fs.readFileSync(pad, 'utf8'));

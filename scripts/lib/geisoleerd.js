@@ -75,7 +75,21 @@ const GEISOLEERD = [
      van de suite wordt er niet trager van, en een toets die van zijn buren
      afhangt meet niet wat hij beweert. Wie de echte botsing vindt, haalt hem
      hier weg. */
-  'lidfactuur.test.js'
+  'lidfactuur.test.js',
+  /* En de volgende, gevonden door dezelfde zeef op 13 september:
+     wekdekking.test.js vervangt scripts/lib/wekbesluit.js op schijf om te
+     bewijzen dat de meter uitslaat als er een domein uit het register valt
+     (de zelfijking uit BEWIJSMACHINE.md par. 5a -- een nul waarop een besluit
+     rust, moet je hebben zien bewegen). Dat bestand is een halve seconde lang
+     gewoon broncode voor iedereen die op dat moment een server start.
+
+     Pijnlijk detail voor wie dit later leest: dezelfde fout kostte deze sessie
+     al een half uur aan de andere kant. Een afgebroken `npm test` liet
+     meterijk.test.js verweesd doorlopen, en drie metingen op rij gaven een fout
+     getal (1840 toetsen in plaats van 1839, 186 schermen in plaats van 185, een
+     poortloze route die niemand had geschreven). Deze lijst bestaat precies om
+     dat te voorkomen, en de zeef vond wat ik zelf was vergeten. */
+  'wekdekking.test.js'
 ];
 
 function isGeisoleerd(naam) {

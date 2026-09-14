@@ -126,6 +126,12 @@ module.exports = (kern) => {
      zaak). Twee poorten, twee bestanden. */
   require('./pay-zaak')(kern, { stuur });
 
+  /* De terugweg van /api/pay/saldo: een betaalde factuur corrigeren. Eigen
+     bestand om dezelfde reden als ./pay-terug.js -- de keuringsgrens, en de
+     snede is inhoudelijk: dit is de enige route hier die geld van het HUIS
+     naar een lid beweegt op gezag van een medewerker. */
+  require('./pay-correctie')(kern, { stuur });
+
   /* HET BEWIJSBORD. Anders dan /gezond hieronder, dat één ja of nee geeft aan de
      bewaking: dit is het bord waarop staat WAT er is aangetoond en waaruit dat
      blijkt. Alleen voor het kantoor, want de tellingen (hoeveel rekeningen,

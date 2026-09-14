@@ -112,7 +112,7 @@ module.exports = function maakTweedeHandtekening({ db, save }) {
       zegTegenDeGebruiker: 'Aangevraagd. Een tweede persoon met een eigen kantooraccount bevestigt dit.' };
   }
 
-  async function bevestig({ id, door, doorNaam }) {
+  async function bevestig({ id, door, doorNaam, verzoek }) {
     opruimen();
     const b = bak();
     const i = b.findIndex(x => x.id === String(id || ''));
@@ -150,7 +150,7 @@ module.exports = function maakTweedeHandtekening({ db, save }) {
 
     const u = uitvoerders.get(a.actie);
     if (!u) return { status: 409, error: 'De handeling bestaat niet meer; vraag hem opnieuw aan.' };
-    const r = await u.voerUit(a.lijf, { aangevraagdDoor: a.door, bevestigdDoor: door });
+    const r = await u.voerUit(a.lijf, { aangevraagdDoor: a.door, bevestigdDoor: door, verzoek });
     if (r && r.error) {
       return { status: r.status || 409, error: r.error, handeling: null,
         aangevraagdDoor: a.door, bevestigdDoor: door, scheiding: oordeel.graad };

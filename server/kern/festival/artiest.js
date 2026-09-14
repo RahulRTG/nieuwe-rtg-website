@@ -130,7 +130,39 @@ module.exports = (ctx) => {
     }
     x.stand = stand;
     save();
+    /* HET PUBLIEKE MOMENT (STAGE.md par. 5a). Pas hier, en alleen hier: een
+       VOORNEMEN blijft buiten Stage om exact dezelfde reden als het buiten het
+       gastprogramma blijft -- anders koopt iemand een kaartje voor een naam die
+       er niet staat. De aanwezigheid is die van het FESTIVAL en niet van de
+       artiest: RTG weet niet of die artiest hier een account heeft, en een
+       aanwezigheid verzinnen voor iemand die er niet om vroeg is precies wat
+       kern/mediaos/aanwezigheid.js verbiedt. */
+    if (stand === 'bevestigd') momentVoorFestival(fid, x);
     return { ok: true, boeking: x };
+  }
+
+  /* Laat gebonden: de Media OS wordt in een latere laag samengesteld, en zonder
+     haak gaat de boeking gewoon door -- er wordt dan alleen niemand gewekt.
+
+     DE AANWEZIGHEID DRAAGT DE NAAM VAN DE ZAAK EN NIET VAN HET FESTIVAL, en dat
+     is geen smaak maar een reparatie die scripts/momentproef.js heeft gevonden.
+     De aanwezigheid hangt aan de DRAGER (`zaak:NACHT`), en een zaak kan meer dan
+     een festival draaien. Stond de festivalnaam erin, dan hernoemde het tweede
+     festival de aanwezigheid van het eerste: een volger drukte op "Eerste
+     Festival" en zag daarna "Tweede Festival" in zijn lijst staan, zonder dat hij
+     iets had gedaan. De naam van het festival hoort in de TITEL van het moment,
+     want die gaat over wat er gebeurd is; de naam van de aanwezigheid gaat over
+     wie er spreekt. */
+  function momentVoorFestival(fid, boeking) {
+    try {
+      const k = ctx.kern ? ctx.kern() : null;
+      if (!k || !k.aanwezigZorg || !k.mediaNieuwMoment) return null;
+      const f = ctx.festivalVind(fid);
+      if (!f) return null;
+      const a = k.aanwezigZorg('zaak', f.eigenaar, ctx.dragerNaam(f));
+      const wie = boeking && boeking.artiest;
+      return a ? k.mediaNieuwMoment(a.id, 'optreden', wie ? wie + ' op ' + f.naam : f.naam) : null;
+    } catch (e) { return null; }
   }
 
   function boekingenVan(fid, eid, dagId) {

@@ -1,0 +1,214 @@
+{
+  "stempel": "2026-09-13",
+  "uitleg": "Van consumentintentie tot het cijfer waar een ondernemer btw over afdraagt: bestelling, betaling, economische gebeurtenis, fiscale verdeling, ondernemersbeeld. Gemeten met twee echte zaken en twee echte leden, op een wegwerpserver.",
+  "grens": "Geen browser en geen echte bank (kern/pay draait op de demo-rail). De proef kijkt naar EEN maand -- de huidige -- en dus niet naar periodeafsluiting, kwartaalaangifte of de weg naar de Belastingdienst. Hij meet EEN genre (restaurant, NL) en zegt niets over logies, vervoer of de buitenlandse tarieventabellen. En hij meet de PROJECTIE financeVoor: dat de zaak dit cijfer ziet, bewijst niet dat er een grootboekregel onder ligt.",
+  "genre": "restaurant",
+  "bruto": 45,
+  "schakels": [
+    {
+      "nr": 1,
+      "van": "lid",
+      "naar": "zaak",
+      "wat": "de bestelling krijgt een eigen sleutel en een bedrag dat vaststaat",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "ref RTG-O-5A77FB, totaal 45 (verwacht 45), betaald false",
+      "fout": null,
+      "ms": 20
+    },
+    {
+      "nr": 2,
+      "van": "zaak",
+      "naar": "boekhouding",
+      "wat": "een onbetaalde bestelling telt NIET mee in de omzet van de maand",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "omzet 0 (voor de bestelling: 0)",
+      "fout": null,
+      "ms": 6
+    },
+    {
+      "nr": 3,
+      "van": "lid",
+      "naar": "betaalrail",
+      "wat": "de betaling landt EEN keer, met tijdstip en met het werkelijk betaalde bedrag",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "betaald true, op 2026-09-13T12:29:18.074Z, 4500 cent (verwacht 4500)",
+      "fout": null,
+      "ms": 25
+    },
+    {
+      "nr": 4,
+      "van": "betaalrail",
+      "naar": "boekhouding",
+      "wat": "de omzet van de maand stijgt met exact het verkochte bedrag, niet meer en niet minder",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "omzet 45, verschil 45 (verwacht 45)",
+      "fout": null,
+      "ms": 15
+    },
+    {
+      "nr": 5,
+      "van": "boekhouding",
+      "naar": "fiscus",
+      "wat": "elke verkochte regel valt in de btw-pot die bij het PRODUCT hoort",
+      "bekend": "de btw-categorie wordt afgeleid uit de werkplek (station) en niet uit het product: een niet-alcoholisch drankje van de bar valt op 21% terwijl NL 9% kent voor eten en niet-alcoholische dranken. De scheidslijn alcohol-ja/nee bestaat al in kern/lidacties/bestellen.js maar niet in kern/fiscaal/tarief.js. Besluit van de eigenaar: wat is de bron van het tarief, de werkplek of het product?",
+      "stand": "openBekend",
+      "status": 200,
+      "ziet": "potten: eten@9% = 40, drank@21% = 5 -- de koffie (5,00) staat bij drank/21%",
+      "fout": null,
+      "ms": 9
+    },
+    {
+      "nr": 6,
+      "van": "fiscus",
+      "naar": "boekhouding",
+      "wat": "het tarief komt van de dag van de transactie en is per pot uitgeschreven",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "2 pot(ten), allemaal met tarief: true, eten staat op 9%",
+      "fout": null,
+      "ms": 5
+    },
+    {
+      "nr": 7,
+      "van": "boekhouding",
+      "naar": "lid",
+      "wat": "het lid ziet dezelfde bestelling, hetzelfde bedrag en dezelfde betaalstand",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "ref RTG-O-5A77FB, 45, betaald true",
+      "fout": null,
+      "ms": 5
+    }
+  ],
+  "storingen": [
+    {
+      "naam": "dezelfde bestelling een tweede keer betalen",
+      "belofte": "wordt geweigerd, en de omzet van de maand beweegt geen cent",
+      "stand": "gehouden",
+      "wat": "status 409, omzet 45 -> 45"
+    },
+    {
+      "naam": "een betaalde bestelling terugstorten",
+      "belofte": "het geld gaat terug EN de boekhouding blijft navolgbaar",
+      "stand": "gehouden",
+      "wat": "status 200, omzet 45 -> 0 (wissen)"
+    },
+    {
+      "naam": "zaak B vraagt haar eigen maand op",
+      "belofte": "ziet geen cent van de omzet van zaak A",
+      "stand": "gehouden",
+      "wat": "zaak B: 0 (zaak A verkocht 45)"
+    },
+    {
+      "naam": "een ander lid betaalt jouw bestelling",
+      "belofte": "wordt geweigerd met een 404: de bestelling bestaat niet voor hem",
+      "stand": "gehouden",
+      "wat": "status 404 -- Bestelling niet gevonden."
+    },
+    {
+      "naam": "een verkocht gerecht van de kaart halen",
+      "belofte": "de btw-verdeling van wat AL verkocht is, beweegt niet meer",
+      "stand": "gehouden",
+      "wat": "drankpot 20 -> 20"
+    },
+    {
+      "naam": "een teruggestorte bestelling opnieuw betalen",
+      "belofte": "wordt geweigerd met de reden, en maakt geen tweede omzet",
+      "stand": "gehouden",
+      "wat": "status 409 -- Deze bestelling is geannuleerd (terugbetaald) en kan niet opnieuw betaald worden., omzet 20 -> 20"
+    },
+    {
+      "naam": "de boeken opvragen zonder zaaksessie",
+      "belofte": "wordt geweigerd",
+      "stand": "gehouden",
+      "wat": "status 401"
+    },
+    {
+      "naam": "zaak B stort een bestelling van zaak A terug",
+      "belofte": "wordt geweigerd: die bon bestaat niet voor haar",
+      "stand": "gehouden",
+      "wat": "status 404 -- Bestelling niet gevonden."
+    }
+  ],
+  "ref": "RTG-O-5A77FB",
+  "zaken": {
+    "a": "PROEFZAAKA",
+    "b": "PROEFZAAKB"
+  },
+  "nulmeting": {
+    "omzet": 0,
+    "status": 200
+  },
+  "naBetaling": 45,
+  "potten": [
+    {
+      "cat": "eten",
+      "tarief": 9,
+      "omzet": 40
+    },
+    {
+      "cat": "drank",
+      "tarief": 21,
+      "omzet": 5
+    }
+  ],
+  "refund": {
+    "voor": 45,
+    "na": 0,
+    "status": 200,
+    "vorm": "wissen",
+    "bevinding": "Een terugstorting WIST de verkoop uit de maand waarin hij stond, in plaats van er een tegenboeking naast te zetten. financeVoor telt op `o.paid`, en /api/supplier/refund zet die op false. Gevolg: de omzet van een AFGESLOTEN maand verandert met terugwerkende kracht, en het verschil tussen \"er is nooit verkocht\" en \"er is verkocht en teruggestort\" is uit de cijfers niet meer te lezen. Besluit van de eigenaar: tegenboeking met eigen datum, of wissen?"
+  },
+  "categorieVerschuiving": {
+    "voor": {
+      "tarief": 21,
+      "omzet": 20
+    },
+    "na": {
+      "tarief": 21,
+      "omzet": 20
+    },
+    "verschoven": false,
+    "bevinding": null
+  },
+  "telling": {
+    "schakels": 7,
+    "gesloten": 6,
+    "open": 0,
+    "openBekend": 1,
+    "stuk": 0,
+    "storingen": 8,
+    "gehouden": 8,
+    "gebroken": 0
+  },
+  "sluit": false,
+  "sluitMetBevinding": true,
+  "bevindingen": [
+    {
+      "schakel": 5,
+      "van": "boekhouding",
+      "naar": "fiscus",
+      "wat": "elke verkochte regel valt in de btw-pot die bij het PRODUCT hoort",
+      "gemeten": "potten: eten@9% = 40, drank@21% = 5 -- de koffie (5,00) staat bij drank/21%",
+      "reden": "de btw-categorie wordt afgeleid uit de werkplek (station) en niet uit het product: een niet-alcoholisch drankje van de bar valt op 21% terwijl NL 9% kent voor eten en niet-alcoholische dranken. De scheidslijn alcohol-ja/nee bestaat al in kern/lidacties/bestellen.js maar niet in kern/fiscaal/tarief.js. Besluit van de eigenaar: wat is de bron van het tarief, de werkplek of het product?"
+    },
+    {
+      "schakel": "storing 2",
+      "van": "zaak",
+      "naar": "boekhouding",
+      "wat": "een terugstorting wist de verkoop uit zijn eigen maand",
+      "gemeten": "45 -> 0",
+      "reden": "Een terugstorting WIST de verkoop uit de maand waarin hij stond, in plaats van er een tegenboeking naast te zetten. financeVoor telt op `o.paid`, en /api/supplier/refund zet die op false. Gevolg: de omzet van een AFGESLOTEN maand verandert met terugwerkende kracht, en het verschil tussen \"er is nooit verkocht\" en \"er is verkocht en teruggestort\" is uit de cijfers niet meer te lezen. Besluit van de eigenaar: tegenboeking met eigen datum, of wissen?"
+    }
+  ]
+}

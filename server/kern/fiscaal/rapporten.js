@@ -45,7 +45,7 @@ module.exports = (ctx) => {
     const landCode = tarief.landVan(s);
     // de categorie uit DEZELFDE routine als de boekhouding en de factuur
     const basisCat = tarief.basisCat(s, db.capsVan(s));
-    const catVan = naam => tarief.catVanItem(s, naam, basisCat);
+    const catVan = (naam, regel) => tarief.catVanItem(s, naam, basisCat, regel);
     const potten = {};
     const betaalwijzen = {}, openstaandGezet = {};
     let bonnen = 0, fooien = 0, omzet = 0;
@@ -55,7 +55,7 @@ module.exports = (ctx) => {
       bonnen++;
       fooien += o.fooi || 0;
       let t = 0;
-      for (const it of o.items || []) { const b = (it.price || 0) * (it.qty || 1); t += b; tel(catVan(it.name), b); }
+      for (const it of o.items || []) { const b = (it.price || 0) * (it.qty || 1); t += b; tel(catVan(it.name, it), b); }
       omzet += t;
       // onder de betaalwijze waarmee er ECHT is afgerekend: een bestelling die
       // aan tafel contant is voldaan hoort niet onder 'app' (TAKEN.md 4.59).
@@ -92,7 +92,7 @@ module.exports = (ctx) => {
       omzet += v.total || 0;
       betaalwijzen[m] = centen((betaalwijzen[m] || 0) + (v.total || 0));
       if (v.omzetElders || m === 'rtg' || m === 'kamer' || m === 'tafel') continue; // interne verrekening (of een bundelbon): de btw loopt via de hoofdboeking
-      if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
+      if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name, it), (it.price || 0) * (it.qty || 1));
       else tel(basisCat, v.total || 0);
     }
     // het tarief van DIE DAG, niet dat van vandaag

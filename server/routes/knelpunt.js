@@ -26,11 +26,24 @@
    geen knelpunt om iets bij te zoeken, en een half antwoord met een halve kaart
    leest als een uitkomst. */
 module.exports = (kern) => {
-  const { app, auth } = kern;
+  const { app, auth, rtf } = kern;
   const knelpunt = require('../kern/knelpunt');
   const openingen = require('../kern/knelpunt/openingen');
+  const { maakAanvoer } = require('../kern/knelpunt/aanvoer-bronnen');
+  const { maakWerkbron } = require('../kern/knelpunt/aanvoer-werk');
+  const { maakOpleidingbron } = require('../kern/knelpunt/aanvoer-opleiding');
+  /* De aanvoer wordt EEN keer samengesteld, bij het bedraden. Per verzoek
+     opnieuw bouwen zou de bronnenlijst per aanroep laten verschillen, en dan is
+     "welke bronnen zijn er" geen vraag meer met een antwoord. */
+  const aanvoer = maakAanvoer({
+    werk: maakWerkbron(() => kern.openVacatures),
+    opleiding: maakOpleidingbron(() => kern.beroepenbieb)
+  });
 
-  app.post('/api/knelpunt', auth, (req, res) => {
+  /* Eén afhandeling voor twee deuren. Ze apart schrijven zou betekenen dat een
+     gezin een ANDER antwoord krijgt dan een lid zodra iemand er een aanpast --
+     en dat is precies de soort stille tweedeling die deze laag moet uitsluiten. */
+  function beantwoord(req, res) {
     const r = knelpunt.reken(req.body || {});
     const { status, ...rest } = r;
     if (!r.ok) return res.status(status || 200).json(rest);
@@ -38,7 +51,93 @@ module.exports = (kern) => {
        lijsten aannames laten de lezer kiezen welke hij leest, en dat is precies
        de helft die hij dan niet leest. */
     const o = openingen.voorKnelpunten(r.knelpunten);
+    /* De aanvoer hangt NAAST de openingen en vervangt ze niet: een opening is
+       de deur, een vondst is wat erachter staat. Alleen `werk` heeft vandaag
+       een bron, en de andere vier staan daarom in `zonderBron` -- met de reden,
+       want een leeg vak leest als "er is hier niets" terwijl het "wij hebben
+       hier nog niets aangesloten" betekent.
+
+       De randvoorwaarden gaan er EEN voor EEN in. De aanvoerlaag kent de mens
+       niet en mag hem ook niet uit een optelsom kunnen afleiden; per
+       randvoorwaarde vragen houdt dat zo. */
+    const vondsten = [], bronMeldingen = [], bronLeeg = [], geleverd = [];
+    /* De knelpunten gaan er EEN voor EEN in, en een knelpunt IS hier de
+       randvoorwaarde -- kern/knelpunt/index.js geeft ze als platte rij
+       { id, wat, blokkeertWegen } en niet genest onder een weg. Dat is bij het
+       bouwen misgegaan: de lus liep over een veld `voorwaarden` dat niet
+       bestaat, dus er kwam nul uit terwijl alles werkte. Een lege lijst zag er
+       precies zo uit als "geen vacatures".
+
+       Een voor een en niet in een optelsom: de aanvoerlaag kent de mens niet en
+       mag hem ook niet uit een samenvoeging kunnen afleiden. */
+    for (const k of (r.knelpunten || [])) {
+      const a = aanvoer.vondsten(k);
+      for (const v of a.vondsten) vondsten.push(v);
+      for (const g of a.geweigerd) bronMeldingen.push(g);
+      /* Een bron die NIETS heeft is iets anders dan een bron die stukging, en
+         die twee worden nooit samengevoegd -- dezelfde regel als in
+         kern/ontvanger.js. */
+      for (const g of a.geenBron) bronLeeg.push(Object.assign({ voorwaarde: k.id }, g));
+      /* Wat elke bron LEVERDE naast wat hij VOND. Zonder dat verschil leest een
+         scherm met een vacature en vierentwintig leerpaden als een oordeel over
+         welke weg de beste is, terwijl het alleen zegt hoeveel elke bron
+         toevallig heeft. Er wordt niets herverdeeld: dat zou een rangorde zijn
+         (kern/knelpunt/index.js regel 4). */
+      for (const g of a.geleverd) geleverd.push(Object.assign({ voorwaarde: k.id }, g));
+    }
+    /* Alleen over de terreinen die dit knelpunt werkelijk RAAKT wordt gemeld dat
+       er geen bron is. Alle vijf melden zou "voor wonen is geen bron
+       aangesloten" zetten onder een vraag die niets met wonen te maken heeft --
+       een mededeling die nergens over gaat, leest als een tekortkoming. */
+    const geraakt = [...new Set((o.openingen || []).map((x) => x.terrein).filter(Boolean))];
+    const metBron = new Set(vondsten.map((v) => v.terrein));
+    const zonderBron = geraakt.filter((t) => !metBron.has(t))
+      .map((t) => ({ terrein: t, reden: 'voor dit terrein is nog geen bron aangesloten; de ingang ' +
+        'bij de opening hierboven is wat dit huis heeft' }));
     res.json({ ...rest, openingen: o.openingen, terreinen: o.terreinen,
+      vondsten, vondstenZonderBron: zonderBron,
+      vondstenGeweigerd: bronMeldingen, vondstenBronLeeg: bronLeeg, vondstenGeleverd: geleverd,
       aannames: rest.aannames.concat(o.aannames), openingenGrens: o.grens });
+  }
+
+  app.post('/api/knelpunt', auth, beantwoord);
+
+  /* ---------------------------------------------------------------------
+     DE FOUNDATION-INGANG -- een besluit van de eigenaar, 13 september 2026.
+
+     WAT HIER WEL EN NIET IS OPENGEZET. Een gezin mag zijn EIGEN vraag laten
+     beantwoorden met vondsten. Dat is niet hetzelfde als "de foundation mag
+     bij /api/knelpunt/*": er is één deur bij gekomen voor één functie, en de
+     rest van deze laag verandert niet. De aanleiding staat in de Adam-keten --
+     de motor die precies de vraag van een zeventienjarige beantwoordt, was
+     voor dat gezin niet te openen.
+
+     DRIE GRENZEN, EN ALLE DRIE STAAN ZE IN DE CODE EN NIET ALLEEN HIER:
+
+     1. GEEN PROFIEL NAAR DE AANVOER. `beantwoord()` leest alleen `req.body`,
+        en de sessie wordt hier ALLEEN gebruikt om de deur te openen -- er gaat
+        niets van `sess` mee naar de motor of de bronnen. De handtekening van
+        `vondsten(voorwaarde)` maakt dat structureel onmogelijk; deze route
+        maakt er geen uitzondering op.
+     2. EEN VONDST IS GEEN RECHT. Dat Adam een vacature ZIET, zegt niets over
+        of hij erop mag solliciteren. Die vraag blijft bij de sollicitatielaag,
+        die de leeftijd uit het PROFIEL leest en niet uit dit antwoord
+        (routes/member/werk/rtf.js: *"de leeftijd komt uit het PROFIEL, niet
+        uit het verzoek"*). Deze laag ordent mogelijkheden; de domeinen blijven
+        eigenaar van hun eigen handelingen.
+     3. GEEN RANGORDE DIE ALS ADVIES LEEST. Er wordt niets gesorteerd, en het
+        antwoord draagt per bron `getoond` naast `gevonden` zodat een korte
+        lijst niet als "dit is alles" en een lange niet als "dit is het beste"
+        leest.
+
+     IEDEREEN IN HET GEZIN MAG KIJKEN, ook een gast-profiel -- dezelfde regel
+     als bij /api/rtf/beroepen. Wie mag KIJKEN begrenzen zou hier een
+     geschiktheidsoordeel zijn over wie zijn eigen mogelijkheden mag zien, en
+     dat is precies wat FOUNDATION.md par. 5 verbiedt.
+     --------------------------------------------------------------------- */
+  app.post('/api/rtf/knelpunt', (req, res) => {
+    const sess = rtf.verifieerProfiel((req.body || {}).code, (req.body || {}).token);
+    if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
+    return beantwoord(req, res);
   });
 };

@@ -12,7 +12,7 @@
    scripts/schakelbaar.js): /api/toestemming, omdat een knop die het intrekscherm
    dichtzet niet hoort te bestaan, en /api/toestel/meting, omdat die op een
    toestelsleutel binnenkomt en niet op een ledensessie. */
-const { LEDEN } = require('./doelgroepen');
+const { LEDEN, LEDEN_RTF } = require('./doelgroepen');
 
 module.exports = [
   { id: 'experience-platform', categorie: 'Eigen apps', naam: 'RTG Experience Platform',
@@ -51,10 +51,13 @@ module.exports = [
       'Een vrije plek is geen plek: inschrijven doet de opvang zelf. De aanwezigheidslijst van een groep komt hier nooit uit; ' +
       'een ouder ziet een getal en niet de namen van andere kinderen.',
     paden: ['/api/opvang'] },
-  { id: 'knelpunt', categorie: 'Eigen apps', naam: 'Knelpunten (welke weg ligt open)', standaard: true, doelgroepen: LEDEN,
+  /* `foundation` en de tweede deur: besluit van de eigenaar, uitgeschreven in
+     de kop van routes/knelpunt.js en bewaakt door test/aanvoer.test.js 23. */
+  { id: 'knelpunt', categorie: 'Eigen apps', naam: 'Knelpunten (welke weg ligt open)', standaard: true, doelgroepen: LEDEN_RTF,
     uitleg: 'Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan. Bewaart niets: ' +
-      'alles komt binnen in het verzoek en gaat eruit als antwoord. Er wordt niets gerangschikt en geen beste weg aangewezen.',
-    paden: ['/api/knelpunt'] },
+      'alles komt binnen in het verzoek en gaat eruit als antwoord. Er wordt niets gerangschikt en geen beste weg aangewezen. ' +
+      'Een gezin mag dezelfde vraag stellen; dat geeft geen recht op de wegen die het ziet.',
+    paden: ['/api/knelpunt', '/api/rtf/knelpunt'] },
   /* RTG Vertegenwoordiging (CARRIERE.md par. 6a): een mens die handelt namens
      een mens -- zaakwaarnemer, boekhouder, coach, ouder.
 

@@ -35,19 +35,19 @@ const TIK = Object.freeze({
       { wat: 'dekking, of ruimte om bij te laden', bron: 'zorgSaldo in kern/pay/verzoeken.js' }
     ],
     gevolgen: [
-      { soort: 'direct', graad: 'gemeten', collectie: 'paySaldi',
+      { soort: 'direct', graad: 'vermoed', collectie: 'paySaldi',
         wat: 'het eigen saldo daalt en dat van de getikte ontvanger stijgt',
-        reden: 'de idempotentieproef zag deze collectie veranderen; beide kanten wonen erin' },
-      { soort: 'direct', graad: 'gemeten', collectie: 'payBoekingen',
+        reden: 'kern/pay/tik.js boekt beide kanten via stuur; de actuele proef bereikte die code niet' },
+      { soort: 'direct', graad: 'vermoed', collectie: 'payBoekingen',
         wat: 'er komt een grootboekregel bij met soort `tik`, die bij beide leden in de ' +
           'tikgeschiedenis staat',
-        reden: 'gemeten in dezelfde ronde; `soort: tik` is waar kern/pay/tik.js#tikFeed op filtert' },
-      { soort: 'direct', graad: 'gemeten', collectie: 'payIdem',
+        reden: '`soort: tik` is waar kern/pay/tik.js#tikFeed op filtert; nog niet gemeten met een geldige tik' },
+      { soort: 'direct', graad: 'vermoed', collectie: 'payIdem',
         wat: 'de sleutel wordt vastgelegd zodat een tweede tik met dezelfde sleutel niet dubbel boekt',
-        reden: 'gemeten in dezelfde ronde; tikBetaal geeft hem door als `tik:<sleutel>`' },
-      { soort: 'direct', graad: 'gemeten', collectie: 'payIdemAfdruk',
+        reden: 'tikBetaal geeft hem door als `tik:<sleutel>`; de actuele proef strandde voor deze stap' },
+      { soort: 'direct', graad: 'vermoed', collectie: 'payIdemAfdruk',
         wat: 'de afdruk van het antwoord wordt bewaard voor die tweede tik',
-        reden: 'gemeten in dezelfde ronde' },
+        reden: 'de geldpoort bewaart de afdruk bij dezelfde sleutel; de tikroute is nog niet succesvol gemeten' },
       { soort: 'afgeleid', graad: 'vermoed',
         wat: 'de tik blijft geldig: hij wordt NIET verbruikt, dus dezelfde code kan binnen zijn ' +
           'vijf minuten door meer mensen gebruikt worden',
@@ -58,11 +58,11 @@ const TIK = Object.freeze({
         uitkomsten: ['niet bijgeladen', 'bijgeladen', 'bijladen mislukt'],
         reden: 'zorgSaldo roept laadOp aan; het antwoord draagt `bijgeladen` zodat het lid ziet dat ' +
           'er meer is gebeurd dan tikken' },
-      { soort: 'mislukking', graad: 'gemeten',
+      { soort: 'mislukking', graad: 'vermoed',
         wat: 'ZONDER idempotentiesleutel gebeurt er niets: de geldpoort weigert met 400 voordat de ' +
           'tik wordt opgezocht -- een kale dubbeltik kan hier dus niet twee keer betalen',
-        reden: 'GEMETEN, niet verklaard: de kale ronde van de idempotentieproef gaf tweemaal 400 en ' +
-          'een leeg verschil in de opslag' },
+        reden: 'de geldpoort staat voor de tikroute; de actuele kale proef had een ongeldige tik en ' +
+          'bereikte deze weigering nog niet' },
       { soort: 'mislukking', graad: 'vermoed',
         wat: 'is de tik verlopen of van de aanroeper zelf, dan gaat er niets van de wallet af',
         reden: 'de twee controles in kern/pay/tik.js#tikBetaal staan VOOR de aanroep van `stuur`, ' +
@@ -76,9 +76,9 @@ const TIK = Object.freeze({
     herstel: { bron: 'HERSTELPROEF.json',
       reden: 'niet verklaard maar gemeten; geld terugtikken is een NIEUWE handeling en geen ' +
         'terugweg -- de ontvanger moet die zelf doen' },
-    nagekeken: 'Claude (Opus 5), 2026-09-14: de vier gemeten collecties uit kern/stuur/gevolg.js, de ' +
-      'kale ronde uit IDEMPROEF.json, de volgorde en de codebehandeling uit kern/pay/tik.js; niet ' +
-      'door een mens nagelezen'
+    nagekeken: 'Claude (Opus 5), 2026-09-14: de volgorde en codebehandeling uit kern/pay/tik.js; ' +
+      'IDEMPROEF.json meldt voor deze route driemaal 404 en dus nog geen succesvolle gevolgmeting; ' +
+      'niet door een mens nagelezen'
   }
 });
 

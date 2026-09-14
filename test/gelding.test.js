@@ -112,7 +112,16 @@ test('4. de claim verandert: CLAIM verschuift, DRAAG en WACHT niet', () => {
   assert.equal(cellenVan(B.asWacht(WACHTERBRON).cellen), voorW, 'de WACHT-as bewoog mee met een CLAIM-wijziging');
 });
 
-/* MUTATIE GEZIEN ZAKKEN: de waarschuwing uit `grens` gehaald; zakte hier. */
+/* MUTATIE GEZIEN ZAKKEN, en hier zijn het er zes, elk apart nagetrokken op een
+   ongewijzigde boom:
+     de waarschuwing uit `grens` gehaald                     -> zakt
+     een handeling uit `zietNiet` gehaald                    -> zakt (sluitende telling)
+     een handeling in `ziet` EN `zietNiet` gezet             -> zakt (dubbele verklaring)
+     `opslaan` uit `ziet` gehaald                            -> zakt (ijkvloer)
+     `tonenGrens` verwijderd                                 -> zakt (regel 13)
+     `tonenStand` op een verzonnen waarde gezet              -> zakt (herkomst)
+   Zonder die zes zou dit een toets zijn die alleen leest wat het script zojuist
+   heeft opgeschreven. */
 test('5. de twee misleesbare uitslagen dragen hun waarschuwing in het register', () => {
   const pad = path.join(WORTEL, 'GELDING.json');
   assert.ok(fs.existsSync(pad), 'GELDING.json ontbreekt; draai `npm run gelding`. Niet-gemeten mag nooit ' +
@@ -127,12 +136,38 @@ test('5. de twee misleesbare uitslagen dragen hun waarschuwing in het register',
     'een percentage over cellen veronderstelt dat elke cel even zwaar weegt, en dat is niet gemeten');
   assert.equal(j.graad, 'vermoed', 'deze assen zijn deels verklaard en deels lexicaal');
 
-  /* De dragersensor ziet maar een van de vier handelingen, en dat hoort te
-     staan waar de lezer het ziet -- anders leest een lege `rangschikken`-cel
-     als bewijs dat er niet gerangschikt wordt. */
-  assert.deepEqual(j.assen.draag.ziet, ['opslaan']);
-  assert.ok(j.assen.draag.zietNiet.length >= 3 && String(j.assen.draag.zietNietWaarom).length > 30,
-    'de dragersensor zegt niet welke handelingen hij NIET ziet, of waarom');
+  /* De dragersensor ziet niet alle handelingen, en dat hoort te staan waar de
+     lezer het ziet -- anders leest een lege `rangschikken`-cel als bewijs dat
+     er niet gerangschikt wordt.
+
+     DIT IS EEN SLUITENDE TELLING EN GEEN VAST GETAL, en dat is met opzet. De
+     eerste versie pinde `ziet` op ['opslaan'] en `zietNiet.length >= 3`. Toen de
+     as werd verbreed naar `tonen` zakte die vloer van 3 naar 2, en een vloer die
+     bij vooruitgang omlaag moet, is de verkeerde vorm. De vraag is niet HOEVEEL
+     de sensor niet ziet maar of hij over ELKE handeling iets zegt: wie er een
+     toevoegt zonder te verklaren of de sensor hem ziet, zakt hier. */
+  const verklaard = [...j.assen.draag.ziet, ...j.assen.draag.zietNiet].sort();
+  assert.deepEqual(verklaard, [...B.GEVAL.handelingen].sort(),
+    'de dragersensor verklaart niet over elke handeling of hij hem ziet; een handeling die in geen van ' +
+    'beide lijsten staat, levert lege cellen die als "hier gebeurt niets" lezen');
+  assert.equal(new Set(verklaard).size, verklaard.length,
+    'een handeling staat in `ziet` EN in `zietNiet`; dan zegt het register twee dingen tegelijk');
+  assert.ok(j.assen.draag.ziet.includes('opslaan'),
+    'de vormsensor is geijkt op `opslaan`; valt die weg, dan is de hele as een andere meting');
+  assert.ok(j.assen.draag.zietNiet.length === 0 || String(j.assen.draag.zietNietWaarom).length > 30,
+    'de dragersensor zegt niet WAAROM hij een handeling niet ziet; zonder reden is een blinde vlek ' +
+    'niet van een besluit te onderscheiden');
+
+  /* `tonen` komt uit ROUTEBRON.json. Ontbreekt dat register, dan hoort de as te
+     zeggen dat hij niet kon kijken -- en geen nul te melden (BESTUUR.md: een
+     meter die niet kon kijken is iets anders dan een meter die niets zag). */
+  assert.ok(j.assen.draag.tonenStand === 'gemeten' || j.assen.draag.tonenStand === 'geenBron',
+    'de `tonen`-tak draagt geen herkomst van zijn uitslag; dan leest "geen enkele drager toont iets" ' +
+    'hetzelfde als "het register ontbrak"');
+  assert.ok(String(j.assen.draag.tonenGrens || '').length > 60,
+    'de `tonen`-tak zegt niet wat hij WERKELIJK heeft waargenomen. Hij ziet dat een module een route ' +
+    'afhandelt, niet dat die route het oordeel toont -- wie dat niet erbij zet, laat een bereikbaarheids- ' +
+    'meting lezen als een tonen-meting (LAT.md regel 13)');
 
   assert.deepEqual(j.assen.claim.citaatKapot, [],
     'een citaat van de claim wijst naar een zin die niet meer bestaat; dan is de claim niet meer na te lezen');

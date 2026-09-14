@@ -2,10 +2,10 @@
  "soort": "meting",
  "uitleg": "De FAILURE-cel per route: faalt hij netjes als er iets onder hem wegvalt. Het contract wordt eerst bepaald uit het gemeten effectprofiel (X-RTG-Effect / X-RTG-Staat) en pas daarna beproefd met het verraad dat daarbij hoort.",
  "stempel": {
-  "op": "2026-09-13T10:02:36.719Z",
-  "commit": "d88085f3",
+  "op": "2026-09-13T20:01:12.460Z",
+  "commit": "6dacd5e8",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/faalproef.js",
   "node": "v22.22.2"
  },
@@ -32,13 +32,15 @@
  ],
  "verradenNietGedraaid": {},
  "gemeten": {
-  "routes": 4952,
-  "duurzaamSchrijvend": 70,
+  "routes": 4965,
+  "duurzaamSchrijvend": 71,
   "nietToeTeSchrijven": 125,
-  "voorziening": 63,
-  "bewezen": 69,
+  "voorziening": 64,
+  "bewezen": 70,
   "gezakt": 1,
   "ongemeten": 0,
+  "gezaktMetBesluit": 1,
+  "gezaktZonderBesluit": 0,
   "nietMutatief": 283,
   "nietBereikt": 4410,
   "onzeker": 126,
@@ -6108,12 +6110,12 @@
    "pad": "/api/festival/mijn",
    "route": "POST /api/festival/mijn",
    "rol": "supplier",
-   "profiel": "onzeker",
+   "profiel": "leest",
    "effect": "geen",
    "effect2": null,
    "perVerraad": {},
-   "failure": "onzeker",
-   "reden": "de momentopname bewoog maar de effectmeter zag geen save(); die opname is globaal en sequentieel, dus dit kan net zo goed een achtergrondschrijver zijn. Niet aan deze route toe te schrijven, en dus niet te beoordelen."
+   "failure": "niet-mutatief",
+   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
   },
   {
    "methode": "POST",
@@ -11235,6 +11237,54 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/mediaos/aanwezig",
+   "route": "POST /api/mediaos/aanwezig",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "niet-bereikt",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/aanwezig/mijn",
+   "route": "POST /api/mediaos/aanwezig/mijn",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "niet-bereikt",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/aanwezig/volg",
+   "route": "POST /api/mediaos/aanwezig/volg",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "niet-bereikt",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/aanwezig/zoek",
+   "route": "POST /api/mediaos/aanwezig/zoek",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "niet-bereikt",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/mediaos/bewaar",
    "route": "POST /api/mediaos/bewaar",
    "rol": "member",
@@ -11357,6 +11407,18 @@
    "methode": "POST",
    "pad": "/api/mediaos/meldingen",
    "route": "POST /api/mediaos/meldingen",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "niet-bereikt",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/momenten",
+   "route": "POST /api/mediaos/momenten",
    "rol": "member",
    "profiel": "geen-werk",
    "effect": null,
@@ -16719,6 +16781,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/member/voorstel/intrek",
+   "route": "POST /api/member/voorstel/intrek",
+   "rol": "member",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "niet-bereikt",
+   "reden": "de proef kreeg hem niet aan het werk (status 401)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/member/vooruit",
    "route": "POST /api/member/vooruit",
    "rol": "member",
@@ -18886,7 +18960,7 @@
    "route": "POST /api/office/bank/draai",
    "rol": "boardroom",
    "profiel": "duurzaam",
-   "effect": "opslag=2",
+   "effect": "opslag=3",
    "effect2": null,
    "perVerraad": {
     "schrijf-faalt": {
@@ -18955,7 +19029,7 @@
    "route": "POST /api/office/bank/herstel",
    "rol": "office",
    "profiel": "duurzaam",
-   "effect": "opslag=2",
+   "effect": "opslag=3",
    "effect2": null,
    "perVerraad": {
     "schrijf-faalt": {
@@ -18975,21 +19049,24 @@
    "pad": "/api/office/bank/incasso",
    "route": "POST /api/office/bank/incasso",
    "rol": "kantoor-op-naam",
-   "profiel": "duurzaam",
-   "effect": "opslag=1",
+   "profiel": "geen-werk",
+   "effect": null,
    "effect2": null,
-   "perVerraad": {
-    "schrijf-faalt": {
-     "staat": "bewezen",
-     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
-    },
-    "schrijf-verloren": {
-     "staat": "ongemeten",
-     "reden": "het verraad greep hier niet aan: de toestand veranderde gewoon"
-    }
-   },
-   "failure": "bewezen",
-   "reden": "schrijf-faalt: expliciete fout (status 503) in plaats van een bevestiging"
+   "perVerraad": {},
+   "failure": "niet-bereikt",
+   "reden": "de proef kreeg hem niet aan het werk (status 400)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/incasso/dossier",
+   "route": "POST /api/office/bank/incasso/dossier",
+   "rol": "kantoor-op-naam",
+   "profiel": "leest",
+   "effect": "geen",
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "niet-mutatief",
+   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
   },
   {
    "methode": "POST",
@@ -19033,11 +19110,11 @@
    "route": "POST /api/office/bank/leden",
    "rol": "office",
    "profiel": "voorziening",
-   "effect": "opslag=2",
+   "effect": "opslag=3",
    "effect2": "geen",
    "perVerraad": {},
    "failure": "voorziening",
-   "reden": "de eerste oproep schreef (opslag=2) en de tweede niet (geen): dit is een route die bij het eerste bezoek zijn standaard klaarzet, geen route die werk vastlegt. Een verraad op de schrijfweg meet hier niets, dus er wordt geen oordeel geveld."
+   "reden": "de eerste oproep schreef (opslag=3) en de tweede niet (geen): dit is een route die bij het eerste bezoek zijn standaard klaarzet, geen route die werk vastlegt. Een verraad op de schrijfweg meet hier niets, dus er wordt geen oordeel geveld."
   },
   {
    "methode": "POST",
@@ -19078,7 +19155,7 @@
    "route": "POST /api/office/bank/nood",
    "rol": "office",
    "profiel": "duurzaam",
-   "effect": "opslag=2",
+   "effect": "opslag=3",
    "effect2": null,
    "perVerraad": {
     "schrijf-faalt": {
@@ -19135,11 +19212,11 @@
    "route": "POST /api/office/bank/operationeel",
    "rol": "boardroom",
    "profiel": "voorziening",
-   "effect": "opslag=2",
+   "effect": "opslag=3",
    "effect2": "geen",
    "perVerraad": {},
    "failure": "voorziening",
-   "reden": "de eerste oproep schreef (opslag=2) en de tweede niet (geen): dit is een route die bij het eerste bezoek zijn standaard klaarzet, geen route die werk vastlegt. Een verraad op de schrijfweg meet hier niets, dus er wordt geen oordeel geveld."
+   "reden": "de eerste oproep schreef (opslag=3) en de tweede niet (geen): dit is een route die bij het eerste bezoek zijn standaard klaarzet, geen route die werk vastlegt. Een verraad op de schrijfweg meet hier niets, dus er wordt geen oordeel geveld."
   },
   {
    "methode": "POST",
@@ -19263,36 +19340,54 @@
    "pad": "/api/office/bank/rekening/open",
    "route": "POST /api/office/bank/rekening/open",
    "rol": "kantoor-op-naam",
-   "profiel": "geen-werk",
-   "effect": null,
+   "profiel": "duurzaam",
+   "effect": "opslag=1",
    "effect2": null,
-   "perVerraad": {},
-   "failure": "niet-bereikt",
-   "reden": "de proef kreeg hem niet aan het werk (status 400)"
+   "perVerraad": {
+    "schrijf-faalt": {
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
+    },
+    "schrijf-verloren": {
+     "staat": "ongemeten",
+     "reden": "het verraad greep hier niet aan: de toestand veranderde gewoon"
+    }
+   },
+   "failure": "bewezen",
+   "reden": "schrijf-faalt: expliciete fout (status 503) in plaats van een bevestiging"
   },
   {
    "methode": "POST",
    "pad": "/api/office/bank/rekening/rood",
    "route": "POST /api/office/bank/rekening/rood",
    "rol": "kantoor-op-naam",
-   "profiel": "geen-werk",
-   "effect": null,
+   "profiel": "duurzaam",
+   "effect": "opslag=1",
    "effect2": null,
-   "perVerraad": {},
-   "failure": "niet-bereikt",
-   "reden": "de proef kreeg hem niet aan het werk (status 404)"
+   "perVerraad": {
+    "schrijf-faalt": {
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 503) in plaats van een bevestiging"
+    },
+    "schrijf-verloren": {
+     "staat": "bewezen",
+     "reden": "expliciete fout (status 404) in plaats van een bevestiging"
+    }
+   },
+   "failure": "bewezen",
+   "reden": "schrijf-verloren: expliciete fout (status 404) in plaats van een bevestiging"
   },
   {
    "methode": "POST",
    "pad": "/api/office/bank/rente",
    "route": "POST /api/office/bank/rente",
    "rol": "office",
-   "profiel": "leest",
+   "profiel": "onzeker",
    "effect": "geen",
    "effect2": null,
    "perVerraad": {},
-   "failure": "niet-mutatief",
-   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
+   "failure": "onzeker",
+   "reden": "de momentopname bewoog maar de effectmeter zag geen save(); die opname is globaal en sequentieel, dus dit kan net zo goed een achtergrondschrijver zijn. Niet aan deze route toe te schrijven, en dus niet te beoordelen."
   },
   {
    "methode": "POST",
@@ -21200,7 +21295,12 @@
     }
    },
    "failure": "gezakt",
-   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard"
+   "reden": "schrijf-verloren: status 200 terwijl de toestand niet veranderde: bevestigd en niet bewaard",
+   "besluit": {
+    "klasse": "cache",
+    "grond": "Het enige dat deze route wegschrijft is `s.laatsteScan`, een tijdstempel die de dagelijkse herhaling afremt. De zestien voorstellen die hij teruggeeft staan in de ZAAISET; de scan maakt ze niet. Gemeten op een draaiende server: twee scans achter elkaar geven allebei nieuw=0, en na een herstart staan de voorstellen er nog voordat er opnieuw is gescand. Raakt de tijdstempel weg, dan slaat de volgende scan de daggrens niet over en draait hij gewoon -- dat kost rekenwerk en verliest niets. Ook een scan die wel iets vindt is herstelbaar: de voorstellen worden ontdubbeld op kans.sleutel, dus wat verloren ging komt de volgende ronde terug.",
+    "besloten": "2026-09-13"
+   }
   },
   {
    "methode": "POST",
@@ -21963,6 +22063,18 @@
   },
   {
    "methode": "POST",
+   "pad": "/api/office/pay/factuurcorrectie",
+   "route": "POST /api/office/pay/factuurcorrectie",
+   "rol": "office",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "niet-bereikt",
+   "reden": "de proef kreeg hem niet aan het werk (status 403)"
+  },
+  {
+   "methode": "POST",
    "pad": "/api/office/payroll/aangifte",
    "route": "POST /api/office/payroll/aangifte",
    "rol": "office",
@@ -22002,12 +22114,12 @@
    "pad": "/api/office/payroll/aangifte/lijst",
    "route": "POST /api/office/payroll/aangifte/lijst",
    "rol": "office",
-   "profiel": "leest",
+   "profiel": "onzeker",
    "effect": "geen",
    "effect2": null,
    "perVerraad": {},
-   "failure": "niet-mutatief",
-   "reden": "geen meetbaar effect; er is geen ingebouwd verraad dat een LEESafhankelijkheid laat wegvallen (de catalogus noemt cache-oud, maar die staat er als voornemen)"
+   "failure": "onzeker",
+   "reden": "de momentopname bewoog maar de effectmeter zag geen save(); die opname is globaal en sequentieel, dus dit kan net zo goed een achtergrondschrijver zijn. Niet aan deze route toe te schrijven, en dus niet te beoordelen."
   },
   {
    "methode": "POST",
@@ -23157,6 +23269,42 @@
    "perVerraad": {},
    "failure": "niet-bereikt",
    "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/salon/uitlicht",
+   "route": "POST /api/office/salon/uitlicht",
+   "rol": "boardroom",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "niet-bereikt",
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/salon/uitlicht/bord",
+   "route": "POST /api/office/salon/uitlicht/bord",
+   "rol": "boardroom",
+   "profiel": "voorziening",
+   "effect": "opslag=1",
+   "effect2": "geen",
+   "perVerraad": {},
+   "failure": "voorziening",
+   "reden": "de eerste oproep schreef (opslag=1) en de tweede niet (geen): dit is een route die bij het eerste bezoek zijn standaard klaarzet, geen route die werk vastlegt. Een verraad op de schrijfweg meet hier niets, dus er wordt geen oordeel geveld."
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/salon/uitlicht/intrek",
+   "route": "POST /api/office/salon/uitlicht/intrek",
+   "rol": "boardroom",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "niet-bereikt",
+   "reden": "de proef kreeg hem niet aan het werk (status 404)"
   },
   {
    "methode": "POST",
@@ -34583,6 +34731,18 @@
    "methode": "POST",
    "pad": "/api/supplier/activiteit/sluit",
    "route": "POST /api/supplier/activiteit/sluit",
+   "rol": "supplier",
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "niet-bereikt",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/supplier/activity",
+   "route": "POST /api/supplier/activity",
    "rol": "supplier",
    "profiel": "geen-werk",
    "effect": null,
@@ -56600,6 +56760,18 @@
    "methode": "POST",
    "pad": "/api/rtf/kantoorpakket/weg",
    "route": "POST /api/rtf/kantoorpakket/weg",
+   "rol": null,
+   "profiel": "geen-werk",
+   "effect": null,
+   "effect2": null,
+   "perVerraad": {},
+   "failure": "niet-bereikt",
+   "reden": "de proef kreeg hem niet aan het werk (status 503)"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/knelpunt",
+   "route": "POST /api/rtf/knelpunt",
    "rol": null,
    "profiel": "geen-werk",
    "effect": null,

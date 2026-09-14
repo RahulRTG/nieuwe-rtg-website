@@ -246,7 +246,11 @@ const BOMEN = [{ map: 'server', laag: 'server' }, { map: 'public', laag: 'scherm
    niet alleen te groot -- het maakt hem ONEERLIJK, want het werk lijkt dubbel
    zo groot als het is. De lijst komt uit de bundelaar zelf en niet uit een
    tweede lijst hier: wie er een bundel bij maakt, hoeft hier niets te doen. */
-const BUNDELS = new Set(Object.keys(require('./bundel').bundels).map(b => 'public/' + b));
+const BUNDELPADEN = Object.keys(require('./bundel').bundels);
+const BUNDELS = new Set(BUNDELPADEN.flatMap(b => [
+  'public/' + b,
+  'public/dist/min/' + b
+]));
 
 /* HOE SCHERP IS DE TOEWIJZING? Twee leesbreedtes, en de smalste die iets vindt
    wint. Een VENSTER van vijftien regels rond de treffer vindt meestal de plek
@@ -298,6 +302,7 @@ function bestandenMetPaid() {
         .filter(i => /\.paid\b/.test(regels[i]) && !/paidAt/.test(regels[i]) && !GEEN_VELD.test(regels[i]));
       if (!hit.length) continue;
       const rel = path.relative(WORTEL, p).replace(/\\/g, '/');
+      if (rel.startsWith('public/dist/min/')) continue;
       if (BUNDELS.has(rel)) continue;
       const c = collectiesVan(regels, hit);
       if (!c.collecties.length) continue;

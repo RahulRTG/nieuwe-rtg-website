@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-14T10:42:01.248Z",
-    "commit": "8d8f93f0",
+    "op": "2026-09-13T20:32:19.250Z",
+    "commit": "a5d5346c8",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 6,
     "instrument": "scripts/mutatie.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",
@@ -2661,14 +2661,6 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
-    "fiscaal-meegeleverd.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/fiscaal/regelwacht.js",
-      "operator": "===->!==#0",
-      "gezakt": 1,
-      "geprobeerd": 2
-    },
     "fiscaal-preflight.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3690,6 +3682,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "idemtoerekening.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/idemproef.js",
+      "operator": "return-weg#4",
+      "gezakt": 4,
+      "geprobeerd": 28
     },
     "idemvoorziening.test.js": {
       "soort": "puur",
@@ -5456,11 +5456,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
-    },
-    "omzetproef.test.js": {
-      "soort": "puur",
-      "staat": "geen bronmutatie mogelijk",
-      "reden": "ratel op een register; elf handmutaties, alle elf raak -- waaronder de twee bevindingen stil wegpoetsen"
     },
     "onboarding.test.js": {
       "soort": "server",

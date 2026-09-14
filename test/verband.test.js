@@ -76,9 +76,23 @@ test('3. de unie vindt de bekende randen terug, en iedere misser draagt zijn naa
      terugval bestaat; test/wetrelatie.test.js houdt die lijst leeg. */
   const verklaard = require('../WETTEN.json').wetten
     .flatMap(w => [...(w.bewaaktDoor || []), ...(w.draagt || []), ...(w.handhaver || [])]).length;
+  /* DE MELDING DRAAGT `loopt achter` MET OPZET, en dat is geen stijl maar een poort.
+     scripts/registerklopt.js vindt de registergrendels op de zin in hun eigen
+     foutmelding; dit bestand droeg geen van de drie merken en viel er dus
+     buiten. Gevolg, gezien op 14 september 2026: WETTEN.json kreeg een 53e wet,
+     VERBAND.json bleef op 97 van 99 paden staan, `npm run check`,
+     `npm run norm` EN `npm run registerklopt` stonden alle drie groen, en
+     Toetsscherf 1 van 4 zakte in CI. Precies de vierde formulering waar de kop
+     van registerklopt.js voor waarschuwt.
+
+     En de melding is er ook inhoudelijk op vooruit gegaan: hij noemde alleen de
+     TWEEDE oorzaak (een soort die stil buiten de ijking valt) terwijl de eerste
+     -- het register loopt achter -- de oorzaak was die zich werkelijk voordeed. */
   assert.equal(j.telling.randenWachter + j.telling.randenImplementatie, verklaard,
-    'de twee soorten randen horen samen alle verklaarde paden te dekken; klopt dat niet, ' +
-    'dan valt er een soort stil buiten de ijking');
+    'VERBAND.json loopt achter op WETTEN.json, of er is een soort rand bijgekomen die ' +
+    'scripts/verband.js niet telt. De twee soorten randen horen samen alle verklaarde paden ' +
+    'te dekken; klopt dat niet, dan valt er een soort stil buiten de ijking. Draai eerst ' +
+    '`npm run verband` opnieuw -- zakt hij daarna nog, dan is het het tweede geval.');
 
   /* De vloer staat op 50 en niet op 54: een NIEUWE wet met een wachter die geen
      enkele sensor ziet, is gewoon werk. Stil wegzakken is dat niet. */

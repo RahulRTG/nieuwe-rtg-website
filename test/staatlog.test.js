@@ -125,19 +125,63 @@ test('DE POORT: zonder RTG_STAATLOG doet de module niets', () => {
   staatlog.begin('');   // de proef laat de vlag niet aan staan voor de volgende toets
 });
 
-test('haak(): zet de kop op het antwoord, en breekt res.json niet', () => {
+/* De opstelling van een antwoord, zoals server/web/verrijk.js hem maakt: `json`
+   serialiseert en geeft het door aan `end`, en `end` is de enige uitgang. */
+function nepRes() {
+  const koppen = {};
+  const res = { headersSent: false, verstuurd: null,
+    setHeader(k, v) { koppen[k] = v; }, koppen,
+    end(body) { res.verstuurd = body; res.headersSent = true; return 'origineel'; },
+    json(x) { return res.end(JSON.stringify(x)); } };
+  return res;
+}
+
+test('haak(): zet de kop op het antwoord, en breekt de uitgang niet', () => {
   staatlog.begin('1');
   let middleware = null;
   staatlog.haak({ use(fn) { middleware = fn; } });
   assert.equal(typeof middleware, 'function');
 
-  const koppen = {};
-  let doorgegeven = null;
-  const res = { headersSent: false, setHeader(k, v) { koppen[k] = v; }, json(x) { doorgegeven = x; return 'origineel'; } };
+  const res = nepRes();
   middleware({}, res, () => {});
   const uit = res.json({ ok: true });
-  assert.equal(typeof koppen['X-RTG-Staat'], 'string', 'de kop staat er');
-  assert.deepEqual(doorgegeven, { ok: true }, 'het antwoord gaat ongewijzigd door');
+  assert.equal(typeof res.koppen['X-RTG-Staat'], 'string', 'de kop staat er');
+  assert.equal(res.verstuurd, JSON.stringify({ ok: true }), 'het antwoord gaat ongewijzigd door');
   assert.equal(uit, 'origineel', 'en de teruggaafwaarde ook');
+  staatlog.begin('');
+});
+
+/* DE TOETS DIE DE FOUT VAN 14 SEPTEMBER 2026 ZOU HEBBEN GEVONDEN.
+
+   De haak hing aan `res.json`, en server/middleware/compressie.js hangt zich
+   daarboven: die serialiseert een lijf van 1 kB of meer zelf, comprimeert het en
+   verstuurt het met `res.send` -- zonder de json-keten onder zich ooit aan te
+   roepen. Elk antwoord boven die drempel droeg dus geen X-RTG-Staat, en de
+   idempotentieproef las een LEEG verschil waar geen meting was. Hier staat die
+   aanroeper nagebouwd: hij mag de kop niet kunnen omzeilen.
+
+   Zet de haak terug op res.json en deze toets zakt -- nagetrokken. */
+test('haak(): een aanroeper die res.json OVERSLAAT en zelf verstuurt, draagt de kop ook', () => {
+  staatlog.begin('2');
+  let middleware = null;
+  staatlog.haak({ use(fn) { middleware = fn; } });
+
+  const res = nepRes();
+  middleware({}, res, () => {});
+
+  /* Precies de vorm van compressie.js: hij pakt de json van dat moment op,
+     gebruikt hem NIET voor een groot lijf, en gaat rechtstreeks naar de uitgang. */
+  const gewoonJson = res.json.bind(res);
+  res.json = (data) => {
+    const s = JSON.stringify(data);
+    if (s.length < 1024) return gewoonJson(data);
+    res.setHeader('Content-Encoding', 'gzip');
+    return res.end(Buffer.from(s));
+  };
+
+  res.json({ ok: true, vulling: 'x'.repeat(2000) });
+  assert.equal(typeof res.koppen['X-RTG-Staat'], 'string',
+    'een verpakt antwoord van meer dan een kilobyte draagt de opslagstand ook');
+  assert.equal(res.koppen['Content-Encoding'], 'gzip', 'en de verpakking blijft staan');
   staatlog.begin('');
 });

@@ -1057,6 +1057,31 @@ const VOORZIENINGEN = {
     if (!(r && r.status >= 200 && r.status < 300)) return { fout: 'pos/sale gaf ' + (r && r.status) };
     return { room: kamer, method: 'contant' };
   },
+  /* DE TIK -- en die KAN niet uit de wereld komen, want een tikcode leeft vijf
+     minuten (KASCODE_MS). De wereld wordt aan het begin van de ronde opgezet en
+     deze route komt duizenden routes later langs; een code uit de wereld is dan
+     allang verlopen, en /api/pay/tik gaf dan ook 404 ("Deze tik is niet (meer)
+     geldig") met een lege opslag. Dit is precies het geval waarvoor de
+     voorziening bestaat: hij draait NA de pasladder-ijkoproep en VOOR de eerste
+     gemeten oproep.
+
+     DE ONTVANGER IS EEN ANDER LID, en dat is geen detail: kern/pay/tik.js weigert
+     met "Dit is je eigen tik" zodra de code van de aanroeper zelf is. `w.anderToken`
+     is het tweede lid uit stap 3 van de wereld.
+
+     WAT DE CODE WEL EN NIET IS. Hij wijst alleen de ONTVANGER aan; er kan dus enkel
+     geld NAAR hem toe. Daarom mag hij binnen zijn vijf minuten door een hele tafel
+     gebruikt worden, en daarom is het geen bezwaar dat de proef hem drie keer
+     gebruikt. Er wordt niets geforceerd en geen grens verhoogd: het lid zet zijn
+     eigen toestel op ontvangen langs de gewone route. */
+  '/api/pay/tik': async ({ post, w }) => {
+    if (!w.anderToken) return { fout: 'geen tweede lid in de wereld' };
+    const r = await post('/api/pay/tikcode', {}, w.anderToken);
+    const code = r.data && r.data.code;
+    if (!code) return { fout: 'pay/tikcode gaf ' + r.status + ' ' + ((r.data && r.data.error) || '') };
+    return { code, centen: 100, oms: 'proeftik' };
+  },
+
   /* Saldo op de rekening van de ZAAK, want oormerken kan niet uit niets. De zaak
      ontvangt via een VERSE kascode van het LID -- twee rollen in een voorziening,
      en de kascode uit de wereld is eenmalig en allang op. */

@@ -92,7 +92,17 @@ module.exports = (kern) => {
     next();
   }
 
-  /* TOEZEGGEN EN STEMMEN VRAGEN EEN VOLWASSEN PROFIEL. Dat is geen nieuwe regel
+  /* TOEZEGGEN EN STEMMEN VRAGEN EEN VOLWASSEN PROFIEL, en de verfijner heet
+     `nietBeschermd` omdat die naam AL bestaat met precies deze betekenis:
+     scripts/lib/bewakers.js verklaart hem als "sluit een beschermd kind uit
+     binnen gezinsPoort", en routes/social/gezinnen.js gebruikt hem zo. Mijn
+     eerste versie heette `volwassenGezin`, en de idemproef meldde hem prompt
+     als "bewaker van onbekende soort" -- terecht: een tweede naam voor dezelfde
+     verfijner maakt de bewakerskaart onleesbaar. De TEKST verschilt wel, en dat
+     hoort: bij vrienden toevoegen leest een kind "je ouder voegt vrienden voor
+     je toe", hier gaat het over geld.
+
+     Dat is geen nieuwe regel
      maar twee bestaande naast elkaar gelegd: server/foundation/gezinshulp.js
      zegt bij isGast met zoveel woorden dat een gast niet bij de privezaken van
      het gezin mag komen "(geld, ...)", en isBeschermd markeert de
@@ -103,7 +113,7 @@ module.exports = (kern) => {
      begrenzen zou hier een oordeel zijn over wie zijn eigen fonds mag zien, en
      dat is precies wat FOUNDATION.md par. 5 verbiedt. Deze laag staat daarom
      NAAST gezinAuth en niet erin. */
-  const volwassenGezin = (req, res, next) => {
+  const nietBeschermd = (req, res, next) => {
     if (req.gezinslid.beschermd) {
       return res.status(403).json({ error: 'Toezeggen en stemmen doet een volwassene uit het gezin.' });
     }
@@ -142,12 +152,12 @@ module.exports = (kern) => {
      ingang naar dezelfde dienst, en een eigen functie zou het bord de ene helft
      laten sluiten en de andere niet. */
   app.post('/api/rtf/labfonds/overzicht', gezinsPoort, alsGezin(DOEN.overzicht));
-  app.post('/api/rtf/labfonds/locatie/maak', gezinsPoort, volwassenGezin, alsGezin(DOEN.locatie));
-  app.post('/api/rtf/labfonds/doneer', gezinsPoort, volwassenGezin, alsGezin(DOEN.doneer));
-  app.post('/api/rtf/labfonds/voorstel/maak', gezinsPoort, volwassenGezin, alsGezin(DOEN.voorstel));
-  app.post('/api/rtf/labfonds/stem', gezinsPoort, volwassenGezin, alsGezin(DOEN.stem));
+  app.post('/api/rtf/labfonds/locatie/maak', gezinsPoort, nietBeschermd, alsGezin(DOEN.locatie));
+  app.post('/api/rtf/labfonds/doneer', gezinsPoort, nietBeschermd, alsGezin(DOEN.doneer));
+  app.post('/api/rtf/labfonds/voorstel/maak', gezinsPoort, nietBeschermd, alsGezin(DOEN.voorstel));
+  app.post('/api/rtf/labfonds/stem', gezinsPoort, nietBeschermd, alsGezin(DOEN.stem));
   app.post('/api/rtf/labfonds/scheidsrechter', gezinsPoort, alsGezin(DOEN.scheidsrechter));
-  app.post('/api/rtf/labfonds/beslis', gezinsPoort, volwassenGezin, alsGezin(DOEN.beslis));
+  app.post('/api/rtf/labfonds/beslis', gezinsPoort, nietBeschermd, alsGezin(DOEN.beslis));
   app.post('/api/rtf/labfonds/financiering', gezinsPoort, alsGezin(DOEN.financiering));
 
   // de boardroom ziet het hele fonds

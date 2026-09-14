@@ -377,7 +377,7 @@ test('6. de beloofde poort staat er ook echt, als middleware en niet in de handl
      stil naar acht kruipen, dan is de leeskant dichtgezet zonder dat iemand dat
      heeft gekozen; kruipt hij naar nul, dan kan een kind over onderzoeksgeld
      stemmen. Allebei zakt hier. */
-  const metVolwassen = regels.filter((r) => /volwassenGezin/.test(r));
+  const metVolwassen = regels.filter((r) => /nietBeschermd/.test(r));
   assert.equal(metVolwassen.length, 5,
     'vijf gezinsroutes horen een volwassen profiel te eisen, niet ' + metVolwassen.length);
   for (const naam of ['locatie/maak', 'doneer', 'voorstel/maak', 'stem', 'beslis']) {

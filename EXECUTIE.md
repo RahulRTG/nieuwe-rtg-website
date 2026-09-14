@@ -228,10 +228,10 @@ bestaat. Daarom: eerst schaduw, dan tanden.
 | | aantal |
 |---|---|
 | routes met een rol | <!--getal:idem.routesMetRol-->4189<!--/getal--> |
-| beoordeeld | <!--getal:idem.beoordeeld-->1678<!--/getal--> |
-| beschermd | <!--getal:idem.beschermd-->1677<!--/getal--> |
+| beoordeeld | <!--getal:idem.beoordeeld-->1682<!--/getal--> |
+| beschermd | <!--getal:idem.beschermd-->1681<!--/getal--> |
 | onbeschermd | **<!--getal:idem.onbeschermd-->1<!--/getal-->** |
-| ongemeten | <!--getal:idem.ongemeten-->3245<!--/getal--> |
+| ongemeten | <!--getal:idem.ongemeten-->3241<!--/getal--> |
 
 Dit staat er beter voor dan `CLAUDE.md` beweert (dat noemt nog 115 gemeten; dat
 cijfer is verouderd). Van alles wat beoordeeld is, is niets onbeschermd. De
@@ -656,8 +656,8 @@ paden die de AI mag bedienen:
 
 | graad | aantal | wat het zegt |
 |---|---|---|
-| `gemeten` | <!--getal:gevolg.gemeten-->24<!--/getal--> | de proef raakte deze collecties aan |
-| `geen-effect-gemeten` | <!--getal:gevolg.geenEffect-->55<!--/getal--> | de proef draaide en raakte niets aan |
+| `gemeten` | <!--getal:gevolg.gemeten-->31<!--/getal--> | de proef raakte deze collecties aan |
+| `geen-effect-gemeten` | <!--getal:gevolg.geenEffect-->48<!--/getal--> | de proef draaide en raakte niets aan |
 | **`onbekend`** | **<!--getal:gevolg.onbekend-->95<!--/getal-->** | de proef kwam er niet bij (404, 403, geen geldige invoer) |
 
 Die getallen stonden hier tot 13 september OVERGETYPT, en waren verouderd: er stond
@@ -679,7 +679,7 @@ zij is een momentopname van de laatste proefronde, niet van deze commit.
 #### Het gevolgcontract: de VERKLARING naast de meting (13 september 2026)
 
 De meting hierboven is hard en smal: zij zegt wélke collecties veranderen, van
-<!--getal:gevolg.gemeten-->24<!--/getal--> van de <!--getal:gevolg.bereikbaar-->174<!--/getal-->
+<!--getal:gevolg.gemeten-->31<!--/getal--> van de <!--getal:gevolg.bereikbaar-->174<!--/getal-->
 bereikbare handelingen. Over <!--getal:gevolg.onbekend-->95<!--/getal--> weet zij niets, en
 over de buitenwereld weet zij per definitie niets — mail, een provider, de bank van
 de ontvanger staan in geen enkele collectie. Een planner die daarop zou leunen, plant

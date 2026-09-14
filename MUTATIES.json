@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-14T23:15:34.849Z",
-    "commit": "381b3d33",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-14T23:54:04.762Z",
+    "commit": "d43c8772",
+    "boomVuil": true,
+    "boomAnders": 8,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -5688,6 +5688,13 @@
       "operator": "===->!==#0",
       "gezakt": 14,
       "geprobeerd": 1
+    },
+    "onderneming-zaakkant.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "onderneming.test.js": {
       "soort": "server",

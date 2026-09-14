@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-14T23:15:53.305Z",
-  "commit": "381b3d33",
-  "boomVuil": false,
-  "boomAnders": 0,
+  "op": "2026-09-14T23:49:23.831Z",
+  "commit": "d43c8772",
+  "boomVuil": true,
+  "boomAnders": 1,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4938,
-  "geclassificeerd": 4938,
+  "totaal": 4939,
+  "geclassificeerd": 4939,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3189,
-   "NOT_APPLICABLE": 1182,
+   "NOT_APPLICABLE": 1183,
    "PROTECTED": 439,
    "INTENTIONALLY_NON_IDEMPOTENT": 128
   },
-  "vastgesteldDoorMens": 1797,
+  "vastgesteldDoorMens": 1798,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4076,
+   "AUTHENTICATED": 4077,
    "PUBLIC": 123,
    "OBJECT_SCOPED": 718,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 128,
    "kale ronde: onbeschermd": 118,
    "kale ronde: geen uitspraak": 4679,
-   "niet gemeten": 13
+   "niet gemeten": 14
   },
   "voorstellen": {},
   "metingVan": "2026-09-14T17:24:33.323Z"
@@ -112366,6 +112366,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "onderneming.zaakkant.lezen",
+   "route": "POST /api/supplier/onderneming",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": null,
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

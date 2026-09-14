@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1578,
+    "kernBreedte": 1579,
     "kernGedeeld": 237,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -112,6 +112,15 @@
     "stilSpoorAanroepen": 228
   },
   "notities": [
+    {
+      "datum": "2026-09-14",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1578,
+      "meter": "kernBreedte 1578 -> 1579; kernGedeeld blijft 237",
+      "reden": "De brug uit ONDERNEMEN.md par. 1: de werkvloer kon het ondernemingsobject niet kennen (`zaakZietOnderneming` stond op 0, gemeten door scripts/ondernemerslus.js), dus kern/onderneming kende de zaak wel en de zaak het bedrijfsobject niet. Er komt EEN kernnaam bij, `ondernemingAchterZaak`, en dat is met opzet geen twee. De route had ook `ondernemingVanZaak` plus `ondernemingBeeld` kunnen aanraken -- dan waren dat TWEE namen geweest die daarna door member en supplier samen worden aangeraakt, en was kernGedeeld 237 -> 239 gegaan. Een eigen toegang houdt de koppeling op een naam en zet de versmalling bovendien in de module die het object BEZIT: daar hoort het besluit over wat er gedeeld wordt, niet in een route. Vandaar dat de brede meter (kernBreedte) een stap zet en de meter die over verstrengeling gaat (kernGedeeld) niet beweegt -- dat is hier de uitslag die telt.",
+      "waarheen": "server/kern/onderneming/zaakkant.js (de projectie, opgebouwd uit een positieve lijst en zonder save of db), server/routes/supplier/onderneming.js (een handler van een regel) en test/onderneming-zaakkant.test.js (zes toetsen, met een besturingsproef in toets 5 en een brontoets in toets 6). De brug loopt EEN kant op; zou hij ooit terugschrijven, dan is dat de plek om hem weer te splitsen."
+    },
     {
       "datum": "2026-09-12",
       "soort": "schuld",

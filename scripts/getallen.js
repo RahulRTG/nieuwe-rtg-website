@@ -392,6 +392,22 @@ const GETALLEN = {
     wat: 'scenario\'s waarin de resolver de context aantoonbaar gebruikte' },
   'menselijk.niemandKeek': { bron: 'MENSELIJKE_UITVOERING.json', veld: 'telling.contextNiemandKeek',
     wat: 'scenario\'s waarin de resolver niet draaide, dus niemand naar de context keek' },
+  'land.landen': { bron: 'LANDDEKKING.json', veld: 'telling.landen',
+    wat: 'landen waarvan kern/fiscaal/landen.js de tarieven en loonkennis draagt' },
+  'land.volledig': { bron: 'LANDDEKKING.json', veld: 'telling.landenVolledig',
+    wat: 'landen die alle onderscheidende uitvoeringsassen halen' },
+  'land.assen': { bron: 'LANDDEKKING.json', veld: 'telling.onderscheidendeAssen',
+    wat: 'assen die onderscheidend zijn (niet voor elk land aanstaan)' },
+  'land.rechtsvorm': { bron: 'LANDDEKKING.json', veld: 'telling.perAs.rechtsvorm',
+    wat: 'landen waarvan RTG de rechtsvormen kent' },
+  'land.loonuitvoering': { bron: 'LANDDEKKING.json', veld: 'telling.perAs.loonuitvoering',
+    wat: 'landen waar werkelijk loon gedraaid kan worden' },
+  'land.fiscaalJaargang': { bron: 'LANDDEKKING.json', veld: 'telling.perAs.fiscaalJaargang',
+    wat: 'landen met een meegeleverde fiscale jaargang' },
+  'land.register': { bron: 'LANDDEKKING.json', veld: 'telling.perAs.bedrijfsregister',
+    wat: 'landen met een aanwijsbaar ondernemingsregister' },
+  'land.zonderEnige': { bron: 'LANDDEKKING.json', veld: 'telling.landenZonderEnige',
+    wat: 'landen waar RTG alleen kennis heeft en geen enkele uitvoeringsas' },
   /* De duur van die parseronde staat MET OPZET niet in deze lijst. Een levend
      getal moet uit een register komen dat bij gelijke code hetzelfde zegt; een
      tijdmeting doet dat niet (4,6 of 4,8 op dezelfde commit), en een controle
@@ -404,7 +420,7 @@ const GETALLEN = {
    dag ook iets dat niemand had bedoeld. */
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
-  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md'];
+  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'FRANCHISE.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

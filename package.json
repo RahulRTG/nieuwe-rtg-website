@@ -355,6 +355,8 @@
     "toelatingsproef:vast": "node scripts/toelatingsproef.js --vastleggen",
     "doelgroepbereik": "node scripts/doelgroepbereik.js",
     "doelgroepbereik:vast": "node scripts/doelgroepbereik.js --vastleggen",
+    "landdekking": "node scripts/landdekking.js",
+    "landdekking:vast": "node scripts/landdekking.js --vastleggen",
     "aanvoervorm": "node scripts/aanvoervorm.js",
     "aanvoervorm:vast": "node scripts/aanvoervorm.js --vastleggen",
     "kantoormacht": "node scripts/kantoormacht.js",

@@ -196,6 +196,15 @@ const REGISTER = {
      moet vangen. */
   'OMZETPROEF.json': { eigenRatel: 'test/omzetproef.test.js' },
 
+  /* De landdekking heeft twee tanden die de TEGENOVERGESTELDE kant op staan, en
+     dat is met opzet: `landenVolledig` mag alleen omhoog en `landenZonderEnige`
+     alleen omlaag. Met een tand zou het getal te verbeteren zijn door een land
+     uit kern/fiscaal/landen.js te halen -- minder landen zonder dekking, zonder
+     dat er iets bijkwam. De toets bewaakt daarnaast de INDELING van de meting
+     (welke as ondergrens is, wordt geteld en niet ingetikt), want een meter die
+     kennis als dekking telt, meet het tegenovergestelde van wat hij moet meten. */
+  'LANDDEKKING.json': { eigenRatel: 'test/landdekking.test.js' },
+
   /* De adressen die de documenten noemen. De toets bevriest het register NIET --
      ADRESSEN.json beweegt bij elke documentregel die een pad noemt, en een tand
      op gelijkheid zou zakken om een reden die niets met adressen te maken heeft.

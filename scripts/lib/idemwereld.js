@@ -116,10 +116,42 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
   w.spaarIban = veld(await stil('/api/bank/rekening/open', { soort: 'spaar', naam: 'Proefspaarpot' }, tokens.member), 'rekening', 'iban');
   if (w.iban) w.pasId = veld(await stil('/api/bank/pas/uitgeven', { iban: w.iban, soort: 'debit', naam: 'Proefpas' }, tokens.member), 'pas', 'id');
 
-  /* 6. EEN VASTE BETALING, zodat terugkerend/stop iets te stoppen heeft. */
+  /* 6. TWEE VASTE BETALINGEN -- en let op de `idem`, want die ontbrak en dat kostte twee
+        metingen.
+
+        DE FOUT DIE HIER ZAT. `stil()` stuurt geen idempotentiesleutel mee, en
+        /api/bank/terugkerend/zet is een GELDroute: die weigert zonder sleutel met 400
+        ("Deze opdracht verplaatst geld en vraagt een idempotentiesleutel"). De reeks werd
+        dus nooit aangemaakt, `w.terugkerendId` bleef null, en `heel()` liet
+        /api/bank/terugkerend/stop terecht uit geldLijf() vallen -- die route staat in
+        IDEMPROEF.json dan ook op `ongemeten` met een lege opslag. Dat de PROEF zelf
+        /api/bank/terugkerend/zet wel gemeten krijgt, verhulde het: zij stuurt op elke
+        gemeten oproep een sleutel mee, dus de route werkt en alleen het VOORWERK faalde.
+
+        DE TWEEDE REEKS IS VOOR DE INCASSORONDE, en die is met opzet apart:
+        /api/office/bank/incasso weigerde met 400 ("Er staat geen enkele vaste betaling aan
+        de beurt") omdat `zet` de eerste termijn een heel interval in de toekomst legt. De
+        eerste reeks kan dat gat niet vullen, want /api/bank/terugkerend/stop zet juist die
+        op `actief: false` en de proef kent geen vaste route-orde -- een meting die van de
+        volgorde afhangt is geen meting. Deze reeks wordt door geen enkele route opgemaakt.
+
+        WEEK EN GEEN MAAND: het lijf in geldLijf() zet `tot` op nu + 8 dagen, dus deze reeks
+        is exact EEN keer aan de beurt en de maandreeks hierboven niet. Een verre grens zou
+        de lus in kern/bank/incasso.js tot 500 termijnen laten tellen.
+
+        EN DIT BREEKT HET MEETOBJECT NIET OPEN. Vergelijk `bank/krediet/besluit`, dat in
+        geldLijf() met reden blind blijft omdat de proef er een vergunning voor zou moeten
+        forceren. Hier wordt niets geforceerd: een lid zet langs de gewone route een vaste
+        betaling, en de vraag aan het kantoor blijft de echte vraag -- in wat er aan de beurt
+        is. */
   if (w.iban && w.iban2) {
     w.terugkerendId = veld(await stil('/api/bank/terugkerend/zet',
-      { vanIban: w.iban, naarIban: w.iban2, centen: 100, interval: 'maand', oms: 'proefreeks' }, tokens.member), 'terugkerend', 'id');
+      { vanIban: w.iban, naarIban: w.iban2, centen: 100, interval: 'maand', oms: 'proefreeks',
+        idem: 'wereld-tk-maand' }, tokens.member), 'terugkerend', 'id');
+    w.incassoReeksId = veld(await stil('/api/bank/terugkerend/zet',
+      { vanIban: w.iban, naarIban: w.iban2, centen: 100, interval: 'week', oms: 'proefincasso',
+        idem: 'wereld-tk-week' }, tokens.member), 'terugkerend', 'id');
+    if (w.incassoReeksId) w.incassoTot = Date.now() + 8 * 24 * 60 * 60 * 1000;
   }
 
   /* 7. TWEE KLOMPJES, en dat is met opzet twee. `verzoek/betaal` wil er een die
@@ -896,7 +928,12 @@ function geldLijf(w) {
        openbreekt om een getal te halen, meet niets meer. Die twee blijven dus
        blind, en dat staat in KANTOORMACHT.json met hun reden. */
     '/api/office/bank/rekening/open': { codenaam: w.cn2, soort: 'spaar', naamRek: 'Kantoorproefpot' },
-    '/api/office/bank/rekening/rood': { iban: w.iban, euro: 100 }
+    '/api/office/bank/rekening/rood': { iban: w.iban, euro: 100 },
+    /* DE INCASSORONDE. `tot` komt uit de wereld (stap 6) en staat er alleen als die
+       wereld haar eigen reeks heeft kunnen zetten -- zonder dat is er niets aan de beurt
+       en weigert de route terecht. De `heel`-controle hieronder laat deze route dan
+       wegvallen in plaats van hem met een halve invoer te laten stranden. */
+    '/api/office/bank/incasso': { tot: w.incassoTot }
   };
   /* Een route waarvan de wereld het benodigde stuk NIET heeft opgeleverd, krijgt
      hier niets. Anders zou hij een lijf met `id: null` krijgen en op een andere

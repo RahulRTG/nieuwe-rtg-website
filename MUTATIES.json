@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-14T16:37:14.282Z",
-    "commit": "eea6024e",
+    "op": "2026-09-14T23:29:12.076Z",
+    "commit": "99043478",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -4160,6 +4160,14 @@
       "module": "server/kern/labfonds.js",
       "operator": "===->!==#0",
       "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "landdekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/landdekking.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "landpakket.test.js": {

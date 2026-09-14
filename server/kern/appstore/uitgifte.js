@@ -78,6 +78,12 @@ function maakUitgifte(kern, E) {
          het lid het niet gaf. Het bepaalt nooit wat er mag -- dat doet
          `machtigingen` hierboven, en dat is wat het lid verleende. */
       vraagt: toonbaar(v.manifest.machtigingen, v.manifest.doelen),
+      /* WAT HET LID PROBEERDE TE GEVEN EN NIET KON, als machtiging -> eissleutel.
+         Gaat mee om precies één reden: zonder dit kan de brug een derde geval
+         niet uit elkaar houden van "het lid gaf het niet", en stuurt hij een
+         uitgever -- en daarmee het lid -- naar een knop die het niet oplost. Het
+         bepaalt nooit wat er mag; dat blijft `machtigingen`. */
+      versmald: verleend.versmald || null,
       /* DE CEL ZELF, ZICHTBAAR. De grenzen van dit kanaal zijn het sterkste wat
          er over deze app te zeggen valt, en ze stonden alleen in een dossier dat
          je apart moest opzoeken. Ze gaan nu mee met de opening, zodat het scherm

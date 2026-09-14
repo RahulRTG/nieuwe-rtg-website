@@ -51,6 +51,16 @@ const CODES = {
     uitleg: 'De app vraagt deze machtiging in zijn manifest, maar dit lid heeft hem niet verleend of weer ingetrokken.',
     uitgezondenDoor: 'server/kern/appstore/brug.js'
   },
+  /* HET DERDE GEVAL. Het lid VINKTE deze machtiging aan en mocht hem zelf niet
+     weggeven, dus is hij niet verleend (kern/namens/versmalling.js). Hij heeft
+     een eigen code omdat de uitweg een andere is dan bij de twee hierboven:
+     daar kan het lid iets aanzetten of de uitgever iets aan zijn manifest
+     veranderen, en hier kan geen van beiden iets. */
+  RTG_MACHTIGING_VERSMALD: {
+    status: 403, herhaalbaar: false,
+    uitleg: 'Het lid heeft deze machtiging aangevinkt, maar mag hem zelf niet weggeven; hij is daarom niet verleend. Noch het lid noch de uitgever lost dit met een knop op.',
+    uitgezondenDoor: 'server/kern/appstore/brug.js'
+  },
   RTG_MACHTIGING_NIET_GEVRAAGD: {
     status: 403, herhaalbaar: false,
     uitleg: 'De app vraagt deze machtiging niet in zijn manifest, dus het lid heeft hem ook nooit kunnen geven.',

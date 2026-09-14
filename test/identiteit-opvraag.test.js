@@ -100,8 +100,8 @@ test('gegevens opvragen levert het nodige, niet het document', () => {
   /* DE BEWERING WAAR HET OM DRAAIT: de medewerker kan het zelf terugvinden.
      Dat is de hele reden dat het journaal bestaat, en juist dat werkte niet. */
   const zijnEigen = inzagelog.voorBetrokkene(7);
-  assert.equal(zijnEigen.length, 1, 'de medewerker ziet deze inzage in zijn eigen dossier');
-  assert.ok(/loonadministratie/.test(zijnEigen[0].waarom), 'met de reden die de werkgever opgaf');
+  assert.equal(zijnEigen.regels.length, 1, 'de medewerker ziet deze inzage in zijn eigen dossier');
+  assert.ok(/loonadministratie/.test(zijnEigen.regels[0].waarom), 'met de reden die de werkgever opgaf');
 
   assert.equal(berichten.length, 1, 'en de medewerker krijgt bericht');
   assert.equal(berichten[0].key, 'user-7');

@@ -925,6 +925,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | mag lid A bij de spullen van lid B (horizontaal), met een zelfproef erop | `scripts/gluurronde.js` + `GLUURRONDE.json` + `ci.yml` |
 | geen vergunningsgegevens naar een beller die zich niet bekendmaakte | `server/middleware/schakelaar-antwoord.js` |
 | elke handhaver EEN keer echt uitgezet, om te zien wie er rood wordt | `scripts/sabotage.js` + `SABOTAGE.json` |
+| een belofte over een spoor die niet kan weigeren (de klasse, geen aanklacht) | `scripts/stilspoor.js` + `STILSPOOR.json` + drie ratels in `NORM.json` |
 | wat we na al dat meten weten, en vooral wat we niet weten | `scripts/zekerheid.js` |
 | bewijsgroen en go-live-groen kunnen elkaar niet groen praten | `scripts/check.js` regel 48 |
 | de dekkingsvloer, opgeteld over de vier delen van de suite | `scripts/dekkingsvloer.js` |

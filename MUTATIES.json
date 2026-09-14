@@ -3362,6 +3362,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "herrekenbaar.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
     "herstel-sandbox.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3798,6 +3806,14 @@
         "scripts/lib/invoerproef.js"
       ],
       "posities": 1
+    },
+    "inzagebewaring.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/inzagelog.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "inzagelog.test.js": {
       "soort": "puur",

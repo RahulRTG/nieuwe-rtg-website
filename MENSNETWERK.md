@@ -1354,7 +1354,49 @@ twee eigenschappen, en de ene wordt hier makkelijk voor de andere aangezien.
 | B. Aantal regels, eerlijk benoemd | Laat de 5000 staan en zeg het erbij. | Een grens die met het gebruik meebeweegt: bij druk verkeer is de horizon korter dan bij rustig, en niemand ziet dat. |
 | C. Archiveren met een anker | De afgevallen staart blijft controleerbaar buiten de database. | Het duurst, en `AFSPRAAK.md` waarschuwt al: een anker in dezelfde database is geen anker. |
 
-### Besluit 7 -- Wordt dit de twaalfde regel van `LAT.md`?
+#### Besluit 6 is genomen: A, en hij staat (13 september 2026)
+
+**De bewaring volgt de belofte, en niet andersom.** `server/inzagelog-bewaring.js`
+houdt de termijn op EEN plek: `BEWAARDAGEN = 730`, en dat is een keuze met een
+grond -- het inzagejournaal is het bewijs OVER toegang, dus het hoort de gegevens
+waarover het gaat te overleven. Het identiteitsbewijs zelf valt na een jaar
+(`server/bewaarveger.js`); het spoor dat iemand ernaar keek blijft daar een jaar
+overheen staan.
+
+**`MAX` is gebleven, maar het is nu een NOODREM en geen bewaartermijn.** 200.000
+in plaats van 5.000, dus ruim boven wat de termijn oplevert -- en bijt hij toch,
+dan telt het journaal dat (`inzageLogAfgekapt`) en zegt het antwoord het hardop.
+Vier dingen daar niet wegpoetsen.
+
+**Verjaren en afgekapt worden zijn twee soorten verlies en ze gaan nooit op een
+hoop.** Een regel die VERJAART is de bewaartermijn die werkt; een regel die door
+de noodrem valt is de belofte die breekt. Alleen de tweede wordt geteld, want
+alleen de tweede is een tekort -- wie ze samentelt verbergt het tekort in het
+normale verloop.
+
+**De belofte reist mee met het antwoord.** `voorBetrokkene()` gaf een kale array
+terug, en dan raadt het scherm wat zij betekent: het raadt *"dit is alles"*,
+terwijl het *"dit is alles binnen de termijn"* is. Het antwoord draagt nu
+`bewaardagen`, een uitgeschreven `belofte`, een expliciet `volledig` en bij een
+tekort de zin die dat zegt. Nul is daar een UITSPRAAK en geen leeg veld: het zegt
+dat de noodrem nooit heeft gebeten, en dus dat de termijn de hele belofte draagt.
+
+**De vormwijziging legde drie productie-lezers bloot die er niet zouden zijn.**
+De eerste aanname was dat `voorBetrokkene()` geen aanroepers had; er zijn er
+drie, en twee toetsen stonden er rood door. Alle drie zijn AANGESLOTEN in plaats
+van teruggedraaid, want juist daar hoort de belofte te landen:
+
+| Lezer | Wat hij nu draagt |
+|---|---|
+| `kern/inzagekaart.js` | `bewaring` **per bron** -- het journaal kent zijn termijn, RTG iD en de paspoortlaag houden hun eigen bewaring bij en deze laag weet die niet. `null` is daar een uitspraak, en de onbekende helft staat even groot op het scherm. |
+| idem | bijt de noodrem, dan verschijnt dat tekort in `nietZichtbaar` -- in dezelfde lijst als de rest van wat de kaart niet kan tonen, want dat is precies wat het is. |
+| `/api/privacy/inzage` en de AVG-export | `inzage` blijft de lijst (geen bestaand scherm merkt er iets van), `bewaring` staat ernaast. |
+
+**Een getal over vier bronnen zou de langste of de kortste tot waarheid maken,
+en allebei is onwaar.** Daarom per bron en niet als een cijfer over het geheel --
+dezelfde regel als overal in dit huis: er staat nooit een getal waar er geen is.
+
+### Besluit 7 -- Wordt dit een eigen regel van `LAT.md`?
 
 Grens 4 van par. 6 is hier geformuleerd voor het inzagejournaal, maar hij gaat
 nergens specifiek over inzage:
@@ -1364,25 +1406,67 @@ nergens specifiek over inzage:
 Dezelfde vraag staat open bij financiële logging, bij consent, bij het
 mutatiebewijs, bij het akkoord op voorwaarden en bij gevoelige AI-handelingen --
 overal waar dit huis zegt dat iets wordt vastgelegd. `LAT.md` is de plek voor een
-regel die overal geldt, en zijn elf regels komen alle elf uit een fout die hier
-écht is gemaakt. Deze zou de twaalfde zijn, en hij heeft die fout nu ook.
+regel die overal geldt, en zijn regels komen allemaal uit een fout die hier écht
+is gemaakt. Deze heeft die fout nu ook.
 
-**De omvang is gemeten en hij is bewust ruw.** In `server/` staan **468** lege
-`catch`-blokken, waarvan er **13** letterlijk de vorm `try { save(); } catch`
-hebben -- dezelfde als `inzagelog.js`.
+**GENOMEN OP 13 SEPTEMBER 2026, OPTIE A: hij staat in `LAT.md` als regel 13** --
+niet als twaalfde, zoals dit document eerst schreef. Die was al bezet door *een
+meting die niet heeft gedraaid is geen slechte uitslag*, en een document dat de
+regels van een ander document nummert zonder te tellen, is zelf een geval van
+LAT-regel 4. De regel kwam binnen mét zijn handhaver, precies wat optie A
+vroeg: besluit 5 was al gebouwd (`inzagelog.noteerVast()` +
+`kern/ledenbalie-inzage.js`, par. 0.6a), en daarnaast staat nu de meter die de
+KLASSE telt.
 
-Dat getal is een **vorm en geen aanklacht**, in de zin van `DOODSPOOR.json`: veruit
-de meeste lege catches zijn terecht (opruimwerk waar mislukken niet uitmaakt --
-`try { res.destroy(err); } catch (e) {}` is geen bug). De dertien zijn de plekken
-waar een duurzaamheidsfout wordt weggeslikt, en pas per stuk nakijken zegt of
-daar ook een belofte boven hangt. Wat de meting wél vaststelt: de vorm is niet
-uniek voor het journaal, en een regel die hem vangt heeft meer dan één klant.
+**De omvang was geschat en is nu gemeten** (`npm run stilspoor`,
+`STILSPOOR.json`). De eerste schatting was een grep: 468 lege `catch`-blokken in
+`server/`, waarvan 13 letterlijk `try { save(); } catch`. De meter leest het lijf
+GEBALANCEERD -- dus ook een smoring die over meerdere regels loopt -- gaat de
+hele boom af, en telt een lijf met alleen een toelichting als leeg. Dat laatste
+is het punt en geen tekortkoming: **een commentaar maakt een smoring niet minder
+stil**, en wie de bron ruw leest telt juist de best toegelichte smoringen als
+afgehandeld. Het zijn daarmee twee verschillende metingen en ze horen niet te
+worden vergeleken of opgeteld.
 
-| Optie | Wat het betekent | Prijs |
-|---|---|---|
-| **A. Ja, maar pas na de eerste handhaver** *(aanbevolen)* | De regel komt in `LAT.md` zodra besluit 5 gebouwd is, zodat hij met een werkend voorbeeld binnenkomt in plaats van als voornemen. | Een regel meer, en de dertien vragen dan een ronde: draagt hier een belofte boven? |
-| B. Ja, nu | Sneller vastgelegd. | `LAT.md` zegt zelf dat een regel zonder handhaver een belofte is; dat zou de twaalfde regel meteen overtreden. |
-| C. Nee, hij blijft van deze laag | Geen huisbrede belofte die niemand nakomt. | Dan wordt hij per domein opnieuw ontdekt, en dat is precies hoe deze er kwam. |
+| | gemeten |
+|---|---|
+| bronbestanden in `server/` | 3424 |
+| `catch`-blokken | 1841 |
+| daarvan volledig leeg | 674 |
+| **SPOOR-schrijvers gesmoord** | **18** (van 221 aanroepen) |
+| **OPSLAG-schrijvers gesmoord** | **24** (van 3193 aanroepen) |
+
+Dat getal is een **vorm en geen aanklacht**, in de zin van `DOODSPOOR.json`.
+Veruit de meeste lege catches zijn terecht, en dat geldt ook binnen de
+tweeënveertig: `server/log.js` smoort `noteerFout` omdat een logger die zelf
+gooit de oorspronkelijke fout maskeert, en `kern/envelop.js` zegt met zoveel
+woorden dat de LEVERING voorgaat -- een geweigerde actor houdt een melding nooit
+tegen. De uitweg is daarom niet een uitzonderingenlijst in de meter maar een
+**besluitregister ernaast**, in de vorm van `HERREKENBAAR.json` naast
+`FAALPROEF.json`: een verklaring is een besluit en wordt **nooit van de telling
+afgetrokken**. Dat register bestaat nog niet, en met opzet -- er is nog geen
+enkel besluit genomen, en een leeg besluitregister is een belofte die niemand
+heeft gedaan. De haak ligt er (`STILSPOORBESLUIT.json`); wie het eerste besluit
+neemt, schrijft het bestand en de telling splitst vanzelf.
+
+**Drie ratels, en ze doen niet hetzelfde.** `stilSpoor` en `stilleOpslag` mogen
+alleen omlaag: dat is de schuld. Ze staan apart omdat het twee beloftes zijn --
+bij de eerste verdwijnt het spoor, bij de tweede het gegeven -- en een optelling
+verbergt welke van de twee bewoog. `stilSpoorAanroepen` mag alleen omhoog, want
+de herkenning is lexicaal: een meter die stil minder spoor-schrijvers vindt,
+meldt dezelfde lage schuld over minder bewijs. **Een schuld die daalt doordat het
+instrument blind wordt, is de gevaarlijkste vorm van vooruitgang** -- dezelfde
+tandvorm als bij `AICONTEXT.json`.
+
+**En de meter maakte onderweg zelf de fout van `BEWIJSMACHINE.md` par. 6a.** De
+eerste versie gaf per bevinding een regelnummer uit de bron ná
+`zonderCommentaar()`, en die plet een blokcommentaar tot één spatie: elk
+regelnummer erná schoof op. De uitslag zag er volkomen geldig uit -- 18 en 24,
+dezelfde getallen -- en wees naar regels die in het echte bestand iets anders
+bevatten. `zonderCommentaar(bron, { regelsHeel: true })` is de derde stand die
+`scripts/lib/bron.js` in zijn kop al noemt; na die reparatie wijzen alle 42
+plekken op een `catch`, nagelopen met `sed`. Een handhaver van een regel over
+stille fouten, die zelf stil de verkeerde regel aanwees.
 
 ---
 

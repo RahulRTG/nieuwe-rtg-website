@@ -26,13 +26,20 @@
 
    Bewust zonder eigen opslaglaag: het journaal leeft in db.data.inzageLog en
    gaat dus mee in dezelfde duurzame opslag (JSON/SQLite/Postgres) als de rest.
-   Begrensd op MAX regels; loopt hij vol, dan valt de oudste eraf. Wie langer
-   moet bewaren, exporteert periodiek (zie lijst()). */
-const MAX = 5000;
+
+   HOE LANG HET JOURNAAL BEWAART staat in ./inzagelog-bewaring.js, met de reden
+   erbij. Kort: op TIJD en niet op aantal, want een bovengrens op aantal maakt
+   een andere belofte waar dan die aan het lid. */
 
 const { hangAan, verifieer, top } = require('./lib/keten');
 const { verankerPunt, verifieerTegenAnker } = require('./lib/keten-anker');
 const { nu, datum } = require('./lib/klok');
+/* DE BEWARING, LOS. Een derde naad in het ONDERWERP naast ./inzagelog-lezen.js:
+   hier wordt geschreven, daar gelezen, en in ./inzagelog-bewaring.js staat hoe
+   lang het blijft staan. `snoei` krijgt de db-laag via een functie mee en niet
+   als waarde, want zet() komt pas bij het opstarten langs. */
+const { BEWAARDAGEN, MAX, maakSnoei } = require('./inzagelog-bewaring');
+const snoei = maakSnoei(() => DB);
 
 /* De db-laag komt via zet() binnen, zodat dit bestand niets circulair
    importeert en tests hem met een nepdatabase kunnen vullen.
@@ -123,7 +130,7 @@ function schrijfRegel({ door, over, waarom, bron, extra } = {}) {
   const l = rij();
   const r = hangAan(l, kaal);
   l.unshift(r);
-  if (l.length > MAX) l.length = MAX;
+  snoei(l);
   return r;
 }
 
@@ -169,7 +176,14 @@ const { noteerVast, noteerVeelVast } = require('./inzagelog-vast')({
    nalopen zijn een ander onderwerp dan schrijven, met andere lezers. De rij
    gaat als FUNCTIE mee, zodat er maar een plek is die weet waar het journaal
    woont. */
-const lezen = require('./inzagelog-lezen')({ rij });
+const lezen = require('./inzagelog-lezen')({
+  rij,
+  /* De termijn en de noodremteller gaan MEE naar de leeskant in plaats van dat
+     die ze zelf ophaalt: zo is er een plek die weet hoe lang dit huis bewaart,
+     en kan een scherm niet iets anders beweren dan de opslag doet. */
+  bewaardagen: BEWAARDAGEN,
+  afgekapt: () => { try { return Number(DB && DB.data && DB.data.inzageLogAfgekapt) || 0; } catch (e) { return 0; } }
+});
 const { lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker } = lezen;
 
-module.exports = { zet, noteer, noteerVast, noteerVeel, noteerVeelVast, lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker, MAX };
+module.exports = { zet, noteer, noteerVast, noteerVeel, noteerVeelVast, lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker, MAX, BEWAARDAGEN };

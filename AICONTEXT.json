@@ -1,0 +1,153 @@
+{
+  "stempel": {
+    "op": "2026-09-13T13:59:27.748Z",
+    "commit": "1b5b464c",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/aicontext.js",
+    "node": "v22.22.2"
+  },
+  "gemeten": "2026-09-13T13:59:27.788Z",
+  "graad": "vermoed",
+  "grens": "dit meet de LEDENcontext van Rahul (kern/ai/prompt.js) en verder niets: de werkcontexten (zaak, personeel, kantoor) hebben eigen samenstellers en zijn hier niet gemeten. Het zegt ook niets over wat een model met de context DOET, niets over andere wegen waarlangs gegevens het huis verlaten, en de veldinventaris is lexicaal -- een ledenstaat onder een naam die deze meter niet kent, valt erbuiten. Een lege doorsnede betekent dus \"niet gevonden\", niet \"kan niet bestaan\".",
+  "waarom": "de veldinventaris is lexicaal en dus een ONDERgrens: een ledenstaat onder een andere naam valt erbuiten. De muur is hoogstens dunner dan hier staat, nooit dikker.",
+  "samensteller": {
+    "bestand": "server/kern/ai/prompt.js",
+    "functie": "aiSystemPrompt(tier, lang, key)"
+  },
+  "invoeren": [
+    {
+      "naam": "db",
+      "sleutel": "globaal",
+      "aanroep": "db",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "PERSONAS",
+      "sleutel": "pas",
+      "aanroep": "PERSONAS",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "AI_TONE",
+      "sleutel": "pas",
+      "aanroep": "AI_TONE",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "naamEn",
+      "sleutel": "globaal",
+      "aanroep": "naamEn(lang | lang)",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "dagContext",
+      "sleutel": "globaal",
+      "aanroep": "dagContext()",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "stemmingVoor",
+      "sleutel": "globaal",
+      "aanroep": "stemmingVoor({ kind: false, werk: false })",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "geloofRegel",
+      "sleutel": "lid",
+      "aanroep": "geloofRegel(key)",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "ledenInhoudVan",
+      "sleutel": "lid",
+      "aanroep": "ledenInhoudVan(key)",
+      "herkomst": "ctx"
+    },
+    {
+      "naam": "rahulOmgangVoor",
+      "sleutel": "lid",
+      "aanroep": "rahulOmgangVoor(key)",
+      "herkomst": "../rahul"
+    },
+    {
+      "naam": "RAHUL_KARAKTER",
+      "sleutel": "statisch",
+      "aanroep": "RAHUL_KARAKTER",
+      "herkomst": "./karakter"
+    },
+    {
+      "naam": "TAALREGELS",
+      "sleutel": "statisch",
+      "aanroep": "TAALREGELS",
+      "herkomst": "../rahul/taal"
+    },
+    {
+      "naam": "TWIJFELREGELS",
+      "sleutel": "statisch",
+      "aanroep": "TWIJFELREGELS",
+      "herkomst": "../rahul/twijfel"
+    }
+  ],
+  "telling": {
+    "lid": 3,
+    "pas": 2,
+    "globaal": 4,
+    "statisch": 3
+  },
+  "ledenstaat": {
+    "namen": [
+      "md",
+      "st"
+    ],
+    "velden": [
+      "aanhef",
+      "adres",
+      "bewaarVerzoek",
+      "conversation",
+      "emailBevestiging",
+      "faceMatch",
+      "fase",
+      "foundationMeldingen",
+      "geboren",
+      "geborenBron",
+      "geloof",
+      "geslacht",
+      "geverifieerdOp",
+      "invoices",
+      "mailwissel",
+      "nationaliteit",
+      "needsConcierge",
+      "omgang",
+      "paspoort",
+      "publiekeMailLokaal",
+      "selfie",
+      "toegankelijk",
+      "vakbewijsNummers",
+      "via",
+      "voornaamwoord"
+    ],
+    "aantal": 25,
+    "doorKantoorGeschreven": [
+      "bewaarVerzoek",
+      "conversation",
+      "faceMatch",
+      "geboren",
+      "geborenBron",
+      "geslacht",
+      "geverifieerdOp",
+      "nationaliteit",
+      "needsConcierge"
+    ]
+  },
+  "muur": {
+    "vorm": "veldselectie op naam in server/kern/ai/prompt.js",
+    "gelezenVelden": [
+      "invoices",
+      "trip"
+    ],
+    "aantalGelezen": 2,
+    "aantalNietGelezen": 24,
+    "lek": []
+  }
+}

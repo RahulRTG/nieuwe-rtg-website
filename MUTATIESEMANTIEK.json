@@ -3,12 +3,12 @@
   "vastgelegd": "2026-09-13",
   "gemeten": {
     "routesMetRol": 4179,
-    "routesGevonden": 4437,
-    "verklaard": 35,
-    "onverklaard": 4402,
+    "routesGevonden": 4448,
+    "verklaard": 37,
+    "onverklaard": 4411,
     "beproefd": 1668,
     "onbereikbaarVoorDeProef": 3244,
-    "verklaardEnBeproefd": 12,
+    "verklaardEnBeproefd": 13,
     "tegenspraken": 0,
     "onbekendeKlassen": 0,
     "randVerklaard": 9
@@ -446,6 +446,28 @@
       "waarom": "lezen */",
       "gemeten": "ongemeten",
       "reden": "de eerste oproep deed geen werk (status 409)",
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/incasso",
+      "bestand": "server/routes/kantoren/bank-incasso.js",
+      "regel": 56,
+      "klasse": "sleutelVereist",
+      "waarom": "MET dezelfde sleutel merkt de poort de herhaling",
+      "gemeten": "beschermd",
+      "reden": "de server merkte de herhaling zelf (herhaald: true)",
+      "tegenspraak": null
+    },
+    {
+      "methode": "POST",
+      "pad": "/api/office/bank/incasso/dossier",
+      "bestand": "server/routes/kantoren/bank-incasso.js",
+      "regel": 149,
+      "klasse": "idempotent",
+      "waarom": "alleen lezen; de enige schrijver van het journaal is de",
+      "gemeten": null,
+      "reden": null,
       "tegenspraak": null
     }
   ]

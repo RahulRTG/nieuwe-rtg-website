@@ -24,7 +24,7 @@ module.exports = (kern, hulp) => {
    een schakelaar met DRIE standen (partner -> hybride -> eigen) die bepaalt hoe
    RTG Bank clearet: via de externe kaart-naad, als eigen emissie, of allebei.
    Eerst gemount zodat de bank en de kantoor-routes dezelfde regie delen. */
-const bankregie = require('../kern/bankregie').maakBankregie({ db, save });
+const bankregie = require('../kern/bankregie').maakBankregie({ db, save, bijeen });
 Object.assign(kern, bankregie);
 /* De BEVOEGDHEID (kern/bevoegdheid.js): de zesde as naast de vijf van de
    functieschakelaars. Die vijf gaan over wie de gebruiker is en wat de beheerder

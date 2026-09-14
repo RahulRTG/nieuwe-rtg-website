@@ -55,6 +55,39 @@ const GETALLEN = {
     wat: 'routes met de vervalstaat bewezen' },
   'vertrouwen.geschorst': { bron: 'VERTROUWEN.json', veld: 'telling.geschorst',
     wat: 'routes met de vervalstaat geschorst' },
+  /* DE GEVOLGDEKKING (EXECUTIE.md blok 4). Deze getallen stonden in het document
+     overgetypt en waren daardoor verouderd: er stond 96 van 176 terwijl de verse
+     meting 87 van 173 zegt. Vandaar levend. */
+  'gevolg.bereikbaar': { bron: 'GEVOLGDEKKING.json', veld: 'tellers.bereikbaarPerRol',
+    wat: 'handelingen die het AI-stuur mag bedienen (live uit beleid.js)' },
+  'gevolg.onbekend': { bron: 'GEVOLGDEKKING.json', veld: 'tellers.onbekendeEffectpaden',
+    wat: 'AI-bereikbare handelingen waarvan NIET is gemeten wat zij veroorzaken (moet dalen)' },
+  'gevolg.gemeten': { bron: 'GEVOLGDEKKING.json', veld: 'tellers.effectGemeten',
+    wat: 'AI-bereikbare handelingen waarvan de proef zag welke collecties veranderen' },
+  'gevolg.geenEffect': { bron: 'GEVOLGDEKKING.json', veld: 'tellers.effectGeenEffectGemeten',
+    wat: 'AI-bereikbare handelingen waarbij de proef draaide en niets zag veranderen' },
+  'gevolg.contractVolledig': { bron: 'GEVOLGDEKKING.json', veld: 'tellers.contractVolledig',
+    wat: 'handelingen met een VOLLEDIG gevolgcontract (mag alleen stijgen)' },
+  'gevolg.contractOnbekend': { bron: 'GEVOLGDEKKING.json', veld: 'tellers.contractOnbekend',
+    wat: 'AI-bereikbare handelingen zonder enig gevolgcontract' },
+  'machine.volledigeKetens': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.volledigeKetens',
+    wat: 'handelingen die de hele baan van de machine lopen (deze teller mag alleen stijgen)' },
+  'machine.muterend': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.muterend',
+    wat: 'muterende routes (methode x pad) die de machinedekking heeft gewogen' },
+  'machine.zonderAs': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.mutatiesZonderEnigeAs',
+    wat: 'muterende routes die geen enkele as van de eigen machinerie raken' },
+  'machine.motorenZonderRoute': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.motorenZonderRouteBereik',
+    wat: 'motoren die geen enkele route bereiken' },
+  'machine.hubRoutes': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.bestandsasOnbruikbaar',
+    wat: 'routes waarvoor de bestandsas onbruikbaar is omdat ze zelf in een hub wonen' },
+  'machine.bewijsDraagt': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.perAs.bewijsDraagt.bestand',
+    wat: 'routes die het bewijstoken raken (proof-carrying authorization)' },
+  'machine.mandaat': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.perAs.mandaat.bestand',
+    wat: 'routes die de mandaatgrammatica raken' },
+  'machine.envelop': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.perAs.envelop.bestand',
+    wat: 'routes die de gebeurtenisenvelop raken' },
+  'machine.mensAanDeDeur': { bron: 'MACHINEDEKKING.json', veld: 'gemeten.perAs.mensAanDeDeur.bestand',
+    wat: 'routes waar de deur een bewezen mens eist' },
   'capabiliteit.lijsten': { bron: 'CAPABILITEIT.json', veld: 'woordenlijsten',
     wat: 'losse capability-woordenlijsten in de code' },
   'capabiliteit.leden': { bron: 'CAPABILITEIT.json', veld: 'leden',
@@ -329,6 +362,15 @@ const GETALLEN = {
      hoeveel garanties je uit de menselijke uitvoeringsketen kunt HALEN terwijl
      een wacht afgaat, en hoeveel je eruit kunt halen zonder dat iemand het
      merkt. Dat tweede getal is het enige dat naar nul moet. */
+  /* DE NOEMER OOK, en om precies dezelfde reden als bij menselijk.scenarios: hij
+     stond als WOORD in de kop en in de tekst ("de twaalf mutaties", "van de
+     twaalf") terwijl de teller ernaast automatisch meegroeide. Toen er vier
+     mutaties bij kwamen las er "15 van de twaalf". Een noemer die stilstaat
+     terwijl de teller beweegt, maakt van twee kloppende getallen een verkeerde
+     verhouding -- en daar kijkt geen enkele controle naar zolang hij geen
+     merkteken draagt. */
+  'mensmutatie.totaal': { bron: 'MENSMUTATIE.json', veld: 'telling.mutaties',
+    wat: 'semantische mutaties in de batterij van scripts/mensmutatie.js' },
   'mensmutatie.gezakt': { bron: 'MENSMUTATIE.json', veld: 'telling.gezakt',
     wat: 'mutaties die een wacht lieten zakken' },
   'mensmutatie.zonderWacht': { bron: 'MENSMUTATIE.json', veld: 'telling.geenWacht',
@@ -338,6 +380,12 @@ const GETALLEN = {
      context die AANKOMT, context die de resolver GEBRUIKT, en gevallen waarin de
      resolver niet eens draaide -- dan heeft NIEMAND GEKEKEN, en dat is iets
      anders dan "de context deed niets". */
+  /* De noemer hoort ook een levend getal te zijn. Hij stond als woord in de
+     tekst ("van de 31 zinnen", "een van de vierendertig") terwijl het corpus
+     doorgroeide, en dan drijft de noemer weg van de teller die er in dezelfde
+     zin naast staat -- precies wat deze merktekens moeten uitsluiten. */
+  'menselijk.scenarios': { bron: 'MENSELIJKE_UITVOERING.json', veld: 'telling.scenarios',
+    wat: 'gedragsgevallen in de menselijke-uitvoeringsprojectie' },
   'menselijk.contextAangeboden': { bron: 'MENSELIJKE_UITVOERING.json', veld: 'telling.contextAangeboden',
     wat: 'scenario\'s waarin context is aangeboden en gesaneerd' },
   'menselijk.contextGebruikt': { bron: 'MENSELIJKE_UITVOERING.json', veld: 'telling.contextGebruikt',
@@ -356,7 +404,7 @@ const GETALLEN = {
    dag ook iets dat niemand had bedoeld. */
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
-  'TRAVELCOMMERCE.md', 'MENS.md'];
+  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

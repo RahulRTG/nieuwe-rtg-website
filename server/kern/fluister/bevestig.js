@@ -19,11 +19,30 @@ module.exports = (ctx) => {
     return klaar(r.tekst, r.gedaan);
   }
 
-  // "nee": het voorstel gaat van tafel
+  /* "nee": het voorstel gaat van tafel.
+
+     ER ZIJN TWEE SOORTEN KLAARGEZET VOORSTEL, en dat is hier jarenlang niet
+     zichtbaar geweest. Deze laag kent `p.wacht`: haar eigen voorstel, in het
+     profiel van het lid. Het STUUR kent daarnaast de 428-goedkeuring
+     (kern/stuur/goedkeuring.js), server-side en eenmalig. Voor het lid is dat
+     een en hetzelfde ding -- "het voorstel" -- en dus zei deze handler
+     "Er stond niets open" terwijl er in de andere lijst wel degelijk iets stond
+     te wachten. Dat is geen onhandige zin maar een onware.
+
+     WAT ER NU GEBEURT, en met opzet niet meer dan dat: had DEZE laag niets van
+     zichzelf, dan geeft zij haar antwoord nog steeds, maar markeert de beurt als
+     "het stuur mag ook kijken". De route (routes/member/persoonlijk-rahul.js)
+     laat het stuur er dan langs; vindt dat een openstaand voorstel, dan wint zijn
+     antwoord, en anders blijft deze zin staan. Er wordt hier dus NIETS van het
+     stuur gelezen en NIETS ingetrokken -- die tweede lijst hoort bij die laag, en
+     een tweede intrekweg hier zou de fout verdubbelen in plaats van hem
+     oplossen. */
   async function nee({ q, p, klaar }) {
     if (!/^(nee|nope|laat maar|annuleer|stop|toch niet)[.!]?$/i.test(q)) return null;
     const wachtVers = p.wacht && Date.now() - Date.parse(p.wacht.at) < 10 * 60000;
-    if (!wachtVers) return klaar('Er stond niets open; alles blijft zoals het was.');
+    if (!wachtVers)
+      return Object.assign(klaar('Er stond niets open; alles blijft zoals het was.'),
+        { stuurMagKijken: true });
     p.wacht = null;
     save();
     return klaar('Goed, het gaat niet door. Het voorstel is van tafel.');

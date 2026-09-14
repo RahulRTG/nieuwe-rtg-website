@@ -260,47 +260,25 @@ function main() {
     if (!jsonUit) console.log('De suite draait met het routejournaal aan; dit duurt zolang de suite duurt.\n');
     suite = draaiSuite(eigen);
     journalen = [eigen];
-    herkomst.push({ pad: eigen, geteld: true, reden: 'hier gedraaid' });
+    herkomst.push({ pad: eigen, geteld: true, reden: 'hier gedraaid (alleen test/*.test.js)' });
+    /* EN WAT HIER NIET IS GEDRAAID, STAAT ER OOK BIJ.
 
-    /* EN HET SCHERMJOURNAAL OOK HIER, ALS HET VERS IS.
+       draaiSuite() voert uitsluitend `test/*.test.js` uit -- de schermsuite van
+       `npm run e2e` niet. In die tak ontbreken dus twee soorten routes: de
+       browser-only routes (/api/fout/client) en de routes die alleen door een
+       .e2e.js-bestand worden geraakt (vier daarvan openen geen browser en
+       toetsen gewoon routes). Die gaten zijn dan een eigenschap van de METING en
+       niet van de code.
 
-       Dit stond er niet, en daardoor deed deze tak iets anders dan de tak
-       erboven terwijl de kop van dit bestand van allebei hetzelfde belooft: de
-       UNIE van alle journalen die er zijn. `npm test` raakt de browser-only
-       routes per definitie niet -- die worden alleen door de e2e-suite
-       aangeroepen -- dus wie hier een verse suite draaide kreeg ze altijd als
-       gat terug. Met vijf zulke routes kan deze tak de eis van 100% NOOIT
-       halen, en dus kan --vastleggen er nooit slagen. Dat kostte op 13
-       september 2026 twee volle rondes voordat het opviel, want het gat ziet
-       eruit als een echte bevinding.
-
-       DE VERSHEIDSTOETS BLIJFT STAAN, en dat is de reden dat hij er niet
-       gewoon bij mag: een schermjournaal van oudere code naast een verse
-       testronde mengt twee metingen. Telt hij niet mee, dan staat dat in de
-       herkomst MET de reden -- zwijgen zou de volgende lezer weer twee rondes
-       kosten.
-
-       EN LET OP WAAROM DIE TOETS VAKER FAALT DAN JE ZOU DENKEN. Hij vergelijkt
-       MTIME, en test/meterijk.test.js schrijft tijdens de suite een paar
-       toetsbestanden byte voor byte terug (metAanbouw(): inhoud identiek, mtime
-       nieuw). Na elke volle ronde is elk journaal dus formeel "ouder dan de
-       code" terwijl er geen letter is veranderd. Wie hier zeker weet dat beide
-       journalen bij dezelfde code horen, geeft ze expliciet mee:
-       `--lees .routejournaal .schermjournaal`. Dat is geen omweg om de toets
-       heen maar de weg die er al voor bestaat: de lezer neemt dan zelf de
-       verantwoordelijkheid die deze toets anders draagt. */
-    const scherm = path.join(WORTEL, '.schermjournaal');
-    const v = jongerDanDeCode(scherm);
-    if (v.ok) {
-      journalen.push(scherm);
-      herkomst.push({ pad: '.schermjournaal', geteld: true, reden: 'vers genoeg om naast deze ronde te tellen' });
-      if (!jsonUit) console.log('  Het schermjournaal van `npm run e2e` telt mee.\n');
-    } else {
-      herkomst.push({ pad: '.schermjournaal', geteld: false,
-        reden: v.reden + ' -- de browser-only routes tellen dus als ongeraakt; draai npm run e2e' });
-      if (!jsonUit) console.log('  Het schermjournaal telt NIET mee: ' + v.reden + '.\n' +
-        '  De routes die alleen de browser aanroept, komen daardoor als gat terug. Draai npm run e2e.\n');
-    }
+       De --lees-tak zegt per journaal of hij meetelde en waarom niet; deze tak
+       zei alleen "hier gedraaid" en verzweeg dat de andere helft niet had
+       gelopen. Dat is precies het verschil tussen een meting die eerlijk is over
+       haar bereik en een die een gat rapporteert dat zij zelf heeft gemaakt --
+       en het is dezelfde regel als de lege-journaal-controle hieronder: een
+       meting die niet kon kijken, is geen nul. */
+    for (const j of JOURNALEN)
+      herkomst.push({ pad: j.pad, geteld: false,
+        reden: 'niet gedraaid in deze tak -- draai ' + j.suite + ' en geef het journaal mee met --lees' });
   }
 
   const routelog = require(path.join(WORTEL, 'server', 'routelog'));

@@ -106,8 +106,25 @@ module.exports = Object.assign((ctx) => {
     }
     if (!Array.isArray(db.data.suppliers)) db.data.suppliers = [];
     const code = codeVoor(a.bedrijf.naam);
+    /* `online: false` IS DE POORT, EN HIJ STOND HIER NIET.
+
+       kern/ondernemerpoort.js belooft letterlijk: "Zo staat er nooit een lege of
+       half-ingerichte zaak in de app", en hij leest `online === false` als "deze
+       zaak moet nog door de poort" (undefined telt als aan, voor de bestaande
+       zaken die van voor de poort dateren). routes/office/partners.js zet die
+       vlag dan ook bij elke partner die het kantoor met de hand aanmaakt.
+
+       Deze weg -- de gewone weg, van aanvraag via een voldane termijn naar een
+       zaak -- zette hem niet. Een zo geboren zaak stond dus meteen op "aan", en
+       daarmee was de poort geen poort: zodra de Salon-pagina compleet was, zag
+       een lid de zaak, terwijl beide verplichte rondleidingen (kassa, werk-apps)
+       ongevolgd waren. De 409 van /api/supplier/poort/online blokkeerde alleen
+       een knop die de ondernemer nooit hoefde in te drukken.
+
+       Gevonden door scripts/zaakliveproef.js schakel 5, die precies die zin uit
+       de kop van ondernemerpoort.js toetst aan de LEDENkant. */
     db.data.suppliers.push({ code, name: a.bedrijf.naam, type: a.bedrijf.type,
-      city: a.bedrijf.plaats || '', loc: null, rate: 0, menu: [], photos: [] });
+      city: a.bedrijf.plaats || '', loc: null, rate: 0, menu: [], photos: [], online: false });
     const pin = legacyPin ? accounts.makePin() : null;
     let staffId = null;
     try {

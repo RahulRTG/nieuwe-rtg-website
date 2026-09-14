@@ -38,7 +38,15 @@ function plaatsOrderVoor(session, body) {
     if (m && m.uitverkocht) return { status: 409, error: m.name + ' is helaas uitverkocht (86 gemeld door de keuken).' };
     // ledenprijsgarantie: reken nooit meer dan de publieke prijs, ook al zou
     // de menuprijs door een fout hoger staan (extra vangnet na het opslaan)
-    if (m) { const unit = ledenPrijs(m.publiekePrijs, m.price); items.push({ id: m.id, name: m.name, qty, price: unit }); total += unit * qty; }
+        /* DE WERKPLEK REIST MEE MET DE REGEL, net als de prijs. Zonder dit veld
+       leidde kern/fiscaal/tarief.js de btw-categorie elke keer opnieuw af uit
+       de menukaart van VANDAAG -- en verhuisde al verkochte drankomzet naar de
+       etenpot zodra de zaak het item van de kaart haalde. Een bestelregel hoort
+       vast te leggen WAT er verkocht is, niet te verwijzen naar iets dat nog
+       kan veranderen. Gemeten met scripts/omzetproef.js. */
+    if (m) { const unit = ledenPrijs(m.publiekePrijs, m.price);
+      items.push({ id: m.id, name: m.name, qty, price: unit, station: m.station === 'bar' ? 'bar' : 'keuken' });
+      total += unit * qty; }
   }
   if (!items.length) return { status: 400, error: 'Geen geldige gerechten gekozen.' };
   const codename = session.account ? session.account.codename : PERSONAS[session.tier].codename;

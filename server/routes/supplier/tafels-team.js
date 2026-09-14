@@ -102,4 +102,35 @@ app.post('/api/supplier/leave/decide', supplierAuth, (req, res) => {
   res.json({ ok: true, entry: v });
 });
 
+/* HET LOGBOEK VAN DE ZAAK -- geschreven sinds jaar en dag, tot nu toe door
+   niemand te lezen.
+
+   logActivity() (opzet/leverancierpoort.js) schrijft elke handeling van een
+   medewerker naar db.data.supplierActivity[code] en stuurt er zelfs een
+   sync-signaal met scope 'team' achteraan. Er was alleen geen enkele route die
+   die bak teruggaf: niet aan de zaak, niet aan het kantoor. Een spoor dat
+   nergens uitkomt is geen spoor.
+
+   Gevonden door scripts/zaakliveproef.js, storing 6: "wie zette deze zaak
+   online?" was na afloop niet te beantwoorden, terwijl het antwoord al die tijd
+   in de opslag stond.
+
+   MANAGER-ONLY, en dat is geen voorzichtigheid maar dezelfde regel als bij
+   /api/supplier/finance: het logboek zet handelingen op NAAM van collega's, en
+   dat is personeelsinformatie. De zaak leest hier uitsluitend haar EIGEN bak --
+   de code komt uit de sessie en nooit uit het lichaam. */
+app.post('/api/supplier/activity', supplierAuth, (req, res) => {
+  if (!managerOnly(req, res)) return;
+  const lijst = (db.data.supplierActivity && db.data.supplierActivity[req.supplier.code]) || [];
+  /* Onzin valt terug op de standaard en niet op de ondergrens. `Math.max(n, 1)`
+     alleen gaf bij `aantal: -3` precies EEN regel terug -- een antwoord dat
+     eruitziet alsof er bijna niets gebeurd is, terwijl er niets mis was met de
+     zaak maar met het verzoek. Gevonden door test/supplier-activity.test.js
+     toets 4. Boven de bovengrens knippen we wel, want daar is de bedoeling
+     duidelijk: de aanroeper wil zoveel mogelijk. */
+  const gevraagd = Number(req.body && req.body.aantal);
+  const n = Number.isFinite(gevraagd) && gevraagd >= 1 ? Math.min(gevraagd, 80) : 40;
+  res.json({ ok: true, activity: lijst.slice(0, n), totaal: lijst.length });
+});
+
 };

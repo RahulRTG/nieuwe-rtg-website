@@ -76,6 +76,17 @@ module.exports = [
     reden: 'de bus over meerdere servers; zonder redis is hij in-proces, en dat is dezelfde bus met een andere rail' },
   { van: 'motor:bus', naar: 'domein:envelop', soort: 'BELEID',
     reden: 'bus.js r.35: elk bericht krijgt de envelop van OS.md (id, tijd, actor, correlatie, oorzaak, classificatie). Een bus zonder envelop levert berichten zonder keten en zonder classificatie' },
+  /* DE GOUDEN WEG DRAAGT DE ENVELOP ZELF. Tot deze rand ging de envelop van
+     OS.md alleen over de BUS -- en dat was precies de bevinding van
+     MACHINEDEKKING.json: 95 bestanden melden buiten de bus om, dus buiten de
+     keten om. kern/kantoor/geldketen/ zet daarom per stap een envelop met
+     dezelfde correlatie en de vorige stap als oorzaak, zodat de vraag "waardoor
+     besta ik" over een geldhandeling te beantwoorden is zonder veertien logs
+     naast elkaar te leggen. Dat is dezelfde soort rand als die van de bus
+     hierboven en met dezelfde grond: BELEID, want de envelop bepaalt hier niets
+     over het domein en alles over wat er van een handeling bewaard blijft. */
+  { van: 'domein:kantoor', naar: 'domein:envelop', soort: 'BELEID',
+    reden: 'kern/kantoor/geldketen/ hangt elke stap van een geldhandeling (klaarzetten, tekenen, uitvoeren) in een envelop met dezelfde correlatie en de vorige stap als oorzaak -- de causale keten van MACHINE.md par. 5a, die zonder deze rand alleen over de bus zou bestaan' },
 
   /* ---- DE BEWAARKETEN. Drie bestanden, een onderwerp: welke gegevens hoe lang
      blijven. Ze zijn geknipt op de omvangsgrens en niet op een naad. ---- */
@@ -311,6 +322,15 @@ module.exports = [
     reden: 'local-ai.js r.18: de lokale server spreekt het OpenAI-protocol, dus hij hergebruikt die client. Dat is een PROTOCOL en geen verbinding naar buiten -- RTG_EXTERNE_AI_UIT=1 raakt de lokale weg niet' },
   { van: 'motor:log', naar: 'domein:doorgeefjournaal', soort: 'DOMEINRELATIE',
     reden: 'log.js r.119 laadt het doorgeefjournaal pas bij gebruik (lui): wat gelogd wordt kan worden doorgegeven, en die keten hoort niet bij het loggen zelf' },
+  /* DE EFFECTBON LEENT DE STANDMETING EN BOUWT HEM NIET NA. server/staatlog.js weet als
+     enige hoe je vaststelt of de opslag is veranderd -- in de ondiepe stand `.length` per
+     array, in de diepe ook een inhoudsafdruk. server/effectbon.js heeft precies dat nodig
+     om een effectbon te maken, en een tweede implementatie ervan zou twee lezers van "wat
+     is er gebeurd" opleveren: LAT.md regel 4 op de plek waar het het duurst is. De rand
+     loopt dus met opzet, en hij loopt EEN kant op. */
+  { van: 'motor:effectbon', naar: 'motor:staatlog', soort: 'DOMEINRELATIE',
+    reden: 'de effectbon stelt met staatlog.stand()/verschil() vast welke collecties bewogen; ' +
+      'een eigen implementatie zou een tweede waarheid over "wat is er gebeurd" zijn' },
   { van: 'motor:mail-bezorgen', naar: 'motor:smtp-direct', soort: 'DOMEINRELATIE',
     reden: 'mail-bezorgen.js r.22: bezorgen zonder tussenpartij is een van de wegen; de andere loopt via een relay' },
   { van: 'motor:mail-opstellen', naar: 'motor:smtp', soort: 'DOMEINRELATIE',

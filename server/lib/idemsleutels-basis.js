@@ -87,6 +87,17 @@ const SLEUTELS = {
     waarom: 'een opname is een momentopname van het concern; twee keer vragen hoort met recht ' +
       'twee momenten op te leveren, anders is de tweede opname stil de eerste' },
 
+  /* Het lijf is hier ALTIJD leeg: er gaat met opzet geen id mee, want bij twee
+     open voorstellen valt er niets aan te wijzen (kern/stuur/goedkeuring.js).
+     `zelfdeVerzoek` zou dus niet een dubbeltik vangen maar een LEUGEN opleveren
+     -- zie het waarom hieronder. Intrekken kan bovendien alleen vermogen
+     inleveren, dus er valt niets te beschermen. */
+  'POST /api/member/voorstel/intrek': { nietIdempotent: true,
+    waarom: 'het lijf is altijd leeg, dus twee intrekkingen hebben dezelfde afdruk terwijl ze over ' +
+      'VERSCHILLENDE voorstellen gaan. Een herhaling zou het antwoord van de eerste keer teruggeven ' +
+      '("voorstel A is ingetrokken") terwijl het voorstel dat er nu staat blijft staan -- onwaar, en ' +
+      'juist bij een handeling die iets weghaalt' },
+
   /* ---- routes die niets veranderen ----
 
      Een POST die alleen leest. Herhalen is per definitie veilig, en er valt
@@ -120,6 +131,12 @@ const SLEUTELS = {
     waarom: 'de route weigert de tweede correctie zelf met een 409 die zegt wat er al is gebeurd; ' +
       'de poort die tik laten opslikken zou die mededeling wegnemen bij precies de mens die hem nodig heeft' },
   'POST /api/office/handelingen': { leest: true },
+  /* Het dossier van de geldketen (kern/kantoor/geldketen/dossier.js): per as wat
+     er gebeurde en welke VERPLICHTE as nog open staat. Alleen lezen -- de baan
+     zelf wordt gezet op /api/office/bank/incasso en afgemaakt bij de tweede
+     handtekening. Twee keer opvragen geeft hetzelfde dossier; er valt niets te
+     dedupliceren. */
+  'POST /api/office/bank/incasso/dossier': { leest: true },
   /* De schaduwmeting van de kantoordeur (KANTOOR.md par. 3). Leest de stand op;
      de TELLING gebeurt in officeAuth op res.on('finish') en niet in deze
      handler, dus twee keer opvragen verandert niets aan wat er geteld is. */

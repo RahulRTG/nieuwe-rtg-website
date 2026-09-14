@@ -55,7 +55,28 @@ const KETENS = [
      opnieuw andere actoren meebrengt -- gezin, jongere, werkgever -- zodat de
      vraag of er gedeelde actoren bestaan niet op drie horeca-achtige ketens
      wordt beantwoord. */
-  { naam: 'adam', register: 'ADAMPROEF.json', domein: 'foundation', proef: 'scripts/adamproef.js' }
+  { naam: 'adam', register: 'ADAMPROEF.json', domein: 'foundation', proef: 'scripts/adamproef.js' },
+  /* DE VIJFDE, en de eerste die niets LEVERT. De vier hierboven eindigen alle
+     bij een geleverde dienst, een verleende toegang of een bereikte mogelijkheid; deze eindigt bij iemand
+     die iets WEET. Als de gedeelde vorm daar ook overheen zou liggen, zou dat
+     voor het eerst iets betekenen -- en als hij dat niet doet, is dat het
+     duidelijkste antwoord dat deze meting kan geven. */
+  { naam: 'moment', register: 'MOMENTPROEF.json', domein: 'mediaos', proef: 'scripts/momentproef.js' },
+  /* De vierde. Hij is toegevoegd omdat hij de meting scherper maakt en niet
+     omdat er een keten bij moest: zijn uitkomst is ZICHTBAARHEID VOOR DERDEN,
+     een soort die de eerste drie geen van alle hadden, en zijn voltooiende
+     actor is de KLANT en niet een medewerker. Blijven de actoren en beloften
+     ook met hem erbij uit elkaar liggen, dan is dat een sterker negatief dan
+     met drie; komt er ineens overlap, dan is dat de eerste echte aanwijzing
+     voor een gedeeld contract. */
+  { naam: 'zaaklive', register: 'ZAAKLIVEPROEF.json', domein: 'ondernemerpoort', proef: 'scripts/zaakliveproef.js' },
+  /* De vijfde, en de eerste die over GELD gaat. Hij zit er om dezelfde reden
+     als de vierde: hij maakt de meting scherper. Zijn uitkomst is een GETAL en
+     geen toestand, en zijn tweede actor is geen mens maar een PROJECTIE
+     (financeVoor) -- twee soorten die de eerste vier geen van alle hadden.
+     Blijven de actoren ook met hem erbij op nul, dan is dat het sterkste
+     negatief dat hier te halen is. */
+  { naam: 'omzet', register: 'OMZETPROEF.json', domein: 'fiscaal', proef: 'scripts/omzetproef.js' }
 ];
 
 /* De woorden waarop een belofte wordt ingedeeld. Een gesloten lijst, want een
@@ -107,8 +128,21 @@ const KETENS = [
    telt in plaats van mensen. Dat zijn echte soorten fout, maar ze komen in geen
    van de andere drie ketens voor -- en dan is het geen gedeelde vorm.
 
-   Wat NIET is gebeurd: de actoren aanpassen. Die staan op nul gedeeld over vier
-   ketens en negentien actoren, en dat blijft de scherpste uitslag. */
+   Wat NIET is gebeurd: de actoren aanpassen. Die staan op nul gedeeld, en dat
+   blijft de scherpste uitslag.
+
+   EEN DERDE UITBREIDING, BIJ DE ZESDE KETEN (13 september 2026), en hij valt
+   onder dezelfde regel: `weigeringMetReden` kende alleen de BEDRIJVENDE vorm
+   ("weigert met de reden") en niet de lijdende ("wordt geweigerd met de
+   reden"). Dat is hetzelfde gezegd, in een andere werkwoordsvorm -- geen
+   ander idee. Zonder dat patroon zakte een thema dat aantoonbaar in alle vijf
+   de ketens staat naar `bijna`, en dan meet deze meter de Nederlandse
+   grammatica in plaats van de vorm van de ketens.
+
+   Let bij het lezen op wat die uitbreiding NIET deed: `themasGedeeld` ging van
+   1 naar 2 en dat is nog steeds LAGER dan de 2 van vier ketens over 10 themas,
+   want de vijfde keten bracht geen enkel eigen thema mee dat de anderen ook
+   hadden. En de actoren zijn opnieuw niet aangeraakt: 0 van 21. */
 const THEMAS = {
   herhaling: [/dezelfde sleutel/i, /twee keer/i, /tweede keer/i, /tweede betaling/i, /geen tweede/i],
   volgorde: [/alleen vooruit/i, /nog niet betaald/i, /terugzetten/i, /eerder/i],
@@ -175,9 +209,24 @@ function meet() {
     actoren[k.naam] = [...s].sort();
   }
   const actorGedeeld = snijAlle(gelezen.map(k => actoren[k.naam]));
+  /* DEZELFDE CORRECTIE ALS BIJ DE THEMAS HIERONDER, en de vierde keten liet zien
+     dat hij hier nog niet stond. "Eigen" was hier "niet in alle", en dat drukte
+     een actor die twee ketens delen af als "alleen toelating" EN als "alleen
+     moment" -- twee keer alleen. Met drie ketens viel dat nauwelijks op (`zaak`
+     stond al twee keer in de lijst); met vier kwamen `kantoor` en `lid` erbij, en
+     dan leest de uitslag alsof er geen enkele actor ergens gedeeld wordt terwijl
+     er drie in twee ketens staan.
+
+     Het KOPGETAL verandert hier niet van: gedeeld blijft "in ALLE ketens", en dat
+     is nul. Wat erbij komt is de middenbak, want zonder die bak verdwijnt een
+     vondst zodra er een keten bijkomt die hem niet heeft. */
+  const actorTelling = {};
+  for (const k of gelezen) for (const a of actoren[k.naam]) actorTelling[a] = (actorTelling[a] || 0) + 1;
+  const actorBijna = Object.keys(actorTelling)
+    .filter(a => actorTelling[a] > 1 && !actorGedeeld.includes(a)).sort();
   const actorEigen = {};
   for (const k of gelezen)
-    actorEigen[k.naam] = actoren[k.naam].filter(a => !actorGedeeld.includes(a));
+    actorEigen[k.naam] = actoren[k.naam].filter(a => actorTelling[a] === 1);
 
   /* 3. DE BELOFTEN. */
   const perKeten = {};
@@ -215,7 +264,7 @@ function meet() {
       sluit: k.data.sluit === true,
       bevindingen: (k.data.bevindingen || []).length })),
     vorm: { gedeeld: vormGedeeld, apart: vormApart, let: 'gelijke vorm is de ondergrens en geen vondst: beide proeven zijn zo geschreven' },
-    actoren: { perKeten: actoren, gedeeld: actorGedeeld, eigen: actorEigen },
+    actoren: { perKeten: actoren, gedeeld: actorGedeeld, bijna: actorBijna, eigen: actorEigen },
     beloften: { perKeten, gedeeld: themaGedeeld, bijna: themaBijna, telling: themaTelling,
       eigen: themaEigen, nietIngedeeld,
       let: '"gedeeld" is in ALLE ketens; "bijna" in meer dan een maar niet in alle. Dat onderscheid staat er ' +
@@ -237,7 +286,8 @@ function druk(u) {
     k.storingen + ' storingen' + (k.bevindingen ? ', ' + k.bevindingen + ' bevinding(en)' : '') + ')').join('  |  '));
   console.log('\n  ACTOREN');
   for (const [k, v] of Object.entries(u.actoren.perKeten)) console.log('    ' + k.padEnd(8) + v.join(', '));
-  console.log('    gedeeld: ' + (u.actoren.gedeeld.join(', ') || '(geen)'));
+  console.log('    in alle ' + u.telling.ketens + ': ' + (u.actoren.gedeeld.join(', ') || '(geen)'));
+  if (u.actoren.bijna.length) console.log('    in meer dan een, niet in alle: ' + u.actoren.bijna.join(', '));
   for (const [k, v] of Object.entries(u.actoren.eigen)) if (v.length) console.log('    alleen ' + k + ': ' + v.join(', '));
   console.log('\n  BELOFTEN (waar de storingen over gaan)');
   for (const [k, v] of Object.entries(u.beloften.perKeten)) console.log('    ' + k.padEnd(8) + v.join(', '));

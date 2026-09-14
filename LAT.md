@@ -477,9 +477,233 @@ je niet hebt.
 `scripts/lib/werkstroom.js`; `--controle` zakt zodra de gewone ronde een poort
 niet meer bereikt) en `scripts/ci-keten.js`, die eist dat elke poort leesbaar
 genoeg blijft om hier na te spelen. Voor de mens die hem niet draait bestaat geen
+
+### 14. Een meter kent zijn eigen grens
+
+Een meter die uitspraken doet over onbekend terrein wordt eerst geijkt tegen
+beschikbare bekende waarheid. Is er geen grondwaarheid beschikbaar, dan zegt de
+meter dat expliciet en beperkt hij zijn conclusies tot wat hij daadwerkelijk
+heeft waargenomen.
+
+Regel 10 gaat over een meter die je niet hebt zien uitslaan. Regel 12 over een
+meting die niet heeft gedraaid. Dit is de derde in die familie en de stilste: een
+meter die WEL draait, WEL uitslaat en een overtuigend getal geeft -- terwijl
+niemand weet of hij het bewijsbare überhaupt ziet.
+
+*Het eerste geval, 13 september 2026:* `scripts/doctrine.js` telde harde
+uitspraken in de doctrine-documenten en meldde 1088 kandidaten. Een net getal,
+netjes uitgesplitst. Toen het tegen `WETTEN.json` werd gehouden -- vijftig
+uitspraken waarvan een mens al had vastgesteld dat ze hard zijn, met een
+handhaver en een sabotage eronder -- vond hij er **21**. Van de 29 die hij miste
+stond het anker van er 15 op een kop, 4 op een vette openingszin en 2 in een
+blokcitaat: drie plekken die hij per ontwerp niet las. Zonder die ijking had
+niemand het gemerkt, want er was niets om het getal tegen af te zetten.
+
+*Het tweede geval, dezelfde dag, en het is de scherpere:* `scripts/verband.js`
+vraagt of een onafhankelijke waarnemer de wet-wachter-randen terugvindt die
+`WETTEN.json` verklaart. Bij het narekenen is er een sensor toegevoegd die het
+veld `handhaver` teruggaf -- precies het veld dat hij moest reconstrueren. De
+uitslag sprong naar 56 van de 56. Honderd procent, en er was niets geleerd. Een
+meter die zijn eigen antwoord leest, ijkt zichzelf en is dan niet fout maar leeg
+-- en hij ziet er beter uit dan de eerlijke versie.
+
+*De helft die niet over percentages gaat.* Deze regel eist NIET dat elke meter
+een score haalt. Voor sommige verschijnselen bestaat geen menselijke catalogus om
+tegen te ijken, en zo'n meter is daarmee niet waardeloos. Hij mag alleen niet
+claimen wat hij niet kan weten: "gevonden: 37 kandidaten" is een waarneming,
+"dekt alle gevallen" is een dekkingsclaim, en die tweede vraagt een grondwaarheid.
+Wie geen grondwaarheid heeft, schrijft op waarom -- dat is een eerlijke stand en
+geen gat dat verstopt wordt, dezelfde vorm als het `mensenwerk` van `WETTEN.json`.
+
+*En de vloer hoort niet op het laatste getal te staan.* De ijking van de
+doctrinecompiler staat op 48 van de 50 en zijn ondergrens op 45; die van de
+verbandlaag op 54 van de 56 met een vloer van 50. Een NIEUWE wet waarvoor nog
+geen sensor bestaat is gewoon werk en mag binnenkomen. Wat niet mag is dat
+bekende zichtbaarheid stil verdwijnt.
+
+**Handhaver:** `scripts/lib/ijking.js` (welke meter tegen welke grondwaarheid is
+geijkt, of waarom er geen is) plus `test/meterwet.test.js`, dat drie dingen laat
+zakken: een meter met een dekkingsclaim die geen grondwaarheid verklaart, een
+`GEEN` zonder reden, en een verklaarde grondwaarheid waarvan de uitslag ontbreekt.
+Voor de mens die een hoog percentage leest en zich niet afvraagt waartegen het is
+gemeten, bestaat geen handhaver; daarvoor staat deze regel hier.
+
+### 15. Een bewijsveld draagt een bewijsrelatie
+
+Wanneer een veld meerdere semantisch verschillende relaties vertegenwoordigt,
+worden die relaties afzonderlijk benoemd en gemeten.
+
+Deze regel staat er pas nadat hij drie keer onafhankelijk is misgegaan, en de
+derde keer was de gevaarlijkste.
+
+*Een, 13 september 2026:* `handhaver` in `WETTEN.json` bleek twee dingen te
+betekenen. Van de 93 verklaarde randen wijzen er 57 naar een WACHTER (een toets
+die rood wordt) en 36 naar de IMPLEMENTATIE die de regel draagt. Een
+implementatiebestand kan de wet perfect dragen zonder ooit rood te worden, en
+een toets kan perfect rood worden zonder de implementatie te zijn. Die twee
+optellen tot "handhavers" telt appels bij peren.
+
+*Twee, dezelfde dag, in de meter die het eerste geval aanwees:* `isWachter` in
+`scripts/verband.js` besliste op het PAD -- alles onder `scripts/` was een
+wachter. Toen `scripts/lib/ijking.js` als handhaver in het register kwam,
+belandde een BIBLIOTHEEK in de wachter-bak: een bestand met besluiten dat niets
+uitvoert en dus nooit rood wordt. De aanwijzer maakte de fout die hij aanwees.
+
+*Drie, en deze kan valse dekking produceren:* het veld `bereik` draagt in de
+bewijsregisters drie betekenissen. In `MAGNAATLAB.json` is het wat de
+simulatielaag werkelijk RAAKT. In `TAALOORDEEL.json` is het *"waarover dit
+oordeel gaat"* -- de gelding. In `EXECUTION_MAP.json` is het wat een rol via het
+AI-stuur MAG. De eerste twee zijn de twee kanten van dezelfde vraag, en ze staan
+onder een naam: wie ze ooit optelt tot een dekkingsgetal, leest waargenomen reik
+als verklaarde gelding. Dat is geen telfout maar een bewering die niemand heeft
+gedaan.
+
+*Waarom dit geen naamgevingskwestie is.* Een veld met twee betekenissen is
+technisch correct en semantisch onjuist, en dat is precies de vorm die geen
+enkele toets ziet: het type klopt, de waarde klopt, de optelling klopt -- alleen
+de vraag die beantwoord wordt is een andere dan de gestelde. Dezelfde familie als
+`SEMANTIEK.json` meet voor constantennamen, hier op de bewijslaag.
+
+*Wat de regel NIET eist:* dat elk veld overal hetzelfde heet. `route` betekent in
+zeventien registers een HTTP-pad en dat is geen overbelasting maar consistentie.
+De regel bijt waar een naam twee verschillende RELATIES draagt binnen dezelfde
+bewijsvraag.
+
+**Handhaver:** `scripts/lib/bewijsvelden.js` (welk veld draagt welke relatie, en
+welke velden zijn aantoonbaar gesplitst) plus `test/bewijsveld.test.js`. Voor de
+mens die twee getallen optelt omdat ze dezelfde kop dragen, bestaat geen
 handhaver; daarvoor staat deze regel hier.
 
-### 14. Een poort die een artefact leest, herberekent het of bewaakt niets
+### 16. Een register heeft hoogstens een schrijver, en die bewijst bij publicatie dat hij nog dezelfde wereld meet
+
+Regel 12 gaat over een meting die niet heeft gedraaid. Dit is de derde vorm, en
+hij is van de drie de gevaarlijkste: een meting die **wel** heeft gedraaid, met
+een **correcte** meter, over een wereld die er niet meer is. De uitslag is dan
+plausibel, netjes opgemaakt en volledig -- en fout. Er is geen enkel spoor in het
+bestand waaraan een lezer dat kan zien.
+
+Twee helften, en ze falen los van elkaar.
+
+**De schrijfkant: hoogstens een schrijver.** Loopt er een tweede meter van
+dezelfde soort, dan wint de laatste die klaar is, en dat is niet degene die de
+verste wereld heeft gezien.
+
+*Het geval, 13 september 2026:* een crashproefronde (pid 9598) was gestart voor
+een rebase en leefde daar nog, terwijl ik na de rebase een verse ronde begon.
+Die oude ronde had `CRASHPROEF.json` technisch geldig kunnen schrijven, alleen
+over de wereld van voor de rebase. Hij is gevonden doordat ik op een proces
+wachtte en `ps` er twee vond -- niet door een wachter. Bij de twee pogingen
+ervoor ging het wachten zelf mis: `pgrep -f` matchte zijn eigen opdrachtregel, en
+`pgrep | tail -1` pakte een vluchtige treffer en meldde daarmee "de meting is
+klaar" terwijl er nog een draaide.
+
+**De publicatiekant: dezelfde wereld als bij de start.** `scripts/lib/stempel.js`
+leest de commit op het moment van SCHRIJVEN. Een ronde die op commit A begint en
+publiceert terwijl HEAD op B staat, krijgt dus stempel B -- een bestand dat van
+zichzelf zegt dat het B meet terwijl het A heeft gemeten. Dat is geen
+theoretische mogelijkheid: het is precies wat pid 9598 zou hebben opgeleverd. Een
+stempel die de bronwereld bij de START vastlegt en bij publicatie vergelijkt,
+weigert dan met een reden in plaats van te liegen.
+
+**En er is een leeskant, met een eigen geval op dezelfde dag.** Een register kan
+ook achterlopen op de bron die het beschrijft, en dan geeft het een
+zelfverzekerd verkeerd antwoord aan zijn LEZER. `ROUTEBRON.json` wees voor vier
+bankroutes naar regelnummers van voor mijn bewerking van
+`server/routes/kantoren/bank.js`; `scripts/crashproef.js` las daar `leestBody:
+false` uit voor routes die hun body wel degelijk lezen. De reparatie was niet het
+register verversen maar de LEZER laten twijfelen: het regelnummer werd een
+aanwijzing in plaats van een adres, en een niet-gevonden pad antwoordt `null` en
+niet `false`. Over de 45 geldroutes klopte het regelnummer 40 keer en zat het 5
+keer ernaast.
+
+Drie dingen die uit deze regel volgen en die je nergens anders moet herhalen. Een
+exclusief slot hoort te WEIGEREN en niet te wachten -- een tweede ronde die
+netjes in de rij gaat staan, publiceert alsnog een verouderde wereld zodra hij
+aan de beurt is. Een geweigerde ronde raakt het register NIET aan, ook niet om er
+"mislukt" in te zetten: een half bijgewerkt register is erger dan een oud. En de
+schaal is niet klein: 84 scripts schrijven via `scripts/lib/stempel.js` en er
+staan 138 registers in de wortel, dus dit is een eigenschap van de meetlaag en
+geen eigenaardigheid van de crashproef.
+
+**Handhaver:** vandaag niemand -- en dat is de eerlijke stand, niet een
+vooruitblik. De leeskant is op een plek gerepareerd
+(`scripts/crashproef.js` `leestBodyVan()`, met `null` voor onbekend) en de andere
+lezers van een register zijn niet nagelopen. Het exclusieve slot en de
+vergelijking bij publicatie horen in `scripts/lib/stempel.js`, waar de stempel al
+woont; zolang ze daar niet staan, is dit een regel waar alleen op mensen wordt
+vertrouwd.
+
+---
+
+### 17. Een poort bewijst alleen zijn eigen bereik
+
+Regel 11 gaat over twee soorten groen die verschillende dingen betekenen. Dit is
+de gemenere variant: **een** soort groen, correct gemeten, en daarna in woorden
+ruimer gemaakt dan hij is.
+
+*Waar dit fout ging, twee keer op een dag:* op 13 september 2026 stonden
+`npm run check`, `npm run norm` en de deltapoort alle drie groen, en dat is in
+dit verslag "de gate is groen" gaan heten. CI bleef daarna terecht rood, twee
+keer achter elkaar en om twee verschillende dingen:
+
+- `test/routedekking.test.js` vond een route die de server registreert en die
+  nooit door een toets was aangeraakt (`POST /api/supplier/activity`);
+- keuringsregel 41 zakte omdat `BEWIJS.md` achterliep op de toetsen.
+
+Geen van beide ligt binnen wat die drie poorten meten. Er was dus niets mis met
+de meting -- de uitspraak was ruimer dan het bewijs. Dat is precies de fout die
+regel 11 in het groot beschrijft, nu in het klein en daarom veel makkelijker te
+maken.
+
+**Elke poort heeft een bereik, en dat bereik is klein:**
+
+| Poort | Bewijst | Bewijst NIET |
+|---|---|---|
+| `npm run check` | statische huisregels, registers, documentwaarheid | gedrag, routedekking, ketens, go-live |
+| `npm run norm` | de ratels en aantalsnormen in `NORM.json` | alles wat geen ratel heeft |
+| `npm run delta` | geen verslechtering t.o.v. de basis, op de **gewijzigde** bestanden | de rest van het huis; gedrag; routedekking |
+| `npm test` | gedrag van wat een toets aanroept | wat geen toets aanroept |
+| `test/routedekking.test.js` | elke geregistreerde route is door een toets geraakt | of die aanraking iets zinnigs toetst |
+| de ketenproeven | dat één benoemde keten van begin tot eind sluit | de negentien andere |
+| `npm run golive` | operationeel en juridisch mogen starten | de software |
+| CI | de samenstelling van al het bovenstaande | niets daarbuiten |
+
+Voortaan dus niet "de gate is groen" maar **"statische poort groen; gedrag en
+routedekking nog niet bevestigd"**. Dat klinkt kleiner en het is waar.
+
+**Het gevolg voor een nieuwe HTTP-route.** Dezelfde dag kwam de tweede helft van
+deze les binnen, en die is architectonisch. `POST /api/supplier/activity` HAD een
+toets: `test/supplier-activity.test.js`, die de handler op een nagemaakte app
+monteert. Die toets is goed en bewijst één ding van de drie die een route nodig
+heeft:
+
+1. **handlergedrag** -- doet de functie wat zij belooft (een nagemaakte app kan dit);
+2. **echte montage en transport** -- is de route werkelijk geregistreerd en bereikbaar;
+3. **bevoegdheid op een echte server** -- weigert de echte deur de verkeerde rol.
+
+Een nagemaakte app bewijst alleen de eerste. Daaruit volgt de regel: **geen
+nieuwe HTTP-route zonder ten minste één treffer op een echte server in een
+gewone CI-toets.** Niet als losse lijst die iemand moet bijhouden, maar
+mechanisch -- route-inventaris tegenover routejournaal, en dat is precies wat
+`test/routedekking.test.js` al doet. De les is dus niet dat er een poort bij
+moet, maar dat die poort tot de definitie van "in CI bewezen" hoort en niet tot
+het optionele meetwerk eromheen.
+
+Let op de valkuil die dit geval eronder verstopte: de route WERD wel over HTTP
+geraakt, door `scripts/zaakliveproef.js`. Maar dat is een SCRIPT: het draait in
+de meetronde en niet in elke CI-run. Dat onderscheid staat al in de kop van
+`test/integratie-routes.test.js`, waar het na een eerdere vondst van de
+deltapoort is opgeschreven -- en is hier alsnog opnieuw gemaakt.
+
+**Handhaver:** `scripts/check.js`, `scripts/norm.js` en `scripts/deltapoort.js`
+drukken sinds deze dag zelf hun bereik af, op de groene EN de rode uitgang. Een
+tabel in een document had deze fout niet voorkomen; een poort die zijn eigen
+grens meeleest wel, want dan staat de beperking op het scherm van wie hem
+draait. Voor de mens die drie groene poorten optelt tot één zin bestaat verder
+geen handhaver -- daarvoor staat deze regel hier, net als bij regel 11.
+
+
+### 18. Een poort die een artefact leest, herberekent het of bewaakt niets
 
 Een register in de wortel is een **bouwartefact**, en een artefact kan een commit
 achterlopen. Een poort die zo'n bestand LEEST en er een uitspraak op doet, doet
@@ -519,7 +743,7 @@ daarvoor staat deze regel hier.
 
 ---
 
-### 15. Tijdens een meetronde is de werkboom niet van jou
+### 19. Tijdens een meetronde is de werkboom niet van jou
 
 Een meetketen SCHRIJFT. Registers, journalen, en -- bij de ijkingen -- met opzet
 verkeerde waarden die zij daarna zelf terugzet. Wie tijdens zo'n ronde `git
@@ -558,7 +782,7 @@ handhaver.
 
 ---
 
-### 16. Een handhaver die één vorm kent, bewaakt één vorm
+### 20. Een handhaver die één vorm kent, bewaakt één vorm
 
 Een poort die op een PATROON zoekt, vindt dat patroon. Niet het probleem. Zodra
 dezelfde fout er anders uitziet, is hij stil -- en zijn groen leest dan als een
@@ -686,6 +910,8 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | geen bestand plukt een naam uit een bereik dat het niet heeft | `scripts/check.js` regel 51 |
 | WERELDLIJST.md loopt niet achter op het wereldregister | `scripts/check.js` regel 52 |
 | elk scherm is vanaf de bank te bereiken | `scripts/check.js` regel 53 |
+| elke meter met een dekkingsclaim is geijkt tegen bekende waarheid, of zegt waarom dat niet kan | `scripts/lib/ijking.js` + `test/meterwet.test.js` |
+| een bewijsveld draagt een bewijsrelatie; een gesplitst veld wordt apart benoemd en gemeten | `scripts/lib/bewijsvelden.js` + `test/bewijsveld.test.js` |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
 | nieuw werk op de norm, aangeraakt werk niet eronder (geen verrekening) | `scripts/deltapoort.js` |
 | een verlaging van de lat heeft een reden, een soort en een einde | `scripts/normverval.js` |
@@ -698,9 +924,6 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | waargenomen endpoint-dekking uit het routejournaal | `scripts/dekking.js` |
 | welke apps een toets ECHT heeft geopend ("af" is geen bewering) | `scripts/schermen.js` + `NORM.json` |
 | elke meter een keer zien uitslaan voor hij een oordeel draagt | `test/meterijk.test.js` + `check.js` regel 35 |
-| een register-afdruk loopt niet achter op de code die hij beschrijft | `test/mutatiecontract.test.js` + `test/capabilities.test.js` toets 8 |
-| een meting uit een vuile werkboom is geen bewijs | `scripts/lib/stempel.js` (`boomVuil`) + `registersUitVuileBoom` in `NORM.json` |
-| grote uitvoer gevolgd door `process.exit()` kapt bij een pipe af | de pipe-regel in `scripts/meetkeuring.js` |
 | de prestatielat: p99, doorvoer, event-loop, herstel | `BEPROEVING.json` + `scripts/norm.js` |
 | wie bewaakt wat, en wat bewaakt niemand | `scripts/samenhang.js` |
 | hoeveel losse schalen beantwoorden "mag de machine dit zelf" (vijf, en ze kennen elkaar niet) | `GEZAG.json` + `scripts/gezag.js` |
@@ -712,6 +935,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | een bovengrens draait in het onderhoud en niet in een schrijfroute | `server/kern/kappen.js` + `test/kappen.test.js` |
 | welke grote krimpen de toetsen echt uitlokken -- met bewijs dat de val aanstond | `KRIMP.json` + `scripts/krimpronde.js` + `test/krimpronde.test.js` |
 | een bronmuterende toets draait alleen, niet naast een server die diezelfde bron leest | `scripts/lib/geisoleerd.js` + `test/bronmutanten.test.js` |
+| een register heeft hoogstens een schrijver, en meet bij publicatie nog dezelfde wereld | **niemand** -- zie regel 13; het slot en de vergelijking horen in `scripts/lib/stempel.js` |
 | staat elke functie in de boardroom (en dus onder een schakelaar) | `scripts/schakelbaar.js` + `NORM.json` |
 | de wisregels van de identiteitskluis en de locatiesporen | `server/bewaarveger.js` |
 | elk scherm opent en geeft een teken van leven (dood is stiller dan stuk) | `test/paginas.e2e.js` |
@@ -735,6 +959,9 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | gedeeld zout blijft bij de demo-seed en komt nooit op een echt account | `scripts/check.js` + `test/zaaihash.test.js` |
 | de pijplijn die dit alles draait bij elke push | `.github/workflows/ci.yml` |
 | de zware rondes (beproeving, dekking) draaien vanzelf, wekelijks | `.github/workflows/ronde.yml` |
+| een register-afdruk loopt niet achter op de code die hij beschrijft | `test/mutatiecontract.test.js` + `test/capabilities.test.js` toets 8 |
+| een meting uit een vuile werkboom is geen bewijs | `scripts/lib/stempel.js` (`boomVuil`) + `registersUitVuileBoom` in `NORM.json` |
+| grote uitvoer gevolgd door `process.exit()` kapt bij een pipe af | de pipe-regel in `scripts/meetkeuring.js` |
 
 Wat hier niet in staat, wordt niet gehandhaafd. Dat is geen tekortkoming van de
 lijst maar informatie: het zegt precies waar je op mensen vertrouwt.

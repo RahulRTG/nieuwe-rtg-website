@@ -578,6 +578,7 @@
       "boardroomAuth",
       "boardroomLijst",
       "boardroomUser",
+      "boardroomWie",
       "capGezondheid",
       "commercieRechten",
       "commercieRonde",
@@ -591,6 +592,7 @@
       "geldOverzicht",
       "geldPasprijsZet",
       "geldPasprijzen",
+      "geldketen",
       "handhavingSchaduw",
       "hardware",
       "ideeen",
@@ -607,6 +609,7 @@
       "reisaanbod",
       "reisbureau",
       "reisuitnodiging",
+      "salonUitlichten",
       "stad",
       "studio",
       "stuur",
@@ -739,6 +742,11 @@
       "markt"
     ],
     "mediaos": [
+      "aanwezigBeeld",
+      "aanwezigMet",
+      "aanwezigMijn",
+      "aanwezigVolg",
+      "aanwezigVolgtHij",
       "mediaBewaar",
       "mediaBieb",
       "mediaBord",
@@ -1452,9 +1460,13 @@
     ],
     "papieren-deur": [],
     "pay": [
+      "corrigeerFactuur",
       "factuurSaldo",
       "onboarding",
       "pay"
+    ],
+    "pay-correctie": [
+      "corrigeerFactuur"
     ],
     "pay-tegoed": [
       "pay"
@@ -1911,6 +1923,7 @@
     "stuur": [
       "isolatie",
       "stuurBevestig",
+      "stuurIntrek",
       "stuurPaden",
       "stuurRoep"
     ],

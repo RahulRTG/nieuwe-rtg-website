@@ -259,9 +259,9 @@ grendel**:
 Twee dingen die deze tabel laat zien en die de opzet nog niet zei. Ten eerste:
 **de helft staat er al**, en de goede helft — namelijk die waar geld en veiligheid
 aan hangen. Ten tweede: de weg van signaal naar grendel is in dit huis al
-uitgevonden en heet **schaduw** (`kern/stuur/schaduw.js`, `CONTROLPLANE.md`): een
-nieuwe handhavingsregel loopt eerst mee zónder te blokkeren, want *je kunt niet
-afdwingen wat nooit in de schaduw heeft gelopen*. `kern/commercie/lidpoort.js`
+uitgevonden en heet **schaduw** (`kern/commercie/schaduw.js`, `CONTROLPLANE.md`):
+een nieuwe handhavingsregel loopt eerst mee zónder te blokkeren, want *je kunt
+niet afdwingen wat nooit in de schaduw heeft gelopen*. `kern/commercie/lidpoort.js`
 doet dat vandaag, met twee aparte schaduwregels omdat *een afgelopen afspraak
 afdwingen* en *elk lid zonder vastgelegde afspraak buitensluiten* twee besluiten
 zijn.

@@ -140,15 +140,39 @@ function verschil(voor, na, negeer) {
   return uit;
 }
 
-/* De haak. `res.json` is het punt waar elke route zijn antwoord geeft, dus daar
-   staat de opslag in de stand die dit verzoek heeft achtergelaten -- na het
-   werk en voor het antwoord de deur uit gaat. Koppen moeten voor het lijf
-   geschreven zijn; vandaar hier en niet op 'finish'. */
+/* De haak. Aan `res.end` en NIET aan `res.json` -- een gemeten reparatie
+   (14 september 2026).
+
+   HIJ HING AAN res.json, "het punt waar elke route zijn antwoord geeft". Dat
+   klopte niet en het mislukte STIL: res.json is waar een route zijn antwoord
+   AANBIEDT, en wie het verstuurt kan iemand anders zijn.
+   server/middleware/compressie.js hangt zich hierboven en verpakt elk JSON-lijf
+   van 1 kB of meer zelf -- serialiseren, comprimeren, `res.send` -- en roept de
+   keten onder zich dan nooit aan. Boven die drempel droeg geen antwoord een
+   X-RTG-Staat.
+
+   WAT DAT KOSTTE, en waarom het erger is dan een gat. Zonder kop geeft `staatVan`
+   in de idempotentieproef een LEEG verschil, en kern/stuur/gevolg.js maakt daar de
+   graad `geen-effect-gemeten` van: "de proef draaide en zag geen enkele collectie
+   veranderen" -- een uitspraak over een meting die nooit plaatsvond. Precies de
+   verwisseling die dit huis weigert: onbekend dat stil nul wordt. Gevonden aan
+   /api/office/bank/incasso, dat een voornemen, dossier en vooruitblik teruggeeft
+   en in IDEMPROEF.json op een leeg `opslag` stond terwijl de effectmeter in
+   hetzelfde verzoek vier schrijfacties telde.
+
+   HET ANTWOORD STOND AL IN HUIS: server/effectmeter.js is om dezelfde reden
+   verhuisd (daar 282 routes), en de zin die daar staat geldt hier woordelijk --
+   res.end is de ene uitgang waar alle andere doorheen lopen. Twee meters met
+   dezelfde blinde vlek en een verschillende uitgang is het gat dat niemand ziet.
+
+   KOPPEN VOOR HET LIJF blijft gelden: op `finish` is het te laat. res.end is het
+   laatste moment, en `headersSent` houdt vast dat een tweede end niets
+   overschrijft. */
 function haak(app) {
   if (!aan || !app || typeof app.use !== 'function') return false;
   app.use((req, res, next) => {
-    const echt = res.json;
-    res.json = function (...args) {
+    const echt = res.end;
+    res.end = function (...args) {
       try { if (!res.headersSent) res.setHeader('X-RTG-Staat', stand()); } catch (e) {}
       return echt.apply(this, args);
     };

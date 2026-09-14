@@ -26,13 +26,17 @@
 
    Bewust zonder eigen opslaglaag: het journaal leeft in db.data.inzageLog en
    gaat dus mee in dezelfde duurzame opslag (JSON/SQLite/Postgres) als de rest.
-   Begrensd op MAX regels; loopt hij vol, dan valt de oudste eraf. Wie langer
-   moet bewaren, exporteert periodiek (zie lijst()). */
-const MAX = 5000;
+
+   HOE LANG HET JOURNAAL BEWAART staat in ./inzagelog-bewaring.js, met de reden
+   erbij. Kort: op TIJD en niet op aantal, want een bovengrens op aantal maakt
+   een andere belofte waar dan die aan het lid. */
 
 const { hangAan, verifieer, top } = require('./lib/keten');
 const { verankerPunt, verifieerTegenAnker } = require('./lib/keten-anker');
 const { nu, datum } = require('./lib/klok');
+/* Bewaartermijn en snoei staan los; de database komt pas via zet() binnen. */
+const { BEWAARDAGEN, MAX, maakSnoei } = require('./inzagelog-bewaring');
+const snoei = maakSnoei(() => DB);
 
 /* De db-laag komt via zet() binnen, zodat dit bestand niets circulair
    importeert en tests hem met een nepdatabase kunnen vullen.
@@ -123,36 +127,15 @@ function schrijfRegel({ door, over, waarom, bron, extra } = {}) {
   const l = rij();
   const r = hangAan(l, kaal);
   l.unshift(r);
-  if (l.length > MAX) l.length = MAX;
+  snoei(l);
   return r;
 }
 
-/* Meerdere accounts in één handeling (een lijstscherm dat namen toont) horen
-   als ÉÉN regel in het journaal, niet als vijftig. Anders verdrinkt het echte
-   signaal -- de gerichte opzoeking van één persoon -- in de ruis van elke
-   pagina die iemand opent. Het aantal en de id's blijven wel staan. */
-function noteerVeel(opdracht = {}) {
-  const o = veelOpdracht(opdracht);
-  return o ? noteer(o) : null;
-}
-
-/* De vorm van een meervoudige regel, los van wie hem vastlegt -- zodat
-   noteerVeel() en noteerVeelVast() nooit twee verschillende regels schrijven.
-   Dezelfde grond als schrijfRegel(): een hashketen die twee soorten regels dekt,
-   bewijst over geen van beide iets.
-
-   De drie extra velden gaan MEE in plaats van er achteraf op te worden gezet:
-   sinds de keten eronder ligt, dekt de hash de regel zoals hij wordt
-   weggeschreven. Zie de uitleg bij noteer(). */
-function veelOpdracht({ door, overIds, waarom, bron } = {}) {
-  const ids = (Array.isArray(overIds) ? overIds : []).map(String);
-  if (!ids.length) return null;
-  return { door, over: { id: ids[0] }, waarom, bron, extra: {
-    overId: null,                       // het is geen enkele persoon
-    aantal: ids.length,
-    overIds: ids.slice(0, 200)          // begrensd: een dump van 65M id's helpt niemand
-  } };
-}
+/* De MEERVOUDIGE kant staat in ./inzagelog-veel.js: een lijstscherm dat vijftig
+   namen toont is een ander onderwerp dan de gerichte opzoeking van een mens, en
+   het schrijft een andere regel. `noteer` gaat als functie mee, zodat beide
+   vormen door dezelfde schrijver gaan. */
+const { noteerVeel, veelOpdracht } = require('./inzagelog-veel')({ noteer });
 
 /* De DUURZAME kant staat in ./inzagelog-vast.js: noteerVast() en
    noteerVeelVast() doen een andere belofte over dezelfde regel -- ze komen pas
@@ -169,7 +152,12 @@ const { noteerVast, noteerVeelVast } = require('./inzagelog-vast')({
    nalopen zijn een ander onderwerp dan schrijven, met andere lezers. De rij
    gaat als FUNCTIE mee, zodat er maar een plek is die weet waar het journaal
    woont. */
-const lezen = require('./inzagelog-lezen')({ rij });
+const lezen = require('./inzagelog-lezen')({
+  rij,
+  /* Zelfde bewaartermijn en noodrem. */
+  bewaardagen: BEWAARDAGEN,
+  afgekapt: () => { try { return Number(DB && DB.data && DB.data.inzageLogAfgekapt) || 0; } catch (e) { return 0; } }
+});
 const { lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker } = lezen;
 
-module.exports = { zet, noteer, noteerVast, noteerVeel, noteerVeelVast, lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker, MAX };
+module.exports = { zet, noteer, noteerVast, noteerVeel, noteerVeelVast, lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker, MAX, BEWAARDAGEN };

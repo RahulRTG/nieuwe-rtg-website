@@ -74,6 +74,19 @@ test('2. zonder grondwaarheid is er een reden, en geen dekkingsclaim zonder gron
     assert.ok(m.claim === 'waarneming' || m.claim === 'dekking',
       naam + ' zegt niet wat hij mag beweren; "waarneming" en "dekking" zijn twee verschillende vergunningen');
 
+    if (m.grondwaarheid === 'ONBEPAALD') {
+      /* Het doel is niet dat dit getal naar nul gaat, maar dat elk ONBEPAALD een
+         VRAAG draagt waarvan het antwoord bepaalt welke grondwaarheid hier
+         geldig zou zijn. Zonder die drie blijft een open post staan omdat
+         niemand weet wat hem zou sluiten. */
+      assert.ok(m.vragen && m.vragen.claim && m.vragen.onafhankelijkeBron && m.vragen.zelfdeBlindheid,
+        naam + ' staat als ONBEPAALD zonder de drie vragen (wat claimt hij letterlijk, welke bron is ' +
+        'onafhankelijk van zijn constructie, en kan die bron dezelfde blindheid hebben)');
+      for (const [v, tekst] of Object.entries(m.vragen)) {
+        assert.ok(String(tekst).length > 25, naam + ': de vraag "' + v + '" is te kort om iets te vragen');
+      }
+    }
+
     if (m.grondwaarheid === 'GEEN' || m.grondwaarheid === 'ONBEPAALD') {
       assert.ok(String(m.reden || '').trim().length > 20,
         naam + ' heeft geen grondwaarheid en geen reden. Zonder reden is een ontbrekende ijking niet te ' +

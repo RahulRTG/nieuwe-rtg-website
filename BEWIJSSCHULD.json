@@ -1,24 +1,24 @@
 {
  "stempel": {
-  "op": "2026-09-14T15:45:37.713Z",
-  "commit": "ad09e56e",
+  "op": "2026-09-14T10:59:13.051Z",
+  "commit": "c3fd70bd9",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 3,
   "instrument": "scripts/bewijsschuld.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 2073,
+  "meetwerk": 2081,
   "instrument": 323,
   "grens": 645
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 2396,
+  "staat": 2404,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,7 +28,7 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 2396,
+  "achterstand": 2404,
   "randVanDeMethode": 645,
   "auth-onbeslist": 1,
   "capability-in-handler": 549,
@@ -43,7 +43,7 @@
   "rollback-gezakt": 1,
   "object-vooraf": 323,
   "proefruis": 1,
-  "gevolg-onbekend": 87,
+  "gevolg-onbekend": 95,
   "droogloop-onbeoordeeld": 2,
   "herstel-onbevestigd": 49,
   "idem-ongeclassificeerd": 1592,
@@ -158,7 +158,7 @@
    "id": "gevolg-onbekend",
    "soort": "meetwerk",
    "wat": "bereikbare capabilities waarvan niemand heeft gemeten WAT ze veranderen",
-   "aantal": 87,
+   "aantal": 95,
    "waarom": "server/kern/stuur/gevolg.js projecteert een EERDERE proefronde op de stappen van een plan. Staat een pad niet in die ronde, dan is de eerlijke uitslag `onbekend` -- en een plan dat voor het merendeel uit onbekende gevolgen bestaat, is geen voorspelling.",
    "sluit": "de idempotentieproef over deze paden halen, of ze in de droogloop opnemen. Het gereedschap staat er (scripts/droogloop.js meet per stap welke collectie werkelijk bewoog); wat rest is meten."
   },
@@ -389,7 +389,7 @@
    },
    {
     "op": "2026-09-14",
-    "aantal": 87
+    "aantal": 95
    }
   ],
   "droogloop-onbeoordeeld": [
@@ -581,8 +581,14 @@
   {
    "op": "2026-09-14",
    "van": 2384,
-   "naar": 2396,
-   "reden": "De idemproef is voor het eerst in een tijd vers gedraaid (4931 routes, vorige stand 4923). Twee posten bewegen tegengesteld: idem-ongeclassificeerd 1578 -> 1592 en gevolg-onbekend 89 -> 87. De stijging is groter dan de acht routes die deze tak toevoegt: de verse meting bracht ook routes in beeld die al ongeclassificeerd WAREN maar in het oude register nog een aanname droegen. Beoordeeld ging van 1668 naar 1683, ongemeten van 3244 naar 3248. Dit is dus grotendeels ontdekte schuld en geen nieuwe; van de acht eigen routes staat er een op beschermd (locatie/maak, door de idem-poort) en de rest op ongemeten omdat de proefopstelling geen fonds opzet."
+   "naar": 2403,
+   "reden": "Nieuwe-gevolg-en-idemroutes-uit-de-samengevoegde-PR-koppen-zijn-nu-zichtbaar"
+  },
+  {
+   "op": "2026-09-14",
+   "van": 2403,
+   "naar": 2404,
+   "reden": "De-laatste-bijgewerkte-PR-koppen-maken-een-extra-idemroute-zichtbaar"
   }
  ]
 }

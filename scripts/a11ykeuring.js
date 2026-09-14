@@ -202,7 +202,7 @@ function verloopStops(laag) {
      kleur(). Liever niets weten dan iets verzinnen. */
   if (/\b(hsla?|hwb|lab|lch|oklab|oklch)\s*\(/i.test(laag)) return null;
   if (/color\(\s*(?!srgb\b)/i.test(laag)) return null;
-  const m = laag.match(/rgba?\([^)]+\)|color\([^)]+\)|\btransparent\b/gi) || [];
+  const m = laag.match(/rgba?\([^)]+\)|color\([^)]+\)/gi) || [];
   /* `transparent` blijft buiten kleur(): die functie weigert met opzet alles wat
      geen rgb is (zie test/a11ykeuring.test.js), en die afspraak is meer waard
      dan dit ene gemak. Hier is het gewoon zwart met alfa nul. */

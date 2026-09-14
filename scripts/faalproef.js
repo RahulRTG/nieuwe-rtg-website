@@ -475,6 +475,34 @@ function oordeel(schoon, met) {
   }
 
   const tel = s => perRoute.filter(r => r.failure === s).length;
+
+  /* HET BESLUITREGISTER NAAST DE METING (MENSNETWERK.md par. 0.6b, besluit A van
+     de eigenaar, 13 september 2026).
+
+     Het contract hier is mechanisch: 200 terwijl de toestand niet veranderde.
+     Wat het NIET kan zien is of het verloren gevolg zichzelf herstelt -- bij een
+     cache-tijdstempel is dat het hele verschil met een verdwenen bankakkoord.
+     Dat is domeinkennis, en die hoort niet in de meter.
+
+     HET BESLUIT DRUKT DE METING NIET WEG, en dat is de hele vorm: `gezakt` blijft
+     `gezakt`, en er komt een `besluit` naast te staan. Zelfde afspraak als
+     IDEMBESLUIT.json naast IDEMPROEF.json. Wie het besluit de meting laat
+     overschrijven, heeft de meting afgeschaft in plaats van haar te verklaren --
+     en dan is het register een manier om een getal groen te praten. */
+  let BESLUITEN = {};
+  try {
+    BESLUITEN = (JSON.parse(fs.readFileSync(path.join(WORTEL, 'HERREKENBAAR.json'), 'utf8')) || {}).routes || {};
+  } catch (e) { BESLUITEN = {}; }
+  for (const r of perRoute) {
+    const b = BESLUITEN[r.route];
+    if (b) r.besluit = { klasse: b.klasse, grond: b.grond, besloten: b.besloten };
+  }
+  /* Apart geteld en NOOIT van `gezakt` afgetrokken: dit is hoeveel van de gezakte
+     routes een uitgeschreven verklaring dragen, niet hoeveel er minder gezakt
+     zijn. Een gezakte route zonder verklaring is werkvoorraad; een met
+     verklaring is een besluit. Allebei staan ze in het getal hierboven. */
+  const gezaktMetBesluit = perRoute.filter(r => r.failure === 'gezakt' && r.besluit).length;
+
   const uit = {
     soort: 'meting',
     uitleg: 'De FAILURE-cel per route: faalt hij netjes als er iets onder hem wegvalt. Het contract wordt eerst bepaald uit het gemeten effectprofiel (X-RTG-Effect / X-RTG-Staat) en pas daarna beproefd met het verraad dat daarbij hoort.',
@@ -502,6 +530,10 @@ function oordeel(schoon, met) {
          niets hoort op te slaan, is een beschuldiging zonder grond. */
       voorziening: telSoort('voorziening'),
       bewezen: tel('bewezen'), gezakt: tel('gezakt'), ongemeten: tel('ongemeten'),
+      /* Zie de kop bij BESLUITEN hierboven: dit is een deelverzameling van
+         `gezakt` en geen correctie erop. */
+      gezaktMetBesluit,
+      gezaktZonderBesluit: tel('gezakt') - gezaktMetBesluit,
       /* DE VIER STANDEN DIE UIT `ongemeten` ZIJN GEHAALD, elk met zijn eigen
          teller. Ze worden met opzet NIET opgeteld tot een 'niet beproefd':
          `nietMutatief` en `voorziening` zijn een EIGENSCHAP van de route (er is

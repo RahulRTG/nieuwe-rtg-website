@@ -52,6 +52,7 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { execFileSync } = require('node:child_process');
 
 const ROOT = path.join(__dirname, '..', '..');
 /* Het pad is te verleggen, en niet voor productie -- daar is het altijd
@@ -97,7 +98,15 @@ function procesLeeft(pid) {
     const stat = fs.readFileSync('/proc/' + pid + '/stat', 'utf8');
     const na = stat.slice(stat.lastIndexOf(')') + 2).split(' ');
     if (na[0] === 'Z') return false;          // defunct: adresseerbaar, maar houdt niets meer vast
-  } catch (e) { /* geen /proc: het oude, voorzichtige gedrag -- hij telt als levend */ }
+  } catch (e) {
+    /* macOS heeft geen /proc, maar ps onderscheidt daar dezelfde zombie. Zonder
+       deze tweede lezing bleef een door de proef geveld kind vijf seconden
+       schijnbaar leven omdat zijn ouder hem nog niet had geoogst. */
+    try {
+      const stand = execFileSync('ps', ['-o', 'stat=', '-p', String(pid)], { encoding: 'utf8' }).trim();
+      if (/^Z/.test(stand)) return false;
+    } catch (geenPs) { /* voorzichtig: als ook ps niets zegt, telt het PID als levend */ }
+  }
   return true;
 }
 /* LEEFT DIT NOG, EN IS HET NOG HETZELFDE? Een PID dat leeft maar een andere
@@ -112,15 +121,22 @@ function zelfdeProces(p) {
 }
 const merk = (pid) => ({ pid: Number(pid), start: procesStart(Number(pid)) });
 
-/* De proceskring: alle nakomelingen van een wortel-PID, uit /proc. Recursief,
-   want een toets die een server start die een werker start is drie diep. */
+/* De proceskring: alle nakomelingen van een wortel-PID. Linux levert ze uit
+   /proc; op macOS bestaat die boom niet en gebruiken we pgrep met een losse
+   argumentlijst (dus zonder shell). Recursief, want een toets die een server
+   start die een werker start is drie diep. */
 function kringVan(wortel, gezien = new Set()) {
   const uit = [];
   let kinderen = [];
   try {
     kinderen = fs.readFileSync('/proc/' + wortel + '/task/' + wortel + '/children', 'utf8')
       .trim().split(/\s+/).filter(Boolean).map(Number);
-  } catch (e) { kinderen = []; }
+  } catch (e) {
+    try {
+      kinderen = execFileSync('pgrep', ['-P', String(wortel)], { encoding: 'utf8' })
+        .trim().split(/\s+/).filter(Boolean).map(Number);
+    } catch (geenKinderen) { kinderen = []; }
+  }
   for (const k of kinderen) {
     if (gezien.has(k)) continue;
     gezien.add(k);

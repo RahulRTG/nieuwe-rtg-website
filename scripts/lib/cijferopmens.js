@@ -58,6 +58,37 @@ const WOORDEN = [
 ];
 
 const PATROON = new RegExp('\\b(' + WOORDEN.map(([w]) => w).join('|') + ')\\b', 'i');
+const PATROON_ALLE = new RegExp(PATROON.source, 'gi');
+
+/* EEN ONTKENNING IS GEEN SCORE, en dat is geen versoepeling maar het uitvoeren
+   van wat de kop hierboven al belooft: *de lagen zelf MOETEN de woorden kunnen
+   noemen om uit te leggen waarom ze er niet zijn*. Dat werkte alleen in
+   COMMENTAAR, en precies daar hoort die uitleg NIET te staan -- een lid leest
+   geen commentaar. Twee schoolmodules schrijven hem daarom in het antwoord:
+
+     analyse-signalen.js  'Er is bewust geen score en geen volgorde op zwaarte.'
+     hr-verlof.js         'Er staat bewust geen cijfer of ranglijst in.'
+
+   Allebei werden ze GEMELD. De scan bestrafte dus de twee modules die hun eigen
+   grens het duidelijkst nakomen, en dat is de gevaarlijkste vorm van een valse
+   treffer: hij leert je de uitleg weg te laten.
+
+   DE ONTKENNING LOOPT OVER EEN LIJSTJE, en daarom staat er geen vast rijtje
+   woorden tussen: "geen cijfer of ranglijst" ontkent allebei, en wie alleen
+   `geen\s+$` accepteert vangt de eerste wel en de tweede niet.
+
+   DE GRENS IS TWEE WOORDEN, en dat is geen afgeronde smaak maar het verschil
+   tussen een NAAMWOORDGROEP en een BIJZIN. Een ontkenning regeert een kort
+   rijtje zelfstandige naamwoorden ("geen cijfer of ranglijst"); zodra er een
+   bijzin achter komt, gaat zij niet meer over het laatste woord. Een venster op
+   TEKENS in plaats van woorden viel daarop om: `geen aparte weging maar wel een
+   echte score` is 33 tekens en dus binnen elk redelijk tekenvenster, terwijl
+   het een score AANKONDIGT. Met twee woorden blijft dat een treffer.
+
+   Leestekens tellen niet als woord, dus `{ uitleg: 'geen oordeel', score: 9 }`
+   blijft ook een treffer: tussen de ontkenning en `score` staat `',` en dat is
+   geen `[\w-]+`. */
+const ONTKEND = /\b(geen|zonder|nooit)\b(\s+[\w-]+){0,2}\s+$/i;
 
 /* De lexicale helft. Geeft een lijst treffers als 'bestand: woord'; leeg is
    goed. Een map die niet bestaat geeft leeg terug EN meldt dat -- een grens die
@@ -70,8 +101,15 @@ function grensScan(mappen) {
     if (!fs.existsSync(map)) { ontbreekt.push(map); continue; }
     for (const naam of fs.readdirSync(map).filter(n => n.endsWith('.js'))) {
       const code = zonderCommentaar(fs.readFileSync(path.join(map, naam), 'utf8'));
-      const treffer = code.match(PATROON);
-      if (treffer) gevonden.push(path.basename(map) + '/' + naam + ': ' + treffer[0]);
+      /* ALLE treffers en niet de eerste. `code.match(PATROON)` zonder /g gaf er
+         een, dus een bestand dat vroeg "geen score" schrijft en laat een ECHTE
+         score bouwt, meldde de onschuldige -- en wie de melding naleest, ziet
+         een valse treffer en kijkt niet verder. */
+      for (const m of code.matchAll(PATROON_ALLE)) {
+        if (ONTKEND.test(code.slice(Math.max(0, m.index - 24), m.index))) continue;
+        gevonden.push(path.basename(map) + '/' + naam + ': ' + m[0]);
+        break;                                   // een melding per bestand is genoeg om te gaan kijken
+      }
     }
   }
   return { gevonden, ontbreekt };

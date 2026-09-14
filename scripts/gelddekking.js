@@ -65,7 +65,7 @@ const { stempel } = require('./lib/stempel');
 
    `bouw` krijgt de drie registers als gewone argumenten. Geen fs, geen paden,
    geen process.exit -- dat staat allemaal onder require.main hieronder. */
-function bouw({ kaart, contract, herstelproef, herstelbesluit, padproef }) {
+function bouw({ kaart, contract, herstelproef, herstelbesluit, padproef, meldbesluit}) {
   const klachten = [];
   if (!kaart) klachten.push('GELDKAART.json ontbreekt -- draai npm run geldkaart');
   if (!contract) klachten.push('MUTATIECONTRACT.json ontbreekt');
@@ -86,6 +86,13 @@ function bouw({ kaart, contract, herstelproef, herstelbesluit, padproef }) {
      route die hier niet in staat is UNKNOWN -- de eerlijke restklasse, en de
      enige die vanzelf ontstaat. */
   const besloten = (herstelbesluit && herstelbesluit.routes) || {};
+  /* DE MELDPLICHT, langs exact dezelfde weg en om dezelfde reden: een
+     VERKLARING naast een METING, nooit eruit afgeleid. CRASHPROEF.json meet per
+     rij of er na een dood op het meldmoment nog een melding ontstond; dit zegt
+     of dat had gemoeten. Leeg betekent hier UNKNOWN en niet GEEN_BERICHT -- een
+     route die niets stuurt kan even goed het defect zijn dat deze kolom moet
+     kunnen aanwijzen. */
+  const gemeld = (meldbesluit && meldbesluit.routes) || {};
 
   /* DE VERTICALE PADPROEVEN ALS VIERDE MEETBRON.
 
@@ -131,6 +138,10 @@ function bouw({ kaart, contract, herstelproef, herstelbesluit, padproef }) {
       /* `klasse` was de oude veldnaam en `stand` is die van het besluit van
          12 september; allebei lezen, want een register mag niet stil van vorm
          veranderen onder een meter die er maar een kent. */
+      berichtAan: (gemeld[g.methode + ' ' + g.pad] && gemeld[g.methode + ' ' + g.pad].stand)
+        || (gemeld[g.pad] && gemeld[g.pad].stand) || 'UNKNOWN',
+      berichtGrond: (gemeld[g.methode + ' ' + g.pad] && gemeld[g.methode + ' ' + g.pad].reden)
+        || (gemeld[g.pad] && gemeld[g.pad].reden) || null,
       herstelKlasse: (besloten[g.methode + ' ' + g.pad] && (besloten[g.methode + ' ' + g.pad].stand || besloten[g.methode + ' ' + g.pad].klasse))
         || (besloten[g.pad] && (besloten[g.pad].stand || besloten[g.pad].klasse)) || 'UNKNOWN',
       herstelGrond: (besloten[g.methode + ' ' + g.pad] && (besloten[g.methode + ' ' + g.pad].reden || besloten[g.methode + ' ' + g.pad].grond))
@@ -294,6 +305,10 @@ function bouw({ kaart, contract, herstelproef, herstelbesluit, padproef }) {
     /* Niet "zonder terugweg" maar "zonder VERKLAARD correctiemodel". Een route
        mag FINAL zijn; wat niet mag is dat niemand het heeft opgeschreven. */
     geldRoutesHerstelOnbesloten: rijen.filter(r => r.herstelKlasse === 'UNKNOWN').length,
+    /* Dezelfde vorm als hierboven: het aantal geldroutes waarvan NIEMAND heeft
+       verklaard of er bericht hoort te gaan. Hij begint op alles en hoort te
+       dalen doordat een mens beslist -- niet doordat een meting iets invult. */
+    geldRoutesMeldOnbesloten: rijen.filter(r => r.berichtAan === 'UNKNOWN').length,
     geldRoutesHerstelTegenspraak: tegenspraken.length
   };
 
@@ -339,6 +354,7 @@ const register = bouw({
   contract: lees('MUTATIECONTRACT.json'),
   herstelproef: lees('HERSTELPROEF.json'),
   herstelbesluit: lees('HERSTELBESLUIT.json'),
+  meldbesluit: lees('MELDBESLUIT.json'),
   /* Ontbreekt hij, dan is `padproef` overal null en verandert er niets aan de
      uitslag: een ontbrekende meting maakt een as nooit slechter dan hij was. */
   padproef: [lees('FACTUURPROEF.json')].filter(Boolean)

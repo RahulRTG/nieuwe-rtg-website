@@ -116,3 +116,45 @@ test('de percentages tellen op tot honderd en elke cent telt maar een keer', () 
      het totaal het dubbele van wat er is gefactureerd. */
   assert.equal(d.totaalCenten, 23100, 'de gefactureerde btw, en niet het dubbele');
 });
+
+/* ==========================================================================
+   DE AFRONDREGEL ZELF -- de cent die aangifte en boekhouding uit elkaar liet
+   lopen (14 september 2026).
+
+   `btwtelling.js` rondde per FACTUURREGEL af en telde op; `financeVoor` telde
+   eerst alle omzet van een categorie bij elkaar en splitste die som EEN keer.
+   Bij gelijke tarieven valt dat samen, bij het Nederlandse 9% niet -- de
+   aangifte telde 13251 cent waar de boekhouding er 13250 telde. Gemeten en niet
+   vermoed: dezelfde fout reproduceert op de commit vOOr de btw-ronde, dus hij
+   was pre-bestaand en werd door de Spaanse tarieven gemaskeerd.
+
+   Sindsdien ronden beide kanten af met kern/afgeleid.js `btwCenten`, op dezelfde
+   eenheid. Deze twee toetsen bewaken die regel rechtstreeks, zodat hij niet
+   alleen via een lange factuurketen wordt geraakt.
+   ========================================================================== */
+const { btwCenten, btwSplit } = require('../server/kern/afgeleid');
+
+/* MUTATIE GEZIEN ZAKKEN: in btwCenten `Math.round` vervangen door `Math.floor`;
+   deze toets zakte op de eerste regel. */
+test('de btw op een regel is dezelfde som als de aangifte hem maakt', () => {
+  /* Precies de getallen uit de gezakte keten: drie bonnen van 9% die samen
+     112,00 bruto zijn. Per regel afgerond is dat een andere uitkomst dan de som
+     in een keer splitsen -- en de aangifte telt per regel. */
+  assert.equal(btwCenten(112.00, 9), 11200 - Math.round(11200 / 1.09));
+  assert.equal(btwCenten(0, 21), 0, 'nul draagt geen btw');
+  /* Een tegenboeking neemt exact terug wat de verkoop bijschreef; zou dat niet
+     zo zijn, dan laat elke terugstorting een cent in de pot achter. */
+  assert.equal(btwCenten(-49.95, 21), -btwCenten(49.95, 21),
+    'een tegenboeking neemt niet exact terug wat de verkoop bijschreef');
+});
+
+test('per regel optellen wijkt af van de som in een keer splitsen -- en dat is de hele reden', () => {
+  /* DE TEGENPROEF. Zonder een geval waarin de twee wegen aantoonbaar UIT ELKAAR
+     lopen, bewijst de toets hierboven niets: dan zou elke afrondregel voldoen.
+     Drie regels van 37,33 bij 9% is zo'n geval. */
+  const regels = [37.33, 37.33, 37.34];
+  const perRegel = regels.reduce((s, b) => s + btwCenten(b, 9), 0);
+  const inEenKeer = Math.round(btwSplit(regels.reduce((s, b) => s + b, 0), 9).btw * 100);
+  assert.notEqual(perRegel, inEenKeer,
+    'deze getallen lopen niet meer uit elkaar; kies een geval dat dat wel doet, anders bewaakt de toets hierboven niets');
+});

@@ -451,11 +451,33 @@ test('6c. een bon die met een cadeaukaart wordt betaald telt EEN keer, en de aan
 /* -------------------------------------------------------------------------
    3. HET DOEL: de aangifte en de boekhouding tellen dezelfde omzet
    ------------------------------------------------------------------------- */
+/* TWEE TARIEVEN ZIJN HET INSTRUMENT VAN DEZE TOETSEN, DUS ZE ZETTEN ZE ZELF.
+
+   De demozaak (KIKUNOI, "Sal de Mar") staat in Ibiza en dus op ES. Daar had de
+   landentabel `drank` op 21% staan, en op dat getal leunden deze twee toetsen
+   voor hun tweede tarief. Het was fout: art. 91 Ley 37/1992 maakt de DIENST het
+   criterium en niet het product, dus alles wat ter plaatse als horecadienst
+   wordt geserveerd valt op 10% -- alcohol inbegrepen. Na die correctie draagt
+   een Spaanse horecazaak terecht EEN tarief, en zakten deze twee.
+
+   De assertie afzwakken naar een tarief zou het instrument slopen: de kop in
+   toets 7 zegt waarom er twee nodig zijn -- zonder een tweede tarief komt een
+   factuur die alles op het lage tarief zet er ongestraft doorheen. Ze zetten het
+   land daarom ZELF op NL, waar eten 9% en drank 21% is. Dat is steviger dan
+   eerst: de toets hangt niet meer aan een tabelwaarde die toevallig verschilde,
+   maar zegt uit welk verschil hij meet. */
+async function tweeTarieven(base, mgr) {
+  const r = await api(base, '/api/supplier/settings', { land: 'NL' }, mgr);
+  assert.equal(r.status, 200,
+    'het land van de zaak kon niet op NL worden gezet: ' + JSON.stringify(r.body).slice(0, 160));
+}
+
 test('7. de btw-aangifte komt uit op de omzet die de maandboekhouding telt', async () => {
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
     const mgr = await managerVan(base, 'KIKUNOI');
+    await tweeTarieven(base, mgr);
     const lid = await registreer(base);
     const item = await eersteItem(base, lid, 'KIKUNOI');
     /* En een BAR-artikel, want de boekhouding telt de bar apart tegen het
@@ -588,6 +610,7 @@ test('9. een bon die met een cadeaukaart wordt betaald: aangifte en boekhouding 
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   try {
     const mgr = await managerVan(base, 'KIKUNOI');
+    await tweeTarieven(base, mgr);
     const lid = await registreer(base);
     const kaartMenu = (await api(base, '/api/supplier/menu/get', { code: 'KIKUNOI' }, lid)).body;
     const eten = (kaartMenu.menu || []).find(x => x.station !== 'bar');

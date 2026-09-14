@@ -1,14 +1,14 @@
 {
   "stempel": {
-    "op": "2026-09-13T20:32:07.787Z",
-    "commit": "e7f7d9153",
+    "op": "2026-09-14T15:14:41.989Z",
+    "commit": "91144914",
     "boomVuil": false,
     "instrument": "scripts/gelding.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Waar geldt een wet (CLAIM), waar leeft hij (DRAAG), en waar kan een wachter hem zien (WACHT)? De drie assen worden onafhankelijk gevuld en pas daarna vergeleken; zij delen geen bron, en test/gelding.test.js houdt dat vast.",
   "graad": "vermoed",
-  "grens": "GEEN PERCENTAGE, en dat is een ontwerpkeuze: voor een verhouding moet eerst vaststaan wat een telbare eenheid is, en bij een centrale architectuur kan een objectfamilie zwaarder wegen dan twintig mappen. TWEE UITSLAGEN ZIJN GEMAKKELIJK VERKEERD TE LEZEN: GECLAIMD_GEEN_DRAGER_GEVONDEN betekent NIET dat er geen drager is, alleen dat DEZE sensor er geen vond -- en die ziet vandaag `opslaan` en `tonen`, en `projecteren` en `rangschikken` niet. GEDRAGEN_NIET_GEZIEN betekent NIET \"ongetest\": misschien bewaakt een centrale laag de cel op een manier die deze wachtersensor niet ziet.",
+  "grens": "GEEN PERCENTAGE, en dat is een ontwerpkeuze: voor een verhouding moet eerst vaststaan wat een telbare eenheid is, en bij een centrale architectuur kan een objectfamilie zwaarder wegen dan twintig mappen. DRIE UITSLAGEN ZIJN GEMAKKELIJK VERKEERD TE LEZEN: GECLAIMD_GEEN_DRAGER_GEVONDEN betekent NIET dat er geen drager is, alleen dat DEZE sensor er geen vond -- en die ziet vandaag `opslaan` en `tonen`, en `projecteren` en `rangschikken` niet. GEDRAGEN_NIET_GEZIEN betekent NIET \"ongetest\": misschien bewaakt een centrale laag de cel op een manier die deze wachtersensor niet ziet. En UITGEZONDERD_IN_DOCTRINE betekent NIET \"hier mag alles\": het zegt dat de doctrine op deze cel zelf een uitzondering maakt, met een uitgeschreven reden die in `claimWaarom` staat -- wie die reden niet leest, leest de uitslag verkeerd. Hij is met opzet gescheiden van ONBEPAALD, want dat betekent het tegenovergestelde: daar weet niemand waarom er niets wordt geclaimd.",
   "geval": {
     "id": "geen-cijfer-op-mens",
     "objectfamilie": "MENS",
@@ -60,6 +60,15 @@
           "context": "school",
           "handeling": "opslaan",
           "waarom": "SCHOOL.md par. 11.1 verbiedt een score BUITEN het potje (risicoscore, uitvalkans, ranglijst, blijvend niveau-label); een cijfer op een toets is de leerstof zelf en valt daar niet onder"
+        },
+        {
+          "context": "school",
+          "handeling": "tonen",
+          "actoren": [
+            "leerling",
+            "docent"
+          ],
+          "waarom": "een cijfer tonen aan de leerling van wie het is, of aan zijn docent, is dezelfde leerstof als het bewaren ervan. Tonen aan een partner of een externe lezer is dat niet en blijft onder de grens -- dat is precies het onderscheid dat SCHOOL.md par. 11.1 maakt"
         }
       ]
     },
@@ -156,30 +165,34 @@
       "bron": "test/cijferopmens.test.js :: MAPPEN",
       "stand": "gemeten",
       "paden": [
-        "vertegenwoordiging",
-        "rugdekking",
-        "carriereledger",
-        "levensband",
-        "levensbeleid",
-        "levensdossier",
-        "levensgraaf",
-        "levenslijn",
-        "socialegraaf"
+        "server/kern/vertegenwoordiging",
+        "server/kern/rugdekking",
+        "server/kern/carriereledger",
+        "server/kern/levensband",
+        "server/kern/levensbeleid",
+        "server/kern/levensdossier",
+        "server/kern/levensgraaf",
+        "server/kern/levenslijn",
+        "server/kern/socialegraaf",
+        "server/kern/rtfos",
+        "server/kern/command",
+        "server/school"
       ],
       "contexten": [
         "work",
         "foundation",
-        "living"
+        "living",
+        "school"
       ]
     }
   },
   "telling": {
-    "GECLAIMD_GEEN_DRAGER_GEVONDEN": 52,
-    "ONBEPAALD": 4,
+    "GECLAIMD_GEEN_DRAGER_GEVONDEN": 56,
+    "UITGEZONDERD_IN_DOCTRINE": 8,
     "GEDRAGEN_EN_GEZIEN": 4,
     "GEDRAGEN_NIET_GEZIEN": 4
   },
-  "bevinding": "Het verbreden van de DRAAG-as naar `tonen` zette vier nieuwe cellen op GEDRAGEN_NIET_GEZIEN: tonen | school | elk van de vier actoren. Dat is geen overtreding (zie `grens`), maar het stelt een vraag die de CLAIM-as vandaag niet KAN beantwoorden: de uitzondering voor School is verklaard op de HANDELING `opslaan` en kent geen actor. Een cijfer tonen aan de leerling zelf of aan zijn docent is dezelfde leerstof als het bewaren ervan; hetzelfde cijfer tonen aan een partner of een externe lezer is precies wat SCHOOL.md par. 11.1 tegenhoudt. De uitzondering is dus vermoedelijk te grof. Hem hier verbreden zou een DOCTRINEBESLUIT zijn, en dat neemt een mens en geen sensor -- daarom staat hij ongewijzigd en staat de vraag hier.",
+  "bevinding": "De vraag die dit register zelf stelde, is op 14 september door de eigenaar beantwoord, en de uitslag is daardoor op drie punten verschoven. (1) DE UITZONDERING VOOR SCHOOL KENT NU EEN ACTOR. Hij stond op de handeling `opslaan` en op niets anders, dus `tonen` viel er volledig buiten -- ook aan de leerling zelf, en dat is niet vol te houden. Hij geldt nu ook voor `tonen`, maar uitsluitend richting `leerling` en `docent`; tonen aan systeem, medewerker, partner of externe lezer blijft onder de grens. Die vier cellen staan dus nog steeds op GEDRAGEN_NIET_GEZIEN, en dat is nu een SCHERPE bevinding in plaats van een vage: het is geen open vraag meer maar een deel van de grens waar de wachter niet bij kan. (2) DE ACTOR-AS KENT TWEE ACTOREN DIE ALLEEN IN SCHOOL BESTAAN. Zonder `leerling` en `docent` was het besluit niet op te schrijven: de vier oorspronkelijke actoren zijn allemaal DERDEN. (3) DE WACHT-AS ZAG SCHOOL HELEMAAL NIET, en dat was een defect van de sensor. Hij las het eerste vierkante haakjespaar van MAPPEN en plakte er `server/kern/` voor; `server/school` staat op een losse regel eronder en viel dus buiten allebei. De wachter scant School aantoonbaar (toets 3 van test/cijferopmens.test.js zakt zonder), terwijl deze as meldde dat niemand daar keek. Een sensor die niet kon kijken, gaf een uitslag alsof hij had gekeken -- exact de faalvorm waar dit hele geval over gaat. ONBEPAALD staat hierdoor op nul: de vier cellen die daar stonden waren de doctrine-uitzondering zelf, en die heet nu UITGEZONDERD_IN_DOCTRINE.",
   "cellen": [
     {
       "handeling": "opslaan",
@@ -223,8 +236,8 @@
       "actor": "systeem",
       "claim": false,
       "draag": true,
-      "wacht": false,
-      "uitslag": "ONBEPAALD",
+      "wacht": true,
+      "uitslag": "UITGEZONDERD_IN_DOCTRINE",
       "claimWaarom": "SCHOOL.md par. 11.1 verbiedt een score BUITEN het potje (risicoscore, uitvalkans, ranglijst, blijvend niveau-label); een cijfer op een toets is de leerstof zelf en valt daar niet onder"
     },
     {
@@ -233,8 +246,8 @@
       "actor": "medewerker",
       "claim": false,
       "draag": true,
-      "wacht": false,
-      "uitslag": "ONBEPAALD",
+      "wacht": true,
+      "uitslag": "UITGEZONDERD_IN_DOCTRINE",
       "claimWaarom": "SCHOOL.md par. 11.1 verbiedt een score BUITEN het potje (risicoscore, uitvalkans, ranglijst, blijvend niveau-label); een cijfer op een toets is de leerstof zelf en valt daar niet onder"
     },
     {
@@ -243,8 +256,8 @@
       "actor": "partner",
       "claim": false,
       "draag": true,
-      "wacht": false,
-      "uitslag": "ONBEPAALD",
+      "wacht": true,
+      "uitslag": "UITGEZONDERD_IN_DOCTRINE",
       "claimWaarom": "SCHOOL.md par. 11.1 verbiedt een score BUITEN het potje (risicoscore, uitvalkans, ranglijst, blijvend niveau-label); een cijfer op een toets is de leerstof zelf en valt daar niet onder"
     },
     {
@@ -253,8 +266,28 @@
       "actor": "externeLezer",
       "claim": false,
       "draag": true,
-      "wacht": false,
-      "uitslag": "ONBEPAALD",
+      "wacht": true,
+      "uitslag": "UITGEZONDERD_IN_DOCTRINE",
+      "claimWaarom": "SCHOOL.md par. 11.1 verbiedt een score BUITEN het potje (risicoscore, uitvalkans, ranglijst, blijvend niveau-label); een cijfer op een toets is de leerstof zelf en valt daar niet onder"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "school",
+      "actor": "leerling",
+      "claim": false,
+      "draag": true,
+      "wacht": true,
+      "uitslag": "UITGEZONDERD_IN_DOCTRINE",
+      "claimWaarom": "SCHOOL.md par. 11.1 verbiedt een score BUITEN het potje (risicoscore, uitvalkans, ranglijst, blijvend niveau-label); een cijfer op een toets is de leerstof zelf en valt daar niet onder"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "school",
+      "actor": "docent",
+      "claim": false,
+      "draag": true,
+      "wacht": true,
+      "uitslag": "UITGEZONDERD_IN_DOCTRINE",
       "claimWaarom": "SCHOOL.md par. 11.1 verbiedt een score BUITEN het potje (risicoscore, uitvalkans, ranglijst, blijvend niveau-label); een cijfer op een toets is de leerstof zelf en valt daar niet onder"
     },
     {
@@ -403,6 +436,24 @@
     },
     {
       "handeling": "projecteren",
+      "context": "school",
+      "actor": "leerling",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "school",
+      "actor": "docent",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
       "context": "work",
       "actor": "systeem",
       "claim": true,
@@ -540,6 +591,24 @@
       "handeling": "rangschikken",
       "context": "school",
       "actor": "externeLezer",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "school",
+      "actor": "leerling",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "school",
+      "actor": "docent",
       "claim": true,
       "draag": false,
       "wacht": false,
@@ -688,6 +757,26 @@
       "draag": true,
       "wacht": false,
       "uitslag": "GEDRAGEN_NIET_GEZIEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "school",
+      "actor": "leerling",
+      "claim": false,
+      "draag": true,
+      "wacht": false,
+      "uitslag": "UITGEZONDERD_IN_DOCTRINE",
+      "claimWaarom": "een cijfer tonen aan de leerling van wie het is, of aan zijn docent, is dezelfde leerstof als het bewaren ervan. Tonen aan een partner of een externe lezer is dat niet en blijft onder de grens -- dat is precies het onderscheid dat SCHOOL.md par. 11.1 maakt"
+    },
+    {
+      "handeling": "tonen",
+      "context": "school",
+      "actor": "docent",
+      "claim": false,
+      "draag": true,
+      "wacht": false,
+      "uitslag": "UITGEZONDERD_IN_DOCTRINE",
+      "claimWaarom": "een cijfer tonen aan de leerling van wie het is, of aan zijn docent, is dezelfde leerstof als het bewaren ervan. Tonen aan een partner of een externe lezer is dat niet en blijft onder de grens -- dat is precies het onderscheid dat SCHOOL.md par. 11.1 maakt"
     },
     {
       "handeling": "tonen",

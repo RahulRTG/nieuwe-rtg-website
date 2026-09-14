@@ -35,19 +35,51 @@ const TIK = Object.freeze({
       { wat: 'dekking, of ruimte om bij te laden', bron: 'zorgSaldo in kern/pay/verzoeken.js' }
     ],
     gevolgen: [
-      { soort: 'direct', graad: 'vermoed', collectie: 'paySaldi',
+      { soort: 'direct', graad: 'gemeten', collectie: 'paySaldi',
         wat: 'het eigen saldo daalt en dat van de getikte ontvanger stijgt',
-        reden: 'kern/pay/tik.js boekt beide kanten via stuur; de actuele proef bereikte die code niet' },
-      { soort: 'direct', graad: 'vermoed', collectie: 'payBoekingen',
+        reden: 'GEMETEN in de ronde van 14 september 2026 met de banktikkers uit: drie keer 200 met ' +
+          'paySaldi gewijzigd. kern/pay/tik.js boekt beide kanten via stuur' },
+      { soort: 'direct', graad: 'gemeten', collectie: 'payBoekingen',
         wat: 'er komt een grootboekregel bij met soort `tik`, die bij beide leden in de ' +
           'tikgeschiedenis staat',
-        reden: '`soort: tik` is waar kern/pay/tik.js#tikFeed op filtert; nog niet gemeten met een geldige tik' },
-      { soort: 'direct', graad: 'vermoed', collectie: 'payIdem',
+        reden: 'gemeten in dezelfde ronde (een regel erbij op de eerste en de derde oproep); ' +
+          '`soort: tik` is waar kern/pay/tik.js#tikFeed op filtert' },
+      { soort: 'direct', graad: 'gemeten', collectie: 'payIdem',
         wat: 'de sleutel wordt vastgelegd zodat een tweede tik met dezelfde sleutel niet dubbel boekt',
-        reden: 'tikBetaal geeft hem door als `tik:<sleutel>`; de actuele proef strandde voor deze stap' },
-      { soort: 'direct', graad: 'vermoed', collectie: 'payIdemAfdruk',
+        reden: 'gemeten in dezelfde ronde; tikBetaal geeft hem door als `tik:<sleutel>`' },
+      { soort: 'direct', graad: 'gemeten', collectie: 'payIdemAfdruk',
         wat: 'de afdruk van het antwoord wordt bewaard voor die tweede tik',
-        reden: 'de geldpoort bewaart de afdruk bij dezelfde sleutel; de tikroute is nog niet succesvol gemeten' },
+        reden: 'gemeten in dezelfde ronde; de geldpoort bewaart de afdruk bij dezelfde sleutel' },
+      /* HIER STONDEN TWEE COLLECTIES DIE NIET VAN DEZE HANDELING WAREN, en die staan er
+         sinds de integratieronde niet meer -- maar om een ANDERE reden dan waarom ze fout
+         waren. Dat verschil hoort hier te blijven staan, want het gaat over de meter en
+         niet over deze route.
+
+         Er stond `betaalOpdrachten` en `capGezondheid`, met graad `gemeten` en een
+         verhaal eronder: ze zouden alleen op de EERSTE oproep bewegen, toen de wallet nog
+         leeg was en er moest worden bijgeladen. Dat verhaal was plausibel en het was
+         ONWAAR -- ik had een meting gezien en er een oorzaak bij bedacht.
+
+         WAT ZE WERKELIJK WAREN. server/opzet/start.js draait elke vijf minuten een
+         onderhoudsronde met `betaalWaarheid.ronde()` erin, en die zendt gestrande
+         betaalopdrachten opnieuw in; `railInzenden` in server/server.js meldt daarbij de
+         stand van `money.payout` aan kern/commercie/capgezondheid.js. Die ronde schrijft
+         dus BUITEN elk verzoek om, en de idempotentieproef rekent een stand tussen twee
+         oproepen door -- dus landt dat werk bij de route die op dat moment aan de beurt
+         is. Gemeten: 14 routes droegen `betaalOpdrachten` en 15 `capGezondheid`,
+         waaronder /api/lab2/labs, /api/member/snaps en /api/rtf/leerling/vakken. Geen
+         daarvan betaalt iets uit.
+
+         NAGETROKKEN IN DE CODE, want een meting tegenspreken vraagt meer dan een
+         vermoeden: kern/pay/tik.js en kern/pay/opladen.js noemen `betaalOpdracht`,
+         `capGezondheid` en `maakUitbetaling` geen van drieen. Bijladen is geld dat
+         BINNENKOMT; een betaalopdracht is geld dat het huis verlaat. Op /api/bank/sepa
+         staan diezelfde twee claims wel, en daar zijn ze waar -- zie ./register-lid.js.
+
+         WAT ERVOOR IN DE PLAATS KOMT: niets. Het bijladen staat al als gevolg `buiten`
+         hieronder, en dat is precies de juiste plek: wat er bij de aanbieder gebeurt, is
+         geen collectie van dit huis. En de achtergrondronde zelf staat sindsdien stil
+         tijdens een meetronde -- zie scripts/idemproef-route.js. */
       { soort: 'afgeleid', graad: 'vermoed',
         wat: 'de tik blijft geldig: hij wordt NIET verbruikt, dus dezelfde code kan binnen zijn ' +
           'vijf minuten door meer mensen gebruikt worden',
@@ -58,11 +90,11 @@ const TIK = Object.freeze({
         uitkomsten: ['niet bijgeladen', 'bijgeladen', 'bijladen mislukt'],
         reden: 'zorgSaldo roept laadOp aan; het antwoord draagt `bijgeladen` zodat het lid ziet dat ' +
           'er meer is gebeurd dan tikken' },
-      { soort: 'mislukking', graad: 'vermoed',
+      { soort: 'mislukking', graad: 'gemeten',
         wat: 'ZONDER idempotentiesleutel gebeurt er niets: de geldpoort weigert met 400 voordat de ' +
           'tik wordt opgezocht -- een kale dubbeltik kan hier dus niet twee keer betalen',
-        reden: 'de geldpoort staat voor de tikroute; de actuele kale proef had een ongeldige tik en ' +
-          'bereikte deze weigering nog niet' },
+        reden: 'GEMETEN: de kale ronde gaf tweemaal 400 en liet de opslag onaangeroerd, dus de ' +
+          'geldpoort valt voor de tik wordt opgezocht' },
       { soort: 'mislukking', graad: 'vermoed',
         wat: 'is de tik verlopen of van de aanroeper zelf, dan gaat er niets van de wallet af',
         reden: 'de twee controles in kern/pay/tik.js#tikBetaal staan VOOR de aanroep van `stuur`, ' +

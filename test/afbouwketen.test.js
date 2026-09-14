@@ -215,7 +215,27 @@ test('NEGATIEF: een mislukte claim registreert geen ronde', (t) => {
   const w = wereld();
   const kindPad = op.pidBestand(path.join(w.map, 'kind.pid'));
 
-  const eerste = op.start(['-e', RONDE, path.join(WORTEL, 'scripts/afbouw-slot.js'), kindPad], w.env());
+  /* DEZE PROEF ZET DE HARTSLAG STIL, en dat is geen versoepeling maar het
+     verschil tussen meten wat je bedoelt en meten wat er toevallig gebeurt.
+
+     wereld() zet RTG_AFLOOP_HARTSLAG op 100 ms, want de toets hierboven wil de
+     hartslag BEPROEVEN zonder erop te wachten. Deze toets beproeft hem niet: hij
+     vergelijkt het afloopbestand byte voor byte voor en na een mislukte claim.
+     Tussen die twee lezingen zit een spawnSync van een module-ladend
+     node-proces, en de hartslag schrijft ondertussen een verse `kringGepeild`
+     in datzelfde bestand. Is dat venster langer dan 100 ms, dan zakt de toets op
+     de HARTSLAG en niet op de mislukte claim.
+
+     Lokaal is dat venster 41 ms en zag je het nooit; op een beladen runner (vier
+     scherven, postgres en redis ernaast) haalde het de 100 ms wel, en dan zakt hij
+     ELKE keer -- drie CI-ronden op rij op 14 september 2026.
+
+     MUTATIE GEZIEN ZAKKEN, in beide richtingen: met een kunstmatige vertraging
+     van 300 ms tussen de twee lezingen zakt deze toets zonder STIL en slaagt hij
+     met STIL. De hartslag blijft in de toets hierboven gewoon op 100 ms staan en
+     wordt daar beproefd; hier is hij alleen geen deelnemer aan de bewering. */
+  const STIL = { RTG_AFLOOP_HARTSLAG: '600000' };
+  const eerste = op.start(['-e', RONDE, path.join(WORTEL, 'scripts/afbouw-slot.js'), kindPad], w.env(STIL));
   assert.ok(wachtOp(() => fs.existsSync(w.afloop)), 'de eerste ronde draait');
   const A = laadAfloop(w.afloop);
   const vanEerste = leesRauw(w.afloop);
@@ -224,7 +244,7 @@ test('NEGATIEF: een mislukte claim registreert geen ronde', (t) => {
   /* De tweede claim MOET stuklopen: het slot is bezet door een levend proces. */
   const tweede = spawnSync(process.execPath,
     ['-e', "require(process.argv[1]).pak('proefronde-twee')", path.join(WORTEL, 'scripts/afbouw-slot.js')],
-    { env: w.env(), encoding: 'utf8' });
+    { env: w.env(STIL), encoding: 'utf8' });
   assert.notEqual(tweede.status, 0, 'een tweede claim op een bezet slot hoort te falen');
   assert.match(String(tweede.stderr || ''), /al actief/i, 'en te zeggen waarom');
 

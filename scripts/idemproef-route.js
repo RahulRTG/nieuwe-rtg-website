@@ -451,6 +451,25 @@ function wachtOpSchoneBoom() {
     if (antwoord && antwoord.staat != null) vorigeStand = antwoord.staat;
   };
 
+  /* NA EEN VERSE INLOG ONDERWEG -- de vierde toerekeningsweg, en de enige die niet
+     uit het voorwerk van een route komt maar uit de OPSTELLING zelf.
+
+     Waarom hij bestaat en waarom het ijkpunt NIET opschuift, staat bij de aanroep in
+     scripts/lib/idemproef.js -- met de meting erbij. Hier staat alleen hoe de namen
+     worden bepaald: het verschil tussen de stand van voor de inlog (de 401 draagt die
+     mee) en de stand die het antwoord van de inlog zelf droeg, met dezelfde geijkte
+     ruis eruit als overal.
+
+     De sleutelbos onthoudt die tweede stand, want dat is de enige plek waar dit huis
+     inlogt. Ontbreekt er een van de twee, dan geeft hij een LEGE lijst terug: dan is
+     er niets bekend om weg te laten, en dan hoort de meting te blijven staan zoals ze
+     is in plaats van te worden opgepoetst. */
+  const naInlog = !staatWerkt ? null : ({ voor }) => {
+    const na = bos.laatsteInlogStaat && bos.laatsteInlogStaat();
+    if (voor == null || na == null) return [];
+    return Object.keys(staatlog.verschil(voor, na, ruis));
+  };
+
   let register = {};
   try { register = JSON.parse(fs.readFileSync(path.join(WORTEL, 'IDEMBESLUIT.json'), 'utf8')); } catch (e) {}
   const besluiten = register.routes || {};
@@ -516,7 +535,7 @@ function wachtOpSchoneBoom() {
   const wacht = maakWereldwacht({ post, tokenVoor, extras: wereldExtras,
     elke: Number(process.env.RTG_WERELDWACHT || 250) });
 
-  const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw, wacht,
+  const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw, naInlog, wacht,
     lijfVoor: (r) => {
       const vv = voorvoegselVan(r.pad);
       return { ...plausibelLijf(r.pad), ...extra, ...(vv ? schoonLijf(vv.lijf) : {}), ...(geldLijven[r.pad] || {}) };

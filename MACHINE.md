@@ -52,7 +52,7 @@ en schaduw (4157) op bijna élke muterende route. Daarna scoorde
 `/api/notifications` tien assen — die route woont zelf in `server/server.js`, 143
 requires. **Een hub markeert de hele boom, van twee kanten.** Een dekkingsgetal
 dat zo ontstaat leest als een overwinning en betekent niets. Vandaar de hubgrens
-(veertig requires) en de <!--getal:machine.hubRoutes-->28<!--/getal--> routes
+(veertig requires) en de <!--getal:machine.hubRoutes-->13<!--/getal--> routes
 waarvoor de bestandsas met naam en toenaam **onbruikbaar** is verklaard in plaats
 van stil meegeteld.
 
@@ -60,7 +60,7 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->4963<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->3784<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
@@ -101,9 +101,22 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2825<!--/getal--> van de
-   <!--getal:machine.muterend-->4963<!--/getal--> muterende routes raken **geen
+1. <!--getal:machine.zonderAs-->2789<!--/getal--> van de
+   <!--getal:machine.muterend-->3784<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
+
+   **Let op de noemer: die is op 14 september 2026 verschoven, en een ronde van
+   vóór die datum is er niet mee te vergelijken.** De meter telde `muterend` op
+   het HTTP-werkwoord, en dit huis doet vrijwel elke lezing met een POST — dus
+   stonden alle leesroutes in de teller die zegt hoeveel *handelingen* om de
+   machine heen lopen. Een lezing loopt nergens omheen. `muterend` komt nu uit
+   MUTATIECONTRACT.json waar dat een stand heeft: `NOT_APPLICABLE` betekent daar
+   letterlijk "deze route verandert niets", en die stand eist een gemeten ronde
+   zonder spoor in de opslag plus een tweede, noembare afdekking van wat die
+   meter niet ziet. Waar het register zwijgt, beslist het werkwoord nog steeds.
+   Dat haalde **1181** bewezen lezingen uit de noemer (`leesroutesUitRegister` in
+   de uitslag) en bracht 4963 → 3784 en 2825 → 2789. Nagetrokken met een mutatie:
+   met de registerlezing uit komt de meter terug op 4965 en 2827.
 2. De hoogst geïntegreerde handeling buiten de hubs raakt **drie** assen
    (`/api/bank/rekening/open`, `/api/office/boardroom`,
    `/api/office/commercie/zaakabonnement/zet`). Er is geen enkele handeling in

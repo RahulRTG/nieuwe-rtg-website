@@ -37,11 +37,24 @@ test('1. HIJ VOERT NIETS UIT: geen weg naar een effect in de code', () => {
    overtypt, zakt zodra er opnieuw wordt gemeten, en dat leert mensen om niet
    opnieuw te meten. Wat hier vastligt is de EIGENSCHAP: een route met een
    gemeten effect noemt precies de collecties die het register noemt. */
+/* EEN ROUTE DIE DE LAAG OOK WERKELIJK `gemeten` NOEMT, en niet alleen een route met
+   collecties in zijn verschil. Die twee liepen hier gelijk op tot 14 september 2026;
+   sinds `geenWerk` voor `gemeten` gaat (zie toets 5) is er een derde geval: een route
+   die 404 of 403 gaf en waar tussendoor tóch iets bewoog. Deze hulpfunctie koos daar de
+   eerste van (`/api/aandacht`) en toetste daarna dat de laag hem `gemeten` noemde -- wat
+   zij terecht niet doet. De regel hoort hier hetzelfde te zijn als in de laag, anders
+   toetst deze toets een regel die nergens geldt. */
 function eenGemetenRoute() {
   const rijen = require('../IDEMPROEF.json').perRoute || [];
-  for (const r of rijen)
+  /* Per PAD, want de laag verzamelt over alle rijen van een pad: een route met twee
+     rollen kan in de ene rij werk doen en in de andere niet. */
+  const geenWerk = new Set();
+  for (const r of rijen) if (/deed geen werk/.test(String(r.reden || ''))) geenWerk.add(r.pad);
+  for (const r of rijen) {
+    if (geenWerk.has(r.pad)) continue;
     for (const k of ['a', 'b', 'c'])
       if (Object.keys((r.opslag || {})[k] || {}).length) return r.pad;
+  }
   return null;
 }
 

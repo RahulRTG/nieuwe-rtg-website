@@ -87,6 +87,8 @@ function sleutelVoor(methode, pad) {
    loopt is geen controle. */
 Object.assign(SLEUTELS,
   require('./idemsleutels-basis').SLEUTELS,
+  /* De vijf dubbeltikken uit de leesronde van 13 september; zie de kop daar. */
+  require('./idemsleutels-afleidrest').SLEUTELS,
   /* De isolatielaag: drie groepen, en het onderscheid staat in de kop daar. */
   require('./idemsleutels-isolatie').SLEUTELS,
   require('./idemsleutels-werelden').SLEUTELS,
@@ -136,7 +138,8 @@ Object.assign(SLEUTELS,
   /* De publieke laag: drie die LEZEN en drie die schrijven. Waarom de tweede
      uitlichting `zelfdeVerzoek`-achtig is en geen `nietIdempotent`, staat in de
      kop van dat bestand -- een 409 op de stand is een toestandscontrole. */
-  require('./idemsleutels-stage').SLEUTELS);
+  require('./idemsleutels-stage').SLEUTELS,
+  require('./idemsleutels-bundel').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:
    geen route in twee zijbestanden, elke verklaring compleet, en vier routes die

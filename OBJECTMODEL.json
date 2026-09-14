@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-13",
   "gemeten": {
-    "bestanden": 2222,
-    "vormen": 1396,
-    "velden": 2022,
-    "modules": 764,
-    "domeinen": 272,
+    "bestanden": 2256,
+    "vormen": 1399,
+    "velden": 2024,
+    "modules": 766,
+    "domeinen": 275,
     "envelopDrempel": 17,
-    "envelop": 29,
-    "veldenDomeineigen": 1425,
-    "veldenGedeeldVanafVier": 201,
+    "envelop": 30,
+    "veldenDomeineigen": 1427,
+    "veldenGedeeldVanafVier": 202,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -42,7 +42,8 @@
     "tot",
     "uitleg",
     "van",
-    "wat"
+    "wat",
+    "wie"
   ],
   "gedeeld": [
     {
@@ -54,7 +55,7 @@
         "kern/clubs",
         "kern/command",
         "kern/commercie",
-        "kern/ledenbalie"
+        "kern/ledenbalie-inzage"
       ]
     },
     {
@@ -91,18 +92,6 @@
         "kern/commercie",
         "kern/concern",
         "kern/gewoonten"
-      ]
-    },
-    {
-      "veld": "wie",
-      "domeinen": 16,
-      "waar": [
-        "bedrijf",
-        "kern/comm",
-        "kern/commerce",
-        "kern/consent-lezers",
-        "kern/horeca",
-        "kern/isolatie"
       ]
     },
     {
@@ -401,7 +390,7 @@
         "kern/commercie",
         "kern/concern",
         "kern/labfonds",
-        "kern/ledenbalie",
+        "kern/ledenbalie-inzage",
         "kern/livinglab"
       ]
     },
@@ -511,6 +500,18 @@
         "kern/onderneming",
         "kern/rechterhand",
         "kern/reisgezelschap"
+      ]
+    },
+    {
+      "veld": "name",
+      "domeinen": 10,
+      "waar": [
+        "kern/experience",
+        "kern/gast",
+        "kern/kantoor",
+        "kern/leverancier",
+        "kern/lidacties",
+        "kern/personeel"
       ]
     },
     {

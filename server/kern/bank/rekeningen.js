@@ -135,43 +135,16 @@ module.exports = (ctx) => {
     return { ok: true, gesloten: iban };
   }
 
-  /* ---------- de leden-bank: alleen live als de boardroom hem aan heeft, en
-     iedereen krijgt zijn eigen rekening pas NA akkoord (opt-in). Zo geldt hetzelfde
-     voor nieuwe leden als voor bestaande leden bij live gaan: bij het eerste bezoek
-     een akkoordscherm, en op akkoord meteen een betaalrekening. ---------- */
-  const eigenBank = require('../eigencollectie')({ db, domein: 'kern/bank/rekeningen', bezit: { bankAkkoord: 'kaart' } });
-  function akkoordStore() { return eigenBank.bak('bankAkkoord'); }
-  function ledenOverzicht(codenaam) {
-    const c = String(codenaam || '').trim();
-    const mijn = vanLid(c);
-    return { ok: true, online: bankregie.bankLedenAan(), akkoord: !!akkoordStore()[c],
-      modus: bankregie.bankModus(), spaarrentePct: bankregie.bankSpaarrenteBp() / 100,
-      rekeningen: mijn.rekeningen, totaalCenten: mijn.totaalCenten };
-  }
-  async function ledenAkkoord(codenaam, tier) {
-    if (!bankregie.bankLedenAan()) return { status: 403, error: 'De RTG Bank is nog niet live voor leden.' };
-    const c = String(codenaam || '').trim();
-    if (!c) return { status: 400, error: 'Onbekend lid.' };
-    const store = akkoordStore();
-    const alHad = Object.values(rekeningen()).some(m => m.codenaam === c);
-    store[c] = store[c] || nu();
-    save();
-    /* MET SLEUTEL: zonder loopt het werk buiten de duurzame commit (idem.js 94). */
-    let rekening = null;
-    if (!alHad) { const r = await open({ codenaam: c, soort: 'betaal', naam: 'RTG Betaalrekening', wie: 'lid', idem: 'akkoord-betaal' }); if (r.error) return r; rekening = r.rekening; }
-    // de Business Pass krijgt er AUTOMATISCH een zakelijke rekening bij (gratis)
-    let zakelijk = null;
-    if (tier === 'business' && !Object.values(rekeningen()).some(m => m.codenaam === c && m.soort === 'zakelijk')) {
-      const z = await open({ codenaam: c, soort: 'zakelijk', naam: 'RTG Zakelijke rekening', wie: 'lid', idem: 'akkoord-zakelijk' });
-      if (!z.error) zakelijk = z.rekening;
-    }
-    return { ok: true, akkoord: true, rekening, zakelijk };
-  }
+  /* De leden-opt-in staat in ./ledenbank.js: dat is de vraag die alleen een LID
+     krijgt (gaat de bank voor u open, en heeft u ja gezegd), en sinds
+     13 september 2026 het enige deel van de bank met een eigen
+     duurzaamheidseis. De mechaniek hierboven geldt net zo goed voor een zaak. */
+  const ledenbank = require('./ledenbank')(ctx, { open, vanLid });
 
   return {
     genIban, ibanControle,
     rekeningOpen: open, rekeningenVanLid: vanLid, rekeningDetail: detail,
     rekeningBevries: bevries, rekeningRoodZet: roodZet, rekeningRoodKeur: roodKeur, rekeningSluit: sluit,
-    bankLedenOverzicht: ledenOverzicht, bankLedenAkkoord: ledenAkkoord
+    bankLedenOverzicht: ledenbank.bankLedenOverzicht, bankLedenAkkoord: ledenbank.bankLedenAkkoord
   };
 };

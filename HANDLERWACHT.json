@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-11T20:42:39.738Z",
-  "commit": "7f0359591",
+  "op": "2026-09-13T13:30:43.945Z",
+  "commit": "2da9ad12",
   "boomVuil": false,
   "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
@@ -9,8 +9,8 @@
  },
  "uitleg": "Per schrijfroute ZONDER bewakerslaag: roept de handler een bekende gezagsfunctie aan, en gebeurt dat voor het eerste antwoord? Dit is geen oordeel over de controle zelf -- alleen of er een staat. Zie de kop van scripts/handlerwacht.js voor de drie uitkomsten en waarom nietGelezen apart telt.",
  "gemeten": {
-  "zonderBewakerslaag": 623,
-  "bewaakt": 533,
+  "zonderBewakerslaag": 624,
+  "bewaakt": 534,
   "openbaarMetReden": 51,
   "eigenControle": 19,
   "sleutelDoorgegeven": 12,
@@ -112,15 +112,15 @@
    "aantal": 7
   },
   {
+   "naam": "rtf.verifieerProfiel",
+   "aantal": 6
+  },
+  {
    "naam": "sessie",
    "aantal": 5
   },
   {
    "naam": "mijn -> personeelVan",
-   "aantal": 5
-  },
-  {
-   "naam": "rtf.verifieerProfiel",
    "aantal": 5
   },
   {
@@ -1001,7 +1001,7 @@
   },
   {
    "sleutel": "POST /api/cluster/:actie",
-   "bestand": "server/server.js:929",
+   "bestand": "server/server.js:932",
    "staat": "openbaar",
    "reden": "de clustersleutel zit in een eigen kop; zonder sleutel bestaat de route niet"
   },
@@ -3257,6 +3257,12 @@
    "wacht": "profiel"
   },
   {
+   "sleutel": "POST /api/rtf/knelpunt",
+   "bestand": "server/routes/knelpunt.js:138",
+   "staat": "bewaakt",
+   "wacht": "rtf.verifieerProfiel"
+  },
+  {
    "sleutel": "POST /api/rtf/onboarding/opslaan",
    "bestand": "server/routes/social/gezinnen/vrienden.js:16",
    "staat": "bewaakt",
@@ -4012,7 +4018,7 @@
   },
   {
    "sleutel": "POST /api/zegel/controleer",
-   "bestand": "server/server.js:1446",
+   "bestand": "server/server.js:1449",
    "staat": "openbaar",
    "reden": "controleert een handtekening; het bewijs zit in het verzoek"
   }

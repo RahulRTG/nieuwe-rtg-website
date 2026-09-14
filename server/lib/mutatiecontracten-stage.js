@@ -43,7 +43,15 @@ module.exports = { CONTRACTEN: {
     mutatieId: 'mediaos.aanwezig.mijn', herkomst: 'mens',
     semantiek: { klasse: 'idempotent' },
     toegang: { klasse: 'AUTHENTICATED' }, stand: 'NOT_APPLICABLE',
-    bewijs: BEWIJS('leest db.data.mediaVolgt en schrijft niets; de handler roept alleen aanwezigMijn() aan'),
+    /* Twee bewijzen, en de tweede is sterker dan een toetscitaat: de
+       idempotentieproef is op 13 september gericht over deze route gedraaid
+       (`node scripts/idemproef-route.js --pad=/api/mediaos/aanwezig`) en gaf
+       `opslag` a/b/c alle drie LEEG -- geen enkele gemeten collectie beweegt,
+       niet bij de eerste oproep en niet bij de herhaling. Dat is wat de machine
+       zag; `nagekeken` hieronder sluit het stuk dat zij niet kan zien. */
+    bewijs: { gemeten: 'test/aanwezigheid.test.js: leest db.data.mediaVolgt en schrijft niets; de handler '
+      + 'roept alleen aanwezigMijn() aan. PLUS scripts/idemproef-route.js --pad=/api/mediaos/aanwezig: '
+      + 'opslag a/b/c alle drie leeg', op: '2026-09-13' },
     nagekeken: 'Claude, 2026-09-13: de handler las ik regel voor regel -- hij roept alleen aanwezigMijn() aan, die uitsluitend leest. Geen bestand, geen externe dienst, geen teller buiten de database.',
     afgetekend: AFGETEKEND
   },

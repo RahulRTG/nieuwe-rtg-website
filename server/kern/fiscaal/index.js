@@ -45,7 +45,7 @@ function maakFiscaal({ db, rondEuro, btwSplit, jaargangen }) {
        telt per tarief, niet per categorie). Verandert er niets, dan is er per
        categorie precies een pot en ziet niemand verschil. */
     const potten = {};
-    const catVan = naam => tarief.catVanItem(s, naam, basisCat);
+    const catVan = (naam, regel) => tarief.catVanItem(s, naam, basisCat, regel);
     const tel = (cat, bedrag, datum) => {
       /* Een tegenboeking is een negatief bedrag en moet dezelfde btw-pot weer
          verlagen. Alleen nul en ongeldige invoer dragen niets bij. */
@@ -57,7 +57,7 @@ function maakFiscaal({ db, rondEuro, btwSplit, jaargangen }) {
     };
     for (const o of db.data.orders) {
       if (o.supplierCode !== s.code || !o.paid || !inMaand(o.paidAt || o.at)) continue;
-      for (const it of o.items || []) tel(catVan(it.name), (it.price || 0) * (it.qty || 1), o.paidAt || o.at);
+      for (const it of o.items || []) tel(catVan(it.name, it), (it.price || 0) * (it.qty || 1), o.paidAt || o.at);
     }
     /* Vier soorten kassabonnen tellen hier niet mee, alle vier omdat hun omzet
        al ergens anders in deze telling staat (TAKEN.md 4.28): `rtg` hoort bij
@@ -71,7 +71,7 @@ function maakFiscaal({ db, rondEuro, btwSplit, jaargangen }) {
          bestelling zijn geteld. Zonder deze regel stond de maand van een zaak
          die tafels contant laat afrekenen twee keer zo hoog (TAKEN.md 4.28). */
       if (v.omzetElders || v.method === 'rtg' || v.method === 'kamer' || v.method === 'tafel' || !inMaand(v.at)) continue;
-      if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1), v.at);
+      if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name, it), (it.price || 0) * (it.qty || 1), v.at);
       else tel(basisCat, v.total || 0, v.at);
     }
     for (const r of db.data.rides) {

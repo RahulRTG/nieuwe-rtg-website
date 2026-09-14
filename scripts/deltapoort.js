@@ -504,10 +504,14 @@ function main() {
   if (!bevindingen.length) {
     console.log('  ' + K.groen + 'De deltapoort is gehaald.' + K.reset + K.grijs +
       ' Niets in deze wijziging staat onder de norm.' + K.reset + '\n');
+    console.log('  ' + K.grijs + 'bereik: geen verslechtering ten opzichte van de basis, op de gewijzigde ' +
+      'bestanden. Zegt niets over gedrag, routedekking of ketens -- en niets over de rest van het huis.' + K.reset + '\n');
     return 0;
   }
 
   console.log('  ' + K.rood + K.vet + 'DE DELTAPOORT IS NIET GEHAALD.' + K.reset + '\n');
+  console.log('  ' + K.grijs + 'bereik: geen verslechtering ten opzichte van de basis, op de gewijzigde ' +
+    'bestanden. Zegt niets over gedrag, routedekking of ketens.' + K.reset + '\n');
   const perRegel = new Map();
   for (const b of bevindingen) { if (!perRegel.has(b.regel)) perRegel.set(b.regel, []); perRegel.get(b.regel).push(b); }
   for (const [naam, lijst] of perRegel) {

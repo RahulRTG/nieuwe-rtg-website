@@ -3406,6 +3406,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/pay/index.js', 'geld: bevestigen vóór duurzaamheid is een belofte die de opslag nog niet deed'],
     ['server/kern/economie/runtime/index.js', 'economische waarheid: intent, ledger en evidence worden vóór bevestiging als één bundel vastgelegd'],
     ['server/kern/fonds.js', 'fondsallocatie: een bevestigde verdeling mag niet na een herstart verdwijnen'],
+    ['server/kern/factuurcorrectie.js', 'geld terug naar een lid: de terugboeking en de correctieregel horen als een duurzame commit op schijf, net als de heenweg in kern/factuursaldo.js -- een lid dat "terugbetaald" leest terwijl de opslag het nog niet heeft, is precies de halve uitkomst waar de factuurproef voor is gebouwd'],
     ['server/kern/experience/index.js', 'menselijke bevestiging: acknowledgement en action evidence worden vóór succes duurzaam vastgelegd'],
     ['server/kern/notities.js', 'werk van een lid: een bevestigde notitie mag niet verdwijnen bij een opslagfout'],
     ['server/kern/vertegenwoordiging/index.js', 'een machtiging is de bevoegdheid van een mens over het leven van een ander: aanvaarden, intrekken en de eigen grens mogen nooit bevestigd zijn zonder dat de opslag het heeft'],
@@ -3452,6 +3453,24 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
        uitkomst heel is. Zie GELDLAT.md par. "Scenario 3, gemeten op een echt
        geldpad". */
     ['server/kern/factuursaldo.js', 'geld: de afschrijving en de afwikkeling van dezelfde factuur horen als EEN duurzame commit te landen, anders staat het geld vast en de tegenprestatie niet'],
+    /* HET ACHTSTE, en het is de tweelingbroer van de bewaking hierboven. Het
+       inzagejournaal (server/inzagelog.js) legt vast wie de IDENTITEITSKLUIS
+       van een mens heeft geopend, en het faalde open: noteer() geeft een
+       uitslag terug die geen van de 42 aanroepers leest, het wegschrijven zit
+       in een lege catch, en zonder database schrijft hij in een weggegooide
+       array en meldt succes. Een spoor dat niet kan weigeren, is geen belofte.
+       De bedrading staat apart zodat deze regel op een bestand slaat dat er
+       werkelijk over gaat; server.js zou hier met een reden over drie regels
+       komen te staan. */
+    /* HET NEGENDE, en het is dezelfde vorm als factuursaldo.js hierboven: de
+       BETALING liep al duurzaam (kern/pay) en het MERKTEKEN dat zij geind was
+       niet, dus stonden er twee commits met een gat ertussen. Onder
+       `schrijf-verloren` gaf /api/office/asset/fees 200 met "geind: N" terwijl
+       feeJaar en de kas verdwenen -- en dan telt de volgende ronde de kas een
+       tweede keer op terwijl het lid door de idem-sleutel maar een keer wordt
+       afgeschreven. Eenmaal betaald, tweemaal geboekt. */
+    ['server/kern/assets.js', 'de servicefee: geind geld en het merkteken dat het geind is, horen als EEN duurzame commit te landen -- anders boekt de volgende ronde de kas nog een keer'],
+    ['server/opzet/inzagespoor.js', 'het inzagejournaal: wie te horen krijgt dat een kluis is geopend, hoort dat spoor na een herstart terug te vinden -- en waar het spoor niet vaststaat, gaat de inzage niet door'],
     ['test/idembundel.test.js', 'de toets die bewijst dat een genestelde bundel meedoet en dat een gewone bundel een geldcommit niet degradeert']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
@@ -5802,5 +5821,58 @@ console.log('\n70) de eerste minuut van een vers lid is gemeten, en niemand is e
   }
 }
 
+/* 71) de vorige bronmuterende ronde is netjes afgelopen EN heeft niets achtergelaten.
+
+   WAAROM DEZE REGEL ER IS. Op 13 september 2026 brak ik een ijkronde af die 146
+   bestanden gesaboteerd had staan. Een wachtketting toetste "draait het proces
+   nog?", las de afwezigheid als "klaar" en startte de volgende stap. Er bleven
+   bovendien drie processen achter -- een toets met twee servers eraan -- die
+   negentien minuten poorten vasthielden zonder eigenaar.
+
+   TWEE BEGRIPPEN, en ze liepen door elkaar:
+     WERKSTATUS    is de ronde af?        PASSED / FAILED / ABORTED
+     PROCESBEZIT   is de runtime schoon?  leeft er nog iets van die ronde?
+   Een ronde kan ABORTED zijn terwijl haar kinderen nog draaien. Dan is een
+   volgende meting formeel nieuw en materieel vervuild.
+
+   HET VERSCHIL MET eisGeenAfbouw(), en dat zijn twee vragen die niet in elkaar
+   mogen schuiven. Die poort vraagt "draait er NU iets"; deze regel vraagt "is de
+   VORIGE ronde netjes afgelopen". Ze samenvoegen zou binnen elke toets weigeren
+   -- precies de fout die in de kop van afbouw-slot.js staat beschreven.
+
+   DEZE REGEL NOEMT WAT HEM BLOKKEERT. Een afbouwslot dat alleen "rood" zegt,
+   wordt in de CI een mysterie dat mensen leren wegkijken; daarom staat er welke
+   run, welke stand, welke procesidentiteit nog leeft, en wat de actie is. */
+console.log('\n71) de vorige bronmuterende ronde is netjes afgelopen en heeft niets achtergelaten');
+{
+  const afloop = require('./lib/afbouw-afloop');
+  const vorige = afloop.lees();
+  if (!vorige) {
+    ok('geen eerdere ronde vastgelegd; de eerste die pak() aanroept legt er een aan');
+  } else {
+    const g = afloop.magStarten();
+    if (g.mag) {
+      ok('vorige ronde ' + (vorige.taak || '?') + ' (' + vorige.runId + ') staat op ' + vorige.stand +
+        ' en haar proceskring is leeg');
+    } else {
+      fout(afloop.diagnose(g, vorige));
+    }
+  }
+}
+
+/* HET BEREIK VAN DEZE POORT, en waarom hij het ZELF zegt.
+
+   Op 13 september 2026 heb ik twee keer op een dag "de gate is groen" gezegd op
+   grond van check + norm + deltapoort, terwijl CI daarna terecht rood bleef:
+   test/routedekking.test.js vond een route die nooit door een toets was
+   aangeraakt, en keuringsregel 41 zakte op een afdruk. Geen van beide valt
+   binnen wat die drie meten -- de uitspraak was ruimer dan het bewijs.
+
+   Een tabel in een document had dat niet voorkomen; dit wel. De poort zegt
+   voortaan zelf wat hij bewijst EN wat hij niet bewijst, zodat wie hem draait de
+   grens meeleest in plaats van hem te moeten onthouden. LAT.md regel 13. */
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
+console.log('\x1b[2mbereik: statische huisregels, registers en documentwaarheid.' +
+  ' Zegt niets over gedrag (npm test), routedekking (test/routedekking.test.js),' +
+  ' ketens (de ketenproeven) of go-live (npm run golive).\x1b[0m');
 process.exit(fouten ? 1 : 0);

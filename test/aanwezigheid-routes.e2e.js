@@ -73,47 +73,46 @@ test('de publieke laag: volgen op naam, en uitlichten alleen door een mens', asy
     assert.ok(aanwezigId, 'de uitlichting leverde een moment met een aanwezigheid');
 
     /* HOOGUIT EEN KEER -- EN DAT HEEFT TWEE DEUREN, want op de ROUTE staat de
-       dubbeltikpoort ervoor en in de MODULE de toestandscontrole.
+       dubbeltikpoort ervoor en in de MODULE de toestandscontrole. Deze toets
+       eiste hier ooit onvoorwaardelijk 409, en dat was de wereld van voordat
+       server/lib/idemsleutels-stage.js bestond. Die verklaring kwam er later bij
+       en zette deze route in het dubbeltikvenster van lib/idemsleutels.js --
+       vijf seconden, huisbreed. Sindsdien krijgt een woordelijk gelijk verzoek
+       binnen dat venster het ANTWOORD VAN DE EERSTE terug en komt de handler er
+       niet meer aan toe.
 
-       DEZE TOETS ZAKTE, EN TERECHT. Hij eiste hier onvoorwaardelijk 409, en dat
-       was de wereld van voordat server/lib/idemsleutels-stage.js bestond. Die
-       verklaring kwam er later bij (de idemschuld-zakker) en zette deze route in
-       het dubbeltikvenster van lib/idemsleutels.js -- vijf seconden, huisbreed.
-       Sindsdien krijgt een woordelijk gelijk verzoek binnen dat venster het
-       ANTWOORD VAN DE EERSTE terug en komt de handler er niet meer aan toe.
-
-       Dat is dezelfde vorm als de rest van deze tak: een verklaring veranderde
-       de werkelijkheid en de wachter bleef de oude beweren. De reparatie is dus
-       niet de eis verlagen maar hem VERDUBBELEN -- allebei de deuren staan
-       hieronder, en allebei bewaren ze dezelfde invariant: er ontstaat NOOIT een
-       tweede uitlichting.
+       De reparatie was niet de eis verlagen maar hem VERDUBBELEN. Beide takken
+       die hieraan werkten kwamen onafhankelijk op dezelfde twee deuren uit; wat
+       hier staat is de UNIE ervan, want ze bewaakten elk iets wat de ander niet
+       zag -- de tekst van de weigering, en de invariant eronder.
 
        1. Woordelijk gelijk, binnen het venster: een HERHALING. Niet zomaar een
           200 -- het moet het antwoord van de eerste zijn, dus dezelfde id. Een
           nieuwe id met status 200 zou betekenen dat er wel degelijk een tweede
           handeling was, en daar is deze regel voor. */
     const nogmaals = await post('/api/office/salon/uitlicht', { postId, grond: 'bijzonder' }, persoon);
-    assert.equal(nogmaals.status, 200, 'binnen het dubbeltikvenster is dit een herhaling');
+    assert.equal(nogmaals.status, 200, 'binnen het dubbeltikvenster speelt de poort het antwoord terug');
     assert.equal(nogmaals.body.herhaald, true, 'en hij zegt er ook bij dat het een herhaling is');
     assert.equal(nogmaals.body.uitlichting.id, uit.body.uitlichting.id,
       'een herhaling geeft het antwoord van de EERSTE terug, dus dezelfde uitlichting');
 
-    /* 2. EEN ANDER VERZOEK, en dan draait de toestandscontrole wel. De
-          identiteit is `postId` + `grond` (idemsleutels-stage.js), dus dezelfde
-          post met een andere grond is geen dubbeltik maar een tweede
-          redactiebesluit -- en dat hoort te stuiten op 409 "al uitgelicht".
+    /* 2. EEN ANDER VERZOEK, en dan draait de toestandscontrole wel. De identiteit
+          is `postId` + `grond` (idemsleutels-stage.js), dus dezelfde post met een
+          andere grond is geen dubbeltik maar een tweede redactiebesluit -- en dat
+          hoort te stuiten op 409 "al uitgelicht", met die reden erbij.
 
-          Zo staat het verschil dat MUTATIECONTRACT.md maakt hier in twee
-          regels naast elkaar: een herhaling die hetzelfde antwoord teruggeeft is
-          IETS ANDERS dan een herhaling die wordt tegengehouden door de stand van
-          het onderwerp. Deze route kent ze allebei, en dat is geen slordigheid
-          maar het venster. */
-    const anderGrond = await post('/api/office/salon/uitlicht', { postId, grond: 'talent' }, persoon);
-    assert.equal(anderGrond.status, 409, 'een ander verzoek stuit op de toestandscontrole');
+          Zo staat het verschil dat MUTATIECONTRACT.md maakt hier in twee regels
+          naast elkaar: een herhaling die hetzelfde antwoord teruggeeft is IETS
+          ANDERS dan een herhaling die wordt tegengehouden door de stand van het
+          onderwerp. Wie die twee samenvoegt, kan later niet meer zien of een
+          route veilig te herhalen IS of alleen toevallig niets deed. */
+    const anders = await post('/api/office/salon/uitlicht', { postId, grond: 'lokaal' }, persoon);
+    assert.equal(anders.status, 409, 'een andere sleutel bereikt de handler, en die weigert op de STAND');
+    assert.match(String(anders.body.error || ''), /al uitgelicht/, 'en zegt waarom');
 
-    /* En de invariant zelf, want die is waar het om gaat: na drie pogingen loopt
-       er precies EEN uitlichting. Zonder deze regel zeggen de twee hierboven
-       alleen iets over statuscodes. */
+    /* 3. En de invariant zelf, want daar gaat het om: na drie pogingen loopt er
+          precies EEN uitlichting. Zonder deze regel zeggen de twee hierboven
+          alleen iets over statuscodes. */
     const naDrie = await post('/api/office/salon/uitlicht/bord', {}, persoon);
     assert.equal(naDrie.body.lopend.filter(r => String(r.post) === String(postId)).length, 1,
       'drie pogingen, een uitlichting');

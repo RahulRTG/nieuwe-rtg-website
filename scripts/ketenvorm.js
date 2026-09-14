@@ -48,25 +48,48 @@ const KETENS = [
      een kantoor in, het gaat over een document met een houdbaarheid, en de
      uitkomst is toegang in plaats van een geleverde dienst. */
   { naam: 'toelating', register: 'TOELATINGSPROEF.json', domein: 'aanmeldingen', proef: 'scripts/toelatingsproef.js' },
-  /* DE VIERDE, en de eerste die niets LEVERT. De drie hierboven eindigen alle
-     bij een geleverde dienst of een verleende toegang; deze eindigt bij iemand
+  /* DE VIERDE, en hij stelt een andere vraag dan de drie erboven. Die gaan over
+     een TRANSACTIE (een rekening, een rit, een toelating) en deze over een
+     MOGELIJKHEID: de hoofdpersoon is een zeventienjarige zonder account, zonder
+     hulpvraag en zonder geld in het spel. Voor deze meter telt vooral dat hij
+     opnieuw andere actoren meebrengt -- gezin, jongere, werkgever -- zodat de
+     vraag of er gedeelde actoren bestaan niet op drie horeca-achtige ketens
+     wordt beantwoord. */
+  { naam: 'adam', register: 'ADAMPROEF.json', domein: 'foundation', proef: 'scripts/adamproef.js' },
+  /* DE VIJFDE, en de eerste die niets LEVERT. De vier hierboven eindigen alle
+     bij een geleverde dienst, een verleende toegang of een bereikte mogelijkheid; deze eindigt bij iemand
      die iets WEET. Als de gedeelde vorm daar ook overheen zou liggen, zou dat
      voor het eerst iets betekenen -- en als hij dat niet doet, is dat het
      duidelijkste antwoord dat deze meting kan geven. */
-  { naam: 'moment', register: 'MOMENTPROEF.json', domein: 'mediaos', proef: 'scripts/momentproef.js' }
+  { naam: 'moment', register: 'MOMENTPROEF.json', domein: 'mediaos', proef: 'scripts/momentproef.js' },
+  /* De vierde. Hij is toegevoegd omdat hij de meting scherper maakt en niet
+     omdat er een keten bij moest: zijn uitkomst is ZICHTBAARHEID VOOR DERDEN,
+     een soort die de eerste drie geen van alle hadden, en zijn voltooiende
+     actor is de KLANT en niet een medewerker. Blijven de actoren en beloften
+     ook met hem erbij uit elkaar liggen, dan is dat een sterker negatief dan
+     met drie; komt er ineens overlap, dan is dat de eerste echte aanwijzing
+     voor een gedeeld contract. */
+  { naam: 'zaaklive', register: 'ZAAKLIVEPROEF.json', domein: 'ondernemerpoort', proef: 'scripts/zaakliveproef.js' },
+  /* De vijfde, en de eerste die over GELD gaat. Hij zit er om dezelfde reden
+     als de vierde: hij maakt de meting scherper. Zijn uitkomst is een GETAL en
+     geen toestand, en zijn tweede actor is geen mens maar een PROJECTIE
+     (financeVoor) -- twee soorten die de eerste vier geen van alle hadden.
+     Blijven de actoren ook met hem erbij op nul, dan is dat het sterkste
+     negatief dat hier te halen is. */
+  { naam: 'omzet', register: 'OMZETPROEF.json', domein: 'fiscaal', proef: 'scripts/omzetproef.js' }
 ];
 
 /* De woorden waarop een belofte wordt ingedeeld. Een gesloten lijst, want een
    automatische woordwolk zou "de" en "een" als gedeelde vorm rapporteren. Elk
    thema is een SOORT fout die een keten kan afvangen; wat er niet in staat,
    komt terug als `nietIngedeeld` en is dus zichtbaar. */
-/* DE LIJST IS EEN KEER UITGEBREID, EN DAT MOET JE WETEN OM DE UITSLAG TE LEZEN.
+/* DE LIJST IS TWEE KEER UITGEBREID, EN DAT MOET JE WETEN OM DE UITSLAG TE LEZEN.
 
    Bij de derde keten viel zes van de zeven beloften buiten de lijst. Dat is
    precies het moment waarop je een overlap kunt FABRICEREN door net zo lang
    patronen bij te zetten tot alles matcht. De regel die daarom is aangehouden:
    een patroon erbij mag alleen als de belofte HETZELFDE zegt als de bestaande
-   beloften in dat thema, in andere woorden. Twee themas zijn zo uitgebreid:
+   beloften in dat thema, in andere woorden. Twee themas zijn toen uitgebreid:
 
      nietsKlaarZonderGrond   "zet geen zaak klaar zonder aftekening" naast
                              "geen chauffeur, dus niets toegewezen" -- zelfde
@@ -77,19 +100,60 @@ const KETENS = [
    En twee themas zijn NIEUW, want ze bestaan alleen in de derde keten
    (handelingMetNaam, geslotenLijst). Die staan dus in `eigen` en niet in
    `gedeeld`, en dat hoort zo: een thema dat maar in een keten voorkomt, is
-   geen gedeelde vorm. Wat NIET is gebeurd: de actoren aanpassen. Die staan op
-   nul gedeeld over drie ketens, en dat blijft de scherpste uitslag. */
+   geen gedeelde vorm.
+
+   BIJ DE VIERDE KETEN (adam) GEBEURDE HETZELFDE, EN SCHERPER. Alle NEGEN
+   beloften vielen buiten de lijst, en de uitslag sprong daardoor van 2 naar 0
+   gedeelde themas. Dat cijfer was onwaar: de Adam-keten toetst wel degelijk
+   herhaling (een tweede sollicitatie op dezelfde vacature) en weigering met een
+   reden (een vijftienjarige krijgt de leeftijdsgrens EN wat er voor hem wel is).
+   De matcher kende zijn woorden niet -- "tweede keer" naast het bestaande "twee
+   keer", "geweigerd met de leeftijd erbij" naast "geweigerd met de mededeling".
+
+   DAAROM DRIE PATRONEN ERBIJ EN GEEN THEMA:
+
+     herhaling               /tweede keer/
+     weigeringMetReden       /geweigerd met / (was: /geweigerd met de mededeling/)
+     nietsKlaarZonderGrond   /laat geen .* achter/ (naast /zet geen .* klaar/)
+
+   Alle drie generaliseren ze voorbij de zin die ze aanleiding gaf; dat is de
+   toets die ze moesten halen. Een patroon dat alleen op EEN belofte past, is
+   een uitslag die zichzelf schrijft. Na de verbreding staat het weer op 2 van
+   10 -- dus die twee overleven een vierde, totaal andere keten, en dat is de
+   eigenlijke vondst.
+
+   ZES BELOFTEN VAN DE ADAM-KETEN BLIJVEN BEWUST ONGEDEELD, en die staan in
+   `nietIngedeeld` waar ze horen: de server die de client niet gelooft over een
+   leeftijd, een afwijzing die op de tijdlijn blijft staan, een motor die wegen
+   telt in plaats van mensen. Dat zijn echte soorten fout, maar ze komen in geen
+   van de andere drie ketens voor -- en dan is het geen gedeelde vorm.
+
+   Wat NIET is gebeurd: de actoren aanpassen. Die staan op nul gedeeld, en dat
+   blijft de scherpste uitslag.
+
+   EEN DERDE UITBREIDING, BIJ DE ZESDE KETEN (13 september 2026), en hij valt
+   onder dezelfde regel: `weigeringMetReden` kende alleen de BEDRIJVENDE vorm
+   ("weigert met de reden") en niet de lijdende ("wordt geweigerd met de
+   reden"). Dat is hetzelfde gezegd, in een andere werkwoordsvorm -- geen
+   ander idee. Zonder dat patroon zakte een thema dat aantoonbaar in alle vijf
+   de ketens staat naar `bijna`, en dan meet deze meter de Nederlandse
+   grammatica in plaats van de vorm van de ketens.
+
+   Let bij het lezen op wat die uitbreiding NIET deed: `themasGedeeld` ging van
+   1 naar 2 en dat is nog steeds LAGER dan de 2 van vier ketens over 10 themas,
+   want de vijfde keten bracht geen enkel eigen thema mee dat de anderen ook
+   hadden. En de actoren zijn opnieuw niet aangeraakt: 0 van 21. */
 const THEMAS = {
-  herhaling: [/dezelfde sleutel/i, /twee keer/i, /tweede betaling/i, /geen tweede/i],
+  herhaling: [/dezelfde sleutel/i, /twee keer/i, /tweede keer/i, /tweede betaling/i, /geen tweede/i],
   volgorde: [/alleen vooruit/i, /nog niet betaald/i, /terugzetten/i, /eerder/i],
   weigeringMetReden: [/zegt waarom/i, /noemt de reden/i, /weigert.*reden/i, /zegt wat er wel kan/i,
-    /geweigerd met de mededeling/i, /geweigerd; /i],
+    /geweigerd met /i, /geweigerd; /i],
   onbekendObject: [/bestaat niet/i, /verzonnen/i, /kent.*niet/i, /niet van deze/i],
   dubbelObject: [/tweede rekening/i, /al gecorrigeerd/i, /wijst naar de bestaande/i],
   geldKlaargezet: [/klaar zonder het uit te voeren/i, /spiegelt/i, /teruggave/i],
   bereikbareWeg: [/die weg bestaat/i, /verwijst/i],
   nietsKlaarZonderGrond: [/nog niet toegewezen/i, /geen chauffeur/i, /toont geen/i,
-    /zet geen .* klaar/i],
+    /zet geen .* klaar/i, /laat geen .* achter/i],
   /* Alleen in de toelatingsketen: daar staat een MENS in de keten, en de andere
      twee kennen dat niet. */
   handelingMetNaam: [/naam van een mens/i, /overschrijft de eerste nooit/i],

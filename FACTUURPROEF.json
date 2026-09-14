@@ -3,12 +3,12 @@
   "uitleg": "Een geldpad van begin tot eind, ECONOMISCH gemeten: niet de status van de route maar de toestand van de vijf geldcollecties eromheen. Zeven stappen, waaronder een crashpunt uit de verraadsmotor (sterf-na-commit) en de herhaling erna. Zie GELDLAT.md, \"Scenario 3, gemeten op een echt geldpad\".",
   "grens": "DIT IS EEN PAD EN GEEN DEKKING. Wat hier bewezen is, geldt voor POST /api/pay/saldo en voor niets anders. De hashes van de vingerafdruk zijn per proces gezouten, dus over de crash heen zijn alleen aantallen en bedragen vergelijkbaar -- dat staat per stap in de meting. En `PROVEN` op stap 3 gaat over de tweede aanroep, nooit over de crashwindow.",
   "stempel": {
-    "op": "2026-09-12T20:42:05.114Z",
-    "commit": "9f9115176",
+    "op": "2026-09-13T05:20:51.384Z",
+    "commit": "a1d9fe1d0",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 0,
     "instrument": "scripts/factuurproef.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "instrument": "factuurproef",
   "pad": "pay.factuur.saldo",
@@ -21,14 +21,16 @@
     "fondsAfdrachten",
     "socialeAfdrachten"
   ],
-  "gemetenOp": "2026-09-12T20:41:52.048Z",
+  "gemetenOp": "2026-09-13T05:20:31.736Z",
   "stappen": [
     {
       "nr": 1,
-      "wat": "de factuur RTG-2026-0207 bestaat en staat open, en het saldo dekt hem",
+      "wat": "de factuur RTG-2026-09-0037 bestaat en staat open, en het saldo dekt hem",
       "stand": "PROVEN",
       "reden": null,
       "gemeten": {
+        "factuur": "RTG-2026-09-0037",
+        "bedragCenten": 7865,
         "factuurStand": "open",
         "saldoCenten": 20000
       }
@@ -48,12 +50,6 @@
             "collectie": "fondsAfdrachten",
             "nVoor": 0,
             "nNa": 1,
-            "hashGewijzigd": true
-          },
-          {
-            "collectie": "invoices",
-            "nVoor": 4,
-            "nNa": 4,
             "hashGewijzigd": true
           },
           {
@@ -136,25 +132,93 @@
     },
     {
       "nr": 7,
-      "wat": "de terugweg: is deze betaling terug te draaien of te compenseren",
-      "stand": "BLOCKED",
-      "reden": "verklaard als COMPENSATABLE, maar er is niets uit te voeren: een route die op een BETAALDE factuur een tegenboeking zet via pay.huisUit, met dezelfde duurzame bundel als de heenweg (kern/factuursaldo.js), en die de afdracht NIET stil terugdraait maar haar eigen correctieregel schrijft. Pas met die route is er iets uit te voeren en kan HERSTELPROEF.json hier `compensatie` meten in plaats van `geen tegenhanger beproefd`. -- een verklaring is geen uitgevoerde terugweg.",
+      "wat": "de terugweg: de betaalde factuur wordt gecompenseerd, en één keer",
+      "stand": "PROVEN",
+      "reden": null,
       "gemeten": {
         "kandidatenInHerstelRegister": 0,
         "compenserendePrimitiveAanwezig": true,
         "correctiemodel": "COMPENSATABLE",
-        "bewijsVanDeTerugweg": "BLOCKED"
+        "bewijsVanDeTerugweg": "PROVEN",
+        "uitgevoerd": true,
+        "status": 200,
+        "statusHerhaling": 200,
+        "bedragCenten": 7865,
+        "saldoVoor": 12135,
+        "saldoNa": 20000,
+        "factuurStand": "paid",
+        "correcties": 1,
+        "geldbakkenBijCorrectie": [
+          {
+            "collectie": "fondsAfdrachten",
+            "nVoor": 1,
+            "nNa": 1,
+            "hashGewijzigd": true
+          },
+          {
+            "collectie": "payBoekingen",
+            "nVoor": 2,
+            "nNa": 3,
+            "hashGewijzigd": true
+          },
+          {
+            "collectie": "paySaldi",
+            "nVoor": 3,
+            "nNa": 3,
+            "hashGewijzigd": true
+          }
+        ],
+        "geldbakkenBijHerhaling": [],
+        "compensatieKlopt": true,
+        "herhalingStil": true,
+        "reden": null
       }
     }
   ],
   "idempotent": true,
   "crashUitkomst": "doorgegaan",
   "correctiemodel": "COMPENSATABLE",
+  "factuurA": "RTG-2026-09-0037",
+  "bedragCenten": 7865,
   "economischeUitkomst": {
     "saldoCenten": 12135,
     "factuurStand": "paid",
     "factuurCenten": -7865,
     "afdrachten": 1
+  },
+  "terugwegGemeten": {
+    "uitgevoerd": true,
+    "status": 200,
+    "statusHerhaling": 200,
+    "bedragCenten": 7865,
+    "saldoVoor": 12135,
+    "saldoNa": 20000,
+    "factuurStand": "paid",
+    "correcties": 1,
+    "geldbakkenBijCorrectie": [
+      {
+        "collectie": "fondsAfdrachten",
+        "nVoor": 1,
+        "nNa": 1,
+        "hashGewijzigd": true
+      },
+      {
+        "collectie": "payBoekingen",
+        "nVoor": 2,
+        "nNa": 3,
+        "hashGewijzigd": true
+      },
+      {
+        "collectie": "paySaldi",
+        "nVoor": 3,
+        "nNa": 3,
+        "hashGewijzigd": true
+      }
+    ],
+    "geldbakkenBijHerhaling": [],
+    "compensatieKlopt": true,
+    "herhalingStil": true,
+    "reden": null
   },
   "crash": {
     "contracten": {
@@ -188,12 +252,12 @@
   },
   "telling": {
     "stappen": 7,
-    "PROVEN": 6,
+    "PROVEN": 7,
     "FAILED": 0,
-    "BLOCKED": 1,
+    "BLOCKED": 0,
     "NOT_APPLICABLE": 0,
     "UNKNOWN": 0
   },
   "gezakt": false,
-  "volledigBewezen": false
+  "volledigBewezen": true
 }

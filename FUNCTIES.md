@@ -21,9 +21,9 @@ het?**
 | Bedrijfsgenres | **78** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2136** |
+| Kernmodules (`server/kern/**`) | **2170** |
 | App-pagina's (`public/apps/**.html`) | **308** |
-| Testbestanden | **1843** |
+| Testbestanden | **1874** |
 
 ## De vier werelden
 
@@ -215,8 +215,8 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Kinderopvang (ouderkant)** (`opvangwijzer`) — Welke kinderopvang er is en hoeveel plek daar vrij is, plus een aanvraag klaarzetten en zelf weer intrekken. Een vrije plek is geen plek: inschrijven doet de opvang zelf. De aanwezigheidslijst van een groep komt hier nooit uit; een ouder ziet een getal en niet de namen van andere kinderen.  
   _voor: rtg, lifestyle, business_
-- **Knelpunten (welke weg ligt open)** (`knelpunt`) — Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan. Bewaart niets: alles komt binnen in het verzoek en gaat eruit als antwoord. Er wordt niets gerangschikt en geen beste weg aangewezen.  
-  _voor: rtg, lifestyle, business_
+- **Knelpunten (welke weg ligt open)** (`knelpunt`) — Rekent uit welke weg naar een doel openligt, wat hem blokkeert en wat er niet is nagegaan. Bewaart niets: alles komt binnen in het verzoek en gaat eruit als antwoord. Er wordt niets gerangschikt en geen beste weg aangewezen. Een gezin mag dezelfde vraag stellen; dat geeft geen recht op de wegen die het ziet.  
+  _voor: rtg, lifestyle, business, foundation_
 - **Vertegenwoordiging (wie mag iets namens mij)** (`vertegenwoordiging`) — Machtigingen van mens tot mens: wie mag wat namens een lid, sinds wanneer, tot wanneer, en wat is er namens hem gedaan. Een machtiging versmalt alleen wat het lid zelf al mocht en voegt er nooit iets aan toe; aanvaarden doet het lid zelf en intrekken kan altijd, per direct.  
   _voor: rtg, lifestyle, business_
 - **Rugdekking (wie staat er achter mij)** (`rugdekking`) — Wat een lid ziet van het programma waarmee RTG achter hem staat: welke soort, welk bedrag, tot wanneer, en wat RTG ervoor terugvraagt. Daaronder staat even groot wat een tegenprestatie NOOIT kan zijn -- een mening, zwijgen, gezondheid, of exclusiviteit die hem afhankelijk maakt.  

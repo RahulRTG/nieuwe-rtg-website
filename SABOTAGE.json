@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-08T21:49:24.824Z",
-    "commit": "9b4e0bd2",
+    "op": "2026-09-13T12:24:27.854Z",
+    "commit": "da878d69",
     "boomVuil": false,
     "boomAnders": 2,
     "instrument": "scripts/sabotage.js",
@@ -352,6 +352,20 @@
       "reden": "SEC-LOCK-004: een onleesbare stand valt terug op beschermd en niet op normaal",
       "wachter": "test:test/seclock.test.js",
       "duurMs": 4681
+    },
+    "techniek-meter-kent-zijn-grens": {
+      "stand": "raak",
+      "afdruk": "18fef81261468562",
+      "reden": "3. een verklaarde grondwaarheid draagt ook een ijkUITSLAG in het register",
+      "wachter": "test:test/meterwet.test.js",
+      "duurMs": 783
+    },
+    "techniek-bewijsveld-een-relatie": {
+      "stand": "raak",
+      "afdruk": "6e3476016e928cc1",
+      "reden": "2. geen verklaring die verder reikt dan de meting",
+      "wachter": "test:test/bewijsveld.test.js",
+      "duurMs": 1831
     }
   }
 }

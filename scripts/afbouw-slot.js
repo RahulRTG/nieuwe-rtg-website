@@ -17,7 +17,20 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const ROOT = path.join(__dirname, '..');
-const SLOT = path.join(ROOT, '.release', 'afbouw-slot');
+/* HET SLOTPAD IS TE OVERSCHRIJVEN, en dat is geen achterdeur maar de enige
+   manier om dit slot te BEPROEVEN. test/afbouwketen.test.js laat een echte
+   ronde claimen, kilt haar met SIGKILL en kijkt wat er van overblijft; deed hij
+   dat op `.release/afbouw-slot`, dan zou een toets de machine waarop hij draait
+   kunnen blokkeren -- en een toets die de productiepoort dichttrekt, wordt
+   binnen een week uitgezet.
+
+   Dezelfde vorm als RTG_AFLOOP_PAD in scripts/lib/afbouw-afloop.js: de
+   wegwerpwereld is compleet (slot EN afloop) of zij bestaat niet, want een
+   halve overschrijving laat de proef met een echt bestand praten zonder dat
+   iemand dat ziet. Niets in de productieweg zet deze variabele. */
+const SLOT = process.env.RTG_AFBOUW_SLOT
+  ? path.resolve(process.env.RTG_AFBOUW_SLOT)
+  : path.join(ROOT, '.release', 'afbouw-slot');
 const EIGENAAR = path.join(SLOT, 'eigenaar.json');
 
 function procesLeeft(pid) {
@@ -55,6 +68,19 @@ function pak(taak) {
     try {
       fs.mkdirSync(SLOT, { mode: 0o700 });
       fs.writeFileSync(EIGENAAR, JSON.stringify({ pid: process.pid, start: procesStart(process.pid), taak, gestart: new Date().toISOString() }) + '\n', { mode: 0o600 });
+      /* DE AFLOOP BEGINT HIER, en met opzet op deze ene plek. pak() heeft vier
+         aanroepers en dat zijn precies de bronmuterende paden: de mutatiemotor,
+         de testrunner (die de zes ijkingen draait), de release-gate en de
+         stagingrepetitie. Ze hier bedraden is er vier tegelijk, zonder er een
+         te vergeten -- en zonder een vijfde lijst die uit de pas gaat lopen.
+
+         Waarom het slot alleen niet genoeg was: hij wordt vrijgegeven op exit,
+         SIGINT en SIGTERM, en SIGKILL is niet af te vangen. Een schone
+         afronding, een crash en een kill zien er daarna identiek uit. De afloop
+         schrijft meteen RUNNING; alleen een exitcode 0 maakt daar PASSED van.
+         Zie scripts/lib/afbouw-afloop.js. */
+      try { require('./lib/afbouw-afloop').begin({ taak, uitExitcode: true }); }
+      catch (e) { /* de afloop mag een ronde nooit tegenhouden; hij is een getuige, geen poort */ }
       let vrij = false;
       const geefVrij = () => {
         if (vrij) return;

@@ -29,6 +29,18 @@
    is, is gevaarlijker dan geen kaart -- dus staat er liever `onbekend` dan een
    gok.
 
+   DRIE STANDEN, en de derde is geen tussenstand maar een ANDER soort regel:
+
+     om         is meegegaan met de tegenboeking (of hoefde niet te wijzigen om
+                mee te gaan). Draagt `gedaan`: wat ermee gebeurd is.
+     geen-werk  beweegt vanzelf mee, meestal omdat hij ook de status leest en
+                een terugstorting die op een eindstand zet. Draagt `gedaan`.
+     wacht      is INGEDEELD maar zijn collectie is nog niet om. Draagt
+                `tedoen`: wat er moet gebeuren op de dag dat zij omgaat. Dit is
+                de bak waar rides, tickets en boekingen in horen te belanden --
+                een lezer die daar staat is GELEZEN, en dat is precies het
+                verschil met `onbekend`.
+
    DRIE SOORTEN LEZER, en het onderscheid bepaalt het RISICO:
 
      toont      laat aan een mens zien of er betaald is. Breekt zichtbaar:
@@ -121,7 +133,78 @@ const LEZERS = {
     gedaan: 'krijgt alleen open bonnen: leverancier-09 filtert `terugbetaald` weg' },
   'public/apps/leverancier/leverancier-03b.js': { collectie: 'orders', soort: 'toont', stand: 'geen-werk',
     wat: 'de kolom "betaald" in de bonnenexport',
-    gedaan: 'blijft `ja`, en dat is juist: er IS betaald. De kolom `status` ernaast draagt `terugbetaald`' }
+    gedaan: 'blijft `ja`, en dat is juist: er IS betaald. De kolom `status` ernaast draagt `terugbetaald`' },
+
+  'server/kern/klantenboek.js': { collectie: 'orders', soort: 'telt', stand: 'om',
+    wat: 'de omzet per klant in het klantenboek van een zaak, gesorteerd op omzet',
+    gedaan: 'telde een teruggestorte bon mee -- stil, en het boek sorteert erop; leest nu `paid && !refunded`' },
+  'server/kern/ervaring/leden/spaarpot.js': { collectie: 'orders', soort: 'grendel', stand: 'om',
+    wat: 'de poort voor het splitsen van een rekening met vrienden',
+    gedaan: 'leunde op `paid === false` na een terugstorting; weigert nu expliciet op `refunded`, anders gingen er betaalverzoeken uit voor geld dat al terug was' },
+  'server/archief.js': { collectie: 'orders', soort: 'telt', stand: 'geen-werk',
+    wat: 'wat er naar het archief gaat',
+    gedaan: 'sluit `terugbetaald` al met zoveel woorden uit naast de betaalstand' },
+  'server/kern/tafelticket.js': { collectie: 'orders', soort: 'toont', stand: 'geen-werk',
+    wat: 'de openstaande rekening aan een tafel',
+    gedaan: 'zoekt juist `!o.paid`; een teruggestorte bon valt er vanzelf buiten' },
+  'server/kern/lidacties/rekening.js': { collectie: 'orders', soort: 'toont', stand: 'geen-werk',
+    wat: 'de open rekening van een lid bij een zaak (achteraf betalen)',
+    gedaan: 'zoekt `!o.paid`; een teruggestorte bon is niet open en hoort er niet in' },
+  'server/routes/supplier/bezorg.js': { collectie: 'orders', soort: 'grendel', stand: 'geen-werk',
+    wat: 'welke leveringen een bezorger mag oppakken',
+    gedaan: 'de regel eronder sluit status `terugbetaald` uit' },
+  'server/routes/supplier/kassa/innen.js': { collectie: 'orders', soort: 'grendel', stand: 'geen-werk',
+    wat: 'innen aan de kassa: alleen wat nog niet betaald is',
+    gedaan: 'de tak hangt aan `!o.paid`, en die staat bij een teruggestorte bon op true -- er wordt dus niet nogmaals geind' },
+  'server/routes/supplier/kassa/afrekenen.js': { collectie: 'orders', soort: 'grendel', stand: 'geen-werk',
+    wat: 'afrekenen aan de kassa',
+    gedaan: 'schrijft `paid` en leest hem niet als betaalstand' },
+  'server/db/tx/rij.js': { collectie: 'orders', soort: 'toont', stand: 'geen-werk',
+    wat: 'de rij die het transactiegrootboek van een bon bewaart',
+    gedaan: 'de KOLOM `paid` is een index; de historie komt terug uit het versleutelde hele object, dus `refunded` reist mee. Let op: die kolom betekent sindsdien "er is betaald" en niet "het geld ligt hier" -- filter er niet op' },
+  'server/db/tx/sqliteachter.js': { collectie: 'orders', soort: 'toont', stand: 'geen-werk',
+    wat: 'de sqlite-kant van datzelfde grootboek',
+    gedaan: 'leest `data` terug, niet de kolom' },
+  'server/db/tx/pgachter.js': { collectie: 'orders', soort: 'toont', stand: 'geen-werk',
+    wat: 'de postgres-kant van datzelfde grootboek',
+    gedaan: 'idem: de kolom is een index, de historie zit in `data`' },
+
+  'server/kern/bezorgvolg.js': { collectie: 'orders', soort: 'toont', stand: 'om',
+    wat: 'de bezorgstatus die de klant op zijn scherm volgt',
+    gedaan: 'liet een teruggestorte bon doorvallen naar "in de keuken" -- `paid` blijft immers staan; een terugstorting is nu een eigen eindtoestand met een eigen zin' },
+
+  /* --- rides en tickets: GELEZEN, maar hun collectie is nog niet om --- */
+  'server/kern/lidacties/ritten.js': { collectie: 'rides', soort: 'grendel', stand: 'wacht',
+    wat: 'weigert een tweede betaling van dezelfde rit',
+    tedoen: 'de `refunded`-grendel staat NA die op `paid` en leunt er uitdrukkelijk op dat annuleren `paid` ' +
+      'weer op false zet; gaan ritten om, dan leest een teruggestorte rit als "Al betaald." en moet die ' +
+      'volgorde om, precies zoals in kern/lidacties/betalen.js' },
+  'server/kern/leverancier/zaak.js': { collectie: 'tickets', soort: 'telt', stand: 'wacht',
+    wat: 'de bezette plaatsen per tijdslot, voor de capaciteit van een activiteit',
+    tedoen: 'telt `b.paid` plus een reservering van een half uur; gaan tickets om, dan houdt een teruggestort kaartje een plaats bezet die vrij is' },
+  'server/kern/ghost.js': { collectie: 'tickets', soort: 'telt', stand: 'wacht',
+    wat: 'verkochte kaartjes per tijdslot, voor de drukte-uitloop op een knooppunt',
+    tedoen: '`b.paid` zonder `refunded` ernaast; gaan tickets om, dan blijft een teruggestort kaartje ' +
+      'publiek op straat zetten dat er niet is' },
+  'server/routes/member/kopen/tickets.js': { collectie: ['tickets', 'rides'], soort: 'grendel', stand: 'wacht',
+    wat: 'de eigen kaartjes van een lid, de betaalstand van de transferrit, en de grendel op een transfer zonder betaald ticket',
+    tedoen: 'drie plekken: de lijst en de grendel sluiten `refunded` niet uit, en de transferrit toont ' +
+      'zijn betaalstand door -- alle drie gaan mee met hun eigen collectie' },
+  'server/kern/lidacties.js': { collectie: 'boekingen', soort: 'grendel', stand: 'wacht',
+    wat: 'weigert een tweede betaling van dezelfde boeking',
+    tedoen: 'zelfde volgorde-probleem als bij ritten: gaat deze collectie om, dan leest een teruggestorte boeking als "Al betaald."' },
+  'server/kern/onderneming/dagbeeld.js': { collectie: 'boekingen', soort: 'telt', stand: 'wacht',
+    wat: 'de maandomzet en het dagbeeld van een onderneming uit haar boekingen',
+    tedoen: 'twee optellingen op `b.paid` zonder `refunded` ernaast -- dit is de stille soort, dus hij gaat mee op de dag dat boekingen omgaan' },
+  'server/routes/supplier/charter/reis.js': { collectie: 'boekingen', soort: 'grendel', stand: 'wacht',
+    wat: 'een charterreis starten kan pas na betaling',
+    tedoen: 'sluit `refunded` niet uit; na de omzetting kan een teruggestorte reis alsnog starten' },
+  'server/routes/supplier/verhuur/rit.js': { collectie: 'boekingen', soort: 'grendel', stand: 'wacht',
+    wat: 'een huurrit starten kan pas na betaling',
+    tedoen: 'idem als de charterreis hierboven' },
+  'server/kern/zaakcommand/signalen.js': { collectie: ['orders', 'rides', 'boekingen'], soort: 'telt', stand: 'geen-werk',
+    wat: 'de openstaande signalen van een zaak: onaangeroerde bon, rit zonder chauffeur, boeking zonder antwoord',
+    gedaan: 'alle drie de regels toetsen ook de status, en een terugstorting zet die op een eindstand' }
 };
 
 /* Plekken die `paid` noemen zonder er een betaalstand uit te lezen. Ze staan
@@ -194,7 +277,12 @@ function bestandenMetPaid() {
   const uit = new Map();
   function loop(map, laag) {
     for (const naam of fs.readdirSync(map)) {
-      if (naam === 'node_modules' || naam === 'data') continue;
+      /* `dist` is BOUWUITVOER en geen bron: de geminificeerde kopie van elk
+         serveerbaar script, buiten git gehouden en door scripts/build.js zelf
+         overgeslagen. Wie hem meetelt, krijgt elke lezer een tweede keer in de
+         kaart -- en dan hangt de uitslag ervan af of iemand toevallig de build
+         heeft gedraaid. Dat is precies wat een meting niet mag doen. */
+      if (naam === 'node_modules' || naam === 'data' || naam === 'dist') continue;
       const p = path.join(map, naam);
       const st = fs.statSync(p);
       if (st.isDirectory()) { loop(p, laag); continue; }
@@ -227,14 +315,19 @@ function meet() {
   }
   for (const rel of Object.keys(LEZERS)) if (!gevonden.has(rel)) verdwenen.push(rel);
 
-  const leeg = () => ({ verklaard: 0, onbekend: 0, om: 0, geenWerk: 0, scherm: 0 });
+  const leeg = () => ({ verklaard: 0, onbekend: 0, om: 0, geenWerk: 0, wacht: 0, scherm: 0 });
   const perCollectie = {};
   for (const c of COLLECTIES) perCollectie[c] = leeg();
-  for (const r of rijen) {
-    const p = perCollectie[r.collectie]; if (!p) continue;
+  /* EEN LEZER KAN ER MEER DAN EEN RAKEN. kern/zaakcommand/signalen.js leest
+     bestellingen, ritten EN boekingen in drie regels onder elkaar. Hem bij een
+     van de drie zetten zou hem bij de andere twee laten verdwijnen, en dat is
+     precies hoe een migratie een lezer overslaat. */
+  for (const r of rijen) for (const c of [].concat(r.collectie)) {
+    const p = perCollectie[c]; if (!p) continue;
     p.verklaard++;
     if (r.stand === 'om') p.om++;
     if (r.stand === 'geen-werk') p.geenWerk++;
+    if (r.stand === 'wacht') p.wacht++;
     if (r.laag === 'scherm') p.scherm++;
   }
   for (const o of onbekend) for (const c of o.collecties) {
@@ -270,10 +363,11 @@ function druk(u) {
     u.telling.verklaard + ' verklaard, ' + u.telling.onbekend + ' onbekend');
   console.log('  ' + u.telling.server + ' op de server, ' + u.telling.scherm + ' op een scherm  |  ' +
     u.telling.scherp + ' scherp toegewezen (venster), ' + u.telling.ruim + ' ruim (heel bestand)\n');
-  console.log('  collectie    verklaard  om  geen-werk  onbekend   scherm');
+  console.log('  collectie    verklaard  om  geen-werk  wacht  onbekend   scherm');
   for (const [c, p] of Object.entries(u.perCollectie))
     console.log('  ' + c.padEnd(12) + String(p.verklaard).padStart(6) + String(p.om).padStart(5) +
-      String(p.geenWerk).padStart(10) + String(p.onbekend).padStart(10) + String(p.scherm).padStart(9));
+      String(p.geenWerk).padStart(10) + String(p.wacht).padStart(7) +
+      String(p.onbekend).padStart(10) + String(p.scherm).padStart(9));
   if (u.verdwenen.length) console.log('\n  LET OP -- verklaard maar niet meer gevonden: ' + u.verdwenen.join(', '));
   console.log('\n  nog te verklaren:');
   for (const o of u.onbekend.slice(0, 40))

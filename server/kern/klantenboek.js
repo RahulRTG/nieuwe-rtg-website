@@ -59,7 +59,11 @@ module.exports = ({ db, save, scho, boekingenVanZaak, ordersVanZaak }) => {
       const k = per.get(b.customerCodename) ||
         { codenaam: b.customerCodename, aantal: 0, omzet: 0, laatste: null, eerste: null };
       k.aantal++;
-      if (b.paid) k.omzet = rond(k.omzet + (Number(b.price) || Number(b.total) || 0));
+      /* `paid` betekent sinds de tegenboeking "er IS betaald" en niet "het geld
+         ligt hier". Zonder `refunded` ernaast blijft een teruggestorte bon in de
+         omzet van deze klant staan -- en dit boek SORTEERT op omzet, dus de
+         volgorde klopt dan ook niet meer. */
+      if (b.paid && !b.refunded) k.omzet = rond(k.omzet + (Number(b.price) || Number(b.total) || 0));
       const dag = geldDag(b);
       if (dag && (!k.laatste || dag > k.laatste)) k.laatste = dag;
       if (dag && (!k.eerste || dag < k.eerste)) k.eerste = dag;

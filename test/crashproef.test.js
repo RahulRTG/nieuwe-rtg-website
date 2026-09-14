@@ -382,15 +382,26 @@ test('elke voorziening overleeft het contract waarmee de crashproef haar aanroep
      voorziening wier vorm hier niet in staat, deze toets laat zakken: dat is op
      13 september gebeurd bij facturen/pdf, en het is de bedoeling. Wat er
      werkelijk uitkomt, meet de crashronde tegen een echte server. */
+  /* `voorstel` hoort hier sinds het Lab-fonds een wereld heeft (14 september
+     2026): drie labfondsroutes krijgen elk een VERS voorstel, want `beslis`
+     sluit het en dan meet de volgende route een toestandscontrole. Precies de
+     kop hierboven: een nieuwe voorziening wier vorm hier niet in staat laat
+     deze toets zakken, en dan hoort de VORM erbij te komen. */
   const post = async () => ({ status: 200, data: { pas: { id: 'p1' }, code: 'k1',
-    verzoeken: [{ id: 'v1' }], regel: { id: 'r1' }, factuur: { id: 'F-1' } } });
+    verzoeken: [{ id: 'v1' }], regel: { id: 'r1' }, factuur: { id: 'F-1' },
+    voorstel: { id: 'vs1' } } });
   const tokenVoor = () => 'token';
   /* `anderToken` hoort hier sinds de tik een voorziening is (14 september 2026): die
      haalt een verse tikcode bij het TWEEDE lid, want kern/pay/tik.js weigert je eigen
      tik. Precies zoals de kop hierboven zegt -- een nieuwe voorziening wier vorm hier
      niet in staat, laat deze toets zakken, en dan hoort de VORM erbij te komen. */
+  /* `labLocId` en de gezinssleutels horen er om dezelfde reden bij: de
+     labfondsvoorzieningen weigeren met zoveel woorden op een wereld zonder
+     locatie, en die voor de GEZINSdeur maakt zijn voorstel langs die deur --
+     `beslis` eist dat de aanroeper de indiener is. */
   const w = { iban: 'NL00RTG0000000001', iban2: 'NL00RTG0000000002', cn2: 'CN-2',
-    anderToken: 'token-van-het-tweede-lid' };
+    anderToken: 'token-van-het-tweede-lid', labLocId: 'LOC-1',
+    gezinCode: 'GEZIN-1', gezinToken: 'token-van-het-gezin' };
   for (const [pad, maak] of Object.entries(VOORZIENINGEN)) {
     const v = await maak({ post, tokenVoor, rol: 'member', w });
     assert.ok(v && typeof v === 'object', pad + ': een voorziening geeft altijd een object terug');

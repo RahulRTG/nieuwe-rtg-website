@@ -45,6 +45,11 @@ const VOLLEDIG = {
   '/api/pay/verzoek': (l, tok) => ({ verzoeken: [{ id: tok === 'ander' ? 'VZAANMIJ' : 'VZVANMIJ' }] }),
   '/api/pay/kascode': { code: 'ABC123' },
   '/api/pay/tikcode': { code: 'TIK999' },
+  /* De locatie in het Lab-fonds, waar vier lijven een `locId` uit halen. Zonder
+     deze rij levert de wereld `labLocId: undefined` en haalt `heel()` die vier
+     er terecht weer uit -- dan telt de keten 33 in plaats van 37, en dat is de
+     fixture die achterloopt en niet de code. */
+  '/api/labfonds/locatie/maak': { locatie: { id: 'LOC1' } },
   '/api/state': { state: { invoices: [{ id: 'RTG-2026-0001', status: 'paid' }, { id: 'RTG-2026-0002', status: 'open' }] } }
 };
 
@@ -87,8 +92,15 @@ test('de keten levert alle stukken op die de geldroutes nodig hebben', async () 
      laatste wint), dus een te laag getal is het enige signaal dat er een lijf is
      overschreven -- maar tegen een gelijk blijvende ruiling is alleen de lijst
      hieronder bestand, plus de toets die vasthoudt dat de tik niet meer uit de wereld
-     komt. */
-  assert.equal(Object.keys(perRoute).length, 31, 'eenendertig geldroutes krijgen een eigen lijf');
+     komt.
+
+     ZEVENENDERTIG SINDS DE LABFONDSWERELD (14 september 2026). Er kwamen er zes
+     bij en er ging er geen af: doneer en voorstel/maak aan BEIDE deuren (leden
+     en gezin) plus de twee `stem`-lijven. Zes ledenroutes van het labfonds
+     stonden op main op `ongemeten (404)` omdat er geen locatie in de wereld
+     was; dat gat is hiermee dicht en `mutatiesZonderEnigeAs` daalde van 2789
+     naar 2783. */
+  assert.equal(Object.keys(perRoute).length, 37, 'zevenendertig geldroutes krijgen een eigen lijf');
   for (const pad of ['/api/office/bank/rekening/open', '/api/office/bank/rekening/rood']) {
     assert.ok(perRoute[pad], 'de zware kantoorroute ' + pad + ' hoort een eigen lijf te krijgen');
   }
@@ -218,11 +230,19 @@ test('een wereld die niets oplevert laat de proef meten als vanouds', async () =
   const { extra, perRoute } = await zetWereldKlaar({ post: async () => ({ status: 500, data: {} }),
     tokens: { member: 'lid', office: 'kantoor' } });
   assert.deepEqual(extra, {});
+  /* ACHT SINDS DE LABFONDSWERELD. De twee `stem`-lijven dragen alleen `keuze`,
+     en dat is met opzet een constante: het VOORSTEL-id komt uit een
+     voorziening, want `beslis` sluit het voorstel en een gedeeld voorstel laat
+     de volgende route een toestandscontrole meten. Een lijf dat niets uit de
+     wereld leest, overleeft een lege wereld -- dat is hier de regel en geen
+     gat, precies zoals bij de zes hierboven. */
   assert.deepEqual(Object.keys(perRoute).sort(), [
     '/api/bank/rekening/open',
     '/api/boardroom/betalingen/proef',
     '/api/labfonds/locatie/maak',
+    '/api/labfonds/stem',
     '/api/pay/oplaad',
+    '/api/rtf/labfonds/stem',
     '/api/supplier/giftcard/sell',
     '/api/wallet/voeg'
   ]);

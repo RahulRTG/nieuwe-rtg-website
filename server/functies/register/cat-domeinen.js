@@ -25,12 +25,8 @@
 
    Het tweede blok (foundation, media, identiteit, geld) staat in
    ./cat-domeinen2.js; samen zijn ze een lijst. */
-const { LEDEN, LEDEN_RTF, WERKOS } = require('./doelgroepen');
+const { LEDEN, LEDEN_RTF, WERKOS, ZAAK } = require('./doelgroepen');
 const LEDEN_GAST = ['rtg', 'lifestyle', 'business', 'gast'];
-/* ZAAK bestaat nog voor de paden die hun doelgroep AL uit hun prefix halen
-   (/api/supplier, /api/staff). De werkfuncties hieronder hebben die prefix niet
-   en dragen daarom WERKOS: dezelfde wereld, drie relaties. Zie doelgroepen.js. */
-const ZAAK = ['leverancier', 'personeel'];
 
 module.exports = [
   // ---------- diensten voor leden ----------
@@ -42,7 +38,7 @@ module.exports = [
     uitleg: 'Advertenties, reviews en boekingen tussen leden onderling.', paden: ['/api/thuis'] },
   { id: 'dom-residentie', categorie: 'Diensten (leden)', naam: 'Residentie', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Het woon- en verblijfsdeel van het platform.', paden: ['/api/residentie'] },
-  { id: 'dom-lucht', categorie: 'Diensten (leden)', naam: 'Luchtvaart en luchthaven', standaard: true, doelgroepen: LEDEN,
+  { id: 'dom-lucht', categorie: 'Diensten (leden)', naam: 'Luchtvaart en luchthaven', standaard: true, doelgroepen: ZAAK,
     uitleg: 'Vluchten, boarding passes en de luchthavendiensten.', paden: ['/api/lucht'] },
   { id: 'dom-reisbureau', categorie: 'Diensten (leden)', naam: 'Reisbureau', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'Reisadvies en het samenstellen van een reis.', paden: ['/api/reisbureau'] },
@@ -73,7 +69,7 @@ module.exports = [
   // ---------- cultuur, sport en gezelschap ----------
   { id: 'dom-genootschap', categorie: 'Cultuur en gezelschap', naam: 'Het Genootschap', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Het besloten genootschap: kringen, bijeenkomsten en beheer.', paden: ['/api/genootschap'] },
-  { id: 'dom-sport', categorie: 'Cultuur en gezelschap', naam: 'Sport', standaard: true, doelgroepen: LEDEN_RTF,
+  { id: 'dom-sport', categorie: 'Cultuur en gezelschap', naam: 'Sport', standaard: true, doelgroepen: ZAAK,
     uitleg: 'Sportprogramma\'s, teams en wedstrijden.', paden: ['/api/sport'] },
   { id: 'dom-muziek', categorie: 'Cultuur en gezelschap', naam: 'Muziek', standaard: true, doelgroepen: LEDEN_RTF,
     uitleg: 'Van lied tot zaal: maken, uitgeven en beluisteren.', paden: ['/api/muziek'] },
@@ -85,7 +81,7 @@ module.exports = [
     uitleg: 'De fluisterlijn binnen de sociale laag.', paden: ['/api/fluister'] },
 
   // ---------- werk en zaken ----------
-  { id: 'dom-werkvloer', categorie: 'Werk (zaken en personeel)', naam: 'De werkvloer', standaard: true, doelgroepen: WERKOS,
+  { id: 'dom-werkvloer', categorie: 'Werk (zaken en personeel)', naam: 'De werkvloer', standaard: true, doelgroepen: ZAAK,
     uitleg: 'Tafels, keukenbord en bedieningskaart op de vloer van een zaak.', paden: ['/api/werkvloer'] },
   { id: 'dom-werkplek', categorie: 'Werk (zaken en personeel)', naam: 'De werkplek', standaard: true, doelgroepen: WERKOS,
     uitleg: 'Het persoonlijke werkstation van een medewerker.', paden: ['/api/werkplek'] },

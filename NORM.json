@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2384,
+    "bewijsAchterstand": 2403,
     "bewijsAlleenKeten": 16,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -90,7 +90,7 @@
     "bevestigGebreken": 0,
     "verwijzingGebreken": 0,
     "mensmutatieZonderWacht": 1,
-    "gevolgPadenOnbekend": 87,
+    "gevolgPadenOnbekend": 92,
     "gevolgContractVolledig": 6,
     "gevolgContractenGezakt": 0,
     "crashasOnbekend": 89,
@@ -2290,6 +2290,26 @@
       "meter": "kernGedeeld 236 -> 237 (VERHOOGD, met reden)",
       "reden": "DEZELFDE KOPPELING ALS `beroepenbieb`, EEN BRON LATER. Het domein `knelpunt` mag sinds vandaag ook `opvangwijzer` lezen (GRENZEN.json), omdat de aanvoerlaag daar zijn DERDE bron op aansluit: kern/knelpunt/aanvoer-opvang.js levert kinderopvangplekken als vondst achter een knelpunt.\n\nWAAROM ER EEN DERDE MOEST KOMEN, en dat is geen willekeur. Werk en leerstof waren met opzet elkaars tegenpool en het contract paste op allebei -- maar twee punten liggen altijd op een lijn. Opvang deelt met geen van beide zijn vorm: wel een aanbieder (anders dan leerstof), geen eis aan de mens (anders dan een vacature), en schaarste als een GEMETEN bezetting (capaciteit min aanwezig) in plaats van een aantal rijen. Het contract paste opnieuw zonder een letter te veranderen, en toets 14 houdt vast dat de contractlaag in code geen van de drie domeinen kent.\n\nEN HIJ VULT ALS EERSTE HET ETIKET `beschikbaarheid`. Dat veld staat sinds dag een in ETIKETTEN en blijft `null` tenzij een bron hem noemt; geen van de eerste twee bronnen kon hem noemen. Een etiket dat nooit gevuld werd, is een etiket waarvan niemand weet of het werkt -- toets 24 beproeft hem nu, en toets 12 houdt tegelijk vast dat hij voor werk `null` blijft. Dat verschil IS de proef: het veld is optioneel en toch gemeten.\n\nWat er NIET is opgehoogd: `kernBreedte` beweegt niet -- er komt geen kernnaam bij, alleen een domein dat een bestaande naam mag lezen. En de domeingrens hield hem netjes tegen tot iemand hem op de lijst zette: de bron leverde een `geweigerd`-regel met de volledige reden in plaats van stil niets terug te geven.\n\nWie deze tand weer omlaag wil: dat kan alleen door een bron los te koppelen, en dat is een productbesluit en geen opruimactie.",
       "waarheen": "Wat hier wegviel is opnieuw de garantie dat `knelpunt` niets uit de kern leest -- en die was al weg sinds `beroepenbieb`. Wat ervoor in de plaats staat is scherper en is met deze bron een derde keer beproefd: toets 14 houdt vast dat de CONTRACTlaag (aanvoer.js, aanvoer-bronnen.js) in code geen enkele domeinnaam kent -- nu ook niet `opvangwijzer`, `kinderopvang`, `groep` of `nanny` -- zodat de koppeling bij de BRON blijft en niet doorlekt naar het contract. Toets 25 bewaakt daarbovenop dat deze bron geen mens aanraakt: `opvangwijzerOverzicht(codenaam)` NEEMT een codenaam aan, en de bron roept hem zonder argument aan en pakt alleen `.opvangen`. GRENZEN.json blijft de grendel -- dezelfde poort die de ritbrug tegenhield tot iemand hem opschreef."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2384,
+      "vervalt": "2026-12-15",
+      "meter": "bewijsAchterstand 2384 -> 2403",
+      "reden": "Samenvoeging van de bijgewerkte open PR-koppen na #253. De verse gevolg- en idemregisters maken negentien aanvullende open bewijsgevallen zichtbaar; ze worden expliciet als schuld vastgelegd en niet verborgen door het oude getal te laten staan.",
+      "waarheen": "De nieuwe routes per gevolg en herhaling classificeren in GEVOLGDEKKING.json en IDEMBESLUIT.json, waarna deze tand weer omlaag kan."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "gevolgPadenOnbekend",
+      "van": 87,
+      "vervalt": "2026-12-15",
+      "meter": "gevolgPadenOnbekend 87 -> 92",
+      "reden": "De bijgewerkte gevolgtoerekenings-PR voegt routes en gevolgcontracten toe. Na samenvoeging over de volledige boom blijven vijf extra bereikbare handelingen zonder gemeten gevolg; de zes volledige contracten blijven groen en geen contractproef zakt.",
+      "waarheen": "Voor de vijf paden het werkelijke gevolg meten en vastleggen, zodat zij uit de onbekende post verdwijnen."
     }
   ],
   "prestatie": {
@@ -2314,7 +2334,7 @@
     "inlineStijlAttributen": "2026-09-11",
     "ratelTanden": "2026-09-14",
     "metingenZonderRatel": "2026-08-18",
-    "bewijsAchterstand": "2026-09-12",
+    "bewijsAchterstand": "2026-09-14",
     "toetsenOngevoeligPct": "2026-09-05",
     "endpointsZonderTest": "2026-09-13",
     "dekkingPct": "2026-09-06",
@@ -2369,7 +2389,7 @@
     "bevestigGebreken": "2026-09-12",
     "verwijzingGebreken": "2026-09-12",
     "mensmutatieZonderWacht": "2026-09-12",
-    "gevolgPadenOnbekend": "2026-09-13",
+    "gevolgPadenOnbekend": "2026-09-14",
     "gevolgContractVolledig": "2026-09-13",
     "gevolgContractenGezakt": "2026-09-13",
     "crashasOnbekend": "2026-09-13",

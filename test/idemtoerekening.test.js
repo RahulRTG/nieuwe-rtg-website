@@ -130,24 +130,35 @@ test('2. MET herijk staat er in `a` alleen nog wat de gemeten handeling zelf dee
     'de gemeten oproep deed EEN schrijfactie; staat hier 2, dan telt de ijkoproep nog mee');
 });
 
-test('2b. ZONDER voorziening is de pasladder-ijkoproep de ENIGE lek, en hij wordt gedekt', async () => {
-  /* DEZE TOETS IS ER OMDAT EEN MUTATIE HEM AFDWONG, en dat hoort hier te staan.
+test('2b. de pasladder-ijkoproep is GEEN lek: dezelfde route, dus hetzelfde effect', async () => {
+  /* DEZE TOETS STOND ER OMGEKEERD IN, en dat was mijn eigen fout (14 september 2026).
+     Hij eiste dat de herijking ook de pasladder-ijkoproep wegstreepte -- ik had de
+     scheidslijn verkeerd getrokken.
 
-     Toets 2 hierboven dekt de voorziening, maar hij dekte de PASLADDER niet: haal de
-     herijking na de ijkoproep weg en toets 2 bleef groen. De reden is dat de
-     voorziening LATER herijkt en daarmee ook het werk van de ijkoproep absorbeert --
-     zolang er een voorziening IS. De meeste routes hebben er geen, en daar is de
-     ijkoproep de enige lek.
+     De herijking bestaat om werk weg te houden dat de proef zelf deed AAN EEN ANDERE
+     ROUTE. De voorziening doet dat (zij maakt met /api/pay/verzoek een klompje en
+     daarna wordt /api/pay/verzoek/intrek gemeten), en daar hoort zij dus te blijven.
+     De pasladder-ijkoproep stuurt hetzelfde lijf naar DEZELFDE route om te zien welke
+     pas erdoor komt: wat die verandert, verandert deze handeling -- alleen een oproep
+     eerder.
 
-     Dus: dezelfde proef zonder voorziening. Zonder herijk staat `onderwerpen` op twee
-     (de ijkoproep plus de gemeten oproep), met herijk op een. */
+     WAT DE OMGEKEERDE REGEL KOSTTE. /api/member/ai/tegoed is idempotent per lid: de
+     eerste oproep maakt de tegoedregel aan, de volgende niet meer. Met een herijking na
+     de ijkoproep deed die oproep het werk, werd het weggestreept, en kwam er
+     `opslag: {}` uit de meting -- terwijl de ronde van main er `aiTegoed: 1` had. De
+     afleidingslaag verloor daarmee haar tweede bron, en test/effectdekking.test.js
+     toets 2 zakte erop. Een reparatie die een echt effect onzichtbaar maakt, is erger
+     dan de fout die zij opruimde.
+
+     Dus: zonder voorziening hoort `a` het werk van de ijkoproep TE DRAGEN, met of
+     zonder herijk. Zet de herijking terug na de pasladder en deze toets zakt. */
   const zonder = await draai({ metHerijk: false, metVoorziening: false });
   assert.equal((zonder.a || {}).onderwerpen, 2,
-    'de nulmeting klopt niet: zonder herijk hoort de ijkoproep mee te tellen');
+    'de nulmeting klopt niet: de ijkoproep en de gemeten oproep raken dezelfde route');
   const met = await draai({ metHerijk: true, metVoorziening: false });
-  assert.equal((met.a || {}).onderwerpen, 1,
-    'de ijkoproep telt nog mee in `a`; de herijking na de pasladder ontbreekt of hangt ' +
-    'op de verkeerde plek (een voorziening kan hem maskeren, maar die is er hier niet)');
+  assert.equal((met.a || {}).onderwerpen, 2,
+    'de herijking streept de ijkoproep weg, en die raakt DEZELFDE route -- dan verdwijnt ' +
+    'het effect van de gemeten handeling zelf uit `a`');
   assert.deepStrictEqual(Object.keys(met.a || {}).sort(), ['onderwerpen'],
     'zonder voorziening hoort er niets anders in `a` te staan');
 });

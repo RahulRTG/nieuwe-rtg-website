@@ -129,7 +129,7 @@ const REGISTERS = [
      dat zijn OUDERDOM zichtbaar wordt, want een stale register maakt die tand
      bot zonder dat iemand het merkt. */
   ['AICONTEXT.json', 'npm run aicontext:vast', 'welke velden van een lid in de system prompt van Rahul terechtkomen'],
-  ['STILSPOOR.json', 'npm run stilspoor:vast', 'schrijfacties waarvan het falen stil wordt weggevangen (LAT.md regel 13)'],
+  ['STILSPOOR.json', 'npm run stilspoor:vast', 'schrijfacties waarvan het falen stil wordt weggevangen (LAT.md regel 21)'],
   ['LAATSTE_METING.json', 'npm run beproeving', 'de laatste stormproef, ook wanneer hij zakt'],
   ['HEAPPROEF.json', 'npm run heapproef', 'geheugengedrag onder herhaalde verzoeken'],
   ['BEPROEVING.json', 'npm run beproeving', 'storm, geld, misbruik en herstel'],

@@ -3,7 +3,7 @@
   "op": "2026-09-14T10:38:12.369Z",
   "commit": "861e5474b",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 1,
   "instrument": "scripts/gevolgdekking.js",
   "node": "v24.18.0"
  },
@@ -2425,9 +2425,14 @@
    ],
    "niveau": "voorstel",
    "meting": {
-    "graad": "onbekend",
-    "collecties": [],
-    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+    "graad": "gemeten",
+    "collecties": [
+     "payBoekingen",
+     "payIdem",
+     "payIdemAfdruk",
+     "paySaldi"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
    },
    "verklaring": {
     "stand": "VOLLEDIG",

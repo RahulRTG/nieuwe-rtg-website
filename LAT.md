@@ -791,6 +791,63 @@ onbekend is, hoort het expliciet te worden vermeld.
 Een handhaver die een tweede schrijfwijze niet ziet, zakt daar niet op, en
 daarvoor staat deze regel hier.
 
+### 21. Een belofte over een spoor is pas een regel als het spoor kan weigeren
+
+Dit huis belooft op tientallen plekken dat er iets wordt vastgelegd: wie in een
+dossier keek, welk besluit er viel, wat er is weggeschreven. Zo'n belofte is pas
+een regel als de schrijfactie de handeling kan TEGENHOUDEN. Kan zij dat niet, dan
+gaat de handeling door terwijl het spoor ontbreekt -- en de gebruiker krijgt een
+bevestiging over iets dat niet is gebeurd.
+
+*Het geval, 13 september 2026:* `server/inzagelog.js` gaf `noteer()` een uitslag
+terug die **geen van de 42 aanroepende bestanden las**, en het wegschrijven zat in
+een lege `catch`. Zonder database schreef hij in een weggegooide array en meldde
+succes. De inzage in het dossier van een lid ging dus gewoon door als het spoor
+niet geschreven werd -- en juist daar is het spoor de hele rechtvaardiging.
+
+*Waarom een genegeerde uitzondering niet het ergste is.* De reparatie die zich
+opdringt is "vang die fout op en meld hem". Dat verschuift het probleem naar een
+VALSE BEVESTIGING, en die is erger, want hij ziet eruit als bewijs.
+`save()` in `server/db/index.js` zet binnen een bundel alleen een vlag; in
+PostgreSQL-modus markeert hij dat de responsepoort vóór het antwoord één
+autoritatieve commit moet doen. Succesvol terugkeren betekent daar dus niet dat
+er iets staat. "Geregistreerd" mag daarom niet betekenen dat er geen fout is
+gegooid, maar dat de COMMIT geslaagd is -- en dat is beproefbaar zonder iets
+nieuws te bouwen: `server/lib/verraad.js` kent `schrijf-verloren` ("keert NORMAAL
+terug zonder iets te bewaren") en `schrijf-faalt`.
+
+*De reparatie hoort op EEN plek en niet in 42.* `inzagelog.noteerVast()` levert
+een uitslag, en `kern/ledenbalie-inzage.js` houdt de inzage tegen als het spoor
+niet vaststaat: onder beide verraadstanden komt er geen dossier, geen
+trefferlijst en geen herstelbericht meer uit. Daaruit volgt een tweede les die
+breder geldt: **plaats een garantie waar alle informatie voor die garantie
+samenkomt, niet zo vroeg mogelijk in de keten.** De kluispoort kent de MENS en
+niet het onderwerp; het journaal kent het onderwerp en niet wat er getoond zou
+worden.
+
+*En het spoor zegt `toegestaan`, nooit `geleverd`.* De regel wordt geschreven
+vóór het dossier wordt samengesteld, dus hij legt vast dat inzage is VERLEEND.
+Zou er `ingezien` staan, dan liegt het spoor bij elke mislukte lezing -- en in
+het voordeel van het huis.
+
+*De vorm is niet uniek voor het journaal.* Van de 1841 `catch`-blokken in
+`server/` zijn er 674 volledig leeg, en daarbinnen staan 18 SPOOR-schrijvers en
+24 OPSLAG-schrijvers in een `try` waarvan het falen wordt opgegeten. Dat is een
+vorm en geen aanklacht: `server/log.js` smoort `noteerFout` omdat een logger die
+zelf gooit de oorspronkelijke fout maskeert, en `kern/envelop.js` zegt met zoveel
+woorden dat de LEVERING voorgaat. Het getal is daarom een triagelijst met een
+besluitregister ernaast, in de vorm van `HERREKENBAAR.json` naast
+`FAALPROEF.json`: een verklaring is een besluit en wordt nooit van de telling
+afgetrokken.
+
+**Handhaver:** `scripts/stilspoor.js` + `STILSPOOR.json` (`npm run stilspoor`),
+met drie ratels in `NORM.json`: `stilSpoor` en `stilleOpslag` mogen alleen
+omlaag, en `stilSpoorAanroepen` alleen omhoog -- want een schuld die daalt
+doordat het instrument blind wordt, is de gevaarlijkste vorm van vooruitgang.
+Verder `test/ledenbaliespoor.test.js` en `scripts/faalproef.js` (`FAALPROEF.json`:
+per route beproefd onder `schrijf-verloren` en `schrijf-faalt`). Voor de
+aanroeper die de uitslag van een schrijfactie negeert ZONDER try/catch bestaat
+geen handhaver; die vorm draagt geen kenmerk waar een meter op kan aanslaan, en
 ---
 
 ## Wat de lat betekent per tijdvak

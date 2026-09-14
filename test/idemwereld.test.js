@@ -68,20 +68,27 @@ test('de keten levert alle stukken op die de geldroutes nodig hebben', async () 
      twaalf van de veertien zware kantoorroutes omdat de proef ze niet aan het
      werk kreeg, en bij deze twee kwam dat door een WOORD en niet door een deur
      (`soort` betekent bij een pas iets anders dan bij een rekening). */
-  /* VIJFENTWINTIG, EN DAT IS EEN RUILING -- precies waar de waarschuwing hieronder
-     over gaat. Na de bundelronde van 13 september stonden er 25 (twee takken breidden
-     de lijst onafhankelijk uit: de ledenkant met twee zware kantoorroutes, de zaakkant
-     van PR #242 met drie). Op 14 september kwam /api/office/bank/incasso erbij en ging
-     /api/pay/tik eruit -- die laatste hoort in een VOORZIENING, want zijn code leeft
-     vijf minuten en een wereld die aan het begin van de ronde wordt opgezet levert hem
-     verlopen af. Het getal is dus hetzelfde en de verzameling niet.
+  /* EENENDERTIG, en dit getal draagt twee waarschuwingen tegelijk.
 
-     HET GETAL IS DE EIS EN NIET DE VERSIERING: een dubbele sleutel in een
-     objectliteraal verdwijnt STIL (de laatste wint), dus een kale telling is het enige
-     signaal dat er een lijf is overschreven. En een kale telling laat juist een RUILING
-     door -- daarom staan de paden die om een reden zijn toegevoegd er hieronder apart
-     bij, en toetst de volgende toets dat de tik NIET meer uit de wereld komt. */
-  assert.equal(Object.keys(perRoute).length, 25, 'vijfentwintig geldroutes krijgen een eigen lijf');
+     GETELD EN NIET OPGETELD. Drie takken breidden deze lijst onafhankelijk uit: de
+     ledenkant met twee zware kantoorroutes (zie hierboven) en PR #242 met zes. De
+     vereniging is 25 + 6 = 31 en niet 25 + 29, want #242 vertrok van dezelfde
+     zaakkant die de vorige bundel al had opgenomen -- wie de getallen van de takken
+     optelt, telt die overlap dubbel.
+
+     EN HET IS BOVENDIEN EEN RUILING. PR #256 zette /api/office/bank/incasso erbij en
+     haalde /api/pay/tik eruit -- die laatste hoort in een VOORZIENING, want zijn code
+     leeft vijf minuten en een wereld die aan het begin van de ronde wordt opgezet
+     levert hem verlopen af. Netto bleef 31 staan terwijl de verzameling veranderde,
+     dus in deze bundel heeft de kale telling die wissel NIET gezien.
+
+     Dat is precies waarom het getal de eis is en niet de versiering, en waarom het
+     hem niet alleen kan: een dubbele sleutel in een objectliteraal verdwijnt STIL (de
+     laatste wint), dus een te laag getal is het enige signaal dat er een lijf is
+     overschreven -- maar tegen een gelijk blijvende ruiling is alleen de lijst
+     hieronder bestand, plus de toets die vasthoudt dat de tik niet meer uit de wereld
+     komt. */
+  assert.equal(Object.keys(perRoute).length, 31, 'eenendertig geldroutes krijgen een eigen lijf');
   for (const pad of ['/api/office/bank/rekening/open', '/api/office/bank/rekening/rood']) {
     assert.ok(perRoute[pad], 'de zware kantoorroute ' + pad + ' hoort een eigen lijf te krijgen');
   }

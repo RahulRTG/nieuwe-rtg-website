@@ -3,7 +3,7 @@
     "op": "2026-09-13T20:32:19.250Z",
     "commit": "a5d5346c8",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 6,
     "instrument": "scripts/mutatie.js",
     "node": "v24.18.0"
   },
@@ -2908,14 +2908,6 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
-    "gelding.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/gelding.js",
-      "operator": "getal+1#0",
-      "gezakt": 1,
-      "geprobeerd": 6
-    },
     "geldkaart.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3362,14 +3354,6 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
-    "herrekenbaar.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/lib/bron.js",
-      "operator": "&&->||#0",
-      "gezakt": 1,
-      "geprobeerd": 3
-    },
     "herstel-sandbox.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3691,14 +3675,6 @@
       "gezakt": 3,
       "geprobeerd": 7
     },
-    "idemidentiteit-velden.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/lib/idem-kast.js",
-      "operator": "!==->===#0",
-      "gezakt": 2,
-      "geprobeerd": 9
-    },
     "idemproef.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3806,14 +3782,6 @@
         "scripts/lib/invoerproef.js"
       ],
       "posities": 1
-    },
-    "inzagebewaring.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/inzagelog.js",
-      "operator": "===->!==#0",
-      "gezakt": 3,
-      "geprobeerd": 1
     },
     "inzagelog.test.js": {
       "soort": "puur",
@@ -5201,14 +5169,6 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
-    },
-    "mn03-commercieelvoordeel.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "server/kern/commercie/vergoeding.js",
-      "operator": "return-weg#0",
-      "gezakt": 1,
-      "geprobeerd": 1
     },
     "mobiliteit-werkkant-routes.test.js": {
       "soort": "server",
@@ -7454,14 +7414,6 @@
       "module": "scripts/lib/schrijfanalyse.js",
       "operator": "===->!==#0",
       "gezakt": 7,
-      "geprobeerd": 1
-    },
-    "schrijfproef.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/schrijfproef.js",
-      "operator": "===->!==#0",
-      "gezakt": 3,
       "geprobeerd": 1
     },
     "scim.test.js": {

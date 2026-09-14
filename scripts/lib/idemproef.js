@@ -269,19 +269,41 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
     const gevraagdeRol = rolVoor ? rolVoor(r) : r.rol;
     let pas = gevraagdeRol;
     if (gevraagdeRol === 'member' && Array.isArray(pasladder) && pasladder.length > 1) {
+      /* HIER WORDT MET OPZET NIET HERIJKT, en dat is een correctie op de reparatie
+         van 13 september (14 september 2026).
+
+         De herijking bestaat om werk dat de proef ZELF deed weg te houden uit `dA`.
+         Maar deze ijkoproep raakt DEZELFDE ROUTE: hij stuurt hetzelfde lijf naar
+         `r.pad` om te zien welke pas erdoor komt. Wat hij verandert, verandert deze
+         handeling -- alleen een oproep eerder. Hem uit `dA` houden gooit dus geen
+         vervuiling weg maar het effect van de gemeten route zelf.
+
+         GEVONDEN AAN /api/member/ai/tegoed, door test/effectdekking.test.js toets 2.
+         Die route is idempotent per lid: de eerste oproep maakt de tegoedregel aan en
+         de volgende niet meer. Met een herijking hier deed de ijkoproep het werk, werd
+         dat weggestreept, en kwam er uit de meting `opslag: {}` -- terwijl main's ronde
+         (van voor de herijking) er `aiTegoed: 1` had. De afleidingslaag verloor
+         daarmee haar tweede bron, en die toets bestaat juist om dat te vangen.
+
+         HET VERSCHIL MET DE VOORZIENING HIERONDER, en dat is de hele scheidslijn: die
+         roept ANDERE routes aan om een onderwerp klaar te zetten (/api/pay/verzoek om
+         een klompje te maken, waarna /api/pay/verzoek/intrek werd gemeten). Dat is
+         vervuiling, en daar blijft de herijking staan. Dezelfde route is geen
+         vervuiling.
+
+         WAT HET KOST: bij een route waar de pasladder langsgaat, kan `dA` het werk van
+         twee of drie oproepen van dezelfde route dragen. Voor de COLLECTIENAMEN -- het
+         enige dat kern/stuur/gevolg.js gebruikt -- maakt dat niets uit, en voor het
+         oordeel ook niet: dA telt alleen mee als "de eerste oproep deed werk", en dat
+         deed hij. */
       const eerste = await post(r.pad, { ...lijf }, tokenVoor('member'));
       gedaan++;
-      /* HERIJKEN NA ELKE IJKOPROEP, en niet alleen na de laatste: elke oproep in
-         deze lus kan werk doen, dus elke oproep hoort het ijkpunt op te schuiven.
-         Deed alleen de laatste dat, dan bleef het werk van de eerdere in `dA`. */
-      if (herijk) herijk(eerste);
       if (eerste.status === 403) {
         for (const kandidaat of pasladder.slice(1)) {
           const t = tokenVoor(kandidaat);
           if (!t) continue;
           const proef = await post(r.pad, { ...lijf }, t);
           gedaan++;
-          if (herijk) herijk(proef);
           if (proef.status !== 403) { pas = kandidaat; pasGewisseld++; break; }
         }
       }

@@ -3,8 +3,8 @@
   "uitleg": "per geldroute en per crashgrens: wat er van de uitkomst overblijft als het proces op dat moment sterft. De vraag is economisch -- wat staat er in de opslag na de herstart -- en niet wat de route antwoordde, want bij een crash antwoordt hij niet.",
   "grens": "drie dingen die deze proef NIET zegt. (1) Wat een aanbieder buiten de deur al had gecommit ziet hij niet -- dat is EXTERNALLY_RECONCILABLE en dat wacht op een echte aanbieder. (2) Het OORDEEL hangt aan de collecties die GELDDEKKING.json per route declareert; een halve schrijfactie in een collectie die daar niet staat, komt terug in `buitenDeRoute` maar laat de uitslag niet zakken. Die lijst is dus de bovengrens van wat hier te vinden is. (3) Een PROVEN geldt voor DIT lijf op DEZE wereld -- een andere invoer kan een ander pad door de route nemen.",
   "stempel": {
-    "op": "2026-09-13T20:05:11.946Z",
-    "commit": "ec789193c",
+    "op": "2026-09-14T08:00:39.751Z",
+    "commit": "c4d16a2a6",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/crashproef.js",
@@ -24,13 +24,27 @@
         "bankSaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/bank.js:43 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "er staat niets, dus zeker niets half"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
@@ -40,7 +54,17 @@
           "id"
         ]
       },
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:bankBoekingen",
+          "store.db:bankPassen",
+          "store.db:bankSaldi"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -55,15 +79,36 @@
         "bankSaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/bank.js:43 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
-      "buitenDeRoute": [],
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 3 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "alle 3 collecties bewogen samen"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
+      "geraakt": [
+        "store.db:bankBoekingen",
+        "store.db:bankPassen",
+        "store.db:bankSaldi"
+      ],
+      "buitenDeRoute": [
+        "store.db:bankIdem",
+        "store.db:bankIdemAfdruk"
+      ],
       "eigenLijf": true,
       "voorziening": {
         "stand": "gelukt",
@@ -71,7 +116,13 @@
           "id"
         ]
       },
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -86,15 +137,22 @@
         "bankSaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
       "leestBody": true,
       "leestBodyGrond": "server/routes/bank.js:43 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
-      "buitenDeRoute": [],
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:bankBoekingen",
+        "store.db:bankPassen",
+        "store.db:bankSaldi"
+      ],
+      "buitenDeRoute": [
+        "store.db:bankIdem",
+        "store.db:bankIdemAfdruk"
+      ],
       "eigenLijf": true,
       "voorziening": {
         "stand": "gelukt",
@@ -364,20 +422,40 @@
         "bankPassen"
       ],
       "idempotentie": "beschermd",
-      "stand": "GEEN_DUURZAME_WEG",
-      "statusVanDeAanroep": 200,
-      "bereiktTot": "HANDLER_VOLTOOID",
-      "blokkeertOp": null,
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/bank.js:40 raakt req.body",
-      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-mutatie: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
-      "geraakt": [
-        "store.db:bankPassen"
-      ],
+      "stand": "NIET_BEPROEFD",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand",
+      "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:bankPassen"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -390,20 +468,43 @@
         "bankPassen"
       ],
       "idempotentie": "beschermd",
-      "stand": "GEEN_DUURZAME_WEG",
-      "statusVanDeAanroep": 200,
-      "bereiktTot": "HANDLER_VOLTOOID",
-      "blokkeertOp": null,
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/bank.js:40 raakt req.body",
-      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-na-commit: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "stand": "NIET_BEPROEFD",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 1 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand",
       "geraakt": [
         "store.db:bankPassen"
       ],
-      "buitenDeRoute": [],
+      "buitenDeRoute": [
+        "store.db:bankIdem",
+        "store.db:bankIdemAfdruk"
+      ],
       "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -426,7 +527,10 @@
       "geraakt": [
         "store.db:bankPassen"
       ],
-      "buitenDeRoute": [],
+      "buitenDeRoute": [
+        "store.db:bankIdem",
+        "store.db:bankIdemAfdruk"
+      ],
       "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
@@ -442,20 +546,40 @@
         "bankRekeningen"
       ],
       "idempotentie": "beschermd",
-      "stand": "GEEN_DUURZAME_WEG",
-      "statusVanDeAanroep": 200,
-      "bereiktTot": "HANDLER_VOLTOOID",
-      "blokkeertOp": null,
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/bank.js:20 raakt req.body",
-      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-mutatie: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
-      "geraakt": [
-        "store.db:bankRekeningen"
-      ],
+      "stand": "NIET_BEPROEFD",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand",
+      "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:bankRekeningen"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -468,20 +592,43 @@
         "bankRekeningen"
       ],
       "idempotentie": "beschermd",
-      "stand": "GEEN_DUURZAME_WEG",
-      "statusVanDeAanroep": 200,
-      "bereiktTot": "HANDLER_VOLTOOID",
-      "blokkeertOp": null,
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/bank.js:20 raakt req.body",
-      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-na-commit: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "stand": "NIET_BEPROEFD",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 1 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand",
       "geraakt": [
         "store.db:bankRekeningen"
       ],
-      "buitenDeRoute": [],
+      "buitenDeRoute": [
+        "store.db:bankIdem",
+        "store.db:bankIdemAfdruk"
+      ],
       "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -504,7 +651,10 @@
       "geraakt": [
         "store.db:bankRekeningen"
       ],
-      "buitenDeRoute": [],
+      "buitenDeRoute": [
+        "store.db:bankIdem",
+        "store.db:bankIdemAfdruk"
+      ],
       "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
@@ -521,18 +671,44 @@
         "bankSaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_WORLD",
-      "statusVanDeAanroep": 402,
-      "bereiktTot": "DOMEINVOORWAARDE",
-      "blokkeertOp": "WERELD",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/bank.js:58 raakt req.body",
-      "reden": "het verzoek kwam door de controle heen en strandde op de TOESTAND (402): de wereld mist een voorwerp of een stand die deze route nodig heeft",
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "er staat niets, dus zeker niets half"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
-      "voorziening": null,
-      "meldingBewoog": false
+      "voorziening": {
+        "stand": "gelukt",
+        "velden": []
+      },
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:bankBoekingen",
+          "store.db:bankSaldi"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -546,18 +722,47 @@
         "bankSaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_WORLD",
-      "statusVanDeAanroep": 402,
-      "bereiktTot": "DOMEINVOORWAARDE",
-      "blokkeertOp": "WERELD",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/bank.js:58 raakt req.body",
-      "reden": "het verzoek kwam door de controle heen en strandde op de TOESTAND (402): de wereld mist een voorwerp of een stand die deze route nodig heeft",
-      "geraakt": [],
-      "buitenDeRoute": [],
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 2 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "alle 2 collecties bewogen samen"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
+      "geraakt": [
+        "store.db:bankBoekingen",
+        "store.db:bankSaldi"
+      ],
+      "buitenDeRoute": [
+        "store.db:bankIdem",
+        "store.db:bankIdemAfdruk"
+      ],
       "eigenLijf": true,
-      "voorziening": null,
-      "meldingBewoog": false
+      "voorziening": {
+        "stand": "gelukt",
+        "velden": []
+      },
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -571,17 +776,26 @@
         "bankSaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_WORLD",
-      "statusVanDeAanroep": 402,
-      "bereiktTot": "DOMEINVOORWAARDE",
-      "blokkeertOp": "WERELD",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
       "leestBody": true,
       "leestBodyGrond": "server/routes/bank.js:58 raakt req.body",
-      "reden": "het verzoek kwam door de controle heen en strandde op de TOESTAND (402): de wereld mist een voorwerp of een stand die deze route nodig heeft",
-      "geraakt": [],
-      "buitenDeRoute": [],
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:bankBoekingen",
+        "store.db:bankSaldi"
+      ],
+      "buitenDeRoute": [
+        "store.db:bankIdem",
+        "store.db:bankIdemAfdruk"
+      ],
       "eigenLijf": true,
-      "voorziening": null,
+      "voorziening": {
+        "stand": "gelukt",
+        "velden": []
+      },
       "meldingBewoog": false
     },
     {
@@ -596,18 +810,38 @@
         "bankSaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/bank.js:34 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "er staat niets, dus zeker niets half"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 402,
+        "deed": [],
+        "tweedeStatus": 402,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -621,13 +855,13 @@
         "bankSaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "BLOCKED_WORLD",
+      "statusVanDeAanroep": 402,
+      "bereiktTot": "DOMEINVOORWAARDE",
+      "blokkeertOp": "WERELD",
       "leestBody": true,
       "leestBodyGrond": "server/routes/bank.js:34 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "reden": "het verzoek kwam door de controle heen en strandde op de TOESTAND (402): de wereld mist een voorwerp of een stand die deze route nodig heeft",
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
@@ -646,13 +880,13 @@
         "bankSaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "BLOCKED_WORLD",
+      "statusVanDeAanroep": 402,
+      "bereiktTot": "DOMEINVOORWAARDE",
+      "blokkeertOp": "WERELD",
       "leestBody": true,
       "leestBodyGrond": "server/routes/bank.js:34 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "reden": "het verzoek kwam door de controle heen en strandde op de TOESTAND (402): de wereld mist een voorwerp of een stand die deze route nodig heeft",
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
@@ -749,18 +983,41 @@
         "bankSaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/bank.js:30 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "er staat niets, dus zeker niets half"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
       "geraakt": [],
       "buitenDeRoute": [],
-      "eigenLijf": false,
+      "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:bankBoekingen",
+          "store.db:bankSaldi"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -774,18 +1031,44 @@
         "bankSaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/bank.js:30 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
-      "buitenDeRoute": [],
-      "eigenLijf": false,
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 2 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "alle 2 collecties bewogen samen"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
+      "geraakt": [
+        "store.db:bankBoekingen",
+        "store.db:bankSaldi"
+      ],
+      "buitenDeRoute": [
+        "store.db:bankIdem",
+        "store.db:bankIdemAfdruk"
+      ],
+      "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -799,16 +1082,22 @@
         "bankSaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
       "leestBody": true,
       "leestBodyGrond": "server/routes/bank.js:30 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
-      "buitenDeRoute": [],
-      "eigenLijf": false,
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:bankBoekingen",
+        "store.db:bankSaldi"
+      ],
+      "buitenDeRoute": [
+        "store.db:bankIdem",
+        "store.db:bankIdemAfdruk"
+      ],
+      "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
     },
@@ -823,18 +1112,40 @@
         "bankTerugkerend"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/bank.js:53 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "stand": "NIET_BEPROEFD",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand",
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:bankTerugkerend"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -847,18 +1158,43 @@
         "bankTerugkerend"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/bank.js:53 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
-      "buitenDeRoute": [],
+      "stand": "NIET_BEPROEFD",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 1 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand",
+      "geraakt": [
+        "store.db:bankTerugkerend"
+      ],
+      "buitenDeRoute": [
+        "store.db:bankIdem",
+        "store.db:bankIdemAfdruk"
+      ],
       "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -871,15 +1207,20 @@
         "bankTerugkerend"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
       "leestBody": true,
       "leestBodyGrond": "server/routes/bank.js:53 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
-      "buitenDeRoute": [],
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:bankTerugkerend"
+      ],
+      "buitenDeRoute": [
+        "store.db:bankIdem",
+        "store.db:bankIdemAfdruk"
+      ],
       "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
@@ -904,7 +1245,7 @@
       "reden": "de proef kwam niet voorbij de deur (401); dat is een rol of een sleutel en geen lijf",
       "geraakt": [],
       "buitenDeRoute": [],
-      "eigenLijf": false,
+      "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
     },
@@ -928,7 +1269,7 @@
       "reden": "de proef kwam niet voorbij de deur (401); dat is een rol of een sleutel en geen lijf",
       "geraakt": [],
       "buitenDeRoute": [],
-      "eigenLijf": false,
+      "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
     },
@@ -952,7 +1293,7 @@
       "reden": "de proef kwam niet voorbij de deur (401); dat is een rol of een sleutel en geen lijf",
       "geraakt": [],
       "buitenDeRoute": [],
-      "eigenLijf": false,
+      "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
     },
@@ -1354,16 +1695,18 @@
         "labFonds"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
       "leestBody": true,
       "leestBodyGrond": "server/routes/labfonds.js:30 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-mutatie: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:labFonds"
+      ],
       "buitenDeRoute": [],
-      "eigenLijf": false,
+      "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
     },
@@ -1378,16 +1721,18 @@
         "labFonds"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
       "leestBody": true,
       "leestBodyGrond": "server/routes/labfonds.js:30 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-na-commit: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:labFonds"
+      ],
       "buitenDeRoute": [],
-      "eigenLijf": false,
+      "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
     },
@@ -1402,16 +1747,18 @@
         "labFonds"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
       "leestBody": true,
       "leestBodyGrond": "server/routes/labfonds.js:30 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:labFonds"
+      ],
       "buitenDeRoute": [],
-      "eigenLijf": false,
+      "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
     },
@@ -1519,12 +1866,12 @@
           "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
         },
         "geenDubbel": {
-          "stand": "NIET_BEPROEFD",
-          "reden": "de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien"
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
         }
       },
       "statusVanDeAanroep": 0,
-      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand | geenDubbel: de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien",
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand",
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
@@ -1536,9 +1883,7 @@
           "store.db:bankregie"
         ],
         "tweedeStatus": 200,
-        "bijgekomen": [
-          "store.db:bankregie"
-        ]
+        "bijgekomen": []
       }
     },
     {
@@ -1803,12 +2148,12 @@
           "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
         },
         "geenDubbel": {
-          "stand": "NIET_BEPROEFD",
-          "reden": "de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien"
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
         }
       },
       "statusVanDeAanroep": 0,
-      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand | geenDubbel: de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien",
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand",
       "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": false,
@@ -1820,9 +2165,7 @@
           "store.db:bankregie"
         ],
         "tweedeStatus": 200,
-        "bijgekomen": [
-          "store.db:bankregie"
-        ]
+        "bijgekomen": []
       }
     },
     {
@@ -2043,20 +2386,43 @@
         "paySaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/pay.js:56 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "er staat niets, dus zeker niets half"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
       "geraakt": [],
       "buitenDeRoute": [
         "store.db:onboarding"
       ],
-      "eigenLijf": false,
+      "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:payBoekingen",
+          "store.db:paySaldi"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -2070,20 +2436,47 @@
         "paySaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/pay.js:56 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
-      "buitenDeRoute": [
-        "store.db:onboarding"
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 2 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "alle 2 collecties bewogen samen"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
+      "geraakt": [
+        "store.db:payBoekingen",
+        "store.db:paySaldi"
       ],
-      "eigenLijf": false,
+      "buitenDeRoute": [
+        "store.db:betaalIdem",
+        "store.db:onboarding",
+        "store.db:payIdem",
+        "store.db:payIdemAfdruk",
+        "store.db:waardePosities"
+      ],
+      "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -2097,18 +2490,25 @@
         "paySaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
       "leestBody": true,
       "leestBodyGrond": "server/routes/pay.js:56 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
-      "buitenDeRoute": [
-        "store.db:onboarding"
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:payBoekingen",
+        "store.db:paySaldi"
       ],
-      "eigenLijf": false,
+      "buitenDeRoute": [
+        "store.db:betaalIdem",
+        "store.db:onboarding",
+        "store.db:payIdem",
+        "store.db:payIdemAfdruk",
+        "store.db:waardePosities"
+      ],
+      "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
     },
@@ -2286,20 +2686,40 @@
         "paySaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/pay.js:64 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "er staat niets, dus zeker niets half"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
       "geraakt": [],
       "buitenDeRoute": [
         "store.db:onboarding"
       ],
       "eigenLijf": false,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 400,
+        "deed": [],
+        "tweedeStatus": 400,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -2368,20 +2788,44 @@
         "payTegoed"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/pay-tegoed.js:31 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "er staat niets, dus zeker niets half"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
       "geraakt": [],
       "buitenDeRoute": [
         "store.db:onboarding"
       ],
-      "eigenLijf": false,
+      "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:payBoekingen",
+          "store.db:paySaldi",
+          "store.db:payTegoed"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -2396,20 +2840,50 @@
         "payTegoed"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/pay-tegoed.js:31 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
-      "buitenDeRoute": [
-        "store.db:onboarding"
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 3 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "alle 3 collecties bewogen samen"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
+      "geraakt": [
+        "store.db:payBoekingen",
+        "store.db:paySaldi",
+        "store.db:payTegoed"
       ],
-      "eigenLijf": false,
+      "buitenDeRoute": [
+        "store.db:betaalIdem",
+        "store.db:geldbeleid",
+        "store.db:onboarding",
+        "store.db:payIdem",
+        "store.db:payIdemAfdruk",
+        "store.db:waardeOormerken",
+        "store.db:waardePosities"
+      ],
+      "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -2424,18 +2898,28 @@
         "payTegoed"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
       "leestBody": true,
       "leestBodyGrond": "server/routes/pay-tegoed.js:31 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
-      "buitenDeRoute": [
-        "store.db:onboarding"
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:payBoekingen",
+        "store.db:paySaldi",
+        "store.db:payTegoed"
       ],
-      "eigenLijf": false,
+      "buitenDeRoute": [
+        "store.db:betaalIdem",
+        "store.db:geldbeleid",
+        "store.db:onboarding",
+        "store.db:payIdem",
+        "store.db:payIdemAfdruk",
+        "store.db:waardeOormerken",
+        "store.db:waardePosities"
+      ],
+      "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
     },
@@ -2451,20 +2935,43 @@
         "paySaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/pay-tegoed.js:51 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "er staat niets, dus zeker niets half"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
       "geraakt": [],
       "buitenDeRoute": [
         "store.db:onboarding"
       ],
       "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:payBoekingen",
+          "store.db:paySaldi"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -2478,20 +2985,49 @@
         "paySaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/pay-tegoed.js:51 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 2 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "alle 2 collecties bewogen samen"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
+      "geraakt": [
+        "store.db:payBoekingen",
+        "store.db:paySaldi"
+      ],
       "buitenDeRoute": [
-        "store.db:onboarding"
+        "store.db:betaalIdem",
+        "store.db:geldbeleid",
+        "store.db:onboarding",
+        "store.db:payIdem",
+        "store.db:payIdemAfdruk",
+        "store.db:waardeOormerken",
+        "store.db:waardePosities"
       ],
       "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -2505,16 +3041,25 @@
         "paySaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
       "leestBody": true,
       "leestBodyGrond": "server/routes/pay-tegoed.js:51 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:payBoekingen",
+        "store.db:paySaldi"
+      ],
       "buitenDeRoute": [
-        "store.db:onboarding"
+        "store.db:betaalIdem",
+        "store.db:geldbeleid",
+        "store.db:onboarding",
+        "store.db:payIdem",
+        "store.db:payIdemAfdruk",
+        "store.db:waardeOormerken",
+        "store.db:waardePosities"
       ],
       "eigenLijf": true,
       "voorziening": null,
@@ -2609,20 +3154,40 @@
         "payVerzoeken"
       ],
       "idempotentie": "beschermd",
-      "stand": "GEEN_DUURZAME_WEG",
-      "statusVanDeAanroep": 200,
-      "bereiktTot": "HANDLER_VOLTOOID",
-      "blokkeertOp": null,
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/pay.js:69 raakt req.body",
-      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-mutatie: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
-      "geraakt": [
-        "store.db:payVerzoeken"
-      ],
+      "stand": "NIET_BEPROEFD",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand",
+      "geraakt": [],
       "buitenDeRoute": [],
       "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:payVerzoeken"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -2635,20 +3200,43 @@
         "payVerzoeken"
       ],
       "idempotentie": "beschermd",
-      "stand": "GEEN_DUURZAME_WEG",
-      "statusVanDeAanroep": 200,
-      "bereiktTot": "HANDLER_VOLTOOID",
-      "blokkeertOp": null,
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/pay.js:69 raakt req.body",
-      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-na-commit: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "stand": "NIET_BEPROEFD",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 1 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand",
       "geraakt": [
         "store.db:payVerzoeken"
       ],
-      "buitenDeRoute": [],
+      "buitenDeRoute": [
+        "store.db:payIdem",
+        "store.db:payIdemAfdruk"
+      ],
       "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -2671,7 +3259,10 @@
       "geraakt": [
         "store.db:payVerzoeken"
       ],
-      "buitenDeRoute": [],
+      "buitenDeRoute": [
+        "store.db:payIdem",
+        "store.db:payIdemAfdruk"
+      ],
       "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
@@ -2689,20 +3280,44 @@
         "payVerzoeken"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/pay.js:75 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "er staat niets, dus zeker niets half"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
       "geraakt": [],
       "buitenDeRoute": [
         "store.db:onboarding"
       ],
       "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:payBoekingen",
+          "store.db:paySaldi",
+          "store.db:payVerzoeken"
+        ],
+        "tweedeStatus": 409,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -2717,20 +3332,50 @@
         "payVerzoeken"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/pay.js:75 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 3 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "alle 3 collecties bewogen samen"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
+      "geraakt": [
+        "store.db:payBoekingen",
+        "store.db:paySaldi",
+        "store.db:payVerzoeken"
+      ],
       "buitenDeRoute": [
-        "store.db:onboarding"
+        "store.db:betaalIdem",
+        "store.db:geldbeleid",
+        "store.db:onboarding",
+        "store.db:payIdem",
+        "store.db:payIdemAfdruk",
+        "store.db:waardeOormerken",
+        "store.db:waardePosities"
       ],
       "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 409,
+        "deed": [],
+        "tweedeStatus": 409,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -2745,16 +3390,26 @@
         "payVerzoeken"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
       "leestBody": true,
       "leestBodyGrond": "server/routes/pay.js:75 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:payBoekingen",
+        "store.db:paySaldi",
+        "store.db:payVerzoeken"
+      ],
       "buitenDeRoute": [
-        "store.db:onboarding"
+        "store.db:betaalIdem",
+        "store.db:geldbeleid",
+        "store.db:onboarding",
+        "store.db:payIdem",
+        "store.db:payIdemAfdruk",
+        "store.db:waardeOormerken",
+        "store.db:waardePosities"
       ],
       "eigenLijf": true,
       "voorziening": null,
@@ -3097,13 +3752,17 @@
           "stand": "PROVEN",
           "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
         },
-        "geenDubbel": {
+        "berichtGeland": {
           "stand": "NIET_BEPROEFD",
-          "reden": "de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien"
+          "reden": "niemand heeft verklaard of hier iemand bericht hoort te krijgen (MELDBESLUIT.json staat op UNKNOWN voor dit pad); gemeten is alleen dat er geen melding ontstond"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
         }
       },
       "statusVanDeAanroep": 0,
-      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand | geenDubbel: de herhaling deed werk in 1 collectie(s), maar idemsleutels.js verklaart voor dit pad niet of een woordelijk gelijk verzoek een herhaling is of een tweede handeling. Zonder die verklaring is een tweede effect niet te beoordelen -- \"de knop een slag verder\" hoort twee keer te draaien",
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand | berichtGeland: niemand heeft verklaard of hier iemand bericht hoort te krijgen (MELDBESLUIT.json staat op UNKNOWN voor dit pad); gemeten is alleen dat er geen melding ontstond",
       "geraakt": [
         "store.db:facturen"
       ],
@@ -3119,9 +3778,7 @@
           "store.db:facturen"
         ],
         "tweedeStatus": 200,
-        "bijgekomen": [
-          "store.db:facturen"
-        ]
+        "bijgekomen": []
       }
     },
     {
@@ -3222,22 +3879,40 @@
         "giftcards"
       ],
       "idempotentie": "beschermd",
-      "stand": "GEEN_DUURZAME_WEG",
-      "statusVanDeAanroep": 200,
-      "bereiktTot": "HANDLER_VOLTOOID",
-      "blokkeertOp": null,
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/supplier/kassa/cadeaukaart.js:32 raakt req.body",
-      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-mutatie: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
-      "geraakt": [
-        "store.db:giftcards"
-      ],
-      "buitenDeRoute": [
-        "store.db:supplierActivity"
-      ],
+      "stand": "NIET_BEPROEFD",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "NIET_BEPROEFD",
+          "reden": "deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "geenHalf: deze route schrijft een collectie, dus \"half\" bestaat hier niet als toestand",
+      "geraakt": [],
+      "buitenDeRoute": [],
       "eigenLijf": true,
       "voorziening": null,
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:giftcards"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -3261,6 +3936,8 @@
         "store.db:giftcards"
       ],
       "buitenDeRoute": [
+        "store.db:kassaIdem",
+        "store.db:kassaIdemAfdruk",
         "store.db:supplierActivity"
       ],
       "eigenLijf": true,
@@ -3289,6 +3966,8 @@
         "store.db:giftcards"
       ],
       "buitenDeRoute": [
+        "store.db:kassaIdem",
+        "store.db:kassaIdemAfdruk",
         "store.db:supplierActivity"
       ],
       "eigenLijf": true,
@@ -3571,28 +4250,44 @@
         "paySaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "GEEN_DUURZAME_WEG",
-      "statusVanDeAanroep": 200,
-      "bereiktTot": "HANDLER_VOLTOOID",
-      "blokkeertOp": null,
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/pay-zaak.js:140 raakt req.body",
-      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-mutatie: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
-      "geraakt": [
-        "store.db:payBoekingen",
-        "store.db:paySaldi"
-      ],
-      "buitenDeRoute": [
-        "store.db:betaalIdem",
-        "store.db:betaalOpdrachten",
-        "store.db:capGezondheid"
-      ],
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "er staat niets, dus zeker niets half"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
+      "geraakt": [],
+      "buitenDeRoute": [],
       "eigenLijf": false,
       "voorziening": {
         "stand": "gelukt",
         "velden": []
       },
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:payBoekingen",
+          "store.db:paySaldi"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -3606,13 +4301,27 @@
         "paySaldi"
       ],
       "idempotentie": "beschermd",
-      "stand": "GEEN_DUURZAME_WEG",
-      "statusVanDeAanroep": 200,
-      "bereiktTot": "HANDLER_VOLTOOID",
-      "blokkeertOp": null,
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/pay-zaak.js:140 raakt req.body",
-      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-na-commit: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "de uitkomst staat na de herstart in 2 collectie(s)"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "alle 2 collecties bewogen samen"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
       "geraakt": [
         "store.db:payBoekingen",
         "store.db:paySaldi"
@@ -3620,14 +4329,22 @@
       "buitenDeRoute": [
         "store.db:betaalIdem",
         "store.db:betaalOpdrachten",
-        "store.db:capGezondheid"
+        "store.db:capGezondheid",
+        "store.db:payIdem",
+        "store.db:payIdemAfdruk"
       ],
       "eigenLijf": false,
       "voorziening": {
         "stand": "gelukt",
         "velden": []
       },
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 400,
+        "deed": [],
+        "tweedeStatus": 400,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -3655,7 +4372,9 @@
       "buitenDeRoute": [
         "store.db:betaalIdem",
         "store.db:betaalOpdrachten",
-        "store.db:capGezondheid"
+        "store.db:capGezondheid",
+        "store.db:payIdem",
+        "store.db:payIdemAfdruk"
       ],
       "eigenLijf": false,
       "voorziening": {
@@ -3676,19 +4395,29 @@
         "posSales"
       ],
       "idempotentie": "beschermd",
-      "stand": "GEEN_DUURZAME_WEG",
-      "statusVanDeAanroep": 200,
-      "bereiktTot": "HANDLER_VOLTOOID",
-      "blokkeertOp": null,
-      "leestBody": true,
-      "leestBodyGrond": "server/routes/supplier/kassa/afrekenen.js:21 raakt req.body",
-      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-mutatie: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
-      "geraakt": [
-        "store.db:posSales"
-      ],
-      "buitenDeRoute": [
-        "store.db:supplierActivity"
-      ],
+      "stand": "PROVEN",
+      "claims": {
+        "toestand": {
+          "stand": "PROVEN",
+          "reden": "geen enkele collectie van deze route veranderde"
+        },
+        "geenHalf": {
+          "stand": "PROVEN",
+          "reden": "er staat niets, dus zeker niets half"
+        },
+        "geenVals": {
+          "stand": "PROVEN",
+          "reden": "de verbinding brak zonder antwoord -- de aanroeper krijgt geen bewering, dus ook geen valse"
+        },
+        "geenDubbel": {
+          "stand": "PROVEN",
+          "reden": "de herhaling na de herstart legde niets bovenop de uitkomst -- en dat is een toestandsbescherming, want de idem-poort is na een herstart uit beeld (venster 5s)"
+        }
+      },
+      "statusVanDeAanroep": 0,
+      "reden": "alle vier de beweringen van het overlevingscontract zijn bewezen",
+      "geraakt": [],
+      "buitenDeRoute": [],
       "eigenLijf": false,
       "voorziening": {
         "stand": "gelukt",
@@ -3697,7 +4426,15 @@
           "method"
         ]
       },
-      "meldingBewoog": false
+      "meldingBewoog": false,
+      "herhaling": {
+        "status": 200,
+        "deed": [
+          "store.db:posSales"
+        ],
+        "tweedeStatus": 200,
+        "bijgekomen": []
+      }
     },
     {
       "methode": "POST",
@@ -3722,6 +4459,8 @@
         "store.db:posSales"
       ],
       "buitenDeRoute": [
+        "store.db:kassaIdem",
+        "store.db:kassaIdemAfdruk",
         "store.db:supplierActivity"
       ],
       "eigenLijf": false,
@@ -3757,6 +4496,8 @@
         "store.db:posSales"
       ],
       "buitenDeRoute": [
+        "store.db:kassaIdem",
+        "store.db:kassaIdemAfdruk",
         "store.db:supplierActivity"
       ],
       "eigenLijf": false,
@@ -3780,16 +4521,18 @@
         "wallet"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
       "leestBody": true,
       "leestBodyGrond": "server/routes/zorgwallet.js:34 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-mutatie: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:wallet"
+      ],
       "buitenDeRoute": [],
-      "eigenLijf": false,
+      "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
     },
@@ -3804,16 +4547,18 @@
         "wallet"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
       "leestBody": true,
       "leestBodyGrond": "server/routes/zorgwallet.js:34 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-na-commit: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:wallet"
+      ],
       "buitenDeRoute": [],
-      "eigenLijf": false,
+      "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
     },
@@ -3828,27 +4573,29 @@
         "wallet"
       ],
       "idempotentie": "beschermd",
-      "stand": "BLOCKED_BODY",
-      "statusVanDeAanroep": 400,
-      "bereiktTot": "VERZOEKCONTROLE",
-      "blokkeertOp": "LIJF",
+      "stand": "GEEN_DUURZAME_WEG",
+      "statusVanDeAanroep": 200,
+      "bereiktTot": "HANDLER_VOLTOOID",
+      "blokkeertOp": null,
       "leestBody": true,
       "leestBodyGrond": "server/routes/zorgwallet.js:34 raakt req.body",
-      "reden": "de route keurde het verzoek af (400) voordat hij aan het werk ging: het lijf dekt niet wat hij vraagt",
-      "geraakt": [],
+      "reden": "de route gaf 200 en het proces leefde door, dus hij liep niet langs het injectiepunt van sterf-voor-bericht: hij schrijft via de gewone write-behind save(). Deze grens bestaat niet op zijn pad -- wat hem wel bedreigt is een VERLOREN schrijfactie (`schrijf-verloren`), en die draait deze proef niet",
+      "geraakt": [
+        "store.db:wallet"
+      ],
       "buitenDeRoute": [],
-      "eigenLijf": false,
+      "eigenLijf": true,
       "voorziening": null,
       "meldingBewoog": false
     }
   ],
   "telling": {
-    "BLOCKED_BODY": 33,
-    "GEEN_DUURZAME_WEG": 87,
-    "BLOCKED_WORLD": 3,
+    "PROVEN": 21,
+    "GEEN_DUURZAME_WEG": 91,
+    "NIET_BEPROEFD": 13,
+    "BLOCKED_WORLD": 2,
     "BLOCKED_ROLE": 3,
-    "NIET_BEPROEFD": 4,
-    "PROVEN": 2,
+    "BLOCKED_BODY": 2,
     "BLOCKED_FEATURE": 3
   },
   "ruis": [

@@ -965,7 +965,32 @@ function geldLijf(w) {
        losse velden -- die terugval is hier met opzet niet gebruikt, want dan
        beproeft de meting een pad dat een echte zaak nooit neemt. */
     '/api/supplier/facturen/maak': { soort: 'dienst', koperNaam: 'Proef Koper', codenaam: w.cn2,
-      regels: [{ omschrijving: 'Proefregel', aantal: 1, stuk: 25 }] }
+      regels: [{ omschrijving: 'Proefregel', aantal: 1, stuk: 25 }] },
+    /* ====================================================================
+       DE LAATSTE VIJF, en elk veld komt uit wat de route ZELF terugriep
+       toen hij het miste -- niet uit de bron afgeleid en niet uit een
+       broertje overgenomen. De foutmelding is het betrouwbaarste
+       requirements-document dat er is.
+
+         storten        "Storten kan vanaf 1 euro"        -> 100 centen
+         pay/oplaad     "Opladen kan van 1 tot 5000 euro" -> binnen de band
+         tegoed/koop    "Dat bedrag kan niet"             -> boven MIN_CENTEN,
+                        en een ONTVANGER, want tegoed koop je voor iemand
+         locatie/maak   "Geef de locatie een duidelijke naam"
+         wallet/voeg    "Geef het een naam" EN daarna "Wat is de kaart- of
+                        ticketcode?" -- twee poorten achter elkaar, dus het
+                        lijf draagt ze allebei
+       ==================================================================== */
+    '/api/bank/storten': { iban: w.iban, centen: 10000, route: 'ideal', oms: 'proefstorting' },
+    '/api/pay/oplaad': { centen: 10000 },
+    '/api/pay/tegoed/koop': { centen: 5000, aan: w.cn2, oms: 'prooftegoed' },
+    '/api/labfonds/locatie/maak': { naam: 'Proeflocatie', land: 'NL' },
+    '/api/wallet/voeg': { soort: 'klantenkaart', titel: 'Proefkaart', code: 'PROEF-0001' },
+    /* `proef` vraagt een BESTAANDE provider-id, anders "Onbekende
+       betaalprovider". `stripe` staat in de gesloten lijst van
+       kern/betaalregie.js. Dit koppelt niets en zet niets aan: de route toetst
+       of de vereiste sleutels aanwezig zijn en meldt wat er ontbreekt. */
+    '/api/boardroom/betalingen/proef': { provider: 'stripe' }
   };
   /* Een route waarvan de wereld het benodigde stuk NIET heeft opgeleverd, krijgt
      hier niets. Anders zou hij een lijf met `id: null` krijgen en op een andere
@@ -1070,6 +1095,19 @@ const VOORZIENINGEN = {
       { iban: w.iban, soort: 'debit', naam: 'Verse proefpas', idem: versSleutel('pas') }, tokenVoor('member'));
     const id = r && r.data && r.data.pas && r.data.pas.id;
     return id ? { id } : { fout: 'pas/uitgeven gaf ' + (r && r.status) };
+  },
+  /* De loonrun stond op 402 "Onvoldoende saldo of rood-staan-ruimte voor de hele
+     batch". Dat is een TOESTAND en geen lijf: de wereld stort eenmalig en
+     tientallen bankroutes geven dat daarna uit, dus tegen de tijd dat salaris
+     aan de beurt is, is de rekening leeg. Hij krijgt daarom vlak voor zijn
+     meting vers geld -- niet meer dan nodig, en langs de gewone stortroute. */
+  '/api/bank/salaris': async ({ post, tokenVoor, w }) => {
+    if (!w.iban) return { fout: 'geen rekening in de wereld' };
+    const r = await post('/api/bank/storten',
+      { iban: w.iban, centen: 500000, route: 'ideal', idem: versSleutel('loonsaldo') }, tokenVoor('member'));
+    if (!(r.status >= 200 && r.status < 300))
+      return { fout: 'bank/storten gaf ' + r.status + ' ' + ((r.data && r.data.error) || '') };
+    return {};
   },
   /* Een verse pas EN geld erop. `pas/betaal` stond op 402 "Onvoldoende saldo":
      de wereld stort eenmalig, en tientallen bankroutes geven dat daarna uit. */

@@ -106,7 +106,7 @@ test('5. de telling spreekt zichzelf niet tegen', () => {
   assert.equal(u.telling.verklaard + u.telling.onbekend, u.telling.bestanden - Object.keys(M.GEEN_LEZER).length,
     'verklaard + onbekend dekt niet alle gevonden bestanden');
   assert.equal(u.telling.scherp + u.telling.ruim, u.telling.verklaard + u.telling.onbekend,
-    'elke rij hoort een bereik te dragen (venster of bestand)');
+    'elke rij hoort een leesbreedte te dragen (venster of bestand)');
   assert.equal(u.telling.server + u.telling.scherm, u.telling.verklaard + u.telling.onbekend,
     'elke rij hoort een laag te dragen (server of scherm)');
 });

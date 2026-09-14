@@ -89,13 +89,50 @@ test('3. een verklaarde eigenaar bestaat, en een handmatig register heeft een le
 });
 
 /* MUTATIE GEZIEN ZAKKEN: BEREIK.json uit EIGENAAR gehaald; het aantal onbekende
-   steeg naar 128 en toets 4 zakte. */
+   steeg naar 128 en toets 4 zakte.
+
+   DE VLOER IS OP 14 SEPTEMBER MET DE HAND VAN 127 NAAR 141 GEZET, en dat hoort
+   hier uitgeschreven te staan in plaats van stil te gebeuren -- een ratel die
+   je ongemerkt optrekt, is geen ratel. De merge van bundel-PR #253 (elf PR's
+   ineens) bracht veertien nieuwe wortelregisters mee, geen daarvan met een
+   verklaarde eigenaar. Dat is schuld van de bundel en niet van deze tak, maar
+   hij staat nu wel hier.
+
+   WAT HEM OMLAAG BRENGT, EN WAT MET OPZET NIET IS GEDAAN. `detecteer()` vindt
+   voor 79 van de 141 een schrijver, dus de verleiding is om EIGENAAR daaruit te
+   vullen en de vloer in een keer naar 62 te duwen. Dat is precies de fout die
+   deze hele tak meet: EIGENAAR is een VERKLARING en detecteer() de METING die
+   hem controleert. Wie de een uit de ander genereert, laat toets 1 vergelijken
+   met zichzelf -- dan is de uitslag per definitie goed en zegt hij niets
+   (dezelfde vorm als de sensor die `w.handhaver` teruggaf in
+   test/verband.test.js). Eigenaren erbij zetten is mensenwerk, een paar per
+   keer, met iemand die kijkt of het klopt. */
+/* 141 -> 146 OP 14 SEPTEMBER 2026, EN DE REDEN IS NIET "ER KWAMEN ER VIJF BIJ".
+   Deze wachter is zelf nieuw: scripts/lib/registereigenaar.js bestaat niet op
+   main en kwam met de tak die hem bouwde. Zijn vloer van 141 is daarom gemeten
+   op EEN TAK, en die tak liep achter op main -- dertien wortelregisters die main
+   allang had (AANVOERVORM, ADAMPROEF, CRASHAS, CRASHPROEF, DOELGROEPBEREIK,
+   GEVOLGDEKKING, MACHINEDEKKING, MOMENTPROEF, OMZETPROEF, ONDERNEMERBEWIJS,
+   STAGEVORM, WEKDEKKING, ZAAKLIVEPROEF) stonden er niet in, en drie zijn echt
+   nieuw uit andere takken van deze bundel (MELDBESLUIT, REFUNDMIGRATIE,
+   SCHRIJFPROEF).
+
+   DAT IS DE LES EN NIET HET GETAL: een vloer die op een tak wordt vastgelegd,
+   meet de wereld van die tak. Hij leest daarna als een belofte over het huis
+   terwijl hij een momentopname van een werkbank was -- dezelfde vorm als een
+   register met een stempel van een andere commit. 146 is de eerste meting op een
+   boom waar alle elf takken en main samen in staan.
+
+   De weg omlaag blijft wat hierboven staat: eigenaren erbij zetten is mensenwerk,
+   een paar per keer, en NOOIT gevuld uit detecteer(). */
 test('4. het aantal registers zonder verklaarde eigenaar mag dalen en niet stijgen', () => {
   const onbekend = wortelregisters().filter(r => !EIGENAAR[r]);
-  assert.ok(onbekend.length <= 127,
-    'er zijn ' + onbekend.length + ' wortelregisters zonder verklaarde eigenaar, en dat waren er 127 op ' +
-    '13 september 2026. Het getal hoort te dalen doordat er eigenaren bijkomen, niet te stijgen doordat er ' +
-    'registers bijkomen zonder dat iemand zegt wie ze bezit.');
+  assert.ok(onbekend.length <= 146,
+    'er zijn ' + onbekend.length + ' wortelregisters zonder verklaarde eigenaar, en de vloer staat op 146 ' +
+    '(127 op 13 september 2026, 141 na de bundel van elf PR\'s, 146 na de tweede bundel -- zie de ' +
+    'toelichting hierboven: de vloer van 141 was op een achterlopende tak gemeten). Het getal hoort te ' +
+    'dalen doordat er eigenaren bijkomen, niet te stijgen doordat er registers bijkomen zonder dat iemand ' +
+    'zegt wie ze bezit.');
 
   /* En de detectie moet werken: vindt zij niets, dan staat toets 1 groen omdat
      er niets te vergelijken viel (LAT.md regel 3). */

@@ -20,17 +20,25 @@ module.exports = (ctx) => {
 async function betaalOrderVoor(session, body) {
   const o = orderMetRef(body.ref);
   if (!o || (o.customerKey || o.customerTier) !== session.key) return { status: 404, error: 'Bestelling niet gevonden.' };
-  if (o.paid) return { status: 409, error: 'Al betaald.' };
-  /* Een terugbetaalde of geannuleerde bon mag NIET opnieuw betaald worden.
-     `o.paid` was de enige poort, en juist de annulering zet die weer op false
-     (ervaring/leden/annuleren.js: paid=false, refunded=true, status
-     'terugbetaald'). Daarmee viel de grendel weg en kon dezelfde retour-bon nog
-     een keer betalen: punten er nog eens bij, de ingredienten nog eens afgeboekt
-     en de zaak kreeg 'Nieuwe bestelling (betaald)' voor iets wat al retour was.
-     De verloopgrens hieronder ving dat niet, want die geldt alleen bij
+  /* Een terugbetaalde of geannuleerde bon mag NIET opnieuw betaald worden, en
+     deze grendel staat VOOR die op `o.paid` -- anders krijgt een teruggestorte
+     bon "Al betaald" te horen in plaats van de reden die klopt.
+
+     Die volgorde deed er vroeger niet toe: een annulering zette `paid` op false
+     (ervaring/leden/annuleren.js), dus de eerste grendel viel dan weg en deze
+     ving hem op. Zonder die tweede kon dezelfde retour-bon nog een keer betaald
+     worden: punten er nog eens bij, de ingredienten nog eens afgeboekt en de
+     zaak kreeg 'Nieuwe bestelling (betaald)' voor iets wat al retour was.
+
+     Sinds 13 september 2026 blijft `paid` na een terugstorting WEL staan (een
+     terugbetaling is een tegenboeking, geen wisser), en daarmee zou de
+     eerste grendel hem nu afvangen met een melding die niet klopt. Vandaar de
+     omdraaiing: de specifieke reden gaat voor de algemene. De verloopgrens
+     hieronder ving dit geen van beide keren, want die geldt alleen bij
      'wacht-op-betaling'. */
   if (o.refunded || ['terugbetaald', 'geweigerd', 'geannuleerd'].includes(o.status))
     return { status: 409, error: 'Deze bestelling is geannuleerd (' + o.status + ') en kan niet opnieuw betaald worden.' };
+  if (o.paid) return { status: 409, error: 'Al betaald.' };
   // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
   if (o.status === 'wacht-op-betaling' && Date.now() - new Date(o.at) > 30 * 60000) return { status: 410, error: 'Deze bestelling is verlopen. Plaats hem opnieuw.' };
   // fooi (gaat naar het team), punten-tegoed (RTG legt bij) en spaarpunten

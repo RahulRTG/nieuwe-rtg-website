@@ -379,3 +379,74 @@ test('tarief: het Z-rapport rekent met dezelfde categorie als de maandboekhoudin
   const catsM = Object.fromEntries(maand.btw.map(r => [r.cat, r.tarief]));
   assert.deepEqual(catsZ, catsM, 'Z-rapport en maandboekhouding noemen dezelfde categorieen');
 });
+
+/* ==========================================================================
+   DE TEGENBOEKING OVER EEN MAANDGRENS.
+
+   scripts/omzetproef.js bewijst dat een terugstorting de verkoop laat staan en
+   er een tegenboeking naast zet -- maar daar vallen beide gebeurtenissen in
+   DEZELFDE maand, en dat is nou net niet waar het besluit over ging. De reden
+   om te tegenboeken in plaats van te wissen is dat een AFGESLOTEN maand niet
+   meer mag bewegen. Die zaak is in een ketenproef tegen een draaiende server
+   niet te meten zonder de klok te verzetten; hier wel, want financeVoor is een
+   pure projectie over db.data.
+
+   Deze twee toetsen sluiten dus het gat dat in de grens van OMZETPROEF.json met
+   zoveel woorden openstaat.
+   ========================================================================== */
+function vorigeMaand() {
+  const d = new Date(); d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth() - 1);
+  return d.toISOString().slice(0, 7);
+}
+function zaakMetBon({ betaaldOp, teruggestortOp }) {
+  const s = { code: 'KIKUNOI', type: 'horeca', menu: [{ name: 'Sushi', station: 'keuken' }],
+    settings: { land: 'NL', uurloon: 20 } };
+  const bon = { supplierCode: 'KIKUNOI', paid: true, at: betaaldOp + '-05', paidAt: betaaldOp + '-05T12:00:00.000Z',
+    items: [{ name: 'Sushi', price: 109, qty: 1, station: 'keuken' }] };
+  if (teruggestortOp) { bon.refunded = true; bon.refundedAt = teruggestortOp + '-08T12:00:00.000Z'; }
+  return { s, db: stubDb({ orders: [bon] }) };
+}
+const omzetVan = (fin) => Math.round((fin.btw || []).reduce((x, r) => x + (r.omzet || 0), 0) * 100) / 100;
+
+test('tegenboeking: een terugstorting van DEZE maand raakt de omzet van VORIGE maand niet', () => {
+  /* De kern van het besluit. Verkocht in de vorige maand, teruggestort in deze.
+     financeVoor rapporteert de LOPENDE maand, dus die hoort NEGATIEF te staan --
+     en de verkoop van vorige maand blijft waar hij stond, onaangeraakt.
+
+     Vóór 13 september 2026 zette de terugstorting `paid` op false en verdween de
+     verkoop uit de vorige maand; die maand veranderde dus met terugwerkende
+     kracht, ook als de aangifte er al over was gedaan. */
+  const vorige = vorigeMaand();
+  const nu = new Date().toISOString().slice(0, 7);
+  const { s, db } = zaakMetBon({ betaaldOp: vorige, teruggestortOp: nu });
+  const { financeVoor } = maakFiscaal({ db, rondEuro, btwSplit });
+  const fin = financeVoor(s);
+  assert.equal(omzetVan(fin), -109,
+    'de tegenboeking hoort NEGATIEF in de lopende maand te staan; gezien: ' + omzetVan(fin));
+  const eten = (fin.btw || []).find(r => r.cat === 'eten');
+  assert.ok(eten, 'de tegenboeking landt niet in de etenpot');
+  assert.ok(eten.omzet < 0, 'de etenpot staat niet negatief: ' + eten.omzet);
+
+  /* En de tegenproef op de datum: draait de bon om (verkocht EN teruggestort in
+     de lopende maand), dan is het netto nul -- niet -109 en niet +109. */
+  const zelfde = zaakMetBon({ betaaldOp: nu, teruggestortOp: nu });
+  const finZelfde = maakFiscaal({ db: zelfde.db, rondEuro, btwSplit }).financeVoor(zelfde.s);
+  assert.equal(omzetVan(finZelfde), 0,
+    'verkoop en terugstorting in dezelfde maand horen netto nul te zijn; gezien: ' + omzetVan(finZelfde));
+});
+
+test('tegenboeking: zonder refundedAt telt hij NIET mee, en dat is eerlijker dan raden', () => {
+  /* Een oude bon van vóór deze wijziging draagt geen refundedAt. Die op de
+     VERKOOPdatum tegenboeken zou de correctie terug de geschiedenis in duwen --
+     precies waar we vandaan komen, alleen minder zichtbaar. Zo'n bon staat
+     bovendien al op `paid: false` en valt dus sowieso weg.
+
+     Deze toets houdt vast dat een tegenboeking zonder eigen datum niet stilletjes
+     op de verkoopdatum belandt. */
+  const nu = new Date().toISOString().slice(0, 7);
+  const { s, db } = zaakMetBon({ betaaldOp: nu });
+  db.data.orders[0].refunded = true;            // wel gemarkeerd, geen datum
+  const fin = maakFiscaal({ db, rondEuro, btwSplit }).financeVoor(s);
+  assert.equal(omzetVan(fin), 109,
+    'een terugstorting zonder eigen datum is toch geboekt; dan raadt de projectie een maand');
+});

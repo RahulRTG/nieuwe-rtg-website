@@ -80,7 +80,21 @@ test('schrijven alleen maakt een crashgrens NIET bestaand -- dat is de schrijfwe
 test('een grens die de proef HEEFT geraakt, staat op ja; een pad zonder weg op nee', () => {
   const cp = require('../CRASHPROEF.json');
   const geraakt = cp.per.find(r => r.stand === 'PROVEN' || r.stand === 'FAILED');
-  const zonderWeg = cp.per.find(r => r.stand === 'GEEN_DUURZAME_WEG');
+  /* DE KEUZE VAN DEZE RIJ IS EEN CRITERIUM EN GEEN VOLGORDE (14 september 2026).
+     Hier stond `find(r => r.stand === 'GEEN_DUURZAME_WEG')`, en dat leunde stil
+     op de VOLGORDE van een register dat deze toets niet bezit. Van de rijen met
+     die stand classificeert de meerderheid als `nee/gemeten` -- maar die op de
+     grens `na-commit-voor-bericht` doen dat met opzet NIET: staat er geen
+     berichtbak in de gemeten collecties, dan is dat geen bewijs van afwezigheid,
+     en crashas.js geeft daar terecht `onbekend`. Zolang zo'n rij niet vooraan
+     stond, ging het goed. Een hermeting van CRASHPROEF.json zette er een vooraan
+     en de toets zakte -- terwijl noch de meter noch de classificatie fout was.
+
+     De toets gaat over de bedrading "gemeten geen weg -> nee", dus hij zegt nu
+     zelf welke rij dat geval IS. Wie de uitgesloten grens hier weghaalt, maakt de
+     uitslag weer afhankelijk van de sorteervolgorde van een vreemd register. */
+  const zonderWeg = cp.per.find(r => r.stand === 'GEEN_DUURZAME_WEG'
+    && r.grens !== 'na-commit-voor-bericht');
   assert.ok(geraakt && zonderWeg, 'het register hoort allebei de gevallen te bevatten');
 
   const kg = ca.classificeer({ methode: geraakt.methode, pad: geraakt.pad,

@@ -68,11 +68,32 @@ function gevolgVan(pad) {
     return { graad: 'onbekend', collecties: [],
       reden: 'deze route staat niet in de proefronde; er is nooit gemeten wat zij aanraakt' };
   const collecties = [...r.collecties].sort();
-  if (collecties.length) return { graad: 'gemeten', collecties,
-    reden: 'de proef zag deze collectie(s) veranderen, met de invoer van de proef' };
+  /* GEEN WERK GAAT VOOR GEMETEN, en die volgorde stond hier omgekeerd (14 september
+     2026). Dat is geen smaakkwestie maar een verkeerde uitspraak: 153 van de 4923
+     paden droegen `gemeten` terwijl de idempotentieproef ze op status 404 of 403 had
+     zien stranden. Het scherpste geval is /api/office/bank/handtekening/bevestig --
+     drie keer 404 ("er staat geen bevestiging klaar") en tussendoor bewoog `wacht`,
+     dus deze laag zei "de proef zag deze collectie veranderen" over een handeling
+     die nooit is uitgevoerd.
+
+     WAT ER DAN BEWOOG, en waarom het niet van deze handeling is: de proef draait alle
+     routes tegen EEN server, dus tussen twee oproepen van een geweigerde route kan het
+     werk van een buur in de stand landen. Toerekenen op tijdsvolgorde is precies de
+     fout die deze tak voor de pasladder-ijkoproep al heeft gerepareerd (`herijk` in
+     scripts/lib/idemproef.js) -- hier is hij hetzelfde, maar aan de andere kant van
+     de meting.
+
+     EN HET REGISTER SPRAK ZICHZELF TEGEN: IDEMPROEF.json noemt zo'n route zelf
+     `ongemeten` ("de eerste oproep deed geen werk"), terwijl deze laag er `gemeten`
+     van maakte. Wat er wel bewoog gaat niet verloren -- het staat in de reden, want
+     weglaten zou een tweede soort stilte zijn. */
   if (r.geenWerk) return { graad: 'onbekend', collecties: [],
     reden: 'de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), ' +
-      'dus dat er niets veranderde zegt niets over deze handeling' };
+      'dus dat er niets veranderde zegt niets over deze handeling' +
+      (collecties.length ? ' -- er bewoog wel ' + collecties.join(', ') +
+        ', maar dat is werk van een andere oproep tegen dezelfde server en niet van deze handeling' : '') };
+  if (collecties.length) return { graad: 'gemeten', collecties,
+    reden: 'de proef zag deze collectie(s) veranderen, met de invoer van de proef' };
   return { graad: 'geen-effect-gemeten', collecties: [],
     reden: 'de proef draaide en zag geen enkele collectie veranderen' };
 }

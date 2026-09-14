@@ -385,7 +385,12 @@ test('elke voorziening overleeft het contract waarmee de crashproef haar aanroep
   const post = async () => ({ status: 200, data: { pas: { id: 'p1' }, code: 'k1',
     verzoeken: [{ id: 'v1' }], regel: { id: 'r1' }, factuur: { id: 'F-1' } } });
   const tokenVoor = () => 'token';
-  const w = { iban: 'NL00RTG0000000001', iban2: 'NL00RTG0000000002', cn2: 'CN-2' };
+  /* `anderToken` hoort hier sinds de tik een voorziening is (14 september 2026): die
+     haalt een verse tikcode bij het TWEEDE lid, want kern/pay/tik.js weigert je eigen
+     tik. Precies zoals de kop hierboven zegt -- een nieuwe voorziening wier vorm hier
+     niet in staat, laat deze toets zakken, en dan hoort de VORM erbij te komen. */
+  const w = { iban: 'NL00RTG0000000001', iban2: 'NL00RTG0000000002', cn2: 'CN-2',
+    anderToken: 'token-van-het-tweede-lid' };
   for (const [pad, maak] of Object.entries(VOORZIENINGEN)) {
     const v = await maak({ post, tokenVoor, rol: 'member', w });
     assert.ok(v && typeof v === 'object', pad + ': een voorziening geeft altijd een object terug');
@@ -409,4 +414,65 @@ test('een GELUKTE voorziening laat de reden met rust -- geen waarschuwing zonder
     voorziening: { stand: 'gelukt', velden: ['id'] } });
   assert.equal(gelukt.reden, schoon.reden,
     'een voorziening die het deed, is geen reden om aan de meting te twijfelen');
+});
+
+/* ============================================================================
+   DE VIJFDE BEWERING -- `berichtGeland`, en waarom hij aan een VERKLARING hangt
+   en niet aan de meting.
+
+   De grens `na-commit-voor-bericht` kan zien dat er na een dood geen melding
+   ontstond. Wat zij niet kan zien is of dat erg is: de meeste geldroutes
+   berichten niemand. Zonder die tweede helft belooft de grens iets wat niets
+   handhaaft, en dat is precies wat dit huis elders weigert.
+
+   De verklaring woont in MELDBESLUIT.json en is met opzet LEEG tot de eigenaar
+   hem invult. Deze toetsen bewaken de drie manieren waarop dat stil verkeerd
+   gaat: een ontbrekende verklaring die als groen leest, een verklaarde plicht
+   die niet kan zakken, en de bewering die op andere grenzen gaat meepraten. */
+const BERICHTBASIS = { verwachtLeeg: false, geraakt: 1, aantalCollecties: 1, status: 0,
+  gestorven: true, herhaalStatus: 200, bijgekomen: 0, verklaring: null,
+  grens: 'na-commit-voor-bericht' };
+
+test('een verklaarde meldplicht die niet is nagekomen, laat de rij ZAKKEN', () => {
+  const u = cp.weegContract({ ...BERICHTBASIS, berichtAan: 'BERICHT_VEREIST', meldingBewoog: false });
+  assert.equal(u.claims.berichtGeland.stand, 'FAILED');
+  assert.equal(u.stand, 'FAILED', 'en de strengste bewering bepaalt de rij');
+  assert.match(u.claims.berichtGeland.reden, /MELDBESLUIT/, 'met de bron van de plicht erbij');
+});
+
+test('zonder verklaring is het NIET_BEPROEFD -- nooit stil groen en nooit stil rood', () => {
+  const u = cp.weegContract({ ...BERICHTBASIS, berichtAan: 'UNKNOWN', meldingBewoog: false });
+  assert.equal(u.claims.berichtGeland.stand, 'NIET_BEPROEFD');
+  assert.notEqual(u.claims.berichtGeland.stand, 'FAILED',
+    'een ontbrekende verklaring is geen defect van de route');
+  assert.notEqual(u.claims.berichtGeland.stand, 'PROVEN',
+    'en al helemaal geen bewijs -- dit is de asymmetrie uit MELDBESLUIT.json');
+  assert.match(u.claims.berichtGeland.reden, /geen melding ontstond/,
+    'de METING staat er wel bij, ook zonder oordeel');
+});
+
+test('een verklaard GEEN_BERICHT is bewezen en geen restklasse', () => {
+  const u = cp.weegContract({ ...BERICHTBASIS, berichtAan: 'GEEN_BERICHT', meldingBewoog: false });
+  assert.equal(u.claims.berichtGeland.stand, 'PROVEN');
+});
+
+test('de meldbewering praat alleen mee op HAAR grens', () => {
+  for (const g of ['voor-eerste-mutatie', 'na-commit-voor-antwoord']) {
+    const u = cp.weegContract({ ...BERICHTBASIS, grens: g, berichtAan: 'BERICHT_VEREIST', meldingBewoog: false });
+    assert.equal(u.claims.berichtGeland, undefined,
+      g + ': een dood op een ANDER moment zegt niets over het bericht');
+    assert.notEqual(u.stand, 'FAILED', 'en mag de rij daar dus niet laten zakken');
+  }
+});
+
+test('MELDBESLUIT.json is leeg, en dat staat er met een reden bij', () => {
+  /* Tegen het ECHTE register: een fixture zou zich houden aan de vorm die deze
+     code aanneemt. Zodra de eigenaar een route verklaart, hoort deze toets te
+     blijven kloppen -- hij eist geen leegte, hij eist dat leegte verklaard is. */
+  const m = require('../MELDBESLUIT.json');
+  assert.ok(m.klassen.BERICHT_VEREIST && m.klassen.GEEN_BERICHT && m.klassen.UNKNOWN,
+    'drie gesloten standen');
+  assert.match(m.grens, /NOOIT AFGELEID UIT BEWIJS/, 'de verklaring komt niet uit de meting');
+  if (!Object.keys(m.routes).length) assert.ok(m.waaromLeeg && m.waaromLeeg.length > 100,
+    'een leeg besluitregister zegt waarom het leeg is');
 });

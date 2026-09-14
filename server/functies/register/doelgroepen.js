@@ -63,5 +63,20 @@ const LEDEN_GAST = ['rtg', 'lifestyle', 'business', 'gast'];
    stuurde, en de knop voor een Business-lid helemaal niet bestond. Zie
    functies/doelgroep.js voor de andere helft van die reparatie. */
 const WERKOS = ['intern', 'business', 'leverancier', 'personeel'];
+/* DE ZAAKKANT ALLEEN. Twee soorten gebruikers van dezelfde partner-app: de
+   manager en zijn medewerker. Hij stond tot 14 september 2026 los in
+   ./cat-domeinen.js en is hierheen verhuisd toen ./cat-domeinen2.js hem ook
+   nodig had -- twee definities van dezelfde lijst lopen binnen een half jaar
+   uit elkaar, en dan zegt "de zaakkant" op twee plekken iets anders.
 
-module.exports = { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, LEDEN_GAST, WERKOS };
+   HIJ IS IETS ANDERS DAN WERKOS, EN DAT VERSCHIL IS GEMETEN. WERKOS is de
+   WERELD (drie relaties: RTG zelf, de werkgever die koopt, de medewerker die
+   werkt); ZAAK is wie er op deze paden werkelijk door de deur komt. Op
+   /api/werkvloer, /api/lucht, /api/sport, /api/kmar en /api/appstore/uitgever
+   is dat gemeten: een sessie van `intern`, `business`, `rtg`, `lifestyle`,
+   `gast` of `foundation` maakt daar op GEEN ENKELE route verschil met een
+   anoniem verzoek. Wie die groepen toch verklaart, zet een schakelaar in de
+   boardroom die niets stuurt. */
+const ZAAK = ['leverancier', 'personeel'];
+
+module.exports = { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, LEDEN_GAST, WERKOS, ZAAK };

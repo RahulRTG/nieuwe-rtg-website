@@ -196,6 +196,16 @@ function journaalMetGat(weglaten) {
 /* De registratie. Elke meter uit scripts/norm.js staat hier, met OF een
    proef die hem laat uitslaan, OF een reden waarom dat in een toets niet
    kan. scripts/check.js regel 35 bewaakt dat die lijst compleet blijft. */
+/* Rijen voor de crashproef-ijkingen: `aantal` rijen met elk een UNIEK pad,
+   want die vier tanden tellen verschillende ROUTES en geen rijen. */
+function ijkRijen(stand, aantal) {
+  const uit = [];
+  for (let i = 0; i < aantal; i++)
+    uit.push({ methode: 'POST', pad: '/api/ijk/' + stand.toLowerCase() + '/' + i,
+      rol: 'member', grens: 'voor-eerste-mutatie', stand, collecties: [] });
+  return uit;
+}
+
 const IJKINGEN = {
   bewijsCellenBewezen: {
     /* De 100%-tand op het bewijs zelf. De teller krijgt een nep-register
@@ -1577,6 +1587,24 @@ const IJKINGEN = {
       (j) => { j.telling.openBekend = (j.telling.openBekend || 0) + 2; return j; },
       () => norm.meet().momentOpenBekend - voor.momentOpenBekend)
   },
+  /* De drie tanden van STILSPOOR.json: twee schulden omhoog en het gemeten
+     bereik omlaag. Elk veld krijgt een eigen verstoring, zodat verwisselde
+     sleutels niet toevallig dezelfde uitslag geven. */
+  stilSpoor: {
+    proef: (voor) => metVervangenJson('STILSPOOR.json',
+      (j) => { j.gemeten.spoorGesmoord = (j.gemeten.spoorGesmoord || 0) + 5; return j; },
+      () => norm.meet().stilSpoor - voor.stilSpoor)
+  },
+  stilleOpslag: {
+    proef: (voor) => metVervangenJson('STILSPOOR.json',
+      (j) => { j.gemeten.opslagGesmoord = (j.gemeten.opslagGesmoord || 0) + 7; return j; },
+      () => norm.meet().stilleOpslag - voor.stilleOpslag)
+  },
+  stilSpoorAanroepen: {
+    proef: (voor) => metVervangenJson('STILSPOOR.json',
+      (j) => { j.gemeten.spoorAanroepen = Math.max(0, (j.gemeten.spoorAanroepen || 0) - 40); return j; },
+      () => voor.stilSpoorAanroepen - norm.meet().stilSpoorAanroepen)
+  },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
      de meter leest `gemeten.defecten` uit een register dat er al is, dus hij
@@ -1626,6 +1654,21 @@ const IJKINGEN = {
     proef: (voor) => metVervangenJson('GELDDEKKING.json',
       (j) => { j.ratel.geldRoutesHerstelTegenspraak = (j.ratel.geldRoutesHerstelTegenspraak || 0) + 7; return j; },
       () => norm.meet().geldRoutesHerstelTegenspraak - voor.geldRoutesHerstelTegenspraak)
+  },
+  /* De meldplicht-tand, met een EIGEN ophoging (8) en niet dezelfde als zijn
+     buren hierboven: alle drie lezen ze uit `j.ratel` van hetzelfde register,
+     en met een gedeeld getal zou een meter die de verkeerde sleutel leest toch
+     het goede verschil geven. Dat is precies de faalvorm die de leeswijzer bij
+     de factuurproef-tanden hieronder beschrijft. */
+  geldRoutesMeldOnbesloten: {
+    proef: (voor) => metVervangenJson('GELDDEKKING.json',
+      (j) => { j.ratel.geldRoutesMeldOnbesloten = (j.ratel.geldRoutesMeldOnbesloten || 0) + 8; return j; },
+      () => norm.meet().geldRoutesMeldOnbesloten - voor.geldRoutesMeldOnbesloten)
+  },
+  geldRoutesValsSucces: {
+    proef: (voor) => metVervangenJson('SCHRIJFPROEF.json',
+      (j) => { j.telling.VALS_SUCCES = (j.telling.VALS_SUCCES || 0) + 9; return j; },
+      () => norm.meet().geldRoutesValsSucces - voor.geldRoutesValsSucces)
   },
   /* DE TWEE TANDEN VAN DE VERTICALE GELDPROEF (FACTUURPROEF.json). Ze lezen
      verschillende velden uit dezelfde `telling`, en juist dat is hier de
@@ -1684,24 +1727,37 @@ const IJKINGEN = {
       (j) => { j.telling.FAILED = (j.telling.FAILED || 0) + 6; return j; },
       () => norm.meet().crashproefGezakt - voor.crashproefGezakt)
   },
+  /* DEZE VIER IJKEN OP `per` EN NIET OP `telling`, en dat verschil is met een
+     RODE IJKING geleerd. De tanden telden RIJEN en lazen daarvoor
+     `j.telling.BLOCKED_*`; sinds ze ROUTES tellen leiden ze hun getal af uit
+     `j.per` -- het aantal verschillende paden in een stand. De ijkingen bleven
+     `telling` ophogen en bewogen daarna NIETS: vier meters die prima werkten
+     maar niet meer beproefd werden. Dat is precies wat deze toets moet vangen,
+     en hij ving het -- een dag nadat ik de eenheid omzette en de ijking vergat.
+
+     Elke ijking zet RIJEN bij met een EIGEN, uniek pad: twee rijen met hetzelfde
+     pad tellen als EEN route, dus wie hier een pad herhaalt ijkt op nul en
+     concludeert ten onrechte dat de meter stuk is. De ongelijke aantallen
+     (9/7/5/4) blijven, om dezelfde reden als hiervoor: vier tanden uit hetzelfde
+     register mogen niet op een gedeeld getal kunnen slagen. */
   crashproefGeenLijf: {
     proef: (voor) => metVervangenJson('CRASHPROEF.json',
-      (j) => { j.telling.BLOCKED_BODY = (j.telling.BLOCKED_BODY || 0) + 9; return j; },
+      (j) => { j.per = j.per.concat(ijkRijen('BLOCKED_BODY', 9)); return j; },
       () => norm.meet().crashproefGeenLijf - voor.crashproefGeenLijf)
   },
   crashproefGeenWereld: {
     proef: (voor) => metVervangenJson('CRASHPROEF.json',
-      (j) => { j.telling.BLOCKED_WORLD = (j.telling.BLOCKED_WORLD || 0) + 7; return j; },
+      (j) => { j.per = j.per.concat(ijkRijen('BLOCKED_WORLD', 7)); return j; },
       () => norm.meet().crashproefGeenWereld - voor.crashproefGeenWereld)
   },
   crashproefGeenRol: {
     proef: (voor) => metVervangenJson('CRASHPROEF.json',
-      (j) => { j.telling.BLOCKED_ROLE = (j.telling.BLOCKED_ROLE || 0) + 5; return j; },
+      (j) => { j.per = j.per.concat(ijkRijen('BLOCKED_ROLE', 5)); return j; },
       () => norm.meet().crashproefGeenRol - voor.crashproefGeenRol)
   },
   crashproefOnbepaald: {
     proef: (voor) => metVervangenJson('CRASHPROEF.json',
-      (j) => { j.telling.BLOCKED_ONBEPAALD = (j.telling.BLOCKED_ONBEPAALD || 0) + 4; return j; },
+      (j) => { j.per = j.per.concat(ijkRijen('BLOCKED_ONBEPAALD', 4)); return j; },
       () => norm.meet().crashproefOnbepaald - voor.crashproefOnbepaald)
   },
   /* DE DRIE TANDEN VAN DE GEVOLGDEKKING (GEVOLGDEKKING.json, 13 september 2026).

@@ -64,6 +64,11 @@ module.exports = (ctx) => {
   function maakSplits(key, codename, ref, metKeys) {
     const o = orderMetRef(ref);
     if (!o || (o.customerKey || o.customerTier) !== key) return { status: 404, error: 'Bestelling niet gevonden.' };
+    /* EEN TERUGGESTORTE REKENING WORDT NIET GESPLITST. Deze poort leunde erop
+       dat een terugstorting `paid` weer op false zette; sinds de tegenboeking
+       blijft die staan, en dan kon je vrienden betaalverzoeken sturen voor een
+       rekening waarvan het geld al terug is. */
+    if (o.refunded) return { status: 409, error: 'Deze rekening is teruggestort en kan niet meer gesplitst worden.' };
     if (!o.paid && o.status !== 'geserveerd') return { status: 409, error: 'Splitsen kan zodra de rekening betaald is.' };
     if ((db.data.splitsen || []).some(s => s.orderRef === ref)) return { status: 409, error: 'Deze rekening is al gesplitst.' };
     const keys = [...new Set((metKeys || []).map(String))].filter(k => k && k !== key).slice(0, 8);

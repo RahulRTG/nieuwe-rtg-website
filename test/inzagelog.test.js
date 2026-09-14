@@ -85,19 +85,30 @@ test('een betrokkene ziet wanneer en waarom, niet wie', () => {
   const { } = verseDb();
   inzagelog.noteer({ door: { id: 7, naam: 'Karel de Controleur' }, over: { id: 42 }, waarom: 'KYC-controle', bron: 'backoffice' });
   inzagelog.noteer({ door: { id: 9, naam: 'Iemand anders' }, over: { id: 99 }, waarom: 'iets anders' });
+  /* DE BELOFTE REIST MEE MET HET ANTWOORD (besluit 6). voorBetrokkene() gaf
+     hiervoor een kale array terug, en dan raadt het scherm wat zij betekent --
+     het raadt dan "dit is alles", terwijl het "dit is alles binnen de termijn"
+     is. Sinds 13 september 2026 draagt het antwoord de termijn en een expliciet
+     `volledig`, en deze toets houdt beide vast: de regels zelf EN de zin die
+     eromheen hoort. */
   const mijn = inzagelog.voorBetrokkene(42);
-  assert.equal(mijn.length, 1, 'alleen regels over mij');
-  assert.equal(mijn[0].waarom, 'KYC-controle');
-  assert.equal(mijn[0].bron, 'backoffice');
-  assert.equal(mijn[0].door, undefined, 'de naam van de kijker is de persoonsdata van een ander');
-  assert.equal(mijn[0].doorId, undefined);
+  assert.equal(mijn.regels.length, 1, 'alleen regels over mij');
+  assert.equal(mijn.regels[0].waarom, 'KYC-controle');
+  assert.equal(mijn.regels[0].bron, 'backoffice');
+  assert.equal(mijn.regels[0].door, undefined, 'de naam van de kijker is de persoonsdata van een ander');
+  assert.equal(mijn.regels[0].doorId, undefined);
+  assert.equal(mijn.bewaardagen, inzagelog.BEWAARDAGEN, 'de termijn komt van de schrijfkant en staat niet los in het antwoord');
+  assert.match(mijn.belofte, new RegExp(String(inzagelog.BEWAARDAGEN) + ' dagen'),
+    'de belofte noemt de termijn die zij waarmaakt');
+  assert.equal(mijn.volledig, true, 'de noodrem heeft niet gebeten, dus de termijn draagt de hele belofte');
+  assert.equal(mijn.tekort, null);
 });
 
 test('een groepsregel telt mee voor iedereen die erin stond', () => {
   const { } = verseDb();
   inzagelog.noteerVeel({ door: { naam: 'backoffice' }, overIds: [11, 22, 33], waarom: 'KYC-wachtrij' });
-  assert.equal(inzagelog.voorBetrokkene(22).length, 1, 'lid 22 zat in de lijst en hoort dat te zien');
-  assert.equal(inzagelog.voorBetrokkene(44).length, 0, 'lid 44 niet');
+  assert.equal(inzagelog.voorBetrokkene(22).regels.length, 1, 'lid 22 zat in de lijst en hoort dat te zien');
+  assert.equal(inzagelog.voorBetrokkene(44).regels.length, 0, 'lid 44 niet');
 });
 
 test('het journaal loopt niet oneindig vol', () => {

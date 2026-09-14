@@ -68,7 +68,20 @@ const GEEN_METING = new Set([
      een commitboodschap, een PR-bericht. Geen meting en geen kwaliteitsgetal: het
      hoort te GROEIEN naarmate er meer wordt rechtgezet, en een ratel erop zou
      precies het rechtzetten bestraffen. */
-  'CORRECTIES.json'
+  'CORRECTIES.json',
+  /* HERREKENBAAR.json is een register van BESLUITEN en geen meting: het zegt per
+     route waarom een verloren schrijfactie zichzelf herstelt. Daar zit geen getal
+     in dat beter of slechter kan worden -- het aantal verklaringen hoort te
+     groeien naarmate er meer is uitgezocht, en een ratel zou juist het uitzoeken
+     bestraffen. De METING ernaast (FAALPROEF.json) hangt wel aan een tand
+     (faalproefGezakt), en die blijft onverkort tellen: het besluit drukt de
+     meting niet weg.
+
+     IDEMBESLUIT.json is hetzelfde soort bestand en staat vandaag in GEEN van
+     beide lijsten, en telt dus mee in `metingenZonderRatel`. Dat hier rechtzetten
+     zou die tand verschuiven, en dat is een apart besluit -- het staat genoteerd
+     en niet stilletjes meegenomen. */
+  'HERREKENBAAR.json'
 ]);
 
 const REGISTER = {
@@ -97,6 +110,8 @@ const REGISTER = {
      naam) meldt diezelfde nul over minder bewijs. Een lek van nul uit een meter
      die niets meer ziet, is de gevaarlijkste vorm van groen. */
   'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
+  /* Het stilspoorregister draagt twee schulden en een bereikmeter. */
+  'STILSPOOR.json': { meter: ['stilSpoor', 'stilleOpslag', 'stilSpoorAanroepen'] },
   /* STAGEVORM.json meet of de publieke domeinen een datavorm delen (STAGE.md
      par. 0). Om dezelfde reden als bij CARRIEREVORM.json hierboven is de
      geratelde waarde het BEREIK en niet de uitkomst: dat er 0 velden gedeeld
@@ -242,6 +257,7 @@ const REGISTER = {
   'NAVIGATIEPROEF.json': { eigenRatel: 'test/navigatieproef.test.js' },
   'MOVEPROEF.json': { eigenRatel: 'test/moveproef.test.js' },
   'KETENVORM.json': { eigenRatel: 'test/toelatingsproef.test.js' },
+  'REFUNDMIGRATIE.json': { eigenRatel: 'test/refundmigratie.test.js' },
   'RITMIGRATIE.json': { eigenRatel: 'test/ritmigratie.test.js' },
   'HEAPPROEF.json': { eigenRatel: 'test/heapproef.test.js' },
   'DOORWERKING.json': { eigenRatel: 'test/doorwerking.test.js' },
@@ -283,9 +299,15 @@ const REGISTER = {
   /* GELDDEKKING.json hangt WEL aan NORM.json -- vier tanden, zie de kop daar.
      Anders dan de geldkaart draagt hij voorraden die mogen dalen in plaats van
      een nul die nul moet blijven, en dat is precies wat een ratel meet. */
+  /* `geldRoutesMeldOnbesloten` hoort HIER en niet alleen bij MELDBESLUIT.json.
+     De VERKLARING woont daar, maar het GETAL komt uit de `ratel` van dit
+     register -- en test/gelddekking.test.js eist terecht dat elke sleutel in die
+     ratel ook in deze meterlijst staat. Anders draait de meter nog en bewaakt
+     hij niets meer, precies het gat dat die toets beschrijft. */
   'GELDDEKKING.json': { meter: ['geldRoutesPubliek', 'geldRoutesZonderSemantiek',
     'geldRoutesZonderIdemBewijs', 'geldRoutesZonderTerugweg',
-    'geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak'] },
+    'geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak',
+    'geldRoutesMeldOnbesloten'] },
   /* FACTUURPROEF.json hangt aan TWEE tanden en niet aan een, en dat is een
      besluit en geen slordigheid: `geldpadGezakt` is een defect dat naar nul
      moet, `geldpadOnbewezen` is werk dat nog niet gedaan is. Een tand die die
@@ -311,6 +333,17 @@ const REGISTER = {
      hier een regel bijzet of weghaalt, beweegt een van deze twee tellers: een
      ontbrekende verklaring zit in `onbesloten`, een verkeerde in `tegenspraak`. */
   'HERSTELBESLUIT.json': { meter: ['geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak'] },
+  /* MELDBESLUIT.json is net zo'n VERKLARING: hij hangt aan het aantal geldroutes
+     waarvan niemand heeft gezegd of er bericht hoort te gaan. Leeg is hier geen
+     nul maar 45 -- de teller telt wat er NIET verklaard is. */
+  'MELDBESLUIT.json': { meter: ['geldRoutesMeldOnbesloten'] },
+  /* SCHRIJFPROEF.json meet iets ANDERS dan CRASHPROEF.json en hangt daarom aan
+     een eigen tand: niet wat er van een uitkomst overblijft na een crash, maar
+     of de aanroeper een succes te zien krijgt over een schrijfactie die is
+     verdwenen. `ONBEREIKT` krijgt met opzet geen tand -- dat is bereik van het
+     instrument en geen defect van een route, dezelfde grond waarop
+     GEEN_DUURZAME_WEG er ook geen heeft. */
+  'SCHRIJFPROEF.json': { meter: ['geldRoutesValsSucces'] },
 
   'TIKKEN.json': { eigenRatel: 'test/sprongindex.test.js' },
   'VINDBAAR.json': { eigenRatel: 'test/sprongindex.test.js' },
@@ -365,6 +398,11 @@ const REGISTER = {
      nog geen sensor ziet, dan daalt het percentage door gewoon werk. De vloer
      staat daarom in de toets en niet in NORM.json, met de reden erbij. */
   'VERBAND.json': { eigenRatel: 'test/verband.test.js' },
+  /* BEREIK.json draagt met opzet GEEN percentage en dus geen getal dat een kant
+     op moet: het aantal cellen per uitslag verschuift zodra de projectieruimte
+     verandert, en dat is een besluit en geen verslechtering. Wat wel kan zakken
+     is de ONAFHANKELIJKHEID van de drie assen, en dat bewaakt test/bereik.test.js. */
+  'GELDING.json': { eigenRatel: 'test/gelding.test.js' },
 
   /* En twee die door een TOETS worden vastgehouden in plaats van door een
      script. Allebei zeggen het in hun eigen uitleg met zoveel woorden: "MAG

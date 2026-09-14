@@ -123,6 +123,23 @@ function wachtOp(fn, ms = 5000) {
   return fn();
 }
 
+/* WACHTEN OP EEN PID-BESTAND IS WACHTEN OP INHOUD, NIET OP BESTAAN.
+
+   Dit ging in CI echt mis (14 september 2026): de negatieve toets las kind.pid
+   meteen nadat het afloopdossier verscheen, en kreeg ENOENT. De ronde schrijft
+   namelijk in DRIE stappen -- pak(), dan een kind spawnen, dan pas het PID
+   wegschrijven -- en alleen de eerste stap was afgewacht. Op deze machine won de
+   schrijver altijd; op een belaste CI-runner niet.
+
+   `existsSync` alleen is niet genoeg: tussen aanmaken en schrijven bestaat het
+   bestand al en is het leeg, dus dan leest de toets NaN in plaats van een PID.
+   Daarom wacht deze helper tot er een GETAL in staat. */
+function wachtOpPid(pad) {
+  return wachtOp(() => {
+    try { return Number(fs.readFileSync(pad, 'utf8')) > 0; } catch (e) { return false; }
+  });
+}
+
 /* Een ronde die het ECHTE pak() gebruikt, een kind maakt en dan blijft hangen.
    Hij schrijft het PID van zijn kind naar een bestand zodat de toets het kent. */
 const RONDE = `
@@ -147,7 +164,7 @@ test('DE KETEN: van claim tot herstel, met echte processen', (t) => {
 
   // --- geslaagde claim -> RUNNING, met een kind ---
   const ronde = op.start(['-e', RONDE, path.join(WORTEL, 'scripts/afbouw-slot.js'), kindPad], w.env());
-  assert.ok(wachtOp(() => fs.existsSync(kindPad) && fs.existsSync(w.afloop)),
+  assert.ok(wachtOp(() => fs.existsSync(w.afloop)) && wachtOpPid(kindPad),
     'de ronde hoort een afloop en een kind te hebben aangemaakt');
   const kind = op.volg(Number(fs.readFileSync(kindPad, 'utf8')));
   const A = laadAfloop(w.afloop);
@@ -235,6 +252,10 @@ test('NEGATIEF: een mislukte claim registreert geen ronde', (t) => {
 
   const eerste = op.start(['-e', RONDE, path.join(WORTEL, 'scripts/afbouw-slot.js'), kindPad], w.env());
   assert.ok(wachtOp(() => fs.existsSync(w.afloop)), 'de eerste ronde draait');
+  /* En wachten tot zij haar kind-PID heeft weggeschreven: dat gebeurt NA pak(),
+     dus het afloopdossier bewijst het niet. Zonder deze regel las de toets in CI
+     een bestand dat er nog niet was. */
+  assert.ok(wachtOpPid(kindPad), 'de eerste ronde heeft haar kind-PID weggeschreven');
   const A = laadAfloop(w.afloop);
   const vanEerste = afloopZonderHartslag(leesRauw(w.afloop));
   const kind = op.volg(Number(fs.readFileSync(kindPad, 'utf8')));
@@ -247,9 +268,10 @@ test('NEGATIEF: een mislukte claim registreert geen ronde', (t) => {
   assert.match(String(tweede.stderr || ''), /al actief/i, 'en te zeggen waarom');
 
   assert.deepEqual(afloopZonderHartslag(leesRauw(w.afloop)), vanEerste,
-    'de mislukte claim hoort GEEN letter aan de afloop te veranderen -- anders lijkt een niet-begonnen ' +
-    'ronde op een gestorven meetronde en blokkeert hij de machine om werk dat nooit bestond');
+    'de mislukte claim hoort niets aan het EIGENDOM of de AFLOOP te veranderen -- anders lijkt een ' +
+    'niet-begonnen ronde op een gestorven meetronde en blokkeert hij de machine om werk dat nooit bestond');
   assert.equal(A.lees().taak, 'proefronde', 'de afloop hoort nog van de EERSTE ronde te zijn');
+  assert.equal(A.lees().stand, 'RUNNING', 'en de eerste ronde hoort gewoon door te draaien');
 
   fs.rmSync(w.map, { recursive: true, force: true });   // de processen ruimt t.after() op
 });

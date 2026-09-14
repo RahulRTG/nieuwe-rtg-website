@@ -54,6 +54,27 @@
    tien regels niet tien formuleringen van dezelfde onzekerheid worden. */
 const NOGNIET = (vraag) => 'niemand heeft vastgelegd waartegen deze meter te ijken is; ' + vraag;
 
+/* DE DRIE VRAGEN DIE EEN `ONBEPAALD` MOET BEANTWOORDEN.
+
+   Het doel is niet dat dit getal naar nul gaat. Het doel is dat elk ONBEPAALD
+   een expliciete vraag draagt waarvan het ANTWOORD bepaalt welke soort
+   grondwaarheid hier uberhaupt geldig zou zijn:
+
+     1. wat is de letterlijke claim van deze meter?
+     2. welke informatiebron is onafhankelijk van de constructie van die meter?
+     3. kan die bron dezelfde blindheid hebben?
+
+   Heeft vraag 2 geen antwoord, dan zijn er drie geldige uitkomsten -- en geen
+   ervan is falen:
+
+     CLAIM_VERSMALLEN                de meting deugt, de naam was te breed
+     IJKCORPUS_NODIG                 een mens moet een klein corpus vaststellen
+     GEEN_ONAFHANKELIJKE_GRONDWAARHEID  er IS er geen, en dat is informatie
+
+   Een ONBEPAALD zonder `vragen` is een open post zonder vraag, en dan blijft hij
+   staan omdat niemand weet wat hem zou sluiten. test/meterwet.test.js eist ze. */
+
+
 const METERS = {
   /* -------------------------------------------------- hier gebouwd en geijkt */
 
@@ -74,6 +95,14 @@ const METERS = {
 
   /* ------------------------------------- dragen een dekkingsgetal, niet geijkt */
 
+  'GELDING.json': {
+    grondwaarheid: 'GEEN', claim: 'waarneming', grensveld: 'grens',
+    reden: 'dit register doet geen dekkingsclaim en telt met opzet geen percentage: het zegt per cel welke ' +
+      'van de drie assen iets zag, en zijn grensveld schrijft uit dat GECLAIMD_GEEN_DRAGER_GEVONDEN niet ' +
+      'betekent dat er geen drager is. Wat hier wel geijkt is, is de ONAFHANKELIJKHEID van de assen ' +
+      '(test/gelding.test.js), en dat is een andere vraag dan recall.',
+  },
+
   /* --------------------------------- claim versmald in plaats van geijkt */
 
   /* APPWERKT.json is de vierde uitweg uit de kop, en hij had hem zelf al
@@ -91,10 +120,25 @@ const METERS = {
   /* ------------------------------------- dragen een dekkingsgetal, niet geijkt */
 
   'HERSTEL.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
+    vragen: {
+      claim: 'de afleiding uit routenamen dekt alle omkeerbare routes',
+      onafhankelijkeBron: 'HERSTELPROEF.json beproeft 90 paren ECHT (heen, kijken, terug, kijken) en is niet uit namen afgeleid',
+      zelfdeBlindheid: 'ja: die proef kent alleen paren die HERSTEL.json hem aanreikt, dus zij deelt de blindheid voor een paar dat geen naamgelijkenis heeft',
+    },
     reden: NOGNIET('HERSTELPROEF.json beproeft paren echt -- is die uitslag de grondwaarheid voor de afleiding uit namen?') },
   'KANTOORMACHT.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
+    vragen: {
+      claim: 'het aandeel kantoorroutes dat anoniem uitvoerbaar is',
+      onafhankelijkeBron: 'de ROUTER zelf: welke deur een route eist is hard af te lezen, de as `anoniem` is lexicaal',
+      zelfdeBlindheid: 'nee voor de harde as, ja voor de zachte -- en juist de zachte draagt het dekkingsgetal',
+    },
     reden: NOGNIET('de deur-assen komen uit de router en zijn hard; de as `anoniem` is lexicaal -- is de harde as de grondwaarheid voor de zachte?') },
   'NORM.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
+    vragen: {
+      claim: 'het dekkingsgetal van de ratel',
+      onafhankelijkeBron: 'geen: dit getal is GELEEND van andere meters en heeft geen eigen meting',
+      zelfdeBlindheid: 'ja, per definitie: het erft de blindheid van elke meter die eraan hangt',
+    },
     reden: NOGNIET('de ratel draagt getallen van andere meters; zijn dekkingsgetal is geleend en heeft geen eigen ijking') },
 
   /* Deze is de scherpste van de vier, want hij is ZELFREFERENTIEEL en het script
@@ -106,13 +150,28 @@ const METERS = {
      `toegestanePaden` ontbreekt, is voor de proef en voor de waarheid even
      onzichtbaar, en dan kan 100% blind betekenen. */
   'RESOLVERBEREIK.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
+    vragen: {
+      claim: 'alle geldige resolverpaden worden opgelost',
+      onafhankelijkeBron: 'geen: `toegestanePaden` levert de proeven EN bepaalt wat volledig is',
+      zelfdeBlindheid: 'ja, en volledig: een pad dat in die lijst ontbreekt is voor de proef en voor de waarheid even onzichtbaar',
+    },
     reden: 'zelfreferentieel: de proeven worden gegenereerd uit `toegestanePaden` en diezelfde lijst bepaalt ' +
       'wat volledig is. Een onafhankelijke inventaris van resolverbare paden -- of een klein canoniek corpus ' +
       'dat bewust buiten de generator staat -- zou de grondwaarheid zijn; die bestaat vandaag niet.' },
 
   'TAALSCHIL.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
+    vragen: {
+      claim: 'het aandeel schilteksten dat per taal gevuld is',
+      onafhankelijkeBron: 'een met de hand vastgestelde lijst van teksten die een schil MOET dragen',
+      zelfdeBlindheid: 'nee, mits die lijst niet uit de schil zelf wordt afgeleid',
+    },
     reden: NOGNIET('welke schilteksten zijn met de hand als volledig vastgesteld?') },
   'VINDBAAR.json': { grondwaarheid: 'ONBEPAALD', claim: 'dekking',
+    vragen: {
+      claim: 'het aandeel functies dat je terugvindt met het woord dat erop staat',
+      onafhankelijkeBron: 'een corpus zoekwoorden van MENSEN die de functie niet hebben gebouwd',
+      zelfdeBlindheid: 'nee -- dit is het duidelijkste geval waar een klein menselijk ijkcorpus de vraag zou sluiten',
+    },
     reden: NOGNIET('is er een lijst functies waarvan een mens heeft vastgesteld met welk woord je hem zoekt?') },
 };
 

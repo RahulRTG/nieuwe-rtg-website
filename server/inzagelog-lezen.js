@@ -28,7 +28,14 @@ const { nu } = require('./lib/klok');
 /* `rij` is een FUNCTIE en geen array: het journaal wordt onderweg aangevuld, en
    een eenmalig meegegeven array zou een momentopname van het opstartmoment
    zijn. */
-module.exports = ({ rij }) => {
+module.exports = ({ rij, bewaardagen, afgekapt }) => {
+  /* De termijn komt van de SCHRIJFKANT mee en staat hier niet als getal. Twee
+     plekken die weten hoe lang dit huis bewaart, lopen uiteen zodra er een
+     verandert, en dan vertelt het scherm iets anders dan de opslag doet
+     (LAT.md regel 4). */
+  const DAGEN = Number(bewaardagen) || null;
+  const gevallen = () => { try { return Number(afgekapt && afgekapt()) || 0; } catch (e) { return 0; } };
+
   /* Lezen. Alleen voor de eigenaar/toezicht (de aanroepende route bewaakt dat),
      en voor een betrokkene die vraagt wie in zijn dossier heeft gekeken. */
   function lijst({ overId, doorId, max } = {}) {
@@ -45,8 +52,26 @@ module.exports = ({ rij }) => {
      Zonder de kijker bij naam te noemen: dat is de persoonsdata van een ander,
      en die staat niet automatisch open voor de een omdat de ander vraagt. Wel
      de functie, de reden en het moment -- dat is waar de vraag over gaat. */
+  /* DE BELOFTE REIST MEE MET HET ANTWOORD, en dat is besluit 6 in zijn kleinste
+     vorm. Een kale lijst laat het scherm raden wat zij betekent, en het scherm
+     raadt dan "dit is alles" -- terwijl het "dit is alles binnen de termijn" is.
+     Wie hier straks een zin omheen zet, hoeft die niet zelf te verzinnen. */
   function voorBetrokkene(overId) {
-    return lijst({ overId, max: 200 }).map(r => ({ at: r.at, waarom: r.waarom, bron: r.bron }));
+    const regels = lijst({ overId, max: 200 }).map(r => ({ at: r.at, waarom: r.waarom, bron: r.bron }));
+    const tekort = gevallen();
+    return {
+      regels,
+      bewaardagen: DAGEN,
+      belofte: DAGEN
+        ? 'U ziet wie er in uw dossier keek, over de afgelopen ' + DAGEN + ' dagen.'
+        : 'De bewaartermijn van dit journaal is hier niet vast te stellen.',
+      /* NUL IS HIER EEN UITSPRAAK EN GEEN LEEG VELD: het zegt dat de noodrem
+         nooit heeft gebeten, en dus dat de termijn de hele belofte draagt. */
+      volledig: tekort === 0,
+      tekort: tekort === 0 ? null :
+        'Er zijn ' + tekort + ' regel(s) door de noodrem afgevallen vóór hun termijn; ' +
+        'over die periode is dit overzicht niet volledig.'
+    };
   }
 
   /* IS HET SPOOR ONGEMOEID? De keten nalopen, zodat een beheerder die een regel
@@ -72,11 +97,23 @@ module.exports = ({ rij }) => {
     const l = rij();
     const grens = nu() - 7 * 24 * 3600 * 1000;
     const week = l.filter(r => Date.parse(r.at) >= grens);
+    const tekort = gevallen();
+    const oudste = l.length ? l[l.length - 1].at : null;
     return {
       totaal: l.length,
       week: week.length,
       zonderReden: l.filter(r => r.waarom === 'GEEN REDEN OPGEGEVEN').length,
       keten: controleer(),
+      /* DE BEWARING, HARDOP. `afgekapt` boven nul betekent dat de noodrem heeft
+         gebeten en de belofte dus NIET wordt waargemaakt -- een zichtbaar tekort
+         in plaats van een gat dat niemand kan vinden. Verjaarde regels staan er
+         met opzet niet bij: die zijn de termijn die werkt, geen verlies. */
+      bewaring: {
+        dagen: DAGEN,
+        oudsteRegel: oudste,
+        afgekaptDoorNoodrem: tekort,
+        volledig: tekort === 0
+      },
       recent: l.slice(0, 10)
     };
   }

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:40:44.921Z",
-    "commit": "b9ef5d31",
+    "op": "2026-09-14T09:02:24.072Z",
+    "commit": "8d784199",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/doelgroepbereik.js",
     "node": "v22.22.2"
   },
@@ -1946,7 +1946,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 35,
+        "zonderRoldeur": 35,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "35 routes met geen roldeur(en) en 35 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "social",
@@ -1957,7 +1964,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 35,
+        "zonderRoldeur": 35,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "35 routes met geen roldeur(en) en 35 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "social",
@@ -1968,7 +1982,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 35,
+        "zonderRoldeur": 35,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "35 routes met geen roldeur(en) en 35 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "social",
@@ -2045,7 +2066,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 228,
+        "zonderRoldeur": 228,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -2056,7 +2084,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 228,
+        "zonderRoldeur": 228,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -2067,7 +2102,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 228,
+        "zonderRoldeur": 228,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -5450,20 +5492,20 @@
       "routes": 8,
       "openRoute": {
         "methode": "POST",
-        "pad": "/api/mediaos/bewaar",
+        "pad": "/api/mediaos/aanwezig",
         "bewakers": [
           "auth"
         ],
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/mediaos.js",
-        "regel": 57,
+        "regel": 167,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
-      "open": "POST /api/mediaos/bewaar",
+      "open": "POST /api/mediaos/aanwezig",
       "uitslag": "waar"
     },
     {
@@ -5474,20 +5516,20 @@
       "routes": 8,
       "openRoute": {
         "methode": "POST",
-        "pad": "/api/mediaos/bewaar",
+        "pad": "/api/mediaos/aanwezig",
         "bewakers": [
           "auth"
         ],
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/mediaos.js",
-        "regel": 57,
+        "regel": 167,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
-      "open": "POST /api/mediaos/bewaar",
+      "open": "POST /api/mediaos/aanwezig",
       "uitslag": "waar"
     },
     {
@@ -5498,20 +5540,20 @@
       "routes": 8,
       "openRoute": {
         "methode": "POST",
-        "pad": "/api/mediaos/bewaar",
+        "pad": "/api/mediaos/aanwezig",
         "bewakers": [
           "auth"
         ],
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/mediaos.js",
-        "regel": 57,
+        "regel": 167,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
-      "open": "POST /api/mediaos/bewaar",
+      "open": "POST /api/mediaos/aanwezig",
       "uitslag": "waar"
     },
     {
@@ -8865,7 +8907,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 103,
+        "regel": 105,
         "samengesteld": false,
         "rauw": ", auth, beantwoord);"
       },
@@ -8889,7 +8931,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 103,
+        "regel": 105,
         "samengesteld": false,
         "rauw": ", auth, beantwoord);"
       },
@@ -8913,7 +8955,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 103,
+        "regel": 105,
         "samengesteld": false,
         "rauw": ", auth, beantwoord);"
       },
@@ -8937,7 +8979,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 103,
+        "regel": 105,
         "samengesteld": false,
         "rauw": ", auth, beantwoord);"
       },
@@ -8991,7 +9033,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 138,
+        "regel": 140,
         "samengesteld": false,
         "rauw": ", (req, res) => {"
       },
@@ -11546,7 +11588,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -11568,7 +11617,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -11579,7 +11635,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -11602,7 +11665,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "betalen",
@@ -12827,7 +12897,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 71,
+        "regel": 108,
         "samengesteld": false,
         "rauw": ", auth, doeHandler('member'));"
       },
@@ -12851,7 +12921,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 71,
+        "regel": 108,
         "samengesteld": false,
         "rauw": ", auth, doeHandler('member'));"
       },
@@ -12875,7 +12945,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 71,
+        "regel": 108,
         "samengesteld": false,
         "rauw": ", auth, doeHandler('member'));"
       },
@@ -12899,7 +12969,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 71,
+        "regel": 108,
         "samengesteld": false,
         "rauw": ", auth, doeHandler('member'));"
       },
@@ -12923,7 +12993,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 75,
+        "regel": 112,
         "samengesteld": false,
         "rauw": ", supplierAuth, doeHandler('staff'));"
       },
@@ -12947,7 +13017,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 75,
+        "regel": 112,
         "samengesteld": false,
         "rauw": ", supplierAuth, doeHandler('staff'));"
       },
@@ -13317,7 +13387,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 14,
+        "zonderRoldeur": 14,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "14 routes met geen roldeur(en) en 14 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tenant",
@@ -13373,7 +13450,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 14,
+        "zonderRoldeur": 14,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "14 routes met geen roldeur(en) en 14 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "vakbewijs",
@@ -14321,34 +14405,34 @@
       "functie": "dom-lucht",
       "naam": "Luchtvaart en luchthaven",
       "doelgroep": "rtg",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-lucht",
       "naam": "Luchtvaart en luchthaven",
       "doelgroep": "lifestyle",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-lucht",
       "naam": "Luchtvaart en luchthaven",
       "doelgroep": "business",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-lucht",
@@ -14365,7 +14449,7 @@
       "functie": "dom-lucht",
       "naam": "Luchtvaart en luchthaven",
       "doelgroep": "leverancier",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 8,
@@ -14377,7 +14461,7 @@
       "functie": "dom-lucht",
       "naam": "Luchtvaart en luchthaven",
       "doelgroep": "personeel",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 8,
@@ -15540,34 +15624,34 @@
       "functie": "dom-sport",
       "naam": "Sport",
       "doelgroep": "rtg",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-sport",
       "naam": "Sport",
       "doelgroep": "lifestyle",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-sport",
       "naam": "Sport",
       "doelgroep": "business",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-sport",
@@ -15584,7 +15668,7 @@
       "functie": "dom-sport",
       "naam": "Sport",
       "doelgroep": "leverancier",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 8,
@@ -15596,7 +15680,7 @@
       "functie": "dom-sport",
       "naam": "Sport",
       "doelgroep": "personeel",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 8,
@@ -15608,7 +15692,7 @@
       "functie": "dom-sport",
       "naam": "Sport",
       "doelgroep": "foundation",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
@@ -16241,12 +16325,12 @@
       "functie": "dom-werkvloer",
       "naam": "De werkvloer",
       "doelgroep": "business",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-werkvloer",
@@ -16323,12 +16407,12 @@
       "functie": "dom-werkvloer",
       "naam": "De werkvloer",
       "doelgroep": "intern",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-werkplek",
@@ -19346,45 +19430,45 @@
       "functie": "dom-appstore-uitgever",
       "naam": "App Store: inzenden door uitgevers",
       "doelgroep": "rtg",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-appstore-uitgever",
       "naam": "App Store: inzenden door uitgevers",
       "doelgroep": "lifestyle",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-appstore-uitgever",
       "naam": "App Store: inzenden door uitgevers",
       "doelgroep": "business",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-appstore-uitgever",
       "naam": "App Store: inzenden door uitgevers",
       "doelgroep": "gast",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-appstore-uitgever",
@@ -19438,7 +19522,7 @@
       "functie": "dom-appstore-uitgever",
       "naam": "App Store: inzenden door uitgevers",
       "doelgroep": "foundation",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
@@ -20960,34 +21044,34 @@
       "functie": "dom-kmar",
       "naam": "Grensdiensten (KMar)",
       "doelgroep": "rtg",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-kmar",
       "naam": "Grensdiensten (KMar)",
       "doelgroep": "lifestyle",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-kmar",
       "naam": "Grensdiensten (KMar)",
       "doelgroep": "business",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-kmar",
@@ -21004,7 +21088,7 @@
       "functie": "dom-kmar",
       "naam": "Grensdiensten (KMar)",
       "doelgroep": "leverancier",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 8,
@@ -21016,7 +21100,7 @@
       "functie": "dom-kmar",
       "naam": "Grensdiensten (KMar)",
       "doelgroep": "personeel",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 8,
@@ -23716,7 +23800,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -23727,7 +23820,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -23738,7 +23840,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -23749,7 +23860,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -23760,7 +23880,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -23771,7 +23900,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -24119,7 +24257,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1420,
+        "regel": 1423,
         "samengesteld": false,
         "rauw": ", (req, res) => {"
       },
@@ -25528,7 +25666,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1502,
+        "regel": 1505,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {"
       },
@@ -25553,7 +25691,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1502,
+        "regel": 1505,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {"
       },
@@ -25578,7 +25716,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1502,
+        "regel": 1505,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {"
       },
@@ -25603,7 +25741,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1502,
+        "regel": 1505,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {"
       },
@@ -31470,15 +31608,15 @@
   "telling": {
     "cellen": 1736,
     "waar": 579,
-    "correct-afgesloten": 166,
-    "registerleugen": 33,
+    "correct-afgesloten": 181,
+    "registerleugen": 18,
     "bereikbaar-zonder-verklaring": 132,
     "geen-deur": 133,
     "onbepaald": 689,
     "niet-beproefd": 4,
     "sessie-ontbreekt": 0
   },
-  "routesGezien": 5011,
+  "routesGezien": 5022,
   "leugens": [
     {
       "functie": "social",
@@ -31489,7 +31627,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 35,
+        "zonderRoldeur": 35,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "35 routes met geen roldeur(en) en 35 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "social",
@@ -31500,7 +31645,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 35,
+        "zonderRoldeur": 35,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "35 routes met geen roldeur(en) en 35 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "social",
@@ -31511,7 +31663,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 35,
+        "zonderRoldeur": 35,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "35 routes met geen roldeur(en) en 35 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -31522,7 +31681,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 228,
+        "zonderRoldeur": 228,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -31533,7 +31699,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 228,
+        "zonderRoldeur": 228,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -31544,7 +31717,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 228,
+        "zonderRoldeur": 228,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -31555,7 +31735,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -31566,7 +31753,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -31577,7 +31771,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -31588,7 +31789,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tenant",
@@ -31599,7 +31807,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 14,
+        "zonderRoldeur": 14,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "14 routes met geen roldeur(en) en 14 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tenant",
@@ -31610,172 +31825,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-lucht",
-      "naam": "Luchtvaart en luchthaven",
-      "doelgroep": "rtg",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-lucht",
-      "naam": "Luchtvaart en luchthaven",
-      "doelgroep": "lifestyle",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-lucht",
-      "naam": "Luchtvaart en luchthaven",
-      "doelgroep": "business",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-sport",
-      "naam": "Sport",
-      "doelgroep": "rtg",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-sport",
-      "naam": "Sport",
-      "doelgroep": "lifestyle",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-sport",
-      "naam": "Sport",
-      "doelgroep": "business",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-werkvloer",
-      "naam": "De werkvloer",
-      "doelgroep": "business",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-werkvloer",
-      "naam": "De werkvloer",
-      "doelgroep": "intern",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-appstore-uitgever",
-      "naam": "App Store: inzenden door uitgevers",
-      "doelgroep": "rtg",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-appstore-uitgever",
-      "naam": "App Store: inzenden door uitgevers",
-      "doelgroep": "lifestyle",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-appstore-uitgever",
-      "naam": "App Store: inzenden door uitgevers",
-      "doelgroep": "business",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-appstore-uitgever",
-      "naam": "App Store: inzenden door uitgevers",
-      "doelgroep": "gast",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-kmar",
-      "naam": "Grensdiensten (KMar)",
-      "doelgroep": "rtg",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-kmar",
-      "naam": "Grensdiensten (KMar)",
-      "doelgroep": "lifestyle",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
-    },
-    {
-      "functie": "dom-kmar",
-      "naam": "Grensdiensten (KMar)",
-      "doelgroep": "business",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 14,
+        "zonderRoldeur": 14,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "14 routes met geen roldeur(en) en 14 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -31786,7 +31843,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -31797,7 +31863,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -31808,7 +31883,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -31819,7 +31903,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -31830,7 +31923,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -31841,7 +31943,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     }
   ],
   "zonderVerklaring": [
@@ -32948,7 +33059,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 103,
+        "regel": 105,
         "samengesteld": false,
         "rauw": ", auth, beantwoord);"
       },

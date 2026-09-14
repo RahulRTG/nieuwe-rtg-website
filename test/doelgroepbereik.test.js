@@ -201,3 +201,57 @@ test('12. "ruimer dan verklaard" wordt nooit zonder bewijs gezegd', () => {
     assert.ok(c.open, 'er is geen route genoemd waar dit op geldt');
   }
 });
+
+test('13. elke registerleugen draagt een triage, en die noemt de deur', () => {
+  /* DEZELFDE LES ALS TOETS 11, MAAR VOOR DE EERSTE RICHTING. 33 leugens die
+     allemaal hetzelfde heten zijn een berg; wie ze wil repareren moet weten
+     welke soort hij voor zich heeft, want de twee vragen het tegenovergestelde.
+
+     `deur-van-een-andere-rol`: elke route van de functie staat achter EEN
+     roldeur (supplierAuth, officeAuth, ...) en de verklaarde doelgroep komt daar
+     structureel nooit langs. De functie beschrijft de bedienende kant terwijl de
+     verklaring de consument noemt -- /api/lucht is de luchthavenmedewerker, het
+     lid vliegt via /api/member/vluchten, dat bij de functie `member` hoort.
+
+     `gemengde-deuren`: de bewaking zit deels in de handler, dus van buiten is
+     niet te zien welke route deze doelgroep zou moeten openen. Daar helpt geen
+     registerwijziging maar een lezing van de code.
+
+     DE MUTATIE: haal de triage-lus uit scripts/doelgroepbereik.js -> deze toets
+     zakt met de eerste cel die geen soort draagt. */
+  const j = lees('DOELGROEPBEREIK.json');
+  const leugens = (j.cellen || []).filter(c => c.uitslag === 'registerleugen');
+  assert.ok(leugens.length > 0, 'er zijn registerleugens om te triëren');
+  const SOORTEN = ['deur-van-een-andere-rol', 'gemengde-deuren'];
+  for (const c of leugens) {
+    assert.ok(SOORTEN.includes(c.triage),
+      c.functie + ' x ' + c.doelgroep + ' draagt geen geldige triage (' + c.triage + ')');
+    assert.ok(c.triageReden && c.triageReden.length > 20,
+      c.functie + ' x ' + c.doelgroep + ': de triage draagt geen uitgeschreven reden');
+    assert.ok(c.deuren && typeof c.deuren.routes === 'number',
+      c.functie + ' x ' + c.doelgroep + ': er staat niet bij hoeveel routes er gewogen zijn');
+  }
+});
+
+test('14. "deur van een andere rol" wordt nooit zonder bewijs gezegd', () => {
+  /* Dat is de tak die zegt: deze verklaring kan NOOIT kloppen. Dat is een
+     hardere uitspraak dan "het register loopt achter", dus hij mag alleen staan
+     als er geen enkele route buiten die ene roldeur valt. Eén route zonder
+     roldeur en het is `gemengde-deuren` -- want dan zit de bewaking in de
+     handler en kijkt deze meter langs het antwoord heen.
+
+     Zonder deze toets zou een functie met negentien supplier-routes en één open
+     route als "kan nooit" worden weggeschreven, en dat is precies de
+     beschuldiging die deze meter niet mag verzinnen. */
+  const j = lees('DOELGROEPBEREIK.json');
+  const hard = (j.cellen || []).filter(c => c.uitslag === 'registerleugen' && c.triage === 'deur-van-een-andere-rol');
+  for (const c of hard) {
+    assert.equal(c.deuren.zonderRoldeur, 0,
+      c.functie + ': ' + c.deuren.zonderRoldeur + ' routes dragen geen roldeur; dan is dit gemengd');
+    assert.equal(c.deuren.rollen.length, 1,
+      c.functie + ': ' + c.deuren.rollen.length + ' verschillende roldeuren; dan is dit gemengd');
+    assert.ok(c.deuren.routes > 0, c.functie + ': er zijn geen routes gewogen');
+    assert.ok(!(c.deuren.rollen || []).includes(c.doelgroep),
+      c.functie + ': de roldeur is die van de verklaarde doelgroep zelf; dan komt zij er juist wél langs');
+  }
+});

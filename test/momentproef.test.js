@@ -58,22 +58,49 @@ test('2. de proef deelt geen module met de drie andere ketens', () => {
     'de momentproef hangt aan een gedeelde ketenmodule');
 });
 
-test('3. elke openBekend-schakel draagt een reden die iets beweert en ergens heen wijst', () => {
+/* DE REGEL, EN WAAROM HIJ NIET MEER AAN HET LEVENDE REGISTER HANGT.
+
+   Deze toets eiste dat er MINSTENS EEN openBekend-schakel was -- een
+   vulcontrole, en een goede: een lus over een lege lijst slaagt vanzelf. Sinds
+   13 september sluit de keten (10 van 10) en staan er nul bevindingen, dus die
+   eis viel om. Het alternatief -- de vulcontrole schrappen -- zou de toets
+   tandeloos maken zodra hij weer nodig is.
+
+   Daarom dezelfde uitweg als elders in dit huis: de REGEL wordt beproefd op een
+   verzonnen register, en het ECHTE register wordt apart gecontroleerd. Zo kan de
+   regel niet stil verdwijnen doordat de werkelijkheid even meezit, en blijft
+   zichtbaar dat hij bestaat voor de volgende keer dat een schakel openstaat. */
+function keurBevinding(s) {
+  const fout = [];
+  if (!(s.bekend && s.bekend.length > 120))
+    fout.push('schakel ' + s.nr + ': de reden is te kort om een bevinding te zijn in plaats van een etiket');
+  if (!/STAGE\.md|besluit|register/i.test(String(s.bekend || '')))
+    fout.push('schakel ' + s.nr + ': de reden zegt niet waar het besluit hoort te vallen');
+  /* Een schakel die door een WEIGERING openstaat heeft geen `ziet` maar wel een
+     antwoord van de server. Beide zijn bewijs; geen van beide mag ontbreken,
+     anders staat er een reden zonder meting onder. */
+  if (!((s.ziet && s.ziet.length > 10) || (s.antwoord && s.antwoord.length > 3)))
+    fout.push('schakel ' + s.nr + ': een bevinding hoort te zeggen wat er WEL gemeten is');
+  return fout;
+}
+
+test('3. de regel voor een openBekend-schakel bijt, ook nu er geen zijn', () => {
+  /* Eerst de regel zelf, op verzonnen invoer -- anders bewijst deze toets niets
+     zodra de keten sluit. */
+  const goed = { nr: 99, bekend: 'X'.repeat(130) + ' Het besluit ligt bij de eigenaar -- STAGE.md par. 7.',
+    ziet: 'dit is wat er wel gemeten is' };
+  assert.deepEqual(keurBevinding(goed), [], 'een volledige bevinding komt er door');
+  assert.equal(keurBevinding({ ...goed, bekend: 'te kort' }).length, 2, 'een etiket in plaats van een reden zakt');
+  assert.equal(keurBevinding({ ...goed, bekend: 'X'.repeat(200) }).length, 1, 'een reden zonder adres zakt');
+  assert.equal(keurBevinding({ ...goed, ziet: null, antwoord: null }).length, 1, 'een reden zonder meting zakt');
+
+  /* En dan het echte register: wat er staat moet eraan voldoen. Vandaag zijn dat
+     er nul, en dan is deze lus met opzet leeg -- de regel hierboven is het
+     bewijs dat hij nog werkt. */
   const j = lees('MOMENTPROEF.json');
   const bevindingen = j.schakels.filter(s => s.stand === 'openBekend');
-  assert.ok(bevindingen.length >= 1, 'geen enkele bevinding -- dan bewaakt deze toets niets');
   assert.equal(bevindingen.length, (j.bevindingen || []).length, 'de bevindingenlijst loopt niet gelijk met de schakels');
-  for (const s of bevindingen) {
-    assert.ok(s.bekend && s.bekend.length > 120,
-      'schakel ' + s.nr + ': de reden is te kort om een bevinding te zijn in plaats van een etiket');
-    assert.match(s.bekend, /STAGE\.md|besluit|register/i,
-      'schakel ' + s.nr + ': de reden zegt niet waar het besluit hoort te vallen');
-    /* Een schakel die door een WEIGERING openstaat heeft geen `ziet` maar wel een
-       antwoord van de server. Beide zijn bewijs; geen van beide mag ontbreken,
-       anders staat er een reden zonder meting onder. */
-    assert.ok((s.ziet && s.ziet.length > 10) || (s.antwoord && s.antwoord.length > 3),
-      'schakel ' + s.nr + ': een bevinding hoort te zeggen wat er WEL gemeten is');
-  }
+  for (const s of bevindingen) assert.deepEqual(keurBevinding(s), []);
 });
 
 test('4. het register sluit en telt op', () => {

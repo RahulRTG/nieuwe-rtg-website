@@ -53,6 +53,8 @@
 
 /* De standen van een randvoorwaarde. Drie, en `onbekend` is de STANDAARD:
    wie niets zegt, heeft niets nagegaan. */
+const W = require('./woorden');
+
 const STANDEN = ['vervuld', 'ontbreekt', 'onbekend'];
 
 /* De standen van een manier. Ze volgen uit de voorwaarden en worden nergens
@@ -70,7 +72,7 @@ function reken(invoer) {
 
   const doel = tekst(b.doel, 200);
   if (!doel) {
-    return { status: 400, error: 'Waar wilt u naartoe? Zonder doel is er niets om wegen naartoe te zoeken.' };
+    return { status: 400, error: W.GEEN_DOEL };
   }
 
   /* De randvoorwaarden, op id. Een dubbele id is geen randgeval maar een fout
@@ -80,8 +82,7 @@ function reken(invoer) {
     const id = tekst(r && r.id, 60);
     if (!id) continue;
     if (vw.has(id)) {
-      return { status: 400, error: 'De randvoorwaarde "' + id + '" staat er twee keer in. ' +
-        'Welke van de twee geldt, is dan niet vast te stellen.' };
+      return { status: 400, error: W.dubbel(id) };
     }
     const stand = STANDEN.includes(r.stand) ? r.stand : 'onbekend';
     vw.set(id, { id, wat: tekst(r.wat, 200) || id, stand });
@@ -89,16 +90,12 @@ function reken(invoer) {
 
   const manieren = Array.isArray(b.manieren) ? b.manieren : [];
   if (!manieren.length) {
-    return { status: 400, error: 'Welke manieren zijn er? Zonder manieren valt er niets te vergelijken.' };
+    return { status: 400, error: W.GEEN_MANIEREN };
   }
 
   /* Wat de motor heeft moeten aannemen. Hij begint bij de vaste twee en groeit
      met wat er onderweg blijkt te ontbreken -- zie regel 3. */
-  const aannames = [
-    'Alleen wat u zelf heeft opgegeven is meegenomen. Er is geen opleidingsduur, geen tarief en ' +
-    'geen wachttijd bijgezocht; die getallen heeft dit huis niet.',
-    'Een randvoorwaarde die u niet heeft ingevuld geldt als NIET nagegaan, en dus niet als geregeld.'
-  ];
+  const aannames = W.AANNAMES_VAST.slice();
 
   const onbekendeVerwijzingen = new Set();
   const blokkeertHoeveel = new Map();   // randvoorwaarde-id -> aantal wegen dat hij blokkeert
@@ -106,6 +103,14 @@ function reken(invoer) {
   const uit = manieren.map((m, i) => {
     const id = tekst(m && m.id, 60) || ('manier-' + (i + 1));
     const nodig = (Array.isArray(m && m.nodig) ? m.nodig : []).map(x => tekst(x, 60)).filter(Boolean);
+
+    /* REGEL 2, TOEGEPAST OP DE LIJST IN PLAATS VAN OP DE STANDEN ERIN. "Deze
+       weg vergt niets" is een bewering van wie hem aandroeg; "wij weten niet
+       wat hij vergt" is het tegenovergestelde. Tot 14 september 2026 waren ze
+       hier niet uit elkaar te houden -- allebei stand `open`, met "alles staat
+       geregeld" eronder. Voor een weg die dit huis zelf samenstelt (./wegen.js)
+       zegt die zin "ga maar" over iets waar niemand naar keek. */
+    const voorwaardenOnbekend = !!(m && m.voorwaardenOnbekend);
 
     const ontbreekt = [], onbekend = [], vervuld = [];
     for (const n of nodig) {
@@ -126,33 +131,35 @@ function reken(invoer) {
 
     for (const r of ontbreekt) blokkeertHoeveel.set(r.id, (blokkeertHoeveel.get(r.id) || 0) + 1);
 
-    const stand = ontbreekt.length ? 'geblokkeerd' : (onbekend.length ? 'onbepaald' : 'open');
+    const stand = ontbreekt.length ? 'geblokkeerd'
+      : ((onbekend.length || voorwaardenOnbekend) ? 'onbepaald' : 'open');
     return {
       id, wat: tekst(m && m.wat, 200) || id, stand,
+      voorwaardenOnbekend,
       /* REGEL 1: een geblokkeerde weg blijft staan, met wat hem zou openen. De
          zin is met opzet in de voorwaardelijke wijs: er staat niet dat het kan,
          er staat wat er dan geregeld zou moeten zijn. */
       zouOpenenAls: ontbreekt.map(r => r.wat),
       nietNagegaan: onbekend.map(r => r.wat),
       alGeregeld: vervuld.map(r => r.wat),
-      uitleg: stand === 'open'
-        ? 'Alles wat deze manier nodig heeft, staat volgens uw eigen opgave geregeld.'
-        : stand === 'geblokkeerd'
-          ? 'Deze manier ligt niet open zolang het bovenstaande niet geregeld is. Hij blijft in de lijst staan, want dat kan veranderen.'
-          : 'Hier is niets van bekend dat hem blokkeert, maar ook niet alles nagegaan. Dat is iets anders dan open.'
+      uitleg: W.uitleg(stand, voorwaardenOnbekend, onbekend.length > 0)
     };
   });
 
   if (onbekendeVerwijzingen.size) {
-    aannames.push('Deze manieren noemen voorwaarden die u niet heeft beschreven (' +
-      [...onbekendeVerwijzingen].slice(0, 8).join(', ') + '). Die zijn als NIET nagegaan geteld.');
+    aannames.push(W.aannameOnbekend([...onbekendeVerwijzingen]));
+  }
+  /* REGEL 3: de stilste aanname hier is een weg zonder gemeten voorwaarden --
+     hij ziet er in de lijst uit als elke andere. */
+  const zonderGemetenVoorwaarden = uit.filter(m => m.voorwaardenOnbekend).length;
+  if (zonderGemetenVoorwaarden) {
+    aannames.push(W.aannameOngemeten(zonderGemetenVoorwaarden, uit.length));
   }
   if (manieren.length === 1) {
     /* REGEL: altijd meer dan een weg. Als er maar een is aangeleverd, is dit
        geen keuze maar een gegeven, en dat hoort de lezer te weten -- anders
        leest een lijst van een als een advies. */
-    aannames.push('Er is maar EEN manier opgegeven. Dit is dus geen keuze tussen wegen maar een ' +
-      'beoordeling van die ene; er kunnen manieren zijn die hier niet staan.');
+    aannames.push(W.AANNAME_EEN_MANIER);
   }
 
   /* REGEL 5: de telling gaat over VOORWAARDEN. Gelijke aantallen worden niet
@@ -169,12 +176,8 @@ function reken(invoer) {
     aannames,
     /* REGEL 4, en hij staat in het ANTWOORD en niet alleen in dit bestand: een
        lezer die de volgorde voor een oordeel aanziet, doet dat anders alsnog. */
-    ordening: 'Deze manieren staan in de volgorde waarin u ze opgaf. Er is niets gerangschikt en ' +
-      'er is geen beste weg aangewezen; die keuze is aan u.',
-    /* En de zin die zegt wat dit NIET is. Zonder deze regel leest een lijst met
-       "open" en "geblokkeerd" als een uitspraak over wat kan lukken. */
-    grens: 'Dit rekent alleen met wat u zelf heeft opgegeven. Het zegt niets over hoe lang iets duurt, ' +
-      'wat het kost of of het u gaat lukken.'
+    ordening: W.ordening(b.manierenBron),
+    grens: W.GRENS
   };
 }
 

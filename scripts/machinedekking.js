@@ -98,6 +98,40 @@ const { KLASSEN, KETENS } = require('../server/kern/kantoor/geldketen.js');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'MACHINEDEKKING.json');
+
+/* WAT TELT ALS EEN HANDELING -- en waarom dat niet het HTTP-werkwoord is.
+
+   Deze meter telde `muterend` op POST|PUT|PATCH|DELETE. Dat is een benadering
+   die een hele klasse verkeerd indeelt: een POST die alleen OPZOEKT of REKENT
+   is geen handeling, en dit huis zit er vol mee -- vrijwel elke leesroute is
+   hier een POST. Ze stonden dus allemaal in `mutatiesZonderEnigeAs`, de teller
+   die zegt hoeveel handelingen om de machine heen lopen. Een lezing loopt
+   nergens omheen; er is niets om langs te gaan.
+
+   De autoriteit is niet dit bestand maar MUTATIECONTRACT.json. De stand
+   NOT_APPLICABLE betekent daar letterlijk "deze route verandert niets" en hij
+   is niet gratis: server/kern/mutatiecontract/klassen.js eist een GEMETEN ronde
+   zonder spoor in de opslag EN een tweede, noembare afdekking van wat die meter
+   structureel niet ziet. Meting plus handtekening, dus -- dat is harder bewijs
+   dan een werkwoord in een routetabel.
+
+   DE PRIJS STAAT HIER OMDAT HIJ ECHT IS. Dit verschuift een gepubliceerde
+   noemer: `muterend` daalt met het aantal bewezen leesroutes, en een ronde van
+   voor deze wijziging is dus niet een-op-een te vergelijken met een ronde erna.
+   Daarom staat het aantal uitgesloten routes als eigen getal in de uitslag
+   (`leesroutesUitRegister`) en het register in `bronnen`: wie het verschil ziet,
+   kan het narekenen. Waar het register GEEN stand heeft, blijft het werkwoord
+   beslissen -- afwezigheid van bewijs is hier geen bewijs van afwezigheid. */
+const BEWEZEN_LEZINGEN = (() => {
+  const uit = new Set();
+  try {
+    const reg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIECONTRACT.json'), 'utf8'));
+    for (const r of (reg.rijen || [])) {
+      if (r && r.stand === 'NOT_APPLICABLE' && r.route) uit.add(String(r.route).trim());
+    }
+  } catch (e) { /* geen register: dan beslist het werkwoord, zoals hiervoor */ }
+  return uit;
+})();
 const K = { rood: '\x1b[31m', groen: '\x1b[32m', geel: '\x1b[33m', grijs: '\x1b[2m', reset: '\x1b[0m' };
 
 /* ---------------------------------------------------------------------------
@@ -413,7 +447,7 @@ function meet() {
 
   const perRoute = [];
   const histogram = new Map();
-  let muterend = 0, zonderEnigeAs = 0, geenSpan = 0, hubRoutes = 0;
+  let muterend = 0, zonderEnigeAs = 0, geenSpan = 0, hubRoutes = 0, lezingen = 0;
 
   const buurTekstCache = new Map();
   const buurTekst = (f) => {
@@ -425,7 +459,10 @@ function meet() {
   };
 
   for (const r of routes) {
-    const mut = /POST|PUT|PATCH|DELETE/i.test(r.methode);
+    const sleutel = (r.methode + ' ' + r.pad).trim();
+    const bewezenLezing = BEWEZEN_LEZINGEN.has(sleutel);
+    const mut = !bewezenLezing && /POST|PUT|PATCH|DELETE/i.test(r.methode);
+    if (bewezenLezing && /POST|PUT|PATCH|DELETE/i.test(r.methode)) lezingen++;
     if (mut) muterend++;
     const onder = [], boven = [];
     const s = span.get(r);
@@ -547,6 +584,7 @@ function meet() {
     bronnen: {
       'EXECUTION_MAP.json': digest('EXECUTION_MAP.json'),
       'KERNHERKOMST.json': digest('KERNHERKOMST.json'),
+      'MUTATIECONTRACT.json': digest('MUTATIECONTRACT.json'),
       'server/kern/stuur/beleid.js': digest('server/kern/stuur/beleid.js'),
       kernherkomstStempel: graaf.herkomstBron, kernherkomstNamen: graaf.herkomstNamen,
       executionmapStempel: kaart && kaart.stempel ? kaart.stempel : null,
@@ -557,6 +595,7 @@ function meet() {
       [n, { wat: a.wat, bron: 'EXECUTION_MAP.json#' + a.veld, graad: a.graad }])),
     gemeten: {
       routes: routes.length, muterend,
+      leesroutesUitRegister: lezingen,
       assen: Object.keys(ASSEN).length + Object.keys(UIT_EXECUTIONMAP).length,
       perAs,
       motoren,

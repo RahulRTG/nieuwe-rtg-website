@@ -1,12 +1,12 @@
 {
-  "vastgelegd": "2026-09-13",
+  "vastgelegd": "2026-09-14",
   "meters": {
     "activeringOnbepaald": 3,
     "activeringOndergrens": 49,
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2384,
+    "bewijsAchterstand": 2404,
     "bewijsAlleenKeten": 16,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -59,8 +59,8 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1657,
-    "toetsenNietGemeten": 610,
+    "testbestanden": 1658,
+    "toetsenNietGemeten": 609,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -90,8 +90,8 @@
     "bevestigGebreken": 0,
     "verwijzingGebreken": 0,
     "mensmutatieZonderWacht": 1,
-    "gevolgPadenOnbekend": 87,
-    "gevolgContractVolledig": 4,
+    "gevolgPadenOnbekend": 95,
+    "gevolgContractVolledig": 8,
     "gevolgContractenGezakt": 0,
     "crashasOnbekend": 89,
     "crashasNietMeetbaar": 0,
@@ -2276,6 +2276,24 @@
       "vervalt": "2026-12-15",
       "meter": "toetsenNietGemeten 607 -> 610",
       "reden": "Samenvoeging van de tien resterende open PR-takken (#242 t/m #252, #244 is los gemerged) in een release-tak. drie toetsen extra waar de mutatiemotor niet langs is geweest, gemeten NA het samenvoegen van de mutatierondes van alle takken. Zonder die samenvoeging zou hier een veel hoger getal staan dat een bundelartefact is en geen schuld."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "gevolgPadenOnbekend",
+      "van": 87,
+      "vervalt": "2026-12-15",
+      "meter": "gevolgPadenOnbekend 87 -> 95",
+      "reden": "MET DE HAND VERLAAGD, en niet omdat er iets slechter werd. Twee reparaties in deze tak halen paden UIT de gemeten verzameling die er nooit in hoorden. (1) De volgorde in kern/stuur/gevolg.js is omgedraaid: `geenWerk` gaat nu voor `gemeten`, en daarmee verliezen 153 van de 4923 paden een graad `gemeten` die IDEMPROEF.json zelf tegensprak -- die noemt ze `ongemeten` omdat de eerste oproep geen werk deed (404 of 403). Deze laag sprak dus zijn eigen bron tegen. (2) De stille ronde van scripts/idemproef-route.js houdt drie klok- en buffergestuurde collecties (`wacht`, `kantoorMensdeur`, `techniek`) uit de toerekening; die bewogen in het verschil van routes die er niets mee te maken hadden. Wat een keer goed was hoort niet stilletjes slechter te worden -- en een getal dat te mooi was hoort niet stilletjes te blijven staan; scripts/norm.js schrijft daarom voor dat dit met de hand gaat, met de reden erbij. Omlaag krijgen vraagt geen nieuwe reparatie maar een idempotentieproef die deze paden ECHT bereikt (geldige invoer en rechten per pad, in de vorm van scripts/lib/herstelwereld.js); vier paden zijn in deze tak al zo gehaald (incasso, tik, kascode en terugkerend/stop)."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2384,
+      "vervalt": "2026-12-15",
+      "meter": "bewijsAchterstand 2384 -> 2404",
+      "reden": "ZELFDE OORZAAK ALS gevolgPadenOnbekend hierboven, en dezelfde soort groei: er komt iets in beeld dat er al was. De twintig zijn de gevolg-onbekende paden plus de idem-ongeclassificeerde die eraan hangen; ze golden eerder als gedekt doordat kern/stuur/gevolg.js een `gemeten` gaf waar IDEMPROEF.json `ongemeten` zei. PROOF.md par. 0 eist dat schuld alleen krimpt, en dat is juist de reden dat dit met de hand gaat: een teller die daalt doordat de meting te ruim was, is geen aflossing. De reden staat ook IN het register zelf (BEWIJSSCHULD.json, via --groei), want dat weigerde terecht vast te leggen zonder."
     }
   ],
   "prestatie": {
@@ -2295,8 +2313,8 @@
   },
   "sinds": {
     "keuringOmvang": "2026-09-13",
-    "testbestanden": "2026-09-13",
-    "toetsenNietGemeten": "2026-09-11",
+    "testbestanden": "2026-09-14",
+    "toetsenNietGemeten": "2026-09-14",
     "inlineStijlAttributen": "2026-09-11",
     "ratelTanden": "2026-09-13",
     "metingenZonderRatel": "2026-08-18",
@@ -2356,7 +2374,7 @@
     "verwijzingGebreken": "2026-09-12",
     "mensmutatieZonderWacht": "2026-09-12",
     "gevolgPadenOnbekend": "2026-09-13",
-    "gevolgContractVolledig": "2026-09-13",
+    "gevolgContractVolledig": "2026-09-14",
     "gevolgContractenGezakt": "2026-09-13",
     "crashasOnbekend": "2026-09-13",
     "crashasNietMeetbaar": "2026-09-13",

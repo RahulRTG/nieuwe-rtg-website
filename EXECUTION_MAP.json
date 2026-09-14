@@ -1,7 +1,7 @@
 {
  "uitleg": "Afgeleide executiekaart: per route wat de AI ermee mag, wat het bewijs eronder zegt en of een herhaling schade doet. De herkomst staat per veldsoort in `velden`, de vertaling naar de gedeelde gezagsnoemer in `noemer`. NOOIT met de hand wijzigen: npm run executionmap:controle zakt erop.",
  "bronnen": {
-  "IDEMPROEF.json": "5f8d21aa228d7b5b",
+  "IDEMPROEF.json": "f78c2d49514aaacb",
   "IDEMBESLUIT.json": "a20e7b5abed335c8",
   "HERSTEL.json": "43f74e808fe06d72",
   "VERTROUWEN.json": "6fb6bc1a3e8ce705",
@@ -72,8 +72,8 @@
   }
  },
  "telling": {
-  "capabilities": 4912,
-  "bereikbaarPerRol": 176,
+  "capabilities": 4923,
+  "bereikbaarPerRol": 177,
   "conflicten": 0,
   "metBesluit": 128,
   "metVermoedeTerugweg": 49,
@@ -1304,7 +1304,7 @@
   {
    "pad": "/api/bank/pas/bevries",
    "rol": "member",
-   "herhaling": "beschermd",
+   "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, FAILURE)",
    "bereik": {
@@ -1316,7 +1316,7 @@
   {
    "pad": "/api/bank/pas/limiet",
    "rol": "member",
-   "herhaling": "beschermd",
+   "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, FAILURE)",
    "bereik": {
@@ -1431,7 +1431,7 @@
   {
    "pad": "/api/bank/spaardoel",
    "rol": "member",
-   "herhaling": "beschermd",
+   "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, FAILURE)",
    "herhalingBesluit": "instelling",
@@ -11912,6 +11912,30 @@
    "bereik": "verboden"
   },
   {
+   "pad": "/api/mediaos/aanwezig",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/mediaos/aanwezig/mijn",
+   "rol": "member",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/mediaos/aanwezig/volg",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
    "pad": "/api/mediaos/bewaar",
    "rol": "member",
    "herhaling": "ongemeten",
@@ -15628,6 +15652,18 @@
    "bereik": "verboden"
   },
   {
+   "pad": "/api/member/voorstel/intrek",
+   "rol": "member",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": {
+    "member": "klein",
+    "supplier": "verboden",
+    "staff": "verboden"
+   }
+  },
+  {
    "pad": "/api/member/vooruit",
    "rol": "member",
    "herhaling": "beschermd",
@@ -16974,7 +17010,7 @@
   },
   {
    "pad": "/api/office/balie/abo",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
@@ -16982,7 +17018,7 @@
   },
   {
    "pad": "/api/office/balie/dossier",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
@@ -16990,7 +17026,7 @@
   },
   {
    "pad": "/api/office/balie/herstel",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
@@ -16998,7 +17034,7 @@
   },
   {
    "pad": "/api/office/balie/klacht",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
@@ -17006,7 +17042,7 @@
   },
   {
    "pad": "/api/office/balie/klacht/status",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
@@ -17030,8 +17066,8 @@
   },
   {
    "pad": "/api/office/balie/zoek",
-   "rol": "office",
-   "herhaling": "ongemeten",
+   "rol": "kantoor-op-naam",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 6 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -17130,6 +17166,14 @@
    "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 4 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, FAILURE, ROLLBACK)",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/office/bank/incasso/dossier",
+   "rol": "kantoor-op-naam",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
   },
   {
@@ -17299,7 +17343,7 @@
   {
    "pad": "/api/office/bank/rekening/open",
    "rol": "kantoor-op-naam",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -17307,7 +17351,7 @@
   {
    "pad": "/api/office/bank/rekening/rood",
    "rol": "kantoor-op-naam",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -18941,6 +18985,14 @@
    "bereik": "verboden"
   },
   {
+   "pad": "/api/office/pay/factuurcorrectie",
+   "rol": "office",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
    "pad": "/api/office/payroll/aangifte",
    "rol": "office",
    "herhaling": "ongemeten",
@@ -19717,6 +19769,30 @@
    "bereik": "verboden"
   },
   {
+   "pad": "/api/office/salon/uitlicht",
+   "rol": "boardroom",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/office/salon/uitlicht/bord",
+   "rol": "boardroom",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/office/salon/uitlicht/intrek",
+   "rol": "boardroom",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
+   "bereik": "verboden"
+  },
+  {
    "pad": "/api/office/school/decide",
    "rol": "office",
    "herhaling": "ongemeten",
@@ -19742,7 +19818,7 @@
   },
   {
    "pad": "/api/office/service/ai/mag",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19750,7 +19826,7 @@
   },
   {
    "pad": "/api/office/service/ai/vraag",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19758,7 +19834,7 @@
   },
   {
    "pad": "/api/office/service/bericht",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19766,7 +19842,7 @@
   },
   {
    "pad": "/api/office/service/bevestiging/code",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19774,7 +19850,7 @@
   },
   {
    "pad": "/api/office/service/bevestiging/vraag",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19782,7 +19858,7 @@
   },
   {
    "pad": "/api/office/service/bundel",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19790,7 +19866,7 @@
   },
   {
    "pad": "/api/office/service/eigenaar",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19798,7 +19874,7 @@
   },
   {
    "pad": "/api/office/service/foutsignaal/koppel",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19806,15 +19882,15 @@
   },
   {
    "pad": "/api/office/service/foutsignalen",
-   "rol": "office",
-   "herhaling": "ongemeten",
+   "rol": "kantoor-op-naam",
+   "herhaling": "beschermd",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
   },
   {
    "pad": "/api/office/service/gesprek/eind",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19822,7 +19898,7 @@
   },
   {
    "pad": "/api/office/service/gesprek/neem",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19830,7 +19906,7 @@
   },
   {
    "pad": "/api/office/service/gesprek/signaal",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19838,15 +19914,15 @@
   },
   {
    "pad": "/api/office/service/gesprekken",
-   "rol": "office",
-   "herhaling": "ongemeten",
+   "rol": "kantoor-op-naam",
+   "herhaling": "beschermd",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
   },
   {
    "pad": "/api/office/service/incident/hersteld",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19854,15 +19930,15 @@
   },
   {
    "pad": "/api/office/service/kanalen",
-   "rol": "office",
-   "herhaling": "ongemeten",
+   "rol": "kantoor-op-naam",
+   "herhaling": "beschermd",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
   },
   {
    "pad": "/api/office/service/koppel",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19870,15 +19946,15 @@
   },
   {
    "pad": "/api/office/service/kwaliteit",
-   "rol": "office",
-   "herhaling": "ongemeten",
+   "rol": "kantoor-op-naam",
+   "herhaling": "beschermd",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
   },
   {
    "pad": "/api/office/service/machtiging/intrek",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19886,7 +19962,7 @@
   },
   {
    "pad": "/api/office/service/machtiging/tekenbij",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19894,23 +19970,23 @@
   },
   {
    "pad": "/api/office/service/machtigingen",
-   "rol": "office",
-   "herhaling": "ongemeten",
+   "rol": "kantoor-op-naam",
+   "herhaling": "beschermd",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
   },
   {
    "pad": "/api/office/service/patronen",
-   "rol": "office",
-   "herhaling": "ongemeten",
+   "rol": "kantoor-op-naam",
+   "herhaling": "beschermd",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
   },
   {
    "pad": "/api/office/service/stand",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19918,15 +19994,15 @@
   },
   {
    "pad": "/api/office/service/wachtrij",
-   "rol": "office",
-   "herhaling": "ongemeten",
+   "rol": "kantoor-op-naam",
+   "herhaling": "beschermd",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
   },
   {
    "pad": "/api/office/service/weeg",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -19934,7 +20010,7 @@
   },
   {
    "pad": "/api/office/service/zaak",
-   "rol": "office",
+   "rol": "kantoor-op-naam",
    "herhaling": "ongemeten",
    "bewijs": "ONBEPAALD",
    "bewijsReden": "deze route staat niet in het vervalregister",
@@ -24321,6 +24397,14 @@
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 9 schakel(s) nooit gemeten (ACL, INPUT, STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE, ROLLBACK, PRIVACY)",
    "herstel": "vermoed",
    "herstelTegenhanger": "/api/rtf/kantoorpakket/maak",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/rtf/knelpunt",
+   "rol": "",
+   "herhaling": "ongemeten",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
   },
   {
@@ -29410,6 +29494,14 @@
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 3 schakel(s) nooit gemeten (OUTPUT, FAILURE, ROLLBACK)",
    "herstel": "bevestigd",
    "herstelTegenhanger": "/api/supplier/activiteit/open",
+   "bereik": "verboden"
+  },
+  {
+   "pad": "/api/supplier/activity",
+   "rol": "supplier",
+   "herhaling": "beschermd",
+   "bewijs": "ONBEPAALD",
+   "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
   },
   {
@@ -34589,7 +34681,7 @@
   {
    "pad": "/api/supplier/pay/uitbetaal",
    "rol": "supplier",
-   "herhaling": "beschermd",
+   "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": {

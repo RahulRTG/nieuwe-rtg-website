@@ -79,6 +79,13 @@ const EIGENAAR = {
   'NORM.json': { schrijver: 'scripts/norm.js',
     waarom: 'de ratel is gedeeld bezit: elke meter schrijft zijn eigen getal erin (dekking, samenhang, ' +
       'schermen, wetten). norm.js is de eigenaar van de VORM, niet van elke waarde.' },
+
+  /* DE ONDERNEMERSLUS. Hij staat hier omdat toets 4 dat zo bedoelt: het aantal
+     registers zonder eigenaar hoort te dalen doordat er eigenaren bijkomen, en
+     niet te stijgen doordat er registers bijkomen. Een nieuw register zonder
+     regel hier zou die vloer optillen, en dat is precies de beweging die de
+     ratel moet tegenhouden -- ook (juist) als het je eigen register is. */
+  'ONDERNEMERSLUS.json': { schrijver: 'scripts/ondernemerslus.js' },
 };
 
 /* MEETING: welk script schrijft aantoonbaar naar een wortelregister? Ondergrens,

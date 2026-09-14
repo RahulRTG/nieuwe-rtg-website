@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T20:04:04.470Z",
-    "commit": "23751107",
+    "op": "2026-09-14T09:02:24.072Z",
+    "commit": "8d784199",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/doelgroepbereik.js",
@@ -5492,20 +5492,20 @@
       "routes": 8,
       "openRoute": {
         "methode": "POST",
-        "pad": "/api/mediaos/bewaar",
+        "pad": "/api/mediaos/aanwezig",
         "bewakers": [
           "auth"
         ],
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/mediaos.js",
-        "regel": 57,
+        "regel": 167,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
-      "open": "POST /api/mediaos/bewaar",
+      "open": "POST /api/mediaos/aanwezig",
       "uitslag": "waar"
     },
     {
@@ -5516,20 +5516,20 @@
       "routes": 8,
       "openRoute": {
         "methode": "POST",
-        "pad": "/api/mediaos/bewaar",
+        "pad": "/api/mediaos/aanwezig",
         "bewakers": [
           "auth"
         ],
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/mediaos.js",
-        "regel": 57,
+        "regel": 167,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
-      "open": "POST /api/mediaos/bewaar",
+      "open": "POST /api/mediaos/aanwezig",
       "uitslag": "waar"
     },
     {
@@ -5540,20 +5540,20 @@
       "routes": 8,
       "openRoute": {
         "methode": "POST",
-        "pad": "/api/mediaos/bewaar",
+        "pad": "/api/mediaos/aanwezig",
         "bewakers": [
           "auth"
         ],
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/mediaos.js",
-        "regel": 57,
+        "regel": 167,
         "samengesteld": false,
         "rauw": ", auth, (req, res) => {"
       },
       "beproefd": 1,
       "onbepaaldeRoutes": 0,
-      "open": "POST /api/mediaos/bewaar",
+      "open": "POST /api/mediaos/aanwezig",
       "uitslag": "waar"
     },
     {
@@ -8907,7 +8907,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 103,
+        "regel": 105,
         "samengesteld": false,
         "rauw": ", auth, beantwoord);"
       },
@@ -8931,7 +8931,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 103,
+        "regel": 105,
         "samengesteld": false,
         "rauw": ", auth, beantwoord);"
       },
@@ -8955,7 +8955,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 103,
+        "regel": 105,
         "samengesteld": false,
         "rauw": ", auth, beantwoord);"
       },
@@ -8979,7 +8979,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 103,
+        "regel": 105,
         "samengesteld": false,
         "rauw": ", auth, beantwoord);"
       },
@@ -9033,7 +9033,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 138,
+        "regel": 140,
         "samengesteld": false,
         "rauw": ", (req, res) => {"
       },
@@ -12897,7 +12897,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 71,
+        "regel": 108,
         "samengesteld": false,
         "rauw": ", auth, doeHandler('member'));"
       },
@@ -12921,7 +12921,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 71,
+        "regel": 108,
         "samengesteld": false,
         "rauw": ", auth, doeHandler('member'));"
       },
@@ -12945,7 +12945,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 71,
+        "regel": 108,
         "samengesteld": false,
         "rauw": ", auth, doeHandler('member'));"
       },
@@ -12969,7 +12969,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 71,
+        "regel": 108,
         "samengesteld": false,
         "rauw": ", auth, doeHandler('member'));"
       },
@@ -12993,7 +12993,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 75,
+        "regel": 112,
         "samengesteld": false,
         "rauw": ", supplierAuth, doeHandler('staff'));"
       },
@@ -13017,7 +13017,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/stuur.js",
-        "regel": 75,
+        "regel": 112,
         "samengesteld": false,
         "rauw": ", supplierAuth, doeHandler('staff'));"
       },
@@ -14405,61 +14405,34 @@
       "functie": "dom-lucht",
       "naam": "Luchtvaart en luchthaven",
       "doelgroep": "rtg",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 20,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 20 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-lucht",
       "naam": "Luchtvaart en luchthaven",
       "doelgroep": "lifestyle",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 20,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 20 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-lucht",
       "naam": "Luchtvaart en luchthaven",
       "doelgroep": "business",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 20,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 20 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-lucht",
@@ -14476,7 +14449,7 @@
       "functie": "dom-lucht",
       "naam": "Luchtvaart en luchthaven",
       "doelgroep": "leverancier",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 8,
@@ -14488,7 +14461,7 @@
       "functie": "dom-lucht",
       "naam": "Luchtvaart en luchthaven",
       "doelgroep": "personeel",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 8,
@@ -15651,61 +15624,34 @@
       "functie": "dom-sport",
       "naam": "Sport",
       "doelgroep": "rtg",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 22,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 22 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-sport",
       "naam": "Sport",
       "doelgroep": "lifestyle",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 22,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 22 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-sport",
       "naam": "Sport",
       "doelgroep": "business",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 22,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 22 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-sport",
@@ -15722,7 +15668,7 @@
       "functie": "dom-sport",
       "naam": "Sport",
       "doelgroep": "leverancier",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 8,
@@ -15734,7 +15680,7 @@
       "functie": "dom-sport",
       "naam": "Sport",
       "doelgroep": "personeel",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 8,
@@ -15746,7 +15692,7 @@
       "functie": "dom-sport",
       "naam": "Sport",
       "doelgroep": "foundation",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
@@ -16379,21 +16325,12 @@
       "functie": "dom-werkvloer",
       "naam": "De werkvloer",
       "doelgroep": "business",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 17,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 17 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-werkvloer",
@@ -16470,21 +16407,12 @@
       "functie": "dom-werkvloer",
       "naam": "De werkvloer",
       "doelgroep": "intern",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 17,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 17 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-werkplek",
@@ -19502,81 +19430,45 @@
       "functie": "dom-appstore-uitgever",
       "naam": "App Store: inzenden door uitgevers",
       "doelgroep": "rtg",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 10,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-appstore-uitgever",
       "naam": "App Store: inzenden door uitgevers",
       "doelgroep": "lifestyle",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 10,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-appstore-uitgever",
       "naam": "App Store: inzenden door uitgevers",
       "doelgroep": "business",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 10,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-appstore-uitgever",
       "naam": "App Store: inzenden door uitgevers",
       "doelgroep": "gast",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 10,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-appstore-uitgever",
@@ -19630,7 +19522,7 @@
       "functie": "dom-appstore-uitgever",
       "naam": "App Store: inzenden door uitgevers",
       "doelgroep": "foundation",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
@@ -21152,61 +21044,34 @@
       "functie": "dom-kmar",
       "naam": "Grensdiensten (KMar)",
       "doelgroep": "rtg",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 8,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 8 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-kmar",
       "naam": "Grensdiensten (KMar)",
       "doelgroep": "lifestyle",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 8,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 8 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-kmar",
       "naam": "Grensdiensten (KMar)",
       "doelgroep": "business",
-      "verklaard": true,
+      "verklaard": false,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 8,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 8 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
+      "uitslag": "correct-afgesloten"
     },
     {
       "functie": "dom-kmar",
@@ -21223,7 +21088,7 @@
       "functie": "dom-kmar",
       "naam": "Grensdiensten (KMar)",
       "doelgroep": "leverancier",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 8,
@@ -21235,7 +21100,7 @@
       "functie": "dom-kmar",
       "naam": "Grensdiensten (KMar)",
       "doelgroep": "personeel",
-      "verklaard": false,
+      "verklaard": true,
       "routes": 8,
       "beproefd": 8,
       "onbepaaldeRoutes": 8,
@@ -24392,7 +24257,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1420,
+        "regel": 1423,
         "samengesteld": false,
         "rauw": ", (req, res) => {"
       },
@@ -25801,7 +25666,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1502,
+        "regel": 1505,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {"
       },
@@ -25826,7 +25691,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1502,
+        "regel": 1505,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {"
       },
@@ -25851,7 +25716,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1502,
+        "regel": 1505,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {"
       },
@@ -25876,7 +25741,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/server.js",
-        "regel": 1502,
+        "regel": 1505,
         "samengesteld": false,
         "rauw": ", uiVertaalPerIp, uiVertaalGlobaal, async (req, res) => {"
       },
@@ -31743,15 +31608,15 @@
   "telling": {
     "cellen": 1736,
     "waar": 579,
-    "correct-afgesloten": 166,
-    "registerleugen": 33,
+    "correct-afgesloten": 181,
+    "registerleugen": 18,
     "bereikbaar-zonder-verklaring": 132,
     "geen-deur": 133,
     "onbepaald": 689,
     "niet-beproefd": 4,
     "sessie-ontbreekt": 0
   },
-  "routesGezien": 5011,
+  "routesGezien": 5022,
   "leugens": [
     {
       "functie": "social",
@@ -31968,306 +31833,6 @@
       },
       "triage": "gemengde-deuren",
       "triageReden": "14 routes met geen roldeur(en) en 14 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
-    },
-    {
-      "functie": "dom-lucht",
-      "naam": "Luchtvaart en luchthaven",
-      "doelgroep": "rtg",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 20,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 20 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
-    },
-    {
-      "functie": "dom-lucht",
-      "naam": "Luchtvaart en luchthaven",
-      "doelgroep": "lifestyle",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 20,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 20 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
-    },
-    {
-      "functie": "dom-lucht",
-      "naam": "Luchtvaart en luchthaven",
-      "doelgroep": "business",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 20,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 20 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
-    },
-    {
-      "functie": "dom-sport",
-      "naam": "Sport",
-      "doelgroep": "rtg",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 22,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 22 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
-    },
-    {
-      "functie": "dom-sport",
-      "naam": "Sport",
-      "doelgroep": "lifestyle",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 22,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 22 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
-    },
-    {
-      "functie": "dom-sport",
-      "naam": "Sport",
-      "doelgroep": "business",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 22,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 22 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
-    },
-    {
-      "functie": "dom-werkvloer",
-      "naam": "De werkvloer",
-      "doelgroep": "business",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 17,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 17 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
-    },
-    {
-      "functie": "dom-werkvloer",
-      "naam": "De werkvloer",
-      "doelgroep": "intern",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 17,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 17 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
-    },
-    {
-      "functie": "dom-appstore-uitgever",
-      "naam": "App Store: inzenden door uitgevers",
-      "doelgroep": "rtg",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 10,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
-    },
-    {
-      "functie": "dom-appstore-uitgever",
-      "naam": "App Store: inzenden door uitgevers",
-      "doelgroep": "lifestyle",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 10,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
-    },
-    {
-      "functie": "dom-appstore-uitgever",
-      "naam": "App Store: inzenden door uitgevers",
-      "doelgroep": "business",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 10,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
-    },
-    {
-      "functie": "dom-appstore-uitgever",
-      "naam": "App Store: inzenden door uitgevers",
-      "doelgroep": "gast",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 10,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
-    },
-    {
-      "functie": "dom-kmar",
-      "naam": "Grensdiensten (KMar)",
-      "doelgroep": "rtg",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 8,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 8 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
-    },
-    {
-      "functie": "dom-kmar",
-      "naam": "Grensdiensten (KMar)",
-      "doelgroep": "lifestyle",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 8,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 8 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
-    },
-    {
-      "functie": "dom-kmar",
-      "naam": "Grensdiensten (KMar)",
-      "doelgroep": "business",
-      "verklaard": true,
-      "routes": 8,
-      "beproefd": 8,
-      "onbepaaldeRoutes": 0,
-      "open": null,
-      "uitslag": "registerleugen",
-      "deuren": {
-        "routes": 8,
-        "zonderRoldeur": 0,
-        "rollen": [
-          "leverancier"
-        ]
-      },
-      "triage": "deur-van-een-andere-rol",
-      "triageReden": "alle 8 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "tg-sso",
@@ -33494,7 +33059,7 @@
         "bewakersBekend": true,
         "viaRouter": false,
         "bestand": "server/routes/knelpunt.js",
-        "regel": 103,
+        "regel": 105,
         "samengesteld": false,
         "rauw": ", auth, beantwoord);"
       },

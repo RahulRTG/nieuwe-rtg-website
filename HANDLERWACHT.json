@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-14T07:35:15.595Z",
-  "commit": "7edf385b",
+  "op": "2026-09-14T07:47:02.063Z",
+  "commit": "f7c07d67",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 2,
   "instrument": "scripts/handlerwacht.js",
   "node": "v22.22.2"
  },
@@ -3258,7 +3258,7 @@
   },
   {
    "sleutel": "POST /api/rtf/knelpunt",
-   "bestand": "server/routes/knelpunt.js:167",
+   "bestand": "server/routes/knelpunt.js:135",
    "staat": "bewaakt",
    "wacht": "rtf.verifieerProfiel"
   },

@@ -216,7 +216,15 @@ test('NEGATIEF: een mislukte claim registreert geen ronde', (t) => {
   const kindPad = op.pidBestand(path.join(w.map, 'kind.pid'));
 
   const eerste = op.start(['-e', RONDE, path.join(WORTEL, 'scripts/afbouw-slot.js'), kindPad], w.env());
-  assert.ok(wachtOp(() => fs.existsSync(w.afloop)), 'de eerste ronde draait');
+  /* WACHT OP BEIDE BESTANDEN, en niet alleen op de afloop. RONDE schrijft ze in
+     deze volgorde: pak() zet de afloop neer, daarna wordt het kleinkind gestart
+     en pas dan zijn pid. Wie alleen op de afloop wacht, leest hieronder een
+     kind.pid dat er nog niet hoeft te zijn -- onder belasting (vier scherven
+     naast elkaar in CI) zakte deze toets daarop met ENOENT, en dat leest als
+     een flake terwijl het een wacht op het verkeerde bestand is. De eerste
+     toets hierboven doet het al goed; deze liet de helft van de voorwaarde weg. */
+  assert.ok(wachtOp(() => fs.existsSync(kindPad) && fs.existsSync(w.afloop)),
+    'de eerste ronde draait, en zijn kind heeft zijn pid geschreven');
   const A = laadAfloop(w.afloop);
   const vanEerste = leesRauw(w.afloop);
   const kind = op.volg(Number(fs.readFileSync(kindPad, 'utf8')));

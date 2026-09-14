@@ -34,7 +34,7 @@
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
     "keuringOmvang": 327,
-    "keuringScheef": 16,
+    "keuringScheef": 17,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
     "laatSpoorVerdacht": 3,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1668,
-    "toetsenNietGemeten": 619,
+    "toetsenNietGemeten": 622,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -2351,6 +2351,26 @@
       "meter": "toetsenNietGemeten 618 -> 619",
       "reden": "test/namensvorm.test.js komt erbij -- zes toetsen op scripts/namensvorm.js (REPRESENTATIE.md par. 0) -- en staat nog niet in MUTATIES.json. Alle zes zijn met de hand gemuteerd en de dragende drie zagen zakken: `async` uit het naampatroon halen laat toets 2, 3 en 6 zakken, en alle zeven synoniemen op /./ zetten breekt toets 4. Die mutatie is niet academisch maar de fout die hier ECHT is gemaakt: zonder `async` meldde de meter dat kern/vertegenwoordiging/ geen verlenen, aanvaarden en intrekken heeft terwijl die drie er als async function staan -- een geldige uitslag van het verkeerde experiment (BEWIJSMACHINE.md par. 6a).",
       "waarheen": "Laat scripts/mutatie.js over test/namensvorm.test.js lopen, samen met railvergelijk, menselijkeuitvoering, mensmutatie, stuurspoor, stuurrail, menstaal en stuurplafond uit de notities hierboven."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "keuringScheef",
+      "van": 16,
+      "vervalt": "2026-12-15",
+      "meter": "keuringScheef 16 -> 17",
+      "reden": "server/kern/namens/versmalling.js wordt nog nergens aangeroepen, en de keuring merkt dat terecht op. Dit is de eerste helft van stap 1 uit REPRESENTATIE.md par. 6: de invariant (REP-03, effectief = gevraagd doorsnede geverEffectief doorsnede beleid doorsnede context) staat er en is met 500 gegenereerde invoeren beproefd, maar de zes mechanismen lopen er nog niet doorheen -- dat is echte gedragswijziging op onder meer SEPA-mandaten en app-rechten en hoort een eigen ronde te zijn. Dit huis kent die tussenstand met naam: INTELLIGENTIE.md noteert dat kern/stuur/mandaat.js nul productie-aanroepers heeft, om precies dezelfde reden.",
+      "waarheen": "De bedradingsronde: laat kern/appstore (winkel.js verleen) en kern/fiscaal/gateway/mandaat.js (verleen) de doorsnede aanroepen met een echte geverEffectief. Dat sluit tegelijk twee van de drie openstaande versmallen-posten uit kern/namens/verklaring.js."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 619,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 619 -> 622",
+      "reden": "Drie toetsbestanden komen erbij (namensversmalling, namensverklaring, namensprojectie: 24 toetsen samen) en staan nog niet in MUTATIES.json. Alle drie zijn met de hand gemuteerd en zagen zakken: de doorsnede tot een optelsom maken laat 6 van de 8 versmallingstoetsen zakken; een ontbrekende bron als ALLES lezen laat toets 3 en 4 zakken; purpose stil invullen laat toets 4 en 5 van de projectie zakken; de codenaamzeef nabouwen in plaats van hergebruiken laat toets 3 en 9 zakken; en een verklaring op voert zetten zonder opmerking laat toets 4 van de verklaring zakken.",
+      "waarheen": "Laat scripts/mutatie.js over de drie namens-toetsbestanden lopen, samen met namensvorm en de overige bestanden uit de notities hierboven."
     }
   ],
   "prestatie": {
@@ -2379,7 +2399,7 @@
     "toetsenOngevoeligPct": "2026-09-05",
     "endpointsZonderTest": "2026-09-13",
     "dekkingPct": "2026-09-06",
-    "keuringScheef": "2026-09-05",
+    "keuringScheef": "2026-09-14",
     "keuringTeGroot": "2026-09-05",
     "keuringDubbeling": "2026-09-07",
     "keuringDekkingAdvies": "2026-09-06",

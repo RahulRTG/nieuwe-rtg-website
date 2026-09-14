@@ -225,7 +225,7 @@ motor bouwt naast een bestaande zonder het te merken.
 | `obligation` | **bezet-samengesteld** | `obligationId`, `obligationIds`, `obligationPayId` in de economic runtime |
 | `opportunity` | **bezet-samengesteld**, zwak | alleen `opportunityCost` — een economische term, andere betekenis |
 | `hoedanigheid` | **vrij buiten deze laag** | drie bestanden, alle drie `kern/vertegenwoordiging/` |
-| `mechanism` | **vrij** | — |
+| `mechanism` | **genomen door deze laag** op 14 september | `kern/namens/projectie.js`; hij was vrij, en dit is de laag die hem nam |
 | `saga` | **vrij** | — |
 
 Vier gevolgen die niet mogen verwateren:
@@ -237,10 +237,13 @@ Vier gevolgen die niet mogen verwateren:
    anders: een gehasht pseudoniem van een sessiesleutel. Eén woord, twee
    betekenissen, en de ene is precies wat deze laag nodig heeft. Zie par. 3.1:
    de conclusie is niet *kies een andere naam* maar *sluit aan op de bestaande*.
-2. **Van de zes velden van het voorgestelde canonieke object is `mechanism` het
-   enige dat vrij is** — en niet toevallig ook het enige dat de economic runtime
-   mist. `principalRef`, `actingRef`, `authorityRef` en `purpose` staan er al
-   onder die exacte namen.
+2. **Van de zes velden van het voorgestelde canonieke object was `mechanism`
+   het enige dat vrij was** — en niet toevallig ook het enige dat de economic
+   runtime mist. `principalRef`, `actingRef`, `authorityRef` en `purpose` staan
+   er al onder die exacte namen, en `kern/namens/projectie.js` neemt ze over in
+   plaats van er een tweede stel naast te zetten. Sinds die laag er staat is
+   `mechanism` zelf bezet, door haar. Van de 33 gemeten woorden is er nu nog
+   één vrij: `saga`.
 3. **`hoedanigheid` is vandaag alleen bezet door deze laag zelf**, en
    `kern/envelop.js` draagt wél `actor` en géén hoedanigheid. Dit is dus de
    eerste plek waar MN-02 hard te bewijzen is — maar een hoedanigheid in de
@@ -479,26 +482,76 @@ de enige regel in deze lijst met een bewezen handhaver.*
 De maatstaf is niet "wanneer heeft RTG een Representation Layer" maar: **wanneer
 kan RTG van een handeling namens een ander vooraf zeggen wat er verandert,
 achteraf bewijzen dat het gebeurd is, en hem terugdraaien als het misging.**
-Vandaag kan dat bij één van de zeven mechanismen.
 
-1. **`aanvaarden` en `spoor` bij de andere zes.** Twee werkwoorden, zes
-   mechanismen, en het is geen nieuwe laag maar bedrading. Dit is de goedkoopste
-   stap met de grootste uitwerking, en hij maakt REP-02 en REP-05 voor het eerst
-   waar buiten `kern/vertegenwoordiging/`.
-2. **Het verklaringsregister van REP-01.** Afgeleid uit de code zoals
-   `WETTEN.json`, niet met de hand bijgehouden — een register dat naast de code
-   leeft, wordt binnen een jaar zelf de botsing waar `SEMANTIEK.json` voor
-   bestaat.
+### 6.0 Wat er sinds 14 september staat: de contractlaag
+
+`server/kern/namens/` — vijf bestanden, **geen opslag, geen routes, geen
+sessie**. Alle drie de onderdelen zijn puur, en dat is met opzet: zo verandert
+er vandaag niets aan gedrag, en is elk besluit te beproeven zonder een server
+op te starten (de vorm van `kern/economie/firewall.js` en
+`kern/rugdekking/soorten.js`).
+
+**`versmalling.js` — REP-03 als machinewet.** `effectief = gevraagd ∩
+geverEffectief ∩ beleid ∩ context`, met `overtreding()` als controleerbare
+bewering die in de BRON woont en niet in de toets. Een gegenereerde proef laat
+500 willekeurige invoeren langs die wet lopen; privilege-amplification kan
+structureel niet ontstaan, want een doorsnede voegt niets toe. Drie dingen liggen
+daar vast: **leeg is dicht**, **`null` is iets anders dan `[]`** (onbekend is
+geen weigering — `CONTROLPLANE.md`), en een bron van het verkeerde type is
+**stuk** en niet leeg, zodat een typefout in een aanroeper niet leest als "deze
+gever mag niets".
+
+**`verklaring.js` + twee lijsthelften — REP-01 en REP-02.** Per mechanisme per
+werkwoord één van drie standen, en de middelste is de hele reden dat het
+bestaat: `voert` (met `waar`), **`nietVanToepassing` (met een GROND)**, of
+`ontbreekt` (met `wat`). Zonder die middelste stand is elk ontbrekend werkwoord
+een gebrek, en dan wordt een register dat vol schuld staat binnen een maand
+genegeerd. Een `aanvaarden` op `voert` beantwoordt bovendien zeven vragen — wie
+geeft, wie ontvangt, wie aanvaardt, welke versie, wanneer, welk bewijs, en wat
+er bij intrekking met het verleden gebeurt.
+
+**`projectie.js` — de gedeelde taal.** Zes velden, waarvan er vijf letterlijk
+uit `kern/economie/runtime/intent.js` komen. De codenaamzeef is `keurActor` uit
+`kern/envelop.js`, hergebruikt en niet nagebouwd, en `purpose` wordt geëist en
+nooit geraden.
+
+Wat de standen vandaag zeggen: `aanvaarden` staat **nergens meer op
+`ontbreekt`** — waar het niet gevoerd wordt, is dat nu een uitgeschreven grond.
+Open staan er acht posten: **`versmallen`** bij app-, fiscaal- en
+sepa-machtiging, **`spoor`** bij ai-, fiscaal- en sepa-mandaat, en `verlenen` +
+`intrekken` bij het ai-mandaat.
+
+**Eén correctie op een eerdere versie van deze paragraaf.** Daar stond dat het
+verklaringsregister *afgeleid* moest worden uit de code, "zoals `WETTEN.json`".
+Dat is onjuist en het is belangrijk genoeg om niet stil te herschrijven: een
+GROND waarom aanvaarding ergens niet hoort — "de gever en de aanvaarder zijn
+dezelfde mens", "dit huis heeft geen incassorail" — is een menselijk oordeel dat
+geen parser kan afleiden. Het register is daarom een VERKLARING, en
+`scripts/namensvorm.js` de METING ernaast. `test/namensverklaring.test.js` legt
+ze naast elkaar en eist **niet** dat ze het eens zijn: hij eist dat elke
+afwijking is opgeschreven. Zou hij gelijkheid eisen, dan is er maar één uitweg —
+de verklaring uit de meting genereren — en dan vergelijkt hij zichzelf. Dat is
+de vorm van `EIGENAAR` naast `detecteer()` in
+`scripts/lib/registereigenaar.js`, niet die van `WETTEN.json`.
+
+### 6.2 Wat er nu open staat
+
+1. **`aanvaarden` en `spoor` BEDRADEN bij de zes.** De contractlaag zegt nu wie
+   wat voert; wat er nog niet is, is dat de mechanismen er doorheen lopen. Dit
+   is echte gedragswijziging op onder meer SEPA-mandaten en app-rechten, en
+   hoort daarom een eigen ronde te zijn.
+2. **`versmallen` bij `app-machtiging` en `fiscaal-mandaat`.** Twee van de drie
+   openstaande `versmallen`-posten, en REP-03 is de regel waar het hele voorstel
+   op leunt. De invariant staat er nu; wat ontbreekt is dat die twee hem
+   aanroepen met een echte `geverEffectief`.
 3. **De conflict-of-interest engine (punt 37).** Het enige onderdeel zonder
    concurrent, en het enige dat een managementbureau écht onderscheidt van een
    adresboek. Let op de vorm: hij mag DETECTEREN en melden, en `BLOCK` is een
    besluit van de cliënt en niet van RTG.
-4. **`versmallen` bij `app-machtiging` en `fiscaal-mandaat`.** REP-03 is de regel
-   waar het hele voorstel op leunt en hij staat op 2 van de 7.
-5. **Pas daarna de cockpit (punt 28–31).** Een bord boven een laag waarvan zes
-   van de zeven mechanismen geen aantoonbaar spoor hebben, toont een macht die
-   het systeem niet kan bewijzen. Dat is dezelfde reden waarom `EXECUTIE.md` blok
-   7 en 9 bewust half zijn gebleven.
+4. **Pas daarna de cockpit (punt 28–31).** Een bord boven een laag waarvan drie
+   mechanismen geen aantoonbaar spoor hebben, toont een macht die het systeem
+   niet kan bewijzen. Dat is dezelfde reden waarom `EXECUTIE.md` blok 7 en 9
+   bewust half zijn gebleven.
 
 ### 6.1 Twee besluiten die vóór de bouw liggen
 

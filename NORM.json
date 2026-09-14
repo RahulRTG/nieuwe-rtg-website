@@ -90,8 +90,8 @@
     "bevestigGebreken": 0,
     "verwijzingGebreken": 0,
     "mensmutatieZonderWacht": 1,
-    "gevolgPadenOnbekend": 92,
-    "gevolgContractVolledig": 6,
+    "gevolgPadenOnbekend": 96,
+    "gevolgContractVolledig": 8,
     "gevolgContractenGezakt": 0,
     "crashasOnbekend": 89,
     "crashasNietMeetbaar": 0,
@@ -2307,9 +2307,9 @@
       "sleutel": "gevolgPadenOnbekend",
       "van": 87,
       "vervalt": "2026-12-15",
-      "meter": "gevolgPadenOnbekend 87 -> 92",
-      "reden": "De bijgewerkte gevolgtoerekenings-PR voegt routes en gevolgcontracten toe. Na samenvoeging over de volledige boom blijven vijf extra bereikbare handelingen zonder gemeten gevolg; de zes volledige contracten blijven groen en geen contractproef zakt.",
-      "waarheen": "Voor de vijf paden het werkelijke gevolg meten en vastleggen, zodat zij uit de onbekende post verdwijnen."
+      "meter": "gevolgPadenOnbekend 87 -> 96",
+      "reden": "De bijgewerkte gevolgtoerekenings-PR voegt routes en gevolgcontracten toe. Na hermeting over de volledige schone boom blijven negen extra bereikbare handelingen zonder gemeten gevolg; tegelijk stijgt het aantal geldige volledige contracten van zes naar acht en geen contractproef zakt.",
+      "waarheen": "Voor de negen paden het werkelijke gevolg meten en vastleggen, zodat zij uit de onbekende post verdwijnen."
     }
   ],
   "prestatie": {
@@ -2390,7 +2390,7 @@
     "verwijzingGebreken": "2026-09-12",
     "mensmutatieZonderWacht": "2026-09-12",
     "gevolgPadenOnbekend": "2026-09-14",
-    "gevolgContractVolledig": "2026-09-13",
+    "gevolgContractVolledig": "2026-09-14",
     "gevolgContractenGezakt": "2026-09-13",
     "crashasOnbekend": "2026-09-13",
     "crashasNietMeetbaar": "2026-09-13",

@@ -30,7 +30,13 @@
    MUTATIES die zijn gedraaid en welke toets erop zakte (LAT.md regel 2):
    - `bankSaldi` uit effectcollecties.js halen        -> 1 ZAKT (RAAK).
    - de twee bronnen laten rangschikken in plaats van
-     optellen (verklaard wint, afgeleid valt weg)     -> 2 ZAKT (RAAK).
+     optellen, verklaard wint                         -> 1 en 2 ZAKKEN (RAAK).
+   - hetzelfde de andere kant op, afgeleid wint       -> 2 ZAKT (RAAK). Allebei
+     de richtingen zijn gedraaid, want een toets die maar een van tweeen vangt,
+     laat de helft van de rangorde door.
+   - wel optellen maar `bronnen` er een laten noemen  -> 1 en 2 ZAKKEN (RAAK).
+     Dit is de stille variant: de effecten kloppen en het ETIKET liegt, zodat
+     een mens de optelling niet meer kan natrekken.
    - `effecten: []` teruggeven bij een onbekend pad   -> 3 ZAKT (RAAK).
    - het vermoeden boven de afleiding zetten          -> 1, 2 en 4 ZAKKEN. De
      bewering zit in 4; dat 1 en 2 meezakken is geen te grove mutatie maar het
@@ -76,19 +82,68 @@ test('1. een gemeten schrijfactie in een ingedeelde collectie levert een effect 
 });
 
 test('2. de twee bronnen worden opgeteld en niet gerangschikt', () => {
-  /* /api/member/ai/tegoed is het geval waaruit dit besluit komt: de VERKLARING
-     ziet aan de naam dat er een model wordt aangeroepen, de PROEF ziet in de
-     collectie dat er tegoed beweegt. Wie de een de ander laat overschrijven,
-     gooit telkens een van beide effecten weg. */
-  const pad = '/api/member/ai/tegoed';
-  const prof = effecten.effectenVan(pad, 'POST', functies.functieVoorPad(pad));
-  assert.deepEqual((prof.bronnen || []).slice().sort(), ['afgeleid', 'verklaard'],
-    'allebei de bronnen horen mee te doen');
-  assert.ok(prof.effecten.includes('UITGAANDE_AANROEP'), 'de verklaring hoort mee te tellen');
-  assert.ok(prof.effecten.includes('GELD_BEWEGEN'), 'de meting hoort mee te tellen');
+  /* WAAR HET BESLUIT VANDAAN KOMT is /api/member/ai/tegoed: de VERKLARING ziet
+     aan de naam dat er een model wordt aangeroepen, de PROEF zag in de collectie
+     dat er tegoed beweegt. Wie de een de ander laat overschrijven, gooit telkens
+     een van beide effecten weg.
+
+     WAAROM DE TOETS DAT PAD NIET MEER VASTPINT, en dat is geen verzwakking.
+     Of de proef die schrijfactie ZIET, hangt af van de volgorde van de ronde:
+     rijVan() in kern/commercie/tegoed.js maakt de tegoedrij aan zodra hij
+     ontbreekt, dus een eerdere route die hem al aanmaakte laat deze meting leeg.
+     IDEMPROEF.json droeg op de tak van deze laag `aiTegoed` voor dit pad en op
+     main (hermeten op 2f5780040) niets -- allebei correct gemeten, en alleen de
+     samenvoeging ziet het verschil. Een toets die op zo'n rij staat vastgepind,
+     meet de volgorde van de proefronde en niet de regel.
+
+     De regel gaat over de POPULATIE, dus die wordt hier GETELD in plaats van
+     aangenomen: er hoort minstens een pad te zijn waar allebei de bronnen
+     spreken en waar ze elkaar AANVULLEN. De telling wordt met opzet niet
+     vastgelegd op een getal -- hij beweegt met elke proefronde mee, en een
+     vastgelegd getal zou van deze toets een versheidswachter maken die hij niet
+     is. Wat er niet mag gebeuren is dat hij op NUL komt. */
+  const paden = [...new Set(Object.values(require('../IDEMPROEF.json').perRoute).map(r => r.pad))];
+  const metingVan = (p) => {
+    const uit = new Set();
+    for (const col of proefmeting.collectiesVan(p) || []) {
+      const rij = effectcollecties.effectVan(col);
+      if (rij) uit.add(rij.effect);
+    }
+    return uit;
+  };
+
+  const beide = [];
+  const aanvullend = [];
+  for (const p of paden.slice().sort()) {
+    const prof = effecten.effectenVan(p, 'POST', functies.functieVoorPad(p));
+    if ((prof.bronnen || []).length < 2) continue;
+    beide.push(p);
+    const meting = metingVan(p);
+    const buitenDeMeting = (prof.effecten || []).filter(e => !meting.has(e));
+    if (meting.size && buitenDeMeting.length) aanvullend.push({ pad: p, prof, meting });
+  }
+
+  assert.ok(beide.length,
+    'geen enkel pad waar allebei de bronnen spreken -- dan is de optelling niet te zien');
+  assert.ok(aanvullend.length,
+    'geen enkel pad waar de twee bronnen elkaar AANVULLEN. Dat is precies wat een ' +
+    'rangorde oplevert: de verliezer valt weg, en dan is er nooit meer iets buiten ' +
+    'de winnaar te zien (' + beide.length + ' paden met twee bronnen)');
+
+  /* En dan het getuigenpad zelf, het eerste op alfabet zodat de uitslag niet van
+     de volgorde van het register afhangt. */
+  const g = aanvullend[0];
+  assert.deepEqual((g.prof.bronnen || []).slice().sort(), ['afgeleid', 'verklaard'],
+    g.pad + ': allebei de bronnen horen mee te doen');
+  for (const e of g.meting) {
+    assert.ok(g.prof.effecten.includes(e),
+      g.pad + ': de meting zag ' + e + ' en dat hoort mee te tellen');
+  }
+  assert.ok(g.prof.effecten.some(e => !g.meting.has(e)),
+    g.pad + ': de verklaring draagt een effect dat de meting niet ziet, en dat hoort mee te tellen');
   /* En de gronden van allebei staan in het antwoord, zodat een mens de optelling
      kan natrekken in plaats van hem te moeten geloven. */
-  assert.ok(prof.gronden.length >= 2);
+  assert.ok(g.prof.gronden.length >= 2);
 });
 
 test('3. geen enkel pad krijgt een lege lijst terug', () => {

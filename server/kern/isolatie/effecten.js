@@ -95,13 +95,22 @@ function effectenVan(pad, methode, functie) {
   }
 
   /* DE TWEE WORDEN OPGETELD EN NIET GERANGSCHIKT, en dat is een besluit uit een
-     meting. Over de 31 paden waar allebei de bronnen iets zeggen, overlapten er
-     26 en waren er 5 zonder overlap -- maar die vijf spreken elkaar NIET tegen,
-     ze vullen elkaar aan: /api/member/ai/tegoed roept een model aan (dat ziet de
-     verklaring aan zijn naam) EN beweegt tegoed (dat ziet de proef in de
-     collectie). Wie hier de een de ander laat overschrijven, gooit telkens een
-     van beide effecten weg -- en bij een beveiligingslaag is dat de helft die je
-     net nodig had.
+     meting. Over de 29 paden waar allebei de bronnen iets zeggen, overlapten er
+     21 en vulden er 8 elkaar AAN -- en die acht spreken elkaar niet tegen:
+     /api/member/rtmail/export voert veel gegevens tegelijk uit (dat leest de
+     verklaring aan zijn naam) EN verzet een postbusrecht (dat ziet de proef in
+     de collectie rtmailRecht). Wie hier de een de ander laat overschrijven,
+     gooit telkens een van beide effecten weg -- en bij een beveiligingslaag is
+     dat de helft die je net nodig had.
+
+     HET GEVAL WAARUIT DIT BESLUIT KWAM WAS /api/member/ai/tegoed, en dat pad
+     staat er vandaag NIET meer bij. Niet omdat de regel veranderde maar omdat
+     de proefronde hem niet meer ziet: rijVan() in kern/commercie/tegoed.js
+     maakt de tegoedrij aan zodra hij ontbreekt, dus een eerdere route in
+     dezelfde ronde laat deze meting leeg. Op de tak van deze laag droeg
+     IDEMPROEF.json `aiTegoed` voor dat pad, op main (hermeten op 2f5780040)
+     niets -- allebei correct gemeten. De getallen hierboven horen dus bij de
+     ronde die in IDEMPROEF.json ligt en niet bij de regel.
 
      Ze zien met opzet verschillende dingen: de proef kijkt in de OPSLAG en zegt
      zelf dat zij bestanden en uitgaande aanroepen niet ziet; de verklaring leest

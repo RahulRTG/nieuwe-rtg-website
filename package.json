@@ -390,7 +390,7 @@
     "omzetproef:vast": "node scripts/omzetproef.js --vastleggen"
   },
   "devDependencies": {
-    "playwright": "^1.62.1"
+    "playwright": "^1.63.0"
   },
   "bin": {
     "rtg": "scripts/rtg.js"

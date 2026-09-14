@@ -1587,16 +1587,9 @@ const IJKINGEN = {
       (j) => { j.telling.openBekend = (j.telling.openBekend || 0) + 2; return j; },
       () => norm.meet().momentOpenBekend - voor.momentOpenBekend)
   },
-  /* DE DRIE TANDEN VAN 13 SEPTEMBER 2026: het spoor dat niet kan weigeren
-     (STILSPOOR.json, LAT.md regel 21). Drie meters op EEN register, dus elk
-     krijgt zijn EIGEN veld verstoord -- leest er een het verkeerde veld, dan
-     blijft hij staan waar hij stond en zakt deze ijking.
-
-     DE TWEE SCHULDEN GAAN IN DE PROEF OMHOOG en het BEREIK omlaag, en dat is
-     niet symmetrisch bedoeld. Bij een schuld is de vraag of de meter een
-     nieuwe smoring werkelijk ziet. Bij het bereik is de gevaarlijke richting
-     de andere: een meter die stil minder spoor-schrijvers vindt, meldt
-     dezelfde lage schuld over minder bewijs -- en dat leest als vooruitgang. */
+  /* De drie tanden van STILSPOOR.json: twee schulden omhoog en het gemeten
+     bereik omlaag. Elk veld krijgt een eigen verstoring, zodat verwisselde
+     sleutels niet toevallig dezelfde uitslag geven. */
   stilSpoor: {
     proef: (voor) => metVervangenJson('STILSPOOR.json',
       (j) => { j.gemeten.spoorGesmoord = (j.gemeten.spoorGesmoord || 0) + 5; return j; },

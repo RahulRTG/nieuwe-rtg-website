@@ -37,6 +37,43 @@ const SOORT_NAAM = {
 };
 
 function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn }) {
+  /* ---- HET MOMENTREGISTER, EN WAAROM HET ER NIET WAS ----
+
+     GEVONDEN DOOR SCHAKEL 5 VAN scripts/momentproef.js (13 september 2026).
+     `nieuwMoment` WEKTE wel en BEWAARDE niets. Een lid werd dus gewekt over een
+     optreden en kon daarna nergens terugvinden waarover -- want een melding is
+     in dit huis een WEK en geen link, en geen enkele `notify()` draagt een
+     bestemming. Dat is precies de scheiding "moment is geen notificatie" uit
+     STAGE.md par. 3, maar dan met de ene helft ontbrekend: de wek werkte, het
+     FEIT werd niet vastgelegd.
+
+     DE VORM DIE HIER GEKOZEN IS, en waarom hij geen tweede waarheid wordt.
+     STAGE.md par. 2 is streng: de BRON bepaalt DAT iets gebeurd is, Stage
+     bepaalt alleen hoe dat publieke feit in deze context wordt gepresenteerd.
+     Een register dat de bron KOPIEERT is dus verboden -- dat is exact de fout
+     die deze tak al een keer maakte, toen de aanwezigheid van een zaak de naam
+     van het festival droeg en een tweede festival de eerste hernoemde.
+
+     Daarom deze scheiding, en zij is het hele ontwerp:
+
+       WAT HIER STAAT is een GEBEURTENIS: dat op dit tijdstip deze aanwezigheid
+       dit soort heeft uitgezonden, met de tekst die er TOEN bij hoorde. Een
+       gebeurtenis is naar haar aard historisch; die tekst hoort niet mee te
+       veranderen en is dus geen kopie maar een momentopname.
+
+       WAT HIER NIET STAAT is alles wat LEEFT. De naam van de aanwezigheid wordt
+       bij het lezen opgehaald uit ./aanwezigheid.js, zodat een club die
+       hernoemt overal meteen goed staat. En er staat geen prijs, geen
+       beschikbaarheid en geen stand van de bron in -- wie dat toevoegt, bouwt de
+       tweede waarheid alsnog.
+
+     DE FEED EN DE WEK ZIJN TWEE DINGEN, en dat is met opzet. Vastleggen gebeurt
+     zodra de AANWEZIGHEID iets uitzendt; gewekt wordt alleen wie dat soort aan
+     heeft staan (`meldVan`). Dus: de feed is de tijdlijn van de aanwezigheid, de
+     wek is mijn meldingsvoorkeur. Wie ze samenvoegt, laat een lid zijn eigen
+     geschiedenis kwijtraken door een vinkje uit te zetten. */
+  const { leg, momentenVoor } = tijdlijn;
+
   /* De volgers van een maker: de vereniging van de twee gratis volgrelaties
      die de Media OS ook zet (Clips en het Theater). Een betaald podium-
      abonnement telt hier niet mee -- dat is een betaalrelatie en geen volg. */
@@ -103,7 +140,7 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn 
        uitgezonden staat los van de vraag of er iemand gewekt kon worden -- een
        moment zonder volgers is nog steeds gebeurd, en hoort in de tijdlijn te
        staan voor wie er morgen op volgen drukt. */
-    const regel = tijdlijn ? tijdlijn.leg(a.id, soort, titel) : null;
+    const regel = leg(a.id, soort, titel);
     const gewekt = [], overgeslagen = [];
     for (const volger of aanwezig.aanwezigVolgersVan(a.id)) {
       const soorten = meldVan(volger, a.naam);
@@ -123,7 +160,8 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn 
   }
 
   return { mediaNieuwWerk: nieuwWerk, mediaNieuwMoment: nieuwMoment,
-    mediaVolgersVan: volgersVan, MEDIA_SOORT_NAAM: SOORT_NAAM };
+    mediaVolgersVan: volgersVan, mediaMomentenVoor: momentenVoor,
+    MEDIA_SOORT_NAAM: SOORT_NAAM };
 }
 
 module.exports = { maakWekken, SOORT_NAAM };

@@ -34,10 +34,7 @@
 const { hangAan, verifieer, top } = require('./lib/keten');
 const { verankerPunt, verifieerTegenAnker } = require('./lib/keten-anker');
 const { nu, datum } = require('./lib/klok');
-/* DE BEWARING, LOS. Een derde naad in het ONDERWERP naast ./inzagelog-lezen.js:
-   hier wordt geschreven, daar gelezen, en in ./inzagelog-bewaring.js staat hoe
-   lang het blijft staan. `snoei` krijgt de db-laag via een functie mee en niet
-   als waarde, want zet() komt pas bij het opstarten langs. */
+/* Bewaartermijn en snoei staan los; de database komt pas via zet() binnen. */
 const { BEWAARDAGEN, MAX, maakSnoei } = require('./inzagelog-bewaring');
 const snoei = maakSnoei(() => DB);
 
@@ -134,32 +131,11 @@ function schrijfRegel({ door, over, waarom, bron, extra } = {}) {
   return r;
 }
 
-/* Meerdere accounts in één handeling (een lijstscherm dat namen toont) horen
-   als ÉÉN regel in het journaal, niet als vijftig. Anders verdrinkt het echte
-   signaal -- de gerichte opzoeking van één persoon -- in de ruis van elke
-   pagina die iemand opent. Het aantal en de id's blijven wel staan. */
-function noteerVeel(opdracht = {}) {
-  const o = veelOpdracht(opdracht);
-  return o ? noteer(o) : null;
-}
-
-/* De vorm van een meervoudige regel, los van wie hem vastlegt -- zodat
-   noteerVeel() en noteerVeelVast() nooit twee verschillende regels schrijven.
-   Dezelfde grond als schrijfRegel(): een hashketen die twee soorten regels dekt,
-   bewijst over geen van beide iets.
-
-   De drie extra velden gaan MEE in plaats van er achteraf op te worden gezet:
-   sinds de keten eronder ligt, dekt de hash de regel zoals hij wordt
-   weggeschreven. Zie de uitleg bij noteer(). */
-function veelOpdracht({ door, overIds, waarom, bron } = {}) {
-  const ids = (Array.isArray(overIds) ? overIds : []).map(String);
-  if (!ids.length) return null;
-  return { door, over: { id: ids[0] }, waarom, bron, extra: {
-    overId: null,                       // het is geen enkele persoon
-    aantal: ids.length,
-    overIds: ids.slice(0, 200)          // begrensd: een dump van 65M id's helpt niemand
-  } };
-}
+/* De MEERVOUDIGE kant staat in ./inzagelog-veel.js: een lijstscherm dat vijftig
+   namen toont is een ander onderwerp dan de gerichte opzoeking van een mens, en
+   het schrijft een andere regel. `noteer` gaat als functie mee, zodat beide
+   vormen door dezelfde schrijver gaan. */
+const { noteerVeel, veelOpdracht } = require('./inzagelog-veel')({ noteer });
 
 /* De DUURZAME kant staat in ./inzagelog-vast.js: noteerVast() en
    noteerVeelVast() doen een andere belofte over dezelfde regel -- ze komen pas
@@ -178,9 +154,7 @@ const { noteerVast, noteerVeelVast } = require('./inzagelog-vast')({
    woont. */
 const lezen = require('./inzagelog-lezen')({
   rij,
-  /* De termijn en de noodremteller gaan MEE naar de leeskant in plaats van dat
-     die ze zelf ophaalt: zo is er een plek die weet hoe lang dit huis bewaart,
-     en kan een scherm niet iets anders beweren dan de opslag doet. */
+  /* Zelfde bewaartermijn en noodrem. */
   bewaardagen: BEWAARDAGEN,
   afgekapt: () => { try { return Number(DB && DB.data && DB.data.inzageLogAfgekapt) || 0; } catch (e) { return 0; } }
 });

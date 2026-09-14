@@ -1,10 +1,10 @@
 {
   "stempel": {
-    "op": "2026-09-13T19:54:34.020Z",
-    "commit": "397ff23f",
+    "op": "2026-09-13T20:32:07.787Z",
+    "commit": "e7f7d9153",
     "boomVuil": false,
     "instrument": "scripts/gelding.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Waar geldt een wet (CLAIM), waar leeft hij (DRAAG), en waar kan een wachter hem zien (WACHT)? De drie assen worden onafhankelijk gevuld en pas daarna vergeleken; zij delen geen bron, en test/gelding.test.js houdt dat vast.",
   "graad": "vermoed",
@@ -158,17 +158,26 @@
       "paden": [
         "vertegenwoordiging",
         "rugdekking",
-        "carriereledger"
+        "carriereledger",
+        "levensband",
+        "levensbeleid",
+        "levensdossier",
+        "levensgraaf",
+        "levenslijn",
+        "socialegraaf"
       ],
       "contexten": [
-        "work"
+        "work",
+        "foundation",
+        "living"
       ]
     }
   },
   "telling": {
     "GECLAIMD_GEEN_DRAGER_GEVONDEN": 52,
     "ONBEPAALD": 4,
-    "GEDRAGEN_NIET_GEZIEN": 8
+    "GEDRAGEN_EN_GEZIEN": 4,
+    "GEDRAGEN_NIET_GEZIEN": 4
   },
   "bevinding": "Het verbreden van de DRAAG-as naar `tonen` zette vier nieuwe cellen op GEDRAGEN_NIET_GEZIEN: tonen | school | elk van de vier actoren. Dat is geen overtreding (zie `grens`), maar het stelt een vraag die de CLAIM-as vandaag niet KAN beantwoorden: de uitzondering voor School is verklaard op de HANDELING `opslaan` en kent geen actor. Een cijfer tonen aan de leerling zelf of aan zijn docent is dezelfde leerstof als het bewaren ervan; hetzelfde cijfer tonen aan een partner of een externe lezer is precies wat SCHOOL.md par. 11.1 tegenhoudt. De uitzondering is dus vermoedelijk te grof. Hem hier verbreden zou een DOCTRINEBESLUIT zijn, en dat neemt een mens en geen sensor -- daarom staat hij ongewijzigd en staat de vraag hier.",
   "cellen": [
@@ -178,7 +187,7 @@
       "actor": "systeem",
       "claim": true,
       "draag": false,
-      "wacht": false,
+      "wacht": true,
       "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
     },
     {
@@ -187,7 +196,7 @@
       "actor": "medewerker",
       "claim": true,
       "draag": false,
-      "wacht": false,
+      "wacht": true,
       "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
     },
     {
@@ -196,7 +205,7 @@
       "actor": "partner",
       "claim": true,
       "draag": false,
-      "wacht": false,
+      "wacht": true,
       "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
     },
     {
@@ -205,7 +214,7 @@
       "actor": "externeLezer",
       "claim": true,
       "draag": false,
-      "wacht": false,
+      "wacht": true,
       "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
     },
     {
@@ -290,8 +299,8 @@
       "actor": "systeem",
       "claim": true,
       "draag": true,
-      "wacht": false,
-      "uitslag": "GEDRAGEN_NIET_GEZIEN"
+      "wacht": true,
+      "uitslag": "GEDRAGEN_EN_GEZIEN"
     },
     {
       "handeling": "opslaan",
@@ -299,8 +308,8 @@
       "actor": "medewerker",
       "claim": true,
       "draag": true,
-      "wacht": false,
-      "uitslag": "GEDRAGEN_NIET_GEZIEN"
+      "wacht": true,
+      "uitslag": "GEDRAGEN_EN_GEZIEN"
     },
     {
       "handeling": "opslaan",
@@ -308,8 +317,8 @@
       "actor": "partner",
       "claim": true,
       "draag": true,
-      "wacht": false,
-      "uitslag": "GEDRAGEN_NIET_GEZIEN"
+      "wacht": true,
+      "uitslag": "GEDRAGEN_EN_GEZIEN"
     },
     {
       "handeling": "opslaan",
@@ -317,8 +326,8 @@
       "actor": "externeLezer",
       "claim": true,
       "draag": true,
-      "wacht": false,
-      "uitslag": "GEDRAGEN_NIET_GEZIEN"
+      "wacht": true,
+      "uitslag": "GEDRAGEN_EN_GEZIEN"
     },
     {
       "handeling": "projecteren",

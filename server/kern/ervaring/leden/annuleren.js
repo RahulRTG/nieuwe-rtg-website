@@ -124,7 +124,14 @@ module.exports = (ctx) => {
      een geannuleerde plek bericht de eerste op de lijst, dus annuleerItem roept
      meldWachtlijst() aan. Naar buiten toe verandert er niets -- de aanroepers
      krijgen dezelfde vijf namen uit dezelfde tas. */
-  const wachtlijst = require('./wachtlijst')(ctx);
+  const wachtlijstOpslag = {
+    lees() {
+      if (!Array.isArray(db.data.wachtlijsten)) db.data.wachtlijsten = [];
+      return db.data.wachtlijsten;
+    },
+    vervang(lijst) { db.data.wachtlijsten = lijst; }
+  };
+  const wachtlijst = require('./wachtlijst')(Object.assign({}, ctx, { wachtlijstOpslag }));
   const { zetOpWachtlijst, mijnWachtlijst, meldWachtlijst, rsvpAnnuleer } = wachtlijst;
 
   return { annuleerItem, zetOpWachtlijst, mijnWachtlijst, meldWachtlijst, rsvpAnnuleer };

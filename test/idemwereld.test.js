@@ -210,32 +210,22 @@ test('een wereld die niets oplevert laat de proef meten als vanouds', async () =
      uit de wereld nodig had -- `rekening/open` vraagt om een geldige
      rekeningsoort en verder niets, en die mag gewoon blijven staan.
 
-     SINDS DE BUNDELRONDE VAN 13 SEPTEMBER STAAT ER EEN TWEEDE, en het is dezelfde
-     soort: `giftcard/sell` draagt `{ bedrag: 25 }`, een constante zonder een enkel
-     veld uit de wereld. Dat hij een lege wereld overleeft is de regel en geen gat.
-     Hij is er niet bij verzonnen maar kwam mee uit PR #242, waar de kop bij dat
-     lijf uitlegt waarom het getal in EURO'S staat en niet in centen. */
+     SINDS DE BUNDELRONDE VAN 13 SEPTEMBER STAAN ER ZES. Ze dragen allemaal een
+     volledig constant lijf, zonder een enkel veld uit de wereld. Dat zij een
+     lege wereld overleven is dus de regel en geen gat. `giftcard/sell` kwam mee
+     uit PR #242; de vier jongste routes staan er met hun eigen bronuitleg naast
+     in geldLijf(). */
   const { extra, perRoute } = await zetWereldKlaar({ post: async () => ({ status: 500, data: {} }),
     tokens: { member: 'lid', office: 'kantoor' } });
   assert.deepEqual(extra, {});
-  /* `giftcard/sell` staat er sinds 13 september bij, en om exact dezelfde reden
-     als `rekening/open`: zijn lijf is `{ bedrag: 25 }` -- een vast bedrag binnen
-     de grenzen die de route zelf stelt (10..5000 EURO, geen centen), en het
-     vraagt niets uit de wereld. Deze lijst is dus geen opsomming van
-     uitzonderingen maar de uitkomst van EEN regel: wat niets uit de wereld
-     nodig heeft, blijft staan. Wie hier een route bijzet die WEL iets uit de
-     wereld leest, breekt die regel en niet deze verwachting. */
-  /* De lijst groeit mee met elk lijf dat NIETS uit de wereld leest. De drie die
-     er op 14 september bij kwamen dragen alleen vaste waarden: `pay/oplaad` een
-     bedrag binnen de band die de route zelf noemt, `labfonds/locatie/maak` een
-     naam en een land, `wallet/voeg` een soort, titel en code. De twee zware
-     kantoorroutes hierboven staan er met opzet NIET bij: die lezen wel degelijk
-     iets uit de wereld, en dat de vorige bundel ze toevoegde verandert daar
-     niets aan. */
-  assert.deepEqual(Object.keys(perRoute).sort(),
-    ['/api/bank/rekening/open', '/api/boardroom/betalingen/proef',
-      '/api/labfonds/locatie/maak', '/api/pay/oplaad',
-      '/api/supplier/giftcard/sell', '/api/wallet/voeg']);
+  assert.deepEqual(Object.keys(perRoute).sort(), [
+    '/api/bank/rekening/open',
+    '/api/boardroom/betalingen/proef',
+    '/api/labfonds/locatie/maak',
+    '/api/pay/oplaad',
+    '/api/supplier/giftcard/sell',
+    '/api/wallet/voeg'
+  ]);
 });
 
 test('de halve-lijf-regel kijkt ook IN lijsten en posten', () => {

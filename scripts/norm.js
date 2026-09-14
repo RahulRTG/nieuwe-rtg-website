@@ -606,10 +606,10 @@ const METERS = [
      proefwereld uit te breiden om een getal groen te krijgen, terwijl er niets
      aan de fixture mankeert. Zelfde grond als GEEN_DUURZAME_WEG: een gemeten
      feit, geen werk. */
-  { sleutel: 'crashproefGeenLijf', richting: 'omlaag', wat: 'geldroutes waar de route het verzoek afkeurde en req.body leest -- er ontbreekt een lijf' },
-  { sleutel: 'crashproefGeenWereld', richting: 'omlaag', wat: 'geldroutes die op de toestand strandden -- er ontbreekt een voorziening' },
-  { sleutel: 'crashproefGeenRol', richting: 'omlaag', wat: 'geldroutes die niet voorbij de deur kwamen (401/403)' },
-  { sleutel: 'crashproefOnbepaald', richting: 'omlaag', wat: 'geldroutes die de triage niet kon indelen -- een signaal over de meter zelf' },
+  { sleutel: 'crashproefGeenLijf', richting: 'omlaag', wat: 'crashproefrijen waar de route het verzoek afkeurde en req.body leest -- er ontbreekt een lijf' },
+  { sleutel: 'crashproefGeenWereld', richting: 'omlaag', wat: 'crashproefrijen die op de toestand strandden -- er ontbreekt een voorziening' },
+  { sleutel: 'crashproefGeenRol', richting: 'omlaag', wat: 'crashproefrijen die niet voorbij de deur kwamen (401/403)' },
+  { sleutel: 'crashproefOnbepaald', richting: 'omlaag', wat: 'crashproefrijen die de triage niet kon indelen -- een signaal over de meter zelf' },
   /* DE GEVOLGDEKKING, EN MET OPZET DRIE TANDEN ZONDER PERCENTAGE ERBOVEN
      (GEVOLGDEKKING.json, npm run gevolgdekking).
 
@@ -1469,12 +1469,12 @@ function meet(bronnen) {
     carriereDomeinenGemeten: leesRegister('CARRIEREVORM.json', (j) => j.gemeten.domeinen),
     aiContextLek: leesRegister('AICONTEXT.json', (j) => j.muur.lek.length),
     aiContextVeldenGezien: leesRegister('AICONTEXT.json', (j) => j.ledenstaat.aantal),
-    stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
-    wekZonderUitspraak: leesRegister('WEKDEKKING.json', (j) => j.gemeten.zonderUitspraak),
-    momentOpenBekend: leesRegister('MOMENTPROEF.json', (j) => j.telling.openBekend),
     stilSpoor: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorGesmoord),
     stilleOpslag: leesRegister('STILSPOOR.json', (j) => j.gemeten.opslagGesmoord),
     stilSpoorAanroepen: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorAanroepen),
+    stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
+    wekZonderUitspraak: leesRegister('WEKDEKKING.json', (j) => j.gemeten.zonderUitspraak),
+    momentOpenBekend: leesRegister('MOMENTPROEF.json', (j) => j.telling.openBekend),
     lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),
     lussenKritiek: leesRegister('LUSSEN.json', (j) => j.ratel.kritiek),
     lussenZonderOverlapRem: leesRegister('LUSSEN.json', (j) => j.ratel.wekkersAsyncZonderRem),

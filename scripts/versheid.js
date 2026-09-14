@@ -348,6 +348,12 @@ const REGISTERS = [
      Ook hier een melding en geen poort: als poort zou hij rood staan op takken
      die niets met geld te maken hebben. */
   ['CRASHPROEF.json', 'npm run crashproef:vast', 'wat er per geldroute van de uitkomst overblijft als het proces op een crashgrens sterft'],
+  /* DE SCHRIJFPROEF IS EEN METING VAN GEDRAG. Hij saboteert de duurzame commit
+     en kijkt of een route toch succes meldt. Een oude uitslag kan dus niet als
+     uitspraak over de huidige schrijfroutes gelden; daarom meldt versheid zijn
+     ouderdom net als bij de crashproef hierboven. */
+  ['SCHRIJFPROEF.json', 'node scripts/schrijfproef.js --vastleggen',
+    'of een route succes meldt terwijl zijn duurzame schrijfactie aantoonbaar niet is uitgevoerd'],
   /* HERSTELBESLUIT.json STAAT HIER BEWUST NIET, en dat is geen vergetelheid.
      Deze lijst is de INSTRUMENTENlijst: scripts/meetkeuring.js leest hem om te
      bepalen welk script welk register vult, en eist van elk instrument een

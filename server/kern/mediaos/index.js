@@ -49,9 +49,10 @@ const MODI = {
      De stand verschijnt alleen bij wie ergens werkt -- zie zaakWereld(). */
   zaak: { naam: 'Zaak', vormen: ['video', 'live'], intern: true }
 };
-const WERELD_MAX = 60;      // de wereld is eindig, en zegt waar hij ophoudt
+const WERELD_MAX = 60; // een eindige wereld
 
 function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, notify, bronnen, zijnVrienden, sseToCustomer }) {
+  const opslag = require('./opslag')({ db, save });
   const catalogus = maakCatalogus({ bronnen });
   const smaak = maakSmaak({ db, save, schoon });
   const hub = maakHub({ catalogus, bronnen, keyVanCodenaam, codenaamVan });
@@ -79,11 +80,9 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
      abonneert, gedragen door een mens OF een organisatie. Hij staat VOOR de
      wekmotor omdat die hem leest -- zonder aanwezigheid kan een festival of een
      club niemand wekken, en dat was precies de bevinding van WEKDEKKING.json. */
-  const aanwezig = require('./aanwezigheid')({ db, save, schoon, codenaamVan });
-  /* De tijdlijn staat VOOR de wekmotor omdat die hem schrijft, en de motor bezit
-     de collectie met opzet niet -- zie de koppen van ./tijdlijn.js en
-     ./zoeken.js. */
-  const tijdlijn = require('./tijdlijn')({ db, save, aanwezig, SOORT_NAAM: require('./wekken').SOORT_NAAM });
+  const aanwezig = require('./aanwezigheid')({ opslag, schoon, codenaamVan });
+  /* De tijdlijn bewaart een moment naast de wek, zonder levende bron te kopieren. */
+  const tijdlijn = require('./tijdlijn')({ opslag, aanwezig, SOORT_NAAM: require('./wekken').SOORT_NAAM });
   const wekken = maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn });
   const zoeken = require('./zoeken')({ aanwezig, SOORTEN: aanwezig.AANWEZIG_SOORTEN });
 
@@ -98,6 +97,13 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
      het Podium. Eigen bestand, want het is een eigen wereld met een eigen deur;
      zie de kop daar voor waarom dit géén filter over de openbare wereld is. */
   const { zaakWereld, modiVoor } = require('./zaakwereld')({ MODI, catalogus, bronnen });
+
+  /* Het bestaande bord is ook de routefacade voor vinden en terugvinden. Zo
+     reizen de twee bordhandelingen door één domeingrens in plaats van als twee
+     nieuwe losse kernnamen. */
+  const mediaBord = (...args) => hub.mediaBord(...args);
+  mediaBord.aanwezigZoek = zoeken.aanwezigZoek;
+  mediaBord.momentenVoor = wekken.mediaMomentenVoor;
 
   /* ---- de wereld: één catalogus, drie standen ---- */
   function wereld(sess, opties) {
@@ -151,7 +157,7 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
     mediaMeldZet: meldZet, mediaMeldVan: meldVan,
     mediaSmaakStuur: (sess, o) => smaak.smaakStuur(sess.key, o),
     mediaSmaakVan: (sess) => ({ status: 200, smaak: smaak.smaakVan(sess.key), regelaars: smaak.smaakRegelaars() }),
-    mediaStuk: hub.mediaStuk, mediaMaker: hub.mediaMaker, mediaBord: hub.mediaBord,
+    mediaStuk: hub.mediaStuk, mediaMaker: hub.mediaMaker, mediaBord,
     mediaNieuwWerk: wekken.mediaNieuwWerk, mediaVolgersVan: wekken.mediaVolgersVan,
     /* De aanwezigheidslaag. `mediaNieuwMoment` is de haak voor alles wat GEEN
        mens is; `aanwezigZorg` is wat een domein aanroept als het publiek wordt. */
@@ -160,8 +166,10 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
     aanwezigMet: aanwezig.aanwezigMet, aanwezigVolg: aanwezig.aanwezigVolg,
     aanwezigVolgtHij: aanwezig.aanwezigVolgtHij, aanwezigMijn: aanwezig.aanwezigMijn,
     aanwezigVolgersVan: aanwezig.aanwezigVolgersVan, aanwezigBeeld: aanwezig.aanwezigBeeld,
-    /* Vinden en terugvinden: schakel 2 en 5 van de momentproef. */
-    aanwezigZoek: zoeken.aanwezigZoek, mediaMomentenVoor: tijdlijn.mediaMomentenVoor,
+    /* Vinden en terugvinden -- de twee helften die schakel 2 en 5 van de
+       momentproef openhielden. `aanwezigZoek` is Discovery achter de ledendeur;
+       `mediaMomentenVoor` is de tijdlijn van wat je volgt, zodat een wek een
+       bestemming HEEFT zonder dat `notify()` er een draagt. */
     MEDIA_MODI: MODI, MEDIA_MELD_SOORTEN: MELD_SOORTEN
   });
 }

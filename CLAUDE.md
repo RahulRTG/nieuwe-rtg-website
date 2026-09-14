@@ -1073,7 +1073,7 @@ ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
 App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
 zie par. 9.2), en er is geen kostenvlak. En
 par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->4189<!--/getal--> routes met een rol
-zijn er <!--getal:idem.beoordeeld-->1678<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3245<!--/getal--> ongemeten (`IDEMPROEF.json`,
+zijn er <!--getal:idem.beoordeeld-->1682<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3241<!--/getal--> ongemeten (`IDEMPROEF.json`,
 levend getal — `npm run getallen` houdt het bij),
 maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
 `UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
@@ -1101,8 +1101,8 @@ weigert wat op een contactgegeven lijkt, want met `REDIS_URL` gaat hij over een
 netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
 niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
 houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
-staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1678<!--/getal--> beproefde muterende routes zijn er
-<!--getal:idem.beschermd-->1677<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1682<!--/getal--> beproefde muterende routes zijn er
+<!--getal:idem.beschermd-->1681<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
 erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
 **Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
 lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`
@@ -1575,7 +1575,7 @@ afkapgrens van vijftien sneed midden in een GELIJKE score, dus /api/bank/pas/bet
 viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
 willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
 **En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
-schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3245<!--/getal--> randen,
+schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3241<!--/getal--> randen,
 <!--getal:verstrengeling.onverklaard-->0<!--/getal--> onverklaard — en dát getal moet naar nul, niet het
 aantal randen), de activering per functie, de deltapoort die er niets bij laat
 komen, de tredeproef over alle zeven treden van LAUNCH.md (0 lekken), en de
@@ -1814,62 +1814,6 @@ stond**: aftekenen en beslissen eisen een naam, en `boardroomWie()` geeft die
 alleen als er een lid-account achter het kantoortoken hangt -- wie met de
 GEDEELDE kantoorcode inlogt, kan de keten niet afmaken. Dat is een grens en geen
 gat, en hij zit nu in de meting (storing 1 en 7) in plaats van eromheen.
-
-**DE VIJFDE KETEN IS DE EERSTE DIE OVER GELD GAAT** (`scripts/omzetproef.js`,
-`npm run omzetproef`): van consumentintentie tot het cijfer waar een ondernemer
-btw over afdraagt -- bestellen, betalen, economische gebeurtenis, fiscale
-verdeling, ondernemersbeeld. De vraag is niet "werkt de betaalknop" maar: komt
-exact diezelfde gebeurtenis, met hetzelfde bedrag, dezelfde tijd, dezelfde
-fiscale betekenis en dezelfde eigenaar, correct terug in de financiele
-werkelijkheid van die zaak? Zeven schakels, acht storingen, gemeten met TWEE
-echte zaken -- want de tenant-naad is niet te meten met een verzonnen code. Hij
-vond drie dingen die geen enkele routetoets zag, en ze zijn met opzet niet
-hetzelfde soort vondst. **Een is gerepareerd**: de btw-CATEGORIE van een
-verkochte regel werd bij elke uitlezing opnieuw afgeleid uit de menukaart van
-VANDAAG, dus een gerecht van de kaart halen verplaatste AL VERKOCHTE omzet naar
-een andere btw-pot (gemeten: vier koffies, drankpot 20,00 -> 0,00, ook als de
-aangifte over die maand al gedaan was). Het TARIEF was wel tijdgetrouw -- de
-categorie niet, en dat verschil zag niemand. De bestelregel draagt nu zijn eigen
-`station`, precies zoals hij zijn eigen `price` draagt; een oude regel zonder dat
-veld blijft de kaart lezen, want anders zou de reparatie in een keer alle
-historische drankomzet naar eten schuiven. **Twee zijn BESLUITEN van de eigenaar
-en staan als bevinding in het register**: de btw-categorie wordt afgeleid uit de
-WERKPLEK (`station === 'bar' -> drank -> 21%`) terwijl de landentabel er zelf bij
-zegt dat in NL eten en NIET-ALCOHOLISCHE dranken 9% zijn -- een Flat White uit de
-bar valt dus op 21%, en de scheidslijn alcohol-ja/nee bestaat al twintig regels
-verderop in `kern/lidacties/bestellen.js` maar niet aan de fiscale kant. **En de tweede is
-inmiddels genomen en uitgevoerd** (13 september 2026): een terugstorting WISTE de
-verkoop uit de maand waarin hij stond, zodat de omzet van een afgesloten maand
-met terugwerkende kracht veranderde en "er is nooit verkocht" niet meer te
-onderscheiden was van "er is verkocht en teruggestort". Een eenmaal geboekte
-verkoop is historische waarheid: `paid` blijft staan, `refunded` komt ernaast met
-een eigen datum, en `kern/fiscaal/index.js` telt twee gebeurtenissen per bon --
-netto kan het nul worden, de geschiedenis blijft heel. Twee dingen daar niet
-wegpoetsen: `test/omzetproef.test.js` houdt de eerste bevinding VAST met haar
-reden -- een bevinding die verdwijnt zonder besluit is de stilste faalvorm die
-deze laag kent -- en de proef zelf had een gat in zijn eigen poort
-(`sluitMetBevinding` telde `gebroken` niet mee, dus de eerste ronde zou zijn
-eigen vondst hebben laten passeren).
-
-**Wat die tegenboeking werkelijk verandert is niet de route maar de BETEKENIS van
-`paid` onder elke lezer die hem al las**, en daarvoor is er een gemeten kaart
-(`scripts/refundmigratie.js`, `REFUNDMIGRATIE.json`, `npm run refundmigratie`):
-58 bestanden met een betaalstand, geteld per collectie, met elke lezer op
-`onbekend` tot iemand hem met de hand heeft ingedeeld. De kaart vond meteen drie
-dingen die geen enkele toets zag, en ze zijn alle drie gerepareerd: twee schermen
-telden geld op uit `paid` zonder `refunded` ernaast -- waarvan een de "Ontvangen"
-op het beginscherm van de ondernemer, en dat breekt STIL want er staat gewoon een
-bedrag -- en `/api/office/timeline` stuurde het veld niet, zodat het kantoorscherm
-de waarheid niet KON tonen hoe het ook las. Een gat in een PROJECTIE is geen gat
-in een scherm. Drie dingen om niet te herhalen: de kaart zocht de collectie van
-een bestand op `\borders\b` en vond daarmee noch `order.paid` noch
-`ordersVanZaak(...)`, zodat twee verklaarde lezers uit de telling vielen en als
-VERDWENEN werden gemeld -- een kaart die zijn eigen werk kwijtraakt stuurt het
-werk verkeerd; de gegenereerde bundels telden elke lezer een tweede keer en
-lieten het werk dubbel zo groot lijken; en **`wacht` is met opzet geen
-`onbekend`** -- rides, tickets en boekingen wissen hun betaalstand nog, en een
-lezer die GELEZEN is en op zijn collectie wacht, is iets anders dan een lezer die
-niemand heeft bekeken.
 
 **En wat de ketens werkelijk delen is GEMETEN** (`scripts/ketenvorm.js`,
 `KETENVORM.json`) in plaats van verklaard -- de proeven delen met opzet geen
@@ -2208,7 +2152,7 @@ het getal dat het blokkeert: een planner op `gevolg.js` heeft 96 van 176 paden
 `onbekend`, en een promotiesysteem boven
 <!--getal:vertrouwen.bewezen-->0<!--/getal--> bewezen routes promoveert niets.
 
-**`LAT.md` is de technische lat** — regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). En regel 13 vóór je pusht: **"mijn gebruikelijke controles" is niet "het oordeel van de keten"** — een CI-job die als EEN release-oordeel geldt heeft meer poorten dan iemand onthoudt, en `npm run ci:lokaal` draait ze allemaal omdat hij ze AFLEIDT uit `.github/workflows` in plaats van ze over te typen. Een handlijst poorten is een tweede waarheid naast ci.yml en loopt uit elkaar. En regel 17 komt uit een fout van twee keer op een dag: **een poort bewijst alleen zijn eigen bereik** — `check`, `norm` en de deltapoort stonden groen terwijl CI terecht rood bleef, want routedekking en de afdrukregel liggen daarbuiten. Zeg dus nooit "de gate is groen" maar welke poort groen staat, en wat er nog niet bevestigd is. Daar hangt de routeregel aan: een nagemaakte app bewijst het handlergedrag en niet de montage of de deur, dus **geen nieuwe HTTP-route zonder minstens één treffer op een echte server in een gewone CI-toets**. En regel 21 is de jongste (13 september 2026): **een belofte over een spoor is pas een regel als het spoor kan weigeren** — met `scripts/stilspoor.js` als handhaver, die de KLASSE telt en niet het geval (spoor- en opslagschrijvers waarvan het falen stil wordt weggevangen, drie ratels, en een besluitregister ernaast dat nooit van de telling aftrekt). Let op het nummer: die regel is op twee takken tegelijk als "regel 13" geschreven, en 13 was hier al bezet — de nummers dragen betekenis, dus hernummeren doe je de jongste. LAT.md gaat over de code, CLAUDE.md over het merk.
+**`LAT.md` is de technische lat** — regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). En regel 13 vóór je pusht: **"mijn gebruikelijke controles" is niet "het oordeel van de keten"** — een CI-job die als EEN release-oordeel geldt heeft meer poorten dan iemand onthoudt, en `npm run ci:lokaal` draait ze allemaal omdat hij ze AFLEIDT uit `.github/workflows` in plaats van ze over te typen. Een handlijst poorten is een tweede waarheid naast ci.yml en loopt uit elkaar. En regel 17 komt uit een fout van twee keer op een dag: **een poort bewijst alleen zijn eigen bereik** — `check`, `norm` en de deltapoort stonden groen terwijl CI terecht rood bleef, want routedekking en de afdrukregel liggen daarbuiten. Zeg dus nooit "de gate is groen" maar welke poort groen staat, en wat er nog niet bevestigd is. Daar hangt de routeregel aan: een nagemaakte app bewijst het handlergedrag en niet de montage of de deur, dus **geen nieuwe HTTP-route zonder minstens één treffer op een echte server in een gewone CI-toets**. LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)
 

@@ -1,7 +1,7 @@
 {
  "uitleg": "Afgeleide executiekaart: per route wat de AI ermee mag, wat het bewijs eronder zegt en of een herhaling schade doet. De herkomst staat per veldsoort in `velden`, de vertaling naar de gedeelde gezagsnoemer in `noemer`. NOOIT met de hand wijzigen: npm run executionmap:controle zakt erop.",
  "bronnen": {
-  "IDEMPROEF.json": "f78c2d49514aaacb",
+  "IDEMPROEF.json": "3edd00350785e664",
   "IDEMBESLUIT.json": "a20e7b5abed335c8",
   "HERSTEL.json": "43f74e808fe06d72",
   "VERTROUWEN.json": "6fb6bc1a3e8ce705",
@@ -1304,7 +1304,7 @@
   {
    "pad": "/api/bank/pas/bevries",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, FAILURE)",
    "bereik": {
@@ -1316,7 +1316,7 @@
   {
    "pad": "/api/bank/pas/limiet",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, FAILURE)",
    "bereik": {
@@ -1431,7 +1431,7 @@
   {
    "pad": "/api/bank/spaardoel",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (INPUT, STATE, SIDE_EFFECT, AUDIT, FAILURE)",
    "herhalingBesluit": "instelling",
@@ -1468,7 +1468,7 @@
   {
    "pad": "/api/bank/terugkerend/stop",
    "rol": "member",
-   "herhaling": "ongemeten",
+   "herhaling": "beschermd",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "herstel": "bevestigd",

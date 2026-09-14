@@ -1,11 +1,11 @@
 {
  "stempel": {
-  "op": "2026-09-14T07:49:21.595Z",
-  "commit": "d89ebf1d",
+  "op": "2026-09-14T10:59:13.051Z",
+  "commit": "c3fd70bd9",
   "boomVuil": false,
   "boomAnders": 3,
   "instrument": "scripts/bewijsschuld.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
@@ -581,8 +581,14 @@
   {
    "op": "2026-09-14",
    "van": 2384,
+   "naar": 2403,
+   "reden": "Nieuwe-gevolg-en-idemroutes-uit-de-samengevoegde-PR-koppen-zijn-nu-zichtbaar"
+  },
+  {
+   "op": "2026-09-14",
+   "van": 2403,
    "naar": 2404,
-   "reden": "De volgorde in kern/stuur/gevolg.js is omgedraaid: geenWerk gaat nu voor gemeten. 153 van de 4923 paden droegen graad gemeten terwijl IDEMPROEF.json ze zelf ongemeten noemt (de eerste oproep deed geen werk, 404 of 403) -- deze laag sprak dus zijn eigen bron tegen. Daarnaast houdt de stille ronde van scripts/idemproef-route.js drie klok- en buffergestuurde collecties (wacht, kantoorMensdeur, techniek) uit de toerekening. Er werd dus niets slechter: er komt in beeld wat er al was. Omlaag krijgen vraagt een proef die deze paden ECHT bereikt (geldige invoer en rechten per pad), niet een nieuwe reparatie hier."
+   "reden": "De-laatste-bijgewerkte-PR-koppen-maken-een-extra-idemroute-zichtbaar"
   }
  ]
 }

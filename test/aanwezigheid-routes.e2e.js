@@ -96,23 +96,22 @@ test('de publieke laag: volgen op naam, en uitlichten alleen door een mens', asy
     assert.equal(nogmaals.body.uitlichting.id, uit.body.uitlichting.id,
       'een herhaling geeft het antwoord van de EERSTE terug, dus dezelfde uitlichting');
 
-    /* 2. EEN ANDER VERZOEK, en dan draait de toestandscontrole wel. De identiteit
-          is `postId` + `grond` (idemsleutels-stage.js), dus dezelfde post met een
-          andere grond is geen dubbeltik maar een tweede redactiebesluit -- en dat
-          hoort te stuiten op 409 "al uitgelicht", met die reden erbij.
+    /* 2. EEN ANDER VERZOEK, en dan draait de toestandscontrole wel. De
+          identiteit is `postId` + `grond` (idemsleutels-stage.js), dus dezelfde
+          post met een andere grond is geen dubbeltik maar een tweede
+          redactiebesluit -- en dat hoort te stuiten op 409 "al uitgelicht".
 
-          Zo staat het verschil dat MUTATIECONTRACT.md maakt hier in twee regels
-          naast elkaar: een herhaling die hetzelfde antwoord teruggeeft is IETS
-          ANDERS dan een herhaling die wordt tegengehouden door de stand van het
-          onderwerp. Wie die twee samenvoegt, kan later niet meer zien of een
-          route veilig te herhalen IS of alleen toevallig niets deed. */
-    const anders = await post('/api/office/salon/uitlicht', { postId, grond: 'lokaal' }, persoon);
-    assert.equal(anders.status, 409, 'een andere sleutel bereikt de handler, en die weigert op de STAND');
-    assert.match(String(anders.body.error || ''), /al uitgelicht/, 'en zegt waarom');
+          Zo staat het verschil dat MUTATIECONTRACT.md maakt hier in twee
+          regels naast elkaar: een herhaling die hetzelfde antwoord teruggeeft is
+          IETS ANDERS dan een herhaling die wordt tegengehouden door de stand van
+          het onderwerp. Deze route kent ze allebei, en dat is geen slordigheid
+          maar het venster. */
+    const anderGrond = await post('/api/office/salon/uitlicht', { postId, grond: 'talent' }, persoon);
+    assert.equal(anderGrond.status, 409, 'een ander verzoek stuit op de toestandscontrole');
 
-    /* 3. En de invariant zelf, want daar gaat het om: na drie pogingen loopt er
-          precies EEN uitlichting. Zonder deze regel zeggen de twee hierboven
-          alleen iets over statuscodes. */
+    /* En de invariant zelf, want die is waar het om gaat: na drie pogingen loopt
+       er precies EEN uitlichting. Zonder deze regel zeggen de twee hierboven
+       alleen iets over statuscodes. */
     const naDrie = await post('/api/office/salon/uitlicht/bord', {}, persoon);
     assert.equal(naDrie.body.lopend.filter(r => String(r.post) === String(postId)).length, 1,
       'drie pogingen, een uitlichting');

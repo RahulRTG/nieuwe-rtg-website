@@ -101,7 +101,7 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2789<!--/getal--> van de
+1. <!--getal:machine.zonderAs-->2787<!--/getal--> van de
    <!--getal:machine.muterend-->3784<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 

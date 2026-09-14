@@ -1,15 +1,15 @@
 {
  "stempel": {
-  "op": "2026-09-14T06:01:07.203Z",
-  "commit": "8a4545c5",
+  "op": "2026-09-14T06:59:23.048Z",
+  "commit": "a3e78c96",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 4,
   "instrument": "scripts/refundmigratie.js",
   "node": "v22.22.2"
  },
  "soort": "meting",
  "uitleg": "Welke lezer van een betaalstand (`paid`) kan mee naar de tegenboeking. Orders zijn om; rides, tickets en boekingen niet. Dit telt de lezers en wijst ze aan; het VERKLAART ze niet -- een lezer staat op onbekend tot iemand hem met de hand heeft ingedeeld.",
- "grens": "De toewijzing van een bestand aan een collectie is lexicaal en dus een BOVENgrens: een bestand dat twee collecties noemt, staat bij allebei. Elke rij draagt daarom zijn `bereik` -- `venster` is toegewezen uit vijftien regels rond de treffer en is scherp, `bestand` uit het hele bestand en is ruim. Het zegt ook niets over of een verklaring KLOPT -- alleen dat de plek nog bestaat. En het ziet geen lezer die de betaalstand via een hulpfunctie leest zonder `.paid` te noemen; dat is een ONDERgrens die naast de bovengrens staat en er niet tegen wegvalt.",
+ "grens": "De toewijzing van een bestand aan een collectie is lexicaal en dus een BOVENgrens: een bestand dat twee collecties noemt, staat bij allebei. Elke rij draagt daarom zijn `leesbreedte` -- `venster` is toegewezen uit vijftien regels rond de treffer en is scherp, `bestand` uit het hele bestand en is ruim. Het zegt ook niets over of een verklaring KLOPT -- alleen dat de plek nog bestaat. En het ziet geen lezer die de betaalstand via een hulpfunctie leest zonder `.paid` te noemen; dat is een ONDERgrens die naast de bovengrens staat en er niet tegen wegvalt.",
  "perCollectie": {
   "orders": {
    "verklaard": 32,
@@ -49,7 +49,7 @@
    "bestand": "server/archief.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "telt",
    "stand": "geen-werk",
@@ -60,7 +60,7 @@
    "bestand": "server/db/tx/pgachter.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "geen-werk",
@@ -71,7 +71,7 @@
    "bestand": "server/db/tx/rij.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "geen-werk",
@@ -82,7 +82,7 @@
    "bestand": "server/db/tx/sqliteachter.js",
    "treffers": 2,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "geen-werk",
@@ -93,7 +93,7 @@
    "bestand": "server/kern/bezorgvolg.js",
    "treffers": 3,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "om",
@@ -104,7 +104,7 @@
    "bestand": "server/kern/ervaring/leden/annuleren.js",
    "treffers": 6,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "grendel",
    "stand": "om",
@@ -115,7 +115,7 @@
    "bestand": "server/kern/ervaring/leden/spaarpot.js",
    "treffers": 4,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "grendel",
    "stand": "om",
@@ -126,7 +126,7 @@
    "bestand": "server/kern/eten/orderbeeld-legacy.js",
    "treffers": 3,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "om",
@@ -137,7 +137,7 @@
    "bestand": "server/kern/fiscaal/index.js",
    "treffers": 2,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "telt",
    "stand": "om",
@@ -148,7 +148,7 @@
    "bestand": "server/kern/ghost.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "tickets",
    "soort": "telt",
    "stand": "wacht",
@@ -159,7 +159,7 @@
    "bestand": "server/kern/kantoor/index.js",
    "treffers": 2,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "telt",
    "stand": "geen-werk",
@@ -170,7 +170,7 @@
    "bestand": "server/kern/kantoor/metrics.js",
    "treffers": 4,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "telt",
    "stand": "geen-werk",
@@ -181,7 +181,7 @@
    "bestand": "server/kern/klantenboek.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "bestand",
+   "leesbreedte": "bestand",
    "collectie": "orders",
    "soort": "telt",
    "stand": "om",
@@ -192,7 +192,7 @@
    "bestand": "server/kern/leverancier/zaak.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "tickets",
    "soort": "telt",
    "stand": "wacht",
@@ -203,7 +203,7 @@
    "bestand": "server/kern/lidacties/betalen.js",
    "treffers": 4,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "grendel",
    "stand": "om",
@@ -214,7 +214,7 @@
    "bestand": "server/kern/lidacties/rekening.js",
    "treffers": 2,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "geen-werk",
@@ -225,7 +225,7 @@
    "bestand": "server/kern/lidacties/ritten.js",
    "treffers": 3,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "rides",
    "soort": "grendel",
    "stand": "wacht",
@@ -236,7 +236,7 @@
    "bestand": "server/kern/lidacties.js",
    "treffers": 2,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "boekingen",
    "soort": "grendel",
    "stand": "wacht",
@@ -247,7 +247,7 @@
    "bestand": "server/kern/live.js",
    "treffers": 2,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "om",
@@ -258,7 +258,7 @@
    "bestand": "server/kern/onderneming/dagbeeld.js",
    "treffers": 2,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "boekingen",
    "soort": "telt",
    "stand": "wacht",
@@ -269,7 +269,7 @@
    "bestand": "server/kern/tafelticket.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "geen-werk",
@@ -280,7 +280,7 @@
    "bestand": "server/kern/zaakcommand/signalen.js",
    "treffers": 3,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": [
     "orders",
     "rides",
@@ -295,7 +295,7 @@
    "bestand": "server/routes/member/kopen/tickets.js",
    "treffers": 3,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": [
     "tickets",
     "rides"
@@ -309,7 +309,7 @@
    "bestand": "server/routes/member/zakelijk.js",
    "treffers": 2,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "telt",
    "stand": "om",
@@ -320,7 +320,7 @@
    "bestand": "server/routes/office/toegang.js",
    "treffers": 7,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "om",
@@ -331,7 +331,7 @@
    "bestand": "server/routes/supplier/backoffice.js",
    "treffers": 3,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "telt",
    "stand": "geen-werk",
@@ -342,7 +342,7 @@
    "bestand": "server/routes/supplier/bezorg.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "grendel",
    "stand": "geen-werk",
@@ -353,7 +353,7 @@
    "bestand": "server/routes/supplier/charter/reis.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "bestand",
+   "leesbreedte": "bestand",
    "collectie": "boekingen",
    "soort": "grendel",
    "stand": "wacht",
@@ -364,7 +364,7 @@
    "bestand": "server/routes/supplier/kassa/afrekenen.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "grendel",
    "stand": "geen-werk",
@@ -375,7 +375,7 @@
    "bestand": "server/routes/supplier/kassa/innen.js",
    "treffers": 4,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "grendel",
    "stand": "geen-werk",
@@ -386,7 +386,7 @@
    "bestand": "server/routes/supplier/orders/afhandeling.js",
    "treffers": 3,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "grendel",
    "stand": "om",
@@ -397,7 +397,7 @@
    "bestand": "server/routes/supplier/pda/vloer.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "geen-werk",
@@ -408,7 +408,7 @@
    "bestand": "server/routes/supplier/verhuur/rit.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "bestand",
+   "leesbreedte": "bestand",
    "collectie": "boekingen",
    "soort": "grendel",
    "stand": "wacht",
@@ -419,7 +419,7 @@
    "bestand": "public/apps/app-main/app-main-20.js",
    "treffers": 4,
    "laag": "scherm",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "geen-werk",
@@ -430,7 +430,7 @@
    "bestand": "public/apps/app-main/app-main-43.js",
    "treffers": 7,
    "laag": "scherm",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "telt",
    "stand": "om",
@@ -441,7 +441,7 @@
    "bestand": "public/apps/backoffice/backoffice-04.js",
    "treffers": 2,
    "laag": "scherm",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "om",
@@ -452,7 +452,7 @@
    "bestand": "public/apps/leverancier/leverancier-03b.js",
    "treffers": 1,
    "laag": "scherm",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "geen-werk",
@@ -463,7 +463,7 @@
    "bestand": "public/apps/leverancier/leverancier-08.js",
    "treffers": 1,
    "laag": "scherm",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "geen-werk",
@@ -474,7 +474,7 @@
    "bestand": "public/apps/leverancier/leverancier-58.js",
    "treffers": 1,
    "laag": "scherm",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "telt",
    "stand": "om",
@@ -485,7 +485,7 @@
    "bestand": "public/apps/leverancier/leverancier-59.js",
    "treffers": 3,
    "laag": "scherm",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collectie": "orders",
    "soort": "toont",
    "stand": "geen-werk",
@@ -498,7 +498,7 @@
    "bestand": "server/kern/care/leden.js",
    "treffers": 3,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collecties": [
     "boekingen"
    ]
@@ -507,7 +507,7 @@
    "bestand": "server/kern/care/zaak.js",
    "treffers": 4,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collecties": [
     "boekingen"
    ]
@@ -516,7 +516,7 @@
    "bestand": "server/kern/onderneming/klussen.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collecties": [
     "boekingen"
    ]
@@ -525,7 +525,7 @@
    "bestand": "server/kern/reiswereld-bronnen-partner.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collecties": [
     "tickets",
     "boekingen"
@@ -535,7 +535,7 @@
    "bestand": "server/kern/vakwerk/index.js",
    "treffers": 3,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collecties": [
     "boekingen"
    ]
@@ -544,7 +544,7 @@
    "bestand": "server/routes/member/voertuigen/charter.js",
    "treffers": 2,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collecties": [
     "boekingen"
    ]
@@ -553,7 +553,7 @@
    "bestand": "server/routes/member/voertuigen/huur.js",
    "treffers": 2,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collecties": [
     "boekingen"
    ]
@@ -562,7 +562,7 @@
    "bestand": "server/routes/supplier/charter/vloot.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collecties": [
     "boekingen"
    ]
@@ -571,7 +571,7 @@
    "bestand": "server/routes/supplier/tickets-dicht.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collecties": [
     "tickets",
     "boekingen"
@@ -581,7 +581,7 @@
    "bestand": "server/routes/supplier/tickets.js",
    "treffers": 2,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collecties": [
     "tickets",
     "boekingen"
@@ -591,7 +591,7 @@
    "bestand": "server/routes/supplier/verhuur/vloot.js",
    "treffers": 1,
    "laag": "server",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collecties": [
     "boekingen"
    ]
@@ -600,7 +600,7 @@
    "bestand": "public/apps/app-main/app-main-13.js",
    "treffers": 2,
    "laag": "scherm",
-   "bereik": "bestand",
+   "leesbreedte": "bestand",
    "collecties": [
     "tickets",
     "boekingen"
@@ -610,7 +610,7 @@
    "bestand": "public/apps/app-main/app-main-21.js",
    "treffers": 1,
    "laag": "scherm",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collecties": [
     "boekingen"
    ]
@@ -619,7 +619,7 @@
    "bestand": "public/apps/app-main/app-main-45.js",
    "treffers": 1,
    "laag": "scherm",
-   "bereik": "bestand",
+   "leesbreedte": "bestand",
    "collecties": [
     "tickets"
    ]
@@ -628,7 +628,7 @@
    "bestand": "public/apps/foundation/zorg-hulp-weergave.js",
    "treffers": 2,
    "laag": "scherm",
-   "bereik": "venster",
+   "leesbreedte": "venster",
    "collecties": [
     "boekingen"
    ]

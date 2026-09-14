@@ -68,7 +68,7 @@ const CANONIEK = {
 
 /* De drie identiteitsmodi. Ze zeggen WIE bepaalt dat twee opdrachten dezelfde
    zijn, niet HOE streng dat is. */
-const MODI = {
+const IDENTITEITSMODI = {
   /* De aanroeper beslist: een verse sleutel is een nieuwe bewuste opdracht, en
      de afgeleide identiteit mag daar nooit overheen walsen. Dit is geen
      voorkeur maar een litteken: bij `bank/pas/uitgeven` besliste ooit de
@@ -125,4 +125,4 @@ function identiteitVan(capability, lijf) {
   return vorm.voorvoegsel + vorm.scheiding + id.velden.map(stuk).join(vorm.scheiding);
 }
 
-module.exports = { CANONIEK, MODI, HERHALING, LEVERING, CONTRACTEN, identiteitVan };
+module.exports = { CANONIEK, IDENTITEITSMODI, HERHALING, LEVERING, CONTRACTEN, identiteitVan };

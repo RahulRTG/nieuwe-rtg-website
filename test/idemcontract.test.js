@@ -50,7 +50,7 @@ test('de canonieke lijst is gesloten: elk verklaard veld noemt een bestaand type
     for (const [veld, soort] of Object.entries(c.identiteit.canoniek || {})) {
       assert.ok(contract.CANONIEK[soort], cap + '.' + veld + ' noemt onbekend canoniek type ' + soort);
     }
-    assert.ok(contract.MODI[c.identiteit.modus], cap + ' noemt een onbekende modus');
+    assert.ok(contract.IDENTITEITSMODI[c.identiteit.modus], cap + ' noemt een onbekende modus');
     assert.ok(contract.HERHALING[c.herhaling], cap + ' noemt een onbekende herhalingsstand');
     assert.ok(contract.LEVERING[c.levering], cap + ' noemt een onbekende leveringsstand');
   }

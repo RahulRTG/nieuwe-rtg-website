@@ -124,7 +124,45 @@ function wachtOpSchoneBoom() {
          alleen wat de route terugzegt -- stiller, en een stuk zwakker. Stand 2,
          want alleen die ziet ook een wijziging OP ZIJN PLAATS (gelijke lengte,
          andere inhoud). Zie server/staatlog.js. */
-      RTG_STAATLOG: '2' } });
+      RTG_STAATLOG: '2',
+      /* DE TIKKERS STILZETTEN, en dat is een MEETbesluit en geen productiewijziging.
+
+         WAT ER GEBEURT. server/kern/bank/index.js draait elke ZESTIG SECONDEN de
+         opdrachtenronde, fire-and-forget: `opdrachten.ronde({}).catch(...)`. Die dient
+         betaalopdrachten opnieuw in bij de rail, en `railInzenden` in server/server.js
+         meldt daarbij de stand van `money.payout` aan kern/commercie/capgezondheid.js.
+         Dat schrijft dus BUITEN elk verzoek om, en deze proef rekent zijn verschil
+         tussen twee oproepen -- dus belandt dat werk in de delta van de route die op dat
+         moment aan de beurt is. Een uurtik erboven (`BANK_RONDE_MS`: rente en vervallen
+         vaste betalingen) doet hetzelfde, minder vaak.
+
+         GEMETEN en niet vermoed: 23 routes droegen `betaalOpdrachten` en 24
+         `capGezondheid`, waaronder /api/command/puls, /api/ontmoeten/aan en
+         /api/zorgprofiel/zet. Geen daarvan betaalt iets uit. De afstanden tussen die
+         routes in de meetvolgorde (108 tot 464 routes bij ~0,4 s per route) passen bij
+         een tikker van een minuut en bij niets anders.
+
+         EN HIER STOND EERST DE VERKEERDE TIKKER, wat deze regel zelf illustreert. Ik
+         wees de onderhoudsronde van vijf minuten aan (server/opzet/start.js, met
+         `betaalWaarheid.ronde()` erin) en zette daar een variabele op. De ronde daarna
+         ging van 14 naar 23 routes: de meting sprak de verklaring tegen. `betaalWaarheid`
+         is een ANDER register (`terugbetaalOpdrachten`), en de tikker die het wel doet
+         had zijn knop al. Een plausibele oorzaak is geen gemeten oorzaak.
+
+         WAAROM NIET IN DE RUISLIJST. Een stille server van 5,5 minuut schrijft
+         {"kosten":1,"wacht":6,"techniek":3,"ledenSites":2,"veilig":1,"rtgai":9}. Die zes
+         in de ruis zetten zou `ledenSites` wegvangen bij /api/site/bewaar, dat hem ZELF
+         schrijft -- een zeef die een echt effect onzichtbaar maakt is erger dan de fout
+         die zij opruimt. Vandaar: de bron stilzetten in plaats van het gevolg filteren.
+         Diezelfde stille ronde is met en zonder deze variabelen woordelijk gelijk, dus
+         die zes komen van andere tikkers en staan hier als `tikkersNogAan`.
+
+         DE COMMERCIERONDE staat er als DERDE bij zonder eigen bewijs: zijn knop bestond
+         al en hij tikt op dezelfde manier, maar geen enkele collectie is aan hem
+         toegerekend. Dat staat er liever bij dan dat het als gemeten bewijs meelift. */
+      BANK_OPDRACHT_RONDE_MS: String(24 * 60 * 60 * 1000),
+      BANK_RONDE_MS: String(24 * 60 * 60 * 1000),
+      RTG_COMMERCIE_RONDE_MS: String(24 * 60 * 60 * 1000) } });
   const { basis, klaar } = server;
 
   /* `extraKoppen` is er voor deuren die hun sleutel in een KOP verwachten en niet
@@ -410,6 +448,10 @@ function wachtOpSchoneBoom() {
      bij elke oproep groeit -- en als het er NUL zijn hoort dat ook te blijken. */
   if (staatWerkt) console.log('  de stille ronde (klok en buffer)     : ' +
     (stilBewoog === null ? 'niet gedraaid' : stilBewoog.length ? stilBewoog.join(', ') : 'niets bewoog'));
+  /* Wat er tijdens het meten UIT staat, hoort even zichtbaar te zijn als wat er is
+     geijkt: een ronde met andere voorwaarden is een andere ronde. */
+  console.log('  tikkers stilgezet                    : bank opdrachtenronde (60s), bank uurtik, commercie (5m)');
+  console.log('  tikkers die NOG tikken (gemeten)     : ledenSites, veilig, rtgai');
 
   /* Het verschil dat DEZE oproep achterliet. De stand loopt door over de hele
      ronde: elk antwoord is het nieuwe ijkpunt voor het volgende. */
@@ -449,6 +491,25 @@ function wachtOpSchoneBoom() {
      niet bij de meting". */
   const herijk = !staatWerkt ? null : (antwoord) => {
     if (antwoord && antwoord.staat != null) vorigeStand = antwoord.staat;
+  };
+
+  /* NA EEN VERSE INLOG ONDERWEG -- de vierde toerekeningsweg, en de enige die niet
+     uit het voorwerk van een route komt maar uit de OPSTELLING zelf.
+
+     Waarom hij bestaat en waarom het ijkpunt NIET opschuift, staat bij de aanroep in
+     scripts/lib/idemproef.js -- met de meting erbij. Hier staat alleen hoe de namen
+     worden bepaald: het verschil tussen de stand van voor de inlog (de 401 draagt die
+     mee) en de stand die het antwoord van de inlog zelf droeg, met dezelfde geijkte
+     ruis eruit als overal.
+
+     De sleutelbos onthoudt die tweede stand, want dat is de enige plek waar dit huis
+     inlogt. Ontbreekt er een van de twee, dan geeft hij een LEGE lijst terug: dan is
+     er niets bekend om weg te laten, en dan hoort de meting te blijven staan zoals ze
+     is in plaats van te worden opgepoetst. */
+  const naInlog = !staatWerkt ? null : ({ voor }) => {
+    const na = bos.laatsteInlogStaat && bos.laatsteInlogStaat();
+    if (voor == null || na == null) return [];
+    return Object.keys(staatlog.verschil(voor, na, ruis));
   };
 
   let register = {};
@@ -516,7 +577,7 @@ function wachtOpSchoneBoom() {
   const wacht = maakWereldwacht({ post, tokenVoor, extras: wereldExtras,
     elke: Number(process.env.RTG_WERELDWACHT || 250) });
 
-  const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw, wacht,
+  const uit = await draaiIdemproef({ post, routes, tokenVoor, hernieuw, naInlog, wacht,
     lijfVoor: (r) => {
       const vv = voorvoegselVan(r.pad);
       return { ...plausibelLijf(r.pad), ...extra, ...(vv ? schoonLijf(vv.lijf) : {}), ...(geldLijven[r.pad] || {}) };
@@ -680,6 +741,15 @@ function wachtOpSchoneBoom() {
       beschermd: t.beschermd, onbeschermd: t.onbeschermd, ongemeten: t.ongemeten,
       oproepen: uit.oproepen, tokensHernieuwd: uit.hernieuwd,
       uitOpslag: uit.uitOpslag || 0, ruisGeijkt: [...ruis], vastlegging: uit.vastleggingGemeten || [],
+      /* ONDER WELKE VOORWAARDEN DIT IS GEMETEN. Twee rondes die elke vijf minuten
+         schrijven staan tijdens deze ronde stil (zie de env hierboven); zonder dat
+         belandt hun werk in de delta van de route die op dat moment aan de beurt is.
+         Het staat in het REGISTER en niet alleen in de bron, want wie deze getallen
+         later leest moet kunnen zien wat er tijdens het meten uit stond -- en wat NIET
+         (`tikkersNogAan`, gemeten op een stille server van 5,5 minuut). */
+      tikkersStil: ['bank opdrachtenronde 60s (kern/bank/index.js)', 'bank uurtik (kern/bank/index.js)',
+        'commercie 5m (kernlaag3c) -- geen eigen bewijs'],
+      tikkersNogAan: ['ledenSites', 'veilig', 'rtgai'],
       blindeRondes: uit.meterStuk ? 1 : 0, begrenzing: MAX,
       wereldKlaargezet: Object.keys(extra), geldroutesMetEigenLijf: Object.keys(geldLijven).length,
       onbeschermdMetBesluit: onbeschermd.length - zonderBesluit.length,

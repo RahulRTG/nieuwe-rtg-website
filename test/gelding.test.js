@@ -172,3 +172,89 @@ test('5. de twee misleesbare uitslagen dragen hun waarschuwing in het register',
   assert.deepEqual(j.assen.claim.citaatKapot, [],
     'een citaat van de claim wijst naar een zin die niet meer bestaat; dan is de claim niet meer na te lezen');
 });
+
+/* ============================================================================
+   HET BESLUIT VAN 14 SEPTEMBER, met drie toetsen -- want een doctrinebesluit dat
+   alleen in een register staat, is een zin en geen regel. */
+
+/* MUTATIE GEZIEN ZAKKEN: `actorenPer` leeggemaakt; toets 6 zakte op het
+   ontbreken van `leerling`, en toets 7 zakte omdat de uitzondering dan naar een
+   actor wijst die niet bestaat. */
+test('6. de actor-as bestaat PER CONTEXT, en een betekenisloze cel wordt niet verzonnen', () => {
+  const m = B.meet(VORMEN);
+  const actorenIn = (c) => [...new Set(m.cellen.filter(x => x.context === c).map(x => x.actor))];
+
+  for (const actor of ['leerling', 'docent']) {
+    assert.ok(actorenIn('school').includes(actor),
+      'zonder de actor "' + actor + '" is het besluit van 14 september niet op te schrijven: de vier ' +
+      'oorspronkelijke actoren zijn allemaal DERDEN en de uitzondering gaat juist over deze twee');
+  }
+  /* EN DE ANDERE KANT, die scherper moet zijn dan twee namen. Een toets die
+     alleen `leerling` en `docent` buiten School verbiedt, laat een DERDE
+     contextactor er ongemerkt bij komen -- en dan groeit de celruimte met cellen
+     die niemand heeft verklaard. Gezien gebeuren: `work: ['stagiair']` erbij
+     zetten liet deze toets groen. Daarom staat er nu de VERZAMELING contexten
+     met eigen actoren, en die is precies { school }. */
+  assert.deepStrictEqual(Object.keys(B.GEVAL.actorenPer || {}).sort(), ['school'],
+    'alleen School kent actoren die er elders niet zijn. Komt er een context bij, dan hoort daar een ' +
+    'uitgeschreven reden bij te staan in plaats van een stille uitbreiding van de celruimte');
+  for (const context of ['work', 'living', 'foundation']) {
+    assert.deepStrictEqual(actorenIn(context).sort(), B.GEVAL.actoren.slice().sort(),
+      'de context ' + context + ' hoort precies de vier vaste actoren te dragen; elke extra cel daar is ' +
+      'een cel zonder betekenis en poetst de telling op met lucht');
+  }
+  /* En de telling sluit: geen cel te veel en geen cel te weinig. Dit is de
+     helft die een 'plaatshouder' die zichzelf gelijk stelt nooit had gevangen. */
+  const verwacht = B.GEVAL.contexten.reduce((n, c) =>
+    n + B.GEVAL.handelingen.length * (B.GEVAL.actoren.length + ((B.GEVAL.actorenPer || {})[c] || []).length), 0);
+  assert.equal(m.cellen.length, verwacht,
+    'de celruimte telt niet op: handelingen x (vaste actoren + de actoren van die context)');
+});
+
+/* MUTATIE GEZIEN ZAKKEN: `actoren: ['leerling', 'docent']` van de tonen-regel
+   gehaald; toets 7 zakte meteen -- de uitzondering dekte toen ook `partner`, en
+   dat is precies wat SCHOOL.md par. 11.1 tegenhoudt. */
+test('7. de uitzondering voor School kent een actor, en dekt de derde partij NIET', () => {
+  const m = B.meet(VORMEN);
+  const cel = (h, a) => m.cellen.find(c => c.handeling === h && c.context === 'school' && c.actor === a);
+
+  for (const actor of ['leerling', 'docent']) {
+    assert.equal(cel('tonen', actor).uitslag, 'UITGEZONDERD_IN_DOCTRINE',
+      'een cijfer tonen aan de ' + actor + ' is dezelfde leerstof als het bewaren ervan');
+  }
+  for (const actor of ['systeem', 'medewerker', 'partner', 'externeLezer']) {
+    assert.notEqual(cel('tonen', actor).uitslag, 'UITGEZONDERD_IN_DOCTRINE',
+      'tonen aan ' + actor + ' hoort onder de grens te blijven; dat is het hele onderscheid van par. 11.1');
+  }
+
+  /* En de vierde uitkomst is er niet voor de sier: een cel waar de doctrine ZELF
+     een uitzondering maakt, is het tegenovergestelde van onbepaald. */
+  assert.equal(m.cellen.filter(c => c.uitslag === 'ONBEPAALD').length, 0,
+    'ONBEPAALD hoort te zeggen dat NIEMAND weet waarom er niets wordt geclaimd; een doordacht besluit ' +
+    'met een uitgeschreven reden hoort daar niet in dezelfde bak te vallen');
+  assert.ok(m.cellen.filter(c => c.uitslag === 'UITGEZONDERD_IN_DOCTRINE').every(c => c.claimWaarom),
+    'een uitgezonderde cel zonder reden is een gat met een etiket erop');
+});
+
+/* MUTATIE GEZIEN ZAKKEN: de gebalanceerde haakjesteller vervangen door het oude
+   `\[([^\]]*)\]`; toets 8 zakte op `server/school` -- precies het defect dat deze
+   toets vastlegt. */
+test('8. de WACHT-as ziet ALLE bewaakte mappen, ook die buiten de kernlijst', () => {
+  const w = B.asWacht();
+  assert.equal(w.bron, 'gemeten');
+  assert.ok(w.paden.includes('server/school'),
+    'de wachter scant server/school aantoonbaar (toets 3 van test/cijferopmens.test.js zakt zonder), dus ' +
+    'een as die dat niet ziet, meldt een gat dat er niet is');
+  assert.ok(w.paden.includes('server/kern/rtfos') && w.paden.includes('server/kern/command'),
+    'de twee mappen die er op 14 september onder de grens bij kwamen, horen de WACHT-as ook te bereiken');
+
+  /* De brokken van de path.join-aanroepen mogen geen bewaakte map worden, en ze
+     verdwijnen ook niet stil: ze staan met naam in de uitslag. */
+  assert.ok(!w.paden.includes('server') && !w.paden.includes('.'),
+    'de wortel en de map server/ zijn geen bewaakte mappen maar brokken van het pad ernaartoe');
+  assert.ok(w.padfragment.length > 0,
+    'de afgewezen padbrokken horen met naam in de uitslag te staan; anders kan niemand nakijken waarom ' +
+    'een map wegviel');
+  assert.deepStrictEqual(w.nietOpgelost, [],
+    'een naam die deze as niet thuisbrengt, is een gat in de meting en geen nul');
+});

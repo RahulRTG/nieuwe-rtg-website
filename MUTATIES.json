@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-14T17:42:29.848Z",
-    "commit": "39936e00",
+    "op": "2026-09-14T16:37:14.282Z",
+    "commit": "eea6024e",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -3675,6 +3675,13 @@
       "gezakt": 3,
       "geprobeerd": 7
     },
+    "idemcontract.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
     "idemproef.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6691,13 +6698,6 @@
       "operator": "===->!==#0",
       "gezakt": 5,
       "geprobeerd": 1
-    },
-    "rtf-labfonds-deur.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 9,
-      "scherp": "gezakt"
     },
     "rtf-veilig.test.js": {
       "soort": "server",

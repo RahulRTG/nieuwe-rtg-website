@@ -3,17 +3,17 @@
  "uitleg": "Per handeling: hoeveel van de eigen machinerie raakt hij? Zestien motoren die ieder apart gemeten zijn, hier voor het eerst naast elkaar op DEZELFDE route.",
  "grens": "Twee assen die verschillende dingen missen, nooit opgeteld: `handler` is lexicaal binnen de tekst van de handler (mist een hulpfunctie en de kern-tas) en `bestand` rekent het routebestand plus zijn DIRECTE requires (vangt de hulpfunctie, markeert alle routes in een bestand, mist nog steeds de kern-tas). De tas zit met opzet niet in de route-as: een hub als server.js zette zo 4162 routes op \"idempotent\". Woont een route ZELF in een hub, dan vervalt de bestandsas (bestandsasOnbruikbaar) en is ook zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. De assen uit EXECUTION_MAP.json zijn gelezen en niet hier geteld.",
  "stempel": {
-  "op": "2026-09-14T19:19:04.524Z",
-  "commit": "1e7951df",
+  "op": "2026-09-14T17:58:41.104Z",
+  "commit": "5e971946",
   "boomVuil": false,
-  "boomAnders": 2,
+  "boomAnders": 0,
   "instrument": "scripts/machinedekking.js",
   "node": "v22.22.2"
  },
  "bronnen": {
-  "EXECUTION_MAP.json": "f4c7bb30cc0f89ee",
+  "EXECUTION_MAP.json": "b4bd7a4083d280e9",
   "KERNHERKOMST.json": "807b7a8bc53cd607",
-  "MUTATIECONTRACT.json": "2bd1f0290938c859",
+  "MUTATIECONTRACT.json": "7b39d1418935bb36",
   "server/kern/stuur/beleid.js": "8dc821a9959c82e0",
   "kernherkomstStempel": {
    "op": "2026-09-03",
@@ -213,8 +213,8 @@
   }
  },
  "gemeten": {
-  "routes": 5063,
-  "muterend": 3792,
+  "routes": 5055,
+  "muterend": 3784,
   "leesroutesUitRegister": 1181,
   "assen": 19,
   "perAs": {
@@ -293,8 +293,8 @@
     "uitKaart": true
    },
    "herhaling": {
-    "handler": 1704,
-    "bestand": 1704,
+    "handler": 1692,
+    "bestand": 1692,
     "uitKaart": true
    }
   },
@@ -575,7 +575,7 @@
     }
    }
   ],
-  "mutatiesZonderEnigeAs": 2783,
+  "mutatiesZonderEnigeAs": 2787,
   "mutatiesZonderHandlerSpan": 0,
   "bestandsasOnbruikbaar": 13,
   "hubdrempel": 40,
@@ -592,11 +592,11 @@
   "assenPerMutatie": [
    {
     "assen": 0,
-    "routes": 2957
+    "routes": 2961
    },
    {
     "assen": 1,
-    "routes": 767
+    "routes": 755
    },
    {
     "assen": 2,
@@ -8790,23 +8790,15 @@
    "methode": "POST",
    "pad": "/api/labfonds/beslis",
    "bestand": "server/routes/labfonds.js",
-   "onder": [
-    "herhaling"
-   ],
-   "boven": [
-    "herhaling"
-   ]
+   "onder": [],
+   "boven": []
   },
   {
    "methode": "POST",
    "pad": "/api/labfonds/doneer",
    "bestand": "server/routes/labfonds.js",
-   "onder": [
-    "herhaling"
-   ],
-   "boven": [
-    "herhaling"
-   ]
+   "onder": [],
+   "boven": []
   },
   {
    "methode": "POST",
@@ -8819,34 +8811,22 @@
    "methode": "POST",
    "pad": "/api/labfonds/scheidsrechter",
    "bestand": "server/routes/labfonds.js",
-   "onder": [
-    "herhaling"
-   ],
-   "boven": [
-    "herhaling"
-   ]
+   "onder": [],
+   "boven": []
   },
   {
    "methode": "POST",
    "pad": "/api/labfonds/stem",
    "bestand": "server/routes/labfonds.js",
-   "onder": [
-    "herhaling"
-   ],
-   "boven": [
-    "herhaling"
-   ]
+   "onder": [],
+   "boven": []
   },
   {
    "methode": "POST",
    "pad": "/api/labfonds/voorstel/maak",
    "bestand": "server/routes/labfonds.js",
-   "onder": [
-    "herhaling"
-   ],
-   "boven": [
-    "herhaling"
-   ]
+   "onder": [],
+   "boven": []
   },
   {
    "methode": "POST",
@@ -18902,90 +18882,6 @@
    "bestand": "server/routes/member/gezin.js",
    "onder": [],
    "boven": []
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtf/labfonds/beslis",
-   "bestand": "server/routes/labfonds.js",
-   "onder": [
-    "herhaling"
-   ],
-   "boven": [
-    "herhaling"
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtf/labfonds/doneer",
-   "bestand": "server/routes/labfonds.js",
-   "onder": [
-    "herhaling"
-   ],
-   "boven": [
-    "herhaling"
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtf/labfonds/financiering",
-   "bestand": "server/routes/labfonds.js",
-   "onder": [],
-   "boven": []
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtf/labfonds/locatie/maak",
-   "bestand": "server/routes/labfonds.js",
-   "onder": [
-    "herhaling"
-   ],
-   "boven": [
-    "herhaling"
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtf/labfonds/overzicht",
-   "bestand": "server/routes/labfonds.js",
-   "onder": [
-    "herhaling"
-   ],
-   "boven": [
-    "herhaling"
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtf/labfonds/scheidsrechter",
-   "bestand": "server/routes/labfonds.js",
-   "onder": [
-    "herhaling"
-   ],
-   "boven": [
-    "herhaling"
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtf/labfonds/stem",
-   "bestand": "server/routes/labfonds.js",
-   "onder": [
-    "herhaling"
-   ],
-   "boven": [
-    "herhaling"
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/rtf/labfonds/voorstel/maak",
-   "bestand": "server/routes/labfonds.js",
-   "onder": [
-    "herhaling"
-   ],
-   "boven": [
-    "herhaling"
-   ]
   },
   {
    "methode": "POST",

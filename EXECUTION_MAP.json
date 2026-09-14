@@ -1,7 +1,7 @@
 {
  "uitleg": "Afgeleide executiekaart: per route wat de AI ermee mag, wat het bewijs eronder zegt en of een herhaling schade doet. De herkomst staat per veldsoort in `velden`, de vertaling naar de gedeelde gezagsnoemer in `noemer`. NOOIT met de hand wijzigen: npm run executionmap:controle zakt erop.",
  "bronnen": {
-  "IDEMPROEF.json": "c21e20e94c905f48",
+  "IDEMPROEF.json": "6fada73718aa26b3",
   "IDEMBESLUIT.json": "a20e7b5abed335c8",
   "HERSTEL.json": "43f74e808fe06d72",
   "VERTROUWEN.json": "6fb6bc1a3e8ce705",
@@ -72,7 +72,7 @@
   }
  },
  "telling": {
-  "capabilities": 4933,
+  "capabilities": 4925,
   "bereikbaarPerRol": 177,
   "conflicten": 0,
   "metBesluit": 128,
@@ -10904,7 +10904,7 @@
   {
    "pad": "/api/labfonds/beslis",
    "rol": "member",
-   "herhaling": "beschermd",
+   "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -10920,7 +10920,7 @@
   {
    "pad": "/api/labfonds/doneer",
    "rol": "member",
-   "herhaling": "beschermd",
+   "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -10952,7 +10952,7 @@
   {
    "pad": "/api/labfonds/scheidsrechter",
    "rol": "member",
-   "herhaling": "beschermd",
+   "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -10960,7 +10960,7 @@
   {
    "pad": "/api/labfonds/stem",
    "rol": "member",
-   "herhaling": "beschermd",
+   "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -10968,7 +10968,7 @@
   {
    "pad": "/api/labfonds/voorstel/maak",
    "rol": "member",
-   "herhaling": "beschermd",
+   "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
    "bereik": "verboden"
@@ -24429,70 +24429,6 @@
    "herhaling": "ongemeten",
    "bewijs": "verzwakt",
    "bewijsReden": "het bewijs draagt minder dan het lijkt: 5 schakel(s) nooit gemeten (STATE, SIDE_EFFECT, AUDIT, IDEMPOTENCY, FAILURE)",
-   "bereik": "verboden"
-  },
-  {
-   "pad": "/api/rtf/labfonds/beslis",
-   "rol": "",
-   "herhaling": "beschermd",
-   "bewijs": "ONBEPAALD",
-   "bewijsReden": "deze route staat niet in het vervalregister",
-   "bereik": "verboden"
-  },
-  {
-   "pad": "/api/rtf/labfonds/doneer",
-   "rol": "",
-   "herhaling": "beschermd",
-   "bewijs": "ONBEPAALD",
-   "bewijsReden": "deze route staat niet in het vervalregister",
-   "bereik": "verboden"
-  },
-  {
-   "pad": "/api/rtf/labfonds/financiering",
-   "rol": "",
-   "herhaling": "ongemeten",
-   "bewijs": "ONBEPAALD",
-   "bewijsReden": "deze route staat niet in het vervalregister",
-   "bereik": "verboden"
-  },
-  {
-   "pad": "/api/rtf/labfonds/locatie/maak",
-   "rol": "",
-   "herhaling": "beschermd",
-   "bewijs": "ONBEPAALD",
-   "bewijsReden": "deze route staat niet in het vervalregister",
-   "bereik": "verboden"
-  },
-  {
-   "pad": "/api/rtf/labfonds/overzicht",
-   "rol": "",
-   "herhaling": "beschermd",
-   "bewijs": "ONBEPAALD",
-   "bewijsReden": "deze route staat niet in het vervalregister",
-   "bereik": "verboden"
-  },
-  {
-   "pad": "/api/rtf/labfonds/scheidsrechter",
-   "rol": "",
-   "herhaling": "beschermd",
-   "bewijs": "ONBEPAALD",
-   "bewijsReden": "deze route staat niet in het vervalregister",
-   "bereik": "verboden"
-  },
-  {
-   "pad": "/api/rtf/labfonds/stem",
-   "rol": "",
-   "herhaling": "beschermd",
-   "bewijs": "ONBEPAALD",
-   "bewijsReden": "deze route staat niet in het vervalregister",
-   "bereik": "verboden"
-  },
-  {
-   "pad": "/api/rtf/labfonds/voorstel/maak",
-   "rol": "",
-   "herhaling": "beschermd",
-   "bewijs": "ONBEPAALD",
-   "bewijsReden": "deze route staat niet in het vervalregister",
    "bereik": "verboden"
   },
   {

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-14T09:24:15.905Z",
-    "commit": "017bbb536",
+    "op": "2026-09-14T16:02:16.896Z",
+    "commit": "73b0b5085",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/vindbaar.js",
     "node": "v22.22.2"
   },
@@ -11,9 +11,9 @@
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 97,
-  "woorden": 1153,
-  "gevonden": 754,
-  "dekking": 0.6539,
+  "woorden": 1161,
+  "gevonden": 757,
+  "dekking": 0.652,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -178,6 +178,27 @@
       ]
     },
     {
+      "naam": "Wie ben ik",
+      "url": "/apps/ik.html",
+      "woorden": 23,
+      "gevonden": 10,
+      "mist": [
+        "regie",
+        "werelden",
+        "privacy",
+        "weergave",
+        "bediening",
+        "informatie",
+        "aanspreekvorm",
+        "welke",
+        "geloof",
+        "levensbeschouwing",
+        "gebedstijden",
+        "richting",
+        "mekka"
+      ]
+    },
+    {
       "naam": "Horeca",
       "url": "/apps/horeca.html",
       "woorden": 47,
@@ -320,22 +341,6 @@
         "rating",
         "sterren",
         "aantal"
-      ]
-    },
-    {
-      "naam": "Wie ben ik",
-      "url": "/apps/ik.html",
-      "woorden": 15,
-      "gevonden": 7,
-      "mist": [
-        "voornaamwoorden",
-        "gedraagt",
-        "welke",
-        "geloof",
-        "levensbeschouwing",
-        "gebedstijden",
-        "richting",
-        "mekka"
       ]
     },
     {

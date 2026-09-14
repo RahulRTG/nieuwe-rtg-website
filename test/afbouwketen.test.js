@@ -55,6 +55,24 @@ function laadAfloop(pad) {
 }
 const leesRauw = (pad) => fs.readFileSync(pad, 'utf8');
 
+/* DE AFLOOP ZONDER DE HARTSLAG.
+
+   `kring` en `kringGepeild` zijn WAARNEMING en geen afloop: de hartslag van een
+   LOPENDE ronde schrijft ze er elke tik in (scripts/lib/afbouw-afloop.js, en in
+   deze proef staat die tik op 100 ms). Wie het bestand byte voor byte vergelijkt
+   over een venster waarin die ronde nog leeft, toetst dus of de hartslag
+   toevallig niet tikte -- en dat is niet wat er bewezen moet worden.
+
+   Waar de ronde DOOD is (na SIGKILL) blijft de byte-vergelijking staan: daar
+   mag er per definitie niets meer geschreven worden, en juist dat is de
+   invariant. */
+const HARTSLAGVELDEN = ['kring', 'kringGepeild'];
+function afloopZonderHartslag(rauw) {
+  const o = JSON.parse(rauw);
+  for (const v of HARTSLAGVELDEN) delete o[v];
+  return o;
+}
+
 /* DE OPRUIMER, EN WAAROM HIJ ER IS -- deze toets maakte precies de fout waar hij
    over gaat.
 
@@ -239,25 +257,7 @@ test('NEGATIEF: een mislukte claim registreert geen ronde', (t) => {
      een bestand dat er nog niet was. */
   assert.ok(wachtOpPid(kindPad), 'de eerste ronde heeft haar kind-PID weggeschreven');
   const A = laadAfloop(w.afloop);
-  /* WAT EEN CLAIM KAN VERANDEREN, EN WAT DE EIGENAAR ZELF SCHRIJFT.
-
-     Hier stond een vergelijking byte voor byte, en die zakte -- terecht, maar
-     niet om de reden die de melding gaf. De EERSTE ronde leeft, en een levende
-     ronde schrijft elke hartslag haar eigen proceskring bij (hier elke 100 ms,
-     zie w.env). Tussen de twee lezingen ging `kring` dus van leeg naar een
-     kind, en dat had niets met de mislukte claim te maken.
-
-     Een levend dossier byte voor byte vergelijken meet de klok en niet de
-     claim. Wat bewezen moet worden is smaller en scherper: de claim schrijft
-     GEEN tweede ronde en raakt niets aan dat over eigendom of afloop gaat. De
-     hartslagvelden horen daar niet bij -- die zijn van de eigenaar, en dat de
-     eigenaar ze mag schrijven staat als eigen toets in test/afbouwafloop. */
-  const eigendom = (rauw) => {
-    const j = JSON.parse(rauw);
-    for (const veld of ['kring', 'kringGepeild']) delete j[veld];
-    return JSON.stringify(j);
-  };
-  const vanEerste = eigendom(leesRauw(w.afloop));
+  const vanEerste = afloopZonderHartslag(leesRauw(w.afloop));
   const kind = op.volg(Number(fs.readFileSync(kindPad, 'utf8')));
 
   /* De tweede claim MOET stuklopen: het slot is bezet door een levend proces. */
@@ -267,7 +267,7 @@ test('NEGATIEF: een mislukte claim registreert geen ronde', (t) => {
   assert.notEqual(tweede.status, 0, 'een tweede claim op een bezet slot hoort te falen');
   assert.match(String(tweede.stderr || ''), /al actief/i, 'en te zeggen waarom');
 
-  assert.equal(eigendom(leesRauw(w.afloop)), vanEerste,
+  assert.deepEqual(afloopZonderHartslag(leesRauw(w.afloop)), vanEerste,
     'de mislukte claim hoort niets aan het EIGENDOM of de AFLOOP te veranderen -- anders lijkt een ' +
     'niet-begonnen ronde op een gestorven meetronde en blokkeert hij de machine om werk dat nooit bestond');
   assert.equal(A.lees().taak, 'proefronde', 'de afloop hoort nog van de EERSTE ronde te zijn');

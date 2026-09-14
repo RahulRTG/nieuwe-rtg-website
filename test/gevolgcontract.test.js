@@ -253,9 +253,17 @@ test('HET REGISTER IS SAMENGESTELD, en een dubbele definitie valt om bij het LAD
      toen er twee pay-delen bijkwamen zei deze toets dat het register niet de som van zijn
      delen was -- terwijl het dat wel was; de toets kende de som niet. Een lijst delen die
      met de hand meegroeit, is precies de tweede waarheid die dit register vermijdt. */
-  const DELEN = ['register-bank', 'register-lid', 'register-pay-oplaad', 'register-pay-stuur',
-    'register-pay-factuur']
-    .map(n => [n + '.js', Object.values(require('../server/kern/stuur/gevolgcontract/' + n))[0]]);
+  /* EN DE LIJST WORDT GELEZEN EN NIET GETYPT. Hij stond hier als acht namen, met de
+     waarschuwing erboven dat een handlijst meegroeit -- en precies dat gebeurde bij het
+     negende deel: de laatste vergelijking zei dat het register niet de som van zijn delen
+     was terwijl het dat wel was. Nu komt de lijst uit de MAP, dus een nieuw deel dat
+     vergeten wordt in register.js laat deze toets zakken in plaats van hem groen te houden
+     op een verouderde lijst. */
+  const fsd = require('fs');
+  const padd = require('path');
+  const MAP = padd.join(__dirname, '..', 'server', 'kern', 'stuur', 'gevolgcontract');
+  const DELEN = fsd.readdirSync(MAP).filter(n => /^register-.+\.js$/.test(n)).sort()
+    .map(n => [n, Object.values(require(padd.join(MAP, n)))[0]]);
   assert.ok(DELEN.length >= 4, 'de delenlijst is leeg of onvolledig');
   for (const [naam, deel] of DELEN)
     assert.ok(deel && Object.keys(deel).length, naam + ' levert geen enkel contract');
@@ -386,6 +394,46 @@ test('DE WALLET-CONTRACTEN: `nooit` wordt AFGEDWONGEN tegen de bron, niet beweer
     assert.ok(c.veroorzaakt.includes('GELD_BEWEGEN'), c.capability + ' verplaatst geld');
     assert.ok(c.nooit.includes('EXTERN_BEREIKEN'), c.capability + ' claimt geen bericht naar buiten');
   }
+});
+
+test('HET KLOMPJE: vragen is VOORSTEL_MAKEN en voldoen is GELD_BEWEGEN, nooit omgekeerd', () => {
+  /* De scherpste naad die deze laag kent, en de eerste plek waar `VOORSTEL_MAKEN` door een
+     contract wordt gebruikt (een van de vier werkwoorden die er op 13 september bijkwamen
+     omdat de dertien van het isolatiemodel deze klasse niet konden uitdrukken).
+
+     Zonder deze toets kan iemand de twee contracten later "opschonen" tot een, en dan zou
+     een handeling die alleen iets KLAARZET meeliften op het werkwoord van een handeling die
+     geld verplaatst -- precies de vermenging die de nieuwe invariant hierboven verbiedt.
+
+     TWEE MUTATIEPROEVEN, en de eerste die ik opschreef was FOUT -- vandaar dat hij hier
+     staat. `GELD_BEWEGEN` in `veroorzaakt` van /api/pay/verzoek zetten laat deze toets NIET
+     zakken: `nooit` houdt het woord dan ook nog, dus de bewering hieronder blijft waar. Wat
+     er dan zakt is de registertoets, omdat keuring.js een werkwoord in BEIDE lijsten
+     weigert. Fail-closed dus wel, maar door een andere wacht dan ik beweerde -- en een
+     mutatieproef die de verkeerde toets noemt, is geen proef.
+
+     Wat deze toets WEL laat zakken, allebei nagetrokken:
+       - VOORSTEL_MAKEN uit `veroorzaakt` halen -> 'vragen zet iets klaar';
+       - de naam SCHRIJVEN_ANDERMANS uit de `onzeker`-reden halen -> 'de onbeslistheid moet
+         UITGESCHREVEN staan'. */
+  const vraag = CONTRACTEN['/api/pay/verzoek'];
+  const betaal = CONTRACTEN['/api/pay/verzoek/betaal'];
+  assert.ok(vraag.veroorzaakt.includes('VOORSTEL_MAKEN'), 'vragen zet iets klaar');
+  assert.ok(vraag.nooit.includes('GELD_BEWEGEN'), 'vragen verplaatst geen geld: verzoekMaak schrijft ' +
+    'alleen klompje-rijen');
+  assert.ok(betaal.veroorzaakt.includes('GELD_BEWEGEN'), 'voldoen verplaatst geld');
+  assert.ok(betaal.nooit.includes('VOORSTEL_MAKEN'), 'voldoen zet niets klaar maar voert uit');
+  /* EN DE TWIJFEL BLIJFT TWIJFEL. Bij vragen staat SCHRIJVEN_ANDERMANS in GEEN van beide
+     lijsten (een nieuwe rij in andermans beeld is geen wijziging van wat hij had, maar wel
+     iets); bij voldoen staat hij hard in `veroorzaakt`, want daar verandert het saldo van de
+     vrager en de status van zijn rij. Wie de twijfel bij vragen wegpoetst naar `nooit`, geeft
+     een garantie die niemand heeft nagerekend. */
+  const W = 'SCHRIJVEN_ANDERMANS';
+  assert.ok(!vraag.veroorzaakt.includes(W) && !vraag.nooit.includes(W),
+    'bij vragen is ' + W + ' met opzet onbeslist, en dat hoort in `onzeker` te staan');
+  assert.ok((vraag.onzeker || []).some(o => /SCHRIJVEN_ANDERMANS/.test(o.reden || '')),
+    'de onbeslistheid moet UITGESCHREVEN staan, niet alleen afwezig zijn');
+  assert.ok(betaal.veroorzaakt.includes(W), 'bij voldoen is er geen twijfel: het saldo van de vrager beweegt');
 });
 
 test('de werkwoorden worden GELEEND van het effectmodel en niet bedacht', () => {

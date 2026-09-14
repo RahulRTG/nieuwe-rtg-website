@@ -162,3 +162,101 @@ test('12. geen enkele viraal- of AI-module kan zelf uitlichten', () => {
     assert.ok(!/\.featured\s*=/.test(src), f + ' zet `featured` niet');
   }
 });
+
+/* ===========================================================================
+   DISCOVERY EN DE FAN INBOX (13 september 2026)
+
+   De twee helften die schakel 2 en 5 van scripts/momentproef.js openhielden:
+   een fan kon een aanwezigheid niet VINDEN, en na de wek niet TERUGVINDEN.
+   ======================================================================== */
+
+/* Discovery woont sinds de splitsing in ../server/kern/mediaos/zoeken.js: die
+   module raakt `db.data` niet aan en leest de aanwezigheden via `aanwezigAlle`,
+   zodat de collectie EEN lezer en EEN schrijver houdt (keuring regel 63). */
+function zoeker(a) {
+  return require('../server/kern/mediaos/zoeken')({ a: null, aanwezig: a, SOORTEN: a.AANWEZIG_SOORTEN });
+}
+
+test('13. zoeken vindt een aanwezigheid die je nog niet volgt, en rangschikt niemand', () => {
+  const a = stel();
+  const z = zoeker(a);
+  a.aanwezigZorg('zaak', 'NACHT', 'Proeffestival');
+  a.aanwezigZorg('zaak', 'FCRTG', 'FC RTG');
+  a.aanwezigZorg('lid', 'lid-1', 'CN-lid-1');
+
+  /* 1. Vinden zonder het id te kennen -- dat is de hele schakel. */
+  const r = z.aanwezigZoek('lid-9', 'proef');
+  assert.equal(r.aanwezigheden.length, 1, 'op een stuk van de naam');
+  assert.equal(r.aanwezigheden[0].id, 'zaak:NACHT');
+  assert.equal(r.aanwezigheden[0].volgIk, false, 'en hij zegt erbij dat je hem nog niet volgt');
+  assert.ok(r.aanwezigheden[0].watUKrijgt.length, 'met wat je zou gaan krijgen');
+
+  /* 2. Op soort filteren doet hetzelfde werk vanuit de andere kant. */
+  assert.ok(z.aanwezigZoek('lid-9', '', 'wedstrijd').aanwezigheden.length >= 2);
+  assert.equal(z.aanwezigZoek('lid-9', 'bestaat-niet').aanwezigheden.length, 0);
+
+  /* 3. DE GRENS: er komt geen volgerstelling uit, ook niet verstopt. Een cijfer
+        over iemands publiek is het begin van een ranglijst, en de meeteenheid
+        van deze laag is de gebeurtenis en nooit de mens (STAGE.md par. 5). */
+  a.aanwezigVolg('lid-2', 'zaak:NACHT', true);
+  a.aanwezigVolg('lid-3', 'zaak:NACHT', true);
+  const na = z.aanwezigZoek('lid-9', 'proef').aanwezigheden[0];
+  for (const sleutel of Object.keys(na))
+    assert.ok(!/volgers|aantal|score|rang|populair/i.test(sleutel), 'geen telling in het veld ' + sleutel);
+  assert.equal(JSON.stringify(na).includes('lid-2'), false, 'en geen enkele volger bij naam');
+
+  /* 4. Jezelf vind je niet: volgen zou toch 400 geven, dus een treffer waar je
+        niets mee kunt is een dood spoor. */
+  assert.equal(z.aanwezigZoek('lid-1', 'CN-lid-1').aanwezigheden.length, 0);
+
+  /* 5. Sorteren op naam en niet op iets wat op populariteit lijkt. */
+  const alle = z.aanwezigZoek('lid-9', '').aanwezigheden.map(x => x.naam);
+  assert.deepEqual(alle, [...alle].sort((x, y) => String(x).localeCompare(String(y))));
+});
+
+test('14. de tijdlijn toont wat je volgt, leest de naam LIVE en bewaart geen tweede waarheid', () => {
+  const db = { data: {} };
+  const save = () => {};
+  const a = require('../server/kern/mediaos/aanwezigheid')({ db, save, schoon, codenaamVan: (k) => 'CN-' + k });
+  const SOORT_NAAM = require('../server/kern/mediaos/wekken').SOORT_NAAM;
+  /* De motor bezit de collectie niet meer: hij legt neer via ./tijdlijn.js, en
+     die is als enige schrijver van `mediaMomenten`. */
+  const tijdlijn = require('../server/kern/mediaos/tijdlijn')({ db, save, aanwezig: a, SOORT_NAAM });
+  const w = require('../server/kern/mediaos/wekken').maakWekken({
+    notify: () => {}, codenaamVan: (k) => 'CN-' + k, meldVan: () => ['wedstrijd', 'optreden'],
+    bronnen: {}, aanwezig: a, tijdlijn
+  });
+
+  a.aanwezigZorg('zaak', 'FCRTG', 'FC RTG');
+  a.aanwezigZorg('zaak', 'NACHT', 'Proeffestival');
+
+  /* 1. EEN MOMENT WORDT VASTGELEGD, OOK ZONDER VOLGERS. Het feit staat los van
+        de vraag of er iemand te wekken viel -- anders mist wie morgen volgt de
+        hele voorgeschiedenis. */
+  w.mediaNieuwMoment('zaak:FCRTG', 'wedstrijd', 'thuis tegen CD Salinas');
+  assert.equal(db.data.mediaMomenten.length, 1, 'vastgelegd zonder een enkele volger');
+
+  /* 2. De tijdlijn is een VENSTER op wat je volgt: niets volgen is niets zien. */
+  assert.equal(tijdlijn.mediaMomentenVoor('lid-1').momenten.length, 0);
+  a.aanwezigVolg('lid-1', 'zaak:FCRTG', true);
+  const t = tijdlijn.mediaMomentenVoor('lid-1');
+  assert.equal(t.momenten.length, 1);
+  assert.equal(t.momenten[0].soort, 'wedstrijd');
+  assert.equal(t.momenten[0].titel, 'thuis tegen CD Salinas');
+
+  /* 3. En wat je NIET volgt blijft weg, ook al staat het in hetzelfde register. */
+  w.mediaNieuwMoment('zaak:NACHT', 'optreden', 'Iemand op het hoofdpodium');
+  assert.equal(tijdlijn.mediaMomentenVoor('lid-1').momenten.length, 1, 'het festival volgt hij niet');
+
+  /* 4. DE GRENS UIT STAGE.md PAR. 2: de bron bepaalt DAT iets gebeurd is, Stage
+        alleen hoe het hier staat. De NAAM wordt dus live gelezen -- hernoemt de
+        club, dan staat de nieuwe naam er meteen -- terwijl de TITEL bij de
+        gebeurtenis hoort en historisch is. Zonder dat verschil draagt dit
+        register een kopie van de bron, en dat is precies de fout die deze tak
+        al een keer heeft gemaakt. */
+  a.aanwezigZorg('zaak', 'FCRTG', 'FC RTG Ibiza');
+  const na = tijdlijn.mediaMomentenVoor('lid-1').momenten[0];
+  assert.equal(na.naam, 'FC RTG Ibiza', 'de naam komt live uit de aanwezigheid');
+  assert.equal(na.titel, 'thuis tegen CD Salinas', 'de titel blijft van het moment');
+  assert.equal(db.data.mediaMomenten[0].naam, undefined, 'de naam staat NIET in het register');
+});

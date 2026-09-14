@@ -57,8 +57,14 @@ module.exports = (kern) => {
          gedaan en niet wat erin stond. */
       handelingen: typeof handelingsspoor === 'object' && handelingsspoor
         ? handelingsspoor.lijst({ over: key, max: 500 }) : null,
-      // wie er in uw identiteitsdossier heeft gekeken, en waarom
-      inzageInUwDossier: req.session.account ? inzagelog.voorBetrokkene(req.session.account.id) : []
+      /* Wie er in uw identiteitsdossier heeft gekeken, en waarom -- MET de
+         bewaartermijn erbij (besluit 6). Een AVG-export is precies de plek
+         waar een kale lijst als "dit is alles" leest terwijl het "dit is
+         alles binnen de termijn" is, en dat verschil moet de betrokkene zelf
+         kunnen zien in plaats van te moeten vermoeden. */
+      inzageInUwDossier: req.session.account
+        ? inzagelog.voorBetrokkene(req.session.account.id)
+        : { regels: [], bewaardagen: inzagelog.BEWAARDAGEN, belofte: null, volledig: true, tekort: null }
     });
   });
 
@@ -74,8 +80,15 @@ module.exports = (kern) => {
   app.post('/api/privacy/inzage', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
     if (!req.session.account) return res.json({ inzage: [], note: 'Dit is een demoprofiel zonder accountdossier.' });
+    /* DE BELOFTE STAAT NAAST DE LIJST EN NIET IN PLAATS ERVAN. `inzage` blijft
+       de regels, zodat een bestaand scherm er niets van merkt; `bewaring`
+       draagt de termijn, de zin eromheen en of de noodrem heeft gebeten. Dat
+       laatste is het verschil tussen "er is niemand geweest" en "er is niemand
+       geweest, voor zover wij nog terugkijken". */
+    const a = inzagelog.voorBetrokkene(req.session.account.id);
     res.json({
-      inzage: inzagelog.voorBetrokkene(req.session.account.id),
+      inzage: a.regels,
+      bewaring: { dagen: a.bewaardagen, belofte: a.belofte, volledig: a.volledig, tekort: a.tekort },
       note: 'Elke keer dat iemand bij RTG uw echte naam achter uw codenaam opvroeg. Leeg is goed nieuws: dan is er niemand in uw dossier geweest.'
     });
   });

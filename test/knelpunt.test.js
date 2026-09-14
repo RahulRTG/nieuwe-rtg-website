@@ -136,3 +136,56 @@ test('6. de motor rekent niets uit wat hij niet weet', () => {
   const dubbel = K.reken({ doel: 'd', randvoorwaarden: [{ id: 'a' }, { id: 'a' }], manieren: [{ id: 'x' }] });
   assert.equal(dubbel.status, 400, 'een dubbele randvoorwaarde hoort te weigeren in plaats van stil de eerste te overschrijven');
 });
+
+/* ---------------------------------------------------------------------------
+   ZEVEN EN ACHT -- SCHAKEL 4 VAN DE ADAM-KETEN (14 september 2026).
+
+   Een lege `nodig` betekende tot nu toe twee dingen tegelijk: "deze weg vergt
+   niets" en "wij weten niet wat hij vergt". Allebei leverden ze `open` op, met
+   de zin *"alles staat volgens uw eigen opgave geregeld"*. Voor een weg die dit
+   huis zelf samenstelt (kern/knelpunt/wegen.js -- de voorwaarden zijn daar met
+   opzet NIET gemeten) is die zin onwaar in de gevaarlijke richting: hij zegt
+   "ga maar" over iets waar niemand naar heeft gekeken. Dat is regel 2 van deze
+   motor, toegepast op de LIJST in plaats van op de standen erin.
+
+   MET EEN MUTATIE NAGETROKKEN:
+     - `voorwaardenOnbekend` uit de standberekening halen: RAAK op 7;
+     - de zin over de volgorde onvoorwaardelijk "u gaf ze op" laten zeggen:
+       RAAK op 8.
+   ------------------------------------------------------------------------- */
+test('7. een weg waarvan de voorwaarden niet gemeten zijn, heet nooit open', () => {
+  const r = K.reken({
+    doel: 'weer aan het werk',
+    manieren: [
+      { id: 'via-werk', wat: 'via werk', nodig: [], voorwaardenOnbekend: true },
+      { id: 'kaal', wat: 'een weg die volgens de opgever niets vergt', nodig: [] }
+    ]
+  });
+  const samengesteld = r.manieren.find(m => m.id === 'via-werk');
+  const opgegeven = r.manieren.find(m => m.id === 'kaal');
+
+  /* De kern: dezelfde lege lijst, twee verschillende uitslagen. */
+  assert.equal(samengesteld.stand, 'onbepaald');
+  assert.equal(opgegeven.stand, 'open');
+
+  /* En de reden staat erbij, want `onbepaald` zonder uitleg leest als een
+     tekortkoming van de mens in plaats van van de meting. */
+  assert.match(samengesteld.uitleg, /niet nagegaan wát hij vergt/);
+  assert.equal(samengesteld.voorwaardenOnbekend, true);
+  assert.equal(opgegeven.voorwaardenOnbekend, false);
+
+  /* REGEL 3: de stilste aanname van allemaal hoort in de uitslag. */
+  assert.ok(r.aannames.some(a => /niet nagegaan wát zij vergen/.test(a)),
+    'de aanname over ongemeten voorwaarden ontbreekt: ' + JSON.stringify(r.aannames));
+});
+
+test('8. het antwoord zegt WIE de manieren heeft samengesteld', () => {
+  const zelf = K.reken(SARAH);
+  assert.match(zelf.ordening, /volgorde waarin u ze opgaf/);
+
+  const huis = K.reken(Object.assign({}, SARAH, { manierenBron: 'samengesteld' }));
+  assert.match(huis.ordening, /door dit huis samengesteld/);
+  /* Wat er NIET mag veranderen: dat er niets gerangschikt is, blijft in beide
+     gevallen staan -- de herkomst van de lijst verandert de belofte niet. */
+  for (const o of [zelf.ordening, huis.ordening]) assert.match(o, /niets gerangschikt/);
+});

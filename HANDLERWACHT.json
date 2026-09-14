@@ -3258,7 +3258,7 @@
   },
   {
    "sleutel": "POST /api/rtf/knelpunt",
-   "bestand": "server/routes/knelpunt.js:138",
+   "bestand": "server/routes/knelpunt.js:140",
    "staat": "bewaakt",
    "wacht": "rtf.verifieerProfiel"
   },

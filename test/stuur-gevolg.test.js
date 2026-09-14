@@ -37,11 +37,24 @@ test('1. HIJ VOERT NIETS UIT: geen weg naar een effect in de code', () => {
    overtypt, zakt zodra er opnieuw wordt gemeten, en dat leert mensen om niet
    opnieuw te meten. Wat hier vastligt is de EIGENSCHAP: een route met een
    gemeten effect noemt precies de collecties die het register noemt. */
+/* EEN ROUTE DIE DE LAAG OOK WERKELIJK `gemeten` NOEMT, en niet alleen een route met
+   collecties in zijn verschil. Die twee liepen hier gelijk op tot 14 september 2026;
+   sinds `geenWerk` voor `gemeten` gaat (zie toets 5) is er een derde geval: een route
+   die 404 of 403 gaf en waar tussendoor tóch iets bewoog. Deze hulpfunctie koos daar de
+   eerste van (`/api/aandacht`) en toetste daarna dat de laag hem `gemeten` noemde -- wat
+   zij terecht niet doet. De regel hoort hier hetzelfde te zijn als in de laag, anders
+   toetst deze toets een regel die nergens geldt. */
 function eenGemetenRoute() {
   const rijen = require('../IDEMPROEF.json').perRoute || [];
-  for (const r of rijen)
+  /* Per PAD, want de laag verzamelt over alle rijen van een pad: een route met twee
+     rollen kan in de ene rij werk doen en in de andere niet. */
+  const geenWerk = new Set();
+  for (const r of rijen) if (/deed geen werk/.test(String(r.reden || ''))) geenWerk.add(r.pad);
+  for (const r of rijen) {
+    if (geenWerk.has(r.pad)) continue;
     for (const k of ['a', 'b', 'c'])
       if (Object.keys((r.opslag || {})[k] || {}).length) return r.pad;
+  }
   return null;
 }
 
@@ -236,4 +249,48 @@ test('13. de voorspelling verandert het plan nog steeds niet', () => {
   const bron = fs.readFileSync(path.join(__dirname, '..', 'server/kern/stuur/plan.js'), 'utf8');
   assert.ok(!/gevolgcontract|gevolgVanStap/.test(bron),
     'plan.js is de gevolgkennis gaan bezitten; zij hangt ERNAAST (zie gevolg.js, slotalinea)');
+});
+
+/* ---------------------------------------------------------------------------
+   GEEN WERK GAAT VOOR GEMETEN -- de volgorde in gevolgVan(), en waarom zij
+   ertoe doet.
+
+   Zij stond omgekeerd, en dat leverde 153 van de 4923 paden een `gemeten` op
+   terwijl de idempotentieproef ze op 404 of 403 had zien stranden. Het scherpste
+   geval: /api/office/bank/handtekening/bevestig gaf drie keer 404 en tussendoor
+   bewoog `wacht` -- de proef draait alles tegen EEN server, dus dat was werk van
+   een buur. IDEMPROEF.json noemt zo'n route zelf `ongemeten`; deze laag maakte er
+   `gemeten` van, en sprak dus zijn eigen bron tegen.
+
+   MUTATIEPROEF: zet in server/kern/stuur/gevolg.js de `collecties.length`-tak
+   terug boven de `geenWerk`-tak en deze toets zakt op de eerste assertie.
+   --------------------------------------------------------------------------- */
+test('5. een route die geen werk deed heet ONBEKEND, ook als er iets bewoog', () => {
+  const rijen = require('../IDEMPROEF.json').perRoute || [];
+  /* Een echt geval uit het register zoeken in plaats van er een te verzinnen: de
+     regel bestaat om wat de proef MEET, en een fixture zou hier de bron vervangen
+     door de aanname die getoetst moet worden. */
+  const kaart = new Map();
+  for (const r of Object.values(rijen)) {
+    if (!r || r.methode !== 'POST' || typeof r.pad !== 'string') continue;
+    const h = kaart.get(r.pad) || { col: new Set(), geenWerk: false };
+    for (const k of ['a', 'b', 'c']) for (const n of Object.keys((r.opslag || {})[k] || {})) h.col.add(n);
+    if (/deed geen werk/.test(String(r.reden || ''))) h.geenWerk = true;
+    kaart.set(r.pad, h);
+  }
+  const gevallen = [...kaart].filter(([, h]) => h.geenWerk && h.col.size);
+  /* Nul gevallen is geen groen: dan bewaakt deze toets niets en hoort iemand te
+     kijken of het register van vorm is veranderd. */
+  assert.ok(gevallen.length, 'geen enkel pad in het register combineert "geen werk" met een ' +
+    'bewogen collectie -- dan meet deze toets niets meer');
+
+  for (const [pad, h] of gevallen.slice(0, 25)) {
+    const g = gevolgVan(pad);
+    assert.equal(g.graad, 'onbekend', pad + ' deed geen werk en heet toch ' + g.graad);
+    assert.deepEqual(g.collecties, [], pad + ': een onbekende uitslag draagt geen collectielijst, ' +
+      'want dan leest hij alsof er wel iets is vastgesteld');
+    /* En wat er WEL bewoog verdwijnt niet: weglaten zou een tweede soort stilte zijn. */
+    for (const naam of h.col) assert.match(g.reden, new RegExp(naam),
+      pad + ': de reden noemt niet wat er bewoog (' + naam + ')');
+  }
 });

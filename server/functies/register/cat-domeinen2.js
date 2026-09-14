@@ -5,7 +5,7 @@
    door de 10 KB van keuringsregel 13 ging; die grens staat er niet voor de
    sier, maar omdat een bestand dat je niet meer in een keer kunt lezen ook
    niet meer in een keer wordt nagekeken. */
-const { DOELGROEPEN, LEDEN, LEDEN_RTF } = require('./doelgroepen');
+const { DOELGROEPEN, LEDEN, LEDEN_RTF, ZAAK } = require('./doelgroepen');
 const ALLE = DOELGROEPEN.map(d => d.id).filter(d => d !== 'intern');
 const LEDEN_GAST = ['rtg', 'lifestyle', 'business', 'gast'];
 
@@ -77,7 +77,7 @@ module.exports = [
      en dat deed het ook: deze twee vullen het laatste economie-gat. */
   { id: 'dom-appstore', categorie: 'Winkel en media', naam: 'App Store (apps van derden)', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'De winkelkant van het derdenkanaal: bladeren, installeren, machtigen, kopen en openen in de cel. Zet dit uit en er draait geen enkele app van een derde meer; wat al is toegelaten blijft staan.', paden: ['/api/appstore'] },
-  { id: 'dom-appstore-uitgever', categorie: 'Winkel en media', naam: 'App Store: inzenden door uitgevers', standaard: true, doelgroepen: ALLE,
+  { id: 'dom-appstore-uitgever', categorie: 'Winkel en media', naam: 'App Store: inzenden door uitgevers', standaard: true, doelgroepen: ZAAK,
     uitleg: 'De uitgeverskant: een organisatie vraagt een uitgeversplek aan en zendt een app in. Zet dit uit en er komt niets nieuws binnen, terwijl de winkel gewoon doorloopt.', paden: ['/api/appstore/uitgever'] },
   { id: 'dom-bestanden', categorie: 'Winkel en media', naam: 'Bestanden (kluis)', standaard: true, doelgroepen: LEDEN_RTF,
     uitleg: 'De persoonlijke bestandenkluis.', paden: ['/api/bestanden'] },
@@ -108,7 +108,7 @@ module.exports = [
     uitleg: 'De digitale identiteit en het delen daarvan.', paden: ['/api/rtgid'] },
   { id: 'dom-veiligheid', categorie: 'Identiteit en veiligheid', naam: 'Veiligheidsdiensten', standaard: true, doelgroepen: LEDEN,
     uitleg: 'De beveiligingskant voor leden en zaken.', paden: ['/api/veiligheid'] },
-  { id: 'dom-kmar', categorie: 'Identiteit en veiligheid', naam: 'Grensdiensten (KMar)', standaard: true, doelgroepen: LEDEN,
+  { id: 'dom-kmar', categorie: 'Identiteit en veiligheid', naam: 'Grensdiensten (KMar)', standaard: true, doelgroepen: ZAAK,
     uitleg: 'De grens- en documentcontrole bij reizen.', paden: ['/api/kmar'] },
   { id: 'dom-onboarding', categorie: 'Identiteit en veiligheid', naam: 'Onboarding', standaard: true, doelgroepen: ALLE,
     uitleg: 'De eerste stappen na aanmelden: profiel compleet maken.', paden: ['/api/onboarding'] }

@@ -1,10 +1,10 @@
 {
   "stempel": {
-    "op": "2026-09-14T09:40:54.357Z",
-    "commit": "74e8da20",
+    "op": "2026-09-13T20:32:07.787Z",
+    "commit": "e7f7d9153",
     "boomVuil": false,
     "instrument": "scripts/gelding.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "uitleg": "Waar geldt een wet (CLAIM), waar leeft hij (DRAAG), en waar kan een wachter hem zien (WACHT)? De drie assen worden onafhankelijk gevuld en pas daarna vergeleken; zij delen geen bron, en test/gelding.test.js houdt dat vast.",
   "graad": "vermoed",

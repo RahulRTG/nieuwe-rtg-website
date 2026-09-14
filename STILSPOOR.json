@@ -1,0 +1,201 @@
+{
+  "stempel": {
+    "op": "2026-09-14T08:08:28.928Z",
+    "commit": "9a7caf217",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/stilspoor.js",
+    "node": "v22.22.2"
+  },
+  "soort": "meting",
+  "uitleg": "Schrijfacties waarvan het falen volledig wordt weggevangen, terwijl de aanroeper daarna succes meldt. De klasse van LAT.md regel 18: een belofte over een spoor is pas een regel als het spoor kan weigeren.",
+  "grens": "Deze meting toont NIET aan dat een gesmoorde schrijfactie fout is -- server/log.js en kern/envelop.js smoren met reden. Het is een triagelijst, geen oordeel. Zij toont ook niet aan dat dit alle gevallen zijn: de herkenning van een spoor- of opslagschrijver is lexicaal, dus dit is een ONDERGRENS op de schuld. En zij zegt niets over aanroepers die de uitslag van een schrijfactie negeren zonder try/catch -- dat is dezelfde faalvorm zonder dit kenmerk.",
+  "graad": "vermoed",
+  "gemeten": {
+    "bestanden": 3480,
+    "vangers": 1858,
+    "leegVangers": 680,
+    "spoorAanroepen": 228,
+    "opslagAanroepen": 3222,
+    "spoorGesmoord": 18,
+    "opslagGesmoord": 25,
+    "spoorGesmoordMetBesluit": 0,
+    "opslagGesmoordMetBesluit": 0
+  },
+  "spoor": [
+    {
+      "plek": "server/kern/afdelingen/inzage.js:39",
+      "lijf": "inzagelog.noteer({ door: { naam: String(wie || kamer.naam) }, over: { id: u.id, codenaam: tref.codename }, waarom: 'Naam opgevraagd bij code"
+    },
+    {
+      "plek": "server/kern/command/alarm-uitgang.js:74",
+      "lijf": "journaal.noteer({ actie: richting === 'aan' ? 'alarm aan' : 'alarm af', actor: 'automaat', niveau: NIVEAUS.auto, objectType: 'alarm', object"
+    },
+    {
+      "plek": "server/kern/command/canary.js:70",
+      "lijf": "journaal.noteer(Object.assign({ actie, objectType: 'functie', objectId: id }, extra || {}));"
+    },
+    {
+      "plek": "server/kern/gastzorg.js:83",
+      "lijf": "inzagelog.noteer({ door: (s && s.name) || zaak, over: { id }, waarom: door.reden || 'zorgprofiel gelezen bij een bestelling of verblijf', br"
+    },
+    {
+      "plek": "server/kern/kantoor/index.js:150",
+      "lijf": "inzagelog.noteerVeel({ door: wie && wie.id != null ? { id: wie.id, naam: wie.naam } : { naam: 'backoffice' }, overIds: rij.map(u => u.id), w"
+    },
+    {
+      "plek": "server/kern/ledenbalie-zaken.js:117",
+      "lijf": "inzagelog.noteer({ door, over: { id: u.id, codenaam: u.codename }, waarom: r, bron: 'ledenbalie/abo' });"
+    },
+    {
+      "plek": "server/kern/payroll/identiteit.js:124",
+      "lijf": "if (inzagelog && inzagelog.noteer) inzagelog.noteer({ door: { naam: String(door || 'werkgever') + ' (' + (doorRol || 'werkgever') + ')' }, o"
+    },
+    {
+      "plek": "server/kern/service/machtiging.js:121",
+      "lijf": "if (inzagelog && inzagelog.noteer) { inzagelog.noteer({ door: w, over: { id: null, codenaam: z.melder }, waarom: 'Servicezaak ' + z.id + ': "
+    },
+    {
+      "plek": "server/kern/service/onderzoeker.js:106",
+      "lijf": "const z = zaken.vind(zaakId); if (z) loop.noteer(z, { soort: 'notitie', van: 'systeem', wie: TOONNAAM, tekst: 'RTG AI heeft om toegang gevra"
+    },
+    {
+      "plek": "server/kern/service/post.js:78",
+      "lijf": "if (inzagelog && inzagelog.noteer) { inzagelog.noteer({ door: 'systeem:service-post', over: { id: u.id, codenaam: u.codename }, waarom: rede"
+    },
+    {
+      "plek": "server/kern/service/post.js:120",
+      "lijf": "const z = zaken.vind(r.zaak.id); if (z) loop.noteer(z, { soort: 'notitie', van: 'systeem', tekst: 'Binnengekomen per e-mail. De afzender is "
+    },
+    {
+      "plek": "server/kern/stuur.js:71",
+      "lijf": "schaduw().noteer(o.wereld, pad, weger().weeg(beleid.niveau, body));"
+    },
+    {
+      "plek": "server/log.js:104",
+      "lijf": "noteerFout(schoonErr, veiligContext);"
+    },
+    {
+      "plek": "server/opzet/auditmeting.js:36",
+      "lijf": "routelog.noteerAudit(req.method, patroon, sporen.gegroeid(voor, sporen.standVan(db.data)), res.statusCode);"
+    },
+    {
+      "plek": "server/opzet/auditspoor.js:116",
+      "lijf": "noteer();"
+    },
+    {
+      "plek": "server/routes/member/persoonlijk-rahul.js:118",
+      "lijf": "if (!req.session.account || !antwoord) return; noteerBeurt(req.session.account, req.body.q, antwoord, req.body.lang);"
+    },
+    {
+      "plek": "server/routes/office/verificaties.js:44",
+      "lijf": "inzagelog.noteer({ door: wieKijkt(req), over: { id: user.id }, waarom: 'KYC-besluit: identiteit ' + (status === 'verified' ? 'goedgekeurd' :"
+    },
+    {
+      "plek": "server/routes/vakbewijs-kantoor.js:98",
+      "lijf": "inzagelog.noteer({ door: wie, over: { id: m ? Number(m[1]) : null, codenaam: codenaamBijSleutel(sleutel) }, waarom: reden.slice(0, 300), bro"
+    }
+  ],
+  "opslag": [
+    {
+      "plek": "server/accounts/mirror.js:197",
+      "lijf": "await wachtrij.flush();"
+    },
+    {
+      "plek": "server/ai-budget.js:151",
+      "lijf": "b.bewaar();"
+    },
+    {
+      "plek": "server/bewaarwacht.js:76",
+      "lijf": "o.save();"
+    },
+    {
+      "plek": "server/db/postgres.js:176",
+      "lijf": "await metOpslagSlot(() => pg.flush(state.getRuweData(), true));"
+    },
+    {
+      "plek": "server/db/voorcheck.js:145",
+      "lijf": "save();"
+    },
+    {
+      "plek": "server/effectbon.js:160",
+      "lijf": "const bon = bewaar(maak({ envelop: req && req.envelop, voor, na: staatlog.stand(), teller })); if (!res.headersSent) res.setHeader('X-RTG-Ef"
+    },
+    {
+      "plek": "server/kern/agenda-ics.js:95",
+      "lijf": "const nuMs = Date.now(); const vandaag = new Date(nuMs).toISOString().slice(0, 10); for (const [owner, arr] of Object.entries(store())) { co"
+    },
+    {
+      "plek": "server/kern/appstore/meting.js:93",
+      "lijf": "save();"
+    },
+    {
+      "plek": "server/kern/architect/aiwerk.js:77",
+      "lijf": "const sys = require('../rahul').RAHUL_LEAD + 'je bent de chef-architect van RTG Architectenbureau. Geef een korte, scherpe maar respectvolle"
+    },
+    {
+      "plek": "server/kern/atelier/aiwerk.js:81",
+      "lijf": "const sys = require('../rahul').RAHUL_LEAD + 'je bent de creatief directeur van RTG Atelier. Geef een korte, scherpe maar respectvolle kriti"
+    },
+    {
+      "plek": "server/kern/doorgeefjournaal.js:107",
+      "lijf": "save();"
+    },
+    {
+      "plek": "server/kern/hardwarelab/aiwinkel.js:112",
+      "lijf": "const sys = require('../rahul').RAHUL_LEAD + 'je bent de chef-engineer van RTG Hardwarelab. Geef een korte, scherpe maar respectvolle kritie"
+    },
+    {
+      "plek": "server/kern/journaalverhuizing.js:37",
+      "lijf": "save();"
+    },
+    {
+      "plek": "server/kern/kosten/meterstand.js:44",
+      "lijf": "save();"
+    },
+    {
+      "plek": "server/kern/leverancier/gastcontact.js:50",
+      "lijf": "save();"
+    },
+    {
+      "plek": "server/kern/lidboard/journaal.js:80",
+      "lijf": "save();"
+    },
+    {
+      "plek": "server/kern/lidboard/journaal.js:106",
+      "lijf": "save();"
+    },
+    {
+      "plek": "server/kern/pay/opladen.js:64",
+      "lijf": "d().kaartWachtend = d().kaartWachtend && typeof d().kaartWachtend === 'object' ? d().kaartWachtend : {}; d().kaartWachtend[betaling.id] = { "
+    },
+    {
+      "plek": "server/kern/studio/aiwerk.js:77",
+      "lijf": "const sys = require('../rahul').RAHUL_LEAD + 'je bent de chef-ontwerper van RTG Ontwerpstudio. Geef een korte, scherpe maar respectvolle kri"
+    },
+    {
+      "plek": "server/kern/veiligheid/codewoord.js:173",
+      "lijf": "const C = lijsten(); if (C[handle]) { C[handle].mislukt = { t: nu(), reden: String(r.error).slice(0, 140) }; save(); }"
+    },
+    {
+      "plek": "server/kern/zaakdoos/synchronisatie.js:43",
+      "lijf": "const r = await fetch(CLOUD() + '/api/doos/kloon', { headers: { 'x-doos-sleutel': SLEUTEL }, signal: AbortSignal.timeout(60000) }); if (!r.o"
+    },
+    {
+      "plek": "server/opzet/luister.js:137",
+      "lijf": "save();"
+    },
+    {
+      "plek": "server/server.js:149",
+      "lijf": "save();"
+    },
+    {
+      "plek": "server/server.js:1829",
+      "lijf": "save();"
+    },
+    {
+      "plek": "server/server.js:1909",
+      "lijf": "save();"
+    }
+  ]
+}

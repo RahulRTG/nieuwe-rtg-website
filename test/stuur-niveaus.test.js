@@ -33,9 +33,28 @@ const ROLLEN = ['member', 'supplier', 'staff'];
 const UIT_DIRECT_GEHAALD = [
   { pad: '/api/pay/saldo', op: '2026-09-13', naar: 'voorstel',
     reden: 'betaalt de maandfactuur uit het eigen RTG Pay-saldo (kern/factuursaldo.js): ' +
-      'negen collecties gemeten, waaronder paySaldi, invoices en fondsAfdrachten. Hij stond ' +
+      'negen collecties volgens de BRON (de proef komt er niet bij). Hij stond ' +
       'in de LEZEN-lijst en was daarmee het enige geldpad van een lid dat het stuur zonder ' +
       'bevestiging kon uitvoeren' }
+];
+
+/* EN WAT ER BEWUST BIJ IS GEKOMEN, apart van wat eruit ging -- want dat zijn twee heel
+   verschillende beslissingen. Iets uit DIRECT halen maakt het stuur voorzichtiger; iets
+   erbij zetten laat de machine een handeling ZONDER bevestiging doen die dat eerder niet
+   mocht. Daarom stond hier eerst alleen de eerste lijst en weigerde toets 1 elke
+   toevoeging: een route die stil van bevestiging-nodig naar direct-uitvoerbaar schuift is
+   precies de fout waar deze toets voor bestaat.
+
+   Weigeren kan hij niet blijven doen zodra de EIGENAAR zo'n pad opent, en dat is gebeurd.
+   Dus staat het hier: benoemd, met datum en reden, en toets 1 erkent uitsluitend deze. */
+const ERBIJ_GEKOMEN = [
+  { pad: '/api/member/voorstel/intrek', op: '2026-09-13', naar: 'klein',
+    reden: 'besluit van de eigenaar: een lid mag zijn eigen klaargezette voorstel conversationeel ' +
+      'intrekken. Hij kan uitsluitend vermogen INLEVEREN -- de drie andere `klein`-paden van een ' +
+      'lid laten iets gebeuren (een smaak wordt gezet, een model wordt betaald), deze laat iets ' +
+      'vervallen. Hij hoort niet bij `lezen` (hij verandert toestand) en niet bij `voorstel` (een ' +
+      'voorstel om een voorstel te laten vervallen is een cirkel); zie de kop bij KLEIN in ' +
+      'server/kern/stuur/beleid-lijsten.js' }
 ];
 
 /* De lijst zoals hij VOOR de splitsing was, met de hand overgeschreven uit de
@@ -91,7 +110,7 @@ test('1. DE SPLITSING VERPLAATST NIETS: lezen + klein is exact de oude direct-li
     /* De benoemde uitzonderingen mogen eruit, en ALLEEN die. Een pad dat erbij KOMT
        (`+`) is nooit toegestaan: dat is een route die stil van bevestiging-nodig naar
        direct-uitvoerbaar schuift, en dat is de fout waar deze toets voor bestaat. */
-    const mag = UIT_DIRECT_GEHAALD.map(u => '-' + u.pad);
+    const mag = [...UIT_DIRECT_GEHAALD.map(u => '-' + u.pad), ...ERBIJ_GEKOMEN.map(u => '+' + u.pad)];
     const onverklaard = verschil.filter(v => !mag.includes(v));
     assert.deepEqual(onverklaard, [], rol + ': de splitsing verschoof ' + onverklaard.length +
       ' route(s) de lijst in of uit zonder verklaring: ' + onverklaard.join(' ') +
@@ -161,11 +180,20 @@ test('6. DIRECT bestaat nog als vereniging, zodat bestaande aanroepers niets mer
 });
 
 test('7. het aanbod aan de AI is geen pad groter of kleiner geworden', () => {
+  /* DE SPLITSING VERPLAATSTE NIETS, maar de EIGENAAR heeft er daarna wel iets bij
+     gezet -- en dat zijn twee beweringen die niet op een hoop mogen. `/api/pay/saldo`
+     schoof van `lezen` naar `voorstel` en blijft dus in het aanbod; wat het aanbod
+     werkelijk groter maakt staat in ERBIJ_GEKOMEN, met datum en reden. Die lijst wordt
+     hier OPGETELD en niet weggefilterd: zo blijft de nulmeting van de splitsing intact
+     en blijft de latere ingreep zichtbaar. */
+  const erbij = new Set(ERBIJ_GEKOMEN.map(u => u.pad));
   for (const rol of ROLLEN) {
     const nu = toegestanePaden(ALLE_ROUTES, rol);
     const toen = ALLE_ROUTES.filter(p => !/^\/api\/(auth|login|account|techniek|boardroom|doos|aanmelding)/.test(p) &&
-      (raakt(DIRECT_VOOR_DE_SPLITSING[rol], p) || raakt(VOORSTEL[rol], p)));
-    assert.deepEqual(nu, toen, rol + ': het aanbod aan de AI is veranderd door een splitsing die niets had mogen verplaatsen');
+      (raakt(DIRECT_VOOR_DE_SPLITSING[rol], p) || raakt(VOORSTEL[rol], p) ||
+        (erbij.has(p) && beleidVoor(p, rol).niveau !== 'verboden')));
+    assert.deepEqual(nu, toen, rol + ': het aanbod aan de AI is veranderd door een splitsing die ' +
+      'niets had mogen verplaatsen (of door een toevoeging die niet in ERBIJ_GEKOMEN staat)');
   }
 });
 

@@ -92,6 +92,12 @@ function fase(o) {
      laatste stap voor altijd "bezig" en was een bezorgde bestelling op het
      scherm niet van een lopende te onderscheiden. */
   if (['bezorgd', 'opgehaald'].includes(o.status)) return stappen.length;
+  /* TERUGGESTORT IS OOK EEN EINDTOESTAND, en sinds de tegenboeking herkent
+     `!o.paid` hem niet meer: `paid` blijft staan, dus zo'n bon viel door naar
+     de keuken en de klant las dat er aan zijn eten werd gewerkt terwijl het
+     geld al terug was. Voor die wijziging las hij "we wachten op de betaling",
+     wat net zo onwaar was -- vandaar een eigen tak en geen omgekeerde vlag. */
+  if (o.refunded) return stappen.length;
   /* "onderweg" bestaat alleen in de bezorgketen: vertrekken vereist een rit,
      en een afhaalbon heeft die niet. Zonder deze voorwaarde vraagt ix() om een
      stap die de afhaalketen niet heeft en klapt hij eruit; met deze voorwaarde
@@ -121,6 +127,7 @@ function watGebeurtEr(o, bezorgerNaam) {
       ? bezorgerNaam + ' is onderweg naar u. U ziet hem op de kaart bewegen.'
       : 'Uw bestelling is onderweg.';
   }
+  if (o.refunded) return 'Deze bestelling is teruggestort. Er wordt niets meer bereid.';
   if (!o.paid) return 'We wachten nog op de betaling; daarna gaat hij meteen naar de keuken.';
   if (keukenKlaar(o)) return ophalen
     ? 'Klaar en ingepakt. U kunt hem komen ophalen.'

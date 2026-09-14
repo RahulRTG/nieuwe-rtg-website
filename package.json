@@ -337,8 +337,12 @@
     "ketenvorm:vast": "node scripts/ketenvorm.js --vastleggen",
     "aicontext": "node scripts/aicontext.js",
     "aicontext:vast": "node scripts/aicontext.js --vastleggen",
+    "stilspoor": "node scripts/stilspoor.js",
+    "stilspoor:vast": "node scripts/stilspoor.js --vastleggen",
     "meterklasse": "node scripts/meterklasse.js",
     "meterklasse:vast": "node scripts/meterklasse.js --vastleggen",
+    "refundmigratie": "node scripts/refundmigratie.js",
+    "refundmigratie:vast": "node scripts/refundmigratie.js --vastleggen",
     "ritmigratie": "node scripts/ritmigratie.js",
     "ritmigratie:vast": "node scripts/ritmigratie.js --vastleggen",
     "doorwerking": "node scripts/doorwerking.js",
@@ -386,7 +390,7 @@
     "omzetproef:vast": "node scripts/omzetproef.js --vastleggen"
   },
   "devDependencies": {
-    "playwright": "^1.62.1"
+    "playwright": "^1.63.0"
   },
   "bin": {
     "rtg": "scripts/rtg.js"

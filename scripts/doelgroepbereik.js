@@ -362,6 +362,57 @@ async function meet() {
         cel.triageReden = 'de verklaarde doelgroepen antwoorden verschillend of onbepaald op ' + cel.open;
       }
     }
+
+    /* ---------------------------------------------------------------------
+       DE TRIAGE VAN DE EERSTE RICHTING -- en die was er niet.
+
+       33 registerleugens zijn een stapel waar niemand iets mee kan zolang ze
+       allemaal hetzelfde heten. De vraag die hen opdeelt is machinaal te
+       stellen en hoeft geen tweede ronde tegen de server: WAT VOOR DEUR dragen
+       de routes van deze functie?
+
+       Staat elke route achter EEN bewaker die bij een andere rol hoort --
+       supplierAuth, officeAuth, staffAuth -- dan kan de verklaarde doelgroep er
+       structureel nooit langs. Zo'n cel is geen achterstallig register maar een
+       functie die de BEDIENENDE kant beschrijft terwijl de verklaring de
+       CONSUMENT noemt: /api/lucht is de luchthavenmedewerker, het lid vliegt via
+       /api/member/vluchten (dat bij de functie `member` hoort).
+
+       WAAROM DIT GEEN REPARATIE IS MAAR EEN CLASSIFICATIE. `f.doelgroepen`
+       draagt twee betekenissen tegelijk: de schakelscope van de boardroom, EN de
+       scope waarbinnen middleware/functieschakelaars.js de RTG-vergunningtoets
+       laat gelden -- die zwijgt met opzet tegen wie niet in de doelgroep staat,
+       met een uitgeschreven reden. Een doelgroep weghalen maakt de schakelaar
+       eerlijk en versmalt tegelijk die tweede toets. Dat is een besluit van de
+       eigenaar; deze meter zegt alleen WELKE van de twee soorten hij voor zich
+       heeft. */
+    const ROLDEUREN = { supplierAuth: 'leverancier', officeAuth: 'kantoor', staffAuth: 'personeel',
+      boardroomAuth: 'boardroom', techAuth: 'techniek', scimAuth: 'koppeling' };
+    for (const cel of uit.cellen) {
+      if (cel.uitslag !== 'registerleugen') continue;
+      const f = FUNCTIES.find((x) => x && x.id === cel.functie);
+      const paden = (f && f.paden) || [];
+      const mijn = routes.filter((r) => paden.some((p) => onderVoorvoegsel(r.pad, p)));
+      const rollen = new Set();
+      let zonder = 0;
+      for (const r of mijn) {
+        const rol = (r.bewakers || []).map((b) => ROLDEUREN[b]).find(Boolean);
+        if (rol) rollen.add(rol); else zonder++;
+      }
+      cel.deuren = { routes: mijn.length, zonderRoldeur: zonder, rollen: [...rollen] };
+      if (mijn.length && !zonder && rollen.size === 1) {
+        cel.triage = 'deur-van-een-andere-rol';
+        cel.triageReden = 'alle ' + mijn.length + ' routes van deze functie staan achter de deur van ' +
+          [...rollen][0] + '; deze doelgroep komt er structureel nooit langs. De functie beschrijft de ' +
+          'bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar ' +
+          'eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar.';
+      } else {
+        cel.triage = 'gemengde-deuren';
+        cel.triageReden = mijn.length + ' routes met ' + (rollen.size || 'geen') + ' roldeur(en) en ' +
+          zonder + ' zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep ' +
+          'zou moeten openen is van buiten niet te zien';
+      }
+    }
   } finally { srv.klaar(); }
 
   const t = { cellen: uit.cellen.length, waar: 0, 'correct-afgesloten': 0, registerleugen: 0,

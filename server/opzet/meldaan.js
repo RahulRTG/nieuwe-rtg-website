@@ -34,10 +34,26 @@
    naad daar. */
 'use strict';
 
+const verraad = require('../lib/verraad');
+
 module.exports = ({ kern, db, save, crypto, sseToCustomer, sendPush, sendPushToUser }) => {
 
   function schrijf(handle, note, veiligheid) {
     if (!handle) return null;
+    /* DE CRASHGRENS `na-commit-voor-bericht` (scripts/lib/crashtaxonomie.js).
+       Hier, en niet drie regels lager na de save: sterven NA het wegschrijven is
+       de milde kant -- de melding staat dan in de lijst van het lid en hij ziet
+       hem bij de eerstvolgende keer laden. De dure kant is deze: de handeling
+       staat vast en er bestaat geen melding, ook niet om later te bezorgen.
+
+       SIGKILL en geen process.exit, om dezelfde reden als bij de andere twee
+       injecties in server/db/: een nette afsluiting laat afsluithaken lopen en
+       bewijst iets over een pad dat bij een echte crash niet bestaat.
+
+       Zonder RTG_VERRAAD kost deze regel een Map-lookup en verder niets. */
+    if (verraad.sla('sterf-voor-bericht')) {
+      try { process.kill(process.pid, 'SIGKILL'); } catch (e) { process.abort(); }
+    }
     const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: new Date().toISOString(), ...note };
     if (kern.rustMagDoor && !kern.rustMagDoor(handle, n)) return n;
     /* De voorkeur van het lid geldt alleen voor gewone berichten. Afwezig

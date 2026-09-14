@@ -137,7 +137,7 @@ test('de bodem raakt alleen wat hij moet raken: gewone leesroutes blijven direct
      een route geraakt die hij met rust hoort te laten. */
   const DIRECT_FAMILIE = ['lezen', 'klein'];
   /* `/api/pay/saldo` STOND HIER EN IS GEEN LEESROUTE. Hij betaalt de maandfactuur uit het
-     eigen RTG Pay-saldo (kern/factuursaldo.js, negen gemeten collecties) en staat sinds
+     eigen RTG Pay-saldo (kern/factuursaldo.js -- gelezen in de bron, niet gemeten) en staat sinds
      13 september 2026 op `voorstel` -- zie toets 4b van test/stuur-niveaus.test.js. Hij is
      vervangen door /api/pay/overzicht, dat wel alleen ophaalt (`geen-effect-gemeten`).
      Dit was de derde toets die hem als voorbeeld van lezen aanvoerde; de aanname stond in

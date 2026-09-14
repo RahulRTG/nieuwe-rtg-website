@@ -55,6 +55,24 @@ function laadAfloop(pad) {
 }
 const leesRauw = (pad) => fs.readFileSync(pad, 'utf8');
 
+/* DE AFLOOP ZONDER DE HARTSLAG.
+
+   `kring` en `kringGepeild` zijn WAARNEMING en geen afloop: de hartslag van een
+   LOPENDE ronde schrijft ze er elke tik in (scripts/lib/afbouw-afloop.js, en in
+   deze proef staat die tik op 100 ms). Wie het bestand byte voor byte vergelijkt
+   over een venster waarin die ronde nog leeft, toetst dus of de hartslag
+   toevallig niet tikte -- en dat is niet wat er bewezen moet worden.
+
+   Waar de ronde DOOD is (na SIGKILL) blijft de byte-vergelijking staan: daar
+   mag er per definitie niets meer geschreven worden, en juist dat is de
+   invariant. */
+const HARTSLAGVELDEN = ['kring', 'kringGepeild'];
+function afloopZonderHartslag(rauw) {
+  const o = JSON.parse(rauw);
+  for (const v of HARTSLAGVELDEN) delete o[v];
+  return o;
+}
+
 /* DE OPRUIMER, EN WAAROM HIJ ER IS -- deze toets maakte precies de fout waar hij
    over gaat.
 
@@ -105,6 +123,23 @@ function wachtOp(fn, ms = 5000) {
   return fn();
 }
 
+/* WACHTEN OP EEN PID-BESTAND IS WACHTEN OP INHOUD, NIET OP BESTAAN.
+
+   Dit ging in CI echt mis (14 september 2026): de negatieve toets las kind.pid
+   meteen nadat het afloopdossier verscheen, en kreeg ENOENT. De ronde schrijft
+   namelijk in DRIE stappen -- pak(), dan een kind spawnen, dan pas het PID
+   wegschrijven -- en alleen de eerste stap was afgewacht. Op deze machine won de
+   schrijver altijd; op een belaste CI-runner niet.
+
+   `existsSync` alleen is niet genoeg: tussen aanmaken en schrijven bestaat het
+   bestand al en is het leeg, dus dan leest de toets NaN in plaats van een PID.
+   Daarom wacht deze helper tot er een GETAL in staat. */
+function wachtOpPid(pad) {
+  return wachtOp(() => {
+    try { return Number(fs.readFileSync(pad, 'utf8')) > 0; } catch (e) { return false; }
+  });
+}
+
 /* Een ronde die het ECHTE pak() gebruikt, een kind maakt en dan blijft hangen.
    Hij schrijft het PID van zijn kind naar een bestand zodat de toets het kent. */
 const RONDE = `
@@ -129,7 +164,7 @@ test('DE KETEN: van claim tot herstel, met echte processen', (t) => {
 
   // --- geslaagde claim -> RUNNING, met een kind ---
   const ronde = op.start(['-e', RONDE, path.join(WORTEL, 'scripts/afbouw-slot.js'), kindPad], w.env());
-  assert.ok(wachtOp(() => fs.existsSync(kindPad) && fs.existsSync(w.afloop)),
+  assert.ok(wachtOp(() => fs.existsSync(w.afloop)) && wachtOpPid(kindPad),
     'de ronde hoort een afloop en een kind te hebben aangemaakt');
   const kind = op.volg(Number(fs.readFileSync(kindPad, 'utf8')));
   const A = laadAfloop(w.afloop);
@@ -215,43 +250,28 @@ test('NEGATIEF: een mislukte claim registreert geen ronde', (t) => {
   const w = wereld();
   const kindPad = op.pidBestand(path.join(w.map, 'kind.pid'));
 
-  /* DEZE PROEF ZET DE HARTSLAG STIL, en dat is geen versoepeling maar het
-     verschil tussen meten wat je bedoelt en meten wat er toevallig gebeurt.
-
-     wereld() zet RTG_AFLOOP_HARTSLAG op 100 ms, want de toets hierboven wil de
-     hartslag BEPROEVEN zonder erop te wachten. Deze toets beproeft hem niet: hij
-     vergelijkt het afloopbestand byte voor byte voor en na een mislukte claim.
-     Tussen die twee lezingen zit een spawnSync van een module-ladend
-     node-proces, en de hartslag schrijft ondertussen een verse `kringGepeild`
-     in datzelfde bestand. Is dat venster langer dan 100 ms, dan zakt de toets op
-     de HARTSLAG en niet op de mislukte claim.
-
-     Lokaal is dat venster 41 ms en zag je het nooit; op een beladen runner (vier
-     scherven, postgres en redis ernaast) haalde het de 100 ms wel, en dan zakt hij
-     ELKE keer -- drie CI-ronden op rij op 14 september 2026.
-
-     MUTATIE GEZIEN ZAKKEN, in beide richtingen: met een kunstmatige vertraging
-     van 300 ms tussen de twee lezingen zakt deze toets zonder STIL en slaagt hij
-     met STIL. De hartslag blijft in de toets hierboven gewoon op 100 ms staan en
-     wordt daar beproefd; hier is hij alleen geen deelnemer aan de bewering. */
-  const STIL = { RTG_AFLOOP_HARTSLAG: '600000' };
-  const eerste = op.start(['-e', RONDE, path.join(WORTEL, 'scripts/afbouw-slot.js'), kindPad], w.env(STIL));
+  const eerste = op.start(['-e', RONDE, path.join(WORTEL, 'scripts/afbouw-slot.js'), kindPad], w.env());
   assert.ok(wachtOp(() => fs.existsSync(w.afloop)), 'de eerste ronde draait');
+  /* En wachten tot zij haar kind-PID heeft weggeschreven: dat gebeurt NA pak(),
+     dus het afloopdossier bewijst het niet. Zonder deze regel las de toets in CI
+     een bestand dat er nog niet was. */
+  assert.ok(wachtOpPid(kindPad), 'de eerste ronde heeft haar kind-PID weggeschreven');
   const A = laadAfloop(w.afloop);
-  const vanEerste = leesRauw(w.afloop);
+  const vanEerste = afloopZonderHartslag(leesRauw(w.afloop));
   const kind = op.volg(Number(fs.readFileSync(kindPad, 'utf8')));
 
   /* De tweede claim MOET stuklopen: het slot is bezet door een levend proces. */
   const tweede = spawnSync(process.execPath,
     ['-e', "require(process.argv[1]).pak('proefronde-twee')", path.join(WORTEL, 'scripts/afbouw-slot.js')],
-    { env: w.env(STIL), encoding: 'utf8' });
+    { env: w.env(), encoding: 'utf8' });
   assert.notEqual(tweede.status, 0, 'een tweede claim op een bezet slot hoort te falen');
   assert.match(String(tweede.stderr || ''), /al actief/i, 'en te zeggen waarom');
 
-  assert.equal(leesRauw(w.afloop), vanEerste,
-    'de mislukte claim hoort GEEN letter aan de afloop te veranderen -- anders lijkt een niet-begonnen ' +
-    'ronde op een gestorven meetronde en blokkeert hij de machine om werk dat nooit bestond');
+  assert.deepEqual(afloopZonderHartslag(leesRauw(w.afloop)), vanEerste,
+    'de mislukte claim hoort niets aan het EIGENDOM of de AFLOOP te veranderen -- anders lijkt een ' +
+    'niet-begonnen ronde op een gestorven meetronde en blokkeert hij de machine om werk dat nooit bestond');
   assert.equal(A.lees().taak, 'proefronde', 'de afloop hoort nog van de EERSTE ronde te zijn');
+  assert.equal(A.lees().stand, 'RUNNING', 'en de eerste ronde hoort gewoon door te draaien');
 
   fs.rmSync(w.map, { recursive: true, force: true });   // de processen ruimt t.after() op
 });

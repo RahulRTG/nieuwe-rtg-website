@@ -21,9 +21,9 @@ het?**
 | Bedrijfsgenres | **78** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2170** |
+| Kernmodules (`server/kern/**`) | **2186** |
 | App-pagina's (`public/apps/**.html`) | **308** |
-| Testbestanden | **1876** |
+| Testbestanden | **1884** |
 
 ## De vier werelden
 
@@ -334,7 +334,7 @@ ook blokkeert.
 - **Residentie** (`dom-residentie`) — Het woon- en verblijfsdeel van het platform.  
   _voor: rtg, lifestyle, business_
 - **Luchtvaart en luchthaven** (`dom-lucht`) — Vluchten, boarding passes en de luchthavendiensten.  
-  _voor: rtg, lifestyle, business_
+  _voor: leverancier, personeel_
 - **Reisbureau** (`dom-reisbureau`) — Reisadvies en het samenstellen van een reis.  
   _voor: rtg, lifestyle, business, gast_
 - **Zorg en welzijn** (`dom-care`) — De zorgkant: intakes, begeleiding en welzijnsdiensten.  
@@ -379,7 +379,7 @@ ook blokkeert.
 - **Het Genootschap** (`dom-genootschap`) — Het besloten genootschap: kringen, bijeenkomsten en beheer.  
   _voor: rtg, lifestyle, business_
 - **Sport** (`dom-sport`) — Sportprogramma's, teams en wedstrijden.  
-  _voor: rtg, lifestyle, business, foundation_
+  _voor: leverancier, personeel_
 - **Muziek** (`dom-muziek`) — Van lied tot zaal: maken, uitgeven en beluisteren.  
   _voor: rtg, lifestyle, business, foundation_
 - **Galerij** (`dom-galerij`) — De beeldgalerij van leden en partners.  
@@ -394,7 +394,7 @@ ook blokkeert.
 ### Werk (zaken en personeel) — 10
 
 - **De werkvloer** (`dom-werkvloer`) — Tafels, keukenbord en bedieningskaart op de vloer van een zaak.  
-  _voor: intern, business, leverancier, personeel_
+  _voor: leverancier, personeel_
 - **De werkplek** (`dom-werkplek`) — Het persoonlijke werkstation van een medewerker.  
   _voor: intern, business, leverancier, personeel_
 - **Metier (vakwerk)** (`dom-metier`) — Het vakwerk van zelfstandigen en ambachtslieden.  
@@ -421,7 +421,7 @@ ook blokkeert.
 - **App Store (apps van derden)** (`dom-appstore`) — De winkelkant van het derdenkanaal: bladeren, installeren, machtigen, kopen en openen in de cel. Zet dit uit en er draait geen enkele app van een derde meer; wat al is toegelaten blijft staan.  
   _voor: rtg, lifestyle, business, gast_
 - **App Store: inzenden door uitgevers** (`dom-appstore-uitgever`) — De uitgeverskant: een organisatie vraagt een uitgeversplek aan en zendt een app in. Zet dit uit en er komt niets nieuws binnen, terwijl de winkel gewoon doorloopt.  
-  _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
+  _voor: leverancier, personeel_
 - **Bestanden (kluis)** (`dom-bestanden`) — De persoonlijke bestandenkluis.  
   _voor: rtg, lifestyle, business, foundation_
 - **Notities** (`dom-notities`) — De notitie-app: losse aantekeningen en lijstjes van een lid.  
@@ -448,7 +448,7 @@ ook blokkeert.
 - **Veiligheidsdiensten** (`dom-veiligheid`) — De beveiligingskant voor leden en zaken.  
   _voor: rtg, lifestyle, business_
 - **Grensdiensten (KMar)** (`dom-kmar`) — De grens- en documentcontrole bij reizen.  
-  _voor: rtg, lifestyle, business_
+  _voor: leverancier, personeel_
 - **Onboarding** (`dom-onboarding`) — De eerste stappen na aanmelden: profiel compleet maken.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
 

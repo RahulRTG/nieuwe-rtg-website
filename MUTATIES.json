@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-14T06:01:47.701Z",
-    "commit": "8a4545c5",
+    "op": "2026-09-14T10:42:01.248Z",
+    "commit": "8d8f93f0",
     "boomVuil": false,
-    "boomAnders": 6,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -2660,6 +2660,14 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "fiscaal-meegeleverd.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/fiscaal/regelwacht.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "fiscaal-preflight.test.js": {
       "soort": "puur",

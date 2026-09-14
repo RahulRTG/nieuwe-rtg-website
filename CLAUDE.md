@@ -1815,6 +1815,62 @@ alleen als er een lid-account achter het kantoortoken hangt -- wie met de
 GEDEELDE kantoorcode inlogt, kan de keten niet afmaken. Dat is een grens en geen
 gat, en hij zit nu in de meting (storing 1 en 7) in plaats van eromheen.
 
+**DE VIJFDE KETEN IS DE EERSTE DIE OVER GELD GAAT** (`scripts/omzetproef.js`,
+`npm run omzetproef`): van consumentintentie tot het cijfer waar een ondernemer
+btw over afdraagt -- bestellen, betalen, economische gebeurtenis, fiscale
+verdeling, ondernemersbeeld. De vraag is niet "werkt de betaalknop" maar: komt
+exact diezelfde gebeurtenis, met hetzelfde bedrag, dezelfde tijd, dezelfde
+fiscale betekenis en dezelfde eigenaar, correct terug in de financiele
+werkelijkheid van die zaak? Zeven schakels, acht storingen, gemeten met TWEE
+echte zaken -- want de tenant-naad is niet te meten met een verzonnen code. Hij
+vond drie dingen die geen enkele routetoets zag, en ze zijn met opzet niet
+hetzelfde soort vondst. **Een is gerepareerd**: de btw-CATEGORIE van een
+verkochte regel werd bij elke uitlezing opnieuw afgeleid uit de menukaart van
+VANDAAG, dus een gerecht van de kaart halen verplaatste AL VERKOCHTE omzet naar
+een andere btw-pot (gemeten: vier koffies, drankpot 20,00 -> 0,00, ook als de
+aangifte over die maand al gedaan was). Het TARIEF was wel tijdgetrouw -- de
+categorie niet, en dat verschil zag niemand. De bestelregel draagt nu zijn eigen
+`station`, precies zoals hij zijn eigen `price` draagt; een oude regel zonder dat
+veld blijft de kaart lezen, want anders zou de reparatie in een keer alle
+historische drankomzet naar eten schuiven. **Twee zijn BESLUITEN van de eigenaar
+en staan als bevinding in het register**: de btw-categorie wordt afgeleid uit de
+WERKPLEK (`station === 'bar' -> drank -> 21%`) terwijl de landentabel er zelf bij
+zegt dat in NL eten en NIET-ALCOHOLISCHE dranken 9% zijn -- een Flat White uit de
+bar valt dus op 21%, en de scheidslijn alcohol-ja/nee bestaat al twintig regels
+verderop in `kern/lidacties/bestellen.js` maar niet aan de fiscale kant. **En de tweede is
+inmiddels genomen en uitgevoerd** (13 september 2026): een terugstorting WISTE de
+verkoop uit de maand waarin hij stond, zodat de omzet van een afgesloten maand
+met terugwerkende kracht veranderde en "er is nooit verkocht" niet meer te
+onderscheiden was van "er is verkocht en teruggestort". Een eenmaal geboekte
+verkoop is historische waarheid: `paid` blijft staan, `refunded` komt ernaast met
+een eigen datum, en `kern/fiscaal/index.js` telt twee gebeurtenissen per bon --
+netto kan het nul worden, de geschiedenis blijft heel. Twee dingen daar niet
+wegpoetsen: `test/omzetproef.test.js` houdt de eerste bevinding VAST met haar
+reden -- een bevinding die verdwijnt zonder besluit is de stilste faalvorm die
+deze laag kent -- en de proef zelf had een gat in zijn eigen poort
+(`sluitMetBevinding` telde `gebroken` niet mee, dus de eerste ronde zou zijn
+eigen vondst hebben laten passeren).
+
+**Wat die tegenboeking werkelijk verandert is niet de route maar de BETEKENIS van
+`paid` onder elke lezer die hem al las**, en daarvoor is er een gemeten kaart
+(`scripts/refundmigratie.js`, `REFUNDMIGRATIE.json`, `npm run refundmigratie`):
+58 bestanden met een betaalstand, geteld per collectie, met elke lezer op
+`onbekend` tot iemand hem met de hand heeft ingedeeld. De kaart vond meteen drie
+dingen die geen enkele toets zag, en ze zijn alle drie gerepareerd: twee schermen
+telden geld op uit `paid` zonder `refunded` ernaast -- waarvan een de "Ontvangen"
+op het beginscherm van de ondernemer, en dat breekt STIL want er staat gewoon een
+bedrag -- en `/api/office/timeline` stuurde het veld niet, zodat het kantoorscherm
+de waarheid niet KON tonen hoe het ook las. Een gat in een PROJECTIE is geen gat
+in een scherm. Drie dingen om niet te herhalen: de kaart zocht de collectie van
+een bestand op `\borders\b` en vond daarmee noch `order.paid` noch
+`ordersVanZaak(...)`, zodat twee verklaarde lezers uit de telling vielen en als
+VERDWENEN werden gemeld -- een kaart die zijn eigen werk kwijtraakt stuurt het
+werk verkeerd; de gegenereerde bundels telden elke lezer een tweede keer en
+lieten het werk dubbel zo groot lijken; en **`wacht` is met opzet geen
+`onbekend`** -- rides, tickets en boekingen wissen hun betaalstand nog, en een
+lezer die GELEZEN is en op zijn collectie wacht, is iets anders dan een lezer die
+niemand heeft bekeken.
+
 **En wat de ketens werkelijk delen is GEMETEN** (`scripts/ketenvorm.js`,
 `KETENVORM.json`) in plaats van verklaard -- de proeven delen met opzet geen
 module, want een gedeelde ketenklasse eroverheen zou de `Asset`-fout zijn.

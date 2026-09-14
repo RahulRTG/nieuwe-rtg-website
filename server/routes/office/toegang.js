@@ -60,7 +60,13 @@ app.post('/api/office/timeline', officeAuth, (req, res) => {
   const alles = db.data.orders
     .filter(o => o.status !== 'wacht-op-betaling' && past([o.supplierName, o.customerCodename, o.ref, o.status].join(' ')))
     .map(o => ({ soort: 'order', at: o.at, ref: o.ref, supplierName: o.supplierName, customerCodename: o.customerCodename,
-      status: o.status, paid: !!o.paid, bedrag: o.total || 0, sub: o.items.reduce((n, i) => n + i.qty, 0) + ' item(s)' }))
+      /* `paid` alleen kan het niet meer zeggen: sinds de tegenboeking blijft hij
+         staan bij een terugstorting. Zonder `teruggestort` kan het scherm de
+         waarheid niet tonen, hoe het ook leest -- dit is een gat in de
+         PROJECTIE en niet in het scherm. Rides en boekingen wissen `paid` nog
+         wel; die dragen hem daarom niet. */
+      status: o.status, paid: !!o.paid, teruggestort: !!o.refunded,
+      bedrag: o.total || 0, sub: o.items.reduce((n, i) => n + i.qty, 0) + ' item(s)' }))
     .concat(db.data.rides
       .filter(r => r.status !== 'wacht-op-betaling' && past([r.supplierName, r.customerCodename, r.ref, r.from, r.to, r.status].join(' ')))
       .map(r => ({ soort: r.type === 'jet' ? 'jet' : 'taxi', at: r.at, ref: r.ref, supplierName: r.supplierName, customerCodename: r.customerCodename,

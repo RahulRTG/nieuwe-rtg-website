@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '78699416';
+var RTG_BOUW = '53a390d7';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -7802,20 +7802,25 @@ var RTG_BOUW = '78699416';
     const el = $('#homePay'); if (!el) return;
     let orders = [];
     try { orders = (await API.call('/orders/mine')).orders || []; } catch(e){}
-    const betaald = orders.filter(o => o.paid);
+    /* Drie bakken en geen twee. Een teruggestorte bon IS betaald geweest, dus
+       `!o.paid` vangt hem niet -- zonder de derde bak stond hij in de som van
+       wat je hebt betaald, terwijl het geld terug is. */
+    const betaald = orders.filter(o => o.paid && !o.refunded);
     const som = betaald.reduce((s,o) => s + o.total, 0);
-    const open = orders.filter(o => !o.paid);
+    const open = orders.filter(o => !o.paid && !o.refunded);
+    const retour = orders.filter(o => o.refunded);
     el.innerHTML = '<div class="label">'+T('app.guest.history','Mijn bestellingen en betalingen')+'</div>'+
       (orders.length
         ? '<div class="big" style="font-size:1.05rem;">'+eur(som)+' <span style="font-size:0.7rem;color:var(--soft);font-weight:400;">'+T('app.guest.paid','betaald')+'</span></div>'+
-          '<div class="meta" style="margin:0.25rem 0 0.5rem;">'+betaald.length+' '+T('app.guest.paidorders','betaalde bestelling(en)')+(open.length?(' · '+open.length+' '+T('app.guest.open','open')):'')+'</div>'+
+          '<div class="meta" style="margin:0.25rem 0 0.5rem;">'+betaald.length+' '+T('app.guest.paidorders','betaalde bestelling(en)')+(open.length?(' · '+open.length+' '+T('app.guest.open','open')):'')+(retour.length?(' · '+retour.length+' '+T('app.guest.refunded','teruggestort')):'')+'</div>'+
           '<div style="display:flex;flex-direction:column;gap:.45rem;">'+orders.slice(0,6).map(o=>{
-            const kleur = o.paid ? 'var(--green,#4CAF7D)' : 'var(--gold)';
-            const st = o.paid ? T('app.guest.ok','betaald') : T('app.guest.te','te betalen');
+            const kleur = o.refunded ? 'var(--soft)' : o.paid ? 'var(--green,#4CAF7D)' : 'var(--gold)';
+            const st = o.refunded ? T('app.guest.refunded','teruggestort')
+              : o.paid ? T('app.guest.ok','betaald') : T('app.guest.te','te betalen');
             return '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.6rem;font-size:0.78rem;color:var(--muted);">'+
               '<span>'+escT(o.supplierName)+' · '+o.items.reduce((n,i)=>n+i.qty,0)+' '+T('app.items','item(s)')+' · '+timeAgo(o.at)+'</span>'+
               '<span style="flex-shrink:0;white-space:nowrap;">'+eur(o.total)+' · <span style="color:'+kleur+';">'+st+'</span>'+
-              (o.paid?'':' <button class="pa" data-guestpay="'+o.ref+'" style="padding:.12rem .5rem;font-size:0.66rem;margin-left:0.25rem;">'+T('app.guest.paynow','betaal')+'</button>')+'</span></div>';
+              (o.paid||o.refunded?'':' <button class="pa" data-guestpay="'+o.ref+'" style="padding:.12rem .5rem;font-size:0.66rem;margin-left:0.25rem;">'+T('app.guest.paynow','betaal')+'</button>')+'</span></div>';
           }).join('')+'</div>'
         : '<div class="meta">'+T('app.guest.none','Je hebt nog niets besteld. Betaal bij een partner via Ter plaatse.')+'</div>');
     el.querySelectorAll('[data-guestpay]').forEach(b => b.addEventListener('click', async () => {

@@ -21,8 +21,12 @@ module.exports = function projecteerLegacy(order) {
     aangemaaktAt:order.at, producten:(order.items || []).map(i => ({ itemId:i.id, naam:i.name,
       aantal:i.qty, centen:Math.round(Number(i.price || 0) * 100), opties:i.opties || [] })),
     prijs:{ totaal:Math.round(Number(order.total || 0) * 100),
-      betaald:order.paid ? Math.round(Number(order.total || 0) * 100) : 0,
-      openstaand:order.paid ? 0 : Math.round(Number(order.total || 0) * 100), valuta:'EUR' },
+      /* `paid` zegt dat er betaald IS; `refunded` dat het geld niet meer bij de
+         zaak ligt. Voor een bedragbeeld tellen ze allebei -- een teruggestorte
+         bon is niet betaald en ook niet openstaand, dus beide nul. Regel 15
+         hierboven deed dit al goed (refunded eerst); deze twee niet. */
+      betaald:order.paid && !order.refunded ? Math.round(Number(order.total || 0) * 100) : 0,
+      openstaand:order.paid || order.refunded ? 0 : Math.round(Number(order.total || 0) * 100), valuta:'EUR' },
     statussen:assen, fase, status:{ sleutel:fase, label:tekst[0], uitleg:tekst[1] },
     allergieControle:!!order.allergyNote, wijzigingen:[], _legacy:order };
 };

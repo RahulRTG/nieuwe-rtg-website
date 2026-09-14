@@ -2239,6 +2239,15 @@
     {
       "datum": "2026-09-13",
       "soort": "schuld",
+      "sleutel": "dbDeuren",
+      "van": 528,
+      "vervalt": "2026-12-01",
+      "meter": "dbDeuren 528 -> 529",
+      "reden": "Een bestand is er twee geworden, geen enkele aanraking is erbij gekomen: kern/ervaring/leden/annuleren.js stond op 10237 van de 10240 bytes van keuringsregel 13 en is gesplitst in annuleren.js (1 db.data-verwijzing) en wachtlijst.js (6, allemaal naar db.data.wachtlijsten). Voor de splitsing waren dat er 7 in een bestand; erna 7 in twee. Deze ratel telt BESTANDEN en kan dat verschil niet zien. De toegang is niet achter een parameter verstopt om de teller te plezieren -- dat zou de meter bespelen en de code slechter maken. Aflossen is db.data.wachtlijsten achter een opslagdeur brengen, zoals kern/payroll/opslag.js dat voor zijn domein doet; checkregel 63 (collectie-eigenaren) bleef groen, dus er schrijft niemand in andermans collectie. BIJGEWERKT 14 september: de GRONDSLAG is verschoven, niet de oorzaak. Deze tak is samengevoegd met main na de release-tak (#242 t/m #252), die zelf van 526 naar 528 ging; de +1 van deze splitsing staat daar bovenop, dus 528 -> 529. Het aflospad is onveranderd."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "schuld",
       "sleutel": "kernBreedte",
       "van": 1569,
       "vervalt": "2026-12-15",
@@ -2377,7 +2386,7 @@
     "keuringTeGroot": "2026-09-05",
     "keuringDubbeling": "2026-09-07",
     "keuringDekkingAdvies": "2026-09-06",
-    "dbDeuren": "2026-08-28",
+    "dbDeuren": "2026-09-13",
     "dbDeurenSchrijvend": "2026-08-28",
     "browserpoortToetsen": "2026-09-12",
     "e2eBestanden": "2026-09-13",

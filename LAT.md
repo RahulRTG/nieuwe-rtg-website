@@ -664,12 +664,23 @@ maken.
 | `npm run delta` | geen verslechtering t.o.v. de basis, op de **gewijzigde** bestanden | de rest van het huis; gedrag; routedekking |
 | `npm test` | gedrag van wat een toets aanroept | wat geen toets aanroept |
 | `test/routedekking.test.js` | elke geregistreerde route is door een toets geraakt | of die aanraking iets zinnigs toetst |
+| `npm run e2e` | gedrag in een echte browser | wat geen schermtoets aanroept |
 | de ketenproeven | dat één benoemde keten van begin tot eind sluit | de negentien andere |
 | `npm run golive` | operationeel en juridisch mogen starten | de software |
 | CI | de samenstelling van al het bovenstaande | niets daarbuiten |
 
 Voortaan dus niet "de gate is groen" maar **"statische poort groen; gedrag en
 routedekking nog niet bevestigd"**. Dat klinkt kleiner en het is waar.
+
+**En een poort kan op de SOM van meer dan een ronde leunen.** `DEKKING.json`
+wordt gevuld uit twee journalen: `.routejournaal` van `npm test` en
+`.schermjournaal` van `npm run e2e`. Draai je er een en lees je de uitslag alsof
+hij compleet is, dan lijken de browser-only routes ongedekt -- vijf stuks, op
+13 september 2026, en geen ervan was een echt gat. `scripts/dekking.js` zegt dat
+zelf ("zonder die ronde blijven de browser-only routes ongeraakt, en dat hoort de
+poort dan ook te zeggen in plaats van ze te verzwijgen") en hij WEIGERDE te
+schrijven. Had hij wel geschreven, dan stond de beperking van mijn omgeving nu
+als eigenschap van de codebase in een register -- regel 12, een laag dieper.
 
 **Het gevolg voor een nieuwe HTTP-route.** Dezelfde dag kwam de tweede helft van
 deze les binnen, en die is architectonisch. `POST /api/supplier/activity` HAD een
@@ -694,6 +705,18 @@ geraakt, door `scripts/zaakliveproef.js`. Maar dat is een SCRIPT: het draait in
 de meetronde en niet in elke CI-run. Dat onderscheid staat al in de kop van
 `test/integratie-routes.test.js`, waar het na een eerdere vondst van de
 deltapoort is opgeschreven -- en is hier alsnog opnieuw gemaakt.
+
+*En deze tabel maakte zelf meteen dezelfde fout:* de deltapoort stond er onder
+de naam van zijn SCRIPTBESTAND in plaats van onder zijn npm-naam, en zo'n
+commando bestaat niet. Keuringsregel 67 (*"elk `npm run X` in een document
+bestaat ook echt"*) ving het binnen een uur. Ik had de tabel uit mijn hoofd
+opgeschreven in plaats van uit `package.json`, en dat is exact het patroon dat
+deze regel beschrijft: een bewering die ruimer is dan wat er is nagekeken.
+
+De reparatie liep bovendien twee keer mis op dezelfde manier als bij de
+afbouwdiagnose hierboven: de eerste versie van dit stukje CITEERDE de kapotte
+naam, en die keuring leest een document net zo goed als code. Een voorbeeld van
+wat er fout was, schrijf je dus niet uit -- je beschrijft het.
 
 **Handhaver:** `scripts/check.js`, `scripts/norm.js` en `scripts/deltapoort.js`
 drukken sinds deze dag zelf hun bereik af, op de groene EN de rode uitgang. Een

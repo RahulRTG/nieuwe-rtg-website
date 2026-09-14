@@ -106,7 +106,7 @@
     "wekZonderUitspraak": 0,
     "momentOpenBekend": 3,
     "stilSpoor": 18,
-    "stilleOpslag": 24,
+    "stilleOpslag": 25,
     "stilSpoorAanroepen": 221
   },
   "notities": [
@@ -2279,6 +2279,15 @@
       "vervalt": "2026-12-15",
       "meter": "toetsenNietGemeten 607 -> 610",
       "reden": "Samenvoeging van de tien resterende open PR-takken (#242 t/m #252, #244 is los gemerged) in een release-tak. drie toetsen extra waar de mutatiemotor niet langs is geweest, gemeten NA het samenvoegen van de mutatierondes van alle takken. Zonder die samenvoeging zou hier een veel hoger getal staan dat een bundelartefact is en geen schuld."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "stilleOpslag",
+      "van": 24,
+      "vervalt": "2026-12-15",
+      "meter": "stilleOpslag 24 -> 25",
+      "reden": "Deze ratel is in deze tak geboren en staat nog niet op main; zijn basis van 24 is dus gemeten op een boom die server/effectbon.js NIET bevatte. Na de merge met main meet dezelfde meter 25, en de ene erbij is server/effectbon.js:160 -- de effectbon wordt geschreven in een try/catch met een lege vanger en de toelichting \"een bon die niet kan, mag het antwoord niet breken\". Dat is dezelfde klasse als server/log.js en kern/envelop.js: soms terecht, en toch geteld, want een toelichting maakt een smoring niet minder stil (LAT.md regel 18). De twee andere verschillen zijn GEEN nieuwe smoringen maar dezelfde twee regels zes regels opgeschoven (server/server.js 1823/1903 -> 1829/1909). De weg omlaag is een besluit over die ene plek: of de effectbon zijn falen gaat melden, of hij komt in STILSPOORBESLUIT.json te staan -- en dat register trekt met opzet NIETS van de telling af, dus ook dan blijft de 25 staan tot de plek zelf verandert."
     }
   ],
   "prestatie": {
@@ -2374,7 +2383,7 @@
     "wekZonderUitspraak": "2026-09-13",
     "momentOpenBekend": "2026-09-13",
     "stilSpoor": "2026-09-13",
-    "stilleOpslag": "2026-09-13",
+    "stilleOpslag": "2026-09-14",
     "stilSpoorAanroepen": "2026-09-13"
   },
   "uitzonderingen": [

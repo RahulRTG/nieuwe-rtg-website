@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1874 bestanden en 13394 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1877 bestanden en 13406 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1874 |
-| losse beweringen (`test(...)`) | 13394 |
+| toetsbestanden | 1877 |
+| losse beweringen (`test(...)`) | 13406 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1244 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1247 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
 | alleen in de kop *genoemd*, nog niet gemeten | 158 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1657 bestanden, 13011 beweringen.
+1660 bestanden, 13023 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -550,6 +550,7 @@ toets omvalt.
 | `herkomst.test.js` | 7 | gezakt op `===->!==#0` | DE HERKOMST VAN INVOER -- onvertrouwde inhoud vergroot nooit de capabilities. WAAROM DIT ER MOEST KOMEN. |
 | `herkomstlus.test.js` | 5 | genoemd | DE HERKOMSTPOORT IN DE LUS -- de regel stond, en werkte nergens. WAT HIER GEREPAREERD IS EN WAAROM HET DE ERGSTE SOORT FOUT WAS. |
 | `herkomstwereld.test.js` | 4 | gezakt op `true->false#0` | DE HERKOMSTPOORT PER WERELD -- een schakelaar die per wereld te betalen is. WAAROM DIT EEN EIGEN TOETS HEEFT. |
+| `herrekenbaar.test.js` | 4 | gezakt op `&&->||#0` | HET BESLUITREGISTER NAAST DE METING -- en waarom het die meting niet mag wegdrukken. `/api/office/magnaat/scan` is de laatste gezakte route van de faalproef, en hij is NAGEMETEN in plaats van weggewerkt... |
 | `herstel-sandbox.test.js` | 2 | gezakt op `liegpoort /api/` | De lokale SMS-sandbox in de echte herstelroute: acceptatie maakt een geldige tweestapsflow; een providerstoring geeft generiek antwoord en geen token. |
 | `herstel.test.js` | 7 | gezakt op `===->!==#0` | DE TERUGWEG PER ROUTE (scripts/herstel.js, EXECUTIE.md blok 5). Wat hier bewaakt wordt is niet de KWALITEIT van de afleiding -- die is aantoonbaar zwak, en dat is de uitkomst van de meting zelf -- maar dat die zwakte... |
 | `herstel2fa.test.js` | 3 | gezakt op `liegpoort /api/` | Integratietests voor wachtwoordherstel met tweestapsverificatie (link per e-mail + code op de telefoon) en wachtwoord wijzigen vanuit de eigen backoffice. Zonder SMTP geeft de server dev-velden terug zodat de flow... |
@@ -629,6 +630,7 @@ toets omvalt.
 | `intreklijst-failclosed.test.js` | 5 | -- | De generieke tokenintreklijst: opslagonzekerheid is nooit hetzelfde als "niet ingetrokken", en een geslaagde intrekking seint levende verbindingen. |
 | `invoer.test.js` | 9 | -- | DE INVOERBALIE (kern/invoer.js + kern/invoer-lezer.js) -- REIZEN.md fase 2. WAT HIER BEWEZEN MOET WORDEN. |
 | `invoerproef.test.js` | 11 | geen bruikbare mutatie | HET OORDEEL VAN DE INVOERPROEF, los van een server. scripts/invoerproef-route.js heeft een echte server nodig en duurt minuten; daar komt niemand ooit met een mutatie bij. |
+| `inzagebewaring.test.js` | 4 | gezakt op `===->!==#0` | BESLUIT 6: DE BEWARING VOLGT DE BELOFTE, EN NIET ANDERSOM. Het inzagejournaal was begrensd op 5000 REGELS. |
 | `inzagekaart.test.js` | 11 | -- | De inzagekaart (kern/inzagekaart.js): wie heeft er in mijn gegevens gekeken. Deze kaart bestaat omdat het antwoord op die vraag over drie sporen verspreid lag. |
 | `inzagelog.test.js` | 10 | gezakt op `===->!==` | Het inzagejournaal: wie keek er in wiens identiteitskluis. De twee regels die dit journaal bruikbaar EN veilig maken staan hier als test, want ze zijn allebei makkelijk stuk te maken zonder dat je het merkt: 1. |
 | `isolatie-lid.test.js` | 11 | gezakt op `liegpoort /api/` | DE ISOLATIEMODUS VAN EEN LID -- end-to-end, tegen een draaiende server. WAT DEZE TOETS BEWIJST, en de tweede is verreweg de belangrijkste: 1. |
@@ -875,6 +877,7 @@ toets omvalt.
 | `mn01-bevoegdheidsvoordeel.test.js` | 7 | gezakt op `liegpoort /api/` | MN-01 -- GEEN BEVOEGDHEIDSVOORDEEL, ALS TOETS IN PLAATS VAN ALS ZIN. > Geen organisatorische relatie met RTG kan menselijke toestemming > vervangen, verruimen, doorgeven of reconstrueren. |
 | `mn02-hoedanigheidsscheiding.test.js` | 4 | gezakt op `liegpoort /api/` | MN-02 -- SCHEIDING VAN HOEDANIGHEDEN, als contaminatieproef. > Kennis die actor X rechtmatig verkrijgt in hoedanigheid A, mag niet zonder > afzonderlijke grond beschikbaar worden in hoedanigheid B. |
 | `mn02ai-contextbesmetting.test.js` | 7 | gezakt op `liegpoort /api/` | MN-02-AI: BESMET EEN HANDELING IN HOEDANIGHEID A DE CONTEXT VAN RAHUL IN B? MENSNETWERK.md par. |
+| `mn03-commercieelvoordeel.test.js` | 4 | gezakt op `return-weg#0` | MN-03: GEEN COMMERCIEEL VOORDEEL -- een VOORUITGESCHOVEN POST, en dat staat er liever dan een bewaker die niets bewaakt. De regel (MENSNETWERK.md par. |
 | `mobiel.test.js` | 5 | genoemd | DE TELEFOONPOORT MOET DICHT KUNNEN, EN OP DE JUISTE MOMENTEN OPEN BLIJVEN. GRAMMATICA.md belooft dat een mens zijn duim vindt wat hij zoekt, en ADAPTIEF.md dat een scherm op een telefoon past. |
 | `mobiliteit-werkkant-routes.test.js` | 6 | gezakt op `liegpoort /api/` | DE WERKKANT VAN DE MOBILITEIT -- dispatch, pendel, en de PDA van de chauffeur. test/mobiliteit.test.js loopt de reizigerskant en de toewijzing af. |
 | `mobiliteit.test.js` | 16 | gezakt op `liegpoort /api/` | Het Mobility OS: een vervoerskern waar taxi, OV, pendel en charter op dezelfde ritten-, voertuig- en betaallaag draaien. Draai los: node --test test/mobiliteit.test.js Wat deze toetsen bewaken, en waarom juist dat: 1. |

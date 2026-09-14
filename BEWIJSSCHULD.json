@@ -1,24 +1,24 @@
 {
  "stempel": {
-  "op": "2026-09-14T10:59:13.051Z",
-  "commit": "c3fd70bd9",
+  "op": "2026-09-14T20:50:45.201Z",
+  "commit": "be8223aa",
   "boomVuil": false,
-  "boomAnders": 3,
+  "boomAnders": 0,
   "instrument": "scripts/bewijsschuld.js",
-  "node": "v24.18.0"
+  "node": "v22.22.2"
  },
  "uitleg": "Wat er nog niet gemeten is, en waarom niet. MAG ALLEEN KRIMPEN -- zie test/bewijsschuld.test.js. Een post van soort \"grens\" sluit nooit; die telt niet als achterstand maar als de rand van de methode.",
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 2081,
+  "meetwerk": 2096,
   "instrument": 323,
   "grens": 645
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 2404,
+  "staat": 2419,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,7 +28,7 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 2404,
+  "achterstand": 2419,
   "randVanDeMethode": 645,
   "auth-onbeslist": 1,
   "capability-in-handler": 549,
@@ -46,7 +46,7 @@
   "gevolg-onbekend": 95,
   "droogloop-onbeoordeeld": 2,
   "herstel-onbevestigd": 49,
-  "idem-ongeclassificeerd": 1592,
+  "idem-ongeclassificeerd": 1607,
   "wegwerpserver-kopieen": 3
  },
  "posten": [
@@ -182,7 +182,7 @@
    "id": "idem-ongeclassificeerd",
    "soort": "meetwerk",
    "wat": "muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer",
-   "aantal": 1592,
+   "aantal": 1607,
    "waarom": "autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.",
    "sluit": "per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk."
   },
@@ -431,7 +431,7 @@
    },
    {
     "op": "2026-09-14",
-    "aantal": 1592
+    "aantal": 1607
    }
   ],
   "wegwerpserver-kopieen": [
@@ -589,6 +589,12 @@
    "van": 2403,
    "naar": 2404,
    "reden": "De-laatste-bijgewerkte-PR-koppen-maken-een-extra-idemroute-zichtbaar"
+  },
+  {
+   "op": "2026-09-14",
+   "van": 2404,
+   "naar": 2419,
+   "reden": "De achterstand groeit van 2404 naar 2419, en dat is volledig ONTDEKTE schuld: idem-ongeclassificeerd 1592 -> 1607, precies +15. Die post telt routes die WERK deden minus die met een besluit in IDEMBESLUIT.json. De verse idempotentieproef met de nieuwe labfondswereld maakt 15 routes meetbaar die dat eerder niet waren (beschermd 1681 -> 1696, ongemeten 3241 -> 3236, gemeten op dezelfde lezer). Die vijftien muteerden altijd al en niemand had erover besloten; zij verstopten zich achter 'de proef kwam er niet bij'. Een meting die MEER ziet, laat deze post dus stijgen -- dat is de richting waarin hij hoort te bewegen, want je kunt geen besluitachterstand hebben over routes die je nooit hebt gemeten. De schuld daalt pas als die vijftien een besluit krijgen in IDEMBESLUIT.json."
   }
  ]
 }

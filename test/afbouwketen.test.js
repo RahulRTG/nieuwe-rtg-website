@@ -215,8 +215,36 @@ test('NEGATIEF: een mislukte claim registreert geen ronde', (t) => {
   const w = wereld();
   const kindPad = op.pidBestand(path.join(w.map, 'kind.pid'));
 
-  const eerste = op.start(['-e', RONDE, path.join(WORTEL, 'scripts/afbouw-slot.js'), kindPad], w.env());
-  assert.ok(wachtOp(() => fs.existsSync(w.afloop)), 'de eerste ronde draait');
+  /* DE HARTSLAG STAAT HIER UIT, EN DAT IS GEEN VERZWAKKING MAAR DE VOORWAARDE.
+
+     Deze bewering vergelijkt het afloopbestand BYTE VOOR BYTE. Dat kan alleen
+     als er in dat venster precies een mogelijke schrijver is: de mislukte
+     claim. Met de hartslag op 100 ms is er een tweede, en die is volkomen
+     legitiem -- de LEVENDE eerste ronde legt elke tel haar proceskring vast.
+     Duurt de tweede claim langer dan een tel (node opstarten op een belaste
+     machine doet dat moeiteloos), dan verschilt `kringGepeild` en zakt de
+     toets op het werk van de rechtmatige eigenaar in plaats van op een
+     ongewenste schrijver.
+
+     Zo is hij ook echt gezakt: op een CI-scherf, niet hier -- lokaal won de
+     spawnSync de race vrijwel altijd. Een toets die op de ene machine groen
+     staat en op de andere rood, meet de machine en niet de code.
+
+     Het alternatief was de vergelijking laten leven met de hartslagvelden.
+     Dat is de verkeerde kant op: dan belooft de bewering "GEEN letter" terwijl
+     zij twee velden door de vingers ziet, en groeit die lijst mee met elk veld
+     dat de hartslag er ooit bij zet. Beter een venster waarin de belofte
+     letterlijk waar is. Deze proef beproeft de kring niet -- dat doet de keten
+     hierboven -- dus zij heeft de hartslag nergens voor nodig. */
+  const traag = w.env({ RTG_AFLOOP_HARTSLAG: '600000' });
+
+  const eerste = op.start(['-e', RONDE, path.join(WORTEL, 'scripts/afbouw-slot.js'), kindPad], traag);
+  /* Wachten op BESTAAT is te vroeg: schrijf() kapt het bestand en vult het
+     daarna, dus tussen die twee staat er een leeg bestand dat wel bestaat.
+     Voor een bytevergelijking is dat een tweede race van dezelfde soort, dus
+     hier wordt gewacht tot er een VOLLEDIGE ronde staat. */
+  assert.ok(wachtOp(() => { try { return !!JSON.parse(fs.readFileSync(w.afloop, 'utf8')).runId; }
+    catch (e) { return false; } }), 'de eerste ronde draait');
   const A = laadAfloop(w.afloop);
   const vanEerste = leesRauw(w.afloop);
   const kind = op.volg(Number(fs.readFileSync(kindPad, 'utf8')));
@@ -224,7 +252,7 @@ test('NEGATIEF: een mislukte claim registreert geen ronde', (t) => {
   /* De tweede claim MOET stuklopen: het slot is bezet door een levend proces. */
   const tweede = spawnSync(process.execPath,
     ['-e', "require(process.argv[1]).pak('proefronde-twee')", path.join(WORTEL, 'scripts/afbouw-slot.js')],
-    { env: w.env(), encoding: 'utf8' });
+    { env: traag, encoding: 'utf8' });
   assert.notEqual(tweede.status, 0, 'een tweede claim op een bezet slot hoort te falen');
   assert.match(String(tweede.stderr || ''), /al actief/i, 'en te zeggen waarom');
 

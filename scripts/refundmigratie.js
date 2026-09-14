@@ -248,14 +248,24 @@ const BOMEN = [{ map: 'server', laag: 'server' }, { map: 'public', laag: 'scherm
    tweede lijst hier: wie er een bundel bij maakt, hoeft hier niets te doen. */
 const BUNDELS = new Set(Object.keys(require('./bundel').bundels).map(b => 'public/' + b));
 
-/* HOE SCHERP IS DE TOEWIJZING? Twee bereiken, en het smalste dat iets vindt
+/* HOE SCHERP IS DE TOEWIJZING? Twee leesbreedtes, en de smalste die iets vindt
    wint. Een VENSTER van vijftien regels rond de treffer vindt meestal de plek
    waar de variabele vandaan komt (`ordersVanZaak(...)` staat zelden dertig
    regels verderop); gemeten zakt dat van 2,08 naar 1,60 collecties per bestand.
    Maar bij zes bestanden vindt het venster NIETS, en een bestand zonder
    collectie valt uit de kaart -- precies de faalvorm die deze meter net heeft
-   gehad. Daarom valt hij terug op het hele bestand, en draagt elke rij WELK
-   bereik hem heeft toegewezen: `venster` is scherp, `bestand` is ruim. */
+   gehad. Daarom valt hij terug op het hele bestand, en draagt elke rij WELKE
+   leesbreedte hem heeft toegewezen: `venster` is scherp, `bestand` is ruim.
+
+   EN HET VELD HEET MET OPZET NIET `bereik`. Die naam draagt in de
+   bewijsregisters al drie relaties (scripts/lib/bewijsvelden.js: WACHT wat een
+   wachter raakt, CLAIM waarover een oordeel geldt, BEVOEGDHEID wat een rol mag)
+   en die twee eerste zijn elkaars tegendeel. Dit veld draagt geen van die drie:
+   het zegt hoe VER de meter keek om een collectie toe te wijzen, en dat is de
+   breedte van de waarneming en niet de reikwijdte van een oordeel. Een vierde
+   betekenis eronder schuiven maakt de botsing groter in plaats van kleiner --
+   CLAUDE.md: een nieuw kernbegrip op een bezette naam hernoemt eerst of wijkt
+   uit. `leesbreedte` is gemeten vrij in alle registers. */
 const VENSTER = 15;
 
 function collectiesVan(regels, hit) {
@@ -264,9 +274,9 @@ function collectiesVan(regels, hit) {
     const v = regels.slice(Math.max(0, i - VENSTER), i + VENSTER + 1).join('\n');
     for (const c of COLLECTIES) if (new RegExp('\\b' + STAM[c], 'i').test(v)) uit.add(c);
   }
-  if (uit.size) return { collecties: [...uit], bereik: 'venster' };
+  if (uit.size) return { collecties: [...uit], leesbreedte: 'venster' };
   const heel = regels.join('\n');
-  return { collecties: COLLECTIES.filter(c => new RegExp('\\b' + STAM[c], 'i').test(heel)), bereik: 'bestand' };
+  return { collecties: COLLECTIES.filter(c => new RegExp('\\b' + STAM[c], 'i').test(heel)), leesbreedte: 'bestand' };
 }
 
 function bestandenMetPaid() {
@@ -291,7 +301,7 @@ function bestandenMetPaid() {
       if (BUNDELS.has(rel)) continue;
       const c = collectiesVan(regels, hit);
       if (!c.collecties.length) continue;
-      uit.set(rel, { treffers: hit.length, collecties: c.collecties, bereik: c.bereik, laag });
+      uit.set(rel, { treffers: hit.length, collecties: c.collecties, leesbreedte: c.leesbreedte, laag });
     }
   }
   for (const b of BOMEN) loop(path.join(WORTEL, b.map), b.laag);
@@ -304,7 +314,7 @@ function meet() {
   for (const [rel, info] of gevonden) {
     if (GEEN_LEZER[rel]) continue;
     const l = LEZERS[rel];
-    const kop = { bestand: rel, treffers: info.treffers, laag: info.laag, bereik: info.bereik };
+    const kop = { bestand: rel, treffers: info.treffers, laag: info.laag, leesbreedte: info.leesbreedte };
     if (!l) { onbekend.push(Object.assign(kop, { collecties: info.collecties })); continue; }
     rijen.push(Object.assign(kop, l));
   }
@@ -339,7 +349,7 @@ function meet() {
       'rides, tickets en boekingen niet. Dit telt de lezers en wijst ze aan; het VERKLAART ze niet -- ' +
       'een lezer staat op onbekend tot iemand hem met de hand heeft ingedeeld.',
     grens: 'De toewijzing van een bestand aan een collectie is lexicaal en dus een BOVENgrens: een bestand ' +
-      'dat twee collecties noemt, staat bij allebei. Elke rij draagt daarom zijn `bereik` -- `venster` is ' +
+      'dat twee collecties noemt, staat bij allebei. Elke rij draagt daarom zijn `leesbreedte` -- `venster` is ' +
       'toegewezen uit vijftien regels rond de treffer en is scherp, `bestand` uit het hele bestand en is ruim. ' +
       'Het zegt ook niets over of een verklaring KLOPT -- alleen dat de plek nog bestaat. En het ziet geen ' +
       'lezer die de betaalstand via een hulpfunctie leest zonder `.paid` te noemen; dat is een ONDERgrens ' +
@@ -348,7 +358,7 @@ function meet() {
     telling: {
       bestanden: gevonden.size, verklaard: rijen.length, onbekend: onbekend.length, verdwenen: verdwenen.length,
       server: alle.filter(r => r.laag === 'server').length, scherm: alle.filter(r => r.laag === 'scherm').length,
-      scherp: alle.filter(r => r.bereik === 'venster').length, ruim: alle.filter(r => r.bereik === 'bestand').length
+      scherp: alle.filter(r => r.leesbreedte === 'venster').length, ruim: alle.filter(r => r.leesbreedte === 'bestand').length
     }
   };
 }
@@ -367,7 +377,7 @@ function druk(u) {
   console.log('\n  nog te verklaren:');
   for (const o of u.onbekend.slice(0, 40))
     console.log('    ' + o.bestand + '  (' + o.treffers + 'x, ' + o.collecties.join('/') +
-      (o.bereik === 'bestand' ? ', ruim' : '') + ')');
+      (o.leesbreedte === 'bestand' ? ', ruim' : '') + ')');
   if (u.onbekend.length > 40) console.log('    ... en nog ' + (u.onbekend.length - 40));
   console.log('\n  ' + u.grens + '\n');
 }

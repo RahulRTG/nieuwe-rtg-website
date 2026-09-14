@@ -318,7 +318,8 @@ aannemen. Leg het vast, welke kant het ook op valt.
 
 Deze vragen geen besluit en wel werk, in oplopende kosten.
 
-1. **Een land erbij in de dekkingsmeter** — klaar, dit document draait erop.
+1. **De dekkingsmeter zelf** — staat (`npm run landdekking`); dit document draait
+   erop, en een land erbij verschijnt er vanzelf in.
 2. **Een fiscale jaargang voor Nederland** (`nl-2026.json`). Dagwerk, en het
    repareert de thuismarkt (par. 1).
 3. **Een loonregelpakket per land.** De motor is landneutraal en wacht op een
@@ -348,7 +349,7 @@ Deze vragen geen besluit en wel werk, in oplopende kosten.
   grondslag én een plafond. Wat er moet komen is één registerregel met die twee,
   niet een nieuwe laag.
 - **Gegevenswoonplaats.** De identiteitskluis is één kluis. Welke gegevens van een
-  Spaanse lid waar staan, is een AVG-vraag met een antwoord per land; `TENANT.md`
+  Spaans lid waar staan, is een AVG-vraag met een antwoord per land; `TENANT.md`
   heeft de herkomstregel al als niet-uitzetbaar vastgelegd (*wiens software je
   personeelsdossier bewaart is een AVG-vraag, geen merkvraag*).
 

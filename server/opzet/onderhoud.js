@@ -25,7 +25,32 @@
 'use strict';
 
 const STILTE_MS = 15 * 60000; // zo lang moet een emmer stil zijn voor hij weg mag
-const RONDE_MS = 5 * 60000;   // ...en zo vaak komt de veger langs
+
+/* HOE VAAK DE VEGER LANGSKOMT -- vijf minuten, en met een knop voor een MEETRONDE.
+
+   Waarom die knop er is, en waarom hij niet over de veger gaat maar over het METEN.
+   `start.js` hangt in dit interval ook `betaalWaarheid.ronde()`, die gestrande
+   betaalopdrachten opnieuw inzendt; `railInzenden` meldt daarbij de stand van
+   `money.payout` aan kern/commercie/capgezondheid.js. Dat schrijft dus BUITEN elk
+   verzoek om -- en de idempotentieproef rekent zijn verschil tussen twee oproepen,
+   dus landt dat werk bij de route die op dat moment aan de beurt is.
+
+   Gemeten op 14 september 2026: 14 routes droegen zo `betaalOpdrachten` en 15
+   `capGezondheid`, waaronder /api/lab2/labs, /api/member/snaps en
+   /api/rtf/leerling/vakken -- geen daarvan betaalt iets uit. Het gevolgcontract van
+   /api/pay/tik claimde die twee daarop als `gemeten`, en of dat "klopte" hing af van
+   waar de tikker in een ronde van drie kwartier viel. Een meter die per ronde iets
+   anders zegt, is geen meter.
+
+   DE STANDAARD BEWEEGT NIET: zonder de variabele staat hij op dezelfde vijf minuten
+   als hiervoor, dus in productie verandert er niets. `RTG_COMMERCIE_RONDE_MS` bestond
+   al met precies deze vorm (server/opzet/kernlaag3c.js); dit is de tweede van de twee
+   rondes die op vijf minuten tikken. Wat een STILLE server in 5,5 minuut nog meer
+   schrijft is ook gemeten en staat NIET stil: `ledenSites`, `veilig` en `rtgai`. Die
+   vallen buiten de twaalf seconden van de stille ijking, en er is geen enkele reden om
+   aan te nemen dat dit de laatste twee tikkers zijn -- zie de kop van
+   scripts/idemproef-route.js. */
+const RONDE_MS = Number(process.env.RTG_ONDERHOUD_RONDE_MS || 5 * 60000);
 
 /* Een kwartier stilte is ruim genoeg om het geheugen niet te laten vollopen, en
    te lang om een aanval te kunnen uitzitten: wie op de rem wacht, wacht langer

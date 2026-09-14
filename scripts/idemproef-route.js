@@ -124,7 +124,34 @@ function wachtOpSchoneBoom() {
          alleen wat de route terugzegt -- stiller, en een stuk zwakker. Stand 2,
          want alleen die ziet ook een wijziging OP ZIJN PLAATS (gelijke lengte,
          andere inhoud). Zie server/staatlog.js. */
-      RTG_STAATLOG: '2' } });
+      RTG_STAATLOG: '2',
+      /* DE TIKKERS STILZETTEN, en dat is een MEETbesluit en geen productiewijziging.
+
+         Twee rondes in dit huis tikken elke vijf minuten: de commercieronde
+         (server/opzet/kernlaag3c.js) en de onderhoudsronde met `betaalWaarheid.ronde()`
+         erin (server/opzet/start.js). Ze schrijven BUITEN elk verzoek om, en deze proef
+         rekent zijn verschil tussen twee oproepen -- dus belandt dat werk in de delta van
+         de route die op dat moment aan de beurt is. Een ronde van drie kwartier vangt er
+         dus een handvol, en welke route de rekening krijgt is toeval.
+
+         GEMETEN, niet vermoed (14 september 2026): 14 routes droegen `betaalOpdrachten`
+         en 15 `capGezondheid`, waaronder /api/lab2/labs en /api/rtf/leerling/vakken.
+         Daar is een gevolgcontract op geschreven dat die twee als `gemeten` claimde --
+         en dat viel pas door de mand toen een volgende ronde ze ergens anders neerlegde.
+
+         WAAROM NIET IN DE RUISLIJST. Een stille server van 5,5 minuut schrijft
+         {"kosten":1,"wacht":6,"techniek":3,"ledenSites":2,"veilig":1,"rtgai":9}. Die zes
+         in de ruis zetten zou `ledenSites` wegvangen bij /api/site/bewaar, dat hem ZELF
+         schrijft -- een zeef die een echt effect onzichtbaar maakt is erger dan de fout
+         die zij opruimt. Vandaar: de bron stilzetten in plaats van het gevolg filteren.
+
+         WAT DIT NIET DEKT, en dat hoort er even groot bij: `ledenSites`, `veilig` en
+         `rtgai` bewegen nog steeds. Hun tikkers hebben geen variabele, en er is geen
+         reden om aan te nemen dat deze twee de laatste zijn. Wie hier een derde vindt,
+         zet hem erbij -- en wie een collectie in een gevolgcontract als `gemeten` claimt
+         terwijl hij in dat rijtje staat, claimt het werk van een klok. */
+      RTG_COMMERCIE_RONDE_MS: String(24 * 60 * 60 * 1000),
+      RTG_ONDERHOUD_RONDE_MS: String(24 * 60 * 60 * 1000) } });
   const { basis, klaar } = server;
 
   /* `extraKoppen` is er voor deuren die hun sleutel in een KOP verwachten en niet
@@ -410,6 +437,10 @@ function wachtOpSchoneBoom() {
      bij elke oproep groeit -- en als het er NUL zijn hoort dat ook te blijken. */
   if (staatWerkt) console.log('  de stille ronde (klok en buffer)     : ' +
     (stilBewoog === null ? 'niet gedraaid' : stilBewoog.length ? stilBewoog.join(', ') : 'niets bewoog'));
+  /* Wat er tijdens het meten UIT staat, hoort even zichtbaar te zijn als wat er is
+     geijkt: een ronde met andere voorwaarden is een andere ronde. */
+  console.log('  vijfminutentikkers stilgezet         : commercie, onderhoud (+betaalWaarheid)');
+  console.log('  tikkers die NOG tikken (gemeten)     : ledenSites, veilig, rtgai');
 
   /* Het verschil dat DEZE oproep achterliet. De stand loopt door over de hele
      ronde: elk antwoord is het nieuwe ijkpunt voor het volgende. */
@@ -699,6 +730,14 @@ function wachtOpSchoneBoom() {
       beschermd: t.beschermd, onbeschermd: t.onbeschermd, ongemeten: t.ongemeten,
       oproepen: uit.oproepen, tokensHernieuwd: uit.hernieuwd,
       uitOpslag: uit.uitOpslag || 0, ruisGeijkt: [...ruis], vastlegging: uit.vastleggingGemeten || [],
+      /* ONDER WELKE VOORWAARDEN DIT IS GEMETEN. Twee rondes die elke vijf minuten
+         schrijven staan tijdens deze ronde stil (zie de env hierboven); zonder dat
+         belandt hun werk in de delta van de route die op dat moment aan de beurt is.
+         Het staat in het REGISTER en niet alleen in de bron, want wie deze getallen
+         later leest moet kunnen zien wat er tijdens het meten uit stond -- en wat NIET
+         (`tikkersNogAan`, gemeten op een stille server van 5,5 minuut). */
+      tikkersStil: ['commercie (kernlaag3c)', 'onderhoud + betaalWaarheid (start.js)'],
+      tikkersNogAan: ['ledenSites', 'veilig', 'rtgai'],
       blindeRondes: uit.meterStuk ? 1 : 0, begrenzing: MAX,
       wereldKlaargezet: Object.keys(extra), geldroutesMetEigenLijf: Object.keys(geldLijven).length,
       onbeschermdMetBesluit: onbeschermd.length - zonderBesluit.length,

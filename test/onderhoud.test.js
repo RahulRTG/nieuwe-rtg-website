@@ -112,3 +112,42 @@ test('de ronde valt niet om als een van de drie er niet is', () => {
   assert.doesNotThrow(() => onderhoudsronde({ loginFails: new Map() }));
   assert.doesNotThrow(() => onderhoudsronde({ pinSlot: {} }));
 });
+
+test('de rondetijd is met een variabele stil te zetten, en staat zonder die variabele op vijf minuten', () => {
+  /* WAAROM DIT EEN TOETS IS EN GEEN COMMENTAAR. Deze interval draagt in start.js ook
+     `betaalWaarheid.ronde()`, die gestrande betaalopdrachten opnieuw inzendt en daarbij
+     `capGezondheid` bijwerkt. Dat schrijft BUITEN elk verzoek om, en de
+     idempotentieproef rekent zijn verschil tussen twee oproepen -- dus landde dat werk
+     in de delta van de route die op dat moment aan de beurt was. Gemeten op 14 september
+     2026: 14 routes droegen zo `betaalOpdrachten` en 15 `capGezondheid`, en er is een
+     gevolgcontract op geschreven dat die twee als `gemeten` claimde.
+
+     De proef zet de tikker daarom stil (scripts/idemproef-route.js). Dat de variabele
+     werkelijk wordt GELEZEN is het enige dat hier valt te bewijzen -- en het is genoeg:
+     staat hij op vierentwintig uur, dan kan de ronde binnen een meetronde van drie
+     kwartier niet vallen. Dat is rekenkunde en geen geluk. De afwezigheid van een
+     collectie in een enkele ronde bewijst niets, want de tikker viel misschien toch net
+     ergens anders.
+
+     EN DE STANDAARD MOET MEE BEWEZEN: een knop die de productiewaarde verandert is geen
+     meetbesluit meer. Zonder variabele blijft hij op vijf minuten staan. */
+  const pad = require.resolve('../server/opzet/onderhoud');
+  const oud = process.env.RTG_ONDERHOUD_RONDE_MS;
+  try {
+    delete process.env.RTG_ONDERHOUD_RONDE_MS;
+    delete require.cache[pad];
+    assert.equal(require('../server/opzet/onderhoud').RONDE_MS, 5 * 60000,
+      'zonder de variabele hoort de veger elke vijf minuten te komen, net als hiervoor');
+
+    process.env.RTG_ONDERHOUD_RONDE_MS = String(24 * 60 * 60 * 1000);
+    delete require.cache[pad];
+    assert.equal(require('../server/opzet/onderhoud').RONDE_MS, 24 * 60 * 60 * 1000,
+      'de variabele wordt niet gelezen -- dan staat de tikker tijdens een meetronde nog aan');
+  } finally {
+    if (oud === undefined) delete process.env.RTG_ONDERHOUD_RONDE_MS;
+    else process.env.RTG_ONDERHOUD_RONDE_MS = oud;
+    delete require.cache[pad];
+    require('../server/opzet/onderhoud');
+  }
+});
+

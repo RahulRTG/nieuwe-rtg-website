@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1885 |
 | losse beweringen (`test(...)`) | 13483 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1258 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1246 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
-| niet te meten (al rood, geen module gevonden, ...) | 84 |
-| alleen in de kop *genoemd*, nog niet gemeten | 158 |
-| niets van beide | 385 |
+| niet te meten (al rood, geen module gevonden, ...) | 71 |
+| alleen in de kop *genoemd*, nog niet gemeten | 165 |
+| niets van beide | 403 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -66,7 +66,7 @@ toets omvalt.
 | `afbouwketen.test.js` | 2 | geen bronmutatie mogelijk | DE VOLLEDIGE LEVENSLOOP VAN EEN BRONMUTERENDE RONDE -- met echte processen. test/afbouwafloop.test.js beproeft de module op zichzelf. |
 | `afbouwpoort.test.js` | 8 | gezakt op `===->!==#3` | MEET NIEMAND TERWIJL EEN MOTOR DE BRON VERBOUWT? Twee motoren in dit huis muteren met opzet echte bestanden en zetten ze in een finally terug: scripts/mutatie.js (de mutatiemotor) en test/meterijk.test.js (de ijking,... |
 | `afleidbaar.test.js` | 9 | gezakt op `===->!==#0` | WAT IS ER AFLEIDBAAR UIT EEN CODENAAM -- en meet die meter dat werkelijk? MAGNAATLAB.md par. |
-| `afleidrest-dubbeltik.test.js` | 3 | geen bruikbare mutatie | DE VIJF DUBBELTIKKEN -- en de eis dat "geen tweede effect" niet genoeg is. server/lib/idemsleutels-afleidrest.js verklaart vijf routes als `zelfdeVerzoek` omdat de idemproef ze GEMETEN onbeschermd vond: "een... |
+| `afleidrest-dubbeltik.test.js` | 3 | -- | DE VIJF DUBBELTIKKEN -- en de eis dat "geen tweede effect" niet genoeg is. server/lib/idemsleutels-afleidrest.js verklaart vijf routes als `zelfdeVerzoek` omdat de idemproef ze GEMETEN onbeschermd vond: "een... |
 | `agenda-pro.test.js` | 5 | gezakt op `liegpoort /api/` | De pro-laag van de agenda: herhalingen die goed uitrollen, uitnodigen op codenaam (nooit een echte naam in beeld), ja/nee dat bij de organisator terugkomt, ICS-export met RRULE, en de eerlijke sluitregels. Draai los:... |
 | `agenda.test.js` | 5 | gezakt op `liegpoort /api/` | Tests voor de persoonlijke AI-agenda (kern/agenda.js): leden en leveranciers hebben een eigen agenda; de AI zet gewone taal om naar datum + tijd; de telling voedt de ballon-badge. Draai: npm test |
 | `agent.test.js` | 4 | gezakt op `liegpoort /api/` | De AI-bedrijfsagent: vaste leverancier koppelen, inkoopvoorstellen met goedkeuring door de gemachtigde (pas dan een echte bestelling bij de groothandel), automatisch een voorstel na de MEP-voorspelling, en het... |
@@ -409,43 +409,43 @@ toets omvalt.
 | `fiscaal-jaargangen.test.js` | 5 | gezakt op `===->!==#0` | DE FISCALE JAARGANGEN: welke regels golden er op die dag. Vijf beweringen, en ze gaan alle vijf over hetzelfde verschil: tussen "wat geldt er nu" (dat kon dit huis al) en "wat gold er toen" (dat kon het niet, want de... |
 | `fiscaal-preflight.test.js` | 6 | gezakt op `===->!==#0` | DE PRE-FLIGHT: GO, REVIEW of BLOCK vóór de klik. Zes beweringen, en de belangrijkste is de laatste. |
 | `fiscaal-scenario.test.js` | 7 | -- | DE SCENARIO-ENGINE: wat gebeurt er als ik dit doe -- zonder dat er iets gebeurt. Zes beweringen, en de eerste is de enige die er echt toe doet. |
-| `fiscaal-terugrekenen.test.js` | 5 | gezakt op `===->!==#0` | DE REKENPLEKKEN OP DE REGELS VAN TOEN. De jaargangen (test/fiscaal-jaargangen.test.js) maakten terugrekenen MOGELIJK. |
-| `fiscaal-verbintenis.test.js` | 6 | gezakt op `===->!==#0` | DE VERBINTENIS: aansluiten zonder alles te laten zien. Zes beweringen. |
-| `fiscaal-zekerheid.test.js` | 5 | gezakt op `===->!==#0` | DE VIER ZEKERHEIDSKLASSEN. Elke fiscale uitkomst droeg dezelfde zin: "voorlichting, geen bindend fiscaal advies". |
-| `fiscaal-zzpwacht.test.js` | 5 | gezakt op `===->!==#0` | DE ZZP-REGIMES PER INGANGSDATUM. De landentabel stond al per jaargang vast; de zzp-tabel niet, en daardoor rekende de zzp-tool elk jaar met de tarieven van nu. |
+| `fiscaal-terugrekenen.test.js` | 5 | -- | DE REKENPLEKKEN OP DE REGELS VAN TOEN. De jaargangen (test/fiscaal-jaargangen.test.js) maakten terugrekenen MOGELIJK. |
+| `fiscaal-verbintenis.test.js` | 6 | -- | DE VERBINTENIS: aansluiten zonder alles te laten zien. Zes beweringen. |
+| `fiscaal-zekerheid.test.js` | 5 | -- | DE VIER ZEKERHEIDSKLASSEN. Elke fiscale uitkomst droeg dezelfde zin: "voorlichting, geen bindend fiscaal advies". |
+| `fiscaal-zzpwacht.test.js` | 5 | -- | DE ZZP-REGIMES PER INGANGSDATUM. De landentabel stond al per jaargang vast; de zzp-tabel niet, en daardoor rekende de zzp-tool elk jaar met de tarieven van nu. |
 | `flits.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Flits: de rijhulp van het netwerk. Meldingen op codenaam met houdbaarheid; een tweede melding dichtbij telt als bevestiging; drie keer "weg" haalt een melding eraf; landregels zetten flitsermeldingen uit waar ze... |
 | `fluister.test.js` | 19 | gezakt op `liegpoort /api/` | Fluister, de persoonlijke assistent met geheugen: onthoudt wat je hem vertelt, leert van je schermgebruik (alleen tellers), is volledig transparant ("wat weet je over mij") en wisbaar. Voor leden en voor het... |
 | `fonds.test.js` | 9 | gezakt op `liegpoort /api/` | Sociale afdracht: van elke bevestigde maandbetaling gaat 30% (ex btw) als twee formele claims naar 20% lokaal en 10% RTFoundation. We toetsen drie lagen: 1. |
 | `foodcourt.test.js` | 3 | gezakt op `liegpoort /api/` | De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de stijl van een reserveerplatform. Overzicht met keuken/prijs/ledenvoordeel, vrije tijdsloten per datum en gezelschap, en reserveren via... |
-| `foundation-geld-later.test.js` | 5 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `foundation-gezondheid-welzijn.test.js` | 5 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `foundation-hulp-zorg.test.js` | 4 | geen module gevonden | De Hulp & Zorg-voorzijde mag warm en persoonlijk ogen, maar nooit een zorgverlener, dossier of toestemming verzinnen. Deze toets bewaakt de drie getekende schermen en hun echte databronnen. |
-| `foundation-leren-groei.test.js` | 5 | geen module gevonden | Leren & Groei toont de bestaande leerroute in de drie goedgekeurde schermen. De toets bewaakt dat vorm nooit wordt verward met bewijs. |
+| `foundation-geld-later.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `foundation-gezondheid-welzijn.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `foundation-hulp-zorg.test.js` | 4 | -- | De Hulp & Zorg-voorzijde mag warm en persoonlijk ogen, maar nooit een zorgverlener, dossier of toestemming verzinnen. Deze toets bewaakt de drie getekende schermen en hun echte databronnen. |
+| `foundation-leren-groei.test.js` | 5 | -- | Leren & Groei toont de bestaande leerroute in de drie goedgekeurde schermen. De toets bewaakt dat vorm nooit wordt verward met bewijs. |
 | `foundation-lesrem.test.js` | 3 | genoemd | DE LES-MAAKROUTE HEEFT DE REM DIE HAAR REDEN BELOOFDE. WAT ER MIS WAS. |
 | `foundation-markt.test.js` | 5 | gezakt op `liegpoort /api/` | DE MARKTPLAATS VAN DE FOUNDATION -- 4 endpoints. detail, verwijder, chat en blokkeer stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
-| `foundation-meedoen-ontdekken.test.js` | 5 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `foundation-persoonscodes.pg.test.js` | 1 | slaat zichzelf over | Echte PostgreSQL-proef voor Foundation-persoonscodes. Twee onafhankelijke contexts delen alleen de database en raken tegelijk dezelfde `rtfos`-rij. |
+| `foundation-meedoen-ontdekken.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `foundation-persoonscodes.pg.test.js` | 1 | genoemd | Echte PostgreSQL-proef voor Foundation-persoonscodes. Twee onafhankelijke contexts delen alleen de database en raken tegelijk dezelfde `rtfos`-rij. |
 | `foundation-persoonscodes.test.js` | 13 | genoemd | De drie Foundation-persoonsportalen delen een codelevenscyclus. Deze toets bewaakt zowel de motor als de echte routes: verval, intrekking, rotatie en gebruik zijn geen UI-belofte, maar sluiten de serverdeur. |
-| `foundation-premium-ui.test.js` | 5 | geen module gevonden | De Foundation is één ervaring: elk los hulpmiddel, School, Klas en Campus draagt dezelfde premiumlaag. Deze toets voorkomt dat een nieuwe pagina als visueel eiland verschijnt of dat mobiel opnieuw buiten beeld groeit. |
-| `foundation-productiepoort.test.js` | 11 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `foundation-premium-ui.test.js` | 5 | -- | De Foundation is één ervaring: elk los hulpmiddel, School, Klas en Campus draagt dezelfde premiumlaag. Deze toets voorkomt dat een nieuwe pagina als visueel eiland verschijnt of dat mobiel opnieuw buiten beeld groeit. |
+| `foundation-productiepoort.test.js` | 11 | genoemd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `foundation-reisrem.test.js` | 3 | genoemd | DE REIS-AANVRAAG HEEFT EEN REM. WAT ER MIS WAS. |
 | `foundation-rest.test.js` | 4 | gezakt op `liegpoort /api/` | DE LAATSTE FOUNDATION-ROUTES -- 5 endpoints, twee heel verschillende kanten. Hiermee is de foundation-groep uit de dekkingsmeting afgewerkt. |
-| `foundation-samen-thuis.test.js` | 5 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `foundation-veilig-vertrouwd.test.js` | 5 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `foundation-voorzijde.test.js` | 4 | geen module gevonden | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `foundation-vrijgave.test.js` | 8 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `foundation-samen-thuis.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `foundation-veilig-vertrouwd.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `foundation-voorzijde.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
+| `foundation-vrijgave.test.js` | 8 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `foundation.test.js` | 28 | gezakt op `liegpoort /api/` | Integratietests voor de RTFoundation-lesapp (gratis onderwijs): de live-les, het bord, het schrift, opgaven en de AI-bijles. Draait tegen een echte RTG-server in een tijdelijke datamap. |
 | `foundationregistratie.test.js` | 4 | -- | FOUNDATION-registratie: openbaar aanvragen, nooit openbaar toelaten. De Boardroom moet elk toepasselijk bewijs afzonderlijk vastleggen voordat een schoolcode, vrijwilligerscode of partnercode ontstaat. |
 | `foundationschil.test.js` | 3 | geen module gevonden | De offline-schil van het RTFoundation-huis. WAAROM DEZE TOETS ER IS. |
 | `fout-aggregatie.test.js` | 5 | gezakt op `&&->||` | Test voor de eigen in-memory fout-aggregatie in server/log.js. Storingen worden gegroepeerd op een vingerafdruk (bericht met cijfers weggenormaliseerd + plaats), met een teller; foutenSamenvatting() geeft de... |
 | `fout-client-route.test.js` | 3 | gezakt op `liegpoort /api/` | DE DEUR VOOR EEN FOUT UIT DE BROWSER (/api/fout/client). Deze route staat er met opzet ZONDER inlog: een fout die het inloggen zelf sloopt, is juist de fout die je wilt zien. |
 | `fout-client.test.js` | 9 | gezakt op `liegpoort /api/` | DE INGANG VOOR BROWSERFOUTEN: POST /api/fout/client WAAROM DEZE TOETS BESTAAT. Dit is het enige spoor van een storing die alleen op het toestel van een gebruiker gebeurt (server/routes/fout.js, gevoed door... |
-| `foutisolatie.test.js` | 6 | gezakt op `===->!==#0` | DE FOUTWIKKEL, EN WAAROM HIJ EEN NAAM DRAAGT. server/lib/foutisolatie.js omhult elke route-handler zodat een (async) fout next(err) wordt in plaats van een unhandledRejection. |
+| `foutisolatie.test.js` | 6 | genoemd | DE FOUTWIKKEL, EN WAAROM HIJ EEN NAAM DRAAGT. server/lib/foutisolatie.js omhult elke route-handler zodat een (async) fout next(err) wordt in plaats van een unhandledRejection. |
 | `foutmelder-dekking.test.js` | 2 | gezakt op `+->-#0` | DRAAGT ELK SCHERM DE FOUTMELDER? -- van voornemen naar machine. |
 | `foutmelder.test.js` | 5 | gezakt op `===->!==` | Eigen externe fout-melder (server/foutmelder.js), die @sentry/node verving. We draaien tegen een lokale nep-webhook en controleren: er gaat een nette JSON-POST uit met de fout + context, dezelfde fout wordt binnen... |
-| `frictiebodem.test.js` | 14 | gezakt op `===->!==#0` | DE BODEM ONDER DE FRICTIE. WAT HIER BEPROEFD WORDT, EN WAAROM HET ZWAAR WEEGT. |
-| `frictieschaduw.test.js` | 6 | gezakt op `===->!==#0` | DE FRICTIESCHADUW -- meelopen zonder te bijten. kern/stuur/beleid.js beantwoordt "mag de AI dit pad" uit een statische lijst plus de bodem. |
-| `functielijst.test.js` | 6 | al rood | DE AFDRUK VAN FUNCTIES.md LAAT NIETS VALLEN. WAAROM DIT ER IS, EN WAT HET KOSTTE. |
+| `frictiebodem.test.js` | 14 | genoemd | DE BODEM ONDER DE FRICTIE. WAT HIER BEPROEFD WORDT, EN WAAROM HET ZWAAR WEEGT. |
+| `frictieschaduw.test.js` | 6 | -- | DE FRICTIESCHADUW -- meelopen zonder te bijten. kern/stuur/beleid.js beantwoordt "mag de AI dit pad" uit een statische lijst plus de bodem. |
+| `functielijst.test.js` | 6 | genoemd | DE AFDRUK VAN FUNCTIES.md LAAT NIETS VALLEN. WAAROM DIT ER IS, EN WAT HET KOSTTE. |
 | `functieplaats.test.js` | 4 | gezakt op `liegpoort /api/` | De plaats-as van de schakelkast: een functie per STAD of DORP dicht. Fijner dan het land, grover dan de persoon. |
 | `functies.test.js` | 16 | geen bruikbare mutatie | Tests voor de functieschakelaars (server/functies.js): de pad-matching (langste prefix wint), de standaard en de catalogus. Zuiver, geen server nodig. |
 | `galerij.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Galerij: de tijdlijn leest De Salon en RTG Bestanden (geen dubbele opslag), albums zijn verwijzingen en favorieten blijven van het lid. |
@@ -457,18 +457,18 @@ toets omvalt.
 | `gastroomservice.test.js` | 7 | gezakt op `liegpoort /api/` | HET GUEST OS OP DE KAMER: roomservice. DE DERDE NAAD, en de scherpste. |
 | `gastverzoek.test.js` | 12 | gezakt op `liegpoort /api/` | WAT EEN GAST VRAAGT IN PLAATS VAN BESTELT. De gastkant kon bestellen en afrekenen, maar niet zeggen "kunt u even komen". |
 | `gastzorg.test.js` | 3 | gezakt op `liegpoort /api/` | De zorgvolle keten: het zorgprofiel reist alleen met toestemming mee met bestellingen en verblijven, en de live locatie is alleen zichtbaar voor zaken die de gast zelf aanwees, tot de zaak (of de gast) het stopt. |
-| `gebaar.test.js` | 15 | geen module gevonden | RTG Gebaren: de regels die je aan een scherm niet ziet, machinaal gehandhaafd. WAAROM DEZE TOETS BESTAAT. |
+| `gebaar.test.js` | 15 | genoemd | RTG Gebaren: de regels die je aan een scherm niet ziet, machinaal gehandhaafd. WAAROM DEZE TOETS BESTAAT. |
 | `gebouw.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Enterprise: het complete kantoorgebouw-systeem (demo Meridiaan Toren). Bewaakt de zalen zonder dubbele boekingen, de bezoekersstroom langs de receptie, badges, facilitaire meldingen, valet, de jetset-laag en de... |
 | `gebouwplus.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Enterprise (gebouwplus): de plus-laag van het kantoorgebouw. Getoetst: de manager van de demo-toren legt een huurcontract vast, verlengt en beeindigt het; leads schuiven door de fasen; energie-weken worden... |
 | `gedachten.test.js` | 7 | gezakt op `liegpoort /api/` | Het gedachtenboek (kern/gedachten.js). De belofte is dat dit GEEN materiaal is, en die wordt hier op drie manieren vastgezet: er is geen deur die de tekst ergens anders heen stuurt, niemand anders kan erbij, en... |
 | `geen-demo.test.js` | 2 | -- | ZONDER RTG_DEMO STAAT ER NIETS VERZONNENS. De demo-INLOG stond al op "uit tenzij je hem aanzet" (server.js, `const DEMO`), met de conclusie erbij: een slot dat opengaat als iemand iets vergeet is geen slot. |
 | `geenlek.test.js` | 9 | gezakt op `getal+1#0` | HET REGRESSIECORPUS VAN DE ZEEF. scripts/lib/geenlek.js bepaalt wat er WEL en NIET in klaartekst in een log belandt. |
-| `gegevenskaart.test.js` | 14 | gezakt op `===->!==#0` | DE GEGEVENSKAART -- wat weet RTG van mij. DE TOETS DIE HET REGISTER EERLIJK HOUDT staat in 1: elke regel noemt een `bron`, en dat bestand moet bestaan. |
+| `gegevenskaart.test.js` | 14 | genoemd | DE GEGEVENSKAART -- wat weet RTG van mij. DE TOETS DIE HET REGISTER EERLIJK HOUDT staat in 1: elke regel noemt een `bron`, en dat bestand moet bestaan. |
 | `gegevenspoort.test.js` | 4 | gezakt op `liegpoort /api/` | Een gratis account vraagt vier dingen. Pas als er een DERDE PARTIJ bij komt -- een zaak, een koerier -- vraagt Rahul de rest, in een gesprek. |
 | `geheugen.test.js` | 7 | gezakt op `===->!==` | De Memory Engine: van leren-toets-vergeten naar onthouden. De beloftes die hier hard worden gemaakt: - een behaald leerdoel krijgt een herhaalmoment, en dat moment ligt in de toekomst (niet vandaag: dan zou alles... |
 | `geld-conservatie-last.test.js` | 1 | gezakt op `liegpoort /api/` | Geld-conservatie onder GELIJKTIJDIGE, ECHTE schrijfpaden. De beproeving zaait haar activiteit rechtstreeks in de opslag (snel, maar het toetst geen functionele juistheid van de echte betaalroute). |
-| `geld-rollen-buiten-bank.test.js` | 4 | gezakt op `true->false#0` | DE ROLLENVRAAG BUITEN DE BANK. test/geld-rollen.test.js bewijst dat lid B niet bij de bankrekening van lid A komt. |
-| `geld-rollen-gezin.test.js` | 4 | gezakt op `return-weg#0` | KOMT GEZIN B BIJ HET DOSSIER VAN GEZIN A? De zesde en laatste rollenvraag, en de zwaarste. |
+| `geld-rollen-buiten-bank.test.js` | 4 | -- | DE ROLLENVRAAG BUITEN DE BANK. test/geld-rollen.test.js bewijst dat lid B niet bij de bankrekening van lid A komt. |
+| `geld-rollen-gezin.test.js` | 4 | -- | KOMT GEZIN B BIJ HET DOSSIER VAN GEZIN A? De zesde en laatste rollenvraag, en de zwaarste. |
 | `geld-rollen-school.test.js` | 4 | -- | KOMT SCHOOL B BIJ DE ADMINISTRATIE VAN SCHOOL A? De vierde rollenvraag. |
 | `geld-rollen-werkruimte.test.js` | 4 | -- | KOMT WERKRUIMTE B BIJ DE LICENTIEKOSTEN VAN WERKRUIMTE A? De vijfde rollenvraag, en de laatste van de vier vormen die dit huis kent. |
 | `geld-rollen-zaken.test.js` | 3 | -- | KOMT ZAAK B BIJ DE OMZET VAN ZAAK A? De derde rollenvraag. |

@@ -1587,6 +1587,24 @@ const IJKINGEN = {
       (j) => { j.telling.openBekend = (j.telling.openBekend || 0) + 2; return j; },
       () => norm.meet().momentOpenBekend - voor.momentOpenBekend)
   },
+  /* De drie tanden van STILSPOOR.json: twee schulden omhoog en het gemeten
+     bereik omlaag. Elk veld krijgt een eigen verstoring, zodat verwisselde
+     sleutels niet toevallig dezelfde uitslag geven. */
+  stilSpoor: {
+    proef: (voor) => metVervangenJson('STILSPOOR.json',
+      (j) => { j.gemeten.spoorGesmoord = (j.gemeten.spoorGesmoord || 0) + 5; return j; },
+      () => norm.meet().stilSpoor - voor.stilSpoor)
+  },
+  stilleOpslag: {
+    proef: (voor) => metVervangenJson('STILSPOOR.json',
+      (j) => { j.gemeten.opslagGesmoord = (j.gemeten.opslagGesmoord || 0) + 7; return j; },
+      () => norm.meet().stilleOpslag - voor.stilleOpslag)
+  },
+  stilSpoorAanroepen: {
+    proef: (voor) => metVervangenJson('STILSPOOR.json',
+      (j) => { j.gemeten.spoorAanroepen = Math.max(0, (j.gemeten.spoorAanroepen || 0) - 40); return j; },
+      () => voor.stilSpoorAanroepen - norm.meet().stilSpoorAanroepen)
+  },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
      de meter leest `gemeten.defecten` uit een register dat er al is, dus hij

@@ -36,8 +36,7 @@ const SOORT_NAAM = {
   wedstrijd: 'een wedstrijd in de agenda', uitgelicht: 'uitgelicht werk'
 };
 
-function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, opslag: gegevenOpslag, db, save }) {
-  const opslag = gegevenOpslag || (db ? require('./opslag')({ db, save }) : null);
+function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn }) {
   /* ---- HET MOMENTREGISTER, EN WAAROM HET ER NIET WAS ----
 
      GEVONDEN DOOR SCHAKEL 5 VAN scripts/momentproef.js (13 september 2026).
@@ -73,9 +72,7 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, opslag: g
      heeft staan (`meldVan`). Dus: de feed is de tijdlijn van de aanwezigheid, de
      wek is mijn meldingsvoorkeur. Wie ze samenvoegt, laat een lid zijn eigen
      geschiedenis kwijtraken door een vinkje uit te zetten. */
-  const { leg, momentenVoor } = require('./momenten')({
-    opslag, aanwezig, soortNaam: SOORT_NAAM
-  });
+  const { leg, momentenVoor } = tijdlijn;
 
   /* De volgers van een maker: de vereniging van de twee gratis volgrelaties
      die de Media OS ook zet (Clips en het Theater). Een betaald podium-
@@ -143,7 +140,7 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, opslag: g
        uitgezonden staat los van de vraag of er iemand gewekt kon worden -- een
        moment zonder volgers is nog steeds gebeurd, en hoort in de tijdlijn te
        staan voor wie er morgen op volgen drukt. */
-    const regel = tijdlijn ? tijdlijn.leg(a.id, soort, titel) : null;
+    const regel = leg(a.id, soort, titel);
     const gewekt = [], overgeslagen = [];
     for (const volger of aanwezig.aanwezigVolgersVan(a.id)) {
       const soorten = meldVan(volger, a.naam);
@@ -163,7 +160,8 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, opslag: g
   }
 
   return { mediaNieuwWerk: nieuwWerk, mediaNieuwMoment: nieuwMoment,
-    mediaVolgersVan: volgersVan, MEDIA_SOORT_NAAM: SOORT_NAAM };
+    mediaVolgersVan: volgersVan, mediaMomentenVoor: momentenVoor,
+    MEDIA_SOORT_NAAM: SOORT_NAAM };
 }
 
 module.exports = { maakWekken, SOORT_NAAM };

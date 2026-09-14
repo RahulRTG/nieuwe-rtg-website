@@ -85,7 +85,9 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
      WEKTE wel en werd niet vastgelegd, dus een gewekt lid kon nergens
      terugvinden waarover. Zie de kop daar voor de grens die voorkomt dat dat
      register een tweede waarheid wordt. */
-  const wekken = maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, opslag });
+  const tijdlijn = require('./tijdlijn')({ opslag, aanwezig, SOORT_NAAM: require('./wekken').SOORT_NAAM });
+  const wekken = maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn });
+  const zoeken = require('./zoeken')({ aanwezig, SOORTEN: aanwezig.AANWEZIG_SOORTEN });
 
   /* VOLGEN staat in ./volgen.js: één knop die in Clips en het Theater tegelijk
      schrijft, en met opzet NIET in het betaalde Podium-abonnement. Dat is een
@@ -103,7 +105,7 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
      reizen de twee bordhandelingen door één domeingrens in plaats van als twee
      nieuwe losse kernnamen. */
   const mediaBord = (...args) => hub.mediaBord(...args);
-  mediaBord.aanwezigZoek = aanwezig.aanwezigZoek;
+  mediaBord.aanwezigZoek = zoeken.aanwezigZoek;
   mediaBord.momentenVoor = wekken.mediaMomentenVoor;
 
   /* ---- de wereld: één catalogus, drie standen ---- */

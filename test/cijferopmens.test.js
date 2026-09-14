@@ -26,9 +26,45 @@ const { WOORDEN, grensScan, mensVrij } = require('../scripts/lib/cijferopmens');
 
 /* De hele kant van het huis waar een mens die van zijn talent leeft woont. Wie
    er een map bij bouwt, zet hem hier bij -- toets 3 zakt als een bestaande map
-   verdwijnt, maar hij kan niet weten dat er een is BIJGEKOMEN. */
-const MAPPEN = ['vertegenwoordiging', 'rugdekking', 'carriereledger']
-  .map(n => path.join(__dirname, '..', 'server', 'kern', n));
+   verdwijnt, maar hij kan niet weten dat er een is BIJGEKOMEN.
+
+   DE FOUNDATION EN SCHOOL STAAN ER SINDS 14 SEPTEMBER BIJ, en dat is geen
+   uitbreiding van de grens maar het uitvoeren ervan. De kop van
+   scripts/lib/cijferopmens.js noemt vier documenten; FOUNDATION.md par. 5 en
+   HDI.md par. 5 zeggen hetzelfde in nog twee, en SCHOOL.md par. 11.1 verbiedt
+   met zoveel woorden een risicoscore, een uitvalkans en een ranglijst. De grens
+   gold daar dus al en werd er door niets tegengehouden -- exact de vorm waarin
+   deze toets zelf is ontstaan ("de grens had vier documenten en een handhaver,
+   en die ene dekte precies een map").
+
+   WAT ER MET OPZET NOG NIET BIJ STAAT, met de meting erbij, want een map
+   weglaten zonder reden is een stille uitzondering:
+
+   EN LET OP HOE DIE LIJST TOT STAND KWAM. De eerste poging zette er `leven` en
+   `gezin` in, want een losse scan meldde daar 0 treffers. Die mappen BESTAAN
+   NIET: `grensScan` geeft een onbestaande map terug in `ontbreekt` en niet in
+   `gevonden`, en wie alleen `gevonden.length` afdrukt leest "0" als "schoon".
+   Toets 3 viel er meteen over -- precies waarvoor de `ontbreekt`-helft is
+   gebouwd. De echte Foundation-mappen heten levensband, levensbeleid,
+   levensdossier, levensgraaf, levenslijn en socialegraaf, en die staan alle zes
+   op nul.
+
+     server/kern/rtfos    1 treffer: risico.js rekent `kans x impact` op een
+                          RISICO en niet op een mens. Een cijfer over een
+                          organisatierisico valt niet onder deze grens, maar het
+                          hoort een BENOEMDE uitzondering te zijn en geen
+                          stilzwijgen -- dat is een besluit van de eigenaar.
+     server/kern/command  9 treffers, alle negen op een DING: risicodrempels
+                          waarboven alleen een mens mag beslissen (beleid.js),
+                          zoekrelevantie (zoek.js) en het oordeel van een
+                          runbook (werkbesparing.js, simulatie.js). Ook die
+                          vragen negen benoemde uitzonderingen. */
+const MAPPEN = [
+  ...['vertegenwoordiging', 'rugdekking', 'carriereledger',
+    'levensband', 'levensbeleid', 'levensdossier', 'levensgraaf', 'levenslijn', 'socialegraaf']
+    .map(n => path.join(__dirname, '..', 'server', 'kern', n)),
+  path.join(__dirname, '..', 'server', 'school'),
+];
 
 test('1. zelfijking: de scan vindt een woord dat er met opzet in wordt gezet', () => {
   const tijdelijk = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-car05-'));
@@ -58,14 +94,53 @@ test('2. elk verboden woord draagt een reden', () => {
   }
 });
 
-test('3. geen cijfer op een mens in de hele carrierekant', () => {
+test('3. geen cijfer op een mens in de carrierekant, de Foundation en School', () => {
   const { gevonden, ontbreekt } = grensScan(MAPPEN);
   assert.deepStrictEqual(ontbreekt, [],
-    'een map uit de carrierekant is weg of hernoemd; een grens die over een verdwenen map zwijgt, ' +
+    'een bewaakte map is weg of hernoemd; een grens die over een verdwenen map zwijgt, ' +
     'staat groen zonder iets te bewaken');
   assert.deepStrictEqual(gevonden, [],
     'CAR-05: een score op een mens wordt nooit een veld en nooit een sorteersleutel ' +
-    '(KANTOORMACHT.md, HDI.md, ONTMOETEN.md, LIFE.md)');
+    '(KANTOORMACHT.md, HDI.md, ONTMOETEN.md, LIFE.md, FOUNDATION.md par. 5, SCHOOL.md par. 11.1)');
+});
+
+/* MUTATIE GEZIEN ZAKKEN: de ontkenningsregel uit scripts/lib/cijferopmens.js
+   gehaald; toets 5 zakte met school/hr-verlof.js erbij.
+
+   DEZE TOETS IS DE PRIJS VAN DE UITBREIDING. School kon pas onder de grens
+   doordat de scan leerde dat een ONTKENNING geen score is -- twee schoolmodules
+   schrijven "bewust geen score" en "bewust geen cijfer of ranglijst" in hun
+   ANTWOORD, waar een lid het leest, en werden daarvoor gemeld. Zonder deze
+   toets sluipt die versoepeling terug of juist te ver door, en in beide
+   gevallen merkt niemand het. */
+test('5. een ontkenning is geen score, en een aankondiging wel', () => {
+  const tijdelijk = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-car05b-'));
+  try {
+    const schrijf = (inhoud) => fs.writeFileSync(path.join(tijdelijk, 'a.js'), inhoud);
+
+    schrijf("module.exports = { uitleg: 'Er is bewust geen score en geen volgorde op zwaarte.' };\n");
+    assert.deepStrictEqual(grensScan([tijdelijk]).gevonden, [],
+      'een module die in zijn eigen antwoord zegt dat er GEEN score is, wordt gemeld; ' +
+      'dan leert de grens je om de uitleg weg te laten in plaats van de score');
+
+    schrijf("module.exports = { let: 'Er staat bewust geen cijfer of ranglijst in.' };\n");
+    assert.deepStrictEqual(grensScan([tijdelijk]).gevonden, [],
+      'de ontkenning loopt over een lijstje ("geen cijfer of ranglijst") en hoort ook het TWEEDE woord te dekken');
+
+    /* En de andere kant, want een ontkenningsregel die alles wegpoetst is erger
+       dan geen regel: deze drie MOETEN blijven zakken. */
+    schrijf("const score = weeg(mens);\nmodule.exports = { score };\n");
+    assert.equal(grensScan([tijdelijk]).gevonden.length, 1, 'een kale score op een mens hoort gewoon gemeld te worden');
+
+    schrijf("module.exports = { uitleg: 'geen oordeel', score: 9 };\n");
+    assert.equal(grensScan([tijdelijk]).gevonden.length, 1,
+      'de ontkenning gaat over `oordeel`; tussen haar en `score` staat een komma, dus zij dekt hem niet');
+
+    schrijf("module.exports = { uitleg: 'geen aparte weging maar wel een echte score op de kandidaat' };\n");
+    assert.equal(grensScan([tijdelijk]).gevonden.length, 1,
+      'een bijzin die een score AANKONDIGT is geen ontkenning; een venster op TEKENS liet deze door, ' +
+      'een venster op twee WOORDEN niet');
+  } finally { fs.rmSync(tijdelijk, { recursive: true, force: true }); }
 });
 
 test('4. de gedragshelft weigert een uitzondering zonder reden', () => {

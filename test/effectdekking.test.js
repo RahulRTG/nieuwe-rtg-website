@@ -91,10 +91,11 @@ test('2. de twee bronnen worden opgeteld en niet gerangschikt', () => {
      Of de proef die schrijfactie ZIET, hangt af van de volgorde van de ronde:
      rijVan() in kern/commercie/tegoed.js maakt de tegoedrij aan zodra hij
      ontbreekt, dus een eerdere route die hem al aanmaakte laat deze meting leeg.
-     IDEMPROEF.json droeg op de tak van deze laag `aiTegoed` voor dit pad en op
-     main (hermeten op 2f5780040) niets -- allebei correct gemeten, en alleen de
-     samenvoeging ziet het verschil. Een toets die op zo'n rij staat vastgepind,
-     meet de volgorde van de proefronde en niet de regel.
+     Dat is niet hypothetisch: IDEMPROEF.json droeg `aiTegoed` voor dit pad, een
+     hermeten ronde (2f5780040) droeg er niets, en de ronde die nu in het
+     register ligt draagt het weer. Alle drie correct gemeten. Een toets die op
+     zo'n rij staat vastgepind, meet de volgorde van de proefronde en niet de
+     regel -- en zakt dan op een dag zonder dat er iets aan de regel mankeert.
 
      De regel gaat over de POPULATIE, dus die wordt hier GETELD in plaats van
      aangenomen: er hoort minstens een pad te zijn waar allebei de bronnen

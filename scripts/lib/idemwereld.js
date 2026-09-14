@@ -1102,48 +1102,6 @@ const VOORZIENINGEN = {
     if (!(r && r.status >= 200 && r.status < 300)) return { fout: 'pos/sale gaf ' + (r && r.status) };
     return { room: kamer, method: 'contant' };
   },
-  /* DE TIK -- en die KAN niet uit de wereld komen, want een tikcode leeft vijf
-     minuten (KASCODE_MS). De wereld wordt aan het begin van de ronde opgezet en
-     deze route komt duizenden routes later langs; een code uit de wereld is dan
-     allang verlopen, en /api/pay/tik gaf dan ook 404 ("Deze tik is niet (meer)
-     geldig") met een lege opslag. Dit is precies het geval waarvoor de
-     voorziening bestaat: hij draait NA de pasladder-ijkoproep en VOOR de eerste
-     gemeten oproep.
-
-     DE ONTVANGER IS EEN ANDER LID, en dat is geen detail: kern/pay/tik.js weigert
-     met "Dit is je eigen tik" zodra de code van de aanroeper zelf is. `w.anderToken`
-     is het tweede lid uit stap 3 van de wereld.
-
-     WAT DE CODE WEL EN NIET IS. Hij wijst alleen de ONTVANGER aan; er kan dus enkel
-     geld NAAR hem toe. Daarom mag hij binnen zijn vijf minuten door een hele tafel
-     gebruikt worden, en daarom is het geen bezwaar dat de proef hem drie keer
-     gebruikt. Er wordt niets geforceerd en geen grens verhoogd: het lid zet zijn
-     eigen toestel op ontvangen langs de gewone route. */
-  '/api/pay/tik': async ({ post, w }) => {
-    if (!w.anderToken) return { fout: 'geen tweede lid in de wereld' };
-    const r = await post('/api/pay/tikcode', {}, w.anderToken);
-    const code = r.data && r.data.code;
-    if (!code) return { fout: 'pay/tikcode gaf ' + r.status + ' ' + ((r.data && r.data.error) || '') };
-    return { code, centen: 100, oms: 'proeftik' };
-  },
-
-  /* EEN ECHTE FACTUUR om een pdf van te maken. `facturen/pdf` stond op 404
-     "Factuur niet gevonden": de wereld maakt wel een factuur voor de LEDENkant
-     (w.factuurId), maar facturatie.mag() eist dat de VERKOPER dezelfde zaak is
-     als die het opvraagt. Een id uit een andere hoek van de database is dus
-     geen factuur van deze zaak, en dat verschil is precies wat die poort
-     bewaakt -- hem omzeilen zou de proef een deur laten passeren die in
-     productie dicht hoort te zitten. */
-  '/api/supplier/facturen/pdf': async ({ post, tokenVoor, w }) => {
-    if (!w.cn2) return { fout: 'geen tweede codenaam in de wereld' };
-    const r = await post('/api/supplier/facturen/maak',
-      { soort: 'dienst', koperNaam: 'Proef Koper', codenaam: w.cn2,
-        regels: [{ omschrijving: 'Proefregel', aantal: 1, stuk: 25 }],
-        idem: versSleutel('factuur') }, tokenVoor('supplier'));
-    const id = r && r.data && r.data.factuur && r.data.factuur.id;
-    return id ? { id } : { fout: 'facturen/maak gaf ' + (r && r.status) +
-      ' ' + ((r && r.data && (r.data.error || r.data.fout)) || '') };
-  },
   /* Saldo op de rekening van de ZAAK, want oormerken kan niet uit niets. */
   '/api/supplier/pay/treasury/apart': async ({ post, tokenVoor }) => {
     const f = await zaakSaldo({ post, tokenVoor });

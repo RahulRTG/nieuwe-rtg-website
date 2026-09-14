@@ -65,16 +65,27 @@ test('de keten levert alle stukken op die de geldroutes nodig hebben', async () 
      twaalf van de veertien zware kantoorroutes omdat de proef ze niet aan het
      werk kreeg, en bij deze twee kwam dat door een WOORD en niet door een deur
      (`soort` betekent bij een pas iets anders dan bij een rekening). */
-  /* VIJFENTWINTIG sinds de bundelronde van 13 september 2026. Twee takken breidden
-     deze lijst onafhankelijk uit -- de ledenkant met twee zware kantoorroutes (zie
-     hierboven) en de zaakkant van PR #242 met drie -- en de vereniging telt 25
-     verschillende paden zonder een enkele dubbele sleutel. Dat laatste is hier de
-     echte eis: een dubbele sleutel in een objectliteraal verdwijnt STIL (de laatste
-     wint), dus een te laag getal zou hier het enige signaal zijn geweest. */
-  assert.equal(Object.keys(perRoute).length, 25, 'vijfentwintig geldroutes krijgen een eigen lijf');
+  /* ZESENTWINTIG sinds de incassoronde van 14 september 2026. Het was 25 na de
+     bundelronde van 13 september (twee takken breidden deze lijst onafhankelijk uit:
+     de ledenkant met twee zware kantoorroutes, de zaakkant van PR #242 met drie), en
+     /api/office/bank/incasso maakt het zesentwintig.
+
+     HET GETAL IS DE EIS EN NIET DE VERSIERING: een dubbele sleutel in een
+     objectliteraal verdwijnt STIL (de laatste wint), dus een kale telling is het
+     enige signaal dat er een lijf is overschreven. En een kale telling laat een
+     RUILING door -- wie er een weghaalt en een ander toevoegt, houdt het getal
+     gelijk -- daarom staan de paden die om een reden zijn toegevoegd er hieronder
+     apart bij. */
+  assert.equal(Object.keys(perRoute).length, 26, 'zesentwintig geldroutes krijgen een eigen lijf');
   for (const pad of ['/api/office/bank/rekening/open', '/api/office/bank/rekening/rood']) {
     assert.ok(perRoute[pad], 'de zware kantoorroute ' + pad + ' hoort een eigen lijf te krijgen');
   }
+  /* DE GOUDEN WEG (MACHINE.md par. 5a). Zonder `tot` weigert de incassoronde met 400
+     ("Er staat geen enkele vaste betaling aan de beurt") en blijft de as `gevolg` van
+     kern/kantoor/geldketen.js op onbekend staan -- dan is de keten niet rond. */
+  assert.ok(perRoute['/api/office/bank/incasso'], 'de incassoronde hoort een grens mee te krijgen');
+  assert.ok(Number.isFinite(perRoute['/api/office/bank/incasso'].tot),
+    '`tot` is een tijdstip en geen belofte: ' + JSON.stringify(perRoute['/api/office/bank/incasso']));
   assert.deepEqual(extra, { iban: 'NL00EEN', aan: 'Gouden Ibis', codenaam: 'Gouden Ibis',
     naarCodenaam: 'Gouden Ibis', code: 'ABC123' });
 });

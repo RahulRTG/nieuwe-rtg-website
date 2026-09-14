@@ -14,13 +14,13 @@ besluiten op een rij die eerst genomen moeten worden.
 
 ---
 
-## 0. De kern in één zin
+## 0. De kern
 
 **RTG weet van <!--getal:land.landen-->189<!--/getal--> landen hoe het daar werkt en kan er in
 <!--getal:land.volledig-->0<!--/getal--> werkelijk draaien — en dat gat is niet het probleem, het
 is de opdracht.**
 
-De tweede zin die het ontwerp stuurt staat al in dit huis geschreven, in
+De zin die het ontwerp stuurt staat al in dit huis geschreven, in
 `kern/mall/vestigingen.js`, over de franchise van een bakker:
 
 > *Waar elke vestiging een eigen ondernemer is, hoort zij een eigen zaak te zijn
@@ -29,10 +29,15 @@ De tweede zin die het ontwerp stuurt staat al in dit huis geschreven, in
 Die regel is voor een klant opgeschreven en hij geldt hier één op één. Een
 RTG-franchisenemer in Spanje is **geen vestiging van RTG** en **geen nieuw
 objecttype**; hij is een eigen partij met een eigen code, een eigen vermogen en
-een eigen rechtspersoon. Wie daar een `franchises`-tabel voor aanlegt die
-mensen, geld, contracten én toegang bezit, maakt de `Asset`-fout opnieuw — en
-dat is in dit huis al vier keer gemeten (`OBJECTMODEL.json`,
-`CARRIEREVORM.json`, `STAGEVORM.json`, `AANVOERVORM.json`).
+een eigen rechtspersoon. Wie daar een `franchises`-tabel voor aanlegt die mensen,
+geld, contracten én toegang bezit, maakt de `Asset`-fout opnieuw — en die is in
+dit huis al vier keer gemeten (`OBJECTMODEL.json`, `CARRIEREVORM.json`,
+`STAGEVORM.json`, `AANVOERVORM.json`).
+
+En één zorg die je hier zou verwachten, is er niet. De zwaarste vraag — mag een
+partner elders geld uitgeven namens RTG — is in `TOKEN.md` al gesteld en met nee
+beantwoord, mét de voorwaarde waaronder het ja wordt (par. 4.2). Dit document
+heeft die vraag dus niet te openen maar te respecteren.
 
 ---
 
@@ -208,11 +213,20 @@ commissieknop en die is er bewust uit gehaald, met de reden erbij.
 
 Er zijn dus twee wegen en precies twee:
 
-- **A. De benoemde dienst.** Dezelfde module kent vier BENOEMDE diensten
-  (betaaldienst, bemiddelingsdienst, en twee meer) die wél in rekening mogen —
-  per transactie of per dienst, nooit over de omzet. Een franchisevergoeding als
-  *platformdienst met een grondslag en een plafond* past daarop zonder de
-  invariant aan te raken. **Aanbevolen.**
+- **A. De benoemde dienst.** Dezelfde module kent vier BENOEMDE diensten die
+  wél in rekening mogen, en alle vier dragen ze `overOmzet: false`:
+  **betaaldienst** (per transactie via RTG Pay, betaald door de zaak),
+  **bemiddelingsdienst** (een boeking via het partnerkanaal voor gasten),
+  **ticketdienst** (verkoop en scan aan de deur) en **inrichting** (eenmalig
+  inrichten, migreren of koppelen). Een franchisevergoeding als *platformdienst
+  met een grondslag en een plafond* past op dat patroon zonder de invariant aan
+  te raken. **Aanbevolen.**
+
+  Let wel op wat dit precies kost: alle vier zijn per transactie of eenmalig, en
+  een terugkerende franchisevergoeding is er geen van. Het is dus een VIJFDE
+  benoemde dienst en geen hergebruik van een bestaande — klein in code, en nog
+  steeds een besluit, want de lijst is met opzet kort en elke naam erbij verruimt
+  wat RTG een partner mag rekenen.
 - **B. De invariant bewust openzetten.** Dan verandert de belofte aan alle
   partners en moeten de partnervoorwaarden mee. Dat is een juridisch besluit met
   een prijs, geen configuratie — en `test/`-toetsen die de invariant bewaken
@@ -220,21 +234,54 @@ Er zijn dus twee wegen en precies twee:
 
 Wat er níét mag gebeuren: een derde weg die de invariant omzeilt zonder hem te
 noemen. Dat is dezelfde vorm als de terugstortstand in `CLAUDE.md` — een knop die
-zelf de juridische positie ís.
+zelf de juridische positie ís, en als de schakelaar in `GIFT.md` par. 4: *de
+schakelaar ÍS de positie*, niet twee dingen die toevallig samenhangen.
 
-### 4.2 Waar het geld landt, en onder welke vergunning
+### 4.2 De vergunningsvraag is al gesteld — en met nee beantwoord
 
-`GIFT.md` houdt de doneerknop tegen omdat er geen positie is om aan te betalen;
-hier is het scherper. Een franchisenemer die in Spanje geld aanneemt van leden,
-doet dat óf op zijn eigen rail óf op die van RTG. Loopt het over RTG Pay, dan
-verplaatst RTG geld in een jurisdictie waar het geen vergunning heeft, en dan is
-de tabel uit `CLAUDE.md` (`WALLET_SALDO` gesloten tegenover open) een tabel per
-land geworden in plaats van per huis. `TOKEN.md` zegt dat de bank-uitgang vóór
-de leden-bank open moet; dit is dezelfde vraag, één land verderop.
+Dit is het punt waar het eerste concept van dit document ernaast zat, en de
+correctie is belangrijker dan de vraag. `TOKEN.md` par. 7 heeft **precies de
+franchisevraag** al voorgelegd en beslist:
 
-Het eerlijke antwoord van vandaag is dat een franchisenemer **zijn eigen
-betaalrail houdt** en RTG de afdracht factureert. Dat vraagt geen vergunning en
-het is waarom optie A hierboven de aanbeveling is.
+> *Mag een partner e-money voor ons uitgeven? — besloten op 20 augustus 2026:
+> `partnerRail: null` blijft staan.* Geen distributie-route in de lijst zolang er
+> geen gesprek met een EMI loopt. De lijst hoort te zeggen wat waar is, niet wat
+> zou kunnen.
+
+Een exploitant die in Spanje ledengeld aanneemt op de rail van RTG, **ís** die
+partnerrail. Het antwoord is dus vandaag nee, en het is geen gat maar een
+genomen besluit met een uitgeschreven voorwaarde: als die route er ooit komt, is
+één regel in `kern/bevoegdheid/lijst.js` genoeg — na het EMI-gesprek, niet ervoor.
+
+Daaronder ligt een tweede grendel die dezelfde kant op wijst. Besluit 1 van
+`TOKEN.md` is óók genomen: de walletbrug is **eenrichtingsverkeer**
+(`kern/bank/walletbrug.js`) — geld mag van een eigen bankrekening naar de wallet
+en niet andersom, en dat kost een lid werkelijk iets (hij kan zijn walletsaldo
+niet naar zijn eigen rekening halen). De slotzin daar geldt hier woordelijk:
+**wie de brug weer opent, opent daarmee de vergunningsvraag.** Een franchise die
+geld terug laat lopen naar een exploitant, doet exact dat — en dan is de tabel
+uit `CLAUDE.md` (`WALLET_SALDO` gesloten tegenover open) een tabel per land
+geworden in plaats van per huis.
+
+**En de vorm die wél werkt, is al een keer gevonden.** `GIFT.md` besluit 1 is op
+31 augustus 2026 genomen en loste hetzelfde probleem op: de RTFoundation krijgt
+een eigen wallet zoals een leverancier er een heeft en betaalt zichzelf
+vandaaruit uit naar haar eigen bankrekening. De eigenschap die de andere opties
+misten, staat er met zoveel woorden: **er komt geen betaalweg bij.**
+`kern/pay/partner.js` boekt al naar `partner:<code>` en `/api/supplier/pay/
+uitbetaal` bestaat al, met een idempotentiesleutel en een eerlijke stand *in
+behandeling* in plaats van *gelukt*.
+
+Een exploitant is dus een partnerwallet, en de afdracht is een boeking naar
+`partner:rtg` in plaats van een nieuwe rail. Wat je daarbij accepteert staat er
+ook al: **de transactiekosten komen van de ontvanger af** — een gift van € 25
+komt binnen als € 24,65, en een franchisescherm dat een rond percentage belooft,
+zou dus liegen.
+
+Wat er dan nog per land bij komt is niet een rail maar een **rekening**: de
+exploitant houdt zijn eigen betaalaanbieder voor zijn eigen klanten, en RTG
+factureert hem. Dat vraagt geen vergunning, en het is de tweede reden dat optie
+A in par. 4.1 de aanbeveling is.
 
 ### 4.3 De kantoordeur is één deur, en dat is de grootste blokkade
 
@@ -248,7 +295,9 @@ hele huis — inclusief de kluis van Nederlandse leden.
 toevoegen maar bestaande macht uit elkaar halen, en `KANTOOR.md` zegt dat een
 spoor dat eindigt bij een gedeelde code geen spoor is maar een alibi. **Een
 franchise maakt dat van een schuld een blokkade.** Dit is geen nieuwe bouwtaak:
-de poort bestaat (`kern/kantoor/kluispoort.js`) en hangt aan 8 van de 585 routes.
+de poort bestaat (`kern/kantoor/kluispoort.js`) en hangt volgens `KANTOOR.md` aan
+8 routes — een fractie van het totaal, en dat totaal is hierboven een levend
+getal omdat het beweegt.
 
 Het besluit dat hier openstaat is niet óf, maar in welke volgorde: eerst de
 kluisweg per land afgrenzen, of eerst de kamers per exploitant. Het eerste is
@@ -341,9 +390,13 @@ Deze vragen geen besluit en wel werk, in oplopende kosten.
 6. **Een getal zonder land is een fout, geen terugval.** De `|| 'NL'` van vandaag
    is verdedigbaar in een Nederlands huis en niet in een franchise. Waar hij
    blijft, staat erbij waarom.
-7. **Het merk reist, de macht niet.** `TENANT.md` par. 3 in het klein: het merk
-   van een exploitant geldt binnen zijn eigen blok, en RTG's schil verft niet
-   mee — maar andersom geldt het even hard.
+7. **Het merk reist, de macht niet.** `TENANT.md` heeft dit al uitgevochten
+   onder *"de kleur blijft binnen het eigen blok"*: de accentkleur van een klant
+   raakt één regel — de merkbalk — en de kopbalk, de navigatie en de rest van de
+   app blijven van RTG, *want een tenant die de hele app kan omverven, kan
+   iemand laten denken dat hij ergens anders is dan hij is.* Bij een franchise
+   geldt dat in beide richtingen: RTG verft niet mee in het blok van de
+   exploitant, en de exploitant niet in dat van RTG.
 
 ---
 
@@ -374,12 +427,17 @@ twee daaronder zijn besluiten van de eigenaar en blokkeren alles eronder.
    de vorm waarmee elk volgend land erbij komt.
 3. **Besluit 4.1** — benoemde dienst of invariant openzetten. Hier hangt de hele
    commerciële kant aan.
-4. **Besluit 4.3** — de kluisweg per land afgrenzen. Hier hangt de hele
-   juridische kant aan, en dit is de enige blokkade die vandaag al een echt
-   risico is: één gedeelde kantoorcode over meerdere landen.
+4. **Besluit 4.3** — de kluisweg per land afgrenzen. Dit is de enige blokkade
+   die vandaag al een echt risico is: één gedeelde kantoorcode over meerdere
+   landen. De vergunningskant (4.2) hoeft hier niet bij, en dat is de
+   geruststellende uitkomst van dit document: die is al beslist, staat op een
+   grendel, en een franchise die binnen optie A blijft raakt hem niet.
 5. Daarna pas: de hoedanigheid, de wereldrelatie voor de afdracht, en per land
    de loon- en rechtsvormpakketten.
 
 Wat er tot die tijd níét gebeurt, is een franchisescherm bouwen. `EXECUTIE.md`
-houdt dat om dezelfde reden tegen als de commandbalk: een scherm dat een macht
-toont die het systeem nog niet kan definiëren, is erger dan geen scherm.
+blok 9 houdt de commandbalk op precies deze grond tegen — *bewust niet gebouwd,
+en dit is waarom*, met als slotsom **eerst die twee getallen bewegen, dan de
+balk.** Hier zijn die twee getallen `landenVolledig` en het besluit uit par. 4.1.
+Een scherm dat een macht toont die het systeem nog niet kan definiëren, is erger
+dan geen scherm.

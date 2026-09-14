@@ -48,6 +48,36 @@ const TIK = Object.freeze({
       { soort: 'direct', graad: 'vermoed', collectie: 'payIdemAfdruk',
         wat: 'de afdruk van het antwoord wordt bewaard voor die tweede tik',
         reden: 'de geldpoort bewaart de afdruk bij dezelfde sleutel; de tikroute is nog niet succesvol gemeten' },
+      /* HIER STONDEN TWEE COLLECTIES DIE NIET VAN DEZE HANDELING WAREN, en die staan er
+         sinds de integratieronde niet meer -- maar om een ANDERE reden dan waarom ze fout
+         waren. Dat verschil hoort hier te blijven staan, want het gaat over de meter en
+         niet over deze route.
+
+         Er stond `betaalOpdrachten` en `capGezondheid`, met graad `gemeten` en een
+         verhaal eronder: ze zouden alleen op de EERSTE oproep bewegen, toen de wallet nog
+         leeg was en er moest worden bijgeladen. Dat verhaal was plausibel en het was
+         ONWAAR -- ik had een meting gezien en er een oorzaak bij bedacht.
+
+         WAT ZE WERKELIJK WAREN. server/opzet/start.js draait elke vijf minuten een
+         onderhoudsronde met `betaalWaarheid.ronde()` erin, en die zendt gestrande
+         betaalopdrachten opnieuw in; `railInzenden` in server/server.js meldt daarbij de
+         stand van `money.payout` aan kern/commercie/capgezondheid.js. Die ronde schrijft
+         dus BUITEN elk verzoek om, en de idempotentieproef rekent een stand tussen twee
+         oproepen door -- dus landt dat werk bij de route die op dat moment aan de beurt
+         is. Gemeten: 14 routes droegen `betaalOpdrachten` en 15 `capGezondheid`,
+         waaronder /api/lab2/labs, /api/member/snaps en /api/rtf/leerling/vakken. Geen
+         daarvan betaalt iets uit.
+
+         NAGETROKKEN IN DE CODE, want een meting tegenspreken vraagt meer dan een
+         vermoeden: kern/pay/tik.js en kern/pay/opladen.js noemen `betaalOpdracht`,
+         `capGezondheid` en `maakUitbetaling` geen van drieen. Bijladen is geld dat
+         BINNENKOMT; een betaalopdracht is geld dat het huis verlaat. Op /api/bank/sepa
+         staan diezelfde twee claims wel, en daar zijn ze waar -- zie ./register-lid.js.
+
+         WAT ERVOOR IN DE PLAATS KOMT: niets. Het bijladen staat al als gevolg `buiten`
+         hieronder, en dat is precies de juiste plek: wat er bij de aanbieder gebeurt, is
+         geen collectie van dit huis. En de achtergrondronde zelf staat sindsdien stil
+         tijdens een meetronde -- zie scripts/idemproef-route.js. */
       { soort: 'afgeleid', graad: 'vermoed',
         wat: 'de tik blijft geldig: hij wordt NIET verbruikt, dus dezelfde code kan binnen zijn ' +
           'vijf minuten door meer mensen gebruikt worden',

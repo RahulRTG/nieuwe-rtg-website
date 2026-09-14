@@ -227,11 +227,11 @@ bestaat. Daarom: eerst schaduw, dan tanden.
 
 | | aantal |
 |---|---|
-| routes met een rol | <!--getal:idem.routesMetRol-->4179<!--/getal--> |
-| beoordeeld | <!--getal:idem.beoordeeld-->1668<!--/getal--> |
-| beschermd | <!--getal:idem.beschermd-->1667<!--/getal--> |
+| routes met een rol | <!--getal:idem.routesMetRol-->4189<!--/getal--> |
+| beoordeeld | <!--getal:idem.beoordeeld-->1678<!--/getal--> |
+| beschermd | <!--getal:idem.beschermd-->1677<!--/getal--> |
 | onbeschermd | **<!--getal:idem.onbeschermd-->1<!--/getal-->** |
-| ongemeten | <!--getal:idem.ongemeten-->3244<!--/getal--> |
+| ongemeten | <!--getal:idem.ongemeten-->3245<!--/getal--> |
 
 Dit staat er beter voor dan `CLAUDE.md` beweert (dat noemt nog 115 gemeten; dat
 cijfer is verouderd). Van alles wat beoordeeld is, is niets onbeschermd. De
@@ -651,14 +651,14 @@ collecties veranderden: dat is het veld `opslag` in `IDEMPROEF.json`. Voor
 `bankIdemAfdruk`. Die vier zijn geen aanname — ze zijn één keer echt gebeurd.
 Over alle routes: **331 met een gemeten effect over 196 collecties**.
 
-**Drie graden, en de derde is de grootste.** Over de <!--getal:gevolg.bereikbaar-->173<!--/getal-->
+**Drie graden, en de derde is de grootste.** Over de <!--getal:gevolg.bereikbaar-->174<!--/getal-->
 paden die de AI mag bedienen:
 
 | graad | aantal | wat het zegt |
 |---|---|---|
-| `gemeten` | <!--getal:gevolg.gemeten-->38<!--/getal--> | de proef raakte deze collecties aan |
-| `geen-effect-gemeten` | <!--getal:gevolg.geenEffect-->48<!--/getal--> | de proef draaide en raakte niets aan |
-| **`onbekend`** | **<!--getal:gevolg.onbekend-->87<!--/getal-->** | de proef kwam er niet bij (404, 403, geen geldige invoer) |
+| `gemeten` | <!--getal:gevolg.gemeten-->24<!--/getal--> | de proef raakte deze collecties aan |
+| `geen-effect-gemeten` | <!--getal:gevolg.geenEffect-->55<!--/getal--> | de proef draaide en raakte niets aan |
+| **`onbekend`** | **<!--getal:gevolg.onbekend-->95<!--/getal-->** | de proef kwam er niet bij (404, 403, geen geldige invoer) |
 
 Die getallen stonden hier tot 13 september OVERGETYPT, en waren verouderd: er stond
 96 van 176. Ze komen nu uit `GEVOLGDEKKING.json` via `npm run getallen`, zodat het
@@ -679,8 +679,8 @@ zij is een momentopname van de laatste proefronde, niet van deze commit.
 #### Het gevolgcontract: de VERKLARING naast de meting (13 september 2026)
 
 De meting hierboven is hard en smal: zij zegt wélke collecties veranderen, van
-<!--getal:gevolg.gemeten-->38<!--/getal--> van de <!--getal:gevolg.bereikbaar-->173<!--/getal-->
-bereikbare handelingen. Over <!--getal:gevolg.onbekend-->87<!--/getal--> weet zij niets, en
+<!--getal:gevolg.gemeten-->24<!--/getal--> van de <!--getal:gevolg.bereikbaar-->174<!--/getal-->
+bereikbare handelingen. Over <!--getal:gevolg.onbekend-->95<!--/getal--> weet zij niets, en
 over de buitenwereld weet zij per definitie niets — mail, een provider, de bank van
 de ontvanger staan in geen enkele collectie. Een planner die daarop zou leunen, plant
 in het donker.
@@ -721,8 +721,8 @@ boolean slaat het verschil tussen een creditnota en een gewiste factuur plat),
 `classificatie`, geleend uit `kern/envelop.js` en niet overgeschreven).
 
 `npm run gevolgdekking` meet het, zonder percentage erboven:
-<!--getal:gevolg.contractVolledig-->4<!--/getal--> volledig,
-<!--getal:gevolg.contractOnbekend-->169<!--/getal--> zonder contract. `--controle` zakt zodra
+<!--getal:gevolg.contractVolledig-->8<!--/getal--> volledig,
+<!--getal:gevolg.contractOnbekend-->166<!--/getal--> zonder contract. `--controle` zakt zodra
 de onbekende paden stijgen, een volledige verklaring verdwijnt, of een contract de
 keuring niet haalt.
 
@@ -842,8 +842,8 @@ een standaard geworden, zodat die combinatie te maken is.
 **En de regel die eruit volgt weigert niets.** *Een plan gaat alleen over handelingen
 waarvan het gevolg voldoende bekend is* loopt in de **schaduw**: het plan zegt hoeveel
 stappen het zou afwijzen en welke, en wijst niets af. Met
-<!--getal:gevolg.onbekend-->87<!--/getal--> van de
-<!--getal:gevolg.bereikbaar-->173<!--/getal--> paden ongemeten zou afdwingen vandaag het
+<!--getal:gevolg.onbekend-->95<!--/getal--> van de
+<!--getal:gevolg.bereikbaar-->174<!--/getal--> paden ongemeten zou afdwingen vandaag het
 halve stuur stilzetten, en dan wordt de regel losgedraaid in plaats van gehaald
 (`CONTROLPLANE.md`: eerst zonder te blokkeren). `geen-effect-gemeten` telt daarbij als
 BEKEND — de proef heeft de route echt gedraaid en er bewoog niets — en dat is iets
@@ -956,7 +956,7 @@ nu vastgelegd.
 
 **Wat er nog niet is, en dat hoort erbij:** het register draagt drie contracten, waarvan
 één in de noemer van de meter. De andere
-<!--getal:gevolg.contractOnbekend-->169<!--/getal--> bereikbare handelingen hebben er
+<!--getal:gevolg.contractOnbekend-->166<!--/getal--> bereikbare handelingen hebben er
 geen — en die vullen is nadrukkelijk **niet** de volgende stap: pas nu de vergelijker er
 beslissingen mee neemt, betekent een contract erbij iets meer dan een JSON-regel erbij.
 De grens die blijft staan: `kern/commercie/tegenfeit.js` is en blijft het

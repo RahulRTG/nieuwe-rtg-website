@@ -116,10 +116,42 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
   w.spaarIban = veld(await stil('/api/bank/rekening/open', { soort: 'spaar', naam: 'Proefspaarpot' }, tokens.member), 'rekening', 'iban');
   if (w.iban) w.pasId = veld(await stil('/api/bank/pas/uitgeven', { iban: w.iban, soort: 'debit', naam: 'Proefpas' }, tokens.member), 'pas', 'id');
 
-  /* 6. EEN VASTE BETALING, zodat terugkerend/stop iets te stoppen heeft. */
+  /* 6. TWEE VASTE BETALINGEN -- en let op de `idem`, want die ontbrak en dat kostte twee
+        metingen.
+
+        DE FOUT DIE HIER ZAT. `stil()` stuurt geen idempotentiesleutel mee, en
+        /api/bank/terugkerend/zet is een GELDroute: die weigert zonder sleutel met 400
+        ("Deze opdracht verplaatst geld en vraagt een idempotentiesleutel"). De reeks werd
+        dus nooit aangemaakt, `w.terugkerendId` bleef null, en `heel()` liet
+        /api/bank/terugkerend/stop terecht uit geldLijf() vallen -- die route staat in
+        IDEMPROEF.json dan ook op `ongemeten` met een lege opslag. Dat de PROEF zelf
+        /api/bank/terugkerend/zet wel gemeten krijgt, verhulde het: zij stuurt op elke
+        gemeten oproep een sleutel mee, dus de route werkt en alleen het VOORWERK faalde.
+
+        DE TWEEDE REEKS IS VOOR DE INCASSORONDE, en die is met opzet apart:
+        /api/office/bank/incasso weigerde met 400 ("Er staat geen enkele vaste betaling aan
+        de beurt") omdat `zet` de eerste termijn een heel interval in de toekomst legt. De
+        eerste reeks kan dat gat niet vullen, want /api/bank/terugkerend/stop zet juist die
+        op `actief: false` en de proef kent geen vaste route-orde -- een meting die van de
+        volgorde afhangt is geen meting. Deze reeks wordt door geen enkele route opgemaakt.
+
+        WEEK EN GEEN MAAND: het lijf in geldLijf() zet `tot` op nu + 8 dagen, dus deze reeks
+        is exact EEN keer aan de beurt en de maandreeks hierboven niet. Een verre grens zou
+        de lus in kern/bank/incasso.js tot 500 termijnen laten tellen.
+
+        EN DIT BREEKT HET MEETOBJECT NIET OPEN. Vergelijk `bank/krediet/besluit`, dat in
+        geldLijf() met reden blind blijft omdat de proef er een vergunning voor zou moeten
+        forceren. Hier wordt niets geforceerd: een lid zet langs de gewone route een vaste
+        betaling, en de vraag aan het kantoor blijft de echte vraag -- in wat er aan de beurt
+        is. */
   if (w.iban && w.iban2) {
     w.terugkerendId = veld(await stil('/api/bank/terugkerend/zet',
-      { vanIban: w.iban, naarIban: w.iban2, centen: 100, interval: 'maand', oms: 'proefreeks' }, tokens.member), 'terugkerend', 'id');
+      { vanIban: w.iban, naarIban: w.iban2, centen: 100, interval: 'maand', oms: 'proefreeks',
+        idem: 'wereld-tk-maand' }, tokens.member), 'terugkerend', 'id');
+    w.incassoReeksId = veld(await stil('/api/bank/terugkerend/zet',
+      { vanIban: w.iban, naarIban: w.iban2, centen: 100, interval: 'week', oms: 'proefincasso',
+        idem: 'wereld-tk-week' }, tokens.member), 'terugkerend', 'id');
+    if (w.incassoReeksId) w.incassoTot = Date.now() + 8 * 24 * 60 * 60 * 1000;
   }
 
   /* 7. TWEE KLOMPJES, en dat is met opzet twee. `verzoek/betaal` wil er een die
@@ -138,14 +170,24 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
   const kas = await stil('/api/pay/kascode', { centen: 100 }, tokens.member);
   w.code = (kas.data && (kas.data.code || (kas.data.kascode && kas.data.kascode.code))) || null;
 
-  /* 9. EEN TIKCODE VAN DE ANDER. `pay/tik` betaalt naar de eigenaar van de code,
-        dus die moet van het TWEEDE lid komen -- je eigen tik weigert de kern
-        terecht ("Dit is je eigen tik"). Dit is een andere codesoort dan de
-        kascode hierboven; met die ene meegestuurd bleef pay/tik op 404 staan. */
-  if (w.anderToken) {
-    const tik = await stil('/api/pay/tikcode', {}, w.anderToken);
-    w.tikcode = (tik.data && tik.data.code) || null;
-  }
+  /* 9. GEEN TIKCODE IN DE WERELD -- die staat als VOORZIENING bij VOORZIENINGEN
+        hieronder, en dat is een gemeten correctie (14 september 2026).
+
+        Hier stond hij wel: `pay/tik` betaalt naar de eigenaar van de code, dus die
+        moet van het TWEEDE lid komen -- je eigen tik weigert de kern terecht ("Dit
+        is je eigen tik"). Die reden is nog steeds juist en verhuist mee.
+
+        WAT ER NIET AAN KLOPTE: een tikcode leeft vijf minuten (KASCODE_MS in
+        kern/pay/stand.js) en deze wereld wordt eenmalig aan het BEGIN van een ronde
+        opgezet die tientallen minuten duurt. In de ronde van 14 september gaf
+        /api/pay/tik drie keer 404 "Deze tik is niet (meer) geldig" -- de code was
+        verlopen voordat de meetlus bij die route was. Dat een eerdere ronde hem op
+        200 had, was geluk in de volgorde en geen eigenschap van deze opzet.
+
+        De voorziening draait NA de pasladder-ijkoproep en VOOR de eerste gemeten
+        oproep, en is dus per definitie vers. Een tweede plek die hetzelfde probeert
+        te regelen is weg: `heel()` laat /api/pay/tik zonder lijf uit geldLijf()
+        vallen, en de voorziening levert het hele lijf. */
 
   /* 10. EEN OPENSTAANDE FACTUUR van het lid zelf, voor `pay/saldo`. Die maken we
          niet: de demostand heeft er een, en we zoeken hem op. Een factuur
@@ -865,7 +907,6 @@ function geldLijf(w) {
     '/api/pay/verzoek': { aan: [w.cn2], totaalCenten: 500, oms: 'proefklompje' },
     '/api/pay/verzoek/betaal': { id: w.verzoekAanMij },
     '/api/pay/verzoek/intrek': { id: w.verzoekVanMij },
-    '/api/pay/tik': { code: w.tikcode, centen: 100, oms: 'prooftik' },
     '/api/pay/saldo': { invoiceId: w.factuurId },
 
     /* ---- twee ZWARE KANTOORROUTES, en waarom ze hier horen ----
@@ -897,6 +938,11 @@ function geldLijf(w) {
        blind, en dat staat in KANTOORMACHT.json met hun reden. */
     '/api/office/bank/rekening/open': { codenaam: w.cn2, soort: 'spaar', naamRek: 'Kantoorproefpot' },
     '/api/office/bank/rekening/rood': { iban: w.iban, euro: 100 },
+    /* DE INCASSORONDE. `tot` komt uit de wereld (stap 6) en staat er alleen als die
+       wereld haar eigen reeks heeft kunnen zetten -- zonder dat is er niets aan de beurt
+       en weigert de route terecht. De `heel`-controle hieronder laat deze route dan
+       wegvallen in plaats van hem met een halve invoer te laten stranden. */
+    '/api/office/bank/incasso': { tot: w.incassoTot },
     /* ====================================================================
        DE ZAAKKANT, en die vraagt andere velden dan de ledenkant -- elk
        hieronder is uit de BRON gelezen en niet uit een broertje afgeleid.
@@ -1103,23 +1149,26 @@ const VOORZIENINGEN = {
     if (!(r && r.status >= 200 && r.status < 300)) return { fout: 'pos/sale gaf ' + (r && r.status) };
     return { room: kamer, method: 'contant' };
   },
-  /* EEN ECHTE FACTUUR om een pdf van te maken. `facturen/pdf` stond op 404
-     "Factuur niet gevonden": de wereld maakt wel een factuur voor de LEDENkant
-     (w.factuurId), maar facturatie.mag() eist dat de VERKOPER dezelfde zaak is
-     als die het opvraagt. Een id uit een andere hoek van de database is dus
-     geen factuur van deze zaak, en dat verschil is precies wat die poort
-     bewaakt -- hem omzeilen zou de proef een deur laten passeren die in
-     productie dicht hoort te zitten. */
-  '/api/supplier/facturen/pdf': async ({ post, tokenVoor, w }) => {
-    if (!w.cn2) return { fout: 'geen tweede codenaam in de wereld' };
-    const r = await post('/api/supplier/facturen/maak',
-      { soort: 'dienst', koperNaam: 'Proef Koper', codenaam: w.cn2,
-        regels: [{ omschrijving: 'Proefregel', aantal: 1, stuk: 25 }],
-        idem: versSleutel('factuur') }, tokenVoor('supplier'));
-    const id = r && r.data && r.data.factuur && r.data.factuur.id;
-    return id ? { id } : { fout: 'facturen/maak gaf ' + (r && r.status) +
-      ' ' + ((r && r.data && (r.data.error || r.data.fout)) || '') };
+  /* DE TIK, EN WAAROM HIJ HIER HOORT EN NIET IN DE WERELD (stap 9 legt het uit).
+     Een tikcode leeft vijf minuten; deze plek is de enige die gegarandeerd vers is.
+
+     DE ONTVANGER IS EEN ANDER LID: kern/pay/tik.js weigert met "Dit is je eigen tik"
+     zodra de code van de aanroeper zelf is. `w.anderToken` is het tweede lid uit stap
+     3 van de wereld.
+
+     Er wordt niets geforceerd en geen grens verhoogd: het tweede lid zet zijn toestel
+     langs de gewone route op ontvangen. Dat de proef die code drie keer gebruikt is
+     geen oprekking maar het ontwerp -- de code wijst alleen de ONTVANGER aan, dus er
+     kan enkel geld naar hem toe, en daarom mag een hele tafel hem binnen die vijf
+     minuten gebruiken. */
+  '/api/pay/tik': async ({ post, w }) => {
+    if (!w.anderToken) return { fout: 'geen tweede lid in de wereld' };
+    const r = await post('/api/pay/tikcode', {}, w.anderToken);
+    const code = r.data && r.data.code;
+    if (!code) return { fout: 'pay/tikcode gaf ' + r.status + ' ' + ((r.data && r.data.error) || '') };
+    return { code, centen: 100, oms: 'proeftik' };
   },
+
   /* Saldo op de rekening van de ZAAK, want oormerken kan niet uit niets. */
   '/api/supplier/pay/treasury/apart': async ({ post, tokenVoor }) => {
     const f = await zaakSaldo({ post, tokenVoor });

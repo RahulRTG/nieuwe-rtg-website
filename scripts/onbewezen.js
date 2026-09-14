@@ -88,6 +88,7 @@ const KLAAR = new Set(['BESCHERMD', 'BEWUST_NIET_IDEMPOTENT', 'NIET_VAN_TOEPASSI
 const BAKKEN = [
   ['STALE_BEWIJS', 'de meting hoort niet meer bij deze code -- opnieuw meten, geen handwerk'],
   ['NIET_AANRAAKBAAR', 'de proef MAG hier niet aankloppen -- een schakelkast of een onomkeerbare handeling, met de reden per route'],
+  ['SLEUTEL_ELDERS', 'deze deur wordt met opzet door een ANDER instrument beproefd, met de reden en het adres per route'],
   ['WACHT_OP_OBJECT', 'het pad draagt een :parameter -- de sleutel is er, het OBJECT waar hij naar wijst niet'],
   ['GEEN_PROEFSLEUTEL', 'dit instrument heeft geen sleutel voor deze deur; zonder sleutel aankloppen bewijst niets'],
   ['FIXTURE_401', 'de eerste oproep gaf 401 -- er is een authenticatiefixture nodig'],
@@ -128,6 +129,40 @@ function laatstGewijzigd(bestand) {
   return t;
 }
 
+/* DEUREN DIE DIT INSTRUMENT MET OPZET NIET OPENT, met de reden en het adres van
+   wie het wel doet.
+
+   WAAROM DIT BESTAAT (14 september 2026). `GEEN_PROEFSLEUTEL` hoort volgens
+   test/eindpoort.test.js op nul te staan, met als eis: "elke deur heeft een sleutel
+   of een uitgeschreven reden waarom niet". Die tweede helft had geen plek. Hij werd
+   zichtbaar toen de idempotentieproef voor het eerst op DEZELFDE commit als HEAD werd
+   gemeten: daarvoor stond `metingGebruikt` op false (de meting was van een andere
+   stand) en sloeg de poort de hele indeling over. De bak stond dus niet op nul omdat
+   er niets was, maar omdat er niet werd gekeken.
+
+   HET VERSCHIL MET NIET_AANRAKEN hierboven: daar MAG de proef niet komen (een
+   schakelkast, iets onomkeerbaars). Hier KAN hij niet, en wel om een reden die zelf
+   gemeten is. Een lijst als deze mag alleen groeien met een adres erbij -- anders is
+   het een uitzonderingenlijst, en die wordt bij de eerste die er tegenaan loopt
+   opgerekt. */
+const SLEUTEL_ELDERS = [
+  { pad: '/api/supplier/roster', waarom: 'de rem staat op dertig opvragingen per kwartier per IP ' +
+      'en de opstelling heeft er al negenentwintig nodig om de zaken in te loggen (gemeten in ' +
+      'IDEMPROEF.json: `roosteropvragingen 29 / 30`). Vijf gemeten oproepen zouden de rem laten ' +
+      'springen en daarmee de wereld van de proef zelf slopen -- test/eindpoort.test.js bewaakt ' +
+      'juist dat die rem heel blijft. De poort zelf is beproefd door scripts/lib/zaakinlog.js, dat ' +
+      'hem bij elke zaakinlog echt aanroept.' },
+  { pad: '/api/webhooks/storingen', waarom: 'de HMAC is gebonden aan het lijf, het event-id en de ' +
+      'tijd; een bearer kruisen meet dat niet. Het verzoek wordt getekend door de eigen HTTP-proef ' +
+      '(zie de verklaring bij `verzoeksignatuur` in scripts/lib/bewakers.js), en dat is de plek waar ' +
+      'zo\'n deur thuishoort -- een tweede ondertekenaar in deze proef zou een tweede definitie van ' +
+      '"geldig getekend" opleveren.' }
+];
+const waaromSleutelElders = (pad) => {
+  const t = SLEUTEL_ELDERS.find(x => String(pad || '') === x.pad);
+  return t ? t.waarom : null;
+};
+
 function bakVan(r, m, metingOp, geenSleutel, wachtOpObject) {
   /* NIET AANRAKEN IS GEEN ONTBREKENDE SLEUTEL, en dat verschil is groot genoeg
      om als eerste te staan.
@@ -153,6 +188,9 @@ function bakVan(r, m, metingOp, geenSleutel, wachtOpObject) {
      in die met opnieuw meten geen millimeter opschieten: er is niets om mee aan
      te kloppen. Twee verschillende oorzaken die op hetzelfde symptoom lijken
      (afwezig in het register), met tegengestelde reparaties. */
+  /* Eerst de verklaarde deuren: "geen sleutel" is hier geen tekort maar een besluit,
+     en dan hoort hij niet in de bak die naar nul moet. */
+  if (geenSleutel && waaromSleutelElders(r.pad)) return 'SLEUTEL_ELDERS';
   if (geenSleutel) return 'GEEN_PROEFSLEUTEL';
   if (!m) return 'STALE_BEWIJS';
   const gewijzigd = laatstGewijzigd(r.bestand);

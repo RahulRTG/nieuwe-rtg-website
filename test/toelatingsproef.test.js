@@ -70,7 +70,11 @@ test('4. de proef meet ANDERE dingen dan de twee voorgangers', () => {
 });
 
 test('5. de woordenlijst is uitgebreid, en dat staat er eerlijk bij', () => {
-  assert.match(vormBron, /DE LIJST IS EEN KEER UITGEBREID/,
+  /* Het aantal keer dat de lijst is uitgebreid staat in de kop van
+     scripts/ketenvorm.js, en het mag groeien -- wat vastligt is dat het ER
+     STAAT. Een vast "EEN KEER" zou bij de vierde keten zakken op de eerlijkheid
+     in plaats van op het gebrek eraan. */
+  assert.match(vormBron, /DE LIJST IS \w+ KEER UITGEBREID/,
     'de themalijst is aangepast zonder dat ergens staat waarom -- dan is de overlap gefabriceerd');
   assert.match(vormBron, /HETZELFDE zegt/, 'de regel waaronder een patroon erbij mag, staat er niet');
   /* Wat NIET is aangepast: de actoren. Dat is de uitslag die telt. */
@@ -78,33 +82,37 @@ test('5. de woordenlijst is uitgebreid, en dat staat er eerlijk bij', () => {
   assert.equal(v.telling.actorenGedeeld, 0,
     'er is nu een actor die alle drie de ketens delen -- dat is een vondst, en die hoort in MAATSTAF.md');
   assert.ok(v.telling.actorenTotaal >= 13);
-  /* Er is wel een WOORD dat twee ketens delen: `zaak`. In de tafelketen is dat
-     de horecazaak die bedient, in de toelatingsketen de zaak die ontstaat --
-     ontvanger tegenover uitkomst. Precies de vorm die SEMANTIEK.json meet:
-     dezelfde naam, twee betekenissen. Daarom telt hij niet als gedeelde actor. */
+  /* Er is wel een WOORD dat meerdere ketens delen: `zaak`. Sinds de bundel van
+     13 september staat hij in VIER, en in elke keten met een andere rol:
+
+       tafel     -- de horecazaak die BEDIENT        (ontvanger)
+       toelating -- de zaak die ONTSTAAT             (uitkomst)
+       zaaklive  -- de zaak die AANGAAT              (onderwerp)
+       omzet     -- de zaak wier omzet wordt GEBOEKT (subject van de boeken)
+
+     Dat is precies de vorm die SEMANTIEK.json meet: dezelfde naam, meer
+     betekenissen. Hij telt daarom niet als gedeelde actor, en het negatief is er
+     sterker van geworden in plaats van zwakker -- vier ketens die het woord delen
+     en geen van vieren hetzelfde bedoelen, is een beter bewijs dan twee.
+
+     DEZE BEWERING IS EEN WACHTER EN GEEN TELLING. Zij zakt zodra `zaak` in een
+     keten opduikt die hier niet staat, want dan moet iemand opnieuw kijken of het
+     daar hetzelfde betekent. Een `>= 2` zou dat nooit vragen. */
   const perKeten = v.actoren.perKeten;
   const metZaak = Object.keys(perKeten).filter(k => perKeten[k].includes('zaak'));
-  /* VIER KETENS DRAGEN NU HET WOORD `zaak`, EN HET BETEKENT ER VIER DINGEN.
-     In de tafelketen is het de horecazaak die BEDIENT, in de toelatingsketen de
-     zaak die ONTSTAAT, in de zaak-live-keten de zaak die ZICHTBAAR wordt, en in
-     de omzetketen de zaak in wiens BOEKEN het geld landt -- ontvanger, uitkomst,
-     onderwerp, eigenaar van de waarheid. Dat is geen gedeelde actor maar precies
-     de vorm die SEMANTIEK.json meet: dezelfde naam, meer betekenissen. En hij
-     wordt met elke keten erger, niet beter: vier ketens, vier betekenissen, nul
-     gedeelde rol. Komt er een vijfde keten met `zaak` bij, dan hoort deze lijst
-     weer te zakken zodat iemand kijkt of het daar hetzelfde betekent. */
   assert.deepEqual(metZaak.sort(), ['omzet', 'tafel', 'toelating', 'zaaklive'],
     'het woord `zaak` staat nu in andere ketens; kijk of het daar hetzelfde betekent');
 });
 
 test('6. de ketenvorm telt over ALLE ketens en niet over de eerste twee', () => {
   const v = lees('KETENVORM.json');
-  /* VIJF sinds 13 september 2026: eerst scripts/zaakliveproef.js en daarna
-     scripts/omzetproef.js. Dit getal hoort mee te groeien met KETENS in
-     scripts/ketenvorm.js -- staat het stil, dan telt een nieuwe keten
-     stilletjes niet mee en meet de vorm nog steeds de oude verzameling. */
-  assert.equal(v.telling.ketens, 5);
-  assert.equal(v.ketens.length, 5);
+  /* AFGELEID EN NIET OVERGETYPT. Hier stond `3`, en bij de vierde keten
+     (scripts/adamproef.js) zakte deze toets op het feit dat er een keten BIJ
+     was gekomen -- precies andersom dan de bedoeling. De eis is dat het
+     register gelijk loopt met de ketenlijst, niet dat het er drie zijn. */
+  const { KETENS } = require('../scripts/ketenvorm');
+  assert.equal(v.telling.ketens, KETENS.length);
+  assert.equal(v.ketens.length, KETENS.length);
   const { zonderCommentaar } = require('../scripts/lib/bron');
   assert.doesNotMatch(zonderCommentaar(vormBron), /gelezen\[1\]/,
     'de meter indexeert nog op de tweede keten; dan telt een derde stil niet mee');
@@ -113,14 +121,14 @@ test('6. de ketenvorm telt over ALLE ketens en niet over de eerste twee', () => 
 test('7. gedeeld is in ALLE ketens, en dat verschilt van "in meer dan een"', () => {
   const v = lees('KETENVORM.json');
   const t = v.beloften.telling;
-  const N = v.telling.ketens;
-  for (const thema of v.beloften.gedeeld) assert.equal(t[thema], N, thema + ' heet gedeeld maar zit niet in alle ' + N);
-  for (const thema of v.beloften.bijna) assert.ok(t[thema] > 1 && t[thema] < N, thema + ' staat verkeerd in "bijna"');
+  const n = require('../scripts/ketenvorm').KETENS.length;
+  for (const thema of v.beloften.gedeeld) assert.equal(t[thema], n, thema + ' heet gedeeld maar zit niet in alle ketens');
+  for (const thema of v.beloften.bijna) assert.ok(t[thema] > 1 && t[thema] < n, thema + ' staat verkeerd in "bijna"');
   for (const [k, lijst] of Object.entries(v.beloften.eigen))
     for (const thema of lijst) assert.equal(t[thema], 1, thema + ' heet "alleen ' + k + '" en zit in meer ketens');
 });
 
-test('8. wat de ketens delen, gaat over de machine en niet over het domein', () => {
+test('8. wat de drie ketens delen, gaat over de machine en niet over het domein', () => {
   /* Dit is het antwoord op MAATSTAF.md U40/U41, en het is een MEETUITSLAG en
      geen wens: zodra er een domeinbegrip in de gedeelde lijst verschijnt, is
      dat een echte vondst en hoort deze toets te zakken zodat iemand kijkt. */

@@ -310,3 +310,55 @@ test('de codemasker ziet een regexliteral, en verwart hem niet met tekst', () =>
   assert.equal(codeNa('/* return true */\nvar x = 1;', 'return true'), false);
   assert.equal(codeNa('var s = "return true";\nvar x = 1;', 'return true'), false);
 });
+
+/* ============================================================================
+   DE KLASSEERDER MAG NIET OP EEN SCHRIJFWIJZE BREKEN.
+
+   `isServerToets()` in scripts/mutatie.js beslist met welke PROEF een toets
+   wordt beproefd: een servertoets krijgt de liegpoort, een pure toets een
+   bronmutatie. Hij herkende een servertoets aan de letterlijke tekst
+   `require('./helper')` -- en drie toetsbestanden schrijven diezelfde require
+   als `require('./helper.js')`.
+
+   Die drie vielen dus stil in het verkeerde vak. Voor test/rahul-mens.test.js
+   liep dat al zo sinds hij bestaat: hij start twee servers, werd met een
+   BRONMUTATIE beproefd, en kreeg gewoon een uitslag -- want hij requiret
+   toevallig ook een servermodule. Een uitslag van de verkeerde proef ziet er
+   precies zo uit als een uitslag van de goede.
+
+   Dat is de faalvorm waar dit hele instrument voor bestaat (LAT.md regel 10:
+   "een meter die je niet hebt zien uitslaan, meet niets"), nu op de meter zelf.
+
+   DE MUTATIE: haal een van de twee schrijfwijzen uit isServerToets() -> deze
+   toets zakt.
+   ========================================================================== */
+test('isServerToets herkent de helper-require met en zonder extensie', () => {
+  const fs2 = require('fs');
+  const path2 = require('path');
+  /* CODE EN GEEN PROZA. De eerste versie van deze toets matchte op de KOP van
+     isServerToets(), waar de schrijfwijze `require('./helper.js')` als voorbeeld
+     staat -- dus hij bleef groen terwijl de regel eronder was weggehaald. Dat is
+     dezelfde val die scripts/check.js regel 47 beschrijft, hier op de toets die
+     hem moest bewaken. Nagemeten: met de tweede schrijfwijze uit regel 1218
+     gehaald bleef hij groen; zonder commentaar zakt hij. */
+  const { zonderCommentaar } = require('../scripts/lib/bron.js');
+  const bron = zonderCommentaar(fs2.readFileSync(path2.join(__dirname, '..', 'scripts', 'mutatie.js'), 'utf8'));
+  const blok = bron.slice(bron.indexOf('function isServerToets'), bron.indexOf('function isServerToets') + 1200);
+  assert.match(blok, /\.js'\)/,
+    'isServerToets() kent de schrijfwijze met extensie niet meer; toetsen die `require(\'./helper.js\')` ' +
+    'schrijven vallen dan uit het servervak en krijgen een bronmutatie in plaats van de liegpoort');
+
+  /* En de uitkomst zelf, want een bron-controle bewijst niet dat hij werkt:
+     elk toetsbestand dat de helper op een van beide manieren requiret, hoort
+     als servertoets te tellen. */
+  const TEST2 = path2.join(__dirname);
+  const teken = "require('./" + 'helper';
+  let metExtensie = 0;
+  for (const n of fs2.readdirSync(TEST2).filter(x => /\.(test|e2e)\.js$/.test(x))) {
+    const b = fs2.readFileSync(path2.join(TEST2, n), 'utf8');
+    if (b.includes(teken + ".js')")) metExtensie++;
+  }
+  assert.ok(metExtensie >= 1,
+    'geen enkel toetsbestand schrijft de require meer met extensie -- dan bewaakt deze toets niets meer ' +
+    'en mag hij weg, maar laat hem niet stil groen staan');
+});

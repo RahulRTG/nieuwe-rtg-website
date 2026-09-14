@@ -68,5 +68,42 @@ module.exports = (ctx) => {
     return { ok: true, uitgevoerd, mislukt, bedragCenten: bedrag };
   }
 
-  return { bankTerugkerendZet: zet, bankTerugkerend: lijst, bankTerugkerendStop: stop, bankIncassoRonde: ronde };
+  /* DE VOORUITBLIK: wat zou deze ronde doen, zonder iets te boeken.
+
+     WAAROM HIJ ER IS. Het voornemen (kern/commercie/voornemen.js) weegt het
+     TOTAAL voordat de eerste boeking valt, en dat kan alleen als het totaal
+     vooraf te kennen is. Tot nu was de enige manier om te weten wat een
+     incassoronde int, hem draaien -- en dan is wegen te laat.
+
+     HIJ SPIEGELT DE LUS VAN `ronde` EXACT, inclusief de inhaalslag (een vaste
+     betaling die drie maanden achterloopt, boekt drie keer) en inclusief de
+     veiligheidsteller. Een vooruitblik die de lus anders rekent dan de
+     uitvoering, is erger dan geen vooruitblik: dan tekent een mens voor een
+     bedrag dat niet komt.
+
+     WAT HIJ NIET WEET, en dat staat in de uitslag: of een boeking LUKT. Saldo,
+     bevroren rekeningen en limieten beslist boekAsync, en die wordt hier met
+     opzet niet aangeroepen -- een vooruitblik die boekt is een ronde. Vandaar
+     `bedragCenten` als BOVENgrens: wat er ten hoogste geind wordt. */
+  function vooruitblik({ tot } = {}) {
+    const grens = Number.isFinite(tot) ? tot : nu();
+    const posten = [];
+    let bedrag = 0;
+    for (const t of reeks()) {
+      if (!t.actief) continue;
+      let volgende = t.volgendeAt, keer = 0, veiligheid = 0;
+      while (volgende <= grens && veiligheid++ < 500) { keer++; volgende += INTERVAL[t.interval]; }
+      if (!keer) continue;
+      posten.push({ id: t.id, vanIban: t.vanIban, naarIban: t.naarIban, centen: t.centen,
+        keer, centenTotaal: t.centen * keer, oms: t.oms });
+      bedrag += t.centen * keer;
+    }
+    return { ok: true, aantal: posten.length, boekingen: posten.reduce((n, p) => n + p.keer, 0),
+      bedragCenten: bedrag, posten,
+      grens: 'BOVENgrens: dit is wat er aan de beurt is, niet wat er zal lukken -- saldo, ' +
+        'bevroren rekeningen en limieten beslist de boeking zelf, en die is hier niet aangeroepen.' };
+  }
+
+  return { bankTerugkerendZet: zet, bankTerugkerend: lijst, bankTerugkerendStop: stop, bankIncassoRonde: ronde,
+    bankIncassoVooruitblik: vooruitblik };
 };

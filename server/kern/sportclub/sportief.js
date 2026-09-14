@@ -46,7 +46,26 @@ module.exports = (ctx) => {
     c.wedstrijden.unshift(w);
     c.wedstrijden = c.wedstrijden.slice(0, 2000);
     save();
+    /* HET PUBLIEKE MOMENT: een vastgelegde wedstrijd is een feit met een datum
+       waar een supporter iets mee kan (komen, kaartje, reizen). De UITSLAG is
+       met opzet GEEN moment maar klasse `stil` (scripts/lib/wekbesluit.js): wie
+       hem wil weten, kijkt -- een duwbericht over een verloren wedstrijd is geen
+       dienst. */
+    momentVoorClub(code, w);
     return { ok: true, wedstrijd: w };
+  }
+
+  /* Laat gebonden naar de Media OS; zonder haak wordt de wedstrijd gewoon
+     vastgelegd en wekt hij niemand. */
+  function momentVoorClub(code, wedstrijd) {
+    try {
+      const k = ctx.kern ? ctx.kern() : null;
+      if (!k || !k.aanwezigZorg || !k.mediaNieuwMoment) return null;
+      const c = club(code);
+      const a = k.aanwezigZorg('zaak', code, (c && c.naam) || code);
+      const titel = wedstrijd ? (wedstrijd.thuis ? 'thuis tegen ' : 'uit tegen ') + wedstrijd.tegenstander : null;
+      return a ? k.mediaNieuwMoment(a.id, 'wedstrijd', titel) : null;
+    } catch (e) { return null; }
   }
   function uitslagZet(code, wid, voor, tegen) {
     const c = club(code);

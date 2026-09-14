@@ -48,6 +48,20 @@ const KETENS = [
      een kantoor in, het gaat over een document met een houdbaarheid, en de
      uitkomst is toegang in plaats van een geleverde dienst. */
   { naam: 'toelating', register: 'TOELATINGSPROEF.json', domein: 'aanmeldingen', proef: 'scripts/toelatingsproef.js' },
+  /* DE VIERDE, en hij stelt een andere vraag dan de drie erboven. Die gaan over
+     een TRANSACTIE (een rekening, een rit, een toelating) en deze over een
+     MOGELIJKHEID: de hoofdpersoon is een zeventienjarige zonder account, zonder
+     hulpvraag en zonder geld in het spel. Voor deze meter telt vooral dat hij
+     opnieuw andere actoren meebrengt -- gezin, jongere, werkgever -- zodat de
+     vraag of er gedeelde actoren bestaan niet op drie horeca-achtige ketens
+     wordt beantwoord. */
+  { naam: 'adam', register: 'ADAMPROEF.json', domein: 'foundation', proef: 'scripts/adamproef.js' },
+  /* DE VIJFDE, en de eerste die niets LEVERT. De vier hierboven eindigen alle
+     bij een geleverde dienst, een verleende toegang of een bereikte mogelijkheid; deze eindigt bij iemand
+     die iets WEET. Als de gedeelde vorm daar ook overheen zou liggen, zou dat
+     voor het eerst iets betekenen -- en als hij dat niet doet, is dat het
+     duidelijkste antwoord dat deze meting kan geven. */
+  { naam: 'moment', register: 'MOMENTPROEF.json', domein: 'mediaos', proef: 'scripts/momentproef.js' },
   /* De vierde. Hij is toegevoegd omdat hij de meting scherper maakt en niet
      omdat er een keten bij moest: zijn uitkomst is ZICHTBAARHEID VOOR DERDEN,
      een soort die de eerste drie geen van alle hadden, en zijn voltooiende
@@ -69,13 +83,13 @@ const KETENS = [
    automatische woordwolk zou "de" en "een" als gedeelde vorm rapporteren. Elk
    thema is een SOORT fout die een keten kan afvangen; wat er niet in staat,
    komt terug als `nietIngedeeld` en is dus zichtbaar. */
-/* DE LIJST IS EEN KEER UITGEBREID, EN DAT MOET JE WETEN OM DE UITSLAG TE LEZEN.
+/* DE LIJST IS TWEE KEER UITGEBREID, EN DAT MOET JE WETEN OM DE UITSLAG TE LEZEN.
 
    Bij de derde keten viel zes van de zeven beloften buiten de lijst. Dat is
    precies het moment waarop je een overlap kunt FABRICEREN door net zo lang
    patronen bij te zetten tot alles matcht. De regel die daarom is aangehouden:
    een patroon erbij mag alleen als de belofte HETZELFDE zegt als de bestaande
-   beloften in dat thema, in andere woorden. Twee themas zijn zo uitgebreid:
+   beloften in dat thema, in andere woorden. Twee themas zijn toen uitgebreid:
 
      nietsKlaarZonderGrond   "zet geen zaak klaar zonder aftekening" naast
                              "geen chauffeur, dus niets toegewezen" -- zelfde
@@ -86,10 +100,38 @@ const KETENS = [
    En twee themas zijn NIEUW, want ze bestaan alleen in de derde keten
    (handelingMetNaam, geslotenLijst). Die staan dus in `eigen` en niet in
    `gedeeld`, en dat hoort zo: een thema dat maar in een keten voorkomt, is
-   geen gedeelde vorm. Wat NIET is gebeurd: de actoren aanpassen. Die staan op
-   nul gedeeld over drie ketens, en dat blijft de scherpste uitslag.
+   geen gedeelde vorm.
 
-   EEN DERDE UITBREIDING, BIJ DE VIJFDE KETEN (13 september 2026), en hij valt
+   BIJ DE VIERDE KETEN (adam) GEBEURDE HETZELFDE, EN SCHERPER. Alle NEGEN
+   beloften vielen buiten de lijst, en de uitslag sprong daardoor van 2 naar 0
+   gedeelde themas. Dat cijfer was onwaar: de Adam-keten toetst wel degelijk
+   herhaling (een tweede sollicitatie op dezelfde vacature) en weigering met een
+   reden (een vijftienjarige krijgt de leeftijdsgrens EN wat er voor hem wel is).
+   De matcher kende zijn woorden niet -- "tweede keer" naast het bestaande "twee
+   keer", "geweigerd met de leeftijd erbij" naast "geweigerd met de mededeling".
+
+   DAAROM DRIE PATRONEN ERBIJ EN GEEN THEMA:
+
+     herhaling               /tweede keer/
+     weigeringMetReden       /geweigerd met / (was: /geweigerd met de mededeling/)
+     nietsKlaarZonderGrond   /laat geen .* achter/ (naast /zet geen .* klaar/)
+
+   Alle drie generaliseren ze voorbij de zin die ze aanleiding gaf; dat is de
+   toets die ze moesten halen. Een patroon dat alleen op EEN belofte past, is
+   een uitslag die zichzelf schrijft. Na de verbreding staat het weer op 2 van
+   10 -- dus die twee overleven een vierde, totaal andere keten, en dat is de
+   eigenlijke vondst.
+
+   ZES BELOFTEN VAN DE ADAM-KETEN BLIJVEN BEWUST ONGEDEELD, en die staan in
+   `nietIngedeeld` waar ze horen: de server die de client niet gelooft over een
+   leeftijd, een afwijzing die op de tijdlijn blijft staan, een motor die wegen
+   telt in plaats van mensen. Dat zijn echte soorten fout, maar ze komen in geen
+   van de andere drie ketens voor -- en dan is het geen gedeelde vorm.
+
+   Wat NIET is gebeurd: de actoren aanpassen. Die staan op nul gedeeld, en dat
+   blijft de scherpste uitslag.
+
+   EEN DERDE UITBREIDING, BIJ DE ZESDE KETEN (13 september 2026), en hij valt
    onder dezelfde regel: `weigeringMetReden` kende alleen de BEDRIJVENDE vorm
    ("weigert met de reden") en niet de lijdende ("wordt geweigerd met de
    reden"). Dat is hetzelfde gezegd, in een andere werkwoordsvorm -- geen
@@ -102,16 +144,16 @@ const KETENS = [
    want de vijfde keten bracht geen enkel eigen thema mee dat de anderen ook
    hadden. En de actoren zijn opnieuw niet aangeraakt: 0 van 21. */
 const THEMAS = {
-  herhaling: [/dezelfde sleutel/i, /twee keer/i, /tweede betaling/i, /geen tweede/i],
+  herhaling: [/dezelfde sleutel/i, /twee keer/i, /tweede keer/i, /tweede betaling/i, /geen tweede/i],
   volgorde: [/alleen vooruit/i, /nog niet betaald/i, /terugzetten/i, /eerder/i],
   weigeringMetReden: [/zegt waarom/i, /noemt de reden/i, /weigert.*reden/i, /zegt wat er wel kan/i,
-    /geweigerd met de mededeling/i, /geweigerd; /i, /geweigerd met de reden/i],
+    /geweigerd met /i, /geweigerd; /i],
   onbekendObject: [/bestaat niet/i, /verzonnen/i, /kent.*niet/i, /niet van deze/i],
   dubbelObject: [/tweede rekening/i, /al gecorrigeerd/i, /wijst naar de bestaande/i],
   geldKlaargezet: [/klaar zonder het uit te voeren/i, /spiegelt/i, /teruggave/i],
   bereikbareWeg: [/die weg bestaat/i, /verwijst/i],
   nietsKlaarZonderGrond: [/nog niet toegewezen/i, /geen chauffeur/i, /toont geen/i,
-    /zet geen .* klaar/i],
+    /zet geen .* klaar/i, /laat geen .* achter/i],
   /* Alleen in de toelatingsketen: daar staat een MENS in de keten, en de andere
      twee kennen dat niet. */
   handelingMetNaam: [/naam van een mens/i, /overschrijft de eerste nooit/i],
@@ -167,9 +209,24 @@ function meet() {
     actoren[k.naam] = [...s].sort();
   }
   const actorGedeeld = snijAlle(gelezen.map(k => actoren[k.naam]));
+  /* DEZELFDE CORRECTIE ALS BIJ DE THEMAS HIERONDER, en de vierde keten liet zien
+     dat hij hier nog niet stond. "Eigen" was hier "niet in alle", en dat drukte
+     een actor die twee ketens delen af als "alleen toelating" EN als "alleen
+     moment" -- twee keer alleen. Met drie ketens viel dat nauwelijks op (`zaak`
+     stond al twee keer in de lijst); met vier kwamen `kantoor` en `lid` erbij, en
+     dan leest de uitslag alsof er geen enkele actor ergens gedeeld wordt terwijl
+     er drie in twee ketens staan.
+
+     Het KOPGETAL verandert hier niet van: gedeeld blijft "in ALLE ketens", en dat
+     is nul. Wat erbij komt is de middenbak, want zonder die bak verdwijnt een
+     vondst zodra er een keten bijkomt die hem niet heeft. */
+  const actorTelling = {};
+  for (const k of gelezen) for (const a of actoren[k.naam]) actorTelling[a] = (actorTelling[a] || 0) + 1;
+  const actorBijna = Object.keys(actorTelling)
+    .filter(a => actorTelling[a] > 1 && !actorGedeeld.includes(a)).sort();
   const actorEigen = {};
   for (const k of gelezen)
-    actorEigen[k.naam] = actoren[k.naam].filter(a => !actorGedeeld.includes(a));
+    actorEigen[k.naam] = actoren[k.naam].filter(a => actorTelling[a] === 1);
 
   /* 3. DE BELOFTEN. */
   const perKeten = {};
@@ -207,7 +264,7 @@ function meet() {
       sluit: k.data.sluit === true,
       bevindingen: (k.data.bevindingen || []).length })),
     vorm: { gedeeld: vormGedeeld, apart: vormApart, let: 'gelijke vorm is de ondergrens en geen vondst: beide proeven zijn zo geschreven' },
-    actoren: { perKeten: actoren, gedeeld: actorGedeeld, eigen: actorEigen },
+    actoren: { perKeten: actoren, gedeeld: actorGedeeld, bijna: actorBijna, eigen: actorEigen },
     beloften: { perKeten, gedeeld: themaGedeeld, bijna: themaBijna, telling: themaTelling,
       eigen: themaEigen, nietIngedeeld,
       let: '"gedeeld" is in ALLE ketens; "bijna" in meer dan een maar niet in alle. Dat onderscheid staat er ' +
@@ -229,7 +286,8 @@ function druk(u) {
     k.storingen + ' storingen' + (k.bevindingen ? ', ' + k.bevindingen + ' bevinding(en)' : '') + ')').join('  |  '));
   console.log('\n  ACTOREN');
   for (const [k, v] of Object.entries(u.actoren.perKeten)) console.log('    ' + k.padEnd(8) + v.join(', '));
-  console.log('    gedeeld: ' + (u.actoren.gedeeld.join(', ') || '(geen)'));
+  console.log('    in alle ' + u.telling.ketens + ': ' + (u.actoren.gedeeld.join(', ') || '(geen)'));
+  if (u.actoren.bijna.length) console.log('    in meer dan een, niet in alle: ' + u.actoren.bijna.join(', '));
   for (const [k, v] of Object.entries(u.actoren.eigen)) if (v.length) console.log('    alleen ' + k + ': ' + v.join(', '));
   console.log('\n  BELOFTEN (waar de storingen over gaan)');
   for (const [k, v] of Object.entries(u.beloften.perKeten)) console.log('    ' + k.padEnd(8) + v.join(', '));

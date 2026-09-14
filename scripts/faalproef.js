@@ -413,8 +413,42 @@ function oordeel(schoon, met) {
       /* De tweede effectkop hoort in de uitslag en niet alleen in de reden:
          `voorziening` is een oordeel over TWEE metingen, dus beide staan er. */
       effect2: p.effect2 || null, perVerraad: {} };
+    /* VIJF DINGEN HEETTEN HIER `ongemeten`, EN ZE ZIJN HET NIET.
+
+       Tot 13 september 2026 kreeg elk niet-duurzaam profiel dezelfde stand, en
+       daarmee stond er een getal (4880 huisbreed, 535 aan de kantoorkant) dat
+       leest als een berg onbeproefde routes. Het waren er vijf soorten:
+
+         leest        deze route schrijft niets. Er is geen bevestiging om te
+                      breken, dus er valt niets te beproeven -- dat is een
+                      EIGENSCHAP en geen tekort.
+         voorziening  zet bij zijn eerste bezoek zijn standaard klaar. Ook geen
+                      duurzame belofte; zie test/faalproefklasse.test.js, waar
+                      22 van 24 `gezakt` hierdoor onterecht bleken.
+         niet-bereikt de proef kreeg hem niet aan het werk (een status staat in
+                      de reden). Dit is een tekort van het INSTRUMENT en het
+                      enige getal dat omlaag hoort.
+         onzeker      de twee metingen spraken elkaar tegen; er valt geen
+                      contract uit af te leiden.
+         ongemeten    er is werkelijk niets over te zeggen.
+
+       Ze op een hoop gooien maakt het duurste getal onleesbaar: wie 4880 ziet,
+       weet niet of dat werk is of eigenschap. Dezelfde vorm als `MET_REDEN` in
+       scripts/tikken.js en `openBekend` in scripts/ritproef.js -- een proef die
+       iets echts vindt en maar twee uitgangen heeft, poetst of zakt.
+
+       LET OP WAT DIT NIET IS: een tweede meting. Het profiel werd al gemeten en
+       stond al per route in de uitslag; alleen de SAMENVATTENDE stand gooide ze
+       bij elkaar. Er verandert niets aan wat er gemeten wordt. */
+    const STAND_VAN_PROFIEL = {
+      leest: 'niet-mutatief',
+      voorziening: 'voorziening',
+      'geen-werk': 'niet-bereikt',
+      onzeker: 'onzeker',
+      onmeetbaar: 'onzeker'
+    };
     if (p.soort !== 'duurzaam') {
-      rij.failure = 'ongemeten';
+      rij.failure = STAND_VAN_PROFIEL[p.soort] || 'ongemeten';
       rij.reden = p.reden;
       perRoute.push(rij);
       continue;
@@ -468,6 +502,16 @@ function oordeel(schoon, met) {
          niets hoort op te slaan, is een beschuldiging zonder grond. */
       voorziening: telSoort('voorziening'),
       bewezen: tel('bewezen'), gezakt: tel('gezakt'), ongemeten: tel('ongemeten'),
+      /* DE VIER STANDEN DIE UIT `ongemeten` ZIJN GEHAALD, elk met zijn eigen
+         teller. Ze worden met opzet NIET opgeteld tot een 'niet beproefd':
+         `nietMutatief` en `voorziening` zijn een EIGENSCHAP van de route (er is
+         geen bevestiging om te breken) en `nietBereikt` is een tekort van dit
+         INSTRUMENT. Alleen die laatste hoort omlaag, en zolang ze op een hoop
+         staan is niet te zien of een daling vooruitgang is of een route die
+         stopte met schrijven. */
+      nietMutatief: tel('niet-mutatief'),
+      nietBereikt: tel('niet-bereikt'),
+      onzeker: tel('onzeker'),
       /* DE NOEMER VAN DE MEETWEG. `bewezen` hierboven is bewezen op zoveel van
          de zoveel sabotages -- staat er een nul in `verradenGedraaid`, dan is
          het geen bewijs maar een niet-uitgevoerde proef. */
@@ -478,8 +522,13 @@ function oordeel(schoon, met) {
   };
   fs.writeFileSync(UITSLAG, JSON.stringify(uit, null, 1) + '\n');
   console.log('\nFAALPROEF.json geschreven');
-  console.log('  bewezen ' + uit.gemeten.bewezen + ' | gezakt ' + uit.gemeten.gezakt + ' | ongemeten ' + uit.gemeten.ongemeten);
-  console.log('  duurzaam schrijvend ' + uit.gemeten.duurzaamSchrijvend + ' | klaarzetters (voorziening) ' + uit.gemeten.voorziening);
+  console.log('  bewezen ' + uit.gemeten.bewezen + ' | gezakt ' + uit.gemeten.gezakt);
+  console.log('  eigenschap : niet-mutatief ' + uit.gemeten.nietMutatief +
+    ' | klaarzetters (voorziening) ' + uit.gemeten.voorziening + '  -- hier valt niets te breken');
+  console.log('  tekort     : niet bereikt ' + uit.gemeten.nietBereikt +
+    ' | onzeker ' + uit.gemeten.onzeker + ' | ongemeten ' + uit.gemeten.ongemeten +
+    '  -- alleen DIT getal hoort omlaag');
+  console.log('  duurzaam schrijvend ' + uit.gemeten.duurzaamSchrijvend);
   console.log('  gemeten met ' + gedraaid.length + ' van de ' + Object.keys(TOEPASBAAR).length + ' sabotages: ' + gedraaid.join(', '));
   for (const [naam, reden] of Object.entries(nietGedraaid)) console.log('  NIET gedraaid -- ' + naam + ': ' + reden);
 })().catch(e => { console.error(e); process.exit(1); });

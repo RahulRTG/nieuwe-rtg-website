@@ -14,7 +14,11 @@
 'use strict';
 
 const BIEB_MAX = 500;
-const MELD_SOORTEN = ['muziek', 'video', 'flow', 'live'];
+/* EEN LIJST EN NIET TWEE. De soorten die een lid kan aan- of uitzetten zijn
+   dezelfde als die een publieke aanwezigheid kan uitzenden -- die woonden hier
+   als vaste lijst tot ./aanwezigheid.js erbij kwam, en twee lijsten lopen binnen
+   een maand uiteen (LAT.md regel 4). */
+const MELD_SOORTEN = require('./aanwezigheid').SOORTEN;
 
 module.exports = ({ db, save, schoon, catalogus }) => {
   const nu = () => new Date().toISOString();

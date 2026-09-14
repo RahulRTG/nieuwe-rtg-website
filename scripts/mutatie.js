@@ -461,6 +461,26 @@ const EIGEN_MODULE = new Map([
      Bevestigd door de motor, en dat is hier de voorwaarde: een geraden module
      geeft de toets de schuld van wat deze lijst fout heeft. */
   ['versheid-uitvoer.test.js', ['scripts/versheid.js']],
+  /* DE WEKDEKKING laadt zijn meter via een PADVARIABELE (de toets vervangt het
+     besluitregister op schijf en moet daarna vers laden, dus de require staat
+     achter `require(METER)`). Statisch ziet de motor daardoor alleen
+     scripts/lib/wekbesluit.js -- en dat is een REGISTER: tekst, geen logica, en
+     dus geen bruikbare mutatiepositie. Dan blijft de toets buiten de meting en
+     bestraft toetsenNietGemeten precies het schrijven van deze toets.
+
+     Bevestigd door de motor, en dat is hier de voorwaarde: met deze regel
+     muteert hij scripts/wekdekking.js en zakt de toets erop. */
+  ['wekdekking.test.js', ['scripts/wekdekking.js']],
+  /* DE MOMENTPROEF wordt door zijn toets als TEKST gelezen (fs.readFileSync) en
+     niet gerequired: de toets bewaakt de VORM van het instrument -- zakt het op
+     een open schakel, draagt elke bevinding een reden, staan B en D er allebei --
+     en dat zijn beweringen over de bron zelf. Statisch ziet de motor daardoor
+     geen module, en dan blijft de toets buiten de meting en bestraft
+     toetsenNietGemeten precies het schrijven ervan.
+
+     Bevestigd door de motor, en dat is hier de voorwaarde: met deze regel
+     muteert hij scripts/momentproef.js en zakt de toets erop. */
+  ['momentproef.test.js', ['scripts/momentproef.js']],
   /* DE BUDGETTERUGNAME toetst de GRENS van registratieTerug (alleen terugnemen
      wat aantoonbaar leeg is) en de poort van MAX_PER_LID -- maar requiret
      kern/waarde als geheel, dus de motor mikte op index.js: de compositiewortel,
@@ -1041,6 +1061,18 @@ const GEEN_BRONMUTATIE = new Map([
      ijkt de toets al zelf: zijn derde bewering is "de scan kan een nieuwe laag
      ook echt vinden", dus hij toont zijn eigen gevoeligheid. */
   ['consent-dekking.test.js', 'een census over de broncode (welke modules bestaan en staan ze in het register), niet over rekenend gedrag; een bronoperator kan daar niet bij. De toets ijkt zichzelf al: zijn derde bewering laat de scan een nieuwe laag vinden'],
+  /* bewijsveld is dezelfde vorm als consent-dekking, een laag hoger: een CENSUS
+     over de registers (welk bestand draagt welk bewijsveld) tegen een verklaring
+     in scripts/lib/bewijsvelden.js, dat louter literalen bevat. Er is geen
+     rekenend gedrag om te muteren -- de betekenisvolle mutatie is een register
+     uit de verklaring halen of er een verzinnen, en die twee zijn met de hand
+     gedaan en zakken allebei. De TWEEDE is bovendien de sabotage van
+     techniek-bewijsveld-een-relatie in WETTEN.json, en die is machinaal raak:
+     `npm run sabotage techniek-bewijsveld-een-relatie` verklaart CODEWERELD.json
+     voor een veld dat het niet draagt en de toets wordt rood. Deze toets heeft
+     dus wel degelijk een machinale gevoeligheidsproef, alleen niet van deze
+     motor. */
+  ['bewijsveld.test.js', 'een census over de registers tegen een verklaring van louter literalen; geen bronoperator raakt dat. De gevoeligheid is machinaal bewezen door de sabotagemotor: techniek-bewijsveld-een-relatie staat op RAAK'],
   /* Nagetrokken: een aanroep verzinnen die niet bestaat (accounts.bestaatNietXX)
      laat toets 1 zakken, en verifyToken uit de users-export halen laat beide
      toetsen zakken. Wat hij vergelijkt is een EXPORTLIJST tegen aanroepen in de
@@ -1261,9 +1293,21 @@ function isServerToets(naam) {
   if (GEEN_BRONMUTATIE.has(path.basename(naam))) return false;
   /* De zoekterm opgeknipt, precies zoals de patronen in regel 36 van
      scripts/check.js: voluit gespeld leest een andere keuringsregel dit als een
-     require van scripts/helper.js, die niet bestaat. */
-  const teken = "require('./" + "helper')";
-  return fs.readFileSync(path.join(TEST, naam), 'utf8').includes(teken);
+     require van scripts/helper.js, die niet bestaat.
+
+     EN MET EN ZONDER EXTENSIE, want dat is dezelfde require en het verschil
+     kostte een stille misklassering. Drie toetsbestanden schrijven hem als
+     `require('./helper.js')` tegenover 973 zonder; die drie vielen hier uit het
+     servervak en werden met een BRONMUTATIE beproefd in plaats van met de
+     liegpoort. Voor test/rahul-mens.test.js liep dat al zo sinds hij bestaat,
+     en het viel niemand op omdat hij toevallig ook een servermodule requiret en
+     dus gewoon een uitslag kreeg -- een uitslag van de verkeerde proef.
+
+     Dat is de faalvorm waar dit bestand zelf voor is gebouwd: niet een toets
+     die zakt, maar een meter die een getal geeft. */
+  const bron = fs.readFileSync(path.join(TEST, naam), 'utf8');
+  const teken = "require('./" + "helper";
+  return bron.includes(teken + "')") || bron.includes(teken + ".js')");
 }
 
 /* DE SERVERTOETSEN in EEN ronde: de liegpoort aan voor alle /api/-paden. Per

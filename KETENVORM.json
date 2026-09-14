@@ -31,6 +31,24 @@
       "bevindingen": 0
     },
     {
+      "naam": "adam",
+      "domein": "foundation",
+      "proef": "scripts/adamproef.js",
+      "schakels": 12,
+      "storingen": 9,
+      "sluit": false,
+      "bevindingen": 1
+    },
+    {
+      "naam": "moment",
+      "domein": "mediaos",
+      "proef": "scripts/momentproef.js",
+      "schakels": 10,
+      "storingen": 13,
+      "sluit": false,
+      "bevindingen": 3
+    },
+    {
       "naam": "zaaklive",
       "domein": "ondernemerpoort",
       "proef": "scripts/zaakliveproef.js",
@@ -71,6 +89,7 @@
     },
     "apart": {
       "schakel": [
+        "antwoord",
         "bekend"
       ],
       "storing": []
@@ -99,6 +118,25 @@
         "tijd",
         "zaak"
       ],
+      "adam": [
+        "Adam",
+        "gezin",
+        "huis",
+        "knelpuntmotor",
+        "lid",
+        "mens",
+        "twee werelden",
+        "werkgever"
+      ],
+      "moment": [
+        "fan",
+        "festival",
+        "kantoor",
+        "lid",
+        "publieke wereld",
+        "sportclub",
+        "tweede fan"
+      ],
       "zaaklive": [
         "etalage",
         "lid",
@@ -117,42 +155,55 @@
       ]
     },
     "gedeeld": [],
+    "bijna": [
+      "kantoor",
+      "lid",
+      "zaak"
+    ],
     "eigen": {
       "tafel": [
         "gast",
         "keuken",
-        "zaak",
         "zaal"
       ],
       "rit": [
         "chauffeur",
         "dispatch",
-        "lid",
         "vervoerder"
       ],
       "toelating": [
         "aanvrager",
         "dossier",
-        "kantoor",
         "keurder",
-        "tijd",
-        "zaak"
+        "tijd"
+      ],
+      "adam": [
+        "Adam",
+        "gezin",
+        "huis",
+        "knelpuntmotor",
+        "mens",
+        "twee werelden",
+        "werkgever"
+      ],
+      "moment": [
+        "fan",
+        "festival",
+        "publieke wereld",
+        "sportclub",
+        "tweede fan"
       ],
       "zaaklive": [
         "etalage",
-        "lid",
         "ondernemer",
         "poort",
         "publiek",
-        "systeem",
-        "zaak"
+        "systeem"
       ],
       "omzet": [
         "betaalrail",
         "boekhouding",
-        "fiscus",
-        "lid",
-        "zaak"
+        "fiscus"
       ]
     }
   },
@@ -181,6 +232,16 @@
         "nietsKlaarZonderGrond",
         "weigeringMetReden"
       ],
+      "adam": [
+        "herhaling",
+        "nietsKlaarZonderGrond",
+        "weigeringMetReden"
+      ],
+      "moment": [
+        "herhaling",
+        "onbekendObject",
+        "weigeringMetReden"
+      ],
       "zaaklive": [
         "herhaling",
         "weigeringMetReden"
@@ -204,11 +265,11 @@
       "bereikbareWeg": 1,
       "dubbelObject": 1,
       "geldKlaargezet": 1,
-      "herhaling": 5,
-      "onbekendObject": 3,
+      "herhaling": 7,
+      "onbekendObject": 4,
       "volgorde": 2,
-      "weigeringMetReden": 5,
-      "nietsKlaarZonderGrond": 2,
+      "weigeringMetReden": 7,
+      "nietsKlaarZonderGrond": 3,
       "geslotenLijst": 1,
       "handelingMetNaam": 1
     },
@@ -223,6 +284,8 @@
         "geslotenLijst",
         "handelingMetNaam"
       ],
+      "adam": [],
+      "moment": [],
       "zaaklive": [],
       "omzet": []
     },
@@ -253,9 +316,74 @@
         "belofte": "kan dat op eigen naam, en ziet de rit op zijn eigen dispatchbord"
       },
       {
-        "keten": "zaaklive",
-        "storing": "een rondleiding die niet bestaat aftikken",
-        "belofte": "wordt geweigerd met een reden, en verschijnt nooit in de lijst"
+        "keten": "adam",
+        "storing": "de client stuurt een hogere leeftijd mee dan het profiel draagt",
+        "belofte": "verandert niets: de leeftijd komt uit het profiel op de server"
+      },
+      {
+        "keten": "adam",
+        "storing": "iemand solliciteert met de gezinscode van Adam en een vreemd token",
+        "belofte": "wordt geweigerd: het profiel achter het token beslist, niet de code in het verzoek"
+      },
+      {
+        "keten": "adam",
+        "storing": "een sollicitatie van Adam wordt afgewezen",
+        "belofte": "blijft bij Adam staan met de stand erbij, in plaats van te verdwijnen"
+      },
+      {
+        "keten": "adam",
+        "storing": "de knelpuntmotor telt wat er in de weg staat",
+        "belofte": "telt WEGEN per voorwaarde, en zet geen enkel getal op de mens"
+      },
+      {
+        "keten": "adam",
+        "storing": "een weg waarvan geen enkele voorwaarde is nagegaan",
+        "belofte": "heet \"onbepaald\" en nooit \"open\", en de aannames zeggen waarom"
+      },
+      {
+        "keten": "adam",
+        "storing": "Adam vraagt zijn eigen levenslijn op met zijn gezinstoken",
+        "belofte": "de deur is dicht EN zegt dat, in plaats van een lege lijn te tonen"
+      },
+      {
+        "keten": "moment",
+        "storing": "een voornemen is geen publiek feit",
+        "belofte": "een boeking die nog niet bevestigd is, wekt geen enkele volger"
+      },
+      {
+        "keten": "moment",
+        "storing": "geen bevestiging zonder bewijs",
+        "belofte": "wie \"bevestigd\" zet zonder te zeggen waaruit dat blijkt, wordt geweigerd -- en er gaat niets uit"
+      },
+      {
+        "keten": "moment",
+        "storing": "uitlichten gebeurt op naam",
+        "belofte": "met de gedeelde kantoorcode lukt uitlichten niet -- ook lezen niet"
+      },
+      {
+        "keten": "moment",
+        "storing": "een wek wordt niet met terugwerkende kracht gewist",
+        "belofte": "de ingetrokken uitlichting staat met haar reden in de geschiedenis, de andere loopt door, en de al verstuurde melding blijft staan"
+      },
+      {
+        "keten": "moment",
+        "storing": "de maker wekt zichzelf niet",
+        "belofte": "de auteur krijgt geen melding over zijn eigen uitgelichte werk, en kan zichzelf niet volgen"
+      },
+      {
+        "keten": "moment",
+        "storing": "een gast heeft geen publieke relaties",
+        "belofte": "zonder lidmaatschap geen volglijst"
+      },
+      {
+        "keten": "moment",
+        "storing": "een tweede festival hernoemt de aanwezigheid niet",
+        "belofte": "de naam in de volglijst van een fan verandert niet doordat de zaak iets anders begint"
+      },
+      {
+        "keten": "moment",
+        "storing": "een wek draagt geen publiek",
+        "belofte": "geen enkele melding noemt een aantal volgers of gebruikt aandrang"
       },
       {
         "keten": "zaaklive",
@@ -284,11 +412,6 @@
       },
       {
         "keten": "omzet",
-        "storing": "dezelfde bestelling een tweede keer betalen",
-        "belofte": "wordt geweigerd, en de omzet van de maand beweegt geen cent"
-      },
-      {
-        "keten": "omzet",
         "storing": "een betaalde bestelling terugstorten",
         "belofte": "het geld gaat terug EN de boekhouding blijft navolgbaar"
       },
@@ -312,11 +435,11 @@
   },
   "telling": {
     "actorenGedeeld": 0,
-    "ketens": 5,
-    "actorenTotaal": 21,
+    "ketens": 7,
+    "actorenTotaal": 33,
     "themasGedeeld": 2,
     "themasBijna": 3,
     "themasTotaal": 10,
-    "nietIngedeeld": 16
+    "nietIngedeeld": 28
   }
 }

@@ -52,10 +52,10 @@ kern.kmar.seed();
    druk op de knop overschrijven naar oude apparatuur of een harde schijf,
    altijd achter het vier- of zes-ogenprincipe (zaak, RTG-kantoor, rijk). */
 Object.assign(kern, require('../kern/uitgifte').maakUitgifte({ db, save, crypto }));
-/* RTG Sportclub (kern/sportclub.js): het stadion met eigen plattegrond,
-   tickets met horeca en wc's, teams van jeugd tot eerste, veldbeheer,
-   trainingskampen (RTG beslist), sponsors, momenten en de financien. */
-Object.assign(kern, require('../kern/sportclub').maakSportclub({ db, save, crypto, anthropic }));
+/* RTG Sportclub: stadion, tickets, teams, veldbeheer, kampen, sponsors,
+   financien. `kern` is laat gebonden -- ermee wekt een geplande wedstrijd de
+   publieke aanwezigheid (STAGE.md par. 5a). */
+Object.assign(kern, require('../kern/sportclub').maakSportclub({ db, save, crypto, anthropic, kern: () => kern }));
 kern.sport.seed();
 /* RTG contentbescherming (kern/drm.js): de DRM-route (Encrypted Media
    Extensions, Clear Key door RTG zelf bediend) voor de beschermde media. */
@@ -148,7 +148,7 @@ Object.assign(kern, require('../kern/hoteldorp')({ db, save, crypto, schoon, sse
 // de zorgvolle keten: zorgprofiel van de gast + live meekijken met toestemming
 Object.assign(kern, require('../kern/gastzorg')({ db, save, crypto, schoon, notify, notifySupplier, sseToSupplier, sseToCustomer, findSupplier, haversine, etaMinutes }));
 // Toren 3, RTG Shared Assets: 300 tickets per object, Access en Asset
-Object.assign(kern, require('../kern/assets')({ db, save, crypto, schoon, notify, pay: kern.pay }));
+Object.assign(kern, require('./assetsduurzaam')(hulp, kern));
 // De Rechterhand: de premium Lifestyle Pass-suite (concierge, bezittingen, gezondheid)
 Object.assign(kern, require('../kern/lifestyle')({ db, save, crypto, anthropic, liveCodename, notify }));
 // De extra premium ROS-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison

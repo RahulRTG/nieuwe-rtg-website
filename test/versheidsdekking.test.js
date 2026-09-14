@@ -122,7 +122,14 @@ const BUITEN = {
        verouderen. */
   'MUTATIECONTRACT-VOORSTEL.json': 'een VOORSTEL van de machine; het besluit staat in server/lib/mutatiecontracten.js en wordt hier nooit weggedrukt',
   'MUTATIECONTRACT-AFGELEID.json': 'idem: afgeleide voorstellen, bij elke gang overschreven',
-  'MUTATIECONTRACT.json': 'een afdruk van de contracten in de code, ververst door de keuring',
+  /* DEZE REDEN WAS ONJUIST, EN DAT KOSTTE VIER DAGEN. Er stond "ververst door de
+     keuring", maar de keuring LAS hem alleen -- er was geen toets die hem
+     herberekende. Daardoor kon hij een commit achterlopen zonder dat iets het zei,
+     en stond de poort op LEGACY_PENDING_CLASSIFICATION vier dagen groen op nul
+     terwijl er 47 schrijfroutes zonder contract waren. Sinds 13 september 2026 is
+     de bewering waar: test/mutatiecontract.test.js draait het instrument opnieuw
+     (--telling) en vergelijkt elke stand. */
+  'MUTATIECONTRACT.json': 'een afdruk van de contracten in de code, HERBEREKEND door test/mutatiecontract.test.js ("de afdruk loopt niet achter op de code") -- loopt hij achter, dan zakt die toets en niet de versheid',
   'MUTATIEINVENTARIS.json': 'een afdruk uit de code: hij TELT de routes en meet geen gedrag',
   'SCHRIJFANALYSE.json': 'een statische afdruk uit de code; hij certificeert niet maar vetoot',
   'HANDLERBEWAKERS.json': 'een afdruk uit de code, ververst door de keuring',
@@ -146,7 +153,17 @@ const BUITEN = {
      hem in toets 7 werkelijk weg om hem opnieuw te laten maken. Loopt hij achter
      op een bron, dan zakt die toets meteen -- een versheidsmelding zou daar
      alleen later hetzelfde zeggen. */
-  'MENSELIJKE_UITVOERING.json': 'een PROJECTIE uit vier registers; test/menselijkeuitvoering.test.js eist byte-gelijkheid met de hercompilatie en maakt hem in toets 7 vanaf nul opnieuw'
+  'MENSELIJKE_UITVOERING.json': 'een PROJECTIE uit vier registers; test/menselijkeuitvoering.test.js eist byte-gelijkheid met de hercompilatie en maakt hem in toets 7 vanaf nul opnieuw',
+  /* METERKLASSE.json STAAT MET OPZET NIET IN DE REPO, en daarom ook niet in de
+     versheidslijst: er is niets om te verouderen. `npm run meterklasse` print
+     twee klassen (welke generatoren repo-waarheid claimen, en welke bronlezers
+     semantiek uit de codevorm afleiden); `--vastleggen` bestaat voor de dag dat
+     er een ratel bij hoort. Die ratel kan er vandaag niet zijn: het getal 67 kan
+     alleen dalen door grendels toe te voegen, en een deel van die 67 hoort er
+     juist geen te hebben -- een tand die daarop duwt maakt het huis slechter en
+     de meter groener. Zie BEWIJSMACHINE.md par. 6a.2; zodra de verklaring per
+     generator een besluit is, verhuist hij hiervandaan naar REGISTERS. */
+  'METERKLASSE.json': 'wordt met opzet niet in de repo gezet: een commando dat je draait, geen register dat meetelt (BEWIJSMACHINE.md par. 6a.2)'
 };
 
 function schrijvers() {

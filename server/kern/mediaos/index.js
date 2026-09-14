@@ -80,7 +80,12 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
      wekmotor omdat die hem leest -- zonder aanwezigheid kan een festival of een
      club niemand wekken, en dat was precies de bevinding van WEKDEKKING.json. */
   const aanwezig = require('./aanwezigheid')({ db, save, schoon, codenaamVan });
-  const wekken = maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig });
+  /* De tijdlijn staat VOOR de wekmotor omdat die hem schrijft, en de motor bezit
+     de collectie met opzet niet -- zie de koppen van ./tijdlijn.js en
+     ./zoeken.js. */
+  const tijdlijn = require('./tijdlijn')({ db, save, aanwezig, SOORT_NAAM: require('./wekken').SOORT_NAAM });
+  const wekken = maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn });
+  const zoeken = require('./zoeken')({ aanwezig, SOORTEN: aanwezig.AANWEZIG_SOORTEN });
 
   /* VOLGEN staat in ./volgen.js: één knop die in Clips en het Theater tegelijk
      schrijft, en met opzet NIET in het betaalde Podium-abonnement. Dat is een
@@ -155,6 +160,8 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
     aanwezigMet: aanwezig.aanwezigMet, aanwezigVolg: aanwezig.aanwezigVolg,
     aanwezigVolgtHij: aanwezig.aanwezigVolgtHij, aanwezigMijn: aanwezig.aanwezigMijn,
     aanwezigVolgersVan: aanwezig.aanwezigVolgersVan, aanwezigBeeld: aanwezig.aanwezigBeeld,
+    /* Vinden en terugvinden: schakel 2 en 5 van de momentproef. */
+    aanwezigZoek: zoeken.aanwezigZoek, mediaMomentenVoor: tijdlijn.mediaMomentenVoor,
     MEDIA_MODI: MODI, MEDIA_MELD_SOORTEN: MELD_SOORTEN
   });
 }

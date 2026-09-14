@@ -72,30 +72,50 @@ test('de publieke laag: volgen op naam, en uitlichten alleen door een mens', asy
     const aanwezigId = uit.body.moment && uit.body.moment.aanwezigheid;
     assert.ok(aanwezigId, 'de uitlichting leverde een moment met een aanwezigheid');
 
-    /* HOOGUIT EEN KEER -- en hier staan TWEE dingen die niet hetzelfde zijn.
-       Deze toets beweerde eerst dat een woordelijk gelijke herhaling meteen 409
-       geeft, en dat is onwaar: server/lib/idemsleutels-stage.js zet op deze route
-       de sleutel ['postId','grond'], dus binnen het dubbeltikvenster speelt de
-       idempotentiepoort het BEWAARDE antwoord terug. Dat is geen gat maar het
-       besluit dat in de kop van dat bestand staat -- binnen vijf seconden is een
-       tweede identieke uitlichting een haperend netwerk.
+    /* HOOGUIT EEN KEER -- EN DAT HEEFT TWEE DEUREN, want op de ROUTE staat de
+       dubbeltikpoort ervoor en in de MODULE de toestandscontrole. Deze toets
+       eiste hier ooit onvoorwaardelijk 409, en dat was de wereld van voordat
+       server/lib/idemsleutels-stage.js bestond. Die verklaring kwam er later bij
+       en zette deze route in het dubbeltikvenster van lib/idemsleutels.js --
+       vijf seconden, huisbreed. Sindsdien krijgt een woordelijk gelijk verzoek
+       binnen dat venster het ANTWOORD VAN DE EERSTE terug en komt de handler er
+       niet meer aan toe.
 
-       Het bewijs dat het een replay is en geen tweede uitlichting: dezelfde `id`.
-       Een nieuwe regel zou een nieuwe dragen.
+       De reparatie was niet de eis verlagen maar hem VERDUBBELEN. Beide takken
+       die hieraan werkten kwamen onafhankelijk op dezelfde twee deuren uit; wat
+       hier staat is de UNIE ervan, want ze bewaakten elk iets wat de ander niet
+       zag -- de tekst van de weigering, en de invariant eronder.
 
-       DE TOESTANDSCONTROLE ZIT ERONDER en is iets anders. Met een andere grond
-       verschilt de sleutel, dus de handler draait echt -- en dan komt de 409 waar
-       hij hoort. Precies het onderscheid dat de kop van idemsleutels-stage.js
-       maakt: wie replay en toestandscontrole samenvoegt, kan later niet meer zien
-       of een route veilig te herhalen IS of alleen toevallig niets deed. */
-    const herhaald = await post('/api/office/salon/uitlicht', { postId, grond: 'bijzonder' }, persoon);
-    assert.equal(herhaald.status, 200, 'binnen het dubbeltikvenster speelt de poort het antwoord terug');
-    assert.equal(herhaald.body.uitlichting.id, uit.body.uitlichting.id,
-      'en het is echt hetzelfde antwoord: een tweede uitlichting zou een nieuwe id dragen');
+       1. Woordelijk gelijk, binnen het venster: een HERHALING. Niet zomaar een
+          200 -- het moet het antwoord van de eerste zijn, dus dezelfde id. Een
+          nieuwe id met status 200 zou betekenen dat er wel degelijk een tweede
+          handeling was, en daar is deze regel voor. */
+    const nogmaals = await post('/api/office/salon/uitlicht', { postId, grond: 'bijzonder' }, persoon);
+    assert.equal(nogmaals.status, 200, 'binnen het dubbeltikvenster speelt de poort het antwoord terug');
+    assert.equal(nogmaals.body.herhaald, true, 'en hij zegt er ook bij dat het een herhaling is');
+    assert.equal(nogmaals.body.uitlichting.id, uit.body.uitlichting.id,
+      'een herhaling geeft het antwoord van de EERSTE terug, dus dezelfde uitlichting');
 
+    /* 2. EEN ANDER VERZOEK, en dan draait de toestandscontrole wel. De identiteit
+          is `postId` + `grond` (idemsleutels-stage.js), dus dezelfde post met een
+          andere grond is geen dubbeltik maar een tweede redactiebesluit -- en dat
+          hoort te stuiten op 409 "al uitgelicht", met die reden erbij.
+
+          Zo staat het verschil dat MUTATIECONTRACT.md maakt hier in twee regels
+          naast elkaar: een herhaling die hetzelfde antwoord teruggeeft is IETS
+          ANDERS dan een herhaling die wordt tegengehouden door de stand van het
+          onderwerp. Wie die twee samenvoegt, kan later niet meer zien of een
+          route veilig te herhalen IS of alleen toevallig niets deed. */
     const anders = await post('/api/office/salon/uitlicht', { postId, grond: 'lokaal' }, persoon);
     assert.equal(anders.status, 409, 'een andere sleutel bereikt de handler, en die weigert op de STAND');
     assert.match(String(anders.body.error || ''), /al uitgelicht/, 'en zegt waarom');
+
+    /* 3. En de invariant zelf, want daar gaat het om: na drie pogingen loopt er
+          precies EEN uitlichting. Zonder deze regel zeggen de twee hierboven
+          alleen iets over statuscodes. */
+    const naDrie = await post('/api/office/salon/uitlicht/bord', {}, persoon);
+    assert.equal(naDrie.body.lopend.filter(r => String(r.post) === String(postId)).length, 1,
+      'drie pogingen, een uitlichting');
 
     /* 3b. DE VOLGLUS, en die maakt de lege lijst hierboven pas iets waard.
 
@@ -136,10 +156,71 @@ test('de publieke laag: volgen op naam, en uitlichten alleen door een mens', asy
     assert.equal((await post('/api/mediaos/aanwezig', { id: 'zaak:bestaat-niet' }, lid.token)).status, 404);
     assert.equal((await post('/api/mediaos/aanwezig/volg', { id: 'zaak:bestaat-niet', aan: true }, lid.token)).status, 404);
 
-    /* 5. En een gast komt er niet in: de Media OS is voor leden. */
+    /* 4a. VOLGEN, ONTVOLGEN, OPNIEUW VOLGEN -- binnen het dubbeltikvenster.
+
+       DEZE TOETS VOND EEN ECHT DEFECT, en het zat in onze eigen verklaring. Met
+       `velden: ['id', 'aan']` was het derde verzoek woordelijk gelijk aan het
+       eerste, dus de dubbeltikpoort gaf het antwoord van toen terug en de
+       handler kwam er niet aan te pas: het lid VOLGDE NIETS terwijl de API 200
+       en volgIk:true zei. Een gewone vinger op een knop, en een stille
+       onwaarheid tegen het lid.
+
+       De drie oproepen staan hier bewust achter elkaar zonder pauze -- met een
+       wachttijd van vijf seconden ertussen zou deze toets altijd slagen en
+       nooit iets bewijzen. */
+    assert.equal((await post('/api/mediaos/aanwezig/volg', { id: aanwezigId, aan: true }, lid2.token)).body.volgIk, true);
+    assert.equal((await post('/api/mediaos/aanwezig/volg', { id: aanwezigId, aan: false }, lid2.token)).body.volgIk, false);
+    const derde = await post('/api/mediaos/aanwezig/volg', { id: aanwezigId, aan: true }, lid2.token);
+    assert.equal(derde.body.volgIk, true, 'de derde zegt dat hij volgt');
+    assert.notEqual(derde.body.herhaald, true, 'en hij is GEEN herhaling: de handler heeft echt gedraaid');
+    assert.equal((await post('/api/mediaos/aanwezig/mijn', {}, lid2.token)).body.aanwezigheden.length, 1,
+      'en dan volgt hij er ook echt een -- dit is de regel die zakte');
+    await post('/api/mediaos/aanwezig/volg', { id: aanwezigId, aan: false }, lid2.token);
+
+    /* 4b. DISCOVERY EN DE FAN INBOX over de echte route (13 september 2026).
+
+       De twee helften die schakel 2 en 5 van de momentproef openhielden. Wat
+       hier bewezen wordt is niet dat ze 200 geven maar dat ze DOEN wat ze
+       beloven: een aanwezigheid VINDEN zonder het id te kennen, en het moment
+       TERUGVINDEN zonder dat de melding een adres draagt. */
+    /* Zoeken op een stuk van de ECHTE naam van de aanwezigheid. Die komt uit de
+       codenaam van de auteur en niet uit een vast voorvoegsel -- de eerste
+       versie van deze toets zocht op de stub uit de unittoets en vond niets. */
+    const naamVanA = (await post('/api/mediaos/aanwezig', { id: aanwezigId }, lid2.token)).body.aanwezigheid.naam;
+    assert.ok(naamVanA && naamVanA.length >= 3, 'de aanwezigheid draagt een naam om op te zoeken');
+    const gezocht = await post('/api/mediaos/aanwezig/zoek', { q: naamVanA.slice(0, 4) }, lid2.token);
+    assert.equal(gezocht.status, 200);
+    assert.ok(Array.isArray(gezocht.body.aanwezigheden), 'de zoeker geeft een lijst');
+    const raak = gezocht.body.aanwezigheden.find(a => a.id === aanwezigId);
+    assert.ok(raak, 'de aanwezigheid van de auteur is te vinden op een stuk van de naam');
+    assert.equal(raak.volgIk, false, 'en lid2 heeft hem net ontvolgd, dus volgIk is false');
+
+    /* De grens die op de route net zo hard staat als in de module: geen
+       volgerstelling, ook niet verstopt in een veldnaam. */
+    for (const sleutel of Object.keys(raak))
+      assert.ok(!/volgers|aantal|score|rang|populair/i.test(sleutel),
+        'de zoeker geeft geen telling terug (veld ' + sleutel + ')');
+
+    /* De tijdlijn is een venster op wat je volgt: eerst niets, dan iets. */
+    assert.equal((await post('/api/mediaos/momenten', {}, lid2.token)).body.momenten.length, 0,
+      'wie niets volgt, ziet niets');
+    await post('/api/mediaos/aanwezig/volg', { id: aanwezigId, aan: true }, lid2.token);
+    const tijdlijn = await post('/api/mediaos/momenten', {}, lid2.token);
+    assert.equal(tijdlijn.status, 200);
+    const uitgelicht = tijdlijn.body.momenten.find(m => m.soort === 'uitgelicht');
+    assert.ok(uitgelicht, 'de uitlichting van eerder staat in de tijdlijn');
+    assert.equal(uitgelicht.aanwezigheid, aanwezigId);
+    assert.ok(uitgelicht.at, 'met een tijdstip');
+    assert.ok(uitgelicht.naam, 'en de naam van de aanwezigheid, live gelezen');
+    await post('/api/mediaos/aanwezig/volg', { id: aanwezigId, aan: false }, lid2.token);
+
+    /* 5. En een gast komt er niet in: de Media OS is voor leden. Alle vier de
+       ledenroutes van deze laag, zodat de deur niet per route kan verschillen. */
     const gast = (await post('/api/login', { tier: 'guest' })).body;
     if (gast.token) {
-      assert.equal((await post('/api/mediaos/aanwezig/mijn', {}, gast.token)).status, 403);
+      for (const pad of ['/api/mediaos/aanwezig/mijn', '/api/mediaos/aanwezig/zoek', '/api/mediaos/momenten']) {
+        assert.equal((await post(pad, {}, gast.token)).status, 403, pad + ' is niet voor een gast');
+      }
     }
   } finally {
     await stop(srv);

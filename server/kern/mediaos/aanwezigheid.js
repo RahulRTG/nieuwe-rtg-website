@@ -94,6 +94,13 @@ module.exports = ({ db, save, schoon, codenaamVan }) => {
   const van = (soort, code) => A().mediaAanwezig[sleutel(soort, code)] || null;
   const met = (id) => A().mediaAanwezig[String(id || '')] || null;
 
+  /* ALLE aanwezigheden, voor ./zoeken.js. Die module doorzoekt ze en raakt
+     `db.data` daardoor zelf niet aan: de collectie houdt EEN lezer en EEN
+     schrijver, en dat is wat regel 63 van de keuring eist. Hij geeft de
+     onbewerkte vormen terug en niet het beeld, want de zoeker filtert op
+     `drager` -- dat veld zit met opzet niet in `beeld()`. */
+  const alle = () => Object.keys(A().mediaAanwezig).map(id => A().mediaAanwezig[id]).filter(Boolean);
+
   /* ---- volgen: altijd expliciet, en altijd door de mens zelf ---- */
   function volg(key, id, aan) {
     const a = met(id);
@@ -143,7 +150,7 @@ module.exports = ({ db, save, schoon, codenaamVan }) => {
 
   return { aanwezigZorg: zorg, aanwezigVan: van, aanwezigMet: met, aanwezigVolg: volg,
     aanwezigVolgtHij: volgtHij, aanwezigVolgersVan: volgersVan, aanwezigMijn: mijn,
-    aanwezigBeeld: beeld, AANWEZIG_SOORTEN: SOORTEN, AANWEZIG_DRAGERS: DRAGERS };
+    aanwezigAlle: alle, aanwezigBeeld: beeld, AANWEZIG_SOORTEN: SOORTEN, AANWEZIG_DRAGERS: DRAGERS };
 };
 module.exports.SOORTEN = SOORTEN;
 module.exports.DRAGERS = DRAGERS;

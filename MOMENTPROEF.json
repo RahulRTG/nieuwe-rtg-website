@@ -1,7 +1,7 @@
 {
   "stempel": "2026-09-13",
   "uitleg": "Een publieke keten van een feit bij de bron tot een melding bij iemand die daar zelf ja tegen zei, gemeten per SCHAKEL (handelt actor A, en weet actor B het?) en per STORING (houdt de keten zijn belofte als het misgaat?). Vierde keten naast tafelproef, ritproef en toelatingsproef -- zie STAGE.md par. 6.",
-  "grens": "Drie van de vier Moment-aanleidingen lopen hier echt (festivalboeking, festivalproduct, uitlichting in De Salon); de wedstrijd van een sportclub niet -- zie schakel 10. Er komt geen browser aan te pas, en er wordt niets betaald: dat een fan werkelijk een kaart KAN kopen is niet gemeten, want die route bestaat aan de ledenkant niet (schakel 5).",
+  "grens": "Alle vier de Moment-aanleidingen lopen hier echt: festivalboeking, festivalproduct en de uitlichting in De Salon op de hoofdserver, de wedstrijd van een sportclub op een eigen server (schakel 10 -- zie de kop van sportclubKeten voor waarom dat een tweede server vraagt). Wat hier NIET gemeten is: er komt geen browser aan te pas, en er wordt niets betaald -- dat een fan werkelijk een kaart KAN kopen blijft ongemeten, want die route bestaat aan de ledenkant niet. Schakel 5 meet dat hij het moment TERUGVINDT, niet dat hij het kan afrekenen.",
   "schakels": [
     {
       "nr": 1,
@@ -13,19 +13,19 @@
       "status": 200,
       "ziet": "aanwezigheid \"Sal Nocturna\" (drager: zaak), zendt uit: muziek, video's, korte video, live, optredens, kaartverkoop, wedstrijden, uitgelicht werk",
       "fout": null,
-      "ms": 15
+      "ms": 23
     },
     {
       "nr": 2,
       "van": "publieke wereld",
       "naar": "fan",
       "wat": "de fan vindt de aanwezigheid van het festival",
-      "bekend": "Er is geen route die publieke aanwezigheden opsomt of doorzoekt: /api/mediaos/aanwezig vraagt een id dat de fan al moet kennen, en /aanwezig/mijn toont uitsluitend wat hij al volgt. Dat is geen gat in deze laag maar het ontbrekende Discovery-blok uit STAGE.md par. 4, en de reden dat het er niet zomaar bij kan staat in routes/festival/gast.js: \"er is in dit huis geen publieke kant, en een line-up is het eerste dat er een van zou maken\". Het besluit ligt bij de eigenaar -- STAGE.md par. 7.",
-      "stand": "openBekend",
+      "bekend": null,
+      "stand": "gesloten",
       "status": 200,
-      "ziet": "de enige lijst is /aanwezig/mijn en die staat op 0: hij toont wat je al volgt, niet wat er is",
+      "ziet": "zoeken op de naam geeft 1 treffer(s); de aanwezigheid van het festival staat erbij met volgIk=false en zendt uit: muziek, video's, korte video, live, optredens, kaartverkoop, wedstrijden, uitgelicht werk",
       "fout": null,
-      "ms": 8
+      "ms": 13
     },
     {
       "nr": 3,
@@ -37,7 +37,7 @@
       "status": 200,
       "ziet": "volgt er 1, en kreeg vooraf te lezen: muziek, video's, korte video, live, optredens, kaartverkoop, wedstrijden, uitgelicht werk",
       "fout": null,
-      "ms": 11
+      "ms": 20
     },
     {
       "nr": 4,
@@ -49,19 +49,19 @@
       "status": 200,
       "ziet": "\"Sal Nocturna: kaartverkoop open -- \"Weekendpas voor Proeffestival\".\" (0 -> 1 meldingen)",
       "fout": null,
-      "ms": 13
+      "ms": 20
     },
     {
       "nr": 5,
       "van": "fan",
       "naar": "festival",
-      "wat": "handelt naar aanleiding van de wek: hij zoekt de kaart",
-      "bekend": "De wek draagt geen adres en er is geen ledenroute die de kaarten van een festival toont of verkoopt. Een melding is in dit huis een WEK en geen link -- geen enkele notify() draagt een bestemming -- en /api/festival/gast/* toont alleen de passen en het programma van een editie waar je AL iets hebt; kopen gebeurt aan de balie (/api/festival/verkoop, supplierAuth). Dit is exact de scheiding \"moment is geen notificatie\" uit STAGE.md par. 3: de wek werkt, de weg terug naar het moment bestaat niet. Het besluit ligt bij de eigenaar -- STAGE.md par. 7, de Fan Inbox.",
-      "stand": "openBekend",
+      "wat": "handelt naar aanleiding van de wek: hij vindt het moment terug",
+      "bekend": null,
+      "stand": "gesloten",
       "status": 200,
-      "ziet": "de melding draagt geen bestemming (velden buiten de vaste zes: geen), en de gastenkant geeft 0 passen -- er is geen route om er een te kopen",
+      "ziet": "de melding draagt geen bestemming (velden buiten de vaste zes: geen), en de tijdlijn van wat hij volgt geeft 2 moment(en) -- de kaartverkoop staat erbij als \"Sal Nocturna: kaartverkoop open\"",
       "fout": null,
-      "ms": 9
+      "ms": 12
     },
     {
       "nr": 6,
@@ -73,7 +73,7 @@
       "status": 200,
       "ziet": "twee posts, 0 lopende uitlichtingen, en de maker draagt 0 aanwezigheden",
       "fout": null,
-      "ms": 18
+      "ms": 25
     },
     {
       "nr": 7,
@@ -85,7 +85,7 @@
       "status": 200,
       "ziet": "moment op lid:lifestyle -- drager: lid, naam: Gouden Ibis",
       "fout": null,
-      "ms": 15
+      "ms": 22
     },
     {
       "nr": 8,
@@ -97,7 +97,7 @@
       "status": 200,
       "ziet": "\"Gouden Ibis: uitgelicht werk -- \"En de tweede middag was stiller.\".\"",
       "fout": null,
-      "ms": 20
+      "ms": 28
     },
     {
       "nr": 9,
@@ -109,18 +109,19 @@
       "status": 200,
       "ziet": "1 melding(en) over kaartverkoop, en het Dagticket zit er niet bij",
       "fout": null,
-      "ms": 20
+      "ms": 30
     },
     {
       "nr": 10,
       "van": "sportclub",
       "naar": "publieke wereld",
       "wat": "legt een wedstrijd vast; de supporters worden gewekt",
-      "bekend": "Niet door deze keten gelopen: /api/sport/* eist een zaak met type `sportclub` (kern/sportclub/index.js, isSportclub), de zaaiset heeft geen enkele zaak van dat type, en er is geen route waarmee een zaak haar type zet -- dat is een aanmelding met een keuring. De haak zelf staat wel (kern/sportclub/sportief.js, momentVoorClub) en scripts/wekdekking.js telt hem, maar geteld is niet gelopen. Het besluit is of de zaaiset een sportclub krijgt; tot dan is dit de enige van de vier aanleidingen zonder ketenbewijs.",
-      "stand": "openBekend",
-      "status": 403,
-      "antwoord": "Alleen voor de sportclub.",
-      "ms": 5
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "de supporter vond \"FC RTG\" via de zoeker, en na de wedstrijd 0 -> 1 meldingen (1 over een wedstrijd); zijn tijdlijn draagt 2 wedstrijdmoment(en) van de club",
+      "fout": null,
+      "ms": 24
     }
   ],
   "storingen": [
@@ -156,9 +157,9 @@
     },
     {
       "naam": "hooguit een keer uitgelicht",
-      "belofte": "dezelfde post twee keer uitlichten wordt geweigerd en wekt niemand opnieuw",
+      "belofte": "een woordelijk gelijk verzoek is een herhaling, een ander verzoek stuit op de toestandscontrole, en er loopt precies EEN uitlichting",
       "stand": "gehouden",
-      "wat": "tweede uitlichting gaf 409 \"Deze post is al uitgelicht.\""
+      "wat": "herhaling gaf 200 (herhaald), een andere grond gaf 409 \"Deze post is al uitgelicht.\", en er loopt 1 uitlichting"
     },
     {
       "naam": "intrekken vraagt een reden",
@@ -226,7 +227,7 @@
       "id": "D",
       "bewering": "de Stage-laag schrijft en leest alleen in haar eigen twee collecties",
       "stand": "gehouden",
-      "gemeten": "alleen mediaAanwezig en mediaVolgt, in 2 bestanden"
+      "gemeten": "alleen mediaAanwezig en mediaVolgt en mediaMomenten, in 4 bestanden"
     }
   ],
   "wereld": {
@@ -236,9 +237,9 @@
   },
   "telling": {
     "schakels": 10,
-    "gesloten": 7,
+    "gesloten": 10,
     "open": 0,
-    "openBekend": 3,
+    "openBekend": 0,
     "stuk": 0,
     "storingen": 13,
     "gehouden": 13,
@@ -247,35 +248,7 @@
     "architectuurGehouden": 4,
     "architectuurGebroken": 0
   },
-  "sluit": false,
+  "sluit": true,
   "sluitMetBevinding": true,
-  "bevindingen": [
-    {
-      "schakel": 2,
-      "van": "publieke wereld",
-      "naar": "fan",
-      "wat": "de fan vindt de aanwezigheid van het festival",
-      "gemeten": "de enige lijst is /aanwezig/mijn en die staat op 0: hij toont wat je al volgt, niet wat er is",
-      "status": 200,
-      "reden": "Er is geen route die publieke aanwezigheden opsomt of doorzoekt: /api/mediaos/aanwezig vraagt een id dat de fan al moet kennen, en /aanwezig/mijn toont uitsluitend wat hij al volgt. Dat is geen gat in deze laag maar het ontbrekende Discovery-blok uit STAGE.md par. 4, en de reden dat het er niet zomaar bij kan staat in routes/festival/gast.js: \"er is in dit huis geen publieke kant, en een line-up is het eerste dat er een van zou maken\". Het besluit ligt bij de eigenaar -- STAGE.md par. 7."
-    },
-    {
-      "schakel": 5,
-      "van": "fan",
-      "naar": "festival",
-      "wat": "handelt naar aanleiding van de wek: hij zoekt de kaart",
-      "gemeten": "de melding draagt geen bestemming (velden buiten de vaste zes: geen), en de gastenkant geeft 0 passen -- er is geen route om er een te kopen",
-      "status": 200,
-      "reden": "De wek draagt geen adres en er is geen ledenroute die de kaarten van een festival toont of verkoopt. Een melding is in dit huis een WEK en geen link -- geen enkele notify() draagt een bestemming -- en /api/festival/gast/* toont alleen de passen en het programma van een editie waar je AL iets hebt; kopen gebeurt aan de balie (/api/festival/verkoop, supplierAuth). Dit is exact de scheiding \"moment is geen notificatie\" uit STAGE.md par. 3: de wek werkt, de weg terug naar het moment bestaat niet. Het besluit ligt bij de eigenaar -- STAGE.md par. 7, de Fan Inbox."
-    },
-    {
-      "schakel": 10,
-      "van": "sportclub",
-      "naar": "publieke wereld",
-      "wat": "legt een wedstrijd vast; de supporters worden gewekt",
-      "gemeten": "Alleen voor de sportclub.",
-      "status": 403,
-      "reden": "Niet door deze keten gelopen: /api/sport/* eist een zaak met type `sportclub` (kern/sportclub/index.js, isSportclub), de zaaiset heeft geen enkele zaak van dat type, en er is geen route waarmee een zaak haar type zet -- dat is een aanmelding met een keuring. De haak zelf staat wel (kern/sportclub/sportief.js, momentVoorClub) en scripts/wekdekking.js telt hem, maar geteld is niet gelopen. Het besluit is of de zaaiset een sportclub krijgt; tot dan is dit de enige van de vier aanleidingen zonder ketenbewijs."
-    }
-  ]
+  "bevindingen": []
 }

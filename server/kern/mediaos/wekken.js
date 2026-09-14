@@ -36,7 +36,7 @@ const SOORT_NAAM = {
   wedstrijd: 'een wedstrijd in de agenda', uitgelicht: 'uitgelicht werk'
 };
 
-function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig }) {
+function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn }) {
   /* De volgers van een maker: de vereniging van de twee gratis volgrelaties
      die de Media OS ook zet (Clips en het Theater). Een betaald podium-
      abonnement telt hier niet mee -- dat is een betaalrelatie en geen volg. */
@@ -99,6 +99,11 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig }) {
        deze regel belooft het volgscherm iets anders dan er gebeurt. */
     if (!a.soorten.includes(soort))
       return { gewekt: [], overgeslagen: [], reden: 'deze aanwezigheid zendt geen ' + soort + ' uit' };
+    /* EERST VASTLEGGEN, DAN WEKKEN. Het feit dat deze aanwezigheid iets heeft
+       uitgezonden staat los van de vraag of er iemand gewekt kon worden -- een
+       moment zonder volgers is nog steeds gebeurd, en hoort in de tijdlijn te
+       staan voor wie er morgen op volgen drukt. */
+    const regel = tijdlijn ? tijdlijn.leg(a.id, soort, titel) : null;
     const gewekt = [], overgeslagen = [];
     for (const volger of aanwezig.aanwezigVolgersVan(a.id)) {
       const soorten = meldVan(volger, a.naam);
@@ -114,7 +119,7 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig }) {
         overgeslagen.push({ key: volger, reden: 'melden mislukte: ' + (e && e.message ? e.message : 'onbekend') });
       }
     }
-    return { gewekt, overgeslagen, soort, aanwezigheid: a.id };
+    return { gewekt, overgeslagen, soort, aanwezigheid: a.id, moment: regel ? regel.id : null };
   }
 
   return { mediaNieuwWerk: nieuwWerk, mediaNieuwMoment: nieuwMoment,

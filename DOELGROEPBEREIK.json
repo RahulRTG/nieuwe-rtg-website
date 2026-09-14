@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T11:40:44.921Z",
-    "commit": "b9ef5d31",
+    "op": "2026-09-13T20:04:04.470Z",
+    "commit": "23751107",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/doelgroepbereik.js",
     "node": "v22.22.2"
   },
@@ -1946,7 +1946,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 35,
+        "zonderRoldeur": 35,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "35 routes met geen roldeur(en) en 35 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "social",
@@ -1957,7 +1964,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 35,
+        "zonderRoldeur": 35,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "35 routes met geen roldeur(en) en 35 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "social",
@@ -1968,7 +1982,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 35,
+        "zonderRoldeur": 35,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "35 routes met geen roldeur(en) en 35 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "social",
@@ -2045,7 +2066,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 228,
+        "zonderRoldeur": 228,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -2056,7 +2084,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 228,
+        "zonderRoldeur": 228,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -2067,7 +2102,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 228,
+        "zonderRoldeur": 228,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -11546,7 +11588,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -11568,7 +11617,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -11579,7 +11635,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -11602,7 +11665,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "betalen",
@@ -13317,7 +13387,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 14,
+        "zonderRoldeur": 14,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "14 routes met geen roldeur(en) en 14 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tenant",
@@ -13373,7 +13450,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 14,
+        "zonderRoldeur": 14,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "14 routes met geen roldeur(en) en 14 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "vakbewijs",
@@ -14326,7 +14410,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 20,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 20 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-lucht",
@@ -14337,7 +14430,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 20,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 20 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-lucht",
@@ -14348,7 +14450,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 20,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 20 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-lucht",
@@ -15545,7 +15656,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 22 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-sport",
@@ -15556,7 +15676,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 22 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-sport",
@@ -15567,7 +15696,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 22 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-sport",
@@ -16246,7 +16384,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 17,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 17 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-werkvloer",
@@ -16328,7 +16475,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 17,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 17 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-werkplek",
@@ -19351,7 +19507,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 10,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-appstore-uitgever",
@@ -19362,7 +19527,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 10,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-appstore-uitgever",
@@ -19373,7 +19547,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 10,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-appstore-uitgever",
@@ -19384,7 +19567,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 10,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-appstore-uitgever",
@@ -20965,7 +21157,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 8,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 8 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-kmar",
@@ -20976,7 +21177,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 8,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 8 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-kmar",
@@ -20987,7 +21197,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 8,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 8 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-kmar",
@@ -23716,7 +23935,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -23727,7 +23955,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -23738,7 +23975,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -23749,7 +23995,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -23760,7 +24015,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -23771,7 +24035,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -31489,7 +31762,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 35,
+        "zonderRoldeur": 35,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "35 routes met geen roldeur(en) en 35 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "social",
@@ -31500,7 +31780,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 35,
+        "zonderRoldeur": 35,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "35 routes met geen roldeur(en) en 35 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "social",
@@ -31511,7 +31798,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 35,
+        "zonderRoldeur": 35,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "35 routes met geen roldeur(en) en 35 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -31522,7 +31816,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 228,
+        "zonderRoldeur": 228,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -31533,7 +31834,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 228,
+        "zonderRoldeur": 228,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "rtf-contacten",
@@ -31544,7 +31852,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 228,
+        "zonderRoldeur": 228,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "228 routes met geen roldeur(en) en 228 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -31555,7 +31870,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -31566,7 +31888,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -31577,7 +31906,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "bedrijf",
@@ -31588,7 +31924,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 108,
+        "zonderRoldeur": 108,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "108 routes met geen roldeur(en) en 108 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tenant",
@@ -31599,7 +31942,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 14,
+        "zonderRoldeur": 14,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "14 routes met geen roldeur(en) en 14 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tenant",
@@ -31610,7 +31960,14 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 14,
+        "zonderRoldeur": 14,
+        "rollen": []
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "14 routes met geen roldeur(en) en 14 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "dom-lucht",
@@ -31621,7 +31978,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 20,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 20 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-lucht",
@@ -31632,7 +31998,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 20,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 20 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-lucht",
@@ -31643,7 +32018,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 20,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 20 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-sport",
@@ -31654,7 +32038,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 22 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-sport",
@@ -31665,7 +32058,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 22 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-sport",
@@ -31676,7 +32078,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 22 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-werkvloer",
@@ -31687,7 +32098,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 17,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 17 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-werkvloer",
@@ -31698,7 +32118,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 17,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 17 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-appstore-uitgever",
@@ -31709,7 +32138,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 10,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-appstore-uitgever",
@@ -31720,7 +32158,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 10,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-appstore-uitgever",
@@ -31731,7 +32178,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 10,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-appstore-uitgever",
@@ -31742,7 +32198,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 10,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 10 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-kmar",
@@ -31753,7 +32218,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 8,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 8 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-kmar",
@@ -31764,7 +32238,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 8,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 8 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "dom-kmar",
@@ -31775,7 +32258,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 8,
+        "zonderRoldeur": 0,
+        "rollen": [
+          "leverancier"
+        ]
+      },
+      "triage": "deur-van-een-andere-rol",
+      "triageReden": "alle 8 routes van deze functie staan achter de deur van leverancier; deze doelgroep komt er structureel nooit langs. De functie beschrijft de bedienende kant terwijl de verklaring de consument noemt -- weghalen maakt de schakelaar eerlijk en versmalt de vergunningtoets in middleware/functieschakelaars.js. Besluit van de eigenaar."
     },
     {
       "functie": "tg-sso",
@@ -31786,7 +32278,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -31797,7 +32298,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -31808,7 +32318,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -31819,7 +32338,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -31830,7 +32358,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     },
     {
       "functie": "tg-sso",
@@ -31841,7 +32378,16 @@
       "beproefd": 8,
       "onbepaaldeRoutes": 0,
       "open": null,
-      "uitslag": "registerleugen"
+      "uitslag": "registerleugen",
+      "deuren": {
+        "routes": 22,
+        "zonderRoldeur": 7,
+        "rollen": [
+          "koppeling"
+        ]
+      },
+      "triage": "gemengde-deuren",
+      "triageReden": "22 routes met 1 roldeur(en) en 7 zonder; de bewaking zit hier deels in de handler, dus welke route deze doelgroep zou moeten openen is van buiten niet te zien"
     }
   ],
   "zonderVerklaring": [

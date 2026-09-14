@@ -32,72 +32,74 @@ module.exports = (kern) => {
   const { maakAanvoer } = require('../kern/knelpunt/aanvoer-bronnen');
   const { maakWerkbron } = require('../kern/knelpunt/aanvoer-werk');
   const { maakOpleidingbron } = require('../kern/knelpunt/aanvoer-opleiding');
+  const { maakOpvangbron } = require('../kern/knelpunt/aanvoer-opvang');
+  const { maakWegen } = require('../kern/knelpunt/wegen');
+  const { bundelVondsten } = require('../kern/knelpunt/vondstenbundel');
   /* De aanvoer wordt EEN keer samengesteld, bij het bedraden. Per verzoek
      opnieuw bouwen zou de bronnenlijst per aanroep laten verschillen, en dan is
-     "welke bronnen zijn er" geen vraag meer met een antwoord. */
-  const aanvoer = maakAanvoer({
+     "welke bronnen zijn er" geen vraag meer met een antwoord.
+
+     EN HIJ HEET MET OPZET NIET `BRONNEN`. Die naam draagt in dit huis al acht
+     betekenissen over acht domeinen (SEMANTIEK.json: botsing, overlap 0), van
+     medicijnbronnen tot loonbronnen. Een negende toevoegen kost hier niets om
+     te vermijden en maakt de meter niet erger. */
+  const AANVOERBRONNEN = {
     werk: maakWerkbron(() => kern.openVacatures),
-    opleiding: maakOpleidingbron(() => kern.beroepenbieb)
-  });
+    opleiding: maakOpleidingbron(() => kern.beroepenbieb),
+    opvang: maakOpvangbron(() => kern.opvangwijzer)
+  };
+  const aanvoer = maakAanvoer(AANVOERBRONNEN);
+  /* De wegen komen uit DEZELFDE lijst bronnen: een bron die hier wordt
+     aangesloten levert vanzelf ook een weg bij een kaal doel. Twee lijsten
+     zouden binnen een maand uit elkaar lopen. */
+  const wegen = maakWegen(Object.keys(AANVOERBRONNEN));
 
   /* Eén afhandeling voor twee deuren. Ze apart schrijven zou betekenen dat een
      gezin een ANDER antwoord krijgt dan een lid zodra iemand er een aanpast --
      en dat is precies de soort stille tweedeling die deze laag moet uitsluiten. */
   function beantwoord(req, res) {
-    const r = knelpunt.reken(req.body || {});
+    const lijf = req.body || {};
+
+    /* SCHAKEL 4 VAN DE ADAM-KETEN. Een mens zegt "ik wil weer aan het werk" --
+       een DOEL zonder wegen -- en de motor weigerde dat terecht. Hier worden de
+       wegen samengesteld uit de bronnen die dit huis heeft (./kern/knelpunt/
+       wegen.js), maar ALLEEN als de mens er zelf geen aandroeg: dit huis vult
+       een gat, het overschrijft geen antwoord. En `manierenBron` zorgt dat de
+       motor niet beweert dat de mens ze opgaf -- een lijst die zich voordoet
+       als die van de mens is precies de stille onwaarheid die hier niet mag. */
+    const zelfOpgegeven = Array.isArray(lijf.manieren) && lijf.manieren.length > 0;
+    const w = zelfOpgegeven ? null : wegen.wegenBij();
+    const invoer = zelfOpgegeven ? lijf
+      : { ...lijf, manieren: (w.manieren || []), manierenBron: 'samengesteld' };
+
+    const r = knelpunt.reken(invoer);
     const { status, ...rest } = r;
-    if (!r.ok) return res.status(status || 200).json(rest);
+    if (!r.ok) {
+      /* Weigert de motor bij nul samengestelde manieren, dan ligt dat aan dit
+         huis en niet aan de vraag; ./wegen.js heeft daar de juiste zin voor. */
+      if (w && !(w.manieren || []).length) {
+        return res.status(status || 400).json({ ...rest, error: w.uitleg });
+      }
+      return res.status(status || 200).json(rest);
+    }
     /* De aannames van beide lagen staan achter elkaar in EEN lijst. Twee
        lijsten aannames laten de lezer kiezen welke hij leest, en dat is precies
        de helft die hij dan niet leest. */
     const o = openingen.voorKnelpunten(r.knelpunten);
     /* De aanvoer hangt NAAST de openingen en vervangt ze niet: een opening is
-       de deur, een vondst is wat erachter staat. Alleen `werk` heeft vandaag
-       een bron, en de andere vier staan daarom in `zonderBron` -- met de reden,
-       want een leeg vak leest als "er is hier niets" terwijl het "wij hebben
-       hier nog niets aangesloten" betekent.
-
-       De randvoorwaarden gaan er EEN voor EEN in. De aanvoerlaag kent de mens
-       niet en mag hem ook niet uit een optelsom kunnen afleiden; per
-       randvoorwaarde vragen houdt dat zo. */
-    const vondsten = [], bronMeldingen = [], bronLeeg = [], geleverd = [];
-    /* De knelpunten gaan er EEN voor EEN in, en een knelpunt IS hier de
-       randvoorwaarde -- kern/knelpunt/index.js geeft ze als platte rij
-       { id, wat, blokkeertWegen } en niet genest onder een weg. Dat is bij het
-       bouwen misgegaan: de lus liep over een veld `voorwaarden` dat niet
-       bestaat, dus er kwam nul uit terwijl alles werkte. Een lege lijst zag er
-       precies zo uit als "geen vacatures".
-
-       Een voor een en niet in een optelsom: de aanvoerlaag kent de mens niet en
-       mag hem ook niet uit een samenvoeging kunnen afleiden. */
-    for (const k of (r.knelpunten || [])) {
-      const a = aanvoer.vondsten(k);
-      for (const v of a.vondsten) vondsten.push(v);
-      for (const g of a.geweigerd) bronMeldingen.push(g);
-      /* Een bron die NIETS heeft is iets anders dan een bron die stukging, en
-         die twee worden nooit samengevoegd -- dezelfde regel als in
-         kern/ontvanger.js. */
-      for (const g of a.geenBron) bronLeeg.push(Object.assign({ voorwaarde: k.id }, g));
-      /* Wat elke bron LEVERDE naast wat hij VOND. Zonder dat verschil leest een
-         scherm met een vacature en vierentwintig leerpaden als een oordeel over
-         welke weg de beste is, terwijl het alleen zegt hoeveel elke bron
-         toevallig heeft. Er wordt niets herverdeeld: dat zou een rangorde zijn
-         (kern/knelpunt/index.js regel 4). */
-      for (const g of a.geleverd) geleverd.push(Object.assign({ voorwaarde: k.id }, g));
-    }
-    /* Alleen over de terreinen die dit knelpunt werkelijk RAAKT wordt gemeld dat
-       er geen bron is. Alle vijf melden zou "voor wonen is geen bron
-       aangesloten" zetten onder een vraag die niets met wonen te maken heeft --
-       een mededeling die nergens over gaat, leest als een tekortkoming. */
-    const geraakt = [...new Set((o.openingen || []).map((x) => x.terrein).filter(Boolean))];
-    const metBron = new Set(vondsten.map((v) => v.terrein));
-    const zonderBron = geraakt.filter((t) => !metBron.has(t))
-      .map((t) => ({ terrein: t, reden: 'voor dit terrein is nog geen bron aangesloten; de ingang ' +
-        'bij de opening hierboven is wat dit huis heeft' }));
+       de deur, een vondst is wat erachter staat. Het bundelen zelf woont in
+       ./kern/knelpunt/vondstenbundel.js -- redeneerwerk hoort toetsbaar te zijn
+       zonder server. */
+    const b = bundelVondsten(aanvoer, r.knelpunten, o.openingen);
     res.json({ ...rest, openingen: o.openingen, terreinen: o.terreinen,
-      vondsten, vondstenZonderBron: zonderBron,
-      vondstenGeweigerd: bronMeldingen, vondstenBronLeeg: bronLeeg, vondstenGeleverd: geleverd,
-      aannames: rest.aannames.concat(o.aannames), openingenGrens: o.grens });
+      vondsten: b.vondsten, vondstenZonderBron: b.zonderBron,
+      vondstenGeweigerd: b.geweigerd, vondstenBronLeeg: b.bronLeeg, vondstenGeleverd: b.geleverd,
+      /* Wie de wegen maakte, staat er als GEGEVEN bij en niet alleen als zin. */
+      manierenSamengesteld: !zelfOpgegeven,
+      manierenUitleg: w ? w.uitleg : null,
+      manierenBronNietOpDeKaart: w ? w.nietOpDeKaart : [],
+      aannames: rest.aannames.concat(o.aannames, w ? [w.uitleg] : []),
+      openingenGrens: o.grens });
   }
 
   app.post('/api/knelpunt', auth, beantwoord);

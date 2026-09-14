@@ -130,6 +130,8 @@ const REGISTERS = [
      bot zonder dat iemand het merkt. */
   ['AICONTEXT.json', 'npm run aicontext:vast', 'welke velden van een lid in de system prompt van Rahul terechtkomen'],
   ['STILSPOOR.json', 'npm run stilspoor:vast', 'schrijfacties waarvan het falen stil wordt weggevangen (LAT.md regel 21)'],
+  ['SCHRIJFPROEF.json', 'node scripts/schrijfproef.js --vastleggen',
+    'per geldroute: krijgt de aanroeper een 2xx terwijl de opslag zijn schrijfactie weggooide (verraad schrijf-verloren)'],
   ['LAATSTE_METING.json', 'npm run beproeving', 'de laatste stormproef, ook wanneer hij zakt'],
   ['HEAPPROEF.json', 'npm run heapproef', 'geheugengedrag onder herhaalde verzoeken'],
   ['BEPROEVING.json', 'npm run beproeving', 'storm, geld, misbruik en herstel'],

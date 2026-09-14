@@ -41,10 +41,21 @@
 
      ONDERWERP  wie kent het ondernemingsobject? Lexicaal gemeten: welke
                 bestanden noemen de collectie waarin kern/onderneming zijn
-                waarheid bewaart. Graad `vermoed`, want een naam is geen
-                verwijzing -- maar de uitslag is een ONDERgrens, en dat is hier
-                de veilige kant: een bestand dat de collectie niet noemt, kent
-                haar zeker niet.
+                waarheid bewaart, OF roepen een toegang aan die dat object
+                teruggeeft. Graad `vermoed`, want een naam is geen verwijzing --
+                maar de uitslag is een ONDERgrens, en dat is hier de veilige
+                kant: een bestand dat geen van beide noemt, kent het object
+                zeker niet.
+
+                DIE TWEEDE HELFT ONTBRAK, EN DAT WAS EEN FOUT IN DEZE METER.
+                De eerste versie telde alleen de COLLECTIENAAM, en dat is een
+                proxy die precies de goede architectuur niet ziet: een route
+                hoort het object via kern/onderneming op te vragen
+                (`ondernemingVanZaak`) en de collectie juist NIET zelf aan te
+                raken. De meter zou dus 0 zijn blijven melden terwijl de brug
+                er lag -- een register dat liegt in de richting van "er is een
+                gat". De lijst met toegangen wordt AFGELEID uit de module zelf,
+                zodat hij niet achterloopt zodra iemand er een toevoegt.
 
      PROEF      is dit station ooit als KETEN gelopen? Gelezen uit
                 ONDERNEMERBEWIJS.json, dat die vraag al per keten beantwoordt.
@@ -160,6 +171,23 @@ const STATIONS = [
    maar de naam verouderd, en dan gooit hij alsnog. */
 const IJKBESTAND = 'server/routes/member/onderneming.js';
 
+/* DE TOEGANGEN DIE HET OBJECT ZELF TERUGGEVEN, afgeleid uit de module die ze
+   exporteert. De referentietabellen vallen er met opzet BUITEN: wie
+   `ondernemingRechtsvormenVanLand` aanroept vraagt een lijst rechtsvormen op en
+   weet daarmee niets over een concrete onderneming. Die uitsluiting is een
+   OORDEEL en staat daarom hier, zichtbaar, in plaats van in een regex. */
+const GEEN_TOEGANG = /^onderneming(Rechtsvorm|RECHTSVORM)/;
+
+function toegangen() {
+  const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/onderneming/index.js'), 'utf8');
+  const namen = new Set();
+  for (const m of bron.matchAll(/\bonderneming[A-Z][A-Za-z0-9_]*/g))
+    if (!GEEN_TOEGANG.test(m[0])) namen.add(m[0]);
+  if (!namen.size) throw new Error('ondernemerslus: geen enkele toegang gevonden in kern/onderneming/index.js; ' +
+    'zonder die lijst meet de onderwerp-as alleen nog de collectienaam en meldt hij een te laag getal.');
+  return [...namen].sort();
+}
+
 function collectieNaam() {
   const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/onderneming/index.js'), 'utf8');
   const m = bron.match(/bezit:\s*\{\s*([A-Za-z0-9_]+)\s*:/);
@@ -237,10 +265,12 @@ function meet() {
         vanRol: keten[i - 1].dragendeRol, naarRol: keten[i].dragendeRol });
 
   /* ---- as 2: het onderwerp ---- */
+  const toeg = toegangen();
+  const woorden = new RegExp('\\b(' + [collectie].concat(toeg).join('|') + ')\\b');
   const alle = bestanden(path.join(WORTEL, 'server'));
   const noemt = alle.filter((f) => !f.startsWith('server/kern/onderneming/'))
     .filter((f) => {
-      try { return new RegExp('\\b' + collectie + '\\b').test(fs.readFileSync(path.join(WORTEL, f), 'utf8')); }
+      try { return woorden.test(fs.readFileSync(path.join(WORTEL, f), 'utf8')); }
       catch { return false; }
     });
   const kant = (f) => f.startsWith('server/routes/supplier/') || f.startsWith('server/routes/staff/') ? 'zaak'
@@ -272,9 +302,12 @@ function meet() {
       'telt hoeveel daarvan ontbreken.',
     onderwerp: {
       collectie,
+      toegangen: toeg,
       bron: 'server/kern/onderneming/index.js',
-      let: 'de collectienaam wordt uit de bezittende module GELEZEN en niet overgetypt; lukt dat niet, ' +
-        'dan gooit de meter in plaats van nul te meten'
+      let: 'zowel de collectienaam als de lijst toegangen wordt uit de bezittende module GELEZEN en niet ' +
+        'overgetypt; lukt dat niet, dan gooit de meter in plaats van nul te meten. Een bestand telt mee ' +
+        'zodra het de collectie OF een toegang noemt -- het tweede is de architectuurvorm die de eerste ' +
+        'versie van deze meter niet zag'
     },
     stations: perStation,
     stationsZonderRoute: zonderRoute,

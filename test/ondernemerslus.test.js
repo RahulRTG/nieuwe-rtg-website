@@ -17,13 +17,22 @@
         bewering over het verleden -- die les kostte dit huis zeven "gezakte"
         routes die allang gerepareerd waren (KANTOORMACHT.md).
 
-   5-6  de BESTURINGSPROEF. Een instrument dat niet kan uitslaan is geen
+   5-7  de BESTURINGSPROEF. Een instrument dat niet kan uitslaan is geen
         instrument. Toets 5 laat de meter zijn onderwerp kwijtraken en eist dat
-        hij GOOIT; toets 6 laat een zaak-bestand de onderneming noemen en eist
-        dat het kopgetal beweegt. Zonder die twee kan deze hele meter stilvallen
-        terwijl alle andere toetsen groen blijven -- en dat is precies hoe de
-        eerste versie van dit script zijn eigen blindheid als bevinding
+        hij GOOIT; toets 6 en 7 laten een zaak-bestand de onderneming noemen en
+        eisen dat het kopgetal beweegt. Zonder die drie kan deze hele meter
+        stilvallen terwijl alle andere toetsen groen blijven -- en dat is precies
+        hoe de eerste versie van dit script zijn eigen blindheid als bevinding
         rapporteerde.
+
+        ZES EN ZEVEN ZIJN NIET DEZELFDE PROEF. De onderwerp-as heeft twee
+        helften: de COLLECTIENAAM (toets 6) en de TOEGANGEN die het object
+        teruggeven (toets 7). Die tweede helft is er later bij gekomen, juist
+        omdat de eerste versie de architectuurvorm niet zag -- een route hoort
+        `ondernemingVanZaak` aan te roepen en de collectie NIET aan te raken.
+        Een besturingsproef op alleen de collectienaam zou groen blijven terwijl
+        precies die helft stilvalt, en dan is de meter weer blind op de enige
+        plek waar het kopgetal vandaan moet komen.
 
    Draai los: node --test test/ondernemerslus.test.js
    De meting:  npm run ondernemerslus */
@@ -37,6 +46,7 @@ const WORTEL = path.join(__dirname, '..');
 const REGISTER = path.join(WORTEL, 'ONDERNEMERSLUS.json');
 const INDEX = path.join(WORTEL, 'server', 'kern', 'onderneming', 'index.js');
 const PROEFBESTAND = path.join(WORTEL, 'server', 'routes', 'supplier', '__lusproef.js');
+const PROEFBESTAND_TOEGANG = path.join(WORTEL, 'server', 'routes', 'supplier', '__lusproef-toegang.js');
 
 /* De meter wordt per toets VERS geladen. Hij leest bestanden van schijf bij het
    aanroepen van meet(), maar require-cache zou een eerdere uitslag vasthouden en
@@ -107,5 +117,29 @@ test('6. BESTURINGSPROEF: een zaak-bestand dat de onderneming noemt, beweegt het
       'deze meter niets en staat hij op nul omdat hij blind is, niet omdat de brug ontbreekt.');
   } finally {
     if (fs.existsSync(PROEFBESTAND)) fs.unlinkSync(PROEFBESTAND);
+  }
+});
+
+test('7. BESTURINGSPROEF: een zaak-bestand dat een TOEGANG aanroept, beweegt het kopgetal ook', () => {
+  /* De naam wordt uit de module GELEZEN en niet overgetypt: staat hij hier vast
+     en wordt hij ginds hernoemd, dan schrijft deze proef een dood woord en
+     slaagt hij op niets. */
+  const index = fs.readFileSync(INDEX, 'utf8');
+  const toegang = (index.match(/\bondernemingVanZaak\b/) || [])[0];
+  assert.ok(toegang,
+    'kern/onderneming/index.js exporteert geen ondernemingVanZaak meer; pas deze proef aan in plaats ' +
+    'van hem te laten slagen op een naam die nergens meer bestaat');
+
+  const voor = versMeten().meet().telling.zaakZietOnderneming;
+  try {
+    fs.writeFileSync(PROEFBESTAND_TOEGANG,
+      '/* tijdelijke besturingsproef */\nconst o = kern.' + toegang + '(code);\n');
+    const na = versMeten().meet().telling.zaakZietOnderneming;
+    assert.equal(na, voor + 1,
+      'het kopgetal bewoog niet toen een bestand onder routes/supplier een toegang van kern/onderneming ' +
+      'aanriep. Dan telt de onderwerp-as alleen nog de collectienaam, en meet hij juist de vorm NIET die ' +
+      'de brug hoort te hebben -- de meter meldt dan een gat dat er niet is.');
+  } finally {
+    if (fs.existsSync(PROEFBESTAND_TOEGANG)) fs.unlinkSync(PROEFBESTAND_TOEGANG);
   }
 });

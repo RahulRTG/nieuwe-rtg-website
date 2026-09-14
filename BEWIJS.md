@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1874 bestanden en 13398 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1874 bestanden en 13403 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1874 |
-| losse beweringen (`test(...)`) | 13398 |
+| losse beweringen (`test(...)`) | 13403 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1244 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1657 bestanden, 13015 beweringen.
+1657 bestanden, 13020 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -43,7 +43,7 @@ toets omvalt.
 | `aanmeldbesluit.test.js` | 5 | gezakt op `liegpoort /api/` | WIE HEEFT DEZE PAS TOEGEKEND? Het accepteren of afwijzen van een aanmelding is de ENE menselijke handeling in een verder volledig geautomatiseerde stroom. |
 | `aanmeldgesprek.test.js` | 1 | gezakt op `liegpoort /api/` | Het poortgesprek: Rahul neemt inloggen EN aanmelden over. Een gratis RTG-account vraagt VIER dingen: volledige naam, geboortedatum, e-mailadres en een wachtwoord. |
 | `aanmeldingen.test.js` | 9 | gezakt op `false->true` | Aanmeldingen (kern/aanmeldingen.js): de aanmelding per pas is geheel geautomatiseerd, behalve de menselijke ja/nee. De AI kent NOOIT zelf Lifestyle/Business toe. |
-| `aanvoer.test.js` | 25 | gezakt op `===->!==#0` | HET AANVOERCONTRACT -- en vooral: wat een bron NIET mag meeleveren. server/kern/knelpunt/aanvoer.js zegt wat een BRON minimaal moet leveren om een vondst te heten. |
+| `aanvoer.test.js` | 28 | gezakt op `===->!==#0` | HET AANVOERCONTRACT -- en vooral: wat een bron NIET mag meeleveren. server/kern/knelpunt/aanvoer.js zegt wat een BRON minimaal moet leveren om een vondst te heten. |
 | `aanwezig.test.js` | 2 | gezakt op `liegpoort /api/` | Aanwezigheid (server): elke receptie/entree telt hoeveel mensen er binnen zijn en de verdeling man/vrouw. Alleen geaggregeerd -- nooit per persoon. |
 | `aanwezigheid.test.js` | 12 | gezakt op `===->!==#0` | DE PUBLIEKE AANWEZIGHEID EN DE REDACTIEHANDELING -- de twee besluiten van 13 september, als toetsen in plaats van als zin. BESLUIT 1: een lid volgt een PUBLIEKE AANWEZIGHEID, gedragen door een mens of een... |
 | `accountroutes.test.js` | 7 | gezakt op `true->false#0` | De accountroutes: deuren die een echt account vragen en niet alleen een pas. Meet gedrag, geen brontekst. |
@@ -684,7 +684,7 @@ toets omvalt.
 | `kluis-rotatie.test.js` | 7 | gezakt op `return-weg#0` | Sleutelrotatie van de identiteitskluis (server/accounts/onderhoud.js). Een gecompromitteerde kluissleutel moet te vervangen zijn zonder de gegevens te verliezen en zonder downtime. |
 | `kluispoort.test.js` | 5 | genoemd | DE KLUISPOORT -- een gedeelde code komt niet in de identiteitskluis. WAT HIER MISGING, EN WAAROM HET GEEN KLEINE FOUT WAS. |
 | `knelpunt-openingen.test.js` | 10 | genoemd | DE OPENINGEN: DRIE STANDEN DIE NOOIT DOOR ELKAAR MOGEN LOPEN HDI.md par. 7 regel 6 (laag 6, Opportunity). |
-| `knelpunt.test.js` | 6 | genoemd | DE KNELPUNTMOTOR: WAT ER OPEN LIGT, WAT BLOKKEERT, EN WAT NIET IS NAGEGAAN HDI.md par. 7 regel 8. |
+| `knelpunt.test.js` | 8 | genoemd | DE KNELPUNTMOTOR: WAT ER OPEN LIGT, WAT BLOKKEERT, EN WAT NIET IS NAGEGAAN HDI.md par. 7 regel 8. |
 | `koppels.test.js` | 4 | gezakt op `liegpoort /api/` | Gekoppelde schakelaars (tegenhangers): twee functies die samen een dienst vormen volgen elkaar automatisch als de boardroom er een omzet, zodat er nooit een halve dienst overblijft (vacatures zonder sollicitanten,... |
 | `kosten.test.js` | 13 | genoemd | RTG KOSTPRIJS: wat kost elke gebruiker, en wie betaalt dat. Getoetst over het routecontract heen -- de schermen bouwen blind op deze routes, dus deze toetsen praten er net zo blind tegen: alleen fetch met een... |
 | `kostengrens.test.js` | 5 | genoemd | EEN VERBRUIKSGRENS DIE ECHT WEIGERT. Een waarschuwing die nergens bijt, is een getal op een scherm. |

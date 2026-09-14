@@ -34,6 +34,7 @@ module.exports = (kern) => {
   const { maakOpleidingbron } = require('../kern/knelpunt/aanvoer-opleiding');
   const { maakOpvangbron } = require('../kern/knelpunt/aanvoer-opvang');
   const { maakWegen } = require('../kern/knelpunt/wegen');
+  const { bundel } = require('../kern/knelpunt/vondstenbundel');
   /* De aanvoer wordt EEN keer samengesteld, bij het bedraden. Per verzoek
      opnieuw bouwen zou de bronnenlijst per aanroep laten verschillen, en dan is
      "welke bronnen zijn er" geen vraag meer met een antwoord. */
@@ -81,46 +82,13 @@ module.exports = (kern) => {
        de helft die hij dan niet leest. */
     const o = openingen.voorKnelpunten(r.knelpunten);
     /* De aanvoer hangt NAAST de openingen en vervangt ze niet: een opening is
-       de deur, een vondst is wat erachter staat. Een terrein zonder bron staat
-       in `zonderBron` MET de reden -- een leeg vak leest als "er is hier niets"
-       terwijl het "hier is nog niets aangesloten" betekent. */
-    const vondsten = [], bronMeldingen = [], bronLeeg = [], geleverd = [];
-    /* De knelpunten gaan er EEN voor EEN in, en een knelpunt IS hier de
-       randvoorwaarde -- kern/knelpunt/index.js geeft ze als platte rij
-       { id, wat, blokkeertWegen } en niet genest onder een weg. Dat is bij het
-       bouwen misgegaan: de lus liep over een veld `voorwaarden` dat niet
-       bestaat, dus er kwam nul uit terwijl alles werkte. Een lege lijst zag er
-       precies zo uit als "geen vacatures".
-
-       Een voor een en niet in een optelsom: de aanvoerlaag kent de mens niet en
-       mag hem ook niet uit een samenvoeging kunnen afleiden. */
-    for (const k of (r.knelpunten || [])) {
-      const a = aanvoer.vondsten(k);
-      for (const v of a.vondsten) vondsten.push(v);
-      for (const g of a.geweigerd) bronMeldingen.push(g);
-      /* Een bron die NIETS heeft is iets anders dan een bron die stukging, en
-         die twee worden nooit samengevoegd -- dezelfde regel als in
-         kern/ontvanger.js. */
-      for (const g of a.geenBron) bronLeeg.push(Object.assign({ voorwaarde: k.id }, g));
-      /* Wat elke bron LEVERDE naast wat hij VOND. Zonder dat verschil leest een
-         scherm met een vacature en vierentwintig leerpaden als een oordeel over
-         welke weg de beste is, terwijl het alleen zegt hoeveel elke bron
-         toevallig heeft. Er wordt niets herverdeeld: dat zou een rangorde zijn
-         (kern/knelpunt/index.js regel 4). */
-      for (const g of a.geleverd) geleverd.push(Object.assign({ voorwaarde: k.id }, g));
-    }
-    /* Alleen over de terreinen die dit knelpunt werkelijk RAAKT wordt gemeld dat
-       er geen bron is. Alle vijf melden zou "voor wonen is geen bron
-       aangesloten" zetten onder een vraag die niets met wonen te maken heeft --
-       een mededeling die nergens over gaat, leest als een tekortkoming. */
-    const geraakt = [...new Set((o.openingen || []).map((x) => x.terrein).filter(Boolean))];
-    const metBron = new Set(vondsten.map((v) => v.terrein));
-    const zonderBron = geraakt.filter((t) => !metBron.has(t))
-      .map((t) => ({ terrein: t, reden: 'voor dit terrein is nog geen bron aangesloten; de ingang ' +
-        'bij de opening hierboven is wat dit huis heeft' }));
+       de deur, een vondst is wat erachter staat. Het bundelen zelf woont in
+       ./kern/knelpunt/vondstenbundel.js -- redeneerwerk hoort toetsbaar te zijn
+       zonder server. */
+    const b = bundel(aanvoer, r.knelpunten, o.openingen);
     res.json({ ...rest, openingen: o.openingen, terreinen: o.terreinen,
-      vondsten, vondstenZonderBron: zonderBron,
-      vondstenGeweigerd: bronMeldingen, vondstenBronLeeg: bronLeeg, vondstenGeleverd: geleverd,
+      vondsten: b.vondsten, vondstenZonderBron: b.zonderBron,
+      vondstenGeweigerd: b.geweigerd, vondstenBronLeeg: b.bronLeeg, vondstenGeleverd: b.geleverd,
       /* Wie de wegen maakte, staat er als GEGEVEN bij en niet alleen als zin. */
       manierenSamengesteld: !zelfOpgegeven,
       manierenUitleg: w ? w.uitleg : null,

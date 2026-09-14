@@ -132,6 +132,50 @@ test('elke ijking heeft een eigen job in de keten', () => {
   }
 });
 
+/* DE VIERDE MANIER WAAROP DEZE KETEN STIL MINDER KAN TOETSEN: EEN GRENS DIE
+   NIET PAST BIJ DE JOB DIE ERONDER HANGT.
+
+   De zes ijkingen deelden een `timeout-minutes: 45`. Vijf zijn in minuten
+   klaar; `meterijk` niet. Gemeten op 14 september 2026, dezelfde stap:
+
+     #269 76235a3e            43 min 27 s   geslaagd
+     #270 07876924 poging 1   44 min 56 s   AFGEKAPT
+     #270 07876924 poging 2   43 min 24 s   geslaagd
+
+   Dezelfde commit, twee pogingen, 92 seconden verschil. Op 96% van de grens is
+   de uitslag een muntworp -- en een afgekapte ijking leest als een rode CI
+   terwijl er niets mis is met de wijziging. Erger nog: hij leest ook als rood
+   als er WEL iets mis is, dus het signaal is aan beide kanten bedorven.
+
+   Deze toets houdt vast dat meterijk meer ruimte heeft dan de rest. Niet
+   hoeveel -- dat is een meting die mag schuiven -- maar DAT hij het heeft. Zet
+   iemand de grens terug op een gedeeld getal, dan is meterijk weer een
+   muntworp en zakt deze toets in plaats van een willekeurige PR.
+
+   MUTATIE (LAT.md regel 2): de expressie vervangen door een vaste
+   `timeout-minutes: 45` -> deze toets ZAKT (RAAK). */
+test('meterijk heeft een eigen tijdgrens, ruimer dan de vijf snelle ijkingen', () => {
+  const yml = fs.readFileSync(path.join(__dirname, '..', '.github', 'workflows', 'ci.yml'), 'utf8');
+  const blok = yml.slice(yml.indexOf('  ijkingen:'));
+  const regel = /^\s*timeout-minutes:\s*(.+)$/m.exec(blok);
+  assert.ok(regel, 'de ijkingen-job heeft geen timeout-minutes meer');
+  const waarde = regel[1].trim();
+  assert.ok(!/^\d+$/.test(waarde),
+    'de zes ijkingen delen weer een vaste tijdgrens (' + waarde + '). meterijk duurt ~43 van de 45 ' +
+    'minuten, dus dan wordt elke PR weer een muntworp op een afkapping die niets over de diff zegt.');
+  const getallen = (waarde.match(/\d+/g) || []).map(Number);
+  assert.equal(getallen.length, 2,
+    'de expressie hoort twee getallen te dragen: de ruimte voor meterijk en de grens voor de rest');
+  const [ruim, strak] = getallen;
+  assert.ok(waarde.includes('meterijk'),
+    'de ruimere grens hoort aan meterijk te hangen en niet aan een willekeurige matrixwaarde');
+  assert.ok(ruim > strak,
+    'meterijk hoort de RUIMERE grens te krijgen (' + ruim + ' vs ' + strak + ')');
+  assert.ok(ruim >= 60,
+    'meterijk duurde op 14 september 2026 gemeten 43 minuten; onder de 60 is er geen ruimte om ' +
+    'te groeien en staat de muntworp er morgen weer');
+});
+
 /* ---- DE GEWOGEN VERDELING (1 september 2026) ----
 
    De verdeling ging van "om en om over de gesorteerde lijst" naar "zwaarste

@@ -992,6 +992,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | elk scherm is vanaf de bank te bereiken | `scripts/check.js` regel 53 |
 | elke meter met een dekkingsclaim is geijkt tegen bekende waarheid, of zegt waarom dat niet kan | `scripts/lib/ijking.js` + `test/meterwet.test.js` |
 | een bewijsveld draagt een bewijsrelatie; een gesplitst veld wordt apart benoemd en gemeten | `scripts/lib/bewijsvelden.js` + `test/bewijsveld.test.js` |
+| elk register heeft een verklaarde eigenaar; geen script schrijft naar andermans register | `scripts/lib/registereigenaar.js` + `test/registereigenaar.test.js` |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
 | nieuw werk op de norm, aangeraakt werk niet eronder (geen verrekening) | `scripts/deltapoort.js` |
 | een verlaging van de lat heeft een reden, een soort en een einde | `scripts/normverval.js` |

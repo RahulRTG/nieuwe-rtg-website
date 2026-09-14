@@ -1,0 +1,756 @@
+{
+  "stempel": {
+    "op": "2026-09-13T19:54:34.020Z",
+    "commit": "397ff23f",
+    "boomVuil": false,
+    "instrument": "scripts/gelding.js",
+    "node": "v22.22.2"
+  },
+  "uitleg": "Waar geldt een wet (CLAIM), waar leeft hij (DRAAG), en waar kan een wachter hem zien (WACHT)? De drie assen worden onafhankelijk gevuld en pas daarna vergeleken; zij delen geen bron, en test/gelding.test.js houdt dat vast.",
+  "graad": "vermoed",
+  "grens": "GEEN PERCENTAGE, en dat is een ontwerpkeuze: voor een verhouding moet eerst vaststaan wat een telbare eenheid is, en bij een centrale architectuur kan een objectfamilie zwaarder wegen dan twintig mappen. TWEE UITSLAGEN ZIJN GEMAKKELIJK VERKEERD TE LEZEN: GECLAIMD_GEEN_DRAGER_GEVONDEN betekent NIET dat er geen drager is, alleen dat DEZE sensor er geen vond -- en die ziet vandaag `opslaan` en `tonen`, en `projecteren` en `rangschikken` niet. GEDRAGEN_NIET_GEZIEN betekent NIET \"ongetest\": misschien bewaakt een centrale laag de cel op een manier die deze wachtersensor niet ziet.",
+  "geval": {
+    "id": "geen-cijfer-op-mens",
+    "objectfamilie": "MENS",
+    "aspect": "PRESTATIEWAARDERING",
+    "handelingen": [
+      "opslaan",
+      "projecteren",
+      "rangschikken",
+      "tonen"
+    ],
+    "contexten": [
+      "foundation",
+      "school",
+      "work",
+      "living"
+    ],
+    "actoren": [
+      "systeem",
+      "medewerker",
+      "partner",
+      "externeLezer"
+    ]
+  },
+  "assen": {
+    "claim": {
+      "soort": "verklaard",
+      "strekking": "platformbreed: geen cijfer op een mens, in geen enkele context en door geen enkele actor, ook niet intern als sorteersleutel",
+      "citaten": [
+        {
+          "bestand": "ONTMOETEN.md",
+          "anker": "Geen cijfer op een mens"
+        },
+        {
+          "bestand": "HDI.md",
+          "anker": "De meeteenheid is nooit de mens"
+        },
+        {
+          "bestand": "LEVEN.md",
+          "anker": "De bijdrage-spiegel is nooit vergelijkend"
+        },
+        {
+          "bestand": "FOUNDATION.md",
+          "anker": "Geen capaciteitscijfer op een mens"
+        }
+      ],
+      "citaatKapot": [],
+      "uitzonderingen": [
+        {
+          "context": "school",
+          "handeling": "opslaan",
+          "waarom": "SCHOOL.md par. 11.1 verbiedt een score BUITEN het potje (risicoscore, uitvalkans, ranglijst, blijvend niveau-label); een cijfer op een toets is de leerstof zelf en valt daar niet onder"
+        }
+      ]
+    },
+    "draag": {
+      "bron": "scripts/objectmodel.js (vormen van bewaarde dingen) + ROUTEBRON.json (routebereik)",
+      "ziet": [
+        "opslaan",
+        "tonen"
+      ],
+      "zietNiet": [
+        "projecteren",
+        "rangschikken"
+      ],
+      "zietNietWaarom": "GEMETEN en niet aangenomen: een module die ergens een persoonssleutel noemt en ergens `.map(` of `.sort(` gebruikt levert 410 respectievelijk 155 treffers -- dezelfde precisie als de woordsensor die al is afgekeurd. Zonder vorm- of graafsignaal blijven die twee handelingen onbepaald.",
+      "tonenBron": "ROUTEBRON.json (welke module handelt een API-route af)",
+      "tonenStand": "gemeten",
+      "tonenGrens": "WAT HIER GEMETEN IS, is dat de dragermodule een API-route afhandelt -- niet dat die route het oordeel TOONT. Alle veertien routes van de twee schooldragers zijn POST, en dit huis gebruikt POST ook om te lezen (/api/foundation/school/toets/lijst), dus de methode scheidt schrijven en tonen niet. `tonen` betekent hier dus: het bewaarde oordeel is van buiten de module bereikbaar. Dat is een ONDERgrens voor bereikbaarheid en een BOVENgrens voor tonen in enge zin.",
+      "dragers": [
+        {
+          "module": "server/kern/command/bijstand.js",
+          "context": "living",
+          "mens": [
+            "medewerker"
+          ],
+          "waarde": [
+            "niveau"
+          ],
+          "routes": 0,
+          "handelingen": [
+            "opslaan"
+          ]
+        },
+        {
+          "module": "server/kern/paspoort/toezicht.js",
+          "context": "living",
+          "mens": [
+            "codenaam"
+          ],
+          "waarde": [
+            "niveau"
+          ],
+          "routes": 0,
+          "handelingen": [
+            "opslaan"
+          ]
+        },
+        {
+          "module": "server/kern/paspoort/toezicht.js",
+          "context": "living",
+          "mens": [
+            "codenaam"
+          ],
+          "waarde": [
+            "niveau"
+          ],
+          "routes": 0,
+          "handelingen": [
+            "opslaan"
+          ]
+        },
+        {
+          "module": "server/school/klas.js",
+          "context": "school",
+          "mens": [
+            "leerling"
+          ],
+          "waarde": [
+            "cijfer"
+          ],
+          "routes": 8,
+          "handelingen": [
+            "opslaan",
+            "tonen"
+          ]
+        },
+        {
+          "module": "server/school/toets.js",
+          "context": "school",
+          "mens": [
+            "leerling"
+          ],
+          "waarde": [
+            "cijfer"
+          ],
+          "routes": 6,
+          "handelingen": [
+            "opslaan",
+            "tonen"
+          ]
+        }
+      ]
+    },
+    "wacht": {
+      "bron": "test/cijferopmens.test.js :: MAPPEN",
+      "stand": "gemeten",
+      "paden": [
+        "vertegenwoordiging",
+        "rugdekking",
+        "carriereledger"
+      ],
+      "contexten": [
+        "work"
+      ]
+    }
+  },
+  "telling": {
+    "GECLAIMD_GEEN_DRAGER_GEVONDEN": 52,
+    "ONBEPAALD": 4,
+    "GEDRAGEN_NIET_GEZIEN": 8
+  },
+  "bevinding": "Het verbreden van de DRAAG-as naar `tonen` zette vier nieuwe cellen op GEDRAGEN_NIET_GEZIEN: tonen | school | elk van de vier actoren. Dat is geen overtreding (zie `grens`), maar het stelt een vraag die de CLAIM-as vandaag niet KAN beantwoorden: de uitzondering voor School is verklaard op de HANDELING `opslaan` en kent geen actor. Een cijfer tonen aan de leerling zelf of aan zijn docent is dezelfde leerstof als het bewaren ervan; hetzelfde cijfer tonen aan een partner of een externe lezer is precies wat SCHOOL.md par. 11.1 tegenhoudt. De uitzondering is dus vermoedelijk te grof. Hem hier verbreden zou een DOCTRINEBESLUIT zijn, en dat neemt een mens en geen sensor -- daarom staat hij ongewijzigd en staat de vraag hier.",
+  "cellen": [
+    {
+      "handeling": "opslaan",
+      "context": "foundation",
+      "actor": "systeem",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "foundation",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "foundation",
+      "actor": "partner",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "foundation",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "school",
+      "actor": "systeem",
+      "claim": false,
+      "draag": true,
+      "wacht": false,
+      "uitslag": "ONBEPAALD",
+      "claimWaarom": "SCHOOL.md par. 11.1 verbiedt een score BUITEN het potje (risicoscore, uitvalkans, ranglijst, blijvend niveau-label); een cijfer op een toets is de leerstof zelf en valt daar niet onder"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "school",
+      "actor": "medewerker",
+      "claim": false,
+      "draag": true,
+      "wacht": false,
+      "uitslag": "ONBEPAALD",
+      "claimWaarom": "SCHOOL.md par. 11.1 verbiedt een score BUITEN het potje (risicoscore, uitvalkans, ranglijst, blijvend niveau-label); een cijfer op een toets is de leerstof zelf en valt daar niet onder"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "school",
+      "actor": "partner",
+      "claim": false,
+      "draag": true,
+      "wacht": false,
+      "uitslag": "ONBEPAALD",
+      "claimWaarom": "SCHOOL.md par. 11.1 verbiedt een score BUITEN het potje (risicoscore, uitvalkans, ranglijst, blijvend niveau-label); een cijfer op een toets is de leerstof zelf en valt daar niet onder"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "school",
+      "actor": "externeLezer",
+      "claim": false,
+      "draag": true,
+      "wacht": false,
+      "uitslag": "ONBEPAALD",
+      "claimWaarom": "SCHOOL.md par. 11.1 verbiedt een score BUITEN het potje (risicoscore, uitvalkans, ranglijst, blijvend niveau-label); een cijfer op een toets is de leerstof zelf en valt daar niet onder"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "work",
+      "actor": "systeem",
+      "claim": true,
+      "draag": false,
+      "wacht": true,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "work",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": false,
+      "wacht": true,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "work",
+      "actor": "partner",
+      "claim": true,
+      "draag": false,
+      "wacht": true,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "work",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": false,
+      "wacht": true,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "living",
+      "actor": "systeem",
+      "claim": true,
+      "draag": true,
+      "wacht": false,
+      "uitslag": "GEDRAGEN_NIET_GEZIEN"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "living",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": true,
+      "wacht": false,
+      "uitslag": "GEDRAGEN_NIET_GEZIEN"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "living",
+      "actor": "partner",
+      "claim": true,
+      "draag": true,
+      "wacht": false,
+      "uitslag": "GEDRAGEN_NIET_GEZIEN"
+    },
+    {
+      "handeling": "opslaan",
+      "context": "living",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": true,
+      "wacht": false,
+      "uitslag": "GEDRAGEN_NIET_GEZIEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "foundation",
+      "actor": "systeem",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "foundation",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "foundation",
+      "actor": "partner",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "foundation",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "school",
+      "actor": "systeem",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "school",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "school",
+      "actor": "partner",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "school",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "work",
+      "actor": "systeem",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "work",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "work",
+      "actor": "partner",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "work",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "living",
+      "actor": "systeem",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "living",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "living",
+      "actor": "partner",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "projecteren",
+      "context": "living",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "foundation",
+      "actor": "systeem",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "foundation",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "foundation",
+      "actor": "partner",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "foundation",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "school",
+      "actor": "systeem",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "school",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "school",
+      "actor": "partner",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "school",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "work",
+      "actor": "systeem",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "work",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "work",
+      "actor": "partner",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "work",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "living",
+      "actor": "systeem",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "living",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "living",
+      "actor": "partner",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "rangschikken",
+      "context": "living",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "foundation",
+      "actor": "systeem",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "foundation",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "foundation",
+      "actor": "partner",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "foundation",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "school",
+      "actor": "systeem",
+      "claim": true,
+      "draag": true,
+      "wacht": false,
+      "uitslag": "GEDRAGEN_NIET_GEZIEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "school",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": true,
+      "wacht": false,
+      "uitslag": "GEDRAGEN_NIET_GEZIEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "school",
+      "actor": "partner",
+      "claim": true,
+      "draag": true,
+      "wacht": false,
+      "uitslag": "GEDRAGEN_NIET_GEZIEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "school",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": true,
+      "wacht": false,
+      "uitslag": "GEDRAGEN_NIET_GEZIEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "work",
+      "actor": "systeem",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "work",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "work",
+      "actor": "partner",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "work",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "living",
+      "actor": "systeem",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "living",
+      "actor": "medewerker",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "living",
+      "actor": "partner",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    },
+    {
+      "handeling": "tonen",
+      "context": "living",
+      "actor": "externeLezer",
+      "claim": true,
+      "draag": false,
+      "wacht": false,
+      "uitslag": "GECLAIMD_GEEN_DRAGER_GEVONDEN"
+    }
+  ]
+}

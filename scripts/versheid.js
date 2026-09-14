@@ -144,6 +144,10 @@ const REGISTERS = [
      bij, of wordt een toets hernoemd, dan is de vorige recall het antwoord op een
      oudere vraag. */
   ['VERBAND.json', 'npm run verband', 'of een onafhankelijke waarnemer de bekende wet->wachter-randen zelf terugvindt'],
+  /* De bereikmeting veroudert met de DOCTRINE, met de PRODUCTVORMEN en met de
+     WACHTER tegelijk: elk van de drie assen kan verschuiven zonder dat de andere
+     twee bewegen, en dan is de vorige vergelijking er een van gisteren. */
+  ['GELDING.json', 'npm run gelding', 'waar een wet geldt, waar hij leeft en waar een wachter hem kan zien'],
   /* DE EERSTE MINUUT. Hij hoort hier en niet in BUITEN, want hij is geen afdruk
      uit de code maar een METING VAN GEDRAG: een vers lid, de echte registratie,
      een echte browser op 390x844. Verandert de onboarding, het menu of het

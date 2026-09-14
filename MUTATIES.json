@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-14T21:23:23.824Z",
-    "commit": "5efb4263",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-14T22:33:09.348Z",
+    "commit": "6efd4f1a",
+    "boomVuil": true,
+    "boomAnders": 29,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -3674,6 +3674,13 @@
       "operator": "true->false#0",
       "gezakt": 3,
       "geprobeerd": 7
+    },
+    "idemcontract.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "idemproef.test.js": {
       "soort": "puur",

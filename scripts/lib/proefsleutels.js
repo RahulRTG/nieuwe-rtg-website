@@ -253,15 +253,38 @@ const PASLADDER = ['member', 'lid-lifestyle', 'lid-business'];
      ontbreekt -- [{rol, waarom}] van wat niet lukte, met de reden waarom die
                   weg zou moeten werken; zo is een storing te onderscheiden van
                   een rol die deze opstelling nooit kan hebben
-     hernieuw  -- (rol) => opnieuw munten (tokens verlopen onderweg)  */
+     hernieuw  -- (rol) => opnieuw munten (tokens verlopen onderweg)
+     laatsteInlogStaat -- () => de opslagstand VAN NA de laatste inlog, of null  */
 async function haalSleutels({ post }) {
   const tokens = {};
   const waaroms = {};
   const ontbreekt = [];
+
+  /* WAT EEN INLOG SCHRIJFT, EN WAAROM DAT HIER WORDT BIJGEHOUDEN.
+
+     Een inlog is geen leesactie: gemeten op 14 september 2026 schrijft
+     /api/login `sessions` en /api/auth/login `securityLog`, `sessiecontext` en
+     `foundation`. Een proef die onderweg een token hermunt, meet dat werk
+     vervolgens als het werk van de route die daarna aan de beurt is -- en
+     `sessions` staat in server/kern/isolatie/effectcollecties.js als
+     IDENTITEIT_WIJZIGEN, dus die toerekening wordt een EFFECT dat er niet is.
+
+     De sleutelbos is de enige plek waar dit huis inlogt, dus is dit de enige
+     plek waar het moment van NA een inlog bekend is. We houden de stand bij die
+     het antwoord van de inlog zelf droeg -- geen extra oproep, en exact het
+     juiste ijkpunt: alles wat de inlog schreef staat erin, alles wat de route
+     daarna doet nog niet. Blijft `null` zolang er geen X-RTG-Staat-kop is; dan
+     heeft de proef geen tweede meetpunt en valt er niets te herijken. */
+  let laatsteStaat = null;
+  const postMeeKijkend = async (...args) => {
+    const st = await post(...args);
+    if (st && st.staat != null) laatsteStaat = st.staat;
+    return st;
+  };
   for (const [rol, waarom, munt] of MUNTERS) {
     waaroms[rol] = waarom;
     let t = null;
-    try { t = await munt(post, tokens); } catch (e) { t = null; }
+    try { t = await munt(postMeeKijkend, tokens); } catch (e) { t = null; }
     /* `t != null` en niet `if (t)`: de lege string IS een geldige sleutel voor de
        drie lege-sleutelrollen hierboven, en een waarheidstoets gooit hem weg.
        Dat is precies hoe 107 openbare routes als ongemeten konden tellen. */
@@ -275,10 +298,10 @@ async function haalSleutels({ post }) {
          is het kind ook dood. Munt de keten dus opnieuw vanaf de bron. */
       if (rol !== 'eigenaar' && rij[2].length > 1) {
         const bron = MUNTERS.find(m => m[0] === 'eigenaar');
-        const e = await bron[2](post, tokens);
+        const e = await bron[2](postMeeKijkend, tokens);
         if (e) tokens.eigenaar = e;
       }
-      const t = await rij[2](post, tokens);
+      const t = await rij[2](postMeeKijkend, tokens);
       if (t) { tokens[rol] = t; return true; }
     } catch (e) { /* onder */ }
     return false;
@@ -316,6 +339,7 @@ async function haalSleutels({ post }) {
   const inlog = Object.fromEntries(MUNTERS.map(([rol, , munt]) => [rol, () => munt(post, tokens)]));
 
   return { tokens, rollen, ontbreekt, waaroms, hernieuw, zaakbureau, inlog,
+    laatsteInlogStaat: () => laatsteStaat,
     tokenVoor: (rol) => tokens[rol] };
 }
 

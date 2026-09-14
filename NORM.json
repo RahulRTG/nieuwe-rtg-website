@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2404,
+    "bewijsAchterstand": 2407,
     "bewijsAlleenKeten": 16,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -59,8 +59,8 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1667,
-    "toetsenNietGemeten": 618,
+    "testbestanden": 1668,
+    "toetsenNietGemeten": 619,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -90,7 +90,7 @@
     "bevestigGebreken": 0,
     "verwijzingGebreken": 0,
     "mensmutatieZonderWacht": 1,
-    "gevolgPadenOnbekend": 96,
+    "gevolgPadenOnbekend": 95,
     "gevolgContractVolledig": 8,
     "gevolgContractenGezakt": 0,
     "crashasOnbekend": 63,
@@ -2340,6 +2340,26 @@
       "meter": "stilleOpslag 24 -> 25",
       "reden": "server/effectbon.js schrijft de effectbon in een try/catch met een lege vanger, zodat een mislukte bon het antwoord niet breekt. De stilspoormeter telt dit terecht als één extra stil weggevaagde opslagfout.",
       "waarheen": "Het falen van de effectbon zichtbaar melden of de opslagroute zo inrichten dat de lege vanger kan verdwijnen."
+    },
+    {
+      "datum": "2026-09-14",
+      "meter": "bewijsAchterstand 2404 -> 2407",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2404,
+      "vervalt": "2026-12-15",
+      "reden": "Drie routes deden in deze ronde WEL werk waar de vorige niets zag: /api/boardroom/betalingen/proef, /api/mediaos/aanwezig/zoek en /api/mediaos/momenten. Daarmee hebben ze een tweede keer om over te beslissen, en die uitspraak staat nog niet in IDEMBESLUIT.json -- post idem-ongeclassificeerd 1592 -> 1595. Er is dus niets slechter geworden: er kwam iets in beeld dat er al was. GEMETEN en niet afgeleid uit het verschil in de teller: de werk-rijen van beide rondes naast elkaar gelegd geeft 1715 -> 1718, en de drie namen komen daaruit.",
+      "waarheen": "Die drie routes classificeren in IDEMBESLUIT.json; dan zakt de tand vanzelf terug naar 2404 of lager."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 618,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 618 -> 619",
+      "reden": "De derde integratieronde na #267 voegt twee toetsbestanden toe waar de mutatiemotor nog niet langs is geweest: test/fiscaal-meegeleverd.test.js en test/idemcontract.test.js. De toetsen draaien wel; deze post zegt uitsluitend dat hun gevoeligheid nog niet door een volledige mutatieronde is bewezen. Het getal stijgt met een en niet met twee omdat de meter per toets telt en niet per bestand. MUTATIES.json is NIET hergedraaid: die motor duurt uren, schrijft in echte bronbestanden en hoort op een schone boom te draaien, dus hij zit in ronde.yml en niet in ci.yml -- de bundel draagt de meting van de main-lijn.",
+      "waarheen": "De twee toetsen meenemen in de volgende volledige npm run mutatie op een schone boom, samen met de zeven van 14 september."
     }
   ],
   "prestatie": {

@@ -15,6 +15,10 @@ const { zzpBerekening } = require('./zzp');
 // de factuur van de klant vraagt het aan dezelfde routine; zie ./tarief.js
 const tarief = require('./tarief');
 const { zekerheid, zin } = require('./zekerheid');
+/* De afrondregel voor de btw op EEN regel. Rechtstreeks gerequired en niet
+   meegegeven: het is een pure som zonder opslag, en hij hoort dezelfde te zijn
+   als die de aangifte gebruikt (kern/fiscaal/btwtelling.js). */
+const { btwCenten } = require('../afgeleid');
 
 function maakFiscaal({ db, rondEuro, btwSplit, jaargangen }) {
   const centen = rondEuro;
@@ -52,8 +56,14 @@ function maakFiscaal({ db, rondEuro, btwSplit, jaargangen }) {
       if (!Number.isFinite(bedrag) || bedrag === 0) return;
       const t = regelbron.tariefOp(landCode, cat, String(datum || '').slice(0, 10));
       const sleutel = cat + '@' + t;
-      const p = potten[sleutel] || (potten[sleutel] = { cat, tarief: t, omzet: 0 });
+      const p = potten[sleutel] || (potten[sleutel] = { cat, tarief: t, omzet: 0, btwC: 0 });
       p.omzet += bedrag;
+      /* DE BTW WORDT HIER AFGEROND EN NIET STRAKS OVER DE SOM. `tel()` wordt per
+         REGEL aangeroepen, net als de aangifte per factuurregel telt, dus met
+         dezelfde afrondregel (kern/afgeleid.js) komen beide kanten op exact
+         hetzelfde getal uit. Splitsen over de opgetelde omzet deed dat niet: bij
+         9% liep de aangifte er een cent naast. */
+      p.btwC += btwCenten(bedrag, t);
     };
     /* TWEE GEBEURTENISSEN PER BON, ELK IN ZIJN EIGEN MAAND.
 
@@ -134,7 +144,12 @@ function maakFiscaal({ db, rondEuro, btwSplit, jaargangen }) {
     }
     const gcOpen = centen(kaarten.reduce((x, g) => x + g.saldo, 0));
     const btw = Object.values(potten)
-      .map(p => ({ cat: p.cat, label: FIN_CAT[p.cat] || p.cat, ...btwSplit(p.omzet, p.tarief) }))
+      .map(p => {
+        const omzet = Math.round(p.omzet * 100) / 100;
+        const btwBedrag = p.btwC / 100;
+        return { cat: p.cat, label: FIN_CAT[p.cat] || p.cat, omzet, tarief: p.tarief,
+          grondslag: Math.round((omzet - btwBedrag) * 100) / 100, btw: btwBedrag };
+      })
       .sort((a, b) => b.omzet - a.omzet);
     // personeelskosten uit de klokuren van deze maand
     const uurloon = (s.settings && Number(s.settings.uurloon)) || 16;

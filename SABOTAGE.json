@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-14T07:28:19.321Z",
-    "commit": "9dc8dbfa",
+    "op": "2026-09-14T15:24:44.861Z",
+    "commit": "814be90c",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/sabotage.js",
@@ -370,9 +370,9 @@
     "leven-geen-capaciteitscijfer-op-een-mens": {
       "stand": "raak",
       "afdruk": "bc08f209cc51f06e",
-      "reden": "3. geen cijfer op een mens in de carrierekant, de Foundation en School",
+      "reden": "3. geen cijfer op een mens in de carrierekant, de Foundation, School, rtfos en command",
       "wachter": "test:test/cijferopmens.test.js",
-      "duurMs": 215
+      "duurMs": 195
     }
   }
 }

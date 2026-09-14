@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1886 bestanden en 13506 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1887 bestanden en 13513 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1886 |
-| losse beweringen (`test(...)`) | 13506 |
+| toetsbestanden | 1887 |
+| losse beweringen (`test(...)`) | 13513 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1247 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1248 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
 | alleen in de kop *genoemd*, nog niet gemeten | 166 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1669 bestanden, 13123 beweringen.
+1670 bestanden, 13130 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -712,6 +712,7 @@ toets omvalt.
 | `lab2-werk.test.js` | 14 | gezakt op `liegpoort /api/` | Het KANTOORWERK van het RTF Living Lab: het bestuur van een lab (budget, partners), het stafbeeld op een lab, het vraagstuk, "wat nu", de deelnemers en hun rollen, de werkplaats (taken, agenda, documenten, logboek,... |
 | `labfonds-onderzoek.test.js` | 8 | -- | DE SCHAKEL TUSSEN HET LAB-FONDS EN HET ONDERZOEK -- wat is er met mijn bijdrage onderzocht? Het fonds haalde geld op VOOR onderzoek en wist niet WELK; een lid kon zien dat het aan de pot van Amsterdam had bijgedragen... |
 | `labfonds.test.js` | 4 | gezakt op `===->!==#0` | Het Lab-fonds (kern/labfonds.js): leden zamelen in voor het RTF Onderzoekslab, per locatie verdeeld, en beslissen gezamenlijk met de AI-scheidsrechter. |
+| `landdekking.test.js` | 7 | gezakt op `===->!==#0` | DE LANDDEKKING (scripts/landdekking.js, LANDDEKKING.json). WAT DEZE TOETS BEWAAKT, en wat met opzet niet. |
 | `landpakket.test.js` | 6 | gezakt op `===->!==#0` | Landpakketten (kern/command/landpakket.js): een land aanzetten als configuratiebundel. WAT DEZE TOETS VOORAL BEWAAKT is dat "geactiveerd" nooit gaat lezen als "in orde". |
 | `lcov.test.js` | 12 | genoemd | HET REGRESSIECORPUS VAN DE LCOV-SAMENVOEGING. Deze code bepaalt of de dekkingsvloer wordt gehaald wanneer de suite over parallelle scherven is verdeeld. |
 | `leden-gids-pg.test.js` | 1 | slaat zichzelf over | Integratietest voor de Postgres-ledengids (member_dir): met DATABASE_URL gezet staat de codenaam/pas-gids als GEINDEXEERDE RIJEN in Postgres in plaats van als object in het geheugen. Een nieuw lid dat zich meldt... |

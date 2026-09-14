@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2403,
+    "bewijsAchterstand": 2404,
     "bewijsAlleenKeten": 16,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -59,8 +59,8 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1666,
-    "toetsenNietGemeten": 611,
+    "testbestanden": 1667,
+    "toetsenNietGemeten": 618,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -93,10 +93,10 @@
     "gevolgPadenOnbekend": 96,
     "gevolgContractVolledig": 8,
     "gevolgContractenGezakt": 0,
-    "crashasOnbekend": 89,
+    "crashasOnbekend": 63,
     "crashasNietMeetbaar": 0,
     "crashproefGezakt": 0,
-    "crashproefGeenLijf": 11,
+    "crashproefGeenLijf": 1,
     "crashproefGeenWereld": 1,
     "crashproefGeenRol": 1,
     "crashproefOnbepaald": 0,
@@ -108,8 +108,8 @@
     "geldRoutesMeldOnbesloten": 45,
     "geldRoutesValsSucces": 28,
     "stilSpoor": 18,
-    "stilleOpslag": 24,
-    "stilSpoorAanroepen": 221
+    "stilleOpslag": 25,
+    "stilSpoorAanroepen": 228
   },
   "notities": [
     {
@@ -2310,6 +2310,36 @@
       "meter": "gevolgPadenOnbekend 87 -> 96",
       "reden": "De bijgewerkte gevolgtoerekenings-PR voegt routes en gevolgcontracten toe. Na hermeting over de volledige schone boom blijven negen extra bereikbare handelingen zonder gemeten gevolg; tegelijk stijgt het aantal geldige volledige contracten van zes naar acht en geen contractproef zakt.",
       "waarheen": "Voor de negen paden het werkelijke gevolg meten en vastleggen, zodat zij uit de onbekende post verdwijnen."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2403,
+      "vervalt": "2026-12-15",
+      "meter": "bewijsAchterstand 2403 -> 2404",
+      "reden": "De laatste bijgewerkte PR-koppen voegen één muterende route toe die nog geen uitspraak over herhaling draagt. De verse BEWIJSSCHULD-meting maakt die route zichtbaar in plaats van haar buiten de noemer te houden.",
+      "waarheen": "De route classificeren in IDEMBESLUIT.json en de bijbehorende herhaalproef uitvoeren."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 611,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 611 -> 618",
+      "reden": "De tweede integratieronde en de mobiele bedieningsreparatie voegen zeven toetsbestanden toe waar de mutatiemotor nog niet langs is geweest. De toetsen draaien wel; deze post zegt uitsluitend dat hun gevoeligheid nog niet door de volledige mutatieronde is bewezen.",
+      "waarheen": "De zeven toetsen meenemen in de volgende volledige npm run mutatie op een schone boom."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "stilleOpslag",
+      "van": 24,
+      "vervalt": "2026-12-15",
+      "meter": "stilleOpslag 24 -> 25",
+      "reden": "server/effectbon.js schrijft de effectbon in een try/catch met een lege vanger, zodat een mislukte bon het antwoord niet breekt. De stilspoormeter telt dit terecht als één extra stil weggevaagde opslagfout.",
+      "waarheen": "Het falen van de effectbon zichtbaar melden of de opslagroute zo inrichten dat de lege vanger kan verdwijnen."
     }
   ],
   "prestatie": {
@@ -2330,7 +2360,7 @@
   "sinds": {
     "keuringOmvang": "2026-09-13",
     "testbestanden": "2026-09-14",
-    "toetsenNietGemeten": "2026-09-11",
+    "toetsenNietGemeten": "2026-09-14",
     "inlineStijlAttributen": "2026-09-11",
     "ratelTanden": "2026-09-14",
     "metingenZonderRatel": "2026-08-18",
@@ -2392,7 +2422,7 @@
     "gevolgPadenOnbekend": "2026-09-14",
     "gevolgContractVolledig": "2026-09-14",
     "gevolgContractenGezakt": "2026-09-13",
-    "crashasOnbekend": "2026-09-13",
+    "crashasOnbekend": "2026-09-14",
     "crashasNietMeetbaar": "2026-09-13",
     "crashproefGezakt": "2026-09-13",
     "crashproefGeenLijf": "2026-09-14",

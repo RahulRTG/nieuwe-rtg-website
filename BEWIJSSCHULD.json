@@ -1,9 +1,9 @@
 {
  "stempel": {
-  "op": "2026-09-14T07:21:27.807Z",
-  "commit": "e2db522dc",
+  "op": "2026-09-14T10:59:13.051Z",
+  "commit": "c3fd70bd9",
   "boomVuil": false,
-  "boomAnders": 8,
+  "boomAnders": 3,
   "instrument": "scripts/bewijsschuld.js",
   "node": "v24.18.0"
  },
@@ -11,14 +11,14 @@
  "grens": "Dit is een lijst van wat we WETEN dat we niet hebben gemeten. Wat niemand heeft bedacht staat er per definitie niet in, en dat is de gevaarlijkste categorie -- een schuldenlijst is geen dekkingsbewijs. De aantallen komen uit de registers en zijn dus zo vers als de laatste ronde; zie scripts/versheid.js.",
  "telling": {
   "posten": 18,
-  "meetwerk": 2080,
+  "meetwerk": 2081,
   "instrument": 323,
   "grens": 645
  },
  "aflossing": {
   "doel": 0,
   "wat": "de achterstand (meetwerk + instrument) gaat naar nul. `grens` telt niet mee en sluit nooit -- dat is de rand van de methode en geen werk.",
-  "staat": 2403,
+  "staat": 2404,
   "regels": [
    "de achterstand mag nooit groeien zonder een reden IN dit register (--groei=...)",
    "een post mag niet van soort veranderen om onder de poort uit te komen: naar `grens` verplaatsen laat de achterstand dalen zonder dat er iets gemeten is",
@@ -28,7 +28,7 @@
  },
  "gemeten": {
   "postenTotaal": 18,
-  "achterstand": 2403,
+  "achterstand": 2404,
   "randVanDeMethode": 645,
   "auth-onbeslist": 1,
   "capability-in-handler": 549,
@@ -46,7 +46,7 @@
   "gevolg-onbekend": 95,
   "droogloop-onbeoordeeld": 2,
   "herstel-onbevestigd": 49,
-  "idem-ongeclassificeerd": 1591,
+  "idem-ongeclassificeerd": 1592,
   "wegwerpserver-kopieen": 3
  },
  "posten": [
@@ -182,7 +182,7 @@
    "id": "idem-ongeclassificeerd",
    "soort": "meetwerk",
    "wat": "muterende routes zonder uitspraak over herhalen: wat gebeurt er bij een tweede keer",
-   "aantal": 1591,
+   "aantal": 1592,
    "waarom": "autonomie zonder herhaalsemantiek is niet te doen: een keten die halverwege afbreekt moet weten of opnieuw beginnen veilig is. Het doel is niet dat alles idempotent IS -- het is dat van elke route vastligt wat een tweede keer betekent.",
    "sluit": "per route beslissen en vastleggen. Het instrument staat (scripts/idemproef-route.js plus IDEMBESLUIT.json met zijn klassen); dit is meetwerk en handwerk."
   },
@@ -431,7 +431,7 @@
    },
    {
     "op": "2026-09-14",
-    "aantal": 1591
+    "aantal": 1592
    }
   ],
   "wegwerpserver-kopieen": [
@@ -583,6 +583,12 @@
    "van": 2384,
    "naar": 2403,
    "reden": "Nieuwe-gevolg-en-idemroutes-uit-de-samengevoegde-PR-koppen-zijn-nu-zichtbaar"
+  },
+  {
+   "op": "2026-09-14",
+   "van": 2403,
+   "naar": 2404,
+   "reden": "De-laatste-bijgewerkte-PR-koppen-maken-een-extra-idemroute-zichtbaar"
   }
  ]
 }

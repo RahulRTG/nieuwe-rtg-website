@@ -56,6 +56,32 @@
 
    Aanroeper: test/tariefindeling.test.js. */
 'use strict';
+const fs = require('fs');
+const path = require('path');
+
+/* DE MEEGELEVERDE WETSWIJZIGINGEN ERBIJ. De basistabel draagt het PEILJAAR, dus
+   een land waarvan de wet daarna veranderde wijkt daar TERECHT van af -- en dan
+   is "de basis klopt niet" een verkeerde uitslag. Wat deze meter moet vragen is:
+   komt RTG voor VANDAAG op het tarief dat de regel voorschrijft, via de basis of
+   via een jaargang (server/kern/fiscaal/meegeleverd/)?
+
+   Lezen mag: dit zijn gegevensbestanden, geen code. De meter draait de projectie
+   niet na -- hij leest alleen welke wijziging met welke ingangsdatum meegeleverd
+   is, en dat is genoeg voor de vraag die hij stelt. */
+const MEEGELEVERD = path.join(__dirname, '..', 'server', 'kern', 'fiscaal', 'meegeleverd');
+
+function meegeleverdeWijzigingen() {
+  const uit = {};
+  let namen = [];
+  try { namen = fs.readdirSync(MEEGELEVERD).filter(n => n.endsWith('.json')); } catch (e) { return uit; }
+  for (const naam of namen) {
+    let j;
+    try { j = JSON.parse(fs.readFileSync(path.join(MEEGELEVERD, naam), 'utf8')); } catch (e) { continue; }
+    if (!j || !j.land) continue;
+    (uit[j.land] = uit[j.land] || []).push(j);
+  }
+  return uit;
+}
 
 /* De eigenschap waar het tarief in dit land op scharniert. Vier waardes, en ze
    sluiten elkaar niet uit -- JP draagt er twee. */
@@ -154,10 +180,22 @@ const INDELING = {
    structureel tekort en geen instelling die iemand vergat bij te werken.
 
    PUUR: de tabel komt binnen, er wordt niets opgeslagen en niets veranderd. */
-function meetLand(cc, tar) {
+function meetLand(cc, tar, wijzigingen) {
   const r = INDELING[cc];
   if (!r) return { land: cc, stand: 'onbekend', reden: 'de regel van dit land is niet nagezocht' };
   const v = r.verwacht;
+  /* De stand van VANDAAG: de basis plus elke meegeleverde wijziging die al is
+     ingegaan. Een wijziging met een datum in de toekomst telt niet mee -- die
+     ligt klaar en doet nog niets, precies zoals de projectie hem behandelt. */
+  const nu = new Date().toISOString().slice(0, 10);
+  const viaJaargang = {};
+  tar = { ...tar };
+  for (const j of (wijzigingen || [])) {
+    if (!j.geldigVanaf || j.geldigVanaf > nu) continue;
+    for (const [k, w] of Object.entries((j.wijzigingen && j.wijzigingen.tarieven) || {})) {
+      if (k in tar && Number.isFinite(Number(w))) { tar[k] = Number(w); viaJaargang[k] = j.versie || j.geldigVanaf; }
+    }
+  }
   const eenBakGenoeg = v.alcoholvrij === v.alcohol;
   const punten = [];
   if (tar.eten !== v.eten) {
@@ -172,12 +210,17 @@ function meetLand(cc, tar) {
   return {
     land: cc, beslist: r.beslist, gezag: r.gezag, rechtsgrond: r.rechtsgrond,
     eenBakGenoeg, verwacht: v, nu: { eten: tar.eten, drank: tar.drank },
+    /* Welk veld zijn tarief van vandaag aan een jaargang dankt in plaats van aan
+       de basistabel. Leeg is niet hetzelfde als "geen jaargang nodig": het zegt
+       alleen dat de basis het vandaag zelf al goed heeft. */
+    viaJaargang: Object.keys(viaJaargang).length ? viaJaargang : null,
     stand: punten.length ? 'wijktAf' : 'klopt', punten,
   };
 }
 
 function meet(LANDEN) {
-  const rijen = Object.keys(LANDEN).map(cc => meetLand(cc, (LANDEN[cc] || {}).tarieven || {}));
+  const mee = meegeleverdeWijzigingen();
+  const rijen = Object.keys(LANDEN).map(cc => meetLand(cc, (LANDEN[cc] || {}).tarieven || {}, mee[cc]));
   const nagezocht = rijen.filter(x => x.stand !== 'onbekend');
   const punten = [].concat(...nagezocht.map(x => x.punten || []));
   return {
@@ -201,4 +244,4 @@ function meet(LANDEN) {
   };
 }
 
-module.exports = { INDELING, BESLIST, meet, meetLand };
+module.exports = { INDELING, BESLIST, meet, meetLand, meegeleverdeWijzigingen };

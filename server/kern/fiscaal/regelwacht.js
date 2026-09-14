@@ -97,6 +97,12 @@ module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl, nu, bronnen }) => {
     return jaargangen.projecteer();
   }
 
+  /* De meegeleverde wetswijzigingen (./meegeleverd/): de basistabel draagt het
+     peiljaar, een wet die daarna veranderde staat daar als jaargang met haar
+     ingangsdatum. Het laden zelf staat hiernaast; zie die kop voor waarom een
+     CORRECTIE er juist niet in hoort. */
+  const laadMeegeleverd = () => require('./meegeleverd').laad(pasToe);
+
   /* De dagelijkse controle: met een bron halen we de nieuwste tabellen op;
      zonder bron is de status "peiljaar als basis". Nooit een crash: een
      onbereikbare of rare bron laat de huidige regels gewoon staan. */
@@ -164,5 +170,5 @@ module.exports = ({ db, save, LANDEN, peiljaar, fetchImpl, nu, bronnen }) => {
         bijgewerkt: (bak[cc] || []).length > 0 })).sort((a, b) => a.naam.localeCompare(b.naam)) };
   }
 
-  return { regelwacht: { pasToe, herstelOverlay, migreerOverlay, check, status, jaargangen } };
+  return { regelwacht: { pasToe, herstelOverlay, laadMeegeleverd, migreerOverlay, check, status, jaargangen } };
 };

@@ -107,11 +107,30 @@ test('3. een verklaarde eigenaar bestaat, en een handmatig register heeft een le
    (dezelfde vorm als de sensor die `w.handhaver` teruggaf in
    test/verband.test.js). Eigenaren erbij zetten is mensenwerk, een paar per
    keer, met iemand die kijkt of het klopt. */
+/* 141 -> 146 OP 14 SEPTEMBER 2026, EN DE REDEN IS NIET "ER KWAMEN ER VIJF BIJ".
+   Deze wachter is zelf nieuw: scripts/lib/registereigenaar.js bestaat niet op
+   main en kwam met de tak die hem bouwde. Zijn vloer van 141 is daarom gemeten
+   op EEN TAK, en die tak liep achter op main -- dertien wortelregisters die main
+   allang had (AANVOERVORM, ADAMPROEF, CRASHAS, CRASHPROEF, DOELGROEPBEREIK,
+   GEVOLGDEKKING, MACHINEDEKKING, MOMENTPROEF, OMZETPROEF, ONDERNEMERBEWIJS,
+   STAGEVORM, WEKDEKKING, ZAAKLIVEPROEF) stonden er niet in, en drie zijn echt
+   nieuw uit andere takken van deze bundel (MELDBESLUIT, REFUNDMIGRATIE,
+   SCHRIJFPROEF).
+
+   DAT IS DE LES EN NIET HET GETAL: een vloer die op een tak wordt vastgelegd,
+   meet de wereld van die tak. Hij leest daarna als een belofte over het huis
+   terwijl hij een momentopname van een werkbank was -- dezelfde vorm als een
+   register met een stempel van een andere commit. 146 is de eerste meting op een
+   boom waar alle elf takken en main samen in staan.
+
+   De weg omlaag blijft wat hierboven staat: eigenaren erbij zetten is mensenwerk,
+   een paar per keer, en NOOIT gevuld uit detecteer(). */
 test('4. het aantal registers zonder verklaarde eigenaar mag dalen en niet stijgen', () => {
   const onbekend = wortelregisters().filter(r => !EIGENAAR[r]);
-  assert.ok(onbekend.length <= 141,
-    'er zijn ' + onbekend.length + ' wortelregisters zonder verklaarde eigenaar, en de vloer staat op 141 ' +
-    '(was 127 op 13 september 2026; de bundel van elf PR\'s bracht er veertien bij). Het getal hoort te ' +
+  assert.ok(onbekend.length <= 146,
+    'er zijn ' + onbekend.length + ' wortelregisters zonder verklaarde eigenaar, en de vloer staat op 146 ' +
+    '(127 op 13 september 2026, 141 na de bundel van elf PR\'s, 146 na de tweede bundel -- zie de ' +
+    'toelichting hierboven: de vloer van 141 was op een achterlopende tak gemeten). Het getal hoort te ' +
     'dalen doordat er eigenaren bijkomen, niet te stijgen doordat er registers bijkomen zonder dat iemand ' +
     'zegt wie ze bezit.');
 

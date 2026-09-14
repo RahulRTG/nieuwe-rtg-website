@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2404,
+    "bewijsAchterstand": 2419,
     "bewijsAlleenKeten": 16,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -2340,6 +2340,16 @@
       "meter": "stilleOpslag 24 -> 25",
       "reden": "server/effectbon.js schrijft de effectbon in een try/catch met een lege vanger, zodat een mislukte bon het antwoord niet breekt. De stilspoormeter telt dit terecht als één extra stil weggevaagde opslagfout.",
       "waarheen": "Het falen van de effectbon zichtbaar melden of de opslagroute zo inrichten dat de lege vanger kan verdwijnen."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2404,
+      "vervalt": "2026-12-15",
+      "meter": "bewijsAchterstand 2404 -> 2419",
+      "reden": "De idempotentieproef kreeg een wereld voor het Lab-fonds en meet daardoor vijftien routes die zij eerder niet kon bereiken (beschermd 1681 -> 1696, ongemeten 3241 -> 3236). De post idem-ongeclassificeerd telt routes die WERK deden minus die met een besluit in IDEMBESLUIT.json, dus elke nieuw meetbare route zonder besluit landt hier: 1592 -> 1607, precies +15. Het is ONTDEKTE schuld en geen nieuwe -- die vijftien muteerden altijd al en verstopten zich achter \"de proef kwam er niet bij\". De schuld zelf oplossen kan deze tak niet: MUTATIECONTRACT.md zegt dat een stand nooit uit bewijs wordt afgeleid, want het bewijs draagt een voorstel en een MENS draagt het besluit.",
+      "waarheen": "Die vijftien routes een besluit geven in IDEMBESLUIT.json (de klasse tebeslissen staat daar juist voor open), door een mens en niet afgeleid uit de meting."
     }
   ],
   "prestatie": {

@@ -253,9 +253,17 @@ test('HET REGISTER IS SAMENGESTELD, en een dubbele definitie valt om bij het LAD
      toen er twee pay-delen bijkwamen zei deze toets dat het register niet de som van zijn
      delen was -- terwijl het dat wel was; de toets kende de som niet. Een lijst delen die
      met de hand meegroeit, is precies de tweede waarheid die dit register vermijdt. */
-  const DELEN = ['register-bank', 'register-bank-bevestig', 'register-lid', 'register-pay-oplaad', 'register-pay-stuur',
-    'register-pay-factuur', 'register-pay-klompje', 'register-pay-klompje-betaal']
-    .map(n => [n + '.js', Object.values(require('../server/kern/stuur/gevolgcontract/' + n))[0]]);
+  /* EN DE LIJST WORDT GELEZEN EN NIET GETYPT. Hij stond hier als acht namen, met de
+     waarschuwing erboven dat een handlijst meegroeit -- en precies dat gebeurde bij het
+     negende deel: de laatste vergelijking zei dat het register niet de som van zijn delen
+     was terwijl het dat wel was. Nu komt de lijst uit de MAP, dus een nieuw deel dat
+     vergeten wordt in register.js laat deze toets zakken in plaats van hem groen te houden
+     op een verouderde lijst. */
+  const fsd = require('fs');
+  const padd = require('path');
+  const MAP = padd.join(__dirname, '..', 'server', 'kern', 'stuur', 'gevolgcontract');
+  const DELEN = fsd.readdirSync(MAP).filter(n => /^register-.+\.js$/.test(n)).sort()
+    .map(n => [n, Object.values(require(padd.join(MAP, n)))[0]]);
   assert.ok(DELEN.length >= 4, 'de delenlijst is leeg of onvolledig');
   for (const [naam, deel] of DELEN)
     assert.ok(deel && Object.keys(deel).length, naam + ' levert geen enkel contract');

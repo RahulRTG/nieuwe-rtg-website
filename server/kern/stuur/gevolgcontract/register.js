@@ -24,6 +24,11 @@
      ./register-pay-klompje.js en ./register-pay-klompje-betaal.js  het klompje vragen en
        voldoen. Twee delen om het scherpste verschil dat deze laag kent: vragen verplaatst
        GEEN geld (`VOORSTEL_MAKEN`) en voldoen wel (`GELD_BEWEGEN`).
+     ./register-pay-tik.js en ./register-pay-kascode.js  de twee CODES van de wallet, en
+       hetzelfde verschil nog een keer: een tik verplaatst geld, een kascode verleent alleen
+       het RECHT om het te komen halen. Apart van ./register-pay-stuur.js omdat de code een
+       eigen voorwaarde draagt (een geldige, niet-eigen code die vijf minuten leeft) en een
+       eigen mislukking (hij is verlopen).
 
    EN HIJ GOOIT BIJ EEN DUBBELE DEFINITIE. Dat is de les uit mutatiecontracten.js: een
    samengesteld register waarin het ene deel het andere stilzwijgend overschrijft, laat
@@ -40,6 +45,8 @@ const { STUUR } = require('./register-pay-stuur');
 const { FACTUUR } = require('./register-pay-factuur');
 const { KLOMPJE } = require('./register-pay-klompje');
 const { KLOMPJE_BETAAL } = require('./register-pay-klompje-betaal');
+const { TIK } = require('./register-pay-tik');
+const { KASCODE } = require('./register-pay-kascode');
 
 const CONTRACTEN = (() => {
   const uit = {};
@@ -47,7 +54,8 @@ const CONTRACTEN = (() => {
     ['register-bank-bevestig.js', BANK_BEVESTIG], ['register-lid.js', LID],
     ['register-pay-oplaad.js', OPLAAD], ['register-pay-stuur.js', STUUR],
     ['register-pay-factuur.js', FACTUUR], ['register-pay-klompje.js', KLOMPJE],
-    ['register-pay-klompje-betaal.js', KLOMPJE_BETAAL]]) {
+    ['register-pay-klompje-betaal.js', KLOMPJE_BETAAL],
+    ['register-pay-tik.js', TIK], ['register-pay-kascode.js', KASCODE]]) {
     for (const pad of Object.keys(deel)) {
       if (uit[pad]) throw new Error('gevolgcontract: twee delen claimen ' + pad +
         ' (de tweede is ' + naam + '). Een contract dat stilzwijgend wordt overschreven, ' +

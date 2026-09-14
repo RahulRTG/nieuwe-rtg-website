@@ -145,10 +145,17 @@ const CONTRACTEN = Object.assign(Object.fromEntries([
   ,
     afgetekend: { door: 'Claude (Opus 5), handler met de hand nagelezen', op: '2026-08-29' }
   },
+
+
 },
   /* De leesroutes van de identiteitslaag staan in een eigen zijbestand: dit
      bestand ging over de 10 kB-grens, en die laag groeit met elk blok van
      MIJNRTG.md terwijl de rest hier niet groeit. */
-  require('./mutatiecontracten-leest-identiteit').CONTRACTEN);
+  require('./mutatiecontracten-leest-identiteit').CONTRACTEN,
+  /* Zelfde reden als hierboven: dit bestand ging opnieuw over de 10 kB-grens
+     toen de leesroutes van een ZAAK erbij kwamen. De zaakkant groeit met de
+     ketenproeven mee (scripts/zaakliveproef.js en wat daarna komt), de rest van
+     dit bestand niet. */
+  require('./mutatiecontracten-leest-zaak').CONTRACTEN);
 
 module.exports = { CONTRACTEN };

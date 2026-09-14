@@ -260,7 +260,25 @@ function main() {
     if (!jsonUit) console.log('De suite draait met het routejournaal aan; dit duurt zolang de suite duurt.\n');
     suite = draaiSuite(eigen);
     journalen = [eigen];
-    herkomst.push({ pad: eigen, geteld: true, reden: 'hier gedraaid' });
+    herkomst.push({ pad: eigen, geteld: true, reden: 'hier gedraaid (alleen test/*.test.js)' });
+    /* EN WAT HIER NIET IS GEDRAAID, STAAT ER OOK BIJ.
+
+       draaiSuite() voert uitsluitend `test/*.test.js` uit -- de schermsuite van
+       `npm run e2e` niet. In die tak ontbreken dus twee soorten routes: de
+       browser-only routes (/api/fout/client) en de routes die alleen door een
+       .e2e.js-bestand worden geraakt (vier daarvan openen geen browser en
+       toetsen gewoon routes). Die gaten zijn dan een eigenschap van de METING en
+       niet van de code.
+
+       De --lees-tak zegt per journaal of hij meetelde en waarom niet; deze tak
+       zei alleen "hier gedraaid" en verzweeg dat de andere helft niet had
+       gelopen. Dat is precies het verschil tussen een meting die eerlijk is over
+       haar bereik en een die een gat rapporteert dat zij zelf heeft gemaakt --
+       en het is dezelfde regel als de lege-journaal-controle hieronder: een
+       meting die niet kon kijken, is geen nul. */
+    for (const j of JOURNALEN)
+      herkomst.push({ pad: j.pad, geteld: false,
+        reden: 'niet gedraaid in deze tak -- draai ' + j.suite + ' en geef het journaal mee met --lees' });
   }
 
   const routelog = require(path.join(WORTEL, 'server', 'routelog'));

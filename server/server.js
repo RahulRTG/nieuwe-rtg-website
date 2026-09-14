@@ -1643,7 +1643,13 @@ const { trChat, chatApplicant, ensureApplyChat, applyChatPubliek, applyChatVerta
     /* Late binding: de communicatiekern wordt pas in kernlaag4 gebouwd, ver na
        deze regel. Een verwijzing zou hier voor altijd undefined zijn en de
        sollicitatiechat stil op de oude tak zetten. */
-    commWerk: () => kern.commWerk });
+    commWerk: () => kern.commWerk,
+    /* De twee wegen naar een sollicitant die GEEN lid is. `rtf` staat hierboven
+       al (poortwachters, regel 492) en kan rechtstreeks mee; `meldLid` wordt
+       pas in kernlaag1 op de kern gezet -- ruim duizend regels verderop -- dus
+       die gaat als late binding, net als commWerk hierboven. */
+    rtf,
+    meldLidVan: () => kern.meldLid });
 
 /* De leverancier-laag (publieke weergave, dashboard/supplierState, kassa,
    gastchat, kamers/HK, deuren, tickets, De Salon, AI-zoekhulpjes, zaak-opties)
@@ -1933,6 +1939,16 @@ const { factuurSaldo } = require('./kern/factuursaldo').maakFactuurSaldo({
   /* De bundel erbij: de afschrijving en de afwikkeling horen als EEN duurzame
      commit op schijf te landen. Zie de kop van kern/factuursaldo.js. */
   bijeen,
+  payVan: () => kern.pay });
+
+/* DE TERUGWEG VAN DIE BETALING (kern/factuurcorrectie.js). HERSTELBESLUIT.json
+   verklaart /api/pay/saldo als COMPENSATABLE; dit is de uitvoerder die daarbij
+   hoort. Hij draait de heenweg niet terug maar boekt ernaast: de factuur blijft
+   `paid`, het betaalbewijs blijft staan, en het lid krijgt zijn geld op zijn
+   wallet. De afdracht aan de RTFoundation krijgt haar eigen regel en wordt NIET
+   stil teruggehaald -- er is geen positie om aan te betalen (GIFT.md). */
+const { corrigeerFactuur } = require('./kern/factuurcorrectie').maakFactuurCorrectie({
+  db, accounts, fonds, broadcastSync, log, bijeen,
   payVan: () => kern.pay });
 
 /* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig
@@ -2284,7 +2300,7 @@ const kern = {
   findSupplier, forgetSession, forgetSessionDuurzaam, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   eersteBijdrageFactuur, ledenInhoudVan, leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, rugdekking, carriereledger, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, vertegenwoordiging, rugdekking, carriereledger, bestanden, bestandenOpslag, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, corrigeerFactuur, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, kluisAuth, naamAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, mensdeurStand, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, sessieregister, toestellen, bezitsbewijs, tweefactor, commercieel, commercieelStand, commercieelZet, ritBezetting, ritVerder, rtf,

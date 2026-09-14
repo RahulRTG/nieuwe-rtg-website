@@ -651,14 +651,18 @@ collecties veranderden: dat is het veld `opslag` in `IDEMPROEF.json`. Voor
 `bankIdemAfdruk`. Die vier zijn geen aanname — ze zijn één keer echt gebeurd.
 Over alle routes: **331 met een gemeten effect over 196 collecties**.
 
-**Drie graden, en de derde is de grootste.** Over de 176 paden die de AI mag
-bedienen:
+**Drie graden, en de derde is de grootste.** Over de <!--getal:gevolg.bereikbaar-->173<!--/getal-->
+paden die de AI mag bedienen:
 
 | graad | aantal | wat het zegt |
 |---|---|---|
-| `gemeten` | 36 | de proef raakte deze collecties aan |
-| `geen-effect-gemeten` | 44 | de proef draaide en raakte niets aan |
-| **`onbekend`** | **96** | de proef kwam er niet bij (404, 403, geen geldige invoer) |
+| `gemeten` | <!--getal:gevolg.gemeten-->38<!--/getal--> | de proef raakte deze collecties aan |
+| `geen-effect-gemeten` | <!--getal:gevolg.geenEffect-->48<!--/getal--> | de proef draaide en raakte niets aan |
+| **`onbekend`** | **<!--getal:gevolg.onbekend-->87<!--/getal-->** | de proef kwam er niet bij (404, 403, geen geldige invoer) |
+
+Die getallen stonden hier tot 13 september OVERGETYPT, en waren verouderd: er stond
+96 van 176. Ze komen nu uit `GEVOLGDEKKING.json` via `npm run getallen`, zodat het
+document niet meer kan achterlopen op zijn eigen meting.
 
 **Die laatste twee mogen nooit door elkaar lopen**, en dat is de scherpste toets
 van dit blok. "De proef kwam er niet bij" is iets anders dan "er gebeurt niets",
@@ -672,8 +676,371 @@ invoer van de proef, dus een ander lichaam kan andere collecties raken; alles
 buiten de opslag valt erbuiten (mail, een betaalprovider, een derde partij); en
 zij is een momentopname van de laatste proefronde, niet van deze commit.
 
+#### Het gevolgcontract: de VERKLARING naast de meting (13 september 2026)
+
+De meting hierboven is hard en smal: zij zegt wélke collecties veranderen, van
+<!--getal:gevolg.gemeten-->38<!--/getal--> van de <!--getal:gevolg.bereikbaar-->173<!--/getal-->
+bereikbare handelingen. Over <!--getal:gevolg.onbekend-->87<!--/getal--> weet zij niets, en
+over de buitenwereld weet zij per definitie niets — mail, een provider, de bank van
+de ontvanger staan in geen enkele collectie. Een planner die daarop zou leunen, plant
+in het donker.
+
+`server/kern/stuur/gevolgcontract.js` voegt de andere helft toe: een **verklaring
+van een mens** over wat een handeling veroorzaakt, in vier soorten — `direct`
+(de opslag verandert), `afgeleid` (volgt eruit), `buiten` (valt buiten elke
+collectie) en `mislukking` (wat er achterblijft als het halverwege stopt). Alleen
+de eerste is machinaal te bevestigen; dat is geen reden om de andere drie weg te
+laten maar de reden dat ze hun graad zelf dragen.
+
+**Twee assen, nooit opgeteld** — dezelfde vorm als `machinedekking` en
+`kantoormacht`. En één regel houdt het geheel eerlijk: *een contract mag MEER zeggen
+dan de meting, maar nooit iets ANDERS.* Claimt het `gemeten` op een collectie die de
+proef daar nooit zag, dan weigert de keuring; en een gevolg `buiten` de opslag kan
+nooit `gemeten` heten, want de meting kijkt alleen naar collecties.
+
+**Er komt geen zesde zekerheidsladder bij.** Het voorstel vroeg
+`KNOWN / BOUNDED / UNKNOWN`; dit huis heeft al vier bewijsgraden, drie graden in
+`gevolg.js`, vijf assurance-standen, acht uitkomsten in `CONTROLPLANE.md`, vier
+fiscale zekerheidsklassen — en zelfs het woord *begrensd* is bezet
+(`bewezenBegrensd` in `scripts/lib/lusvorm.js`). `AFSPRAAK.md` verbiedt de zesde.
+De bedoeling blijft wel overeind, als **tweede as** in plaats van als derde trede:
+de graad zegt hoe hard we het weten, en het veld `uitkomsten` zegt of de
+uitkomstRUIMTE benoemd en gesloten is. Een uitgaande SEPA laat alle drie de soorten
+zekerheid op één handeling zien:
+
+| gevolg | graad | uitkomstruimte |
+|---|---|---|
+| het eigen saldo daalt | `gemeten` | — (het is gebeurd) |
+| de provider bevestigt, weigert of boekt terug | `vermoed` | **gesloten**: drie benoemde uitkomsten |
+| de bank van de ontvanger schrijft bij | `onbekend` | geen: daar komt geen signaal van terug |
+
+**Drie dingen worden actief geweigerd**, elk omdat de naam al bezet was: `reversible`
+(herstel is hier GEMETEN met vijf uitslagen — `scripts/herstelproef.js` — en een
+boolean slaat het verschil tussen een creditnota en een gewiste factuur plat),
+`doel`/`goals` (dat heet `streefstand`) en `privacyImpact` (dat heet
+`classificatie`, geleend uit `kern/envelop.js` en niet overgeschreven).
+
+`npm run gevolgdekking` meet het, zonder percentage erboven:
+<!--getal:gevolg.contractVolledig-->4<!--/getal--> volledig,
+<!--getal:gevolg.contractOnbekend-->169<!--/getal--> zonder contract. `--controle` zakt zodra
+de onbekende paden stijgen, een volledige verklaring verdwijnt, of een contract de
+keuring niet haalt.
+
+**En de tellers hangen aan de huisratel, niet alleen aan hun eigen script** — drie
+tanden in `NORM.json`, en ze staan met opzet apart: `gevolgPadenOnbekend` (alleen
+omlaag: dit is de rem op een planner), `gevolgContractVolledig` (alleen omhoog: een
+verklaring die verdwijnt, droeg niet) en `gevolgContractenGezakt` (hoort nul te zijn,
+en is geen voorraad). Die derde bij de eerste optellen zou een pad zonder meting
+laten lezen als een contract dat liegt; dat zijn twee dingen die het
+tegenovergestelde vragen — dezelfde tweedeling als `geldpadGezakt` /
+`geldpadOnbewezen`.
+
+##### Waarom deze laag `gevolg` heet en niet `effect`
+
+Hij heette bij het schrijven `effectcontract`, met een meter `effectdekking`. Toen
+bleek `test/effectdekking.test.js` al te bestaan — over de **derde bron van het
+effectmodel** (`server/kern/isolatie/effecten.js`), iets heel anders. Er stonden dus
+een meter en een gelijknamige toets die over verschillende dingen gingen. Het woord
+`effect` is in dit huis **vijf keer bezet**: het effectmodel (welke
+platformwerkwoorden een pad draagt, met vier ANDERE graden —
+verklaard/afgeleid/vermoed/onbekend), `scripts/effectcontracten.js` (voorstellen voor
+`NOT_APPLICABLE`-mutatiecontracten, één letter verschil), `server/effectmeter.js`, en
+de twee toetsen daarvan.
+
+Dat is exact de fout die `SEMANTIEK.json` meet en die `BEWIJSMACHINE.md` de duurste
+van het huis noemt — hier bijna gemaakt door de laag die valse zekerheid moest
+voorkomen. `gevolg` is wél het juiste woord: `kern/stuur/gevolg.js`,
+`kern/move/gevolg.js` en `server/bedrijf/gevolg.js` dragen het alle drie met
+DEZELFDE betekenis (wat een verandering met de rest doet) — één betekenis op drie
+plekken is de goede kant van die meting, vijf betekenissen op één woord de slechte.
+`test/gevolgcontract.test.js` houdt het vast van twee kanten: geen bestand van deze
+laag draagt `effect` in zijn naam, en niemand anders in huis mag `gevolgcontract` of
+`gevolgdekking` gaan heten zonder hier langs te komen.
+
+**De algemene regel eronder is meetbaar en niet gebouwd, met de reden.** Wat deze
+botsing had gevonden vóór de naam viel, is één vraag: noemt een toets met dezelfde naam
+als een script dat script ook? Vandaag zijn er **11** scripts met een gelijknamige toets die
+het script niet noemt. Dat is te veel voor een poort en te weinig onderzocht voor een
+ratel — de meeste zijn vermoedelijk een toets die via `npm run` of via het register
+werkt. Het staat hier als leeslijst en niet als meter, want een twaalfde meter
+toevoegen op een getal dat niemand heeft nagelopen, is precies wat dit document
+elders tegenhoudt.
+
+##### De effectklassen van de kantoorbank: semantiek, niet domein
+
+De vraag die het effectmodel moet beantwoorden is *kan deze handeling na commit een
+geldpositie wijzigen* — en niet *zit deze route in het bankdomein*. Dat tweede vermengt
+handelingstype met domeincontext, en dan wordt het model juist minder waar op het moment dat
+je het voor causaliteit wilt gebruiken.
+
+`server/kern/isolatie/kantoorbank.js` beantwoordt per route **twee** vragen: de scherpe
+(geldpositie, met zijn eigen toets) en de tweede (wat doet zij dan wel). 39 routes, 7 ja en
+32 nee, elk met een grond. Het bestand heet daarom niet meer `geldpositie.js`: een tabel die
+ook `CONFIGUREREN` draagt, is geen geldtabel.
+
+**Vier werkwoorden erbij** in `effectwoorden.js`, omdat de dertien voor ISOLATIE zijn
+gebouwd (*wat kan een aanvaller hiermee bereiken*) en vier klassen niet konden uitdrukken die
+een causale laag nodig heeft. Per werkwoord is in `standsluiting.js` besloten of hij ook in
+de **beschermstand** dichtgaat — `isolatie` sluit alles behalve `LEZEN_EIGEN`, dus daar gaan
+alle vier vanzelf dicht:
+
+| werkwoord | beschermstand | waarom |
+|---|---|---|
+| `PLAFOND_WIJZIGEN` | **dicht** | een limiet verhogen maakt geld mogelijk; tijdens een beschermde stand vergroot niemand die ruimte |
+| `CONFIGUREREN` | **dicht** | een stand zetten terwijl het huis beschermd staat is wat je juist niet wilt |
+| `LEZEN_ANDERMANS` | open | `beschermd` bevriest mutaties en bevoorrechte handelingen; lezen is geen van beide — in isolatie gaat hij wél dicht, en dat is precies het onderscheid dat dit woord moest maken |
+| `VOORSTEL_MAKEN` | open | een voorstel verandert niets en wacht op een tweede mens; het klaarzetten tegenhouden stopt geen effect |
+
+**Twee vervalsingen zijn gerepareerd, en geen van beide is een versoepeling** — dat is de
+voorwaarde bij een waarheidscorrectie in deze laag. `bankregie` stond als `GELD_BEWEGEN` met
+de grond *"de bediening van de bankkant"*, waardoor vier bankSTANDEN dat label droegen
+terwijl geen van hen een euro verplaatst; hij is nu `BEVEILIGING_VERZWAKKEN`, dat net als
+`GELD_BEWEGEN` in `BESCHERMD_SLUIT` staat. En `sso` matchte op de letters in
+inca-**sso**: `/api/office/bank/incasso` droeg *"een blijvende relatie met iets buiten de
+sessie"* — op de grootste geldweg van dit huis, en `/incasso/dossier` is zelfs een leesroute.
+**Mijn eerste reparatie was ook fout** (`sso[-_/]` matchte "incasso/dossier" alsnog): een
+grens aan één kant is geen grens, het moet een SEGMENT zijn. Gevonden doordat de toets beide
+paden noemt en niet alleen het eerste.
+
+**`[]` en `null` lijken niet op elkaar.** `klassenVan()` geeft `[]` voor *verklaard, en geen
+van de zeventien werkwoorden past* (`/gezond` leest een systeemstand, `/bevoegdheid` een
+matrix per land) en `null` voor *hierover is niets verklaard*. Het effectmodel houdt daarbij
+zijn eigen grens: een declaratie zonder werkwoord blijft daar `onbekend`, want dat bestand mag
+nooit een lege lijst teruggeven — dan keurt het goed wat het niet begrijpt.
+
+En de toets draagt **geen drempel op het aantal**: een getal kiezen dat net haalt is
+achterstevoren toetsen. De invariant is dat elke nee-route óf een werkwoord draagt óf een
+grond die uitlegt waarom er geen past; hoeveel het er zijn (vandaag 25 van 32) is een uitkomst
+en geen eis.
+
+##### De runtime-lezer staat, en hij zit niet waar het voorstel hem zocht
+
+Het voorstel wees naar `tegenfeit.js`. Dat bestand blijkt iets anders te zijn: het is
+een **beleidscontrafeit** (`kern/commercie/tegenfeit.js`) — het draait een gewijzigde
+regel tegen de geschiedenis om te zien hoeveel handelingen anders zouden zijn gelopen.
+Dat gaat over een regel en niet over een handeling, en het leest geen contract.
+
+De plek waar de verklaring hoort, bestond al: `kern/stuur/gevolg.js` hangt met
+`voorspel()` een gevolgvoorspelling **naast** een gewogen plan, en `lusstap.js` doet dat
+bij elke `plan`-aanroep. Daar is nu de tweede as bij gekomen, in
+`kern/stuur/gevolgcontract/voorspelling.js`:
+
+| as | komt uit | zegt |
+|---|---|---|
+| meting | `gevolg.js` ← IDEMPROEF.json | welke collecties bewogen, in de laatste proefronde |
+| verklaring | `gevolgcontract.js` | wat een mens verklaart, óók buiten de opslag en bij een mislukking |
+
+**Een verklaring vult een meting aan en vervangt haar nooit.** Dat is de scherpste
+regel van de schil, en hij is bijna ongemerkt weggevallen: de eerste versie van de
+toets erop stond GROEN terwijl een mutatie die de graad opwaardeerde naar `gemeten`
+zodra er een volledige verklaring stond, er ongestraft door kwam. In de fixture was
+het pad met een contract toch al gemeten en het ongemeten pad had geen contract — de
+combinatie die de bewering draagt (ongemeten mét een volledige verklaring) ontbrak, en
+die bestaat vandaag in geen enkel echt pad. Het register is daarom een parameter met
+een standaard geworden, zodat die combinatie te maken is.
+
+**En de regel die eruit volgt weigert niets.** *Een plan gaat alleen over handelingen
+waarvan het gevolg voldoende bekend is* loopt in de **schaduw**: het plan zegt hoeveel
+stappen het zou afwijzen en welke, en wijst niets af. Met
+<!--getal:gevolg.onbekend-->87<!--/getal--> van de
+<!--getal:gevolg.bereikbaar-->173<!--/getal--> paden ongemeten zou afdwingen vandaag het
+halve stuur stilzetten, en dan wordt de regel losgedraaid in plaats van gehaald
+(`CONTROLPLANE.md`: eerst zonder te blokkeren). `geen-effect-gemeten` telt daarbij als
+BEKEND — de proef heeft de route echt gedraaid en er bewoog niets — en dat is iets
+anders dan "de proef kwam er niet bij".
+
+**Twee dingen die dit bouwen corrigeerde en die je nergens anders moet herhalen.** De
+eerste versie zette de gevolgkennis PER STAP in `plan.js`, en dat verbood de code al
+met zoveel woorden: *"hij hangt NAAST het plan en niet erin: PLAN bezit niets, en dat
+blijft zo"* (slotalinea van `gevolg.js`) — bovendien deed `lusstap.js` het al, dus het
+was een tweede lezer van dezelfde waarheid. En de samenstelling kan **niet** in een van
+de twee lagen zelf zitten: `gevolgcontract.js` laadt `gevolg.js` (zijn poort toetst een
+`gemeten` claim tegen de meting), dus omgekeerd zou een kring zijn. Zij hoort bij de
+aanroeper, en die stond er al.
+
+##### Het derde contract: de route waar het geld werkelijk beweegt
+
+De gouden geldweg heeft twee routes, en de namen zeggen het omgekeerde van de
+waarheid: `/api/office/bank/incasso` **zet klaar** en verplaatst geen euro,
+`/api/office/bank/handtekening/bevestig` **voert uit**. Die tweede had geen contract,
+en zijn meting staat op `onbekend` met een eerlijke reden — *de proef kwam niet bij de
+muterende code*. Dat is geen tekort dat op te lossen is: de route eist twee
+kantoormensen op naam, en een script kan de tweede niet zijn. **Dit is dus precies het
+geval waarvoor de tweede as bestaat**, en het contract claimt daarom nergens `gemeten`.
+
+Twee dingen daar niet wegpoetsen. Zijn gevolg is **gedelegeerd**: de route voert uit
+wat er is aangevraagd (`uitvoerders.get(a.actie)`), dus wat hij veroorzaakt staat in
+het contract van *die* capability. De uitkomstruimte is daarom gesloten en klein —
+`bank.rood` en `bank.incasso` — en de toets leest die lijst uit de route zelf, zodat
+een derde geregistreerde handeling het contract laat zakken in plaats van stil te
+verouderen (met een mutatie beide kanten op nagetrokken). En de duurste regel: **de
+handtekening is OPGEBRUIKT ook als de uitvoering faalt**, want `splice()` staat vóór
+`voerUit()`. Dat is beleid uit de kop van de module — *een nee wordt geen ja door het
+nog eens te vragen* — en het staat als `mislukking`-gevolg in het contract.
+
+Het register bestaat sindsdien uit **delen** (`register-bank.js`, `register-lid.js`) met
+`register.js` als enige samensteller, en die **gooit bij het LADEN** zodra twee delen
+hetzelfde pad claimen. Dat is de les uit `server/lib/mutatiecontracten.js`: een register
+waarin het ene deel het andere stilzwijgend overschrijft, laat twee mensen een contract
+schrijven waarvan er één nooit wordt gelezen. De naad tussen de delen is niet de omvang
+maar de **lezer**: de kantoorpaden staan niet in de AI-allowlist en tellen dus niet mee
+in de noemer van de meter (hij meldt ze apart als `contractenBuitenBereik`), het
+ledenpad wel.
+
+##### De vergelijker: de laag wordt voor het eerst ACTIEF (as 17 van de geldketen)
+
+Een laag met een register, toetsen en een meter maar zonder productgedrag is een patroon
+dat dit huis vaker heeft gevonden dan het zou willen. De vergelijker maakt er een eind
+aan: hij houdt de **vooruitblik van het domein** tegen het **gevolgcontract van de
+handeling**, en de gouden geldweg loopt erdoor.
+
+```
+voorgenomen handeling
+       ↓  het domein rekent vooruit wat zij zou doen  (as `tegenfeit`)
+       ↓
+het gevolgcontract zegt wat zij veroorzaakt en wat zij NOOIT veroorzaakt
+       ↓
+de vergelijker  (kern/stuur/gevolgcontract/vergelijk.js)
+       ├─ IN_ORDE / GATEN → de keten loopt door, gaten met naam in het dossier
+       └─ CONFLICT        → de keten STOPT, met de soort en de reden erbij
+```
+
+**Er wordt niet op naamgelijkheid vergeleken, en dat is de dragende keuze.** De
+vooruitblik zegt *"2 posten, 4.000 cent"*; het contract zegt *"de collectie `bankSaldi`
+verandert"*. Die twee hebben geen woord gemeen, dus een tekstvergelijking zou altijd nul
+vinden — en **nul conflicten uit een vergelijker die niets kan zien is het gevaarlijkste
+groen dat er is**. Er wordt daarom vergeleken op een gesloten, gedeelde woordenlijst: de
+dertien effectwerkwoorden uit `kern/isolatie/effectwoorden.js`, **geleend en niet
+bedacht** (een eigen lijst hier zou de 22e vermogenslijst van dit huis zijn). Dat de twee
+lagen diezelfde woorden ánders gebruiken is geen botsing maar de bedoeling: het
+effectmodel wijst een pad zijn werkwoorden toe om isolatie te beslissen, hier verklaart
+een mens wat een handeling veroorzaakt.
+
+| soort | wat het is | blokkeert |
+|---|---|---|
+| **TEGENSPRAAK** | de vooruitblik impliceert een werkwoord dat het contract UITSLUIT | **ja** |
+| **GAT** | de vooruitblik impliceert een werkwoord waarover het contract niets zegt | nee |
+| **OVERCLAIM** | het contract beweert harder dan de meting toelaat (`keuring.js`, aangeroepen en niet nagebouwd) | **ja** |
+
+Waarom die tweedeling: een tegenspraak en een overclaim zijn **defecten tussen twee
+verklaringen van mensen** — beide kanten staan opgeschreven, dus daar is geen
+dekkingsprobleem aan dat eerst in de schaduw hoort te lopen. Een gat is een *ontbrekende*
+verklaring, en wie daarop blokkeert zet het huis stil op zijn eigen achterstand. Die
+weging woont op één plek (`BLOKKEERT` in `vergelijk.js`), want twee plekken die beslissen
+wat blokkeert zijn een halve dag zoeken zodra ze uiteenlopen.
+
+**Het subject komt van het domein en wordt niet geraden.** In deze keten staat de
+vooruitblik bij de **aanvraag** (`/api/office/bank/incasso`) en beschrijft hij wat de
+**ronde** zou doen — en die ronde loopt op een andere route
+(`/handtekening/bevestig`). Tegen het contract van de aanvraag gehouden zou élke
+geldvoorspelling een tegenspraak zijn, want die aanvraag verplaatst met zoveel woorden
+geen euro. Vandaar `tegenfeit.over`. Een vergelijker die het subject raadt, vindt precies
+de conflicten die er niet zijn — en toets 10 van `test/geldketen.test.js` gebruikt juist
+die verkeerde paring om te bewijzen dat de poort werkelijk weigert.
+
+**De keten heeft er een zeventiende as door**, `gevolgcontract`, naast `gevolg` en niet
+erin: die zegt wat de proef ooit zag bewegen, deze dat de vooruitblik van *deze*
+handeling is nagekeken. `npm run machinedekking` staat op **17 van 17 op 3/3 routes** en
+`volledigeKetens` blijft 1. Haal de as eruit en de keten zakt naar nul, met zijn naam
+erbij.
+
+**En het vond een gat in zichzelf.** De eerste versie gaf op een vooruitblik zonder
+werkwoorden de uitslag `IN_ORDE`: er werd niets geïmpliceerd, dus sprak niets iets tegen.
+De hele suite stond daar 9 van 9 groen bij terwijl de as leeg was — precies de stille
+poort waar deze laag tegen is gebouwd. **Een ontbrekende lijst is geen lege lijst**: dat
+laatste moet het domein zéggen (`effecten: []`), en `Array.isArray` is exact dat
+onderscheid. Een tweede gat zat in een tikfout: een werkwoord buiten de lijst viel door
+naar de vergelijking en verscheen daar netjes als *gat*, waarmee een fout in de
+voorspelling een bevinding over het contract werd. Beide gevonden met een mutatie, beide
+nu vastgelegd.
+
+**Wat er nog niet is, en dat hoort erbij:** het register draagt drie contracten, waarvan
+één in de noemer van de meter. De andere
+<!--getal:gevolg.contractOnbekend-->169<!--/getal--> bereikbare handelingen hebben er
+geen — en die vullen is nadrukkelijk **niet** de volgende stap: pas nu de vergelijker er
+beslissingen mee neemt, betekent een contract erbij iets meer dan een JSON-regel erbij.
+De grens die blijft staan: `kern/commercie/tegenfeit.js` is en blijft het
+**beleids**contrafeit (wat als we `maxCenten` verlagen), niet deze vergelijker — dat zijn
+twee verschillende vragen onder één woord.
+
 **En dit was géén droogloop.** Er werd een eerdere meting op het plan
 geprojecteerd; het plan liep niet. Dat deel staat er nu wel.
+
+#### De effectbon: de observatie die ALTIJD bestaat (13 september 2026)
+
+Tot nu hing elke observatie aan `RTG_STAATLOG`. Dat is juist voor zware diagnostiek, maar
+het heeft één gevolg dat de hele laag ondermijnt: **als de observatie alleen bestaat
+wanneer een diagnostische vlag aanstaat, dan heeft dit huis geen causale runtime maar een
+meetopstelling** — en dan is elke voorspelling in productie onweerlegbaar.
+
+`server/effectbon.js` staat daarom altijd aan (`RTG_EFFECTBON=0` zet hem uit, voor het
+geval dat en niet als normale stand) en draagt zeven velden en niet meer:
+
+| veld | waar het uit komt |
+|---|---|
+| `verzoek`, `oorzaak` | de correlatie van `req.envelop` — **geen tweede id** |
+| `capability` | dezelfde envelop |
+| `klassen` | de WAARGENOMEN effectklassen, via `kern/isolatie/effectcollecties.js` |
+| `objectrefs` | de collecties die bewogen — **namen, nooit rijen of sleutels** |
+| `at` | wanneer |
+| `dekking` | wat deze bon wél en níét kon zien, bij naam |
+
+**Hij bouwt niets na.** Alle drie de bronnen bestonden: `staatlog.stand()` is in de
+ondiepe stand alleen `.length` per array (O(1) per collectie), de effectmeter telt op drie
+choke points, en `effectcollecties.js` vertaalt een collectie naar een klasse met een
+grond. Een tweede implementatie van "wat is er gebeurd" zou LAT.md regel 4 zijn op de
+plek waar het het duurst is — `test/effectbon.test.js` toetst op de bron dat hij geen
+eigen hash, geen eigen `stringify` en geen eigen collectietabel heeft.
+
+**En de vlag VERDIEPT, hij schakelt niet aan.** Met `RTG_STAATLOG=2` wordt `stand()`
+dieper en ziet de bon ook een wijziging op zijn plaats; wat hij in de ondiepe stand niet
+kan zien staat in `dekking.blind`. Geen payload, geen momentopname, geen diff: een bon met
+inhoud is een gedragslogboek per lid, en dat is precies wat `KOSTEN.md` weigert.
+
+##### De vier uitkomsten, en de vierde is de enige die echt moet
+
+`kern/stuur/gevolgcontract/nameting.js` houdt de **voorspelde** klassen tegen de
+**waargenomen** klassen:
+
+| uitkomst | wat het betekent |
+|---|---|
+| `VOORSPELD_EN_GEZIEN` | voorspeld en waargenomen |
+| `VOORSPELD_NIET_GEZIEN` | voorspeld, niet gezien, **en de meter had dekking** — of de voorspelling klopt niet, of het effect bleef uit |
+| `GEZIEN_NIET_VOORSPELD` | een onverklaarde bijwerking: dit is wat een effectcontract hoort te vinden |
+| `NIET_MEETBAAR` | voorspeld, niet gezien, en de meter **kon** het niet zien |
+
+**Zonder die vierde verandert "geen observatie" stilletjes in "geen effect"**, en dan is
+de laag een machine die zichzelf gerust stelt. De dekking wordt daarom uit de bon GELEZEN
+en niet aangenomen: `UITGAANDE_AANROEP` komt langs geen enkel choke point en is dus altijd
+`NIET_MEETBAAR`; is er niets geschreven terwijl het choke point aanstond, dan is "niet
+gezien" juist wél het signaal; is er wél geschreven maar niet in een ingedeelde collectie,
+dan zegt "niet gezien" niets zolang de bon ondiep is. Er komt **geen samengesteld cijfer**
+boven die vier: een score van 3 op 4 middelt precies de vierde weg.
+
+**De brug is een id en geen identiteit.** De bon bestaat pas als het antwoord de deur uit
+gaat, dus de geldketen kan hem niet lezen — maar hij kan hem terugvinden: `uitvoer()`
+onthoudt `uitvoerVerzoek`, en de voorspelling staat al op de as `gevolgcontract` (achteraf
+reconstrueren zou geen voorspelling meer zijn). De richting van de koppeling is bewust:
+**kern duwt niets naar de serverlaag**, dus geeft `server/opzet/kern-geldketen.js` — dat
+beide kent — een zuiver lezende functie aan de bon mee, zelfde vorm als de frictiemotor
+die lui aan die baan wordt meegegeven.
+
+**Wat dit over HTTP bewijst:** `test/tweedehandtekening.test.js` toets 6 verplaatst met
+twee kantoormensen op naam echt geld, en het verzoek dat dat deed meldt in zijn eigen kop
+`X-RTG-Effectbon: GELD_BEWEGEN` — **zonder `RTG_STAATLOG`**. Zet de bon uit met zijn eigen
+uitweg en die toets zakt met "(geen kop)".
+
+**Drie dingen die dit bouwen blootlegde.** De tellers moesten altijd aan (alleen de KOPPEN
+hangen nog aan de vlag), en `perVerzoek` mocht daardoor niet meer NESTEN: met een verse
+teller in de binnenste schil schreef `tel()` daarin en zag de buitenste nul — de bon zou
+dan melden dat er geen mail uitging. Twee bestaande toetsen in
+`test/effectmeter.test.js` eisten het omgekeerde en zijn **met de reden erbij** van
+betekenis veranderd; één van de twee slaagde daarna nog steeds, maar om een andere reden
+dan zijn boodschap zei, en dat is erger dan zakken. En de derde: de uitvoerder van
+`bank.incasso` is een **closure die de tweede-handtekeningmodule aanroept en niet de
+route**, dus `req` bestaat daar niet. Dat gaf een 500 met "req is not defined" die alleen
+de e2e tegen een echte server vond — een unittoets roept die closure nooit vanuit een
+verzoek aan.
 
 #### De echte droogloop (`scripts/droogloop.js`, `npm run droogloop`)
 

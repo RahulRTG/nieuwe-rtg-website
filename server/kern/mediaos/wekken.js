@@ -27,9 +27,16 @@
    u"): dat zijn de lokkertjes die dit huis nergens gebruikt. */
 'use strict';
 
-const SOORT_NAAM = { muziek: 'nieuwe muziek', video: 'een nieuwe video', flow: 'een nieuwe korte video', live: 'nu live' };
+const SOORT_NAAM = {
+  muziek: 'nieuwe muziek', video: 'een nieuwe video', flow: 'een nieuwe korte video', live: 'nu live',
+  /* De vier die er op 13 september bij kwamen. Ze horen bij een PUBLIEKE
+     AANWEZIGHEID (./aanwezigheid.js) en niet per se bij een mens: een festival en
+     een club kunnen ze ook uitzenden. */
+  optreden: 'een bevestigd optreden', kaartverkoop: 'kaartverkoop open',
+  wedstrijd: 'een wedstrijd in de agenda', uitgelicht: 'uitgelicht werk'
+};
 
-function maakWekken({ notify, codenaamVan, meldVan, bronnen }) {
+function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig }) {
   /* De volgers van een maker: de vereniging van de twee gratis volgrelaties
      die de Media OS ook zet (Clips en het Theater). Een betaald podium-
      abonnement telt hier niet mee -- dat is een betaalrelatie en geen volg. */
@@ -39,6 +46,13 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen }) {
     catch (e) { /* een bron die stuk is mag de rest niet tegenhouden */ }
     try { for (const k of (bronnen.theaterVolgersVan ? bronnen.theaterVolgersVan(makerKey) : [])) uit.add(k); }
     catch (e) {}
+    /* EN DE AANWEZIGHEID VAN DIT LID. Sinds 13 september is dat de derde bron,
+       en de enige die de Media OS zelf bezit. Voor een MENS is het dus een
+       aanvulling op zijn domeinlijsten; voor een organisatie is het de enige. */
+    try {
+      const a = aanwezig && aanwezig.aanwezigVan('lid', makerKey);
+      if (a) for (const k of aanwezig.aanwezigVolgersVan(a.id)) uit.add(k);
+    } catch (e) {}
     uit.delete(makerKey);
     return [...uit];
   }
@@ -69,7 +83,42 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen }) {
     return { gewekt, overgeslagen, soort, maker: codenaam };
   }
 
-  return { mediaNieuwWerk: nieuwWerk, mediaVolgersVan: volgersVan, MEDIA_SOORT_NAAM: SOORT_NAAM };
+  /* ---- WEKKEN OP EEN AANWEZIGHEID, en dat is de ingang voor alles wat geen
+     mens is. Een festival en een club hebben geen ledensleutel, dus nieuwWerk()
+     hierboven kan hen niet bedienen -- hij begint immers bij een maker.
+
+     DRIE DINGEN DIE HIER GELIJK BLIJVEN aan nieuwWerk, want anders zou een
+     organisatie stiekem meer mogen dan een mens: de voorkeur per soort wordt
+     gerespecteerd, de algemene meldingsschakelaar van notify() blijft erboven
+     staan, en de uitslag zegt WIE er gewekt is en wie niet met de reden. */
+  function nieuwMoment(aanwezigheidId, soort, titel) {
+    if (!aanwezig || !SOORT_NAAM[soort]) return { gewekt: [], overgeslagen: [] };
+    const a = aanwezig.aanwezigMet(aanwezigheidId);
+    if (!a) return { gewekt: [], overgeslagen: [], reden: 'deze aanwezigheid bestaat niet' };
+    /* Een aanwezigheid die deze soort niet uitzendt, wekt er ook niet mee. Zonder
+       deze regel belooft het volgscherm iets anders dan er gebeurt. */
+    if (!a.soorten.includes(soort))
+      return { gewekt: [], overgeslagen: [], reden: 'deze aanwezigheid zendt geen ' + soort + ' uit' };
+    const gewekt = [], overgeslagen = [];
+    for (const volger of aanwezig.aanwezigVolgersVan(a.id)) {
+      const soorten = meldVan(volger, a.naam);
+      if (!soorten.includes(soort)) { overgeslagen.push({ key: volger, reden: 'wil geen ' + soort + ' van ' + a.naam }); continue; }
+      try {
+        notify(volger, {
+          title: 'RTG Media',
+          body: a.naam + ': ' + SOORT_NAAM[soort] + (titel ? ' -- "' + titel + '"' : '') + '.',
+          scope: 'media'
+        });
+        gewekt.push(volger);
+      } catch (e) {
+        overgeslagen.push({ key: volger, reden: 'melden mislukte: ' + (e && e.message ? e.message : 'onbekend') });
+      }
+    }
+    return { gewekt, overgeslagen, soort, aanwezigheid: a.id };
+  }
+
+  return { mediaNieuwWerk: nieuwWerk, mediaNieuwMoment: nieuwMoment,
+    mediaVolgersVan: volgersVan, MEDIA_SOORT_NAAM: SOORT_NAAM };
 }
 
 module.exports = { maakWekken, SOORT_NAAM };

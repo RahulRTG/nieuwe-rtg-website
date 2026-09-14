@@ -443,6 +443,83 @@ met een eigen klok).
 
 ---
 
+## 5a. De vier administraties — de checklist bij een nieuwe meter
+
+Dit is het kleinste stuk van dit document en het voorkomt waarschijnlijk de
+meeste verspilde CI-rondes. Het is **geen nieuwe architectuur**: alle vier de
+administraties bestaan al, alle vier worden ze al afgedwongen, en alle vier
+bestaan ze om een fout die hier echt is gemaakt. Wat ontbrak is dat ze van
+elkaar wisten.
+
+**De aanleiding (13 september 2026).** Eén nieuwe meter (`scripts/stagevorm.js`
++ `STAGEVORM.json`) en één nieuwe toets (`test/stagevorm.test.js`) moesten in
+vier onafhankelijke administraties worden opgenomen voordat het huis tevreden
+was. Elke administratie meldde zich pas nadat de vorige was opgelost, elk in een
+eigen CI-ronde, en geen van de vier noemde de andere drie. Vier rondes voor één
+meter.
+
+**De checklist, in de volgorde waarin ze zich melden:**
+
+| # | administratie | waar | wat hij tegenhoudt | wie hem afdwingt |
+|---|---|---|---|---|
+| 1 | **ratel** | `scripts/lib/metingen.js` (welke meting aan welke tand) + `METERS` in `scripts/norm.js` + de grondwaarde in `NORM.json` | een register dat aan niets hangt en dus stilletjes de verkeerde kant op kan groeien | normmeter `metingenZonderRatel`, richting omlaag |
+| 2 | **ijking** | `test/meterijk.test.js` | een meter die niet aantoonbaar uitslaat op een bekend-foute invoer — groen omdat hij niets *kan* vinden | `scripts/check.js` regel 35 |
+| 3 | **mutatie** | `node scripts/mutatie.js <toets>` → `MUTATIES.json` | een toets waarvan niemand heeft gezien dat hij kan zakken (`LAT.md` regel 2) | normmeter `toetsenNietGemeten`, richting omlaag |
+| 4 | **versheid** | `REGISTERS` in `scripts/versheid.js`, of `BUITEN` mét de reden | een register dat veroudert zonder dat iemand het merkt | `test/versheidsdekking.test.js` |
+
+Wie een meter toevoegt, loopt die vier af. Wie er een overslaat, ontdekt hem één
+CI-ronde later — en dat is precies wat deze tabel bespaart.
+
+### De vijfde, en die heeft geen huisbrede handhaver
+
+Eén ronde later dan de vier hierboven meldde zich een vijfde, en hij past niet in
+de tabel omdat er geen enkele meter over gaat. Vier registers lieten CI zakken op
+een toets die **in het register zelf woont**: `CAPABILITEIT.json`,
+`MAGNAATLAB.json`, `MUTATIESEMANTIEK.json` en `SEMANTIEK.json` dragen elk een
+eigen toets die "loopt achter op de code" meldt zodra hun getal niet meer klopt
+met een verse meting. Dat is precies goed — maar `scripts/check.js` kent ze niet,
+`scripts/versheid.js` kent ze niet, en `metingenZonderRatel` telt ze niet, want ze
+hángen aan een ratel. Ze liften mee op de OMVANG van de kern, dus elke tak die
+code toevoegt laat ze zakken, en je vindt ze alleen door de scherf lokaal te
+reproduceren of door `grep "loopt achter op" test/*.test.js` te draaien.
+
+De vorm van die vijfde is dus: *een register dat door niemand wordt bewaakt
+behalve door zijn eigen toets, en dat meebeweegt met iets waar het niet over
+gaat.* Dat is hier alleen OPGEMERKT en niet opgelost; de vraag die eronder ligt
+(welke registers lopen mee op de kernomvang, en hoort die groei bij hun
+onderwerp?) hoort bij par. 6 en niet bij deze checklist.
+
+### De regel eronder, en die is breder dan meters
+
+De vierde administratie lijkt de saaiste en is de gevaarlijkste. `STAGEVORM.json`
+maakte dat zichtbaar, want zijn uitslag is een **nul**: 0 van 136 velden gedeeld
+over tien publieke domeinen. Op die nul rust in `STAGE.md` par. 0 het besluit dat
+een Moment een projectie is en geen object.
+
+> **Een nulmeting waarop een besluit rust, mag niet stil verouderen.**
+> Afwezigheid van bevindingen is alleen bewijs als de meting aantoonbaar vers is.
+
+Dat is scherper dan het klinkt, en het geldt overal in dit huis waar een meter
+niets vindt. Een POSITIEVE uitslag die oud is, valt vaak vanzelf op: het getal
+past niet meer bij wat iemand net heeft gebouwd. Een oude NUL blijft er precies
+zo uitzien als een verse nul — geruststellend, en misschien onwaar. De faalvorm
+is niet dat het getal verkeerd is, maar dat het van een andere vraag is: van
+*"deze domeinen delen niets"* naar *"we hebben minder gekeken"*, zonder dat er
+één teken op het scherm verandert.
+
+Vandaar dat de ijking van zo'n meter **omlaag** gaat en niet omhoog (zie
+`stageDomeinenGemeten` en `carriereDomeinenGemeten` in `test/meterijk.test.js`):
+wat geratelde wordt is het BEREIK van de meting en niet haar uitkomst. De
+uitkomst mag bewegen — dat is nieuws. Het aantal domeinen dat de meter ziet, mag
+dat niet, want dan verandert de betekenis van de nul zonder dat de nul beweegt.
+
+Dit is dezelfde familie als de zelfijking uit par. 3: *een scan die niets KAN
+vinden staat groen om precies dezelfde reden als een scan die niets vindt, en
+die twee zijn van buiten niet te onderscheiden.* Par. 5a voegt daar de tijd aan
+toe: een scan die ooit iets kon vinden en nu over een andere boom gaat, óók.
+
+---
+
 ## 6. De volgorde
 
 | fase | wat | waarom nu |

@@ -83,9 +83,24 @@ const NIET_GEMETEN = ['bestand', 'externe-aanroep'];
 const winkel = new AsyncLocalStorage();
 
 /* Eén teller per verzoek. Geen globale optelling: die zou van achtergrondwerk
-   niet te onderscheiden zijn, en dat is precies het onderscheid dat hier telt. */
+   niet te onderscheiden zijn, en dat is precies het onderscheid dat hier telt.
+
+   HET TELLEN STAAT ALTIJD AAN SINDS 13 SEPTEMBER 2026, en dat is een besluit met een
+   reden. Alleen de KOPPEN en de zware opslagmeter hangen nog aan RTG_STAATLOG; de tellers
+   zelf zijn de observatie waar ./effectbon.js op staat, en een observatie die alleen
+   bestaat als een diagnostische vlag aanstaat, maakt van een causale runtime een
+   meetopstelling. Wat het kost is een object per verzoek en een Map-opzoeking per save;
+   wat het oplevert is dat "niet waargenomen" in productie iets betekent.
+
+   EN HIJ NEST NIET. Bestaat er al een teller in deze async-context, dan wordt DIE
+   gebruikt in plaats van een tweede erbovenop gezet. Zonder die regel zou een tweede
+   aanroeper (de effectbon hangt zijn schil eromheen) een eigen teller krijgen, `tel()`
+   in de binnenste schrijven en de buitenste op nul laten staan -- twee lezers van
+   dezelfde waarheid die verschillende getallen zien, en de bon zou dan melden dat er
+   geen mail uitging. */
 function perVerzoek(fn) {
-  if (!aan) return fn();
+  const bestaand = winkel.getStore();
+  if (bestaand) return fn(bestaand);
   const teller = { opslag: 0, mail: 0, sms: 0 };
   return winkel.run(teller, () => fn(teller));
 }
@@ -93,11 +108,14 @@ function perVerzoek(fn) {
 /* Tellen. Buiten een verzoek (een achtergrondlus, het opstarten) is er geen
    context en gebeurt er niets -- die schrijfacties horen ook bij niemand. */
 function tel(soort, hoeveel) {
-  if (!aan) return;
   const t = winkel.getStore();
   if (!t || !Object.prototype.hasOwnProperty.call(t, soort)) return;
   t[soort] += (hoeveel == null ? 1 : Number(hoeveel)) || 0;
 }
+
+/* De teller van DIT verzoek, of null. Voor wie de stand niet als tekst wil maar als
+   getallen -- ./effectbon.js leest hem zo, en bouwt er geen tweede naast. */
+function huidig() { return winkel.getStore() || null; }
 
 /* De stand van dit verzoek, als korte tekst voor de kop. Leeg blijft leeg: een
    kop met alleen nullen suggereert een meting waar er geen was. */
@@ -154,5 +172,5 @@ function begin(vlag) {
 
 begin(process.env.RTG_STAATLOG);
 
-module.exports = { haak, tel, stand, begin, perVerzoek, SOORTEN, NIET_GEMETEN,
+module.exports = { haak, tel, stand, begin, perVerzoek, huidig, SOORTEN, NIET_GEMETEN,
   get aan() { return aan; } };

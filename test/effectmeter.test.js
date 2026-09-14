@@ -15,11 +15,27 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const meter = require('../server/effectmeter');
 
-test('uit is de stand die je krijgt als je niets doet', () => {
+test('uit betekent: geen KOPPEN. De tellers tellen altijd', () => {
+  /* OOK DEZE TOETS IS OP 13 SEPTEMBER 2026 VAN BETEKENIS VERANDERD. Hij zei "zonder vlag
+     is er geen context en dus geen stand", en die boodschap is niet meer waar: sinds
+     server/effectbon.js de observatie altijd nodig heeft, telt deze meter altijd. Alleen
+     de KOPPEN en de zware opslagmeter hangen nog aan RTG_STAATLOG.
+
+     De oude assertie slaagde daarna nog steeds, maar om de verkeerde reden -- hij keek
+     BUITEN de callback, waar er inderdaad geen context is, en bewees dus niets over de
+     vlag. Een toets die slaagt om een andere reden dan zijn boodschap zegt, is erger dan
+     een die zakt. */
   meter.begin('');
   assert.equal(meter.aan, false);
-  meter.perVerzoek(() => { meter.tel('opslag'); });
-  assert.equal(meter.stand(), '', 'zonder vlag is er geen context en dus geen stand');
+  meter.perVerzoek(() => {
+    meter.tel('opslag');
+    assert.equal(meter.stand(), 'opslag=1', 'zonder vlag hoort hij WEL te tellen');
+  });
+  assert.equal(meter.stand(), '', 'buiten een verzoek is er geen context en dus geen stand');
+  /* En de vlag bepaalt nog steeds of hij in de keten hangt: geen koppen zonder vlag. */
+  let gebruikt = 0;
+  assert.equal(meter.haak({ use: () => { gebruikt++; } }), false);
+  assert.equal(gebruikt, 0);
 });
 
 test('aan met de vlag van de staatmeter, en met geen andere', () => {
@@ -50,13 +66,35 @@ test('geen spoor heet `geen` en niet leeg -- dat verschil is het hele punt', () 
 });
 
 test('tellers zijn per verzoek en lekken niet naar elkaar', () => {
+  /* DEZE TOETS IS OP 13 SEPTEMBER 2026 VAN BETEKENIS VERANDERD, en dat hoort hier te
+     staan in plaats van stil te gebeuren.
+
+     Hij eiste eerst dat een GENEST perVerzoek op nul begint. Die eis was een proxy voor
+     wat er werkelijk moet gelden -- twee VERZOEKEN mogen niet in elkaar lekken -- en die
+     proxy bleek verkeerd zodra er een tweede lezer kwam: nesten betekent in de echte
+     keten niet twee verzoeken maar twee MIDDLEWARES op hetzelfde verzoek
+     (server/effectbon.js hangt zijn schil om die van de effectmeter). Met een verse
+     teller in de binnenste schil schreef tel() daarin en zag de buitenste nul -- de bon
+     zou dan melden dat er geen mail uitging. Twee lezers van dezelfde waarheid met
+     verschillende getallen.
+
+     Wat er dus WEL wordt afgedwongen: twee losse verzoeken zijn onafhankelijk, en een
+     geneste schil HERGEBRUIKT de teller van het verzoek waarin hij staat. */
   meter.begin('1');
+
+  /* 1. twee LOSSE verzoeken lekken niet in elkaar -- de echte eis. */
+  meter.perVerzoek(() => { meter.tel('opslag'); assert.equal(meter.stand(), 'opslag=1'); });
+  meter.perVerzoek(() => { assert.equal(meter.stand(), 'geen', 'een vers verzoek begint op nul'); });
+
+  /* 2. een GENESTE schil is dezelfde teller, en telt dus door. */
   meter.perVerzoek(() => {
     meter.tel('opslag');
-    meter.perVerzoek(() => {
-      assert.equal(meter.stand(), 'geen', 'een genest verzoek begint op nul');
+    meter.perVerzoek((binnen) => {
+      assert.equal(meter.stand(), 'opslag=1', 'een geneste schil hoort de teller te hergebruiken');
+      assert.equal(binnen.opslag, 1, 'en hem ook mee te geven');
+      meter.tel('mail');
     });
-    assert.equal(meter.stand(), 'opslag=1');
+    assert.equal(meter.stand(), 'opslag=1,mail=1', 'wat de binnenste telde, ziet de buitenste');
   });
   meter.begin('');
 });

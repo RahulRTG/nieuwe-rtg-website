@@ -121,6 +121,60 @@ const BRONMAP = /^(server|scripts|public)\b/;
 
 /* DE FLOW-ZEEF voor een pad uit een variabele. Geeft de namen terug waarvan
    ELKE toekenning uit de bron komt en waarop ook echt geschreven wordt. */
+/* WELK ARGUMENT WORDT BESCHREVEN -- en dat is niet bij elke functie het eerste.
+
+   Hier stond een lijst van vijf schrijvers achter EEN regex die altijd het
+   eerste argument nam. Voor writeFileSync, appendFileSync en rmSync klopt dat.
+   Voor `copyFileSync(bron, doel)` en `renameSync(oud, nieuw)` niet: daar is het
+   eerste argument de BRON, en dus een lezing.
+
+   Gevolg, gemeten op 13 september 2026: test/ondernemerbewijs.test.js kopieert
+   registers UIT de wortel NAAR een wegwerpmap en werd daardoor aangewezen als
+   een toets die de echte bron muteert. Hij schrijft daar geen byte -- hij zet
+   zelfs RTG_BEWIJS_BRON en RTG_BEWIJS_DOEL allebei op die wegwerpmap.
+
+   WAAROM DIT DE MOEITE WAARD IS OM TE REPAREREN in plaats van de toets in
+   GEISOLEERD te zetten: dat laatste zou een onwaarheid vastleggen ("deze toets
+   muteert de bron") en de isolatielijst duurder maken zonder reden. En erger --
+   een keuring die onterecht aanslaat, wordt binnen een week omzeild door er
+   gewoon een naam bij te zetten, en dan bewaakt de lijst niets meer. Dezelfde
+   les als bij de `wacht`-regel in scripts/meetkeuring.js.
+
+   Nagemeten vóór de wijziging over alle toetsbestanden: 2 valse treffers (beide
+   in dat ene bestand) en 0 echte die hun vlag zouden verliezen. */
+const SCHRIJFT_OP_ARG1 = 'writeFileSync|appendFileSync|rmSync|unlinkSync|truncateSync';
+const SCHRIJFT_OP_ARG2 = ['copyFileSync', 'renameSync', 'linkSync', 'symlinkSync'];
+
+/* De argumenten van elke `fs.<fn>(...)`-aanroep, gesplitst op de komma's die op
+   diepte nul staan. Een regex kan dat niet: `path.join(map, b)` draagt zelf een
+   komma, en die hoort niet te splitsen. */
+function argumentenVan(bron, fn) {
+  const uit = [];
+  const naald = 'fs.' + fn + '(';
+  let i = 0;
+  while ((i = bron.indexOf(naald, i)) !== -1) {
+    let j = i + naald.length, diep = 0, huidig = '', args = [];
+    for (; j < bron.length; j++) {
+      const c = bron[j];
+      if (c === '(' || c === '[') diep++;
+      else if (c === ')' && diep === 0) break;
+      else if (c === ')' || c === ']') diep--;
+      else if (c === ',' && diep === 0) { args.push(huidig.trim()); huidig = ''; continue; }
+      huidig += c;
+    }
+    args.push(huidig.trim());
+    uit.push(args);
+    i = j + 1;
+  }
+  return uit;
+}
+
+function schrijftNaar(bron, naam) {
+  if (new RegExp('fs\\.(' + SCHRIJFT_OP_ARG1 + ')\\(\\s*' + naam + '\\b').test(bron)) return true;
+  return SCHRIJFT_OP_ARG2.some(fn =>
+    argumentenVan(bron, fn).some(args => args.length > 1 && new RegExp('^' + naam + '\\b').test(args[1])));
+}
+
 function variabeleBronschrijvers(bron) {
   const raak = [];
   /* Alle toekenningen per naam, ook de tweede en de derde: een naam die ook uit
@@ -131,8 +185,7 @@ function variabeleBronschrijvers(bron) {
     toekenningen.get(m[1]).push(m[2]);
   }
   for (const [naam, waarden] of toekenningen) {
-    const schrijft = new RegExp('fs\\.(writeFileSync|appendFileSync|rmSync|copyFileSync|renameSync)\\(\\s*' +
-      naam + '\\b').test(bron);
+    const schrijft = schrijftNaar(bron, naam);
     if (!schrijft) continue;
     const uitBron = waarden.map(w => {
       const j = /path\.join\(\s*WORTEL\s*,\s*(.+)$/.exec(w);
@@ -210,6 +263,44 @@ test('DE TEGENPROEF: de zeef ziet een bronmutatie ook echt', () => {
   assert.ok(VORMEN.some(v => v.test(nep)), 'een echte bronmutatie wordt niet herkend');
   const onschuldig = "metVervangen(path.join(os.tmpdir(), 'x'), 'a', 'b', () => {});";
   assert.equal(VORMEN.some(v => v.test(onschuldig)), false, 'een tijdelijk bestand telt ten onrechte mee');
+});
+
+test('DE TEGENPROEF op het argumentnummer: kopieren NAAR de bron wordt wel gezien', () => {
+  /* De reparatie hierboven maakt de zeef losser, en dat is precies het soort
+     wijziging dat stil te ver kan gaan. Deze tegenproef houdt de andere kant
+     vast: een toets die met copyFileSync of renameSync IN de bron schrijft,
+     hoort nog steeds aangewezen te worden.
+
+     Twee kanten in een proef, want ze horen bij elkaar: lezen UIT de bron is
+     geen mutatie, schrijven NAAR de bron wel -- en het verschil zit uitsluitend
+     in welk argument de naam draagt. */
+  const leest = [
+    "const bron = path.join(WORTEL, 'server/kern/x.js');",
+    "fs.copyFileSync(bron, path.join(map, 'x.js'));"
+  ].join('\n');
+  assert.deepEqual(variabeleBronschrijvers(leest), [],
+    'kopieren UIT de bron naar een wegwerpmap is een lezing en geen mutatie');
+
+  const schrijft = [
+    "const doel = path.join(WORTEL, 'server/kern/x.js');",
+    "fs.copyFileSync(path.join(map, 'x.js'), doel);"
+  ].join('\n');
+  assert.deepEqual(variabeleBronschrijvers(schrijft), ['doel'],
+    'kopieren NAAR de bron is wel een mutatie en hoort gezien te worden');
+
+  const hernoemt = [
+    "const doel = path.join(WORTEL, 'scripts/y.js');",
+    "fs.renameSync(tijdelijk, doel);"
+  ].join('\n');
+  assert.deepEqual(variabeleBronschrijvers(hernoemt), ['doel'],
+    'hernoemen NAAR de bron hoort gezien te worden');
+
+  /* En de splitser zelf: `path.join(map, b)` draagt een komma, en die mag het
+     argument niet in tweeen hakken. Zonder deze bewering zou een regex-splitser
+     hier een tweede argument `b)` zien en dus willekeurig oordelen. */
+  const args = argumentenVan("fs.copyFileSync(path.join(a, b), path.join(c, d));", 'copyFileSync');
+  assert.deepEqual(args, [['path.join(a, b)', 'path.join(c, d)']],
+    'de argumentsplitser knipt op een komma binnen haakjes');
 });
 
 test('DE TEGENPROEF op de flow-zeef: een pad uit een variabele wordt gezien', () => {

@@ -129,7 +129,14 @@ const BUITEN = {
        verouderen. */
   'MUTATIECONTRACT-VOORSTEL.json': 'een VOORSTEL van de machine; het besluit staat in server/lib/mutatiecontracten.js en wordt hier nooit weggedrukt',
   'MUTATIECONTRACT-AFGELEID.json': 'idem: afgeleide voorstellen, bij elke gang overschreven',
-  'MUTATIECONTRACT.json': 'een afdruk van de contracten in de code, ververst door de keuring',
+  /* DEZE REDEN WAS ONJUIST, EN DAT KOSTTE VIER DAGEN. Er stond "ververst door de
+     keuring", maar de keuring LAS hem alleen -- er was geen toets die hem
+     herberekende. Daardoor kon hij een commit achterlopen zonder dat iets het zei,
+     en stond de poort op LEGACY_PENDING_CLASSIFICATION vier dagen groen op nul
+     terwijl er 47 schrijfroutes zonder contract waren. Sinds 13 september 2026 is
+     de bewering waar: test/mutatiecontract.test.js draait het instrument opnieuw
+     (--telling) en vergelijkt elke stand. */
+  'MUTATIECONTRACT.json': 'een afdruk van de contracten in de code, HERBEREKEND door test/mutatiecontract.test.js ("de afdruk loopt niet achter op de code") -- loopt hij achter, dan zakt die toets en niet de versheid',
   'MUTATIEINVENTARIS.json': 'een afdruk uit de code: hij TELT de routes en meet geen gedrag',
   'SCHRIJFANALYSE.json': 'een statische afdruk uit de code; hij certificeert niet maar vetoot',
   'HANDLERBEWAKERS.json': 'een afdruk uit de code, ververst door de keuring',

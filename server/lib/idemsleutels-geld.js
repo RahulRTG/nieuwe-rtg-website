@@ -54,6 +54,27 @@ const SLEUTELS = {
   'POST /api/geld/grens/zet': { zelfdeVerzoek: true },              // de grens zelf
   'POST /api/supplier/pay/treasury/zet': { zelfdeVerzoek: true },   // de inrichting
 
+  /* De correctie van een betaalde factuur (kern/factuurcorrectie.js): een
+     dubbeltik is een herhaling, meer heeft de poort hier niet te doen.
+
+     HIER STOND EERST `velden: ['userId', 'invoiceId']`, en dat was verleidelijk
+     en fout. De gedachte was goed -- het lid en de factuur bepalen de handeling,
+     `grond` en `reden` zijn vrije invoer -- maar de poort leidt uit die velden
+     een SLEUTEL af en vergelijkt daarna het hele verzoek: een tweede correctie
+     op dezelfde factuur met een andere grond werd daarmee "dezelfde sleutel,
+     ander verzoek" en kreeg 409 "Deze idem-sleutel is al gebruikt voor een ander
+     verzoek". Dat is niet onwaar, maar het VERDRINGT het antwoord dat de route
+     zelf geeft en dat veel bruikbaarder is: 200 met `herhaald: true` en de
+     bestaande correctieregel erbij. De poort hoorde hier dus niet slimmer te
+     zijn dan de route. Nagemeten met test/factuurcorrectie.test.js toets 7.
+
+     De route beschermt zichzelf al twee keer -- een toestandscontrole op
+     `inv.correcties` en een idem-sleutel uit het factuurnummer die de aanroeper
+     niet kan zetten. Deze regel is de derde en de goedkoopste, en hij is er
+     vooral omdat de VERKLARING hoort te bestaan: een schrijfroute zonder
+     verklaring is een gat, ook als hij toevallig veilig is. */
+  'POST /api/office/pay/factuurcorrectie': { zelfdeVerzoek: true },
+
   /* ---- laat los; de handeling is haar eigen id ---- */
   'POST /api/supplier/pay/treasury/apart': { zelfdeVerzoek: true }, // doel + bedrag
   'POST /api/supplier/pay/treasury/vrij': { velden: ['id'] },       // welke pot vrij

@@ -1,0 +1,189 @@
+{
+  "stempel": "2026-09-13",
+  "uitleg": "Van goedgekeurde aanvraag naar een zaak die een lid werkelijk kan zien. De toelatingsketen ervoor is hier WERELD en geen schakel; die is elders beproefd.",
+  "grens": "Geen browser, geen betaling. De proef meet de partner-app en de ledenkant van EEN zaak in een vrij genre (hotel); een gereguleerd genre loopt eerst door de toelatingsketen.",
+  "genre": "hotel",
+  "schakels": [
+    {
+      "nr": 1,
+      "van": "ondernemer",
+      "naar": "zaak",
+      "wat": "met het eigen RTG-account op de eigen zaak landen, als manager",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "zaak PROEFHOTEL, rol manager",
+      "fout": null,
+      "ms": 124
+    },
+    {
+      "nr": 2,
+      "van": "zaak",
+      "naar": "ondernemer",
+      "wat": "de poort noemt elke openstaande stap MET een uitleg waarom hij nodig is",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "3 open stap(pen), 3 met uitleg",
+      "fout": null,
+      "ms": 9
+    },
+    {
+      "nr": 3,
+      "van": "zaak",
+      "naar": "systeem",
+      "wat": "de werkvormen volgen uit wat de zaak IS, zonder dat iemand iets aanzet",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "zelfstandig, verblijf, kassa",
+      "fout": null,
+      "ms": 5
+    },
+    {
+      "nr": 4,
+      "van": "ondernemer",
+      "naar": "etalage",
+      "wat": "de Salon-pagina vullen, en de zaak bevestigt dat hij compleet is",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "compleet: true",
+      "fout": null,
+      "ms": 15
+    },
+    {
+      "nr": 5,
+      "van": "poort",
+      "naar": "etalage",
+      "wat": "zolang de verplichte rondleidingen niet gevolgd zijn, ziet een lid de zaak niet",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "poort klaar: false, lid ziet de zaak: nee (kassa:false, werk:false, salon:false)",
+      "fout": null,
+      "ms": 14
+    },
+    {
+      "nr": 6,
+      "van": "ondernemer",
+      "naar": "poort",
+      "wat": "de twee verplichte rondleidingen aftikken, en de poort staat daarna op klaar",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "klaar: true, verplicht gevolgd: 2/2",
+      "fout": null,
+      "ms": 15
+    },
+    {
+      "nr": 7,
+      "van": "ondernemer",
+      "naar": "publiek",
+      "wat": "de zaak online zetten lukt zodra de poort klaar is",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "online: true",
+      "fout": null,
+      "ms": 8
+    },
+    {
+      "nr": 8,
+      "van": "zaak",
+      "naar": "lid",
+      "wat": "een lid opent de etalage van de zaak en ziet de ingevulde bio",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "bio bij het lid: Een klein proefhotel aan de gracht, acht kamers en een binne",
+      "fout": null,
+      "ms": 17
+    },
+    {
+      "nr": 9,
+      "van": "ondernemer",
+      "naar": "zaak",
+      "wat": "na een nieuwe inlog staat dezelfde poortstand er nog",
+      "bekend": null,
+      "stand": "gesloten",
+      "status": 200,
+      "ziet": "na herinloggen -- klaar: true, online: true",
+      "fout": null,
+      "ms": 119
+    }
+  ],
+  "storingen": [
+    {
+      "naam": "een rondleiding die niet bestaat aftikken",
+      "belofte": "wordt geweigerd met een reden, en verschijnt nooit in de lijst",
+      "stand": "gehouden",
+      "wat": "status 400 -- Onbekende rondleiding."
+    },
+    {
+      "naam": "twee keer online zetten",
+      "belofte": "levert dezelfde stand op, geen tweede zaak en geen fout",
+      "stand": "gehouden",
+      "wat": "eerste 200, tweede 200"
+    },
+    {
+      "naam": "een ander lid logt in op deze zaak",
+      "belofte": "wordt geweigerd: hij staat hier niet op het rooster",
+      "stand": "gehouden",
+      "wat": "status 404 -- U staat nog nergens op het rooster. Vraag uw werkgever om een kassacode en meld u eenmalig aan."
+    },
+    {
+      "naam": "een ledentoken op een partnerroute",
+      "belofte": "opent de partner-app niet",
+      "stand": "gehouden",
+      "wat": "status 401"
+    },
+    {
+      "naam": "de zaak pauzeren en weer aanzetten",
+      "belofte": "pauzeren haalt hem bij het LID weg, aanzetten brengt hem terug",
+      "stand": "gehouden",
+      "wat": "gepauzeerd: lid kreeg 404, na aanzetten: 200"
+    },
+    {
+      "naam": "het spoor van de livegang",
+      "belofte": "het logboek van de zaak noemt wie haar online zette",
+      "stand": "gehouden",
+      "wat": "status 200, \"online\" in het spoor: true"
+    },
+    {
+      "naam": "de etalage opvragen zonder inlog",
+      "belofte": "wordt geweigerd; de Salon is voor leden",
+      "stand": "gehouden",
+      "wat": "status 401"
+    },
+    {
+      "naam": "de etalage van een zaak die niet bestaat",
+      "belofte": "geeft dezelfde 404 als een zaak die nog niet zichtbaar is",
+      "stand": "gehouden",
+      "wat": "status 404"
+    }
+  ],
+  "poort": {
+    "klaarNaSalon": false,
+    "zichtbaarNaSalon": false,
+    "rondleidingen": "kassa:false, werk:false, salon:false"
+  },
+  "zaak": {
+    "code": "PROEFHOTEL",
+    "genre": "hotel",
+    "aanmelding": "563ad3aa"
+  },
+  "telling": {
+    "schakels": 9,
+    "gesloten": 9,
+    "open": 0,
+    "openBekend": 0,
+    "stuk": 0,
+    "storingen": 8,
+    "gehouden": 8,
+    "gebroken": 0
+  },
+  "sluit": true,
+  "sluitMetBevinding": true,
+  "bevindingen": []
+}

@@ -1560,6 +1560,48 @@ const IJKINGEN = {
       (j) => { j.gemeten.spoorAanroepen = Math.max(0, (j.gemeten.spoorAanroepen || 0) - 40); return j; },
       () => voor.stilSpoorAanroepen - norm.meet().stilSpoorAanroepen)
   },
+  /* DE TAND VAN 13 SEPTEMBER 2026: stageDomeinenGemeten telt de publieke
+     domeinen die scripts/stagevorm.js werkelijk heeft gezien (STAGE.md par. 0).
+     Dezelfde vorm en dezelfde richting als zijn zuster hierboven, en om dezelfde
+     reden OMLAAG: de uitkomst van die meter is een NUL (0 velden gedeeld over
+     tien domeinen), en op een nul rust een architectuurbesluit. Ziet de meter
+     stil minder domeinen, dan blijft diezelfde nul op het scherm staan terwijl
+     hij iets anders is gaan betekenen -- van "deze domeinen delen niets" naar
+     "we hebben minder gekeken". Dat is precies de verwarring die deze tand moet
+     tegenhouden, en ze is van buiten niet te zien. */
+  stageDomeinenGemeten: {
+    proef: (voor) => metVervangenJson('STAGEVORM.json',
+      (j) => { j.gemeten.vorm.domeinen = Math.max(0, (j.gemeten.vorm.domeinen || 0) - 4); return j; },
+      () => voor.stageDomeinenGemeten - norm.meet().stageDomeinenGemeten)
+  },
+  /* DE TAND VAN 13 SEPTEMBER 2026 (tweede): wekZonderUitspraak telt de publieke
+     domeinen waarover het wekbesluitregister zwijgt. Hij staat op NUL, en dat
+     maakt hem een ander geval dan de meters hierboven: bij een nul is "de meter
+     is stuk" en "er is niets aan de hand" van buiten identiek. De ijking gaat
+     daarom OMHOOG -- zet er drie onbesproken domeinen in het register en de
+     meter hoort exact drie te melden. */
+  wekZonderUitspraak: {
+    proef: (voor) => metVervangenJson('WEKDEKKING.json',
+      (j) => { j.gemeten.zonderUitspraak = (j.gemeten.zonderUitspraak || 0) + 3; return j; },
+      () => norm.meet().wekZonderUitspraak - voor.wekZonderUitspraak)
+  },
+  /* DE TAND VAN 13 SEPTEMBER 2026 (derde): momentOpenBekend telt de schakels in
+     de publieke keten die aantoonbaar OPENSTAAN met een uitgeschreven reden
+     (MOMENTPROEF.json, STAGE.md par. 6). Elke open schakel is een openstaand
+     besluit van de eigenaar, dus er mogen er alleen minder worden.
+
+     DE IJKING GAAT HIER OMHOOG, en dat is de richting die ertoe doet. De uitweg
+     `openBekend` is bedoeld voor een schakel die niet sluit terwijl er een
+     besluit over loopt, en zo'n uitweg verwatert vanzelf tot "alles wat niet
+     werkt krijgt een zinnetje". Wat deze tand moet vangen is dus dat er STIL een
+     vierde bij komt; leest de meter het verkeerde veld -- `telling.open` in
+     plaats van `telling.openBekend`, die naast elkaar staan en allebei op een
+     getal lijken -- dan beweegt hij niet mee en zakt deze ijking. */
+  momentOpenBekend: {
+    proef: (voor) => metVervangenJson('MOMENTPROEF.json',
+      (j) => { j.telling.openBekend = (j.telling.openBekend || 0) + 2; return j; },
+      () => norm.meet().momentOpenBekend - voor.momentOpenBekend)
+  },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
      de meter leest `gemeten.defecten` uit een register dat er al is, dus hij
@@ -1626,6 +1668,94 @@ const IJKINGEN = {
       (j) => { j.telling.BLOCKED = (j.telling.BLOCKED || 0) + 2;
         j.telling.UNKNOWN = (j.telling.UNKNOWN || 0) + 3; return j; },
       () => norm.meet().geldpadOnbewezen - voor.geldpadOnbewezen)
+  },
+  /* DE TWEE TANDEN VAN 13 SEPTEMBER 2026 (CRASHAS.json), en ze worden apart
+     geijkt omdat ze apart bestaan.
+
+     `crashasOnbekend` leest `telling.onbekend` rechtstreeks -- zelfde vorm als
+     de vier hierboven, dus ophogen en kijken of de meter meebeweegt.
+
+     `crashasNietMeetbaar` is de interessantere: hij staat NIET als veld in het
+     register maar wordt gerekend als `bestaat - meetbaar`. Een meter die een
+     verschil leest, kan op twee manieren stukgaan -- hij leest het verkeerde
+     veld, of hij leest er maar een. Daarom beweegt deze proef alleen `meetbaar`
+     en laat hij `bestaat` staan: gaat de meter dan niet omhoog, dan rekent hij
+     niet met het verschil maar met een van de twee. */
+  crashasOnbekend: {
+    proef: (voor) => metVervangenJson('CRASHAS.json',
+      (j) => { j.telling.onbekend = (j.telling.onbekend || 0) + 7; return j; },
+      () => norm.meet().crashasOnbekend - voor.crashasOnbekend)
+  },
+  crashasNietMeetbaar: {
+    proef: (voor) => metVervangenJson('CRASHAS.json',
+      (j) => { j.telling.meetbaar = (j.telling.meetbaar || 0) - 5; return j; },
+      () => norm.meet().crashasNietMeetbaar - voor.crashasNietMeetbaar)
+  },
+  /* DE TWEE TANDEN VAN DE CRASHPROEF (CRASHPROEF.json), en ze worden apart
+     geijkt om dezelfde reden als hierboven: ze tellen verschillende dingen en
+     mogen nooit worden opgeteld.
+
+     `crashproefGezakt` telt gebroken overlevingscontracten -- een DEFECT.
+     `crashproefOnbereikt` telt rijen waar de proef de route niet aan het werk
+     kreeg -- BEREIK van het instrument.
+
+     Er is een derde stand in dat register, GEEN_DUURZAME_WEG, en die hangt aan
+     GEEN van beide tanden: dat is een gemeten niet-van-toepassing en geen
+     schuld. Daarom hoogt elke proef hieronder alleen ZIJN EIGEN veld op; zou
+     een meter meebewegen met het andere veld, dan telt hij iets samen wat apart
+     hoort te staan. */
+  crashproefGezakt: {
+    proef: (voor) => metVervangenJson('CRASHPROEF.json',
+      (j) => { j.telling.FAILED = (j.telling.FAILED || 0) + 6; return j; },
+      () => norm.meet().crashproefGezakt - voor.crashproefGezakt)
+  },
+  crashproefGeenLijf: {
+    proef: (voor) => metVervangenJson('CRASHPROEF.json',
+      (j) => { j.telling.BLOCKED_BODY = (j.telling.BLOCKED_BODY || 0) + 9; return j; },
+      () => norm.meet().crashproefGeenLijf - voor.crashproefGeenLijf)
+  },
+  crashproefGeenWereld: {
+    proef: (voor) => metVervangenJson('CRASHPROEF.json',
+      (j) => { j.telling.BLOCKED_WORLD = (j.telling.BLOCKED_WORLD || 0) + 7; return j; },
+      () => norm.meet().crashproefGeenWereld - voor.crashproefGeenWereld)
+  },
+  crashproefGeenRol: {
+    proef: (voor) => metVervangenJson('CRASHPROEF.json',
+      (j) => { j.telling.BLOCKED_ROLE = (j.telling.BLOCKED_ROLE || 0) + 5; return j; },
+      () => norm.meet().crashproefGeenRol - voor.crashproefGeenRol)
+  },
+  crashproefOnbepaald: {
+    proef: (voor) => metVervangenJson('CRASHPROEF.json',
+      (j) => { j.telling.BLOCKED_ONBEPAALD = (j.telling.BLOCKED_ONBEPAALD || 0) + 4; return j; },
+      () => norm.meet().crashproefOnbepaald - voor.crashproefOnbepaald)
+  },
+  /* DE DRIE TANDEN VAN DE GEVOLGDEKKING (GEVOLGDEKKING.json, 13 september 2026).
+
+     Ze lezen drie verschillende velden uit dezelfde `tellers`, en dat is hier de
+     faalvorm: een meter die het verkeerde veld leest, beweegt wel mee maar met een
+     ANDER getal. Vandaar drie ONGELIJKE bedragen (3, 5 en 7) -- met drie keer
+     dezelfde ophoging zou een verwisseling er precies even goed uitzien.
+
+     EN LET OP DE MIDDELSTE: `gevolgContractVolledig` gaat de andere kant op
+     (richting omhoog), dus zijn bekend-foute invoer is een verklaring die
+     VERDWIJNT en niet een die erbij komt. Dat is de echte faalvorm van die tand:
+     een contract dat de keuring niet meer haalt, verdwijnt uit de teller, en een
+     ratel die alleen naar boven kijkt zou dat als "niets veranderd" lezen. Daarom
+     telt de proef het verschil de andere kant op. */
+  gevolgPadenOnbekend: {
+    proef: (voor) => metVervangenJson('GEVOLGDEKKING.json',
+      (j) => { j.tellers.onbekendeEffectpaden = (j.tellers.onbekendeEffectpaden || 0) + 3; return j; },
+      () => norm.meet().gevolgPadenOnbekend - voor.gevolgPadenOnbekend)
+  },
+  gevolgContractVolledig: {
+    proef: (voor) => metVervangenJson('GEVOLGDEKKING.json',
+      (j) => { j.tellers.contractVolledig = (j.tellers.contractVolledig || 0) - 5; return j; },
+      () => voor.gevolgContractVolledig - norm.meet().gevolgContractVolledig)
+  },
+  gevolgContractenGezakt: {
+    proef: (voor) => metVervangenJson('GEVOLGDEKKING.json',
+      (j) => { j.tellers.contractenGezakt = (j.tellers.contractenGezakt || 0) + 7; return j; },
+      () => norm.meet().gevolgContractenGezakt - voor.gevolgContractenGezakt)
   },
   /* DE TAND VAN 12 SEPTEMBER 2026: eersteMinuutGezakt telt de toetsen van de
      eerste minuut die ZAKKEN (EERSTEMINUUT.json, telling.gezakt). Zelfde vorm

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1874 bestanden en 13394 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1874 bestanden en 13396 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1874 |
-| losse beweringen (`test(...)`) | 13394 |
+| losse beweringen (`test(...)`) | 13396 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1244 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1657 bestanden, 13011 beweringen.
+1657 bestanden, 13013 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -45,7 +45,7 @@ toets omvalt.
 | `aanmeldingen.test.js` | 9 | gezakt op `false->true` | Aanmeldingen (kern/aanmeldingen.js): de aanmelding per pas is geheel geautomatiseerd, behalve de menselijke ja/nee. De AI kent NOOIT zelf Lifestyle/Business toe. |
 | `aanvoer.test.js` | 23 | gezakt op `===->!==#0` | HET AANVOERCONTRACT -- en vooral: wat een bron NIET mag meeleveren. server/kern/knelpunt/aanvoer.js zegt wat een BRON minimaal moet leveren om een vondst te heten. |
 | `aanwezig.test.js` | 2 | gezakt op `liegpoort /api/` | Aanwezigheid (server): elke receptie/entree telt hoeveel mensen er binnen zijn en de verdeling man/vrouw. Alleen geaggregeerd -- nooit per persoon. |
-| `aanwezigheid.test.js` | 12 | gezakt op `===->!==#0` | DE PUBLIEKE AANWEZIGHEID EN DE REDACTIEHANDELING -- de twee besluiten van 13 september, als toetsen in plaats van als zin. BESLUIT 1: een lid volgt een PUBLIEKE AANWEZIGHEID, gedragen door een mens of een... |
+| `aanwezigheid.test.js` | 14 | gezakt op `===->!==#0` | DE PUBLIEKE AANWEZIGHEID EN DE REDACTIEHANDELING -- de twee besluiten van 13 september, als toetsen in plaats van als zin. BESLUIT 1: een lid volgt een PUBLIEKE AANWEZIGHEID, gedragen door een mens of een... |
 | `accountroutes.test.js` | 7 | gezakt op `true->false#0` | De accountroutes: deuren die een echt account vragen en niet alleen een pas. Meet gedrag, geen brontekst. |
 | `accounts-os.test.js` | 8 | gezakt op `===->!==` | De accountkluis (public/shared/accounts-os.js): meerdere accounts per toestel, snel wisselen (één actief) en "echt tegelijk" (per-venster account). Pure logica, dus we injecteren nep-opslag en draaien het gewoon in node. |
 | `accounts-productie-hardclose.test.js` | 6 | gezakt op `return-weg#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |

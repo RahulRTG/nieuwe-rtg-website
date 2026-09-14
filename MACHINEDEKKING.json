@@ -3,15 +3,15 @@
  "uitleg": "Per handeling: hoeveel van de eigen machinerie raakt hij? Zestien motoren die ieder apart gemeten zijn, hier voor het eerst naast elkaar op DEZELFDE route.",
  "grens": "Twee assen die verschillende dingen missen, nooit opgeteld: `handler` is lexicaal binnen de tekst van de handler (mist een hulpfunctie en de kern-tas) en `bestand` rekent het routebestand plus zijn DIRECTE requires (vangt de hulpfunctie, markeert alle routes in een bestand, mist nog steeds de kern-tas). De tas zit met opzet niet in de route-as: een hub als server.js zette zo 4162 routes op \"idempotent\". Woont een route ZELF in een hub, dan vervalt de bestandsas (bestandsasOnbruikbaar) en is ook zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. De assen uit EXECUTION_MAP.json zijn gelezen en niet hier geteld.",
  "stempel": {
-  "op": "2026-09-13T15:46:04.147Z",
-  "commit": "2364e49cd",
+  "op": "2026-09-14T15:41:56.595Z",
+  "commit": "532eec0b",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/machinedekking.js",
   "node": "v22.22.2"
  },
  "bronnen": {
-  "EXECUTION_MAP.json": "d00fd813681f1de0",
+  "EXECUTION_MAP.json": "dba5a118d30b288a",
   "KERNHERKOMST.json": "807b7a8bc53cd607",
   "server/kern/stuur/beleid.js": "8dc821a9959c82e0",
   "kernherkomstStempel": {
@@ -212,8 +212,8 @@
   }
  },
  "gemeten": {
-  "routes": 5053,
-  "muterend": 4963,
+  "routes": 5061,
+  "muterend": 4971,
   "assen": 19,
   "perAs": {
    "mensAanDeDeur": {
@@ -281,8 +281,8 @@
     "bestand": 29
    },
    "aiVindbaar": {
-    "handler": 173,
-    "bestand": 173,
+    "handler": 174,
+    "bestand": 174,
     "uitKaart": true
    },
    "bewijsstand": {
@@ -291,8 +291,8 @@
     "uitKaart": true
    },
    "herhaling": {
-    "handler": 1675,
-    "bestand": 1675,
+    "handler": 1690,
+    "bestand": 1690,
     "uitKaart": true
    }
   },
@@ -573,7 +573,7 @@
     }
    }
   ],
-  "mutatiesZonderEnigeAs": 2825,
+  "mutatiesZonderEnigeAs": 2826,
   "mutatiesZonderHandlerSpan": 0,
   "bestandsasOnbruikbaar": 28,
   "hubdrempel": 40,
@@ -590,23 +590,23 @@
   "assenPerMutatie": [
    {
     "assen": 0,
-    "routes": 3002
+    "routes": 3003
    },
    {
     "assen": 1,
-    "routes": 1817
+    "routes": 1814
    },
    {
     "assen": 2,
-    "routes": 139
+    "routes": 149
    },
    {
     "assen": 3,
-    "routes": 3
+    "routes": 4
    },
    {
     "assen": 4,
-    "routes": 2
+    "routes": 1
    }
   ]
  },
@@ -13226,8 +13226,12 @@
    "methode": "POST",
    "pad": "/api/mediaos/aanwezig/mijn",
    "bestand": "server/routes/mediaos.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "herhaling"
+   ],
+   "boven": [
+    "herhaling"
+   ]
   },
   {
    "methode": "POST",
@@ -17226,8 +17230,12 @@
    "methode": "POST",
    "pad": "/api/member/voorstel/intrek",
    "bestand": "server/routes/stuur.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "aiVindbaar"
+   ],
+   "boven": [
+    "aiVindbaar"
+   ]
   },
   {
    "methode": "POST",
@@ -18758,10 +18766,12 @@
    "pad": "/api/office/balie/zoek",
    "bestand": "server/routes/ledenbalie.js",
    "onder": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ]
   },
   {
@@ -18949,7 +18959,22 @@
    "onder": [
     "mensAanDeDeur",
     "voornemen",
+    "tegenfeit"
+   ],
+   "boven": [
+    "mensAanDeDeur",
+    "bewijsDraagt",
+    "voornemen",
     "tegenfeit",
+    "frictie"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/office/bank/incasso/dossier",
+   "bestand": "server/routes/kantoren/bank-incasso.js",
+   "onder": [
+    "mensAanDeDeur",
     "herhaling"
    ],
    "boven": [
@@ -18959,21 +18984,6 @@
     "tegenfeit",
     "frictie",
     "herhaling"
-   ]
-  },
-  {
-   "methode": "POST",
-   "pad": "/api/office/bank/incasso/dossier",
-   "bestand": "server/routes/kantoren/bank-incasso.js",
-   "onder": [
-    "mensAanDeDeur"
-   ],
-   "boven": [
-    "mensAanDeDeur",
-    "bewijsDraagt",
-    "voornemen",
-    "tegenfeit",
-    "frictie"
    ]
   },
   {
@@ -19229,10 +19239,12 @@
    "pad": "/api/office/bank/rekening/open",
    "bestand": "server/routes/kantoren/bank-rekeningen.js",
    "onder": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ]
   },
   {
@@ -19240,10 +19252,12 @@
    "pad": "/api/office/bank/rekening/rood",
    "bestand": "server/routes/kantoren/bank-rekeningen.js",
    "onder": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ]
   },
   {
@@ -22492,10 +22506,12 @@
    "pad": "/api/office/salon/uitlicht/bord",
    "bestand": "server/routes/kantoren/salon.js",
    "onder": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ]
   },
   {
@@ -22635,10 +22651,12 @@
    "pad": "/api/office/service/foutsignalen",
    "bestand": "server/routes/service-kantoor-borden.js",
    "onder": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ]
   },
   {
@@ -22682,11 +22700,13 @@
    "pad": "/api/office/service/gesprekken",
    "bestand": "server/routes/service-kantoor.js",
    "onder": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ],
    "boven": [
     "mensAanDeDeur",
-    "voornemen"
+    "voornemen",
+    "herhaling"
    ]
   },
   {
@@ -22705,10 +22725,12 @@
    "pad": "/api/office/service/kanalen",
    "bestand": "server/routes/service-kantoor-kanalen.js",
    "onder": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ]
   },
   {
@@ -22728,10 +22750,12 @@
    "pad": "/api/office/service/kwaliteit",
    "bestand": "server/routes/service-kantoor-borden.js",
    "onder": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ]
   },
   {
@@ -22763,11 +22787,13 @@
    "pad": "/api/office/service/machtigingen",
    "bestand": "server/routes/service-kantoor.js",
    "onder": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ],
    "boven": [
     "mensAanDeDeur",
-    "voornemen"
+    "voornemen",
+    "herhaling"
    ]
   },
   {
@@ -22775,10 +22801,12 @@
    "pad": "/api/office/service/patronen",
    "bestand": "server/routes/service-kantoor-borden.js",
    "onder": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ],
    "boven": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ]
   },
   {
@@ -22798,11 +22826,13 @@
    "pad": "/api/office/service/wachtrij",
    "bestand": "server/routes/service-kantoor.js",
    "onder": [
-    "mensAanDeDeur"
+    "mensAanDeDeur",
+    "herhaling"
    ],
    "boven": [
     "mensAanDeDeur",
-    "voornemen"
+    "voornemen",
+    "herhaling"
    ]
   },
   {
@@ -26042,8 +26072,12 @@
    "methode": "POST",
    "pad": "/api/pakket/typen",
    "bestand": "server/routes/member/pakket.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "herhaling"
+   ],
+   "boven": [
+    "herhaling"
+   ]
   },
   {
    "methode": "POST",
@@ -26208,8 +26242,12 @@
    "methode": "POST",
    "pad": "/api/pay/portefeuille",
    "bestand": "server/routes/pay-waarde.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "herhaling"
+   ],
+   "boven": [
+    "herhaling"
+   ]
   },
   {
    "methode": "POST",
@@ -26293,12 +26331,10 @@
    "pad": "/api/pay/tik",
    "bestand": "server/routes/pay-tegoed.js",
    "onder": [
-    "aiVindbaar",
-    "herhaling"
+    "aiVindbaar"
    ],
    "boven": [
-    "aiVindbaar",
-    "herhaling"
+    "aiVindbaar"
    ]
   },
   {
@@ -27666,6 +27702,70 @@
    "methode": "POST",
    "pad": "/api/rtf/koppel",
    "bestand": "server/routes/member/gezin.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/beslis",
+   "bestand": "server/routes/labfonds.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/doneer",
+   "bestand": "server/routes/labfonds.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/financiering",
+   "bestand": "server/routes/labfonds.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/locatie/maak",
+   "bestand": "server/routes/labfonds.js",
+   "onder": [
+    "herhaling"
+   ],
+   "boven": [
+    "herhaling"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/overzicht",
+   "bestand": "server/routes/labfonds.js",
+   "onder": [
+    "herhaling"
+   ],
+   "boven": [
+    "herhaling"
+   ]
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/scheidsrechter",
+   "bestand": "server/routes/labfonds.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/stem",
+   "bestand": "server/routes/labfonds.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/voorstel/maak",
+   "bestand": "server/routes/labfonds.js",
    "onder": [],
    "boven": []
   },
@@ -32772,8 +32872,12 @@
    "methode": "POST",
    "pad": "/api/supplier/activity",
    "bestand": "server/routes/supplier/tafels-team.js",
-   "onder": [],
-   "boven": []
+   "onder": [
+    "herhaling"
+   ],
+   "boven": [
+    "herhaling"
+   ]
   },
   {
    "methode": "POST",
@@ -38023,12 +38127,10 @@
    "pad": "/api/supplier/pay/uitbetaal",
    "bestand": "server/routes/pay-zaak.js",
    "onder": [
-    "aiVindbaar",
-    "herhaling"
+    "aiVindbaar"
    ],
    "boven": [
-    "aiVindbaar",
-    "herhaling"
+    "aiVindbaar"
    ]
   },
   {

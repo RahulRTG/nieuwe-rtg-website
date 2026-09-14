@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-13T10:49:58.911Z",
-    "commit": "ca7925ecc",
+    "op": "2026-09-14T10:27:43.948Z",
+    "commit": "adf0407a2",
     "boomVuil": false,
-    "boomAnders": 3,
+    "boomAnders": 0,
     "instrument": "scripts/crashas.js",
     "node": "v22.22.2"
   },
@@ -45,8 +45,8 @@
       "waarom": "ingebouwd in server/db/index.js, in de duurzame commit zelf: na de bevestigde schrijfactie en voor het antwoord"
     },
     "na-commit-voor-bericht": {
-      "verraad": null,
-      "waarom": "er is geen haak tussen de commit en het versturen van het bericht"
+      "verraad": "sterf-voor-bericht",
+      "waarom": "ingebouwd in server/opzet/meldaan.js EN server/opzet/meldingen.js -- de twee schrijvers naar db.data.notifications -- na de handeling en voordat de melding is weggeschreven. Twee seams omdat er twee wegen zijn; een ervan meet de helft"
     },
     "providercommit-zonder-antwoord": {
       "verraad": null,
@@ -61,22 +61,22 @@
     "actief": false,
     "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen."
   },
-  "gemetenOp": "2026-09-13T10:49:58.875Z",
+  "gemetenOp": "2026-09-14T10:27:43.908Z",
   "telling": {
     "routes": 45,
     "paren": 270,
-    "bestaat": 5,
-    "bestaatNiet": 176,
-    "onbekend": 89,
-    "meetbaar": 5,
-    "gemeten": 5,
+    "bestaat": 21,
+    "bestaatNiet": 186,
+    "onbekend": 63,
+    "meetbaar": 21,
+    "gemeten": 21,
     "perGrens": {
       "voor-eerste-mutatie": {
-        "bestaat": 4,
-        "bestaatNiet": 19,
-        "onbekend": 22,
-        "meetbaar": 4,
-        "gemeten": 4
+        "bestaat": 12,
+        "bestaatNiet": 23,
+        "onbekend": 10,
+        "meetbaar": 12,
+        "gemeten": 12
       },
       "in-de-opslag": {
         "bestaat": 0,
@@ -86,11 +86,11 @@
         "gemeten": 0
       },
       "na-commit-voor-antwoord": {
-        "bestaat": 1,
-        "bestaatNiet": 22,
-        "onbekend": 22,
-        "meetbaar": 1,
-        "gemeten": 1
+        "bestaat": 9,
+        "bestaatNiet": 28,
+        "onbekend": 8,
+        "meetbaar": 9,
+        "gemeten": 9
       },
       "na-commit-voor-bericht": {
         "bestaat": 0,
@@ -127,19 +127,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: bankBoekingen, bankPassen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: bankBoekingen, bankPassen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-na-commit"
         },
         "in-de-opslag": {
@@ -159,8 +159,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -227,8 +226,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -295,8 +293,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -363,8 +360,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -397,19 +393,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "nee",
-          "graad": "gemeten",
-          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
-          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "nee",
-          "graad": "gemeten",
-          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
-          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: bankPassen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -431,8 +425,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -465,19 +458,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "nee",
-          "graad": "gemeten",
-          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
-          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: bankRekeningen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "nee",
-          "graad": "gemeten",
-          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
-          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: bankRekeningen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -499,8 +490,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -534,19 +524,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-na-commit"
         },
         "in-de-opslag": {
@@ -566,8 +556,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -601,11 +590,11 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
@@ -633,8 +622,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -701,8 +689,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -736,19 +723,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-na-commit"
         },
         "in-de-opslag": {
@@ -768,8 +755,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -834,8 +820,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -900,8 +885,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -934,17 +918,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: geldbeleid), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: geldbeleid), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -966,8 +952,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1034,8 +1019,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1102,8 +1086,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1170,8 +1153,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1238,8 +1220,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1272,17 +1253,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: labFonds), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: labFonds), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -1304,8 +1287,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1372,8 +1354,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1406,11 +1387,11 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (FAILED)",
-          "uitslag": "FAILED",
-          "instrument": "scripts/crashproef.js",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
@@ -1439,8 +1420,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1473,11 +1453,11 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (FAILED)",
-          "uitslag": "FAILED",
-          "instrument": "scripts/crashproef.js",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
@@ -1506,8 +1486,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1574,8 +1553,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1608,11 +1586,11 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "ja",
-          "graad": "gemeten",
-          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (FAILED)",
-          "uitslag": "FAILED",
-          "instrument": "scripts/crashproef.js",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: bankregie), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
@@ -1641,8 +1619,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1709,8 +1686,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1777,8 +1753,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1812,19 +1787,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-na-commit"
         },
         "in-de-opslag": {
@@ -1844,8 +1819,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1914,8 +1888,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -1949,11 +1922,11 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
@@ -1981,8 +1954,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2017,19 +1989,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payTegoed), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payTegoed), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-na-commit"
         },
         "in-de-opslag": {
@@ -2049,8 +2021,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2084,19 +2055,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-na-commit"
         },
         "in-de-opslag": {
@@ -2116,8 +2087,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2184,8 +2154,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2218,19 +2187,17 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "nee",
-          "graad": "gemeten",
-          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
-          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: payVerzoeken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "nee",
-          "graad": "gemeten",
-          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
-          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: payVerzoeken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2252,8 +2219,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2288,19 +2254,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payVerzoeken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payVerzoeken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-na-commit"
         },
         "in-de-opslag": {
@@ -2320,8 +2286,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2388,8 +2353,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2456,8 +2420,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2490,17 +2453,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalVerzoeken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalVerzoeken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2522,8 +2487,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2556,17 +2520,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2588,8 +2554,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2622,17 +2587,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2654,8 +2621,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2696,9 +2662,10 @@
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: giftcards), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2720,8 +2687,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2786,8 +2752,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2825,17 +2790,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 6 collectie(s) aanraken: facturen, payBoekingen, payCodes, paySaldi, posSales, waardeOormerken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 6 collectie(s) aanraken: facturen, payBoekingen, payCodes, paySaldi, posSales, waardeOormerken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -2857,8 +2824,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2925,8 +2891,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -2960,19 +2925,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-na-commit"
         },
         "in-de-opslag": {
@@ -2992,8 +2957,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -3027,17 +2991,18 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: facturen, posSales), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
-          "uitslag": null,
-          "instrument": null,
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: facturen, posSales), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -3059,8 +3024,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",
@@ -3093,17 +3057,19 @@
       ],
       "grenzen": {
         "voor-eerste-mutatie": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: wallet), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-voor-mutatie"
         },
         "na-commit-voor-antwoord": {
-          "bestaat": "onbekend",
-          "graad": "onbekend",
-          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: wallet), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
           "uitslag": null,
           "instrument": null,
           "meetbaar": "sterf-na-commit"
@@ -3125,8 +3091,7 @@
           "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
           "uitslag": null,
           "instrument": null,
-          "meetbaar": false,
-          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+          "meetbaar": "sterf-voor-bericht"
         },
         "providercommit-zonder-antwoord": {
           "bestaat": "nee",

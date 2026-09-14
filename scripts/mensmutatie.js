@@ -87,10 +87,20 @@ const WACHTEN = [
    stil leeg maken, en dan zou een fase eruitzien alsof niemand hem bewaakt. */
 const L = 'server/kern/stuur/lus.js';
 const LS = 'server/kern/stuur/lusstap.js';
+/* DE PLANTAK WOONT SINDS 13 SEPTEMBER 2026 APART (server/kern/stuur/lusstap-plan.js).
+   Mutatie 3 en 4 grijpen daar aan en niet meer in ./lusstap.js -- die tak is afgesplitst
+   toen de gevolgvoorspelling een tweede as kreeg. Deze regel staat er omdat het anders een
+   zoektocht is: een ankerpunt dat niet meer past wordt OVERGESLAGEN, en dan beweert
+   MENSMUTATIE.json iets over een garantie die nooit is aangeraakt -- precies wat toets 1
+   van test/mensmutatie.test.js vangt, en wat hij hier ook echt heeft gevangen. */
+const LSP = 'server/kern/stuur/lusstap-plan.js';
 const PL = 'server/kern/stuur/plafond.js';
 const RC = 'server/kern/stuur/rail-corpus.js';
 const RCC = 'server/kern/stuur/rail-corpus-context.js';
 const CON = 'server/kern/stuur/menstaal.json';
+const GK = 'server/kern/stuur/goedkeuring.js';
+const BL = 'server/kern/stuur/beleid-lijsten.js';
+const CL = 'server/kern/stuur/classificatie.js';
 
 /* De projectie van geval B ("die andere" met EEN alternatief). Drie mutaties
    grijpen hem aan, en met opzet dezelfde: hij is de enige gescriptte zin die
@@ -125,9 +135,9 @@ const MUTATIES = [
     weg: 'de echte compileer() draait niet en PLAN_COMPILED wordt niet gemerkt',
     hoortTeZakken: 'het spoor is incompleet',
     tekst: [
-      { bestand: LS, van: 'const gewogen = compileer(t.input || {}, wereld);',
+      { bestand: LSP, van: 'const gewogen = compileer(t.input || {}, wereld);',
         naar: 'const gewogen = { uitvoerbaar: true, bezwaren: [], stappen: [] };' },
-      { bestand: LS, van: "spoor && spoor.mark('PLAN_COMPILED', 'PASS',",
+      { bestand: LSP, van: "spoor && spoor.mark('PLAN_COMPILED', 'PASS',",
         naar: "false && spoor.mark('PLAN_COMPILED', 'PASS'," }] },
 
   { nr: '4', naam: 'gevolg bypass',
@@ -135,8 +145,12 @@ const MUTATIES = [
     weg: 'de echte voorspel() draait niet en CONSEQUENCE_EVALUATED wordt niet gemerkt',
     hoortTeZakken: 'het spoor is incompleet',
     tekst: [
-      { bestand: LS, van: 'const gevolg = voorspel(gewogen);', naar: 'const gevolg = null;' },
-      { bestand: LS,
+      /* `voorspel` heet hier `voorspelMet`: de voorspelling kreeg een tweede as (de
+         verklaring uit het gevolgcontract) en wordt samengesteld door
+         kern/stuur/gevolgcontract/voorspelling.js. De mutatie bewaakt hetzelfde: draait de
+         echte voorspelling niet, dan hoort CONSEQUENCE_EVALUATED niet gemerkt te worden. */
+      { bestand: LSP, van: 'const gevolg = voorspelMet(gewogen);', naar: 'const gevolg = null;' },
+      { bestand: LSP,
         van: "spoor && spoor.mark('CONSEQUENCE_EVALUATED', 'PASS',",
         naar: "false && spoor.mark('CONSEQUENCE_EVALUATED', 'PASS'," }] },
 
@@ -209,7 +223,61 @@ const MUTATIES = [
     hoortTeZakken: 'dezelfde toets, maar dan op het gedrag in plaats van op het contract',
     tekst: [{ bestand: RCC, van: B_PROJECTIE,
       naar: "projectie: 'Je bedoelt de afspraak van 14:00. Zeg maar of ik dit in RTG Agenda ' +\n" +
-        "        'regel of in RTG Reizen.' }" }] }
+        "        'regel of in RTG Reizen.' }" }] },
+
+  /* ---- 11 t/m 14: het intrekbesluit van 13 september 2026 ----
+
+     Vier garanties die pas bestaan sinds een lid een klaargezet voorstel mag
+     laten vervallen. Ze zijn met opzet niet een mutatie maar vier: de belofte
+     valt in vier stukken die elk apart kunnen sneuvelen, en een enkele mutatie
+     zou drie ervan ongemeten laten. */
+
+  /* 11. DE POORT DIE MAG KIEZEN. Haal de weigering bij twee openstaande
+         voorstellen weg en pak de eerste. Dit is de gevaarlijkste faalvorm van
+         het besluit: een lid zegt "laat maar" en er verdwijnt een ander
+         voorstel dan hij bedoelde -- zonder dat er iets zichtbaar misgaat. */
+  { nr: '11', naam: 'poort kiest bij twee voorstellen',
+    bewaakt: 'intrekken',
+    weg: 'bij twee openstaande voorstellen wordt er een gekozen in plaats van gevraagd',
+    hoortTeZakken: 'intrekveiligheid (409 en EXECUTED NOT_RUN bij twee)',
+    tekst: [{ bestand: GK,
+      van: '    if (rijen.length > 1)',
+      naar: '    if (false)' }] },
+
+  /* 12. DE ID-INGANG. Geef trekEnige een id mee. De vorm die "precies een
+         eenduidig voorstel" afdwingt IS de afwezigheid van dat argument; komt
+         het terug, dan is de eis weer een regel die de aanroeper kan overslaan. */
+  { nr: '12', naam: 'intrekken op een aangewezen id',
+    bewaakt: 'intrekken',
+    weg: 'de interpretatielaag kan bij twee voorstellen zelf aanwijzen welke vervalt',
+    hoortTeZakken: 'de bronassertie op de handtekening van trekEnige',
+    tekst: [{ bestand: GK,
+      van: '  function trekEnige(req, wereld) {',
+      naar: '  function trekEnige(req, wereld, id) {' }] },
+
+  /* 13. INTREKKEN ALS VOORSTEL. Zet het pad op `voorstel` in plaats van
+         `klein`. Dan is er een bevestiging nodig om een bevestiging te laten
+         vervallen -- een cirkel waarin het besluit onuitvoerbaar wordt zonder
+         dat er iets rood wordt. */
+  { nr: '13', naam: 'intrekpad naar `voorstel`',
+    bewaakt: 'intrekken',
+    weg: 'een voorstel is nodig om een voorstel te laten vervallen; het besluit werkt niet meer',
+    hoortTeZakken: 'intrekveiligheid (niveau `klein`)',
+    tekst: [{ bestand: BL,
+      van: "    /^\\/api\\/member\\/voorstel\\/intrek$/",
+      naar: "  ],\n  _weg: [\n    /^\\/api\\/member\\/voorstel\\/intrek$/" }] },
+
+  /* 14. DE BEVESTIGDEUR OPEN. Haal de stuurtak uit de verbodslijst. Intrekken
+         openzetten mag de andere kant nooit meeopenen, en dat is precies wat
+         deze mutatie probeert. Hij hoort te zakken op de ECHTE route -- de
+         vier spookpaden die hier ooit werden getoetst, bestonden niet. */
+  { nr: '14', naam: 'de bevestigdeur meegeopend',
+    bewaakt: 'intrekken',
+    weg: 'het stuur kan zijn eigen klaargezette handeling bevestigen',
+    hoortTeZakken: 'bevestigveiligheid (de poort op /api/member/doe/bevestig)',
+    tekst: [{ bestand: CL,
+      van: '  /^\\/api\\/(member|supplier|staff)\\/doe(?:\\/|$)/ // stuur + menselijke bevestiging: geen rondzingen',
+      naar: '  /^\\/api\\/zzz-nooit\\/doe(?:\\/|$)/ // gemuteerd' }] }
 ];
 
 function hash(p) { return crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex'); }

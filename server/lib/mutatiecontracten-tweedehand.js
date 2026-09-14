@@ -60,20 +60,51 @@ const CONTRACTEN = {
     },
     afgetekend: AFGETEKEND
   },
+  /* HIER STOND `nietHerhaalbaar`, EN DE METING SPRAK DAT TEGEN. `IDEMPROEF.json`
+     meet deze route als `beschermd`: met dezelfde sleutel komt er GEEN tweede
+     deurticket (a: 1, b: 0, c: 1 met een verse sleutel), zonder sleutel wel. Dat
+     is de omschrijving van `sleutelVereist` in kern/mutatie.js. De STAND blijft
+     staan -- die gaat over iets anders en is nog waar. Zichtbaar geworden toen de
+     route een `mutatie:`-regel kreeg; zie scripts/mutatiesemantiek.js. */
   'POST /api/office/bank/incasso': {
     mutatieId: 'bank.incasso.aanvragen',
     herkomst: 'mens',
-    semantiek: { klasse: 'nietHerhaalbaar' },
+    semantiek: { klasse: 'sleutelVereist' },
     toegang: { klasse: 'AUTHENTICATED' },
     stand: 'INTENTIONALLY_NON_IDEMPOTENT',
-    waarom: 'Zelfde vorm als hierboven: een tweede aanroep is een tweede aanvraag en de ronde ' +
-      'draait er niet van. De ronde zelf is wel gevoelig voor herhaling -- zij int geld -- maar ' +
-      'die gevoeligheid zit achter de bevestiging, en een bevestiging werkt precies een keer.',
+    waarom: 'Zonder idempotentiesleutel is een tweede aanroep een tweede aanvraag, en dat hoort zo: ' +
+      'de aanvraag verandert zelf niets aan de bank. De ronde is wel gevoelig voor herhaling -- zij ' +
+      'int geld -- maar die gevoeligheid zit achter de bevestiging, en die werkt precies een keer.',
     bewijs: {
       gemeten: 'test/tweedehandtekening.test.js toets 6: de aanvraag draagt `needsAuth` en geen ' +
-        '`uitgevoerd`; de ronde draait pas na de tweede handtekening.',
-      op: '2026-09-09'
+        '`uitgevoerd`; de ronde draait pas na de tweede handtekening. En IDEMPROEF.json: met ' +
+        'sleutel `beschermd`, zonder sleutel twee tickets.',
+      op: '2026-09-13'
     },
+    afgetekend: AFGETEKEND
+  },
+
+  /* HET DOSSIER VAN DE GOUDEN WEG (MACHINE.md par. 5a). Een POST die LEEST: hij
+     geeft per as terug wat er gebeurde en welke verplichte as nog open staat. Ook
+     voor het LEZEN staat hij achter de kluisdeur, want het dossier toont de
+     bedragen van leden en de namen van beide ondertekenaars -- `npm run
+     kantoormacht` rekent dit pad tot de zware wegen. De eerste versie stond achter
+     de gedeelde code; die zette `zwaarePaden.zonderMens` van nul op een. */
+  'POST /api/office/bank/incasso/dossier': {
+    mutatieId: 'bank.incasso.dossier.lezen',
+    herkomst: 'mens',
+    semantiek: { klasse: 'idempotent' },
+    toegang: { klasse: 'AUTHENTICATED' },
+    stand: 'NOT_APPLICABLE',
+    bewijs: {
+      gemeten: 'niet gemeten door de idempotentieproef: de route is nieuw. Wat er WEL over bewezen ' +
+        'is: test/geldketen.test.js toets 1 en 5 lezen het dossier twee keer en vergelijken de assen, ' +
+        'en de leeslaag (kern/kantoor/geldketen/dossier.js) schrijft nergens.',
+      op: '2026-09-13'
+    },
+    nagekeken: 'Claude (Opus 5), 2026-09-13: de handler roept `dossier(id)` of `lijst()` aan plus ' +
+      '`journaalTop`/`journaalVerifieer`. Alle vier zijn lezers; de enige schrijver van het journaal ' +
+      'is de baan zelf (klaarzetten, tekenen, uitvoeren). Twee keer lezen laat dezelfde stand achter.',
     afgetekend: AFGETEKEND
   },
 

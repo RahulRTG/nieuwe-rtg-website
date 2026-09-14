@@ -1,6 +1,6 @@
 /* WELKE METER IS TEGEN WELKE BEKENDE WAARHEID GEIJKT?
 
-   LAT.md regel 13: een meter die uitspraken doet over onbekend terrein wordt
+   LAT.md regel 14: een meter die uitspraken doet over onbekend terrein wordt
    eerst geijkt tegen beschikbare bekende waarheid. Is er geen grondwaarheid,
    dan zegt de meter dat expliciet en beperkt hij zijn conclusies tot wat hij
    werkelijk heeft waargenomen.
@@ -39,7 +39,7 @@
    geschreven droegen twaalf registers in de wortel een dekkings- of
    recallachtig getal. Twee daarvan zijn hier gebouwd en dus te verantwoorden;
    van de tien andere weet de schrijver van dit bestand niet genoeg om een
-   grondwaarheid te VERZINNEN, en dat zou precies de fout zijn die regel 13
+   grondwaarheid te VERZINNEN, en dat zou precies de fout zijn die regel 14
    verbiedt. Ze staan er dus als ONBEPAALD in, met de vraag die beantwoord moet
    worden. Het aantal hoort te dalen doordat er geijkt wordt, niet doordat er
    regels verdwijnen -- test/meterwet.test.js houdt die vloer vast.
@@ -181,7 +181,7 @@ const METERS = {
    keek naar de naam en vond twaalf registers -- waaronder APPWERKT.json, waar
    `gevonden: 34` het aantal bedienbare elementen op EEN scherm is, en
    EXECUTION_MAP.json, waar `bereik: "verboden"` een etiket is. Een te brede
-   detector in de handhaver van regel 13 is precies de fout die regel 13 verbiedt.
+   detector in de handhaver van regel 14 is precies de fout die regel 14 verbiedt.
 
    Een claimsleutel telt daarom pas als zijn WAARDE zich als verhouding gedraagt:
      - een breuk tussen 0 en 1        (VINDBAAR: dekking 0,6539)

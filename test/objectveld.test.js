@@ -40,11 +40,21 @@ const register = require(path.join(WORTEL, 'MUTATIECONTRACT.json'));
 const handlerpoorten = require(path.join(WORTEL, 'server/kern/handlerpoorten'));
 const { CONTRACTEN } = require(path.join(WORTEL, 'server/lib/mutatiecontracten'));
 
-/* De achttien die vandaag geen objectveld hebben. Geen van alle is een bewezen
+/* De zeventien die vandaag geen objectveld hebben. Geen van alle is een bewezen
    lek -- ze zijn ONBEPAALD, en dat is het punt: van deze routes kan niemand
    zeggen waarop het verschil tussen twee eigenaren hangt. Ze clusteren in drie
    families (de uitnodigingen van gezin en school, de sollicitatiekant van de
-   RTFoundation) plus drie losse. */
+   RTFoundation) plus twee losse.
+
+   GEKROMPEN OP 13 SEPTEMBER 2026: /api/foundation/kosten eraf. Die route kreeg
+   een mutatiecontract met `toegang.objectVeld: 'code'` in
+   server/lib/mutatiecontracten-afleidrest.js, en objectVeldVan() hieronder leest
+   het CONTRACT voor hij naar de bewakerskaart kijkt.
+
+   Het veld was overigens niet nieuw: handlerpoorten/buiten-routes-b.js:53
+   beschrijft deze deur al als "gezinVan(code) plus beheerderVan()". Wat ontbrak
+   was dat het REGISTER het zei -- en dat is precies wat toets 3 bedoelt met
+   "wie er een oplost, haalt hem eraf". */
 const NOG_ZONDER = [
   'POST /api/aanmeld/zeg',
   'POST /api/auth/reset',
@@ -52,7 +62,6 @@ const NOG_ZONDER = [
   'POST /api/foundation/gezin/uitnodiging/bekijk',
   'POST /api/foundation/gezin/uitnodiging/intrek',
   'POST /api/foundation/gezin/uitnodiging/maak',
-  'POST /api/foundation/kosten',
   'POST /api/foundation/mail/lees',
   'POST /api/foundation/mail/stuur',
   'POST /api/foundation/school/personeel/inlog/accepteer',

@@ -40,6 +40,26 @@
    met de reden; hij telt nooit als gehaald en nooit als gezakt. Een teller die
    alleen "7 van de 9" zegt, laat niet zien of die twee ontbraken of faalden.
 
+   STAP 7 IS OP 13 SEPTEMBER 2026 VAN EEN LEZING EEN UITVOERING GEWORDEN, en de
+   drie mutaties eronder horen erbij (LAT.md regel 2 -- een proef die je niet
+   hebt zien zakken, is geen proef):
+
+     - beide sloten in kern/factuurcorrectie.js uit  -> stap 7 FAILED, en de
+       melding noemt fondsAfdrachten, payBoekingen en paySaldi;
+     - alleen het TOESTANDSSLOT uit (de idem-sleutel intact) -> stap 7 FAILED,
+       en nu beweegt ALLEEN fondsAfdrachten. Dat is de scherpste van de drie:
+       de sleutel beschermt de GELDBEWEGING (pay.huisUit wordt ontdubbeld) maar
+       niet de AANTEKENING -- merkAfdracht() draait eromheen. De twee sloten
+       overlappen dus niet, en wie er een weghaalt verliest echt iets;
+     - niets gemuteerd -> stap 7 PROVEN.
+
+   En een vierde die GEEN bevinding over de code was maar over deze proef: met
+   een WOORDELIJK gelijke tweede aanroep bleef stap 7 groen terwijl beide sloten
+   uitstonden. Oorzaak: lib/idemsleutels-geld.js verklaart deze route
+   `zelfdeVerzoek`, dus de idem-poort speelde het eerste antwoord terug en de
+   route werd nooit bereikt. De tweede aanroep draagt daarom een andere `reden`.
+   Wie die weer gelijk maakt, meet de poort in plaats van de route.
+
    Draaien:  npm run factuurproef            (print, zakt op FAILED)
              npm run factuurproef -- --json  (register op stdout)
    ========================================================================== */
@@ -107,12 +127,13 @@ async function post(basis, pad, lijf, tok) {
    server/lib/vingerafdruk.js, met reden). Over een crash heen zijn dus alleen
    de AANTALLEN en de bedragen vergelijkbaar, en dat staat in de uitslag.
    --------------------------------------------------------------------------- */
-async function beeld(basis, tokLid, tokEig) {
+async function beeld(basis, tokLid, tokEig, factuurId) {
+  const FACT = factuurId || FACTUUR;
   const vf = await post(basis, '/api/techniek/vingerafdruk', { detail: GELDBAKKEN }, tokEig);
   const ov = await post(basis, '/api/pay/overzicht', {}, tokLid);
   const ex = await post(basis, '/api/privacy/export', {}, tokLid);
   const facturen = (ex.body && ex.body.invoices) || [];
-  const f = facturen.find(i => i && i.id === FACTUUR) || null;
+  const f = facturen.find(i => i && i.id === FACT) || null;
   return {
     bereikbaar: vf.status === 200 && ov.status === 200,
     collecties: (vf.body && vf.body.collecties) || null,
@@ -122,13 +143,19 @@ async function beeld(basis, tokLid, tokEig) {
     /* Alleen de boekingen die BIJ DEZE FACTUUR horen. Het totaal beweegt ook
        door de oplading, en dan meet je de opstelling in plaats van het pad. */
     factuurBoekingen: ov.body && Array.isArray(ov.body.geschiedenis)
-      ? ov.body.geschiedenis.filter(b => String(b.oms || '').includes(FACTUUR)).length : null,
+      ? ov.body.geschiedenis.filter(b => String(b.oms || '').includes(FACT)).length : null,
     factuurCenten: ov.body && Array.isArray(ov.body.geschiedenis)
-      ? ov.body.geschiedenis.filter(b => String(b.oms || '').includes(FACTUUR))
+      ? ov.body.geschiedenis.filter(b => String(b.oms || '').includes(FACT))
         .reduce((s, b) => s + (Number(b.centen) || 0), 0) : null,
     factuurStand: f ? (f.status || null) : null,
     factuurDeelbetaald: f ? (Number(f.deelbetaald) || 0) : null,
-    factuurBewijzen: f && Array.isArray(f.betaalBewijzen) ? f.betaalBewijzen.length : null
+    factuurBewijzen: f && Array.isArray(f.betaalBewijzen) ? f.betaalBewijzen.length : null,
+    /* DE CORRECTIEREGEL, en waarom hij hier bij de bedragen staat en niet bij
+       de vingerafdruk. De afdruk ziet dat `invoices` bewoog; alleen dit getal
+       zegt dat er precies EEN correctie bij kwam. Bij een tweede aanroep is dat
+       het verschil tussen "de route weigerde netjes" en "hij schreef nog een
+       regel" -- en dat tweede is de faalvorm waar stap 7 op let. */
+    factuurCorrecties: f && Array.isArray(f.correcties) ? f.correcties.length : 0
   };
 }
 
@@ -164,12 +191,53 @@ function bakverschil(voor, na) {
    een factuur die al in de zaaiset staat. Wat er niet nodig bleek, hoort ook
    niet in een gedeelde fixture terecht te komen.
    --------------------------------------------------------------------------- */
-async function opstelling(datamap, extraEnv) {
+async function opstelling(datamap, extraEnv, opties) {
+  const o = opties || {};
   const srv = await W.start({ datamap, env: Object.assign({ RTG_DEMO: '1' }, extraEnv || {}) });
   const eig = await post(srv.basis, '/api/auth/login',
     { login: process.env.RTG_OWNER_EMAIL || 'roellie.i@gmail.com', password: process.env.DEMO_PASS || 'Imran' });
-  const lid = await post(srv.basis, '/api/login', { tier: 'rtg' });
-  return { srv, tokEig: eig.body && eig.body.token, tokLid: lid.body && lid.body.token };
+  const tokEig = eig.body && eig.body.token;
+  if (!o.echtAccount) {
+    const lid = await post(srv.basis, '/api/login', { tier: 'rtg' });
+    return { srv, tokEig, tokLid: lid.body && lid.body.token, userId: null, tokKantoor: null };
+  }
+  /* EEN ECHT ACCOUNT, EN WAAROM DAT NIET OVERAL KAN.
+
+     De demo-pas hierboven (`/api/login {tier}`) geeft een sessie zonder
+     ACCOUNT: `sess.key` is de naam van de pas en er is geen `sess.account`.
+     Voor het geldpad volstaat dat -- de wallet hangt aan de sessiesleutel --
+     maar de terugweg niet: /api/office/pay/factuurcorrectie eist een `userId`,
+     omdat het geld aan de EIGENAAR van de factuur moet vastzitten en niet aan
+     wie de knop indrukt. Zonder account is er dus niemand om aan terug te
+     betalen, en dat is een grens en geen gebrek.
+
+     Wie de terugweg wil meten, heeft daarom een geregistreerd lid nodig. Dat
+     lid krijgt zijn EIGEN maandfactuur met een eigen nummer (zie de kop van
+     kern/lid/facturen.js: het kopiëren van RTG-2026-0207 naar elk vers account
+     is er juist uitgehaald), dus de proef zoekt hem op in plaats van hem te
+     kennen -- een proef die zijn onderwerp verzint, meet iets anders dan hij
+     zegt. De crashwereld blijft wel op de demo-pas: daar is geen terugweg te
+     meten en een tweede verandering zou de crashmeting vertroebelen. */
+  const email = 'factuurproef' + Date.now() + Math.random().toString(36).slice(2, 8) + '@voorbeeld.test';
+  const reg = await post(srv.basis, '/api/auth/register', { name: 'Factuurproef Lid', email,
+    phone: '0655544333', password: 'geheim123', geboortedatum: '1985-04-04', geslacht: 'm',
+    tier: 'rtg', pasApp: 'rtg' });
+  const tokLid = reg.body && reg.body.token;
+  const userId = reg.body && reg.body.state && reg.body.state.user && reg.body.state.user.id;
+  /* De payGate: een lid laat eenmalig zijn paspoort zien voor RTG Pay opengaat.
+     Zonder deze twee geeft /api/pay/oplaad 403 met kyc:true, en dan meet stap 1
+     de onboarding in plaats van het geldpad. */
+  const PNG = 'data:image/png;base64,' + Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 1, 2, 3, 4]).toString('base64');
+  if (tokLid) {
+    await post(srv.basis, '/api/verify/upload', { image: PNG }, tokLid);
+    await post(srv.basis, '/api/verify/selfie', { image: PNG }, tokLid);
+  }
+  /* DE MEDEWERKER OP NAAM. Een gedeelde kantoorcode geeft `boardroomWie() ===
+     null` en komt de correctieroute niet door -- met opzet. De eigenaarssessie
+     start daarom de kantoorrol, en dat levert een office-sessie MET een sleutel:
+     dezelfde weg als test/helper.js `kantoorAlsPersoon`. */
+  const k = tokEig ? await post(srv.basis, '/api/account/start', { rol: 'kantoor' }, tokEig) : null;
+  return { srv, tokEig, tokLid, userId, tokKantoor: k && k.body && k.body.token };
 }
 
 const stap = (nr, wat) => ({ nr, wat });
@@ -185,7 +253,7 @@ function uitslag(s, stand, reden, gemeten) {
    --------------------------------------------------------------------------- */
 async function geldpad(uit) {
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-factuurproef-a-'));
-  const { srv, tokEig, tokLid } = await opstelling(map);
+  const { srv, tokEig, tokLid, userId, tokKantoor } = await opstelling(map, null, { echtAccount: true });
   try {
     if (!tokEig || !tokLid) {
       uit.stappen.push(uitslag(stap(1, 'een wereld met een open factuur en een gevuld saldo'),
@@ -193,28 +261,43 @@ async function geldpad(uit) {
         '; zonder beide is er geen bedrag en geen vingerafdruk te lezen'));
       return;
     }
-    /* STAP 1 -- de factuur bestaat en staat open. */
-    const b0a = await beeld(srv.basis, tokLid, tokEig);
-    if (b0a.factuurStand !== 'open') {
-      uit.stappen.push(uitslag(stap(1, 'de factuur ' + FACTUUR + ' bestaat en staat open'),
-        'BLOCKED', 'de zaaiset levert hem niet open op (stand: ' + b0a.factuurStand + ')', b0a.factuurStand));
+    /* STAP 1 -- de factuur bestaat en staat open.
+
+       HIER STOND EEN VAST NUMMER EN EEN VAST BEDRAG (RTG-2026-0207, 7865 cent),
+       en dat kan niet meer: dit lid is een ECHT account en krijgt zijn eigen
+       maandfactuur met een eigen nummer en de prijs uit de pasladder. De proef
+       leest dus welke factuur er open staat en welk bedrag erop staat, en rekent
+       daarmee. Dat maakt de assertie niet zwakker -- ze gaat nog steeds over
+       exact dit bedrag -- maar wel bestand tegen een prijswijziging. */
+    const ex0 = await post(srv.basis, '/api/privacy/export', {}, tokLid);
+    const open = (((ex0.body && ex0.body.invoices) || []).filter(i => i && i.status === 'open'));
+    const fac = open[0] || null;
+    const bedragCenten = fac ? Math.round((Number(fac.bijdrage) || 0) * 100) : 0;
+    if (!fac || bedragCenten <= 0) {
+      uit.stappen.push(uitslag(stap(1, 'een open factuur op naam van dit lid'),
+        'BLOCKED', !fac ? 'een vers account krijgt geen open factuur in deze opstelling'
+          : 'de open factuur draagt geen bedrag (bijdrage: ' + fac.bijdrage + ')',
+        { openFacturen: open.length }));
       return;
     }
+    uit.factuurA = fac.id;
+    uit.bedragCenten = bedragCenten;
     const op = await post(srv.basis, '/api/pay/oplaad', { centen: OPLADING, idem: 'factuurproef-oplaad' }, tokLid);
-    const b0 = await beeld(srv.basis, tokLid, tokEig);
-    uit.stappen.push(uitslag(stap(1, 'de factuur ' + FACTUUR + ' bestaat en staat open, en het saldo dekt hem'),
-      op.status === 200 && b0.saldoCenten >= 7865 ? 'PROVEN' : 'BLOCKED',
-      op.status === 200 ? null : 'opladen gaf ' + op.status,
-      { factuurStand: b0.factuurStand, saldoCenten: b0.saldoCenten }));
-    if (op.status !== 200) return;
+    const b0 = await beeld(srv.basis, tokLid, tokEig, fac.id);
+    uit.stappen.push(uitslag(stap(1, 'de factuur ' + fac.id + ' bestaat en staat open, en het saldo dekt hem'),
+      op.status === 200 && b0.factuurStand === 'open' && b0.saldoCenten >= bedragCenten ? 'PROVEN' : 'BLOCKED',
+      op.status === 200 ? (b0.factuurStand === 'open' ? null : 'de factuur staat op ' + b0.factuurStand)
+        : 'opladen gaf ' + op.status,
+      { factuur: fac.id, bedragCenten, factuurStand: b0.factuurStand, saldoCenten: b0.saldoCenten }));
+    if (op.status !== 200 || b0.factuurStand !== 'open') return;
 
     /* STAP 2 -- het geldpad uitvoeren. */
-    const r1 = await post(srv.basis, '/api/pay/saldo', { invoiceId: FACTUUR }, tokLid);
-    const b1 = await beeld(srv.basis, tokLid, tokEig);
+    const r1 = await post(srv.basis, '/api/pay/saldo', { invoiceId: fac.id }, tokLid);
+    const b1 = await beeld(srv.basis, tokLid, tokEig, fac.id);
     const v1 = bakverschil(b0, b1);
     const heel = b1.factuurStand === 'paid'
-      && b1.saldoCenten === b0.saldoCenten - 7865
-      && b1.factuurBoekingen === 1 && b1.factuurCenten === -7865;
+      && b1.saldoCenten === b0.saldoCenten - bedragCenten
+      && b1.factuurBoekingen === 1 && b1.factuurCenten === -bedragCenten;
     uit.stappen.push(uitslag(stap(2, 'het geldpad voert uit: saldo af, factuur dicht, afdracht geboekt'),
       r1.status === 200 && heel ? 'PROVEN' : 'FAILED',
       r1.status === 200 ? (heel ? null : 'de uitkomst is niet heel') : 'de route gaf ' + r1.status,
@@ -227,8 +310,8 @@ async function geldpad(uit) {
        geldcollectie beweegt: gelijk aantal en gelijke hash op alle vijf. Een
        weigering die onderweg al twee bakken had aangeraakt, zakt hier -- en
        die faalvorm is met een statuscontrole niet te zien. */
-    const r2 = await post(srv.basis, '/api/pay/saldo', { invoiceId: FACTUUR }, tokLid);
-    const b2 = await beeld(srv.basis, tokLid, tokEig);
+    const r2 = await post(srv.basis, '/api/pay/saldo', { invoiceId: fac.id }, tokLid);
+    const b2 = await beeld(srv.basis, tokLid, tokEig, fac.id);
     const v2 = bakverschil(b1, b2);
     const stil = v2.geld.length === 0
       && b2.saldoCenten === b1.saldoCenten
@@ -245,6 +328,75 @@ async function geldpad(uit) {
     uit.economischeUitkomst = { saldoCenten: b1.saldoCenten, factuurStand: b1.factuurStand,
       factuurCenten: b1.factuurCenten, afdrachten: b1.collecties && b1.collecties.fondsAfdrachten
         ? b1.collecties.fondsAfdrachten.n : null };
+
+    /* ---------------------------------------------------------------------
+       STAP 7 -- DE TERUGWEG, OP DEZELFDE BETALING.
+
+       Tot 13 september las deze stap alleen de VERKLARING in
+       HERSTELBESLUIT.json en stond hij daarom op BLOCKED: er was niets uit te
+       voeren. Die route bestaat nu (POST /api/office/pay/factuurcorrectie), en
+       een verklaring blijft geen bewijs -- dus wordt hij hier ECHT aangeroepen,
+       op de factuur die in stap 2 betaald is en in dezelfde wereld.
+
+       DE MAAT IS ECONOMISCH EN NIET DE STATUSCODE, net als bij stap 3. Wat hier
+       moet kloppen:
+         - het saldo komt exact met het betaalde bedrag terug;
+         - de factuur BLIJFT `paid` -- compenseren is geen terugdraaien, en een
+           derde stand zou bij het lid als openstaande schuld lezen;
+         - er staat precies EEN correctieregel.
+       En daarna nog een keer dezelfde aanroep: die hoort nul waarde te
+       verplaatsen en geen tweede regel te schrijven. Zonder die tweede helft
+       bewijst de stap alleen dat er geld terugkomt, niet dat het er een keer
+       terugkomt. */
+    if (!tokKantoor || !userId) {
+      uit.terugwegGemeten = { uitgevoerd: false,
+        waarom: !userId ? 'het lid heeft geen account-id, dus er is niemand om aan terug te betalen'
+          : 'geen kantoorsessie OP NAAM; een gedeelde code mag deze handeling niet doen',
+        userId: userId || null, kantoorOpNaam: !!tokKantoor };
+      return;
+    }
+    const lijf = { userId, invoiceId: fac.id, grond: 'niet-geleverd',
+      reden: 'de verticale proef voert de terugweg uit' };
+    const c1 = await post(srv.basis, '/api/office/pay/factuurcorrectie', lijf, tokKantoor);
+    const b3 = await beeld(srv.basis, tokLid, tokEig, fac.id);
+    const v3 = bakverschil(b2, b3);
+    const terug = c1.status === 200
+      && b3.saldoCenten === b2.saldoCenten + bedragCenten
+      && b3.factuurStand === 'paid'
+      && b3.factuurCorrecties === 1;
+
+    /* DE TWEEDE AANROEP DRAAGT EEN ANDERE REDEN, EN DAT IS GEEN DETAIL.
+
+       Met een WOORDELIJK gelijk verzoek bereikt de tweede aanroep de route
+       nooit: lib/idemsleutels-geld.js verklaart dit pad `zelfdeVerzoek`, dus de
+       idem-poort speelt het eerste antwoord terug op HTTP-niveau. Deze stap zou
+       dan de POORT meten in plaats van de route -- en dat is precies wat hier
+       eerst gebeurde: met beide sloten in de kern uitgezet bleef stap 7 gewoon
+       PROVEN. Een stap die niet kan zakken is geen bewijs.
+
+       Een andere `reden` komt langs de poort en belandt bij de route zelf, die
+       zich dan met zijn eigen twee sloten moet verdedigen: de toestandscontrole
+       op `inv.correcties` en de deterministische idem-sleutel richting
+       pay.huisUit. Nagemeten met twee mutaties, zie de kop van dit bestand. */
+    const c2 = await post(srv.basis, '/api/office/pay/factuurcorrectie',
+      Object.assign({}, lijf, { reden: 'tweede poging met een andere reden' }), tokKantoor);
+    const b4 = await beeld(srv.basis, tokLid, tokEig, fac.id);
+    const v4 = bakverschil(b3, b4);
+    const stilTerug = v4.geld.length === 0
+      && b4.saldoCenten === b3.saldoCenten
+      && b4.factuurCorrecties === b3.factuurCorrecties;
+
+    uit.terugwegGemeten = {
+      uitgevoerd: true, status: c1.status, statusHerhaling: c2.status,
+      bedragCenten, saldoVoor: b2.saldoCenten, saldoNa: b3.saldoCenten,
+      factuurStand: b3.factuurStand, correcties: b3.factuurCorrecties,
+      geldbakkenBijCorrectie: v3.geld, geldbakkenBijHerhaling: v4.geld,
+      compensatieKlopt: terug, herhalingStil: stilTerug,
+      reden: terug ? (stilTerug ? null : 'een tweede correctie bewoog geld: ' + v4.geld.map(g => g.collectie).join(', '))
+        : 'de compensatie klopt niet (status ' + c1.status + ', saldo ' + b2.saldoCenten + ' -> ' +
+          b3.saldoCenten + ', verwacht ' + (b2.saldoCenten + bedragCenten) + ', stand ' + b3.factuurStand +
+          ', correcties ' + b3.factuurCorrecties + ')'
+    };
   } finally {
     try { srv.kind.kill('SIGKILL'); } catch (e) {}
     fs.rmSync(map, { recursive: true, force: true });
@@ -421,18 +573,39 @@ function terugweg(uit) {
     const b = require('../HERSTELBESLUIT.json');
     besluit = (b.routes && (b.routes['POST ' + ROUTE_PAD] || b.routes[ROUTE_PAD])) || null;
   } catch (e) { besluit = null; }
-  // Deze stap voert geen compensatie uit. Ook een gewijzigde verklaring kan
-  // daarom nooit bewijs uit deze proef opleveren.
-  const stand = !besluit ? 'UNKNOWN' : 'BLOCKED';
-  uit.stappen.push(uitslag(stap(7, 'de terugweg: is deze betaling terug te draaien of te compenseren'),
+  /* DE VERKLARING BLIJFT DE VERKLARING, DE METING BLIJFT DE METING.
+
+     Deze stap stond tot 13 september hard op BLOCKED met de regel "ook een
+     gewijzigde verklaring kan hier nooit bewijs opleveren". Die regel is nog
+     steeds waar en verandert niet: `besluit.stand` (COMPENSATABLE) is een
+     BESLUIT van de eigenaar en telt hier nergens als bewijs mee.
+
+     Wat er wel is veranderd, is dat er iets UIT TE VOEREN is. `geldpad()` roept
+     de correctieroute nu echt aan op de factuur die het in stap 2 betaalde, en
+     zet het gemeten resultaat in `uit.terugwegGemeten`. Alleen dat resultaat
+     bepaalt de stand hieronder. Ontbreekt het -- omdat de wereld geen
+     kantoorsessie op naam of geen account opleverde -- dan is de stand weer
+     BLOCKED met de reden erbij, en nooit stil PROVEN.
+
+     De twee lezingen eronder (kandidaten in HERSTEL.json, de compenserende
+     bouwsteen) blijven in de uitslag staan. Ze bewijzen niets, maar ze laten
+     zien dat HERSTEL.json deze route nog steeds niet kent -- die leidt
+     kandidaten af uit de NAAM van een route, en `factuurcorrectie` lijkt niet
+     op `saldo`. Dat is een bevinding over de METER en niet over dit pad. */
+  const g = uit.terugwegGemeten;
+  const stand = !besluit ? 'UNKNOWN'
+    : (!g || !g.uitgevoerd) ? 'BLOCKED'
+      : (g.compensatieKlopt && g.herhalingStil) ? 'PROVEN' : 'FAILED';
+  uit.stappen.push(uitslag(stap(7, 'de terugweg: de betaalde factuur wordt gecompenseerd, en één keer'),
     stand,
     !besluit ? 'er is geen verklaring voor dit pad in HERSTELBESLUIT.json'
-      : 'verklaard als ' + besluit.stand + ', maar er is niets uit te voeren: ' +
-        (besluit.bewijs && besluit.bewijs.watErMoetKomen) +
-        ' -- een verklaring is geen uitgevoerde terugweg.',
-    { kandidatenInHerstelRegister: kandidaten, compenserendePrimitiveAanwezig: primitive,
+      : (!g || !g.uitgevoerd) ? 'verklaard als ' + besluit.stand + ', maar de terugweg kon hier niet draaien: ' +
+        ((g && g.waarom) || 'de opstelling leverde geen uitvoerbare wereld') +
+        ' -- een verklaring is geen uitgevoerde terugweg.'
+        : (g.reden || null),
+    Object.assign({ kandidatenInHerstelRegister: kandidaten, compenserendePrimitiveAanwezig: primitive,
       correctiemodel: besluit ? besluit.stand : 'UNKNOWN',
-      bewijsVanDeTerugweg: besluit && besluit.bewijs ? besluit.bewijs.stand : null }));
+      bewijsVanDeTerugweg: besluit && besluit.bewijs ? besluit.bewijs.stand : null }, g || {})));
   uit.correctiemodel = besluit ? besluit.stand : 'UNKNOWN';
 }
 

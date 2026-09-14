@@ -115,6 +115,20 @@ const REGISTERS = [
   ['UITVOERPROEF.json', 'npm run meetronde -- --alleen=uitvoerproef', 'of een antwoord gegevens van een ander bevat', BEVEILIGING],
   ['BEWIJSMATRIX.json', 'npm run bewijsmatrix:vast', 'de elf schakels per route, uit de vijf registers hierboven'],
   ['MUTATIES.json', 'npm run mutatie', 'welke toetsen kunnen zakken'],
+  /* DE LEDENCONTEXT VAN RAHUL (MENSNETWERK.md par. 4d). Hij veroudert met de
+     CODE en niet met de klok: hij telt welke velden van een lid in een
+     modelprompt terechtkomen, en die telling is niets waard zodra
+     kern/ai/prompt.js of een schrijver van de ledenstaat is veranderd zonder
+     hem opnieuw te draaien.
+
+     MELDING EN GEEN POORT, en dat is met opzet. Er staan al twee dingen hard op
+     dit register: de tand `aiContextLek` in NORM.json (richting omlaag, nu 0) en
+     test/aicontext-allowlist.test.js toets 4, die eist dat het register en de
+     verklaarde LEDENVELDEN hetzelfde zeggen. Een derde harde poort zou volgens
+     de kop van dit bestand de sirene zijn die iedereen uitzet; wat hier telt is
+     dat zijn OUDERDOM zichtbaar wordt, want een stale register maakt die tand
+     bot zonder dat iemand het merkt. */
+  ['AICONTEXT.json', 'npm run aicontext:vast', 'welke velden van een lid in de system prompt van Rahul terechtkomen'],
   ['LAATSTE_METING.json', 'npm run beproeving', 'de laatste stormproef, ook wanneer hij zakt'],
   ['HEAPPROEF.json', 'npm run heapproef', 'geheugengedrag onder herhaalde verzoeken'],
   ['BEPROEVING.json', 'npm run beproeving', 'storm, geld, misbruik en herstel'],
@@ -192,6 +206,23 @@ const REGISTERS = [
      (KANTOOR.md par. 14, blok 1) -- vanaf dat moment is een verouderd getal wel
      een uitspraak over wie er binnenkomt. Dat is een besluit en geen automatisme. */
   ['KANTOORMACHT.json', 'npm run kantoormacht:vast', 'of er een mens achter een kantoorhandeling staat'],
+  /* DE MACHINEDEKKING (MACHINE.md). Hij hoort hier om dezelfde reden als de
+     kantoormacht ernaast: zijn getallen zijn afgeleid uit de ROUTER en uit
+     registers, dus ze verouderen met elke route die erbij komt zonder dat er iets
+     aan de meter verandert. En hij hoort op `overig` en niet op BEVEILIGING, met
+     de lezing die de overleving hieronder uitschrijft: een poortklasse zegt hier
+     niet WAAROVER een register gaat maar dat een verouderd exemplaar de RONDE
+     tegenhoudt, en dat is voorbehouden aan de vier die `npm run meetronde` ook
+     werkelijk ververst.
+
+     Zijn tanden zitten waar ze horen, op de INHOUD en niet op de ouderdom
+     (test/machinedekking.test.js, via npm run machinedekking:controle): twee
+     schulden die alleen mogen dalen, en `volledigeKetens` die alleen mag stijgen. */
+  ['MACHINEDEKKING.json', 'npm run machinedekking:vastleggen', 'of de motoren van dit huis bij dezelfde handeling langskomen'],
+  /* DE GEVOLGDEKKING (EXECUTIE.md blok 4). Twee assen die nooit worden opgeteld: wat
+     de proef zag veranderen, en wat een mens erover heeft verklaard. Hij veroudert op
+     twee manieren -- een nieuwe AI-bereikbare route, en een verse idempotentieronde. */
+  ['GEVOLGDEKKING.json', 'npm run gevolgdekking:vastleggen', 'van hoeveel AI-bedienbare handelingen bekend is wat zij veroorzaken'],
   /* DE OVERLEVING STAAT MET OPZET OP `overig` EN NIET OP BEVEILIGING, en dat is
      de correctie op een eerste versie die hem die vlag wel gaf -- "hij gaat over
      beveiliging, dus hij hoort in de beveiligingsklasse". Dat is de verkeerde
@@ -293,6 +324,27 @@ const REGISTERS = [
      in een toets: test/factuurproef.test.js bewaakt de regel die bepaalt wat
      als een economische mutatie telt, en die zakt gewoon. */
   ['FACTUURPROEF.json', 'npm run factuurproef:vast', 'of een geldpad van begin tot eind heel blijft: tweede aanroep, crash, herhaling'],
+  /* MELDT EN IS GEEN POORT, om dezelfde reden als zijn twee buren hierboven.
+     Deze classificatie beweegt mee met ELKE nieuwe geldroute: komt er een bij,
+     dan groeit het aantal (route, grens)-paren en loopt het register achter tot
+     iemand `npm run crashas` draait. Als poort zou hij dus rood staan op takken
+     die niets met crashgedrag te maken hebben -- precies de sirene waar de kop
+     van dit bestand voor waarschuwt. Wat hij WEL doet is zeggen hoe oud de
+     classificatie is, en dat is hier het punt: een crash-as die op een oudere
+     routelijst is gemeten, beweert iets over routes die er niet meer zijn. */
+  ['CRASHAS.json', 'npm run crashas:vast', 'welke van de zes crashgrenzen er per geldroute werkelijk bestaan, en welke te beproeven zijn'],
+  /* CRASHPROEF.json hoort hier om dezelfde reden als CRASHAS.json, en om een
+     scherpere. Dit is geen classificatie maar een UITGEVOERDE proef: hij laat
+     per geldroute het proces sterven en kijkt wat er van de uitkomst
+     overblijft. Zo'n uitslag veroudert harder dan een classificatie -- een
+     PROVEN op een route die sindsdien een tweede collectie is gaan schrijven,
+     beweert iets dat niemand meer heeft nagemeten. En hij is DUUR (ongeveer
+     negentig serverstarts), dus hij draait niet vanzelf mee; juist dan hoort
+     zijn leeftijd hardop gemeld te worden in plaats van stil te verstrijken.
+
+     Ook hier een melding en geen poort: als poort zou hij rood staan op takken
+     die niets met geld te maken hebben. */
+  ['CRASHPROEF.json', 'npm run crashproef:vast', 'wat er per geldroute van de uitkomst overblijft als het proces op een crashgrens sterft'],
   /* HERSTELBESLUIT.json STAAT HIER BEWUST NIET, en dat is geen vergetelheid.
      Deze lijst is de INSTRUMENTENlijst: scripts/meetkeuring.js leest hem om te
      bepalen welk script welk register vult, en eist van elk instrument een
@@ -355,21 +407,41 @@ const REGISTERS = [
      "de keten sluit" meldt terwijl er sindsdien een schakel is verlegd, is erger
      dan geen meting.
 
-     Ze staan in de volgorde waarin ze iets zeggen: eerst de drie gouden ketens
+     Ze staan in de volgorde waarin ze iets zeggen: eerst de vijf gouden ketens
      en wat ze delen, dan de metingen over de code zelf, dan de twee kaarten. */
   ['TAFELPROEF.json', 'npm run tafelproef:vast', 'of de horecaketen sluit, van tafel tot correctie'],
   ['RITPROEF.json', 'npm run ritproef:vast', 'of de ritketen sluit, van aanvraag tot afronding'],
   ['TOELATINGSPROEF.json', 'npm run toelatingsproef:vast', 'of de toelatingsketen sluit, van aanvraag tot zaak'],
+  ['ADAMPROEF.json', 'npm run adamproef:vast', 'of een jongere van 17 zonder account een mogelijkheid bereikt, en het zelf ziet'],
+  ['MOMENTPROEF.json', 'npm run momentproef:vast', 'of de publieke keten sluit, van een feit bij de bron tot een melding bij een volger'],
+  ['DOELGROEPBEREIK.json', 'npm run doelgroepbereik:vast', 'of de VERKLAARDE doelgroep van een functie zijn eigen paden werkelijk kan bereiken'],
+  ['AANVOERVORM.json', 'npm run aanvoervorm:vast', 'of de vijf terreinen van de aanvoer een VORM delen -- de vraag onder het aanvoercontract'],
+  /* De navigatieproef staat NAAST de vijf gouden ketens en niet ertussen: hij
+     meet geen keten tussen actoren maar de belofte van EEN scherm, in een echte
+     browser (BETROUWBAARHEID.md par. 1). Daarom telt scripts/ketenvorm.js hem
+     ook niet mee -- wat de ketens delen, wordt vertroebeld door een meting die
+  /* De VIERDE gouden keten. Hij begint waar de toelating ophoudt -- daar staat
+     de zaak klaar, hier wordt zij bruikbaar en zichtbaar voor een lid -- en hij
+     veroudert om dezelfde reden even hard: zijn uitslag gaat over de poort van
+     die dag. Een ZAAKLIVEPROEF.json die "de keten sluit" meldt terwijl iemand
+     sindsdien de poortstappen heeft verlegd, is erger dan geen meting. */
+  ['ZAAKLIVEPROEF.json', 'npm run zaakliveproef:vast', 'of de ondernemerketen sluit, van goedgekeurde aanvraag tot een zaak die een lid ziet'],
+  ['OMZETPROEF.json', 'npm run omzetproef:vast', 'of de geldketen sluit, van bestelling tot het cijfer waar btw over wordt afgedragen'],
+  /* De Business Proof Map is GEEN keten maar een PROJECTIE over zeven registers,
+     en juist daarom veroudert hij snel: hij is precies zo vers als zijn oudste
+     bron. Een uitslag die "2786 routes bevoegd" meldt op een ROLPROEF van drie
+     weken oud, meldt iets over drie weken geleden. */
+  ['ONDERNEMERBEWIJS.json', 'npm run ondernemerbewijs:vast', 'wat de registers samen over de twaalf bewijslagen van een ondernemer-capability zeggen'],
   /* De navigatieproef staat NAAST de drie gouden ketens en niet ertussen: hij
      meet geen keten tussen actoren maar de belofte van EEN scherm, in een echte
      browser (BETROUWBAARHEID.md par. 1). Daarom telt scripts/ketenvorm.js hem
-     ook niet mee -- wat drie ketens delen, wordt vertroebeld door een vierde die
+     ook niet mee -- wat de gouden ketens delen, wordt vertroebeld door een meting die
      iets anders is. Veroudering weegt hier even zwaar: hij draait tegen een
      draaiende server EN een browser, dus zijn uitslag hoort bij de code van die
      dag en bij geen andere. */
   ['NAVIGATIEPROEF.json', 'npm run navigatieproef:vast', 'of RTG Navigatie zijn belofte houdt: van waar ik sta naar mijn bestemming'],
   ['MOVEPROEF.json', 'npm run moveproef:vast', 'of een lid RTG Move werkelijk kan gebruiken: van een boeking naar een oordeel op het scherm'],
-  ['KETENVORM.json', 'npm run ketenvorm:vast', 'wat de drie gouden ketens werkelijk delen (actoren, beloften)'],
+  ['KETENVORM.json', 'npm run ketenvorm:vast', 'wat de vier gouden ketens werkelijk delen (actoren, beloften)'],
   ['DOODSPOOR.json', 'npm run doodspoor:vast', 'of een handeling ergens AANKOMT, of een verklaring draagt waarom niet'],
   ['DOORWERKING.json', 'npm run doorwerking:vast', 'of een gegeven dat een keer is opgegeven doorwerkt, met doel en actualiteit'],
   ['RITMIGRATIE.json', 'npm run ritmigratie:vast', 'welke lezers van db.data.rides wanneer naar de opdrachtwereld kunnen'],
@@ -395,7 +467,18 @@ const REGISTERS = [
      uitweg zijn, terwijl er sindsdien drie bij kunnen zijn gekomen -- en aan dat
      getal hangt sinds 11 september 2026 een normtand. */
   ['LUSSEN.json', 'npm run lussen', 'elke cyclische gedraging met zijn terminatiegraad, en de drie schulden waar NORM.json op ratelt'],
-  ['CARRIEREVORM.json', 'node scripts/carrierevorm.js --vastleggen', 'of de talentdomeinen een datavorm delen -- CARRIERE.md par. 0 rust erop, dus een verouderde uitslag draagt daar een conclusie die niemand nog heeft nagerekend']
+  ['CARRIEREVORM.json', 'node scripts/carrierevorm.js --vastleggen', 'of de talentdomeinen een datavorm delen -- CARRIERE.md par. 0 rust erop, dus een verouderde uitslag draagt daar een conclusie die niemand nog heeft nagerekend'],
+  /* Zelfde soort als zijn buurman hierboven, en om dezelfde reden `overig`: het
+     is een uitslag waar een DOCUMENT op rust en geen poort waar iemand langs
+     binnenkomt. Wel scherper in een opzicht -- de uitslag is een NUL (0 velden
+     gedeeld over tien publieke domeinen), en STAGE.md par. 0 draagt daarop het
+     besluit dat een Moment een projectie is en geen object. Een verouderde nul
+     ziet er exact zo uit als een verse. */
+  ['STAGEVORM.json', 'npm run stagevorm:vast', 'of de publieke domeinen een datavorm delen -- STAGE.md par. 0 rust erop, en de uitslag is een nul die er vers en verouderd hetzelfde uitziet'],
+  /* Ook een nul, en om dezelfde reden hier: `zonderUitspraak: 0` betekent dat
+     elk publiek domein een besluit draagt. Verouderd betekent diezelfde nul
+     alleen nog dat er destijds geen domein ontbrak. */
+  ['WEKDEKKING.json', 'npm run wekdekking:vast', 'welke brongebeurtenis de publieke rail op mag -- de nul zegt dat geen publiek domein onbesproken is, en dat is alleen waar als hij vers is']
 ];
 
 /* De lezer van beide stempelvormen woont in ./lib/stempel.js -- hij stond hier

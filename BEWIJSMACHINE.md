@@ -443,6 +443,83 @@ met een eigen klok).
 
 ---
 
+## 5a. De vier administraties — de checklist bij een nieuwe meter
+
+Dit is het kleinste stuk van dit document en het voorkomt waarschijnlijk de
+meeste verspilde CI-rondes. Het is **geen nieuwe architectuur**: alle vier de
+administraties bestaan al, alle vier worden ze al afgedwongen, en alle vier
+bestaan ze om een fout die hier echt is gemaakt. Wat ontbrak is dat ze van
+elkaar wisten.
+
+**De aanleiding (13 september 2026).** Eén nieuwe meter (`scripts/stagevorm.js`
++ `STAGEVORM.json`) en één nieuwe toets (`test/stagevorm.test.js`) moesten in
+vier onafhankelijke administraties worden opgenomen voordat het huis tevreden
+was. Elke administratie meldde zich pas nadat de vorige was opgelost, elk in een
+eigen CI-ronde, en geen van de vier noemde de andere drie. Vier rondes voor één
+meter.
+
+**De checklist, in de volgorde waarin ze zich melden:**
+
+| # | administratie | waar | wat hij tegenhoudt | wie hem afdwingt |
+|---|---|---|---|---|
+| 1 | **ratel** | `scripts/lib/metingen.js` (welke meting aan welke tand) + `METERS` in `scripts/norm.js` + de grondwaarde in `NORM.json` | een register dat aan niets hangt en dus stilletjes de verkeerde kant op kan groeien | normmeter `metingenZonderRatel`, richting omlaag |
+| 2 | **ijking** | `test/meterijk.test.js` | een meter die niet aantoonbaar uitslaat op een bekend-foute invoer — groen omdat hij niets *kan* vinden | `scripts/check.js` regel 35 |
+| 3 | **mutatie** | `node scripts/mutatie.js <toets>` → `MUTATIES.json` | een toets waarvan niemand heeft gezien dat hij kan zakken (`LAT.md` regel 2) | normmeter `toetsenNietGemeten`, richting omlaag |
+| 4 | **versheid** | `REGISTERS` in `scripts/versheid.js`, of `BUITEN` mét de reden | een register dat veroudert zonder dat iemand het merkt | `test/versheidsdekking.test.js` |
+
+Wie een meter toevoegt, loopt die vier af. Wie er een overslaat, ontdekt hem één
+CI-ronde later — en dat is precies wat deze tabel bespaart.
+
+### De vijfde, en die heeft geen huisbrede handhaver
+
+Eén ronde later dan de vier hierboven meldde zich een vijfde, en hij past niet in
+de tabel omdat er geen enkele meter over gaat. Vier registers lieten CI zakken op
+een toets die **in het register zelf woont**: `CAPABILITEIT.json`,
+`MAGNAATLAB.json`, `MUTATIESEMANTIEK.json` en `SEMANTIEK.json` dragen elk een
+eigen toets die "loopt achter op de code" meldt zodra hun getal niet meer klopt
+met een verse meting. Dat is precies goed — maar `scripts/check.js` kent ze niet,
+`scripts/versheid.js` kent ze niet, en `metingenZonderRatel` telt ze niet, want ze
+hángen aan een ratel. Ze liften mee op de OMVANG van de kern, dus elke tak die
+code toevoegt laat ze zakken, en je vindt ze alleen door de scherf lokaal te
+reproduceren of door `grep "loopt achter op" test/*.test.js` te draaien.
+
+De vorm van die vijfde is dus: *een register dat door niemand wordt bewaakt
+behalve door zijn eigen toets, en dat meebeweegt met iets waar het niet over
+gaat.* Dat is hier alleen OPGEMERKT en niet opgelost; de vraag die eronder ligt
+(welke registers lopen mee op de kernomvang, en hoort die groei bij hun
+onderwerp?) hoort bij par. 6 en niet bij deze checklist.
+
+### De regel eronder, en die is breder dan meters
+
+De vierde administratie lijkt de saaiste en is de gevaarlijkste. `STAGEVORM.json`
+maakte dat zichtbaar, want zijn uitslag is een **nul**: 0 van 136 velden gedeeld
+over tien publieke domeinen. Op die nul rust in `STAGE.md` par. 0 het besluit dat
+een Moment een projectie is en geen object.
+
+> **Een nulmeting waarop een besluit rust, mag niet stil verouderen.**
+> Afwezigheid van bevindingen is alleen bewijs als de meting aantoonbaar vers is.
+
+Dat is scherper dan het klinkt, en het geldt overal in dit huis waar een meter
+niets vindt. Een POSITIEVE uitslag die oud is, valt vaak vanzelf op: het getal
+past niet meer bij wat iemand net heeft gebouwd. Een oude NUL blijft er precies
+zo uitzien als een verse nul — geruststellend, en misschien onwaar. De faalvorm
+is niet dat het getal verkeerd is, maar dat het van een andere vraag is: van
+*"deze domeinen delen niets"* naar *"we hebben minder gekeken"*, zonder dat er
+één teken op het scherm verandert.
+
+Vandaar dat de ijking van zo'n meter **omlaag** gaat en niet omhoog (zie
+`stageDomeinenGemeten` en `carriereDomeinenGemeten` in `test/meterijk.test.js`):
+wat geratelde wordt is het BEREIK van de meting en niet haar uitkomst. De
+uitkomst mag bewegen — dat is nieuws. Het aantal domeinen dat de meter ziet, mag
+dat niet, want dan verandert de betekenis van de nul zonder dat de nul beweegt.
+
+Dit is dezelfde familie als de zelfijking uit par. 3: *een scan die niets KAN
+vinden staat groen om precies dezelfde reden als een scan die niets vindt, en
+die twee zijn van buiten niet te onderscheiden.* Par. 5a voegt daar de tijd aan
+toe: een scan die ooit iets kon vinden en nu over een andere boom gaat, óók.
+
+---
+
 ## 6. De volgorde
 
 | fase | wat | waarom nu |
@@ -462,6 +539,113 @@ register — anders legt het register de rommel vast. Fase 1 staat en heeft mete
 laten zien dat het werkt: één samenvoeging haalde tien dubbelingen weg.
 
 ---
+
+## 6a. Een proef kan een geldige uitslag geven en toch het verkeerde experiment zijn
+
+> **Een bewijs draagt niet alleen zijn uitslag, maar ook zijn INDELING en zijn
+> foutmodel -- en die twee zijn zelf aantoonbaar of ze zijn niet waar.**
+
+Dit is geen nieuwe wet maar een klasse die dit huis in één week vier keer heeft
+gezien, elke keer in een andere gedaante en elke keer met een keurige groene
+uitslag eroverheen. De uitslag was niet vals; het experiment was het.
+
+| Waar | Wat er gemeten werd | Wat er gemeten had moeten worden |
+|---|---|---|
+| `scripts/mutatie.js` | `isServerToets()` herkende alleen `require('./helper')` en niet `require('./helper.js')` -- drie toetsen zaten daardoor stil in de verkeerde bewijsklasse en kregen een bronmutatie in plaats van de liegpoort | de vorm, niet één spelling ervan |
+| `test/mutatiewacht.test.js` | de eerste wacht daarop matchte op zijn EIGEN commentaar en bleef groen met de bewaakte code weg | de code, met het commentaar eraf |
+| `scripts/aicontext.js` | de ledenstaat heet ook `st`, en dat woord betekent huisbreed ook status, stand en state: 91 velden in plaats van 25 | een naam is alleen die ledenstaat in het bestand waar hij eraan gebonden is |
+| `test/mn02ai-contextbesmetting.test.js` | een marker (`bewaarVerzoek.door`) die woordelijk in de vaste tekst van Rahuls karakter staat, wees een lek aan dat er niet was | alleen ONDERSCHEIDENDE markers: wat er vóór de handeling al stond, is er niet door gekomen |
+
+Vier gedaanten, één vorm: **de proef draaide, gaf een geldige uitslag, en mat
+iets anders dan waar hij over ging.** Daar helpt LAT.md regel 2 niet tegen -- die
+eist dat je een toets hebt zien zakken, en deze toetsen zakten keurig, alleen op
+de verkeerde vraag.
+
+**Wat een proef daarom hoort te dragen, en waar het vandaag staat:**
+
+| Eigenschap | Wat het betekent | Waar het wordt afgedwongen |
+|---|---|---|
+| **indeling** | in welke bewijsklasse valt deze proef, en is die indeling zelf beproefd | `test/mutatiewacht.test.js` (voor `isServerToets`) |
+| **foutmodel** | welke storing wordt er ingespoten, en raakt die de bron waar het over gaat | `server/lib/verraad.js` + `scripts/faalproef.js` |
+| **geraakte bron** | welk bestand of welke opslag verandert er werkelijk door die storing | `FAALPROEF.json`, per route |
+| **verwachte waarneming** | wat zou er anders zijn als de bewering onwaar was | vandaag: **de toets zelf, en verder niemand** |
+| **levendheid** | kan dit instrument überhaupt uitslaan | vandaag: **twee plekken, met de hand** |
+
+De laatste twee rijen zijn de open kant. De levendheidscontrole is het goedkoopst
+en het meest verwaarloosd: `test/mn02ai-contextbesmetting.test.js` toets 5 en 6,
+en `scripts/herstelproef.js` met zijn opwarmronde, zijn vandaag de enige plekken
+waar een instrument moet bewijzen dat het kán uitslaan. Toets 6 bestaat omdat de
+proef zonder hem volledig groen bleef onder een cache-mutatie -- de gelijkheid
+die hij bewaakt heeft een blinde vlek die er precies uitziet als succes.
+
+### 6a.1 Code en commentaar zijn twee dingen, en een meter die dat niet scheidt meet zijn eigen toelichting
+
+Dit is de goedkoopste helft van par. 6a en hij is machinaal te sluiten.
+`scripts/lib/bron.js` draagt `zonderCommentaar()` al, in drie standen (weghalen,
+platslaan met behoud van regelnummers, en per taal).
+
+**De eerste telling was de verkeerde noemer, en dat is zelf een voorbeeld van
+par. 6a.** Er stond hier "195 scripts lezen broncode, 19 scheiden code van
+commentaar", en dat leest als 176 fouten. Dat is het niet: het merendeel van die
+scripts telt bestanden of paden en raakt een regel commentaar nooit. De klasse
+die ertoe doet is smaller, en `npm run meterklasse` (`METERKLASSE.json`) meet
+haar apart:
+
+| | |
+|---|---|
+| scripts die broncode lezen | **201** |
+| daarvan: leiden SEMANTIEK af uit de VORM van die code | **73** |
+| daarvan: scheiden code en commentaar | **13** |
+| daarvan: doen dat niet | **60** |
+
+Alleen die 73 hoeven door `zonderCommentaar()`, want juist een toelichting
+beschrijft wat de code doet en bevat dus per definitie de woorden waar je op
+zoekt. Dat is hier twee keer echt gebeurd: `test/mutatiewacht.test.js` bleef
+groen met de bewaakte code weg omdat hij zijn eigen commentaar las, en de kop van
+`server/kern/ai/prompt.js` bevat `...md` letterlijk als voorbeeld van wat NIET
+mag -- een toets die zijn onderwerp met commentaar en al leest, zakt daar op de
+uitleg van de regel die hij bewaakt.
+
+### 6a.2 Een generator hoort zijn eigen klasse te kennen
+
+Daar staat een tweede, even goedkope regel naast, en die is groter dan
+proceshygiëne. `eisSchoneBoom()` in `scripts/lib/stempel.js` weigert een ronde
+die toch `boomVuil: true` zou opleveren; `stempel()` MELDT het achteraf, als de
+tijd al op is en de meter `registersUitVuileBoom` al omhoog is gerateld. Gemeten
+door hetzelfde script:
+
+| | |
+|---|---|
+| scripts die een artefact schrijven | **187** |
+| daarvan: stempelen, en claimen dus repo-waarheid | **79** |
+| daarvan: weigeren een vuile boom | **12** |
+| daarvan: doen dat niet | **67** |
+| grendelen zonder te stempelen | **0** |
+
+**Die 67 zijn geen foutenlijst.** Uitvoer die bewust worktree-lokaal is, of een
+tussenronde, hoort de grendel juist niet te hebben. Het punt is dat
+`registersUitVuileBoom` daarmee ophoudt een incidentklasse te zijn en een
+SYSTEMATISCH ONGEDEKT CONTRACT wordt: van de 79 artefacten die zich als
+repo-waarheid gedragen, kan er bij 67 niemand zeggen of dat expliciet zo bedoeld
+is. De laatste rij is het enige wat vandaag hard is -- er is er geen die grendelt
+zonder te stempelen, dus de poort is een strikte deelverzameling van de claim en
+niemand grendelt iets dat geen waarheid pretendeert.
+
+**Wat er dus moet komen is geen regel voor alle 79 maar een VERKLARING per
+generator**: dit artefact is repo-waarheid (en dan grendelt hij), of dit artefact
+is worktree-lokaal (en dan zegt hij dat). Zolang die verklaring ontbreekt, is elk
+getal over vuile bomen een meting van toeval. `scripts/aicontext.js` en
+`scripts/meterklasse.js` zijn de eerste twee die de grendel meebrengen; de
+verklaring per generator is een besluit dat nog openstaat.
+
+**En daarom staat `METERKLASSE.json` bewust nog niet in de repo.** Een meetbestand
+in de wortel hoort aan een ratel te hangen en die ratel hoort geijkt te zijn. Voor
+de tweede vraag is de tand evident -- het aantal vormlezers zonder scheiding hoort
+te dalen. Voor de eerste is hij dat niet: 67 kan alleen dalen door grendels toe te
+voegen, en een deel van die 67 hoort er juist geen te hebben. Een ratel die daarop
+duwt maakt het huis slechter en de meter groener, en dat is precies de faalvorm
+waar dit hoofdstuk over gaat. Tot de verklaring per generator een besluit is, is
+`npm run meterklasse` een commando dat je draait en geen getal dat meetelt.
 
 ## 7. Wat dit niet wordt
 

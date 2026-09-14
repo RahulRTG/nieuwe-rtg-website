@@ -72,6 +72,12 @@ require('./foundation/zorg')(ctx);
 const { gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht,
   kanaalInfo, setPushHook, bezorgAanGasten, berichtVanGast } = require('./foundation/gasten')(ctx);
 require('./foundation/berichten')(ctx);
+/* Een bericht VAN RTG aan een gezinslid. Eigen module omdat het een andere
+   vraag is dan chatten tussen gezinsleden: hier is de afzender het huis en de
+   ontvanger een persoon, en het mag nooit op 'allen' landen. Zie de kop van
+   ./foundation/systeembericht.js voor waarom dit NIET via
+   db.data.notifications gaat -- die bak heeft aan deze kant geen enkele lezer. */
+const { aanGezinslid } = require('./foundation/systeembericht')(ctx);
 gctx.bezorgAanGasten = bezorgAanGasten; // late binding voor de gezinsberichten
 gctx.welkomRtf = () => {}; // late binding: het welkom-draaiboek (RTMAIL) komt via setAutomatisering
 /* Volwassen gezinsleden en gasten komen niet binnen op alleen de gedeelde
@@ -136,4 +142,4 @@ const { groepen, leerlingPassen } = require('./foundation/leeftijdsgroepen')({ G
 // magSolliciteren/groepLeeftijd horen ook naar buiten: de sollicitatieroute moet
 // de leeftijdsgrens uit het PROFIEL kunnen halen in plaats van uit het verzoek.
 // setKostenHook: de kostenpoort van de RTFoundation (foundation/kostenpoort.js).
-module.exports = { setOnderwijs, router, setKostenHook, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen, setSchoolMail, schoolMailAdresActief:schoolMail && schoolMail.schoolMailAdresActief, foundationMailAdresActief:foundationMail && foundationMail.foundationMailAdresActief, accepteerGast };
+module.exports = { aanGezinslid, setOnderwijs, router, setKostenHook, gastProfielen, linkGast, unlinkGast, gekoppeldeGezinnen, gastOverzicht, kanaalInfo, setPushHook, setMarkt, setAutomatisering, berichtVanGast, verifieerProfiel, bewaarSollicitatie, alGesolliciteerd, socialProfielen, profielInfoVanHandle, leeftijdInstr, magSolliciteren, groepLeeftijd, groepen, leerlingPassen, setSchoolMail, schoolMailAdresActief:schoolMail && schoolMail.schoolMailAdresActief, foundationMailAdresActief:foundationMail && foundationMail.foundationMailAdresActief, accepteerGast };

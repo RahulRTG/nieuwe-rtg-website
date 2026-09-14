@@ -126,7 +126,9 @@ test('7. wat de ketens delen, is geteld en niet verklaard', () => {
 test('8. de proeven delen geen module -- de vorm wordt gevonden, niet verklaard', () => {
   const tafel = fs.readFileSync(path.join(WORTEL, 'scripts', 'tafelproef.js'), 'utf8');
   const toelating = fs.readFileSync(path.join(WORTEL, 'scripts', 'toelatingsproef.js'), 'utf8');
-  for (const [naam, b] of [['ritproef', bron], ['tafelproef', tafel], ['toelatingsproef', toelating]])
+  const moment = fs.readFileSync(path.join(WORTEL, 'scripts', 'momentproef.js'), 'utf8');
+  for (const [naam, b] of [['ritproef', bron], ['tafelproef', tafel], ['toelatingsproef', toelating],
+    ['momentproef', moment]])
     assert.doesNotMatch(b, /require\(.*(lib\/keten|lib\/ketenvorm|lib\/proefvorm)/,
       naam + ' hangt aan een gedeelde ketenmodule; dan meet ketenvorm.js zijn eigen aanname (de Asset-fout)');
 });

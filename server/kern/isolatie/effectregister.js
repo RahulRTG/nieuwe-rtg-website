@@ -26,7 +26,19 @@ const VERKLAARD = Object.freeze([
     grond: 'zelfde strekking, ongeacht waar het pad woont -- dit is precies wat een effectmodel moet doen' },
   { patroon: /^\/api\/rtgid\//,                 effecten: ['IDENTITEIT_WIJZIGEN'],
     grond: 'RTG iD is de identiteit zelf' },
-  { patroon: /(webhook|apikey|sleutel|oauth|sso|scim|koppel)/i, effecten: ['VERTROUWENSRELATIE_AANGAAN'],
+  /* `sso` IS EEN PADSEGMENT EN GEEN LOSSE LETTERGREEP (13 september 2026). Los matchte
+     hij op de letters in inca-SSO: /api/office/bank/incasso en /incasso/dossier kregen
+     daardoor VERTROUWENSRELATIE_AANGAAN met de grond "een blijvende relatie met iets
+     buiten de sessie" -- op de grootste geldweg van dit huis, en de tweede is zelfs een
+     LEESroute. Een grond die onzin is, is erger dan geen grond: hij overleeft het
+     nakijken.
+
+     EN DE EERSTE REPARATIE WAS OOK FOUT, wat precies is waarom test/geldpositie.test.js
+     beide paden noemt en niet alleen het eerste: met `sso[-_/]` erin matchte
+     "inca-SSO/dossier" alsnog. Een grens aan een kant is geen grens. Het moet dus een
+     SEGMENT zijn -- links en rechts begrensd door een scheidingsteken of het eind. */
+  { patroon: /(webhook|apikey|sleutel|oauth|(^|[/_-])sso([/_-]|$)|scim|koppel)/i,
+    effecten: ['VERTROUWENSRELATIE_AANGAAN'],
     grond: 'elk van deze maakt een blijvende relatie met iets buiten de sessie' },
   { patroon: /(upload|bestand|document|foto|beeld|pdf|import)/i, effecten: ['ONVERTROUWDE_BYTES'],
     grond: 'hier komen bytes binnen die niemand van ons heeft geschreven' },

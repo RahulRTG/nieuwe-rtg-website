@@ -88,14 +88,68 @@ test('elke bewaker draagt een waarom, en dat is geen losse kreet', () => {
   }
 });
 
-test('een rol wint van een eigenrol, en verfijners doen niet mee', () => {
+/* DE SMALSTE DEUR WINT -- en deze toets stond tot 13 september 2026 andersom.
+
+   Hij eiste `rol(['officeAuth','boardroomAuth']) === 'office'`, en dat is de
+   brede voordeur van twee deuren waarvan de tweede beslist. Een proef die op
+   dat oordeel afgaat, klopt aan met een sleutel waarvan vaststaat dat hij
+   geweigerd wordt; de 403 die terugkomt is dan zelf-uitgelokt en meet de route
+   niet. Precies zo bleven de 31 baliewegen ongemeten.
+
+   DE MUTATIE: draai de twee lussen in beoordeel() terug om -> de eerste drie
+   regels hieronder zakken. */
+test('de smalste deur wint van de bredere, en verfijners doen niet mee', () => {
   const rol = (b) => bk.beoordeel({ bewakersBekend: true, bewakers: b }).rol;
-  assert.strictEqual(rol(['officeAuth', 'boardroomAuth']), 'office');
+  assert.strictEqual(rol(['officeAuth', 'boardroomAuth']), 'boardroom');
+  assert.strictEqual(rol(['officeAuth', 'balieAuth']), 'kantoor-op-naam');
   assert.strictEqual(rol(['boardroomAuth']), 'boardroom');
   assert.strictEqual(rol(['boardroomAuth', 'alleenBaas']), 'boardroom');
   assert.strictEqual(rol(['techAuth', 'eigenaarAlleen']), 'techniek');
   assert.strictEqual(rol(['supplierAuth', 'rijk']), 'supplier');
   assert.strictEqual(rol(['auth', 'pro', 'kansPoort']), 'member');
+});
+
+/* ============================================================================
+   DE REGEL DIE balieAuth HAD MOETEN VANGEN -- en die er niet was.
+
+   `office` is de enige rol op de kaart die GEEN mens vaststelt: de backoffice-
+   code is gedeeld en de sessie draagt dan geen lidKey (kern/kantoor/index.js
+   zet `req.officeKey = sess.lidKey || null`). Alle andere rollen wijzen wel
+   iemand aan -- een lid, een zaak.
+
+   Daarom is een verfijner boven `office` altijd een van twee dingen, en allebei
+   zijn ze een indelingsfout:
+     - hij versmalt op een eigenschap van een mens die er niet is, of
+     - hij is in werkelijkheid een IDENTITEITSpoort en weigert de rol geheel.
+
+   balieAuth was het tweede en stond ingedeeld als het eerste. Dat kostte 31
+   baliewegen, waarvan de zes muterende in FAALPROEF.json als `ongemeten`
+   stonden met "status 403" -- de gevoeligste routes van dit huis, en ongemeten
+   leest in een uitslagbestand als geslaagd.
+
+   Verfijners boven auth, supplierAuth, techAuth en boardroomAuth blijven gewoon
+   goed: die rollen stellen de identiteit al vast, dus daar verandert een
+   versmalling niets aan welke sleutel er nodig is.
+
+   DE MUTATIE: zet balieAuth in scripts/lib/bewakers.js terug op
+   ['verfijner', null, ...] -> deze toets zakt.
+   ========================================================================== */
+test('geen verfijner boven `office`: die rol wijst geen mens aan', () => {
+  const OFFICE_DEUREN = bk.namenVan('rol').filter(n => bk.rolBij(n) === 'office');
+  assert.ok(OFFICE_DEUREN.length, 'de kaart hoort office-deuren te kennen');
+
+  const fout = [];
+  for (const r of alleRoutes()) {
+    const b = r.bewakers || [];
+    if (!b.some(n => OFFICE_DEUREN.includes(n))) continue;
+    for (const n of b) {
+      if (bk.soortVan(n) === 'verfijner') fout.push(n + '  op  ' + r.methode + ' ' + r.pad);
+    }
+  }
+  assert.deepStrictEqual(fout.slice(0, 8), [],
+    'verfijner(s) boven de rol `office`, die geen mens vaststelt:\n  ' + fout.slice(0, 8).join('\n  ') +
+    '\n  -- ofwel versmalt hij op een mens die er niet is, ofwel is hij een identiteitspoort. ' +
+    'Deel hem in als eigenrol in scripts/lib/bewakers.js, met de rol die hij werkelijk eist.');
 });
 
 test('een lichaamssleutel of objectpoort krijgt GEEN rol, met de reden erbij', () => {

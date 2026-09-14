@@ -138,10 +138,4 @@ module.exports = (ctx) => {
     });
   });
 
-  app.post('/api/office/bank/incasso', kluisAuth, (req, res) => veilig(res, () => tweedeHand.vraag({
-    actie: 'bank.incasso',
-    lijf: req.body && req.body.tot != null ? { tot: Number(req.body.tot) } : {},
-    onderwerp: 'alle vaste betalingen die aan de beurt zijn',
-    door: req.officeKey
-  })));
 };

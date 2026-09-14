@@ -65,7 +65,7 @@ test('1. elk register met een dekkingsclaim verklaart zijn grondwaarheid', () =>
   assert.deepEqual(onverklaard, [],
     'deze registers dragen een dekkingsclaim zonder dat iemand heeft vastgelegd waartegen zij geijkt zijn. ' +
     'Zet ze in scripts/lib/ijking.js -- met een grondwaarheid, of met ONBEPAALD en de vraag die beantwoord ' +
-    'moet worden. LAT.md regel 13: ' + onverklaard.join(', '));
+    'moet worden. LAT.md regel 14: ' + onverklaard.join(', '));
 });
 
 /* MUTATIE GEZIEN ZAKKEN: bij APPWERKT.json de `reden` weggehaald; zakte. */
@@ -151,8 +151,8 @@ test('4. het aantal ongeijkte meters mag dalen en niet stijgen', () => {
    zijn bron afdwaalt is de stilste vorm van uit elkaar lopen (LAT.md regel 6). */
 test('5. de regel staat in de doctrine en niet alleen in deze toets', () => {
   const lat = fs.readFileSync(path.join(WORTEL, 'LAT.md'), 'utf8');
-  assert.match(lat, /### 13\. Een meter kent zijn eigen grens/,
-    'LAT.md draagt regel 13 niet meer; dan handhaaft deze toets iets wat nergens meer is afgesproken');
+  assert.match(lat, /### 14\. Een meter kent zijn eigen grens/,
+    'LAT.md draagt regel 14 niet meer; dan handhaaft deze toets iets wat nergens meer is afgesproken');
   assert.match(lat, /geijkt tegen\s+beschikbare bekende waarheid/,
-    'de kernzin van regel 13 staat niet meer in LAT.md');
+    'de kernzin van regel 14 staat niet meer in LAT.md');
 });

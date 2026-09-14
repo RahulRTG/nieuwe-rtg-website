@@ -284,6 +284,7 @@ function wachtOpSchoneBoom() {
      teller bij komt; deze ijking niet. Zelfde gedachte als de per-route ijking
      in de proef zelf: eerst zien dat de meter kan bewegen. */
   const staatlog = require('../server/staatlog');
+  let stilBewoog = null;
   const ruis = new Set();
   let ijkStand = null, staatWerkt = false;
   {
@@ -335,6 +336,60 @@ function wachtOpSchoneBoom() {
       }
       ijkStand = stand;
     }
+
+    /* ---------------------------------------------------------------------
+       DE STILLE RONDE -- wat beweegt er ZONDER dat er iets wordt aangeroepen.
+
+       WAAROM DE IJKING HIERBOVEN DIT NIET VINDT: zij zoekt wat bij ELKE oproep
+       groeit, en doet dat in milliseconden. Een collectie die aan een KLOK hangt
+       of die een RAM-buffer periodiek uitspoelt, beweegt daar niet in mee -- en
+       landt daarna in het verschil van de route die op dat moment gemeten wordt.
+
+       GEVONDEN AAN TWEE ECHTE GEVALLEN, en beide keren was de uitslag een
+       verkeerde toerekening:
+
+         `wacht`            De Wacht (kern/wacht/staat.js) houdt een meetring van
+                            180 punten op tien seconden. Hij bewoog in het verschil
+                            van /api/pay/stuur en van /api/office/bank/handtekening/
+                            bevestig -- en dat laatste pad gaf drie keer 404.
+         `kantoorMensdeur`  de schaduwmeting van de kantoordeur telt in RAM en
+                            SPOELT periodiek (kern/kantoor/mensdeur-spoel.js). Hij
+                            sprong met TIEN omhoog in een enkel verschil; dat zijn
+                            tien eerdere verzoeken, niet dit ene.
+
+       Dit is dezelfde fout als de toerekening van voorwerk die `herijk` hierboven
+       oplost, maar van een derde kant: niet de proef die zelf schrijft en niet een
+       buurroute, maar een achtergrondlus in dezelfde server.
+
+       LOS BEPROEFD VOORDAT HIJ IN DE RONDE KWAM, en hij vond er DRIE: `wacht`,
+       `kantoorMensdeur` en `techniek` (het beveiligingsbord, server/beveiliging.js --
+       ook dat beweegt zonder dat iemand iets vraagt). De snelle ijking vond in
+       dezelfde opstelling alleen `kosten`, `handelingLog` en `apiSpoor`; die twee
+       lijsten overlappen dus niet, en dat is precies waarom deze ronde bestaat.
+
+       WAT HET KOST, en dat hoort er even groot bij: een route die ZELF in zo'n
+       collectie schrijft, wordt daarop niet meer gemeten. Voor `wacht` zijn dat de
+       /api/wacht/-routes, voor `techniek` de technische pagina, en zij staan hiermee
+       op de lijst van dingen die deze proef niet ziet -- precies zoals `kosten`
+       hierboven. Een zeef die te veel wegvangt is erger dan een die niets doet, dus
+       de zeef wordt GEMETEN en niet geraden: wat hier in ruis belandt, is wat er
+       beweegt terwijl er niets wordt gevraagd. Komt er ooit niets meer uit, dan
+       meldt de ronde dat ook -- 'niets bewoog' is een uitslag en geen stilte.
+
+       TWAALF SECONDEN, want de kortste klok die we vonden tikt op tien. Het is
+       eenmalig per ronde naast een meetlus van tientallen minuten. */
+    if (ijkStand != null) {
+      const stil = async (ms) => new Promise(r => setTimeout(r, ms));
+      const voor = ijkStand;
+      await stil(12000);
+      const na = await post(IJKROUTES[0], {}, tokens.member);
+      if (na.staat != null) {
+        const stilleRuis = Object.keys(staatlog.verschil(voor, na.staat, ruis));
+        for (const k of stilleRuis) ruis.add(k);
+        ijkStand = na.staat;
+        stilBewoog = stilleRuis;
+      }
+    }
     staatWerkt = ijkStand != null;
   }
   /* DE VASTLEGGING wordt hier NIET geijkt, en dat is een gemeten keuze. Deze
@@ -350,6 +405,11 @@ function wachtOpSchoneBoom() {
   console.log('  tweede meetpunt (de opslag)          : ' + (staatWerkt
     ? 'aan; ruis geijkt op ' + (ruis.size ? [...ruis].join(', ') : 'niets')
     : 'UIT -- geen X-RTG-Staat-kop; de proef meet alleen het antwoord'));
+  /* De stille ronde apart melden en niet in het rijtje hierboven verstoppen: wat
+     beweegt terwijl er niets wordt gevraagd, is een ander soort bevinding dan wat
+     bij elke oproep groeit -- en als het er NUL zijn hoort dat ook te blijken. */
+  if (staatWerkt) console.log('  de stille ronde (klok en buffer)     : ' +
+    (stilBewoog === null ? 'niet gedraaid' : stilBewoog.length ? stilBewoog.join(', ') : 'niets bewoog'));
 
   /* Het verschil dat DEZE oproep achterliet. De stand loopt door over de hele
      ronde: elk antwoord is het nieuwe ijkpunt voor het volgende. */

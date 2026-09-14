@@ -22,7 +22,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const { zetWereldKlaar, gedeeldLijf, geldLijf } = require('../scripts/lib/idemwereld');
+const { zetWereldKlaar, gedeeldLijf, geldLijf, voorzieningVoor } = require('../scripts/lib/idemwereld');
 const wereld = require('../scripts/lib/idemwereld');
 const { alleRoutes } = require('../scripts/lib/routes');
 
@@ -56,7 +56,10 @@ test('de keten levert alle stukken op die de geldroutes nodig hebben', async () 
   assert.equal(wereld.spaarIban, 'NL00SPAAR');
   assert.equal(wereld.pasId, 'PAS1');
   assert.equal(wereld.terugkerendId, 'TK1');
-  assert.equal(wereld.tikcode, 'TIK999');
+  /* EN MET OPZET GEEN TIKCODE: die leeft vijf minuten en hoort dus in een
+     voorziening, niet in een wereld die eenmalig aan het begin wordt opgezet. De
+     volgende toets meet dat. */
+  assert.equal(wereld.tikcode, undefined, 'de wereld draagt geen tikcode meer');
   assert.equal(wereld.factuurId, 'RTG-2026-0002', 'de OPENSTAANDE factuur, niet de eerste de beste');
   /* TWEEENTWINTIG, en de laatste twee staan er apart bij. Een kale telling laat
      een RUILING door: wie een lijf weghaalt en een ander toevoegt, houdt het
@@ -65,33 +68,74 @@ test('de keten levert alle stukken op die de geldroutes nodig hebben', async () 
      twaalf van de veertien zware kantoorroutes omdat de proef ze niet aan het
      werk kreeg, en bij deze twee kwam dat door een WOORD en niet door een deur
      (`soort` betekent bij een pas iets anders dan bij een rekening). */
-  /* VIJFENTWINTIG sinds de bundelronde van 13 september 2026. Twee takken breidden
-     deze lijst onafhankelijk uit -- de ledenkant met twee zware kantoorroutes (zie
-     hierboven) en de zaakkant van PR #242 met drie -- en de vereniging telt 25
-     verschillende paden zonder een enkele dubbele sleutel. Dat laatste is hier de
-     echte eis: een dubbele sleutel in een objectliteraal verdwijnt STIL (de laatste
-     wint), dus een te laag getal zou hier het enige signaal zijn geweest. */
+  /* VIJFENTWINTIG, EN DAT IS EEN RUILING -- precies waar de waarschuwing hieronder
+     over gaat. Na de bundelronde van 13 september stonden er 25 (twee takken breidden
+     de lijst onafhankelijk uit: de ledenkant met twee zware kantoorroutes, de zaakkant
+     van PR #242 met drie). Op 14 september kwam /api/office/bank/incasso erbij en ging
+     /api/pay/tik eruit -- die laatste hoort in een VOORZIENING, want zijn code leeft
+     vijf minuten en een wereld die aan het begin van de ronde wordt opgezet levert hem
+     verlopen af. Het getal is dus hetzelfde en de verzameling niet.
+
+     HET GETAL IS DE EIS EN NIET DE VERSIERING: een dubbele sleutel in een
+     objectliteraal verdwijnt STIL (de laatste wint), dus een kale telling is het enige
+     signaal dat er een lijf is overschreven. En een kale telling laat juist een RUILING
+     door -- daarom staan de paden die om een reden zijn toegevoegd er hieronder apart
+     bij, en toetst de volgende toets dat de tik NIET meer uit de wereld komt. */
   assert.equal(Object.keys(perRoute).length, 25, 'vijfentwintig geldroutes krijgen een eigen lijf');
   for (const pad of ['/api/office/bank/rekening/open', '/api/office/bank/rekening/rood']) {
     assert.ok(perRoute[pad], 'de zware kantoorroute ' + pad + ' hoort een eigen lijf te krijgen');
   }
+  /* DE GOUDEN WEG (MACHINE.md par. 5a). Zonder `tot` weigert de incassoronde met 400
+     ("Er staat geen enkele vaste betaling aan de beurt") en blijft de as `gevolg` van
+     kern/kantoor/geldketen.js op onbekend staan -- dan is de keten niet rond. */
+  assert.ok(perRoute['/api/office/bank/incasso'], 'de incassoronde hoort een grens mee te krijgen');
+  assert.ok(Number.isFinite(perRoute['/api/office/bank/incasso'].tot),
+    '`tot` is een tijdstip en geen belofte: ' + JSON.stringify(perRoute['/api/office/bank/incasso']));
   assert.deepEqual(extra, { iban: 'NL00EEN', aan: 'Gouden Ibis', codenaam: 'Gouden Ibis',
     naarCodenaam: 'Gouden Ibis', code: 'ABC123' });
 });
 
-test('de tikcode komt van de ANDER, want je eigen tik weigert de kern', () => {
-  /* `pay/tik` betaalt naar de eigenaar van de code. Met een eigen tikcode geeft
-     de kern terecht "Dit is je eigen tik", en met de KASCODE (een andere
-     codesoort) een 404 -- zo bleef die route staan op ongemeten. */
+test('de tikcode komt van de ANDER en uit een VOORZIENING, niet uit de wereld', () => {
+  /* TWEE BEWERINGEN IN EEN TOETS, en ze horen bij elkaar.
+
+     1. De code moet van het TWEEDE lid komen: `pay/tik` betaalt naar de eigenaar van
+        de code, dus met een eigen tikcode weigert de kern terecht ("Dit is je eigen
+        tik") en met de KASCODE (een andere codesoort) volgt een 404.
+     2. Hij mag NIET uit de wereld komen. Een tikcode leeft vijf minuten (KASCODE_MS)
+        en de wereld wordt eenmalig aan het begin van een ronde van tientallen minuten
+        opgezet -- gemeten op 14 september 2026 gaf /api/pay/tik dan drie keer 404
+        "Deze tik is niet (meer) geldig". De voorziening draait NA de
+        pasladder-ijkoproep en is dus per definitie vers.
+
+     De eerste bewering stond hier al en verhuist mee naar het nieuwe adres; de tweede
+     is de reparatie. Zet de tikcode terug in zetWereldKlaar() en deze toets zakt op de
+     eerste assertie. */
   const journaal = [];
   const nep = nepPost(VOLLEDIG, journaal);
-  return zetWereldKlaar({ post: nep, tokens: { member: 'lid', office: 'kantoor' } }).then(({ perRoute }) => {
-    const tik = journaal.find(x => x.pad === '/api/pay/tikcode');
-    assert.ok(tik, 'er wordt een tikcode gehaald');
+  return zetWereldKlaar({ post: nep, tokens: { member: 'lid', office: 'kantoor' } }).then(async ({ wereld, perRoute }) => {
+    assert.equal(journaal.some(x => x.pad === '/api/pay/tikcode'), false,
+      'de WERELD haalt geen tikcode meer: die verloopt voordat de meetlus er is');
+    assert.equal(perRoute['/api/pay/tik'], undefined,
+      'en geldLijf() draagt hem dus ook niet meer -- anders zijn er twee mechanismen');
+
+    const voorziening = voorzieningVoor('/api/pay/tik');
+    assert.equal(typeof voorziening, 'function', 'de tik hoort een voorziening te hebben');
+    const eigen = [];
+    const lijf = await voorziening({ post: nepPost(VOLLEDIG, eigen), w: wereld });
+    const tik = eigen.find(x => x.pad === '/api/pay/tikcode');
+    assert.ok(tik, 'de voorziening haalt een verse tikcode');
     assert.equal(tik.tok, 'ander', 'en wel bij het tweede lid');
-    assert.equal(perRoute['/api/pay/tik'].code, 'TIK999');
-    assert.notEqual(perRoute['/api/pay/tik'].code, 'ABC123', 'niet de kascode');
+    assert.equal(lijf.code, 'TIK999');
+    assert.notEqual(lijf.code, 'ABC123', 'niet de kascode');
+    assert.equal(lijf.centen, 100);
   });
+});
+
+test('zonder tweede lid weigert de tik-voorziening met een reden', async () => {
+  /* Een voorziening die stil `undefined` teruggeeft, laat de route meten met een half
+     lijf en dat leest daarna als een routefout. `fout` is hier de juiste uitkomst. */
+  const uit = await voorzieningVoor('/api/pay/tik')({ post: nepPost(VOLLEDIG), w: {} });
+  assert.match(String(uit.fout || ''), /tweede lid/);
 });
 
 test('TWEE klompjes, want betalen en intrekken vragen tegengestelde kanten', () => {

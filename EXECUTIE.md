@@ -227,11 +227,11 @@ bestaat. Daarom: eerst schaduw, dan tanden.
 
 | | aantal |
 |---|---|
-| routes met een rol | <!--getal:idem.routesMetRol-->4179<!--/getal--> |
-| beoordeeld | <!--getal:idem.beoordeeld-->1668<!--/getal--> |
-| beschermd | <!--getal:idem.beschermd-->1667<!--/getal--> |
+| routes met een rol | <!--getal:idem.routesMetRol-->4180<!--/getal--> |
+| beoordeeld | <!--getal:idem.beoordeeld-->1666<!--/getal--> |
+| beschermd | <!--getal:idem.beschermd-->1665<!--/getal--> |
 | onbeschermd | **<!--getal:idem.onbeschermd-->1<!--/getal-->** |
-| ongemeten | <!--getal:idem.ongemeten-->3244<!--/getal--> |
+| ongemeten | <!--getal:idem.ongemeten-->3247<!--/getal--> |
 
 Dit staat er beter voor dan `CLAUDE.md` beweert (dat noemt nog 115 gemeten; dat
 cijfer is verouderd). Van alles wat beoordeeld is, is niets onbeschermd. De
@@ -656,9 +656,9 @@ paden die de AI mag bedienen:
 
 | graad | aantal | wat het zegt |
 |---|---|---|
-| `gemeten` | <!--getal:gevolg.gemeten-->38<!--/getal--> | de proef raakte deze collecties aan |
-| `geen-effect-gemeten` | <!--getal:gevolg.geenEffect-->48<!--/getal--> | de proef draaide en raakte niets aan |
-| **`onbekend`** | **<!--getal:gevolg.onbekend-->87<!--/getal-->** | de proef kwam er niet bij (404, 403, geen geldige invoer) |
+| `gemeten` | <!--getal:gevolg.gemeten-->28<!--/getal--> | de proef raakte deze collecties aan |
+| `geen-effect-gemeten` | <!--getal:gevolg.geenEffect-->53<!--/getal--> | de proef draaide en raakte niets aan |
+| **`onbekend`** | **<!--getal:gevolg.onbekend-->92<!--/getal-->** | de proef kwam er niet bij (404, 403, geen geldige invoer) |
 
 Die getallen stonden hier tot 13 september OVERGETYPT, en waren verouderd: er stond
 96 van 176. Ze komen nu uit `GEVOLGDEKKING.json` via `npm run getallen`, zodat het
@@ -679,8 +679,8 @@ zij is een momentopname van de laatste proefronde, niet van deze commit.
 #### Het gevolgcontract: de VERKLARING naast de meting (13 september 2026)
 
 De meting hierboven is hard en smal: zij zegt wélke collecties veranderen, van
-<!--getal:gevolg.gemeten-->38<!--/getal--> van de <!--getal:gevolg.bereikbaar-->173<!--/getal-->
-bereikbare handelingen. Over <!--getal:gevolg.onbekend-->87<!--/getal--> weet zij niets, en
+<!--getal:gevolg.gemeten-->28<!--/getal--> van de <!--getal:gevolg.bereikbaar-->173<!--/getal-->
+bereikbare handelingen. Over <!--getal:gevolg.onbekend-->92<!--/getal--> weet zij niets, en
 over de buitenwereld weet zij per definitie niets — mail, een provider, de bank van
 de ontvanger staan in geen enkele collectie. Een planner die daarop zou leunen, plant
 in het donker.
@@ -842,7 +842,7 @@ een standaard geworden, zodat die combinatie te maken is.
 **En de regel die eruit volgt weigert niets.** *Een plan gaat alleen over handelingen
 waarvan het gevolg voldoende bekend is* loopt in de **schaduw**: het plan zegt hoeveel
 stappen het zou afwijzen en welke, en wijst niets af. Met
-<!--getal:gevolg.onbekend-->87<!--/getal--> van de
+<!--getal:gevolg.onbekend-->92<!--/getal--> van de
 <!--getal:gevolg.bereikbaar-->173<!--/getal--> paden ongemeten zou afdwingen vandaag het
 halve stuur stilzetten, en dan wordt de regel losgedraaid in plaats van gehaald
 (`CONTROLPLANE.md`: eerst zonder te blokkeren). `geen-effect-gemeten` telt daarbij als

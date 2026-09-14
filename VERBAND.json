@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-13T12:24:55.654Z",
-    "commit": "ec8faeab",
+    "op": "2026-09-14T09:37:55.947Z",
+    "commit": "84034ddc",
     "boomVuil": false,
     "instrument": "scripts/verband.js",
     "node": "v22.22.2"
@@ -10,47 +10,47 @@
   "graad": "vermoed",
   "grens": "De RECALL is gemeten, de PRECISIE niet: van de voorstellen per sensor is niet vastgesteld welk deel een echte handhaver aanwijst. De vijf sensoren worden NOOIT tot een cijfer gemiddeld -- `anker` haalt 8 van de 57 met 12 voorstellen en `wettekst` 52 met 411, dus een gemiddelde verbergt precies het verschil waar een lezer op moet wegen. Een rand draagt daarom WELKE sensoren hem zagen en geen betrouwbaarheidspercentage.",
   "telling": {
-    "wetten": 52,
-    "randenWachter": 58,
-    "randenImplementatie": 39,
-    "gevonden": 56,
+    "wetten": 53,
+    "randenWachter": 59,
+    "randenImplementatie": 40,
+    "gevonden": 57,
     "gemist": 2
   },
   "tweeRelaties": {
     "uitleg": "Het veld `handhaver` draagt twee verschillende beweringen: een WACHTER die rood wordt (relatie BEWAAKT_DOOR), en de IMPLEMENTATIE die de regel draagt (relatie DRAAGT). Deze meter ijkt alleen de eerste. Elke rand draagt daarom een `relatie` die zegt WAT hij is, naast een `bronrelatie` die zegt wat er in WETTEN.json stond.",
     "interpretatie": "ONBEPAALD IN DE BRON: WETTEN.json kent een veldnaam voor twee relaties. De splitsing hier is een LEZING van deze meter en geen besluit -- WETTEN.json is niet aangeraakt. Wie die twee daar uit elkaar trekt, doet dat als besluit en niet als berekening.",
-    "wachter": 58,
-    "implementatie": 39
+    "wachter": 59,
+    "implementatie": 40
   },
   "sensoren": {
     "causaal": {
       "recall": 4,
-      "van": 58,
-      "voorstellen": 8,
+      "van": 59,
+      "voorstellen": 9,
       "bron": "gemeten"
     },
     "document": {
-      "recall": 37,
-      "van": 58,
-      "voorstellen": 391,
+      "recall": 38,
+      "van": 59,
+      "voorstellen": 416,
       "bron": "gemeten"
     },
     "anker": {
       "recall": 8,
-      "van": 58,
+      "van": 59,
       "voorstellen": 12,
       "bron": "gemeten"
     },
     "doelbestand": {
       "recall": 34,
-      "van": 58,
-      "voorstellen": 109,
+      "van": 59,
+      "voorstellen": 110,
       "bron": "gemeten"
     },
     "wettekst": {
       "recall": 52,
-      "van": 58,
-      "voorstellen": 382,
+      "van": 59,
+      "voorstellen": 391,
       "bron": "gemeten"
     }
   },
@@ -661,6 +661,15 @@
       ],
       "relatie": "BEWAAKT_DOOR",
       "bronrelatie": "bewaaktDoor"
+    },
+    {
+      "wet": "leven-geen-capaciteitscijfer-op-een-mens",
+      "wachter": "test/cijferopmens.test.js",
+      "gezienDoor": [
+        "document"
+      ],
+      "relatie": "BEWAAKT_DOOR",
+      "bronrelatie": "bewaaktDoor"
     }
   ],
   "implementatie": [
@@ -895,6 +904,12 @@
     {
       "wet": "techniek-bewijsveld-een-relatie",
       "bestand": "scripts/lib/wetrelatie.js",
+      "relatie": "DRAAGT",
+      "bronrelatie": "draagt"
+    },
+    {
+      "wet": "leven-geen-capaciteitscijfer-op-een-mens",
+      "bestand": "scripts/lib/cijferopmens.js",
       "relatie": "DRAAGT",
       "bronrelatie": "draagt"
     }

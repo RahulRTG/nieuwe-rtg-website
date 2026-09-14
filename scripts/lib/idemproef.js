@@ -215,7 +215,7 @@ function weegZonderSleutel(d, e, staat) {
     reden: 'een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik' };
 }
 
-async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hernieuw, maxRoutes, staatVan, herijk, vastlegging, metenZonderSleutel, pasladder, wacht, voorzieningVoor, wereld }) {
+async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hernieuw, naInlog, maxRoutes, staatVan, herijk, vastlegging, metenZonderSleutel, pasladder, wacht, voorzieningVoor, wereld }) {
   const perRoute = {};
   let gedaan = 0, hernieuwd = 0, uitOpslag = 0, verworpen = 0, pasGewisseld = 0;
   const tel = { beschermd: 0, onbeschermd: 0, ongemeten: 0 };
@@ -356,6 +356,11 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
       gedaan++;
     }
 
+    /* WAT EEN VERSE INLOG ONDERWEG RAAKTE -- per route verzameld, en per oproep
+       weer schoongeveegd. Zie de uitleg bij de 401 hieronder. */
+    let inlogOnderweg = null;
+    let inlogNamen = null;
+
     const doe = async (sleutel) => {
       let st = await post(r.pad, { ...lijf, idem: sleutel, idempotentieSleutel: sleutel }, tokenVoor(pas));
       gedaan++;
@@ -363,17 +368,76 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
          ronde "niets gemeten" over honderden routes zonder dat iets klaagt --
          dezelfde meetfout als in de invoerproef, en dezelfde reparatie. */
       if (st.status === 401 && hernieuw) {
-        if (await hernieuw(pas)) { hernieuwd++; st = await post(r.pad, { ...lijf, idem: sleutel, idempotentieSleutel: sleutel }, tokenVoor(pas)); gedaan++; }
+        /* De stand van VOOR de inlog. Een 401 draagt hem ook: server/staatlog.js
+           hangt de kop aan res.end en niet aan res.json, dus een geweigerd
+           antwoord is hier net zo goed een meetpunt als een geslaagd. */
+        const voorInlog = st.staat;
+        if (await hernieuw(pas)) {
+          hernieuwd++;
+          /* DE VIERDE TOEREKENINGSWEG, en de enige die niet uit het VOORWERK van de
+             route komt maar uit de OPSTELLING: een verse inlog SCHRIJFT, en wat hij
+             schrijft belandde in de delta van de oproep die hier wordt herhaald.
+
+             GEMETEN en niet vermoed (14 september 2026, wegwerpserver met
+             RTG_STAATLOG=2, ruis geijkt op een leesroute):
+
+               /api/login        -> {"sessions":1}
+               /api/auth/login   -> {"securityLog":2,"sessiecontext":1,"foundation":2}
+
+             Geen van de vier staat in de ruislijst, en `sessions` is in
+             server/kern/isolatie/effectcollecties.js ingedeeld als
+             IDENTITEIT_WIJZIGEN. De ronde van 14 september deed 21 hernieuwingen en
+             droeg `sessions` op acht routes, waarvan er EEN (/api/logout) hem
+             werkelijk schrijft: /api/mall en vijf rtfos-routes "wijzigden
+             identiteit" omdat de proef tussendoor opnieuw had ingelogd. Dat is geen
+             ruis in een teller maar een verzonnen effect in de laag die over
+             bevoegdheid gaat. Een eigenrol maakt het zwaarder: die hernieuwing munt
+             eerst de eigenaarsketen opnieuw, dus drie collecties extra.
+
+             WAAROM HET IJKPUNT NIET WORDT OPGESCHOVEN, en dat is de hele keuze hier.
+             Het ijkpunt naar de stand van na de inlog schuiven is een regel te grof:
+             dan valt ook de pasladder-ijkoproep erbuiten, en die raakt DEZELFDE
+             route. Op een route die idempotent is per onderwerp (/api/member/ai/tegoed
+             maakt de tegoedregel bij de eerste oproep aan en daarna niet meer) blijft
+             er dan `opslag: {}` over -- precies de over-correctie die
+             test/idemtoerekening.test.js toets 2b op 14 september ving. Nagemeten:
+             met een opgeschoven ijkpunt staat `onderwerpen` hier op 1 in plaats van 2.
+
+             Dus wordt alleen weggelaten wat DEZE INLOG raakte, en alleen bij deze ene
+             oproep. Dat is een zeef, en een zeef kan te veel wegvangen: schrijft de
+             route zelf ook in een collectie die de inlog raakte, dan verdwijnt die
+             naam bij deze oproep mee. Daarom staat hij in het register (`inlogOnderweg`)
+             en niet alleen in dit commentaar -- wie de opslag van zo'n route leest,
+             ziet dat er een inlog tussendoor is gekomen en welke namen daarbij zijn
+             weggelaten. */
+          if (naInlog) {
+            const namen = (await naInlog({ voor: voorInlog, rol: pas })) || [];
+            if (namen.length) {
+              inlogNamen = namen;
+              inlogOnderweg = [...new Set([...(inlogOnderweg || []), ...namen])];
+            }
+          }
+          st = await post(r.pad, { ...lijf, idem: sleutel, idempotentieSleutel: sleutel }, tokenVoor(pas));
+          gedaan++;
+        }
       }
       return st;
+    };
+
+    /* De namen van de inlog uit DEZE delta halen, en daarna het lijstje legen: de
+       volgende oproep hoort er niets meer van te merken. */
+    const zuiver = (d) => {
+      if (d && inlogNamen) for (const n of inlogNamen) delete d[n];
+      inlogNamen = null;
+      return d;
     };
 
     /* De opslagstand tussen de oproepen door. `staatVan` geeft het verschil dat
        DIE oproep achterliet, met de geijkte ruis er al uit. Zonder de vlag is
        hij er niet en werkt de proef als vanouds op alleen het antwoord. */
-    const a = await doe(k1); const dA = staatVan ? staatVan(a) : null;
-    const b = await doe(k1); const dB = staatVan ? staatVan(b) : null;
-    const c = await doe(k2); const dC = staatVan ? staatVan(c) : null;
+    const a = await doe(k1); const dA = zuiver(staatVan ? staatVan(a) : null);
+    const b = await doe(k1); const dB = zuiver(staatVan ? staatVan(b) : null);
+    const c = await doe(k2); const dC = zuiver(staatVan ? staatVan(c) : null);
 
     /* ========================================================================
        DE RONDE ZONDER SLEUTEL -- en dit is de meting waar het bij een dubbeltik
@@ -440,6 +504,10 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
     /* Met een LEGE kop aangeroepen, en waarom. Zonder dit veld leest zo'n regel
        als een meting met de juiste rol, en dat is iets anders. */
     if (r.zonderRol) rij.zonderRol = r.zonderRol;
+    /* Er is onderweg opnieuw ingelogd, en wat die inlog raakte is uit de opslag
+       gelaten. Het staat er ZICHTBAAR bij, want het is een beperking van de meting
+       en geen eigenschap van de route. */
+    if (inlogOnderweg) rij.inlogOnderweg = inlogOnderweg;
     /* Met welke pas gemeten, als het niet de instapfas was. */
     if (pas !== r.rol) rij.viaPas = pas;
 

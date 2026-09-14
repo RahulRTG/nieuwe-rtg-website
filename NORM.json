@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2382,
+    "bewijsAchterstand": 2388,
     "bewijsAlleenKeten": 16,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -90,7 +90,7 @@
     "bevestigGebreken": 0,
     "verwijzingGebreken": 0,
     "mensmutatieZonderWacht": 1,
-    "gevolgPadenOnbekend": 87,
+    "gevolgPadenOnbekend": 92,
     "gevolgContractVolledig": 6,
     "gevolgContractenGezakt": 0
   },
@@ -2192,6 +2192,24 @@
       "meter": "kernBreedte 1569 -> 1570",
       "reden": "de gouden weg (MACHINE.md par. 5a) hangt EEN naam in de kern-tas: `geldketen`, gebruikt door routes/kantoren/bank-incasso.js en bank-tweedehand.js. Die naam is de baan waarlangs een geldhandeling langs alle motoren gaat, en hij staat in GRENZEN.json bij kantoren -- de domeingrens hield de brug tegen tot hij daar stond. Een alternatief dat de breedte NIET verhoogt is er niet: de baan uit ctx laten komen (zoals tweedeHand) verplaatst de naam naar routes/kantoren/index.js, en dat is ook een routebestand, dus de meter telt hem daar net zo. Twee exemplaren bouwen zou wel de tas sparen en kost een tweede journaal dat het eerste niet ziet -- precies wat kern/kantoor/tweedehandtekening.js in zijn kop verbiedt.",
       "waarheen": "deze schuld lost af zodra de gouden weg meer dan een handeling draagt: zodra de tweede en derde geldhandeling langs dezelfde baan lopen (KANTOORMACHT.md blok 1: de dertien zware kantoorpaden), draagt die ENE naam er n in plaats van een -- de breedte blijft dan 1570 terwijl de dekking stijgt. Wordt de baan ooit weer tot een enkele handeling teruggebracht, dan hoort de naam mee te verdwijnen en de norm terug naar 1569."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "schuld",
+      "sleutel": "gevolgPadenOnbekend",
+      "van": 87,
+      "vervalt": "2026-12-15",
+      "meter": "gevolgPadenOnbekend 87 -> 92",
+      "reden": "MET DE HAND VERLAAGD, en niet omdat er iets slechter werd: het getal van 87 was te mooi. De idempotentieproef rekende werk dat zij ZELF voor de meting deed (de pasladder-ijkoproep en de voorziening die het onderwerp aanmaakt) toe aan de gemeten handeling, want `staatVan` schoof zijn ijkpunt alleen op wanneer hij werd aangeroepen. Na de herijking in scripts/lib/idemproef.js verdwijnt die toerekening: 116 routes verliezen schrijfwerk dat niet van hen was, 61 collecties zijn niet langer aan een verkeerde handeling toegeschreven, en vijf AI-bereikbare paden blijken nooit gemeten te zijn in plaats van gemeten-met-voorwerk. Die vijf stonden dus ten onrechte NIET in deze teller. Wat een keer goed was hoort niet stilletjes slechter te worden -- en een getal dat te mooi was hoort niet stilletjes te blijven staan; scripts/norm.js schrijft daarom voor dat dit met de hand gaat, met de reden erbij. Omlaag krijgen vraagt geen nieuwe reparatie maar een idempotentieproef die deze paden ECHT bereikt (geldige invoer en rechten per pad, in de vorm van scripts/lib/herstelwereld.js) -- dezelfde klus die de andere as van GEVOLGDEKKING.json blokkeert."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2382,
+      "vervalt": "2026-12-15",
+      "meter": "bewijsAchterstand 2382 -> 2388",
+      "reden": "ZELFDE OORZAAK ALS gevolgPadenOnbekend hierboven, en dezelfde soort groei: er komt iets in beeld dat er al was. De zes zijn vijf gevolg-onbekende paden plus een idem-ongeclassificeerde; alle zes golden eerder als gedekt omdat de idempotentieproef haar EIGEN voorwerk aan de gemeten handeling toerekende. PROOF.md par. 0 eist dat schuld alleen krimpt, en dat is juist de reden dat dit met de hand gaat: een teller die daalt doordat de meting te ruim was, is geen aflossing. De reden staat ook IN het register zelf (BEWIJSSCHULD.json, via --groei), want dat weigerde terecht vast te leggen zonder. Omlaag krijgen vraagt een idempotentieproef die deze paden echt bereikt, niet een nieuwe reparatie hier."
     }
   ],
   "prestatie": {

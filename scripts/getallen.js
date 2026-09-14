@@ -410,6 +410,8 @@ const GETALLEN = {
     wat: 'bestanden aan de zaakkant die het ondernemingsobject kennen' },
   'lus.ketensZonderProef': { bron: 'ONDERNEMERSLUS.json', veld: 'telling.ketensZonderProef',
     wat: 'ketens van de lus die nooit als keten zijn gelopen' },
+  'lus.kennersTotaal': { bron: 'ONDERNEMERSLUS.json', veld: 'telling.kennersTotaal',
+    wat: 'bestanden buiten kern/onderneming die het ondernemingsobject kennen' },
   /* De duur van die parseronde staat MET OPZET niet in deze lijst. Een levend
      getal moet uit een register komen dat bij gelijke code hetzelfde zegt; een
      tijdmeting doet dat niet (4,6 of 4,8 op dezelfde commit), en een controle

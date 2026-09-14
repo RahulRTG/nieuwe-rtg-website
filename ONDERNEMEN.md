@@ -97,7 +97,10 @@ Drie assen, drie graden, nooit opgeteld:
 
 **1. De lus loopt één kant op.** `kern/onderneming` kent de zaak — hij heeft
 `vanZaak` en `/api/onderneming/koppel`. Het omgekeerde is nul: geen enkel bestand
-onder `routes/supplier/` of `routes/staff/` noemt de ondernemingscollectie. De
+onder `routes/supplier/` of `routes/staff/` noemt de ondernemingscollectie **of
+roept een toegang aan die het object teruggeeft** (`ondernemingVanZaak` voorop).
+Die tweede helft telt sinds 14 september mee — zonder haar mat de meter juist de
+vorm niet die de brug hoort te hebben; zie het kader hieronder. De
 werkvloer weet niet dat hij een onderneming heeft. Dat is dezelfde vorm die
 `scripts/ritmigratie.js` in de twee ritwerelden vond, en de reparatie daar
 (`kern/mobiliteit/appbrug.js`) is hier het model — inclusief de regel die daar
@@ -120,14 +123,29 @@ hieronder — geen gevoel maar een leeg station.
 verkenningslaag van Ondernemers-OS is ongemeten"*), `offerte-factuur`,
 `medewerker-dienst` en `tweede-vestiging`.
 
-> **De meter kan zelf blind worden, en dat is nagetrokken.** De eerste versie
-> gooide bij een onleesbaar patroon, maar bij een *hernoemde* collectie las hij
-> gewoon de nieuwe naam en meldde `0 kenners` — de duurste bevinding die hij kan
-> doen, terwijl er niets aan de hand was. Er staat nu een ijking naast
-> (`routes/member/onderneming.js` moet de collectie noemen) en twee
+> **De meter kan zelf blind worden, en dat is twee keer gebeurd.** De eerste
+> versie gooide bij een onleesbaar patroon, maar bij een *hernoemde* collectie
+> las hij gewoon de nieuwe naam en meldde `0 kenners` — de duurste bevinding die
+> hij kan doen, terwijl er niets aan de hand was. Er staat nu een ijking naast
+> (`routes/member/onderneming.js` moet de collectie noemen) en drie
 > besturingsproeven in `test/ondernemerslus.test.js`. *Een instrument dat niet
 > kan uitslaan is geen instrument; een instrument dat zijn eigen blindheid als
 > uitslag rapporteert is erger.*
+>
+> **De tweede blindheid zat in de proxy zelf, en die is verraderlijker.** De
+> onderwerp-as telde alleen de COLLECTIENAAM — en dat is precies de vorm die een
+> goede brug *niet* heeft: een route onder `routes/supplier/` hoort het object via
+> `kern/onderneming` op te vragen en de collectie juist met rust te laten. De
+> meter zou dus `0` zijn blijven melden terwijl de brug er lag. Hij telt nu ook de
+> **toegangen**, afgeleid uit `kern/onderneming/index.js` zodat de lijst niet
+> achterloopt. Twee dingen daarbij niet wegpoetsen. De verbreding tilde het totaal
+> van 5 naar <!--getal:lus.kennersTotaal-->16<!--/getal--> kenners terwijl
+> `zaakZietOnderneming` **op 0 bleef** — gemeten vóór er een letter aan de brug
+> was geschreven, want een meter die zijn eigen ratel betaalt is geen meter. En de
+> besturingsproef staat **apart per helft** (toets 6 op de collectie, toets 7 op de
+> toegangen): haal de verbreding eruit en alleen 7 zakt. Eén gedeelde proef zou
+> groen blijven terwijl precies de helft stilvalt waar het kopgetal vandaan moet
+> komen.
 
 ---
 

@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-14T22:33:28.217Z",
-    "commit": "55f05e2f",
+    "op": "2026-09-14T23:30:01.058Z",
+    "commit": "08dcb0b4",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/ondernemerslus.js",
@@ -12,8 +12,33 @@
   "grens": "Drie assen, drie graden, en ze worden nooit opgeteld. De deur is GEMETEN maar alleen voor de routes die de idempotentieproef heeft bereikt -- `rolOnbepaald` telt de routes waar geen enkele rol langskwam, en dat is onbepaald en niet \"geen deur\". Het onderwerp is VERMOED: een naam is geen verwijzing, dus dit is een ONDERgrens (wie de collectie niet noemt, kent haar zeker niet). De proef is overgenomen uit ONDERNEMERBEWIJS.json en hier niet nagebouwd. En deze meter zegt NIET of de lus klopt: dat is de vraag van een ketenproef, en `ketensZonderProef` telt hoeveel daarvan ontbreken.",
   "onderwerp": {
     "collectie": "ondernemingen",
+    "toegangen": [
+      "ondernemingAanvraag",
+      "ondernemingAanvraagStand",
+      "ondernemingBeeld",
+      "ondernemingCaps",
+      "ondernemingDagbeeld",
+      "ondernemingEersteKlant",
+      "ondernemingFeiten",
+      "ondernemingIngeschreven",
+      "ondernemingIntakeBeeld",
+      "ondernemingIntakeZet",
+      "ondernemingKans",
+      "ondernemingKoppel",
+      "ondernemingMallProfiel",
+      "ondernemingNaam",
+      "ondernemingNieuw",
+      "ondernemingPlan",
+      "ondernemingPlanVastleggen",
+      "ondernemingSimuleer",
+      "ondernemingStress",
+      "ondernemingVanEigenaar",
+      "ondernemingVanZaak",
+      "ondernemingVerkenning",
+      "ondernemingVind"
+    ],
     "bron": "server/kern/onderneming/index.js",
-    "let": "de collectienaam wordt uit de bezittende module GELEZEN en niet overgetypt; lukt dat niet, dan gooit de meter in plaats van nul te meten"
+    "let": "zowel de collectienaam als de lijst toegangen wordt uit de bezittende module GELEZEN en niet overgetypt; lukt dat niet, dan gooit de meter in plaats van nul te meten. Een bestand telt mee zodra het de collectie OF een toegang noemt -- het tweede is de architectuurvorm die de eerste versie van deze meter niet zag"
   },
   "stations": [
     {
@@ -245,11 +270,14 @@
     }
   ],
   "kenners": {
-    "totaal": 5,
+    "totaal": 16,
     "perKant": {
       "lid": {
-        "aantal": 1,
+        "aantal": 4,
         "bestanden": [
+          "server/routes/concern.js",
+          "server/routes/concern/mensen.js",
+          "server/routes/member/onderneming-verkenning.js",
           "server/routes/member/onderneming.js"
         ]
       },
@@ -262,12 +290,20 @@
         "bestanden": []
       },
       "kern": {
-        "aantal": 4,
+        "aantal": 12,
         "bestanden": [
+          "server/kern/concern/discovery.js",
+          "server/kern/concern/entiteit.js",
+          "server/kern/concern/index.js",
+          "server/kern/concern/uitnodiging.js",
+          "server/kern/concern/vestiging.js",
+          "server/kern/concern/voorstel.js",
           "server/kern/economie/werelden.js",
           "server/kern/festival/partner.js",
+          "server/kern/onboarding/meebouwen.js",
           "server/kern/overheid/kantoor.js",
-          "server/kern/wereld/ai.js"
+          "server/kern/wereld/ai.js",
+          "server/opzet/kernlaag4b.js"
         ]
       }
     }
@@ -310,7 +346,7 @@
       "supplier"
     ],
     "deurwissels": 8,
-    "kennersTotaal": 5,
+    "kennersTotaal": 16,
     "zaakZietOnderneming": 0,
     "ketensVanDeLus": 7,
     "ketensZonderProef": 4

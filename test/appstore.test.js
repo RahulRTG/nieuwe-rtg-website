@@ -270,6 +270,21 @@ test('8. GRENS 1: de cel draait op een naamloze herkomst, zonder netwerk', async
   assert.ok(brug.tekst.includes('window.parent.postMessage'), 'de enige weg naar buiten');
   assert.ok(brug.tekst.includes("e.source!==window.parent"), 'en hij luistert alleen naar dat venster');
 
+  /* EN HIJ DRAAGT DE HERHAALKAART. Dit hoort tegen een ECHTE server te staan en
+     niet tegen de module: `maakBrugklant()` wordt op montagemoment aangeroepen
+     met `appstoreBrug.herhaalKaart`, en of die naam dan op de kern staat, is
+     precies wat een toets zonder server niet ziet (LAT-regel 17). Ontbreekt
+     hij, dan valt de brugklant om bij het bedraden -- of erger: de cel serveert
+     een script dat elke time-out als herhaalbaar afdoet.
+
+     Twee methodes met een tegengesteld antwoord, want een kaart waarin alles
+     hetzelfde staat bewijst niet dat er iets uit de mutatieklasse komt. */
+  assert.match(brug.tekst, /var HERHAAL=\{/, 'de kaart hoort mee de cel in te gaan');
+  assert.match(brug.tekst, /"opslag\.zet":true/, 'idempotent: na een time-out mag opnieuw');
+  assert.match(brug.tekst, /"bericht\.zet":false/, 'nietHerhaalbaar: opnieuw zou een tweede bericht klaarzetten');
+  assert.ok(brug.tekst.includes('herhaalbaar:HERHAAL[String(methode)]===true'),
+    'en de time-out leest hem, in plaats van hard ja te zeggen');
+
   // een andere hash van dezelfde app bestaat niet
   assert.equal((await haal('/appcel/derden-teller/' + 'a'.repeat(32) + '/index.html')).status, 404);
   // een pad buiten de bundel ook niet

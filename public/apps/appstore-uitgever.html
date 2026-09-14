@@ -377,7 +377,7 @@ function tekenNaslag(n){
       kB(n.budget.script)+' script · '+kB(n.budget.stijl)+' stijl</p>'+
     '<h3>Als de brug weigert</h3>'+
     '<table><tr><th>code</th><th>herhaalbaar</th><th>wat het betekent</th></tr>'+
-    n.fouten.map(f => '<tr><td><code>'+esc(f.code)+'</code></td><td>'+(f.herhaalbaar ? 'ja' : 'nee')+'</td><td>'+esc(f.uitleg)+'</td></tr>').join('')+
+    n.fouten.map(f => '<tr><td><code>'+esc(f.code)+'</code></td><td>'+esc(f.herhaalbaarTekst)+'</td><td>'+esc(f.uitleg)+'</td></tr>').join('')+
     '</table></div>';
 }
 

@@ -27,6 +27,17 @@
    leest dat veld. Een tweede naam ernaast zou betekenen dat elk scherm moet gaan
    kiezen (LAT-regel 4). De code komt ERBIJ; hij vervangt niets.
 
+   `herhaalbaar` IN DE TABEL IS IETS ANDERS DAN `herhaalbaar` OP EEN FOUT, en dat
+   verschil draagt de hele reparatie van 14 september 2026. Op een UITGEZONDEN
+   fout is het altijd een boolean: de app krijgt een antwoord. In de TABEL mag
+   het `null` zijn, en dat betekent niet "onbekend" maar iets preciezers -- deze
+   CODE kan het niet alleen beantwoorden, want of de handeling werd uitgevoerd
+   hangt af van de methode en niet van de fout. Zie `herhaalbaarVan` verderop.
+
+   `uitvoeringBekend` is daarom een BOOLEAN en geen nieuwe woordenlijst: er is
+   maar een vraag ("staat vast of deze aanroep nog is uitgevoerd?"), en dit huis
+   heeft al meer gezagsladders dan het nodig heeft (AFSPRAAK.md, MACHINE.md).
+
    WAT HIER NIET IN STAAT, en met opzet: een code die nergens wordt uitgezonden.
    Een foutcode in een tabel die geen enkele regel code kan produceren, is een
    belofte in tekst zonder belofte in code (LAT-regel 6). `RTG_DOEL_KOMT_NIET_OVEREEN`
@@ -67,13 +78,15 @@ const CODES = {
     uitgezondenDoor: 'server/kern/appstore/brug.js'
   },
   RTG_GEEN_ANTWOORD: {
-    status: 504, herhaalbaar: true,
+    status: 504, herhaalbaar: null,
     uitleg: 'De brug antwoordde niet binnen vijftien seconden. Deze wordt in de CEL gemaakt en niet op de server: als de celpagina zwijgt, is er niemand die een status kan sturen.',
+    uitvoeringBekend: false,
     uitgezondenDoor: 'server/kern/appstore/brugklant.js'
   },
   RTG_BRUG_FOUT: {
-    status: 500, herhaalbaar: true,
+    status: 500, herhaalbaar: null,
     uitleg: 'De brug kon deze aanroep niet uitvoeren. Dit ligt niet aan de app.',
+    uitvoeringBekend: false,
     uitgezondenDoor: 'server/kern/appstore/brug.js'
   }
 };
@@ -92,20 +105,67 @@ const isCode = (c) => Object.prototype.hasOwnProperty.call(CODES, String(c == nu
 /* Een fout maken. `extra` draagt de velden die bij deze code horen -- machtiging,
    verleend, gevraagd, hoe. Ze worden niet gecontroleerd: welke velden zinnig zijn
    weet de laag die de fout uitzendt, en een controle hier zou betekenen dat deze
-   module weet wat een machtiging is. */
+   module weet wat een machtiging is.
+
+   EEN UITZONDERING, en die is er met opzet: `herhaalbaar` komt NOOIT uit `extra`
+   langs de tabel heen. Stond het veld in de eerste helft van de Object.assign,
+   dan kon een uitzender er een eigen antwoord overheen zetten -- een 403 die
+   zichzelf herhaalbaar noemt, en niemand die het merkt. Het staat daarom in de
+   LAATSTE helft, waar het altijd wint. */
 function maak(code, error, extra) {
   if (!isCode(code)) {
     throw new Error('Onbekende platformfoutcode "' + code + '". De codes zijn: ' + Object.keys(CODES).join(', ') + '.');
   }
   const d = CODES[code];
-  return Object.assign({ status: d.status, code, error: String(error || d.uitleg), herhaalbaar: d.herhaalbaar }, extra || {});
+  const e = extra || {};
+  return Object.assign({ status: d.status, code, error: String(error || d.uitleg) }, e,
+    { herhaalbaar: herhaalbaarVan(code, e) });
+}
+
+/* WIE HET ANTWOORD GEEFT OP "MAG EEN TAAKLOPER DIT OPNIEUW?".
+
+   Voor vijf codes is dat de tabel zelf: bij een onbekende methode, een
+   ontbrekende machtiging en een ongeldig argument is er NIETS uitgevoerd en
+   verandert een tweede poging daar niets aan; bij de rem is er ook niets
+   uitgevoerd, maar gaat hij vanzelf over.
+
+   Voor twee codes kan de tabel het NIET weten, en dat is het gebrek dat deze
+   laag repareert. `RTG_BRUG_FOUT` betekent dat `doe()` halverwege omviel en
+   `RTG_GEEN_ANTWOORD` dat de cel binnen vijftien seconden niets hoorde -- in
+   beide gevallen is onbekend of de handeling LANDDE. Of herhalen dan mag, hangt
+   niet van de fout af maar van de HANDELING: `opslag.zet` twee keer laat
+   dezelfde stand achter, `bericht.zet` twee keer zet twee berichten klaar.
+
+   Die twee stonden allebei hard op `true`. Een taakloper die na een time-out
+   netjes opnieuw probeerde, zette dus een tweede bericht klaar en een tweede
+   arena-inzending -- terwijl de klasse in `brugmethodes.js` dat voorspelde.
+
+   De uitzender levert het antwoord daarom zelf, uit die klasse. Doet hij dat
+   niet, dan is dat een bouwfout in RTG en geen toestand van een derde, dus
+   gooit deze functie in plaats van stil op `false` of `true` terug te vallen:
+   een stille terugval zou precies de fout herhalen die hier wordt weggehaald. */
+function herhaalbaarVan(code, extra) {
+  const d = CODES[code];
+  if (d.herhaalbaar !== null) return d.herhaalbaar;
+  if (typeof extra.herhaalbaar !== 'boolean') {
+    throw new Error('De code "' + code + '" weet zelf niet of herhalen mag (uitvoeringBekend: false)'
+      + ': of de handeling landde, staat niet vast. De uitzender hoort `herhaalbaar` mee te geven,'
+      + ' afgeleid uit de mutatieklasse van de methode (kern/mutatie.js, magHerhalen).');
+  }
+  return extra.herhaalbaar;
 }
 
 /* Wat een SDK-generator en de documentatie hiervan moeten weten. Eén vorm, zodat
    de tabel in de documentatie niet met de hand wordt bijgehouden. */
 function overzicht() {
   return Object.entries(CODES).map(([code, d]) => ({
-    code, status: d.status, herhaalbaar: d.herhaalbaar, uitleg: d.uitleg, uitgezondenDoor: d.uitgezondenDoor
+    code, status: d.status, herhaalbaar: d.herhaalbaar, uitvoeringBekend: d.uitvoeringBekend !== false,
+    /* De ZIN staat hier en niet bij de lezers. Twee schermen renderden
+       `f.herhaalbaar ? 'ja' : 'nee'`, en met een derde stand zouden ze allebei
+       "nee" tonen waar "hangt af van de methode" hoort te staan -- twee keer
+       dezelfde stille fout, op twee plekken (LAT-regel 4). */
+    herhaalbaarTekst: d.herhaalbaar === null ? 'hangt af van de methode' : (d.herhaalbaar ? 'ja' : 'nee'),
+    uitleg: d.uitleg, uitgezondenDoor: d.uitgezondenDoor
   }));
 }
 

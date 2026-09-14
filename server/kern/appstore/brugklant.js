@@ -39,6 +39,9 @@
        e.hoe          'Alleen het lid kan dit aanzetten, in de App Store ...'
        e.herhaalbaar  false
      }
+
+   En bij een time-out draagt `e.herhaalbaar` het antwoord van de METHODE en
+   niet van de fout: `opslag.zet` mag opnieuw, `bericht.zet` niet.
    ========================================================================== */
 'use strict';
 
@@ -60,9 +63,40 @@ const celCsp = (herkomst) =>
 /* De klant zelf. Klein houden is hier een eigenschap en geen zuinigheid: dit
    script staat in ELK celdocument en telt mee in wat de telefoon van een lid
    moet uitvoeren voordat er iets op het scherm staat. */
-const BRUGKLANT = `(function(){'use strict';
+/* DE KLANT IS EEN FABRIEK EN GEEN CONSTANTE, en dat is geen stijl maar de
+   reparatie van 14 september 2026.
+
+   Een time-out is de ENIGE weigering die in de cel ontstaat: als de celpagina
+   zwijgt, is er niemand die een status kan sturen. Hij stond hard op
+   `herhaalbaar:true`, en dat is precies de verkeerde kant op -- na vijftien
+   seconden stilte staat NIET vast of de aanroep landde, dus een taakloper die
+   het sein "probeer gerust opnieuw" krijgt, zet bij `bericht.zet` een tweede
+   bericht klaar en bij `arena.zet` een tweede inzending.
+
+   Wat er dan wel moet gebeuren hangt af van de METHODE, en die kent de cel wel:
+   hij heeft hem zelf net aangeroepen. De brug levert daarom zijn `herhaalKaart`
+   mee -- afgeleid uit dezelfde mutatieklassen die de server gebruikt, zodat de
+   cel en de server nooit een ander antwoord kunnen geven.
+
+   De kaart is klein (negen korte regels) en openbaar: hij staat al in het
+   naslagwerk en in de SDK. Er gaat dus niets de cel in wat een derde niet al
+   mocht weten. */
+function maakBrugklant(herhaalKaart) {
+  const kaart = herhaalKaart && typeof herhaalKaart === 'object' ? herhaalKaart : null;
+  /* FAIL CLOSED EN HARDOP. Zonder kaart zou elke methode als niet-herhaalbaar
+     uitkomen: stil verkeerd voor de zeven die het wel zijn. Een brugklant
+     zonder kaart is een bedradingsfout en geen toestand van een derde, dus
+     valt hij hier om en niet pas in de cel van iemand anders. */
+  if (!kaart || !Object.keys(kaart).length) {
+    throw new Error('De brugklant heeft de herhaalkaart van de brug nodig (brug.herhaalKaart):'
+      + ' zonder die kaart kan een time-out in de cel niet zeggen of herhalen mag.');
+  }
+  return `(function(){'use strict';
 var nr=0,open={};
 var VELDEN=${JSON.stringify(FOUTVELDEN)};
+/* Mag een taakloper deze methode opnieuw doen als hij NIET weet of hij landde?
+   Komt uit de mutatieklasse op de server; een onbekende naam telt als nee. */
+var HERHAAL=${JSON.stringify(kaart)};
 function maakFout(d){
   var e=new Error(d && d.error ? d.error : 'De brug weigerde deze aanroep.');
   e.naam='RTGFout';
@@ -78,7 +112,7 @@ window.addEventListener('message',terug,false);
 function roep(methode,args){ return new Promise(function(ja,nee){
   var n=++nr; open[n]={ja:ja,nee:nee};
   setTimeout(function(){ if(open[n]){ delete open[n];
-    nee(maakFout({code:'RTG_GEEN_ANTWOORD',error:'De brug antwoordde niet op tijd.',herhaalbaar:true,methode:String(methode)})); } },15000);
+    nee(maakFout({code:'RTG_GEEN_ANTWOORD',error:'De brug antwoordde niet op tijd.',herhaalbaar:HERHAAL[String(methode)]===true,methode:String(methode)})); } },15000);
   window.parent.postMessage({rtgcel:1,nr:n,methode:String(methode),args:args||{}},'*'); }); }
 /* DE CONTEXT VAN DEZE OPENING. Hij komt van de celpagina en alleen als het lid
    hem daar heeft doorgegeven; hij komt EEN keer en er is niets op te vragen.
@@ -97,6 +131,7 @@ window.RTG={ roep:roep, context:context, versie:1,
     naam:'Een app van derden krijgt een codenaam, nooit een echte naam.',
     push:'Er is geen kanaal dat een telefoon laat trillen.' } };
 })();`;
+}
 
 /* Het brugscript in een celdocument zetten. Eerst in de <head>, zodat de app
    RTG.roep() al heeft voordat zijn eigen code draait. Geen <head>? Dan vooraan;
@@ -106,4 +141,4 @@ function metBrug(html, pad) {
   return /<head[^>]*>/i.test(html) ? html.replace(/<head[^>]*>/i, (m) => m + tag) : tag + html;
 }
 
-module.exports = { BRUGKLANT, celCsp, metBrug, FOUTVELDEN };
+module.exports = { maakBrugklant, celCsp, metBrug, FOUTVELDEN };

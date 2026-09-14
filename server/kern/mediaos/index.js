@@ -49,7 +49,7 @@ const MODI = {
      De stand verschijnt alleen bij wie ergens werkt -- zie zaakWereld(). */
   zaak: { naam: 'Zaak', vormen: ['video', 'live'], intern: true }
 };
-const WERELD_MAX = 60;      // de wereld is eindig, en zegt waar hij ophoudt
+const WERELD_MAX = 60; // een eindige wereld
 
 function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, notify, bronnen, zijnVrienden, sseToCustomer }) {
   const opslag = require('./opslag')({ db, save });

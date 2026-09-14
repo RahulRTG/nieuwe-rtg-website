@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-14T09:37:55.947Z",
-    "commit": "84034ddc",
+    "op": "2026-09-14T15:23:42.516Z",
+    "commit": "67fd1712",
     "boomVuil": false,
     "instrument": "scripts/verband.js",
     "node": "v22.22.2"
@@ -50,7 +50,7 @@
     "wettekst": {
       "recall": 52,
       "van": 59,
-      "voorstellen": 391,
+      "voorstellen": 395,
       "bron": "gemeten"
     }
   },

@@ -90,29 +90,174 @@ const PATROON_ALLE = new RegExp(PATROON.source, 'gi');
    geen `[\w-]+`. */
 const ONTKEND = /\b(geen|zonder|nooit)\b(\s+[\w-]+){0,2}\s+$/i;
 
+/* ============================================================================
+   DE BENOEMDE UITZONDERINGEN -- en waarom dit geen toegeeflijkheid is.
+
+   `server/kern/rtfos` en `server/kern/command` stonden buiten de grens met de
+   meting ernaast: 1 en 9 treffers, alle tien op een DING. Ze eruit laten is
+   goedkoper en het is de slechtste van de twee: een map die niemand bewaakt is
+   ONZICHTBAAR, terwijl een map met een benoemde uitzondering bij elke wijziging
+   opnieuw wordt gelezen. Dit huis zegt overal *wat er niet is, staat er met de
+   reden* -- dat geldt ook voor de grens zelf.
+
+   DRIE EIGENSCHAPPEN MAKEN HET VERSCHIL MET EEN ALLOWLIST.
+
+   1. HET ONDERWERP IS VERPLICHT EN MAG NOOIT EEN MENS ZIJN. Een uitzondering
+      verklaart niet "dit woord mag hier" maar "dit getal gaat over X", en X
+      wordt getoetst tegen VERBODEN_ONDERWERP. Daarmee kan dit mechanisme
+      structureel niet worden gebruikt om een score op een mens door te laten --
+      wie het probeert, krijgt een fout in plaats van een vinkje.
+
+   2. EEN UITZONDERING DRAAGT ZIJN EIGEN BEWIJS. `bewijs.bevat` is een letterlijk
+      fragment dat in de bron moet staan en dat LAAT ZIEN waarover het getal
+      gaat (`kans * impact`, `weeg(waarde, term)`). Verandert de constructie van
+      onderwerp, dan verdwijnt dat fragment en vervalt de uitzondering vanzelf.
+      Een uitzondering die zijn eigen voorwaarde niet meer waarmaakt, is er geen.
+
+   3. EEN ONBENUTTE UITZONDERING IS EEN FOUT EN GEEN RESTJE. Dekt hij nul
+      treffers, dan spreekt hij over een verleden dat niet meer bestaat -- en een
+      dode uitzondering is een gat dat eruitziet als beleid. Zelfde les als *een
+      register dat niet is hergedraaid, is een bewering over het verleden*.
+
+   WAT HIJ NIET DOET, en dat hoort er even hard bij: hij dekt een BESTAND en niet
+   een regel. Komt er in `command/zoek.js` een tweede getal bij dat wel over een
+   mens gaat, dan valt dat onder dezelfde uitzondering en ziet deze scan het
+   niet. De lexicale helft blijft een ONDERgrens; `mensVrij()` is de gedragshelft
+   en die kijkt naar het antwoord in plaats van naar de tekst.
+   ========================================================================== */
+const VERBODEN_ONDERWERP = ['mens', 'mensen', 'persoon', 'personen', 'lid', 'leden', 'medewerker',
+  'klant', 'gebruiker', 'kandidaat', 'leerling', 'sporter', 'talent'];
+
+const UITZONDERINGEN = [
+  {
+    id: 'rtfos-risicoweging',
+    onderwerp: 'een geregistreerd risico van de stichting',
+    woorden: ['score'],
+    bestanden: ['server/kern/rtfos/risico.js'],
+    bewijs: { bestand: 'server/kern/rtfos/risico.js', bevat: '(Number(r.kans) || 0) * (Number(r.impact) || 0)' },
+    reden: 'kans maal impact op een GEREGISTREERD RISICO. Het getal hangt uitsluitend aan de twee velden ' +
+      'van dat risico en aan niets van een mens; de sortering ordent risicos en geen personen.'
+  },
+  {
+    id: 'command-handelingsrisico',
+    onderwerp: 'een handeling van de machine',
+    woorden: ['score'],
+    bestanden: ['server/kern/command/beleid.js', 'server/kern/command/index.js',
+      'server/kern/command/operator.js', 'server/kern/command/puls.js',
+      'server/kern/command/runbooks-historie.js', 'server/kern/command/runbooks.js',
+      'server/kern/command/simulatie.js', 'server/kern/command/werkbesparing.js'],
+    bewijs: { bestand: 'server/kern/frictie/motor.js', bevat: 'return { actie: naam, score, niveau, waarom, vierOgen, opbouw,' },
+    reden: 'elk van deze acht draagt dezelfde score, en dat is beoordeel(actie, ctx).score uit ' +
+      'kern/frictie/motor.js: de weging van een HANDELING (een runbook, een massamutatie) die bepaalt of ' +
+      'de machine hem zelf mag doen. KANTOORMACHT.md eist bij een score de opbouw, en die reist mee als ' +
+      'opbouw. Het onderwerp is de handeling; wie hem uitvoert of ondergaat komt er niet in voor.'
+  },
+  {
+    id: 'command-zoekrelevantie',
+    onderwerp: 'de overeenkomst tussen een zoekterm en een veldwaarde',
+    woorden: ['score'],
+    bestanden: ['server/kern/command/zoek.js'],
+    bewijs: { bestand: 'server/kern/command/zoek.js', bevat: 'function weeg(waarde, term)' },
+    reden: 'de scherpste van de drie, want de gesorteerde rijen KUNNEN mensen zijn. Toch is dit geen cijfer ' +
+      'op een mens: weeg(waarde, term) neemt alleen de ingetypte term en de veldwaarde, dus twee rijen met ' +
+      'dezelfde tekst krijgen hetzelfde getal ongeacht wie erachter zit. De sortering ordent de MATCH en ' +
+      'niet de persoon. Gaat weeg() ooit een eigenschap van het onderwerp lezen, dan verdwijnt het ' +
+      'bewijsfragment en vervalt deze uitzondering vanzelf.'
+  }
+];
+
+/* Keurt de VERKLARING, los van welke code er ligt: dit is de poort van
+   eigenschap 1 en 2. Geeft een lijst bezwaren; leeg is goed. */
+function keurUitzonderingen(lijst, wortel) {
+  const bezwaren = [];
+  const gezien = new Set();
+  for (const u of lijst || []) {
+    const id = String((u && u.id) || '').trim();
+    if (!id) { bezwaren.push('een uitzondering zonder id is niet te bespreken'); continue; }
+    if (gezien.has(id)) bezwaren.push(id + ': twee uitzonderingen met dezelfde naam');
+    gezien.add(id);
+
+    const onderwerp = String(u.onderwerp || '').trim().toLowerCase();
+    if (!onderwerp) bezwaren.push(id + ': geen onderwerp -- een uitzondering zegt WAAROVER het getal gaat');
+    for (const woord of VERBODEN_ONDERWERP) {
+      if (new RegExp('\\b' + woord + '\\b').test(onderwerp)) {
+        bezwaren.push(id + ': het onderwerp noemt "' + woord + '". CAR-05 kent geen uitzondering voor een ' +
+          'cijfer op een mens -- dat IS de regel en niet een geval ervan.');
+      }
+    }
+    if (String(u.reden || '').trim().length < 40) {
+      bezwaren.push(id + ': de reden is te kort om een besluit te dragen');
+    }
+    if (!Array.isArray(u.bestanden) || !u.bestanden.length) bezwaren.push(id + ': dekt geen enkel bestand');
+
+    const bewijs = u.bewijs || {};
+    if (!bewijs.bestand || !bewijs.bevat) { bezwaren.push(id + ': geen bewijsfragment'); continue; }
+    let bron = null;
+    try { bron = fs.readFileSync(path.join(wortel, bewijs.bestand), 'utf8'); } catch (e) { /* hieronder gemeld */ }
+    if (bron == null) bezwaren.push(id + ': het bewijsbestand ' + bewijs.bestand + ' bestaat niet (meer)');
+    else if (!bron.includes(bewijs.bevat)) {
+      bezwaren.push(id + ': het bewijsfragment staat niet meer in ' + bewijs.bestand + '. De constructie ' +
+        'waarover deze uitzondering gaat is veranderd, dus de uitzondering geldt niet meer.');
+    }
+  }
+  return bezwaren;
+}
+
 /* De lexicale helft. Geeft een lijst treffers als 'bestand: woord'; leeg is
    goed. Een map die niet bestaat geeft leeg terug EN meldt dat -- een grens die
-   over een verdwenen map zwijgt, staat groen zonder iets te bewaken. */
-function grensScan(mappen) {
+   over een verdwenen map zwijgt, staat groen zonder iets te bewaken.
+
+   MET `opties.uitzonderingen` gaan de benoemde uitzonderingen mee. Zonder is
+   het gedrag exact als hiervoor: geen enkele aanroeper krijgt er stilzwijgend
+   soepelheid bij.
+
+   DE UITZONDERING WORDT TOEGEPAST OP DE TREFFER EN NIET OP HET BESTAND, en dat
+   verschil is het hele punt. De oude lus stopte na de eerste treffer per
+   bestand; zou een uitgezonderde treffer die `break` opsouperen, dan verbergt
+   een toegestane score op regel 11 een verboden score op regel 40. Daarom loopt
+   hij nu door tot hij een treffer vindt die NIET is uitgezonderd. */
+function grensScan(mappen, opties) {
   const lijst = Array.isArray(mappen) ? mappen : [mappen];
+  const wortel = (opties && opties.wortel) || path.join(__dirname, '..', '..');
+  const uitz = (opties && opties.uitzonderingen) || [];
   const gevonden = [];
   const ontbreekt = [];
+  const uitgezonderd = [];
+  const benut = new Set();
+
+  const bezwaren = uitz.length ? keurUitzonderingen(uitz, wortel) : [];
+  /* Een verklaring die niet door haar eigen keuring komt, dekt NIETS. Anders
+     zou een uitzondering met een verboden onderwerp wel een bezwaar opleveren
+     en ondertussen gewoon treffers wegpoetsen -- een grens die klaagt terwijl
+     hij toegeeft, is geen grens. */
+  const geldig = bezwaren.length ? [] : uitz;
+
   for (const map of lijst) {
     if (!fs.existsSync(map)) { ontbreekt.push(map); continue; }
     for (const naam of fs.readdirSync(map).filter(n => n.endsWith('.js'))) {
-      const code = zonderCommentaar(fs.readFileSync(path.join(map, naam), 'utf8'));
-      /* ALLE treffers en niet de eerste. `code.match(PATROON)` zonder /g gaf er
-         een, dus een bestand dat vroeg "geen score" schrijft en laat een ECHTE
-         score bouwt, meldde de onschuldige -- en wie de melding naleest, ziet
-         een valse treffer en kijkt niet verder. */
+      const pad = path.join(map, naam);
+      const relatief = path.relative(wortel, pad).split(path.sep).join('/');
+      const code = zonderCommentaar(fs.readFileSync(pad, 'utf8'));
       for (const m of code.matchAll(PATROON_ALLE)) {
         if (ONTKEND.test(code.slice(Math.max(0, m.index - 24), m.index))) continue;
+        const woord = m[0].toLowerCase();
+        const dekt = geldig.find(u => (u.bestanden || []).includes(relatief) &&
+          (u.woorden || []).map(w => String(w).toLowerCase()).includes(woord));
+        if (dekt) {
+          benut.add(dekt.id);
+          uitgezonderd.push(relatief + ': ' + m[0] + '  <- ' + dekt.id);
+          continue;
+        }
         gevonden.push(path.basename(map) + '/' + naam + ': ' + m[0]);
         break;                                   // een melding per bestand is genoeg om te gaan kijken
       }
     }
   }
-  return { gevonden, ontbreekt };
+
+  /* Eigenschap 3: wie niets meer dekt, hoort weg. Een dode uitzondering is een
+     gat dat eruitziet als beleid. */
+  const onbenut = geldig.filter(u => !benut.has(u.id)).map(u => u.id);
+  return { gevonden, ontbreekt, uitgezonderd, onbenut, bezwaren };
 }
 
 /* De gedragshelft: staat er in dit antwoord een GETAL op een mens?
@@ -138,4 +283,4 @@ function mensVrij(rijen, uitgezonderd) {
   return fout;
 }
 
-module.exports = { WOORDEN, PATROON, grensScan, mensVrij };
+module.exports = { WOORDEN, PATROON, VERBODEN_ONDERWERP, UITZONDERINGEN, keurUitzonderingen, grensScan, mensVrij };

@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1885 |
 | losse beweringen (`test(...)`) | 13483 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1246 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1247 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
 | alleen in de kop *genoemd*, nog niet gemeten | 165 |
-| niets van beide | 403 |
+| niets van beide | 402 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -957,7 +957,7 @@ toets omvalt.
 | `ondernemerbewijs.test.js` | 12 | geen bronmutatie mogelijk | DE BUSINESS PROOF MAP: kan hij zakken? ONDERNEMERBEWIJS.json is een PROJECTIE over zeven bestaande registers. |
 | `ondernemerpoort-e2e.test.js` | 4 | gezakt op `liegpoort /api/` | Ondernemer-poort, end-to-end: een zaak die offline staat is niet zichtbaar voor leden; pas na de poort (Salon-pagina + rondleiding kassa en werk-apps) kan de manager de zaak online zetten en verschijnt hij weer. npm test |
 | `ondernemerpoort.test.js` | 6 | gezakt op `true->false#0` | Ondernemer-poort (kern/ondernemerpoort.js): een nieuwe zaak loopt eerst de basis door (Salon-pagina + rondleiding kassa en werk-apps) voordat hij online mag. Bestaande zaken zijn grandfathered (online tenzij... |
-| `ondernemerslus.test.js` | 6 | -- | DE ONDERNEMERSLUS -- de ratel onder ONDERNEMERSLUS.json. Het register beantwoordt de dragende vraag van ONDERNEMEN.md: draagt de ondernemerslus EEN onderwerp, of is hij een reis langs losse deuren. |
+| `ondernemerslus.test.js` | 6 | gezakt op `===->!==#0` | DE ONDERNEMERSLUS -- de ratel onder ONDERNEMERSLUS.json. Het register beantwoordt de dragende vraag van ONDERNEMEN.md: draagt de ondernemerslus EEN onderwerp, of is hij een reis langs losse deuren. |
 | `onderneming-belasting.test.js` | 16 | gezakt op `===->!==#0` | Ronde: de belastingreservering. Vier beweringen, en ze gaan alle vier over het verschil tussen een HARD getal en een INDICATIE: 1. |
 | `onderneming-bestuur.test.js` | 28 | gezakt op `===->!==#0` | Ronde: het bestuur -- wie beslist, wie bezit, en wie er als UBO uit volgt. Vijf beweringen: 1. |
 | `onderneming-capaciteit.test.js` | 15 | gezakt op `===->!==#0` | Ronde: de capaciteit -- kan er nog iets bij. Vier beweringen: 1. |

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1875 bestanden en 13408 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1875 bestanden en 13409 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 1875 |
-| losse beweringen (`test(...)`) | 13408 |
+| losse beweringen (`test(...)`) | 13409 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1245 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1658 bestanden, 13025 beweringen.
+1658 bestanden, 13026 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1173,7 +1173,7 @@ toets omvalt.
 | `routerindex.test.js` | 9 | gezakt op `===->!==#0` | DE DISPATCH-INDEX VAN DE ROUTER (server/web/routing.js). De router liep bij elk verzoek de hele lagenlijst af. |
 | `routesbron.test.js` | 5 | genoemd | WAAR STAAT DEZE ROUTE? -- de bronverrijking van scripts/lib/routes.js. |
 | `rtdocs-voorzijde.test.js` | 4 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `rtf-labfonds-deur.test.js` | 9 | gezakt op `liegpoort /api/` | DE GEZINSDEUR VAN HET LABFONDS -- wie komt er door, en wat doet een TWEEDE aanroep. WAAROM DEZE TOETS BESTAAT. |
+| `rtf-labfonds-deur.test.js` | 10 | gezakt op `liegpoort /api/` | DE GEZINSDEUR VAN HET LABFONDS -- wie komt er door, en wat doet een TWEEDE aanroep. WAAROM DEZE TOETS BESTAAT. |
 | `rtf-samen-credential.pg.test.js` | 1 | -- | Echte PostgreSQL-proef voor FoundationOS Samen. Twee onafhankelijke app- instances delen alleen de kamercollectie; uitgifte, capaciteit, gebruik, rotatie en intrekking moeten onder hetzelfde advisory slot serialiseren. |
 | `rtf-samen-credential.test.js` | 7 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtf-samen-routes-failclosed.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |

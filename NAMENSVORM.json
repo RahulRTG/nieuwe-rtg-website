@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-14T19:13:21.721Z",
-    "commit": "00ce9041",
+    "op": "2026-09-14T19:46:54.848Z",
+    "commit": "4e51af5d",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 3,
     "instrument": "scripts/namensvorm.js",
     "node": "v22.22.2"
   },
@@ -613,8 +613,8 @@
   "woordenschat": [
     {
       "woord": "doel",
-      "bestanden": 247,
-      "domeinen": 133,
+      "bestanden": 248,
+      "domeinen": 134,
       "samengesteld": 178,
       "samengesteldDomeinen": 83,
       "stand": "bezet",
@@ -707,8 +707,8 @@
       "woord": "machtiging",
       "bestanden": 19,
       "domeinen": 8,
-      "samengesteld": 36,
-      "samengesteldDomeinen": 11,
+      "samengesteld": 37,
+      "samengesteldDomeinen": 12,
       "stand": "bezet",
       "waar": [
         "kern/appstore",
@@ -774,8 +774,8 @@
     },
     {
       "woord": "capability",
-      "bestanden": 34,
-      "domeinen": 10,
+      "bestanden": 35,
+      "domeinen": 11,
       "samengesteld": 6,
       "samengesteldDomeinen": 6,
       "stand": "bezet",
@@ -883,6 +883,29 @@
       ]
     },
     {
+      "woord": "projectie",
+      "bestanden": 13,
+      "domeinen": 5,
+      "samengesteld": 11,
+      "samengesteldDomeinen": 7,
+      "stand": "bezet",
+      "waar": [
+        "kern/kosten",
+        "kern/magnaat-kantoorregels",
+        "kern/namens",
+        "kern/spelprojectie-toegang",
+        "kern/stuur"
+      ],
+      "vormen": [
+        "maakFondsProjecties",
+        "maakProjectie",
+        "maakProjecties",
+        "projectieKoppel",
+        "projectieOpen",
+        "projectieSluit"
+      ]
+    },
+    {
       "woord": "envelop",
       "bestanden": 13,
       "domeinen": 7,
@@ -924,28 +947,6 @@
         "bevoegdheidNodig",
         "maakBevoegdheid",
         "zoekBevoegdheid"
-      ]
-    },
-    {
-      "woord": "projectie",
-      "bestanden": 12,
-      "domeinen": 4,
-      "samengesteld": 10,
-      "samengesteldDomeinen": 6,
-      "stand": "bezet",
-      "waar": [
-        "kern/kosten",
-        "kern/magnaat-kantoorregels",
-        "kern/spelprojectie-toegang",
-        "kern/stuur"
-      ],
-      "vormen": [
-        "maakFondsProjecties",
-        "maakProjectie",
-        "maakProjecties",
-        "projectieKoppel",
-        "projectieOpen",
-        "projectieSluit"
       ]
     },
     {
@@ -998,8 +999,8 @@
       "woord": "principal",
       "bestanden": 2,
       "domeinen": 2,
-      "samengesteld": 10,
-      "samengesteldDomeinen": 3,
+      "samengesteld": 11,
+      "samengesteldDomeinen": 4,
       "stand": "bezet",
       "waar": [
         "kern/experience",
@@ -1036,15 +1037,16 @@
     },
     {
       "woord": "purpose",
-      "bestanden": 6,
-      "domeinen": 3,
+      "bestanden": 7,
+      "domeinen": 4,
       "samengesteld": 2,
       "samengesteldDomeinen": 2,
       "stand": "bezet",
       "waar": [
         "kern/economie",
         "kern/fonds",
-        "kern/gast"
+        "kern/gast",
+        "kern/namens"
       ],
       "vormen": [
         "economicIntentsVoorPurpose",
@@ -1055,8 +1057,8 @@
       "woord": "authority",
       "bestanden": 2,
       "domeinen": 1,
-      "samengesteld": 4,
-      "samengesteldDomeinen": 3,
+      "samengesteld": 5,
+      "samengesteldDomeinen": 4,
       "stand": "bezet",
       "waar": [
         "kern/experience"
@@ -1150,6 +1152,20 @@
       "vormen": []
     },
     {
+      "woord": "mechanism",
+      "bestanden": 1,
+      "domeinen": 1,
+      "samengesteld": 1,
+      "samengesteldDomeinen": 1,
+      "stand": "bezet",
+      "waar": [
+        "kern/namens"
+      ],
+      "vormen": [
+        "mechanisme"
+      ]
+    },
+    {
       "woord": "outbox",
       "bestanden": 1,
       "domeinen": 1,
@@ -1204,16 +1220,6 @@
       "vormen": [
         "opportunityCost"
       ]
-    },
-    {
-      "woord": "mechanism",
-      "bestanden": 0,
-      "domeinen": 0,
-      "samengesteld": 0,
-      "samengesteldDomeinen": 0,
-      "stand": "vrij",
-      "waar": [],
-      "vormen": []
     },
     {
       "woord": "saga",

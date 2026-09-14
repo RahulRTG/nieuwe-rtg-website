@@ -55,17 +55,34 @@ const metTok = async (base, pad, lijf, token) => {
   return { status: r.status, d: await r.json().catch(() => ({})) };
 };
 
-/* Een EIGEN gezin en een EIGEN stad per toets. De stadsnaam wordt de id van de
-   locatie, dus twee toetsen delen nooit een pot. */
+/* EEN EIGEN STAD PER TOETS, EN EEN GEDEELD GEZIN -- en die tweede helft is een
+   geleerde les. De eerste opzet maakte per toets een nieuw gezin, en bij de
+   tiende sloeg /api/foundation/gezin/maak om naar 429: "hooguit 8 nieuwe
+   gezinnen per adres per half uur" (server/foundation/gezin.js). Dat is geen
+   toeval dat je een keer treft maar een plafond dat elke volgende toets in dit
+   bestand zou raken -- en het zou zich melden als een raadselachtige flake bij
+   wie er de elfde toets bij zet.
+
+   Delen mag hier, omdat de isolatie NIET van het gezin komt maar van de STAD:
+   elke toets krijgt een eigen locatie-id, dus een eigen pot en een eigen
+   `mijnBijdrage`. Wie een toets toevoegt die WEL twee gezinnen nodig heeft,
+   gebruikt `eigenGezin()` hieronder -- en let dan op datzelfde plafond. */
 let teller = 0;
+let GEDEELD = null;
+
+async function eigenGezin(base, nr) {
+  const g = await roep(base, '/api/foundation/gezin/maak', { gezinsnaam: 'Proefgezin' + nr,
+    naam: 'Papa', pin: '1234', bevoegdGezin: true, privacyAkkoord: true });
+  assert.ok(g.d && g.d.token,
+    'geen gezin kunnen maken (' + g.status + ' ' + JSON.stringify(g.d).slice(0, 140) + ')');
+  return { code: g.d.code, token: g.d.token };
+}
+
 async function wereld() {
   const base = SRV.base;
   const nr = ++teller;
-  const g = await roep(base, '/api/foundation/gezin/maak', { gezinsnaam: 'Proefgezin' + nr,
-    naam: 'Papa', pin: '123' + nr, bevoegdGezin: true, privacyAkkoord: true });
-  assert.ok(g.d && g.d.token, 'geen gezin kunnen maken; dan meet deze toets niets');
-  return { base, stad: 'Proefstad' + nr, locId: 'proefstad' + nr,
-    gez: { code: g.d.code, token: g.d.token } };
+  if (!GEDEELD) GEDEELD = await eigenGezin(base, 'gedeeld');
+  return { base, stad: 'Proefstad' + nr, locId: 'proefstad' + nr, nr, gez: GEDEELD };
 }
 
 test('1. de deur laat een gezinsprofiel binnen en een vreemde niet', async () => {
@@ -293,6 +310,57 @@ test('9. een gastprofiel komt de deur niet door, ook niet om te kijken', async (
     const na = await roep(w.base, '/api/rtf/labfonds/overzicht', w.gez);
     const loc = (na.d.locaties || []).find((l) => l.id === w.locId) || {};
     assert.equal(loc.pot || 0, 0, 'een geweigerde gast hoort de pot niet te raken');
+  }
+});
+
+test('10. twee GEZINNEN delen de pot, maar niet hun eigen bijdrage', async () => {
+  const a = await wereld();
+  /* DEZE toets heeft er wel twee nodig: de vraag IS of twee gezinnen elkaars
+     bijdrage zien. Hij maakt daarom een tweede gezin naast het gedeelde -- twee
+     aanmaakacties in het hele bestand, ruim onder het plafond van acht. */
+  const b = { base: a.base, stad: a.stad, locId: a.locId,
+    gez: await eigenGezin(a.base, 'tweede') };
+  {
+    /* DE VRAAG DIE DE GLUURRONDE STELT, en die deze deur moet kunnen
+       beantwoorden. `scripts/gluurronde.js` geeft A en B allebei een EIGEN
+       gezin en laat A daarna met zijn eigen gezin lezen wat B heeft
+       aangemaakt. Op deze route ziet A dan inderdaad iets van B -- en dat is
+       geen lek maar het fonds: een locatie is openbaar, leden doneren eraan en
+       stemmen erover (dezelfde reden waarom /api/labfonds/locatie/maak al in
+       GEDEELD_BEDOELD staat). Wat NIET gedeeld mag worden, staat hieronder, en
+       zonder deze toets is die vrijstelling een belofte in plaats van een
+       grens. */
+    await roep(a.base, '/api/rtf/labfonds/locatie/maak', { ...a.gez, naam: a.stad, land: 'NL' });
+    await roep(a.base, '/api/rtf/labfonds/doneer', { ...a.gez, locId: a.locId, bedrag: 100 });
+    await roep(b.base, '/api/rtf/labfonds/doneer', { ...b.gez, locId: a.locId, bedrag: 7 });
+
+    const zA = await roep(a.base, '/api/rtf/labfonds/overzicht', a.gez);
+    const zB = await roep(b.base, '/api/rtf/labfonds/overzicht', b.gez);
+    const loc = (r) => ((r.d.locaties || []).find((l) => l.id === a.locId) || {});
+
+    assert.equal(loc(zA).pot, 107, 'de POT is van het fonds en hoort gedeeld te zijn');
+    assert.equal(loc(zB).pot, 107, 'beide gezinnen horen dezelfde pot te zien');
+    assert.equal(loc(zA).mijnBijdrage, 100, 'gezin A hoort alleen zijn eigen 100 te zien');
+    assert.equal(loc(zB).mijnBijdrage, 7, 'gezin B hoort alleen zijn eigen 7 te zien');
+
+    /* EN ER GAAT GEEN GELOOFSBRIEF MEE. Een gedeeld grootboek mag de pot tonen
+       en nooit de sleutel waarmee een ander binnenkomt. */
+    const tekst = JSON.stringify(zA.d);
+    assert.ok(!tekst.includes(b.gez.code), 'de gezinscode van B hoort niet in het antwoord van A te staan');
+    assert.ok(!tekst.includes(b.gez.token), 'het token van B hoort al helemaal niet in het antwoord van A te staan');
+
+    /* MEESTEMMEN MAG, AFHAMEREN NIET. Dat onderscheid is de grens die telt:
+       zonder hem zou "openbaar fonds" betekenen dat een vreemde de stemming van
+       een ander kan sluiten. */
+    const v = await roep(b.base, '/api/rtf/labfonds/voorstel/maak',
+      { ...b.gez, locId: a.locId, titel: 'Voorstel van B', doel: 'iets nuttigs in de wijk', bedrag: 50 });
+    assert.equal(v.status, 200);
+    const id = v.d.voorstel.id;
+    assert.equal((await roep(a.base, '/api/rtf/labfonds/stem', { ...a.gez, id, keuze: 'tegen' })).status, 200,
+      'meestemmen over een voorstel van een ander hoort te mogen -- dat IS een fonds');
+    const dicht = await roep(a.base, '/api/rtf/labfonds/beslis', { ...a.gez, id });
+    assert.equal(dicht.status, 403, 'de stemming sluiten hoort alleen de indiener te mogen');
+    assert.match(String(dicht.d.error || ''), /indiende/i, 'en de weigering hoort te zeggen waarom');
   }
 });
 

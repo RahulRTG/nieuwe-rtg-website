@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1876 bestanden en 13404 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1874 bestanden en 13390 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1876 |
-| losse beweringen (`test(...)`) | 13404 |
+| toetsbestanden | 1874 |
+| losse beweringen (`test(...)`) | 13390 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1246 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1244 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
 | alleen in de kop *genoemd*, nog niet gemeten | 158 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1659 bestanden, 13021 beweringen.
+1657 bestanden, 13007 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -254,7 +254,7 @@ toets omvalt.
 | `charter.test.js` | 8 | gezakt op `liegpoort /api/` | Charter (boten en jachten), eerlijk verhuren: vaste dagprijs vooraf betaald, met of zonder schipper, bareboat alleen met vaarbewijs, dubbele boekingen onmogelijk, staat met foto's VOOR het uitvaren en NA de... |
 | `ci-keten.test.js` | 6 | gezakt op `+->-#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `ci-lokaal.test.js` | 13 | gezakt op `<=-><#0` | DE LOKALE KETEN -- draait hier wat de CI straks draait? Deze toetsen bewaken twee dingen die uit elkaar kunnen lopen zonder dat iemand het merkt: de AFLEIDING (leest scripts/lib/werkstroom.js de werkstromen goed... |
-| `cijferopmens.test.js` | 5 | gezakt op `===->!==#0` | CAR-05 OVER DE HELE CARRIEREKANT -- er komt geen cijfer op een mens. DEZE TOETS BESTAAT OMDAT DE GRENS VIER DOCUMENTEN HAD EN EEN HANDHAVER, en die ene dekte precies EEN map. |
+| `cijferopmens.test.js` | 4 | gezakt op `===->!==#0` | CAR-05 OVER DE HELE CARRIEREKANT -- er komt geen cijfer op een mens. DEZE TOETS BESTAAT OMDAT DE GRENS VIER DOCUMENTEN HAD EN EEN HANDHAVER, en die ene dekte precies EEN map. |
 | `claims-btw.test.js` | 11 | gezakt op `===->!==#0` | BTW EN CLAIMS: het tarief op EEN plek, en geen bewering zonder dekking. TWEE GATEN uit de doorlichting van 20 augustus 2026: 4.10 `* 1.21` stond hard in kern/fonds.js en kern/lid/facturen.js, terwijl het platform... |
 | `clipdeler.test.js` | 4 | geen module gevonden | DE CLIPDELER STAAT ÉÉN KEER. Korte video's staan alleen op het toestel van de maker en reizen rechtstreeks (WebRTC-datakanaal). |
 | `clips.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Clips: korte verticale video's die alleen op het toestel van de maker staan (OPFS). De server bewaart enkel de kaart (titel, duur, affiche) en relayeert signalen; de feed is een eindige dagselectie zonder... |
@@ -479,7 +479,6 @@ toets omvalt.
 | `geldeenheid.test.js` | 10 | -- | DE EENHEID VAN GELD -- en de naam die drie dingen betekende. DEZE TOETS KOMT UIT EEN METING. |
 | `geldgraaf.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Geldgraaf, fase 1 van GELD.md: de cockpit staat voor een vers lid, de patroonherkenning vindt terugkerende posten en meldt een prijsstijging als 'post-duurder', een minimumbuffer-regel geeft een uitzondering met... |
 | `geldgrens.test.js` | 8 | gezakt op `liegpoort /api/` | DE EIGEN GELDGRENS -- een regel die het lid over zichzelf stelt en die echt weigert. WAAROM DEZE TOETS ER IS kern/geldbeleid/regels.js kent vier regelsoorten en ze WAARSCHUWEN allemaal. |
-| `gelding.test.js` | 5 | gezakt op `getal+1#0` | DE DRIE GELDINGSASSEN -- en de ene eigenschap die ze waardevol maakt. CLAIM, DRAAG en WACHT beantwoorden drie verschillende vragen: waar GELDT een wet, waar LEEFT hij, en waar kan iemand hem ZIEN. |
 | `geldkaart.test.js` | 7 | gezakt op `===->!==#0` | DE ZELFIJKING VAN DE GELDKAART. Deze meter beweert iets dat een mens niet kan nakijken: dat elke waardemutatie op de vier kernbakken door haar eigen poort ging. |
 | `geldketen.test.js` | 14 | gezakt op `===->!==#0` | DE GOUDEN WEG (server/kern/kantoor/geldketen.js). Deze toets beproeft de BAAN en niet de motoren: die hebben hun eigen toetsen. |
 | `geldregie.test.js` | 5 | gezakt op `liegpoort /api/` | De geld-regie van de boardroom: RTG bepaalt de pasprijzen (publiek zichtbaar, de voorwaarden volgen live), de interne partnervergoeding per genre of per zaak, en het RTG-ledenvoordeel per genre (RTG legt bij; de zaak... |
@@ -1123,7 +1122,6 @@ toets omvalt.
 | `redisbus-failclosed.test.js` | 2 | -- | Redis is bij een geconfigureerd cluster geen versneller maar een deel van de bevoegdheidsketen. Een ongeldige verbinding en een vollopende wachtrij mogen daarom nooit als gezonde in-procesbus eindigen. |
 | `regexmutatie.test.js` | 13 | gezakt op `===->!==#0` | DE REGEX-OPERATOR VAN DE MUTATIEMOTOR. scripts/lib/regexmutatie.js laat het laatste alternatief van een regex vallen, zodat de mutatiemotor ook beweringen kan beproeven die aan een regex hangen. |
 | `regie.test.js` | 7 | gezakt op `liegpoort /api/` | De app-regie van de boardroom: RTG bepaalt welke apps voor wie beschikbaar zijn. Elke eigen app staat als functie op het schakelbord (per pas of doelgroep te sluiten), de grote hendel zet alles bij iedereen aan of... |
-| `registereigenaar.test.js` | 4 | gezakt op `&&->||#0` | WIE BEZIT DIT REGISTER? -- de wachter die op 13 september 2026 ontbrak. |
 | `registerklopt.test.js` | 3 | gezakt op `getal+1#1` | DE POORT DIE NIETS MAG VINDEN -- scripts/registerklopt.js Deze poort leidt zijn lijst AF uit de toetsbestanden (op de zin die hun foutmelding draagt) in plaats van hem te typen. Dat is de juiste keuze -- twee lijsten... |
 | `reisaanbod.test.js` | 3 | -- | HET REISAANBOD: van een leeg reisbureau naar een reis in het dossier. DE KETEN DIE HIER GEMETEN WORDT was tot nu toe doorgeknipt. |
 | `reisactiviteiten.test.js` | 6 | genoemd | ACTIVITEITEN IN DE REIS, EN DE SLUITDAG -- REIZEN.md fase 4, eerste helft. Twee gaten die hier dicht moeten, en waarom ze gaten waren: 1. |
@@ -1220,7 +1218,7 @@ toets omvalt.
 | `rtg-heritage-operational.test.js` | 6 | gezakt op `===->!==#0` | Operationele Heritage-borging: een laat stijlblad mag echte formulieren, tabellen, modalen en canvassen verfijnen, maar hun werking niet veranderen. |
 | `rtg-heritage-order.test.js` | 3 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-heritage-transition.test.js` | 1 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
-| `rtg-heritage.test.js` | 16 | geen bronmutatie mogelijk | DE HERITAGE-DOCTRINE IS CODE, GEEN MOODBOARD. Deze toets borgt de vaste wereldpaletten, twee geometrieën, vier dieptelagen en de componentrollen waarmee routes gefaseerd worden opgebouwd. |
+| `rtg-heritage.test.js` | 12 | geen bronmutatie mogelijk | DE HERITAGE-DOCTRINE IS CODE, GEEN MOODBOARD. Deze toets borgt de vaste wereldpaletten, twee geometrieën, vier dieptelagen en de componentrollen waarmee routes gefaseerd worden opgebouwd. |
 | `rtg-operation.test.js` | 5 | gezakt op `true->false#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-route-memory.test.js` | 15 | gezakt op `===->!==#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `rtg-world-identity.test.js` | 5 | gezakt op `===->!==#0` | DE HERITAGE-ROUTEKAART IS FAIL-CLOSED. Een nieuw echt scherm mag niet ongemerkt een vijfde kleur erven en een oude redirect mag geen tweede productoppervlak worden. |

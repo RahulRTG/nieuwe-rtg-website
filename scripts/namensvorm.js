@@ -214,7 +214,8 @@ const WOORDEN = Object.freeze([
   'intent', 'intentie', 'doel', 'purpose', 'opportunity', 'kans',
   'deal', 'contract', 'obligation', 'verplichting', 'gevolg', 'consequence',
   'assurance', 'zekerheid', 'risico', 'hoedanigheid', 'envelop', 'outbox',
-  'saga', 'reconciliatie', 'settlement', 'projectie'
+  'saga', 'reconciliatie', 'reconciliation', 'settlement', 'projectie',
+  'mechanism', 'authority', 'commitment', 'claim'
 ]);
 
 /* ---------------------------------------------------------------------------
@@ -374,31 +375,69 @@ function werkwoorden(paden, mechanismen, lijst) {
    uitleg staat, is niet bezet -- en juist deze bestanden staan vol uitleg, dus
    zonder de wringer is elk woord bezet.
 
-   DE TREFFER IS EEN IDENTIFIER EN GEEN SUBSTRING. Zonder woordgrens telt
-   `machtiging` mee in `servicemachtiging` en `doel` in `doelgroep`, en dan is
-   alles altijd bezet. Met woordgrens mist hij samenstellingen, en dat is de
-   goede kant om te missen: een samenstelling is een ANDERE naam. ------------- */
+   TWEE ASSEN, EN DE TWEEDE IS ER OMDAT DE EERSTE ALLEEN EEN MATERIEEL FOUT
+   ANTWOORD GAF. De eerste versie telde alleen KALE identifiers (`\bwoord\b`),
+   met als verklaring: "een samenstelling is een ANDERE naam, en dat is de goede
+   kant om te missen". Dat klopt voor een naamBOTSING en is onwaar voor de vraag
+   die een bouwer stelt. `obligation` kwam op nul terwijl
+   kern/economie/runtime/intent.js een veld `obligationIds` draagt, en
+   `principal` leek vrij naast `principalRef` en `actingRef` in datzelfde
+   bestand. Dit huis STELT namen SAMEN; wie alleen het kale woord telt, meldt
+   "vrij" over een begrip dat al een motor heeft.
+
+   Dus:
+     kaal          de identifier IS het woord -- dit is de naamBOTSING
+     samengesteld  het woord zit IN een langere identifier (principalRef,
+                   obligationIds, intentsVoorPrincipal) -- dit is het BEGRIP
+
+   Ze worden nooit opgeteld en de stand is drieledig: `vrij` (geen van beide),
+   `bezet` (kaal, eventueel ook samengesteld), en `bezet-samengesteld` -- de
+   naam is vrij maar het BEGRIP is bezet, en dat is precies de stand waarin je
+   een tweede motor bouwt naast een bestaande zonder het te merken.
+
+   De vergelijking blijft eerlijk: `doel` in `doelgroep` komt in de tweede bak
+   en niet in de eerste, dus de botsingstelling is niet opgeblazen. ---------- */
+const IDENTIFIER = /[A-Za-z_$][A-Za-z0-9_$]*/g;
+
 function woordenschat(paden, woorden) {
-  const tel = new Map(woorden.map(w => [w, { bestanden: [], domeinen: new Set() }]));
+  const tel = new Map(woorden.map(w => [w, {
+    kaal: new Set(), kaalDom: new Set(), samen: new Set(), samenDom: new Set(), vormen: new Set()
+  }]));
   for (const p of paden) {
     const bron = om.wring(fs.readFileSync(path.join(WORTEL, p), 'utf8'));
-    for (const w of woorden) {
-      if (!new RegExp('\\b' + w + '\\b', 'i').test(bron)) continue;
-      const t = tel.get(w);
-      t.bestanden.push(p);
-      t.domeinen.add(om.domeinVan(p));
+    const dom = om.domeinVan(p);
+    /* Eén keer alle identifiers uit het bestand halen en daarna per woord
+       kijken. Per woord opnieuw over de bron lopen is hetzelfde antwoord tegen
+       vierendertig keer de tijd. */
+    const ids = new Set();
+    for (const m of bron.matchAll(IDENTIFIER)) ids.add(m[0]);
+    for (const id of ids) {
+      const laag = id.toLowerCase();
+      for (const w of woorden) {
+        if (!laag.includes(w)) continue;
+        const t = tel.get(w);
+        if (laag === w) { t.kaal.add(p); t.kaalDom.add(dom); }
+        else { t.samen.add(p); t.samenDom.add(dom); t.vormen.add(id); }
+      }
     }
   }
   return woorden.map(w => {
     const t = tel.get(w);
+    const kaal = t.kaal.size, samen = t.samen.size;
     return {
       woord: w,
-      bestanden: t.bestanden.length,
-      domeinen: t.domeinen.size,
-      stand: t.bestanden.length === 0 ? 'vrij' : 'bezet',
-      waar: [...t.domeinen].sort().slice(0, 5)
+      bestanden: kaal,                 // de kale as; de naam blijft zoals hij was
+      domeinen: t.kaalDom.size,
+      samengesteld: samen,
+      samengesteldDomeinen: t.samenDom.size,
+      stand: kaal > 0 ? 'bezet' : (samen > 0 ? 'bezet-samengesteld' : 'vrij'),
+      waar: [...t.kaalDom].sort().slice(0, 5),
+      /* De concrete samenstellingen staan erbij, want "het begrip is bezet"
+         zonder te zeggen HOE is een bewering die niemand kan natrekken. */
+      vormen: [...t.vormen].sort().slice(0, 6)
     };
-  }).sort((a, b) => b.bestanden - a.bestanden || a.woord.localeCompare(b.woord));
+  }).sort((a, b) => (b.bestanden + b.samengesteld) - (a.bestanden + a.samengesteld) ||
+    a.woord.localeCompare(b.woord));
 }
 
 /* --------------------------------------------------------------------------- */
@@ -488,12 +527,23 @@ if (require.main === module) {
   }
   console.log('');
   const vrij = r.woordenschat.filter(w => w.stand === 'vrij');
-  console.log('  DE VOORGESTELDE WOORDENSCHAT\n');
-  for (const w of r.woordenschat.slice(0, 10)) {
-    console.log('    ' + w.woord.padEnd(14) + String(w.bestanden).padStart(4) + ' bestanden  ' + String(w.domeinen).padStart(3) + ' domeinen   ' + w.waar.slice(0, 3).join(', '));
+  const begrip = r.woordenschat.filter(w => w.stand === 'bezet-samengesteld');
+  console.log('  DE VOORGESTELDE WOORDENSCHAT');
+  console.log('  (kaal = de identifier IS het woord, een naamBOTSING. samen = het woord zit IN een');
+  console.log('   langere identifier, dus het BEGRIP is bezet. Twee assen, nooit opgeteld.)\n');
+  console.log('    ' + 'woord'.padEnd(16) + 'kaal   samen   stand               waar');
+  for (const w of r.woordenschat.slice(0, 14)) {
+    console.log('    ' + w.woord.padEnd(16) + String(w.bestanden).padStart(4) + '  ' +
+      String(w.samengesteld).padStart(5) + '   ' + w.stand.padEnd(19) +
+      (w.waar.slice(0, 2).join(', ') || w.vormen.slice(0, 2).join(', ')));
   }
   console.log('');
-  console.log('  VRIJ (nul treffers): ' + (vrij.length ? vrij.map(w => w.woord).join(' ') : 'geen van de ' + r.woordenschat.length));
+  console.log('  VRIJ (kaal noch samengesteld): ' + (vrij.length ? vrij.map(w => w.woord).join(' ') : 'geen van de ' + r.woordenschat.length));
+  if (begrip.length) {
+    console.log('');
+    console.log('  NAAM VRIJ, BEGRIP BEZET -- hier bouw je een tweede motor naast een bestaande:');
+    for (const w of begrip) console.log('    ' + w.woord.padEnd(16) + w.vormen.slice(0, 5).join(' '));
+  }
   console.log('');
   console.log('  Lees deze uitkomst met REPRESENTATIE.md par. 0 ernaast: een nul hier zegt');
   console.log('  dat de representatielus geen OBJECT is, niet dat hij niet bestaat.\n');

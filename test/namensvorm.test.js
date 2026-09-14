@@ -99,6 +99,44 @@ test('5. de woordenschat telt identifiers en geen commentaar', () => {
   assert.equal(verzonnen[0].stand, 'vrij', 'een woord dat nergens staat, komt vrij uit');
 });
 
+/* DE TOETS DIE ER NIET WAS TOEN DE FOUT WERD GEMAAKT.
+
+   De eerste versie van de woordenschat telde alleen KALE identifiers, met de
+   verklaring dat een samenstelling "een andere naam" is. Dat is waar voor een
+   naambotsing en onwaar voor de vraag die een bouwer stelt, en het leverde twee
+   materieel foute uitspraken op: `principal` heette vrij naast `principalRef`
+   en `actingRef` in kern/economie/runtime/intent.js, en `obligation` heette
+   vrij naast een complete `obligationIds`-levenscyclus in datzelfde bestand.
+   Op grond daarvan is in REPRESENTATIE.md par. 2 een naam aanbevolen die al
+   bezet was.
+
+   Deze toets bewaakt beide assen op de twee gevallen waarop de meter brak. Hij
+   noemt ze met naam en toenaam en niet in het algemeen: een toets die zegt "er
+   is minstens een samenstelling" gaat groen op elk willekeurig woord. */
+test('7. de samengestelde as vindt de vormen waarop de kale as brak', () => {
+  const bij = (w) => N.meet().woordenschat.find(x => x.woord === w);
+
+  const principal = bij('principal');
+  assert.ok(principal.samengesteld > 0,
+    '`principal` komt samengesteld voor (principalRef, actingRef in de economic runtime)');
+  assert.equal(principal.stand, 'bezet', 'en kaal ook, dus de naam zelf is bezet');
+
+  const obligation = bij('obligation');
+  assert.equal(obligation.bestanden, 0, '`obligation` komt KAAL nergens voor');
+  assert.ok(obligation.samengesteld > 0, 'maar het BEGRIP is bezet');
+  assert.equal(obligation.stand, 'bezet-samengesteld',
+    'en dat is een eigen stand: de naam is vrij, het begrip niet. Precies hier bouw je een ' +
+    'tweede motor naast een bestaande zonder het te merken.');
+  assert.ok(obligation.vormen.some(v => /^obligationId/.test(v)),
+    'de concrete vorm staat erbij, zodat de bewering na te trekken is: ' + obligation.vormen.join(' '));
+
+  /* En de tegenproef, want anders haalt een meter die ALLES samengesteld noemt
+     deze toets: er moet aantoonbaar een woord overblijven dat geen van beide is. */
+  const vrij = N.meet().woordenschat.filter(x => x.stand === 'vrij');
+  assert.ok(vrij.length > 0,
+    'er is nog minstens een woord dat kaal noch samengesteld voorkomt; zonder dat meet deze as niets');
+});
+
 test('6. het register NAMENSVORM.json klopt met een verse meting', () => {
   const vast = JSON.parse(fs.readFileSync(path.join(WORTEL, 'NAMENSVORM.json'), 'utf8'));
   const vers = N.meet();
@@ -114,4 +152,10 @@ test('6. het register NAMENSVORM.json klopt met een verse meting', () => {
   klopt('ruim, velden in alle', vast.gemeten.ruim.inAlleMechanismen, vers.gemeten.ruim.inAlleMechanismen);
   klopt('mechanismen met de hele grammatica', vast.gemeten.werkwoord.volledigOpNaam, vers.gemeten.werkwoord.volledigOpNaam);
   klopt('werkwoorden in alle mechanismen', vast.gemeten.werkwoord.inAlleMechanismenOpNaam, vers.gemeten.werkwoord.inAlleMechanismenOpNaam);
+  /* DE WOORDENSCHAT HOORT ER OOK IN, en dat hij er eerst niet in zat is de
+     reden dat het register een volle dag een vrij-lijst droeg die niet meer
+     klopte. REPRESENTATIE.md par. 2 citeert deze standen, dus een register dat
+     erop achterloopt laat het document een naam aanbevelen die bezet is. */
+  const standen = (j) => Object.fromEntries(j.woordenschat.map(w => [w.woord, w.stand]));
+  klopt('de standen van de woordenschat', standen(vast), standen(vers));
 });

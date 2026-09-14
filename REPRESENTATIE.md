@@ -188,6 +188,22 @@ droeg: `envelop` (`AFSPRAAK.md`), `moment` (`STAGE.md`), `manier`
 ruim twintig, dus is er geteld vóór er iets heet. `bezet` is een waarschuwing
 met een adres en geen verbod — of twee betekenissen botsen, leest een mens.
 
+**Er wordt op TWEE assen geteld, en de tweede is er omdat de eerste alleen een
+materieel fout antwoord gaf.** De eerste versie van deze paragraaf telde alleen
+KALE identifiers, met de verklaring dat een samenstelling "een andere naam" is.
+Dat klopt voor een naambotsing en is onwaar voor de vraag die een bouwer stelt.
+Uitkomst: hier stond dat `principal` en `obligation` vrij waren, terwijl
+`kern/economie/runtime/intent.js` velden `principalRef`, `actingRef` en
+`obligationIds` draagt — en op grond daarvan is in dit document een naam
+aanbevolen die al bezet was. Sinds 14 september staan de assen los:
+
+- **kaal** — de identifier ÍS het woord. Dit is de naambotsing.
+- **samengesteld** — het woord zit IN een langere identifier. Dit is het BEGRIP.
+
+Ze worden nooit opgeteld, en er is een derde stand: **`bezet-samengesteld`** —
+de naam is vrij, het begrip niet. Dat is precies de stand waarin je een tweede
+motor bouwt naast een bestaande zonder het te merken.
+
 | naam uit het voorstel | stand | waar hij al woont |
 |---|---|---|
 | `doel` | **bezet, zwaar** — 247 bestanden, 133 domeinen | levensdoel, AVG-doelbinding (`kern/identiteit/doelen.js`), en 26 andere |
@@ -201,25 +217,36 @@ met een adres en geen verbod — of twee betekenissen botsen, leest een mens.
 | `gevolg` | **bezet** | `kern/stuur/gevolg.js` — de effectmeting van een plan |
 | `envelop` | **bezet, gesloten op acht velden** | `kern/envelop.js`, en die zegt met opzet nooit WAT |
 | `projectie` | **bezet** | `kern/levensgraaf/graaf.js` en `kern/carriereledger/projectie.js` |
-| `principal` | **vrij** | — |
-| `opportunity` | **vrij** | — |
-| `obligation` / `verplichting` | `obligation` vrij, `verplichting` bezet | — |
-| `assurance` | **vrij** (het Nederlandse `zekerheid` niet) | — |
+| `settlement` | **bezet** — 9 kaal, 16 samengesteld | `kern/economie`, `kern/fonds` |
+| `claim` | **bezet** — 23 kaal, 37 samengesteld | o.a. `kern/appstore`, de economic runtime |
+| `principal` | **bezet** — 2 kaal, en samengesteld | `kern/economie/runtime` (`principalRef`), `kern/experience` (een hash-pseudoniem) |
+| `assurance` | **bezet** — 3 bestanden | `kern/identiteit`, `kern/kantoor` |
+| `outbox` | **bezet** — 1 bestand | `kern/intreksignaal` |
+| `obligation` | **bezet-samengesteld** | `obligationId`, `obligationIds`, `obligationPayId` in de economic runtime |
+| `opportunity` | **bezet-samengesteld**, zwak | alleen `opportunityCost` — een economische term, andere betekenis |
+| `hoedanigheid` | **vrij buiten deze laag** | drie bestanden, alle drie `kern/vertegenwoordiging/` |
+| `mechanism` | **vrij** | — |
 | `saga` | **vrij** | — |
-| `outbox` | **vrij** (het Nederlandse `uitbak` niet) | — |
-| `hoedanigheid` | **vrij buiten deze laag** | vier bestanden, alle vier `kern/vertegenwoordiging/` |
 
-Drie gevolgen die niet mogen verwateren:
+Vier gevolgen die niet mogen verwateren:
 
-1. **`principal` is vrij en dat is de enige vrije naam die het voorstel echt
-   nodig heeft.** Punt 2 (Principal belangrijker dan account) kan dus gewoon zo
-   heten.
-2. **`hoedanigheid` is vandaag alleen bezet door deze laag zelf**, en
+1. **`principal` is NIET vrij, en de botsing is van de gevaarlijke soort.**
+   `kern/economie/runtime/intent.js` draagt `principalRef` en `actingRef` voor
+   exact dit begrip — wie handelt, namens wie — terwijl
+   `kern/experience/contexts.js` `principal(key)` gebruikt voor iets heel
+   anders: een gehasht pseudoniem van een sessiesleutel. Eén woord, twee
+   betekenissen, en de ene is precies wat deze laag nodig heeft. Zie par. 3.1:
+   de conclusie is niet *kies een andere naam* maar *sluit aan op de bestaande*.
+2. **Van de zes velden van het voorgestelde canonieke object is `mechanism` het
+   enige dat vrij is** — en niet toevallig ook het enige dat de economic runtime
+   mist. `principalRef`, `actingRef`, `authorityRef` en `purpose` staan er al
+   onder die exacte namen.
+3. **`hoedanigheid` is vandaag alleen bezet door deze laag zelf**, en
    `kern/envelop.js` draagt wél `actor` en géén hoedanigheid. Dit is dus de
    eerste plek waar MN-02 hard te bewijzen is — maar een hoedanigheid in de
    envelop is een **versiesprong** op een envelop die gesloten is op acht
    velden, geen toevoeging (`CARRIERE.md` par. 6).
-3. **`doel` is onbruikbaar als nieuwe kernnaam.** Punt 44 (purpose-bound access)
+4. **`doel` is onbruikbaar als nieuwe kernnaam.** Punt 44 (purpose-bound access)
    bestaat al en heet `kern/identiteit/doelen.js`, met vier gronden waarvan er
    één een keuze is. Een tweede `doel` in deze laag is de duurste botsing die
    `SEMANTIEK.json` kent.
@@ -227,6 +254,59 @@ Drie gevolgen die niet mogen verwateren:
 ---
 
 ## 3. Wat er al staat, onder een andere naam
+
+### 3.1 De economic runtime — het canonieke object bestaat al, half
+
+De naamcorrectie hierboven legde iets bloot dat groter is dan een naam.
+`server/kern/economie/runtime/` (acht bestanden, aangeroepen door
+`kern/fonds.js`) draagt een `intent` met deze velden:
+
+```
+principalRef · actingRef · purpose · sourceRef
+authorizationContext { authorityRef, limitsSnapshot }
+policySnapshot { decisionId, policyId, version }
+economicContext { experienceWorld, economicWorld, domain, capability }
+state { intent, authorization, commitment, fulfillment, financial,
+        allocation, settlement, reconciliation, evidence, recovery, lifecycle }
+commitmentIds · obligationIds · claimIds · ledgerTransactionIds
+idempotency { key → fingerprint }   (botsing op dezelfde sleutel = 409)
+```
+
+Leg dat naast het voorgestelde canonieke object en naast de 57 punten:
+
+| voorgesteld | staat in de economic runtime als |
+|---|---|
+| `principalRef` | `principalRef` |
+| `actorPrincipalRef` | `actingRef` |
+| `representedPrincipalRef` | `principalRef` (het paar draagt beide rollen) |
+| `authorityRef` | `authorizationContext.authorityRef` |
+| `purpose` | `purpose` |
+| `mechanism` | **ontbreekt** — en het is het enige veld waarvan de naam vrij is |
+| punt 40 policy snapshots | `policySnapshot` met `version` |
+| punt 16/17 obligations | `obligationIds`, `commitmentIds`, `claimIds` |
+| punt 19 idempotency | `idempotency` met fingerprint-conflict |
+| punt 46 reconciliation | `state.reconciliation`, plus `runtime/reconciliatie.js` |
+| punt 45 herstel | `state.recovery` |
+| punt 26 double-entry | `ledgerTransactionIds` |
+
+**Dat verandert de opdracht van bouwen naar aansluiten, en het verscherpt de
+grens.** Deze runtime is de ECONOMISCHE weg: hij bestaat om een bevestigde
+betaling te verdelen, en `settlement.js` is als enige toegestaan extern geld te
+verplaatsen. Hem uitbreiden tot de algemene representatielaag zou van een
+geldmotor een bevoegdheidsmotor maken — precies de vermenging die
+`WAARDE.md` en `GELD.md` tegenhouden.
+
+De uitweg is dezelfde die dit document in par. 1 al koos, nu met een tweede
+reden: de representatielaag krijgt **geen eigen canoniek object** maar
+**projecteert naar dezelfde veldnamen**. Eén taal voor audit, beleid en
+conflictcontrole; twee motoren die niets van elkaar overnemen. Wie in plaats
+daarvan een tweede `principalRef` met een eigen betekenis invoert, heeft de
+`VERMOGENS`-botsing gemaakt op het centrale veld van twee lagen tegelijk.
+
+Wat daarbij niet mag verdwijnen: dit is **geen bewijs dat de economic runtime
+de zeven namens-mechanismen dekt.** Hij kent ze niet. `NAMENSVORM.json` meet ze
+apart en vindt daar 0 gedeelde velden; deze paragraaf zegt alleen dat de VORM
+waarin je erover praat al bestaat en al bezet is.
 
 Dit is de goedkoopste paragraaf van het document, en de vorm ervan komt uit
 `HDI.md` par. 1 en `EXECUTIE.md`: **het werk is aansluiten en niet uitvinden.**
@@ -284,7 +364,7 @@ in kan. *Jaren weg* = er ontbreekt een getal of een laag waar dit op leunt.
 | # | onderwerp | stand |
 |---|---|---|
 | 1 | de universele hoofdloop | **jaren weg** — hij kruist vier ketens die 0 van 33 actoren delen (`KETENVORM.json`) |
-| 2 | Principal boven account | **vraagt een besluit** — de naam is vrij, maar het is een versiesprong op `kern/envelop.js` |
+| 2 | Principal boven account | **een stap weg** — `principalRef`/`actingRef`/`purpose`/`authorityRef` staan al in de economic runtime (par. 3.1); alleen `mechanism` ontbreekt, en alleen die naam is vrij |
 | 3 | capability grants met context | **een stap weg** — `kern/vertegenwoordiging/bevoegdheden.js` heeft 9 sleutels, `kern/stuur/mandaat.js` heeft de context |
 | 4 | mandaten als objecten met versies | **een stap weg** — de levenscyclus staat, de VERSIE niet |
 | 5 | NOOIT-lijst technisch sterker | **een stap weg** — de lijst staat (7 items, elk met een adres), hard-deny als voorrangsregel niet |
@@ -299,9 +379,9 @@ in kan. *Jaren weg* = er ontbreekt een getal of een laag waar dit op leunt.
 | 14 | Deal Room met projectie per deelnemer | **een stap weg** — de projectievorm staat in `kern/levensgraaf/graaf.js` |
 | 15 | delta contracts | **een stap weg** — `contract.js` heeft de standen, niet de diff |
 | 16 | contract compilation | **een stap weg** — acht standen, nul lezers buiten de module |
-| 17 | obligation graph | **jaren weg** — hangt aan 16 |
+| 17 | obligation graph | **een stap weg voor de geldweg, jaren weg daarbuiten** — `obligationIds`/`commitmentIds`/`claimIds` bestaan in de economic runtime (par. 3.1), maar alleen voor een bevestigde betaling |
 | 18 | event-driven kern | **staat** |
-| 19 | outbox + idempotency | **half**: idempotency staat, outbox bestaat niet |
+| 19 | outbox + idempotency | **half**: idempotency staat (huisbreed én met fingerprint-conflict in de economic runtime), outbox bestaat niet |
 | 20 | saga / workflow orchestration | **jaren weg** |
 | 21 | human-in-the-loop als primitief | **een stap weg** — `WAITING_FOR_CLIENT_APPROVAL` is in deze laag `voorgesteld` |
 | 22 | risk engine | **staat** |
@@ -319,13 +399,13 @@ in kan. *Jaren weg* = er ontbreekt een getal of een laag waar dit op leunt.
 | 37 | conflict-of-interest engine | **bestaat niet, en is het enige onderdeel zonder concurrent** |
 | 38 | minderjarigen als eigen graph | **staat** — `kern/vertegenwoordiging/jeugd.js` |
 | 39 | temporal authorization | **een stap weg** — `effectiveAt` bestaat nergens |
-| 40 | policy snapshots | **een stap weg** |
+| 40 | policy snapshots | **een stap weg** — `policySnapshot` met `version` staat in de economic runtime, en `voornemen.js` bevriest een goedgekeurd plan |
 | 41 | cryptografisch auditspoor | **staat**; het externe anker **vraagt een besluit** |
 | 42 | zero-trust intern | **jaren weg** — er zijn geen workload-identities |
 | 43 | data classification | **een stap weg** — bestaat voor één dataklasse |
 | 44 | purpose-bound access | **staat**, in de schaduw |
 | 45 | herstelbaarheid per capability | **staat** als meting, niet als contract |
-| 46 | reconciliation engine | **bestaat niet** |
+| 46 | reconciliation engine | **bestaat voor de geldweg** — `runtime/reconciliatie.js` en `state.reconciliation`; daarbuiten niet |
 | 47 | machine-dekkingscontract | **een stap weg** |
 | 48 | observability op businessniveau | **een stap weg** — `kern/service/` par. 12 heeft de maat |
 | 49 | één correlationId | **staat** |

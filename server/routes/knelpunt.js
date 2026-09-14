@@ -37,17 +37,22 @@ module.exports = (kern) => {
   const { bundelVondsten } = require('../kern/knelpunt/vondstenbundel');
   /* De aanvoer wordt EEN keer samengesteld, bij het bedraden. Per verzoek
      opnieuw bouwen zou de bronnenlijst per aanroep laten verschillen, en dan is
-     "welke bronnen zijn er" geen vraag meer met een antwoord. */
-  const BRONNEN = {
+     "welke bronnen zijn er" geen vraag meer met een antwoord.
+
+     EN HIJ HEET MET OPZET NIET `BRONNEN`. Die naam draagt in dit huis al acht
+     betekenissen over acht domeinen (SEMANTIEK.json: botsing, overlap 0), van
+     medicijnbronnen tot loonbronnen. Een negende toevoegen kost hier niets om
+     te vermijden en maakt de meter niet erger. */
+  const AANVOERBRONNEN = {
     werk: maakWerkbron(() => kern.openVacatures),
     opleiding: maakOpleidingbron(() => kern.beroepenbieb),
     opvang: maakOpvangbron(() => kern.opvangwijzer)
   };
-  const aanvoer = maakAanvoer(BRONNEN);
+  const aanvoer = maakAanvoer(AANVOERBRONNEN);
   /* De wegen komen uit DEZELFDE lijst bronnen: een bron die hier wordt
      aangesloten levert vanzelf ook een weg bij een kaal doel. Twee lijsten
      zouden binnen een maand uit elkaar lopen. */
-  const wegen = maakWegen(Object.keys(BRONNEN));
+  const wegen = maakWegen(Object.keys(AANVOERBRONNEN));
 
   /* Eén afhandeling voor twee deuren. Ze apart schrijven zou betekenen dat een
      gezin een ANDER antwoord krijgt dan een lid zodra iemand er een aanpast --

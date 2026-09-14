@@ -85,13 +85,61 @@ test('bank.pas.uitgeven: de standaard soort staat ook echt in de handler', () =>
     contract.identiteitVan('bank.pas.uitgeven', { iban: 'NL01', soort: 'debit' }));
 });
 
-test('supplier.betaalverzoek: de verklaarde identiteit staat letterlijk in de handler', () => {
+test('supplier.betaalverzoek: elk verklaard veld wordt door de handler vergeleken', () => {
   const src = bron('server/kern/directpay/verzoek.js');
-  /* De handler vergelijkt met de hand, en op precies EEN veld. */
-  assert.match(src, /al\.bedrag\s*!==\s*cent/,
-    'de hand-gebouwde vergelijking van verzoekMaak() is niet meer te vinden');
-  assert.deepEqual(contract.CONTRACTEN['supplier.betaalverzoek'].identiteit.velden, ['centen'],
-    'de handler vergelijkt alleen het bedrag; het contract mag niet meer claimen');
+  /* De handler vergelijkt met de hand. Per verklaard veld hoort er een
+     vergelijking te staan; claimt het contract er een die de handler niet
+     kent, dan belooft de verklaring iets wat de route niet doet. */
+  const vergelijking = { centen: /al\.bedrag\s*!==\s*cent/, naarCodename: /al\.naarCodename\s*!==/ };
+  for (const veld of contract.CONTRACTEN['supplier.betaalverzoek'].identiteit.velden) {
+    assert.ok(vergelijking[veld], 'geen bekende vergelijking voor verklaard veld ' + veld);
+    assert.match(src, vergelijking[veld],
+      'het contract verklaart ' + veld + ' maar de handler vergelijkt hem niet');
+  }
+});
+
+test('EN ANDERSOM: elke vergelijking die de handler doet, is ook verklaard', () => {
+  const src = bron('server/kern/directpay/verzoek.js');
+  /* De spiegel van de toets hierboven, en zonder hem is die half. Controleert de
+     handler een veld dat het contract niet noemt, dan LIEGT de verklaring --
+     stilletjes, want een lezer die alleen `velden` kent denkt dat hij alles weet.
+     Deze richting vangt precies de mutatie die de andere richting doorlaat:
+     een veld uit `velden` halen terwijl de handler het blijft vergelijken. */
+  const bekend = { bedrag: 'centen', naarCodename: 'naarCodename' };
+  const verklaard = contract.CONTRACTEN['supplier.betaalverzoek'].identiteit.velden;
+  for (const [inCode, inContract] of Object.entries(bekend)) {
+    if (!new RegExp('al\\.' + inCode + '\\s*!==').test(src)) continue;
+    assert.ok(verklaard.includes(inContract),
+      'de handler vergelijkt ' + inCode + ' maar het contract verklaart ' + inContract + ' niet');
+  }
+});
+
+test('de VERKLAARDE canonicalisatie doet wat de handler doet', () => {
+  const src = bron('server/kern/directpay/verzoek.js');
+  const idx = bron('server/kern/directpay/index.js');
+  /* Deze toets bestaat omdat een mutatie hem opende: `naarCodename` van
+     `opaqueId` naar `exact` zetten liet alle andere toetsen groen. Het contract
+     zou dan beweren dat de waarde blijft staan terwijl de handler hem trimt --
+     en een tweede transport dat de verklaring leest, rekent een andere
+     identiteit uit dan de route. Een verklaring over canonicalisatie is pas
+     waar als zij tegen de normalisatie van de schrijver is gehouden. */
+  assert.match(src, /ontvangerVan\s*=\s*x\s*=>\s*\(x\s*\?\s*schoon\(/,
+    'de handler normaliseert de ontvanger niet meer met schoon()');
+  assert.match(idx, /const schoon\s*=[^\n]*\.trim\(\)/,
+    'schoon() trimt niet meer; de verklaarde canonicalisatie hoort dan mee te veranderen');
+  const soort = contract.CONTRACTEN['supplier.betaalverzoek'].identiteit.canoniek.naarCodename;
+  assert.equal(contract.CANONIEK[soort]('  ANNA-001  '), contract.CANONIEK[soort]('ANNA-001'),
+    'de handler trimt de ontvanger, dus een canonicalisatie die dat niet doet is onwaar');
+});
+
+test('de twee weigeringen dragen elk hun eigen reden', () => {
+  const src = bron('server/kern/directpay/verzoek.js');
+  /* "een ander bedrag" en "een andere ontvanger" zijn voor de balie twee
+     verschillende vergissingen. Een gedeelde tekst laat de medewerker naar het
+     verkeerde veld kijken, dus de teksten moeten verschillen. */
+  const teksten = src.match(/hoort al bij een [^']+/g) || [];
+  assert.ok(teksten.length >= 2, 'er horen twee verschillende weigeringsteksten te staan');
+  assert.equal(new Set(teksten).size, teksten.length, 'twee weigeringen delen dezelfde tekst');
 });
 
 test('een veld dat teSmal heet, mag NOOIT stilzwijgend in velden staan', () => {
@@ -162,20 +210,28 @@ test('ECHT: verschillende contractidentiteit -> de route weigert met 409', async
   assert.equal(b.status, 409, 'een andere identiteit op dezelfde sleutel hoort te weigeren');
 });
 
-test('ECHT: de teSmal-bevinding is echt, en blijft zichtbaar zolang zij bestaat', async () => {
+test('ECHT: een andere ontvanger is een andere opdracht en wordt niet ingeslikt', async () => {
   const s = 'ct-ontvanger-' + Date.now();
-  const a = await post('/api/supplier/betaalverzoek', { codename: 'ANNA-001', centen: 5000, idem: s });
+  await post('/api/supplier/betaalverzoek', { codename: 'ANNA-001', centen: 5000, idem: s });
   const b = await post('/api/supplier/betaalverzoek', { codename: 'BOB-002', centen: 5000, idem: s });
-  /* Dit is GEEN goedkeuring. De route geeft het verzoek van de eerste ontvanger
-     terug en de zaak leest "gelukt", terwijl de tweede ontvanger niets krijgt.
-     Verandert iemand dat -- en dat zou goed zijn -- dan zakt deze toets en moet
-     `teSmal` in het contract mee veranderen. Dat is precies de bedoeling: het
-     gebrek mag niet stil verdwijnen en ook niet stil blijven. */
-  assert.equal(b.status, 200);
+  /* Dit was tot september 2026 een 200 met `herhaald: true` en het verzoek van
+     ANNA terug -- BOB kreeg niets en de balie las "gelukt". Nu weigert de route,
+     met een eigen reden die over de ONTVANGER gaat en niet over het bedrag. */
+  assert.equal(b.status, 409, 'een andere ontvanger op dezelfde sleutel hoort te weigeren');
+  assert.match(b.body.error, /ontvanger/, 'de weigering hoort over de ontvanger te gaan');
+  assert.notEqual(contract.identiteitVan('supplier.betaalverzoek', { centen: 5000, naarCodename: 'ANNA-001' }),
+    contract.identiteitVan('supplier.betaalverzoek', { centen: 5000, naarCodename: 'BOB-002' }));
+});
+
+test('ECHT: dezelfde ontvanger met een spatie eromheen blijft een herhaling', async () => {
+  const s = 'ct-spatie-' + Date.now();
+  const a = await post('/api/supplier/betaalverzoek', { codename: 'ANNA-001', centen: 5000, idem: s });
+  const b = await post('/api/supplier/betaalverzoek', { codename: '  ANNA-001  ', centen: 5000, idem: s });
+  /* De keerzijde van de reparatie, en de reden dat de vergelijking exact de
+     normalisatie van de schrijfregel gebruikt: zou zij dat niet doen, dan werd
+     een tweede klik met een spatie erbij een 409 op een woordelijk gelijk
+     verzoek -- een nieuw gebrek in ruil voor het oude. */
+  assert.equal(b.status, 200, 'dezelfde ontvanger met randspaties is dezelfde opdracht');
   assert.equal(b.body.herhaald, true);
-  assert.equal(b.body.verzoek.naarCodename, 'ANNA-001',
-    'de route geeft nog steeds de EERSTE ontvanger terug -- werk `teSmal` bij als dit is gerepareerd');
   assert.equal(a.body.verzoek.ref, b.body.verzoek.ref);
-  assert.ok(contract.CONTRACTEN['supplier.betaalverzoek'].identiteit.teSmal.naarCodename,
-    'het contract hoort dit gebrek uitgeschreven te dragen');
 });

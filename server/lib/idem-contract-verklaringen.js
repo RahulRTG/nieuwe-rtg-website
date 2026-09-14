@@ -54,24 +54,29 @@ const CONTRACTEN = {
      ZAAK en niet aan de medewerker; de identiteit is het BEDRAG en verder
      niets (`if (al && al.bedrag !== cent) return 409`).
 
-     LET OP -- HIER IS DE VERKLARING SMALLER DAN DE HANDELING, EN DAT IS GEMETEN
-     EN GEEN VERMOEDEN. `naarCodename` staat niet in de identiteit. Zelfde
-     sleutel, zelfde bedrag, ANDERE ontvanger geeft vandaag 200 met
-     `herhaald: true` en het verzoek van de EERSTE ontvanger terug:
+     DE ONTVANGER IS ERBIJ GEKOMEN, en dat was een BESLUIT en geen bijvangst.
+     Tot september 2026 vergeleek de handler alleen het bedrag, en stond
+     `naarCodename` hier in `teSmal` met de meting erbij: zelfde sleutel,
+     zelfde bedrag, ANDERE ontvanger gaf 200 met `herhaald: true` en het
+     verzoek van de EERSTE ontvanger terug --
 
        A: 200 ref BVA52D48EF50 naarCodename ANNA-001
        B: 200 ref BVA52D48EF50 naarCodename ANNA-001  herhaald: true
 
-     De tweede ontvanger krijgt niets en de zaak leest "gelukt". Een ander
-     BEDRAG geeft wel netjes 409. Dit contract beschrijft dus de code zoals hij
-     is; `naarCodename` erbij zetten is een GEDRAGSwijziging op een geldroute en
-     hoort een besluit te zijn, geen bijvangst van een declaratie. Het staat
-     daarom in `teSmal` en niet stilzwijgend in `velden`. */
+     -- waarbij de tweede ontvanger niets kreeg en de balie "gelukt" las. Dat is
+     op besluit van de eigenaar gerepareerd; `teSmal` is daarmee leeg en die
+     bak hoort pas terug als er weer iets in staat.
+
+     `opaqueId` is hier de eerlijke canonicalisatie en niet `exact`: de
+     schrijfregel bewaart `schoon(naarCodename, 40)`, wat de randen eraf haalt.
+     Een codenaam is een sleutel en geen woord, dus er gaat GEEN hoofdletterregel
+     overheen -- twee codenamen die alleen in kapitalisatie verschillen zijn twee
+     codenamen. */
   'supplier.betaalverzoek': {
     identiteit: {
       modus: 'CLIENT_KEY_AUTHORITATIVE',
-      velden: ['centen'],
-      canoniek: { centen: 'geldbedrag' },
+      velden: ['centen', 'naarCodename'],
+      canoniek: { centen: 'geldbedrag', naarCodename: 'opaqueId' },
       standaarden: {},
       /* Geen vorm: deze handler bewaart geen afdrukstring maar vergelijkt het
          bewaarde verzoek veld voor veld (`al.bedrag !== cent`). Er is dus geen
@@ -83,9 +88,6 @@ const CONTRACTEN = {
         actorName: 'de medewerker; de sleutel hangt bewust aan de zaak',
         idem: 'is de sleutel zelf'
       },
-      teSmal: {
-        naarCodename: 'de ontvanger bepaalt de handeling wel degelijk, maar zit vandaag niet in de vergelijking; verbreden verandert gedrag en vraagt een besluit'
-      }
     },
     herhaling: 'ZELFDE_SLEUTEL_VEREIST',
     levering: 'HERPROBEREN_MAG'

@@ -7,17 +7,19 @@
    Het fonds is van de RTFoundation, en tot vandaag kwam alleen een RTG-LID
    erbij: een gezinssessie kreeg op elke route 401, terwijl dom-labfonds in het
    functieregister uitsluitend `foundation` verklaarde. Dat is gemeten en niet
-   vermoed (DOELGROEPBEREIK.json, 14 september). De gezinsdeur staat hieronder
-   in DIT bestand en niet in een eigen, om dezelfde reden als bij
-   /api/rtf/knelpunt: elke handeling staat een keer opgeschreven in DOEN, en
-   beide deuren roepen hem aan. Twee kopieen zouden binnen een maand twee
-   verschillende fondsen worden.
+   vermoed (DOELGROEPBEREIK.json, 14 september). Wat de twee deuren delen is de
+   AFHANDELING, om dezelfde reden als bij /api/rtf/knelpunt: elke handeling
+   staat een keer opgeschreven in DOEN, en beide deuren roepen hem aan. Twee
+   kopieen zouden binnen een maand twee verschillende fondsen worden.
+
+   De gezinsdeur zelf (poort, verfijner, afhandeling) woont sinds de splitsing
+   in ./labfonds-gezinsdeur.js; de ROUTES staan alle zestien hier. Dat is geen
+   nuance maar de hele reden dat de splitsing veilig is -- zie de kop daar.
 
    HET IS EEN TOEZEGGINGEN-GROOTBOEK EN GEEN KAS. Er verhuist hier geen euro;
    `doneer` legt een toezegging vast. Dat is de reden dat deze deur open KAN:
    wie geld werkelijk zou verplaatsen, komt langs kern/pay/poort.js en daar
    zet een mens de laatste stap (GELD.md). */
-const envelop = require('../opzet/envelop');
 
 module.exports = (kern) => {
   const { app, auth, officeAuth, labfonds, rtf } = kern;
@@ -64,72 +66,11 @@ module.exports = (kern) => {
     veilig(res, () => werk(lid(req), naam(req), req.body || {}));
   };
 
-  /* DE GEZINSDEUR, als POORTWACHTER en niet als controle binnen de handler.
+  /* DE GEZINSDEUR staat in ./labfonds-gezinsdeur.js -- poort, verfijner en
+     afhandeling, met de uitleg erbij. Alleen de ROUTES blijven hier: zestien
+     adressen op een plek. Zie de kop daar voor waarom dat onderscheid telt. */
+  const { gezinsPoort, nietBeschermd, alsGezin } = require('./labfonds-gezinsdeur')({ rtf, veilig });
 
-     Dat is geen stijlkeuze. Een poort die inline in de afhandeling staat, is
-     voor de router onzichtbaar en dus ook voor de bewakerskaart, de
-     schaduwmeting en keuringsregel 28 -- die laatste leest wat er VOOR de
-     handler staat, en terecht: valse goedkeuring is daar de gevaarlijke
-     richting. Als middleware staat hij op precies een plek, is hij per route te
-     zien, en kan hij niet per ongeluk bij een volgende route wegvallen. Zelfde
-     vorm als routes/rtfleerling.js. */
-  function gezinsPoort(req, res, next) {
-    const b = req.body || {};
-    const sess = rtf.verifieerProfiel(b.code, b.token);
-    if (!sess) return res.status(403).json({ error: 'Log opnieuw in bij je gezin.' });
-    /* GASTEN ERBUITEN, ook om te kijken -- en dat is de naam die dit contract
-       draagt. server/kern/handlerpoorten/buiten.js verklaart `gezinsPoort` als
-       "rtf.verifieerProfiel(code, token)" met gasten eruit, en routes/tiener.js
-       en baby.js doen dat al zo. Hier een zachtere variant onder dezelfde naam
-       bouwen zou dat verklaarde contract stil uithollen. Inhoudelijk klopt het
-       ook: gezinshulp.js sluit een gast uit van de privezaken van het gezin, en
-       geld is daar het eerste voorbeeld van. */
-    if (sess.gast) return res.status(403).json({ error: 'Dit is van de gezinsleden zelf.' });
-    req.gezinslid = sess;
-    envelop.zet(req, { soort: 'gezinslid', id: sess.handle || sess.profielId || null,
-      rol: sess.rol || null, identiteit: 'bewezen',
-      tenantSoort: 'gezin', tenantId: String(b.code || '').toUpperCase() || null });
-    next();
-  }
-
-  /* TOEZEGGEN EN STEMMEN VRAGEN EEN VOLWASSEN PROFIEL, en de verfijner heet
-     `nietBeschermd` omdat die naam AL bestaat met precies deze betekenis:
-     scripts/lib/bewakers.js verklaart hem als "sluit een beschermd kind uit
-     binnen gezinsPoort", en routes/social/gezinnen.js gebruikt hem zo. Mijn
-     eerste versie heette `volwassenGezin`, en de idemproef meldde hem prompt
-     als "bewaker van onbekende soort" -- terecht: een tweede naam voor dezelfde
-     verfijner maakt de bewakerskaart onleesbaar. De TEKST verschilt wel, en dat
-     hoort: bij vrienden toevoegen leest een kind "je ouder voegt vrienden voor
-     je toe", hier gaat het over geld.
-
-     Dat is geen nieuwe regel
-     maar twee bestaande naast elkaar gelegd: server/foundation/gezinshulp.js
-     zegt bij isGast met zoveel woorden dat een gast niet bij de privezaken van
-     het gezin mag komen "(geld, ...)", en isBeschermd markeert de
-     minderjarige profielen. Een kind laten toezeggen en laten meestemmen over
-     onderzoeksgeld zou allebei die grenzen passeren.
-
-     KIJKEN MAG HET HELE GEZIN, ook een gast en ook een kind: wie MAG KIJKEN
-     begrenzen zou hier een oordeel zijn over wie zijn eigen fonds mag zien, en
-     dat is precies wat FOUNDATION.md par. 5 verbiedt. Deze laag staat daarom
-     NAAST gezinAuth en niet erin. */
-  const nietBeschermd = (req, res, next) => {
-    if (req.gezinslid.beschermd) {
-      return res.status(403).json({ error: 'Toezeggen en stemmen doet een volwassene uit het gezin.' });
-    }
-    next();
-  };
-
-  /* De HANDLE is de sleutel in het grootboek en niet de gezinscode: hij draagt
-     het voorvoegsel `rtf:` en kan daardoor structureel niet botsen met de
-     sleutel van een lid. Wie hier de gezinscode zou doorgeven, laat het hele
-     gezin als EEN toezegger in het boek staan -- nagemeten: een gezin dat 25
-     toezegt en een lid dat 40 toezegt houden ieder hun eigen bijdrage, en de
-     pot telt 65. */
-  const alsGezin = (werk) => (req, res) => {
-    const sess = req.gezinslid;
-    veilig(res, () => werk(sess.handle, sess.codenaam || 'Gezinslid', req.body || {}));
-  };
 
   // Inzamelen, stemmen en beslissen kan alleen als LID (auth zet req.session).
   // Het overzicht is ook voor leden; wie niet ingelogd is, ziet het via de OS-kaart.

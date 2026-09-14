@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1667,
-    "toetsenNietGemeten": 618,
+    "toetsenNietGemeten": 619,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -2340,6 +2340,16 @@
       "meter": "stilleOpslag 24 -> 25",
       "reden": "server/effectbon.js schrijft de effectbon in een try/catch met een lege vanger, zodat een mislukte bon het antwoord niet breekt. De stilspoormeter telt dit terecht als één extra stil weggevaagde opslagfout.",
       "waarheen": "Het falen van de effectbon zichtbaar melden of de opslagroute zo inrichten dat de lege vanger kan verdwijnen."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 618,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 618 -> 619",
+      "reden": "test/namensvorm.test.js komt erbij -- zes toetsen op scripts/namensvorm.js (REPRESENTATIE.md par. 0) -- en staat nog niet in MUTATIES.json. Alle zes zijn met de hand gemuteerd en de dragende drie zagen zakken: `async` uit het naampatroon halen laat toets 2, 3 en 6 zakken, en alle zeven synoniemen op /./ zetten breekt toets 4. Die mutatie is niet academisch maar de fout die hier ECHT is gemaakt: zonder `async` meldde de meter dat kern/vertegenwoordiging/ geen verlenen, aanvaarden en intrekken heeft terwijl die drie er als async function staan -- een geldige uitslag van het verkeerde experiment (BEWIJSMACHINE.md par. 6a).",
+      "waarheen": "Laat scripts/mutatie.js over test/namensvorm.test.js lopen, samen met railvergelijk, menselijkeuitvoering, mensmutatie, stuurspoor, stuurrail, menstaal en stuurplafond uit de notities hierboven."
     }
   ],
   "prestatie": {

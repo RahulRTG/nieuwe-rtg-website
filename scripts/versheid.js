@@ -483,6 +483,13 @@ const REGISTERS = [
      besluit dat een Moment een projectie is en geen object. Een verouderde nul
      ziet er exact zo uit als een verse. */
   ['STAGEVORM.json', 'npm run stagevorm:vast', 'of de publieke domeinen een datavorm delen -- STAGE.md par. 0 rust erop, en de uitslag is een nul die er vers en verouderd hetzelfde uitziet'],
+  /* Derde van deze soort, en de scherpste: hier staan TWEE nullen naast elkaar
+     (0 gedeelde velden, 0 werkwoorden in alle mechanismen op naam) en
+     REPRESENTATIE.md par. 0 draagt daarop het besluit dat er geen Representation
+     Engine komt maar een verklaarde grammatica. Een verouderde nul ziet er exact
+     zo uit als een verse -- en bij twee nullen naast elkaar leest hij ook nog
+     eens als bevestiging. */
+  ['NAMENSVORM.json', 'npm run namensvorm:vast', 'of de manieren van namens-iemand-handelen een machine delen -- REPRESENTATIE.md par. 0 rust op twee nullen, en die zien er vers en verouderd hetzelfde uit'],
   /* Ook een nul, en om dezelfde reden hier: `zonderUitspraak: 0` betekent dat
      elk publiek domein een besluit draagt. Verouderd betekent diezelfde nul
      alleen nog dat er destijds geen domein ontbrak. */

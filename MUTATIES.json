@@ -7440,6 +7440,14 @@
       "gezakt": 7,
       "geprobeerd": 1
     },
+    "schrijfproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/schrijfproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "scim.test.js": {
       "soort": "puur",
       "staat": "gezakt",

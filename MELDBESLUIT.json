@@ -1,0 +1,16 @@
+{
+  "uitleg": "Per waardebewegende route: MOET er een mens bericht krijgen als deze handeling slaagt? CRASHPROEF.json MEET of er na een dood op het meldmoment nog een melding is ontstaan (`meldingBewoog`); dit register VERKLAART of dat er had moeten zijn. De twee worden nooit samengevoegd: een route die vandaag toevallig niets stuurt, legt daarmee niet vast dat hij dat niet hoeft.",
+  "grens": "EEN STAND WORDT NOOIT AFGELEID UIT BEWIJS (MUTATIECONTRACT.md, en dezelfde regel als in HERSTELBESLUIT.json). Een gemeten `meldingBewoog: true` is een VOORSTEL om BERICHT_VEREIST te verklaren, geen verklaring. Andersom is scherper: een gemeten `false` bewijst NIET dat er geen meldplicht is -- het kan even goed het defect zijn dat dit register moet kunnen aanwijzen. Daarom is de ontbrekende verklaring UNKNOWN en niet GEEN_BERICHT.",
+  "klassen": {
+    "BERICHT_VEREIST": "Deze handeling raakt een mens die het hoort te weten, en het systeem is de enige die het hem kan vertellen. Zakt de crashgrens `na-commit-voor-bericht` hier, dan staat de uitkomst vast terwijl de betrokkene nooit iets hoort -- en dat is een defect en geen ongemak.",
+    "GEEN_BERICHT": "Deze route bericht met opzet niemand: de handeling is zichtbaar op het scherm van wie hem uitvoert, of de betrokkene ziet het gevolg vanzelf bij de eerstvolgende keer kijken. Een expliciet besluit, geen restklasse.",
+    "UNKNOWN": "Niemand heeft gekeken. Dit is de enige stand die vanzelf ontstaat, en hij telt als schuld en niet als groen."
+  },
+  "routes": {},
+  "waaromLeeg": "Hij is met opzet leeg, en dat is dezelfde keuze die HERSTELBESLUIT.json tot 12 september 2026 maakte. Het mechanisme is op 13 september gebouwd (de crashgrens `na-commit-voor-bericht` bestaat, de meting `meldingBewoog` staat per rij in CRASHPROEF.json, en scripts/gelddekking.js voegt de verklaring hier samen tot de kolom `berichtAan`). Wat ontbreekt is het BESLUIT welke geldroutes een meldplicht dragen, en dat is niet iets wat de bouwer of de meter mag invullen: wie hier een stand neerzet, bepaalt wanneer een crash een defect heet. Zolang dit leeg is, meldt de crashproef voor elke route NIET_BEPROEFD met de reden erbij -- nooit stil groen. De eerste kandidaat ligt klaar en is gemeten, niet verzonnen: POST /api/supplier/facturen/maak schrijft een factuur en bericht de koper, en onder `sterf-voor-bericht` bleef de factuur staan terwijl de melding en de rtmail allebei wegbleven (CRASHPROEF.json, stempel ec789193c).",
+  "beleid": {
+    "besloten": "13 september 2026, door de eigenaar: de meldplicht hoort in GELDDEKKING.json naast de collecties, langs de weg die HERSTELBESLUIT.json al gebruikt.",
+    "afgewezenAlternatief": "Afleiden uit een ijkronde zonder crash. Dat is bewust NIET gekozen: het maakt van een gemeten gewoonte een verklaarde plicht, en dan legt een route die vandaag niemand bericht daarmee vast dat hij dat nooit hoeft.",
+    "opgeschrevenDoor": "Claude (Opus 5), 13 september 2026; door geen mens nagelezen op deze formulering"
+  }
+}

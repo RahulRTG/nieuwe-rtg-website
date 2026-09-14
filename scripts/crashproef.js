@@ -412,7 +412,7 @@ function weegHerhaling(bijgekomen, verklaring) {
    `verwachtLeeg` zegt of DEZE grens belooft dat er niets veranderd is (dat is de
    ATOMIC-grens) of juist dat de uitkomst er hoort te staan (na de commit). */
 function weegContract({ verwachtLeeg, geraakt, aantalCollecties, status, gestorven,
-  herhaalStatus, bijgekomen, verklaring }) {
+  herhaalStatus, bijgekomen, verklaring, grens, berichtAan, meldingBewoog }) {
   const c = {};
 
   /* 1. TOESTAND. Voor de grens voor de mutatie: er hoort niets te staan. Voor de
@@ -451,6 +451,32 @@ function weegContract({ verwachtLeeg, geraakt, aantalCollecties, status, gestorv
       ' collectie(s) veranderden: vals falen' };
   else c.geenVals = { stand: 'PROVEN',
     reden: 'het antwoord (' + status + ') komt overeen met wat er is blijven staan' };
+
+  /* 5. IS DE BETROKKENE BERICHT? ALLEEN OP DE MELDGRENS, en alleen als iemand
+        heeft VERKLAARD dat hier bericht hoort te gaan.
+
+        Deze bewering bestaat omdat de belofte van die grens anders niets
+        handhaaft: de proef kan zien dat er geen melding ontstond, maar niet of
+        dat erg is. Dat staat in MELDBESLUIT.json, en dat register is met opzet
+        leeg tot de eigenaar het invult -- dus zolang niemand iets verklaarde,
+        zegt deze bewering NIET_BEPROEFD en nooit stil PROVEN.
+
+        Let op de asymmetrie, die uit het register zelf komt: een gemeten `false`
+        bewijst NIET dat er geen meldplicht is. Daarom is de ontbrekende
+        verklaring UNKNOWN en niet GEEN_BERICHT. */
+  if (grens === 'na-commit-voor-bericht') {
+    if (berichtAan === 'BERICHT_VEREIST') c.berichtGeland = meldingBewoog
+      ? { stand: 'PROVEN', reden: 'er is bericht ontstaan ondanks de dood op het meldmoment' }
+      : { stand: 'FAILED', reden: 'MELDBESLUIT.json verklaart dat hier iemand bericht hoort te ' +
+          'krijgen, en na deze dood bestaat er geen melding -- de uitkomst staat vast en de ' +
+          'betrokkene hoort er nooit van' };
+    else if (berichtAan === 'GEEN_BERICHT') c.berichtGeland = { stand: 'PROVEN',
+      reden: 'deze route bericht met opzet niemand (MELDBESLUIT.json), dus er valt hier niets te verliezen' };
+    else c.berichtGeland = { stand: 'NIET_BEPROEFD',
+      reden: 'niemand heeft verklaard of hier iemand bericht hoort te krijgen (MELDBESLUIT.json ' +
+        'staat op UNKNOWN voor dit pad); gemeten is alleen dat er ' +
+        (meldingBewoog ? 'wel' : 'geen') + ' melding ontstond' };
+  }
 
   /* 4. GEEN DUBBEL EFFECT. De helft van crashveiligheid. */
   if (herhaalStatus === null || herhaalStatus === undefined) c.geenDubbel =
@@ -656,7 +682,8 @@ async function ronde(route, grens, ruis) {
     const c = weegContract({ verwachtLeeg, geraakt: binnen.length,
       aantalCollecties: route.collecties.length, status: r.status, gestorven,
       herhaalStatus: herhaal.status, bijgekomen: bijgekomen.length,
-      verklaring: sleutelVoor(route.pad) });
+      verklaring: sleutelVoor(route.pad),
+      grens: grens.grens, berichtAan: route.berichtAan, meldingBewoog });
 
     return { stand: c.stand, claims: c.claims, statusVanDeAanroep: 0,
       reden: Object.entries(c.claims).filter(([, v]) => v.stand !== 'PROVEN')

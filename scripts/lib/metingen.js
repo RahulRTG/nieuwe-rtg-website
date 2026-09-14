@@ -284,9 +284,15 @@ const REGISTER = {
   /* GELDDEKKING.json hangt WEL aan NORM.json -- vier tanden, zie de kop daar.
      Anders dan de geldkaart draagt hij voorraden die mogen dalen in plaats van
      een nul die nul moet blijven, en dat is precies wat een ratel meet. */
+  /* `geldRoutesMeldOnbesloten` hoort HIER en niet alleen bij MELDBESLUIT.json.
+     De VERKLARING woont daar, maar het GETAL komt uit de `ratel` van dit
+     register -- en test/gelddekking.test.js eist terecht dat elke sleutel in die
+     ratel ook in deze meterlijst staat. Anders draait de meter nog en bewaakt
+     hij niets meer, precies het gat dat die toets beschrijft. */
   'GELDDEKKING.json': { meter: ['geldRoutesPubliek', 'geldRoutesZonderSemantiek',
     'geldRoutesZonderIdemBewijs', 'geldRoutesZonderTerugweg',
-    'geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak'] },
+    'geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak',
+    'geldRoutesMeldOnbesloten'] },
   /* FACTUURPROEF.json hangt aan TWEE tanden en niet aan een, en dat is een
      besluit en geen slordigheid: `geldpadGezakt` is een defect dat naar nul
      moet, `geldpadOnbewezen` is werk dat nog niet gedaan is. Een tand die die
@@ -312,6 +318,17 @@ const REGISTER = {
      hier een regel bijzet of weghaalt, beweegt een van deze twee tellers: een
      ontbrekende verklaring zit in `onbesloten`, een verkeerde in `tegenspraak`. */
   'HERSTELBESLUIT.json': { meter: ['geldRoutesHerstelOnbesloten', 'geldRoutesHerstelTegenspraak'] },
+  /* MELDBESLUIT.json is net zo'n VERKLARING: hij hangt aan het aantal geldroutes
+     waarvan niemand heeft gezegd of er bericht hoort te gaan. Leeg is hier geen
+     nul maar 45 -- de teller telt wat er NIET verklaard is. */
+  'MELDBESLUIT.json': { meter: ['geldRoutesMeldOnbesloten'] },
+  /* SCHRIJFPROEF.json meet iets ANDERS dan CRASHPROEF.json en hangt daarom aan
+     een eigen tand: niet wat er van een uitkomst overblijft na een crash, maar
+     of de aanroeper een succes te zien krijgt over een schrijfactie die is
+     verdwenen. `ONBEREIKT` krijgt met opzet geen tand -- dat is bereik van het
+     instrument en geen defect van een route, dezelfde grond waarop
+     GEEN_DUURZAME_WEG er ook geen heeft. */
+  'SCHRIJFPROEF.json': { meter: ['geldRoutesValsSucces'] },
 
   'TIKKEN.json': { eigenRatel: 'test/sprongindex.test.js' },
   'VINDBAAR.json': { eigenRatel: 'test/sprongindex.test.js' },

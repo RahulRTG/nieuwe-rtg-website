@@ -143,7 +143,7 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, opslag: g
        uitgezonden staat los van de vraag of er iemand gewekt kon worden -- een
        moment zonder volgers is nog steeds gebeurd, en hoort in de tijdlijn te
        staan voor wie er morgen op volgen drukt. */
-    const regel = leg(a.id, soort, titel);
+    const regel = tijdlijn ? tijdlijn.leg(a.id, soort, titel) : null;
     const gewekt = [], overgeslagen = [];
     for (const volger of aanwezig.aanwezigVolgersVan(a.id)) {
       const soorten = meldVan(volger, a.naam);
@@ -163,8 +163,7 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, opslag: g
   }
 
   return { mediaNieuwWerk: nieuwWerk, mediaNieuwMoment: nieuwMoment,
-    mediaVolgersVan: volgersVan, mediaMomentenVoor: momentenVoor,
-    MEDIA_SOORT_NAAM: SOORT_NAAM };
+    mediaVolgersVan: volgersVan, MEDIA_SOORT_NAAM: SOORT_NAAM };
 }
 
 module.exports = { maakWekken, SOORT_NAAM };

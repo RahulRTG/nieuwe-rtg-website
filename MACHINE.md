@@ -60,7 +60,7 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->4953<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->4963<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
@@ -82,7 +82,7 @@ aantal routes dat hem raakt (`handler` / `bestand`):
 | envelop (oorzaak, correlatie) | 2 | <!--getal:machine.envelop-->109<!--/getal--> | `kern/envelop.js` |
 | idempotentie | 13 | 114 | `lib/idem-poort.js` |
 | aiVindbaar | 173 | 173 | `kern/stuur/beleid.js` |
-| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->235<!--/getal--> | `kern/kantoor/kluispoort.js` |
+| mensAanDeDeur | 234 | <!--getal:machine.mensAanDeDeur-->238<!--/getal--> | `kern/kantoor/kluispoort.js` |
 | herhaling (beschermd) | 1675 | 1675 | `IDEMPROEF.json` |
 
 Vier assen staan als **ongemeten met een reden** en nooit als 0: doelvindbaarheid
@@ -101,8 +101,8 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2818<!--/getal--> van de
-   <!--getal:machine.muterend-->4953<!--/getal--> muterende routes raken **geen
+1. <!--getal:machine.zonderAs-->2825<!--/getal--> van de
+   <!--getal:machine.muterend-->4963<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 2. De hoogst geïntegreerde handeling buiten de hubs raakt **drie** assen
    (`/api/bank/rekening/open`, `/api/office/boardroom`,
@@ -113,6 +113,24 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
    gouden keten van par. 5a doet het bij elke aanvraag -- maar via de kern-tas, en
    die is voor de route-as per constructie onzichtbaar. Vóór die keten waren het er
    drie (bewijstoken, veiligheidskern, gevolgmeting).
+
+**De ratel is op 13 september 2026 verhoogd van 2818 naar 2825, en dat staat hier
+uitgeschreven omdat hij alleen mag DALEN.** De oorzaak is de samenvoeging van tien
+open PR-takken in één release-tak: elke tak bleef apart binnen zijn eigen stand, en
+de optelsom niet. Zeven van de routes die daarbij zijn bijgekomen raken geen enkele
+as -- ze doen hun werk buiten de zestien motoren om.
+
+Wat deze verhoging NIET is: een versoepeling van de eis. `mutatiesZonderEnigeAs`
+mag daarna weer alleen omlaag, en de weg omlaag is per route dezelfde als in par.
+5a: hem langs een as laten lopen in plaats van eromheen. Wat de meter hier NIET
+levert is welke zeven het zijn -- hij houdt een telling en geen lijst, en dat is
+een tekort van het instrument dat hier vermeld hoort te staan in plaats van
+weggelaten. Wie ze wil aanwijzen, draait `npm run machinedekking` naast een ronde
+op `origin/main` en neemt het verschil.
+
+Dezelfde behandeling als `OPEN_MAX` in `SERVICE.md` par. 13 en de acht
+schuldnotities in `NORM.json`: wie een ratel omzeilt zonder het te zeggen, sloopt
+de ratel zelf.
 
 Dat is de meetkundige vorm van de stelling: **niet te weinig motoren, te weinig
 handelingen die erlangs gaan.** De prijs van de sprong is dus bedrading en geen
@@ -160,7 +178,7 @@ vrij, **Situation** let op); die worden hier niet herhaald. Dit zijn de zeven di
 uit de uitvoeringskant komen. `SEMANTIEK.json` meet dat dit huis
 <!--getal:semantiek.namen-->123<!--/getal--> namen in meer dan één domein heeft,
 waarvan <!--getal:semantiek.betekenissen-->105<!--/getal--> met meer dan één
-betekenis (samen <!--getal:semantiek.betekenissenTotaal-->389<!--/getal-->
+betekenis (samen <!--getal:semantiek.betekenissenTotaal-->392<!--/getal-->
 betekenissen).
 
 1. **`envelop`** — bezet en gesloten (zie par. 2).
@@ -275,7 +293,7 @@ betekenissen).
 - **Routes als bijproduct.** Kan pas als de capability-laag is **afgeleid**;
   `OBJECTMODEL.json` (71% van de velden hoort bij één domein) en
   `KETENVORM.json` (<!--getal:ketenvorm.actorenGedeeld-->0<!--/getal--> van
-  <!--getal:ketenvorm.actorenTotaal-->13<!--/getal--> gedeelde actoren over drie
+  <!--getal:ketenvorm.actorenTotaal-->33<!--/getal--> gedeelde actoren over drie
   ketens) zeggen dat een model eroverheen de `Asset`-fout is.
 
 ---

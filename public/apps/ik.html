@@ -13,32 +13,114 @@
 <link href="/shared/veiligheid.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/ios.css" rel="stylesheet">
 <style>
-  .keus{display:block;width:100%;text-align:left;margin:.45rem 0;padding:.85rem 1rem;background:transparent;
-    border:1px solid var(--line);border-radius:0;color:var(--txt);font:inherit;cursor:pointer;}
-  .keus:focus-visible{outline:2px solid var(--goldlicht);outline-offset:2px;}
-  .keus[aria-pressed="true"]{border-color:var(--goldlicht);background:rgba(201,162,75,.09);}
-  /* DE GEKOZEN KAART LEGT EEN GOUDWAS OVER ZIJN GROND, dus wordt die grond
-     lichter dan waar de zachte toon van het thema op gerekend is: 9% goud over
-     het paneel maakt er rgb(56,51,42) van, en daar haalt --rtg-soft 4,14:1. Een
-     GEKOZEN regel mag ook gewoon sterker staan, dus hij gaat een trede omhoog:
-     7,59:1. Wie de was zwaarder maakt, controleert dit opnieuw. */
-  .keus[aria-pressed="true"] span{color:var(--rtg-muted,var(--muted));}
-  .keus b{display:block;font-size:.96rem;margin-bottom:.15rem;}
-  .keus span{display:block;color:var(--soft);font-size:.8rem;line-height:1.5;}
+  html{background:#080a0b;color-scheme:dark;}
+  html body.rtg-settings-page.rtg-stijl{
+    --rtg-world-bg:#080a0b!important;--rtg-world-ground:#080a0b!important;
+    --rtg-world-card:#111315!important;--rtg-world-card-strong:#17191b!important;
+    --rtg-world-ink:#f4efe7!important;--rtg-world-muted:#b8b2a9!important;
+    --rtg-world-line:rgba(229,201,154,.16)!important;--rtg-world-metal:#e5c99a!important;
+    --rtg-world-photo:none!important;--rtg-world-photo-mask:none!important;
+    --edge-bar-dim:#d7cabb!important;
+    margin:0;background:#080a0b!important;background-image:none!important;color:#f4efe7!important;min-height:100dvh;
+  }
+  body.rtg-settings-page::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(circle at 50% 2%,rgba(205,171,113,.09),transparent 31%);}
+  body.rtg-settings-page .rtg-settings-top{position:sticky;top:var(--edge-top,44px);z-index:80;display:grid!important;
+    grid-template-columns:48px minmax(0,1fr) 48px;align-items:center;min-height:68px;padding:.55rem max(1rem,env(safe-area-inset-right)) .55rem max(1rem,env(safe-area-inset-left));
+    border-bottom:1px solid rgba(229,201,154,.18);background:rgba(8,10,11,.97)!important;color:#f4efe7!important;backdrop-filter:blur(18px);}
+  .rtg-settings-top h1{margin:0;text-align:center;font:500 clamp(1.32rem,4.8vw,1.7rem)/1.1 'Bodoni Moda',serif;
+    letter-spacing:-.025em;color:#f5efe5;}
+  body.rtg-settings-page .rtg-settings-back,body.rtg-settings-page .rtg-settings-avatar{width:44px;height:44px;display:grid;place-items:center;
+    border:1px solid rgba(229,201,154,.3)!important;border-radius:50%!important;background:rgba(229,201,154,.055)!important;color:#e5c99a!important;text-decoration:none;cursor:pointer;}
+  .rtg-settings-avatar{font:500 1rem 'Bodoni Moda',serif;}
+  .rtg-settings-back svg{width:22px;height:22px;}
+  body.rtg-settings-page .rtg-settings-shell{position:relative;z-index:1;width:min(100%,760px);margin:0 auto!important;
+    padding:1.2rem 0 calc(var(--edge-bottom,76px) + env(safe-area-inset-bottom,0px) + 2rem)!important;
+    background:#080a0b!important;color:#f4efe7!important;}
+  .rtg-settings-search-label{position:relative;display:block;margin:0 1rem 1rem;}
+  .rtg-settings-search-label svg{position:absolute;left:1rem;top:50%;width:20px;height:20px;color:#908d88;
+    transform:translateY(-50%);pointer-events:none;}
+  #instellingenZoek{display:block;width:100%;height:50px;margin:0;padding:0 1rem 0 3rem;border:1px solid rgba(229,201,154,.13);
+    border-radius:0;outline:none;background:#181b1e;color:#f5efe5;font:500 .92rem Inter,sans-serif;}
+  #instellingenZoek::placeholder{color:#8d8f92;}
+  #instellingenZoek:focus{border-color:rgba(229,201,154,.7);box-shadow:0 0 0 3px rgba(229,201,154,.08);}
+  body.rtg-settings-page .rtg-settings-intro{padding:1.2rem 1.25rem 1.35rem;background:linear-gradient(125deg,rgba(229,201,154,.09),transparent 62%)!important;color:#f4efe7!important;}
+  .rtg-settings-kicker{display:block;color:#d3c7b7!important;font-size:.66rem;font-weight:750;letter-spacing:.16em;text-transform:uppercase;}
+  .rtg-settings-intro h2{margin:.45rem 0 .28rem;font:500 clamp(1.65rem,6vw,2.25rem)/1.12 'Bodoni Moda',serif;
+    letter-spacing:-.035em;color:#fffaf2!important;text-transform:none!important;}
+  .rtg-settings-intro p{max-width:36rem;margin:0;color:#c7c0b6!important;font-size:.84rem;font-weight:500;line-height:1.55;}
+  body.rtg-settings-page .rtg-settings-group{padding:1.2rem 0 .45rem;border-top:8px solid #111417!important;background:#080a0b!important;color:#f4efe7!important;box-shadow:none!important;}
+  .rtg-settings-group h2{margin:0;padding:0 1.25rem .68rem;color:#ddd5ca!important;font:750 .69rem Inter,sans-serif;
+    letter-spacing:.12em;text-transform:uppercase;}
+  body.rtg-settings-page .rtg-settings-row{position:relative;width:100%;min-height:68px;display:grid!important;grid-template-columns:40px minmax(0,1fr) auto 18px;
+    align-items:center;gap:.62rem;padding:.65rem 1.1rem .65rem 1.25rem;border:0;background:transparent;color:#f2ede6;
+    text-decoration:none;text-align:left;font:inherit;cursor:pointer;border-radius:0!important;box-shadow:none!important;background-color:transparent!important;color:#f2ede6!important;}
+  .rtg-settings-row::after{content:"";position:absolute;right:1.1rem;bottom:0;left:4.25rem;height:1px;background:rgba(255,255,255,.055);}
+  body.rtg-settings-page .rtg-settings-row:hover,body.rtg-settings-page .rtg-settings-row:focus-visible{outline:0;background:linear-gradient(90deg,rgba(229,201,154,.09),rgba(229,201,154,.015))!important;}
+  body.rtg-settings-page .rtg-settings-row:active{background:rgba(229,201,154,.12)!important;}
+  .rtg-settings-row[hidden],.rtg-settings-group[hidden]{display:none!important;}
+  .rtg-settings-icon{width:36px;height:36px;display:grid;place-items:center;color:#d9c5a4;}
+  .rtg-settings-icon svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:round;stroke-linejoin:round;}
+  .rtg-settings-copy{min-width:0;}
+  .rtg-settings-name{display:block;font-size:.96rem;font-weight:650;line-height:1.28;color:#f5f0e8!important;}
+  .rtg-settings-note{display:block;margin-top:.16rem;color:#c6bfb5!important;font-size:.72rem;font-weight:500;line-height:1.4;}
+  .rtg-settings-value{color:#d0c7ba!important;font-size:.72rem;font-weight:600;white-space:nowrap;}
+  .rtg-settings-chevron{width:9px;height:9px;border-top:1.5px solid #8d9094;border-right:1.5px solid #8d9094;transform:rotate(45deg);}
+  .rtg-settings-world-living .rtg-settings-icon{color:#e5c99a;}
+  .rtg-settings-world-travel .rtg-settings-icon{color:#a72b50;}
+  .rtg-settings-world-foundation .rtg-settings-icon{color:#4f79e8;}
+  .rtg-settings-world-work .rtg-settings-icon{color:#f3efe8;}
+  .rtg-settings-danger{color:#df6077;}
+  #instellingenLeeg{display:none;padding:3.5rem 1.5rem;text-align:center;color:#a5a29d;}
+  #instellingenLeeg strong{display:block;margin-bottom:.35rem;color:#f3eee6;font:400 1.35rem 'Bodoni Moda',serif;}
+
+  .rtg-settings-overlay{position:fixed;z-index:9998;inset:0;display:grid;align-items:end;background:rgba(0,0,0,.62);
+    opacity:0;pointer-events:none;transition:opacity .18s ease;}
+  .rtg-settings-overlay[data-open="true"]{opacity:1;pointer-events:auto;}
+  .rtg-settings-dialog{position:relative;width:min(100%,760px);max-height:calc(100dvh - env(safe-area-inset-top,0px) - 2rem);
+    margin:0 auto;padding:0 1rem calc(env(safe-area-inset-bottom,0px) + 1.25rem);overflow:auto;border:1px solid rgba(229,201,154,.38);
+    border-bottom:0;border-radius:0;background:linear-gradient(155deg,#171513,#0b0c0e 42%);color:#f4efe7;
+    box-shadow:0 -24px 70px rgba(0,0,0,.68);transform:translateY(102%);transition:transform .24s cubic-bezier(.2,.8,.2,1);}
+  .rtg-settings-overlay[data-open="true"] .rtg-settings-dialog{transform:translateY(0);}
+  .rtg-settings-dialog-head{position:sticky;top:0;z-index:2;display:grid;grid-template-columns:1fr 44px;align-items:center;
+    padding:1rem 0 .85rem;background:linear-gradient(#151310 78%,rgba(21,19,16,0));}
+  .rtg-settings-dialog-head::before{content:"";position:absolute;top:.45rem;left:50%;width:42px;height:4px;border-radius:50%;
+    background:#625e57;transform:translateX(-50%);}
+  .rtg-settings-dialog-title{margin:.7rem 0 0;font:400 clamp(1.45rem,6vw,2rem)/1.15 'Bodoni Moda',serif;color:#f4efe7;}
+  .rtg-settings-close{width:44px;height:44px;margin-top:.55rem;border:1px solid rgba(229,201,154,.26);border-radius:50%;
+    background:rgba(229,201,154,.06);color:#e5c99a;font-size:1.45rem;cursor:pointer;}
+  .rtg-setting-pane{display:none;padding:.2rem 0 1rem;}
+  .rtg-setting-pane[data-active="true"]{display:block;}
+  .rtg-setting-pane>h2{margin:1.2rem 0 .6rem;font:400 1.45rem 'Bodoni Moda',serif;color:#f4efe7;}
+  .rtg-settings-dialog .kaart{margin:.5rem 0 1.2rem;padding:1rem;border:1px solid rgba(229,201,154,.16);border-radius:0;
+    background:rgba(255,255,255,.025);box-shadow:none;}
+  .rtg-settings-dialog input,.rtg-settings-dialog select{width:100%;min-height:48px;border:1px solid rgba(229,201,154,.22);border-radius:0;
+    background:#121416;color:#f4efe7;}
+  .keus{display:block;width:100%;min-height:52px;text-align:left;margin:.48rem 0;padding:.78rem .9rem;background:transparent;
+    border:1px solid rgba(229,201,154,.2);border-radius:0;color:#f2ede6;font:inherit;cursor:pointer;}
+  .keus:focus-visible{outline:2px solid #e5c99a;outline-offset:2px;}
+  .keus[aria-pressed="true"]{border-color:#d2b77f;background:rgba(210,183,127,.12);}
+  .keus[aria-pressed="true"] span{color:#d7d0c5;}
+  .keus b{display:block;font-size:.92rem;margin-bottom:.15rem;}
+  .keus span{display:block;color:#9d9a95;font-size:.77rem;line-height:1.5;}
   .vinkjes{display:flex;flex-wrap:wrap;gap:.4rem;margin:.5rem 0;}
-  .vinkjes label{display:flex;align-items:center;gap:.35rem;border:1px solid var(--line);border-radius:0;
-    padding:.4rem .8rem;font-size:.82rem;cursor:pointer;}
-  .vinkjes input{width:auto;}
+  .vinkjes label{display:flex;align-items:center;gap:.35rem;border:1px solid rgba(229,201,154,.2);border-radius:0;
+    padding:.48rem .72rem;font-size:.78rem;cursor:pointer;}
+  .vinkjes input{width:auto;min-height:0;}
   .stemming{font-family:'Bodoni Moda',serif;font-size:1.5rem;}
-  .welkom{border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;margin:1rem 0;
-    font-size:.85rem;line-height:1.6;color:var(--soft);}
-  .welkom strong{color:var(--txt);}
-  .instellingpoorten{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin:1rem 0 1.4rem;}
-  .instellingpoorten a{display:block;border:1px solid var(--line);border-radius:0;padding:.9rem 1rem;
-    color:var(--txt);text-decoration:none;font-weight:700;}
-  .instellingpoorten small{display:block;color:var(--soft);font-weight:400;line-height:1.4;margin-top:.25rem;}
-  @media(max-width:680px){.instellingpoorten{grid-template-columns:1fr;}}
+  body.rtg-settings-modal-open{overflow:hidden;}
+  @media(min-width:761px){
+    .rtg-settings-shell{border-right:1px solid rgba(229,201,154,.1);border-left:1px solid rgba(229,201,154,.1);}
+    .rtg-settings-top{top:var(--edge-top,44px);}
+  }
+  @media(max-width:760px){
+    .rtg-settings-top{top:var(--edge-top,44px);}
+    body[data-rtg-edge-2-state="compact"] .rtg-settings-top{top:0;}
+    .rtg-settings-value{max-width:7.5rem;overflow:hidden;text-overflow:ellipsis;}
+  }
+  @media(prefers-reduced-motion:reduce){.rtg-settings-overlay,.rtg-settings-dialog{transition:none;}}
 </style>
 <!-- De premium-laag. Sneltoetsen hebben hier echt werk: het deelmenu geeft ze
      1-5. Meenemen is hier bewust NIET geladen: deze pagina meldt geen bron aan,
@@ -49,78 +131,283 @@
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/plek.js" defer></script>
 <script src="/shared/veiligheid.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="living" data-rtg-skin="heritage">
+<body class="rtg-stijl rtg-settings-page" data-rtg-world="living" data-rtg-skin="heritage" data-rtg-eigenvlak="onyx" data-rtg-edge-2-state="overview" data-rtg-edge-2-auto="true">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
-<header class="kop">
-  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
-  <h1>INSTELLINGEN</h1>
-  <div class="rek"></div>
-  <span class="stil">voor Rahul</span>
-</header>
-<main id="inhoud">
-  <nav class="instellingpoorten" aria-label="Onderdelen van Instellingen">
-    <a href="#persoonlijk">Persoonlijk<small>Profiel, aanspreekvorm en voorkeuren</small></a>
-    <a href="/apps/passkeys.html">Passkeys<small>Veilig inloggen en toegang beheren</small></a>
-    <a href="/apps/juridisch.html">Juridisch<small>Voorwaarden, toestemmingen en afspraken</small></a>
-  </nav>
-  <div class="welkom">
-    <strong>Alles hier is van u, en alles is optioneel.</strong> Vult u niets in, dan krijgt u
-    precies dezelfde Rahul; alleen weet hij dan de dingen niet die u niet heeft verteld.
-    Hij raadt nooit iets: niet uw geloof uit uw naam, niet hoe u aangesproken wilt worden uit uw
-    paspoort. Wat u hier zet, blijft in huis en gaat nergens heen.
-  </div>
+<div class="rtg-settings-top" role="banner">
+  <a class="rtg-settings-back" href="/apps/rtg.html" aria-label="Terug naar RTG">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 4-8 8 8 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+  <h1>Instellingen</h1>
+  <button class="rtg-settings-avatar" type="button" data-open-settings="persoonlijk" aria-label="Open uw profiel">A</button>
+</div>
+<main id="inhoud" class="rtg-settings-shell">
+  <label class="rtg-settings-search-label" for="instellingenZoek">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 4.2 4.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    <input id="instellingenZoek" type="search" autocomplete="off" placeholder="Zoek in instellingen">
+  </label>
 
-  <section id="persoonlijk" aria-label="Waar staat u in het leven">
-    <h2>Waar staat u in het leven</h2>
-    <div class="kaart" id="fase"><p class="stil">Laden...</p></div>
+  <section class="rtg-settings-intro" id="instellingenIntro">
+    <span class="rtg-settings-kicker">Uw RTG</span>
+    <h2>Alles onder uw regie.</h2>
+    <p>Beheer één keer uw identiteit, werelden, privacy en Rahul AI.</p>
   </section>
 
-  <section aria-label="Hoe Rahul tegen u doet">
-    <h2>Hoe Rahul tegen u doet</h2>
-    <div class="kaart" id="omgang"><p class="stil">Laden...</p></div>
+  <section class="rtg-settings-group" data-settings-group>
+    <h2>Uw account</h2>
+    <button class="rtg-settings-row" type="button" data-open-settings="persoonlijk" data-search="rtg id profiel naam voornaamwoorden levensfase">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 19c.6-4 3-6 6.5-6s5.9 2 6.5 6"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">RTG ID</span><span class="rtg-settings-note">Profiel, aanspreekvorm en levensfase</span></span>
+      <span class="rtg-settings-value">Persoonlijk</span><span class="rtg-settings-chevron"></span>
+    </button>
+    <a class="rtg-settings-row" href="/apps/passkeys.html" data-search="toegang beveiliging passkey wachtwoord pincode biometrie">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 19 6v5.2c0 4.3-2.5 7.6-7 9.6-4.5-2-7-5.3-7-9.6V6l7-2.8Z"/><path d="m9.2 12 1.8 1.8 3.9-4"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Toegang en beveiliging</span><span class="rtg-settings-note">Passkeys, herstel en bescherming</span></span>
+      <span class="rtg-settings-value"></span><span class="rtg-settings-chevron"></span>
+    </a>
+    <a class="rtg-settings-row" href="/apps/mijn-sessies.html" data-search="apparaten sessies ingelogd toegang">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6.5" y="2.8" width="11" height="18.4" rx="2.2"/><path d="M10.2 5h3.6M10.2 18.8h3.6"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Apparaten en sessies</span><span class="rtg-settings-note">Waar u bent aangemeld</span></span>
+      <span class="rtg-settings-value"></span><span class="rtg-settings-chevron"></span>
+    </a>
+    <a class="rtg-settings-row" href="/apps/mijn-post.html" data-search="meldingen notificaties post berichten">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 10.2c0-3.5 2.1-5.8 5.5-5.8s5.5 2.3 5.5 5.8v3.3l1.6 2.4H4.9l1.6-2.4v-3.3Z"/><path d="M9.8 18.2c.5.9 1.2 1.4 2.2 1.4s1.7-.5 2.2-1.4"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Meldingen</span><span class="rtg-settings-note">Post en belangrijke updates</span></span>
+      <span class="rtg-settings-value"></span><span class="rtg-settings-chevron"></span>
+    </a>
   </section>
 
-  <section aria-label="Uw naam en voornaamwoorden">
-    <h2>Naam en voornaamwoorden</h2>
-    <div class="kaart">
-      <p class="stil">Hoe u genoemd wilt worden en wat er in uw paspoort staat, zijn twee
-      verschillende dingen. Hier telt het eerste.</p>
-      <label class="stil lbl" for="vnw">Voornaamwoorden</label>
-      <input id="vnw" maxlength="40" placeholder="Bijv. zij/haar, hij/hem, die/diens">
-      <label class="stil lbl" for="aanhef">Hoe spreekt Rahul u aan?</label>
-      <input id="aanhef" maxlength="40" placeholder="Uw naam, of hoe u genoemd wilt worden">
-      <button class="knop hoofd h-mt80" id="bewaar">Bewaren</button>
-    </div>
+  <section class="rtg-settings-group" data-settings-group>
+    <h2>Uw werelden</h2>
+    <a class="rtg-settings-row rtg-settings-world-living" href="/apps/rtg.html" data-search="livingos leven wonen welzijn champagne">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 11 8-6.5 8 6.5v8.2h-6v-5.4h-4v5.4H4V11Z"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">LivingOS</span><span class="rtg-settings-note">Dagelijks leven en welzijn</span></span>
+      <span class="rtg-settings-value">Champagne</span><span class="rtg-settings-chevron"></span>
+    </a>
+    <a class="rtg-settings-row rtg-settings-world-work" href="/apps/kantoor.html" data-search="workos werk organisaties classy zwart">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7.5" width="17" height="11.5" rx="2"/><path d="M9 7.5V5.8h6v1.7M3.5 12h17M10 12v2h4v-2"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">WorkOS</span><span class="rtg-settings-note">Werk en organisaties</span></span>
+      <span class="rtg-settings-value">Classy zwart</span><span class="rtg-settings-chevron"></span>
+    </a>
+    <a class="rtg-settings-row rtg-settings-world-travel" href="/apps/reizen.html" data-search="travelos reizen onderweg bordeaux rood">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m3 13 7.3 1 4.5 6 1.6-.6-2-6.2 5.1-2.6c1.5-.8 2-2.2 1.5-3.1-.6-.9-2-.9-3.3.1l-4.5 3.4-6.3-2.3-1.3 1.1 4.7 3-5.7-.7L3 13Z"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">TravelOS</span><span class="rtg-settings-note">Reizen en onderweg</span></span>
+      <span class="rtg-settings-value">Bordeaux</span><span class="rtg-settings-chevron"></span>
+    </a>
+    <a class="rtg-settings-row rtg-settings-world-foundation" href="/apps/foundation/os-publiek.html" data-search="foundationos stichting fundament koninklijk blauw">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19h16M6 16h12M7.5 16V9m4.5 7V9m4.5 7V9M5 8.8h14L12 4 5 8.8Z"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">FoundationOS</span><span class="rtg-settings-note">Mens, samenleving en fundament</span></span>
+      <span class="rtg-settings-value">Koninklijk blauw</span><span class="rtg-settings-chevron"></span>
+    </a>
   </section>
 
-  <section aria-label="Hoe het scherm zich gedraagt">
-    <h2>Hoe het scherm zich gedraagt</h2>
-    <div class="kaart" id="toegankelijk"><p class="stil">Laden...</p></div>
+  <section class="rtg-settings-group" data-settings-group>
+    <h2>Privacy en gegevens</h2>
+    <a class="rtg-settings-row" href="/apps/juridisch.html" data-search="privacy mandaat toestemming juridisch voorwaarden">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Privacy en mandaat</span><span class="rtg-settings-note">Wat RTG mag zien en doen</span></span>
+      <span class="rtg-settings-value">Uw regie</span><span class="rtg-settings-chevron"></span>
+    </a>
+    <a class="rtg-settings-row" href="/apps/mijn-relaties.html" data-search="relaties toegang delen organisaties wie">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="8.5" cy="8" r="3"/><circle cx="16.5" cy="9.5" r="2.4"/><path d="M3 19c.5-3.7 2.5-5.7 5.5-5.7s5 2 5.5 5.7M14 14.2c3.6-.8 6.2 1.1 6.7 4.8"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Wie heeft toegang</span><span class="rtg-settings-note">Relaties en gedeelde gegevens</span></span>
+      <span class="rtg-settings-value"></span><span class="rtg-settings-chevron"></span>
+    </a>
+    <a class="rtg-settings-row" href="/apps/mijn-gegevens.html" data-search="gegevens data downloaden bewaren export">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v11m-4-4 4 4 4-4M5 19.5h14"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Uw gegevens</span><span class="rtg-settings-note">Inzien, downloaden en bewaren</span></span>
+      <span class="rtg-settings-value"></span><span class="rtg-settings-chevron"></span>
+    </a>
+    <a class="rtg-settings-row" href="/apps/geld.html" data-search="betaling abonnement facturen geld">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="2"/><path d="M3.5 9h17M7 15h4"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Betalingen en abonnement</span><span class="rtg-settings-note">Betaalmethoden en facturen</span></span>
+      <span class="rtg-settings-value"></span><span class="rtg-settings-chevron"></span>
+    </a>
   </section>
 
-  <section aria-label="Welke hand u gebruikt">
-    <h2>Welke hand u gebruikt</h2>
-    <div class="kaart" id="hand"></div>
+  <section class="rtg-settings-group" data-settings-group>
+    <h2>Rahul AI</h2>
+    <button class="rtg-settings-row" type="button" data-open-settings="rahul" data-search="rahul ai voorkeuren toon omgang initiatief stemming">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8c.9 5.4 3 7.5 8.4 8.4-5.4.9-7.5 3-8.4 8.4-.9-5.4-3-7.5-8.4-8.4 5.4-.9 7.5-3 8.4-8.4Z"/><path d="M18.5 3.8v3.5M20.2 5.5h-3.5"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">AI-voorkeuren</span><span class="rtg-settings-note">Aanspreekvorm, toon en omgang</span></span>
+      <span class="rtg-settings-value">Menselijk</span><span class="rtg-settings-chevron"></span>
+    </button>
+    <button class="rtg-settings-row" type="button" data-open-settings="levensbeschouwing" data-search="context geheugen geloof levensbeschouwing feestdagen gebed">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.2 7.2H2.8V4.8M3.5 7a8.5 8.5 0 1 1 .4 10.6"/><path d="M12 7.4V12l3 1.8"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Context en geheugen</span><span class="rtg-settings-note">Altijd inzichtelijk en aanpasbaar</span></span>
+      <span class="rtg-settings-value">Optioneel</span><span class="rtg-settings-chevron"></span>
+    </button>
+    <a class="rtg-settings-row" href="/apps/app.html#ai" data-search="gesprek historie chat ai rahul">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4.5" cy="6" r="1" fill="currentColor" stroke="none"/><circle cx="4.5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="4.5" cy="18" r="1" fill="currentColor" stroke="none"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Gesprek met Rahul</span><span class="rtg-settings-note">Open uw beveiligde gesprek</span></span>
+      <span class="rtg-settings-value"></span><span class="rtg-settings-chevron"></span>
+    </a>
   </section>
 
-  <section aria-label="Geloof of levensbeschouwing">
-    <h2>Geloof of levensbeschouwing</h2>
-    <div class="kaart" id="geloof"><p class="stil">Laden...</p></div>
+  <section class="rtg-settings-group" data-settings-group>
+    <h2>Weergave en bediening</h2>
+    <button class="rtg-settings-row" type="button" data-open-settings="weergave" data-search="taal weergave toegankelijk contrast tekst beweging">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.2"/><path d="M3.8 12h16.4M12 3.8c2.1 2.3 3.2 5 3.2 8.2s-1.1 5.9-3.2 8.2C9.9 17.9 8.8 15.2 8.8 12S9.9 6.1 12 3.8Z"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Taal en weergave</span><span class="rtg-settings-note">Tekst, contrast en beweging</span></span>
+      <span class="rtg-settings-value">Nederlands</span><span class="rtg-settings-chevron"></span>
+    </button>
+    <button class="rtg-settings-row" type="button" data-open-settings="bediening" data-search="hand links rechts bediening duim toestel">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 12V5.5a1.5 1.5 0 0 1 3 0V11m0-5.5a1.5 1.5 0 0 1 3 0V11m0-4.5a1.5 1.5 0 0 1 3 0V12m0-2.5a1.5 1.5 0 0 1 3 0v4.1c0 4.4-2.7 7-7.2 7-3.7 0-5.8-1.7-7.5-4.6l-2-3.4a1.6 1.6 0 0 1 2.6-1.8l2.1 2.2V12Z"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Bediening</span><span class="rtg-settings-note">Links- of rechtshandig</span></span>
+      <span class="rtg-settings-value">Dit toestel</span><span class="rtg-settings-chevron"></span>
+    </button>
   </section>
 
-  <section aria-label="Vandaag" id="vandaagVak" hidden>
-    <h2>Vandaag</h2>
-    <div class="kaart" id="vandaag"><p class="stil">Laden...</p></div>
+  <section class="rtg-settings-group" data-settings-group>
+    <h2>Hulp en informatie</h2>
+    <a class="rtg-settings-row" href="/apps/veilig.html" data-search="hulp veiligheid ondersteuning accountstatus">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.8 9.4a2.4 2.4 0 1 1 3.8 2c-1.2.8-1.6 1.3-1.6 2.4M12 17.2h.01"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Hulp en veiligheid</span><span class="rtg-settings-note">Directe hulp en veiligheidsfuncties</span></span>
+      <span class="rtg-settings-value"></span><span class="rtg-settings-chevron"></span>
+    </a>
+    <a class="rtg-settings-row" href="/apps/mijn-isolatie.html" data-search="account status bescherming beveiliging">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.2 19 6v5.2c0 4.3-2.5 7.6-7 9.6-4.5-2-7-5.3-7-9.6V6l7-2.8Z"/><path d="m9.2 12 1.8 1.8 3.9-4"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Accountstatus</span><span class="rtg-settings-note">Bescherming en aandachtspunten</span></span>
+      <span class="rtg-settings-value">Controleren</span><span class="rtg-settings-chevron"></span>
+    </a>
+    <a class="rtg-settings-row" href="/apps/juridisch.html#privacy" data-search="over rtg privacycentrum voorwaarden informatie">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 10.7v5.1M12 7.7h.01"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Privacycentrum en over RTG</span></span>
+      <span class="rtg-settings-value"></span><span class="rtg-settings-chevron"></span>
+    </a>
+    <a class="rtg-settings-row rtg-settings-danger" href="/apps/mijn-sessies.html" data-search="afmelden uitloggen sessie">
+      <span class="rtg-settings-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5v8M6.6 7A8 8 0 1 0 17.4 7"/></svg></span>
+      <span class="rtg-settings-copy"><span class="rtg-settings-name">Afmelden</span><span class="rtg-settings-note">Beheer of sluit deze sessie</span></span>
+      <span class="rtg-settings-value"></span><span class="rtg-settings-chevron"></span>
+    </a>
   </section>
 
-  <section aria-label="Hoe Rahul erbij zit">
-    <h2>Hoe Rahul er vandaag bij zit</h2>
-    <div class="kaart" id="bui"><p class="stil">Laden...</p></div>
-  </section>
+  <p id="instellingenLeeg" role="status"><strong>Niets gevonden</strong>Probeer een andere zoekterm.</p>
 </main>
+
+<div class="rtg-settings-overlay" id="instellingenDialoog" data-open="false" aria-hidden="true" inert>
+  <section class="rtg-settings-dialog" role="dialog" aria-modal="false" aria-labelledby="instellingenDialoogTitel">
+    <header class="rtg-settings-dialog-head">
+      <h2 class="rtg-settings-dialog-title" id="instellingenDialoogTitel">Uw instellingen</h2>
+      <button class="rtg-settings-close" type="button" aria-label="Sluiten">&times;</button>
+    </header>
+
+    <section class="rtg-setting-pane" data-settings-pane="persoonlijk">
+      <span class="rtg-settings-kicker">Uw RTG ID</span>
+      <h2>Profiel en aanspreekvorm</h2>
+      <div class="kaart">
+        <p class="stil">Hoe u genoemd wilt worden en wat er in uw paspoort staat, zijn twee verschillende dingen. Hier telt het eerste.</p>
+        <label class="stil lbl" for="vnw">Voornaamwoorden</label>
+        <input id="vnw" maxlength="40" placeholder="Bijv. zij/haar, hij/hem, die/diens">
+        <label class="stil lbl" for="aanhef">Hoe spreekt Rahul u aan?</label>
+        <input id="aanhef" maxlength="40" placeholder="Uw naam, of hoe u genoemd wilt worden">
+        <button class="knop hoofd h-mt80" id="bewaar">Bewaren</button>
+      </div>
+      <h2>Waar staat u in het leven</h2>
+      <div class="kaart" id="fase"><p class="stil">Laden...</p></div>
+    </section>
+
+    <section class="rtg-setting-pane" data-settings-pane="rahul">
+      <span class="rtg-settings-kicker">Rahul AI</span>
+      <h2>Hoe Rahul tegen u doet</h2>
+      <div class="kaart" id="omgang"><p class="stil">Laden...</p></div>
+      <h2>Hoe Rahul er vandaag bij zit</h2>
+      <div class="kaart" id="bui"><p class="stil">Laden...</p></div>
+    </section>
+
+    <section class="rtg-setting-pane" data-settings-pane="weergave">
+      <span class="rtg-settings-kicker">Voor alle schermen</span>
+      <h2>Taal en weergave</h2>
+      <div class="kaart" id="toegankelijk"><p class="stil">Laden...</p></div>
+    </section>
+
+    <section class="rtg-setting-pane" data-settings-pane="bediening">
+      <span class="rtg-settings-kicker">Dit toestel</span>
+      <h2>Welke hand gebruikt u?</h2>
+      <div class="kaart" id="hand"></div>
+    </section>
+
+    <section class="rtg-setting-pane" data-settings-pane="levensbeschouwing">
+      <span class="rtg-settings-kicker">Vrijwillige context</span>
+      <h2>Geloof of levensbeschouwing</h2>
+      <div class="kaart" id="geloof"><p class="stil">Laden...</p></div>
+      <section aria-label="Vandaag" id="vandaagVak" hidden>
+        <h2>Vandaag</h2>
+        <div class="kaart" id="vandaag"><p class="stil">Laden...</p></div>
+      </section>
+    </section>
+  </section>
+</div>
+
+<script>
+(() => {
+  const dialoog = document.getElementById('instellingenDialoog');
+  const dialoogVak = dialoog.querySelector('.rtg-settings-dialog');
+  const titel = document.getElementById('instellingenDialoogTitel');
+  const sluit = dialoog.querySelector('.rtg-settings-close');
+  const zoek = document.getElementById('instellingenZoek');
+  const rijen = [...document.querySelectorAll('.rtg-settings-row')];
+  const groepen = [...document.querySelectorAll('[data-settings-group]')];
+  const paneelTitels = {
+    persoonlijk: 'Profiel en RTG ID',
+    rahul: 'Rahul AI-voorkeuren',
+    weergave: 'Taal en weergave',
+    bediening: 'Bediening',
+    levensbeschouwing: 'Context en geheugen'
+  };
+  let opener = null;
+
+  function openPaneel(naam, knop) {
+    const paneel = dialoog.querySelector('[data-settings-pane="' + naam + '"]');
+    if (!paneel) return;
+    opener = knop || null;
+    dialoog.querySelectorAll('[data-settings-pane]').forEach(el => el.dataset.active = String(el === paneel));
+    titel.textContent = paneelTitels[naam] || 'Uw instellingen';
+    dialoog.dataset.open = 'true';
+    dialoog.setAttribute('aria-hidden', 'false');
+    dialoog.inert = false;
+    dialoogVak.setAttribute('aria-modal', 'true');
+    document.body.classList.add('rtg-settings-modal-open');
+    dialoogVak.scrollTop = 0;
+    sluit.focus();
+  }
+
+  function sluitPaneel() {
+    dialoog.dataset.open = 'false';
+    dialoog.setAttribute('aria-hidden', 'true');
+    dialoog.inert = true;
+    dialoogVak.setAttribute('aria-modal', 'false');
+    document.body.classList.remove('rtg-settings-modal-open');
+    if (opener) opener.focus();
+  }
+
+  document.querySelectorAll('[data-open-settings]').forEach(knop => {
+    knop.addEventListener('click', () => openPaneel(knop.dataset.openSettings, knop));
+  });
+  sluit.addEventListener('click', sluitPaneel);
+  dialoog.addEventListener('click', e => { if (e.target === dialoog) sluitPaneel(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && dialoog.dataset.open === 'true') sluitPaneel(); });
+
+  zoek.addEventListener('input', () => {
+    const taal = document.documentElement.lang || navigator.language;
+    const term = zoek.value.trim().toLocaleLowerCase(taal);
+    let zichtbaar = 0;
+    rijen.forEach(rij => {
+      const raak = !term || (rij.dataset.search || rij.textContent).toLocaleLowerCase(taal).includes(term);
+      rij.hidden = !raak;
+      if (raak) zichtbaar++;
+    });
+    groepen.forEach(groep => {
+      groep.hidden = ![...groep.querySelectorAll('.rtg-settings-row')].some(rij => !rij.hidden);
+    });
+    document.getElementById('instellingenIntro').hidden = Boolean(term);
+    document.getElementById('instellingenLeeg').style.display = zichtbaar ? 'none' : 'block';
+  });
+
+  if (location.hash === '#persoonlijk') openPaneel('persoonlijk');
+})();
+</script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -332,8 +619,6 @@
   else window.addEventListener('load', start);
 })();
 </script>
-<script src="/shared/deelmenu.js" defer></script>
-<script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

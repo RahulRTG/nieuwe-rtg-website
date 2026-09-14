@@ -944,6 +944,31 @@ test('Reizen & Veilig opent vervoer als direct RTG-werkblad met één onderbalk'
          vijf keer, met en zonder de wijzigingen van die dag. Opnieuw pakken is
          hier dus de juiste reparatie; een langere wachttijd zou de race alleen
          onzichtbaar maken. */
+      /* EN EERST WACHTEN TOT DE BALK BIJ HET BLAD IS. De lus hieronder pakt de
+         knop opnieuw als hij ONDER je handen verdwijnt; hij dekt niet het geval
+         dat hij er nog helemaal niet IS. Dan telt `count()` nul, breekt de lus
+         meteen af, en valt de toets terug op Meer -- die op dat moment nog
+         verborgen is omdat er niets overloopt in de OUDE rij. De uitslag was
+         dan "Gaan is ook niet via Meer bereikbaar", en dat leest als een
+         onbereikbare functie terwijl de balk simpelweg nog de vorige stand
+         toonde (CI-ronde 34766353782, schermdeel 1; dezelfde toets liep in
+         dezelfde boom lokaal wel door).
+
+         Wachten op de balk en niet op een klok, om de reden die twintig regels
+         hierboven staat: de balk volgt het blad, dus we wachten tot hij dit
+         vermogen toont OF tot Meer zichtbaar wordt -- die twee samen zijn
+         precies "de balk is bij". */
+      const balkBij = await page.waitForFunction((cap) => {
+        const wortel = document.querySelector('#rtgCommand');
+        if (!wortel) return false;
+        const knop = wortel.querySelector('.cmd-actie[data-cap="' + cap + '"]');
+        if (knop && knop.getBoundingClientRect().height > 0) return true;
+        const m = wortel.querySelector('.cmd-meer');
+        return !!(m && !m.hidden && m.getBoundingClientRect().height > 0);
+      }, id, { timeout: 20000 }).then(() => true, () => false);
+      assert.equal(balkBij, true,
+        label + ': de actiebalk toonde binnen 20 s noch de knop zelf noch Meer');
+
       const directeKnop = () => page.locator('#rtgCommand .cmd-actie[data-cap="' + id + '"]');
       for (let poging = 0; poging < 3; poging++) {
         const direct = directeKnop();

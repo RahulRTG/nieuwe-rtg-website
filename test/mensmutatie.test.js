@@ -78,7 +78,12 @@ test('3b. elke mutatie zegt in EEN woord wat zij bewaakt, en een fasenaam bestaa
      het soort stilte waar dit huis op let.
      MUTATIE: schrijf `INTENT_RESOLVD` bij mutatie 2. */
   const { FASEN } = require('../server/kern/stuur/spoor');
-  const EIGEN = ['trede', 'referent', 'onbekendeZin', 'blokkerendeVragen', 'architectuurkeuze'];
+  /* `intrekken` kwam erbij op 13 september 2026, met het besluit dat een lid een
+     klaargezet voorstel conversationeel mag laten vervallen. Hij staat hier en
+     niet bij de FASEN omdat hij geen fase van het spoor bewaakt maar een BELOFTE
+     over de poort: precies EEN eenduidig voorstel, of niets. */
+  const EIGEN = ['trede', 'referent', 'onbekendeZin', 'blokkerendeVragen', 'architectuurkeuze',
+    'intrekken'];
   for (const m of MUTATIES) {
     assert.ok(m.bewaakt, 'mutatie ' + m.nr + ' zegt niet wat zij bewaakt');
     const isFase = m.bewaakt === m.bewaakt.toUpperCase();

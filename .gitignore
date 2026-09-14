@@ -106,3 +106,22 @@ dump.rdb
 
 # de ruwe waarnemingen van scripts/lib/geldwacht.js (GELDKAART.json is de uitslag)
 .geldwacht.jsonl
+
+# EN DE TWEE DIE GEEN KOPPELTEKENS MOGEN DRAGEN. test/meterijk.test.js zet voor
+# de ijking van `verstrengelingOnverklaard` server/kern/zzijkbron.js neer, dat
+# ./zzijkdoel requireert. Die namen missen met OPZET de koppeltekens van hun
+# acht broertjes hierboven: de meter groepeert op `familie` -- alles voor het
+# eerste koppelteken -- dus `zz-ijk-bron` en `zz-ijk-doel` zouden allebei
+# familie `zz` heten, de rand zou als EIGEN_DATA tellen en de meter zou niet
+# bewegen. De ijking zou dan concluderen dat hij niet beweegbaar is terwijl hij
+# precies deed wat hij hoort te doen.
+#
+# Die noodzakelijke naam viel buiten elk patroon hierboven, en op 13 september
+# 2026 is zzijkbron.js daardoor met een `git add -A` meegecommit terwijl de
+# ijking liep. Precies het ongeluk dat de regel hierboven beschrijft ("dat
+# scheelde hier een keer een haar"), nu wel gebeurd. test/afbouwpoort.test.js
+# houdt sindsdien elk tijdelijk pad uit meterijk.test.js naast deze lijst, zodat
+# een volgende naam die buiten de patronen valt de build laat zakken in plaats
+# van in de repo te belanden.
+zzijk*
+**/zzijk*

@@ -26,6 +26,12 @@ const fs = require('fs');
 const path = require('path');
 const O = require('../scripts/objectmodel');
 
+/* MEET NIET NAAST EEN MOTOR DIE DE BRON VERBOUWT (scripts/lib/verseboom.js).
+   Deze toets meet de boom OPNIEUW en legt de uitslag naast OBJECTMODEL.json;
+   loopt er intussen een meterijking of de mutatiemotor, dan telt hij hun
+   tijdelijke aanbouw mee en is het verschil met het register betekenisloos.
+   Zo meldde test/magnaatlab.test.js een keer 2069 waar er 2068 stonden. */
+const { afbouwInDeWeg } = require('../scripts/lib/verseboom');
 const V = (module, velden) => ({ module, velden });
 /* De envelopdrempel als ABSOLUUT getal in plaats van een deel. Met een deel is
    in een voorbeeld van drie domeinen niet uit te drukken "in drie domeinen is
@@ -130,7 +136,13 @@ test('6. seed- en catalogusbestanden tellen niet mee', () => {
   assert.ok(g.vormen.length > 500, 'en er blijft ruim genoeg over om iets over te zeggen: ' + g.vormen.length);
 });
 
-test('7. OBJECTMODEL.json is een AFDRUK van de meting en geen los verhaal', () => {
+test('7. OBJECTMODEL.json is een AFDRUK van de meting en geen los verhaal', (t) => {
+  /* De vergelijking hieronder is alleen iets waard op een boom die NIEMAND
+     aan het verbouwen is; zie scripts/lib/verseboom.js. Overslaan is hier geen
+     slagen: de reden gaat mee de uitslag in. */
+  const inDeWeg = afbouwInDeWeg('objectmodel');
+  if (inDeWeg) return t.skip(inDeWeg);
+
   /* Zelfde regel als SLO.md/SLO.json en BEREIK.json: twee plaatsen met dezelfde
      waarheid lopen uit elkaar. Wie de code verandert en dit bestand niet
      bijwerkt, ziet het hier. */

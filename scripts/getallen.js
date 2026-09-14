@@ -362,6 +362,15 @@ const GETALLEN = {
      hoeveel garanties je uit de menselijke uitvoeringsketen kunt HALEN terwijl
      een wacht afgaat, en hoeveel je eruit kunt halen zonder dat iemand het
      merkt. Dat tweede getal is het enige dat naar nul moet. */
+  /* DE NOEMER OOK, en om precies dezelfde reden als bij menselijk.scenarios: hij
+     stond als WOORD in de kop en in de tekst ("de twaalf mutaties", "van de
+     twaalf") terwijl de teller ernaast automatisch meegroeide. Toen er vier
+     mutaties bij kwamen las er "15 van de twaalf". Een noemer die stilstaat
+     terwijl de teller beweegt, maakt van twee kloppende getallen een verkeerde
+     verhouding -- en daar kijkt geen enkele controle naar zolang hij geen
+     merkteken draagt. */
+  'mensmutatie.totaal': { bron: 'MENSMUTATIE.json', veld: 'telling.mutaties',
+    wat: 'semantische mutaties in de batterij van scripts/mensmutatie.js' },
   'mensmutatie.gezakt': { bron: 'MENSMUTATIE.json', veld: 'telling.gezakt',
     wat: 'mutaties die een wacht lieten zakken' },
   'mensmutatie.zonderWacht': { bron: 'MENSMUTATIE.json', veld: 'telling.geenWacht',
@@ -371,6 +380,12 @@ const GETALLEN = {
      context die AANKOMT, context die de resolver GEBRUIKT, en gevallen waarin de
      resolver niet eens draaide -- dan heeft NIEMAND GEKEKEN, en dat is iets
      anders dan "de context deed niets". */
+  /* De noemer hoort ook een levend getal te zijn. Hij stond als woord in de
+     tekst ("van de 31 zinnen", "een van de vierendertig") terwijl het corpus
+     doorgroeide, en dan drijft de noemer weg van de teller die er in dezelfde
+     zin naast staat -- precies wat deze merktekens moeten uitsluiten. */
+  'menselijk.scenarios': { bron: 'MENSELIJKE_UITVOERING.json', veld: 'telling.scenarios',
+    wat: 'gedragsgevallen in de menselijke-uitvoeringsprojectie' },
   'menselijk.contextAangeboden': { bron: 'MENSELIJKE_UITVOERING.json', veld: 'telling.contextAangeboden',
     wat: 'scenario\'s waarin context is aangeboden en gesaneerd' },
   'menselijk.contextGebruikt': { bron: 'MENSELIJKE_UITVOERING.json', veld: 'telling.contextGebruikt',

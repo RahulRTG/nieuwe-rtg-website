@@ -112,6 +112,13 @@ module.exports = [
     reden: 'mall/aanbod.js r.52 leest ratingVanZaak: de waardering van een zaak hoort bij de ervaring en wordt in de mall alleen getoond' },
   { van: 'domein:stadsweefsel', naar: 'domein:navigatie', soort: 'DOMEINRELATIE',
     reden: 'stadsweefsel/geografie.js r.31 gebruikt REF en BOUNDS: waar Nederland ligt staat op een plek' },
+  /* DE BEZORGING EN DE ONTVANGEROPLOSSING. kern/werk-bezorging.js weet WELKE
+     berichten een sollicitant krijgt; kern/ontvanger.js weet LANGS WELKE WEG je
+     een mens bereikt. Dat is met opzet uit elkaar gehaald: de tweede kent geen
+     domein en is daarom herbruikbaar voor de volgende ontvangervorm. De eerste
+     heeft de tweede dus echt nodig -- dat is de relatie zelf en geen lek. */
+  { van: 'domein:werk-bezorging', naar: 'domein:ontvanger', soort: 'DOMEINRELATIE',
+    reden: 'werk-bezorging.js stelt het bericht samen en ontvanger.js kiest de weg: de bezorger is gebouwd op maakBezorger() en leest de rij met uitSollicitatie()' },
   { van: 'domein:vakwerk', naar: 'domein:klantenboek', soort: 'DOMEINRELATIE',
     reden: 'vakwerk/index.js r.28 gebruikt geldDag uit het klantenboek: de vakman werkt op de dagen die bij de klant staan' },
   { van: 'domein:school', naar: 'domein:schooladvies', soort: 'DOMEINRELATIE',

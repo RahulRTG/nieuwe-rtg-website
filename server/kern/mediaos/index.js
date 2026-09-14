@@ -75,7 +75,12 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
   /* En de andere kant van die voorkeur: nieuw werk wekt de volgers die dit
      soort van deze maker aan hebben staan (./wekken.js). De vier domeinen
      roepen dat aan via een laat gebonden haak in ./opzet/kernlaag*.js. */
-  const wekken = maakWekken({ notify, codenaamVan, meldVan, bronnen });
+  /* DE PUBLIEKE AANWEZIGHEID (./aanwezigheid.js): het adres waarop een lid zich
+     abonneert, gedragen door een mens OF een organisatie. Hij staat VOOR de
+     wekmotor omdat die hem leest -- zonder aanwezigheid kan een festival of een
+     club niemand wekken, en dat was precies de bevinding van WEKDEKKING.json. */
+  const aanwezig = require('./aanwezigheid')({ db, save, schoon, codenaamVan });
+  const wekken = maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig });
 
   /* VOLGEN staat in ./volgen.js: één knop die in Clips en het Theater tegelijk
      schrijft, en met opzet NIET in het betaalde Podium-abonnement. Dat is een
@@ -143,6 +148,13 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
     mediaSmaakVan: (sess) => ({ status: 200, smaak: smaak.smaakVan(sess.key), regelaars: smaak.smaakRegelaars() }),
     mediaStuk: hub.mediaStuk, mediaMaker: hub.mediaMaker, mediaBord: hub.mediaBord,
     mediaNieuwWerk: wekken.mediaNieuwWerk, mediaVolgersVan: wekken.mediaVolgersVan,
+    /* De aanwezigheidslaag. `mediaNieuwMoment` is de haak voor alles wat GEEN
+       mens is; `aanwezigZorg` is wat een domein aanroept als het publiek wordt. */
+    mediaNieuwMoment: wekken.mediaNieuwMoment,
+    aanwezigZorg: aanwezig.aanwezigZorg, aanwezigVan: aanwezig.aanwezigVan,
+    aanwezigMet: aanwezig.aanwezigMet, aanwezigVolg: aanwezig.aanwezigVolg,
+    aanwezigVolgtHij: aanwezig.aanwezigVolgtHij, aanwezigMijn: aanwezig.aanwezigMijn,
+    aanwezigVolgersVan: aanwezig.aanwezigVolgersVan, aanwezigBeeld: aanwezig.aanwezigBeeld,
     MEDIA_MODI: MODI, MEDIA_MELD_SOORTEN: MELD_SOORTEN
   });
 }

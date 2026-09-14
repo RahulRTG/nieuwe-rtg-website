@@ -45,7 +45,17 @@ module.exports = (kern) => {
        (pakte=false), dan mag hij het met het AI-stuur alsnog echt DOEN;
        alles wat het lid zelf kan, met de eigen inlog en de geld-drempel.
        Zonder AI-sleutel bestaat stuurLus niet en blijft alles zoals het was. */
-    if (stuurLus && !r.pakte) {
+    /* `stuurMagKijken` is de ENIGE uitbreiding op "pakte het zelf niet", en hij
+       komt uit kern/fluister/bevestig.js: een "nee"/"toch niet" waarbij die laag
+       niets van zichzelf had staan. De keuze om niets te doen blijft daarmee bij
+       de laag die als enige weet of zij iets open had -- deze route classificeert
+       geen zinnen en kijkt in geen enkele voorstellenlijst.
+
+       EN HET IS GEEN GRATIS BIJEFFECT: vindt het stuur niets, dan levert de lus
+       geen tekst en valt het antwoord van hierboven gewoon terug op zijn plek.
+       Een zin die vandaag niets doet, doet pas iets zodra er echt een voorstel
+       openstaat en de rail de zin herkent. */
+    if (stuurLus && (!r.pakte || r.stuurMagKijken)) {
       const lus = await stuurLus(req, {
         vraag: req.body.q,
         wereld: 'member',

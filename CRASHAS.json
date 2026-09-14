@@ -1,0 +1,3154 @@
+{
+  "stempel": {
+    "op": "2026-09-13T10:49:58.911Z",
+    "commit": "ca7925ecc",
+    "boomVuil": false,
+    "boomAnders": 3,
+    "instrument": "scripts/crashas.js",
+    "node": "v22.22.2"
+  },
+  "soort": "meting",
+  "instrument": "scripts/crashas.js",
+  "uitleg": "Per geldroute en per crashgrens: BESTAAT die grens hier, hoe hard weten we dat, en is hij te beproeven. Dit is een classificatie en geen oordeel over de code.",
+  "grens": "Bestaan en meetbaarheid worden nooit opgeteld. Een grens die niet bestaat is geen bewezen grens, en een grens zonder injectiepunt is niet weerlegd maar ongemeten.",
+  "bronnen": [
+    "GELDDEKKING.json",
+    "scripts/lib/crashtaxonomie.js",
+    "server/lib/verraad.js",
+    "FACTUURPROEF.json",
+    "CRASHPROEF.json"
+  ],
+  "contracten": {
+    "ATOMIC": "Een interne operatie is alles of niets. Er bestaat geen moment waarop een deel van de uitkomst duurzaam is en de rest niet -- ook niet als het proces er middenin sterft.",
+    "RECOVERABLE": "Na een crash kan RTG deterministisch ontdekken waar hij gebleven was en veilig verdergaan. Dat is iets ANDERS dan atomair: een operatie die netjes half is afgebroken kan herstelbaar zijn, en een atomaire operatie kan onherstelbaar zijn als niemand kan zien dat hij is gebeurd.",
+    "EXTERNALLY_RECONCILABLE": "Heeft een aanbieder mogelijk al gecommit terwijl RTG het antwoord verloor, dan kan RTG de waarheid terugvinden. Deze derde bestaat omdat de eerste twee alleen over de eigen opslag gaan, en het duurste geldverlies juist buiten de deur ontstaat."
+  },
+  "grenzen": {
+    "voor-eerste-mutatie": "het proces sterft voordat er iets is gemuteerd",
+    "in-de-opslag": "het proces sterft MIDDENIN de onderliggende schrijfactie",
+    "na-commit-voor-antwoord": "de schrijfactie is duurzaam, de aanroeper heeft nog niets gehoord",
+    "na-commit-voor-bericht": "de herstart valt tussen de commit en het bericht aan de betrokkene",
+    "providercommit-zonder-antwoord": "een aanbieder heeft geboekt en RTG kreeg het antwoord niet",
+    "ambigu-extern-resultaat": "het externe resultaat is onbeslist en moet worden verzoend"
+  },
+  "injectiepunten": {
+    "voor-eerste-mutatie": {
+      "verraad": "sterf-voor-mutatie",
+      "waarom": "ingebouwd in server/db/bijeen.js, voor fn() van de buitenste bundel: op dat punt staat vast dat er nog niets is gemuteerd"
+    },
+    "in-de-opslag": {
+      "verraad": null,
+      "waarom": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+    },
+    "na-commit-voor-antwoord": {
+      "verraad": "sterf-na-commit",
+      "waarom": "ingebouwd in server/db/index.js, in de duurzame commit zelf: na de bevestigde schrijfactie en voor het antwoord"
+    },
+    "na-commit-voor-bericht": {
+      "verraad": null,
+      "waarom": "er is geen haak tussen de commit en het versturen van het bericht"
+    },
+    "providercommit-zonder-antwoord": {
+      "verraad": null,
+      "waarom": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+    },
+    "ambigu-extern-resultaat": {
+      "verraad": null,
+      "waarom": "vraagt een aanbieder met een onbesliste uitkomst"
+    }
+  },
+  "aanbieder": {
+    "actief": false,
+    "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen."
+  },
+  "gemetenOp": "2026-09-13T10:49:58.875Z",
+  "telling": {
+    "routes": 45,
+    "paren": 270,
+    "bestaat": 5,
+    "bestaatNiet": 176,
+    "onbekend": 89,
+    "meetbaar": 5,
+    "gemeten": 5,
+    "perGrens": {
+      "voor-eerste-mutatie": {
+        "bestaat": 4,
+        "bestaatNiet": 19,
+        "onbekend": 22,
+        "meetbaar": 4,
+        "gemeten": 4
+      },
+      "in-de-opslag": {
+        "bestaat": 0,
+        "bestaatNiet": 45,
+        "onbekend": 0,
+        "meetbaar": 0,
+        "gemeten": 0
+      },
+      "na-commit-voor-antwoord": {
+        "bestaat": 1,
+        "bestaatNiet": 22,
+        "onbekend": 22,
+        "meetbaar": 1,
+        "gemeten": 1
+      },
+      "na-commit-voor-bericht": {
+        "bestaat": 0,
+        "bestaatNiet": 0,
+        "onbekend": 45,
+        "meetbaar": 0,
+        "gemeten": 0
+      },
+      "providercommit-zonder-antwoord": {
+        "bestaat": 0,
+        "bestaatNiet": 45,
+        "onbekend": 0,
+        "meetbaar": 0,
+        "gemeten": 0
+      },
+      "ambigu-extern-resultaat": {
+        "bestaat": 0,
+        "bestaatNiet": 45,
+        "onbekend": 0,
+        "meetbaar": 0,
+        "gemeten": 0
+      }
+    }
+  },
+  "per": [
+    {
+      "route": "POST /api/bank/pas/betaal",
+      "rol": "member",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "bankBoekingen",
+        "bankPassen",
+        "bankSaldi"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: bankBoekingen, bankPassen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: bankBoekingen, bankPassen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 3,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/bank/pas/bevries",
+      "rol": "member",
+      "semantiek": "idempotent",
+      "collecties": [
+        "bankPassen"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/bank/pas/limiet",
+      "rol": "member",
+      "semantiek": "idempotent",
+      "collecties": [
+        "bankPassen"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/bank/pas/sluit",
+      "rol": "member",
+      "semantiek": "idempotent",
+      "collecties": [
+        "bankPassen"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/bank/pas/uitgeven",
+      "rol": "member",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "bankPassen"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/bank/rekening/open",
+      "rol": "member",
+      "semantiek": "nietHerhaalbaar",
+      "collecties": [
+        "bankRekeningen"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/bank/salaris",
+      "rol": "member",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/bank/sepa",
+      "rol": "member",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/bank/spaardoel",
+      "rol": "member",
+      "semantiek": "idempotent",
+      "collecties": [
+        "bankRekeningen"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/bank/storten",
+      "rol": "member",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "bankBoekingen",
+        "bankSaldi"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: bankBoekingen, bankSaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/bank/terugkerend/zet",
+      "rol": "member",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "bankTerugkerend"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: bankTerugkerend), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: bankTerugkerend), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/boardroom/betalingen/proef",
+      "rol": "techniek",
+      "semantiek": "nietHerhaalbaar",
+      "collecties": [
+        "betaalRegie"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalRegie), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalRegie), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/geld/beleid/weg",
+      "rol": "member",
+      "semantiek": "idempotent",
+      "collecties": [
+        "geldbeleid"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: geldbeleid), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: geldbeleid), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/geld/cockpit",
+      "rol": "member",
+      "semantiek": "idempotent",
+      "collecties": [
+        "labFonds"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/geld/grens",
+      "rol": "member",
+      "semantiek": "idempotent",
+      "collecties": [
+        "geldbeleid"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/gemeente/belasting/mijn",
+      "rol": "member",
+      "semantiek": "idempotent",
+      "collecties": [
+        "gemeenteAanslagen"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/kosten/vooruitblik",
+      "rol": "member",
+      "semantiek": "idempotent",
+      "collecties": [
+        "economie"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/labfonds/locatie/maak",
+      "rol": "member",
+      "semantiek": "idempotent",
+      "collecties": [
+        "labFonds"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: labFonds), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: labFonds), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/member/ai/tegoed",
+      "rol": "member",
+      "semantiek": "idempotent",
+      "collecties": [
+        "aiTegoed"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/office/bank/draai",
+      "rol": "boardroom",
+      "semantiek": "nietHerhaalbaar",
+      "collecties": [
+        "bankregie"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (FAILED)",
+          "uitslag": "FAILED",
+          "instrument": "scripts/crashproef.js",
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/office/bank/leden",
+      "rol": "office",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "bankregie"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (FAILED)",
+          "uitslag": "FAILED",
+          "instrument": "scripts/crashproef.js",
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/office/bank/mislukking",
+      "rol": "office",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "bankregie"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/office/bank/nood",
+      "rol": "office",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "bankregie"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (FAILED)",
+          "uitslag": "FAILED",
+          "instrument": "scripts/crashproef.js",
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/office/rechtsvormwacht",
+      "rol": "office",
+      "semantiek": "idempotent",
+      "collecties": [
+        "aiTegoed"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/pay/kascode",
+      "rol": "member",
+      "semantiek": "nietHerhaalbaar",
+      "collecties": [
+        "payCodes"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/pay/oplaad",
+      "rol": "member",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/pay/saldo",
+      "rol": "member",
+      "semantiek": "idempotent",
+      "collecties": [
+        "fondsAfdrachten",
+        "invoices",
+        "payBoekingen",
+        "paySaldi",
+        "socialeAfdrachten"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "ja",
+          "graad": "gemeten",
+          "grond": "scripts/crashproef.js heeft deze grens werkelijk geraakt op deze route (PROVEN)",
+          "uitslag": "PROVEN",
+          "instrument": "scripts/crashproef.js",
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 5,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/pay/stuur",
+      "rol": "member",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/pay/tegoed/koop",
+      "rol": "member",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi",
+        "payTegoed"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payTegoed), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payTegoed), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 3,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/pay/tik",
+      "rol": "member",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/pay/tikcode",
+      "rol": "member",
+      "semantiek": "nietHerhaalbaar",
+      "collecties": [
+        "payTikCodes"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/pay/verzoek",
+      "rol": "member",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "payVerzoeken"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/pay/verzoek/betaal",
+      "rol": "member",
+      "semantiek": "onbekend",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi",
+        "payVerzoeken"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payVerzoeken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 3 collectie(s) aanraken: payBoekingen, paySaldi, payVerzoeken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 3,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/pay/verzoek/intrek",
+      "rol": "member",
+      "semantiek": "idempotent",
+      "collecties": [
+        "payVerzoeken"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/punten",
+      "rol": "member",
+      "semantiek": "idempotent",
+      "collecties": [
+        "punten"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/supplier/betaalverzoek",
+      "rol": "supplier",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "betaalVerzoeken"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalVerzoeken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: betaalVerzoeken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/supplier/facturen/maak",
+      "rol": "supplier",
+      "semantiek": "compenseerbaar",
+      "collecties": [
+        "facturen"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/supplier/facturen/pdf",
+      "rol": "supplier",
+      "semantiek": "idempotent",
+      "collecties": [
+        "facturen"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: facturen), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/supplier/giftcard/sell",
+      "rol": "supplier",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "giftcards"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: giftcards), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: giftcards), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/supplier/oog/overzicht",
+      "rol": "supplier",
+      "semantiek": "idempotent",
+      "collecties": [
+        "directOntvangsten"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: directOntvangsten), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: directOntvangsten), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/supplier/pay/treasury/apart",
+      "rol": "supplier",
+      "semantiek": "compenseerbaar",
+      "collecties": [
+        "facturen",
+        "payBoekingen",
+        "payCodes",
+        "paySaldi",
+        "posSales",
+        "waardeOormerken"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 6 collectie(s) aanraken: facturen, payBoekingen, payCodes, paySaldi, posSales, waardeOormerken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 6 collectie(s) aanraken: facturen, payBoekingen, payCodes, paySaldi, posSales, waardeOormerken), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 6,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/supplier/pay/treasury/zet",
+      "rol": "supplier",
+      "semantiek": "idempotent",
+      "collecties": [
+        "payTreasury"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "gemeten met scripts/crashproef.js: de route deed zijn werk en het proces bleef leven, dus hij loopt langs geen van beide injectiepunten (de duurzame bundel, de duurzame commit) -- hij schrijft met de gewone write-behind save(), en die kent dit moment niet",
+          "wordtRelevantAls": "deze route zijn schrijfweg naar een duurzame bundel verlegt. Wat hem NU bedreigt is een verloren schrijfactie, en dat is `schrijf-verloren` en niet deze grens",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/supplier/pay/uitbetaal",
+      "rol": "supplier",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "payBoekingen",
+        "paySaldi"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: payBoekingen, paySaldi), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/supplier/pos/checkout",
+      "rol": "supplier",
+      "semantiek": "sleutelVereist",
+      "collecties": [
+        "facturen",
+        "posSales"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: facturen, posSales), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 2 collectie(s) aanraken: facturen, posSales), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 2,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    },
+    {
+      "route": "POST /api/wallet/voeg",
+      "rol": "member",
+      "semantiek": "nietHerhaalbaar",
+      "collecties": [
+        "wallet"
+      ],
+      "grenzen": {
+        "voor-eerste-mutatie": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: wallet), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-voor-mutatie"
+        },
+        "na-commit-voor-antwoord": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "de route schrijft aantoonbaar (de idempotentieproef zag deze route 1 collectie(s) aanraken: wallet), maar scripts/crashproef.js kreeg hem niet aan het werk, dus welke SCHRIJFWEG hij neemt is niet gemeten -- en daarvan hangt af of deze grens op zijn pad ligt",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": "sterf-na-commit"
+        },
+        "in-de-opslag": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "de opslag is transactioneel: db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save commit heel of rolt heel terug. Nagemeten met scripts/crashgrenzen.js: een dood tussen de schrijfopdracht en de checkpoint gaf exact de uitkomst van sterf-na-commit.",
+          "collecties": 1,
+          "wordtRelevantAls": "de opslag kan scheuren -- de json-stand schrijft een tijdelijk bestand en hernoemt het, en daartussen bestaat het moment wel",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "de opslag is transactioneel (BEGIN IMMEDIATE ... COMMIT in db/sqlite.js), dus er is geen waarneembaar moment MIDDENIN de schrijfactie om in te sterven"
+        },
+        "na-commit-voor-bericht": {
+          "bestaat": "onbekend",
+          "graad": "onbekend",
+          "grond": "in de gemeten collecties staat geen berichtbak, maar dat bewijst niets: de idempotentieproef hoeft de berichtweg niet te hebben geraakt, en een routebestand delegeert naar de kern via de contexttas -- die weg is statisch niet te volgen",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "er is geen haak tussen de commit en het versturen van het bericht"
+        },
+        "providercommit-zonder-antwoord": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd"
+        },
+        "ambigu-extern-resultaat": {
+          "bestaat": "nee",
+          "graad": "gemeten",
+          "grond": "server/betaal.js weigert fail-closed zonder echte provider (\"Geen betaalprovider actief\"); de synthetische rail draait alleen achter RTG_SIMULATIEBANK en nooit naast een echte. Zonder aanbieder is er geen providercommit om het antwoord van te verliezen.",
+          "wordtRelevantAls": "er een echte betaalprovider is aangesloten",
+          "uitslag": null,
+          "instrument": null,
+          "meetbaar": false,
+          "nietMeetbaarOmdat": "vraagt een aanbieder met een onbesliste uitkomst"
+        }
+      }
+    }
+  ]
+}

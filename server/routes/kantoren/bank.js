@@ -39,19 +39,40 @@ module.exports = (ctx) => {
      operationeel is; dat bewaakt de bankregie zelf. */
   /* De knop schakelt via vier-ogen bij het OPSCHALEN: opschalen levert
      needsAuth (wacht op een tweede persoon), afschalen gaat direct. */
-  function relais(req, r, wat) {
-    if (!r || r.error) return r;
+  /* HET SPOOR GAAT MEE DE BUNDEL IN, en dat is de reparatie van 13 september.
+
+     Hier stond het andersom: de kern muteerde met een write-behind save(), en
+     PAS DAARNA schreef deze functie het auditspoor. scripts/crashproef.js mat
+     wat dat betekent -- ledenAan ging duurzaam van true naar false terwijl het
+     proces stierf, en de auditregel landde niet. De schakelaar kon dus omgaan
+     zonder spoor van wie hem omzette.
+
+     Daarom is dit nu een CALLBACK die de kern binnen zijn duurzame bundel
+     aanroept (zie `besluit` in kern/bankregie/index.js): mutatie en spoor
+     committen heel, of geen van beide. De woorden blijven hier, want pas de
+     uitkomst zegt of er is uitgevoerd of op een tweede persoon wordt gewacht.
+
+     De sync() blijft ERBUITEN: dat is een seintje naar schermen en geen opslag,
+     en een scherm mag niet horen van een besluit dat nog niet vaststaat. */
+  const spoor = (req, wat) => (r) => {
+    if (!r || r.error) return;
     if (r.needsAuth) afdelingen.audit(naam(req), wat + ' AANGEVRAAGD -- wacht op een tweede persoon');
-    else if (!r.ongewijzigd) { afdelingen.audit(naam(req), wat + ' uitgevoerd'); sync(); }
+    else if (!r.ongewijzigd) afdelingen.audit(naam(req), wat + ' uitgevoerd');
+  };
+  async function relais(belofte) {
+    const r = await belofte;
+    if (r && !r.error && !r.needsAuth && !r.ongewijzigd) sync();
     return r;
   }
   app.post('/api/office/bank/modus', boardroomAuth, (req, res) => veilig(res, () =>
-    relais(req, kern.bankModusZet({ modus: String(req.body.modus || ''), wie: naam(req) }), 'RTG Bank-stand "' + String(req.body.modus || '') + '"')));
+    relais(kern.bankModusZet({ modus: String(req.body.modus || ''), wie: naam(req),
+      audit: spoor(req, 'RTG Bank-stand "' + String(req.body.modus || '') + '"') }))));
   app.post('/api/office/bank/draai', boardroomAuth, (req, res) => veilig(res, () => req.body.terug === true
-    ? relais(req, kern.bankDraaiTerug({ wie: naam(req) }), 'RTG Bank-knop terug')
-    : relais(req, kern.bankDraai({ wie: naam(req) }), 'RTG Bank-knop een slag verder')));
+    ? relais(kern.bankDraaiTerug({ wie: naam(req), audit: spoor(req, 'RTG Bank-knop terug') }))
+    : relais(kern.bankDraai({ wie: naam(req), audit: spoor(req, 'RTG Bank-knop een slag verder') }))));
   app.post('/api/office/bank/operationeel', boardroomAuth, (req, res) => veilig(res, () =>
-    relais(req, kern.bankOperationeelZet({ aan: req.body.aan === true, wie: naam(req) }), 'RTG Bank ' + (req.body.aan === true ? 'operationeel aan' : 'operationeel uit'))));
+    relais(kern.bankOperationeelZet({ aan: req.body.aan === true, wie: naam(req),
+      audit: spoor(req, 'RTG Bank ' + (req.body.aan === true ? 'operationeel aan' : 'operationeel uit')) }))));
 
   // de tweede persoon bevestigt (of iemand trekt in) een openstaande autorisatie
   app.post('/api/office/bank/autoriseer/bevestig', boardroomAuth, (req, res) => veilig(res, () => {
@@ -67,14 +88,16 @@ module.exports = (ctx) => {
 
   /* Nood-fallback: noodstop (clearing valt terug op de kaart-rails), herstel, en
      het melden van een mislukte clearing (trip automatisch nood bij de drempel). */
-  app.post('/api/office/bank/nood', officeAuth, (req, res) => veilig(res, () => {
-    const r = kern.bankNoodMeld({ reden: req.body.reden, wie: naam(req) });
-    if (r.ok) { afdelingen.audit(naam(req), 'RTG Bank NOODSTOP -- clearing valt terug op de kaart-rails'); sync(); }
+  app.post('/api/office/bank/nood', officeAuth, (req, res) => veilig(res, async () => {
+    const r = await kern.bankNoodMeld({ reden: req.body.reden, wie: naam(req),
+      audit: (u) => { if (u.ok) afdelingen.audit(naam(req), 'RTG Bank NOODSTOP -- clearing valt terug op de kaart-rails'); } });
+    if (r.ok) sync();
     return r;
   }));
-  app.post('/api/office/bank/herstel', officeAuth, (req, res) => veilig(res, () => {
-    const r = kern.bankNoodHerstel({ wie: naam(req) });
-    if (r.ok) { afdelingen.audit(naam(req), 'RTG Bank noodstop hersteld -- clearing volgt weer de stand'); sync(); }
+  app.post('/api/office/bank/herstel', officeAuth, (req, res) => veilig(res, async () => {
+    const r = await kern.bankNoodHerstel({ wie: naam(req),
+      audit: (u) => { if (u.ok) afdelingen.audit(naam(req), 'RTG Bank noodstop hersteld -- clearing volgt weer de stand'); } });
+    if (r.ok) sync();
     return r;
   }));
   app.post('/api/office/bank/mislukking', officeAuth, (req, res) => veilig(res, () => {
@@ -85,9 +108,10 @@ module.exports = (ctx) => {
   }));
 
   // de leden-bank live zetten (zichtbaar in de app) of weer sluiten
-  app.post('/api/office/bank/leden', officeAuth, (req, res) => veilig(res, () => {
-    const r = kern.bankLedenZet({ aan: req.body.aan === true, wie: naam(req) });
-    if (r.ok) { afdelingen.audit(naam(req), 'RTG Bank voor leden ' + (r.ledenAan ? 'LIVE gezet' : 'gesloten')); sync(); }
+  app.post('/api/office/bank/leden', officeAuth, (req, res) => veilig(res, async () => {
+    const r = await kern.bankLedenZet({ aan: req.body.aan === true, wie: naam(req),
+      audit: (u) => { if (u.ok) afdelingen.audit(naam(req), 'RTG Bank voor leden ' + (u.ledenAan ? 'LIVE gezet' : 'gesloten')); } });
+    if (r.ok) sync();
     return r;
   }));
   app.post('/api/office/bank/instellingen', officeAuth, (req, res) => veilig(res, () => {

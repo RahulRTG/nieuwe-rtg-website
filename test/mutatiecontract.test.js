@@ -25,6 +25,7 @@ const { test } = require('node:test');
 const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const contract = require('../server/kern/mutatiecontract');
 const mutatie = require('../server/kern/mutatie');
@@ -262,6 +263,32 @@ test('elk contract in server/lib/mutatiecontracten.js deugt', () => {
 /* DE ZEVENENVEERTIG DIE BEKEND EN ONVERKLAARD ZIJN -- een besluit van de
    eigenaar op 13 september 2026, met de reden en het adres van wat hen weghaalt.
 
+   DE OORZAAK VAN DE 47, overgenomen uit PR #248 omdat hij hier het duurst is om
+     kwijt te raken -- en met de afloop erbij, want die kende die tak nog niet.
+
+     Niet: er kwamen 47 routes bij. Ze stonden er al, en de poort zag ze niet omdat
+     hij een VEROUDERD artefact las. Op een schone origin/main geeft
+     `node scripts/mutatiecontract.js` 47 LEGACY en 3186 BLOCKED, terwijl het
+     INGECHECKTE register 3233 BLOCKED en geen enkele LEGACY meldde. Het register
+     was al maanden in tegenspraak met zichzelf; deze toets stond groen op een
+     BESTAND in plaats van op een meting.
+
+     De afleidgang schrijft alleen BLOCKED_BY_TEST_FIXTURE, en zijn `stilGeenWerk`-tak
+     draagt met opzet een rem: alleen als de effectmeter WEL iets telde. Alle 47
+     lezen "op allebei `geen`" -- precies de routes die die rem eruit zet. Gevolg:
+     47 rijen beweerden "de proef kwam er niet bij" terwijl hun eigen bewijsregel
+     in datzelfde bestand `hindernis: null` zei.
+
+     Waarom het nu pas opviel: keuringsregel 64 draait de generator opnieuw en
+     vergelijkt. Zolang niemand een schrijfroute toevoegde werd er niets
+     geregenereerd en bleef de tegenspraak onzichtbaar. De eerste tak die er een
+     toevoegde legde hem bloot -- elke tak had dat gedaan.
+
+     DE AFLOOP: PR #252 heeft alle 47 met de hand geclassificeerd. Een verse ronde
+     meldt nul LEGACY over 4933 routes, dus er is geen plafond meer nodig. PR #248
+     stelde hier `const GRENS = 47` voor; dat is een opgehoogd getal en laat een
+     RUILING door, en de lijst hieronder staat er in plaats daarvan -- leeg.
+
    WAAROM DIT GEEN LOSSE BOVENGRENS IS. Een getal verhogen laat een RUILING door:
    wie een van deze routes indeelt en tegelijk een nieuwe onverklaarde toevoegt,
    houdt het aantal gelijk en de poort groen. Daarom staan ze bij NAAM. Een route
@@ -284,53 +311,17 @@ test('elk contract in server/lib/mutatiecontracten.js deugt', () => {
    BEDOELING, en dat leest niemand uit een meting af (zie de kop van
    server/lib/mutatiecontracten.js). Deze lijst mag daarom alleen KRIMPEN. */
 const BEKEND_OPEN = Object.freeze([
-  'POST /api/foundation/kosten',
-  'POST /api/foundation/school/aanwezigheid/leerling',
-  'POST /api/foundation/school/belasting/mij',
-  'POST /api/foundation/school/dossier',
-  'POST /api/foundation/school/dossier/contact',
-  'POST /api/foundation/school/hr/uren',
-  'POST /api/foundation/school/leerling/overstap',
-  'POST /api/foundation/school/leraar/klas/maak',
-  'POST /api/foundation/school/leraar/overzicht',
-  'POST /api/foundation/school/mijn-rechten',
-  'POST /api/foundation/school/peiling/mijn-personeel',
-  'POST /api/foundation/school/personeel/mail/inbox',
-  'POST /api/foundation/school/personeel/mail/overzicht',
-  'POST /api/foundation/school/personeel/mail/verzonden',
-  'POST /api/foundation/school/personeel/start',
-  'POST /api/foundation/school/personeel/status',
-  'POST /api/foundation/school/rooster/zet',
-  'POST /api/foundation/school/zorg/zet',
-  'POST /api/gemeente/afspraken',
-  'POST /api/gemeente/bekendmaking',
-  'POST /api/gemeente/meldingen',
-  'POST /api/gemeente/regie',
-  'POST /api/gemeente/triage',
-  'POST /api/gemeente/vergunningen',
-  'POST /api/kosten/grens',
-  'POST /api/kosten/mij',
-  'POST /api/lab2/ledger/studie',
-  'POST /api/lucht/ai',
-  'POST /api/lucht/bagage',
-  'POST /api/lucht/bord',
-  'POST /api/lucht/charters',
-  'POST /api/lucht/cockpit',
-  'POST /api/lucht/lounge',
-  'POST /api/lucht/vip/lijst',
-  'POST /api/lucht/vlucht/maak',
-  'POST /api/notifications/read',
-  'POST /api/office/rtgai/train',
-  'POST /api/rtfos/gift/machtiging/mijn',
-  'POST /api/rtfos/gift/plan/mijn',
-  'POST /api/rtfos/gift/projecten',
-  'POST /api/rtfos/gift/stand',
-  'POST /api/rtfos/ruil/mijn',
-  'POST /api/rtfos/winkel',
-  'POST /api/rtfos/winkel/mijn',
-  'POST /api/supplier/horeca/keuken/tijden',
-  'POST /api/supplier/kosten',
-  'POST /api/supplier/kosten/vooruitblik',
+  /* LEEG SINDS 13 SEPTEMBER 2026, en dat is de bedoeling van deze lijst.
+
+     De 47 hierboven zijn met de hand geclassificeerd in PR #252 en staan nu in
+     server/lib/mutatiecontracten-afleidrest*.js. Een verse ronde meldt over 4933
+     schrijfroutes nul LEGACY_PENDING_CLASSIFICATION, dus er is niets meer om uit
+     te zonderen -- en de toets hieronder zegt het zelf: een uitzondering die niet
+     meer geldt, is een alibi.
+
+     DE LIJST BLIJFT STAAN, leeg. Hij is de vorm waarin een volgende schuld bij
+     NAAM wordt opgeschreven in plaats van als opgehoogd getal; die keuze staat
+     hierboven uitgeschreven en is niet ingetrokken, alleen afbetaald. */
 ]);
 
 test('LEGACY_PENDING_CLASSIFICATION mag alleen krimpen', () => {
@@ -384,6 +375,115 @@ test('het register claimt nooit meer afgeleide regels dan er afgeleid zijn', () 
     (geclaimd - aanwezig) + ') zijn routes die het register als ingedeeld telt terwijl er geen ' +
     'afgeleide regel meer voor bestaat -- leg het register opnieuw vast met een APARTE ronde ' +
     '(node scripts/mutatiecontract.js --vastleggen), zonder --afleiden.');
+});
+
+test('de afdruk loopt niet achter op de code', () => {
+  /* DE POORT DIE HIER ONTBRAK, EN DAT KOSTTE VIER DAGEN.
+
+     De twee toetsen hierboven lezen het INGECHECKTE MUTATIECONTRACT.json. Dat is
+     een bouwartefact, en een bouwartefact kan een commit achterlopen -- precies
+     wat EXECUTION_MAP.json al een keer heeft opgelost met "de autoriteit komt
+     LIVE en nooit uit een bouwartefact".
+
+     Op 9 september kromp MUTATIECONTRACT-AFGELEID.json van 3192 naar 3142 regels
+     (de proef kwam er wel bij, dus de afgeleide stand viel terecht weg) zonder
+     dat dit register werd meegeregenereerd. De poort op
+     LEGACY_PENDING_CLASSIFICATION stond daarna vier dagen groen op NUL terwijl er
+     47 schrijfroutes zonder contract waren -- en zij kwamen pas boven toen een
+     andere tak het register toevallig vers schreef.
+
+     Deze toets HERBEREKENT de telling in plaats van haar te geloven. Hij draait
+     hetzelfde instrument (scripts/mutatiecontract.js --telling, een eigen uitgang
+     die alleen de tellingen als JSON geeft), zodat er geen tweede lezer van
+     dezelfde waarheid ontstaat -- LAT.md regel 4.
+
+     DE MUTATIE: verwijder een regel uit server/lib/mutatiecontracten-naleesronde.js
+     zonder het register opnieuw te schrijven -> deze toets zakt met het verschil
+     erbij, en de twee toetsen hierboven blijven groen. Dat is het gat, en dit is
+     de dekking. */
+  const uit = execFileSync(process.execPath,
+    [path.join(WORTEL, 'scripts', 'mutatiecontract.js'), '--telling'],
+    { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 });
+  const vers = JSON.parse(uit.trim().split('\n').pop());
+
+  assert.strictEqual(vers.totaal, register.gemeten.totaal,
+    'MUTATIECONTRACT.json telt ' + register.gemeten.totaal + ' schrijfroutes en de code ' +
+    vers.totaal + ' -- de afdruk loopt achter; draai: node scripts/mutatiecontract.js --vastleggen');
+
+  /* ELKE STAND, en niet alleen LEGACY. Een afdruk die maar half wordt vergeleken
+     is een afdruk die half achterloopt (zelfde les als test/capabilities.test.js
+     toets 8). Een stand die in de ene en niet in de andere staat, telt als nul. */
+  const standen = new Set([...Object.keys(vers.perStand), ...Object.keys(register.gemeten.perStand)]);
+  for (const stand of standen) {
+    assert.strictEqual(vers.perStand[stand] || 0, register.gemeten.perStand[stand] || 0,
+      'MUTATIECONTRACT.json loopt achter op "' + stand + '" (' +
+      (register.gemeten.perStand[stand] || 0) + ' vastgelegd, ' + (vers.perStand[stand] || 0) +
+      ' gemeten) -- draai: node scripts/mutatiecontract.js --vastleggen');
+  }
+});
+
+test('geen afgeleide stand zonder afgeleid contract', () => {
+  /* DE REPARATIE VAN 13 SEPTEMBER 2026 -- de oorzaak onder de grens hierboven.
+
+     BLOCKED_BY_TEST_FIXTURE is de enige stand die een script mag zetten, en hij
+     doet maar een uitspraak: de proef kwam er niet bij, en dit was de hindernis.
+     Die uitspraak leeft in MUTATIECONTRACT-AFGELEID.json. Verdwijnt een route
+     daaruit -- omdat zijn hindernis weg is, of omdat een grens in de afleidgang
+     hem terecht uitzet -- dan is de GROND van zijn stand weg.
+
+     Dat gebeurde, en niemand zag het. Het register bleef 47 keer
+     BLOCKED_BY_TEST_FIXTURE melden voor routes die niet meer in het afgeleide
+     bestand stonden, met in diezelfde rij `hindernis: null`. De poort hierboven
+     stond groen omdat zij het register las en het register niemand.
+
+     "Vervallen bewijs is geen bewijs" (BESTUUR.md) geldt dus ook tussen twee
+     registers onderling. Deze toets legt ze naast elkaar: elke rij die zegt dat
+     een SCRIPT haar stand zette, moet dat script nog steeds achter zich hebben.
+
+     HIJ KIJKT NAAR HERKOMST EN NIET NAAR STAND. Een mens mag een route wel
+     degelijk op BLOCKED zetten (de deur staat open in server/lib/), en dan hoort
+     hij juist NIET in het afgeleide bestand. Het is de combinatie
+     "herkomst: afgeleid" zonder afgeleid contract die niets meer betekent. */
+  const wezen = register.rijen.filter(r =>
+    r.herkomst === 'afgeleid' && !AFGELEID[r.route]);
+  assert.deepStrictEqual(wezen.map(r => r.route + ' (' + r.stand + ')'), [],
+    'deze rijen dragen een stand die een script zette, terwijl dat script hen niet ' +
+    'meer afleidt -- de grond onder hun stand is weg. Draai: node scripts/mutatiecontract.js ' +
+    '--afleiden && node scripts/mutatiecontract.js --vastleggen, en geef wat daarna op ' +
+    'LEGACY_PENDING_CLASSIFICATION staat een contract in server/lib/mutatiecontracten*.js');
+});
+
+test('de afleidgang en het register zijn in dezelfde gang geschreven', () => {
+  /* DE VALKUIL DIE DE DRIFT LIET ONTSTAAN, en hij zit in de VOLGORDE van een
+     enkel proces. scripts/mutatiecontract.js leest MUTATIECONTRACT-AFGELEID.json
+     bij het OPSTARTEN (regel 70), schrijft hem halverwege opnieuw bij
+     --afleiden, en schrijft het register pas daarna bij --vastleggen. Wie beide
+     vlaggen in een gang meegeeft, legt dus een register vast op grond van het
+     VORIGE afgeleide bestand -- en precies dat verschil van een gang is hier
+     maanden blijven staan.
+
+     Deze toets kan die volgorde niet afdwingen, maar hij vangt het GEVOLG: de
+     twee registers horen uit dezelfde boomstand te komen. Verschillen ze van
+     commit, dan is minstens een van beide een momentopname van iets anders.
+
+     HIJ IS EEN WAARSCHUWING EN GEEN POORT, met opzet: op een schone tak zijn
+     beide stempels gelijk, maar tijdens het werken loopt er altijd een van de
+     twee een commit achter, en een toets die daarop zakt leert mensen hem te
+     negeren. Hij zakt alleen als de INHOUD uiteenloopt -- dat is de toets
+     hierboven -- en meldt het verschil hier alleen als het er is. */
+  let af = {};
+  try {
+    af = JSON.parse(fs.readFileSync(path.join(WORTEL, 'MUTATIECONTRACT-AFGELEID.json'), 'utf8'));
+  } catch (e) { af = {}; }
+  const a = (af.stempel && af.stempel.commit) || null;
+  const b = (register.stempel && register.stempel.commit) || null;
+  assert.ok(a && b, 'een van beide registers draagt geen stempel; dan is niet vast te ' +
+    'stellen of ze uit dezelfde boomstand komen');
+  if (a !== b) {
+    console.log('  LET OP: MUTATIECONTRACT-AFGELEID.json staat op ' + a + ' en ' +
+      'MUTATIECONTRACT.json op ' + b + '. Dat mag tijdens het werken, maar wie ze ' +
+      'inchecken wil, draait eerst --afleiden en DAARNA --vastleggen, in twee gangen.');
+  }
 });
 
 test('het register telt hetzelfde als de mutatie-inventaris', () => {

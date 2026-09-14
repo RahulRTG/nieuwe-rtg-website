@@ -37,13 +37,53 @@ function valtOm(env, code) {
 
 /* ---------- de catalogus ---------- */
 
+/* TWEE WOORDENLIJSTEN, EN ZE ZIJN EEN KEER DOOR ELKAAR GELOPEN.
+
+   `raakt` hoort een SCHAKEL van de bewijsmatrix te noemen; `contract` een
+   CRASHCONTRACT uit scripts/lib/crashtaxonomie.js. Op 13 september stond er
+   ATOMIC in `raakt` bij de twee nieuwe doden -- het juiste woord uit de
+   verkeerde lijst. De toets hieronder vond dat, maar pas in CI en met een
+   regex die alleen kon zeggen dat er GEEN matrixwoord stond.
+
+   Daarom nu drie beweringen in plaats van een: er staat een matrixwoord, er
+   staat GEEN contractwoord in `raakt` (dat is precies de gemaakte fout), en
+   een `contract` dat er staat komt uit de taxonomie zelf -- gelezen en niet
+   overgetypt, anders ontstaat de tweede lijst opnieuw. */
+const SCHAKELS = ['STATE', 'IDEMPOTENCY', 'FAILURE', 'ROLLBACK'];
+const CONTRACTEN = Object.keys(require('../scripts/lib/crashtaxonomie.js').CONTRACTEN);
+
 test('elk verraad noemt wat het nabootst en welke schakel het raakt', () => {
   for (const v of CATALOGUS) {
     assert.ok(v.naam && /^[a-z-]+$/.test(v.naam), 'naam ontbreekt of is raar: ' + v.naam);
     assert.ok(v.wat && v.wat.length > 20, v.naam + ' legt niet uit wat hij nabootst');
-    assert.ok(v.raakt && /STATE|FAILURE|ROLLBACK|IDEMPOTENCY/.test(v.raakt),
+    assert.ok(v.raakt && SCHAKELS.some(s => v.raakt.includes(s)),
       v.naam + ' zegt niet welke schakel van de bewijsmatrix hij raakt');
   }
+});
+
+test('`raakt` draagt geen crashcontract -- dat is de andere lijst', () => {
+  for (const v of CATALOGUS) for (const c of CONTRACTEN)
+    assert.ok(!v.raakt.includes(c), v.naam + ' zet het crashcontract ' + c + ' in `raakt`. ' +
+      'Die hoort in `contract`: een matrixschakel en een crashcontract zijn twee ' +
+      'woordenlijsten, en door elkaar claimt de matrix dekking die er niet is.');
+});
+
+test('een `contract` komt uit de crashtaxonomie en niet uit de pen van wie het opschreef', () => {
+  const met = CATALOGUS.filter(v => v.contract);
+  assert.ok(met.length >= 1, 'de drie doden horen hun crashcontract te noemen');
+  for (const v of met)
+    assert.ok(CONTRACTEN.includes(v.contract),
+      v.naam + ' noemt contract ' + v.contract + ', dat de taxonomie niet kent. ' +
+      'Bekend zijn: ' + CONTRACTEN.join(', '));
+});
+
+/* DE ZELFIJKING. Een toets die je niet hebt zien zakken is geen toets, en deze
+   drie hierboven zijn alledrie op een met opzet verkeerde regel losgelaten. */
+test('zelfijking: een regel met de fout van 13 september zakt aantoonbaar', () => {
+  const fout = { naam: 'verzonnen', wat: 'x'.repeat(30), waar: null, raakt: 'ATOMIC -- geen spoor' };
+  assert.ok(!SCHAKELS.some(s => fout.raakt.includes(s)), 'de eerste toets hoort hierop te zakken');
+  assert.ok(CONTRACTEN.some(c => fout.raakt.includes(c)), 'en de tweede ook');
+  assert.ok(!CONTRACTEN.includes('ONZIN'), 'en een verzonnen contract hoort niet in de lijst');
 });
 
 test('namen zijn uniek -- twee verraden met dezelfde naam maken de instelling dubbelzinnig', () => {

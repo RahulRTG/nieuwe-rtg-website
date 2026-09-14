@@ -68,6 +68,43 @@ module.exports = (kern) => {
     const r = await stuurBevestig(req, String(req.body.goedkeuringId || ''), wereld);
     antwoord(res, r);
   };
+  /* ---- INTREKKEN: een klaargezet voorstel laten vervallen voor het loopt ----
+
+     WAAROM DEZE ROUTE NIET ONDER /doe HANGT. `kern/stuur/classificatie.js`
+     verbiedt `/api/(member|supplier|staff)/doe(/|$)` voor het stuur zelf, tegen
+     rondzingen -- en die grens blijft onaangeraakt. Zou intrekken daaronder
+     vallen, dan was hij per definitie onbereikbaar voor de laag die hem juist
+     moet kunnen gebruiken, en de verleiding was geweest die regex te verzachten.
+     Dat zou de bevestiging meeopenen, en dat is exact het gat.
+
+     DE ASYMMETRIE IS DE HELE GRAP: bevestigen geeft een handeling VRIJ en blijft
+     daarom buiten het gesprek; intrekken kan alleen iets WEGNEMEN. Een route die
+     uitsluitend vermogen inlevert, kan door misbruik niets laten gebeuren -- het
+     ergste geval is dat een lid opnieuw moet vragen.
+
+     GEEN ID IN HET LIJF. Zie kern/stuur/goedkeuring.js: er is niets om aan te
+     wijzen, dus bij twee open voorstellen kan hier niet gegokt worden. Het lijf
+     wordt met opzet niet gelezen. */
+  const intrekHandler = (wereld) => (req, res) => {
+    if (!alleenPersoneel(req, res, wereld)) return;
+    const r = kern.stuurIntrek(req, wereld);
+    if (r.error) return res.status(r.status || 500).json(r);
+    return res.json({ ok: true, ingetrokken: r.ingetrokken, aantal: r.aantal });
+  };
+  /* ALLEEN HET LID, en dat is een besluit en geen halve oplevering. De eerste
+     versie hing hem ook voor supplier en staff op, "voor de symmetrie". De
+     deltapoort wees dat terecht af: die twee stonden in geen enkele toets, en
+     een endpoint dat later een toets krijgt, krijgt hem niet.
+
+     Maar de echte reden is een maat dieper. Het besluit van de eigenaar ging
+     over een LID, en de allowlist opent het pad ook alleen daar
+     (kern/stuur/beleid-lijsten.js). Een route voor een zaak zou dus bestaan
+     zonder dat Rahul hem mag gebruiken en zonder dat een scherm hem aanroept --
+     een ingang naar niets. Die twee komen er zodra er besloten is hoe de
+     werkwerelden erin staan; tot dan is het gat zichtbaar in plaats van
+     dichtgeplamuurd. */
+  app.post('/api/member/voorstel/intrek', auth, intrekHandler('member'));
+
   app.post('/api/member/doe', auth, doeHandler('member'));
   app.post('/api/member/doe/bevestig', auth, bevestigHandler('member'));
   app.post('/api/supplier/doe', supplierAuth, doeHandler('supplier'));

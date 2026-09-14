@@ -578,6 +578,7 @@
       "boardroomAuth",
       "boardroomLijst",
       "boardroomUser",
+      "boardroomWie",
       "capGezondheid",
       "commercieRechten",
       "commercieRonde",
@@ -608,6 +609,7 @@
       "reisaanbod",
       "reisbureau",
       "reisuitnodiging",
+      "salonUitlichten",
       "stad",
       "studio",
       "stuur",
@@ -626,6 +628,9 @@
       "klok"
     ],
     "knelpunt": [
+      "beroepenbieb",
+      "openVacatures",
+      "rtf",
       "status"
     ],
     "kosten": [
@@ -736,6 +741,11 @@
       "markt"
     ],
     "mediaos": [
+      "aanwezigBeeld",
+      "aanwezigMet",
+      "aanwezigMijn",
+      "aanwezigVolg",
+      "aanwezigVolgtHij",
       "mediaBewaar",
       "mediaBieb",
       "mediaBord",
@@ -1449,9 +1459,13 @@
     ],
     "papieren-deur": [],
     "pay": [
+      "corrigeerFactuur",
       "factuurSaldo",
       "onboarding",
       "pay"
+    ],
+    "pay-correctie": [
+      "corrigeerFactuur"
     ],
     "pay-tegoed": [
       "pay"
@@ -1908,6 +1922,7 @@
     "stuur": [
       "isolatie",
       "stuurBevestig",
+      "stuurIntrek",
       "stuurPaden",
       "stuurRoep"
     ],

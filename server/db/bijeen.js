@@ -20,6 +20,7 @@
    ========================================================================== */
 'use strict';
 const postgres = require('./postgres');
+const verraad = require('../lib/verraad');
 
 module.exports = ({ save, saveDuurzaam }) => {
   /* EEN COMMIT VOOR WAT BIJ ELKAAR HOORT (bijeen). Gevonden met kill -9 onder
@@ -100,6 +101,27 @@ module.exports = ({ save, saveDuurzaam }) => {
        GELDLAT.md weerlegde. Dan dus NIET meedoen, maar een eigen duurzame doos
        openen, exact zoals hiervoor. */
     if (inBundel(duurzaam ? { duurzaam: true } : undefined)) return fn();
+    /* STERF-VOOR-MUTATIE, en hij hoort HIER en niet in een route.
+
+       De grens `voor-eerste-mutatie` uit scripts/lib/crashtaxonomie.js vraagt om
+       een dood VOORDAT er iets is gemuteerd. Dit is de laatste plek waar dat met
+       zekerheid geldt: de buitenste bundel is geopend, fn() heeft nog niet
+       gedraaid, en er staat dus geen halve toestand in het geheugen of op schijf.
+       Een regel hoger (binnen een openstaande bundel) klopt het niet meer -- dan
+       heeft de buitenste al kunnen muteren.
+
+       WAAROM NIET IN DE 45 GELDROUTES. Dan moet elke aanroeper iets onthouden,
+       en dat is precies het probleem dat bijeen() zelf heeft opgelost: lib/idem
+       vergat de bundelvraag te stellen en dat kostte de geldketen haar
+       atomiciteit zonder dat er iets rood werd. Een verrader die je moet
+       aanroepen, wordt vergeten door de route die hem het hardst nodig heeft.
+
+       SIGKILL en geen process.exit, om dezelfde reden als bij sterf-na-commit:
+       een nette afsluiting laat afsluithaken lopen en bewijst iets over een pad
+       dat bij een echte crash niet bestaat. */
+    if (verraad.sla('sterf-voor-mutatie')) {
+      try { process.kill(process.pid, 'SIGKILL'); } catch (e) { process.abort(); }
+    }
     const doos = { open: true, nodig: false, duurzaam };
     try { return await bijeenContext.run(doos, fn); }
     finally {

@@ -140,15 +140,45 @@ function verschil(voor, na, negeer) {
   return uit;
 }
 
-/* De haak. `res.json` is het punt waar elke route zijn antwoord geeft, dus daar
-   staat de opslag in de stand die dit verzoek heeft achtergelaten -- na het
-   werk en voor het antwoord de deur uit gaat. Koppen moeten voor het lijf
-   geschreven zijn; vandaar hier en niet op 'finish'. */
+/* De haak. Hij hangt aan `res.end` en NIET aan `res.json`, en dat is een
+   gemeten reparatie (14 september 2026).
+
+   HIJ HING AAN res.json, met als reden: "dat is het punt waar elke route zijn
+   antwoord geeft". Dat klopte niet, en het mislukte STIL. `res.json` is het punt
+   waar elke route zijn antwoord AANBIEDT; wie het verstuurt kan iemand anders
+   zijn. server/middleware/compressie.js hangt zich boven deze haak en verpakt elk
+   JSON-lijf van 1 kB of meer zelf: hij serialiseert, comprimeert en stuurt het
+   resultaat met `res.send` -- en roept de keten onder zich dan NOOIT aan
+   (`return gewoonJson(data)` is alleen de uitweg voor een klein of mislukt lijf).
+   Elk antwoord boven die drempel droeg dus geen X-RTG-Staat.
+
+   WAT DAT KOSTTE, en waarom het erger is dan een gat. De idempotentieproef leest
+   deze kop als tweede meetpunt; zonder kop geeft `staatVan` een LEEG verschil
+   terug, en dat is niet hetzelfde als "niets veranderd". kern/stuur/gevolg.js
+   maakt van een leeg verschil de graad `geen-effect-gemeten` met de zin "de proef
+   draaide en zag geen enkele collectie veranderen" -- een uitspraak over een
+   meting die nooit heeft plaatsgevonden. Precies de verwisseling die dit huis
+   overal weigert: onbekend dat stilletjes nul wordt. Gevonden aan
+   /api/office/bank/incasso, dat een voornemen, een dossier en een vooruitblik
+   teruggeeft (ruim boven de kilobyte) en daarmee in IDEMPROEF.json op een leeg
+   `opslag` stond terwijl de effectmeter in hetzelfde verzoek vier schrijfacties
+   telde.
+
+   ER STOND AL EEN ANTWOORD IN DIT HUIS. server/effectmeter.js is om dezelfde
+   reden verhuisd -- daar stond het op 282 routes -- en de zin die daar staat
+   geldt hier woordelijk: res.end is de ene uitgang waar alle andere doorheen
+   lopen (res.json roept hem aan, res.send ook, een redirect ook). Twee meters met
+   dezelfde blinde vlek en een verschillende uitgang is het gat dat niemand ziet;
+   nu hangen ze op dezelfde plek.
+
+   KOPPEN MOETEN VOOR HET LIJF GESCHREVEN ZIJN, en dat blijft gelden: op `finish`
+   is het te laat. `res.end` is het laatste moment waarop het nog kan, en de
+   `headersSent`-controle houdt vast dat een tweede end niets overschrijft. */
 function haak(app) {
   if (!aan || !app || typeof app.use !== 'function') return false;
   app.use((req, res, next) => {
-    const echt = res.json;
-    res.json = function (...args) {
+    const echt = res.end;
+    res.end = function (...args) {
       try { if (!res.headersSent) res.setHeader('X-RTG-Staat', stand()); } catch (e) {}
       return echt.apply(this, args);
     };

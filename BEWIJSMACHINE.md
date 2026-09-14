@@ -558,7 +558,7 @@ uitslag eroverheen. De uitslag was niet vals; het experiment was het.
 | `scripts/stilspoor.js` | elke bevinding droeg een regelnummer uit de bron NÁ `zonderCommentaar()`, en die plet een blokcommentaar tot één spatie -- elk regelnummer erna schoof op, dus 42 bevindingen wezen naar regels die iets anders bevatten | `zonderCommentaar(bron, { regelsHeel: true })`, de derde stand die `scripts/lib/bron.js` in zijn eigen kop al noemt |
 
 **De vijfde is de leerzaamste, want hij is gemaakt IN de handhaver van een regel
-over stille fouten** -- LAT.md regel 13, op de dag dat hij werd geschreven. De
+over stille fouten** -- LAT.md regel 18, op de dag dat hij werd geschreven. De
 uitslag was op geen enkel punt verdacht: dezelfde tellingen (18 en 24), dezelfde
 bestandsnamen, een plausibel regelnummer erachter. Alleen wees dat nummer naar de
 verkeerde regel, en dat is precies zo onzichtbaar als de smoringen waar de meter

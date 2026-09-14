@@ -1409,7 +1409,7 @@ overal waar dit huis zegt dat iets wordt vastgelegd. `LAT.md` is de plek voor ee
 regel die overal geldt, en zijn regels komen allemaal uit een fout die hier écht
 is gemaakt. Deze heeft die fout nu ook.
 
-**GENOMEN OP 13 SEPTEMBER 2026, OPTIE A: hij staat in `LAT.md` als regel 13** --
+**GENOMEN OP 13 SEPTEMBER 2026, OPTIE A: hij staat in `LAT.md` als regel 18** --
 niet als twaalfde, zoals dit document eerst schreef. Die was al bezet door *een
 meting die niet heeft gedraaid is geen slechte uitslag*, en een document dat de
 regels van een ander document nummert zonder te tellen, is zelf een geval van

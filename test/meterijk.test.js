@@ -1536,7 +1536,7 @@ const IJKINGEN = {
       () => voor.aiContextVeldenGezien - norm.meet().aiContextVeldenGezien)
   },
   /* DE DRIE TANDEN VAN 13 SEPTEMBER 2026: het spoor dat niet kan weigeren
-     (STILSPOOR.json, LAT.md regel 13). Drie meters op EEN register, dus elk
+     (STILSPOOR.json, LAT.md regel 18). Drie meters op EEN register, dus elk
      krijgt zijn EIGEN veld verstoord -- leest er een het verkeerde veld, dan
      blijft hij staan waar hij stond en zakt deze ijking.
 

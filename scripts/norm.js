@@ -743,7 +743,7 @@ const METERS = [
   { sleutel: 'momentOpenBekend', richting: 'omlaag', wat: 'schakels in de publieke keten die openstaan met een uitgeschreven reden (MOMENTPROEF.json)' },
   { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' },
   /* HET SPOOR DAT NIET KAN WEIGEREN (STILSPOOR.json, npm run stilspoor), de
-     handhaver bij LAT.md regel 13. Twee schulden omlaag, het bereik omhoog;
+     handhaver bij LAT.md regel 18. Twee schulden omlaag, het bereik omhoog;
      zie de kop bij het register in ./lib/metingen.js. */
   { sleutel: 'stilSpoor', richting: 'omlaag', wat: 'spoor-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
   { sleutel: 'stilleOpslag', richting: 'omlaag', wat: 'opslag-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },

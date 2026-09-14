@@ -110,7 +110,7 @@ const REGISTER = {
      naam) meldt diezelfde nul over minder bewijs. Een lek van nul uit een meter
      die niets meer ziet, is de gevaarlijkste vorm van groen. */
   'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
-  /* STILSPOOR.json is de handhaver van LAT.md regel 13: een belofte over een
+  /* STILSPOOR.json is de handhaver van LAT.md regel 18: een belofte over een
      spoor is pas een regel als het spoor kan weigeren. Drie tanden, en ze doen
      twee verschillende dingen.
 

@@ -244,6 +244,20 @@ test('9. het nummer gaat alleen open met een reden, en dat staat in het journaal
   assert.ok(/aftekenen van de VOG/.test(String(mijne[0].waarom || '')), 'met de reden erbij');
   assert.equal(JSON.stringify(regels).includes('VOG-KLUIS-42'), false,
     'het journaal bewaart het nummer niet; dat zou een tweede kopie van de kluis zijn');
+
+  /* EN DE ROUTE DRAAGT DE BEWAARTERMIJN (besluit 6, 13 september 2026). Zonder
+     die zin leest deze lijst als "dit is alles", terwijl het "dit is alles
+     binnen de termijn" is -- en juist op een AVG-inzage is dat verschil het
+     antwoord. De termijn komt van de schrijfkant mee; staat hier een getal dat
+     daar niet vandaan komt, dan zijn er twee plekken die weten hoe lang dit
+     huis bewaart (LAT.md regel 4). */
+  const b = log.body.bewaring;
+  assert.ok(b, 'de inzageroute draagt een bewaarblok: ' + JSON.stringify(log.body).slice(0, 200));
+  assert.equal(b.dagen, require('../server/inzagelog').BEWAARDAGEN,
+    'en die termijn komt uit het journaal zelf, niet uit een tweede getal');
+  assert.match(String(b.belofte), new RegExp(String(b.dagen) + ' dagen'),
+    'de belofte noemt de termijn die zij waarmaakt');
+  assert.equal(b.volledig, true, 'de noodrem heeft niet gebeten');
 });
 
 /* ============================================================================

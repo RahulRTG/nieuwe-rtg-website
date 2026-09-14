@@ -753,6 +753,12 @@ const METERS = [
      proef langer te maken, en dan wordt een meter beter door hem te verlengen. */
   { sleutel: 'momentOpenBekend', richting: 'omlaag', wat: 'schakels in de publieke keten die openstaan met een uitgeschreven reden (MOMENTPROEF.json)' },
   { sleutel: 'faalproefGezakt', richting: 'omlaag', wat: 'routes die een schrijfactie bevestigden die verloren ging (FAALPROEF.json)' },
+  /* HET SPOOR DAT NIET KAN WEIGEREN (STILSPOOR.json, npm run stilspoor), de
+     handhaver bij LAT.md regel 21. Twee schulden omlaag, het bereik omhoog;
+     zie de kop bij het register in ./lib/metingen.js. */
+  { sleutel: 'stilSpoor', richting: 'omlaag', wat: 'spoor-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
+  { sleutel: 'stilleOpslag', richting: 'omlaag', wat: 'opslag-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
+  { sleutel: 'stilSpoorAanroepen', richting: 'omhoog', wat: 'spoor-schrijvers die de stilspoormeter werkelijk heeft gevonden' },
   /* DE LUSINDEX (LUSSEN.json, npm run lussen). Drie tanden, en alle drie tellen
      ze een SCHULD en geen prestatie -- anders maakt lussen toevoegen de meter
      beter.
@@ -1466,6 +1472,9 @@ function meet(bronnen) {
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
     wekZonderUitspraak: leesRegister('WEKDEKKING.json', (j) => j.gemeten.zonderUitspraak),
     momentOpenBekend: leesRegister('MOMENTPROEF.json', (j) => j.telling.openBekend),
+    stilSpoor: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorGesmoord),
+    stilleOpslag: leesRegister('STILSPOOR.json', (j) => j.gemeten.opslagGesmoord),
+    stilSpoorAanroepen: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorAanroepen),
     lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),
     lussenKritiek: leesRegister('LUSSEN.json', (j) => j.ratel.kritiek),
     lussenZonderOverlapRem: leesRegister('LUSSEN.json', (j) => j.ratel.wekkersAsyncZonderRem),

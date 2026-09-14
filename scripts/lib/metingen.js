@@ -68,7 +68,20 @@ const GEEN_METING = new Set([
      een commitboodschap, een PR-bericht. Geen meting en geen kwaliteitsgetal: het
      hoort te GROEIEN naarmate er meer wordt rechtgezet, en een ratel erop zou
      precies het rechtzetten bestraffen. */
-  'CORRECTIES.json'
+  'CORRECTIES.json',
+  /* HERREKENBAAR.json is een register van BESLUITEN en geen meting: het zegt per
+     route waarom een verloren schrijfactie zichzelf herstelt. Daar zit geen getal
+     in dat beter of slechter kan worden -- het aantal verklaringen hoort te
+     groeien naarmate er meer is uitgezocht, en een ratel zou juist het uitzoeken
+     bestraffen. De METING ernaast (FAALPROEF.json) hangt wel aan een tand
+     (faalproefGezakt), en die blijft onverkort tellen: het besluit drukt de
+     meting niet weg.
+
+     IDEMBESLUIT.json is hetzelfde soort bestand en staat vandaag in GEEN van
+     beide lijsten, en telt dus mee in `metingenZonderRatel`. Dat hier rechtzetten
+     zou die tand verschuiven, en dat is een apart besluit -- het staat genoteerd
+     en niet stilletjes meegenomen. */
+  'HERREKENBAAR.json'
 ]);
 
 const REGISTER = {
@@ -113,6 +126,22 @@ const REGISTER = {
      publiek domein bijkomt waar niemand over heeft nagedacht, en dat is precies
      de stille groei die deze tand moet vangen. */
   'WEKDEKKING.json': { meter: ['wekZonderUitspraak'] },
+  /* STILSPOOR.json is de handhaver van LAT.md regel 21: een belofte over een
+     spoor is pas een regel als het spoor kan weigeren. Drie tanden, en ze doen
+     twee verschillende dingen.
+
+     `stilSpoor` en `stilleOpslag` zijn de SCHULD: schrijfacties waarvan het
+     falen volledig wordt weggevangen terwijl de aanroeper succes meldt. Ze
+     staan apart omdat het twee beloftes zijn -- bij de eerste verdwijnt het
+     spoor, bij de tweede het gegeven -- en een optelling verbergt welke van de
+     twee bewoog.
+
+     `stilSpoorAanroepen` is het BEREIK, om dezelfde reden als bij
+     AICONTEXT.json hierboven: de herkenning is lexicaal, dus een meter die
+     stil minder spoor-schrijvers vindt meldt dezelfde lage schuld over minder
+     bewijs. Een schuld die daalt doordat het instrument blind wordt, is de
+     gevaarlijkste vorm van vooruitgang. */
+  'STILSPOOR.json': { meter: ['stilSpoor', 'stilleOpslag', 'stilSpoorAanroepen'] },
   'BEPROEVING.json': { meter: ['p99Ms', 'doorvoerPerSec', 'eventLoopP99Ms', 'herstelSeconden', 'geheugenHellingMBPerMin'] },
   /* De ACTUELE meting naast de geaccepteerde basislijn hierboven: scripts/
      beproeving.js schrijft hem na ELKE ronde, ook een gezakte, zodat rood

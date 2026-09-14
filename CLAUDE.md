@@ -380,8 +380,21 @@ van een testtalent en zonder machtiging niets kan), **MN-02 scheiding van
 hoedanigheden** en **MN-03 geen commercieel voordeel** (de AI zegt erbij dat RTG
 aan één van de opties verdient).
 
-**MN-01 en MN-02 zijn sinds 13 september 2026 TOETSEN en geen zinnen** (par. 4a
-en 4b). Ze staan bewust apart, want het zijn twee soorten regels: MN-01 gaat over
+**Alle drie de grondwetsregels zijn sinds 13 september 2026 TOETSEN en geen
+zinnen** (par. 4a, 4b, 4c, 4e) -- en de derde op een andere manier dan de eerste
+twee. **MN-03 heeft vandaag geen ONDERWERP, en dat is gemeten**: de
+partnervergoeding over omzet is een invariant op nul (geen instelling, geen
+boardroomknop) en RTG is zelf geen hoedanigheid (negen rollen, allemaal een mens;
+"RTG Management" komt nul keer voor). Beveelt de AI dus een partner aan, dan is er
+geen belang om te melden -- niet omdat het verzwegen wordt, maar omdat het er niet
+is. `test/mn03-commercieelvoordeel.test.js` bewaakt daarom niet de openbaarmaking
+maar die twee AANNAMES, en zakt zodra een ervan verschuift; de foutmelding zegt
+erbij dat de toets dan niet moet worden aangepast maar VERVANGEN door een proef op
+het keuzepad. **Een keuzepad bouwen met een vierde optie die niet bestaat, is het
+product verzinnen om de regel te kunnen toetsen** -- dezelfde grond waarop
+AI-CONTEXT-02 bewust geen handhaver heeft.
+
+**MN-01 en MN-02** (par. 4a en 4b). Ze staan bewust apart, want het zijn twee soorten regels: MN-01 gaat over
 BEVOEGDHEID en is structureel te meten (de aanvalsproef: de EIGENAAR van RTG
 krijgt op dezelfde machtiging 404 waar de gemachtigde 200 krijgt -- zelfde
 object, zelfde actie, andere actor), MN-02 over KENNIS. Bij die tweede is de
@@ -425,14 +438,37 @@ dat is beproefbaar zonder iets nieuws te bouwen: `server/lib/verraad.js` kent
 `schrijf-faalt` ("een aanroeper die dat stil wegvangt, meldt succes over niets"),
 acht toetsbestanden gebruiken ze, tien raken het inzagejournaal, en de doorsnede
 is **nul** -- de toets bij besluit 5 is dus niet "werkt de poort" maar *weigert de
-poort onder `schrijf-verloren`*. De ringbuffer is een APART besluit (6): een
-hashketen bewijst de integriteit van wat er staat en zegt niets over wat eraf
-viel, dus integriteit en retentie zijn twee eigenschappen en de ene wordt hier
-makkelijk voor de andere aangezien. En besluit 7 legt de vraag voor of *een
-belofte over een spoor is pas een regel als het spoor kan weigeren* de twaalfde
-regel van `LAT.md` wordt -- de vorm is niet uniek voor het journaal: 468 lege
-`catch`-blokken in `server/`, waarvan 13 letterlijk `try { save(); } catch`, en
-dat is een vorm en geen aanklacht. **Par. 0.7 keert de volgorde om, en corrigeert
+poort onder `schrijf-verloren`*. De ringbuffer was een APART besluit (6) en is
+genomen: een hashketen bewijst de integriteit van wat er STAAT en zegt niets over
+wat eraf viel, dus integriteit en retentie zijn twee eigenschappen en de ene
+wordt makkelijk voor de andere aangezien. `server/inzagelog-bewaring.js` bewaart
+daarom op TIJD en niet op aantal -- 730 dagen, want het journaal is het bewijs
+OVER toegang en hoort de gegevens waarover het gaat te overleven -- en `MAX` is
+een NOODREM geworden die, als hij bijt, dat TELT en hardop zegt. Verjaren en
+afgekapt worden gaan nooit op een hoop: het eerste is de termijn die werkt, het
+tweede de belofte die breekt. De belofte reist mee met het antwoord tot aan het
+scherm: de inzagekaart draagt `bewaring` PER BRON (`null` waar deze laag de
+termijn van een andere laag niet kent -- een getal over vier bronnen zou de
+langste of de kortste tot waarheid maken) en zet een tekort van de noodrem in
+`nietZichtbaar`, tussen de rest van wat die kaart niet kan tonen. En besluit 7 is genomen: *een belofte over
+een spoor is pas een regel als het spoor kan weigeren* is **regel 13 van
+`LAT.md`** -- niet de twaalfde, want die was al bezet (*een meting die niet heeft
+gedraaid is geen slechte uitslag*), en dat is precies de soort verwarring waar
+LAT-regel 4 over gaat. De vorm is niet uniek voor het journaal en is nu GEMETEN
+in plaats van geschat (`npm run stilspoor`, `STILSPOOR.json`): van de 1841
+`catch`-blokken in `server/` zijn er 674 volledig leeg, met daarbinnen 18
+SPOOR-schrijvers en 24 OPSLAG-schrijvers waarvan het falen wordt opgegeten. Dat
+getal wijkt af van de eerdere schatting van 468 en hoort daar ook niet mee
+vergeleken te worden: deze meter leest het lijf GEBALANCEERD (dus ook over
+meerdere regels) en telt een lijf met alleen een toelichting als leeg -- een
+commentaar maakt een smoring niet minder stil. Het is een vorm en geen
+aanklacht: `server/log.js` smoort `noteerFout` omdat een logger die zelf gooit de
+oorspronkelijke fout maskeert, en `kern/envelop.js` zegt dat de LEVERING
+voorgaat. Vandaar drie ratels die niet hetzelfde doen -- `stilSpoor` en
+`stilleOpslag` alleen omlaag, `stilSpoorAanroepen` alleen omhoog, want een schuld
+die daalt doordat het instrument blind wordt is de gevaarlijkste vorm van
+vooruitgang -- en een besluitregister ernaast dat nooit van de telling
+aftrekt. **Par. 0.7 keert de volgorde om, en corrigeert
 dit document zelf.** Het duurzame primitief bestaat al en is bewust schaars
 (`db/duurzaam.js`: synchroon met fsync, keert pas terug als de opslag bevestigt,
 met `check.js` regel 47 op zijn AANROEPERSLIJST) -- en deze laag staat er al op:
@@ -2116,7 +2152,7 @@ het getal dat het blokkeert: een planner op `gevolg.js` heeft 96 van 176 paden
 `onbekend`, en een promotiesysteem boven
 <!--getal:vertrouwen.bewezen-->0<!--/getal--> bewezen routes promoveert niets.
 
-**`LAT.md` is de technische lat** — regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). En regel 13 vóór je pusht: **"mijn gebruikelijke controles" is niet "het oordeel van de keten"** — een CI-job die als EEN release-oordeel geldt heeft meer poorten dan iemand onthoudt, en `npm run ci:lokaal` draait ze allemaal omdat hij ze AFLEIDT uit `.github/workflows` in plaats van ze over te typen. Een handlijst poorten is een tweede waarheid naast ci.yml en loopt uit elkaar. En regel 17 komt uit een fout van twee keer op een dag: **een poort bewijst alleen zijn eigen bereik** — `check`, `norm` en de deltapoort stonden groen terwijl CI terecht rood bleef, want routedekking en de afdrukregel liggen daarbuiten. Zeg dus nooit "de gate is groen" maar welke poort groen staat, en wat er nog niet bevestigd is. Daar hangt de routeregel aan: een nagemaakte app bewijst het handlergedrag en niet de montage of de deur, dus **geen nieuwe HTTP-route zonder minstens één treffer op een echte server in een gewone CI-toets**. LAT.md gaat over de code, CLAUDE.md over het merk.
+**`LAT.md` is de technische lat** — regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). En regel 13 vóór je pusht: **"mijn gebruikelijke controles" is niet "het oordeel van de keten"** — een CI-job die als EEN release-oordeel geldt heeft meer poorten dan iemand onthoudt, en `npm run ci:lokaal` draait ze allemaal omdat hij ze AFLEIDT uit `.github/workflows` in plaats van ze over te typen. Een handlijst poorten is een tweede waarheid naast ci.yml en loopt uit elkaar. En regel 17 komt uit een fout van twee keer op een dag: **een poort bewijst alleen zijn eigen bereik** — `check`, `norm` en de deltapoort stonden groen terwijl CI terecht rood bleef, want routedekking en de afdrukregel liggen daarbuiten. Zeg dus nooit "de gate is groen" maar welke poort groen staat, en wat er nog niet bevestigd is. Daar hangt de routeregel aan: een nagemaakte app bewijst het handlergedrag en niet de montage of de deur, dus **geen nieuwe HTTP-route zonder minstens één treffer op een echte server in een gewone CI-toets**. En regel 21 is de jongste (13 september 2026): **een belofte over een spoor is pas een regel als het spoor kan weigeren** — met `scripts/stilspoor.js` als handhaver, die de KLASSE telt en niet het geval (spoor- en opslagschrijvers waarvan het falen stil wordt weggevangen, drie ratels, en een besluitregister ernaast dat nooit van de telling aftrekt). Let op het nummer: die regel is op twee takken tegelijk als "regel 13" geschreven, en 13 was hier al bezet — de nummers dragen betekenis, dus hernummeren doe je de jongste. LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)
 

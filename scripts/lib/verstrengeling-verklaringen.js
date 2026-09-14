@@ -381,5 +381,14 @@ module.exports = [
   { van: 'ingang:techniek', naar: 'ingang:eigenaarherstel', soort: 'DOMEINRELATIE',
     reden: 'routes/techniek.js monteert routes/eigenaarherstel.js op zijn gedeelde context. Die context draagt techAuth en eigenaarAlleen, en die twee horen bij de technische pagina en niet op de kern -- ze daarheen tillen zou elk domein toegang geven tot de eigenaarscontrole. De publieke helft van dat bestand (/api/herstel/*) heeft alleen `app` nodig en reist mee' },
   { van: 'domein:rtgid-bewijs', naar: 'domein:persoonseis-lijst', soort: 'DOMEINRELATIE',
-    reden: 'kern/rtgid-bewijs.js r.54 leest SOORTEN uit de persoonseislijst: de bewijsmap toont dat een lid aan een persoonseis voldoet zonder het registratienummer af te geven, en welke eisen er bestaan staat op EEN plek (kern/persoonseis-lijst.js), niet nog eens in de map' }
+    reden: 'kern/rtgid-bewijs.js r.54 leest SOORTEN uit de persoonseislijst: de bewijsmap toont dat een lid aan een persoonseis voldoet zonder het registratienummer af te geven, en welke eisen er bestaan staat op EEN plek (kern/persoonseis-lijst.js), niet nog eens in de map' },
+  /* DE AFRONDREGEL VAN DE BTW. Deze rand is er gekomen om er een weg te halen:
+     de btw op een regel werd op TWEE plekken uitgerekend met twee
+     granulariteiten -- de aangifte per factuurregel, de maandboekhouding over de
+     opgetelde omzet van een categorie. Bij 9% liep dat een cent uit elkaar, en
+     een aangifte die een cent van het grootboek afwijkt laat een boekhouder het
+     hele systeem wantrouwen. De som staat nu in kern/afgeleid.js, waar btwSplit
+     al stond, en beide kanten tellen dezelfde afgeronde centen op. */
+  { van: 'domein:fiscaal', naar: 'domein:afgeleid', soort: 'DOMEINRELATIE',
+    reden: 'kern/fiscaal/index.js en kern/fiscaal/btwtelling.js lezen allebei btwCenten uit kern/afgeleid.js. Dat is met opzet EEN plek: de aangifte telt per factuurregel en de maandboekhouding per bestelregel, en alleen met dezelfde afrondregel komen die twee op hetzelfde getal uit. Stond de som in het fiscale domein zelf, dan had de boekhouding hem opnieuw geschreven -- wat zij deed, en wat de cent opleverde' }
 ];

@@ -81,16 +81,27 @@ test('4. de meter slaat uit op een ontbrekende bak en op een verouderd getal', (
   } finally { INDELING.NL = bewaar; }
 });
 
-/* DE STAND VAN 14 SEPTEMBER 2026. Deze toets is er niet om te zeggen dat vier
-   landen fout staan -- hij is er zodat een VERANDERING een besluit afdwingt in
-   plaats van stil te gebeuren. Verschuift een getal hieronder, dan hoort in de
-   commit te staan welk besluit dat was: is de bak gesplitst, is een tarief
-   bijgewerkt via een jaargang, of is er iets weggepoetst? */
+/* DE STAND VAN 14 SEPTEMBER 2026. Deze toets is er niet om te zeggen dat landen
+   fout staan -- hij is er zodat een VERANDERING een besluit afdwingt in plaats
+   van stil te gebeuren. Verschuift een getal hieronder, dan hoort in de commit te
+   staan welk besluit dat was: is de bak gesplitst, is een tarief bijgewerkt via
+   een jaargang, of is er iets weggepoetst?
+
+   HIJ IS EEN KEER VERSCHOVEN, EN DIT WAS HET BESLUIT (14 september 2026, de
+   eigenaar): `verouderd` van 2 naar 0. DE kreeg een meegeleverde jaargang met
+   ingangsdatum 1-1-2026 (spijzen 19% -> 7%, par. 12 Abs. 2 UStG), zodat de omzet
+   van 2025 op 19% blijft staan; ES is in de BASISTABEL gecorrigeerd van 21% naar
+   10%, want daar was niets veranderd -- wij hadden de horecadienst verkeerd
+   toegewezen (art. 91 Ley 37/1992). Die twee zijn met opzet op een andere manier
+   opgelost; zie test/fiscaal-meegeleverd.test.js toets 5.
+
+   `bakOntbreekt` staat bewust nog op 2 (NL en FR): een bak `drank` kan daar twee
+   tarieven niet dragen, en dat is een vormbesluit dat apart wordt genomen. */
 test('5. de gemeten stand verschuift niet stil', () => {
   const t = meet(LANDEN).telling;
   assert.deepEqual(
     { nagezocht: t.nagezocht, klopt: t.klopt, verouderd: t.verouderd, bakOntbreekt: t.bakOntbreekt },
-    { nagezocht: 6, klopt: 2, verouderd: 2, bakOntbreekt: 2 },
+    { nagezocht: 6, klopt: 4, verouderd: 0, bakOntbreekt: 2 },
     'de stand van de tariefindeling is veranderd. Dat mag -- maar noteer in de commit WELK besluit erachter ' +
     'zit. `bakOntbreekt` omlaag betekent dat de tabel een categorie heeft gekregen; `verouderd` omlaag ' +
     'betekent dat een tarief is bijgewerkt (en dan hoort daar een jaargang met rechtsgrond bij).');
@@ -102,8 +113,14 @@ test('6. verouderd en bakOntbreekt blijven gescheiden', () => {
   const u = meet(LANDEN);
   const de = u.rijen.find(r => r.land === 'DE');
   const nl = u.rijen.find(r => r.land === 'NL');
-  assert.equal(de.punten.every(p => p.soort === 'verouderd'), true,
-    'DE draagt een verouderd eten-tarief (19% terwijl de regel sinds 1-1-2026 7% zegt), geen vormtekort');
+  /* DE klopt nu, maar niet uit de basistabel: de basis draagt het peiljaar 2025
+     (19%) en de meegeleverde jaargang zet er 7% overheen. Dat verschil hoort
+     zichtbaar te blijven -- anders lijkt het alsof de basistabel is bijgewerkt,
+     en dan zou iemand de jaargang kunnen weghalen zonder dat er iets opvalt. */
+  assert.equal(de.stand, 'klopt', 'DE komt vandaag niet op het tarief dat de regel voorschrijft');
+  assert.equal(de.viaJaargang && de.viaJaargang.eten ? true : false, true,
+    'DE dankt zijn eten-tarief niet meer aan een jaargang -- is de basistabel stilletjes bijgewerkt?');
+  assert.equal(de.nu.eten, 7, 'DE rekent vandaag niet met 7% over spijzen');
   assert.equal(nl.punten.every(p => p.soort === 'bakOntbreekt'), true,
     'NL draagt een vormtekort (een bak voor twee tarieven), geen verouderd getal');
   assert.equal(de.eenBakGenoeg, true, 'in DE beslist drank-of-eten, dus een bak volstaat');

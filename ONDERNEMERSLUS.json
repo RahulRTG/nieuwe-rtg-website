@@ -1,8 +1,8 @@
 {
   "stempel": {
-    "op": "2026-09-14T21:04:37.506Z",
-    "commit": "d46c0650",
-    "boomVuil": true,
+    "op": "2026-09-14T21:17:03.054Z",
+    "commit": "4f0af735",
+    "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/ondernemerslus.js",
     "node": "v22.22.2"

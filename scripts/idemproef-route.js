@@ -127,31 +127,42 @@ function wachtOpSchoneBoom() {
       RTG_STAATLOG: '2',
       /* DE TIKKERS STILZETTEN, en dat is een MEETbesluit en geen productiewijziging.
 
-         Twee rondes in dit huis tikken elke vijf minuten: de commercieronde
-         (server/opzet/kernlaag3c.js) en de onderhoudsronde met `betaalWaarheid.ronde()`
-         erin (server/opzet/start.js). Ze schrijven BUITEN elk verzoek om, en deze proef
-         rekent zijn verschil tussen twee oproepen -- dus belandt dat werk in de delta van
-         de route die op dat moment aan de beurt is. Een ronde van drie kwartier vangt er
-         dus een handvol, en welke route de rekening krijgt is toeval.
+         WAT ER GEBEURT. server/kern/bank/index.js draait elke ZESTIG SECONDEN de
+         opdrachtenronde, fire-and-forget: `opdrachten.ronde({}).catch(...)`. Die dient
+         betaalopdrachten opnieuw in bij de rail, en `railInzenden` in server/server.js
+         meldt daarbij de stand van `money.payout` aan kern/commercie/capgezondheid.js.
+         Dat schrijft dus BUITEN elk verzoek om, en deze proef rekent zijn verschil
+         tussen twee oproepen -- dus belandt dat werk in de delta van de route die op dat
+         moment aan de beurt is. Een uurtik erboven (`BANK_RONDE_MS`: rente en vervallen
+         vaste betalingen) doet hetzelfde, minder vaak.
 
-         GEMETEN, niet vermoed (14 september 2026): 14 routes droegen `betaalOpdrachten`
-         en 15 `capGezondheid`, waaronder /api/lab2/labs en /api/rtf/leerling/vakken.
-         Daar is een gevolgcontract op geschreven dat die twee als `gemeten` claimde --
-         en dat viel pas door de mand toen een volgende ronde ze ergens anders neerlegde.
+         GEMETEN en niet vermoed: 23 routes droegen `betaalOpdrachten` en 24
+         `capGezondheid`, waaronder /api/command/puls, /api/ontmoeten/aan en
+         /api/zorgprofiel/zet. Geen daarvan betaalt iets uit. De afstanden tussen die
+         routes in de meetvolgorde (108 tot 464 routes bij ~0,4 s per route) passen bij
+         een tikker van een minuut en bij niets anders.
+
+         EN HIER STOND EERST DE VERKEERDE TIKKER, wat deze regel zelf illustreert. Ik
+         wees de onderhoudsronde van vijf minuten aan (server/opzet/start.js, met
+         `betaalWaarheid.ronde()` erin) en zette daar een variabele op. De ronde daarna
+         ging van 14 naar 23 routes: de meting sprak de verklaring tegen. `betaalWaarheid`
+         is een ANDER register (`terugbetaalOpdrachten`), en de tikker die het wel doet
+         had zijn knop al. Een plausibele oorzaak is geen gemeten oorzaak.
 
          WAAROM NIET IN DE RUISLIJST. Een stille server van 5,5 minuut schrijft
          {"kosten":1,"wacht":6,"techniek":3,"ledenSites":2,"veilig":1,"rtgai":9}. Die zes
          in de ruis zetten zou `ledenSites` wegvangen bij /api/site/bewaar, dat hem ZELF
          schrijft -- een zeef die een echt effect onzichtbaar maakt is erger dan de fout
          die zij opruimt. Vandaar: de bron stilzetten in plaats van het gevolg filteren.
+         Diezelfde stille ronde is met en zonder deze variabelen woordelijk gelijk, dus
+         die zes komen van andere tikkers en staan hier als `tikkersNogAan`.
 
-         WAT DIT NIET DEKT, en dat hoort er even groot bij: `ledenSites`, `veilig` en
-         `rtgai` bewegen nog steeds. Hun tikkers hebben geen variabele, en er is geen
-         reden om aan te nemen dat deze twee de laatste zijn. Wie hier een derde vindt,
-         zet hem erbij -- en wie een collectie in een gevolgcontract als `gemeten` claimt
-         terwijl hij in dat rijtje staat, claimt het werk van een klok. */
-      RTG_COMMERCIE_RONDE_MS: String(24 * 60 * 60 * 1000),
-      RTG_ONDERHOUD_RONDE_MS: String(24 * 60 * 60 * 1000) } });
+         DE COMMERCIERONDE staat er als DERDE bij zonder eigen bewijs: zijn knop bestond
+         al en hij tikt op dezelfde manier, maar geen enkele collectie is aan hem
+         toegerekend. Dat staat er liever bij dan dat het als gemeten bewijs meelift. */
+      BANK_OPDRACHT_RONDE_MS: String(24 * 60 * 60 * 1000),
+      BANK_RONDE_MS: String(24 * 60 * 60 * 1000),
+      RTG_COMMERCIE_RONDE_MS: String(24 * 60 * 60 * 1000) } });
   const { basis, klaar } = server;
 
   /* `extraKoppen` is er voor deuren die hun sleutel in een KOP verwachten en niet
@@ -439,7 +450,7 @@ function wachtOpSchoneBoom() {
     (stilBewoog === null ? 'niet gedraaid' : stilBewoog.length ? stilBewoog.join(', ') : 'niets bewoog'));
   /* Wat er tijdens het meten UIT staat, hoort even zichtbaar te zijn als wat er is
      geijkt: een ronde met andere voorwaarden is een andere ronde. */
-  console.log('  vijfminutentikkers stilgezet         : commercie, onderhoud (+betaalWaarheid)');
+  console.log('  tikkers stilgezet                    : bank opdrachtenronde (60s), bank uurtik, commercie (5m)');
   console.log('  tikkers die NOG tikken (gemeten)     : ledenSites, veilig, rtgai');
 
   /* Het verschil dat DEZE oproep achterliet. De stand loopt door over de hele
@@ -736,7 +747,8 @@ function wachtOpSchoneBoom() {
          Het staat in het REGISTER en niet alleen in de bron, want wie deze getallen
          later leest moet kunnen zien wat er tijdens het meten uit stond -- en wat NIET
          (`tikkersNogAan`, gemeten op een stille server van 5,5 minuut). */
-      tikkersStil: ['commercie (kernlaag3c)', 'onderhoud + betaalWaarheid (start.js)'],
+      tikkersStil: ['bank opdrachtenronde 60s (kern/bank/index.js)', 'bank uurtik (kern/bank/index.js)',
+        'commercie 5m (kernlaag3c) -- geen eigen bewijs'],
       tikkersNogAan: ['ledenSites', 'veilig', 'rtgai'],
       blindeRondes: uit.meterStuk ? 1 : 0, begrenzing: MAX,
       wereldKlaargezet: Object.keys(extra), geldroutesMetEigenLijf: Object.keys(geldLijven).length,

@@ -147,21 +147,6 @@ test('de vier werelden hebben elk een eigen foto en merkaccent', () => {
   }
 });
 
-test('mobiel gebruikt overal één goed aanraakbare Meta-achtige RTG-rand', () => {
-  const mobiel = SIMPLE.slice(SIMPLE.indexOf('/* DE ENE MOBIELE RAND'));
-  assert.match(mobiel, /grid-template-columns:repeat\(5,minmax\(0,1fr\)\)!important/);
-  assert.match(mobiel, /height:72px!important/);
-  assert.match(mobiel, /border-radius:var\(--rtg-radius-system\)!important/);
-  assert.match(mobiel, /min-height:60px!important/);
-  assert.match(mobiel, /\.rtg-edge-ai\{[\s\S]*grid-column:3!important/);
-  assert.match(mobiel, /\.rtg-edge-ai\{[\s\S]*position:absolute!important/);
-  assert.match(mobiel, /left:50%!important;top:6px!important;width:64px!important;transform:translateX\(-50%\)!important/);
-  assert.match(mobiel, /\.rtg-edge-mouth\{width:64px!important;height:34px!important\}/);
-  assert.match(mobiel, /\.rtg-edge-ai small\{display:none!important\}/);
-  for (const oud of ['.rtgdeel-balk', '.ios-thuis', '.tos-nav', '.tos-topbar', '.wos-dock', '.ws-balk'])
-    assert.ok(mobiel.includes(oud), oud + ' wordt niet centraal verborgen');
-});
-
 test('de vaste volgorde is Home, Werelden, AI, Acties, Menu', () => {
   const footer = EDGE.match(/<footer class="rtg-edge-bottom">([\s\S]+?)<\/footer>/);
   assert.ok(footer);
@@ -173,14 +158,12 @@ test('de vaste volgorde is Home, Werelden, AI, Acties, Menu', () => {
   ];
   assert.ok(posities.every(positie => positie >= 0));
   assert.equal(new Set(posities).size, posities.length);
-  for (const [selector, kolom] of [
-    ['.rtg-edge-bottom>a', 1], ['.rtg-edge-worlds-trigger', 2],
-    ['.rtg-edge-ai', 3], ['.rtg-edge-actions-trigger', 4], ['.rtg-edge-menu', 5]
-  ]) {
-    const patroon = new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') +
-      '\\{[\\s\\S]*?grid-column:' + kolom + '!important');
-    assert.match(SIMPLE.slice(SIMPLE.indexOf('/* DE ENE MOBIELE RAND')), patroon);
-  }
+  /* DE KOLOMHELFT IS HIER WEG, EN NIET OMDAT ZIJ ZAKTE. Zij wees naar
+     `/* DE ENE MOBIELE RAND`, het blok dat op telefoonbreedte de bediening van
+     het scherm zelf verborg; dat blok is teruggedraaid, dus er is geen kolom
+     meer om over te oordelen. Wat hier overblijft is de VOLGORDE in de HTML,
+     en die staat in shared/rtg-edge-library.js -- los van de vormlaag, en
+     ongewijzigd sinds voor die rand bestond. */
 });
 
 test('Heritage overschrijft geen route-eigen tekstinkt op donkere eilanden', () => {

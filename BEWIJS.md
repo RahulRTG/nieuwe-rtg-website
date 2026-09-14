@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1875 bestanden en 13406 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1876 bestanden en 13413 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1875 |
-| losse beweringen (`test(...)`) | 13406 |
+| toetsbestanden | 1876 |
+| losse beweringen (`test(...)`) | 13413 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1245 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 72 |
-| alleen in de kop *genoemd*, nog niet gemeten | 158 |
+| alleen in de kop *genoemd*, nog niet gemeten | 159 |
 | niets van beide | 400 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1658 bestanden, 13023 beweringen.
+1659 bestanden, 13030 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -1458,6 +1458,7 @@ toets omvalt.
 | `takken.test.js` | 9 | gezakt op `===->!==#0` | DE TAKKENOPRUIMER -- wanneer zegt hij "deze mag weg", en vooral: wanneer niet. Dit is het enige gereedschap in dit huis dat iets WEGGOOIT op eigen houtje (scripts/takken.js, gestart door .github/workflows/takken.yml). |
 | `talen.test.js` | 10 | gezakt op `liegpoort /api/` | Wereldtalen: het register, de Boardroom-schakelaars en het overal-in-je-eigen- taal-chatten. Iedereen schrijft in de eigen taal; de ander leest alles in de zijne (vertaling per bericht, gecachet). |
 | `talen114.test.js` | 6 | gezakt op `liegpoort /api/` | 114 wereldtalen: het register telt er 114, en de app kan in ELKE actieve taal draaien. Het publieke /api/vertaal/ui vertaalt het UI-woordenboek van een pagina in een keer naar een actieve wereldtaal (shared/i18n.js... |
+| `tariefindeling.test.js` | 7 | genoemd | HOUDT BEVINDING B1 VAN DE OMZETPROEF VAST -- en houdt het register eerlijk. `scripts/omzetproef.js` vond dat de btw-categorie uit de WERKPLEK wordt afgeleid. |
 | `teacherflow.test.js` | 6 | -- | Teacher Flow en het Attention OS: administratie als bijproduct. De beloftes die hier hard worden gemaakt: - de aandachtslijst staat in drie bakken met een REGEL erachter, en er staat een regel per SOORT met een... |
 | `team-room-voorzijde.test.js` | 5 | -- | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `techniek-functies.test.js` | 6 | gezakt op `liegpoort /api/` | Integratietest: functieschakelaars met bevestiging. Een schakelactie maakt een AANVRAAG; er verandert pas iets nadat de eigenaar (Rahul) accepteert. |

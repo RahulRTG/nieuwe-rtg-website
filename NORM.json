@@ -12,7 +12,7 @@
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 341,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 529,
+    "dbDeuren": 530,
     "dbDeurenSchrijvend": 276,
     "dekkingPct": 82,
     "dekkingWaargenomenPct": 100,
@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1578,
+    "kernBreedte": 1580,
     "kernGedeeld": 237,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1658,
-    "toetsenNietGemeten": 609,
+    "toetsenNietGemeten": 618,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -90,7 +90,7 @@
     "bevestigGebreken": 0,
     "verwijzingGebreken": 0,
     "mensmutatieZonderWacht": 1,
-    "gevolgPadenOnbekend": 87,
+    "gevolgPadenOnbekend": 95,
     "gevolgContractVolledig": 4,
     "gevolgContractenGezakt": 0,
     "crashasOnbekend": 89,
@@ -2372,6 +2372,42 @@
       "vervalt": "2026-12-15",
       "meter": "bewijsAchterstand 2384 -> 2404",
       "reden": "ZELFDE OORZAAK ALS gevolgPadenOnbekend hierboven, en dezelfde soort groei: er komt iets in beeld dat er al was. De twintig zijn de gevolg-onbekende paden plus de idem-ongeclassificeerde die eraan hangen; ze golden eerder als gedekt doordat kern/stuur/gevolg.js een `gemeten` gaf waar IDEMPROEF.json `ongemeten` zei. PROOF.md par. 0 eist dat schuld alleen krimpt, en dat is juist de reden dat dit met de hand gaat: een teller die daalt doordat de meting te ruim was, is geen aflossing. De reden staat ook IN het register zelf (BEWIJSSCHULD.json, via --groei), want dat weigerde terecht vast te leggen zonder."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "dbDeuren",
+      "van": 529,
+      "vervalt": "2026-12-15",
+      "meter": "dbDeuren 529 -> 530",
+      "reden": "Tweede samenvoegronde: de elf takken die na bundel #253 zijn doorgegroeid (#242, #243, #246 t/m #252, #256, #257). Een bestand extra buiten server/db/ dat db.data rechtstreeks aanraakt. De weg omlaag is per bestand langs de eigen deur van zijn domein."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "kernBreedte",
+      "van": 1578,
+      "vervalt": "2026-12-15",
+      "meter": "kernBreedte 1578 -> 1580",
+      "reden": "Tweede samenvoegronde (#242 t/m #257). Twee kern-eigenschappen die routes aanraken, opgeteld over de verzameling; elke tak bleef binnen zijn eigen lat. De weg omlaag is per naam kijken of hij een eigen ingang verdient of bij een bestaande hoort."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 609,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 609 -> 618",
+      "reden": "Tweede samenvoegronde (#242 t/m #257): negen toetsbestanden extra waar de mutatiemotor nog niet langs is. Dit is instrumentschuld en geen kwaliteitsverlies -- de toetsen draaien, alleen is nog niet BEWEZEN dat ze kunnen zakken. De motor is urenlang en is in deze ronde bewust niet gedraaid; de weg omlaag is npm run mutatie op een schone boom. LET OP: hem halverwege afbreken laat zijn mutaties in de werkboom staan (LAT.md regel 19) -- dat is hier een keer gebeurd en kostte een ronde."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "gevolgPadenOnbekend",
+      "van": 87,
+      "vervalt": "2026-12-15",
+      "meter": "gevolgPadenOnbekend 87 -> 95",
+      "reden": "Tweede samenvoegronde (#242 t/m #257). Acht AI-bereikbare handelingen erbij waarvan de proef het gevolg niet heeft gezien. VERS GEMETEN op de samengevoegde boom (npm run gevolgdekking: 174 bereikbaar, 24 gemeten, 55 geen effect, 95 onbekend) en niet uit een tak overgenomen -- een van de takken had de norm zelf al op 95 gezet met dezelfde uitslag. Dit is de rem op een planner: een plan mag alleen over handelingen gaan waarvan het gevolg bekend genoeg is. De weg omlaag is de idempotentieproef over die acht paden."
     }
   ],
   "prestatie": {

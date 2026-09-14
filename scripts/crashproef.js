@@ -527,6 +527,27 @@ async function ronde(route, grens, ruis) {
        is EEN object dat alle routes van deze ronde delen; er rechtstreeks in
        schrijven zou het onderwerp van deze route meegeven aan de volgende. */
     const lijf = { ...(a.lijven[route.pad] || a.gedeeld) };
+    /* EEN IDEMPOTENTIESLEUTEL, EN VOOR ALLE DRIE DE OPROEPEN DEZELFDE.
+
+       Zes geldroutes weigerden met "Deze opdracht verplaatst geld en vraagt een
+       idempotentiesleutel" -- pas/betaal, sepa, terugkerend/zet, pay/stuur,
+       pay/tik en verzoek/betaal. Dat was geen zes keer een ontbrekend lijf maar
+       EEN ontbrekend veld in deze proef: scripts/lib/idemproef.js stuurt hem
+       wel, deze niet, en daarmee kwam een kwart van de geldroutes nooit voorbij
+       de verzoekcontrole.
+
+       DEZELFDE SLEUTEL VOOR DE HERHALING, en dat is geen gemak maar de zaak
+       zelf. Een echte client die na een crash opnieuw aanbiedt, stuurt zijn
+       oorspronkelijke sleutel mee -- dat is waar zo'n sleutel voor bestaat. Een
+       VERSE sleutel per poging zou de vraag van `geenDubbel` ontwijken: dan
+       meet je twee verschillende opdrachten in plaats van een herhaling.
+
+       En hij verandert per ronde (route + grens + tijd), zodat twee rondes
+       elkaars sleutel niet erven: een sleutel die blijft hangen maakt van de
+       tweede ronde een herhaling van de eerste. */
+    const idem = 'crashproef-' + route.pad.replace(/[^a-z0-9]+/gi, '-') + '-' + grens.grens + '-' + Date.now();
+    if (lijf.idem === undefined) lijf.idem = idem;
+    if (lijf.idempotentieSleutel === undefined) lijf.idempotentieSleutel = idem;
     if (!lijf || !Object.keys(lijf).length) return { stand: 'WERELD_ONTBREEKT',
       reden: 'idemwereld.js levert geen lijf voor dit pad en de gedeelde wereld is leeg; ' +
         'zonder de echte IBAN/codenaam van DEZE database strandt de oproep op "deed geen werk" ' +

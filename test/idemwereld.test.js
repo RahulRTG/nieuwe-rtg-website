@@ -58,7 +58,7 @@ test('de keten levert alle stukken op die de geldroutes nodig hebben', async () 
   assert.equal(wereld.terugkerendId, 'TK1');
   assert.equal(wereld.tikcode, 'TIK999');
   assert.equal(wereld.factuurId, 'RTG-2026-0002', 'de OPENSTAANDE factuur, niet de eerste de beste');
-  assert.equal(Object.keys(perRoute).length, 23, 'drieentwintig geldroutes krijgen een eigen lijf');
+  assert.equal(Object.keys(perRoute).length, 29, 'negenentwintig geldroutes krijgen een eigen lijf');
   assert.deepEqual(extra, { iban: 'NL00EEN', aan: 'Gouden Ibis', codenaam: 'Gouden Ibis',
     naarCodenaam: 'Gouden Ibis', code: 'ABC123' });
 });
@@ -152,8 +152,17 @@ test('een wereld die niets oplevert laat de proef meten als vanouds', async () =
      uitzonderingen maar de uitkomst van EEN regel: wat niets uit de wereld
      nodig heeft, blijft staan. Wie hier een route bijzet die WEL iets uit de
      wereld leest, breekt die regel en niet deze verwachting. */
+  /* De lijst groeit mee met elk lijf dat NIETS uit de wereld leest, en dat is
+     geen uitzonderingenlijst maar de uitkomst van die ene regel. De drie die er
+     op 14 september bij kwamen dragen alleen vaste waarden: `pay/oplaad` een
+     bedrag binnen de band die de route zelf noemt, `labfonds/locatie/maak` een
+     naam en een land, `wallet/voeg` een soort, titel en code. Wie hier een route
+     bijzet die WEL iets uit de wereld leest, breekt de regel en niet deze
+     verwachting. */
   assert.deepEqual(Object.keys(perRoute).sort(),
-    ['/api/bank/rekening/open', '/api/supplier/giftcard/sell']);
+    ['/api/bank/rekening/open', '/api/boardroom/betalingen/proef',
+      '/api/labfonds/locatie/maak', '/api/pay/oplaad',
+      '/api/supplier/giftcard/sell', '/api/wallet/voeg']);
 });
 
 test('de halve-lijf-regel kijkt ook IN lijsten en posten', () => {

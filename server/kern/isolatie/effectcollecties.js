@@ -43,7 +43,9 @@ const PER_COLLECTIE = Object.freeze({
   bankRekeningen:   ['GELD_BEWEGEN', 'het bestaan en de eigenaar van een rekening'],
   bankPassen:       ['GELD_BEWEGEN', 'een betaalmiddel: uitgeven, bevriezen, limiet'],
   bankTerugkerend:  ['GELD_BEWEGEN', 'een opdracht die vanzelf blijft betalen'],
-  bankregie:        ['GELD_BEWEGEN', 'de bediening van de bankkant'],
+  /* Een bediening is een STAND en geen positie. Hij stond hier als GELD_BEWEGEN en gaf
+     vier bankschakelaars dat label; zie ./geldpositie.js. */
+  bankregie:        ['BEVEILIGING_VERZWAKKEN', 'de bediening van de bankkant: een stand, geen positie'],
   paySaldi:         ['GELD_BEWEGEN', 'het tegoed in RTG Pay'],
   payBoekingen:     ['GELD_BEWEGEN', 'de grootboekregels van RTG Pay'],
   payTegoed:        ['GELD_BEWEGEN', 'tegoed dat besteed kan worden'],

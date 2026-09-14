@@ -506,7 +506,18 @@
       "maxMandaat": "geen",
       "blockingVraagMax": 1,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "NU",
+      "contextGeval": {
+        "app": "RTG Agenda",
+        "deel": "Deze week",
+        "interactie": {
+          "soort": "keuze",
+          "opties": [
+            "Afspraak dinsdag 10:00",
+            "Afspraak donderdag 15:00"
+          ]
+        }
+      }
     },
     {
       "id": "amb-doe-maar-leeg",
@@ -603,7 +614,8 @@
       "maxMandaat": "tonen",
       "blockingVraagMax": 0,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "FASE4",
+      "let op": "de contextconditie is \"na een datumvoorstel\", en die vorm bestaat wel in het contract (een `interactie` met opties). Hij is nog niet gescript omdat de drie toestanden van \"liever later\" dezelfde bewering al dragen -- context verfijnt de intentie -- en een vierde variant daarvan meet niets nieuws. Wie hem alsnog activeert, schrijft de verwachting uit DIT contract en niet uit wat een rail toevallig doet."
     },
     {
       "id": "fup-met-zn-tweeen",
@@ -617,7 +629,8 @@
       "maxMandaat": "tonen",
       "blockingVraagMax": 0,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "FASE4",
+      "let op": "idem: \"na een reisvraag\" is dezelfde vorm als de reiscontext van \"liever later\", en die bewering staat al. Bovendien loopt hij tegen dezelfde productgap aan als \"parijs vrijdag\": er is voor een lid geen reis-capability op de AI-allowlist."
     },
     {
       "id": "fup-ja-doe-maar",
@@ -652,12 +665,66 @@
       "verwachteRoute": "OPERATIONAL",
       "verwachtDoel": "intrekken",
       "ambigu": false,
-      "sideEffectMax": "tonen",
-      "maxMandaat": "tonen",
+      "sideEffectMax": "uitvoeren",
+      "maxMandaat": "uitvoeren",
       "blockingVraagMax": 0,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4",
-      "let op": "NIET TE DRAAIEN, EN NIET OM DE CONTEXT. Het contract wil hier `intrekken`, en er is voor deze rail geen pad om een klaargezet voorstel in te trekken: /api/goedkeuring/intrek, /api/stuur/bevestig en /api/stuur/voorstellen staan alle drie op `verboden`. Dat is geen gat in de bedrading maar een PRODUCTVRAAG -- mag een lid een staand voorstel via Rahul intrekken, of alleen op de knop waar hij het ook bevestigt? Zolang dat niet is besloten, blijft dit geval een vooruitlopend contract; een corpusregel schrijven die iets anders doet dan intrekken, zou de belofte stil veranderen."
+      "beproefbaar": "NU",
+      "let op": "BESLUIT VAN DE EIGENAAR (13 september 2026): ja, een lid mag een nog niet uitgevoerd voorstel conversationeel intrekken. Let op de trede: dit geval mag als enige van de opvolgzinnen tot `uitvoeren` komen, en dat is geen versoepeling maar een meting van wat er echt gebeurt -- /api/member/voorstel/intrek staat op `klein`, en `klein` beeldt af op `uitvoeren` (GEZAGSNOEMER). De trede zegt hoe zelfstandig de machine handelt, niet hoe erg het is als hij ernaast zit: intrekken kan uitsluitend vermogen INLEVEREN, terwijl bevestigen het vrijgeeft. Daarom blijft fup-ja-doe-maar op `geen` staan en komt dit geval verder. Het oude `tonen` hier was een aanname uit de tijd dat het besluit nog niet was genomen, niet een gemeten grens.",
+      "voorbereiding": [
+        {
+          "pad": "/api/agenda/toevoegen",
+          "body": {
+            "titel": "Tandarts",
+            "wanneer": "vrijdag 14:00"
+          }
+        }
+      ],
+      "contextGeval": {
+        "app": "RTG Agenda",
+        "deel": "Vrijdag",
+        "interactie": {
+          "soort": "selectie",
+          "opties": [
+            "Voorstel tandarts vrijdag 14:00"
+          ]
+        }
+      }
+    },
+    {
+      "id": "fup-laat-maar-twee",
+      "input": "laat maar",
+      "klasse": "FOLLOWUP",
+      "context": "twee klaargezette voorstellen, geen van beide op het scherm",
+      "verwachteRoute": "OPERATIONAL",
+      "verwachtDoel": "intrekken",
+      "ambigu": false,
+      "sideEffectMax": "uitvoeren",
+      "maxMandaat": "uitvoeren",
+      "blockingVraagMax": 1,
+      "architectuurKeuzesMax": 0,
+      "beproefbaar": "NU",
+      "let op": "WAAROM DIT GEVAL `ambigu: false` IS, terwijl er twee kandidaten zijn. Het contractveld `ambigu` gaat over wat de INTERPRETATIELAAG kan zien, en die ziet hier niets dubbelzinnigs: de bedoeling (\"laat het klaargezette voorstel vervallen\") is eenduidig, en hoeveel voorstellen er openstaan is aan de zin noch aan het scherm af te lezen. Zou dit geval `ambigu: true` heten, dan eist toets 6 van test/menstaal.test.js terecht `sideEffectMax: geen` -- en dat is de scherpste veiligheidsregel van deze laag, die niet wordt verzacht om een geval te laten passen. Het scherm toont daarom ook met opzet GEEN twee voorstellen: dan zou de dubbelzinnigheid wel zichtbaar zijn en hoorde de TAAL te vragen, zoals bij amb-annuleer-hem.\n\nWAT DIT GEVAL DAN WEL MEET: dubbelzinnigheid die alleen in de TOESTAND VAN DE SERVER bestaat. De keten handelt (tot `uitvoeren`), de POORT weigert met 409 omdat er twee openstaan, en er vervalt niets. De ene vraag die daarna volgt komt dus van de machine en niet van het corpus -- kern/stuur/goedkeuring.js heeft geen id-ingang, dus er valt bij twee voorstellen niets aan te wijzen.",
+      "voorbereiding": [
+        {
+          "pad": "/api/agenda/toevoegen",
+          "body": {
+            "titel": "Tandarts",
+            "wanneer": "vrijdag 14:00"
+          }
+        },
+        {
+          "pad": "/api/agenda/toevoegen",
+          "body": {
+            "titel": "Kapper",
+            "wanneer": "maandag 09:00"
+          }
+        }
+      ],
+      "contextGeval": {
+        "app": "RTG Agenda",
+        "deel": "Deze week"
+      }
     },
     {
       "id": "ctx-deze-met",
@@ -691,7 +758,8 @@
       "maxMandaat": "geen",
       "blockingVraagMax": 1,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "NU"
+      "beproefbaar": "NU",
+      "let op": "BESLUIT VAN DE EIGENAAR (13 september 2026): NIET oplossen, en niet uit gemakzucht. Locatie is semantisch iets anders dan presentatie, verwijzing of interactie; hem in `selectie` proppen zou een vierde contextsoort binnensmokkelen via een tekstveld. Wordt locatie ooit echt onderdeel van Rahul, dan verdient zij een EIGEN contexttype met eigen herkomst, versheid en toestemmingsregels. Tot die tijd hoort dit geval onmeetbaar te blijven: dat is de eerlijke stand en geen gat."
     },
     {
       "id": "ctx-daar",
@@ -705,7 +773,8 @@
       "maxMandaat": "geen",
       "blockingVraagMax": 1,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "FASE4",
+      "let op": "BESLUIT VAN DE EIGENAAR (13 september 2026): NIET oplossen door nu geheugen toe te voegen. De menselijke context is met opzet VLUCHTIG (huidig verzoek, openstaande interactie, selectie). \"Zelfde als vorige keer\" hoort bij een toekomstige geschiedenis- of geheugenlaag met eigen bewaartermijn- en veiligheidsregels, en die laag bestaat niet. Een corpusregel schrijven die iets anders doet dan herhalen, zou de belofte stil veranderen."
     },
     {
       "id": "ctx-zelfde-met",
@@ -719,7 +788,8 @@
       "maxMandaat": "tonen",
       "blockingVraagMax": 1,
       "architectuurKeuzesMax": 0,
-      "beproefbaar": "FASE4"
+      "beproefbaar": "FASE4",
+      "let op": "de contextconditie is \"met geschiedenis\", en die bestaat met opzet niet: de menselijke context is VLUCHTIG (fase 4 -- current request, pending interaction, current selection) en draagt geen verleden. \"Zelfde als vorige keer\" vraagt om langetermijngeheugen, en dat is een ander productprobleem dan deze laag oplost."
     },
     {
       "id": "ctx-zelfde-zonder",

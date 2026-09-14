@@ -47,4 +47,33 @@ module.exports = (ctx) => {
       res.json({ ok: true, ...r, stand: stand() });
     } catch (e) { console.error('[salon-curatie]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
+
+  /* ---- UITLICHTEN: de redactiehandeling zelf (kern/salon/uitlichten.js).
+
+     RTG CUREERT, EN DAT IS NU EEN HANDELING. Tot 13 september stond `featured`
+     alleen in de seed: de merkregel was waar in de tekst en nergens in de code.
+     Het oordeel hierboven (AI/heuristiek) blijft wat het was -- een VOORSTEL --
+     en zet niets. De overgang naar uitgelicht zet een mens, op naam. */
+  const uitl = () => kern.salonUitlichten;
+
+  app.post('/api/office/salon/uitlicht/bord', boardroomAuth, (req, res) => {
+    if (!uitl()) return res.status(503).json({ error: 'Deze laag draait hier niet.' });
+    const voorstellen = viraal.belangKandidaten(posts()).slice(0, 20)
+      .map(p => ({ id: p.id, tekst: String(p.text || '').slice(0, 80) }));
+    res.json(uitl().uitlichtBord(voorstellen));
+  });
+
+  app.post('/api/office/salon/uitlicht', boardroomAuth, (req, res) => {
+    if (!uitl()) return res.status(503).json({ error: 'Deze laag draait hier niet.' });
+    const r = uitl().uitlicht(kern.boardroomWie ? kern.boardroomWie(req) : null, req.body || {});
+    if (r.error) return res.status(r.status || 400).json(r);
+    res.json(r);
+  });
+
+  app.post('/api/office/salon/uitlicht/intrek', boardroomAuth, (req, res) => {
+    if (!uitl()) return res.status(503).json({ error: 'Deze laag draait hier niet.' });
+    const r = uitl().trekIn(kern.boardroomWie ? kern.boardroomWie(req) : null, req.body || {});
+    if (r.error) return res.status(r.status || 400).json(r);
+    res.json(r);
+  });
 };

@@ -89,9 +89,15 @@ test('6. een stap die naar een onbekende stap wijst, zakt', () => {
 });
 
 test('7. het plan zegt VOORAF hoeveel bevestigingen het gaat vragen', () => {
+  /* STAP c IS EEN LEESSTAP en hoort daarom niets aan de teller toe te voegen -- dat is wat
+     deze toets aantoont. Hier stond `/api/pay/saldo`, en die bleek geen leesroute maar een
+     geldweg (kern/factuursaldo.js: de maandfactuur uit het eigen saldo, negen gemeten
+     collecties); hij staat sinds 13 september 2026 op `voorstel`. Vervangen door een ECHTE
+     leesroute in plaats van de verwachting op 3 te zetten: met 3 zou de toets nog wel een
+     getal controleren, maar niet meer de eigenschap dat lezen geen bevestiging kost. */
   const r = compileer({ doel: 'twee mutaties', stappen: [
     stap('a', '/api/agenda/toevoegen'), stap('b', '/api/bank/overboek', { afhankelijkVan: ['a'] }),
-    stap('c', '/api/pay/saldo')] }, 'member');
+    stap('c', '/api/pay/overzicht')] }, 'member');
   assert.equal(r.uitvoerbaar, true);
   assert.equal(r.bevestigingen, 2, 'het aantal bevestigingen klopt niet');
   assert.match(r.samenvatting, /bevestiging/i);

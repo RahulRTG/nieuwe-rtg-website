@@ -81,12 +81,37 @@ module.exports = (ctx) => {
       return { status: 400, error: 'Een bundel gaat tot ' + ctx.KETEN_MAX + ' lagen diep.' };
     }
 
-    const p = d.id && e.producten[String(d.id)] ? e.producten[String(d.id)]
+    const bestond = !!(d.id && e.producten[String(d.id)]);
+    const p = bestond ? e.producten[String(d.id)]
       : { id: 'prod' + crypto.randomBytes(4).toString('hex') };
     Object.assign(p, { naam, prijs, rechten, voorraad, onderdelen });
     e.producten[p.id] = p;
     save();
+    /* HET PUBLIEKE MOMENT: er is iets te koop. Alleen bij een NIEUW product --
+       een prijs of een voorraad bijwerken is geen nieuwe kaartverkoop, en wie
+       dat wel zo telt, wekt zijn volgers bij elke tikfout.
+
+       EN DIT IS DE GEBEURTENIS DIE ER ECHT IS. Het besluitregister noemde
+       eerst `festival.verkoop_geopend`, maar zo'n handeling bestaat niet: een
+       festival OPENT de verkoop niet, het zet een product klaar en dan is het
+       koopbaar. `reserveer` als aanleiding nemen zou een "verkoop open"-moment
+       afvuren bij elke AANKOOP. */
+    if (!bestond) momentVoorProduct(fid, p);
     return { ok: true, product: p };
+  }
+
+  function momentVoorProduct(fid, product) {
+    try {
+      const k = ctx.kern ? ctx.kern() : null;
+      if (!k || !k.aanwezigZorg || !k.mediaNieuwMoment) return null;
+      const f = ctx.festivalVind(fid);
+      if (!f) return null;
+      /* De naam van de ZAAK en niet van het festival -- zie ./index.js,
+         dragerNaam, en de reparatie in ./artiest.js. */
+      const a = k.aanwezigZorg('zaak', f.eigenaar, ctx.dragerNaam(f));
+      const wat = product && product.naam;
+      return a ? k.mediaNieuwMoment(a.id, 'kaartverkoop', wat ? wat + ' voor ' + f.naam : f.naam) : null;
+    } catch (e) { return null; }
   }
 
   return { productZet };

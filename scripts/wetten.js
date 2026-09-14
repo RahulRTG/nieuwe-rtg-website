@@ -55,6 +55,7 @@
 const fs = require('fs');
 const path = require('path');
 const W = require('./lib/wetboek');
+const R = require('./lib/wetrelatie');
 
 const WORTEL = W.WORTEL;
 const NORMBESTAND = path.join(WORTEL, 'NORM.json');
@@ -88,7 +89,7 @@ function meet() {
   const uitslag = W.leesUitslag();
   const rijen = boek.wetten.map(wet => {
     const bron = bronstand(wet);
-    const missendeHandhaver = wet.handhaver.filter(h => !bestaat(h));
+    const missendeHandhaver = R.alleHandhavers(wet).filter(h => !bestaat(h));
     const stand = W.standVan(wet, uitslag);
     return { wet, bron, missendeHandhaver, ...stand };
   });
@@ -133,7 +134,7 @@ function main() {
 
   if (vlag('json')) {
     console.log(JSON.stringify({ wetten: m.rijen.map(r => ({ id: r.wet.id, soort: r.wet.soort, wet: r.wet.wet,
-      bron: r.wet.bron, bronOk: r.bron.ok, handhaver: r.wet.handhaver, stand: r.stand, reden: r.reden })),
+      bron: r.wet.bron, bronOk: r.bron.ok, bewaaktDoor: r.wet.bewaaktDoor || [], draagt: r.wet.draagt || [], stand: r.stand, reden: r.reden })),
       onbewezen, fouten }, null, 2));
     return fouten.length ? 1 : 0;
   }
@@ -156,7 +157,7 @@ function main() {
     const [kleur, woord] = MERK[r.stand] || [K.grijs, r.stand];
     console.log('    ' + kleur + woord.padEnd(12) + K.uit + r.wet.wet);
     console.log('      ' + K.grijs + r.wet.bron.bestand + (r.bron.ok ? '' : K.rood + '  (de zin staat er niet meer!)' + K.grijs) +
-      (r.wet.handhaver.length ? '  [' + r.wet.handhaver.join(', ') + ']' : '  [geen machinale handhaver]') + K.uit);
+      (R.alleHandhavers(r.wet).length ? '  [' + R.alleHandhavers(r.wet).join(', ') + ']' : '  [geen machinale handhaver]') + K.uit);
     if (r.missendeHandhaver.length)
       console.log('      ' + K.rood + 'ontbreekt: ' + r.missendeHandhaver.join(', ') + K.uit);
     if (r.reden) console.log('      ' + K.grijs + '> ' + r.reden.slice(0, 150) + K.uit);

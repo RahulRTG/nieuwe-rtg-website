@@ -22,6 +22,12 @@ const os = require('os');
 const path = require('path');
 const M = require('../scripts/mutatiesemantiek');
 
+/* MEET NIET NAAST EEN MOTOR DIE DE BRON VERBOUWT (scripts/lib/verseboom.js).
+   Deze toets meet de boom OPNIEUW en legt de uitslag naast MUTATIESEMANTIEK.json;
+   loopt er intussen een meterijking of de mutatiemotor, dan telt hij hun
+   tijdelijke aanbouw mee en is het verschil met het register betekenisloos.
+   Zo meldde test/magnaatlab.test.js een keer 2069 waar er 2068 stonden. */
+const { afbouwInDeWeg } = require('../scripts/lib/verseboom');
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mutsem-'));
 /* Elke proef krijgt zijn EIGEN map. Eerst deelden ze er een, en toen las elke
    toets ook de routebestanden van de vorige -- dan meet je de optelsom en niet
@@ -135,7 +141,13 @@ test('8 - de rand van het platform staat apart geteld', () => {
   assert.ok(!r.verklaard.some(x => x.pad === 'bericht.zet'), 'de rand hoort niet tussen de routes te staan');
 });
 
-test('9 - MUTATIESEMANTIEK.json is een AFDRUK en geen los verhaal', () => {
+test('9 - MUTATIESEMANTIEK.json is een AFDRUK en geen los verhaal', (t) => {
+  /* De vergelijking hieronder is alleen iets waard op een boom die NIEMAND
+     aan het verbouwen is; zie scripts/lib/verseboom.js. Overslaan is hier geen
+     slagen: de reden gaat mee de uitslag in. */
+  const inDeWeg = afbouwInDeWeg('mutatiesemantiek');
+  if (inDeWeg) return t.skip(inDeWeg);
+
   /* Zelfde regel als OBJECTMODEL.json en MAKERS.json, en om dezelfde reden: dit
      getal wordt geciteerd, dus een afdruk die stilletjes veroudert is erger dan
      geen afdruk. */

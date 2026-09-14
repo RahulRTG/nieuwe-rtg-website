@@ -136,7 +136,13 @@ test('de bodem raakt alleen wat hij moet raken: gewone leesroutes blijven direct
      hier nooit mag staan is `voorstel` of `verboden`, want dan heeft de bodem
      een route geraakt die hij met rust hoort te laten. */
   const DIRECT_FAMILIE = ['lezen', 'klein'];
-  for (const [pad, wereld] of [['/api/pay/saldo', 'member'], ['/api/agenda/mijn', 'member'],
+  /* `/api/pay/saldo` STOND HIER EN IS GEEN LEESROUTE. Hij betaalt de maandfactuur uit het
+     eigen RTG Pay-saldo (kern/factuursaldo.js, negen gemeten collecties) en staat sinds
+     13 september 2026 op `voorstel` -- zie toets 4b van test/stuur-niveaus.test.js. Hij is
+     vervangen door /api/pay/overzicht, dat wel alleen ophaalt (`geen-effect-gemeten`).
+     Dit was de derde toets die hem als voorbeeld van lezen aanvoerde; de aanname stond in
+     drie bestanden en in geen van de drie was hij nagekeken. */
+  for (const [pad, wereld] of [['/api/pay/overzicht', 'member'], ['/api/agenda/mijn', 'member'],
     ['/api/supplier/state', 'supplier']]) {
     const uit = beleidVoor(pad, wereld);
     assert.ok(DIRECT_FAMILIE.includes(uit.niveau),

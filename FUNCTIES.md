@@ -16,7 +16,7 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **217** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **218** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
 | Bedrijfsgenres | **78** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 217 functieschakelaars
+# 1. De 218 functieschakelaars
 
 ### Leden (RTG-app) — 24
 
@@ -266,7 +266,7 @@ ook blokkeert.
 - **Tenant Control Plane (white-label)** (`tenant`) — Welke organisatie een werkruimte draait, welk merk zij daar voert, en hoe een groep van haar identiteitsprovider een rol wordt. Uit = de werkruimtes werken door onder de RTG-huisstijl, en een inlog via een provider levert geen rollen meer op.  
   _voor: intern, business_
 
-### RTFoundation — 15
+### RTFoundation — 16
 
 - **RTFoundation-app (onderwijs)** (`foundation`) — De gratis onderwijs-app: live schoolbord, leerling-schrift en de AI-bijleshulp.  
   _voor: foundation_
@@ -293,10 +293,12 @@ ook blokkeert.
 - **Klaslokaal (lesmaker)** (`dom-les`) — De live les: klascode, vragen en antwoorden.  
   _voor: foundation_
 - **Leerstof** (`dom-leerstof`) — Het lesmateriaal achter het onderwijs.  
-  _voor: foundation_
+  _voor: rtg, lifestyle, business, gast_
 - **Onderwijs (paspoort en ladder)** (`dom-onderwijs`) — Inschrijven, het leerpaspoort en de leerladder.  
-  _voor: foundation_
+  _voor: rtg, lifestyle, business, gast_
 - **Bijles** (`ov-bijles`) — Het bijlesgesprek met de begeleider.  
+  _voor: rtg, lifestyle, business, gast_
+- **Leerpaspoort (leerling)** (`rtf-leerpaspoort`) — De leerlingkant van onderwijs, leerstof, examen en bijles, achter de leeftijdspas.  
   _voor: foundation_
 
 ### Betalen & verificatie — 6

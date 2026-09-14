@@ -51,9 +51,9 @@ module.exports = [
     uitleg: 'De gezamenlijke uitslagen en besluiten met stadspartners.', paden: ['/api/samen'] },
   { id: 'dom-les', categorie: 'RTFoundation', naam: 'Klaslokaal (lesmaker)', standaard: true, doelgroepen: ['foundation'],
     uitleg: 'De live les: klascode, vragen en antwoorden.', paden: ['/api/les'] },
-  { id: 'dom-leerstof', categorie: 'RTFoundation', naam: 'Leerstof', standaard: true, doelgroepen: ['foundation'],
+  { id: 'dom-leerstof', categorie: 'RTFoundation', naam: 'Leerstof', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'Het lesmateriaal achter het onderwijs.', paden: ['/api/leerstof'] },
-  { id: 'dom-onderwijs', categorie: 'RTFoundation', naam: 'Onderwijs (paspoort en ladder)', standaard: true, doelgroepen: ['foundation'],
+  { id: 'dom-onderwijs', categorie: 'RTFoundation', naam: 'Onderwijs (paspoort en ladder)', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'Inschrijven, het leerpaspoort en de leerladder.', paden: ['/api/onderwijs'] },
 
   // ---------- winkel, media en opslag ----------

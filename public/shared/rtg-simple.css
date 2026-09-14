@@ -23,6 +23,11 @@ body[data-rtg-skin="heritage"][data-rtg-world]{
 
 /* Werelden zijn kamers in hetzelfde huis. De compositie blijft gelijk; kleur,
    metaal en een heel lichte gloed geven elke kamer haar eigen materiaal. */
+body[data-rtg-skin="heritage"][data-rtg-world="living"]:not([data-rtg-eigenvlak]){
+  --rtg-world-photo:url('/images/worlds/heritage/living-heritage-v2.jpg')!important;
+  --rtg-world-photo-position:68% center!important;
+  --rtg-world-photo-mask:linear-gradient(108deg,rgba(244,240,232,.97) 0%,rgba(244,240,232,.89) 48%,rgba(244,240,232,.66) 100%)!important;
+}
 body[data-rtg-skin="heritage"][data-rtg-world="living"]{
   --edge-bg:#0a0805!important;--edge-panel:#15110b!important;--edge-copy:#fff7e9!important;
   --edge-dim:#bcae9a!important;--edge-line:rgba(231,199,143,.2)!important;--edge-metal:#ebcc94!important;
@@ -30,6 +35,11 @@ body[data-rtg-skin="heritage"][data-rtg-world="living"]{
   --edge2-dim:#bcae9a!important;--edge2-line:rgba(231,199,143,.2)!important;--edge2-metal:#ebcc94!important;
   --edge-bar-bg:#0a0805!important;--edge-bar-copy:#fff7e9!important;--edge-bar-dim:#bcae9a!important;
   --edge-bar-line:rgba(231,199,143,.2)!important;--edge-bar-accent:#ebcc94!important;--edge-bar-metal:#ebcc94!important;
+}
+body[data-rtg-skin="heritage"][data-rtg-world="travel"]:not([data-rtg-eigenvlak]){
+  --rtg-world-photo:url('/images/worlds/heritage/travel-heritage-v2.jpg')!important;
+  --rtg-world-photo-position:68% center!important;
+  --rtg-world-photo-mask:linear-gradient(108deg,rgba(12,6,8,.97) 0%,rgba(12,6,8,.83) 48%,rgba(12,6,8,.52) 100%)!important;
 }
 body[data-rtg-skin="heritage"][data-rtg-world="travel"]{
   --edge-bg:#0c0608!important;--edge-panel:#160c0f!important;--edge-copy:#fff5f2!important;
@@ -39,6 +49,11 @@ body[data-rtg-skin="heritage"][data-rtg-world="travel"]{
   --edge-bar-bg:#0c0608!important;--edge-bar-copy:#fff5f2!important;--edge-bar-dim:#c3adb1!important;
   --edge-bar-line:rgba(190,72,108,.23)!important;--edge-bar-accent:#a82c51!important;--edge-bar-metal:#ddb5ad!important;
 }
+body[data-rtg-skin="heritage"][data-rtg-world="work"]:not([data-rtg-eigenvlak]){
+  --rtg-world-photo:url('/images/worlds/heritage/work-heritage-v2.jpg')!important;
+  --rtg-world-photo-position:70% center!important;
+  --rtg-world-photo-mask:linear-gradient(108deg,rgba(4,4,4,.97) 0%,rgba(4,4,4,.84) 48%,rgba(4,4,4,.5) 100%)!important;
+}
 body[data-rtg-skin="heritage"][data-rtg-world="work"]{
   --edge-bg:#040404!important;--edge-panel:#0e0e0e!important;--edge-copy:#f8f5ef!important;
   --edge-dim:#aaa49b!important;--edge-line:rgba(218,210,197,.16)!important;--edge-metal:#d8cebc!important;
@@ -46,6 +61,11 @@ body[data-rtg-skin="heritage"][data-rtg-world="work"]{
   --edge2-dim:#aaa49b!important;--edge2-line:rgba(218,210,197,.16)!important;--edge2-metal:#d8cebc!important;
   --edge-bar-bg:#040404!important;--edge-bar-copy:#f8f5ef!important;--edge-bar-dim:#aaa49b!important;
   --edge-bar-line:rgba(218,210,197,.16)!important;--edge-bar-accent:#c8bda9!important;--edge-bar-metal:#d8cebc!important;
+}
+body[data-rtg-skin="heritage"][data-rtg-world="foundation"]:not([data-rtg-eigenvlak]){
+  --rtg-world-photo:url('/images/worlds/heritage/foundation-heritage-v2.jpg')!important;
+  --rtg-world-photo-position:72% center!important;
+  --rtg-world-photo-mask:linear-gradient(108deg,rgba(5,8,15,.97) 0%,rgba(5,8,15,.84) 48%,rgba(5,8,15,.5) 100%)!important;
 }
 body[data-rtg-skin="heritage"][data-rtg-world="foundation"]{
   --edge-bg:#05080f!important;--edge-panel:#0b1120!important;--edge-copy:#f5f8ff!important;
@@ -294,21 +314,38 @@ body[data-rtg-skin="heritage"] .cmd-startwerelden{
   width:min(100%,780px)!important;margin:0 auto!important
 }
 body[data-rtg-skin="heritage"] .cmd-startwereld{
-  position:relative;display:flex!important;min-height:118px;padding:18px!important;
+  position:relative;display:flex!important;min-height:176px;padding:18px!important;
   flex-direction:column;align-items:flex-start;justify-content:flex-end;gap:5px;
-  border:1px solid var(--rtg-world-line)!important;
+  overflow:hidden;border:1px solid color-mix(in srgb,var(--rtg-world-metal) 34%,var(--rtg-world-line))!important;
   background:
-    radial-gradient(circle at 88% 14%,var(--rtg-world-signature-soft),transparent 46%),
-    var(--rtg-world-card)!important;color:var(--rtg-world-ink)!important;
-  box-shadow:var(--rtg-depth-content);text-align:left!important
+    linear-gradient(180deg,rgba(5,5,5,.04) 8%,rgba(5,5,5,.18) 42%,rgba(5,5,5,.92) 100%),
+    var(--rtg-card-photo),var(--rtg-world-card)!important;
+  background-size:auto,cover,auto!important;background-position:center,center,center!important;
+  color:#fff8ee!important;box-shadow:var(--rtg-depth-focus);text-align:left!important;
+  text-shadow:0 2px 12px rgba(0,0,0,.78)
+}
+body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="living"]{
+  --rtg-card-photo:url('/images/worlds/heritage/living-heritage-v2.jpg');background-position:center,62% center,center!important
+}
+body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="travel"]{
+  --rtg-card-photo:url('/images/worlds/heritage/travel-heritage-v2.jpg');background-position:center,68% center,center!important
+}
+body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="work"]{
+  --rtg-card-photo:url('/images/worlds/heritage/work-heritage-v2.jpg');background-position:center,70% center,center!important
+}
+body[data-rtg-skin="heritage"] .cmd-startwereld[data-world="foundation"]{
+  --rtg-card-photo:url('/images/worlds/heritage/foundation-heritage-v2.jpg');background-position:center,66% center,center!important
 }
 body[data-rtg-skin="heritage"] .cmd-startwereld::before{
   content:"";position:absolute;top:16px;left:16px;width:9px;height:9px;border-radius:50%;
-  background:var(--rtg-world-signature);box-shadow:0 0 0 5px var(--rtg-world-signature-soft)
+  background:var(--rtg-world-metal);box-shadow:0 0 0 5px rgba(0,0,0,.32),0 0 18px var(--rtg-world-metal)
 }
-body[data-rtg-skin="heritage"] .cmd-startwereld strong{font-size:16px;font-weight:650}
+body[data-rtg-skin="heritage"] .cmd-startwereld strong{
+  position:relative;z-index:1;color:#fff8ee!important;
+  font:450 24px/1.05 var(--rtg-display,"Bodoni Moda",Georgia,serif)
+}
 body[data-rtg-skin="heritage"] .cmd-startwereld small{
-  display:block;color:var(--rtg-world-muted);font-size:11px;line-height:1.35
+  position:relative;z-index:1;display:block;color:#f2e7d8!important;font-size:11px;line-height:1.35
 }
 body[data-rtg-skin="heritage"] .cmd-startwereld:hover,
 body[data-rtg-skin="heritage"] .cmd-startwereld:focus-visible{
@@ -556,78 +593,20 @@ body[data-rtg-edge-2-rendered="true"]>.verderbalk:empty{display:none!important}
   body[data-rtg-skin="heritage"] .cmd-startwerelden{grid-template-columns:1fr}
 }
 
-/* DE ENE MOBIELE RAND ------------------------------------------------------
-   Eén zwevende bediening op elk zelfstandig wereldscherm. Oude lokale docks
-   blijven als bron beschikbaar voor de contextlade, maar staan nooit als een
-   tweede zichtbare balk boven of onder Edge. */
-@media(max-width:767px){
-  :root{--edge-bottom:72px}
-  body.rtg-edge-host{
-    --edge-side:0px!important;
-    padding-bottom:calc(92px + env(safe-area-inset-bottom,0px))!important
-  }
-  body.rtg-edge-host[data-rtg-edge-2-rendered="true"]>:is(
-    .rtgdeel-balk,.ios-thuis,.tos-nav,.tos-topbar,.wos-dock,.ws-balk,
-    nav.balk[aria-label="Hoofdnavigatie"]){display:none!important}
-  body.rtg-command[data-rtg-edge-2-rendered="true"] #rtgCommand .cmd-balk{display:none!important}
+/* HIER STOND "DE ENE MOBIELE RAND", EN HIJ IS TERUGGEDRAAID -----------------
+   Dat blok zette op telefoonbreedte onvoorwaardelijk
+   `.rtg-edge-action` en `.rtg-edge-appslot` op display:none. Die twee dragen de
+   handelingen van het scherm ZELF: de Continue Key, en de rail die Edge van de
+   app adopteert. Gemeten op /apps/personeel.html bij 390px stonden er daardoor
+   drie knoppen "Regie" in de DOM en NUL zichtbaar, terwijl de vervangende knop
+   "Acties" zelf niet klikbaar was -- `.rtg-edge-ai` ligt er absoluut overheen.
 
-  body.rtg-edge-host:not([data-rtg-edge-appbar="true"]) .rtg-edge-bottom{
-    left:max(10px,env(safe-area-inset-left,0px))!important;
-    right:max(10px,env(safe-area-inset-right,0px))!important;
-    bottom:max(10px,env(safe-area-inset-bottom,0px))!important;
-    width:auto!important;height:72px!important;padding:6px!important;
-    grid-template-columns:repeat(5,minmax(0,1fr))!important;
-    border:1px solid color-mix(in srgb,var(--edge-bar-accent) 58%,var(--edge-bar-line))!important;
-    border-radius:var(--rtg-radius-system)!important;
-    background:linear-gradient(180deg,
-      color-mix(in srgb,var(--edge-bar-bg) 93%,white 7%),var(--edge-bar-bg))!important;
-    box-shadow:inset 0 1px rgba(255,255,255,.08),0 18px 44px rgba(0,0,0,.5),
-      0 0 28px color-mix(in srgb,var(--edge-bar-accent) 17%,transparent)!important;
-    overflow:hidden!important;backdrop-filter:blur(22px) saturate(1.05)!important
-  }
-  body.rtg-edge-host .rtg-edge-bottom>:is(a,button){
-    min-width:0!important;width:100%!important;height:60px!important;min-height:60px!important;
-    padding:5px 2px!important;border:0!important;border-radius:var(--rtg-radius-system)!important;
-    grid-row:1;align-self:center
-  }
-  body.rtg-edge-host:not([data-rtg-edge-appbar="true"]) .rtg-edge-bottom>a{
-    display:flex!important;grid-column:1!important
-  }
-  body.rtg-edge-host:not([data-rtg-edge-appbar="true"]) .rtg-edge-worlds-trigger{
-    display:flex!important;grid-column:2!important
-  }
-  body.rtg-edge-host:not([data-rtg-edge-appbar="true"]) .rtg-edge-ai{
-    display:flex!important;grid-column:3!important;position:absolute!important;
-    left:50%!important;top:6px!important;width:64px!important;transform:translateX(-50%)!important;
-    color:var(--edge-bar-accent)!important;filter:drop-shadow(0 0 8px color-mix(in srgb,var(--edge-bar-accent) 52%,transparent))
-  }
-  body.rtg-edge-host:not([data-rtg-edge-appbar="true"]) .rtg-edge-actions-trigger{
-    display:flex!important;grid-column:4!important
-  }
-  body.rtg-edge-host:not([data-rtg-edge-appbar="true"]) .rtg-edge-menu{
-    display:flex!important;grid-column:5!important
-  }
-  body.rtg-edge-host .rtg-edge-bottom>:is(a,button):is(
-    [aria-current="page"],[aria-expanded="true"],:active){
-    color:var(--edge-bar-copy)!important;
-    background:radial-gradient(ellipse at 50% 38%,
-      color-mix(in srgb,var(--edge-bar-accent) 25%,transparent),transparent 68%)!important
-  }
-  /* .rtg-edge-appslot staat hier NIET bij. Draagt een app zijn balk over, dan
-     is de eigen kopie al verborgen door de regel bovenaan dit blok; hem hier
-     ook verbergen laat die balk NERGENS staan -- de WorkOS-rail was op een
-     telefoon onbereikbaar (test/zaakregie.e2e.js). */
-  body.rtg-edge-host .rtg-edge-bottom :is(
-    .rtg-edge-history,.rtg-edge-layout,.rtg-edge-action){display:none!important}
-  body.rtg-edge-host .rtg-edge-mouth{width:64px!important;height:34px!important}
-  body.rtg-edge-host .rtg-edge-mouth canvas{
-    width:64px!important;height:30px!important;max-width:64px!important;max-height:30px!important
-  }
-  body.rtg-edge-host .rtg-edge-ai small{display:none!important}
-  body:has(#gate .ag-doos.ag-ballotage) .ag-doos.ag-ballotage .ag-stappen{
-    margin-top:.45rem!important
-  }
-}
+   Dezelfde lijst bestaat nog wel, maar GEBONDEN AAN DE OPEN BALLOTAGEPOORT
+   (zoek op `:has(#gate:not([style*="display: none"]))` hierboven). Daar hoort
+   hij: tijdens het inloggen is een tweede functierail ongewenst. Wie de rand
+   opnieuw bouwt, bouwt eerst een plek waar die handelingen WEL staan -- alleen
+   de verbergregel weghalen is niet genoeg, want in de zwevende capsule kreeg de
+   rail 71px op een scherm van 390px, met de lippen eroverheen. */
 
 @media(min-width:768px){
   .rtg-edge-top{background:color-mix(in srgb,var(--edge-bg) 92%,transparent)!important}

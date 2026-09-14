@@ -32,12 +32,14 @@ module.exports = (kern) => {
   const { maakAanvoer } = require('../kern/knelpunt/aanvoer-bronnen');
   const { maakWerkbron } = require('../kern/knelpunt/aanvoer-werk');
   const { maakOpleidingbron } = require('../kern/knelpunt/aanvoer-opleiding');
+  const { maakOpvangbron } = require('../kern/knelpunt/aanvoer-opvang');
   /* De aanvoer wordt EEN keer samengesteld, bij het bedraden. Per verzoek
      opnieuw bouwen zou de bronnenlijst per aanroep laten verschillen, en dan is
      "welke bronnen zijn er" geen vraag meer met een antwoord. */
   const aanvoer = maakAanvoer({
     werk: maakWerkbron(() => kern.openVacatures),
-    opleiding: maakOpleidingbron(() => kern.beroepenbieb)
+    opleiding: maakOpleidingbron(() => kern.beroepenbieb),
+    opvang: maakOpvangbron(() => kern.opvangwijzer)
   });
 
   /* Eén afhandeling voor twee deuren. Ze apart schrijven zou betekenen dat een

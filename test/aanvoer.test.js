@@ -197,8 +197,12 @@ test('12. een echte vacature komt als vondst achter het knelpunt vandaan', async
 
     assert.equal(r.status, 200);
     assert.ok(Array.isArray(r.d.vondsten), 'de route geeft geen vondsten terug');
-    assert.equal(r.d.vondsten.length, 1, 'de geplaatste vacature komt er niet uit -- de bron is niet bedraad');
-    const v = r.d.vondsten[0];
+    /* DE WERKVONDSTEN, NIET DE HELE LIJST -- zie de reden bij toets 13: een
+       toets die op `length === 1` staat, zakt zodra er een bron bij komt en
+       zegt dan iets over de bronnenlijst in plaats van over de vacature. */
+    const werk = r.d.vondsten.filter((x) => x.terrein === 'werk');
+    assert.equal(werk.length, 1, 'de geplaatste vacature komt er niet uit -- de bron is niet bedraad');
+    const v = werk[0];
     assert.equal(v.terrein, 'werk');
     assert.equal(v.herkomst, 'werk');
     /* Wat de vacature van zichzelf EIST staat er zichtbaar bij en wordt nooit
@@ -228,7 +232,13 @@ test('13. een lege wereld heet bronLeeg en niet "geen vondsten"', async () => {
       manieren: [{ id: 'werken', wat: 'gaan werken', nodig: ['baan'] }]
     }, lid.d.token);
     assert.equal(r.status, 200);
-    assert.deepEqual(r.d.vondsten, []);
+    /* OVER DE WERKBRON, NIET OVER DE HELE LIJST. Hier stond `deepEqual(vondsten,
+       [])`, en dat hield alleen zolang er EEN bron was: de derde bron (opvang)
+       levert in de demowereld wel degelijk plekken, en toen zakte deze toets op
+       een uitslag die precies klopte. Een toets die aan de bronnenLIJST vastzit,
+       verbiedt een vierde bron zonder dat iemand dat heeft besloten. */
+    assert.deepEqual(r.d.vondsten.filter((v) => v.terrein === 'werk'), [],
+      'er is geen vacature in deze wereld, dus de werkbron hoort niets te leveren');
     assert.ok((r.d.vondstenBronLeeg || []).some((b) => b.herkomst === 'werk'),
       'de lege bron meldt zich niet; dan is "geen vacatures" niet te onderscheiden van "niet aangesloten"');
     assert.deepEqual(r.d.vondstenGeweigerd, [], 'een lege wereld is geen weigering');
@@ -254,7 +264,7 @@ test('14. de contractlaag kent geen enkele domeinnaam', () => {
      ("een vacature is geen inkomen"), nooit in code. */
   const codeVan = (t) => t.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
   for (const [naam, tekst] of [['aanvoer.js', bron], ['aanvoer-bronnen.js', bronnenContract]]) {
-    assert.doesNotMatch(codeVan(tekst), /vacature|leerpad|beroep|openVacatures|beroepenbieb/i,
+    assert.doesNotMatch(codeVan(tekst), /vacature|leerpad|beroep|openVacatures|beroepenbieb|opvangwijzer|kinderopvang|groep|nanny/i,
       naam + ' kent een domeinbegrip; het contract is meegebogen met een bron');
   }
 });
@@ -468,4 +478,65 @@ test('23. de grant staat in het register, op EEN functie en met beide deuren', (
      hele knelpuntlaag zet. */
   const breed = FUNCTIES.filter((x) => (x.paden || []).some((p) => p === '/api/knelpunt') && x.id !== 'knelpunt');
   assert.deepEqual(breed, [], 'een tweede functie claimt /api/knelpunt');
+});
+
+/* ---------------------------------------------------------------------------
+   DE DERDE BRON -- want twee punten liggen altijd op een lijn.
+
+   Werk en leerstof waren met opzet elkaars tegenpool, en het contract paste op
+   allebei. Dat bewijst dat het op TWEE vormen past, niet dat het past.
+   Kinderopvang deelt met geen van beide zijn vorm: wel een aanbieder (anders dan
+   leerstof), geen eis aan de mens (anders dan een vacature), en schaarste als
+   een GEMETEN bezetting in plaats van een aantal rijen.
+   ------------------------------------------------------------------------- */
+
+test('24. de derde bron vult als eerste het etiket `beschikbaarheid`', async () => {
+  /* HET ETIKET DAT NOOIT BEPROEFD WAS. `beschikbaarheid` staat sinds dag een in
+     ETIKETTEN en blijft `null` tenzij een bron hem noemt -- en geen van de eerste
+     twee bronnen kon hem noemen. Een etiket dat nooit gevuld werd, is een etiket
+     waarvan niemand weet of het werkt.
+
+     DE MUTATIE: haal `beschikbaarheid` uit de vondst in aanvoer-opvang.js -> deze
+     toets zakt, en toets 12 (die op `null` staat voor werk) blijft groen. Dat
+     verschil is het punt: het veld is optioneel en toch beproefd. */
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-bron3-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP,
+    NODE_ENV: 'test', RTG_DEMO: '1' } });
+  try {
+    const lid = await roep(base, '/api/login', { tier: 'rtg' });
+    const r = await roep(base, '/api/knelpunt', {
+      doel: 'weer aan het werk',
+      randvoorwaarden: [{ id: 'opvang', wat: 'opvang voor mijn kind', stand: 'ontbreekt' }],
+      manieren: [{ id: 'werken', wat: 'gaan werken', nodig: ['opvang'] }]
+    }, lid.d.token);
+    assert.equal(r.status, 200);
+    const plekken = (r.d.vondsten || []).filter((v) => v.terrein === 'opvang');
+    assert.ok(plekken.length > 0, 'de opvangbron levert niets; is hij bedraad?');
+    for (const v of plekken) {
+      assert.equal(v.herkomst, 'opvang');
+      assert.ok(typeof v.beschikbaarheid === 'string' && /\d+ van \d+/.test(v.beschikbaarheid),
+        'de beschikbaarheid is geen geteld getal maar "' + v.beschikbaarheid + '"');
+      /* De zin die de ouderlaag in zijn eigen antwoord zet, reist mee: een
+         vondst komt verder dan de route die hem maakte. */
+      assert.match(v.dektNiet, /niet dat u hem heeft/);
+      assert.match(v.dektNiet, /kinderopvangtoeslag bestaat in deze code niet/);
+    }
+    assert.deepEqual(r.d.vondstenGeweigerd, [], 'de derde bron werd geweigerd door de keuring');
+  } finally { await stop(child); }
+});
+
+test('25. de derde bron krijgt geen mens, en kan dat structureel niet', () => {
+  /* De ouderlaag geeft het aanbod EN wat er op de eigen codenaam openstaat.
+     `opvangwijzerOverzicht(codenaam)` neemt dus een mens aan -- en juist daarom
+     staat hier een toets: de bron roept hem ZONDER argument aan en pakt alleen
+     `.opvangen`. Wie er ooit een codenaam in schrijft, laat deze zakken.
+
+     Dit is dezelfde grens als de handtekening `vondsten(voorwaarde)`, maar een
+     laag dieper: daar kan een mens er niet IN, hier mag hij er niet UIT gehaald
+     worden. */
+  const tekst = fs.readFileSync(path.join(WORTEL, 'server', 'kern', 'knelpunt', 'aanvoer-opvang.js'), 'utf8');
+  const code = tekst.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  assert.doesNotMatch(code, /codenaam|\.mijn\b|sess/i,
+    'de opvangbron raakt een mens aan; de aanvoerlaag mag er structureel geen kennen');
+  assert.match(code, /overzicht\(\)/, 'overzicht() wordt niet zonder argument aangeroepen');
 });

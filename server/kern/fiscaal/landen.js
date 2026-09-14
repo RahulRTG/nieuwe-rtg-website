@@ -36,7 +36,17 @@ const LANDEN = {
       logies: 'TVA op hotelkosten voor eigen werknemers is NIET aftrekbaar; voor genodigden wel.',
       vervoer: 'TVA op personenvervoer is niet aftrekbaar.',
       jet: 'Internationaal personenvervoer valt onder het 0%-tarief.' } },
-  ES: { naam: 'Spanje', alcoholLeeftijd: 18, tarieven: { eten: 10, drank: 21, logies: 10, vervoer: 10, jet: 0, standaard: 21 },
+  /* ES `drank` STOND OP 21 EN DAT WAS GEEN VEROUDERD TARIEF MAAR EEN VERKEERDE
+     TOEWIJZING -- vandaar een correctie hier en GEEN jaargang. Een jaargang draagt
+     een ingangsdatum, en die zou beweren dat er op die dag iets veranderde; in
+     Spanje is er niets veranderd, wij hadden het mis. Art. 91 Ley 37/1992: het
+     criterium is de DIENST en niet het product, dus alles wat ter plaatse als
+     horecadienst wordt geserveerd valt op 10% -- alcohol inbegrepen. De `extra`
+     hieronder zei dat al met zoveel woorden terwijl het getal 21 was.
+     Alcohol BUITEN de horecadienst blijft 21% en komt hier niet langs: die valt
+     via basisCat op `standaard` (kern/fiscaal/tarief.js), want `drank` wordt
+     alleen bereikt vanuit een zaak die eten of logies verkoopt. */
+  ES: { naam: 'Spanje', alcoholLeeftijd: 18, tarieven: { eten: 10, drank: 10, logies: 10, vervoer: 10, jet: 0, standaard: 21 },
     lasten: 0.30, vakantiegeld: 0, uurloonMin: 8.87,
     aangifte: 'IVA per kwartaal (modelo 303) met een jaaroverzicht (modelo 390); loonaangifte maandelijks.',
     extra: 'Horeca en hotels 10%; alcohol in de winkel 21%, als onderdeel van de horecadienst 10%.',

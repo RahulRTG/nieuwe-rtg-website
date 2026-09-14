@@ -16,6 +16,7 @@
    voor NL: een zaak in Belgie of Spanje heeft andere tarieven en een ander
    formulier, en daar een Nederlands rubrieknummer op plakken zou een bewering
    zijn die niet waar is. Daar blijft het bij het tarief zelf. */
+const { btwCenten } = require('../afgeleid');
 const RUBRIEK_NL = { 21: '1a', 9: '1b', 0: '1e' };
 const KWARTAAL = /^(\d{4})K([1-4])$/;
 const MAAND = /^(\d{4})-(0[1-9]|1[0-2])$/;
@@ -70,7 +71,11 @@ function maakBtwTelling({ db }) {
   function regelBtwCenten(r) {
     const inclC = cent(r.incl);
     const tarief = Number(r.btw) || 0;
-    return { inclC, btwC: inclC - Math.round(inclC / (1 + tarief / 100)), tarief };
+    /* De afrondregel zelf staat in kern/afgeleid.js, want de maandboekhouding
+       telt dezelfde centen op. Stond hij hier, dan hadden de twee kanten weer
+       elk hun eigen afronding -- en dat was precies de cent die ze uit elkaar
+       liet lopen. */
+    return { inclC, btwC: btwCenten(r.incl, tarief), tarief };
   }
 
   /* De optelling over het factuurregister. Per REGEL, want daar zit het tarief;

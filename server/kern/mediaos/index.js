@@ -81,10 +81,7 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
      wekmotor omdat die hem leest -- zonder aanwezigheid kan een festival of een
      club niemand wekken, en dat was precies de bevinding van WEKDEKKING.json. */
   const aanwezig = require('./aanwezigheid')({ opslag, schoon, codenaamVan });
-  /* `db` en `save` erbij sinds het momentregister (./wekken.js): een moment
-     WEKTE wel en werd niet vastgelegd, dus een gewekt lid kon nergens
-     terugvinden waarover. Zie de kop daar voor de grens die voorkomt dat dat
-     register een tweede waarheid wordt. */
+  /* De tijdlijn bewaart een moment naast de wek, zonder levende bron te kopieren. */
   const tijdlijn = require('./tijdlijn')({ opslag, aanwezig, SOORT_NAAM: require('./wekken').SOORT_NAAM });
   const wekken = maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn });
   const zoeken = require('./zoeken')({ aanwezig, SOORTEN: aanwezig.AANWEZIG_SOORTEN });

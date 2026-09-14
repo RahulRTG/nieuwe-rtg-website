@@ -606,7 +606,7 @@ body[data-rtg-edge-2-rendered="true"]>.verderbalk:empty{display:none!important}
     nav.balk[aria-label="Hoofdnavigatie"]){display:none!important}
   body.rtg-command[data-rtg-edge-2-rendered="true"] #rtgCommand .cmd-balk{display:none!important}
 
-  body.rtg-edge-host .rtg-edge-bottom{
+  body.rtg-edge-host:not([data-rtg-edge-appbar="true"]) .rtg-edge-bottom{
     left:max(10px,env(safe-area-inset-left,0px))!important;
     right:max(10px,env(safe-area-inset-right,0px))!important;
     bottom:max(10px,env(safe-area-inset-bottom,0px))!important;
@@ -625,21 +625,21 @@ body[data-rtg-edge-2-rendered="true"]>.verderbalk:empty{display:none!important}
     padding:5px 2px!important;border:0!important;border-radius:var(--rtg-radius-system)!important;
     grid-row:1;align-self:center
   }
-  body.rtg-edge-host .rtg-edge-bottom>a{
+  body.rtg-edge-host:not([data-rtg-edge-appbar="true"]) .rtg-edge-bottom>a{
     display:flex!important;grid-column:1!important
   }
-  body.rtg-edge-host .rtg-edge-worlds-trigger{
+  body.rtg-edge-host:not([data-rtg-edge-appbar="true"]) .rtg-edge-worlds-trigger{
     display:flex!important;grid-column:2!important
   }
-  body.rtg-edge-host .rtg-edge-ai{
+  body.rtg-edge-host:not([data-rtg-edge-appbar="true"]) .rtg-edge-ai{
     display:flex!important;grid-column:3!important;position:absolute!important;
     left:50%!important;top:6px!important;width:64px!important;transform:translateX(-50%)!important;
     color:var(--edge-bar-accent)!important;filter:drop-shadow(0 0 8px color-mix(in srgb,var(--edge-bar-accent) 52%,transparent))
   }
-  body.rtg-edge-host .rtg-edge-actions-trigger{
+  body.rtg-edge-host:not([data-rtg-edge-appbar="true"]) .rtg-edge-actions-trigger{
     display:flex!important;grid-column:4!important
   }
-  body.rtg-edge-host .rtg-edge-menu{
+  body.rtg-edge-host:not([data-rtg-edge-appbar="true"]) .rtg-edge-menu{
     display:flex!important;grid-column:5!important
   }
   body.rtg-edge-host .rtg-edge-bottom>:is(a,button):is(
@@ -648,8 +648,12 @@ body[data-rtg-edge-2-rendered="true"]>.verderbalk:empty{display:none!important}
     background:radial-gradient(ellipse at 50% 38%,
       color-mix(in srgb,var(--edge-bar-accent) 25%,transparent),transparent 68%)!important
   }
+  /* .rtg-edge-appslot staat hier NIET bij. Draagt een app zijn balk over, dan
+     is de eigen kopie al verborgen door de regel bovenaan dit blok; hem hier
+     ook verbergen laat die balk NERGENS staan -- de WorkOS-rail was op een
+     telefoon onbereikbaar (test/zaakregie.e2e.js). */
   body.rtg-edge-host .rtg-edge-bottom :is(
-    .rtg-edge-history,.rtg-edge-layout,.rtg-edge-action,.rtg-edge-appslot){display:none!important}
+    .rtg-edge-history,.rtg-edge-layout,.rtg-edge-action){display:none!important}
   body.rtg-edge-host .rtg-edge-mouth{width:64px!important;height:34px!important}
   body.rtg-edge-host .rtg-edge-mouth canvas{
     width:64px!important;height:30px!important;max-width:64px!important;max-height:30px!important

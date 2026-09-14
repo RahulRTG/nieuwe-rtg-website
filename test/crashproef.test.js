@@ -385,7 +385,12 @@ test('elke voorziening overleeft het contract waarmee de crashproef haar aanroep
   const post = async () => ({ status: 200, data: { pas: { id: 'p1' }, code: 'k1',
     verzoeken: [{ id: 'v1' }], regel: { id: 'r1' }, factuur: { id: 'F-1' } } });
   const tokenVoor = () => 'token';
-  const w = { iban: 'NL00RTG0000000001', iban2: 'NL00RTG0000000002', cn2: 'CN-2' };
+  /* `anderToken` hoort hier sinds de tik een voorziening is (14 september 2026): die
+     haalt een verse tikcode bij het TWEEDE lid, want kern/pay/tik.js weigert je eigen
+     tik. Precies zoals de kop hierboven zegt -- een nieuwe voorziening wier vorm hier
+     niet in staat, laat deze toets zakken, en dan hoort de VORM erbij te komen. */
+  const w = { iban: 'NL00RTG0000000001', iban2: 'NL00RTG0000000002', cn2: 'CN-2',
+    anderToken: 'token-van-het-tweede-lid' };
   for (const [pad, maak] of Object.entries(VOORZIENINGEN)) {
     const v = await maak({ post, tokenVoor, rol: 'member', w });
     assert.ok(v && typeof v === 'object', pad + ': een voorziening geeft altijd een object terug');

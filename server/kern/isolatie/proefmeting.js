@@ -22,10 +22,11 @@ const fs = require('fs');
 
 const BRON = path.join(__dirname, '..', '..', '..', 'IDEMPROEF.json');
 
-/* De sleutels waaronder de proef zijn opslagbeelden bewaart. Ze staan hier als
-   lijst omdat het er in de loop van de tijd meer zijn geworden (de kale ronde
-   kreeg er twee bij); een vaste greep op 'a' en 'd' zou stil de helft missen. */
-const BEELDEN = ['a', 'b', 'c', 'd', 'e'];
+/* DE VIJF OPSLAGBEELDEN staan niet meer in een lijst hierboven, en dat is de kern
+   van de reparatie van 14 september 2026: elk beeld hoort bij een EIGEN oproep met
+   een eigen status, dus horen die twee bij elkaar te staan. Een vlakke lijst maakte
+   het onmogelijk om te zien welke oproep een beeld had achtergelaten -- zie de lus
+   in lees() en de uitleg daarboven. */
 
 let ingelezen = null;
 
@@ -48,12 +49,44 @@ function lees() {
 
     /* De COLLECTIES komen uit beide rondes: de proef met een sleutel en de kale
        ronde eronder. Alleen de kale nemen zou de helft van de waarnemingen
-       weggooien, en dit register wordt strenger naarmate het meer ziet. */
+       weggooien, en dit register wordt strenger naarmate het meer ziet.
+
+       MAAR ALLEEN UIT EEN OPROEP DIE ER BIJ KWAM, en dat is de regel die in de kop
+       van dit bestand al stond en hier niet werd toegepast: "een oproep die met 404
+       eindigde bewijst niets over de route, alleen dat de proef er niet bij kwam".
+       Het LEZERSCHAP hieronder eist een 2xx; de collecties namen alles mee.
+
+       WAT DAT KOSTTE (gemeten op 14 september 2026). /api/aandacht gaf drie keer 404
+       ("Zaak niet gevonden") en droeg 27 collecties, want de proef meet tegen EEN
+       server en om die route heen gebeurde ondertussen alles. Daaruit leidde
+       ./effecten.js vier effecten af met graad `afgeleid`: IDENTITEIT_WIJZIGEN,
+       EXTERN_BEREIKEN, SCHRIJVEN_ANDERMANS en VERTROUWENSRELATIE_AANGAAN -- over een
+       handeling die aantoonbaar niet heeft plaatsgevonden. kern/stuur/gevolg.js zei
+       over datzelfde pad `onbekend` met de reden erbij; twee lezers van hetzelfde
+       register die iets anders zeggen over dezelfde route, en dat is LAT.md regel 4
+       op de dag zelf in plaats van over een jaar.
+
+       PER BEELD EN NIET PER RIJ, want de rondes hebben eigen statussen: a/b/c horen
+       bij `statussen`, d/e bij die van de kale ronde. Een route die met een sleutel
+       slaagt en zonder sleutel strandt, houdt zo wat hij werkelijk aanraakte.
+
+       DE RICHTING VAN DE TWIJFEL. Schrijft een route iets en geeft hij daarna een
+       4xx, dan valt die waarneming hier weg. Dat is de strenge kant op -- geen
+       afgeleid effect -- en precies wat de kop hieronder over verouderen zegt: deze
+       laag hoort strenger te worden als zij minder zeker weet, nooit losser. */
+    const OK = (st) => typeof st === 'number' && st >= 200 && st < 300;
     const raakte = collectiesVan.get(rij.pad) || new Set();
-    for (const s of BEELDEN) {
-      for (const bron of [(rij.opslag || {})[s], (z.opslag || {})[s]]) {
-        if (bron) for (const naam of Object.keys(bron)) raakte.add(naam);
-      }
+    const sleutelStatus = rij.statussen || [];
+    const kaleStatus = z.statussen || [];
+    for (const [s, bron, status] of [
+      ['a', (rij.opslag || {}).a, sleutelStatus[0]],
+      ['b', (rij.opslag || {}).b, sleutelStatus[1]],
+      ['c', (rij.opslag || {}).c, sleutelStatus[2]],
+      ['d', (z.opslag || {}).d, kaleStatus[0]],
+      ['e', (z.opslag || {}).e, kaleStatus[1]]
+    ]) {
+      if (!bron || !OK(status)) continue;
+      for (const naam of Object.keys(bron)) raakte.add(naam);
     }
     if (raakte.size) collectiesVan.set(rij.pad, raakte);
 

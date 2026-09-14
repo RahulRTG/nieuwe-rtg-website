@@ -27,7 +27,7 @@
 /* `aanvoer` is het ding uit ./aanvoer-bronnen.js, `knelpunten` de platte rij uit
    ./index.js, en `openingen` de rijen uit ./openingen.js -- die laatste alleen
    om te weten welke terreinen deze vraag RAAKT. */
-function bundel(aanvoer, knelpunten, openingen) {
+function bundelVondsten(aanvoer, knelpunten, openingen) {
   const vondsten = [], geweigerd = [], bronLeeg = [], geleverd = [];
 
   for (const k of (Array.isArray(knelpunten) ? knelpunten : [])) {
@@ -58,4 +58,4 @@ function bundel(aanvoer, knelpunten, openingen) {
   return { vondsten, geweigerd, bronLeeg, geleverd, zonderBron };
 }
 
-module.exports = { bundel };
+module.exports = { bundelVondsten };

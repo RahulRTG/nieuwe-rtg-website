@@ -34,7 +34,7 @@ module.exports = (kern) => {
   const { maakOpleidingbron } = require('../kern/knelpunt/aanvoer-opleiding');
   const { maakOpvangbron } = require('../kern/knelpunt/aanvoer-opvang');
   const { maakWegen } = require('../kern/knelpunt/wegen');
-  const { bundel } = require('../kern/knelpunt/vondstenbundel');
+  const { bundelVondsten } = require('../kern/knelpunt/vondstenbundel');
   /* De aanvoer wordt EEN keer samengesteld, bij het bedraden. Per verzoek
      opnieuw bouwen zou de bronnenlijst per aanroep laten verschillen, en dan is
      "welke bronnen zijn er" geen vraag meer met een antwoord. */
@@ -85,7 +85,7 @@ module.exports = (kern) => {
        de deur, een vondst is wat erachter staat. Het bundelen zelf woont in
        ./kern/knelpunt/vondstenbundel.js -- redeneerwerk hoort toetsbaar te zijn
        zonder server. */
-    const b = bundel(aanvoer, r.knelpunten, o.openingen);
+    const b = bundelVondsten(aanvoer, r.knelpunten, o.openingen);
     res.json({ ...rest, openingen: o.openingen, terreinen: o.terreinen,
       vondsten: b.vondsten, vondstenZonderBron: b.zonderBron,
       vondstenGeweigerd: b.geweigerd, vondstenBronLeeg: b.bronLeeg, vondstenGeleverd: b.geleverd,

@@ -92,8 +92,13 @@ const SLEUTELS = {
      opnieuw langs de meldcode gaan. */
   'POST /api/rtfos/bescherming/meldcode': { zelfdeVerzoek: true },
 
-  /* ---- de knelpuntmotor: rekent, bewaart niets ---- */
+  /* ---- de knelpuntmotor: rekent, bewaart niets ----
+     Twee deuren, een handler: /api/knelpunt vraagt een ingelogde identiteit, de
+     tweede een gezinsprofiel van de RTFoundation. Ze roepen allebei dezelfde
+     beantwoord() aan, juist zodat een gezin nooit een ander antwoord kan krijgen
+     dan een lid -- dus ook hier hetzelfde duplicaatgedrag. */
   'POST /api/knelpunt': { leest: true },
+  'POST /api/rtf/knelpunt': { leest: true },
 
   /* ---- de ouderingang op de kinderopvang ---- */
   'POST /api/opvang': { leest: true },

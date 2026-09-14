@@ -50,9 +50,39 @@ const CATALOGUS = [
     wat: 'de schijf meldt ruimte, de schrijfactie mislukt alsnog',
     waar: 'server/db/index.js save()',
     raakt: 'FAILURE -- een aanroeper die dit stil wegvangt, meldt succes over niets' },
+  /* DRIE DODEN OP DRIE MOMENTEN, en ze horen bij elkaar te staan omdat ze
+     samen de interne crashgrenzen van scripts/lib/crashtaxonomie.js afdekken.
+     Eerst was er alleen de derde; CRASHAS.json mat daardoor 90 van de 135
+     bestaande grenzen als NIET TE BEPROEVEN -- geen onwetendheid maar
+     ontbrekend gereedschap.
+
+     Het verschil tussen de drie is het hele punt. Wie ze samenvoegt tot "een
+     crash", meet drie keer hetzelfde moment en noemt dat dekking.
+
+     TWEE WOORDENLIJSTEN, EN ZE LIEPEN HIER EEN KEER DOOR ELKAAR. `raakt` noemt
+     een SCHAKEL van de bewijsmatrix, `contract` een CRASHCONTRACT uit
+     scripts/lib/crashtaxonomie.js. Waarom dat verschil ertoe doet, staat in
+     test/verraad.test.js, dat het ook bewaakt. */
+  { naam: 'sterf-voor-mutatie',
+    wat: 'het proces sterft VOORDAT er iets is gemuteerd',
+    waar: 'server/db/bijeen.js bijeen(), voor fn()',
+    contract: 'ATOMIC',
+    raakt: 'ROLLBACK, STATE -- er hoort geen spoor te zijn, en een retry hoort schoon te beginnen' },
+  /* EN DE DERDE IS ER NIET, met een GEMETEN reden in plaats van een voornemen.
+     db/sqlite.js schrijft met `BEGIN IMMEDIATE ... COMMIT`, dus de save heeft
+     geen waarneembaar middelpunt: geprobeerd tussen schrijfopdracht en
+     checkpoint, en scripts/crashgrenzen.js mat er een tweede sterf-na-commit.
+     Daarom `waar: null` en geen regel code. Op een opslag die WEL kan scheuren
+     hoort hij alsnog -- server/db/duurzaam.js draagt de vindplaats. */
+  { naam: 'sterf-in-de-opslag',
+    wat: 'het proces sterft MIDDENIN de onderliggende schrijfactie',
+    waar: null,
+    contract: 'ATOMIC',
+    raakt: 'ROLLBACK -- niet te bouwen op een transactionele opslag: er is geen middelpunt' },
   { naam: 'sterf-na-commit',
     wat: 'het proces sterft NA de duurzame schrijfactie en VOOR het antwoord',
     waar: 'server/db/index.js saveDuurzaam()',
+    contract: 'RECOVERABLE',
     raakt: 'IDEMPOTENCY, ROLLBACK -- de klant weet niet dat het gelukt is en probeert opnieuw' },
   { naam: 'klok-vooruit',
     wat: 'de klok loopt voor of achter',

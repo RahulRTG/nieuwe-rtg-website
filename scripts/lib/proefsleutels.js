@@ -105,6 +105,64 @@ const MUNTERS = [
   ['boardroom', 'eigenaar -> /api/account/start {rol:kantoor}: een office-sessie MET lidKey, het enige wat boardroomAuth() doorlaat',
     async (post, bos) => (bos.eigenaar ? tok(await post('/api/account/start', { rol: 'kantoor' }, bos.eigenaar)) : null)],
 
+  /* ---------------------------------------------------------------------
+     TWEE ECHTE KANTOORMEDEWERKERS -- en de reden dat het er TWEE zijn.
+
+     `boardroom` hierboven is de eigenaar. Hij komt door elke kantoordeur, en
+     daardoor kon deze opstelling tot nu toe precies EEN mens aan het kantoor
+     zetten. Dat is genoeg om te meten of een deur opengaat, en te weinig om te
+     meten waar hij OPENGING: een spoor, een handtekening en een journaalregel
+     die aan "de enige medewerker" hangen, hangen aantoonbaar nergens aan.
+
+     Het scherpst is dat bij het vier-ogenprincipe. server/routes/uitgifte.js
+     eist twee PERSONEN onder een document, en met een sleutelbos van een mens
+     is die eis per definitie niet te beproeven -- niet omdat hij zwak is, maar
+     omdat het instrument geen tweede paar ogen heeft. Hetzelfde geldt voor de
+     vraag die het inzagejournaal stelt: staat er de medewerker die keek, of de
+     kantoorcontext waarin hij toevallig zat?
+
+     Vandaar A en B: twee VERSE accounts, allebei niet de eigenaar, die allebei
+     de weg lopen die een medewerker loopt -- registreren, de kantoorrol
+     koppelen, de kantoordeur openen. Elke munter maakt zijn eigen account, dus
+     ze kunnen nooit stilletjes dezelfde mens blijken te zijn.
+
+     DE ZETEL HOORT ERBIJ EN IS GEMETEN. kern/ledenbalie-zetels.js laat de
+     boardroom altijd toe en iedereen anders alleen met een zetel. Gemeten op
+     13 september 2026 met een verse medewerker: zonder zetel 403 op
+     /api/office/balie/zoek, met zetel 400 ("geef minstens twee tekens") -- dus
+     door de deur. Zonder deze stap blijven de baliewegen ongemeten, en dat is
+     precies het gat dat hieronder bij `kantoor-op-naam` beschreven staat.
+
+     De zetel wordt BEST-EFFORT gezet: lukt hij niet (geen boardroom, geen
+     account-id), dan blijft de sleutel gewoon staan. Een medewerker zonder
+     zetel is een geldige medewerker -- hij komt alleen niet aan de balie, en
+     dat is een uitslag en geen instrumenttekort. */
+  ...['a', 'b'].map((letter) => [
+    'kantoor-' + letter,
+    'een VERSE kantoormedewerker op naam (niet de eigenaar): registreren, de kantoorrol koppelen, de kantoordeur openen -- ' +
+      'en van de boardroom een baliezetel krijgen. Twee van deze, A en B, zodat vier ogen en een journaalregel aan een PERSOON te hangen zijn',
+    async (post, bos) => {
+      const email = 'kantoor-' + letter + '-' + Date.now() + '-' +
+        Math.random().toString(36).slice(2, 8) + '@voorbeeld.test';
+      const reg = await post('/api/auth/register', { name: 'Kantoor ' + letter.toUpperCase(),
+        email, password: 'geheim123', geboortedatum: '1985-05-05', pasApp: 'rtg' });
+      const lidTok = tok(reg);
+      if (!lidTok) return null;
+      const k = await post('/api/account/koppel', { soort: 'kantoor', code: OFFICE_CODE }, lidTok);
+      if (!k || k.status !== 200 || (k.data && k.data.error)) return null;
+      const s = await post('/api/account/start', { rol: 'kantoor' }, lidTok);
+      const kantoorTok = tok(s);
+      if (!kantoorTok) return null;
+      /* Het account-id zit in het registratie-antwoord onder state.user; de
+         zetel hangt aan 'user-<id>' en nergens anders aan (ledenbalie-zetels.js
+         weigert met zoveel woorden alles wat daar niet op lijkt). */
+      const id = reg && reg.data && reg.data.state && reg.data.state.user && reg.data.state.user.id;
+      if (id && bos.boardroom) {
+        try { await post('/api/office/balie/zetel', { key: 'user-' + id }, bos.boardroom); } catch (e) {}
+      }
+      return kantoorTok;
+    }]),
+
   /* KANTOOR OP NAAM, en dat is iets anders dan `office` hierboven.
 
      `office` is de GEDEELDE backofficecode: een sessie zonder lidKey, dus zonder
@@ -117,12 +175,21 @@ const MUNTERS = [
      overgeslagen, en ongemeten leest in een uitslag als geslaagd. Dat is precies
      het gat dat test/proefsleutels.test.js bewaakt.
 
-     De sessie is dezelfde als die van de boardroom: de eigenaar logt in als lid
-     en opent daarmee de kantoordeur (kern/eenaccount/starten.js), en DIE sessie
-     draagt een lidKey. Hij staat hier als eigen rol en niet als alias, omdat de
+     DE SLEUTEL IS EEN ECHTE MEDEWERKER EN NIET MEER DE EIGENAAR. Tot 13
+     september 2026 was dit letterlijk `bos.boardroom`. Dat MAT wel iets -- de
+     eigenaar loopt door dezelfde tak van kluispoort.js als een medewerker, want
+     zijn `/api/account/start`-sessie is een office-sessie met een lidKey, en
+     `req.eigenaar` wordt op die weg niet gezet -- maar het mat het met de enige
+     mens die overal bij mag. Wat een medewerker NIET heeft (een baliezetel, een
+     tweede paar ogen naast zich) bleef daarmee onzichtbaar.
+
+     Nu is het `kantoor-a` hierboven: een vers account dat de kantoorrol heeft
+     gekoppeld. De boardroom blijft de terugval, zodat deze rol nooit MINDER
+     dekking heeft dan hij had -- een reparatie die dekking kost, is geen
+     reparatie. Hij staat hier als eigen rol en niet als alias, omdat de
      bewakerskaart hem als eigen rol kent en de verdeling op die naam gebeurt. */
-  ['kantoor-op-naam', 'dezelfde office-sessie MET lidKey als de boardroom: een kantoorsessie met een mens erachter, wat de gedeelde code niet is',
-    async (post, bos) => bos.boardroom || null],
+  ['kantoor-op-naam', 'kantoor-a: een echte medewerker op naam, met de boardroom als terugval. De gedeelde code komt hier niet door',
+    async (post, bos) => bos['kantoor-a'] || bos.boardroom || null],
 
   /* baasAuth() in server/routes/werkplek.js is `wie(req).baas`, en `wie` is
      boardroomWie/boardroomBaas. Dezelfde sessie dus, met dezelfde reden. */
@@ -168,7 +235,12 @@ const MUNTERS = [
    `member` met een ander abonnement erachter -- geen enkele route draagt ze als
    bewaker, en ze in de verdeling opnemen zou routes toewijzen aan een rol die
    niet bestaat. Ze zijn er om te KUNNEN uitwijken, niet om op te verdelen. */
-const GEEN_BEWAKER = new Set(['eigenaar', 'lid-lifestyle', 'lid-business']);
+/* `kantoor-a` en `kantoor-b` staan er om dezelfde reden bij als `eigenaar`: ze
+   zijn IDENTITEITEN en geen deuren. Geen enkele route draagt ze als bewaker --
+   de deur heet `kantoor-op-naam` -- en ze in de verdeling opnemen zou routes
+   toewijzen aan een rol die niet bestaat. Ze zijn er om te KUNNEN uitwijken en
+   om twee mensen naast elkaar te kunnen zetten, niet om op te verdelen. */
+const GEEN_BEWAKER = new Set(['eigenaar', 'lid-lifestyle', 'lid-business', 'kantoor-a', 'kantoor-b']);
 
 /* De passen in de volgorde waarin een 403 wordt herprobeerd. */
 const PASLADDER = ['member', 'lid-lifestyle', 'lid-business'];

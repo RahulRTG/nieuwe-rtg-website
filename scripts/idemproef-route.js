@@ -17,6 +17,7 @@
 
    Draai:  node scripts/idemproef-route.js
            node scripts/idemproef-route.js --max=200
+           node scripts/idemproef-route.js --pad=office/bank/rekening   (PEILING: schrijft niets)
    ========================================================================== */
 'use strict';
 const fs = require('fs');
@@ -34,6 +35,34 @@ const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'IDEMPROEF.json');
 const argv = process.argv.slice(2);
 const MAX = Number((argv.find(a => a.startsWith('--max=')) || '').slice(6)) || 0;   // 0 = alles
+
+/* `--pad=<stuk>` MEET EEN HANDVOL ROUTES EN SCHRIJFT NIETS -- een PEILING en
+   geen ronde.
+
+   WAAROM DIT ER IS. De effect-as van `npm run kantoormacht` leest de `opslag` van
+   dit register en is BLIND voor twaalf van de veertien zware kantoorroutes: de
+   proef krijgt ze niet aan het werk omdat ze een wereld vragen (een rekening, een
+   kredietaanvraag, een salarisvoorstel). Wie daar een lijf aan toevoegt in
+   ./lib/idemwereld.js, wil weten of die ene route nu werk doet -- en het
+   instrument kende alleen alles-of-niets. Een volle ronde raakt vijfduizend
+   routes, dus dan wordt zo'n verbetering nooit nagetrokken.
+
+   HIJ IS AANWIJSBAAR EN NIET SNEL, en dat verschil hoort erbij. De filter
+   versmalt de MEETLUS, niet de opstelling: `zetWereldKlaar` bouwt nog steeds de
+   hele wereld (leden, rekeningen, zaken, een school), en dat kostte op 13
+   september meer dan negen en een halve minuut -- een peiling op twee routes werd
+   door een tijdgrens van 580 seconden afgekapt voordat de lus begon. Wie alleen
+   wil weten of een LIJF klopt, is met een eigen opstelling van dertig regels
+   sneller klaar; deze vlag is er om de PROEF op een route te kunnen aanwijzen.
+
+   EN WAAROM HIJ WEIGERT TE SCHRIJVEN. Een gefilterde ronde die het register
+   overschrijft, zet 4912 gemeten routes terug naar twee -- en dat ziet er daarna
+   volkomen normaal uit. Dat is niet theoretisch: de kop hierboven beschrijft
+   precies zo'n geval bij ROLPROEF.json (3377 naar 292), en op 13 september is in
+   scripts/mutatiecontract.js een register gevonden dat over een oudere
+   werkelijkheid rapporteerde. Dezelfde fout, twee instrumenten. Een peiling is
+   dus een peiling: hij meet, hij vertelt, en hij laat het register staan. */
+const PAD = (argv.find(a => a.startsWith('--pad=')) || '').slice(6);
 
 /* rolVan() woont in ./lib/routes.js, samen met de REDEN waarom een rol soms niet
    te bepalen valt. Hij stond hier woordelijk, en in drie andere proef-scripts nog
@@ -181,7 +210,14 @@ function wachtOpSchoneBoom() {
      mee ging, en `zonderRol` draagt de reden als de oproep met een lege kop is
      gedaan. Wie het naleest kan die twee nooit voor elkaar aanzien. */
   const zonderKop = verdeling.zonderRol.map(r => ({ methode: r.methode, pad: r.pad, rol: null, zonderRol: r.reden }));
-  const routes = [...verdeling.metRol, ...zonderKop];
+  const alleKandidaten = [...verdeling.metRol, ...zonderKop];
+  /* De peiling (--pad) versmalt de lijst; zonder vlag verandert er niets. */
+  const routes = PAD ? alleKandidaten.filter(r => r.pad.includes(PAD)) : alleKandidaten;
+  if (PAD) {
+    console.log('\n  PEILING op "' + PAD + '": ' + routes.length + ' van ' +
+      alleKandidaten.length + ' routes. Het register wordt NIET geschreven.');
+    if (!routes.length) { console.error('  Geen route bevat dat stuk pad.'); process.exitCode = 1; }
+  }
 
   console.log('\n=== DE IDEMPOTENTIE PER ROUTE ===\n');
   meldSleutels(bos);
@@ -513,6 +549,22 @@ function wachtOpSchoneBoom() {
     ' peilingen (elke ' + wachtVerslag.stap + ' routes), ' + wachtVerslag.gebeurtenissen.length + ' omslag(en)');
   console.log('  roosteropvragingen                   : ' + bos.zaakbureau.verbruikt() + ' / 30');
 
+
+  /* DE PEILING SCHRIJFT NIET. Zie de kop bij PAD: een gefilterde ronde die het
+     register overschrijft, zet duizenden gemeten routes terug naar een handvol en
+     ziet er daarna normaal uit. */
+  if (PAD) {
+    console.log('\n  PEILING: IDEMPROEF.json is NIET geschreven (--pad was actief).');
+    for (const [sleutel, rij] of Object.entries(uit.perRoute || {})) {
+      const z = rij.zonderSleutel || {};
+      console.log('    ' + sleutel + '\n      met sleutel : ' + rij.idempotentie + '  (' + (rij.reden || '') + ')' +
+        '\n      zonder      : ' + (z.stand || '-') + '  (' + (z.reden || '') + ')' +
+        '\n      opslag      : ' + JSON.stringify(rij.opslag || {}) +
+        (z.effect ? '\n      effect      : ' + JSON.stringify(z.effect) : ''));
+    }
+    await klaar();
+    return;
+  }
 
   fs.writeFileSync(UITSLAG, JSON.stringify({
     stempel: stempel(),

@@ -1,7 +1,7 @@
 /* Shared-assets (deelmodule): hertaxatie, het kantooroverzicht, terugkoop uitbetalen en de service-fees.
    Krijgt de gedeelde context een keer bij het opstarten vanuit kern/assets.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, schoon, notify, pay,
+  const { db, save, vastleggen, crypto, schoon, notify, pay,
     TICKETS_PER_OBJECT, UREN_PER_TICKET, JAREN_GELDIG, BETALENDE_PASSEN, BEDENKTIJD_DAGEN,
     TERUGKOOP_VENSTER_DAGEN, SERVICE_FEE_PCT, OVERDRACHT_FEE_PCT, ONDERHOUD_DAGEN, PIEK_MAANDEN,
     ACCESS_FACTOR, ASSET_FACTOR, netjes,
@@ -85,12 +85,47 @@ module.exports = (ctx) => {
       try { r = await pay.huisIn({ vanCodenaam: t.codenaam, centen: fee * 100, oms: 'Servicefee ' + jaar + ' ' + a.naam, idem: 'fee-' + t.id + '-' + jaar }); }
       catch (e) { r = { error: e.message }; }
       if (!r || !r.ok) { mislukt++; if (!reden && r && r.error) reden = r.error; continue; }
-      t.feeJaar = jaar;
-      kasAdd(a.id, fee * 100);
+      /* GEIND EN AFGEVINKT HOREN SAMEN VAST TE STAAN.
+
+         Hier stond `t.feeJaar = jaar; kasAdd(...)` los, met een `save()` na de
+         hele lus. De BETALING erboven is duurzaam (kern/pay staat op de lijst
+         van check.js regel 47), het merkteken was dat niet -- en dat is de
+         gevaarlijkste helft van de twee. Gemeten in FAALPROEF.json: onder
+         `schrijf-verloren` kwam /api/office/asset/fees terug met 200 en
+         "geind: N" terwijl `feeJaar` en de kas verdwenen.
+
+         Wat daar werkelijk misgaat is niet het getal maar de VOLGENDE ronde:
+         met een verdwenen `feeJaar` wordt de fee opnieuw geprobeerd. De
+         idem-sleutel (`fee-<ticket>-<jaar>`) houdt het LID dan schadeloos --
+         hij wordt geen tweede keer afgeschreven -- maar `kasAdd` zou wel een
+         tweede keer optellen. Eenmaal betaald, tweemaal geboekt.
+
+         Per TICKET een commit en niet een aan het eind: de lus schrijft per
+         ticket geld weg, en een commit die twintig tickets omvat laat bij een
+         storing niet zien welke van de twintig wel betaald zijn. Een ticket
+         dat niet vastgelegd kon worden telt als MISLUKT met de reden erbij --
+         het geld is dan geind en het merkteken niet, en dat moet een mens
+         zien, niet een teller verbergen. */
+      if (vastleggen) {
+        const nietVast = await vastleggen(() => { t.feeJaar = jaar; kasAdd(a.id, fee * 100); });
+        if (nietVast) {
+          mislukt++;
+          if (!reden) reden = 'De fee is geind maar niet vastgelegd; de opslag bevestigde het niet. ' +
+            'Draai deze ronde opnieuw: het lid wordt niet nog een keer afgeschreven (idem-sleutel).';
+          continue;
+        }
+      } else {
+        t.feeJaar = jaar;
+        kasAdd(a.id, fee * 100);
+        save();
+      }
       geind++; totaal += fee;
     }
-    save();
-    return { ok: true, geind, totaal, mislukt, reden, door: schoon(wie, 40) || 'RTG-kantoor' };
+    return { ok: true, geind, totaal, mislukt, reden, door: schoon(wie, 40) || 'RTG-kantoor',
+      /* Zonder vastlegger is `geind` een getal zonder duurzaamheidsbelofte, en
+         dat hoort in het antwoord te staan in plaats van eruit te zien als de
+         andere. */
+      ...(vastleggen ? {} : { vastgelegd: false, waarom: 'deze opstelling heeft geen duurzame bundel' }) };
   }
 
   return { assetHertaxeer, assetKantoor, assetTerugkoopUit, assetFeesInnen };

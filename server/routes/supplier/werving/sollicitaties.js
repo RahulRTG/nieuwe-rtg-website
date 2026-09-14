@@ -70,14 +70,20 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
     logActivity(req.supplier.code, req.actor, 'nam ' + a.name + ' aan als ' + a.func);
     sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
     sseToOffice('sync', { scope: 'team' });
-    notifyApplicant(a, req.supplier);
-    if (a.key && db.data.notifications[a.key]) {
-      notify(a.key, direct
-        ? { icon: 'ster', title: 'Aangenomen bij ' + req.supplier.name,
-            body: 'Welkom bij het team. Uw werkplek staat klaar in de app onder Mijn werkplekken; u hoeft niets meer in te vullen.' }
-        : { icon: 'ster', title: 'Aangenomen bij ' + req.supplier.name,
-            body: 'Uw personeelsuitnodiging staat klaar. Vraag uw werkgever om de eenmalige beveiligde uitnodigingslink.' });
-    }
+    // Mee met het besluit; een eigen `if (a.key)`-blok liet een sollicitant
+    // zonder lidsessie dit missen. Zie kern/werk-bezorging.js.
+    notifyApplicant(a, req.supplier, { vervolg: direct
+      ? { icon: 'ster', titel: 'Aangenomen bij ' + req.supplier.name,
+          tekst: 'Welkom bij het team. Uw werkplek staat klaar in de app onder Mijn werkplekken; u hoeft niets meer in te vullen.' }
+      : { icon: 'ster', titel: 'Aangenomen bij ' + req.supplier.name,
+          tekst: 'Uw personeelsuitnodiging staat klaar. Vraag uw werkgever om de eenmalige beveiligde uitnodigingslink.' } });
+    /* HET VERVOLGBERICHT LANGS DEZELFDE WEGEN. Hier stond `if (a.key && ...)`,
+       en dat is dezelfde stille val als in notifyApplicant: een sollicitant
+       zonder LIDsessie -- een gezinslid uit de RTFoundation -- kreeg deze
+       tweede, praktische mededeling nooit. Juist die telt: `direct` is voor hem
+       per definitie vals (neemAan hangt aan a.key), dus hij is degene die de
+       uitnodigingslink moet vragen. kern/ontvanger.js kiest de weg. */
+
     return res.json({ ok: true, bedrijf: req.supplier.name,
       // de kassacode blijft in het antwoord voor wie hem nog nodig heeft; is de
       // sollicitant al verbonden, dan is hij verbruikt en zegt 'direct' dat

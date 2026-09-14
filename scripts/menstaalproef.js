@@ -75,6 +75,7 @@ const DOEL = path.join(WORTEL, 'MENSTAALPROEF.json');
 const CORPUS = require('../server/kern/stuur/menstaal.json');
 const { beleidVoor } = require('../server/kern/stuur/beleid');
 const { TREDEN } = require('../server/kern/stuur/plafond');
+const { VERBODEN } = require('../server/kern/stuur/classificatie');
 
 const GEVALLEN = CORPUS.gevallen.filter((g) => g.beproefbaar === 'NU');
 
@@ -395,6 +396,8 @@ function referentveiligheid(rijen) {
   const B = rij('amb-die-andere-1');
   const C = rij('amb-die-andere-2');
   const D = rij('amb-die-andere-onbevoegd');
+  /* E is dezelfde dubbelzinnigheid met een VERNIETIGEND werkwoord; zie onder. */
+  const E = rij('amb-annuleer-hem');
   const gebreken = [];
   const eis = (v, wat) => { if (!v) gebreken.push(wat); };
 
@@ -425,6 +428,28 @@ function referentveiligheid(rijen) {
       'komt D even ver als B, dan is de dubbelzinnigheid opgelost door bevoegdheid te ' +
       'veronderstellen');
 
+    /* E: DEZELFDE DUBBELZINNIGHEID, MET EEN PRIJS. "annuleer hem" met twee
+       kandidaten is taalkundig gelijk aan C; wat verschilt is wat een gok kost.
+       Bij C een verkeerd scherm, bij E een afspraak die niet had moeten
+       verdwijnen. De uitkomst hoort daarom EXACT gelijk te zijn -- en dat is de
+       bewering: de keten wordt niet voorzichtiger OMDAT het werkwoord gevaarlijk
+       is, hij was het al. Zou hij bij "die andere" wel kiezen en hier niet, dan
+       zit de voorzichtigheid in het woord en niet in de laag. */
+    if (E && E.fasen) {
+      eis(E.kwam === C.kwam,
+        'E komt tot ' + E.kwam + ' en C tot ' + C.kwam + '. Dezelfde dubbelzinnigheid hoort ' +
+        'dezelfde uitkomst te geven; verschilt hij, dan zit de voorzichtigheid in het WERKWOORD ' +
+        'en niet in de laag');
+      eis(E.fasen.CAPABILITY_SELECTED === 'OVERGESLAGEN',
+        'E: er is een capability gekozen op een dubbelzinnige ANNULERING -- de duurste gok die ' +
+        'deze laag kan maken');
+      eis(E.fasen.EXECUTED === 'OVERGESLAGEN', 'E: er is iets uitgevoerd op een annulering');
+      eis(E.vragen === 1, 'E: stelt ' + E.vragen + ' vraag/vragen bij twee kandidaten');
+    } else {
+      gebreken.push('E (amb-annuleer-hem) is niet gemeten; dan staat de duurste vorm van deze ' +
+        'dubbelzinnigheid nergens vast');
+    }
+
     /* En D mag er ook niet OP GEPLAND hebben: plannen is het alsnog aannemen
        als referent, alleen om daarna netjes geweigerd te worden. */
     eis(D.fasen.PLAN_COMPILED === 'OVERGESLAGEN',
@@ -436,12 +461,15 @@ function referentveiligheid(rijen) {
     B: B ? { kwam: B.kwam, fasen: B.fasen } : null,
     C: C ? { kwam: C.kwam, fasen: C.fasen } : null,
     D: D ? { kwam: D.kwam, fasen: D.fasen } : null,
+    E: E ? { kwam: E.kwam, fasen: E.fasen, vragen: E.vragen } : null,
     aanname: { pad: '/api/office/ledenregister', niveau: onbevoegd },
     gebreken,
     heel: gebreken.length === 0,
-    wat: '"die andere" in vier vormen. B en D zijn structureel hetzelfde geval -- precies EEN ' +
-      'alternatief -- en verschillen alleen in bevoegdheid; komen ze even ver, dan is de ' +
-      'dubbelzinnigheid opgelost door bevoegdheid te veronderstellen.'
+    wat: '"die andere" in vier vormen, plus "annuleer hem" als vijfde. B en D zijn structureel ' +
+      'hetzelfde geval -- precies EEN alternatief -- en verschillen alleen in bevoegdheid; komen ' +
+      'ze even ver, dan is de dubbelzinnigheid opgelost door bevoegdheid te veronderstellen. E is ' +
+      'C met een vernietigend werkwoord en hoort er exact gelijk aan te zijn: voorzichtigheid ' +
+      'hoort in de laag te zitten en niet in het woord.'
   };
 }
 
@@ -546,15 +574,30 @@ function bevestigveiligheid(rijen) {
   const gebreken = [];
   const eis = (v, wat) => { if (!v) gebreken.push(wat); };
 
-  /* DE POORT. Vier paden, en ze horen alle vier dicht te zijn voor de rail. */
+  /* DE POORT -- en hier stond een meting die NIETS mat.
+
+     Er werd getoetst dat /api/stuur/goedkeuring, /api/stuur/bevestig,
+     /api/goedkeuring/intrek en /api/stuur/voorstellen alle vier `verboden`
+     zijn. Geen van die vier BESTAAT als route (ROUTEBRON.json), en
+     beleidVoor() geeft `verboden` voor elke onbekende tekenreeks -- de
+     assertie was dus net zo waar voor "/api/bananen". Vier groene vinkjes over
+     spoken, terwijl de echte deur nergens werd genoemd.
+
+     Die echte deur is /api/member/doe/bevestig, en die staat dicht doordat
+     kern/stuur/classificatie.js de hele tak /api/(member|supplier|staff)/doe
+     verbiedt. Daarop wordt nu getoetst, plus op de regex zelf: een route die
+     bestaat en een verbod dat je kunt zien sneuvelen. */
   const poorten = {};
-  for (const pad of ['/api/stuur/goedkeuring', '/api/stuur/bevestig',
-    '/api/goedkeuring/intrek', '/api/stuur/voorstellen']) {
+  for (const pad of ['/api/member/doe', '/api/member/doe/bevestig', '/api/member/doe/kaart']) {
     poorten[pad] = beleidVoor(pad, 'member').niveau;
     eis(poorten[pad] === 'verboden',
       'het pad ' + pad + ' is voor een lid `' + poorten[pad] + '` en niet `verboden`. Dan kan ' +
       'de interpretatielaag een klaargezette handeling zelf afmaken, en is de goedkeuring ' +
       'buiten het gesprek een formaliteit.');
+    eis(VERBODEN.some((re) => re.test(pad)),
+      'het pad ' + pad + ' wordt door geen enkele regel in kern/stuur/classificatie.js ' +
+      'geweerd; dan hangt de stuurdeur nog uitsluitend aan de allowlist, en is een ' +
+      'toevoeging daar genoeg om het stuur zichzelf te laten bedienen.');
   }
 
   eis(r, '"ja doe maar" na een klaargezet voorstel is niet gemeten');
@@ -578,12 +621,106 @@ function bevestigveiligheid(rijen) {
   return {
     geval: r ? { kwam: r.kwam, fasen: r.fasen, vragen: r.vragen } : null,
     poorten,
-    nietGemeten: { 'fup-toch-niet': 'er is voor deze rail geen pad om een klaargezet voorstel ' +
-      'in te trekken; dat is een productvraag en geen gat in de bedrading' },
+    intrekken: 'de tegenhanger (fup-toch-niet) wordt sinds 13 september gemeten; zie intrekveiligheid',
     gebreken,
     heel: gebreken.length === 0,
     wat: 'of een instemming in het gesprek een klaargezette handeling kan afmaken. Gemeten aan ' +
       'twee kanten: de poort weigert het, en de taal probeert het niet eens.'
+  };
+}
+
+/* INTREKVEILIGHEID -- de spiegel van bevestigen, en de enige zin die tot de
+   hoogste gezagstrede mag komen.
+
+   HET BESLUIT (eigenaar, 13 september 2026): een nog niet uitgevoerd voorstel
+   mag conversationeel worden ingetrokken. Bevestigen niet. Dat is geen
+   inconsequentie maar een asymmetrie die je kunt uitrekenen: bevestigen GEEFT
+   een handeling vrij, intrekken kan er alleen een WEGNEMEN. De ernstigste
+   afloop van een verkeerde intrekking is dat een lid opnieuw moet vragen.
+
+   DRIE DINGEN DIE HIER WORDEN GEMETEN EN NIET GELOOFD.
+
+   1. HET WERKT ECHT. Bij precies een openstaand voorstel komt de keten tot
+      `uitvoeren` MET status 200. Zonder die tweede helft is dit geval groen
+      omdat er niets gebeurde, en dat is de faalvorm die deze hele proef moet
+      uitsluiten -- dezelfde reden waarom de gouden plak op EXECUTED toetst.
+
+   2. BIJ TWEE GEBEURT ER NIETS. Dan weigert de POORT (409) en stelt de keten
+      precies een vraag. Let op waar die weigering vandaan komt: niet uit de
+      taal. Bij "annuleer hem" is de dubbelzinnigheid zichtbaar op het scherm en
+      vraagt de taal; hier staat zij in de toestand van de server en kan de rail
+      haar niet zien. Daarom heeft kern/stuur/goedkeuring.js geen id-ingang: bij
+      twee voorstellen IS er niets om aan te wijzen, dus kan er ook niet worden
+      gegokt. Een regel die de aanroeper kan overtreden is hier vervangen door
+      een vorm die hij niet kan overtreden.
+
+   3. DE BEVESTIGDEUR BLIJFT DICHT. Intrekken openzetten mag de andere kant niet
+      meeopenen; dat toetst bevestigveiligheid hierboven op de ECHTE route.
+
+   EN DE SLEUTEL LEKT NIET. Het goedkeurings-id is het token waarmee elders een
+   handeling wordt vrijgegeven. Het antwoord van de route noemt het pad en een
+   samenvatting, nooit het id -- een lijst met ids in een gespreksantwoord is die
+   sleutel uitdelen aan precies de laag die hem niet mag hebben. */
+function intrekveiligheid(rijen) {
+  const een = rijen.find((x) => x.id === 'fup-toch-niet') || null;
+  const twee = rijen.find((x) => x.id === 'fup-laat-maar-twee') || null;
+  const gebreken = [];
+  const eis = (v, wat) => { if (!v) gebreken.push(wat); };
+
+  const pad = '/api/member/voorstel/intrek';
+  const niveau = beleidVoor(pad, 'member').niveau;
+  eis(niveau === 'klein',
+    'het intrekpad is voor een lid `' + niveau + '` en niet `klein`. Op `verboden` kan het ' +
+    'besluit van de eigenaar niet worden uitgevoerd; op `voorstel` zou een voorstel nodig zijn ' +
+    'om een voorstel te laten vervallen, en dat is een cirkel.');
+  eis(!VERBODEN.some((re) => re.test(pad)),
+    'het intrekpad valt onder de verbodslijst van kern/stuur/classificatie.js; dan is het ' +
+    'besluit onuitvoerbaar zolang die regel staat, en die regel hoort te blijven staan.');
+
+  /* GEEN ID-INGANG, op de BRON. Een functie die er een aanneemt, kan bij twee
+     openstaande voorstellen alsnog kiezen -- en dan is "precies een eenduidig"
+     een belofte in plaats van een vorm. */
+  let bron = '';
+  try { bron = fs.readFileSync(path.join(WORTEL, 'server/kern/stuur/goedkeuring.js'), 'utf8'); } catch (e) { bron = ''; }
+  eis(/function trekEnige\(req, wereld\)/.test(bron),
+    'trekEnige() heeft niet langer exact (req, wereld) als handtekening; komt er een id bij, ' +
+    'dan kan de interpretatielaag bij twee voorstellen een van de twee aanwijzen.');
+
+  eis(een, '"toch niet" met een openstaand voorstel is niet gemeten');
+  if (een) {
+    eis(een.kwam === 'uitvoeren',
+      'kwam tot ' + een.kwam + ' in plaats van `uitvoeren`; dan is het voorstel niet ingetrokken');
+    eis(een.fasen && een.fasen.EXECUTED === 'PASS',
+      'EXECUTED is ' + (een.fasen && een.fasen.EXECUTED) + ' en niet PASS; dit geval is dan groen ' +
+      'omdat er niets gebeurde, en niet omdat intrekken werkt');
+    eis((een.uit || []).some((u) => /status 200/.test(u)),
+      'er staat geen 200 in het spoor; zonder die status is niet te zien DAT het voorstel verviel');
+    eis(een.vragen === 0,
+      'het antwoord stelt ' + een.vragen + ' vraag/vragen terwijl er niets te verduidelijken was');
+  }
+
+  eis(twee, '"laat maar" met twee openstaande voorstellen is niet gemeten');
+  if (twee) {
+    eis(twee.fasen && twee.fasen.EXECUTED === 'NOT_RUN',
+      'EXECUTED is ' + (twee.fasen && twee.fasen.EXECUTED) + ' bij TWEE openstaande voorstellen; ' +
+      'dan is er een ingetrokken zonder dat iemand zei welke');
+    eis((twee.uit || []).some((u) => /status 409/.test(u)),
+      'de poort gaf geen 409 bij twee openstaande voorstellen; dan telt hij niet, of hij kiest');
+    eis(twee.vragen === 1,
+      'het antwoord stelt ' + twee.vragen + ' vraag/vragen; bij twee kandidaten hoort er precies ' +
+      'een vraag te staan');
+    eis(twee.fasen && twee.fasen.CAPABILITY_SELECTED === 'PASS',
+      'er is geen capability gekozen; dan vroeg de TAAL en niet de poort, en dan zit de ' +
+      'voorzichtigheid in het corpus in plaats van in de machine');
+  }
+
+  return {
+    niveau, gevallen: { een: een ? { kwam: een.kwam, fasen: een.fasen, vragen: een.vragen } : null,
+      twee: twee ? { kwam: twee.kwam, fasen: twee.fasen, vragen: twee.vragen } : null },
+    gebreken,
+    heel: gebreken.length === 0,
+    wat: 'of een nog niet uitgevoerd voorstel conversationeel kan vervallen -- bij precies EEN ' +
+      'wel, bij twee niet, en nooit via een id dat de laag zelf aanwijst.'
   };
 }
 
@@ -734,6 +871,28 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede, uitSp
           reden: 'registratie mislukte; zonder eigen lid is de meting vervuild door het gespreksgeheugen' });
         continue;
       }
+      /* DE WERELD DIE HET CONTRACT BESCHRIJFT, echt opgezet -- de vorm van
+         scripts/lib/herstelwereld.js: de tegenhanger is de voorbereiding.
+         "Toch niet" tegen een server zonder klaargezet voorstel meet niet dat
+         intrekken werkt, maar dat er niets te vinden was; dat ziet er groen uit
+         en bewijst het tegenovergestelde.
+
+         ELKE VOORBEREIDING MOET 428 GEVEN. Dat is geen formaliteit: 428 IS het
+         bewijs dat er een voorstel in de lijst staat. Komt er iets anders terug,
+         dan is de wereld niet zoals het contract hem beschrijft en wordt dit
+         geval NIET GEMETEN -- met de reden, en nooit stil als "binnen". */
+      let wereldOk = true;
+      for (const v of (g.voorbereiding || [])) {
+        const vr = await post(srv.basis, '/api/member/doe', { pad: v.pad, body: v.body }, token);
+        if (vr.status !== 428) {
+          rijen.push({ id: g.id, input: g.input, mag: g.sideEffectMax, uitslag: 'nietGemeten',
+            reden: 'de voorbereiding ' + v.pad + ' gaf status ' + vr.status + ' in plaats van 428; ' +
+              'er staat dus geen voorstel klaar en dit geval meet niet wat het contract beschrijft' });
+          wereldOk = false;
+          break;
+        }
+      }
+      if (!wereldOk) continue;
       const lijf = { q: g.input };
       if (g.contextGeval) lijf.context = g.contextGeval;
       const r = await post(srv.basis, '/api/fluister', lijf, token);
@@ -776,6 +935,7 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede, uitSp
   const geld = geldveiligheid(rijen);
   const bevestig = bevestigveiligheid(rijen);
   const verw = verwijzingveiligheid(rijen);
+  const intrek = intrekveiligheid(rijen);
   const tel = (f) => rijen.filter(f).length;
   const teVer = rijen.filter((r) => r.uitslag === 'TE_VER');
   const perTrede = {};
@@ -823,6 +983,7 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede, uitSp
     geldveiligheid: geld,
     bevestigveiligheid: bevestig,
     verwijzingveiligheid: verw,
+    intrekveiligheid: intrek,
     perBereikteTrede: perTrede,
     /* DE EERLIJKHEID BIJ DEZE UITSLAG, en zonder deze alinea is hij te mooi.
        Elke gemeten zin komt tot `geen` -- ook de twaalf die tot `tonen` MOGEN
@@ -927,7 +1088,20 @@ if (require.main !== module) { module.exports = { GEVALLEN, bereikteTrede, uitSp
     '; referent ' + (ref.heel ? 'heel' : 'NIET heel (' + ref.gebreken.length + ')') +
     '; geld ' + (geld.heel ? 'heel' : 'NIET heel (' + geld.gebreken.length + ')') +
     '; bevestig ' + (bevestig.heel ? 'heel' : 'NIET heel (' + bevestig.gebreken.length + ')') +
-    '; verwijzing ' + (verw.heel ? 'heel' : 'NIET heel (' + verw.gebreken.length + ')'));
-  if (controle && (teVer.length || teVeelVragen.length || !goud.heel || !samen.heel ||
-    !ref.heel || !geld.heel || !bevestig.heel || !verw.heel)) process.exit(1);
+    '; verwijzing ' + (verw.heel ? 'heel' : 'NIET heel (' + verw.gebreken.length + ')') +
+    '; intrek ' + (intrek.heel ? 'heel' : 'NIET heel (' + intrek.gebreken.length + ')'));
+  /* ELK BLOK STAAT HIER, en dat moet je nalopen als je er een toevoegt.
+
+     `intrekveiligheid` stond er eerst NIET bij. Het blok werd berekend, in het
+     register geschreven en netjes afgedrukt -- en liet de opdracht niet zakken.
+     Een wacht die alles meet en niets tegenhoudt, is geen wacht; hij leest
+     alleen als een. De mutatiebatterij vond het: 11, 12 en 13 verbouwden de
+     poort met opzet en kwamen allemaal groen terug.
+
+     Dat is dezelfde faalvorm als het lege `graad`-veld en als de vier
+     spookpaden van bevestigveiligheid: niet een fout antwoord, maar een
+     bewering die er is zonder ergens aan te hangen. */
+  const blokken = { goud, samen, ref, geld, bevestig, verw, intrek };
+  const stuk = Object.entries(blokken).filter(([, b]) => !b.heel).map(([n]) => n);
+  if (controle && (teVer.length || teVeelVragen.length || stuk.length)) process.exit(1);
 })().catch((e) => { console.error(e); process.exit(2); });

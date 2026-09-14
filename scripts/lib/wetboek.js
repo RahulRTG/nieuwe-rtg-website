@@ -101,7 +101,13 @@ function keurVorm(boek) {
     else gezien.add(w.id);
     if (!w.wet || w.wet.length < 15) fouten.push(waar + ': de wet zelf staat er niet, of is te kort om iets te betekenen');
     if (!w.bron || !w.bron.bestand || !w.bron.anker) fouten.push(waar + ': geen bron met bestand + anker');
-    if (!Array.isArray(w.handhaver)) fouten.push(waar + ': `handhaver` hoort een lijst te zijn (leeg mag, dan is het mensenwerk)');
+    /* SINDS DE SPLITSING (LAT.md regel 14) zijn het er twee: `bewaaktDoor` (wat
+       rood wordt) en `draagt` (waar de regel in het product staat). Het oude
+       `handhaver` droeg die twee samen en mag hier niet meer opduiken -- een
+       veld dat twee relaties draagt, is precies wat regel 14 verbiedt. */
+    if (w.handhaver) fouten.push(waar + ': `handhaver` is vervallen; splits hem in `bewaaktDoor` en `draagt` (LAT.md regel 14)');
+    if (w.bewaaktDoor !== undefined && !Array.isArray(w.bewaaktDoor)) fouten.push(waar + ': `bewaaktDoor` hoort een lijst te zijn');
+    if (w.draagt !== undefined && !Array.isArray(w.draagt)) fouten.push(waar + ': `draagt` hoort een lijst te zijn');
     if (w.sabotage && w.mensenwerk) fouten.push(waar + ': een wet is machinaal gehandhaafd OF mensenwerk, niet allebei');
     if (!w.sabotage && !w.mensenwerk) fouten.push(waar + ': zonder sabotage-recept hoort er een reden te staan waarom het mensenwerk is');
     if (w.sabotage) {

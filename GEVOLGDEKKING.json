@@ -1,0 +1,4060 @@
+{
+ "stempel": {
+  "op": "2026-09-13T15:22:07.930Z",
+  "commit": "b8998fbb",
+  "boomVuil": false,
+  "boomAnders": 4,
+  "instrument": "scripts/gevolgdekking.js",
+  "node": "v22.22.2"
+ },
+ "uitleg": "Per AI-bereikbare handeling twee assen: de METING (wat de idempotentieproef zag veranderen, via kern/stuur/gevolg.js) en de VERKLARING (het gevolgcontract van een mens, via kern/stuur/gevolgcontract.js). Ze worden nooit opgeteld.",
+ "grens": "De meting zegt WELKE collecties, nooit hoeveel erin verandert, en zij kijkt niet buiten de opslag (geen mail, geen provider, geen bank). De verklaring mag MEER zeggen dan de meting maar nooit iets anders: waar zij `gemeten` claimt, moet de meting dat bevestigen.",
+ "tellers": {
+  "bereikbaarPerRol": 173,
+  "onbekendeEffectpaden": 87,
+  "effectGemeten": 38,
+  "effectGeenEffectGemeten": 48,
+  "contractVolledig": 4,
+  "contractGedeeltelijk": 0,
+  "contractOnbekend": 169,
+  "contractenGezakt": 0,
+  "contractenBuitenBereik": 2
+ },
+ "fouten": [],
+ "buitenBereik": [
+  "/api/office/bank/handtekening/bevestig",
+  "/api/office/bank/incasso"
+ ],
+ "rijen": [
+  {
+   "pad": "/api/agenda/antwoord",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/agenda/bereik",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/agenda/bewaar",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/agenda/ics",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/agenda/mijn",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/agenda/mijn-lijst",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/agenda/toevoegen",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "agendas"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "agendas"
+    ]
+   }
+  },
+  {
+   "pad": "/api/agenda/uitnodig",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/agenda/verwijder",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/agenda/wijzig",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/asset/document",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "sharedAssets"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "sharedAssets"
+    ]
+   }
+  },
+  {
+   "pad": "/api/asset/gebruik",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/asset/herroep",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/asset/koop",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/asset/mijn",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/asset/uitstap",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/asset/wachtlijst",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/advies",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/afschrift",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/akkoord",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/bevries",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/bulk",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/hart",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/inzichten",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/krediet",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "kantoorMensdeur"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "kantoorMensdeur"
+    ]
+   }
+  },
+  {
+   "pad": "/api/bank/krediet/aanvraag",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/krediet/aflossing",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/naar-wallet",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/overboek",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/overzicht",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/pas/betaal",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "bankBoekingen",
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankPassen",
+     "bankSaldi"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "bankBoekingen",
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankPassen",
+     "bankSaldi"
+    ]
+   }
+  },
+  {
+   "pad": "/api/bank/pas/bevries",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "bankPassen"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "bankPassen"
+    ]
+   }
+  },
+  {
+   "pad": "/api/bank/pas/limiet",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "bankPassen"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "bankPassen"
+    ]
+   }
+  },
+  {
+   "pad": "/api/bank/pas/sluit",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankPassen"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankPassen"
+    ]
+   }
+  },
+  {
+   "pad": "/api/bank/pas/uitgeven",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankPassen"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankPassen"
+    ]
+   }
+  },
+  {
+   "pad": "/api/bank/passen",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/rekening",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/rekening/open",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankRekeningen"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankRekeningen"
+    ]
+   }
+  },
+  {
+   "pad": "/api/bank/rente-voorbeeld",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/salaris",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "bankBoekingen",
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankSaldi"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "bankBoekingen",
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankSaldi"
+    ]
+   }
+  },
+  {
+   "pad": "/api/bank/sepa",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "bankBoekingen",
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankSaldi",
+     "betaalIdem",
+     "betaalOpdrachten",
+     "capGezondheid"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "VOLLEDIG",
+    "open": [],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/spaardoel",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "bankRekeningen"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "bankRekeningen"
+    ]
+   }
+  },
+  {
+   "pad": "/api/bank/storten",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "bankBoekingen",
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankSaldi",
+     "betaalIdem"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "bankBoekingen",
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankSaldi",
+     "betaalIdem"
+    ]
+   }
+  },
+  {
+   "pad": "/api/bank/terugkerend",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/terugkerend/stop",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/terugkerend/zet",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankTerugkerend"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "bankIdem",
+     "bankIdemAfdruk",
+     "bankTerugkerend"
+    ]
+   }
+  },
+  {
+   "pad": "/api/bank/van-wallet",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/vastelasten",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bank/veeg",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bijles/gesprek",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "bijles"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "bijles"
+    ]
+   }
+  },
+  {
+   "pad": "/api/bijles/vraag",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "klein",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "bijles",
+     "onderwijs"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "bijles",
+     "onderwijs"
+    ]
+   }
+  },
+  {
+   "pad": "/api/booking/pay",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/booking/request",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/bookings/mine",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/gemeente/melding/zet",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/gemeente/vergunning/beslis",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/kantoorpakket/bewaar",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "officeDocs"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "officeDocs"
+    ]
+   }
+  },
+  {
+   "pad": "/api/kantoorpakket/deel",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "officeDocs"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "officeDocs"
+    ]
+   }
+  },
+  {
+   "pad": "/api/kantoorpakket/fase",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/kantoorpakket/maak",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "officeDocs"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "officeDocs"
+    ]
+   }
+  },
+  {
+   "pad": "/api/kantoorpakket/mijn",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/kantoorpakket/open",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/kantoorpakket/ster",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "officeDocs"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "officeDocs"
+    ]
+   }
+  },
+  {
+   "pad": "/api/kantoorpakket/terug",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/kantoorpakket/uitslag",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/kantoorpakket/versies",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/kantoorpakket/vul",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/kantoorpakket/weg",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "officeDocs"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "officeDocs"
+    ]
+   }
+  },
+  {
+   "pad": "/api/leerstof/antwoord",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "klein",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/leerstof/examen",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/leerstof/examen-antwoord",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/leerstof/les",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/leerstof/oefen",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "klein",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/leerstof/vakken",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/locatie/deel",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/locatie/mijn",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/locatie/stop",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/mediaos/stuk",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/mediaos/stuur",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "klein",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/mediaos/volg",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "klein",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/mediaos/wereld",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/meet/kom",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/meet/maak",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "meetKamers"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "meetKamers"
+    ]
+   }
+  },
+  {
+   "pad": "/api/meet/mijn",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/meet/sein",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/meet/verlaat",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/meet/weg",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/onderwijs/advies",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/onderwijs/doel",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/onderwijs/inschrijf",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/onderwijs/jaar-over",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/onderwijs/ladder",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/onderwijs/mijn",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/overheid/bezwaar/beslis",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/overheid/subsidie/beslis",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/overheid/toeslag/beslis",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/overheid/uitkering/beslis",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/overheid/verkiezing/sluit",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "rijkVerkiezing"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "rijkVerkiezing"
+    ]
+   }
+  },
+  {
+   "pad": "/api/overheid/water/melding/zet",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/pay/kascode",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "payCodes"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "payCodes"
+    ]
+   }
+  },
+  {
+   "pad": "/api/pay/oplaad",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "betaalIdem",
+     "payBoekingen",
+     "payIdem",
+     "payIdemAfdruk",
+     "paySaldi"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "VOLLEDIG",
+    "open": [],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/pay/overzicht",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/pay/saldo",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "betaalIdem",
+     "economischeRuntime",
+     "fondsAfdrachten",
+     "invoices",
+     "payBoekingen",
+     "payIdem",
+     "payIdemAfdruk",
+     "paySaldi",
+     "socialeAfdrachten"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "VOLLEDIG",
+    "open": [],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/pay/stuur",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "payBoekingen",
+     "payIdem",
+     "payIdemAfdruk",
+     "paySaldi"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "VOLLEDIG",
+    "open": [],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/pay/tik",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "payBoekingen",
+     "payIdem",
+     "payIdemAfdruk",
+     "paySaldi"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "payBoekingen",
+     "payIdem",
+     "payIdemAfdruk",
+     "paySaldi"
+    ]
+   }
+  },
+  {
+   "pad": "/api/pay/tiks",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/pay/verzoek",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "payIdem",
+     "payIdemAfdruk",
+     "payVerzoeken"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "payIdem",
+     "payIdemAfdruk",
+     "payVerzoeken"
+    ]
+   }
+  },
+  {
+   "pad": "/api/pay/verzoek/betaal",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "payBoekingen",
+     "payIdem",
+     "payIdemAfdruk",
+     "paySaldi",
+     "payVerzoeken"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "payBoekingen",
+     "payIdem",
+     "payIdemAfdruk",
+     "paySaldi",
+     "payVerzoeken"
+    ]
+   }
+  },
+  {
+   "pad": "/api/pay/verzoek/intrek",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "payIdem",
+     "payIdemAfdruk",
+     "payVerzoeken"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "payIdem",
+     "payIdemAfdruk",
+     "payVerzoeken"
+    ]
+   }
+  },
+  {
+   "pad": "/api/reservering/annuleer",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/bewaar",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "ledenSites"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "ledenSites"
+    ]
+   }
+  },
+  {
+   "pad": "/api/site/cijfers",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/domein",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/foto",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/foto-weg",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/fotos",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/haal",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/herstel",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/live",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/mijn",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/offline",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/plan",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "ledenSites"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "ledenSites"
+    ]
+   }
+  },
+  {
+   "pad": "/api/site/publiceer",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/sjablonen",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/sjabloon",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/spoor",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/versies",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/site/verwijder",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/staff/fluister/profiel",
+   "rollen": [
+    "staff"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/staff/mob/cdt/aanmelden",
+   "rollen": [
+    "staff"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/staff/mob/cdt/afmelden",
+   "rollen": [
+    "staff"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/staff/mob/cdt/soort",
+   "rollen": [
+    "staff"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/staff/mob/kaart/controle",
+   "rollen": [
+    "staff"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/staff/mob/kaart/storing",
+   "rollen": [
+    "staff"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/staff/mob/kaart/storingen",
+   "rollen": [
+    "staff"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/staff/ov/checkin",
+   "rollen": [
+    "staff"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/staff/ov/dienst",
+   "rollen": [
+    "staff"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/staff/ov/lijn/zet",
+   "rollen": [
+    "staff"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "suppliers"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "suppliers"
+    ]
+   }
+  },
+  {
+   "pad": "/api/staff/ov/lijnen",
+   "rollen": [
+    "staff"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/staff/ov/pos",
+   "rollen": [
+    "staff"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "wacht"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "wacht"
+    ]
+   }
+  },
+  {
+   "pad": "/api/staff/ov/stand",
+   "rollen": [
+    "staff"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/agenda/lijst",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/agenda/toevoegen",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "agendas"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "agendas"
+    ]
+   }
+  },
+  {
+   "pad": "/api/supplier/agenda/verwijder",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/agenda/wijzig",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/door/zet",
+   "rollen": [
+    "staff",
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/pay/in",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/pay/overzicht",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/pay/uitbetaal",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "betaalIdem",
+     "betaalOpdrachten",
+     "capGezondheid",
+     "payBoekingen",
+     "payIdem",
+     "payIdemAfdruk",
+     "paySaldi"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "betaalIdem",
+     "betaalOpdrachten",
+     "capGezondheid",
+     "payBoekingen",
+     "payIdem",
+     "payIdemAfdruk",
+     "paySaldi"
+    ]
+   }
+  },
+  {
+   "pad": "/api/supplier/room/hk",
+   "rollen": [
+    "staff",
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/rtmail/btw-herinner",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/rtmail/inbox",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/rtmail/inkoop",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/rtmail/lees",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/rtmail/ongelezen",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/rtmail/stuur",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/rtmail/verzonden",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/site/bewaar",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "gemeten",
+    "collecties": [
+     "ledenSites",
+     "rtgai"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": [
+     "ledenSites",
+     "rtgai"
+    ]
+   }
+  },
+  {
+   "pad": "/api/supplier/site/cijfers",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/site/domein",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/site/genereer",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/site/haal",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/site/herstel",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/site/live",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/site/mijn",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/site/offline",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/site/plan",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/site/publiceer",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/site/spoor",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/site/team/zet",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/site/versies",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/state",
+   "rollen": [
+    "supplier"
+   ],
+   "niveau": "lezen",
+   "meting": {
+    "graad": "geen-effect-gemeten",
+    "collecties": [],
+    "reden": "de proef draaide en zag geen enkele collectie veranderen"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
+   "pad": "/api/supplier/ticket/add",
+   "rollen": [
+    "staff",
+    "supplier"
+   ],
+   "niveau": "voorstel",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  }
+ ]
+}

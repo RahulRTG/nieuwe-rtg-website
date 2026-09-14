@@ -39,9 +39,12 @@ const TOOLS = [
      dus het gewone voorstel dat een mens buiten dit gesprek bevestigt. */
   { name: 'plan', description: 'Weeg een keten van stappen VOORDAT je iets doet. Geef doel en stappen; je krijgt per stap ' +
       'terug of hij bestaat voor deze gebruiker, welke frictie hij heeft en hoeveel bevestigingen het plan gaat vragen. ' +
-      'Je krijgt er ook een GEVOLGVOORSPELLING bij: welke collecties de stappen in een eerdere proef aanraakten, ' +
-      'en bij hoeveel stappen dat NIET gemeten is. Dit voert NIETS uit. Gebruik hem bij een opdracht van meerdere ' +
-      'handelingen, en vertel de gebruiker daarna kort wat er klaarstaat en wat je niet kunt voorspellen.',
+      'Je krijgt er ook een GEVOLGVOORSPELLING bij, met TWEE ASSEN die nooit worden opgeteld: welke collecties de ' +
+      'stappen in een eerdere proef aanraakten (en bij hoeveel stappen dat NIET gemeten is), en wat een mens heeft ' +
+      'VERKLAARD dat een stap veroorzaakt -- ook buiten de opslag, en ook wat er bij een mislukking achterblijft. ' +
+      'Dit voert NIETS uit. Gebruik hem bij een opdracht van meerdere handelingen, en vertel de gebruiker daarna kort ' +
+      'wat er klaarstaat en wat je niet kunt voorspellen -- de stappen onder `verklaring.paden` zijn juist die waarvan ' +
+      'het gevolg onbekend is.',
     input_schema: { type: 'object', properties: {
       doel: { type: 'string', description: 'wat de gebruiker wil bereiken, in een zin' },
       stappen: { type: 'array', description: 'de stappen in volgorde',

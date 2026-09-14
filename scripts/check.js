@@ -2622,18 +2622,101 @@ console.log('\n36) geen proefrestant in de laatste commit');
 
        Dat is precies de vorm die de rest van deze lijst probeert te voorkomen: een
        handhaver die iets net niet dekt is gevaarlijker dan geen handhaver, want
-       hij geeft groen. Dus nu ook de namenlijst van de commit. */
+       hij geeft groen. Dus nu ook de namenlijst van de commit.
+
+       EN OP 13 SEPTEMBER 2026 GEBEURDE HET EEN DERDE KEER, met dezelfde vorm en
+       een andere naam: server/kern/zzijkbron.js kwam mee in een commit terwijl
+       de ijking liep, en deze regel gaf groen. De marker (opgeknipt, zie onder) zit
+       niet in die naam en niet in die inhoud -- en dat is geen slordigheid van
+       de ijking maar een EIS: de meter die hij voedt groepeert op `familie`,
+       alles voor het eerste koppelteken, dus `zz-ijk-bron` en `zz-ijk-doel`
+       zouden allebei familie `zz` heten en de meter zou niet bewegen.
+
+       Drie keer dezelfde ontsnapping is geen toeval maar een vorm: deze regel
+       zocht een PATROON dat hij zelf had opgeschreven, terwijl de ijking haar
+       eigen namen kiest. Regel 37 hieronder doet het al goed en zegt ook waarom
+       -- "de klassen komen uit het blad zelf en niet uit een lijst hier: een
+       tweede lijst loopt binnen een week uit de pas (LAT.md regel 4)".
+
+       EN DE NAAM STAAT HIER NERGENS VOLUIT, net als in de patronen hierboven:
+       deze regel grep't de hele boom inclusief zijn eigen bron, dus wie de
+       marker in een uitleg voluit schrijft, laat de regel over zijn eigen
+       commentaar klagen. Dat is hier prompt gebeurd in een eerste versie van
+       deze reparatie.
+
+       Dus nu uit de BRON: de paden komen uit test/meterijk.test.js zelf, uit de
+       aanroepen van metTijdelijkBestand(). Komt er een ijkbestand bij met weer
+       een eigen naam, dan dekt deze regel het vanzelf. De marker blijft er als
+       tweede net naast staan, want die vangt de varianten (-a, -b, -c) die in
+       augustus langskwamen en die geen eigen aanroep in de lijst hebben. */
+    const ijkbron = path.join(ROOT, 'test', 'meterijk.test.js');
+    let ijkpaden = [], bronVanDeIjking = '';
+    try {
+      bronVanDeIjking = fs.readFileSync(ijkbron, 'utf8');
+      ijkpaden = [...new Set([...bronVanDeIjking.matchAll(/metTijdelijkBestand\(\s*'([^']+)'/g)].map(m => m[1]))];
+    } catch (e) { ijkpaden = []; bronVanDeIjking = ''; }
+    /* EEN LEGE OF ONVERWACHT KLEINE BRONVERZAMELING IS EEN FOUT VAN DE
+       HANDHAVER, GEEN BEWIJS VAN AFWEZIGHEID.
+
+       Dat is het principe en het reikt verder dan deze regel. Zonder deze
+       controle levert een parserfout namelijk exact dit op: nul gevonden
+       tijdelijke bestanden, nul verboden bestanden in de commit, groen. Een
+       meter die niets meer MEET en daarom alles GOEDKEURT -- en dat is de
+       gevaarlijkste faalvorm die dit huis kent, want hij is van buiten niet te
+       onderscheiden van een schone commit.
+
+       Acht is geen magisch getal maar de ondergrens van wat de ijking vandaag
+       aantoonbaar neerzet; wordt het er een minder, dan hoort iemand te kijken
+       of dat een besluit was of een afleider die stukging. */
+    if (ijkpaden.length < 8) {
+      fout('uit test/meterijk.test.js komen maar ' + ijkpaden.length + ' tijdelijke ijkpaden; ' +
+        'dan meet de namencontrole van deze regel niets meer');
+    }
+    /* De losse namen die in de INHOUD van zo'n bestand kunnen staan: zzijkbron
+       requireert ./zzijkdoel, en dat woord staat in geen enkele bestandsnaam van
+       de commit. Zonder deze afgeleide zou een bestand dat alleen VERWIJST naar
+       een ijkbestand er nog steeds doorheen komen. */
+    const ijknamen = [...new Set([
+      ...ijkpaden.map(p => path.basename(p).replace(/\.[a-z0-9]+$/i, '')),
+      /* EN DE NAMEN DIE ALLEEN IN DE INHOUD VAN ZO'N BESTAND STAAN. zzijkbron.js
+         bevat `require('./zzijkdoel')`, en `zzijkdoel` is nooit een pad in de
+         lijst hierboven -- de meter leest de brontekst en voert hem niet uit, dus
+         dat bestand bestaat niet eens. Zonder deze afleiding zou een commit die
+         alleen dat woord draagt er nog steeds doorheen komen. */
+      ...[...bronVanDeIjking.matchAll(/require\(\\?['"]\.\/([A-Za-z0-9_-]+)/g)].map(m => m[1])
+    ])].filter(n => n && n.startsWith('zz') && n !== 'zz' + '-ijk-tijdelijk');
+
     const lijst = git('ls-tree', '-r', '--name-only', 'HEAD');
     if (lijst.status !== 0) {
       fout('kan de bestandenlijst van HEAD niet lezen: ' + String(lijst.stderr || '').trim());
     } else {
       const marker = 'zz' + '-ijk-tijdelijk';
+      const uitDeIjking = new Set(ijkpaden);
       for (const pad of String(lijst.stdout || '').split('\n').filter(Boolean)) {
-        if (!pad.includes(marker)) continue;
+        const viaMarker = pad.includes(marker);
+        const viaLijst = uitDeIjking.has(pad);
+        if (!viaMarker && !viaLijst) continue;
         gevonden++;
         fout('ijkrestant als BESTAND in de commit: ' + pad +
+          (viaLijst && !viaMarker ? ' (uit de lijst van test/meterijk.test.js)' : '') +
           '\n    een ijking maakt dit bestand en ruimt het op; hier is er gecommit tussen die twee' +
           ' -- git rm het bestand en commit opnieuw');
+      }
+    }
+    /* En de INHOUD, voor de namen die geen bestandsnaam in de commit zijn. */
+    if (ijknamen.length) {
+      const r2 = git('grep', '-n', '-E', ijknamen.join('|'), 'HEAD', '--', '*.js', '*.json', '*.html', '*.css');
+      if (r2.status > 1) {
+        fout('git grep faalde voor de ijknamen: ' + String(r2.stderr || '').trim());
+      } else {
+        for (const regel of String(r2.stdout || '').split('\n').filter(Boolean)) {
+          const pad = regel.replace(/^HEAD:/, '').split(':')[0];
+          if (/^test\/meterijk\.test\.js$/.test(pad)) continue;   // daar worden ze gemaakt
+          if (/^(\.gitignore|scripts\/check\.js|test\/afbouwpoort\.test\.js)$/.test(pad)) continue;
+          gevonden++;
+          fout('ijkrestant in de INHOUD: ' + regel.replace(/^HEAD:/, '').slice(0, 160) +
+            '\n    dit noemt een ijkbestand van test/meterijk.test.js -- zet het terug en commit opnieuw');
+        }
       }
     }
     if (!gevonden) ok('de laatste commit draagt geen ijk- of mutatierestant, in inhoud noch in naam');
@@ -3323,6 +3406,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['server/kern/pay/index.js', 'geld: bevestigen vóór duurzaamheid is een belofte die de opslag nog niet deed'],
     ['server/kern/economie/runtime/index.js', 'economische waarheid: intent, ledger en evidence worden vóór bevestiging als één bundel vastgelegd'],
     ['server/kern/fonds.js', 'fondsallocatie: een bevestigde verdeling mag niet na een herstart verdwijnen'],
+    ['server/kern/factuurcorrectie.js', 'geld terug naar een lid: de terugboeking en de correctieregel horen als een duurzame commit op schijf, net als de heenweg in kern/factuursaldo.js -- een lid dat "terugbetaald" leest terwijl de opslag het nog niet heeft, is precies de halve uitkomst waar de factuurproef voor is gebouwd'],
     ['server/kern/experience/index.js', 'menselijke bevestiging: acknowledgement en action evidence worden vóór succes duurzaam vastgelegd'],
     ['server/kern/notities.js', 'werk van een lid: een bevestigde notitie mag niet verdwijnen bij een opslagfout'],
     ['server/kern/vertegenwoordiging/index.js', 'een machtiging is de bevoegdheid van een mens over het leven van een ander: aanvaarden, intrekken en de eigen grens mogen nooit bevestigd zijn zonder dat de opslag het heeft'],
@@ -3369,6 +3453,24 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
        uitkomst heel is. Zie GELDLAT.md par. "Scenario 3, gemeten op een echt
        geldpad". */
     ['server/kern/factuursaldo.js', 'geld: de afschrijving en de afwikkeling van dezelfde factuur horen als EEN duurzame commit te landen, anders staat het geld vast en de tegenprestatie niet'],
+    /* HET ACHTSTE, en het is de tweelingbroer van de bewaking hierboven. Het
+       inzagejournaal (server/inzagelog.js) legt vast wie de IDENTITEITSKLUIS
+       van een mens heeft geopend, en het faalde open: noteer() geeft een
+       uitslag terug die geen van de 42 aanroepers leest, het wegschrijven zit
+       in een lege catch, en zonder database schrijft hij in een weggegooide
+       array en meldt succes. Een spoor dat niet kan weigeren, is geen belofte.
+       De bedrading staat apart zodat deze regel op een bestand slaat dat er
+       werkelijk over gaat; server.js zou hier met een reden over drie regels
+       komen te staan. */
+    /* HET NEGENDE, en het is dezelfde vorm als factuursaldo.js hierboven: de
+       BETALING liep al duurzaam (kern/pay) en het MERKTEKEN dat zij geind was
+       niet, dus stonden er twee commits met een gat ertussen. Onder
+       `schrijf-verloren` gaf /api/office/asset/fees 200 met "geind: N" terwijl
+       feeJaar en de kas verdwenen -- en dan telt de volgende ronde de kas een
+       tweede keer op terwijl het lid door de idem-sleutel maar een keer wordt
+       afgeschreven. Eenmaal betaald, tweemaal geboekt. */
+    ['server/kern/assets.js', 'de servicefee: geind geld en het merkteken dat het geind is, horen als EEN duurzame commit te landen -- anders boekt de volgende ronde de kas nog een keer'],
+    ['server/opzet/inzagespoor.js', 'het inzagejournaal: wie te horen krijgt dat een kluis is geopend, hoort dat spoor na een herstart terug te vinden -- en waar het spoor niet vaststaat, gaat de inzage niet door'],
     ['test/idembundel.test.js', 'de toets die bewijst dat een genestelde bundel meedoet en dat een gewone bundel een geldcommit niet degradeert']
   ]);
   /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
@@ -5719,5 +5821,58 @@ console.log('\n70) de eerste minuut van een vers lid is gemeten, en niemand is e
   }
 }
 
+/* 71) de vorige bronmuterende ronde is netjes afgelopen EN heeft niets achtergelaten.
+
+   WAAROM DEZE REGEL ER IS. Op 13 september 2026 brak ik een ijkronde af die 146
+   bestanden gesaboteerd had staan. Een wachtketting toetste "draait het proces
+   nog?", las de afwezigheid als "klaar" en startte de volgende stap. Er bleven
+   bovendien drie processen achter -- een toets met twee servers eraan -- die
+   negentien minuten poorten vasthielden zonder eigenaar.
+
+   TWEE BEGRIPPEN, en ze liepen door elkaar:
+     WERKSTATUS    is de ronde af?        PASSED / FAILED / ABORTED
+     PROCESBEZIT   is de runtime schoon?  leeft er nog iets van die ronde?
+   Een ronde kan ABORTED zijn terwijl haar kinderen nog draaien. Dan is een
+   volgende meting formeel nieuw en materieel vervuild.
+
+   HET VERSCHIL MET eisGeenAfbouw(), en dat zijn twee vragen die niet in elkaar
+   mogen schuiven. Die poort vraagt "draait er NU iets"; deze regel vraagt "is de
+   VORIGE ronde netjes afgelopen". Ze samenvoegen zou binnen elke toets weigeren
+   -- precies de fout die in de kop van afbouw-slot.js staat beschreven.
+
+   DEZE REGEL NOEMT WAT HEM BLOKKEERT. Een afbouwslot dat alleen "rood" zegt,
+   wordt in de CI een mysterie dat mensen leren wegkijken; daarom staat er welke
+   run, welke stand, welke procesidentiteit nog leeft, en wat de actie is. */
+console.log('\n71) de vorige bronmuterende ronde is netjes afgelopen en heeft niets achtergelaten');
+{
+  const afloop = require('./lib/afbouw-afloop');
+  const vorige = afloop.lees();
+  if (!vorige) {
+    ok('geen eerdere ronde vastgelegd; de eerste die pak() aanroept legt er een aan');
+  } else {
+    const g = afloop.magStarten();
+    if (g.mag) {
+      ok('vorige ronde ' + (vorige.taak || '?') + ' (' + vorige.runId + ') staat op ' + vorige.stand +
+        ' en haar proceskring is leeg');
+    } else {
+      fout(afloop.diagnose(g, vorige));
+    }
+  }
+}
+
+/* HET BEREIK VAN DEZE POORT, en waarom hij het ZELF zegt.
+
+   Op 13 september 2026 heb ik twee keer op een dag "de gate is groen" gezegd op
+   grond van check + norm + deltapoort, terwijl CI daarna terecht rood bleef:
+   test/routedekking.test.js vond een route die nooit door een toets was
+   aangeraakt, en keuringsregel 41 zakte op een afdruk. Geen van beide valt
+   binnen wat die drie meten -- de uitspraak was ruimer dan het bewijs.
+
+   Een tabel in een document had dat niet voorkomen; dit wel. De poort zegt
+   voortaan zelf wat hij bewijst EN wat hij niet bewijst, zodat wie hem draait de
+   grens meeleest in plaats van hem te moeten onthouden. LAT.md regel 13. */
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
+console.log('\x1b[2mbereik: statische huisregels, registers en documentwaarheid.' +
+  ' Zegt niets over gedrag (npm test), routedekking (test/routedekking.test.js),' +
+  ' ketens (de ketenproeven) of go-live (npm run golive).\x1b[0m');
 process.exit(fouten ? 1 : 0);

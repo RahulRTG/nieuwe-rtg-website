@@ -1186,6 +1186,31 @@
         "scripts/lib/bewijsvelden.js",
         "scripts/lib/wetrelatie.js"
       ]
+    },
+    {
+      "id": "leven-geen-capaciteitscijfer-op-een-mens",
+      "soort": "leven",
+      "wet": "De eenheid van meting is de taak, nooit de persoon: er komt geen capaciteitscijfer op een mens, ook niet intern als sorteersleutel.",
+      "bron": {
+        "bestand": "FOUNDATION.md",
+        "anker": "Geen capaciteitscijfer op een mens"
+      },
+      "kanttekening": "FOUNDATION.md par. 5.4 verwijst zelf door naar LEVEN.md par. 2.4 en LIFE.md par. 4.4; HDI.md par. 5 en SCHOOL.md par. 11.1 zeggen hetzelfde voor de civiele en de schoolkant. De grens stond dus in ZES documenten en werd op de Foundation-kant door niets tegengehouden -- de gedeelde wachter dekte alleen de carrierekant.",
+      "sabotage": {
+        "wat": "zet een score op een mens in een bewaakte Foundation-map, zoals een capaciteitsmotor die zou opleveren",
+        "bestand": "server/kern/levensgraaf/graaf.js",
+        "zoek": "'use strict';",
+        "zet": "'use strict';\nconst score = (mens) => mens.taken.length;",
+        "wachters": [
+          "test:test/cijferopmens.test.js"
+        ]
+      },
+      "bewaaktDoor": [
+        "test/cijferopmens.test.js"
+      ],
+      "draagt": [
+        "scripts/lib/cijferopmens.js"
+      ]
     }
   ]
 }

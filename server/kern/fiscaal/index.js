@@ -55,9 +55,36 @@ function maakFiscaal({ db, rondEuro, btwSplit, jaargangen }) {
       const p = potten[sleutel] || (potten[sleutel] = { cat, tarief: t, omzet: 0 });
       p.omzet += bedrag;
     };
+    /* TWEE GEBEURTENISSEN PER BON, ELK IN ZIJN EIGEN MAAND.
+
+       De verkoop telt in de maand waarin er betaald is. Een terugstorting is een
+       APARTE economische gebeurtenis met een eigen datum en telt negatief in de
+       maand waarin zij plaatsvond -- vaak een andere. `tel()` is daarvoor
+       gemaakt: "een tegenboeking is een negatief bedrag en moet dezelfde btw-pot
+       weer verlagen".
+
+       Hier stond alleen de eerste lus, op `o.paid`, en /api/supplier/refund zette
+       die vlag op false. De verkoop verdween dus uit zijn eigen maand in plaats
+       van een tegenboeking te krijgen, en een afgesloten maand veranderde met
+       terugwerkende kracht. Gemeten met scripts/omzetproef.js.
+
+       LET OP WELKE DATUM WELKE LUS STUURT: de eerste leest `paidAt`, de tweede
+       `refundedAt`. Wie in de tweede lus per ongeluk `paidAt` gebruikt, boekt de
+       correctie terug de geschiedenis in en is precies weer waar we vandaan
+       kwamen -- alleen minder zichtbaar. */
     for (const o of db.data.orders) {
-      if (o.supplierCode !== s.code || !o.paid || !inMaand(o.paidAt || o.at)) continue;
-      for (const it of o.items || []) tel(catVan(it.name, it), (it.price || 0) * (it.qty || 1), o.paidAt || o.at);
+      if (o.supplierCode !== s.code || !o.paid) continue;
+      if (inMaand(o.paidAt || o.at)) {
+        for (const it of o.items || []) tel(catVan(it.name, it), (it.price || 0) * (it.qty || 1), o.paidAt || o.at);
+      }
+      /* De tegenboeking. Zonder `refundedAt` is er geen datum om hem aan op te
+         hangen; dan telt hij niet mee en dat is eerlijker dan hem op de
+         verkoopdatum te zetten. Oude bonnen van voor deze wijziging dragen geen
+         refundedAt en staan bovendien al op `paid: false` -- die vallen dus
+         hierboven al weg en worden niet dubbel gecorrigeerd. */
+      if (o.refunded && o.refundedAt && inMaand(o.refundedAt)) {
+        for (const it of o.items || []) tel(catVan(it.name, it), -((it.price || 0) * (it.qty || 1)), o.refundedAt);
+      }
     }
     /* Vier soorten kassabonnen tellen hier niet mee, alle vier omdat hun omzet
        al ergens anders in deze telling staat (TAKEN.md 4.28): `rtg` hoort bij

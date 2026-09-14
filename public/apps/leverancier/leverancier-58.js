@@ -19,7 +19,10 @@
   // ---- home ----
   function renderHome(){
     const open = (state.orders||[]).filter(o => !['geserveerd','geweigerd','terugbetaald'].includes(o.status));
-    const revenue = (state.orders||[]).filter(o=>o.paid).reduce((s,o)=>s+o.total,0);
+    /* `paid` betekent sinds de tegenboeking "er IS betaald" en niet "het geld
+       ligt hier". Wie hier alleen `paid` leest, telt een teruggestorte bon mee
+       in "Ontvangen" -- en dat valt niemand op, want er staat gewoon een bedrag. */
+    const revenue = (state.orders||[]).filter(o=>o.paid && !o.refunded).reduce((s,o)=>s+o.total,0);
     $('#homeH').textContent = T('sup.hello','Goedendag,') + ' ' + S.name.split(' ')[0] + '.';
     const rating = state.reviews && state.reviews.rating;
     $('#homeSub').textContent = tType(S.typeLabel) + (rating ? ' ·  ' + rating.score + ' (' + rating.aantal + ' reviews)' : '') + ' · ' + T('sup.connected','verbonden met RTG');

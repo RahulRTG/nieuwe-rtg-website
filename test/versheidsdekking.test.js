@@ -84,7 +84,7 @@ const BUITEN = {
      besluit genomen, dus het bestaat niet. Een leeg besluitregister zou een
      belofte zijn die niemand heeft gedaan -- maar een verwijzing die nergens
      verklaard staat, leest bij de eerste lezer als een vergeten register. */
-  'STILSPOORBESLUIT.json': 'een register van BESLUITEN over gesmoorde schrijfacties (LAT.md regel 18), met de hand bijgehouden en vandaag nog leeg; de meting ernaast is STILSPOOR.json en die veroudert wel',
+  'STILSPOORBESLUIT.json': 'een register van BESLUITEN over gesmoorde schrijfacties (LAT.md regel 21), met de hand bijgehouden en vandaag nog leeg; de meting ernaast is STILSPOOR.json en die veroudert wel',
   'LADDER.json': 'een afdruk uit de code, ververst door de keuring',
   'SLO.json': 'de servicedoelen zelf -- gegevens, geen meting',
   'KLOK.json': 'een tabel, geen meting',

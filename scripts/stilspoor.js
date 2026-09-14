@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 /* ============================================================================
-   HET SPOOR DAT NIET KAN WEIGEREN -- de handhaver bij LAT.md regel 18.
+   HET SPOOR DAT NIET KAN WEIGEREN -- de handhaver bij LAT.md regel 21.
 
    DE REGEL: "Een belofte over een spoor is pas een regel als het spoor kan
    weigeren." Dit huis belooft op tientallen plekken dat er iets wordt
@@ -182,7 +182,7 @@ function main() {
   return {
     soort: 'meting',
     uitleg: 'Schrijfacties waarvan het falen volledig wordt weggevangen, terwijl de aanroeper ' +
-      'daarna succes meldt. De klasse van LAT.md regel 18: een belofte over een spoor is pas een ' +
+      'daarna succes meldt. De klasse van LAT.md regel 21: een belofte over een spoor is pas een ' +
       'regel als het spoor kan weigeren.',
     grens: 'Deze meting toont NIET aan dat een gesmoorde schrijfactie fout is -- server/log.js en ' +
       'kern/envelop.js smoren met reden. Het is een triagelijst, geen oordeel. Zij toont ook niet ' +
@@ -212,7 +212,7 @@ function main() {
 
 function toon(stand) {
   const g = stand.gemeten;
-  console.log('\nHET SPOOR DAT NIET KAN WEIGEREN -- LAT.md regel 18\n');
+  console.log('\nHET SPOOR DAT NIET KAN WEIGEREN -- LAT.md regel 21\n');
   console.log('  ' + g.bestanden + ' bronbestanden, ' + g.vangers + ' catch-blokken, ' +
     g.leegVangers + ' daarvan leeg');
   console.log('  SPOOR : ' + g.spoorGesmoord + ' gesmoord van ' + g.spoorAanroepen + ' aanroepen' +

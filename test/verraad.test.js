@@ -281,3 +281,48 @@ test('MET verraad komt het OPSTARTEN er nu doorheen -- en daarna slaat hij wel t
   assert.ok(r.stand.overgeslagen > 0, 'de overgeslagen opstartschrijfacties zijn geteld');
   fs.rmSync(map, { recursive: true, force: true });
 });
+
+/* ============================================================================
+   DE VIERDE DOOD -- `sterf-voor-bericht`, en waarom hij een eigen toets krijgt.
+
+   De drie doden ervoor gaan over de UITKOMST: is er een spoor, staat het vast,
+   legt een herhaling er iets bovenop. Deze gaat over de MENS: de handeling staat
+   vast en de betrokkene hoort er nooit van. Een route kan atomair EN herstelbaar
+   zijn en hier alsnog zakken, en juist daarom mag hij nooit met de andere drie
+   worden samengevat.
+
+   Deze toetsen bewaken de twee manieren waarop hij stilletjes waardeloos wordt:
+   het injectiepunt verdwijnt (dan heet de grens onmeetbaar en zakt er niets
+   meer), of hij verhuist naar NA de schrijfactie (dan meet hij de milde kant en
+   heet dat de dure). */
+test('sterf-voor-bericht staat in de catalogus, is INGEBOUWD en draagt een crashcontract', () => {
+  const v = CATALOGUS.find(x => x.naam === 'sterf-voor-bericht');
+  assert.ok(v, 'het verraad hoort in de catalogus te staan');
+  assert.ok(v.waar, 'en INGEBOUWD te zijn -- `waar: null` is een voornemen, geen faalmoment');
+  assert.match(v.waar, /meldaan/, 'in de schrijver van de persoonlijke melding');
+  assert.equal(v.contract, 'RECOVERABLE',
+    'de uitkomst staat vast; wat ontbreekt is dat iemand het te horen krijgt');
+});
+
+test('de injectie staat VOOR het wegschrijven en niet erna', () => {
+  /* Op de BRON, want dit is een uitspraak over volgorde en die is niet uit
+     gedrag af te lezen zonder een echte crash. Staat de injectie na de save,
+     dan meet de proef de milde kant (de melding bestaat, alleen de bezorging
+     ontbrak) en noemt die de dure. */
+  const fs = require('node:fs');
+  const src = fs.readFileSync(require('node:path').join(__dirname, '..', 'server', 'opzet', 'meldaan.js'), 'utf8');
+  const injectie = src.indexOf("sterf-voor-bericht");
+  const opbouw = src.indexOf('const n = {');
+  const wegschrijven = src.indexOf('db.data.notifications[handle].unshift');
+  assert.ok(injectie > 0, 'de injectie hoort in meldaan.js te staan');
+  assert.ok(opbouw > 0 && wegschrijven > 0, 'en de melding wordt daar opgebouwd en weggeschreven');
+  assert.ok(injectie < opbouw, 'de injectie komt VOOR het opbouwen van de melding');
+  assert.ok(injectie < wegschrijven, 'en zeker voor het wegschrijven ervan');
+});
+
+test('zonder RTG_VERRAAD slaat hij nooit toe -- de haak kost niets in productie', () => {
+  /* De motor leest RTG_VERRAAD bij het laden. In deze toetsronde staat hij uit,
+     dus elke sla() hoort false te geven -- ook die van de nieuwe. */
+  assert.equal(sla('sterf-voor-bericht'), false);
+  assert.equal(actief('sterf-voor-bericht'), false);
+});

@@ -48,7 +48,21 @@ const CONTROLES = [
   { wereld: 'school', pad: '/api/foundation/school/klas',
     velden: ['schoolCode', 'personeelToken', 'klasCode'],
     waarom: 'de klas moet nog te lezen zijn met de sleutel van de leraar die hem geeft' },
-  { wereld: 'rtfos', pad: '/api/rtfos/stad', velden: ['stad'], rol: 'kantoor-op-naam',
+  /* MET DE SLEUTEL DIE DE WERELD HEEFT GEMAAKT, en dat was hij niet (14 september
+     2026). Deze controle vroeg het met `kantoor-op-naam`, terwijl de stadsafdeling
+     door het LANDELIJKE bestuur wordt geopend (`tokens.boardroom`, zie stap rtfos in
+     ./idemwereld.js). kern/rtfos/basis.js#poortIn kijkt naar de sleutel die vraagt:
+     `landelijk` is `magBoardroom(key)`, en zonder zetel in die stad is 403 het JUISTE
+     antwoord. Gemeten, direct na het opzetten en voordat er een enkele rtfos-route was
+     aangeroepen: boardroom 200, kantoor-op-naam 403, office 403.
+
+     WAT DAT BETEKENT VOOR DE UITSLAG DIE HIJ GAF. In eerdere rondes stond deze wereld
+     op `ok` -- dus toen kon `kantoor-op-naam` het wel, en dat kan alleen doordat een
+     van de duizenden routes die ervoor liepen die sleutel onderweg boardroom-toegang
+     gaf. Een controle waarvan de uitslag afhangt van de volgorde van 4900 routes,
+     controleert niets: hij meldt "wereld overeind" op een recht dat de wereld niet
+     zelf heeft. Vandaar de rol van de maker, en niet een rol die het soms mag. */
+  { wereld: 'rtfos', pad: '/api/rtfos/stad', velden: ['stad'], rol: 'boardroom',
     lijfUit: (e) => ({ id: e.stad }),
     waarom: 'de stadsafdeling is de wortel van dat hele domein' },
   { wereld: 'festival', pad: '/api/festival/terrein', velden: ['festival', 'editie'], rol: 'supplier',

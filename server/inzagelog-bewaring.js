@@ -30,7 +30,7 @@
                   toch bijt is dat ZICHTBAAR (`inzageLogAfgekapt`).
 
    EN DAT LAATSTE IS HET PUNT. Een grens die stil afkapt, is een belofte die stil
-   breekt -- precies de faalvorm waar LAT.md regel 18 over gaat. Bijt de noodrem,
+   breekt -- precies de faalvorm waar LAT.md regel 21 over gaat. Bijt de noodrem,
    dan telt het journaal dat en zegt samenvatting() het hardop. Dan is het een
    zichtbaar tekort in plaats van een gat dat niemand kan vinden.
 

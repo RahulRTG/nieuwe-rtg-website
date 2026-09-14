@@ -630,6 +630,7 @@
     "knelpunt": [
       "beroepenbieb",
       "openVacatures",
+      "opvangwijzer",
       "rtf",
       "status"
     ],
@@ -746,6 +747,7 @@
       "aanwezigMijn",
       "aanwezigVolg",
       "aanwezigVolgtHij",
+      "aanwezigZoek",
       "mediaBewaar",
       "mediaBieb",
       "mediaBord",
@@ -757,6 +759,7 @@
       "mediaLijsten",
       "mediaMaker",
       "mediaMeldZet",
+      "mediaMomentenVoor",
       "mediaSamenIn",
       "mediaSamenMijn",
       "mediaSamenNodig",

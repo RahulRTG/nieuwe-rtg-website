@@ -14,6 +14,29 @@
    ========================================================================== */
 'use strict';
 
+/* DE GRAAD VAN DE NEGEN COLLECTIES IS OP 13 SEPTEMBER 2026 VAN `gemeten` NAAR `vermoed`
+   GEGAAN, en dat is een CORRECTIE VAN MIJN EIGEN BEWERING -- niet een verzachting.
+
+   Bij het schrijven van dit contract stond in IDEMPROEF.json dat de proef hier negen
+   collecties zag bewegen, en dat is hier als bewijs gebruikt. Die negen waren VOORWERK: de
+   pasladder-ijkoproep en de voorziening schreven ze, en de proef rekende dat aan deze route
+   toe (zie de herijking in scripts/lib/idemproef.js). Na de reparatie is `opslag.a` van dit
+   pad LEEG, en de stand is wat hij in beide rondes al was: `ongemeten` -- de proef kwam nooit
+   bij de muterende code, want zonder openstaande factuur is er niets te betalen.
+
+   DE KEURING HEEFT DAT ZELF GEVONDEN. ./keuring.js weigert een `gemeten` claim die de meting
+   niet dekt, en na de hermeting zakte dit contract op alle negen regels. Precies waarvoor die
+   poort bestaat, en hij heeft hem tegen de schrijver van het contract gebruikt.
+
+   WAT ER NIET VERANDERT: dat deze handeling geld verplaatst. Dat staat in de BRON en niet in
+   de meting -- routes/pay.js roept factuurSaldo aan, en kern/factuursaldo.js schrijft af via
+   pay.huisIn, sluit de factuur via settleFactuur en boekt de 30%-afdracht. Ook de
+   bevoegdheidsreparatie (van de LEZEN-lijst naar `voorstel`) staat daarop en niet op de
+   meting. Wat wegvalt is een derde been dat er nooit was. */
+const BRON = 'verklaard uit kern/factuursaldo.js en niet gemeten: de idempotentieproef komt ' +
+  'hier niet bij de muterende code (geen openstaande factuur), dus over deze collectie bestaat ' +
+  'geen meting.';
+
 const FACTUUR = Object.freeze({
   '/api/pay/saldo': {
     capability: '/api/pay/saldo',
@@ -41,36 +64,35 @@ const FACTUUR = Object.freeze({
         bron: 'de `bezig`-set vangt de race binnen het proces; de idem-sleutel vangt de herhaling' }
     ],
     gevolgen: [
-      { soort: 'direct', graad: 'gemeten', collectie: 'paySaldi',
+      { soort: 'direct', graad: 'vermoed', collectie: 'paySaldi',
         wat: 'het saldo van de wallet van het lid daalt met het openstaande bedrag',
-        reden: 'de idempotentieproef zag deze collectie veranderen' },
-      { soort: 'direct', graad: 'gemeten', collectie: 'payBoekingen',
+        reden: BRON },
+      { soort: 'direct', graad: 'vermoed', collectie: 'payBoekingen',
         wat: 'er komt een grootboekregel bij: van het lid naar de huisrekening',
-        reden: 'gemeten in dezelfde ronde' },
-      { soort: 'direct', graad: 'gemeten', collectie: 'invoices',
+        reden: BRON },
+      { soort: 'direct', graad: 'vermoed', collectie: 'invoices',
         wat: 'de factuur gaat op `paid`, met "Betaald uit RTG Pay-saldo" als hoe',
-        reden: 'gemeten in dezelfde ronde. Let op: bij een EIGEN account woont de factuur in de ' +
-          'identiteitskluis (accounts.getMemberState) en niet in db.data -- de proef liep over de ' +
-          'db-kant, dus deze meting gaat over die kant' },
-      { soort: 'direct', graad: 'gemeten', collectie: 'fondsAfdrachten',
+        reden: BRON + ' Bij een EIGEN account woont de factuur in de identiteitskluis ' +
+          '(accounts.getMemberState) en niet in db.data.' },
+      { soort: 'direct', graad: 'vermoed', collectie: 'fondsAfdrachten',
         wat: 'de afdracht aan de RTFoundation wordt vastgelegd',
-        reden: 'gemeten in dezelfde ronde; settleFactuur doet dit voor elke betaalweg gelijk' },
-      { soort: 'direct', graad: 'gemeten', collectie: 'socialeAfdrachten',
+        reden: BRON + ' settleFactuur doet dit voor elke betaalweg gelijk.' },
+      { soort: 'direct', graad: 'vermoed', collectie: 'socialeAfdrachten',
         wat: 'de sociale afdracht wordt vastgelegd',
-        reden: 'gemeten in dezelfde ronde' },
-      { soort: 'direct', graad: 'gemeten', collectie: 'economischeRuntime',
+        reden: BRON },
+      { soort: 'direct', graad: 'vermoed', collectie: 'economischeRuntime',
         wat: 'de economische runtime houdt de stroom tussen de werelden bij',
-        reden: 'gemeten in dezelfde ronde; dit is een teller en geen geld' },
-      { soort: 'direct', graad: 'gemeten', collectie: 'payIdem',
+        reden: BRON + ' Dit is een teller en geen geld.' },
+      { soort: 'direct', graad: 'vermoed', collectie: 'payIdem',
         wat: 'de sleutel (wie + factuurnummer) wordt vastgelegd zodat een tweede poging niet dubbel boekt',
-        reden: 'gemeten in dezelfde ronde; de sleutel is DETERMINISTISCH, dus een herhaling na een ' +
-          'halve betaling geneest in plaats van dubbel te boeken' },
-      { soort: 'direct', graad: 'gemeten', collectie: 'payIdemAfdruk',
+        reden: BRON + ' De sleutel is DETERMINISTISCH (wie + factuurnummer), dus een herhaling na ' +
+          'een halve betaling geneest in plaats van dubbel te boeken.' },
+      { soort: 'direct', graad: 'vermoed', collectie: 'payIdemAfdruk',
         wat: 'de afdruk van het antwoord wordt bewaard voor die tweede poging',
-        reden: 'gemeten in dezelfde ronde' },
-      { soort: 'direct', graad: 'gemeten', collectie: 'betaalIdem',
+        reden: BRON },
+      { soort: 'direct', graad: 'vermoed', collectie: 'betaalIdem',
         wat: 'dezelfde bescherming aan de kant van de betaal-naad',
-        reden: 'gemeten in dezelfde ronde' },
+        reden: BRON },
       { soort: 'afgeleid', graad: 'vermoed',
         wat: 'is er te weinig saldo, dan laadt de wallet eerst bij en staat dat als `bijgeladen` ' +
           'in het antwoord -- er is dan meer gebeurd dan een factuur betalen',
@@ -105,8 +127,8 @@ const FACTUUR = Object.freeze({
     herstel: { bron: 'HERSTELPROEF.json',
       reden: 'niet verklaard maar gemeten; een betaalde factuur heeft geen `exact` terugweg -- wat ' +
         'bestaat is een creditnota, en die wist geen factuur (zie kern/commerce/retour*.js)' },
-    nagekeken: 'Claude (Opus 5), 2026-09-13: negen gemeten collecties uit kern/stuur/gevolg.js, de ' +
-      'poorten en het bundelvenster uit kern/factuursaldo.js; niet door een mens nagelezen'
+    nagekeken: 'Claude (Opus 5), 2026-09-13: negen collecties, de poorten en het bundelvenster ' +
+      'gelezen uit kern/factuursaldo.js -- NIET gemeten (zie de kop); niet door een mens nagelezen'
   }
 });
 

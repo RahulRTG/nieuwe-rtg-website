@@ -706,6 +706,68 @@ rechtenmodel bij. De kern in één zin: **één bedrijf is niet één KvK**, dus
 concern, entiteit, registratie, vestiging, merk en operating unit zijn zes
 begrippen en geen zes velden.
 
+**`ONDERNEMEN.md` is de laag die die bedrijvenkant aan elkaar knoopt** — de RTG
+Ondernemerslus, als richtingsdocument met per onderdeel of het **staat**, **een
+stap weg** is, **een besluit vraagt** of **jaren weg** is. Lees die vóór je iets
+bouwt voor iemand die een bedrijf begint, draait, overdraagt of uitbouwt tot een
+concern. De kernregel: *de gebruiker hoeft steeds minder van ondernemen te weten,
+terwijl RTG steeds meer van de onderneming begrijpt* — en de regel eronder, want
+zonder haar is de eerste een verkoopzin: **RTG maakt ondernemen niet makkelijker
+te documenteren, RTG verwijdert systematisch de vermijdbare fouten uit
+ondernemen.** De eerste opdracht is aansluiten en niet bouwen, en dat volgt uit
+een register dat er al ligt: `ONDERNEMERBEWIJS.json` weegt 197
+ondernemer-capabilities langs twaalf bewijslagen en staat op **0 verkoopbaar**,
+met 4 van de 20 ketens sluitend. De dragende bewering — *de stations zijn geen
+losse producten meer maar stations van dezelfde lus* — is daarnaast **gemeten**
+(`npm run ondernemerslus`, `ONDERNEMERSLUS.json`) in plaats van verklaard, en dat
+is met opzet een ANDERE meter dan `objectmodel.js`: die vraagt of domeinen een
+VORM delen, deze of de keten een ONDERWERP draagt. Een intake hoeft niet op een
+salarisrun te lijken; een lus is een lus doordat station 11 nog weet over welk
+bedrijf station 2 het had. Uitslag: <!--getal:lus.stations-->12<!--/getal-->
+stations waarvan <!--getal:lus.stationsMetRoute-->11<!--/getal--> met routes,
+drie rollen met <!--getal:lus.deurwissels-->8<!--/getal--> deurwissels, en
+**`zaakZietOnderneming` = <!--getal:lus.zaakZietOnderneming-->0<!--/getal-->** —
+de lus loopt één kant op, want geen enkel bestand onder `routes/supplier/` of
+`routes/staff/` kent het ondernemingsobject. Dezelfde vorm als de twee
+ritwerelden, met `kern/mobiliteit/appbrug.js` als model én met de regel die daar
+geleerd is: de brug loopt één kant op, want twee lijsten die elkaar bijwerken
+hebben geen waarheid meer. Vijf dingen die het voorstel corrigeren en die je
+nergens anders moet herhalen. **`twin` is bezet en vierdubbel** — een woning
+(`kern/bureau/twin.js`), een veld in het levensdossier, de digitale tweeling van
+`command/simulatie.js`, en het scherpst: `magnaat-partnerstudio` bouwt al een
+speelbare tweeling van een ECHT bedrijf — dus een Business Twin zou de vijfde
+betekenis zijn náást een bestaande bedrijfstweeling, en de vorm die overleeft is
+de PROJECTIE van `kern/levensgraaf/graaf.js` (die heet hier al
+`ondernemingBeeld`). **`invariant` is óók bezet, en dat is goed nieuws**: in
+`kern/commercie/subsidie.js` en `vergoeding.js` betekent hij al precies wat de
+opzet bedoelt, dus de Business Invariant is een uitbreiding en geen nieuw begrip
+— met als scherpste zin van het document dat **een bedrijfsregel pas een
+invariant is als hij kan weigeren** (LAT-regel 13, verplaatst naar dit domein), en
+de weg van signaal naar grendel heet hier **schaduw** en niet "aanzetten".
+**Founder Dependency botst frontaal met de scherpste grens van dit huis**: een
+afhankelijkheidspercentage is een cijfer op een mens (KANTOORMACHT, HDI, INT-04,
+CAR-05, STAGE zeggen alle vijf dat de meeteenheid nooit de mens is, ook niet
+intern als sorteersleutel) — de uitweg is één niveau omhoog meten: *23 processen
+hebben één goedkeurder* is een feit over de inrichting, *jij bent voor 47% een
+knelpunt* een oordeel over een mens. **`bedacht → voorgesteld → geautoriseerd →
+uitgevoerd → bevestigd` wordt geen zesde gezagsladder** (GEZAGSNOEMER telt er al
+vijf met 21 treden): die vijf woorden beschrijven de levensloop van één handeling
+en niet het gezag erover. En de **autonome backoffice wacht op een getal en niet
+op moed**: `VERTROUWEN.json` staat op 0 bewezen, `ONDERNEMERBEWIJS.json` op 0 van
+197, en 91 van de 115 AI-schrijfpaden hebben geen bekende terugweg — eerst de
+<!--getal:lus.ketensZonderProef-->4<!--/getal--> ongelopen ketens, dan de
+bewijslagen, dan autonomie. Par. 7 is het gat dat het document sluit: de
+**Staff Care Loop**, met de regel *persoonlijk welzijn blijft persoonlijk, een
+organisatieprobleem wordt een organisatiesignaal* — nooit "deze medewerker voelt
+zich somber", wel "de sluitdiensten zijn zes weken onevenredig over drie mensen
+verdeeld". Let daarbij op de deur die vandaag verkeerd hangt: `kern/gemoed.js`
+draait op `auth` (de LEDENsessie) terwijl personeel op `supplierAuth` binnenkomt,
+dus een medewerker die geen lid is kan niet bij de dagcheck-in. En let op wat de
+meter van zichzelf leerde: hij gooide netjes bij een onleesbaar patroon maar
+meldde bij een HERNOEMDE collectie stil `0 kenners` — zijn eigen blindheid als
+duurste bevinding — waarna er een ijking naast kwam en twee besturingsproeven in
+`test/ondernemerslus.test.js`.
+
 **`LINK.md` is de adres- en capabilitylaag** — wat een RTG-code is. De contactpin
 was een sociale functie; RTG Link is de laag eronder: één menselijk adres (RTG
 PIN), waarachter het platform per context tijdelijke, begrensde bevoegdheden

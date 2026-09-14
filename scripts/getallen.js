@@ -392,6 +392,24 @@ const GETALLEN = {
     wat: 'scenario\'s waarin de resolver de context aantoonbaar gebruikte' },
   'menselijk.niemandKeek': { bron: 'MENSELIJKE_UITVOERING.json', veld: 'telling.contextNiemandKeek',
     wat: 'scenario\'s waarin de resolver niet draaide, dus niemand naar de context keek' },
+  /* DE ONDERNEMERSLUS (ONDERNEMEN.md par. 1). Vier getallen, en ze staan hier
+     omdat juist deze in een document verouderen: het zijn de getallen waarop de
+     volgorde in par. 14 rust, en een verouderde volgorde stuurt werk verkeerd.
+
+     `zaakZietOnderneming` is de scherpste van de vier. Hij staat vandaag op nul
+     en hoort te STIJGEN; wie hem in het document overtypt, schrijft over een
+     half jaar een gat op dat misschien allang gedicht is -- of erger, een brug
+     die weer is afgebroken. */
+  'lus.stations': { bron: 'ONDERNEMERSLUS.json', veld: 'telling.stations',
+    wat: 'stations van de ondernemerslus' },
+  'lus.stationsMetRoute': { bron: 'ONDERNEMERSLUS.json', veld: 'telling.stationsMetRoute',
+    wat: 'stations waarvoor werkelijk een route bestaat' },
+  'lus.deurwissels': { bron: 'ONDERNEMERSLUS.json', veld: 'telling.deurwissels',
+    wat: 'keren dat de lus van sessie wisselt' },
+  'lus.zaakZietOnderneming': { bron: 'ONDERNEMERSLUS.json', veld: 'telling.zaakZietOnderneming',
+    wat: 'bestanden aan de zaakkant die het ondernemingsobject kennen' },
+  'lus.ketensZonderProef': { bron: 'ONDERNEMERSLUS.json', veld: 'telling.ketensZonderProef',
+    wat: 'ketens van de lus die nooit als keten zijn gelopen' },
   /* De duur van die parseronde staat MET OPZET niet in deze lijst. Een levend
      getal moet uit een register komen dat bij gelijke code hetzelfde zegt; een
      tijdmeting doet dat niet (4,6 of 4,8 op dezelfde commit), en een controle
@@ -404,7 +422,7 @@ const GETALLEN = {
    dag ook iets dat niemand had bedoeld. */
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
-  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md'];
+  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'ONDERNEMEN.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

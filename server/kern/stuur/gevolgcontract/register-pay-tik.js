@@ -48,6 +48,22 @@ const TIK = Object.freeze({
       { soort: 'direct', graad: 'gemeten', collectie: 'payIdemAfdruk',
         wat: 'de afdruk van het antwoord wordt bewaard voor die tweede tik',
         reden: 'gemeten in dezelfde ronde' },
+      /* TWEE COLLECTIES DIE ALLEEN OP DE EERSTE OPROEP BEWEGEN, en die horen er juist
+         daarom bij. Ze stonden er niet toen de meting alleen de tweede en derde oproep
+         zag: de idempotentieproef herijkte na haar pasladder-oproep, en die eerste
+         oproep is nu meegeteld (zie de kop bij de pasladder in
+         scripts/lib/idemproef.js). Wat er eenmalig ontstaat is niet minder een gevolg
+         dan wat er elke keer bijkomt. */
+      { soort: 'direct', graad: 'gemeten', collectie: 'betaalOpdrachten',
+        wat: 'moest er worden bijgeladen, dan komt er een betaalopdracht bij de aanbieder ' +
+          'in de eigen opslag te staan',
+        reden: 'gemeten op de eerste oproep, toen de wallet nog leeg was; op de derde niet meer, ' +
+          'want dan is er saldo. Zie het gevolg `buiten` hieronder -- dit is de binnenkant ervan' },
+      { soort: 'direct', graad: 'gemeten', collectie: 'capGezondheid',
+        wat: 'de stand van deze capability wordt bijgehouden: hoe gaat het met betalen',
+        reden: 'gemeten op de eerste oproep; kern/commercie/capgezondheid.js houdt een stand PER ' +
+          'capability en legt die bij het eerste gebruik vast. Groen is daar niet "geen nieuws", ' +
+          'dus een capability die gebruikt wordt, schrijft' },
       { soort: 'afgeleid', graad: 'vermoed',
         wat: 'de tik blijft geldig: hij wordt NIET verbruikt, dus dezelfde code kan binnen zijn ' +
           'vijf minuten door meer mensen gebruikt worden',

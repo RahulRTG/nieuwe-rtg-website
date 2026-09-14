@@ -537,8 +537,29 @@ async function elevateTier(base, memberToken, pas, approverToken) {
    weg. Het is bovendien een race: welke test erop struikelt verschilt per
    run. Hem meetellen als "JS-fout op de pagina" maakt de tests onbetrouwbaar
    zonder ook maar iets te bewaken. Alles wat WEL uit onze code komt telt
-   onverkort mee -- dit filter noemt precies een bericht, geen patroon. */
-const BROWSERRUIS = ['Transition was skipped'];
+   onverkort mee -- dit filter noemt precies een bericht, geen patroon.
+
+   DEZELFDE OVERGANG HEEFT TWEE BEWOORDINGEN, en de tweede kostte een rode main.
+   Chromium verwerpt die ready-promise soms met "Transition was skipped" en soms
+   met "Transition was aborted because of invalid state. ViewTransition opt-in
+   disabled". Hetzelfde verschijnsel, dezelfde bron (shared/rtg-heritage-
+   transition.js roept startViewTransition aan), en even onopvangbaar -- alleen
+   een andere tekst, dus het filter liet hem door.
+
+   Gemeten op 14 september 2026, en de meting is de reden dat het hier eindigt
+   en niet in een hertest: main zakte op test/move.e2e.js met exact deze tekst,
+   terwijl DEZELFDE BOOM (4b2c6a37c, byte voor byte) een uur eerder groen door
+   de PR-ronde kwam. Zelfde inhoud, andere uitslag: dat is per definitie geen
+   inhoudsfout.
+
+   Waarom er geen patroon van wordt gemaakt: `/Transition/` zou ook een echte
+   fout uit onze eigen overgangscode wegfilteren. Twee letterlijke teksten is
+   de prijs van die strengheid, en die prijs hoort betaald te worden per
+   bewoording die zich in het wild vertoont -- niet vooruit geraden. */
+const BROWSERRUIS = [
+  'Transition was skipped',
+  'Transition was aborted because of invalid state. ViewTransition opt-in disabled'
+];
 function letOpFouten(page, bak) {
   /* De eigen browserdriver (server/lib/browser.js) heeft geen .on. Vroeger stond
      bij elke aanroeper `if (page.on)` ervoor; nu staat die vraag hier, op een

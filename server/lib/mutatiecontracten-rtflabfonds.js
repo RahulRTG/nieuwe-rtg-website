@@ -16,15 +16,19 @@
 
    EN DRIE DINGEN WORDEN HIER MET OPZET UIT ELKAAR GEHOUDEN:
 
-   - `natuurlijk` -- de tweede aanroep DOET iets, en dat hoort zo. Twee keer tien
-     euro toezeggen is twintig euro toezeggen; een fonds dat de tweede negeert,
-     verliest een echte toezegging.
+   - `nietHerhaalbaar` -- de tweede aanroep IS een tweede gebeurtenis, en dat is
+     de bedoeling. Twee keer tien euro toezeggen is twintig euro toezeggen; een
+     fonds dat de tweede negeert, verliest een echte toezegging. Er is ook niets
+     recht te zetten, want er ging niets fout.
    - `idempotent` -- de tweede aanroep verandert niets meer. Bij `stem` is dat
      gemeten: dezelfde stem twee keer blijft EEN stem, zodat wie het vaakst klikt
      niet het hardst stemt.
-   - een GEWEIGERDE herhaling is een TOESTANDSCONTROLE en geen idempotentie.
-     `beslis` geeft de tweede keer 409 "Over dit voorstel is al beslist". Die twee
-     op een hoop gooien zou van een grendel een garantie maken.
+   - `hooguitEens` voor `beslis`, en met opzet NIET `idempotent`. De tweede
+     aanroep wordt GEWEIGERD met 409 "Over dit voorstel is al beslist". Naar de
+     letter blijft de stand gelijk, maar een herhaling die wordt geweigerd is een
+     TOESTANDSCONTROLE en geen idempotentie (MUTATIECONTRACT.md): wie hem
+     idempotent noemt, geeft een taakloper toestemming om automatisch opnieuw te
+     proberen op iets wat hij nooit ongemerkt mag herhalen.
    ========================================================================== */
 'use strict';
 
@@ -57,15 +61,15 @@ const CONTRACTEN = {
   'POST /api/rtf/labfonds/locatie/maak': contract('rtf.labfonds.locatie.maak',
     'idempotent', 'dezelfde locatie twee keer aanmaken levert er EEN op'),
   'POST /api/rtf/labfonds/doneer': contract('rtf.labfonds.doneer',
-    'natuurlijk', 'twee keer tien toezeggen staat als twintig in het grootboek -- ' +
+    'nietHerhaalbaar', 'twee keer tien toezeggen staat als twintig in het grootboek -- ' +
     'een tweede toezegging IS een tweede toezegging'),
   'POST /api/rtf/labfonds/voorstel/maak': contract('rtf.labfonds.voorstel.maak',
-    'natuurlijk', 'een tweede identiek voorstel krijgt een EIGEN id en staat er als tweede; ' +
+    'nietHerhaalbaar', 'een tweede identiek voorstel krijgt een EIGEN id en staat er als tweede; ' +
     'samenvoegen zou de tweede indiener zijn stem afnemen'),
   'POST /api/rtf/labfonds/stem': contract('rtf.labfonds.stem',
     'idempotent', 'dezelfde stem twee keer blijft EEN stem (voor: 1, tegen: 0)'),
   'POST /api/rtf/labfonds/beslis': contract('rtf.labfonds.beslis',
-    'toestandscontrole', 'de tweede aanroep wordt GEWEIGERD met 409 "al beslist" -- ' +
+    'hooguitEens', 'de tweede aanroep wordt GEWEIGERD met 409 "al beslist" -- ' +
     'dat is een grendel en geen idempotentie')
 };
 

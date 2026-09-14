@@ -15,10 +15,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 1885 |
 | losse beweringen (`test(...)`) | 13484 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1246 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1247 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
-| alleen in de kop *genoemd*, nog niet gemeten | 166 |
+| alleen in de kop *genoemd*, nog niet gemeten | 165 |
 | niets van beide | 402 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -407,7 +407,7 @@ toets omvalt.
 | `fiscaal-gateway.test.js` | 10 | -- | DE AANGIFTEGATEWAY: klaargezet, niet aangezet. Zeven beweringen, en de eerste is de enige die er echt toe doet. |
 | `fiscaal-herkomst.test.js` | 7 | -- | DE BEWIJSKETEN: waar komt dit bedrag vandaan, en klopt het nog. Vijf beweringen: 1. |
 | `fiscaal-jaargangen.test.js` | 5 | gezakt op `===->!==#0` | DE FISCALE JAARGANGEN: welke regels golden er op die dag. Vijf beweringen, en ze gaan alle vijf over hetzelfde verschil: tussen "wat geldt er nu" (dat kon dit huis al) en "wat gold er toen" (dat kon het niet, want de... |
-| `fiscaal-meegeleverd.test.js` | 5 | genoemd | DE MEEGELEVERDE WETSWIJZIGINGEN (server/kern/fiscaal/meegeleverd/). De basistabel van kern/fiscaal/landen.js draagt het PEILJAAR. |
+| `fiscaal-meegeleverd.test.js` | 5 | gezakt op `===->!==#0` | DE MEEGELEVERDE WETSWIJZIGINGEN (server/kern/fiscaal/meegeleverd/). De basistabel van kern/fiscaal/landen.js draagt het PEILJAAR. |
 | `fiscaal-preflight.test.js` | 6 | gezakt op `===->!==#0` | DE PRE-FLIGHT: GO, REVIEW of BLOCK vóór de klik. Zes beweringen, en de belangrijkste is de laatste. |
 | `fiscaal-scenario.test.js` | 7 | -- | DE SCENARIO-ENGINE: wat gebeurt er als ik dit doe -- zonder dat er iets gebeurt. Zes beweringen, en de eerste is de enige die er echt toe doet. |
 | `fiscaal-terugrekenen.test.js` | 5 | -- | DE REKENPLEKKEN OP DE REGELS VAN TOEN. De jaargangen (test/fiscaal-jaargangen.test.js) maakten terugrekenen MOGELIJK. |

@@ -170,14 +170,24 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
   const kas = await stil('/api/pay/kascode', { centen: 100 }, tokens.member);
   w.code = (kas.data && (kas.data.code || (kas.data.kascode && kas.data.kascode.code))) || null;
 
-  /* 9. EEN TIKCODE VAN DE ANDER. `pay/tik` betaalt naar de eigenaar van de code,
-        dus die moet van het TWEEDE lid komen -- je eigen tik weigert de kern
-        terecht ("Dit is je eigen tik"). Dit is een andere codesoort dan de
-        kascode hierboven; met die ene meegestuurd bleef pay/tik op 404 staan. */
-  if (w.anderToken) {
-    const tik = await stil('/api/pay/tikcode', {}, w.anderToken);
-    w.tikcode = (tik.data && tik.data.code) || null;
-  }
+  /* 9. GEEN TIKCODE IN DE WERELD -- die staat als VOORZIENING bij VOORZIENINGEN
+        hieronder, en dat is een gemeten correctie (14 september 2026).
+
+        Hier stond hij wel: `pay/tik` betaalt naar de eigenaar van de code, dus die
+        moet van het TWEEDE lid komen -- je eigen tik weigert de kern terecht ("Dit
+        is je eigen tik"). Die reden is nog steeds juist en verhuist mee.
+
+        WAT ER NIET AAN KLOPTE: een tikcode leeft vijf minuten (KASCODE_MS in
+        kern/pay/stand.js) en deze wereld wordt eenmalig aan het BEGIN van een ronde
+        opgezet die tientallen minuten duurt. In de ronde van 14 september gaf
+        /api/pay/tik drie keer 404 "Deze tik is niet (meer) geldig" -- de code was
+        verlopen voordat de meetlus bij die route was. Dat een eerdere ronde hem op
+        200 had, was geluk in de volgorde en geen eigenschap van deze opzet.
+
+        De voorziening draait NA de pasladder-ijkoproep en VOOR de eerste gemeten
+        oproep, en is dus per definitie vers. Een tweede plek die hetzelfde probeert
+        te regelen is weg: `heel()` laat /api/pay/tik zonder lijf uit geldLijf()
+        vallen, en de voorziening levert het hele lijf. */
 
   /* 10. EEN OPENSTAANDE FACTUUR van het lid zelf, voor `pay/saldo`. Die maken we
          niet: de demostand heeft er een, en we zoeken hem op. Een factuur
@@ -897,7 +907,6 @@ function geldLijf(w) {
     '/api/pay/verzoek': { aan: [w.cn2], totaalCenten: 500, oms: 'proefklompje' },
     '/api/pay/verzoek/betaal': { id: w.verzoekAanMij },
     '/api/pay/verzoek/intrek': { id: w.verzoekVanMij },
-    '/api/pay/tik': { code: w.tikcode, centen: 100, oms: 'prooftik' },
     '/api/pay/saldo': { invoiceId: w.factuurId },
 
     /* ---- twee ZWARE KANTOORROUTES, en waarom ze hier horen ----
@@ -1102,6 +1111,26 @@ const VOORZIENINGEN = {
     if (!(r && r.status >= 200 && r.status < 300)) return { fout: 'pos/sale gaf ' + (r && r.status) };
     return { room: kamer, method: 'contant' };
   },
+  /* DE TIK, EN WAAROM HIJ HIER HOORT EN NIET IN DE WERELD (stap 9 legt het uit).
+     Een tikcode leeft vijf minuten; deze plek is de enige die gegarandeerd vers is.
+
+     DE ONTVANGER IS EEN ANDER LID: kern/pay/tik.js weigert met "Dit is je eigen tik"
+     zodra de code van de aanroeper zelf is. `w.anderToken` is het tweede lid uit stap
+     3 van de wereld.
+
+     Er wordt niets geforceerd en geen grens verhoogd: het tweede lid zet zijn toestel
+     langs de gewone route op ontvangen. Dat de proef die code drie keer gebruikt is
+     geen oprekking maar het ontwerp -- de code wijst alleen de ONTVANGER aan, dus er
+     kan enkel geld naar hem toe, en daarom mag een hele tafel hem binnen die vijf
+     minuten gebruiken. */
+  '/api/pay/tik': async ({ post, w }) => {
+    if (!w.anderToken) return { fout: 'geen tweede lid in de wereld' };
+    const r = await post('/api/pay/tikcode', {}, w.anderToken);
+    const code = r.data && r.data.code;
+    if (!code) return { fout: 'pay/tikcode gaf ' + r.status + ' ' + ((r.data && r.data.error) || '') };
+    return { code, centen: 100, oms: 'proeftik' };
+  },
+
   /* Saldo op de rekening van de ZAAK, want oormerken kan niet uit niets. */
   '/api/supplier/pay/treasury/apart': async ({ post, tokenVoor }) => {
     const f = await zaakSaldo({ post, tokenVoor });

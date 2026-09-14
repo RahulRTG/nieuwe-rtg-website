@@ -37,18 +37,31 @@ const BANK = Object.freeze({
          aan test/tweedehandtekening.test.js toets 6 (echt geld door de hele baan) en aan de assen
          die kern/kantoor/geldketen.js tijdens die uitvoering vastlegt; die staan los van
          IDEMPROEF.json. Alleen deze collectie-claim leunde erop. */
-      { soort: 'direct', graad: 'vermoed', collectie: 'kantoorHandtekeningen',
+      /* DE VIER ZIJN NU GEMETEN, en dat was op 13 september nog niet zo. De
+         idempotentieproef kwam hier niet verder dan een 400 ("Er staat geen enkele vaste
+         betaling aan de beurt") omdat haar wereld geen reeks had die aan de beurt was;
+         sinds zij een eigen weekreeks zet en een grens meestuurt, loopt de route echt.
+         Twee collecties die in het eerste verschil meekwamen staan er met opzet NIET bij:
+         `kantoorMensdeur` en `techniek` bewegen op een klok en een buffer, niet op deze
+         handeling -- zie de stille ronde in scripts/idemproef-route.js. */
+      { soort: 'direct', graad: 'gemeten', collectie: 'kantoorHandtekeningen',
         wat: 'er komt een openstaande aanvraag voor een tweede mens bij',
-        reden: 'gelezen in kern/kantoor/tweedehandtekening.js en uitgevoerd in ' +
-          'test/tweedehandtekening.test.js toets 6. NIET gemeten door de idempotentieproef: die ' +
-          'krijgt op dit pad een 400 en komt niet bij de muterende code' },
-      { soort: 'afgeleid', graad: 'vermoed',
+        reden: 'de idempotentieproef zag deze collectie veranderen; ook uitgevoerd in ' +
+          'test/tweedehandtekening.test.js toets 6' },
+      { soort: 'direct', graad: 'gemeten', collectie: 'voornemens',
         wat: 'er wordt een voornemen vastgelegd met een bevroren totaal en een besluit',
-        reden: 'kern/commercie/voornemen.js schrijft dat weg, maar de proef kwam niet tot die stap ' +
-          '(zij tekent niet af) -- dus verklaard en niet gemeten' },
+        reden: 'gemeten in dezelfde ronde; kern/commercie/voornemen.js schrijft het weg, en de ' +
+          'economische sleutel maakt een tweede klik hetzelfde voornemen' },
+      { soort: 'direct', graad: 'gemeten', collectie: 'geldketenDossiers',
+        wat: 'het dossier van de geldketen krijgt zijn assen met een uitslag en een graad',
+        reden: 'gemeten in dezelfde ronde; kern/kantoor/geldketen/klaarzet.js legt ze vast' },
+      { soort: 'direct', graad: 'gemeten', collectie: 'geldketenJournaal',
+        wat: 'het journaal van de baan krijgt een regel die aan de vorige is geketend',
+        reden: 'gemeten in dezelfde ronde; de hashketen van kern/kantoor/geldketen.js' },
       { soort: 'afgeleid', graad: 'vermoed',
-        wat: 'het dossier van de geldketen krijgt zeven assen met een uitslag en een graad',
-        reden: 'kern/kantoor/geldketen/klaarzet.js legt ze vast; zelfde reden als hierboven' },
+        wat: 'een tweede klik levert een tweede deurticket en GEEN tweede voornemen',
+        reden: 'de economische sleutel hangt aan de klokgrens van de ronde: op dezelfde grens is ' +
+          'het hetzelfde voornemen, en dat staat dan op UITGEVOERD' },
       /* DE BELANGRIJKSTE REGEL VAN DIT CONTRACT. Wat hier NIET gebeurt, staat er
          even groot bij -- anders leest "incasso" als een geldbeweging. */
       { soort: 'buiten', graad: 'vermoed',

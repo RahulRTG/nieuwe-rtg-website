@@ -35,14 +35,13 @@ const wortelMaat = (page) => page.evaluate(() =>
 const opgemaakt = (page) => page.waitForFunction(
   () => document.styleSheets.length > 0 && !!window.__rtgBasis, null, { timeout: 15000 });
 
-/* ik.html toont instellingen als één doorzoekbare lijst. De werkende
-   toegankelijkheidskeuzes zitten achter de bijbehorende rij in een blad. De
-   toets loopt dus dezelfde weg als een lid: eerst die instelling openen. */
+/* ik.html is een lange pagina en shared/deelmenu.js knipt hem op in stukken
+   met een balk erboven; alles wat niet open staat is display:none. De toets
+   loopt dus dezelfde weg als een lid: eerst het stuk openen. */
 async function openHetDeel(page) {
-  const knop = page.locator('[data-open-settings="weergave"]');
+  const knop = page.locator('.rtgdeel-balk button', { hasText: 'Hoe het scherm zich gedraagt' });
   await knop.waitFor({ timeout: 10000 });
   await knop.click();
-  await page.waitForSelector('[data-settings-pane="weergave"][data-active="true"]', { timeout: 10000 });
 }
 
 test('een instelling op ik.html werkt door op een app die er niets van weet',
@@ -130,7 +129,6 @@ test('een instelling op ik.html werkt door op een app die er niets van weet',
     /* 4. terugzetten moet ook echt terugzetten. Een instelling die vastzit is
        erger dan een die er niet is. */
     await page.goto(base + '/apps/ik.html', { waitUntil: 'domcontentloaded' });
-    await openHetDeel(page);
     await page.waitForSelector('#toegankelijk [data-tgveld="tekst"][data-tgwaarde="normaal"]', { timeout: 10000 });
     const terug = page.locator('#toegankelijk [data-tgveld="tekst"][data-tgwaarde="normaal"]');
     await terug.scrollIntoViewIfNeeded();

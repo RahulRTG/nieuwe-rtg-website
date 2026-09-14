@@ -935,6 +935,9 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | gedeeld zout blijft bij de demo-seed en komt nooit op een echt account | `scripts/check.js` + `test/zaaihash.test.js` |
 | de pijplijn die dit alles draait bij elke push | `.github/workflows/ci.yml` |
 | de zware rondes (beproeving, dekking) draaien vanzelf, wekelijks | `.github/workflows/ronde.yml` |
+| een register-afdruk loopt niet achter op de code die hij beschrijft | `test/mutatiecontract.test.js` + `test/capabilities.test.js` toets 8 |
+| een meting uit een vuile werkboom is geen bewijs | `scripts/lib/stempel.js` (`boomVuil`) + `registersUitVuileBoom` in `NORM.json` |
+| grote uitvoer gevolgd door `process.exit()` kapt bij een pipe af | de pipe-regel in `scripts/meetkeuring.js` |
 
 Wat hier niet in staat, wordt niet gehandhaafd. Dat is geen tekortkoming van de
 lijst maar informatie: het zegt precies waar je op mensen vertrouwt.

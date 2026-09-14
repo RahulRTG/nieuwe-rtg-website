@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2404,
+    "bewijsAchterstand": 2407,
     "bewijsAlleenKeten": 16,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -2340,6 +2340,16 @@
       "meter": "stilleOpslag 24 -> 25",
       "reden": "server/effectbon.js schrijft de effectbon in een try/catch met een lege vanger, zodat een mislukte bon het antwoord niet breekt. De stilspoormeter telt dit terecht als één extra stil weggevaagde opslagfout.",
       "waarheen": "Het falen van de effectbon zichtbaar melden of de opslagroute zo inrichten dat de lege vanger kan verdwijnen."
+    },
+    {
+      "datum": "2026-09-14",
+      "meter": "bewijsAchterstand 2404 -> 2407",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2404,
+      "vervalt": "2026-12-15",
+      "reden": "Drie routes deden in deze ronde WEL werk waar de vorige niets zag: /api/boardroom/betalingen/proef, /api/mediaos/aanwezig/zoek en /api/mediaos/momenten. Daarmee hebben ze een tweede keer om over te beslissen, en die uitspraak staat nog niet in IDEMBESLUIT.json -- post idem-ongeclassificeerd 1592 -> 1595. Er is dus niets slechter geworden: er kwam iets in beeld dat er al was. GEMETEN en niet afgeleid uit het verschil in de teller: de werk-rijen van beide rondes naast elkaar gelegd geeft 1715 -> 1718, en de drie namen komen daaruit.",
+      "waarheen": "Die drie routes classificeren in IDEMBESLUIT.json; dan zakt de tand vanzelf terug naar 2404 of lager."
     }
   ],
   "prestatie": {

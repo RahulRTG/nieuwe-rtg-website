@@ -227,11 +227,11 @@ bestaat. Daarom: eerst schaduw, dan tanden.
 
 | | aantal |
 |---|---|
-| routes met een rol | <!--getal:idem.routesMetRol-->4189<!--/getal--> |
-| beoordeeld | <!--getal:idem.beoordeeld-->1682<!--/getal--> |
-| beschermd | <!--getal:idem.beschermd-->1681<!--/getal--> |
+| routes met een rol | <!--getal:idem.routesMetRol-->4191<!--/getal--> |
+| beoordeeld | <!--getal:idem.beoordeeld-->1685<!--/getal--> |
+| beschermd | <!--getal:idem.beschermd-->1684<!--/getal--> |
 | onbeschermd | **<!--getal:idem.onbeschermd-->1<!--/getal-->** |
-| ongemeten | <!--getal:idem.ongemeten-->3241<!--/getal--> |
+| ongemeten | <!--getal:idem.ongemeten-->3240<!--/getal--> |
 
 Dit staat er beter voor dan `CLAUDE.md` beweert (dat noemt nog 115 gemeten; dat
 cijfer is verouderd). Van alles wat beoordeeld is, is niets onbeschermd. De

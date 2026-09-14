@@ -1,11 +1,11 @@
 {
   "stempel": {
-    "op": "2026-09-13T20:32:19.250Z",
-    "commit": "a5d5346c8",
+    "op": "2026-09-14T17:26:42.396Z",
+    "commit": "3cf8182b",
     "boomVuil": false,
-    "boomAnders": 6,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
-    "node": "v24.18.0"
+    "node": "v22.22.2"
   },
   "uitleg": "Per toetsbestand: kan hij zakken? Pure toetsen krijgen een bronmutatie in de module die ze laden; servertoetsen krijgen de liegpoort (RTG_LIEG). scherp = de deuren bleven open, dus hij zakte op de INHOUD en niet op de inlog.",
   "grens": "een toets die zakt is bewezen GEVOELIG, niet bewezen GOED -- hij kan op de verkeerde reden zakken. Een toets die groen blijft is niet bewezen waardeloos: de operatoren zijn mechanisch en er zijn fouten die ze niet maken.",

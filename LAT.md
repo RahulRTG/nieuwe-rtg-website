@@ -664,12 +664,23 @@ maken.
 | `npm run delta` | geen verslechtering t.o.v. de basis, op de **gewijzigde** bestanden | de rest van het huis; gedrag; routedekking |
 | `npm test` | gedrag van wat een toets aanroept | wat geen toets aanroept |
 | `test/routedekking.test.js` | elke geregistreerde route is door een toets geraakt | of die aanraking iets zinnigs toetst |
+| `npm run e2e` | gedrag in een echte browser | wat geen schermtoets aanroept |
 | de ketenproeven | dat één benoemde keten van begin tot eind sluit | de negentien andere |
 | `npm run golive` | operationeel en juridisch mogen starten | de software |
 | CI | de samenstelling van al het bovenstaande | niets daarbuiten |
 
 Voortaan dus niet "de gate is groen" maar **"statische poort groen; gedrag en
 routedekking nog niet bevestigd"**. Dat klinkt kleiner en het is waar.
+
+**En een poort kan op de SOM van meer dan een ronde leunen.** `DEKKING.json`
+wordt gevuld uit twee journalen: `.routejournaal` van `npm test` en
+`.schermjournaal` van `npm run e2e`. Draai je er een en lees je de uitslag alsof
+hij compleet is, dan lijken de browser-only routes ongedekt -- vijf stuks, op
+13 september 2026, en geen ervan was een echt gat. `scripts/dekking.js` zegt dat
+zelf ("zonder die ronde blijven de browser-only routes ongeraakt, en dat hoort de
+poort dan ook te zeggen in plaats van ze te verzwijgen") en hij WEIGERDE te
+schrijven. Had hij wel geschreven, dan stond de beperking van mijn omgeving nu
+als eigenschap van de codebase in een register -- regel 12, een laag dieper.
 
 **Het gevolg voor een nieuwe HTTP-route.** Dezelfde dag kwam de tweede helft van
 deze les binnen, en die is architectonisch. `POST /api/supplier/activity` HAD een
@@ -695,6 +706,18 @@ de meetronde en niet in elke CI-run. Dat onderscheid staat al in de kop van
 `test/integratie-routes.test.js`, waar het na een eerdere vondst van de
 deltapoort is opgeschreven -- en is hier alsnog opnieuw gemaakt.
 
+*En deze tabel maakte zelf meteen dezelfde fout:* de deltapoort stond er onder
+de naam van zijn SCRIPTBESTAND in plaats van onder zijn npm-naam, en zo'n
+commando bestaat niet. Keuringsregel 67 (*"elk `npm run X` in een document
+bestaat ook echt"*) ving het binnen een uur. Ik had de tabel uit mijn hoofd
+opgeschreven in plaats van uit `package.json`, en dat is exact het patroon dat
+deze regel beschrijft: een bewering die ruimer is dan wat er is nagekeken.
+
+De reparatie liep bovendien twee keer mis op dezelfde manier als bij de
+afbouwdiagnose hierboven: de eerste versie van dit stukje CITEERDE de kapotte
+naam, en die keuring leest een document net zo goed als code. Een voorbeeld van
+wat er fout was, schrijf je dus niet uit -- je beschrijft het.
+
 **Handhaver:** `scripts/check.js`, `scripts/norm.js` en `scripts/deltapoort.js`
 drukken sinds deze dag zelf hun bereik af, op de groene EN de rode uitgang. Een
 tabel in een document had deze fout niet voorkomen; een poort die zijn eigen
@@ -702,6 +725,130 @@ grens meeleest wel, want dan staat de beperking op het scherm van wie hem
 draait. Voor de mens die drie groene poorten optelt tot één zin bestaat verder
 geen handhaver -- daarvoor staat deze regel hier, net als bij regel 11.
 
+
+### 17. Een poort die een artefact leest, herberekent het of bewaakt niets
+
+Een register in de wortel is een **bouwartefact**, en een artefact kan een commit
+achterlopen. Een poort die zo'n bestand leest en er een uitspraak op doet, doet
+die uitspraak over de laatste meetstand en niet noodzakelijk over de huidige code.
+
+`EXECUTION_MAP.json` heeft dit al opgelost: de autoriteit komt live en nooit uit
+een bouwartefact. De vorm die werkt staat in `test/capabilities.test.js`: draai
+het instrument opnieuw en vergelijk elk getal met wat er is vastgelegd.
+
+*Het geval, 13 september 2026:* de poort `LEGACY_PENDING_CLASSIFICATION mag
+alleen krimpen` stond vier dagen groen op nul terwijl er 47 schrijfroutes zonder
+contract waren. `MUTATIECONTRACT-AFGELEID.json` was veranderd zonder dat
+`MUTATIECONTRACT.json` was meegeregenereerd. Een versheidswaarschuwing alleen is
+niet genoeg: die zegt dat een bestand oud is, niet of het nog klopt. Vergelijk
+daarom elk getal, niet slechts een handvol.
+
+**Handhaver:** `test/mutatiecontract.test.js` draait de actuele telling en
+vergelijkt elke stand; `test/capabilities.test.js` en
+`test/objectmodel.test.js` doen hetzelfde voor hun registers. Voor registers
+zonder zo'n toets bestaat geen handhaver, en daarvoor staat deze regel hier.
+
+---
+
+### 18. Tijdens een meetronde is de werkboom niet van jou
+
+Een meetketen schrijft registers en journalen en zet bij ijkingen bewust
+verkeerde waarden neer die zij daarna zelf terugzet. Wie tijdens zo'n ronde
+`git status` leest, ziet een momentopname midden in een proef. Wie er
+`git add -A` op loslaat, schrijft die momentopname de geschiedenis in.
+
+Op 13 september 2026 gebeurde dat in drie vormen: een `GLUURRONDE.json` uit een
+vuile boom, tijdelijke ijkgegevens in `package.json` en `LUSSEN.json`, en een
+half `.schermjournaal` na het afbreken van de e2e-fase. De regel die eruit volgt:
+draai nooit twee meetketens tegelijk, commit niet door een lopende ronde heen en
+beëindig een keten niet halverwege een fase.
+
+**Handhaver:** `scripts/lib/stempel.js` zet `boomVuil` op elk register en
+`scripts/norm.js` ratelt `registersUitVuileBoom`; de deltapoort meldt hem per
+bestand met de reden. Voor de mens die midden in een ronde commit bestaat geen
+handhaver.
+
+---
+
+### 19. Een handhaver die één vorm kent, bewaakt één vorm
+
+Een poort die op een patroon zoekt, vindt dat patroon en niet automatisch het
+hele probleem. Zodra dezelfde fout anders wordt geschreven, kan groen ten
+onrechte als een uitspraak over alle vormen worden gelezen.
+
+*Het geval, 13 september 2026:* de pipe-regel vond
+`console.log(JSON.stringify(...))` gevolgd door `process.exit()`, maar niet de
+gelijkwaardige variant met `process.stdout.write`. Hetzelfde gebeurde in
+`scripts/dekking.js`: twee takken telden de unie van de route- en
+schermjournalen, terwijl de tak die de suite zelf draaide alleen het eigen
+journaal gebruikte. Browser-only routes konden daar dus nooit gedekt raken.
+
+De vraag bij elke handhaver is daarom niet alleen "vindt hij dit geval?", maar
+ook "hoe ziet dit geval eruit als iemand het anders schrijft?". Waar dat
+onbekend is, hoort het expliciet te worden vermeld.
+
+**Handhaver:** `scripts/mutatie.js` muteert de code en eist dat een toets zakt.
+Een handhaver die een tweede schrijfwijze niet ziet, zakt daar niet op, en
+daarvoor staat deze regel hier.
+
+### 21. Een belofte over een spoor is pas een regel als het spoor kan weigeren
+
+Dit huis belooft op tientallen plekken dat er iets wordt vastgelegd: wie in een
+dossier keek, welk besluit er viel, wat er is weggeschreven. Zo'n belofte is pas
+een regel als de schrijfactie de handeling kan TEGENHOUDEN. Kan zij dat niet, dan
+gaat de handeling door terwijl het spoor ontbreekt -- en de gebruiker krijgt een
+bevestiging over iets dat niet is gebeurd.
+
+*Het geval, 13 september 2026:* `server/inzagelog.js` gaf `noteer()` een uitslag
+terug die **geen van de 42 aanroepende bestanden las**, en het wegschrijven zat in
+een lege `catch`. Zonder database schreef hij in een weggegooide array en meldde
+succes. De inzage in het dossier van een lid ging dus gewoon door als het spoor
+niet geschreven werd -- en juist daar is het spoor de hele rechtvaardiging.
+
+*Waarom een genegeerde uitzondering niet het ergste is.* De reparatie die zich
+opdringt is "vang die fout op en meld hem". Dat verschuift het probleem naar een
+VALSE BEVESTIGING, en die is erger, want hij ziet eruit als bewijs.
+`save()` in `server/db/index.js` zet binnen een bundel alleen een vlag; in
+PostgreSQL-modus markeert hij dat de responsepoort vóór het antwoord één
+autoritatieve commit moet doen. Succesvol terugkeren betekent daar dus niet dat
+er iets staat. "Geregistreerd" mag daarom niet betekenen dat er geen fout is
+gegooid, maar dat de COMMIT geslaagd is -- en dat is beproefbaar zonder iets
+nieuws te bouwen: `server/lib/verraad.js` kent `schrijf-verloren` ("keert NORMAAL
+terug zonder iets te bewaren") en `schrijf-faalt`.
+
+*De reparatie hoort op EEN plek en niet in 42.* `inzagelog.noteerVast()` levert
+een uitslag, en `kern/ledenbalie-inzage.js` houdt de inzage tegen als het spoor
+niet vaststaat: onder beide verraadstanden komt er geen dossier, geen
+trefferlijst en geen herstelbericht meer uit. Daaruit volgt een tweede les die
+breder geldt: **plaats een garantie waar alle informatie voor die garantie
+samenkomt, niet zo vroeg mogelijk in de keten.** De kluispoort kent de MENS en
+niet het onderwerp; het journaal kent het onderwerp en niet wat er getoond zou
+worden.
+
+*En het spoor zegt `toegestaan`, nooit `geleverd`.* De regel wordt geschreven
+vóór het dossier wordt samengesteld, dus hij legt vast dat inzage is VERLEEND.
+Zou er `ingezien` staan, dan liegt het spoor bij elke mislukte lezing -- en in
+het voordeel van het huis.
+
+*De vorm is niet uniek voor het journaal.* Van de 1841 `catch`-blokken in
+`server/` zijn er 674 volledig leeg, en daarbinnen staan 18 SPOOR-schrijvers en
+24 OPSLAG-schrijvers in een `try` waarvan het falen wordt opgegeten. Dat is een
+vorm en geen aanklacht: `server/log.js` smoort `noteerFout` omdat een logger die
+zelf gooit de oorspronkelijke fout maskeert, en `kern/envelop.js` zegt met zoveel
+woorden dat de LEVERING voorgaat. Het getal is daarom een triagelijst met een
+besluitregister ernaast, in de vorm van `HERREKENBAAR.json` naast
+`FAALPROEF.json`: een verklaring is een besluit en wordt nooit van de telling
+afgetrokken.
+
+**Handhaver:** `scripts/stilspoor.js` + `STILSPOOR.json` (`npm run stilspoor`),
+met drie ratels in `NORM.json`: `stilSpoor` en `stilleOpslag` mogen alleen
+omlaag, en `stilSpoorAanroepen` alleen omhoog -- want een schuld die daalt
+doordat het instrument blind wordt, is de gevaarlijkste vorm van vooruitgang.
+Verder `test/ledenbaliespoor.test.js` en `scripts/faalproef.js` (`FAALPROEF.json`:
+per route beproefd onder `schrijf-verloren` en `schrijf-faalt`). Voor de
+aanroeper die de uitslag van een schrijfactie negeert ZONDER try/catch bestaat
+geen handhaver; die vorm draagt geen kenmerk waar een meter op kan aanslaan, en
+---
 
 ## Wat de lat betekent per tijdvak
 
@@ -796,6 +943,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | elk scherm is vanaf de bank te bereiken | `scripts/check.js` regel 53 |
 | elke meter met een dekkingsclaim is geijkt tegen bekende waarheid, of zegt waarom dat niet kan | `scripts/lib/ijking.js` + `test/meterwet.test.js` |
 | een bewijsveld draagt een bewijsrelatie; een gesplitst veld wordt apart benoemd en gemeten | `scripts/lib/bewijsvelden.js` + `test/bewijsveld.test.js` |
+| elk register heeft een verklaarde eigenaar; geen script schrijft naar andermans register | `scripts/lib/registereigenaar.js` + `test/registereigenaar.test.js` |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
 | nieuw werk op de norm, aangeraakt werk niet eronder (geen verrekening) | `scripts/deltapoort.js` |
 | een verlaging van de lat heeft een reden, een soort en een einde | `scripts/normverval.js` |
@@ -835,6 +983,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | mag lid A bij de spullen van lid B (horizontaal), met een zelfproef erop | `scripts/gluurronde.js` + `GLUURRONDE.json` + `ci.yml` |
 | geen vergunningsgegevens naar een beller die zich niet bekendmaakte | `server/middleware/schakelaar-antwoord.js` |
 | elke handhaver EEN keer echt uitgezet, om te zien wie er rood wordt | `scripts/sabotage.js` + `SABOTAGE.json` |
+| een belofte over een spoor die niet kan weigeren (de klasse, geen aanklacht) | `scripts/stilspoor.js` + `STILSPOOR.json` + drie ratels in `NORM.json` |
 | wat we na al dat meten weten, en vooral wat we niet weten | `scripts/zekerheid.js` |
 | bewijsgroen en go-live-groen kunnen elkaar niet groen praten | `scripts/check.js` regel 48 |
 | de dekkingsvloer, opgeteld over de vier delen van de suite | `scripts/dekkingsvloer.js` |
@@ -843,6 +992,9 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | gedeeld zout blijft bij de demo-seed en komt nooit op een echt account | `scripts/check.js` + `test/zaaihash.test.js` |
 | de pijplijn die dit alles draait bij elke push | `.github/workflows/ci.yml` |
 | de zware rondes (beproeving, dekking) draaien vanzelf, wekelijks | `.github/workflows/ronde.yml` |
+| een register-afdruk loopt niet achter op de code die hij beschrijft | `test/mutatiecontract.test.js` + `test/capabilities.test.js` toets 8 |
+| een meting uit een vuile werkboom is geen bewijs | `scripts/lib/stempel.js` (`boomVuil`) + `registersUitVuileBoom` in `NORM.json` |
+| grote uitvoer gevolgd door `process.exit()` kapt bij een pipe af | de pipe-regel in `scripts/meetkeuring.js` |
 
 Wat hier niet in staat, wordt niet gehandhaafd. Dat is geen tekortkoming van de
 lijst maar informatie: het zegt precies waar je op mensen vertrouwt.

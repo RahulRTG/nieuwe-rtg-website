@@ -380,8 +380,21 @@ van een testtalent en zonder machtiging niets kan), **MN-02 scheiding van
 hoedanigheden** en **MN-03 geen commercieel voordeel** (de AI zegt erbij dat RTG
 aan één van de opties verdient).
 
-**MN-01 en MN-02 zijn sinds 13 september 2026 TOETSEN en geen zinnen** (par. 4a
-en 4b). Ze staan bewust apart, want het zijn twee soorten regels: MN-01 gaat over
+**Alle drie de grondwetsregels zijn sinds 13 september 2026 TOETSEN en geen
+zinnen** (par. 4a, 4b, 4c, 4e) -- en de derde op een andere manier dan de eerste
+twee. **MN-03 heeft vandaag geen ONDERWERP, en dat is gemeten**: de
+partnervergoeding over omzet is een invariant op nul (geen instelling, geen
+boardroomknop) en RTG is zelf geen hoedanigheid (negen rollen, allemaal een mens;
+"RTG Management" komt nul keer voor). Beveelt de AI dus een partner aan, dan is er
+geen belang om te melden -- niet omdat het verzwegen wordt, maar omdat het er niet
+is. `test/mn03-commercieelvoordeel.test.js` bewaakt daarom niet de openbaarmaking
+maar die twee AANNAMES, en zakt zodra een ervan verschuift; de foutmelding zegt
+erbij dat de toets dan niet moet worden aangepast maar VERVANGEN door een proef op
+het keuzepad. **Een keuzepad bouwen met een vierde optie die niet bestaat, is het
+product verzinnen om de regel te kunnen toetsen** -- dezelfde grond waarop
+AI-CONTEXT-02 bewust geen handhaver heeft.
+
+**MN-01 en MN-02** (par. 4a en 4b). Ze staan bewust apart, want het zijn twee soorten regels: MN-01 gaat over
 BEVOEGDHEID en is structureel te meten (de aanvalsproef: de EIGENAAR van RTG
 krijgt op dezelfde machtiging 404 waar de gemachtigde 200 krijgt -- zelfde
 object, zelfde actie, andere actor), MN-02 over KENNIS. Bij die tweede is de
@@ -425,14 +438,37 @@ dat is beproefbaar zonder iets nieuws te bouwen: `server/lib/verraad.js` kent
 `schrijf-faalt` ("een aanroeper die dat stil wegvangt, meldt succes over niets"),
 acht toetsbestanden gebruiken ze, tien raken het inzagejournaal, en de doorsnede
 is **nul** -- de toets bij besluit 5 is dus niet "werkt de poort" maar *weigert de
-poort onder `schrijf-verloren`*. De ringbuffer is een APART besluit (6): een
-hashketen bewijst de integriteit van wat er staat en zegt niets over wat eraf
-viel, dus integriteit en retentie zijn twee eigenschappen en de ene wordt hier
-makkelijk voor de andere aangezien. En besluit 7 legt de vraag voor of *een
-belofte over een spoor is pas een regel als het spoor kan weigeren* de twaalfde
-regel van `LAT.md` wordt -- de vorm is niet uniek voor het journaal: 468 lege
-`catch`-blokken in `server/`, waarvan 13 letterlijk `try { save(); } catch`, en
-dat is een vorm en geen aanklacht. **Par. 0.7 keert de volgorde om, en corrigeert
+poort onder `schrijf-verloren`*. De ringbuffer was een APART besluit (6) en is
+genomen: een hashketen bewijst de integriteit van wat er STAAT en zegt niets over
+wat eraf viel, dus integriteit en retentie zijn twee eigenschappen en de ene
+wordt makkelijk voor de andere aangezien. `server/inzagelog-bewaring.js` bewaart
+daarom op TIJD en niet op aantal -- 730 dagen, want het journaal is het bewijs
+OVER toegang en hoort de gegevens waarover het gaat te overleven -- en `MAX` is
+een NOODREM geworden die, als hij bijt, dat TELT en hardop zegt. Verjaren en
+afgekapt worden gaan nooit op een hoop: het eerste is de termijn die werkt, het
+tweede de belofte die breekt. De belofte reist mee met het antwoord tot aan het
+scherm: de inzagekaart draagt `bewaring` PER BRON (`null` waar deze laag de
+termijn van een andere laag niet kent -- een getal over vier bronnen zou de
+langste of de kortste tot waarheid maken) en zet een tekort van de noodrem in
+`nietZichtbaar`, tussen de rest van wat die kaart niet kan tonen. En besluit 7 is genomen: *een belofte over
+een spoor is pas een regel als het spoor kan weigeren* is **regel 13 van
+`LAT.md`** -- niet de twaalfde, want die was al bezet (*een meting die niet heeft
+gedraaid is geen slechte uitslag*), en dat is precies de soort verwarring waar
+LAT-regel 4 over gaat. De vorm is niet uniek voor het journaal en is nu GEMETEN
+in plaats van geschat (`npm run stilspoor`, `STILSPOOR.json`): van de 1841
+`catch`-blokken in `server/` zijn er 674 volledig leeg, met daarbinnen 18
+SPOOR-schrijvers en 24 OPSLAG-schrijvers waarvan het falen wordt opgegeten. Dat
+getal wijkt af van de eerdere schatting van 468 en hoort daar ook niet mee
+vergeleken te worden: deze meter leest het lijf GEBALANCEERD (dus ook over
+meerdere regels) en telt een lijf met alleen een toelichting als leeg -- een
+commentaar maakt een smoring niet minder stil. Het is een vorm en geen
+aanklacht: `server/log.js` smoort `noteerFout` omdat een logger die zelf gooit de
+oorspronkelijke fout maskeert, en `kern/envelop.js` zegt dat de LEVERING
+voorgaat. Vandaar drie ratels die niet hetzelfde doen -- `stilSpoor` en
+`stilleOpslag` alleen omlaag, `stilSpoorAanroepen` alleen omhoog, want een schuld
+die daalt doordat het instrument blind wordt is de gevaarlijkste vorm van
+vooruitgang -- en een besluitregister ernaast dat nooit van de telling
+aftrekt. **Par. 0.7 keert de volgorde om, en corrigeert
 dit document zelf.** Het duurzame primitief bestaat al en is bewust schaars
 (`db/duurzaam.js`: synchroon met fsync, keert pas terug als de opslag bevestigt,
 met `check.js` regel 47 op zijn AANROEPERSLIJST) -- en deze laag staat er al op:
@@ -1036,8 +1072,8 @@ in de ontwikkelaarsroute** (de beproevingsomgeving voor software is een eigen
 ding, met `scripts/aanval.js` en `scripts/chaos.js` als eerste bouwstenen), de
 App Store-keuring keek niet naar toegankelijkheid (inmiddels wél, en als POORT:
 zie par. 9.2), en er is geen kostenvlak. En
-par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->4179<!--/getal--> routes met een rol
-zijn er <!--getal:idem.beoordeeld-->1668<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3244<!--/getal--> ongemeten (`IDEMPROEF.json`,
+par. 10 draait één aanname om die vaak fout gaat: van <!--getal:idem.routesMetRol-->4189<!--/getal--> routes met een rol
+zijn er <!--getal:idem.beoordeeld-->1682<!--/getal--> beproefd op herhaalbaarheid en <!--getal:idem.ongemeten-->3241<!--/getal--> ongemeten (`IDEMPROEF.json`,
 levend getal — `npm run getallen` houdt het bij),
 maar het doel is **niet alles idempotent — het is alles geclassificeerd**, met
 `UNKNOWN` verboden voor nieuwe publiek aanroepbare ontwikkelaarsopdrachten.
@@ -1065,8 +1101,8 @@ weigert wat op een contactgegeven lijkt, want met `REDIS_URL` gaat hij over een
 netwerk), **`onbekend` is geen `openbaar`** (en een gevolg erft de classificatie
 niet — dat zou raden zijn), en **de levering gaat voor** (een geweigerde actor
 houdt een melding nooit tegen, maar verdwijnt ook nooit stil). Wat er nog niet is,
-staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1668<!--/getal--> beproefde muterende routes zijn er
-<!--getal:idem.beschermd-->1667<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
+staat er met de meting erbij: van de <!--getal:idem.beoordeeld-->1682<!--/getal--> beproefde muterende routes zijn er
+<!--getal:idem.beschermd-->1681<!--/getal--> retry-veilig, en een schemaregister (`payment.authorized.v1` met een vorm
 erachter) bestaat niet — de envelop zegt met opzet nooit WAT. Zeven punten die een besluit van de eigenaar vragen staan in par. 4.
 **Het goedkoopste daarvan is genomen (27 augustus 2026):** het woord dat in twee
 lagenmodellen niet hetzelfde betekende, is hernoemd — laag 4 van `PLATFORM.md`
@@ -1539,7 +1575,7 @@ afkapgrens van vijftien sneed midden in een GELIJKE score, dus /api/bank/pas/bet
 viel op alfabet af terwijl /api/bank/advies bleef. Een gelijke score afkappen is
 willekeur, en willekeur verbergt een vermogen zonder dat iemand het merkt.
 **En meetgetallen in de documenten verouderen niet meer**: `npm run getallen`
-schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3244<!--/getal--> randen,
+schrijft ze tussen merktekens uit de registers (`<!--getal:idem.ongemeten-->3241<!--/getal--> randen,
 <!--getal:verstrengeling.onverklaard-->0<!--/getal--> onverklaard — en dát getal moet naar nul, niet het
 aantal randen), de activering per functie, de deltapoort die er niets bij laat
 komen, de tredeproef over alle zeven treden van LAUNCH.md (0 lekken), en de
@@ -2057,8 +2093,8 @@ zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
 motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
-bestaande meter deed: van de <!--getal:machine.muterend-->4963<!--/getal-->
-muterende routes raken er <!--getal:machine.zonderAs-->2825<!--/getal--> geen
+bestaande meter deed: van de <!--getal:machine.muterend-->3784<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2789<!--/getal--> geen
 enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele
@@ -2068,7 +2104,7 @@ dingen missen), en de meter heeft zichzelf twee keer betrapt op dezelfde fout va
 twee kanten: een hub in de kern-tas zette 4162 routes op "idempotent", en
 `/api/notifications` scoorde tien assen omdat die route zelf in `server/server.js`
 woont (143 requires). Vandaar de hubgrens en de
-<!--getal:machine.hubRoutes-->28<!--/getal--> routes waarvoor de bestandsas met
+<!--getal:machine.hubRoutes-->13<!--/getal--> routes waarvoor de bestandsas met
 naam en toenaam onbruikbaar is verklaard. **De eerste keten is rond** (par. 5a):
 `/api/office/bank/incasso` -> `handtekening/bevestig` -> `incasso/dossier`, vijftien
 verplichte assen voor haar klasse en alle vijftien gelopen, met

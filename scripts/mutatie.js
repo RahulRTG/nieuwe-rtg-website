@@ -937,6 +937,18 @@ const GEEN_BRONMUTATIE = new Map([
      leest in de CI als een flake. De opruimer in afbouwketen.test.js is daarop
      het antwoord, en is zelf met mutatie 4 nagemeten: zakt wel, laat nul
      processen achter. */
+  /* DEZELFDE KLASSE, EEN DAG LATER: deze toets is de RATEL onder
+     OMZETPROEF.json. Hij leest een register en raakt geen servermodule, dus
+     modulesVan() vindt niets en "geen module gevonden" zou hier een uitspraak
+     over de motor zijn in plaats van over de toets.
+
+     De faalklasse is met de hand nagetrokken op 13 september 2026, elf
+     mutaties op een kopie van het register, alle elf raak -- inclusief de twee
+     die ertoe doen: een BEVINDING stil op `gesloten` zetten (B1) en de vorm van
+     een terugstorting stil van `wissen` in iets anders veranderen (B2). Dat is
+     precies waar deze tand voor bestaat: een bevinding die verdwijnt zonder dat
+     iemand een besluit nam, is de stilste faalvorm van deze laag. */
+  ['omzetproef.test.js', 'ratel op een register; elf handmutaties, alle elf raak -- waaronder de twee bevindingen stil wegpoetsen'],
   ['afbouwafloop.test.js', 'de afbouwwet woont in scripts/ en niet in server/; vijf handmutaties, alle vijf raak (zie de kop hierboven)'],
   ['afbouwketen.test.js', 'idem, met echte processen; de vijf handmutaties vonden er twee echte gaten mee (hartslag, PASSED-only)'],
   /* De waarheidstoets leest operationele claims in HTML en letterlijke

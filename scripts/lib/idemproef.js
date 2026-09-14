@@ -215,7 +215,7 @@ function weegZonderSleutel(d, e, staat) {
     reden: 'een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik' };
 }
 
-async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hernieuw, maxRoutes, staatVan, vastlegging, metenZonderSleutel, pasladder, wacht, voorzieningVoor, wereld }) {
+async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hernieuw, maxRoutes, staatVan, herijk, vastlegging, metenZonderSleutel, pasladder, wacht, voorzieningVoor, wereld }) {
   const perRoute = {};
   let gedaan = 0, hernieuwd = 0, uitOpslag = 0, verworpen = 0, pasGewisseld = 0;
   const tel = { beschermd: 0, onbeschermd: 0, ongemeten: 0 };
@@ -250,17 +250,52 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
 
        WAT HET KOST, EERLIJK: dit is een EXTRA oproep per ledenroute, en die kan
        werk doen. Op een creatieroute staat er dus een item meer in de wereld dan
-       zonder deze lus. Dat vertroebelt de meting niet -- `staatVan` geeft het
-       verschil PER oproep, en deze valt buiten de drie die gewogen worden -- maar
-       het is wel een mutatie die niemand heeft gevraagd, en daarom staat hij hier
-       genoemd in plaats van verstopt. Hij kan alleen op een wegwerpmap, en de
-       proef draait ook nergens anders. */
+       zonder deze lus. Het is een mutatie die niemand heeft gevraagd, en daarom
+       staat hij hier genoemd in plaats van verstopt. Hij kan alleen op een
+       wegwerpmap, en de proef draait ook nergens anders.
+
+       EN HIER STOND EEN ONWAARHEID, die op 13 september 2026 is weggehaald omdat
+       zij een echte meetfout dekte. Er stond: "dat vertroebelt de meting niet --
+       `staatVan` geeft het verschil PER oproep, en deze valt buiten de drie die
+       gewogen worden". Hij valt er NIET buiten. `staatVan` schuift het ijkpunt
+       alleen op wanneer hij wordt AANGEROEPEN, en dat gebeurt uitsluitend voor de
+       drie gewogen oproepen -- dus belandde alles wat deze ijkoproep schreef in
+       `dA`, het vak waarin staat wat de gemeten handeling aanraakte. Vandaar
+       `herijk` hieronder, en de uitleg bij zijn definitie in
+       scripts/idemproef-route.js. */
     /* De rol die deze route werkelijk nodig heeft. Meestal die van de bewaker,
        maar een voorvoegselregel kan er een opleggen -- het werkplek-huis laat
        alleen de eigenaar binnen en draagt zelf geen bewakersrol. */
     const gevraagdeRol = rolVoor ? rolVoor(r) : r.rol;
     let pas = gevraagdeRol;
     if (gevraagdeRol === 'member' && Array.isArray(pasladder) && pasladder.length > 1) {
+      /* HIER WORDT MET OPZET NIET HERIJKT, en dat is een correctie op de reparatie
+         van 13 september (14 september 2026).
+
+         De herijking bestaat om werk dat de proef ZELF deed weg te houden uit `dA`.
+         Maar deze ijkoproep raakt DEZELFDE ROUTE: hij stuurt hetzelfde lijf naar
+         `r.pad` om te zien welke pas erdoor komt. Wat hij verandert, verandert deze
+         handeling -- alleen een oproep eerder. Hem uit `dA` houden gooit dus geen
+         vervuiling weg maar het effect van de gemeten route zelf.
+
+         GEVONDEN AAN /api/member/ai/tegoed, door test/effectdekking.test.js toets 2.
+         Die route is idempotent per lid: de eerste oproep maakt de tegoedregel aan en
+         de volgende niet meer. Met een herijking hier deed de ijkoproep het werk, werd
+         dat weggestreept, en kwam er uit de meting `opslag: {}` -- terwijl main's ronde
+         (van voor de herijking) er `aiTegoed: 1` had. De afleidingslaag verloor
+         daarmee haar tweede bron, en die toets bestaat juist om dat te vangen.
+
+         HET VERSCHIL MET DE VOORZIENING HIERONDER, en dat is de hele scheidslijn: die
+         roept ANDERE routes aan om een onderwerp klaar te zetten (/api/pay/verzoek om
+         een klompje te maken, waarna /api/pay/verzoek/intrek werd gemeten). Dat is
+         vervuiling, en daar blijft de herijking staan. Dezelfde route is geen
+         vervuiling.
+
+         WAT HET KOST: bij een route waar de pasladder langsgaat, kan `dA` het werk van
+         twee of drie oproepen van dezelfde route dragen. Voor de COLLECTIENAMEN -- het
+         enige dat kern/stuur/gevolg.js gebruikt -- maakt dat niets uit, en voor het
+         oordeel ook niet: dA telt alleen mee als "de eerste oproep deed werk", en dat
+         deed hij. */
       const eerste = await post(r.pad, { ...lijf }, tokenVoor('member'));
       gedaan++;
       if (eerste.status === 403) {
@@ -300,7 +335,20 @@ async function draaiIdemproef({ post, routes, tokenVoor, lijfVoor, rolVoor, hern
            verkeerde token en kreeg 401. Een voorziening mag meerdere rollen
            nodig hebben (de zaak ontvangt geld VAN een lid); wie haar een vaste
            rol oplegt, bepaalt ongemerkt wat zij kan. */
-        const v = await maakVoorziening({ post, tokenVoor, rol: pas, w: wereld || {} });
+        /* DE VOORZIENING KRIJGT EEN POST DIE HERIJKT. Zij doet haar schrijfwerk zelf,
+           via deze `post` -- dus is dit de enige plek waar het ijkpunt kan meeschuiven
+           met wat zij aanmaakt. Zonder deze wikkel belandt alles wat het onderwerp
+           heeft gekost in `dA` van de route die er daarna op wordt gemeten, en dat is
+           precies hoe /api/pay/verzoek/intrek aan payIdem en payIdemAfdruk kwam.
+
+           Elke oproep schuift op en niet alleen de laatste: een voorziening mag
+           meerdere rollen en meerdere stappen nodig hebben. Antwoorden zonder
+           `staat` (een 401, iets buiten /api) schuiven niets op -- dat is geen
+           volledige dekking, en het staat als beperking in de kop van dit bestand. */
+        const postHerijkend = herijk
+          ? (async (...args) => { const st = await post(...args); herijk(st); return st; })
+          : post;
+        const v = await maakVoorziening({ post: postHerijkend, tokenVoor, rol: pas, w: wereld || {} });
         if (v && v.fout) voorziening = { stand: 'mislukt', reden: String(v.fout) };
         else if (v && typeof v === 'object') { lijf = { ...lijf, ...v }; voorziening = { stand: 'gelukt', velden: Object.keys(v) }; }
         else voorziening = { stand: 'mislukt', reden: 'de voorziening gaf niets terug' };

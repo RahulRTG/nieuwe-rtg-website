@@ -1,22 +1,22 @@
 {
  "stempel": {
-  "op": "2026-09-13T15:22:07.930Z",
-  "commit": "b8998fbb",
+  "op": "2026-09-14T10:38:12.369Z",
+  "commit": "861e5474b",
   "boomVuil": false,
-  "boomAnders": 4,
+  "boomAnders": 0,
   "instrument": "scripts/gevolgdekking.js",
-  "node": "v22.22.2"
+  "node": "v24.18.0"
  },
  "uitleg": "Per AI-bereikbare handeling twee assen: de METING (wat de idempotentieproef zag veranderen, via kern/stuur/gevolg.js) en de VERKLARING (het gevolgcontract van een mens, via kern/stuur/gevolgcontract.js). Ze worden nooit opgeteld.",
  "grens": "De meting zegt WELKE collecties, nooit hoeveel erin verandert, en zij kijkt niet buiten de opslag (geen mail, geen provider, geen bank). De verklaring mag MEER zeggen dan de meting maar nooit iets anders: waar zij `gemeten` claimt, moet de meting dat bevestigen.",
  "tellers": {
-  "bereikbaarPerRol": 173,
-  "onbekendeEffectpaden": 87,
-  "effectGemeten": 38,
-  "effectGeenEffectGemeten": 48,
-  "contractVolledig": 4,
+  "bereikbaarPerRol": 174,
+  "onbekendeEffectpaden": 96,
+  "effectGemeten": 23,
+  "effectGeenEffectGemeten": 55,
+  "contractVolledig": 8,
   "contractGedeeltelijk": 0,
-  "contractOnbekend": 169,
+  "contractOnbekend": 166,
   "contractenGezakt": 0,
   "contractenBuitenBereik": 2
  },
@@ -257,11 +257,9 @@
    ],
    "niveau": "lezen",
    "meting": {
-    "graad": "gemeten",
-    "collecties": [
-     "sharedAssets"
-    ],
-    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling -- er bewoog wel sharedAssets, maar dat is werk van een andere oproep tegen dezelfde server en niet van deze handeling"
    },
    "verklaring": {
     "stand": "ONBEKEND",
@@ -271,9 +269,7 @@
      "buiten",
      "mislukking"
     ],
-    "nietVerklaard": [
-     "sharedAssets"
-    ]
+    "nietVerklaard": []
    }
   },
   {
@@ -569,11 +565,9 @@
    ],
    "niveau": "lezen",
    "meting": {
-    "graad": "gemeten",
-    "collecties": [
-     "kantoorMensdeur"
-    ],
-    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
    },
    "verklaring": {
     "stand": "ONBEKEND",
@@ -583,9 +577,7 @@
      "buiten",
      "mislukking"
     ],
-    "nietVerklaard": [
-     "kantoorMensdeur"
-    ]
+    "nietVerklaard": []
    }
   },
   {
@@ -793,8 +785,6 @@
    "meting": {
     "graad": "gemeten",
     "collecties": [
-     "bankIdem",
-     "bankIdemAfdruk",
      "bankPassen"
     ],
     "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
@@ -808,8 +798,6 @@
      "mislukking"
     ],
     "nietVerklaard": [
-     "bankIdem",
-     "bankIdemAfdruk",
      "bankPassen"
     ]
    }
@@ -1086,9 +1074,11 @@
    ],
    "niveau": "voorstel",
    "meting": {
-    "graad": "onbekend",
-    "collecties": [],
-    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+    "graad": "gemeten",
+    "collecties": [
+     "bankTerugkerend"
+    ],
+    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
    },
    "verklaring": {
     "stand": "ONBEKEND",
@@ -1098,7 +1088,9 @@
      "buiten",
      "mislukking"
     ],
-    "nietVerklaard": []
+    "nietVerklaard": [
+     "bankTerugkerend"
+    ]
    }
   },
   {
@@ -1626,11 +1618,9 @@
    ],
    "niveau": "voorstel",
    "meting": {
-    "graad": "gemeten",
-    "collecties": [
-     "officeDocs"
-    ],
-    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling -- er bewoog wel officeDocs, maar dat is werk van een andere oproep tegen dezelfde server en niet van deze handeling"
    },
    "verklaring": {
     "stand": "ONBEKEND",
@@ -1640,9 +1630,7 @@
      "buiten",
      "mislukking"
     ],
-    "nietVerklaard": [
-     "officeDocs"
-    ]
+    "nietVerklaard": []
    }
   },
   {
@@ -2068,6 +2056,28 @@
    }
   },
   {
+   "pad": "/api/member/voorstel/intrek",
+   "rollen": [
+    "member"
+   ],
+   "niveau": "klein",
+   "meting": {
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+   },
+   "verklaring": {
+    "stand": "ONBEKEND",
+    "open": [
+     "direct",
+     "afgeleid",
+     "buiten",
+     "mislukking"
+    ],
+    "nietVerklaard": []
+   }
+  },
+  {
    "pad": "/api/onderwijs/advies",
    "rollen": [
     "member"
@@ -2349,16 +2359,9 @@
     "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
    },
    "verklaring": {
-    "stand": "ONBEKEND",
-    "open": [
-     "direct",
-     "afgeleid",
-     "buiten",
-     "mislukking"
-    ],
-    "nietVerklaard": [
-     "payCodes"
-    ]
+    "stand": "VOLLEDIG",
+    "open": [],
+    "nietVerklaard": []
    }
   },
   {
@@ -2413,19 +2416,9 @@
    ],
    "niveau": "voorstel",
    "meting": {
-    "graad": "gemeten",
-    "collecties": [
-     "betaalIdem",
-     "economischeRuntime",
-     "fondsAfdrachten",
-     "invoices",
-     "payBoekingen",
-     "payIdem",
-     "payIdemAfdruk",
-     "paySaldi",
-     "socialeAfdrachten"
-    ],
-    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling -- er bewoog wel betaalIdem, economischeRuntime, fondsAfdrachten, invoices, payBoekingen, payIdem, payIdemAfdruk, paySaldi, socialeAfdrachten, maar dat is werk van een andere oproep tegen dezelfde server en niet van deze handeling"
    },
    "verklaring": {
     "stand": "VOLLEDIG",
@@ -2464,6 +2457,8 @@
    "meting": {
     "graad": "gemeten",
     "collecties": [
+     "betaalOpdrachten",
+     "capGezondheid",
      "payBoekingen",
      "payIdem",
      "payIdemAfdruk",
@@ -2472,19 +2467,9 @@
     "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
    },
    "verklaring": {
-    "stand": "ONBEKEND",
-    "open": [
-     "direct",
-     "afgeleid",
-     "buiten",
-     "mislukking"
-    ],
-    "nietVerklaard": [
-     "payBoekingen",
-     "payIdem",
-     "payIdemAfdruk",
-     "paySaldi"
-    ]
+    "stand": "VOLLEDIG",
+    "open": [],
+    "nietVerklaard": []
    }
   },
   {
@@ -2525,18 +2510,9 @@
     "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
    },
    "verklaring": {
-    "stand": "ONBEKEND",
-    "open": [
-     "direct",
-     "afgeleid",
-     "buiten",
-     "mislukking"
-    ],
-    "nietVerklaard": [
-     "payIdem",
-     "payIdemAfdruk",
-     "payVerzoeken"
-    ]
+    "stand": "VOLLEDIG",
+    "open": [],
+    "nietVerklaard": []
    }
   },
   {
@@ -2557,20 +2533,9 @@
     "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
    },
    "verklaring": {
-    "stand": "ONBEKEND",
-    "open": [
-     "direct",
-     "afgeleid",
-     "buiten",
-     "mislukking"
-    ],
-    "nietVerklaard": [
-     "payBoekingen",
-     "payIdem",
-     "payIdemAfdruk",
-     "paySaldi",
-     "payVerzoeken"
-    ]
+    "stand": "VOLLEDIG",
+    "open": [],
+    "nietVerklaard": []
    }
   },
   {
@@ -2583,7 +2548,6 @@
     "graad": "gemeten",
     "collecties": [
      "payIdem",
-     "payIdemAfdruk",
      "payVerzoeken"
     ],
     "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
@@ -2598,7 +2562,6 @@
     ],
     "nietVerklaard": [
      "payIdem",
-     "payIdemAfdruk",
      "payVerzoeken"
     ]
    }
@@ -2858,7 +2821,7 @@
    "meting": {
     "graad": "onbekend",
     "collecties": [],
-    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling -- er bewoog wel betaalOpdrachten, capGezondheid, maar dat is werk van een andere oproep tegen dezelfde server en niet van deze handeling"
    },
    "verklaring": {
     "stand": "ONBEKEND",
@@ -2878,11 +2841,9 @@
    ],
    "niveau": "voorstel",
    "meting": {
-    "graad": "gemeten",
-    "collecties": [
-     "ledenSites"
-    ],
-    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
    },
    "verklaring": {
     "stand": "ONBEKEND",
@@ -2892,9 +2853,7 @@
      "buiten",
      "mislukking"
     ],
-    "nietVerklaard": [
-     "ledenSites"
-    ]
+    "nietVerklaard": []
    }
   },
   {
@@ -2906,7 +2865,7 @@
    "meting": {
     "graad": "onbekend",
     "collecties": [],
-    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling -- er bewoog wel rtgai, maar dat is werk van een andere oproep tegen dezelfde server en niet van deze handeling"
    },
    "verklaring": {
     "stand": "ONBEKEND",
@@ -3234,11 +3193,9 @@
    ],
    "niveau": "voorstel",
    "meting": {
-    "graad": "gemeten",
-    "collecties": [
-     "suppliers"
-    ],
-    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling -- er bewoog wel suppliers, maar dat is werk van een andere oproep tegen dezelfde server en niet van deze handeling"
    },
    "verklaring": {
     "stand": "ONBEKEND",
@@ -3248,9 +3205,7 @@
      "buiten",
      "mislukking"
     ],
-    "nietVerklaard": [
-     "suppliers"
-    ]
+    "nietVerklaard": []
    }
   },
   {
@@ -3282,11 +3237,9 @@
    ],
    "niveau": "voorstel",
    "meting": {
-    "graad": "gemeten",
-    "collecties": [
-     "wacht"
-    ],
-    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
    },
    "verklaring": {
     "stand": "ONBEKEND",
@@ -3296,9 +3249,7 @@
      "buiten",
      "mislukking"
     ],
-    "nietVerklaard": [
-     "wacht"
-    ]
+    "nietVerklaard": []
    }
   },
   {
@@ -3489,17 +3440,9 @@
    ],
    "niveau": "voorstel",
    "meting": {
-    "graad": "gemeten",
-    "collecties": [
-     "betaalIdem",
-     "betaalOpdrachten",
-     "capGezondheid",
-     "payBoekingen",
-     "payIdem",
-     "payIdemAfdruk",
-     "paySaldi"
-    ],
-    "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
+    "graad": "onbekend",
+    "collecties": [],
+    "reden": "de proef kwam niet bij de muterende code (geen geldige invoer of geen rechten), dus dat er niets veranderde zegt niets over deze handeling"
    },
    "verklaring": {
     "stand": "ONBEKEND",
@@ -3509,15 +3452,7 @@
      "buiten",
      "mislukking"
     ],
-    "nietVerklaard": [
-     "betaalIdem",
-     "betaalOpdrachten",
-     "capGezondheid",
-     "payBoekingen",
-     "payIdem",
-     "payIdemAfdruk",
-     "paySaldi"
-    ]
+    "nietVerklaard": []
    }
   },
   {
@@ -3706,8 +3641,7 @@
    "meting": {
     "graad": "gemeten",
     "collecties": [
-     "ledenSites",
-     "rtgai"
+     "ledenSites"
     ],
     "reden": "de proef zag deze collectie(s) veranderen, met de invoer van de proef"
    },
@@ -3720,8 +3654,7 @@
      "mislukking"
     ],
     "nietVerklaard": [
-     "ledenSites",
-     "rtgai"
+     "ledenSites"
     ]
    }
   },

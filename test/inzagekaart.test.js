@@ -115,6 +115,22 @@ test('wat de kaart NIET kan zien, staat op de kaart', () => {
   assert.match(d.nietZichtbaar[0].naam, /Zegel/);
   assert.match(d.nietZichtbaar[0].reden, /pseudoniem/,
     'met de echte reden: het Zegel is per partner anders, dus niet aan een account te koppelen');
+
+  /* HOE VER DEZE KAART TERUGKIJKT, PER BRON -- en met opzet niet als een getal
+     over het geheel (besluit 6, 13 september 2026). Het inzagejournaal kent
+     zijn termijn en geeft hem mee; de RTG iD-log en de paspoortlaag houden hun
+     eigen bewaring bij en deze laag weet die niet. Een enkel getal zou de
+     langste of de kortste tot waarheid maken, en allebei is onwaar. `null` is
+     hier dus een uitspraak en geen leeg veld, en deze toets houdt dat vast:
+     zodra iemand er een getal in schrijft dat nergens vandaan komt, zakt hij. */
+  const B = require('../server/inzagelog').BEWAARDAGEN;
+  assert.equal(d.bewaring.Ledendossier, B, 'de termijn komt uit het journaal zelf');
+  assert.equal(d.bewaring.Zorgprofiel, B, 'het zorgprofiel woont in hetzelfde journaal');
+  assert.equal(d.bewaring['RTG iD'], null, 'die bewaring kent deze laag niet, en dat zegt zij');
+  assert.equal(d.bewaring.Identiteitsbewijs, null);
+  assert.match(d.bewaring.uitleg, new RegExp(String(B) + ' dagen'));
+  assert.match(d.bewaring.uitleg, /weet deze kaart niet/,
+    'en de onbekende helft staat er even groot bij');
 });
 
 test('een gast heeft geen dossier en dus geen kaart', () => {

@@ -129,6 +129,7 @@ const REGISTERS = [
      dat zijn OUDERDOM zichtbaar wordt, want een stale register maakt die tand
      bot zonder dat iemand het merkt. */
   ['AICONTEXT.json', 'npm run aicontext:vast', 'welke velden van een lid in de system prompt van Rahul terechtkomen'],
+  ['STILSPOOR.json', 'npm run stilspoor:vast', 'schrijfacties waarvan het falen stil wordt weggevangen (LAT.md regel 21)'],
   ['LAATSTE_METING.json', 'npm run beproeving', 'de laatste stormproef, ook wanneer hij zakt'],
   ['HEAPPROEF.json', 'npm run heapproef', 'geheugengedrag onder herhaalde verzoeken'],
   ['BEPROEVING.json', 'npm run beproeving', 'storm, geld, misbruik en herstel'],
@@ -143,6 +144,10 @@ const REGISTERS = [
      bij, of wordt een toets hernoemd, dan is de vorige recall het antwoord op een
      oudere vraag. */
   ['VERBAND.json', 'npm run verband', 'of een onafhankelijke waarnemer de bekende wet->wachter-randen zelf terugvindt'],
+  /* De bereikmeting veroudert met de DOCTRINE, met de PRODUCTVORMEN en met de
+     WACHTER tegelijk: elk van de drie assen kan verschuiven zonder dat de andere
+     twee bewegen, en dan is de vorige vergelijking er een van gisteren. */
+  ['GELDING.json', 'npm run gelding', 'waar een wet geldt, waar hij leeft en waar een wachter hem kan zien'],
   /* DE EERSTE MINUUT. Hij hoort hier en niet in BUITEN, want hij is geen afdruk
      uit de code maar een METING VAN GEDRAG: een vers lid, de echte registratie,
      een echte browser op 390x844. Verandert de onboarding, het menu of het
@@ -341,6 +346,12 @@ const REGISTERS = [
      Ook hier een melding en geen poort: als poort zou hij rood staan op takken
      die niets met geld te maken hebben. */
   ['CRASHPROEF.json', 'npm run crashproef:vast', 'wat er per geldroute van de uitkomst overblijft als het proces op een crashgrens sterft'],
+  /* DE SCHRIJFPROEF IS EEN METING VAN GEDRAG. Hij saboteert de duurzame commit
+     en kijkt of een route toch succes meldt. Een oude uitslag kan dus niet als
+     uitspraak over de huidige schrijfroutes gelden; daarom meldt versheid zijn
+     ouderdom net als bij de crashproef hierboven. */
+  ['SCHRIJFPROEF.json', 'node scripts/schrijfproef.js --vastleggen',
+    'of een route succes meldt terwijl zijn duurzame schrijfactie aantoonbaar niet is uitgevoerd'],
   /* HERSTELBESLUIT.json STAAT HIER BEWUST NIET, en dat is geen vergetelheid.
      Deze lijst is de INSTRUMENTENlijst: scripts/meetkeuring.js leest hem om te
      bepalen welk script welk register vult, en eist van elk instrument een
@@ -440,6 +451,7 @@ const REGISTERS = [
   ['KETENVORM.json', 'npm run ketenvorm:vast', 'wat de vier gouden ketens werkelijk delen (actoren, beloften)'],
   ['DOODSPOOR.json', 'npm run doodspoor:vast', 'of een handeling ergens AANKOMT, of een verklaring draagt waarom niet'],
   ['DOORWERKING.json', 'npm run doorwerking:vast', 'of een gegeven dat een keer is opgegeven doorwerkt, met doel en actualiteit'],
+  ['REFUNDMIGRATIE.json', 'npm run refundmigratie:vast', 'welke lezers van een betaalstand mee kunnen naar de tegenboeking'],
   ['RITMIGRATIE.json', 'npm run ritmigratie:vast', 'welke lezers van db.data.rides wanneer naar de opdrachtwereld kunnen'],
   ['CODEWERELD.json', 'node scripts/codewereld.js --vastleggen', 'wat de registers samen over deze code beweren'],
   /* Het tekstoppervlak veroudert bij elke merge die schermen meebrengt, en

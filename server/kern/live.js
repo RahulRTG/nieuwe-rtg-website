@@ -69,7 +69,7 @@ function maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, fi
         etaMin: etaMinutes(dist, mode),
         // voor een rit telt de ETA van het voertuig naar het lid
         taxiEtaMin: ride && me && s.loc ? etaMinutes(haversine(s.loc, me), 'driving') : null,
-        order: order ? { ref: order.ref, status: order.status, items: order.items.reduce((n, i) => n + i.qty, 0), total: order.total, paid: order.paid } : null,
+        order: order ? { ref: order.ref, status: order.status, items: order.items.reduce((n, i) => n + i.qty, 0), total: order.total, paid: order.paid && !order.refunded } : null,
         ride: ride ? { ref: ride.ref, status: ride.status, to: ride.to, quote: ride.quote, km: ride.km,
                        passengers: ride.passengers, driver: ride.driver ? ride.driver.name : null,
                        vehicle: ride.vehicle ? ride.vehicle.name + (ride.vehicle.plate ? ' · ' + ride.vehicle.plate : '') : null,

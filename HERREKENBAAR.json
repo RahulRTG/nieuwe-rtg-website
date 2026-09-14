@@ -1,0 +1,18 @@
+{
+  "uitleg": "Per route of het GEVOLG van een schrijfactie herrekenbaar is. scripts/faalproef.js meet mechanisch of een route 200 gaf terwijl de toestand niet veranderde; wat die meting niet kan zien is of het verloren gevolg zichzelf herstelt. Dat is domeinkennis en geen meetuitkomst, en daarom staat het hier en niet in de meter.",
+  "vastlegging": "Het besluit drukt de meting NOOIT weg. FAALPROEF.json blijft `gezakt` melden voor een route die hier staat; dit register zet er alleen een verklaring naast. Dezelfde vorm als IDEMBESLUIT.json naast IDEMPROEF.json: wie het besluit de meting laat overschrijven, heeft de meting afgeschaft en niet verklaard.",
+  "klassen": {
+    "cache": "Wat verloren gaat is een afgeleide waarde die bij de volgende ronde opnieuw wordt berekend. Het verlies kost rekenwerk en geen gegevens. Dit is GEEN vrijbrief: de route blijft gezakt in de meting, want een mechanisch contract kan het verschil met een verdwenen bankakkoord niet zien.",
+    "herrekenbaar-uit-bron": "Het gevolg is opnieuw af te leiden uit een bron die zelf duurzaam is vastgelegd. Het verlies valt de veilige kant op.",
+    "duurzaam-vereist": "Het gevolg is niet te herrekenen en hoort dus wel aan een duurzame commit. Een route die hier staat en toch zakt, is werk en geen verklaring."
+  },
+  "routes": {
+    "POST /api/office/magnaat/scan": {
+      "klasse": "cache",
+      "grond": "Het enige dat deze route wegschrijft is `s.laatsteScan`, een tijdstempel die de dagelijkse herhaling afremt. De zestien voorstellen die hij teruggeeft staan in de ZAAISET; de scan maakt ze niet. Gemeten op een draaiende server: twee scans achter elkaar geven allebei nieuw=0, en na een herstart staan de voorstellen er nog voordat er opnieuw is gescand. Raakt de tijdstempel weg, dan slaat de volgende scan de daggrens niet over en draait hij gewoon -- dat kost rekenwerk en verliest niets. Ook een scan die wel iets vindt is herstelbaar: de voorstellen worden ontdubbeld op kans.sleutel, dus wat verloren ging komt de volgende ronde terug.",
+      "waaromNietDuurzaam": "Hem aan saveDuurzaam() hangen zou de schaarste van dat primitief opgeven voor een tijdstempel in de simulatiewereld -- precies waar db/duurzaam.js in zijn eigen kop voor waarschuwt: zodra iemand hem leest als 'de veilige save', staat hij binnen een half jaar onder een profielwijziging en een like.",
+      "besloten": "2026-09-13",
+      "meting": "FAALPROEF.json blijft deze route als gezakt melden; zie MENSNETWERK.md par. 0.6b."
+    }
+  }
+}

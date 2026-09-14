@@ -31,6 +31,15 @@
            node scripts/norm.js --vastleggen
    ========================================================================== */
 'use strict';
+
+/* Hoeveel verschillende ROUTES staan er in deze stand? De crashproef schrijft
+   een rij per (route x crashgrens); voor een blokkade is de route de eenheid
+   van het werk en de rij niet. Zie de leeswijzer bij de crashproef-meters. */
+function routesInStand(j, stand) {
+  const uit = new Set();
+  for (const r of (j.per || [])) if (r.stand === stand) uit.add(r.methode + ' ' + r.pad);
+  return uit.size;
+}
 const fs = require('fs');
 const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
@@ -516,6 +525,8 @@ const METERS = [
      tegenspreekt. FINAL naast een gemeten `exact` zegt dat de route wel degelijk
      terug te draaien is terwijl een mens hem definitief noemde. */
   { sleutel: 'geldRoutesHerstelOnbesloten', richting: 'omlaag', wat: 'geldroutes zonder verklaard correctiemodel (HERSTELBESLUIT.json)' },
+  { sleutel: 'geldRoutesMeldOnbesloten', richting: 'omlaag', wat: 'geldroutes zonder verklaarde meldplicht (MELDBESLUIT.json)' },
+  { sleutel: 'geldRoutesValsSucces', richting: 'omlaag', wat: 'geldroutes die een 2xx geven terwijl hun schrijfactie is verdwenen (SCHRIJFPROEF.json)' },
   { sleutel: 'geldRoutesHerstelTegenspraak', richting: 'omlaag', wat: 'geldroutes waar de herstelverklaring de meting tegenspreekt' },
   /* DE VERTICALE GELDPROEF, EN MET OPZET TWEE TANDEN (FACTUURPROEF.json).
 
@@ -595,10 +606,10 @@ const METERS = [
      proefwereld uit te breiden om een getal groen te krijgen, terwijl er niets
      aan de fixture mankeert. Zelfde grond als GEEN_DUURZAME_WEG: een gemeten
      feit, geen werk. */
-  { sleutel: 'crashproefGeenLijf', richting: 'omlaag', wat: 'crashproefrijen waar de route het verzoek afkeurde en req.body leest -- er ontbreekt een lijf' },
-  { sleutel: 'crashproefGeenWereld', richting: 'omlaag', wat: 'crashproefrijen die op de toestand strandden -- er ontbreekt een voorziening' },
-  { sleutel: 'crashproefGeenRol', richting: 'omlaag', wat: 'crashproefrijen die niet voorbij de deur kwamen (401/403)' },
-  { sleutel: 'crashproefOnbepaald', richting: 'omlaag', wat: 'crashproefrijen die de triage niet kon indelen -- een signaal over de meter zelf' },
+  { sleutel: 'crashproefGeenLijf', richting: 'omlaag', wat: 'geldroutes waar de route het verzoek afkeurde en req.body leest -- er ontbreekt een lijf' },
+  { sleutel: 'crashproefGeenWereld', richting: 'omlaag', wat: 'geldroutes die op de toestand strandden -- er ontbreekt een voorziening' },
+  { sleutel: 'crashproefGeenRol', richting: 'omlaag', wat: 'geldroutes die niet voorbij de deur kwamen (401/403)' },
+  { sleutel: 'crashproefOnbepaald', richting: 'omlaag', wat: 'geldroutes die de triage niet kon indelen -- een signaal over de meter zelf' },
   /* DE GEVOLGDEKKING, EN MET OPZET DRIE TANDEN ZONDER PERCENTAGE ERBOVEN
      (GEVOLGDEKKING.json, npm run gevolgdekking).
 
@@ -1464,6 +1475,10 @@ function meet(bronnen) {
     geldRoutesZonderIdemBewijs: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderIdemBewijs),
     geldRoutesZonderTerugweg: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesZonderTerugweg),
     geldRoutesHerstelOnbesloten: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesHerstelOnbesloten),
+    geldRoutesMeldOnbesloten: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesMeldOnbesloten),
+    /* Uit de TELLING en niet uit `per`: deze stand is per route en niet per
+       (route x grens), dus rij en route zijn hier hetzelfde ding. */
+    geldRoutesValsSucces: leesRegister('SCHRIJFPROEF.json', (j) => j.telling.VALS_SUCCES || 0),
     geldRoutesHerstelTegenspraak: leesRegister('GELDDEKKING.json', (j) => j.ratel.geldRoutesHerstelTegenspraak),
     geldpadGezakt: leesRegister('FACTUURPROEF.json', (j) => j.telling.FAILED),
     /* BLOCKED en UNKNOWN worden hier WEL opgeteld, en alleen hier: allebei
@@ -1475,11 +1490,28 @@ function meet(bronnen) {
        getallen die dit verschil dragen staan daar al, en een derde dat ze
        samenvat zou bij de eerstvolgende wijziging uit de pas lopen. */
     crashasNietMeetbaar: leesRegister('CRASHAS.json', (j) => j.telling.bestaat - j.telling.meetbaar),
+    /* GEZAKT TELT RIJEN, DE BLOKKADES TELLEN ROUTES, en dat verschil is met
+       opzet. Een gezakte rij is een gebroken belofte op EEN crashgrens: twee
+       grenzen die zakken op dezelfde route zijn twee defecten, geen een. Een
+       blokkade is het tegenovergestelde -- daar is de route niet aan het werk
+       gekomen, en het WERK dat dat oplost (een lijf, een voorziening, de juiste
+       rol) is per ROUTE en niet per grens.
+
+       Dat werd duur toen de derde crashgrens erbij kwam: de drie blokkadetanden
+       sprongen van 22/2/2 naar 33/3/3 terwijl er geen route slechter was
+       geworden -- dezelfde elf, een, een, nu met drie grenzen elk. Een tand die
+       omhoogschiet van werk dat je juist goed deed, leert iedereen om hem te
+       negeren.
+
+       AFGELEID UIT `per` EN NIET UIT EEN EIGEN VELD IN HET REGISTER, om exact
+       de reden die twee regels hierboven bij crashasNietMeetbaar staat: een
+       samenvattend getal loopt bij de eerstvolgende wijziging uit de pas met de
+       rijen waaruit het komt. `per` is de bron; hier wordt hij alleen geteld. */
     crashproefGezakt: leesRegister('CRASHPROEF.json', (j) => j.telling.FAILED || 0),
-    crashproefGeenLijf: leesRegister('CRASHPROEF.json', (j) => j.telling.BLOCKED_BODY || 0),
-    crashproefGeenWereld: leesRegister('CRASHPROEF.json', (j) => j.telling.BLOCKED_WORLD || 0),
-    crashproefGeenRol: leesRegister('CRASHPROEF.json', (j) => j.telling.BLOCKED_ROLE || 0),
-    crashproefOnbepaald: leesRegister('CRASHPROEF.json', (j) => j.telling.BLOCKED_ONBEPAALD || 0),
+    crashproefGeenLijf: leesRegister('CRASHPROEF.json', (j) => routesInStand(j, 'BLOCKED_BODY')),
+    crashproefGeenWereld: leesRegister('CRASHPROEF.json', (j) => routesInStand(j, 'BLOCKED_WORLD')),
+    crashproefGeenRol: leesRegister('CRASHPROEF.json', (j) => routesInStand(j, 'BLOCKED_ROLE')),
+    crashproefOnbepaald: leesRegister('CRASHPROEF.json', (j) => routesInStand(j, 'BLOCKED_ONBEPAALD')),
     gevolgPadenOnbekend: leesRegister('GEVOLGDEKKING.json', (j) => j.tellers.onbekendeEffectpaden),
     gevolgContractVolledig: leesRegister('GEVOLGDEKKING.json', (j) => j.tellers.contractVolledig),
     gevolgContractenGezakt: leesRegister('GEVOLGDEKKING.json', (j) => j.tellers.contractenGezakt),

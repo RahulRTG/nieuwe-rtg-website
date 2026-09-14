@@ -13,6 +13,7 @@
    terug, nul draden.
    ========================================================================== */
 'use strict';
+const verraad = require('../lib/verraad');
 
 module.exports = function maakMeldingen(deps) {
   const {
@@ -34,6 +35,21 @@ function broadcastSync(tiers, scope) {
 
 // notificeer één tier: opslaan, naar open schermen sturen én web-push
 function notify(tier, note) {
+  /* DE TWEEDE HELFT VAN DE CRASHGRENS `na-commit-voor-bericht`, en dat er twee
+     helften zijn is zelf de vondst. ./meldaan.js draagt dezelfde injectie; de
+     eerste ronde zette hem alleen daar, en op /api/supplier/facturen/maak sloeg
+     hij nooit toe -- die route meldt via DEZE schrijver
+     (kern/facturatie/motor.js roept `notify(f.koper.key, ...)`).
+
+     Er zijn dus twee wegen naar db.data.notifications, en een injectie in een
+     ervan meet de helft terwijl zij de hele grens belooft. Dat de twee wegen
+     bestaan is een bekende naad (zie de kop van ./meldaan.js); die samenvoegen
+     is een eigen opdracht en geen bijvangst van de crash-as. Tot die er is,
+     hangt de haak op ALLEBEI -- liever twee eerlijke seams dan een grens die
+     stil de helft mist. */
+  if (verraad.sla('sterf-voor-bericht')) {
+    try { process.kill(process.pid, 'SIGKILL'); } catch (e) { process.abort(); }
+  }
   const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: new Date().toISOString(), ...note };
   // meldingsvoorkeuren (kern/ervaring.js): een uitgezette scope wordt niet
   // opgeslagen en niet gepusht; zonder voorkeur staat alles aan

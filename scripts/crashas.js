@@ -88,8 +88,16 @@ const INJECTIE = {
   'na-commit-voor-antwoord': { verraad: 'sterf-na-commit',
     waarom: 'ingebouwd in server/db/index.js, in de duurzame commit zelf: na de bevestigde ' +
       'schrijfactie en voor het antwoord' },
-  'na-commit-voor-bericht': { verraad: null,
-    waarom: 'er is geen haak tussen de commit en het versturen van het bericht' },
+  /* SINDS 13 SEPTEMBER WEL GEBOUWD, en dat was de grootste enkele post in dit
+     register: 45 van de 45 routes stonden hier op `onbekend`, ruim de helft van
+     alle 89 open vragen -- niet uit onwetendheid maar bij gebrek aan een moment
+     om in te sterven. De haak zit in de schrijver van de persoonlijke melding en
+     slaat toe VOORDAT de melding bestaat; sterven erna is de milde kant (het lid
+     ziet hem bij de volgende keer laden). */
+  'na-commit-voor-bericht': { verraad: 'sterf-voor-bericht',
+    waarom: 'ingebouwd in server/opzet/meldaan.js EN server/opzet/meldingen.js -- de twee ' +
+      'schrijvers naar db.data.notifications -- na de handeling en voordat de melding is ' +
+      'weggeschreven. Twee seams omdat er twee wegen zijn; een ervan meet de helft' },
   'providercommit-zonder-antwoord': { verraad: null,
     waarom: 'vraagt een aanbieder die commit en dan zwijgt; server/betaal/synthetisch.js kan ' +
       'wel `traag` en `terugboeking`, maar niet vanuit een HTTP-route worden gestuurd' },

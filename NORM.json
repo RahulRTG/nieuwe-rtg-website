@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-09-13",
+  "vastgelegd": "2026-09-14",
   "meters": {
     "activeringOnbepaald": 3,
     "activeringOndergrens": 49,
@@ -100,6 +100,8 @@
     "crashproefGeenWereld": 2,
     "crashproefGeenRol": 2,
     "crashproefOnbepaald": 0,
+    "geldRoutesMeldOnbesloten": 45,
+    "geldRoutesValsSucces": 28,
     "aiContextLek": 0,
     "aiContextVeldenGezien": 25,
     "stageDomeinenGemeten": 10,
@@ -2276,6 +2278,25 @@
       "vervalt": "2026-12-15",
       "meter": "toetsenNietGemeten 607 -> 610",
       "reden": "Samenvoeging van de tien resterende open PR-takken (#242 t/m #252, #244 is los gemerged) in een release-tak. drie toetsen extra waar de mutatiemotor niet langs is geweest, gemeten NA het samenvoegen van de mutatierondes van alle takken. Zonder die samenvoeging zou hier een veel hoger getal staan dat een bundelartefact is en geen schuld."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 321,
+      "vervalt": "2026-12-15",
+      "meter": "keuringOmvang 322 -> 323",
+      "reden": "server/kern/bankregie/index.js komt in de waarschuwingsband onder 10 kB (9681 byte); de harde grens van keuringsregel 13 haalt hij niet. De groei is de reparatie van drie gezakte crashrijen plus de reden erbij: /api/office/bank/leden, /draai en /nood muteerden `bankregie` duurzaam terwijl het proces stierf en de auditregel NIET landde, dus een schakelaar die bepaalt of de leden-bank live is kon omgaan zonder spoor van wie. De helper `besluit` zet mutatie en spoor samen in een duurzame bundel. Het commentaar is al ingekort -- de lange kant staat in routes/kantoren/bank.js -- en wat overblijft legt uit waarom deze module als enige van de bankregie de duurzame commit mag bereiken (keuringsregel 47).",
+      "waarheen": "bankregie/index.js draagt vier onderwerpen (stand, clearing, plafonds, de knop). De knop plus `besluit` is de natuurlijke naad naar een eigen bestand, net zoals nood.js, autorisatie.js en instellingen.js er al af zijn. Dat is een verhuizing en geen herschrijving."
+    },
+    {
+      "datum": "2026-09-13",
+      "soort": "structureel",
+      "sleutel": "crashproefGeenLijf",
+      "van": 22,
+      "meter": "crashproefGeenLijf 22 -> 11, crashproefGeenWereld 2 -> 1, crashproefGeenRol 2 -> 1",
+      "reden": "GEEN VOORUITGANG MAAR EEN ANDERE EENHEID, en wie deze drie als verbetering leest, leest ze verkeerd. De drie blokkadetanden telden RIJEN (route x crashgrens). Op 13 september kwam er een derde crashgrens bij (na-commit-voor-bericht), en daarmee sprongen ze van 22/2/2 naar 33/3/3 zonder dat er ook maar een route slechter was geworden: het zijn dezelfde 11, 1 en 1 routes, nu met drie grenzen elk gemeten in plaats van twee. Een tand die omhoogschiet van werk dat je juist goed deed, leert iedereen om hem te negeren -- dus telt hij nu ROUTES. Dat is bovendien de eenheid van het werk zelf: een lijf schrijf je per route, en dan worden er in een klap drie rijen meetbaar. De getallen van eerder vandaag (30 -> 22 en 10 -> 2) zijn RIJEN en dus niet een-op-een met deze te vergelijken; in routes waren dat 15 -> 11 en 5 -> 1. `crashproefGezakt` blijft met opzet RIJEN tellen: een gebroken belofte op twee grenzen van dezelfde route is twee defecten en niet een. Het routegetal wordt AFGELEID uit `per` en staat niet als eigen veld in het register, om dezelfde reden die bij crashasNietMeetbaar staat: een samenvattend getal loopt bij de eerstvolgende wijziging uit de pas met de rijen waaruit het komt.",
+      "waarheen": "omlaag door per route een lijf, een voorziening of de juiste rol te leveren -- elke route die omgaat, maakt drie crashgrenzen tegelijk meetbaar. Deze tand is vanaf nu ONGEVOELIG voor het aantal grenzen, dus een vierde grens erbij mag hem niet meer laten stijgen; gebeurt dat toch, dan telt er iets weer rijen."
     }
   ],
   "prestatie": {
@@ -2361,10 +2382,12 @@
     "crashasOnbekend": "2026-09-13",
     "crashasNietMeetbaar": "2026-09-13",
     "crashproefGezakt": "2026-09-13",
-    "crashproefGeenLijf": "2026-09-13",
+    "crashproefGeenLijf": "2026-09-14",
     "crashproefGeenWereld": "2026-09-13",
     "crashproefGeenRol": "2026-09-13",
     "crashproefOnbepaald": "2026-09-13",
+    "geldRoutesMeldOnbesloten": "2026-09-13",
+    "geldRoutesValsSucces": "2026-09-13",
     "aiContextLek": "2026-09-13",
     "aiContextVeldenGezien": "2026-09-13",
     "stageDomeinenGemeten": "2026-09-13",

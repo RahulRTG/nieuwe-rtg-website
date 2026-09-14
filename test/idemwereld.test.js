@@ -65,13 +65,15 @@ test('de keten levert alle stukken op die de geldroutes nodig hebben', async () 
      twaalf van de veertien zware kantoorroutes omdat de proef ze niet aan het
      werk kreeg, en bij deze twee kwam dat door een WOORD en niet door een deur
      (`soort` betekent bij een pas iets anders dan bij een rekening). */
-  /* VIJFENTWINTIG sinds de bundelronde van 13 september 2026. Twee takken breidden
-     deze lijst onafhankelijk uit -- de ledenkant met twee zware kantoorroutes (zie
-     hierboven) en de zaakkant van PR #242 met drie -- en de vereniging telt 25
-     verschillende paden zonder een enkele dubbele sleutel. Dat laatste is hier de
-     echte eis: een dubbele sleutel in een objectliteraal verdwijnt STIL (de laatste
-     wint), dus een te laag getal zou hier het enige signaal zijn geweest. */
-  assert.equal(Object.keys(perRoute).length, 25, 'vijfentwintig geldroutes krijgen een eigen lijf');
+  /* EENENDERTIG sinds de tweede bundelronde van 14 september 2026, en dat getal is
+     GETELD en niet opgeteld. Drie takken breidden deze lijst onafhankelijk uit: de
+     ledenkant met twee zware kantoorroutes (zie hierboven), en PR #242 met zes. De
+     vereniging is 25 + 6 = 31 en niet 25 + 29, want #242 vertrok van dezelfde
+     zaakkant die de vorige bundel al had opgenomen -- wie hier de twee getallen
+     van de takken optelt, telt die overlap dubbel. De echte eis blijft dezelfde:
+     een dubbele sleutel in een objectliteraal verdwijnt STIL (de laatste wint),
+     dus een te laag getal is hier het enige signaal dat er een pad is ingeslikt. */
+  assert.equal(Object.keys(perRoute).length, 31, 'eenendertig geldroutes krijgen een eigen lijf');
   for (const pad of ['/api/office/bank/rekening/open', '/api/office/bank/rekening/rood']) {
     assert.ok(perRoute[pad], 'de zware kantoorroute ' + pad + ' hoort een eigen lijf te krijgen');
   }
@@ -167,7 +169,24 @@ test('een wereld die niets oplevert laat de proef meten als vanouds', async () =
   const { extra, perRoute } = await zetWereldKlaar({ post: async () => ({ status: 500, data: {} }),
     tokens: { member: 'lid', office: 'kantoor' } });
   assert.deepEqual(extra, {});
-  assert.deepEqual(Object.keys(perRoute).sort(), ['/api/bank/rekening/open', '/api/supplier/giftcard/sell']);
+  /* `giftcard/sell` staat er sinds 13 september bij, en om exact dezelfde reden
+     als `rekening/open`: zijn lijf is `{ bedrag: 25 }` -- een vast bedrag binnen
+     de grenzen die de route zelf stelt (10..5000 EURO, geen centen), en het
+     vraagt niets uit de wereld. Deze lijst is dus geen opsomming van
+     uitzonderingen maar de uitkomst van EEN regel: wat niets uit de wereld
+     nodig heeft, blijft staan. Wie hier een route bijzet die WEL iets uit de
+     wereld leest, breekt die regel en niet deze verwachting. */
+  /* De lijst groeit mee met elk lijf dat NIETS uit de wereld leest. De drie die
+     er op 14 september bij kwamen dragen alleen vaste waarden: `pay/oplaad` een
+     bedrag binnen de band die de route zelf noemt, `labfonds/locatie/maak` een
+     naam en een land, `wallet/voeg` een soort, titel en code. De twee zware
+     kantoorroutes hierboven staan er met opzet NIET bij: die lezen wel degelijk
+     iets uit de wereld, en dat de vorige bundel ze toevoegde verandert daar
+     niets aan. */
+  assert.deepEqual(Object.keys(perRoute).sort(),
+    ['/api/bank/rekening/open', '/api/boardroom/betalingen/proef',
+      '/api/labfonds/locatie/maak', '/api/pay/oplaad',
+      '/api/supplier/giftcard/sell', '/api/wallet/voeg']);
 });
 
 test('de halve-lijf-regel kijkt ook IN lijsten en posten', () => {

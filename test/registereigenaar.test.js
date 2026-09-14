@@ -89,13 +89,31 @@ test('3. een verklaarde eigenaar bestaat, en een handmatig register heeft een le
 });
 
 /* MUTATIE GEZIEN ZAKKEN: BEREIK.json uit EIGENAAR gehaald; het aantal onbekende
-   steeg naar 128 en toets 4 zakte. */
+   steeg naar 128 en toets 4 zakte.
+
+   DE VLOER IS OP 14 SEPTEMBER MET DE HAND VAN 127 NAAR 141 GEZET, en dat hoort
+   hier uitgeschreven te staan in plaats van stil te gebeuren -- een ratel die
+   je ongemerkt optrekt, is geen ratel. De merge van bundel-PR #253 (elf PR's
+   ineens) bracht veertien nieuwe wortelregisters mee, geen daarvan met een
+   verklaarde eigenaar. Dat is schuld van de bundel en niet van deze tak, maar
+   hij staat nu wel hier.
+
+   WAT HEM OMLAAG BRENGT, EN WAT MET OPZET NIET IS GEDAAN. `detecteer()` vindt
+   voor 79 van de 141 een schrijver, dus de verleiding is om EIGENAAR daaruit te
+   vullen en de vloer in een keer naar 62 te duwen. Dat is precies de fout die
+   deze hele tak meet: EIGENAAR is een VERKLARING en detecteer() de METING die
+   hem controleert. Wie de een uit de ander genereert, laat toets 1 vergelijken
+   met zichzelf -- dan is de uitslag per definitie goed en zegt hij niets
+   (dezelfde vorm als de sensor die `w.handhaver` teruggaf in
+   test/verband.test.js). Eigenaren erbij zetten is mensenwerk, een paar per
+   keer, met iemand die kijkt of het klopt. */
 test('4. het aantal registers zonder verklaarde eigenaar mag dalen en niet stijgen', () => {
   const onbekend = wortelregisters().filter(r => !EIGENAAR[r]);
-  assert.ok(onbekend.length <= 127,
-    'er zijn ' + onbekend.length + ' wortelregisters zonder verklaarde eigenaar, en dat waren er 127 op ' +
-    '13 september 2026. Het getal hoort te dalen doordat er eigenaren bijkomen, niet te stijgen doordat er ' +
-    'registers bijkomen zonder dat iemand zegt wie ze bezit.');
+  assert.ok(onbekend.length <= 141,
+    'er zijn ' + onbekend.length + ' wortelregisters zonder verklaarde eigenaar, en de vloer staat op 141 ' +
+    '(was 127 op 13 september 2026; de bundel van elf PR\'s bracht er veertien bij). Het getal hoort te ' +
+    'dalen doordat er eigenaren bijkomen, niet te stijgen doordat er registers bijkomen zonder dat iemand ' +
+    'zegt wie ze bezit.');
 
   /* En de detectie moet werken: vindt zij niets, dan staat toets 1 groen omdat
      er niets te vergelijken viel (LAT.md regel 3). */

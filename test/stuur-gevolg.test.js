@@ -237,3 +237,47 @@ test('13. de voorspelling verandert het plan nog steeds niet', () => {
   assert.ok(!/gevolgcontract|gevolgVanStap/.test(bron),
     'plan.js is de gevolgkennis gaan bezitten; zij hangt ERNAAST (zie gevolg.js, slotalinea)');
 });
+
+/* ---------------------------------------------------------------------------
+   GEEN WERK GAAT VOOR GEMETEN -- de volgorde in gevolgVan(), en waarom zij
+   ertoe doet.
+
+   Zij stond omgekeerd, en dat leverde 153 van de 4923 paden een `gemeten` op
+   terwijl de idempotentieproef ze op 404 of 403 had zien stranden. Het scherpste
+   geval: /api/office/bank/handtekening/bevestig gaf drie keer 404 en tussendoor
+   bewoog `wacht` -- de proef draait alles tegen EEN server, dus dat was werk van
+   een buur. IDEMPROEF.json noemt zo'n route zelf `ongemeten`; deze laag maakte er
+   `gemeten` van, en sprak dus zijn eigen bron tegen.
+
+   MUTATIEPROEF: zet in server/kern/stuur/gevolg.js de `collecties.length`-tak
+   terug boven de `geenWerk`-tak en deze toets zakt op de eerste assertie.
+   --------------------------------------------------------------------------- */
+test('5. een route die geen werk deed heet ONBEKEND, ook als er iets bewoog', () => {
+  const rijen = require('../IDEMPROEF.json').perRoute || [];
+  /* Een echt geval uit het register zoeken in plaats van er een te verzinnen: de
+     regel bestaat om wat de proef MEET, en een fixture zou hier de bron vervangen
+     door de aanname die getoetst moet worden. */
+  const kaart = new Map();
+  for (const r of Object.values(rijen)) {
+    if (!r || r.methode !== 'POST' || typeof r.pad !== 'string') continue;
+    const h = kaart.get(r.pad) || { col: new Set(), geenWerk: false };
+    for (const k of ['a', 'b', 'c']) for (const n of Object.keys((r.opslag || {})[k] || {})) h.col.add(n);
+    if (/deed geen werk/.test(String(r.reden || ''))) h.geenWerk = true;
+    kaart.set(r.pad, h);
+  }
+  const gevallen = [...kaart].filter(([, h]) => h.geenWerk && h.col.size);
+  /* Nul gevallen is geen groen: dan bewaakt deze toets niets en hoort iemand te
+     kijken of het register van vorm is veranderd. */
+  assert.ok(gevallen.length, 'geen enkel pad in het register combineert "geen werk" met een ' +
+    'bewogen collectie -- dan meet deze toets niets meer');
+
+  for (const [pad, h] of gevallen.slice(0, 25)) {
+    const g = gevolgVan(pad);
+    assert.equal(g.graad, 'onbekend', pad + ' deed geen werk en heet toch ' + g.graad);
+    assert.deepEqual(g.collecties, [], pad + ': een onbekende uitslag draagt geen collectielijst, ' +
+      'want dan leest hij alsof er wel iets is vastgesteld');
+    /* En wat er WEL bewoog verdwijnt niet: weglaten zou een tweede soort stilte zijn. */
+    for (const naam of h.col) assert.match(g.reden, new RegExp(naam),
+      pad + ': de reden noemt niet wat er bewoog (' + naam + ')');
+  }
+});

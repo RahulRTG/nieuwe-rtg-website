@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2407,
+    "bewijsAchterstand": 2419,
     "bewijsAlleenKeten": 16,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -2360,6 +2360,16 @@
       "meter": "toetsenNietGemeten 618 -> 619",
       "reden": "De derde integratieronde na #267 voegt twee toetsbestanden toe waar de mutatiemotor nog niet langs is geweest: test/fiscaal-meegeleverd.test.js en test/idemcontract.test.js. De toetsen draaien wel; deze post zegt uitsluitend dat hun gevoeligheid nog niet door een volledige mutatieronde is bewezen. Het getal stijgt met een en niet met twee omdat de meter per toets telt en niet per bestand. MUTATIES.json is NIET hergedraaid: die motor duurt uren, schrijft in echte bronbestanden en hoort op een schone boom te draaien, dus hij zit in ronde.yml en niet in ci.yml -- de bundel draagt de meting van de main-lijn.",
       "waarheen": "De twee toetsen meenemen in de volgende volledige npm run mutatie op een schone boom, samen met de zeven van 14 september."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2407,
+      "vervalt": "2026-12-15",
+      "meter": "bewijsAchterstand 2407 -> 2419",
+      "reden": "De idempotentieproef kreeg in deze tak een wereld voor het Lab-fonds (scripts/lib/idemwereld.js: een locatie plus een VERS voorstel per route die er een noemt) en bereikt daardoor routes die eerder 404 gaven. De post idem-ongeclassificeerd telt routes die WERK deden minus die met een besluit in IDEMBESLUIT.json, dus elke nieuw meetbare route zonder besluit landt hier: 1595 -> 1607, precies +12. Het is ONTDEKTE schuld en geen nieuwe -- die twaalf muteerden altijd al en verstopten zich achter \"de proef kwam er niet bij\". Dezelfde post daalde in dezelfde ronde aan de andere kant: mutatiesZonderEnigeAs ging van 2787 naar 2783, want zes ledenroutes van het labfonds werden meetbaar die op main al op ongemeten stonden. De schuld zelf oplossen kan deze tak niet: MUTATIECONTRACT.md zegt dat een stand nooit uit bewijs wordt afgeleid, want het bewijs draagt een voorstel en een MENS draagt het besluit. Deze notitie verving een eerdere met dezelfde strekking (2404 -> 2419) die bij de samenvoeging met main wegviel toen NORM.json op de versie van main werd gezet; de beginwaarde is daarom 2407 en niet 2404.",
+      "waarheen": "Die twaalf routes een besluit geven in IDEMBESLUIT.json (de klasse tebeslissen staat daar juist voor open), door een mens en niet afgeleid uit de meting."
     }
   ],
   "prestatie": {

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-14T16:37:14.282Z",
-    "commit": "eea6024e",
+    "op": "2026-09-14T23:41:07.659Z",
+    "commit": "1edf32c5",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 4,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -6698,6 +6698,13 @@
       "operator": "===->!==#0",
       "gezakt": 5,
       "geprobeerd": 1
+    },
+    "rtf-labfonds-deur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
     },
     "rtf-veilig.test.js": {
       "soort": "server",

@@ -110,6 +110,8 @@ const REGISTER = {
      naam) meldt diezelfde nul over minder bewijs. Een lek van nul uit een meter
      die niets meer ziet, is de gevaarlijkste vorm van groen. */
   'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
+  /* Het stilspoorregister draagt twee schulden en een bereikmeter. */
+  'STILSPOOR.json': { meter: ['stilSpoor', 'stilleOpslag', 'stilSpoorAanroepen'] },
   /* STAGEVORM.json meet of de publieke domeinen een datavorm delen (STAGE.md
      par. 0). Om dezelfde reden als bij CARRIEREVORM.json hierboven is de
      geratelde waarde het BEREIK en niet de uitkomst: dat er 0 velden gedeeld

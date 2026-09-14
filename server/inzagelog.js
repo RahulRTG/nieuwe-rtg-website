@@ -34,10 +34,7 @@
 const { hangAan, verifieer, top } = require('./lib/keten');
 const { verankerPunt, verifieerTegenAnker } = require('./lib/keten-anker');
 const { nu, datum } = require('./lib/klok');
-/* DE BEWARING, LOS. Een derde naad in het ONDERWERP naast ./inzagelog-lezen.js:
-   hier wordt geschreven, daar gelezen, en in ./inzagelog-bewaring.js staat hoe
-   lang het blijft staan. `snoei` krijgt de db-laag via een functie mee en niet
-   als waarde, want zet() komt pas bij het opstarten langs. */
+/* Bewaartermijn en snoei staan los; de database komt pas via zet() binnen. */
 const { BEWAARDAGEN, MAX, maakSnoei } = require('./inzagelog-bewaring');
 const snoei = maakSnoei(() => DB);
 
@@ -178,9 +175,7 @@ const { noteerVast, noteerVeelVast } = require('./inzagelog-vast')({
    woont. */
 const lezen = require('./inzagelog-lezen')({
   rij,
-  /* De termijn en de noodremteller gaan MEE naar de leeskant in plaats van dat
-     die ze zelf ophaalt: zo is er een plek die weet hoe lang dit huis bewaart,
-     en kan een scherm niet iets anders beweren dan de opslag doet. */
+  /* Zelfde bewaartermijn en noodrem. */
   bewaardagen: BEWAARDAGEN,
   afgekapt: () => { try { return Number(DB && DB.data && DB.data.inzageLogAfgekapt) || 0; } catch (e) { return 0; } }
 });

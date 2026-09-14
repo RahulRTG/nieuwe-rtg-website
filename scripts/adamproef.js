@@ -301,50 +301,50 @@ async function loop(basis, uit) {
           ', geblokkeerde weg blijft staan met "' + ((bbl && bbl.zouOpenenAls) || []).join(', ') + '"' };
     });
 
-  /* 4 -- DE AANVOER. Dit is de schakel die door een MUTATIE is gevonden en niet
-     door na te denken, en hij is belangrijker dan schakel 2.
+  /* 4 -- VAN EEN KAAL DOEL NAAR WEGEN. Deze schakel is door een MUTATIE
+     gevonden en niet door na te denken, en hij is belangrijker dan schakel 2.
 
      Bij het natrekken van schakel 2 is `auth` er tijdelijk afgehaald, om te
      bewijzen dat daar een DEUR zit en geen kapotte motor. Met de deur open
-     sloot de schakel niet alsnog: hij werd `stuk` met een 400. De reden staat
+     sloot de schakel niet alsnog: hij werd `stuk` met een 400. De reden stond
      in kern/knelpunt/index.js zelf -- `reken()` eist `manieren`, en zonder
      manieren valt er niets te vergelijken. Dat is een eerlijke motor.
 
-     Maar het betekent dat de AANROEPER de wegen al moet kennen. En niemand
-     levert ze: /api/knelpunt heeft in dit huis nul aanroepers -- geen scherm in
-     public/, geen module in server/, alleen de route zelf, twee registers en
-     een regel in de functielijst.
+     Maar het betekende dat de AANROEPER de wegen al moest kennen, en niemand
+     leverde ze. Een mens zegt "ik wil weer aan het werk". Dat is een DOEL
+     zonder wegen, en deze schakel meet precies dat geval -- met een lidsessie,
+     zodat de deur van schakel 2 er niet tussen zit.
 
-     Een mens zegt "ik wil weer aan het werk". Dat is een DOEL zonder wegen.
-     Deze schakel meet precies dat geval, met een lidsessie, zodat de deur van
-     schakel 2 er niet tussen zit: wat gebeurt er als er alleen een doel is?
+     SINDS 14 SEPTEMBER 2026 SLUIT HIJ. kern/knelpunt/wegen.js stelt de manieren
+     samen uit de BRONNEN die dit huis werkelijk heeft aangesloten (werk,
+     opleiding, opvang), in de vorm die de eigenaar op 13 september besloot: de
+     zinnen komen woord voor woord uit openingen-kaart.js, er wordt niets
+     verzonnen, niets gerangschikt en niets weggelaten op grond van het doel.
 
-     DIT IS DE WORLD OPPORTUNITY GRAPH-VRAAG, en het antwoord is dat de
-     rekenmachine er staat en de aanvoer niet. */
+     EN HET VELD `nodig` BLIJFT LEEG -- dat was de kern van dat besluit, en het
+     legde meteen een gat in de motor bloot dat er al die tijd zat. Een lege
+     voorwaardenlijst leverde de stand `open` op, met de zin "alles staat
+     volgens uw eigen opgave geregeld". Voor een weg die dit huis zelf
+     samenstelt is dat onwaar in de gevaarlijke richting: het zegt "ga maar"
+     over iets waar niemand naar heeft gekeken. Daarom draagt elke samengestelde
+     weg `voorwaardenOnbekend`, en daarom toetst deze schakel niet alleen DAT er
+     wegen komen maar ook dat er geen enkele als `open` uit rolt. Zonder die
+     tweede helft zou een motor die alles op groen zet deze schakel halen. */
   await stap(
-    schakel(4, 'mens', 'knelpuntmotor', 'noemt alleen een doel; iets in dit huis levert de mogelijke wegen aan',
-      'WAT ONTBREEKT: een bron die uit een DOEL de MANIEREN samenstelt. ' +
-      'DEZE REDEN IS SINDS 13 SEPTEMBER 2026 SMALLER GEWORDEN EN NIET WEGGEVALLEN, en dat verschil is ' +
-      'de moeite waard. Er is nu wel aanvoer (kern/knelpunt/aanvoer*.js, twee bronnen), maar die ' +
-      'levert VONDSTEN bij een RANDVOORWAARDE -- wat zou dit knelpunt kunnen opheffen -- en geen WEGEN ' +
-      'bij een kaal doel. Wie "ik wil weer aan het werk" intikt, heeft nog steeds zelf de manieren te ' +
-      'bedenken; pas daarna vindt het huis er iets bij. ' +
-      'WAAROM: de motor is met opzet een rekenmachine en geen zoeker -- hij mag niet rangschikken en niets ' +
-      'weglaten (regel 1 en 4), dus zelf wegen VERZINNEN zou precies die grens breken. ' +
-      'WIE EROVER GAAT: de eigenaar. De stap die nog ontbreekt is klein en eerlijk te benoemen: van een ' +
-      'doel naar een handvol manieren, zonder ze te rangschikken. ' +
-      'DE VORM IS INMIDDELS BESLOTEN (eigenaar, 13 september 2026) EN NOG NIET GEBOUWD, en dat ' +
-      'onderscheid hoort hier te staan in plaats van in een gesprek. De manieren volgen uit de BRONNEN ' +
-      'die er zijn -- via werk, via opleiding, via opvang -- en niet uit een lijst die iemand bedenkt. ' +
-      'Daarmee wordt er niets verzonnen (elke manier heeft een aantoonbare bron), niets gerangschikt ' +
-      '(de volgorde is die van de terreinen) en niets weggelaten. HET VELD `nodig` BLIJFT LEEG, en dat ' +
-      'is de kern van het besluit: welke voorwaarden een weg vergt, weet dit huis niet, en ze afleiden ' +
-      'uit de trefwoorden van openingen-kaart.js zou de motor laten GOKKEN welke randvoorwaarde bij ' +
-      'welke weg hoort. Liever een manier zonder voorwaarden dan een voorwaarde die niemand heeft ' +
-      'gemeten -- dat is grens zes van kern/knelpunt/index.js (hij rekent niets uit wat hij niet weet).'),
+    schakel(4, 'mens', 'knelpuntmotor', 'noemt alleen een doel; dit huis stelt de mogelijke wegen samen uit zijn eigen bronnen'),
     () => P('/api/knelpunt', { doel: 'ik wil weer aan het werk' }, M),
-    async r => ({ klopt: !!(r.data && r.data.manieren && r.data.manieren.length),
-      wat: 'de motor gaf ' + (((r.data && r.data.manieren) || []).length) + ' wegen bij een kaal doel' }));
+    async r => {
+      const m = (r.data && r.data.manieren) || [];
+      /* Drie eisen, en de laatste twee zijn de eigenlijke winst. Dat er wegen
+         zijn is de helft; dat het antwoord zegt WIE ze maakte en dat geen
+         ervan zich voordoet als nagegaan, is de andere. */
+      const samengesteld = r.data && r.data.manierenSamengesteld === true;
+      const geenValsOpen = m.length > 0 && m.every(x => x.stand !== 'open');
+      return { klopt: !!(m.length && samengesteld && geenValsOpen),
+        wat: 'de motor gaf ' + m.length + ' wegen bij een kaal doel (' +
+          m.map(x => x.id).join(', ') + '), samengesteld door het huis: ' + !!samengesteld +
+          ', geen ervan heet "open": ' + geenValsOpen };
+    });
 
   /* 5 -- DE WERKGEVER ZET EEN BIJBAAN OPEN, met een minimumleeftijd. Vanaf hier
      loopt de keten over routes die Adam WEL kan bereiken (/api/rtf/...), en dat

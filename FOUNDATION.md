@@ -256,17 +256,58 @@ Bij vrijwilligers en personeel ligt dit anders -- daar is bezetting een
 legitiem operationeel gegeven -- maar dan loopt het via `CONCERN.md` en de rol,
 niet via het gezin.
 
-### 5.5 Bewaarde groei valt onder de 18+-grens
+### 5.5 Bewaarde groei valt onder de 18+-grens, een leerdossier niet
 
-"Proof of Growth" is per definitie een prestatie die buiten het moment bewaard
-blijft. Daarmee valt hij onder `server/kern/spellen/grens.js`: alles wat een
-prestatie búiten het potje bewaart bestaat alleen voor geverifieerd volwassen
-leden. Onder die grens blijft leren volledig bruikbaar -- er wordt alleen niets
-van vastgelegd.
+Er liepen hier twee dingen door elkaar die niet hetzelfde zijn, en het verschil
+is op 14 september 2026 vastgelegd.
 
-De grens hangt aan `progressieMag` en krijgt geen tweede kopie. Een leerpaspoort
-dat zijn eigen leeftijdsregel meebrengt, is precies de zesde progressievorm waar
-de kop van dat bestand voor waarschuwt.
+**Wat onder `progressieMag` blijft vallen** is de *competitieve* progressielaag,
+precies zoals `CLAUDE.md` hem opsomt: highscores, ranglijsten, niveaus,
+prestaties, toernooien, seizoenen. Alles wat een prestatie bewaart om haar te
+kunnen *vergelijken* of als *stand* te laten gelden, bestaat alleen voor
+geverifieerd volwassen leden. "Proof of Growth" als badge of niveau hoort daar
+onverkort bij. Onder die grens blijft leren volledig bruikbaar -- er wordt alleen
+niets van vastgelegd.
+
+**Een leerdossier is iets anders**, en de letterlijke lezing van de oude regel
+liep daarop stuk: zij zou betekenen dat School van een kind niets vastlegt --
+geen behaald leerdoel, geen leerlijn, geen overgang. Dat is niet de bescherming
+die de grens bedoelt maar het tegenovergestelde ervan; een kind zonder dossier
+begint elk jaar opnieuw bij nul en heeft niets in handen als het van school
+wisselt. `SCHOOL.md` zegt zelf **"leren is geen wedstrijd"**, en juist dat is de
+reden: een leerdossier is geen wedstrijduitslag.
+
+Het dossier mag daarom op elke leeftijd bestaan, onder vier voorwaarden die
+samen de grens vormen -- valt er een weg, dan is het geen leerdossier meer maar
+de progressielaag onder een andere naam:
+
+1. **Het gaat over de persoon zelf en vergelijkt nooit.** Geen ranglijst, geen
+   reeks, geen percentiel, geen cohortpositie.
+2. **Geen niveau-label dat blijft plakken.** Een fase is een plaats op de ladder
+   en geen oordeel over het kind; een overgang wordt door een mens besloten.
+3. **Het is leesbaar voor de leerling zelf en voor wie al een rechtmatige
+   verhouding tot hem heeft** (ouder, docent) -- en voor niemand anders. Een
+   partner of een externe lezer komt er niet bij.
+4. **Het hangt aan de codenaam** en niet aan een naam.
+
+`server/kern/onderwijs.js` voldoet vandaag aan 1, 2 en 4, en zegt dat in zijn
+eigen kop met zoveel woorden: *"Wat hier staat is van de leerling zelf: geen
+ranglijsten, geen reeksen, en een overgang wordt geadviseerd door het systeem
+maar besloten door een mens."* De code krijgt dus geen leeftijdsregel erbij; de
+documenten zeggen voortaan wat de code al doet.
+
+**Voorwaarde 3 heeft vandaag geen handhaver, en dat staat hier liever dan een
+schijnbewaker.** `GELDING.json` wijst de vier cellen aan waar het om gaat --
+`tonen | school | {systeem, medewerker, partner, externeLezer}` staat op
+`GEDRAGEN_NIET_GEZIEN`: het cijfer verlaat het systeem via een route, en geen
+wachter kijkt mee wie het leest. Dat is geen overtreding en het is ook geen
+belofte; het is het eerstvolgende werk.
+
+De grens hangt voor de competitieve laag aan `progressieMag` en krijgt geen
+tweede kopie. Een leerdossier dat zijn eigen leeftijdsregel meebrengt, is precies
+de zesde progressievorm waar de kop van dat bestand voor waarschuwt -- en een
+leerdossier dat zich als progressielaag gaat gedragen, valt vanzelf weer onder
+`progressieMag`, want dan is aan een van de vier voorwaarden niet meer voldaan.
 
 ### 5.6 Geen misbruikgraaf die over codenamen heen kijkt
 

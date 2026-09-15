@@ -186,3 +186,28 @@ test('perBestand laat zien langs welk bestand een toets binnenkwam', () => {
   assert.ok(Object.keys(r.perBestand).length >= 1);
   assert.ok(r.perBestand[ECHTE.bestand] >= 1, ECHTE.bestand + ' hoort de band te zijn waarlangs hij binnenkwam');
 });
+
+/* ---- 6. VOLLEDIG IS LIDMAATSCHAP, GEEN AANTAL ------------------------------
+   De keten meldde "1901 van 1900 toetsbestanden gedraaid": de duurregisters
+   dragen een naam die niet op schijf staat (test/meterijk.test.js zet tijdens
+   zijn ijking een toetsbestand neer en haalt het weer weg). Met een TELLER kan
+   een ronde dus een echt bestand missen en toch volledig heten, zolang er maar
+   een vreemde naam tegenover staat -- een gelijkheidstoets met een blinde vlek
+   die eruitziet als succes. */
+test('een ronde met het juiste AANTAL maar een ontbrekend bestand is niet volledig', () => {
+  const opEenNa = TOETSEN.filter((t) => t !== A);
+  const metVreemde = ronde([...opEenNa, 'zz-bestaat-niet.test.js']);  // zelfde aantal, ander lidmaatschap
+  const u = meet([journaal(['TOETS ' + ECHTE.route + ' ' + B])], metVreemde);
+  assert.equal(u.gemeten.toetsenInDezeRonde, TOETSEN.length, 'het aantal klopt namelijk wel');
+  assert.equal(u.gemeten.rondeVolledig, false, 'maar er ontbreekt een echt toetsbestand');
+  assert.equal(u.gemeten.rondeGemist, 1);
+  assert.equal(u.gemeten.rondeVreemdeNamen, 1);
+  assert.equal(u.per[A].stand, 'nietInDezeRonde');
+});
+
+test('een volledige ronde heet volledig, ook met een vreemde naam erbij', () => {
+  const u = meet([journaal(['TOETS ' + ECHTE.route + ' ' + A])], ronde([...TOETSEN, 'zz-weg.test.js']));
+  assert.equal(u.gemeten.rondeVolledig, true);
+  assert.equal(u.gemeten.rondeGemist, 0);
+  assert.equal(u.gemeten.rondeVreemdeNamen, 1);
+});

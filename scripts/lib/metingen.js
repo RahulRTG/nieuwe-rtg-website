@@ -161,6 +161,7 @@ const REGISTER = {
   'GLUURRONDE.json': { meter: ['gluurGaten', 'gluurGecontroleerd'] },
   'VERSTRENGELING.json': { meter: ['verstrengelingOnverklaard'] },
   'BEWIJSLADDER.json': { meter: ['bewijsAlleenKeten'] },
+  'VERANDERBEREIK.json': { meter: ['veranderbereikZonderBereik'] },
   'ACTIVERING.json': { meter: ['activeringOndergrens'] },
   'TREDEPROEF.json': { meter: ['tredeLekken', 'tredeRondgangGezakt', 'tredeIngangLekken'] },
   'WEKKERS.json': { meter: ['wekkersOnverklaard', 'wekkersFunctieUitToch', 'wekkersZonderTrede'] },

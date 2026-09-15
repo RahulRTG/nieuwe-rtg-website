@@ -188,6 +188,25 @@ const METERS = [
      er mag geen bewijs BIJKOMEN dat alleen GitHub kan leveren zonder dat iemand
      dat opschrijft. */
   { sleutel: 'bewijsAlleenKeten', richting: 'omlaag', wat: 'bewijsmechanismen die alleen in de keten draaien en niet lokaal (uit BEWIJSLADDER.json)' },
+  /* TOETSEN ZONDER VASTGESTELD BEREIK (VERANDERBEREIK.json, npm run veranderbereik).
+
+     Van hoeveel toetsbestanden weet dit huis NIET welke bronbestanden ze dekken --
+     niet statisch (geen require-kant naar server/) en niet waargenomen (geen route
+     in het journaal die naar een bestand oplost). Dat getal is de bodem onder elk
+     impactplan: zolang het niet nul is, dekt geen enkele versmalling de suite en
+     draagt elke toets erin een volle ring (KEURING.md par. 1).
+
+     EEN ABSOLUUT GETAL EN GEEN PERCENTAGE, met opzet: een percentage daalt ook als
+     er toetsen bijkomen die niets bewijzen.
+
+     WAT DEZE TAND NIET KAN, en dat hoort erbij. Het register draagt `rondeVolledig`;
+     is dat false, dan is de meting over een DEEL van de suite gedaan en telt hij te
+     veel volle ringen. Die kant is veilig (te ruim), maar het betekent dat een
+     daling ook van een grotere ronde kan komen in plaats van van meer bereik. De
+     meter weigert daarom zelf een onvolledige ronde vast te leggen zonder
+     --onvolledig, en zijn eigen --controle slaat de vergelijking over zodra een van
+     beide rondes onvolledig is. Hier telt alleen wat er in het register staat. */
+  { sleutel: 'veranderbereikZonderBereik', richting: 'omlaag', wat: 'toetsen zonder vastgesteld bronbestandbereik (uit VERANDERBEREIK.json)' },
   { sleutel: 'tredeLekken', richting: 'omlaag', wat: 'routes buiten trede 0 die tóch antwoorden (uit TREDEPROEF.json)' },
   /* WEKKERS DIE GEEN ENKELE FUNCTIE RAAKT (WEKKERS.json).
 
@@ -1573,6 +1592,7 @@ function meet(bronnen) {
     verwijzingGebreken: leesRegister('MENSTAALPROEF.json', (j) => (j.verwijzingveiligheid.gebreken || []).length),
     mensmutatieZonderWacht: leesRegister('MENSMUTATIE.json', (j) => j.telling.geenWacht),
     bewijsAlleenKeten: leesRegister('BEWIJSLADDER.json', (j) => j.telling.alleenKeten),
+    veranderbereikZonderBereik: leesRegister('VERANDERBEREIK.json', (j) => j.gemeten.zonderBereik),
     /* Vers gerekend en niet uit het register gelezen: deze meting kost een paar
        milliseconden en een afdruk die achterloopt zou hier een groen getal
        geven voor een poort die inmiddels openstaat. */

@@ -26,62 +26,25 @@
    als een meting en is een gok. */
 'use strict';
 
-const { geldrij } = require('./waarde/economischeherkomst');
-const { voorAanvraag } = require('./reisbureau-samenstelling');
+const { geldrijenVoor } = require('./reisbureau-geldrijen');
 
 /* De positie waar RTG de reissom int. Een eigen naam en niet `rtg:reserve`:
    die bak is van de fondsafdracht (opzet/kern-geldnaden.js), en twee
    geldstromen op een positie maken elk saldo onverklaarbaar. */
 const KAS = 'rtg:reisbureau';
 
-/* ---------- PUUR: de samenstelling wordt een stel geldrijen ----------
-   Geen db, geen pay, geen sessie -- zodat een toets hem kan voeden zonder dat er
-   een server draait, en zodat de invariant hieronder aantoonbaar is in plaats
-   van beloofd. */
-function geldrijenVoor({ trip, personen, boekingId, valuta }) {
-  const s = voorAanvraag(trip, personen);
-  if (!s.bekend) return { ok: false, waarom: s.waarom, rijen: [], totaalCenten: null };
-
-  const bron = boekingId ? ('payboeking:' + boekingId) : null;
-  const rijen = s.regels.map(o => geldrij({
-    bedragCenten: o.centen,
-    valuta: valuta || 'EUR',
-    /* WIE BETAALDE: het lid. Voor elke rij dezelfde, want er is een betaler. */
-    economischeHerkomst: 'lid',
-    /* AAN WIE HIJ TOEKOMT: per onderdeel verschillend, uit de commerciele bron
-       en nergens afgeleid. */
-    economischeEigenaar: o.eigenaar,
-    /* WAAR HET GELD FEITELIJK HEEN GING: naar RTG. Ook voor het deel van het
-       hotel -- dat is de hele reden dat dit veld bestaat. Zou hier `derde`
-       staan, dan beweert de rij een uitkering die niet heeft plaatsgevonden. */
-    naarWie: 'rtg',
-    grond: o.wat || o.soort,
-    bronObject: bron,
-    relatie: o.leverancier || null,
-    /* HET LAND BLIJFT LEEG. `trip.dest` is een plaatsnaam ("Ibiza") en daar
-       valt geen landcode uit af te leiden zonder te raden -- dezelfde regel als
-       in KAARTEN.md: een ingelezen waarde wordt nooit stilletjes verbeterd. */
-    land: null,
-    bewijs: 'kern/reisbureau-samenstelling.js, onderdeel van reis ' + String(trip && trip.id || '?')
-  }));
-
-  /* DE INVARIANT VAN DEZE SCHAKEL: de herkomstrijen tellen op tot precies het
-     bedrag dat het lid betaalde. Niet "ongeveer", en er wordt geen restrij
-     bijgemaakt om het kloppend te krijgen -- een restrij zonder eigenaar is
-     precies de cent die later aan de verkeerde kant van de streep belandt. */
-  const som = rijen.reduce((a, r) => a + (r.bedragCenten || 0), 0);
-  if (som !== s.totaalCenten) {
-    return {
-      ok: false, rijen: [], totaalCenten: null,
-      waarom: 'de herkomstrijen tellen op tot ' + som + ' cent en de reissom is ' + s.totaalCenten +
-        ' cent. Er wordt niets bijgeboekt om het verschil te dekken.'
-    };
-  }
-  return { ok: true, rijen, totaalCenten: s.totaalCenten, personen: s.personen, waarom: null };
-}
-
-function maakReisbetaling({ db, save, payVan, nu }) {
+function maakReisbetaling({ db, save, crypto, payVan, nu }) {
   const klok = nu || (() => new Date().toISOString());
+  /* EEN BEWAARDE RIJ HEEFT EEN EIGEN IDENTITEIT, en dat is hier geen formaliteit.
+     Zonder id kan de klaargezette uitkering alleen naar de REIS wijzen en niet
+     naar de herkomstrij die hij afwikkelt -- en juist dat is wat een mens nodig
+     heeft die straks het deel van het hotel overmaakt en moet kunnen aantonen
+     welke cent hij daarmee afboekt. (Het is ook wat scripts/objectmodel.js als
+     kenmerk van een bewaarde vorm leest: vier velden en een id. Dat die lezer en
+     deze reden samenvallen is geen toeval -- de heuristiek codeert de eigenschap.) */
+  const nieuwId = (voorvoegsel) => voorvoegsel + '-' +
+    (crypto ? crypto.randomBytes(5).toString('hex').toUpperCase()
+            : Math.abs(Date.now() % 1e10).toString(16).toUpperCase());
   const eigen = require('./eigencollectie')({
     db, domein: 'kern/reisbureau-betaling',
     bezit: { reisGeldrijen: 'lijst', reisUitkeringen: 'lijst' }
@@ -130,14 +93,45 @@ function maakReisbetaling({ db, save, payVan, nu }) {
        naar een boeking wijst die niet bestaat, is een bewering zonder bewijs. */
     const metBoeking = geldrijenVoor({ trip, personen: a.personen, boekingId: b.boeking.id, valuta: 'EUR' });
     const stempel = klok();
-    for (const r of metBoeking.rijen) eigen.bak('reisGeldrijen').push({ ref: a.ref, at: stempel, ...r });
+    /* DE BEWAARDE RIJ WORDT VELD VOOR VELD OPGESCHREVEN EN NIET MET EEN SPREAD,
+       en dat is geen stijl. Hier stond `{ ref, at, ...r }`, en daarmee was de
+       herkomst onzichtbaar voor de meter die er nu juist voor bestaat:
+       scripts/doorbelasting.js leest BEWAARDE vormen statisch, en door een
+       spread kijkt geen enkele lezer heen. De hele migratie bewoog de ratel
+       daardoor geen streep.
 
-    /* En wat er aan derden TOEKOMT, wordt klaargezet en niet uitgevoerd. */
+       Het is bovendien dezelfde richting als AI-CONTEXT-01: bij een spread
+       passeert elk NIEUW veld vanzelf, bij een verklaarde lijst blijft het
+       buiten tot iemand het er bewust bij zet. Bij een AI-context is dat een
+       lek; hier is het een blinde vlek in de verantwoording. */
     for (const r of metBoeking.rijen) {
-      if (r.economischeEigenaar === 'rtg') continue;
+      const rijId = nieuwId('RGH');
+      eigen.bak('reisGeldrijen').push({
+        id: rijId, ref: a.ref, at: stempel,
+        bedragCenten: r.bedragCenten, valuta: r.valuta,
+        /* DE PRECIEZE NAMEN BLIJVEN STAAN. Kort `herkomst` zou hier botsen met
+           het GELIJKNAMIGE veld in reisbureau-samenstelling.js, en die betekent
+           iets anders: daar partner/rtg/extern (waar kwam het onderdeel
+           vandaan), hier lid/derde/rtg (van wie kwam de WAARDE). Twee
+           betekenissen op een woord binnen een functie is de botsing uit
+           SEMANTIEK.json, en die ontstaat het makkelijkst bij het afkorten. */
+        economischeHerkomst: r.economischeHerkomst,
+        economischeEigenaar: r.economischeEigenaar, naarWie: r.naarWie,
+        grond: r.grond, bronObject: r.bronObject, relatie: r.relatie,
+        land: r.land, bewijs: r.bewijs
+      });
+    }
+
+    /* En wat er aan derden TOEKOMT, wordt klaargezet en niet uitgevoerd. Elke
+       uitkering wijst naar de HERKOMSTRIJ die hij afwikkelt (`geldrij`) en niet
+       alleen naar de reis: anders kan een mens die het deel van het hotel
+       overmaakt niet aantonen welke cent hij daarmee afboekt. */
+    for (const g of eigen.kijk('reisGeldrijen')) {
+      if (g.ref !== a.ref || g.at !== stempel || g.economischeEigenaar === 'rtg') continue;
       eigen.bak('reisUitkeringen').push({
-        ref: a.ref, at: stempel, centen: r.bedragCenten, valuta: r.valuta,
-        aan: r.economischeEigenaar, relatie: r.relatie, grond: r.grond,
+        id: nieuwId('RUK'), geldrij: g.id, ref: a.ref, at: stempel,
+        centen: g.bedragCenten, valuta: g.valuta,
+        aan: g.economischeEigenaar, relatie: g.relatie, grond: g.grond,
         uitgevoerd: false,
         hoe: 'klaargezet; een mens van het kantoor voert hem uit langs kern/pay (GELD.md)'
       });
@@ -160,4 +154,4 @@ function maakReisbetaling({ db, save, payVan, nu }) {
   return { reisbetaling: { betaal, rijenVan, alleRijen, uitkeringenVan, KAS } };
 }
 
-module.exports = { maakReisbetaling, geldrijenVoor, KAS };
+module.exports = { maakReisbetaling, KAS };

@@ -146,7 +146,7 @@ Object.assign(kern, require('../kern/reisbureau').maakReisbureau({ db, save, cry
 /* De geldgebeurtenis van een reis (kern/reisbureau-betaling.js): een boeking,
    veel herkomstrijen. Waarom, staat daar. `pay` is laat gebonden. */
 Object.assign(kern, require('../kern/reisbureau-betaling').maakReisbetaling({
-  db, save, payVan: () => kern.pay }));
+  db, save, crypto, payVan: () => kern.pay }));
 /* Het REISAANBOD (kern/reisaanbod.js): de enige schrijver van partnerTrips, de
    bak die het reisbureau hierboven leest. Waarom die schrijver moest bestaan
    staat in de kop daar; de balie zit in routes/kantoren/reizen.js. */

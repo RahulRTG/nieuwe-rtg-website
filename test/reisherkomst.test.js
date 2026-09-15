@@ -21,7 +21,7 @@ const fs = require('fs');
 const { startServer, stop, kantoorAlsPersoon, keurLidGoed } = require('./helper');
 
 const sam = require('../server/kern/reisbureau-samenstelling.js');
-const { geldrijenVoor } = require('../server/kern/reisbureau-betaling.js');
+const { geldrijenVoor } = require('../server/kern/reisbureau-geldrijen.js');
 const bb = require('../server/kern/waarde/bijdragebasis.js');
 const eh = require('../server/kern/waarde/economischeherkomst.js');
 const vergoeding = require('../server/kern/commercie/vergoeding.js');

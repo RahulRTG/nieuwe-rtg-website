@@ -237,6 +237,77 @@ noemen. Dat is dezelfde vorm als de terugstortstand in `CLAUDE.md` — een knop 
 zelf de juridische positie ís, en als de schakelaar in `GIFT.md` par. 4: *de
 schakelaar ÍS de positie*, niet twee dingen die toevallig samenhangen.
 
+
+### 4.1a De basis onder die afdracht is nu een PRIMITIEF, en de norm is een gezaaide wereld
+
+Welke van de twee wegen hierboven het ook wordt, allebei rekenen ze over een
+**bijdragebasis** — bruto min wat rechtstreeks aan derden is doorbelast. Zo'n
+basis is alleen een eerlijk getal als hij een reproduceerbare functie van
+bronregels is; anders is het een commercieel bedacht getal met een formule
+eromheen, en is de eerste onenigheid met een exploitant meteen principieel.
+Vandaar dat de meting vóór de vergoeding komt, en niet andersom.
+
+**Besluit 1: herkomst is drie vragen en geen veld.** De eerste ingeving was
+`herkomst: 'partner'` op de geldrij, en die sneuvelt op een gewone regel: een
+klant betaalt EUR 800, daarvan komt EUR 550 toe aan een hotel, en RTG INT het
+hele bedrag. Wie daar alleen de betaler van bewaart, kan later niet zeggen van
+wie het geld was; wie alleen de eigenaar bewaart, kan niet zeggen wie het
+betaald heeft; en wie de ene uit de andere AFLEIDT, verzint de helft.
+`server/kern/waarde/economischeherkomst.js` draagt daarom drie velden die nooit
+mogen samenvallen:
+
+| veld | vraag |
+|---|---|
+| `economischeHerkomst` | van wie kwam de waarde |
+| `economischeEigenaar` | aan wie komt hij economisch toe |
+| `naarWie` | waar gaat het geld feitelijk heen |
+
+Ze vallen vaak samen en ze zijn nooit hetzelfde veld. In het voorbeeld hierboven
+zijn ze alle drie verschillend, en dat is geen randgeval maar de normale vorm van
+een reis. `bestemming` is bewust vermeden: dat woord is hier 167 bestanden lang
+een REISbestemming, en een tweede betekenis op de centrale naam van een
+reisbedrijf is de `VERMOGENS`-botsing uit `SEMANTIEK.json`.
+
+Dit is de **primitief en niet de migratie**. Van de
+<!--getal:doorbelasting.geldvormen-->208<!--/getal--> geldvormen in dit huis
+dragen er <!--getal:doorbelasting.volgbaar-->26<!--/getal--> een aantoonbare
+herkomst; die andere <!--getal:doorbelasting.nietVolgbaar-->182<!--/getal-->
+gaan hier niet vanzelf op over. Wat de module levert is de VORM waarin een
+geldrij het wél kan dragen, plus het oordeel of een gegeven rij te volgen is. De
+ratel eromheen — volgbaar alleen omhoog, niet-volgbaar alleen omlaag — maakt daar
+een migratiepad van in plaats van een big bang. Beide modules hebben vandaag
+**nul aanroepers**, en dat staat als schuld in `NORM.json` met de weg eruit
+erbij: dat is dezelfde tussenstand die dit huis al kent van
+`kern/namens/versmalling.js` en `kern/stuur/mandaat.js`.
+
+**Besluit 2: de norm is een gezaaide wereld en nooit de productiedata.**
+`DOORBELASTING.json` valt daarom in twee helften die nooit worden opgeteld:
+
+| | wat het is | poort? |
+|---|---|---|
+| **B1 — de norm** | `scripts/lib/economiewereld.js`: <!--getal:doorbelasting.normRijen-->22<!--/getal--> deterministische rijen, in de keuring | ja, met twee ratels |
+| **B2 — de werkelijkheid** | de echte opslag, elk bedrag ingedeeld | nee, observatie |
+
+Productiedata is uitstekend om te zien wat RTG werkelijk verdient en ongeschikt
+als definitie van correctheid: haar samenstelling verandert voortdurend. Vandaag
+geen terugboekingen, morgen wel; vandaag geen yen, volgende week wel. **Een
+regressie die alleen zichtbaar is als er toevallig een yen in de data zit, is
+geen regressietoets.**
+
+De gezaaide wereld is met opzet gemeen: een pakketreis die uiteenvalt in hotel,
+vlucht, eigen dienst en btw; geld dat RTG int maar niet toekomt; drie soorten
+terugbetaling die elk iets anders betekenen (gedeeltelijk, volledig, door de bank
+afgedwongen); vouchers en cadeaubonnen, die een VERPLICHTING zijn en geen omzet;
+en drie munten, waaronder de yen die geen honderdsten heeft. En
+<!--getal:doorbelasting.normNietVolgbaar-->4<!--/getal--> rijen zijn er met opzet
+**niet** te volgen — een wereld waarin alles keurig klopt, meet de enige vraag
+niet die ertoe doet: ziet de meter een gat, of rekent hij het dicht?
+
+Die wereld verdiende zich binnen een minuut terug. De onbekende post liep
+**negatief** (−52260), omdat een terugbetaling toekomt aan het LID en `lid` in de
+restbak viel. Een negatief gat is precies het soort getal waar niemand op klikt
+omdat het klein lijkt.
+
 ### 4.2 De vergunningsvraag is al gesteld — en met nee beantwoord
 
 Dit is het punt waar het eerste concept van dit document ernaast zat, en de

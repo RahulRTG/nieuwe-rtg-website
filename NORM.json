@@ -2365,11 +2365,12 @@
     },
     {
       "datum": "2026-09-15",
-      "soort": "besluit",
+      "soort": "structureel",
       "sleutel": "kernBreedte",
       "van": 1578,
       "meter": "kernBreedte 1578 -> 1579",
-      "reden": "RTG Neiging (NEIGING.md) voegt EEN kern-eigenschap toe: `kern.neiging`, een object met zeven functies erachter. Dat is het minimum dat een laag met een eigen router kan kosten. De eerste versie legde elf LOSSE namen op de kern en duwde deze meter met zeven omhoog; dat is hersteld naar de vorm die kern/socialewereld.js en kern/geldwereld.js al gebruiken (kern.neiging.intake(...)), en GRENZEN.json laat voor het domein `neiging` precies die ene naam door. Deze plus-een is dus geen slordigheid maar de prijs van een nieuwe LAAG, en die hoort per laag te worden betaald en niet per functie -- zou de meter met het aantal routes meegroeien, dan meet hij niets meer. Geen vervaldatum: dit is geen schuld die je aflost maar een laag die bestaat; hij daalt weer zodra de laag verdwijnt."
+      "reden": "STRUCTUREEL en geen schuld: er is een LAAG bijgekomen, en dat is een verandering in wat er gemeten wordt -- niet iets wat we even niet konden. RTG Neiging (NEIGING.md) voegt EEN kern-eigenschap toe: `kern.neiging`, een object met zeven functies erachter. Dat is het minimum dat een laag met een eigen router kan kosten. De eerste versie legde elf LOSSE namen op de kern en duwde deze meter met zeven omhoog; dat is hersteld naar de vorm die kern/socialewereld.js en kern/geldwereld.js al gebruiken (kern.neiging.intake(...)), en GRENZEN.json laat voor het domein `neiging` precies die ene naam door. Deze plus-een hoort per LAAG te worden betaald en niet per functie -- zou de meter met het aantal routes meegroeien, dan meet hij niets meer. Daarom ook geen vervaldatum: hij daalt weer zodra de laag verdwijnt, en niet doordat iemand hem aflost.",
+      "waarheen": "GRENZEN.json (domein `neiging`, precies EEN naam) plus server/opzet/domeingrens.js, die bij een naam buiten die lijst GOOIT in plaats van undefined te geven. Wat kernBreedte meet is koppeling: hoeveel van de kern een route kan aanraken. Voor deze laag draagt de domeingrens dat nu HARDER dan een telling ooit deed -- de zeven routes kunnen aantoonbaar bij precies een naam, en een achtste erbij zetten vraagt een regel in GRENZEN.json die iemand moet schrijven. De plus-een in de telling is dus de prijs van een laag, en de belofte eronder is verhuisd naar de poort die hem afdwingt in plaats van telt."
     }
   ],
   "prestatie": {

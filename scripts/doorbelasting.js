@@ -187,6 +187,7 @@ function norm() {
   const { volgbaar, waaromNietVolgbaar } = require(
     path.join(WORTEL, 'server/kern/waarde/economischeherkomst.js'));
   const { naarEigenaar } = require(path.join(WORTEL, 'server/kern/waarde/herkomstsplitsing.js'));
+  const dk = require(path.join(WORTEL, 'server/kern/waarde/dekking.js'));
 
   const rijen = wereld();
   const nietVolgbaar = rijen.filter(r => !volgbaar(r));
@@ -203,11 +204,20 @@ function norm() {
       grond: r.grond, waarom: waaromNietVolgbaar(r)
     })),
     splitsing: s,
+    /* DE TWEE DEKKINGSGETALLEN, en ze staan hier onder EEN sleutel die het woord
+       zaadwereld draagt. Dat is geen sierlijkheid: een percentage dat `dekking`
+       heet en over een fixture is gerekend, wordt bij het overtypen vanzelf het
+       cijfer over de werkelijkheid. De productiekant staat elders in dit
+       register en kan die naam niet lenen. */
+    dekkingZaadwereld: dk.dekkingOver(rijen),
+    euroDekkingZaadwereld: dk.euroDekking(rijen, { wereld: 'zaadwereld' }),
     verwacht: VERWACHT,
     klopt: rijen.length === VERWACHT.rijen && nietVolgbaar.length === VERWACHT.nietVolgbaar,
     grens: 'Dit is de NORM en geen waarneming: deze wereld is verzonnen en deterministisch. ' +
       'Hij bewijst dat de machine niet gaat raden, en zegt NIETS over wat RTG werkelijk verdient. ' +
-      'Dat staat in B2, en die twee worden nooit opgeteld.'
+      'Dat staat in B2, en die twee worden nooit opgeteld. Dat geldt ook voor de dekkingsgetallen ' +
+      'hierboven: een zaadwereld bewijst dat de rekenmachine werkt, productie vertelt hoeveel van ' +
+      'de werkelijkheid zij begrijpt.'
   };
 }
 
@@ -233,10 +243,15 @@ function euros() {
   for (const k of KLASSEN) perKlasse[k] = { rijen: 0, centen: 0 };
   const redenen = {};
   let rijen = 0;
+  /* De rijen die de KANONIEKE vorm dragen (kern/waarde/economischeherkomst.js).
+     Ze worden apart bewaard omdat alleen zij de strenge teller kunnen halen: de
+     rest van de opslag draagt wel bedragen maar geen economische keten. */
+  const canoniek = [];
 
   const loop = (waarde, collectie) => {
     if (Array.isArray(waarde)) { for (const r of waarde) loop(r, collectie); return; }
     if (!waarde || typeof waarde !== 'object') return;
+    if (waarde.economischeHerkomst !== undefined && waarde.bedragCenten !== undefined) canoniek.push(waarde);
     const u = deelIn(waarde);
     if (u.bedrag != null) {
       rijen++;
@@ -256,13 +271,94 @@ function euros() {
 
   const noemer = KLASSEN.reduce((a, k) => a + perKlasse[k].centen, 0);
   return {
-    noemerCenten: noemer, rijen, perKlasse,
+    noemerCenten: noemer, rijen, perKlasse, canoniek,
     redenen: Object.entries(redenen).sort((a, b) => b[1] - a[1]).slice(0, 12)
       .map(([reden, n]) => ({ reden, rijen: n })),
     waaromGeen: rijen === 0
       ? 'de opslag draagt geen enkele rij met een bedrag. server/seed/index.js zet `invoices: []` ' +
         'met opzet, dus dit is geen storing maar een lege noemer -- en een lege noemer is geen 100%.'
       : null
+  };
+}
+
+/* ---------- B3. DE EURODEKKING OVER DE WERKELIJKE OPSLAG ----------
+   Het vierde getal, en het strengste. Vormdekking (A) telt VORMEN, herkomst- en
+   economische dekking (B1) rekenen over een FIXTURE; dit rekent over het geld
+   dat er werkelijk staat.
+
+   DE NOEMER IS ALLE GELD EN NIET DE KANONIEKE RIJEN. Dat is de hele reden dat
+   dit getal iets waard is. Zou de noemer de canonieke rijen zijn, dan meldt een
+   huis met zes goede rijen naast tienduizend ongeclassificeerde bedragen
+   doodleuk 100% -- en dat is precies het cijfer waar een exploitant zijn
+   vergoeding op baseert.
+
+   DE WERELD WORDT VERKLAARD EN NIET GERADEN. Op een ontwikkelmachine is
+   server/data/store.db de gezaaide wereld, en die is uiterlijk niet te
+   onderscheiden van een echte. Een meter die dat gokt, plakt vroeg of laat het
+   etiket PRODUCTIE op zaaddata. RTG_ECONOMIE_WERELD zegt het, en zwijgt de
+   omgeving, dan is de uitkomst GEEN_NOEMER met die reden -- nooit stilzwijgend
+   productie, want dat is het cijfer waar iemand een besluit op neemt. */
+const GRENS_B3 = 'De noemer is ELK bedrag dat deze meter in de opslag vindt, niet alleen de rijen ' +
+  'die de economische keten dragen -- anders meldt zes goede rijen naast tienduizend losse ' +
+  'bedragen 100%. De teller is de STRENGE: bedrag, herkomst, eigenaar, tegenpartij, bron en ' +
+  'classificatie moeten er alle zes staan. Dit getal wordt nooit vergeleken met de vormdekking ' +
+  'uit A (die telt vormen) en nooit met de dekking uit B1 (die rekent over een fixture).';
+
+function euroDekkingProductie(b) {
+  const dk = require(path.join(WORTEL, 'server/kern/waarde/dekking.js'));
+  const verklaardeWereld = process.env.RTG_ECONOMIE_WERELD || null;
+  const canoniek = b.canoniek || [];
+
+  /* DE REDENEN ZIJN EEN LIJST EN GEEN ZIN. Er kan meer dan een ding tegelijk
+     mis zijn, en wie er een van repareert hoort te zien dat het getal daarna
+     nog steeds null is -- met de overgebleven reden erbij. Een enkele reden
+     laat de tweede pas opduiken als de eerste weg is, en dat leest als een
+     nieuwe storing. */
+  const beletsels = [];
+  if (!b.noemerCenten) {
+    beletsels.push(b.waaromGeen || 'er staat geen bedrag in de opslag; een percentage over een ' +
+      'lege noemer is fictie en geen voorzichtige nul');
+  }
+  /* DE OPSLAG DRAAGT GEEN VALUTA. De bedragen in server/data/store.db staan als
+     kaal getal; deze meter kan dus niet vaststellen dat de noemer euro's zijn.
+     Een cijfer dat EURODEKKING heet over een noemer zonder munt, is precies de
+     fout die kern/waarde/dekking.js per valuta weigert te maken. */
+  beletsels.push('de bedragen in de opslag dragen geen valuta, dus deze noemer is niet aantoonbaar ' +
+    'in euro; kern/waarde/dekking.js weigert om die reden ook een totaal over meerdere munten');
+  if (verklaardeWereld !== 'productie' && verklaardeWereld !== 'zaadwereld') {
+    beletsels.push('niemand heeft verklaard of deze opslag productie of een ontwikkelomgeving is ' +
+      '(RTG_ECONOMIE_WERELD is niet gezet). Een dekkingscijfer zonder die verklaring leest als ' +
+      'productie, en zaaddata is uiterlijk niet van echte handel te onderscheiden.');
+  }
+
+  /* De teller wordt WEL gerekend, ook als hij niet gedeeld mag worden: wie de
+     beletsels opruimt, hoort niet ook nog te moeten raden hoe groot het
+     verklaarde deel was. */
+  let verklaard = 0;
+  const ontbreekt = {};
+  for (const r of canoniek) {
+    const u = dk.volledigVerklaard(r);
+    if (u.ok) verklaard += Math.abs(Number(r.bedragCenten) || 0);
+    for (const m of u.mist) ontbreekt[m] = (ontbreekt[m] || 0) + 1;
+  }
+  const euro = (c) => Number((c / 100).toFixed(2));
+
+  if (beletsels.length) {
+    return {
+      status: 'GEEN_NOEMER', percentage: null, verklaardEuro: null, totaalEuro: null,
+      verklaardCenten: verklaard, noemerCenten: b.noemerCenten || 0,
+      kanoniekeRijen: canoniek.length, bedragrijen: b.rijen || 0, ontbreekt,
+      beletsels, reden: beletsels[0], grens: GRENS_B3
+    };
+  }
+  const status = verklaardeWereld === 'productie' ? 'PRODUCTIE' : 'ZAADWERELD';
+  return {
+    status,
+    percentage: Number((100 * verklaard / b.noemerCenten).toFixed(1)),
+    verklaardEuro: euro(verklaard), totaalEuro: euro(b.noemerCenten),
+    verklaardCenten: verklaard, noemerCenten: b.noemerCenten,
+    kanoniekeRijen: canoniek.length, bedragrijen: b.rijen || 0, ontbreekt,
+    beletsels: [], reden: dk.TOESTANDEN[status], grens: GRENS_B3
   };
 }
 
@@ -286,8 +382,17 @@ function meet() {
       'wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en ' +
       'komen allebei iemand goed uit',
     vorm: a,
+    /* VIER GETALLEN DIE ELK EEN ANDERE VRAAG BEANTWOORDEN, en die daarom vier
+       sleutels hebben in plaats van een gemiddelde. Een percentage dat vier
+       waarheden moet dragen, draagt er geen een:
+         vorm.volgbaar          -- KAN een rij herkomst dragen (structuur)
+         norm.dekkingZaadwereld -- draagt hij hem, in een fixture (rekenmachine)
+         euroDekkingProductie   -- hoeveel van het ECHTE geld (werkelijkheid)
+       en de vierde is de uitsplitsing binnen de tweede: herkomstdekking (zacht)
+       naast economisch verklaard (streng). */
     norm: norm(),
-    euros: b
+    euros: (({ canoniek, ...rest }) => rest)(b),
+    euroDekkingProductie: euroDekkingProductie(b)
   };
 }
 
@@ -332,6 +437,39 @@ function druk(u) {
   if (b.redenen && b.redenen.length) {
     console.log('\n    waarom een rij zo is ingedeeld (top):');
     for (const r of b.redenen) console.log('      ' + String(r.rijen).padStart(5) + '  ' + r.reden);
+  }
+
+  /* VIER GETALLEN, VIER REGELS, GEEN GEMIDDELDE. Ze staan onder elkaar met hun
+     noemer erbij, want het gevaar van deze vier is niet dat iemand ze niet
+     begrijpt maar dat iemand er een van citeert als "de dekking". */
+  const d = u.norm.dekkingZaadwereld, ep = u.euroDekkingProductie;
+  console.log('\n  DE VIER GETALLEN -- ze beantwoorden vier vragen en worden nooit samengevoegd');
+  console.log('    1. vormdekking            ' +
+    (100 * a.volgbaar / (a.geldvormen || 1)).toFixed(1).padStart(6) + '%   ' +
+    a.volgbaar + '/' + a.geldvormen + ' vormen KUNNEN herkomst dragen (structuur, ondergrens)');
+  const kop = d.eenValuta ? d.eenValuta : 'EUR';
+  const eur = (d.perValuta && d.perValuta[kop]) || null;
+  console.log('    2. herkomstdekking        ' +
+    (eur ? String(eur.herkomst.percentage).padStart(6) + '%' : '  null ') +
+    '   zaadwereld, ' + kop + ': draagt een rij een herkomst (zacht)');
+  console.log('    3. economisch verklaard   ' +
+    (eur ? String(eur.economisch.percentage).padStart(6) + '%' : '  null ') +
+    '   zaadwereld, ' + kop + ': de HELE keten -- bedrag, herkomst, eigenaar, ' +
+    'tegenpartij, bron, classificatie');
+  console.log('    4. eurodekking productie  ' +
+    (ep.percentage == null ? '  null ' : String(ep.percentage).padStart(6) + '%') +
+    '   ' + ep.status);
+  if (ep.beletsels && ep.beletsels.length) {
+    for (const r of ep.beletsels) console.log('         - ' + r);
+  }
+  if (d.waaromGeenTotaal) {
+    console.log('\n    en 2 en 3 gaan PER VALUTA, niet over alles heen:');
+    console.log('      ' + d.waaromGeenTotaal);
+    for (const [v, bak] of Object.entries(d.perValuta)) {
+      console.log('      ' + v.padEnd(5) + String(bak.rijen).padStart(3) + ' rijen  ' +
+        'herkomst ' + String(bak.herkomst.percentage).padStart(5) + '%   ' +
+        'economisch ' + String(bak.economisch.percentage).padStart(5) + '%');
+    }
   }
 }
 

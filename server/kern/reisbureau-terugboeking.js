@@ -1,42 +1,23 @@
-/* DE WEG TERUG -- en waarom de waarheid dan ACHTERUIT moet blijven kloppen.
+/* DE WEG TERUG VAN EEN REIS -- de toepassing van ECON-01.
 
    Puur, net als ./reisbureau-geldrijen.js: er gaan bewaarde herkomstrijen in en
    er komen spiegelrijen uit. Geen db, geen pay. De opslag blijft bij de eigenaar
    van de collectie (./reisbureau-betaling.js), want twee schrijvers op een
-   verklaarde bak is precies wat keuringsregel 63 tegenhoudt.
+   verklaarde bak is wat keuringsregel 63 tegenhoudt.
 
-   ================== DE KEUZE DIE ALLES BEPAALT ==================
+   DE REGEL ZELF STAAT HIER NIET. Hij woont in kern/waarde/omkering.js als
+   ECON-01 -- `geldrichting is niet hetzelfde als economische eigendom` -- en
+   dat is met opzet: dezelfde vraag komt terug bij een chargeback, een storno,
+   een voucher, een correctieboeking en een afwikkeling met een leverancier. Wie
+   hem hier zou uitschrijven, zet dezelfde waarheid op zeven plekken en laat de
+   zevende afdrijven.
 
-   Welke EIGENAAR draagt een spiegelrij? Er zijn twee antwoorden die allebei
-   plausibel klinken, en maar een ervan houdt de boeken eerlijk.
-
-   FOUT: eigenaar = `lid`, want het geld gaat terug naar het lid. Dan telt de
-   spiegel in de bak `aanDeKlant` en blijven doorbelasting en bijdragebasis op
-   hun oude bedrag staan. Na een VOLLEDIGE terugbetaling zegt de uitslag dan nog
-   steeds dat RTG EUR 120 heeft verdiend en EUR 1.800 aan derden toekomt, met
-   daarnaast een negatieve post van EUR 1.950. Het bruto klopt (nul) en elke
-   afzonderlijke bak liegt.
-
-   GOED: eigenaar = DEZELFDE als op de oorspronkelijke rij. Een hotelnacht van
-   EUR 610 terugdraaien is min EUR 610 DOORBELASTING, niet een schuld aan de
-   klant. Na een volledige terugbetaling staan doorbelasting, bijdragebasis en
-   belasting alle drie op nul, en dat is wat er economisch is gebeurd: niemand
-   heeft iets overgehouden.
-
-   Wat wel omdraait zijn de twee ANDERE vragen. `economischeHerkomst` wordt
-   `rtg` (de waarde komt nu van RTG) en `naarWie` wordt `lid` (daar gaat hij
-   heen). Dat is de hele reden dat die drie velden apart bestaan: bij een
-   terugboeking bewegen er twee mee en blijft er een staan.
-
-   ================== GEEN GELD, ALLEEN DE WAARHEID ==================
-
-   Deze laag verplaatst niets. Wat eruit komt is de administratieve spiegel plus
-   een teruggaveRECHT dat een mens uitvoert -- dezelfde vorm als
-   kern/horeca/correctie.js en dezelfde regel als in CLAUDE.md: een afzegging
-   verplaatst geen geld maar legt vast wat er niet is geregeld. */
+   Deze module doet dus drie dingen die WEL van reizen zijn: welke rijen mogen
+   terug (niet twee keer, niet een rij die zelf al een spiegel is), wat een
+   gedeeltelijke terugboeking betekent, en of de uitslag daarna nog sluit. */
 'use strict';
 
-const { geldrij } = require('./waarde/economischeherkomst');
+const { keerOm, schendingen, REGEL } = require('./waarde/omkering');
 
 /* ---------- de spiegel ----------
    `rijen` zijn de BEWAARDE herkomstrijen van een betaalde reis; `kiesIds` is
@@ -70,23 +51,20 @@ function spiegelVoor({ rijen, kiesIds, reden, boekingId }) {
     return { ok: false, rijen: [], waarom: 'deze rijen zijn al teruggedraaid' };
   }
 
-  const rijenUit = bruikbaar.map(r => ({
-    spiegelVan: r.id,
-    rij: geldrij({
-      bedragCenten: -Math.abs(Number(r.bedragCenten) || 0),
-      valuta: r.valuta,
-      /* De waarde komt nu van RTG en gaat naar het lid -- twee velden draaien om. */
-      economischeHerkomst: 'rtg',
-      /* En dit veld draait NIET om: zie de kop. Een hotelnacht terugdraaien is
-         min doorbelasting, geen schuld aan de klant. */
-      economischeEigenaar: r.economischeEigenaar,
-      naarWie: 'lid',
-      grond: 'terugboeking (' + grond + '): ' + (r.grond || ''),
+  const rijenUit = [];
+  for (const r of bruikbaar) {
+    const om = keerOm(r, { grond: 'terugbetaling', reden: grond,
       bronObject: boekingId ? ('payboeking:' + boekingId) : r.bronObject,
-      relatie: r.relatie, land: r.land,
-      bewijs: 'spiegel van herkomstrij ' + r.id
-    })
-  }));
+      bewijs: REGEL + ': spiegel van herkomstrij ' + r.id });
+    if (!om.ok) return { ok: false, rijen: [], waarom: om.waarom };
+    /* DE HANDHAVER DRAAIT OP DE UITKOMST EN NIET OP HET VERTROUWEN. keerOm en
+       schendingen komen uit dezelfde module, dus dit vangt geen fout in de
+       spiegel maar een fout in DEZE laag: een rij die hier wordt aangepast
+       voordat hij wordt bewaard, komt er niet meer doorheen. */
+    const fout = schendingen(r, om.rij);
+    if (fout.length) return { ok: false, rijen: [], waarom: fout.join(' | ') };
+    rijenUit.push({ spiegelVan: r.id, rij: om.rij });
+  }
 
   const terug = rijenUit.reduce((a, x) => a + Math.abs(x.rij.bedragCenten), 0);
   return { ok: true, rijen: rijenUit, terugCenten: terug, volledig: bruikbaar.length === alles.length, waarom: null };

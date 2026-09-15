@@ -151,4 +151,11 @@ function waarom(rij) {
   };
 }
 
+/* De DEKKING over een stel rijen -- hoeveel van dit geld is werkelijk verklaard
+   -- woont in ./dekking.js en niet hier. Dat is geen opruiming maar een scheiding
+   van onderwerpen: deze module REKENT over rijen waarvan de indeling vaststaat,
+   die module MEET hoeveel van een stel rijen die indeling uberhaupt draagt. Wie
+   ze samenhoudt, krijgt vanzelf de verleiding om de teller mee te laten bewegen
+   met de rekensom. */
+
 module.exports = { INDELING, OVERIGE_BAKKEN, ongedeeldeSoorten, bereken, waarom };

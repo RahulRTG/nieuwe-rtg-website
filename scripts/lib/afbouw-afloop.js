@@ -150,9 +150,36 @@ function lees() {
   try { return JSON.parse(fs.readFileSync(AFLOOP, 'utf8')); }
   catch (e) { return null; }
 }
+/* ATOMAIR, EN DAT IS GEEN NETHEID MAAR DE BELOFTE VAN `lees()` HIERBOVEN.
+
+   Hier stond een kale writeFileSync. Die MAAKT het bestand eerst (of kapt het
+   af op nul) en vult het daarna, dus er is een venster waarin de afloop wel
+   BESTAAT en niet PARSEERT. `lees()` geeft dan `null`, en null betekent in deze
+   laag "er loopt geen ronde" -- de lezing faalt dus OPEN: een tweede
+   bronmuterende ronde zou mogen starten naast een ronde die gewoon draait.
+
+   Dat venster is echt waargenomen en niet bedacht. test/afbouwketen.test.js
+   wacht met `fs.existsSync` tot de afloop er is en leest hem meteen daarna; op
+   deze machine is dat 363 ms groen, op een belaste CI-runner (419 toetsbestanden,
+   vier parallel, twee containers) zakte hij op `null.stand` -- twee rondes
+   achter elkaar, op een toets en een laag die geen letter waren veranderd.
+
+   Schrijven naar een buurbestand en dan renamen maakt de vervanging ondeelbaar:
+   een lezer ziet de oude afloop of de nieuwe, nooit een halve. De naam draagt
+   het pid, want twee rondes die tegelijk hun tijdelijke bestand schrijven mogen
+   elkaars bestand niet overschrijven. Er kijkt niets met fs.watch naar dit pad
+   (nagetrokken), dus een nieuwe inode breekt niemand.
+
+   Waarom de REPARATIE hier zit en niet in de wacht van die toets: de toets
+   beweert "pak() hoort de ronde als RUNNING te publiceren", en dat is precies
+   wat een niet-atomaire schrijf niet garandeert. De wacht verbreden had de toets
+   groen gekregen en de belofte onbewezen gelaten -- LAT.md regel 1. */
 function schrijf(o) {
   fs.mkdirSync(path.dirname(AFLOOP), { recursive: true, mode: 0o700 });
-  fs.writeFileSync(AFLOOP, JSON.stringify(o, null, 1) + '\n', { mode: 0o600 });
+  const tijdelijk = AFLOOP + '.' + process.pid + '.tmp';
+  fs.writeFileSync(tijdelijk, JSON.stringify(o, null, 1) + '\n', { mode: 0o600 });
+  try { fs.renameSync(tijdelijk, AFLOOP); }
+  catch (e) { try { fs.unlinkSync(tijdelijk); } catch (e2) {} throw e; }
 }
 
 /* WELKE VAN DE VASTGELEGDE KINDEREN LEVEN ER NOG? Dit is het afbouwbewijs, en

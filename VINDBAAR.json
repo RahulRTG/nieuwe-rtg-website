@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-15T14:57:31.494Z",
-    "commit": "1b1c9eb0",
-    "boomVuil": false,
-    "boomAnders": 1,
+    "op": "2026-09-15T16:10:43.874Z",
+    "commit": "443ce6b7",
+    "boomVuil": true,
+    "boomAnders": 5,
     "instrument": "scripts/vindbaar.js",
     "node": "v22.22.2"
   },
@@ -11,9 +11,9 @@
   "vloer": 0.6,
   "drempel": 3,
   "bestemmingen": 98,
-  "woorden": 1161,
-  "gevonden": 757,
-  "dekking": 0.652,
+  "woorden": 1162,
+  "gevonden": 758,
+  "dekking": 0.6523,
   "perBestemming": [
     {
       "naam": "Magnaat",
@@ -1097,10 +1097,10 @@
       "mist": []
     },
     {
-      "naam": "Mijn RTG",
+      "naam": "Mijn neigingen",
       "url": "/apps/mijn-neigingen.html",
-      "woorden": 0,
-      "gevonden": 0,
+      "woorden": 1,
+      "gevonden": 1,
       "mist": []
     },
     {

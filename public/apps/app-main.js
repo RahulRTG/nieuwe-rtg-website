@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '6a15df7b';
+var RTG_BOUW = '0d98d28d';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4416,7 +4416,7 @@ var RTG_BOUW = '6a15df7b';
        over NEIGINGEN die RTG van u denkt te kennen. Twee vragen die op elkaar
        lijken en een ander antwoord hebben; samenvoegen zou van beide een
        halve maken. */
-    neigingen:   { naam: T('app.neigingen', 'Mijn RTG'), url: '/apps/mijn-neigingen.html' },
+    neigingen:   { naam: T('app.neigingen', 'Mijn neigingen'), url: '/apps/mijn-neigingen.html' },
     post:        { naam: 'Post van RTG', url: '/apps/mijn-post.html' },
   /* Afgesplitst van app-main-23.js, dat met dit blok over de 10 KB ging
      (keuringsregel 13). De snede loopt midden door LINKS -- dat mag hier, want

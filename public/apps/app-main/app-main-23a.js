@@ -108,5 +108,5 @@
        over NEIGINGEN die RTG van u denkt te kennen. Twee vragen die op elkaar
        lijken en een ander antwoord hebben; samenvoegen zou van beide een
        halve maken. */
-    neigingen:   { naam: T('app.neigingen', 'Mijn RTG'), url: '/apps/mijn-neigingen.html' },
+    neigingen:   { naam: T('app.neigingen', 'Mijn neigingen'), url: '/apps/mijn-neigingen.html' },
     post:        { naam: 'Post van RTG', url: '/apps/mijn-post.html' },

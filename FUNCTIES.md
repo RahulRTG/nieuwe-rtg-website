@@ -80,7 +80,7 @@ ook blokkeert.
   _voor: lifestyle, business_
 - **Automatisch ondertitelen in een gesprek** (`ondertiteling`) — Een deelnemer laat zijn eigen stem omzetten naar tekst met een LOKAAL model; de regel komt in de meeleesbaan van het gesprek. Uit zetten laat die baan staan -- meetypen blijft werken -- maar wie doof is is dan weer afhankelijk van de anderen.  
   _voor: rtg, lifestyle, business_
-- **RTG Neiging (Mijn RTG)** (`neiging`) — De intake die zichzelf afkapt, en de kaart met wat RTG van je denkt te weten. Zet je dit uit, dan wordt er niets meer bijgehouden en is de kaart dicht; wat er staat blijft tot je het zelf weghaalt of de bewaartermijn verloopt.  
+- **RTG Neiging (Mijn neigingen)** (`neiging`) — De intake die zichzelf afkapt, en de kaart met wat RTG van je denkt te weten. Zet je dit uit, dan wordt er niets meer bijgehouden en is de kaart dicht; wat er staat blijft tot je het zelf weghaalt of de bewaartermijn verloopt.  
   _voor: rtg, lifestyle, business_
 - **Het Privékantoor (Lifestyle)** (`privekantoor`) — De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn. Uit zetten laat de onderliggende apps staan; alleen de samenhang verdwijnt.  
   _voor: lifestyle, business_

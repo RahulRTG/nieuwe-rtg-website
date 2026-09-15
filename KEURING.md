@@ -115,6 +115,12 @@ Wat overblijft is <!--getal:veranderbereik.zonder-->828<!--/getal--> toetsbestan
 zonder enig vastgesteld bereik, en zolang dat getal niet nul is verandert de
 volgorde hierboven niet. `VERANDERING.md` is het document eromheen.
 
+Die twee getallen komen uit een register van een HALVE ronde (769 van 1900). Op
+een volledige ronde in de keten (15 september 2026, run `34974276733`) dicht de
+waarneming er **734** en blijven er **333** over -- en die 333 zijn dan allemaal
+in-proces toetsen, met `nietInDezeRonde` op nul. De volgorde verandert daar niet
+van: 333 volle ringen is nog steeds geen impactplan.
+
 ## 2. Het CI-contract: vier regels, alle vier uit een vondst
 
 De toetsen bewaken het product; niets bewaakte het systeem dat ze draait.

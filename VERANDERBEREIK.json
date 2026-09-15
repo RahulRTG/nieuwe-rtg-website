@@ -3,10 +3,10 @@
  "uitleg": "Van welke toets staat het BRONBESTANDbereik vast, langs de statische as (require) of de waargenomen as (routejournaal -> ROUTEBRON). Twee assen, nooit opgeteld. `ongemeten` betekent dat er niets over bewezen is -- nooit dat de toets niets aanraakt. Dit is geen selector: zolang zonderBereik niet nul is, is versmallen geen recht (KEURING.md par. 1).",
  "hoe": "npm run veranderbereik -- --lees <journaal>",
  "stempel": {
-  "op": "2026-09-15T13:00:45.688Z",
-  "commit": "d7e43ace",
+  "op": "2026-09-15T14:17:31.811Z",
+  "commit": "0422b320",
   "boomVuil": false,
-  "boomAnders": 1,
+  "boomAnders": 0,
   "instrument": "scripts/veranderbereik.js",
   "node": "v22.22.2"
  },
@@ -37,6 +37,8 @@
   "kantenZonderEigenaar": 0,
   "toetsenInDezeRonde": 769,
   "rondeVolledig": false,
+  "rondeVreemdeNamen": 0,
+  "rondeGemist": 1131,
   "draaideZonderRoute": 150,
   "nietInDezeRonde": 678
  },

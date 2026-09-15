@@ -76,7 +76,7 @@ module.exports = function maakBewaren({ db, save, crypto, nu }) {
   /* ONTHOUD. Dezelfde onderwerp+grond wordt OPGEHOOGD en niet verdubbeld: twee
      rijen voor hetzelfde zouden de teller onbruikbaar maken, en juist die
      teller is het verschil tussen `vermoed` en `gemeten`. */
-  function onthoud(key, invoer) {
+  function bewaarNeiging(key, invoer) {
     const b = invoer || {};
     const onderwerp = schoon(b.onderwerp, 60);
     if (!onderwerp) return { status: 400, error: 'Zonder onderwerp is er niets te onthouden.' };
@@ -101,7 +101,7 @@ module.exports = function maakBewaren({ db, save, crypto, nu }) {
          lib/mutatiecontracten-neiging.js. Een herhaalde uitspraak is daarom
          een NO-OP, klok en al, zodat de route echt idempotent is en niet bijna.
          Verandert het lid van gedachten, dan is dat een ANDER onderwerp of
-         `vergeet()` -- allebei een zichtbaar besluit van het lid. */
+         `vergeetNeiging()` -- allebei een zichtbaar besluit van het lid. */
       const telt = grond !== 'gezegd';
       if (telt) {
         bestaand.aantal += 1;
@@ -156,5 +156,5 @@ module.exports = function maakBewaren({ db, save, crypto, nu }) {
      gesteld) woont in ./beheer.js en krijgt de binnenkant MEE. */
   const beheer = require('./beheer')({ bak, actor, lijstVan, toon, tijd, save });
 
-  return Object.assign({ onthoud, neigingen, alles, DOELEN, KRING, BEWAARDAGEN }, beheer);
+  return Object.assign({ bewaarNeiging, neigingen, alles, DOELEN, KRING, BEWAARDAGEN }, beheer);
 };

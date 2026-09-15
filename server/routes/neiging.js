@@ -34,33 +34,33 @@ module.exports = (kern) => {
 
   /* De volgende vraag, of `klaar`. Leest alleen. */
   app.post('/api/neiging/intake', auth, lid, (req, res) =>
-    stuur(res, kern.neigingIntake(req.session.key)));
+    stuur(res, kern.neiging.intake(req.session.key)));
 
   /* Een antwoord. De client stuurt de vraag-id mee die hij kreeg; onderwerpen
      die niet bij die vraag horen worden geteld als `genegeerd` en niet bewaard
      -- zie de toelichting in kern/neiging/index.js. */
   app.post('/api/neiging/antwoord', auth, lid, (req, res) =>
-    stuur(res, kern.neigingAntwoord(req.session.key, String((req.body || {}).vraag || ''),
+    stuur(res, kern.neiging.antwoord(req.session.key, String((req.body || {}).vraag || ''),
       (req.body || {}).onderwerpen)));
 
   app.post('/api/neiging/overslaan', auth, lid, (req, res) =>
-    stuur(res, kern.neigingOverslaan(req.session.key)));
+    stuur(res, kern.neiging.overslaan(req.session.key)));
 
   app.post('/api/neiging/opnieuw', auth, lid, (req, res) =>
-    stuur(res, kern.neigingOpnieuw(req.session.key)));
+    stuur(res, kern.neiging.opnieuw(req.session.key)));
 
   /* Wat RTG van mij denkt te weten. */
   app.post('/api/neiging/geheugen', auth, lid, (req, res) =>
-    stuur(res, kern.neigingGeheugen(req.session.key)));
+    stuur(res, kern.neiging.geheugen(req.session.key)));
 
   /* Weghalen, en niet hiervoor gebruiken. Deze twee staan HIER en niet bij
      /api/mijn/gegevens: die kaart schrijft met opzet niets, en weghalen doe je
      waar het gegeven woont. Zouden ze daar ook staan, dan waren er twee plekken
      om hetzelfde te wissen, en binnen een jaar doet er een het net anders. */
   app.post('/api/neiging/vergeet', auth, lid, (req, res) =>
-    stuur(res, kern.neigingVergeet(req.session.key, String((req.body || {}).id || ''))));
+    stuur(res, kern.neiging.vergeet(req.session.key, String((req.body || {}).id || ''))));
 
   app.post('/api/neiging/niet-voor', auth, lid, (req, res) =>
-    stuur(res, kern.neigingNietVoor(req.session.key, String((req.body || {}).id || ''),
+    stuur(res, kern.neiging.nietVoor(req.session.key, String((req.body || {}).id || ''),
       String((req.body || {}).doel || ''))));
 };

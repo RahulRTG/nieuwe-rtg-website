@@ -80,7 +80,12 @@ test('niet-hiervoor-gebruiken werkt, en vergeten haalt het echt weg', async () =
   const weg = await post('/api/neiging/vergeet', { id: doel.id }, token);
   assert.equal(weg.status, 200);
   const na = await post('/api/neiging/geheugen', {}, token);
-  assert.ok(!na.body.neigingen.some(n => n.id === doel.id), 'vergeten hoort echt weg te zijn');
+  /* TELLEN EN NIET ALLEEN ZOEKEN. `some(...)` is onwaar op een lege lijst, dus
+     een route die ALLES weggooit zou deze bewering ook halen. Het aantal moet
+     met precies een dalen (scripts/tandeloos.js wees dit aan). */
+  assert.equal(na.body.neigingen.length, voor.body.neigingen.length - 1,
+    'vergeten hoort er precies EEN weg te halen');
+  assert.ok(!na.body.neigingen.some(n => n.id === doel.id), 'en wel die ene');
 });
 
 test('een onbekend doel wordt geweigerd en geeft geen lege lijst', async () => {
@@ -105,7 +110,18 @@ test('een tweede lid ziet niets van het eerste', async () => {
   });
   const g = await post('/api/neiging/geheugen', {}, ander.body.token);
   assert.equal(g.status, 200);
-  assert.equal(g.body.neigingen.length, 0, 'een vers lid hoort een leeg geheugen te hebben');
+  const eigen = await post('/api/neiging/geheugen', {}, token);
+
+  /* HET CONTRAST IS DE BEWERING, EN NIET DE NUL. `length === 0` voor het tweede
+     lid is ook waar als de route voor IEDEREEN niets teruggeeft -- dan staat
+     deze toets groen boven een kapotte laag. Wat werkelijk moet gelden is dat
+     de een wel iets heeft en de ander niet, en dat is een uitspraak die je in
+     een keer doet. scripts/tandeloos.js wees de oude vorm aan als een bewering
+     die op een lege verzameling vanzelf slaagt. */
+  assert.deepEqual(
+    { eerste: eigen.body.neigingen.length > 0, tweede: g.body.neigingen.length },
+    { eerste: true, tweede: 0 },
+    'een vers lid hoort leeg te zijn terwijl het eerste lid wel degelijk neigingen heeft');
 });
 
 test('overslaan kan, en daarna komt er geen vraag meer', async () => {

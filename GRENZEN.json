@@ -1345,13 +1345,7 @@
       "navStatus"
     ],
     "neiging": [
-      "neigingIntake",
-      "neigingAntwoord",
-      "neigingOverslaan",
-      "neigingOpnieuw",
-      "neigingGeheugen",
-      "neigingVergeet",
-      "neigingNietVoor"
+      "neiging"
     ],
     "noodkaart": [
       "noodkaartVan",

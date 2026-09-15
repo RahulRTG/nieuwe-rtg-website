@@ -23,7 +23,7 @@ const { DOELEN } = require('./besluiten');
 
 module.exports = function maakBeheer({ bak, actor, lijstVan, toon, tijd, save }) {
   /* VERGEET. Echt weg, en niet een vlaggetje. */
-  function vergeet(key, id) {
+  function vergeetNeiging(key, id) {
     const lijst = lijstVan(actor(key));
     const i = lijst.findIndex(n => n.id === id);
     if (i < 0) return { status: 404, error: 'Die staat hier niet.' };
@@ -32,7 +32,7 @@ module.exports = function maakBeheer({ bak, actor, lijstVan, toon, tijd, save })
   }
 
   /* NIET HIERVOOR GEBRUIKEN. Het doel gaat eraf en komt niet terug doordat het
-     gedrag zich herhaalt -- zie `afgewezenDoel` in onthoud(). */
+     gedrag zich herhaalt -- zie `afgewezenDoel` in bewaarNeiging(). */
   function nietVoor(key, id, doel) {
     if (!DOELEN.includes(doel)) return { status: 400, error: 'Onbekend doel.' };
     const n = lijstVan(actor(key)).find(x => x.id === id);
@@ -77,5 +77,5 @@ module.exports = function maakBeheer({ bak, actor, lijstVan, toon, tijd, save })
     return { ok: true };
   }
 
-  return { vergeet, nietVoor, veeg, gesteld, noteerGesteld, opnieuw };
+  return { vergeetNeiging, nietVoor, veeg, gesteld, noteerGesteld, opnieuw };
 };

@@ -82,14 +82,14 @@ module.exports = function maakNeigingLaag({ db, save, crypto, nu }) {
     return (r.neigingen || []).map(n => n.onderwerp);
   }
 
-  /* DE INTAKE. Geeft de volgende vraag, of `klaar` met wat er is opengegaan.
+  /* DE INTAKE. Geeft de volgendeVraag vraag, of `klaar` met wat er is opengegaan.
      Er zit geen teller in en geen "stap 2 van 5": het aantal vragen hangt af
      van de antwoorden, en een voortgangsbalk die dat suggereert liegt. */
   function intake(key) {
     neiging.veeg(key);
     const onderwerpen = onderwerpenVan(key);
     const gesteld = neiging.gesteld(key);
-    const v = vraag.volgende(onderwerpen, gesteld);
+    const v = vraag.volgendeVraag(onderwerpen, gesteld);
     if (!v) return { ok: true, klaar: true, vraag: null, opent: vraag.opent(onderwerpen),
       waarom: 'Er is geen vraag meer die iets nieuws opendoet.' };
     return { ok: true, klaar: false, vraag: v, opent: vraag.opent(onderwerpen) };
@@ -107,7 +107,7 @@ module.exports = function maakNeigingLaag({ db, save, crypto, nu }) {
     /* Een onderwerp dat niet bij deze vraag hoort, wordt WEGGELATEN en niet
        stil bewaard: anders is dit endpoint een vrije schrijfweg naar het
        geheugen van een lid, en dan bepaalt de client wat RTG "weet". */
-    for (const o of gekozen) neiging.onthoud(key, { onderwerp: o, grond: 'gezegd', doel: ['tonen', 'helpen'] });
+    for (const o of gekozen) neiging.bewaarNeiging(key, { onderwerp: o, grond: 'gezegd', doel: ['tonen', 'helpen'] });
     neiging.noteerGesteld(key, vraagId);
     return Object.assign({ ok: true, opgeslagen: gekozen.length,
       genegeerd: (Array.isArray(onderwerpen) ? onderwerpen.length : 0) - gekozen.length }, intake(key));
@@ -127,25 +127,38 @@ module.exports = function maakNeigingLaag({ db, save, crypto, nu }) {
      boekt, maakt van een vermoeden een bewijs. */
   function merkOp(key, onderwerp, grond) {
     const g = grond === 'gekozen' || grond === 'afgeleid' ? grond : 'afgeleid';
-    return neiging.onthoud(key, { onderwerp, grond: g, doel: ['tonen'] });
+    return neiging.bewaarNeiging(key, { onderwerp, grond: g, doel: ['tonen'] });
   }
 
   /* De geheugenkaart woont in ./geheugen.js: een andere vraag, een andere
      lezer, en samen gingen ze over de omvangsgrens. */
   const { geheugen } = require('./geheugen')({ neiging });
 
+  /* EEN NAAM OP DE KERN EN NIET ELF, en dat is dezelfde vorm als
+     kern/socialewereld.js en kern/geldwereld.js: `kern.neiging.intake(...)`.
+
+     Het scheelde meer dan netheid. scripts/norm.js ratelt op `kernBreedte` --
+     kern-eigenschappen die routes aanraken -- en elf losse namen duwden die
+     meter met zeven omhoog voor een laag met zeven routes. Een laag die zijn
+     eigen deurtje per functie op de kern legt, laat die meter groeien met het
+     aantal FUNCTIES in plaats van met het aantal LAGEN, en dan meet hij niets
+     meer.
+
+     De vier onderaan staan met opzet NIET in GRENZEN.json: geen enkel domein
+     mag er vandaag bij. `lees` is de weg voor een toekomstige lezer (altijd MET
+     een doel), `merkOp` de progressive-profiling kant die nog geen aanroeper
+     heeft, en `controle` en `ladder` zijn er voor toetsen en meters. Leeg is
+     dicht: wie ze nodig heeft, zet ze bewust op de lijst van zijn domein. */
   return {
-    neigingIntake: intake,
-    neigingAntwoord: antwoord,
-    neigingOverslaan: overslaan,
-    neigingOpnieuw: opnieuw,
-    neigingMerkOp: merkOp,
-    neigingGeheugen: geheugen,
-    neigingVergeet: (key, id) => neiging.vergeet(key, id),
-    neigingNietVoor: (key, id, doel) => neiging.nietVoor(key, id, doel),
-    /* Voor lezers binnen het huis. Altijd MET een doel -- zie ./bewaren.js. */
-    neigingLees: (key, doel, opties) => neiging.neigingen(key, doel, opties),
-    neigingControle: () => vraag.controle(),
-    neigingLadder: ladder
+    neiging: {
+      intake, antwoord, overslaan, opnieuw, geheugen,
+      vergeet: (key, id) => neiging.vergeetNeiging(key, id),
+      nietVoor: (key, id, doel) => neiging.nietVoor(key, id, doel),
+      /* Voor lezers binnen het huis. Altijd MET een doel -- zie ./bewaren.js. */
+      lees: (key, doel, opties) => neiging.neigingen(key, doel, opties),
+      merkOp,
+      controle: () => vraag.controle(),
+      ladder
+    }
   };
 };

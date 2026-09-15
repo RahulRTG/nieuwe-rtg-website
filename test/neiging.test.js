@@ -59,7 +59,7 @@ test('een onleesbare datum laat niets zakken -- niet-weten werkt nooit tegen het
 test('de doelen zijn een gesloten lijst van twee, en adverteren zit er niet bij', () => {
   const h = huis();
   assert.deepEqual(h.neiging.DOELEN, ['tonen', 'helpen']);
-  h.neiging.onthoud('k', { onderwerp: 'eten', grond: 'gezegd' });
+  h.neiging.bewaarNeiging('k', { onderwerp: 'eten', grond: 'gezegd' });
   const r = h.neiging.neigingen('k', 'adverteren');
   assert.equal(r.status, 400, 'een onbekend doel moet WEIGEREN en geen lege lijst geven');
   assert.ok(!r.neigingen, 'een weigering mag geen lijst meesturen');
@@ -67,23 +67,23 @@ test('de doelen zijn een gesloten lijst van twee, en adverteren zit er niet bij'
 
 test('een neiging komt er niet uit voor een doel dat zij niet draagt', () => {
   const h = huis();
-  h.neiging.onthoud('k', { onderwerp: 'eten', grond: 'gezegd', doel: ['tonen'] });
+  h.neiging.bewaarNeiging('k', { onderwerp: 'eten', grond: 'gezegd', doel: ['tonen'] });
   assert.equal(h.neiging.neigingen('k', 'tonen').neigingen.length, 1);
   assert.equal(h.neiging.neigingen('k', 'helpen').neigingen.length, 0);
 });
 
 test('"niet hiervoor gebruiken" komt niet terug doordat het gedrag zich herhaalt', () => {
   const h = huis();
-  const n = h.neiging.onthoud('k', { onderwerp: 'muziek', grond: 'gekozen', doel: ['tonen', 'helpen'] }).neiging;
+  const n = h.neiging.bewaarNeiging('k', { onderwerp: 'muziek', grond: 'gekozen', doel: ['tonen', 'helpen'] }).neiging;
   h.neiging.nietVoor('k', n.id, 'tonen');
-  h.neiging.onthoud('k', { onderwerp: 'muziek', grond: 'gekozen', doel: ['tonen'] });
+  h.neiging.bewaarNeiging('k', { onderwerp: 'muziek', grond: 'gekozen', doel: ['tonen'] });
   const na = h.neiging.alles('k')[0];
   assert.deepEqual(na.doel, ['helpen'], 'een weggehaald doel mag niet terugkeren via herhaling');
 });
 
 test('geen enkel doel over betekent geweigerd, en de regel blijft ZICHTBAAR staan', () => {
   const h = huis();
-  const n = h.neiging.onthoud('k', { onderwerp: 'sport', grond: 'gezegd', doel: ['tonen'] }).neiging;
+  const n = h.neiging.bewaarNeiging('k', { onderwerp: 'sport', grond: 'gezegd', doel: ['tonen'] }).neiging;
   h.neiging.nietVoor('k', n.id, 'tonen');
   assert.equal(h.neiging.neigingen('k', 'tonen').neigingen.length, 0, 'hij mag nergens meer voor tellen');
   assert.equal(h.neiging.alles('k').length, 1, 'maar het lid moet hem wel kunnen zien staan');
@@ -92,21 +92,21 @@ test('geen enkel doel over betekent geweigerd, en de regel blijft ZICHTBAAR staa
 
 test('vergeten is echt weg en niet een vlaggetje', () => {
   const h = huis();
-  const n = h.neiging.onthoud('k', { onderwerp: 'sport', grond: 'gezegd' }).neiging;
-  assert.equal(h.neiging.vergeet('k', n.id).ok, true);
+  const n = h.neiging.bewaarNeiging('k', { onderwerp: 'sport', grond: 'gezegd' }).neiging;
+  assert.equal(h.neiging.vergeetNeiging('k', n.id).ok, true);
   assert.equal(h.neiging.alles('k').length, 0);
-  assert.equal(h.neiging.vergeet('k', n.id).status, 404);
+  assert.equal(h.neiging.vergeetNeiging('k', n.id).status, 404);
 });
 
 test('twee leden zien elkaars neigingen niet', () => {
   const h = huis();
-  h.neiging.onthoud('lid-a', { onderwerp: 'eten', grond: 'gezegd' });
+  h.neiging.bewaarNeiging('lid-a', { onderwerp: 'eten', grond: 'gezegd' });
   assert.equal(h.neiging.alles('lid-b').length, 0);
 });
 
 test('de bewaartermijn staat er vanaf de eerste regel en veegt echt', () => {
   const h = huis();
-  h.neiging.onthoud('k', { onderwerp: 'eten', grond: 'gezegd' });
+  h.neiging.bewaarNeiging('k', { onderwerp: 'eten', grond: 'gezegd' });
   assert.ok(h.neiging.alles('k')[0].vervalt, 'elke neiging draagt een vervaldatum');
   h.klok.t = '2029-01-01T00:00:00Z';
   assert.equal(h.neiging.veeg('k'), 1);
@@ -138,19 +138,19 @@ test('een vraag zonder winst wordt niet gesteld', () => {
   /* Alles van de openingsvraag gekozen en alle vervolgvragen gehad: dan is er
      niets meer te winnen en hoort de motor NIETS te geven. */
   const alles = vraag.VRAGEN.flatMap(v => v.opties.map(o => o.onderwerp));
-  assert.equal(vraag.volgende(alles, vraag.VRAGEN.map(v => v.id)), null);
+  assert.equal(vraag.volgendeVraag(alles, vraag.VRAGEN.map(v => v.id)), null);
 });
 
 test('de intake kapt zichzelf af en herhaalt geen gestelde vraag', () => {
   const h = huis();
   const gehad = [];
-  let s = h.laag.neigingIntake('k'), rondes = 0;
+  let s = h.laag.neiging.intake('k'), rondes = 0;
   while (!s.klaar) {
     assert.ok(rondes++ < 12, 'de intake eindigt niet');
     assert.ok(!gehad.includes(s.vraag.id), 'vraag ' + s.vraag.id + ' werd twee keer gesteld');
     assert.ok(s.vraag.winst > 0, 'een vraag zonder winst hoort niet gesteld te worden');
     gehad.push(s.vraag.id);
-    s = h.laag.neigingAntwoord('k', s.vraag.id, [s.vraag.opties[0].onderwerp]);
+    s = h.laag.neiging.antwoord('k', s.vraag.id, [s.vraag.opties[0].onderwerp]);
   }
   assert.ok(rondes >= 2, 'er hoort minstens een vervolgvraag te komen');
   assert.ok(s.opent.length > 0, 'na de intake hoort er iets open te staan');
@@ -158,24 +158,24 @@ test('de intake kapt zichzelf af en herhaalt geen gestelde vraag', () => {
 
 test('niets aanvinken is ook een antwoord -- de vraag komt niet terug', () => {
   const h = huis();
-  const eerst = h.laag.neigingIntake('k').vraag;
-  const na = h.laag.neigingAntwoord('k', eerst.id, []);
+  const eerst = h.laag.neiging.intake('k').vraag;
+  const na = h.laag.neiging.antwoord('k', eerst.id, []);
   assert.equal(na.opgeslagen, 0);
   assert.ok(!na.vraag || na.vraag.id !== eerst.id, 'dezelfde vraag mag niet opnieuw komen');
 });
 
 test('een onderwerp dat niet bij de vraag hoort, wordt niet bewaard', () => {
   const h = huis();
-  const v = h.laag.neigingIntake('k').vraag;
-  const r = h.laag.neigingAntwoord('k', v.id, ['ik:ben:een:smokkelaar']);
+  const v = h.laag.neiging.intake('k').vraag;
+  const r = h.laag.neiging.antwoord('k', v.id, ['ik:ben:een:smokkelaar']);
   assert.equal(r.opgeslagen, 0);
   assert.equal(r.genegeerd, 1);
-  assert.equal(h.laag.neigingGeheugen('k').neigingen.length, 0);
+  assert.equal(h.laag.neiging.geheugen('k').neigingen.length, 0);
 });
 
 test('een onbekende vraag-id wordt geweigerd', () => {
   const h = huis();
-  assert.equal(h.laag.neigingAntwoord('k', 'bestaat-niet', []).status, 400);
+  assert.equal(h.laag.neiging.antwoord('k', 'bestaat-niet', []).status, 400);
 });
 
 test('de uitkomst voegt alleen TOE en sluit nooit iets af', () => {
@@ -190,16 +190,16 @@ test('de uitkomst voegt alleen TOE en sluit nooit iets af', () => {
 
 test('een antwoord van het lid telt als GEZEGD en nooit als afgeleid', () => {
   const h = huis();
-  const v = h.laag.neigingIntake('k').vraag;
-  h.laag.neigingAntwoord('k', v.id, [v.opties[0].onderwerp]);
-  assert.equal(h.laag.neigingGeheugen('k').neigingen[0].grond, 'gezegd');
+  const v = h.laag.neiging.intake('k').vraag;
+  h.laag.neiging.antwoord('k', v.id, [v.opties[0].onderwerp]);
+  assert.equal(h.laag.neiging.geheugen('k').neigingen[0].grond, 'gezegd');
 });
 
 test('gedrag wordt nooit als een uitspraak van het lid geboekt', () => {
   const h = huis();
   /* Ook als een aanroeper `gezegd` probeert mee te geven. */
-  h.laag.neigingMerkOp('k', 'eten:japans', 'gezegd');
-  assert.equal(h.laag.neigingGeheugen('k').neigingen[0].grond, 'afgeleid');
+  h.laag.neiging.merkOp('k', 'eten:japans', 'gezegd');
+  assert.equal(h.laag.neiging.geheugen('k').neigingen[0].grond, 'afgeleid');
 });
 
 /* --------------------------------------------------------------- geheugen */
@@ -209,33 +209,33 @@ test('twee keer hetzelfde ZEGGEN is een uitspraak; twee keer hetzelfde DOEN telt
   /* Gemeten aanleiding: een tweede identieke POST op /api/neiging/antwoord
      veranderde het beeld van het lid opnieuw -- een dubbelklik werd een tweede
      gebeurtenis. Voor gedrag is tellen juist de bedoeling. */
-  h.neiging.onthoud('k', { onderwerp: 'eten', grond: 'gezegd' });
-  h.neiging.onthoud('k', { onderwerp: 'eten', grond: 'gezegd' });
+  h.neiging.bewaarNeiging('k', { onderwerp: 'eten', grond: 'gezegd' });
+  h.neiging.bewaarNeiging('k', { onderwerp: 'eten', grond: 'gezegd' });
   const gezegd = h.neiging.alles('k').find(n => n.grond === 'gezegd');
   assert.equal(gezegd.aantal, 1, 'een herhaalde uitspraak mag niet meetellen als tweede');
 
-  h.neiging.onthoud('k', { onderwerp: 'sport', grond: 'gekozen' });
-  h.neiging.onthoud('k', { onderwerp: 'sport', grond: 'gekozen' });
+  h.neiging.bewaarNeiging('k', { onderwerp: 'sport', grond: 'gekozen' });
+  h.neiging.bewaarNeiging('k', { onderwerp: 'sport', grond: 'gekozen' });
   const gekozen = h.neiging.alles('k').find(n => n.grond === 'gekozen');
   assert.equal(gekozen.aantal, 2, 'herhaald GEDRAG hoort juist wel te tellen -- dat is de graad');
 });
 
 test('een herhaald antwoord verandert het beeld van het lid niet meer', () => {
   const h = huis();
-  const v = h.laag.neigingIntake('k').vraag;
+  const v = h.laag.neiging.intake('k').vraag;
   const keuze = [v.opties[0].onderwerp];
-  h.laag.neigingAntwoord('k', v.id, keuze);
-  const na1 = JSON.stringify(h.laag.neigingGeheugen('k').neigingen);
-  h.laag.neigingAntwoord('k', v.id, keuze);
-  const na2 = JSON.stringify(h.laag.neigingGeheugen('k').neigingen);
+  h.laag.neiging.antwoord('k', v.id, keuze);
+  const na1 = JSON.stringify(h.laag.neiging.geheugen('k').neigingen);
+  h.laag.neiging.antwoord('k', v.id, keuze);
+  const na2 = JSON.stringify(h.laag.neiging.geheugen('k').neigingen);
   assert.equal(na1, na2, 'een tweede identiek antwoord hoort niets te veranderen');
 });
 
 test('de geheugenkaart toont ook wat niet meer meetelt, met de reden', () => {
   const h = huis();
-  h.laag.neigingMerkOp('k', 'muziek:hiphop', 'afgeleid');
+  h.laag.neiging.merkOp('k', 'muziek:hiphop', 'afgeleid');
   h.klok.t = '2026-12-25T00:00:00Z';
-  const g = h.laag.neigingGeheugen('k');
+  const g = h.laag.neiging.geheugen('k');
   assert.equal(g.neigingen.length, 1, 'hij mag niet stil verdwijnen');
   assert.equal(g.neigingen[0].telt, false);
   assert.ok(g.neigingen[0].stil, 'er hoort een reden bij te staan');
@@ -252,32 +252,32 @@ test('de uitleg op de geheugenkaart komt UIT het besluitenregister', () => {
      Deze toets zakt zodra een van de teksten afwijkt. */
   const besluiten = require('../server/kern/neiging/besluiten');
   const h = huis();
-  h.neiging.onthoud('k', { onderwerp: 'eten', grond: 'gezegd', doel: ['tonen', 'helpen'] });
-  const n = h.laag.neigingGeheugen('k').neigingen[0];
+  h.neiging.bewaarNeiging('k', { onderwerp: 'eten', grond: 'gezegd', doel: ['tonen', 'helpen'] });
+  const n = h.laag.neiging.geheugen('k').neigingen[0];
   assert.equal(n.grondUitleg, besluiten.GRONDUITLEG.gezegd);
   for (const d of n.doelen) assert.equal(d.uitleg, besluiten.DOELUITLEG[d.id]);
 });
 
 test('de geheugenkaart noemt zijn eigen rand', () => {
-  const g = huis().laag.neigingGeheugen('k');
+  const g = huis().laag.neiging.geheugen('k');
   assert.ok(g.grenzen.length >= 4, 'een overzicht zonder rand leest als "dit is alles"');
   for (const x of g.grenzen) assert.ok(x.naam && x.reden);
 });
 
 test('de intake is nooit verplicht: overslaan bestaat en laat de neigingen staan', () => {
   const h = huis();
-  const v = h.laag.neigingIntake('k').vraag;
-  h.laag.neigingAntwoord('k', v.id, [v.opties[0].onderwerp]);
-  assert.equal(h.laag.neigingOverslaan('k').klaar, true);
-  assert.equal(h.laag.neigingIntake('k').klaar, true, 'na overslaan komt er geen vraag meer');
-  assert.equal(h.laag.neigingGeheugen('k').neigingen.length, 1, 'overslaan wist niets');
+  const v = h.laag.neiging.intake('k').vraag;
+  h.laag.neiging.antwoord('k', v.id, [v.opties[0].onderwerp]);
+  assert.equal(h.laag.neiging.overslaan('k').klaar, true);
+  assert.equal(h.laag.neiging.intake('k').klaar, true, 'na overslaan komt er geen vraag meer');
+  assert.equal(h.laag.neiging.geheugen('k').neigingen.length, 1, 'overslaan wist niets');
 });
 
 test('opnieuw beginnen haalt de vragen terug en raakt geen enkele neiging aan', () => {
   const h = huis();
-  h.laag.neigingOverslaan('k');
-  h.laag.neigingMerkOp('k', 'sport', 'gekozen');
-  const r = h.laag.neigingOpnieuw('k');
+  h.laag.neiging.overslaan('k');
+  h.laag.neiging.merkOp('k', 'sport', 'gekozen');
+  const r = h.laag.neiging.opnieuw('k');
   assert.equal(r.klaar, false, 'er hoort weer een vraag te komen');
-  assert.equal(h.laag.neigingGeheugen('k').neigingen.length, 1, 'opnieuw mag niets wissen');
+  assert.equal(h.laag.neiging.geheugen('k').neigingen.length, 1, 'opnieuw mag niets wissen');
 });

@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1578,
+    "kernBreedte": 1579,
     "kernGedeeld": 237,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -109,7 +109,9 @@
     "geldRoutesValsSucces": 28,
     "stilSpoor": 18,
     "stilleOpslag": 25,
-    "stilSpoorAanroepen": 228
+    "stilSpoorAanroepen": 228,
+    "neigingVerwijzingRot": 0,
+    "neigingVoorkeurBlind": 14
   },
   "notities": [
     {
@@ -2360,6 +2362,14 @@
       "meter": "toetsenNietGemeten 618 -> 619",
       "reden": "De derde integratieronde na #267 voegt twee toetsbestanden toe waar de mutatiemotor nog niet langs is geweest: test/fiscaal-meegeleverd.test.js en test/idemcontract.test.js. De toetsen draaien wel; deze post zegt uitsluitend dat hun gevoeligheid nog niet door een volledige mutatieronde is bewezen. Het getal stijgt met een en niet met twee omdat de meter per toets telt en niet per bestand. MUTATIES.json is NIET hergedraaid: die motor duurt uren, schrijft in echte bronbestanden en hoort op een schone boom te draaien, dus hij zit in ronde.yml en niet in ci.yml -- de bundel draagt de meting van de main-lijn.",
       "waarheen": "De twee toetsen meenemen in de volgende volledige npm run mutatie op een schone boom, samen met de zeven van 14 september."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "besluit",
+      "sleutel": "kernBreedte",
+      "van": 1578,
+      "meter": "kernBreedte 1578 -> 1579",
+      "reden": "RTG Neiging (NEIGING.md) voegt EEN kern-eigenschap toe: `kern.neiging`, een object met zeven functies erachter. Dat is het minimum dat een laag met een eigen router kan kosten. De eerste versie legde elf LOSSE namen op de kern en duwde deze meter met zeven omhoog; dat is hersteld naar de vorm die kern/socialewereld.js en kern/geldwereld.js al gebruiken (kern.neiging.intake(...)), en GRENZEN.json laat voor het domein `neiging` precies die ene naam door. Deze plus-een is dus geen slordigheid maar de prijs van een nieuwe LAAG, en die hoort per laag te worden betaald en niet per functie -- zou de meter met het aantal routes meegroeien, dan meet hij niets meer. Geen vervaldatum: dit is geen schuld die je aflost maar een laag die bestaat; hij daalt weer zodra de laag verdwijnt."
     }
   ],
   "prestatie": {
@@ -2411,7 +2421,7 @@
     "wekkersZonderTrede": "2026-09-02",
     "wekkersOnverklaard": "2026-09-02",
     "meetleerBlind": "2026-09-02",
-    "kernBreedte": "2026-09-02",
+    "kernBreedte": "2026-09-15",
     "kernGedeeld": "2026-09-05",
     "registersUitVuileBoom": "2026-09-10",
     "laatSpoorVerdacht": "2026-09-03",
@@ -2458,7 +2468,9 @@
     "geldRoutesValsSucces": "2026-09-14",
     "stilSpoor": "2026-09-14",
     "stilleOpslag": "2026-09-14",
-    "stilSpoorAanroepen": "2026-09-14"
+    "stilSpoorAanroepen": "2026-09-14",
+    "neigingVerwijzingRot": "2026-09-15",
+    "neigingVoorkeurBlind": "2026-09-15"
   },
   "uitzonderingen": [
     {

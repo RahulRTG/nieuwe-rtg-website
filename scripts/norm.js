@@ -737,6 +737,22 @@ const METERS = [
      reden omhoog: de UITKOMST (0 gedeelde velden) mag bewegen, het aantal
      publieke domeinen dat de meter ziet niet stil dalen. */
   { sleutel: 'stageDomeinenGemeten', richting: 'omhoog', wat: 'publieke domeinen die de stagevormmeter werkelijk heeft gezien' },
+  /* NEIGINGVORM.json (NEIGING.md par. 0). Twee ratels en met opzet geen derde
+     over de naamsmeting: die telt sinds de laag bestaat zijn eigen bestanden
+     mee, dus een getal daarop zou alleen maar groeien met het werk.
+
+     `neigingVerwijzingRot` bewaakt meting C: elk punt van het voorstel draagt
+     een verwijzing naar bestaande code, en die wordt nagetrokken. Rot er een,
+     dan is het document een bewering over het verleden geworden.
+
+     `neigingVoorkeurBlind` bewaakt meting B, en hij gaat de ANDERE kant op dan
+     je zou denken: het telt de bestaande affiniteitsvormen die GEEN grond,
+     zekerheid of verval dragen. Vandaag zijn dat er veertien, en deze laag
+     slikt ze met opzet niet in (de Asset-les). Het getal mag dus dalen doordat
+     een domein zijn eigen voorkeuren etiketteert -- en nooit stijgen doordat er
+     ergens een ongeetiketteerde voorkeur bij komt. */
+  { sleutel: 'neigingVerwijzingRot', richting: 'omlaag', wat: 'punten in NEIGING.md waarvan de verwijzing naar code niet meer klopt' },
+  { sleutel: 'neigingVoorkeurBlind', richting: 'omlaag', wat: 'bestaande voorkeursvormen zonder grond, zekerheid of verval' },
   /* Publieke domeinen waarover scripts/lib/wekbesluit.js geen uitspraak doet.
      Omlaag, en hij staat op nul: een domein dat publiek is en waarvan niemand
      heeft besloten of het de publieke rail op mag, hoort niet stil te kunnen
@@ -1473,6 +1489,8 @@ function meet(bronnen) {
     stilleOpslag: leesRegister('STILSPOOR.json', (j) => j.gemeten.opslagGesmoord),
     stilSpoorAanroepen: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorAanroepen),
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
+    neigingVerwijzingRot: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorstel.rot),
+    neigingVoorkeurBlind: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorkeur.metAffiniteit - j.gemeten.voorkeur.metAlledrie),
     wekZonderUitspraak: leesRegister('WEKDEKKING.json', (j) => j.gemeten.zonderUitspraak),
     momentOpenBekend: leesRegister('MOMENTPROEF.json', (j) => j.telling.openBekend),
     lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),

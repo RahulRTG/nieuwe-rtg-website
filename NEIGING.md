@@ -34,6 +34,9 @@ metingen waardeloos maken. Drie metingen die niet hetzelfde zeggen.
 
 ### A. De naam — alle vijftien begrippen waren bezet
 
+Gemeten over de hele boom: bestanden die het woord noemen, domeinen waarin ze
+vallen, en het aantal plekken waar het al een **veldnaam** is.
+
 | begrip | bestanden | domeinen | als veldnaam |
 |---|---|---|---|
 | `moment` | 1615 | 384 | 97 |
@@ -44,7 +47,15 @@ metingen waardeloos maken. Drie metingen die niet hetzelfde zeggen.
 | … | | | |
 | `adaptief` | 95 | 34 | 1 |
 | `relevantie` | 17 | 11 | 1 |
-| **`neiging`** | **4** | **4** | **0** |
+
+En de naam die het geworden is, met een ANDERE meting en dat hoort erbij te
+staan: `neiging` is geteld op de commit **vóór** deze tak, want sinds
+`server/kern/neiging/` bestaat telt de meter zijn eigen laag mee. Toen: **4
+bestanden, 4 domeinen, 0 veldnamen** — en alle vier gewone Nederlandse tekst in
+een toelichting ("de neiging om toch maar iets te doen is nu juist het
+probleem"). Na te rekenen met `git grep -lIi neiging <commit>`. Wie de twee
+getallen naast elkaar legt zonder dat verschil te kennen, leest een botsing waar
+er geen is; de `grens` van het register zegt het daarom ook.
 
 Dat is geen trivia. `context` betekent in dit huis **situatie** —
 `kern/experience/contexts.js` gebruikt het voor *welke reis, welke werkruimte*,
@@ -53,13 +64,7 @@ overneemt voor *wat iemand leuk vindt*, is exact de `VERMOGENS`-botsing uit
 `OS.md` en de `moment`-botsing uit `STAGE.md`: twee betekenissen op de centrale
 naam van een hele laag.
 
-Het centrale begrip heet daarom **neiging**. De vier plekken waar dat woord al
-stond, zijn alle vier gewone Nederlandse tekst in een toelichting ("de neiging om
-toch maar iets te doen is nu juist het probleem") en geen enkele een module, een
-scherm of een veldnaam. Na te rekenen met `git grep -lIi neiging <commit vóór
-deze tak>`.
-
-En het woord is preciezer: een profiel klinkt als iets wat iemand *is*, een
+Het woord is bovendien preciezer: een profiel klinkt als iets wat iemand *is*, een
 neiging is wat iemand *neigt te doen*. Dat verschil bepaalt of je het durft te
 laten zien aan degene over wie het gaat — en deze laag is gebouwd om precies dat
 te doen.
@@ -275,7 +280,17 @@ later bij doet, geldt niet voor wat er al ligt.
 ### Staat
 
 - **De neiging met grond, graad, doel, deel en termijn** — `kern/neiging/`,
-  zeven bestanden, 27 unittoetsen en 7 e2e-toetsen.
+  negen bestanden, 29 unittoetsen, 7 e2e-toetsen tegen een echte server en 6
+  schermtoetsen in een echte browser.
+- **Eén naam op de kern** (`kern.neiging`), de vorm van `kern/socialewereld.js`
+  en `kern/geldwereld.js` — en `GRENZEN.json` laat voor het domein precies die
+  ene naam door.
+- **Een schakelaar in de boardroom** (`neiging` in de functiecatalogus), zodat de
+  laag als geheel uit kan. Eén pad en niet zeven: intake en geheugenkaart zijn
+  twee helften van dezelfde functie.
+- **Twee ratels** op `NEIGINGVORM.json` (`neigingVerwijzingRot`,
+  `neigingVoorkeurBlind`), allebei geijkt in `test/meterijk.test.js` — een meter
+  die niet kan uitslaan is geen meter.
 - **De vraagmotor die zichzelf afkapt** — winst als telling, bestemmingen
   nagetrokken tegen `sprongindex.json`.
 - **Verval dat `gezegd` met rust laat.**
@@ -489,8 +504,8 @@ productdefect (`BETROUWBAARHEID.md`); een onzichtbare ingang is er ook een.
 |---|---|
 | de meting | `scripts/neigingvorm.js`, `NEIGINGVORM.json`, `npm run neigingvorm` |
 | de ladder | `server/kern/neiging/ladder.js` |
-| de besluiten (doelen, kring, termijn) | `server/kern/neiging/besluiten.js` |
-| de opslag | `server/kern/neiging/opslag.js` |
+| de besluiten (doelen, kring, termijn, uitlegteksten) | `server/kern/neiging/besluiten.js` |
+| de opslag (bak, actor, schoonmaak) | `server/kern/neiging/opslag.js` |
 | onthouden en lezen | `server/kern/neiging/bewaren.js` |
 | wat het lid met zijn geheugen doet | `server/kern/neiging/beheer.js` |
 | de vragenlijst | `server/kern/neiging/vraag-lijst.js` |
@@ -500,7 +515,9 @@ productdefect (`BETROUWBAARHEID.md`); een onzichtbare ingang is er ook een.
 | de routes | `server/routes/neiging.js` |
 | het scherm | `public/apps/mijn-neigingen.html` ("Mijn RTG") |
 | de contracten | `server/lib/mutatiecontracten-neiging.js` |
-| de toetsen | `test/neiging.test.js`, `test/neiging.e2e.js` |
+| de toetsen | `test/neiging.test.js`, `test/neiging.e2e.js`, `test/neiging-scherm.e2e.js` |
+| de boardroomschakelaar | `server/functies/register/cat-leden.js` (`neiging`) |
+| de ratels en hun ijking | `NORM.json`, `scripts/lib/metingen.js`, `test/meterijk.test.js` |
 
 > Niet te verwarren met **`ADAPTIEF.md`** en `public/shared/adaptief/`: die laag
 > gaat over de VORM waarin een capability verschijnt (bureau, tablet, telefoon,

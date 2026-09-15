@@ -1,14 +1,13 @@
 /* ============================================================================
    DE VRAAGMOTOR -- welke vraag levert nog iets op, en wanneer houdt het op?
 
-   DIT IS HET STUK WAAR HET WOORD "ADAPTIEF" OP SLAAT. De rest van deze laag
-   bewaart en toont; dit bestand beslist wat er GEVRAAGD wordt, en vooral wat er
-   NIET meer gevraagd wordt.
+   Dit is het stuk waar het woord "adaptief" op slaat. De volle redenering staat
+   in NEIGING.md par. 3.3; hier staat wat de CODE bindt.
 
    HET PROBLEEM MET EEN INTAKE VAN VEERTIG VELDEN is niet dat hij lang is, maar
    dat niemand kan zeggen wat een antwoord oplevert. Veld 37 wordt uitgevraagd
    omdat hij in het formulier staat. De vraag die dit bestand in plaats daarvan
-   stelt, en per keer opnieuw:
+   per keer stelt:
 
        verandert het antwoord op deze vraag iets aan wat RTG voor jou opendoet?
 
@@ -17,48 +16,38 @@
    winnen valt. Vijf goede antwoorden zijn meer waard dan veertig velden, en dat
    is hier een REKENSOM en geen leus.
 
-   ------------------------------------------------------------------------
-   DE WINST IS EEN GETAL EN GEEN GEVOEL
+   DE WINST IS EEN GETAL EN GEEN GEVOEL. Elke optie wijst naar BESTEMMINGEN, en
+   de winst van een vraag is het aantal dat hij nog kan opendoen. Winst nul
+   betekent: welk antwoord je ook geeft, er verandert niets. Met opzet geen
+   gewogen score met verzonnen factoren -- INT-04 zegt dat zo'n motor zijn
+   besluit met de OPBOUW geeft en nooit als samengesteld cijfer, en `confidence`
+   is hier niet meetbaar. Een telling van bestemmingen is wel na te rekenen: je
+   kunt ze aanwijzen.
 
-   Elke optie wijst naar BESTEMMINGEN: onderdelen van dit huis die door dat
-   antwoord relevant worden. De winst van een vraag is het aantal bestemmingen
-   dat hij kan opendoen en dat nog NIET open staat. Winst nul betekent: welk
-   antwoord je ook geeft, er verandert niets -- dus stellen we hem niet.
+   DE BESTEMMINGEN KOMEN UIT DE BESTAANDE LIJST, EN WORDEN NAGETROKKEN. `wijst`
+   verwijst naar de SLEUTEL van een onderdeel in public/shared/sprongindex.json,
+   afgeleid uit MAPPEN door scripts/sprongindex.js -- de enige lijst apps die dit
+   huis heeft, en TIKKEN.md is daar terecht streng over. Verdwijnt een onderdeel
+   of wordt het hernoemd, dan zakt test/neiging.test.js in plaats van dat een lid
+   stil een vraag krijgt die nergens meer toe leidt.
 
-   Dat is met opzet geen gewogen score met verzonnen factoren. INT-04 zegt dat
-   een aandachtmotor zijn besluit met de OPBOUW geeft en nooit een samengesteld
-   cijfer, en `confidence` en `novelty` zijn hier niet meetbaar. Een telling van
-   bestemmingen is wel na te rekenen: je kunt ze aanwijzen.
+   WAT HIER EEN BESLUIT IS EN GEEN AFLEIDING: de VRAGEN zelf zijn geschreven
+   (./vraag-lijst.js). Welke onderdelen samen "eten" heten staat nergens in de
+   code -- precies zoals WERELDLIJST.md vaststelt over de laag tussen wereld en
+   onderdeel. De grens loopt tussen de indeling (mensenwerk) en de bestemmingen
+   (nagetrokken), en niet ertussenin.
 
-   ------------------------------------------------------------------------
-   DE BESTEMMINGEN KOMEN UIT DE BESTAANDE LIJST, EN WORDEN NAGETROKKEN
-
-   `wijst` verwijst naar de SLEUTEL van een onderdeel in
-   public/shared/sprongindex.json. Die lijst wordt door scripts/sprongindex.js
-   AFGELEID uit MAPPEN in app-main.js -- de enige lijst apps die dit huis heeft.
-   TIKKEN.md is daar streng over en terecht: er komt geen tweede lijst apps bij.
-
-   Daarom staan hier geen namen van schermen en geen url's, maar sleutels die
-   worden NAGETROKKEN door `controle()`. Verdwijnt een onderdeel of wordt het
-   hernoemd, dan wijst een optie naar niets -- en dan zakt
-   test/neiging.test.js in plaats van dat een lid stil een vraag krijgt
-   die nergens meer toe leidt. Dat is dezelfde vorm als de nagetrokken
-   verwijzing in scripts/neigingvorm.js meting C.
-
-   ------------------------------------------------------------------------
-   ------------------------------------------------------------------------
    DRIE DINGEN DIE DEZE MOTOR MET OPZET NIET DOET
 
-   - Hij vraagt niets over een MENS. Geen leeftijd, geen geslacht, geen
-     inkomen, geen gezinssamenstelling. Alles wat hij vraagt gaat over wat
-     iemand wil DOEN. Dat is geen kiesheid: FOUNDATION.md par. 5 zegt dat een
-     eligibility-motor alleen mag TOEVOEGEN, en een vraag naar een eigenschap
-     van de mens is de eerste stap naar een antwoord dat iets afsluit.
-   - Hij slaat niets over op grond van een antwoord. Een vervolgvraag KOMT erbij
-     als hij iets opent; er valt nooit iets weg. Wie dat omdraait, bouwt een
-     trechter.
+   - Hij vraagt niets over een MENS. Geen leeftijd, geen geslacht, geen inkomen,
+     geen gezinssamenstelling; alles gaat over wat iemand wil DOEN. Dat is geen
+     kiesheid: FOUNDATION.md par. 5 zegt dat zo'n motor alleen mag TOEVOEGEN, en
+     een vraag naar een eigenschap van de mens is de eerste stap naar een antwoord
+     dat iets afsluit.
+   - Hij slaat niets over op grond van een antwoord. Een vervolgvraag KOMT erbij;
+     er valt nooit iets weg. Wie dat omdraait, bouwt een trechter.
    - Hij beslist niet dat iemand ergens NIET bij hoort. De uitkomst is een lijst
-     bestemmingen die opengaan, nooit een lijst die dichtgaat. */
+     die opengaat, nooit een die dichtgaat. */
 'use strict';
 
 /* De vragen zelf staan in ./vraag-lijst.js -- zie daar ook waarom de INDELING
@@ -155,7 +144,7 @@ function winstVan(vraag, onderwerpen) {
    Wie sport niet aantikt, heeft gezegd dat sport het niet is. Alleen bijhouden
    wat iemand WEL koos, maakt van elk niet-gekozen vakje een openstaande vraag,
    en dan is er geen intake die ooit eindigt. */
-function beschikbaar(vraag, onderwerpen, beantwoord) {
+function vraagBeschikbaar(vraag, onderwerpen, beantwoord) {
   if ((beantwoord || []).includes(vraag.id)) return false;
   if (!vraag.alsOnderwerp) return true;
   return (onderwerpen || []).includes(vraag.alsOnderwerp);
@@ -164,9 +153,9 @@ function beschikbaar(vraag, onderwerpen, beantwoord) {
 /* DE VOLGENDE VRAAG, of niets. `null` is hier een volwaardig antwoord en geen
    storing: het betekent dat er niets meer te winnen valt. De aanroeper hoort
    dat te lezen als "klaar", en ./index.js doet dat ook. */
-function volgende(onderwerpen, beantwoord) {
+function volgendeVraag(onderwerpen, beantwoord) {
   const kandidaten = VRAGEN
-    .filter(v => beschikbaar(v, onderwerpen, beantwoord))
+    .filter(v => vraagBeschikbaar(v, onderwerpen, beantwoord))
     .map(v => ({ vraag: v, winst: winstVan(v, onderwerpen) }))
     .filter(x => x.winst > 0)
     /* Hoogste winst eerst. Bij gelijke winst wint de volgorde in VRAGEN, en dat
@@ -189,4 +178,4 @@ function opent(onderwerpen) {
   return [...open(onderwerpen)].sort();
 }
 
-module.exports = { VRAGEN, controle, volgende, winstVan, opent, open };
+module.exports = { VRAGEN, controle, volgendeVraag, winstVan, opent, open };

@@ -805,6 +805,23 @@ const METERS = [
   { sleutel: 'stilSpoor', richting: 'omlaag', wat: 'spoor-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
   { sleutel: 'stilleOpslag', richting: 'omlaag', wat: 'opslag-schrijvers waarvan het falen stil wordt weggevangen (STILSPOOR.json)' },
   { sleutel: 'stilSpoorAanroepen', richting: 'omhoog', wat: 'spoor-schrijvers die de stilspoormeter werkelijk heeft gevonden' },
+  /* ONLEESBAAR IS NIET AFWEZIG (STILLEZING.json, npm run stillezing). Bewijs
+     kent drie toestanden -- bestaat+geldig, bestaat+ongeldig, bestaat niet --
+     en een `catch` die op null valt maakt van de tweede de derde. Leeg betekent
+     in dit huis bijna overal "geen beperking", dus dat is fail-open.
+
+     DE TWEE SCHULDEN WORDEN NOOIT OPGETELD, en dat is geen netheid: in server/
+     laat zo'n lezing een HANDELING door, in scripts/ laat zij een METING liegen.
+     Een som van die twee zou een getal zijn waarop niemand kan sturen.
+
+     `stilLezingBereik` is de ENIGE plek waar de twee werelden wel bij elkaar
+     komen, en met reden: blindheid is een eigenschap van het INSTRUMENT en niet
+     van het huis. Zonder die tand is een dalende schuld niet te onderscheiden
+     van een meter die minder ziet. */
+  { sleutel: 'stilLezing', richting: 'omlaag', wat: 'runtime-lezers die een onleesbaar bewijs als afwezig behandelen (STILLEZING.json)' },
+  { sleutel: 'stilLezingMeters', richting: 'omlaag', wat: 'meters die een onleesbaar register als afwezig behandelen (STILLEZING.json)' },
+  { sleutel: 'stilLezingBereik', richting: 'omhoog', wat: 'bewijslezingen die de stillezingmeter werkelijk heeft gevonden' },
+  { sleutel: 'bewijsOnderscheidt', richting: 'omhoog', wat: 'lezers die ONGELDIG onderscheiden van LEEG in plaats van samen te smelten' },
   /* DE LUSINDEX (LUSSEN.json, npm run lussen). Drie tanden, en alle drie tellen
      ze een SCHULD en geen prestatie -- anders maakt lussen toevoegen de meter
      beter.
@@ -1519,6 +1536,10 @@ function meet(bronnen) {
     idemAfdrukVoegtNietsToe: leesRegister('IDEMIDENTITEIT.json', (j) => j.voegtNietsToe),
     idemHandwerkGeenVergelijking: leesRegister('IDEMIDENTITEIT.json', (j) => j.handwerkGeenVergelijking),
     stilSpoor: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorGesmoord),
+    stilLezing: leesRegister('STILLEZING.json', (j) => j.gemeten.server.smeltSamen),
+    stilLezingMeters: leesRegister('STILLEZING.json', (j) => j.gemeten.scripts.smeltSamen),
+    stilLezingBereik: leesRegister('STILLEZING.json', (j) => j.gemeten.server.bewijslezingen + j.gemeten.scripts.bewijslezingen),
+    bewijsOnderscheidt: leesRegister('STILLEZING.json', (j) => j.gemeten.server.onderscheidt + j.gemeten.scripts.onderscheidt),
     stilleOpslag: leesRegister('STILSPOOR.json', (j) => j.gemeten.opslagGesmoord),
     stilSpoorAanroepen: leesRegister('STILSPOOR.json', (j) => j.gemeten.spoorAanroepen),
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),

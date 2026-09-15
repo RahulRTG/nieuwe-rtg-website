@@ -66,6 +66,12 @@ const EIGENAAR = {
      het bezit, en dat is precies wat die toets moet tegenhouden. */
   'NEIGINGVORM.json': { schrijver: 'scripts/neigingvorm.js' },
 
+  /* De spiegel van STILSPOOR: lezers die een onleesbaar bewijs als een afwezig
+     bewijs behandelen. Vier tanden in scripts/lib/metingen.js, en de detectie
+     hieronder vindt hem niet (het doel staat in een `const DOEL` die via
+     path.join is opgebouwd) -- precies de ondergrens die de kop beschrijft. */
+  'STILLEZING.json': { schrijver: 'scripts/stillezing.js' },
+
   /* De lagen die in deze tak zijn gebouwd. */
   'IDEMIDENTITEIT.json': { schrijver: 'scripts/idemidentiteit.js' },
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },

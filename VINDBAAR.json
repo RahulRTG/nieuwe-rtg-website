@@ -1,16 +1,16 @@
 {
   "stempel": {
-    "op": "2026-09-14T16:02:16.896Z",
-    "commit": "73b0b5085",
+    "op": "2026-09-15T06:11:14.857Z",
+    "commit": "90fa3762",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/vindbaar.js",
     "node": "v22.22.2"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
-  "bestemmingen": 97,
+  "bestemmingen": 98,
   "woorden": 1161,
   "gevonden": 757,
   "dekking": 0.652,
@@ -1094,6 +1094,13 @@
       "url": "/apps/juridisch.html",
       "woorden": 1,
       "gevonden": 1,
+      "mist": []
+    },
+    {
+      "naam": "Mijn RTG",
+      "url": "/apps/mijn-neigingen.html",
+      "woorden": 0,
+      "gevonden": 0,
       "mist": []
     },
     {

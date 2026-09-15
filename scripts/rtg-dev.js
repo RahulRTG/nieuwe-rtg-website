@@ -34,7 +34,7 @@ const path = require('path');
 
 const WORTEL = path.join(__dirname, '..');
 const { maakBrug } = require(path.join(WORTEL, 'server/kern/appstore/brug'));
-const { BRUGKLANT, celCsp, metBrug } = require(path.join(WORTEL, 'server/kern/appstore/brugklant'));
+const { maakBrugklant, celCsp, metBrug } = require(path.join(WORTEL, 'server/kern/appstore/brugklant'));
 const { MACHTIGINGEN, NIET_GEBOUWD, toonbaar } = require(path.join(WORTEL, 'server/kern/appstore/machtigingen'));
 const { TOEGESTAAN } = require(path.join(WORTEL, 'server/kern/appstore/keuring'));
 const manifestLezer = require(path.join(WORTEL, 'server/kern/appstore/manifest'));
@@ -129,7 +129,7 @@ module.exports = function dev(argv, hulp) {
 
     // ---- de brugklant: hetzelfde script als in de cel ----
     if (pad === '/appcel/brug.js') {
-      return stuur(200, 'text/javascript', BRUGKLANT, {
+      return stuur(200, 'text/javascript', maakBrugklant(brug.herhaalKaart), {
         'Content-Security-Policy': celCsp(herkomst),
         'Cross-Origin-Resource-Policy': 'cross-origin'
       });

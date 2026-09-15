@@ -85,7 +85,7 @@ module.exports = [
     uitleg: 'De aandachtslaag en de vooruitblik op wat een lid waarschijnlijk nodig heeft.', paden: ['/api/aandacht', '/api/voorspel'] },
   { id: 'ov-spar', categorie: 'Diensten (leden)', naam: 'Sparren en parkeren', standaard: true, doelgroepen: LEDEN,
     uitleg: 'De sparlijst: iets parkeren om er later op terug te komen.', paden: ['/api/spar'] },
-  { id: 'ov-bijles', categorie: 'RTFoundation', naam: 'Bijles', standaard: true, doelgroepen: ['foundation'],
+  { id: 'ov-bijles', categorie: 'RTFoundation', naam: 'Bijles', standaard: true, doelgroepen: LEDEN_GAST,
     uitleg: 'Het bijlesgesprek met de begeleider.', paden: ['/api/bijles'] },
   { id: 'ov-kantoorgesprek', categorie: 'Werk (zaken en personeel)', naam: 'Kantoorgesprek', standaard: true, doelgroepen: WERKOS,
     uitleg: 'Het gesprek waarmee een zaak zijn kantoor inricht.', paden: ['/api/kantoor'] },

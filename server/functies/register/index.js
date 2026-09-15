@@ -34,6 +34,7 @@ const FUNCTIES = [].concat(
   require('./cat-geld'),
   require('./cat-domeinen3'),
   require('./cat-domeinen4'),
+  require('./cat-domeinen5'),
   require('./cat-festival'));
 
 const OP_ID = Object.fromEntries(FUNCTIES.map(f => [f.id, f]));

@@ -1,0 +1,5599 @@
+{
+  "stempel": {
+    "op": "2026-09-15T00:25:12.502Z",
+    "commit": "ca059d78",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/landdekking.js",
+    "node": "v22.22.2"
+  },
+  "graad": "gemeten",
+  "grens": "Deze meter telt GEVULDE CELLEN en beoordeelt geen enkel getal: of het Albanese btw-tarief klopt, of het minimumuurloon van vandaag is, en of een regelpakket juridisch juist rekent, staat hier NIET in. Hij zegt ook niets over of RTG naar een land moet -- dat is een besluit van de eigenaar. En `bedrijfsregister` telt een AANWIJSBAAR register en niet of dat register bereikbaar of actueel is.",
+  "hoe": "Elke as leest een bron in server/; geen enkele as komt uit een lijst in dit script.",
+  "assen": [
+    {
+      "onderscheidend": false,
+      "id": "btwTarief",
+      "bron": "kern/fiscaal/landen.js",
+      "wat": "De btw-tarieven per categorie (eten, drank, logies, vervoer, jet, standaard)."
+    },
+    {
+      "onderscheidend": false,
+      "id": "aangifte",
+      "bron": "kern/fiscaal/landen.js",
+      "wat": "Hoe en waar er in dit land aangifte wordt gedaan, als tekst voor een mens."
+    },
+    {
+      "onderscheidend": false,
+      "id": "loonkennis",
+      "bron": "kern/fiscaal/landen.js",
+      "wat": "Minimumuurloon, werkgeverslasten en vakantiegeld. Kennis, geen motor."
+    },
+    {
+      "onderscheidend": true,
+      "id": "zakelijkeUitleg",
+      "bron": "kern/fiscaal/landen.js",
+      "wat": "Wat een ondernemer per categorie mag aftrekken."
+    },
+    {
+      "onderscheidend": true,
+      "id": "loonuitvoering",
+      "bron": "kern/payroll/jaargangen/",
+      "wat": "Een regelpakket waarmee er werkelijk loon gedraaid kan worden. Zonder dit komt er geen loonstrook, en dat is goed -- met Nederlandse tarieven Spaans loon rekenen is erger dan niet rekenen."
+    },
+    {
+      "onderscheidend": true,
+      "id": "fiscaalJaargang",
+      "bron": "kern/fiscaal/meegeleverd/",
+      "wat": "Een meegeleverde fiscale jaargang, zodat een tariefwijziging meebeweegt in plaats van met de hand te worden nagelopen."
+    },
+    {
+      "onderscheidend": true,
+      "id": "rechtsvorm",
+      "bron": "kern/onderneming/rechtsvorm*.js",
+      "wat": "De rechtsvormen van dit land, met hun verplichtingen. Zonder dit kan er geen onderneming worden opgericht."
+    },
+    {
+      "onderscheidend": true,
+      "id": "bedrijfsregister",
+      "bron": "kern/internationalehandel.js",
+      "wat": "Een AANWIJSBAAR ondernemingsregister met adres. De terugval \"het officiele register van het vestigingsland\" telt hier niet mee: dat is een zin, geen register."
+    }
+  ],
+  "telling": {
+    "landen": 189,
+    "onderscheidendeAssen": 5,
+    "ondergrensAssen": 3,
+    "landenVolledig": 0,
+    "landenMetMinstensEen": 33,
+    "landenZonderEnige": 156,
+    "perAs": {
+      "btwTarief": 189,
+      "aangifte": 189,
+      "loonkennis": 189,
+      "zakelijkeUitleg": 6,
+      "loonuitvoering": 1,
+      "fiscaalJaargang": 1,
+      "rechtsvorm": 7,
+      "bedrijfsregister": 33
+    },
+    "perAantal": {
+      "0": 156,
+      "1": 25,
+      "2": 3,
+      "3": 3,
+      "4": 2
+    }
+  },
+  "volledig": [],
+  "koplopers": [
+    {
+      "code": "DE",
+      "naam": "Duitsland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": true,
+        "loonuitvoering": false,
+        "fiscaalJaargang": true,
+        "rechtsvorm": true,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 4,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "loonuitvoering"
+      ],
+      "onderscheidendeAssen": 4
+    },
+    {
+      "code": "NL",
+      "naam": "Nederland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": true,
+        "loonuitvoering": true,
+        "fiscaalJaargang": false,
+        "rechtsvorm": true,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 7,
+      "register": "KVK Handelsregister",
+      "mist": [
+        "fiscaalJaargang"
+      ],
+      "onderscheidendeAssen": 4
+    },
+    {
+      "code": "BE",
+      "naam": "Belgie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": true,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": true,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 3,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "loonuitvoering",
+        "fiscaalJaargang"
+      ],
+      "onderscheidendeAssen": 3
+    },
+    {
+      "code": "FR",
+      "naam": "Frankrijk",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": true,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": true,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 4,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "loonuitvoering",
+        "fiscaalJaargang"
+      ],
+      "onderscheidendeAssen": 3
+    },
+    {
+      "code": "ES",
+      "naam": "Spanje",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": true,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": true,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 3,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "loonuitvoering",
+        "fiscaalJaargang"
+      ],
+      "onderscheidendeAssen": 3
+    },
+    {
+      "code": "JP",
+      "naam": "Japan",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": true,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "National Tax Agency Corporate Number Publication Site",
+      "mist": [
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 2
+    },
+    {
+      "code": "GB",
+      "naam": "Verenigd Koninkrijk",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": true,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 3,
+      "register": "Companies House",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang"
+      ],
+      "onderscheidendeAssen": 2
+    },
+    {
+      "code": "US",
+      "naam": "Verenigde Staten",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": true,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 4,
+      "register": "Officieel register van de staat of het territorium",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang"
+      ],
+      "onderscheidendeAssen": 2
+    },
+    {
+      "code": "BG",
+      "naam": "Bulgarije",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "CY",
+      "naam": "Cyprus",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "DK",
+      "naam": "Denemarken",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "EE",
+      "naam": "Estland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "FI",
+      "naam": "Finland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "GR",
+      "naam": "Griekenland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "HU",
+      "naam": "Hongarije",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "IE",
+      "naam": "Ierland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "IS",
+      "naam": "IJsland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "IT",
+      "naam": "Italie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "HR",
+      "naam": "Kroatie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "LV",
+      "naam": "Letland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "LI",
+      "naam": "Liechtenstein",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "LT",
+      "naam": "Litouwen",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "LU",
+      "naam": "Luxemburg",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "MT",
+      "naam": "Malta",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "NO",
+      "naam": "Noorwegen",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "AT",
+      "naam": "Oostenrijk",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "PL",
+      "naam": "Polen",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "PT",
+      "naam": "Portugal",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "RO",
+      "naam": "Roemenie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "SI",
+      "naam": "Slovenie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "SK",
+      "naam": "Slowakije",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "CZ",
+      "naam": "Tsjechie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "SE",
+      "naam": "Zweden",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    }
+  ],
+  "perLand": [
+    {
+      "code": "DE",
+      "naam": "Duitsland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": true,
+        "loonuitvoering": false,
+        "fiscaalJaargang": true,
+        "rechtsvorm": true,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 4,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "loonuitvoering"
+      ],
+      "onderscheidendeAssen": 4
+    },
+    {
+      "code": "NL",
+      "naam": "Nederland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": true,
+        "loonuitvoering": true,
+        "fiscaalJaargang": false,
+        "rechtsvorm": true,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 7,
+      "register": "KVK Handelsregister",
+      "mist": [
+        "fiscaalJaargang"
+      ],
+      "onderscheidendeAssen": 4
+    },
+    {
+      "code": "BE",
+      "naam": "Belgie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": true,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": true,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 3,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "loonuitvoering",
+        "fiscaalJaargang"
+      ],
+      "onderscheidendeAssen": 3
+    },
+    {
+      "code": "FR",
+      "naam": "Frankrijk",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": true,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": true,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 4,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "loonuitvoering",
+        "fiscaalJaargang"
+      ],
+      "onderscheidendeAssen": 3
+    },
+    {
+      "code": "ES",
+      "naam": "Spanje",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": true,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": true,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 3,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "loonuitvoering",
+        "fiscaalJaargang"
+      ],
+      "onderscheidendeAssen": 3
+    },
+    {
+      "code": "JP",
+      "naam": "Japan",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": true,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "National Tax Agency Corporate Number Publication Site",
+      "mist": [
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 2
+    },
+    {
+      "code": "GB",
+      "naam": "Verenigd Koninkrijk",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": true,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 3,
+      "register": "Companies House",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang"
+      ],
+      "onderscheidendeAssen": 2
+    },
+    {
+      "code": "US",
+      "naam": "Verenigde Staten",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": true,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 4,
+      "register": "Officieel register van de staat of het territorium",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang"
+      ],
+      "onderscheidendeAssen": 2
+    },
+    {
+      "code": "BG",
+      "naam": "Bulgarije",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "CY",
+      "naam": "Cyprus",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "DK",
+      "naam": "Denemarken",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "EE",
+      "naam": "Estland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "FI",
+      "naam": "Finland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "GR",
+      "naam": "Griekenland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "HU",
+      "naam": "Hongarije",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "IE",
+      "naam": "Ierland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "IS",
+      "naam": "IJsland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "IT",
+      "naam": "Italie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "HR",
+      "naam": "Kroatie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "LV",
+      "naam": "Letland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "LI",
+      "naam": "Liechtenstein",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "LT",
+      "naam": "Litouwen",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "LU",
+      "naam": "Luxemburg",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "MT",
+      "naam": "Malta",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "NO",
+      "naam": "Noorwegen",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "AT",
+      "naam": "Oostenrijk",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "PL",
+      "naam": "Polen",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "PT",
+      "naam": "Portugal",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "RO",
+      "naam": "Roemenie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "SI",
+      "naam": "Slovenie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "SK",
+      "naam": "Slowakije",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "CZ",
+      "naam": "Tsjechie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "SE",
+      "naam": "Zweden",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": true
+      },
+      "rechtsvormen": 0,
+      "register": "EU/EEA Business Registers Interconnection System (BRIS)",
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm"
+      ],
+      "onderscheidendeAssen": 1
+    },
+    {
+      "code": "AF",
+      "naam": "Afghanistan",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "AL",
+      "naam": "Albanie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "DZ",
+      "naam": "Algerije",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "AD",
+      "naam": "Andorra",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "AO",
+      "naam": "Angola",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "AR",
+      "naam": "Argentinie",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "AM",
+      "naam": "Armenie",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "AU",
+      "naam": "Australie",
+      "regio": "Oceanie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "AZ",
+      "naam": "Azerbeidzjan",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BS",
+      "naam": "Bahama's",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BH",
+      "naam": "Bahrein",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BD",
+      "naam": "Bangladesh",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BB",
+      "naam": "Barbados",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BY",
+      "naam": "Belarus",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BZ",
+      "naam": "Belize",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BJ",
+      "naam": "Benin",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BT",
+      "naam": "Bhutan",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BO",
+      "naam": "Bolivia",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BA",
+      "naam": "Bosnie en Herzegovina",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BW",
+      "naam": "Botswana",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BR",
+      "naam": "Brazilie",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BN",
+      "naam": "Brunei",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BF",
+      "naam": "Burkina Faso",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "BI",
+      "naam": "Burundi",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "KH",
+      "naam": "Cambodja",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "CA",
+      "naam": "Canada",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "CF",
+      "naam": "Centraal-Afrikaanse Republiek",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "CL",
+      "naam": "Chili",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "CN",
+      "naam": "China",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "CO",
+      "naam": "Colombia",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "KM",
+      "naam": "Comoren",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "CG",
+      "naam": "Congo-Brazzaville",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "CD",
+      "naam": "Congo-Kinshasa",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "CR",
+      "naam": "Costa Rica",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "CU",
+      "naam": "Cuba",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "DJ",
+      "naam": "Djibouti",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "DO",
+      "naam": "Dominicaanse Republiek",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "EC",
+      "naam": "Ecuador",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "EG",
+      "naam": "Egypte",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "SV",
+      "naam": "El Salvador",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "GQ",
+      "naam": "Equatoriaal-Guinea",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "ER",
+      "naam": "Eritrea",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "SZ",
+      "naam": "Eswatini",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "ET",
+      "naam": "Ethiopie",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "FJ",
+      "naam": "Fiji",
+      "regio": "Oceanie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "PH",
+      "naam": "Filipijnen",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "GA",
+      "naam": "Gabon",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "GM",
+      "naam": "Gambia",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "GE",
+      "naam": "Georgie",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "GH",
+      "naam": "Ghana",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "GT",
+      "naam": "Guatemala",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "GN",
+      "naam": "Guinee",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "GW",
+      "naam": "Guinee-Bissau",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "GY",
+      "naam": "Guyana",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "HT",
+      "naam": "Haiti",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "HN",
+      "naam": "Honduras",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "HK",
+      "naam": "Hongkong",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "IN",
+      "naam": "India",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "ID",
+      "naam": "Indonesie",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "IQ",
+      "naam": "Irak",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "IR",
+      "naam": "Iran",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "IL",
+      "naam": "Israel",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "CI",
+      "naam": "Ivoorkust",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "JM",
+      "naam": "Jamaica",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "YE",
+      "naam": "Jemen",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "JO",
+      "naam": "Jordanie",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "CV",
+      "naam": "Kaapverdie",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "CM",
+      "naam": "Kameroen",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "KZ",
+      "naam": "Kazachstan",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "KE",
+      "naam": "Kenia",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "KG",
+      "naam": "Kirgizie",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "KI",
+      "naam": "Kiribati",
+      "regio": "Oceanie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "KW",
+      "naam": "Koeweit",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "LA",
+      "naam": "Laos",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "LS",
+      "naam": "Lesotho",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "LB",
+      "naam": "Libanon",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "LR",
+      "naam": "Liberia",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "LY",
+      "naam": "Libie",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MO",
+      "naam": "Macau",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MG",
+      "naam": "Madagaskar",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MW",
+      "naam": "Malawi",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MV",
+      "naam": "Maldiven",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MY",
+      "naam": "Maleisie",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "ML",
+      "naam": "Mali",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MA",
+      "naam": "Marokko",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MH",
+      "naam": "Marshalleilanden",
+      "regio": "Oceanie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MR",
+      "naam": "Mauritanie",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MU",
+      "naam": "Mauritius",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MX",
+      "naam": "Mexico",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "FM",
+      "naam": "Micronesie",
+      "regio": "Oceanie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MD",
+      "naam": "Moldavie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MC",
+      "naam": "Monaco",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MN",
+      "naam": "Mongolie",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "ME",
+      "naam": "Montenegro",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MZ",
+      "naam": "Mozambique",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MM",
+      "naam": "Myanmar",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "NA",
+      "naam": "Namibie",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "NR",
+      "naam": "Nauru",
+      "regio": "Oceanie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "NP",
+      "naam": "Nepal",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "NI",
+      "naam": "Nicaragua",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "NZ",
+      "naam": "Nieuw-Zeeland",
+      "regio": "Oceanie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "NE",
+      "naam": "Niger",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "NG",
+      "naam": "Nigeria",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "MK",
+      "naam": "Noord-Macedonie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "UG",
+      "naam": "Oeganda",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "UA",
+      "naam": "Oekraine",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "UZ",
+      "naam": "Oezbekistan",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "OM",
+      "naam": "Oman",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "TL",
+      "naam": "Oost-Timor",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "PK",
+      "naam": "Pakistan",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "PW",
+      "naam": "Palau",
+      "regio": "Oceanie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "PA",
+      "naam": "Panama",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "PG",
+      "naam": "Papoea-Nieuw-Guinea",
+      "regio": "Oceanie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "PY",
+      "naam": "Paraguay",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "PE",
+      "naam": "Peru",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "QA",
+      "naam": "Qatar",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "RU",
+      "naam": "Rusland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "RW",
+      "naam": "Rwanda",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "SB",
+      "naam": "Salomonseilanden",
+      "regio": "Oceanie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "WS",
+      "naam": "Samoa",
+      "regio": "Oceanie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "SM",
+      "naam": "San Marino",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "ST",
+      "naam": "Sao Tome en Principe",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "SA",
+      "naam": "Saoedi-Arabie",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "SN",
+      "naam": "Senegal",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "RS",
+      "naam": "Servie",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "SC",
+      "naam": "Seychellen",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "SL",
+      "naam": "Sierra Leone",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "SG",
+      "naam": "Singapore",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "SD",
+      "naam": "Soedan",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "SO",
+      "naam": "Somalie",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "LK",
+      "naam": "Sri Lanka",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "SR",
+      "naam": "Suriname",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "SY",
+      "naam": "Syrie",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "TJ",
+      "naam": "Tadzjikistan",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "TW",
+      "naam": "Taiwan",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "TZ",
+      "naam": "Tanzania",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "TH",
+      "naam": "Thailand",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "TG",
+      "naam": "Togo",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "TO",
+      "naam": "Tonga",
+      "regio": "Oceanie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "TT",
+      "naam": "Trinidad en Tobago",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "TD",
+      "naam": "Tsjaad",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "TN",
+      "naam": "Tunesie",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "TR",
+      "naam": "Turkije",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "TM",
+      "naam": "Turkmenistan",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "TV",
+      "naam": "Tuvalu",
+      "regio": "Oceanie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "UY",
+      "naam": "Uruguay",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "VU",
+      "naam": "Vanuatu",
+      "regio": "Oceanie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "VE",
+      "naam": "Venezuela",
+      "regio": "Amerika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "AE",
+      "naam": "Verenigde Arabische Emiraten",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "VN",
+      "naam": "Vietnam",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "ZM",
+      "naam": "Zambia",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "ZW",
+      "naam": "Zimbabwe",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "ZA",
+      "naam": "Zuid-Afrika",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "KR",
+      "naam": "Zuid-Korea",
+      "regio": "Azie",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "SS",
+      "naam": "Zuid-Soedan",
+      "regio": "Afrika",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    },
+    {
+      "code": "CH",
+      "naam": "Zwitserland",
+      "regio": "Europa",
+      "heeft": {
+        "btwTarief": true,
+        "aangifte": true,
+        "loonkennis": true,
+        "zakelijkeUitleg": false,
+        "loonuitvoering": false,
+        "fiscaalJaargang": false,
+        "rechtsvorm": false,
+        "bedrijfsregister": false
+      },
+      "rechtsvormen": 0,
+      "register": null,
+      "mist": [
+        "zakelijkeUitleg",
+        "loonuitvoering",
+        "fiscaalJaargang",
+        "rechtsvorm",
+        "bedrijfsregister"
+      ],
+      "onderscheidendeAssen": 0
+    }
+  ],
+  "huisbreed": [
+    {
+      "as": "exploitant",
+      "aantal": 1,
+      "graad": "vermoed",
+      "treffers": [
+        "server/kern/beroepenbieb/data.js"
+      ],
+      "bron": "woordtelling over alle .js in server/",
+      "wat": "Een partijsoort die RTG in een land exploiteert onder het merk RTG.",
+      "waarom": "Geteld op de woorden franchisenemer, franchisegever, masterfranchise, licentienemer, licentiegever, merklicentie en royalty. De enige treffer is kern/beroepenbieb/data.js, en daar staan Franchisenemer en Franchisegever als BEROEPSNAAM in een lijst van beroepen -- dat is een woord in gegevens en geen partijsoort, dezelfde vorm als een pad dat in schermroutes.js een gegeven bleek in plaats van een doel. Als BEGRIP is deze as dus nul. Het woord \"franchise\" zelf staat er twee keer en beide keren over een KLANT: kern/mall/vestigingen.js beschrijft de franchise van een bakker, en zegt daar meteen de regel die hier het meest toe doet -- waar elke vestiging een eigen ondernemer is, hoort zij een eigen zaak met een eigen code te zijn en geen vestiging. De graad is vermoed omdat dit op woorden telt en niet op structuur: een begrip onder een naam die hier niet in staat, wordt gemist."
+    },
+    {
+      "as": "economischeWereld",
+      "aantal": 1,
+      "graad": "gemeten",
+      "treffers": [
+        "huis"
+      ],
+      "bron": "server/kern/economie/werelden.js",
+      "wat": "Hoeveel dragers de wereld rtg-intern kent.",
+      "waarom": "De wereld rtg-intern heeft precies deze dragers: huis. Er is dus een huis. Een exploitant in een ander land is een tweede huis met een eigen vermogen, en daar bestaat geen drager voor -- zijn kosten en zijn omzet hebben vandaag geen plek die niet van RTG zelf is."
+    },
+    {
+      "as": "kantoorcode",
+      "aantal": 1,
+      "graad": "gemeten",
+      "treffers": [
+        "server/server.js"
+      ],
+      "bron": "de plek waar OFFICE_CODE ontstaat",
+      "wat": "Hoeveel gedeelde kantoorcodes het huis kent.",
+      "waarom": "Er is een gedeelde OFFICE_CODE en een rol office; KANTOORMACHT.md meet 26 kamers achter die ene sleutel. Een medewerker van een exploitant in Spanje zou daarmee de deur van het hele huis hebben. Dit telt de codes en niet de kamers -- KANTOORMACHT.json telt die."
+    },
+    {
+      "as": "vergoedingOverOmzet",
+      "aantal": 0,
+      "graad": "gemeten",
+      "bron": "kern/commercie/vergoeding.js, PARTNER_COMMISSIE",
+      "wat": "Het percentage dat RTG over de omzet van een partner rekent.",
+      "waarom": "De partnervergoeding over omzet is nul, en dat is geen instelling maar een eigenschap van het product (partnervoorwaarden art. 1). Een royalty is precies zo een stroom. Wat er WEL mag zijn vier BENOEMDE diensten in dezelfde module -- die weg staat open, de generieke weg niet."
+    },
+    {
+      "as": "landTaalTabel",
+      "aantal": 0,
+      "graad": "gemeten",
+      "treffers": [],
+      "bron": "woordtelling over alle .js in server/",
+      "wat": "Een tabel die een land aan een taal knoopt.",
+      "waarom": "Er staan 114 talen in server/talen.js en 11 schiltalen in server/taalschil.js, maar niets knoopt een land aan een taal. Een lid in Madrid krijgt dus geen Spaans omdat hij in Spanje zit; hij krijgt het omdat hij het kiest. Dat is verdedigbaar en het is een BESLUIT dat nergens staat."
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
  "stempel": {
-  "op": "2026-09-14T17:24:33.323Z",
-  "commit": "4f3508ab",
+  "op": "2026-09-14T23:40:03.108Z",
+  "commit": "1edf32c5",
   "boomVuil": false,
   "boomAnders": 0,
   "instrument": "scripts/idemproef-route.js",
@@ -19,12 +19,12 @@
    "aantal": 62
   },
   {
-   "reden": "objectpoort: huisPoort -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord",
-   "aantal": 44
+   "reden": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "aantal": 47
   },
   {
-   "reden": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
-   "aantal": 39
+   "reden": "objectpoort: huisPoort -- eigenaarschap van een object uit het lichaam; zonder bestaand object van een ander is 404 het enige antwoord",
+   "aantal": 44
   },
   {
    "reden": "lichaamssleutel: rtfPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
@@ -47,17 +47,17 @@
    "aantal": 1
   }
  ],
- "zonderRolAangeroepen": 734,
- "routesGevonden": 4925,
+ "zonderRolAangeroepen": 742,
+ "routesGevonden": 4933,
  "gemeten": {
-  "routesAangeroepen": 4925,
+  "routesAangeroepen": 4933,
   "routesMetRol": 4191,
-  "routesZonderRol": 734,
-  "beoordeeld": 1685,
-  "beschermd": 1684,
+  "routesZonderRol": 742,
+  "beoordeeld": 1697,
+  "beschermd": 1696,
   "onbeschermd": 1,
-  "ongemeten": 3240,
-  "oproepen": 26940,
+  "ongemeten": 3236,
+  "oproepen": 26984,
   "tokensHernieuwd": 21,
   "uitOpslag": 4,
   "ruisGeijkt": [
@@ -109,7 +109,7 @@
    "naarCodenaam",
    "code"
   ],
-  "geldroutesMetEigenLijf": 31,
+  "geldroutesMetEigenLijf": 37,
   "onbeschermdMetBesluit": 1,
   "werelden": [
    {
@@ -186,16 +186,16 @@
    "lifestyle"
   ],
   "zonderSleutel": {
-   "beschermd": 128,
-   "onbeschermd": 118,
-   "ongemeten": 4679
+   "beschermd": 129,
+   "onbeschermd": 123,
+   "ongemeten": 4681
   },
   "pasGewisseld": 184
  },
  "zonderBesluit": [],
  "tegenspraken": [],
  "vastleggingVerdacht": [],
- "vermoedensVerworpen": 5,
+ "vermoedensVerworpen": 3,
  "perRoute": [
   {
    "methode": "POST",
@@ -2027,8 +2027,7 @@
       "appstore": "gewijzigd"
      },
      "e": {
-      "appstore": "gewijzigd",
-      "ledenSites": 2
+      "appstore": "gewijzigd"
      }
     },
     "effect": {
@@ -2482,9 +2481,7 @@
    ],
    "hindernis": "Deze app is niet (meer) beschikbaar.",
    "opslag": {
-    "a": {
-     "veilig": 1
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -2964,7 +2961,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "ledenSites": 2
+     }
     },
     "effect": {
      "d": "geen",
@@ -3458,7 +3457,9 @@
    "hindernis": "Vernieuw de pagina en probeer het opnieuw.",
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "veilig": 1
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -10999,7 +11000,7 @@
     404,
     404
    ],
-   "hindernis": "Die regel bestaat niet: proef-8y9e4h",
+   "hindernis": "Die regel bestaat niet: proef-q14ptw",
    "opslag": {
     "a": {
      "commandBeleid": 9
@@ -11037,7 +11038,7 @@
     404,
     404
    ],
-   "hindernis": "Die regel bestaat niet: proef-aa1psa",
+   "hindernis": "Die regel bestaat niet: proef-hi9w4a",
    "opslag": {
     "a": {},
     "b": {},
@@ -11502,7 +11503,7 @@
     404,
     404
    ],
-   "hindernis": "Onbekende functie: proef-4h4ou6",
+   "hindernis": "Onbekende functie: proef-7ph8r2",
    "opslag": {
     "a": {},
     "b": {},
@@ -13138,7 +13139,7 @@
     404,
     404
    ],
-   "hindernis": "Dat runbook bestaat niet: proef-bvpfsw",
+   "hindernis": "Dat runbook bestaat niet: proef-ye02ni",
    "opslag": {
     "a": {},
     "b": {},
@@ -13876,9 +13877,7 @@
    "hindernis": "Die organisatie kennen we niet.",
    "opslag": {
     "a": {},
-    "b": {
-     "rtgai": 9
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -15509,7 +15508,9 @@
    "hindernis": "Deze entiteit staat niet op uw naam.",
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "rtgai": 9
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -22009,8 +22010,7 @@
    ],
    "opslag": {
     "a": {
-     "accountRollen": 1,
-     "labFonds": 3
+     "accountRollen": 1
     },
     "b": {},
     "c": {}
@@ -29140,9 +29140,7 @@
    ],
    "hindernis": "Kies een projectsoort.",
    "opslag": {
-    "a": {
-     "rtgai": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -31789,26 +31787,27 @@
    "methode": "POST",
    "pad": "/api/labfonds/beslis",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    409
    ],
-   "hindernis": "Dit voorstel bestaat niet.",
    "opslag": {
-    "a": {},
+    "a": {
+     "labFonds": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "reden": "de eerste kale oproep deed geen werk (status 409)",
     "statussen": [
-     404,
-     404
+     409,
+     409
     ],
     "opslag": {
      "d": {},
@@ -31819,6 +31818,12 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
+   },
+   "voorziening": {
+    "stand": "gelukt",
+    "velden": [
+     "id"
+    ]
    }
   },
   {
@@ -31860,34 +31865,41 @@
    "methode": "POST",
    "pad": "/api/labfonds/doneer",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
-   "hindernis": "Deze locatie bestaat niet.",
    "opslag": {
-    "a": {},
+    "a": {
+     "labFonds": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "labFonds": "gewijzigd"
+    }
    },
    "zonderSleutel": {
-    "stand": "ongemeten",
+    "stand": "onbeschermd",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
     "statussen": [
-     404,
-     404
+     200,
+     200
     ],
     "opslag": {
-     "d": {},
-     "e": {}
+     "d": {
+      "labFonds": "gewijzigd"
+     },
+     "e": {
+      "labFonds": "gewijzigd"
+     }
     },
     "effect": {
-     "d": "geen",
-     "e": "geen",
+     "d": "opslag=1",
+     "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
     }
    }
@@ -32004,50 +32016,62 @@
    "methode": "POST",
    "pad": "/api/labfonds/scheidsrechter",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
-   "hindernis": "Dit voorstel bestaat niet.",
    "opslag": {
-    "a": {},
+    "a": {
+     "labFonds": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "labFonds": "gewijzigd"
+    }
    },
    "zonderSleutel": {
-    "stand": "ongemeten",
+    "stand": "onbeschermd",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
     "statussen": [
-     404,
-     404
+     200,
+     200
     ],
     "opslag": {
-     "d": {},
-     "e": {}
+     "d": {
+      "labFonds": "gewijzigd"
+     },
+     "e": {
+      "labFonds": "gewijzigd"
+     }
     },
     "effect": {
-     "d": "geen",
-     "e": "geen",
+     "d": "opslag=1",
+     "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
     }
+   },
+   "voorziening": {
+    "stand": "gelukt",
+    "velden": [
+     "id"
+    ]
    }
   },
   {
    "methode": "POST",
    "pad": "/api/labfonds/stem",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
-   "hindernis": "Dit voorstel bestaat niet.",
    "opslag": {
     "a": {},
     "b": {},
@@ -32056,54 +32080,67 @@
    "zonderSleutel": {
     "stand": "ongemeten",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
-     404,
-     404
+     200,
+     200
     ],
     "opslag": {
      "d": {},
      "e": {}
     },
     "effect": {
-     "d": "geen",
-     "e": "geen",
+     "d": "opslag=1",
+     "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
     }
+   },
+   "voorziening": {
+    "stand": "gelukt",
+    "velden": [
+     "id"
+    ]
    }
   },
   {
    "methode": "POST",
    "pad": "/api/labfonds/voorstel/maak",
    "rol": "member",
-   "idempotentie": "ongemeten",
-   "reden": "de eerste oproep deed geen werk (status 404)",
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
    "statussen": [
-    404,
-    404,
-    404
+    200,
+    200,
+    200
    ],
-   "hindernis": "Deze locatie bestaat niet.",
    "opslag": {
-    "a": {},
+    "a": {
+     "labFonds": "gewijzigd"
+    },
     "b": {},
-    "c": {}
+    "c": {
+     "labFonds": "gewijzigd"
+    }
    },
    "zonderSleutel": {
-    "stand": "ongemeten",
+    "stand": "onbeschermd",
     "grond": null,
-    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
     "statussen": [
-     404,
-     404
+     200,
+     200
     ],
     "opslag": {
-     "d": {},
-     "e": {}
+     "d": {
+      "labFonds": "gewijzigd"
+     },
+     "e": {
+      "labFonds": "gewijzigd"
+     }
     },
     "effect": {
-     "d": "geen",
-     "e": "geen",
+     "d": "opslag=1",
+     "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
     }
    }
@@ -33506,7 +33543,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "rtgai": "gewijzigd"
+     }
     },
     "effect": {
      "d": "opslag=1",
@@ -41192,9 +41231,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "rtgai": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -45907,7 +45944,9 @@
    ],
    "viaPas": "lid-lifestyle",
    "opslag": {
-    "a": {},
+    "a": {
+     "rtgai": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -50170,9 +50209,7 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {
-     "rtgai": "gewijzigd"
-    }
+    "c": {}
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -56629,7 +56666,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "rtgai": "gewijzigd"
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -56649,7 +56688,8 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in rtgai, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -58498,9 +58538,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "rtgai": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "opslag=1",
@@ -59133,33 +59171,25 @@
     200
    ],
    "opslag": {
-    "a": {
-     "inzageLog": 1
-    },
+    "a": {},
     "b": {},
-    "c": {
-     "inzageLog": 1
-    }
+    "c": {}
    },
    "zonderSleutel": {
-    "stand": "onbeschermd",
+    "stand": "ongemeten",
     "grond": null,
-    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {
-      "inzageLog": 1
-     },
-     "e": {
-      "inzageLog": 1
-     }
+     "d": {},
+     "e": {}
     },
     "effect": {
-     "d": "opslag=1",
-     "e": "opslag=1",
+     "d": "geen",
+     "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
    }
@@ -66101,9 +66131,7 @@
      404
     ],
     "opslag": {
-     "d": {
-      "rtgai": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -66384,7 +66412,9 @@
    "hindernis": "Overeenkomst niet gevonden.",
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "rtgai": "gewijzigd"
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -73281,17 +73311,15 @@
     "c": {}
    },
    "zonderSleutel": {
-    "stand": "beschermd",
-    "grond": "opslag",
-    "reden": "de eerste kale oproep veranderde de opslag en de woordelijk gelijke herhaling niet",
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
     "statussen": [
      200,
      200
     ],
     "opslag": {
-     "d": {
-      "rtgai": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -75790,7 +75818,9 @@
    ],
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "rtgai": "gewijzigd"
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -75810,7 +75840,8 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in rtgai, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -79408,9 +79439,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "rtgai": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -83260,7 +83289,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "rtgai": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -85050,9 +85081,7 @@
    ],
    "viaPas": "lid-lifestyle",
    "opslag": {
-    "a": {
-     "rtgai": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -90157,7 +90186,9 @@
    ],
    "hindernis": "Vul eerst de geboortedatum in; zonder leeftijdspas blijft het leerpaspoort dicht.",
    "opslag": {
-    "a": {},
+    "a": {
+     "rtgai": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -90193,9 +90224,7 @@
    ],
    "hindernis": "Vul eerst de geboortedatum in; zonder leeftijdspas blijft het leerpaspoort dicht.",
    "opslag": {
-    "a": {
-     "rtgai": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -96267,9 +96296,7 @@
    "hindernis": "Dit project bestaat niet.",
    "opslag": {
     "a": {},
-    "b": {
-     "rtgai": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -98039,7 +98066,9 @@
      404
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "rtgai": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -101929,9 +101958,7 @@
     "a": {
      "ledenSites": 1
     },
-    "b": {
-     "rtgai": "gewijzigd"
-    },
+    "b": {},
     "c": {
      "ledenSites": "gewijzigd"
     }
@@ -101954,8 +101981,7 @@
      "nietGemeten": "bestand,externe-aanroep"
     },
     "laag": "idem-poort (verklaring in idemsleutels.js)"
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in rtgai, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -104367,11 +104393,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "weefsel": "gewijzigd",
-     "stadNodes": "gewijzigd",
-     "stadMetingen": 35
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -105030,7 +105052,9 @@
      403
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "rtgai": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -107318,9 +107342,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "rtgai": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -111411,7 +111433,7 @@
     404,
     404
    ],
-   "hindernis": "Die regel bestaat niet: proef-487cl9",
+   "hindernis": "Die regel bestaat niet: proef-f6id25",
    "opslag": {
     "a": {
      "zaakCommand": 1
@@ -111449,7 +111471,7 @@
     404,
     404
    ],
-   "hindernis": "Die regel bestaat niet: proef-zmo8ri",
+   "hindernis": "Die regel bestaat niet: proef-f1vvgh",
    "opslag": {
     "a": {},
     "b": {},
@@ -111852,7 +111874,7 @@
     404,
     404
    ],
-   "hindernis": "Dat runbook bestaat niet: proef-xk17v1",
+   "hindernis": "Dat runbook bestaat niet: proef-3gbdy7",
    "opslag": {
     "a": {},
     "b": {},
@@ -112788,7 +112810,9 @@
      409
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "rtgai": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -113279,9 +113303,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "rtgai": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -113301,8 +113323,7 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in rtgai, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -118900,9 +118921,7 @@
     "a": {
      "horeca": "gewijzigd"
     },
-    "b": {
-     "rtgai": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -120204,7 +120223,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "rtgai": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -124291,9 +124312,7 @@
    ],
    "hindernis": "Niets staat onder het minimum; er valt niets te bestellen.",
    "opslag": {
-    "a": {
-     "rtgai": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -127546,7 +127565,9 @@
    "opslag": {
     "a": {},
     "b": {},
-    "c": {}
+    "c": {
+     "rtgai": "gewijzigd"
+    }
    },
    "zonderSleutel": {
     "stand": "ongemeten",
@@ -129505,9 +129526,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "rtgai": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "opslag=2",
@@ -134498,7 +134517,9 @@
    ],
    "hindernis": "Geef een groothandel-code op.",
    "opslag": {
-    "a": {},
+    "a": {
+     "rtgai": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -134640,9 +134661,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "rtgai": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -134662,8 +134681,7 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in rtgai, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -139688,9 +139706,7 @@
    "hindernis": "Autoverkoop hoort bij een verhuur/autobedrijf.",
    "opslag": {
     "a": {},
-    "b": {
-     "rtgai": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -141254,7 +141270,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "rtgai": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -144407,9 +144425,7 @@
    ],
    "opslag": {
     "a": {},
-    "b": {
-     "rtgai": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -144429,8 +144445,7 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in rtgai, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -146927,7 +146942,9 @@
     ],
     "opslag": {
      "d": {},
-     "e": {}
+     "e": {
+      "rtgai": "gewijzigd"
+     }
     },
     "effect": {
      "d": "geen",
@@ -148306,9 +148323,7 @@
     200
    ],
    "opslag": {
-    "a": {
-     "rtgai": "gewijzigd"
-    },
+    "a": {},
     "b": {},
     "c": {}
    },
@@ -152236,7 +152251,9 @@
      404
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "rtgai": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -152273,9 +152290,7 @@
      404
     ],
     "opslag": {
-     "d": {
-      "rtgai": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -157029,9 +157044,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "rtgai": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "opslag=1",
@@ -158443,7 +158456,9 @@
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "opslag": {
     "a": {},
-    "b": {},
+    "b": {
+     "rtgai": "gewijzigd"
+    },
     "c": {}
    },
    "zonderSleutel": {
@@ -158463,7 +158478,8 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   }
+   },
+   "vermoedenVerworpen": "bij B bewoog een wijziging in rtgai, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
   },
   {
    "methode": "POST",
@@ -161567,9 +161583,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "rtgai": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "geen",
@@ -164442,7 +164456,9 @@
      404
     ],
     "opslag": {
-     "d": {},
+     "d": {
+      "rtgai": "gewijzigd"
+     },
      "e": {}
     },
     "effect": {
@@ -165758,9 +165774,7 @@
    "hindernis": "Dat rapport kennen we niet.",
    "opslag": {
     "a": {},
-    "b": {
-     "rtgai": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -170167,9 +170181,7 @@
      404
     ],
     "opslag": {
-     "d": {
-      "rtgai": "gewijzigd"
-     },
+     "d": {},
      "e": {}
     },
     "effect": {
@@ -170360,6 +170372,347 @@
     "effect": {
      "d": "geen",
      "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/beslis",
+   "rol": null,
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    409
+   ],
+   "zonderRol": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "opslag": {
+    "a": {
+     "labFonds": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 409)",
+    "statussen": [
+     409,
+     409
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   },
+   "voorziening": {
+    "stand": "gelukt",
+    "velden": [
+     "id"
+    ]
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/doneer",
+   "rol": null,
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "zonderRol": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "opslag": {
+    "a": {
+     "labFonds": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "labFonds": "gewijzigd"
+    }
+   },
+   "zonderSleutel": {
+    "stand": "onbeschermd",
+    "grond": null,
+    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
+    "statussen": [
+     200,
+     200
+    ],
+    "opslag": {
+     "d": {
+      "labFonds": "gewijzigd"
+     },
+     "e": {
+      "labFonds": "gewijzigd"
+     }
+    },
+    "effect": {
+     "d": "opslag=1",
+     "e": "opslag=1",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/financiering",
+   "rol": null,
+   "idempotentie": "ongemeten",
+   "reden": "de eerste oproep deed geen werk (status 404)",
+   "statussen": [
+    404,
+    404,
+    404
+   ],
+   "zonderRol": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "hindernis": "Er is geen onderzoek genoemd.",
+   "opslag": {
+    "a": {},
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep deed geen werk (status 404)",
+    "statussen": [
+     404,
+     404
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/locatie/maak",
+   "rol": null,
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "zonderRol": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "opslag": {
+    "a": {
+     "labFonds": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "beschermd",
+    "grond": "gemerkt",
+    "reden": "de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js",
+    "statussen": [
+     200,
+     200
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    },
+    "laag": "idem-poort (verklaring in idemsleutels.js)"
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/overzicht",
+   "rol": null,
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "zonderRol": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "opslag": {
+    "a": {
+     "rtgai": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "ongemeten",
+    "grond": null,
+    "reden": "de eerste kale oproep liet niets achter in de gemeten collecties; dan is er geen tweede effect om te zien",
+    "statussen": [
+     200,
+     200
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "geen",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/scheidsrechter",
+   "rol": null,
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "zonderRol": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "opslag": {
+    "a": {
+     "labFonds": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "labFonds": "gewijzigd"
+    }
+   },
+   "zonderSleutel": {
+    "stand": "onbeschermd",
+    "grond": null,
+    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
+    "statussen": [
+     200,
+     200
+    ],
+    "opslag": {
+     "d": {
+      "labFonds": "gewijzigd"
+     },
+     "e": {
+      "labFonds": "gewijzigd"
+     }
+    },
+    "effect": {
+     "d": "opslag=1",
+     "e": "opslag=1",
+     "nietGemeten": "bestand,externe-aanroep"
+    }
+   },
+   "voorziening": {
+    "stand": "gelukt",
+    "velden": [
+     "id"
+    ]
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/stem",
+   "rol": null,
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "zonderRol": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "opslag": {
+    "a": {
+     "labFonds": "gewijzigd"
+    },
+    "b": {},
+    "c": {}
+   },
+   "zonderSleutel": {
+    "stand": "beschermd",
+    "grond": "gemerkt",
+    "reden": "de server merkte de herhaling zelf (herhaald: true) terwijl er GEEN sleutel is gestuurd -- dat kan alleen van de idem-poort komen, op grond van de verklaring in idemsleutels.js",
+    "statussen": [
+     200,
+     200
+    ],
+    "opslag": {
+     "d": {},
+     "e": {}
+    },
+    "effect": {
+     "d": "opslag=1",
+     "e": "geen",
+     "nietGemeten": "bestand,externe-aanroep"
+    },
+    "laag": "idem-poort (verklaring in idemsleutels.js)"
+   },
+   "voorziening": {
+    "stand": "gelukt",
+    "velden": [
+     "id"
+    ]
+   }
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/labfonds/voorstel/maak",
+   "rol": null,
+   "idempotentie": "beschermd",
+   "reden": "de server merkte de herhaling zelf (herhaald: true)",
+   "statussen": [
+    200,
+    200,
+    200
+   ],
+   "zonderRol": "lichaamssleutel: gezinsPoort -- de sleutel staat in het lichaam en niet in de kop, dus rollen kruisen meet niets",
+   "opslag": {
+    "a": {
+     "labFonds": "gewijzigd"
+    },
+    "b": {},
+    "c": {
+     "labFonds": "gewijzigd"
+    }
+   },
+   "zonderSleutel": {
+    "stand": "onbeschermd",
+    "grond": null,
+    "reden": "een woordelijk gelijke herhaling ZONDER sleutel deed het werk opnieuw -- dit is de dubbeltik",
+    "statussen": [
+     200,
+     200
+    ],
+    "opslag": {
+     "d": {
+      "labFonds": "gewijzigd"
+     },
+     "e": {
+      "labFonds": "gewijzigd"
+     }
+    },
+    "effect": {
+     "d": "opslag=1",
+     "e": "opslag=1",
      "nietGemeten": "bestand,externe-aanroep"
     }
    }
@@ -174475,9 +174828,7 @@
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "opslag": {
     "a": {},
-    "b": {
-     "rtgai": "gewijzigd"
-    },
+    "b": {},
     "c": {}
    },
    "zonderSleutel": {
@@ -174497,8 +174848,7 @@
      "e": "geen",
      "nietGemeten": "bestand,externe-aanroep"
     }
-   },
-   "vermoedenVerworpen": "bij B bewoog een wijziging in rtgai, maar een vierde oproep met dezelfde sleutel deed dat niet opnieuw: niet van deze route"
+   }
   },
   {
    "methode": "POST",
@@ -176076,7 +176426,9 @@
    "zonderRol": "geen bewakerslaag (bewaking zit in de handler, bijv. een capability-token)",
    "hindernis": "Onbekende werkruimte of verkeerd lid-token.",
    "opslag": {
-    "a": {},
+    "a": {
+     "rtgai": "gewijzigd"
+    },
     "b": {},
     "c": {}
    },
@@ -178667,9 +179019,7 @@
     ],
     "opslag": {
      "d": {},
-     "e": {
-      "rtgai": "gewijzigd"
-     }
+     "e": {}
     },
     "effect": {
      "d": "opslag=1",

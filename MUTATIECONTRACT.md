@@ -1529,6 +1529,62 @@ is de prijskaart van die keuze.
 
 ---
 
+## 6e. Wat maakt twee aanroepen hetzelfde verzoek? (14 september 2026)
+
+`npm run idemidentiteit` (`IDEMIDENTITEIT.json`) meet de as die de vijf assen
+hierboven openlieten: niet *of* een tweede aanroep wordt herkend, maar **waaraan**.
+
+De aanleiding is een gemeten gebrek en geen ordedrang. `/api/supplier/betaalverzoek`
+vergeleek alleen het bedrag, dus dezelfde sleutel met een **andere ontvanger** gaf
+200 met `herhaald: true` — de tweede ontvanger kreeg niets en de balie las *gelukt*.
+Dat is in september gerepareerd; de vraag die overbleef is waar er nóg zo één zit,
+en dat is een meting.
+
+**Wat hij leest.** Per `metIdem`-aanroepplek de sleutel (waaronder een herhaling
+wordt teruggevonden) en de afdruk (waaraan de laag ziet dat twee oproepen met
+dezelfde sleutel tóch een ander verzoek dragen), en daaruit één grove uitspraak:
+`verklaard` · `voegtToe` · `voegtNietsToe` · `geenAfdruk` · `nietTeLezen`.
+
+**Drie dingen die je nergens anders moet herhalen.**
+
+**`voegtToe` is geen goedkeuring.** Het zegt dat de afdruk *iets* draagt dat de
+sleutel niet heeft — niet dat hij alles draagt waarop de handler onderscheidt. Dat
+laatste was precies het betaalverzoek: de afdruk had het bedrag wél en de ontvanger
+niet, en die plek zou hier gewoon `voegtToe` heten. Het register draagt daarom
+`voegtToeIsGeenGoedkeuring: true`, en een toets bewaakt dat dat zo blijft.
+
+**`metIdem` is niet één functie, en die indeling is zelf een bewering**
+(`BEWIJSMACHINE.md` par. 6a). Naast die van `lib/idem.js` — `(sleutel, afdruk,
+werk)` — heeft `kern/podium/index.js:103` een eigen, per-kanaal exemplaar met de
+volgorde `(k, sleutel, doe)`. Wie dat door elkaar haalt, leest
+`metIdem(k, idem ? 'c:' + key + ':' + idem : null, …)` als een afdruk die zijn
+eigen sleutel bevat en meldt een gat dat er niet is. De vier podium-plekken staan
+daarom in `nietTeLezen` mét de reden, en niet in een van de vier uitspraken.
+
+**De duurste helft loopt buiten `metIdem` om.** Het gebrek van #270 zat niet op een
+aanroepplek: het betaalverzoek zoekt met `verzoekIdemZoek()` zélf een eerdere
+aanroep op en vergelijkt daarna met de hand. Een meter die alleen `metIdem` leest,
+had er dus niets over gezegd — en ondertussen gemeld dat alles in orde is. Er is
+daarom een tweede familie, waar de **vergelijkingen** de afdruk zijn. Daar staan
+vandaag drie plekken die er géén doen; twee ervan liggen op een geldweg.
+
+**Wat hij níét zegt.** Dit is een triagelijst en geen foutenlijst, in de vorm van
+`DOODSPOOR.json`. Een smalle afdruk kan een uitgeschreven besluit zijn: bij
+`kern/pay/partner.js` staat er met zoveel woorden dat een uitbetaling geen
+parameters buiten de partner heeft, omdat het altijd om het beschikbare saldo gaat
+en het bedrag legitiem per moment verschilt. De graad is `vermoed` en kan dat niet
+overstijgen: er wordt bron gelezen en niets uitgevoerd.
+
+**En de meter heeft zichzelf drie keer betrapt**, wat hier hoort te staan omdat het
+de uitslag kleurt. Hij telde eerst veertig aanroepplekken in plaats van
+achtendertig, omdat twee documenten een `metIdem`-aanroep *citeren* in hun
+toelichting — een citaat is geen aanroep. Hij miste de twee plekken die het minste
+vergelijken, omdat zijn patroon stilzwijgend minstens één teken vóór `idem` eiste:
+`verzoekIdemZoek` matchte en `idemZoek` niet. En zijn eerste versie las argumenten
+met een kale komma-splitsing, die breekt op de allereerste vorm die dit huis
+gebruikt. Alle drie zitten nu in de ijking, en de meter **weigert een uitslag te
+schrijven** als die ijking niet schoon is.
+
 ## 7. Wat er vandaag níét is
 
 Eerlijk, met de reden:

@@ -174,10 +174,18 @@ function documentatie({ methodes, GRENS }) {
   R('Een weigering draagt een stabiele `code`, de zin voor een mens in `error`, en');
   R('`herhaalbaar`. Bij een machtigingsfout komen `machtiging`, `verleend`, `gevraagd`');
   R('en `hoe` mee -- samen zeggen die welke van de vier oorzaken je voor je hebt.\n');
+  R('Twee codes staan er met *hangt af van de methode*, en dat is geen slag om de');
+  R('arm: bij die twee staat niet vast of je aanroep nog is uitgevoerd, en dan');
+  R('beslist de mutatieklasse van de methode of opnieuw proberen mag. Je hoeft dat');
+  R('niet zelf op te zoeken -- de fout die je vangt draagt gewoon `true` of');
+  R('`false`, ingevuld voor de methode die je aanriep.\n');
   R('| code | status | herhaalbaar | wat het betekent |');
   R('|---|---|---|---|');
   for (const f of platformfout.overzicht()) {
-    R('| `' + f.code + '` | ' + f.status + ' | ' + (f.herhaalbaar ? 'ja' : 'nee') + ' | ' + f.uitleg + ' |');
+    /* `herhaalbaarTekst` en geen eigen ternair: met `f.herhaalbaar ? ja : nee`
+       leest een derde stand als "nee", en dan staat er iets anders in de
+       documentatie dan wat de fout zelf draagt. */
+    R('| `' + f.code + '` | ' + f.status + ' | ' + f.herhaalbaarTekst + ' | ' + f.uitleg + ' |');
   }
   R('');
   R('### Codes die er (nog) niet zijn\n');

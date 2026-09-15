@@ -355,6 +355,12 @@
     "toelatingsproef:vast": "node scripts/toelatingsproef.js --vastleggen",
     "doelgroepbereik": "node scripts/doelgroepbereik.js",
     "doelgroepbereik:vast": "node scripts/doelgroepbereik.js --vastleggen",
+    "landdekking": "node scripts/landdekking.js",
+    "landdekking:vast": "node scripts/landdekking.js --vastleggen",
+    "soeverein": "node scripts/soeverein.js",
+    "soeverein:vast": "node scripts/soeverein.js --vastleggen",
+    "doorbelasting": "node scripts/doorbelasting.js",
+    "doorbelasting:vast": "node scripts/doorbelasting.js --vastleggen",
     "aanvoervorm": "node scripts/aanvoervorm.js",
     "aanvoervorm:vast": "node scripts/aanvoervorm.js --vastleggen",
     "kantoormacht": "node scripts/kantoormacht.js",
@@ -389,7 +395,8 @@
     "zaakliveproef": "node scripts/zaakliveproef.js",
     "zaakliveproef:vast": "node scripts/zaakliveproef.js --vastleggen",
     "omzetproef": "node scripts/omzetproef.js",
-    "omzetproef:vast": "node scripts/omzetproef.js --vastleggen"
+    "omzetproef:vast": "node scripts/omzetproef.js --vastleggen",
+    "idemidentiteit": "node scripts/idemidentiteit.js"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

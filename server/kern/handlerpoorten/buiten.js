@@ -80,7 +80,7 @@ const ROUTERPOORTEN = {
   huisPoort: { veld: 'bedrijf',
     wat: 'server/routes/kantoorpakket-huis.js via huisDrive(): werkplek.kent(bedrijf) plus magIn()' },
   gezinsPoort: { veld: 'code',
-    wat: 'server/routes/tiener.js en baby.js: rtf.verifieerProfiel(code, token)' },
+    wat: 'server/routes/tiener.js, baby.js en labfonds.js: rtf.verifieerProfiel(code, token), gasten eruit' },
   rtfPoort: { veld: 'code',
     wat: 'server/routes/kantoorpakket-huis.js: dezelfde profielcontrole op code + token' },
   gastAuth: { veld: 'sleutel',

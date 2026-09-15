@@ -197,6 +197,20 @@ async function zetWereldKlaar({ post, tokens, datamap }) {
   const open = facturen.find(f => f && f.status === 'open');
   w.factuurId = (open && open.id) || null;
 
+  /* 10a. EEN LOCATIE IN HET LAB-FONDS, en dit is geen luxe maar een gat dat al
+          op main stond. Zes labfondsroutes gaven `ongemeten` met de reden "de
+          eerste oproep deed geen werk (status 404)" -- doneer, voorstel/maak,
+          stem, beslis, scheidsrechter en financiering. Dat 404 is geen
+          eigenschap van die routes maar van de wereld: elk van hen noemt een
+          locId of een voorstel-id, en er was geen enkele locatie.
+
+          De naam draagt een UNIEK achtervoegsel. `locatieMaak` normaliseert de
+          naam en de idem-poort leidt uit de inhoud een sleutel af; met een
+          vaste naam is de tweede ronde een herkende dubbeltik en krijg je de
+          locatie van de vorige ronde terug in plaats van een verse. */
+  w.labLocId = veld(await stil('/api/labfonds/locatie/maak',
+    { naam: 'Proeflocatie ' + Date.now(), land: 'NL' }, tokens.member), 'locatie', 'id');
+
   /* ============================================================================
      11. DE WERELDEN MET EEN EIGEN SLEUTEL IN HET LIJF.
 
@@ -985,6 +999,29 @@ function geldLijf(w) {
     '/api/pay/oplaad': { centen: 10000 },
     '/api/pay/tegoed/koop': { centen: 5000, aan: w.cn2, oms: 'prooftegoed' },
     '/api/labfonds/locatie/maak': { naam: 'Proeflocatie', land: 'NL' },
+    /* DE VIER DIE EEN LOCATIE NODIG HEBBEN. `bedrag` staat hier in EURO'S en
+       niet in centen: kern/labfonds.js doet `naarCenten(euro)` en weigert
+       onder EUR 1. Wie hier 500 invult, zamelt vijfhonderd euro in. Dezelfde
+       eenheidsval als `giftcard/sell` hierboven, en daarom staat hij er weer
+       bij. De teksten halen de ondergrenzen van de route zelf (titel >= 4,
+       doel >= 10 tekens); `onderzoek` blijft leeg, want dat veld is optioneel
+       en een verzonnen verwijzing zou 400 geven.
+
+       Valt `w.labLocId` weg, dan haalt `heel()` deze vier er vanzelf uit en
+       blijven ze eerlijk ongemeten -- niet met een `locId: null` dat op een
+       andere manier strandt. */
+    '/api/labfonds/doneer': { locId: w.labLocId, bedrag: 5 },
+    '/api/labfonds/voorstel/maak': { locId: w.labLocId, titel: 'Proefvoorstel',
+      doel: 'Dit levert de omgeving iets op en is met opzet klein gehouden.', bedrag: 5 },
+    '/api/rtf/labfonds/doneer': { locId: w.labLocId, bedrag: 5 },
+    '/api/rtf/labfonds/voorstel/maak': { locId: w.labLocId, titel: 'Proefvoorstel gezin',
+      doel: 'Dit levert de omgeving iets op en is met opzet klein gehouden.', bedrag: 5 },
+    /* `keuze` hoort bij het LIJF en het voorstel-id bij de VOORZIENING: stem,
+       beslis en scheidsrechter krijgen elk een VERS voorstel, want `beslis`
+       sluit het (status !== 'open' -> 409) en dan meet de volgende route een
+       toestandscontrole in plaats van zijn eigen gedrag. */
+    '/api/labfonds/stem': { keuze: 'voor' },
+    '/api/rtf/labfonds/stem': { keuze: 'voor' },
     '/api/wallet/voeg': { soort: 'klantenkaart', titel: 'Proefkaart', code: 'PROEF-0001' },
     /* `proef` vraagt een BESTAANDE provider-id, anders "Onbekende
        betaalprovider". `stripe` staat in de gesloten lijst van
@@ -1119,6 +1156,59 @@ const VOORZIENINGEN = {
     const id = r && r.data && r.data.pas && r.data.pas.id;
     return id ? { id } : { fout: 'pas/uitgeven gaf ' + (r && r.status) };
   },
+  /* ======================================================================
+     EEN VERS VOORSTEL IN HET LAB-FONDS, voor de drie routes die er een
+     NOEMEN. Zij delen er met opzet geen: `beslis` zet de status weg van
+     'open', en daarna geeft `stem` 409 ("Over dit voorstel is al beslist")
+     en meet de proef een toestandscontrole in plaats van duplicaatgedrag.
+     Dat is precies het onderscheid dat MUTATIECONTRACT.md niet wil zien
+     vervagen, dus elk van de drie krijgt zijn eigen voorstel.
+
+     Het voorstel wordt door het LID gemaakt, ook voor de gezinsdeur: het
+     grootboek is een en dezelfde, en het id is er niet anders om. Wie hier
+     de gezinssessie zou gebruiken, beproeft de voorziening in plaats van de
+     route. De titel draagt een unieke sleutel om dezelfde reden als de
+     locatie hierboven. ====================================================== */
+  ...(() => {
+    const versVoorstel = async ({ post, tokenVoor, w }) => {
+      if (!w.labLocId) return { fout: 'geen labfondslocatie in de wereld' };
+      const r = await post('/api/labfonds/voorstel/maak',
+        { locId: w.labLocId, titel: 'Vers proefvoorstel', bedrag: 5,
+          doel: 'Dit levert de omgeving iets op en is met opzet klein gehouden.',
+          idem: versSleutel('labvoorstel') }, tokenVoor('member'));
+      const id = r && r.data && r.data.voorstel && r.data.voorstel.id;
+      return id ? { id } : { fout: 'labfonds/voorstel/maak gaf ' + (r && r.status) +
+        ' ' + ((r && r.data && r.data.error) || '') };
+    };
+    /* EN `beslis` VRAAGT EEN VOORSTEL VAN DE JUISTE INDIENER. `beslis` weigert
+       met 403 "Alleen wie dit voorstel indiende, sluit de stemming" zodra
+       `v.doorKey` niet de aanroeper is. Een voorstel dat het LID heeft
+       ingediend is voor de GEZINSdeur dus onbruikbaar: die schrijft in het
+       grootboek op `rtf:CODE:pid` en niet op de lidsleutel. Gemeten: de
+       gezinsroute stond op `ongemeten (403)` zolang hij het lid-voorstel
+       kreeg. Voor die ene route maakt de voorziening het voorstel daarom
+       LANGS DE GEZINSDEUR ZELF -- dezelfde route, dezelfde poort, alleen een
+       stap eerder. `stem` en `scheidsrechter` stellen die eis niet en houden
+       het goedkopere lid-voorstel. */
+    const versGezinsVoorstel = async ({ post, tokenVoor, w }) => {
+      if (!w.labLocId) return { fout: 'geen labfondslocatie in de wereld' };
+      if (!w.gezinCode || !w.gezinToken) return { fout: 'geen gezinssessie in de wereld' };
+      const r = await post('/api/rtf/labfonds/voorstel/maak',
+        { code: w.gezinCode, token: w.gezinToken, locId: w.labLocId, bedrag: 5,
+          titel: 'Vers gezinsvoorstel',
+          doel: 'Dit levert de omgeving iets op en is met opzet klein gehouden.',
+          idem: versSleutel('labvoorstelgezin') }, tokenVoor('member'));
+      const id = r && r.data && r.data.voorstel && r.data.voorstel.id;
+      return id ? { id } : { fout: 'rtf/labfonds/voorstel/maak gaf ' + (r && r.status) +
+        ' ' + ((r && r.data && r.data.error) || '') };
+    };
+    const uit = {};
+    for (const p of ['/api/labfonds/stem', '/api/labfonds/beslis', '/api/labfonds/scheidsrechter',
+      '/api/rtf/labfonds/stem', '/api/rtf/labfonds/scheidsrechter'])
+      uit[p] = versVoorstel;
+    uit['/api/rtf/labfonds/beslis'] = versGezinsVoorstel;
+    return uit;
+  })(),
   /* Een vers klompje VAN mij, want de ijkoproep trekt het vorige in. */
   '/api/pay/verzoek/intrek': async ({ post, tokenVoor, w }) => {
     if (!w.cn2) return { fout: 'geen tweede codenaam in de wereld' };

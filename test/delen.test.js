@@ -176,6 +176,47 @@ test('meterijk heeft een eigen tijdgrens, ruimer dan de vijf snelle ijkingen', (
     'te groeien en staat de muntworp er morgen weer');
 });
 
+/* DE VIJFDE MANIER: EEN RUISFILTER DAT TE VEEL WEGVANGT.
+
+   test/helper.js houdt een lijst BROWSERRUIS bij: meldingen die de browser over
+   zijn EIGEN animatie doet en die niets over de app zeggen. Keuringsregel 30
+   dwingt af dat elke schermtoets via letOpFouten() luistert, dus die lijst is
+   het ENE punt waar een paginafout kan verdwijnen -- voor alle schermtoetsen
+   tegelijk.
+
+   Dat maakt hem precies zo gevaarlijk als hij nuttig is. Wordt hij een patroon
+   ('alles wat met Transition begint') of een blanco zeef, dan blijven de
+   schermtoetsen groen terwijl er echte fouten op de pagina staan, en dan test
+   deze keten stil minder dan hij belooft.
+
+   Deze toets houdt twee dingen tegelijk vast, want een van de twee alleen is
+   onvoldoende: de twee BEKENDE animatiemeldingen worden gefilterd (anders zakt
+   move.e2e.js weer op een afkap die de app zelf al inslikt -- zie de kop van
+   BROWSERRUIS), EN een echte appfout komt nog steeds door. Zonder die tweede
+   helft zou "filter alles" deze toets halen.
+
+   MUTATIE (LAT.md regel 2): een derde, onbekende melding erbij zetten in de
+   verwachting -> ZAKT. De lijst leegmaken -> ZAKT. Er een patroon van maken dat
+   ook de appfout pakt -> ZAKT op de tweede helft. */
+test('de browserruis-zeef vangt de bekende animatiemeldingen en laat een echte appfout door', () => {
+  const { letOpFouten } = require('./helper');
+  const luisteraars = {};
+  const nep = { on: (naam, fn) => { (luisteraars[naam] = luisteraars[naam] || []).push(fn); } };
+  const bak = letOpFouten(nep, []);
+  assert.ok(luisteraars.pageerror && luisteraars.pageerror.length,
+    'letOpFouten hangt geen pageerror-luisteraar op -- dan filtert hij niets en meet hij niets');
+
+  const RUIS = ['Transition was skipped',
+    'Transition was aborted because of invalid state. ViewTransition opt-in disabled'];
+  const ECHT = "Cannot read properties of null (reading 'textContent')";
+  for (const bericht of RUIS.concat([ECHT]))
+    for (const fn of luisteraars.pageerror) fn(new Error(bericht));
+
+  assert.deepEqual(bak, [ECHT],
+    'de zeef hoort precies de twee animatiemeldingen te slikken en de appfout door te laten; ' +
+    'gekregen: ' + JSON.stringify(bak));
+});
+
 /* ---- DE GEWOGEN VERDELING (1 september 2026) ----
 
    De verdeling ging van "om en om over de gesorteerde lijst" naar "zwaarste

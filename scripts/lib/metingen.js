@@ -112,6 +112,10 @@ const REGISTER = {
   'AICONTEXT.json': { meter: ['aiContextLek', 'aiContextVeldenGezien'] },
   /* Het stilspoorregister draagt twee schulden en een bereikmeter. */
   'STILSPOOR.json': { meter: ['stilSpoor', 'stilleOpslag', 'stilSpoorAanroepen'] },
+  /* IDEMIDENTITEIT.json (npm run idemidentiteit) beantwoordt wat na #269/#270
+     overbleef: waar is de identiteit van een verzoek nog te smal? Drie tanden,
+     een omhoog en twee omlaag -- zie de kop bij die tanden in ../norm.js. */
+  'IDEMIDENTITEIT.json': { meter: ['idemVerklaard', 'idemAfdrukVoegtNietsToe', 'idemHandwerkGeenVergelijking'] },
   /* STAGEVORM.json meet of de publieke domeinen een datavorm delen (STAGE.md
      par. 0). Om dezelfde reden als bij CARRIEREVORM.json hierboven is de
      geratelde waarde het BEREIK en niet de uitkomst: dat er 0 velden gedeeld
@@ -203,6 +207,33 @@ const REGISTER = {
      die verdwijnt zonder besluit is precies de stille faalvorm die deze laag
      moet vangen. */
   'OMZETPROEF.json': { eigenRatel: 'test/omzetproef.test.js' },
+
+  /* De landdekking heeft twee tanden die de TEGENOVERGESTELDE kant op staan, en
+     dat is met opzet: `landenVolledig` mag alleen omhoog en `landenZonderEnige`
+     alleen omlaag. Met een tand zou het getal te verbeteren zijn door een land
+     uit kern/fiscaal/landen.js te halen -- minder landen zonder dekking, zonder
+     dat er iets bijkwam. De toets bewaakt daarnaast de INDELING van de meting
+     (welke as ondergrens is, wordt geteld en niet ingetikt), want een meter die
+     kennis als dekking telt, meet het tegenovergestelde van wat hij moet meten. */
+  'LANDDEKKING.json': { eigenRatel: 'test/landdekking.test.js' },
+
+  /* De soevereiniteitsmeter heeft twee tanden die allebei OMHOOG moeten, en dat
+     is anders dan de landdekking ernaast: daar is de schuld het aantal landen
+     zonder dekking, hier is er geen schuldgetal maar alleen bereik. Wat hij
+     bewaakt is dat de isolatielaag niet stil KRIMPT -- een drager die zijn
+     sleutel verliest of een poort die req.session niet meer zet, maakt de
+     isolatie zwakker zonder dat er een toets zakt, en dat is precies wat
+     SEC-LOCK-003 verbiedt. De toets bewaakt daarnaast dat de vier delen nooit
+     tot een cijfer worden opgeteld. */
+  'SOEVEREIN.json': { eigenRatel: 'test/soeverein.test.js' },
+
+  /* De doorbelasting heeft twee tanden die elkaars spiegelbeeld zijn: het aantal
+     geldvormen MET een herkomst mag alleen omhoog, het aantal ZONDER alleen
+     omlaag. Met een tand zou het getal te verbeteren zijn door geldvormen weg te
+     halen. De toets bewaakt daarnaast de regel waar de hele meter op staat --
+     `onbekend` is een uitkomst en nooit een aanname -- en dat er geen
+     bijdragebasis wordt berekend zolang de noemer grotendeels onbekend is. */
+  'DOORBELASTING.json': { eigenRatel: 'test/doorbelasting.test.js' },
 
   /* De adressen die de documenten noemen. De toets bevriest het register NIET --
      ADRESSEN.json beweegt bij elke documentregel die een pad noemt, en een tand

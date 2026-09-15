@@ -112,12 +112,23 @@ test('de graden zijn de vier van het huis, in deze volgorde', () => {
 });
 
 test('de graad van een mechanisme komt uit zijn feiten en uit niets anders', () => {
-  assert.equal(L.graadVan({ register: null, stempel: null, lokaal: true, keten: ['ci.yml'] }), 'onbekend');
+  assert.equal(L.graadVan({ register: null, stempel: null, lokaal: false, keten: [] }), 'onbekend',
+    'alleen wie NERGENS draait, vertelt ons niets');
   assert.equal(L.graadVan({ register: 'X.json', stempel: null, lokaal: true, keten: ['ci.yml'] }), 'vermoed',
     'een register zonder stempel hoort bij geen enkele commit');
   assert.equal(L.graadVan({ register: 'X.json', stempel: true, lokaal: false, keten: ['ci.yml'] }), 'gemeten',
     'gestempeld maar maar aan een kant');
   assert.equal(L.graadVan({ register: 'X.json', stempel: true, lokaal: true, keten: ['ci.yml'] }), 'bewezen');
+});
+
+/* DE FOUT DIE DEZE METER ZELF BIJNA MAAKTE. De eerste versie gaf `onbekend` aan
+   elk mechanisme zonder register, en toen heette tien van de twaalf sporten
+   `onbekend`. Maar scripts/check.js schrijft geen JSON en geeft wel degelijk een
+   oordeel via zijn exitcode. Een poort met een uitspraak gelijkstellen aan een
+   poort die nergens draait, is meten wat je niet bedoelt. */
+test('een poort die draait maar geen register schrijft is vermoed, niet onbekend', () => {
+  assert.equal(L.graadVan({ register: null, stempel: null, lokaal: false, keten: ['ci.yml'] }), 'vermoed');
+  assert.equal(L.graadVan({ register: null, stempel: null, lokaal: true, keten: [] }), 'vermoed');
 });
 
 /* DIT IS DE TOETS DIE ERTOE DOET. Drie sterke mechanismen en een zwakke geven

@@ -240,9 +240,19 @@ function bewijsVan(doel) {
 const GRADEN = ['onbekend', 'vermoed', 'gemeten', 'bewezen'];
 
 function graadVan(m) {
-  if (!m.register) return 'onbekend';
-  if (m.stempel !== true) return 'vermoed';
-  return (m.lokaal && m.keten.length) ? 'bewezen' : 'gemeten';
+  /* DRAAIT HIJ UBERHAUPT? Alleen dan weten we niets, en alleen dan is
+     `onbekend` waar. Dit stond hier eerst op "geen register", en dat was
+     aantoonbaar onjuist: scripts/check.js schrijft geen JSON en geeft wel
+     degelijk een oordeel via zijn exitcode. Tien van de twaalf sporten heetten
+     daardoor `onbekend` -- een meter die een poort met een uitspraak gelijkstelt
+     aan een poort die nergens draait, meet iets anders dan hij zegt. */
+  if (!m.lokaal && !(m.keten || []).length) return 'onbekend';
+  /* DRAAGT HIJ ZIJN UITSLAG? Een poort die alleen een exitcode geeft, heeft
+     gemeten maar laat niets na dat bij een commit hoort; een register zonder
+     stempel net zomin. Beide zijn `vermoed`: er is iets vastgesteld, maar niet
+     op een manier die later nog iets bewijst. */
+  if (!m.register || m.stempel !== true) return 'vermoed';
+  return (m.lokaal && (m.keten || []).length) ? 'bewezen' : 'gemeten';
 }
 
 function graadSport(mechanismen) {

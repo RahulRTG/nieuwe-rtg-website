@@ -339,9 +339,19 @@ woordenlijst. **Bewust nog niet gebouwd**: het verandert de standen van
 `BEWIJSLADDER.json`, en daarmee de normtand `bewijsAlleenKeten` en zijn toetsen.
 De eigenaar heeft die correctie overgenomen ("doe het met de bestaande vier graden"), en **het staat**:
 `scripts/bewijsladder.js` geeft elke sport een **graad** naast zijn stand, afgeleid uit feiten
-die het mechanisme al draagt -- geen register is `onbekend`, een register zonder stempel is
-`vermoed` (de uitslag hoort bij geen commit), register plus stempel is `gemeten`, en dat plus
-draaien aan beide kanten is `bewezen`. De graad van een sport is de **zwakste** van zijn
+die het mechanisme al draagt. Twee vragen, in deze volgorde: **draait hij** (zo niet, dan is
+`onbekend` waar en anders niet), en **draagt hij zijn uitslag** -- een poort die alleen een
+exitcode geeft en een register zonder stempel zijn allebei `vermoed`, register plus stempel is
+`gemeten`, en dat plus draaien aan beide kanten is `bewezen`.
+
+**Die eerste vraag zat er eerst niet in, en de meter loog daardoor over zichzelf.** De eerste
+versie gaf `onbekend` aan elk mechanisme zonder register, en toen heette tien van de twaalf
+sporten `onbekend` -- terwijl `scripts/check.js` geen JSON schrijft en wel degelijk een oordeel
+geeft. Een poort met een uitspraak gelijkstellen aan een poort die nergens draait, is meten wat
+je niet bedoelt (`BEWIJSMACHINE.md` par. 6a). Met de correctie: **12 van de 12 sporten staan op
+`vermoed`**, nul op `onbekend`, en per mechanisme 46 `vermoed`, 10 `bewezen`, 2 `gemeten`. Dat
+de sportas geen spreiding heeft is geen defect maar de uitslag: elke sport heeft minstens een
+poort die zijn uitslag niet commit-gebonden draagt. De graad van een sport is de **zwakste** van zijn
 mechanismen, want een conclusie is nooit harder dan haar zachtste premisse.
 
 Uitslag voor de sport waar het om begon: **stand `staat`, graad `vermoed`** -- en hij noemt de

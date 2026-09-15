@@ -1,6 +1,14 @@
 {
-  "gemeten": "2026-09-14",
+  "stempel": {
+    "op": "2026-09-15T00:25:12.502Z",
+    "commit": "ca059d78",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/landdekking.js",
+    "node": "v22.22.2"
+  },
   "graad": "gemeten",
+  "grens": "Deze meter telt GEVULDE CELLEN en beoordeelt geen enkel getal: of het Albanese btw-tarief klopt, of het minimumuurloon van vandaag is, en of een regelpakket juridisch juist rekent, staat hier NIET in. Hij zegt ook niets over of RTG naar een land moet -- dat is een besluit van de eigenaar. En `bedrijfsregister` telt een AANWIJSBAAR register en niet of dat register bereikbaar of actueel is.",
   "hoe": "Elke as leest een bron in server/; geen enkele as komt uit een lijst in dit script.",
   "assen": [
     {

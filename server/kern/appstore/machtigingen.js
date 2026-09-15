@@ -30,8 +30,15 @@
    zonder `bereik` valt in bereik.js door de bodem naar de zwaarste klasse; dat
    blijft zo, en juist daarom is dit veld geen verplichting maar een verzwaring
    die je wegneemt als je weet wat je doet. */
-const M = (id, label, geeft, nooit, risico, doelen, bereik) =>
-  ({ id, label, geeft, nooit, risico, doelen: doelen || [], bereik: bereik || null });
+/* `eistVanLid` is de sleutel van een eis aan het LID ZELF: iets wat het lid moet
+   kunnen voordat hij het kan weggeven. Hij staat HIER op de machtiging en niet
+   in een lijst ernaast, want een tweede lijst met dezelfde vier id's is precies
+   wat hier bij `bereik` al een keer is opgeruimd. Wat de sleutel BETEKENT en wie
+   hem toetst, staat in ./gevermacht.js -- dit bestand kent geen sessie, geen db
+   en geen poort. */
+const M = (id, label, geeft, nooit, risico, doelen, bereik, eistVanLid) =>
+  ({ id, label, geeft, nooit, risico, doelen: doelen || [], bereik: bereik || null,
+    eistVanLid: eistVanLid || null });
 
 /* ----------------------------------------------------------------------------
    DE DOELEN, EN WAAROM HET EEN GESLOTEN LIJST IS.
@@ -87,7 +94,7 @@ const MACHTIGINGEN = [
     'je score in de arena van DEZE app, met je codenaam ernaast',
     'een plek in de ranglijsten van RTG zelf, en niets over leden die deze app niet spelen',
     'hoog',
-    ['meedoen-arena'], 'op-een-bord'),
+    ['meedoen-arena'], 'op-een-bord', 'progressie'),
   M('bericht.klaarzetten',
     'Een bericht voor je klaarzetten in de App Store',
     'hooguit een handvol berichten per dag, die je zelf ophaalt in de App Store',
@@ -139,4 +146,15 @@ function toonbaar(ids, doelen) {
   return uit;
 }
 
-module.exports = { MACHTIGINGEN, DOELEN, machtiging, isMachtiging, toonbaar, doelUitleg, doelMag, NIET_GEBOUWD, RISICO };
+/* Alle id's, in de volgorde van de lijst. Bestaat omdat de doorsnede van
+   kern/namens/versmalling.js een bron `context` EIST: een bron die je weglaat
+   telt daar als leeg en niet als alles, en dat is precies de bedoeling. Deze
+   laag heeft geen contextbeperking per machtiging -- er is niets aan DIT moment
+   dat één van de vier afzonderlijk tegenhoudt -- en dat wordt hier dus
+   UITGESPROKEN in plaats van weggelaten. */
+const ALLE_IDS = Object.freeze(MACHTIGINGEN.map(m => m.id));
+const GEEN_CONTEXTBEPERKING = 'Er is aan dit moment niets dat een afzonderlijke machtiging tegenhoudt; ' +
+  'wat per moment verschilt (is de app live, is hij betaald, is hij verlopen) geldt voor de hele app.';
+
+module.exports = { MACHTIGINGEN, DOELEN, ALLE_IDS, GEEN_CONTEXTBEPERKING,
+  machtiging, isMachtiging, toonbaar, doelUitleg, doelMag, NIET_GEBOUWD, RISICO };

@@ -1,0 +1,1425 @@
+{
+  "stempel": {
+    "op": "2026-09-15T11:35:14.511Z",
+    "commit": "eae98de8",
+    "boomVuil": false,
+    "boomAnders": 0,
+    "instrument": "scripts/ketenbereik.js",
+    "node": "v22.22.2"
+  },
+  "soort": "meting",
+  "uitleg": "Welke schakel van de keten mens -> effect een echte mensenzin werkelijk aanraakt, per ingang, met en zonder lokaal model. Waargenomen met scripts/lib/ketenspoor.js, een preload die zonder RTG_KETENSPOOR niets doet; er is geen regel productiecode voor gewijzigd.",
+  "grens": "Vier dingen die dit NIET zegt. (1) Het spoor zegt \"aangeroepen\" en niet \"geslaagd\" -- een weigering op de juiste plek telt hier even zwaar als een goedkeuring, en dat is met opzet. (2) De toewijzing van een aanraking aan een zin loopt over de POSITIE in het spoorbestand en veronderstelt dat er een verzoek tegelijk loopt; achtergrondwerk tussen twee zinnen door zou aan de laatste zin worden toegeschreven. (3) `effect` komt van de route zelf (`gedaan`), de enige effectclaim die dit huis vandaag doet -- er is niet in de opslag nagekeken. (4) BEREIKBAAR betekent \"een andere ingang raakte hem in DEZE ronde\", niet \"er bestaat een pad\" -- dat laatste is statisch niet te bewijzen.",
+  "corpus": [
+    {
+      "id": "lezen",
+      "zin": "wat staat er morgen in mijn agenda",
+      "verwacht": "een leesactie die al bewezen werkt"
+    },
+    {
+      "id": "mutatie-toegestaan",
+      "zin": "zet vrijdag in mijn agenda",
+      "verwacht": "een mutatie die dit lid zelf mag doen"
+    },
+    {
+      "id": "mutatie-zonder-bevoegdheid",
+      "zin": "maak 500 euro over naar Jan",
+      "verwacht": "geld: hoort nooit zelfstandig te lopen"
+    },
+    {
+      "id": "ambigu",
+      "zin": "regel het maar",
+      "verwacht": "te vaag om een capability te kiezen"
+    },
+    {
+      "id": "onbekende-capability",
+      "zin": "bestel een ruimteschip naar Mars",
+      "verwacht": "bestaat niet; hoort niet verzonnen te worden"
+    },
+    {
+      "id": "uitleg",
+      "zin": "wat is het verschil tussen de passen",
+      "verwacht": "kennis, geen handeling: hoort de executor niet te raken"
+    }
+  ],
+  "standen": [
+    {
+      "stand": "zonder-model",
+      "productie": true,
+      "waarom": "een gewone start"
+    },
+    {
+      "stand": "met-lokaal-model",
+      "productie": true,
+      "waarom": "een gewone start"
+    },
+    {
+      "stand": "deterministische-rail",
+      "productie": false,
+      "waarom": "DIAGNOSE en geen productie: kern/stuur/rail.js draait deze rail alleen met RTG_INTENT_RAIL=deterministisch, nooit in productie en nooit naast een echte modelclient"
+    }
+  ],
+  "haakstand": [
+    {
+      "stand": "zonder-model",
+      "geinstrumenteerd": [
+        {
+          "schakel": "menscontext",
+          "vorm": "object",
+          "functies": 3
+        },
+        {
+          "schakel": "resolver",
+          "vorm": "object",
+          "functies": 4
+        },
+        {
+          "schakel": "beleid",
+          "vorm": "object",
+          "functies": 2
+        },
+        {
+          "schakel": "plan",
+          "vorm": "object",
+          "functies": 2
+        },
+        {
+          "schakel": "gevolg",
+          "vorm": "object",
+          "functies": 2
+        },
+        {
+          "schakel": "mandaat",
+          "vorm": "object",
+          "functies": 3
+        },
+        {
+          "schakel": "executor",
+          "vorm": "fabriek"
+        },
+        {
+          "schakel": "lus",
+          "vorm": "fabriek"
+        },
+        {
+          "schakel": "nacontrole",
+          "vorm": "object",
+          "functies": 2
+        }
+      ],
+      "nietGeinstrumenteerd": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "geinstrumenteerd": [
+        {
+          "schakel": "menscontext",
+          "vorm": "object",
+          "functies": 3
+        },
+        {
+          "schakel": "resolver",
+          "vorm": "object",
+          "functies": 4
+        },
+        {
+          "schakel": "beleid",
+          "vorm": "object",
+          "functies": 2
+        },
+        {
+          "schakel": "plan",
+          "vorm": "object",
+          "functies": 2
+        },
+        {
+          "schakel": "gevolg",
+          "vorm": "object",
+          "functies": 2
+        },
+        {
+          "schakel": "mandaat",
+          "vorm": "object",
+          "functies": 3
+        },
+        {
+          "schakel": "executor",
+          "vorm": "fabriek"
+        },
+        {
+          "schakel": "lus",
+          "vorm": "fabriek"
+        },
+        {
+          "schakel": "nacontrole",
+          "vorm": "object",
+          "functies": 2
+        }
+      ],
+      "nietGeinstrumenteerd": []
+    },
+    {
+      "stand": "deterministische-rail",
+      "geinstrumenteerd": [
+        {
+          "schakel": "menscontext",
+          "vorm": "object",
+          "functies": 3
+        },
+        {
+          "schakel": "resolver",
+          "vorm": "object",
+          "functies": 4
+        },
+        {
+          "schakel": "beleid",
+          "vorm": "object",
+          "functies": 2
+        },
+        {
+          "schakel": "plan",
+          "vorm": "object",
+          "functies": 2
+        },
+        {
+          "schakel": "gevolg",
+          "vorm": "object",
+          "functies": 2
+        },
+        {
+          "schakel": "mandaat",
+          "vorm": "object",
+          "functies": 3
+        },
+        {
+          "schakel": "executor",
+          "vorm": "fabriek"
+        },
+        {
+          "schakel": "lus",
+          "vorm": "fabriek"
+        },
+        {
+          "schakel": "nacontrole",
+          "vorm": "object",
+          "functies": 2
+        }
+      ],
+      "nietGeinstrumenteerd": []
+    }
+  ],
+  "keten": {
+    "zonder-model": {
+      "fluister": {
+        "menscontext": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "resolver": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "beleid": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "plan": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "gevolg": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "mandaat": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        },
+        "executor": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "lus": {
+          "stand": "BEWEZEN",
+          "waarom": "een echte zin via deze ingang raakte hem"
+        },
+        "nacontrole": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        }
+      },
+      "ai": {
+        "menscontext": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "resolver": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "beleid": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "plan": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "gevolg": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "mandaat": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        },
+        "executor": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "lus": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "nacontrole": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        }
+      },
+      "chat": {
+        "menscontext": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "resolver": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "beleid": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "plan": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "gevolg": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "mandaat": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        },
+        "executor": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "lus": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "nacontrole": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        }
+      }
+    },
+    "met-lokaal-model": {
+      "fluister": {
+        "menscontext": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "resolver": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "beleid": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "plan": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "gevolg": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "mandaat": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        },
+        "executor": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "lus": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "nacontrole": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        }
+      },
+      "ai": {
+        "menscontext": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "resolver": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "beleid": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "plan": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "gevolg": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "mandaat": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        },
+        "executor": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "lus": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "nacontrole": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        }
+      },
+      "chat": {
+        "menscontext": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "resolver": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "beleid": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "plan": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "gevolg": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "mandaat": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        },
+        "executor": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "lus": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "nacontrole": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        }
+      }
+    },
+    "deterministische-rail": {
+      "fluister": {
+        "menscontext": {
+          "stand": "BEWEZEN",
+          "waarom": "een echte zin via deze ingang raakte hem"
+        },
+        "resolver": {
+          "stand": "BEWEZEN",
+          "waarom": "een echte zin via deze ingang raakte hem"
+        },
+        "beleid": {
+          "stand": "BEWEZEN",
+          "waarom": "een echte zin via deze ingang raakte hem"
+        },
+        "plan": {
+          "stand": "BEWEZEN",
+          "waarom": "een echte zin via deze ingang raakte hem"
+        },
+        "gevolg": {
+          "stand": "BEWEZEN",
+          "waarom": "een echte zin via deze ingang raakte hem"
+        },
+        "mandaat": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        },
+        "executor": {
+          "stand": "BEWEZEN",
+          "waarom": "een echte zin via deze ingang raakte hem"
+        },
+        "lus": {
+          "stand": "BEWEZEN",
+          "waarom": "een echte zin via deze ingang raakte hem"
+        },
+        "nacontrole": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        }
+      },
+      "ai": {
+        "menscontext": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "resolver": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "beleid": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "plan": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "gevolg": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "mandaat": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        },
+        "executor": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "lus": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "nacontrole": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        }
+      },
+      "chat": {
+        "menscontext": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "resolver": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "beleid": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "plan": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "gevolg": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "mandaat": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        },
+        "executor": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "lus": {
+          "stand": "BEREIKBAAR",
+          "waarom": "niet via deze ingang, wel via een andere -- een mensenzin kan er komen"
+        },
+        "nacontrole": {
+          "stand": "AANWEZIG",
+          "waarom": "gemeten, maar geen enkele zin uit het corpus raakte hem"
+        }
+      }
+    }
+  },
+  "onomzeilbaarheid": {
+    "mandaatGemeten": true,
+    "mutatiesMetEffect": 0,
+    "langsMandaat": 0,
+    "buitenMandaat": 0,
+    "onbekendSpoor": 0,
+    "gereedschapsaanroepen": 2,
+    "leesacties": 0,
+    "gevallen": [],
+    "uitspraak": "NIET_BEPROEFD: geen enkele zin uit het corpus leidde tot een mutatie, dus de vraag of mandaat te omzeilen is, is niet gesteld. Lees `buitenMandaat: 0` NIET als \"mandaat is onomzeilbaar\"."
+  },
+  "zinnen": [
+    {
+      "stand": "zonder-model",
+      "ingang": "fluister",
+      "geval": "lezen",
+      "zin": "wat staat er morgen in mijn agenda",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [
+        "lus"
+      ],
+      "functies": [
+        "lus.(uitkomst)"
+      ]
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "fluister",
+      "geval": "mutatie-toegestaan",
+      "zin": "zet vrijdag in mijn agenda",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [
+        "lus"
+      ],
+      "functies": [
+        "lus.(uitkomst)"
+      ]
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "fluister",
+      "geval": "mutatie-zonder-bevoegdheid",
+      "zin": "maak 500 euro over naar Jan",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [
+        "lus"
+      ],
+      "functies": [
+        "lus.(uitkomst)"
+      ]
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "fluister",
+      "geval": "ambigu",
+      "zin": "regel het maar",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [
+        "lus"
+      ],
+      "functies": [
+        "lus.(uitkomst)"
+      ]
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "fluister",
+      "geval": "onbekende-capability",
+      "zin": "bestel een ruimteschip naar Mars",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "fluister",
+      "geval": "uitleg",
+      "zin": "wat is het verschil tussen de passen",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [
+        "lus"
+      ],
+      "functies": [
+        "lus.(uitkomst)"
+      ]
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "ai",
+      "geval": "lezen",
+      "zin": "wat staat er morgen in mijn agenda",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "ai",
+      "geval": "mutatie-toegestaan",
+      "zin": "zet vrijdag in mijn agenda",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "ai",
+      "geval": "mutatie-zonder-bevoegdheid",
+      "zin": "maak 500 euro over naar Jan",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "ai",
+      "geval": "ambigu",
+      "zin": "regel het maar",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "ai",
+      "geval": "onbekende-capability",
+      "zin": "bestel een ruimteschip naar Mars",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "ai",
+      "geval": "uitleg",
+      "zin": "wat is het verschil tussen de passen",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "chat",
+      "geval": "lezen",
+      "zin": "wat staat er morgen in mijn agenda",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "chat",
+      "geval": "mutatie-toegestaan",
+      "zin": "zet vrijdag in mijn agenda",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "chat",
+      "geval": "mutatie-zonder-bevoegdheid",
+      "zin": "maak 500 euro over naar Jan",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "chat",
+      "geval": "ambigu",
+      "zin": "regel het maar",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "chat",
+      "geval": "onbekende-capability",
+      "zin": "bestel een ruimteschip naar Mars",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "zonder-model",
+      "ingang": "chat",
+      "geval": "uitleg",
+      "zin": "wat is het verschil tussen de passen",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "fluister",
+      "geval": "lezen",
+      "zin": "wat staat er morgen in mijn agenda",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "fluister",
+      "geval": "mutatie-toegestaan",
+      "zin": "zet vrijdag in mijn agenda",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "fluister",
+      "geval": "mutatie-zonder-bevoegdheid",
+      "zin": "maak 500 euro over naar Jan",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "fluister",
+      "geval": "ambigu",
+      "zin": "regel het maar",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "fluister",
+      "geval": "onbekende-capability",
+      "zin": "bestel een ruimteschip naar Mars",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "fluister",
+      "geval": "uitleg",
+      "zin": "wat is het verschil tussen de passen",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "ai",
+      "geval": "lezen",
+      "zin": "wat staat er morgen in mijn agenda",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "ai",
+      "geval": "mutatie-toegestaan",
+      "zin": "zet vrijdag in mijn agenda",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "ai",
+      "geval": "mutatie-zonder-bevoegdheid",
+      "zin": "maak 500 euro over naar Jan",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "ai",
+      "geval": "ambigu",
+      "zin": "regel het maar",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "ai",
+      "geval": "onbekende-capability",
+      "zin": "bestel een ruimteschip naar Mars",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "ai",
+      "geval": "uitleg",
+      "zin": "wat is het verschil tussen de passen",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "chat",
+      "geval": "lezen",
+      "zin": "wat staat er morgen in mijn agenda",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "chat",
+      "geval": "mutatie-toegestaan",
+      "zin": "zet vrijdag in mijn agenda",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "chat",
+      "geval": "mutatie-zonder-bevoegdheid",
+      "zin": "maak 500 euro over naar Jan",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "chat",
+      "geval": "ambigu",
+      "zin": "regel het maar",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "chat",
+      "geval": "onbekende-capability",
+      "zin": "bestel een ruimteschip naar Mars",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "met-lokaal-model",
+      "ingang": "chat",
+      "geval": "uitleg",
+      "zin": "wat is het verschil tussen de passen",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "fluister",
+      "geval": "lezen",
+      "zin": "wat staat er morgen in mijn agenda",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [
+          {
+            "pad": "plan",
+            "soort": "gereedschap"
+          }
+        ],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [
+        "lus",
+        "menscontext",
+        "executor",
+        "beleid",
+        "resolver",
+        "plan",
+        "gevolg"
+      ],
+      "functies": [
+        "lus.(uitkomst)",
+        "menscontext.saneer",
+        "menscontext.handtekening",
+        "executor.(fabriek)",
+        "executor.voerUit",
+        "beleid.toegestanePaden",
+        "resolver.resolveer",
+        "plan.compileer",
+        "beleid.beleidVoor",
+        "gevolg.voorspel"
+      ]
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "fluister",
+      "geval": "mutatie-toegestaan",
+      "zin": "zet vrijdag in mijn agenda",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [
+          {
+            "pad": "plan",
+            "soort": "gereedschap"
+          }
+        ],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [
+        "lus",
+        "menscontext",
+        "executor",
+        "beleid",
+        "resolver",
+        "plan",
+        "gevolg"
+      ],
+      "functies": [
+        "lus.(uitkomst)",
+        "menscontext.saneer",
+        "menscontext.handtekening",
+        "executor.(fabriek)",
+        "executor.voerUit",
+        "beleid.toegestanePaden",
+        "resolver.resolveer",
+        "plan.compileer",
+        "beleid.beleidVoor",
+        "gevolg.voorspel"
+      ]
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "fluister",
+      "geval": "mutatie-zonder-bevoegdheid",
+      "zin": "maak 500 euro over naar Jan",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [
+        "lus",
+        "menscontext",
+        "executor"
+      ],
+      "functies": [
+        "lus.(uitkomst)",
+        "menscontext.saneer",
+        "menscontext.handtekening",
+        "executor.(fabriek)"
+      ]
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "fluister",
+      "geval": "ambigu",
+      "zin": "regel het maar",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [
+        "lus",
+        "menscontext",
+        "executor"
+      ],
+      "functies": [
+        "lus.(uitkomst)",
+        "menscontext.saneer",
+        "menscontext.handtekening",
+        "executor.(fabriek)"
+      ]
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "fluister",
+      "geval": "onbekende-capability",
+      "zin": "bestel een ruimteschip naar Mars",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "fluister",
+      "geval": "uitleg",
+      "zin": "wat is het verschil tussen de passen",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [
+        "lus",
+        "menscontext",
+        "executor"
+      ],
+      "functies": [
+        "lus.(uitkomst)",
+        "menscontext.saneer",
+        "menscontext.handtekening",
+        "executor.(fabriek)"
+      ]
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "ai",
+      "geval": "lezen",
+      "zin": "wat staat er morgen in mijn agenda",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "ai",
+      "geval": "mutatie-toegestaan",
+      "zin": "zet vrijdag in mijn agenda",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "ai",
+      "geval": "mutatie-zonder-bevoegdheid",
+      "zin": "maak 500 euro over naar Jan",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "ai",
+      "geval": "ambigu",
+      "zin": "regel het maar",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "ai",
+      "geval": "onbekende-capability",
+      "zin": "bestel een ruimteschip naar Mars",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "ai",
+      "geval": "uitleg",
+      "zin": "wat is het verschil tussen de passen",
+      "status": 200,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "chat",
+      "geval": "lezen",
+      "zin": "wat staat er morgen in mijn agenda",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "chat",
+      "geval": "mutatie-toegestaan",
+      "zin": "zet vrijdag in mijn agenda",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "chat",
+      "geval": "mutatie-zonder-bevoegdheid",
+      "zin": "maak 500 euro over naar Jan",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "chat",
+      "geval": "ambigu",
+      "zin": "regel het maar",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "chat",
+      "geval": "onbekende-capability",
+      "zin": "bestel een ruimteschip naar Mars",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    },
+    {
+      "stand": "deterministische-rail",
+      "ingang": "chat",
+      "geval": "uitleg",
+      "zin": "wat is het verschil tussen de passen",
+      "status": 403,
+      "weging": {
+        "geslaagdeActies": [],
+        "mutaties": 0,
+        "onbekendeActies": 0
+      },
+      "schakels": [],
+      "functies": []
+    }
+  ]
+}

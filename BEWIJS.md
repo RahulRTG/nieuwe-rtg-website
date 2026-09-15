@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1900 bestanden en 13638 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1901 bestanden en 13652 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1900 |
-| losse beweringen (`test(...)`) | 13638 |
+| toetsbestanden | 1901 |
+| losse beweringen (`test(...)`) | 13652 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 1256 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 1257 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
 | alleen in de kop *genoemd*, nog niet gemeten | 168 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1683 bestanden, 13255 beweringen.
+1684 bestanden, 13269 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -675,6 +675,7 @@ toets omvalt.
 | `kern-live.test.js` | 5 | gezakt op `===->!==` | Tests voor de live-/geo-laag (server/kern/live.js). De functies dragen db + de bus + SSE-routers + geo + i18n; we voeren stubs op en gebruiken de echte geo-helpers. |
 | `kern-util.test.js` | 4 | gezakt op `!==->===` | Zuivere kern-hulpjes (server/kern/util.js): los testbaar, geen server nodig. |
 | `keten.test.js` | 30 | gezakt op `===->!==#0` | DE KETEN (server/lib/keten.js) en het inzagejournaal dat eraan hangt. WAT HIER BEWEZEN WORDT. |
+| `ketenbereik.test.js` | 14 | gezakt op `===->!==#0` | DE KETENPROEF (scripts/ketenbereik.js + scripts/lib/ketenspoor.js). Deze toets bewaakt niet de UITSLAG -- die hoort te veranderen zodra er wordt bedraad. |
 | `ketenchat.test.js` | 5 | gezakt op `liegpoort /api/` | De ketenchat en de interne noodknop: korpsen verbinden eenmalig en delen daarna EEN ketenkanaal; besloten deelgroepen zijn alleen voor de leden en de meldkamer-chefs van de betrokken korpsen kijken mee (lezen, niet... |
 | `ketenproef.test.js` | 33 | gezakt op `===->!==#0` | DE KETENPROEF (scripts/lib/ketenproef.js) -- de acht velden en de zevenstappenlat. WAAROM DIT LOS GETOETST WORDT. |
 | `keuken.test.js` | 17 | gezakt op `liegpoort /api/` | Het keukenbrein (toren horeca): recepten per gerecht, automatische voorraad-afboeking bij de kassabon EN de betaalde gastbestelling, telling, verspilling, levering (met nieuwe kostprijs), het inkoopadvies en de marge... |

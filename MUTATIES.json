@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-15T10:35:35.000Z",
-    "commit": "938edbbf",
+    "op": "2026-09-15T11:36:23.873Z",
+    "commit": "eae98de8",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 2,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -3987,6 +3987,14 @@
       "module": "server/lib/keten.js",
       "operator": "===->!==#0",
       "gezakt": 10,
+      "geprobeerd": 1
+    },
+    "ketenbereik.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/ketenbereik.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "ketenchat.test.js": {

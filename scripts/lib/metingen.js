@@ -215,6 +215,14 @@ const REGISTER = {
      tot een cijfer worden opgeteld. */
   'SOEVEREIN.json': { eigenRatel: 'test/soeverein.test.js' },
 
+  /* De doorbelasting heeft twee tanden die elkaars spiegelbeeld zijn: het aantal
+     geldvormen MET een herkomst mag alleen omhoog, het aantal ZONDER alleen
+     omlaag. Met een tand zou het getal te verbeteren zijn door geldvormen weg te
+     halen. De toets bewaakt daarnaast de regel waar de hele meter op staat --
+     `onbekend` is een uitkomst en nooit een aanname -- en dat er geen
+     bijdragebasis wordt berekend zolang de noemer grotendeels onbekend is. */
+  'DOORBELASTING.json': { eigenRatel: 'test/doorbelasting.test.js' },
+
   /* De adressen die de documenten noemen. De toets bevriest het register NIET --
      ADRESSEN.json beweegt bij elke documentregel die een pad noemt, en een tand
      op gelijkheid zou zakken om een reden die niets met adressen te maken heeft.

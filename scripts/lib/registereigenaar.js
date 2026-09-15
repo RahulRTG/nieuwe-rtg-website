@@ -58,6 +58,7 @@ const EIGENAAR = {
      registers bijkomen zonder dat iemand zegt wie ze bezit. */
   'LANDDEKKING.json': { schrijver: 'scripts/landdekking.js' },
   'SOEVEREIN.json': { schrijver: 'scripts/soeverein.js' },
+  'DOORBELASTING.json': { schrijver: 'scripts/doorbelasting.js' },
 
   /* De lagen die in deze tak zijn gebouwd. */
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },

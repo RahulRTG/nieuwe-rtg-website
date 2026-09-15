@@ -457,6 +457,7 @@ const REGISTERS = [
      dat is exact de reden dat STAGEVORM.json hier ook staat. */
   ['LANDDEKKING.json', 'npm run landdekking:vast', 'in welk land RTG werkelijk kan draaien, tegenover in welk land het alleen kennis heeft'],
   ['SOEVEREIN.json', 'npm run soeverein:vast', 'hoe ver de isolatieladder reikt, en welke toegangswegen hem helemaal niet bereiken'],
+  ['DOORBELASTING.json', 'npm run doorbelasting:vast', 'of herkomst financieel tot de euro te volgen is -- de vraag onder de bijdragebasis'],
   ['DOODSPOOR.json', 'npm run doodspoor:vast', 'of een handeling ergens AANKOMT, of een verklaring draagt waarom niet'],
   ['DOORWERKING.json', 'npm run doorwerking:vast', 'of een gegeven dat een keer is opgegeven doorwerkt, met doel en actualiteit'],
   ['REFUNDMIGRATIE.json', 'npm run refundmigratie:vast', 'welke lezers van een betaalstand mee kunnen naar de tegenboeking'],

@@ -131,6 +131,13 @@ function maakReisbetaling({ db, save, crypto, payVan, nu }) {
       eigen.bak('reisUitkeringen').push({
         id: nieuwId('RUK'), geldrij: g.id, ref: a.ref, at: stempel,
         centen: g.bedragCenten, valuta: g.valuta,
+        /* DE HERKOMST STAAT OP DE RIJ ZELF EN NIET ALLEEN IN `geldrij`. Dat
+           veld is een verwijzing, en scripts/doorbelasting.js zegt in zijn eigen
+           grens dat hij die niet volgt -- met de reden: een keten die je niet in
+           EEN rij ziet, kun je bij een geschil ook niet in een rij tonen. Een
+           uitkering die zegt "dit is voor een derde" zonder erbij te zeggen van
+           wie de waarde kwam, is precies zo'n rij. */
+        economischeHerkomst: g.economischeHerkomst,
         aan: g.economischeEigenaar, relatie: g.relatie, grond: g.grond,
         uitgevoerd: false,
         hoe: 'klaargezet; een mens van het kantoor voert hem uit langs kern/pay (GELD.md)'

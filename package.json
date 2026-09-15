@@ -398,7 +398,10 @@
     "zaakliveproef:vast": "node scripts/zaakliveproef.js --vastleggen",
     "omzetproef": "node scripts/omzetproef.js",
     "omzetproef:vast": "node scripts/omzetproef.js --vastleggen",
-    "idemidentiteit": "node scripts/idemidentiteit.js"
+    "idemidentiteit": "node scripts/idemidentiteit.js",
+    "connectlus": "node scripts/connectlus.js",
+    "connectlus:vast": "node scripts/connectlus.js --vastleggen",
+    "lusproef": "node scripts/lusproef.js"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

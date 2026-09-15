@@ -56,5 +56,15 @@ module.exports = {
     ['Kies uit de huisbibliotheek, of zet een tekstbestand (.txt) in je kluis en hij staat op de plank',
      'Lees in de eigen lezer; de lettergrootte stel je zelf in',
      'Je leesplek reist met je account mee: op elk toestel ga je verder waar je was'],
-    'Bewust geen leesdoelen en geen reeksen -- lezen is geen wedstrijd. De server bewaart alleen je leesplek.')
+    'Bewust geen leesdoelen en geen reeksen -- lezen is geen wedstrijd. De server bewaart alleen je leesplek.'),
+  /* Foundation Connect. De tip gaat over wat het scherm NIET doet, en dat is
+     hier de helft van het product: een ontdeklijst zonder likes, zonder
+     volgers en zonder niveau is zo ongewoon dat een mens het uitgelegd moet
+     krijgen, anders leest de afwezigheid als een gebrek. */
+  '/apps/connect.html': G('Ontdekken: nieuwsgierigheid als ingang, en je gaat weg met iets wat je hebt geleerd, gedaan of doorgegeven.',
+    ['Zeg waar je nieuwsgierig naar bent; een enkel onderwerp is genoeg om te beginnen',
+      'Volg een vraag die je van je eigen onderwerp naar iets nieuws brengt',
+      'Verzet je horizon: van vertrouwd naar ontdekken, en terug',
+      'Kijk onderaan wat je hebt gezien, begrepen, geoefend, gemaakt of doorgegeven'],
+    'Er zijn geen likes, geen volgers, geen reeksen en geen niveau. Wat je hebt gedaan staat er als lijst per onderwerp en nooit als cijfer, en het wordt met niemand vergeleken -- ook niet verborgen als sorteervolgorde. Wat je bekeek maar niet aanraakte, hoe lang je keek en wanneer je keek, wordt niet vastgelegd; wat je ziet komt van wat je zelf hebt aangegeven. De lijst houdt op: twaalf per keer, en dan is het genoeg. Delen en samenwerken hebben hier nog geen knop, want die bereiken een tweede mens en dat wordt in dit huis klaargezet en nooit automatisch verstuurd.'),
 };

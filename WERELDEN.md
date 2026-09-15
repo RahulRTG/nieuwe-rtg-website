@@ -111,7 +111,7 @@ prijs of doelgroep; ze moeten elk een stabiele menselijke context zijn.
 | **LivingOS** | `/apps/rtg.html` | mijn dagelijks leven | 58 |
 | **WorkOS** | `/apps/kantoor.html` | mijn werk en organisaties | 17 |
 | **TravelOS** | `/apps/reizen.html` | mijn reizen en onderweg zijn | 15 |
-| **FoundationOS** | `/apps/foundation/os-publiek.html` | zorg, hulp en maatschappelijke vooruitgang | 10 |
+| **FoundationOS** | `/apps/foundation/os-publiek.html` | zorg, hulp en maatschappelijke vooruitgang | 11 |
 
 Die laatste kolom telt items in `MAPPEN` en geen schermen. De tabel wordt
 machinaal vergeleken met de code, dus als hij niet meer klopt zakt de bouw.
@@ -240,6 +240,21 @@ in `server/kern/livinglab/kader.js`, en dat lab telt al 23 modules met studies,
 ethiek, bewijsgraden en een thema-trechter voor bewoners. Een eigen klimaatlab
 zou die hele laag dupliceren -- de toetsvraag van `PLATFORM.md` par. 0b
 beantwoordt zichzelf hier: tweede ingang, geen zelfstandige capability.
+
+**Ontdekken** (`/apps/connect.html`, werknaam Foundation Connect) kwam er op 15
+september 2026 bij, en hij staat VOORAAN in deze wereld. Waarom hier en niet in
+LivingOS: de contextvraag hierboven beantwoordt zichzelf -- wie iets wil
+ontdekken, leren of doorgeven denkt niet dat hij in zijn huishouden of op zijn
+werk zit. Het is bovendien de enige ingang van deze wereld waar een mens uit
+*nieuwsgierigheid* komt in plaats van uit een vraag om hulp.
+
+Hij BEZIT geen inhoud en dat is het ontwerp: `server/kern/connect/` leest
+`kern/leerstof.js` en `kern/rtfos/publiek.js` en legt er etiketten op. Dat er
+geen gedeeld contenttype onder mag liggen, is gemeten en niet aangenomen
+(`CONNECTLUS.json`: over 18 domeinen met iets ontdekbaars staan 0 van 496 velden
+in alle domeinen en 87,9% in precies een -- minder verwant dan een willekeurige
+doorsnede van dit huis). Dezelfde uitslag als bij `Asset`, `Koopbaar`, `Moment`
+en `Manier`, en dezelfde uitweg: een projectie met etiketten.
 
 De **Buurtruil** kwam er als zesde bij, en hij is de enige rtfos-ingang die op
 een gewone LEDENsessie opengaat -- alle andere staan achter de kantoordeur of op

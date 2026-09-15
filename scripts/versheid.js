@@ -493,6 +493,11 @@ const REGISTERS = [
      besluit dat een Moment een projectie is en geen object. Een verouderde nul
      ziet er exact zo uit als een verse. */
   ['STAGEVORM.json', 'npm run stagevorm:vast', 'of de publieke domeinen een datavorm delen -- STAGE.md par. 0 rust erop, en de uitslag is een nul die er vers en verouderd hetzelfde uitziet'],
+  /* Om dezelfde reden als STAGEVORM.json hierboven: de dragende uitslag is een
+     NUL (0 van 8 werkwoorden in alle domeinen, 0 van 496 velden), en een nul
+     ziet er vers en verouderd precies hetzelfde uit. Wie hem citeert zonder
+     zijn stempel te lezen, citeert de dag dat hij is geschreven. */
+  ['CONNECTLUS.json', 'npm run connectlus:vast', 'of de ontdekkingsdomeinen de lus en zijn contentvorm DELEN -- kern/connect/ rust erop, en de uitslag is een nul'],
   /* Derde van deze soort, en de scherpste: hier staan TWEE nullen naast elkaar
      (0 gedeelde velden, 0 werkwoorden in alle mechanismen op naam) en
      REPRESENTATIE.md par. 0 draagt daarop het besluit dat er geen Representation

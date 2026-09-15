@@ -3,17 +3,17 @@
  "uitleg": "Per handeling: hoeveel van de eigen machinerie raakt hij? Zestien motoren die ieder apart gemeten zijn, hier voor het eerst naast elkaar op DEZELFDE route.",
  "grens": "Twee assen die verschillende dingen missen, nooit opgeteld: `handler` is lexicaal binnen de tekst van de handler (mist een hulpfunctie en de kern-tas) en `bestand` rekent het routebestand plus zijn DIRECTE requires (vangt de hulpfunctie, markeert alle routes in een bestand, mist nog steeds de kern-tas). De tas zit met opzet niet in de route-as: een hub als server.js zette zo 4162 routes op \"idempotent\". Woont een route ZELF in een hub, dan vervalt de bestandsas (bestandsasOnbruikbaar) en is ook zijn handlerspan grof, want die loopt door de infrastructuur van dat bestand. Alleen `mensAanDeDeur` komt uit de ROUTER en is hard. De assen uit EXECUTION_MAP.json zijn gelezen en niet hier geteld.",
  "stempel": {
-  "op": "2026-09-15T14:37:13.790Z",
-  "commit": "121f09d85",
+  "op": "2026-09-15T18:29:04.198Z",
+  "commit": "f59d931e4",
   "boomVuil": false,
-  "boomAnders": 0,
+  "boomAnders": 13,
   "instrument": "scripts/machinedekking.js",
   "node": "v24.18.0"
  },
  "bronnen": {
   "EXECUTION_MAP.json": "c712a29884bcaa0d",
   "KERNHERKOMST.json": "807b7a8bc53cd607",
-  "MUTATIECONTRACT.json": "bdda4283cf84bdd6",
+  "MUTATIECONTRACT.json": "cae7fda12488e1e0",
   "server/kern/stuur/beleid.js": "8dc821a9959c82e0",
   "kernherkomstStempel": {
    "op": "2026-09-03",
@@ -213,9 +213,9 @@
   }
  },
  "gemeten": {
-  "routes": 5076,
-  "muterend": 3803,
-  "leesroutesUitRegister": 1183,
+  "routes": 5098,
+  "muterend": 3813,
+  "leesroutesUitRegister": 1195,
   "assen": 19,
   "perAs": {
    "mensAanDeDeur": {
@@ -576,7 +576,7 @@
     }
    }
   ],
-  "mutatiesZonderEnigeAs": 2794,
+  "mutatiesZonderEnigeAs": 2804,
   "mutatiesZonderHandlerSpan": 0,
   "bestandsasOnbruikbaar": 13,
   "hubdrempel": 40,
@@ -593,7 +593,7 @@
   "assenPerMutatie": [
    {
     "assen": 0,
-    "routes": 2968
+    "routes": 2978
    },
    {
     "assen": 1,
@@ -3935,6 +3935,48 @@
    "methode": "POST",
    "pad": "/api/concern/vestigingen",
    "bestand": "server/routes/concern.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connect/naklank",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connect/naklank/weg",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connect/noteer",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connect/open",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connect/schuif",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/connect/signaal",
+   "bestand": "server/routes/connect.js",
    "onder": [],
    "boven": []
   },
@@ -18762,6 +18804,34 @@
    "methode": "POST",
    "pad": "/api/rtf/club/portaal",
    "bestand": "server/routes/rtfkantoor/codedeuren.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/connect/naklank",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/connect/noteer",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/connect/open",
+   "bestand": "server/routes/connect.js",
+   "onder": [],
+   "boven": []
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/rtf/connect/signaal",
+   "bestand": "server/routes/connect.js",
    "onder": [],
    "boven": []
   },

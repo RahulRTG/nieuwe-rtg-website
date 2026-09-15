@@ -1,12 +1,12 @@
 {
   "uitleg": "Gemeten met scripts/connectlus.js; de vraag en de methode staan in de kop van dat bestand. Een gedeelde WERKWOORDNAAM is geen gedeeld gedrag -- dit wijst kandidaten aan, een mens beslist. Lees A nooit zonder D: een domein met negentig bestanden haalt alle acht werkwoorden door zijn omvang.",
   "stempel": {
-    "op": "2026-09-15T14:12:04.882Z",
-    "commit": "3f11d577",
-    "boomVuil": true,
-    "boomAnders": 0,
+    "op": "2026-09-15T18:29:04.309Z",
+    "commit": "f59d931e4",
+    "boomVuil": false,
+    "boomAnders": 13,
     "instrument": "scripts/connectlus.js",
-    "node": "v22.22.2"
+    "node": "v24.18.0"
   },
   "werkwoorden": {
     "domeinen": 23,
@@ -316,11 +316,11 @@
   "vorm": {
     "vormen": 220,
     "domeinen": 18,
-    "velden": 496,
+    "velden": 495,
     "helftDrempel": 9,
     "inAlleDomeinen": 0,
     "inMinstensDeHelft": 0,
-    "veldenDomeineigen": 436,
+    "veldenDomeineigen": 435,
     "domeineigenPct": 87.9,
     "gedeeld": [
       {
@@ -484,6 +484,49 @@
       ]
     },
     {
+      "naam": "connect",
+      "plekken": 3,
+      "domeinen": [
+        "kern/connect"
+      ],
+      "waar": [
+        "server/kern/connect/horizon.js",
+        "server/kern/connect/leerdossier.js",
+        "server/kern/connect/naklank.js"
+      ]
+    },
+    {
+      "naam": "horizon",
+      "plekken": 2,
+      "domeinen": [
+        "kern/connect"
+      ],
+      "waar": [
+        "server/kern/connect/horizon.js",
+        "server/kern/connect/index.js"
+      ]
+    },
+    {
+      "naam": "ontdekking",
+      "plekken": 1,
+      "domeinen": [
+        "kern/connect"
+      ],
+      "waar": [
+        "server/kern/connect/ontdekking.js"
+      ]
+    },
+    {
+      "naam": "naklank",
+      "plekken": 1,
+      "domeinen": [
+        "kern/connect"
+      ],
+      "waar": [
+        "server/kern/connect/naklank.js"
+      ]
+    },
+    {
       "naam": "vondst",
       "plekken": 1,
       "domeinen": [
@@ -494,31 +537,13 @@
       ]
     },
     {
-      "naam": "ontdekking",
-      "plekken": 0,
-      "domeinen": [],
-      "waar": []
-    },
-    {
       "naam": "lus",
       "plekken": 0,
       "domeinen": [],
       "waar": []
     },
     {
-      "naam": "naklank",
-      "plekken": 0,
-      "domeinen": [],
-      "waar": []
-    },
-    {
       "naam": "weerklank",
-      "plekken": 0,
-      "domeinen": [],
-      "waar": []
-    },
-    {
-      "naam": "horizon",
       "plekken": 0,
       "domeinen": [],
       "waar": []
@@ -543,12 +568,6 @@
     },
     {
       "naam": "mixer",
-      "plekken": 0,
-      "domeinen": [],
-      "waar": []
-    },
-    {
-      "naam": "connect",
       "plekken": 0,
       "domeinen": [],
       "waar": []

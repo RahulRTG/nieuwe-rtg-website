@@ -2,14 +2,14 @@
   "uitleg": "Gemeten met scripts/commerce.js; de vraag en de methode staan in de kop van dat bestand en in COMMERCE.md par. 1. De meting is met opzet royaal: zij maakt Koopbaar rijker dan hij is, zodat een negatieve uitslag zwaar weegt. Een gedeelde NAAM is geen gedeelde BETEKENIS.",
   "vastgelegd": "2026-09-15",
   "gemeten": {
-    "bestanden": 2303,
-    "domeinenTotaal": 620,
-    "koopbareVormen": 554,
-    "koopbareDomeinen": 115,
+    "bestanden": 2317,
+    "domeinenTotaal": 621,
+    "koopbareVormen": 555,
+    "koopbareDomeinen": 116,
     "envelopDrempel": 7,
     "envelop": 46,
     "veldenDomeineigen": 735,
-    "veldenNietEnvelop": 967,
+    "veldenNietEnvelop": 968,
     "gelijkendeVormparen": 16,
     "werkwoordenVolledig": 1,
     "werkwoordenOveral": 0,
@@ -73,9 +73,9 @@
     "zaak"
   ],
   "perWerkwoord": {
-    "toon": 89,
+    "toon": 90,
     "prijs": 37,
-    "beschikbaarheid": 51,
+    "beschikbaarheid": 52,
     "reserveer": 27,
     "bevestig": 55,
     "lever": 20,
@@ -1321,6 +1321,24 @@
       "bewijs": {
         "toon": "fitOverzicht",
         "bevestig": "fitBaanBoek"
+      },
+      "telt": 2
+    },
+    {
+      "domein": "kern/connect",
+      "heeft": {
+        "toon": true,
+        "prijs": false,
+        "beschikbaarheid": true,
+        "reserveer": false,
+        "bevestig": false,
+        "lever": false,
+        "annuleer": false,
+        "retour": false
+      },
+      "bewijs": {
+        "toon": "lijstVan",
+        "beschikbaarheid": "open"
       },
       "telt": 2
     },

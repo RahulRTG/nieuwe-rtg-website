@@ -125,6 +125,15 @@
   "notities": [
     {
       "datum": "2026-09-15",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1579,
+      "meter": "kernBreedte 1579 -> 1580 (de SOM van twee lijnen, niet een derde laag)",
+      "reden": "Het samengaan met main (3f11d577). Twee lijnen verhoogden deze meter ONAFHANKELIJK van 1578 naar 1579, en allebei met een uitgeschreven notitie die hieronder gewoon blijft staan: main met `ondernemingAchterZaak` (de brug uit ONDERNEMEN.md par. 1, 14 september) en deze tak met `kern.neiging` (NEIGING.md, 15 september). In een boom zijn dat twee kernnamen en dus 1580. Er komt met deze samenvoeging GEEN derde naam bij -- het getal stijgt omdat de twee lijnen nu naast elkaar staan, en dat is exact de vorm die de notitie van `toetsenNietGemeten 623 -> 624` hieronder al beschrijft. De twee posten worden daarom NIET samengevoegd tot een: elk beschrijft een echte gebeurtenis op zijn eigen lijn, en een post die zegt `+2 door een merge` wist welke twee namen het zijn. Dat is dezelfde reden waarom `--theirs` op dit bestand eerder in deze tak twee keer een besluit weggooide: een meter kan een getal terugrekenen, een reden niet.",
+      "waarheen": "GRENZEN.json draagt beide namen, elk onder zijn eigen domein: `ondernemingAchterZaak` onder de ondernemingskant en `neiging` onder `neiging`. server/opzet/domeingrens.js GOOIT bij een naam buiten die lijst in plaats van undefined te geven, dus de belofte 'de kern blijft smal' wordt voor deze twee afgedwongen en niet geteld. Daalt een van beide lagen weg, dan daalt deze meter vanzelf mee -- vandaar geen vervaldatum: dit is functieprijs en geen schuld."
+    },
+    {
+      "datum": "2026-09-15",
       "soort": "schuld",
       "sleutel": "keuringOmvang",
       "van": 331,

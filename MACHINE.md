@@ -141,6 +141,24 @@ een tekort van het instrument dat hier vermeld hoort te staan in plaats van
 weggelaten. Wie ze wil aanwijzen, draait `npm run machinedekking` naast een ronde
 op `origin/main` en neemt het verschil.
 
+**En op 15 september 2026 van 2790 naar 2792, en dat is een SOM en geen derde
+ronde.** Twee lijnen verhoogden de ratel onafhankelijk vanaf 2783: main met de
+twee schrijvende routes van de personeels-dagcheck-in (`POST /api/staff/gemoed/zet`
+en `/weg`, uitgeschreven in de commit die de ratel op 2789 zette) en daarna de
+vier routes van de ondernemerslus, en deze tak met de zeven routes van RTG
+Neiging. In één boom zijn dat 2785 + 7 = 2792. Er komt met het samengaan zelf
+geen enkele route bij; het getal stijgt doordat de twee lijnen naast elkaar komen
+te staan. Precies daarom worden de twee posten hierboven niet tot één
+samengevoegd -- een post die zegt "+9 door een merge" wist welke routes het zijn,
+en de meter kan dat niet terughalen omdat hij een telling houdt en geen lijst.
+
+Waarom er op de zeven van deze laag geen as is geplakt, staat in `NEIGING.md`
+par. 5 en komt op hetzelfde neer als bij de dagcheck-in: `envelop` zou de grens
+van de laag tegenspreken (een neiging verlaat het huis nooit, ook niet over de
+bus), en de idempotentie van deze zeven is al gemeten en verklaard in het
+mutatiecontract in plaats van door een motor afgedwongen. Een as aanplakken om
+een teller te laten dalen zet een groen vinkje op een motor die niets doet.
+
 Dezelfde behandeling als `OPEN_MAX` in `SERVICE.md` par. 13 en de acht
 schuldnotities in `NORM.json`: wie een ratel omzeilt zonder het te zeggen, sloopt
 de ratel zelf.

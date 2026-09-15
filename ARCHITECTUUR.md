@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 5089 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 5093 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 5089 |
-| servermodules (`server/**/*.js`) | 3537 |
-| routebestanden (`server/routes/**`) | 594 |
-| kernmodules (`server/kern/**`) | 2211 |
+| API-endpoints | 5093 |
+| servermodules (`server/**/*.js`) | 3550 |
+| routebestanden (`server/routes/**`) | 595 |
+| kernmodules (`server/kern/**`) | 2220 |
 | schermen (`public/**/*.html`) | 319 |
 | gedeelde browsermodules (`public/shared/*.js`) | 353 |
-| toetsbestanden (`test/*.test.js`) | 1683 |
-| schermtoetsen (`test/*.e2e.js`) | 217 |
+| toetsbestanden (`test/*.test.js`) | 1684 |
+| schermtoetsen (`test/*.e2e.js`) | 218 |
 
 ## 2. De weg van een verzoek
 
@@ -127,7 +127,7 @@ lessen en schoolborden van de RTFoundation bijvoorbeeld) en hebben dus geen
 bewakerslaag. Regel 28 van de keuring eist per route een poort **of** een plek op de
 publieke lijst met reden. Deze kolom is een wegwijzer, geen verdict.
 
-Daarnaast 3462 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 3466 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -135,9 +135,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1595 |
+| kern-namen die routes aanraken | 1580 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 237 |
-| daarvan door precies één domein | 1358 |
+| daarvan door precies één domein | 1343 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

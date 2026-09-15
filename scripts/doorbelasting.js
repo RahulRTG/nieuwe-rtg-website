@@ -68,7 +68,19 @@ const DOEL = path.join(WORTEL, 'DOORBELASTING.json');
    geldbedrag is; `soort` en `type` staan NIET bij de herkomsten, want die
    dragen in dit huis tientallen betekenissen (SEMANTIEK.json). */
 const BEDRAG = /^(centen|bedrag|prijs|stuk|totaal|subtotaal|bruto|netto|saldo|amount|btwBedrag|btwCenten|[a-z]+Centen)$/;
-const HERKOMST = /^(herkomst|bron|leverancier|supplier|partner|provider|aanbieder)$/;
+/* `economischeHerkomst` is er op 15 september 2026 bijgekomen, en dat is een
+   verruiming met een reden in plaats van een bredere greep. Het is de KANONIEKE
+   naam die kern/waarde/economischeherkomst.js voor precies deze vraag heeft
+   vastgelegd -- strikter dan `bron` of `partner`, want hij draagt een gesloten
+   lijst partijsoorten in plaats van vrije tekst.
+
+   LET OP BIJ HET VERGELIJKEN MET EEN OUDER REGISTER: een deel van de beweging
+   van dit getal is de meter die een woord LEERT en niet de code die beter wordt.
+   Het onderscheid staat daarom in de uitslag zelf (`perHerkomstveld`), zodat
+   iedereen kan zien welke vormen op welk woord binnenkwamen. Een verschil tussen
+   twee registers van verschillende leeftijd is een leeftijdsverschil, en dat
+   wordt hier niet stilletjes als vooruitgang geboekt. */
+const HERKOMST = /^(herkomst|bron|leverancier|supplier|partner|provider|aanbieder|economischeHerkomst)$/;
 
 const KLASSEN = ['rtgEigen', 'derdePartij', 'belasting', 'fee', 'kortingRefund', 'onbekend'];
 
@@ -147,10 +159,17 @@ function vorm() {
     perModule[m].geldvormen++;
     if (v.volgbaar) perModule[m].volgbaar++;
   }
+  /* Welk WOORD bracht welke vorm binnen. Zonder deze uitsplitsing is niet te
+     zien of een stijging van `volgbaar` uit nieuwe code komt of uit een
+     verruiming van de woordenlijst hierboven. */
+  const perHerkomstveld = {};
+  for (const v of volgbaar) for (const h of v.herkomstVelden) perHerkomstveld[h] = (perHerkomstveld[h] || 0) + 1;
+
   return {
     vormenTotaal: g.vormen.length,
     geldvormen: geldvormen.length,
     volgbaar: volgbaar.length,
+    perHerkomstveld,
     nietVolgbaar: geldvormen.length - volgbaar.length,
     volgbareModules: volgbaar.map(v => v.module).sort(),
     perModule,

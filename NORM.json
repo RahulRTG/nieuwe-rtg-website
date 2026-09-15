@@ -29,7 +29,7 @@
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
     "kernBreedte": 1580,
-    "kernGedeeld": 237,
+    "kernGedeeld": 238,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -2465,6 +2465,103 @@
       "meter": "kernBreedte 1579 -> 1580",
       "reden": "STRUCTUREEL en geen schuld: er is een LAAG bijgekomen, en dat is een verandering in wat er gemeten wordt -- niet iets wat we even niet konden. RTG Neiging (NEIGING.md) voegt EEN kern-eigenschap toe: `kern.neiging`, een object met zeven functies erachter. Dat is het minimum dat een laag met een eigen router kan kosten. De eerste versie legde elf LOSSE namen op de kern en duwde deze meter met zeven omhoog; dat is hersteld naar de vorm die kern/socialewereld.js en kern/geldwereld.js al gebruiken (kern.neiging.intake(...)), en GRENZEN.json laat voor het domein `neiging` precies die ene naam door. Deze plus-een hoort per LAAG te worden betaald en niet per functie -- zou de meter met het aantal routes meegroeien, dan meet hij niets meer. Daarom ook geen vervaldatum: hij daalt weer zodra de laag verdwijnt, en niet doordat iemand hem aflost. AANGEPAST BIJ DE SAMENVOEGING: op de tak was de overgang 1578 -> 1579, op de samengevoegde boom 1579 -> 1580. De reden is ongewijzigd -- het blijft die ENE kern-eigenschap van deze laag -- maar de basis is verschoven doordat main intussen zelf een naam had gekregen (de ondernemerslus van #275). Gemeten: main staat op 1579, de samengevoegde boom op 1580, verschil precies een.",
       "waarheen": "GRENZEN.json (domein `neiging`, precies EEN naam) plus server/opzet/domeingrens.js, die bij een naam buiten die lijst GOOIT in plaats van undefined te geven. Wat kernBreedte meet is koppeling: hoeveel van de kern een route kan aanraken. Voor deze laag draagt de domeingrens dat nu HARDER dan een telling ooit deed -- de zeven routes kunnen aantoonbaar bij precies een naam, en een achtste erbij zetten vraagt een regel in GRENZEN.json die iemand moet schrijven. De plus-een in de telling is dus de prijs van een laag, en de belofte eronder is verhuisd naar de poort die hem afdwingt in plaats van telt."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "kernGedeeld",
+      "van": 237,
+      "vervalt": "2026-12-15",
+      "meter": "kernGedeeld 237 -> 238",
+      "reden": "`reisbetaling` wordt nu door TWEE domeinen aangeraakt: `member` (het lid betaalt) en `kantoren` (het kantoor draait terug). Dat is echte koppeling en geen slordigheid -- een terugboeking is een besluit van een mens en hoort dus achter de kantoordeur, terwijl betalen iets is wat het lid zelf doet. De twee kunnen niet in hetzelfde domein wonen zonder dat een van beide door de verkeerde deur komt. Beide staan als VERKLARING in GRENZEN.json; de domeingrens hield de tweede tegen tot iemand hem opschreef, precies zoals bedoeld. Zelfde vorm als de notitie over `knelpunt` -> `beroepenbieb` van 13 september: een laag die per definitie door twee kanten wordt gebruikt, IS koppeling, en die prijs hoort opgeschreven en niet weggewerkt.",
+      "waarheen": "Niets, tenzij de terugboeking naar het lid verhuist -- en dat mag niet: een lid draait zijn eigen betaling niet terug. Dit getal hoort te dalen doordat OUDE koppelingen verdwijnen, niet doordat nieuwe capabilities buiten de kern om worden bedraad."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "aflossing",
+      "sleutel": "dbDeuren",
+      "van": 529,
+      "meter": "dbDeuren 529 -> 528",
+      "reden": "De schuld van een uur eerder is afgelost langs de weg die er toen bij stond. kern/reisbureau-betaling.js las `db.data.reisAanvragen` en `db.data.partnerTrips` rechtstreeks en schreef `a.betaald` op een rij die hij niet bezit; hij vraagt ze nu op bij de eigenaar (`aanvraagVan`, `tripVan`) en laat die zijn eigen rij bijwerken (`markeerBetaald`). De tand wordt aangedraaid en niet blijven staan: dit is de teller die over een ARCHITECTUURgrens gaat, en die hoort niet stil terug te kunnen. De prijs stond ernaast en is betaald in keuringOmvang.",
+      "waarheen": "De volgende stap is groter dan deze teller: een VERKLAARDE eigenaar voor `reisAanvragen` en `partnerTrips` via kern/eigencollectie.js. Elk van beide wordt vandaag door zes bestanden aangeraakt, dus dat is een eigen ronde -- en pas daarna is `dbDeuren` voor dit domein werkelijk op nul te brengen."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 327,
+      "vervalt": "2026-12-15",
+      "meter": "keuringOmvang 327 -> 328",
+      "reden": "server/kern/reisbureau.js groeide van 8647 naar 9540 byte en komt daarmee in de waarschuwingsband onder 10 kB; de HARDE grens haalt hij niet (700 byte ruimte). De groei is de deur die de eigendomsgrens herstelt: `aanvraagVan`, `tripVan` en `markeerBetaald`, zodat kern/reisbureau-betaling.js niet langer in `db.data.reisAanvragen` en `db.data.partnerTrips` graait. Die ruil is bewust -- dbDeuren ging er 529 -> 528 van omlaag, en dat is de teller die over een ARCHITECTUURgrens gaat in plaats van over een maat. Twee trimrondes zijn al gedaan; wat er staat is de reden waarom de deur bestaat, en die weghalen maakt de volgende lezer niet wijzer. Zelfde vorm als de notitie over kern/stuur/lusstap.js van 11 september: de groei is commentaar en geen code.",
+      "waarheen": "De echte oplossing is groter dan deze maat: `reisAanvragen` en `partnerTrips` worden elk door ZES bestanden aangeraakt, dus een verklaarde eigenaar via kern/eigencollectie.js zakt vandaag op keuringsregel 63 (een schrijver buiten de eigenaar). Als die ronde komt, verhuizen deze drie functies mee naar het opslagcontract en valt dit bestand vanzelf terug."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "aflossing",
+      "sleutel": "keuringScheef",
+      "van": 19,
+      "meter": "keuringScheef 19 -> 18",
+      "reden": "DE SCHULD VAN VANOCHTEND IS AFGELOST, en langs de weg die er toen bij stond. kern/waarde/economischeherkomst.js en kern/waarde/herkomstsplitsing.js hadden nul aanroepers; de verticale slice geeft ze er drie (reisbureau-samenstelling, reisbureau-betaling, bijdragebasis) en daarmee vallen ze allebei uit deze post. Er komt er EEN voor terug -- kern/waarde/bijdragebasis.js, die de basis uitrekent en nog door geen enkele route wordt gelezen -- dus 19 - 2 + 1 = 18. De tand wordt aangedraaid en niet blijven staan: wat een keer beter is geworden, hoort niet stil terug te kunnen.",
+      "waarheen": "bijdragebasis.js krijgt zijn aanroeper zodra er een scherm of route is die de basis TOONT. Dat is bewust nog niet gebouwd: er staat geen tarief naast, dus er valt nog niets af te rekenen -- en een bord dat een basis toont zonder dat iemand weet wat ermee gebeurt, nodigt uit tot een getal dat niemand heeft afgewogen."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "dbDeuren",
+      "van": 528,
+      "vervalt": "2026-12-15",
+      "meter": "dbDeuren 528 -> 529",
+      "reden": "server/kern/reisbureau-betaling.js leest `db.data.reisAanvragen` en `db.data.partnerTrips` rechtstreeks. Dat is geen nieuwe gewoonte maar die van het domein zelf: kern/reisbureau.js raakt db.data op negen plekken aan, en geen van beide collecties heeft een verklaarde eigenaar (regel 63 staat groen). De EIGEN collecties van deze module gaan wel netjes langs kern/eigencollectie.js (`reisGeldrijen`, `reisUitkeringen`). Het gaat dus om twee LEESwegen naar de bak van de buurman plus een veld op de aanvraag zelf (`a.betaald`).",
+      "waarheen": "Laat kern/reisbureau.js een `aanvraagVan(ref)` en een `tripVan(id)` exporteren en geef de betaallaag `reisbureauVan: () => kern.reisbureau` mee, zoals hij nu `payVan` krijgt. Dan zijn beide leeswegen weg en kan `reisAanvragen` meteen een verklaarde eigenaar krijgen -- dat tweede is het echte doel; de teller is er maar het symptoom van."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "kernBreedte",
+      "van": 1578,
+      "vervalt": "2026-12-15",
+      "meter": "kernBreedte 1578 -> 1579",
+      "reden": "`reisbetaling` komt als naam in de kern en wordt door routes/member/winkel.js aangeraakt. Dat is geen sluipende groei maar de prijs van EEN nieuwe capability: de verticale slice van Economic Provenance heeft een ingang nodig, en die ingang is deze naam. Hij staat ook als verklaring in GRENZEN.json bij `member` -- de domeingrens hield hem tegen tot iemand hem opschreef, precies zoals bedoeld.",
+      "waarheen": "Niets, tenzij de route verdwijnt. Dit getal hoort te dalen doordat oude namen verdwijnen en niet doordat nieuwe capabilities buiten de kern om worden bedraad."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 623,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 623 -> 624",
+      "reden": "test/reisherkomst.test.js komt erbij -- dertien toetsen op de verticale slice -- en staat nog niet in MUTATIES.json. Dat is de definitie van deze teller en geen zwakkere toets: VIER mutaties zijn met de hand gedraaid en raakten elk precies hun eigen bewering. Een partijsoort uit de INDELING halen laat toets 6 EN 7 zakken (de dragende: een som over bakken met een restbak klopt altijd, wat wegloopt is de betekenis). Een bak uit de som halen laat 7 zakken. De samenstelling naar de prijs toe laten schalen laat 3 zakken. Een tarief op de vijfde dienst laat 10 zakken. Herstellen gaf telkens 13/13.",
+      "waarheen": "Laat scripts/mutatie.js over test/reisherkomst.test.js lopen bij de eerstvolgende volle ronde; dan mag dit getal weer omlaag."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "keuringScheef",
+      "van": 17,
+      "vervalt": "2026-12-15",
+      "meter": "keuringScheef 17 -> 19",
+      "reden": "server/kern/waarde/economischeherkomst.js en server/kern/waarde/herkomstsplitsing.js worden nog nergens aangeroepen, en de keuring merkt dat terecht op. Dit is de PRIMITIEF uit besluit 1 en niet de migratie: van de 208 geldvormen in DOORBELASTING.json dragen er 26 een aantoonbare herkomst, en welke geldrij als EERSTE omgaat is een productbesluit op een echt betaalpad -- niet iets om terloops te kiezen om een ratel groen te krijgen. De vorm is wel volledig beproefd: de gezaaide wereld uit scripts/lib/economiewereld.js draait hem over 22 deterministische rijen (deel B1 van DOORBELASTING.json) en vond er meteen een echte fout in (de onbekende post liep negatief). Dit huis kent deze tussenstand met naam: NORM.json noteert op 14 september hetzelfde over kern/namens/versmalling.js, en INTELLIGENTIE.md over kern/stuur/mandaat.js -- nul productie-aanroepers, om precies dezelfde reden. Wat hier NIET gebeurt is de telling verlagen door de meting te verzachten: twee modules zonder aanroeper zijn twee modules zonder aanroeper, en dat hoort zichtbaar te blijven staan.",
+      "waarheen": "De eerste migratieronde: laat een geldrij die vandaag AL volgbaar is (een van de 26 uit DOORBELASTING.json deel A, `volgbareModules`) zijn herkomst via geldrij() opschrijven in plaats van via een eigen veld, en laat kern/pay/poort.js die rij lezen. Dat haalt beide modules in een keer uit deze post, en het is meteen de eerste tand van de ratel volgbaar 26 -> hoger."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "keuringScheef",
+      "van": 16,
+      "vervalt": "2026-12-15",
+      "meter": "keuringScheef 16 -> 17",
+      "reden": "server/kern/namens/versmalling.js wordt nog nergens aangeroepen, en de keuring merkt dat terecht op. Dit is de eerste helft van stap 1 uit REPRESENTATIE.md par. 6: de invariant (REP-03, effectief = gevraagd doorsnede geverEffectief doorsnede beleid doorsnede context) staat er en is met 500 gegenereerde invoeren beproefd, maar de zes mechanismen lopen er nog niet doorheen -- dat is echte gedragswijziging op onder meer SEPA-mandaten en app-rechten en hoort een eigen ronde te zijn. Dit huis kent die tussenstand met naam: INTELLIGENTIE.md noteert dat kern/stuur/mandaat.js nul productie-aanroepers heeft, om precies dezelfde reden.",
+      "waarheen": "De bedradingsronde: laat kern/appstore (winkel.js verleen) en kern/fiscaal/gateway/mandaat.js (verleen) de doorsnede aanroepen met een echte geverEffectief. Dat sluit tegelijk twee van de drie openstaande versmallen-posten uit kern/namens/verklaring.js."
+    },
+    {
+      "datum": "2026-09-10",
+      "soort": "schuld",
+      "sleutel": "keuringScheef",
+      "van": 16,
+      "vervalt": "2026-12-15",
+      "meter": "keuringScheef 16 -> 17",
+      "reden": "server/kern/navigatie/gebieden.js wordt nergens aangeroepen. Het bestand komt uit de Move-tak (#226) en droeg daar dezelfde bevinding: de keuring op die tak zelf meet 17 en niet 16, dus dit is geen artefact van de samenvoeging van zeven takken maar een schuld die de tak al had. De module is geen restant: hij houdt de catalogus en de licentiepoort van de navigatiegebieden (aangeboden / gebouwd / actief), ./gebiedkeuze.js is er van afgesplitst en test/navigatiegebieden.test.js bewaakt hem. Wat ontbreekt is de plek waar die catalogus wordt opgevraagd -- een route, of een aanroep uit de routemotor. Dat is een ontwerpbesluit van de tak en niet iets wat een samenvoeging hoort te verzinnen.\n\nVervalt op 2026-12-15: dan hangt hij ergens in, of hij is weg. Beide is beter dan blijven staan -- de eigen woorden van de keuring."
     }
   ],
   "prestatie": {

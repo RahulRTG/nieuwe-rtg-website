@@ -141,7 +141,27 @@ function maakReisbureau({ db, save, crypto, visumtaakVan, accounts, meldLidVan }
     rij: () => (Array.isArray(db.data.reisAanvragen) ? db.data.reisAanvragen : []),
     save, nu, dossier, visum, meldLid });
 
+  /* De deur voor kern/reisbureau-betaling.js: twee lezers en EEN schrijver, zodat
+     die laag niet in deze bak hoeft te graaien. Waarom, staat in de kop daar. */
+  function aanvraagVan(ref) {
+    return (db.data.reisAanvragen || []).find(a => a.ref === String(ref || '')) || null;
+  }
+  function tripVan(id) {
+    return (db.data.partnerTrips || []).find(t => t.id === String(id || '')) || null;
+  }
+  /* Een tweede betaling wordt geweigerd en niet overschreven: dat zou een
+     eerdere boeking onvindbaar maken. */
+  function markeerBetaald(ref, betaling) {
+    const a = aanvraagVan(ref);
+    if (!a) return { status: 404, error: 'Aanvraag niet gevonden.' };
+    if (a.betaald) return { status: 409, error: 'Deze reis is al betaald.', betaald: a.betaald };
+    a.betaald = betaling;
+    save();
+    return { ok: true, betaald: a.betaald };
+  }
+
   return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen,
+    aanvraagVan, tripVan, markeerBetaald,
     bevestig, wijsAf, besluit,
     vraagWijziging: nazorg.vraagWijziging, besluitWijziging: nazorg.besluitWijziging,
     zegAf: nazorg.zegAf } };

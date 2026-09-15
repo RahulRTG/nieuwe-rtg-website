@@ -1,7 +1,7 @@
 {
   "simulatiemodules": 66,
-  "kernmodules": 2126,
-  "kernDomeinen": 597,
+  "kernmodules": 2135,
+  "kernDomeinen": 598,
   "perWereld": {
     "magnaat": {
       "modules": 63,
@@ -76,8 +76,8 @@
       "aantal": 1
     }
   ],
-  "gedeeldeOnderwerpen": 13,
-  "kandidaatparen": 39,
+  "gedeeldeOnderwerpen": 14,
+  "kandidaatparen": 41,
   "parenMetGedeeldeVorm": 0,
   "paren": [
     {

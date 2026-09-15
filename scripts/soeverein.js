@@ -41,6 +41,7 @@
    ============================================================================ */
 const fs = require('fs');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'SOEVEREIN.json');
@@ -191,8 +192,9 @@ function meet() {
   const aanwezig = stenen.filter(s => s.bestaat).length;
 
   return {
-    gemeten: new Date().toISOString().slice(0, 10),
+    stempel: stempel(),
     graad: 'gemeten',
+    grens: 'De vier delen mogen nooit tot een soevereiniteitscijfer worden opgeteld. Het BEREIK is lexicaal herkend en dus een ONDERgrens op \'weegt niet mee\': een poort die req.session via een helper zet, wordt gemist. De NAAMRUIMTE is een woordtelling, dus een begrip onder een andere naam wordt gemist. En dat een BOUWSTEEN bestaat zegt niet dat hij doet wat het voorstel vraagt -- elke steen draagt daarom dektVoorstel: onbepaald.',
     hoe: 'De ladder komt uit kern/isolatie/dragers.js, het bereik uit de toekenning van req.session ' +
       'in de poortbestanden, de naamruimte uit een woordtelling over alle .js in server/, en de ' +
       'bouwstenen uit het bestaan van hun bestand. Geen van vieren uit een lijst in dit script.',
@@ -259,7 +261,12 @@ module.exports = { meet, DOEL, BEGRIPPEN, BOUWSTENEN, VOORGESTELDE_SPORTEN, POOR
 
 if (require.main === module) {
   const u = meet();
-  if (process.argv.includes('--json')) { console.log(JSON.stringify(u, null, 2)); process.exit(0); }
+  /* GEEN process.exit() NA EEN GROTE console.log: naar een BESTAND schrijft node
+     synchroon en gaat het goed, naar een PIPE wordt de uitvoer afgekapt --
+     geldige tekst, kapotte JSON, exitcode 0. Dat is keuringsregel `pipe` in
+     scripts/meetkeuring.js, en hij kostte dit huis ooit twee derde van een
+     uitslag zonder enig signaal. process.exitCode laat de pipe leeglopen. */
+  if (process.argv.includes('--json')) { console.log(JSON.stringify(u, null, 2)); process.exitCode = 0; return; }
   druk(u);
   if (process.argv.includes('--vastleggen')) {
     fs.writeFileSync(DOEL, JSON.stringify(u, null, 2) + '\n');

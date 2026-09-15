@@ -449,6 +449,14 @@ const REGISTERS = [
   ['NAVIGATIEPROEF.json', 'npm run navigatieproef:vast', 'of RTG Navigatie zijn belofte houdt: van waar ik sta naar mijn bestemming'],
   ['MOVEPROEF.json', 'npm run moveproef:vast', 'of een lid RTG Move werkelijk kan gebruiken: van een boeking naar een oordeel op het scherm'],
   ['KETENVORM.json', 'npm run ketenvorm:vast', 'wat de vier gouden ketens werkelijk delen (actoren, beloften)'],
+  /* DE INTERNATIONALE LAAG. Beide verouderen met de CODE en niet met de klok:
+     de landdekking leest kern/fiscaal/landen.js en de pakketmappen, de
+     soevereiniteitsmeter leest kern/isolatie/dragers.js en de poortbestanden.
+     Een land erbij of een drager eruit verandert de uitslag onmiddellijk, en
+     een verouderd exemplaar ziet er precies zo uit als een vers exemplaar --
+     dat is exact de reden dat STAGEVORM.json hier ook staat. */
+  ['LANDDEKKING.json', 'npm run landdekking:vast', 'in welk land RTG werkelijk kan draaien, tegenover in welk land het alleen kennis heeft'],
+  ['SOEVEREIN.json', 'npm run soeverein:vast', 'hoe ver de isolatieladder reikt, en welke toegangswegen hem helemaal niet bereiken'],
   ['DOODSPOOR.json', 'npm run doodspoor:vast', 'of een handeling ergens AANKOMT, of een verklaring draagt waarom niet'],
   ['DOORWERKING.json', 'npm run doorwerking:vast', 'of een gegeven dat een keer is opgegeven doorwerkt, met doel en actualiteit'],
   ['REFUNDMIGRATIE.json', 'npm run refundmigratie:vast', 'welke lezers van een betaalstand mee kunnen naar de tegenboeking'],

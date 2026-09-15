@@ -48,6 +48,7 @@
    ============================================================================ */
 const fs = require('fs');
 const path = require('path');
+const { stempel } = require('./lib/stempel');
 
 const WORTEL = path.join(__dirname, '..');
 const DOEL = path.join(WORTEL, 'LANDDEKKING.json');
@@ -159,8 +160,9 @@ function meet() {
   for (const l of perLand) perAantal[l.onderscheidendeAssen] = (perAantal[l.onderscheidendeAssen] || 0) + 1;
 
   return {
-    gemeten: new Date().toISOString().slice(0, 10),
+    stempel: stempel(),
     graad: 'gemeten',
+    grens: 'Deze meter telt GEVULDE CELLEN en beoordeelt geen enkel getal: of het Albanese btw-tarief klopt, of het minimumuurloon van vandaag is, en of een regelpakket juridisch juist rekent, staat hier NIET in. Hij zegt ook niets over of RTG naar een land moet -- dat is een besluit van de eigenaar. En `bedrijfsregister` telt een AANWIJSBAAR register en niet of dat register bereikbaar of actueel is.',
     hoe: 'Elke as leest een bron in server/; geen enkele as komt uit een lijst in dit script.',
     assen: ASSEN.map(a => Object.assign({ onderscheidend: ONDERSCHEIDEND.includes(a.id) }, a)),
     telling: {
@@ -283,7 +285,12 @@ module.exports = { meet, ASSEN, DOEL };
 
 if (require.main === module) {
   const u = meet();
-  if (process.argv.includes('--json')) { console.log(JSON.stringify(u, null, 2)); process.exit(0); }
+  /* GEEN process.exit() NA EEN GROTE console.log: naar een BESTAND schrijft node
+     synchroon en gaat het goed, naar een PIPE wordt de uitvoer afgekapt --
+     geldige tekst, kapotte JSON, exitcode 0. Dat is keuringsregel `pipe` in
+     scripts/meetkeuring.js, en hij kostte dit huis ooit twee derde van een
+     uitslag zonder enig signaal. process.exitCode laat de pipe leeglopen. */
+  if (process.argv.includes('--json')) { console.log(JSON.stringify(u, null, 2)); process.exitCode = 0; return; }
   druk(u);
   if (process.argv.includes('--vastleggen')) {
     fs.writeFileSync(DOEL, JSON.stringify(u, null, 2) + '\n');

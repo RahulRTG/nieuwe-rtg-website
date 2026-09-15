@@ -1,5 +1,5 @@
 {
-  "vastgelegd": "2026-09-14",
+  "vastgelegd": "2026-09-15",
   "meters": {
     "activeringOnbepaald": 3,
     "activeringOndergrens": 49,
@@ -10,7 +10,7 @@
     "bewijsAlleenKeten": 16,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
-    "browserpoortToetsen": 341,
+    "browserpoortToetsen": 342,
     "carriereDomeinenGemeten": 15,
     "dbDeuren": 528,
     "dbDeurenSchrijvend": 275,
@@ -19,7 +19,7 @@
     "delenZonderOnderwerp": 0,
     "dependencies": 0,
     "devPakketten": 1,
-    "e2eBestanden": 217,
+    "e2eBestanden": 219,
     "endpointsNooitAangeraakt": 0,
     "endpointsZonderTest": 902,
     "faalproefGezakt": 1,
@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1578,
+    "kernBreedte": 1579,
     "kernGedeeld": 237,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 116,
+    "ratelTanden": 118,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -59,7 +59,7 @@
     "taalCellenVerkeerdSchrift": 0,
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
-    "testbestanden": 1668,
+    "testbestanden": 1677,
     "toetsenNietGemeten": 623,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
@@ -109,7 +109,10 @@
     "geldRoutesValsSucces": 28,
     "stilSpoor": 18,
     "stilleOpslag": 25,
-    "stilSpoorAanroepen": 228
+    "stilSpoorAanroepen": 228,
+    "neigingVerwijzingRot": 0,
+    "neigingVoorkeurBlind": 14,
+    "namensMechanismenGemeten": 7
   },
   "notities": [
     {
@@ -2400,6 +2403,15 @@
       "meter": "toetsenNietGemeten 618 -> 619",
       "reden": "De derde integratieronde na #267 voegt twee toetsbestanden toe waar de mutatiemotor nog niet langs is geweest: test/fiscaal-meegeleverd.test.js en test/idemcontract.test.js. De toetsen draaien wel; deze post zegt uitsluitend dat hun gevoeligheid nog niet door een volledige mutatieronde is bewezen. Het getal stijgt met een en niet met twee omdat de meter per toets telt en niet per bestand. MUTATIES.json is NIET hergedraaid: die motor duurt uren, schrijft in echte bronbestanden en hoort op een schone boom te draaien, dus hij zit in ronde.yml en niet in ci.yml -- de bundel draagt de meting van de main-lijn.",
       "waarheen": "De twee toetsen meenemen in de volgende volledige npm run mutatie op een schone boom, samen met de zeven van 14 september."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1578,
+      "meter": "kernBreedte 1578 -> 1579",
+      "reden": "STRUCTUREEL en geen schuld: er is een LAAG bijgekomen, en dat is een verandering in wat er gemeten wordt -- niet iets wat we even niet konden. RTG Neiging (NEIGING.md) voegt EEN kern-eigenschap toe: `kern.neiging`, een object met zeven functies erachter. Dat is het minimum dat een laag met een eigen router kan kosten. De eerste versie legde elf LOSSE namen op de kern en duwde deze meter met zeven omhoog; dat is hersteld naar de vorm die kern/socialewereld.js en kern/geldwereld.js al gebruiken (kern.neiging.intake(...)), en GRENZEN.json laat voor het domein `neiging` precies die ene naam door. Deze plus-een hoort per LAAG te worden betaald en niet per functie -- zou de meter met het aantal routes meegroeien, dan meet hij niets meer. Daarom ook geen vervaldatum: hij daalt weer zodra de laag verdwijnt, en niet doordat iemand hem aflost.",
+      "waarheen": "GRENZEN.json (domein `neiging`, precies EEN naam) plus server/opzet/domeingrens.js, die bij een naam buiten die lijst GOOIT in plaats van undefined te geven. Wat kernBreedte meet is koppeling: hoeveel van de kern een route kan aanraken. Voor deze laag draagt de domeingrens dat nu HARDER dan een telling ooit deed -- de zeven routes kunnen aantoonbaar bij precies een naam, en een achtste erbij zetten vraagt een regel in GRENZEN.json die iemand moet schrijven. De plus-een in de telling is dus de prijs van een laag, en de belofte eronder is verhuisd naar de poort die hem afdwingt in plaats van telt."
     }
   ],
   "prestatie": {
@@ -2419,10 +2431,10 @@
   },
   "sinds": {
     "keuringOmvang": "2026-09-13",
-    "testbestanden": "2026-09-14",
+    "testbestanden": "2026-09-15",
     "toetsenNietGemeten": "2026-09-14",
     "inlineStijlAttributen": "2026-09-11",
-    "ratelTanden": "2026-09-14",
+    "ratelTanden": "2026-09-15",
     "metingenZonderRatel": "2026-08-18",
     "bewijsAchterstand": "2026-09-14",
     "toetsenOngevoeligPct": "2026-09-05",
@@ -2434,8 +2446,8 @@
     "keuringDekkingAdvies": "2026-09-06",
     "dbDeuren": "2026-08-28",
     "dbDeurenSchrijvend": "2026-08-28",
-    "browserpoortToetsen": "2026-09-12",
-    "e2eBestanden": "2026-09-13",
+    "browserpoortToetsen": "2026-09-15",
+    "e2eBestanden": "2026-09-15",
     "schermenZonderVormtaal": "2026-08-28",
     "bewijsCellenBewezen": "2026-09-06",
     "beweringenZonderVulcontrole": "2026-09-05",
@@ -2451,7 +2463,7 @@
     "wekkersZonderTrede": "2026-09-02",
     "wekkersOnverklaard": "2026-09-02",
     "meetleerBlind": "2026-09-02",
-    "kernBreedte": "2026-09-02",
+    "kernBreedte": "2026-09-15",
     "kernGedeeld": "2026-09-05",
     "registersUitVuileBoom": "2026-09-10",
     "laatSpoorVerdacht": "2026-09-03",
@@ -2498,7 +2510,10 @@
     "geldRoutesValsSucces": "2026-09-14",
     "stilSpoor": "2026-09-14",
     "stilleOpslag": "2026-09-14",
-    "stilSpoorAanroepen": "2026-09-14"
+    "stilSpoorAanroepen": "2026-09-14",
+    "neigingVerwijzingRot": "2026-09-15",
+    "neigingVoorkeurBlind": "2026-09-15",
+    "namensMechanismenGemeten": "2026-09-15"
   },
   "uitzonderingen": [
     {

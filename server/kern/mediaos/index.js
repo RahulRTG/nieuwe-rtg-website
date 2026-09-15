@@ -51,7 +51,7 @@ const MODI = {
 };
 const WERELD_MAX = 60; // een eindige wereld
 
-function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, notify, bronnen, zijnVrienden, sseToCustomer }) {
+function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, notify, bronnen, zijnVrienden, sseToCustomer, werkherkomst }) {
   const opslag = require('./opslag')({ db, save });
   const catalogus = maakCatalogus({ bronnen });
   const smaak = maakSmaak({ db, save, schoon });
@@ -83,7 +83,7 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
   const aanwezig = require('./aanwezigheid')({ opslag, schoon, codenaamVan });
   /* De tijdlijn bewaart een moment naast de wek, zonder levende bron te kopieren. */
   const tijdlijn = require('./tijdlijn')({ opslag, aanwezig, SOORT_NAAM: require('./wekken').SOORT_NAAM });
-  const wekken = maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn });
+  const wekken = maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn, werkherkomst });
   const zoeken = require('./zoeken')({ aanwezig, SOORTEN: aanwezig.AANWEZIG_SOORTEN });
 
   /* VOLGEN staat in ./volgen.js: één knop die in Clips en het Theater tegelijk
@@ -105,51 +105,9 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
   mediaBord.aanwezigZoek = zoeken.aanwezigZoek;
   mediaBord.momentenVoor = wekken.mediaMomentenVoor;
 
-  /* ---- de wereld: één catalogus, drie standen ---- */
-  function wereld(sess, opties) {
-    const o = opties || {};
-    if (o.modus === 'zaak') return zaakWereld(sess);
-    const modusNaam = MODI[o.modus] ? o.modus : 'alles';
-    const modus = MODI[modusNaam];
-    const alles = catalogus.alles(sess);
-    const s = smaak.smaakVan(sess.key);
-
-    // wie u volgt, afgeleid uit de domeinen zelf (geen tweede lijst)
-    const volgt = new Set();
-    for (const r of alles.rijen) if (r.volgIk) volgt.add((r.maker || {}).codenaam);
-
-    const inModus = alles.rijen.filter(r => modus.vormen.includes(r.vorm));
-    const geordend = smaak.smaakOrden(inModus, s, volgt);
-    const bewaard = new Set(biebVan(sess.key).map(x => x.id));
-    const rijen = geordend.rijen.slice(0, WERELD_MAX)
-      .map(r => Object.assign({}, r, { bewaard: bewaard.has(r.id) }));
-
-    const meer = geordend.rijen.length - rijen.length;
-    /* Een leeg raster ziet eruit als een kapotte app en zegt niet waarom. Bij
-       niets te tonen komt er daarom een stand mee die WEL iets zegt: wat hier
-       komt, waarom het er nu niet is, en welke stap dat opheft (./leeg.js). */
-    const leeg = rijen.length ? null : legeStand(modusNaam, alles.buiten, geordend.weggelaten, modus.vormen);
-    return {
-      status: 200, modus: modusNaam, modusNaam: modus.naam,
-      leeg,
-      modi: modiVoor(sess),
-      stukken: rijen,
-      totaal: geordend.rijen.length,
-      einde: meer > 0
-        ? 'Dat is wat er nu voor u klaarstaat; er staan nog ' + meer + ' stukken achter de rand.'
-        : 'Dat was alles wat er nu staat.',
-      uitleg: 'Op volgorde van: wie u volgt, wat u zelf hebt aangewezen, en daarna wat er het laatst bij kwam. ' +
-        'Er is geen hitlijst en geen volgorde op kijkcijfers; bij elk stuk staat waarom het er staat.',
-      weggelaten: geordend.weggelaten,
-      /* Alleen de bronnen die in DEZE stand horen. Onder FLOW stond anders een
-         kaart "Live staat buiten uw wereld" -- waar in die stand helemaal geen
-         live in zit. Zelfde filter als in ./leeg.js, en om dezelfde reden: een
-         scherm hoort geen deur te noemen die er niet toe doet. */
-      buiten: (alles.buiten || []).filter(b => modus.vormen.includes(b.vorm)),
-      smaak: s, regelaars: smaak.smaakRegelaars(),
-      volgt: [...volgt].filter(Boolean)
-    };
-  }
+  /* De wereld -- een catalogus, drie standen -- staat in ./wereld.js: dit
+     bestand stelt samen, dat bestand doet iets. Zie de kop daar. */
+  const { wereld } = require('./wereld')({ MODI, catalogus, bronnen, smaak, zaakWereld, modiVoor, biebVan });
 
   return Object.assign({}, lijsten, samen, {
     mediaWereld: wereld, mediaVolg: volg,

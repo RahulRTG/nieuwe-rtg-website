@@ -60,6 +60,13 @@ const EIGENAAR = {
   'SOEVEREIN.json': { schrijver: 'scripts/soeverein.js' },
   'DOORBELASTING.json': { schrijver: 'scripts/doorbelasting.js' },
 
+  /* Foundation Connect (CONNECT.md par. 1). Hij meet of de ontdekkingsdomeinen
+     de lus DELEN, en op die nul rust het besluit dat kern/connect/ een
+     projectie wordt en geen gedeeld inhoudstype. Een eigen ratel in
+     scripts/lib/metingen.js (`connectDomeinenGemeten`, het BEREIK) met een
+     ijking in test/meterijk.test.js. */
+  'CONNECTLUS.json': { schrijver: 'scripts/connectlus.js' },
+
   /* De lagen die in deze tak zijn gebouwd. */
   'IDEMIDENTITEIT.json': { schrijver: 'scripts/idemidentiteit.js' },
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },

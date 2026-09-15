@@ -58,6 +58,12 @@
     /* `link:vrienden` is hier vandaan LivingOS gekomen: de contactenlaag van
        een gezin hoort in de wereld waar haar deur staat (zie de reden in
        app-main-24a2.js). */
+    /* Ontdekken staat VOORAAN in deze wereld en niet achteraan: het is de
+       ingang waar een mens uit zichzelf komt, en de rest van FoundationOS is
+       wat hij daarna tegenkomt. Hij hoort hier en niet in LivingOS omdat de
+       contextvraag van WERELDEN.md dat zegt -- wie iets wil ontdekken, leren of
+       doorgeven denkt niet dat hij in zijn huishouden of op zijn werk zit. */
+      'link:connect',
       'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil', 'link:geven',
       'link:vrienden'] }
   ];

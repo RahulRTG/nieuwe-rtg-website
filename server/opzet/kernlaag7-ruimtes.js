@@ -35,7 +35,46 @@ Object.assign(kern, require('../kern/rtfwallet').maakRtfWallet({
   ensureSupplierDefaults: kern.ensureSupplierDefaults, makeSupplierCode: kern.makeSupplierCode,
   economie: kern.economie, rtfos: kern.rtfos }));
 
-// De Media OS hangt HIER, als laatste: hij LEEST de vier media-domeinen en
-// die moeten er dus al zijn. Uitleg: ./mediaos.js.
+/* FOUNDATION CONNECT (kern/connect/): de ontdeklus over bestaande domeinen --
+   ontdekken, begrijpen, doen, maken, delen, verbinden, helpen, groeien. Hij
+   hoort hier en niet bij de diensten in kernlaag7.js, want hij is precies zo'n
+   overkoepelende werkruimte als RTG One: hij BEZIT geen inhoud en LEEST er
+   twee (kern/leerstof.js en kern/rtfos/publiek.js).
+
+   DAAROM STAAT HIJ NA DE RTFOUNDATION. `rtfos` wordt in kernlaag7.js opgehangen
+   en de lokale bron leest `rtfos.publiek.stad()`; een kopie op montagemoment
+   zou hier undefined bevriezen, en dan meldt de mixer stil dat die motor niets
+   vond terwijl hij er gewoon niet bij kon (de fout die de kop van kernlaag7b
+   beschrijft).
+
+   `DOELEN` komt RECHTSTREEKS uit de module en niet uit de kern, en dat is geen
+   slordigheid: het is een statische tabel van 166 leerdoelen zonder db-greep,
+   geen draaiende motor. De leerstof-INSTANTIE (sessies, voortgang) blijft van
+   routes/leerstof.js -- deze laag leest alleen de catalogus, en kan dus per
+   constructie niemands oefensessie aanraken. */
+/* HIJ HANGT NA DE MEDIA OS, en dat is sinds 15 september de volgorde die
+   telt. `makerVan` en `werkenVan` komen uit kern/mediaos/werkherkomst.js --
+   het register waar vijf domeinen via `nieuwWerk()` zelf vertellen dat DEZE
+   maker DIT heeft gemaakt. Connect LEEST dat en stelt het nooit zelf vast
+   (besluit van de eigenaar: auteurschap consumeren, niet uitvinden).
+
+   Een kopie op montagemoment zou hier undefined bevriezen, en dan zegt de
+   naklank stil dat er geen maker is terwijl het register er gewoon staat --
+   precies de stille faalvorm die de kop van kernlaag7b beschrijft. Vandaar
+   functies die de kern bij AANROEP lezen. */
 require('./mediaos')(kern, hulp);
+
+Object.assign(kern, require('../kern/connect').maakConnect({
+  db, save, crypto,
+  DOELEN: require('../kern/leerstof').DOELEN,
+  rtfos: kern.rtfos,
+  /* Het voorvoegsel gaat eraf: een ontdekking draagt `herkomst:id`
+     (kern/connect/ontdekking.js), het register kent alleen het id. */
+  makerVan: (id) => kern.mediaMakerVanWerk
+    ? kern.mediaMakerVanWerk(String(id || '').replace(/^mediaos:/, '')) : null,
+  werkenVan: (sleutel, max) => kern.mediaWerkenVan ? kern.mediaWerkenVan(sleutel, max) : [] }));
+
+// De Media OS hing HIER als laatste en staat nu BOVEN Foundation Connect: hij
+// LEEST de vier media-domeinen (die moeten er dus al zijn) en Connect leest op
+// zijn beurt zijn werkherkomst. Uitleg: ./mediaos.js.
 };

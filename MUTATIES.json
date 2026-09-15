@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-15T00:31:37.703Z",
-    "commit": "92de4a23",
+    "op": "2026-09-15T19:33:06.162Z",
+    "commit": "f6cb0232",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 7,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -1852,6 +1852,28 @@
       "operator": "getal+1#2",
       "gezakt": 1,
       "geprobeerd": 5
+    },
+    "connect-routes.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "connect-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "connect.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/connect/kring.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 2
     },
     "consent-dekking.test.js": {
       "soort": "puur",
@@ -9367,6 +9389,14 @@
       "module": "server/bedrijf/handeling.js",
       "operator": "===->!==#0",
       "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "werkherkomst.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/mediaos/werkherkomst.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
       "geprobeerd": 1
     },
     "werkindienst.test.js": {

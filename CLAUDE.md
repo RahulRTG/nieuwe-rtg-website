@@ -154,6 +154,73 @@ LEZER op `levensgraaf/termijnen.js`. Par. 7 zet de volgorde vast, en de eerste
 twee regels (uitstapknop, hulpwijzer verbreden) kosten samen twee dagen en doen
 meer voor de mens uit de missie dan de acht eronder.
 
+**`CONNECT.md` is het diepte-document van Foundation Connect** -- het
+ontdeknetwerk van FoundationOS, op het scherm **Ontdekken**. In een zin: *je komt
+omdat het leuk is, je blijft omdat je nieuwsgierig wordt, en je gaat weg met iets
+wat je hebt geleerd, gemaakt, gedaan of betekend.* Lees die vóór je iets bouwt
+waarmee een mens hier iets ontdekt, leert, maakt of doorgeeft. De dragende
+bewering van het voorstel -- dat vrijwel iedere functie in dezelfde lus
+terechtkomt (ontdek, begrijp, doe, maak, deel, verbind, help, groei) -- is eerst
+**gemeten** en niet aangenomen (`npm run connectlus`, `CONNECTLUS.json`, op de
+lezer van `scripts/objectmodel.js`), want dat is exact de vorm waarin `Asset`,
+`Koopbaar`, `Moment`, `Career` en `Manier` alle vijf al sneuvelden. Uitslag over
+<!--getal:connectlus.domeinen-->23<!--/getal--> ontdekkingsdomeinen: **0 van 8 werkwoorden in álle domeinen** (ook `maak`
+niet, 21/23), **2 van 23** domeinen maken de lus rond -- en dat zijn precies de
+twee grootste, dus ze halen het door hun OMVANG en niet door hun vorm -- en **<!--getal:connectlus.combinaties-->22<!--/getal-->
+verschillende combinaties over evenveel domeinen**. De vorm eronder is even streng: <!--getal:connectlus.inAlle-->0<!--/getal-->
+van 496 velden in alle domeinen, 0 in zelfs maar de helft, **<!--getal:connectlus.domeineigenPct-->87.9<!--/getal-->% in precies
+één** (platformbreed 71%), dus de ontdekkingsdomeinen zijn MÍNDER verwant dan een
+willekeurige doorsnede van dit huis. Er komt dus geen `Ontdekking`-objecttype en
+geen contenttabel; wat overleeft is een **verklaring van werkwoorden**
+(`COMMERCE.md`'s `Koopbaar`) plus een **projectie met etiketten**
+(`kern/levensgraaf/graaf.js`). **Het getal dat het product stuurt is
+`begrijp`: <!--getal:connectlus.begrijp-->5<!--/getal--> van 23**, het zeldzaamste werkwoord van het huis -- de stap waar de
+lus op draait bestaat hier bijna nergens, en dat is de naad die deze laag vult in
+plaats van een tweede feed te bouwen. Vier dingen die je nergens anders moet
+herhalen. **De mixer verdeelt PLEKKEN en geen punten**: acht motoren dingen om
+een plek, de horizon van de mens verdeelt ze, en er wordt niets gewogen of
+gesorteerd -- zodra elke motor een getal levert en de hoogste wint, is er weer
+één algoritme met een gewichtenvector die niemand kan lezen; elke plek draagt
+daarom zijn reden in WOORDEN, en vijf motoren melden hardop dat ze niet kijken
+(`KAARTEN.md` par. 6). **Het leerdossier is een ledger en nooit een niveau**: de
+tien treden zijn geen trap waar iemand OP staat, de hoogste wordt afgeleid per
+ONDERWERP en nergens opgeteld (een getal over alle onderwerpen ÍS een niveau), en
+elke regel draagt een graad die volgt uit WIE hem schrijft -- `toegepast` is
+`vermoed`, `gemaakt` `gemeten`, en `gebruikt` en `doorgegeven` zijn `bewezen`
+omdat alleen een ANDER ze kan zetten. Dat is meteen de reden dat hij onder de 18 mag bestaan: de vier
+voorwaarden van het besluit van 14 september staan er als code en niet als
+belofte, en valt er één weg dan geldt `progressieMag` weer. **De naklank heeft
+zes soorten en met opzet geen totaal** -- `signalen` was trouwens bezet (13
+plekken in 8 domeinen) en `weerklank` ook (KANTOOR.md), vandaar de naam. En **de
+kringladder gaat niet de kant op die hij lijkt te gaan**: de trap van een KRING
+is BEREIK en die van een RELATIE NABIJHEID, dus wie dichtbij staat ziet wat
+verder reikt -- met `kijker >= doel` kon een gezinslid het publieke werk van zijn
+eigen kind niet zien. **Besluit 2 is genomen (15 september 2026) en de lus is rond**:
+`npm run lusproef` staat op 17 schakels en 10 storingen, alle gesloten. De regel
+die dat ontwerp stuurt is **Connect mag auteurschap CONSUMEREN, niet zelf
+uitvinden** -- en die komt uit een LEK en niet uit voorzichtigheid: de eerste
+versie liet de aanroeper zeggen wie de maker was, waarmee iedereen een regel met
+bewijskracht in andermans dossier kon schrijven. De uitweg stond er al:
+`kern/mediaos/wekken.js` heeft een haak `nieuwWerk(makerKey, soort, titel)` die
+vijf domeinen aanroepen met een echte ledensleutel op het moment dat het werk er
+is, en `kern/mediaos/werkherkomst.js` legt dat daar vast -- VOOR het wekken, want
+een maker zonder volgers maakt evengoed iets. Connect leest het en krijgt er
+precies EEN ding uit (`makerVanWerk(id)`); er is met opzet geen functie die alle
+werken van iedereen teruggeeft, want dat zou een publieke makerslijst zijn.
+**Daarbij zijn de vijf overdrachtstreden uit elkaar getrokken** -- gemaakt,
+aangeboden, bereikt, gebruikt, doorgegeven -- want als een trede die vijf
+samenvat, zijn publiceren en betekenen hetzelfde ding. De regel eronder is de
+scherpste van deze laag: **wij tellen geen aandacht als ontwikkeling.** `bereikt`
+draagt daarom `aanspraak: 'geen'` en staat WEL in het dossier en NOOIT in het
+portfolio (dat je werk ergens aankwam is bereik, en bereik is aandacht), en
+`mooi` is de enige naklank zonder trede -- juist omdat hij het vaakst gegeven
+wordt. Alle vijf zijn `eenmalig`: deze ladder legt OVERGANGEN vast en nooit
+VOLUMES, dus vier mensen met vier verschillende naklanken leveren samen EEN regel
+`gebruikt` op, en niemand kan andermans dossier laten groeien door te blijven
+drukken. De zes vragen per bewijsstuk (`stelt`, `nietZegt`, `doorWie`, `graad`,
+`werkwoord`, `herkomst`) gebruiken met opzet de woorden van
+`kern/carriereledger/regels.js` en geen tweede vocabulaire.
+
 **`ONTMOETEN.md` is het diepte-document van de twee datingapps** — Vonk en
 Rendez-vous, en vooral waarom het er twee zijn en geen drie. In één zin: **Vonk
 zoekt de juiste mensen, Rendez-vous maakt de juiste ontmoeting** — bij Vonk is de
@@ -1186,8 +1253,8 @@ dat RTG vandaag klopt (`MAGNAATLAB.md`) maar of hij kan voorspellen dat RTG
 mórgen nog klopt. Lees die vóór je een begrip introduceert, een register aanlegt
 of een scorecard bouwt. De opzet vraagt een semantisch register naar aanleiding
 van de twee `VERMOGENS`; de vraag ervóór is gemeten (`scripts/semantiek.js`,
-`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->124<!--/getal--> namen die in meer dan
-één domein staan, dragen er **<!--getal:semantiek.betekenissen-->106<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->394<!--/getal-->
+`SEMANTIEK.json`) en het was **geen incident**: van de <!--getal:semantiek.namen-->125<!--/getal--> namen die in meer dan
+één domein staan, dragen er **<!--getal:semantiek.betekenissen-->107<!--/getal--> meer dan één betekenis** — samen <!--getal:semantiek.betekenissenTotaal-->400<!--/getal-->
 betekenissen, met `SOORTEN` op **39**. Daarnaast **29** betekenissen die op meer
 dan één plek wonen én **106** paren die dezelfde waarheid onder een ándere naam
 dragen — die tweede ronde bestaat omdat de eerste ze miste, en de duurste
@@ -2093,8 +2160,8 @@ zeventiende motor bouwt. De kern in één zin: **dit huis heeft geen tekort aan
 motoren, het heeft een tekort aan handelingen die erlangs gaan** -- en dat is
 gemeten in plaats van beweerd. `npm run machinedekking` (`MACHINEDEKKING.json`)
 legt zestien motoren naast elkaar op DEZELFDE route, iets wat geen enkele
-bestaande meter deed: van de <!--getal:machine.muterend-->3794<!--/getal-->
-muterende routes raken er <!--getal:machine.zonderAs-->2785<!--/getal--> geen
+bestaande meter deed: van de <!--getal:machine.muterend-->3806<!--/getal-->
+muterende routes raken er <!--getal:machine.zonderAs-->2797<!--/getal--> geen
 enkele as, <!--getal:machine.motorenZonderRoute-->1<!--/getal--> motoren bereiken
 geen enkele route (bewijstoken, veiligheidskern, gevolgmeting), en de hoogst
 geïntegreerde handeling buiten de hubs raakt DRIE assen -- er is dus geen enkele

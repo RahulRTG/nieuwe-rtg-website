@@ -269,6 +269,9 @@
       "voorstelLees",
       "werkOverzicht"
     ],
+    "connect": [
+      "connect"
+    ],
     "consent": [
       "commercieelStand",
       "commercieelZet",

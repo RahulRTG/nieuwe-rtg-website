@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **219** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **220** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
 | Bedrijfsgenres | **78** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
-| Kernmodules (`server/kern/**`) | **2198** |
-| App-pagina's (`public/apps/**.html`) | **308** |
-| Testbestanden | **1899** |
+| Kernmodules (`server/kern/**`) | **2220** |
+| App-pagina's (`public/apps/**.html`) | **309** |
+| Testbestanden | **1903** |
 
 ## De vier werelden
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 219 functieschakelaars
+# 1. De 220 functieschakelaars
 
 ### Leden (RTG-app) — 24
 
@@ -141,7 +141,7 @@ ook blokkeert.
 - **RTG Commerce (mand & retour)** (`commerce`) — De verkooplaag boven de domeinen: wat er te koop staat en wat NIET met de reden erbij, een mand over verkopers heen met een afrekening per verkoper, de overdracht naar de deur die bevestigt, en de weg terug. RTG bevestigt hier zelf niets.  
   _voor: rtg, lifestyle, business_
 
-### Eigen apps — 40
+### Eigen apps — 41
 
 - **Spelen (spellen met vrienden)** (`spellen`) — Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.  
   _voor: rtg, lifestyle, business, foundation_
@@ -223,6 +223,8 @@ ook blokkeert.
   _voor: rtg, lifestyle, business_
 - **Mijn loopbaan (het carriere ledger)** (`carriereledger`) — De loopbaan van een mens als chronologische reeks: wat er gebeurde, wanneer, en wie dat heeft bevestigd. Per regel staat erbij wat die bevestiging WEL en NIET zegt -- RTG stelt niets vast over de prestatie zelf. Een regel is apart te delen met een code die verloopt, zodat een sponsor of een bond een titel kan nakijken zonder het hele dossier te zien. Er staat nergens een cijfer op de mens.  
   _voor: rtg, lifestyle, business_
+- **Ontdekken (leren, doen, doorgeven)** (`connect`) — Een ontdeklijst die wordt samengesteld uit lagen die RTG al heeft: leerstof en wat er in de buurt gebeurt. Bezit zelf geen inhoud. Er wordt niets gerangschikt en er staat geen cijfer op iets of iemand; elke plek zegt welke motor hem koos en waarom. Wat u hebt gezien, begrepen, geoefend, gemaakt of doorgegeven blijft als lijst staan -- nooit als niveau, en nooit vergeleken met iemand anders. Uitzetten haalt uw leerdossier niet weg; het sluit alleen de ingang.  
+  _voor: rtg, lifestyle, business, foundation_
 
 ### Partners (leveranciers) — 11
 

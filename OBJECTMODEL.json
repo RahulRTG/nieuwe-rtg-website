@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-15",
   "gemeten": {
-    "bestanden": 2293,
-    "vormen": 1403,
-    "velden": 2027,
-    "modules": 769,
-    "domeinen": 276,
+    "bestanden": 2303,
+    "vormen": 1407,
+    "velden": 2035,
+    "modules": 770,
+    "domeinen": 277,
     "envelopDrempel": 17,
     "envelop": 31,
-    "veldenDomeineigen": 1428,
-    "veldenGedeeldVanafVier": 201,
+    "veldenDomeineigen": 1436,
+    "veldenGedeeldVanafVier": 202,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -192,6 +192,18 @@
       ]
     },
     {
+      "veld": "aan",
+      "domeinen": 12,
+      "waar": [
+        "kern/afdelingen",
+        "kern/command",
+        "kern/geldbeleid",
+        "kern/klok",
+        "kern/lidboard",
+        "kern/pay"
+      ]
+    },
+    {
       "veld": "categorie",
       "domeinen": 12,
       "waar": [
@@ -216,6 +228,18 @@
       ]
     },
     {
+      "veld": "land",
+      "domeinen": 12,
+      "waar": [
+        "bedrijf",
+        "kern/commercie",
+        "kern/concern",
+        "kern/labfonds",
+        "kern/ledenbalie-inzage",
+        "kern/livinglab"
+      ]
+    },
+    {
       "veld": "besluit",
       "domeinen": 11,
       "waar": [
@@ -225,18 +249,6 @@
         "kern/gemeente",
         "kern/labfonds",
         "kern/ledenbalie-zaken"
-      ]
-    },
-    {
-      "veld": "aan",
-      "domeinen": 11,
-      "waar": [
-        "kern/afdelingen",
-        "kern/command",
-        "kern/geldbeleid",
-        "kern/klok",
-        "kern/lidboard",
-        "kern/pay"
       ]
     },
     {
@@ -324,6 +336,18 @@
       ]
     },
     {
+      "veld": "bewijs",
+      "domeinen": 11,
+      "waar": [
+        "kern/betaalwaarheid",
+        "kern/horeca",
+        "kern/invoer",
+        "kern/livinglab",
+        "kern/magnaat-controle",
+        "kern/magnaat-trainingslobby-acties"
+      ]
+    },
+    {
       "veld": "voor",
       "domeinen": 11,
       "waar": [
@@ -369,18 +393,6 @@
         "kern/envelop",
         "kern/experience",
         "kern/luchthaven"
-      ]
-    },
-    {
-      "veld": "land",
-      "domeinen": 11,
-      "waar": [
-        "bedrijf",
-        "kern/commercie",
-        "kern/concern",
-        "kern/labfonds",
-        "kern/ledenbalie-inzage",
-        "kern/livinglab"
       ]
     },
     {
@@ -453,18 +465,6 @@
         "kern/galerij",
         "kern/gedachten",
         "kern/klok"
-      ]
-    },
-    {
-      "veld": "bewijs",
-      "domeinen": 10,
-      "waar": [
-        "kern/betaalwaarheid",
-        "kern/horeca",
-        "kern/invoer",
-        "kern/livinglab",
-        "kern/magnaat-controle",
-        "kern/magnaat-trainingslobby-acties"
       ]
     },
     {

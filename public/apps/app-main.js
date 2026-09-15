@@ -13,7 +13,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '1961d09a';
+var RTG_BOUW = '6b8d8d44';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4459,6 +4459,11 @@ var RTG_BOUW = '1961d09a';
     aankomst:    { naam: 'Aankomst',      url: '/apps/arrival.html' },
     routedossier:{ naam: 'Routedossier',  url: '/apps/routedossier.html' },
     ovroutes:    { naam: 'OV-routes',     url: '/apps/ovroutes.html' },
+    /* Foundation Connect (apps/connect.html): de ontdeklus. Hij heet op het
+       scherm "Ontdekken" en niet "Connect" -- een wereldnaam hoort te klinken
+       als wat een mens er doet, en de werknaam van een laag is geen productnaam
+       (zie de kop van kern/connect/). */
+    connect:     { naam: T('app.connect', 'Ontdekken'), url: '/apps/connect.html' },
     rtfbord:     { naam: 'Het bord',      url: '/apps/foundation/bord.html' },
     rtfschrift:  { naam: 'Het schrift',   url: '/apps/foundation/schrift.html' },
     /* Veiligheid en verbinding. Hier stonden VIER tegels -- Thuiswacht,
@@ -4844,6 +4849,12 @@ var RTG_BOUW = '1961d09a';
     /* `link:vrienden` is hier vandaan LivingOS gekomen: de contactenlaag van
        een gezin hoort in de wereld waar haar deur staat (zie de reden in
        app-main-24a2.js). */
+    /* Ontdekken staat VOORAAN in deze wereld en niet achteraan: het is de
+       ingang waar een mens uit zichzelf komt, en de rest van FoundationOS is
+       wat hij daarna tegenkomt. Hij hoort hier en niet in LivingOS omdat de
+       contextvraag van WERELDEN.md dat zegt -- wie iets wil ontdekken, leren of
+       doorgeven denkt niet dat hij in zijn huishouden of op zijn werk zit. */
+      'link:connect',
       'link:rtfbord', 'link:rtfschrift', 'link:klimaat', 'link:buurtruil', 'link:geven',
       'link:vrienden'] }
   ];

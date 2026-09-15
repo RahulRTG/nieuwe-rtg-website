@@ -753,6 +753,14 @@ const METERS = [
      ergens een ongeetiketteerde voorkeur bij komt. */
   { sleutel: 'neigingVerwijzingRot', richting: 'omlaag', wat: 'punten in NEIGING.md waarvan de verwijzing naar code niet meer klopt' },
   { sleutel: 'neigingVoorkeurBlind', richting: 'omlaag', wat: 'bestaande voorkeursvormen zonder grond, zekerheid of verval' },
+  /* Het BEREIK van de namensvormmeter (REPRESENTATIE.md par. 0), en om exact
+     dezelfde reden omhoog als de twee hierboven. De UITKOMST is daar een nul
+     (0 velden gedeeld, 0 werkwoorden in alle mechanismen op naam) en daarop
+     rust het besluit dat er geen Representation Engine komt maar een
+     verklaarde grammatica. Ziet de meter stil minder mechanismen, dan blijft
+     diezelfde nul staan terwijl hij iets anders betekent: van "deze zeven
+     delen niets" naar "we hebben er minder bekeken". */
+  { sleutel: 'namensMechanismenGemeten', richting: 'omhoog', wat: 'mechanismen van namens-iemand-handelen die de namensvormmeter werkelijk heeft gezien' },
   /* Publieke domeinen waarover scripts/lib/wekbesluit.js geen uitspraak doet.
      Omlaag, en hij staat op nul: een domein dat publiek is en waarvan niemand
      heeft besloten of het de publieke rail op mag, hoort niet stil te kunnen
@@ -1491,6 +1499,11 @@ function meet(bronnen) {
     stageDomeinenGemeten: leesRegister('STAGEVORM.json', (j) => j.gemeten.vorm.domeinen),
     neigingVerwijzingRot: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorstel.rot),
     neigingVoorkeurBlind: leesRegister('NEIGINGVORM.json', (j) => j.gemeten.voorkeur.metAffiniteit - j.gemeten.voorkeur.metAlledrie),
+    /* De WERKWOORD-as en niet de vorm-as, want die telt alleen mechanismen die
+       iets OPSLAAN -- en kern/stuur/mandaat.js slaat met opzet niets op. Het
+       bereik van deze meter is dus het aantal mechanismen dat hij op zijn
+       grammatica heeft nagelopen, en dat zijn ze alle zeven. */
+    namensMechanismenGemeten: leesRegister('NAMENSVORM.json', (j) => j.gemeten.werkwoord.mechanismen),
     wekZonderUitspraak: leesRegister('WEKDEKKING.json', (j) => j.gemeten.zonderUitspraak),
     momentOpenBekend: leesRegister('MOMENTPROEF.json', (j) => j.telling.openBekend),
     lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),

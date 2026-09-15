@@ -1586,6 +1586,21 @@ const IJKINGEN = {
       (j) => { j.gemeten.voorkeur.metAlledrie = (j.gemeten.voorkeur.metAlledrie || 0) + 4; return j; },
       () => voor.neigingVoorkeurBlind - norm.meet().neigingVoorkeurBlind)
   },
+  /* DE TAND VAN 14 SEPTEMBER 2026: namensMechanismenGemeten telt de mechanismen
+     van namens-iemand-handelen die scripts/namensvorm.js op zijn grammatica
+     heeft nagelopen (REPRESENTATIE.md par. 0). Zelfde vorm en zelfde richting
+     als zijn twee zusters hierboven.
+
+     HIJ LEEST DE WERKWOORD-AS EN NIET DE VORM-AS, en dat is geen detail: de
+     vorm-as telt alleen mechanismen die iets OPSLAAN, en kern/stuur/mandaat.js
+     slaat met opzet niets op. Op die as gemeten zou het bereik zes zijn terwijl
+     de meter er zeven nakijkt, en dan ratelt de tand op een noemer die niet bij
+     de conclusie hoort. */
+  namensMechanismenGemeten: {
+    proef: (voor) => metVervangenJson('NAMENSVORM.json',
+      (j) => { j.gemeten.werkwoord.mechanismen = Math.max(0, (j.gemeten.werkwoord.mechanismen || 0) - 3); return j; },
+      () => voor.namensMechanismenGemeten - norm.meet().namensMechanismenGemeten)
+  },
   /* DE TAND VAN 13 SEPTEMBER 2026 (tweede): wekZonderUitspraak telt de publieke
      domeinen waarover het wekbesluitregister zwijgt. Hij staat op NUL, en dat
      maakt hem een ander geval dan de meters hierboven: bij een nul is "de meter

@@ -2,15 +2,15 @@
   "uitleg": "Gemeten met scripts/objectmodel.js; de vraag en de methode staan in de kop van dat bestand en in DEVELOPERCLOUD.md par. 2. Een gedeelde NAAM is geen gedeelde BETEKENIS: dit wijst kandidaten aan, een mens beslist.",
   "vastgelegd": "2026-09-15",
   "gemeten": {
-    "bestanden": 2282,
-    "vormen": 1403,
-    "velden": 2027,
-    "modules": 769,
-    "domeinen": 276,
+    "bestanden": 2278,
+    "vormen": 1401,
+    "velden": 2026,
+    "modules": 768,
+    "domeinen": 275,
     "envelopDrempel": 17,
-    "envelop": 31,
+    "envelop": 30,
     "veldenDomeineigen": 1428,
-    "veldenGedeeldVanafVier": 201,
+    "veldenGedeeldVanafVier": 202,
     "gelijkendeVormparen": 20
   },
   "envelop": [
@@ -21,7 +21,6 @@
     "code",
     "codenaam",
     "datum",
-    "doel",
     "door",
     "gemaakt",
     "id",
@@ -57,6 +56,18 @@
         "kern/command",
         "kern/commercie",
         "kern/ledenbalie-inzage"
+      ]
+    },
+    {
+      "veld": "doel",
+      "domeinen": 16,
+      "waar": [
+        "kern/appstore",
+        "kern/codelevenscyclus",
+        "kern/commercie",
+        "kern/consent-register",
+        "kern/defensie",
+        "kern/labfonds"
       ]
     },
     {
@@ -168,30 +179,6 @@
       ]
     },
     {
-      "veld": "onderwerp",
-      "domeinen": 13,
-      "waar": [
-        "bedrijf",
-        "kern/command",
-        "kern/commercie",
-        "kern/kantoor",
-        "kern/mailwachtrij",
-        "kern/neiging"
-      ]
-    },
-    {
-      "veld": "vervalt",
-      "domeinen": 12,
-      "waar": [
-        "kern/aanmeldingen",
-        "kern/command",
-        "kern/commerce",
-        "kern/koppel",
-        "kern/levensband",
-        "kern/levensgraaf"
-      ]
-    },
-    {
       "veld": "categorie",
       "domeinen": 12,
       "waar": [
@@ -216,6 +203,18 @@
       ]
     },
     {
+      "veld": "onderwerp",
+      "domeinen": 12,
+      "waar": [
+        "bedrijf",
+        "kern/command",
+        "kern/commercie",
+        "kern/kantoor",
+        "kern/mailwachtrij",
+        "kern/postdatum"
+      ]
+    },
+    {
       "veld": "besluit",
       "domeinen": 11,
       "waar": [
@@ -225,6 +224,18 @@
         "kern/gemeente",
         "kern/labfonds",
         "kern/ledenbalie-zaken"
+      ]
+    },
+    {
+      "veld": "vervalt",
+      "domeinen": 11,
+      "waar": [
+        "kern/aanmeldingen",
+        "kern/command",
+        "kern/commerce",
+        "kern/koppel",
+        "kern/levensband",
+        "kern/levensgraaf"
       ]
     },
     {
@@ -465,18 +476,6 @@
         "kern/livinglab",
         "kern/magnaat-controle",
         "kern/magnaat-trainingslobby-acties"
-      ]
-    },
-    {
-      "veld": "laatst",
-      "domeinen": 10,
-      "waar": [
-        "kern/command",
-        "kern/fluister",
-        "kern/geldbeleid",
-        "kern/link",
-        "kern/mailsleutel",
-        "kern/meet"
       ]
     },
     {

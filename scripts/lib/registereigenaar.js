@@ -52,6 +52,14 @@ const EIGENAAR = {
     waarom: 'schuldlijst van schermen zonder klikroute; wordt met de hand bijgehouden en mag alleen krimpen. ' +
       'Precies daarom kon een nieuw script hem stil overschrijven zonder dat een schrijverscan iets zag.' },
 
+  /* De internationale laag. Beide hebben een eigen ratel (scripts/lib/metingen.js)
+     en worden door precies een script geschreven; ze staan hier zodat het getal
+     van toets 4 daalt doordat er eigenaren bijkomen, en niet stijgt doordat er
+     registers bijkomen zonder dat iemand zegt wie ze bezit. */
+  'LANDDEKKING.json': { schrijver: 'scripts/landdekking.js' },
+  'SOEVEREIN.json': { schrijver: 'scripts/soeverein.js' },
+  'DOORBELASTING.json': { schrijver: 'scripts/doorbelasting.js' },
+
   /* De lagen die in deze tak zijn gebouwd. */
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },
   'VERBAND.json': { schrijver: 'scripts/verband.js' },
@@ -79,6 +87,17 @@ const EIGENAAR = {
   'NORM.json': { schrijver: 'scripts/norm.js',
     waarom: 'de ratel is gedeeld bezit: elke meter schrijft zijn eigen getal erin (dekking, samenhang, ' +
       'schermen, wetten). norm.js is de eigenaar van de VORM, niet van elke waarde.' },
+
+  /* DEZE WACHTER BETRAPTE ZIJN EIGEN BOUWER, en dat is het punt van de vloer.
+     NAMENSVORM.json kwam er op 14 september bij zonder verklaring, en toets 4
+     zakte op 147 terwijl de vloer op 146 staat -- terwijl `npm run check`,
+     `npm run registerklopt` en `npm run norm` alle drie lokaal groen stonden.
+     LAT.md regel 17 in het klein: een poort bewijst alleen zijn eigen bereik. */
+  'NAMENSVORM.json': { schrijver: 'scripts/namensvorm.js',
+    waarom: 'de meting achter REPRESENTATIE.md par. 0: delen de zeven manieren van ' +
+      'namens-iemand-handelen een vorm en een woordenschat? Geschreven met --vastleggen, ' +
+      'gelezen door test/namensvorm.test.js, scripts/norm.js (de ratel namensMechanismenGemeten) ' +
+      'en scripts/getallen.js (zeven levende getallen in het document).' },
 };
 
 /* MEETING: welk script schrijft aantoonbaar naar een wortelregister? Ondergrens,

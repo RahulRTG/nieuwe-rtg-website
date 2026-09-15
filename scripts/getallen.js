@@ -117,6 +117,25 @@ const GETALLEN = {
     wat: 'kantoorroutes waarvan de handler de handelende mens noemt' },
   'kantoor.bestanden': { bron: 'KANTOORMACHT.json', veld: 'gemeten.bestanden',
     wat: 'bestanden die een kantoorroute registreren' },
+  /* De namensvorm (REPRESENTATIE.md par. 0). Twee nullen dragen daar een
+     architectuurbesluit, en juist een NUL in proza veroudert onzichtbaar: hij
+     ziet er vers en achterhaald identiek uit. Vandaar dat ook de noemers een
+     merkteken krijgen -- "0 van de 50" wordt onwaar zodra die 50 beweegt, en
+     dan klopt de zin nog steeds half. */
+  'namens.mechanismen': { bron: 'NAMENSVORM.json', veld: 'gemeten.werkwoord.mechanismen',
+    wat: 'mechanismen waarmee iemand in dit huis namens een ander handelt' },
+  'namens.velden': { bron: 'NAMENSVORM.json', veld: 'gemeten.smal.velden',
+    wat: 'velden die die mechanismen samen dragen, envelop eraf' },
+  'namens.inAlle': { bron: 'NAMENSVORM.json', veld: 'gemeten.smal.inAlleMechanismen',
+    wat: 'velden die in ALLE opslaande mechanismen staan' },
+  'namens.eigenPct': { bron: 'NAMENSVORM.json', veld: 'gemeten.smal.eigenPct',
+    wat: 'aandeel velden dat in precies EEN mechanisme staat (%)' },
+  'namens.werkwoordenInAlle': { bron: 'NAMENSVORM.json', veld: 'gemeten.werkwoord.inAlleMechanismenOpNaam.length',
+    wat: 'werkwoorden die onder dezelfde naam in alle mechanismen staan' },
+  'namens.gemiddeldOpNaam': { bron: 'NAMENSVORM.json', veld: 'gemeten.werkwoord.gemiddeldOpNaam',
+    wat: 'werkwoorden per mechanisme, onder de naam van kern/vertegenwoordiging' },
+  'namens.gemiddeldOpSynoniem': { bron: 'NAMENSVORM.json', veld: 'gemeten.werkwoord.gemiddeldOpSynoniem',
+    wat: 'werkwoorden per mechanisme, onder een van de namen die dit huis ervoor gebruikt' },
   'semantiek.namen': { bron: 'SEMANTIEK.json', veld: 'namenInMeerDomeinen',
     wat: 'namen die in meer dan een domein voorkomen' },
   'semantiek.betekenissen': { bron: 'SEMANTIEK.json', veld: 'woordenMetMeerBetekenissen',
@@ -392,6 +411,30 @@ const GETALLEN = {
     wat: 'scenario\'s waarin de resolver de context aantoonbaar gebruikte' },
   'menselijk.niemandKeek': { bron: 'MENSELIJKE_UITVOERING.json', veld: 'telling.contextNiemandKeek',
     wat: 'scenario\'s waarin de resolver niet draaide, dus niemand naar de context keek' },
+  'land.landen': { bron: 'LANDDEKKING.json', veld: 'telling.landen',
+    wat: 'landen waarvan kern/fiscaal/landen.js de tarieven en loonkennis draagt' },
+  'land.volledig': { bron: 'LANDDEKKING.json', veld: 'telling.landenVolledig',
+    wat: 'landen die alle onderscheidende uitvoeringsassen halen' },
+  'land.assen': { bron: 'LANDDEKKING.json', veld: 'telling.onderscheidendeAssen',
+    wat: 'assen die onderscheidend zijn (niet voor elk land aanstaan)' },
+  'land.rechtsvorm': { bron: 'LANDDEKKING.json', veld: 'telling.perAs.rechtsvorm',
+    wat: 'landen waarvan RTG de rechtsvormen kent' },
+  'land.loonuitvoering': { bron: 'LANDDEKKING.json', veld: 'telling.perAs.loonuitvoering',
+    wat: 'landen waar werkelijk loon gedraaid kan worden' },
+  'land.fiscaalJaargang': { bron: 'LANDDEKKING.json', veld: 'telling.perAs.fiscaalJaargang',
+    wat: 'landen met een meegeleverde fiscale jaargang' },
+  'land.register': { bron: 'LANDDEKKING.json', veld: 'telling.perAs.bedrijfsregister',
+    wat: 'landen met een aanwijsbaar ondernemingsregister' },
+  'land.zonderEnige': { bron: 'LANDDEKKING.json', veld: 'telling.landenZonderEnige',
+    wat: 'landen waar RTG alleen kennis heeft en geen enkele uitvoeringsas' },
+  'soeverein.dragers': { bron: 'SOEVEREIN.json', veld: 'ladder.telling.dragers',
+    wat: 'dragers in de isolatieladder (kern/isolatie/dragers.js)' },
+  'soeverein.metSleutel': { bron: 'SOEVEREIN.json', veld: 'ladder.telling.metSleutelBijVerzoek',
+    wat: 'dragers die bij een lopend verzoek werkelijk een sleutel dragen' },
+  'soeverein.stenen': { bron: 'SOEVEREIN.json', veld: 'bouwstenen.telling.aanwezig',
+    wat: 'bouwstenen uit het soevereiniteitsvoorstel die als bestand al bestaan' },
+  'soeverein.stenenGenoemd': { bron: 'SOEVEREIN.json', veld: 'bouwstenen.telling.genoemd',
+    wat: 'bouwstenen die het voorstel noemt en die de meter nagaat' },
   /* De duur van die parseronde staat MET OPZET niet in deze lijst. Een levend
      getal moet uit een register komen dat bij gelijke code hetzelfde zegt; een
      tijdmeting doet dat niet (4,6 of 4,8 op dezelfde commit), en een controle
@@ -404,7 +447,7 @@ const GETALLEN = {
    dag ook iets dat niemand had bedoeld. */
 const DOCUMENTEN = ['CLAUDE.md', 'CREATE.md', 'EXECUTIE.md', 'OS.md', 'BEWIJSMACHINE.md', 'MODULAIR.md', 'HDI.md',
   'ISOLATIE.md', 'MAATSTAF.md', 'CODE.md', 'KANTOOR.md', 'WEERBAARHEID.md',
-  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md'];
+  'TRAVELCOMMERCE.md', 'MENS.md', 'MACHINE.md', 'REPRESENTATIE.md', 'FRANCHISE.md', 'SOEVEREIN.md'];
 
 const MERK = /<!--getal:([a-zA-Z0-9._-]+)-->([\s\S]*?)<!--\/getal-->/g;
 

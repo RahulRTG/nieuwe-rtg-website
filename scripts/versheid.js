@@ -449,6 +449,15 @@ const REGISTERS = [
   ['NAVIGATIEPROEF.json', 'npm run navigatieproef:vast', 'of RTG Navigatie zijn belofte houdt: van waar ik sta naar mijn bestemming'],
   ['MOVEPROEF.json', 'npm run moveproef:vast', 'of een lid RTG Move werkelijk kan gebruiken: van een boeking naar een oordeel op het scherm'],
   ['KETENVORM.json', 'npm run ketenvorm:vast', 'wat de vier gouden ketens werkelijk delen (actoren, beloften)'],
+  /* DE INTERNATIONALE LAAG. Beide verouderen met de CODE en niet met de klok:
+     de landdekking leest kern/fiscaal/landen.js en de pakketmappen, de
+     soevereiniteitsmeter leest kern/isolatie/dragers.js en de poortbestanden.
+     Een land erbij of een drager eruit verandert de uitslag onmiddellijk, en
+     een verouderd exemplaar ziet er precies zo uit als een vers exemplaar --
+     dat is exact de reden dat STAGEVORM.json hier ook staat. */
+  ['LANDDEKKING.json', 'npm run landdekking:vast', 'in welk land RTG werkelijk kan draaien, tegenover in welk land het alleen kennis heeft'],
+  ['SOEVEREIN.json', 'npm run soeverein:vast', 'hoe ver de isolatieladder reikt, en welke toegangswegen hem helemaal niet bereiken'],
+  ['DOORBELASTING.json', 'npm run doorbelasting:vast', 'of herkomst financieel tot de euro te volgen is -- de vraag onder de bijdragebasis'],
   ['DOODSPOOR.json', 'npm run doodspoor:vast', 'of een handeling ergens AANKOMT, of een verklaring draagt waarom niet'],
   ['DOORWERKING.json', 'npm run doorwerking:vast', 'of een gegeven dat een keer is opgegeven doorwerkt, met doel en actualiteit'],
   ['REFUNDMIGRATIE.json', 'npm run refundmigratie:vast', 'welke lezers van een betaalstand mee kunnen naar de tegenboeking'],
@@ -484,6 +493,13 @@ const REGISTERS = [
      ziet er exact zo uit als een verse. */
   ['STAGEVORM.json', 'npm run stagevorm:vast', 'of de publieke domeinen een datavorm delen -- STAGE.md par. 0 rust erop, en de uitslag is een nul die er vers en verouderd hetzelfde uitziet'],
   ['NEIGINGVORM.json', 'npm run neigingvorm:vast', 'of er een persoonlijke laag bij mag en in welke vorm -- NEIGING.md par. 0 rust erop. Twee uitslagen verouderen anders stil: de NAAMmeting (die zijn eigen laag meetelt zodra die bestaat) en de veertien voorkeursvormen zonder grond, zekerheid of verval, waar de hele bestaansgrond van de laag op staat'],
+  /* Derde van deze soort, en de scherpste: hier staan TWEE nullen naast elkaar
+     (0 gedeelde velden, 0 werkwoorden in alle mechanismen op naam) en
+     REPRESENTATIE.md par. 0 draagt daarop het besluit dat er geen Representation
+     Engine komt maar een verklaarde grammatica. Een verouderde nul ziet er exact
+     zo uit als een verse -- en bij twee nullen naast elkaar leest hij ook nog
+     eens als bevestiging. */
+  ['NAMENSVORM.json', 'npm run namensvorm:vast', 'of de manieren van namens-iemand-handelen een machine delen -- REPRESENTATIE.md par. 0 rust op twee nullen, en die zien er vers en verouderd hetzelfde uit'],
   /* Ook een nul, en om dezelfde reden hier: `zonderUitspraak: 0` betekent dat
      elk publiek domein een besluit draagt. Verouderd betekent diezelfde nul
      alleen nog dat er destijds geen domein ontbrak. */

@@ -1559,6 +1559,33 @@ const IJKINGEN = {
       (j) => { j.gemeten.vorm.domeinen = Math.max(0, (j.gemeten.vorm.domeinen || 0) - 4); return j; },
       () => voor.stageDomeinenGemeten - norm.meet().stageDomeinenGemeten)
   },
+  /* DE TWEE TANDEN VAN 15 SEPTEMBER 2026, bij NEIGINGVORM.json (NEIGING.md par.
+     0). Ze staan allebei op een NUL of op een getal waar een besluit op rust, en
+     dat is precies waarom ze een ijking nodig hebben: bij zo'n meter is "hij is
+     stuk" van buiten niet te onderscheiden van "er is niets aan de hand".
+
+     neigingVerwijzingRot staat op nul: elk punt van het voorstel draagt een
+     verwijzing naar bestaande code die wordt nagetrokken. De ijking gaat daarom
+     OMHOOG -- zet er drie rotte verwijzingen in en de meter hoort er exact drie
+     te melden. Ging hij omlaag, dan zou je een nul met een nul vergelijken.
+
+     neigingVoorkeurBlind telt de bestaande affiniteitsvormen zonder grond,
+     zekerheid of verval; hij staat op veertien, en op dat getal rust de hele
+     bestaansgrond van de laag. De ijking gaat OMLAAG, want zakken is hier de
+     richting die iets betekent: een domein dat zijn voorkeuren etiketteert. De
+     meter leest metAffiniteit MIN metAlledrie, dus de proef verhoogt de tweede
+     -- een mutatie op alleen de eerste zou ook de noemer verschuiven en dan meet
+     de ijking zichzelf. */
+  neigingVerwijzingRot: {
+    proef: (voor) => metVervangenJson('NEIGINGVORM.json',
+      (j) => { j.gemeten.voorstel.rot = (j.gemeten.voorstel.rot || 0) + 3; return j; },
+      () => norm.meet().neigingVerwijzingRot - voor.neigingVerwijzingRot)
+  },
+  neigingVoorkeurBlind: {
+    proef: (voor) => metVervangenJson('NEIGINGVORM.json',
+      (j) => { j.gemeten.voorkeur.metAlledrie = (j.gemeten.voorkeur.metAlledrie || 0) + 4; return j; },
+      () => voor.neigingVoorkeurBlind - norm.meet().neigingVoorkeurBlind)
+  },
   /* DE TAND VAN 14 SEPTEMBER 2026: namensMechanismenGemeten telt de mechanismen
      van namens-iemand-handelen die scripts/namensvorm.js op zijn grammatica
      heeft nagelopen (REPRESENTATIE.md par. 0). Zelfde vorm en zelfde richting

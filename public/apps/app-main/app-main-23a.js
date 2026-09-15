@@ -103,4 +103,10 @@
     sessies:     { naam: 'Waar ben ik aanwezig', url: '/apps/mijn-sessies.html' },
     relaties:    { naam: 'Wie heeft toegang tot mij', url: '/apps/mijn-relaties.html' },
     gegevens:    { naam: 'Wat weet RTG van mij', url: '/apps/mijn-gegevens.html' },
+    /* RTG Neiging (NEIGING.md). NAAST `gegevens` en niet erin: die kaart
+       gaat over GEGEVENS die RTG van u heeft (naam, adres, documenten), deze
+       over NEIGINGEN die RTG van u denkt te kennen. Twee vragen die op elkaar
+       lijken en een ander antwoord hebben; samenvoegen zou van beide een
+       halve maken. */
+    neigingen:   { naam: T('app.neigingen', 'Mijn RTG'), url: '/apps/mijn-neigingen.html' },
     post:        { naam: 'Post van RTG', url: '/apps/mijn-post.html' },

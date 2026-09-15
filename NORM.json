@@ -10,7 +10,7 @@
     "bewijsAlleenKeten": 16,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
-    "browserpoortToetsen": 341,
+    "browserpoortToetsen": 342,
     "carriereDomeinenGemeten": 15,
     "dbDeuren": 528,
     "dbDeurenSchrijvend": 275,
@@ -19,7 +19,7 @@
     "delenZonderOnderwerp": 0,
     "dependencies": 0,
     "devPakketten": 1,
-    "e2eBestanden": 217,
+    "e2eBestanden": 219,
     "endpointsNooitAangeraakt": 0,
     "endpointsZonderTest": 902,
     "faalproefGezakt": 1,
@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 119,
+    "ratelTanden": 121,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -113,7 +113,9 @@
     "namensMechanismenGemeten": 7,
     "idemVerklaard": 1,
     "idemAfdrukVoegtNietsToe": 2,
-    "idemHandwerkGeenVergelijking": 3
+    "idemHandwerkGeenVergelijking": 3,
+    "neigingVerwijzingRot": 0,
+    "neigingVoorkeurBlind": 14
   },
   "notities": [
     {
@@ -2454,6 +2456,15 @@
       "meter": "bewijsAchterstand 2407 -> 2419",
       "reden": "De idempotentieproef kreeg in deze tak een wereld voor het Lab-fonds (scripts/lib/idemwereld.js: een locatie plus een VERS voorstel per route die er een noemt) en bereikt daardoor routes die eerder 404 gaven. De post idem-ongeclassificeerd telt routes die WERK deden minus die met een besluit in IDEMBESLUIT.json, dus elke nieuw meetbare route zonder besluit landt hier: 1595 -> 1607, precies +12. Het is ONTDEKTE schuld en geen nieuwe -- die twaalf muteerden altijd al en verstopten zich achter \"de proef kwam er niet bij\". Dezelfde post daalde in dezelfde ronde aan de andere kant: mutatiesZonderEnigeAs ging van 2787 naar 2783, want zes ledenroutes van het labfonds werden meetbaar die op main al op ongemeten stonden. De schuld zelf oplossen kan deze tak niet: MUTATIECONTRACT.md zegt dat een stand nooit uit bewijs wordt afgeleid, want het bewijs draagt een voorstel en een MENS draagt het besluit. Deze notitie verving een eerdere met dezelfde strekking (2404 -> 2419) die bij de samenvoeging met main wegviel toen NORM.json op de versie van main werd gezet; de beginwaarde is daarom 2407 en niet 2404.",
       "waarheen": "Die twaalf routes een besluit geven in IDEMBESLUIT.json (de klasse tebeslissen staat daar juist voor open), door een mens en niet afgeleid uit de meting."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1578,
+      "meter": "kernBreedte 1578 -> 1579",
+      "reden": "STRUCTUREEL en geen schuld: er is een LAAG bijgekomen, en dat is een verandering in wat er gemeten wordt -- niet iets wat we even niet konden. RTG Neiging (NEIGING.md) voegt EEN kern-eigenschap toe: `kern.neiging`, een object met zeven functies erachter. Dat is het minimum dat een laag met een eigen router kan kosten. De eerste versie legde elf LOSSE namen op de kern en duwde deze meter met zeven omhoog; dat is hersteld naar de vorm die kern/socialewereld.js en kern/geldwereld.js al gebruiken (kern.neiging.intake(...)), en GRENZEN.json laat voor het domein `neiging` precies die ene naam door. Deze plus-een hoort per LAAG te worden betaald en niet per functie -- zou de meter met het aantal routes meegroeien, dan meet hij niets meer. Daarom ook geen vervaldatum: hij daalt weer zodra de laag verdwijnt, en niet doordat iemand hem aflost.",
+      "waarheen": "GRENZEN.json (domein `neiging`, precies EEN naam) plus server/opzet/domeingrens.js, die bij een naam buiten die lijst GOOIT in plaats van undefined te geven. Wat kernBreedte meet is koppeling: hoeveel van de kern een route kan aanraken. Voor deze laag draagt de domeingrens dat nu HARDER dan een telling ooit deed -- de zeven routes kunnen aantoonbaar bij precies een naam, en een achtste erbij zetten vraagt een regel in GRENZEN.json die iemand moet schrijven. De plus-een in de telling is dus de prijs van een laag, en de belofte eronder is verhuisd naar de poort die hem afdwingt in plaats van telt."
     }
   ],
   "prestatie": {
@@ -2488,8 +2499,8 @@
     "keuringDekkingAdvies": "2026-09-06",
     "dbDeuren": "2026-08-28",
     "dbDeurenSchrijvend": "2026-08-28",
-    "browserpoortToetsen": "2026-09-12",
-    "e2eBestanden": "2026-09-13",
+    "browserpoortToetsen": "2026-09-15",
+    "e2eBestanden": "2026-09-15",
     "schermenZonderVormtaal": "2026-08-28",
     "bewijsCellenBewezen": "2026-09-06",
     "beweringenZonderVulcontrole": "2026-09-05",
@@ -2505,7 +2516,7 @@
     "wekkersZonderTrede": "2026-09-02",
     "wekkersOnverklaard": "2026-09-02",
     "meetleerBlind": "2026-09-02",
-    "kernBreedte": "2026-09-02",
+    "kernBreedte": "2026-09-15",
     "kernGedeeld": "2026-09-05",
     "registersUitVuileBoom": "2026-09-10",
     "laatSpoorVerdacht": "2026-09-03",
@@ -2556,7 +2567,9 @@
     "namensMechanismenGemeten": "2026-09-15",
     "idemVerklaard": "2026-09-15",
     "idemAfdrukVoegtNietsToe": "2026-09-15",
-    "idemHandwerkGeenVergelijking": "2026-09-15"
+    "idemHandwerkGeenVergelijking": "2026-09-15",
+    "neigingVerwijzingRot": "2026-09-15",
+    "neigingVoorkeurBlind": "2026-09-15"
   },
   "uitzonderingen": [
     {

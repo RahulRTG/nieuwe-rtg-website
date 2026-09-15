@@ -1345,6 +1345,9 @@
       "navRoute",
       "navStatus"
     ],
+    "neiging": [
+      "neiging"
+    ],
     "noodkaart": [
       "noodkaartVan",
       "noodkaartWeg",

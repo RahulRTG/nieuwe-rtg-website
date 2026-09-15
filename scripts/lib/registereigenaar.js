@@ -61,6 +61,7 @@ const EIGENAAR = {
   'DOORBELASTING.json': { schrijver: 'scripts/doorbelasting.js' },
 
   /* De lagen die in deze tak zijn gebouwd. */
+  'IDEMIDENTITEIT.json': { schrijver: 'scripts/idemidentiteit.js' },
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },
   'VERBAND.json': { schrijver: 'scripts/verband.js' },
   'GELDING.json': { schrijver: 'scripts/gelding.js' },

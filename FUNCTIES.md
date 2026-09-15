@@ -16,14 +16,14 @@ het?**
 
 | | |
 |---|---|
-| Functieschakelaars (aan/uit per functie) | **217** in 17 categorieën |
+| Functieschakelaars (aan/uit per functie) | **219** in 17 categorieën |
 | Apps in de leden-catalogus | **89** in 8 categorieën |
 | Bedrijfsgenres | **78** in 28 sectoren |
 | Genre-caps (waar de apps op sturen) | **40** |
 | API-routes (uit de router) | **4738** |
 | Kernmodules (`server/kern/**`) | **2192** |
 | App-pagina's (`public/apps/**.html`) | **308** |
-| Testbestanden | **1893** |
+| Testbestanden | **1895** |
 
 ## De vier werelden
 
@@ -54,7 +54,7 @@ ook blokkeert.
 
 ---
 
-# 1. De 217 functieschakelaars
+# 1. De 219 functieschakelaars
 
 ### Leden (RTG-app) — 24
 
@@ -266,7 +266,7 @@ ook blokkeert.
 - **Tenant Control Plane (white-label)** (`tenant`) — Welke organisatie een werkruimte draait, welk merk zij daar voert, en hoe een groep van haar identiteitsprovider een rol wordt. Uit = de werkruimtes werken door onder de RTG-huisstijl, en een inlog via een provider levert geen rollen meer op.  
   _voor: intern, business_
 
-### RTFoundation — 15
+### RTFoundation — 17
 
 - **RTFoundation-app (onderwijs)** (`foundation`) — De gratis onderwijs-app: live schoolbord, leerling-schrift en de AI-bijleshulp.  
   _voor: foundation_
@@ -286,17 +286,21 @@ ook blokkeert.
   _voor: foundation_
 - **Living Lab: de bewonerskant** (`dom-livinglab-bewoner`) — Meedoen met een labpas, een onderzoeksvraag aandragen, stemmen en het labpaspoort.  
   _voor: rtg, lifestyle, business, gast, leverancier, personeel, foundation_
-- **Het labfonds** (`dom-labfonds`) — De financiering van onderzoeksprojecten.  
-  _voor: foundation_
-- **Samen (stadsraad)** (`dom-samen`) — De gezamenlijke uitslagen en besluiten met stadspartners.  
-  _voor: foundation_
 - **Klaslokaal (lesmaker)** (`dom-les`) — De live les: klascode, vragen en antwoorden.  
   _voor: foundation_
 - **Leerstof** (`dom-leerstof`) — Het lesmateriaal achter het onderwijs.  
-  _voor: foundation_
+  _voor: rtg, lifestyle, business, gast_
 - **Onderwijs (paspoort en ladder)** (`dom-onderwijs`) — Inschrijven, het leerpaspoort en de leerladder.  
-  _voor: foundation_
+  _voor: rtg, lifestyle, business, gast_
 - **Bijles** (`ov-bijles`) — Het bijlesgesprek met de begeleider.  
+  _voor: rtg, lifestyle, business, gast_
+- **Leerpaspoort (leerling)** (`rtf-leerpaspoort`) — De leerlingkant van onderwijs, leerstof, examen en bijles, achter de leeftijdspas.  
+  _voor: foundation_
+- **Het labfonds** (`dom-labfonds`) — De financiering van onderzoeksprojecten.  
+  _voor: rtg, lifestyle, business, gast, foundation, intern_
+- **Samen (stadsraad)** (`dom-samen`) — De gezamenlijke uitslagen en besluiten met stadspartners.  
+  _voor: rtg, lifestyle, business_
+- **Samen (gezin)** (`rtf-samen`) — De gedeelde kamer van een gezin: plek, chat en muziek achter de gezinsdeur.  
   _voor: foundation_
 
 ### Betalen & verificatie — 6

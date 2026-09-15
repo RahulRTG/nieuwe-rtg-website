@@ -1,0 +1,817 @@
+{
+  "stempel": {
+    "op": "2026-09-15T03:20:03.596Z",
+    "commit": "6f81be9e",
+    "boomVuil": false,
+    "boomAnders": 3,
+    "instrument": "scripts/idemidentiteit.js",
+    "node": "v22.22.2"
+  },
+  "soort": "triage",
+  "uitleg": "Waaraan ziet dit huis dat twee aanroepen hetzelfde verzoek dragen -- per plek waar idempotentie wordt gedaan, in twee families: langs metIdem en met de hand ernaast. Gelezen is elke metIdem-aanroep onder server/, plus elke opzoeking op een idem-sleutel die daar met de hand omheen gaat; lexicaal, dus zonder iets uit te voeren.",
+  "grens": "Deze meting toont NIET aan dat een smalle afdruk fout is -- bij kern/pay/partner.js staat uitgeschreven dat een uitbetaling geen parameters buiten de partner heeft. Het is een triagelijst, geen oordeel. Zij toont ook NIET aan dat een `voegtToe` in orde is: dat zegt alleen dat de afdruk IETS draagt dat de sleutel niet heeft, niet dat hij alles draagt waarop de handler onderscheidt -- precies het gat van #270, dat hier `voegtToe` zou heten. En `geenVergelijking` in de tweede familie is een ONDERGRENS: er wordt vanaf de opzoeking veertig regels vooruit gekeken, dus een vergelijking die verderop staat of via een hulpfunctie loopt, ziet deze meter niet.",
+  "graad": "vermoed",
+  "waaromVermoed": "de argumenten worden uit de BRON gelezen en niet uitgevoerd; een naam die via een hulpfunctie in de afdruk belandt, telt hier als een naam en niet als de velden erachter.",
+  "aanroepplekken": 38,
+  "verklaard": 1,
+  "geenAfdruk": 0,
+  "voegtNietsToe": 2,
+  "voegtToe": 31,
+  "nietTeLezen": 4,
+  "voegtToeIsGeenGoedkeuring": true,
+  "handwerkPlekken": 4,
+  "handwerkVergelijkt": 1,
+  "handwerkGeenVergelijking": 3,
+  "plekken": [
+    {
+      "bestand": "server/kern/bank/incasso.js",
+      "regel": 32,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "vanIban"
+      ],
+      "afdrukNamen": [
+        "c",
+        "interval",
+        "naarIban",
+        "vanIban"
+      ],
+      "regelTekst": "return metIdem(idem ? 'tkzet:' + vanIban + ':' + idem : null, 'tkzet|' + vanIban + '|' + naarIban + '|' + c + '|' + interval, () => {",
+      "afdrukExtra": [
+        "c",
+        "interval",
+        "naarIban"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/bank/ledenbank.js",
+      "regel": 53,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "c"
+      ],
+      "afdrukNamen": [
+        "c"
+      ],
+      "regelTekst": "const vast = await metIdem('bankakkoord:' + c, 'bankakkoord|' + c, () => {",
+      "afdrukExtra": [],
+      "uitspraak": "voegtNietsToe"
+    },
+    {
+      "bestand": "server/kern/bank/overboeken.js",
+      "regel": 39,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "iban",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "c",
+        "iban",
+        "via"
+      ],
+      "regelTekst": "return metIdem(idem ? 'stort:' + iban + ':' + idem : null, 'stort|' + iban + '|' + c + '|' + via, async () => {",
+      "afdrukExtra": [
+        "c",
+        "via"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/bank/overboeken.js",
+      "regel": 72,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "vanIban"
+      ],
+      "afdrukNamen": [
+        "c",
+        "naarIban",
+        "vanIban"
+      ],
+      "regelTekst": "return metIdem(idem ? 'overboek:' + vanIban + ':' + idem : null, 'overboek|' + vanIban + '|' + naarIban + '|' + c, async () => {",
+      "afdrukExtra": [
+        "c",
+        "naarIban"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/bank/overboeken.js",
+      "regel": 90,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "iban",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "c",
+        "dest",
+        "iban"
+      ],
+      "regelTekst": "return metIdem(idem ? 'sepa:' + iban + ':' + idem : null, 'sepa|' + iban + '|' + c + '|' + dest, async () => {",
+      "afdrukExtra": [
+        "c",
+        "dest"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/bank/passen.js",
+      "regel": 47,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "iban",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "iban",
+        "idemContract",
+        "identiteitVan",
+        "soort"
+      ],
+      "regelTekst": "return metIdem(idem ? 'pasuit:' + iban + ':' + idem : null,",
+      "uitspraak": "verklaard"
+    },
+    {
+      "bestand": "server/kern/bank/passen.js",
+      "regel": 104,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "id",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "c",
+        "id"
+      ],
+      "regelTekst": "return metIdem(idem ? 'pasbetaal:' + id + ':' + idem : null, 'pasbetaal|' + id + '|' + c, async () => {",
+      "afdrukExtra": [
+        "c"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/bank/rekeningen.js",
+      "regel": 65,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "c",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "c",
+        "naam",
+        "soort"
+      ],
+      "regelTekst": "return metIdem(idem ? 'rekopen:' + c + ':' + idem : null,",
+      "afdrukExtra": [
+        "naam",
+        "soort"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/bank/walletbrug.js",
+      "regel": 55,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "iban",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "bedrag",
+        "iban"
+      ],
+      "regelTekst": "return metIdem(idem ? 'naarwallet:' + iban + ':' + idem : null, 'naarwallet|' + iban + '|' + bedrag, async () => {",
+      "afdrukExtra": [
+        "bedrag"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/bank/zakelijk.js",
+      "regel": 54,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "vanIban"
+      ],
+      "afdrukNamen": [
+        "batchAfdruk",
+        "posten",
+        "soort",
+        "vanIban"
+      ],
+      "regelTekst": "return metIdem(idem ? 'batch:' + vanIban + ':' + idem : null, batchAfdruk(vanIban, soort, posten), async () => {",
+      "afdrukExtra": [
+        "batchAfdruk",
+        "posten",
+        "soort"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/kassa/herhaling.js",
+      "regel": 67,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "code",
+        "s",
+        "soort"
+      ],
+      "afdrukNamen": [
+        "afdruk",
+        "body",
+        "code",
+        "soort"
+      ],
+      "regelTekst": "return metIdem('bon:' + soort + ':' + code + ':' + s, afdruk(soort, code, body), werk);",
+      "afdrukExtra": [
+        "afdruk",
+        "body"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/budget.js",
+      "regel": 49,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "uitgeverRek"
+      ],
+      "afdrukNamen": [
+        "aanCodenaam",
+        "c",
+        "klasse",
+        "uitgeverRek"
+      ],
+      "regelTekst": "return metIdem(idem ? 'budget:' + uitgeverRek + ':' + idem : null,",
+      "afdrukExtra": [
+        "aanCodenaam",
+        "c",
+        "klasse"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/kassa.js",
+      "regel": 66,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "supplierCode"
+      ],
+      "afdrukNamen": [
+        "c",
+        "code",
+        "k",
+        "supplierCode"
+      ],
+      "regelTekst": "return metIdem(idem ? 'kas:' + supplierCode + ':' + idem : null,",
+      "afdrukExtra": [
+        "c",
+        "code",
+        "k"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/opladen.js",
+      "regel": 27,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "codenaam",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "c",
+        "codenaam"
+      ],
+      "regelTekst": "return metIdem(idem ? 'oplaad:' + codenaam + ':' + idem : null, 'oplaad|' + codenaam + '|' + c, async () => {",
+      "afdrukExtra": [
+        "c"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/partner.js",
+      "regel": 50,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "codenaam",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "c",
+        "codenaam",
+        "supplierCode"
+      ],
+      "regelTekst": "return metIdem(idem ? 'partnerin:' + codenaam + ':' + idem : null,",
+      "afdrukExtra": [
+        "c",
+        "supplierCode"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/partner.js",
+      "regel": 114,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "supplierCode"
+      ],
+      "afdrukNamen": [
+        "supplierCode"
+      ],
+      "regelTekst": "return metIdem(idem ? 'uit:' + supplierCode + ':' + idem : null, 'uit|' + supplierCode, async () => {",
+      "afdrukExtra": [],
+      "uitspraak": "voegtNietsToe"
+    },
+    {
+      "bestand": "server/kern/pay/tegoed-zaak.js",
+      "regel": 43,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "zaak"
+      ],
+      "afdrukNamen": [
+        "aan",
+        "c",
+        "zaak"
+      ],
+      "regelTekst": "return metIdem(idem ? 'tegoedzaak:' + zaak + ':' + idem : null,",
+      "afdrukExtra": [
+        "aan",
+        "c"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/tegoed-zaak.js",
+      "regel": 72,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "zaak"
+      ],
+      "afdrukNamen": [
+        "id",
+        "t",
+        "zaak"
+      ],
+      "regelTekst": "return metIdem(idem ? 'tegoedzaakterug:' + zaak + ':' + idem : null,",
+      "afdrukExtra": [
+        "id",
+        "t"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/tegoed.js",
+      "regel": 56,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "codenaam",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "aan",
+        "c",
+        "codenaam"
+      ],
+      "regelTekst": "return metIdem(idem ? 'tegoedkoop:' + codenaam + ':' + idem : null,",
+      "afdrukExtra": [
+        "aan",
+        "c"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/tegoed.js",
+      "regel": 88,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "codenaam",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "codenaam",
+        "id",
+        "t"
+      ],
+      "regelTekst": "return metIdem(idem ? 'tegoedin:' + codenaam + ':' + idem : null,",
+      "afdrukExtra": [
+        "id",
+        "t"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/tegoed.js",
+      "regel": 125,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "codenaam",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "codenaam",
+        "id",
+        "t"
+      ],
+      "regelTekst": "return metIdem(idem ? 'tegoedterug:' + codenaam + ':' + idem : null,",
+      "afdrukExtra": [
+        "id",
+        "t"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/terug.js",
+      "regel": 107,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "codenaam",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "codenaam",
+        "gevraagd"
+      ],
+      "regelTekst": "return metIdem(idem ? 'terug:' + codenaam + ':' + idem : null,",
+      "afdrukExtra": [
+        "gevraagd"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/verkoop.js",
+      "regel": 41,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "naarPartner"
+      ],
+      "afdrukNamen": [
+        "bruto",
+        "codenaam",
+        "naarPartner",
+        "som"
+      ],
+      "regelTekst": "return metIdem(idem ? 'verkoop:' + naarPartner + ':' + idem : null,",
+      "afdrukExtra": [
+        "bruto",
+        "codenaam",
+        "som"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/verkoop.js",
+      "regel": 104,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "vanPartner"
+      ],
+      "afdrukNamen": [
+        "codenaam",
+        "totaal",
+        "vanPartner"
+      ],
+      "regelTekst": "return metIdem(idem ? 'teruggave:' + (vanPartner || 'rtg') + ':' + idem : null,",
+      "afdrukExtra": [
+        "codenaam",
+        "totaal"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/verzoeken.js",
+      "regel": 17,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "van"
+      ],
+      "afdrukNamen": [
+        "afdruk"
+      ],
+      "regelTekst": "return metIdem(idem ? 'stuur:' + van + ':' + idem : null, afdruk, async () => {",
+      "afdrukExtra": [
+        "afdruk"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/verzoeken.js",
+      "regel": 44,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "van"
+      ],
+      "afdrukNamen": [
+        "c",
+        "van"
+      ],
+      "regelTekst": "return metIdem(idem ? 'huisin:' + van + ':' + idem : null, 'huisin|' + van + '|' + c, async () => {",
+      "afdrukExtra": [
+        "c"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/verzoeken.js",
+      "regel": 59,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "aan",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "aan",
+        "c"
+      ],
+      "regelTekst": "return metIdem(idem ? 'huisuit:' + aan + ':' + idem : null, 'huisuit|' + aan + '|' + c, async () => {",
+      "afdrukExtra": [
+        "c"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/verzoeken.js",
+      "regel": 86,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "van"
+      ],
+      "afdrukNamen": [
+        "join",
+        "namen",
+        "per",
+        "slice",
+        "sort",
+        "van"
+      ],
+      "regelTekst": "return metIdem(idem ? 'klompjemaak:' + van + ':' + idem : null,",
+      "afdrukExtra": [
+        "join",
+        "namen",
+        "per",
+        "slice",
+        "sort"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/verzoeken.js",
+      "regel": 112,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "codenaam",
+        "idem"
+      ],
+      "afdrukNamen": [
+        "centen",
+        "codenaam",
+        "id",
+        "v"
+      ],
+      "regelTekst": "return metIdem(idem ? 'klompje:' + codenaam + ':' + idem : null,",
+      "afdrukExtra": [
+        "centen",
+        "id",
+        "v"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/vooraf.js",
+      "regel": 66,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "supplierCode"
+      ],
+      "afdrukNamen": [
+        "c",
+        "code",
+        "k",
+        "supplierCode"
+      ],
+      "regelTekst": "return metIdem(idem ? 'vooraf:' + supplierCode + ':' + idem : null,",
+      "afdrukExtra": [
+        "c",
+        "code",
+        "k"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/vooraf.js",
+      "regel": 102,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "supplierCode"
+      ],
+      "afdrukNamen": [
+        "centen",
+        "id",
+        "r",
+        "round",
+        "supplierCode"
+      ],
+      "regelTekst": "return metIdem(idem ? 'vastleg:' + supplierCode + ':' + idem : null,",
+      "afdrukExtra": [
+        "centen",
+        "id",
+        "r",
+        "round"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/zaakbetaling.js",
+      "regel": 62,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "lid"
+      ],
+      "afdrukNamen": [
+        "bij",
+        "c",
+        "lid",
+        "zaak"
+      ],
+      "regelTekst": "return metIdem(idem ? 'zaakbetaling:' + lid + ':' + idem : null,",
+      "afdrukExtra": [
+        "bij",
+        "c",
+        "zaak"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/pay/zaakbetaling.js",
+      "regel": 117,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem",
+        "lid"
+      ],
+      "afdrukNamen": [
+        "bij",
+        "c",
+        "lid",
+        "zaak"
+      ],
+      "regelTekst": "return metIdem(idem ? 'zaakterug:' + lid + ':' + idem : null,",
+      "afdrukExtra": [
+        "bij",
+        "c",
+        "zaak"
+      ],
+      "uitspraak": "voegtToe"
+    },
+    {
+      "bestand": "server/kern/podium/handel.js",
+      "regel": 89,
+      "soort": "eigen",
+      "binding": "server/kern/podium/index.js",
+      "uitspraak": "nietTeLezen",
+      "reden": "eigen metIdem in server/kern/podium/index.js met een andere argumentvolgorde; deze meter leest alleen die van server/lib/idem.js"
+    },
+    {
+      "bestand": "server/kern/podium/interactie.js",
+      "regel": 32,
+      "soort": "eigen",
+      "binding": "server/kern/podium/index.js",
+      "uitspraak": "nietTeLezen",
+      "reden": "eigen metIdem in server/kern/podium/index.js met een andere argumentvolgorde; deze meter leest alleen die van server/lib/idem.js"
+    },
+    {
+      "bestand": "server/kern/podium/interactie.js",
+      "regel": 51,
+      "soort": "eigen",
+      "binding": "server/kern/podium/index.js",
+      "uitspraak": "nietTeLezen",
+      "reden": "eigen metIdem in server/kern/podium/index.js met een andere argumentvolgorde; deze meter leest alleen die van server/lib/idem.js"
+    },
+    {
+      "bestand": "server/kern/podium/toegang.js",
+      "regel": 38,
+      "soort": "eigen",
+      "binding": "server/kern/podium/index.js",
+      "uitspraak": "nietTeLezen",
+      "reden": "eigen metIdem in server/kern/podium/index.js met een andere argumentvolgorde; deze meter leest alleen die van server/lib/idem.js"
+    },
+    {
+      "bestand": "server/routes/supplier/kassa/cadeaukaart.js",
+      "regel": 35,
+      "soort": "kern",
+      "binding": "server/lib/idem.js",
+      "sleutelNamen": [
+        "idem"
+      ],
+      "afdrukNamen": [
+        "bedrag",
+        "code",
+        "req",
+        "supplier"
+      ],
+      "regelTekst": "const r = await metIdem(idem, 'gc|' + req.supplier.code + '|' + bedrag, () => {",
+      "afdrukExtra": [
+        "bedrag",
+        "code",
+        "req",
+        "supplier"
+      ],
+      "uitspraak": "voegtToe"
+    }
+  ],
+  "handwerk": [
+    {
+      "bestand": "server/kern/betaalopdracht/rij.js",
+      "regel": 58,
+      "opzoeker": "vindOpIdem",
+      "gevondenAls": "bestaand",
+      "vergeleken": [],
+      "uitspraak": "geenVergelijking",
+      "regelTekst": "const bestaand = vindOpIdem(o.idemSleutel);"
+    },
+    {
+      "bestand": "server/kern/directpay/betalen.js",
+      "regel": 32,
+      "opzoeker": "idemZoek",
+      "gevondenAls": "al",
+      "vergeleken": [],
+      "uitspraak": "geenVergelijking",
+      "regelTekst": "const al = idemZoek(idemSleutel);"
+    },
+    {
+      "bestand": "server/kern/directpay/betalen.js",
+      "regel": 114,
+      "opzoeker": "idemZoek",
+      "gevondenAls": "al",
+      "vergeleken": [],
+      "uitspraak": "geenVergelijking",
+      "regelTekst": "const al = idemZoek(idemSleutel);"
+    },
+    {
+      "bestand": "server/kern/directpay/verzoek.js",
+      "regel": 45,
+      "opzoeker": "verzoekIdemZoek",
+      "gevondenAls": "al",
+      "vergeleken": [
+        "bedrag",
+        "naarCodename"
+      ],
+      "uitspraak": "vergelijkt",
+      "regelTekst": "const al = verzoekIdemZoek(idemSleutel);"
+    }
+  ]
+}

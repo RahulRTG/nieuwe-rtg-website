@@ -169,6 +169,16 @@ const IDVELDEN = ['id', 'ref', 'code', 'sleutel', 'key', 'nummer', 'uuid', 'kame
    hij binnen een week niet meer serieus te nemen. */
 const GEDEELD_BEDOELD = new Map([
   ['/api/labfonds/locatie/maak', { reden: 'een locatie in het Lab-fonds is juist openbaar: leden doneren eraan en stemmen erover' }],
+  /* Dezelfde locatie, aangemaakt via de gezinsdeur van 14 september 2026. Het is
+     hetzelfde fonds en hetzelfde grootboek -- een tweede ingang, geen tweede
+     wereld. Wat WEL gescheiden blijft is nagemeten en niet aangenomen, en het
+     staat vast in test/rtf-labfonds-deur.test.js toets 10: twee gezinnen zien
+     dezelfde pot (107) en ieder alleen hun eigen bijdrage (100 en 7), er gaat
+     geen gezinscode of token van de een naar de ander, en meestemmen op het
+     voorstel van een ander mag wel terwijl de stemming SLUITEN 403 geeft
+     ("Alleen wie dit voorstel indiende, sluit de stemming"). Zonder die toets
+     zou deze regel een belofte zijn in plaats van een grens. */
+  ['/api/rtf/labfonds/locatie/maak', { reden: 'dezelfde openbare locatie als hierboven, via de gezinsdeur: een fonds is een gedeeld grootboek en de eigen bijdrage blijft prive (toets 10 in test/rtf-labfonds-deur.test.js)' }],
   ['/api/meet/maak', { reden: 'de code van een ontmoeting IS de uitnodiging: wie hem heeft mag erbij, net als een vergaderlink' }],
   ['/api/samen/maak', { reden: 'idem voor een samen-sessie: meedoen gebeurt met de code, dat is het hele mechanisme' }],
   ['/api/les/maak', { reden: 'de code van een les is de uitnodiging: de klas doet ermee mee' }],
@@ -434,7 +444,33 @@ async function main() {
      de vindbaarheid en deed er niets mee, en daardoor kwam een mutatie die B's
      notitie liet weggooien er ongezien doorheen. Een meting die geen oordeel
      draagt, is precies wat LAT.md regel 10 een liegende meter noemt. */
+  /* TWEE FAMILIEBEGRIPPEN, EN DAT IS GEEN DUBBELING MAAR EEN CORRECTIE.
+
+     `familieVan` bepaalt WAAR er gekeken wordt (de leesroutes in de opname) en
+     `vrijstellingsFamilie` WAT er van de inhoudscontrole wordt vrijgesteld. Die
+     twee willen tegengestelde breedtes, en toen ze nog dezelfde functie waren
+     kon je er maar een goed hebben:
+
+       - breed is goed voor de DEKKING: /api/rtf als familie betekent dat de
+         opname alle foundation-leesroutes meeneemt. Smaller maken kostte hier
+         meteen 77 leesroutes uit de momentopname (1008 -> 931), en dat is
+         minder beproefd en niet minder mis.
+       - smal is noodzakelijk voor de VRIJSTELLING: staat er een gedeelde
+         gezinsroute in GEDEELD_BEDOELD, dan zou /api/rtf als familie de hele
+         foundation-oppervlakte in een klap uit de inhoudscontrole tillen.
+
+     Vandaar twee. De eerste blijft precies wat hij was; alleen de tweede kijkt
+     achter /api/rtf en /api/school een segment verder, waar het derde segment
+     het PORTAAL is en het vierde pas het domein. Dat onderscheid bestond in dit
+     bestand al -- `gezinPad` gebruikt dezelfde twee voorvoegsels. Voor de
+     bestaande vrijstellingen verandert er niets: geen ervan begint met
+     /api/rtf. */
   const familieVan = (pad) => String(pad || '').split('/').slice(0, 3).join('/');
+  const PORTAALPAD = new Set(['rtf', 'school']);
+  const vrijstellingsFamilie = (pad) => {
+    const d = String(pad || '').split('/');
+    return d.slice(0, PORTAALPAD.has(d[2]) ? 4 : 3).join('/');
+  };
 
   /* EEN MOMENTOPNAME IN PLAATS VAN ZOEKEN PER STUK, en dat is tegelijk breder EN
      goedkoper. Hiervoor keek deze controle alleen in de eigen FAMILIE van de
@@ -611,7 +647,7 @@ async function main() {
   const priveMerken = [...bezitB.merken.keys()].filter(m => !gedeeldeMerken.has(m));
   const priveIds = vanB.filter(id => !GEDEELD_BEDOELD.has(bezitB.bronnen.get(id)));
   const gedeeldeFamilies = [...GEDEELD_BEDOELD].flatMap(([pad, regel]) =>
-    [familieVan(pad)].concat((regel && regel.toont) || []));
+    [vrijstellingsFamilie(pad)].concat((regel && regel.toont) || []));
   const inGedeeldeFamilie = (pad) => gedeeldeFamilies.some(f => pad.startsWith(f + '/') || pad === f);
   const merkersVanB = new Set(priveIds.concat(codeB ? [codeB] : []).concat(priveMerken));
   for (const pad of onbewaakt.filter(p => ONGELEZEN_BEDOELD.has(p)))

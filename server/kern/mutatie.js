@@ -119,6 +119,45 @@ function poort(opdrachten, waar) {
   return true;
 }
 
+/* HETZELFDE ANTWOORD, OPZOEKBAAR OP NAAM. `overzicht()` geeft een lijst om te
+   tonen; dit geeft per opdracht het ene antwoord dat een taakloper nodig heeft.
+
+   Het woont hier en niet bij de aanroeper, omdat dit de module is die bepaalt
+   wat een tweede aanroep doet. Wie de kaart naast de tabel opschrijft, heeft
+   twee plekken die allebei "mag dit twee keer" beweren -- en de eerste keer dat
+   ze uiteenlopen, geeft de verste lezer het oude antwoord (LAT-regel 4).
+
+   HIJ ANTWOORDT VOOR EEN AANROEPER ZONDER IDEMPOTENTIESLEUTEL, en dat staat
+   vast in plaats van in een parameter. Er stond eerst `metSleutel`, en die was
+   met geen enkele echte tabel te beproeven: geen enkele opdracht die vandaag
+   door deze kaart gaat is `sleutelVereist`, dus beide standen gaven exact
+   hetzelfde antwoord. Een mutatie die `false` in `true` veranderde, gleed
+   daardoor langs alle toetsen heen.
+
+   Een vrijheidsgraad in een veiligheidsantwoord die niemand kan beproeven, is
+   gevaarlijker dan geen vrijheidsgraad (LAT-regel 2, en CLAUDE.md over de tak
+   die groen bleef omdat een toets hem met verzonnen invoer voedde).
+
+   Hij is er daarom uit, en de klasse waar hij over ging WEIGERT hier. Dat is
+   het verschil tussen "de twee standen geven toevallig hetzelfde antwoord" en
+   "ze kunnen niet verschillen": voor elke klasse die deze regel haalt, is
+   `magHerhalen(k, false)` gelijk aan `magHerhalen(k, true)` -- `sleutelVereist`
+   is de enige waarbij dat niet zo is, en die komt er niet langs. Komt er ooit
+   een aanroeper die WEL sleutels kent, dan valt deze kaart hardop om in plaats
+   van stil het verkeerde antwoord te geven. */
+function herhaalKaartVan(opdrachten) {
+  const kaart = {};
+  for (const { naam, mutatie, sleutelNodig } of overzicht(opdrachten)) {
+    if (sleutelNodig) {
+      throw new Error('"' + naam + '" is ' + mutatie + ', en deze kaart antwoordt voor een aanroeper'
+        + ' ZONDER idempotentiesleutel. Of herhalen mag, hangt daar juist van die sleutel af.'
+        + ' Geef herhaalKaartVan() die kennis mee voor je deze klasse erdoorheen stuurt.');
+    }
+    kaart[naam] = magHerhalen(mutatie, false);
+  }
+  return kaart;
+}
+
 /* Wat de SDK, de documentatie en een taakloper hiervan moeten weten. Eén vorm,
    zodat er geen tweede manier ontstaat om hetzelfde op te schrijven. */
 function overzicht(opdrachten) {
@@ -131,4 +170,4 @@ function overzicht(opdrachten) {
   })).sort((a, b) => a.naam.localeCompare(b.naam));
 }
 
-module.exports = { KLASSEN, NAMEN, isKlasse, klasse, magHerhalen, poort, overzicht };
+module.exports = { KLASSEN, NAMEN, isKlasse, klasse, magHerhalen, herhaalKaartVan, poort, overzicht };

@@ -18,7 +18,7 @@ module.exports = {
      'Lees waarvoor elk gegeven gebruikt mag worden, en waar het fysiek staat',
      'Zie wat er blijft staan als je je account opheft, en waarom'],
     'Dit zijn SOORTEN en geen inhoud: hier staat dat RTG je adres heeft, niet welk. De inhoud haal je op met een uitvoer van je dossier onder Juridisch.'),
-  '/apps/mijn-neigingen.html': G('Mijn RTG: de vragen die zichzelf afkappen, en wat RTG van je DENKT te weten.',
+  '/apps/mijn-neigingen.html': G('Mijn neigingen: de vragen die zichzelf afkappen, en wat RTG van je DENKT te weten.',
     ['Beantwoord een handvol vragen; ze stoppen zodra een antwoord niets nieuws meer opendoet',
      'Zie per neiging waar RTG hem vandaan heeft en hoe hard hij is -- gezegd, geteld of afgeleid',
      'Haal er een weg, of zeg waarvoor RTG hem juist niet mag gebruiken'],

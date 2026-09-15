@@ -125,6 +125,14 @@ const REGISTER = {
      EN loopt mee in een commando dat een mens als controle leest. Dat is het
      incident van 15 september; de bredere klasse is een werklijst. */
   'STEMPELVEILIGHEID.json': { meter: ['stempelOngevraagd', 'stempelInPoort', 'stempelSchrijversGezien'] },
+  /* ONLEESBAAR IS NIET AFWEZIG (STILLEZING.json, npm run stillezing) -- de
+     spiegel van STILSPOOR hierboven. Die meet SCHRIJVERS wier falen wordt
+     opgegeten; deze meet LEZERS die een kapot bewijs als een leeg bewijs
+     behandelen, en alleen die tweede kan een poort laten opengaan. Vier tanden:
+     twee schulden omlaag (en die worden NOOIT opgeteld -- in server/ staat er
+     een handeling tegenover, in scripts/ een meting), het bereik omhoog, en het
+     aantal lezers dat het onderscheid wel maakt omhoog. */
+  'STILLEZING.json': { meter: ['stilLezing', 'stilLezingMeters', 'stilLezingBereik', 'bewijsOnderscheidt'] },
   /* IDEMIDENTITEIT.json (npm run idemidentiteit) beantwoordt wat na #269/#270
      overbleef: waar is de identiteit van een verzoek nog te smal? Drie tanden,
      een omhoog en twee omlaag -- zie de kop bij die tanden in ../norm.js. */

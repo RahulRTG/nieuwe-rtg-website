@@ -344,6 +344,8 @@
     "stilspoor:vast": "node scripts/stilspoor.js --vastleggen",
     "stempelveiligheid": "node scripts/stempelveiligheid.js",
     "stempelveiligheid:vast": "node scripts/stempelveiligheid.js --vastleggen",
+    "stillezing": "node scripts/stillezing.js",
+    "stillezing:vast": "node scripts/stillezing.js --vastleggen",
     "meterklasse": "node scripts/meterklasse.js",
     "meterklasse:vast": "node scripts/meterklasse.js --vastleggen",
     "refundmigratie": "node scripts/refundmigratie.js",

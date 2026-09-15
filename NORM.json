@@ -120,7 +120,11 @@
     "stempelOngevraagd": 54,
     "stempelInPoort": 16,
     "stempelSchrijversGezien": 211,
-    "veranderbereikZonderBereik": 828
+    "veranderbereikZonderBereik": 828,
+    "stilLezing": 5,
+    "stilLezingMeters": 61,
+    "stilLezingBereik": 517,
+    "bewijsOnderscheidt": 3
   },
   "notities": [
     {
@@ -2822,7 +2826,11 @@
     "idemHandwerkGeenVergelijking": "2026-09-15",
     "neigingVerwijzingRot": "2026-09-15",
     "neigingVoorkeurBlind": "2026-09-15",
-    "veranderbereikZonderBereik": "2026-09-15"
+    "veranderbereikZonderBereik": "2026-09-15",
+    "stilLezing": "2026-09-15",
+    "stilLezingMeters": "2026-09-15",
+    "stilLezingBereik": "2026-09-15",
+    "bewijsOnderscheidt": "2026-09-15"
   },
   "uitzonderingen": [
     {

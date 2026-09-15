@@ -1724,6 +1724,41 @@ const IJKINGEN = {
       (j) => { j.schrijvers = Math.max(0, (j.schrijvers || 0) - 30); return j; },
       () => voor.stempelSchrijversGezien - norm.meet().stempelSchrijversGezien)
   },
+  /* DE VIER TANDEN VAN STILLEZING.json -- de spiegel van STILSPOOR hierboven.
+     Elk veld krijgt een EIGEN verstoring en een eigen grootte, zodat twee
+     verwisselde sleutels niet toevallig dezelfde uitslag geven; die val staat
+     bij STILSPOOR al uitgeschreven.
+
+     De twee schulden worden apart geijkt en niet met een gedeelde verstoring,
+     want ze wonen in twee bakken die met opzet nooit worden opgeteld: `server`
+     (een lezing die een HANDELING doorlaat) en `scripts` (een lezing die een
+     METING laat liegen). Een meter die ze zou optellen, beweegt bij beide
+     verstoringen even hard mee en die fout zou hier onzichtbaar blijven. */
+  stilLezing: {
+    proef: (voor) => metVervangenJson('STILLEZING.json',
+      (j) => { j.gemeten.server.smeltSamen = (j.gemeten.server.smeltSamen || 0) + 9; return j; },
+      () => norm.meet().stilLezing - voor.stilLezing)
+  },
+  stilLezingMeters: {
+    proef: (voor) => metVervangenJson('STILLEZING.json',
+      (j) => { j.gemeten.scripts.smeltSamen = (j.gemeten.scripts.smeltSamen || 0) + 13; return j; },
+      () => norm.meet().stilLezingMeters - voor.stilLezingMeters)
+  },
+  /* Het bereik telt de twee werelden WEL bij elkaar op -- de enige plek waar dat
+     gebeurt, want blindheid is een eigenschap van het instrument. De verstoring
+     zit daarom in EEN van de twee: komt hij er niet doorheen, dan telt de meter
+     maar een helft. */
+  stilLezingBereik: {
+    proef: (voor) => metVervangenJson('STILLEZING.json',
+      (j) => { j.gemeten.scripts.bewijslezingen = Math.max(0, (j.gemeten.scripts.bewijslezingen || 0) - 55); return j; },
+      () => voor.stilLezingBereik - norm.meet().stilLezingBereik)
+  },
+  bewijsOnderscheidt: {
+    proef: (voor) => metVervangenJson('STILLEZING.json',
+      (j) => { j.gemeten.server.onderscheidt = Math.max(0, (j.gemeten.server.onderscheidt || 0) - 1);
+               j.gemeten.scripts.onderscheidt = Math.max(0, (j.gemeten.scripts.onderscheidt || 0) - 2); return j; },
+      () => voor.bewijsOnderscheidt - norm.meet().bewijsOnderscheidt)
+  },
   /* DE TAND VAN 7 SEPTEMBER 2026: appwerktDefecten telt de onderdelen uit MAPPEN
      waarvan APPWERKT.json een defect bewijs vastlegt. Zelfde vorm als hierboven:
      de meter leest `gemeten.defecten` uit een register dat er al is, dus hij

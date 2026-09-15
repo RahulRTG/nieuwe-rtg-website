@@ -295,7 +295,7 @@ later bij doet, geldt niet voor wat er al ligt.
   nagetrokken tegen `sprongindex.json`.
 - **Verval dat `gezegd` met rust laat.**
 - **Zeven ledenroutes**, alle zeven met een mutatiecontract op een gemeten ronde.
-- **Het scherm** `/apps/mijn-neigingen.html` ("Mijn RTG"), met per neiging *wijzigen*,
+- **Het scherm** `/apps/mijn-neigingen.html` ("Mijn neigingen"), met per neiging *wijzigen*,
   *vergeet dit* en *niet hiervoor gebruiken*, en met de eigen rand erbij.
 - **De intake is nooit verplicht** — "ik doe dit later" bestaat, en wie hem nooit
   doet houdt exact het huis dat hij vandaag heeft.
@@ -315,7 +315,7 @@ later bij doet, geldt niet voor wat er al ligt.
 ### Vraagt een besluit
 
 - **Wordt dit de voordeur?** Het voorstel wil de intake bij binnenkomst. Vandaag
-  hangt hij onder *Instellingen → Mijn RTG*. De voordeur veranderen raakt
+  hangt hij onder *Instellingen → Mijn neigingen*. De voordeur veranderen raakt
   `server/middleware/voordeur.js` en de inlogpoort, en dat is geen bijvangst van
   deze laag. Klein en omkeerbaar zou zijn: na de eerste inlog één keer aanbieden,
   met "later" even groot.
@@ -513,7 +513,7 @@ productdefect (`BETROUWBAARHEID.md`); een onzichtbare ingang is er ook een.
 | de geheugenkaart | `server/kern/neiging/geheugen.js` |
 | de laag zelf | `server/kern/neiging/index.js` |
 | de routes | `server/routes/neiging.js` |
-| het scherm | `public/apps/mijn-neigingen.html` ("Mijn RTG") |
+| het scherm | `public/apps/mijn-neigingen.html` ("Mijn neigingen") |
 | de contracten | `server/lib/mutatiecontracten-neiging.js` |
 | de toetsen | `test/neiging.test.js`, `test/neiging.e2e.js`, `test/neiging-scherm.e2e.js` |
 | de boardroomschakelaar | `server/functies/register/cat-leden.js` (`neiging`) |

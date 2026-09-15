@@ -345,6 +345,8 @@
     "refundmigratie:vast": "node scripts/refundmigratie.js --vastleggen",
     "ritmigratie": "node scripts/ritmigratie.js",
     "ritmigratie:vast": "node scripts/ritmigratie.js --vastleggen",
+    "ondernemerslus": "node scripts/ondernemerslus.js",
+    "ondernemerslus:vast": "node scripts/ondernemerslus.js --vastleggen",
     "doorwerking": "node scripts/doorwerking.js",
     "doorwerking:vast": "node scripts/doorwerking.js --vastleggen",
     "factuurproef": "node scripts/factuurproef.js",

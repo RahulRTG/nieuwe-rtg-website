@@ -89,7 +89,20 @@ const GEISOLEERD = [
      getal (1840 toetsen in plaats van 1839, 186 schermen in plaats van 185, een
      poortloze route die niemand had geschreven). Deze lijst bestaat precies om
      dat te voorkomen, en de zeef vond wat ik zelf was vergeten. */
-  'wekdekking.test.js'
+  'wekdekking.test.js',
+  /* ondernemerslus.test.js hoort hier om exact de reden die bovenaan dit bestand
+     staat, en hij is er door de zeef in gezet en niet door inzicht vooraf: zijn
+     besturingsproeven HERSCHRIJVEN `server/kern/onderneming/index.js` (om te
+     bewijzen dat de meter gooit als hij zijn onderwerp kwijtraakt) en zetten een
+     bestand neer onder `server/routes/supplier/` (om te bewijzen dat het kopgetal
+     kan bewegen). Allebei binnen een `finally` die netjes opruimt -- maar tussen
+     schrijven en opruimen staat er een kapotte kernmodule op schijf, en elke
+     toets die in dat venster een server start leest hem.
+
+     De les die dat oplevert is breder dan deze toets: een besturingsproef die
+     BEWIJST dat een meter kan uitslaan, doet dat bijna altijd door de wereld
+     even stuk te maken. Wie er een schrijft, hoort hier meteen te kijken. */
+  'ondernemerslus.test.js'
 ];
 
 function isGeisoleerd(naam) {

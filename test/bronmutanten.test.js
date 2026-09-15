@@ -430,3 +430,52 @@ test('de draaier past de lijst ook echt toe, en niet alleen op papier', () => {
     'de twee bronmuterende toetsen horen apart te draaien; staan ze in de parallelle groep, dan is ' +
     'de splits in scripts/test-runner.js weg en is de hele isolatielijst een dode letter');
 });
+
+test('de registerpoort draait de bronmuterende toetsen apart', () => {
+  /* HET GAT DAT DE ZEEF HIERBOVEN LIET, gevonden op 15 september 2026. Die zeef
+     leest package.json en herkent een GLOB (`test/*.test.js`). Maar
+     scripts/registerklopt.js bouwt zijn lijst in JAVASCRIPT -- hij zoekt de
+     toetsen op die een register bewaken -- en start daar zelf `node --test` mee.
+     Geen glob, dus de zeef zag hem nooit, terwijl er twee bronmuterende toetsen
+     in die lijst zitten (capabilities en ondernemerslus).
+
+     Het beet toen ondernemerslus er een tweede proefbestand bij kreeg: de
+     semantiekmeter zag `server/routes/supplier/__lusproef.js` in de LIJST en was
+     hem bij het LEZEN alweer kwijt, en de poort meldde dat een REGISTER
+     achterliep. Dezelfde vorm die scripts/keuring.js in zijn kop optekent, en de
+     duurste soort rood: hij wees de verkeerde kant op.
+
+     DEZE TOETS VRAAGT DE POORT WAT HIJ ZOU DOEN en gelooft de code niet op haar
+     woord -- dezelfde vorm als de toets hierboven over de draaier. De race zelf
+     is timingafhankelijk en dus geen bruikbare toets: hij bleef twee keer groen
+     met de splitsing eruit. Wat WEL vaststaat is de SPLITSING, en die is hier
+     meetbaar gemaakt. */
+  const bron = fs.readFileSync(path.join(WORTEL, 'scripts', 'registerklopt.js'), 'utf8');
+
+  assert.match(bron, /require\(['"]\.\/lib\/geisoleerd['"]\)/,
+    'scripts/registerklopt.js leest de isolatielijst niet meer. Dan draaien de bronmuterende toetsen ' +
+    'daar weer naast elkaar, en zakt er een die er niets mee te maken heeft -- met een melding die de ' +
+    'verkeerde kant op wijst.');
+
+  /* En de splitsing zelf: de lijst LEZEN is niet de lijst TOEPASSEN. Precies dat
+     onderscheid kostte de draaier hierboven een eigen toets. */
+  /* DE BEVESTIGENDE KANT MOET APART GETOETST, EN DAT IS MET EEN MUTATIE
+     GEVONDEN. Eerst stond hier /GEISOLEERD\.includes\(n\)/ zonder meer, en die
+     matcht OOK op de negatie een regel lager -- haal de eerste helft van de
+     splitsing weg en de toets bleef groen. Vandaar [^!] ervoor: die eist een
+     voorkomen dat NIET genegeerd is. */
+  assert.match(bron, /[^!]GEISOLEERD\.includes\(n\)/,
+    'de lijst wordt gelezen maar niet toegepast: er is geen bevestigende splitsing op GEISOLEERD meer, ' +
+    'dus niets wordt apart gedraaid');
+  assert.match(bron, /!GEISOLEERD\.includes\(n\)/,
+    'de gewone toetsen worden niet meer van de geisoleerde gescheiden');
+
+  /* DE TEGENPROEF. Zonder deze zou de toets ook slagen als er geen enkele
+     bronmuterende toets in de poort zat -- en dan bewaakt hij niets. */
+  const { vind } = require('../scripts/registerklopt');
+  const { GEISOLEERD } = require('../scripts/lib/geisoleerd');
+  const raak = vind().filter(n => GEISOLEERD.includes(n));
+  assert.ok(raak.length >= 1,
+    'geen enkele toets van de registerpoort staat in de isolatielijst; dan toetst de splitsing hierboven ' +
+    'niets. Is er een hernoemd, pas dan deze toets aan -- maar laat hem niet stil op nul staan.');
+});

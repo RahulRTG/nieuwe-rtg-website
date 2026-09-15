@@ -85,8 +85,7 @@ module.exports = ({ db, save }) => {
   };
 
   function lees(sleutel) {
-    const h = peil(sleutel);
-    if (!h) return { schuif: STANDAARD, onderwerpen: [], signalen: SIGNALEN, standaard: STANDAARD };
+    const h = peil(sleutel) || { schuif: STANDAARD, onderwerpen: {} };
     return {
       schuif: h.schuif,
       /* Gesorteerd op NAAM en niet op gewicht. Een lijst van je eigen

@@ -394,7 +394,7 @@ afwezigheid met een reden, en geen lege functie.
 
 ## 7. Wat het bouwen blootlegde
 
-Vijf dingen die geen enkele bestaande toets zag, en die je nergens anders moet
+Zes dingen die geen enkele bestaande toets zag, en die je nergens anders moet
 herhalen. De eerste is de duurste, en hij gaat over deze meter zelf.
 
 **De naammeting gaf een naam vrij die niet vrij was, en twee bestaande toetsen
@@ -443,6 +443,24 @@ was altijd waar. Daarom staat er nu een **besturingsproef** naast: de eerste
 aanroep van een schrijfroute móét het beeld veranderen. Zonder die tweede helft is
 "de tweede veranderde niets" geen bevinding maar een blinde vlek
 (`BEWIJSMACHINE.md` par. 6a).
+
+**Een bestemming wees naar dode tekst terwijl er een adres bestond — en alleen
+een browser kon dat zien.** De server geeft aan het eind van de intake een lijst
+SLEUTELS, en het scherm zoekt daar een naam en een adres bij in
+`sprongindex.json`. Dat deed het met *wie het eerst komt wint* — en `reizen` staat
+twee keer in die index: eerst als **tab** (zonder url) en daarna als **link** naar
+`/apps/reizen-veilig.html`. Het lid zag dus grijze tekst waar een knop hoorde,
+terwijl elke servertoets groen stond: de route gaf keurig `["reizen","stad"]`
+terug.
+
+Twee dingen zitten eronder. Een `sleutel` in de sprongindex is **niet uniek**, dus
+"zoek hem op" is een lossy aanname; de keuze is nu inhoudelijk (een rij mét adres
+verslaat een rij zonder) in plaats van op volgorde — dezelfde fout die
+`KAARTEN.md` bij `gebiedkeuze.js` beschrijft, waar de sortering iets besliste waar
+zij niets van wist. En de index werd **asynchroon** geladen terwijl de slotkaart
+al kon tekenen: een wedloop die zich als "soms werkt het" voordoet.
+`test/neiging-scherm.e2e.js` bewaakt nu beide, en vergelijkt met wat de SERVER
+zegt in plaats van met een getal.
 
 **`public/apps/app-main.js` is bouwuitvoer.** De eerste registratie van het scherm
 ging naar het gebundelde bestand in plaats van naar

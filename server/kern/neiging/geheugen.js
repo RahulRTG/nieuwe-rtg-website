@@ -29,16 +29,14 @@ module.exports = function maakGeheugen({ neiging }) {
   /* WAT WEET RTG VAN MIJ. Alles, ook het vervallene en het geweigerde, met per
      regel waar het vandaan komt en wat ermee mag. De uitleg reist mee met de
      rij en staat niet als lijst onderaan: een graad die je pas drie schermen
-     verder kunt verklaren, wordt gelezen als een oordeel. */
-  const UITLEG = Object.freeze({
-    gezegd: 'Dit heb je zelf gezegd of aangetikt.',
-    gekozen: 'Dit heb je meermaals gekozen; RTG heeft het geteld.',
-    afgeleid: 'Dit heeft RTG ergens uit afgeleid. Het is het zwakste wat hier staat.'
-  });
-  const DOELUITLEG = Object.freeze({
-    tonen: 'Hiermee bepaalt RTG wat hij je laat zien.',
-    helpen: 'Hiermee helpt RTG je met iets wat je zelf vraagt.'
-  });
+     verder kunt verklaren, wordt gelezen als een oordeel.
+
+     De teksten komen uit ./besluiten.js en staan hier NIET nog een keer. Dat
+     stond er wel, en het was precies de dubbeling waar de kop hierboven tegen
+     waarschuwt: een lokale `DOELUITLEG` overschaduwde de geimporteerde, zodat
+     het register wel werd binnengehaald en nooit gelezen. Twee plekken die
+     dezelfde grond uitleggen lopen uiteen, en de kopie wint stil.
+     test/neiging.test.js vergelijkt de uitvoer sindsdien met de bron. */
 
   function geheugen(key) {
     neiging.veeg(key);

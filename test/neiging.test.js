@@ -228,6 +228,22 @@ test('de geheugenkaart toont ook wat niet meer meetelt, met de reden', () => {
   assert.equal(g.telt, 0);
 });
 
+test('de uitleg op de geheugenkaart komt UIT het besluitenregister', () => {
+  /* Er stond hier een lokale kopie van GRONDUITLEG en DOELUITLEG die de
+     geimporteerde overschaduwde: het register werd binnengehaald en nooit
+     gelezen. Twee plekken die dezelfde grond uitleggen lopen uiteen, en de
+     kopie wint stil -- precies LAT-regel 4. Deze toets vergelijkt met de bron.
+
+     DE MUTATIE: zet in geheugen.js een eigen `const DOELUITLEG = {...}` terug.
+     Deze toets zakt zodra een van de teksten afwijkt. */
+  const besluiten = require('../server/kern/neiging/besluiten');
+  const h = huis();
+  h.neiging.onthoud('k', { onderwerp: 'eten', grond: 'gezegd', doel: ['tonen', 'helpen'] });
+  const n = h.laag.neigingGeheugen('k').neigingen[0];
+  assert.equal(n.grondUitleg, besluiten.GRONDUITLEG.gezegd);
+  for (const d of n.doelen) assert.equal(d.uitleg, besluiten.DOELUITLEG[d.id]);
+});
+
 test('de geheugenkaart noemt zijn eigen rand', () => {
   const g = huis().laag.neigingGeheugen('k');
   assert.ok(g.grenzen.length >= 4, 'een overzicht zonder rand leest als "dit is alles"');

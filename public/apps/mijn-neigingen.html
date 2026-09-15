@@ -61,6 +61,8 @@
   .opent{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.7rem;}
   .opent a{border:1px solid var(--line);background:var(--card2);color:var(--txt);text-decoration:none;
     font-size:0.82rem;padding:0.5rem 0.8rem;min-height:36px;display:inline-flex;align-items:center;}
+  .opent .opent-stil{border:1px dashed var(--line);color:var(--soft);
+    font-size:0.82rem;padding:0.5rem 0.8rem;min-height:36px;display:inline-flex;align-items:center;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
@@ -90,10 +92,24 @@
   /* Wat er per bestemming te zien is. De NAMEN komen uit de sprongindex -- de
      lijst die uit MAPPEN wordt afgeleid -- zodat dit scherm geen tweede lijst
      apps wordt. Lukt het laden niet, dan tonen we de sleutel zelf en verzinnen
-     we geen naam. */
+     we geen naam.
+
+     EEN SLEUTEL IS NIET UNIEK, EN DE EERSTE IS NIET DE BESTE. Hier stond
+     `if (!INDEX[i.sleutel])` -- wie het eerst komt wint -- en dat viel meteen
+     verkeerd: `reizen` staat twee keer in de index, eerst als TAB (zonder url)
+     en daarna als LINK (/apps/reizen-veilig.html). Het lid kreeg dus dode tekst
+     te zien terwijl er een prima adres bestond. Een winnaar op volgorde is
+     precies de fout die KAARTEN.md bij `gebiedkeuze.js` beschrijft: de sortering
+     beslist iets waar zij niets van weet.
+
+     De regel is nu inhoudelijk: een rij MET adres verslaat een rij zonder. */
   let INDEX = {};
-  fetch('/shared/sprongindex.json').then(r => r.json()).then(j => {
-    for (const i of (j.items || [])) if (i.sleutel && !INDEX[i.sleutel]) INDEX[i.sleutel] = i;
+  const indexKlaar = fetch('/shared/sprongindex.json').then(r => r.json()).then(j => {
+    for (const i of (j.items || [])) {
+      if (!i.sleutel) continue;
+      const staand = INDEX[i.sleutel];
+      if (!staand || (!staand.url && i.url)) INDEX[i.sleutel] = i;
+    }
   }).catch(() => {});
 
   /* ------------------------------------------------------------- de intake */
@@ -166,7 +182,9 @@
         if (i && i.url) {
           const a = maak('a'); a.href = i.url; tekst(a, i.naam || sleutel); bak.appendChild(a);
         } else {
-          bak.appendChild(tekst(maak('span', 'opent'), (i && i.naam) || sleutel));
+          /* Geen adres bekend: de naam als TEKST en geen knop die nergens heen
+             gaat. Eigen klasse, want `.opent` is de container en niet de rij. */
+          bak.appendChild(tekst(maak('span', 'opent-stil'), (i && i.naam) || sleutel));
         }
       }
       el.appendChild(bak);
@@ -258,6 +276,10 @@
   }
 
   async function laad() {
+    /* Wachten op de index voordat er iets wordt getekend. Zonder dit is de
+       slotkaart een wedloop: is de fetch nog niet terug, dan staat elke
+       bestemming als dode tekst terwijl er adressen bestaan. */
+    await indexKlaar;
     const s = await api('/api/neiging/intake', {});
     if (s.status === 401) { $('#uitleg').textContent = 'Log in om dit te zien.'; return; }
     if (s.status === 403) { $('#uitleg').textContent = s.body.error || 'Dit hoort bij een account.'; return; }

@@ -164,3 +164,35 @@ test('10. de uitslag kruist met NAMENSVORM.json, dat spoor onafhankelijk telde',
   assert.equal(uit.gemeten.mechanismen, (nv.gemeten && nv.gemeten.werkwoord
     ? nv.gemeten.werkwoord.mechanismen : 7), 'beide meters praten over evenveel mechanismen');
 });
+
+test('11. het register SPOORVORM.json klopt met een verse meting', () => {
+  /* WAAROM DEZE GRENDEL ER IS, en hij is precies zo nodig als bij NAMENSVORM.
+     Deze matrix bestaat bijna helemaal uit streepjes, en een streepje dat
+     verouderd is ziet er identiek uit aan een streepje dat vandaag is gemeten.
+     Repareert iemand `bijstand` naar vier van vier en vergeet hij het register,
+     dan blijft REPRESENTATIE.md par. 8.1 een gat melden dat gedicht is -- en
+     `spoorConvergent` in NORM.json blijft op een getal staan dat niemand meer
+     haalt. De zin "loopt achter" is geen sier: scripts/registerklopt.js vindt
+     deze toets erop.
+
+     Alleen de DRAGENDE getallen, niet de hele matrix. De rijen bevatten
+     bestandsnamen en ingangsnamen die bij een onschuldige hernoeming meebewegen;
+     dan zou deze toets zakken op iets wat geen bevinding is. Wat hier staat is
+     wat het document citeert en wat de ratel leest. */
+  const vast = JSON.parse(fs.readFileSync(path.join(WORTEL, 'SPOORVORM.json'), 'utf8'));
+  const vers = S.meet();
+  const klopt = (wat, a, b) => assert.deepEqual(a, b,
+    'SPOORVORM.json loopt achter op de code (' + wat + ') -- draai: npm run spoorvorm:vast. ' +
+    'REPRESENTATIE.md par. 8.1 citeert deze getallen en NORM.json ratelt op volledigConvergent; ' +
+    'een verouderd streepje ziet er identiek uit aan een vers streepje.');
+  klopt('mechanismen', vast.gemeten.mechanismen, vers.gemeten.mechanismen);
+  klopt('mechanismen die iets vastleggen', vast.gemeten.metSpoor, vers.gemeten.metSpoor);
+  klopt('mechanismen waar het spoor kan tegenhouden', vast.gemeten.kanTegenhouden, vers.gemeten.kanTegenhouden);
+  klopt('mechanismen die alle vier halen', vast.gemeten.volledigConvergent, vers.gemeten.volledigConvergent);
+  /* De vier uitslagen per mechanisme horen er ook in. Zonder deze regel kan
+     `bijstand` V-2 winnen en V-4 verliezen zonder dat een van de vier tellers
+     hierboven beweegt, en dan staat er een matrix in het document die niet meer
+     bij de code hoort terwijl elke teller klopt. */
+  const matrix = (j) => Object.fromEntries(j.rijen.map(r => [r.mechanisme, [r.V1, r.V2, r.V3, r.V4]]));
+  klopt('de vier uitslagen per mechanisme', matrix(vast), matrix(vers));
+});

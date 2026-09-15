@@ -621,9 +621,14 @@ is precies de plek waar dit huis al vier keer een objecttype heeft weggemeten.
 | `sepa-machtiging` | — | — | — | — |
 | `app-machtiging` | — | — | — | — |
 
-**2 van 7 legt iets vast, 1 kan de handeling tegenhouden, 1 haalt alle vier.**
-Dat eerste getal kruist met `NAMENSVORM.json`, dat `spoor` onafhankelijk op 2/7
-zette — twee meters, apart gebouwd, dezelfde uitslag.
+**<!--getal:spoor.metSpoor-->2<!--/getal--> van <!--getal:spoor.mechanismen-->7<!--/getal--> legt iets vast,
+<!--getal:spoor.kanTegenhouden-->1<!--/getal--> kan de handeling tegenhouden,
+<!--getal:spoor.volledigConvergent-->1<!--/getal--> haalt alle vier.**
+Dat eerste getal kruist met `NAMENSVORM.json`, dat `spoor` onafhankelijk over
+diezelfde <!--getal:namens.mechanismen-->7<!--/getal--> mechanismen telde en op 2
+uitkwam — twee meters, apart gebouwd, dezelfde uitslag. De noemer draagt hier een
+merkteken en de tellers ook: drie van de vier staan op één, en een één in proza
+veroudert net zo onzichtbaar als een nul.
 
 **V-4 is niet wat `scripts/stilspoor.js` meet**, en die twee worden nergens
 opgeteld. Stilspoor vraagt of het FALEN van een spoorschrijver wordt opgegeten

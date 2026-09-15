@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 119,
+    "ratelTanden": 120,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -124,7 +124,7 @@
       "van": 623,
       "vervalt": "2026-12-15",
       "meter": "toetsenNietGemeten 623 -> 624",
-      "reden": "test/spoorvorm.test.js komt erbij -- tien toetsen op de convergentiematrix -- en staat nog niet in MUTATIES.json. Vier ervan ZIJN een mutatie (op verzonnen lijven, want op de echte boom haalt alleen de referentie vier van vier), en de meter is daarnaast met de hand gemuteerd: de V-3-regel terugzetten naar de oude fout laat toets 1, 2, 4 en 8 zakken, en `onbepaald` als NEE invullen laat toets 7 zakken. Eén mutatie vond een gat dat NIET is gerepareerd maar wel is opgeschreven in toets 8: het veld `besturing.inOrde` hardcoderen op true wordt door geen enkele toets gezien zolang de referentie toch vier haalt -- de inhoudelijke eigenschap is bewaakt, de vlag is een afgeleide.",
+      "reden": "test/spoorvorm.test.js komt erbij -- elf toetsen op de convergentiematrix -- en staat nog niet in MUTATIES.json. Vier ervan ZIJN een mutatie (op verzonnen lijven, want op de echte boom haalt alleen de referentie vier van vier), en de meter is daarnaast met de hand gemuteerd: de V-3-regel terugzetten naar de oude fout laat toets 1, 2, 4 en 8 zakken, en `onbepaald` als NEE invullen laat toets 7 zakken. Toets 11 (het register klopt met een verse meting) is met twee mutaties nagetrokken: volledigConvergent van 1 naar 3 laat hem zakken, en `bijstand` V-2 vals op ja OOK -- die tweede beweegt geen enkele teller, en zonder de matrixregel zou het register een uitslag kunnen dragen die niet meer bij de code hoort terwijl alle vier de getallen kloppen. Eén mutatie vond een gat dat NIET is gerepareerd maar wel is opgeschreven in toets 8: het veld `besturing.inOrde` hardcoderen op true wordt door geen enkele toets gezien zolang de referentie toch vier haalt -- de inhoudelijke eigenschap is bewaakt, de vlag is een afgeleide.",
       "waarheen": "Laat scripts/mutatie.js over test/spoorvorm.test.js lopen, samen met de namens-bestanden uit de notities hieronder."
     },
     {

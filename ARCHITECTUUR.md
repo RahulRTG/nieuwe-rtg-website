@@ -135,9 +135,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1585 |
+| kern-namen die routes aanraken | 1579 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 237 |
-| daarvan door precies één domein | 1348 |
+| daarvan door precies één domein | 1342 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

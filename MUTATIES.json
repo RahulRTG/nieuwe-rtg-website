@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-15T00:31:37.703Z",
-    "commit": "92de4a23",
+    "op": "2026-09-15T00:37:34.734Z",
+    "commit": "d4d9a3a1",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
@@ -2134,6 +2134,14 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "doorbelasting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/doorbelasting.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "doorgeefjournaal.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3682,14 +3690,6 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
-    "idemidentiteit.test.js": {
-      "soort": "puur",
-      "staat": "gezakt",
-      "module": "scripts/idemidentiteit.js",
-      "operator": "===->!==#0",
-      "gezakt": 2,
-      "geprobeerd": 1
-    },
     "idemproef.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4168,6 +4168,14 @@
       "module": "server/kern/labfonds.js",
       "operator": "===->!==#0",
       "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "landdekking.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/landdekking.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
       "geprobeerd": 1
     },
     "landpakket.test.js": {
@@ -7625,6 +7633,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "soeverein.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/soeverein.js",
+      "operator": "&&->||#1",
+      "gezakt": 1,
+      "geprobeerd": 9
     },
     "sparren.test.js": {
       "soort": "server",

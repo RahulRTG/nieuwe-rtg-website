@@ -1,0 +1,421 @@
+{
+  "stempel": {
+    "op": "2026-09-15T00:25:13.310Z",
+    "commit": "ca059d78",
+    "boomVuil": false,
+    "boomAnders": 1,
+    "instrument": "scripts/soeverein.js",
+    "node": "v22.22.2"
+  },
+  "graad": "gemeten",
+  "grens": "De vier delen mogen nooit tot een soevereiniteitscijfer worden opgeteld. Het BEREIK is lexicaal herkend en dus een ONDERgrens op 'weegt niet mee': een poort die req.session via een helper zet, wordt gemist. De NAAMRUIMTE is een woordtelling, dus een begrip onder een andere naam wordt gemist. En dat een BOUWSTEEN bestaat zegt niet dat hij doet wat het voorstel vraagt -- elke steen draagt daarom dektVoorstel: onbepaald.",
+  "hoe": "De ladder komt uit kern/isolatie/dragers.js, het bereik uit de toekenning van req.session in de poortbestanden, de naamruimte uit een woordtelling over alle .js in server/, en de bouwstenen uit het bestaan van hun bestand. Geen van vieren uit een lijst in dit script.",
+  "graadPerDeel": {
+    "ladder": "gemeten -- gelezen uit de gegevensstructuur zelf, niet uit tekst",
+    "bereik": "vermoed -- de toekenning wordt LEXICAAL herkend (/req\\.session\\s*=/). Een poort die hem via een helper zet, wordt gemist, en een poort die hem in commentaar noemt telt ten onrechte mee. Dit is dus een ONDERgrens op \"weegt niet mee\" en geen bewijs van het tegendeel; de e2e-weg om het hard te maken is een verzoek met een zaaksessie door kern/isolatie/sessiedragers.js halen en tellen wat eruit komt.",
+    "naamruimte": "vermoed -- woordtelling, dus een begrip onder een andere naam wordt gemist",
+    "bouwstenen": "gemeten voor BESTAAN, onbepaald voor DEKKING (zie per steen)"
+  },
+  "geenSamengesteldCijfer": "De vier delen worden NOOIT opgeteld tot een soevereiniteitscijfer. Een ladder met een gat, een weg zonder isolatie en een bezette naam zijn drie verschillende soorten probleem, en een gemiddelde ervan stuurt niemand ergens heen (INT-04).",
+  "ladder": {
+    "dragers": [
+      {
+        "naam": "huis",
+        "wat": "het hele platform",
+        "heeftStandOpslag": true,
+        "draagtSleutelBijVerzoek": true,
+        "waaromGeenSleutel": null
+      },
+      {
+        "naam": "organisatie",
+        "wat": "één klantorganisatie (TENANT.md: org IS de klant)",
+        "heeftStandOpslag": true,
+        "draagtSleutelBijVerzoek": false,
+        "waaromGeenSleutel": "DRIE REDENEN, en ze zijn alle drie gemeten. (1) Een ledensessie draagt geen organisatiecode: req.session wordt op precies EEN plek gezet (opzet/diensten2.js) in de vorm { tier, key, account }, en daar zit geen org bij. (2) De zaaksessie die WEL een code draagt, bereikt deze laag helemaal niet: supplierAuth zet req.supplier en req.actor en nooit req.session, dus voor een zaakverzoek weegt GEEN ENKELE drager mee -- niet alleen deze niet. (3) En er is geen eenduidig antwoord op de vraag welke organisatie het IS: TENANT.md houdt org, werkruimte en leverancier met opzet uit elkaar, en iemand die bij twee organisaties werkt zou de strengste van de twee over zijn hele sessie krijgen -- de join kent geen wereld. Een sleutel invullen is hier dus geen ontbrekend stukje werk maar een BESLUIT dat eerst moet worden genomen; hem raden sluit de verkeerde mensen af."
+      },
+      {
+        "naam": "identiteit",
+        "wat": "één mens of zaak, over al zijn sessies",
+        "heeftStandOpslag": true,
+        "draagtSleutelBijVerzoek": true,
+        "waaromGeenSleutel": null
+      },
+      {
+        "naam": "sessie",
+        "wat": "één ingelogde sessie",
+        "heeftStandOpslag": true,
+        "draagtSleutelBijVerzoek": true,
+        "waaromGeenSleutel": null
+      },
+      {
+        "naam": "apparaat",
+        "wat": "één toestel",
+        "heeftStandOpslag": true,
+        "draagtSleutelBijVerzoek": true,
+        "waaromGeenSleutel": null
+      },
+      {
+        "naam": "workload",
+        "wat": "een achtergrondtaak, geplande opdracht of webhook-verwerker",
+        "heeftStandOpslag": false,
+        "draagtSleutelBijVerzoek": false,
+        "waaromGeenSleutel": "geen achtergrondtaak meldt zich aan; er is ook geen gedeeld beginpunt waar dat zou kunnen (de async-context van kern/kosten/haak.js draagt een kostendrager, geen actor)."
+      }
+    ],
+    "telling": {
+      "dragers": 6,
+      "metSleutelBijVerzoek": 4
+    },
+    "ontbrekendeSporten": [
+      {
+        "naam": "land",
+        "wat": "een country realm: alles binnen een rechtsgebied",
+        "waarom": "Zonder deze sport is \"Nederlandse gegevens\" geen afdwingbare verzameling maar een woord.",
+        "bestaat": false
+      },
+      {
+        "naam": "locatie",
+        "wat": "een location realm: een vestiging",
+        "waarom": "Het voorstel begrenst capabilities op vestigingsniveau (scope: ES-IBIZA-004).",
+        "bestaat": false
+      }
+    ]
+  },
+  "bereik": {
+    "poorten": [
+      {
+        "poort": "ledenpoort",
+        "pad": "server/opzet/diensten2.js",
+        "bestaat": true,
+        "zetSessie": true,
+        "isolatieWeegtMee": true,
+        "let": null
+      },
+      {
+        "poort": "leverancierpoort",
+        "pad": "server/opzet/leverancierpoort.js",
+        "bestaat": true,
+        "zetSessie": false,
+        "isolatieWeegtMee": false,
+        "let": "deze weg zet req.session niet, dus kern/isolatie/sessiedragers.js krijgt niets -- er weegt GEEN ENKELE drager mee, ook `huis` niet"
+      },
+      {
+        "poort": "kantoorpoort",
+        "pad": "server/kern/kantoor/kluispoort.js",
+        "bestaat": true,
+        "zetSessie": false,
+        "isolatieWeegtMee": false,
+        "let": "deze weg zet req.session niet, dus kern/isolatie/sessiedragers.js krijgt niets -- er weegt GEEN ENKELE drager mee, ook `huis` niet"
+      }
+    ],
+    "poortenZonderIsolatie": [
+      "leverancierpoort",
+      "kantoorpoort"
+    ],
+    "let": "Een buitenlandse exploitant is een ZAAK. Draagt de zaakweg geen drager, dan is de soevereiniteitsbelofte voor precies de partij die hem nodig heeft vandaag niet afdwingbaar door deze laag."
+  },
+  "naamruimte": {
+    "begrippen": [
+      {
+        "begrip": "capability",
+        "bestanden": 141,
+        "vrij": false,
+        "voorbeelden": [
+          "server/ai.js",
+          "server/config/productie-ai.js",
+          "server/config/productie-motor.js",
+          "server/effectbon.js"
+        ]
+      },
+      {
+        "begrip": "schaduw",
+        "bestanden": 89,
+        "vrij": false,
+        "voorbeelden": [
+          "server/config/productie-motor.js",
+          "server/functies/register/cat-command.js",
+          "server/imap.js",
+          "server/kern/ai/router.js"
+        ]
+      },
+      {
+        "begrip": "mandaat",
+        "bestanden": 62,
+        "vrij": false,
+        "voorbeelden": [
+          "server/functies/register/cat-command.js",
+          "server/functies/register/cat-leden.js",
+          "server/kern/appgids-data/deel2b.js",
+          "server/kern/bureau/ai.js"
+        ]
+      },
+      {
+        "begrip": "ledger",
+        "bestanden": 50,
+        "vrij": false,
+        "voorbeelden": [
+          "server/db/keuze.js",
+          "server/db/tx/collecties.js",
+          "server/db/tx/index.js",
+          "server/db/tx/pgachter.js"
+        ]
+      },
+      {
+        "begrip": "cel",
+        "bestanden": 45,
+        "vrij": false,
+        "voorbeelden": [
+          "server/functies/register/cat-domeinen2.js",
+          "server/kern/appgids-data/deel12.js",
+          "server/kern/appstore/aanschaf.js",
+          "server/kern/appstore/bereik.js"
+        ]
+      },
+      {
+        "begrip": "canary",
+        "bestanden": 23,
+        "vrij": false,
+        "voorbeelden": [
+          "server/config/productie-motor.js",
+          "server/functies/canaryas.js",
+          "server/functies/register/cat-command.js",
+          "server/functies/toegang.js"
+        ]
+      },
+      {
+        "begrip": "policy",
+        "bestanden": 19,
+        "vrij": false,
+        "voorbeelden": [
+          "server/kern/bank/grootboek.js",
+          "server/kern/bevoegdheid/lijst-afhankelijk.js",
+          "server/kern/economie/runtime/intent.js",
+          "server/kern/experience/action-attention.js"
+        ]
+      },
+      {
+        "begrip": "twin",
+        "bestanden": 17,
+        "vrij": false,
+        "voorbeelden": [
+          "server/ai-live-twin.js",
+          "server/kern/bureau/index.js",
+          "server/kern/bureau/twin.js",
+          "server/kern/bureau/uitgang.js"
+        ]
+      },
+      {
+        "begrip": "tweeling",
+        "bestanden": 16,
+        "vrij": false,
+        "voorbeelden": [
+          "server/config/productie-geld.js",
+          "server/inzagelog-vast.js",
+          "server/kern/appgids-data/deel1b.js",
+          "server/kern/bureau/twin.js"
+        ]
+      },
+      {
+        "begrip": "readiness",
+        "bestanden": 14,
+        "vrij": false,
+        "voorbeelden": [
+          "server/accounts/mirror.js",
+          "server/bus.js",
+          "server/db/tx/index.js",
+          "server/db/tx/ledger.js"
+        ]
+      },
+      {
+        "begrip": "blastradius",
+        "bestanden": 5,
+        "vrij": false,
+        "voorbeelden": [
+          "server/opzet/begrotingsgrenzen.js",
+          "server/opzet/envelop.js",
+          "server/opzet/handeling.js",
+          "server/opzet/handelingtelling.js"
+        ]
+      },
+      {
+        "begrip": "sovereign",
+        "bestanden": 4,
+        "vrij": false,
+        "voorbeelden": [
+          "server/kern/tenant/levensloop.js",
+          "server/kern/tenant/register.js",
+          "server/routes/sso-saml.js",
+          "server/routes/techniek/tenant.js"
+        ]
+      },
+      {
+        "begrip": "territorium",
+        "bestanden": 2,
+        "vrij": false,
+        "voorbeelden": [
+          "server/kern/internationalehandel.js",
+          "server/routes/kantoren/techniek.js"
+        ]
+      },
+      {
+        "begrip": "realm",
+        "bestanden": 1,
+        "vrij": false,
+        "voorbeelden": [
+          "server/routes/scim.js"
+        ]
+      },
+      {
+        "begrip": "soeverein",
+        "bestanden": 0,
+        "vrij": true,
+        "voorbeelden": []
+      }
+    ],
+    "vrij": [
+      "soeverein"
+    ]
+  },
+  "bouwstenen": {
+    "stenen": [
+      {
+        "steen": "isolatie per drager",
+        "pad": "server/kern/isolatie/dragers.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "de join (strengste wint)",
+        "pad": "server/kern/isolatie/ordening.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "schaduwdraaien",
+        "pad": "server/kern/commercie/schaduw.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "digitale tweeling (huis)",
+        "pad": "server/kern/command/simulatie.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "gebeurtenisenvelop met oorzaakketen",
+        "pad": "server/kern/envelop.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "mandaat dat alleen versmalt",
+        "pad": "server/kern/stuur/mandaat.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "AI-beleid gesloten by default",
+        "pad": "server/kern/stuur/beleid.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "economische firewall",
+        "pad": "server/kern/economie/firewall.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "tijdgebonden regels (loon)",
+        "pad": "server/kern/payroll/regelpakket.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "tijdgebonden regels (fiscaal)",
+        "pad": "server/kern/fiscaal/jaargangen.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "valuta met eigen precisie",
+        "pad": "server/kern/payroll/valuta.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "verifieerbare claims",
+        "pad": "server/kern/rtgid-claims.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "passkeys",
+        "pad": "server/webauthn/index.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "getekende release",
+        "pad": "scripts/release-bewijs.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "herkomst van het image",
+        "pad": "scripts/imageherkomst.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "landdekking",
+        "pad": "scripts/landdekking.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "dubbel boekhouden",
+        "pad": "server/pg/economische-boeking.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "blast radius per verzoek",
+        "pad": "server/opzet/handeling.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      },
+      {
+        "steen": "rijen voor en na per collectie",
+        "pad": "server/opzet/verzoekketen.js",
+        "bestaat": true,
+        "dektVoorstel": "onbepaald",
+        "waarom": "gemeten is het bestaan van het bestand; of deze steen doet wat het voorstel vraagt is per steen een leesvraag en geen telling"
+      }
+    ],
+    "telling": {
+      "genoemd": 19,
+      "aanwezig": 19,
+      "ontbreekt": 0
+    }
+  }
+}

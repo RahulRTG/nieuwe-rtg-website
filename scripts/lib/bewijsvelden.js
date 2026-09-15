@@ -55,7 +55,7 @@ const GESPLITST = {
       'wachter RAAKT en waarover een oordeel GELDT. Wie die twee optelt, leest waargenomen reik als ' +
       'verklaarde gelding -- valse dekking.',
     relaties: {
-      WACHT: { waar: 'MAGNAATLAB.json:bereik', uitleg: 'welke kernmodules de simulatielaag werkelijk raakt' },
+      WACHT: { waar: 'MAGNAATLAB.json:bereik + SOEVEREIN.json:bereik', uitleg: 'welke onderdelen een laag WERKELIJK raakt -- kernmodules voor de simulatielaag, toegangswegen voor de isolatielaag. Twee registers, EEN relatie: allebei meten zij waarneembare reik en geen verklaarde gelding, dus ze mogen naast elkaar staan en nooit bij CLAIM worden opgeteld.' },
       CLAIM: { waar: 'TAALOORDEEL.json:vorm.bereik', uitleg: 'waarover dit oordeel gaat' },
       BEVOEGDHEID: { waar: 'EXECUTION_MAP.json:capabilities[].bereik', uitleg: 'wat een rol via het AI-stuur mag' },
     },
@@ -80,7 +80,11 @@ const GEBRUIKERS = {
      noemde RESOLVERBEREIK.json en CODEWERELD.json erbij omdat hun NAAM ernaar
      klinkt, en geen van beide draagt het veld. Een verklaring die verder reikt
      dan de meting is precies zo fout als een meting zonder verklaring. */
-  bereik: ['MAGNAATLAB.json', 'TAALOORDEEL.json', 'EXECUTION_MAP.json'],
+  /* SOEVEREIN.json erbij op 15 september 2026, en met de relatie WACHT en niet met een nieuwe:
+     zijn `bereik` telt welke toegangswegen de isolatielaag raakt, en dat is dezelfde vraag die
+     MAGNAATLAB.json over kernmodules stelt. Een tweede meetplek voor DEZELFDE relatie is
+     consistentie; een tweede relatie onder dezelfde naam zou de overbelasting zijn. */
+  bereik: ['MAGNAATLAB.json', 'TAALOORDEEL.json', 'EXECUTION_MAP.json', 'SOEVEREIN.json'],
   /* Sinds de splitsing draagt WETTEN.json het veld niet meer; wat overblijft is
      de LEGACY-terugval in de lezers, die test/wetrelatie.test.js leeg houdt. */
   handhaver: [],

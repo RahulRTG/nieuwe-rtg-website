@@ -1,24 +1,24 @@
 {
   "stempel": {
-    "op": "2026-09-15T17:27:01.331Z",
-    "commit": "1e0dc04de",
+    "op": "2026-09-15T20:24:01.748Z",
+    "commit": "d4c190d4f",
     "boomVuil": false,
-    "boomAnders": 11,
+    "boomAnders": 14,
     "instrument": "scripts/vindbaar.js",
     "node": "v24.18.0"
   },
   "uitleg": "Per bestemming in de sprong: welk aandeel van de ONDERSCHEIDENDE woorden van dat scherm (woorden uit zijn koppen die op hooguit 3 bestemmingen voorkomen) er ook naartoe leidt in de zoekfilter van shared/sprong.js. Meet woorden, geen mensen: of iemand op het idee komt dat woord te typen, weet deze meter niet.",
   "vloer": 0.6,
   "drempel": 3,
-  "bestemmingen": 98,
-  "woorden": 1161,
-  "gevonden": 757,
-  "dekking": 0.652,
+  "bestemmingen": 99,
+  "woorden": 1170,
+  "gevonden": 766,
+  "dekking": 0.6547,
   "perBestemming": [
     {
       "naam": "Magnaat",
       "url": "/apps/magnaat.html",
-      "woorden": 87,
+      "woorden": 86,
       "gevonden": 34,
       "mist": [
         "werkvloer",
@@ -42,7 +42,6 @@
         "functiehal",
         "wereldkaart",
         "waarin",
-        "kunt",
         "oefenen",
         "bedrijfsteamkamers",
         "economische",
@@ -220,26 +219,6 @@
       ]
     },
     {
-      "naam": "Daten",
-      "url": "/apps/vonk.html",
-      "woorden": 26,
-      "gevonden": 14,
-      "mist": [
-        "bevestig",
-        "genoeg",
-        "veel",
-        "kunt",
-        "moet",
-        "kunnen",
-        "leeftijd",
-        "klein",
-        "passend",
-        "eindig",
-        "matches",
-        "afspraken"
-      ]
-    },
-    {
       "naam": "Openbaar vervoer",
       "url": "/apps/ov.html",
       "woorden": 27,
@@ -257,6 +236,25 @@
         "journey",
         "studio",
         "operaties"
+      ]
+    },
+    {
+      "naam": "Daten",
+      "url": "/apps/vonk.html",
+      "woorden": 25,
+      "gevonden": 14,
+      "mist": [
+        "bevestig",
+        "genoeg",
+        "veel",
+        "moet",
+        "kunnen",
+        "leeftijd",
+        "klein",
+        "passend",
+        "eindig",
+        "matches",
+        "afspraken"
       ]
     },
     {
@@ -293,22 +291,6 @@
         "bron",
         "waarmee",
         "helpen"
-      ]
-    },
-    {
-      "naam": "Rendez-vous",
-      "url": "/apps/rendezvous.html",
-      "woorden": 27,
-      "gevonden": 19,
-      "mist": [
-        "intentie",
-        "kunt",
-        "inhoud",
-        "matches",
-        "uitnodigingen",
-        "voorgesteld",
-        "worden",
-        "ontmoet"
       ]
     },
     {
@@ -388,6 +370,21 @@
         "tekoop",
         "length",
         "aanbiedernaam"
+      ]
+    },
+    {
+      "naam": "Rendez-vous",
+      "url": "/apps/rendezvous.html",
+      "woorden": 26,
+      "gevonden": 19,
+      "mist": [
+        "intentie",
+        "inhoud",
+        "matches",
+        "uitnodigingen",
+        "voorgesteld",
+        "worden",
+        "ontmoet"
       ]
     },
     {
@@ -735,6 +732,17 @@
         "loonstroken",
         "keek",
         "papieren"
+      ]
+    },
+    {
+      "naam": "Ontdekken",
+      "url": "/apps/connect.html",
+      "woorden": 11,
+      "gevonden": 8,
+      "mist": [
+        "hebt",
+        "gedaan",
+        "waarom"
       ]
     },
     {
@@ -1097,10 +1105,10 @@
       "mist": []
     },
     {
-      "naam": "Mijn RTG",
+      "naam": "Mijn neigingen",
       "url": "/apps/mijn-neigingen.html",
-      "woorden": 0,
-      "gevonden": 0,
+      "woorden": 1,
+      "gevonden": 1,
       "mist": []
     },
     {

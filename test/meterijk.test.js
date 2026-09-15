@@ -1601,6 +1601,28 @@ const IJKINGEN = {
       (j) => { j.gemeten.werkwoord.mechanismen = Math.max(0, (j.gemeten.werkwoord.mechanismen || 0) - 3); return j; },
       () => voor.namensMechanismenGemeten - norm.meet().namensMechanismenGemeten)
   },
+  /* DE TAND VAN 15 SEPTEMBER 2026: spoorConvergent telt de mechanismen die alle
+     VIER de spoor-eigenschappen van kern/vertegenwoordiging/handelen.js halen
+     (SPOORVORM.json, REPRESENTATIE.md par. 8.1).
+
+     DE IJKING GAAT OMHOOG, en dat is hier de richting die iets bewijst. De tand
+     staat op ÉÉN, en bij zo'n laag getal is "de meter herkent de vorm niet" van
+     buiten bijna niet te onderscheiden van "er is er pas één". Zet er in het
+     register twee convergente mechanismen bij en de meter hoort er exact twee
+     meer te melden; leest hij het verkeerde veld -- `gemeten.metSpoor` in plaats
+     van `gemeten.volledigConvergent`, en die twee staan naast elkaar met een
+     ander getal -- dan beweegt hij niet mee en zakt deze proef.
+
+     Dat de meter ook OMLAAG kan slaan, staat elders en beter: de meter draagt
+     zijn eigen besturingsproef (de referentie moet vier van vier halen, anders
+     eindigt hij met een foutcode), en test/spoorvorm.test.js laat hem op vier
+     verzonnen lijven uitslaan. Deze ijking dekt de KOPPELING tussen register en
+     tand; die toetsen dekken het oordeel zelf. */
+  spoorConvergent: {
+    proef: (voor) => metVervangenJson('SPOORVORM.json',
+      (j) => { j.gemeten.volledigConvergent = (j.gemeten.volledigConvergent || 0) + 2; return j; },
+      () => norm.meet().spoorConvergent - voor.spoorConvergent)
+  },
   /* DE TAND VAN 13 SEPTEMBER 2026 (tweede): wekZonderUitspraak telt de publieke
      domeinen waarover het wekbesluitregister zwijgt. Hij staat op NUL, en dat
      maakt hem een ander geval dan de meters hierboven: bij een nul is "de meter

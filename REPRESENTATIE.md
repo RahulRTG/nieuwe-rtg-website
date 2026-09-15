@@ -660,3 +660,284 @@ zijn. `webauthn-stapop.js` hangt vandaag aan geen enkele kantoorroute, en
 `VERTROUWEN.json` staat op 0 bewezen. Een AAL-ladder boven nul bewezen routes
 verhoogt geen zekerheid; hij verplaatst hem naar een getal dat niemand heeft
 gemeten.
+
+---
+
+## 8. De drie metingen vóór het spoor (15 september 2026)
+
+De volgende stap leek "een uniform vertegenwoordigingsspoor ontwerpen". Dat is
+het niet, en drie metingen zeggen waarom. Ze staan hier vóór de bouw, want dit
+is precies de plek waar dit huis al vier keer een objecttype heeft weggemeten.
+
+### 8.1 De convergentiematrix — de vorm bestaat al, in één mechanisme
+
+`npm run spoorvorm` → `SPOORVORM.json`. **Vier eigenschappen, afgelezen aan
+`kern/vertegenwoordiging/handelen.js` en niet bedacht:**
+
+| | |
+|---|---|
+| **V-1** | een TOEGESTANE handeling wordt vastgelegd |
+| **V-2** | een GEWEIGERDE handeling wordt ÓÓK vastgelegd |
+| **V-3** | het spoor gaat vóór de uitkomst de deur uit |
+| **V-4** | een spoor dat niet vaststaat HOUDT DE HANDELING TEGEN |
+
+| mechanisme | V-1 | V-2 | V-3 | V-4 |
+|---|:--:|:--:|:--:|:--:|
+| `vertegenwoordiging` *(referentie)* | ja | ja | ja | ja |
+| `bijstand` | ja | — | ? | — |
+| `servicemachtiging` | — | — | — | — |
+| `ai-mandaat` | — | — | — | — |
+| `fiscaal-mandaat` | — | — | — | — |
+| `sepa-machtiging` | — | — | — | — |
+| `app-machtiging` | — | — | — | — |
+
+**<!--getal:spoor.metSpoor-->2<!--/getal--> van <!--getal:spoor.mechanismen-->7<!--/getal--> legt iets vast,
+<!--getal:spoor.kanTegenhouden-->1<!--/getal--> kan de handeling tegenhouden,
+<!--getal:spoor.volledigConvergent-->1<!--/getal--> haalt alle vier.**
+Dat eerste getal kruist met `NAMENSVORM.json`, dat `spoor` onafhankelijk over
+diezelfde <!--getal:namens.mechanismen-->7<!--/getal--> mechanismen telde en op 2
+uitkwam — twee meters, apart gebouwd, dezelfde uitslag. De noemer draagt hier een
+merkteken en de tellers ook: drie van de vier staan op één, en een één in proza
+veroudert net zo onzichtbaar als een nul.
+
+**V-4 is niet wat `scripts/stilspoor.js` meet**, en die twee worden nergens
+opgeteld. Stilspoor vraagt of het FALEN van een spoorschrijver wordt opgegeten
+door een lege `catch` (smoren); deze vraagt of de aanroeper er iets mee DOET
+(tegenhouden). Netjes loggen en doorlopen haalt de eerste wel en de tweede niet.
+
+**De besturingsproef zit in de meter en hij sloeg meteen aan.** De referentie
+MOET vier van vier halen, anders eindigt het script met een foutcode — zonder
+die regel is een matrix vol nullen niet te onderscheiden van een meter die niets
+herkent. En hij zakte: V-3 vergeleek het spoor met de EERSTE status-return in
+het lijf, en dat is in de referentie de 404 *"U heeft deze machtiging niet"* —
+een VOORWAARDE-uitgang die vóór het oordeel ligt en zegt *dit gaat niet over u*,
+niet *dit mag niet*. De referentie zakte dus op de eigenschap die zij zelf
+definieert: een geldige uitslag van het verkeerde experiment (`BEWIJSMACHINE.md`
+par. 6a), gevonden door de meter en niet door een mens. V-3 kijkt nu of het
+spoor tussen het OORDEEL en de eerstvolgende uitkomst staat.
+
+### 8.2 `gelukt` betekent TOEGESTAAN, en er staat "Uitgevoerd" onder
+
+De tweede meting was of `gelukt: !!oordeel.mag` in de referentie het verschil
+tussen *mocht het* en *is het gelukt* verdoezelt. Het antwoord is scherper dan
+de vraag.
+
+`handel()` **voert niets uit.** Hij zoekt de machtiging, oordeelt, legt vast,
+weigert of geeft 200 — en daar houdt het op. De enige aanroeper is
+`routes/vertegenwoordiging.js`, die het antwoord rechtstreeks doorgeeft. Er is
+geen uitvoeringsstap, dus het gat *"spoor zegt gelukt, uitvoering faalt"* kan
+vandaag niet ontstaan.
+
+Wat er wél staat is een belofte zonder dekking: op de tak waar
+`oordeel.klaarzetten` onwaar is, luidt het antwoord **"Uitgevoerd binnen de
+machtiging, en het staat in het spoor van de cliënt."** Er is niets uitgevoerd.
+Dat is vandaag onschuldig — er gebeurt immers niets — en het wordt schadelijk op
+het moment dat deze vorm naar de vijf andere gaat, want `sepa-machtiging`,
+`fiscaal-mandaat` en `app-machtiging` voeren wél echt iets uit. Dan schrijft
+`gelukt: true` een uitvoering op die alleen een toestemming was.
+
+**De naam moet dus vóór de uitrol uit elkaar, en het huis heeft de vorm al.**
+`kern/platformfout.js` kreeg op 14 september `uitvoeringBekend` — een BOOLEAN,
+met in de kop de reden: *"er is maar een vraag ('staat vast of deze aanroep nog
+is uitgevoerd?'), en dit huis heeft al meer gezagsladders dan het nodig heeft"*.
+Dat pleit tegen een drietrapsuitkomst (`GESLAAGD / GEFAALD / NIET_UITGEVOERD`)
+en vóór twee booleans naast elkaar: `toegestaan` en `uitvoeringBekend`.
+
+### 8.3 `belang` bestaat nergens als structuur — en drie keer wel als vorm
+
+De derde meting: bestaat *een partij heeft belang van soort Y bij context Z* al
+ergens? **Nee.** Drie kandidaten komen dichtbij en missen elk precies één been:
+
+| kandidaat | heeft | mist |
+|---|---|---|
+| `kern/rugdekking/index.js` | houder + soort + tegenprestaties | **de context** — het programma hangt aan niets |
+| `kern/rtfos/bestuur.js` (`belanghebbend[]`) | houder + context | **soort en grond** — een kale lijst codenamen |
+| `kern/onderneming/bestuur.js` (aandelen) | houder + soort + grond | de `grond` is BEWIJSgrond, niet de reden van het belang |
+
+Wat er wél is, is de **vorm** houder + soort + grond, drie keer:
+`kern/economie/identiteit.js` (`{drager, wereld, grond, door, op}` — grond is
+verplichte tekst van minstens vijf tekens), `kern/economie/relaties.js`
+(`{van, naar, grondslag, plafondCenten, tot}`) en de aandelenrij hierboven.
+`kern/factuurcorrectie.js` is de enige plek waar `grond` een **gecodeerde** id
+met label is in plaats van vrije tekst — dat is het precedent voor een
+`SOORTEN`-tabel.
+
+Verder bestaat belang als losse getallen per domein: `PARTNER_COMMISSIE = 0`,
+`afdracht.procent` (App Store), `bijdrage.promille` (ondernemersregie),
+`commissiePct`, en `begunstigde` als tekenreeks op een betaalregel.
+`'belangenverstrengeling'` bestaat vandaag alleen als **meldingssoort** in
+`kern/rtfos/integriteit.js` — iets wat een mens rapporteert, niet iets wat
+wordt afgeleid. De enige plek waar belang wél wordt GEREKEND is
+`kern/concern/graaf.js` (`belangen()`, `ubo()`), en dat gaat over eigendom.
+
+**Wat dit voor de conflictmotor betekent:** de eigendomshelft is er en rekent;
+de commerciële helft is losse getallen zonder houder. Een `BELANG`-structuur is
+daarmee gerechtvaardigd als PROJECTIE over bestaande bronnen — niet als vierde
+plek waar een percentage wordt opgeslagen.
+
+### 8.4 Wat deze drie metingen veranderen aan de volgorde
+
+1. **Er wordt geen uniform spoor ontworpen.** Het werk is: de vier eigenschappen
+   naar de andere vijf brengen. Niet noodzakelijk dezelfde code — SEPA, fiscaal
+   en app hebben elk een andere transactiegrens — maar wel dezelfde vier
+   uitslagen in `SPOORVORM.json`.
+2. **Vóór die uitrol wordt `gelukt` gesplitst** in `toegestaan` en
+   `uitvoeringBekend`, en verdwijnt de zin die uitvoering claimt waar niets is
+   uitgevoerd. Anders kopieer je een onwaarheid vijf keer.
+3. **De conflictladder wordt niet gebouwd.** Vier standen (signaleren, openbaar
+   maken, toestemming vereisen, blokkeren) is een LADDER, en `AFSPRAAK.md`
+   verbiedt een zesde uitkomst- of zekerheidsladder terwijl `GEZAGSNOEMER.json`
+   op vijf schalen met 21 treden staat. De eerste vraag is of belangenconflict
+   een nieuwe schaal IS of een toepassing van een bestaande.
+4. **MN-03 blijft zonder onderwerp tot de eigenaar een positie inneemt.** Zolang
+   `PARTNER_COMMISSIE = 0` en RTG geen hoedanigheid is, bestaat *"RTG heeft
+   financieel belang bij deze keuze"* alleen in ons hoofd — en daar mag een
+   conflictmotor niet op leunen.
+
+---
+
+## 9. Twee referenties, en geen van beide is de combinatie (15 september 2026)
+
+Par. 8.1 leest makkelijk verkeerd. `vertegenwoordiging` haalt daar vier van
+vier, en over drie maanden leest iemand dat als *dit is de gouden
+implementatie, kopieer hem*. Dat is precies wat er niet moet gebeuren, en de
+reden staat hieronder.
+
+**`kern/vertegenwoordiging/handelen.js` is de referentie voor BEOORDELING +
+VERPLICHT SPOOR.** Hij oordeelt, vormt de regel, legt duurzaam vast, stopt als
+dat niet lukt, en weigert of geeft 200. Wat hij niet heeft: een uitvoering.
+`handel()` voert niets uit, en zijn enige aanroeper
+(`routes/vertegenwoordiging.js`) geeft het antwoord rechtstreeks door.
+
+**`kern/appstore/brug.js` (`roepKaal`) is de referentie voor UITVOERING +
+UITKOMSTKENNIS.** Daar staat `m.doe(...)` in een `try/catch`, en de drie
+uitkomsten zijn al uit elkaar gehaald: geweigerd, gelukt, en omgevallen met een
+landing die niet vaststaat (`RTG_BRUG_FOUT`, `uitvoeringBekend: false`, plus
+`herhaalbaar` afgeleid uit de mutatieklasse). Wat hij niet heeft: één regel
+spoor. Gemeten op `spoor`, `log.`, `noteer` en `journaal`: nul treffers in
+`brug.js` en `brugweigering.js`.
+
+> **Geen enkel mechanisme is vandaag de referentie voor de combinatie.** De twee
+> helften van het contract wonen in verschillende mechanismen, en uitgerekend de
+> helft met de echte uitvoering is de rij die in `SPOORVORM.json` op vier
+> streepjes staat.
+
+Daaruit volgt dat de splitsing van `gelukt` geen wijziging AAN `handelen.js` is —
+daar valt niets af te splitsen — maar een contract dat pas bewijsbaar wordt waar
+beide helften bestaan.
+
+### 9.1 De vijf gevallen, en welke drie hier niet kunnen
+
+| # | oordeel | spoor | uitvoering | tegen de referentie |
+|---|---|---|---|---|
+| 1 | weigert | slaagt | niet gestart | **beproefd** |
+| 2 | staat toe | faalt | niet gestart | **beproefd** |
+| 3 | staat toe | slaagt | slaagt | structureel niet: geen uitvoering |
+| 4 | staat toe | slaagt | faalt | idem |
+| 5 | uitvoering slaagt, eindspoor faalt | | | idem |
+
+Geval 1 en 2 staan sinds deze ronde in `test/handelenspoor.test.js`, en niet als
+lezing van de control flow maar onder `RTG_VERRAAD=schrijf-verloren` tegen een
+echte server. Twee mutaties op `handelen.js` zijn nagetrokken: het spoor ná de
+weigering zetten laat toets 2 zakken, en de uitslag van `vastleggen()` weggooien
+laat toets 5 zakken.
+
+**De wereld wordt eerlijk gebouwd en daarna liegt de opslag.** Een machtiging
+vraagt een cliënt die `volwassen()` haalt (A3), dus een keuring door het
+kantoor; op een server die schrijfacties weggooit lukt die opbouw niet. De proef
+bouwt daarom op een eerlijke server, stopt hem, en opent dezelfde datamap
+opnieuw met het verraad aan.
+
+### 9.2 Twee bevindingen die het bouwen van die proef opleverde
+
+**`gelogd: true` bereikt niemand.** `handelen.js` zet dat veld bij een weigering
+zodat de aanroeper weet dat zijn poging is vastgelegd. `stuur()` in
+`routes/vertegenwoordiging.js` is `(r && r.error) ? res.status(...).json({ error:
+r.error }) : res.json(r)` en gooit bij élk foutantwoord alles behalve `error`
+weg — voor alle acht de routes. Dezelfde vorm als de `res.append` uit
+`AFSPRAAK.md`: een laag zet een veld, de laag erboven laat het stil vallen. Welke
+velden op een weigering mee mogen is een besluit, dus het staat hier en niet in
+een toets.
+
+**Er is geen rollback van het geheugenmodel.** Onder `schrijf-verloren` gaf de
+route netjes 503 — en het spoor van de cliënt groeide van 5 naar 6 regels.
+`vastleggen()` draait via `bijeen()` eerst de mutatie en commit daarna; faalt de
+commit, dan keert de route terug met een fout terwijl het geheugen niet wordt
+teruggedraaid. Tussen de mislukte commit en de eerstvolgende herstart leest een
+lezer op datzelfde proces dus een regel die niet bestaat. `ROLLBACK` bestaat in
+`scripts/lib/crashtaxonomie.js` als contract, maar hier niet als handeling. De
+toets legt daarom vast wat wél hard is — na een herstart staat er niets.
+
+### 9.3 Waarom CRASHAS maar 45 routes kent, en waarom dat goed nieuws is
+
+De vraag was of `CRASHAS.json` uitbreiden naar de brug een tweede lijst zou
+maken. Nagemeten is de keten:
+
+```
+CRASHAS.json (45)
+  <- GELDDEKKING.json
+     <- GELDKAART.json  as1Kaart.geldroutes
+        <- (a) de route schreef een collectie waarvan de KLASSE in
+               server/kern/isolatie/effectcollecties.js `GELD_BEWEGEN` is
+           (b) EN de idempotentieproef kwam erbij en zag de waarde veranderen
+```
+
+Het bereik is dus **geen oordeel "is dit geld"**, maar een filter op één
+verklaarde gegevensklasse, doorsneden met wat `IDEMPROEF.json` toevallig heeft
+bereikt. En er zijn er **negen** over 80 collecties: `GELD_BEWEGEN` (30),
+`VERTROUWENSRELATIE_AANGAAN` (13), `EXTERN_BEREIKEN` (10),
+`IDENTITEIT_WIJZIGEN` (8), `SCHRIJVEN_ANDERMANS` (8), `RECHT_VERLENEN` (6),
+`BEVEILIGING_VERZWAKKEN` (3), `DERDENCODE_UITVOEREN` (1),
+`ONVERTROUWDE_BYTES` (1).
+
+Uitbreiden is daarmee **het filter verbreden en geen uitzondering toevoegen** —
+precies wat een tweede lijst voorkomt. Twee dingen vallen er meteen uit:
+
+- **`appInstallaties` is al geklasseerd**, als `VERTROUWENSRELATIE_AANGAAN` met
+  als grond *"APPSTORE.md: een machtiging die het lid verleent"* — plus zes
+  broertjes (`rtfAppInstallaties`, `beroepenInstallaties`, …). De app-machtiging
+  kan de crash-as dus vandaag in, zonder één nieuwe naam.
+- **`vertegenwoordigingen` is NERGENS geklasseerd**, net als `rugdekking` en het
+  carrièreledger. De referentie-implementatie draagt geen effectklasse, dus zij
+  komt er langs géén enkel klassefilter in. `effectcollecties.js` zegt zelf dat
+  het indelen bewust onvolledig is (*"Ingedeeld is wat een HOOG BELANG draagt:
+  geld, identiteit, rechten, blijvende koppelingen en de beveiliging zelf"*) — en
+  een machtiging IS een recht. Dit is dus een gat dat een regel verdient, geen
+  defect.
+
+Dat bestand noemt bovendien zijn eigen plafond, en dat hoort hierbij: slechts 599
+van de 4643 rol-paden hebben überhaupt een gemeten collectie. Het effectmodel komt
+niet uit de schaduw door dit register vol te maken, maar doordat `IDEMPROEF.json`
+verder reikt.
+
+### 9.4 Wat het contract wordt, en wat het niet wordt
+
+Eén semantiek met **verschillende zekerheidsprofielen**, en geen uniforme
+uitvoeringsprocedure:
+
+| transactiegrens | wat het mechanisme moet kunnen |
+|---|---|
+| in-process, zelfde database (app-machtiging: `m.doe()` is synchroon) | beoordeling, spoor en uitvoering in dezelfde bundel; valt de uitvoering om, dan doet de eindtoestand niet alsof zij slaagde |
+| externe aanbieder mét betrouwbare status/idempotency | voornemen duurzaam vastleggen → externe aanroep → reconciliatie → definitieve uitkomst |
+| externe aanbieder zónder betrouwbare status | expliciet onbekende landing: niet herhalen alsof er niets gebeurde, niet "gefaald", niet "geslaagd" — de bestaande `uitvoeringBekend: false` |
+
+Er komt **geen derde stand naast** die twee booleans. `kern/platformfout.js`
+heeft die keuze al gemaakt en de reden staat in zijn kop.
+
+En de tweede spoorregel wordt **niet automatisch ingevoerd**. Het spoor is een
+ringbuffer (`MAX_LOG`), dus twee regels per handeling halveert de
+gebeurtenishorizon. De regel is niet *elke handeling schrijft twee regels* maar
+*het spoor bevat genoeg append-only gebeurtenissen om de werkelijk bekende
+toestand eerlijk te reconstrueren*: één waar atomiciteit bestaat, meer waar er
+een tijd- of providergrens tussen zit. Retentie zelf is een apart besluit —
+`integriteit ≠ retentie`, de les van het inzagejournaal — en hoort niet stilletjes
+in deze ronde mee te liften.
+
+### 9.5 Wat `SPOORVORM` later moet gaan meten
+
+Nu: *herkent deze meter vier eigenschappen van de bestaande vorm?* Straks: *welk
+deel van het contract kan dit mechanisme aantoonbaar waarmaken?* Het doel is
+uitdrukkelijk **niet** zeven mechanismen op 7/7 — dat zou dezelfde verkeerde
+uniformiteit terugbrengen. `n.v.t.` is daar even belangrijk als `ja`: een
+mechanisme zonder uitvoering hoort niet rood te staan omdat het geen
+uitvoeringscrash kan hebben.

@@ -761,6 +761,20 @@ const METERS = [
      diezelfde nul staan terwijl hij iets anders betekent: van "deze zeven
      delen niets" naar "we hebben er minder bekeken". */
   { sleutel: 'namensMechanismenGemeten', richting: 'omhoog', wat: 'mechanismen van namens-iemand-handelen die de namensvormmeter werkelijk heeft gezien' },
+  /* DE CONVERGENTIE VAN HET VERTEGENWOORDIGINGSSPOOR (SPOORVORM.json).
+
+     `kern/vertegenwoordiging/handelen.js` voert als enige de hele gedragsvorm:
+     toegestaan gelogd, geweigerd ook, spoor voor de uitkomst, en een spoor dat
+     niet vaststaat houdt de handeling tegen. Deze tand telt hoeveel mechanismen
+     alle VIER halen, en hij gaat met opzet OMHOOG: elk mechanisme dat naar die
+     vorm toegroeit, zet hem vast zodat hij niet stilletjes terug kan.
+
+     Waarom niet de schuldkant tellen (hoeveel er GEEN spoor hebben)? Omdat die
+     daalt zodra iemand een spoorschrijver onder een naam zet die de meter niet
+     kent -- dan lijkt er vooruitgang waar alleen het instrument blind werd. Een
+     stijgende tand op de VOLLEDIGE vorm kan dat niet: vier eigenschappen
+     tegelijk faken is geen typefout. */
+  { sleutel: 'spoorConvergent', richting: 'omhoog', wat: 'mechanismen die alle vier de spoor-eigenschappen van de referentie halen' },
   /* Publieke domeinen waarover scripts/lib/wekbesluit.js geen uitspraak doet.
      Omlaag, en hij staat op nul: een domein dat publiek is en waarvan niemand
      heeft besloten of het de publieke rail op mag, hoort niet stil te kunnen
@@ -1529,6 +1543,7 @@ function meet(bronnen) {
        bereik van deze meter is dus het aantal mechanismen dat hij op zijn
        grammatica heeft nagelopen, en dat zijn ze alle zeven. */
     namensMechanismenGemeten: leesRegister('NAMENSVORM.json', (j) => j.gemeten.werkwoord.mechanismen),
+    spoorConvergent: leesRegister('SPOORVORM.json', (j) => j.gemeten.volledigConvergent),
     wekZonderUitspraak: leesRegister('WEKDEKKING.json', (j) => j.gemeten.zonderUitspraak),
     momentOpenBekend: leesRegister('MOMENTPROEF.json', (j) => j.telling.openBekend),
     lussenGeenUitweg: leesRegister('LUSSEN.json', (j) => j.ratel.geenUitwegGevonden),

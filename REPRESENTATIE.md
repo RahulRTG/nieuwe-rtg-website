@@ -517,9 +517,13 @@ nooit geraden.
 
 Wat de standen vandaag zeggen: `aanvaarden` staat **nergens meer op
 `ontbreekt`** — waar het niet gevoerd wordt, is dat nu een uitgeschreven grond.
-Open staan er acht posten: **`versmallen`** bij app-, fiscaal- en
+Open stonden er acht posten: **`versmallen`** bij app-, fiscaal- en
 sepa-machtiging, **`spoor`** bij ai-, fiscaal- en sepa-mandaat, en `verlenen` +
-`intrekken` bij het ai-mandaat.
+`intrekken` bij het ai-mandaat. Sinds stap 2 (par. 6.0a) zijn dat er **zes**:
+`versmallen` bij `app-machtiging` en `fiscaal-mandaat` staat op `voert`, allebei
+met een `opmerking` die zegt hoe grof de snede is en waarom. Die twee zijn
+bijgewerkt in de VERKLARING en niet in de meter — dat is de hele opzet van par.
+6.1 hieronder.
 
 **Eén correctie op een eerdere versie van deze paragraaf.** Daar stond dat het
 verklaringsregister *afgeleid* moest worden uit de code, "zoals `WETTEN.json`".
@@ -534,16 +538,82 @@ de verklaring uit de meting genereren — en dan vergelijkt hij zichzelf. Dat is
 de vorm van `EIGENAAR` naast `detecteer()` in
 `scripts/lib/registereigenaar.js`, niet die van `WETTEN.json`.
 
+### 6.0a Stap 2, 15 september 2026: de doorsnede beslist echte bevoegdheid
+
+`app-machtiging` en `fiscaal-mandaat` roepen `versmalNamens()` aan met een echte
+`geverEffectief`. Twee van de drie openstaande `versmallen`-posten zijn daarmee
+dicht, en de invariant heeft zijn eerste productie-aanroepers.
+
+**De naad die dat afdwingt.** De wet kent geen domeinwoorden en de domeinen
+kennen elkaar niet: `kern/appstore/gevermacht.js` en
+`kern/fiscaal/gateway/mandaat.js` requiren allebei `kern/namens/versmalling`, en
+verder niets van elkaar. `kern/namens/` requiret op zijn beurt alleen zijn eigen
+buren plus `kern/envelop.js` — en dat is een TOETS en geen afspraak
+(`test/namensversmalling-bedrading.test.js` toets 8). De twee randen staan als
+`GEDEELDE_PRIMITIEF` in `scripts/lib/verstrengeling-verklaringen.js`; de
+domeingrens hield ze tegen tot iemand ze verklaarde, precies zoals bedoeld.
+
+**Bij `app-machtiging` was het gat er een van EERLIJKHEID en niet van lekkage.**
+`arena.meedoen` werd aan iedereen verleend, ook aan een lid dat de 18+-poort niet
+haalt. Er lekte niets — alle drie de arena-methodes toetsen `progressieMag` bij
+de uitvoering — maar het toestemmingsscherm vroeg zo'n lid wél om ja te zeggen
+tegen *"andere spelers zien uw codenaam en uw score op het bord"*, en
+`bereik.js` rekende zijn app op de ZWAARSTE klasse (`op-een-bord`). Toestemming
+voor iets dat structureel niet kan gebeuren, met een risicolabel dat niet klopt.
+De uitkomst is dus niet "minder mag" maar "er wordt niet meer gevraagd dan er
+kan": grens 3 van `arena.js` blijft staan (het spel speelt door), en er is een
+DERDE weigering op de brug bij gekomen — de bestaande zei letterlijk *"Alleen het
+lid kan dit aanzetten, in de App Store"*, en dat is voor dit geval onwaar.
+
+**Bij `fiscaal-mandaat` zat het gat ergens anders dan de verklaring vermoedde,
+en dat is de leerzaamste helft van deze ronde.** De verklaring noemde *"een
+bestuurder zonder fiscale bevoegdheid"*, en die bestaat niet: `req.actor` draagt
+één boolean `manager`, de zaak kent precies twee rollen
+(`kern/onderneming/toegang.js`), en er is geen fiscaal recht per medewerker. Er
+is bovendien **geen btw-plichtregister, geen loonplichtvlag en geen
+inhoudingsplichtnummer** — dus een snede op "heeft deze zaak deze aangifteplicht"
+zou een FISCALE POSITIE innemen die dit huis niet mag innemen
+(`kern/fiscaal/zekerheid.js`: dat is `voorbehouden`), en zij zou bovendien onwaar
+zijn: een inhoudingsplichtige zonder loon doet nog steeds een nulaangifte. Die
+snede komt er dus niet, en dat staat in de bron met de reden.
+
+Wat er wél zat, was een belofte zonder grendel. De kop van `mandaat.js` zegt al
+jaren: *"wie dat controleert staat buiten deze module (de route), en dat het
+gecontroleerd MOET zijn staat hier."* Die module kon een mandaat verlenen aan wie
+hem maar aanriep. `geverEffectief` is nu een VERPLICHTE invoer, en een aanroeper
+die zwijgt krijgt geen mandaat maar een verklaarde weigering. Dat is precies het
+verschil dat `versmalNamens()` toevoegt aan `doorsnede()`: een bron die niet is
+vast te stellen levert **503 met de reden** en geen lege uitkomst — *"deze gever
+mag niets"* en *"er heeft niemand gekeken"* mogen nooit hetzelfde antwoord zijn.
+
+**De groei-lek is dicht door de VORM en niet door een controle.** Er wordt
+gesneden bij het VERLENEN en de uitkomst wordt bewaard; bij gebruik wordt niets
+opnieuw uit de bron afgeleid. Een gever die later meer mag, verbreedt daarom
+niets vanzelf — alleen een nieuwe handeling verbreedt, en die gaat opnieuw door
+de doorsnede. Dat is de "tenzij" uit de opdracht, en het is de plek waar
+delegatiesystemen normaal lekken: de broncontext verandert later en een ooit
+veilige afleiding groeit ongemerkt mee.
+
+Negen toetsen, waarvan vier over HTTP tegen een echte server. Alle negen met een
+mutatie nagetrokken op een schone gecommitte boom, en elke mutatie raakte precies
+wat hij hoort te raken. Toets 2 is de besturingsproef en blijft bij alle vier de
+mutaties staan — hij valt alleen om als de snede ALLES wegsnijdt, en dat is
+waarvoor hij er is. Wat er NIET is: continue autorisatie. Bestaande mandaten en
+verleningen van vóór deze ronde worden niet met terugwerkende kracht gesneden, en
+`geldt()` herrekent niets bij gebruik. Dat is een grens en geen gat — hij werkt
+vooruit.
+
 ### 6.2 Wat er nu open staat
 
 1. **`aanvaarden` en `spoor` BEDRADEN bij de zes.** De contractlaag zegt nu wie
    wat voert; wat er nog niet is, is dat de mechanismen er doorheen lopen. Dit
    is echte gedragswijziging op onder meer SEPA-mandaten en app-rechten, en
    hoort daarom een eigen ronde te zijn.
-2. **`versmallen` bij `app-machtiging` en `fiscaal-mandaat`.** Twee van de drie
-   openstaande `versmallen`-posten, en REP-03 is de regel waar het hele voorstel
-   op leunt. De invariant staat er nu; wat ontbreekt is dat die twee hem
-   aanroepen met een echte `geverEffectief`.
+2. **`versmallen` bij `sepa-machtiging`.** De derde en laatste openstaande post.
+   Hij is bewust niet met de andere twee meegegaan: bij een privépersoon op zijn
+   eigen rekening is er niets te versmallen, en bij een zakelijke rekening met een
+   tekenbevoegdheidsgrens is er geen register waaruit die grens te lezen valt —
+   dezelfde muur als bij het fiscale mandaat, en dus eerst een besluit.
 3. **De conflict-of-interest engine (punt 37).** Het enige onderdeel zonder
    concurrent, en het enige dat een managementbureau écht onderscheidt van een
    adresboek. Let op de vorm: hij mag DETECTEREN en melden, en `BLOCK` is een

@@ -84,7 +84,11 @@ module.exports = (kern) => {
          alleen mee zodat een weigering kan uitleggen welke van de twee ontbrak.
          Dat onderscheid is de hele reden dat een weigering hier bruikbaar is
          (kern/appstore/brug.js). */
-      verleend: open.machtigingen, vraagt: (open.vraagt || []).map(m => m.id) });
+      verleend: open.machtigingen, vraagt: (open.vraagt || []).map(m => m.id),
+      /* En het derde geval: wat het lid gaf maar zelf niet mocht weggeven. Ook
+         dit bepaalt niets -- het maakt alleen dat de weigering de juiste uitweg
+         noemt in plaats van een knop die niets oplost. */
+      versmald: open.versmald || null });
     antwoord(res, r);
   });
 

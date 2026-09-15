@@ -382,6 +382,21 @@ module.exports = [
     reden: 'routes/techniek.js monteert routes/eigenaarherstel.js op zijn gedeelde context. Die context draagt techAuth en eigenaarAlleen, en die twee horen bij de technische pagina en niet op de kern -- ze daarheen tillen zou elk domein toegang geven tot de eigenaarscontrole. De publieke helft van dat bestand (/api/herstel/*) heeft alleen `app` nodig en reist mee' },
   { van: 'domein:rtgid-bewijs', naar: 'domein:persoonseis-lijst', soort: 'DOMEINRELATIE',
     reden: 'kern/rtgid-bewijs.js r.54 leest SOORTEN uit de persoonseislijst: de bewijsmap toont dat een lid aan een persoonseis voldoet zonder het registratienummer af te geven, en welke eisen er bestaan staat op EEN plek (kern/persoonseis-lijst.js), niet nog eens in de map' },
+  /* ---- DE VERSMALLING (REPRESENTATIE.md REP-03, stap 2) ----
+     Twee randen naar dezelfde module, uit twee domeinen die niets met elkaar te
+     maken hebben. Dat is hier geen toeval maar de vorm: kern/namens/ draagt EEN
+     wet die overal geldt waar iemand namens een ander handelt, en de prijs
+     daarvan is dat elk mechanisme dat hem gebruikt een rand naar hem heeft. De
+     rand loopt met opzet maar EEN kant op -- de wet kent geen enkel domein, en
+     test/namensversmalling-bedrading.test.js toets 8 laat zakken zodra
+     kern/namens/ iets anders requiret dan zijn eigen buren plus kern/envelop.js.
+     Een tweede doorsnede per domein zou de rand weghalen en de wet slopen: dan
+     kan elk mechanisme zijn eigen definitie van "versmallen" krijgen, en juist
+     dat is waar privilege-amplification binnenkomt. */
+  { van: 'domein:appstore', naar: 'domein:namens', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'kern/appstore/gevermacht.js leest versmalNamens: wat een lid aan een app van derden verleent is de doorsnede van wat hij aanvinkt, wat hij ZELF mag, wat het manifest vroeg en wat de context toelaat. De vier bronnen vult de App Store; de rekensom hoort niet per domein opnieuw geschreven te worden' },
+  { van: 'domein:fiscaal', naar: 'domein:namens', soort: 'GEDEELDE_PRIMITIEF',
+    reden: 'kern/fiscaal/gateway/mandaat.js r.27 leest dezelfde versmalNamens. Hier sluit hij een gat dat de kop van die module al jaren beschreef: "wie dat controleert staat buiten deze module (de route)" was een belofte zonder grendel, en een aanroeper die geen geverEffectief opgeeft krijgt sindsdien geen mandaat maar een verklaarde weigering' },
   /* DE AFRONDREGEL VAN DE BTW. Deze rand is er gekomen om er een weg te halen:
      de btw op een regel werd op TWEE plekken uitgerekend met twee
      granulariteiten -- de aangifte per factuurregel, de maandboekhouding over de

@@ -1,27 +1,27 @@
 {
  "stempel": {
-  "op": "2026-09-15T11:00:23.612Z",
-  "commit": "4ebd91079",
+  "op": "2026-09-15T05:36:05.483Z",
+  "commit": "80701bb45",
   "boomVuil": false,
-  "boomAnders": 6,
+  "boomAnders": 2,
   "instrument": "scripts/mutatiecontract.js",
   "node": "v22.22.2"
  },
  "uitleg": "Per schrijfroute vijf assen: semantiek (kern/mutatie.js), duplicaatgedrag (lib/idemsleutels.js), bewijs (IDEMPROEF.json), toegang en stand (kern/mutatiecontract.js). Afgeleid uit die bronnen; alleen de BEDOELING komt uit server/lib/mutatiecontracten.js, want die is geen waarneming.",
  "grens": "Een stand wordt nooit afgeleid uit bewijs. Het bewijs draagt hooguit een VOORSTEL; de stand komt uit een verklaring van een mens. Zonder die regel staat dit register binnen een uur op 100% en weet niemand meer wat dat betekent.",
  "gemeten": {
-  "totaal": 4945,
-  "geclassificeerd": 4945,
+  "totaal": 4947,
+  "geclassificeerd": 4947,
   "perStand": {
    "BLOCKED_BY_TEST_FIXTURE": 3189,
-   "NOT_APPLICABLE": 1181,
+   "NOT_APPLICABLE": 1183,
    "PROTECTED": 447,
    "INTENTIONALLY_NON_IDEMPOTENT": 128
   },
-  "vastgesteldDoorMens": 1804,
+  "vastgesteldDoorMens": 1806,
   "afgeleidDoorScript": 3141,
   "toegangWaargenomen": {
-   "AUTHENTICATED": 4075,
+   "AUTHENTICATED": 4077,
    "PUBLIC": 123,
    "OBJECT_SCOPED": 726,
    "(niet af te leiden -- vraagt een verklaring)": 5,
@@ -32,7 +32,7 @@
    "kale ronde: beschermd": 129,
    "kale ronde: onbeschermd": 123,
    "kale ronde: geen uitspraak": 4681,
-   "niet gemeten": 12
+   "niet gemeten": 14
   },
   "voorstellen": {},
   "metingVan": "2026-09-14T23:40:03.108Z"
@@ -250,12 +250,6 @@
   },
   {
    "route": "POST /api/reisbureau/afzeggen",
-   "bedoeld": "OBJECT_SCOPED",
-   "waargenomen": "AUTHENTICATED",
-   "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
-  },
-  {
-   "route": "POST /api/reisbureau/betaal",
    "bedoeld": "OBJECT_SCOPED",
    "waargenomen": "AUTHENTICATED",
    "wat": "de verklaarde toegang en de deur in de router zeggen niet hetzelfde"
@@ -63622,27 +63616,6 @@
    "voorstelGrond": null
   },
   {
-   "mutatieId": "reisbureau.terugboeking.kantoor",
-   "route": "POST /api/office/reisbureau/terugboeking",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "AUTHENTICATED",
-    "bewakers": [
-     "officeAuth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
    "mutatieId": "office.reisbureau.uitnodiging.roteren",
    "route": "POST /api/office/reisbureau/uitnodiging-roteer",
    "semantiek": {
@@ -77212,27 +77185,6 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
-   "voorstel": null,
-   "voorstelGrond": null
-  },
-  {
-   "mutatieId": "reisbureau.betaling.lid",
-   "route": "POST /api/reisbureau/betaal",
-   "semantiek": {
-    "klasse": "idempotent"
-   },
-   "duplicaatregel": null,
-   "toegang": {
-    "waargenomen": "AUTHENTICATED",
-    "uitHandler": null,
-    "bedoeld": "OBJECT_SCOPED",
-    "bewakers": [
-     "auth"
-    ]
-   },
-   "bewijs": null,
-   "stand": "PROTECTED",
-   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },
@@ -95165,6 +95117,69 @@
    "voorstelGrond": null
   },
   {
+   "mutatieId": "gemoed.lezen.staff",
+   "route": "POST /api/staff/gemoed",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "gemoed.wissen.staff",
+   "route": "POST /api/staff/gemoed/weg",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "velden",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "gemoed.zetten.staff",
+   "route": "POST /api/staff/gemoed/zet",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "velden",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "PROTECTED",
+   "herkomst": "mens",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
    "mutatieId": "staff.inzetbaarheid",
    "route": "POST /api/staff/inzetbaarheid",
    "semantiek": {
@@ -112572,6 +112587,27 @@
    },
    "stand": "BLOCKED_BY_TEST_FIXTURE",
    "herkomst": "afgeleid",
+   "voorstel": null,
+   "voorstelGrond": null
+  },
+  {
+   "mutatieId": "onderneming.zaakkant.lezen",
+   "route": "POST /api/supplier/onderneming",
+   "semantiek": {
+    "klasse": "idempotent"
+   },
+   "duplicaatregel": "leest",
+   "toegang": {
+    "waargenomen": "AUTHENTICATED",
+    "uitHandler": null,
+    "bedoeld": "AUTHENTICATED",
+    "bewakers": [
+     "supplierAuth"
+    ]
+   },
+   "bewijs": null,
+   "stand": "NOT_APPLICABLE",
+   "herkomst": "mens",
    "voorstel": null,
    "voorstelGrond": null
   },

@@ -27,10 +27,26 @@
    3. Een knop die overal wordt gelezen en nergens iets doet, is erger dan geen
       knop: hij ziet eruit alsof hij werkt.
 
-   DUS: geen generieke commissie meer, en in plaats daarvan VIER BENOEMDE
-   VERGOEDINGEN. Elke euro die RTG van een partner ontvangt, hoort onder precies
-   een van deze soorten te vallen, met een eigen naam op de factuur. Past een
-   nieuw idee onder geen enkele, dan is dat een ontwerpvraag en geen percentage.
+   DUS: geen generieke commissie meer, en in plaats daarvan BENOEMDE
+   VERGOEDINGEN. Elke euro die RTG ontvangt, hoort onder precies een van deze
+   soorten te vallen, met een eigen naam op de factuur. Past een nieuw idee onder
+   geen enkele, dan is dat een ontwerpvraag en geen percentage.
+
+   ER ZIJN ER VIJF, EN DE VIJFDE HEEFT EEN ANDERE TEGENPARTIJ. De eerste vier
+   gaan over een PARTNER: een zaak met een leverancierscontract. `RTG_OPERATING_
+   SERVICE` gaat over een EXPLOITANT: iemand die RTG in een ander land draait op
+   het operating network van RTG Amsterdam. Dat onderscheid staat als veld
+   (`tegenpartij`) en niet in een naam, want het beslist wie er mag lezen: de
+   partnervoorwaarden beloven een partner nul over zijn omzet, en die belofte
+   gaat niet over een exploitant. Wie de vijfde in de partnerweigering zou
+   meenemen, laat een zaak lezen dat RTG haar iets rekent voor een netwerk
+   waarvan zij geen gebruiker is.
+
+   EN DE VIJFDE DRAAGT GEEN PERCENTAGE. Grondslag OPEN, tarief OPEN, berekening
+   NIET ACTIEF -- een besluit van de eigenaar op 15 september 2026, en sterker dan
+   alvast een getal neerzetten: wat gemeten is, is het aandeel VORMEN met een
+   herkomst en niet het aandeel EURO'S. De rekensom staat in FRANCHISE.md par.
+   4.1a; hier staat alleen de stand.
 
    Het onderscheid dat dit mogelijk maakt: een PAYMENT SERVICE FEE is een prijs
    voor een verleende dienst (het afhandelen van een betaling), een COMMISSIE is
@@ -42,8 +58,17 @@
 
 /* De invariant. Geen functie die hem kan verzetten, geen sleutel in de database
    waar hij vandaan komt. Zou hier ooit een instelling van gemaakt worden, dan
-   valt test/vergoeding.test.js om. */
+   vallen test/commercie.test.js en test/mn03-commercieelvoordeel.test.js om.
+   (Hier stond `test/vergoeding.test.js`, en dat bestand bestaat niet -- een
+   commentaar dat naar een niet-bestaande wacht wijst, leest als een garantie en
+   is er geen.) */
 const PARTNER_COMMISSIE = 0;
+
+/* Twee waarden die iets anders betekenen dan een leeg veld. Ze staan hier als
+   constante zodat een lezer ze kan vergelijken in plaats van op de spelling van
+   een string te moeten vertrouwen. */
+const OPEN = 'OPEN';
+const NIET_ACTIEF = 'NIET ACTIEF';
 
 /* De vier soorten. `overOmzet` is de vraag die telt: neemt deze vergoeding een
    aandeel in de omzet van de partner (dan is het een commissie, en die bestaat
@@ -53,6 +78,8 @@ const SOORTEN = {
     label: 'Betaaldienst',
     wat: 'het afhandelen van een betaling via RTG Pay',
     grondslag: 'per transactie: een vaste voet plus een percentage van het bedrag',
+    berekening: 'kern/commercie/fee.js, aangeroepen door kern/pay/kassa.js',
+    tegenpartij: 'partner',
     overOmzet: false,
     betaaldDoor: 'de zaak',
     waar: 'kern/pay/kassa.js, direct verrekend op de partnerrekening'
@@ -61,6 +88,8 @@ const SOORTEN = {
     label: 'Bemiddelingsdienst',
     wat: 'een boeking via het partnerkanaal voor niet-leden (gasten)',
     grondslag: 'een promillage over de SERVICE, nooit over de netto reissom',
+    berekening: NIET_ACTIEF,
+    tegenpartij: 'partner',
     overOmzet: false,
     betaaldDoor: 'de partner, uit de service die de gast betaalt',
     waar: 'kern/onderneming/regie.js + routes/member/partnerkanaal.js'
@@ -69,6 +98,8 @@ const SOORTEN = {
     label: 'Ticketdienst',
     wat: 'verkoop en scan van tickets aan de deur',
     grondslag: 'per ticket, niet over de omzet van het evenement',
+    berekening: NIET_ACTIEF,
+    tegenpartij: 'partner',
     overOmzet: false,
     betaaldDoor: 'de organisator',
     waar: 'nog niet gebouwd'
@@ -77,11 +108,67 @@ const SOORTEN = {
     label: 'Inrichting',
     wat: 'eenmalig inrichten, migreren of koppelen',
     grondslag: 'een eenmalig bedrag, vooraf afgesproken',
+    berekening: NIET_ACTIEF,
+    tegenpartij: 'partner',
     overOmzet: false,
     betaaldDoor: 'de klant',
     waar: 'nog niet gebouwd'
+  },
+
+  /* DE VIJFDE, EN HIJ IS MET OPZET LEEG (besluit van de eigenaar, 15 september
+     2026). Niet een commissie met een ander etiket: een exploitant betaalt voor
+     wat RTG Amsterdam LEVERT -- merk en licentie, de kernsoftware, de AI, de
+     security, de infrastructuur, de updates en de centrale ondersteuning. Dat is
+     dezelfde toets als bij de andere vier: `overOmzet: false`, want de vraag is
+     wat er geleverd wordt en niet wat de exploitant omzet.
+
+     Juist daarom raakt hij de 0%-invariant niet. Die belofte gaat over een
+     PARTNER en over diens OMZET; deze vergoeding gaat over een EXPLOITANT en
+     over een geleverd netwerk. Zou hij wel over omzet gaan, dan was het een
+     commissie en dan hoort hij hier niet.
+
+     DRIE VELDEN STAAN OP OPEN EN DAT IS DE HELE FUNCTIE VAN DEZE RIJ. De relatie
+     bestaat en is benoemd; het bedrag is niet besloten. Dat is sterker dan een
+     voorlopig percentage, want een voorlopig getal wordt de as waar de rest
+     omheen groeit -- en dan is de eerste onenigheid met een exploitant een
+     discussie over een getal dat niemand ooit heeft afgewogen. */
+  rtg_operating_service: {
+    label: 'Operating network',
+    wat: 'de expliciete vergoeding die een RTG-exploitant aan RTG Amsterdam ' +
+      'verschuldigd kan zijn voor het operating network waarvan hij gebruikmaakt: ' +
+      'merk en licentie, kernsoftware, AI, security, infrastructuur, updates, ' +
+      'centrale ondersteuning en andere overeengekomen centrale capabilities',
+    grondslag: OPEN,
+    tarief: OPEN,
+    berekening: NIET_ACTIEF,
+    tegenpartij: 'exploitant',
+    overOmzet: false,
+    betaaldDoor: 'de RTG-exploitant',
+    waar: 'nergens -- er is geen berekening, en dat is de stand en geen gat'
   }
 };
+
+/* De drie standen van de vijfde, als waarde en niet als lege string. `null` zou
+   hier "niet ingevuld" betekenen en dat is iets anders dan "bewust nog open":
+   het eerste is een omissie, het tweede een besluit. Een lezer moet dat verschil
+   kunnen zien zonder de geschiedenis te kennen. */
+function isOpen(v) { return v === OPEN; }
+
+/* WORDT DEZE VERGOEDING ERGENS UITGEREKEND? Elke soort draagt daarvoor een
+   EIGEN `berekening`: ofwel de plek in de code, ofwel NIET_ACTIEF. Dat is met
+   opzet een veld en geen afleiding uit de zin in `waar` -- betekenis uit de vorm
+   van proza halen is precies de klasse die METERKLASSE.md telt, en hier zou hij
+   `nog niet gebouwd` moeten herkennen naast `nergens` naast wat de volgende
+   schrijver verzint.
+
+   Van de vijf staat er vandaag EEN op actief. Dat is geen tekort van deze
+   module: drie zijn een benoemde vergoeding waar nog geen weg voor is, en de
+   vijfde is bewust open. */
+function isActief(soort) {
+  const s = SOORTEN[soort];
+  if (!s) return false;
+  return s.berekening !== NIET_ACTIEF && !isOpen(s.grondslag) && !isOpen(s.tarief);
+}
 
 /* De partnervergoeding over omzet, voor welke zaak dan ook. Neemt de zaak als
    argument omdat elke aanroeper er een heeft en het de vraag leesbaar houdt --
@@ -91,9 +178,15 @@ function commissieVoor(/* zaak */) { return PARTNER_COMMISSIE; }
 /* Waarom het zetten van een commissie geweigerd wordt. Een zin en geen
    foutcode: wie hier komt, zoekt iets, en hoort te lezen wat het wel is. */
 function waaromGeenCommissie() {
+  /* ALLEEN DE PARTNERDIENSTEN. Deze zin gaat naar een ZAAK, en de vijfde soort
+     gaat over een exploitant van RTG in een ander land. Wie hem hier meeneemt,
+     laat een partner lezen dat RTG haar iets rekent voor een netwerk waarvan zij
+     geen gebruiker is -- en dat is precies het soort onduidelijkheid waar deze
+     hele module tegen bestaat. */
+  const voorPartners = Object.values(SOORTEN).filter(s => s.tegenpartij === 'partner');
   return 'RTG rekent geen commissie over de omzet van een partner; dat staat in de partnervoorwaarden en is geen instelling. ' +
     'Wat RTG wel in rekening kan brengen zijn benoemde diensten: ' +
-    Object.values(SOORTEN).map(s => s.label.toLowerCase()).join(', ') + '.';
+    voorPartners.map(s => s.label.toLowerCase()).join(', ') + '.';
 }
 
 // het soortenoverzicht voor de boardroom, zonder dat er iets te zetten valt
@@ -101,4 +194,5 @@ function soorten() {
   return Object.entries(SOORTEN).map(([id, s]) => ({ id, ...s }));
 }
 
-module.exports = { PARTNER_COMMISSIE, SOORTEN, soorten, commissieVoor, waaromGeenCommissie };
+module.exports = { PARTNER_COMMISSIE, OPEN, NIET_ACTIEF, SOORTEN, soorten,
+  commissieVoor, waaromGeenCommissie, isOpen, isActief };

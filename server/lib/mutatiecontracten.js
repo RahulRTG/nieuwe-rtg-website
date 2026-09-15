@@ -98,6 +98,7 @@ const CONTRACTEN = Object.assign({},
   /* De nazorg van een reisaanvraag: vier routes die samen de weg terug uit een
      toezegging zijn. Eigen bestand omdat ze een afweging delen -- zie de kop. */
   require('./mutatiecontracten-reisnazorg').CONTRACTEN,
+  require('./mutatiecontracten-reisherkomst').CONTRACTEN,
   /* Een lid en zijn eigen lidmaatschap: twee lezers en een opzegging. Eigen
      bestand omdat het indelen er een defect uit haalde -- zie de kop. */
   require('./mutatiecontracten-lidabonnement').CONTRACTEN,

@@ -39,6 +39,25 @@ app.post('/api/reisbureau/boek', auth, async (req, res) => {
 });
 // mijn reisaanvragen
 app.post('/api/reisbureau/mijn', auth, (req, res) => res.json({ aanvragen: reisbureau.mijn(req.session.key) }));
+/* HET LID BETAALT EEN BEVESTIGDE REIS (kern/reisbureau-betaling.js).
+
+   Dit is de weg die TRAVELCOMMERCE.md par. 9 als eerste van vier bevindingen
+   noteerde en die er niet was: een verkochte reis kon nergens betaald worden.
+   De route int de reissom op EEN boeking en splitst die in herkomstrijen uit de
+   commerciele samenstelling -- het deel van het hotel, van de vervoerder, van de
+   belastingdienst en van RTG zelf. Wat aan derden toekomt wordt KLAARGEZET en
+   nooit uitgevoerd (GELD.md).
+
+   Een reis zonder samenstelling wordt hier GEWEIGERD met de reden en niet
+   geboekt met een onbekende herkomst: een geldrij die `onbekend` draagt terwijl
+   de reis simpelweg niet is uitgesplitst, ziet er in de meter uit als een meting
+   en is een gok. */
+app.post('/api/reisbureau/betaal', auth, async (req, res) => {
+  if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+  const r = await kern.reisbetaling.betaal(req.session, liveCodename(req.session), String(req.body.ref || ''));
+  if (r.error) return res.status(r.status || 400).json({ error: r.error, hoe: r.hoe || undefined });
+  res.json(r);
+});
 // een eigen reisaanvraag intrekken zolang die openstaat
 app.post('/api/reisbureau/annuleer', auth, async (req, res) => {
   const r = await reisbureau.annuleer(req.session.key, String(req.body.ref || ''));

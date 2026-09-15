@@ -29,7 +29,7 @@
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
     "kernBreedte": 1579,
-    "kernGedeeld": 237,
+    "kernGedeeld": 238,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
@@ -116,6 +116,16 @@
     "idemHandwerkGeenVergelijking": 3
   },
   "notities": [
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "kernGedeeld",
+      "van": 237,
+      "vervalt": "2026-12-15",
+      "meter": "kernGedeeld 237 -> 238",
+      "reden": "`reisbetaling` wordt nu door TWEE domeinen aangeraakt: `member` (het lid betaalt) en `kantoren` (het kantoor draait terug). Dat is echte koppeling en geen slordigheid -- een terugboeking is een besluit van een mens en hoort dus achter de kantoordeur, terwijl betalen iets is wat het lid zelf doet. De twee kunnen niet in hetzelfde domein wonen zonder dat een van beide door de verkeerde deur komt. Beide staan als VERKLARING in GRENZEN.json; de domeingrens hield de tweede tegen tot iemand hem opschreef, precies zoals bedoeld. Zelfde vorm als de notitie over `knelpunt` -> `beroepenbieb` van 13 september: een laag die per definitie door twee kanten wordt gebruikt, IS koppeling, en die prijs hoort opgeschreven en niet weggewerkt.",
+      "waarheen": "Niets, tenzij de terugboeking naar het lid verhuist -- en dat mag niet: een lid draait zijn eigen betaling niet terug. Dit getal hoort te dalen doordat OUDE koppelingen verdwijnen, niet doordat nieuwe capabilities buiten de kern om worden bedraad."
+    },
     {
       "datum": "2026-09-15",
       "soort": "aflossing",

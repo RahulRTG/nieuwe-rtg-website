@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-15T09:20:26.194Z",
-    "commit": "10323c27b",
+    "op": "2026-09-15T10:57:08.798Z",
+    "commit": "4ebd91079",
     "boomVuil": false,
-    "boomAnders": 1,
+    "boomAnders": 0,
     "instrument": "scripts/doorbelasting.js",
     "node": "v22.22.2"
   },
@@ -21,16 +21,16 @@
   ],
   "regel": "onbekend is een uitkomst en nooit een aanname: een bedrag zonder aantoonbare herkomst wordt niet naar rtgEigen of derdePartij geduwd, want beide fouten zijn onzichtbaar en komen allebei iemand goed uit",
   "vorm": {
-    "vormenTotaal": 1403,
-    "geldvormen": 210,
-    "volgbaar": 28,
+    "vormenTotaal": 1405,
+    "geldvormen": 212,
+    "volgbaar": 30,
     "perHerkomstveld": {
       "bron": 15,
       "provider": 2,
       "aanbieder": 7,
       "herkomst": 1,
       "leverancier": 6,
-      "economischeHerkomst": 2
+      "economischeHerkomst": 4
     },
     "nietVolgbaar": 182,
     "volgbareModules": [
@@ -56,6 +56,8 @@
       "server/kern/munten.js",
       "server/kern/onderneming/crediteuren.js",
       "server/kern/ov/operatie.js",
+      "server/kern/reisbureau-betaling.js",
+      "server/kern/reisbureau-betaling.js",
       "server/kern/reisbureau-betaling.js",
       "server/kern/reisbureau-betaling.js",
       "server/kern/rtfos/geld-uitgaven.js",
@@ -293,8 +295,8 @@
         "volgbaar": 0
       },
       "server/kern/reisbureau-betaling.js": {
-        "geldvormen": 2,
-        "volgbaar": 2
+        "geldvormen": 4,
+        "volgbaar": 4
       },
       "server/kern/reisbureau.js": {
         "geldvormen": 1,

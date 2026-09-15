@@ -1,14 +1,14 @@
 {
   "stempel": {
-    "op": "2026-09-15T02:58:22.134Z",
-    "commit": "2c65dbf4",
+    "op": "2026-09-15T03:30:39.091Z",
+    "commit": "282561fe",
     "boomVuil": false,
     "boomAnders": 1,
     "instrument": "scripts/rolronde.js",
     "node": "v22.22.2"
   },
   "uitleg": "De rolronde: welke rol komt waar binnen, gevraagd aan een echte server in plaats van aan de brontekst. gaten MAG ALLEEN DALEN en gemeten mag ALLEEN STIJGEN -- zie scripts/rolronde.js. Dit is de VERTICALE scheiding; de horizontale (lid A tegen lid B) is de gluurder-trede van de ladder.",
-  "gedraaid": "2026-09-15T02:58:22.135Z",
+  "gedraaid": "2026-09-15T03:30:39.091Z",
   "meters": {
     "rolscheidingGaten": 0,
     "rolscheidingGemeten": 1854

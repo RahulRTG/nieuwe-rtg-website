@@ -15,7 +15,7 @@
 
    POORT EN GEEN ETIKET, en dat is de hele reden dat dit bestand bestaat.
    graaf.js zegt het over `deel`: de motor FILTERT erop, en de bureau-kant
-   krijgt nooit meer dan is vrijgegeven. Hier net zo: `magZien()` is de enige
+   krijgt nooit meer dan is vrijgegeven. Hier net zo: `magKringZien()` is de enige
    plek waar zichtbaarheid wordt beslist. Een laag die de kring als veld
    meestuurt en de lezer laat filteren, lekt bij de eerste route die het
    vergeet -- en dat is precies het soort lek dat geen enkele toets ziet, want
@@ -87,7 +87,7 @@ const trapVan = (id) => { const k = kring(id); return k ? k.trap : null; };
    trappen lopen tegen elkaar in. Een onbekende waarde aan welke kant dan ook
    is DICHT en niet open: een typefout in een relatie mag geen publicatie
    worden (kern/stuur/mandaat.js: leeg is dicht). */
-function magZien(kringVan, relatie) {
+function magKringZien(kringVan, relatie) {
   const bereik = trapVan(kringVan), nabijheid = trapVan(relatie);
   if (bereik == null || nabijheid == null) return false;
   return nabijheid <= bereik;
@@ -130,4 +130,4 @@ function keuzes(opties) {
   }));
 }
 
-module.exports = { KRINGEN, STANDAARD, MAX_BESCHERMD, kring, trapVan, magZien, zet, keuzes };
+module.exports = { KRINGEN, STANDAARD, MAX_BESCHERMD, kring, trapVan, magZien: magKringZien, zet, keuzes };

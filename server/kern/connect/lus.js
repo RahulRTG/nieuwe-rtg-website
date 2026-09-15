@@ -91,7 +91,7 @@ function verklaar(lijst) {
    bij het INTREKKEN -- een maker die zijn werk terughaalt, haalt daarmee ook
    het delen, het helpen erop en het verbinden eraan weg. Een laag die alleen
    `verklaar` kent, laat die drie staan tot iemand erop drukt. */
-function zonder(lijst, weg) {
+function zonderWerkwoord(lijst, weg) {
   const basis = new Set(verklaar(lijst).werkwoorden);
   const gevallen = new Set([String(weg || '')].filter(id => basis.has(id)));
   if (!gevallen.size) return { werkwoorden: [...basis].filter(id => IDS.includes(id)), gevallen: [] };
@@ -113,7 +113,7 @@ function zonder(lijst, weg) {
    komt uit dezelfde lijst als de motor en wordt nergens overgetypt: een tweede
    tekst naast de eerste loopt binnen een jaar uit elkaar, en dan staat er op
    het scherm iets anders dan wat de code afdwingt. */
-function uitleg(id) {
+function uitlegLus(id) {
   const w = werkwoord(id);
   if (!w) return { werkwoord: String(id || ''), bestaat: false,
     reden: NIET_GEBOUWD[String(id || '')] || 'Dit werkwoord bestaat niet in kern/connect/werkwoordlijst.js.' };
@@ -121,4 +121,4 @@ function uitleg(id) {
     vereist: w.vereist.slice(), bevestigtEenMens: w.raaktEenAnder };
 }
 
-module.exports = { verklaar, zonder, uitleg, werkwoord, isWerkwoord, IDS };
+module.exports = { verklaar, zonder: zonderWerkwoord, uitleg: uitlegLus, werkwoord, isWerkwoord, IDS };

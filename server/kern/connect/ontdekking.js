@@ -79,7 +79,7 @@ const VERPLICHT = ['onderwerp', 'soort', 'titel', 'ingang', 'herkomst', 'dektNie
 /* EEN ontdekking projecteren. Geeft `{ ok, ontdekking }` of `{ ok:false, reden }`
    -- nooit een uitzondering, want een bron die een veld te veel stuurt hoort dat
    te LEZEN en niet om te vallen. */
-function projecteer(rec) {
+function projecteerOntdekking(rec) {
   const r = rec && typeof rec === 'object' ? rec : {};
 
   for (const veld of Object.keys(r)) {
@@ -151,11 +151,11 @@ function projecteer(rec) {
 function projecteerAlle(lijst, herkomst) {
   const uit = [], geweigerd = [];
   for (const rec of Array.isArray(lijst) ? lijst : []) {
-    const r = projecteer(Object.assign({ herkomst }, rec));
+    const r = projecteerOntdekking(Object.assign({ herkomst }, rec));
     if (r.ok) uit.push(r.ontdekking);
     else geweigerd.push({ titel: String((rec || {}).titel || '').slice(0, 60), veld: r.veld, reden: r.reden });
   }
   return { ontdekkingen: uit, geweigerd };
 }
 
-module.exports = { projecteer, projecteerAlle, GEEN_CIJFER, GEEN_MENS, VERPLICHT };
+module.exports = { projecteer: projecteerOntdekking, projecteerAlle, GEEN_CIJFER, GEEN_MENS, VERPLICHT };

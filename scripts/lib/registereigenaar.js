@@ -72,6 +72,7 @@ const EIGENAAR = {
      getal van toets 4 doordat er een register bijkomt zonder dat iemand zegt wie
      het bezit, en dat is precies wat die toets moet tegenhouden. */
   'NEIGINGVORM.json': { schrijver: 'scripts/neigingvorm.js' },
+  'CONNECTLUS.json': { schrijver: 'scripts/connectlus.js' },
 
   /* De lagen die in deze tak zijn gebouwd. */
   'IDEMIDENTITEIT.json': { schrijver: 'scripts/idemidentiteit.js' },

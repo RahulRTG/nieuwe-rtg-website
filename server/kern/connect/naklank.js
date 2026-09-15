@@ -6,13 +6,7 @@
    te hebben, 4.211 het probeerden en 117 daarna iemand anders hielpen. Die
    laatste vier zeggen iets; een duim zegt alleen dat er is gescrold.
 
-   DE NAAM IS GEMETEN EN TWEE VOOR DE HAND LIGGENDE WOORDEN VIELEN AF.
-   CONNECTLUS.json: `signalen` staat op DERTIEN plekken in acht domeinen
-   (festival, fiscaal, luchthaven, marechaussee ...) en is daarmee een van de
-   namen waar SEMANTIEK.json over gaat. En `weerklank` is al vergeven: KANTOOR.md
-   doopt de gebeurtenismotor zo, juist omdat `Pulse` bezet bleek. `naklank` stond
-   op nul plekken -- en het woord klopt ook beter: dit is niet het antwoord op
-   iets (dat is weerklank) maar wat er van overblijft.
+   CONNECTLUS.json onderbouwt de naam; CONNECT.md bewaart de besluiten.
 
    VIER REGELS, EN DE EERSTE IS DE HELE REDEN DAT DE LAAG BESTAAT.
 

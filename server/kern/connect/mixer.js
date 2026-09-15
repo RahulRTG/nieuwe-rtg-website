@@ -1,20 +1,10 @@
 /* ============================================================================
-   DE MIXER -- acht motoren die om een PLEK dingen, en geen enkele die wint.
+   DE MIXER -- plekken verdelen zonder scores.
 
-   Het voorstel vraagt met zoveel woorden om niet een aanbevelingsalgoritme maar
-   verschillende, die met elkaar concurreren: interesse, nieuwsgierigheid,
-   groei, brug, lokaal, actualiteit, menselijk, serendipiteit. Dat is de juiste
-   vorm, en het valt op precies een manier om: door er een SCORE tussen te
-   zetten. Zodra elke motor een getal levert en de hoogste wint, is er weer een
-   algoritme -- met acht ingangen en een gewichtenvector die niemand kan lezen.
+   De horizon verdeelt plekken over vertrouwde en ontdekkende motoren. Elke
+   motor krijgt om beurten een plek; er is geen score, sortering of weging.
 
-   DAAROM VERDEELT DEZE MIXER PLEKKEN EN GEEN PUNTEN. De horizon van de mens
-   (./horizon.js) zegt hoeveel van de plekken naar de VERTROUWDE kant gaan en
-   hoeveel naar de ONTDEKKENDE. Binnen elke kant krijgen de motoren om beurten
-   een plek. Er wordt niets gesorteerd, niets gewogen en niets vergeleken --
-   en daardoor is er ook niets waarop iemand later kan optimaliseren.
-
-   ELKE PLEK DRAAGT ZIJN REDEN. Niet "aanbevolen voor jou" maar "dit staat hier
+   ELKE PLEK DRAAGT EEN REDEN. Niet "aanbevolen voor jou" maar "dit staat hier
    omdat u vorige week aan bruggen werkte" of "dit komt van een motor die
    expres iets buiten uw wereld zoekt". Dat is dezelfde regel als bij
    kern/frictie/motor.js: een cijfer zonder opbouw is een orakel. Hier is er

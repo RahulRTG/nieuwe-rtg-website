@@ -10,13 +10,24 @@
    met een echte server naloopt. Zakt die toets, dan klopt dit register niet meer
    en hoort HET te worden herzien, niet de toets.
 
-   EEN ONDERSCHEID DAT HIER NIET WEGGEPOETST WORDT. `/weg` laat bij een tweede
-   aanroep dezelfde STAND achter (de dag is weg en blijft weg), maar het antwoord
-   is 404 en niet 200. Dat is een TOESTANDSCONTROLE en geen duplicaatlaag: wat
-   vaststaat is dat er geen tweede effect kan ontstaan, niet dat een dubbeltik
-   wordt herkend. Dezelfde formulering als in ./mutatiecontracten-vertegenwoordiging.js,
-   en om dezelfde reden -- wie die twee samenvoegt, leest straks een
-   duplicaatgarantie waar er geen is. */
+   EEN ONDERSCHEID DAT HIER NIET WEGGEPOETST WORDT -- EN DAT SINDS 15 SEPTEMBER
+   2026 ANDERS LIGT VOOR `/weg`.
+
+   Tot die dag gaf een tweede aanroep van `/weg` dezelfde STAND (de dag is weg en
+   blijft weg) maar een ANDER antwoord: 404 in plaats van 200. Dat was een
+   toestandscontrole en geen duplicaatlaag, en dat stond hier met zoveel woorden.
+
+   Sinds ./idemsleutels-ondernemerslus.js draagt de route een verklaarde sleutel,
+   en daarmee geeft de poort binnen het venster het EERSTE antwoord terug. Er
+   wordt nu dus wel degelijk een dubbeltik herkend. Die zin is daarom hieronder
+   vervangen in plaats van blijven staan: een register dat een garantie ontkent
+   die inmiddels bestaat, is net zo onwaar als een register dat er een belooft
+   die er niet is.
+
+   Voor `/zet` verandert er niets aan de STAND -- een dag heeft hooguit een regel
+   en die wordt overschreven -- maar de sleutel noemt daar met opzet OOK de
+   notitie. Waarom dat nodig was (vrije tekst valt buiten de afdruk, dus een
+   bijgewerkte notitie zou zijn opgeslokt) staat in de kop van dat bestand. */
 'use strict';
 
 const OP = '2026-09-14';
@@ -90,9 +101,11 @@ const CONTRACTEN = {
     semantiek: { klasse: 'idempotent' },
     toegang: TOEGANG,
     stand: 'PROTECTED',
-    waarom: 'de tweede aanroep is een TOESTANDSCONTROLE: de dag is al weg, dus er ontstaat geen tweede ' +
-      'effect, maar het antwoord is 404 en niet 200. Er wordt geen dubbeltik HERKEND; er valt er geen ' +
-      'te maken.',
+    waarom: 'de dag is na een tweede aanroep nog steeds weg, dus er ontstaat geen tweede effect. Sinds ' +
+      'de verklaarde sleutel in ./idemsleutels-ondernemerslus.js wordt een dubbeltik binnen het venster ' +
+      'ook HERKEND: de poort geeft dan het eerste antwoord (200 met de gewiste dag) in plaats van de ' +
+      '404 die de handler zelf zou geven. Buiten het venster is het weer 404, en dat is het venster en ' +
+      'geen inconsistentie.',
     bewijs: BEWIJS,
     afgetekend: AFGETEKEND
   }

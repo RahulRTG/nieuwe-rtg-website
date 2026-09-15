@@ -208,11 +208,35 @@ test('7. de dubbeltik: wat een TWEEDE identieke aanroep werkelijk doet', async (
     const na = (await api(base, '/api/staff/gemoed', {}, a)).body;
     assert.deepEqual(na.recent, voor.recent, 'lezen hoort de opslag niet te raken');
 
-    // weg: de tweede keer is een TOESTANDSCONTROLE en geen duplicaatlaag --
-    // de stand is gelijk, maar het antwoord zegt eerlijk dat er niets stond.
-    assert.equal((await api(base, '/api/staff/gemoed/weg', {}, a)).status, 200, 'de eerste keer wist');
+    /* DE NOTITIE MOET DOOR DE POORT KOMEN, en dit is de reden dat de sleutel in
+       ./idemsleutels-ondernemerslus.js `velden` gebruikt en geen
+       `zelfdeVerzoek`. Vrije tekst valt buiten de afdruk van een verzoek
+       (BUITEN_AFDRUK in lib/handelingsspoor.js kent `notitie`), dus met
+       `zelfdeVerzoek` zou dit tweede verzoek dezelfde sleutel hebben als het
+       eerste en zou de bijgewerkte notitie stil verdwijnen. */
+    await api(base, '/api/staff/gemoed/zet', { stemming: 'gemiddeld', notitie: 'bijgewerkt' }, a);
+    assert.equal((await api(base, '/api/staff/gemoed', {}, a)).body.vandaagIngevuld.notitie, 'bijgewerkt',
+      'alleen de notitie wijzigen hoort door te komen; wordt hij opgeslokt, dan staat de sleutel op ' +
+      '`zelfdeVerzoek` in plaats van op `velden`');
+
+    /* WEG: DE STAND WAS AL GELIJK, HET ANTWOORD IS DAT SINDS 15 SEPTEMBER OOK.
+       Zonder verklaarde sleutel gaf de tweede aanroep 404 ("voor die dag staat
+       er niets"); met de sleutel geeft de poort binnen het venster het eerste
+       antwoord terug. Voor wie twee keer tikt is dat het eerlijkere van de twee:
+       hij vroeg die dag weg te halen, en die dag is weg. */
+    const eersteWeg = await api(base, '/api/staff/gemoed/weg', {}, a);
+    assert.equal(eersteWeg.status, 200, 'de eerste keer wist');
     const tweedeWeg = await api(base, '/api/staff/gemoed/weg', {}, a);
-    assert.equal(tweedeWeg.status, 404, 'de tweede keer meldt dat er niets stond');
+    assert.equal(tweedeWeg.status, 200,
+      'een dubbeltik hoort binnen het venster het eerste antwoord te krijgen; 404 betekent dat de ' +
+      'verklaarde sleutel van deze route weg is');
+    /* EN DE POORT ZEGT ERBIJ DAT HET EEN HERHALING WAS. Dat is beter dan een
+       stille replay en het hoort hier vastgelegd: `herhaald` is het enige
+       verschil met het eerste antwoord, dus de client kan een dubbeltik
+       onderscheiden van een eerste keer zonder dat hij iets anders ziet. */
+    assert.equal(tweedeWeg.body.herhaald, true, 'de poort hoort te melden dat dit een herhaling was');
+    const { herhaald, ...rest } = tweedeWeg.body;
+    assert.deepEqual(rest, eersteWeg.body, 'afgezien van dat merkteken is het hetzelfde antwoord');
     assert.deepEqual((await api(base, '/api/staff/gemoed', {}, a)).body.recent, [],
       'en de stand is na twee keer wissen dezelfde als na een keer');
   } finally { await stop(child); fs.rmSync(TMP, { recursive: true, force: true }); }

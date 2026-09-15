@@ -139,6 +139,10 @@ Object.assign(SLEUTELS,
      uitlichting `zelfdeVerzoek`-achtig is en geen `nietIdempotent`, staat in de
      kop van dat bestand -- een 409 op de stand is een toestandscontrole. */
   require('./idemsleutels-stage').SLEUTELS,
+  /* De ondernemerslus: twee lezers, en twee schrijvers waarvan er een vrije
+     tekst draagt. Waarom `velden` en niet `zelfdeVerzoek`, en waarom `/weg`
+     hierdoor een ander ANTWOORD geeft, staat in de kop van dat bestand. */
+  require('./idemsleutels-ondernemerslus').SLEUTELS,
   require('./idemsleutels-bundel').SLEUTELS);
 
 /* Drie keuringen bij het laden, en ze staan bij elkaar in ./idemsleutels-nooit.js:

@@ -941,3 +941,219 @@ uitdrukkelijk **niet** zeven mechanismen op 7/7 — dat zou dezelfde verkeerde
 uniformiteit terugbrengen. `n.v.t.` is daar even belangrijk als `ja`: een
 mechanisme zonder uitvoering hoort niet rood te staan omdat het geen
 uitvoeringscrash kan hebben.
+
+---
+
+## 10. De drie besluiten, genomen (15 september 2026)
+
+Par. 9 eindigde met drie dingen die een besluit vroegen en geen bouwwerk. Ze
+zijn genomen. Ze staan hier met hun consequentie, zodat de volgende ronde niet
+opnieuw begint bij de vraag.
+
+### 10.1 Geen verplichte tweede spoorregel
+
+**Besluit: een vertegenwoordigde handeling schrijft zoveel append-only
+gebeurtenissen als nodig zijn om de werkelijk bekende toestand ondubbelzinnig te
+reconstrueren — niet standaard één en niet standaard twee.**
+
+De ringbuffer wordt dus niet twee keer zo snel opgegeten omdat we toevallig een
+levensloop willen modelleren. Concreet:
+
+| geval | gebeurtenissen |
+|---|---|
+| weigering | **één** terminale regel (beoordeeld, geweigerd, met reden; niets uitgevoerd) |
+| lokale transactionele uitvoering | **één** definitieve toestand, mits de atomiciteit werkelijk is bewezen |
+| externe handeling | **meer**: toegestaan → uitvoering aangezet → uitkomst onbekend → gereconcilieerd |
+
+Append-only blijft intact zonder het normale geval te verdubbelen.
+
+**Retentie is een eigen probleem en wordt hier niet stilletjes meebeslist.** De
+ringbuffer mag een snelle operationele projectie zijn; hij mag niet ongemerkt de
+volledige historische garantie definiëren. Welke bewaartermijn juridisch en
+productmatig nodig is, is een apart besluit — dezelfde scheiding die het
+inzagejournaal al heeft afgedwongen: *integriteit ≠ retentie*.
+
+### 10.2 Drie zekerheidsprofielen, en geen nieuwe ladder
+
+**Besluit: één semantiek, per transactiegrens een expliciet profiel.**
+
+1. **Lokaal transactioneel.** Spoor en toestand committen samen. Geen halve
+   uitkomst: niet spoor-ja/uitvoering-nee en niet andersom.
+2. **Extern reconcileerbaar** (de aanbieder heeft idempotency, status of
+   reconciliatie): duurzame intentie → uitvoering → bevestiging of onbekend →
+   reconciliatie. **Een crash ná verzending betekent dus niet automatisch
+   opnieuw proberen.**
+3. **Extern niet-reconcileerbaar.** `uitvoeringBekend: false` blijft de waarheid
+   en er volgt menselijke of operationele afhandeling. Niet gokken, en **niet
+   opnieuw uitvoeren omdat er geen succes staat.** Dat laatste is een van de
+   scherpste economische veiligheidsregels die dit huis kan hebben.
+
+Er komt géén nieuwe zekerheidsladder: het bestaande vocabulaire van
+`kern/platformfout.js` (`uitvoeringBekend` plus `herhaalbaar`) drukt dit uit.
+
+### 10.3 Een effectklasse volgt de HANDELING, niet de vertegenwoordiging
+
+**Besluit: ja, dit mag CRASHAS niet blind houden — maar er komt geen
+`REPRESENTATION = STATE`.** Vertegenwoordiging kan ook lezen, voorstellen of
+beoordelen. De klasse hoort bij de handeling die eronder ligt:
+
+```
+vertegenwoordiging  ->  handeling  ->  effectprofiel
+```
+
+Daaruit volgt de invariant die verder reikt dan deze laag:
+
+> **Vertegenwoordiging verandert de actor en de bevoegdheid, niet de
+> effectsemantiek van de onderliggende handeling.** Mag Noah handeling X zelf
+> uitvoeren en is die `RECOVERABLE + STATE`, dan valt X niet buiten CRASHAS
+> omdat Sophie hem namens Noah uitvoert.
+
+CRASHAS hoeft dus niets over vertegenwoordiging te weten. Zijn bestaande
+klassefilter blijft staan; wat moet kloppen is dat een vertegenwoordigde
+handeling dezelfde effectwaarheid draagt als dezelfde handeling door de
+principal zelf.
+
+**En daar zit vandaag een obstakel dat gemeten hoort te zijn vóór iemand één
+regel toevoegt.** `effectcollecties.js` klasseert **per COLLECTIE** — één klasse
+en één grond per naam. De collectie `vertegenwoordigingen` draagt per lid drie
+verschillende soorten inhoud tegelijk:
+
+| veld | wat het is |
+|---|---|
+| `machtigingen` | de machtigingen zelf — een RECHT dat wordt verleend |
+| `log` | het spoor — een verantwoordingsregel OVER toegang |
+| `grens` | de staande eigen grens van de cliënt |
+
+Eén klasse kan die drie niet eerlijk dekken. `vertegenwoordigingen:
+['RECHT_VERLENEN', …]` invullen is dus niet de uitvoering van dit besluit maar
+een kortere weg eromheen.
+
+**En er is een tweede reden om hier nog niets in te vullen, en die is scherper:
+er is vandaag geen onderliggende handeling.** `handel()` voert niets uit; het
+enige dat er geschreven wordt is het spoor. De invariant van 10.3 heeft dus nog
+geen ONDERWERP in deze laag — precies de vorm van MN-03, waar de regel klopt en
+het geval nog niet bestaat. Zij wordt scherp op het moment dat één mechanisme
+werkelijk namens iemand uitvoert, en dat is dezelfde stap als 10.2.
+
+### 10.4 Twee bevindingen blijven met opzet open
+
+Beide uit par. 9.2, en beide zijn een BESLUIT en geen reparatie.
+
+**`gelogd: true` dat `stuur()` weggooit** is een projectievraag, geen
+serialisatiefout. De oplossing is niet vanzelf *laat alle interne velden door
+naar HTTP*. Misschien is `gelogd` intern bewijs en hoort de cliënt alleen 403 met
+een reden te zien; misschien is *"deze geweigerde poging is vastgelegd"* juist een
+belofte aan de gebruiker. Dat verschil hoort iemand te kiezen.
+
+**Het ontbreken van een rollback** is pas te beoordelen als vaststaat wat het
+geheugenmodel REPRESENTEERT. Is het een afgeleide projectie die na persistentie
+opnieuw wordt opgebouwd, dan is een klassieke rollback mogelijk het verkeerde
+gereedschap. Draagt het autoritatieve toestand, dan is het een ander verhaal.
+
+### 10.5 Wat de volgende ronde wordt
+
+Niet *het uniforme spoor bouwen*. Wel: **voor het eerst één mechanisme de hele
+keten laten bewijzen** — bevoegdheid → verplicht spoor → echte uitvoering →
+eerlijke uitkomst → crashgedrag. De kandidaat is `app-machtiging`, want daar is
+`m.doe()` synchroon in-process en valt profiel 1 uit 10.2 werkelijk te halen.
+
+Staat dat, dan bestaat de referentie voor de combinatie die vandaag bewust
+nergens bestaat — en pas dán verandert `SPOORVORM` van vraag. De oude meter gaat
+niet weg voordat de nieuwe bewezen is, en in de nieuwe is **`n.v.t.` geen
+tekort**: een mechanisme zonder uitvoering hoort niet rood te staan omdat het
+geen uitvoeringscrash kan hebben.
+
+---
+
+## 11. De slice is gemeten vóór hij werd gebouwd, en hij heeft geen onderwerp
+
+Par. 10.5 wees `app-machtiging` aan als het eerste mechanisme dat de hele keten
+zou bewijzen. Dat is nagemeten vóór er een regel is geschreven, en de premisse
+houdt niet. Dit is de derde keer in deze reeks dat een regel klopt terwijl het
+geval nog niet bestaat — en dat is geen toeval maar een eigenschap van het huis.
+
+### 11.1 Wat de proef nodig heeft
+
+De dragende toets van besluit 3 is:
+
+```
+effect(X door de principal zelf)  ==  effect(X namens hem, door een ander)
+```
+
+Daarvoor moet er een X bestaan die van **beide kanten** bereikbaar is: de mens
+kan hem zelf uitvoeren, én het mechanisme kan hem namens hem uitvoeren. Zonder
+zo'n X is er niets te vergelijken.
+
+### 11.2 De brug heeft negen methodes, en geen enkele raakt gedeelde grond
+
+`kern/appstore/brugmethodes.js` draagt er negen, en ze schrijven alle drie de
+soorten opslag in een **doos per app**:
+
+| methode | schrijft naar | gedeeld met RTG? |
+|---|---|---|
+| `profiel.wieBenIk` | niets (leest) | — |
+| `opslag.lees/lijst/zet/wis` | `bak('opslag', app, lid)` | nee: een kladblok per app per lid |
+| `bericht.zet` | `bak('bakjes', lid, app)` | nee: het bakje van díé app |
+| `arena.zet/bord/mijn` | het bord van díé app | nee, en uitgeschreven |
+
+Die laatste staat er met zoveel woorden: *"EEN BORD PER APP, NOOIT DAT VAN DE
+ARENA"*, met als reden dat een ranglijst waar een derde het getal instuurt precies
+zo betrouwbaar is als de minst betrouwbare app erin.
+
+Dat is geen omissie maar **de cel** (`APPSTORE.md`: derdencode draait nooit op de
+RTG-herkomst). Een lid kan `opslag.zet` voor app Y niet zelf doen — die
+sleutelruimte bestaat alleen omdát de app bestaat. Er is dus geen X met twee
+kanten, en de vergelijking van 11.1 heeft hier geen onderwerp.
+
+### 11.3 En het geldt voor alle zeven
+
+De vraag is daarna breder gesteld: is er érgens een mechanisme dat namens iemand
+een onderliggende capability UITVOERT?
+
+| mechanisme | wat het werkelijk doet |
+|---|---|
+| `vertegenwoordiging` | oordeelt en legt vast — `handel()` voert niets uit |
+| `app-machtiging` | voert uit, maar uitsluitend binnen de cel van de app |
+| `bijstand` | `voerUit()` zet `status = 'uitgevoerd'` en schrijft een uitslag: het **registreert dat een mens het deed** |
+| `servicemachtiging` | `magNu()` heeft twee aanroepers, en die openen een BEELD (`organisatie.stand`) |
+| `ai-mandaat` | `magZelfstandig()` heeft één aanroeper, in `kantoor/geldketen/klaarzet.js` — klaarzetten |
+| `sepa-machtiging` | keurt |
+| `fiscaal-mandaat` | beoordeelt geldigheid |
+
+> **In dit huis betekent *namens iemand handelen* vandaag: beoordelen, openen,
+> klaarzetten en vastleggen — nooit uitvoeren.** De uitvoering doet een mens, of
+> de principal zelf.
+
+Dat is volledig in lijn met wat dit huis elders hardop kiest (`GELD.md`: geld
+wordt klaargezet en een mens voert uit; `FABRIC.md`: wat een tweede persoon
+bereikt bevestigt een mens). De keten uit 10.5 vraagt dus niet om een
+implementatie maar om een **product- en architectuurbesluit dat er nog niet is**.
+
+### 11.4 Drie wegen, en geen ervan is een slice
+
+1. **De cel openen** — de brug een methode geven die gedeelde grond raakt. Dat
+   doorbreekt de grens waar de hele App Store op staat, inclusief de zes
+   machtigingen die met opzet niet bestaan. Groot besluit, geen slice.
+2. **`vertegenwoordiging` laten uitvoeren** — `handel()` een echte onderliggende
+   capability laten aanroepen. Dan bestaat de vergelijking van 11.1 meteen (de
+   cliënt kan die capability zelf ook), en profiel 1 uit 10.2 is haalbaar omdat
+   alles in-process is. Dit is de kortste weg naar een echt onderwerp, en het
+   raakt geen bestaande grens — maar het verandert wel wat een machtiging IS:
+   van een vastgelegde toestemming naar een uitvoerbare.
+3. **Wachten tot een domein er zelf om vraagt.** Niets bouwen; de invariant staat
+   opgeschreven en wordt scherp zodra er ergens een uitvoerend mechanisme
+   ontstaat.
+
+Wat er **niet** moet gebeuren is een `X_TEST_VERTEGENWOORDIGING` — een werkwoord
+dat alleen bestaat om de keten groen te krijgen. Dan is er een prachtige keten
+die niets bewijst over echte capabilities, en dat is precies de vorm die
+`BEWIJSMACHINE.md` par. 6a een geldige uitslag van het verkeerde experiment
+noemt.
+
+### 11.5 Wat deze meting wél heeft opgeleverd
+
+De drie besluiten van par. 10 staan, en ze zijn nu preciezer geadresseerd:
+besluit 1 en 2 wachten op een uitvoerende levensloop, besluit 3 op een
+onderliggende handeling — en alle drie wachten op hetzelfde, namelijk op weg 1
+of weg 2 hierboven. Dat is geen vertraging maar het verschil tussen een besluit
+dat af is en een besluit dat nog een onderwerp moet krijgen.

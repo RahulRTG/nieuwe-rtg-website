@@ -2,7 +2,8 @@
    HET LEERDOSSIER -- zeven treden, chronologisch, en met opzet geen niveau.
 
    Foundation Connect wil onderscheid maken tussen gezien, gelezen, begrepen,
-   geoefend, toegepast, gemaakt en onderwezen. Vijftig video's over
+   geoefend, toegepast, gemaakt, aangeboden, bereikt, gebruikt en doorgegeven.
+   De ladder staat in ./tredenlijst.js en niet hier. Vijftig video's over
    programmeren bekijken is geen programmeren; een werkende applicatie bouwen
    is veel sterker bewijs. Dat klopt, en het is ook precies de plek waar zo'n
    laag omslaat in het tegenovergestelde van wat hij belooft.
@@ -16,7 +17,7 @@
    een, en `test/connect.test.js` de tweede.
 
    DE TREDEN ZIJN GEEN TRAP. Iemand staat niet OP een trede -- hij heeft regels
-   die er een dragen, per ONDERWERP. Voor koken kan `onderwezen` er staan en
+   die er een dragen, per ONDERWERP. Voor koken kan `doorgegeven` er staan en
    voor breuken `gezien`, en dat zijn geen twee standen van dezelfde mens. De
    hoogste trede wordt daarom AFGELEID per onderwerp en nooit bewaard, en
    nergens over onderwerpen heen opgeteld: een getal over alle onderwerpen IS

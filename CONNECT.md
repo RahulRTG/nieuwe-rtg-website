@@ -257,8 +257,8 @@ de helft van de betekenis.
 
 **Elke regel draagt zijn graad, en die is niet te kiezen maar volgt uit wie hem
 schrijft.** `toegepast` zegt de mens zelf en blijft `vermoed`; `gemaakt` heeft een
-ding achter zich en is `gemeten`; `onderwezen` ontstaat doordat een **ander** zei
-dat hij geholpen is, en is `bewezen`. Wie die drie op een hoop gooit, bouwt een
+ding achter zich en is `gemeten`; `gebruikt` en `doorgegeven` ontstaan doordat een
+**ander** er aantoonbaar iets mee deed, en zijn `bewezen`. Wie die drie op een hoop gooit, bouwt een
 portfolio waarin *"ik heb dit toegepast"* er hetzelfde uitziet als *"iemand zei
 dat ik hem hielp"* — en alleen dat laatste is buiten Foundation iets waard.
 
@@ -300,10 +300,12 @@ Vier regels, en de eerste is de hele reden dat de laag bestaat:
    `score` toevoegt, heeft de like teruggebouwd met zes ingangen.
 2. **Een naklank hangt aan een DING, nooit aan een mens.** Zodra dit op een
    persoon kan staan, is het een reputatiecijfer.
-3. **`geholpen` is de enige met een gevolg buiten de module**: hij schrijft bij de
-   maker de trede `onderwezen`. Daarom loopt hij langs een haak en niet langs een
-   tweede schrijver — een dossierregel die hier zou ontstaan, omzeilt de grendel
-   uit par. 3.
+3. **Vijf van de zes hebben een gevolg buiten de module**: ze schrijven bij de
+   maker een OVERDRACHTStrede (`gebruikt`, of `doorgegeven`), en welke dat is
+   beslist `naklanklijst.js`. `mooi` is de enige zonder — juist omdat hij het
+   vaakst gegeven wordt. Ze lopen langs een haak en niet langs een tweede
+   schrijver: een dossierregel die hier zou ontstaan, omzeilt de grendel uit
+   par. 3.
 4. **De maker ziet aantallen en geen namen.** Een lijst namen onder een bijdrage
    is een volgerslijst met een ander etiket.
 
@@ -451,6 +453,57 @@ elkaar legt, geen zoekweg op makers, geen volgerslijst.
    `kern/handlerpoorten/buiten.js` verklaard als *"gasten eruit"*, en een
    zachtere variant onder dezelfde naam holt een contract uit waar drie andere
    routes op leunen.
+10. **Een bron is een verwijzing en geen opmerking.** Wat een mens zelf als
+    `bron` meestuurt moet een id zijn dat deze laag had kunnen uitgeven —
+    `<herkomst>:<rest>`, met de herkomsten gelezen uit de bronmodules zelf. Zie
+    par. 8a voor waarom die regel er is.
+
+---
+
+## 8a. Wat de gluurronde vond, en wat hij niet vond
+
+`scripts/gluurronde.js` (15 september 2026) meldde vier lekken op
+`POST /api/rtf/connect/dossier`: *"A stuurde een identificator van B en kreeg
+gegevens van B terug"*. Die ronde **had gelijk over wat hij zag en ongelijk over
+wat het betekende**, en beide helften zijn de moeite waard.
+
+**Er lekte niets.** De actieve ronde zet alle id-velden op een merker van B;
+`/open` schrijft die merker als `bron` in het dossier van **A**, en `/dossier`
+geeft hem daarna terug. De detector sluit alleen het id uit dat in *die* aanroep
+is meegestuurd, niet de merkers uit eerdere aanroepen. Nagetrokken bleef het
+dossier van B leeg: A las een tekenreeks terug die A zelf had ingestuurd. Er
+loopt geen enkel gegeven van B naar A.
+
+**Maar hij wees iets echts aan.** `bron` nam elke vrije tekst aan, bewaarde hem
+ongezien en gaf hem onveranderd terug. Via `/api/connect/noteer` kon een mens
+daarmee *"Jan de Vries woont in Zwolle"* in zijn eigen dossier zetten: de naam
+van iemand anders, in een bak zonder bewaartermijn voor zulke gegevens. Dat is
+precies het pad dat `scripts/afleidbaar.js` meet — een merker naast een sleutel,
+samen terug te voeren op een mens.
+
+De reparatie staat in `kern/connect/verwijzing.js`. Elke ontdekking die deze laag
+uitgeeft draagt haar herkomst in haar id (`herkomst + ':' + id`, zie
+`ontdekking.js`), dus een bron van een mens moet een verwijzing zijn **die deze
+laag had kunnen uitgeven**. Drie dingen daar niet wegpoetsen:
+
+- **De zeef belooft niet dat het ding bestaat.** Dat herkomst en vorm kloppen,
+  maakt van `leerstof:bestaatniet` geen les. Die sterkere vraag is een
+  opzoeking, en die staat waar hij hoort — bij de naklank, die de maker opzoekt
+  en weigert als hij het ding niet kan plaatsen.
+- **Hij raakt twee plekken en niet meer**: `open()` en `noteer()` waar
+  `door === 'zelf'`. Geen enkele trede met `doorWie: 'zelf'` heeft `bronNodig`,
+  dus de zeef weigert niets wat de tabel toestaat, en interne schrijvers met hun
+  eigen bronvorm (`naklank:<item>:<trede>`) blijven ongemoeid.
+- **De herkomsten worden gelezen en niet overgetypt** (LAT.md regel 4). Toets 36
+  zakt zodra iemand een bron hernoemt zonder dat de zeef meebeweegt.
+
+En de vondst die er gratis bij kwam: de toets gebruikte `id: 'les:1'` terwijl een
+echte leerstof-id `leerstof:rekenen.g6.omtrek-opp` heet. **De fixture hield zich
+aan de vorm die de code aannam in plaats van aan die van de bron** — dezelfde
+fout als in MENSNETWERK.md par. 6, en hij kwam hier boven doordat de nieuwe zeef
+hem weigerde. Een meter die iets vindt dat geen enkele toets zag, is de meter
+waard; een meter die iets vindt en daarbij de verkeerde conclusie trekt, is het
+nog steeds — mits iemand de conclusie natrekt in plaats van hem over te nemen.
 
 ---
 

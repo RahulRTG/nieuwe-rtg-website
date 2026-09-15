@@ -183,11 +183,11 @@ gesorteerd -- zodra elke motor een getal levert en de hoogste wint, is er weer
 één algoritme met een gewichtenvector die niemand kan lezen; elke plek draagt
 daarom zijn reden in WOORDEN, en vijf motoren melden hardop dat ze niet kijken
 (`KAARTEN.md` par. 6). **Het leerdossier is een ledger en nooit een niveau**: de
-zeven treden zijn geen trap waar iemand OP staat, de hoogste wordt afgeleid per
+tien treden zijn geen trap waar iemand OP staat, de hoogste wordt afgeleid per
 ONDERWERP en nergens opgeteld (een getal over alle onderwerpen ÍS een niveau), en
 elke regel draagt een graad die volgt uit WIE hem schrijft -- `toegepast` is
-`vermoed`, `gemaakt` `gemeten`, en `onderwezen` `bewezen` omdat alleen een ANDER
-hem kan zetten. Dat is meteen de reden dat hij onder de 18 mag bestaan: de vier
+`vermoed`, `gemaakt` `gemeten`, en `gebruikt` en `doorgegeven` zijn `bewezen`
+omdat alleen een ANDER ze kan zetten. Dat is meteen de reden dat hij onder de 18 mag bestaan: de vier
 voorwaarden van het besluit van 14 september staan er als code en niet als
 belofte, en valt er één weg dan geldt `progressieMag` weer. **De naklank heeft
 zes soorten en met opzet geen totaal** -- `signalen` was trouwens bezet (13

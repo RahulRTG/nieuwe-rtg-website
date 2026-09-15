@@ -24,7 +24,7 @@
    - naklank krijgt de haak `bijHelp` van het LEERDOSSIER mee, en niet
      andersom. Wie iemand helpt, krijgt daar een dossierregel van -- maar de
      schrijfgrendel (`doorWie`) hoort bij het dossier. Zou naklank zelf
-     schrijven, dan kan iedereen via die weg zijn eigen `onderwezen` zetten.
+     schrijven, dan kan iedereen via die weg zijn eigen `gebruikt` zetten.
    - de mixer krijgt zijn BRONNEN mee en kiest ze niet zelf, om dezelfde reden
      als kern/levensgraaf/graaf.js: een motor die zijn eigen brandstof kiest,
      kan er maar een soort verstoken.
@@ -56,17 +56,17 @@ function maakConnect(ctx) {
   const dossier = require('./leerdossier')({ opslag, save, crypto });
   const horizon = require('./horizon')({ opslag, save });
 
-  /* De haak: een `geholpen` van iemand anders wordt bij de MAKER een regel op
-     de trede `onderwezen`. `door: 'eenAnder'` is geen formaliteit -- het is
-     precies het woord waarop leerdossier.js zijn grendel zet. */
-  /* `makerVan` zoekt op van WIE een stuk werk is. Vandaag geeft hij altijd
-     niets terug, en dat is een eerlijke stand en geen vergeten bedrading: geen
-     van de twee aangesloten bronnen draagt een maker -- leerstof is van dit
-     huis, een buurtactiviteit van een afdeling. Zolang dat zo is, wordt een
-     `geholpen` wel geteld maar ontstaat de trede `onderwezen` niet, met de
-     reden in het antwoord. Wie hier ooit een bron met makers aansluit
-     (kern/mediaos/wekken.js kent `nieuwWerk(key, ...)`), geeft die resolver
-     hier mee en de lus sluit vanzelf.
+  /* De haak: een naklank van iemand anders wordt bij de MAKER een regel op een
+     OVERDRACHTStrede -- welke, beslist ./naklanklijst.js en niet deze plek.
+     `door: 'eenAnder'` is geen formaliteit: het is precies het woord waarop
+     leerdossier.js zijn grendel zet. */
+  /* `makerVan` zoekt op van WIE een stuk werk is, en sinds 15 september 2026 is
+     hij ECHT bedraad: kern/mediaos/werkherkomst.js, het register waar vijf
+     domeinen via `nieuwWerk()` zelf vertellen dat deze maker dit heeft gemaakt.
+     Draait deze laag zonder kern/mediaos (zoals in een unittoets), dan geeft hij
+     niets terug -- en dan wordt een naklank wel geteld maar ontstaat er geen
+     regel bij de maker, met de reden in het antwoord. Dat is een eerlijke stand
+     en geen vergeten bedrading.
 
      HIJ STAAT ER ALS FUNCTIE EN NIET ALS `null`, want dan zou naklank.js twee
      takken moeten kennen. Nu is er een tak, en het antwoord zegt waarom hij

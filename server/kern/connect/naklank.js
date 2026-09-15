@@ -29,8 +29,8 @@
 
    3. `geholpen` IS DE ENIGE MET EEN GEVOLG BUITEN DEZE MODULE. Wie hem geeft,
       zegt: ik ben hierdoor geholpen. Dat schrijft een regel in het dossier van
-      de MAKER op de trede `onderwezen` -- de enige trede die een mens niet zelf
-      kan zetten (./leerdossier.js). Daarom loopt hij langs de haak `bijHelp` en
+      de MAKER op een OVERDRACHTStrede -- treden die een mens niet zelf kan
+      zetten (./leerdossier.js). Daarom loopt hij langs de haak `bijHelp` en
       niet langs een tweede schrijver: een dossierregel die hier zou ontstaan,
       omzeilt de grendel die dat bestand juist heeft.
 
@@ -113,7 +113,7 @@ module.exports = ({ opslag, save, bijOverdracht, makerVan }) => {
     /* De enige uitgang naar een andere module, en hij loopt via een HAAK die de
        aanroeper meegeeft. Zou deze module zelf in het dossier schrijven, dan
        had zij de schrijfgrendel van leerdossier.js omzeild en kon iedereen via
-       deze weg zijn eigen `onderwezen` zetten. */
+       deze weg zijn eigen `gebruikt` zetten. */
     let dossier = null, dossierReden = null;
     if (!s.trede) {
       /* `mooi` komt hier terecht, en met opzet. Waardering is AANDACHT, en wij

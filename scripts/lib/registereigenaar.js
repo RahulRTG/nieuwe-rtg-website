@@ -53,6 +53,7 @@ const EIGENAAR = {
       'Precies daarom kon een nieuw script hem stil overschrijven zonder dat een schrijverscan iets zag.' },
 
   /* De lagen die in deze tak zijn gebouwd. */
+  'IDEMIDENTITEIT.json': { schrijver: 'scripts/idemidentiteit.js' },
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },
   'VERBAND.json': { schrijver: 'scripts/verband.js' },
   'GELDING.json': { schrijver: 'scripts/gelding.js' },

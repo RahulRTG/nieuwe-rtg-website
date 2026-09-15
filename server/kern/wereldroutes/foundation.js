@@ -4,6 +4,11 @@
 'use strict';
 
 module.exports = [
+  /* Foundation Connect (CONNECT.md): het ontdeknetwerk van FoundationOS, op
+     het hoogste niveau en niet onder /apps/foundation/ -- net als lab, labpas
+     en livinglab onderaan. De lijst staat op alfabet, dus `connect` komt vóór
+     `foundation/`; test/appwereldcatalogus.test.js bewaakt die sortering. */
+  '/apps/connect.html',
   '/apps/foundation/agenda.html',
   '/apps/foundation/arena.html',
   '/apps/foundation/babyboek.html',

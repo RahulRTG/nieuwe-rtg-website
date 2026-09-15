@@ -143,10 +143,9 @@ Object.assign(kern, require('../kern/foodcourt').maakFoodcourt({ db, save, crypt
    kernlaag7) en optioneel. */
 Object.assign(kern, require('../kern/reisbureau').maakReisbureau({ db, save, crypto, anthropic, accounts,
   visumtaakVan: () => kern.visumtaak, meldLidVan: () => kern.meldLid }));
-/* De geldgebeurtenis van een reis: een boeking, veel herkomstrijen. Waarom,
-   staat in de kop daar. `pay` is laat gebonden. */
+/* De geldgebeurtenis van een reis. Waarom, staat in de kop daar. */
 Object.assign(kern, require('../kern/reisbureau-betaling').maakReisbetaling({
-  db, save, crypto, payVan: () => kern.pay }));
+  db, crypto, payVan: () => kern.pay, reisbureauVan: () => kern.reisbureau }));
 /* Het REISAANBOD (kern/reisaanbod.js): de enige schrijver van partnerTrips, de
    bak die het reisbureau hierboven leest. Waarom die schrijver moest bestaan
    staat in de kop daar; de balie zit in routes/kantoren/reizen.js. */

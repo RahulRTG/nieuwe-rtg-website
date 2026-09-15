@@ -6,24 +6,25 @@
      reiscomponent -> herkomst -> commerciele geldgebeurtenis -> pay-geldrij
        -> economic provenance -> doorbelasting -> bijdragebasis
 
-   EEN BOEKING EN VEEL HERKOMSTRIJEN, en dat is geen implementatiedetail. Het lid
-   betaalt EEN bedrag en dat is EEN beweging in het grootboek; waar dat bedrag
-   economisch uiteenvalt is een tweede vraag met een ander antwoord. Wie voor elk
-   onderdeel een eigen boeking zou maken, verzint bewegingen die niet hebben
+   EEN BOEKING EN VEEL HERKOMSTRIJEN. Het lid betaalt EEN bedrag, dus EEN beweging
+   in het grootboek; waar dat bedrag economisch uiteenvalt is een tweede vraag.
+   Wie per onderdeel een boeking maakt, verzint bewegingen die niet hebben
    plaatsgevonden -- het hotel heeft op dat moment nog niets ontvangen.
 
-   RTG INT EN KEERT NIET UIT. De vervolgbetaling aan het hotel, de vervoerder en
-   de belastingdienst wordt hier KLAARGEZET en nooit uitgevoerd: GELD.md is daar
-   onvoorwaardelijk over, en `uitgevoerd: false` blijft staan tot een mens hem
-   langs kern/pay uitvoert. Dat is exact het voorbeeld waarop `herkomst:
-   'partner'` sneuvelde: de klant betaalt, RTG int, het hotel is de eigenaar, en
-   die drie staan op dezelfde rij zonder elkaar te overschrijven.
+   RTG INT EN KEERT NIET UIT. Wat aan derden toekomt wordt KLAARGEZET met
+   `uitgevoerd: false` tot een mens hem langs kern/pay uitvoert (GELD.md).
 
-   EN HIJ WEIGERT LIEVER DAN DAT HIJ RAADT. Een reis zonder samenstelling
-   (twee van de drie in de zaaiset) levert hier geen betaling met een onbekende
-   herkomst op maar een WEIGERING met de reden. Een geldrij die `onbekend`
-   draagt terwijl de reis gewoon niet is uitgesplitst, ziet er in de meter uit
-   als een meting en is een gok. */
+   HIJ GRAAIT NIET IN DE BAK VAN DE BUURMAN. `reisAanvragen` en `partnerTrips`
+   zijn van kern/reisbureau.js; deze laag vraagt ze daar op en laat de eigenaar
+   zijn eigen rij bijwerken (`markeerBetaald`, die een tweede betaling weigert).
+   Een verklaarde eigenaar via kern/eigencollectie.js is dit nog NIET: zes
+   bestanden raken elk van beide collecties aan, dus dat zakt vandaag op
+   keuringsregel 63. Eigen ronde, met de reden in NORM.json.
+
+   EN HIJ WEIGERT LIEVER DAN DAT HIJ RAADT. Een reis zonder samenstelling levert
+   geen betaling met een onbekende herkomst op maar een WEIGERING met de reden:
+   een geldrij die `onbekend` draagt terwijl de reis simpelweg niet is
+   uitgesplitst, ziet er in de meter uit als een meting en is een gok. */
 'use strict';
 
 const { geldrijenVoor } = require('./reisbureau-geldrijen');
@@ -33,15 +34,12 @@ const { geldrijenVoor } = require('./reisbureau-geldrijen');
    geldstromen op een positie maken elk saldo onverklaarbaar. */
 const KAS = 'rtg:reisbureau';
 
-function maakReisbetaling({ db, save, crypto, payVan, nu }) {
+function maakReisbetaling({ db, crypto, payVan, reisbureauVan, nu }) {
   const klok = nu || (() => new Date().toISOString());
-  /* EEN BEWAARDE RIJ HEEFT EEN EIGEN IDENTITEIT, en dat is hier geen formaliteit.
-     Zonder id kan de klaargezette uitkering alleen naar de REIS wijzen en niet
-     naar de herkomstrij die hij afwikkelt -- en juist dat is wat een mens nodig
-     heeft die straks het deel van het hotel overmaakt en moet kunnen aantonen
-     welke cent hij daarmee afboekt. (Het is ook wat scripts/objectmodel.js als
-     kenmerk van een bewaarde vorm leest: vier velden en een id. Dat die lezer en
-     deze reden samenvallen is geen toeval -- de heuristiek codeert de eigenschap.) */
+  /* EEN BEWAARDE RIJ HEEFT EEN EIGEN IDENTITEIT. Zonder id kan de klaargezette
+     uitkering alleen naar de REIS wijzen en niet naar de herkomstrij die hij
+     afwikkelt -- precies wat een mens nodig heeft die het deel van het hotel
+     overmaakt en moet aantonen welke cent hij afboekt. */
   const nieuwId = (voorvoegsel) => voorvoegsel + '-' +
     (crypto ? crypto.randomBytes(5).toString('hex').toUpperCase()
             : Math.abs(Date.now() % 1e10).toString(16).toUpperCase());
@@ -52,13 +50,12 @@ function maakReisbetaling({ db, save, crypto, payVan, nu }) {
   /* Laat gebonden, zoals de rest van deze kern: pay wordt in een latere laag
      gemount, en zonder pay hoort dit te weigeren en niet te doen alsof. */
   const pay = () => (payVan && payVan()) || null;
-
-  function aanvraagVan(ref) {
-    return (db.data.reisAanvragen || []).find(a => a.ref === String(ref || '')) || null;
-  }
+  const bureau = () => (reisbureauVan && reisbureauVan()) || null;
 
   async function betaal(sess, codenaam, ref) {
-    const a = aanvraagVan(ref);
+    const rb = bureau();
+    if (!rb) return { status: 503, error: 'Het reisbureau is niet beschikbaar.' };
+    const a = rb.aanvraagVan(ref);
     if (!a) return { status: 404, error: 'Aanvraag niet gevonden.' };
     if (a.customerKey !== sess.key) return { status: 404, error: 'Aanvraag niet gevonden.' };
     /* ALLEEN EEN BEVESTIGDE REIS. Een aanvraag is geen verplichting: tot een
@@ -70,7 +67,7 @@ function maakReisbetaling({ db, save, crypto, payVan, nu }) {
     }
     if (a.betaald) return { ok: true, alBetaald: true, betaling: a.betaald };
 
-    const trip = (db.data.partnerTrips || []).find(t => t.id === a.tripId);
+    const trip = rb.tripVan(a.tripId);
     const opbouw = geldrijenVoor({ trip, personen: a.personen, valuta: 'EUR' });
     if (!opbouw.ok) {
       /* WEIGEREN MET DE REDEN, en dat is hier een grens en geen gat. Zonder
@@ -93,17 +90,11 @@ function maakReisbetaling({ db, save, crypto, payVan, nu }) {
        naar een boeking wijst die niet bestaat, is een bewering zonder bewijs. */
     const metBoeking = geldrijenVoor({ trip, personen: a.personen, boekingId: b.boeking.id, valuta: 'EUR' });
     const stempel = klok();
-    /* DE BEWAARDE RIJ WORDT VELD VOOR VELD OPGESCHREVEN EN NIET MET EEN SPREAD,
-       en dat is geen stijl. Hier stond `{ ref, at, ...r }`, en daarmee was de
-       herkomst onzichtbaar voor de meter die er nu juist voor bestaat:
-       scripts/doorbelasting.js leest BEWAARDE vormen statisch, en door een
-       spread kijkt geen enkele lezer heen. De hele migratie bewoog de ratel
-       daardoor geen streep.
-
-       Het is bovendien dezelfde richting als AI-CONTEXT-01: bij een spread
-       passeert elk NIEUW veld vanzelf, bij een verklaarde lijst blijft het
-       buiten tot iemand het er bewust bij zet. Bij een AI-context is dat een
-       lek; hier is het een blinde vlek in de verantwoording. */
+    /* VELD VOOR VELD EN NIET MET EEN SPREAD. Hier stond `{ ref, at, ...r }`, en
+       daarmee was de herkomst onzichtbaar voor scripts/doorbelasting.js: die
+       leest BEWAARDE vormen statisch en kijkt niet door een spread heen. Zelfde
+       richting als AI-CONTEXT-01 -- bij een spread passeert elk nieuw veld
+       vanzelf, bij een verklaarde lijst niet. */
     for (const r of metBoeking.rijen) {
       const rijId = nieuwId('RGH');
       eigen.bak('reisGeldrijen').push({
@@ -144,9 +135,13 @@ function maakReisbetaling({ db, save, crypto, payVan, nu }) {
       });
     }
 
-    a.betaald = { at: stempel, boeking: b.boeking.id, centen: opbouw.totaalCenten, valuta: 'EUR' };
-    save();
-    return { ok: true, betaling: a.betaald, rijen: metBoeking.rijen.length };
+    /* De EIGENAAR schrijft de betaling op zijn eigen rij. Mislukt dat (een
+       tweede betaling die er tussendoor kwam), dan zegt hij dat en verzint deze
+       laag geen succes. */
+    const gezet = rb.markeerBetaald(a.ref, {
+      at: stempel, boeking: b.boeking.id, centen: opbouw.totaalCenten, valuta: 'EUR' });
+    if (gezet.error) return { status: gezet.status || 409, error: gezet.error };
+    return { ok: true, betaling: gezet.betaald, rijen: metBoeking.rijen.length };
   }
 
   /* De herkomstrijen van EEN reis, voor de meter en voor het kantoor. */

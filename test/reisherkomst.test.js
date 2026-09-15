@@ -180,6 +180,35 @@ test('10. de vijfde dienst bestaat, is LEEG, en raakt de 0%-invariant niet', () 
   }
 });
 
+test('10a. GRENDEL: zolang het tarief OPEN is, staat de berekening op NIET ACTIEF', () => {
+  /* Besluit van de eigenaar, 15 september 2026. De commerciele beslissing over
+     een franchisepercentage is NIET genomen, en deze toets zorgt dat een
+     volgende sessie hem niet half kan afmaken.
+
+     WAAROM DIT GEEN ZOEKTOCHT NAAR `0.20` IS. Dat getal komt in een codebase
+     van deze omvang overal legitiem voor (een kansverdeling, een marge, een
+     opacity), dus zo'n greep levert onzintreffers en went binnen een week. Wat
+     hier wordt afgedwongen is de KOPPELING: een tarief dat nog openstaat en een
+     berekening die al draait, kunnen niet allebei waar zijn. Wie het percentage
+     invult moet dus ook de berekening aanzetten, en dat is precies het moment
+     waarop een mens ernaar hoort te kijken. */
+  for (const [id, soort] of Object.entries(vergoeding.SOORTEN)) {
+    if (soort.tarief !== vergoeding.OPEN) continue;
+    assert.equal(soort.berekening, vergoeding.NIET_ACTIEF,
+      id + ' heeft een tarief dat nog OPEN staat en een berekening die niet op NIET ACTIEF staat. ' +
+      'Dat is de helft van een besluit: er wordt iets uitgerekend over een grondslag die niemand ' +
+      'heeft vastgesteld. Zet het tarief, of zet de berekening uit -- maar niet allebei half.');
+    assert.equal(vergoeding.isActief(id), false,
+      id + ' telt als actief terwijl zijn tarief nog OPEN is');
+  }
+  /* En de grendel kan uitslaan: een soort met een tarief en een draaiende
+     berekening hoort er gewoon doorheen te komen, anders bewaakt hij niets maar
+     verbiedt hij alles. */
+  assert.equal(vergoeding.isActief('payment_service'), true,
+    'de betaaldienst heeft een grondslag en een berekening en hoort actief te zijn; staat hij ' +
+    'hier op false, dan meet deze grendel niet de koppeling maar iets anders');
+});
+
 test('11. geen enkele soort draagt een percentage over omzet', () => {
   for (const [id, s] of Object.entries(vergoeding.SOORTEN)) {
     assert.equal(s.overOmzet, false, id + ' neemt een aandeel in andermans omzet; dat is een commissie');

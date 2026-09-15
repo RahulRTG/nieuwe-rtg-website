@@ -12,7 +12,7 @@
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 341,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 529,
+    "dbDeuren": 528,
     "dbDeurenSchrijvend": 275,
     "dekkingPct": 82,
     "dekkingWaargenomenPct": 100,
@@ -33,7 +33,7 @@
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
     "keuringDubbeling": 178,
-    "keuringOmvang": 327,
+    "keuringOmvang": 328,
     "keuringScheef": 18,
     "keuringStuk": 0,
     "keuringTeGroot": 14,
@@ -116,6 +116,25 @@
     "idemHandwerkGeenVergelijking": 3
   },
   "notities": [
+    {
+      "datum": "2026-09-15",
+      "soort": "aflossing",
+      "sleutel": "dbDeuren",
+      "van": 529,
+      "meter": "dbDeuren 529 -> 528",
+      "reden": "De schuld van een uur eerder is afgelost langs de weg die er toen bij stond. kern/reisbureau-betaling.js las `db.data.reisAanvragen` en `db.data.partnerTrips` rechtstreeks en schreef `a.betaald` op een rij die hij niet bezit; hij vraagt ze nu op bij de eigenaar (`aanvraagVan`, `tripVan`) en laat die zijn eigen rij bijwerken (`markeerBetaald`). De tand wordt aangedraaid en niet blijven staan: dit is de teller die over een ARCHITECTUURgrens gaat, en die hoort niet stil terug te kunnen. De prijs stond ernaast en is betaald in keuringOmvang.",
+      "waarheen": "De volgende stap is groter dan deze teller: een VERKLAARDE eigenaar voor `reisAanvragen` en `partnerTrips` via kern/eigencollectie.js. Elk van beide wordt vandaag door zes bestanden aangeraakt, dus dat is een eigen ronde -- en pas daarna is `dbDeuren` voor dit domein werkelijk op nul te brengen."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "keuringOmvang",
+      "van": 327,
+      "vervalt": "2026-12-15",
+      "meter": "keuringOmvang 327 -> 328",
+      "reden": "server/kern/reisbureau.js groeide van 8647 naar 9540 byte en komt daarmee in de waarschuwingsband onder 10 kB; de HARDE grens haalt hij niet (700 byte ruimte). De groei is de deur die de eigendomsgrens herstelt: `aanvraagVan`, `tripVan` en `markeerBetaald`, zodat kern/reisbureau-betaling.js niet langer in `db.data.reisAanvragen` en `db.data.partnerTrips` graait. Die ruil is bewust -- dbDeuren ging er 529 -> 528 van omlaag, en dat is de teller die over een ARCHITECTUURgrens gaat in plaats van over een maat. Twee trimrondes zijn al gedaan; wat er staat is de reden waarom de deur bestaat, en die weghalen maakt de volgende lezer niet wijzer. Zelfde vorm als de notitie over kern/stuur/lusstap.js van 11 september: de groei is commentaar en geen code.",
+      "waarheen": "De echte oplossing is groter dan deze maat: `reisAanvragen` en `partnerTrips` worden elk door ZES bestanden aangeraakt, dus een verklaarde eigenaar via kern/eigencollectie.js zakt vandaag op keuringsregel 63 (een schrijver buiten de eigenaar). Als die ronde komt, verhuizen deze drie functies mee naar het opslagcontract en valt dit bestand vanzelf terug."
+    },
     {
       "datum": "2026-09-15",
       "soort": "aflossing",

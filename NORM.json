@@ -12,7 +12,7 @@
     "bronBlindeBestanden": 3,
     "browserpoortToetsen": 344,
     "carriereDomeinenGemeten": 15,
-    "dbDeuren": 528,
+    "dbDeuren": 531,
     "dbDeurenSchrijvend": 275,
     "dekkingPct": 82,
     "dekkingWaargenomenPct": 100,
@@ -28,7 +28,7 @@
     "gluurOnbewaakt": 0,
     "inlineStijlAttributen": 4638,
     "kernBreedsteBestand": 71,
-    "kernBreedte": 1581,
+    "kernBreedte": 1597,
     "kernGedeeld": 238,
     "kernOngebruikt": 0,
     "keuringDekkingAdvies": 52,
@@ -45,7 +45,7 @@
     "lussenZonderOverlapRem": 3,
     "meetleerBlind": 8,
     "metersOngeijkt": 0,
-    "metingenZonderRatel": 50,
+    "metingenZonderRatel": 51,
     "onbewaakt": 0,
     "ratelTanden": 126,
     "registersUitVuileBoom": 1,
@@ -123,6 +123,34 @@
     "veranderbereikZonderBereik": 828
   },
   "notities": [
+    {
+      "soort": "structureel",
+      "sleutel": "dbDeuren",
+      "van": 528,
+      "meter": "dbDeuren 528 -> 531",
+      "reden": "PR #296 voegt drie eigen opslagmodules voor Connect toe: horizon.js, leerdossier.js en naklank.js. Ze lezen hun eigen namespace in db.data; de bestaande opslag- en savegrenzen blijven staan. Gemeten op de gecombineerde bron na 1e0dc04de; dbDeurenSchrijvend bleef 275. Dit zijn drie domeineigen lezers en geen nieuwe databaseverbindingen.",
+      "waarheen": "De eigendom blijft bij server/kern/connect. test/connect.test.js en test/connect-routes.e2e.js bewaken accountisolatie, ongewijzigde leesroutes en de gezinsgrens. Verwijderen van een opslagmodule verlaagt deze meter.",
+      "datum": "2026-09-15"
+    },
+    {
+      "soort": "structureel",
+      "sleutel": "kernBreedte",
+      "van": 1581,
+      "meter": "kernBreedte 1581 -> 1597",
+      "reden": "De routes van Foundation Connect uit PR #296 lezen zestien nieuwe kern-eigenschappen. GRENZEN.json verklaart ze binnen connect en de bestaande domeingrens bewaakt het gebruik. De gecombineerde telling is 1597, gemeten met scripts/norm.js; kernGedeeld groeit hierdoor niet. Dit is de concrete interface van de nieuwe functie.",
+      "waarheen": "server/routes/connect.js en server/opzet/kernlaag7-ruimtes.js zijn de aansluitpunten. De 22 Connect-routes zijn tegen een echte server getest, inclusief weigeringen en herhaalde verzoeken.",
+      "datum": "2026-09-15"
+    },
+    {
+      "soort": "schuld",
+      "sleutel": "metingenZonderRatel",
+      "van": 50,
+      "meter": "metingenZonderRatel 50 -> 51",
+      "vervalt": "2026-12-15",
+      "reden": "CONNECTLUS.json uit PR #296 is een nieuwe beschrijvende meting van gedeelde werkwoorden en datavormen. Zij heeft een schrijver en versheidscontrole, maar nog geen aantoonbare ratel voor haar meetbereik. De samenvoeging verklaart die ontbrekende ratel expliciet; een registratie die alleen bestaat om de teller groen te maken zou niets bewaken.",
+      "waarheen": "Voeg een inhoudelijke minimumgrens voor het waargenomen domeinbereik toe aan scripts/connectlus.js of NORM, met een ijkproef die faalt wanneer een domein uit de meting verdwijnt. Tot die proef bestaat blijft dit meetbewijs zonder ratel.",
+      "datum": "2026-09-15"
+    },
     {
       "datum": "2026-09-15",
       "soort": "structureel",

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-14T23:41:07.659Z",
-    "commit": "1edf32c5",
+    "op": "2026-09-15T00:31:37.703Z",
+    "commit": "92de4a23",
     "boomVuil": false,
-    "boomAnders": 4,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -3682,6 +3682,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "idemidentiteit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/idemidentiteit.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "idemproef.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -6698,13 +6706,6 @@
       "operator": "===->!==#0",
       "gezakt": 5,
       "geprobeerd": 1
-    },
-    "rtf-labfonds-deur.test.js": {
-      "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 9,
-      "scherp": "gezakt"
     },
     "rtf-veilig.test.js": {
       "soort": "server",

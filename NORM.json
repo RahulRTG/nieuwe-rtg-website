@@ -47,7 +47,7 @@
     "metersOngeijkt": 0,
     "metingenZonderRatel": 50,
     "onbewaakt": 0,
-    "ratelTanden": 116,
+    "ratelTanden": 119,
     "registersUitVuileBoom": 1,
     "rollbackUitzonderingen": 1,
     "rolscheidingGaten": 0,
@@ -110,7 +110,10 @@
     "stilSpoor": 18,
     "stilleOpslag": 25,
     "stilSpoorAanroepen": 228,
-    "namensMechanismenGemeten": 7
+    "namensMechanismenGemeten": 7,
+    "idemVerklaard": 1,
+    "idemAfdrukVoegtNietsToe": 2,
+    "idemHandwerkGeenVergelijking": 3
   },
   "notities": [
     {
@@ -2433,7 +2436,7 @@
     "testbestanden": "2026-09-15",
     "toetsenNietGemeten": "2026-09-14",
     "inlineStijlAttributen": "2026-09-11",
-    "ratelTanden": "2026-09-14",
+    "ratelTanden": "2026-09-15",
     "metingenZonderRatel": "2026-08-18",
     "bewijsAchterstand": "2026-09-14",
     "toetsenOngevoeligPct": "2026-09-05",
@@ -2510,7 +2513,10 @@
     "stilSpoor": "2026-09-14",
     "stilleOpslag": "2026-09-14",
     "stilSpoorAanroepen": "2026-09-14",
-    "namensMechanismenGemeten": "2026-09-15"
+    "namensMechanismenGemeten": "2026-09-15",
+    "idemVerklaard": "2026-09-15",
+    "idemAfdrukVoegtNietsToe": "2026-09-15",
+    "idemHandwerkGeenVergelijking": "2026-09-15"
   },
   "uitzonderingen": [
     {

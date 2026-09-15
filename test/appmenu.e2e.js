@@ -215,6 +215,7 @@ async function openLade(page) {
     document.querySelector('.rtg-edge-menu[data-rtg-command-brug="true"]'), null,
   { timeout: 5000 }).catch(() => {});
   const edge = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]');
+  await edge.waitFor({ state: 'visible', timeout: 10000 });
   if (await edge.isVisible()) {
     await edge.click();
     if (await page.evaluate(() => !!document.querySelector('#rtgCommand').__rtgSecondScreen)) {
@@ -313,6 +314,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
                 '.rtg-edge-2-reveal,.rtg-edge-2-edge-reveal')].some(zichtbaar);
               return zichtbaar(document.getElementById('osMenuBtn')) ||
                 zichtbaar(document.querySelector('.rtg-edge-menu')) ||
+                zichtbaar(document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]')) ||
                 edgeGreep ||
                 zichtbaar(document.querySelector('#rtf-toegang-slot [data-rtf-uitweg]'));
             }, null, { timeout: 8000 });
@@ -324,6 +326,7 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
                   Number(s.opacity || 1) > 0 && r.width > 0 && r.height > 0;
               };
               return {
+                adaptive: zichtbaar(document.querySelector('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]')),
                 legacy: zichtbaar(document.getElementById('osMenuBtn')),
                 edge: zichtbaar(document.querySelector('.rtg-edge-menu')),
                 edgeGreep: [...document.querySelectorAll(
@@ -333,8 +336,8 @@ test('Rahul heeft één balk en elk app-scherm houdt een veilige systeemdeur',
               };
             });
             gemeten++;
-            if (deuren.edge && deuren.legacy) dubbeleDeuren.push(pad + ': oude hamburger naast Edge-menu');
-            if (deuren.edge && deuren.roots !== 1) dubbeleDeuren.push(pad + ': ' + deuren.roots + ' Edge-casco\'s');
+            if ([deuren.edge, deuren.adaptive, deuren.legacy].filter(Boolean).length > 1) dubbeleDeuren.push(pad + ': oude hamburger naast Edge-menu');
+            if ((deuren.edge || deuren.adaptive) && deuren.roots !== 1) dubbeleDeuren.push(pad + ': ' + deuren.roots + ' Edge-casco\'s');
           } catch (e) {
             if (new URL(page.url()).pathname === pad) menuFouten.push(pad);
           }

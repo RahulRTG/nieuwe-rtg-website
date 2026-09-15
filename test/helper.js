@@ -1338,7 +1338,6 @@ async function bankDeur(page, naam, opties) {
   /* Tijdens login wordt de gesloten Command-root door de echte werktafel
      vervangen. Een kort zichtbare gesloten root is nog geen bedienbare deur. */
   await page.waitForSelector('#rtgCommand[data-stand="open"]', { state: 'visible', timeout: 10000 });
-  const lade = page.locator('#rtgCommand .cmd-lade');
   const mobielDicht = await page.evaluate(() => matchMedia('(max-width:999px)').matches &&
     !document.getElementById('rtgCommand').classList.contains('bank-open'));
   if (mobielDicht) {
@@ -1347,8 +1346,9 @@ async function bankDeur(page, naam, opties) {
     await page.waitForFunction(() => !document.querySelector('.rtg-edge-menu') ||
       document.querySelector('.rtg-edge-menu[data-rtg-command-brug="true"]'), null,
     { timeout: 5000 }).catch(() => {});
-    const edge = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]:visible, .rtg-edge-menu[data-rtg-command-brug="true"]:visible');
-    if (await edge.isVisible()) { await edge.click(); await edgeWerkbladen(page); } else await lade.click();
+    const edge = page.locator('.rtg-adaptive-bar [data-rtg-adaptive-action="menu"]');
+    await edge.waitFor({ state: 'visible', timeout: 10000 });
+    await edge.click(); await edgeWerkbladen(page);
     await page.waitForSelector('#rtgCommand.bank-open', { timeout: 5000 });
   }
   await page.waitForFunction((n) => [...document.querySelectorAll('#rtgCommand .cmd-bankvoet button')]

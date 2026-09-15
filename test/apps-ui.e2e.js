@@ -362,8 +362,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
        ongewijzigd: #chat mag de payload nooit uitvoeren. */
     await bankDeur(page, 'Instellingen');
     await page.waitForSelector('#osCcScrim.open', { timeout: 10000 });
-    await require('./helper').edgeActies(page);
-    await page.click('[data-rtg-adaptive-source="osCcZoek"]');
+    await page.click('#osCcZoek');
     await page.waitForSelector('#osZoekScrim.open', { timeout: 10000 });
     /* EERST BEWIJZEN DAT HET PANEEL VAN DEZE KLIK OPEN IS, en pas dan typen.
 
@@ -431,8 +430,7 @@ test('Leden-app: het conciergegesprek toont een bericht veilig (geen XSS)',
     await page.waitForSelector('#askInput', { state: 'visible', timeout: 10000 });
     const payload = '<img src=x onerror="window.__xss=1">';
     await page.fill('#askInput', payload);
-    await require('./helper').edgeActies(page);
-    await page.click('[data-rtg-adaptive-source="askBtn"]');
+    await page.click('#askBtn');
     await page.waitForSelector('#chat .bubble.user', { timeout: 10000 });
     /* Hier werd gewacht om een EVENTUELE onerror de tijd te geven -- wachten op
        iets wat er juist niet hoort te zijn. Dat kan niet met "verschijnt het?",

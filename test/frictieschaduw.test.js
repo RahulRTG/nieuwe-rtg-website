@@ -8,9 +8,16 @@
    VIER DINGEN, en de eerste is de enige die er echt toe doet:
 
      1 DE SCHADUW BESLIST NIETS. Getoetst op de BRON, zoals bij ./plan.js: de
-       aanroep in kern/stuur.js staat achter een vangnet en zijn uitkomst raakt
-       `beleid.niveau` nergens aan. Zou hij dat wel doen, dan is dit geen schaduw
-       maar een tweede poort die nooit in de schaduw heeft gelopen.
+       aanroep staat achter een vangnet en zijn uitkomst raakt `beleid.niveau`
+       nergens aan. Zou hij dat wel doen, dan is dit geen schaduw maar een tweede
+       poort die nooit in de schaduw heeft gelopen.
+
+       DE BRON IS VERHUISD, en de toets wijst mee. stuurToets woont sinds de
+       mandaatpoort in kern/stuur/toets.js -- kern/stuur.js ging door de 10 KB
+       van keuringsregel 13 en is op de naad BESLISSEN/DOEN gesplitst. De toets
+       leest daarom dat bestand, en zakt als de aanroep er niet meer staat. Dat
+       laatste is met opzet: verhuist hij nog een keer, dan hoort deze toets dat
+       te merken in plaats van stil groen te blijven op een leeg bestand.
      2 HIJ KAN ALLEEN VERZWAREN. Dezelfde regel als de bodem in ./beleid.js:
        frictie mag omhoog van de omstandigheden en omlaag van niets.
      3 EEN BEDRAG ZONDER EENHEID WORDT NIET GELEZEN. COMMERCE.md heeft daar een
@@ -32,8 +39,8 @@ const { VERZWAREN, meet } = require('../scripts/frictiestuur');
 const WORTEL = path.join(__dirname, '..');
 const weger = schaduw.maakSchaduw({});
 
-test('1. DE SCHADUW BESLIST NIETS -- getoetst op de bron van kern/stuur.js', () => {
-  const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/stuur.js'), 'utf8');
+test('1. DE SCHADUW BESLIST NIETS -- getoetst op de bron van kern/stuur/toets.js', () => {
+  const bron = fs.readFileSync(path.join(WORTEL, 'server/kern/stuur/toets.js'), 'utf8');
   /* De aanroep staat als `schaduw().noteer(` en niet als `frictieschaduw.noteer(`:
      de module wordt LUI geladen, want een require bovenaan stuur.js verschoof de
      opstarttiming genoeg om test/ledenschermen.e2e.js te laten zakken. Deze toets

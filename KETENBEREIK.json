@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-15T11:35:14.511Z",
-    "commit": "eae98de8",
+    "op": "2026-09-15T15:52:18.639Z",
+    "commit": "d390153f",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/ketenbereik.js",
     "node": "v22.22.2"
   },

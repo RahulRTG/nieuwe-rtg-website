@@ -417,7 +417,9 @@
     "paktebetekenis:vast": "node scripts/paktebetekenis.js --vastleggen",
     "connectlus": "node scripts/connectlus.js",
     "connectlus:vast": "node scripts/connectlus.js --vastleggen",
-    "lusproef": "node scripts/lusproef.js"
+    "lusproef": "node scripts/lusproef.js",
+    "mandaatproef": "node scripts/mandaatproef.js",
+    "mandaatproef:vast": "node scripts/mandaatproef.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

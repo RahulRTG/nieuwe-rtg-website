@@ -446,6 +446,12 @@ const REGISTERS = [
      reden -- zodra `pakte` wordt gesplitst, beschrijft een oude uitslag een
      samenpersing die er niet meer is. */
   ['PAKTEBETEKENIS.json', 'npm run paktebetekenis:vast', 'hoeveel onderscheiden betekenissen de boolean `pakte` samenperst'],
+  /* De proef die de twee vorige metingen afsluit: komt er een muterend effect
+     voorbij de autoriteitslaag zonder gezag? Veroudert het hardst van de drie --
+     hij draait tegen een echte server EN tegen een poort die van stand kan
+     wisselen, dus een oude uitslag beschrijft een grens die er misschien niet
+     meer zo staat. */
+  ['MANDAATPROEF.json', 'npm run mandaatproef:vast', 'of een zelfstandige mutatie zonder mandaat werkelijk zonder effect blijft'],
   /* De navigatieproef staat NAAST de vijf gouden ketens en niet ertussen: hij
      meet geen keten tussen actoren maar de belofte van EEN scherm, in een echte
      browser (BETROUWBAARHEID.md par. 1). Daarom telt scripts/ketenvorm.js hem

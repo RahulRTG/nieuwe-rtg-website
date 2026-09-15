@@ -47,6 +47,22 @@ const BREED = [
      vragen hem alle drie iets. Hij hoort dus in de Integratiekamer en niet bij
      een van zijn afnemers. */
   [/\/rtgone|\/comm\b|\/gegevens|\/notifications|\/meldingen|\/push|\/stream|\/vertaal|\/translate|\/talen|\/nav\b|\/plaats\b|\/mail\b/, 'integraties', 'Integratiekamer'],
+  /* FOUNDATION CONNECT (CONNECT.md), expliciet en niet via de brede regel
+     hieronder. Die pakt `rtf` en dekt daarmee wel de gezinsdeur
+     (/api/rtf/connect/*) en niet de ledendeur (/api/connect/*) of het scherm --
+     de helft van een laag, en precies de vorm waar de kop van tabel-platform.js
+     voor waarschuwt: een regel die de routes half pakt, dekt de helft en meldt
+     zich niet. Gemeten op 15 september 2026: 26 controlepunten stonden op
+     `terugval`, wat test/magnaatwereld.test.js zag als 26 dekkingsgaten.
+
+     De kamer is Onderzoek & data en dat is dezelfde kamer als de terugval --
+     maar `toewijzing: 'regel'` in plaats van `'terugval'`, en dat verschil is
+     het hele punt van deze tabel: onbekend werk hoort niet stilletjes bij
+     Onderzoek te belanden, bekend werk hoort er met een reden. Connect is de
+     ontdek- en leerlaag van FoundationOS -- hij leest leerstof en de publieke
+     bron van de RTFoundation -- dus hij hoort bij dezelfde kamer als
+     `/leerstof` en `/leren` een regel verderop. */
+  [/\/api\/connect(?:\/|$)|\/apps\/connect\.html/, 'onderzoek', 'Onderzoek & data'],
   [/foundation|rtf|labfonds|\/lab\b|\/onderzoek|\/onderwijs|\/leerstof|\/leren|\/meet\b|\/metrics|\/voorspel|\/projectie|\/sonde|\/sat\b/, 'onderzoek', 'Onderzoek & data'],
   [/podium|theater|clips|flits|creatief|\/mediaos|\/muziek|\/sport|\/avond|\/uitgaan|\/boeken|\/galerij/, 'creatief', 'Creatief'],
 

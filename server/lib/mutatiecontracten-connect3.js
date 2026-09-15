@@ -1,11 +1,12 @@
-/* FOUNDATION CONNECT -- de mutatiecontracten, deel drie: de horizon en de kring.
+/* FOUNDATION CONNECT -- de mutatiecontracten, deel drie: het eigen werk
+   en het portfolio.
 
    Uit ./mutatiecontracten-connect2.js geknipt op de 10 kB-grens
    (keuringsregel 13), en de knip loopt langs dezelfde soort naad als de vorige:
    deel een is de ONTDEKLUS, deel twee wat een mens van zichzelf VASTLEGT, en dit
-   is wat hij INSTELT. Dat laatste is een eigen soort: de horizon en de kring
-   bewaren geen gebeurtenis maar een keuze, en de kring bewaart zelfs dat niet --
-   kern/connect/kring.js REKENT alleen.
+   gaat over zijn eigen WERK: wat hij maakte, en wat hij daarvan naar buiten zou
+   tonen. Die twee horen bij elkaar en niet bij de rest -- het portfolio is de
+   projectie van precies datgene wat `werk` binnenhaalt.
 
    De bouwstenen staan hier opnieuw en niet geimporteerd, om dezelfde reden als
    in deel twee: ./idemsleutels-eenmaal.js bewaakt dat een route niet in twee
@@ -73,57 +74,45 @@ const valtSamen = (id, toegang, hoe) => ({
 });
 
 const CONTRACTEN = {
-  /* ------------------------------------------------------------- de horizon */
-  'POST /api/connect/horizon': leest('connect.horizon', LID,
-    'de schuif en de onderwerpen die de mens ZELF heeft aangeklikt. Gesorteerd op naam en niet op ' +
-    'gewicht: een lijst van je eigen interesses op volgorde van sterkte is een ranglijst van jezelf.'),
-  'POST /api/rtf/connect/horizon': leest('connect.horizon.gezin', GEZIN,
-    'zelfde functie, gezinsdeur.'),
-  'POST /api/connect/schuif': valtSamen('connect.schuif', LID,
-    'zet een getal van 0 tot 100. Twee keer dezelfde waarde is dezelfde stand; buiten bereik weigert ' +
-    'de kern met de reden.'),
-  'POST /api/connect/signaal': {
-    mutatieId: 'connect.signaal', herkomst: 'mens',
-    /* Twee keer "meer hiervan" betekent meer dan een keer. Het loopt niet weg:
-       kern/connect/horizon.js knijpt af op +-3. */
+  /* ---------------------------------- het eigen werk en het portfolio ---- */
+  /* NIET valtSamen, en dat is een correctie die een e2e-toets afdwong: de
+     EFFECTEN zijn idempotent (beide treden zijn eenmalig per werk-id) maar het
+     ANTWOORD is het niet, want er kan werk bij zijn gekomen. Een sleutel op de
+     poort speelde binnen het dubbeltikvenster "leeg" terug aan een lid dat net
+     iets had gemaakt. Zie ./idemsleutels-connect.js voor het hele verhaal. */
+  'POST /api/connect/werk': {
+    mutatieId: 'connect.werk', herkomst: 'mens',
     semantiek: { klasse: 'nietHerhaalbaar' },
     toegang: LID, stand: 'INTENTIONALLY_NON_IDEMPOTENT',
-    waarom: 'Twee keer "meer hiervan" betekent meer dan een keer. Wie die twee samenvoegt, gooit er ' +
-      'stil een weg en noemt dat een verbetering. Het loopt niet weg: kern/connect/horizon.js knijpt ' +
-      'af op +-3, dus honderd keer drukken betekent hetzelfde als drie keer.',
-    nagekeken: OP + ': het signaal `verras` schrijft NIETS -- hij komt terug als `eenmalig` en de ' +
-      'aanroeper geeft hem door aan de mixer. Een knop die stilletjes je instelling verandert, is ' +
-      'precies de manipulatie waar deze laag tegen is. De vier andere schuiven een gewicht op, ' +
-      'begrensd op +-3.',
-    bewijs: { gemeten: 'npm run lusproef (15 september 2026): de lus is met twee leden, een gezinsbeheerder en een kindprofiel volledig gelopen -- 14 van 15 schakels gesloten en 10 van 10 storingen gehouden. Deze route is met opzet NIET samen te vatten; de reden staat in server/lib/idemsleutels-connect.js.', op: OP },
+    waarom: 'Het antwoord hangt af van wat er sinds de vorige aanroep is aangemeld, dus terugspelen zou ' +
+      'een lid zijn eigen nieuwe werk laten missen. De effecten zijn wel idempotent: `gemaakt` en ' +
+      '`aangeboden` zijn eenmalig per werk-id.',
+    nagekeken: OP + ': neemt de eigen werken over uit kern/mediaos/werkherkomst.js -- het register waar ' +
+      'vijf domeinen via nieuwWerk() zelf hebben verteld dat DEZE maker DIT heeft gemaakt. Er wordt niets ' +
+      'vastgesteld: wat hier binnenkomt stond daar al (besluit van de eigenaar, 15 september 2026: Connect ' +
+      'mag auteurschap consumeren, niet uitvinden).',
+    bewijs: { gemeten: 'npm run lusproef schakel 8 (15 september 2026): een lid maakt een clip langs ' +
+      '/api/clips/maak, kern/clips.js roept nieuwWerk() aan, en /api/connect/werk levert precies twee ' +
+      'nieuwe treden op -- gemaakt en aangeboden. Een tweede aanroep levert `nieuw: []` en `stond` met ' +
+      'diezelfde twee.', op: OP },
     afgetekend: AFGETEKEND
   },
-  'POST /api/rtf/connect/signaal': {
-    mutatieId: 'connect.signaal.gezin', herkomst: 'mens',
+  'POST /api/rtf/connect/werk': {
+    mutatieId: 'connect.werk.gezin', herkomst: 'mens',
     semantiek: { klasse: 'nietHerhaalbaar' },
     toegang: GEZIN, stand: 'INTENTIONALLY_NON_IDEMPOTENT',
-    waarom: 'Zelfde handler en zelfde begrenzing als POST /api/connect/signaal.',
-    nagekeken: OP + ': zelfde handler en zelfde begrenzing als POST /api/connect/signaal.',
-    bewijs: { gemeten: 'npm run lusproef (15 september 2026): de lus is met twee leden, een gezinsbeheerder en een kindprofiel volledig gelopen -- 14 van 15 schakels gesloten en 10 van 10 storingen gehouden. Deze route is met opzet NIET samen te vatten; de reden staat in server/lib/idemsleutels-connect.js.', op: OP },
+    waarom: 'Zelfde handler en zelfde reden als POST /api/connect/werk.',
+    nagekeken: OP + ': zelfde functie, gezinsdeur.',
+    bewijs: { gemeten: 'zie POST /api/connect/werk.', op: OP },
     afgetekend: AFGETEKEND
   },
-
-  /* --------------------------------------------------------------- de kring */
-  /* DEZE VIER REKENEN ALLEEN. kern/connect/kring.js bewaart niets: hij krijgt
-     een huidige en een gewenste kring en geeft terug of dat mag. Waar de kring
-     van een gemaakt ding LANDT, is de zaak van het domein dat dat ding bezit --
-     deze laag is de poort en niet de opslag. */
-  'POST /api/connect/kring': leest('connect.kring', LID,
-    'rekent uit of een kring verbreed mag worden. De `beschermd`-vlag komt UIT de sessie en nooit uit ' +
-    'het lijf; zou hij uit req.body mogen komen, dan zet een kind hem zelf op false.'),
-  'POST /api/rtf/connect/kring': leest('connect.kring.gezin', GEZIN,
-    'zelfde berekening, en dit is de deur waar het om gaat: alleen de gezinssessie weet of een profiel ' +
-    'minderjarig is, en die vlag houdt een kind binnen de kring `team`.'),
-  'POST /api/connect/kring/keuzes': leest('connect.kring.keuzes', LID,
-    'de vijf kringen met per stuk of hij open staat en zo niet waarom -- geen grijze knop zonder ' +
-    'uitleg (GRAMMATICA.md).'),
-  'POST /api/rtf/connect/kring/keuzes': leest('connect.kring.keuzes.gezin', GEZIN,
-    'zelfde lijst, gezinsdeur.')
+  'POST /api/connect/portfolio': leest('connect.portfolio', LID,
+    'wat deze mens hiervan naar buiten zou tonen. Apart van /dossier omdat er een andere REGEL geldt: ' +
+    'alles met aanspraak `geen` valt eruit -- gezien, uitgelezen en BEREIKT. Dat je werk ergens aankwam ' +
+    'is bereik, en bereik is aandacht; wij tellen aandacht niet als ontwikkeling. Er staat ook geen ' +
+    'aantal in, in geen enkele vorm.'),
+  'POST /api/rtf/connect/portfolio': leest('connect.portfolio.gezin', GEZIN,
+    'zelfde projectie en zelfde filter, gezinsdeur.'),
 };
 
 module.exports = { CONTRACTEN };

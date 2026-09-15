@@ -15,7 +15,7 @@
    Foundation iets betekent. Geen enkele routetoets ziet die overdracht, want
    hij loopt van het ene dossier naar het andere langs een haak.
 
-   VIJFTIEN SCHAKELS EN TIEN STORINGEN. Een schakel vraagt: handelt actor A, en
+   ZEVENTIEN SCHAKELS EN TIEN STORINGEN. Een schakel vraagt: handelt actor A, en
    MERKT actor B dat? Een storing vraagt: houdt de keten zijn belofte als het
    misgaat? De storingen zijn hier de helft van de waarde, want de beloftes van
    deze laag zijn bijna allemaal NEGATIEF -- geen score, geen rangorde, geen
@@ -89,51 +89,85 @@ async function proef(basis) {
   schakel(6, 'de mens zet zelf "begrepen", en die regel draagt de graad `vermoed`',
     r.status === 200 && (r.body.regel || {}).graad === 'vermoed', 'graad ' + ((r.body.regel || {}).graad || '-'));
 
-  /* ---- 7. maar `onderwezen` kan hij NIET zelf zetten --------------------- */
-  r = await post('/api/connect/noteer', { trede: 'onderwezen', onderwerp: o.onderwerp }, a);
-  schakel(7, 'de enige trede met bewijskracht kan hij niet zelf zetten',
-    r.status !== 200 && /een ander/i.test(String((r.body || {}).error || '')), 'geweigerd met de reden');
+  /* ---- 7. maar de overdrachtstreden kan hij NIET zelf zetten ------------- */
+  /* `gebruikt` en `doorgegeven` dragen aanspraak `overdracht` en zijn daarmee de
+     enige twee die buiten Foundation iets betekenen -- precies daarom mag de
+     mens ze zelf niet schrijven. Hier stond `onderwezen`, en die trede bestaat
+     sinds de ladder vijf overdrachtstreden kreeg niet meer; de route weigerde
+     toen om de VERKEERDE reden ("die trede bestaat niet") terwijl de proef
+     groen las op het woord. Een geldige uitslag van het verkeerde experiment. */
+  const zelfGeweigerd = [];
+  for (const trede of ['gebruikt', 'doorgegeven']) {
+    const w = await post('/api/connect/noteer', { trede, onderwerp: o.onderwerp, bron: 'w1' }, a);
+    zelfGeweigerd.push(w.status !== 200 && /een ander/i.test(String((w.body || {}).error || '')));
+  }
+  schakel(7, 'de twee treden met bewijskracht kan hij niet zelf zetten',
+    zelfGeweigerd.every(Boolean), 'gebruikt en doorgegeven allebei geweigerd met de reden');
 
   /* ---- 8. EEN TWEEDE MENS zegt dat hij geholpen is ----------------------- */
-  /* DE SCHAKEL WAAR DE HELE LAAG OM DRAAIT, EN HIJ IS OPEN -- met een reden die
-     deze proef zelf heeft gevonden. De eerste versie gaf `maker` mee in het
-     verzoek en stond op groen; daarmee kon iedereen een regel `onderwezen` in
-     het dossier van een willekeurig ander schrijven, in de enige trede die
-     bewijskracht heeft. De zelf-weigering sloeg nooit aan, want een verzonnen
-     codenaam is per definitie niet gelijk aan de gever.
+  /* DE SCHAKEL WAAR DE HELE LAAG OM DRAAIT, en hij is op 15 september gesloten.
 
-     De maker wordt nu OPGEZOCHT (kern/connect/naklank.js, `makerVan`), en
-     vandaag geeft die niets terug: geen van de twee aangesloten bronnen draagt
-     een maker -- leerstof is van dit huis, een buurtactiviteit van een
-     afdeling. De naklank wordt dus geteld en de dossierregel ontstaat NIET,
-     met de reden in het antwoord. Dat er geen maker is, is de juiste uitkomst;
-     dat de lus hier nog niet sluit, is de bevinding. Wat er moet komen is een
-     bron met makers (kern/mediaos/wekken.js kent `nieuwWerk(key, ...)`).
+     Hij stond OPEN met een reden: geen enkele bron droeg een maker, dus een
+     `geholpen` kon bij niemand landen. Daarvoor stond hij op GROEN met `maker`
+     uit het verzoek -- waarmee iedereen een regel met bewijskracht in het
+     dossier van een willekeurig ander kon schrijven.
 
-     Dat de haak WEL loopt zodra er een maker is, staat in
-     test/connect.test.js -- daar is de resolver in te spuiten. */
-  const werk = 'connect:werk-van-a';
-  r = await post('/api/connect/naklank', { id: werk, soort: 'geholpen' }, b);
-  schakel(8, 'een TWEEDE mens geeft "hierdoor geholpen" en dat loopt door naar een dossier',
-    (r.status === 200 && r.body.ok === true && r.body.dossier === null && !!r.body.dossierReden) ? 'open' : false,
-    r.status === 200 && r.body.dossier === null
-      ? 'geteld, geen dossierregel: geen enkele aangesloten bron draagt een maker'
-      : 'onverwacht: ' + JSON.stringify(r.body).slice(0, 90));
+     Het besluit van de eigenaar wees de uitweg aan: Connect mag auteurschap
+     CONSUMEREN en niet uitvinden. Daarom begint deze schakel nu bij een ECHT
+     domein: lid A maakt een clip langs /api/clips/maak, kern/clips.js roept
+     `nieuwWerk(key, 'flow', titel)` aan zoals hij altijd al deed, en
+     kern/mediaos/werkherkomst.js legt daar vast van wie dat werk is. Pas dan
+     kan lid B er iets mee, en landt de regel bij A.
 
-  /* ---- 9. en die trede staat er, op `bewezen` --------------------------- */
+     Dat is de hele bewijsketen in een schakel: een domein beweert auteurschap,
+     Connect leest het, een tweede mens doet er iets mee. */
+  const clip = await post('/api/clips/maak', { titel: 'Zo maak je pasta', duurS: 30 }, a);
+  const werken = await post('/api/connect/werk', {}, a);
+  schakel(8, 'een ECHT domein meldt werk aan, en Connect neemt het auteurschap over',
+    clip.status === 200 && werken.status === 200 && werken.body.nieuw &&
+      werken.body.nieuw.some(x => x.trede === 'gemaakt') && werken.body.nieuw.some(x => x.trede === 'aangeboden'),
+    'clip gemaakt (' + clip.status + '); overgenomen: ' +
+      ((werken.body.nieuw || []).map(x => x.trede).join(', ') || 'niets'));
+
+  /* De ontdekking-sleutel zoals een scherm hem zou dragen: herkomst + id. */
+  const werkId = ((werken.body.nieuw || [])[0] || {}).werk;
+  const werk = werkId ? 'mediaos:' + werkId : 'mediaos:onbekend';
+
+  /* ---- 8b. het komt bij een ander AAN -- en dat telt niet als ontwikkeling -- */
+  r = await post('/api/connect/open', { id: werk, onderwerp: 'flow', herkomst: 'mediaos' }, b);
+  const naOpen = await post('/api/connect/portfolio', {}, a);
+  schakel(9, 'bereikt staat in het dossier van de maker en NIET in zijn portfolio',
+    r.status === 200 && r.body.bereikteMaker === true &&
+      !(naOpen.body.bewijzen || []).some(x => x.trede === 'bereikt'),
+    'bereikt geschreven: ' + r.body.bereikteMaker + '; in portfolio: ' +
+      (naOpen.body.bewijzen || []).some(x => x.trede === 'bereikt'));
+
+  /* ---- 8c. en pas als B er IETS MEE doet, telt het wel -------------------- */
+  const mooi = await post('/api/connect/naklank', { id: werk, soort: 'mooi' }, b);
+  const naMooi = await post('/api/connect/portfolio', {}, a);
+  const gebruikt = await post('/api/connect/naklank', { id: werk, soort: 'geprobeerd' }, b);
+  const naGebruik = await post('/api/connect/portfolio', {}, a);
+  schakel(10, '"mooi" levert de maker niets op, "geprobeerd" wel',
+    mooi.body.dossier === null && !!mooi.body.dossierReden &&
+      !(naMooi.body.bewijzen || []).some(x => x.trede === 'gebruikt') &&
+      (naGebruik.body.bewijzen || []).some(x => x.trede === 'gebruikt' && x.graad === 'bewezen'),
+    'na "mooi": ' + (naMooi.body.bewijzen || []).length + ' bewijzen; na "geprobeerd": ' +
+      (naGebruik.body.bewijzen || []).length);
+
+  /* ---- 11. de teller zelf ------------------------------------------------ */
   /* De maker is hier een losse codenaam en niet lid A: deze laag ZOEKT de maker
      niet op (hij kent hem niet), dus de proef geeft hem mee zoals een scherm dat
      zou doen. Wat bewezen wordt is de haak en de graad, niet de opzoeking. */
   const tel = await post('/api/connect/naklank/tel', { id: werk }, b);
   const soorten = ((tel.body || {}).soorten || []);
-  schakel(9, 'de teller kent zes soorten en GEEN totaal',
+  schakel(11, 'de teller kent zes soorten en GEEN totaal',
     soorten.length === 6 && !('totaal' in (tel.body || {})) && !('score' in (tel.body || {})),
     soorten.length + ' soorten, velden: ' + Object.keys(tel.body || {}).join(', '));
 
   /* ---- 10. het dossier vat samen PER onderwerp, zonder totaal ------------ */
   const dos = await post('/api/connect/dossier', {}, a);
   const per = (dos.body || {}).perOnderwerp || [];
-  schakel(10, 'het dossier geeft de hoogste trede per ONDERWERP en geen niveau',
+  schakel(12, 'het dossier geeft de hoogste trede per ONDERWERP en geen niveau',
     per.length > 0 && per.every(p => p.trede && p.graad) && !('niveau' in (dos.body || {})),
     per.map(p => p.onderwerp + '=' + p.trede).join(', '));
 
@@ -142,19 +176,19 @@ async function proef(basis) {
   const vertrouwd = await post('/api/connect/ontdek', { vandaag: '2026-09-15' }, a);
   await post('/api/connect/schuif', { schuif: 100 }, a);
   const ontdekkend = await post('/api/connect/ontdek', { vandaag: '2026-09-15' }, a);
-  schakel(11, 'de schuif van de mens verdeelt de plekken en niets anders doet dat',
+  schakel(13, 'de schuif van de mens verdeelt de plekken en niets anders doet dat',
     (vertrouwd.body || {}).verdeling.ontdekken === 0 && (ontdekkend.body || {}).verdeling.vertrouwd === 0,
     'schuif 0 -> ' + JSON.stringify(vertrouwd.body.verdeling) + ', schuif 100 -> ' + JSON.stringify(ontdekkend.body.verdeling));
 
   /* ---- 12. de sessie mag ophouden ---------------------------------------- */
-  schakel(12, 'het antwoord zegt zelf wanneer het genoeg is',
+  schakel(14, 'het antwoord zegt zelf wanneer het genoeg is',
     !!(ontdekkend.body || {}).genoeg, String((ontdekkend.body || {}).genoeg || '').slice(0, 60) + '...');
 
   /* ---- 13. een GEZIN loopt dezelfde lus langs een andere deur ------------ */
   const g = await ROLLEN.gezin.haal(basis);
   if (!g) throw new Error('geen gezinssessie');
   const gr = await post('/api/rtf/connect/ontdek', { code: g.code, token: g.token, vandaag: '2026-09-15' });
-  schakel(13, 'een gezinsprofiel krijgt dezelfde motor langs een eigen deur',
+  schakel(15, 'een gezinsprofiel krijgt dezelfde motor langs een eigen deur',
     gr.status === 200 && ((gr.body || {}).plekken || []).length > 0,
     (((gr.body || {}).plekken) || []).length + ' plekken');
 
@@ -178,7 +212,7 @@ async function proef(basis) {
     kindStand = naarPubliek.status !== 200 && terug.body && terug.body.ok === true && terug.body.versmald === true;
     kindDetail = 'publiek geweigerd (' + naarPubliek.status + '), versmallen lukt wel';
   }
-  schakel(14, 'een minderjarig profiel gaat niet publiek, maar kan altijd versmallen', kindStand, kindDetail);
+  schakel(16, 'een minderjarig profiel gaat niet publiek, maar kan altijd versmallen', kindStand, kindDetail);
 
   /* ---- 15. lezen laat de opslag met rust --------------------------------- */
   /* Van buitenaf niet te zien, dus gemeten aan wat er WEL waarneembaar is: een
@@ -191,7 +225,7 @@ async function proef(basis) {
   await post('/api/connect/dossier', {}, c);
   const na = await post('/api/connect/dossier', {}, c);
   const h = await post('/api/connect/horizon', {}, c);
-  schakel(15, 'alleen lezen verandert niets aan de eigen stand',
+  schakel(17, 'alleen lezen verandert niets aan de eigen stand',
     (na.body || {}).totaal === 0 && (h.body || {}).schuif === 40,
     'dossier ' + (na.body || {}).totaal + ' regels, schuif ' + (h.body || {}).schuif);
 
@@ -216,9 +250,11 @@ async function proef(basis) {
     String((zelfMagNiet.body || {}).error || '').slice(0, 50));
 
   /* Nummer 4 gaf `maker` mee in het verzoek en las de weigering als bewijs. Dat
-     veld bestaat niet meer -- zie schakel 8. Wat er nu wordt getoetst is de
-     garantie die er vandaag werkelijk is: een naklank waarvan de maker niet
-     vaststaat, schrijft in NIEMANDS dossier, en zegt dat erbij. */
+     veld bestaat niet meer -- zie schakel 8. Wat hier overblijft is de garantie
+     die ook NA het sluiten van die schakel geldt: een ding waarvan het huis de
+     maker niet kent (hier een verzonnen id) schrijft in NIEMANDS dossier. De
+     opzoeking is de enige weg; er is geen achterdeur waarlangs de aanroeper
+     alsnog een maker aanwijst. */
   const s4 = await post('/api/connect/naklank', { id: 'los-werk', soort: 'geholpen' }, a);
   storing(4, 'zonder vaststaande maker komt er geen regel in andermans dossier',
     s4.status === 200 && s4.body.dossier === null && !!s4.body.dossierReden,
@@ -250,6 +286,31 @@ async function proef(basis) {
   const s10 = await post('/api/connect/ontdek', { vandaag: '2026-09-15' }, a);
   storing(10, 'zonder plaats meldt de laag dat, in plaats van stil niets lokaals te tonen',
     !!(s10.body || {}).plaatsGevraagd, String((s10.body || {}).plaatsGevraagd || '').slice(0, 55));
+
+  /* Gevonden door scripts/gluurronde.js: `bron` nam elke vrije tekst aan,
+     bewaarde hem ongezien en gaf hem onveranderd terug -- ook de naam van iemand
+     anders, in een bak zonder bewaartermijn voor zulke gegevens. Zie de kop van
+     kern/connect/verwijzing.js. Hier op een ECHTE server, want de unittoets kent
+     de kern en niet de deur. */
+  const s11 = await post('/api/connect/noteer',
+    { trede: 'begrepen', onderwerp: 'koken', bron: 'Jan de Vries woont in Zwolle' }, a);
+  const na11 = await post('/api/connect/dossier', {}, a);
+  /* TWEE ONAFHANKELIJKE HELFTEN, en het bericht zegt welke het deed. De eerste
+     versie meldde altijd "geweigerd (200) en niets bewaard" -- ook als er niets
+     geweigerd wAs. Een proef die zakt moet vertellen WAT hij zag, anders zoekt
+     de volgende het in de verkeerde helft. */
+  const bewaard11 = JSON.stringify(na11.body || {}).includes('Zwolle');
+  storing(11, 'vrije tekst komt het dossier niet in, ook niet als eigen bron',
+    s11.status !== 200 && !bewaard11,
+    (s11.status !== 200 ? 'geweigerd (' + s11.status + ')' : 'NIET geweigerd (200)') +
+      (bewaard11 ? ' en WEL bewaard' : ' en niets bewaard'));
+
+  /* DE TEGENPROEF, want zonder deze is de goedkoopste implementatie "weiger alles
+     met een bron" en staat de proef groen terwijl het product stuk is. */
+  const s12 = await post('/api/connect/noteer',
+    { trede: 'toegepast', onderwerp: 'koken', bron: 'leerstof:rekenen.g6.omtrek-opp' }, a);
+  storing(12, 'en een ECHTE verwijzing komt er gewoon langs',
+    s12.status === 200 && s12.body.ok === true, 'status ' + s12.status);
 }
 
 (async () => {

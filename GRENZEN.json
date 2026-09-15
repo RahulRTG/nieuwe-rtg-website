@@ -270,22 +270,7 @@
       "werkOverzicht"
     ],
     "connect": [
-      "CONNECT",
-      "connectBruggen",
-      "connectDossier",
-      "connectDossierNoteer",
-      "connectHorizon",
-      "connectKringKeuzes",
-      "connectKringZet",
-      "connectMotoren",
-      "connectNaklank",
-      "connectNaklankTel",
-      "connectNaklankWeg",
-      "connectOntdek",
-      "connectOpen",
-      "connectSchuif",
-      "connectSignaal",
-      "connectWerkwoord"
+      "connect"
     ],
     "consent": [
       "commercieelStand",

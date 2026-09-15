@@ -36,7 +36,7 @@ const SOORT_NAAM = {
   wedstrijd: 'een wedstrijd in de agenda', uitgelicht: 'uitgelicht werk'
 };
 
-function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn }) {
+function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn, werkherkomst }) {
   /* ---- HET MOMENTREGISTER, EN WAAROM HET ER NIET WAS ----
 
      GEVONDEN DOOR SCHAKEL 5 VAN scripts/momentproef.js (13 september 2026).
@@ -102,6 +102,12 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn 
     if (!makerKey || !SOORT_NAAM[soort]) return { gewekt: [], overgeslagen: [] };
     const codenaam = codenaamVan ? codenaamVan(makerKey) : null;
     if (!codenaam) return { gewekt: [], overgeslagen: [] };
+
+    /* Eerst vastleggen, dan wekken: ./werkherkomst.js, DE AANROEPPLEK. */
+    let werk = null;
+    try { werk = werkherkomst ? werkherkomst.legWerk(makerKey, soort, titel) : null; }
+    catch (e) { werk = null; }
+
     const gewekt = [], overgeslagen = [];
     for (const volger of volgersVan(makerKey)) {
       const soorten = meldVan(volger, codenaam);
@@ -117,7 +123,7 @@ function maakWekken({ notify, codenaamVan, meldVan, bronnen, aanwezig, tijdlijn 
         overgeslagen.push({ key: volger, reden: 'melden mislukte: ' + (e && e.message ? e.message : 'onbekend') });
       }
     }
-    return { gewekt, overgeslagen, soort, maker: codenaam };
+    return { gewekt, overgeslagen, soort, maker: codenaam, werk: werk ? werk.id : null };
   }
 
   /* ---- WEKKEN OP EEN AANWEZIGHEID, en dat is de ingang voor alles wat geen

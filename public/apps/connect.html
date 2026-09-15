@@ -13,6 +13,10 @@
 <link href="/shared/veiligheid.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- De tokenlaag van ONTWERP.md. Een ontwerpsysteem dat een scherm niet
+     insluit, is voor dat scherm een document en geen systeem; de ratel
+     `schermenZonderVormtaal` in NORM.json telt precies dat, en mag alleen
+     omlaag. Deze pagina stond erbij tot hij hem laadde. -->
 <link href="/shared/rtg-ontwerp.css" rel="stylesheet">
 <style>
   /* Inhoudsvlakken recht (0-4px): HERITAGE.md. De afgeronde vormen wonen in de
@@ -40,6 +44,12 @@
     border-top:1px solid var(--line);}
   .genoeg{border-top:1px solid var(--line);margin-top:1.4rem;padding-top:1rem;
     font-size:.88rem;line-height:1.6;color:var(--soft);}
+  .bewijs{border:1px solid var(--line);border-radius:0;padding:.75rem;margin:.6rem 0;}
+  .bewijs h4{font-family:'Bodoni Moda',Georgia,serif;font-size:1rem;font-weight:600;margin:0;}
+  .bewijs .meta{font-size:.74rem;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);
+    margin:.2rem 0 .4rem;}
+  .bewijs .zegt{font-size:.84rem;line-height:1.55;margin:.2rem 0 0;}
+  .bewijs .nietzegt{font-size:.8rem;line-height:1.5;margin:.35rem 0 0;color:var(--soft);font-style:italic;}
 </style>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/plek.js" defer></script>
@@ -47,7 +57,7 @@
 <link href="/shared/ios.css" rel="stylesheet">
 <link id="rtgHeritageCss" href="/shared/rtg-heritage.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage">
+<body class="rtg-stijl" data-rtg-world="foundation" data-rtg-skin="heritage" data-rtg-edge-2-context="native-header,rtgdeel-balk">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <header class="kop">
   <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
@@ -104,6 +114,16 @@
     <div class="kaart">
       <div id="dossier"><p class="stil">Laden...</p></div>
       <p class="stil" id="dossierNoot"></p>
+    </div>
+
+    <h3 class="h-mt90">Wat u kunt laten zien</h3>
+    <div class="kaart">
+      <p class="stil">Uw bewijsstukken, nieuwste eerst. Bij elk staat wat het zegt, wat het
+      <em>niet</em> zegt, en hoe hard het is: u zelf gezegd, door het systeem gezien, of door iemand
+      anders bevestigd.</p>
+      <button class="knop mini" id="werkBij">Mijn eigen werk erbij halen</button>
+      <div id="portfolio"><p class="stil">Laden...</p></div>
+      <p class="stil" id="portfolioNoot"></p>
     </div>
   </section>
 
@@ -210,6 +230,26 @@
       : '<p class="stil">Nog niets.</p>';
   }
 
+  /* De graad in woorden. Hij staat op het scherm omdat het verschil tussen "ik
+     zeg dat ik het snap" en "iemand anders zei dat hij erdoor geholpen is" het
+     hele punt van deze lijst is -- zonder dat verschil is het weer een stapel
+     vinkjes. */
+  const GRAAD = { vermoed: 'u zelf gezegd', gemeten: 'door het systeem gezien',
+    bewezen: 'door iemand anders bevestigd' };
+
+  function tekenPortfolio(p) {
+    $('#portfolio').innerHTML = p.bewijzen && p.bewijzen.length
+      ? p.bewijzen.map(b => '<div class="bewijs">' +
+          '<p class="meta">' + esc(b.onderwerp) + ' &middot; ' + esc(GRAAD[b.graad] || b.graad) + '</p>' +
+          '<h4>' + esc(b.naam) + '</h4>' +
+          '<p class="zegt">' + esc(b.stelt) + '</p>' +
+          '<p class="nietzegt">Zegt niet: ' + esc(b.nietZegt) + '</p>' +
+        '</div>').join('')
+      : '<p class="stil">Hier komen uw bewijsstukken. Iets maken telt, en iets waar een ander mens ' +
+        'daadwerkelijk mee heeft gewerkt telt het zwaarst.</p>';
+    $('#portfolioNoot').textContent = (p.nietGeteld || '') + ' ' + (p.uitgang || '');
+  }
+
   function tekenDossier(d) {
     $('#dossier').innerHTML = d.perOnderwerp && d.perOnderwerp.length
       ? d.perOnderwerp.map(p => '<p class="trede"><span>' + esc(p.onderwerp) + '</span>' +
@@ -235,6 +275,7 @@
          het tweede antwoord traag is. */
       tekenHorizon(await Veilig.api('/api/connect/horizon'), d.onderwerpenDieBruggenKennen);
       tekenDossier(await Veilig.api('/api/connect/dossier'));
+      tekenPortfolio(await Veilig.api('/api/connect/portfolio'));
     } catch (e) {
       $('#lijst').innerHTML = '<p class="stil">' + esc(e.message) + '</p>';
     }
@@ -249,6 +290,17 @@
        Een knop die stilletjes je instelling verandert, is een val. */
     $('#verras').addEventListener('click', () => { staat.verras = true; laad(); });
     $('#plaats').addEventListener('change', laad);
+    /* Een HANDELING en geen lezing: het dossier haalt dit niet stilzwijgend op
+       bij het openen van het scherm. Zie de kop van kern/connect/werkbij.js. */
+    $('#werkBij').addEventListener('click', async () => {
+      try {
+        const r = await Veilig.api('/api/connect/werk');
+        Veilig.melding(r.nieuw && r.nieuw.length
+          ? r.nieuw.length + ' bewijsstuk(ken) erbij uit uw eigen werk.'
+          : (r.geenBron ? r.reden : 'Er kwam niets nieuws bij; wat er is, stond er al.'));
+        laad();
+      } catch (e) { Veilig.melding(e.message); }
+    });
     laad();
   }
 

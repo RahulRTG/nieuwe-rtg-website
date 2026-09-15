@@ -172,6 +172,17 @@ const REGISTER = {
      door een feit. */
   'NAMENSVORM.json': { meter: ['namensMechanismenGemeten'] },
   'SPOORVORM.json': { meter: ['spoorConvergent'] },
+  /* CONNECTLUS.json meet of de ontdekkingsdomeinen de lus DELEN (CONNECT.md
+     par. 1). Zelfde soort als CARRIEREVORM, STAGEVORM en NAMENSVORM hierboven,
+     en om exact dezelfde reden is de geratelde waarde het BEREIK: dat er 0 van
+     de acht werkwoorden in alle domeinen staan en dat maar twee domeinen de lus
+     rond krijgen, is de bevinding waar kern/connect/ op rust -- en een bevinding
+     die beweegt is nieuws. Wat niet stil mag bewegen is hoeveel domeinen de
+     meter heeft gezien. Die faalvorm is hier geen theorie: scripts/carrierevorm.js
+     sloeg bij een versmalling tot twee domeinen om van 0 naar 8 gedeelde velden,
+     dus een meter die minder domeinen ziet meldt niet dezelfde nul maar een
+     andere werkelijkheid, onder dezelfde naam. */
+  'CONNECTLUS.json': { meter: ['connectDomeinenGemeten'] },
   /* WEKDEKKING.json zet het BESLUIT (welke brongebeurtenis mag de publieke rail
      op, scripts/lib/wekbesluit.js) naast de METING. Geratelde is
      `wekZonderUitspraak`: publieke domeinen waarover het besluitregister

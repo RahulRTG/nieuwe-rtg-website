@@ -2,7 +2,8 @@
    HET LEERDOSSIER -- zeven treden, chronologisch, en met opzet geen niveau.
 
    Foundation Connect wil onderscheid maken tussen gezien, gelezen, begrepen,
-   geoefend, toegepast, gemaakt en onderwezen. Vijftig video's over
+   geoefend, toegepast, gemaakt, aangeboden, bereikt, gebruikt en doorgegeven.
+   De ladder staat in ./tredenlijst.js en niet hier. Vijftig video's over
    programmeren bekijken is geen programmeren; een werkende applicatie bouwen
    is veel sterker bewijs. Dat klopt, en het is ook precies de plek waar zo'n
    laag omslaat in het tegenovergestelde van wat hij belooft.
@@ -16,7 +17,7 @@
    een, en `test/connect.test.js` de tweede.
 
    DE TREDEN ZIJN GEEN TRAP. Iemand staat niet OP een trede -- hij heeft regels
-   die er een dragen, per ONDERWERP. Voor koken kan `onderwezen` er staan en
+   die er een dragen, per ONDERWERP. Voor koken kan `doorgegeven` er staan en
    voor breuken `gezien`, en dat zijn geen twee standen van dezelfde mens. De
    hoogste trede wordt daarom AFGELEID per onderwerp en nooit bewaard, en
    nergens over onderwerpen heen opgeteld: een getal over alle onderwerpen IS
@@ -50,6 +51,8 @@
    ========================================================================== */
 'use strict';
 
+const { bronKlopt, weigering } = require('./verwijzing');
+
 const { TREDEN } = require('./tredenlijst');
 
 const OP_ID = new Map(TREDEN.map(t => [t.id, t]));
@@ -59,25 +62,19 @@ const trede = (id) => OP_ID.get(String(id == null ? '' : id)) || null;
    jaren maakt; bijt hij toch, dan hoort dat te KLINKEN en niet te gebeuren. */
 const MAX = 2000;
 
-module.exports = ({ db, save, crypto }) => {
-  const bak = () => {
-    const d = db.data || (db.data = {});
-    if (!d.connect) d.connect = {};
-    if (!d.connect.dossier) d.connect.dossier = {};
-    return d.connect.dossier;
-  };
+module.exports = ({ opslag, save, crypto }) => {
   const lijstVan = (sleutel) => {
-    const b = bak(), s = String(sleutel || '');
+    const b = opslag.bak('dossier'), s = String(sleutel || '');
     if (!s) return null;
     if (!Array.isArray(b[s])) b[s] = [];
     return b[s];
   };
-  /* De LEZER maakt niets aan -- zie dezelfde correctie in ./horizon.js. Een
-     dossier dat ontstaat doordat iemand ernaar kijkt, is een dossier dat bij
-     iedereen bestaat zodra een scherm een keer is geopend. */
+  /* De LEZER maakt niets aan -- zie de kop van ./opslag.js. Een dossier dat
+     ontstaat doordat iemand ernaar kijkt, is een dossier dat bij iedereen
+     bestaat zodra een scherm een keer is geopend. */
   const peil = (sleutel) => {
     const s = String(sleutel || '');
-    const rij = s ? (db.data && db.data.connect && db.data.connect.dossier || {})[s] : null;
+    const rij = s ? (opslag.peil('dossier') || {})[s] : null;
     return Array.isArray(rij) ? rij : [];
   };
 
@@ -90,15 +87,28 @@ module.exports = ({ db, save, crypto }) => {
     if (!t) return { ok: false, reden: 'Die trede bestaat niet. Kies uit: ' + TREDEN.map(x => x.id).join(', ') + '.' };
 
     const door = String(r.door || 'zelf');
-    if (door !== t.wieSchrijft) {
-      return { ok: false, reden: t.wieSchrijft === 'eenAnder'
+    if (door !== t.doorWie) {
+      return { ok: false, reden: t.doorWie === 'eenAnder'
         ? 'Deze trede zet een ander. "' + t.naam + '" ontstaat doordat iemand zegt dat hij door u geholpen is, en niet doordat u dat zelf opschrijft.'
-        : 'Deze trede wordt door ' + (t.wieSchrijft === 'zelf' ? 'de mens zelf' : 'het systeem') + ' gezet, niet door "' + door + '".' };
+        : 'Deze trede wordt door ' + (t.doorWie === 'zelf' ? 'de mens zelf' : 'het systeem') + ' gezet, niet door "' + door + '".' };
     }
-    /* `gemaakt` zonder een ding is een bewering zonder onderwerp, en dat is
-       precies de regel die een portfolio waardeloos maakt. */
-    if (t.id === 'gemaakt' && !String(r.bron || '')) {
-      return { ok: false, reden: 'Een regel "Gemaakt" verwijst naar wat er gemaakt is. Zonder die verwijzing is er niets aan te tonen.' };
+    /* DE BRON-EIS KOMT UIT DE TABEL EN NIET UIT EEN NAAM. Hier stond
+       `t.id === 'gemaakt'`, en toen de ladder van zeven naar tien treden ging
+       waren er vijf treden die een verwijzing nodig hebben -- een hardgecodeerde
+       naam dekt er dan een. Een bewering zonder onderwerp is precies wat een
+       portfolio waardeloos maakt. */
+    if (t.bronNodig && !String(r.bron || '')) {
+      return { ok: false, reden: 'Een regel "' + t.naam + '" verwijst naar het werk waar hij over gaat. ' +
+        'Zonder die verwijzing is er niets aan te tonen.' };
+    }
+    /* EN ALS DE MENS ZELF EEN VERWIJZING MEESTUURT, MOET HET ER EEN ZIJN.
+       Geen enkele trede met `doorWie: 'zelf'` heeft `bronNodig`, dus dit weigert
+       niets wat de tabel toestaat -- het houdt alleen vrije tekst tegen op de
+       ene plek waar een mens hem zelf kan intypen. Waarom dat moest, en wat deze
+       zeef NIET belooft, staat in de kop van ./verwijzing.js. */
+    if (door === 'zelf' && String(r.bron || '')) {
+      const v = bronKlopt(r.bron);
+      if (!v.ok) return { ok: false, reden: weigering(v.reden) };
     }
     const onderwerp = String(r.onderwerp || '').trim().slice(0, 80);
     if (!onderwerp) return { ok: false, reden: 'Een regel hoort bij een onderwerp.' };
@@ -125,6 +135,15 @@ module.exports = ({ db, save, crypto }) => {
       id: (crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random()).slice(0, 36),
       at: new Date().toISOString(),
       onderwerp, trede: t.id, graad: t.graad,
+      /* DE ASPRAAK REIST MEE EN WORDT NIET BIJ HET LEZEN AFGELEID. Zou hij
+         alleen uit de tabel komen, dan verandert de betekenis van een regel uit
+         2026 zodra iemand in 2028 een trede anders indeelt -- en een ledger
+         waarvan de oude regels meebewegen, is geen ledger. */
+      aanspraak: t.aanspraak,
+      /* Welk werkwoord van de lus hier is uitgevoerd. Dat is de vraag "welk
+         vermogen werd gebruikt" -- en met opzet niet het woord `capability`,
+         dat in OS.md al platformvermogen betekent. */
+      werkwoord: String(r.werkwoord || '') || null,
       bron: String(r.bron || '') || null,
       herkomst: String(r.herkomst || '') || null
     };
@@ -135,40 +154,15 @@ module.exports = ({ db, save, crypto }) => {
     return { ok: true, nieuw: true, regel, afgekapt };
   }
 
-  /* LEZEN. Een sleutel in, de regels van DIE mens uit. Er is met opzet geen
-     functie die over sleutels heen leest: dat zou de route zijn die HDI.md par.
-     5.1 verbiedt -- "alles over deze mens" zonder dat de mens zelf aanroept,
-     en in de vorm van een lijst mensen nog erger. */
-  function lees(sleutel, opties) {
-    const o = opties || {};
-    const lijst = peil(sleutel);
-    const gefilterd = o.onderwerp ? lijst.filter(r => r.onderwerp === String(o.onderwerp)) : lijst;
-    return {
-      regels: gefilterd.slice().reverse().slice(0, Math.min(Number(o.max) || 200, 500)),
-      totaal: gefilterd.length,
-      /* Per ONDERWERP de hoogste trede, afgeleid en niet bewaard. En bewust
-         geen getal eroverheen: een totaal over onderwerpen is een niveau. */
-      perOnderwerp: hoogste(sleutel),
-      nietGemeten: 'Dit dossier zegt wat er is gebeurd, niet hoe goed het ging. Er staat geen cijfer in, ' +
-        'geen niveau en geen vergelijking met iemand anders -- ook niet verborgen als sorteervolgorde.'
-    };
-  }
+  /* Lezen woont apart, in ./dossierlezer.js en ./portfolio.js -- allebei
+     krijgen ze `peil` en `trede` en kunnen dus per constructie niet schrijven.
+     Zie de koppen daar, ook voor de regel die die twee lezers onderscheidt. */
+  const { lees, hoogste } = require('./dossierlezer')({ peil, trede });
 
-  /* De hoogste trede PER ONDERWERP, met de graad van die trede erbij. Twee
-     onderwerpen worden nooit opgeteld en nooit gesorteerd op trap: een lijst
-     die op hoogte staat, is een ranglijst van je eigen leven. */
-  function hoogste(sleutel) {
-    const lijst = peil(sleutel);
-    const per = new Map();
-    for (const r of lijst) {
-      const t = trede(r.trede);
-      if (!t) continue;
-      const nu = per.get(r.onderwerp);
-      if (!nu || t.trap > nu.trap) per.set(r.onderwerp, { trap: t.trap, trede: t.id, naam: t.naam, graad: t.graad });
-    }
-    return [...per.entries()].sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([onderwerp, v]) => ({ onderwerp, trede: v.trede, naam: v.naam, graad: v.graad }));
-  }
+  /* Het portfolio is een LEZER op deze opslag en woont apart: zie de kop van
+     ./portfolio.js voor de regel die hem van `lees()` onderscheidt. Hij krijgt
+     `peil` en `trede` mee en kan dus per constructie niet schrijven. */
+  const { portfolio } = require('./portfolio')({ peil, trede });
 
-  return { noteer, lees, hoogste, TREDEN, MAX };
+  return { noteer, lees, hoogste, portfolio, TREDEN, MAX };
 };

@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-14T23:29:12.076Z",
-    "commit": "99043478",
+    "op": "2026-09-15T00:11:54.606Z",
+    "commit": "7f4e04c9",
     "boomVuil": false,
-    "boomAnders": 0,
+    "boomAnders": 1,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -7625,6 +7625,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "soeverein.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/soeverein.js",
+      "operator": "&&->||#1",
+      "gezakt": 1,
+      "geprobeerd": 9
     },
     "sparren.test.js": {
       "soort": "server",

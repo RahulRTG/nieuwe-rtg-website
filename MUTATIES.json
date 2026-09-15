@@ -1,9 +1,9 @@
 {
   "stempel": {
-    "op": "2026-09-15T15:12:37.992Z",
-    "commit": "c9834f1a",
+    "op": "2026-09-15T15:40:00.245Z",
+    "commit": "cb21424d",
     "boomVuil": false,
-    "boomAnders": 2,
+    "boomAnders": 5,
     "instrument": "scripts/mutatie.js",
     "node": "v22.22.2"
   },
@@ -4856,6 +4856,14 @@
       "module": "server/middleware/malwarescan.js",
       "operator": "true->false#0",
       "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "mandaatpoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/bron.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
       "geprobeerd": 1
     },
     "marechaussee.test.js": {

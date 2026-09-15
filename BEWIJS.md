@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 1888 bestanden en 13508 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 1889 bestanden en 13517 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 1888 |
-| losse beweringen (`test(...)`) | 13508 |
+| toetsbestanden | 1889 |
+| losse beweringen (`test(...)`) | 13517 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 138 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 1246 |
 | **overleefd**: geen mutatie kreeg hem rood | 0 |
 | niet te meten (al rood, geen module gevonden, ...) | 71 |
-| alleen in de kop *genoemd*, nog niet gemeten | 165 |
+| alleen in de kop *genoemd*, nog niet gemeten | 166 |
 | niets van beide | 406 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-1671 bestanden, 13125 beweringen.
+1672 bestanden, 13134 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -915,6 +915,7 @@ toets omvalt.
 | `naarkassa.test.js` | 2 | gezakt op `liegpoort /api/` | Order naar de kassa (server): het lid kiest "stuur naar de kassa" -- de bestelling gaat direct als open bon naar de zaak (de keuken maakt hem), en wordt aan de balie afgerekend met de ophaalcode. Getoetst: de vlag... |
 | `namensprojectie.test.js` | 9 | -- | DE NAMENSPROJECTIE -- één taal, geen tweede motor. Twee soorten toetsen staan hier naast elkaar en ze bewijzen verschillende dingen: 1-6 GEDRAG: weigert de projectie wat zij belooft te weigeren? |
 | `namensverklaring.test.js` | 7 | -- | HET VERKLARINGSREGISTER NAAST DE METING -- en met opzet zonder winnaar. `kern/namens/verklaring.js` is een VERKLARING (een mens schrijft op wat een mechanisme doet) en `NAMENSVORM.json` een METING (een script leest... |
+| `namensversmalling-bedrading.test.js` | 9 | genoemd | DE VERSMALLING OP LEVENDE PADEN -- stap 2 van REPRESENTATIE.md. Stap 1 zette de wet neer (kern/namens/versmalling.js) en bewees hem op verzonnen letters: `test/namensversmalling.test.js` draait vijfhonderd... |
 | `namensversmalling.test.js` | 8 | -- | DE VERSMALLING ALS MACHINEWET -- kan deze doorsnede ooit iets TOEVOEGEN? REPRESENTATIE.md REP-03 zegt: een gedelegeerde bevoegdheid kan nooit groter zijn dan de effectieve bevoegdheid van de gever. |
 | `namensvorm.test.js` | 7 | -- | DE NAMENSVORM-METER: kan hij nog vinden wat hij beweert niet te vinden? REPRESENTATIE.md par. |
 | `naslag.test.js` | 9 | genoemd | HET NASLAGWERK -- één bron voor de CLI en het uitgeversbureau. `rtg sdk` schreef de typings en de documentatie al uit de code. |

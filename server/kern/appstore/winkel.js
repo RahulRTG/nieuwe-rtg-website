@@ -23,51 +23,19 @@
    ========================================================================== */
 'use strict';
 
-const { toonbaar, isMachtiging, ALLE_IDS, GEEN_CONTEXTBEPERKING } = require('./machtigingen');
-const { versmalNamens } = require('../namens/versmalling');
+const { toonbaar, isMachtiging } = require('./machtigingen');
 
 const MAX_PER_LID = 60;
 
 function maakWinkel(kern) {
   const { S, app, versie, eigen, nu, geld, noteer } = kern;
   const save = kern.save;
-  /* WAT HET LID ZELF MAG (./gevermacht.js) -- de bron `geverEffectief` van de
-     doorsnede hieronder. Zie de kop daar voor waarom hij een eigen bestand is. */
+  /* DE SNEDE (./gevermacht.js): wat het lid zelf mag, en wat daarvan overblijft
+     na de doorsnede van kern/namens/versmalling.js. Hij staat daar en niet hier
+     omdat `installeer` en `verleen` allebei verlenen en aantoonbaar dezelfde
+     snede moeten maken -- twee kopieën lopen bij de eerste aanpassing uiteen. */
   const geverMacht = require('./gevermacht').maakGeverMacht(kern);
-
-  /* ------------------------------------------------------------------------
-     DE SNEDE, en hij staat hier één keer omdat `installeer` en `verleen`
-     allebei verlenen. Zouden ze elk hun eigen rekensom houden, dan is de tweede
-     die iemand later aanpast de plek waar ze uiteenlopen.
-
-     DE WET KOMT UIT kern/namens/versmalling.js EN WORDT HIER NIET NAGEBOUWD:
-     effectief = gevraagd ∩ geverEffectief ∩ beleid ∩ context. Wat deze functie
-     doet is de VIER BRONNEN vullen met wat de App Store erover weet -- de
-     gedeelde laag kent geen machtiging-id's en hoort die ook nooit te leren.
-
-     ALLE VIER WORDEN OPGEGEVEN, ook `context` die hier niets tegenhoudt. Een
-     weggelaten bron telt in die laag als LEEG en niet als alles, en het verschil
-     tussen "gemeten en er is niets" en "niemand heeft gekeken" is daar het hele
-     punt. Weglaten zou hier dus alles dichtzetten; stilzwijgend als "alles"
-     lezen zou de wet slopen. Dus staat hij er, uitgesproken.
-     ---------------------------------------------------------------------- */
-  function snijd(key, getikt, manifestVraagt) {
-    const gm = geverMacht.geverEffectief(key);
-    const uit = versmalNamens({
-      gevraagd: getikt,
-      geverEffectief: gm.lijst,
-      beleid: (Array.isArray(manifestVraagt) ? manifestVraagt : []).filter(isMachtiging),
-      context: ALLE_IDS
-    });
-    return { uit, gm, contextGrond: GEEN_CONTEXTBEPERKING };
-  }
-  /* Een onbepaalbare snede is een STORING en geen weigering: er is niets mis met
-     dit lid of deze app -- er is een bron niet aangesloten. 503 met de reden, en
-     met opzet geen 403, want dat zou de gebruiker laten denken dat hij iets fout
-     doet (CONTROLPLANE.md: `ONBEKEND` is geen `WEIGEREN`). */
-  const storing = (uit) => ({ status: 503, error: uit.weigering.reden,
-    code: uit.weigering.code, onbekend: uit.weigering.onbekend, stuk: uit.weigering.stuk,
-    hoe: 'Dit is een gebrek aan onze kant. Probeer het later opnieuw; er is niets verleend en niets ingetrokken.' });
+  const { snijd, storing } = geverMacht;
   /* De leeskant (bladeren, de kaart, mijn apps) staat in ./etalage.js; dit
      bestand is de SCHRIJFkant. Die twee uit elkaar houden is hier meer dan
      opruimen: alles wat hieronder staat verandert iets aan wat een lid heeft

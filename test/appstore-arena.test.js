@@ -112,7 +112,11 @@ test('1. een gewoon lid krijgt de machtiging NIET, en bewaart dus niets', async 
      hij niet mag, krijgt hij niet". */
   const open = await api('/api/appstore/open', { sleutel: 'arena-proef' }, lid);
   assert.equal(open.status, 200, JSON.stringify(open.body));
-  assert.deepEqual(open.body.machtigingen, [],
+  /* De vulcontrole staat vóór de bewering, want "de lijst bevat hem niet" is op
+     een lege lijst gratis waar -- ook als er iets heel anders stukging. */
+  assert.ok((open.body.vraagt || []).some(m => m.id === 'arena.meedoen'),
+    'de app VRAAGT hem in zijn manifest; zonder dat bewijst de regel hieronder niets');
+  assert.ok(Array.isArray(open.body.machtigingen) && !open.body.machtigingen.includes('arena.meedoen'),
     'het lid vinkte hem aan bij het installeren en hij is toch niet verleend');
   assert.equal((open.body.versmald || {})['arena.meedoen'], 'progressie',
     'en er staat bij WAAROM hij wegviel -- de eissleutel, niet de zin');

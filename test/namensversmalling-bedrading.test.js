@@ -156,10 +156,21 @@ test('4. LEVEND PAD: een lege doorsnede is een UITKOMST en geen stilte', async (
      en dat moet als uitkomst leesbaar zijn -- met de reden, niet als leeg vak.
 
      ZAKT OP: `versmald` niet teruggeven uit ./winkel.js. */
-  const r = await api('/api/appstore/verleen',
+  /* DE VULCONTROLE STAAT VOOROP, en op DEZELFDE variabele. "De lijst is leeg"
+     is gratis waar op een route die altijd leeg teruggeeft, en dan meet de
+     bewering erna niets. Dus eerst dezelfde route met één machtiging erbij die
+     hij WEL mag geven: die moet er staan. */
+  let r = await api('/api/appstore/verleen',
+    { sleutel: 'vier-proef', machtigingen: ['arena.meedoen', 'opslag.eigen'] }, lid);
+  assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.deepEqual(r.body.verleend.map(m => m.id), ['opslag.eigen'],
+    'deze route levert wél iets zodra er iets te leveren valt');
+
+  /* En nu alleen wat hij niet mag geven. Zelfde route, zelfde variabele. */
+  r = await api('/api/appstore/verleen',
     { sleutel: 'vier-proef', machtigingen: ['arena.meedoen'] }, lid);
   assert.equal(r.status, 200, JSON.stringify(r.body));
-  assert.deepEqual(r.body.verleend, [], 'er is niets verleend');
+  assert.equal(r.body.verleend.length, 0, 'er is niets verleend');
   assert.equal((r.body.versmald || [])[0] && r.body.versmald[0].id, 'arena.meedoen',
     'en er staat waarom, in plaats van een leeg vak dat de lezer zelf invult');
 
@@ -314,12 +325,14 @@ test('8. ARCHITECTUUR: de gedeelde laag leert geen domeinwoorden', async () => {
   const wet = fs.readFileSync(path.join(MAP, 'versmalling.js'), 'utf8');
   assert.doesNotMatch(wet, /\b(arena|appstore|loonheffing|btw|manifest|uitgever)\b/i,
     'de doorsnede hoort niet te weten waarover hij gaat');
-  /* En andersom: de twee mechanismen delen geen enkele module behalve de wet. */
-  const winkel = fs.readFileSync(path.join(WORTEL, 'server/kern/appstore/winkel.js'), 'utf8');
+  /* C. En andersom: de twee mechanismen bereiken allebei de WET, en geen van
+     beide de ander. De appstore doet dat via ./gevermacht.js -- daar woont zijn
+     snede, en winkel.js roept die alleen aan. */
+  const snede = fs.readFileSync(path.join(WORTEL, 'server/kern/appstore/gevermacht.js'), 'utf8');
   const mnd = fs.readFileSync(path.join(WORTEL, 'server/kern/fiscaal/gateway/mandaat.js'), 'utf8');
-  assert.match(winkel, /require\('\.\.\/namens\/versmalling'\)/);
+  assert.match(snede, /require\('\.\.\/namens\/versmalling'\)/);
   assert.match(mnd, /require\('\.\.\/\.\.\/namens\/versmalling'\)/);
-  assert.ok(!/fiscaal/.test(winkel), 'de appstore kent de fiscale kant niet');
+  assert.ok(!/fiscaal/.test(snede), 'de appstore kent de fiscale kant niet');
   assert.ok(!/appstore/.test(mnd), 'en andersom ook niet');
 });
 

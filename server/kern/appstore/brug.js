@@ -45,10 +45,11 @@ function maakBrug(kern) {
      opzet NIET welk lid er aanroept -- deze functie geeft hem alleen de
      appsleutel en de foutcode mee (kern/appstore/meting.js). */
   const meting = require('./meting').maakMeting({ S, save, nu });
-  /* Alleen voor de UITLEG bij een versmalde machtiging -- deze module beslist
-     hier niets. Wat er verleend is, staat in `verleend`; dit zet een eissleutel
-     om in de zin die ./machtigingen.js eroverheen legt. */
-  const geverMacht = require('./gevermacht').maakGeverMacht(kern);
+  /* De weigering die uitlegt (./brugweigering.js). `uitleg` gaat mee zodat een
+     versmalde machtiging de ECHTE reden kan noemen; deze module beslist daar
+     niets mee -- wat er verleend is, staat in `verleend`. */
+  const weigerMachtiging = require('./brugweigering')
+    .maakWeigering({ uitleg: require('./gevermacht').maakGeverMacht(kern).uitleg });
 
   /* De rem staat in het geheugen en niet in de database: een teller die per
      aanroep wordt weggeschreven, maakt van een rem een schrijfstorm. Hij gaat bij
@@ -108,50 +109,12 @@ function maakBrug(kern) {
     const naam = String(methode || '');
     const m = Object.prototype.hasOwnProperty.call(METHODES, naam) ? METHODES[naam] : null;
     if (!m) return fout.maak('RTG_METHODE_ONBEKEND', 'De methode "' + naam + '" bestaat niet. Er zijn er ' + namen.length + ': ' + namen.join(', ') + '.', { methode: naam, methodes: namen });
+    /* DE WEIGERING STAAT IN ./brugweigering.js. Drie gevallen met drie
+       verschillende uitwegen, en dat is het contract met een derde; deze
+       functie is de poort en beslist alleen OF er iets doorkomt. */
     const heeft = Array.isArray(verleend) ? verleend : [];
-    /* HET DERDE GEVAL, EN HET STOND ER NIET. Naast "niet gevraagd" en "niet
-       gegeven" bestaat sinds de versmalling (kern/namens/versmalling.js) ook
-       "het lid GAF het, maar mocht het zelf niet weggeven". Dat viel hiervoor
-       onder de tweede, en die zegt er letterlijk bij: "Alleen het lid kan dit
-       aanzetten, in de App Store." Dat is voor dit geval ONWAAR -- het lid kan
-       daar drukken wat hij wil -- en dus stuurde de uitgever hem naar een knop
-       die zijn probleem niet oplost. Een weigering die de verkeerde uitweg
-       noemt, is duurder dan een kale weigering. */
-    const eis = versmald && typeof versmald === 'object' ? versmald[m.machtiging] : null;
-    if (eis && !heeft.includes(m.machtiging)) {
-      return fout.maak('RTG_MACHTIGING_VERSMALD',
-        'De methode "' + naam + '" vraagt de machtiging "' + m.machtiging + '". Dit lid heeft hem ' +
-        'aangevinkt, maar mag hem zelf niet weggeven; hij is daarom niet verleend.',
-        { methode: naam, machtiging: m.machtiging, verleend: heeft, eis,
-          waarom: geverMacht.uitleg(eis),
-          hoe: 'Dit lost het lid niet op met een knop en jij niet met een nieuwe versie. Werk zonder ' +
-            'deze machtiging verder; verandert er iets aan de situatie van het lid, dan kan hij hem ' +
-            'opnieuw verlenen en werkt hij vanzelf.' });
-    }
-    if (!heeft.includes(m.machtiging)) {
-      /* EEN WEIGERING DIE UITLEGT, en dat is geen vriendelijkheid maar
-         gereedschap. "403 Forbidden" laat een uitgever raden tussen vier
-         oorzaken: vroeg ik het verkeerde, vroeg ik het niet, gaf het lid het
-         niet, of trok hij het terug? Elk van die vier heeft een andere
-         oplossing, en drie ervan zijn niets waar hij iets aan kan doen.
-
-         Daarom staat er wat er nodig was, wat dit lid WEL heeft gegeven, en waar
-         hij het kan veranderen. Dat laatste is het belangrijkste: het lid, niet
-         de uitgever, en niet RTG. */
-      const gevraagdMaarNietGegeven = Array.isArray(vraagt) && vraagt.includes(m.machtiging);
-      return fout.maak(gevraagdMaarNietGegeven ? 'RTG_MACHTIGING_NIET_VERLEEND' : 'RTG_MACHTIGING_NIET_GEVRAAGD',
-        'De methode "' + naam + '" vraagt de machtiging "' + m.machtiging + '". '
-          + (gevraagdMaarNietGegeven
-              ? 'Je app vraagt hem in zijn manifest, maar dit lid heeft hem niet verleend of weer ingetrokken.'
-              : 'Je app vraagt hem niet in zijn manifest, dus het lid heeft hem ook nooit kunnen geven.'),
-        { methode: naam,
-        machtiging: m.machtiging,
-        verleend: heeft,
-        gevraagd: Array.isArray(vraagt) ? vraagt : null,
-        hoe: gevraagdMaarNietGegeven
-          ? 'Alleen het lid kan dit aanzetten, in de App Store onder "wat mag deze app". Vraag het niet nog eens via de brug; werk zonder deze machtiging verder.'
-          : 'Zet hem in het manifest van een volgende versie, met een doel. Die versie gaat opnieuw langs de keuring, en het lid beslist opnieuw.' });
-    }
+    const nee = weigerMachtiging({ naam, machtiging: m.machtiging, heeft, vraagt, versmald });
+    if (nee) return nee;
     if (rem('roep:' + sleutel + ':' + key, GRENS.roepenPerMinuut, 60000)) {
       return fout.maak('RTG_TE_VEEL_AANROEPEN', 'Meer dan ' + GRENS.roepenPerMinuut + ' aanroepen per minuut houdt de brug tegen.', { methode: naam, perMinuut: GRENS.roepenPerMinuut });
     }

@@ -30,44 +30,15 @@
    zonder `bereik` valt in bereik.js door de bodem naar de zwaarste klasse; dat
    blijft zo, en juist daarom is dit veld geen verplichting maar een verzwaring
    die je wegneemt als je weet wat je doet. */
-/* `eistVanLid` is de sleutel van een eis aan het LID ZELF -- zie LIDEISEN
-   hieronder. Hij staat op de machtiging en niet in een lijst ernaast, want een
-   tweede lijst met dezelfde vier id's is precies wat hier bij `bereik` al een
-   keer is opgeruimd. */
+/* `eistVanLid` is de sleutel van een eis aan het LID ZELF: iets wat het lid moet
+   kunnen voordat hij het kan weggeven. Hij staat HIER op de machtiging en niet
+   in een lijst ernaast, want een tweede lijst met dezelfde vier id's is precies
+   wat hier bij `bereik` al een keer is opgeruimd. Wat de sleutel BETEKENT en wie
+   hem toetst, staat in ./gevermacht.js -- dit bestand kent geen sessie, geen db
+   en geen poort. */
 const M = (id, label, geeft, nooit, risico, doelen, bereik, eistVanLid) =>
   ({ id, label, geeft, nooit, risico, doelen: doelen || [], bereik: bereik || null,
     eistVanLid: eistVanLid || null });
-
-/* ----------------------------------------------------------------------------
-   WAT HET LID ZELF MOET KUNNEN, VOORDAT HIJ HET KAN WEGGEVEN.
-
-   Een machtiging is een stuk van het vermogen van het lid dat hij aan een app
-   uitleent. Kan hij het zelf niet, dan kan hij het ook niet uitlenen -- dat is
-   REP-03 uit REPRESENTATIE.md, en het is geen nieuwe regel maar een oude die
-   hier niet werd toegepast.
-
-   HET GAT DAT DIT DICHT, EN HET WAS ER EEN VAN EERLIJKHEID EN NIET VAN LEKKAGE.
-   `arena.meedoen` werd aan iedereen verleend, ook aan een lid dat de 18+-poort
-   niet haalt. Er lekte niets -- alle drie de arena-methodes toetsen
-   `progressieMag` bij de UITVOERING en geven `ranglijst: false` terug -- maar
-   het toestemmingsscherm vroeg zo'n lid wél om ja te zeggen tegen "andere
-   spelers zien uw codenaam en uw score op het bord", en ./bereik.js rekende zijn
-   app op de ZWAARSTE klasse (`op-een-bord`). Toestemming voor iets dat
-   structureel niet kan gebeuren, en een risicolabel dat niet klopt.
-
-   DE UITKOMST IS DUS NIET "MINDER MAG", MAAR "ER WORDT NIET MEER GEVRAAGD DAN
-   ER KAN". Onder de grens speelt het spel door -- dat blijft grens 3 van
-   ./arena.js -- alleen wordt de machtiging niet meer verleend, en zegt de brug
-   voortaan de ECHTE reden in plaats van het lid naar een knop te sturen die
-   niets voor hem oplost.
-
-   DE SLEUTEL WORDT HIER VERKLAARD EN ELDERS UITGEVOERD. Dit bestand kent geen
-   sessie, geen db en geen poort; ./gevermacht.js zet de sleutel om in een
-   toets. Een onbekende sleutel valt daar dicht en niet open. */
-const LIDEISEN = Object.freeze({
-  progressie: 'Scores en ranglijsten bewaart RTG alleen voor leden van wie het identiteitsbewijs is ' +
-    'gezien en die 18 of ouder zijn. Het spel zelf speel je gewoon door; er wordt alleen niets bewaard.'
-});
 
 /* ----------------------------------------------------------------------------
    DE DOELEN, EN WAAROM HET EEN GESLOTEN LIJST IS.
@@ -185,8 +156,5 @@ const ALLE_IDS = Object.freeze(MACHTIGINGEN.map(m => m.id));
 const GEEN_CONTEXTBEPERKING = 'Er is aan dit moment niets dat een afzonderlijke machtiging tegenhoudt; ' +
   'wat per moment verschilt (is de app live, is hij betaald, is hij verlopen) geldt voor de hele app.';
 
-const lidEis = (sleutel) => (Object.prototype.hasOwnProperty.call(LIDEISEN, String(sleutel || ''))
-  ? LIDEISEN[String(sleutel)] : null);
-
-module.exports = { MACHTIGINGEN, DOELEN, LIDEISEN, lidEis, ALLE_IDS, GEEN_CONTEXTBEPERKING,
+module.exports = { MACHTIGINGEN, DOELEN, ALLE_IDS, GEEN_CONTEXTBEPERKING,
   machtiging, isMachtiging, toonbaar, doelUitleg, doelMag, NIET_GEBOUWD, RISICO };

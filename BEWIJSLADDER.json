@@ -1,7 +1,7 @@
 {
   "stempel": {
-    "op": "2026-09-15T15:30:54.290Z",
-    "commit": "5b9158ca",
+    "op": "2026-09-15T15:33:03.424Z",
+    "commit": "b007567b",
     "boomVuil": false,
     "boomAnders": 0,
     "instrument": "scripts/bewijsladder.js",
@@ -14,8 +14,8 @@
       "wat": "huisregels, statische analyse, geheimen, het contract van de keten zelf",
       "stand": "stap",
       "waarom": "draait aan beide kanten, maar laat geen gestempeld register achter",
-      "graad": "onbekend",
-      "graadWaarom": "de zwakste premisse is git diff (onbekend)",
+      "graad": "vermoed",
+      "graadWaarom": "de zwakste premisse is git diff (vermoed)",
       "mechanismen": [
         {
           "doel": "git diff",
@@ -30,7 +30,7 @@
           ],
           "register": null,
           "stempel": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/ast-scan.js",
@@ -46,7 +46,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/check.js",
@@ -62,7 +62,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/ci-keten.js",
@@ -78,7 +78,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/ci-lokaal.js",
@@ -88,7 +88,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/deltapoort.js",
@@ -104,7 +104,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/geheimen.js",
@@ -120,7 +120,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/keuring.js",
@@ -130,7 +130,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/normverval.js",
@@ -148,7 +148,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/samenhang.js",
@@ -262,8 +262,8 @@
       "wat": "de toetssuite zelf, plus de as-proeven per route",
       "stand": "staat",
       "waarom": "1 mechanisme(n) draaien aan beide kanten en laten een gestempeld register achter",
-      "graad": "onbekend",
-      "graadWaarom": "de zwakste premisse is scripts/pgtoetsen.js (onbekend)",
+      "graad": "vermoed",
+      "graadWaarom": "de zwakste premisse is scripts/pgtoetsen.js (vermoed)",
       "mechanismen": [
         {
           "doel": "scripts/pgtoetsen.js",
@@ -280,7 +280,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/test-runner.js",
@@ -298,7 +298,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/wekkers.js",
@@ -329,7 +329,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         }
       ]
     },
@@ -412,8 +412,8 @@
       "wat": "isolatie, aanval, gluren, verraad, sabotage, overleving",
       "stand": "staat",
       "waarom": "2 mechanisme(n) draaien aan beide kanten en laten een gestempeld register achter",
-      "graad": "onbekend",
-      "graadWaarom": "de zwakste premisse is npm audit (onbekend)",
+      "graad": "vermoed",
+      "graadWaarom": "de zwakste premisse is npm audit (vermoed)",
       "mechanismen": [
         {
           "doel": "npm audit",
@@ -428,7 +428,7 @@
           ],
           "register": null,
           "stempel": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/gluurronde.js",
@@ -485,8 +485,8 @@
       "wat": "chaos, crash, faalpad, terugweg, geheugen",
       "stand": "staat",
       "waarom": "1 mechanisme(n) draaien aan beide kanten en laten een gestempeld register achter",
-      "graad": "onbekend",
-      "graadWaarom": "de zwakste premisse is scripts/grondwacht.js (onbekend)",
+      "graad": "vermoed",
+      "graadWaarom": "de zwakste premisse is scripts/grondwacht.js (vermoed)",
       "mechanismen": [
         {
           "doel": "scripts/grondwacht.js",
@@ -501,7 +501,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/heapproef.js",
@@ -531,7 +531,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         }
       ]
     },
@@ -541,8 +541,8 @@
       "wat": "de storm, de duurmeting en de gewichten",
       "stand": "staat",
       "waarom": "1 mechanisme(n) draaien aan beide kanten en laten een gestempeld register achter",
-      "graad": "onbekend",
-      "graadWaarom": "de zwakste premisse is scripts/dekkingsvloer.js (onbekend)",
+      "graad": "vermoed",
+      "graadWaarom": "de zwakste premisse is scripts/dekkingsvloer.js (vermoed)",
       "mechanismen": [
         {
           "doel": "scripts/beproeving.js",
@@ -591,7 +591,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/gewichtdrift.js",
@@ -607,7 +607,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/gewichtvoorstel.js",
@@ -623,7 +623,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/toetsduur.js",
@@ -649,8 +649,8 @@
       "wat": "de schermsuite, de a11y-scan en het oordeel erover",
       "stand": "stap",
       "waarom": "draait aan beide kanten, maar laat geen gestempeld register achter",
-      "graad": "onbekend",
-      "graadWaarom": "de zwakste premisse is scripts/a11y-oordeel.js (onbekend)",
+      "graad": "vermoed",
+      "graadWaarom": "de zwakste premisse is scripts/a11y-oordeel.js (vermoed)",
       "mechanismen": [
         {
           "doel": "scripts/a11y-oordeel.js",
@@ -666,7 +666,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/a11y.js",
@@ -684,7 +684,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/e2e.js",
@@ -702,7 +702,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/schermen.js",
@@ -728,8 +728,8 @@
       "wat": "schemamigraties, bewaartermijnen, de container die opkomt",
       "stand": "stap",
       "waarom": "draait aan beide kanten, maar laat geen gestempeld register achter",
-      "graad": "onbekend",
-      "graadWaarom": "de zwakste premisse is scripts/containerproef.js (onbekend)",
+      "graad": "vermoed",
+      "graadWaarom": "de zwakste premisse is scripts/containerproef.js (vermoed)",
       "mechanismen": [
         {
           "doel": "scripts/containerproef.js",
@@ -745,7 +745,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/norm.js",
@@ -779,7 +779,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         }
       ]
     },
@@ -789,8 +789,8 @@
       "wat": "de bronboom gehasht, de stuklijst, de herkomst, de poort ervoor",
       "stand": "stap",
       "waarom": "draait aan beide kanten, maar laat geen gestempeld register achter",
-      "graad": "onbekend",
-      "graadWaarom": "de zwakste premisse is npm run afbouw:software (onbekend)",
+      "graad": "vermoed",
+      "graadWaarom": "de zwakste premisse is npm run afbouw:software (vermoed)",
       "mechanismen": [
         {
           "doel": "npm run afbouw:software",
@@ -804,7 +804,7 @@
           ],
           "register": null,
           "stempel": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/bron-release-bewijs.js",
@@ -819,7 +819,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/build.js",
@@ -835,7 +835,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/envelop.js",
@@ -882,7 +882,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/meetronde.js",
@@ -897,7 +897,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/versheid.js",
@@ -912,7 +912,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/zekerheid.js",
@@ -927,7 +927,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         }
       ]
     },
@@ -937,8 +937,8 @@
       "wat": "het image gebonden aan een digest en een handtekening",
       "stand": "stap",
       "waarom": "draait maar aan een kant: alleen in de keten",
-      "graad": "onbekend",
-      "graadWaarom": "de zwakste premisse is scripts/imageherkomst.js (onbekend)",
+      "graad": "vermoed",
+      "graadWaarom": "de zwakste premisse is scripts/imageherkomst.js (vermoed)",
       "mechanismen": [
         {
           "doel": "scripts/imageherkomst.js",
@@ -953,7 +953,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         }
       ]
     },
@@ -963,8 +963,8 @@
       "wat": "de repetitie, de uitrol en de sonde erna",
       "stand": "stap",
       "waarom": "draait aan beide kanten, maar laat geen gestempeld register achter",
-      "graad": "onbekend",
-      "graadWaarom": "de zwakste premisse is scripts/publieke-tls-proef.js (onbekend)",
+      "graad": "vermoed",
+      "graadWaarom": "de zwakste premisse is scripts/publieke-tls-proef.js (vermoed)",
       "mechanismen": [
         {
           "doel": "scripts/publieke-tls-proef.js",
@@ -979,7 +979,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/sonde.js",
@@ -994,7 +994,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/takken.js",
@@ -1008,7 +1008,7 @@
           "register": null,
           "stempel": null,
           "grond": null,
-          "graad": "onbekend"
+          "graad": "vermoed"
         },
         {
           "doel": "scripts/triage.js",
@@ -1054,8 +1054,8 @@
     "jaren": 0,
     "graadBewezen": 0,
     "graadGemeten": 0,
-    "graadVermoed": 2,
-    "graadOnbekend": 10,
+    "graadVermoed": 12,
+    "graadOnbekend": 0,
     "alleenKeten": 17,
     "zonderTrede": 0
   }

@@ -6,7 +6,7 @@
     "activeringZonderReden": 0,
     "appwerktDefecten": 0,
     "beweringenZonderVulcontrole": 100,
-    "bewijsAchterstand": 2404,
+    "bewijsAchterstand": 2407,
     "bewijsAlleenKeten": 16,
     "bewijsCellenBewezen": 26449,
     "bronBlindeBestanden": 3,
@@ -60,7 +60,7 @@
     "taalPoortHoudtTegen": 7,
     "taalSchilOffline": 10,
     "testbestanden": 1668,
-    "toetsenNietGemeten": 623,
+    "toetsenNietGemeten": 624,
     "toetsenOngevoeligPct": 0,
     "tredeIngangLekken": 0,
     "tredeLekken": 0,
@@ -90,7 +90,7 @@
     "bevestigGebreken": 0,
     "verwijzingGebreken": 0,
     "mensmutatieZonderWacht": 1,
-    "gevolgPadenOnbekend": 96,
+    "gevolgPadenOnbekend": 95,
     "gevolgContractVolledig": 8,
     "gevolgContractenGezakt": 0,
     "crashasOnbekend": 63,
@@ -109,10 +109,19 @@
     "geldRoutesValsSucces": 28,
     "stilSpoor": 18,
     "stilleOpslag": 25,
-    "stilSpoorAanroepen": 228,
-    "namensMechanismenGemeten": 7
+    "stilSpoorAanroepen": 228
   },
   "notities": [
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 623,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 623 -> 624",
+      "reden": "De som van drie lijnen die elk hun eigen post al hadden: de main-lijn (fiscaal-meegeleverd, idemcontract), stap 1 (namensvorm plus de drie namens-bestanden) en stap 2 (namensversmalling-bedrading). Er komt met deze merge GEEN nieuw ongemeten toetsbestand bij -- het getal stijgt omdat de drie lijnen nu in een boom staan. De drie posten blijven daarom apart bewaard: samenvoegen tot een post zou de herkomst wissen, en dan weet niemand meer welke bestanden de motor moet zien.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom dekt alle drie de lijnen in een keer."
+    },
     {
       "datum": "2026-09-15",
       "soort": "afgelost",
@@ -141,6 +150,46 @@
       "meter": "toetsenNietGemeten 622 -> 623",
       "reden": "test/namensversmalling-bedrading.test.js komt erbij -- negen toetsen op de versmalling op levende paden (REPRESENTATIE.md stap 2) -- en staat nog niet in MUTATIES.json. Alle negen zijn met de hand gemuteerd, op een SCHONE gecommitte boom, en elke mutatie raakte precies de toetsen die hij hoort te raken: geverEffectief niet meer snijden laat 1, 3 en 4 zakken; de versmald-tak uit de brug halen laat alleen 3 zakken; de onbekende-bron-tak uit versmalNamens halen laat 6 en 9 zakken; de doorsnede uit verleen() van het mandaat halen laat 5 en 7 zakken. Toets 2 is de besturingsproef en blijft bij alle vier staan -- hij valt alleen om als de snede ALLES wegsnijdt, en dat is precies waarvoor hij er is.",
       "waarheen": "Laat scripts/mutatie.js over test/namensversmalling-bedrading.test.js lopen, samen met de drie namens-bestanden en namensvorm uit de notities hieronder."
+    },
+    {
+      "datum": "2026-09-15",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 622,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 622 -> 623",
+      "reden": "Het binnenhalen van main (57 commits) brengt toetsen mee waar de mutatiemotor nog niet langs is geweest. Dit is GEEN nieuwe schuld van deze tak: het getal is de som van twee lijnen die elk hun eigen post al hadden staan (de main-lijn noemt test/fiscaal-meegeleverd.test.js en test/idemcontract.test.js; deze tak test/namensvorm.test.js en de drie namens-bestanden). De notities van beide lijnen staan naast elkaar bewaard in plaats van dat de ene de andere overschreef -- ze beschrijven elk een echte gebeurtenis op hun eigen lijn, en samenvoegen tot een post zou de herkomst wissen.",
+      "waarheen": "Een volledige npm run mutatie op een schone boom dekt beide lijnen in een keer; de bestandsnamen staan in de twee posten hieronder."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 618,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 618 -> 619",
+      "reden": "test/namensvorm.test.js komt erbij -- zes toetsen op scripts/namensvorm.js (REPRESENTATIE.md par. 0) -- en staat nog niet in MUTATIES.json. Alle zes zijn met de hand gemuteerd en de dragende drie zagen zakken: `async` uit het naampatroon halen laat toets 2, 3 en 6 zakken, en alle zeven synoniemen op /./ zetten breekt toets 4. Die mutatie is niet academisch maar de fout die hier ECHT is gemaakt: zonder `async` meldde de meter dat kern/vertegenwoordiging/ geen verlenen, aanvaarden en intrekken heeft terwijl die drie er als async function staan -- een geldige uitslag van het verkeerde experiment (BEWIJSMACHINE.md par. 6a).",
+      "waarheen": "Laat scripts/mutatie.js over test/namensvorm.test.js lopen, samen met railvergelijk, menselijkeuitvoering, mensmutatie, stuurspoor, stuurrail, menstaal en stuurplafond uit de notities hierboven."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "keuringScheef",
+      "van": 16,
+      "vervalt": "2026-12-15",
+      "meter": "keuringScheef 16 -> 17",
+      "reden": "server/kern/namens/versmalling.js wordt nog nergens aangeroepen, en de keuring merkt dat terecht op. Dit is de eerste helft van stap 1 uit REPRESENTATIE.md par. 6: de invariant (REP-03, effectief = gevraagd doorsnede geverEffectief doorsnede beleid doorsnede context) staat er en is met 500 gegenereerde invoeren beproefd, maar de zes mechanismen lopen er nog niet doorheen -- dat is echte gedragswijziging op onder meer SEPA-mandaten en app-rechten en hoort een eigen ronde te zijn. Dit huis kent die tussenstand met naam: INTELLIGENTIE.md noteert dat kern/stuur/mandaat.js nul productie-aanroepers heeft, om precies dezelfde reden.",
+      "waarheen": "De bedradingsronde: laat kern/appstore (winkel.js verleen) en kern/fiscaal/gateway/mandaat.js (verleen) de doorsnede aanroepen met een echte geverEffectief. Dat sluit tegelijk twee van de drie openstaande versmallen-posten uit kern/namens/verklaring.js."
+    },
+    {
+      "datum": "2026-09-14",
+      "soort": "schuld",
+      "sleutel": "toetsenNietGemeten",
+      "van": 619,
+      "vervalt": "2026-12-15",
+      "meter": "toetsenNietGemeten 619 -> 622",
+      "reden": "Drie toetsbestanden komen erbij (namensversmalling, namensverklaring, namensprojectie: 24 toetsen samen) en staan nog niet in MUTATIES.json. Alle drie zijn met de hand gemuteerd en zagen zakken: de doorsnede tot een optelsom maken laat 6 van de 8 versmallingstoetsen zakken; een ontbrekende bron als ALLES lezen laat toets 3 en 4 zakken; purpose stil invullen laat toets 4 en 5 van de projectie zakken; de codenaamzeef nabouwen in plaats van hergebruiken laat toets 3 en 9 zakken; en een verklaring op voert zetten zonder opmerking laat toets 4 van de verklaring zakken.",
+      "waarheen": "Laat scripts/mutatie.js over de drie namens-toetsbestanden lopen, samen met namensvorm en de overige bestanden uit de notities hierboven."
     },
     {
       "datum": "2026-09-12",
@@ -2373,33 +2422,23 @@
     },
     {
       "datum": "2026-09-14",
+      "meter": "bewijsAchterstand 2404 -> 2407",
+      "soort": "schuld",
+      "sleutel": "bewijsAchterstand",
+      "van": 2404,
+      "vervalt": "2026-12-15",
+      "reden": "Drie routes deden in deze ronde WEL werk waar de vorige niets zag: /api/boardroom/betalingen/proef, /api/mediaos/aanwezig/zoek en /api/mediaos/momenten. Daarmee hebben ze een tweede keer om over te beslissen, en die uitspraak staat nog niet in IDEMBESLUIT.json -- post idem-ongeclassificeerd 1592 -> 1595. Er is dus niets slechter geworden: er kwam iets in beeld dat er al was. GEMETEN en niet afgeleid uit het verschil in de teller: de werk-rijen van beide rondes naast elkaar gelegd geeft 1715 -> 1718, en de drie namen komen daaruit.",
+      "waarheen": "Die drie routes classificeren in IDEMBESLUIT.json; dan zakt de tand vanzelf terug naar 2404 of lager."
+    },
+    {
+      "datum": "2026-09-14",
       "soort": "schuld",
       "sleutel": "toetsenNietGemeten",
       "van": 618,
       "vervalt": "2026-12-15",
       "meter": "toetsenNietGemeten 618 -> 619",
-      "reden": "test/namensvorm.test.js komt erbij -- zes toetsen op scripts/namensvorm.js (REPRESENTATIE.md par. 0) -- en staat nog niet in MUTATIES.json. Alle zes zijn met de hand gemuteerd en de dragende drie zagen zakken: `async` uit het naampatroon halen laat toets 2, 3 en 6 zakken, en alle zeven synoniemen op /./ zetten breekt toets 4. Die mutatie is niet academisch maar de fout die hier ECHT is gemaakt: zonder `async` meldde de meter dat kern/vertegenwoordiging/ geen verlenen, aanvaarden en intrekken heeft terwijl die drie er als async function staan -- een geldige uitslag van het verkeerde experiment (BEWIJSMACHINE.md par. 6a).",
-      "waarheen": "Laat scripts/mutatie.js over test/namensvorm.test.js lopen, samen met railvergelijk, menselijkeuitvoering, mensmutatie, stuurspoor, stuurrail, menstaal en stuurplafond uit de notities hierboven."
-    },
-    {
-      "datum": "2026-09-14",
-      "soort": "schuld",
-      "sleutel": "keuringScheef",
-      "van": 16,
-      "vervalt": "2026-12-15",
-      "meter": "keuringScheef 16 -> 17",
-      "reden": "server/kern/namens/versmalling.js wordt nog nergens aangeroepen, en de keuring merkt dat terecht op. Dit is de eerste helft van stap 1 uit REPRESENTATIE.md par. 6: de invariant (REP-03, effectief = gevraagd doorsnede geverEffectief doorsnede beleid doorsnede context) staat er en is met 500 gegenereerde invoeren beproefd, maar de zes mechanismen lopen er nog niet doorheen -- dat is echte gedragswijziging op onder meer SEPA-mandaten en app-rechten en hoort een eigen ronde te zijn. Dit huis kent die tussenstand met naam: INTELLIGENTIE.md noteert dat kern/stuur/mandaat.js nul productie-aanroepers heeft, om precies dezelfde reden.",
-      "waarheen": "De bedradingsronde: laat kern/appstore (winkel.js verleen) en kern/fiscaal/gateway/mandaat.js (verleen) de doorsnede aanroepen met een echte geverEffectief. Dat sluit tegelijk twee van de drie openstaande versmallen-posten uit kern/namens/verklaring.js."
-    },
-    {
-      "datum": "2026-09-14",
-      "soort": "schuld",
-      "sleutel": "toetsenNietGemeten",
-      "van": 619,
-      "vervalt": "2026-12-15",
-      "meter": "toetsenNietGemeten 619 -> 622",
-      "reden": "Drie toetsbestanden komen erbij (namensversmalling, namensverklaring, namensprojectie: 24 toetsen samen) en staan nog niet in MUTATIES.json. Alle drie zijn met de hand gemuteerd en zagen zakken: de doorsnede tot een optelsom maken laat 6 van de 8 versmallingstoetsen zakken; een ontbrekende bron als ALLES lezen laat toets 3 en 4 zakken; purpose stil invullen laat toets 4 en 5 van de projectie zakken; de codenaamzeef nabouwen in plaats van hergebruiken laat toets 3 en 9 zakken; en een verklaring op voert zetten zonder opmerking laat toets 4 van de verklaring zakken.",
-      "waarheen": "Laat scripts/mutatie.js over de drie namens-toetsbestanden lopen, samen met namensvorm en de overige bestanden uit de notities hierboven."
+      "reden": "De derde integratieronde na #267 voegt twee toetsbestanden toe waar de mutatiemotor nog niet langs is geweest: test/fiscaal-meegeleverd.test.js en test/idemcontract.test.js. De toetsen draaien wel; deze post zegt uitsluitend dat hun gevoeligheid nog niet door een volledige mutatieronde is bewezen. Het getal stijgt met een en niet met twee omdat de meter per toets telt en niet per bestand. MUTATIES.json is NIET hergedraaid: die motor duurt uren, schrijft in echte bronbestanden en hoort op een schone boom te draaien, dus hij zit in ronde.yml en niet in ci.yml -- de bundel draagt de meting van de main-lijn.",
+      "waarheen": "De twee toetsen meenemen in de volgende volledige npm run mutatie op een schone boom, samen met de zeven van 14 september."
     }
   ],
   "prestatie": {
@@ -2428,7 +2467,7 @@
     "toetsenOngevoeligPct": "2026-09-05",
     "endpointsZonderTest": "2026-09-13",
     "dekkingPct": "2026-09-06",
-    "keuringScheef": "2026-09-14",
+    "keuringScheef": "2026-09-05",
     "keuringTeGroot": "2026-09-05",
     "keuringDubbeling": "2026-09-07",
     "keuringDekkingAdvies": "2026-09-06",
@@ -2498,8 +2537,7 @@
     "geldRoutesValsSucces": "2026-09-14",
     "stilSpoor": "2026-09-14",
     "stilleOpslag": "2026-09-14",
-    "stilSpoorAanroepen": "2026-09-14",
-    "namensMechanismenGemeten": "2026-09-14"
+    "stilSpoorAanroepen": "2026-09-14"
   },
   "uitzonderingen": [
     {

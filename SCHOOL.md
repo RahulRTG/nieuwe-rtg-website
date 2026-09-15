@@ -711,8 +711,21 @@ hoofdstuk van dit document.
    uitvalkans, geen ranglijst, geen niveau-label dat blijft plakken. Signalen
    zijn factoren met hun rekensom; de lijst staat op naam en nooit op zwaarte.
    Bestaande regel, blijft staan: alles wat een prestatie buiten de sessie
-   bewaart, valt onder `progressieMag` (18+), en School houdt vast aan **"leren
-   is geen wedstrijd"**.
+   bewaart **om haar te vergelijken of als stand te laten gelden**, valt onder
+   `progressieMag` (18+), en School houdt vast aan **"leren is geen wedstrijd"**.
+
+   **Een leerdossier valt daar niet onder, en dat is op 14 september 2026
+   vastgelegd** (`FOUNDATION.md` par. 5.5). De letterlijke lezing van deze regel
+   liep stuk op haar eigen bedoeling: zij zou betekenen dat School van een kind
+   niets vastlegt -- geen behaald leerdoel, geen leerlijn, geen overgang -- en
+   dat is niet de bescherming die de grens bedoelt maar het tegenovergestelde.
+   Juist *"leren is geen wedstrijd"* is de reden: een leerdossier is geen
+   wedstrijduitslag. Het mag op elke leeftijd bestaan zolang het over de persoon
+   zelf gaat en nooit vergelijkt, geen blijvend niveau-label draagt, alleen
+   leesbaar is voor de leerling en wie al een rechtmatige verhouding tot hem
+   heeft, en aan de codenaam hangt. Valt er een van die vier weg, dan is het de
+   progressielaag onder een andere naam en geldt `progressieMag` weer.
+
 2. **De AI stelt geen schooladvies vast, kent geen niveau toe en verleent geen
    toegang.** Zij stelt voor; een mens besluit, met naam en moment. Dit is de
    schoolvariant van de bestaande huisregel dat AI nooit zelf toegang belooft.

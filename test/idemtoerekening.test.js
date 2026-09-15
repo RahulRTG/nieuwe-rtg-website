@@ -57,13 +57,20 @@ function verschil(oud, nieuw) {
 
 /* De proef opzetten zoals scripts/idemproef-route.js dat doet, maar met de
    nagemaakte wereld. `metHerijk` staat aan of uit -- dat is de mutatie. */
-async function draai({ metHerijk, metVoorziening = true }) {
+async function draai({ metHerijk, metVoorziening = true, metDoodToken = false, metNaInlog = false }) {
   const w = maakWereld();
   const PAD = '/api/proef/intrek';
 
+  /* EEN TOKEN DAT ONDERWEG STERFT. `metDoodToken` laat de eerste GEMETEN oproep een
+     401 geven -- precies de situatie waarin de echte proef opnieuw inlogt. De 401
+     schrijft zelf niets: een geweigerde oproep hoort niets achter te laten, en zou
+     hij dat wel doen, dan meet deze toets zijn eigen fixture. */
+  let eenmalig401 = metDoodToken;
+
   /* De gemeten route WIJZIGT alleen zijn onderwerp; hij maakt niets aan. Dat is de
      hele aanname die de toerekening moet respecteren. */
-  const post = async (pad) => {
+  const post = async (pad, lijf) => {
+    if (eenmalig401 && lijf && lijf.idem) { eenmalig401 = false; return { status: 401, staat: w.stand(), body: {} }; }
     /* De gemeten route EN de pasladder-ijkoproep gaan naar hetzelfde pad -- zo werkt
        de echte proef ook, die de deur eerst op dat pad probeert. De voorziening gaat
        naar haar eigen pad en raakt twee collecties die de route zelf nooit raakt. */
@@ -81,9 +88,18 @@ async function draai({ metHerijk, metVoorziening = true }) {
   };
   const herijk = metHerijk ? (antwoord) => { if (antwoord && antwoord.staat != null) vorige = antwoord.staat; } : null;
 
+  /* DE INLOG SCHRIJFT, en dat is gemeten en niet verzonnen: /api/login zet een rij in
+     `sessions` (14 september 2026, wegwerpserver met RTG_STAATLOG=2). De sleutelbos
+     onthoudt de stand die het ANTWOORD van die inlog droeg; `naInlog` geeft daarmee de
+     NAMEN terug die deze inlog raakte -- dezelfde weg als in scripts/idemproef-route.js,
+     hier nagemaakt. Hij schuift het ijkpunt met opzet niet op: zie toets 4. */
+  let inlogStaat = null;
+  const hernieuw = async () => { w.schrijf('sessions'); inlogStaat = w.stand(); return true; };
+  const naInlog = metNaInlog ? ({ voor }) => (voor == null || inlogStaat == null ? [] : Object.keys(verschil(voor, inlogStaat))) : null;
+
   const uit = await draaiIdemproef({
     post, routes: [{ methode: 'POST', pad: PAD, rol: 'member' }],
-    tokenVoor: () => 'token', lijfVoor: () => ({}), staatVan, herijk,
+    tokenVoor: () => 'token', lijfVoor: () => ({}), staatVan, herijk, hernieuw, naInlog,
     metenZonderSleutel: false, pasladder: ['member', 'lifestyle'],
     /* DE VOORZIENING SCHRIJFT, net als in het echt: zij maakt het onderwerp aan en
        raakt daarbij twee collecties die de gemeten route zelf nooit aanraakt. */
@@ -92,7 +108,10 @@ async function draai({ metHerijk, metVoorziening = true }) {
   });
   /* De sleutel is "POST <pad>" en niet het pad alleen -- dat kostte de eerste versie
      van deze toets drie valse rode lampjes. */
-  return (uit.perRoute['POST ' + PAD] || {}).opslag || {};
+  const rij = uit.perRoute['POST ' + PAD] || {};
+  /* De opslag EN de melding erover: toets 4 heeft beide nodig, en de andere toetsen
+     lezen alleen `a`/`b`/`c` -- dus een extra veld erbij stoort daar niets. */
+  return Object.assign({}, rij.opslag || {}, { inlogOnderweg: rij.inlogOnderweg });
 }
 
 test('1. ZONDER herijk lekt het voorwerk in het vak van de gemeten handeling', async () => {
@@ -172,4 +191,49 @@ test('3. de herijking VERZINT niets: wat de handeling wel doet, blijft staan', a
   assert.ok(Object.keys(opslag.a || {}).length > 0,
     'na de herijking is `a` helemaal leeg -- dan is de reparatie doorgeschoten en leest ' +
     'elke route als "verandert niets", wat erger is dan de fout zelf');
+});
+
+test('4. een verse inlog ONDERWEG wordt niet aan de route toegerekend', async () => {
+  /* DE VIERDE WEG WAARLANGS VREEMD WERK IN `opslag.a` KOMT, en de eerste die niet uit
+     het voorwerk van de route komt maar uit de opstelling: verloopt een token, dan logt
+     de proef opnieuw in en doet de oproep over. Die inlog schrijft.
+
+     GEMETEN op 14 september 2026 (wegwerpserver, RTG_STAATLOG=2, ruis geijkt op een
+     leesroute): /api/login geeft {"sessions":1} en /api/auth/login -- de keten die een
+     eigenrol nodig heeft -- {"securityLog":2,"sessiecontext":1,"foundation":2}. Geen van
+     de vier staat in de ruislijst.
+
+     WAT HET KOSTTE. `sessions` is in server/kern/isolatie/effectcollecties.js ingedeeld
+     als IDENTITEIT_WIJZIGEN, en de ronde van 14 september droeg hem op acht routes --
+     waarvan er EEN (/api/logout) hem werkelijk schrijft. /api/mall en vijf
+     rtfos-routes "wijzigden identiteit" omdat de proef er tussendoor opnieuw had
+     ingelogd. Dat is geen ruis in een teller maar een verzonnen effect in de laag die
+     over bevoegdheid gaat. */
+  const zonder = await draai({ metHerijk: true, metVoorziening: false, metDoodToken: true, metNaInlog: false });
+  assert.ok(Object.keys(zonder.a || {}).includes('sessions'),
+    'de nulmeting klopt niet: zonder herijking na de inlog hoort `sessions` juist WEL in ' +
+    '`a` te staan, en hier staat: ' + Object.keys(zonder.a || {}).join(', '));
+
+  const met = await draai({ metHerijk: true, metVoorziening: false, metDoodToken: true, metNaInlog: true });
+  assert.deepStrictEqual(Object.keys(met.a || {}).sort(), ['onderwerpen'],
+    'na de herijking hoort er van de inlog niets meer in `a` te staan; gevonden: ' +
+    Object.keys(met.a || {}).join(', '));
+
+  /* EN HET WERK VAN DE ROUTE ZELF BLIJFT STAAN -- dezelfde valkuil als in toets 3: een
+     zeef die te veel wegneemt, maakt van een schrijfroute een route die niets doet.
+     TWEE, want de pasladder-ijkoproep raakt dezelfde route (toets 2b), en juist dat is
+     de reden dat hier de NAMEN van de inlog worden weggelaten en niet het IJKPUNT wordt
+     opgeschoven. Nagemeten met een opgeschoven ijkpunt: dan staat hier 1, en op
+     /api/member/ai/tegoed -- idempotent per lid -- blijft er `{}` over. */
+  assert.equal((met.a || {}).onderwerpen, 2,
+    'de ijkoproep en de herhaalde oproep raken allebei deze route; staat hier minder, ' +
+    'dan neemt de zeef het effect van de handeling zelf mee');
+
+  /* EN DE WEGLATING STAAT IN HET REGISTER. Een zeef die stil wegvangt, is niet na te
+     lopen: wie de opslag van zo'n route leest, hoort te zien dat er een inlog tussendoor
+     kwam en welke namen daarbij zijn weggelaten. */
+  assert.deepStrictEqual(met.inlogOnderweg, ['sessions'],
+    'de route hoort te melden dat er onderweg is ingelogd en welke collecties dat raakte');
+  assert.equal(zonder.inlogOnderweg, undefined,
+    'zonder de zeef valt er niets weg en hoort er dus ook niets gemeld te worden');
 });

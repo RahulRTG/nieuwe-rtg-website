@@ -1,5 +1,6 @@
 
-const { magBij } = require('./eigendom');/* RTG Bank, deel "passen": betaalpassen en creditcards op een rekening. Een pas is
+const { magBij } = require('./eigendom');
+const idemContract = require('../../lib/idem-contract');/* RTG Bank, deel "passen": betaalpassen en creditcards op een rekening. Een pas is
    een instrument OP een rekening: uitgeven, bevriezen, een daglimiet, en betalen
    (dat boekt van de gekoppelde rekening naar extern:kaartbetaling en respecteert de
    bodem van de rekening, dus ook de rood-staan-ruimte bij een creditcard). Het volle
@@ -36,7 +37,15 @@ module.exports = (ctx) => {
     if (!magBij(m, codenaam)) return { status: 404, error: 'De rekening bestaat niet.' };
     if (!SOORTEN[soort]) return { status: 400, error: 'Kies een betaalpas of creditcard.' };
     if (Object.values(passen()).filter(p => p.codenaam === m.codenaam).length >= 20) return { status: 429, error: 'Het maximaal aantal passen is bereikt.' };
-    return metIdem(idem ? 'pasuit:' + iban + ':' + idem : null, 'pasuit|' + iban + '|' + soort, () => {
+    /* De identiteit van deze handeling staat sinds september 2026 VERKLAARD in
+       ../../lib/idem-contract.js in plaats van hier met de hand gebouwd. De
+       verklaring levert byte voor byte dezelfde afdruk op -- dat moet ook, want
+       ../../lib/idem.js BEWAART die afdruk naast de sleutel, en een andere vorm
+       zou elke sleutel die nu in de database staat op een 409 laten lopen. De
+       sleutel zelf blijft hier: die hangt aan de rekening en aan wat de
+       aanroeper meestuurt, en is geen eigenschap van de handeling. */
+    return metIdem(idem ? 'pasuit:' + iban + ':' + idem : null,
+      idemContract.identiteitVan('bank.pas.uitgeven', { iban, soort }), () => {
       const pan = genPan();
       const pas = { id: 'PAS' + crypto.randomBytes(5).toString('hex').toUpperCase(), iban, codenaam: m.codenaam, soort,
         naam: String(naam || SOORTEN[soort]).replace(/[<>]/g, '').slice(0, 40), masker: masker(pan), laatste4: pan.slice(-4),

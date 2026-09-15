@@ -87,6 +87,21 @@ const GEVAL = {
   contexten: ['foundation', 'school', 'work', 'living'],
   actoren: ['systeem', 'medewerker', 'partner', 'externeLezer'],
 
+  /* TWEE ACTOREN DIE ALLEEN IN SCHOOL BESTAAN, en dat is geen verfijning maar
+     de voorwaarde om het besluit van 14 september uberhaupt te kunnen opschrijven.
+
+     De vier actoren hierboven zijn allemaal DERDEN: het systeem, een medewerker
+     van RTG, een partner, een externe lezer. De leerling zelf en zijn docent
+     komen er niet in voor, en juist over die twee gaat de uitzondering. Zonder
+     hen is "alleen aan de leerling en zijn docent" niet uit te drukken en valt
+     de keuze terug op alles of niets -- en dat was hem ook: de uitzondering gold
+     voor `opslaan` in de hele context, voor elke actor.
+
+     Ze bestaan ALLEEN in school. Een `leerling` in de context `work` is een cel
+     zonder betekenis, en 24 betekenisloze cellen erbij zouden de telling
+     oppoetsen met lucht. */
+  actorenPer: { school: ['leerling', 'docent'] },
+
   /* DE CLAIM-AS: uit de doctrine en nergens anders vandaan. Dit is een VERKLAARDE
      lezing van een mens; wat de machine ervan controleert is dat elk citaat nog
      bestaat in het document dat het noemt (dezelfde vorm als de ankers in
@@ -104,11 +119,27 @@ const GEVAL = {
     /* Waar de doctrine zelf een uitzondering maakt. Zonder deze zou elke cel in
        School als overtreding lezen, terwijl een cijfer op een toets juist het
        product is (SCHOOL.md par. 11 verbiedt een risicoscore, een uitvalkans en
-       een blijvend niveau-label -- niet het cijferboek). */
+       een blijvend niveau-label -- niet het cijferboek).
+
+       DE UITZONDERING KENT SINDS 14 SEPTEMBER EEN ACTOR, en dat is het besluit
+       van de eigenaar op de bevinding die dit register zelf opleverde. Hij stond
+       op de HANDELING `opslaan` en op niets anders, en daardoor viel `tonen`
+       volledig buiten de uitzondering -- ook aan de leerling zelf. Dat is niet
+       vol te houden: een cijfer LATEN ZIEN aan de leerling van wie het is, is
+       dezelfde leerstof als het bewaren ervan. Andersom is een cijfer tonen aan
+       een partner of een externe lezer precies wat par. 11.1 tegenhoudt.
+
+       Vandaar twee regels in plaats van een, en de tweede noemt de twee actoren
+       bij naam. Wat er NIET in staat is even belangrijk: `systeem`, `medewerker`,
+       `partner` en `externeLezer` blijven bij `tonen` onder de grens vallen. */
     uitzonderingen: [
       { context: 'school', handeling: 'opslaan',
         waarom: 'SCHOOL.md par. 11.1 verbiedt een score BUITEN het potje (risicoscore, uitvalkans, ranglijst, ' +
           'blijvend niveau-label); een cijfer op een toets is de leerstof zelf en valt daar niet onder' },
+      { context: 'school', handeling: 'tonen', actoren: ['leerling', 'docent'],
+        waarom: 'een cijfer tonen aan de leerling van wie het is, of aan zijn docent, is dezelfde leerstof ' +
+          'als het bewaren ervan. Tonen aan een partner of een externe lezer is dat niet en blijft onder ' +
+          'de grens -- dat is precies het onderscheid dat SCHOOL.md par. 11.1 maakt' },
     ],
   },
 
@@ -128,6 +159,13 @@ const CONTEXT_VAN = [
 ];
 const contextVan = (p) => (CONTEXT_VAN.find(([re]) => re.test(p)) || [null, null])[1];
 
+/* Welke actoren bestaan er in deze context? De vier derden overal, plus wat
+   alleen daar bestaat. Een actor die in een context niets betekent, levert geen
+   cel op -- de celruimte hoort te beschrijven wat er is, niet wat er past. */
+function actorenVan(context) {
+  return GEVAL.actoren.concat((GEVAL.actorenPer || {})[context] || []);
+}
+
 /* ------------------------------------------------------------ de drie assen */
 
 /* CLAIM. Geeft per cel of de doctrine daar iets claimt. De strekking is
@@ -137,10 +175,12 @@ function asClaim() {
   const cellen = new Map();
   for (const handeling of GEVAL.handelingen) {
     for (const context of GEVAL.contexten) {
-      for (const actor of GEVAL.actoren) {
+      for (const actor of actorenVan(context)) {
         const uitz = GEVAL.claim.uitzonderingen.find(u =>
-          (!u.context || u.context === context) && (!u.handeling || u.handeling === handeling));
-        cellen.set(sleutel(handeling, context, actor), uitz ? { claimt: false, waarom: uitz.waarom } : { claimt: true });
+          (!u.context || u.context === context) && (!u.handeling || u.handeling === handeling) &&
+          (!u.actoren || u.actoren.includes(actor)));
+        cellen.set(sleutel(handeling, context, actor),
+          uitz ? { claimt: false, uitgezonderd: true, waarom: uitz.waarom } : { claimt: true });
       }
     }
   }
@@ -188,7 +228,7 @@ function asDraag(vormen, routesPerBestand) {
     /* Wie de bewaarde vorm leest is niet uit de vorm af te leiden, dus de actor
        blijft onbepaald: de cel wordt gezet voor elke actor en die onzekerheid
        staat in de uitslag. */
-    for (const actor of GEVAL.actoren) {
+    for (const actor of actorenVan(context)) {
       cellen.set(sleutel('opslaan', context, actor), true);
       if (routes.length) cellen.set(sleutel('tonen', context, actor), true);
     }
@@ -214,7 +254,26 @@ function routesPerBestand() {
   } catch (e) { return { kaart: new Map(), stand: 'geenBron' }; }
 }
 
-/* WACHT. Uit de BRON van de wachter: welke paden scant hij? */
+/* WACHT. Uit de BRON van de wachter: welke paden scant hij?
+
+   DE NAMEN WORDEN TEGEN DE BOOM GEHOUDEN EN NIET VAN EEN VOORVOEGSEL VOORZIEN,
+   en dat is op 14 september gerepareerd nadat deze as zichzelf had betrapt.
+
+   De oude lezer deed twee aannames tegelijk: hij pakte met `\[([^\]]*)\]` het
+   EERSTE vierkante haakjespaar, en hij plakte voor elke naam `server/kern/`. In
+   MAPPEN staat de kernlijst inderdaad eerst, maar eronder staat nog een losse
+   regel -- `path.join(__dirname, '..', 'server', 'school')` -- en die viel
+   buiten het eerste haakjespaar EN buiten het voorvoegsel. Gevolg: de wachter
+   scande School aantoonbaar (toets 3 zakt zonder), terwijl deze as meldde dat
+   School door niemand werd bekeken. Elke schoolcel las daardoor als ongezien.
+
+   Dat is precies de faalvorm waar dit hele geval over gaat: een sensor die niet
+   kon kijken, gaf een uitslag alsof hij had gekeken. Nu leest hij ALLE tekens
+   tussen de buitenste haken, en resolveert elke naam tegen de echte boom --
+   `server/<naam>` of `server/kern/<naam>`, en alleen als de gevonden map ook
+   echt zo heet. Wat niet resolveert, staat als `nietOpgelost` in de uitslag en
+   verdwijnt niet stil: een naam die de as niet thuisbrengt, is een gat in de
+   meting en geen nul. */
 function asWacht(bronTekst) {
   /* De bron is een PARAMETER zodat test/gelding.test.js hem kan verhangen zonder
      een bestand aan te raken -- en zodat deze as aantoonbaar niets anders leest
@@ -222,38 +281,97 @@ function asWacht(bronTekst) {
   let bron = bronTekst;
   if (bron === undefined) {
     try { bron = fs.readFileSync(path.join(WORTEL, GEVAL.wachter.bestand), 'utf8'); }
-    catch (e) { return { cellen: new Map(), paden: [], bron: 'geenBron' }; }
+    catch (e) { return { cellen: new Map(), paden: [], nietOpgelost: [], bron: 'geenBron' }; }
   }
 
-  const m = bron.match(new RegExp('const\\s+' + GEVAL.wachter.lijst + '\\s*=\\s*\\[([^\\]]*)\\]'));
-  if (!m) return { cellen: new Map(), paden: [], bron: 'lijstNietGevonden' };
-  const paden = [...m[1].matchAll(/'([^']+)'/g)].map(x => x[1]);
+  const start = bron.search(new RegExp('const\\s+' + GEVAL.wachter.lijst + '\\s*=\\s*\\['));
+  if (start < 0) return { cellen: new Map(), paden: [], nietOpgelost: [], bron: 'lijstNietGevonden' };
+  /* De BUITENSTE haken, gebalanceerd geteld. Het eerste `]` is dat van de
+     binnenste lijst met kernnamen, en daar hield de oude lezer op. */
+  const open = bron.indexOf('[', start);
+  let diep = 0, eind = -1;
+  for (let i = open; i < bron.length; i++) {
+    if (bron[i] === '[') diep++;
+    else if (bron[i] === ']' && --diep === 0) { eind = i; break; }
+  }
+  if (eind < 0) return { cellen: new Map(), paden: [], nietOpgelost: [], bron: 'lijstNietGesloten' };
+
+  const namen = [...bron.slice(open, eind).matchAll(/'([^']+)'/g)].map(x => x[1]);
+
+  /* EERST RESOLVEREN, DAN DE PADFRAGMENTEN ERUIT. De lijst bevat naast de
+     bewaakte namen ook de brokken van de `path.join`-aanroepen eromheen ('..',
+     'server', 'kern'), en sommige daarvan resolveren gewoon: `server/..` is de
+     wortel en `server/kern` is een echte map. Een hardgecodeerd rijtje woorden
+     zou dat oplossen en meteen de volgende lijst zijn die uit de pas loopt.
+
+     Het signaal zit in de boom zelf: een bewaakte map is een BLAD van deze
+     verzameling. Wat een strikte voorouder is van een andere kandidaat, is een
+     brok van het pad ernaartoe en geen doel op zich. Dat staat als `padfragment`
+     in de uitslag en niet weggemoffeld -- zou iemand ooit echt een map EN een
+     submap ervan bewaken, dan ziet hij hier waarom de bovenste wegviel. */
+  const opgelost = [];
+  const nietOpgelost = [];
+  for (const naam of namen) {
+    const kandidaat = ['server/' + naam, 'server/kern/' + naam]
+      .map(p => path.normalize(p).split(path.sep).join('/'))
+      /* NORMALISEREN VOOR HET RESOLVEREN, want '..' maakt van 'server/..' de
+         WORTEL -- en de wortel is geen bewaakte map maar het huis zelf. */
+      .filter(p => p !== '.' && !p.startsWith('..'))
+      .find(p => { try { return fs.statSync(path.join(WORTEL, p)).isDirectory(); }
+                   catch (e) { return false; } });
+    if (kandidaat) { if (!opgelost.some(o => o.pad === kandidaat)) opgelost.push({ naam, pad: kandidaat }); }
+    else nietOpgelost.push(naam);
+  }
+  const isVoorouder = (a, b) => a !== b && (b + '/').startsWith(a + '/');
+  const paden = opgelost.filter(o => !opgelost.some(x => isVoorouder(o.pad, x.pad))).map(o => o.pad);
+  const padfragment = opgelost.filter(o => opgelost.some(x => isVoorouder(o.pad, x.pad))).map(o => o.naam);
+
+  /* Wat niet resolveert EN als naamdeel in een bewaakt pad voorkomt, is
+     eveneens een brok van de join ('server' in `server/school`). Wat overblijft
+     is een naam die deze as werkelijk niet thuisbrengt, en dat is een gat in de
+     meting en geen nul. */
+  const delen = new Set(paden.flatMap(p => p.split('/')));
+  const onbekend = nietOpgelost.filter(n => !delen.has(n) && !padfragment.includes(n));
 
   const cellen = new Map();
   const contexten = new Set();
   for (const p of paden) {
-    const context = contextVan('server/kern/' + p);
+    const context = contextVan(p + '/');
     if (!context) continue;
     contexten.add(context);
     /* De scan leest broncode; wat hij daarmee ziet is de OPSLAG-kant. Over
        projecteren, rangschikken en tonen doet hij geen uitspraak. */
-    for (const actor of GEVAL.actoren) cellen.set(sleutel('opslaan', context, actor), true);
+    for (const actor of actorenVan(context)) cellen.set(sleutel('opslaan', context, actor), true);
   }
-  return { cellen, paden, contexten: [...contexten], bron: 'gemeten' };
+  return { cellen, paden, padfragment, nietOpgelost: onbekend, contexten: [...contexten], bron: 'gemeten' };
 }
 
 const sleutel = (h, c, a) => h + ' | ' + c + ' | ' + a;
 
 /* --------------------------------------------------------------- de uitslag */
 
-function oordeel(claimt, draagt, wacht) {
+/* DE VIJF UITKOMSTEN, en `UITGEZONDERD_IN_DOCTRINE` is er op 14 september bij
+   gekomen omdat `ONBEPAALD` twee dingen betekende die niets met elkaar te maken
+   hebben.
+
+   `ONBEPAALD` hoort te zeggen: hier claimt de doctrine niets EN niemand weet
+   waarom. Een cel waar de doctrine ZELF een uitzondering maakt, met een
+   uitgeschreven reden erbij, is het tegenovergestelde daarvan -- daar is juist
+   over nagedacht. Toch vielen die vier schoolcellen in dezelfde bak, en dan
+   leest een register vier doordachte besluiten als vier open vragen.
+
+   Zelfde regel als elders in dit huis: `ONBEKEND` is geen `WEIGEREN`, en
+   `geen-effect-gemeten` is geen `onbekend`. Wie twee uitslagen samenvoegt omdat
+   ze allebei "niet van toepassing" voelen, verliest precies het verschil waar
+   een mens naar op zoek is. */
+function oordeel(claimt, draagt, wacht, uitgezonderd) {
+  if (uitgezonderd) return 'UITGEZONDERD_IN_DOCTRINE';
   if (!claimt && wacht) return 'GEZIEN_BUITEN_CLAIM';
   if (!claimt) return 'ONBEPAALD';
   if (draagt && wacht) return 'GEDRAGEN_EN_GEZIEN';
   if (draagt) return 'GEDRAGEN_NIET_GEZIEN';
   return 'GECLAIMD_GEEN_DRAGER_GEVONDEN';
 }
-
 function meet(vormen) {
   const claim = asClaim();
   const routes = routesPerBestand();
@@ -264,13 +382,13 @@ function meet(vormen) {
   const cellen = [];
   for (const handeling of GEVAL.handelingen) {
     for (const context of GEVAL.contexten) {
-      for (const actor of GEVAL.actoren) {
+      for (const actor of actorenVan(context)) {
         const s = sleutel(handeling, context, actor);
         const c = claim.cellen.get(s) || { claimt: false };
         cellen.push({
           handeling, context, actor,
           claim: c.claimt, draag: !!draag.cellen.get(s), wacht: !!wacht.cellen.get(s),
-          uitslag: oordeel(c.claimt, !!draag.cellen.get(s), !!wacht.cellen.get(s)),
+          uitslag: oordeel(c.claimt, !!draag.cellen.get(s), !!wacht.cellen.get(s), !!c.uitgezonderd),
           ...(c.waarom ? { claimWaarom: c.waarom } : {}),
         });
       }
@@ -302,10 +420,14 @@ function draai() {
     graad: 'vermoed',
     grens: 'GEEN PERCENTAGE, en dat is een ontwerpkeuze: voor een verhouding moet eerst vaststaan wat een ' +
       'telbare eenheid is, en bij een centrale architectuur kan een objectfamilie zwaarder wegen dan twintig ' +
-      'mappen. TWEE UITSLAGEN ZIJN GEMAKKELIJK VERKEERD TE LEZEN: GECLAIMD_GEEN_DRAGER_GEVONDEN betekent ' +
+      'mappen. DRIE UITSLAGEN ZIJN GEMAKKELIJK VERKEERD TE LEZEN: GECLAIMD_GEEN_DRAGER_GEVONDEN betekent ' +
       'NIET dat er geen drager is, alleen dat DEZE sensor er geen vond -- en die ziet vandaag `opslaan` ' +
       'en `tonen`, en `projecteren` en `rangschikken` niet. GEDRAGEN_NIET_GEZIEN betekent NIET "ongetest": ' +
-      'misschien bewaakt een centrale laag de cel op een manier die deze wachtersensor niet ziet.',
+      'misschien bewaakt een centrale laag de cel op een manier die deze wachtersensor niet ziet. En ' +
+      'UITGEZONDERD_IN_DOCTRINE betekent NIET "hier mag alles": het zegt dat de doctrine op deze cel zelf een ' +
+      'uitzondering maakt, met een uitgeschreven reden die in `claimWaarom` staat -- wie die reden niet leest, ' +
+      'leest de uitslag verkeerd. Hij is met opzet gescheiden van ONBEPAALD, want dat betekent het ' +
+      'tegenovergestelde: daar weet niemand waarom er niets wordt geclaimd.',
     geval: { id: GEVAL.id, objectfamilie: GEVAL.objectfamilie, aspect: GEVAL.aspect,
       handelingen: GEVAL.handelingen, contexten: GEVAL.contexten, actoren: GEVAL.actoren },
     assen: {
@@ -336,14 +458,21 @@ function draai() {
        `sluitMetBevinding` in scripts/ritproef.js: een proef die iets echts vindt
        en maar twee uitgangen heeft -- zakken of de bevinding wegpoetsen -- levert
        op den duur alleen nog wegpoetsen op. */
-    bevinding: 'Het verbreden van de DRAAG-as naar `tonen` zette vier nieuwe cellen op GEDRAGEN_NIET_GEZIEN: ' +
-      'tonen | school | elk van de vier actoren. Dat is geen overtreding (zie `grens`), maar het stelt een ' +
-      'vraag die de CLAIM-as vandaag niet KAN beantwoorden: de uitzondering voor School is verklaard op de ' +
-      'HANDELING `opslaan` en kent geen actor. Een cijfer tonen aan de leerling zelf of aan zijn docent is ' +
-      'dezelfde leerstof als het bewaren ervan; hetzelfde cijfer tonen aan een partner of een externe lezer ' +
-      'is precies wat SCHOOL.md par. 11.1 tegenhoudt. De uitzondering is dus vermoedelijk te grof. Hem hier ' +
-      'verbreden zou een DOCTRINEBESLUIT zijn, en dat neemt een mens en geen sensor -- daarom staat hij ' +
-      'ongewijzigd en staat de vraag hier.',
+    bevinding: 'De vraag die dit register zelf stelde, is op 14 september door de eigenaar beantwoord, en ' +
+      'de uitslag is daardoor op drie punten verschoven. (1) DE UITZONDERING VOOR SCHOOL KENT NU EEN ACTOR. ' +
+      'Hij stond op de handeling `opslaan` en op niets anders, dus `tonen` viel er volledig buiten -- ook aan ' +
+      'de leerling zelf, en dat is niet vol te houden. Hij geldt nu ook voor `tonen`, maar uitsluitend richting ' +
+      '`leerling` en `docent`; tonen aan systeem, medewerker, partner of externe lezer blijft onder de grens. ' +
+      'Die vier cellen staan dus nog steeds op GEDRAGEN_NIET_GEZIEN, en dat is nu een SCHERPE bevinding in ' +
+      'plaats van een vage: het is geen open vraag meer maar een deel van de grens waar de wachter niet bij kan. ' +
+      '(2) DE ACTOR-AS KENT TWEE ACTOREN DIE ALLEEN IN SCHOOL BESTAAN. Zonder `leerling` en `docent` was het ' +
+      'besluit niet op te schrijven: de vier oorspronkelijke actoren zijn allemaal DERDEN. (3) DE WACHT-AS ZAG ' +
+      'SCHOOL HELEMAAL NIET, en dat was een defect van de sensor. Hij las het eerste vierkante haakjespaar van ' +
+      'MAPPEN en plakte er `server/kern/` voor; `server/school` staat op een losse regel eronder en viel dus ' +
+      'buiten allebei. De wachter scant School aantoonbaar (toets 3 van test/cijferopmens.test.js zakt zonder), ' +
+      'terwijl deze as meldde dat niemand daar keek. Een sensor die niet kon kijken, gaf een uitslag alsof hij ' +
+      'had gekeken -- exact de faalvorm waar dit hele geval over gaat. ONBEPAALD staat hierdoor op nul: de vier ' +
+      'cellen die daar stonden waren de doctrine-uitzondering zelf, en die heet nu UITGEZONDERD_IN_DOCTRINE.',
     cellen: m.cellen,
   };
 

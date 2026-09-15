@@ -82,7 +82,7 @@ module.exports = function maakNeigingLaag({ db, save, crypto, nu }) {
     return (r.neigingen || []).map(n => n.onderwerp);
   }
 
-  /* DE INTAKE. Geeft de volgendeVraag vraag, of `klaar` met wat er is opengegaan.
+  /* DE INTAKE. Geeft de volgende vraag, of `klaar` met wat er is opengegaan.
      Er zit geen teller in en geen "stap 2 van 5": het aantal vragen hangt af
      van de antwoorden, en een voortgangsbalk die dat suggereert liegt. */
   function intake(key) {

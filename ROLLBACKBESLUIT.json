@@ -17,10 +17,6 @@
    "bron": "server/kern/pay/budget.js",
    "citaat": "stil opruimen is erger dan niet opruimen",
    "wat blijft staan": "payIdem (de idempotentie-administratie); een lege positie alleen wanneer de terugname mislukt, en dan met de reden in het antwoord"
-  },
-  "/api/zz-ijk-verzonnen": {
-   "klasse": "veilige-kant",
-   "reden": "ijking"
   }
  }
 }

@@ -21,6 +21,10 @@ const FUNCTIES = [].concat(
   require('./cat-apps'),
   require('./cat-apps2'),
   require('./cat-life'),
+  /* ./cat-life2.js is de afsplitsing van cat-life op de omvangsgrens, en hij
+     staat HIER zodat de volgorde van FUNCTIES onveranderd blijft -- zie de
+     reden bij cat-genres hierboven. */
+  require('./cat-life2'),
   require('./cat-partners'),
   /* De drie Command-schakelaars staan sinds cat-partners.js door zijn
      omvangsgrens ging in een eigen bestand, op precies deze plek zodat de

@@ -154,6 +154,54 @@ LEZER op `levensgraaf/termijnen.js`. Par. 7 zet de volgorde vast, en de eerste
 twee regels (uitstapknop, hulpwijzer verbreden) kosten samen twee dagen en doen
 meer voor de mens uit de missie dan de acht eronder.
 
+**`CONNECT.md` is het diepte-document van Foundation Connect** -- het
+ontdeknetwerk van FoundationOS, op het scherm **Ontdekken**. In een zin: *je komt
+omdat het leuk is, je blijft omdat je nieuwsgierig wordt, en je gaat weg met iets
+wat je hebt geleerd, gemaakt, gedaan of betekend.* Lees die vóór je iets bouwt
+waarmee een mens hier iets ontdekt, leert, maakt of doorgeeft. De dragende
+bewering van het voorstel -- dat vrijwel iedere functie in dezelfde lus
+terechtkomt (ontdek, begrijp, doe, maak, deel, verbind, help, groei) -- is eerst
+**gemeten** en niet aangenomen (`npm run connectlus`, `CONNECTLUS.json`, op de
+lezer van `scripts/objectmodel.js`), want dat is exact de vorm waarin `Asset`,
+`Koopbaar`, `Moment`, `Career` en `Manier` alle vijf al sneuvelden. Uitslag over
+<!--getal:connectlus.domeinen-->23<!--/getal--> ontdekkingsdomeinen: **0 van 8 werkwoorden in álle domeinen** (ook `maak`
+niet, 21/23), **2 van 23** domeinen maken de lus rond -- en dat zijn precies de
+twee grootste, dus ze halen het door hun OMVANG en niet door hun vorm -- en **<!--getal:connectlus.combinaties-->22<!--/getal-->
+verschillende combinaties over evenveel domeinen**. De vorm eronder is even streng: <!--getal:connectlus.inAlle-->0<!--/getal-->
+van 496 velden in alle domeinen, 0 in zelfs maar de helft, **<!--getal:connectlus.domeineigenPct-->87.9<!--/getal-->% in precies
+één** (platformbreed 71%), dus de ontdekkingsdomeinen zijn MÍNDER verwant dan een
+willekeurige doorsnede van dit huis. Er komt dus geen `Ontdekking`-objecttype en
+geen contenttabel; wat overleeft is een **verklaring van werkwoorden**
+(`COMMERCE.md`'s `Koopbaar`) plus een **projectie met etiketten**
+(`kern/levensgraaf/graaf.js`). **Het getal dat het product stuurt is
+`begrijp`: <!--getal:connectlus.begrijp-->5<!--/getal--> van 23**, het zeldzaamste werkwoord van het huis -- de stap waar de
+lus op draait bestaat hier bijna nergens, en dat is de naad die deze laag vult in
+plaats van een tweede feed te bouwen. Vier dingen die je nergens anders moet
+herhalen. **De mixer verdeelt PLEKKEN en geen punten**: acht motoren dingen om
+een plek, de horizon van de mens verdeelt ze, en er wordt niets gewogen of
+gesorteerd -- zodra elke motor een getal levert en de hoogste wint, is er weer
+één algoritme met een gewichtenvector die niemand kan lezen; elke plek draagt
+daarom zijn reden in WOORDEN, en vijf motoren melden hardop dat ze niet kijken
+(`KAARTEN.md` par. 6). **Het leerdossier is een ledger en nooit een niveau**: de
+zeven treden zijn geen trap waar iemand OP staat, de hoogste wordt afgeleid per
+ONDERWERP en nergens opgeteld (een getal over alle onderwerpen ÍS een niveau), en
+elke regel draagt een graad die volgt uit WIE hem schrijft -- `toegepast` is
+`vermoed`, `gemaakt` `gemeten`, en `onderwezen` `bewezen` omdat alleen een ANDER
+hem kan zetten. Dat is meteen de reden dat hij onder de 18 mag bestaan: de vier
+voorwaarden van het besluit van 14 september staan er als code en niet als
+belofte, en valt er één weg dan geldt `progressieMag` weer. **De naklank heeft
+zes soorten en met opzet geen totaal** -- `signalen` was trouwens bezet (13
+plekken in 8 domeinen) en `weerklank` ook (KANTOOR.md), vandaar de naam. En **de
+kringladder gaat niet de kant op die hij lijkt te gaan**: de trap van een KRING
+is BEREIK en die van een RELATIE NABIJHEID, dus wie dichtbij staat ziet wat
+verder reikt -- met `kijker >= doel` kon een gezinslid het publieke werk van zijn
+eigen kind niet zien. Par. 7.1 is de eerlijke bevinding van `npm run lusproef`
+(15 schakels, 10 storingen): schakel 8 staat OPEN omdat geen van de twee
+aangesloten bronnen een maker draagt, en de eerste versie stond daar GROEN met
+`maker` uit het verzoek -- waarmee iedereen een regel `onderwezen` in het dossier
+van een willekeurig ander kon schrijven. Dat er geen maker is, is de juiste
+uitkomst; dat de lus daar nog niet sluit, is de bevinding.
+
 **`ONTMOETEN.md` is het diepte-document van de twee datingapps** — Vonk en
 Rendez-vous, en vooral waarom het er twee zijn en geen drie. In één zin: **Vonk
 zoekt de juiste mensen, Rendez-vous maakt de juiste ontmoeting** — bij Vonk is de

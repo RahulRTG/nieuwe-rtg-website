@@ -105,6 +105,21 @@ const GETALLEN = {
     wat: 'compromis-scenario\'s waarover niemand heeft gemeten' },
   'overleving.rijen': { bron: 'OVERLEVING.json', veld: 'telling.rijen',
     wat: 'compromis-scenario\'s in de overlevingsmeter' },
+  /* De lus van Foundation Connect (CONNECT.md par. 0). Drie van de vier zijn
+     een NUL of een bijna-nul, en dat is precies waarom ze hier staan: een nul
+     ziet er vers en verouderd hetzelfde uit, dus een getal dat met de hand in
+     een document is overgetypt blijft kloppen lang nadat hij dat niet meer doet.
+     Zelfde reden als bij de stagevorm hieronder. */
+  'connectlus.domeinen': { bron: 'CONNECTLUS.json', veld: 'werkwoorden.domeinen',
+    wat: 'ontdekkingsdomeinen waarover de lus is gemeten' },
+  'connectlus.combinaties': { bron: 'CONNECTLUS.json', veld: 'werkwoorden.combinaties',
+    wat: 'verschillende combinaties van werkwoorden over die domeinen' },
+  'connectlus.begrijp': { bron: 'CONNECTLUS.json', veld: 'werkwoorden.zeldzaamste.domeinen',
+    wat: 'domeinen die het zeldzaamste werkwoord (begrijp) uitvoeren' },
+  'connectlus.domeineigenPct': { bron: 'CONNECTLUS.json', veld: 'vorm.domeineigenPct',
+    wat: 'percentage velden dat in precies EEN ontdekkingsdomein staat' },
+  'connectlus.inAlle': { bron: 'CONNECTLUS.json', veld: 'vorm.inAlleDomeinen',
+    wat: 'velden die in ALLE ontdekkingsdomeinen staan' },
   'kantoor.routes': { bron: 'KANTOORMACHT.json', veld: 'gemeten.routes',
     wat: 'kantoorroutes achter /api/office en /api/boardroom' },
   'kantoor.deurEistMens': { bron: 'KANTOORMACHT.json', veld: 'gemeten.deurEistMens',

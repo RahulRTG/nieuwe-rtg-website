@@ -206,6 +206,60 @@ function bewijsVan(doel) {
   return { register, stempel, grond };
 }
 
+/* DE BEWIJSGRAAD VAN EEN SPORT, en waarom die naast de stand staat.
+
+   De stand hieronder zegt of een SOORT bewijs bestaat (staat / stap / jaren).
+   Hij zegt niets over hoe hard dat bewijs is, en dat liep op 15 september 2026
+   mis: de sport `geraakt` stond op `staat` omdat TWEE van zijn vier mechanismen
+   een gestempeld register achterlaten -- terwijl `attributie.js` zijn uitslag
+   naar een artefact van vijf dagen schrijft en `impactbereik.js` nergens draait.
+   De stand nam de STERKSTE premisse, en dat is precies verkeerd om.
+
+   Een conclusie is nooit harder dan haar zachtste premisse
+   (kern/identiteit/vertrouwen.js), en de stand van een rij is de strengste van
+   haar bewijzen (BETROUWBAARHEID.md). Daarom telt de graad van een sport de
+   ZWAKSTE van zijn mechanismen.
+
+   GEEN NIEUWE LADDER. Dit huis heeft er een, en die staat in BESTUUR.md par. 3
+   als huisregel: onbekend, vermoed, gemeten, bewezen. Een eigen woordenlijst
+   hier zou de zesde gezagsladder zijn, en dat is precies wat BEWIJSMACHINE.md
+   tegenhoudt. De vier graden worden hier afgeleid uit feiten die het mechanisme
+   al draagt en uit niets anders:
+
+     onbekend   er is geen register: we weten niet wat dit mechanisme vond.
+     vermoed    er is een register, maar het draagt geen stempel -- de uitslag
+                hoort bij geen enkele commit, of de repo kent hem niet.
+     gemeten    register plus stempel: er is een uitslag en die hoort bij een
+                commit.
+     bewezen    dat, en het mechanisme draait aan BEIDE kanten -- de uitslag is
+                gedragen en hier na te spelen.
+
+   HERKOMST EN GRAAD ZIJN TWEE ASSEN en worden nooit tot een cijfer verrekend.
+   Iets kan in de keten waargenomen zijn (gemeten) zonder daarmee bewezen te
+   zijn; dat onderscheid is het halve punt van deze meter. */
+const GRADEN = ['onbekend', 'vermoed', 'gemeten', 'bewezen'];
+
+function graadVan(m) {
+  if (!m.register) return 'onbekend';
+  if (m.stempel !== true) return 'vermoed';
+  return (m.lokaal && m.keten.length) ? 'bewezen' : 'gemeten';
+}
+
+function graadSport(mechanismen) {
+  if (!mechanismen.length) return { graad: 'onbekend', graadWaarom: 'geen enkel mechanisme draait hiervoor' };
+  let zwakste = 'bewezen', drager = null;
+  for (const m of mechanismen) {
+    const g = graadVan(m);
+    if (GRADEN.indexOf(g) < GRADEN.indexOf(zwakste)) { zwakste = g; drager = m; }
+  }
+  return {
+    graad: zwakste,
+    graadWaarom: drager
+      ? 'de zwakste premisse is ' + drager.doel + ' (' + zwakste + ')'
+      : 'elk mechanisme draagt zijn uitslag en draait aan beide kanten'
+  };
+}
+
 /* DE STAND KOMT UIT DE FEITEN, en uit niets anders. Drie standen en geen
    vierde: of een sport een BESLUIT van de eigenaar vraagt, is een oordeel over
    kosten en risico en geen eigenschap van een bestand -- dat hoort in
@@ -252,7 +306,12 @@ function meet() {
         aanleiding: [...r.aanleiding].sort(), register: bewijs.register, stempel: bewijs.stempel, grond: bewijs.grond });
     }
     const { stand, waarom } = standVan(mechanismen);
-    return { id: sport.id, naam: sport.naam, wat: sport.wat, stand, waarom, mechanismen };
+    /* De graad staat NAAST de stand en vervangt hem niet: de stand zegt of dit
+       soort bewijs bestaat, de graad hoe hard het is. Twee assen, nooit een
+       cijfer. */
+    const { graad, graadWaarom } = graadSport(mechanismen);
+    return { id: sport.id, naam: sport.naam, wat: sport.wat, stand, waarom, graad, graadWaarom,
+      mechanismen: mechanismen.map((m) => Object.assign({}, m, { graad: graadVan(m) })) };
   });
 
   const zonderTrede = [...keten.values()].filter(r => !gebruikt.has(r.doel))
@@ -282,12 +341,17 @@ function meet() {
       staat: sporten.filter(s => s.stand === 'staat').length,
       stap: sporten.filter(s => s.stand === 'stap').length,
       jaren: sporten.filter(s => s.stand === 'jaren').length,
+      /* Per GRAAD, naast per stand. Nooit opgeteld: het zijn twee assen. */
+      graadBewezen: sporten.filter(s => s.graad === 'bewezen').length,
+      graadGemeten: sporten.filter(s => s.graad === 'gemeten').length,
+      graadVermoed: sporten.filter(s => s.graad === 'vermoed').length,
+      graadOnbekend: sporten.filter(s => s.graad === 'onbekend').length,
       alleenKeten: sporten.reduce((n, s) => n + s.mechanismen.filter(m => !m.lokaal).length, 0),
       zonderTrede: zonderTrede.length
     } };
 }
 
-module.exports = { LADDER, meet, bewijsVan, standVan, REGISTER };
+module.exports = { LADDER, meet, bewijsVan, standVan, REGISTER , graadVan, graadSport, GRADEN };
 
 /* ==========================================================================
    DE UITVOER
@@ -323,7 +387,14 @@ if (require.main === module) {
     ' -- de sporten zijn verklaard, de mechanismen erop zijn gemeten' + K.uit + '\n');
   for (const s of uitslag.sporten) {
     const kleur = s.stand === 'staat' ? K.groen : s.stand === 'jaren' ? K.rood : K.geel;
-    console.log('  ' + kleur + s.stand.padEnd(6) + K.uit + ' ' + K.vet + s.naam + K.uit + K.dim + ' -- ' + s.wat + K.uit);
+    /* DE GRAAD STAAT ERNAAST EN NIET ERACHTER. Een sport kan `staat` zijn en
+       toch maar `vermoed` dragen: het soort bewijs bestaat, maar de zwakste
+       premisse draagt zijn uitslag niet. Wie alleen de stand leest, leest de
+       sterkste premisse -- en dat was de fout. */
+    const gk = s.graad === 'bewezen' ? K.groen : s.graad === 'onbekend' ? K.rood : K.geel;
+    console.log('  ' + kleur + s.stand.padEnd(6) + K.uit + gk + s.graad.padEnd(9) + K.uit +
+      ' ' + K.vet + s.naam + K.uit + K.dim + ' -- ' + s.wat + K.uit);
+    if (s.graad !== 'bewezen') console.log('         ' + K.dim + s.graadWaarom + K.uit);
     console.log('         ' + K.dim + s.waarom + K.uit);
     for (const m of s.mechanismen)
       console.log('         ' + (m.lokaal ? '  ' : K.geel + '! ' + K.uit) + m.doel.replace(/^scripts\//, '').padEnd(30) +

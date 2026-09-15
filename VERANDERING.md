@@ -337,7 +337,18 @@ is `vermoed`, *bedraad* is `gemeten`, *bewezen* is `bewezen` — en ze hebben al
 lezers. De sport hoort dus een **bewijsgraad** te krijgen en geen nieuwe
 woordenlijst. **Bewust nog niet gebouwd**: het verandert de standen van
 `BEWIJSLADDER.json`, en daarmee de normtand `bewijsAlleenKeten` en zijn toetsen.
-Dat vóór de correctie bouwen zou het verkeerde bouwen.
+De eigenaar heeft die correctie overgenomen ("doe het met de bestaande vier graden"), en **het staat**:
+`scripts/bewijsladder.js` geeft elke sport een **graad** naast zijn stand, afgeleid uit feiten
+die het mechanisme al draagt -- geen register is `onbekend`, een register zonder stempel is
+`vermoed` (de uitslag hoort bij geen commit), register plus stempel is `gemeten`, en dat plus
+draaien aan beide kanten is `bewezen`. De graad van een sport is de **zwakste** van zijn
+mechanismen, want een conclusie is nooit harder dan haar zachtste premisse.
+
+Uitslag voor de sport waar het om begon: **stand `staat`, graad `vermoed`** -- en hij noemt de
+zwakste premisse bij naam (`attributie.js`, die zijn uitslag naar een artefact van vijf dagen
+schrijft). `veranderbereik.js` haalt `gemeten` en niet `bewezen`, want hij draait alleen in de
+keten. De stand is bewust NIET aangeraakt: stand en graad zijn twee assen -- de een zegt of dit
+soort bewijs bestaat, de ander hoe hard het is -- en ze worden nooit tot een cijfer verrekend.
 
 **3. Property-based testing komt er, en begint bij de wetten.** Niet willekeurige
 invoer op een scherm, maar de invarianten waar de hoogste veiligheidswinst zit:

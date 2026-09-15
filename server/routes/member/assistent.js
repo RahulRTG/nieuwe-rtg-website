@@ -6,6 +6,7 @@ module.exports = (kern) => {
   const { app, auth, anthropic, aiSystemPrompt, cannedAnswer, trChat, convOf, talen,
     memberSays, accounts, ledenInhoudVan } = kern;
   const aiStatus = () => require('../../ai-stand').beschikbaarheid(anthropic);
+  const meting = require('../../kern/ai/routermeting');
 
   app.post('/api/ai/status', auth, (req, res) => res.json(aiStatus()));
 
@@ -25,6 +26,13 @@ module.exports = (kern) => {
       return res.status(400).json({ error: 'Geen vraag ontvangen.' });
     }
 
+    /* De vraag en de reis staan hier al klaar, want de schaduwmeting onderaan
+       heeft ze allebei nodig en tweemaal opzoeken is twee waarheden. */
+    const vraag = history[history.length - 1].content;
+    const eigenReis = (ledenInhoudVan ? (ledenInhoudVan(req.session.key) || {}) : {}).trip || null;
+    const meet = (modelAntwoordde) => meting.meet(vraag,
+      { ingang: 'ai', pas: req.session.tier, reis: eigenReis, modelAntwoordde });
+
     if (anthropic) {
       try {
         const response = await anthropic.messages.create({
@@ -39,6 +47,7 @@ module.exports = (kern) => {
           .join('\n')
           .trim();
         const stand = aiStatus();
+        meet(true);
         return res.json({ reply: reply || 'Excuses, ik heb geen antwoord kunnen formuleren.', source: 'ai', ai: true,
           modus: stand.modus, verwerking: stand.verwerking, kompas: stand.kompas });
       } catch (e) {
@@ -50,11 +59,11 @@ module.exports = (kern) => {
        eerst niet mee, en dit is de aanroep die zonder API-sleutel ALTIJD loopt
        -- dus in elke demo en de hele suite kreeg een RTG Pass-lid de u-vorm. */
     const stand = aiStatus();
-    /* En de REIS gaat mee, om dezelfde reden als de pas: zonder reis noemt
-       Rahul geen bestemming. Deze antwoorden waren geschreven voor de demo-reis
-       uit de seed en gingen zo ook naar leden die nergens heen gingen. */
-    const eigenReis = (ledenInhoudVan ? (ledenInhoudVan(req.session.key) || {}) : {}).trip || null;
-    res.json({ reply: cannedAnswer(history[history.length - 1].content, req.session.tier, eigenReis), source: 'regels', ai: false,
+    /* De REIS ging hierboven al mee, om dezelfde reden als de pas: zonder reis
+       noemt Rahul geen bestemming. Deze antwoorden waren geschreven voor de
+       demo-reis uit de seed en gingen zo ook naar leden die nergens heen gingen. */
+    meet(false);
+    res.json({ reply: cannedAnswer(vraag, req.session.tier, eigenReis), source: 'regels', ai: false,
       modus: 'handmatig', verwerking: 'geen-model', kompas: stand.kompas });
   });
 

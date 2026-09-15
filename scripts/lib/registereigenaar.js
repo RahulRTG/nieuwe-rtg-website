@@ -61,6 +61,13 @@ const EIGENAAR = {
   'DOORBELASTING.json': { schrijver: 'scripts/doorbelasting.js' },
 
   /* De lagen die in deze tak zijn gebouwd. */
+  /* ROUTER.json is de enige hier die NIET in de repo staat (.gitignore), en dat
+     is geen uitzondering op deze lijst maar de reden dat hij erop hoort: hij
+     wordt op elke installatie geschreven, dus zonder verklaring telt hij overal
+     waar iemand `npm run router` draait als een register zonder eigenaar. Hij is
+     een WAARNEMING uit server/data/ en geen afleiding uit de bron -- zie de kop
+     van scripts/router.js. */
+  'ROUTER.json': { schrijver: 'scripts/router.js' },
   'IDEMIDENTITEIT.json': { schrijver: 'scripts/idemidentiteit.js' },
   'DOCTRINE.json': { schrijver: 'scripts/doctrine.js' },
   'VERBAND.json': { schrijver: 'scripts/verband.js' },

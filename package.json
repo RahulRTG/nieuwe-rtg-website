@@ -396,7 +396,8 @@
     "zaakliveproef:vast": "node scripts/zaakliveproef.js --vastleggen",
     "omzetproef": "node scripts/omzetproef.js",
     "omzetproef:vast": "node scripts/omzetproef.js --vastleggen",
-    "idemidentiteit": "node scripts/idemidentiteit.js"
+    "idemidentiteit": "node scripts/idemidentiteit.js",
+    "router": "node scripts/router.js"
   },
   "devDependencies": {
     "playwright": "^1.63.0"

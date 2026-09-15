@@ -60,7 +60,7 @@ van stil meegeteld.
 
 ## 1. Wat er gemeten is
 
-<!--getal:machine.muterend-->3794<!--/getal--> muterende routes. Per as het
+<!--getal:machine.muterend-->3796<!--/getal--> muterende routes. Per as het
 aantal routes dat hem raakt (`handler` / `bestand`):
 
 | as | handler | bestand | motor |
@@ -101,8 +101,8 @@ de teller zakt naar 0 met de naam van die as erbij; dat is nagetrokken door
 
 **De drie getallen die de richting bepalen:**
 
-1. <!--getal:machine.zonderAs-->2785<!--/getal--> van de
-   <!--getal:machine.muterend-->3794<!--/getal--> muterende routes raken **geen
+1. <!--getal:machine.zonderAs-->2787<!--/getal--> van de
+   <!--getal:machine.muterend-->3796<!--/getal--> muterende routes raken **geen
    enkele** as — zelfs niet op de ruime bestandsas.
 
    **Let op de noemer: die is op 14 september 2026 verschoven, en een ronde van
